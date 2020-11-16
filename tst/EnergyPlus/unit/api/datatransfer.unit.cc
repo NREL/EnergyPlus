@@ -245,7 +245,7 @@ public:
     {
         this->pluginManager.addGlobalVariable(newGlobalVarName);
         int i = EnergyPlus::PluginManagement::PluginManager::getGlobalVariableHandle(state, newGlobalVarName, true);
-        EnergyPlus::PluginManagement::trends.emplace_back(trendName, numTrendValues, i);
+        EnergyPlus::PluginManagement::trends.emplace_back(state, trendName, numTrendValues, i);
     }
 
     void simulateTimeStepAndReport()

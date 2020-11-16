@@ -130,7 +130,7 @@ std::unique_ptr<SQLite> CreateSQLiteDatabase(EnergyPlusData &state)
 void CreateSQLiteZoneExtendedOutput(EnergyPlusData &state)
 {
     if (sqlite && sqlite->writeOutputToSQLite()) {
-        for (int zoneNum = 1; zoneNum <= DataGlobals::NumOfZones; ++zoneNum) {
+        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
             sqlite->addZoneData(zoneNum, DataHeatBalance::Zone(zoneNum));
         }
         for (int listNum = 1; listNum <= DataHeatBalance::NumOfZoneLists; ++listNum) {
@@ -192,7 +192,7 @@ void CreateSQLiteZoneExtendedOutput(EnergyPlusData &state)
         for (int ventNum = 1; ventNum <= DataHeatBalance::TotVentilation; ++ventNum) {
             sqlite->addVentilationData(ventNum, DataHeatBalance::Ventilation(ventNum));
         }
-        for (int zoneNum = 1; zoneNum <= DataGlobals::NumOfZones; ++zoneNum) {
+        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
             sqlite->addRoomAirModelData(zoneNum, DataRoomAirModel::AirModel(zoneNum));
         }
 
@@ -1508,7 +1508,7 @@ void SQLite::createSQLiteReportDataRecord(int const recordIndex,
 }
 
 void SQLite::createSQLiteTimeIndexRecord(int const reportingInterval,
-                                         int const EP_UNUSED(recordIndex),
+                                         [[maybe_unused]] int const recordIndex,
                                          int const cumlativeSimulationDays,
                                          int const curEnvirNum,
                                          int const simulationYear,

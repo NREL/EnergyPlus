@@ -138,10 +138,11 @@ namespace Pipes {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void LocalPipeData::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
-                                 bool const EP_UNUSED(FirstHVACIteration),
-                                 Real64 &EP_UNUSED(CurLoad),
-                                 bool const EP_UNUSED(RunFlag))
+    void LocalPipeData::simulate(EnergyPlusData &state,
+                                 [[maybe_unused]] const PlantLocation &calledFromLocation,
+                                 [[maybe_unused]] bool const FirstHVACIteration,
+                                 [[maybe_unused]] Real64 &CurLoad,
+                                 [[maybe_unused]] bool const RunFlag)
     {
         if (this->OneTimeInit) {
             int FoundOnLoop = 0;

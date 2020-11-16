@@ -112,7 +112,6 @@ namespace PackagedThermalStorageCoil {
 
     // Using/Aliasing
     using namespace DataLoopNode;
-    using namespace DataGlobals;
     using namespace Psychrometrics;
     using DataEnvironment::CurMnDy;
     using DataEnvironment::EnvironmentName;
@@ -1807,7 +1806,7 @@ namespace PackagedThermalStorageCoil {
             }
         }
 
-        if (AnyEnergyManagementSystemInModel) {
+        if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
             for (item = 1; item <= NumTESCoils; ++item) {
                 // setup EMS actuator for control mode
                 SetupEMSActuator("Coil:Cooling:DX:SingleSpeed:ThermalStorage",
@@ -1960,7 +1959,7 @@ namespace PackagedThermalStorageCoil {
 
         if (!state.dataGlobal->BeginEnvrnFlag) MyEnvrnFlag(TESCoilNum) = true;
 
-        if (MyWarmupFlag(TESCoilNum) && (!WarmupFlag)) {
+        if (MyWarmupFlag(TESCoilNum) && (!state.dataGlobal->WarmupFlag)) {
             // reset to initial condition once warm up is over.
             TESCoil(TESCoilNum).IceFracRemain = 0.0;
             TESCoil(TESCoilNum).IceFracRemainLastTimestep = 0.0;
@@ -1969,7 +1968,7 @@ namespace PackagedThermalStorageCoil {
             MyWarmupFlag(TESCoilNum) = false;
         }
 
-        if (WarmupFlag) MyWarmupFlag(TESCoilNum) = true;
+        if (state.dataGlobal->WarmupFlag) MyWarmupFlag(TESCoilNum) = true;
 
         // determine control mode
         if (GetCurrentScheduleValue(state, TESCoil(TESCoilNum).AvailSchedNum) != 0.0) {
@@ -1991,7 +1990,7 @@ namespace PackagedThermalStorageCoil {
                             ShowContinueError(state, "Value returned from schedule =" + RoundSigDigits(tmpSchedValue, 8));
                             ShowContinueError(state, "Operating mode will be set to Off, and the simulation continues");
                         }
-                        ShowRecurringSevereErrorAtEnd("InitTESCoil: Invalid control schedule value for TES operating mode, set to Off",
+                        ShowRecurringSevereErrorAtEnd(state, "InitTESCoil: Invalid control schedule value for TES operating mode, set to Off",
                                                       TESCoil(TESCoilNum).ControlModeErrorIndex,
                                                       tmpSchedValue,
                                                       tmpSchedValue);
@@ -2054,7 +2053,7 @@ namespace PackagedThermalStorageCoil {
                                 ShowContinueError(state, "Value returned from EMS =" + RoundSigDigits(TESCoil(TESCoilNum).EMSControlModeValue, 8));
                                 ShowContinueError(state, "Operating mode will be set to Off, and the simulation continues");
                             }
-                            ShowRecurringSevereErrorAtEnd("InitTESCoil: Invalid control schedule value for TES operating mode, set to Off",
+                            ShowRecurringSevereErrorAtEnd(state, "InitTESCoil: Invalid control schedule value for TES operating mode, set to Off",
                                                           TESCoil(TESCoilNum).ControlModeErrorIndex,
                                                           TESCoil(TESCoilNum).EMSControlModeValue,
                                                           TESCoil(TESCoilNum).EMSControlModeValue);
@@ -2463,7 +2462,7 @@ namespace PackagedThermalStorageCoil {
         }
     }
 
-    void CalcTESCoilCoolingOnlyMode(EnergyPlusData &state, int const TESCoilNum, int const EP_UNUSED(FanOpMode), Real64 const PartLoadRatio)
+    void CalcTESCoilCoolingOnlyMode(EnergyPlusData &state, int const TESCoilNum, [[maybe_unused]] int const FanOpMode, Real64 const PartLoadRatio)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2769,7 +2768,8 @@ namespace PackagedThermalStorageCoil {
         }
     }
 
-    void CalcTESCoilCoolingAndChargeMode(EnergyPlusData &state, int const TESCoilNum, int const EP_UNUSED(FanOpMode), Real64 const PartLoadRatio)
+    void
+    CalcTESCoilCoolingAndChargeMode(EnergyPlusData &state, int const TESCoilNum, [[maybe_unused]] int const FanOpMode, Real64 const PartLoadRatio)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3200,7 +3200,8 @@ namespace PackagedThermalStorageCoil {
         }
     }
 
-    void CalcTESCoilCoolingAndDischargeMode(EnergyPlusData &state, int const TESCoilNum, int const EP_UNUSED(FanOpMode), Real64 const PartLoadRatio)
+    void
+    CalcTESCoilCoolingAndDischargeMode(EnergyPlusData &state, int const TESCoilNum, [[maybe_unused]] int const FanOpMode, Real64 const PartLoadRatio)
     {
 
         // SUBROUTINE INFORMATION:
@@ -4192,7 +4193,7 @@ namespace PackagedThermalStorageCoil {
                     Par(5) = double(FanOpMode);
                     TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFlag, PartLoadFrac, TESCoilResidualFunction, 0.0, 1.0, Par);
                     if (SolFlag == -1) {
-                        if (!WarmupFlag) {
+                        if (!state.dataGlobal->WarmupFlag) {
                             if (SensPLRIter < 1) {
                                 ++SensPLRIter;
                                 ShowWarningError(state, SystemType +
@@ -4202,7 +4203,7 @@ namespace PackagedThermalStorageCoil {
                                 ShowContinueErrorTimeStamp(state,
                                     "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
                             }
-                            ShowRecurringWarningErrorAtEnd(SystemType + " \"" + CoilName +
+                            ShowRecurringWarningErrorAtEnd(state, SystemType + " \"" + CoilName +
                                                                "\" - Iteration limit exceeded calculating sensible part-load ratio error continues. "
                                                                "Sensible PLR statistics follow.",
                                                            SensPLRIterIndex,
@@ -4211,7 +4212,7 @@ namespace PackagedThermalStorageCoil {
                         }
                     } else if (SolFlag == -2) {
                         PartLoadFrac = ReqOutput / FullOutput;
-                        if (!WarmupFlag) {
+                        if (!state.dataGlobal->WarmupFlag) {
                             if (SensPLRFail < 1) {
                                 ++SensPLRFail;
                                 ShowWarningError(state,
@@ -4222,7 +4223,7 @@ namespace PackagedThermalStorageCoil {
                                 ShowContinueErrorTimeStamp(state,
                                     "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
                             }
-                            ShowRecurringWarningErrorAtEnd(
+                            ShowRecurringWarningErrorAtEnd(state,
                                 SystemType + " \"" + CoilName +
                                     "\" - DX unit sensible part-load ratio calculation failed error continues. Sensible PLR statistics follow.",
                                 SensPLRFailIndex,
@@ -4259,7 +4260,7 @@ namespace PackagedThermalStorageCoil {
                         Par(5) = double(FanOpMode);
                         TempSolveRoot::SolveRoot(state, HumRatAcc, MaxIte, SolFlag, PartLoadFrac, TESCoilHumRatResidualFunction, 0.0, 1.0, Par);
                         if (SolFlag == -1) {
-                            if (!WarmupFlag) {
+                            if (!state.dataGlobal->WarmupFlag) {
                                 if (LatPLRIter < 1) {
                                     ++LatPLRIter;
                                     ShowWarningError(state, SystemType +
@@ -4269,7 +4270,7 @@ namespace PackagedThermalStorageCoil {
                                     ShowContinueErrorTimeStamp(state,
                                         "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
                                 }
-                                ShowRecurringWarningErrorAtEnd(SystemType + " \"" + CoilName +
+                                ShowRecurringWarningErrorAtEnd(state, SystemType + " \"" + CoilName +
                                                                    "\" - Iteration limit exceeded calculating latent part-load ratio error "
                                                                    "continues. Latent PLR statistics follow.",
                                                                LatPLRIterIndex,
@@ -4283,7 +4284,7 @@ namespace PackagedThermalStorageCoil {
                             } else {
                                 PartLoadFrac = 1.0;
                             }
-                            if (!WarmupFlag) {
+                            if (!state.dataGlobal->WarmupFlag) {
                                 if (LatPLRFail < 1) {
                                     ++LatPLRFail;
                                     ShowWarningError(state,
@@ -4294,7 +4295,7 @@ namespace PackagedThermalStorageCoil {
                                     ShowContinueErrorTimeStamp(state,
                                         "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
                                 }
-                                ShowRecurringWarningErrorAtEnd(
+                                ShowRecurringWarningErrorAtEnd(state,
                                     SystemType + " \"" + CoilName +
                                         "\" - DX unit latent part-load ratio calculation failed error continues. Latent PLR statistics follow.",
                                     LatPLRFailIndex,
@@ -4536,9 +4537,6 @@ namespace PackagedThermalStorageCoil {
 
         // Using/Aliasing
         using DataBranchAirLoopPlant::MassFlowTolerance;
-        using DataGlobals::HourOfDay;
-        using DataGlobals::TimeStep;
-        using DataGlobals::TimeStepZone;
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
         using DataPlant::PlantLoop;
@@ -4583,7 +4581,7 @@ namespace PackagedThermalStorageCoil {
         SecInTimeStep = TimeStepSys * DataGlobalConstants::SecInHour();
         TimeRemaining = SecInTimeStep;
 
-        TimeElapsed = HourOfDay + TimeStep * TimeStepZone + SysTimeElapsed;
+        TimeElapsed = state.dataGlobal->HourOfDay + state.dataGlobal->TimeStep * state.dataGlobal->TimeStepZone + SysTimeElapsed;
 
         if (TESCoil(TESCoilNum).TimeElapsed != TimeElapsed) {
             TESCoil(TESCoilNum).FluidTankTempFinalLastTimestep = TESCoil(TESCoilNum).FluidTankTempFinal;
@@ -4676,9 +4674,6 @@ namespace PackagedThermalStorageCoil {
 
         // Using/Aliasing
         using DataBranchAirLoopPlant::MassFlowTolerance;
-        using DataGlobals::HourOfDay;
-        using DataGlobals::TimeStep;
-        using DataGlobals::TimeStepZone;
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
         using DataPlant::PlantLoop;
@@ -4703,7 +4698,7 @@ namespace PackagedThermalStorageCoil {
         Real64 TimeElapsed;   // Fraction of the current hour that has elapsed (h)
         Real64 NewOutletTemp; // calculated new tankoutlet temp (C)
 
-        TimeElapsed = HourOfDay + TimeStep * TimeStepZone + SysTimeElapsed;
+        TimeElapsed = state.dataGlobal->HourOfDay + state.dataGlobal->TimeStep * state.dataGlobal->TimeStepZone + SysTimeElapsed;
 
         if (TESCoil(TESCoilNum).TimeElapsed != TimeElapsed) {
             TESCoil(TESCoilNum).IceFracRemainLastTimestep = TESCoil(TESCoilNum).IceFracRemain;

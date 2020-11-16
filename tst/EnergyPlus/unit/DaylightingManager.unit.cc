@@ -837,16 +837,16 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
     EXPECT_FALSE(foundErrors);                       // expect no errors
     HeatBalanceIntRadExchange::InitSolarViewFactors(state);
 
-    DataGlobals::NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
-    DataGlobals::MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
+    state.dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
+    state.dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(state);
     ScheduleManager::ScheduleInputProcessed = true;
-    DataGlobals::TimeStep = 1;
-    DataGlobals::HourOfDay = 1;
-    DataGlobals::PreviousHour = 1;
+    state.dataGlobal->TimeStep = 1;
+    state.dataGlobal->HourOfDay = 1;
+    state.dataGlobal->PreviousHour = 1;
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
-    DataGlobals::HourOfDay = 1;
+    state.dataGlobal->HourOfDay = 1;
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
@@ -880,8 +880,8 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
     EXPECT_NEAR(0.9, ZoneDaylight(1).DaylRefPtAbsCoord(3, 1), 0.001);
 
     state.dataGlobal->BeginSimFlag = true;
-    DataGlobals::WeightNow = 1.0;
-    DataGlobals::WeightPreviousHour = 0.0;
+    state.dataGlobal->WeightNow = 1.0;
+    state.dataGlobal->WeightPreviousHour = 0.0;
     CalcDayltgCoefficients(state);
     int zoneNum = 1;
     // test that tmp arrays are allocated to correct dimension
@@ -926,8 +926,8 @@ TEST_F(EnergyPlusFixture, DaylightingManager_ProfileAngle_Test)
 
 TEST_F(EnergyPlusFixture, AssociateWindowShadingControlWithDaylighting_Test)
 {
-    DataGlobals::NumOfZones = 4;
-    ZoneDaylight.allocate(DataGlobals::NumOfZones);
+    state.dataGlobal->NumOfZones = 4;
+    ZoneDaylight.allocate(state.dataGlobal->NumOfZones);
     ZoneDaylight(1).Name = "ZD1";
     ZoneDaylight(2).Name = "ZD2";
     ZoneDaylight(3).Name = "ZD3";
@@ -988,8 +988,8 @@ TEST_F(EnergyPlusFixture, CreateShadeDeploymentOrder_test)
     WindowShadingControl(3).FenestrationIndex(1) = 8;
     WindowShadingControl(3).FenestrationIndex(2) = 9;
 
-    DataGlobals::NumOfZones = zn;
-    ZoneDaylight.allocate(DataGlobals::NumOfZones);
+    state.dataGlobal->NumOfZones = zn;
+    ZoneDaylight.allocate(state.dataGlobal->NumOfZones);
 
     CreateShadeDeploymentOrder(zn);
 
@@ -1059,8 +1059,8 @@ TEST_F(EnergyPlusFixture, MapShadeDeploymentOrderToLoopNumber_Test)
     WindowShadingControl(3).FenestrationIndex(1) = 8;
     WindowShadingControl(3).FenestrationIndex(2) = 9;
 
-    DataGlobals::NumOfZones = zn;
-    ZoneDaylight.allocate(DataGlobals::NumOfZones);
+    state.dataGlobal->NumOfZones = zn;
+    ZoneDaylight.allocate(state.dataGlobal->NumOfZones);
 
     CreateShadeDeploymentOrder(zn);
 
@@ -1307,12 +1307,12 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    DataGlobals::NumOfTimeStepInHour = 1;
+    state.dataGlobal->NumOfTimeStepInHour = 1;
     ScheduleManager::ProcessScheduleInput(state);
     ScheduleManager::ScheduleInputProcessed = true;
-    DataGlobals::TimeStep = 1;
-    DataGlobals::HourOfDay = 10;
-    DataGlobals::PreviousHour = 10;
+    state.dataGlobal->TimeStep = 1;
+    state.dataGlobal->HourOfDay = 10;
+    state.dataGlobal->PreviousHour = 10;
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
     DataEnvironment::DSTIndicator = 0;
@@ -1343,7 +1343,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
     DaylightingManager::GetInputDayliteRefPt(state, foundErrors);
     DaylightingManager::GetDaylightingParametersInput(state);
     DaylightingManager::GILSK = 100.0;
-    DataGlobals::WeightNow = 1.0;
+    state.dataGlobal->WeightNow = 1.0;
     DataEnvironment::HISUNF = 100.0;
     DataEnvironment::HISKF = 100.0;
     DataEnvironment::SkyClearness = 6.0;
@@ -1371,11 +1371,11 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
     // Set un-shaded surface illuminance factor to 1.0 for RefPt1, 0.1 for RefPt2
     // Set shaded surface illuminance factor to 0.5 for RefPt1, 0.05 for RefPt2
     int RefPt = 1;
-    ZoneDaylight(ZoneNum).DaylIllFacSky(DataGlobals::HourOfDay, Unshaded, ISky, RefPt, DayltgExtWin) = 1.0;
-    ZoneDaylight(ZoneNum).DaylIllFacSky(DataGlobals::HourOfDay, Shaded, ISky, RefPt, DayltgExtWin) = 0.5;
+    ZoneDaylight(ZoneNum).DaylIllFacSky(state.dataGlobal->HourOfDay, Unshaded, ISky, RefPt, DayltgExtWin) = 1.0;
+    ZoneDaylight(ZoneNum).DaylIllFacSky(state.dataGlobal->HourOfDay, Shaded, ISky, RefPt, DayltgExtWin) = 0.5;
     RefPt = 2;
-    ZoneDaylight(ZoneNum).DaylIllFacSky(DataGlobals::HourOfDay, Unshaded, ISky, RefPt, DayltgExtWin) = 0.1;
-    ZoneDaylight(ZoneNum).DaylIllFacSky(DataGlobals::HourOfDay, Shaded, ISky, RefPt, DayltgExtWin) = 0.05;
+    ZoneDaylight(ZoneNum).DaylIllFacSky(state.dataGlobal->HourOfDay, Unshaded, ISky, RefPt, DayltgExtWin) = 0.1;
+    ZoneDaylight(ZoneNum).DaylIllFacSky(state.dataGlobal->HourOfDay, Shaded, ISky, RefPt, DayltgExtWin) = 0.05;
 
     // Window5 model - expect 100 for unshaded and 50 for shaded (10 and 5 for RefPt2)
     SurfWinWindowModelType(IWin) = Window5DetailedModel;
@@ -2111,16 +2111,16 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
     EXPECT_FALSE(foundErrors);                       // expect no errors
     HeatBalanceIntRadExchange::InitSolarViewFactors(state);
 
-    DataGlobals::NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
-    DataGlobals::MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
+    state.dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
+    state.dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(state);
     ScheduleManager::ScheduleInputProcessed = true;
-    DataGlobals::TimeStep = 1;
-    DataGlobals::HourOfDay = 1;
-    DataGlobals::PreviousHour = 1;
+    state.dataGlobal->TimeStep = 1;
+    state.dataGlobal->HourOfDay = 1;
+    state.dataGlobal->PreviousHour = 1;
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
-    DataGlobals::HourOfDay = 1;
+    state.dataGlobal->HourOfDay = 1;
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
@@ -2159,8 +2159,8 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
     EXPECT_FALSE(has_dfs_output(true));
 
     state.dataGlobal->BeginSimFlag = true;
-    DataGlobals::WeightNow = 1.0;
-    DataGlobals::WeightPreviousHour = 0.0;
+    state.dataGlobal->WeightNow = 1.0;
+    state.dataGlobal->WeightPreviousHour = 0.0;
     CalcDayltgCoefficients(state);
     int zoneNum = 1;
     // test that tmp arrays are allocated to correct dimension

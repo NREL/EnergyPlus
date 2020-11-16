@@ -49,10 +49,9 @@
 #include <ObjexxFCL/Array.functions.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataRoomAirModel.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HybridModel.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -77,10 +76,8 @@ namespace HybridModel {
     // USE STATEMENTS:
 
     // Using/Aliasing
-    using namespace DataGlobals;
     using namespace DataHeatBalance;
     using namespace DataRoomAirModel;
-    using General::CheckCreatedZoneItemName;
 
     bool FlagHybridModel(false);    // True if hybrid model is activated
     bool FlagHybridModel_TM(false); // User input IM option - True if hybrid model (thermal mass) is activated
@@ -139,7 +136,7 @@ namespace HybridModel {
         // Read hybrid model input
         CurrentModuleObject = "HybridModel:Zone";
         NumOfHybridModelZones = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-        HybridModelZone.allocate(NumOfZones);
+        HybridModelZone.allocate(state.dataGlobal->NumOfZones);
 
         if (NumOfHybridModelZones > 0) {
 
@@ -452,7 +449,7 @@ namespace HybridModel {
 
             // RoomAirModelType should be Mixing if Hybrid Modeling is performed for the zone
             if (FlagHybridModel) {
-                for (ZonePtr = 1; ZonePtr <= NumOfZones; ZonePtr++) {
+                for (ZonePtr = 1; ZonePtr <= state.dataGlobal->NumOfZones; ZonePtr++) {
                     if ((HybridModelZone(ZonePtr).InternalThermalMassCalc_T || HybridModelZone(ZonePtr).InfiltrationCalc_T) &&
                         (AirModel(ZonePtr).AirModelType != RoomAirModel_Mixing)) {
                         AirModel(ZonePtr).AirModelType = RoomAirModel_Mixing;

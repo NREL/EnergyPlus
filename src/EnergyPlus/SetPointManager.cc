@@ -141,9 +141,6 @@ namespace SetPointManager {
     using DataEnvironment::OutDryBulbTemp;
     using DataEnvironment::OutHumRat;
     using DataEnvironment::OutWetBulbTemp;
-    using DataGlobals::MetersHaveBeenInitialized;
-    using DataGlobals::NumOfZones;
-    using DataGlobals::RunOptCondEntTemp;
     using namespace ScheduleManager;
     using DataHVACGlobals::NumPrimaryAirSys;
     using namespace CurveManager;
@@ -3670,7 +3667,7 @@ namespace SetPointManager {
         lNumericFieldBlanks.deallocate();
     }
 
-    void VerifySetPointManagers(EnergyPlusData &state, bool &EP_UNUSED(ErrorsFound)) // flag to denote node conflicts in input. !unused1208
+    void VerifySetPointManagers(EnergyPlusData &state, [[maybe_unused]] bool &ErrorsFound) // flag to denote node conflicts in input. !unused1208
     {
 
         // SUBROUTINE INFORMATION:
@@ -3905,7 +3902,7 @@ namespace SetPointManager {
                     ZoneNode = SingZoneHtSetPtMgr(SetPtMgrNum).ZoneNodeNum;
                     // find the index in the ZoneEquipConfig array of the control zone (the one with the main or only thermostat)
                     ConZoneNum = 0;
-                    for (ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum) {
+                    for (ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
                         if (ZoneEquipConfig(ControlledZoneNum).ZoneNode == ZoneNode) {
                             ConZoneNum = ControlledZoneNum;
                         }
@@ -3937,7 +3934,7 @@ namespace SetPointManager {
                     ZoneNode = SingZoneClSetPtMgr(SetPtMgrNum).ZoneNodeNum;
                     // find the index in the ZoneEquipConfig array of the control zone (the one with the main or only thermostat)
                     ConZoneNum = 0;
-                    for (ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum) {
+                    for (ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
                         if (ZoneEquipConfig(ControlledZoneNum).ZoneNode == ZoneNode) {
                             ConZoneNum = ControlledZoneNum;
                         }
@@ -3967,7 +3964,7 @@ namespace SetPointManager {
                 for (SetPtMgrNum = 1; SetPtMgrNum <= NumSZMinHumSetPtMgrs; ++SetPtMgrNum) {
                     for (SetZoneNum = 1; SetZoneNum <= SZMinHumSetPtMgr(SetPtMgrNum).NumZones; ++SetZoneNum) {
                         // set the actual and controlled zone numbers
-                        for (ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum) {
+                        for (ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
                             if (ZoneEquipConfig(ControlledZoneNum).ZoneNode == SZMinHumSetPtMgr(SetPtMgrNum).ZoneNodes(SetZoneNum)) {
                                 SZMinHumSetPtMgr(SetPtMgrNum).CtrlZoneNum(SetZoneNum) = ControlledZoneNum;
                                 SZMinHumSetPtMgr(SetPtMgrNum).ZoneNum(SetZoneNum) = ZoneEquipConfig(ControlledZoneNum).ActualZoneNum;
@@ -4003,7 +4000,7 @@ namespace SetPointManager {
                 for (SetPtMgrNum = 1; SetPtMgrNum <= NumSZMaxHumSetPtMgrs; ++SetPtMgrNum) {
                     for (SetZoneNum = 1; SetZoneNum <= SZMaxHumSetPtMgr(SetPtMgrNum).NumZones; ++SetZoneNum) {
                         // set the actual and controlled zone numbers
-                        for (ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum) {
+                        for (ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
                             if (ZoneEquipConfig(ControlledZoneNum).ZoneNode == SZMaxHumSetPtMgr(SetPtMgrNum).ZoneNodes(SetZoneNum)) {
                                 SZMaxHumSetPtMgr(SetPtMgrNum).CtrlZoneNum(SetZoneNum) = ControlledZoneNum;
                                 SZMaxHumSetPtMgr(SetPtMgrNum).ZoneNum(SetZoneNum) = ZoneEquipConfig(ControlledZoneNum).ActualZoneNum;
@@ -4048,7 +4045,7 @@ namespace SetPointManager {
                     ZoneNode = SingZoneRhSetPtMgr(SetPtMgrNum).ZoneNodeNum;
                     // find the index in the ZoneEquipConfig array of the control zone (the one with the main or only thermostat)
                     ConZoneNum = 0;
-                    for (ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum) {
+                    for (ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
                         if (ZoneEquipConfig(ControlledZoneNum).ZoneNode == ZoneNode) {
                             ConZoneNum = ControlledZoneNum;
                         }
@@ -5947,8 +5944,6 @@ namespace SetPointManager {
         // na
 
         // Using/Aliasing
-        using DataGlobals::AnyEnergyManagementSystemInModel;
-        using DataGlobals::SysSizingCalc;
         using DataHVACGlobals::SetPointErrorFlag;
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
         using EMSManager::iTemperatureSetPoint;
@@ -5981,11 +5976,11 @@ namespace SetPointManager {
         MinTemp = this->MinCoolCoilOutTemp;
         this->FreezeCheckEnable = false;
 
-        if (!SysSizingCalc && this->MySetPointCheckFlag) {
+        if (!state.dataGlobal->SysSizingCalc && this->MySetPointCheckFlag) {
 
             RefNode = this->RefNode;
             if (Node(RefNode).TempSetPoint == SensedNodeFlagValue) {
-                if (!AnyEnergyManagementSystemInModel) {
+                if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                     ShowSevereError(state, "CalcMixedAirSetPoint: Missing reference temperature setpoint for Mixed Air Setpoint Manager " + this->Name);
                     ShowContinueError(state, "Node Referenced =" + NodeID(RefNode));
                     ShowContinueError(state,
@@ -6050,8 +6045,6 @@ namespace SetPointManager {
         // na
 
         // Using/Aliasing
-        using DataGlobals::AnyEnergyManagementSystemInModel;
-        using DataGlobals::SysSizingCalc;
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
         using EMSManager::iHumidityRatioMaxSetPoint;
         using EMSManager::iHumidityRatioMinSetPoint;
@@ -6114,10 +6107,10 @@ namespace SetPointManager {
             }
         }
 
-        if (!SysSizingCalc && this->MySetPointCheckFlag) {
+        if (!state.dataGlobal->SysSizingCalc && this->MySetPointCheckFlag) {
             this->MySetPointCheckFlag = false;
             if (RefNodeSetPoint == SensedNodeFlagValue) {
-                if (!AnyEnergyManagementSystemInModel) {
+                if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                     ShowSevereError(state, "CalcOAPretreatSetPoint: Missing reference setpoint for Outdoor Air Pretreat Setpoint Manager " + this->Name);
                     ShowContinueError(state, "Node Referenced =" + NodeID(RefNode));
                     ShowContinueError(state, "use a Setpoint Manager to establish a setpoint at this node.");
@@ -7493,7 +7486,7 @@ namespace SetPointManager {
         static Real64 TotEnergy(0.0);         // Total energy consumptions at this time step
         static Real64 TotEnergyPre(0.0);      // Total energy consumptions at the previous time step
 
-        if (MetersHaveBeenInitialized) {
+        if (state.dataGlobal->MetersHaveBeenInitialized) {
             // Setup meter vars
             if (this->SetupIdealCondEntSetPtVars) {
                 this->SetupMeteredVarsForSetPt(state);
@@ -7501,7 +7494,7 @@ namespace SetPointManager {
             }
         }
 
-        if (MetersHaveBeenInitialized && RunOptCondEntTemp) {
+        if (state.dataGlobal->MetersHaveBeenInitialized && state.dataGlobal->RunOptCondEntTemp) {
 
             // If chiller is on
             CurLoad = std::abs(
@@ -7527,17 +7520,17 @@ namespace SetPointManager {
                 TotEnergy = this->calculateCurrentEnergyUsage(state);
 
                 this->setupSetPointAndFlags(
-                    TotEnergy, TotEnergyPre, CondWaterSetPoint, CondTempLimit, RunOptCondEntTemp, RunSubOptCondEntTemp, RunFinalOptCondEntTemp);
+                    TotEnergy, TotEnergyPre, CondWaterSetPoint, CondTempLimit, state.dataGlobal->RunOptCondEntTemp, RunSubOptCondEntTemp, RunFinalOptCondEntTemp);
 
             } else {
                 CondWaterSetPoint = this->MaxCondEntTemp;
                 TotEnergyPre = 0.0;
-                RunOptCondEntTemp = false;
+                state.dataGlobal->RunOptCondEntTemp = false;
                 RunSubOptCondEntTemp = false;
             }
         } else {
             CondWaterSetPoint = this->MaxCondEntTemp;
-            RunOptCondEntTemp = false;
+            state.dataGlobal->RunOptCondEntTemp = false;
             RunSubOptCondEntTemp = false;
         }
 
@@ -8006,8 +7999,6 @@ namespace SetPointManager {
         // na
 
         // Using/Aliasing
-        using DataGlobals::AnyEnergyManagementSystemInModel;
-        using DataGlobals::SysSizingCalc;
         using DataHVACGlobals::SetPointErrorFlag;
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
         using EMSManager::iTemperatureSetPoint;
@@ -8781,20 +8772,15 @@ namespace SetPointManager {
         // PURPOSE OF THIS SUBROUTINE:
         // Determine if ideal condenser entering set point manager is used in model and set flag
 
-        // Using/Aliasing
-        using DataGlobals::AnyIdealCondEntSetPointInModel;
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
         std::string cCurrentModuleObject;
 
         cCurrentModuleObject = "SetpointManager:CondenserEnteringReset:Ideal";
         NumIdealCondEntSetPtMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (NumIdealCondEntSetPtMgrs > 0) {
-            AnyIdealCondEntSetPointInModel = true;
+            state.dataGlobal->AnyIdealCondEntSetPointInModel = true;
         } else {
-            AnyIdealCondEntSetPointInModel = false;
+            state.dataGlobal->AnyIdealCondEntSetPointInModel = false;
         }
     }
 

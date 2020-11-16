@@ -111,7 +111,7 @@ namespace OutputReportTabularAnnual {
         objCount = inputProcessor->getNumObjectsFound(state, currentModuleObject);
         if (objCount > 0) {
             // if not a run period using weather do not create reports
-            if (!DataGlobals::DoWeathSim) {
+            if (!state.dataGlobal->DoWeathSim) {
                 ShowWarningError(state, currentModuleObject + " requested with SimulationControl Run Simulation for Weather File Run Periods set to No so " +
                                  currentModuleObject + " will not be generated");
                 return;
@@ -247,7 +247,7 @@ namespace OutputReportTabularAnnual {
     {
         std::vector<AnnualTable>::iterator annualTableIt;
         bool invalidAggregationOrderFound = false;
-        if (!DataGlobals::DoWeathSim) { // if no weather simulation than no reading of MonthlyInput array
+        if (!state.dataGlobal->DoWeathSim) { // if no weather simulation than no reading of MonthlyInput array
             return;
         }
         for (annualTableIt = annualTables.begin(); annualTableIt != annualTables.end(); ++annualTableIt) {
@@ -321,8 +321,8 @@ namespace OutputReportTabularAnnual {
         // For each cell of the table, gather the value as indicated by the type of aggregation
 
         int timestepTimeStamp;
-        Real64 elapsedTime = AnnualTable::getElapsedTime(kindOfTimeStep);
-        Real64 secondsInTimeStep = AnnualTable::getSecondsInTimeStep(kindOfTimeStep);
+        Real64 elapsedTime = AnnualTable::getElapsedTime(state, kindOfTimeStep);
+        Real64 secondsInTimeStep = AnnualTable::getSecondsInTimeStep(state, kindOfTimeStep);
         bool activeMinMax = false;
         bool activeHoursShown = false;
         // if schedule is used and the current value is zero, don't gather values
@@ -353,9 +353,9 @@ namespace OutputReportTabularAnnual {
                         Real64 newDuration = 0.0;
                         bool activeNewValue = false;
                         // the current timestamp
-                        int minuteCalculated = General::DetermineMinuteForReporting(kindOfTimeStep);
+                        int minuteCalculated = General::DetermineMinuteForReporting(state, kindOfTimeStep);
                         General::EncodeMonDayHrMin(
-                            timestepTimeStamp, DataEnvironment::Month, DataEnvironment::DayOfMonth, DataGlobals::HourOfDay, minuteCalculated);
+                            timestepTimeStamp, DataEnvironment::Month, DataEnvironment::DayOfMonth, state.dataGlobal->HourOfDay, minuteCalculated);
                         // perform the selected aggregation type
                         // the following types of aggregations are not gathered at this point:
                         // noAggregation, valueWhenMaxMin, sumOrAverageHoursShown, 	maximumDuringHoursShown, minimumDuringHoursShown:
@@ -601,24 +601,24 @@ namespace OutputReportTabularAnnual {
         }
     }
 
-    Real64 AnnualTable::getElapsedTime(OutputProcessor::TimeStepType kindOfTimeStep)
+    Real64 AnnualTable::getElapsedTime(EnergyPlusData &state, OutputProcessor::TimeStepType kindOfTimeStep)
     {
         Real64 elapsedTime;
         if (kindOfTimeStep == OutputProcessor::TimeStepType::TimeStepZone) {
             elapsedTime = DataHVACGlobals::TimeStepSys;
         } else {
-            elapsedTime = DataGlobals::TimeStepZone;
+            elapsedTime = state.dataGlobal->TimeStepZone;
         }
         return elapsedTime;
     }
 
-    Real64 AnnualTable::getSecondsInTimeStep(OutputProcessor::TimeStepType kindOfTimeStep)
+    Real64 AnnualTable::getSecondsInTimeStep(EnergyPlusData &state, OutputProcessor::TimeStepType kindOfTimeStep)
     {
         Real64 secondsInTimeStep;
         if (kindOfTimeStep == OutputProcessor::TimeStepType::TimeStepZone) {
             secondsInTimeStep = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
         } else {
-            secondsInTimeStep = DataGlobals::TimeStepZoneSec;
+            secondsInTimeStep = state.dataGlobal->TimeStepZoneSec;
         }
         return secondsInTimeStep;
     }

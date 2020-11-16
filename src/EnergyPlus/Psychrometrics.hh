@@ -64,6 +64,9 @@
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+
 #ifdef EP_nocache_Psychrometrics
 #undef EP_cache_PsyTwbFnTdbWPb
 #undef EP_cache_PsyPsatFnTemp
@@ -77,10 +80,6 @@ namespace EnergyPlus {
 #define EP_psych_errors
 
 namespace Psychrometrics {
-
-#ifdef EP_psych_errors
-    using namespace DataGlobals;
-#endif
 
     // Data
     // MODULE PARAMETER DEFINITIONS:
@@ -290,7 +289,7 @@ namespace Psychrometrics {
         return rhoair;
     }
 
-    inline Real64 PsyHfgAirFnWTdb(Real64 const EP_UNUSED(w), // humidity ratio {kgWater/kgDryAir} !unused1208
+    inline Real64 PsyHfgAirFnWTdb([[maybe_unused]] Real64 const w, // humidity ratio {kgWater/kgDryAir} !unused1208
                                   Real64 const T             // input temperature {Celsius}
     )
     {
@@ -320,7 +319,7 @@ namespace Psychrometrics {
         return (2500940.0 + 1858.95 * Temperature) - (4180.0 * Temperature); // enthalpy of the gas - enthalpy of the fluid
     }
 
-    inline Real64 PsyHgAirFnWTdb(Real64 const EP_UNUSED(w), // humidity ratio {kgWater/kgDryAir} !unused1208
+    inline Real64 PsyHgAirFnWTdb([[maybe_unused]] Real64 const w, // humidity ratio {kgWater/kgDryAir} !unused1208
                                  Real64 const T             // input temperature {Celsius}
     )
     {
@@ -1255,7 +1254,7 @@ namespace Psychrometrics {
         return (A0 + X * (A1 + X * (A2 + X * (A3 + X * (A4 + X * (A5 + X * A6)))))) / 1.0E10;
     }
 
-    inline Real64 CPCW(Real64 const EP_UNUSED(Temperature) // unused1208
+    inline Real64 CPCW([[maybe_unused]] Real64 const Temperature // unused1208
     )
     {
         // FUNCTION INFORMATION:
@@ -1268,7 +1267,7 @@ namespace Psychrometrics {
         return 4180.0;
     }
 
-    inline Real64 CPHW(Real64 const EP_UNUSED(Temperature) // unused1208
+    inline Real64 CPHW([[maybe_unused]] Real64 const Temperature // unused1208
     )
     {
         // FUNCTION INFORMATION:

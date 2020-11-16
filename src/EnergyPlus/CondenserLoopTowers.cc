@@ -130,8 +130,9 @@ namespace CondenserLoopTowers {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void CoolingTower::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
-                                bool const EP_UNUSED(FirstHVACIteration),
+    void CoolingTower::simulate(EnergyPlusData &state,
+                                [[maybe_unused]] const PlantLocation &calledFromLocation,
+                                [[maybe_unused]] bool const FirstHVACIteration,
                                 Real64 &CurLoad,
                                 bool const RunFlag)
     {
@@ -150,7 +151,11 @@ namespace CondenserLoopTowers {
         this->report(RunFlag);
     }
 
-    void CoolingTower::getDesignCapacities(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
+    void CoolingTower::getDesignCapacities([[maybe_unused]] EnergyPlusData &state,
+                                           [[maybe_unused]] const PlantLocation &calledFromLocation,
+                                           Real64 &MaxLoad,
+                                           Real64 &MinLoad,
+                                           Real64 &OptLoad)
     {
         MinLoad = 0.0;
         MaxLoad = this->TowerNominalCapacity * this->HeatRejectCapNomCapSizingRatio;
@@ -162,7 +167,7 @@ namespace CondenserLoopTowers {
         SizFactor = this->SizFac;
     }
 
-    void CoolingTower::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation))
+    void CoolingTower::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation)
     {
         this->initialize(state);
         if (this->TowerType_Num == DataPlant::TypeOf_CoolingTower_VarSpdMerkel) {
@@ -3228,7 +3233,7 @@ namespace CondenserLoopTowers {
                                                                     tmpNomTowerCap,
                                                                     "User-Specified Nominal Capacity [W]",
                                                                     NomCapUser);
-                            if (DataGlobals::DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpNomTowerCap - NomCapUser) / NomCapUser) > DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeVSMerkelTower: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError(state, "User-Specified Nominal Capacity of " + General::RoundSigDigits(NomCapUser, 2) + " [W]");
@@ -3267,7 +3272,7 @@ namespace CondenserLoopTowers {
                                                                     tmpTowerFreeConvNomCap,
                                                                     "User-Specified Free Convection Nominal Capacity [W]",
                                                                     NomCapUser);
-                            if (DataGlobals::DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpTowerFreeConvNomCap - NomCapUser) / NomCapUser) > DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeVSMerkelTower: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError(state, "User-Specified Free Convection Nominal Capacity of " + General::RoundSigDigits(NomCapUser, 2) +
@@ -3310,7 +3315,7 @@ namespace CondenserLoopTowers {
                                                                     this->DesignWaterFlowRate,
                                                                     "User-Specified Design Water Flow Rate [m3/s]",
                                                                     NomDesWaterFlowUser);
-                            if (DataGlobals::DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpDesignWaterFlowRate - NomDesWaterFlowUser) / NomDesWaterFlowUser) >
                                     DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeVSMerkelTower: Potential issue with equipment sizing for " + this->Name);
@@ -3356,7 +3361,7 @@ namespace CondenserLoopTowers {
                                                                 tmpDesignAirFlowRate,
                                                                 "User-Specified Design Air Flow Rate [m3/s]",
                                                                 DesignAirFlowRateUser);
-                        if (DataGlobals::DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(tmpDesignAirFlowRate - DesignAirFlowRateUser) / DesignAirFlowRateUser) >
                                 DataSizing::AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeVSMerkelTower: Potential issue with equipment sizing for " + this->Name);
@@ -3395,7 +3400,7 @@ namespace CondenserLoopTowers {
                                                                 tmpFreeConvAirFlowRate,
                                                                 "User-Specified Design Free Convection Regime Air Flow Rate [m3/s]",
                                                                 FreeConvAirFlowUser);
-                        if (DataGlobals::DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(tmpFreeConvAirFlowRate - FreeConvAirFlowUser) / FreeConvAirFlowUser) >
                                 DataSizing::AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeVSMerkelTower: Potential issue with equipment sizing for " + this->Name);
@@ -3941,7 +3946,7 @@ namespace CondenserLoopTowers {
                                                             tmpHighSpeedFanPower,
                                                             "User-Specified Design Fan Power [W]",
                                                             HighSpeedFanPowerUser);
-                    if (DataGlobals::DisplayExtraWarnings) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
                         if ((std::abs(tmpHighSpeedFanPower - HighSpeedFanPowerUser) / HighSpeedFanPowerUser) >
                             DataSizing::AutoVsHardSizingThreshold) {
                             ShowMessage(state, "SizeVSMerkelTower: Potential issue with equipment sizing for " + this->Name);
@@ -4058,8 +4063,8 @@ namespace CondenserLoopTowers {
             }
         }
 
-        // If there is a fault of condenser SWT Sensor (zrp_Jul2016)
-        if (this->FaultyCondenserSWTFlag && (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation)) {
+        // If there is a fault of condenser SWT Sensor
+        if (this->FaultyCondenserSWTFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
             int FaultIndex = this->FaultyCondenserSWTIndex;
             Real64 TowerOutletTemp_ff = TempSetPoint;
 
@@ -4069,8 +4074,8 @@ namespace CondenserLoopTowers {
             TempSetPoint = TowerOutletTemp_ff - this->FaultyCondenserSWTOffset;
         }
 
-        // If there is a fault of cooling tower fouling (zrp_Jul2016)
-        if (this->FaultyTowerFoulingFlag && (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation)) {
+        // If there is a fault of cooling tower fouling
+        if (this->FaultyTowerFoulingFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
             int FaultIndex = this->FaultyTowerFoulingIndex;
             Real64 FreeConvTowerUA_ff = this->FreeConvTowerUA;
             Real64 HighSpeedTowerUA_ff = this->HighSpeedTowerUA;
@@ -4360,8 +4365,8 @@ namespace CondenserLoopTowers {
             }
         }
 
-        // If there is a fault of condenser SWT Sensor (zrp_Jul2016)
-        if (this->FaultyCondenserSWTFlag && (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation)) {
+        // If there is a fault of condenser SWT Sensor
+        if (this->FaultyCondenserSWTFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
             int FaultIndex = this->FaultyCondenserSWTIndex;
             Real64 TowerOutletTemp_ff = TempSetPoint;
 
@@ -4371,8 +4376,8 @@ namespace CondenserLoopTowers {
             TempSetPoint = TowerOutletTemp_ff - this->FaultyCondenserSWTOffset;
         }
 
-        // If there is a fault of cooling tower fouling (zrp_Jul2016)
-        if (this->FaultyTowerFoulingFlag && (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation)) {
+        // If there is a fault of cooling tower fouling
+        if (this->FaultyTowerFoulingFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
             int FaultIndex = this->FaultyTowerFoulingIndex;
             Real64 FreeConvTowerUA_ff = this->FreeConvTowerUA;
             Real64 HighSpeedTowerUA_ff = this->HighSpeedTowerUA;
@@ -4614,8 +4619,8 @@ namespace CondenserLoopTowers {
             }
         }
 
-        // If there is a fault of condenser SWT Sensor (zrp_Jul2016)
-        if (this->FaultyCondenserSWTFlag && (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation)) {
+        // If there is a fault of condenser SWT Sensor
+        if (this->FaultyCondenserSWTFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
             int FaultIndex = this->FaultyCondenserSWTIndex;
             Real64 TowerOutletTemp_ff = TempSetPoint;
 
@@ -4740,11 +4745,11 @@ namespace CondenserLoopTowers {
                     auto f = std::bind(&CoolingTower::residualTa, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
                     TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, this->airFlowRateRatio, f, this->MinimumVSAirFlowFrac, 1.0, Par);
                     if (SolFla == -1) {
-                        if (!DataGlobals::WarmupFlag)
+                        if (!state.dataGlobal->WarmupFlag)
                             ShowWarningError(state, "Cooling tower iteration limit exceeded when calculating air flow rate ratio for tower " + this->Name);
                         //           IF RegulaFalsi cannot find a solution then provide detailed output for debugging
                     } else if (SolFla == -2) {
-                        if (!DataGlobals::WarmupFlag) {
+                        if (!state.dataGlobal->WarmupFlag) {
 
                             if (this->CoolingTowerAFRRFailedCount < 1) {
                                 ++this->CoolingTowerAFRRFailedCount;
@@ -4755,7 +4760,7 @@ namespace CondenserLoopTowers {
                                 ShowContinueErrorTimeStamp(state, format(" ...Valid air flow rate ratio range = {:5.2F} to 1.0.", this->MinimumVSAirFlowFrac));
                                 ShowContinueError(state, "...Consider modifying the design approach or design range temperature for this tower.");
                             } else {
-                                ShowRecurringWarningErrorAtEnd("CoolingTower:VariableSpeed \"" + this->Name +
+                                ShowRecurringWarningErrorAtEnd(state, "CoolingTower:VariableSpeed \"" + this->Name +
                                                                    "\" - Cooling tower air flow rate ratio calculation failed error continues.",
                                                                this->CoolingTowerAFRRFailedIndex);
                             }
@@ -4784,7 +4789,7 @@ namespace CondenserLoopTowers {
         this->Qactual = this->WaterMassFlowRate * CpWater * (DataLoopNode::Node(this->WaterInletNodeNum).Temp - this->OutletWaterTemp);
 
         //   calculate end time of current time step
-        Real64 const CurrentEndTime = DataGlobals::CurrentTime + DataHVACGlobals::SysTimeElapsed;
+        Real64 const CurrentEndTime = state.dataGlobal->CurrentTime + DataHVACGlobals::SysTimeElapsed;
 
         //   Print warning messages only when valid and only for the first occurrence. Let summary provide statistics.
         //   Wait for next time step to print warnings. If simulation iterates, print out
@@ -4798,7 +4803,7 @@ namespace CondenserLoopTowers {
                     ShowWarningError(state, state.dataCondenserLoopTowers->towers(this->VSTower).LGBuffer1);
                     ShowContinueError(state, state.dataCondenserLoopTowers->towers(this->VSTower).LGBuffer2);
                 } else {
-                    ShowRecurringWarningErrorAtEnd(this->TowerType + " \"" + this->Name +
+                    ShowRecurringWarningErrorAtEnd(state, this->TowerType + " \"" + this->Name +
                                                        "\" - Liquid to gas ratio is out of range error continues...",
                                                    state.dataCondenserLoopTowers->towers(this->VSTower).ErrIndexLG,
                                                    state.dataCondenserLoopTowers->towers(this->VSTower).LGLast,
@@ -4820,14 +4825,14 @@ namespace CondenserLoopTowers {
                 //        Flow fractions greater than a MaxLiquidToGasRatio of 8 are not reliable using the YorkCalc model
                 if (FlowFraction > state.dataCondenserLoopTowers->towers(this->VSTower).MaxLiquidToGasRatio) {
                     //          Report warnings only during actual simulation
-                    if (!DataGlobals::WarmupFlag) {
+                    if (!state.dataGlobal->WarmupFlag) {
                         state.dataCondenserLoopTowers->towers(this->VSTower).PrintLGMessage = true;
                         state.dataCondenserLoopTowers->towers(this->VSTower).LGBuffer1 =
                             format("{} \"{}\" - Liquid to gas ratio (L/G) is out of range at {:5.2F}.", this->TowerType, this->Name, FlowFraction);
                         state.dataCondenserLoopTowers->towers(this->VSTower).LGBuffer2 = format(" ...Valid maximum ratio = {:5.2F}. Occurrence info = {}, {} {}",
                                                                  DataEnvironment::EnvironmentName,
                                                                  DataEnvironment::CurMnDy,
-                                                                 General::CreateSysTimeIntervalString());
+                                                                 General::CreateSysTimeIntervalString(state));
 
                         state.dataCondenserLoopTowers->towers(this->VSTower).LGLast = FlowFraction;
                     }
@@ -4874,15 +4879,15 @@ namespace CondenserLoopTowers {
         Real64 freeConvTowerUA = this->FreeConvTowerUA;
         Real64 highSpeedTowerUA = this->HighSpeedTowerUA;
 
-        // If there is a fault of condenser SWT Sensor (zrp_Jul2016)
-        if (this->FaultyCondenserSWTFlag && (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation)) {
+        // If there is a fault of condenser SWT Sensor
+        if (this->FaultyCondenserSWTFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
             int FaultIndex = this->FaultyCondenserSWTIndex;
             // calculate the sensor offset using fault information
             this->FaultyCondenserSWTOffset = FaultsManager::FaultsCondenserSWTSensor(FaultIndex).CalFaultOffsetAct(state);
         }
 
-        // If there is a fault of cooling tower fouling (zrp_Jul2016)
-        if (this->FaultyTowerFoulingFlag && (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation)) {
+        // If there is a fault of cooling tower fouling
+        if (this->FaultyTowerFoulingFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
             int FaultIndex = this->FaultyTowerFoulingIndex;
             Real64 FreeConvTowerUA_ff = this->FreeConvTowerUA;
             Real64 HighSpeedTowerUA_ff = this->HighSpeedTowerUA;
@@ -5038,7 +5043,7 @@ namespace CondenserLoopTowers {
             TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, this->airFlowRateRatio, f, this->MinimumVSAirFlowFrac, 1.0, Par);
 
             if (SolFla == -1) {
-                if (!DataGlobals::WarmupFlag) {
+                if (!state.dataGlobal->WarmupFlag) {
                     if (this->VSMerkelAFRErrorIter < 1) {
                         ++this->VSMerkelAFRErrorIter;
                         ShowWarningError(state, cCoolingTower_VariableSpeedMerkel +
@@ -5048,7 +5053,7 @@ namespace CondenserLoopTowers {
                         ShowContinueError(state, "Calculated air flow ratio = " + General::RoundSigDigits(this->airFlowRateRatio, 4));
                         ShowContinueErrorTimeStamp(state, "The calculated air flow ratio will be used and the simulation continues. Occurrence info:");
                     }
-                    ShowRecurringWarningErrorAtEnd(
+                    ShowRecurringWarningErrorAtEnd(state,
                         cCoolingTower_VariableSpeedMerkel + " \"" + this->Name +
                             "\" - Iteration limit exceeded calculating air flow ratio error continues. air flow ratio statistics follow.",
                         this->VSMerkelAFRErrorIterIndex,
@@ -5057,7 +5062,7 @@ namespace CondenserLoopTowers {
                 }
             } else if (SolFla == -2) {
                 this->airFlowRateRatio = (std::abs(MyLoad) - MinSpeedFanQdot) / (FullSpeedFanQdot - MinSpeedFanQdot);
-                if (!DataGlobals::WarmupFlag) {
+                if (!state.dataGlobal->WarmupFlag) {
                     if (this->VSMerkelAFRErrorFail < 1) {
                         ++this->VSMerkelAFRErrorFail;
                         ShowWarningError(state, cCoolingTower_VariableSpeedMerkel +
@@ -5065,7 +5070,7 @@ namespace CondenserLoopTowers {
                         ShowContinueError(state, "Estimated air flow ratio  = " + General::RoundSigDigits(this->airFlowRateRatio, 4));
                         ShowContinueErrorTimeStamp(state, "The estimated air flow ratio will be used and the simulation continues. Occurrence info:");
                     }
-                    ShowRecurringWarningErrorAtEnd(
+                    ShowRecurringWarningErrorAtEnd(state,
                         cCoolingTower_VariableSpeedMerkel + " \"" + this->Name +
                             "\" - solver failed calculating air flow ratio error continues. air flow ratio statistics follow.",
                         this->VSMerkelAFRErrorFailIndex,
@@ -5445,7 +5450,7 @@ namespace CondenserLoopTowers {
         WaterFlowRateRatioCapped = WaterFlowRateRatio;
 
         //   calculate end time of current time step
-        CurrentEndTime = DataGlobals::CurrentTime + DataHVACGlobals::SysTimeElapsed;
+        CurrentEndTime = state.dataGlobal->CurrentTime + DataHVACGlobals::SysTimeElapsed;
 
         //   Print warning messages only when valid and only for the first ocurrance. Let summary provide statistics.
         //   Wait for next time step to print warnings. If simulation iterates, print out
@@ -5461,7 +5466,7 @@ namespace CondenserLoopTowers {
                     ShowContinueError(state, " ...Range temperatures outside model boundaries may not adversely affect tower performance.");
                     ShowContinueError(state, " ...This is not an unexpected occurrence when simulating actual conditions.");
                 } else {
-                    ShowRecurringWarningErrorAtEnd(this->TowerType + " \"" + this->Name +
+                    ShowRecurringWarningErrorAtEnd(state, this->TowerType + " \"" + this->Name +
                                                        "\" - Tower range temperature is out of range error continues...",
                                                    state.dataCondenserLoopTowers->towers(this->VSTower).ErrIndexTR,
                                                    state.dataCondenserLoopTowers->towers(this->VSTower).TrLast,
@@ -5476,7 +5481,7 @@ namespace CondenserLoopTowers {
                     ShowContinueError(state, state.dataCondenserLoopTowers->towers(this->VSTower).TwbBuffer3);
                     ShowContinueError(state, " ...Wet-bulb temperatures outside model boundaries may not adversely affect tower performance.");
                 } else {
-                    ShowRecurringWarningErrorAtEnd(this->TowerType + " \"" + this->Name +
+                    ShowRecurringWarningErrorAtEnd(state, this->TowerType + " \"" + this->Name +
                                                        "\" - Inlet air wet-bulb temperature is out of range error continues...",
                                                    state.dataCondenserLoopTowers->towers(this->VSTower).ErrIndexIAWB,
                                                    state.dataCondenserLoopTowers->towers(this->VSTower).TwbLast,
@@ -5492,7 +5497,7 @@ namespace CondenserLoopTowers {
                     ShowContinueError(state, " ...Approach temperatures outside model boundaries may not adversely affect tower performance.");
                     ShowContinueError(state, " ...This is not an unexpected occurrence when simulating actual conditions.");
                 } else {
-                    ShowRecurringWarningErrorAtEnd(this->TowerType + " \"" + this->Name +
+                    ShowRecurringWarningErrorAtEnd(state, this->TowerType + " \"" + this->Name +
                                                        "\" - Tower approach temperature is out of range error continues...",
                                                    state.dataCondenserLoopTowers->towers(this->VSTower).ErrIndexTA,
                                                    state.dataCondenserLoopTowers->towers(this->VSTower).TaLast,
@@ -5507,7 +5512,7 @@ namespace CondenserLoopTowers {
                     ShowContinueError(state, state.dataCondenserLoopTowers->towers(this->VSTower).WFRRBuffer3);
                     ShowContinueError(state, " ...Water flow rate ratios outside model boundaries may not adversely affect tower performance.");
                 } else {
-                    ShowRecurringWarningErrorAtEnd(this->TowerType + " \"" + this->Name +
+                    ShowRecurringWarningErrorAtEnd(state, this->TowerType + " \"" + this->Name +
                                                        "\" - Water flow rate ratio is out of range error continues...",
                                                    state.dataCondenserLoopTowers->towers(this->VSTower).ErrIndexWFRR,
                                                    state.dataCondenserLoopTowers->towers(this->VSTower).WaterFlowRateRatioLast,
@@ -5531,13 +5536,13 @@ namespace CondenserLoopTowers {
             if (Twb > state.dataCondenserLoopTowers->towers(this->VSTower).MaxInletAirWBTemp) {
                 TwbCapped = state.dataCondenserLoopTowers->towers(this->VSTower).MaxInletAirWBTemp;
             }
-            if (!DataGlobals::WarmupFlag) {
+            if (!state.dataGlobal->WarmupFlag) {
                 state.dataCondenserLoopTowers->towers(this->VSTower).PrintTwbMessage = true;
                 state.dataCondenserLoopTowers->towers(this->VSTower).TwbBuffer1 =
                     this->TowerType + " \"" + this->Name + "\" - Inlet air wet-bulb temperature is outside model boundaries at " + OutputChar + '.';
                 state.dataCondenserLoopTowers->towers(this->VSTower).TwbBuffer2 = " ...Valid range = " + OutputCharLo + " to " + OutputCharHi +
                                                    ". Occurrence info = " + DataEnvironment::EnvironmentName + ", " + DataEnvironment::CurMnDy + ' ' +
-                                                   General::CreateSysTimeIntervalString();
+                                                   General::CreateSysTimeIntervalString(state);
                 TrimValue = General::RoundSigDigits(TwbCapped, 6);
                 state.dataCondenserLoopTowers->towers(this->VSTower).TwbBuffer3 = " ...Inlet air wet-bulb temperature passed to the model = " + TrimValue;
                 state.dataCondenserLoopTowers->towers(this->VSTower).TwbLast = Twb;
@@ -5558,13 +5563,13 @@ namespace CondenserLoopTowers {
             if (Tr > state.dataCondenserLoopTowers->towers(this->VSTower).MaxRangeTemp) {
                 TrCapped = state.dataCondenserLoopTowers->towers(this->VSTower).MaxRangeTemp;
             }
-            if (!DataGlobals::WarmupFlag) {
+            if (!state.dataGlobal->WarmupFlag) {
                 state.dataCondenserLoopTowers->towers(this->VSTower).PrintTrMessage = true;
                 state.dataCondenserLoopTowers->towers(this->VSTower).TrBuffer1 =
                     this->TowerType + " \"" + this->Name + "\" - Tower range temperature is outside model boundaries at " + OutputChar + '.';
                 state.dataCondenserLoopTowers->towers(this->VSTower).TrBuffer2 = " ...Valid range = " + OutputCharLo + " to " + OutputCharHi +
                                                   ". Occurrence info = " + DataEnvironment::EnvironmentName + ", " + DataEnvironment::CurMnDy + ' ' +
-                                                  General::CreateSysTimeIntervalString();
+                                                  General::CreateSysTimeIntervalString(state);
                 TrimValue = General::RoundSigDigits(Tr, 5);
                 state.dataCondenserLoopTowers->towers(this->VSTower).TrBuffer3 = " ...Tower range temperature passed to the model = " + TrimValue;
                 state.dataCondenserLoopTowers->towers(this->VSTower).TrLast = Tr;
@@ -5585,13 +5590,13 @@ namespace CondenserLoopTowers {
             if (Ta > state.dataCondenserLoopTowers->towers(this->VSTower).MaxApproachTemp) {
                 TaCapped = state.dataCondenserLoopTowers->towers(this->VSTower).MaxApproachTemp;
             }
-            if (!DataGlobals::WarmupFlag) {
+            if (!state.dataGlobal->WarmupFlag) {
                 state.dataCondenserLoopTowers->towers(this->VSTower).PrintTaMessage = true;
                 state.dataCondenserLoopTowers->towers(this->VSTower).TaBuffer1 =
                     this->TowerType + " \"" + this->Name + "\" - Tower approach temperature is outside model boundaries at " + OutputChar + '.';
                 state.dataCondenserLoopTowers->towers(this->VSTower).TaBuffer2 = " ...Valid range = " + OutputCharLo + " to " + OutputCharHi +
                                                   ". Occurrence info = " + DataEnvironment::EnvironmentName + ", " + DataEnvironment::CurMnDy + ' ' +
-                                                  General::CreateSysTimeIntervalString();
+                                                  General::CreateSysTimeIntervalString(state);
                 TrimValue = General::RoundSigDigits(Ta, 5);
                 state.dataCondenserLoopTowers->towers(this->VSTower).TaBuffer3 = " ...Tower approach temperature passed to the model = " + TrimValue;
                 state.dataCondenserLoopTowers->towers(this->VSTower).TaLast = Ta;
@@ -5617,13 +5622,13 @@ namespace CondenserLoopTowers {
                 if (WaterFlowRateRatio > state.dataCondenserLoopTowers->towers(this->VSTower).MaxWaterFlowRatio) {
                     WaterFlowRateRatioCapped = state.dataCondenserLoopTowers->towers(this->VSTower).MaxWaterFlowRatio;
                 }
-                if (!DataGlobals::WarmupFlag) {
+                if (!state.dataGlobal->WarmupFlag) {
                     state.dataCondenserLoopTowers->towers(this->VSTower).PrintWFRRMessage = true;
                     state.dataCondenserLoopTowers->towers(this->VSTower).WFRRBuffer1 =
                         this->TowerType + " \"" + this->Name + "\" - Water flow rate ratio is outside model boundaries at " + OutputChar + '.';
                     state.dataCondenserLoopTowers->towers(this->VSTower).WFRRBuffer2 = " ...Valid range = " + OutputCharLo + " to " + OutputCharHi +
                                                         ". Occurrence info = " + DataEnvironment::EnvironmentName + ", " + DataEnvironment::CurMnDy +
-                                                        ' ' + General::CreateSysTimeIntervalString();
+                                                        ' ' + General::CreateSysTimeIntervalString(state);
                     TrimValue = General::RoundSigDigits(WaterFlowRateRatioCapped, 5);
                     state.dataCondenserLoopTowers->towers(this->VSTower).WFRRBuffer3 = " ...Water flow rate ratio passed to the model = " + TrimValue;
                     state.dataCondenserLoopTowers->towers(this->VSTower).WaterFlowRateRatioLast = WaterFlowRateRatio;
@@ -5895,7 +5900,7 @@ namespace CondenserLoopTowers {
         // set node information
         DataLoopNode::Node(this->WaterOutletNodeNum).Temp = this->OutletWaterTemp;
 
-        if (DataPlant::PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock == 0 || DataGlobals::WarmupFlag) return;
+        if (DataPlant::PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock == 0 || state.dataGlobal->WarmupFlag) return;
 
         // Check flow rate through tower and compare to design flow rate, show warning if greater than Design * Mulitplier
         if (DataLoopNode::Node(this->WaterOutletNodeNum).MassFlowRate > this->DesWaterMassFlowRate * this->TowerMassFlowRateMultiplier) {
@@ -5908,7 +5913,7 @@ namespace CondenserLoopTowers {
                 ShowContinueError(state, " Tower Design Mass Flow Rate   = " + General::TrimSigDigits(this->DesWaterMassFlowRate, 6));
                 ShowContinueErrorTimeStamp(state, "");
             } else {
-                ShowRecurringWarningErrorAtEnd(
+                ShowRecurringWarningErrorAtEnd(state,
                     this->TowerType + " \"" + this->Name +
                         "\"  Condenser Loop Mass Flow Rate is much greater than the towers design mass flow rate error continues...",
                     this->HighMassFlowErrorIndex,
@@ -5927,7 +5932,7 @@ namespace CondenserLoopTowers {
                 ShowContinueError(state, format("Cooling tower water outlet temperature ({:.2F} C) is below the specified minimum condenser loop temp of {:.2F} C", this->OutletWaterTemp, LoopMinTemp));
                 ShowContinueErrorTimeStamp(state, "");
             } else {
-                ShowRecurringWarningErrorAtEnd(
+                ShowRecurringWarningErrorAtEnd(state,
                     this->TowerType + " \"" + this->Name +
                         "\" Cooling tower water outlet temperature is below the specified minimum condenser loop temp error continues...",
                     this->OutletWaterTempErrorIndex,
@@ -5945,7 +5950,7 @@ namespace CondenserLoopTowers {
                 ShowContinueErrorTimeStamp(state, "");
                 ShowContinueError(state, format("Actual Mass flow = {:.2T}", this->WaterMassFlowRate));
             } else {
-                ShowRecurringWarningErrorAtEnd(this->TowerType + " \"" + this->Name +
+                ShowRecurringWarningErrorAtEnd(state, this->TowerType + " \"" + this->Name +
                                                    "\"  Cooling tower water mass flow rate near zero error continues...",
                                                this->SmallWaterMassFlowErrorIndex,
                                                this->WaterMassFlowRate,

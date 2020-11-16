@@ -76,7 +76,7 @@ TEST_F(EnergyPlusFixture, HeatBalFiniteDiffManager_CalcNodeHeatFluxTest)
     SurfaceFD(SurfNum).CpDelXRhoS1.allocate(numNodes + 1);
     SurfaceFD(SurfNum).CpDelXRhoS2.allocate(numNodes + 1);
     DataHeatBalSurface::SurfOpaqInsFaceConductionFlux.allocate(1);
-    DataGlobals::TimeStepZoneSec = 600.0;
+    state.dataGlobal->TimeStepZoneSec = 600.0;
 
     Real64 expectedResult1(0.0);
     Real64 expectedResult2(0.0);
@@ -121,7 +121,7 @@ TEST_F(EnergyPlusFixture, HeatBalFiniteDiffManager_CalcNodeHeatFluxTest)
     SurfaceFD(SurfNum).CpDelXRhoS2(nodeNum) = 2000.0;
     expectedResult5 = DataHeatBalSurface::SurfOpaqInsFaceConductionFlux(SurfNum);
 
-    CalcNodeHeatFlux(SurfNum, numNodes);
+    CalcNodeHeatFlux(state, SurfNum, numNodes);
     EXPECT_NEAR(SurfaceFD(SurfNum).QDreport(1), expectedResult1, 0.0001);
     EXPECT_NEAR(SurfaceFD(SurfNum).QDreport(2), expectedResult2, 0.0001);
     EXPECT_NEAR(SurfaceFD(SurfNum).QDreport(3), expectedResult3, 0.0001);
@@ -137,7 +137,7 @@ TEST_F(EnergyPlusFixture, HeatBalFiniteDiffManager_CalcNodeHeatFluxTest)
     expectedResult5 = 0.0;
 
     // Unsteady-state case
-    DataGlobals::TimeStepZoneSec = 600.0;
+    state.dataGlobal->TimeStepZoneSec = 600.0;
     DataHeatBalSurface::SurfOpaqInsFaceConductionFlux(SurfNum) = -200.0;
 
     nodeNum = 5;
@@ -167,7 +167,7 @@ TEST_F(EnergyPlusFixture, HeatBalFiniteDiffManager_CalcNodeHeatFluxTest)
     SurfaceFD(SurfNum).CpDelXRhoS1(nodeNum) = 1000.0;
     SurfaceFD(SurfNum).CpDelXRhoS2(nodeNum) = 2000.0;
     expectedResult2 = expectedResult3 + (SurfaceFD(SurfNum).TDT(nodeNum) - SurfaceFD(SurfNum).TDpriortimestep(nodeNum)) *
-                                            SurfaceFD(SurfNum).CpDelXRhoS2(nodeNum) / DataGlobals::TimeStepZoneSec;
+                                            SurfaceFD(SurfNum).CpDelXRhoS2(nodeNum) / state.dataGlobal->TimeStepZoneSec;
 
     nodeNum = 1;
     SurfaceFD(SurfNum).TDpriortimestep(nodeNum) = 20.1;
@@ -175,11 +175,11 @@ TEST_F(EnergyPlusFixture, HeatBalFiniteDiffManager_CalcNodeHeatFluxTest)
     SurfaceFD(SurfNum).CpDelXRhoS1(nodeNum) = 1000.0;
     SurfaceFD(SurfNum).CpDelXRhoS2(nodeNum) = 2000.0;
     expectedResult1 = expectedResult2 + (SurfaceFD(SurfNum).TDT(nodeNum + 1) - SurfaceFD(SurfNum).TDpriortimestep(nodeNum + 1)) *
-                                            SurfaceFD(SurfNum).CpDelXRhoS1(nodeNum + 1) / DataGlobals::TimeStepZoneSec;
+                                            SurfaceFD(SurfNum).CpDelXRhoS1(nodeNum + 1) / state.dataGlobal->TimeStepZoneSec;
     expectedResult1 = expectedResult1 + (SurfaceFD(SurfNum).TDT(nodeNum) - SurfaceFD(SurfNum).TDpriortimestep(nodeNum)) *
-                                            SurfaceFD(SurfNum).CpDelXRhoS2(nodeNum) / DataGlobals::TimeStepZoneSec;
+                                            SurfaceFD(SurfNum).CpDelXRhoS2(nodeNum) / state.dataGlobal->TimeStepZoneSec;
 
-    CalcNodeHeatFlux(SurfNum, numNodes);
+    CalcNodeHeatFlux(state, SurfNum, numNodes);
     EXPECT_NEAR(SurfaceFD(SurfNum).QDreport(1), expectedResult1, 0.0001);
     EXPECT_NEAR(SurfaceFD(SurfNum).QDreport(2), expectedResult2, 0.0001);
     EXPECT_NEAR(SurfaceFD(SurfNum).QDreport(3), expectedResult3, 0.0001);
