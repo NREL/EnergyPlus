@@ -15567,7 +15567,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_CheckBadInputOutputNodes)
     mySys.Name = "Bath_ZN_1_FLR_1 ZN-PTAC Unitary";
     state.dataUnitarySystems->unitarySys.push_back(mySys);
     DataZoneEquipment::ZoneEquipInputsFilled = true;
-    DataGlobals::NumOfZones = 1;
+    state.dataGlobal->NumOfZones = 1;
     DataZoneEquipment::ZoneEquipConfig.allocate(1);
     DataZoneEquipment::ZoneEquipConfig(1).NumExhaustNodes = 1;
     DataZoneEquipment::ZoneEquipConfig(1).ExhaustNode.allocate(1);
