@@ -966,7 +966,7 @@ namespace EvaporativeFluidCoolers {
         _SizFac = this->SizFac;
     }
 
-    void EvapFluidCoolerSpecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation))
+    void EvapFluidCoolerSpecs::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation)
     {
         this->InitEvapFluidCooler(state);
         this->SizeEvapFluidCooler(state);
@@ -992,9 +992,9 @@ namespace EvaporativeFluidCoolers {
     }
 
     void EvapFluidCoolerSpecs::simulate(EnergyPlusData &state,
-                                        const PlantLocation &EP_UNUSED(calledFromLocation),
-                                        bool EP_UNUSED(FirstHVACIteration),
-                                        Real64 &EP_UNUSED(CurLoad),
+                                        [[maybe_unused]] const PlantLocation &calledFromLocation,
+                                        [[maybe_unused]] bool FirstHVACIteration,
+                                        [[maybe_unused]] Real64 &CurLoad,
                                         bool RunFlag)
     {
 

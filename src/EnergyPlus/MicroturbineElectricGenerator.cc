@@ -871,17 +871,22 @@ namespace MicroturbineElectricGenerator {
         }
     }
 
-    void MTGeneratorSpecs::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation),
-                                    bool EP_UNUSED(FirstHVACIteration),
-                                    Real64 &EP_UNUSED(CurLoad),
-                                    bool EP_UNUSED(RunFlag))
+    void MTGeneratorSpecs::simulate([[maybe_unused]] EnergyPlusData &state,
+                                    [[maybe_unused]] const PlantLocation &calledFromLocation,
+                                    [[maybe_unused]] bool FirstHVACIteration,
+                                    [[maybe_unused]] Real64 &CurLoad,
+                                    [[maybe_unused]] bool RunFlag)
     {
         // empty function to emulate current behavior as of conversion to using the PlantComponent calling structure.
         // calls from the plant side... do nothing.
         // calls from the ElectricPowerServiceManger call the init, calc, and update worker functions
     }
 
-    void MTGeneratorSpecs::getDesignCapacities(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
+    void MTGeneratorSpecs::getDesignCapacities([[maybe_unused]] EnergyPlusData &state,
+                                               [[maybe_unused]] const PlantLocation &calledFromLocation,
+                                               Real64 &MaxLoad,
+                                               Real64 &MinLoad,
+                                               Real64 &OptLoad)
     {
         MaxLoad = 0.0;
         MinLoad = 0.0;

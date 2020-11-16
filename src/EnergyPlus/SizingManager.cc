@@ -2157,11 +2157,11 @@ namespace SizingManager {
                                     int &NumAlphas,
                                     Array1D<Real64> const &Numbers,
                                     int &NumNumbers,
-                                    Array1D_bool const &EP_UNUSED(lNumericBlanks), // Unused
+                                    [[maybe_unused]] Array1D_bool const &lNumericBlanks, // Unused
                                     Array1D_bool const &lAlphaBlanks,
                                     Array1D_string const &cAlphaFields,
-                                    Array1D_string const &EP_UNUSED(cNumericFields), // Unused
-                                    bool &ErrorsFound                                // If errors found in input
+                                    [[maybe_unused]] Array1D_string const &cNumericFields, // Unused
+                                    bool &ErrorsFound                                      // If errors found in input
     )
     {
 
@@ -4805,7 +4805,7 @@ namespace SizingManager {
     }
 
     // Update the sizing for the entire facilty to gather values for reporting - Glazer January 2017
-    void UpdateFacilitySizing(EnergyPlusData &EP_UNUSED(state), DataGlobalConstants::CallIndicator const CallIndicator)
+    void UpdateFacilitySizing([[maybe_unused]] EnergyPlusData &state, DataGlobalConstants::CallIndicator const CallIndicator)
     {
         int NumOfTimeStepInDay = NumOfTimeStepInHour * 24;
 

@@ -142,7 +142,7 @@ namespace HeatBalanceIntRadExchange {
 #ifdef EP_Count_Calls
                                  std::string const &CalledFrom)
 #else
-                                 std::string const &EP_UNUSED(CalledFrom))
+                                 [[maybe_unused]] std::string const &CalledFrom)
 #endif
     {
 
@@ -1103,12 +1103,12 @@ namespace HeatBalanceIntRadExchange {
     }
 
     void GetInputViewFactors(EnergyPlusData &state,
-                             std::string const &ZoneName, // Needed to check for user input view factors.
-                             int const N,                 // NUMBER OF SURFACES
-                             Array2A<Real64> F,           // USER INPUT DIRECT VIEW FACTOR MATRIX (N X N)
-                             const Array1D_int &EP_UNUSED(SPtr),     // pointer to actual surface number
-                             bool &NoUserInputF,          // Flag signifying no input F's for this
-                             bool &ErrorsFound            // True when errors are found in number of fields vs max args
+                             std::string const &ZoneName,              // Needed to check for user input view factors.
+                             int const N,                              // NUMBER OF SURFACES
+                             Array2A<Real64> F,                        // USER INPUT DIRECT VIEW FACTOR MATRIX (N X N)
+                             [[maybe_unused]] const Array1D_int &SPtr, // pointer to actual surface number
+                             bool &NoUserInputF,                       // Flag signifying no input F's for this
+                             bool &ErrorsFound                         // True when errors are found in number of fields vs max args
     )
     {
 

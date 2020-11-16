@@ -1151,8 +1151,12 @@ namespace RoomAirModelAirflowNetwork {
 
     } // CalcNodeSums
 
-    void RAFNData::CalcSurfaceMoistureSums(
-        EnergyPlusData &state, int const RoomAirNode, Real64 &SumHmAW, Real64 &SumHmARa, Real64 &SumHmARaW, Array1D<bool> const &EP_UNUSED(SurfMask))
+    void RAFNData::CalcSurfaceMoistureSums(EnergyPlusData &state,
+                                           int const RoomAirNode,
+                                           Real64 &SumHmAW,
+                                           Real64 &SumHmARa,
+                                           Real64 &SumHmARaW,
+                                           [[maybe_unused]] Array1D<bool> const &SurfMask)
     {
 
         // SUBROUTINE INFORMATION:

@@ -5040,11 +5040,11 @@ namespace HeatBalanceManager {
                          int &NumAlphas,
                          Array1D<Real64> const &rNumericArgs,
                          int &NumNumbers,
-                         Array1D_bool const &EP_UNUSED(lNumericFieldBlanks), // Unused
+                         [[maybe_unused]] Array1D_bool const &lNumericFieldBlanks, // Unused
                          Array1D_bool const &lAlphaFieldBlanks,
                          Array1D_string const &cAlphaFieldNames,
-                         Array1D_string const &EP_UNUSED(cNumericFieldNames), // Unused
-                         bool &ErrorsFound                                   // If errors found in input
+                         [[maybe_unused]] Array1D_string const &cNumericFieldNames, // Unused
+                         bool &ErrorsFound                                          // If errors found in input
     )
     {
 
@@ -7809,7 +7809,7 @@ namespace HeatBalanceManager {
         }
     }
 
-    void CreateTCConstructions(EnergyPlusData &state, bool &EP_UNUSED(ErrorsFound)) // If errors found in input
+    void CreateTCConstructions(EnergyPlusData &state, [[maybe_unused]] bool &ErrorsFound) // If errors found in input
     {
 
         // SUBROUTINE INFORMATION:

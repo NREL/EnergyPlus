@@ -141,7 +141,7 @@ SiteBuildingSurfaceGroundTemps::BuildingSurfaceGTMFactory(EnergyPlusData &state,
 
 //******************************************************************************
 
-Real64 SiteBuildingSurfaceGroundTemps::getGroundTemp(EnergyPlusData &EP_UNUSED(state))
+Real64 SiteBuildingSurfaceGroundTemps::getGroundTemp([[maybe_unused]] EnergyPlusData &state)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -157,7 +157,8 @@ Real64 SiteBuildingSurfaceGroundTemps::getGroundTemp(EnergyPlusData &EP_UNUSED(s
 
 //******************************************************************************
 
-Real64 SiteBuildingSurfaceGroundTemps::getGroundTempAtTimeInSeconds(EnergyPlusData &state, Real64 const EP_UNUSED(_depth), Real64 const _seconds)
+Real64
+SiteBuildingSurfaceGroundTemps::getGroundTempAtTimeInSeconds(EnergyPlusData &state, [[maybe_unused]] Real64 const _depth, Real64 const _seconds)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -187,7 +188,7 @@ Real64 SiteBuildingSurfaceGroundTemps::getGroundTempAtTimeInSeconds(EnergyPlusDa
 
 //******************************************************************************
 
-Real64 SiteBuildingSurfaceGroundTemps::getGroundTempAtTimeInMonths(EnergyPlusData &state, Real64 const EP_UNUSED(_depth), int const _month)
+Real64 SiteBuildingSurfaceGroundTemps::getGroundTempAtTimeInMonths(EnergyPlusData &state, [[maybe_unused]] Real64 const _depth, int const _month)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell

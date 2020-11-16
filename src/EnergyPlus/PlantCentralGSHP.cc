@@ -165,7 +165,8 @@ namespace PlantCentralGSHP {
         this->SizeWrapper(state);
     }
 
-    void WrapperSpecs::getDesignCapacities(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
+    void WrapperSpecs::getDesignCapacities(
+        [[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
     {
         MinLoad = 0.0;
         MaxLoad = 0.0;
@@ -195,7 +196,7 @@ namespace PlantCentralGSHP {
     }
 
     void WrapperSpecs::simulate(
-        EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool EP_UNUSED(RunFlag))
+        EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, [[maybe_unused]] bool RunFlag)
     {
         if (calledFromLocation.loopNum != this->GLHELoopNum) {
 

@@ -2277,11 +2277,11 @@ namespace SystemAvailabilityManager {
     }
 
     void CalcOptStartSysAvailMgr(EnergyPlusData &state,
-                                 int const SysAvailNum,                       // number of the current scheduled system availability manager
-                                 int const PriAirSysNum,                      // number of the primary air system affected by this Avail. Manager
-                                 int &AvailStatus,                            // System status indicator
-                                 Optional_int_const EP_UNUSED(ZoneEquipType), // Type of ZoneHVAC equipment component
-                                 Optional_int_const EP_UNUSED(CompNum)        // Index of ZoneHVAC equipment component
+                                 int const SysAvailNum,  // number of the current scheduled system availability manager
+                                 int const PriAirSysNum, // number of the primary air system affected by this Avail. Manager
+                                 int &AvailStatus,       // System status indicator
+                                 [[maybe_unused]] Optional_int_const ZoneEquipType, // Type of ZoneHVAC equipment component
+                                 [[maybe_unused]] Optional_int_const CompNum        // Index of ZoneHVAC equipment component
     )
     {
 

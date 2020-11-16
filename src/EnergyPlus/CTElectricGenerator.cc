@@ -118,10 +118,11 @@ namespace CTElectricGenerator {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void CTGeneratorData::simulate(EnergyPlusData &EP_UNUSED(state), const EnergyPlus::PlantLocation &EP_UNUSED(calledFromLocation),
-                                   bool EP_UNUSED(FirstHVACIteration),
-                                   Real64 &EP_UNUSED(CurLoad),
-                                   bool EP_UNUSED(RunFlag))
+    void CTGeneratorData::simulate([[maybe_unused]] EnergyPlusData &state,
+                                   [[maybe_unused]] const EnergyPlus::PlantLocation &calledFromLocation,
+                                   [[maybe_unused]] bool FirstHVACIteration,
+                                   [[maybe_unused]] Real64 &CurLoad,
+                                   [[maybe_unused]] bool RunFlag)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher

@@ -134,7 +134,7 @@ std::shared_ptr<SiteDeepGroundTemps> SiteDeepGroundTemps::DeepGTMFactory(EnergyP
 
 //******************************************************************************
 
-Real64 SiteDeepGroundTemps::getGroundTemp(EnergyPlusData &EP_UNUSED(state))
+Real64 SiteDeepGroundTemps::getGroundTemp([[maybe_unused]] EnergyPlusData &state)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -150,7 +150,7 @@ Real64 SiteDeepGroundTemps::getGroundTemp(EnergyPlusData &EP_UNUSED(state))
 
 //******************************************************************************
 
-Real64 SiteDeepGroundTemps::getGroundTempAtTimeInSeconds(EnergyPlusData &state, Real64 const EP_UNUSED(_depth), Real64 const _seconds)
+Real64 SiteDeepGroundTemps::getGroundTempAtTimeInSeconds(EnergyPlusData &state, [[maybe_unused]] Real64 const _depth, Real64 const _seconds)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -180,7 +180,7 @@ Real64 SiteDeepGroundTemps::getGroundTempAtTimeInSeconds(EnergyPlusData &state, 
 
 //******************************************************************************
 
-Real64 SiteDeepGroundTemps::getGroundTempAtTimeInMonths(EnergyPlusData &state, Real64 const EP_UNUSED(_depth), int const _month)
+Real64 SiteDeepGroundTemps::getGroundTempAtTimeInMonths(EnergyPlusData &state, [[maybe_unused]] Real64 const _depth, int const _month)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell

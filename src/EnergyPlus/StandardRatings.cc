@@ -1647,7 +1647,7 @@ namespace StandardRatings {
         int const CapFFlowCurveIndex,                     // Index for the capacity as a function of flow fraction modifier curve
         int const EIRFTempCurveIndex,                     // Index for the EIR as a function of temperature modifier curve
         int const EIRFFlowCurveIndex,                     // Index for the EIR as a function of flow fraction modifier curve
-        int const EP_UNUSED(PLFFPLRCurveIndex),           // Index for the EIR vs part-load ratio curve
+        [[maybe_unused]] int const PLFFPLRCurveIndex,     // Index for the EIR vs part-load ratio curve
         Real64 const RatedTotalCapacity,                  // Rated gross total cooling capacity
         Real64 const RatedCOP,                            // Rated gross COP
         Real64 const RatedAirVolFlowRate,                 // air flow rate through the coil at rated condition
@@ -1969,8 +1969,8 @@ namespace StandardRatings {
 
     void MultiSpeedDXHeatingCoilStandardRatings(
         EnergyPlusData &state,
-        std::string const &EP_UNUSED(DXCoilName),                  // Name of DX coil for which HSPF is calculated
-        std::string const &EP_UNUSED(DXCoilType),                  // Type of DX coil for which HSPF is calculated
+        [[maybe_unused]] std::string const &DXCoilName,            // Name of DX coil for which HSPF is calculated
+        [[maybe_unused]] std::string const &DXCoilType,            // Type of DX coil for which HSPF is calculated
         Array1A_int const CapFTempCurveIndex,                      // Index for the capacity as a function of temperature modifier curve
         Array1A_int const CapFFlowCurveIndex,                      // Index for the capacity as a function of flow fraction modifier curve
         Array1A_int const EIRFTempCurveIndex,                      // Index for the EIR as a function of temperature modifier curve

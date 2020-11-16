@@ -180,9 +180,10 @@ namespace IceThermalStorage {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void SimpleIceStorageData::simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation,
-                                        bool EP_UNUSED(FirstHVACIteration),
-                                        Real64 &EP_UNUSED(CurLoad),
+    void SimpleIceStorageData::simulate(EnergyPlusData &state,
+                                        const PlantLocation &calledFromLocation,
+                                        [[maybe_unused]] bool FirstHVACIteration,
+                                        [[maybe_unused]] Real64 &CurLoad,
                                         bool RunFlag)
     {
         std::string const RoutineName("SimpleIceStorageData::simulate");
@@ -288,10 +289,11 @@ namespace IceThermalStorage {
         this->RecordOutput(MyLoad2, RunFlag);
     }
 
-    void DetailedIceStorageData::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
-                                          bool EP_UNUSED(FirstHVACIteration),
-                                          Real64 &EP_UNUSED(CurLoad),
-                                          bool EP_UNUSED(RunFlag))
+    void DetailedIceStorageData::simulate(EnergyPlusData &state,
+                                          [[maybe_unused]] const PlantLocation &calledFromLocation,
+                                          [[maybe_unused]] bool FirstHVACIteration,
+                                          [[maybe_unused]] Real64 &CurLoad,
+                                          [[maybe_unused]] bool RunFlag)
     {
 
         if (state.dataGlobal->BeginEnvrnFlag && this->MyEnvrnFlag) {

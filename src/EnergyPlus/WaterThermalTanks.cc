@@ -188,8 +188,11 @@ namespace WaterThermalTanks {
         }
     }
 
-    void
-    WaterThermalTankData::getDesignCapacities(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
+    void WaterThermalTankData::getDesignCapacities([[maybe_unused]] EnergyPlusData &state,
+                                                   [[maybe_unused]] const PlantLocation &calledFromLocation,
+                                                   Real64 &MaxLoad,
+                                                   Real64 &MinLoad,
+                                                   Real64 &OptLoad)
     {
         MinLoad = 0.0;
         MaxLoad = this->MaxCapacity;
@@ -263,7 +266,7 @@ namespace WaterThermalTanks {
     }
 
     void WaterThermalTankData::simulate(
-        EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool EP_UNUSED(RunFlag))
+        EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, [[maybe_unused]] bool RunFlag)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brandon Anderson
@@ -336,8 +339,8 @@ namespace WaterThermalTanks {
         Tank.onInitLoopEquip(state, calledFromLocation);
     }
 
-    void HeatPumpWaterHeaterData::getDesignCapacities(EnergyPlusData &EP_UNUSED(state),
-                                                      const PlantLocation &EP_UNUSED(calledFromLocation),
+    void HeatPumpWaterHeaterData::getDesignCapacities([[maybe_unused]] EnergyPlusData &state,
+                                                      [[maybe_unused]] const PlantLocation &calledFromLocation,
                                                       Real64 &MaxLoad,
                                                       Real64 &MinLoad,
                                                       Real64 &OptLoad)
@@ -348,7 +351,7 @@ namespace WaterThermalTanks {
     }
 
     void HeatPumpWaterHeaterData::simulate(
-        EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool EP_UNUSED(RunFlag))
+        EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, [[maybe_unused]] bool RunFlag)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brandon Anderson
@@ -9862,11 +9865,12 @@ namespace WaterThermalTanks {
         return NeedsHeatOrCool;
     }
 
-    Real64 WaterThermalTankData::PlantMassFlowRatesFunc(EnergyPlusData &state, int const InNodeNum,
+    Real64 WaterThermalTankData::PlantMassFlowRatesFunc(EnergyPlusData &state,
+                                                        int const InNodeNum,
                                                         bool const FirstHVACIteration,
                                                         SideEnum const WaterThermalTankSide,
                                                         int const PlantLoopSide,
-                                                        bool const EP_UNUSED(PlumbedInSeries),
+                                                        [[maybe_unused]] bool const PlumbedInSeries,
                                                         int const BranchControlType,
                                                         Real64 const OutletTemp,
                                                         Real64 const DeadBandTemp,
