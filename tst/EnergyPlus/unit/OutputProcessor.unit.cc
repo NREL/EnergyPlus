@@ -5237,8 +5237,8 @@ namespace OutputProcessor {
         Real64 transferredenergy = 0;
         state.dataGlobal->NumOfZones = 1;
         DataHVACGlobals::NumPrimaryAirSys = 1;
-        DataAirSystems::PrimaryAirSystem.allocate(DataHVACGlobals::NumPrimaryAirSys);
-        DataAirSystems::PrimaryAirSystem(1).Name = "Air Loop 1";
+        state.dataAirSystemsData->PrimaryAirSystems.allocate(DataHVACGlobals::NumPrimaryAirSys);
+        state.dataAirSystemsData->PrimaryAirSystems(1).Name = "Air Loop 1";
         DataZoneEquipment::ZoneEquipConfig.allocate(state.dataGlobal->NumOfZones);
         DataZoneEquipment::ZoneEquipConfig(state.dataGlobal->NumOfZones).IsControlled = true;
         SetupOutputVariable(state, "Surface Average Face Conduction Heat Transfer Energy", OutputProcessor::Unit::J, transferredenergy, "Zone", "Sum", "*");

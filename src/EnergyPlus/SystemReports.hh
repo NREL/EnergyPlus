@@ -313,7 +313,8 @@ namespace SystemReports {
 
     void ReportMaxVentilationLoads(EnergyPlusData &state);
 
-    void MatchPlantSys(int const AirLoopNum, // counter for zone air distribution inlets
+    void MatchPlantSys(EnergyPlusData &state,
+                       int const AirLoopNum, // counter for zone air distribution inlets
                        int const BranchNum   // counter for zone air distribution inlets
     );
 

@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataHVACSystems.hh>
@@ -413,7 +414,6 @@ namespace DataAirSystems {
     };
 
     // Object Data
-    extern Array1D<DefinePrimaryAirSystem> PrimaryAirSystem;
     extern Array1D<ConnectionPoint> DemandSideConnect;               // Connections between loops
     extern Array1D<ConnectZoneComp> ZoneCompToPlant;                 // Connections between loops
     extern Array1D<ConnectZoneSubComp> ZoneSubCompToPlant;           // Connections between loops
@@ -428,6 +428,16 @@ namespace DataAirSystems {
     Real64 calcFanDesignHeatGain(EnergyPlusData &state, int const &dataFanEnumType, int const &dataFanIndex, Real64 const &desVolFlow);
 
 } // namespace DataAirSystems
+
+    struct AirSystemsData : BaseGlobalStruct {
+
+        Array1D<DataAirSystems::DefinePrimaryAirSystem> PrimaryAirSystems;
+
+        void clear_state() override
+        {
+            this->PrimaryAirSystems.deallocate();
+        }
+    };
 
 } // namespace EnergyPlus
 

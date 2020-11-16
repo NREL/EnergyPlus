@@ -352,7 +352,6 @@ namespace AirLoopHVACDOAS {
     void AirLoopDOAS::getAirLoopDOASInput(EnergyPlusData &state)
     {
 
-        using DataAirSystems::PrimaryAirSystem;
         using ScheduleManager::GetScheduleIndex;
 
         bool errorsFound(false);
@@ -755,7 +754,7 @@ namespace AirLoopHVACDOAS {
                     int num = 0;
                     for (auto AirLoopHAVCName : AirLoopArray) {
                         std::string name = AirLoopHAVCName.at("airloophvac_name");
-                        int LoopNum = UtilityRoutines::FindItemInList(name, PrimaryAirSystem);
+                        int LoopNum = UtilityRoutines::FindItemInList(name, state.dataAirSystemsData->PrimaryAirSystems);
                         num += 1;
                         if (LoopNum > 0 && num <= thisDOAS.NumOfAirLoops) {
                             thisDOAS.AirLoopName.push_back(name);

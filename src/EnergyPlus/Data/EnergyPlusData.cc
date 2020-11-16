@@ -59,6 +59,7 @@ namespace EnergyPlus {
         this->dataAirflowNetworkBalanceManager = std::unique_ptr<AirflowNetworkBalanceManagerData>(new AirflowNetworkBalanceManagerData);
         this->dataAirLoop = std::unique_ptr<DataAirLoopData>(new DataAirLoopData);
         this->dataAirLoopHVACDOAS = std::unique_ptr<AirLoopHVACDOASData>(new AirLoopHVACDOASData);
+        this->dataAirSystemsData = std::unique_ptr<AirSystemsData>(new AirSystemsData);
         this->dataBaseboardElectric = std::unique_ptr<BaseboardElectricData>(new BaseboardElectricData);
         this->dataBaseboardRadiator = std::unique_ptr<BaseboardRadiatorData>(new BaseboardRadiatorData);
         this->dataBoilers = std::unique_ptr<BoilersData>(new BoilersData);

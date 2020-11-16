@@ -3859,7 +3859,6 @@ namespace ZoneEquipmentManager {
 
         using DataLoopNode::Node;
         using namespace DataRoomAirModel; // UCSD
-        using DataAirSystems::PrimaryAirSystem;
         using DataHeatBalance::AddInfiltrationFlow;
         using DataHeatBalance::AdjustInfiltrationFlow;
         using DataHeatBalance::AllZones;
@@ -3918,7 +3917,7 @@ namespace ZoneEquipmentManager {
 
         // Set max OA flow and frac for systems which are all OA (no OASys)
         for (int airLoop = 1; airLoop <= DataHVACGlobals::NumPrimaryAirSys; ++airLoop) {
-            if (PrimaryAirSystem(airLoop).isAllOA) {
+            if (state.dataAirSystemsData->PrimaryAirSystems(airLoop).isAllOA) {
                 state.dataAirLoop->AirLoopFlow(airLoop).MaxOutAir = state.dataAirLoop->AirLoopFlow(airLoop).SupFlow;
                 state.dataAirLoop->AirLoopFlow(airLoop).OAFlow = state.dataAirLoop->AirLoopFlow(airLoop).SupFlow;
                 state.dataAirLoop->AirLoopFlow(airLoop).OAFrac = 1.0;
@@ -4256,7 +4255,7 @@ namespace ZoneEquipmentManager {
                     }
 
                     airLoopReturnFrac = thisAirLoopFlow.DesReturnFrac;
-                    if (DataAirSystems::PrimaryAirSystem(airLoop).OASysExists && (thisAirLoopFlow.MaxOutAir > 0.0)) {
+                    if (state.dataAirSystemsData->PrimaryAirSystems(airLoop).OASysExists && (thisAirLoopFlow.MaxOutAir > 0.0)) {
                         // Set return flow as fraction of matching inlet node flow if there is an OA system and available OA flow > 0.0
                         returnNodeMassFlow = airLoopReturnFrac * inletMassFlow;
                         thisZoneEquip.TotAvailAirLoopOA += thisAirLoopFlow.MaxOutAir;
@@ -4275,7 +4274,7 @@ namespace ZoneEquipmentManager {
                     if ((state.dataGlobal->DoingSizing) && numRetNodes == 1) {
                         returnNodeMassFlow = ExpTotalReturnMassFlow;
                         if (airLoop > 0) {
-                            if (!DataAirSystems::PrimaryAirSystem(airLoop).OASysExists || (state.dataAirLoop->AirLoopFlow(airLoop).MaxOutAir == 0.0)) {
+                            if (!state.dataAirSystemsData->PrimaryAirSystems(airLoop).OASysExists || (state.dataAirLoop->AirLoopFlow(airLoop).MaxOutAir == 0.0)) {
                                 ExpTotalReturnMassFlow = max(0.0, ExpTotalReturnMassFlow - thisZoneEquip.ZoneExhBalanced + thisZoneEquip.ZoneExh);
                                 returnNodeMassFlow = ExpTotalReturnMassFlow;
                             }

@@ -542,14 +542,14 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest2)
     Node(ZoneEquipConfig(ZoneNum).ZoneNode).HumRat = 0.004;
 
     DataHVACGlobals::NumPrimaryAirSys = 3;
-    DataAirSystems::PrimaryAirSystem.allocate(3);
+    state.dataAirSystemsData->PrimaryAirSystems.allocate(3);
     state.dataAirLoop->AirLoopFlow.allocate(3);
 
-    DataAirSystems::PrimaryAirSystem(1).OASysExists = false;
+    state.dataAirSystemsData->PrimaryAirSystems(1).OASysExists = false;
     state.dataAirLoop->AirLoopFlow(1).DesReturnFrac = 1.0;
-    DataAirSystems::PrimaryAirSystem(2).OASysExists = false;
+    state.dataAirSystemsData->PrimaryAirSystems(2).OASysExists = false;
     state.dataAirLoop->AirLoopFlow(2).DesReturnFrac = 1.0;
-    DataAirSystems::PrimaryAirSystem(3).OASysExists = false;
+    state.dataAirSystemsData->PrimaryAirSystems(3).OASysExists = false;
     state.dataAirLoop->AirLoopFlow(3).DesReturnFrac = 1.0;
     state.dataGlobal->DoingSizing = false;
     state.dataGlobal->isPulseZoneSizing = false;
@@ -655,10 +655,10 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest3)
     }
 
     DataHVACGlobals::NumPrimaryAirSys = 1;
-    DataAirSystems::PrimaryAirSystem.allocate(1);
+    state.dataAirSystemsData->PrimaryAirSystems.allocate(1);
     state.dataAirLoop->AirLoopFlow.allocate(1);
 
-    DataAirSystems::PrimaryAirSystem(1).OASysExists = false;
+    state.dataAirSystemsData->PrimaryAirSystems(1).OASysExists = false;
     state.dataAirLoop->AirLoopFlow(1).DesReturnFrac = 1.0;
     state.dataGlobal->DoingSizing = false;
     state.dataGlobal->isPulseZoneSizing = false;
@@ -776,17 +776,17 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest4)
     Node(ZoneEquipConfig(ZoneNum).ZoneNode).HumRat = 0.004;
 
     DataHVACGlobals::NumPrimaryAirSys = 3;
-    DataAirSystems::PrimaryAirSystem.allocate(3);
+    state.dataAirSystemsData->PrimaryAirSystems.allocate(3);
     state.dataAirLoop->AirLoopFlow.allocate(3);
 
     // Add an outdoor air system to airloop 2
-    DataAirSystems::PrimaryAirSystem(1).OASysExists = false;
+    state.dataAirSystemsData->PrimaryAirSystems(1).OASysExists = false;
     state.dataAirLoop->AirLoopFlow(1).DesReturnFrac = 1.0;
-    DataAirSystems::PrimaryAirSystem(2).OASysExists = true;
+    state.dataAirSystemsData->PrimaryAirSystems(2).OASysExists = true;
     state.dataAirLoop->AirLoopFlow(2).DesReturnFrac = 0.9;
     state.dataAirLoop->AirLoopFlow(2).MaxOutAir = 0.1;
     state.dataAirLoop->AirLoopFlow(2).OAFlow = 0.1;
-    DataAirSystems::PrimaryAirSystem(3).OASysExists = false;
+    state.dataAirSystemsData->PrimaryAirSystems(3).OASysExists = false;
     state.dataAirLoop->AirLoopFlow(3).DesReturnFrac = 1.0;
     state.dataGlobal->DoingSizing = false;
     state.dataGlobal->isPulseZoneSizing = false;
@@ -827,7 +827,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest4)
 
     // Case 3 - add exhaust flow, but set system 2 MaxOutAir to zero, expect sum of inlet flow back
     Node(ZoneEquipConfig(ZoneNum).ExhaustNode(1)).MassFlowRate = 1.000000001;
-    DataAirSystems::PrimaryAirSystem(2).OASysExists = true;
+    state.dataAirSystemsData->PrimaryAirSystems(2).OASysExists = true;
     state.dataAirLoop->AirLoopFlow(2).DesReturnFrac = 0.9;
     state.dataAirLoop->AirLoopFlow(2).MaxOutAir = 0.0;
     state.dataAirLoop->AirLoopFlow(2).OAFlow = 0.0;

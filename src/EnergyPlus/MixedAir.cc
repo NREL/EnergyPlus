@@ -2267,7 +2267,6 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
         using NodeInputManager::GetOnlySingleNode;
         using namespace OutputReportPredefined;
 
-        using DataAirSystems::PrimaryAirSystem;
         using DataContaminantBalance::Contaminant;
         using DataZoneControls::HumidityControlZone;
         using DataZoneControls::NumHumidityControlZones;
@@ -2459,11 +2458,11 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                     for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig(ControlledZoneNum).NumInletNodes; ++zoneInNode) {
                         int AirLoopNumber = ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum(zoneInNode);
                         if (AirLoopNumber > 0 && OASysIndex > 0) {
-                            for (BranchNum = 1; BranchNum <= PrimaryAirSystem(AirLoopNumber).NumBranches; ++BranchNum) {
-                                for (CompNum = 1; CompNum <= PrimaryAirSystem(AirLoopNumber).Branch(BranchNum).TotalComponents; ++CompNum) {
-                                    if (!UtilityRoutines::SameString(PrimaryAirSystem(AirLoopNumber).Branch(BranchNum).Comp(CompNum).Name,
+                            for (BranchNum = 1; BranchNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).NumBranches; ++BranchNum) {
+                                for (CompNum = 1; CompNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).TotalComponents; ++CompNum) {
+                                    if (!UtilityRoutines::SameString(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).Comp(CompNum).Name,
                                                                      state.dataAirLoop->OutsideAirSys(OASysIndex).Name) ||
-                                        !UtilityRoutines::SameString(PrimaryAirSystem(AirLoopNumber).Branch(BranchNum).Comp(CompNum).TypeOf,
+                                        !UtilityRoutines::SameString(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).Comp(CompNum).TypeOf,
                                                                      "AirLoopHVAC:OutdoorAirSystem"))
                                         continue;
                                     AirLoopFound = true;
@@ -2676,7 +2675,6 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
 
         using General::RoundSigDigits;
         using namespace OutputReportPredefined;
-        using DataAirSystems::PrimaryAirSystem;
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
         using EMSManager::iTemperatureSetPoint;
 
@@ -2856,7 +2854,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                 Real64 DesSupplyVolFlowRate = state.dataAirLoop->AirLoopFlow(AirLoopNum).DesSupply / StdRhoAir;
                 if ((thisOAController.MinOA - DesSupplyVolFlowRate) > 0.0001) {
                     ShowWarningError(state, "InitOAController: Minimum Outdoor Air Flow Rate for Controller:OutdoorAir=" + thisOAController.Name +
-                                     " is greater than Design Supply Air Flow Rate for AirLoopHVAC=" + PrimaryAirSystem(AirLoopNum).Name + ".");
+                                     " is greater than Design Supply Air Flow Rate for AirLoopHVAC=" + state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Name + ".");
                     ShowContinueError(state, "...Minimum Outdoor Air Flow Rate=" + RoundSigDigits(thisOAController.MinOA, 6) +
                                       " will be reset to loop Design Supply Air Flow Rate=" + RoundSigDigits(DesSupplyVolFlowRate, 6));
                     thisOAController.MinOA = DesSupplyVolFlowRate;
@@ -2866,7 +2864,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                 }
                 if ((thisOAController.MaxOA - DesSupplyVolFlowRate) > 0.0001) {
                     ShowWarningError(state, "InitOAController: Maximum Outdoor Air Flow Rate for Controller:OutdoorAir=" + thisOAController.Name +
-                                     " is greater than Design Supply Air Flow Rate for AirLoopHVAC=" + PrimaryAirSystem(AirLoopNum).Name + ".");
+                                     " is greater than Design Supply Air Flow Rate for AirLoopHVAC=" + state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Name + ".");
                     ShowContinueError(state, "...Maximum Outdoor Air Flow Rate=" + RoundSigDigits(thisOAController.MaxOA, 6) +
                                       " will be reset to loop Design Supply Air Flow Rate=" + RoundSigDigits(DesSupplyVolFlowRate, 6));
                     thisOAController.MaxOA = DesSupplyVolFlowRate;
@@ -3134,11 +3132,11 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                         // Find the primary air loop that has the outside air system
                         AirLoopFound = false;
                         for (thisAirLoop = 1; thisAirLoop <= NumPrimaryAirSys; ++thisAirLoop) {
-                            for (BranchNum = 1; BranchNum <= PrimaryAirSystem(thisAirLoop).NumBranches; ++BranchNum) {
-                                for (CompNum = 1; CompNum <= PrimaryAirSystem(thisAirLoop).Branch(BranchNum).TotalComponents; ++CompNum) {
-                                    if (!UtilityRoutines::SameString(PrimaryAirSystem(thisAirLoop).Branch(BranchNum).Comp(CompNum).Name,
+                            for (BranchNum = 1; BranchNum <= state.dataAirSystemsData->PrimaryAirSystems(thisAirLoop).NumBranches; ++BranchNum) {
+                                for (CompNum = 1; CompNum <= state.dataAirSystemsData->PrimaryAirSystems(thisAirLoop).Branch(BranchNum).TotalComponents; ++CompNum) {
+                                    if (!UtilityRoutines::SameString(state.dataAirSystemsData->PrimaryAirSystems(thisAirLoop).Branch(BranchNum).Comp(CompNum).Name,
                                                                      state.dataAirLoop->OutsideAirSys(thisOASys).Name) ||
-                                        !UtilityRoutines::SameString(PrimaryAirSystem(thisAirLoop).Branch(BranchNum).Comp(CompNum).TypeOf,
+                                        !UtilityRoutines::SameString(state.dataAirSystemsData->PrimaryAirSystems(thisAirLoop).Branch(BranchNum).Comp(CompNum).TypeOf,
                                                                      "AirLoopHVAC:OutdoorAirSystem"))
                                         continue;
                                     AirLoopFound = true;
@@ -3151,7 +3149,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                     }
                     // Check primary air loop name
                     if (AirLoopFound && thisAirLoop > 0) {
-                        airloopName = PrimaryAirSystem(thisAirLoop).Name; // state.dataAirLoop->OutsideAirSys(OASysIndex)%Name
+                        airloopName = state.dataAirSystemsData->PrimaryAirSystems(thisAirLoop).Name; // state.dataAirLoop->OutsideAirSys(OASysIndex)%Name
                     } else {
                         ShowWarningError(state, "Cannot find the primary air loop for the OA Controller: " + thisOAController.Name);
                         airloopName = "AirLoop not found";
