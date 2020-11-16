@@ -3201,7 +3201,7 @@ namespace UnitarySystems {
                     int ZoneExhNum = 0;
 
                     if (!thisSys.ATMixerExists) {
-                        ZoneEquipmentFound = searchExhaustNodes(thisSys.AirInNode, ControlledZoneNum, ZoneExhNum);
+                        ZoneEquipmentFound = searchExhaustNodes(state, thisSys.AirInNode, ControlledZoneNum, ZoneExhNum);
                         if (ZoneEquipmentFound) {
                             // The Node was found among the exhaust nodes, now check that a matching inlet node exists
                             thisSys.m_ZoneInletNode = DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).ExhaustNode(ZoneExhNum);
@@ -3210,7 +3210,7 @@ namespace UnitarySystems {
                             ZoneInletNodeFound = searchZoneInletNodesByEquipmentIndex(thisSys.AirOutNode, thisSys.ControlZoneNum);
                         }
                     } else if (thisSys.ATMixerType == DataHVACGlobals::ATMixer_InletSide) {
-                        ZoneEquipmentFound = searchExhaustNodes(thisSys.m_ATMixerSecNode, ControlledZoneNum, ZoneExhNum);
+                        ZoneEquipmentFound = searchExhaustNodes(state, thisSys.m_ATMixerSecNode, ControlledZoneNum, ZoneExhNum);
                         if (ZoneEquipmentFound) {
                             thisSys.m_ZoneInletNode = thisSys.AirOutNode;
                             thisSys.ControlZoneNum = ControlledZoneNum;
@@ -3219,7 +3219,7 @@ namespace UnitarySystems {
                             ZoneInletNodeFound = searchZoneInletNodesByEquipmentIndex(thisSys.AirOutNode, thisSys.ControlZoneNum);
                         }
                     } else if (thisSys.ATMixerType == DataHVACGlobals::ATMixer_SupplySide) {
-                        ZoneEquipmentFound = searchExhaustNodes(thisSys.AirInNode, ControlledZoneNum, ZoneExhNum);
+                        ZoneEquipmentFound = searchExhaustNodes(state, thisSys.AirInNode, ControlledZoneNum, ZoneExhNum);
                         if (ZoneEquipmentFound) {
                             thisSys.m_ZoneInletNode = thisSys.ATMixerOutNode;
                             thisSys.ControlZoneNum = ControlledZoneNum;
