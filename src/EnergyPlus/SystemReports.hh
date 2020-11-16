@@ -243,7 +243,8 @@ namespace SystemReports {
                                 int const PlantBranch,
                                 int const PlantComp);
 
-    void UpdateZoneSubCompPtrArray(int &Idx,
+    void UpdateZoneSubCompPtrArray(EnergyPlusData &state,
+                                   int &Idx,
                                    int const ListNum,
                                    int const AirDistUnitNum,
                                    int const SubCompNum,
