@@ -373,7 +373,7 @@ namespace BoilerSteam {
 
             if ((DataLoopNode::Node(this->BoilerOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&
                 (DataLoopNode::Node(this->BoilerOutletNodeNum).TempSetPointLo == DataLoopNode::SensedNodeFlagValue)) {
-                if (!DataGlobals::AnyEnergyManagementSystemInModel) {
+                if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                     if (!this->MissingSetPointErrDone) {
                         ShowWarningError(state, "Missing temperature setpoint for Boiler:Steam = " + this->Name);
                         ShowContinueError(state, " A temperature setpoint is needed at the outlet node of the boiler, use a SetpointManager");
@@ -515,7 +515,7 @@ namespace BoilerSteam {
                                                          tmpNomCap,
                                                          "User-Specified Nominal Capacity [W]",
                                                          NomCapUser);
-                            if (DataGlobals::DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpNomCap - NomCapUser) / NomCapUser) > DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizePump: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError(state, "User-Specified Nominal Capacity of " + General::RoundSigDigits(NomCapUser, 2) + " [W]");
@@ -613,7 +613,7 @@ namespace BoilerSteam {
                 ShowContinueError(state, "Steam temperature=[" + General::RoundSigDigits(this->BoilerOutletTemp, 2) + "] C");
                 ShowContinueError(state, "Refrigerant Saturation Pressure =[" + General::RoundSigDigits(this->BoilerPressCheck, 0) + "] Pa");
             }
-            ShowRecurringSevereErrorAtEnd("Boiler:Steam=\"" + this->Name +
+            ShowRecurringSevereErrorAtEnd(state, "Boiler:Steam=\"" + this->Name +
                                               "\", Saturation Pressure is greater than Maximum Operating Pressure..continues",
                                           this->PressErrIndex,
                                           this->BoilerPressCheck,

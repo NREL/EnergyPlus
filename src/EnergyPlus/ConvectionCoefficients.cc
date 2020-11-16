@@ -107,7 +107,6 @@ namespace ConvectionCoefficients {
     // Subroutines are called to fill the variable HConvIn with the convection coefficient at
     // the inside face.  or outside face for the current surface.
 
-    using namespace DataGlobals;
     using namespace DataLoopNode;
     using namespace DataHeatBalance;
     using namespace DataSurfaces;
@@ -172,9 +171,9 @@ namespace ConvectionCoefficients {
         }
 
         if (state.dataConvectionCoefficient->NodeCheck) { // done once when conditions are ready...
-            if (!SysSizingCalc && !ZoneSizingCalc && ZoneEquipInputsFilled && allocated(Node)) {
+            if (!state.dataGlobal->SysSizingCalc && !state.dataGlobal->ZoneSizingCalc && ZoneEquipInputsFilled && allocated(Node)) {
                 state.dataConvectionCoefficient->NodeCheck = false;
-                for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+                for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                     if (Zone(ZoneNum).InsideConvectionAlgo != CeilingDiffuser) continue;
                     if (Zone(ZoneNum).SystemZoneNodeNumber != 0) continue;
                     ShowSevereError(state, "InitInteriorConvectionCoeffs: Inside Convection=CeilingDiffuser, but no system inlet node defined, Zone=" +
@@ -186,7 +185,7 @@ namespace ConvectionCoefficients {
             }
         }
 
-        if (state.dataConvectionCoefficient->ActiveSurfaceCheck && !SysSizingCalc && !ZoneSizingCalc && ZoneEquipSimulatedOnce) {
+        if (state.dataConvectionCoefficient->ActiveSurfaceCheck && !state.dataGlobal->SysSizingCalc && !state.dataGlobal->ZoneSizingCalc && ZoneEquipSimulatedOnce) {
             SetupAdaptiveConvectionRadiantSurfaceData(state);
             state.dataConvectionCoefficient->ActiveSurfaceCheck = false;
         }
@@ -236,7 +235,7 @@ namespace ConvectionCoefficients {
             state.dataConvectionCoefficient->MyEnvirnFlag = false;
         }
         if (!state.dataGlobal->BeginEnvrnFlag) state.dataConvectionCoefficient->MyEnvirnFlag = true;
-        for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+        for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
 
             {
                 auto const SELECT_CASE_var(Zone(ZoneNum).InsideConvectionAlgo);
@@ -252,7 +251,7 @@ namespace ConvectionCoefficients {
                 }
             }
         }
-        for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+        for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
 
             for (SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
 
@@ -1688,7 +1687,7 @@ namespace ConvectionCoefficients {
                       UserExtConvectionCoeffs(Loop).HcModelEq != ASHRAESimple) ||
                      UserExtConvectionCoeffs(Loop).OverrideType != ConvCoefSpecifiedModel)) {
                     ++Count;
-                    if (DisplayExtraWarnings) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
                         ShowSevereError(state, RoutineName + "Surface=\"" + UserExtConvectionCoeffs(Loop).SurfaceName + "\", mixed algorithms.");
                         ShowContinueError(state,
                             "Zone Outside Convection Algorithm specifies \"SimpleCombined\". SimpleCombined will be used for this surface.");
@@ -1699,7 +1698,7 @@ namespace ConvectionCoefficients {
                 ShowSevereMessage(state, RoutineName + RoundSigDigits(Count) + " surfaces had different outside convection algorithms specified when");
                 ShowContinueError(state,
                     "the Zone Outside Convection Algorithm specifies \"SimpleCombined\". SimpleCombined will be used for these surfaces.");
-                if (!DisplayExtraWarnings) {
+                if (!state.dataGlobal->DisplayExtraWarnings) {
                     ShowContinueError(state, "Use OutputDiagnostics,DisplayExtraWarnings; to see specific instances.");
                     TotalSevereErrors += Count;
                 }
@@ -1728,7 +1727,7 @@ namespace ConvectionCoefficients {
             state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.EnteredByUser = true;
 
             // The following array maps the inputs for the SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections algorithm input fields
-            // to the corresponding defaults by making a pair with a pointer to the state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo algorithm int parameter
+            // to the corresponding defaults by making a pair with a pointer to the InsideFaceAdaptiveConvectionAlgo algorithm int parameter
             // to the default int value
             std::array<int* const, 45> AdaptiveConvectionAlgoInsideDefaults =
                 {
@@ -1881,7 +1880,7 @@ namespace ConvectionCoefficients {
                     if (ConvectionType == "OUTSIDE") {
                         if (Surface(SurfNum).OSCPtr > 0) continue;
                         if (Surface(SurfNum).ExtConvCoeff != 0) {
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                                  "\", not overwriting already assigned value for (Outside) in Surface=" + Surface(SurfNum).Name);
                             } else {
@@ -1892,7 +1891,7 @@ namespace ConvectionCoefficients {
                         }
                     } else {
                         if (Surface(SurfNum).IntConvCoeff != 0) {
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                                  "\", not overwriting already assigned value for (Inside) in Surface=" + Surface(SurfNum).Name);
                             } else {
@@ -1903,7 +1902,7 @@ namespace ConvectionCoefficients {
                         }
                     }
                 }
-                if (!DisplayExtraWarnings && (SurfaceCountOutside > 0 || SurfaceCountInside > 0)) {
+                if (!state.dataGlobal->DisplayExtraWarnings && (SurfaceCountOutside > 0 || SurfaceCountInside > 0)) {
                     if (SurfaceCountOutside > 0) {
                         OverwriteMessage = TrimSigDigits(SurfaceCountOutside) + " Outside";
                     }
@@ -1926,7 +1925,7 @@ namespace ConvectionCoefficients {
                     if (ConvectionType == "OUTSIDE") {
                         if (Surface(SurfNum).OSCPtr > 0) continue;
                         if (Surface(SurfNum).ExtConvCoeff != 0) {
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                                  "\", not overwriting already assigned value for (Outside) in Surface=" + Surface(SurfNum).Name);
                             } else {
@@ -1937,7 +1936,7 @@ namespace ConvectionCoefficients {
                         }
                     } else {
                         if (Surface(SurfNum).IntConvCoeff != 0) {
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                                  "\", not overwriting already assigned value for (Inside) in Surface=" + Surface(SurfNum).Name);
                             } else {
@@ -1948,7 +1947,7 @@ namespace ConvectionCoefficients {
                         }
                     }
                 }
-                if (!DisplayExtraWarnings && (SurfaceCountOutside > 0 || SurfaceCountInside > 0)) {
+                if (!state.dataGlobal->DisplayExtraWarnings && (SurfaceCountOutside > 0 || SurfaceCountInside > 0)) {
                     if (SurfaceCountOutside > 0) {
                         OverwriteMessage = TrimSigDigits(SurfaceCountOutside) + " Outside";
                     }
@@ -1971,7 +1970,7 @@ namespace ConvectionCoefficients {
                     if (ConvectionType == "OUTSIDE") {
                         if (Surface(SurfNum).OSCPtr > 0) continue;
                         if (Surface(SurfNum).ExtConvCoeff != 0) {
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                                  "\", not overwriting already assigned value for (Outside) in Surface=" + Surface(SurfNum).Name);
                             } else {
@@ -1982,7 +1981,7 @@ namespace ConvectionCoefficients {
                         }
                     } else {
                         if (Surface(SurfNum).IntConvCoeff != 0) {
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                                  "\", not overwriting already assigned value for (Inside) in Surface=" + Surface(SurfNum).Name);
                             } else {
@@ -1993,7 +1992,7 @@ namespace ConvectionCoefficients {
                         }
                     }
                 }
-                if (!DisplayExtraWarnings && (SurfaceCountOutside > 0 || SurfaceCountInside > 0)) {
+                if (!state.dataGlobal->DisplayExtraWarnings && (SurfaceCountOutside > 0 || SurfaceCountInside > 0)) {
                     if (SurfaceCountOutside > 0) {
                         OverwriteMessage = TrimSigDigits(SurfaceCountOutside) + " Outside";
                     }
@@ -2016,7 +2015,7 @@ namespace ConvectionCoefficients {
                     if (ConvectionType == "OUTSIDE") {
                         if (Surface(SurfNum).OSCPtr > 0) continue;
                         if (Surface(SurfNum).ExtConvCoeff != 0) {
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                                  "\", not overwriting already assigned value for (Outside) in Surface=" + Surface(SurfNum).Name);
                             } else {
@@ -2027,7 +2026,7 @@ namespace ConvectionCoefficients {
                         }
                     } else {
                         if (Surface(SurfNum).IntConvCoeff != 0) {
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                                  "\", not overwriting already assigned value for (Inside) in Surface=" + Surface(SurfNum).Name);
                             } else {
@@ -2038,7 +2037,7 @@ namespace ConvectionCoefficients {
                         }
                     }
                 }
-                if (!DisplayExtraWarnings && (SurfaceCountOutside > 0 || SurfaceCountInside > 0)) {
+                if (!state.dataGlobal->DisplayExtraWarnings && (SurfaceCountOutside > 0 || SurfaceCountInside > 0)) {
                     if (SurfaceCountOutside > 0) {
                         OverwriteMessage = TrimSigDigits(SurfaceCountOutside) + " Outside";
                     }
@@ -2061,7 +2060,7 @@ namespace ConvectionCoefficients {
                     if (ConvectionType == "OUTSIDE") {
                         if (Surface(SurfNum).OSCPtr > 0) continue;
                         if (Surface(SurfNum).ExtConvCoeff != 0) {
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                                  "\", not overwriting already assigned value for (Outside) in Surface=" + Surface(SurfNum).Name);
                             } else {
@@ -2072,7 +2071,7 @@ namespace ConvectionCoefficients {
                         }
                     } else {
                         if (Surface(SurfNum).IntConvCoeff != 0) {
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                                  "\", not overwriting already assigned value for (Inside) in Surface=" + Surface(SurfNum).Name);
                             } else {
@@ -2083,7 +2082,7 @@ namespace ConvectionCoefficients {
                         }
                     }
                 }
-                if (!DisplayExtraWarnings && (SurfaceCountOutside > 0 || SurfaceCountInside > 0)) {
+                if (!state.dataGlobal->DisplayExtraWarnings && (SurfaceCountOutside > 0 || SurfaceCountInside > 0)) {
                     if (SurfaceCountOutside > 0) {
                         OverwriteMessage = TrimSigDigits(SurfaceCountOutside) + " Outside";
                     }
@@ -2105,7 +2104,7 @@ namespace ConvectionCoefficients {
                     if (ConvectionType == "OUTSIDE") {
                         if (Surface(SurfNum).OSCPtr > 0) continue;
                         if (Surface(SurfNum).ExtConvCoeff != 0) {
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                                  "\", not overwriting already assigned value for (Outside) in Surface=" + Surface(SurfNum).Name);
                             } else {
@@ -2116,7 +2115,7 @@ namespace ConvectionCoefficients {
                         }
                     } else {
                         if (Surface(SurfNum).IntConvCoeff != 0) {
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                                  "\", not overwriting already assigned value for (Inside) in Surface=" + Surface(SurfNum).Name);
                             } else {
@@ -2127,7 +2126,7 @@ namespace ConvectionCoefficients {
                         }
                     }
                 }
-                if (!DisplayExtraWarnings && (SurfaceCountOutside > 0 || SurfaceCountInside > 0)) {
+                if (!state.dataGlobal->DisplayExtraWarnings && (SurfaceCountOutside > 0 || SurfaceCountInside > 0)) {
                     if (SurfaceCountOutside > 0) {
                         OverwriteMessage = TrimSigDigits(SurfaceCountOutside) + " Outside";
                     }
@@ -2150,7 +2149,7 @@ namespace ConvectionCoefficients {
                     if (ConvectionType == "OUTSIDE") {
                         if (Surface(SurfNum).OSCPtr > 0) continue;
                         if (Surface(SurfNum).ExtConvCoeff != 0) {
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                                  "\", not overwriting already assigned value for (Outside) in Surface=" + Surface(SurfNum).Name);
                             } else {
@@ -2161,7 +2160,7 @@ namespace ConvectionCoefficients {
                         }
                     } else {
                         if (Surface(SurfNum).IntConvCoeff != 0) {
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                                  "\", not overwriting already assigned value for (Inside) in Surface=" + Surface(SurfNum).Name);
                             } else {
@@ -2172,7 +2171,7 @@ namespace ConvectionCoefficients {
                         }
                     }
                 }
-                if (!DisplayExtraWarnings && (SurfaceCountOutside > 0 || SurfaceCountInside > 0)) {
+                if (!state.dataGlobal->DisplayExtraWarnings && (SurfaceCountOutside > 0 || SurfaceCountInside > 0)) {
                     if (SurfaceCountOutside > 0) {
                         OverwriteMessage = TrimSigDigits(SurfaceCountOutside) + " Outside";
                     }
@@ -2195,7 +2194,7 @@ namespace ConvectionCoefficients {
                     if (ConvectionType == "OUTSIDE") {
                         if (Surface(SurfNum).OSCPtr > 0) continue;
                         if (Surface(SurfNum).ExtConvCoeff != 0) {
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                                  "\", not overwriting already assigned value for (Outside) in Surface=" + Surface(SurfNum).Name);
                             } else {
@@ -2206,7 +2205,7 @@ namespace ConvectionCoefficients {
                         }
                     } else {
                         if (Surface(SurfNum).IntConvCoeff != 0) {
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                                  "\", not overwriting already assigned value for (Inside) in Surface=" + Surface(SurfNum).Name);
                             } else {
@@ -2217,7 +2216,7 @@ namespace ConvectionCoefficients {
                         }
                     }
                 }
-                if (!DisplayExtraWarnings && (SurfaceCountOutside > 0 || SurfaceCountInside > 0)) {
+                if (!state.dataGlobal->DisplayExtraWarnings && (SurfaceCountOutside > 0 || SurfaceCountInside > 0)) {
                     if (SurfaceCountOutside > 0) {
                         OverwriteMessage = TrimSigDigits(SurfaceCountOutside) + " Outside";
                     }
@@ -2240,7 +2239,7 @@ namespace ConvectionCoefficients {
                     if (ConvectionType == "OUTSIDE") {
                         if (Surface(SurfNum).OSCPtr > 0) continue;
                         if (Surface(SurfNum).ExtConvCoeff != 0) {
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                                  "\", not overwriting already assigned value for (Outside) in Surface=" + Surface(SurfNum).Name);
                             } else {
@@ -2251,7 +2250,7 @@ namespace ConvectionCoefficients {
                         }
                     } else {
                         if (Surface(SurfNum).IntConvCoeff != 0) {
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                                  "\", not overwriting already assigned value for (Inside) in Surface=" + Surface(SurfNum).Name);
                             } else {
@@ -2262,7 +2261,7 @@ namespace ConvectionCoefficients {
                         }
                     }
                 }
-                if (!DisplayExtraWarnings && (SurfaceCountOutside > 0 || SurfaceCountInside > 0)) {
+                if (!state.dataGlobal->DisplayExtraWarnings && (SurfaceCountOutside > 0 || SurfaceCountInside > 0)) {
                     if (SurfaceCountOutside > 0) {
                         OverwriteMessage = TrimSigDigits(SurfaceCountOutside) + " Outside";
                     }
@@ -2285,7 +2284,7 @@ namespace ConvectionCoefficients {
                     if (ConvectionType == "OUTSIDE") {
                         if (Surface(SurfNum).OSCPtr > 0) continue;
                         if (Surface(SurfNum).ExtConvCoeff != 0) {
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                                  "\", not overwriting already assigned value for (Outside) in Surface=" + Surface(SurfNum).Name);
                             } else {
@@ -2296,7 +2295,7 @@ namespace ConvectionCoefficients {
                         }
                     } else {
                         if (Surface(SurfNum).IntConvCoeff != 0) {
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                                  "\", not overwriting already assigned value for (Inside) in Surface=" + Surface(SurfNum).Name);
                             } else {
@@ -2307,7 +2306,7 @@ namespace ConvectionCoefficients {
                         }
                     }
                 }
-                if (!DisplayExtraWarnings && (SurfaceCountOutside > 0 || SurfaceCountInside > 0)) {
+                if (!state.dataGlobal->DisplayExtraWarnings && (SurfaceCountOutside > 0 || SurfaceCountInside > 0)) {
                     if (SurfaceCountOutside > 0) {
                         OverwriteMessage = TrimSigDigits(SurfaceCountOutside) + " Outside";
                     }
@@ -2817,7 +2816,7 @@ namespace ConvectionCoefficients {
         Real64 ZoneMult;
 
         // FLOW:
-        if (SysSizingCalc || ZoneSizingCalc || !allocated(Node)) {
+        if (state.dataGlobal->SysSizingCalc || state.dataGlobal->ZoneSizingCalc || !allocated(Node)) {
             ACH = 0.0;
         } else {
             // Set local variables
@@ -3486,7 +3485,7 @@ namespace ConvectionCoefficients {
 
         BldgVolumeSum = 0.0;
         RoofBoundZvals = 0.0;
-        for (ZoneLoop = 1; ZoneLoop <= NumOfZones; ++ZoneLoop) {
+        for (ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) {
 
             BldgVolumeSum += Zone(ZoneLoop).Volume * Zone(ZoneLoop).Multiplier * Zone(ZoneLoop).ListMultiplier;
             PerimExtLengthSum = 0.0; // init
@@ -3994,7 +3993,7 @@ namespace ConvectionCoefficients {
             }
 
             // if display advanced reports also dump meta group data used for convection geometry
-            if (DisplayAdvancedReportVariables) {
+            if (state.dataGlobal->DisplayAdvancedReportVariables) {
                 static constexpr auto Format_8000(
                     "! <Building Convection Parameters:North Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax \n");
                 print(state.files.eio, Format_8000); // header for north facade
@@ -4185,7 +4184,7 @@ namespace ConvectionCoefficients {
         int ZoneLoop;
         int SurfLoop;
 
-        for (ZoneLoop = 1; ZoneLoop <= NumOfZones; ++ZoneLoop) {
+        for (ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) {
             state.dataConvectionCoefficient->ActiveWallCount = 0;
             state.dataConvectionCoefficient->ActiveWallArea = 0.0;
             state.dataConvectionCoefficient->ActiveCeilingCount = 0;
@@ -5103,7 +5102,7 @@ namespace ConvectionCoefficients {
             FlowRegimeStack(0) = InConvFlowRegime_A3;
         } else { // is controlled, lets see by how and if that means is currently active
 
-            if (!(ZoneEquipConfig(ZoneNum).EquipListIndex > 0) || SysSizingCalc || ZoneSizingCalc || !ZoneEquipSimulatedOnce) {
+            if (!(ZoneEquipConfig(ZoneNum).EquipListIndex > 0) || state.dataGlobal->SysSizingCalc || state.dataGlobal->ZoneSizingCalc || !ZoneEquipSimulatedOnce) {
                 FlowRegimeStack(0) = InConvFlowRegime_A3;
             } else {
 
@@ -6466,7 +6465,7 @@ namespace ConvectionCoefficients {
                 ShowContinueError(state, "Effective hydraulic diameter is zero, convection model not applicable for surface =" + Surface(SurfNum).Name);
                 ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
             }
-            ShowRecurringSevereErrorAtEnd(
+            ShowRecurringSevereErrorAtEnd(state,
                 "CalcAlamdariHammondUnstableHorizontal: Convection model not evaluated because zero hydraulic diameter and set to 9.999 [W/m2-K]",
                 state.dataConvectionCoefficient->AHUnstableHorizontalErrorIDX);
         }
@@ -6518,7 +6517,7 @@ namespace ConvectionCoefficients {
                 ShowContinueError(state, "Effective hydraulic diameter is zero, convection model not applicable for surface =" + Surface(SurfNum).Name);
                 ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
             }
-            ShowRecurringSevereErrorAtEnd(
+            ShowRecurringSevereErrorAtEnd(state,
                 "CalcAlamdariHammondStableHorizontal: Convection model not evaluated because zero hydraulic diameter and set to 9.999 [W/m2-K]",
                 state.dataConvectionCoefficient->AHStableHorizontalErrorIDX);
         }
@@ -6570,7 +6569,7 @@ namespace ConvectionCoefficients {
                 ShowContinueError(state, "Effective hydraulic diameter is zero, convection model not applicable for surface =" + Surface(SurfNum).Name);
                 ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
             }
-            ShowRecurringSevereErrorAtEnd(
+            ShowRecurringSevereErrorAtEnd(state,
                 "CalcAlamdariHammondVerticalWall: Convection model not evaluated because zero hydraulic diameter and set to 9.999 [W/m2-K]",
                 state.dataConvectionCoefficient->AHVerticalWallErrorIDX);
         }
@@ -6861,11 +6860,11 @@ namespace ConvectionCoefficients {
                     ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
                 }
 
-                ShowRecurringWarningErrorAtEnd("CalcBeausoleilMorrisonMixedAssistedWall: Convection model not evaluated because of zero height "
+                ShowRecurringWarningErrorAtEnd(state, "CalcBeausoleilMorrisonMixedAssistedWall: Convection model not evaluated because of zero height "
                                                "and set to 9.999 [W/m2-K]",
                                                state.dataConvectionCoefficient->BMMixedAssistedWallErrorIDX2);
             }
-            if (DeltaTemp == 0.0 && !WarmupFlag) {
+            if (DeltaTemp == 0.0 && !state.dataGlobal->WarmupFlag) {
                 if (state.dataConvectionCoefficient->BMMixedAssistedWallErrorIDX1 == 0) {
                     ShowWarningMessage(state, "CalcBeausoleilMorrisonMixedAssistedWall: Convection model not evaluated (would divide by zero)");
                     ShowContinueError(state, "The temperature difference between surface and air is zero");
@@ -6873,7 +6872,7 @@ namespace ConvectionCoefficients {
                     ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
                 }
 
-                ShowRecurringWarningErrorAtEnd("CalcBeausoleilMorrisonMixedAssistedWall: Convection model not evaluated because of zero temperature "
+                ShowRecurringWarningErrorAtEnd(state, "CalcBeausoleilMorrisonMixedAssistedWall: Convection model not evaluated because of zero temperature "
                                                "difference and set to 9.999 [W/m2-K]",
                                                state.dataConvectionCoefficient->BMMixedAssistedWallErrorIDX1);
             }
@@ -6950,7 +6949,7 @@ namespace ConvectionCoefficients {
                     ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
                 }
 
-                ShowRecurringSevereErrorAtEnd(
+                ShowRecurringSevereErrorAtEnd(state,
                     "CalcBeausoleilMorrisonMixedOpposingWall: Convection model not evaluated because of zero height and set to 9.999 [W/m2-K]",
                     state.dataConvectionCoefficient->BMMixedOpposingWallErrorIDX2);
             }
@@ -6959,7 +6958,7 @@ namespace ConvectionCoefficients {
             return CalcBeausoleilMorrisonMixedOpposingWall(DeltaTemp, Height, SurfTemp, SupplyAirTemp, AirChangeRate);
 
         } else {
-            if (!WarmupFlag) {
+            if (!state.dataGlobal->WarmupFlag) {
                 if (state.dataConvectionCoefficient->BMMixedOpposingWallErrorIDX1 == 0) {
                     ShowSevereMessage(state, "CalcBeausoleilMorrisonMixedOpposingWall: Convection model not evaluated (would divide by zero)");
                     ShowContinueError(state, "The temperature difference between surface and air is zero");
@@ -6967,7 +6966,7 @@ namespace ConvectionCoefficients {
                     ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
                 }
 
-                ShowRecurringSevereErrorAtEnd("CalcBeausoleilMorrisonMixedOpposingWall: Convection model not evaluated because of zero temperature "
+                ShowRecurringSevereErrorAtEnd(state, "CalcBeausoleilMorrisonMixedOpposingWall: Convection model not evaluated because of zero temperature "
                                               "difference and set to 9.999 [W/m2-K]",
                                               state.dataConvectionCoefficient->BMMixedOpposingWallErrorIDX1);
             }
@@ -7030,11 +7029,11 @@ namespace ConvectionCoefficients {
                     ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
                 }
 
-                ShowRecurringWarningErrorAtEnd("CalcBeausoleilMorrisonMixedStableFloor: Convection model not evaluated because effective hydraulic diameter is zero "
+                ShowRecurringWarningErrorAtEnd(state, "CalcBeausoleilMorrisonMixedStableFloor: Convection model not evaluated because effective hydraulic diameter is zero "
                                                "and set to 9.999 [W/m2-K]",
                                                state.dataConvectionCoefficient->BMMixedStableFloorErrorIDX1);
             }
-            if (DeltaTemp == 0.0 && !WarmupFlag) {
+            if (DeltaTemp == 0.0 && !state.dataGlobal->WarmupFlag) {
                 if (state.dataConvectionCoefficient->BMMixedStableFloorErrorIDX2 == 0) {
                     ShowWarningMessage(state, "CalcBeausoleilMorrisonMixedStableFloor: Convection model not evaluated (would divide by zero)");
                     ShowContinueError(state, "The temperature difference between surface and air is zero");
@@ -7042,7 +7041,7 @@ namespace ConvectionCoefficients {
                     ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
                 }
 
-                ShowRecurringWarningErrorAtEnd("CalcBeausoleilMorrisonMixedStableFloor: Convection model not evaluated because of zero temperature "
+                ShowRecurringWarningErrorAtEnd(state, "CalcBeausoleilMorrisonMixedStableFloor: Convection model not evaluated because of zero temperature "
                                                "difference and set to 9.999 [W/m2-K]",
                                                state.dataConvectionCoefficient->BMMixedStableFloorErrorIDX2);
             }
@@ -7107,12 +7106,12 @@ namespace ConvectionCoefficients {
                     ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
                 }
 
-                ShowRecurringWarningErrorAtEnd("CalcBeausoleilMorrisonMixedUnstableFloor: Convection model not evaluated because effective hydraulic diameter is zero "
+                ShowRecurringWarningErrorAtEnd(state, "CalcBeausoleilMorrisonMixedUnstableFloor: Convection model not evaluated because effective hydraulic diameter is zero "
                                                "and set to 9.999 [W/m2-K]",
                                                state.dataConvectionCoefficient->BMMixedUnstableFloorErrorIDX1);
             }
 
-            if (DeltaTemp == 0.0 && !WarmupFlag) {
+            if (DeltaTemp == 0.0 && !state.dataGlobal->WarmupFlag) {
                 if (state.dataConvectionCoefficient->BMMixedUnstableFloorErrorIDX2 == 0) {
                     ShowWarningMessage(state, "CalcBeausoleilMorrisonMixedUnstableFloor: Convection model not evaluated (would divide by zero)");
                     ShowContinueError(state, "The temperature difference between surface and air is zero");
@@ -7120,7 +7119,7 @@ namespace ConvectionCoefficients {
                     ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
                 }
 
-                ShowRecurringWarningErrorAtEnd("CalcBeausoleilMorrisonMixedUnstableFloor: Convection model not evaluated because of zero temperature "
+                ShowRecurringWarningErrorAtEnd(state, "CalcBeausoleilMorrisonMixedUnstableFloor: Convection model not evaluated because of zero temperature "
                                                "difference and set to 9.999 [W/m2-K]",
                                                state.dataConvectionCoefficient->BMMixedUnstableFloorErrorIDX2);
             }
@@ -7183,12 +7182,12 @@ namespace ConvectionCoefficients {
                     ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
                 }
 
-                ShowRecurringWarningErrorAtEnd("CalcBeausoleilMorrisonMixedStableCeiling: Convection model not evaluated because effective hydraulic diameter is zero "
+                ShowRecurringWarningErrorAtEnd(state, "CalcBeausoleilMorrisonMixedStableCeiling: Convection model not evaluated because effective hydraulic diameter is zero "
                                                "and set to 9.999 [W/m2-K]",
                                                state.dataConvectionCoefficient->BMMixedStableCeilingErrorIDX1);
 
             }
-            if (DeltaTemp == 0.0 && !WarmupFlag) {
+            if (DeltaTemp == 0.0 && !state.dataGlobal->WarmupFlag) {
                 if (state.dataConvectionCoefficient->BMMixedStableCeilingErrorIDX2 == 0) {
                     ShowWarningMessage(state, "CalcBeausoleilMorrisonMixedStableCeiling: Convection model not evaluated (would divide by zero)");
                     ShowContinueError(state, "The temperature difference between surface and air is zero");
@@ -7196,7 +7195,7 @@ namespace ConvectionCoefficients {
                     ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
                 }
 
-                ShowRecurringWarningErrorAtEnd("CalcBeausoleilMorrisonMixedStableCeiling: Convection model not evaluated because of zero temperature "
+                ShowRecurringWarningErrorAtEnd(state, "CalcBeausoleilMorrisonMixedStableCeiling: Convection model not evaluated because of zero temperature "
                                                "difference and set to 9.999 [W/m2-K]",
                                                state.dataConvectionCoefficient->BMMixedStableCeilingErrorIDX2);
             }
@@ -7247,9 +7246,7 @@ namespace ConvectionCoefficients {
                                                       int const ZoneNum               // index of zone for messaging
     )
     {
-        using DataGlobals::WarmupFlag;
-
-         if ((HydraulicDiameter != 0.0) && (std::abs(DeltaTemp) > DataHVACGlobals::SmallTempDiff)) {
+        if ((HydraulicDiameter != 0.0) && (std::abs(DeltaTemp) > DataHVACGlobals::SmallTempDiff)) {
             Real64 SupplyAirTemp = CalcZoneSupplyAirTemp(ZoneNum);
             Real64 AirChangeRate = CalcZoneSystemACH(state, ZoneNum);
             return CalcBeausoleilMorrisonMixedUnstableCeiling(DeltaTemp, HydraulicDiameter, SurfTemp, SupplyAirTemp, AirChangeRate);
@@ -7261,11 +7258,11 @@ namespace ConvectionCoefficients {
                     ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
                 }
 
-                ShowRecurringWarningErrorAtEnd("CalcBeausoleilMorrisonMixedUnstableCeiling: Convection model not evaluated because effective hydraulic diameter is zero "
+                ShowRecurringWarningErrorAtEnd(state, "CalcBeausoleilMorrisonMixedUnstableCeiling: Convection model not evaluated because effective hydraulic diameter is zero "
                                                "and set to 9.999 [W/m2-K]",
                                                state.dataConvectionCoefficient->BMMixedUnstableCeilingErrorIDX1);
             }
-            if (DeltaTemp == 0.0 && !WarmupFlag) {
+            if (DeltaTemp == 0.0 && !state.dataGlobal->WarmupFlag) {
                 if (state.dataConvectionCoefficient->BMMixedUnstableCeilingErrorIDX2 == 0) {
                     ShowWarningMessage(state, "CalcBeausoleilMorrisonMixedUnstableCeiling: Convection model not evaluated (would divide by zero)");
                     ShowContinueError(state, "The temperature difference between surface and air is zero");
@@ -7273,7 +7270,7 @@ namespace ConvectionCoefficients {
                     ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
                 }
 
-                ShowRecurringWarningErrorAtEnd("CalcBeausoleilMorrisonMixedUnstableCeiling: Convection model not evaluated because of zero "
+                ShowRecurringWarningErrorAtEnd(state, "CalcBeausoleilMorrisonMixedUnstableCeiling: Convection model not evaluated because of zero "
                                                "temperature difference and set to 9.999 [W/m2-K]",
                                                state.dataConvectionCoefficient->BMMixedUnstableCeilingErrorIDX2);
             }
@@ -7342,7 +7339,7 @@ namespace ConvectionCoefficients {
                 ShowContinueError(state, "Effective surface height is zero, convection model not applicable for surface =" + Surface(SurfNum).Name);
                 ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
             }
-            ShowRecurringSevereErrorAtEnd(
+            ShowRecurringSevereErrorAtEnd(state,
                 "CalcFohannoPolidoriVerticalWall: Convection model not evaluated because zero height and set to 9.999 [W/m2-K]", state.dataConvectionCoefficient->CalcFohannoPolidoriVerticalWallErrorIDX);
             return 9.999;
         }
@@ -7445,7 +7442,7 @@ namespace ConvectionCoefficients {
                         ShowContinueError(state, "Occurs for zone named = " + Zone(ZoneNum).Name);
                         ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
                     }
-                    ShowRecurringSevereErrorAtEnd("CalcGoldsteinNovoselacCeilingDiffuserWindow: Convection model not evaluated because bad window "
+                    ShowRecurringSevereErrorAtEnd(state, "CalcGoldsteinNovoselacCeilingDiffuserWindow: Convection model not evaluated because bad window "
                                                   "location and set to 9.999 [W/m2-K]",
                                                   state.dataConvectionCoefficient->CalcGoldsteinNovoselacCeilingDiffuserWindowErrorIDX1);
                 }
@@ -7458,7 +7455,7 @@ namespace ConvectionCoefficients {
                 ShowContinueError(state, "Occurs for zone named = " + Zone(ZoneNum).Name);
                 ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
             }
-            ShowRecurringSevereErrorAtEnd(
+            ShowRecurringSevereErrorAtEnd(state,
                 "CalcGoldsteinNovoselacCeilingDiffuserWindow: Convection model not evaluated because bad perimeter length and set to 9.999 [W/m2-K]",
                 state.dataConvectionCoefficient->CalcGoldsteinNovoselacCeilingDiffuserWindowErrorIDX2);
         }
@@ -7520,7 +7517,7 @@ namespace ConvectionCoefficients {
                     ShowContinueError(state, "Occurs for zone named = " + Zone(ZoneNum).Name);
                     ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
                 }
-                ShowRecurringSevereErrorAtEnd(
+                ShowRecurringSevereErrorAtEnd(state,
                     "CalcGoldsteinNovoselacCeilingDiffuserWall: Convection model not evaluated because bad window location and set to 9.999 [W/m2-K]",
                     state.dataConvectionCoefficient->CalcGoldsteinNovoselacCeilingDiffuserWallErrorIDX1);
             }
@@ -7531,7 +7528,7 @@ namespace ConvectionCoefficients {
                 ShowContinueError(state, "Occurs for zone named = " + Zone(ZoneNum).Name);
                 ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
             }
-            ShowRecurringSevereErrorAtEnd(
+            ShowRecurringSevereErrorAtEnd(state,
                 "CalcGoldsteinNovoselacCeilingDiffuserWall: Convection model not evaluated because bad perimeter length and set to 9.999 [W/m2-K]",
                 state.dataConvectionCoefficient->CalcGoldsteinNovoselacCeilingDiffuserWallErrorIDX2);
         }
@@ -7582,7 +7579,7 @@ namespace ConvectionCoefficients {
                 ShowContinueError(state, "Occurs for zone named = " + Zone(ZoneNum).Name);
                 ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
             }
-            ShowRecurringSevereErrorAtEnd(
+            ShowRecurringSevereErrorAtEnd(state,
                 "CalcGoldsteinNovoselacCeilingDiffuserFloor: Convection model not evaluated because bad perimeter length and set to 9.999 [W/m2-K]",
                 state.dataConvectionCoefficient->CalcGoldsteinNovoselacCeilingDiffuserFloorErrorIDX);
         }
@@ -7660,7 +7657,7 @@ namespace ConvectionCoefficients {
                 ShowContinueError(state, "Occurs for surface named = " + Surface(SurfNum).Name);
                 ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
             }
-            ShowRecurringSevereErrorAtEnd("CalcSparrowWindward: Convection model not evaluated because bad face area and set to 9.999 [W/m2-k]",
+            ShowRecurringSevereErrorAtEnd(state, "CalcSparrowWindward: Convection model not evaluated because bad face area and set to 9.999 [W/m2-k]",
                                           state.dataConvectionCoefficient->CalcSparrowWindwardErrorIDX);
             return 9.999; // safe but noticeable
         }
@@ -7677,7 +7674,7 @@ namespace ConvectionCoefficients {
                 ShowContinueError(state, "Occurs for surface named = " + Surface(SurfNum).Name);
                 ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
             }
-            ShowRecurringSevereErrorAtEnd("CalcSparrowLeeward: Convection model not evaluated because bad face area and set to 9.999 [W/m2-k]",
+            ShowRecurringSevereErrorAtEnd(state, "CalcSparrowLeeward: Convection model not evaluated because bad face area and set to 9.999 [W/m2-k]",
                                           state.dataConvectionCoefficient->CalcSparrowLeewardErrorIDX);
 
             return 9.999; // safe but noticeable
@@ -7908,7 +7905,7 @@ namespace ConvectionCoefficients {
                 ShowContinueError(state, "Occurs for surface named = " + Surface(SurfNum).Name);
                 ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
             }
-            ShowRecurringSevereErrorAtEnd("CalcMitchell: Convection model not evaluated because bad length scale and set to 9.999 [W/m2-k]",
+            ShowRecurringSevereErrorAtEnd(state, "CalcMitchell: Convection model not evaluated because bad length scale and set to 9.999 [W/m2-k]",
                                           state.dataConvectionCoefficient->CalcMitchellErrorIDX);
             return 9.999; // safe but noticeable
         }
@@ -8012,7 +8009,7 @@ namespace ConvectionCoefficients {
                 ShowContinueError(state, "Occurs for surface named = " + Surface(SurfNum).Name);
                 ShowContinueError(state, "Convection model uses high theta correlation and the simulation continues");
             }
-            ShowRecurringSevereErrorAtEnd("CalcEmmelVertical: Convection model wind angle calculation suspect and high theta correlation",
+            ShowRecurringSevereErrorAtEnd(state, "CalcEmmelVertical: Convection model wind angle calculation suspect and high theta correlation",
                                           state.dataConvectionCoefficient->CalcEmmelVerticalErrorIDX);
             Hf = 3.54 * std::pow(WindAt10m, 0.76);
         }
@@ -8070,7 +8067,7 @@ namespace ConvectionCoefficients {
                 ShowContinueError(state, "Occurs for surface named = " + Surface(SurfNum).Name);
                 ShowContinueError(state, "Convection model uses high theta correlation and the simulation continues");
             }
-            ShowRecurringSevereErrorAtEnd("CalcEmmelRoof: Convection model wind angle calculation suspect and high theta correlation",
+            ShowRecurringSevereErrorAtEnd(state, "CalcEmmelRoof: Convection model wind angle calculation suspect and high theta correlation",
                                           state.dataConvectionCoefficient->CalcEmmelRoofErrorIDX);
 
             Hf = 3.54 * std::pow(WindAt10m, 0.76);
@@ -8162,7 +8159,7 @@ namespace ConvectionCoefficients {
                 ShowContinueError(state, "Occurs for surface named = " + Surface(SurfNum).Name);
                 ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
             }
-            ShowRecurringSevereErrorAtEnd(
+            ShowRecurringSevereErrorAtEnd(state,
                 "CalcClearRoof: Convection model not evaluated because bad value for distance to roof edge and set to 9.999 [W/m2-k]",
                 state.dataConvectionCoefficient->CalcClearRoofErrorIDX);
             return 9.9999; // safe but noticeable

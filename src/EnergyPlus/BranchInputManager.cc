@@ -85,7 +85,6 @@ namespace BranchInputManager {
     // information about these objects.
 
     // Using/Aliasing
-    using DataGlobals::DisplayExtraWarnings;
     using namespace DataLoopNode;
     using namespace DataBranchAirLoopPlant;
     using namespace NodeInputManager;
@@ -2386,7 +2385,7 @@ namespace BranchInputManager {
             }
             if (Found != 0) continue;
             ++NumDanglingCount;
-            if (DisplayExtraWarnings || mustprint) {
+            if (state.dataGlobal->DisplayExtraWarnings || mustprint) {
                 if (mustprint) {
                     ShowContinueError(state, "AuditBranches: Branch=\"" + state.dataBranchInputManager->Branch(BrN).Name + "\" not found on any BranchLists.");
                     if (!FoundBranchName.empty()) {

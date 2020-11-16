@@ -55,6 +55,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/BranchInputManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -267,7 +268,7 @@ namespace PlantUtilities {
         if (DataLoopNode::Node(InletNode).MassFlowRateMax >= 0.0) {
             DataLoopNode::Node(OutletNode).MassFlowRateMaxAvail = min(DataLoopNode::Node(InletNode).MassFlowRateMaxAvail, DataLoopNode::Node(InletNode).MassFlowRateMax);
         } else {
-            if (!DataGlobals::SysSizingCalc && DataPlant::PlantFirstSizesOkayToFinalize) {
+            if (!state.dataGlobal->SysSizingCalc && DataPlant::PlantFirstSizesOkayToFinalize) {
                 // throw error for developers, need to change a component model to set hardware limits on inlet
                 if (!DataLoopNode::Node(InletNode).plantNodeErrorMsgIssued) {
                     ShowSevereError(state, "SetComponentFlowRate: check component model implementation for component with inlet node named=" +
@@ -625,8 +626,6 @@ namespace PlantUtilities {
 
         // Using/Aliasing
         using DataBranchAirLoopPlant::MassFlowTolerance;
-        using DataGlobals::DoingSizing;
-        using DataGlobals::WarmupFlag;
         using DataLoopNode::Node;
         using DataPlant::CriteriaDelta_MassFlowRate;
         using DataPlant::DemandSide;
@@ -645,7 +644,7 @@ namespace PlantUtilities {
         int LastNodeOnBranch;
 
         if (!PlantLoop(LoopNum).LoopHasConnectionComp) {
-            if (!DoingSizing && !WarmupFlag && PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer.Exists && !FirstHVACIteration) {
+            if (!state.dataGlobal->DoingSizing && !state.dataGlobal->WarmupFlag && PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer.Exists && !FirstHVACIteration) {
                 // Find mixer outlet node number
                 MixerOutletNode = PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer.NodeNumOut;
                 // Find splitter inlet node number
@@ -663,7 +662,7 @@ namespace PlantUtilities {
                         ShowContinueError(state, "Splitter inlet mass flow rate= " + RoundSigDigits(Node(SplitterInletNode).MassFlowRate, 6) + " {kg/s}");
                         ShowContinueError(state, "Difference in two mass flow rates= " + RoundSigDigits(AbsDifference, 6) + " {kg/s}");
                     }
-                    ShowRecurringSevereErrorAtEnd("Plant Flows (Loop=" + PlantLoop(LoopNum).Name +
+                    ShowRecurringSevereErrorAtEnd(state, "Plant Flows (Loop=" + PlantLoop(LoopNum).Name +
                                                       ") splitter inlet flow not match mixer outlet flow",
                                                   PlantLoop(LoopNum).MFErrIndex1,
                                                   AbsDifference,
@@ -709,7 +708,7 @@ namespace PlantUtilities {
                         ShowContinueError(state, "Splitter inlet mass flow rate= " + RoundSigDigits(Node(SplitterInletNode).MassFlowRate, 6) + " {kg/s}");
                         ShowContinueError(state, "Difference in two mass flow rates= " + RoundSigDigits(AbsDifference, 6) + " {kg/s}");
                     }
-                    ShowRecurringSevereErrorAtEnd("Plant Flows (Loop=" + PlantLoop(LoopNum).Name +
+                    ShowRecurringSevereErrorAtEnd(state, "Plant Flows (Loop=" + PlantLoop(LoopNum).Name +
                                                       ") splitter inlet flow does not match branch outlet flows",
                                                   PlantLoop(LoopNum).MFErrIndex2,
                                                   AbsDifference,
@@ -744,8 +743,6 @@ namespace PlantUtilities {
         // na
 
         // Using/Aliasing
-        using DataGlobals::DoingSizing;
-        using DataGlobals::WarmupFlag;
         using DataLoopNode::Node;
         using DataLoopNode::NodeID;
         using DataPlant::DemandSide;
@@ -785,7 +782,7 @@ namespace PlantUtilities {
         if (Node(PlantLoop(LoopNum).LoopSide(LoopSideNum).NodeNumOut).Temp > (PlantLoop(LoopNum).MaxTemp + OverShootOffset)) {
 
             // first stage, throw recurring warning that plant loop is getting out of control
-            ShowRecurringWarningErrorAtEnd("Plant loop exceeding upper temperature limit, PlantLoop=\"" + PlantLoop(LoopNum).Name + "\"",
+            ShowRecurringWarningErrorAtEnd(state, "Plant loop exceeding upper temperature limit, PlantLoop=\"" + PlantLoop(LoopNum).Name + "\"",
                                            PlantLoop(LoopNum).MaxTempErrIndex,
                                            Node(PlantLoop(LoopNum).LoopSide(LoopSideNum).NodeNumOut).Temp);
 
@@ -798,7 +795,7 @@ namespace PlantUtilities {
         if (Node(PlantLoop(LoopNum).LoopSide(LoopSideNum).NodeNumOut).Temp < (PlantLoop(LoopNum).MinTemp - UnderShootOffset)) {
 
             // first stage, throw recurring warning that plant loop is getting out of control
-            ShowRecurringWarningErrorAtEnd("Plant loop falling below lower temperature limit, PlantLoop=\"" + PlantLoop(LoopNum).Name + "\"",
+            ShowRecurringWarningErrorAtEnd(state, "Plant loop falling below lower temperature limit, PlantLoop=\"" + PlantLoop(LoopNum).Name + "\"",
                                            PlantLoop(LoopNum).MinTempErrIndex,
                                            _,
                                            Node(PlantLoop(LoopNum).LoopSide(LoopSideNum).NodeNumOut).Temp);
@@ -1758,7 +1755,6 @@ namespace PlantUtilities {
         // Standard EnergyPlus methodology.
 
         // Using/Aliasing
-        using namespace DataGlobals;
         using BranchInputManager::AuditBranches;
         using General::RoundSigDigits;
 
@@ -1887,7 +1883,6 @@ namespace PlantUtilities {
         // na
 
         // Using/Aliasing
-        using namespace DataGlobals;
         using General::RoundSigDigits;
 
         // Locals
@@ -1952,7 +1947,7 @@ namespace PlantUtilities {
         if (!FoundNode) {
             ShowSevereError(state, "ScanPlantLoopsForNodeNum: Plant Node was not found as inlet node (for component) on any plant loops");
             ShowContinueError(state, "Node Name=\"" + DataLoopNode::NodeID(NodeNum) + "\"");
-            if (!DoingSizing) {
+            if (!state.dataGlobal->DoingSizing) {
                 ShowContinueError(state, "called by " + CallerName);
             } else {
                 ShowContinueError(state, "during sizing: called by " + CallerName);

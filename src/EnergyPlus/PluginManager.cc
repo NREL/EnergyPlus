@@ -72,6 +72,18 @@ namespace PluginManagement {
     bool fullyReady = false;
     bool apiErrorFlag = false;
 
+    PluginTrendVariable::PluginTrendVariable(EnergyPlusData &state, std::string _name, int _numValues, int _indexOfPluginVariable) :
+    name(std::move(_name)), numValues(_numValues), indexOfPluginVariable(_indexOfPluginVariable)
+    {
+        // initialize the deque so it can be queried immediately, even with just zeroes
+        for (int i = 1; i <= this->numValues; i++) {
+            this->values.push_back(0);
+        }
+        for (int loop = 1; loop <= _numValues; ++loop) {
+            this->times.push_back(-loop * state.dataGlobal->TimeStepZone);
+        }
+    }
+
     void registerNewCallback([[maybe_unused]] EnergyPlusData &state, EMSManager::EMSCallFrom iCalledFrom, const std::function<void(void *)> &f)
     {
         callbacks[iCalledFrom].push_back(f);
@@ -95,14 +107,14 @@ namespace PluginManagement {
 
     void runAnyRegisteredCallbacks(EnergyPlusData &state, EMSManager::EMSCallFrom iCalledFrom, bool &anyRan)
     {
-        if (DataGlobals::KickOffSimulation) return;
+        if (state.dataGlobal->KickOffSimulation) return;
         for (auto const &cb : callbacks[iCalledFrom]) {
             cb((void *) &state);
             anyRan = true;
         }
 #if LINK_WITH_PYTHON == 1
         for (auto &plugin : plugins) {
-            if (plugin.runDuringWarmup || !DataGlobals::WarmupFlag) {
+            if (plugin.runDuringWarmup || !state.dataGlobal->WarmupFlag) {
                 bool const didOneRun = plugin.run(state, iCalledFrom);
                 if (didOneRun) anyRan = true;
             }
@@ -111,16 +123,16 @@ namespace PluginManagement {
     }
 
 #if LINK_WITH_PYTHON == 1
-    std::string pythonStringForUsage()
+    std::string pythonStringForUsage(EnergyPlusData &state)
     {
-        if (DataGlobals::eplusRunningViaAPI) {
+        if (state.dataGlobal->errorCallback) {
             return "Python Version not accessible during API calls";
         }
         std::string sVersion = Py_GetVersion();
         return "Linked to Python Version: \"" + sVersion + "\"";
     }
 #else
-    std::string pythonStringForUsage()
+    std::string pythonStringForUsage(state)
     {
         return "This version of EnergyPlus not linked to Python library.";
     }
@@ -584,7 +596,7 @@ namespace PluginManagement {
                 std::string variableName = fields.at("name_of_a_python_plugin_variable");
                 int variableIndex = EnergyPlus::PluginManagement::PluginManager::getGlobalVariableHandle(state, variableName);
                 int numValues = fields.at("number_of_timesteps_to_be_logged");
-                trends.emplace_back(thisObjectName, numValues, variableIndex);
+                trends.emplace_back(state, thisObjectName, numValues, variableIndex);
                 this->maxTrendVariableIndex++;
             }
         }

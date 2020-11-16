@@ -90,7 +90,6 @@ namespace TARCOGGasses90 {
     // USE STATEMENTS:
 
     // Using/Aliasing
-    using namespace DataGlobals;
     using namespace TARCOGGassesParams;
 
     // Data

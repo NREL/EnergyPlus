@@ -80,7 +80,7 @@ namespace ChillerReformulatedEIR {
         std::string EIRFTName;            // EIRFT curve name
         std::string EIRFPLRName;          // EIRPLR curve name
         DataPlant::CondenserType CondenserType;   // Type of Condenser. Water Cooled is the only available option for now
-        PLR PartLoadCurveType;            // Part Load Ratio Curve Type: 1_LeavingCondenserWaterTemperature; 2_Lift //zrp
+        PLR PartLoadCurveType;            // Part Load Ratio Curve Type: 1_LeavingCondenserWaterTemperature; 2_Lift
         Real64 RefCap;                    // Reference capacity of the chiller [W]
         bool RefCapWasAutoSized;          // reference capacity was autosized on input
         Real64 RefCOP;                    // Reference coefficient of performance [W/W]

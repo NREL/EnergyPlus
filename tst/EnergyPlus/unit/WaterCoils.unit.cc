@@ -93,7 +93,6 @@ using namespace EnergyPlus;
 using namespace DataAirLoop;
 using namespace DataAirSystems;
 using namespace DataEnvironment;
-using namespace EnergyPlus::DataGlobals;
 using namespace EnergyPlus::DataPlant;
 using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::DataHeatBalance;
@@ -1283,9 +1282,9 @@ TEST_F(WaterCoilsTest, FanCoilCoolingWaterFlowTest)
     DataEnvironment::StdRhoAir = 1.20;
     state.dataWaterCoils->GetWaterCoilsInputFlag = true;
     NumCoils = 0;
-    DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::TimeStep = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->NumOfTimeStepInHour = 1;
+    state.dataGlobal->TimeStep = 1;
+    state.dataGlobal->MinutesPerTimeStep = 60;
 
     InitializePsychRoutines();
 
@@ -1568,7 +1567,7 @@ TEST_F(WaterCoilsTest, FanCoilCoolingWaterFlowTest)
     QUnitOut = 0.0;
     QZnReq = -4000.0;
 
-    DataGlobals::DoingSizing = true;
+    state.dataGlobal->DoingSizing = true;
 
     CurZoneEqNum = 1;
     ZoneSizingRunDone = true;

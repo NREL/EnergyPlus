@@ -177,7 +177,7 @@ namespace EIRPlantLoopHeatPumps {
 
         static void clear_state();
 
-        static void checkConcurrentOperation();
+        static void checkConcurrentOperation(EnergyPlusData &state);
 
         static Real64 add(Real64 const a, Real64 const b)
         {

@@ -78,7 +78,6 @@
 using namespace EnergyPlus;
 using namespace EnergyPlus::BranchNodeConnections;
 using namespace EnergyPlus::DataBranchNodeConnections;
-using namespace EnergyPlus::DataGlobals;
 using namespace EnergyPlus::DataGlobalConstants;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataLoopNode;
@@ -1115,13 +1114,13 @@ TEST_F(EnergyPlusFixture, BranchNodeConnections_ReturnPlenumNodeCheckFailure)
     state.dataGlobal->DDOnlySimulation = true;
 
     GetProjectData(state);
-    OutputReportPredefined::SetPredefinedTables();
+    OutputReportPredefined::SetPredefinedTables(state);
     SetPreConstructionInputParameters(state); // establish array bounds for constructions early
     createFacilityElectricPowerServiceObject();
     BranchInputManager::ManageBranchInput(state);
     state.dataGlobal->BeginSimFlag = true;
     state.dataGlobal->BeginEnvrnFlag = true;
-    ZoneSizingCalc = true;
+    state.dataGlobal->ZoneSizingCalc = true;
     SizingManager::ManageSizing(state);
 
     bool ErrorsFound(false);
@@ -2123,13 +2122,13 @@ TEST_F(EnergyPlusFixture, BranchNodeConnections_ReturnPlenumNodeCheck)
     state.dataGlobal->DDOnlySimulation = true;
 
     GetProjectData(state);
-    OutputReportPredefined::SetPredefinedTables();
+    OutputReportPredefined::SetPredefinedTables(state);
     SetPreConstructionInputParameters(state); // establish array bounds for constructions early
     createFacilityElectricPowerServiceObject();
     BranchInputManager::ManageBranchInput(state);
     state.dataGlobal->BeginSimFlag = true;
     state.dataGlobal->BeginEnvrnFlag = true;
-    ZoneSizingCalc = true;
+    state.dataGlobal->ZoneSizingCalc = true;
     SizingManager::ManageSizing(state);
 
     bool ErrorsFound(false);

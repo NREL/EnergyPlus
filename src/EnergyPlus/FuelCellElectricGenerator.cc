@@ -1134,7 +1134,7 @@ namespace FuelCellElectricGenerator {
                                   &this->Report.SkinLossRadiat);
         }
 
-        if (DataGlobals::DisplayAdvancedReportVariables) { // show extra data originally needed for detailed comparative testing
+        if (state.dataGlobal->DisplayAdvancedReportVariables) { // show extra data originally needed for detailed comparative testing
             SetupOutputVariable(state, "Generator Air Inlet Temperature", OutputProcessor::Unit::C, this->Report.TairInlet, "System", "Average", this->Name);
 
             SetupOutputVariable(state, "Generator Power Module Entering Air Temperature",
@@ -1381,7 +1381,7 @@ namespace FuelCellElectricGenerator {
                 // set Day and Time of Last Shut Down
                 this->FCPM.FractionalDayofLastShutDown =
                     double(state.dataGlobal->DayOfSim) +
-                    (int(DataGlobals::CurrentTime) + (DataHVACGlobals::SysTimeElapsed + (DataGlobals::CurrentTime - int(DataGlobals::CurrentTime)))) /
+                    (int(state.dataGlobal->CurrentTime) + (DataHVACGlobals::SysTimeElapsed + (state.dataGlobal->CurrentTime - int(state.dataGlobal->CurrentTime)))) /
                         DataGlobalConstants::HoursInDay();
                 this->FCPM.HasBeenOn = false;
 
@@ -1401,7 +1401,7 @@ namespace FuelCellElectricGenerator {
 
             this->FCPM.FractionalDayofLastStartUp =
                 double(state.dataGlobal->DayOfSim) +
-                (int(DataGlobals::CurrentTime) + (DataHVACGlobals::SysTimeElapsed + (DataGlobals::CurrentTime - int(DataGlobals::CurrentTime)))) /
+                (int(state.dataGlobal->CurrentTime) + (DataHVACGlobals::SysTimeElapsed + (state.dataGlobal->CurrentTime - int(state.dataGlobal->CurrentTime)))) /
                     DataGlobalConstants::HoursInDay();
 
             this->FCPM.HasBeenOn = true;
@@ -2775,7 +2775,7 @@ namespace FuelCellElectricGenerator {
 
         Real64 CurrentFractionalDay =
             double(state.dataGlobal->DayOfSim) +
-            (int(DataGlobals::CurrentTime) + (DataHVACGlobals::SysTimeElapsed + (DataGlobals::CurrentTime - int(DataGlobals::CurrentTime)))) /
+            (int(state.dataGlobal->CurrentTime) + (DataHVACGlobals::SysTimeElapsed + (state.dataGlobal->CurrentTime - int(state.dataGlobal->CurrentTime)))) /
                 DataGlobalConstants::HoursInDay();
 
         // Check if in start up and if it still should be
@@ -3282,7 +3282,7 @@ namespace FuelCellElectricGenerator {
             this->MyEnvrnFlag_Init = true;
         }
 
-        if (this->MyWarmupFlag_Init && (!DataGlobals::WarmupFlag)) {
+        if (this->MyWarmupFlag_Init && (!state.dataGlobal->WarmupFlag)) {
             // need to reset initial state of charge at beginning of environment but after warm up is complete
             this->ElecStorage.LastTimeStepStateOfCharge = this->ElecStorage.StartingEnergyStored;
             this->ElecStorage.ThisTimeStepStateOfCharge = this->ElecStorage.StartingEnergyStored;
@@ -3290,7 +3290,7 @@ namespace FuelCellElectricGenerator {
         }
 
         // using and elapsed time method rather than FirstHVACIteration here
-        Real64 timeElapsed = DataGlobals::HourOfDay + DataGlobals::TimeStep * DataGlobals::TimeStepZone + DataHVACGlobals::SysTimeElapsed;
+        Real64 timeElapsed = state.dataGlobal->HourOfDay + state.dataGlobal->TimeStep * state.dataGlobal->TimeStepZone + DataHVACGlobals::SysTimeElapsed;
         if (this->TimeElapsed != timeElapsed) {
 
             this->ElecStorage.LastTimeStepStateOfCharge = this->ElecStorage.ThisTimeStepStateOfCharge;

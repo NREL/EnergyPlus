@@ -85,13 +85,15 @@ void issueText(EnergyPlusState state, const char * message) {
     EnergyPlus::ShowContinueError(*thisState, message);
 }
 
-void registerProgressCallback(EnergyPlusState, void (*f)(int const)) {
-    EnergyPlus::DataGlobals::progressCallback = f;
+void registerProgressCallback(EnergyPlusState state, void (*f)(int const)) {
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    thisState->dataGlobal->progressCallback = f;
 }
 
 void registerStdOutCallback([[maybe_unused]] EnergyPlusState state, std::function<void(const std::string &)> f)
 {
-    EnergyPlus::DataGlobals::messageCallback = f;
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    thisState->dataGlobal->messageCallback = f;
 }
 
 void registerStdOutCallback(EnergyPlusState state, void (*f)(const char *)) {

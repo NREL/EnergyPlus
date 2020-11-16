@@ -106,7 +106,6 @@ namespace HeatBalanceAirManager {
     // USE STATEMENTS:
     // Use statements for data only modules
     // Using/Aliasing
-    using namespace DataGlobals;
     using namespace DataEnvironment;
     using namespace DataHeatBalFanSys;
     using namespace DataHeatBalance;
@@ -354,7 +353,6 @@ namespace HeatBalanceAirManager {
         //     A3 [Source Zone Name], N2 [Delta Temperature delta C];
 
         // Using/Aliasing
-        using DataGlobals::NumOfZones;
         using General::CheckCreatedZoneItemName;
         using General::RoundSigDigits;
         using ScheduleManager::CheckScheduleValueMinMax;
@@ -429,12 +427,12 @@ namespace HeatBalanceAirManager {
 
 
 
-        RepVarSet.dimension(NumOfZones, true);
+        RepVarSet.dimension(state.dataGlobal->NumOfZones, true);
 
         // Following used for reporting
-        ZnAirRpt.allocate(NumOfZones);
+        ZnAirRpt.allocate(state.dataGlobal->NumOfZones);
 
-        for (Loop = 1; Loop <= NumOfZones; ++Loop) {
+        for (Loop = 1; Loop <= state.dataGlobal->NumOfZones; ++Loop) {
             // CurrentModuleObject='Zone'
             SetupOutputVariable(state,
                 "Zone Mean Air Temperature", OutputProcessor::Unit::C, ZnAirRpt(Loop).MeanAirTemp, "Zone", "Average", Zone(Loop).Name);
@@ -494,7 +492,7 @@ namespace HeatBalanceAirManager {
                                 "System",
                                 "Average",
                                 Zone(Loop).Name);
-            if (DisplayAdvancedReportVariables) {
+            if (state.dataGlobal->DisplayAdvancedReportVariables) {
                 SetupOutputVariable(state, "Zone Phase Change Material Melting Enthalpy",
                                     OutputProcessor::Unit::J_kg,
                                     ZnAirRpt(Loop).SumEnthalpyM,
@@ -1254,7 +1252,7 @@ namespace HeatBalanceAirManager {
                 }
             }
 
-            if (AnyEnergyManagementSystemInModel) {
+            if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                 SetupEMSActuator("Zone Infiltration",
                                  Infiltration(Loop).Name,
                                  "Air Exchange Flow Rate",
@@ -1897,7 +1895,7 @@ namespace HeatBalanceAirManager {
                         }
                     }
 
-                    if (AnyEnergyManagementSystemInModel) {
+                    if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                         SetupEMSActuator("Zone Ventilation",
                                          Ventilation(Loop).Name,
                                          "Air Exchange Flow Rate",
@@ -2301,7 +2299,7 @@ namespace HeatBalanceAirManager {
                 }
             }
 
-            if (AnyEnergyManagementSystemInModel) {
+            if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                 SetupEMSActuator("Zone Ventilation",
                                  Ventilation(VentiCount).Name,
                                  "Air Exchange Flow Rate",
@@ -2651,7 +2649,7 @@ namespace HeatBalanceAirManager {
                                         Zone(Mixing(Loop).ZonePtr).Name);
                 }
             }
-            if (AnyEnergyManagementSystemInModel) {
+            if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                 SetupEMSActuator("ZoneMixing",
                                  Mixing(Loop).Name,
                                  "Air Exchange Flow Rate",
@@ -2662,13 +2660,13 @@ namespace HeatBalanceAirManager {
         }
 
         // allocate MassConservation
-        MassConservation.allocate(NumOfZones);
+        MassConservation.allocate(state.dataGlobal->NumOfZones);
 
         // added by BAN, 02/14
         if (TotMixing > 0) {
             ZoneMixingNum.allocate(TotMixing);
             // get source zones mixing objects index
-            for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+            for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 SourceCount = 0;
                 for (Loop = 1; Loop <= TotMixing; ++Loop) {
                     if (ZoneNum == Mixing(Loop).FromZone) {
@@ -2687,7 +2685,7 @@ namespace HeatBalanceAirManager {
             }
 
             // check zones which are used only as a source zones
-            for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+            for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 IsSourceZone = false;
                 for (Loop = 1; Loop <= TotMixing; ++Loop) {
                     if (ZoneNum != Mixing(Loop).FromZone) continue;
@@ -2702,7 +2700,7 @@ namespace HeatBalanceAirManager {
             }
             // get receiving zones mixing objects index
             ZoneMixingNum = 0;
-            for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+            for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 ReceivingCount = 0;
                 for (Loop = 1; Loop <= TotMixing; ++Loop) {
                     if (ZoneNum == Mixing(Loop).ZonePtr) {
@@ -2726,13 +2724,13 @@ namespace HeatBalanceAirManager {
         // zone mass conservation calculation order starts with receiving zones
         // and then proceeds to source zones
         Loop = 0;
-        for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+        for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             if (!MassConservation(ZoneNum).IsOnlySourceZone) {
                 Loop += 1;
                 ZoneReOrder(Loop) = ZoneNum;
             }
         }
-        for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+        for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             if (MassConservation(ZoneNum).IsOnlySourceZone) {
                 Loop += 1;
                 ZoneReOrder(Loop) = ZoneNum;
@@ -3169,7 +3167,7 @@ namespace HeatBalanceAirManager {
                 }
             }
 
-            if (AnyEnergyManagementSystemInModel) {
+            if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                 SetupEMSActuator("ZoneCrossMixing",
                                  CrossMixing(Loop).Name,
                                  "Air Exchange Flow Rate",
@@ -3182,7 +3180,7 @@ namespace HeatBalanceAirManager {
         cCurrentModuleObject = "ZoneRefrigerationDoorMixing";
         TotRefDoorMixing = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (TotRefDoorMixing > 0) {
-            RefDoorMixing.allocate(NumOfZones);
+            RefDoorMixing.allocate(state.dataGlobal->NumOfZones);
             for (auto &e : RefDoorMixing)
                 e.NumRefDoorConnections = 0;
 
@@ -3233,16 +3231,16 @@ namespace HeatBalanceAirManager {
                 }
 
                 if (!allocated(RefDoorMixing(ZoneNumA).OpenSchedPtr)) {
-                    RefDoorMixing(ZoneNumA).DoorMixingObjectName.allocate(NumOfZones);
-                    RefDoorMixing(ZoneNumA).OpenSchedPtr.allocate(NumOfZones);
-                    RefDoorMixing(ZoneNumA).DoorHeight.allocate(NumOfZones);
-                    RefDoorMixing(ZoneNumA).DoorArea.allocate(NumOfZones);
-                    RefDoorMixing(ZoneNumA).Protection.allocate(NumOfZones);
-                    RefDoorMixing(ZoneNumA).MateZonePtr.allocate(NumOfZones);
-                    RefDoorMixing(ZoneNumA).EMSRefDoorMixingOn.allocate(NumOfZones);
-                    RefDoorMixing(ZoneNumA).EMSRefDoorFlowRate.allocate(NumOfZones);
-                    RefDoorMixing(ZoneNumA).VolRefDoorFlowRate.allocate(NumOfZones);
-                    RefDoorMixing(ZoneNumA).DoorProtTypeName.allocate(NumOfZones);
+                    RefDoorMixing(ZoneNumA).DoorMixingObjectName.allocate(state.dataGlobal->NumOfZones);
+                    RefDoorMixing(ZoneNumA).OpenSchedPtr.allocate(state.dataGlobal->NumOfZones);
+                    RefDoorMixing(ZoneNumA).DoorHeight.allocate(state.dataGlobal->NumOfZones);
+                    RefDoorMixing(ZoneNumA).DoorArea.allocate(state.dataGlobal->NumOfZones);
+                    RefDoorMixing(ZoneNumA).Protection.allocate(state.dataGlobal->NumOfZones);
+                    RefDoorMixing(ZoneNumA).MateZonePtr.allocate(state.dataGlobal->NumOfZones);
+                    RefDoorMixing(ZoneNumA).EMSRefDoorMixingOn.allocate(state.dataGlobal->NumOfZones);
+                    RefDoorMixing(ZoneNumA).EMSRefDoorFlowRate.allocate(state.dataGlobal->NumOfZones);
+                    RefDoorMixing(ZoneNumA).VolRefDoorFlowRate.allocate(state.dataGlobal->NumOfZones);
+                    RefDoorMixing(ZoneNumA).DoorProtTypeName.allocate(state.dataGlobal->NumOfZones);
                     RefDoorMixing(ZoneNumA).DoorMixingObjectName = "";
                     RefDoorMixing(ZoneNumA).OpenSchedPtr = 0;
                     RefDoorMixing(ZoneNumA).DoorHeight = 0.0;
@@ -3256,16 +3254,16 @@ namespace HeatBalanceAirManager {
                 } // First refrigeration mixing in this zone
 
                 if (!allocated(RefDoorMixing(ZoneNumB).OpenSchedPtr)) {
-                    RefDoorMixing(ZoneNumB).DoorMixingObjectName.allocate(NumOfZones);
-                    RefDoorMixing(ZoneNumB).OpenSchedPtr.allocate(NumOfZones);
-                    RefDoorMixing(ZoneNumB).DoorHeight.allocate(NumOfZones);
-                    RefDoorMixing(ZoneNumB).DoorArea.allocate(NumOfZones);
-                    RefDoorMixing(ZoneNumB).Protection.allocate(NumOfZones);
-                    RefDoorMixing(ZoneNumB).MateZonePtr.allocate(NumOfZones);
-                    RefDoorMixing(ZoneNumB).EMSRefDoorMixingOn.allocate(NumOfZones);
-                    RefDoorMixing(ZoneNumB).EMSRefDoorFlowRate.allocate(NumOfZones);
-                    RefDoorMixing(ZoneNumB).VolRefDoorFlowRate.allocate(NumOfZones);
-                    RefDoorMixing(ZoneNumB).DoorProtTypeName.allocate(NumOfZones);
+                    RefDoorMixing(ZoneNumB).DoorMixingObjectName.allocate(state.dataGlobal->NumOfZones);
+                    RefDoorMixing(ZoneNumB).OpenSchedPtr.allocate(state.dataGlobal->NumOfZones);
+                    RefDoorMixing(ZoneNumB).DoorHeight.allocate(state.dataGlobal->NumOfZones);
+                    RefDoorMixing(ZoneNumB).DoorArea.allocate(state.dataGlobal->NumOfZones);
+                    RefDoorMixing(ZoneNumB).Protection.allocate(state.dataGlobal->NumOfZones);
+                    RefDoorMixing(ZoneNumB).MateZonePtr.allocate(state.dataGlobal->NumOfZones);
+                    RefDoorMixing(ZoneNumB).EMSRefDoorMixingOn.allocate(state.dataGlobal->NumOfZones);
+                    RefDoorMixing(ZoneNumB).EMSRefDoorFlowRate.allocate(state.dataGlobal->NumOfZones);
+                    RefDoorMixing(ZoneNumB).VolRefDoorFlowRate.allocate(state.dataGlobal->NumOfZones);
+                    RefDoorMixing(ZoneNumB).DoorProtTypeName.allocate(state.dataGlobal->NumOfZones);
                     RefDoorMixing(ZoneNumB).DoorMixingObjectName = "";
                     RefDoorMixing(ZoneNumB).OpenSchedPtr = 0;
                     RefDoorMixing(ZoneNumB).DoorHeight = 0.0;
@@ -3435,7 +3433,7 @@ namespace HeatBalanceAirManager {
                                             Zone(ZoneNumA).Name);
                     }
                 }
-                if (AnyEnergyManagementSystemInModel) {
+                if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                     SetupEMSActuator("ZoneRefDoorMixing",
                                      RefDoorMixing(ZoneNumA).Name,
                                      "Air Exchange Flow Rate",
@@ -3507,7 +3505,7 @@ namespace HeatBalanceAirManager {
                                             Zone(ZoneNumB).Name);
                     }
                 }
-                if (AnyEnergyManagementSystemInModel) {
+                if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                     SetupEMSActuator("ZoneRefDoorMixing",
                                      RefDoorMixing(ZoneNumB).Name,
                                      "Air Exchange Flow Rate",
@@ -3527,7 +3525,7 @@ namespace HeatBalanceAirManager {
         lAlphaFieldBlanks.deallocate();
         lNumericFieldBlanks.deallocate();
 
-        TotInfilVentFlow.dimension(NumOfZones, 0.0);
+        TotInfilVentFlow.dimension(state.dataGlobal->NumOfZones, 0.0);
 
 
         auto divide_and_print_if_greater_than_zero = [&](const Real64 denominator, const Real64 numerator){
@@ -3642,7 +3640,7 @@ namespace HeatBalanceAirManager {
             print(state.files.eio, "{:.2R}\n", Ventilation(Loop).MaxWindSpeed);
         }
 
-        TotMixingFlow.dimension(NumOfZones, 0.0);
+        TotMixingFlow.dimension(state.dataGlobal->NumOfZones, 0.0);
         for (Loop = 1; Loop <= TotMixing; ++Loop) {
             if (Loop == 1)
                 print(state.files.eio, Format_721, "Mixing",
@@ -3711,7 +3709,7 @@ namespace HeatBalanceAirManager {
             print(state.files.eio, Format_724,
                 "RefrigerationDoorMixing ",
                 "Name, Zone 1 Name,Zone 2 Name,Door Opening Schedule Name,Door Height {m},Door Area {m2},Door Protection Type");
-            for (ZoneNumA = 1; ZoneNumA <= (NumOfZones - 1); ++ZoneNumA) {
+            for (ZoneNumA = 1; ZoneNumA <= (state.dataGlobal->NumOfZones - 1); ++ZoneNumA) {
                 if (!RefDoorMixing(ZoneNumA).RefDoorMixFlag) continue;
                 for (ConnectionNumber = 1; ConnectionNumber <= RefDoorMixing(ZoneNumA).NumRefDoorConnections; ++ConnectionNumber) {
                     ZoneNumB = RefDoorMixing(ZoneNumA).MateZonePtr(ConnectionNumber);
@@ -3731,14 +3729,14 @@ namespace HeatBalanceAirManager {
             }     // ZoneNumA
         }         //(TotRefDoorMixing .GT. 0)
 
-        for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+        for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             Zone(ZoneNum).NominalInfilVent = TotInfilVentFlow(ZoneNum);
             Zone(ZoneNum).NominalMixing = TotMixingFlow(ZoneNum);
         }
 
         if (ZoneAirMassFlow.EnforceZoneMassBalance) {
             // Check for infiltration in zone which are only a mixing source zone
-            for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+            for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 if ((ZoneAirMassFlow.BalanceMixing && MassConservation(ZoneNum).IsOnlySourceZone) &&
                     (ZoneAirMassFlow.InfiltrationTreatment != NoInfiltrationFlow)) {
                     if (MassConservation(ZoneNum).InfiltrationPtr == 0) {
@@ -3748,7 +3746,7 @@ namespace HeatBalanceAirManager {
                 }
             }
             // Set up zone air mass balance output variables
-            for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+            for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 SetupOutputVariable(state, "Zone Air Mass Balance Supply Mass Flow Rate",
                                     OutputProcessor::Unit::kg_s,
                                     MassConservation(ZoneNum).InMassFlowRate,
@@ -3830,7 +3828,6 @@ namespace HeatBalanceAirManager {
 
         // Using/Aliasing
         using namespace DataIPShortCuts;
-        using DataGlobals::NumOfZones;
         using DataHeatBalance::Zone;
         using DataRoomAirModel::AirModel;
         using DataRoomAirModel::ChAirModel;
@@ -3863,13 +3860,13 @@ namespace HeatBalanceAirManager {
         // FLOW:
 
         // Initialize default values for air model parameters
-        AirModel.allocate(NumOfZones);
+        AirModel.allocate(state.dataGlobal->NumOfZones);
 
         ErrorsFound = false;
 
         cCurrentModuleObject = "RoomAirModelType";
         NumOfAirModels = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
-        if (NumOfAirModels > NumOfZones) {
+        if (NumOfAirModels > state.dataGlobal->NumOfZones) {
             ShowSevereError(state, "Too many " + cCurrentModuleObject + ".  Cannot exceed the number of Zones.");
             ErrorsFound = true;
         }
@@ -4000,7 +3997,7 @@ namespace HeatBalanceAirManager {
             }
         } // AirModel_Param_Loop
 
-        for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+        for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             if (NumOfAirModels == 0) {
                 AirModel(ZoneNum).AirModelName = "MIXING AIR MODEL FOR " + Zone(ZoneNum).Name;
                 AirModel(ZoneNum).ZoneName = Zone(ZoneNum).Name;
@@ -4014,7 +4011,7 @@ namespace HeatBalanceAirManager {
         // Write RoomAir Model details onto EIO file
         static constexpr auto RoomAirHeader("! <RoomAir Model>, Zone Name, Mixing/Mundt/UCSDDV/UCSDCV/UCSDUFI/UCSDUFE/User Defined\n");
         print(state.files.eio, RoomAirHeader);
-        for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+        for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             {
                 static constexpr auto RoomAirZoneFmt("RoomAir Model,{},{}\n");
 
@@ -4137,7 +4134,7 @@ namespace HeatBalanceAirManager {
                 // if zone air mass flow balance enforced calculate the fraction of
                 // contribution of each mixing object to a zone mixed flow rate, BAN Feb 2014
                 if (ZoneAirMassFlow.EnforceZoneMassBalance) {
-                    for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+                    for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                         ZoneMixingFlowSum = 0.0;
                         NumOfMixingObjects = MassConservation(ZoneNum).NumReceivingZonesMixingObject;
                         for (Loop = 1; Loop <= NumOfMixingObjects; ++Loop) {
@@ -4164,7 +4161,7 @@ namespace HeatBalanceAirManager {
 
                 // Process the scheduled Refrigeration Door mixing for air heat balance
                 if (TotRefDoorMixing > 0) {
-                    for (NZ = 1; NZ <= (NumOfZones - 1);
+                    for (NZ = 1; NZ <= (state.dataGlobal->NumOfZones - 1);
                          ++NZ) { // Can't have %ZonePtr==NumOfZones because lesser zone # of pair placed in ZonePtr in input
                         if (!RefDoorMixing(NZ).RefDoorMixFlag) continue;
                         if (RefDoorMixing(NZ).ZonePtr == NZ) {
@@ -4296,7 +4293,7 @@ namespace HeatBalanceAirManager {
         int TempControlledZoneID; // index for zone in TempConrolled Zone structure
         Real64 thisMRTFraction;   // temp working value for radiative fraction/weight
 
-        for (ZoneLoop = 1; ZoneLoop <= NumOfZones; ++ZoneLoop) {
+        for (ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) {
             // The mean air temperature is actually ZTAV which is the average
             // temperature of the air temperatures at the system time step for the
             // entire zone time step.

@@ -74,7 +74,6 @@
 
 using namespace EnergyPlus;
 using namespace ObjexxFCL;
-using namespace EnergyPlus::DataGlobals;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataHeatBalFanSys;
 using namespace EnergyPlus::DataHVACGlobals;
@@ -286,7 +285,7 @@ TEST_F(EnergyPlusFixture, IdealLoadsAirSystem_GetInput)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::DoWeathSim = true;
+    state.dataGlobal->DoWeathSim = true;
 
     GetPurchasedAir(state);
 
@@ -386,7 +385,7 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_PlenumTest)
 
     ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
 
-    DataGlobals::DoWeathSim = true;
+    state.dataGlobal->DoWeathSim = true;
 
     bool ErrorsFound = false;
     GetZoneData(state, ErrorsFound);
@@ -496,7 +495,7 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_ExhaustNodeTest)
 
     ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
 
-    DataGlobals::DoWeathSim = true;
+    state.dataGlobal->DoWeathSim = true;
 
     bool ErrorsFound = false;
     GetZoneData(state, ErrorsFound);
@@ -626,7 +625,7 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_EMSOverrideTest)
 
     ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
 
-    DataGlobals::DoWeathSim = true;
+    state.dataGlobal->DoWeathSim = true;
 
     bool ErrorsFound = false;
     GetZoneData(state, ErrorsFound);
@@ -645,7 +644,7 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_EMSOverrideTest)
     ZoneEquipConfig(1).ExhaustNode.allocate(1);
     ZoneEquipConfig(1).NumExhaustNodes = 1;
     ZoneEquipConfig(1).ExhaustNode(1) = 2;
-    DataGlobals::TimeStepZone = 0.25;
+    state.dataGlobal->TimeStepZone = 0.25;
 
     EMSManager::CheckIfAnyEMS(state); // get EMS input
     EMSManager::GetEMSInput(state);

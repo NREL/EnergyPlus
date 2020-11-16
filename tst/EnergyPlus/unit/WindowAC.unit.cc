@@ -429,8 +429,8 @@ TEST_F(EnergyPlusFixture, WindowAC_VStest1)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::NumOfTimeStepInHour = 6;    // must initialize this to get schedules initialized
-    DataGlobals::MinutesPerTimeStep = 10;    // must initialize this to get schedules initialized
+    state.dataGlobal->NumOfTimeStepInHour = 6;    // must initialize this to get schedules initialized
+    state.dataGlobal->MinutesPerTimeStep = 10;    // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(state); // read schedule data
 
     bool errorsFound(false);
@@ -440,12 +440,12 @@ TEST_F(EnergyPlusFixture, WindowAC_VStest1)
     state.dataGlobal->DDOnlySimulation = true;
 
     SimulationManager::GetProjectData(state);
-    OutputReportPredefined::SetPredefinedTables();
+    OutputReportPredefined::SetPredefinedTables(state);
     HeatBalanceManager::SetPreConstructionInputParameters(state); // establish array bounds for constructions early
 
     state.dataGlobal->BeginSimFlag = true;
     state.dataGlobal->BeginEnvrnFlag = true;
-    DataGlobals::ZoneSizingCalc = true;
+    state.dataGlobal->ZoneSizingCalc = true;
     EnergyPlus::createFacilityElectricPowerServiceObject();
 
     SizingManager::ManageSizing(state);

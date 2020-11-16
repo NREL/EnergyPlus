@@ -76,7 +76,6 @@
 // EnergyPlus Headers
 using namespace EnergyPlus::DataDefineEquip;
 using namespace EnergyPlus::DataEnvironment;
-using namespace EnergyPlus::DataGlobals;
 using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::DataZoneEquipment;
 using namespace EnergyPlus::HeatBalanceManager;
@@ -151,8 +150,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_GetInput)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
-    MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
+    state.dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
+    state.dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ProcessScheduleInput(state);  // read schedules
 
     GetZoneData(state, ErrorsFound);
@@ -231,8 +230,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_SimConstVolNoReheat)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
-    MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
+    state.dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
+    state.dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ProcessScheduleInput(state);  // read schedules
 
     GetZoneData(state, ErrorsFound);
@@ -314,8 +313,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_Sim)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
-    MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
+    state.dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
+    state.dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ProcessScheduleInput(state);  // read schedules
 
     GetZoneData(state, ErrorsFound);
@@ -325,7 +324,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_Sim)
     GetZoneAirLoopEquipment(state);
     GetSysInput(state);
 
-    DataGlobals::SysSizingCalc = true;
+    state.dataGlobal->SysSizingCalc = true;
     state.dataGlobal->BeginEnvrnFlag = true;
     DataEnvironment::StdRhoAir = 1.0;
     DataEnvironment::OutBaroPress = 101325.0;
@@ -488,8 +487,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OASpecification)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
-    MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
+    state.dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
+    state.dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ProcessScheduleInput(state);  // read schedules
 
     GetZoneData(state, ErrorsFound);
@@ -501,7 +500,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OASpecification)
     GetZoneAirLoopEquipment(state);
     GetSysInput(state);
 
-    DataGlobals::SysSizingCalc = true;
+    state.dataGlobal->SysSizingCalc = true;
     state.dataGlobal->BeginEnvrnFlag = true;
     DataEnvironment::StdRhoAir = 1.0;
     DataEnvironment::OutBaroPress = 101325.0;
@@ -551,23 +550,23 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OASpecification)
     DataEnvironment::DayOfYear_Schedule = 1;
     DataEnvironment::DayOfWeek = 1;
     DataEnvironment::HolidayIndex = 0;
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
 
     // Full occupancy 3 people, OA/person = 0.1, OA/zone = 0.5, OA Sched = 1.0
-    DataGlobals::HourOfDay = 12;
+    state.dataGlobal->HourOfDay = 12;
     ScheduleManager::UpdateScheduleValues(state);
     // Just set number of people directly, too many other things that have to be in place to call ManagerInternalHeatGains()
     DataHeatBalance::ZoneIntGain(1).NOFOCC = 3.0;
     Real64 expectedMassFlow = 1.0 * ((3.0 * 0.1) + 0.5);
 
-    // run SimulateSingleDuct(state, ) function
+    // run SimulateSingleDuct() function
     SimulateSingleDuct(state, AirDistUnit(1).EquipName(1), FirstHVACIteration, ZonePtr, ZoneAirNodeNum, AirDistUnit(1).EquipIndex(1));
     // check AT air mass flow rates
     EXPECT_EQ(expectedMassFlow, sd_airterminal(SysNum).sd_airterminalInlet.AirMassFlowRate);
     EXPECT_EQ(expectedMassFlow, sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRate);
 
     // 50% occupancy 1.5 people, OA/person = 0.1, OA/zone = 0.5, OA Sched = 1.0
-    DataGlobals::HourOfDay = 12;
+    state.dataGlobal->HourOfDay = 12;
     ScheduleManager::UpdateScheduleValues(state);
     // Just set number of people directly, too many other things that have to be in place to call ManagerInternalHeatGains()
     DataHeatBalance::ZoneIntGain(1).NOFOCC = 1.5;
@@ -578,7 +577,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OASpecification)
     EXPECT_EQ(expectedMassFlow, sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRate);
 
     // Nighttime OA Sched = 0.0
-    DataGlobals::HourOfDay = 24;
+    state.dataGlobal->HourOfDay = 24;
     ScheduleManager::UpdateScheduleValues(state);
     // Just set number of people directly, too many other things that have to be in place to call ManagerInternalHeatGains()
     DataHeatBalance::ZoneIntGain(1).NOFOCC = 1.5;
@@ -651,8 +650,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_EMSOverrideAirFlow)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
-    MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
+    state.dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
+    state.dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ProcessScheduleInput(state);  // read schedules
 
     GetZoneData(state, ErrorsFound);
@@ -662,7 +661,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_EMSOverrideAirFlow)
     GetZoneAirLoopEquipment(state);
     GetSysInput(state);
 
-    DataGlobals::SysSizingCalc = true;
+    state.dataGlobal->SysSizingCalc = true;
     state.dataGlobal->BeginEnvrnFlag = true;
     DataEnvironment::StdRhoAir = 1.0;
     DataEnvironment::OutBaroPress = 101325.0;
@@ -823,8 +822,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OAVolumeFlowRateReport
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
-    MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
+    state.dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
+    state.dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ProcessScheduleInput(state);  // read schedules
 
     GetZoneData(state, ErrorsFound);
@@ -836,7 +835,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OAVolumeFlowRateReport
     GetZoneAirLoopEquipment(state);
     GetSysInput(state);
 
-    DataGlobals::SysSizingCalc = true;
+    state.dataGlobal->SysSizingCalc = true;
     state.dataGlobal->BeginEnvrnFlag = true;
     DataEnvironment::StdRhoAir = 1.0;
     DataEnvironment::OutBaroPress = 101325.0;
@@ -894,10 +893,10 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OAVolumeFlowRateReport
     DataEnvironment::DayOfYear_Schedule = 1;
     DataEnvironment::DayOfWeek = 1;
     DataEnvironment::HolidayIndex = 0;
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
 
     // Full occupancy 3 people, OA/person = 0.1, OA/zone = 0.5, OA Sched = 1.0
-    DataGlobals::HourOfDay = 12;
+    state.dataGlobal->HourOfDay = 12;
     ScheduleManager::UpdateScheduleValues(state);
     // Just set number of people directly, too many other things that have to be in place to call ManagerInternalHeatGains()
     DataHeatBalance::ZoneIntGain(1).NOFOCC = 3.0;
@@ -912,7 +911,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OAVolumeFlowRateReport
     EXPECT_EQ(expected_OAVolFlowRate, thisAirTerminal.OutdoorAirFlowRate);  // OA volume flow rate
 
     // 50% occupancy 1.5 people, OA/person = 0.1, OA/zone = 0.5, OA Sched = 1.0
-    DataGlobals::HourOfDay = 12;
+    state.dataGlobal->HourOfDay = 12;
     ScheduleManager::UpdateScheduleValues(state);
     // Just set number of people directly, too many other things that have to be in place to call ManagerInternalHeatGains()
     DataHeatBalance::ZoneIntGain(1).NOFOCC = 1.5;
@@ -925,7 +924,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OAVolumeFlowRateReport
     EXPECT_EQ(expected_OAVolFlowRate, thisAirTerminal.OutdoorAirFlowRate);  // OA volume flow rate
 
     // Nighttime OA Sched = 0.0
-    DataGlobals::HourOfDay = 24;
+    state.dataGlobal->HourOfDay = 24;
     ScheduleManager::UpdateScheduleValues(state);
     // Just set number of people directly, too many other things that have to be in place to call ManagerInternalHeatGains()
     DataHeatBalance::ZoneIntGain(1).NOFOCC = 1.5;
@@ -1000,8 +999,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_SimSensibleOutPutTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
-    MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
+    state.dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
+    state.dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ProcessScheduleInput(state);  // read schedules
 
     GetZoneData(state, ErrorsFound);
@@ -1011,7 +1010,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_SimSensibleOutPutTest)
     GetZoneAirLoopEquipment(state);
     GetSysInput(state);
 
-    DataGlobals::SysSizingCalc = true;
+    state.dataGlobal->SysSizingCalc = true;
     state.dataGlobal->BeginEnvrnFlag = true;
     DataEnvironment::StdRhoAir = 1.0;
     DataEnvironment::OutBaroPress = 101325.0;

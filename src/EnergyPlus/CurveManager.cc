@@ -1834,7 +1834,7 @@ namespace CurveManager {
                     }
 
                 }
-                // Add grid to state.dataCurveManager->btwxtManager
+                // Add grid to btwxtManager
                 state.dataCurveManager->btwxtManager.addGrid(UtilityRoutines::MakeUPPERCase(thisObjectName), Btwxt::GriddedData(gridAxes));
             }
         }
@@ -2239,7 +2239,7 @@ namespace CurveManager {
                                 DataBranchAirLoopPlant::PressureCurve(CurveIndex).Name);
         }
 
-        if (DataGlobals::AnyEnergyManagementSystemInModel) { // provide hook for possible EMS control
+        if (state.dataGlobal->AnyEnergyManagementSystemInModel) { // provide hook for possible EMS control
             for (CurveIndex = 1; CurveIndex <= state.dataCurveManager->NumCurves; ++CurveIndex) {
                 SetupEMSActuator("Curve",
                                  state.dataCurveManager->PerfCurve(CurveIndex).Name,
@@ -2249,7 +2249,7 @@ namespace CurveManager {
                                  state.dataCurveManager->PerfCurve(CurveIndex).EMSOverrideCurveValue);
             } // All performance curves
         }
-        if (DataGlobals::AnyEnergyManagementSystemInModel) { // provide hook for possible EMS control
+        if (state.dataGlobal->AnyEnergyManagementSystemInModel) { // provide hook for possible EMS control
             for (CurveIndex = 1; CurveIndex <= DataBranchAirLoopPlant::NumPressureCurves; ++CurveIndex) {
                 SetupEMSActuator("Curve",
                                  DataBranchAirLoopPlant::PressureCurve(CurveIndex).Name,

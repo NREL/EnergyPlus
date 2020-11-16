@@ -191,7 +191,6 @@ namespace PlantLoadProfile {
         // actual available flow is set.
 
         // Using/Aliasing
-        using DataGlobals::SysSizingCalc;
         using DataLoopNode::Node;
         using FluidProperties::GetDensityGlycol;
         using PlantUtilities::RegisterPlantCompDesignFlow;
@@ -222,7 +221,7 @@ namespace PlantLoadProfile {
             }
         }
 
-        if (!SysSizingCalc && this->InitSizing) {
+        if (!state.dataGlobal->SysSizingCalc && this->InitSizing) {
             RegisterPlantCompDesignFlow(InletNode, this->PeakVolFlowRate);
             this->InitSizing = false;
         }
@@ -362,7 +361,6 @@ namespace PlantLoadProfile {
 
         // Using/Aliasing
         using BranchNodeConnections::TestCompSet;
-        using DataGlobals::AnyEnergyManagementSystemInModel;
         using NodeInputManager::GetOnlySingleNode;
         using ScheduleManager::GetScheduleIndex;
         using namespace DataLoopNode;
@@ -479,7 +477,7 @@ namespace PlantLoadProfile {
                                     _,
                                     "Plant");
 
-                if (AnyEnergyManagementSystemInModel) {
+                if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                     SetupEMSActuator("Plant Load Profile",
                                      PlantProfile(ProfileNum).Name,
                                      "Mass Flow Rate",

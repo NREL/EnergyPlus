@@ -128,7 +128,7 @@ namespace PlantValves {
                                    [[maybe_unused]] bool RunFlag)
     {
         this->initialize(state);
-        this->calculate();
+        this->calculate(state);
         PlantUtilities::SafeCopyPlantNode(this->PltInletNodeNum, this->PltOutletNodeNum);
         Real64 mdot = this->MixedMassFlowRate * this->FlowDivFract;
         if (this->LoopNum > 0) {
@@ -441,7 +441,7 @@ namespace PlantValves {
 
     }
 
-    void TemperValveData::calculate()
+    void TemperValveData::calculate(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -463,7 +463,7 @@ namespace PlantValves {
         Real64 Tset; // local working variable for Setpoint Temperature (C)
         Real64 Ts2;  // local Working Variable for Stream 2 outlet Temperature (C)
 
-        if (DataGlobals::KickOffSimulation) return;
+        if (state.dataGlobal->KickOffSimulation) return;
 
         if (DataPlant::PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock == 0) {
             Tin = this->InletTemp;

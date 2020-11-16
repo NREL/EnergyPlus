@@ -448,7 +448,7 @@ namespace OutsideEnergySources {
                                                          NomCapDes,
                                                          "User-Specified Nominal Capacity [W]",
                                                          NomCapUser);
-                            if (DataGlobals::DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(NomCapDes - NomCapUser) / NomCapUser) > DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeDistrict" + typeName + ": Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError(state, "User-Specified Nominal Capacity of " + General::RoundSigDigits(NomCapUser, 2) + " [W]");

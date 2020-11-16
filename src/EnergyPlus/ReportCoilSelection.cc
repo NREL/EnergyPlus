@@ -1178,7 +1178,7 @@ void ReportCoilSelection::setCoilCoolingCapacity(
             c->coilSensePeakHrMin =
                 General::TrimSigDigits(state.dataWeatherManager->DesDayInput(DataSizing::SysSizPeakDDNum(curSysNum).SensCoolPeakDD).Month) + "/" +
                 General::TrimSigDigits(state.dataWeatherManager->DesDayInput(DataSizing::SysSizPeakDDNum(curSysNum).SensCoolPeakDD).DayOfMonth) + " " +
-                getTimeText(DataSizing::SysSizPeakDDNum(curSysNum).TimeStepAtSensCoolPk(DataSizing::SysSizPeakDDNum(curSysNum).SensCoolPeakDD));
+                getTimeText(state, DataSizing::SysSizPeakDDNum(curSysNum).TimeStepAtSensCoolPk(DataSizing::SysSizPeakDDNum(curSysNum).SensCoolPeakDD));
         }
         if (DataSizing::SysSizPeakDDNum(curSysNum).TotCoolPeakDD > 0 &&
             DataSizing::SysSizPeakDDNum(curSysNum).TotCoolPeakDD <= DataEnvironment::TotDesDays) {
@@ -1186,7 +1186,7 @@ void ReportCoilSelection::setCoilCoolingCapacity(
             c->coilTotalPeakHrMin =
                 General::TrimSigDigits(state.dataWeatherManager->DesDayInput(DataSizing::SysSizPeakDDNum(curSysNum).TotCoolPeakDD).Month) + "/" +
                 General::TrimSigDigits(state.dataWeatherManager->DesDayInput(DataSizing::SysSizPeakDDNum(curSysNum).TotCoolPeakDD).DayOfMonth) + " " +
-                getTimeText(DataSizing::SysSizPeakDDNum(curSysNum).TimeStepAtTotCoolPk(DataSizing::SysSizPeakDDNum(curSysNum).TotCoolPeakDD));
+                getTimeText(state, DataSizing::SysSizPeakDDNum(curSysNum).TimeStepAtTotCoolPk(DataSizing::SysSizPeakDDNum(curSysNum).TotCoolPeakDD));
         }
 
         if (DataSizing::SysSizPeakDDNum(curSysNum).CoolFlowPeakDD > 0 &&
@@ -1195,7 +1195,7 @@ void ReportCoilSelection::setCoilCoolingCapacity(
             c->airPeakHrMin =
                 General::TrimSigDigits(state.dataWeatherManager->DesDayInput(DataSizing::SysSizPeakDDNum(curSysNum).CoolFlowPeakDD).Month) + "/" +
                 General::TrimSigDigits(state.dataWeatherManager->DesDayInput(DataSizing::SysSizPeakDDNum(curSysNum).CoolFlowPeakDD).DayOfMonth) + " " +
-                getTimeText(DataSizing::SysSizPeakDDNum(curSysNum).TimeStepAtCoolFlowPk(DataSizing::SysSizPeakDDNum(curSysNum).CoolFlowPeakDD));
+                getTimeText(state, DataSizing::SysSizPeakDDNum(curSysNum).TimeStepAtCoolFlowPk(DataSizing::SysSizPeakDDNum(curSysNum).CoolFlowPeakDD));
         }
 
         if (DataSizing::FinalSysSizing(curSysNum).CoolingPeakLoadType == DataSizing::TotalCoolingLoad) {
@@ -1340,10 +1340,10 @@ void ReportCoilSelection::setCoilCoolingCapacity(
             c->coilSensePeakHrMin =
                 General::TrimSigDigits(state.dataWeatherManager->DesDayInput(DataSizing::FinalZoneSizing(curZoneEqNum).CoolDDNum).Month) + "/" +
                 General::TrimSigDigits(state.dataWeatherManager->DesDayInput(DataSizing::FinalZoneSizing(curZoneEqNum).CoolDDNum).DayOfMonth) + " " +
-                getTimeText(DataSizing::FinalZoneSizing(curZoneEqNum).TimeStepNumAtCoolMax);
+                getTimeText(state, DataSizing::FinalZoneSizing(curZoneEqNum).TimeStepNumAtCoolMax);
             c->airPeakHrMin = General::TrimSigDigits(state.dataWeatherManager->DesDayInput(DataSizing::FinalZoneSizing(curZoneEqNum).CoolDDNum).Month) + "/" +
                               General::TrimSigDigits(state.dataWeatherManager->DesDayInput(DataSizing::FinalZoneSizing(curZoneEqNum).CoolDDNum).DayOfMonth) +
-                              " " + getTimeText(DataSizing::FinalZoneSizing(curZoneEqNum).TimeStepNumAtCoolMax);
+                              " " + getTimeText(state, DataSizing::FinalZoneSizing(curZoneEqNum).TimeStepNumAtCoolMax);
         }
 
         c->rmSensibleAtPeak = DataSizing::FinalZoneSizing(curZoneEqNum).DesCoolLoad;
@@ -1511,10 +1511,10 @@ void ReportCoilSelection::setCoilHeatingCapacity(
         if (DataSizing::FinalSysSizing(curSysNum).HeatDDNum > 0 && DataSizing::FinalSysSizing(curSysNum).HeatDDNum <= DataEnvironment::TotDesDays) {
             c->coilSensePeakHrMin = General::TrimSigDigits(state.dataWeatherManager->DesDayInput(DataSizing::FinalSysSizing(curSysNum).HeatDDNum).Month) + "/" +
                                     General::TrimSigDigits(state.dataWeatherManager->DesDayInput(DataSizing::FinalSysSizing(curSysNum).HeatDDNum).DayOfMonth) +
-                                    " " + getTimeText(DataSizing::FinalSysSizing(curSysNum).SysHeatCoilTimeStepPk);
+                                    " " + getTimeText(state, DataSizing::FinalSysSizing(curSysNum).SysHeatCoilTimeStepPk);
             c->airPeakHrMin = General::TrimSigDigits(state.dataWeatherManager->DesDayInput(DataSizing::FinalSysSizing(curSysNum).HeatDDNum).Month) + "/" +
                               General::TrimSigDigits(state.dataWeatherManager->DesDayInput(DataSizing::FinalSysSizing(curSysNum).HeatDDNum).DayOfMonth) + " " +
-                              getTimeText(DataSizing::FinalSysSizing(curSysNum).SysHeatAirTimeStepPk);
+                              getTimeText(state, DataSizing::FinalSysSizing(curSysNum).SysHeatAirTimeStepPk);
             c->desDayNameAtAirFlowPeak = state.dataWeatherManager->DesDayInput(DataSizing::FinalSysSizing(curSysNum).HeatDDNum).Title;
         }
 
@@ -1567,10 +1567,10 @@ void ReportCoilSelection::setCoilHeatingCapacity(
             c->coilSensePeakHrMin =
                 General::TrimSigDigits(state.dataWeatherManager->DesDayInput(DataSizing::FinalZoneSizing(curZoneEqNum).HeatDDNum).Month) + "/" +
                 General::TrimSigDigits(state.dataWeatherManager->DesDayInput(DataSizing::FinalZoneSizing(curZoneEqNum).HeatDDNum).DayOfMonth) + " " +
-                getTimeText(DataSizing::FinalZoneSizing(curZoneEqNum).TimeStepNumAtHeatMax);
+                getTimeText(state, DataSizing::FinalZoneSizing(curZoneEqNum).TimeStepNumAtHeatMax);
             c->airPeakHrMin = General::TrimSigDigits(state.dataWeatherManager->DesDayInput(DataSizing::FinalZoneSizing(curZoneEqNum).HeatDDNum).Month) + "/" +
                               General::TrimSigDigits(state.dataWeatherManager->DesDayInput(DataSizing::FinalZoneSizing(curZoneEqNum).HeatDDNum).DayOfMonth) +
-                              " " + getTimeText(DataSizing::FinalZoneSizing(curZoneEqNum).TimeStepNumAtHeatMax);
+                              " " + getTimeText(state, DataSizing::FinalZoneSizing(curZoneEqNum).TimeStepNumAtHeatMax);
         }
         c->desDayNameAtAirFlowPeak = DataSizing::FinalZoneSizing(curZoneEqNum).HeatDesDay;
 
@@ -1851,7 +1851,7 @@ void ReportCoilSelection::setCoilSupplyFanInfo(EnergyPlusData &state, std::strin
     }
 }
 
-std::string ReportCoilSelection::getTimeText(int const timeStepAtPeak)
+std::string ReportCoilSelection::getTimeText(EnergyPlusData &state, int const timeStepAtPeak)
 {
     std::string returnString = "";
 
@@ -1864,9 +1864,9 @@ std::string ReportCoilSelection::getTimeText(int const timeStepAtPeak)
     int timeStepIndex(0);
     int hourPrint;
     for (int hourCounter = 1; hourCounter <= 24; ++hourCounter) {
-        for (int timeStepCounter = 1; timeStepCounter <= DataGlobals::NumOfTimeStepInHour; ++timeStepCounter) {
+        for (int timeStepCounter = 1; timeStepCounter <= state.dataGlobal->NumOfTimeStepInHour; ++timeStepCounter) {
             ++timeStepIndex;
-            minutes += DataGlobals::MinutesPerTimeStep;
+            minutes += state.dataGlobal->MinutesPerTimeStep;
             if (minutes == 60) {
                 minutes = 0;
                 hourPrint = hourCounter;

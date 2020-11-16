@@ -68,7 +68,7 @@ TEST_F(EnergyPlusFixture, TestTrendVariable)
 
     // now create a trend variable to track it
     size_t const numValues = 4;
-    PluginManagement::trends.emplace_back("TREND_VAR", numValues, globalVarIndex);
+    PluginManagement::trends.emplace_back(state, "TREND_VAR", numValues, globalVarIndex);
     int trendVarIndex = EnergyPlus::PluginManagement::PluginManager::getTrendVariableHandle("trend_var");
     EXPECT_EQ(0, trendVarIndex);
 
