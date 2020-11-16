@@ -264,7 +264,8 @@ namespace SystemReports {
                                       int const PlantBranch,
                                       int const PlantComp);
 
-    void UpdateAirSysCompPtrArray(int &Idx,
+    void UpdateAirSysCompPtrArray(EnergyPlusData &state,
+                                  int &Idx,
                                   int const AirLoopNum,
                                   int const BranchNum,
                                   int const CompNum,

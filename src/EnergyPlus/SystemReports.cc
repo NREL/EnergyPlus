@@ -584,8 +584,8 @@ namespace SystemReports {
                     } else {
                         SubSubEquipNum = 0;
                     }
-                    if (allocated(AirSysCompToPlant)) {
-                        CompNum = isize(AirSysCompToPlant);
+                    if (allocated(state.dataAirSystemsData->AirSysCompToPlant)) {
+                        CompNum = isize(state.dataAirSystemsData->AirSysCompToPlant);
                     } else {
                         CompNum = 0;
                     }
@@ -731,10 +731,10 @@ namespace SystemReports {
                     if (CompNum > 0) {
                         ArrayCount = 0;
                         for (int i = 1; i <= CompNum; ++i) {
-                            auto const &ai(AirSysCompToPlant(i));
+                            auto const &ai(state.dataAirSystemsData->AirSysCompToPlant(i));
                             bool duplicate(false);
                             for (int j = 1; j <= ArrayCount; ++j) {
-                                auto const &aj(AirSysCompToPlant(j));
+                                auto const &aj(state.dataAirSystemsData->AirSysCompToPlant(j));
                                 if ((ai.AirLoopNum == aj.AirLoopNum) && (ai.AirLoopBranch == aj.AirLoopBranch) &&
                                     (ai.AirLoopComp == aj.AirLoopComp)) { // Duplicate
                                     duplicate = true;
@@ -744,7 +744,7 @@ namespace SystemReports {
                             if (!duplicate) {
                                 ++ArrayCount;
                                 if (i > ArrayCount) { // Copy to lower position
-                                    auto &aa(AirSysCompToPlant(ArrayCount));
+                                    auto &aa(state.dataAirSystemsData->AirSysCompToPlant(ArrayCount));
                                     aa.AirLoopNum = ai.AirLoopNum;
                                     aa.AirLoopBranch = ai.AirLoopBranch;
                                     aa.AirLoopComp = ai.AirLoopComp;
@@ -758,7 +758,7 @@ namespace SystemReports {
                             }
                         }
                         for (int i = ArrayCount + 1; i <= CompNum; ++i) { // Zero the now-unused entries
-                            auto &ai(AirSysCompToPlant(i));
+                            auto &ai(state.dataAirSystemsData->AirSysCompToPlant(i));
                             ai.AirLoopNum = 0;
                             ai.AirLoopBranch = 0;
                             ai.AirLoopComp = 0;
@@ -907,7 +907,7 @@ namespace SystemReports {
             } // Controlled Zone Loop
 
             // 4.  Now Load all of the plant supply/demand side connections in a single array with pointers from the
-            //    connection arrays (state.dataAirSystemsData->ZoneCompToPlant, state.dataAirSystemsData->ZoneSubCompToPlant, state.dataAirSystemsData->ZoneSubSubCompToPlant, AirSysCompToPlant, etc.)
+            //    connection arrays (state.dataAirSystemsData->ZoneCompToPlant, state.dataAirSystemsData->ZoneSubCompToPlant, state.dataAirSystemsData->ZoneSubSubCompToPlant, state.dataAirSystemsData->AirSysCompToPlant, etc.)
             if (allocated(state.dataAirSystemsData->ZoneCompToPlant)) {
                 NumZoneConnectComps = isize(state.dataAirSystemsData->ZoneCompToPlant);
             } else {
@@ -923,8 +923,8 @@ namespace SystemReports {
             } else {
                 NumZoneConnectSubSubComps = 0;
             }
-            if (allocated(AirSysCompToPlant)) {
-                NumAirSysConnectComps = isize(AirSysCompToPlant);
+            if (allocated(state.dataAirSystemsData->AirSysCompToPlant)) {
+                NumAirSysConnectComps = isize(state.dataAirSystemsData->AirSysCompToPlant);
             } else {
                 NumAirSysConnectComps = 0;
             }
@@ -1001,8 +1001,8 @@ namespace SystemReports {
                 }
             }
             for (CompNum = 1; CompNum <= NumAirSysConnectComps; ++CompNum) {
-                LoopType = AirSysCompToPlant(CompNum).PlantLoopType;
-                LoopNum = AirSysCompToPlant(CompNum).PlantLoopNum;
+                LoopType = state.dataAirSystemsData->AirSysCompToPlant(CompNum).PlantLoopType;
+                LoopNum = state.dataAirSystemsData->AirSysCompToPlant(CompNum).PlantLoopNum;
                 FirstIndex = ArrayCount + 1;
                 LoopCount = 1;
 
@@ -1015,8 +1015,8 @@ namespace SystemReports {
                 LastIndex = ArrayCount;
                 if (FirstIndex > LastIndex) FirstIndex = LastIndex;
                 if (ConnectionFlag) {
-                    AirSysCompToPlant(CompNum).FirstDemandSidePtr = FirstIndex;
-                    AirSysCompToPlant(CompNum).LastDemandSidePtr = LastIndex;
+                    state.dataAirSystemsData->AirSysCompToPlant(CompNum).FirstDemandSidePtr = FirstIndex;
+                    state.dataAirSystemsData->AirSysCompToPlant(CompNum).LastDemandSidePtr = LastIndex;
                 }
             }
 
@@ -1636,7 +1636,8 @@ namespace SystemReports {
         ++ArrayCounter;
     }
 
-    void UpdateAirSysCompPtrArray(int &Idx,
+    void UpdateAirSysCompPtrArray(EnergyPlusData &state,
+                                  int &Idx,
                                   int const AirLoopNum,
                                   int const BranchNum,
                                   int const CompNum,
@@ -1676,8 +1677,8 @@ namespace SystemReports {
         static int ArrayCounter(1);
 
         if (OneTimeFlag) {
-            AirSysCompToPlant.allocate(ArrayLimit);
-            for (auto &e : AirSysCompToPlant) {
+            state.dataAirSystemsData->AirSysCompToPlant.allocate(ArrayLimit);
+            for (auto &e : state.dataAirSystemsData->AirSysCompToPlant) {
                 e.AirLoopNum = 0;
                 e.AirLoopBranch = 0;
                 e.AirLoopComp = 0;
@@ -1694,9 +1695,9 @@ namespace SystemReports {
 
         if (ArrayCounter >= ArrayLimit) { // Redimension larger
             int const OldArrayLimit(ArrayLimit);
-            AirSysCompToPlant.redimension(ArrayLimit *= 2);
+            state.dataAirSystemsData->AirSysCompToPlant.redimension(ArrayLimit *= 2);
             for (int i = OldArrayLimit + 1; i <= ArrayLimit; ++i) {
-                auto &actp(AirSysCompToPlant(i));
+                auto &actp(state.dataAirSystemsData->AirSysCompToPlant(i));
                 actp.AirLoopNum = 0;
                 actp.AirLoopBranch = 0;
                 actp.AirLoopComp = 0;
@@ -1710,7 +1711,7 @@ namespace SystemReports {
         }
 
         Idx = ArrayCounter;
-        auto &actp(AirSysCompToPlant(Idx));
+        auto &actp(state.dataAirSystemsData->AirSysCompToPlant(Idx));
         actp.AirLoopNum = AirLoopNum;
         actp.AirLoopBranch = BranchNum;
         actp.AirLoopComp = CompNum;
@@ -4964,7 +4965,7 @@ namespace SystemReports {
                         Idx = 0;
                         FindDemandSideMatch(CompType, CompName, MatchFound, MatchLoopType, MatchLoop, MatchBranch, MatchComp);
                         if (MatchFound)
-                            UpdateAirSysCompPtrArray(Idx, AirLoopNum, BranchNum, CompNum, MatchLoopType, MatchLoop, MatchBranch, MatchComp);
+                            UpdateAirSysCompPtrArray(state, Idx, AirLoopNum, BranchNum, CompNum, MatchLoopType, MatchLoop, MatchBranch, MatchComp);
                         thisComp.AirSysToPlantPtr = Idx;
                         break;
                     }
