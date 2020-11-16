@@ -205,7 +205,6 @@ namespace DXFEarClipping {
 
         // Use statements:
         // Using/Aliasing
-        using DataGlobals::DisplayExtraWarnings;
         using DataSurfaces::cSurfaceClass;
         using DataSurfaces::SurfaceClass;
 
@@ -310,10 +309,10 @@ namespace DXFEarClipping {
                 ShowWarningError(state, "DXFOut: Could not triangulate surface=\"" + surfname + "\", type=\"" + cSurfaceClass(surfclass) +
                                  "\", check surface vertex order(entry)");
                 ++errcount;
-                if (errcount == 1 && !DisplayExtraWarnings) {
+                if (errcount == 1 && !state.dataGlobal->DisplayExtraWarnings) {
                     ShowContinueError(state, "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual surfaces.");
                 }
-                if (DisplayExtraWarnings) {
+                if (state.dataGlobal->DisplayExtraWarnings) {
                     ShowMessage(state, format(" surface={} class={}", surfname, cSurfaceClass(surfclass)));
 
                     for (int j = 1; j <= nsides; ++j) {

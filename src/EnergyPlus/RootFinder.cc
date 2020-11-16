@@ -175,7 +175,6 @@ namespace RootFinder {
     // Use statements for data only modules
     // Using/Aliasing
     using namespace DataRootFinder;
-    using namespace DataGlobals;
     using General::TrimSigDigits;
 
     // Data

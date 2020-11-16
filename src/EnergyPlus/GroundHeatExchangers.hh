@@ -343,7 +343,7 @@ namespace GroundHeatExchangers {
 
         void calcShortTimestepGFunctions(EnergyPlusData &state);
 
-        void calcLongTimestepGFunctions();
+        void calcLongTimestepGFunctions(EnergyPlusData &state);
 
         void calcGFunctions(EnergyPlusData &state);
 

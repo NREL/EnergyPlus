@@ -68,7 +68,6 @@ using namespace EnergyPlus::HVACStandAloneERV;
 using namespace ObjexxFCL;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataHVACGlobals;
-using namespace DataGlobals;
 using namespace EnergyPlus::DataZoneEquipment;
 using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::Fans;
@@ -211,8 +210,8 @@ TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test2)
     ASSERT_TRUE(process_idf(idf_objects));
     DataEnvironment::StdRhoAir = 1.0;
 
-    NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
-    MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
+    state.dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
+    state.dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ProcessScheduleInput(state);  // read schedules
 
     GetFanInput(state);

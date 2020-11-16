@@ -56,7 +56,6 @@
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
-#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -533,7 +532,7 @@ namespace IceThermalStorage {
                             ShowContinueError(state, "Detailed Ice Storage System Name = " + this->Name);
                             ShowContinueErrorTimeStamp(state, "");
                         } else {
-                            ShowRecurringWarningErrorAtEnd("Detailed Ice Storage system [" + this->Name +
+                            ShowRecurringWarningErrorAtEnd(state, "Detailed Ice Storage system [" + this->Name +
                                                                "]  charging maximum iteration limit exceeded occurrence continues.",
                                                            this->ChargeErrorCount);
                         }
@@ -663,14 +662,14 @@ namespace IceThermalStorage {
                     } // ...loop iterating for the ice storage outlet temperature
 
                     // Keep track of times that the iterations got excessive
-                    if (IterNum >= MaxIterNum && (!DataGlobals::WarmupFlag)) {
+                    if (IterNum >= MaxIterNum && (!state.dataGlobal->WarmupFlag)) {
                         ++this->DischargeIterErrors;
                         if (this->DischargeIterErrors <= 25) {
                             ShowWarningError(state, "Detailed Ice Storage model exceeded its internal discharging maximum iteration limit");
                             ShowContinueError(state, "Detailed Ice Storage System Name = " + this->Name);
                             ShowContinueErrorTimeStamp(state, "");
                         } else {
-                            ShowRecurringWarningErrorAtEnd("Detailed Ice Storage system [" + this->Name +
+                            ShowRecurringWarningErrorAtEnd(state, "Detailed Ice Storage system [" + this->Name +
                                                                "]  discharging maximum iteration limit exceeded occurrence continues.",
                                                            this->DischargeErrorCount);
                         }
@@ -682,7 +681,7 @@ namespace IceThermalStorage {
                     // outlet parameters.  If outlet temperature is greater than or equal
                     // to the setpoint temperature, then send all flow through the tank.
                     // Otherwise, we have more capacity than needed so let's bypass some
-                    // flow and meet the setpoint temperautre.
+                    // flow and meet the setpoint temperature.
                     if (ToutNew >= TempSetPt) {
                         this->OutletTemp = ToutNew;
                         this->TankOutletTemp = ToutNew;

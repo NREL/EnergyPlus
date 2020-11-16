@@ -76,7 +76,6 @@ using namespace ObjexxFCL;
 using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataLoopNode;
 using namespace DataZoneEnergyDemands;
-using namespace DataGlobals;
 using namespace ScheduleManager;
 using namespace EnergyPlus::DataAirLoop;
 using namespace EnergyPlus::OutputProcessor;

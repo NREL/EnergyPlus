@@ -76,7 +76,6 @@
 
 using namespace EnergyPlus;
 using namespace DataEnvironment;
-using namespace DataGlobals;
 using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataHVACGlobals;
@@ -104,15 +103,15 @@ protected:
         CurZoneEqNum = 0;
         CurSysNum = 0;
         CurOASysNum = 0;
-        NumOfZones = 1;
+        state.dataGlobal->NumOfZones = 1;
         NumOfNodes = 5;
         state.dataGlobal->BeginEnvrnFlag = true;
         int NumOfSurfaces = 2;
-        RoomAirflowNetworkZoneInfo.allocate(NumOfZones);
-        Zone.allocate(NumOfZones);
-        ZoneEquipConfig.allocate(NumOfZones);
-        ZoneEquipList.allocate(NumOfZones);
-        ZoneIntGain.allocate(NumOfZones);
+        RoomAirflowNetworkZoneInfo.allocate(state.dataGlobal->NumOfZones);
+        Zone.allocate(state.dataGlobal->NumOfZones);
+        ZoneEquipConfig.allocate(state.dataGlobal->NumOfZones);
+        ZoneEquipList.allocate(state.dataGlobal->NumOfZones);
+        ZoneIntGain.allocate(state.dataGlobal->NumOfZones);
         NodeID.allocate(NumOfNodes);
         Node.allocate(NumOfNodes);
         Surface.allocate(NumOfSurfaces);
@@ -127,12 +126,12 @@ protected:
         RhoVaporSurfIn.allocate(NumOfSurfaces);
         RhoVaporAirIn.allocate(NumOfSurfaces);
         HMassConvInFD.allocate(NumOfSurfaces);
-        MAT.allocate(NumOfZones);
+        MAT.allocate(state.dataGlobal->NumOfZones);
         ZoneAirHumRat.allocate(1);
         AirflowNetwork::AirflowNetworkLinkageData.allocate(5);
         AirflowNetwork::AirflowNetworkNodeSimu.allocate(6);
         AirflowNetwork::AirflowNetworkLinkSimu.allocate(5);
-        RAFN.allocate(NumOfZones);
+        RAFN.allocate(state.dataGlobal->NumOfZones);
     }
 
     virtual void TearDown()

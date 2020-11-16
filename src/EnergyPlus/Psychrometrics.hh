@@ -64,6 +64,9 @@
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+
 #ifdef EP_nocache_Psychrometrics
 #undef EP_cache_PsyTwbFnTdbWPb
 #undef EP_cache_PsyPsatFnTemp
@@ -77,10 +80,6 @@ namespace EnergyPlus {
 #define EP_psych_errors
 
 namespace Psychrometrics {
-
-#ifdef EP_psych_errors
-    using namespace DataGlobals;
-#endif
 
     // Data
     // MODULE PARAMETER DEFINITIONS:

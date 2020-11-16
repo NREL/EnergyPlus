@@ -418,11 +418,11 @@ namespace HVACControllers {
                                    int const Operation, // Operation to execute
                                    bool const IsConvergedFlag);
 
-    std::string CreateHVACTimeString();
+    std::string CreateHVACTimeString(EnergyPlusData &state);
 
-    std::string CreateHVACStepFullString();
+    std::string CreateHVACStepFullString(EnergyPlusData &state);
 
-    std::string MakeHVACTimeIntervalString();
+    std::string MakeHVACTimeIntervalString(EnergyPlusData &state);
 
     //        End of Tracing subroutines for the Controller Module
 

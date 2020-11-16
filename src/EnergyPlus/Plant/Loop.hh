@@ -51,6 +51,10 @@
 #include <EnergyPlus/Plant/LoopSide.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
+
 namespace DataPlant {
 
     struct PlantLoopData

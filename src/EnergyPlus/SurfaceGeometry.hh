@@ -81,7 +81,7 @@ namespace SurfaceGeometry {
 
     void SetupZoneGeometry(EnergyPlusData &state, bool &ErrorsFound);
 
-    void AllocateModuleArrays();
+    void AllocateModuleArrays(EnergyPlusData &state);
 
     void AllocateSurfaceWindows(int NumSurfaces);
 

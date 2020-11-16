@@ -227,7 +227,7 @@ namespace DataSurfaceLists {
                         if (SurfNum > 1) {
                             if (ZoneForSurface != Surface(SurfList(Item).SurfPtr(SurfNum)).Zone && showSameZoneWarning) {
                                 ShowWarningError(state, "Not all surfaces in same zone for " + CurrentModuleObject1 + " = " + SurfList(Item).Name);
-                                if (!DataGlobals::DisplayExtraWarnings) {
+                                if (!state.dataGlobal->DisplayExtraWarnings) {
                                     ShowContinueError(state, "If this is intentionally a radiant system with surfaces in more than one thermal zone,");
                                     ShowContinueError(state, "then ignore this warning message.  Use Output:Diagnostics,DisplayExtraWarnings for more details.");
                                 }

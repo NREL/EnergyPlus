@@ -458,7 +458,7 @@ TEST_F(ConvectionCoefficientsFixture, DynamicIntConvSurfaceClassification)
 
     BaseboardElectric::GetBaseboardInput(state);
 
-    DataGlobals::ZoneSizingCalc = true;
+    state.dataGlobal->ZoneSizingCalc = true;
 
     // Surface 1 is a vertical wall
     // Surface 2 is a wall tilted down (interior faces up)
@@ -594,7 +594,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
     SurfNum = 1;
 
     DataSurfaces::TotSurfaces = 1;
-    DataGlobals::NumOfZones = 1;
+    state.dataGlobal->NumOfZones = 1;
     DataSurfaces::Surface.allocate( 1 );
     state.dataConstruction->Construct.allocate( 1 );
     DataHeatBalance::Zone.allocate( 1 );
@@ -1002,7 +1002,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedAssistedWall)
 
     BaseboardElectric::GetBaseboardInput(state);
 
-    DataGlobals::ZoneSizingCalc = true;
+    state.dataGlobal->ZoneSizingCalc = true;
 
     Real64 tolerance = 1E-3;
 
@@ -1059,7 +1059,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedOpposingWall)
 
     BaseboardElectric::GetBaseboardInput(state);
 
-    DataGlobals::ZoneSizingCalc = true;
+    state.dataGlobal->ZoneSizingCalc = true;
 
     Real64 tolerance = 1E-3;
 
@@ -1116,7 +1116,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedStableFloor)
 
     BaseboardElectric::GetBaseboardInput(state);
 
-    DataGlobals::ZoneSizingCalc = true;
+    state.dataGlobal->ZoneSizingCalc = true;
 
     Real64 tolerance = 1E-3;
 
@@ -1173,7 +1173,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedUnstableFloor)
 
     BaseboardElectric::GetBaseboardInput(state);
 
-    DataGlobals::ZoneSizingCalc = true;
+    state.dataGlobal->ZoneSizingCalc = true;
 
     Real64 tolerance = 1E-3;
 
@@ -1230,7 +1230,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedStableCeiling)
 
     BaseboardElectric::GetBaseboardInput(state);
 
-    DataGlobals::ZoneSizingCalc = true;
+    state.dataGlobal->ZoneSizingCalc = true;
 
     Real64 tolerance = 1E-3;
 
@@ -1287,7 +1287,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedUnstableCeiling
 
     BaseboardElectric::GetBaseboardInput(state);
 
-    DataGlobals::ZoneSizingCalc = true;
+    state.dataGlobal->ZoneSizingCalc = true;
 
     Real64 tolerance = 1E-3;
 

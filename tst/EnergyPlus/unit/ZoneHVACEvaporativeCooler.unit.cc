@@ -93,10 +93,10 @@ protected:
         DataEnvironment::OutWetBulbTemp =
             Psychrometrics::PsyTwbFnTdbWPb(state, DataEnvironment::OutDryBulbTemp, DataEnvironment::OutHumRat, DataEnvironment::OutBaroPress);
 
-        DataGlobals::NumOfZones = 1;
-        DataHeatBalance::Zone.allocate(DataGlobals::NumOfZones);
-        DataZoneEquipment::ZoneEquipConfig.allocate(DataGlobals::NumOfZones);
-        DataZoneEquipment::ZoneEquipList.allocate(DataGlobals::NumOfZones);
+        state.dataGlobal->NumOfZones = 1;
+        DataHeatBalance::Zone.allocate(state.dataGlobal->NumOfZones);
+        DataZoneEquipment::ZoneEquipConfig.allocate(state.dataGlobal->NumOfZones);
+        DataZoneEquipment::ZoneEquipList.allocate(state.dataGlobal->NumOfZones);
         DataLoopNode::Node.allocate(NumOfNodes);
         DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(1);
         DataHeatBalFanSys::ZoneThermostatSetPointHi.allocate(1);

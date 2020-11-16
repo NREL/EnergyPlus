@@ -74,7 +74,6 @@ using namespace EnergyPlus;
 using namespace AirflowNetworkBalanceManager;
 using namespace DataSurfaces;
 using namespace DataHeatBalance;
-using namespace DataGlobals;
 using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::ScheduleManager;
 
@@ -107,7 +106,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSimulationControl_DefaultSolver)
     SurfaceGeometry::AllocateSurfaceWindows(2);
     SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
     SurfWinOriginalClass(2) = DataSurfaces::SurfaceClass::Window;
-    NumOfZones = 1;
+    state.dataGlobal->NumOfZones = 1;
 
     TotPeople = 1; // Total number of people statements
     People.allocate(TotPeople);
@@ -201,7 +200,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSimulationControl_SetSolver)
     SurfaceGeometry::AllocateSurfaceWindows(2);
     SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;;
     SurfWinOriginalClass(2) = DataSurfaces::SurfaceClass::Window;;
-    NumOfZones = 1;
+    state.dataGlobal->NumOfZones = 1;
 
     TotPeople = 1; // Total number of people statements
     People.allocate(TotPeople);

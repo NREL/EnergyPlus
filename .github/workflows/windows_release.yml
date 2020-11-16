@@ -8,132 +8,118 @@ on:
 env:
   CMAKE_Fortran_COMPILER: "/c/msys64/mingw64/bin/x86_64-w64-mingw32-gfortran.exe"
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  BUILD_TYPE: Release
 
 jobs:
-  windows_release_64:
+  windows_release:
     runs-on: windows-2019
-    steps:
+    continue-on-error: ${{ matrix.allow_failure }}
+    strategy:
+      # fail-fast: Default is true, switch to false to allow one platform to fail and still run others
+      fail-fast: false
+      matrix:
+        arch: [x64, x86]
+        include:
+        - arch: x64
+          allow_failure: false
+          vs-generator: x64
+          package-arch: x86_64
+        - arch: x86
+          allow_failure: false
+          vs-generator: Win32
+          package-arch: i386
 
+    steps:
     - uses: actions/checkout@v2
 
     - name: Set up Python 3.7
       uses: actions/setup-python@v2
       with:
         python-version: 3.7
-        architecture: 'x64'
+        architecture: ${{ matrix.arch }}
 
     - name: Install Python dependencies
       run: |
         python -m pip install --upgrade pip
         pip install aqtinstall
 
-    - name: Install Chocolately Packages
-      run: choco install miktex && refreshenv
 
-    - name: Build Test Document (will install missing packages)
-      working-directory: ${{runner.workspace}}/EnergyPlus/doc/test
-      run: /C/Program\ Files/MikTeX/miktex/bin/x64/xelatex.exe dependencies.tex
+    - name: Install System dependencies and LaTeX
       shell: bash
-
-    - name: Install IFW
-      run: aqt tool windows tools_ifw 3.2.2 qt.tools.ifw.32 --outputdir=${{runner.workspace}}/Qt
-
-    - name: Add IFW to PATH
-      run: echo "::add-path::${{runner.workspace}}/Qt/Tools/QtInstallerFramework/3.2/bin"
-
-    - name: Create Build Directory
-      run: cmake -E make_directory ${{runner.workspace}}/EnergyPlus/build
-
-    - name: Configure CMake
-      shell: bash
-      working-directory: ${{runner.workspace}}/EnergyPlus/build
-      run: cmake -G "Visual Studio 16 2019" -A x64 -DLINK_WITH_PYTHON=ON -DTEX_INTERACTION="batchmode" -DBUILD_FORTRAN=ON -DDOCUMENTATION_BUILD="BuildWithAll" -DMIKTEX_BINARY_PATH="C:/Program Files/MikTeX/miktex/bin/x64" -DQTIFWDIR="${{runner.workspace}}/Qt/Tools/QtInstallerFramework/3.2" -DBUILD_PACKAGE:BOOL=ON ..
-
-    - name: Build Package
-      working-directory: ${{runner.workspace}}/EnergyPlus/build
-      shell: bash
-      run: cmake --build . --target package -j 2 --config Release
-
-    - name: Upload Zip to release
-      uses: svenstaro/upload-release-action@v2
-      with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: ${{runner.workspace}}/EnergyPlus/build/EnergyPlus-*-Windows-x86_64.zip
-        tag: ${{ github.ref }}
-        overwrite: true
-        file_glob: true
-        asset_name: Win64_Zip
-
-    - name: Upload IFW to release
-      uses: svenstaro/upload-release-action@v2
-      with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: ${{runner.workspace}}/EnergyPlus/build/EnergyPlus-*-Windows-x86_64.exe
-        tag: ${{ github.ref }}
-        overwrite: true
-        file_glob: true
-        asset_name: Win64_Installer
-
-  windows_release_32:
-    runs-on: windows-2019
-    steps:
-
-    - uses: actions/checkout@v2
-
-    - name: Set up Python 3.7
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.7
-        architecture: 'x86'
-
-    - name: Install Python dependencies
       run: |
-        python -m pip install --upgrade pip
-        pip install aqtinstall
+        set -x
+        echo "Downloading MiKTeX CLI installer"
+        # We download from a specific miror already
+        curl -L -O https://ctan.math.illinois.edu/systems/win32/miktex/setup/windows-x64/miktexsetup-4.0-x64.zip
+        unzip miktexsetup-4.0-x64.zip
 
-    - name: Install Chocolately Packages
-      run: choco install miktex && refreshenv
-#
-    - name: Build Test Document (will install missing packages)
-      working-directory: ${{runner.workspace}}/EnergyPlus/doc/test
-      run: /C/Program\ Files/MikTeX/miktex/bin/x64/xelatex.exe dependencies.tex
-      shell: bash
+        echo "Setting up the local package directory via download"
+        ./miktexsetup --verbose \
+            --local-package-repository=C:/ProgramData/MiKTeX-Repo \
+            --remote-package-repository="https://ctan.math.illinois.edu/systems/win32/miktex/tm/packages/" \
+            --package-set=basic \
+            download
+
+        echo "Installing from the local package directory previously set up"
+        ./miktexsetup --verbose \
+            --local-package-repository=C:/ProgramData/MiKTeX-Repo \
+            --package-set=basic \
+            --shared \
+            install
+
+        echo "Adding MiKTeX bin folder to PATH and to GITHUB_PATH"
+        echo "C:/Program Files/MiKTeX/miktex/bin/x64/" >> $GITHUB_PATH
+        export PATH="/c/Program Files/MiKTeX/miktex/bin/x64/:$PATH"
+
+        echo "Configuring MiKTeX to install missing packages on the fly"
+        initexmf --admin --verbose --set-config-value='[MPM]AutoInstall=1'
+
+        echo "Configure default mirror for packages"
+        mpm --admin --set-repository="https://ctan.math.illinois.edu/systems/win32/miktex/tm/packages/"
+        # Avoid annoying warning: "xelatex: major issue: So far, you have not checked for updates as a MiKTeX user."
+        mpm --find-updates
+        mpm --admin --find-updates
 
     - name: Install IFW
-      run: aqt tool windows tools_ifw 3.2.2 qt.tools.ifw.32 --outputdir=${{runner.workspace}}/Qt
-
-    - name: Add IFW to PATH
-      run: echo "::add-path::${{runner.workspace}}/Qt/Tools/QtInstallerFramework/3.2/bin"
+      shell: bash
+      run: |
+        set -x
+        out_dir="C:/Qt"
+        aqt tool windows tools_ifw 4.0 qt.tools.ifw.4.0 --outputdir="$out_dir"
+        echo "$out_dir/Tools/QtInstallerFramework/4.0/bin" >> $GITHUB_PATH
 
     - name: Create Build Directory
-      run: cmake -E make_directory ${{runner.workspace}}/EnergyPlus/build
+      run: cmake -E make_directory ./build/
 
     - name: Configure CMake
+      working-directory: ./build
       shell: bash
-      working-directory: ${{runner.workspace}}/EnergyPlus/build
-      run: cmake -G "Visual Studio 16 2019" -A Win32 -DLINK_WITH_PYTHON=ON -DTEX_INTERACTION="batchmode" -DBUILD_FORTRAN=ON -DDOCUMENTATION_BUILD="BuildWithAll" -DMIKTEX_BINARY_PATH="C:/Program Files/MikTeX/miktex/bin/x64" -DQTIFWDIR="${{runner.workspace}}/Qt/Tools/QtInstallerFramework/3.2" -DBUILD_PACKAGE:BOOL=ON ..
+      run: |
+        set -x
+        cmake -G "Visual Studio 16 2019" -A ${{ matrix.vs-generator }} \
+              -DLINK_WITH_PYTHON=ON -DBUILD_FORTRAN=ON -DBUILD_PACKAGE:BOOL=ON \
+              -DDOCUMENTATION_BUILD="BuildWithAll" -DTEX_INTERACTION="batchmode" \
+              ../
 
     - name: Build Package
-      working-directory: ${{runner.workspace}}/EnergyPlus/build
+      working-directory: ./build
       shell: bash
-      run: cmake --build . --target package -j 2 --config Release
+      run: cmake --build . --target package -j 2 --config $BUILD_TYPE
 
     - name: Upload Zip to release
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: ${{runner.workspace}}/EnergyPlus/build/EnergyPlus-*-Windows-i386.zip
+        file: build/EnergyPlus-*-Windows-${{ matrix.package-arch }}.zip
         tag: ${{ github.ref }}
         overwrite: true
         file_glob: true
-        asset_name: Win32_Zip
 
     - name: Upload IFW to release
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: ${{runner.workspace}}/EnergyPlus/build/EnergyPlus-*-Windows-i386.exe
+        file: build/EnergyPlus-*-Windows-${{ matrix.package-arch }}.exe
         tag: ${{ github.ref }}
         overwrite: true
         file_glob: true
-        asset_name: Win32_Installer
