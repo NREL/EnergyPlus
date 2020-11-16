@@ -18,7 +18,7 @@ endif()
 if(USE_PSYCHROMETRICS_CACHING)
   # Caching defaulted ON
 else()
-  add_definitions("-DEP_nocache_Psychrometrics=1")
+  add_definitions("-DEP_nocache_Psychrometrics")
 endif()
 
 SET( SRC
