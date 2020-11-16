@@ -196,7 +196,6 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SetPointManager.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
-#include <EnergyPlus/SingleDuct.hh>
 
 void EnergyPlus::clearAllStates(EnergyPlusData &state)
 {
@@ -352,6 +351,5 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     ScheduleManager::clear_state();
     SetPointManager::clear_state();
     SimAirServingZones::clear_state();
-    SingleDuct::clear_state();
     ResultsFramework::clear_state();
 }

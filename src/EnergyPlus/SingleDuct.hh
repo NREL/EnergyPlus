@@ -211,7 +211,7 @@ namespace SingleDuct {
 
         void SimVAV(EnergyPlusData &state, bool FirstHVACIteration, int ZoneNum, int ZoneNodeNum);
 
-        void CalcOAMassFlow(EnergyPlusData &state, Real64 &SAMassFlow, Real64 &AirLoopOAFrac);
+        void CalcOAMassFlow(EnergyPlusData &state, Real64 &SAMassFlow, Real64 &AirLoopOAFrac) const;
 
         void SimCBVAV(EnergyPlusData &state, bool FirstHVACIteration, int ZoneNum, int ZoneNodeNum);
 
@@ -233,7 +233,7 @@ namespace SingleDuct {
 
         void CalcOutdoorAirVolumeFlowRate(EnergyPlusData &state);
 
-        void UpdateSys();
+        void UpdateSys() const;
 
         void ReportSys(EnergyPlusData &state);
 
@@ -312,7 +312,7 @@ namespace SingleDuct {
 
     void CalcATMixer(EnergyPlusData &state, int SysNum);
 
-    void UpdateATMixer(int SysNum);
+    void UpdateATMixer(EnergyPlusData &state, int SysNum);
 
     void GetATMixer(EnergyPlusData &state,
                     std::string const &ZoneEquipName, // zone unit name name
@@ -325,7 +325,7 @@ namespace SingleDuct {
                     int const &ZoneEquipOutletNode    // zone equipment outlet node (used with inlet side mixers)
     );
 
-    void SetATMixerPriFlow(int ATMixerNum,                         // Air terminal mixer index
+    void SetATMixerPriFlow(EnergyPlusData &state, int ATMixerNum,                         // Air terminal mixer index
                            Optional<Real64 const> PriAirMassFlowRate = _ // Air terminal mixer primary air mass flow rate [kg/s]
     );
 
@@ -334,18 +334,38 @@ namespace SingleDuct {
                                     int const &curZoneEqNum       // current zone equipment being simulated
     );
 
-    extern Array1D<SingleDuctAirTerminal> sd_airterminal;
-    extern Array1D<AirTerminalMixerData> SysATMixer;
-    extern int NumATMixers;
-    extern bool GetInputFlag;   // Flag set to make sure you get input once
-    extern bool GetATMixerFlag; // Flag set to make sure you get input once
-    extern int NumConstVolSys;
-    extern Array1D_bool CheckEquipName;
-    extern int NumSDAirTerminal; // The Number of single duct air terminals found in the Input
-
-    void clear_state();
-
 } // namespace SingleDuct
+
+struct SingleDuctData : BaseGlobalStruct {
+
+    Array1D<SingleDuct::AirTerminalMixerData> SysATMixer;
+    Array1D<SingleDuct::SingleDuctAirTerminal> sd_airterminal;
+    std::unordered_map<std::string, std::string> SysUniqueNames;
+    Array1D_bool CheckEquipName;
+    int NumATMixers = 0;
+    int NumConstVolSys = 0;
+    int NumSDAirTerminal = 0; // The Number of single duct air terminals found in the Input
+    bool GetInputFlag = true;   // Flag set to make sure you get input once
+    bool GetATMixerFlag = true; // Flag set to make sure you get input once
+    bool InitSysFlag = true;               // Flag set to make sure you do begin simulation initializaztions once
+    bool InitATMixerFlag = true;           // Flag set to make sure you do begin simulation initializaztions once for mixer
+    bool ZoneEquipmentListChecked = false; // True after the Zone Equipment List has been checked for items
+
+    void clear_state() override {
+        SysATMixer.deallocate();
+        sd_airterminal.deallocate();
+        SysUniqueNames.clear();
+        CheckEquipName.deallocate();
+        NumATMixers = 0;
+        NumConstVolSys = 0;
+        NumSDAirTerminal = 0;
+        GetInputFlag = true;
+        GetATMixerFlag = true;
+        InitSysFlag = true;
+        InitATMixerFlag = true;
+        ZoneEquipmentListChecked = false;
+    }
+};
 
 } // namespace EnergyPlus
 

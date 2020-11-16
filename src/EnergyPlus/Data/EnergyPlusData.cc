@@ -87,6 +87,7 @@ namespace EnergyPlus {
         this->dataPlantChillers = std::make_unique<PlantChillersData>();
         this->dataPlantValves = std::make_unique<PlantValvesData>();
         this->dataSimulationManager = std::make_unique<SimulationManagerData>();
+        this->dataSingleDuct = std::make_unique<SingleDuctData>();
         this->dataSizingManager = std::make_unique<SizingManagerData>();
         this->dataSolarCollectors = std::make_unique<SolarCollectorsData>();
         this->dataSolarReflectionManager = std::make_unique<SolarReflectionManagerData>();
