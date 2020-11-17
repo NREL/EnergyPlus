@@ -71,16 +71,18 @@ namespace SetPointManager {
         reference
     };
 
-    extern int const MaxTemp;
-    extern int const MinTemp;
-    extern int const TempFirst;
-    extern int const FlowFirst;
-    extern int const iRefTempType_WetBulb;
-    extern int const iRefTempType_DryBulb;
-    extern int const iRefGroundTempObjType_BuildingSurface;
-    extern int const iRefGroundTempObjType_Shallow;
-    extern int const iRefGroundTempObjType_Deep;
-    extern int const iRefGroundTempObjType_FCfactorMethod;
+    enum class SupplyFlowTempStrategy {
+        MaxTemp, MinTemp, Unknown
+    };
+    enum class ControlStrategy {
+        TempFirst, FlowFirst, Unknown
+    };
+    enum class ReferenceTempType {
+        WetBulb, DryBulb, Unknown
+    };
+    enum class ReferenceGroundTempObjectType {
+        BuildingSurface, Shallow, Deep, FCFactorMethod, Unknown
+    };
 
     enum class iCtrlVarType {
         Unknown,
@@ -94,7 +96,6 @@ namespace SetPointManager {
         MaxMassFlow,
         MinMassFlow
     };
-
     int constexpr NumValidCtrlTypes = 9;
     inline const char* controlTypeName(iCtrlVarType cvt) {
         switch(cvt) {
@@ -155,7 +156,6 @@ namespace SetPointManager {
         TESScheduled,
         Unknown
     };
-
     int constexpr NumValidSPMTypes = 30;
     inline const char* managerTypeName(SetPointManagerType t) {
         switch(t) {
@@ -490,14 +490,14 @@ namespace SetPointManager {
         int AirLoopNum;          // index of named air loop
         Real64 MinSetTemp;       // minimum supply air setpoint temperature
         Real64 MaxSetTemp;       // maximum supply air setpoint temperature
-        int Strategy;            // supply flow and temperature set strategy
+        SupplyFlowTempStrategy Strategy;            // supply flow and temperature set strategy
         // 1 = MaxTemp
         int NumCtrlNodes;      // number of nodes whose temperature is being set
         Array1D_int CtrlNodes; // nodes where temperature is being set
         Real64 SetPt;          // the setpoint
 
         // Default Constructor
-        DefineWarmestSetPointManager() : AirLoopNum(0), MinSetTemp(0.0), MaxSetTemp(0.0), Strategy(0), NumCtrlNodes(0), SetPt(0.0)
+        DefineWarmestSetPointManager() : AirLoopNum(0), MinSetTemp(0.0), MaxSetTemp(0.0), Strategy(SupplyFlowTempStrategy::Unknown), NumCtrlNodes(0), SetPt(0.0)
         {
         }
 
@@ -511,14 +511,14 @@ namespace SetPointManager {
         int AirLoopNum;          // index of named air loop
         Real64 MinSetTemp;       // minimum supply air setpoint temperature
         Real64 MaxSetTemp;       // maximum supply air setpoint temperature
-        int Strategy;            // supply flow and temperature set strategy
+        SupplyFlowTempStrategy Strategy;            // supply flow and temperature set strategy
         // 2 = MinTemp
         int NumCtrlNodes;      // number of nodes whose temperature is being set
         Array1D_int CtrlNodes; // nodes where temperature is being set
         Real64 SetPt;          // the setpoint
 
         // Default Constructor
-        DefineColdestSetPointManager() : AirLoopNum(0), MinSetTemp(0.0), MaxSetTemp(0.0), Strategy(0), NumCtrlNodes(0), SetPt(0.0)
+        DefineColdestSetPointManager() : AirLoopNum(0), MinSetTemp(0.0), MaxSetTemp(0.0), Strategy(SupplyFlowTempStrategy::Unknown), NumCtrlNodes(0), SetPt(0.0)
         {
         }
 
@@ -532,7 +532,7 @@ namespace SetPointManager {
         int AirLoopNum;          // index of named air loop
         Real64 MinSetTemp;       // minimum supply air setpoint temperature
         Real64 MaxSetTemp;       // maximum supply air setpoint temperature
-        int Strategy;            // supply flow and temperature set strategy
+        ControlStrategy Strategy;            // supply flow and temperature set strategy
         // 1 = TempFirst, 2 = FlowFirst
         int NumCtrlNodes;      // number of nodes whose temperature is being set
         Array1D_int CtrlNodes; // nodes where temperature is being set
@@ -544,7 +544,7 @@ namespace SetPointManager {
 
         // Default Constructor
         DefWarmestSetPtManagerTempFlow()
-            : AirLoopNum(0), MinSetTemp(0.0), MaxSetTemp(0.0), Strategy(0), NumCtrlNodes(0), SetPt(0.0), MinTurndown(0.0),
+            : AirLoopNum(0), MinSetTemp(0.0), MaxSetTemp(0.0), Strategy(ControlStrategy::Unknown), NumCtrlNodes(0), SetPt(0.0), MinTurndown(0.0),
               Turndown(0.0), CritZoneNum(0), SimReady(false)
         {
         }
@@ -697,7 +697,7 @@ namespace SetPointManager {
     {
         // Members
         std::string RefTempType; // Reference Temperature type (choice OutdoorAirWetBulb/OutdoorAirDryBulb)
-        int RefTypeMode;         // set to iRefTempType_WetBulb or iRefTempType_DryBulb
+        ReferenceTempType RefTypeMode;         // set to iRefTempType_WetBulb or iRefTempType_DryBulb
         Real64 Offset;           // Offset temperature difference
         Real64 MinSetTemp;       // Minimum supply air setpoint temperature
         Real64 MaxSetTemp;       // Maximum supply air setpoint temperature
@@ -707,7 +707,7 @@ namespace SetPointManager {
 
         // Default Constructor
         DefineFollowOATempSetPointManager()
-            : RefTypeMode(0), Offset(0.0), MinSetTemp(0.0), MaxSetTemp(0.0), NumCtrlNodes(0), SetPt(0.0)
+            : RefTypeMode(ReferenceTempType::Unknown), Offset(0.0), MinSetTemp(0.0), MaxSetTemp(0.0), NumCtrlNodes(0), SetPt(0.0)
         {
         }
 
@@ -719,7 +719,7 @@ namespace SetPointManager {
         // Members
         int RefNodeNum;          // reference node number
         std::string RefTempType; // Reference Temperature type (choice OutdoorAirWetBulb/OutdoorAirDryBulb)
-        int RefTypeMode;         // set to iRefTempType_WetBulb or iRefTempType_DryBulb
+        ReferenceTempType RefTypeMode;         // set to iRefTempType_WetBulb or iRefTempType_DryBulb
         Real64 Offset;           // Offset temperature difference
         Real64 MinSetTemp;       // Minimum supply air setpoint temperature
         Real64 MaxSetTemp;       // Maximum supply air setpoint temperature
@@ -729,7 +729,7 @@ namespace SetPointManager {
 
         // Default Constructor
         DefineFollowSysNodeTempSetPointManager()
-            : RefNodeNum(0), RefTypeMode(0), Offset(0.0), MinSetTemp(0.0), MaxSetTemp(0.0), NumCtrlNodes(0), SetPt(0.0)
+            : RefNodeNum(0), RefTypeMode(ReferenceTempType::Unknown), Offset(0.0), MinSetTemp(0.0), MaxSetTemp(0.0), NumCtrlNodes(0), SetPt(0.0)
         {
         }
 
@@ -744,7 +744,7 @@ namespace SetPointManager {
         // Site:GroundTemperature:Shallow
         // Site:GroundTemperature:Deep
         // Site:GroundTemperature:FCfactorMethod
-        int RefTypeMode;       // set to iRefGroundTempObjType_xxxx based on RefGroundTempObjType
+        ReferenceGroundTempObjectType RefTypeMode;       // set to iRefGroundTempObjType_xxxx based on RefGroundTempObjType
         Real64 Offset;         // Offset temperature difference
         Real64 MinSetTemp;     // Minimum supply air setpoint temperature
         Real64 MaxSetTemp;     // Maximum supply air setpoint temperature
@@ -754,7 +754,7 @@ namespace SetPointManager {
 
         // Default Constructor
         DefineGroundTempSetPointManager()
-            : RefTypeMode(0), Offset(0.0), MinSetTemp(0.0), MaxSetTemp(0.0), NumCtrlNodes(0), SetPt(0.0)
+            : RefTypeMode(ReferenceGroundTempObjectType::Unknown), Offset(0.0), MinSetTemp(0.0), MaxSetTemp(0.0), NumCtrlNodes(0), SetPt(0.0)
         {
         }
 

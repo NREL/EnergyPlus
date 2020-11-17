@@ -147,19 +147,6 @@ namespace EnergyPlus::SetPointManager {
     using Psychrometrics::PsyCpAirFnW;
     using Psychrometrics::PsyHFnTdbW;
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    int const MaxTemp(1);
-    int const MinTemp(2);
-    int const TempFirst(1);
-    int const FlowFirst(2);
-    int const iRefTempType_WetBulb(1);
-    int const iRefTempType_DryBulb(2);
-    int const iRefGroundTempObjType_BuildingSurface(1);
-    int const iRefGroundTempObjType_Shallow(2);
-    int const iRefGroundTempObjType_Deep(3);
-    int const iRefGroundTempObjType_FCfactorMethod(4);
-
     // MODULE VARIABLE DECLARATIONS:
     int NumAllSetPtMgrs(0);                 // Number of all Setpoint Managers found in input
     int NumSchSetPtMgrs(0);                 // Number of Scheduled Setpoint Managers found in input
@@ -1851,7 +1838,7 @@ namespace EnergyPlus::SetPointManager {
             {
                 auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(cAlphaArgs(4)));
                 if (SELECT_CASE_var == "MAXIMUMTEMPERATURE") {
-                    WarmestSetPtMgr(SetPtMgrNum).Strategy = MaxTemp;
+                    WarmestSetPtMgr(SetPtMgrNum).Strategy = SupplyFlowTempStrategy::MaxTemp;
                 } else {
                     ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
                     ShowContinueError(state, "..invalid " + cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) + "\".");
@@ -1950,7 +1937,7 @@ namespace EnergyPlus::SetPointManager {
             {
                 auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(cAlphaArgs(4)));
                 if (SELECT_CASE_var == "MINIMUMTEMPERATURE") {
-                    ColdestSetPtMgr(SetPtMgrNum).Strategy = MinTemp;
+                    ColdestSetPtMgr(SetPtMgrNum).Strategy = SupplyFlowTempStrategy::MinTemp;
                 } else {
                     ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
                     ShowContinueError(state, "..invalid " + cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) + "\".");
@@ -2056,9 +2043,9 @@ namespace EnergyPlus::SetPointManager {
             {
                 auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(cAlphaArgs(4)));
                 if (SELECT_CASE_var == "TEMPERATUREFIRST") {
-                    WarmestSetPtMgrTempFlow(SetPtMgrNum).Strategy = TempFirst;
+                    WarmestSetPtMgrTempFlow(SetPtMgrNum).Strategy = ControlStrategy::TempFirst;
                 } else if (SELECT_CASE_var == "FLOWFIRST") {
-                    WarmestSetPtMgrTempFlow(SetPtMgrNum).Strategy = FlowFirst;
+                    WarmestSetPtMgrTempFlow(SetPtMgrNum).Strategy = ControlStrategy::FlowFirst;
                 } else {
                     ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
                     ShowContinueError(state, "..invalid " + cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) + "\".");
@@ -2702,9 +2689,9 @@ namespace EnergyPlus::SetPointManager {
             }
             FollowOATempSetPtMgr(SetPtMgrNum).RefTempType = cAlphaArgs(3);
             if (UtilityRoutines::SameString(FollowOATempSetPtMgr(SetPtMgrNum).RefTempType, "OutdoorAirWetBulb")) {
-                FollowOATempSetPtMgr(SetPtMgrNum).RefTypeMode = iRefTempType_WetBulb;
+                FollowOATempSetPtMgr(SetPtMgrNum).RefTypeMode = ReferenceTempType::WetBulb;
             } else if (UtilityRoutines::SameString(FollowOATempSetPtMgr(SetPtMgrNum).RefTempType, "OutdoorAirDryBulb")) {
-                FollowOATempSetPtMgr(SetPtMgrNum).RefTypeMode = iRefTempType_DryBulb;
+                FollowOATempSetPtMgr(SetPtMgrNum).RefTypeMode = ReferenceTempType::DryBulb;
             } else {
                 ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
                 ShowContinueError(state, "..invalid " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
@@ -2808,9 +2795,9 @@ namespace EnergyPlus::SetPointManager {
                 cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Unknown, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
             FollowSysNodeTempSetPtMgr(SetPtMgrNum).RefTempType = cAlphaArgs(4);
             if (UtilityRoutines::SameString(FollowSysNodeTempSetPtMgr(SetPtMgrNum).RefTempType, "NodeWetBulb")) {
-                FollowSysNodeTempSetPtMgr(SetPtMgrNum).RefTypeMode = iRefTempType_WetBulb;
+                FollowSysNodeTempSetPtMgr(SetPtMgrNum).RefTypeMode = ReferenceTempType::WetBulb;
             } else if (UtilityRoutines::SameString(FollowSysNodeTempSetPtMgr(SetPtMgrNum).RefTempType, "NodeDryBulb")) {
-                FollowSysNodeTempSetPtMgr(SetPtMgrNum).RefTypeMode = iRefTempType_DryBulb;
+                FollowSysNodeTempSetPtMgr(SetPtMgrNum).RefTypeMode = ReferenceTempType::DryBulb;
             } else {
                 // should not come here if idd type choice and key list is working
                 ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
@@ -2913,7 +2900,7 @@ namespace EnergyPlus::SetPointManager {
             }
             GroundTempSetPtMgr(SetPtMgrNum).RefGroundTempObjType = cAlphaArgs(3);
             if (UtilityRoutines::SameString(GroundTempSetPtMgr(SetPtMgrNum).RefGroundTempObjType, "Site:GroundTemperature:BuildingSurface")) {
-                GroundTempSetPtMgr(SetPtMgrNum).RefTypeMode = iRefGroundTempObjType_BuildingSurface;
+                GroundTempSetPtMgr(SetPtMgrNum).RefTypeMode = ReferenceGroundTempObjectType::BuildingSurface;
                 if (NoSurfaceGroundTempObjWarning) {
                     if (!GroundTempObjInput) {
                         ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
@@ -2923,7 +2910,7 @@ namespace EnergyPlus::SetPointManager {
                     NoSurfaceGroundTempObjWarning = false;
                 }
             } else if (UtilityRoutines::SameString(GroundTempSetPtMgr(SetPtMgrNum).RefGroundTempObjType, "Site:GroundTemperature:Shallow")) {
-                GroundTempSetPtMgr(SetPtMgrNum).RefTypeMode = iRefGroundTempObjType_Shallow;
+                GroundTempSetPtMgr(SetPtMgrNum).RefTypeMode = ReferenceGroundTempObjectType::Shallow;
                 if (NoShallowGroundTempObjWarning) {
                     if (!GroundTemp_SurfaceObjInput) {
                         ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
@@ -2933,7 +2920,7 @@ namespace EnergyPlus::SetPointManager {
                     NoShallowGroundTempObjWarning = false;
                 }
             } else if (UtilityRoutines::SameString(GroundTempSetPtMgr(SetPtMgrNum).RefGroundTempObjType, "Site:GroundTemperature:Deep")) {
-                GroundTempSetPtMgr(SetPtMgrNum).RefTypeMode = iRefGroundTempObjType_Deep;
+                GroundTempSetPtMgr(SetPtMgrNum).RefTypeMode = ReferenceGroundTempObjectType::Deep;
                 if (NoDeepGroundTempObjWarning) {
                     if (!GroundTemp_DeepObjInput) {
                         ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
@@ -2943,7 +2930,7 @@ namespace EnergyPlus::SetPointManager {
                     NoDeepGroundTempObjWarning = false;
                 }
             } else if (UtilityRoutines::SameString(GroundTempSetPtMgr(SetPtMgrNum).RefGroundTempObjType, "Site:GroundTemperature:FCfactorMethod")) {
-                GroundTempSetPtMgr(SetPtMgrNum).RefTypeMode = iRefGroundTempObjType_FCfactorMethod;
+                GroundTempSetPtMgr(SetPtMgrNum).RefTypeMode = ReferenceGroundTempObjectType::FCFactorMethod;
                 if (NoFCGroundTempObjWarning) {
                     if (!FCGroundTemps) {
                         ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
@@ -4829,7 +4816,7 @@ namespace EnergyPlus::SetPointManager {
             for (SetPtMgrNum = 1; SetPtMgrNum <= NumFollowOATempSetPtMgrs; ++SetPtMgrNum) {
                 for (CtrlNodeIndex = 1; CtrlNodeIndex <= FollowOATempSetPtMgr(SetPtMgrNum).NumCtrlNodes; ++CtrlNodeIndex) {
                     NodeNum = FollowOATempSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex); // Get the node number
-                    if (FollowOATempSetPtMgr(SetPtMgrNum).RefTypeMode == iRefTempType_WetBulb) {
+                    if (FollowOATempSetPtMgr(SetPtMgrNum).RefTypeMode == ReferenceTempType::WetBulb) {
                         if (FollowOATempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::Temp) {
                             Node(NodeNum).TempSetPoint = OutWetBulbTemp; // Set the setpoint
                         } else if (FollowOATempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::MaxTemp) {
@@ -4837,7 +4824,7 @@ namespace EnergyPlus::SetPointManager {
                         } else if (FollowOATempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::MinTemp) {
                             Node(NodeNum).TempSetPointLo = OutWetBulbTemp; // Set the setpoint
                         }
-                    } else if (FollowOATempSetPtMgr(SetPtMgrNum).RefTypeMode == iRefTempType_DryBulb) {
+                    } else if (FollowOATempSetPtMgr(SetPtMgrNum).RefTypeMode == ReferenceTempType::DryBulb) {
                         if (FollowOATempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::Temp) {
                             Node(NodeNum).TempSetPoint = OutDryBulbTemp; // Set the setpoint
                         } else if (FollowOATempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::MaxTemp) {
@@ -4853,7 +4840,7 @@ namespace EnergyPlus::SetPointManager {
                 for (CtrlNodeIndex = 1; CtrlNodeIndex <= FollowSysNodeTempSetPtMgr(SetPtMgrNum).NumCtrlNodes; ++CtrlNodeIndex) {
                     NodeNum = FollowSysNodeTempSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex); // Get the node number
                     if (CheckOutAirNodeNumber(state, FollowSysNodeTempSetPtMgr(SetPtMgrNum).RefNodeNum)) {
-                        if (FollowSysNodeTempSetPtMgr(SetPtMgrNum).RefTypeMode == iRefTempType_WetBulb) {
+                        if (FollowSysNodeTempSetPtMgr(SetPtMgrNum).RefTypeMode == ReferenceTempType::WetBulb) {
                             Node(FollowSysNodeTempSetPtMgr(SetPtMgrNum).RefNodeNum).SPMNodeWetBulbRepReq = true;
                             if (FollowSysNodeTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::Temp) {
                                 Node(NodeNum).TempSetPoint = OutWetBulbTemp; // Set the setpoint
@@ -4862,7 +4849,7 @@ namespace EnergyPlus::SetPointManager {
                             } else if (FollowSysNodeTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::MinTemp) {
                                 Node(NodeNum).TempSetPointLo = OutWetBulbTemp; // Set the setpoint
                             }
-                        } else if (FollowSysNodeTempSetPtMgr(SetPtMgrNum).RefTypeMode == iRefTempType_DryBulb) {
+                        } else if (FollowSysNodeTempSetPtMgr(SetPtMgrNum).RefTypeMode == ReferenceTempType::DryBulb) {
                             if (FollowSysNodeTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::Temp) {
                                 Node(NodeNum).TempSetPoint = OutDryBulbTemp; // Set the setpoint
                             } else if (FollowSysNodeTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::MaxTemp) {
@@ -4874,9 +4861,9 @@ namespace EnergyPlus::SetPointManager {
                     } else {
                         // If reference node is a water node, then set RefTypeMode to NodeDryBulb
                         if (Node(FollowSysNodeTempSetPtMgr(SetPtMgrNum).RefNodeNum).FluidType == NodeType_Water) {
-                            FollowSysNodeTempSetPtMgr(SetPtMgrNum).RefTypeMode = iRefTempType_DryBulb;
+                            FollowSysNodeTempSetPtMgr(SetPtMgrNum).RefTypeMode = ReferenceTempType::DryBulb;
                         } else if (Node(FollowSysNodeTempSetPtMgr(SetPtMgrNum).RefNodeNum).FluidType == NodeType_Air) {
-                            if (FollowSysNodeTempSetPtMgr(SetPtMgrNum).RefTypeMode == iRefTempType_WetBulb) {
+                            if (FollowSysNodeTempSetPtMgr(SetPtMgrNum).RefTypeMode == ReferenceTempType::WetBulb) {
                                 Node(FollowSysNodeTempSetPtMgr(SetPtMgrNum).RefNodeNum).SPMNodeWetBulbRepReq = true;
                             }
                         }
@@ -4894,7 +4881,7 @@ namespace EnergyPlus::SetPointManager {
             for (SetPtMgrNum = 1; SetPtMgrNum <= NumGroundTempSetPtMgrs; ++SetPtMgrNum) {
                 for (CtrlNodeIndex = 1; CtrlNodeIndex <= GroundTempSetPtMgr(SetPtMgrNum).NumCtrlNodes; ++CtrlNodeIndex) {
                     NodeNum = GroundTempSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex); // Get the node number
-                    if (GroundTempSetPtMgr(SetPtMgrNum).RefTypeMode == iRefGroundTempObjType_BuildingSurface) {
+                    if (GroundTempSetPtMgr(SetPtMgrNum).RefTypeMode == ReferenceGroundTempObjectType::BuildingSurface) {
                         if (GroundTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::Temp) {
                             Node(NodeNum).TempSetPoint = GroundTemp; // Set the setpoint
                         } else if (GroundTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::MaxTemp) {
@@ -4902,7 +4889,7 @@ namespace EnergyPlus::SetPointManager {
                         } else if (GroundTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::MinTemp) {
                             Node(NodeNum).TempSetPointLo = GroundTemp; // Set the setpoint
                         }
-                    } else if (GroundTempSetPtMgr(SetPtMgrNum).RefTypeMode == iRefGroundTempObjType_Shallow) {
+                    } else if (GroundTempSetPtMgr(SetPtMgrNum).RefTypeMode == ReferenceGroundTempObjectType::Shallow) {
                         if (GroundTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::Temp) {
                             Node(NodeNum).TempSetPoint = GroundTemp_Surface; // Set the setpoint
                         } else if (GroundTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::MaxTemp) {
@@ -4910,7 +4897,7 @@ namespace EnergyPlus::SetPointManager {
                         } else if (GroundTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::MinTemp) {
                             Node(NodeNum).TempSetPointLo = GroundTemp_Surface; // Set the setpoint
                         }
-                    } else if (GroundTempSetPtMgr(SetPtMgrNum).RefTypeMode == iRefGroundTempObjType_Deep) {
+                    } else if (GroundTempSetPtMgr(SetPtMgrNum).RefTypeMode == ReferenceGroundTempObjectType::Deep) {
                         if (GroundTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::Temp) {
                             Node(NodeNum).TempSetPoint = GroundTemp_Deep; // Set the setpoint
                         } else if (GroundTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::MaxTemp) {
@@ -4918,7 +4905,7 @@ namespace EnergyPlus::SetPointManager {
                         } else if (GroundTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::MinTemp) {
                             Node(NodeNum).TempSetPointLo = GroundTemp_Deep; // Set the setpoint
                         }
-                    } else if (GroundTempSetPtMgr(SetPtMgrNum).RefTypeMode == iRefGroundTempObjType_FCfactorMethod) {
+                    } else if (GroundTempSetPtMgr(SetPtMgrNum).RefTypeMode == ReferenceGroundTempObjectType::FCFactorMethod) {
                         if (GroundTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::Temp) {
                             Node(NodeNum).TempSetPoint = GroundTempFC; // Set the setpoint
                         } else if (GroundTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::MaxTemp) {
@@ -6296,7 +6283,6 @@ namespace EnergyPlus::SetPointManager {
         Real64 MinSetPointTemp;
         int CritZoneNumTemp;
         int CritZoneNumFlow;
-        int ControlStrategy;
 
         if (!this->SimReady) return;
         AirLoopNum = this->AirLoopNum;
@@ -6308,7 +6294,6 @@ namespace EnergyPlus::SetPointManager {
         FracFlow = MinFracFlow;
         CritZoneNumTemp = 0;
         CritZoneNumFlow = 0;
-        ControlStrategy = this->Strategy;
 
         for (ZonesCooledIndex = 1; ZonesCooledIndex <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++ZonesCooledIndex) {
             CtrlZoneNum = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(ZonesCooledIndex);
@@ -6324,7 +6309,7 @@ namespace EnergyPlus::SetPointManager {
                 TotCoolLoad += std::abs(ZoneLoad);
                 CpAir = PsyCpAirFnW(Node(ZoneInletNode).HumRat);
                 if (ZoneMassFlowMax > SmallMassFlow) {
-                    if (ControlStrategy == TempFirst) {
+                    if (this->Strategy == ControlStrategy::TempFirst) {
                         // First find supply air temperature required to meet the load at minimum flow. If this is
                         // below the minimum supply air temperature, calculate the fractional flow rate required to meet the
                         // load at the minimum supply air temperature.
@@ -6366,7 +6351,7 @@ namespace EnergyPlus::SetPointManager {
 
         this->SetPt = SetPointTemp;
         this->Turndown = FracFlow;
-        if (ControlStrategy == TempFirst) {
+        if (this->Strategy == ControlStrategy::TempFirst) {
             if (CritZoneNumFlow != 0) {
                 this->CritZoneNum = CritZoneNumFlow;
             } else {
@@ -7002,9 +6987,9 @@ namespace EnergyPlus::SetPointManager {
 
         {
             auto const SELECT_CASE_var(this->RefTypeMode);
-            if (SELECT_CASE_var == iRefTempType_WetBulb) {
+            if (SELECT_CASE_var == ReferenceTempType::WetBulb) {
                 this->SetPt = OutWetBulbTemp + this->Offset;
-            } else if (SELECT_CASE_var == iRefTempType_DryBulb) {
+            } else if (SELECT_CASE_var == ReferenceTempType::DryBulb) {
                 this->SetPt = OutDryBulbTemp + this->Offset;
             }
         }
@@ -7069,11 +7054,11 @@ namespace EnergyPlus::SetPointManager {
 
         {
             auto const SELECT_CASE_var(this->RefTypeMode);
-            if (SELECT_CASE_var == iRefTempType_WetBulb) {
+            if (SELECT_CASE_var == ReferenceTempType::WetBulb) {
                 if (allocated(MoreNodeInfo)) {
                     RefNodeTemp = MoreNodeInfo(RefNode).WetBulbTemp;
                 }
-            } else if (SELECT_CASE_var == iRefTempType_DryBulb) {
+            } else if (SELECT_CASE_var == ReferenceTempType::DryBulb) {
                 RefNodeTemp = Node(RefNode).Temp;
             }
         }
@@ -7132,13 +7117,13 @@ namespace EnergyPlus::SetPointManager {
 
         {
             auto const SELECT_CASE_var(this->RefTypeMode);
-            if (SELECT_CASE_var == iRefGroundTempObjType_BuildingSurface) {
+            if (SELECT_CASE_var == ReferenceGroundTempObjectType::BuildingSurface) {
                 this->SetPt = GroundTemp + this->Offset;
-            } else if (SELECT_CASE_var == iRefGroundTempObjType_Shallow) {
+            } else if (SELECT_CASE_var == ReferenceGroundTempObjectType::Shallow) {
                 this->SetPt = GroundTemp_Surface + this->Offset;
-            } else if (SELECT_CASE_var == iRefGroundTempObjType_Deep) {
+            } else if (SELECT_CASE_var == ReferenceGroundTempObjectType::Deep) {
                 this->SetPt = GroundTemp_Deep + this->Offset;
-            } else if (SELECT_CASE_var == iRefGroundTempObjType_FCfactorMethod) {
+            } else if (SELECT_CASE_var == ReferenceGroundTempObjectType::FCFactorMethod) {
                 this->SetPt = GroundTempFC + this->Offset;
             }
         }
