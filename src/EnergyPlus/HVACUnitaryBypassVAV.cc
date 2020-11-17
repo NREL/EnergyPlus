@@ -1549,7 +1549,7 @@ namespace HVACUnitaryBypassVAV {
             state.dataAirLoop->AirLoopControlInfo(AirLoopNum).FanOpMode = CBVAV(CBVAVNum).OpMode;
             // check for set point manager on outlet node of CBVAV
             CBVAV(CBVAVNum).OutNodeSPMIndex = SetPointManager::getSPMBasedOnNode(
-                state, OutNode, SetPointManager::iCtrlVarType::Temp, SetPointManager::iSPMType_MixedAir, SetPointManager::CtrlNodeType::reference);
+                state, OutNode, SetPointManager::iCtrlVarType::Temp, SetPointManager::SetPointManagerType::MixedAir, SetPointManager::CtrlNodeType::reference);
             MySizeFlag(CBVAVNum) = false;
         }
 

@@ -160,76 +160,6 @@ namespace EnergyPlus::SetPointManager {
     int const iRefGroundTempObjType_Deep(3);
     int const iRefGroundTempObjType_FCfactorMethod(4);
 
-    // following are used to reduce string comparisons related to CtrlVarType
-    int const iSPMType_Scheduled(1);
-    int const iSPMType_ScheduledDual(2);
-    int const iSPMType_OutsideAir(3);
-    int const iSPMType_SZReheat(4);
-    int const iSPMType_SZHeating(5);
-    int const iSPMType_SZCooling(6);
-    int const iSPMType_SZMinHum(7);
-    int const iSPMType_SZMaxHum(8);
-    int const iSPMType_MixedAir(9);
-    int const iSPMType_OutsideAirPretreat(10);
-    int const iSPMType_Warmest(11);
-    int const iSPMType_Coldest(12);
-    int const iSPMType_WarmestTempFlow(13);
-    int const iSPMType_RAB(14);
-    int const iSPMType_MZCoolingAverage(15);
-    int const iSPMType_MZHeatingAverage(16);
-    int const iSPMType_MZMinHumAverage(17);
-    int const iSPMType_MZMaxHumAverage(18);
-    int const iSPMType_MZMinHum(19);
-    int const iSPMType_MZMaxHum(20);
-    int const iSPMType_FollowOATemp(21);
-    int const iSPMType_FollowSysNodeTemp(22);
-    int const iSPMType_GroundTemp(23);
-    int const iSPMType_CondEntReset(24);
-    int const iSPMType_IdealCondEntReset(25);
-    int const iSPMType_SZOneStageCooling(26);
-    int const iSPMType_SZOneStageHeating(27);
-    int const iSPMType_ReturnWaterResetChW(28);
-    int const iSPMType_ReturnWaterResetHW(29);
-    int const iSPMType_TESScheduled(30);
-
-    int const NumValidSPMTypes(30);
-    Array1D_string const cValidSPMTypes(NumValidSPMTypes,
-                                        {"SetpointManager:Scheduled",
-                                         "SetpointManager:Scheduled:DualSetpoint",
-                                         "SetpointManager:OutdoorAirReset",
-                                         "SetpointManager:SingleZone:Reheat",
-                                         "SetpointManager:SingleZone:Heating",
-                                         "SetpointManager:SingleZone:Cooling",
-                                         "SetpointManager:SingleZone:Humidity:Minimum",
-                                         "SetpointManager:SingleZone:Humidity:Maximum",
-                                         "SetpointManager:MixedAir",
-                                         "SetpointManager:OutdoorAirPretreat",
-                                         "SetpointManager:Warmest",
-                                         "SetpointManager:Coldest",
-                                         "SetpointManager:WarmestTemperatureFlow",
-                                         "SetpointManager:ReturnAirBypassFlow",
-                                         "SetpointManager:MultiZone:Cooling:Average",
-                                         "SetpointManager:MultiZone:Heating:Average",
-                                         "SetpointManager:MultiZone:MinimumHumidity:Average",
-                                         "SetpointManager:MultiZone:MaximumHumidity:Average",
-                                         "SetpointManager:MultiZone:Humidity:Minimum",
-                                         "SetpointManager:MultiZone:Humidity:Maximum",
-                                         "SetpointManager:FollowOutdoorAirTemperature",
-                                         "SetpointManager:FollowSystemNodeTemperature",
-                                         "SetpointManager:FollowGroundTemperature",
-                                         "SetpointManager:CondenserEnteringReset",
-                                         "SetpointManager:CondenserEnteringReset:Ideal",
-                                         "SetpointManager:SingleZone:OneStageCooling",
-                                         "SetpointManager:SingleZone:OneStageHeating",
-                                         "SetpointManager:ReturnTemperature:ChilledWater",
-                                         "SetpointManager:ReturnTemperature:HotWater",
-                                         "SetpointManager:ScheduledTES"});
-
-    // Type declarations in SetPointManager module
-
-    // This one is used for conflicting node checks and is DEALLOCATED at the end of VerifySetPointManagers
-    // Aug 2014 (RKS) The AllSetPtMgr structure is no longer deallocated because of additions of new ScheduledTES managers after all others are read
-
     // MODULE VARIABLE DECLARATIONS:
     int NumAllSetPtMgrs(0);                 // Number of all Setpoint Managers found in input
     int NumSchSetPtMgrs(0);                 // Number of Scheduled Setpoint Managers found in input
@@ -898,7 +828,7 @@ namespace EnergyPlus::SetPointManager {
                 AllSetPtMgr(AllSetPtMgrNum).CtrlNodes = SchSetPtMgr(SetPtMgrNum).CtrlNodes;
             }
             AllSetPtMgr(AllSetPtMgrNum).Name = SchSetPtMgr(SetPtMgrNum).Name;
-            AllSetPtMgr(AllSetPtMgrNum).SPMType = iSPMType_Scheduled;
+            AllSetPtMgr(AllSetPtMgrNum).SPMType = SetPointManagerType::Scheduled;
             AllSetPtMgr(AllSetPtMgrNum).SPMIndex = SetPtMgrNum;
             AllSetPtMgr(AllSetPtMgrNum).CtrlTypeMode = SchSetPtMgr(SetPtMgrNum).CtrlTypeMode;
             AllSetPtMgr(AllSetPtMgrNum).NumCtrlNodes = SchSetPtMgr(SetPtMgrNum).NumCtrlNodes;
@@ -1001,7 +931,7 @@ namespace EnergyPlus::SetPointManager {
                 AllSetPtMgr(AllSetPtMgrNum).CtrlNodes = DualSchSetPtMgr(SetPtMgrNum).CtrlNodes;
             }
             AllSetPtMgr(AllSetPtMgrNum).Name = DualSchSetPtMgr(SetPtMgrNum).Name;
-            AllSetPtMgr(AllSetPtMgrNum).SPMType = iSPMType_ScheduledDual;
+            AllSetPtMgr(AllSetPtMgrNum).SPMType = SetPointManagerType::ScheduledDual;
             AllSetPtMgr(AllSetPtMgrNum).SPMIndex = SetPtMgrNum;
             AllSetPtMgr(AllSetPtMgrNum).CtrlTypeMode = DualSchSetPtMgr(SetPtMgrNum).CtrlTypeMode;
             AllSetPtMgr(AllSetPtMgrNum).NumCtrlNodes = DualSchSetPtMgr(SetPtMgrNum).NumCtrlNodes;
@@ -1114,7 +1044,7 @@ namespace EnergyPlus::SetPointManager {
                 AllSetPtMgr(AllSetPtMgrNum).CtrlNodes = OutAirSetPtMgr(SetPtMgrNum).CtrlNodes;
             }
             AllSetPtMgr(AllSetPtMgrNum).Name = OutAirSetPtMgr(SetPtMgrNum).Name;
-            AllSetPtMgr(AllSetPtMgrNum).SPMType = iSPMType_OutsideAir;
+            AllSetPtMgr(AllSetPtMgrNum).SPMType = SetPointManagerType::OutsideAir;
             AllSetPtMgr(AllSetPtMgrNum).SPMIndex = SetPtMgrNum;
             AllSetPtMgr(AllSetPtMgrNum).CtrlTypeMode = OutAirSetPtMgr(SetPtMgrNum).CtrlTypeMode;
             AllSetPtMgr(AllSetPtMgrNum).NumCtrlNodes = OutAirSetPtMgr(SetPtMgrNum).NumCtrlNodes;
@@ -1212,7 +1142,7 @@ namespace EnergyPlus::SetPointManager {
                 AllSetPtMgr(AllSetPtMgrNum).CtrlNodes = SingZoneRhSetPtMgr(SetPtMgrNum).CtrlNodes;
             }
             AllSetPtMgr(AllSetPtMgrNum).Name = SingZoneRhSetPtMgr(SetPtMgrNum).Name;
-            AllSetPtMgr(AllSetPtMgrNum).SPMType = iSPMType_SZReheat;
+            AllSetPtMgr(AllSetPtMgrNum).SPMType = SetPointManagerType::SZReheat;
             AllSetPtMgr(AllSetPtMgrNum).SPMIndex = SetPtMgrNum;
             AllSetPtMgr(AllSetPtMgrNum).CtrlTypeMode = SingZoneRhSetPtMgr(SetPtMgrNum).CtrlTypeMode;
             AllSetPtMgr(AllSetPtMgrNum).NumCtrlNodes = SingZoneRhSetPtMgr(SetPtMgrNum).NumCtrlNodes;
@@ -1310,7 +1240,7 @@ namespace EnergyPlus::SetPointManager {
                 AllSetPtMgr(AllSetPtMgrNum).CtrlNodes = SingZoneHtSetPtMgr(SetPtMgrNum).CtrlNodes;
             }
             AllSetPtMgr(AllSetPtMgrNum).Name = SingZoneHtSetPtMgr(SetPtMgrNum).Name;
-            AllSetPtMgr(AllSetPtMgrNum).SPMType = iSPMType_SZHeating;
+            AllSetPtMgr(AllSetPtMgrNum).SPMType = SetPointManagerType::SZHeating;
             AllSetPtMgr(AllSetPtMgrNum).SPMIndex = SetPtMgrNum;
             AllSetPtMgr(AllSetPtMgrNum).CtrlTypeMode = SingZoneHtSetPtMgr(SetPtMgrNum).CtrlTypeMode;
             AllSetPtMgr(AllSetPtMgrNum).NumCtrlNodes = SingZoneHtSetPtMgr(SetPtMgrNum).NumCtrlNodes;
@@ -1407,7 +1337,7 @@ namespace EnergyPlus::SetPointManager {
                 AllSetPtMgr(AllSetPtMgrNum).CtrlNodes = SingZoneClSetPtMgr(SetPtMgrNum).CtrlNodes;
             }
             AllSetPtMgr(AllSetPtMgrNum).Name = SingZoneClSetPtMgr(SetPtMgrNum).Name;
-            AllSetPtMgr(AllSetPtMgrNum).SPMType = iSPMType_SZCooling;
+            AllSetPtMgr(AllSetPtMgrNum).SPMType = SetPointManagerType::SZCooling;
             AllSetPtMgr(AllSetPtMgrNum).SPMIndex = SetPtMgrNum;
             AllSetPtMgr(AllSetPtMgrNum).CtrlTypeMode = SingZoneClSetPtMgr(SetPtMgrNum).CtrlTypeMode;
             AllSetPtMgr(AllSetPtMgrNum).NumCtrlNodes = SingZoneClSetPtMgr(SetPtMgrNum).NumCtrlNodes;
@@ -1515,7 +1445,7 @@ namespace EnergyPlus::SetPointManager {
                 AllSetPtMgr(AllSetPtMgrNum).CtrlNodes = SZMinHumSetPtMgr(SetPtMgrNum).CtrlNodes;
             }
             AllSetPtMgr(AllSetPtMgrNum).Name = SZMinHumSetPtMgr(SetPtMgrNum).Name;
-            AllSetPtMgr(AllSetPtMgrNum).SPMType = iSPMType_SZMinHum;
+            AllSetPtMgr(AllSetPtMgrNum).SPMType = SetPointManagerType::SZMinHum;
             AllSetPtMgr(AllSetPtMgrNum).SPMIndex = SetPtMgrNum;
             AllSetPtMgr(AllSetPtMgrNum).CtrlTypeMode = SZMinHumSetPtMgr(SetPtMgrNum).CtrlTypeMode;
             AllSetPtMgr(AllSetPtMgrNum).NumCtrlNodes = SZMinHumSetPtMgr(SetPtMgrNum).NumCtrlNodes;
@@ -1624,7 +1554,7 @@ namespace EnergyPlus::SetPointManager {
                 AllSetPtMgr(AllSetPtMgrNum).CtrlNodes = SZMaxHumSetPtMgr(SetPtMgrNum).CtrlNodes;
             }
             AllSetPtMgr(AllSetPtMgrNum).Name = SZMaxHumSetPtMgr(SetPtMgrNum).Name;
-            AllSetPtMgr(AllSetPtMgrNum).SPMType = iSPMType_SZMaxHum;
+            AllSetPtMgr(AllSetPtMgrNum).SPMType = SetPointManagerType::SZMaxHum;
             AllSetPtMgr(AllSetPtMgrNum).SPMIndex = SetPtMgrNum;
             AllSetPtMgr(AllSetPtMgrNum).CtrlTypeMode = SZMaxHumSetPtMgr(SetPtMgrNum).CtrlTypeMode;
             AllSetPtMgr(AllSetPtMgrNum).NumCtrlNodes = SZMaxHumSetPtMgr(SetPtMgrNum).NumCtrlNodes;
@@ -1729,7 +1659,7 @@ namespace EnergyPlus::SetPointManager {
                 AllSetPtMgr(AllSetPtMgrNum).CtrlNodes = MixedAirSetPtMgr(SetPtMgrNum).CtrlNodes;
             }
             AllSetPtMgr(AllSetPtMgrNum).Name = MixedAirSetPtMgr(SetPtMgrNum).Name;
-            AllSetPtMgr(AllSetPtMgrNum).SPMType = iSPMType_MixedAir;
+            AllSetPtMgr(AllSetPtMgrNum).SPMType = SetPointManagerType::MixedAir;
             AllSetPtMgr(AllSetPtMgrNum).SPMIndex = SetPtMgrNum;
             AllSetPtMgr(AllSetPtMgrNum).CtrlTypeMode = MixedAirSetPtMgr(SetPtMgrNum).CtrlTypeMode;
             AllSetPtMgr(AllSetPtMgrNum).NumCtrlNodes = MixedAirSetPtMgr(SetPtMgrNum).NumCtrlNodes;
@@ -1869,7 +1799,7 @@ namespace EnergyPlus::SetPointManager {
                 AllSetPtMgr(AllSetPtMgrNum).CtrlNodes = OAPretreatSetPtMgr(SetPtMgrNum).CtrlNodes;
             }
             AllSetPtMgr(AllSetPtMgrNum).Name = OAPretreatSetPtMgr(SetPtMgrNum).Name;
-            AllSetPtMgr(AllSetPtMgrNum).SPMType = iSPMType_OutsideAirPretreat;
+            AllSetPtMgr(AllSetPtMgrNum).SPMType = SetPointManagerType::OutsideAirPretreat;
             AllSetPtMgr(AllSetPtMgrNum).SPMIndex = SetPtMgrNum;
             AllSetPtMgr(AllSetPtMgrNum).CtrlTypeMode = OAPretreatSetPtMgr(SetPtMgrNum).CtrlTypeMode;
             AllSetPtMgr(AllSetPtMgrNum).NumCtrlNodes = OAPretreatSetPtMgr(SetPtMgrNum).NumCtrlNodes;
@@ -1968,7 +1898,7 @@ namespace EnergyPlus::SetPointManager {
                 AllSetPtMgr(AllSetPtMgrNum).CtrlNodes = WarmestSetPtMgr(SetPtMgrNum).CtrlNodes;
             }
             AllSetPtMgr(AllSetPtMgrNum).Name = WarmestSetPtMgr(SetPtMgrNum).Name;
-            AllSetPtMgr(AllSetPtMgrNum).SPMType = iSPMType_Warmest;
+            AllSetPtMgr(AllSetPtMgrNum).SPMType = SetPointManagerType::Warmest;
             AllSetPtMgr(AllSetPtMgrNum).SPMIndex = SetPtMgrNum;
             AllSetPtMgr(AllSetPtMgrNum).CtrlTypeMode = WarmestSetPtMgr(SetPtMgrNum).CtrlTypeMode;
             AllSetPtMgr(AllSetPtMgrNum).NumCtrlNodes = WarmestSetPtMgr(SetPtMgrNum).NumCtrlNodes;
@@ -2068,7 +1998,7 @@ namespace EnergyPlus::SetPointManager {
                 AllSetPtMgr(AllSetPtMgrNum).CtrlNodes = ColdestSetPtMgr(SetPtMgrNum).CtrlNodes;
             }
             AllSetPtMgr(AllSetPtMgrNum).Name = ColdestSetPtMgr(SetPtMgrNum).Name;
-            AllSetPtMgr(AllSetPtMgrNum).SPMType = iSPMType_Coldest;
+            AllSetPtMgr(AllSetPtMgrNum).SPMType = SetPointManagerType::Coldest;
             AllSetPtMgr(AllSetPtMgrNum).SPMIndex = SetPtMgrNum;
             AllSetPtMgr(AllSetPtMgrNum).CtrlTypeMode = ColdestSetPtMgr(SetPtMgrNum).CtrlTypeMode;
             AllSetPtMgr(AllSetPtMgrNum).NumCtrlNodes = ColdestSetPtMgr(SetPtMgrNum).NumCtrlNodes;
@@ -2176,7 +2106,7 @@ namespace EnergyPlus::SetPointManager {
                 AllSetPtMgr(AllSetPtMgrNum).CtrlNodes = WarmestSetPtMgrTempFlow(SetPtMgrNum).CtrlNodes;
             }
             AllSetPtMgr(AllSetPtMgrNum).Name = WarmestSetPtMgrTempFlow(SetPtMgrNum).Name;
-            AllSetPtMgr(AllSetPtMgrNum).SPMType = iSPMType_WarmestTempFlow;
+            AllSetPtMgr(AllSetPtMgrNum).SPMType = SetPointManagerType::WarmestTempFlow;
             AllSetPtMgr(AllSetPtMgrNum).SPMIndex = SetPtMgrNum;
             AllSetPtMgr(AllSetPtMgrNum).CtrlTypeMode = WarmestSetPtMgrTempFlow(SetPtMgrNum).CtrlTypeMode;
             AllSetPtMgr(AllSetPtMgrNum).NumCtrlNodes = WarmestSetPtMgrTempFlow(SetPtMgrNum).NumCtrlNodes;
@@ -2243,7 +2173,7 @@ namespace EnergyPlus::SetPointManager {
             // need to reset this to the control node (RABSplitOutNode) in Init, will be 0 here
             AllSetPtMgr(AllSetPtMgrNum).CtrlNodes = RABFlowSetPtMgr(SetPtMgrNum).CtrlNodes;
             AllSetPtMgr(AllSetPtMgrNum).Name = RABFlowSetPtMgr(SetPtMgrNum).Name;
-            AllSetPtMgr(AllSetPtMgrNum).SPMType = iSPMType_RAB;
+            AllSetPtMgr(AllSetPtMgrNum).SPMType = SetPointManagerType::RAB;
             AllSetPtMgr(AllSetPtMgrNum).SPMIndex = SetPtMgrNum;
             AllSetPtMgr(AllSetPtMgrNum).CtrlTypeMode = RABFlowSetPtMgr(SetPtMgrNum).CtrlTypeMode;
             AllSetPtMgr(AllSetPtMgrNum).NumCtrlNodes = RABFlowSetPtMgr(SetPtMgrNum).NumCtrlNodes;
@@ -2323,7 +2253,7 @@ namespace EnergyPlus::SetPointManager {
                 AllSetPtMgr(AllSetPtMgrNum).CtrlNodes = MZAverageCoolingSetPtMgr(SetPtMgrNum).CtrlNodes;
             }
             AllSetPtMgr(AllSetPtMgrNum).Name = MZAverageCoolingSetPtMgr(SetPtMgrNum).Name;
-            AllSetPtMgr(AllSetPtMgrNum).SPMType = iSPMType_MZCoolingAverage;
+            AllSetPtMgr(AllSetPtMgrNum).SPMType = SetPointManagerType::MZCoolingAverage;
             AllSetPtMgr(AllSetPtMgrNum).SPMIndex = SetPtMgrNum;
             AllSetPtMgr(AllSetPtMgrNum).CtrlTypeMode = MZAverageCoolingSetPtMgr(SetPtMgrNum).CtrlTypeMode;
             AllSetPtMgr(AllSetPtMgrNum).NumCtrlNodes = MZAverageCoolingSetPtMgr(SetPtMgrNum).NumCtrlNodes;
@@ -2403,7 +2333,7 @@ namespace EnergyPlus::SetPointManager {
                 AllSetPtMgr(AllSetPtMgrNum).CtrlNodes = MZAverageHeatingSetPtMgr(SetPtMgrNum).CtrlNodes;
             }
             AllSetPtMgr(AllSetPtMgrNum).Name = MZAverageHeatingSetPtMgr(SetPtMgrNum).Name;
-            AllSetPtMgr(AllSetPtMgrNum).SPMType = iSPMType_MZHeatingAverage;
+            AllSetPtMgr(AllSetPtMgrNum).SPMType = SetPointManagerType::MZHeatingAverage;
             AllSetPtMgr(AllSetPtMgrNum).SPMIndex = SetPtMgrNum;
             AllSetPtMgr(AllSetPtMgrNum).CtrlTypeMode = MZAverageHeatingSetPtMgr(SetPtMgrNum).CtrlTypeMode;
             AllSetPtMgr(AllSetPtMgrNum).NumCtrlNodes = MZAverageHeatingSetPtMgr(SetPtMgrNum).NumCtrlNodes;
@@ -2484,7 +2414,7 @@ namespace EnergyPlus::SetPointManager {
                 AllSetPtMgr(AllSetPtMgrNum).CtrlNodes = MZAverageMinHumSetPtMgr(SetPtMgrNum).CtrlNodes;
             }
             AllSetPtMgr(AllSetPtMgrNum).Name = MZAverageMinHumSetPtMgr(SetPtMgrNum).Name;
-            AllSetPtMgr(AllSetPtMgrNum).SPMType = iSPMType_MZMinHumAverage;
+            AllSetPtMgr(AllSetPtMgrNum).SPMType = SetPointManagerType::MZMinHumAverage;
             AllSetPtMgr(AllSetPtMgrNum).SPMIndex = SetPtMgrNum;
             AllSetPtMgr(AllSetPtMgrNum).CtrlTypeMode = MZAverageMinHumSetPtMgr(SetPtMgrNum).CtrlTypeMode;
             AllSetPtMgr(AllSetPtMgrNum).NumCtrlNodes = MZAverageMinHumSetPtMgr(SetPtMgrNum).NumCtrlNodes;
@@ -2565,7 +2495,7 @@ namespace EnergyPlus::SetPointManager {
                 AllSetPtMgr(AllSetPtMgrNum).CtrlNodes = MZAverageMaxHumSetPtMgr(SetPtMgrNum).CtrlNodes;
             }
             AllSetPtMgr(AllSetPtMgrNum).Name = MZAverageMaxHumSetPtMgr(SetPtMgrNum).Name;
-            AllSetPtMgr(AllSetPtMgrNum).SPMType = iSPMType_MZMaxHumAverage;
+            AllSetPtMgr(AllSetPtMgrNum).SPMType = SetPointManagerType::MZMaxHumAverage;
             AllSetPtMgr(AllSetPtMgrNum).SPMIndex = SetPtMgrNum;
             AllSetPtMgr(AllSetPtMgrNum).CtrlTypeMode = MZAverageMaxHumSetPtMgr(SetPtMgrNum).CtrlTypeMode;
             AllSetPtMgr(AllSetPtMgrNum).NumCtrlNodes = MZAverageMaxHumSetPtMgr(SetPtMgrNum).NumCtrlNodes;
@@ -2646,7 +2576,7 @@ namespace EnergyPlus::SetPointManager {
                 AllSetPtMgr(AllSetPtMgrNum).CtrlNodes = MZMinHumSetPtMgr(SetPtMgrNum).CtrlNodes;
             }
             AllSetPtMgr(AllSetPtMgrNum).Name = MZMinHumSetPtMgr(SetPtMgrNum).Name;
-            AllSetPtMgr(AllSetPtMgrNum).SPMType = iSPMType_MZMinHum;
+            AllSetPtMgr(AllSetPtMgrNum).SPMType = SetPointManagerType::MZMinHum;
             AllSetPtMgr(AllSetPtMgrNum).SPMIndex = SetPtMgrNum;
             AllSetPtMgr(AllSetPtMgrNum).CtrlTypeMode = MZMinHumSetPtMgr(SetPtMgrNum).CtrlTypeMode;
             AllSetPtMgr(AllSetPtMgrNum).NumCtrlNodes = MZMinHumSetPtMgr(SetPtMgrNum).NumCtrlNodes;
@@ -2728,7 +2658,7 @@ namespace EnergyPlus::SetPointManager {
                 AllSetPtMgr(AllSetPtMgrNum).CtrlNodes = MZMaxHumSetPtMgr(SetPtMgrNum).CtrlNodes;
             }
             AllSetPtMgr(AllSetPtMgrNum).Name = MZMaxHumSetPtMgr(SetPtMgrNum).Name;
-            AllSetPtMgr(AllSetPtMgrNum).SPMType = iSPMType_MZMaxHum;
+            AllSetPtMgr(AllSetPtMgrNum).SPMType = SetPointManagerType::MZMaxHum;
             AllSetPtMgr(AllSetPtMgrNum).SPMIndex = SetPtMgrNum;
             AllSetPtMgr(AllSetPtMgrNum).CtrlTypeMode = MZMaxHumSetPtMgr(SetPtMgrNum).CtrlTypeMode;
             AllSetPtMgr(AllSetPtMgrNum).NumCtrlNodes = MZMaxHumSetPtMgr(SetPtMgrNum).NumCtrlNodes;
@@ -2832,7 +2762,7 @@ namespace EnergyPlus::SetPointManager {
                 AllSetPtMgr(AllSetPtMgrNum).CtrlNodes = FollowOATempSetPtMgr(SetPtMgrNum).CtrlNodes;
             }
             AllSetPtMgr(AllSetPtMgrNum).Name = FollowOATempSetPtMgr(SetPtMgrNum).Name;
-            AllSetPtMgr(AllSetPtMgrNum).SPMType = iSPMType_FollowOATemp;
+            AllSetPtMgr(AllSetPtMgrNum).SPMType = SetPointManagerType::FollowOATemp;
             AllSetPtMgr(AllSetPtMgrNum).SPMIndex = SetPtMgrNum;
             AllSetPtMgr(AllSetPtMgrNum).CtrlTypeMode = FollowOATempSetPtMgr(SetPtMgrNum).CtrlTypeMode;
             AllSetPtMgr(AllSetPtMgrNum).NumCtrlNodes = FollowOATempSetPtMgr(SetPtMgrNum).NumCtrlNodes;
@@ -2939,7 +2869,7 @@ namespace EnergyPlus::SetPointManager {
                 AllSetPtMgr(AllSetPtMgrNum).CtrlNodes = FollowSysNodeTempSetPtMgr(SetPtMgrNum).CtrlNodes;
             }
             AllSetPtMgr(AllSetPtMgrNum).Name = FollowSysNodeTempSetPtMgr(SetPtMgrNum).Name;
-            AllSetPtMgr(AllSetPtMgrNum).SPMType = iSPMType_FollowSysNodeTemp;
+            AllSetPtMgr(AllSetPtMgrNum).SPMType = SetPointManagerType::FollowSysNodeTemp;
             AllSetPtMgr(AllSetPtMgrNum).SPMIndex = SetPtMgrNum;
             AllSetPtMgr(AllSetPtMgrNum).CtrlTypeMode = FollowSysNodeTempSetPtMgr(SetPtMgrNum).CtrlTypeMode;
             AllSetPtMgr(AllSetPtMgrNum).NumCtrlNodes = FollowSysNodeTempSetPtMgr(SetPtMgrNum).NumCtrlNodes;
@@ -3081,7 +3011,7 @@ namespace EnergyPlus::SetPointManager {
                 AllSetPtMgr(AllSetPtMgrNum).CtrlNodes = GroundTempSetPtMgr(SetPtMgrNum).CtrlNodes;
             }
             AllSetPtMgr(AllSetPtMgrNum).Name = GroundTempSetPtMgr(SetPtMgrNum).Name;
-            AllSetPtMgr(AllSetPtMgrNum).SPMType = iSPMType_GroundTemp;
+            AllSetPtMgr(AllSetPtMgrNum).SPMType = SetPointManagerType::GroundTemp;
             AllSetPtMgr(AllSetPtMgrNum).SPMIndex = SetPtMgrNum;
             AllSetPtMgr(AllSetPtMgrNum).CtrlTypeMode = GroundTempSetPtMgr(SetPtMgrNum).CtrlTypeMode;
             AllSetPtMgr(AllSetPtMgrNum).NumCtrlNodes = GroundTempSetPtMgr(SetPtMgrNum).NumCtrlNodes;
@@ -3190,7 +3120,7 @@ namespace EnergyPlus::SetPointManager {
                 AllSetPtMgr(AllSetPtMgrNum).CtrlNodes = CondEntSetPtMgr(SetPtMgrNum).CtrlNodes;
             }
             AllSetPtMgr(AllSetPtMgrNum).Name = CondEntSetPtMgr(SetPtMgrNum).Name;
-            AllSetPtMgr(AllSetPtMgrNum).SPMType = iSPMType_CondEntReset;
+            AllSetPtMgr(AllSetPtMgrNum).SPMType = SetPointManagerType::CondEntReset;
             AllSetPtMgr(AllSetPtMgrNum).SPMIndex = SetPtMgrNum;
             AllSetPtMgr(AllSetPtMgrNum).CtrlTypeMode = CondEntSetPtMgr(SetPtMgrNum).CtrlTypeMode;
             AllSetPtMgr(AllSetPtMgrNum).NumCtrlNodes = CondEntSetPtMgr(SetPtMgrNum).NumCtrlNodes;
@@ -3272,7 +3202,7 @@ namespace EnergyPlus::SetPointManager {
                 AllSetPtMgr(AllSetPtMgrNum).CtrlNodes = IdealCondEntSetPtMgr(SetPtMgrNum).CtrlNodes;
             }
             AllSetPtMgr(AllSetPtMgrNum).Name = IdealCondEntSetPtMgr(SetPtMgrNum).Name;
-            AllSetPtMgr(AllSetPtMgrNum).SPMType = iSPMType_IdealCondEntReset;
+            AllSetPtMgr(AllSetPtMgrNum).SPMType = SetPointManagerType::IdealCondEntReset;
             AllSetPtMgr(AllSetPtMgrNum).SPMIndex = SetPtMgrNum;
             AllSetPtMgr(AllSetPtMgrNum).CtrlTypeMode = IdealCondEntSetPtMgr(SetPtMgrNum).CtrlTypeMode;
             AllSetPtMgr(AllSetPtMgrNum).NumCtrlNodes = IdealCondEntSetPtMgr(SetPtMgrNum).NumCtrlNodes;
@@ -3367,7 +3297,7 @@ namespace EnergyPlus::SetPointManager {
                 AllSetPtMgr(AllSetPtMgrNum).CtrlNodes = SZOneStageCoolingSetPtMgr(SetPtMgrNum).CtrlNodes;
             }
             AllSetPtMgr(AllSetPtMgrNum).Name = SZOneStageCoolingSetPtMgr(SetPtMgrNum).Name;
-            AllSetPtMgr(AllSetPtMgrNum).SPMType = iSPMType_SZOneStageCooling;
+            AllSetPtMgr(AllSetPtMgrNum).SPMType = SetPointManagerType::SZOneStageCooling;
             AllSetPtMgr(AllSetPtMgrNum).SPMIndex = SetPtMgrNum;
             AllSetPtMgr(AllSetPtMgrNum).CtrlTypeMode = SZOneStageCoolingSetPtMgr(SetPtMgrNum).CtrlTypeMode;
             AllSetPtMgr(AllSetPtMgrNum).NumCtrlNodes = SZOneStageCoolingSetPtMgr(SetPtMgrNum).NumCtrlNodes;
@@ -3462,7 +3392,7 @@ namespace EnergyPlus::SetPointManager {
                 AllSetPtMgr(AllSetPtMgrNum).CtrlNodes = SZOneStageHeatingSetPtMgr(SetPtMgrNum).CtrlNodes;
             }
             AllSetPtMgr(AllSetPtMgrNum).Name = SZOneStageHeatingSetPtMgr(SetPtMgrNum).Name;
-            AllSetPtMgr(AllSetPtMgrNum).SPMType = iSPMType_SZOneStageHeating;
+            AllSetPtMgr(AllSetPtMgrNum).SPMType = SetPointManagerType::SZOneStageHeating;
             AllSetPtMgr(AllSetPtMgrNum).SPMIndex = SetPtMgrNum;
             AllSetPtMgr(AllSetPtMgrNum).CtrlTypeMode = SZOneStageHeatingSetPtMgr(SetPtMgrNum).CtrlTypeMode;
             AllSetPtMgr(AllSetPtMgrNum).NumCtrlNodes = SZOneStageHeatingSetPtMgr(SetPtMgrNum).NumCtrlNodes;
@@ -3545,7 +3475,7 @@ namespace EnergyPlus::SetPointManager {
             AllSetPtMgr(AllSetPtMgrNum).CtrlNodes.allocate(1);
             AllSetPtMgr(AllSetPtMgrNum).CtrlNodes(1) = ReturnWaterResetChWSetPtMgr(SetPtMgrNum).supplyNodeIndex;
             AllSetPtMgr(AllSetPtMgrNum).Name = ReturnWaterResetChWSetPtMgr(SetPtMgrNum).Name;
-            AllSetPtMgr(AllSetPtMgrNum).SPMType = iSPMType_ReturnWaterResetChW;
+            AllSetPtMgr(AllSetPtMgrNum).SPMType = SetPointManagerType::ReturnWaterResetChW;
             AllSetPtMgr(AllSetPtMgrNum).SPMIndex = SetPtMgrNum;
             AllSetPtMgr(AllSetPtMgrNum).CtrlTypeMode = iCtrlVarType::Temp;
             AllSetPtMgr(AllSetPtMgrNum).NumCtrlNodes = 1;
@@ -3628,7 +3558,7 @@ namespace EnergyPlus::SetPointManager {
             AllSetPtMgr(AllSetPtMgrNum).CtrlNodes.allocate(1);
             AllSetPtMgr(AllSetPtMgrNum).CtrlNodes(1) = ReturnWaterResetHWSetPtMgr(SetPtMgrNum).supplyNodeIndex;
             AllSetPtMgr(AllSetPtMgrNum).Name = ReturnWaterResetHWSetPtMgr(SetPtMgrNum).Name;
-            AllSetPtMgr(AllSetPtMgrNum).SPMType = iSPMType_ReturnWaterResetHW;
+            AllSetPtMgr(AllSetPtMgrNum).SPMType = SetPointManagerType::ReturnWaterResetHW;
             AllSetPtMgr(AllSetPtMgrNum).SPMIndex = SetPtMgrNum;
             AllSetPtMgr(AllSetPtMgrNum).CtrlTypeMode = iCtrlVarType::Temp;
             AllSetPtMgr(AllSetPtMgrNum).NumCtrlNodes = 1;
@@ -3687,7 +3617,7 @@ namespace EnergyPlus::SetPointManager {
             for (CtrldNodeNum = 1; CtrldNodeNum <= AllSetPtMgr(SetPtMgrNum).NumCtrlNodes - 1; ++CtrldNodeNum) {
                 for (TempCtrldNodeNum = CtrldNodeNum + 1; TempCtrldNodeNum <= AllSetPtMgr(SetPtMgrNum).NumCtrlNodes; ++TempCtrldNodeNum) {
                     if (AllSetPtMgr(SetPtMgrNum).CtrlNodes(CtrldNodeNum) != AllSetPtMgr(SetPtMgrNum).CtrlNodes(TempCtrldNodeNum)) continue;
-                    ShowWarningError(state, cValidSPMTypes(AllSetPtMgr(SetPtMgrNum).SPMType) + "=\"" + AllSetPtMgr(SetPtMgrNum).Name + "\"");
+                    ShowWarningError(state, format("{} =\"{}\"", managerTypeName(AllSetPtMgr(SetPtMgrNum).SPMType), AllSetPtMgr(SetPtMgrNum).Name));
                     ShowContinueError(state, format("...duplicate node specified = {}", NodeID(AllSetPtMgr(SetPtMgrNum).CtrlNodes(CtrldNodeNum))));
                     ShowContinueError(state, format("...control type variable    = {}", controlTypeName(AllSetPtMgr(SetPtMgrNum).CtrlTypeMode)));
                 }
@@ -3697,22 +3627,21 @@ namespace EnergyPlus::SetPointManager {
             for (TempSetPtMgrNum = SetPtMgrNum + 1; TempSetPtMgrNum <= NumAllSetPtMgrs; ++TempSetPtMgrNum) {
 
                 //   check the air loop name in addition to the node names for these SP manager types
-                //    IF((AllSetPtMgr(SetPtMgrNum)%SPMType == iSPMType_WarmestTempFlow .AND. &
-                //        AllSetPtMgr(TempSetPtMgrNum)%SPMType == iSPMType_WarmestTempFlow) .OR. &
-                //       (AllSetPtMgr(SetPtMgrNum)%SPMType == iSPMType_RAB .AND. &
-                //        AllSetPtMgr(TempSetPtMgrNum)%SPMType == iSPMType_RAB) .OR. &
-                //       (AllSetPtMgr(SetPtMgrNum)%SPMType == iSPMType_Coldest .AND. &
-                //        AllSetPtMgr(TempSetPtMgrNum)%SPMType == iSPMType_Coldest) .OR. &
-                //       (AllSetPtMgr(SetPtMgrNum)%SPMType == iSPMType_Warmest .AND. &
-                //        AllSetPtMgr(TempSetPtMgrNum)%SPMType == iSPMType_Warmest))THEN
-                if ((AllSetPtMgr(SetPtMgrNum).SPMType == iSPMType_RAB && AllSetPtMgr(TempSetPtMgrNum).SPMType == iSPMType_RAB)) {
+                //    IF((AllSetPtMgr(SetPtMgrNum)%SPMType == SetPointManagerType::WarmestTempFlow .AND. &
+                //        AllSetPtMgr(TempSetPtMgrNum)%SPMType == SetPointManagerType::WarmestTempFlow) .OR. &
+                //       (AllSetPtMgr(SetPtMgrNum)%SPMType == SetPointManagerType::RAB .AND. &
+                //        AllSetPtMgr(TempSetPtMgrNum)%SPMType == SetPointManagerType::RAB) .OR. &
+                //       (AllSetPtMgr(SetPtMgrNum)%SPMType == SetPointManagerType::Coldest .AND. &
+                //        AllSetPtMgr(TempSetPtMgrNum)%SPMType == SetPointManagerType::Coldest) .OR. &
+                //       (AllSetPtMgr(SetPtMgrNum)%SPMType == SetPointManagerType::Warmest .AND. &
+                //        AllSetPtMgr(TempSetPtMgrNum)%SPMType == SetPointManagerType::Warmest))THEN
+                if ((AllSetPtMgr(SetPtMgrNum).SPMType == SetPointManagerType::RAB && AllSetPtMgr(TempSetPtMgrNum).SPMType == SetPointManagerType::RAB)) {
 
                     //     check the air loop name for duplicates in this SP manager type
                     if (AllSetPtMgr(SetPtMgrNum).AirLoopNum == AllSetPtMgr(TempSetPtMgrNum).AirLoopNum) {
-                        ShowWarningError(state, cValidSPMTypes(AllSetPtMgr(SetPtMgrNum).SPMType) + "=\"" + AllSetPtMgr(SetPtMgrNum).Name + "\"");
+                        ShowWarningError(state, format("{}=\"{}\"", managerTypeName(AllSetPtMgr(SetPtMgrNum).SPMType), AllSetPtMgr(SetPtMgrNum).Name));
                         ShowContinueError(state, "...air loop name conflicts with another setpoint manager.");
-                        ShowContinueError(state, "...conflicting setpoint manager = " + cValidSPMTypes(AllSetPtMgr(TempSetPtMgrNum).SPMType) + " \"" +
-                                          AllSetPtMgr(TempSetPtMgrNum).Name + "\"");
+                        ShowContinueError(state, format("...conflicting setpoint manager = {} \"{}\"", managerTypeName(AllSetPtMgr(TempSetPtMgrNum).SPMType), AllSetPtMgr(TempSetPtMgrNum).Name));
                         ShowContinueError(state, "...conflicting air loop name = " + AllSetPtMgr(SetPtMgrNum).AirLoopName);
                         //        ErrorsFound=.TRUE.
                     }
@@ -3724,10 +3653,9 @@ namespace EnergyPlus::SetPointManager {
                         for (TempCtrldNodeNum = 1; TempCtrldNodeNum <= AllSetPtMgr(TempSetPtMgrNum).NumCtrlNodes; ++TempCtrldNodeNum) {
                             if ((AllSetPtMgr(SetPtMgrNum).CtrlNodes(CtrldNodeNum) == AllSetPtMgr(TempSetPtMgrNum).CtrlNodes(TempCtrldNodeNum)) &&
                                 AllSetPtMgr(SetPtMgrNum).CtrlNodes(CtrldNodeNum) != 0) {
-                                ShowWarningError(state, cValidSPMTypes(AllSetPtMgr(SetPtMgrNum).SPMType) + "=\"" + AllSetPtMgr(SetPtMgrNum).Name + "\"");
+                                ShowWarningError(state, format("{}=\"{}\"", managerTypeName(AllSetPtMgr(SetPtMgrNum).SPMType), AllSetPtMgr(SetPtMgrNum).Name));
                                 ShowContinueError(state, "...setpoint node conflicts with another setpoint manager.");
-                                ShowContinueError(state, "...conflicting setpoint manager = " + cValidSPMTypes(AllSetPtMgr(TempSetPtMgrNum).SPMType) +
-                                                  " \"" + AllSetPtMgr(TempSetPtMgrNum).Name + "\"");
+                                ShowContinueError(state, format("...conflicting setpoint manager = {} \"{}\"", managerTypeName(AllSetPtMgr(TempSetPtMgrNum).SPMType), AllSetPtMgr(TempSetPtMgrNum).Name));
                                 ShowContinueError(state, "...conflicting node name = " + NodeID(AllSetPtMgr(SetPtMgrNum).CtrlNodes(CtrldNodeNum)));
                                 ShowContinueError(state, format("...control type variable = {}", controlTypeName(AllSetPtMgr(SetPtMgrNum).CtrlTypeMode)));
                                 //            ErrorsFound=.TRUE.
@@ -3747,20 +3675,18 @@ namespace EnergyPlus::SetPointManager {
                                 continue;
 
                             //         only warn if scheduled setpoint manager is setting mass flow rate on the same node used by RAB
-                            if (AllSetPtMgr(SetPtMgrNum).SPMType == iSPMType_RAB || AllSetPtMgr(TempSetPtMgrNum).SPMType == iSPMType_RAB) {
-                                ShowWarningError(state, cValidSPMTypes(AllSetPtMgr(SetPtMgrNum).SPMType) + "=\"" + AllSetPtMgr(SetPtMgrNum).Name + "\"");
+                            if (AllSetPtMgr(SetPtMgrNum).SPMType == SetPointManagerType::RAB || AllSetPtMgr(TempSetPtMgrNum).SPMType == SetPointManagerType::RAB) {
+                                ShowWarningError(state, format("{}=\"{}\"", managerTypeName(AllSetPtMgr(SetPtMgrNum).SPMType), AllSetPtMgr(SetPtMgrNum).Name));
                                 ShowContinueError(state, "...setpoint node conflicts with another setpoint manager.");
-                                ShowContinueError(state, "...conflicting setpoint manager =" + cValidSPMTypes(AllSetPtMgr(TempSetPtMgrNum).SPMType) + ":\"" +
-                                                  AllSetPtMgr(TempSetPtMgrNum).Name + "\"");
+                                ShowContinueError(state, format("...conflicting setpoint manager ={}:\"{}\"", managerTypeName(AllSetPtMgr(TempSetPtMgrNum).SPMType), AllSetPtMgr(TempSetPtMgrNum).Name));
                                 ShowContinueError(state, "...conflicting node name = " + NodeID(AllSetPtMgr(SetPtMgrNum).CtrlNodes(CtrldNodeNum)));
                                 ShowContinueError(state, format("...control type variable = {}", controlTypeName(AllSetPtMgr(SetPtMgrNum).CtrlTypeMode)));
                                 ShowContinueError(state,
                                     "...return air bypass flow setpoint manager will have priority setting mass flow rate on this node.");
                             } else { // severe error for other SP manager types
-                                ShowWarningError(state, cValidSPMTypes(AllSetPtMgr(SetPtMgrNum).SPMType) + "=\"" + AllSetPtMgr(SetPtMgrNum).Name + "\"");
+                                ShowWarningError(state, format("{}=\"{}\"", managerTypeName(AllSetPtMgr(SetPtMgrNum).SPMType), AllSetPtMgr(SetPtMgrNum).Name));
                                 ShowContinueError(state, "...setpoint node conflicts with another setpoint manager.");
-                                ShowContinueError(state, "...conflicting setpoint manager = " + cValidSPMTypes(AllSetPtMgr(TempSetPtMgrNum).SPMType) +
-                                                  ":\"" + AllSetPtMgr(TempSetPtMgrNum).Name + "\"");
+                                ShowContinueError(state, format("...conflicting setpoint manager = {}:\"{}\"", managerTypeName(AllSetPtMgr(TempSetPtMgrNum).SPMType), AllSetPtMgr(TempSetPtMgrNum).Name));
                                 ShowContinueError(state, "...conflicting node name = " + NodeID(AllSetPtMgr(SetPtMgrNum).CtrlNodes(CtrldNodeNum)));
                                 ShowContinueError(state, format("...control type variable = {}", controlTypeName(AllSetPtMgr(SetPtMgrNum).CtrlTypeMode)));
                                 //            ErrorsFound=.TRUE.
@@ -3871,7 +3797,7 @@ namespace EnergyPlus::SetPointManager {
             if (InitSetPointManagersOneTimeFlag) {
 
                 // "SetpointManager:SingleZone:Heating"
-                cSetPointManagerType = cValidSPMTypes(iSPMType_SZHeating);
+                cSetPointManagerType = managerTypeName(SetPointManagerType::SZHeating);
                 for (SetPtMgrNum = 1; SetPtMgrNum <= NumSZHtSetPtMgrs; ++SetPtMgrNum) {
                     ZoneInletNode = SingZoneHtSetPtMgr(SetPtMgrNum).ZoneInletNodeNum;
                     ZoneNode = SingZoneHtSetPtMgr(SetPtMgrNum).ZoneNodeNum;
@@ -3903,7 +3829,7 @@ namespace EnergyPlus::SetPointManager {
                 }
 
                 // "SetpointManager:SingleZone:Cooling"
-                cSetPointManagerType = cValidSPMTypes(iSPMType_SZCooling);
+                cSetPointManagerType = managerTypeName(SetPointManagerType::SZCooling);
                 for (SetPtMgrNum = 1; SetPtMgrNum <= NumSZClSetPtMgrs; ++SetPtMgrNum) {
                     ZoneInletNode = SingZoneClSetPtMgr(SetPtMgrNum).ZoneInletNodeNum;
                     ZoneNode = SingZoneClSetPtMgr(SetPtMgrNum).ZoneNodeNum;
@@ -3935,7 +3861,7 @@ namespace EnergyPlus::SetPointManager {
                 }
 
                 // Minimum humidity setpoint managers
-                cSetPointManagerType = cValidSPMTypes(iSPMType_SZMinHum);
+                cSetPointManagerType = managerTypeName(SetPointManagerType::SZMinHum);
                 for (SetPtMgrNum = 1; SetPtMgrNum <= NumSZMinHumSetPtMgrs; ++SetPtMgrNum) {
                     for (SetZoneNum = 1; SetZoneNum <= SZMinHumSetPtMgr(SetPtMgrNum).NumZones; ++SetZoneNum) {
                         // set the actual and controlled zone numbers
@@ -3971,7 +3897,7 @@ namespace EnergyPlus::SetPointManager {
                 }
 
                 // Maximum humidity setpoint managers
-                cSetPointManagerType = cValidSPMTypes(iSPMType_SZMaxHum);
+                cSetPointManagerType = managerTypeName(SetPointManagerType::SZMaxHum);
                 for (SetPtMgrNum = 1; SetPtMgrNum <= NumSZMaxHumSetPtMgrs; ++SetPtMgrNum) {
                     for (SetZoneNum = 1; SetZoneNum <= SZMaxHumSetPtMgr(SetPtMgrNum).NumZones; ++SetZoneNum) {
                         // set the actual and controlled zone numbers
@@ -4007,7 +3933,7 @@ namespace EnergyPlus::SetPointManager {
                 }
 
                 // single zone reheat setpoint manager
-                cSetPointManagerType = cValidSPMTypes(iSPMType_SZReheat);
+                cSetPointManagerType = managerTypeName(SetPointManagerType::SZReheat);
                 for (SetPtMgrNum = 1; SetPtMgrNum <= NumSZRhSetPtMgrs; ++SetPtMgrNum) {
                     FanNodeIn = 0;
                     FanNodeOut = 0;
@@ -4102,7 +4028,7 @@ namespace EnergyPlus::SetPointManager {
                 }
 
                 // Warmest Setpoint Managers
-                cSetPointManagerType = cValidSPMTypes(iSPMType_Warmest);
+                cSetPointManagerType = managerTypeName(SetPointManagerType::Warmest);
                 for (SetPtMgrNum = 1; SetPtMgrNum <= NumWarmestSetPtMgrs; ++SetPtMgrNum) {
                     if (NumPrimaryAirSys > 0) {
                         AirLoopNum = UtilityRoutines::FindItemInList(
@@ -4127,7 +4053,7 @@ namespace EnergyPlus::SetPointManager {
                 }
 
                 // Coldest Setpoint Managers
-                cSetPointManagerType = cValidSPMTypes(iSPMType_Coldest);
+                cSetPointManagerType = managerTypeName(SetPointManagerType::Coldest);
                 for (SetPtMgrNum = 1; SetPtMgrNum <= NumColdestSetPtMgrs; ++SetPtMgrNum) {
                     if (NumPrimaryAirSys > 0) {
                         AirLoopNum = UtilityRoutines::FindItemInList(
@@ -4156,7 +4082,7 @@ namespace EnergyPlus::SetPointManager {
                 }
 
                 // Warmest Temp Flow Setpoint Managers
-                cSetPointManagerType = cValidSPMTypes(iSPMType_WarmestTempFlow);
+                cSetPointManagerType = managerTypeName(SetPointManagerType::WarmestTempFlow);
                 for (SetPtMgrNum = 1; SetPtMgrNum <= NumWarmestSetPtMgrsTempFlow; ++SetPtMgrNum) {
                     if (NumPrimaryAirSys > 0) {
                         AirLoopNum = UtilityRoutines::FindItemInList(
@@ -4185,7 +4111,7 @@ namespace EnergyPlus::SetPointManager {
                 }
 
                 // return air bypass flow set manager
-                cSetPointManagerType = cValidSPMTypes(iSPMType_RAB);
+                cSetPointManagerType = managerTypeName(SetPointManagerType::RAB);
                 for (SetPtMgrNum = 1; SetPtMgrNum <= NumRABFlowSetPtMgrs; ++SetPtMgrNum) {
                     if (NumPrimaryAirSys > 0) {
                         AirLoopNum = UtilityRoutines::FindItemInList(
@@ -4221,7 +4147,7 @@ namespace EnergyPlus::SetPointManager {
                 }
 
                 // MultiZone Average Cooling Setpoint Managers
-                cSetPointManagerType = cValidSPMTypes(iSPMType_MZCoolingAverage);
+                cSetPointManagerType = managerTypeName(SetPointManagerType::MZCoolingAverage);
                 for (SetPtMgrNum = 1; SetPtMgrNum <= NumMZClgAverageSetPtMgrs; ++SetPtMgrNum) {
                     if (NumPrimaryAirSys > 0) {
                         AirLoopNum = UtilityRoutines::FindItemInList(
@@ -4250,7 +4176,7 @@ namespace EnergyPlus::SetPointManager {
                 }
 
                 // MultiZone Average Heating Setpoint Managers
-                cSetPointManagerType = cValidSPMTypes(iSPMType_MZHeatingAverage);
+                cSetPointManagerType = managerTypeName(SetPointManagerType::MZHeatingAverage);
                 for (SetPtMgrNum = 1; SetPtMgrNum <= NumMZHtgAverageSetPtMgrs; ++SetPtMgrNum) {
                     if (NumPrimaryAirSys > 0) {
                         AirLoopNum = UtilityRoutines::FindItemInList(
@@ -4279,7 +4205,7 @@ namespace EnergyPlus::SetPointManager {
                 }
 
                 // MultiZone Average Minimum Humidity Setpoint Managers
-                cSetPointManagerType = cValidSPMTypes(iSPMType_MZMinHumAverage);
+                cSetPointManagerType = managerTypeName(SetPointManagerType::MZMinHumAverage);
                 for (SetPtMgrNum = 1; SetPtMgrNum <= NumMZAverageMinHumSetPtMgrs; ++SetPtMgrNum) {
                     if (NumPrimaryAirSys > 0) {
                         AirLoopNum = UtilityRoutines::FindItemInList(
@@ -4321,7 +4247,7 @@ namespace EnergyPlus::SetPointManager {
                 }
 
                 // MultiZone Average Maximum Humidity Setpoint Managers
-                cSetPointManagerType = cValidSPMTypes(iSPMType_MZMaxHumAverage);
+                cSetPointManagerType = managerTypeName(SetPointManagerType::MZMaxHumAverage);
                 for (SetPtMgrNum = 1; SetPtMgrNum <= NumMZAverageMaxHumSetPtMgrs; ++SetPtMgrNum) {
                     if (NumPrimaryAirSys > 0) {
                         AirLoopNum = UtilityRoutines::FindItemInList(
@@ -4363,7 +4289,7 @@ namespace EnergyPlus::SetPointManager {
                 }
 
                 // Multizone Minimum Humidity Ratio Setpoint Managers
-                cSetPointManagerType = cValidSPMTypes(iSPMType_MZMinHum);
+                cSetPointManagerType = managerTypeName(SetPointManagerType::MZMinHum);
                 for (SetPtMgrNum = 1; SetPtMgrNum <= NumMZMinHumSetPtMgrs; ++SetPtMgrNum) {
                     if (NumPrimaryAirSys > 0) {
                         AirLoopNum = UtilityRoutines::FindItemInList(
@@ -4403,7 +4329,7 @@ namespace EnergyPlus::SetPointManager {
                 }
 
                 // Multizone Maximum Humidity Ratio Setpoint Managers
-                cSetPointManagerType = cValidSPMTypes(iSPMType_MZMaxHum);
+                cSetPointManagerType = managerTypeName(SetPointManagerType::MZMaxHum);
                 for (SetPtMgrNum = 1; SetPtMgrNum <= NumMZMaxHumSetPtMgrs; ++SetPtMgrNum) {
                     if (NumPrimaryAirSys > 0) {
                         AirLoopNum = UtilityRoutines::FindItemInList(
@@ -4443,7 +4369,7 @@ namespace EnergyPlus::SetPointManager {
                 }
 
                 // condenser entering water temperature reset setpoint manager
-                cSetPointManagerType = cValidSPMTypes(iSPMType_CondEntReset);
+                cSetPointManagerType = managerTypeName(SetPointManagerType::CondEntReset);
                 for (SetPtMgrNum = 1; SetPtMgrNum <= NumCondEntSetPtMgrs; ++SetPtMgrNum) {
                     // Scan loops and find the loop index that includes the condenser cooling tower node used as setpoint
                     for (LoopNum = 1; LoopNum <= NumCondLoops + NumPlantLoops;
@@ -4510,7 +4436,7 @@ namespace EnergyPlus::SetPointManager {
                 }
 
                 // Ideal condenser entering water temperature reset setpoint manager
-                cSetPointManagerType = cValidSPMTypes(iSPMType_IdealCondEntReset);
+                cSetPointManagerType = managerTypeName(SetPointManagerType::IdealCondEntReset);
                 NumChiller = 0;
                 for (SetPtMgrNum = 1; SetPtMgrNum <= NumIdealCondEntSetPtMgrs; ++SetPtMgrNum) {
                     // Scan loops and find the loop index that includes the condenser cooling tower node used as setpoint
@@ -8505,7 +8431,7 @@ namespace EnergyPlus::SetPointManager {
         }
     }
 
-    int getSPMBasedOnNode(EnergyPlusData &state, int const NodeNum, iCtrlVarType const SetPtType, int const SPMType, CtrlNodeType ctrlOrRefNode)
+    int getSPMBasedOnNode(EnergyPlusData &state, int const NodeNum, iCtrlVarType const SetPtType, SetPointManagerType const SPMType, CtrlNodeType ctrlOrRefNode)
     {
 
         if (GetInputFlag) {
@@ -8520,7 +8446,7 @@ namespace EnergyPlus::SetPointManager {
                 switch (ctrlOrRefNode) { // ctrlOrRefNode is enum type of node to look for, either control node or reference node
                 case CtrlNodeType::control: {
                     for (int NumNode = 1; NumNode <= AllSetPtMgr(SetPtMgrNum).NumCtrlNodes; ++NumNode) {
-                        // SPMType is type of set point manager, e.g., iSPMType_Scheduled, iSPMType_MixedAir, etc.
+                        // SPMType is type of set point manager, e.g., SetPointManagerType::Scheduled, SetPointManagerType::MixedAir, etc.
                         if (NodeNum == AllSetPtMgr(SetPtMgrNum).CtrlNodes(NumNode) && SPMType == AllSetPtMgr(SetPtMgrNum).SPMType) {
                             getSPMBasedOnNode = AllSetPtMgr(SetPtMgrNum).SPMIndex; // SPMIndex is index to specific type of SPM
                             break;
@@ -8529,7 +8455,7 @@ namespace EnergyPlus::SetPointManager {
                     break;
                 }
                 case CtrlNodeType::reference: {
-                    // SPMType is type of set point manager, e.g., iSPMType_Scheduled, iSPMType_MixedAir, etc.
+                    // SPMType is type of set point manager, e.g., SetPointManagerType::Scheduled, SetPointManagerType::MixedAir, etc.
                     if (NodeNum == AllSetPtMgr(SetPtMgrNum).RefNode && SPMType == AllSetPtMgr(SetPtMgrNum).SPMType) {
                         getSPMBasedOnNode = AllSetPtMgr(SetPtMgrNum).SPMIndex; // SPMIndex is index to specific type of SPM
                     }
@@ -8727,7 +8653,7 @@ namespace EnergyPlus::SetPointManager {
     SPMLoop_exit:;
 
         if (ResetCntrlVarType) {
-            ShowWarningError(state, RoutineName + cValidSPMTypes(AllSetPtMgr(SetPtMgrNumPtr).SPMType) + "=\"" + AllSetPtMgr(SetPtMgrNumPtr).Name + "\". ");
+            ShowWarningError(state, RoutineName + managerTypeName(AllSetPtMgr(SetPtMgrNumPtr).SPMType) + "=\"" + AllSetPtMgr(SetPtMgrNumPtr).Name + "\". ");
             ShowContinueError(state, format(" ..Humidity ratio control variable type specified is = {}", controlTypeName(iCtrlVarType::HumRat)));
             ShowContinueError(state, format(" ..Humidity ratio control variable type allowed with water coils is = {}", controlTypeName(iCtrlVarType::MaxHumRat)));
             ShowContinueError(state, format(" ..Setpointmanager control variable type is reset to = {}", controlTypeName(iCtrlVarType::MaxHumRat)));
@@ -8938,7 +8864,7 @@ namespace EnergyPlus::SetPointManager {
         AllSetPtMgr(NumAllSetPtMgrs).CtrlNodes(1) = SchTESSetPtMgr(NumSchTESSetPtMgrs).CtrlNodeNum;
         // Give it a Name just in case it's used for error reporting
         AllSetPtMgr(NumAllSetPtMgrs).Name = "Auto generated TES SPM " + General::TrimSigDigits(NumSchTESSetPtMgrs);
-        AllSetPtMgr(NumAllSetPtMgrs).SPMType = iSPMType_TESScheduled;
+        AllSetPtMgr(NumAllSetPtMgrs).SPMType = SetPointManagerType::TESScheduled;
         AllSetPtMgr(NumAllSetPtMgrs).CtrlTypeMode = iCtrlVarType::Temp;
         AllSetPtMgr(NumAllSetPtMgrs).NumCtrlNodes = 1;
 

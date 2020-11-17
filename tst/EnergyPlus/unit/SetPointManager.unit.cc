@@ -1271,7 +1271,7 @@ TEST_F(EnergyPlusFixture, SetPointManager_OutdoorAirResetMaxTempTest)
     // check Set Point Manager get inputs
     EXPECT_EQ(SetPointManager::OutAirSetPtMgr(1).CtrlVarType, "MAXIMUMTEMPERATURE");
     EXPECT_EQ(SetPointManager::OutAirSetPtMgr(1).CtrlTypeMode, SetPointManager::iCtrlVarType::MaxTemp);
-    EXPECT_EQ(SetPointManager::AllSetPtMgr(1).SPMType, SetPointManager::iSPMType_OutsideAir);
+    EXPECT_EQ(SetPointManager::AllSetPtMgr(1).SPMType, SetPointManager::SetPointManagerType::OutsideAir);
     EXPECT_EQ(80.0, SetPointManager::OutAirSetPtMgr(1).OutLowSetPt1);
     EXPECT_EQ(-17.778, SetPointManager::OutAirSetPtMgr(1).OutLow1);
     EXPECT_EQ(40.0, SetPointManager::OutAirSetPtMgr(1).OutHighSetPt1);
@@ -1327,7 +1327,7 @@ TEST_F(EnergyPlusFixture, SetPointManager_OutdoorAirResetMinTempTest)
     // check Set Point Manager get inputs
     EXPECT_EQ(SetPointManager::OutAirSetPtMgr(1).CtrlVarType, "MINIMUMTEMPERATURE");
     EXPECT_EQ(SetPointManager::OutAirSetPtMgr(1).CtrlTypeMode, SetPointManager::iCtrlVarType::MinTemp);
-    EXPECT_EQ(SetPointManager::AllSetPtMgr(1).SPMType, SetPointManager::iSPMType_OutsideAir);
+    EXPECT_EQ(SetPointManager::AllSetPtMgr(1).SPMType, SetPointManager::SetPointManagerType::OutsideAir);
     EXPECT_EQ(80.0, SetPointManager::OutAirSetPtMgr(1).OutLowSetPt1);
     EXPECT_EQ(-17.778, SetPointManager::OutAirSetPtMgr(1).OutLow1);
     EXPECT_EQ(40.0, SetPointManager::OutAirSetPtMgr(1).OutHighSetPt1);

@@ -95,7 +95,7 @@ namespace SetPointManager {
         MinMassFlow
     };
 
-    int constexpr NumValidCtrlTypes(9);
+    int constexpr NumValidCtrlTypes = 9;
     inline const char* controlTypeName(iCtrlVarType cvt) {
         switch(cvt) {
             case iCtrlVarType::Temp:
@@ -122,40 +122,109 @@ namespace SetPointManager {
         return "*UNKNOWN*";  // not sure how we would get here, the switch block cases are exhaustive
     }
 
-    // following are used to reduce string comparisons related to CtrlVarType
-    extern int const iSPMType_Scheduled;
-    extern int const iSPMType_ScheduledDual;
-    extern int const iSPMType_OutsideAir;
-    extern int const iSPMType_SZReheat;
-    extern int const iSPMType_SZHeating;
-    extern int const iSPMType_SZCooling;
-    extern int const iSPMType_SZMinHum;
-    extern int const iSPMType_SZMaxHum;
-    extern int const iSPMType_MixedAir;
-    extern int const iSPMType_OutsideAirPretreat;
-    extern int const iSPMType_Warmest;
-    extern int const iSPMType_Coldest;
-    extern int const iSPMType_WarmestTempFlow;
-    extern int const iSPMType_RAB;
-    extern int const iSPMType_MZCoolingAverage;
-    extern int const iSPMType_MZHeatingAverage;
-    extern int const iSPMType_MZMinHumAverage;
-    extern int const iSPMType_MZMaxHumAverage;
-    extern int const iSPMType_MZMinHum;
-    extern int const iSPMType_MZMaxHum;
-    extern int const iSPMType_FollowOATemp;
-    extern int const iSPMType_FollowSysNodeTemp;
-    extern int const iSPMType_GroundTemp;
-    extern int const iSPMType_CondEntReset;
-    extern int const iSPMType_IdealCondEntReset;
-    extern int const iSPMType_SZOneStageCooling;
-    extern int const iSPMType_SZOneStageHeating;
-    extern int const iSPMType_ReturnWaterResetChW;
-    extern int const iSPMType_ReturnWaterResetHW;
+    enum class SetPointManagerType {
+        Scheduled,
+        ScheduledDual,
+        OutsideAir,
+        SZReheat,
+        SZHeating,
+        SZCooling,
+        SZMinHum,
+        SZMaxHum,
+        MixedAir,
+        OutsideAirPretreat,
+        Warmest,
+        Coldest,
+        WarmestTempFlow,
+        RAB,
+        MZCoolingAverage,
+        MZHeatingAverage,
+        MZMinHumAverage,
+        MZMaxHumAverage,
+        MZMinHum,
+        MZMaxHum,
+        FollowOATemp,
+        FollowSysNodeTemp,
+        GroundTemp,
+        CondEntReset,
+        IdealCondEntReset,
+        SZOneStageCooling,
+        SZOneStageHeating,
+        ReturnWaterResetChW,
+        ReturnWaterResetHW,
+        TESScheduled,
+        Unknown
+    };
 
-    extern int const NumValidSPMTypes;
-    extern Array1D_string const cValidSPMTypes;
-
+    int constexpr NumValidSPMTypes = 30;
+    inline const char* managerTypeName(SetPointManagerType t) {
+        switch(t) {
+            case SetPointManagerType::Scheduled:
+                return "SetpointManager:Scheduled";
+            case SetPointManagerType::ScheduledDual:
+                return "SetpointManager:Scheduled:DualSetpoint";
+            case SetPointManagerType::OutsideAir:
+                return "SetpointManager:OutdoorAirReset";
+            case SetPointManagerType::SZReheat:
+                return "SetpointManager:SingleZone:Reheat";
+            case SetPointManagerType::SZHeating:
+                return "SetpointManager:SingleZone:Heating";
+            case SetPointManagerType::SZCooling:
+                return "SetpointManager:SingleZone:Cooling";
+            case SetPointManagerType::SZMinHum:
+                return "SetpointManager:SingleZone:Humidity:Minimum";
+            case SetPointManagerType::SZMaxHum:
+                return "SetpointManager:SingleZone:Humidity:Maximum";
+            case SetPointManagerType::MixedAir:
+                return "SetpointManager:MixedAir";
+            case SetPointManagerType::OutsideAirPretreat:
+                return "SetpointManager:OutdoorAirPretreat";
+            case SetPointManagerType::Warmest:
+                return "SetpointManager:Warmest";
+            case SetPointManagerType::Coldest:
+                return "SetpointManager:Coldest";
+            case SetPointManagerType::WarmestTempFlow:
+                return "SetpointManager:WarmestTemperatureFlow";
+            case SetPointManagerType::RAB:
+                return "SetpointManager:ReturnAirBypassFlow";
+            case SetPointManagerType::MZCoolingAverage:
+                return "SetpointManager:MultiZone:Cooling:Average";
+            case SetPointManagerType::MZHeatingAverage:
+                return "SetpointManager:MultiZone:Heating:Average";
+            case SetPointManagerType::MZMinHumAverage:
+                return "SetpointManager:MultiZone:MinimumHumidity:Average";
+            case SetPointManagerType::MZMaxHumAverage:
+                return "SetpointManager:MultiZone:MaximumHumidity:Average";
+            case SetPointManagerType::MZMinHum:
+                return "SetpointManager:MultiZone:Humidity:Minimum";
+            case SetPointManagerType::MZMaxHum:
+                return "SetpointManager:MultiZone:Humidity:Maximum";
+            case SetPointManagerType::FollowOATemp:
+                return "SetpointManager:FollowOutdoorAirTemperature";
+            case SetPointManagerType::FollowSysNodeTemp:
+                return "SetpointManager:FollowSystemNodeTemperature";
+            case SetPointManagerType::GroundTemp:
+                return "SetpointManager:FollowGroundTemperature";
+            case SetPointManagerType::CondEntReset:
+                return "SetpointManager:CondenserEnteringReset";
+            case SetPointManagerType::IdealCondEntReset:
+                return "SetpointManager:CondenserEnteringReset:Ideal";
+            case SetPointManagerType::SZOneStageCooling:
+                return "SetpointManager:SingleZone:OneStageCooling";
+            case SetPointManagerType::SZOneStageHeating:
+                return "SetpointManager:SingleZone:OneStageHeating";
+            case SetPointManagerType::ReturnWaterResetChW:
+                return "SetpointManager:ReturnTemperature:ChilledWater";
+            case SetPointManagerType::ReturnWaterResetHW:
+                return "SetpointManager:ReturnTemperature:HotWater";
+            case SetPointManagerType::TESScheduled:
+                return "SetpointManager:ScheduledTES";
+            case SetPointManagerType::Unknown:
+                return "*UNKNOWN*";
+        }
+        return "*UNKNOWN*";  // not sure how we would get here, the switch block cases are exhaustive
+    }
+    
     struct SPBase {
         std::string Name;
         iCtrlVarType CtrlTypeMode; // set to iCtrlVarType::*
@@ -166,7 +235,7 @@ namespace SetPointManager {
     struct DataSetPointManager : SPBase // Derived type for all Setpoint Managers
     {
         // Members
-        int SPMType;             // integer representing type of setpoint manager
+        SetPointManagerType SPMType;             // integer representing type of setpoint manager
         int SPMIndex;            // index to specific set point manager
         int NumCtrlNodes;        // number of control nodes
         Array1D_int CtrlNodes;   // index to control node
@@ -175,7 +244,7 @@ namespace SetPointManager {
         int RefNode;             // index to reference node
 
         // Default Constructor
-        DataSetPointManager() : SPMType(0), SPMIndex(0), NumCtrlNodes(0), AirLoopNum(0), RefNode(0)
+        DataSetPointManager() : SPMType(SetPointManagerType::Unknown), SPMIndex(0), NumCtrlNodes(0), AirLoopNum(0), RefNode(0)
         {
         }
     };
@@ -917,7 +986,7 @@ namespace SetPointManager {
 
     void UpdateOAPretreatSetPoints();
 
-    int getSPMBasedOnNode(EnergyPlusData &state, int NodeNum, iCtrlVarType SetPtType, int SMPType, CtrlNodeType ctrlOrRefNode);
+    int getSPMBasedOnNode(EnergyPlusData &state, int NodeNum, iCtrlVarType SetPtType, SetPointManagerType SMPType, CtrlNodeType ctrlOrRefNode);
 
     bool IsNodeOnSetPtManager(EnergyPlusData &state, int NodeNum, iCtrlVarType SetPtType);
 
