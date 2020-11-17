@@ -1,6 +1,7 @@
 
 
 
+
 Separate Design and Control Variables
 ================
 
@@ -33,17 +34,17 @@ Separate Design and Control Variables
 
 ## Justification for New Feature ##
 
-The LowTemperatureRadiant and BaseBoard objects in EnergyPlus currently has the  control and design fields lumped together. This results in a large number of fields for these objects as seen in the objects below:
+LowTemperatureRadiant and BaseBoard objects in EnergyPlus currently has design and control fields lumped together. This results in a large number of fields for these objects as seen below:
  - The `ZoneHVAC:LowTemperatureRadiant:VariableFlow` object has 34 fields
  - The `ZoneHVAC:LowTemperatureRadiant:ConstantFlow` object has 34 fields
  - The `ZoneHVAC:Baseboard:RadiantConvective:Water` object has 17+ fields*
  - The `ZoneHVAC:Baseboard:RadiantConvective:Steam` object has 17+ fields*
  
- Lumping of design and control parameters together results in many of the variables being repeated for every zone. This causes difficulty and confusion for the users as the control variables get lost in the mixture of design and control variables. There have been requests from users to split these fields into design and control variables. 
+ Lumping of design and control parameters together results in many of the variables being repeated for every zone which could have been instead shared among the zones. Lumping everything together is also less organized and causes confusion for the users. There have been requests from users to split these objects into design and control variables. 
 
-Splitting the variables into control and design variables may result in 
+Splitting the objects into design and control variables may result in 
 
- 1. Ease of creating new objects, with fewer fields to fill in. 
+ 1. Increased ease of creating new objects, with fewer fields to fill in. 
  2. Decreased confusion from too many fields and may result in fewer errors from having too many variables. 
  3. If there is a case where different radiant systems (for example, LowTemperatureRadiant:VariableFlow and LowTemperatureRadiant:ConstantFlow) exist together in a model, a design object could provide common information to both these systems.
  
@@ -53,7 +54,7 @@ Splitting the variables into control and design variables may result in
 
 University of Illinois at Urbana-Champaign and Center for the Built Environment(CBE) at the University of California Berkeley requests this new feature. The original request is like below:
 
-"Potentially separate the lowtemp: radiant objects such that one main object contains the design parameters of the radiant system (e.g. amount of tubing, hot and chilled water loop connections), while the other contains the control parameters (e.g. two position, modulating, zone circulator pump, etc.)." (Quote from CBE)   Right now, all of the parameters associated with a radiant system in EnergyPlus are contained in a single input syntax.  The concern here is that much of the control information is probably pretty similar from system to system within a single user input file.  So, there could be less work and smaller files if the input was broken up into two separate inputs, allowing many radiant systems to re-use a single control definition.  This could potentially be applied to other input syntax beyond the low temperature radiant systems.
+"Potentially separate the lowtemp:radiant objects such that one main object contains the design parameters of the radiant system (e.g. amount of tubing, hot and chilled water loop connections), while the other contains the control parameters (e.g. two position, modulating, zone circulator pump, etc.)." (Quote from CBE)   Right now, all of the parameters associated with a radiant system in EnergyPlus are contained in a single input syntax.  The concern here is that much of the control information is probably pretty similar from system to system within a single user input file.  So, there could be less work and smaller files if the input was broken up into two separate inputs, allowing many radiant systems to re-use a single control definition.  This could potentially be applied to other input syntax beyond the low temperature radiant systems.
 
 
 [comment]: <> (### Questions and Comments Received through June 1 ##)
@@ -93,7 +94,7 @@ The proposed approach is to identify the design variables in the LowTemperatureR
 
 #### ZoneHVAC:LowTemperatureRadiant objects ####
 
-We decided to ignore the `ZoneHVAC:LowTemperatureRadiant:Electric` since it only has 12 fields, and therefore does not have a drastic need to reduce inputs as the VariableFlow and ConstantFlow systems. Also, `ZoneHVAC:LowTemperatureRadiant:Electric` is different from the fluid (`ZoneHVAC:LowTemperatureRadiant:VariableFlow` and `ZoneHVAC:LowTemperatureRadiant:ConstantFlow`) objects. Therefore, trying to find parameters common to all three would result in very few design parameters (only two in our preliminary study) that could be extracted out. Therefore, the `ZoneHVAC:LowTemperatureRadiant:VariableFlow` and `ZoneHVAC:LowTemperatureRadiant:ConstantFlow` were inspected and nine common parameters were identified. The common variables could be set as design variables since it seems like they could be shared between different `ZoneHVAC:LowTemperatureRadiant:VariableFlow` and/or `ZoneHVAC:LowTemperatureRadiant:ConstantFlow` objects in a model.
+We decided to ignore the `ZoneHVAC:LowTemperatureRadiant:Electric` since it only has 12 fields, and therefore does not have a drastic need to reduce inputs like the VariableFlow and ConstantFlow objects do. Also, `ZoneHVAC:LowTemperatureRadiant:Electric` is different from the fluid (`ZoneHVAC:LowTemperatureRadiant:VariableFlow` and `ZoneHVAC:LowTemperatureRadiant:ConstantFlow`) objects. Therefore, trying to find parameters common to all three would result in very few design parameters (only two in our preliminary study) that could be extracted out. Therefore, the `ZoneHVAC:LowTemperatureRadiant:VariableFlow` and `ZoneHVAC:LowTemperatureRadiant:ConstantFlow` were inspected and nine common parameters were identified. The common variables could be set as design variables since it seems like they could be shared between different `ZoneHVAC:LowTemperatureRadiant:VariableFlow` and/or `ZoneHVAC:LowTemperatureRadiant:ConstantFlow` objects in a model.
 
 The following common variables were decided to be set as control variables/unable to be grouped into the design parameters since they will be specific to every object in a radiant system:
 
@@ -127,7 +128,7 @@ Common fields for all four ZoneHVAC:Baseboard:RadiantConvective objects were ide
 -   Maximum Water Flow Rate
 -   Surface Name, Fraction of Radiant Energy to Surface
 
-Since only three design objects could be identified as common fields that could be used as design variables to all four and this does not warrant the need to differentiate between design and control variables, and also it may be that a group of similar baseboard objects may be more commonly used as compared to others, different types of groupings were identified to find if more variables may be grouped to find if this would yield a larger chunk of parameters that could be set aside as design variables. Grouping the `ZoneHVAC:Baseboard:RadiantConvective:Water` and `ZoneHVAC:Baseboard:RadiantConvective:Steam` as radiant baseboard  objects that used fluids for heating seemed like a natural grouping that yielded the seven common variables that could to be set as design variables:
+Since only three design objects could be identified as common fields that could be used as design variables to all four baseboard objects, this does not warrant the need to differentiate between design and control variables. Also, it may be that a group of similar baseboard objects may be more commonly used as compared to others. Therefore, different types of baseboard object groupings were explored to find a group that would have a larger number of design variables. Grouping the `ZoneHVAC:Baseboard:RadiantConvective:Water` and `ZoneHVAC:Baseboard:RadiantConvective:Steam` as radiant baseboard  objects that used fluids for heating seemed like a good choice since it enabled grouping seven common variables that could to be set as design variables:
 
 ##### Comments ######
  - As in the LowTemperatureRadiant objects, some of the common objects are optional fields or depend on other fields. I just wanted to point out that it should not be assumed that every field has the same importance. 
@@ -135,7 +136,7 @@ Since only three design objects could be identified as common fields that could 
 
 ## Testing/Validation/Data Sources ##
 
-Regression tests will be done to ensure that no changes to the current models have been made. 
+Regression tests will be done to ensure that no changes to the current models have been made.  
 
 ## Input Output Reference Documentation ##
 
@@ -207,7 +208,6 @@ All of the current example files that use `ZoneHVAC:LowTemperatureRadiant:Variab
 
 None.
 
-
 ## Next Steps ##
 
 Get feedback from the EnergyPlus team regarding:
@@ -224,7 +224,6 @@ Get feedback from the EnergyPlus team regarding:
 **ZoneHVAC:LowTemperatureRadiant:Design,**
 
     	    \memo Design parameters for ZoneHVAC:LowTemperatureRadiant objects
-            \min-fields 33 
        A1 , \field Name
             \required-field
             \reference-class-name validBranchEquipmentTypes
@@ -298,10 +297,7 @@ Get feedback from the EnergyPlus team regarding:
 
 **ZoneHVAC:Baseboard:RadiantConvective:Design,**
 
-           \extensible:2 - repeat last two fields, remembering to remove ; from "inner" fields.
-           \memo The number of surfaces can be expanded beyond 100, if necessary, by adding more
-           \memo groups to the end of the list
-           \min-fields 12
+           \memo Design parameters for ZoneHVAC:Baseboard:RadiantConvective objects
       A1,  \field Name
            \required-field
            \reference-class-name validBranchEquipmentTypes
@@ -492,6 +488,9 @@ Get feedback from the EnergyPlus team regarding:
        N12, \field Circuit Length
             \units m
             \default 106.7
+       A14, \field Design Object Name
+            \type object-list
+            \object-list LowTemperatureRadiant:Design Object Name
 
 **ZoneHVAC:LowTemperatureRadiant:ConstantFlow,**
 
@@ -609,6 +608,10 @@ Get feedback from the EnergyPlus team regarding:
        N8, \field Circuit Length
             \units m
             \default 106.7
+       A18, \field Design Object Name
+            \type object-list
+            \object-list LowTemperatureRadiant:Design Object Name
+
 
 **ZoneHVAC:Baseboard:RadiantConvective:Water,**
 
@@ -663,7 +666,10 @@ Get feedback from the EnergyPlus team regarding:
            \type real
            \units m3/s
            \ip-units gal/min
-      A4,  \field Surface 1 Name
+      A4, \field Design Object Name
+           \type object-list
+           \object-list ZoneHVAC:Baseboard:RadiantConvective:Design Object Name
+      A5,  \field Surface 1 Name
            \begin-extensible
            \note Radiant energy may be distributed to specific surfaces
            \type object-list
@@ -672,7 +678,7 @@ Get feedback from the EnergyPlus team regarding:
            \type real
            \minimum 0
            \maximum 1
-      A5,  \field Surface 2 Name
+      A6,  \field Surface 2 Name
            \type object-list
            \object-list AllHeatTranSurfNames
       N6, \field Fraction of Radiant Energy to Surface 2
@@ -682,7 +688,7 @@ Get feedback from the EnergyPlus team regarding:
     .
     .
     .
-     A103, \field Surface 100 Name
+     A104, \field Surface 100 Name
            \type object-list
            \object-list AllHeatTranSurfNames
      N104; \field Fraction of Radiant Energy to Surface 100
@@ -727,7 +733,10 @@ Get feedback from the EnergyPlus team regarding:
            \autosizable
            \minimum> 0.0
            \units m3/s
-      A4,  \field Surface 1 Name
+      A4, \field Design Object Name
+           \type object-list
+           \object-list ZoneHVAC:Baseboard:RadiantConvective:Design Object Name
+      A5,  \field Surface 1 Name
            \begin-extensible
            \note Radiant energy may be distributed to specific surfaces
            \type object-list
@@ -736,7 +745,7 @@ Get feedback from the EnergyPlus team regarding:
            \type real
            \minimum 0
            \maximum 1
-      A5,  \field Surface 2 Name
+      A6,  \field Surface 2 Name
            \type object-list
            \object-list AllHeatTranSurfNames
       N5, \field Fraction of Radiant Energy to Surface 2
@@ -746,7 +755,7 @@ Get feedback from the EnergyPlus team regarding:
     .
     .
     .
-     A103, \field Surface 100 Name
+     A104, \field Surface 100 Name
            \type object-list
            \object-list AllHeatTranSurfNames
      N103; \field Fraction of Radiant Energy to Surface 100
