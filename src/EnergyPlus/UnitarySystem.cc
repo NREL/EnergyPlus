@@ -4334,9 +4334,9 @@ namespace UnitarySystems {
                 } // CoilDX_Cooling sets these above
 
                 // coil outlet node set point has priority, IF not exist, then use system outlet node
-                if (SetPointManager::NodeHasSPMCtrlVarType(state, thisSys.AirOutNode, SetPointManager::iCtrlVarType_Temp))
+                if (SetPointManager::NodeHasSPMCtrlVarType(state, thisSys.AirOutNode, SetPointManager::iCtrlVarType::Temp))
                     thisSys.m_SystemHeatControlNodeNum = thisSys.AirOutNode;
-                if (SetPointManager::NodeHasSPMCtrlVarType(state, HeatingCoilOutletNode, SetPointManager::iCtrlVarType_Temp))
+                if (SetPointManager::NodeHasSPMCtrlVarType(state, HeatingCoilOutletNode, SetPointManager::iCtrlVarType::Temp))
                     thisSys.m_SystemHeatControlNodeNum = HeatingCoilOutletNode;
 
                 thisSys.HeatCoilInletNodeNum = HeatingCoilInletNode;
@@ -5437,9 +5437,9 @@ namespace UnitarySystems {
                         thisSys.m_ContSpeedCoolingCoil = true;
                     } // CoilDX_Cooling is set above
 
-                    if (SetPointManager::NodeHasSPMCtrlVarType(state, thisSys.AirOutNode, SetPointManager::iCtrlVarType_Temp))
+                    if (SetPointManager::NodeHasSPMCtrlVarType(state, thisSys.AirOutNode, SetPointManager::iCtrlVarType::Temp))
                         thisSys.m_SystemCoolControlNodeNum = thisSys.AirOutNode;
-                    if (SetPointManager::NodeHasSPMCtrlVarType(state, CoolingCoilOutletNode, SetPointManager::iCtrlVarType_Temp))
+                    if (SetPointManager::NodeHasSPMCtrlVarType(state, CoolingCoilOutletNode, SetPointManager::iCtrlVarType::Temp))
                         thisSys.m_SystemCoolControlNodeNum = CoolingCoilOutletNode;
 
                     thisSys.CoolCoilInletNodeNum = CoolingCoilInletNode;
@@ -5805,9 +5805,9 @@ namespace UnitarySystems {
 
                 } // IF(.NOT. lAlphaBlanks(iSuppHeatCoilTypeAlphaNum))THEN
 
-                if (SetPointManager::NodeHasSPMCtrlVarType(state, thisSys.AirOutNode, SetPointManager::iCtrlVarType_Temp))
+                if (SetPointManager::NodeHasSPMCtrlVarType(state, thisSys.AirOutNode, SetPointManager::iCtrlVarType::Temp))
                     thisSys.m_SuppHeatControlNodeNum = thisSys.AirOutNode;
-                if (SetPointManager::NodeHasSPMCtrlVarType(state, SupHeatCoilOutletNode, SetPointManager::iCtrlVarType_Temp))
+                if (SetPointManager::NodeHasSPMCtrlVarType(state, SupHeatCoilOutletNode, SetPointManager::iCtrlVarType::Temp))
                     thisSys.m_SuppHeatControlNodeNum = SupHeatCoilOutletNode;
 
                 // Add supplemental heating coil to component sets array

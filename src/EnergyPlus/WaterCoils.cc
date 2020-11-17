@@ -6057,8 +6057,7 @@ namespace WaterCoils {
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
         using EMSManager::iHumidityRatioMaxSetPoint;
         using EMSManager::iTemperatureSetPoint;
-        using SetPointManager::iCtrlVarType_MaxHumRat;
-        using SetPointManager::iCtrlVarType_Temp;
+        using SetPointManager::iCtrlVarType;
         using SetPointManager::NodeHasSPMCtrlVarType;
 
         // USE HVACControllers,     ONLY: iTemperature, iHumidityRatio, iTemperatureAndHumidityRatio
@@ -6117,7 +6116,7 @@ namespace WaterCoils {
                         CheckIfNodeSetPointManagedByEMS(state, SensorNodeNum, iTemperatureSetPoint, EMSSetPointErrorFlag);
                         DataLoopNode::NodeSetpointCheck(SensorNodeNum).needsSetpointChecking = false;
                         if (EMSSetPointErrorFlag) {
-                            if (!NodeHasSPMCtrlVarType(state, SensorNodeNum, iCtrlVarType_Temp)) {
+                            if (!NodeHasSPMCtrlVarType(state, SensorNodeNum, iCtrlVarType::Temp)) {
                                 ShowWarningError(state, RoutineName + WaterCoilType + "=\"" + state.dataWaterCoils->WaterCoil(WhichCoil).Name + "\". ");
                                 ShowContinueError(state, " ..Temperature setpoint not found on coil air outlet node.");
                                 ShowContinueError(state,
@@ -6129,7 +6128,7 @@ namespace WaterCoils {
                         CheckIfNodeSetPointManagedByEMS(state, SensorNodeNum, iHumidityRatioMaxSetPoint, EMSSetPointErrorFlag);
                         DataLoopNode::NodeSetpointCheck(SensorNodeNum).needsSetpointChecking = false;
                         if (EMSSetPointErrorFlag) {
-                            if (!NodeHasSPMCtrlVarType(state, SensorNodeNum, iCtrlVarType_MaxHumRat)) {
+                            if (!NodeHasSPMCtrlVarType(state, SensorNodeNum, iCtrlVarType::MaxHumRat)) {
                                 ShowWarningError(state, RoutineName + WaterCoilType + "=\"" + state.dataWaterCoils->WaterCoil(WhichCoil).Name + "\". ");
                                 ShowContinueError(state, " ..Humidity ratio setpoint not found on coil air outlet node.");
                                 ShowContinueError(state,
@@ -6141,7 +6140,7 @@ namespace WaterCoils {
                         CheckIfNodeSetPointManagedByEMS(state, SensorNodeNum, iTemperatureSetPoint, EMSSetPointErrorFlag);
                         DataLoopNode::NodeSetpointCheck(SensorNodeNum).needsSetpointChecking = false;
                         if (EMSSetPointErrorFlag) {
-                            if (!NodeHasSPMCtrlVarType(state, SensorNodeNum, iCtrlVarType_Temp)) {
+                            if (!NodeHasSPMCtrlVarType(state, SensorNodeNum, iCtrlVarType::Temp)) {
                                 ShowWarningError(state, RoutineName + WaterCoilType + "=\"" + state.dataWaterCoils->WaterCoil(WhichCoil).Name + "\". ");
                                 ShowContinueError(state, " ..Temperature setpoint not found on coil air outlet node.");
                                 ShowContinueError(state,
@@ -6153,7 +6152,7 @@ namespace WaterCoils {
                         CheckIfNodeSetPointManagedByEMS(state, SensorNodeNum, iHumidityRatioMaxSetPoint, EMSSetPointErrorFlag);
                         DataLoopNode::NodeSetpointCheck(SensorNodeNum).needsSetpointChecking = false;
                         if (EMSSetPointErrorFlag) {
-                            if (!NodeHasSPMCtrlVarType(state, SensorNodeNum, iCtrlVarType_MaxHumRat)) {
+                            if (!NodeHasSPMCtrlVarType(state, SensorNodeNum, iCtrlVarType::MaxHumRat)) {
                                 ShowWarningError(state, RoutineName + WaterCoilType + "=\"" + state.dataWaterCoils->WaterCoil(WhichCoil).Name + "\". ");
                                 ShowContinueError(state, " ..Humidity ratio setpoint not found on coil air outlet node.");
                                 ShowContinueError(state,

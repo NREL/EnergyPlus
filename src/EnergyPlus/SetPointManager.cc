@@ -80,9 +80,7 @@
 #include <EnergyPlus/SetPointManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
-namespace EnergyPlus {
-
-namespace SetPointManager {
+namespace EnergyPlus::SetPointManager {
 
     // Module containing the SetPoint Manager routines
 
@@ -161,29 +159,6 @@ namespace SetPointManager {
     int const iRefGroundTempObjType_Shallow(2);
     int const iRefGroundTempObjType_Deep(3);
     int const iRefGroundTempObjType_FCfactorMethod(4);
-
-    // following are used to reduce string comparisons related to CtrlVarType
-    int const iCtrlVarType_Temp(1);        // control type 'Temperature'
-    int const iCtrlVarType_MaxTemp(2);     // control type 'MaximumTemperature'
-    int const iCtrlVarType_MinTemp(3);     // control type 'MinimumTemperature'
-    int const iCtrlVarType_HumRat(4);      // control Type 'HumidityRatio'
-    int const iCtrlVarType_MaxHumRat(5);   // control Type 'MaximumHumidityRatio'
-    int const iCtrlVarType_MinHumRat(6);   // control Type 'MinimumHumidityRatio'
-    int const iCtrlVarType_MassFlow(7);    // control type 'MassFlowRate'
-    int const iCtrlVarType_MaxMassFlow(8); // control Type 'MaximumMassFlowRate'
-    int const iCtrlVarType_MinMassFlow(9); // control Type 'MinimumMassFlowRate'
-
-    int const NumValidCtrlTypes(9);
-    Array1D_string const cValidCtrlTypes(NumValidCtrlTypes,
-                                         {"Temperature",
-                                          "MaximumTemperature",
-                                          "MinimumTemperature",
-                                          "HumidityRatio",
-                                          "MaximumHumidityRatio",
-                                          "MinimumHumidityRatio",
-                                          "MassFlowRate",
-                                          "MaximumMassFlowRate",
-                                          "MinimumMassFlowRate"});
 
     // following are used to reduce string comparisons related to CtrlVarType
     int const iSPMType_Scheduled(1);
@@ -846,29 +821,29 @@ namespace SetPointManager {
             SchSetPtMgr(SetPtMgrNum).CtrlVarType = cAlphaArgs(2);
             // setup program flow control integers
             if (UtilityRoutines::SameString(SchSetPtMgr(SetPtMgrNum).CtrlVarType, "Temperature")) {
-                SchSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType_Temp;
+                SchSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType::Temp;
             } else if (UtilityRoutines::SameString(SchSetPtMgr(SetPtMgrNum).CtrlVarType, "MaximumTemperature")) {
-                SchSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType_MaxTemp;
+                SchSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType::MaxTemp;
             } else if (UtilityRoutines::SameString(SchSetPtMgr(SetPtMgrNum).CtrlVarType, "MinimumTemperature")) {
-                SchSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType_MinTemp;
+                SchSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType::MinTemp;
             } else if (UtilityRoutines::SameString(SchSetPtMgr(SetPtMgrNum).CtrlVarType, "HumidityRatio")) {
-                SchSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType_HumRat;
+                SchSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType::HumRat;
             } else if (UtilityRoutines::SameString(SchSetPtMgr(SetPtMgrNum).CtrlVarType, "MaximumHumidityRatio")) {
-                SchSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType_MaxHumRat;
+                SchSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType::MaxHumRat;
             } else if (UtilityRoutines::SameString(SchSetPtMgr(SetPtMgrNum).CtrlVarType, "MinimumHumidityRatio")) {
-                SchSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType_MinHumRat;
+                SchSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType::MinHumRat;
             } else if (UtilityRoutines::SameString(SchSetPtMgr(SetPtMgrNum).CtrlVarType, "MassFlowRate")) {
-                SchSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType_MassFlow;
+                SchSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType::MassFlow;
             } else if (UtilityRoutines::SameString(SchSetPtMgr(SetPtMgrNum).CtrlVarType, "MaximumMassFlowRate")) {
-                SchSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType_MaxMassFlow;
+                SchSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType::MaxMassFlow;
             } else if (UtilityRoutines::SameString(SchSetPtMgr(SetPtMgrNum).CtrlVarType, "MinimumMassFlowRate")) {
-                SchSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType_MinMassFlow;
+                SchSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType::MinMassFlow;
             } else {
                 ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
                 ShowContinueError(state, "..invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
-                ShowContinueError(state, "..Valid values are \"Temperature\",\"MaximumTemperature\",\"MinimumTemperature\",");
-                ShowContinueError(state, "     \"HumidityRatio\",\"MaximumHumidityRatio\",\"MinimumHumidityRatio\",\"MassFlowRate\",");
-                ShowContinueError(state, "     \"MaximumMassFlowRate\" or \"MinimumMassFlowRate\"");
+                ShowContinueError(state, R"(..Valid values are "Temperature","MaximumTemperature","MinimumTemperature",)");
+                ShowContinueError(state, R"(     "HumidityRatio","MaximumHumidityRatio","MinimumHumidityRatio","MassFlowRate",)");
+                ShowContinueError(state, R"(     "MaximumMassFlowRate" or "MinimumMassFlowRate")");
                 ErrorsFound = true;
             }
 
@@ -954,7 +929,7 @@ namespace SetPointManager {
             DualSchSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
             DualSchSetPtMgr(SetPtMgrNum).CtrlVarType = cAlphaArgs(2);
             if (UtilityRoutines::SameString(DualSchSetPtMgr(SetPtMgrNum).CtrlVarType, "Temperature")) {
-                DualSchSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType_Temp;
+                DualSchSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType::Temp;
             } else {
                 // should not come here if idd type choice and key list is working
                 ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
@@ -1057,11 +1032,11 @@ namespace SetPointManager {
             OutAirSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
             OutAirSetPtMgr(SetPtMgrNum).CtrlVarType = cAlphaArgs(2);
             if (UtilityRoutines::SameString(OutAirSetPtMgr(SetPtMgrNum).CtrlVarType, "Temperature")) {
-                OutAirSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType_Temp;
+                OutAirSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType::Temp;
             } else if (UtilityRoutines::SameString(OutAirSetPtMgr(SetPtMgrNum).CtrlVarType, "MaximumTemperature")) {
-                OutAirSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType_MaxTemp;
+                OutAirSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType::MaxTemp;
             } else if (UtilityRoutines::SameString(OutAirSetPtMgr(SetPtMgrNum).CtrlVarType, "MinimumTemperature")) {
-                OutAirSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType_MinTemp;
+                OutAirSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType::MinTemp;
             } else {
                 // should not come here if idd type choice and key list is working
                 ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
@@ -1170,7 +1145,7 @@ namespace SetPointManager {
             SingZoneRhSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
             SingZoneRhSetPtMgr(SetPtMgrNum).CtrlVarType = cAlphaArgs(2);
             if (UtilityRoutines::SameString(SingZoneRhSetPtMgr(SetPtMgrNum).CtrlVarType, "Temperature")) {
-                SingZoneRhSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType_Temp;
+                SingZoneRhSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType::Temp;
             } else {
                 // should not come here if idd type choice and key list is working
                 ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
@@ -1268,7 +1243,7 @@ namespace SetPointManager {
             SingZoneHtSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
             SingZoneHtSetPtMgr(SetPtMgrNum).CtrlVarType = cAlphaArgs(2);
             if (UtilityRoutines::SameString(SingZoneHtSetPtMgr(SetPtMgrNum).CtrlVarType, "Temperature")) {
-                SingZoneHtSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType_Temp;
+                SingZoneHtSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType::Temp;
             } else {
                 // should not come here if idd type choice and key list is working
                 ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
@@ -1365,7 +1340,7 @@ namespace SetPointManager {
             SingZoneClSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
             SingZoneClSetPtMgr(SetPtMgrNum).CtrlVarType = cAlphaArgs(2);
             if (UtilityRoutines::SameString(SingZoneClSetPtMgr(SetPtMgrNum).CtrlVarType, "Temperature")) {
-                SingZoneClSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType_Temp;
+                SingZoneClSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType::Temp;
             } else {
                 // should not come here if idd type choice and key list is working
                 ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
@@ -1461,7 +1436,7 @@ namespace SetPointManager {
 
             SZMinHumSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
             SZMinHumSetPtMgr(SetPtMgrNum).CtrlVarType = "MinimumHumidityRatio";
-            SZMinHumSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType_MinHumRat;
+            SZMinHumSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType::MinHumRat;
 
             NodeListError = false;
             GetNodeNums(state,
@@ -1569,7 +1544,7 @@ namespace SetPointManager {
 
             SZMaxHumSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
             SZMaxHumSetPtMgr(SetPtMgrNum).CtrlVarType = "MaximumHumidityRatio";
-            SZMaxHumSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType_MaxHumRat;
+            SZMaxHumSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType::MaxHumRat;
 
             NodeListError = false;
             GetNodeNums(state,
@@ -1679,7 +1654,7 @@ namespace SetPointManager {
             MixedAirSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
             MixedAirSetPtMgr(SetPtMgrNum).CtrlVarType = cAlphaArgs(2);
             if (UtilityRoutines::SameString(MixedAirSetPtMgr(SetPtMgrNum).CtrlVarType, "Temperature")) {
-                MixedAirSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType_Temp;
+                MixedAirSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType::Temp;
             } else {
                 // should not come here if idd type choice and key list is working
                 ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
@@ -1789,18 +1764,18 @@ namespace SetPointManager {
                 auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(OAPretreatSetPtMgr(SetPtMgrNum).CtrlVarType));
 
                 if (SELECT_CASE_var == "TEMPERATURE") {
-                    OAPretreatSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType_Temp;
+                    OAPretreatSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType::Temp;
                 } else if (SELECT_CASE_var == "HUMIDITYRATIO") {
-                    OAPretreatSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType_HumRat;
+                    OAPretreatSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType::HumRat;
                 } else if (SELECT_CASE_var == "MAXIMUMHUMIDITYRATIO") {
-                    OAPretreatSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType_MaxHumRat;
+                    OAPretreatSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType::MaxHumRat;
                 } else if (SELECT_CASE_var == "MINIMUMHUMIDITYRATIO") {
-                    OAPretreatSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType_MinHumRat;
+                    OAPretreatSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType::MinHumRat;
                 } else {
                     // should not come here if idd type choice and key list is working
                     ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
                     ShowContinueError(state, "..invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
-                    ShowContinueError(state, "..Valid values are \"Temperature\",\"HumidityRatio\",\"MaximumHumidityRatio\" or \"MinimumHumidityRatio\".");
+                    ShowContinueError(state, R"(..Valid values are "Temperature","HumidityRatio","MaximumHumidityRatio" or "MinimumHumidityRatio".)");
                     ErrorsFound = true;
                 }
             }
@@ -1924,7 +1899,7 @@ namespace SetPointManager {
             WarmestSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
             WarmestSetPtMgr(SetPtMgrNum).CtrlVarType = cAlphaArgs(2);
             if (UtilityRoutines::SameString(WarmestSetPtMgr(SetPtMgrNum).CtrlVarType, "Temperature")) {
-                WarmestSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType_Temp;
+                WarmestSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType::Temp;
             } else {
                 // should not come here if idd type choice and key list is working
                 ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
@@ -2023,7 +1998,7 @@ namespace SetPointManager {
             ColdestSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
             ColdestSetPtMgr(SetPtMgrNum).CtrlVarType = cAlphaArgs(2);
             if (UtilityRoutines::SameString(ColdestSetPtMgr(SetPtMgrNum).CtrlVarType, "Temperature")) {
-                ColdestSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType_Temp;
+                ColdestSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType::Temp;
             } else {
                 // should not come here if idd type choice and key list is working
                 ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
@@ -2123,7 +2098,7 @@ namespace SetPointManager {
             WarmestSetPtMgrTempFlow(SetPtMgrNum).Name = cAlphaArgs(1);
             WarmestSetPtMgrTempFlow(SetPtMgrNum).CtrlVarType = cAlphaArgs(2);
             if (UtilityRoutines::SameString(WarmestSetPtMgrTempFlow(SetPtMgrNum).CtrlVarType, "Temperature")) {
-                WarmestSetPtMgrTempFlow(SetPtMgrNum).CtrlTypeMode = iCtrlVarType_Temp;
+                WarmestSetPtMgrTempFlow(SetPtMgrNum).CtrlTypeMode = iCtrlVarType::Temp;
             } else {
                 // should not come here if idd type choice and key list is working
                 ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
@@ -2157,7 +2132,7 @@ namespace SetPointManager {
                 } else {
                     ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
                     ShowContinueError(state, "..invalid " + cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) + "\".");
-                    ShowContinueError(state, "..Valid values are \"TemperatureFirst\" or \"FlowFirst\".");
+                    ShowContinueError(state, R"(..Valid values are "TemperatureFirst" or "FlowFirst".)");
                     ErrorsFound = true;
                 }
             }
@@ -2234,7 +2209,7 @@ namespace SetPointManager {
             NumNodesCtrld = 1;
 
             if (UtilityRoutines::SameString(RABFlowSetPtMgr(SetPtMgrNum).CtrlVarType, "Flow")) {
-                RABFlowSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType_MassFlow;
+                RABFlowSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType::MassFlow;
             } else {
                 // should not come here if idd type choice and key list is working
                 ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
@@ -2300,7 +2275,7 @@ namespace SetPointManager {
             MZAverageCoolingSetPtMgr(SetPtMgrNum).MinSetTemp = rNumericArgs(1);
             MZAverageCoolingSetPtMgr(SetPtMgrNum).MaxSetTemp = rNumericArgs(2);
             MZAverageCoolingSetPtMgr(SetPtMgrNum).CtrlVarType = "Temperature";
-            MZAverageCoolingSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType_Temp;
+            MZAverageCoolingSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType::Temp;
 
             if (MZAverageCoolingSetPtMgr(SetPtMgrNum).MaxSetTemp < MZAverageCoolingSetPtMgr(SetPtMgrNum).MinSetTemp) {
                 ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
@@ -2380,7 +2355,7 @@ namespace SetPointManager {
             MZAverageHeatingSetPtMgr(SetPtMgrNum).MinSetTemp = rNumericArgs(1);
             MZAverageHeatingSetPtMgr(SetPtMgrNum).MaxSetTemp = rNumericArgs(2);
             MZAverageHeatingSetPtMgr(SetPtMgrNum).CtrlVarType = "Temperature";
-            MZAverageHeatingSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType_Temp;
+            MZAverageHeatingSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType::Temp;
 
             if (MZAverageHeatingSetPtMgr(SetPtMgrNum).MaxSetTemp < MZAverageHeatingSetPtMgr(SetPtMgrNum).MinSetTemp) {
                 ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
@@ -2460,7 +2435,7 @@ namespace SetPointManager {
             MZAverageMinHumSetPtMgr(SetPtMgrNum).MinSetHum = rNumericArgs(1);
             MZAverageMinHumSetPtMgr(SetPtMgrNum).MaxSetHum = rNumericArgs(2);
             MZAverageMinHumSetPtMgr(SetPtMgrNum).CtrlVarType = "MinimumHumidityRatio";
-            MZAverageMinHumSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType_MinHumRat;
+            MZAverageMinHumSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType::MinHumRat;
 
             if (MZAverageMinHumSetPtMgr(SetPtMgrNum).MaxSetHum < MZAverageMinHumSetPtMgr(SetPtMgrNum).MinSetHum) {
                 ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
@@ -2541,7 +2516,7 @@ namespace SetPointManager {
             MZAverageMaxHumSetPtMgr(SetPtMgrNum).MinSetHum = rNumericArgs(1);
             MZAverageMaxHumSetPtMgr(SetPtMgrNum).MaxSetHum = rNumericArgs(2);
             MZAverageMaxHumSetPtMgr(SetPtMgrNum).CtrlVarType = "MaximumHumidityRatio";
-            MZAverageMaxHumSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType_MaxHumRat;
+            MZAverageMaxHumSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType::MaxHumRat;
 
             if (MZAverageMaxHumSetPtMgr(SetPtMgrNum).MaxSetHum < MZAverageMaxHumSetPtMgr(SetPtMgrNum).MinSetHum) {
                 ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
@@ -2622,7 +2597,7 @@ namespace SetPointManager {
             MZMinHumSetPtMgr(SetPtMgrNum).MinSetHum = rNumericArgs(1);
             MZMinHumSetPtMgr(SetPtMgrNum).MaxSetHum = rNumericArgs(2);
             MZMinHumSetPtMgr(SetPtMgrNum).CtrlVarType = "MinimumHumidityRatio";
-            MZMinHumSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType_MinHumRat;
+            MZMinHumSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType::MinHumRat;
 
             if (MZMinHumSetPtMgr(SetPtMgrNum).MaxSetHum < MZMinHumSetPtMgr(SetPtMgrNum).MinSetHum) {
                 ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
@@ -2703,7 +2678,7 @@ namespace SetPointManager {
             MZMaxHumSetPtMgr(SetPtMgrNum).MinSetHum = rNumericArgs(1);
             MZMaxHumSetPtMgr(SetPtMgrNum).MaxSetHum = rNumericArgs(2);
             MZMaxHumSetPtMgr(SetPtMgrNum).CtrlVarType = "MaximumHumidityRatio";
-            MZMaxHumSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType_MaxHumRat;
+            MZMaxHumSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType::MaxHumRat;
 
             if (MZMaxHumSetPtMgr(SetPtMgrNum).MaxSetHum < MZMaxHumSetPtMgr(SetPtMgrNum).MinSetHum) {
                 ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
@@ -2783,16 +2758,16 @@ namespace SetPointManager {
             FollowOATempSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
             FollowOATempSetPtMgr(SetPtMgrNum).CtrlVarType = cAlphaArgs(2);
             if (UtilityRoutines::SameString(FollowOATempSetPtMgr(SetPtMgrNum).CtrlVarType, "Temperature")) {
-                FollowOATempSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType_Temp;
+                FollowOATempSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType::Temp;
             } else if (UtilityRoutines::SameString(FollowOATempSetPtMgr(SetPtMgrNum).CtrlVarType, "MaximumTemperature")) {
-                FollowOATempSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType_MaxTemp;
+                FollowOATempSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType::MaxTemp;
             } else if (UtilityRoutines::SameString(FollowOATempSetPtMgr(SetPtMgrNum).CtrlVarType, "MinimumTemperature")) {
-                FollowOATempSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType_MinTemp;
+                FollowOATempSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType::MinTemp;
             } else {
                 // should not come here if idd type choice and key list is working
                 ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
                 ShowContinueError(state, "..invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
-                ShowContinueError(state, "..Valid values are \"Temperature\",\"MaximumTemperature\" or \"MinimumTemperature\".");
+                ShowContinueError(state, R"(..Valid values are "Temperature","MaximumTemperature" or "MinimumTemperature".)");
                 ErrorsFound = true;
             }
             FollowOATempSetPtMgr(SetPtMgrNum).RefTempType = cAlphaArgs(3);
@@ -2803,7 +2778,7 @@ namespace SetPointManager {
             } else {
                 ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
                 ShowContinueError(state, "..invalid " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
-                ShowContinueError(state, "..Valid values are \"OutdoorAirWetBulb\" or \"OutdoorAirDryBulb\".");
+                ShowContinueError(state, R"(..Valid values are "OutdoorAirWetBulb" or "OutdoorAirDryBulb".)");
                 ErrorsFound = true;
             }
             FollowOATempSetPtMgr(SetPtMgrNum).Offset = rNumericArgs(1);
@@ -2887,16 +2862,16 @@ namespace SetPointManager {
             FollowSysNodeTempSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
             FollowSysNodeTempSetPtMgr(SetPtMgrNum).CtrlVarType = cAlphaArgs(2);
             if (UtilityRoutines::SameString(FollowSysNodeTempSetPtMgr(SetPtMgrNum).CtrlVarType, "Temperature")) {
-                FollowSysNodeTempSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType_Temp;
+                FollowSysNodeTempSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType::Temp;
             } else if (UtilityRoutines::SameString(FollowSysNodeTempSetPtMgr(SetPtMgrNum).CtrlVarType, "MaximumTemperature")) {
-                FollowSysNodeTempSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType_MaxTemp;
+                FollowSysNodeTempSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType::MaxTemp;
             } else if (UtilityRoutines::SameString(FollowSysNodeTempSetPtMgr(SetPtMgrNum).CtrlVarType, "MinimumTemperature")) {
-                FollowSysNodeTempSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType_MinTemp;
+                FollowSysNodeTempSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType::MinTemp;
             } else {
                 // should not come here if idd type choice and key list is working
                 ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
                 ShowContinueError(state, "..invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
-                ShowContinueError(state, "..Valid values are \"Temperature\",\"MaximumTemperature\" or \"MinimumTemperature\".");
+                ShowContinueError(state, R"(..Valid values are "Temperature","MaximumTemperature" or "MinimumTemperature".)");
                 ErrorsFound = true;
             }
             FollowSysNodeTempSetPtMgr(SetPtMgrNum).RefNodeNum = GetOnlySingleNode(state,
@@ -2910,7 +2885,7 @@ namespace SetPointManager {
                 // should not come here if idd type choice and key list is working
                 ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
                 ShowContinueError(state, "..invalid " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
-                ShowContinueError(state, "..Valid values are \"NodeWetBulb\" or \"NodeDryBulb\".");
+                ShowContinueError(state, R"(..Valid values are "NodeWetBulb" or "NodeDryBulb".)");
                 ErrorsFound = true;
             }
             FollowSysNodeTempSetPtMgr(SetPtMgrNum).Offset = rNumericArgs(1);
@@ -2994,16 +2969,16 @@ namespace SetPointManager {
             GroundTempSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
             GroundTempSetPtMgr(SetPtMgrNum).CtrlVarType = cAlphaArgs(2);
             if (UtilityRoutines::SameString(GroundTempSetPtMgr(SetPtMgrNum).CtrlVarType, "Temperature")) {
-                GroundTempSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType_Temp;
+                GroundTempSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType::Temp;
             } else if (UtilityRoutines::SameString(GroundTempSetPtMgr(SetPtMgrNum).CtrlVarType, "MaximumTemperature")) {
-                GroundTempSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType_MaxTemp;
+                GroundTempSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType::MaxTemp;
             } else if (UtilityRoutines::SameString(GroundTempSetPtMgr(SetPtMgrNum).CtrlVarType, "MinimumTemperature")) {
-                GroundTempSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType_MinTemp;
+                GroundTempSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType::MinTemp;
             } else {
                 // should not come here if idd type choice and key list is working
                 ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
                 ShowContinueError(state, "..invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
-                ShowContinueError(state, "..Valid values are \"Temperature\",\"MaximumTemperature\" or \"MinimumTemperature\".");
+                ShowContinueError(state, R"(..Valid values are "Temperature","MaximumTemperature" or "MinimumTemperature".)");
                 ErrorsFound = true;
             }
             GroundTempSetPtMgr(SetPtMgrNum).RefGroundTempObjType = cAlphaArgs(3);
@@ -3012,7 +2987,7 @@ namespace SetPointManager {
                 if (NoSurfaceGroundTempObjWarning) {
                     if (!GroundTempObjInput) {
                         ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
-                                         "\" requires \"Site:GroundTemperature:BuildingSurface\" in the input.");
+                                         R"(" requires "Site:GroundTemperature:BuildingSurface" in the input.)");
                         ShowContinueError(state, "Defaults, constant throughout the year of (" + RoundSigDigits(GroundTemp, 1) + ") will be used.");
                     }
                     NoSurfaceGroundTempObjWarning = false;
@@ -3022,7 +2997,7 @@ namespace SetPointManager {
                 if (NoShallowGroundTempObjWarning) {
                     if (!GroundTemp_SurfaceObjInput) {
                         ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
-                                         "\" requires \"Site:GroundTemperature:Shallow\" in the input.");
+                                         R"(" requires "Site:GroundTemperature:Shallow" in the input.)");
                         ShowContinueError(state, "Defaults, constant throughout the year of (" + RoundSigDigits(GroundTemp_Surface, 1) + ") will be used.");
                     }
                     NoShallowGroundTempObjWarning = false;
@@ -3032,7 +3007,7 @@ namespace SetPointManager {
                 if (NoDeepGroundTempObjWarning) {
                     if (!GroundTemp_DeepObjInput) {
                         ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
-                                         "\" requires \"Site:GroundTemperature:Deep\" in the input.");
+                                         R"(" requires "Site:GroundTemperature:Deep" in the input.)");
                         ShowContinueError(state, "Defaults, constant throughout the year of (" + RoundSigDigits(GroundTemp_Deep, 1) + ") will be used.");
                     }
                     NoDeepGroundTempObjWarning = false;
@@ -3042,7 +3017,7 @@ namespace SetPointManager {
                 if (NoFCGroundTempObjWarning) {
                     if (!FCGroundTemps) {
                         ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
-                                         "\" requires \"Site:GroundTemperature:FCfactorMethod\" in the input.");
+                                         R"(" requires "Site:GroundTemperature:FCfactorMethod" in the input.)");
                         ShowContinueError(state, "Defaults, constant throughout the year of (" + RoundSigDigits(GroundTempFC, 1) + ") will be used.");
                     }
                     NoFCGroundTempObjWarning = false;
@@ -3051,8 +3026,8 @@ namespace SetPointManager {
                 // should not come here if idd type choice and key list is working
                 ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
                 ShowContinueError(state, "..invalid " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
-                ShowContinueError(state, "..Valid values are \"Site:GroundTemperature:BuildingSurface\", \"Site:GroundTemperature:Shallow\",");
-                ShowContinueError(state, "     \"Site:GroundTemperature:Deep\" or \"Site:GroundTemperature:FCfactorMethod\".");
+                ShowContinueError(state, R"(..Valid values are "Site:GroundTemperature:BuildingSurface", "Site:GroundTemperature:Shallow",)");
+                ShowContinueError(state, R"(     "Site:GroundTemperature:Deep" or "Site:GroundTemperature:FCfactorMethod".)");
                 ErrorsFound = true;
             }
             GroundTempSetPtMgr(SetPtMgrNum).Offset = rNumericArgs(1);
@@ -3152,7 +3127,7 @@ namespace SetPointManager {
             CondEntSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
             CondEntSetPtMgr(SetPtMgrNum).CtrlVarType = cAlphaArgs(2);
             if (UtilityRoutines::SameString(CondEntSetPtMgr(SetPtMgrNum).CtrlVarType, "Temperature")) {
-                CondEntSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType_Temp;
+                CondEntSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType::Temp;
             } else {
                 // should not come here if idd type choice and key list is working
                 ShowSevereError(state, " found invalid control type of " + cAlphaArgs(2) + " in " + cCurrentModuleObject + " = " + cAlphaArgs(1));
@@ -3247,7 +3222,7 @@ namespace SetPointManager {
             IdealCondEntSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
             IdealCondEntSetPtMgr(SetPtMgrNum).CtrlVarType = cAlphaArgs(2);
             if (UtilityRoutines::SameString(IdealCondEntSetPtMgr(SetPtMgrNum).CtrlVarType, "Temperature")) {
-                IdealCondEntSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType_Temp;
+                IdealCondEntSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType::Temp;
             } else {
                 ShowSevereError(state, " found invalid control type of " + cAlphaArgs(2) + " in " + cCurrentModuleObject + " = " + cAlphaArgs(1));
                 ErrorsFound = true;
@@ -3323,7 +3298,7 @@ namespace SetPointManager {
 
             SZOneStageCoolingSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
             SZOneStageCoolingSetPtMgr(SetPtMgrNum).CtrlVarType = "Temperature";
-            SZOneStageCoolingSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType_Temp;
+            SZOneStageCoolingSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType::Temp;
             SZOneStageCoolingSetPtMgr(SetPtMgrNum).CoolingOnTemp = rNumericArgs(1);
             SZOneStageCoolingSetPtMgr(SetPtMgrNum).CoolingOffTemp = rNumericArgs(2);
 
@@ -3418,7 +3393,7 @@ namespace SetPointManager {
 
             SZOneStageHeatingSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
             SZOneStageHeatingSetPtMgr(SetPtMgrNum).CtrlVarType = "Temperature";
-            SZOneStageHeatingSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType_Temp;
+            SZOneStageHeatingSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType::Temp;
             SZOneStageHeatingSetPtMgr(SetPtMgrNum).HeatingOnTemp = rNumericArgs(1);
             SZOneStageHeatingSetPtMgr(SetPtMgrNum).HeatingOffTemp = rNumericArgs(2);
 
@@ -3572,7 +3547,7 @@ namespace SetPointManager {
             AllSetPtMgr(AllSetPtMgrNum).Name = ReturnWaterResetChWSetPtMgr(SetPtMgrNum).Name;
             AllSetPtMgr(AllSetPtMgrNum).SPMType = iSPMType_ReturnWaterResetChW;
             AllSetPtMgr(AllSetPtMgrNum).SPMIndex = SetPtMgrNum;
-            AllSetPtMgr(AllSetPtMgrNum).CtrlTypeMode = iCtrlVarType_Temp;
+            AllSetPtMgr(AllSetPtMgrNum).CtrlTypeMode = iCtrlVarType::Temp;
             AllSetPtMgr(AllSetPtMgrNum).NumCtrlNodes = 1;
         }
 
@@ -3655,7 +3630,7 @@ namespace SetPointManager {
             AllSetPtMgr(AllSetPtMgrNum).Name = ReturnWaterResetHWSetPtMgr(SetPtMgrNum).Name;
             AllSetPtMgr(AllSetPtMgrNum).SPMType = iSPMType_ReturnWaterResetHW;
             AllSetPtMgr(AllSetPtMgrNum).SPMIndex = SetPtMgrNum;
-            AllSetPtMgr(AllSetPtMgrNum).CtrlTypeMode = iCtrlVarType_Temp;
+            AllSetPtMgr(AllSetPtMgrNum).CtrlTypeMode = iCtrlVarType::Temp;
             AllSetPtMgr(AllSetPtMgrNum).NumCtrlNodes = 1;
         }
 
@@ -3688,7 +3663,7 @@ namespace SetPointManager {
         // 2) Check for duplicate names in all other setpoint managers
         //    Verify setpoint managers use same control type (e.g. TEMP) and then check for duplicate nodes
         // SPM 1 - Control nodes A - D, SPM 2 - Control nodes E - H, SPM 3 - Control nodes I - L
-        // If SPM 1 has same control type as SPM 2 and SPM 3 (e.g. all use SPM%CtrlTypeMode = iCtrlVarType_Temp) then:
+        // If SPM 1 has same control type as SPM 2 and SPM 3 (e.g. all use SPM%CtrlTypeMode = iCtrlVarType::Temp) then:
         // Check A with E-H and I-L
         // Check B with E-H and I-L
         // Check C with E-H and I-L
@@ -3713,8 +3688,8 @@ namespace SetPointManager {
                 for (TempCtrldNodeNum = CtrldNodeNum + 1; TempCtrldNodeNum <= AllSetPtMgr(SetPtMgrNum).NumCtrlNodes; ++TempCtrldNodeNum) {
                     if (AllSetPtMgr(SetPtMgrNum).CtrlNodes(CtrldNodeNum) != AllSetPtMgr(SetPtMgrNum).CtrlNodes(TempCtrldNodeNum)) continue;
                     ShowWarningError(state, cValidSPMTypes(AllSetPtMgr(SetPtMgrNum).SPMType) + "=\"" + AllSetPtMgr(SetPtMgrNum).Name + "\"");
-                    ShowContinueError(state, "...duplicate node specified = " + NodeID(AllSetPtMgr(SetPtMgrNum).CtrlNodes(CtrldNodeNum)));
-                    ShowContinueError(state, "...control type variable    = " + cValidCtrlTypes(AllSetPtMgr(SetPtMgrNum).CtrlTypeMode));
+                    ShowContinueError(state, format("...duplicate node specified = {}", NodeID(AllSetPtMgr(SetPtMgrNum).CtrlNodes(CtrldNodeNum))));
+                    ShowContinueError(state, format("...control type variable    = {}", controlTypeName(AllSetPtMgr(SetPtMgrNum).CtrlTypeMode)));
                 }
             }
 
@@ -3754,7 +3729,7 @@ namespace SetPointManager {
                                 ShowContinueError(state, "...conflicting setpoint manager = " + cValidSPMTypes(AllSetPtMgr(TempSetPtMgrNum).SPMType) +
                                                   " \"" + AllSetPtMgr(TempSetPtMgrNum).Name + "\"");
                                 ShowContinueError(state, "...conflicting node name = " + NodeID(AllSetPtMgr(SetPtMgrNum).CtrlNodes(CtrldNodeNum)));
-                                ShowContinueError(state, "...control type variable = " + cValidCtrlTypes(AllSetPtMgr(SetPtMgrNum).CtrlTypeMode));
+                                ShowContinueError(state, format("...control type variable = {}", controlTypeName(AllSetPtMgr(SetPtMgrNum).CtrlTypeMode)));
                                 //            ErrorsFound=.TRUE.
                             }
                         }
@@ -3778,7 +3753,7 @@ namespace SetPointManager {
                                 ShowContinueError(state, "...conflicting setpoint manager =" + cValidSPMTypes(AllSetPtMgr(TempSetPtMgrNum).SPMType) + ":\"" +
                                                   AllSetPtMgr(TempSetPtMgrNum).Name + "\"");
                                 ShowContinueError(state, "...conflicting node name = " + NodeID(AllSetPtMgr(SetPtMgrNum).CtrlNodes(CtrldNodeNum)));
-                                ShowContinueError(state, "...control type variable = " + cValidCtrlTypes(AllSetPtMgr(SetPtMgrNum).CtrlTypeMode));
+                                ShowContinueError(state, format("...control type variable = {}", controlTypeName(AllSetPtMgr(SetPtMgrNum).CtrlTypeMode)));
                                 ShowContinueError(state,
                                     "...return air bypass flow setpoint manager will have priority setting mass flow rate on this node.");
                             } else { // severe error for other SP manager types
@@ -3787,7 +3762,7 @@ namespace SetPointManager {
                                 ShowContinueError(state, "...conflicting setpoint manager = " + cValidSPMTypes(AllSetPtMgr(TempSetPtMgrNum).SPMType) +
                                                   ":\"" + AllSetPtMgr(TempSetPtMgrNum).Name + "\"");
                                 ShowContinueError(state, "...conflicting node name = " + NodeID(AllSetPtMgr(SetPtMgrNum).CtrlNodes(CtrldNodeNum)));
-                                ShowContinueError(state, "...control type variable = " + cValidCtrlTypes(AllSetPtMgr(SetPtMgrNum).CtrlTypeMode));
+                                ShowContinueError(state, format("...control type variable = {}", controlTypeName(AllSetPtMgr(SetPtMgrNum).CtrlTypeMode)));
                                 //            ErrorsFound=.TRUE.
                             }
                         }
@@ -4659,23 +4634,23 @@ namespace SetPointManager {
                     // Initialize scheduled setpoints
                     {
                         auto const SELECT_CASE_var(SchSetPtMgr(SetPtMgrNum).CtrlTypeMode);
-                        if (SELECT_CASE_var == iCtrlVarType_Temp) {
+                        if (SELECT_CASE_var == iCtrlVarType::Temp) {
                             Node(NodeNum).TempSetPoint = GetCurrentScheduleValue(state, SchSetPtMgr(SetPtMgrNum).SchedPtr);
-                        } else if (SELECT_CASE_var == iCtrlVarType_MaxTemp) {
+                        } else if (SELECT_CASE_var == iCtrlVarType::MaxTemp) {
                             Node(NodeNum).TempSetPointHi = GetCurrentScheduleValue(state, SchSetPtMgr(SetPtMgrNum).SchedPtr);
-                        } else if (SELECT_CASE_var == iCtrlVarType_MinTemp) {
+                        } else if (SELECT_CASE_var == iCtrlVarType::MinTemp) {
                             Node(NodeNum).TempSetPointLo = GetCurrentScheduleValue(state, SchSetPtMgr(SetPtMgrNum).SchedPtr);
-                        } else if (SELECT_CASE_var == iCtrlVarType_HumRat) {
+                        } else if (SELECT_CASE_var == iCtrlVarType::HumRat) {
                             Node(NodeNum).HumRatSetPoint = GetCurrentScheduleValue(state, SchSetPtMgr(SetPtMgrNum).SchedPtr);
-                        } else if (SELECT_CASE_var == iCtrlVarType_MaxHumRat) {
+                        } else if (SELECT_CASE_var == iCtrlVarType::MaxHumRat) {
                             Node(NodeNum).HumRatMax = GetCurrentScheduleValue(state, SchSetPtMgr(SetPtMgrNum).SchedPtr);
-                        } else if (SELECT_CASE_var == iCtrlVarType_MinHumRat) {
+                        } else if (SELECT_CASE_var == iCtrlVarType::MinHumRat) {
                             Node(NodeNum).HumRatMin = GetCurrentScheduleValue(state, SchSetPtMgr(SetPtMgrNum).SchedPtr);
-                        } else if (SELECT_CASE_var == iCtrlVarType_MassFlow) {
+                        } else if (SELECT_CASE_var == iCtrlVarType::MassFlow) {
                             Node(NodeNum).MassFlowRateSetPoint = GetCurrentScheduleValue(state, SchSetPtMgr(SetPtMgrNum).SchedPtr);
-                        } else if (SELECT_CASE_var == iCtrlVarType_MaxMassFlow) {
+                        } else if (SELECT_CASE_var == iCtrlVarType::MaxMassFlow) {
                             Node(NodeNum).MassFlowRateMax = GetCurrentScheduleValue(state, SchSetPtMgr(SetPtMgrNum).SchedPtr);
-                        } else if (SELECT_CASE_var == iCtrlVarType_MinMassFlow) {
+                        } else if (SELECT_CASE_var == iCtrlVarType::MinMassFlow) {
                             Node(NodeNum).MassFlowRateMin = GetCurrentScheduleValue(state, SchSetPtMgr(SetPtMgrNum).SchedPtr);
                         }
                     }
@@ -4685,7 +4660,7 @@ namespace SetPointManager {
             for (SetPtMgrNum = 1; SetPtMgrNum <= NumDualSchSetPtMgrs; ++SetPtMgrNum) {
                 for (CtrlNodeIndex = 1; CtrlNodeIndex <= DualSchSetPtMgr(SetPtMgrNum).NumCtrlNodes; ++CtrlNodeIndex) {
                     NodeNum = DualSchSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex); // Get the node number
-                    if (DualSchSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_Temp) {
+                    if (DualSchSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::Temp) {
                         Node(NodeNum).TempSetPointHi = GetCurrentScheduleValue(state, DualSchSetPtMgr(SetPtMgrNum).SchedPtrHi);
                         Node(NodeNum).TempSetPointLo = GetCurrentScheduleValue(state, DualSchSetPtMgr(SetPtMgrNum).SchedPtrLo);
                         Node(NodeNum).TempSetPoint = (Node(NodeNum).TempSetPointHi + Node(NodeNum).TempSetPointLo) / 2.0;
@@ -4697,11 +4672,11 @@ namespace SetPointManager {
                 for (CtrlNodeIndex = 1; CtrlNodeIndex <= OutAirSetPtMgr(SetPtMgrNum).NumCtrlNodes; ++CtrlNodeIndex) {
                     OutAirSetPtMgr(SetPtMgrNum).calculate(state);
                     NodeNum = OutAirSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex); // Get the node number
-                    if (OutAirSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_Temp) {
+                    if (OutAirSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::Temp) {
                         Node(NodeNum).TempSetPoint = OutAirSetPtMgr(SetPtMgrNum).SetPt;
-                    } else if (OutAirSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_MaxTemp) {
+                    } else if (OutAirSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::MaxTemp) {
                         Node(NodeNum).TempSetPointHi = OutAirSetPtMgr(SetPtMgrNum).SetPt;
-                    } else if (OutAirSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_MinTemp) {
+                    } else if (OutAirSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::MinTemp) {
                         Node(NodeNum).TempSetPointLo = OutAirSetPtMgr(SetPtMgrNum).SetPt;
                     }
                 }
@@ -4736,7 +4711,7 @@ namespace SetPointManager {
                 Node(ZoneNode).MassFlowRate = 0.0;
                 for (CtrlNodeIndex = 1; CtrlNodeIndex <= SingZoneRhSetPtMgr(SetPtMgrNum).NumCtrlNodes; ++CtrlNodeIndex) {
                     NodeNum = SingZoneRhSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex); // Get the node number
-                    if (SingZoneRhSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_Temp) {
+                    if (SingZoneRhSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::Temp) {
                         Node(NodeNum).TempSetPoint = 20.0; // Set the setpoint
                     }
                 }
@@ -4749,7 +4724,7 @@ namespace SetPointManager {
                 Node(ZoneNode).MassFlowRate = 0.0;
                 for (CtrlNodeIndex = 1; CtrlNodeIndex <= SingZoneHtSetPtMgr(SetPtMgrNum).NumCtrlNodes; ++CtrlNodeIndex) {
                     NodeNum = SingZoneHtSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex); // Get the node number
-                    if (SingZoneHtSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_Temp) {
+                    if (SingZoneHtSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::Temp) {
                         Node(NodeNum).TempSetPoint = 20.0; // Set the setpoint
                     }
                 }
@@ -4762,7 +4737,7 @@ namespace SetPointManager {
                 Node(ZoneNode).MassFlowRate = 0.0;
                 for (CtrlNodeIndex = 1; CtrlNodeIndex <= SingZoneClSetPtMgr(SetPtMgrNum).NumCtrlNodes; ++CtrlNodeIndex) {
                     NodeNum = SingZoneClSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex); // Get the node number
-                    if (SingZoneClSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_Temp) {
+                    if (SingZoneClSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::Temp) {
                         Node(NodeNum).TempSetPoint = 20.0; // Set the setpoint
                     }
                 }
@@ -4790,7 +4765,7 @@ namespace SetPointManager {
                 Node(MixedAirSetPtMgr(SetPtMgrNum).FanOutNode).Enthalpy = PsyHFnTdbW(DataPrecisionGlobals::constant_twenty, OutHumRat);
                 for (CtrlNodeIndex = 1; CtrlNodeIndex <= MixedAirSetPtMgr(SetPtMgrNum).NumCtrlNodes; ++CtrlNodeIndex) {
                     NodeNum = MixedAirSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex); // Get the node number
-                    if (MixedAirSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_Temp) {
+                    if (MixedAirSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::Temp) {
                         Node(NodeNum).TempSetPoint = 20.0; // Set the setpoint
                     }
                 }
@@ -4824,16 +4799,16 @@ namespace SetPointManager {
                 Node(OAPretreatSetPtMgr(SetPtMgrNum).ReturnInNode).Enthalpy = PsyHFnTdbW(DataPrecisionGlobals::constant_twenty, OutHumRat);
                 for (CtrlNodeIndex = 1; CtrlNodeIndex <= OAPretreatSetPtMgr(SetPtMgrNum).NumCtrlNodes; ++CtrlNodeIndex) {
                     NodeNum = OAPretreatSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex); // Get the node number
-                    if (OAPretreatSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_Temp) {
+                    if (OAPretreatSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::Temp) {
                         Node(NodeNum).TempSetPoint = 20.0; // Set the setpoint
                     }
-                    if (OAPretreatSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_MaxHumRat) {
+                    if (OAPretreatSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::MaxHumRat) {
                         Node(NodeNum).HumRatMax = OutHumRat; // Set the setpoint
                     }
-                    if (OAPretreatSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_MinHumRat) {
+                    if (OAPretreatSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::MinHumRat) {
                         Node(NodeNum).HumRatMin = OutHumRat; // Set the setpoint
                     }
-                    if (OAPretreatSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_HumRat) {
+                    if (OAPretreatSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::HumRat) {
                         Node(NodeNum).HumRatSetPoint = OutHumRat; // Set the setpoint
                     }
                 }
@@ -4842,7 +4817,7 @@ namespace SetPointManager {
             for (SetPtMgrNum = 1; SetPtMgrNum <= NumWarmestSetPtMgrs; ++SetPtMgrNum) {
                 for (CtrlNodeIndex = 1; CtrlNodeIndex <= WarmestSetPtMgr(SetPtMgrNum).NumCtrlNodes; ++CtrlNodeIndex) {
                     NodeNum = WarmestSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex); // Get the node number
-                    if (WarmestSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_Temp) {
+                    if (WarmestSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::Temp) {
                         Node(NodeNum).TempSetPoint = 20.0; // Set the setpoint
                     }
                 }
@@ -4851,7 +4826,7 @@ namespace SetPointManager {
             for (SetPtMgrNum = 1; SetPtMgrNum <= NumColdestSetPtMgrs; ++SetPtMgrNum) {
                 for (CtrlNodeIndex = 1; CtrlNodeIndex <= ColdestSetPtMgr(SetPtMgrNum).NumCtrlNodes; ++CtrlNodeIndex) {
                     NodeNum = ColdestSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex); // Get the node number
-                    if (ColdestSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_Temp) {
+                    if (ColdestSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::Temp) {
                         Node(NodeNum).TempSetPoint = 20.0; // Set the setpoint
                     }
                 }
@@ -4860,7 +4835,7 @@ namespace SetPointManager {
             for (SetPtMgrNum = 1; SetPtMgrNum <= NumWarmestSetPtMgrsTempFlow; ++SetPtMgrNum) {
                 for (CtrlNodeIndex = 1; CtrlNodeIndex <= WarmestSetPtMgrTempFlow(SetPtMgrNum).NumCtrlNodes; ++CtrlNodeIndex) {
                     NodeNum = WarmestSetPtMgrTempFlow(SetPtMgrNum).CtrlNodes(CtrlNodeIndex); // Get the node number
-                    if (WarmestSetPtMgrTempFlow(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_Temp) {
+                    if (WarmestSetPtMgrTempFlow(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::Temp) {
                         Node(NodeNum).TempSetPoint = 20.0; // Set the temperature setpoint
                         if (WarmestSetPtMgrTempFlow(SetPtMgrNum).AirLoopNum != 0) {
                             state.dataAirLoop->AirLoopFlow(WarmestSetPtMgrTempFlow(SetPtMgrNum).AirLoopNum).ReqSupplyFrac = 1.0;           // PH 10/09/04 Set the flow
@@ -4873,7 +4848,7 @@ namespace SetPointManager {
             if (ZoneEquipInputsFilled && state.dataAirLoop->AirLoopInputsFilled) {
                 for (SetPtMgrNum = 1; SetPtMgrNum <= NumRABFlowSetPtMgrs; ++SetPtMgrNum) {
                     NodeNum = RABFlowSetPtMgr(SetPtMgrNum).RABSplitOutNode;
-                    if (RABFlowSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_MassFlow) {
+                    if (RABFlowSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::MassFlow) {
                         Node(NodeNum).MassFlowRateSetPoint = 0.0;
                     }
                 }
@@ -4882,7 +4857,7 @@ namespace SetPointManager {
             for (SetPtMgrNum = 1; SetPtMgrNum <= NumMZClgAverageSetPtMgrs; ++SetPtMgrNum) {
                 for (CtrlNodeIndex = 1; CtrlNodeIndex <= MZAverageCoolingSetPtMgr(SetPtMgrNum).NumCtrlNodes; ++CtrlNodeIndex) {
                     NodeNum = MZAverageCoolingSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex); // Get the node number
-                    if (MZAverageCoolingSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_Temp) {
+                    if (MZAverageCoolingSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::Temp) {
                         Node(NodeNum).TempSetPoint = 20.0; // Set the setpoint
                     }
                 }
@@ -4891,7 +4866,7 @@ namespace SetPointManager {
             for (SetPtMgrNum = 1; SetPtMgrNum <= NumMZHtgAverageSetPtMgrs; ++SetPtMgrNum) {
                 for (CtrlNodeIndex = 1; CtrlNodeIndex <= MZAverageHeatingSetPtMgr(SetPtMgrNum).NumCtrlNodes; ++CtrlNodeIndex) {
                     NodeNum = MZAverageHeatingSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex); // Get the node number
-                    if (MZAverageHeatingSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_Temp) {
+                    if (MZAverageHeatingSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::Temp) {
                         Node(NodeNum).TempSetPoint = 20.0; // Set the setpoint
                     }
                 }
@@ -4929,19 +4904,19 @@ namespace SetPointManager {
                 for (CtrlNodeIndex = 1; CtrlNodeIndex <= FollowOATempSetPtMgr(SetPtMgrNum).NumCtrlNodes; ++CtrlNodeIndex) {
                     NodeNum = FollowOATempSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex); // Get the node number
                     if (FollowOATempSetPtMgr(SetPtMgrNum).RefTypeMode == iRefTempType_WetBulb) {
-                        if (FollowOATempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_Temp) {
+                        if (FollowOATempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::Temp) {
                             Node(NodeNum).TempSetPoint = OutWetBulbTemp; // Set the setpoint
-                        } else if (FollowOATempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_MaxTemp) {
+                        } else if (FollowOATempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::MaxTemp) {
                             Node(NodeNum).TempSetPointHi = OutWetBulbTemp; // Set the setpoint
-                        } else if (FollowOATempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_MinTemp) {
+                        } else if (FollowOATempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::MinTemp) {
                             Node(NodeNum).TempSetPointLo = OutWetBulbTemp; // Set the setpoint
                         }
                     } else if (FollowOATempSetPtMgr(SetPtMgrNum).RefTypeMode == iRefTempType_DryBulb) {
-                        if (FollowOATempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_Temp) {
+                        if (FollowOATempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::Temp) {
                             Node(NodeNum).TempSetPoint = OutDryBulbTemp; // Set the setpoint
-                        } else if (FollowOATempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_MaxTemp) {
+                        } else if (FollowOATempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::MaxTemp) {
                             Node(NodeNum).TempSetPointHi = OutDryBulbTemp; // Set the setpoint
-                        } else if (FollowOATempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_MinTemp) {
+                        } else if (FollowOATempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::MinTemp) {
                             Node(NodeNum).TempSetPointLo = OutDryBulbTemp; // Set the setpoint
                         }
                     }
@@ -4954,19 +4929,19 @@ namespace SetPointManager {
                     if (CheckOutAirNodeNumber(state, FollowSysNodeTempSetPtMgr(SetPtMgrNum).RefNodeNum)) {
                         if (FollowSysNodeTempSetPtMgr(SetPtMgrNum).RefTypeMode == iRefTempType_WetBulb) {
                             Node(FollowSysNodeTempSetPtMgr(SetPtMgrNum).RefNodeNum).SPMNodeWetBulbRepReq = true;
-                            if (FollowSysNodeTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_Temp) {
+                            if (FollowSysNodeTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::Temp) {
                                 Node(NodeNum).TempSetPoint = OutWetBulbTemp; // Set the setpoint
-                            } else if (FollowSysNodeTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_MaxTemp) {
+                            } else if (FollowSysNodeTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::MaxTemp) {
                                 Node(NodeNum).TempSetPointHi = OutWetBulbTemp; // Set the setpoint
-                            } else if (FollowSysNodeTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_MinTemp) {
+                            } else if (FollowSysNodeTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::MinTemp) {
                                 Node(NodeNum).TempSetPointLo = OutWetBulbTemp; // Set the setpoint
                             }
                         } else if (FollowSysNodeTempSetPtMgr(SetPtMgrNum).RefTypeMode == iRefTempType_DryBulb) {
-                            if (FollowSysNodeTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_Temp) {
+                            if (FollowSysNodeTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::Temp) {
                                 Node(NodeNum).TempSetPoint = OutDryBulbTemp; // Set the setpoint
-                            } else if (FollowSysNodeTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_MaxTemp) {
+                            } else if (FollowSysNodeTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::MaxTemp) {
                                 Node(NodeNum).TempSetPointHi = OutDryBulbTemp; // Set the setpoint
-                            } else if (FollowSysNodeTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_MinTemp) {
+                            } else if (FollowSysNodeTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::MinTemp) {
                                 Node(NodeNum).TempSetPointLo = OutDryBulbTemp; // Set the setpoint
                             }
                         }
@@ -4979,11 +4954,11 @@ namespace SetPointManager {
                                 Node(FollowSysNodeTempSetPtMgr(SetPtMgrNum).RefNodeNum).SPMNodeWetBulbRepReq = true;
                             }
                         }
-                        if (FollowSysNodeTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_Temp) {
+                        if (FollowSysNodeTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::Temp) {
                             Node(NodeNum).TempSetPoint = 20.0; // Set the setpoint
-                        } else if (FollowSysNodeTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_MaxTemp) {
+                        } else if (FollowSysNodeTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::MaxTemp) {
                             Node(NodeNum).TempSetPointHi = 20.0; // Set the setpoint
-                        } else if (FollowSysNodeTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_MinTemp) {
+                        } else if (FollowSysNodeTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::MinTemp) {
                             Node(NodeNum).TempSetPointLo = 20.0; // Set the setpoint
                         }
                     }
@@ -4994,35 +4969,35 @@ namespace SetPointManager {
                 for (CtrlNodeIndex = 1; CtrlNodeIndex <= GroundTempSetPtMgr(SetPtMgrNum).NumCtrlNodes; ++CtrlNodeIndex) {
                     NodeNum = GroundTempSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex); // Get the node number
                     if (GroundTempSetPtMgr(SetPtMgrNum).RefTypeMode == iRefGroundTempObjType_BuildingSurface) {
-                        if (GroundTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_Temp) {
+                        if (GroundTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::Temp) {
                             Node(NodeNum).TempSetPoint = GroundTemp; // Set the setpoint
-                        } else if (GroundTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_MaxTemp) {
+                        } else if (GroundTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::MaxTemp) {
                             Node(NodeNum).TempSetPointHi = GroundTemp; // Set the setpoint
-                        } else if (GroundTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_MinTemp) {
+                        } else if (GroundTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::MinTemp) {
                             Node(NodeNum).TempSetPointLo = GroundTemp; // Set the setpoint
                         }
                     } else if (GroundTempSetPtMgr(SetPtMgrNum).RefTypeMode == iRefGroundTempObjType_Shallow) {
-                        if (GroundTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_Temp) {
+                        if (GroundTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::Temp) {
                             Node(NodeNum).TempSetPoint = GroundTemp_Surface; // Set the setpoint
-                        } else if (GroundTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_MaxTemp) {
+                        } else if (GroundTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::MaxTemp) {
                             Node(NodeNum).TempSetPointHi = GroundTemp_Surface; // Set the setpoint
-                        } else if (GroundTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_MinTemp) {
+                        } else if (GroundTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::MinTemp) {
                             Node(NodeNum).TempSetPointLo = GroundTemp_Surface; // Set the setpoint
                         }
                     } else if (GroundTempSetPtMgr(SetPtMgrNum).RefTypeMode == iRefGroundTempObjType_Deep) {
-                        if (GroundTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_Temp) {
+                        if (GroundTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::Temp) {
                             Node(NodeNum).TempSetPoint = GroundTemp_Deep; // Set the setpoint
-                        } else if (GroundTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_MaxTemp) {
+                        } else if (GroundTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::MaxTemp) {
                             Node(NodeNum).TempSetPointHi = GroundTemp_Deep; // Set the setpoint
-                        } else if (GroundTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_MinTemp) {
+                        } else if (GroundTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::MinTemp) {
                             Node(NodeNum).TempSetPointLo = GroundTemp_Deep; // Set the setpoint
                         }
                     } else if (GroundTempSetPtMgr(SetPtMgrNum).RefTypeMode == iRefGroundTempObjType_FCfactorMethod) {
-                        if (GroundTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_Temp) {
+                        if (GroundTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::Temp) {
                             Node(NodeNum).TempSetPoint = GroundTempFC; // Set the setpoint
-                        } else if (GroundTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_MaxTemp) {
+                        } else if (GroundTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::MaxTemp) {
                             Node(NodeNum).TempSetPointHi = GroundTempFC; // Set the setpoint
-                        } else if (GroundTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_MinTemp) {
+                        } else if (GroundTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::MinTemp) {
                             Node(NodeNum).TempSetPointLo = GroundTempFC; // Set the setpoint
                         }
                     }
@@ -5032,7 +5007,7 @@ namespace SetPointManager {
             for (SetPtMgrNum = 1; SetPtMgrNum <= NumCondEntSetPtMgrs; ++SetPtMgrNum) { // Condenser entering water Set point managers
                 for (CtrlNodeIndex = 1; CtrlNodeIndex <= CondEntSetPtMgr(SetPtMgrNum).NumCtrlNodes; ++CtrlNodeIndex) {
                     NodeNum = CondEntSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex); // Get the node number
-                    if (CondEntSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_Temp) {
+                    if (CondEntSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::Temp) {
                         Node(NodeNum).TempSetPoint = GetCurrentScheduleValue(state, CondEntSetPtMgr(SetPtMgrNum).CondEntTempSchedPtr);
                     }
                 }
@@ -5041,7 +5016,7 @@ namespace SetPointManager {
             for (SetPtMgrNum = 1; SetPtMgrNum <= NumIdealCondEntSetPtMgrs; ++SetPtMgrNum) { // Ideal Condenser entering water Set point managers
                 for (CtrlNodeIndex = 1; CtrlNodeIndex <= IdealCondEntSetPtMgr(SetPtMgrNum).NumCtrlNodes; ++CtrlNodeIndex) {
                     NodeNum = IdealCondEntSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex); // Get the node number
-                    if (IdealCondEntSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_Temp) {
+                    if (IdealCondEntSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::Temp) {
                         Node(NodeNum).TempSetPoint = IdealCondEntSetPtMgr(SetPtMgrNum).MaxCondEntTemp;
                     }
                 }
@@ -5050,7 +5025,7 @@ namespace SetPointManager {
             for (SetPtMgrNum = 1; SetPtMgrNum <= NumSZOneStageCoolingSetPtMgrs; ++SetPtMgrNum) {
                 for (CtrlNodeIndex = 1; CtrlNodeIndex <= SZOneStageCoolingSetPtMgr(SetPtMgrNum).NumCtrlNodes; ++CtrlNodeIndex) {
                     NodeNum = SZOneStageCoolingSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex); // Get the node number
-                    if (SZOneStageCoolingSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_Temp) {
+                    if (SZOneStageCoolingSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::Temp) {
                         Node(NodeNum).TempSetPoint = SZOneStageCoolingSetPtMgr(SetPtMgrNum).CoolingOffTemp;
                     }
                 }
@@ -5059,7 +5034,7 @@ namespace SetPointManager {
             for (SetPtMgrNum = 1; SetPtMgrNum <= NumSZOneStageHeatingSetPtMgrs; ++SetPtMgrNum) {
                 for (CtrlNodeIndex = 1; CtrlNodeIndex <= SZOneStageHeatingSetPtMgr(SetPtMgrNum).NumCtrlNodes; ++CtrlNodeIndex) {
                     NodeNum = SZOneStageHeatingSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex); // Get the node number
-                    if (SZOneStageHeatingSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_Temp) {
+                    if (SZOneStageHeatingSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::Temp) {
                         Node(NodeNum).TempSetPoint = SZOneStageHeatingSetPtMgr(SetPtMgrNum).HeatingOffTemp;
                     }
                 }
@@ -6081,24 +6056,24 @@ namespace SetPointManager {
 
         {
             auto const SELECT_CASE_var(this->CtrlTypeMode);
-            if (SELECT_CASE_var == iCtrlVarType_Temp) { // 'Temperature'
+            if (SELECT_CASE_var == iCtrlVarType::Temp) { // 'Temperature'
                 RefNodeSetPoint = Node(RefNode).TempSetPoint;
                 ReturnInValue = Node(ReturnInNode).Temp;
                 MinSetPoint = this->MinSetTemp;
                 MaxSetPoint = this->MaxSetTemp;
-            } else if (SELECT_CASE_var == iCtrlVarType_MaxHumRat) { // 'HUMRATMAX'
+            } else if (SELECT_CASE_var == iCtrlVarType::MaxHumRat) { // 'HUMRATMAX'
                 RefNodeSetPoint = Node(RefNode).HumRatMax;
                 ReturnInValue = Node(ReturnInNode).HumRat;
                 MinSetPoint = this->MinSetHumRat;
                 MaxSetPoint = this->MaxSetHumRat;
                 HumiditySetPoint = true;
-            } else if (SELECT_CASE_var == iCtrlVarType_MinHumRat) { // 'HUMRATMIN'
+            } else if (SELECT_CASE_var == iCtrlVarType::MinHumRat) { // 'HUMRATMIN'
                 RefNodeSetPoint = Node(RefNode).HumRatMin;
                 ReturnInValue = Node(ReturnInNode).HumRat;
                 MinSetPoint = this->MinSetHumRat;
                 MaxSetPoint = this->MaxSetHumRat;
                 HumiditySetPoint = true;
-            } else if (SELECT_CASE_var == iCtrlVarType_HumRat) { // 'HumidityRatio'
+            } else if (SELECT_CASE_var == iCtrlVarType::HumRat) { // 'HumidityRatio'
                 RefNodeSetPoint = Node(RefNode).HumRatSetPoint;
                 ReturnInValue = Node(ReturnInNode).HumRat;
                 MinSetPoint = this->MinSetHumRat;
@@ -6119,13 +6094,13 @@ namespace SetPointManager {
                     bool LocalSetPointCheckFailed = false;
                     {
                         auto const SELECT_CASE_var(this->CtrlTypeMode);
-                        if (SELECT_CASE_var == iCtrlVarType_Temp) { // 'Temperature'
+                        if (SELECT_CASE_var == iCtrlVarType::Temp) { // 'Temperature'
                             CheckIfNodeSetPointManagedByEMS(state, RefNode, iTemperatureSetPoint, LocalSetPointCheckFailed);
-                        } else if (SELECT_CASE_var == iCtrlVarType_MaxHumRat) { // 'HUMRATMAX'
+                        } else if (SELECT_CASE_var == iCtrlVarType::MaxHumRat) { // 'HUMRATMAX'
                             CheckIfNodeSetPointManagedByEMS(state, RefNode, iHumidityRatioMaxSetPoint, LocalSetPointCheckFailed);
-                        } else if (SELECT_CASE_var == iCtrlVarType_MinHumRat) { // 'HUMRATMIN'
+                        } else if (SELECT_CASE_var == iCtrlVarType::MinHumRat) { // 'HUMRATMIN'
                             CheckIfNodeSetPointManagedByEMS(state, RefNode, iHumidityRatioMinSetPoint, LocalSetPointCheckFailed);
-                        } else if (SELECT_CASE_var == iCtrlVarType_HumRat) { // 'HumidityRatio'
+                        } else if (SELECT_CASE_var == iCtrlVarType::HumRat) { // 'HumidityRatio'
                             CheckIfNodeSetPointManagedByEMS(state, RefNode, iHumidityRatioSetPoint, LocalSetPointCheckFailed);
                         }
                     }
@@ -7543,7 +7518,7 @@ namespace SetPointManager {
                                                                   Real64 &CondTempLimit,
                                                                   bool &RunOptCondEntTemp,
                                                                   bool &RunSubOptCondEntTemp,
-                                                                  bool &RunFinalOptCondEntTemp)
+                                                                  bool &RunFinalOptCondEntTemp) const
     {
         Real64 DeltaTotEnergy;
         if (TotEnergyPre != 0.0) {
@@ -8029,23 +8004,23 @@ namespace SetPointManager {
                 {
                     auto const SELECT_CASE_var(SchSetPtMgr(SetPtMgrNum).CtrlTypeMode);
                     // set the setpoint depending on the type of variable being controlled
-                    if (SELECT_CASE_var == iCtrlVarType_Temp) {
+                    if (SELECT_CASE_var == iCtrlVarType::Temp) {
                         Node(NodeNum).TempSetPoint = SchSetPtMgr(SetPtMgrNum).SetPt;
-                    } else if (SELECT_CASE_var == iCtrlVarType_MaxTemp) {
+                    } else if (SELECT_CASE_var == iCtrlVarType::MaxTemp) {
                         Node(NodeNum).TempSetPointHi = SchSetPtMgr(SetPtMgrNum).SetPt;
-                    } else if (SELECT_CASE_var == iCtrlVarType_MinTemp) {
+                    } else if (SELECT_CASE_var == iCtrlVarType::MinTemp) {
                         Node(NodeNum).TempSetPointLo = SchSetPtMgr(SetPtMgrNum).SetPt;
-                    } else if (SELECT_CASE_var == iCtrlVarType_HumRat) {
+                    } else if (SELECT_CASE_var == iCtrlVarType::HumRat) {
                         Node(NodeNum).HumRatSetPoint = SchSetPtMgr(SetPtMgrNum).SetPt;
-                    } else if (SELECT_CASE_var == iCtrlVarType_MaxHumRat) {
+                    } else if (SELECT_CASE_var == iCtrlVarType::MaxHumRat) {
                         Node(NodeNum).HumRatMax = SchSetPtMgr(SetPtMgrNum).SetPt;
-                    } else if (SELECT_CASE_var == iCtrlVarType_MinHumRat) {
+                    } else if (SELECT_CASE_var == iCtrlVarType::MinHumRat) {
                         Node(NodeNum).HumRatMin = SchSetPtMgr(SetPtMgrNum).SetPt;
-                    } else if (SELECT_CASE_var == iCtrlVarType_MassFlow) {
+                    } else if (SELECT_CASE_var == iCtrlVarType::MassFlow) {
                         Node(NodeNum).MassFlowRateSetPoint = SchSetPtMgr(SetPtMgrNum).SetPt;
-                    } else if (SELECT_CASE_var == iCtrlVarType_MaxMassFlow) {
+                    } else if (SELECT_CASE_var == iCtrlVarType::MaxMassFlow) {
                         Node(NodeNum).MassFlowRateMax = SchSetPtMgr(SetPtMgrNum).SetPt;
-                    } else if (SELECT_CASE_var == iCtrlVarType_MinMassFlow) {
+                    } else if (SELECT_CASE_var == iCtrlVarType::MinMassFlow) {
                         Node(NodeNum).MassFlowRateMin = SchSetPtMgr(SetPtMgrNum).SetPt;
                     }
                 }
@@ -8073,7 +8048,7 @@ namespace SetPointManager {
                 // setpoints from this setpoint manager
                 NodeNum = DualSchSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex); // Get the node number
 
-                if (DualSchSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_Temp) {
+                if (DualSchSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::Temp) {
                     Node(NodeNum).TempSetPointHi = DualSchSetPtMgr(SetPtMgrNum).SetPtHi;                              // Set the setpoint High
                     Node(NodeNum).TempSetPointLo = DualSchSetPtMgr(SetPtMgrNum).SetPtLo;                              // Set the setpoint Low
                     Node(NodeNum).TempSetPoint = (Node(NodeNum).TempSetPointHi + Node(NodeNum).TempSetPointLo) / 2.0; // average of the high and low
@@ -8089,11 +8064,11 @@ namespace SetPointManager {
                  ++CtrlNodeIndex) { // Loop over the list of nodes wanting
                 // setpoints from this setpoint manager
                 NodeNum = OutAirSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex); // Get the node number
-                if (OutAirSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_Temp) {
+                if (OutAirSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::Temp) {
                     Node(NodeNum).TempSetPoint = OutAirSetPtMgr(SetPtMgrNum).SetPt; // Set the setpoint
-                } else if (OutAirSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_MaxTemp) {
+                } else if (OutAirSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::MaxTemp) {
                     Node(NodeNum).TempSetPointHi = OutAirSetPtMgr(SetPtMgrNum).SetPt; // Set the high temperature setpoint
-                } else if (OutAirSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_MinTemp) {
+                } else if (OutAirSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::MinTemp) {
                     Node(NodeNum).TempSetPointLo = OutAirSetPtMgr(SetPtMgrNum).SetPt; // Set the low temperature setpoint
                 }
             }
@@ -8108,7 +8083,7 @@ namespace SetPointManager {
                 // setpoints from this setpoint manager
                 NodeNum = SingZoneRhSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex); // Get the node number
 
-                if (SingZoneRhSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_Temp) {
+                if (SingZoneRhSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::Temp) {
                     Node(NodeNum).TempSetPoint = SingZoneRhSetPtMgr(SetPtMgrNum).SetPt; // Set the setpoint
                 }
             }
@@ -8123,7 +8098,7 @@ namespace SetPointManager {
                 // setpoints from this setpoint manager
                 NodeNum = SingZoneHtSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex); // Get the node number
 
-                if (SingZoneHtSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_Temp) {
+                if (SingZoneHtSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::Temp) {
                     Node(NodeNum).TempSetPoint = SingZoneHtSetPtMgr(SetPtMgrNum).SetPt; // Set the setpoint
                 }
             }
@@ -8138,7 +8113,7 @@ namespace SetPointManager {
                 // setpoints from this setpoint manager
                 NodeNum = SingZoneClSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex); // Get the node number
 
-                if (SingZoneClSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_Temp) {
+                if (SingZoneClSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::Temp) {
                     Node(NodeNum).TempSetPoint = SingZoneClSetPtMgr(SetPtMgrNum).SetPt; // Set the setpoint
                 }
             }
@@ -8179,7 +8154,7 @@ namespace SetPointManager {
                 // setpoints from this setpoint manager
                 NodeNum = WarmestSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex); // Get the node number
 
-                if (WarmestSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_Temp) {
+                if (WarmestSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::Temp) {
                     Node(NodeNum).TempSetPoint = WarmestSetPtMgr(SetPtMgrNum).SetPt; // Set the setpoint
                 }
             }
@@ -8194,7 +8169,7 @@ namespace SetPointManager {
                 // setpoints from this setpoint manager
                 NodeNum = ColdestSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex); // Get the node number
 
-                if (ColdestSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_Temp) {
+                if (ColdestSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::Temp) {
                     Node(NodeNum).TempSetPoint = ColdestSetPtMgr(SetPtMgrNum).SetPt; // Set the setpoint
                 }
             }
@@ -8209,7 +8184,7 @@ namespace SetPointManager {
                 // setpoints from this setpoint manager
                 NodeNum = WarmestSetPtMgrTempFlow(SetPtMgrNum).CtrlNodes(CtrlNodeIndex); // Get the node number
 
-                if (WarmestSetPtMgrTempFlow(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_Temp) {
+                if (WarmestSetPtMgrTempFlow(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::Temp) {
                     Node(NodeNum).TempSetPoint = WarmestSetPtMgrTempFlow(SetPtMgrNum).SetPt; // Set the supply air temperature setpoint
                     state.dataAirLoop->AirLoopFlow(WarmestSetPtMgrTempFlow(SetPtMgrNum).AirLoopNum).ReqSupplyFrac =
                         WarmestSetPtMgrTempFlow(SetPtMgrNum).Turndown;                                          // Set the supply air flow rate
@@ -8222,7 +8197,7 @@ namespace SetPointManager {
 
             NodeNum = RABFlowSetPtMgr(SetPtMgrNum).RABSplitOutNode; // Get the node number
 
-            if (RABFlowSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_MassFlow) {
+            if (RABFlowSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::MassFlow) {
                 Node(NodeNum).MassFlowRateSetPoint = RABFlowSetPtMgr(SetPtMgrNum).FlowSetPt; // Set the flow setpoint
             }
         }
@@ -8233,7 +8208,7 @@ namespace SetPointManager {
                  ++CtrlNodeIndex) { // Loop over the list of nodes wanting
                 //  setpoints from this setpoint manager
                 NodeNum = MZAverageCoolingSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex); // Get the node number
-                if (MZAverageCoolingSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_Temp) {
+                if (MZAverageCoolingSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::Temp) {
                     Node(NodeNum).TempSetPoint = MZAverageCoolingSetPtMgr(SetPtMgrNum).SetPt; // Set the temperature setpoint
                 }
             }
@@ -8245,7 +8220,7 @@ namespace SetPointManager {
                  ++CtrlNodeIndex) { // Loop over the list of nodes wanting
                 //  setpoints from this setpoint manager
                 NodeNum = MZAverageHeatingSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex); // Get the node number
-                if (MZAverageHeatingSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_Temp) {
+                if (MZAverageHeatingSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::Temp) {
                     Node(NodeNum).TempSetPoint = MZAverageHeatingSetPtMgr(SetPtMgrNum).SetPt; // Set the temperature setpoint
                 }
             }
@@ -8257,7 +8232,7 @@ namespace SetPointManager {
                  ++CtrlNodeIndex) { // Loop over the list of nodes wanting
                 //  setpoints from this setpoint manager
                 NodeNum = MZAverageMinHumSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex); // Get the node number
-                if (MZAverageMinHumSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_MinHumRat) {
+                if (MZAverageMinHumSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::MinHumRat) {
                     Node(NodeNum).HumRatMin = MZAverageMinHumSetPtMgr(SetPtMgrNum).SetPt; // Set the humidity ratio setpoint
                 }
             }
@@ -8269,7 +8244,7 @@ namespace SetPointManager {
                  ++CtrlNodeIndex) { // Loop over the list of nodes wanting
                 //  setpoints from this setpoint manager
                 NodeNum = MZAverageMaxHumSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex); // Get the node number
-                if (MZAverageMaxHumSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_MaxHumRat) {
+                if (MZAverageMaxHumSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::MaxHumRat) {
                     Node(NodeNum).HumRatMax = MZAverageMaxHumSetPtMgr(SetPtMgrNum).SetPt; // Set the humidity ratio setpoint
                 }
             }
@@ -8281,7 +8256,7 @@ namespace SetPointManager {
                  ++CtrlNodeIndex) { // Loop over the list of nodes wanting
                 //  setpoints from this setpoint manager
                 NodeNum = MZMinHumSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex); // Get the node number
-                if (MZMinHumSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_MinHumRat) {
+                if (MZMinHumSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::MinHumRat) {
                     Node(NodeNum).HumRatMin = MZMinHumSetPtMgr(SetPtMgrNum).SetPt; // Set the humidity ratio setpoint
                 }
             }
@@ -8293,7 +8268,7 @@ namespace SetPointManager {
                  ++CtrlNodeIndex) { // Loop over the list of nodes wanting
                 //  setpoints from this setpoint manager
                 NodeNum = MZMaxHumSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex); // Get the node number
-                if (MZMaxHumSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_MaxHumRat) {
+                if (MZMaxHumSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::MaxHumRat) {
                     Node(NodeNum).HumRatMax = MZMaxHumSetPtMgr(SetPtMgrNum).SetPt; // Set the humidity ratio setpoint
                 }
             }
@@ -8305,11 +8280,11 @@ namespace SetPointManager {
                  ++CtrlNodeIndex) { // Loop over the list of nodes wanting
                 //  setpoints from this setpoint manager
                 NodeNum = FollowOATempSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex); // Get the node number
-                if (FollowOATempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_Temp) {
+                if (FollowOATempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::Temp) {
                     Node(NodeNum).TempSetPoint = FollowOATempSetPtMgr(SetPtMgrNum).SetPt; // Set the temperature setpoint
-                } else if (FollowOATempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_MaxTemp) {
+                } else if (FollowOATempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::MaxTemp) {
                     Node(NodeNum).TempSetPointHi = FollowOATempSetPtMgr(SetPtMgrNum).SetPt; // Set the temperature setpoint
-                } else if (FollowOATempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_MinTemp) {
+                } else if (FollowOATempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::MinTemp) {
                     Node(NodeNum).TempSetPointLo = FollowOATempSetPtMgr(SetPtMgrNum).SetPt; // Set the temperature setpoint
                 }
             }
@@ -8321,11 +8296,11 @@ namespace SetPointManager {
                  ++CtrlNodeIndex) { // Loop over the list of nodes wanting
                 //  setpoints from this setpoint manager
                 NodeNum = FollowSysNodeTempSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex); // Get the node number
-                if (FollowSysNodeTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_Temp) {
+                if (FollowSysNodeTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::Temp) {
                     Node(NodeNum).TempSetPoint = FollowSysNodeTempSetPtMgr(SetPtMgrNum).SetPt; // Set the temperature setpoint
-                } else if (FollowSysNodeTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_MaxTemp) {
+                } else if (FollowSysNodeTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::MaxTemp) {
                     Node(NodeNum).TempSetPointHi = FollowSysNodeTempSetPtMgr(SetPtMgrNum).SetPt; // Set the temperature setpoint
-                } else if (FollowSysNodeTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_MinTemp) {
+                } else if (FollowSysNodeTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::MinTemp) {
                     Node(NodeNum).TempSetPointLo = FollowSysNodeTempSetPtMgr(SetPtMgrNum).SetPt; // Set the temperature setpoint
                 }
             }
@@ -8337,11 +8312,11 @@ namespace SetPointManager {
                  ++CtrlNodeIndex) { // Loop over the list of nodes wanting
                 //  setpoints from this setpoint manager
                 NodeNum = GroundTempSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex); // Get the node number
-                if (GroundTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_Temp) {
+                if (GroundTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::Temp) {
                     Node(NodeNum).TempSetPoint = GroundTempSetPtMgr(SetPtMgrNum).SetPt; // Set the temperature setpoint
-                } else if (GroundTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_MaxTemp) {
+                } else if (GroundTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::MaxTemp) {
                     Node(NodeNum).TempSetPointHi = GroundTempSetPtMgr(SetPtMgrNum).SetPt; // Set the temperature setpoint
-                } else if (GroundTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_MinTemp) {
+                } else if (GroundTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::MinTemp) {
                     Node(NodeNum).TempSetPointLo = GroundTempSetPtMgr(SetPtMgrNum).SetPt; // Set the temperature setpoint
                 }
             }
@@ -8354,7 +8329,7 @@ namespace SetPointManager {
                  ++CtrlNodeIndex) { // Loop over the list of nodes wanting
                 //  set points from this set point manager
                 NodeNum = CondEntSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex); // Get the node number
-                if (CondEntSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_Temp) {
+                if (CondEntSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::Temp) {
                     Node(NodeNum).TempSetPoint = CondEntSetPtMgr(SetPtMgrNum).SetPt; // Set the temperature setpoint
                 }
             }
@@ -8367,7 +8342,7 @@ namespace SetPointManager {
                  ++CtrlNodeIndex) { // Loop over the list of nodes wanting
                 // set points from this set point manager
                 NodeNum = IdealCondEntSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex); // Get the node number
-                if (IdealCondEntSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_Temp) {
+                if (IdealCondEntSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::Temp) {
                     Node(NodeNum).TempSetPoint = IdealCondEntSetPtMgr(SetPtMgrNum).SetPt; // Set the temperature setpoint
                 }
             }
@@ -8379,7 +8354,7 @@ namespace SetPointManager {
                  ++CtrlNodeIndex) { // Loop over the list of nodes wanting
                 // set points from this set point manager
                 NodeNum = SZOneStageCoolingSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex); // Get the node number
-                if (SZOneStageCoolingSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_Temp) {
+                if (SZOneStageCoolingSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::Temp) {
                     Node(NodeNum).TempSetPoint = SZOneStageCoolingSetPtMgr(SetPtMgrNum).SetPt; // Set the temperature setpoint
                 }
             }
@@ -8391,7 +8366,7 @@ namespace SetPointManager {
                  ++CtrlNodeIndex) { // Loop over the list of nodes wanting
                 // set points from this set point manager
                 NodeNum = SZOneStageHeatingSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex); // Get the node number
-                if (SZOneStageHeatingSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_Temp) {
+                if (SZOneStageHeatingSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::Temp) {
                     Node(NodeNum).TempSetPoint = SZOneStageHeatingSetPtMgr(SetPtMgrNum).SetPt; // Set the temperature setpoint
                 }
             }
@@ -8462,7 +8437,7 @@ namespace SetPointManager {
                 // setpoints from this setpoint manager
                 NodeNum = MixedAirSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex); // Get the node number
 
-                if (MixedAirSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_Temp) {
+                if (MixedAirSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::Temp) {
                     Node(NodeNum).TempSetPoint = MixedAirSetPtMgr(SetPtMgrNum).SetPt; // Set the setpoint
                 }
             }
@@ -8516,13 +8491,13 @@ namespace SetPointManager {
 
                 {
                     auto const SELECT_CASE_var(OAPretreatSetPtMgr(SetPtMgrNum).CtrlTypeMode);
-                    if (SELECT_CASE_var == iCtrlVarType_Temp) {                               // 'Temperature'
+                    if (SELECT_CASE_var == iCtrlVarType::Temp) {                               // 'Temperature'
                         Node(NodeNum).TempSetPoint = OAPretreatSetPtMgr(SetPtMgrNum).SetPt;   // Set the setpoint
-                    } else if (SELECT_CASE_var == iCtrlVarType_MaxHumRat) {                   // 'MaximumHumidityRatio'
+                    } else if (SELECT_CASE_var == iCtrlVarType::MaxHumRat) {                   // 'MaximumHumidityRatio'
                         Node(NodeNum).HumRatMax = OAPretreatSetPtMgr(SetPtMgrNum).SetPt;      // Set the setpoint
-                    } else if (SELECT_CASE_var == iCtrlVarType_MinHumRat) {                   // 'MinimumHumidityRatio'
+                    } else if (SELECT_CASE_var == iCtrlVarType::MinHumRat) {                   // 'MinimumHumidityRatio'
                         Node(NodeNum).HumRatMin = OAPretreatSetPtMgr(SetPtMgrNum).SetPt;      // Set the setpoint
-                    } else if (SELECT_CASE_var == iCtrlVarType_HumRat) {                      // 'HumidityRatio'
+                    } else if (SELECT_CASE_var == iCtrlVarType::HumRat) {                      // 'HumidityRatio'
                         Node(NodeNum).HumRatSetPoint = OAPretreatSetPtMgr(SetPtMgrNum).SetPt; // Set the setpoint
                     }
                 }
@@ -8530,7 +8505,7 @@ namespace SetPointManager {
         }
     }
 
-    int getSPMBasedOnNode(EnergyPlusData &state, int const NodeNum, int const SetPtType, int const SPMType, CtrlNodeType ctrlOrRefNode)
+    int getSPMBasedOnNode(EnergyPlusData &state, int const NodeNum, iCtrlVarType const SetPtType, int const SPMType, CtrlNodeType ctrlOrRefNode)
     {
 
         if (GetInputFlag) {
@@ -8541,7 +8516,7 @@ namespace SetPointManager {
         int getSPMBasedOnNode = 0;
 
         for (int SetPtMgrNum = 1; SetPtMgrNum <= NumAllSetPtMgrs; ++SetPtMgrNum) {
-            if (SetPtType == AllSetPtMgr(SetPtMgrNum).CtrlTypeMode) { // SetPtType is e.g., iCtrlVarType_Temp, iCtrlVarType_HumRat, etc.
+            if (SetPtType == AllSetPtMgr(SetPtMgrNum).CtrlTypeMode) { // SetPtType is e.g., iCtrlVarType::Temp, iCtrlVarType::HumRat, etc.
                 switch (ctrlOrRefNode) { // ctrlOrRefNode is enum type of node to look for, either control node or reference node
                 case CtrlNodeType::control: {
                     for (int NumNode = 1; NumNode <= AllSetPtMgr(SetPtMgrNum).NumCtrlNodes; ++NumNode) {
@@ -8568,7 +8543,7 @@ namespace SetPointManager {
         return getSPMBasedOnNode;
     }
 
-    bool IsNodeOnSetPtManager(EnergyPlusData &state, int const NodeNum, int const SetPtType)
+    bool IsNodeOnSetPtManager(EnergyPlusData &state, int const NodeNum, iCtrlVarType const SetPtType)
     {
 
         // FUNCTION INFORMATION:
@@ -8618,7 +8593,7 @@ namespace SetPointManager {
         return IsNodeOnSetPtManager;
     }
 
-    bool NodeHasSPMCtrlVarType(EnergyPlusData &state, int const NodeNum, int const iCtrlVarType)
+    bool NodeHasSPMCtrlVarType(EnergyPlusData &state, int const NodeNum, iCtrlVarType const iCtrlVarType)
     {
 
         // FUNCTION INFORMATION:
@@ -8739,8 +8714,8 @@ namespace SetPointManager {
         for (SetPtMgrNum = 1; SetPtMgrNum <= NumAllSetPtMgrs; ++SetPtMgrNum) {
             for (NumNode = 1; NumNode <= AllSetPtMgr(SetPtMgrNum).NumCtrlNodes; ++NumNode) {
                 if (NodeNum == AllSetPtMgr(SetPtMgrNum).CtrlNodes(NumNode)) {
-                    if (AllSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_HumRat) {
-                        AllSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType_MaxHumRat;
+                    if (AllSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::HumRat) {
+                        AllSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType::MaxHumRat;
                         SetPtMgrNumPtr = SetPtMgrNum;
                         ResetCntrlVarType = true;
                         goto SPMLoop_exit;
@@ -8753,9 +8728,9 @@ namespace SetPointManager {
 
         if (ResetCntrlVarType) {
             ShowWarningError(state, RoutineName + cValidSPMTypes(AllSetPtMgr(SetPtMgrNumPtr).SPMType) + "=\"" + AllSetPtMgr(SetPtMgrNumPtr).Name + "\". ");
-            ShowContinueError(state, " ..Humidity ratio control variable type specified is = " + cValidCtrlTypes(iCtrlVarType_HumRat));
-            ShowContinueError(state, " ..Humidity ratio control variable type allowed with water coils is = " + cValidCtrlTypes(iCtrlVarType_MaxHumRat));
-            ShowContinueError(state, " ..Setpointmanager control variable type is reset to = " + cValidCtrlTypes(iCtrlVarType_MaxHumRat));
+            ShowContinueError(state, format(" ..Humidity ratio control variable type specified is = {}", controlTypeName(iCtrlVarType::HumRat)));
+            ShowContinueError(state, format(" ..Humidity ratio control variable type allowed with water coils is = {}", controlTypeName(iCtrlVarType::MaxHumRat)));
+            ShowContinueError(state, format(" ..Setpointmanager control variable type is reset to = {}", controlTypeName(iCtrlVarType::MaxHumRat)));
             ShowContinueError(state, " ..Simulation continues. ");
         }
     }
@@ -8784,7 +8759,7 @@ namespace SetPointManager {
         }
     }
 
-    int GetHumidityRatioVariableType(EnergyPlusData &state, int const CntrlNodeNum)
+    iCtrlVarType GetHumidityRatioVariableType(EnergyPlusData &state, int const CntrlNodeNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -8805,7 +8780,7 @@ namespace SetPointManager {
         // USE STATEMENTS:
 
         // Return value
-        int HumRatCntrlType;
+        iCtrlVarType HumRatCntrlType;
 
         // Locals
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -8826,14 +8801,14 @@ namespace SetPointManager {
             GetInputFlag = false;
         }
 
-        HumRatCntrlType = iCtrlVarType_HumRat;
+        HumRatCntrlType = iCtrlVarType::HumRat;
 
         // Loop over the single zone maximum humidity setpoint Managers
         for (SetPtMgrNum = 1; SetPtMgrNum <= NumSZMaxHumSetPtMgrs; ++SetPtMgrNum) {
             for (CtrlNodeIndex = 1; CtrlNodeIndex <= SZMaxHumSetPtMgr(SetPtMgrNum).NumCtrlNodes; ++CtrlNodeIndex) {
                 NodeNum = SZMaxHumSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex);
                 if (CntrlNodeNum == NodeNum) {
-                    HumRatCntrlType = iCtrlVarType_MaxHumRat;
+                    HumRatCntrlType = iCtrlVarType::MaxHumRat;
                     return HumRatCntrlType;
                 }
             }
@@ -8843,7 +8818,7 @@ namespace SetPointManager {
             for (CtrlNodeIndex = 1; CtrlNodeIndex <= MZMaxHumSetPtMgr(SetPtMgrNum).NumCtrlNodes; ++CtrlNodeIndex) {
                 NodeNum = MZMaxHumSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex);
                 if (CntrlNodeNum == NodeNum) {
-                    HumRatCntrlType = iCtrlVarType_MaxHumRat;
+                    HumRatCntrlType = iCtrlVarType::MaxHumRat;
                     return HumRatCntrlType;
                 }
             }
@@ -8853,7 +8828,7 @@ namespace SetPointManager {
             for (CtrlNodeIndex = 1; CtrlNodeIndex <= MZAverageMaxHumSetPtMgr(SetPtMgrNum).NumCtrlNodes; ++CtrlNodeIndex) {
                 NodeNum = MZAverageMaxHumSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex);
                 if (CntrlNodeNum == NodeNum) {
-                    HumRatCntrlType = iCtrlVarType_MaxHumRat;
+                    HumRatCntrlType = iCtrlVarType::MaxHumRat;
                     return HumRatCntrlType;
                 }
             }
@@ -8863,7 +8838,7 @@ namespace SetPointManager {
             for (CtrlNodeIndex = 1; CtrlNodeIndex <= SZMinHumSetPtMgr(SetPtMgrNum).NumCtrlNodes; ++CtrlNodeIndex) {
                 NodeNum = SZMinHumSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex);
                 if (CntrlNodeNum == NodeNum) {
-                    HumRatCntrlType = iCtrlVarType_MinHumRat;
+                    HumRatCntrlType = iCtrlVarType::MinHumRat;
                     return HumRatCntrlType;
                 }
             }
@@ -8873,7 +8848,7 @@ namespace SetPointManager {
             for (CtrlNodeIndex = 1; CtrlNodeIndex <= MZMinHumSetPtMgr(SetPtMgrNum).NumCtrlNodes; ++CtrlNodeIndex) {
                 NodeNum = MZMinHumSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex);
                 if (CntrlNodeNum == NodeNum) {
-                    HumRatCntrlType = iCtrlVarType_MinHumRat;
+                    HumRatCntrlType = iCtrlVarType::MinHumRat;
                     return HumRatCntrlType;
                 }
             }
@@ -8883,7 +8858,7 @@ namespace SetPointManager {
             for (CtrlNodeIndex = 1; CtrlNodeIndex <= MZAverageMinHumSetPtMgr(SetPtMgrNum).NumCtrlNodes; ++CtrlNodeIndex) {
                 NodeNum = MZAverageMinHumSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex);
                 if (CntrlNodeNum == NodeNum) {
-                    HumRatCntrlType = iCtrlVarType_MinHumRat;
+                    HumRatCntrlType = iCtrlVarType::MinHumRat;
                     return HumRatCntrlType;
                 }
             }
@@ -8892,10 +8867,10 @@ namespace SetPointManager {
         for (SetPtMgrNum = 1; SetPtMgrNum <= NumSchSetPtMgrs; ++SetPtMgrNum) {
             for (CtrlNodeIndex = 1; CtrlNodeIndex <= SchSetPtMgr(SetPtMgrNum).NumCtrlNodes; ++CtrlNodeIndex) {
                 if (CntrlNodeNum == SchSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex)) {
-                    if (SchSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_HumRat) {
-                        return iCtrlVarType_HumRat;
-                    } else if (SchSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_MaxHumRat) {
-                        return iCtrlVarType_MaxHumRat;
+                    if (SchSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::HumRat) {
+                        return iCtrlVarType::HumRat;
+                    } else if (SchSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::MaxHumRat) {
+                        return iCtrlVarType::MaxHumRat;
                     }
                 }
             }
@@ -8964,7 +8939,7 @@ namespace SetPointManager {
         // Give it a Name just in case it's used for error reporting
         AllSetPtMgr(NumAllSetPtMgrs).Name = "Auto generated TES SPM " + General::TrimSigDigits(NumSchTESSetPtMgrs);
         AllSetPtMgr(NumAllSetPtMgrs).SPMType = iSPMType_TESScheduled;
-        AllSetPtMgr(NumAllSetPtMgrs).CtrlTypeMode = iCtrlVarType_Temp;
+        AllSetPtMgr(NumAllSetPtMgrs).CtrlTypeMode = iCtrlVarType::Temp;
         AllSetPtMgr(NumAllSetPtMgrs).NumCtrlNodes = 1;
 
         // Now verify that there is no overlap (no other SPM uses the node of the new setpoint manager)
@@ -9093,7 +9068,5 @@ namespace SetPointManager {
 
         return MixedAirSPMNum;
     } // End of GetMixedAirNumWithCoilFreezingCheck(
-
-} // namespace SetPointManager
 
 } // namespace EnergyPlus

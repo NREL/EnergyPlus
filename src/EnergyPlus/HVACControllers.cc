@@ -546,8 +546,7 @@ namespace HVACControllers {
         using EMSManager::iTemperatureSetPoint;
         using MixedAir::CheckForControllerWaterCoil;
         using NodeInputManager::GetOnlySingleNode;
-        using SetPointManager::iCtrlVarType_MaxHumRat;
-        using SetPointManager::iCtrlVarType_Temp;
+        using SetPointManager::iCtrlVarType;
         using SetPointManager::NodeHasSPMCtrlVarType;
         using SetPointManager::ResetHumidityRatioCtrlVarType;
         using WaterCoils::CheckActuatorNode;
@@ -707,7 +706,7 @@ namespace HVACControllers {
                                 CheckIfNodeSetPointManagedByEMS(state, ControllerProps(Num).SensedNode, iTemperatureSetPoint, EMSSetPointErrorFlag);
                                 DataLoopNode::NodeSetpointCheck(ControllerProps(Num).SensedNode).needsSetpointChecking = false;
                                 if (EMSSetPointErrorFlag) {
-                                    if (!NodeHasSPMCtrlVarType(state, ControllerProps(Num).SensedNode, iCtrlVarType_Temp)) {
+                                    if (!NodeHasSPMCtrlVarType(state, ControllerProps(Num).SensedNode, iCtrlVarType::Temp)) {
                                         ShowContinueError(state, " ..Temperature setpoint not found on coil air outlet node.");
                                         ShowContinueError(state,
                                             " ..The setpoint may have been placed on a node downstream of the coil or on an airloop outlet node.");
@@ -718,7 +717,7 @@ namespace HVACControllers {
                                 CheckIfNodeSetPointManagedByEMS(state, ControllerProps(Num).SensedNode, iHumidityRatioMaxSetPoint, EMSSetPointErrorFlag);
                                 DataLoopNode::NodeSetpointCheck(ControllerProps(Num).SensedNode).needsSetpointChecking = false;
                                 if (EMSSetPointErrorFlag) {
-                                    if (!NodeHasSPMCtrlVarType(state, ControllerProps(Num).SensedNode, iCtrlVarType_MaxHumRat)) {
+                                    if (!NodeHasSPMCtrlVarType(state, ControllerProps(Num).SensedNode, iCtrlVarType::MaxHumRat)) {
                                         ShowContinueError(state, " ..Humidity ratio setpoint not found on coil air outlet node.");
                                         ShowContinueError(state,
                                             " ..The setpoint may have been placed on a node downstream of the coil or on an airloop outlet node.");
@@ -729,7 +728,7 @@ namespace HVACControllers {
                                 CheckIfNodeSetPointManagedByEMS(state, ControllerProps(Num).SensedNode, iTemperatureSetPoint, EMSSetPointErrorFlag);
                                 DataLoopNode::NodeSetpointCheck(ControllerProps(Num).SensedNode).needsSetpointChecking = false;
                                 if (EMSSetPointErrorFlag) {
-                                    if (!NodeHasSPMCtrlVarType(state, ControllerProps(Num).SensedNode, iCtrlVarType_Temp)) {
+                                    if (!NodeHasSPMCtrlVarType(state, ControllerProps(Num).SensedNode, iCtrlVarType::Temp)) {
                                         ShowContinueError(state, " ..Temperature setpoint not found on coil air outlet node.");
                                         ShowContinueError(state,
                                             " ..The setpoint may have been placed on a node downstream of the coil or on an airloop outlet node.");
@@ -740,7 +739,7 @@ namespace HVACControllers {
                                 CheckIfNodeSetPointManagedByEMS(state, ControllerProps(Num).SensedNode, iHumidityRatioMaxSetPoint, EMSSetPointErrorFlag);
                                 DataLoopNode::NodeSetpointCheck(ControllerProps(Num).SensedNode).needsSetpointChecking = false;
                                 if (EMSSetPointErrorFlag) {
-                                    if (!NodeHasSPMCtrlVarType(state, ControllerProps(Num).SensedNode, iCtrlVarType_MaxHumRat)) {
+                                    if (!NodeHasSPMCtrlVarType(state, ControllerProps(Num).SensedNode, iCtrlVarType::MaxHumRat)) {
                                         ShowContinueError(state, " ..Humidity ratio setpoint not found on coil air outlet node.");
                                         ShowContinueError(state,
                                             " ..The setpoint may have been placed on a node downstream of the coil or on an airloop outlet node.");
@@ -945,9 +944,7 @@ namespace HVACControllers {
         using PlantUtilities::SetActuatedBranchFlowRate;
         using RootFinder::SetupRootFinder;
         using SetPointManager::GetHumidityRatioVariableType;
-        using SetPointManager::iCtrlVarType_HumRat;
-        using SetPointManager::iCtrlVarType_MaxHumRat;
-        using SetPointManager::iCtrlVarType_MinHumRat;
+        using SetPointManager::iCtrlVarType;
 
         static std::string const RoutineName("InitController");
 
@@ -1013,9 +1010,9 @@ namespace HVACControllers {
                         }
                     } else if (SELECT_CASE_var == iHumidityRatio) { // 'HumidityRatio'
                         ControllerProps(ControllerIndex).HumRatCntrlType = GetHumidityRatioVariableType(state, SensedNode);
-                        if ((ControllerProps(ControlNum).HumRatCntrlType == iCtrlVarType_HumRat &&
+                        if ((ControllerProps(ControlNum).HumRatCntrlType == iCtrlVarType::HumRat &&
                              Node(SensedNode).HumRatSetPoint == SensedNodeFlagValue) ||
-                            (ControllerProps(ControlNum).HumRatCntrlType == iCtrlVarType_MaxHumRat &&
+                            (ControllerProps(ControlNum).HumRatCntrlType == iCtrlVarType::MaxHumRat &&
                              Node(SensedNode).HumRatMax == SensedNodeFlagValue)) {
                             if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                                 ShowSevereError(state, "HVACControllers: Missing humidity ratio setpoint for controller type=" +
@@ -1038,7 +1035,7 @@ namespace HVACControllers {
                                 }
                             }
 
-                        } else if (ControllerProps(ControlNum).HumRatCntrlType == iCtrlVarType_MinHumRat) {
+                        } else if (ControllerProps(ControlNum).HumRatCntrlType == iCtrlVarType::MinHumRat) {
                             ShowSevereError(state, "HVACControllers: incorrect humidity ratio setpoint for controller type=" +
                                             ControllerProps(ControllerIndex).ControllerType + " Name=\"" +
                                             ControllerProps(ControllerIndex).ControllerName + "\"");
@@ -1268,7 +1265,7 @@ namespace HVACControllers {
                 if (!ControllerProps(ControlNum).IsSetPointDefinedFlag) {
                     {
                         auto const SELECT_CASE_var1(ControllerProps(ControlNum).HumRatCntrlType);
-                        if (SELECT_CASE_var1 == iCtrlVarType_MaxHumRat) {
+                        if (SELECT_CASE_var1 == iCtrlVarType::MaxHumRat) {
                             ControllerProps(ControlNum).SetPointValue = Node(SensedNode).HumRatMax;
                         } else {
                             ControllerProps(ControlNum).SetPointValue = Node(SensedNode).HumRatSetPoint;
