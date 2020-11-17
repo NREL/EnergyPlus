@@ -115,7 +115,8 @@ namespace DataSurfaces {
         Overhang,
         Fin,
         TDD_Dome,
-        TDD_Diffuser
+        TDD_Diffuser,
+        SurfaceClassCount // The counter representing the total number of surface class, always stays at the bottom
     };
 
     // Parameters to indicate exterior boundary conditions for use with
@@ -352,8 +353,8 @@ namespace DataSurfaces {
     extern int BuildingShadingCount; // Total number of Building External Shades
     extern int FixedShadingCount;    // Total number of Fixed External Shades
     extern int AttachedShadingCount; // Total number of Shades attached to Zones
-    extern int ShadingSurfaceFirst(-1); // Start index of shading surfaces (Building External Shades, Fixed External Shades and Shades attached to Zone)
-    extern int ShadingSurfaceLast(-1);  // End index of shading surfaces (Building External Shades, Fixed External Shades and Shades attached to Zone)
+    extern int ShadingSurfaceFirst; // Start index of shading surfaces (Building External Shades, Fixed External Shades and Shades attached to Zone)
+    extern int ShadingSurfaceLast;  // End index of shading surfaces (Building External Shades, Fixed External Shades and Shades attached to Zone)
 
     extern bool AspectTransform;  // Set to true when GeometryTransform object is used
     extern bool CalcSolRefl;      // Set to true when Solar Reflection Calculations object is used

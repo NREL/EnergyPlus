@@ -915,8 +915,9 @@ namespace HeatBalanceSurfaceManager {
         Real64 frameArea;
         Real64 dividerArea;
         // counts for object count report
-        Array1D_int numSurfaces(20);
-        Array1D_int numExtSurfaces(20);
+        int SurfaceClassCount = int(SurfaceClass::SurfaceClassCount);
+        Array1D_int numSurfaces(SurfaceClassCount);
+        Array1D_int numExtSurfaces(SurfaceClassCount);
         int frameDivNum;
         bool isExterior;
         Array1D<Real64> computedNetArea; // holds the gross wall area minus the window and door areas
@@ -1260,19 +1261,19 @@ namespace HeatBalanceSurfaceManager {
                 }
             }
             int currSurfaceClass = int(Surface(iSurf).Class);
-            if ((currSurfaceClass <= 20) && (currSurfaceClass >= 1)) {
-                ++numSurfaces(currSurfaceClass);
-                if (isExterior) {
-                    ++numExtSurfaces(currSurfaceClass);
-                }
-                if (Surface(iSurf).Class == SurfaceClass::Window) {
-                    if (SurfWinOriginalClass(iSurf) == SurfaceClass::GlassDoor ||
-                        SurfWinOriginalClass(iSurf) == SurfaceClass::TDD_Diffuser) {
-                        int currOriginalSurfaceClass = int(SurfWinOriginalClass(iSurf));
-                        ++numSurfaces(currOriginalSurfaceClass);
-                        if (isExterior) {
-                            ++numExtSurfaces(currOriginalSurfaceClass);
-                        }
+            assert(currSurfaceClass < int(SurfaceClass::SurfaceClassCount));
+            assert(currSurfaceClass > int(SurfaceClass::None));
+            ++numSurfaces(currSurfaceClass);
+            if (isExterior) {
+                ++numExtSurfaces(currSurfaceClass);
+            }
+            if (Surface(iSurf).Class == SurfaceClass::Window) {
+                if (SurfWinOriginalClass(iSurf) == SurfaceClass::GlassDoor ||
+                    SurfWinOriginalClass(iSurf) == SurfaceClass::TDD_Diffuser) {
+                    int currOriginalSurfaceClass = int(SurfWinOriginalClass(iSurf));
+                    ++numSurfaces(currOriginalSurfaceClass);
+                    if (isExterior) {
+                        ++numExtSurfaces(currOriginalSurfaceClass);
                     }
                 }
             }
@@ -2613,7 +2614,7 @@ namespace HeatBalanceSurfaceManager {
                 // For Complex Fenestrations:
                 for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
                     SurfWinSkyGndSolarInc(SurfNum) = DifSolarRad * GndReflectance * ReflFacSkySolGnd(SurfNum);
-                    SurfWinBmGndSolarInc(SurfNum) = BeamSolarRad * SOLCOS(3) * GndReflectance * BmToDiffReflFacGnd(SurfNum);
+                    SurfWinBmGndSolarInc(SurfNum) = BeamSolarRad * SOLCOS(3) * GndReflectance * SurfBmToDiffReflFacGnd(SurfNum);
                     SurfBmToBmReflFacObs(SurfNum) = state.dataGlobal->WeightNow * ReflFacBmToBmSolObs[lSH + SurfNum] +
                                                     state.dataGlobal->WeightPreviousHour * ReflFacBmToBmSolObs[lSP + SurfNum];
                     SurfBmToDiffReflFacObs(SurfNum) = state.dataGlobal->WeightNow * ReflFacBmToDiffSolObs[lSH + SurfNum] +
@@ -2740,7 +2741,7 @@ namespace HeatBalanceSurfaceManager {
 
                 }
             }
-            for (int zoneNum = 1; zoneNum <= DataGlobals::NumOfZones; ++zoneNum) {
+            for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
                 for (int SurfNum : Zone(zoneNum).ZoneExtSolarSurfaceList) {
                     // Regular surface
                     currCosInc(SurfNum) = CosIncAng(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum);
@@ -7051,7 +7052,7 @@ namespace HeatBalanceSurfaceManager {
                     DataSurfaces::SurfWinHeatLossRepEnergy(surfNum) = DataSurfaces::SurfWinHeatLossRep(surfNum) * state.dataGlobal->TimeStepZoneSec;
                 }
                 DataSurfaces::SurfWinHeatTransferRepEnergy(surfNum) = DataSurfaces::SurfWinHeatGain(surfNum) * state.dataGlobal->TimeStepZoneSec;
-                if (DataSurfaces::SurfWinOriginalClass(surfNum) == DataSurfaces::SurfaceClass:TDD_Diffuser) { // Tubular daylighting device
+                if (DataSurfaces::SurfWinOriginalClass(surfNum) == DataSurfaces::SurfaceClass::TDD_Diffuser) { // Tubular daylighting device
                     int pipeNum = DataSurfaces::SurfWinTDDPipeNum(surfNum);
                     DataDaylightingDevices::TDDPipe(pipeNum).HeatGain = DataSurfaces::SurfWinHeatGainRep(surfNum);
                     DataDaylightingDevices::TDDPipe(pipeNum).HeatLoss = DataSurfaces::SurfWinHeatLossRep(surfNum);
@@ -7745,7 +7746,7 @@ namespace HeatBalanceSurfaceManager {
                         DataSurfaces::SurfWinHeatLossRepEnergy(surfNum) = DataSurfaces::SurfWinHeatLossRep(surfNum) * state.dataGlobal->TimeStepZoneSec;
                     }
                     DataSurfaces::SurfWinHeatTransferRepEnergy(surfNum) = DataSurfaces::SurfWinHeatGain(surfNum) * state.dataGlobal->TimeStepZoneSec;
-                    if (DataSurfaces::SurfWinOriginalClass(surfNum) == DataSurfaces::SurfaceClass:TDD_Diffuser) { // Tubular daylighting device
+                    if (DataSurfaces::SurfWinOriginalClass(surfNum) == DataSurfaces::SurfaceClass::TDD_Diffuser) { // Tubular daylighting device
                         int pipeNum = DataSurfaces::SurfWinTDDPipeNum(surfNum);
                         DataDaylightingDevices::TDDPipe(pipeNum).HeatGain = DataSurfaces::SurfWinHeatGainRep(surfNum);
                         DataDaylightingDevices::TDDPipe(pipeNum).HeatLoss = DataSurfaces::SurfWinHeatLossRep(surfNum);
