@@ -1346,7 +1346,6 @@ namespace SurfaceGeometry {
         Array1D<bool> SurfaceTmpClassMoved(TotSurfaces); // Tmp class is moved
         // Move all shading Surfaces to Front
 
-        state.dataSurfaceGeometry->SurfaceTmpClassInvalid.dimension(TotSurfaces, false);
         SurfaceTmpClassMoved.dimension(TotSurfaces, false);
         for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
             if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class != SurfaceClass::Detached_F && state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class != SurfaceClass::Detached_B &&
@@ -1457,7 +1456,7 @@ namespace SurfaceGeometry {
             ShowSevereError(state, format("{}Reordered # of Surfaces ({}) not = Total # of Surfaces ({})", RoutineName, MovedSurfs, TotSurfaces));
             SurfError = true;
             for (int Loop = 1; Loop <= TotSurfaces; ++Loop) {
-                if (!SurfaceTmpClassMoved(Loop) && state.dataSurfaceGeometry->SurfaceTmpClassInvalid(Loop)) {
+                if (!SurfaceTmpClassMoved(Loop) && state.dataSurfaceGeometry->SurfaceTmp(Loop).Class == SurfaceClass::INVALID) {
                     ShowSevereError(state, RoutineName + "Error in Surface= \"" + state.dataSurfaceGeometry->SurfaceTmp(Loop).Name + "\" Class=" +
                                         cSurfaceClass(state.dataSurfaceGeometry->SurfaceTmp(Loop).Class) + " indicated Zone=\"" + state.dataSurfaceGeometry->SurfaceTmp(Loop).ZoneName + "\"");
                 }
@@ -3104,7 +3103,7 @@ namespace SurfaceGeometry {
                 } else {
                     ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name + "\", invalid " + cAlphaFieldNames(ArgPointer) + "=\"" +
                                     cAlphaArgs(ArgPointer) + "\".");
-                    state.dataSurfaceGeometry->SurfaceTmpClassInvalid(SurfNum) = true;
+                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class = SurfaceClass::INVALID;
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ZoneName = "Unknown Zone";
                     ErrorsFound = true;
                 }
@@ -3582,7 +3581,7 @@ namespace SurfaceGeometry {
                 } else {
                     ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name + "\", invalid " + cAlphaFieldNames(3) + "=\"" +
                                     cAlphaArgs(3) + "\".");
-                    state.dataSurfaceGeometry->SurfaceTmpClassInvalid(SurfNum) = true;
+                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class = SurfaceClass::INVALID;
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ZoneName = "Unknown Zone";
                     ErrorsFound = true;
                 }
@@ -5816,7 +5815,7 @@ namespace SurfaceGeometry {
                 ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) +
                                 "\" not found.");
                 ++SurfNum;
-                state.dataSurfaceGeometry->SurfaceTmpClassInvalid(SurfNum) = true;
+                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class = SurfaceClass::INVALID;
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ZoneName = "Unknown Zone";
                 ErrorsFound = true;
                 errFlag = true;

@@ -101,6 +101,7 @@ namespace DataSurfaces {
     };
 
     enum class SurfaceClass : int {
+        INVALID = -1,
         None = 0,
         Wall,
         Floor,

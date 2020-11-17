@@ -432,8 +432,6 @@ struct SurfaceGeometryData : BaseGlobalStruct {
                                                   // referencing another in adjacent zone
     int const UnreconciledZoneSurface = -999; // interim value between entering surfaces ("Surface") and reconciling
 
-    Array1D<bool> SurfaceTmpClassInvalid; // Tmp class is invalid
-
     Array1D<SurfaceGeometry::SurfaceData> SurfaceTmp; // Allocated/Deallocated during input processing
     HeatBalanceKivaManager::KivaManager kivaManager;
     SurfaceGeometry::ExposedFoundationPerimeter exposedFoundationPerimeter;
@@ -459,7 +457,6 @@ struct SurfaceGeometryData : BaseGlobalStruct {
         Warning2Count = 0;
         Warning3Count = 0;
         SurfaceTmp.deallocate();
-        SurfaceTmpClassInvalid.deallocate();
         GetSurfaceDataOneTimeFlag = false;
         UniqueSurfaceNames.clear();
         kivaManager = HeatBalanceKivaManager::KivaManager();
