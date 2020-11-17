@@ -219,7 +219,8 @@ namespace Psychrometrics {
     extern Array1D<cached_psat_t> cached_Psat; // DIMENSION(0:psatcache_size)
 #endif
 #ifdef EP_cache_PsyTsatFnPb
-    extern Array1D<cached_tsat_pb> cached_Tsat; // DIMENSION(0:tsatcache_size)
+    inline Array1D<cached_tsat_pb> cached_Tsat; // DIMENSION(0:tsatcache_size)
+    cached_Tsat.allocate({0, tsatcache_size});
 #endif
 #ifdef EP_cache_PsyTsatFnHPb
     extern Array1D<cached_tsat_h_pb> cached_Tsat_HPb; // DIMENSION(0:tsat_hbp_cache_size)
