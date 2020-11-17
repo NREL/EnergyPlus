@@ -132,13 +132,13 @@ namespace PluginManagement {
         return "Linked to Python Version: \"" + sVersion + "\"";
     }
 #else
-    std::string pythonStringForUsage(state)
+    std::string pythonStringForUsage([[maybe_unused]] EnergyPlusData &state)
     {
         return "This version of EnergyPlus not linked to Python library.";
     }
 #endif
 
-    void PluginManager::setupOutputVariables(EnergyPlusData &state)
+    void PluginManager::setupOutputVariables([[maybe_unused]] EnergyPlusData &state)
     {
 #if LINK_WITH_PYTHON == 1
         // with the PythonPlugin:Variables all set in memory, we can now set them up as outputs as needed
@@ -651,7 +651,7 @@ namespace PluginManagement {
     }
 #endif
 
-    void PluginInstance::reportPythonError(EnergyPlusData &state)
+    void PluginInstance::reportPythonError([[maybe_unused]] EnergyPlusData &state)
     {
 #if LINK_WITH_PYTHON == 1
         PyObject *exc_type = nullptr;
@@ -724,7 +724,7 @@ namespace PluginManagement {
 #endif
     }
 
-    void PluginInstance::setup(EnergyPlusData &state)
+    void PluginInstance::setup([[maybe_unused]] EnergyPlusData &state)
     {
 #if LINK_WITH_PYTHON == 1
         // this first section is really all about just ultimately getting a full Python class instance
@@ -1093,7 +1093,7 @@ namespace PluginManagement {
         }
     }
 #else
-    void PluginManager::addToPythonPath(EnergyPlusData &state, [[maybe_unused]] const std::string &path, [[maybe_unused]] bool userDefinedPath)
+    void PluginManager::addToPythonPath([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] const std::string &path, [[maybe_unused]] bool userDefinedPath)
     {
     }
 #endif
@@ -1134,7 +1134,7 @@ namespace PluginManagement {
         }
     }
 #else
-    int PluginManager::getGlobalVariableHandle(EnergyPlusData &state,
+    int PluginManager::getGlobalVariableHandle([[maybe_unused]] EnergyPlusData &state,
                                                [[maybe_unused]] const std::string &name,
                                                [[maybe_unused]] bool const suppress_warning)
     {
@@ -1278,7 +1278,7 @@ namespace PluginManagement {
     }
 #endif
 
-    void PluginManager::updatePluginValues(EnergyPlusData &state)
+    void PluginManager::updatePluginValues([[maybe_unused]] EnergyPlusData &state)
     {
 #if LINK_WITH_PYTHON == 1
         for (auto &trend : trends) {
@@ -1306,7 +1306,7 @@ namespace PluginManagement {
         return 0.0;
     }
 #else
-    Real64 PluginManager::getGlobalVariableValue(EnergyPlusData &state, [[maybe_unused]] int handle)
+    Real64 PluginManager::getGlobalVariableValue([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] int handle)
     {
         return 0.0;
     }
@@ -1328,7 +1328,7 @@ namespace PluginManagement {
         }
     }
 #else
-    void PluginManager::setGlobalVariableValue(EnergyPlusData &state, [[maybe_unused]] int handle, [[maybe_unused]] Real64 value)
+    void PluginManager::setGlobalVariableValue([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] int handle, [[maybe_unused]] Real64 value)
     {
     }
 #endif
@@ -1384,7 +1384,7 @@ namespace PluginManagement {
         return numTotalThings > 0;
     }
 #else
-    bool PluginManager::anyUnexpectedPluginObjects(EnergyPlusData &state)
+    bool PluginManager::anyUnexpectedPluginObjects([[maybe_unused]] EnergyPlusData &state)
     {
         return false;
     }
