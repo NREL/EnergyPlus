@@ -71,6 +71,7 @@ struct EnergyPlusData;
 #undef EP_cache_PsyTwbFnTdbWPb
 #undef EP_cache_PsyPsatFnTemp
 #undef EP_cache_PsyTsatFnPb
+#undef EP_cache_PsyTsatFnHPb
 #else
 #define EP_cache_PsyTwbFnTdbWPb
 #define EP_cache_PsyPsatFnTemp
