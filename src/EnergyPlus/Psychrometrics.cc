@@ -95,7 +95,7 @@ namespace Psychrometrics {
     // more research on hfg calc
 
     // Using/Aliasing
-    #ifdef EP_psych_errors
+#ifdef EP_psych_errors
     using namespace DataEnvironment;
 #endif
 
@@ -156,17 +156,6 @@ namespace Psychrometrics {
                                             // PsyTwbFnTdbWPb_raw (raw calc) | PsyPsatFnTemp_cache  19 - PsyPsatFnTemp_raw (raw calc)
 #endif
 
-#ifndef EP_psych_errors
-#endif
-
-#ifdef EP_cache_PsyTwbFnTdbWPb
-#endif
-#ifdef EP_cache_PsyPsatFnTemp
-#endif
-#ifdef EP_cache_PsyTsatFnPb
-#endif
-#ifdef EP_cache_PsyTsatFnHPb
-#endif
     // MODULE VARIABLE DECLARATIONS:
     // na
 
@@ -179,18 +168,6 @@ namespace Psychrometrics {
     Array1D_int NumIterations(NumPsychMonitors, 0);
 #endif
 
-    // Object Data
-#ifdef EP_cache_PsyTwbFnTdbWPb
-    Array1D<cached_twb_t> cached_Twb; // DIMENSION(0:twbcache_size)
-#endif
-#ifdef EP_cache_PsyPsatFnTemp
-    Array1D<cached_psat_t> cached_Psat; // DIMENSION(0:psatcache_size)
-#endif
-#ifdef EP_cache_PsyTsatFnPb
-#endif
-#ifdef EP_cache_PsyTsatFnHPb
-    Array1D<cached_tsat_h_pb> cached_Tsat_HPb; // DIMENSION(0:tsat_hbp_cache_size)
-#endif
     // Subroutine Specifications for the Module
 
     // Functions
@@ -211,6 +188,7 @@ namespace Psychrometrics {
         cached_Psat.deallocate();
 #endif
 #ifdef EP_cache_PsyTsatFnPb
+        cached_Tsat.deallocate();
 #endif
 #ifdef EP_cache_PsyTsatFnHPb
         cached_Tsat_HPb.deallocate();
@@ -260,6 +238,7 @@ namespace Psychrometrics {
         cached_Psat.allocate({0, psatcache_size});
 #endif
 #ifdef EP_cache_PsyTsatFnPb
+        cached_Tsat.allocate({0, tsatcache_size});
 #endif
 #ifdef EP_cache_PsyTsatFnHPb
         cached_Tsat_HPb.allocate({0, tsat_hbp_cache_size});
