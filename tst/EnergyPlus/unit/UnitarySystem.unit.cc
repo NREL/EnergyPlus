@@ -16351,6 +16351,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_DesuperHeatCoilStptNodeTest)
     UnitarySystems::UnitarySys::factory(state, DataHVACGlobals::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &state.dataUnitarySystems->unitarySys[0];
     thisSys->AirInNode = 3;
+    DataZoneEquipment::ZoneEquipConfig(1).ExhaustNode(1) = 3;
 
     DataZoneEquipment::ZoneEquipInputsFilled = true;                                    // indicate zone data is available
     DataLoopNode::NodeID.allocate(20);
