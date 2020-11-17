@@ -85,11 +85,11 @@ The proposed approach is to identify the design variables in the LowTemperatureR
 
 <span style="display:block;text-align:center">![How the objects will be split](https://github.com/NREL/EnergyPlus/blob/Separate-Design-and-Control-Variables/design/FY2021/BigSplit.jpg)
 
-Figure: How the objects will be split
+**Figure: How the objects will be split**
 
 <span style="display:block;text-align:center">![How the design objects will be brokendown](https://github.com/NREL/EnergyPlus/blob/Separate-Design-and-Control-Variables/design/FY2021/Breakdown.jpg)
 
-Figure: How the design objects will be brokendown
+**Figure: How the design objects will be brokendown**
 
 #### ZoneHVAC:LowTemperatureRadiant objects ####
 
