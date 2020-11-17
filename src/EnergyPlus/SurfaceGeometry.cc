@@ -1343,10 +1343,10 @@ namespace SurfaceGeometry {
 
         MovedSurfs = 0;
         Surface.allocate(TotSurfaces); // Allocate the Surface derived type appropriately
-        Array1D<bool> SurfaceTmpClassMoved(TotSurfaces); // Tmp class is moved
-        // Move all shading Surfaces to Front
-
+        Array1D<bool> SurfaceTmpClassMoved; // Tmp class is moved
         SurfaceTmpClassMoved.dimension(TotSurfaces, false);
+
+        // Move all shading Surfaces to Front
         for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
             if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class != SurfaceClass::Detached_F && state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class != SurfaceClass::Detached_B &&
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class != SurfaceClass::Shading)
