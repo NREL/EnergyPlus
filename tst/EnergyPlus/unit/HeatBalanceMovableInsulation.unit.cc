@@ -229,7 +229,7 @@ TEST_F(EnergyPlusFixture, SurfaceControlMovableInsulation_InvalidWindowSimpleGla
     // set error to false
     bool ErrorsFound(false);
     // set zone data
-    DataGlobals::NumOfZones = 1;
+    state.dataGlobal->NumOfZones = 1;
     DataHeatBalance::Zone.allocate(1);
     DataHeatBalance::Zone(1).Name = "ZONE ONE";
     // get schedule data

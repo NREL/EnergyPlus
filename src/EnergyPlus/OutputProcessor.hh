@@ -172,18 +172,12 @@ namespace OutputProcessor {
     extern int RunPeriodStampReportNbr;         // RunPeriod Report number
     extern std::string RunPeriodStampReportChr; // RunPeriod Report number (character -- for printing)
     extern bool TrackingRunPeriodVariables;     // Requested RunPeriod Report Variables
-    extern Real64 TimeStepZoneSec;              // Seconds from NumTimeStepInHour
     extern bool ErrorsLogged;
-    extern bool ProduceVariableDictionary;
 
     extern int MaxNumSubcategories;
     extern bool isFinalYear;
 
     extern bool GetOutputInputFlag; // First time, input is "gotten"
-
-    // All routines should be listed here whether private or not
-    // PUBLIC  ReallocateTVar
-    // PUBLIC  SetReportNow
 
     // Types
     enum class Unit
@@ -620,7 +614,8 @@ namespace OutputProcessor {
                              ReportingFrequency const ReportFreq // Reporting Frequency
     );
 
-    void ProduceMinMaxStringWStartMinute(std::string &String,                // Current value
+    void ProduceMinMaxStringWStartMinute(EnergyPlusData &state,
+                                         std::string &String,                // Current value
                                          int const DateValue,                // Date of min/max
                                          ReportingFrequency const ReportFreq // Reporting Frequency
     );
@@ -747,7 +742,7 @@ namespace OutputProcessor {
 
     void ReportYRMeters(EnergyPlusData &state, bool PrintTimeStampToSQL);
 
-    void ReportForTabularReports();
+    void ReportForTabularReports(EnergyPlusData &state);
 
     std::string DateToStringWithMonth(int const codedDate); // word containing encoded month, day, hour, minute
 

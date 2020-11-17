@@ -62,8 +62,8 @@ using namespace EnergyPlus;
 TEST_F(EnergyPlusFixture, ERLExpression_TestExponentials)
 {
     // set the program state so that errors can be thrown
-    DataGlobals::DoingSizing = false;
-    DataGlobals::KickOffSimulation = false;
+    state.dataGlobal->DoingSizing = false;
+    state.dataGlobal->KickOffSimulation = false;
     EMSManager::FinishProcessingUserInput = false;
 
     bool errorsFound = false;

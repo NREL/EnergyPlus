@@ -137,11 +137,11 @@ namespace Photovoltaics {
     }
 
     void SimPVGenerator(EnergyPlusData &state,
-                        GeneratorType const EP_UNUSED(GeneratorType), // type of Generator !unused1208
-                        std::string const &GeneratorName,   // user specified name of Generator
+                        [[maybe_unused]] GeneratorType const GeneratorType, // type of Generator !unused1208
+                        std::string const &GeneratorName,                   // user specified name of Generator
                         int &GeneratorIndex,
-                        bool const RunFlag,            // is PV ON or OFF as determined by schedules in ElecLoadCenter
-                        Real64 const EP_UNUSED(PVLoad) // electrical load on the PV (not really used... PV models assume "full on" !unused1208
+                        bool const RunFlag,                  // is PV ON or OFF as determined by schedules in ElecLoadCenter
+                        [[maybe_unused]] Real64 const PVLoad // electrical load on the PV (not really used... PV models assume "full on" !unused1208
     )
     {
 
@@ -217,7 +217,7 @@ namespace Photovoltaics {
         ReportPV(state, PVnum);
     }
 
-    void GetPVGeneratorResults(GeneratorType const EP_UNUSED(GeneratorType), // type of Generator !unused1208
+    void GetPVGeneratorResults([[maybe_unused]] GeneratorType const GeneratorType, // type of Generator !unused1208
                                int const GeneratorIndex,
                                Real64 &GeneratorPower,  // electrical power
                                Real64 &GeneratorEnergy, // electrical energy
@@ -367,7 +367,7 @@ namespace Photovoltaics {
                     ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs(1));
                     ShowContinueError(state, "Surface is not exposed to solar, check surface bounday condition");
                 }
-                PVarray(PVnum).Zone = GetPVZone(PVarray(PVnum).SurfacePtr);
+                PVarray(PVnum).Zone = GetPVZone(state, PVarray(PVnum).SurfacePtr);
 
                 // check surface orientation, warn if upside down
                 if ((Surface(SurfNum).Tilt < -95.0) || (Surface(SurfNum).Tilt > 95.0)) {
@@ -764,7 +764,7 @@ namespace Photovoltaics {
         }
     }
 
-    int GetPVZone(int const SurfNum)
+    int GetPVZone(EnergyPlusData &state, int const SurfNum)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
@@ -773,7 +773,6 @@ namespace Photovoltaics {
         // PURPOSE OF THIS SUBROUTINE:
         // Get the zone number for this PV array for use when zone multipliers are applied
 
-        using DataGlobals::NumOfZones;
         using DataHeatBalance::Zone;
         using DataSurfaces::Surface;
 
@@ -782,7 +781,7 @@ namespace Photovoltaics {
         if (SurfNum > 0) {
             GetPVZone = Surface(SurfNum).Zone;
             if (GetPVZone == 0) { // might need to get the zone number from the name
-                GetPVZone = UtilityRoutines::FindItemInList(Surface(SurfNum).ZoneName, Zone, NumOfZones);
+                GetPVZone = UtilityRoutines::FindItemInList(Surface(SurfNum).ZoneName, Zone, state.dataGlobal->NumOfZones);
             }
         }
 
@@ -888,7 +887,6 @@ namespace Photovoltaics {
         // collect statements that assign to variables tied to output variables
 
         // Using/Aliasing
-        using DataGlobals::NumOfZones;
         using DataHeatBalance::Zone;
         using DataHeatBalFanSys::QPVSysSource;
         using DataSurfaces::Surface;
@@ -1196,9 +1194,6 @@ namespace Photovoltaics {
         // USE STATEMENTS:
         //  USE DataPhotovoltaics, ONLY:CellTemp,LastCellTemp
         // Using/Aliasing
-        using DataGlobals::HourOfDay;
-        using DataGlobals::TimeStep;
-        using DataGlobals::TimeStepZone;
         using DataHeatBalance::SurfQRadSWOutIncident;
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
@@ -1240,7 +1235,7 @@ namespace Photovoltaics {
         }
 
         // Do the beginning of every time step initializations
-        TimeElapsed = HourOfDay + TimeStep * TimeStepZone + SysTimeElapsed;
+        TimeElapsed = state.dataGlobal->HourOfDay + state.dataGlobal->TimeStep * state.dataGlobal->TimeStepZone + SysTimeElapsed;
         if (PVarray(PVnum).TRNSYSPVcalc.TimeElapsed != TimeElapsed) {
             // The simulation has advanced to the next system timestep.  Save conditions from the end of the previous system
             PVarray(PVnum).TRNSYSPVcalc.LastCellTempK = PVarray(PVnum).TRNSYSPVcalc.CellTempK;
@@ -1274,7 +1269,6 @@ namespace Photovoltaics {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine simulates the PV performance.
 
-        using DataGlobals::MinutesPerTimeStep;
         using DataSurfaces::Surface;
         //  USE DataPhotovoltaics, ONLY:CellTemp,LastCellTemp
         using DataHeatBalance::Zone;
@@ -1321,7 +1315,7 @@ namespace Photovoltaics {
 
         // if the cell temperature mode is 2, convert the timestep to seconds
         if (firstTime && PVarray(PVnum).CellIntegrationMode == iDecoupledUllebergDynamicCellIntegration) {
-            PVTimeStep = double(MinutesPerTimeStep) * 60.0; // Seconds per time step
+            PVTimeStep = double(state.dataGlobal->MinutesPerTimeStep) * 60.0; // Seconds per time step
         }
         firstTime = false;
 

@@ -225,7 +225,8 @@ namespace ScheduleManager {
                                     Array2S<Real64> DayValues   // Returned set of values
     );
 
-    void ExternalInterfaceSetSchedule(int &ScheduleIndex,
+    void ExternalInterfaceSetSchedule(EnergyPlusData &state,
+                                      int &ScheduleIndex,
                                       Real64 &Value // The new value for the schedule
     );
 

@@ -122,8 +122,6 @@ namespace UnitVentilator {
 
     // Using/Aliasing
     using namespace DataLoopNode;
-    using DataGlobals::DisplayExtraWarnings;
-    using DataGlobals::SysSizingCalc;
     using DataHVACGlobals::ATMixer_InletSide;
     using DataHVACGlobals::ATMixer_SupplySide;
     using DataHVACGlobals::ContFanCycCoil;
@@ -250,7 +248,6 @@ namespace UnitVentilator {
         using Fans::GetFanVolFlow;
         using HVACHXAssistedCoolingCoil::GetHXCoilTypeAndName;
 
-        using DataGlobals::NumOfZones;
         using DataPlant::TypeOf_CoilSteamAirHeating;
         using DataPlant::TypeOf_CoilWaterCooling;
         using DataPlant::TypeOf_CoilWaterDetailedFlatCooling;
@@ -900,7 +897,7 @@ namespace UnitVentilator {
             if (!state.dataUnitVentilators->UnitVent(UnitVentNum).ATMixerExists) {
                 // check that unit ventilator air inlet node is the same as a zone exhaust node
                 ZoneNodeNotFound = true;
-                for (CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone) {
+                for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                     if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
                     for (NodeNum = 1; NodeNum <= ZoneEquipConfig(CtrlZone).NumExhaustNodes; ++NodeNum) {
                         if (state.dataUnitVentilators->UnitVent(UnitVentNum).AirInNode == ZoneEquipConfig(CtrlZone).ExhaustNode(NodeNum)) {
@@ -918,7 +915,7 @@ namespace UnitVentilator {
                 }
                 // check that unit ventilator air outlet node is the same as a zone inlet node.
                 ZoneNodeNotFound = true;
-                for (CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone) {
+                for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                     if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
                     for (NodeNum = 1; NodeNum <= ZoneEquipConfig(CtrlZone).NumInletNodes; ++NodeNum) {
                         if (state.dataUnitVentilators->UnitVent(UnitVentNum).AirOutNode == ZoneEquipConfig(CtrlZone).InletNode(NodeNum)) {
@@ -939,7 +936,7 @@ namespace UnitVentilator {
                 if (state.dataUnitVentilators->UnitVent(UnitVentNum).ATMixerType == ATMixer_InletSide) {
                     // check that unit ventilator air outlet node is the same as a zone inlet node.
                     ZoneNodeNotFound = true;
-                    for (CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone) {
+                    for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                         if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
                         for (NodeNum = 1; NodeNum <= ZoneEquipConfig(CtrlZone).NumInletNodes; ++NodeNum) {
                             if (state.dataUnitVentilators->UnitVent(UnitVentNum).AirOutNode == ZoneEquipConfig(CtrlZone).InletNode(NodeNum)) {
@@ -978,7 +975,7 @@ namespace UnitVentilator {
 
                     // check that air teminal mixer outlet node is the same as a zone inlet node.
                     ZoneNodeNotFound = true;
-                    for (CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone) {
+                    for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                         if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
                         for (NodeNum = 1; NodeNum <= ZoneEquipConfig(CtrlZone).NumInletNodes; ++NodeNum) {
                             if (state.dataUnitVentilators->UnitVent(UnitVentNum).ATMixerOutNode == ZoneEquipConfig(CtrlZone).InletNode(NodeNum)) {
@@ -1215,7 +1212,6 @@ namespace UnitVentilator {
         // Uses the status flags to trigger initializations.
 
         using DataEnvironment::StdRhoAir;
-        using DataGlobals::AnyPlantInModel;
         using DataHVACGlobals::FanType_SimpleOnOff;
         using DataHVACGlobals::ZoneComp;
         using DataHVACGlobals::ZoneCompTurnFansOff;
@@ -1337,20 +1333,20 @@ namespace UnitVentilator {
                     ShowFatalError(state, "InitUnitVentilator: Unit=" + state.dataUnitVentilators->UnitVent(UnitVentNum).Name + ", invalid cooling coil type. Program terminated.");
             }
             MyPlantScanFlag(UnitVentNum) = false;
-        } else if (MyPlantScanFlag(UnitVentNum) && !AnyPlantInModel) {
+        } else if (MyPlantScanFlag(UnitVentNum) && !state.dataGlobal->AnyPlantInModel) {
             MyPlantScanFlag(UnitVentNum) = false;
         }
 
         if (!state.dataUnitVentilators->ZoneEquipmentListChecked && ZoneEquipInputsFilled) {
             state.dataUnitVentilators->ZoneEquipmentListChecked = true;
             for (Loop = 1; Loop <= state.dataUnitVentilators->NumOfUnitVents; ++Loop) {
-                if (CheckZoneEquipmentList("ZoneHVAC:UnitVentilator", state.dataUnitVentilators->UnitVent(Loop).Name)) continue;
+                if (CheckZoneEquipmentList(state, "ZoneHVAC:UnitVentilator", state.dataUnitVentilators->UnitVent(Loop).Name)) continue;
                 ShowSevereError(state, "InitUnitVentilator: Unit=[UNIT VENTILATOR," + state.dataUnitVentilators->UnitVent(Loop).Name +
                                 "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated.");
             }
         }
 
-        if (!SysSizingCalc && state.dataUnitVentilators->MySizeFlag(UnitVentNum) && !MyPlantScanFlag(UnitVentNum)) {
+        if (!state.dataGlobal->SysSizingCalc && state.dataUnitVentilators->MySizeFlag(UnitVentNum) && !MyPlantScanFlag(UnitVentNum)) {
 
             SizeUnitVentilator(state, UnitVentNum);
 
@@ -1988,7 +1984,7 @@ namespace UnitVentilator {
                                                      OutAirVolFlowDes,
                                                      "User-Specified Maximum Outdoor Air Flow Rate [m3/s]",
                                                      OutAirVolFlowUser);
-                        if (DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(OutAirVolFlowDes - OutAirVolFlowUser) / OutAirVolFlowUser) > AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeUnitVentilator: Potential issue with equipment sizing for " + state.dataUnitVentilators->cMO_UnitVentilator + ' ' +
                                             state.dataUnitVentilators->UnitVent(UnitVentNum).Name);
@@ -2042,7 +2038,7 @@ namespace UnitVentilator {
                                                      MinOutAirVolFlowDes,
                                                      "User-Specified Minimum Outdoor Air Flow Rate [m3/s]",
                                                      MinOutAirVolFlowUser);
-                        if (DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(MinOutAirVolFlowDes - MinOutAirVolFlowUser) / MinOutAirVolFlowUser) > AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeUnitVentilator: Potential issue with equipment sizing for " + state.dataUnitVentilators->cMO_UnitVentilator + ' ' +
                                             state.dataUnitVentilators->UnitVent(UnitVentNum).Name);
@@ -2174,7 +2170,7 @@ namespace UnitVentilator {
                                                          MaxVolHotWaterFlowDes,
                                                          "User-Specified Maximum Hot Water Flow [m3/s]",
                                                          MaxVolHotWaterFlowUser);
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(MaxVolHotWaterFlowDes - MaxVolHotWaterFlowUser) / MaxVolHotWaterFlowUser) > AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeUnitVentilator: Potential issue with equipment sizing for " + state.dataUnitVentilators->cMO_UnitVentilator + ' ' +
                                                 state.dataUnitVentilators->UnitVent(UnitVentNum).Name);
@@ -2292,7 +2288,7 @@ namespace UnitVentilator {
                                                          MaxVolHotSteamFlowDes,
                                                          "User-Specified Maximum Steam Flow [m3/s]",
                                                          MaxVolHotSteamFlowUser);
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(MaxVolHotSteamFlowDes - MaxVolHotSteamFlowUser) / MaxVolHotSteamFlowUser) > AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeUnitVentilator: Potential issue with equipment sizing for " + state.dataUnitVentilators->cMO_UnitVentilator + ' ' +
                                                 state.dataUnitVentilators->UnitVent(UnitVentNum).Name);
@@ -2442,7 +2438,7 @@ namespace UnitVentilator {
                                                          MaxVolColdWaterFlowDes,
                                                          "User-Specified Maximum Cold Water Flow [m3/s]",
                                                          MaxVolColdWaterFlowUser);
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(MaxVolColdWaterFlowDes - MaxVolColdWaterFlowUser) / MaxVolColdWaterFlowUser) >
                                     AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeUnitVentilator: Potential issue with equipment sizing for " + state.dataUnitVentilators->cMO_UnitVentilator + ' ' +
@@ -3696,7 +3692,7 @@ namespace UnitVentilator {
         state.dataUnitVentilators->UnitVent(UnitVentNum).ElecEnergy = state.dataUnitVentilators->UnitVent(UnitVentNum).ElecPower * TimeStepSys * DataGlobalConstants::SecInHour();
 
         if (state.dataUnitVentilators->UnitVent(UnitVentNum).FirstPass) { // reset sizing flags so other zone equipment can size normally
-            if (!DataGlobals::SysSizingCalc) {
+            if (!state.dataGlobal->SysSizingCalc) {
                 DataSizing::resetHVACSizingGlobals(DataSizing::CurZoneEqNum, 0, state.dataUnitVentilators->UnitVent(UnitVentNum).FirstPass);
             }
         }

@@ -871,17 +871,22 @@ namespace MicroturbineElectricGenerator {
         }
     }
 
-    void MTGeneratorSpecs::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation),
-                                    bool EP_UNUSED(FirstHVACIteration),
-                                    Real64 &EP_UNUSED(CurLoad),
-                                    bool EP_UNUSED(RunFlag))
+    void MTGeneratorSpecs::simulate([[maybe_unused]] EnergyPlusData &state,
+                                    [[maybe_unused]] const PlantLocation &calledFromLocation,
+                                    [[maybe_unused]] bool FirstHVACIteration,
+                                    [[maybe_unused]] Real64 &CurLoad,
+                                    [[maybe_unused]] bool RunFlag)
     {
         // empty function to emulate current behavior as of conversion to using the PlantComponent calling structure.
         // calls from the plant side... do nothing.
         // calls from the ElectricPowerServiceManger call the init, calc, and update worker functions
     }
 
-    void MTGeneratorSpecs::getDesignCapacities(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
+    void MTGeneratorSpecs::getDesignCapacities([[maybe_unused]] EnergyPlusData &state,
+                                               [[maybe_unused]] const PlantLocation &calledFromLocation,
+                                               Real64 &MaxLoad,
+                                               Real64 &MinLoad,
+                                               Real64 &OptLoad)
     {
         MaxLoad = 0.0;
         MinLoad = 0.0;
@@ -1172,7 +1177,7 @@ namespace MicroturbineElectricGenerator {
                 ShowContinueError(state, "... and an elevation of " + General::TrimSigDigits(DataEnvironment::Elevation, 2) + " m.");
                 ShowContinueErrorTimeStamp(state, "... Resetting curve output to zero and continuing simulation.");
             }
-            ShowRecurringWarningErrorAtEnd("GENERATOR:MICROTURBINE \"" + this->Name +
+            ShowRecurringWarningErrorAtEnd(state, "GENERATOR:MICROTURBINE \"" + this->Name +
                                                "\": Electrical Power Modifier curve is less than zero warning continues...",
                                            this->PowerFTempElevErrorIndex,
                                            PowerFTempElev,
@@ -1233,7 +1238,7 @@ namespace MicroturbineElectricGenerator {
                                       General::TrimSigDigits(CombustionAirInletTemp, 2) + " C.");
                     ShowContinueErrorTimeStamp(state, "... Resetting curve output to zero and continuing simulation.");
                 }
-                ShowRecurringWarningErrorAtEnd(
+                ShowRecurringWarningErrorAtEnd(state,
                     "GENERATOR:MICROTURBINE \"" + this->Name +
                         "\": Electrical Efficiency Modifier (function of temperature) output is less than zero warning continues...",
                     this->EffFTempErrorIndex,
@@ -1255,7 +1260,7 @@ namespace MicroturbineElectricGenerator {
                     ShowContinueError(state, "... Value occurs using a part-load ratio of " + General::TrimSigDigits(PLR, 3) + '.');
                     ShowContinueErrorTimeStamp(state, "... Resetting curve output to zero and continuing simulation.");
                 }
-                ShowRecurringWarningErrorAtEnd(
+                ShowRecurringWarningErrorAtEnd(state,
                     "GENERATOR:MICROTURBINE \"" + this->Name +
                         "\": Electrical Efficiency Modifier (function of part-load ratio) output is less than zero warning continues...",
                     this->EffFPLRErrorIndex,
@@ -1296,7 +1301,7 @@ namespace MicroturbineElectricGenerator {
                                           " kg/s.");
                         ShowContinueErrorTimeStamp(state, "... Resetting curve output to zero and continuing simulation.");
                     }
-                    ShowRecurringWarningErrorAtEnd(
+                    ShowRecurringWarningErrorAtEnd(state,
                         "GENERATOR:MICROTURBINE \"" + this->Name +
                             "\": Ancillary Power Modifier (function of fuel input) output is less than zero warning continues...",
                         this->AnciPowerFMdotFuelErrorIndex,
@@ -1328,7 +1333,7 @@ namespace MicroturbineElectricGenerator {
                 ShowContinueError(state, "... Fuel input rate = " + General::TrimSigDigits(AnciPowerFMdotFuel, 4) + " kg/s.");
                 ShowContinueErrorTimeStamp(state, "... Simulation will continue.");
             }
-            ShowRecurringWarningErrorAtEnd("GENERATOR:MICROTURBINE \"" + this->Name +
+            ShowRecurringWarningErrorAtEnd(state, "GENERATOR:MICROTURBINE \"" + this->Name +
                                                "\": Iteration loop for electric power generation is not converging within tolerance continues...",
                                            this->AnciPowerIterErrorIndex);
         }
@@ -1364,7 +1369,7 @@ namespace MicroturbineElectricGenerator {
                         ShowContinueError(state, "... and an elevation of " + General::TrimSigDigits(DataEnvironment::Elevation, 2) + " m.");
                         ShowContinueErrorTimeStamp(state, "... Resetting curve output to zero and continuing simulation.");
                     }
-                    ShowRecurringWarningErrorAtEnd("GENERATOR:MICROTURBINE \"" + this->Name +
+                    ShowRecurringWarningErrorAtEnd(state, "GENERATOR:MICROTURBINE \"" + this->Name +
                                                        "\": Electrical Power Modifier curve is less than zero warning continues...",
                                                    this->ThermEffFTempElevErrorIndex,
                                                    ThermalEffFTempElev,
@@ -1390,7 +1395,7 @@ namespace MicroturbineElectricGenerator {
                         ShowContinueError(state, "... Value occurs using a part-load ratio of " + General::TrimSigDigits(PLR, 3) + '.');
                         ShowContinueErrorTimeStamp(state, "... Resetting curve output to zero and continuing simulation.");
                     }
-                    ShowRecurringWarningErrorAtEnd(
+                    ShowRecurringWarningErrorAtEnd(state,
                         "GENERATOR:MICROTURBINE \"" + this->Name +
                             "\": Heat Recovery Rate Modifier (function of part-load ratio) output is less than zero warning continues...",
                         this->HeatRecRateFPLRErrorIndex,
@@ -1416,7 +1421,7 @@ namespace MicroturbineElectricGenerator {
                                           General::TrimSigDigits(HeatRecInTemp, 2) + " C.");
                         ShowContinueErrorTimeStamp(state, "... Resetting curve output to zero and continuing simulation.");
                     }
-                    ShowRecurringWarningErrorAtEnd(
+                    ShowRecurringWarningErrorAtEnd(state,
                         "GENERATOR:MICROTURBINE \"" + this->Name +
                             "\": Heat Recovery Rate Modifier (function of inlet water temp) output is less than zero warning continues...",
                         this->HeatRecRateFTempErrorIndex,
@@ -1446,7 +1451,7 @@ namespace MicroturbineElectricGenerator {
                         ShowContinueError(state, "... Value occurs using a water flow rate of " + General::TrimSigDigits(HeatRecVolFlowRate, 4) + " m3/s.");
                         ShowContinueErrorTimeStamp(state, "... Resetting curve output to zero and continuing simulation.");
                     }
-                    ShowRecurringWarningErrorAtEnd(
+                    ShowRecurringWarningErrorAtEnd(state,
                         "GENERATOR:MICROTURBINE \"" + this->Name +
                             "\": Heat Recovery Rate Modifier (function of water flow rate) output is less than zero warning continues...",
                         this->HeatRecRateFFlowErrorIndex,
@@ -1504,7 +1509,7 @@ namespace MicroturbineElectricGenerator {
                     ShowContinueError(state, "...Heat reclaim water mass flow rate = " + General::TrimSigDigits(heatRecMdot, 4) + '.');
                     ShowContinueErrorTimeStamp(state, "...Check inputs for heat recovery water flow rate.");
                 }
-                ShowRecurringWarningErrorAtEnd(
+                ShowRecurringWarningErrorAtEnd(state,
                     "GENERATOR:MICROTURBINE \"" + this->Name +
                         "\": Heat recovery water flow rate is below the generators minimum mass flow rate warning continues...",
                     this->HRMinFlowErrorIndex,
@@ -1521,7 +1526,7 @@ namespace MicroturbineElectricGenerator {
                     ShowContinueError(state, "...Heat reclaim water mass flow rate = " + General::TrimSigDigits(heatRecMdot, 4) + '.');
                     ShowContinueErrorTimeStamp(state, "...Check inputs for heat recovery water flow rate.");
                 }
-                ShowRecurringWarningErrorAtEnd(
+                ShowRecurringWarningErrorAtEnd(state,
                     "GENERATOR:MICROTURBINE \"" + this->Name +
                         "\": Heat recovery water flow rate is above the generators maximum mass flow rate warning continues...",
                     this->HRMaxFlowErrorIndex,
@@ -1554,7 +1559,7 @@ namespace MicroturbineElectricGenerator {
                                           General::TrimSigDigits(CombustionAirInletTemp, 2) + '.');
                         ShowContinueErrorTimeStamp(state, "...Resetting curve output to zero and continuing simulation.");
                     }
-                    ShowRecurringWarningErrorAtEnd(
+                    ShowRecurringWarningErrorAtEnd(state,
                         "GENERATOR:MICROTURBINE \"" + this->Name +
                             "\": Exhaust Air Flow Rate Modifier (function of temperature) output is less than or equal to zero warning continues...",
                         this->ExhFlowFTempErrorIndex,
@@ -1579,7 +1584,7 @@ namespace MicroturbineElectricGenerator {
                         ShowContinueError(state, "...Value occurs using a part-load ratio of " + General::TrimSigDigits(PLR, 2) + '.');
                         ShowContinueErrorTimeStamp(state, "...Resetting curve output to zero and continuing simulation.");
                     }
-                    ShowRecurringWarningErrorAtEnd("GENERATOR:MICROTURBINE \"" + this->Name +
+                    ShowRecurringWarningErrorAtEnd(state, "GENERATOR:MICROTURBINE \"" + this->Name +
                                                        "\": Exhaust Air Flow Rate Modifier (function of part-load ratio) output is less than or "
                                                        "equal to zero warning continues...",
                                                    this->ExhFlowFPLRErrorIndex,
@@ -1619,7 +1624,7 @@ namespace MicroturbineElectricGenerator {
                                           General::TrimSigDigits(CombustionAirInletTemp, 2) + '.');
                         ShowContinueErrorTimeStamp(state, "...Resetting curve output to zero and continuing simulation.");
                     }
-                    ShowRecurringWarningErrorAtEnd("GENERATOR:MICROTURBINE \"" + this->Name +
+                    ShowRecurringWarningErrorAtEnd(state, "GENERATOR:MICROTURBINE \"" + this->Name +
                                                        "\": Exhaust Air Temperature Modifier (function of temperature) output is less than or equal "
                                                        "to zero warning continues...",
                                                    this->ExhTempFTempErrorIndex,
@@ -1644,7 +1649,7 @@ namespace MicroturbineElectricGenerator {
                         ShowContinueError(state, "...Value occurs using a part-load ratio of " + General::TrimSigDigits(PLR, 2) + '.');
                         ShowContinueErrorTimeStamp(state, "...Resetting curve output to zero and continuing simulation.");
                     }
-                    ShowRecurringWarningErrorAtEnd("GENERATOR:MICROTURBINE \"" + this->Name +
+                    ShowRecurringWarningErrorAtEnd(state, "GENERATOR:MICROTURBINE \"" + this->Name +
                                                        "\": Exhaust Air Temperature Modifier (function of part-load ratio) output is less than or "
                                                        "equal to zero warning continues...",
                                                    this->ExhTempFPLRErrorIndex,
@@ -1694,7 +1699,7 @@ namespace MicroturbineElectricGenerator {
                     ShowContinueError(state, "...Value of combustion air inlet temp =" + General::TrimSigDigits(CombustionAirInletTemp, 4) + " C.");
                     ShowContinueErrorTimeStamp(state, "... Simulation will continue.");
                 }
-                ShowRecurringWarningErrorAtEnd("GENERATOR:MICROTURBINE \"" + this->Name +
+                ShowRecurringWarningErrorAtEnd(state, "GENERATOR:MICROTURBINE \"" + this->Name +
                                                    "\": Exhaust air temperature less than combustion air inlet temperature warning continues...",
                                                this->ExhTempLTInletTempIndex,
                                                this->ExhaustAirTemperature,
@@ -1712,7 +1717,7 @@ namespace MicroturbineElectricGenerator {
                                       " kgWater/kgDryAir.");
                     ShowContinueErrorTimeStamp(state, "... Simulation will continue.");
                 }
-                ShowRecurringWarningErrorAtEnd(
+                ShowRecurringWarningErrorAtEnd(state,
                     "GENERATOR:MICROTURBINE \"" + this->Name +
                         "\": Exhaust air humidity ratio less than combustion air inlet humidity ratio warning continues...",
                     this->ExhHRLTInletHRIndex,

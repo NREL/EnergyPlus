@@ -70,7 +70,6 @@
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::DataEnvironment;
-using namespace EnergyPlus::DataGlobals;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataRuntimeLanguage;
 using namespace EnergyPlus::DataSurfaces;

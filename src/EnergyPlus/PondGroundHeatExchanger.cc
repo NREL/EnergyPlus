@@ -128,10 +128,11 @@ namespace PondGroundHeatExchanger {
         PondGHE.clear();
     }
 
-    void PondGroundHeatExchangerData::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
+    void PondGroundHeatExchangerData::simulate(EnergyPlusData &state,
+                                               [[maybe_unused]] const PlantLocation &calledFromLocation,
                                                bool const FirstHVACIteration,
-                                               Real64 &EP_UNUSED(CurLoad),
-                                               bool const EP_UNUSED(RunFlag))
+                                               [[maybe_unused]] Real64 &CurLoad,
+                                               [[maybe_unused]] bool const RunFlag)
     {
         this->InitPondGroundHeatExchanger(state, FirstHVACIteration);
         this->CalcPondGroundHeatExchanger(state);
@@ -155,13 +156,13 @@ namespace PondGroundHeatExchanger {
         return nullptr;
     }
 
-    void PondGroundHeatExchangerData::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation))
+    void PondGroundHeatExchangerData::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation)
     {
         this->InitPondGroundHeatExchanger(state, true);
     }
 
-    void PondGroundHeatExchangerData::getDesignCapacities(EnergyPlusData &EP_UNUSED(state),
-                                                          const PlantLocation &EP_UNUSED(calledFromLocation),
+    void PondGroundHeatExchangerData::getDesignCapacities([[maybe_unused]] EnergyPlusData &state,
+                                                          [[maybe_unused]] const PlantLocation &calledFromLocation,
                                                           Real64 &MaxLoad,
                                                           Real64 &MinLoad,
                                                           Real64 &OptLoad)
@@ -402,7 +403,7 @@ namespace PondGroundHeatExchanger {
             this->setupOutputVarsFlag = false;
         }
 
-        if (this->OneTimeFlag || DataGlobals::WarmupFlag) {
+        if (this->OneTimeFlag || state.dataGlobal->WarmupFlag) {
             // initialize pond temps to mean of drybulb and ground temps.
             this->BulkTemperature = this->PastBulkTemperature =
                 0.5 * (DataEnvironment::OutDryBulbTempAt(state, PondHeight) + DataEnvironment::GroundTemp_Deep);
@@ -832,14 +833,14 @@ namespace PondGroundHeatExchanger {
                                    General::RoundSigDigits(PondTemperature, 2) + "] C");
                 ShowContinueErrorTimeStamp(state, "");
             }
-            ShowRecurringWarningErrorAtEnd("GroundHeatExchanger:Pond=\"" + this->Name + "\", is frozen",
+            ShowRecurringWarningErrorAtEnd(state, "GroundHeatExchanger:Pond=\"" + this->Name + "\", is frozen",
                                            this->FrozenErrIndex,
                                            PondTemperature,
                                            PondTemperature,
                                            _,
                                            "[C]",
                                            "[C]");
-            if (this->ConsecutiveFrozen >= DataGlobals::NumOfTimeStepInHour * 30) {
+            if (this->ConsecutiveFrozen >= state.dataGlobal->NumOfTimeStepInHour * 30) {
                 ShowFatalError(state, "GroundHeatExchanger:Pond=\"" + this->Name + "\" has been frozen for 30 consecutive hours.  Program terminates.");
             }
         } else {

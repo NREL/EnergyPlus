@@ -334,11 +334,11 @@ TEST_F(EnergyPlusFixture, SetPointManager_DefineCondEntSetPointManager)
                                                       "For: AllDays,            !- Field 2",
                                                       "Until: 24:00,30.0;       !- Field 3"});
     ASSERT_TRUE(process_idf(idf_objects));
-    DataGlobals::NumOfTimeStepInHour = 4;
-    DataGlobals::MinutesPerTimeStep = 60 / DataGlobals::NumOfTimeStepInHour;
+    state.dataGlobal->NumOfTimeStepInHour = 4;
+    state.dataGlobal->MinutesPerTimeStep = 60 / state.dataGlobal->NumOfTimeStepInHour;
     ScheduleManager::ProcessScheduleInput(state);
-    DataGlobals::TimeStep = 1;
-    DataGlobals::HourOfDay = 1;
+    state.dataGlobal->TimeStep = 1;
+    state.dataGlobal->HourOfDay = 1;
     DataEnvironment::DayOfWeek = 1;
     DataEnvironment::DayOfYear_Schedule = 1;
     ScheduleManager::UpdateScheduleValues(state);
@@ -543,11 +543,11 @@ TEST_F(EnergyPlusFixture, CalcScheduledTESSetPoint)
         "Schedule:Constant,MyScheduleOff,,0;",
     }));
     ASSERT_TRUE(process_idf(idf_contents));
-    DataGlobals::NumOfTimeStepInHour = 4;
-    DataGlobals::MinutesPerTimeStep = 60 / DataGlobals::NumOfTimeStepInHour;
+    state.dataGlobal->NumOfTimeStepInHour = 4;
+    state.dataGlobal->MinutesPerTimeStep = 60 / state.dataGlobal->NumOfTimeStepInHour;
     ScheduleManager::ProcessScheduleInput(state);
-    DataGlobals::TimeStep = 1;
-    DataGlobals::HourOfDay = 1;
+    state.dataGlobal->TimeStep = 1;
+    state.dataGlobal->HourOfDay = 1;
     DataEnvironment::DayOfWeek = 1;
     DataEnvironment::DayOfYear_Schedule = 1;
     ScheduleManager::UpdateScheduleValues(state);
@@ -594,9 +594,9 @@ TEST_F(EnergyPlusFixture, SZRHOAFractionImpact)
 
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
-    DataGlobals::NumOfZones = 1;
+    state.dataGlobal->NumOfZones = 1;
 
-    DataHeatBalance::Zone.allocate(DataGlobals::NumOfZones);
+    DataHeatBalance::Zone.allocate(state.dataGlobal->NumOfZones);
     DataHeatBalance::Zone(1).Name = "KITCHEN";
 
     state.dataAirLoop->AirLoopFlow.allocate(1);
@@ -1192,8 +1192,8 @@ TEST_F(EnergyPlusFixture, ColdestSetPointMgrInSingleDuct)
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
 
-    DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->NumOfTimeStepInHour = 1;
+    state.dataGlobal->MinutesPerTimeStep = 60;
     ScheduleManager::ProcessScheduleInput(state);
 
     HeatBalanceManager::GetZoneData(state, ErrorsFound); // read zone data
@@ -1207,7 +1207,7 @@ TEST_F(EnergyPlusFixture, ColdestSetPointMgrInSingleDuct)
     BranchInputManager::GetMixerInput(state);
     BranchInputManager::ManageBranchInput(state);
 
-    DataGlobals::SysSizingCalc = true;
+    state.dataGlobal->SysSizingCalc = true;
     SimAirServingZones::GetAirPathData(state);
     SimAirServingZones::InitAirLoops(state, true);
     // check the number of zones served by single duct or dual duct system
@@ -1376,9 +1376,9 @@ TEST_F(EnergyPlusFixture, SingZoneRhSetPtMgrZoneInletNodeTest)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    DataGlobals::NumOfZones = 1;
+    state.dataGlobal->NumOfZones = 1;
 
-    DataHeatBalance::Zone.allocate(DataGlobals::NumOfZones);
+    DataHeatBalance::Zone.allocate(state.dataGlobal->NumOfZones);
     DataHeatBalance::Zone(1).Name = "KITCHEN";
 
     DataLoopNode::Node.allocate(3);
@@ -1443,9 +1443,9 @@ TEST_F(EnergyPlusFixture, SingZoneCoolHeatSetPtMgrZoneInletNodeTest)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    DataGlobals::NumOfZones = 1;
+    state.dataGlobal->NumOfZones = 1;
 
-    DataHeatBalance::Zone.allocate(DataGlobals::NumOfZones);
+    DataHeatBalance::Zone.allocate(state.dataGlobal->NumOfZones);
     DataHeatBalance::Zone(1).Name = "ZSF1";
 
     DataLoopNode::Node.allocate(3);
@@ -1510,9 +1510,9 @@ TEST_F(EnergyPlusFixture, SingZoneCoolHeatSetPtMgrSetPtTest)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    DataGlobals::NumOfZones = 1;
+    state.dataGlobal->NumOfZones = 1;
 
-    DataHeatBalance::Zone.allocate(DataGlobals::NumOfZones);
+    DataHeatBalance::Zone.allocate(state.dataGlobal->NumOfZones);
     DataHeatBalance::Zone(1).Name = "ZSF1";
     SetPointManager::GetSetPointManagerInputs(state);
 

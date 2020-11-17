@@ -1026,7 +1026,7 @@ namespace AirLoopHVACDOAS {
                                                General::RoundSigDigits(maxDiff, 6));
                 } else {
                     ++loop.ConveCount;
-                    ShowRecurringWarningErrorAtEnd(loop.Name +
+                    ShowRecurringWarningErrorAtEnd(state, loop.Name +
                                                        "\": The max difference of node temperatures exceeding 1.0e-6  continues...",
                                                    loop.ConveIndex,
                                                    maxDiff,

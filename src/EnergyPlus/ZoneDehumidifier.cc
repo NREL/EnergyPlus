@@ -115,12 +115,12 @@ namespace ZoneDehumidifier {
     using namespace ScheduleManager;
 
     void SimZoneDehumidifier(EnergyPlusData &state,
-                             std::string const &CompName,              // Name of the zone dehumidifier
-                             int const ZoneNum,                        // Number of zone being served
-                             bool const EP_UNUSED(FirstHVACIteration), // TRUE if 1st HVAC simulation of system timestep
-                             Real64 &QSensOut,                         // Sensible capacity delivered to zone (W)
-                             Real64 &QLatOut,                          // Latent capacity delivered to zone (kg/s), dehumidify = negative
-                             int &CompIndex                            // Index to the zone dehumidifier
+                             std::string const &CompName,                    // Name of the zone dehumidifier
+                             int const ZoneNum,                              // Number of zone being served
+                             [[maybe_unused]] bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
+                             Real64 &QSensOut,                               // Sensible capacity delivered to zone (W)
+                             Real64 &QLatOut,                                // Latent capacity delivered to zone (kg/s), dehumidify = negative
+                             int &CompIndex                                  // Index to the zone dehumidifier
     )
     {
 
@@ -591,7 +591,7 @@ namespace ZoneDehumidifier {
         if (!state.dataZoneDehumidifier->ZoneEquipmentListChecked && ZoneEquipInputsFilled) {
             state.dataZoneDehumidifier->ZoneEquipmentListChecked = true;
             for (LoopIndex = 1; LoopIndex <= state.dataZoneDehumidifier->NumDehumidifiers; ++LoopIndex) {
-                if (CheckZoneEquipmentList(state.dataZoneDehumidifier->ZoneDehumid(LoopIndex).UnitType, state.dataZoneDehumidifier->ZoneDehumid(LoopIndex).Name)) continue;
+                if (CheckZoneEquipmentList(state, state.dataZoneDehumidifier->ZoneDehumid(LoopIndex).UnitType, state.dataZoneDehumidifier->ZoneDehumid(LoopIndex).Name)) continue;
                 ShowSevereError(state, "InitZoneDehumidifier: Zone Dehumidifier=\"" + state.dataZoneDehumidifier->ZoneDehumid(LoopIndex).UnitType + ',' + state.dataZoneDehumidifier->ZoneDehumid(LoopIndex).Name +
                                 "\" is not on any ZoneHVAC:EquipmentList.  It will not be simulated.");
             }
@@ -780,7 +780,7 @@ namespace ZoneDehumidifier {
                                       " and an inlet air relative humidity of " + TrimSigDigits(InletAirRH, 1) + '.');
                     ShowContinueErrorTimeStamp(state, " Dehumidifier turned off for this time step but simulation continues.");
                 } else {
-                    ShowRecurringWarningErrorAtEnd(state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).UnitType + " \"" + state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).Name +
+                    ShowRecurringWarningErrorAtEnd(state, state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).UnitType + " \"" + state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).Name +
                                                        "\": Water Removal Rate Curve output is <= 0.0 warning continues...",
                                                    state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).WaterRemovalCurveErrorIndex,
                                                    WaterRemovalRateFactor,
@@ -814,7 +814,7 @@ namespace ZoneDehumidifier {
                                       " and an inlet air relative humidity of " + TrimSigDigits(InletAirRH, 1) + '.');
                     ShowContinueErrorTimeStamp(state, " Dehumidifier turned off for this time step but simulation continues.");
                 } else {
-                    ShowRecurringWarningErrorAtEnd(state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).UnitType + " \"" + state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).Name +
+                    ShowRecurringWarningErrorAtEnd(state, state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).UnitType + " \"" + state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).Name +
                                                        "\": Energy Factor Curve output is <= 0.0 warning continues...",
                                                    state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).EnergyFactorCurveErrorIndex,
                                                    EnergyFactorAdjFactor,
@@ -841,7 +841,7 @@ namespace ZoneDehumidifier {
                                           ") at a part-load ratio =" + TrimSigDigits(PLR, 3));
                         ShowContinueErrorTimeStamp(state, " PLF curve values must be >= 0.7.  PLF has been reset to 0.7 and simulation is continuing.");
                     } else {
-                        ShowRecurringWarningErrorAtEnd(state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).UnitType + " \"" + state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).Name +
+                        ShowRecurringWarningErrorAtEnd(state, state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).UnitType + " \"" + state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).Name +
                                                            "\": Part Load Fraction Correlation Curve output < 0.7 warning continues...",
                                                        state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).LowPLFErrorIndex,
                                                        PLF,
@@ -858,7 +858,7 @@ namespace ZoneDehumidifier {
                                           ") at a part-load ratio =" + TrimSigDigits(PLR, 3));
                         ShowContinueErrorTimeStamp(state, " PLF curve values must be < 1.0.  PLF has been reset to 1.0 and simulation is continuing.");
                     } else {
-                        ShowRecurringWarningErrorAtEnd(state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).UnitType + " \"" + state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).Name +
+                        ShowRecurringWarningErrorAtEnd(state, state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).UnitType + " \"" + state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).Name +
                                                            "\": Part Load Fraction Correlation Curve output > 1.0 warning continues...",
                                                        state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).HighPLFErrorIndex,
                                                        PLF,
@@ -878,7 +878,7 @@ namespace ZoneDehumidifier {
                         ShowContinueError(state, "Runtime fraction reset to 1 and the simulation will continue.");
                         ShowContinueErrorTimeStamp(state, "");
                     } else {
-                        ShowRecurringWarningErrorAtEnd(state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).UnitType + " \"" + state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).Name +
+                        ShowRecurringWarningErrorAtEnd(state, state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).UnitType + " \"" + state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).Name +
                                                            "\": Part load fraction less than part load ratio warning continues...",
                                                        state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).PLFPLRErrorIndex);
                     }
@@ -894,7 +894,7 @@ namespace ZoneDehumidifier {
                         ShowContinueError(state, "Runtime fraction reset to 1 and the simulation will continue.");
                         ShowContinueErrorTimeStamp(state, "");
                     } else {
-                        ShowRecurringWarningErrorAtEnd(state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).UnitType + " \"" + state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).Name +
+                        ShowRecurringWarningErrorAtEnd(state, state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).UnitType + " \"" + state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).Name +
                                                            "\": Runtime fraction for zone dehumidifier exceeded 1.0 warning continues...",
                                                        state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).HighRTFErrorIndex,
                                                        RunTimeFraction,

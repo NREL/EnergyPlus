@@ -170,7 +170,6 @@ SET( SRC
   DataGenerators.hh
   DataGlobalConstants.cc
   DataGlobalConstants.hh
-  DataGlobals.cc
   DataGlobals.hh
   DataHVACControllers.cc
   DataHVACControllers.hh

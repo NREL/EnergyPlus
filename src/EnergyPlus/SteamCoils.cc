@@ -97,7 +97,6 @@ namespace SteamCoils {
     // manage the SteamCoil System Component.
 
     using namespace DataLoopNode;
-    using namespace DataGlobals;
     using namespace DataHVACGlobals;
     using namespace Psychrometrics;
     using namespace FluidProperties;
@@ -495,7 +494,7 @@ namespace SteamCoils {
             MyPlantScanFlag(CoilNum) = false;
         }
 
-        if (!SysSizingCalc && state.dataSteamCoils->MySizeFlag(CoilNum)) {
+        if (!state.dataGlobal->SysSizingCalc && state.dataSteamCoils->MySizeFlag(CoilNum)) {
             // for each coil, do the sizing once.
             SizeSteamCoil(state, CoilNum);
             state.dataSteamCoils->MySizeFlag(CoilNum) = false;
@@ -997,9 +996,6 @@ namespace SteamCoils {
         // desired is input by the user, which is used to calculate water outlet temp.
         // Heat exchange is = Latent Heat + Sensible heat,coil effectivness is 1.0
 
-        using DataGlobals::DoingSizing;
-        using DataGlobals::KickOffSimulation;
-        using DataGlobals::WarmupFlag;
         using DataHVACGlobals::TempControlTol;
         using FaultsManager::FaultsCoilSATSensor;
         using PlantUtilities::SetComponentFlowRate;
@@ -1041,8 +1037,8 @@ namespace SteamCoils {
         SubcoolDeltaTemp = state.dataSteamCoils->SteamCoil(CoilNum).DegOfSubcooling;
         TempSetPoint = state.dataSteamCoils->SteamCoil(CoilNum).DesiredOutletTemp;
 
-        // If there is a fault of coil SAT Sensor (zrp_Jul2016)
-        if (state.dataSteamCoils->SteamCoil(CoilNum).FaultyCoilSATFlag && (!WarmupFlag) && (!DoingSizing) && (!KickOffSimulation)) {
+        // If there is a fault of coil SAT Sensor
+        if (state.dataSteamCoils->SteamCoil(CoilNum).FaultyCoilSATFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
             // calculate the sensor offset using fault information
             int FaultIndex = state.dataSteamCoils->SteamCoil(CoilNum).FaultyCoilSATIndex;
             state.dataSteamCoils->SteamCoil(CoilNum).FaultyCoilSATOffset = FaultsCoilSATSensor(FaultIndex).CalFaultOffsetAct(state);
@@ -1525,7 +1521,8 @@ namespace SteamCoils {
         return IndexNum;
     }
 
-    void CheckSteamCoilSchedule(EnergyPlusData &state, std::string const &EP_UNUSED(CompType), std::string const &CompName, Real64 &Value, int &CompIndex)
+    void CheckSteamCoilSchedule(
+        EnergyPlusData &state, [[maybe_unused]] std::string const &CompType, std::string const &CompName, Real64 &Value, int &CompIndex)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1607,7 +1604,7 @@ namespace SteamCoils {
             if (WhichCoil != 0) {
                 // coil does not specify MaxWaterFlowRate
                 MaxWaterFlowRate = 0.0;
-                ShowRecurringWarningErrorAtEnd("Requested Max Water Flow Rate from COIL:Heating:Steam N/A", ErrCount);
+                ShowRecurringWarningErrorAtEnd(state, "Requested Max Water Flow Rate from COIL:Heating:Steam N/A", ErrCount);
             }
         } else {
             WhichCoil = 0;
@@ -1745,9 +1742,9 @@ namespace SteamCoils {
     }
 
     int GetCoilAirOutletNode(EnergyPlusData &state,
-                             std::string const &CoilType, // must match coil types in this module
-                             std::string const &CoilName, // must match coil names for the coil type
-                             bool &EP_UNUSED(ErrorsFound) // set to true if problem
+                             std::string const &CoilType,       // must match coil types in this module
+                             std::string const &CoilName,       // must match coil names for the coil type
+                             [[maybe_unused]] bool &ErrorsFound // set to true if problem
     )
     {
 

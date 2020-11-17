@@ -278,7 +278,7 @@ TEST_F(EnergyPlusFixture, FiniteDiffGroundTempModel_GetWeather_Weather) {
     // Read the project data, such as Timestep
     state.dataGlobal->BeginSimFlag = true;
     SimulationManager::GetProjectData(state);
-    EXPECT_EQ(DataGlobals::NumOfTimeStepInHour, 4);
+    EXPECT_EQ(state.dataGlobal->NumOfTimeStepInHour, 4);
 
     // Needed to avoid crash in SetupSimulation (from ElectricPowerServiceManager.hh)
     createFacilityElectricPowerServiceObject();

@@ -91,7 +91,6 @@ namespace VariableSpeedCoils {
     // Use statements for data only modules
     // Using/Aliasing
     using namespace DataLoopNode;
-    using namespace DataGlobals;
     using namespace Psychrometrics;
     using DataEnvironment::CurMnDy;
     using DataEnvironment::EnvironmentName;
@@ -3007,16 +3006,16 @@ namespace VariableSpeedCoils {
     //******************************************************************************
 
     void InitVarSpeedCoil(EnergyPlusData &state,
-                          int const DXCoilNum,                       // Current DXCoilNum under simulation
-                          Real64 const MaxONOFFCyclesperHour,        // Maximum cycling rate of heat pump [cycles/hr]
-                          Real64 const HPTimeConstant,               // Heat pump time constant [s]
-                          Real64 const FanDelayTime,                 // Fan delay time, time delay for the HP's fan to
-                          Real64 const SensLoad,                     // Control zone sensible load[W]
-                          Real64 const LatentLoad,                   // Control zone latent load[W]
-                          int const CyclingScheme,                   // fan operating mode
-                          Real64 const EP_UNUSED(OnOffAirFlowRatio), // ratio of compressor on flow to average flow over time step
-                          Real64 const SpeedRatio,                   // compressor speed ratio
-                          int const SpeedNum                         // compressor speed number
+                          int const DXCoilNum,                             // Current DXCoilNum under simulation
+                          Real64 const MaxONOFFCyclesperHour,              // Maximum cycling rate of heat pump [cycles/hr]
+                          Real64 const HPTimeConstant,                     // Heat pump time constant [s]
+                          Real64 const FanDelayTime,                       // Fan delay time, time delay for the HP's fan to
+                          Real64 const SensLoad,                           // Control zone sensible load[W]
+                          Real64 const LatentLoad,                         // Control zone latent load[W]
+                          int const CyclingScheme,                         // fan operating mode
+                          [[maybe_unused]] Real64 const OnOffAirFlowRatio, // ratio of compressor on flow to average flow over time step
+                          Real64 const SpeedRatio,                         // compressor speed ratio
+                          int const SpeedNum                               // compressor speed number
     )
     {
 
@@ -3033,7 +3032,6 @@ namespace VariableSpeedCoils {
         // Uses the status flags to trigger initializations.
 
         // Using/Aliasing
-        using DataGlobals::SysSizingCalc;
         using DataPlant::PlantLoop;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
@@ -3136,7 +3134,7 @@ namespace VariableSpeedCoils {
             MyPlantScanFlag(DXCoilNum) = false;
         }
 
-        if (!SysSizingCalc && MySizeFlag(DXCoilNum) && !MyPlantScanFlag(DXCoilNum)) {
+        if (!state.dataGlobal->SysSizingCalc && MySizeFlag(DXCoilNum) && !MyPlantScanFlag(DXCoilNum)) {
             // for each furnace, do the sizing once.
             SizeVarSpeedCoil(state, DXCoilNum);
 
@@ -4056,7 +4054,7 @@ namespace VariableSpeedCoils {
                                                  RatedCapCoolTotalDes,
                                                  "User-Specified Rated Total Cooling Capacity [W]",
                                                  RatedCapCoolTotalUser);
-                    if (DisplayExtraWarnings) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
                         if ((std::abs(RatedCapCoolTotalDes - RatedCapCoolTotalUser) / RatedCapCoolTotalUser) > AutoVsHardSizingThreshold) {
                             ShowMessage(state, "SizeVarSpeedCoil: Potential issue with equipment sizing for " + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CoolHeatType + ' ' +
                                         CurrentObjSubfix);
@@ -4157,7 +4155,7 @@ namespace VariableSpeedCoils {
                                              RatedCapHeatDes,
                                              "User-Specified Nominal Heating Capacity [W]",
                                              RatedCapHeatUser);
-                if (DisplayExtraWarnings) {
+                if (state.dataGlobal->DisplayExtraWarnings) {
                     if ((std::abs(RatedCapHeatDes - RatedCapHeatUser) / RatedCapHeatUser) > AutoVsHardSizingThreshold) {
                         ShowMessage(state, "SizeVarSpeedCoil: Potential issue with equipment sizing for " + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CoolHeatType + ' ' +
                                     CurrentObjSubfix);
@@ -4196,7 +4194,7 @@ namespace VariableSpeedCoils {
                                                  RatedAirVolFlowRateDes,
                                                  "User-Specified Rated Air Flow Rate [m3/s]",
                                                  RatedAirVolFlowRateUser);
-                    if (DisplayExtraWarnings) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
                         if ((std::abs(RatedAirVolFlowRateDes - RatedAirVolFlowRateUser) / RatedAirVolFlowRateUser) > AutoVsHardSizingThreshold) {
                             ShowMessage(state, "SizeVarSpeedCoil: Potential issue with equipment sizing for" + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CoolHeatType + ' ' +
                                         CurrentObjSubfix);
@@ -4467,7 +4465,7 @@ namespace VariableSpeedCoils {
                                              RatedWaterVolFlowRateDes,
                                              "User-Specified Rated Water Flow Rate [m3/s]",
                                              RatedWaterVolFlowRateUser);
-                if (DisplayExtraWarnings) {
+                if (state.dataGlobal->DisplayExtraWarnings) {
                     if ((std::abs(RatedWaterVolFlowRateDes - RatedWaterVolFlowRateUser) / RatedWaterVolFlowRateUser) > AutoVsHardSizingThreshold) {
                         ShowMessage(state, "SizeVarSpeedCoil: Potential issue with equipment sizing for" + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CoolHeatType + ' ' +
                                     CurrentObjSubfix);
@@ -4743,7 +4741,7 @@ namespace VariableSpeedCoils {
                                                  EvapCondPumpElecNomPowerDes,
                                                  "User-Specified Evaporative Condenser Pump Rated Power Consumption [W]",
                                                  EvapCondPumpElecNomPowerUser);
-                    if (DisplayExtraWarnings) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
                         if ((std::abs(EvapCondPumpElecNomPowerDes - EvapCondPumpElecNomPowerUser) / EvapCondPumpElecNomPowerUser) >
                             AutoVsHardSizingThreshold) {
                             ShowMessage(state, "SizeVarSpeedCoil: Potential issue with equipment sizing for " + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CoolHeatType + ' ' +
@@ -4788,7 +4786,7 @@ namespace VariableSpeedCoils {
                                                  DefrostCapacityDes,
                                                  "User-Specified Resistive Defrost Heater Capacity [W]",
                                                  DefrostCapacityUser);
-                    if (DisplayExtraWarnings) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
                         if ((std::abs(DefrostCapacityDes - DefrostCapacityUser) / DefrostCapacityUser) > AutoVsHardSizingThreshold) {
                             ShowMessage(state, "SizeVarSpeedCoil: Potential issue with equipment sizing for " + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CoolHeatType + ' ' +
                                         CurrentObjSubfix);
@@ -4857,16 +4855,16 @@ namespace VariableSpeedCoils {
     }
 
     void CalcVarSpeedCoilCooling(EnergyPlusData &state,
-                                 int const DXCoilNum,                       // Heat Pump Number
-                                 int const CyclingScheme,                   // Fan/Compressor cycling scheme indicator
-                                 Real64 &RuntimeFrac,                       // Runtime Fraction of compressor or percent on time (on-time/cycle time)
-                                 Real64 const EP_UNUSED(SensDemand),        // Cooling Sensible Demand [W] !unused1208
-                                 Real64 const EP_UNUSED(LatentDemand),      // Cooling Latent Demand [W]
-                                 int const CompOp,                          // compressor operation flag
-                                 Real64 const PartLoadRatio,                // compressor part load ratio
-                                 Real64 const EP_UNUSED(OnOffAirFlowRatio), // ratio of compressor on flow to average flow over time step
-                                 Real64 const SpeedRatio,                   // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)
-                                 int const SpeedNum                         // Speed number, high bound
+                                 int const DXCoilNum,                        // Heat Pump Number
+                                 int const CyclingScheme,                    // Fan/Compressor cycling scheme indicator
+                                 Real64 &RuntimeFrac,                        // Runtime Fraction of compressor or percent on time (on-time/cycle time)
+                                 [[maybe_unused]] Real64 const SensDemand,   // Cooling Sensible Demand [W] !unused1208
+                                 [[maybe_unused]] Real64 const LatentDemand, // Cooling Latent Demand [W]
+                                 int const CompOp,                           // compressor operation flag
+                                 Real64 const PartLoadRatio,                 // compressor part load ratio
+                                 [[maybe_unused]] Real64 const OnOffAirFlowRatio, // ratio of compressor on flow to average flow over time step
+                                 Real64 const SpeedRatio, // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)
+                                 int const SpeedNum       // Speed number, high bound
     )
     {
 
@@ -6077,15 +6075,15 @@ namespace VariableSpeedCoils {
     }
 
     void CalcVarSpeedCoilHeating(EnergyPlusData &state,
-                                 int const DXCoilNum,                       // Heat Pump Number
-                                 int const CyclingScheme,                   // Fan/Compressor cycling scheme indicator
-                                 Real64 &RuntimeFrac,                       // Runtime Fraction of compressor or percent on time (on-time/cycle time)
-                                 Real64 const EP_UNUSED(SensDemand),        // Cooling Sensible Demand [W] !unused1208
-                                 int const CompOp,                          // compressor operation flag
-                                 Real64 const PartLoadRatio,                // compressor part load ratio
-                                 Real64 const EP_UNUSED(OnOffAirFlowRatio), // ratio of compressor on flow to average flow over time step
-                                 Real64 const SpeedRatio,                   // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)
-                                 int const SpeedNum                         // Speed number, high bound, i.e. SpeedNum - 1 is the other side
+                                 int const DXCoilNum,                      // Heat Pump Number
+                                 int const CyclingScheme,                  // Fan/Compressor cycling scheme indicator
+                                 Real64 &RuntimeFrac,                      // Runtime Fraction of compressor or percent on time (on-time/cycle time)
+                                 [[maybe_unused]] Real64 const SensDemand, // Cooling Sensible Demand [W] !unused1208
+                                 int const CompOp,                         // compressor operation flag
+                                 Real64 const PartLoadRatio,               // compressor part load ratio
+                                 [[maybe_unused]] Real64 const OnOffAirFlowRatio, // ratio of compressor on flow to average flow over time step
+                                 Real64 const SpeedRatio, // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)
+                                 int const SpeedNum       // Speed number, high bound, i.e. SpeedNum - 1 is the other side
     )
     {
 
@@ -6121,7 +6119,7 @@ namespace VariableSpeedCoils {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("CalcVarSpeedCoilHeating");
-        static std::string const RoutineNameSourceSideInletTemp("CalcVarSpeedCoilHeating:state.dataVariableSpeedCoils->SourceSideInletTemp");
+        static std::string const RoutineNameSourceSideInletTemp("CalcVarSpeedCoilHeating:SourceSideInletTemp");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -7162,7 +7160,7 @@ namespace VariableSpeedCoils {
         }
 
         if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).reportCoilFinalSizes) {
-            if (!DataGlobals::WarmupFlag && !DataGlobals::DoingHVACSizingSimulations && !DataGlobals::DoingSizing) {
+            if (!state.dataGlobal->WarmupFlag && !state.dataGlobal->DoingHVACSizingSimulations && !state.dataGlobal->DoingSizing) {
                 if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == Coil_CoolingWaterToAirHPVSEquationFit ||
                     state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == Coil_CoolingAirToAirVariableSpeed) { // cooling coil
                     coilSelectionReportObj->setCoilFinalSizes(state, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,

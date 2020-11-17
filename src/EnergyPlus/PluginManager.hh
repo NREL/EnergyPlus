@@ -83,7 +83,7 @@ namespace PluginManagement {
     void registerNewCallback(EnergyPlusData &state, EMSManager::EMSCallFrom iCalledFrom, const std::function<void (void *)>& f);
     void runAnyRegisteredCallbacks(EnergyPlusData &state, EMSManager::EMSCallFrom iCalledFrom, bool &anyRan);
     void onBeginEnvironment();
-    std::string pythonStringForUsage();
+    std::string pythonStringForUsage(EnergyPlusData &state);
 
     void clear_state();
 
@@ -215,17 +215,7 @@ namespace PluginManagement {
         std::deque<Real64> values;
         std::deque<Real64> times;
         int indexOfPluginVariable;
-        PluginTrendVariable(std::string _name, int _numValues, int _indexOfPluginVariable) :
-            name(std::move(_name)), numValues(_numValues), indexOfPluginVariable(_indexOfPluginVariable)
-        {
-            // initialize the deque so it can be queried immediately, even with just zeroes
-            for (int i = 1; i <= this->numValues; i++) {
-                this->values.push_back(0);
-            }
-            for (int loop = 1; loop <= _numValues; ++loop) {
-                this->times.push_back(-loop * DataGlobals::TimeStepZone);
-            }
-        }
+        PluginTrendVariable(EnergyPlusData &state, std::string _name, int _numValues, int _indexOfPluginVariable);
         void reset() {
             this->values.clear();
             for (int i = 1; i <= this->numValues; i++) {

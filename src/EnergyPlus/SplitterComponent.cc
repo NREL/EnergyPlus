@@ -75,7 +75,6 @@ namespace SplitterComponent {
     // To encapsulate the data and algorithms required to
     // manage Air Path Splitter Components
 
-    using namespace DataGlobals;
     using namespace DataLoopNode;
 
     void
@@ -532,7 +531,7 @@ namespace SplitterComponent {
         } // The FirstCall END IF
     }
 
-    void ReportSplitter(int const EP_UNUSED(SplitterNum))
+    void ReportSplitter([[maybe_unused]] int const SplitterNum)
     {
 
         // SUBROUTINE INFORMATION:

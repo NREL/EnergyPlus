@@ -80,7 +80,7 @@ public:
 
     static std::shared_ptr<SiteShallowGroundTemps> ShallowGTMFactory(EnergyPlusData &state, int objectType, std::string objectName);
 
-    Real64 getGroundTemp(EnergyPlusData &EP_UNUSED(state)) override;
+    Real64 getGroundTemp([[maybe_unused]] EnergyPlusData &state) override;
 
     Real64 getGroundTempAtTimeInSeconds(EnergyPlusData &state, Real64 const depth, Real64 const timeInSecondsOfSim) override;
 

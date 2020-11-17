@@ -110,9 +110,6 @@ namespace HVACSingleDuctInduc {
     // Using/Aliasing
     using namespace DataLoopNode;
     using DataEnvironment::StdRhoAir;
-    using DataGlobals::DisplayExtraWarnings;
-    using DataGlobals::NumOfZones;
-    using DataGlobals::SysSizingCalc;
     // Use statements for access to subroutines in other modules
     using namespace ScheduleManager;
     using DataHVACGlobals::SmallAirVolFlow;
@@ -443,7 +440,7 @@ namespace HVACSingleDuctInduc {
                 ErrorsFound = true;
             } else {
                 // Fill the Zone Equipment data with the supply air inlet node number of this unit.
-                for (CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone) {
+                for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                     if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
                     for (SupAirIn = 1; SupAirIn <= ZoneEquipConfig(CtrlZone).NumInletNodes; ++SupAirIn) {
                         if (IndUnit(IUNum).OutAirNode == ZoneEquipConfig(CtrlZone).InletNode(SupAirIn)) {
@@ -514,7 +511,6 @@ namespace HVACSingleDuctInduc {
 
         // Using/Aliasing
         using DataDefineEquip::AirDistUnit;
-        using DataGlobals::AnyPlantInModel;
         using DataPlant::PlantLoop;
         using DataPlant::TypeOf_CoilWaterCooling;
         using DataPlant::TypeOf_CoilWaterDetailedFlatCooling;
@@ -600,7 +596,7 @@ namespace HVACSingleDuctInduc {
                 ShowFatalError(state, "InitIndUnit: Program terminated for previous conditions.");
             }
             MyPlantScanFlag(IUNum) = false;
-        } else if (MyPlantScanFlag(IUNum) && !AnyPlantInModel) {
+        } else if (MyPlantScanFlag(IUNum) && !state.dataGlobal->AnyPlantInModel) {
             MyPlantScanFlag(IUNum) = false;
         }
 
@@ -624,14 +620,14 @@ namespace HVACSingleDuctInduc {
             // Check to see if there is a Air Distribution Unit on the Zone Equipment List
             for (Loop = 1; Loop <= NumIndUnits; ++Loop) {
                 if (IndUnit(Loop).ADUNum == 0) continue;
-                if (CheckZoneEquipmentList("ZONEHVAC:AIRDISTRIBUTIONUNIT", AirDistUnit(IndUnit(Loop).ADUNum).Name)) continue;
+                if (CheckZoneEquipmentList(state, "ZONEHVAC:AIRDISTRIBUTIONUNIT", AirDistUnit(IndUnit(Loop).ADUNum).Name)) continue;
                 ShowSevereError(state, "InitIndUnit: ADU=[Air Distribution Unit," + AirDistUnit(IndUnit(Loop).ADUNum).Name +
                                 "] is not on any ZoneHVAC:EquipmentList.");
                 ShowContinueError(state, "...Unit=[" + IndUnit(Loop).UnitType + ',' + IndUnit(Loop).Name + "] will not be simulated.");
             }
         }
 
-        if (!SysSizingCalc && MySizeFlag(IUNum)) {
+        if (!state.dataGlobal->SysSizingCalc && MySizeFlag(IUNum)) {
 
             SizeIndUnit(state, IUNum);
             MySizeFlag(IUNum) = false;
@@ -847,7 +843,7 @@ namespace HVACSingleDuctInduc {
                                                      MaxTotAirVolFlowDes,
                                                      "User-Specified Maximum Total Air Flow Rate [m3/s]",
                                                      MaxTotAirVolFlowUser);
-                        if (DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(MaxTotAirVolFlowDes - MaxTotAirVolFlowUser) / MaxTotAirVolFlowUser) > AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeHVACSingleDuctInduction: Potential issue with equipment sizing for " + IndUnit(IUNum).UnitType +
                                             " = \"" + IndUnit(IUNum).Name + "\".");
@@ -947,7 +943,7 @@ namespace HVACSingleDuctInduc {
                                                          MaxVolHotWaterFlowDes,
                                                          "User-Specified Maximum Hot Water Flow Rate [m3/s]",
                                                          MaxVolHotWaterFlowUser);
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(MaxVolHotWaterFlowDes - MaxVolHotWaterFlowUser) / MaxVolHotWaterFlowUser) > AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeHVACSingleDuctInduction: Potential issue with equipment sizing for " + IndUnit(IUNum).UnitType +
                                                 " = \"" + IndUnit(IUNum).Name + "\".");
@@ -1038,7 +1034,7 @@ namespace HVACSingleDuctInduc {
                                                          MaxVolColdWaterFlowDes,
                                                          "User-Specified Maximum Cold Water Flow Rate [m3/s]",
                                                          MaxVolColdWaterFlowUser);
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(MaxVolColdWaterFlowDes - MaxVolColdWaterFlowUser) / MaxVolColdWaterFlowUser) >
                                     AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeHVACSingleDuctInduction: Potential issue with equipment sizing for " + IndUnit(IUNum).UnitType +
@@ -1257,7 +1253,7 @@ namespace HVACSingleDuctInduc {
                             ShowContinueError(state, "  Iteration limit [" + RoundSigDigits(SolveMaxIter) +
                                               "] exceeded in calculating hot water mass flow rate");
                         }
-                        ShowRecurringWarningErrorAtEnd("SimFourPipeIndUnit: Hot water coil control failed (iteration limit [" +
+                        ShowRecurringWarningErrorAtEnd(state, "SimFourPipeIndUnit: Hot water coil control failed (iteration limit [" +
                                                            RoundSigDigits(SolveMaxIter) + "]) for " + IndUnit(IUNum).UnitType + "=\"" +
                                                            IndUnit(IUNum).Name + "\"",
                                                        IndUnit(IUNum).HWCoilFailNum1);
@@ -1270,7 +1266,7 @@ namespace HVACSingleDuctInduc {
                             ShowContinueError(state, "...Given minimum water flow rate=" + RoundSigDigits(MinHotWaterFlow, 3) + " kg/s");
                             ShowContinueError(state, "...Given maximum water flow rate=" + RoundSigDigits(MaxHotWaterFlow, 3) + " kg/s");
                         }
-                        ShowRecurringWarningErrorAtEnd("SimFourPipeIndUnit: Hot water coil control failed (flow limits) for " +
+                        ShowRecurringWarningErrorAtEnd(state, "SimFourPipeIndUnit: Hot water coil control failed (flow limits) for " +
                                                            IndUnit(IUNum).UnitType + "=\"" + IndUnit(IUNum).Name + "\"",
                                                        IndUnit(IUNum).HWCoilFailNum2,
                                                        MaxHotWaterFlow,
@@ -1306,7 +1302,7 @@ namespace HVACSingleDuctInduc {
                             ShowContinueError(state, "  Iteration limit [" + RoundSigDigits(SolveMaxIter) +
                                               "] exceeded in calculating cold water mass flow rate");
                         }
-                        ShowRecurringWarningErrorAtEnd("SimFourPipeIndUnit: Cold water coil control failed (iteration limit [" +
+                        ShowRecurringWarningErrorAtEnd(state, "SimFourPipeIndUnit: Cold water coil control failed (iteration limit [" +
                                                            RoundSigDigits(SolveMaxIter) + "]) for " + IndUnit(IUNum).UnitType + "=\"" +
                                                            IndUnit(IUNum).Name,
                                                        IndUnit(IUNum).CWCoilFailNum1);
@@ -1319,7 +1315,7 @@ namespace HVACSingleDuctInduc {
                             ShowContinueError(state, "...Given minimum water flow rate=" + RoundSigDigits(MinColdWaterFlow, 3) + " kg/s");
                             ShowContinueError(state, "...Given maximum water flow rate=" + RoundSigDigits(MaxColdWaterFlow, 3) + " kg/s");
                         }
-                        ShowRecurringWarningErrorAtEnd("SimFourPipeIndUnit: Cold water coil control failed (flow limits) for " +
+                        ShowRecurringWarningErrorAtEnd(state, "SimFourPipeIndUnit: Cold water coil control failed (flow limits) for " +
                                                            IndUnit(IUNum).UnitType + "=\"" + IndUnit(IUNum).Name + "\"",
                                                        IndUnit(IUNum).CWCoilFailNum2,
                                                        MaxColdWaterFlow,

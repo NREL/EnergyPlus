@@ -163,7 +163,7 @@ namespace HeatBalanceKivaManager {
 
         // Initialize with steady state before accelerated timestepping
         instance.ground->foundation.numericalScheme = Kiva::Foundation::NS_STEADY_STATE;
-        setInitialBoundaryConditions(state, kivaWeather, accDate, 24, DataGlobals::NumOfTimeStepInHour);
+        setInitialBoundaryConditions(state, kivaWeather, accDate, 24, state.dataGlobal->NumOfTimeStepInHour);
         instance.calculate();
         accDate += acceleratedTimestep;
         while (accDate > 365 + state.dataWeatherManager->LeapYearAdd) {
@@ -173,7 +173,7 @@ namespace HeatBalanceKivaManager {
         // Accelerated timestepping
         instance.ground->foundation.numericalScheme = Kiva::Foundation::NS_IMPLICIT;
         for (int i = 0; i < numAccelaratedTimesteps; ++i) {
-            setInitialBoundaryConditions(state, kivaWeather, accDate, 24, DataGlobals::NumOfTimeStepInHour);
+            setInitialBoundaryConditions(state, kivaWeather, accDate, 24, state.dataGlobal->NumOfTimeStepInHour);
             instance.calculate(acceleratedTimestep * 24 * 60 * 60);
             accDate += acceleratedTimestep;
             while (accDate > 365 + state.dataWeatherManager->LeapYearAdd) {
@@ -194,9 +194,9 @@ namespace HeatBalanceKivaManager {
 
         if (kivaWeather.intervalsPerHour == 1) {
             index = (date - 1) * 24 + (hour - 1);
-            weightNow = min(1.0, (double(timestep) / double(DataGlobals::NumOfTimeStepInHour)));
+            weightNow = min(1.0, (double(timestep) / double(state.dataGlobal->NumOfTimeStepInHour)));
         } else {
-            index = (date - 1) * 24 * DataGlobals::NumOfTimeStepInHour + (hour - 1) * DataGlobals::NumOfTimeStepInHour + (timestep - 1);
+            index = (date - 1) * 24 * state.dataGlobal->NumOfTimeStepInHour + (hour - 1) * state.dataGlobal->NumOfTimeStepInHour + (timestep - 1);
             weightNow = 1.0; // weather data interval must be the same as the timestep interval (i.e., no interpolation)
         }
         if (index == 0) {
@@ -1097,7 +1097,7 @@ namespace HeatBalanceKivaManager {
             kv.setBoundaryConditions(state);
             kv.instance.calculate(timestep);
             kv.instance.calculate_surface_averages();
-            if (DataEnvironment::Month == 1 && DataEnvironment::DayOfMonth == 1 && DataGlobals::HourOfDay == 1 && DataGlobals::TimeStep == 1) {
+            if (DataEnvironment::Month == 1 && DataEnvironment::DayOfMonth == 1 && state.dataGlobal->HourOfDay == 1 && state.dataGlobal->TimeStep == 1) {
                 kv.plotDomain();
             }
         }
@@ -1145,7 +1145,7 @@ namespace HeatBalanceKivaManager {
         }
 
         gp.createFrame(std::to_string(DataEnvironment::Month) + "/" + std::to_string(DataEnvironment::DayOfMonth) + " " +
-                       std::to_string(DataGlobals::HourOfDay) + ":00");
+                       std::to_string(state.dataGlobal->HourOfDay) + ":00");
 
 #ifndef NDEBUG
 

@@ -160,7 +160,6 @@ void ControlCompOutput(EnergyPlusData &state, std::string const &CompName,      
     using namespace DataLoopNode;
     using BaseboardRadiator::SimHWConvective;
     using DataBranchAirLoopPlant::MassFlowTolerance;
-    using DataGlobals::WarmupFlag;
     using FanCoilUnits::Calc4PipeFanCoil;
     using General::RoundSigDigits;
     using General::TrimSigDigits;
@@ -626,7 +625,7 @@ void ControlCompOutput(EnergyPlusData &state, std::string const &CompName,      
         }
 
         ++Iter;
-        if ((Iter > MaxIter) && (!WarmupFlag)) {
+        if ((Iter > MaxIter) && (!state.dataGlobal->WarmupFlag)) {
             // if ( CompErrIndex == 0 ) {
             ShowWarningMessage(state, "ControlCompOutput: Maximum iterations exceeded for " + CompType + " = " + CompName);
             ShowContinueError(state, "... Load met       = " + TrimSigDigits(LoadMet, 5) + " W.");
@@ -636,7 +635,7 @@ void ControlCompOutput(EnergyPlusData &state, std::string const &CompName,      
             ShowContinueError(state, "... Error          = (Load met - Load requested) / MAXIMUM(Load requested, 100)");
             ShowContinueError(state, "... Actuated Node Mass Flow Rate =" + RoundSigDigits(Node(ActuatedNode).MassFlowRate, 9) + " kg/s");
             ShowContinueErrorTimeStamp(state, "");
-            ShowRecurringWarningErrorAtEnd("ControlCompOutput: Maximum iterations error for " + CompType + " = " + CompName,
+            ShowRecurringWarningErrorAtEnd(state, "ControlCompOutput: Maximum iterations error for " + CompType + " = " + CompName,
                                            CompErrIndex,
                                            std::abs((LoadMet - QZnReq) * 100.0 / Denom),
                                            std::abs((LoadMet - QZnReq) * 100.0 / Denom),
@@ -644,7 +643,7 @@ void ControlCompOutput(EnergyPlusData &state, std::string const &CompName,      
                                            "%",
                                            "%");
             //}
-            ShowRecurringWarningErrorAtEnd("ControlCompOutput: Maximum iterations error for " + CompType + " = " + CompName,
+            ShowRecurringWarningErrorAtEnd(state, "ControlCompOutput: Maximum iterations error for " + CompType + " = " + CompName,
                                            CompErrIndex,
                                            std::abs((LoadMet - QZnReq) * 100.0 / Denom),
                                            std::abs((LoadMet - QZnReq) * 100.0 / Denom),
@@ -720,7 +719,6 @@ void CheckSysSizing(EnergyPlusData &state,
     // na
 
     // Using/Aliasing
-    using DataGlobals::DoSystemSizing;
     using DataSizing::NumSysSizInput;
     using DataSizing::SysSizingRunDone;
 
@@ -743,7 +741,7 @@ void CheckSysSizing(EnergyPlusData &state,
         if (NumSysSizInput == 0) {
             ShowContinueError(state, "No \"Sizing:System\" objects were entered.");
         }
-        if (!DoSystemSizing) {
+        if (!state.dataGlobal->DoSystemSizing) {
             ShowContinueError(state, "The \"SimulationControl\" object did not have the field \"Do System Sizing Calculation\" set to Yes.");
         }
         ShowFatalError(state, "Program terminates due to previously shown condition(s).");
@@ -822,7 +820,6 @@ void CheckZoneSizing(EnergyPlusData &state,
     // na
 
     // Using/Aliasing
-    using DataGlobals::DoZoneSizing;
     using DataSizing::NumZoneSizingInput;
     using DataSizing::ZoneSizingRunDone;
 
@@ -845,7 +842,7 @@ void CheckZoneSizing(EnergyPlusData &state,
         if (NumZoneSizingInput == 0) {
             ShowContinueError(state, "No \"Sizing:Zone\" objects were entered.");
         }
-        if (!DoZoneSizing) {
+        if (!state.dataGlobal->DoZoneSizing) {
             ShowContinueError(state, "The \"SimulationControl\" object did not have the field \"Do Zone Sizing Calculation\" set to Yes.");
         }
         ShowFatalError(state, "Program terminates due to previously shown condition(s).");

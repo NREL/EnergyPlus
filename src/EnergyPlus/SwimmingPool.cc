@@ -134,16 +134,17 @@ namespace SwimmingPool {
         ReportSwimmingPool(state);
     }
 
-    void SwimmingPoolData::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
+    void SwimmingPoolData::simulate(EnergyPlusData &state,
+                                    [[maybe_unused]] const PlantLocation &calledFromLocation,
                                     bool FirstHVACIteration,
-                                    Real64 &EP_UNUSED(CurLoad),
-                                    bool EP_UNUSED(RunFlag))
+                                    [[maybe_unused]] Real64 &CurLoad,
+                                    [[maybe_unused]] bool RunFlag)
     {
         this->initialize(state, FirstHVACIteration);
 
         this->calculate(state);
 
-        this->update();
+        this->update(state);
     }
 
     void GetSwimmingPool(EnergyPlusData &state)
@@ -415,7 +416,7 @@ namespace SwimmingPool {
         } else if (DataSurfaces::Surface(this->SurfacePtr).IsRadSurfOrVentSlabOrPool) {
             ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alpha1 + "\", Invalid Surface");
             ShowContinueError(state, cAlphaField2 + "=\"" + Alpha2 + "\" has been used in another radiant system, ventilated slab, or pool.");
-            ShowContinueError(state, 
+            ShowContinueError(state,
                 "A single surface can only be a radiant system, a ventilated slab, or a pool.  It CANNOT be more than one of these.");
             ErrorsFound = true;
             // Something present that is not allowed for a swimming pool (non-CTF algorithm, movable insulation, or radiant source/sink
@@ -433,7 +434,7 @@ namespace SwimmingPool {
                             " is a pool and has movable insulation.  This is not allowed.  Remove the movable insulation for this surface.");
             ErrorsFound = true;
         } else if (state.dataConstruction->Construct(DataSurfaces::Surface(this->SurfacePtr).Construction).SourceSinkPresent) {
-            ShowSevereError(state, 
+            ShowSevereError(state,
                 DataSurfaces::Surface(this->SurfacePtr).Name +
                 " is a pool and uses a construction with a source/sink.  This is not allowed.  Use a standard construction for this surface.");
             ErrorsFound = true;
@@ -444,7 +445,7 @@ namespace SwimmingPool {
             // Check to make sure pool surface is a floor
             if (DataSurfaces::Surface(this->SurfacePtr).Class != DataSurfaces::SurfaceClass_Floor) {
                 ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alpha1 + " contains a surface name that is NOT a floor.");
-                ShowContinueError(state, 
+                ShowContinueError(state,
                     "A swimming pool must be associated with a surface that is a FLOOR.  Association with other surface types is not permitted.");
                 ErrorsFound = true;
             }
@@ -472,7 +473,7 @@ namespace SwimmingPool {
 
         if (this->MyOneTimeFlag) {
             this->setupOutputVars(state); // Set up the output variables once here
-            this->ZeroSourceSumHATsurf.allocate(DataGlobals::NumOfZones);
+            this->ZeroSourceSumHATsurf.allocate(state.dataGlobal->NumOfZones);
             this->ZeroSourceSumHATsurf = 0.0;
             this->QPoolSrcAvg.allocate(DataSurfaces::TotSurfaces);
             this->QPoolSrcAvg = 0.0;
@@ -724,7 +725,7 @@ namespace SwimmingPool {
                 }
             }
             this->MyPlantScanFlagPool = false;
-        } else if (this->MyPlantScanFlagPool && !DataGlobals::AnyPlantInModel) {
+        } else if (this->MyPlantScanFlagPool && !state.dataGlobal->AnyPlantInModel) {
             this->MyPlantScanFlagPool = false;
         }
     }
@@ -859,10 +860,10 @@ namespace SwimmingPool {
         // We now have a flow rate so we can assemble the terms needed for the surface heat balance that is solved for the inside face temperature
         DataHeatBalFanSys::QPoolSurfNumerator(SurfNum) =
             SWtotal + LWtotal + PeopleGain + EvapEnergyLossPerArea + HConvIn * DataHeatBalFanSys::MAT(ZoneNum) +
-            (EvapRate * Tmuw + MassFlowRate * TLoopInletTemp + (this->WaterMass * TH22 / DataGlobals::TimeStepZoneSec)) * Cp /
+            (EvapRate * Tmuw + MassFlowRate * TLoopInletTemp + (this->WaterMass * TH22 / state.dataGlobal->TimeStepZoneSec)) * Cp /
                 DataSurfaces::Surface(SurfNum).Area;
         DataHeatBalFanSys::PoolHeatTransCoefs(SurfNum) =
-            HConvIn + (EvapRate + MassFlowRate + (this->WaterMass / DataGlobals::TimeStepZoneSec)) * Cp / DataSurfaces::Surface(SurfNum).Area;
+            HConvIn + (EvapRate + MassFlowRate + (this->WaterMass / state.dataGlobal->TimeStepZoneSec)) * Cp / DataSurfaces::Surface(SurfNum).Area;
 
         // Finally take care of the latent and convective gains resulting from the pool
         DataHeatBalFanSys::SumConvPool(ZoneNum) += this->RadConvertToConvect;
@@ -893,7 +894,7 @@ namespace SwimmingPool {
                    DataConversions::CFMF * this->CurCoverEvapFac;
     }
 
-    void SwimmingPoolData::update()
+    void SwimmingPoolData::update(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand, Ho-Sung Kim
@@ -910,13 +911,13 @@ namespace SwimmingPool {
         if (this->LastSysTimeElapsed(SurfNum) == DataHVACGlobals::SysTimeElapsed) {
             // Still iterating or reducing system time step, so subtract old values which were
             // not valid
-            this->QPoolSrcAvg(SurfNum) -= this->LastQPoolSrc(SurfNum) * this->LastTimeStepSys(SurfNum) / DataGlobals::TimeStepZone;
-            this->HeatTransCoefsAvg(SurfNum) -= this->LastHeatTransCoefs(SurfNum) * this->LastTimeStepSys(SurfNum) / DataGlobals::TimeStepZone;
+            this->QPoolSrcAvg(SurfNum) -= this->LastQPoolSrc(SurfNum) * this->LastTimeStepSys(SurfNum) / state.dataGlobal->TimeStepZone;
+            this->HeatTransCoefsAvg(SurfNum) -= this->LastHeatTransCoefs(SurfNum) * this->LastTimeStepSys(SurfNum) / state.dataGlobal->TimeStepZone;
         }
 
         // Update the running average and the "last" values with the current values of the appropriate variables
-        this->QPoolSrcAvg(SurfNum) += DataHeatBalFanSys::QPoolSurfNumerator(SurfNum) * DataHVACGlobals::TimeStepSys / DataGlobals::TimeStepZone;
-        this->HeatTransCoefsAvg(SurfNum) += DataHeatBalFanSys::PoolHeatTransCoefs(SurfNum) * DataHVACGlobals::TimeStepSys / DataGlobals::TimeStepZone;
+        this->QPoolSrcAvg(SurfNum) += DataHeatBalFanSys::QPoolSurfNumerator(SurfNum) * DataHVACGlobals::TimeStepSys / state.dataGlobal->TimeStepZone;
+        this->HeatTransCoefsAvg(SurfNum) += DataHeatBalFanSys::PoolHeatTransCoefs(SurfNum) * DataHVACGlobals::TimeStepSys / state.dataGlobal->TimeStepZone;
 
         this->LastQPoolSrc(SurfNum) = DataHeatBalFanSys::QPoolSurfNumerator(SurfNum);
         this->LastHeatTransCoefs(SurfNum) = DataHeatBalFanSys::PoolHeatTransCoefs(SurfNum);
