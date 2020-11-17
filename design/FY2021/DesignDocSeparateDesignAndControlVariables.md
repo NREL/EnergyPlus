@@ -108,6 +108,9 @@ The following common variables were decided to be set as control variables/unabl
  - The best way to decide what would be ideal system parameters would be to get feedback in some way from the current users. This would mean that the current users of radiant systems should be identified as well. 
  - Some of the common objects are optional fields or depend on other fields. I just wanted to point out that it should not be assumed that every field has the same importance. 
 
+
+
+
 #### ZoneHVAC:Baseboard:RadiantConvective Objects ####
 
 Common fields for all four ZoneHVAC:Baseboard:RadiantConvective objects were identified, and the following common variables were decided to be set as control variables/unable to be grouped as design parameters since they will be specific to every object in a radiant system:
@@ -144,6 +147,7 @@ This `ZoneHVAC:LowTemperatureRadiant:Design` object is referenced in the `ZoneHV
 *Field: Name*    
 *Field: Availability Schedule Name*     
 *Field: Temperature Control Type*    
+*Field: Fluid to Radiant Surface Heat Transfer Model*
 *Field: Hydronic Tubing Inside Diameter*    
 *Field: Hydronic Tubing Outside Diameter*    
 *Field: Hydronic Tubing Conductivity*    
@@ -214,8 +218,8 @@ Get feedback from the EnergyPlus team regarding:
 
 **ZoneHVAC:LowTemperatureRadiant:Design,**
 
-    	\memo Design parameters for ZoneHVAC:LowTemperatureRadiant objects
-            \min-fields 33
+    	    \memo Design parameters for ZoneHVAC:LowTemperatureRadiant objects
+            \min-fields 33 
        A1 , \field Name
             \required-field
             \reference-class-name validBranchEquipmentTypes
@@ -265,46 +269,22 @@ Get feedback from the EnergyPlus team regarding:
             \note Conductivity of the tubing/piping material
             \units W/m-K
             \minimum> 0
-            \default 0.35
-       A5 , \field Heating Design Capacity Method
-            \type choice
-            \key HeatingDesignCapacity
-            \key CapacityPerFloorArea
-            \key FractionOfAutosizedHeatingCapacity
-            \default HeatingDesignCapacity
-            \note Enter the method used to determine the heating design capacity.
-            \note HeatingDesignCapacity = > selected when the design heating capacity value or autosize
-            \note is specified. CapacityPerFloorArea = > selected when the design heating capacity is
-            \note determine from user specified heating capacity per floor area and zone floor area.
-            \note FractionOfAutosizedHeatingCapacity = > is selected when the design heating capacity is
-            \note determined from a user-specified fraction and the auto-sized design heating capacity.
-       N4 , \field Heating Design Capacity Per Floor Area
-            \type real
-            \units W/m2
-            \minimum 0.0
-            \note Enter the heating design capacity per zone floor area. Required field when the heating design
-            \note capacity method field is CapacityPerFloorArea.
-       N5 , \field Fraction of Autosized Heating Design Capacity
-            \type real
-            \minimum 0.0
-            \default 1.0
-            \note Enter the fraction of auto - sized heating design capacity.Required field when capacity the
-            \note heating design capacity method field is FractionOfAutosizedHeatingCapacity.           
-       A6, \field Condensation Control Type
+            \default 0.35          
+       A5, \field Condensation Control Type
             \type choice
             \key Off
             \key SimpleOff
             \key VariableOff
             \default SimpleOff
-       N6, \field Condensation Control Dewpoint Offset
+       N4, \field Condensation Control Dewpoint Offset
             \units C
             \default 1.0
-       A7, \field Number of Circuits
+       A6, \field Number of Circuits
             \type choice
             \key OnePerSurface
             \key CalculateFromCircuitLength
             \default OnePerSurface
-       A8; \field Changeover Delay Time Period Schedule
+       A7; \field Changeover Delay Time Period Schedule
             \note Changeover delay schedule name for this system.  Schedule value <= 0 allows changeover with no delay
             \note The schedule values are interpretted as hours.
             \note If this field is blank, the system allows changeover with no delay
@@ -519,11 +499,11 @@ Get feedback from the EnergyPlus team regarding:
             \reference-class-name validBranchEquipmentTypes
             \reference validBranchEquipmentNames
             \reference ZoneEquipmentNames
-       A3 , \field Zone Name
+       A2 , \field Zone Name
             \note Name of zone system is serving
             \type object-list
             \object-list ZoneNames
-       A4 , \field Surface Name or Radiant Surface Group Name
+       A3 , \field Surface Name or Radiant Surface Group Name
             \note Identifies surfaces that radiant system is embedded in.
             \note For a system with multiple surfaces, enter the name of
             \note a ZoneHVAC:LowTemperatureRadiant:SurfaceGroup object.
@@ -548,7 +528,7 @@ Get feedback from the EnergyPlus team regarding:
             \units m3/s
             \ip-units gal/min
             \autosizable
-       A7 , \field Pump Flow Rate Schedule Name
+       A4 , \field Pump Flow Rate Schedule Name
             \note Modifies the Rated Flow Rate of the pump on a time basis
             \note the default is that the pump is ON and runs according to its other
             \note operational requirements specified above.  The schedule is for special
@@ -571,11 +551,11 @@ Get feedback from the EnergyPlus team regarding:
             \minimum 0.0
             \maximum 1.0
             \default 0.0
-       A8 , \field Heating Water Inlet Node Name
+       A5 , \field Heating Water Inlet Node Name
             \type node
-       A9 , \field Heating Water Outlet Node Name
+       A6 , \field Heating Water Outlet Node Name
             \type node
-       A10, \field Heating High Water Temperature Schedule Name
+       A7 , \field Heating High Water Temperature Schedule Name
             \note Water and control temperatures for heating work together to provide
             \note a linear function that determines the water temperature sent to the
             \note radiant system.  The current control temperature (see Temperature Control Type above) is
@@ -589,42 +569,39 @@ Get feedback from the EnergyPlus team regarding:
             \note temperature values.
             \type object-list
             \object-list ScheduleNames
-       A11, \field Heating Low Water Temperature Schedule Name
+       A8 , \field Heating Low Water Temperature Schedule Name
             \type object-list
             \object-list ScheduleNames
-       A12, \field Heating High Control Temperature Schedule Name
+       A9 , \field Heating High Control Temperature Schedule Name
             \type object-list
             \object-list ScheduleNames
-       A13, \field Heating Low Control Temperature Schedule Name
+       A10 , \field Heating Low Control Temperature Schedule Name
             \type object-list
             \object-list ScheduleNames
-       A14, \field Cooling Water Inlet Node Name
+       A11 , \field Cooling Water Inlet Node Name
             \type node
-       A15, \field Cooling Water Outlet Node Name
+       A12, \field Cooling Water Outlet Node Name
             \type node
-       A16, \field Cooling High Water Temperature Schedule Name
+       A13, \field Cooling High Water Temperature Schedule Name
             \note See note for Heating High Water Temperature Schedule above for
             \note interpretation information (or see the Input/Output Reference).
             \type object-list
             \object-list ScheduleNames
-       A17, \field Cooling Low Water Temperature Schedule Name
+       A14, \field Cooling Low Water Temperature Schedule Name
             \type object-list
             \object-list ScheduleNames
-       A18, \field Cooling High Control Temperature Schedule Name
+       A15, \field Cooling High Control Temperature Schedule Name
             \type object-list
             \object-list ScheduleNames
-       A19, \field Cooling Low Control Temperature Schedule Name
+       A16, \field Cooling Low Control Temperature Schedule Name
             \type object-list
             \object-list ScheduleNames
-       N8, \field Condensation Control Dewpoint Offset
-            \units C
-            \default 1.0
-       A21, \field Number of Circuits
+       A17, \field Number of Circuits
             \type choice
             \key OnePerSurface
             \key CalculateFromCircuitLength
             \default OnePerSurface
-       N9, \field Circuit Length
+       N8, \field Circuit Length
             \units m
             \default 106.7
 
