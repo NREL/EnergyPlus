@@ -982,9 +982,9 @@ namespace SetPointManager {
 
     void UpdateSetPointManagers(EnergyPlusData &state);
 
-    void UpdateMixedAirSetPoints();
+    void UpdateMixedAirSetPoints(EnergyPlusData &state);
 
-    void UpdateOAPretreatSetPoints();
+    void UpdateOAPretreatSetPoints(EnergyPlusData &state);
 
     int getSPMBasedOnNode(EnergyPlusData &state, int NodeNum, iCtrlVarType SetPtType, SetPointManagerType SMPType, CtrlNodeType ctrlOrRefNode);
 
@@ -1005,75 +1005,205 @@ namespace SetPointManager {
 
     int GetMixedAirNumWithCoilFreezingCheck(EnergyPlusData &state, int MixedAirNode);
 
-    extern int NumAllSetPtMgrs;                 // Number of all Setpoint Managers found in input
-    extern int NumSchSetPtMgrs;                 // Number of Scheduled Setpoint Managers found in input
-    extern int NumDualSchSetPtMgrs;             // Number of Scheduled Dual Setpoint Managers found in input
-    extern int NumOutAirSetPtMgrs;              // Number of Outside Air Setpoint Managers found in input
-    extern int NumSZRhSetPtMgrs;                // number of single zone reheat setpoint managers
-    extern int NumSZHtSetPtMgrs;                // number of single zone heating setpoint managers
-    extern int NumSZClSetPtMgrs;                // number of single zone cooling setpoint managers
-    extern int NumSZMinHumSetPtMgrs;            // number of Single Zone Minimum Humidity Setpoint Managers
-    extern int NumSZMaxHumSetPtMgrs;            // number of Single Zone Maximum Humidity Setpoint Managers
-    extern int NumMixedAirSetPtMgrs;            // number of mixed air setpoint managers
-    extern int NumOAPretreatSetPtMgrs;          // number of outside air pretreat setpoint managers
-    extern int NumWarmestSetPtMgrs;             // number of Warmest setpoint managers
-    extern int NumColdestSetPtMgrs;             // number of Coldest setpoint managers
-    extern int NumWarmestSetPtMgrsTempFlow;     // number of Warmest Temp Flow setpoint managers
-    extern int NumRABFlowSetPtMgrs;             // number of return air bypass temperature-based flow setpoint manager
-    extern int NumMZClgAverageSetPtMgrs;        // number of Multizone:Cooling:Average setpoint managers
-    extern int NumMZHtgAverageSetPtMgrs;        // number of Multizone:Heating:Average setpoint managers
-    extern int NumMZAverageMinHumSetPtMgrs;     // number of MultiZone:MinimumHumidity:Average setpoint managers
-    extern int NumMZAverageMaxHumSetPtMgrs;     // number of MultiZone:MaximumHumidity:Average setpoint managers
-    extern int NumMZMinHumSetPtMgrs;            // number of MultiZone:Humidity:Minimum setpoint managers
-    extern int NumMZMaxHumSetPtMgrs;            // number of MultiZone:Humidity:Maximum setpoint managers
-    extern int NumFollowOATempSetPtMgrs;        // number of SetpointManager:FollowOutdoorAirTemperature setpoint managers
-    extern int NumFollowSysNodeTempSetPtMgrs;   // number of SetpointManager:FollowSystemNodeTemperature setpoint managers
-    extern int NumGroundTempSetPtMgrs;          // number of SetpointManager:FollowGroundTemperature setpoint managers
-    extern int NumCondEntSetPtMgrs;             // number of Condenser Entering Reset setpoint managers
-    extern int NumIdealCondEntSetPtMgrs;        // number of Ideal Condenser Entering Temperature setpoint managers
-    extern int NumSZOneStageCoolingSetPtMgrs;   // number of single zone one stage cooling setpoint managers
-    extern int NumSZOneStageHeatingSetPtMgrs;   // number of singel zone one stage heating setpoint managers
-    extern int NumReturnWaterResetChWSetPtMgrs; // number of chilled-water return water reset setpoint managers
-    extern int NumReturnWaterResetHWSetPtMgrs;  // number of hot-water return water reset setpoint managers
-    extern int NumSchTESSetPtMgrs;              // Number of TES Scheduled Setpoint Managers found in input
-
-    extern bool ManagerOn;
-    extern bool GetInputFlag; // First time, input is "gotten"
-
-    extern Array1D<DataSetPointManager> AllSetPtMgr;                                    // Array for all Setpoint Manager data(warnings)
-    extern Array1D<DefineScheduledSetPointManager> SchSetPtMgr;                         // Array for Scheduled Setpoint Manager data
-    extern Array1D<DefineSchedDualSetPointManager> DualSchSetPtMgr;                     // Dual Scheduled Setpoint Manager data
-    extern Array1D<DefineOutsideAirSetPointManager> OutAirSetPtMgr;                     // Array for Outside Air Setpoint Manager data
-    extern Array1D<DefineSZReheatSetPointManager> SingZoneRhSetPtMgr;                   // Array for SZRH Set Pt Mgr
-    extern Array1D<DefineSZHeatingSetPointManager> SingZoneHtSetPtMgr;                  // Array for SZ Heating Set Pt Mgr
-    extern Array1D<DefineSZCoolingSetPointManager> SingZoneClSetPtMgr;                  // Array for SZ Cooling Set Pt Mgr
-    extern Array1D<DefineSZMinHumSetPointManager> SZMinHumSetPtMgr;                     // Array for SZ Min Hum Set Pt Mgr
-    extern Array1D<DefineSZMaxHumSetPointManager> SZMaxHumSetPtMgr;                     // Array for SZ Max Hum Set Pt Mgr
-    extern Array1D<DefineMixedAirSetPointManager> MixedAirSetPtMgr;                     // Array for Mixed Air Set Pt Mgr
-    extern Array1D<DefineOAPretreatSetPointManager> OAPretreatSetPtMgr;                 // Array for OA Pretreat Set Pt Mgr
-    extern Array1D<DefineWarmestSetPointManager> WarmestSetPtMgr;                       // Array for Warmest Set Pt Mgr
-    extern Array1D<DefineColdestSetPointManager> ColdestSetPtMgr;                       // Array for Coldest Set Pt Mgr
-    extern Array1D<DefWarmestSetPtManagerTempFlow> WarmestSetPtMgrTempFlow;             // Array for Warmest Set Pt Mgr
-    extern Array1D<DefRABFlowSetPointManager> RABFlowSetPtMgr;                          // Array for return air bypass
-    extern Array1D<DefMultiZoneAverageCoolingSetPointManager> MZAverageCoolingSetPtMgr; // Array for MultiZone
-    extern Array1D<DefMultiZoneAverageHeatingSetPointManager> MZAverageHeatingSetPtMgr; // Array for MultiZone
-    extern Array1D<DefMultiZoneAverageMinHumSetPointManager> MZAverageMinHumSetPtMgr;   // Array for MultiZone
-    extern Array1D<DefMultiZoneAverageMaxHumSetPointManager> MZAverageMaxHumSetPtMgr;   // Array for MultiZone
-    extern Array1D<DefMultiZoneMinHumSetPointManager> MZMinHumSetPtMgr;                 // Multizone min humidity rat Set Pt Mgr
-    extern Array1D<DefMultiZoneMaxHumSetPointManager> MZMaxHumSetPtMgr;                 // Multizone max humidity rat Set Pt Mgr
-    extern Array1D<DefineFollowOATempSetPointManager> FollowOATempSetPtMgr;             // Array for Follow Outdoor Air
-    extern Array1D<DefineFollowSysNodeTempSetPointManager> FollowSysNodeTempSetPtMgr;   // Array for Follow System
-    extern Array1D<DefineGroundTempSetPointManager> GroundTempSetPtMgr;                 // Array for Ground Temp Setpoint
-    extern Array1D<DefineCondEntSetPointManager> CondEntSetPtMgr;                       // Condenser Entering Water Set Pt Mgr
-    extern Array1D<DefineIdealCondEntSetPointManager> IdealCondEntSetPtMgr;             // Ideal Condenser Entering Set Pt Mgr
-    extern Array1D<DefineSZOneStageCoolinggSetPointManager> SZOneStageCoolingSetPtMgr;  // single zone 1 stage cool
-    extern Array1D<DefineSZOneStageHeatingSetPointManager> SZOneStageHeatingSetPtMgr;   // single zone 1 stage heat
-    extern Array1D<DefineReturnWaterChWSetPointManager> ReturnWaterResetChWSetPtMgr;    // return water reset
-    extern Array1D<DefineReturnWaterHWSetPointManager> ReturnWaterResetHWSetPtMgr;      // hot-water return reset
-    extern Array1D<DefineScheduledTESSetPointManager> SchTESSetPtMgr;                   // Array for Scheduled Setpoint Manager data
-
-
 } // namespace SetPointManager
+
+struct SetPointManagerData : BaseGlobalStruct {
+    // MODULE VARIABLE DECLARATIONS:
+    int NumAllSetPtMgrs = 0;                 // Number of all Setpoint Managers found in input
+    int NumSchSetPtMgrs = 0;                 // Number of Scheduled Setpoint Managers found in input
+    int NumDualSchSetPtMgrs = 0;             // Number of Scheduled Dual Setpoint Managers found in input
+    int NumOutAirSetPtMgrs = 0;              // Number of Outside Air Setpoint Managers found in input
+    int NumSZRhSetPtMgrs = 0;                // number of single zone reheat setpoint managers
+    int NumSZHtSetPtMgrs = 0;                // number of single zone heating setpoint managers
+    int NumSZClSetPtMgrs = 0;                // number of single zone cooling setpoint managers
+    int NumSZMinHumSetPtMgrs = 0;            // number of Single Zone Minimum Humidity Setpoint Managers
+    int NumSZMaxHumSetPtMgrs = 0;            // number of Single Zone Maximum Humidity Setpoint Managers
+    int NumMixedAirSetPtMgrs = 0;            // number of mixed air setpoint managers
+    int NumOAPretreatSetPtMgrs = 0;          // number of outside air pretreat setpoint managers
+    int NumWarmestSetPtMgrs = 0;             // number of Warmest setpoint managers
+    int NumColdestSetPtMgrs = 0;             // number of Coldest setpoint managers
+    int NumWarmestSetPtMgrsTempFlow = 0;     // number of Warmest Temp Flow setpoint managers
+    int NumRABFlowSetPtMgrs = 0;             // number of return air bypass temperature-based flow setpoint manager
+    int NumMZClgAverageSetPtMgrs = 0;        // number of Multizone:Cooling:Average setpoint managers
+    int NumMZHtgAverageSetPtMgrs = 0;        // number of Multizone:Heating:Average setpoint managers
+    int NumMZAverageMinHumSetPtMgrs = 0;     // number of MultiZone:MinimumHumidity:Average setpoint managers
+    int NumMZAverageMaxHumSetPtMgrs = 0;     // number of MultiZone:MaximumHumidity:Average setpoint managers
+    int NumMZMinHumSetPtMgrs = 0;            // number of MultiZone:Humidity:Minimum setpoint managers
+    int NumMZMaxHumSetPtMgrs = 0;            // number of MultiZone:Humidity:Maximum setpoint managers
+    int NumFollowOATempSetPtMgrs = 0;        // number of SetpointManager:FollowOutdoorAirTemperature setpoint managers
+    int NumFollowSysNodeTempSetPtMgrs = 0;   // number of SetpointManager:FollowSystemNodeTemperature setpoint managers
+    int NumGroundTempSetPtMgrs = 0;          // number of SetpointManager:FollowGroundTemperature setpoint managers
+    int NumCondEntSetPtMgrs = 0;             // number of Condenser Entering Reset setpoint managers
+    int NumIdealCondEntSetPtMgrs = 0;        // number of Ideal Condenser Entering Temperature setpoint managers
+    int NumSZOneStageCoolingSetPtMgrs = 0;   // number of single zone one stage cooling setpoint managers
+    int NumSZOneStageHeatingSetPtMgrs = 0;   // number of singel zone one stage heating setpoint managers
+    int NumReturnWaterResetChWSetPtMgrs = 0; // number of return water reset setpoint managers
+    int NumReturnWaterResetHWSetPtMgrs = 0;  // number of hot-water return water reset setpoint managers
+    int NumSchTESSetPtMgrs = 0;              // number of TES scheduled setpoint managers (created internally, not by user input)
+
+    bool ManagerOn = false;
+    bool GetInputFlag = true; // First time, input is "gotten"
+    
+    bool InitSetPointManagersOneTimeFlag = true;
+    bool InitSetPointManagersOneTimeFlag2 = true;
+    Real64 DCESPMDsn_EntCondTemp = 0.0;
+    Real64 DCESPMDsn_MinCondSetpt = 0.0;
+    Real64 DCESPMCur_MinLiftTD = 0.0;
+    Real64 DCESPMDesign_Load_Sum = 0.0;
+    Real64 DCESPMActual_Load_Sum = 0.0;
+    Real64 DCESPMWeighted_Actual_Load_Sum = 0.0;
+    Real64 DCESPMWeighted_Design_Load_Sum = 0.0;
+    Real64 DCESPMWeighted_Ratio = 0.0;
+    Real64 DCESPMMin_DesignWB = 0.0;
+    Real64 DCESPMMin_ActualWb = 0.0;
+    Real64 DCESPMOpt_CondEntTemp = 0.0;
+    Real64 DCESPMDesignClgCapacity_Watts = 0.0;
+    Real64 DCESPMCurrentLoad_Watts = 0.0;
+    Real64 DCESPMCondInletTemp = 0.0;
+    Real64 DCESPMEvapOutletTemp = 0.0;
+    bool NoSurfaceGroundTempObjWarning = true; // This will cause a warning to be issued if no "surface" ground
+    // temperature object was input.
+    bool NoShallowGroundTempObjWarning = true; // This will cause a warning to be issued if no "shallow" ground
+    // temperature object was input.
+    bool NoDeepGroundTempObjWarning = true; // This will cause a warning to be issued if no "deep" ground
+    // temperature object was input.
+    bool NoFCGroundTempObjWarning = true; // This will cause a warning to be issued if no ground
+    // temperature object was input for FC Factor method
+    bool InitSetPointManagersMyEnvrnFlag = true; // flag for init once at start of environment
+    bool RunSubOptCondEntTemp = false;
+    bool RunFinalOptCondEntTemp = false;
+
+    // Object Data
+    Array1D<SetPointManager::DataSetPointManager> AllSetPtMgr;                                    // Array for all Setpoint Manager data(warnings)
+    Array1D<SetPointManager::DefineScheduledSetPointManager> SchSetPtMgr;                         // Array for Scheduled Setpoint Manager data
+    Array1D<SetPointManager::DefineSchedDualSetPointManager> DualSchSetPtMgr;                     // Dual Scheduled Setpoint Manager data
+    Array1D<SetPointManager::DefineOutsideAirSetPointManager> OutAirSetPtMgr;                     // Array for Outside Air Setpoint Manager data
+    Array1D<SetPointManager::DefineSZReheatSetPointManager> SingZoneRhSetPtMgr;                   // Array for SZRH Set Pt Mgr
+    Array1D<SetPointManager::DefineSZHeatingSetPointManager> SingZoneHtSetPtMgr;                  // Array for SZ Heating Set Pt Mgr
+    Array1D<SetPointManager::DefineSZCoolingSetPointManager> SingZoneClSetPtMgr;                  // Array for SZ Cooling Set Pt Mgr
+    Array1D<SetPointManager::DefineSZMinHumSetPointManager> SZMinHumSetPtMgr;                     // Array for SZ Min Hum Set Pt Mgr
+    Array1D<SetPointManager::DefineSZMaxHumSetPointManager> SZMaxHumSetPtMgr;                     // Array for SZ Max Hum Set Pt Mgr
+    Array1D<SetPointManager::DefineMixedAirSetPointManager> MixedAirSetPtMgr;                     // Array for Mixed Air Set Pt Mgr
+    Array1D<SetPointManager::DefineOAPretreatSetPointManager> OAPretreatSetPtMgr;                 // Array for OA Pretreat Set Pt Mgr
+    Array1D<SetPointManager::DefineWarmestSetPointManager> WarmestSetPtMgr;                       // Array for Warmest Set Pt Mgr
+    Array1D<SetPointManager::DefineColdestSetPointManager> ColdestSetPtMgr;                       // Array for Coldest Set Pt Mgr
+    Array1D<SetPointManager::DefWarmestSetPtManagerTempFlow> WarmestSetPtMgrTempFlow;             // Array for Warmest Set Pt Mgr
+    Array1D<SetPointManager::DefRABFlowSetPointManager> RABFlowSetPtMgr;                          // Array for return air bypass
+    Array1D<SetPointManager::DefMultiZoneAverageCoolingSetPointManager> MZAverageCoolingSetPtMgr; // Array for MultiZone
+    Array1D<SetPointManager::DefMultiZoneAverageHeatingSetPointManager> MZAverageHeatingSetPtMgr; // Array for MultiZone
+    Array1D<SetPointManager::DefMultiZoneAverageMinHumSetPointManager> MZAverageMinHumSetPtMgr;   // Array for MultiZone
+    Array1D<SetPointManager::DefMultiZoneAverageMaxHumSetPointManager> MZAverageMaxHumSetPtMgr;   // Array for MultiZone
+    Array1D<SetPointManager::DefMultiZoneMinHumSetPointManager> MZMinHumSetPtMgr;                 // Multizone min humidity rat Set Pt Mgr
+    Array1D<SetPointManager::DefMultiZoneMaxHumSetPointManager> MZMaxHumSetPtMgr;                 // Multizone max humidity rat Set Pt Mgr
+    Array1D<SetPointManager::DefineFollowOATempSetPointManager> FollowOATempSetPtMgr;             // Array for Follow Outdoor Air
+    Array1D<SetPointManager::DefineFollowSysNodeTempSetPointManager> FollowSysNodeTempSetPtMgr;   // Array for Follow System
+    Array1D<SetPointManager::DefineGroundTempSetPointManager> GroundTempSetPtMgr;                 // Array for Ground Temp Setpoint
+    Array1D<SetPointManager::DefineCondEntSetPointManager> CondEntSetPtMgr;                       // Condenser Entering Water Set Pt Mgr
+    Array1D<SetPointManager::DefineIdealCondEntSetPointManager> IdealCondEntSetPtMgr;             // Ideal Condenser Entering Set Pt Mgr
+    Array1D<SetPointManager::DefineSZOneStageCoolinggSetPointManager> SZOneStageCoolingSetPtMgr;  // single zone 1 stage cool
+    Array1D<SetPointManager::DefineSZOneStageHeatingSetPointManager> SZOneStageHeatingSetPtMgr;   // single zone 1 stage heat
+    Array1D<SetPointManager::DefineReturnWaterChWSetPointManager> ReturnWaterResetChWSetPtMgr;    // return water reset
+    Array1D<SetPointManager::DefineReturnWaterHWSetPointManager> ReturnWaterResetHWSetPtMgr;      // hot-water return water reset
+    Array1D<SetPointManager::DefineScheduledTESSetPointManager> SchTESSetPtMgr;                   // Array for TES Scheduled Setpoint Manager data
+
+    void clear_state() override
+    {
+
+        NumAllSetPtMgrs = 0;                 // Number of all Setpoint Managers found in input
+        NumSchSetPtMgrs = 0;                 // Number of Scheduled Setpoint Managers found in input
+        NumDualSchSetPtMgrs = 0;             // Number of Scheduled Dual Setpoint Managers found in input
+        NumOutAirSetPtMgrs = 0;              // Number of Outside Air Setpoint Managers found in input
+        NumSZRhSetPtMgrs = 0;                // number of single zone reheat setpoint managers
+        NumSZHtSetPtMgrs = 0;                // number of single zone heating setpoint managers
+        NumSZClSetPtMgrs = 0;                // number of single zone cooling setpoint managers
+        NumSZMinHumSetPtMgrs = 0;            // number of Single Zone Minimum Humidity Setpoint Managers
+        NumSZMaxHumSetPtMgrs = 0;            // number of Single Zone Maximum Humidity Setpoint Managers
+        NumMixedAirSetPtMgrs = 0;            // number of mixed air setpoint managers
+        NumOAPretreatSetPtMgrs = 0;          // number of outside air pretreat setpoint managers
+        NumWarmestSetPtMgrs = 0;             // number of Warmest setpoint managers
+        NumColdestSetPtMgrs = 0;             // number of Coldest setpoint managers
+        NumWarmestSetPtMgrsTempFlow = 0;     // number of Warmest Temp Flow setpoint managers
+        NumRABFlowSetPtMgrs = 0;             // number of return air bypass temperature-based flow setpoint manager
+        NumMZClgAverageSetPtMgrs = 0;        // number of Multizone:Cooling:Average setpoint managers
+        NumMZHtgAverageSetPtMgrs = 0;        // number of Multizone:Heating:Average setpoint managers
+        NumMZAverageMinHumSetPtMgrs = 0;     // number of MultiZone:MinimumHumidity:Average setpoint managers
+        NumMZAverageMaxHumSetPtMgrs = 0;     // number of MultiZone:MaximumHumidity:Average setpoint managers
+        NumMZMinHumSetPtMgrs = 0;            // number of MultiZone:Humidity:Minimum setpoint managers
+        NumMZMaxHumSetPtMgrs = 0;            // number of MultiZone:Humidity:Maximum setpoint managers
+        NumFollowOATempSetPtMgrs = 0;        // number of SetpointManager:FollowOutdoorAirTemperature setpoint managers
+        NumFollowSysNodeTempSetPtMgrs = 0;   // number of SetpointManager:FollowSystemNodeTemperature setpoint managers
+        NumGroundTempSetPtMgrs = 0;          // number of SetpointManager:FollowGroundTemperature setpoint managers
+        NumCondEntSetPtMgrs = 0;             // number of Condenser Entering Reset setpoint managers
+        NumIdealCondEntSetPtMgrs = 0;        // number of Ideal Condenser Entering Temperature setpoint managers
+        NumSZOneStageCoolingSetPtMgrs = 0;   // number of single zone one stage cooling setpoint managers
+        NumSZOneStageHeatingSetPtMgrs = 0;   // number of singel zone one stage heating setpoint managers
+        NumReturnWaterResetChWSetPtMgrs = 0; // number of return water reset setpoint managers
+        NumReturnWaterResetHWSetPtMgrs = 0;  // number of hot-water return water reset setpoint managers
+        NumSchTESSetPtMgrs = 0;              // number of TES Scheduled setpoint Managers
+
+        DCESPMDsn_EntCondTemp = 0.0;
+        DCESPMDsn_MinCondSetpt = 0.0;
+        DCESPMCur_MinLiftTD = 0.0;
+        DCESPMDesign_Load_Sum = 0.0;
+        DCESPMActual_Load_Sum = 0.0;
+        DCESPMWeighted_Actual_Load_Sum = 0.0;
+        DCESPMWeighted_Design_Load_Sum = 0.0;
+        DCESPMWeighted_Ratio = 0.0;
+        DCESPMMin_DesignWB = 0.0;
+        DCESPMMin_ActualWb = 0.0;
+        DCESPMOpt_CondEntTemp = 0.0;
+        DCESPMDesignClgCapacity_Watts = 0.0;
+        DCESPMCurrentLoad_Watts = 0.0;
+        DCESPMCondInletTemp = 0.0;
+        DCESPMEvapOutletTemp = 0.0;
+
+        ManagerOn = false;
+        GetInputFlag = true; // First time, input is "gotten"
+        // Object Data
+        InitSetPointManagersOneTimeFlag = true;
+        InitSetPointManagersOneTimeFlag2 = true;
+        AllSetPtMgr.deallocate();                 // Array for all Setpoint Manager data(warnings)
+        SchSetPtMgr.deallocate();                 // Array for Scheduled Setpoint Manager data
+        DualSchSetPtMgr.deallocate();             // Dual Scheduled Setpoint Manager data
+        OutAirSetPtMgr.deallocate();              // Array for Outside Air Setpoint Manager data
+        SingZoneRhSetPtMgr.deallocate();          // Array for SZRH Set Pt Mgr
+        SingZoneHtSetPtMgr.deallocate();          // Array for SZ Heating Set Pt Mgr
+        SingZoneClSetPtMgr.deallocate();          // Array for SZ Cooling Set Pt Mgr
+        SZMinHumSetPtMgr.deallocate();            // Array for SZ Min Hum Set Pt Mgr
+        SZMaxHumSetPtMgr.deallocate();            // Array for SZ Max Hum Set Pt Mgr
+        MixedAirSetPtMgr.deallocate();            // Array for Mixed Air Set Pt Mgr
+        OAPretreatSetPtMgr.deallocate();          // Array for OA Pretreat Set Pt Mgr
+        WarmestSetPtMgr.deallocate();             // Array for Warmest Set Pt Mgr
+        ColdestSetPtMgr.deallocate();             // Array for Coldest Set Pt Mgr
+        WarmestSetPtMgrTempFlow.deallocate();     // Array for Warmest Set Pt Mgr
+        RABFlowSetPtMgr.deallocate();             // Array for return air bypass
+        MZAverageCoolingSetPtMgr.deallocate();    // Array for MultiZone
+        MZAverageHeatingSetPtMgr.deallocate();    // Array for MultiZone
+        MZAverageMinHumSetPtMgr.deallocate();     // Array for MultiZone
+        MZAverageMaxHumSetPtMgr.deallocate();     // Array for MultiZone
+        MZMinHumSetPtMgr.deallocate();            // Multizone min humidity rat Set Pt Mgr
+        MZMaxHumSetPtMgr.deallocate();            // Multizone max humidity rat Set Pt Mgr
+        FollowOATempSetPtMgr.deallocate();        // Array for Follow Outdoor Air
+        FollowSysNodeTempSetPtMgr.deallocate();   // Array for Follow System
+        GroundTempSetPtMgr.deallocate();          // Array for Ground Temp Setpoint
+        CondEntSetPtMgr.deallocate();             // Condenser Entering Water Set Pt Mgr
+        IdealCondEntSetPtMgr.deallocate();        // Ideal Condenser Entering Set Pt Mgr
+        SZOneStageCoolingSetPtMgr.deallocate();   // single zone 1 stage cool
+        SZOneStageHeatingSetPtMgr.deallocate();   // single zone 1 stage heat
+        ReturnWaterResetChWSetPtMgr.deallocate(); // return water reset
+        ReturnWaterResetHWSetPtMgr.deallocate();  // hot-water return water reset
+        SchTESSetPtMgr.deallocate();              // TES Scheduled setpoint Managers
+
+        NoSurfaceGroundTempObjWarning = true;
+        NoShallowGroundTempObjWarning = true;
+        NoDeepGroundTempObjWarning = true;
+        NoFCGroundTempObjWarning = true;
+        InitSetPointManagersMyEnvrnFlag = true;
+        RunSubOptCondEntTemp = false;
+        RunFinalOptCondEntTemp = false;
+    }
+
+};
 
 } // namespace EnergyPlus
 

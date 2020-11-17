@@ -193,7 +193,6 @@
 #include <EnergyPlus/RoomAirModelUserTempPattern.hh>
 #include <EnergyPlus/RuntimeLanguageProcessor.hh>
 #include <EnergyPlus/ScheduleManager.hh>
-#include <EnergyPlus/SetPointManager.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
 
 void EnergyPlus::clearAllStates(EnergyPlusData &state)
@@ -347,7 +346,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     RoomAirModelUserTempPattern::clear_state();
     RuntimeLanguageProcessor::clear_state();
     ScheduleManager::clear_state();
-    SetPointManager::clear_state();
     SimAirServingZones::clear_state();
     ResultsFramework::clear_state();
 }
