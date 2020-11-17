@@ -749,6 +749,7 @@ namespace UnitarySystems {
 
     bool searchZoneInletNodes(EnergyPlusData &state, int nodeToFind, int &ZoneEquipConfigIndex, int &InletNodeIndex);
     bool searchZoneInletNodesByEquipmentIndex(int nodeToFind, int zoneEquipmentIndex);
+    bool searchZoneInletNodeAirLoopNum(EnergyPlusData &state, int airLoopNumToFind, int &ZoneEquipConfigIndex, int &InletNodeIndex);
     bool searchExhaustNodes(EnergyPlusData &state, const int nodeToFind, int &ZoneEquipConfigIndex, int &ExhaustNodeIndex);
     void setSystemParams(UnitarySys &thisSys, Real64 &TotalFloorAreaOnAirLoop, const std::string thisObjectName);
     bool searchTotalComponents(std:: string objectNameToFind, int &compIndex, int &branchIndex, int &airLoopIndex);

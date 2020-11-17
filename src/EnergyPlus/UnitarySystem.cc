@@ -3247,7 +3247,7 @@ namespace UnitarySystems {
                             ZoneInletNodeFound = false;
                             int InletControlledZoneNum = 0;
                             int ZoneInletNum = 0;
-                            ZoneInletNodeFound = searchZoneInletNodes(state, AirLoopNumber, InletControlledZoneNum, ZoneInletNum);
+                            ZoneInletNodeFound = searchZoneInletNodeAirLoopNum(state, AirLoopNumber, InletControlledZoneNum, ZoneInletNum);
                             if (ZoneInletNodeFound){
                                 thisSys.m_ZoneInletNode = DataZoneEquipment::ZoneEquipConfig(InletControlledZoneNum).InletNode(ZoneInletNum);
                                 TotalFloorAreaOnAirLoop +=
@@ -3294,7 +3294,7 @@ namespace UnitarySystems {
                                         ZoneInletNodeFound = false;
                                         int InletControlledZoneNum = 0;
                                         int ZoneInletNum = 0;
-                                        ZoneInletNodeFound = searchZoneInletNodes(state, AirLoopNumber, InletControlledZoneNum, ZoneInletNum);
+                                        ZoneInletNodeFound = searchZoneInletNodeAirLoopNum(state, AirLoopNumber, InletControlledZoneNum, ZoneInletNum);
                                         if (ZoneInletNodeFound){
                                             thisSys.m_ZoneInletNode = DataZoneEquipment::ZoneEquipConfig(InletControlledZoneNum).InletNode(ZoneInletNum);
                                             TotalFloorAreaOnAirLoop +=
@@ -16032,6 +16032,20 @@ namespace UnitarySystems {
         for (int ZoneInletNum = 1; ZoneInletNum <= DataZoneEquipment::ZoneEquipConfig(zoneEquipmentIndex).NumInletNodes; ++ZoneInletNum) {
             if (DataZoneEquipment::ZoneEquipConfig(zoneEquipmentIndex).InletNode(ZoneInletNum) == nodeToFind) {
                 return true;
+            }
+        }
+        return false;
+    }
+
+    bool searchZoneInletNodeAirLoopNum(EnergyPlusData &state, int airLoopNumToFind, int &ZoneEquipConfigIndex, int &InletNodeIndex)
+    {
+        for (int ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
+            for (int ZoneInletNum = 1; ZoneInletNum <= DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).NumInletNodes; ++ZoneInletNum) {
+                if (DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum(ZoneInletNum) == airLoopNumToFind) {
+                    ZoneEquipConfigIndex = ControlledZoneNum;
+                    InletNodeIndex = ZoneInletNum;
+                    return true;
+                }
             }
         }
         return false;
