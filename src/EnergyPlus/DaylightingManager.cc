@@ -306,7 +306,7 @@ namespace DaylightingManager {
         // REFERENCES:
         // Based on DOE-2.1E subroutine DAVREF
 
-        int IType;                  // Surface type/class
+        SurfaceClass IType;                  // Surface type/class
         Real64 AREA;                // Inside surface area (m2)
         Real64 AInsTot;             // Total inside surface area of a zone (m2)
         Real64 ARHTOT;              // Sum over surfaces of AREA*(inside visible reflectance) (m2)
@@ -334,7 +334,7 @@ namespace DaylightingManager {
         for (int ISurf : thisEnclosure.SurfacePtr) {
             IType = Surface(ISurf).Class;
             // Error if window has multiplier > 1 since this causes incorrect illuminance calc
-            if (IType == SurfaceClass_Window && Surface(ISurf).Multiplier > 1.0) {
+            if (IType == SurfaceClass::Window && Surface(ISurf).Multiplier > 1.0) {
                 if (thisEnclosure.TotalEnclosureDaylRefPoints > 0) {
                     ShowSevereError(state, "DayltgAveInteriorReflectance: Multiplier > 1.0 for window " + Surface(ISurf).Name +
                                     " in Zone=" + Surface(ISurf).ZoneName);
@@ -347,8 +347,8 @@ namespace DaylightingManager {
                     ShowFatalError(state, "Program terminates due to preceding conditions.");
                 }
             }
-            if (IType == SurfaceClass_Wall || IType == SurfaceClass_Floor || IType == SurfaceClass_Roof || IType == SurfaceClass_Window ||
-                IType == SurfaceClass_Door) {
+            if (IType == SurfaceClass::Wall || IType == SurfaceClass::Floor || IType == SurfaceClass::Roof || IType == SurfaceClass::Window ||
+                IType == SurfaceClass::Door) {
                 AREA = Surface(ISurf).Area;
                 // In following, FrameArea and DividerArea can be non-zero only for exterior windows
                 AInsTot += AREA + SurfWinFrameArea(ISurf) * (1.0 + 0.5 * SurfWinProjCorrFrIn(ISurf)) +
@@ -378,7 +378,7 @@ namespace DaylightingManager {
 
         for (int ISurf : thisEnclosure.SurfacePtr) {
             IType = Surface(ISurf).Class;
-            if (IType == SurfaceClass_Wall || IType == SurfaceClass_Floor || IType == SurfaceClass_Roof) {
+            if (IType == SurfaceClass::Wall || IType == SurfaceClass::Floor || IType == SurfaceClass::Roof) {
                 // Remove this surface from the zone inside surface area and area*reflectivity
                 // The resulting areas are AP(ITILT). The resulting area*reflectivity is ARHP(ITILT).
                 // Initialize gross area of surface (including subsurfaces)
@@ -395,7 +395,7 @@ namespace DaylightingManager {
                 }
                 // Loop over windows and doors on this wall
                 for (int IWinDr : thisEnclosure.SurfacePtr) {
-                    if ((Surface(IWinDr).Class == SurfaceClass_Window || Surface(IWinDr).Class == SurfaceClass_Door) &&
+                    if ((Surface(IWinDr).Class == SurfaceClass::Window || Surface(IWinDr).Class == SurfaceClass::Door) &&
                         Surface(IWinDr).BaseSurf == ISurf) {
                         ATWL += Surface(IWinDr).Area + SurfWinFrameArea(IWinDr) * (1.0 + 0.5 * SurfWinProjCorrFrIn(IWinDr)) +
                                 SurfWinDividerArea(IWinDr) * (1.0 + SurfWinProjCorrDivIn(IWinDr));
@@ -422,7 +422,7 @@ namespace DaylightingManager {
         } // End of loop over opaque surfaces in zone
 
         for (int IWin : thisEnclosure.SurfacePtr) {
-            if (Surface(IWin).Class == SurfaceClass_Window) {
+            if (Surface(IWin).Class == SurfaceClass::Window) {
                 int ISurf = Surface(IWin).BaseSurf;
                 // Ratio of floor-to-window-center height and average floor-to-ceiling height
                 ETA = max(0.0, min(1.0, (SurfaceWindow(IWin).WinCenter(3) - Zone(ZoneNum).OriginZ) * Zone(ZoneNum).FloorArea / Zone(ZoneNum).Volume));
@@ -895,7 +895,7 @@ namespace DaylightingManager {
             for (TZoneNum = 1; TZoneNum <= state.dataGlobal->NumOfZones; ++TZoneNum) {
                 for (loopwin = 1; loopwin <= ZoneDaylight(TZoneNum).NumOfDayltgExtWins; ++loopwin) {
                     IWin = ZoneDaylight(TZoneNum).DayltgExtWinSurfNums(loopwin);
-                    if (SurfWinOriginalClass(IWin) != SurfaceClass_TDD_Diffuser) continue;
+                    if (SurfWinOriginalClass(IWin) != SurfaceClass::TDD_Diffuser) continue;
                     // Look up the TDD:DOME object
                     PipeNum = SurfWinTDDPipeNum(IWin);
                     if (PipeNum == 0) {
@@ -2028,7 +2028,7 @@ namespace DaylightingManager {
         }
 
         // Recalculation of values for TDD:DOME
-        if (SurfWinOriginalClass(IWin) == SurfaceClass_TDD_Diffuser) {
+        if (SurfWinOriginalClass(IWin) == SurfaceClass::TDD_Diffuser) {
 
             // Look up the TDD:DOME object
             PipeNum = SurfWinTDDPipeNum(IWin);
@@ -2349,7 +2349,7 @@ namespace DaylightingManager {
             TVISIntWinDisk = 0.0; // Init Value
             TVISIntWin = 0.0;
 
-            if (SurfWinOriginalClass(IWin) == SurfaceClass_TDD_Diffuser) {
+            if (SurfWinOriginalClass(IWin) == SurfaceClass::TDD_Diffuser) {
                 // Look up the TDD:DOME object
                 PipeNum = SurfWinTDDPipeNum(IWin);
                 // Unshaded visible transmittance of TDD for a single ray from sky/ground element
@@ -2368,7 +2368,7 @@ namespace DaylightingManager {
                 if (ExtWinType == AdjZoneExtWin) {
                     // Does ray pass through an interior window in zone (ZoneNum) containing the ref point?
                     for (IntWin = Zone(ZoneNum).SurfaceFirst; IntWin <= Zone(ZoneNum).SurfaceLast; ++IntWin) {
-                        if (Surface(IntWin).Class == SurfaceClass_Window && Surface(IntWin).ExtBoundCond >= 1) {
+                        if (Surface(IntWin).Class == SurfaceClass::Window && Surface(IntWin).ExtBoundCond >= 1) {
                             if (Surface(Surface(IntWin).ExtBoundCond).Zone == Surface(IWin).Zone) {
                                 PierceSurface(IntWin, RREF, Ray, HitPtIntWin, hitIntWin);
                                 if (hitIntWin) {
@@ -3606,7 +3606,7 @@ namespace DaylightingManager {
         if (ObTrans > 1.e-6) {
             // Ray did not hit an obstruction or the transmittance product of hit obstructions is non-zero.
             // Contribution of sky or ground luminance in cd/m2
-            if (SurfWinOriginalClass(IWin) == SurfaceClass_TDD_Diffuser) {
+            if (SurfWinOriginalClass(IWin) == SurfaceClass::TDD_Diffuser) {
                 // Make all transmitted light diffuse for a TDD with a bare diffuser
                 assert(equal_dimensions(AVWLSK, WLUMSK));
                 assert(equal_dimensions(AVWLSK, EDIRSK));
@@ -3719,7 +3719,7 @@ namespace DaylightingManager {
                         // Loop over zone surfaces looking for interior windows between reference point and sun
                         for (int IntWinDisk = Zone(ZoneNum).SurfaceFirst, IntWinDisk_end = Zone(ZoneNum).SurfaceLast; IntWinDisk <= IntWinDisk_end;
                              ++IntWinDisk) {
-                            if (Surface(IntWinDisk).Class == SurfaceClass_Window && Surface(IntWinDisk).ExtBoundCond >= 1) {
+                            if (Surface(IntWinDisk).Class == SurfaceClass::Window && Surface(IntWinDisk).ExtBoundCond >= 1) {
                                 if (Surface(Surface(IntWinDisk).ExtBoundCond).Zone == Surface(IWin2).Zone) {
                                     PierceSurface(IntWinDisk, RREF, RAYCOS, HitPtIntWinDisk, hitIntWinDisk);
                                     if (hitIntWinDisk) {
@@ -3783,7 +3783,7 @@ namespace DaylightingManager {
                         // Sun reaches reference point;  increment illuminance.
                         // Direct normal illuminance is normalized to 1.0
 
-                        if (SurfWinOriginalClass(IWin) == SurfaceClass_TDD_Diffuser) {
+                        if (SurfWinOriginalClass(IWin) == SurfaceClass::TDD_Diffuser) {
                             // No beam is transmitted.  Takes care of TDD with a bare diffuser and all types of blinds.
                             TVISS = 0.0;
                         } else {
@@ -3882,7 +3882,7 @@ namespace DaylightingManager {
                                 if (dot(RAYCOS, Surface(ReflSurfNum).OutNormVec) < 0.0) ReflSurfNumX = ReflSurfNum + 1;
                             }
                             // Require that the surface can have specular reflection
-                            if (Surface(ReflSurfNum).Class == SurfaceClass_Window || Surface(ReflSurfNum).ShadowSurfGlazingFrac > 0.0) {
+                            if (Surface(ReflSurfNum).Class == SurfaceClass::Window || Surface(ReflSurfNum).ShadowSurfGlazingFrac > 0.0) {
                                 ReflNorm = Surface(ReflSurfNumX).OutNormVec;
                                 // Vector to sun that is mirrored in obstruction
                                 SunVecMir = RAYCOS - 2.0 * dot(RAYCOS, ReflNorm) * ReflNorm;
@@ -3922,7 +3922,7 @@ namespace DaylightingManager {
                                 // There is no obstruction for this ray between ref pt and hit pt on reflecting surface.
                                 // See if ray from hit pt on reflecting surface to original (unmirrored) sun position is obstructed
                                 hitObs = false;
-                                if (Surface(ReflSurfNum).Class == SurfaceClass_Window) {
+                                if (Surface(ReflSurfNum).Class == SurfaceClass::Window) {
                                     // Reflecting surface is a window.
                                     // Receiving surface number for this reflecting window.
                                     ReflSurfRecNum = Surface(ReflSurfNum).ShadowSurfRecSurfNum;
@@ -3949,7 +3949,7 @@ namespace DaylightingManager {
                                 // No obstructions. Calculate reflected beam illuminance at ref. pt. from this reflecting surface.
                                 SpecReflectance = 0.0;
                                 CosIncAngRefl = std::abs(dot(RAYCOS, ReflNorm));
-                                if (Surface(ReflSurfNum).Class == SurfaceClass_Window) {
+                                if (Surface(ReflSurfNum).Class == SurfaceClass::Window) {
                                     ConstrNumRefl = Surface(ReflSurfNum).Construction;
                                     if (SurfWinStormWinFlag(ReflSurfNum) == 1) ConstrNumRefl = Surface(ReflSurfNum).StormWinConstruction;
                                     SpecReflectance = POLYF(std::abs(CosIncAngRefl), state.dataConstruction->Construct(ConstrNumRefl).ReflSolBeamFrontCoef);
@@ -4387,7 +4387,7 @@ namespace DaylightingManager {
         maxNumRefPtInAnyZone = 0;
         maxNumRefPtInAnyEncl = 0;
         for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-            if (Surface(SurfNum).Class != SurfaceClass_Window) continue;
+            if (Surface(SurfNum).Class != SurfaceClass::Window) continue;
             // Loop through all zones in the same enclosure to find total reference points
             int numEnclRefPoints = 0;
             int surfEnclNum = Surface(SurfNum).SolarEnclIndex;
@@ -4465,7 +4465,7 @@ namespace DaylightingManager {
                         if (thisSurfEnclosure.TotalEnclosureDaylRefPoints > 0) {
                             for (int const intWin : thisSurfEnclosure.SurfacePtr) {
                                 int const SurfNumAdj = Surface(intWin).ExtBoundCond;
-                                if (Surface(intWin).Class == SurfaceClass_Window && SurfNumAdj > 0) {
+                                if (Surface(intWin).Class == SurfaceClass::Window && SurfNumAdj > 0) {
                                     auto & adjSurfEnclosure(DataViewFactorInformation::ZoneSolarInfo(Surface(SurfNumAdj).SolarEnclIndex));
                                     if (adjSurfEnclosure.TotalEnclosureDaylRefPoints > 0) {
                                         ShowSevereError(state, "Window=" + Surface(SurfNum).Name + " has Window Shading Control with");
@@ -4493,7 +4493,7 @@ namespace DaylightingManager {
                         if (thisSurfEnclosure.TotalEnclosureDaylRefPoints > 0) {
                             for (int const intWin : thisSurfEnclosure.SurfacePtr) {
                                 int const SurfNumAdj = Surface(intWin).ExtBoundCond;
-                                if (Surface(intWin).Class == SurfaceClass_Window && SurfNumAdj > 0) {
+                                if (Surface(intWin).Class == SurfaceClass::Window && SurfNumAdj > 0) {
                                     auto & adjSurfEnclosure(DataViewFactorInformation::ZoneSolarInfo(Surface(SurfNumAdj).SolarEnclIndex));
                                     if (adjSurfEnclosure.TotalEnclosureDaylRefPoints > 0) {
                                         ShowSevereError(state, "Window=" + Surface(SurfNum).Name + " has Window Shading Control with");
@@ -4512,7 +4512,7 @@ namespace DaylightingManager {
 
         if (!DataHeatBalance::AnyAirBoundaryGroupedSolar) {
             for (int SurfLoop = 1; SurfLoop <= TotSurfaces; ++SurfLoop) {
-                if (Surface(SurfLoop).Class == SurfaceClass_Window && Surface(SurfLoop).ExtSolar) {
+                if (Surface(SurfLoop).Class == SurfaceClass::Window && Surface(SurfLoop).ExtSolar) {
                     int const zoneOfSurf = Surface(SurfLoop).Zone;
                     if (ZoneDaylight(zoneOfSurf).TotalDaylRefPoints > 0 && !Zone(zoneOfSurf).HasInterZoneWindow &&
                         ZoneDaylight(zoneOfSurf).DaylightMethod == SplitFluxDaylighting) {
@@ -4536,7 +4536,7 @@ namespace DaylightingManager {
         } else {
             for (int enclNum = 1; enclNum <= DataViewFactorInformation::NumOfSolarEnclosures; ++enclNum) {
                 for (int const enclSurfNum : DataViewFactorInformation::ZoneSolarInfo(enclNum).SurfacePtr) {
-                    if (Surface(enclSurfNum).Class == SurfaceClass_Window && Surface(enclSurfNum).ExtSolar) {
+                    if (Surface(enclSurfNum).Class == SurfaceClass::Window && Surface(enclSurfNum).ExtSolar) {
                         int refPtCount = 0;
                         for (int const enclZoneNum : DataViewFactorInformation::ZoneSolarInfo(enclNum).ZoneNums) {
                             if (DataViewFactorInformation::ZoneSolarInfo(enclNum).TotalEnclosureDaylRefPoints > 0 &&
@@ -5634,7 +5634,7 @@ namespace DaylightingManager {
             // Check that associated surface is an exterior window
             WrongSurfaceType = false;
             if (SurfNum != 0) {
-                if (Surface(SurfNum).Class != SurfaceClass_Window && Surface(SurfNum).ExtBoundCond != ExternalEnvironment) WrongSurfaceType = true;
+                if (Surface(SurfNum).Class != SurfaceClass::Window && Surface(SurfNum).ExtBoundCond != ExternalEnvironment) WrongSurfaceType = true;
                 if (WrongSurfaceType) {
                     ShowSevereError(state, cCurrentModuleObject + ": invalid " + cAlphaFieldNames(1) + "=\"" + cAlphaArgs(1) +
                                     "\" - not an exterior window.");
@@ -5949,7 +5949,7 @@ namespace DaylightingManager {
         using ScheduleManager::LookUpScheduleValue;
 
         // Local declarations
-        int IType;                 // Surface type/class:  mirror surfaces of shading surfaces
+        SurfaceClass IType;                 // Surface type/class:  mirror surfaces of shading surfaces
         static Vector3<Real64> HP; // Hit coordinates, if ray hits an obstruction
         bool hit;                  // True iff a particular obstruction is hit
 
@@ -5967,7 +5967,7 @@ namespace DaylightingManager {
                 auto const &surface(Surface(ISurf));
                 if (!surface.ShadowSurfPossibleObstruction) continue;
                 IType = surface.Class;
-                if ((IType == SurfaceClass_Wall || IType == SurfaceClass_Roof || IType == SurfaceClass_Floor) && (ISurf != window_iBaseSurf)) {
+                if ((IType == SurfaceClass::Wall || IType == SurfaceClass::Roof || IType == SurfaceClass::Floor) && (ISurf != window_iBaseSurf)) {
                     PierceSurface(ISurf, R1, RN, HP, hit);
                     if (hit) { // Building element is hit (assumed opaque)
                         ObTrans = 0.0;
@@ -5997,7 +5997,7 @@ namespace DaylightingManager {
             auto solarTransmittance = [=, &state, &R1, &RN, &hit, &ObTrans](SurfaceData const &surface) -> bool {
                 if (!surface.ShadowSurfPossibleObstruction) return false; // Do Consider separate octree without filtered surfaces
                 auto const sClass(surface.Class);
-                if ((sClass == SurfaceClass_Wall || sClass == SurfaceClass_Roof || sClass == SurfaceClass_Floor) && (&surface != window_base_p)) {
+                if ((sClass == SurfaceClass::Wall || sClass == SurfaceClass::Roof || sClass == SurfaceClass::Floor) && (&surface != window_base_p)) {
                     PierceSurface(surface, R1, RN, HP, hit);
                     if (hit) { // Building element is hit (assumed opaque)
                         ObTrans = 0.0;
@@ -6046,7 +6046,7 @@ namespace DaylightingManager {
         assert(magnitude(R2 - R1) > 0.0); // Protect normalize() from divide by zero
 
         // Local declarations
-        int IType;                 // Surface type/class
+        SurfaceClass IType;                 // Surface type/class
         static Vector3<Real64> HP; // Hit coordinates, if ray hits an obstruction
         static Vector3<Real64> RN; // Unit vector along ray
 
@@ -6068,7 +6068,7 @@ namespace DaylightingManager {
                 IType = surface.Class;
                 if ((surface.ShadowingSurf) ||        // Shadowing surface
                     ((surface.SolarEnclIndex == window_Enclosure) && // Wall/ceiling/floor is in same zone as window
-                     (IType == SurfaceClass_Wall || IType == SurfaceClass_Roof || IType == SurfaceClass_Floor) && (ISurf != window_iBaseSurf) &&
+                     (IType == SurfaceClass::Wall || IType == SurfaceClass::Roof || IType == SurfaceClass::Floor) && (ISurf != window_iBaseSurf) &&
                      (ISurf != window_base_iExtBoundCond))) // Exclude window's base or base-adjacent surfaces
                 {
                     PierceSurface(ISurf, R1, RN, d12, HP, hit); // Check if R2-R1 segment pierces surface
@@ -6087,7 +6087,7 @@ namespace DaylightingManager {
                 auto const sClass(surface.Class);
                 if ((surface.ShadowingSurf) ||        // Shadowing surface
                     ((surface.SolarEnclIndex == window_Enclosure) && // Surface is in same zone as window
-                     (sClass == SurfaceClass_Wall || sClass == SurfaceClass_Roof || sClass == SurfaceClass_Floor) && // Wall, ceiling/roof, or floor
+                     (sClass == SurfaceClass::Wall || sClass == SurfaceClass::Roof || sClass == SurfaceClass::Floor) && // Wall, ceiling/roof, or floor
                      (&surface != window_base_p) && (&surface != window_base_adjacent_p))) // Exclude window's base or base-adjacent surfaces
                 {
                     PierceSurface(surface, R1, RN, d12, HP, hit); // Check if R2-R1 segment pierces surface
@@ -6124,7 +6124,7 @@ namespace DaylightingManager {
         assert(magnitude(R2 - R1) > 0.0); // Protect normalize() from divide by zero
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int IType;                 // Surface type/class
+        SurfaceClass IType;                 // Surface type/class
         static Vector3<Real64> HP; // Hit coordinates, if ray hits an obstruction surface (m)
         static Vector3<Real64> RN; // Unit vector along ray from R1 to R2
 
@@ -6155,7 +6155,7 @@ namespace DaylightingManager {
                 IType = surface.Class;
                 if ((surface.ShadowingSurf) ||         // Shadowing surface
                     ((surface.SolarEnclIndex == window2_Enclosure) && // Wall/ceiling/floor is in same zone as windows
-                     (IType == SurfaceClass_Wall || IType == SurfaceClass_Roof || IType == SurfaceClass_Floor) && // Wall, ceiling/roof, or floor
+                     (IType == SurfaceClass::Wall || IType == SurfaceClass::Roof || IType == SurfaceClass::Floor) && // Wall, ceiling/roof, or floor
                      (ISurf != window1_iBaseSurf) && (ISurf != window2_iBaseSurf) &&                              // Exclude windows' base surfaces
                      (ISurf != window1_base_iExtBoundCond) && (ISurf != window2_base_iExtBoundCond))) // Exclude windows' base-adjacent surfaces
                 {
@@ -6179,7 +6179,7 @@ namespace DaylightingManager {
                 auto const sClass(surface.Class);
                 if ((surface.ShadowingSurf) ||         // Shadowing surface
                     ((surface.SolarEnclIndex == window2_Enclosure) && // Surface is in same zone as window
-                     (sClass == SurfaceClass_Wall || sClass == SurfaceClass_Roof || sClass == SurfaceClass_Floor) && // Wall, ceiling/roof, or floor
+                     (sClass == SurfaceClass::Wall || sClass == SurfaceClass::Roof || sClass == SurfaceClass::Floor) && // Wall, ceiling/roof, or floor
                      (&surface != window1_base_p) && (&surface != window2_base_p) &&                                 // Exclude windows' base surfaces
                      (&surface != window1_base_adjacent_p) && (&surface != window2_base_adjacent_p))) // Exclude windows' base-adjacent surfaces
                 {
@@ -7138,7 +7138,7 @@ namespace DaylightingManager {
         // Loop again over windows and reset remaining shading flags that
         // are 10 or higher (i.e., conditionally off) to off
         for (IWin = Zone(ZoneNum).SurfaceFirst; IWin <= Zone(ZoneNum).SurfaceLast; ++IWin) {
-            if (Surface(IWin).Class != SurfaceClass_Window) continue;
+            if (Surface(IWin).Class != SurfaceClass::Window) continue;
             if (Surface(IWin).ExtBoundCond != ExternalEnvironment) continue;
             if (SurfWinShadingFlag(IWin) >= 10) SurfWinShadingFlag(IWin) = ShadeOff;
         }
@@ -7747,7 +7747,7 @@ namespace DaylightingManager {
         ShadeOn = false;
         ScreenOn = false;
 
-        if (SurfWinOriginalClass(IWin) == SurfaceClass_TDD_Dome) {
+        if (SurfWinOriginalClass(IWin) == SurfaceClass::TDD_Dome) {
             PipeNum = SurfWinTDDPipeNum(IWin);
         }
 
@@ -7945,7 +7945,7 @@ namespace DaylightingManager {
                 // FLCW--(I,J) = part of incoming flux (in lumens) that goes up to ceiling and upper part of walls.
                 // FLFW--(I,J) = part that goes down to floor and lower part of walls
 
-                if (SurfWinOriginalClass(IWin) == SurfaceClass_TDD_Dome) {
+                if (SurfWinOriginalClass(IWin) == SurfaceClass::TDD_Dome) {
                     // Unshaded visible transmittance of TDD for a single ray from sky/ground element
                     TVISBR = TransTDD(state, PipeNum, COSB, VisibleBeam) * SurfWinGlazedFrac(IWin);
 
@@ -8066,7 +8066,7 @@ namespace DaylightingManager {
                     TransMult = 0.0;
 
                     if (ShadeOn) { // Shade
-                        if (SurfWinOriginalClass(IWin) == SurfaceClass_TDD_Dome) {
+                        if (SurfWinOriginalClass(IWin) == SurfaceClass::TDD_Dome) {
                             // Shaded visible transmittance of TDD for a single ray from sky/ground element
                             TransMult(1) = TransTDD(state, PipeNum, COSB, VisibleBeam) * SurfWinGlazedFrac(IWin);
                         } else { // Shade only, no TDD
@@ -8146,7 +8146,7 @@ namespace DaylightingManager {
                             POLYF(COSB, state.dataConstruction->Construct(IConstShaded).TransVisBeamCoef) * SurfWinGlazedFrac(IWin) * SurfWinLightWellEff(IWin);
                     } // End of check if shade, blind or diffusing glass
 
-                    if (SurfWinOriginalClass(IWin) == SurfaceClass_TDD_Dome) {
+                    if (SurfWinOriginalClass(IWin) == SurfaceClass::TDD_Dome) {
                         // No beam is transmitted.  This takes care of all types of screens and blinds.
                         TransBmBmMult = 0.0;
                     }
@@ -8240,7 +8240,7 @@ namespace DaylightingManager {
 
                 // -- Bare window
 
-                if (SurfWinOriginalClass(IWin) == SurfaceClass_TDD_Dome) {
+                if (SurfWinOriginalClass(IWin) == SurfaceClass::TDD_Dome) {
                     // Unshaded visible transmittance of TDD for collimated beam from the sun
                     TVISBSun = TransTDD(state, PipeNum, COSBSun, VisibleBeam) * SurfWinGlazedFrac(IWin);
                     TDDTransVisBeam(IHR, PipeNum) = TVISBSun;
@@ -8279,7 +8279,7 @@ namespace DaylightingManager {
                         if (!SurfWinMovableSlats(IWin) && JB > 1) break;
 
                         if (ShadeOn || ScreenOn || SurfWinSolarDiffusing(IWin)) { // Shade or screen on or diffusing glass
-                            if (SurfWinOriginalClass(IWin) == SurfaceClass_TDD_Dome) {
+                            if (SurfWinOriginalClass(IWin) == SurfaceClass::TDD_Dome) {
                                 // Shaded visible transmittance of TDD for collimated beam from the sun
                                 TransMult(1) = TransTDD(state, PipeNum, COSBSun, VisibleBeam) * SurfWinGlazedFrac(IWin);
                             } else {
@@ -8343,7 +8343,7 @@ namespace DaylightingManager {
                                 BlindBeamBeamTrans(ProfAng, SlatAng, Blind(BlNum).SlatWidth, Blind(BlNum).SlatSeparation, Blind(BlNum).SlatThickness);
                         } // ShadeOn/ScreenOn/BlindOn/Diffusing glass
 
-                        if (SurfWinOriginalClass(IWin) == SurfaceClass_TDD_Dome) {
+                        if (SurfWinOriginalClass(IWin) == SurfaceClass::TDD_Dome) {
                             TransBmBmMult = 0.0; // No beam, diffuse only
                         }
 
@@ -8368,7 +8368,7 @@ namespace DaylightingManager {
         // In the following, Beam normal illuminance times ZSU1refl = illuminance on window due to
         // specular reflection from exterior surfaces
 
-        if (CalcSolRefl && SurfWinOriginalClass(IWin) != SurfaceClass_TDD_Dome) {
+        if (CalcSolRefl && SurfWinOriginalClass(IWin) != SurfaceClass::TDD_Dome) {
             ZSU1refl = ReflFacBmToBmSolObs(IHR, IWin);
 
             if (ZSU1refl > 0.0) {
@@ -9269,7 +9269,7 @@ namespace DaylightingManager {
                     if (hit) { // Ray pierces surface
                         // If obstruction is a window and its base surface is the nearest obstruction hit so far set nearestHitSurface to this window
                         // Note that in this case NearestHitDistance_sq has already been calculated, so does not have to be recalculated
-                        if ((Surface(ObsSurfNum).Class == SurfaceClass_Window) && (Surface(ObsSurfNum).BaseSurf == NearestHitSurfNum)) {
+                        if ((Surface(ObsSurfNum).Class == SurfaceClass::Window) && (Surface(ObsSurfNum).BaseSurf == NearestHitSurfNum)) {
                             NearestHitSurfNum = ObsSurfNum;
                         } else {
                             // Distance squared from receiving point to hit point
@@ -9297,7 +9297,7 @@ namespace DaylightingManager {
                     if (hit) {                                         // Ray pierces surface
                         // If obstruction is a window and its base surface is the nearest obstruction hit so far set nearestHitSurface to this window
                         // Note that in this case NearestHitDistance_sq has already been calculated, so does not have to be recalculated
-                        if ((surface.Class == SurfaceClass_Window) && (surface.BaseSurf > 0) && (&Surface(surface.BaseSurf) == nearestHitSurface)) {
+                        if ((surface.Class == SurfaceClass::Window) && (surface.BaseSurf > 0) && (&Surface(surface.BaseSurf) == nearestHitSurface)) {
                             nearestHitSurface = &surface;
                         } else {
                             // Distance squared from receiving point to hit point
@@ -10250,8 +10250,8 @@ namespace DaylightingManager {
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             // Count exterior windows in this zone or shared solar enclosure
             for (int const surfNum : DataViewFactorInformation::ZoneSolarInfo(Zone(ZoneNum).SolarEnclosureNum).SurfacePtr) {
-                if ((Surface(surfNum).Class == SurfaceClass_Window && Surface(surfNum).ExtBoundCond == ExternalEnvironment) ||
-                    SurfWinOriginalClass(surfNum) == SurfaceClass_TDD_Diffuser) {
+                if ((Surface(surfNum).Class == SurfaceClass::Window && Surface(surfNum).ExtBoundCond == ExternalEnvironment) ||
+                    SurfWinOriginalClass(surfNum) == SurfaceClass::TDD_Diffuser) {
                     ++ZoneDaylight(ZoneNum).TotalExtWindows;
                 }
             }
@@ -10269,7 +10269,7 @@ namespace DaylightingManager {
                     // Require that ZoneNumAdj have a least one exterior window
                     bool AdjZoneHasExtWins = false;
                     for (int SurfNumAdj = Zone(ZoneNumAdj).SurfaceFirst; SurfNumAdj <= Zone(ZoneNumAdj).SurfaceLast; ++SurfNumAdj) {
-                        if (Surface(SurfNumAdj).Class == SurfaceClass_Window && Surface(SurfNumAdj).ExtBoundCond == ExternalEnvironment) {
+                        if (Surface(SurfNumAdj).Class == SurfaceClass::Window && Surface(SurfNumAdj).ExtBoundCond == ExternalEnvironment) {
                             AdjZoneHasExtWins = true;
                             break;
                         }
@@ -10277,7 +10277,7 @@ namespace DaylightingManager {
                     if (!AdjZoneHasExtWins) continue;
                     // Loop again through surfaces in ZoneNumAdj and see if any are interior windows adjacent to ZoneNum
                     for (int SurfNumAdj = Zone(ZoneNumAdj).SurfaceFirst; SurfNumAdj <= Zone(ZoneNumAdj).SurfaceLast; ++SurfNumAdj) {
-                        if (Surface(SurfNumAdj).Class == SurfaceClass_Window && Surface(SurfNumAdj).ExtBoundCond >= 1) {
+                        if (Surface(SurfNumAdj).Class == SurfaceClass::Window && Surface(SurfNumAdj).ExtBoundCond >= 1) {
                             // This is an interior window in ZoneNumAdj
                             if (Surface(Surface(SurfNumAdj).ExtBoundCond).SolarEnclIndex == thisZoneEnclNum) {
                                 // This interior window is adjacent to ZoneNum
@@ -10305,7 +10305,7 @@ namespace DaylightingManager {
                     // Require that ZoneNumAdj have a least one exterior window
                     bool AdjZoneHasExtWins = false;
                     for (int SurfNumAdj = Zone(ZoneNumAdj).SurfaceFirst; SurfNumAdj <= Zone(ZoneNumAdj).SurfaceLast; ++SurfNumAdj) {
-                        if (Surface(SurfNumAdj).Class == SurfaceClass_Window && Surface(SurfNumAdj).ExtBoundCond == ExternalEnvironment) {
+                        if (Surface(SurfNumAdj).Class == SurfaceClass::Window && Surface(SurfNumAdj).ExtBoundCond == ExternalEnvironment) {
                             AdjZoneHasExtWins = true;
                             break;
                         }
@@ -10313,7 +10313,7 @@ namespace DaylightingManager {
                     if (!AdjZoneHasExtWins) continue;
                     // Loop again through surfaces in ZoneNumAdj and see if any are interior windows adjacent to ZoneNum
                     for (int SurfNumAdj = Zone(ZoneNumAdj).SurfaceFirst; SurfNumAdj <= Zone(ZoneNumAdj).SurfaceLast; ++SurfNumAdj) {
-                        if (Surface(SurfNumAdj).Class == SurfaceClass_Window && Surface(SurfNumAdj).ExtBoundCond >= 1) {
+                        if (Surface(SurfNumAdj).Class == SurfaceClass::Window && Surface(SurfNumAdj).ExtBoundCond >= 1) {
                             // This is an interior window in ZoneNumAdj
                             if (Surface(Surface(SurfNumAdj).ExtBoundCond).SolarEnclIndex == thisZoneEnclNum) {
                                 // This interior window is adjacent to ZoneNum
@@ -10340,7 +10340,7 @@ namespace DaylightingManager {
             for (int ZoneAdjLoop = 1; ZoneAdjLoop <= ZoneDaylight(ZoneNum).NumOfIntWinAdjZones; ++ZoneAdjLoop) {
                 int ZoneNumAdj = ZoneDaylight(ZoneNum).AdjIntWinZoneNums(ZoneAdjLoop);
                 for (int SurfNumAdj = Zone(ZoneNumAdj).SurfaceFirst; SurfNumAdj <= Zone(ZoneNumAdj).SurfaceLast; ++SurfNumAdj) {
-                    if (Surface(SurfNumAdj).Class == SurfaceClass_Window && Surface(SurfNumAdj).ExtBoundCond == ExternalEnvironment) {
+                    if (Surface(SurfNumAdj).Class == SurfaceClass::Window && Surface(SurfNumAdj).ExtBoundCond == ExternalEnvironment) {
                         ++ZoneDaylight(ZoneNum).NumOfIntWinAdjZoneExtWins;
                     }
                 }
@@ -10353,14 +10353,14 @@ namespace DaylightingManager {
             for (int ZoneAdjLoop = 1; ZoneAdjLoop <= ZoneDaylight(ZoneNum).NumOfIntWinAdjZones; ++ZoneAdjLoop) {
                 int const ZoneNumAdj = ZoneDaylight(ZoneNum).AdjIntWinZoneNums(ZoneAdjLoop);
                 for (int SurfNumAdj = Zone(ZoneNumAdj).SurfaceFirst; SurfNumAdj <= Zone(ZoneNumAdj).SurfaceLast; ++SurfNumAdj) {
-                    if (Surface(SurfNumAdj).Class == SurfaceClass_Window && Surface(SurfNumAdj).ExtBoundCond == ExternalEnvironment) {
+                    if (Surface(SurfNumAdj).Class == SurfaceClass::Window && Surface(SurfNumAdj).ExtBoundCond == ExternalEnvironment) {
                         ++ExtWinIndex;
                         ZoneDaylight(ZoneNum).IntWinAdjZoneExtWin(ExtWinIndex).SurfNum = SurfNumAdj;
 
                         // now count interior windows shared by both zones
                         int NumOfIntWindowsCount = 0;
                         for (int SurfNumAdj2 = Zone(ZoneNumAdj).SurfaceFirst; SurfNumAdj2 <= Zone(ZoneNumAdj).SurfaceLast; ++SurfNumAdj2) {
-                            if (Surface(SurfNumAdj2).Class == SurfaceClass_Window && Surface(SurfNumAdj2).ExtBoundCond >= 1) {
+                            if (Surface(SurfNumAdj2).Class == SurfaceClass::Window && Surface(SurfNumAdj2).ExtBoundCond >= 1) {
                                 // This is an interior window in ZoneNumAdj
                                 if (Surface(Surface(SurfNumAdj2).ExtBoundCond).SolarEnclIndex == thisZoneEnclNum) {
                                     // This interior window is adjacent to ZoneNum and associated with this
@@ -10373,7 +10373,7 @@ namespace DaylightingManager {
                         ZoneDaylight(ZoneNum).IntWinAdjZoneExtWin(ExtWinIndex).IntWinNum = 0;
                         int IntWinIndex = 0;
                         for (int SurfNumAdj2 = Zone(ZoneNumAdj).SurfaceFirst; SurfNumAdj2 <= Zone(ZoneNumAdj).SurfaceLast; ++SurfNumAdj2) {
-                            if (Surface(SurfNumAdj2).Class == SurfaceClass_Window && Surface(SurfNumAdj2).ExtBoundCond >= 1) {
+                            if (Surface(SurfNumAdj2).Class == SurfaceClass::Window && Surface(SurfNumAdj2).ExtBoundCond >= 1) {
                                 // This is an interior window in ZoneNumAdj
                                 if (Surface(Surface(SurfNumAdj2).ExtBoundCond).SolarEnclIndex == thisZoneEnclNum) {
                                     // This interior window is adjacent to ZoneNum and associated with this
@@ -10395,8 +10395,8 @@ namespace DaylightingManager {
 
                 // Get exterior windows in this zone or shared solar enclosure
                 for (int const surfNum : DataViewFactorInformation::ZoneSolarInfo(Zone(ZoneNum).SolarEnclosureNum).SurfacePtr) {
-                    if ((Surface(surfNum).Class == SurfaceClass_Window && Surface(surfNum).ExtBoundCond == ExternalEnvironment) ||
-                        SurfWinOriginalClass(surfNum) == SurfaceClass_TDD_Diffuser) {
+                    if ((Surface(surfNum).Class == SurfaceClass::Window && Surface(surfNum).ExtBoundCond == ExternalEnvironment) ||
+                        SurfWinOriginalClass(surfNum) == SurfaceClass::TDD_Diffuser) {
                         ++ZoneExtWin(ZoneNum);
                     }
                 }
@@ -10408,8 +10408,8 @@ namespace DaylightingManager {
                         // Get exterior windows in ZoneNumAdj -- there must be at least one, otherwise
                         // it would not be an "AdjIntWinZone"
                         for (int SurfNumAdj = Zone(ZoneNumAdj).SurfaceFirst; SurfNumAdj <= Zone(ZoneNumAdj).SurfaceLast; ++SurfNumAdj) {
-                            if ((Surface(SurfNumAdj).Class == SurfaceClass_Window && Surface(SurfNumAdj).ExtBoundCond == ExternalEnvironment) ||
-                                SurfWinOriginalClass(SurfNumAdj) == SurfaceClass_TDD_Diffuser) {
+                            if ((Surface(SurfNumAdj).Class == SurfaceClass::Window && Surface(SurfNumAdj).ExtBoundCond == ExternalEnvironment) ||
+                                SurfWinOriginalClass(SurfNumAdj) == SurfaceClass::TDD_Diffuser) {
                                 ++ZoneExtWin(ZoneNum);
                             }
                         }
@@ -10463,8 +10463,8 @@ namespace DaylightingManager {
                 int ZoneExtWinCtr = 0;
 
                 for (int const surfNum : DataViewFactorInformation::ZoneSolarInfo(Zone(ZoneNum).SolarEnclosureNum).SurfacePtr) {
-                    if ((Surface(surfNum).Class == SurfaceClass_Window && Surface(surfNum).ExtBoundCond == ExternalEnvironment) ||
-                        SurfWinOriginalClass(surfNum) == SurfaceClass_TDD_Diffuser) {
+                    if ((Surface(surfNum).Class == SurfaceClass::Window && Surface(surfNum).ExtBoundCond == ExternalEnvironment) ||
+                        SurfWinOriginalClass(surfNum) == SurfaceClass::TDD_Diffuser) {
                         ++ZoneExtWinCtr;
                         ZoneDaylight(ZoneNum).DayltgExtWinSurfNums(ZoneExtWinCtr) = surfNum;
                     }
@@ -10477,8 +10477,8 @@ namespace DaylightingManager {
                         // Get exterior windows in ZoneNumAdj -- there must be at least one, otherwise
                         // it would not be an "AdjIntWinZone"
                         for (int SurfNumAdj = Zone(ZoneNumAdj).SurfaceFirst; SurfNumAdj <= Zone(ZoneNumAdj).SurfaceLast; ++SurfNumAdj) {
-                            if ((Surface(SurfNumAdj).Class == SurfaceClass_Window && Surface(SurfNumAdj).ExtBoundCond == ExternalEnvironment) ||
-                                SurfWinOriginalClass(SurfNumAdj) == SurfaceClass_TDD_Diffuser) {
+                            if ((Surface(SurfNumAdj).Class == SurfaceClass::Window && Surface(SurfNumAdj).ExtBoundCond == ExternalEnvironment) ||
+                                SurfWinOriginalClass(SurfNumAdj) == SurfaceClass::TDD_Diffuser) {
                                 ++ZoneExtWinCtr;
                                 ZoneDaylight(ZoneNum).DayltgExtWinSurfNums(ZoneExtWinCtr) = SurfNumAdj;
 
@@ -10657,7 +10657,7 @@ namespace DaylightingManager {
 
         auto &thisEnclSurfaces(DataViewFactorInformation::ZoneSolarInfo(Zone(ZoneNum).SolarEnclosureNum).SurfacePtr);
         for (int const IWin : thisEnclSurfaces) {
-            if (Surface(IWin).Class == SurfaceClass_Window && Surface(IWin).ExtBoundCond >= 1) {
+            if (Surface(IWin).Class == SurfaceClass::Window && Surface(IWin).ExtBoundCond >= 1) {
                 // This is an interior window in ZoneNum
                 int const ConstrNum = Surface(IWin).Construction;
                 int const adjEnclNum = Surface(Surface(IWin).ExtBoundCond).SolarEnclIndex;
@@ -10678,7 +10678,7 @@ namespace DaylightingManager {
         // TH, CR 7873, 9/17/2009
         BmInterReflIll = 0.0;
         if (ZoneDaylight(ZoneNum).TotInsSurfArea > 0) {
-            BmInterReflIll = (DBZoneIntWin(ZoneNum) * BeamSolarRad * PDIRLW * ZoneDaylight(ZoneNum).FloorVisRefl) /
+            BmInterReflIll = (EnclSolDBIntWin(ZoneNum) * BeamSolarRad * PDIRLW * ZoneDaylight(ZoneNum).FloorVisRefl) /
                              (ZoneDaylight(ZoneNum).TotInsSurfArea * (1.0 - ZoneDaylight(ZoneNum).AveVisDiffReflect));
         }
 
@@ -10745,7 +10745,7 @@ namespace DaylightingManager {
             if (ZoneDaylight(ZoneNum).TotalDaylRefPoints == 0) continue;
             if (ZoneDaylight(ZoneNum).NumOfIntWinAdjZones == 0) continue;
             for (IWin = Zone(ZoneNum).SurfaceFirst; IWin <= Zone(ZoneNum).SurfaceLast; ++IWin) {
-                if (Surface(IWin).Class == SurfaceClass_Window && Surface(IWin).ExtBoundCond >= 1) {
+                if (Surface(IWin).Class == SurfaceClass::Window && Surface(IWin).ExtBoundCond >= 1) {
                     ZoneNumAdj = Surface(Surface(IWin).ExtBoundCond).Zone;
                     IntWinNextToIntWinAdjZone = false;
                     for (loop = 1; loop <= ZoneDaylight(ZoneNum).NumOfIntWinAdjZones; ++loop) {

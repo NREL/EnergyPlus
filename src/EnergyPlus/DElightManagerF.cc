@@ -311,9 +311,9 @@ namespace DElightManagerF {
 
                     for (int isurf = iSurfaceFirst; isurf <= iSurfaceLast; ++isurf) {
                         auto &surf(Surface(isurf));
-                        if (surf.Class == SurfaceClass_Wall) ++iNumOpaqueSurfs;
-                        if (surf.Class == SurfaceClass_Roof) ++iNumOpaqueSurfs;
-                        if (surf.Class == SurfaceClass_Floor) ++iNumOpaqueSurfs;
+                        if (surf.Class == SurfaceClass::Wall) ++iNumOpaqueSurfs;
+                        if (surf.Class == SurfaceClass::Roof) ++iNumOpaqueSurfs;
+                        if (surf.Class == SurfaceClass::Floor) ++iNumOpaqueSurfs;
                     } // Zone Opaque Surface loop
 
                     print(delightInFile, Format_906, iNumOpaqueSurfs);
@@ -324,7 +324,7 @@ namespace DElightManagerF {
                         auto &surf(Surface(isurf));
 
                         // Only process "opaque bounding" surface types
-                        if ((surf.Class == SurfaceClass_Wall) || (surf.Class == SurfaceClass_Roof) || (surf.Class == SurfaceClass_Floor)) {
+                        if ((surf.Class == SurfaceClass::Wall) || (surf.Class == SurfaceClass::Roof) || (surf.Class == SurfaceClass::Floor)) {
 
                             // Get the Construction index for this Surface
                             iconstruct = surf.Construction;
@@ -361,7 +361,7 @@ namespace DElightManagerF {
                             // Count each Window hosted by the current opaque bounding Surface
                             iNumWindows = 0;
                             for (int iwndo = iSurfaceFirst; iwndo <= iSurfaceLast; ++iwndo) {
-                                if (Surface(iwndo).Class == SurfaceClass_Window) {
+                                if (Surface(iwndo).Class == SurfaceClass::Window) {
                                     auto &wndo(Surface(iwndo));
                                     if (wndo.BaseSurfName == surf.Name) {
 
@@ -407,7 +407,7 @@ namespace DElightManagerF {
                             // and track the Window Construction type for later writing
                             if (iNumWindows > 0) {
                                 for (int iwndo2 = iSurfaceFirst; iwndo2 <= iSurfaceLast; ++iwndo2) {
-                                    if (Surface(iwndo2).Class == SurfaceClass_Window) {
+                                    if (Surface(iwndo2).Class == SurfaceClass::Window) {
 
                                         auto &wndo2(Surface(iwndo2));
 
@@ -494,7 +494,7 @@ namespace DElightManagerF {
 
                                         auto &wndo3(Surface(iwndo3));
 
-                                        if (wndo3.Class == SurfaceClass_Window) {
+                                        if (wndo3.Class == SurfaceClass::Window) {
 
                                             // Is the current Window Surface the Doppelganger for the current CFS?
                                             if (wndo3.Name == cfs.wndwName) {

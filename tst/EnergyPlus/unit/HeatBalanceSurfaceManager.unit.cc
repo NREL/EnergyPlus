@@ -133,7 +133,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_CalcOutsideSurfTemp)
 
     DataHeatBalSurface::TH.allocate(2, 2, 1);
     DataSurfaces::Surface.allocate(SurfNum);
-    DataSurfaces::Surface(SurfNum).Class = 1;
+    DataSurfaces::Surface(SurfNum).Class = DataSurfaces::SurfaceClass::Wall;
     DataSurfaces::Surface(SurfNum).Area = 10.0;
     DataSurfaces::Surface(SurfNum).MaterialMovInsulExt = 1;
 
@@ -307,7 +307,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_UpdateFinalThermalHistories)
 
     AllocateSurfaceHeatBalArrays(state); // allocates a host of variables related to CTF calculations
 
-    DataSurfaces::Surface(1).Class = DataSurfaces::SurfaceClass_Wall;
+    DataSurfaces::Surface(1).Class = DataSurfaces::SurfaceClass::Wall;
     DataSurfaces::Surface(1).HeatTransSurf = true;
     DataSurfaces::Surface(1).HeatTransferAlgorithm = DataSurfaces::HeatTransferModel_CTF;
     DataSurfaces::Surface(1).ExtBoundCond = 1;
@@ -1947,7 +1947,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_SurfaceCOnstructionIndexTest
     state.dataConstruction->Construct.allocate(DataHeatBalance::TotConstructs);
     DataHeatBalance::AnyConstructInternalSourceInInput = true;
 
-    DataSurfaces::Surface(1).Class = DataSurfaces::SurfaceClass_Wall;
+    DataSurfaces::Surface(1).Class = DataSurfaces::SurfaceClass::Wall;
     DataSurfaces::Surface(1).HeatTransSurf = true;
     DataSurfaces::Surface(1).HeatTransferAlgorithm = DataSurfaces::HeatTransferModel_CTF;
     DataSurfaces::Surface(1).ExtBoundCond = 1;
@@ -2460,7 +2460,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
     // Test Additional Heat Source Calculation
     CalcHeatBalanceOutsideSurf(state);
     EXPECT_EQ(-0.1, DataHeatBalSurface::SurfQAdditionalHeatSourceOutside(1));
-
     CalcHeatBalanceInsideSurf(state);
     EXPECT_EQ(0.1, DataHeatBalSurface::SurfQAdditionalHeatSourceInside(6));
 
