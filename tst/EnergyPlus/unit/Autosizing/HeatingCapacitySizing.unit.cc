@@ -413,7 +413,7 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 
     DataSizing::SysSizingRunDone = true;
-    DataAirSystems::PrimaryAirSystem.allocate(1);
+    state.dataAirSystemsData->PrimaryAirSystems.allocate(1);
     state.dataAirLoop->AirLoopControlInfo.allocate(1);
     DataSizing::UnitarySysEqSizing.allocate(1);
     DataSizing::SysSizInput.allocate(1);
@@ -462,7 +462,7 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     // Test 19 - Airloop Equipment, with min OA
     DataSizing::FinalSysSizing(1).DesOutAirVolFlow = 0.02;
     DataSizing::FinalSysSizing(1).HeatOAOption = DataSizing::MinOA;
-    DataAirSystems::PrimaryAirSystem(1).NumOAHeatCoils = 1;
+    state.dataAirSystemsData->PrimaryAirSystems(1).NumOAHeatCoils = 1;
     // start with an autosized value
     inputValue = DataSizing::AutoSize;
     // do sizing

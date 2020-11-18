@@ -154,7 +154,7 @@ public:
         SysSizPeakDDNum(1).TotCoolPeakDD = 1;
         FinalSysSizing.allocate(1);
         FinalZoneSizing.allocate(1);
-        PrimaryAirSystem.allocate(1);
+        state.dataAirSystemsData->PrimaryAirSystems.allocate(1);
         state.dataAirLoop->AirLoopControlInfo.allocate(1);
         InitializePsychRoutines();
     }
@@ -175,7 +175,7 @@ public:
         SysSizPeakDDNum.clear();
         FinalSysSizing.clear();
         SysSizPeakDDNum.clear();
-        PrimaryAirSystem.clear();
+        state.dataAirSystemsData->PrimaryAirSystems.clear();
         state.dataAirLoop->AirLoopControlInfo.clear();
         cached_Twb.clear();
         cached_Psat.clear();

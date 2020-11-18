@@ -314,7 +314,7 @@ TEST_F(AutoSizingFixture, HeatingWaterDesCoilLoadUsedForUASizingGauntlet)
     EnergyPlus::DataSizing::FinalSysSizing(1).HeatSupTemp = 30.0;
     EnergyPlus::DataSizing::SysSizInput.allocate(1);
     EnergyPlus::DataSizing::SysSizInput(1).AirLoopNum = 1;
-    DataAirSystems::PrimaryAirSystem.allocate(1);
+    state.dataAirSystemsData->PrimaryAirSystems.allocate(1);
     DataSizing::DataAirFlowUsedForSizing = 0.6;
 
     // start with an auto-sized value as the user input
@@ -369,7 +369,7 @@ TEST_F(AutoSizingFixture, HeatingWaterDesCoilLoadUsedForUASizingGauntlet)
     sizer.autoSizedValue = 0.0; // reset for next test
 
     // Test 16 - Air Loop Equipment, DOAS air loop w/ heating coil
-    DataAirSystems::PrimaryAirSystem(DataSizing::CurSysNum).NumOAHeatCoils = 1;
+    state.dataAirSystemsData->PrimaryAirSystems(DataSizing::CurSysNum).NumOAHeatCoils = 1;
     DataSizing::DataDesicRegCoil = false;
     // start with an auto-sized value as the user input
     inputValue = EnergyPlus::DataSizing::AutoSize;

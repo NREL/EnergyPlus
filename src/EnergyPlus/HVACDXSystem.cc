@@ -869,27 +869,27 @@ namespace HVACDXSystem {
         if (!DXCoolingSystem(DXSystemNum).VSCoilFanInfoSet && AirLoopNum > 0) {
             if (DXCoolingSystem(DXSystemNum).CoolingCoilType_Num == Coil_CoolingAirToAirVariableSpeed) {
 
-                switch (DataAirSystems::PrimaryAirSystem(AirLoopNum).supFanModelTypeEnum) {
+                switch (state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanModelTypeEnum) {
                 case DataAirSystems::structArrayLegacyFanModels: {
-                    int SupFanNum = DataAirSystems::PrimaryAirSystem(AirLoopNum).SupFanNum;
+                    int SupFanNum = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).SupFanNum;
                     if (SupFanNum > 0) {
                         coilSelectionReportObj->setCoilSupplyFanInfo(state, DXCoolingSystem(DXSystemNum).CoolingCoilName,
                                                                      DXCoolingSystem(DXSystemNum).CoolingCoilType,
-                                                                     Fans::Fan(DataAirSystems::PrimaryAirSystem(AirLoopNum).SupFanNum).FanName,
+                                                                     Fans::Fan(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).SupFanNum).FanName,
                                                                      DataAirSystems::structArrayLegacyFanModels,
-                                                                     DataAirSystems::PrimaryAirSystem(AirLoopNum).SupFanNum);
+                                                                     state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).SupFanNum);
                     }
 
                     break;
                 }
                 case DataAirSystems::objectVectorOOFanSystemModel: {
-                    if (DataAirSystems::PrimaryAirSystem(AirLoopNum).supFanVecIndex >= 0) {
+                    if (state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanVecIndex >= 0) {
                         coilSelectionReportObj->setCoilSupplyFanInfo(state,
                             DXCoolingSystem(DXSystemNum).CoolingCoilName,
                             DXCoolingSystem(DXSystemNum).CoolingCoilType,
-                            HVACFan::fanObjs[DataAirSystems::PrimaryAirSystem(AirLoopNum).supFanVecIndex]->name,
+                            HVACFan::fanObjs[state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanVecIndex]->name,
                             DataAirSystems::objectVectorOOFanSystemModel,
-                            DataAirSystems::PrimaryAirSystem(AirLoopNum).supFanVecIndex);
+                            state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanVecIndex);
                     }
                     break;
                 }

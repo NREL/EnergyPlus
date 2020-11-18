@@ -252,7 +252,7 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirInletHumRatSizingGauntlet)
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 
     // Test 10 - Airloop Equipment - no OA coils
-    DataAirSystems::PrimaryAirSystem.allocate(1);
+    state.dataAirSystemsData->PrimaryAirSystems.allocate(1);
     DataSizing::SysSizingRunDone = true;
     EnergyPlus::DataSizing::FinalSysSizing.allocate(1);
     EnergyPlus::DataSizing::SysSizInput.allocate(1);
@@ -279,7 +279,7 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirInletHumRatSizingGauntlet)
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 
     // Test 11 - Airloop Equipment - 1 OA coil, use PrecoolHumRat
-    DataAirSystems::PrimaryAirSystem(DataSizing::CurSysNum).NumOACoolCoils = 1;
+    state.dataAirSystemsData->PrimaryAirSystems(DataSizing::CurSysNum).NumOACoolCoils = 1;
     EnergyPlus::DataSizing::FinalSysSizing(DataSizing::CurSysNum).RetHumRatAtCoolPeak = 0.015;
     EnergyPlus::DataSizing::FinalSysSizing(DataSizing::CurSysNum).PrecoolHumRat = 0.01;
 

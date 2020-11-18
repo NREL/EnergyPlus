@@ -536,8 +536,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     ZoneEquipInputsFilled = true;
     NumPrimaryAirSys = 1;
     state.dataAirLoop->AirLoopFlow.allocate(1);
-    PrimaryAirSystem.allocate(1);
-    PrimaryAirSystem(1).OASysExists = true;
+    state.dataAirSystemsData->PrimaryAirSystems.allocate(1);
+    state.dataAirSystemsData->PrimaryAirSystems(1).OASysExists = true;
     Node.allocate(8);
 
     // Avoid zero values in volume flow balance check
@@ -575,7 +575,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     ZoneReOrder.deallocate();
     ZoneEquipConfig.deallocate();
     Node.deallocate();
-    PrimaryAirSystem.deallocate();
+    state.dataAirSystemsData->PrimaryAirSystems.deallocate();
     state.dataAirLoop->AirLoopFlow.deallocate();
     NumPrimaryAirSys = 0;
 }

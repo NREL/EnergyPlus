@@ -552,7 +552,6 @@ namespace HVACMultiSpeedHeatPump {
 
         // Using/Aliasing
         using BranchNodeConnections::TestCompSet;
-        using DataAirSystems::PrimaryAirSystem;
         using DataHeatBalance::Zone;
         using DataHVACGlobals::FanType_SimpleConstVolume;
         using DataHVACGlobals::FanType_SimpleOnOff;
@@ -735,11 +734,11 @@ namespace HVACMultiSpeedHeatPump {
                     for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig(ControlledZoneNum).NumInletNodes; ++zoneInNode) {
                         int AirLoopNumber = ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum(zoneInNode);
                         if (AirLoopNumber > 0) {
-                            for (BranchNum = 1; BranchNum <= PrimaryAirSystem(AirLoopNumber).NumBranches; ++BranchNum) {
-                                for (CompNum = 1; CompNum <= PrimaryAirSystem(AirLoopNumber).Branch(BranchNum).TotalComponents; ++CompNum) {
-                                    if (!UtilityRoutines::SameString(PrimaryAirSystem(AirLoopNumber).Branch(BranchNum).Comp(CompNum).Name,
+                            for (BranchNum = 1; BranchNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).NumBranches; ++BranchNum) {
+                                for (CompNum = 1; CompNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).TotalComponents; ++CompNum) {
+                                    if (!UtilityRoutines::SameString(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).Comp(CompNum).Name,
                                                                      MSHeatPump(MSHPNum).Name) ||
-                                        !UtilityRoutines::SameString(PrimaryAirSystem(AirLoopNumber).Branch(BranchNum).Comp(CompNum).TypeOf,
+                                        !UtilityRoutines::SameString(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).Comp(CompNum).TypeOf,
                                                                      CurrentModuleObject))
                                         continue;
                                     AirLoopFound = true;
@@ -2697,7 +2696,6 @@ namespace HVACMultiSpeedHeatPump {
 
         // Using/Aliasing
         using namespace DataSizing;
-        using DataAirSystems::PrimaryAirSystem;
         using DataZoneEquipment::ZoneEquipConfig;
         using General::TrimSigDigits;
         using PlantUtilities::RegisterPlantCompDesignFlow;
@@ -2709,16 +2707,16 @@ namespace HVACMultiSpeedHeatPump {
 
         if (CurSysNum > 0 && CurOASysNum == 0) {
             if (MSHeatPump(MSHeatPumpNum).FanType == DataHVACGlobals::FanType_SystemModelObject) {
-                PrimaryAirSystem(CurSysNum).supFanVecIndex = MSHeatPump(MSHeatPumpNum).FanNum;
-                PrimaryAirSystem(CurSysNum).supFanModelTypeEnum = DataAirSystems::objectVectorOOFanSystemModel;
+                state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).supFanVecIndex = MSHeatPump(MSHeatPumpNum).FanNum;
+                state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).supFanModelTypeEnum = DataAirSystems::objectVectorOOFanSystemModel;
             } else {
-                PrimaryAirSystem(CurSysNum).SupFanNum = MSHeatPump(MSHeatPumpNum).FanNum;
-                PrimaryAirSystem(CurSysNum).supFanModelTypeEnum = DataAirSystems::structArrayLegacyFanModels;
+                state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).SupFanNum = MSHeatPump(MSHeatPumpNum).FanNum;
+                state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).supFanModelTypeEnum = DataAirSystems::structArrayLegacyFanModels;
             }
             if (MSHeatPump(MSHeatPumpNum).FanPlaceType == BlowThru) {
-                DataAirSystems::PrimaryAirSystem(CurSysNum).supFanLocation = DataAirSystems::fanPlacement::BlowThru;
+                state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).supFanLocation = DataAirSystems::fanPlacement::BlowThru;
             } else if (MSHeatPump(MSHeatPumpNum).FanPlaceType == DrawThru) {
-                DataAirSystems::PrimaryAirSystem(CurSysNum).supFanLocation = DataAirSystems::fanPlacement::DrawThru;
+                state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).supFanLocation = DataAirSystems::fanPlacement::DrawThru;
             }
         }
 

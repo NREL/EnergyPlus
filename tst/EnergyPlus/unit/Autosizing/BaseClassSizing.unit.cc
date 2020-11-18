@@ -274,10 +274,10 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystem)
     FinalSysSizing(CurSysNum).DesCoolVolFlow = 1.00;
     FinalSysSizing(CurSysNum).DesOutAirVolFlow = 0.2;
 
-    PrimaryAirSystem.allocate(1);
-    PrimaryAirSystem(CurSysNum).NumOACoolCoils = 0;
-    PrimaryAirSystem(CurSysNum).SupFanNum = 0;
-    PrimaryAirSystem(CurSysNum).RetFanNum = 0;
+    state.dataAirSystemsData->PrimaryAirSystems.allocate(1);
+    state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).NumOACoolCoils = 0;
+    state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).SupFanNum = 0;
+    state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).RetFanNum = 0;
 
     SysSizingRunDone = true;
     SysSizInput.allocate(1);
@@ -450,11 +450,11 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystemWithFans)
     FinalSysSizing(CurSysNum).DesCoolVolFlow = 1.00;
     FinalSysSizing(CurSysNum).DesOutAirVolFlow = 0.2;
 
-    PrimaryAirSystem.allocate(1);
-    PrimaryAirSystem(CurSysNum).NumOACoolCoils = 0;
-    PrimaryAirSystem(CurSysNum).SupFanNum = 0;
-    PrimaryAirSystem(CurSysNum).RetFanNum = 0;
-    PrimaryAirSystem(CurSysNum).supFanModelTypeEnum = DataAirSystems::fanModelTypeNotYetSet;
+    state.dataAirSystemsData->PrimaryAirSystems.allocate(1);
+    state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).NumOACoolCoils = 0;
+    state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).SupFanNum = 0;
+    state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).RetFanNum = 0;
+    state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).supFanModelTypeEnum = DataAirSystems::fanModelTypeNotYetSet;
 
     SysSizingRunDone = true;
     SysSizInput.allocate(1);
@@ -489,9 +489,9 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystemWithFans)
     Real64 dxCoilSizeNoFan = SizingResult;
 
     // With Test Fan 4 fan heat
-    PrimaryAirSystem(CurSysNum).SupFanNum = 1;
-    PrimaryAirSystem(CurSysNum).RetFanNum = 0;
-    PrimaryAirSystem(CurSysNum).supFanModelTypeEnum = DataAirSystems::structArrayLegacyFanModels;
+    state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).SupFanNum = 1;
+    state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).RetFanNum = 0;
+    state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).supFanModelTypeEnum = DataAirSystems::structArrayLegacyFanModels;
     CompType = "COIL:COOLING:DX:SINGLESPEED";
     CompName = "Single Speed DX Cooling Coil";
     SizingType = DataHVACGlobals::CoolingCapacitySizing;
@@ -509,10 +509,10 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystemWithFans)
     EXPECT_NEAR(expectedDXCoilSize, SizingResult, 0.1);
 
     // With Test Fan 3 fan heat - this fails before the #6126 fix
-    PrimaryAirSystem(CurSysNum).SupFanNum = 2;
-    PrimaryAirSystem(CurSysNum).supFanVecIndex = 2;
-    PrimaryAirSystem(CurSysNum).RetFanNum = 0;
-    PrimaryAirSystem(CurSysNum).supFanModelTypeEnum = DataAirSystems::objectVectorOOFanSystemModel;
+    state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).SupFanNum = 2;
+    state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).supFanVecIndex = 2;
+    state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).RetFanNum = 0;
+    state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).supFanModelTypeEnum = DataAirSystems::objectVectorOOFanSystemModel;
     CompType = "COIL:COOLING:DX:SINGLESPEED";
     CompName = "Single Speed DX Cooling Coil";
     SizingType = DataHVACGlobals::CoolingCapacitySizing;

@@ -1868,8 +1868,6 @@ namespace EMSManager {
         // na
 
         // Using/Aliasing
-        using DataAirSystems::PrimaryAirSystem;
-
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
         // na
@@ -1894,7 +1892,7 @@ namespace EMSManager {
             numAirLoops = isize(state.dataAirLoop->PriAirSysAvailMgr);
             for (Loop = 1; Loop <= numAirLoops; ++Loop) {
                 SetupEMSActuator(
-                    "AirLoopHVAC", PrimaryAirSystem(Loop).Name, "Availability Status", "[ ]", lDummy, state.dataAirLoop->PriAirSysAvailMgr(Loop).AvailStatus);
+                    "AirLoopHVAC", state.dataAirSystemsData->PrimaryAirSystems(Loop).Name, "Availability Status", "[ ]", lDummy, state.dataAirLoop->PriAirSysAvailMgr(Loop).AvailStatus);
             }
 
         } else {
