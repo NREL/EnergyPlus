@@ -2,6 +2,7 @@
 
 
 
+
 Separate Design and Control Variables
 ================
 
@@ -80,11 +81,11 @@ The proposed approach is to identify the design variables in the LowTemperatureR
 
 <span style="display:block;text-align:center">![How the objects will be split](https://github.com/NREL/EnergyPlus/blob/Separate-Design-and-Control-Variables/design/FY2021/BigSplit.jpg)
 
-**Figure: How the objects will be split**
+<span style="display:block;text-align:center">**Figure: How the objects will be split**
 
 <span style="display:block;text-align:center">![How the design objects will be brokendown](https://github.com/NREL/EnergyPlus/blob/Separate-Design-and-Control-Variables/design/FY2021/Breakdown.jpg)
 
-**Figure: How the design objects will be brokendown**
+<span style="display:block;text-align:center">**Figure: How the design objects will be brokendown**
 
 #### ZoneHVAC:LowTemperatureRadiant objects ####
 
@@ -122,7 +123,7 @@ Common fields for all four ZoneHVAC:Baseboard:RadiantConvective objects were ide
 -   Maximum Water Flow Rate
 -   Surface Name, Fraction of Radiant Energy to Surface
 
-Since only three design objects could be identified as common fields that could be used as design variables to all four baseboard objects, this does not warrant the need to differentiate between design and control variables. Also, it may be that a group of similar baseboard objects may be more commonly used as compared to others. Therefore, different types of baseboard object groupings were explored to find a group that would have a larger number of design variables. Grouping the `ZoneHVAC:Baseboard:RadiantConvective:Water` and `ZoneHVAC:Baseboard:RadiantConvective:Steam` as radiant baseboard  objects that used fluids for heating seemed like a good choice since it enabled grouping seven common variables that could to be set as design variables:
+Since only three design objects could be identified as common fields that could be used as design variables to all four baseboard objects, this does not warrant the need to differentiate between design and control variables. Also, it may be that a group of similar baseboard objects may be more commonly used as compared to others. Therefore, different types of baseboard object groupings were explored to find a group that would have a larger number of design variables. Grouping the `ZoneHVAC:Baseboard:RadiantConvective:Water` and `ZoneHVAC:Baseboard:RadiantConvective:Steam` as radiant baseboard  objects that used fluids for heating seemed like a good choice since it enabled grouping six common variables that could to be set as design variables:
 
 ##### Comments ######
  - As in the LowTemperatureRadiant objects, some of the common objects are optional fields or depend on other fields. I just wanted to point out that it should not be assumed that every field has the same importance. 
@@ -144,8 +145,7 @@ The new objects will have the fields that were removed from the old/modified obj
 
 This `ZoneHVAC:LowTemperatureRadiant:Design` object is referenced in the `ZoneHVAC:LowTemperatureRadiant:VariableFlow` and `ZoneHVAC:LowTemperatureRadiant:ConstantFlow` objects and provide additional design parameters to them. Multiple `ZoneHVAC:LowTemperatureRadiant:VariableFlow` and `ZoneHVAC:LowTemperatureRadiant:ConstantFlow` can be mapped to a single `ZoneHVAC:LowTemperatureRadiant:Design` object.
 
-*Field: Name*    
-*Field: Availability Schedule Name*     
+*Field: Name*         
 *Field: Temperature Control Type*    
 *Field: Fluid to Radiant Surface Heat Transfer Model*    
 *Field: Hydronic Tubing Inside Diameter*    
@@ -170,7 +170,6 @@ This field cannot be blank, and it should point to one of the `ZoneHVAC:LowTempe
 This `ZoneHVAC:Baseboard:RadiantConvective:Design` object is referenced in the `ZoneHVAC:Baseboard:RadiantConvective:Water` and `ZoneHVAC:Baseboard:RadiantConvective:Steam` objects and provide additional design parameters to them. Multiple `ZoneHVAC:Baseboard:RadiantConvective:Water` and `ZoneHVAC:Baseboard:RadiantConvective:Steam` can be mapped to a single `ZoneHVAC:Baseboard:RadiantConvective:Design` object.
 
 *Field: Name*    
-*Field: Availability Schedule Name*    
 *Field: Fraction Radiant*    
 *Field: Fraction of Radiant Energy Incident on People*    
 *Field: Heating Design Capacity Method*    
@@ -221,25 +220,22 @@ The metadata to remain same, so it was taken out to improve readability.
 
        \memo Design parameters for ZoneHVAC:LowTemperatureRadiant objects
        A1 , \field Name
-       A2 , \field Availability Schedule Name
-       A3 , \field Fluid to Radiant Surface Heat Transfer Model
-       A4 , \field Temperature Control Type
+       A2 , \field Fluid to Radiant Surface Heat Transfer Model
+       A3 , \field Temperature Control Type
        N1 , \field Hydronic Tubing Inside Diameter
        N2 , \field Hydronic Tubing Outside Diameter
        N3 , \field Hydronic Tubing Conductivity      
-       A5 , \field Condensation Control Type
+       A4 , \field Condensation Control Type
        N4 , \field Condensation Control Dewpoint Offset
-       A6 , \field Number of Circuits
-       A7 ; \field Changeover Delay Time Period Schedule
+       A5 ; \field Changeover Delay Time Period Schedule
 
 **ZoneHVAC:Baseboard:RadiantConvective:Design,**
 
            \memo Design parameters for ZoneHVAC:Baseboard:RadiantConvective objects
       A1 ,  \field Name
-      A2 ,  \field Availability Schedule Name
-      A3 ,  \field Heating Design Capacity Method
-      N1 , \field Heating Design Capacity Per Floor Area
-      N2 , \field Fraction of Autosized Heating Design Capacity
+      A2 ,  \field Heating Design Capacity Method
+      N1 ,  \field Heating Design Capacity Per Floor Area
+      N2 ,  \field Fraction of Autosized Heating Design Capacity
       N3 ,  \field Convergence Tolerance
       N4 ,  \field Fraction Radiant
       N5 ;  \field Fraction of Radiant Energy Incident on People
@@ -250,99 +246,103 @@ The metadata to remain same, so it was taken out to improve readability.
 
             \min-fields 26
        A1 , \field Name
-       A2 , \field Zone Name
-       A3 , \field Surface Name or Radiant Surface Group Name
+       A2 , \field Availability Schedule Name
+       A3 , \field Zone Name
+       A4 , \field Surface Name or Radiant Surface Group Name
        N1 , \field Hydronic Tubing Length
-       A4,  \field Setpoint Control Type
-       A5 , \field Heating Design Capacity Method
+       A5 ,  \field Setpoint Control Type
+       A6 , \field Heating Design Capacity Method
        N2 , \field Heating Design Capacity
        N3 , \field Heating Design Capacity Per Floor Area
        N5 , \field Maximum Hot Water Flow
-       A6 , \field Heating Water Inlet Node Name
-       A7 , \field Heating Water Outlet Node Name
+       A7 , \field Heating Water Inlet Node Name
+       A8 , \field Heating Water Outlet Node Name
        N6 , \field Heating Control Throttling Range
-       A8 , \field Heating Control Temperature Schedule Name
-       A9 , \field Cooling Design Capacity Method
+       A9 , \field Heating Control Temperature Schedule Name
+       A10, \field Cooling Design Capacity Method
        N7 , \field Cooling Design Capacity
        N8 , \field Cooling Design Capacity Per Floor Area
        N9 , \field Fraction of Autosized Cooling Design Capacity
        N10, \field Maximum Cold Water Flow
-       A10, \field Cooling Water Inlet Node Name
-       A11, \field Cooling Water Outlet Node Name
+       A11, \field Cooling Water Inlet Node Name
+       A12, \field Cooling Water Outlet Node Name
        N11, \field Cooling Control Throttling Range
-       A12, \field Cooling Control Temperature Schedule Name
-       A13, \field Number of Circuits
+       A13, \field Cooling Control Temperature Schedule Name
+       A14, \field Number of Circuits
        N12, \field Circuit Length
-       A14; \field Design Object Name
+       A15; \field Design Object Name
 
 **ZoneHVAC:LowTemperatureRadiant:ConstantFlow,**
 
             \min-fields 26
        A1 , \field Name
-       A2 , \field Zone Name
-       A3 , \field Surface Name or Radiant Surface Group Name
+       A2 , \field Availability Schedule Name
+       A3 , \field Zone Name
+       A4 , \field Surface Name or Radiant Surface Group Name
        N1 , \field Hydronic Tubing Length
        N2 , \field Running Mean Outdoor Dry-Bulb Temperature Weighting Factor
        N3 , \field Rated Flow Rate
-       A4 , \field Pump Flow Rate Schedule Name
+       A5 , \field Pump Flow Rate Schedule Name
        N4 , \field Rated Pump Head
        N5 , \field Rated Power Consumption
        N6 , \field Motor Efficiency
        N7 , \field Fraction of Motor Inefficiencies to Fluid Stream
-       A5 , \field Heating Water Inlet Node Name
-       A6 , \field Heating Water Outlet Node Name
-       A7 , \field Heating High Water Temperature Schedule Name
-       A8 , \field Heating Low Water Temperature Schedule Name
-       A9 , \field Heating High Control Temperature Schedule Name
-       A10, \field Heating Low Control Temperature Schedule Name
-       A11, \field Cooling Water Inlet Node Name
-       A12, \field Cooling Water Outlet Node Name
-       A13, \field Cooling High Water Temperature Schedule Name
-       A14, \field Cooling Low Water Temperature Schedule Name
-       A15, \field Cooling High Control Temperature Schedule Name
-       A16, \field Cooling Low Control Temperature Schedule Name
-       A17, \field Number of Circuits
+       A6 , \field Heating Water Inlet Node Name
+       A7 , \field Heating Water Outlet Node Name
+       A8 , \field Heating High Water Temperature Schedule Name
+       A9 , \field Heating Low Water Temperature Schedule Name
+       A10, \field Heating High Control Temperature Schedule Name
+       A11, \field Heating Low Control Temperature Schedule Name
+       A12, \field Cooling Water Inlet Node Name
+       A13, \field Cooling Water Outlet Node Name
+       A14, \field Cooling High Water Temperature Schedule Name
+       A15, \field Cooling Low Water Temperature Schedule Name
+       A16, \field Cooling High Control Temperature Schedule Name
+       A17, \field Cooling Low Control Temperature Schedule Name
+       A18, \field Number of Circuits
        N8 , \field Circuit Length
-       A18; \field Design Object Name
+       A19; \field Design Object Name
 
 **ZoneHVAC:Baseboard:RadiantConvective:Water,**
 
           \min-fields 8
       A1, \field Name
-      A2, \field Inlet Node Name
-      A3, \field Outlet Node Name
+      A2, \field Availability Schedule Name
+      A3, \field Inlet Node Name
+      A4, \field Outlet Node Name
       N1, \field Rated Average Water Temperature
       N2, \field Rated Water Mass Flow Rate
       N3, \field Heating Design Capacity
       N4, \field Maximum Water Flow Rate
-      A4, \field Design Object Name
-      A5, \field Surface 1 Name
+      A5, \field Design Object Name
+      A6, \field Surface 1 Name
       N5, \field Fraction of Radiant Energy to Surface 1
-      A6, \field Surface 2 Name
+      A7, \field Surface 2 Name
       N6, \field Fraction of Radiant Energy to Surface 2
     .
     .
     .
-     A104, \field Surface 100 Name
+     A105, \field Surface 100 Name
      N104; \field Fraction of Radiant Energy to Surface 100
 
 **ZoneHVAC:Baseboard:RadiantConvective:Steam,**
 
            \min-fields 7
       A1,  \field Name
-      A2,  \field Inlet Node Name
-      A3,  \field Outlet Node Name
+      A2,  \field Availability Schedule Name
+      A3,  \field Inlet Node Name
+      A4,  \field Outlet Node Name
       N1,  \field Heating Design Capacity
       N2,  \field Degree of SubCooling
       N3,  \field Maximum Steam Flow Rate
-      A4,  \field Design Object Name
-      A5,  \field Surface 1 Name
+      A5,  \field Design Object Name
+      A6,  \field Surface 1 Name
       N4,  \field Fraction of Radiant Energy to Surface 1
-      A6,  \field Surface 2 Name
+      A7,  \field Surface 2 Name
       N5,  \field Fraction of Radiant Energy to Surface 2
     .
     .
     .
-     A104, \field Surface 100 Name
+     A105, \field Surface 100 Name
      N103; \field Fraction of Radiant Energy to Surface 100
 
