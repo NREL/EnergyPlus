@@ -354,7 +354,7 @@ Get feedback from the EnergyPlus team regarding:
             \memo Low temperature hydronic radiant heating and/or cooling system embedded in a building
             \memo surface (wall, ceiling, or floor). Controlled by varying the hot or chilled water
             \memo flow to the unit.
-            \min-fields 33
+            \min-fields 26
        A1 , \field Name
             \required-field
             \reference-class-name validBranchEquipmentTypes
@@ -497,7 +497,7 @@ Get feedback from the EnergyPlus team regarding:
             \memo Low temperature hydronic radiant heating and/or cooling system embedded in a building
             \memo surface (wall, ceiling, or floor). Controlled by varying the hot or chilled water
             \memo temperature circulating through the unit.
-            \min-fields 33
+            \min-fields 26
        A1 , \field Name
             \required-field
             \reference-class-name validBranchEquipmentTypes
