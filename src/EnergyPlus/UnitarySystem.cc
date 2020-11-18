@@ -3245,13 +3245,12 @@ namespace UnitarySystems {
 
                             //             Determine if system is on air loop served by the thermostat location specified
                             ZoneInletNodeFound = false;
-                            int InletControlledZoneNum = 0;
                             int ZoneInletNum = 0;
-                            ZoneInletNodeFound = searchZoneInletNodeAirLoopNum(state, AirLoopNumber, InletControlledZoneNum, ZoneInletNum);
+                            ZoneInletNodeFound = searchZoneInletNodeAirLoopNum(AirLoopNumber, ControlledZoneNum, ZoneInletNum);
                             if (ZoneInletNodeFound){
-                                thisSys.m_ZoneInletNode = DataZoneEquipment::ZoneEquipConfig(InletControlledZoneNum).InletNode(ZoneInletNum);
+                                thisSys.m_ZoneInletNode = DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).InletNode(ZoneInletNum);
                                 TotalFloorAreaOnAirLoop +=
-                                    DataHeatBalance::Zone(DataZoneEquipment::ZoneEquipConfig(InletControlledZoneNum).ActualZoneNum)
+                                    DataHeatBalance::Zone(DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).ActualZoneNum)
                                         .FloorArea;
                             }
 
@@ -3292,13 +3291,12 @@ namespace UnitarySystems {
 
                                         //             Determine if system is on air loop served by the thermostat location specified
                                         ZoneInletNodeFound = false;
-                                        int InletControlledZoneNum = 0;
                                         int ZoneInletNum = 0;
-                                        ZoneInletNodeFound = searchZoneInletNodeAirLoopNum(state, AirLoopNumber, InletControlledZoneNum, ZoneInletNum);
+                                        ZoneInletNodeFound = searchZoneInletNodeAirLoopNum(AirLoopNumber, ControlledZoneNum, ZoneInletNum);
                                         if (ZoneInletNodeFound){
-                                            thisSys.m_ZoneInletNode = DataZoneEquipment::ZoneEquipConfig(InletControlledZoneNum).InletNode(ZoneInletNum);
+                                            thisSys.m_ZoneInletNode = DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).InletNode(ZoneInletNum);
                                             TotalFloorAreaOnAirLoop +=
-                                                DataHeatBalance::Zone(DataZoneEquipment::ZoneEquipConfig(InletControlledZoneNum).ActualZoneNum)
+                                                DataHeatBalance::Zone(DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).ActualZoneNum)
                                                     .FloorArea;
                                         }
 
@@ -16037,15 +16035,12 @@ namespace UnitarySystems {
         return false;
     }
 
-    bool searchZoneInletNodeAirLoopNum(EnergyPlusData &state, int airLoopNumToFind, int &ZoneEquipConfigIndex, int &InletNodeIndex)
+    bool searchZoneInletNodeAirLoopNum(int airLoopNumToFind, int ZoneEquipConfigIndex, int &InletNodeIndex)
     {
-        for (int ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
-            for (int ZoneInletNum = 1; ZoneInletNum <= DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).NumInletNodes; ++ZoneInletNum) {
-                if (DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum(ZoneInletNum) == airLoopNumToFind) {
-                    ZoneEquipConfigIndex = ControlledZoneNum;
-                    InletNodeIndex = ZoneInletNum;
-                    return true;
-                }
+        for (int ZoneInletNum = 1; ZoneInletNum <= DataZoneEquipment::ZoneEquipConfig(ZoneEquipConfigIndex).NumInletNodes; ++ZoneInletNum) {
+            if (DataZoneEquipment::ZoneEquipConfig(ZoneEquipConfigIndex).InletNodeAirLoopNum(ZoneInletNum) == airLoopNumToFind) {
+                InletNodeIndex = ZoneInletNum;
+                return true;
             }
         }
         return false;
