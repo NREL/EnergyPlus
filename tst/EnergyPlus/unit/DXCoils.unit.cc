@@ -282,7 +282,7 @@ TEST_F(EnergyPlusFixture, DXCoils_Test2)
     state.dataGlobal->DisplayExtraWarnings = true;
     SysSizingRunDone = true;
     FinalSysSizing.allocate(1);
-    PrimaryAirSystem.allocate(1);
+    state.dataAirSystemsData->PrimaryAirSystems.allocate(1);
     state.dataAirLoop->AirLoopControlInfo.allocate(1);
     CurSysNum = 1;
     NumDXCoils = 2;
@@ -382,7 +382,7 @@ TEST_F(EnergyPlusFixture, DXCoils_Test2)
     // Clean up
     UnitarySysEqSizing.deallocate();
     FinalSysSizing.deallocate();
-    PrimaryAirSystem.deallocate();
+    state.dataAirSystemsData->PrimaryAirSystems.deallocate();
     state.dataAirLoop->AirLoopControlInfo.deallocate();
 }
 
@@ -2194,10 +2194,10 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_TwoSpeed)
     DataSizing::FinalSysSizing(CurSysNum).DesCoolVolFlow = 1.00;
     DataSizing::FinalSysSizing(CurSysNum).DesOutAirVolFlow = 0.2;
 
-    DataAirSystems::PrimaryAirSystem.allocate(1);
-    DataAirSystems::PrimaryAirSystem(CurSysNum).NumOACoolCoils = 0;
-    DataAirSystems::PrimaryAirSystem(CurSysNum).SupFanNum = 0;
-    DataAirSystems::PrimaryAirSystem(CurSysNum).RetFanNum = 0;
+    state.dataAirSystemsData->PrimaryAirSystems.allocate(1);
+    state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).NumOACoolCoils = 0;
+    state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).SupFanNum = 0;
+    state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).RetFanNum = 0;
 
     DataSizing::SysSizingRunDone = true;
     DataSizing::SysSizInput.allocate(1);
@@ -2420,10 +2420,10 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_SingleSpeed)
     DataSizing::FinalSysSizing(CurSysNum).DesCoolVolFlow = 1.00;
     DataSizing::FinalSysSizing(CurSysNum).DesOutAirVolFlow = 0.2;
 
-    DataAirSystems::PrimaryAirSystem.allocate(1);
-    DataAirSystems::PrimaryAirSystem(CurSysNum).NumOACoolCoils = 0;
-    DataAirSystems::PrimaryAirSystem(CurSysNum).SupFanNum = 0;
-    DataAirSystems::PrimaryAirSystem(CurSysNum).RetFanNum = 0;
+    state.dataAirSystemsData->PrimaryAirSystems.allocate(1);
+    state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).NumOACoolCoils = 0;
+    state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).SupFanNum = 0;
+    state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).RetFanNum = 0;
 
     DataSizing::SysSizingRunDone = true;
     DataSizing::SysSizInput.allocate(1);
@@ -3531,10 +3531,10 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoilsAutoSizingOutput)
     DataSizing::FinalSysSizing(CurSysNum).MixHumRatAtCoolPeak = 0.0095218208835786931;
     DataSizing::FinalSysSizing(CurSysNum).OutTempAtCoolPeak = 28.244709704058657;
 
-    DataAirSystems::PrimaryAirSystem.allocate(1);
-    DataAirSystems::PrimaryAirSystem(CurSysNum).NumOACoolCoils = 0;
-    DataAirSystems::PrimaryAirSystem(CurSysNum).SupFanNum = 0;
-    DataAirSystems::PrimaryAirSystem(CurSysNum).RetFanNum = 0;
+    state.dataAirSystemsData->PrimaryAirSystems.allocate(1);
+    state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).NumOACoolCoils = 0;
+    state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).SupFanNum = 0;
+    state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).RetFanNum = 0;
 
     DataSizing::SysSizInput.allocate(1);
     DataSizing::SysSizInput(1).AirLoopNum = CurSysNum;
@@ -3783,10 +3783,10 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoolingCoilPartialAutoSizeOutput)
     DataSizing::FinalSysSizing(CurSysNum).MixHumRatAtCoolPeak = 0.0095218208835786931;
     DataSizing::FinalSysSizing(CurSysNum).OutTempAtCoolPeak = 28.244709704058657;
 
-    DataAirSystems::PrimaryAirSystem.allocate(1);
-    DataAirSystems::PrimaryAirSystem(CurSysNum).NumOACoolCoils = 0;
-    DataAirSystems::PrimaryAirSystem(CurSysNum).SupFanNum = 0;
-    DataAirSystems::PrimaryAirSystem(CurSysNum).RetFanNum = 0;
+    state.dataAirSystemsData->PrimaryAirSystems.allocate(1);
+    state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).NumOACoolCoils = 0;
+    state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).SupFanNum = 0;
+    state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).RetFanNum = 0;
 
     DataSizing::SysSizInput.allocate(1);
     DataSizing::SysSizInput(1).AirLoopNum = CurSysNum;

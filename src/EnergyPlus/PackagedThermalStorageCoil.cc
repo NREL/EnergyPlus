@@ -2105,7 +2105,6 @@ namespace PackagedThermalStorageCoil {
 
         // Using/Aliasing
         using namespace DataSizing;
-        using DataAirSystems::PrimaryAirSystem;
         using DataEnvironment::StdRhoAir;
         using namespace OutputReportPredefined;
         using CurveManager::CurveValue;
@@ -2189,7 +2188,7 @@ namespace PackagedThermalStorageCoil {
                         //     MixHumRat = FinalSysSizing(CurSysNum)%MixHumRatAtCoolPeak
                         SupTemp = FinalSysSizing(CurSysNum).CoolSupTemp;
                         SupHumRat = FinalSysSizing(CurSysNum).CoolSupHumRat;
-                        if (PrimaryAirSystem(CurSysNum).NumOACoolCoils == 0) { // there is no precooling of the OA stream
+                        if (state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).NumOACoolCoils == 0) { // there is no precooling of the OA stream
                             MixTemp = FinalSysSizing(CurSysNum).MixTempAtCoolPeak;
                             MixHumRat = FinalSysSizing(CurSysNum).MixHumRatAtCoolPeak;
                         } else { // there is precooling of OA stream
