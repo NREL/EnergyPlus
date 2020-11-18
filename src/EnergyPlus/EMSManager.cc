@@ -1868,8 +1868,6 @@ namespace EMSManager {
         // na
 
         // Using/Aliasing
-        using DataAirSystems::PrimaryAirSystem;
-
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
         // na
@@ -1894,7 +1892,7 @@ namespace EMSManager {
             numAirLoops = isize(state.dataAirLoop->PriAirSysAvailMgr);
             for (Loop = 1; Loop <= numAirLoops; ++Loop) {
                 SetupEMSActuator(
-                    "AirLoopHVAC", PrimaryAirSystem(Loop).Name, "Availability Status", "[ ]", lDummy, state.dataAirLoop->PriAirSysAvailMgr(Loop).AvailStatus);
+                    "AirLoopHVAC", state.dataAirSystemsData->PrimaryAirSystems(Loop).Name, "Availability Status", "[ ]", lDummy, state.dataAirLoop->PriAirSysAvailMgr(Loop).AvailStatus);
             }
 
         } else {
@@ -1922,7 +1920,6 @@ namespace EMSManager {
         // Using/Aliasing
         using DataSurfaces::ExternalEnvironment;
         using DataSurfaces::Surface;
-        using DataSurfaces::SurfaceClass_Window;
         using DataSurfaces::TotSurfaces;
         using DataSurfaces::WindowShadingControl;
         using DataSurfaces::WSC_ST_SwitchableGlazing;
@@ -1946,7 +1943,7 @@ namespace EMSManager {
 
         for (loopSurfNum = 1; loopSurfNum <= TotSurfaces; ++loopSurfNum) {
 
-            if (Surface(loopSurfNum).Class != SurfaceClass_Window) continue;
+            if (Surface(loopSurfNum).Class != DataSurfaces::SurfaceClass::Window) continue;
             if (Surface(loopSurfNum).ExtBoundCond != ExternalEnvironment) continue;
             if (!Surface(loopSurfNum).HasShadeControl) continue;
 

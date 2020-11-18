@@ -1472,20 +1472,20 @@ namespace UnitarySystems {
 
         if (DataSizing::CurSysNum > 0 && DataSizing::CurOASysNum == 0 && this->m_FanExists) {
             if (this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                DataAirSystems::PrimaryAirSystem(DataSizing::CurSysNum).supFanVecIndex = this->m_FanIndex;
-                DataAirSystems::PrimaryAirSystem(DataSizing::CurSysNum).supFanModelTypeEnum = DataAirSystems::objectVectorOOFanSystemModel;
+                state.dataAirSystemsData->PrimaryAirSystems(DataSizing::CurSysNum).supFanVecIndex = this->m_FanIndex;
+                state.dataAirSystemsData->PrimaryAirSystems(DataSizing::CurSysNum).supFanModelTypeEnum = DataAirSystems::objectVectorOOFanSystemModel;
                 DataSizing::DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
                 DataSizing::DataFanIndex = this->m_FanIndex;
             } else {
-                DataAirSystems::PrimaryAirSystem(DataSizing::CurSysNum).SupFanNum = this->m_FanIndex;
-                DataAirSystems::PrimaryAirSystem(DataSizing::CurSysNum).supFanModelTypeEnum = DataAirSystems::structArrayLegacyFanModels;
+                state.dataAirSystemsData->PrimaryAirSystems(DataSizing::CurSysNum).SupFanNum = this->m_FanIndex;
+                state.dataAirSystemsData->PrimaryAirSystems(DataSizing::CurSysNum).supFanModelTypeEnum = DataAirSystems::structArrayLegacyFanModels;
                 DataSizing::DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
                 DataSizing::DataFanIndex = this->m_FanIndex;
             }
             if (this->m_FanPlace == FanPlace::BlowThru) {
-                DataAirSystems::PrimaryAirSystem(AirLoopNum).supFanLocation = DataAirSystems::fanPlacement::BlowThru;
+                state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanLocation = DataAirSystems::fanPlacement::BlowThru;
             } else if (this->m_FanPlace == FanPlace::DrawThru) {
-                DataAirSystems::PrimaryAirSystem(AirLoopNum).supFanLocation = DataAirSystems::fanPlacement::DrawThru;
+                state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanLocation = DataAirSystems::fanPlacement::DrawThru;
             }
         } else if (DataSizing::CurZoneEqNum > 0 && this->m_FanExists) {
             if (this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
@@ -2414,7 +2414,7 @@ namespace UnitarySystems {
                     this->m_MaxCoolAirVolFlow = BranchFanFlow;
                 } else {
                     SystemFlow = 0.0;
-                    if (AirLoopNum > 0.0) SystemFlow = DataAirSystems::PrimaryAirSystem(AirLoopNum).DesignVolFlowRate;
+                    if (AirLoopNum > 0.0) SystemFlow = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).DesignVolFlowRate;
                     if (SystemFlow > 0.0) {
                         this->m_MaxCoolAirVolFlow = SystemFlow;
                     } else {
@@ -2630,7 +2630,7 @@ namespace UnitarySystems {
         // Set flow rate for unitary system with no fan
         if (DataSizing::CurOASysNum == 0 && DataSizing::CurZoneEqNum == 0 && this->m_DesignFanVolFlowRate <= 0.0) {
             SystemFlow = 0;
-            if (AirLoopNum > 0) SystemFlow = DataAirSystems::PrimaryAirSystem(AirLoopNum).DesignVolFlowRate;
+            if (AirLoopNum > 0) SystemFlow = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).DesignVolFlowRate;
             if (SystemFlow > 0.0) {
                 this->m_DesignFanVolFlowRate = SystemFlow;
             } else {
@@ -3274,12 +3274,12 @@ namespace UnitarySystems {
                     }
 
                     for (int AirLoopNum = 1; AirLoopNum <= DataHVACGlobals::NumPrimaryAirSys; ++AirLoopNum) {
-                        for (int BranchNum = 1; BranchNum <= DataAirSystems::PrimaryAirSystem(AirLoopNum).NumBranches; ++BranchNum) {
-                            for (int CompNum = 1; CompNum <= DataAirSystems::PrimaryAirSystem(AirLoopNum).Branch(BranchNum).TotalComponents;
+                        for (int BranchNum = 1; BranchNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).NumBranches; ++BranchNum) {
+                            for (int CompNum = 1; CompNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).TotalComponents;
                                  ++CompNum) {
-                                if (UtilityRoutines::SameString(DataAirSystems::PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name,
+                                if (UtilityRoutines::SameString(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name,
                                                                 thisObjectName) &&
-                                    UtilityRoutines::SameString(DataAirSystems::PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).TypeOf,
+                                    UtilityRoutines::SameString(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).TypeOf,
                                                                 cCurrentModuleObject)) {
                                     AirLoopNumber = AirLoopNum;
                                     AirLoopFound = true;

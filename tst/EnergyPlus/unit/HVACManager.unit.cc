@@ -279,9 +279,9 @@ TEST_F(EnergyPlusFixture, AirloopFlowBalanceTest)
     DataEnvironment::StdRhoAir = 1.0;
 
     DataHVACGlobals::NumPrimaryAirSys = 2;
-    DataAirSystems::PrimaryAirSystem.allocate(DataHVACGlobals::NumPrimaryAirSys);
-    DataAirSystems::PrimaryAirSystem(1).Name = "System 1";
-    DataAirSystems::PrimaryAirSystem(2).Name = "System 2";
+    state.dataAirSystemsData->PrimaryAirSystems.allocate(DataHVACGlobals::NumPrimaryAirSys);
+    state.dataAirSystemsData->PrimaryAirSystems(1).Name = "System 1";
+    state.dataAirSystemsData->PrimaryAirSystems(2).Name = "System 2";
         state.dataAirLoop->AirLoopFlow.allocate(DataHVACGlobals::NumPrimaryAirSys);
     auto &thisAirLoopFlow1(state.dataAirLoop->AirLoopFlow(1));
     auto &thisAirLoopFlow2(state.dataAirLoop->AirLoopFlow(2));

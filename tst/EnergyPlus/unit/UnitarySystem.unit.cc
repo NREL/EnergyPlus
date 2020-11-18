@@ -275,7 +275,7 @@ public:
         DataSizing::FinalSysSizing.allocate(1);
         DataSizing::FinalZoneSizing.allocate(1);
         DataHVACGlobals::NumPrimaryAirSys = 1;
-        DataAirSystems::PrimaryAirSystem.allocate(1);
+        state.dataAirSystemsData->PrimaryAirSystems.allocate(1);
         state.dataAirLoop->AirLoopControlInfo.allocate(1);
         Psychrometrics::InitializePsychRoutines();
         DataLoopNode::Node.allocate(30);
@@ -298,7 +298,7 @@ public:
         DataSizing::FinalSysSizing.clear();
         DataSizing::SysSizPeakDDNum.clear();
         DataHVACGlobals::NumPrimaryAirSys = 0;
-        DataAirSystems::PrimaryAirSystem.clear();
+        state.dataAirSystemsData->PrimaryAirSystems.clear();
         state.dataAirLoop->AirLoopControlInfo.clear();
         Psychrometrics::cached_Twb.clear();
         Psychrometrics::cached_Psat.clear();
@@ -470,11 +470,11 @@ TEST_F(AirloopUnitarySysTest, MultipleWaterCoolingCoilSizing)
     Fans::Fan(1).MotEff = 0.7;
     Fans::Fan(1).MotInAirFrac = 1.0;
 
-    DataAirSystems::PrimaryAirSystem(1).supFanModelTypeEnum = DataAirSystems::structArrayLegacyFanModels;
-    DataAirSystems::PrimaryAirSystem(1).supFanVecIndex = 1;
-    DataAirSystems::PrimaryAirSystem(1).SupFanNum = 1;
-    DataAirSystems::PrimaryAirSystem(1).supFanLocation = DataAirSystems::fanPlacement::BlowThru;
-    Real64 FanCoolLoad = Fans::FanDesHeatGain(state, DataAirSystems::PrimaryAirSystem(1).SupFanNum, coil1CoolingAirFlowRate);
+    state.dataAirSystemsData->PrimaryAirSystems(1).supFanModelTypeEnum = DataAirSystems::structArrayLegacyFanModels;
+    state.dataAirSystemsData->PrimaryAirSystems(1).supFanVecIndex = 1;
+    state.dataAirSystemsData->PrimaryAirSystems(1).SupFanNum = 1;
+    state.dataAirSystemsData->PrimaryAirSystems(1).supFanLocation = DataAirSystems::fanPlacement::BlowThru;
+    Real64 FanCoolLoad = Fans::FanDesHeatGain(state, state.dataAirSystemsData->PrimaryAirSystems(1).SupFanNum, coil1CoolingAirFlowRate);
     WaterCoils::SizeWaterCoil(state, CoilNum);
 
     EXPECT_NEAR(FanCoolLoad, 106.0, 1.0); // make sure there is enough fan heat to change results
@@ -490,8 +490,8 @@ TEST_F(AirloopUnitarySysTest, MultipleWaterCoolingCoilSizing)
     state.dataWaterCoils->WaterCoil(CoilNum).DesOutletAirHumRat = DataSizing::AutoSize;
     state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate = DataSizing::AutoSize;
     // reset primary air system fan type and location as if is doesn't exist
-    DataAirSystems::PrimaryAirSystem(1).supFanModelTypeEnum = DataAirSystems::fanModelTypeNotYetSet;
-    DataAirSystems::PrimaryAirSystem(1).supFanLocation = DataAirSystems::fanPlacement::fanPlaceNotSet;
+    state.dataAirSystemsData->PrimaryAirSystems(1).supFanModelTypeEnum = DataAirSystems::fanModelTypeNotYetSet;
+    state.dataAirSystemsData->PrimaryAirSystems(1).supFanLocation = DataAirSystems::fanPlacement::fanPlaceNotSet;
 
     // size same coils in UnitarySystem
     int AirLoopNum(1);
@@ -9925,13 +9925,13 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultiSpeedCoils_SingleMode)
     BranchInputManager::ManageBranchInput(state); // just gets input and returns.
 
     DataHVACGlobals::NumPrimaryAirSys = 1;
-    DataAirSystems::PrimaryAirSystem.allocate(1);
-    DataAirSystems::PrimaryAirSystem(1).NumBranches = 1;
-    DataAirSystems::PrimaryAirSystem(1).Branch.allocate(1);
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).TotalComponents = 1;
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp.allocate(1);
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp(1).Name = "UNITARY SYSTEM MODEL";
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp(1).TypeOf = "AirLoopHVAC:UnitarySystem";
+    state.dataAirSystemsData->PrimaryAirSystems.allocate(1);
+    state.dataAirSystemsData->PrimaryAirSystems(1).NumBranches = 1;
+    state.dataAirSystemsData->PrimaryAirSystems(1).Branch.allocate(1);
+    state.dataAirSystemsData->PrimaryAirSystems(1).Branch(1).TotalComponents = 1;
+    state.dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp.allocate(1);
+    state.dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).Name = "UNITARY SYSTEM MODEL";
+    state.dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).TypeOf = "AirLoopHVAC:UnitarySystem";
 
     DataZoneControls::NumTempControlledZones = 1;
     DataZoneControls::TempControlledZone.allocate(DataZoneControls::NumTempControlledZones);
@@ -11154,11 +11154,11 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_SizingWithFans)
     DataSizing::FinalSysSizing(DataSizing::CurSysNum).DesCoolVolFlow = 1.005;
     DataSizing::FinalSysSizing(DataSizing::CurSysNum).DesOutAirVolFlow = 0.2;
 
-    DataAirSystems::PrimaryAirSystem.allocate(1);
-    DataAirSystems::PrimaryAirSystem(DataSizing::CurSysNum).NumOACoolCoils = 0;
-    DataAirSystems::PrimaryAirSystem(DataSizing::CurSysNum).SupFanNum = 0;
-    DataAirSystems::PrimaryAirSystem(DataSizing::CurSysNum).RetFanNum = 0;
-    DataAirSystems::PrimaryAirSystem(DataSizing::CurSysNum).supFanModelTypeEnum = DataAirSystems::fanModelTypeNotYetSet;
+    state.dataAirSystemsData->PrimaryAirSystems.allocate(1);
+    state.dataAirSystemsData->PrimaryAirSystems(DataSizing::CurSysNum).NumOACoolCoils = 0;
+    state.dataAirSystemsData->PrimaryAirSystems(DataSizing::CurSysNum).SupFanNum = 0;
+    state.dataAirSystemsData->PrimaryAirSystems(DataSizing::CurSysNum).RetFanNum = 0;
+    state.dataAirSystemsData->PrimaryAirSystems(DataSizing::CurSysNum).supFanModelTypeEnum = DataAirSystems::fanModelTypeNotYetSet;
 
     DataSizing::SysSizingRunDone = true;
     DataSizing::SysSizInput.allocate(1);
@@ -11230,7 +11230,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_SizingWithFans)
     // clean
     DataSizing::NumSysSizInput = 0;
     DataSizing::FinalSysSizing.deallocate();
-    DataAirSystems::PrimaryAirSystem.deallocate();
+    state.dataAirSystemsData->PrimaryAirSystems.deallocate();
     DataSizing::SysSizInput.deallocate();
     DataSizing::UnitarySysEqSizing.deallocate();
     DataSizing::OASysEqSizing.deallocate();
