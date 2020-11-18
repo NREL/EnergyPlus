@@ -45,76 +45,26 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+// Google Test Headers
+#include <gtest/gtest.h>
+
 // EnergyPlus Headers
-#include <EnergyPlus/DataAirSystems.hh>
-#include <EnergyPlus/Fans.hh>
-#include <EnergyPlus/HVACFan.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataSystemVariables.hh>
+#include <EnergyPlus/FileSystem.hh>
 
-namespace EnergyPlus {
+#include "Fixtures/EnergyPlusFixture.hh"
 
-namespace DataAirSystems {
+using namespace EnergyPlus;
 
-    // MODULE INFORMATION:
-    //       AUTHOR         Plant code authors?
-    //       DATE WRITTEN
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS MODULE:
-    // This data-only module contains the structures for various parts of the Plant and
-    // Condenser Loops.
-
-    // METHODOLOGY EMPLOYED:
-    // na
-
-    // REFERENCES: none
-
-    // OTHER NOTES: none
-
-    // USE STATEMENTS:
-    // Use statements for data only modules (only modules that should be used here and sparingly)
-    // Using/Aliasing
-    using namespace DataPlant;
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // DERIVED TYPE DEFINITIONS
-
-    // DefinePrimaryAirSystem contains the data for a primary air HVAC system
-
-    // The ConnectionPoint derived type is used to link quickly between loops at connection points
-    // and avoids the need for repetitive searches.
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // None
-
-    // MODULE VARIABLE DECLARATIONS
-    // For each type of air path, define an array of DefineAirPaths
-
-    Real64 calcFanDesignHeatGain(EnergyPlusData &state, int const &dataFanEnumType, int const &dataFanIndex, Real64 const &desVolFlow)
-    {
-        Real64 fanDesHeatLoad = 0.0; // design fan heat load (W)
-
-        if (dataFanEnumType < 0 || dataFanIndex < 0 || desVolFlow == 0.0) return fanDesHeatLoad;
-
-        switch (dataFanEnumType) {
-        case DataAirSystems::structArrayLegacyFanModels: {
-            fanDesHeatLoad = Fans::FanDesHeatGain(state, dataFanIndex, desVolFlow);
-            break;
-        }
-        case DataAirSystems::objectVectorOOFanSystemModel: {
-            fanDesHeatLoad = HVACFan::fanObjs[dataFanIndex]->getFanDesignHeatGain(state, desVolFlow);
-            break;
-        }
-        case DataAirSystems::fanModelTypeNotYetSet: {
-            // do nothing
-            break;
-        }
-        } // end switch
-        return fanDesHeatLoad;
-    }
-
-} // namespace DataAirSystems
-
-} // namespace EnergyPlus
+TEST_F(EnergyPlusFixture, File_Not_Found_ERR_Output)
+{
+    std::string filePath = "./NonExistentFile.txt";
+    FileSystem::makeNativePath(filePath);
+    std::string expectedError = FileSystem::getParentDirectoryPath(FileSystem::getAbsolutePath(filePath));
+    bool fileFound = false;
+    std::string fullPath;
+    std::string contextString = "Test File_Not_Found_ERR_Output";
+    DataSystemVariables::CheckForActualFileName(this->state, filePath, fileFound, fullPath, contextString);
+    EXPECT_FALSE(fileFound);
+    EXPECT_TRUE(match_err_stream(expectedError));
+}

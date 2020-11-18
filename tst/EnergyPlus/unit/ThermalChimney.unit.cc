@@ -73,7 +73,6 @@
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::DataEnvironment;
-using namespace EnergyPlus::DataGlobals;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataHeatBalFanSys;
@@ -1129,18 +1128,18 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
     DataHeatBalSurface::TempSurfIn(surfNum) = 26.99;
     surfNum = UtilityRoutines::FindItemInList("ZN004:WALL001:WIN001", DataSurfaces::Surface);
     DataHeatBalSurface::TempSurfIn(surfNum) = 22.99;
-    DataHeatBalFanSys::MAT.allocate(DataGlobals::NumOfZones);
-    DataHeatBalFanSys::ZoneAirHumRat.allocate(DataGlobals::NumOfZones);
+    DataHeatBalFanSys::MAT.allocate(state.dataGlobal->NumOfZones);
+    DataHeatBalFanSys::ZoneAirHumRat.allocate(state.dataGlobal->NumOfZones);
     DataHeatBalFanSys::MAT = 23.0;
     DataHeatBalFanSys::ZoneAirHumRat = 0.01;
     DataEnvironment::OutBaroPress = 101325.0;
     StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, DataEnvironment::OutBaroPress, 20.0, 0.0);
 
-    DataHeatBalFanSys::MCPThermChim.allocate(DataGlobals::NumOfZones);
-    DataHeatBalFanSys::ThermChimAMFL.allocate(DataGlobals::NumOfZones);
-    DataHeatBalFanSys::MCPTThermChim.allocate(DataGlobals::NumOfZones);
+    DataHeatBalFanSys::MCPThermChim.allocate(state.dataGlobal->NumOfZones);
+    DataHeatBalFanSys::ThermChimAMFL.allocate(state.dataGlobal->NumOfZones);
+    DataHeatBalFanSys::MCPTThermChim.allocate(state.dataGlobal->NumOfZones);
     ScheduleManager::Schedule(1).CurrentValue = 1.0;
-    DataHeatBalance::ZnAirRpt.allocate(DataGlobals::NumOfZones);
+    DataHeatBalance::ZnAirRpt.allocate(state.dataGlobal->NumOfZones);
     // No EMS
     ThermalChimney::GetThermalChimney(state, localErrorsFound);
     EXPECT_FALSE(localErrorsFound);

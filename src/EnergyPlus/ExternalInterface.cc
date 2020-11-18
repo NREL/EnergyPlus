@@ -234,8 +234,6 @@ namespace ExternalInterface {
         // Exchanges variables between EnergyPlus and the BCVTB socket.
 
         // Using/Aliasing
-        using DataGlobals::WarmupFlag;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         std::string errorMessage;       // Error message
         int retValErrMsg;
@@ -250,7 +248,7 @@ namespace ExternalInterface {
             // Exchange data only after sizing and after warm-up.
             // Note that checking for ZoneSizingCalc SysSizingCalc does not work here, hence we
             // use the KindOfSim flag
-            if (!WarmupFlag && (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather)) {
+            if (!state.dataGlobal->WarmupFlag && (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather)) {
                 CalcExternalInterface(state);
             }
         }
@@ -339,7 +337,7 @@ namespace ExternalInterface {
 
         if ((NumExternalInterfacesBCVTB == 1) && (NumExternalInterfacesFMUExport == 0)) {
             haveExternalInterfaceBCVTB = true;
-            DisplayString("Instantiating Building Controls Virtual Test Bed");
+            DisplayString(state, "Instantiating Building Controls Virtual Test Bed");
             varKeys.allocate(maxVar);         // Keys of report variables used for data exchange
             varNames.allocate(maxVar);        // Names of report variables used for data exchange
             inpVarTypes.dimension(maxVar, 0); // Names of report variables used for data exchange
@@ -348,7 +346,7 @@ namespace ExternalInterface {
         } else if ((NumExternalInterfacesBCVTB == 0) && (NumExternalInterfacesFMUExport == 1)) {
             haveExternalInterfaceFMUExport = true;
             FMUExportActivate = 1;
-            DisplayString("Instantiating FunctionalMockupUnitExport interface");
+            DisplayString(state, "Instantiating FunctionalMockupUnitExport interface");
             varKeys.allocate(maxVar);         // Keys of report variables used for data exchange
             varNames.allocate(maxVar);        // Names of report variables used for data exchange
             inpVarTypes.dimension(maxVar, 0); // Names of report variables used for data exchange
@@ -361,7 +359,7 @@ namespace ExternalInterface {
 
         if ((NumExternalInterfacesFMUImport == 1) && (NumExternalInterfacesFMUExport == 0)) {
             haveExternalInterfaceFMUImport = true;
-            DisplayString("Instantiating FunctionalMockupUnitImport interface");
+            DisplayString(state, "Instantiating FunctionalMockupUnitImport interface");
             cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport";
             NumFMUObjects = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
             VerifyExternalInterfaceObject(state);
@@ -540,7 +538,7 @@ namespace ExternalInterface {
         int mainVersion;          // The version number
 
         if (InitExternalInterfacefirstCall) {
-            DisplayString("ExternalInterface initializes.");
+            DisplayString(state, "ExternalInterface initializes.");
             // do one time initializations
 
             if (haveExternalInterfaceBCVTB) {
@@ -670,8 +668,8 @@ namespace ExternalInterface {
             }
             StopExternalInterfaceIfError(state);
 
-            DisplayString("Number of outputs in ExternalInterface = " + TrimSigDigits(nOutVal));
-            DisplayString("Number of inputs  in ExternalInterface = " + TrimSigDigits(nInpVar));
+            DisplayString(state, "Number of outputs in ExternalInterface = " + TrimSigDigits(nOutVal));
+            DisplayString(state, "Number of inputs  in ExternalInterface = " + TrimSigDigits(nInpVar));
 
             InitExternalInterfacefirstCall = false;
 
@@ -732,7 +730,6 @@ namespace ExternalInterface {
         // This routine gets, sets and does the time integration in FMUs.
 
         // Using/Aliasing
-        using DataGlobals::WarmupFlag;
         using EMSManager::ManageEMS;
         using General::TrimSigDigits;
         using RuntimeLanguageProcessor::ExternalInterfaceSetErlVariable;
@@ -864,7 +861,8 @@ namespace ExternalInterface {
 
                 // Set in EnergyPlus the values of the schedules
                 for (k = 1; k <= FMU(i).Instance(j).NumOutputVariablesSchedule; ++k) {
-                    ExternalInterfaceSetSchedule(FMU(i).Instance(j).eplusInputVariableSchedule(k).VarIndex,
+                    ExternalInterfaceSetSchedule(state,
+                                                 FMU(i).Instance(j).eplusInputVariableSchedule(k).VarIndex,
                                                  FMU(i).Instance(j).fmuOutputVariableSchedule(k).RealVarValue);
                 }
 
@@ -1118,7 +1116,7 @@ namespace ExternalInterface {
         int FOUND;
 
         if (FirstCallIni) {
-            DisplayString("Initializing FunctionalMockupUnitImport interface");
+            DisplayString(state, "Initializing FunctionalMockupUnitImport interface");
             // do one time initializations
             ValidateRunControl(state);
             FMU.allocate(NumFMUObjects);
@@ -1150,7 +1148,11 @@ namespace ExternalInterface {
                                               cNumericFieldNames);
                 // Get the FMU name
                 FMU(Loop).Name = cAlphaArgs(1);
-                CheckForActualFileName(state, cAlphaArgs(1), fileExist, tempFullFileName);
+
+                std::string contextString = cCurrentModuleObject + ", " + cAlphaFieldNames(1) + ": ";
+
+                CheckForActualFileName(state, cAlphaArgs(1), fileExist, tempFullFileName, contextString);
+
                 if (fileExist) {
                     pos = index(FMU(Loop).Name, pathChar, true); // look backwards
                     if (pos != std::string::npos) {
@@ -1165,8 +1167,6 @@ namespace ExternalInterface {
                     }
                     fullFileName(Loop) = tempFullFileName;
                 } else {
-                    ShowSevereError(state, "ExternalInterface/InitExternalInterfaceFMUImport:");
-                    ShowContinueError(state, "file not located = \"" + cAlphaArgs(1) + "\".");
                     ErrorsFound = true;
                 }
                 // Get fmu time out
@@ -1838,9 +1838,9 @@ namespace ExternalInterface {
                         ShowContinueError(state, "Check the input file and the modelDescription file again.");
                     }
 
-                    DisplayString("Number of inputs in instance \"" + FMU(i).Instance(j).Name + "\" of FMU \"" + FMU(i).Name + "\" = \"" +
+                    DisplayString(state, "Number of inputs in instance \"" + FMU(i).Instance(j).Name + "\" of FMU \"" + FMU(i).Name + "\" = \"" +
                                   TrimSigDigits(FMU(i).Instance(j).NumInputVariablesInIDF) + "\".");
-                    DisplayString("Number of outputs in instance \"" + FMU(i).Instance(j).Name + "\" of FMU \"" + FMU(i).Name + "\" = \"" +
+                    DisplayString(state, "Number of outputs in instance \"" + FMU(i).Instance(j).Name + "\" of FMU \"" + FMU(i).Name + "\" = \"" +
                                   TrimSigDigits(FMU(i).Instance(j).NumOutputVariablesInIDF) + "\".");
                 }
             }
@@ -1856,7 +1856,7 @@ namespace ExternalInterface {
         return str.substr(first, last - first + 1);
     }
 
-    Real64 GetCurSimStartTimeSeconds()
+    Real64 GetCurSimStartTimeSeconds(EnergyPlusData &state)
     {
         // FUNCTION INFORMATION:
         //       AUTHOR         Thierry S. Nouidui, Michael Wetter, Wangda Zuo
@@ -1872,8 +1872,6 @@ namespace ExternalInterface {
         using DataEnvironment::CurrentYearIsLeapYear;
         using DataEnvironment::DayOfMonth;
         using DataEnvironment::Month;
-        using DataGlobals::HourOfDay;
-
         // Locals
         Real64 simtime;
 
@@ -1962,7 +1960,7 @@ namespace ExternalInterface {
         }
 
         simtime = 24 * (simtime + (DayOfMonth - 1)); // day of month does not need to be stubtracted??
-        simtime = 60 * (simtime + (HourOfDay - 1));  // hours to minutes
+        simtime = 60 * (simtime + (state.dataGlobal->HourOfDay - 1));  // hours to minutes
         simtime = 60 * (simtime);                    // minutes to seconds
 
         return simtime;
@@ -1983,8 +1981,6 @@ namespace ExternalInterface {
         // Using/Aliasing
         using DataEnvironment::TotalOverallSimDays;
         using DataEnvironment::TotDesDays;
-        using DataGlobals::TimeStepZone;
-        using DataGlobals::WarmupFlag;
         using DataSystemVariables::UpdateDataDuringWarmupExternalInterface;
         using EMSManager::ManageEMS;
         using General::TrimSigDigits;
@@ -2003,18 +1999,18 @@ namespace ExternalInterface {
         Array1D_int keyIndexes(1);     // Array index for
         Array1D_string NamesOfKeys(1); // Specific key name
 
-        if (WarmupFlag && (state.dataGlobal->KindOfSim != DataGlobalConstants::KindOfSim::RunPeriodWeather)) { // No data exchange during design days
+        if (state.dataGlobal->WarmupFlag && (state.dataGlobal->KindOfSim != DataGlobalConstants::KindOfSim::RunPeriodWeather)) { // No data exchange during design days
             if (FirstCallDesignDays) {
                 ShowWarningError(state, "ExternalInterface/CalcExternalInterfaceFMUImport: ExternalInterface does not exchange data during design days.");
             }
             FirstCallDesignDays = false;
         }
-        if (WarmupFlag && (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather)) { // Data exchange after design days
+        if (state.dataGlobal->WarmupFlag && (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather)) { // Data exchange after design days
             if (FirstCallWUp) {
                 // set the report during warmup to true so that variables are also updated during the warmup
                 UpdateDataDuringWarmupExternalInterface = true;
-                hStep = (60.0 * TimeStepZone) * 60.0;
-                tStart = GetCurSimStartTimeSeconds();
+                hStep = (60.0 * state.dataGlobal->TimeStepZone) * 60.0;
+                tStart = GetCurSimStartTimeSeconds(state);
                 tStop = tStart + 24.0 * 3600.0;
                 tComm = tStart;
 
@@ -2133,13 +2129,13 @@ namespace ExternalInterface {
             }
         }
         // BeginSimulation
-        if (!WarmupFlag && (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather)) {
+        if (!state.dataGlobal->WarmupFlag && (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather)) {
 
             if (FirstCallTStep) {
                 // reset the UpdateDataDuringWarmupExternalInterface to be false.
                 UpdateDataDuringWarmupExternalInterface = false;
                 // The time is computed in seconds for FMU
-                tStart = GetCurSimStartTimeSeconds();
+                tStart = GetCurSimStartTimeSeconds(state);
                 tStop = tStart + (TotalOverallSimDays - TotDesDays) * 24.0 * 3600.0;
                 tComm = tStart;
 
@@ -2284,8 +2280,6 @@ namespace ExternalInterface {
         //       RE-ENGINEERED  na
 
         // Using/Aliasing
-        using DataGlobals::MinutesPerTimeStep;
-        using DataGlobals::SimTimeSteps;
         using EMSManager::ManageEMS;
         using General::TrimSigDigits;
         using RuntimeLanguageProcessor::ExternalInterfaceSetErlVariable;
@@ -2311,11 +2305,11 @@ namespace ExternalInterface {
         bool continueSimulation; // Flag, true if simulation should continue
 
         if (firstCall) {
-            DisplayString("ExternalInterface starts first data exchange.");
+            DisplayString(state, "ExternalInterface starts first data exchange.");
             simulationStatus = 2;
             preSimTim = 0; // In the first call, E+ did not reset SimTimeSteps to zero
         } else {
-            preSimTim = SimTimeSteps * MinutesPerTimeStep * 60.0;
+            preSimTim = state.dataGlobal->SimTimeSteps * state.dataGlobal->MinutesPerTimeStep * 60.0;
         }
 
         // Socket asked to terminate simulation, but simulation continues
@@ -2393,7 +2387,7 @@ namespace ExternalInterface {
             if ((flaRea == 0) && continueSimulation) {
                 for (i = 1; i <= isize(varInd); ++i) {
                     if (inpVarTypes(i) == indexSchedule) {
-                        ExternalInterfaceSetSchedule(varInd(i), dblValRea(i));
+                        ExternalInterfaceSetSchedule(state, varInd(i), dblValRea(i));
                     } else if ((inpVarTypes(i) == indexVariable) || (inpVarTypes(i) == indexActuator)) {
                         ExternalInterfaceSetErlVariable(varInd(i), dblValRea(i));
                     } else {

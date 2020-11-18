@@ -491,7 +491,7 @@ namespace UnitarySystems {
             myOneTimeFlag = false;
         }
 
-        if (!DataGlobals::SysSizingCalc && this->m_MySizingCheckFlag && !this->m_ThisSysInputShouldBeGotten) {
+        if (!state.dataGlobal->SysSizingCalc && this->m_MySizingCheckFlag && !this->m_ThisSysInputShouldBeGotten) {
             if (AirLoopNum > 0) {
                 if (this->m_FanExists && (this->m_CoolCoilExists && (this->m_HeatCoilExists || this->m_SuppCoilExists)))
                     state.dataAirLoop->AirLoopControlInfo(AirLoopNum).UnitarySys = true;
@@ -727,7 +727,7 @@ namespace UnitarySystems {
 
             this->m_MyPlantScanFlag = false;
 
-        } else if (this->m_MyPlantScanFlag && !DataGlobals::AnyPlantInModel) {
+        } else if (this->m_MyPlantScanFlag && !state.dataGlobal->AnyPlantInModel) {
             this->m_MyPlantScanFlag = false;
         }
 
@@ -810,7 +810,7 @@ namespace UnitarySystems {
 
             this->m_MySuppCoilPlantScanFlag = false;
 
-        } else if (this->m_MySuppCoilPlantScanFlag && !DataGlobals::AnyPlantInModel) {
+        } else if (this->m_MySuppCoilPlantScanFlag && !state.dataGlobal->AnyPlantInModel) {
             this->m_MySuppCoilPlantScanFlag = false;
         }
 
@@ -1135,7 +1135,7 @@ namespace UnitarySystems {
         this->m_IterationCounter += 1;
 
         if (this->m_MySetPointCheckFlag) {
-            if (!DataGlobals::SysSizingCalc && DataHVACGlobals::DoSetPointTest) {
+            if (!state.dataGlobal->SysSizingCalc && DataHVACGlobals::DoSetPointTest) {
 
                 if (this->m_CoolCoilExists) {
                     int ControlNode = this->m_SystemCoolControlNodeNum;
@@ -1163,7 +1163,7 @@ namespace UnitarySystems {
         }
 
         if (m_setFaultModelInput) {
-            if ((!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation)) {
+            if ((!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
 
                 // check FaultsManager if connection exists
                 FaultsManager::SetFaultyCoilSATSensor(this->UnitType, this->Name, this->m_FaultyCoilSATFlag, this->m_FaultyCoilSATIndex);
@@ -1266,7 +1266,7 @@ namespace UnitarySystems {
 
             bool SetPointErrorFlag = false;
             if (DataLoopNode::Node(ControlNode).TempSetPoint == DataLoopNode::SensedNodeFlagValue && this->m_ControlType == ControlType::Setpoint) {
-                if (!DataGlobals::AnyEnergyManagementSystemInModel) {
+                if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                     ShowSevereError(state, this->UnitType + ": Missing temperature setpoint for unitary system = " + this->Name);
                     ShowContinueError(state, "  use a Setpoint Manager to establish a setpoint at the coil control node.");
                     SetPointErrorFlag = true;
@@ -1282,12 +1282,12 @@ namespace UnitarySystems {
             if ((this->m_DehumidControlType_Num != DehumCtrlType::None) &&
                 (DataLoopNode::Node(ControlNode).HumRatMax == DataLoopNode::SensedNodeFlagValue) && this->m_ControlType == ControlType::Setpoint &&
                 CoilType == state.dataUnitarySystems->CoolingCoil) {
-                if (!DataGlobals::AnyEnergyManagementSystemInModel &&
+                if (!state.dataGlobal->AnyEnergyManagementSystemInModel &&
                     DataLoopNode::Node(this->CoolCoilOutletNodeNum).HumRatMax == DataLoopNode::SensedNodeFlagValue) {
                     ShowSevereError(state, this->UnitType + ": Missing humidity ratio setpoint (HUMRATMAX) for unitary system = " + this->Name);
                     ShowContinueError(state, "  use a Setpoint Manager to establish a setpoint at the coil control node.");
                     SetPointErrorFlag = true;
-                } else if (DataGlobals::AnyEnergyManagementSystemInModel) {
+                } else if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                     EMSManager::CheckIfNodeSetPointManagedByEMS(state, ControlNode, EMSManager::iHumidityRatioMaxSetPoint, SetPointErrorFlag);
                     if (SetPointErrorFlag) {
                         ShowSevereError(state, this->UnitType + ": Missing maximum humidity ratio setpoint (HUMRATMAX) for unitary system = " + this->Name);
@@ -1472,20 +1472,20 @@ namespace UnitarySystems {
 
         if (DataSizing::CurSysNum > 0 && DataSizing::CurOASysNum == 0 && this->m_FanExists) {
             if (this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                DataAirSystems::PrimaryAirSystem(DataSizing::CurSysNum).supFanVecIndex = this->m_FanIndex;
-                DataAirSystems::PrimaryAirSystem(DataSizing::CurSysNum).supFanModelTypeEnum = DataAirSystems::objectVectorOOFanSystemModel;
+                state.dataAirSystemsData->PrimaryAirSystems(DataSizing::CurSysNum).supFanVecIndex = this->m_FanIndex;
+                state.dataAirSystemsData->PrimaryAirSystems(DataSizing::CurSysNum).supFanModelTypeEnum = DataAirSystems::objectVectorOOFanSystemModel;
                 DataSizing::DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
                 DataSizing::DataFanIndex = this->m_FanIndex;
             } else {
-                DataAirSystems::PrimaryAirSystem(DataSizing::CurSysNum).SupFanNum = this->m_FanIndex;
-                DataAirSystems::PrimaryAirSystem(DataSizing::CurSysNum).supFanModelTypeEnum = DataAirSystems::structArrayLegacyFanModels;
+                state.dataAirSystemsData->PrimaryAirSystems(DataSizing::CurSysNum).SupFanNum = this->m_FanIndex;
+                state.dataAirSystemsData->PrimaryAirSystems(DataSizing::CurSysNum).supFanModelTypeEnum = DataAirSystems::structArrayLegacyFanModels;
                 DataSizing::DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
                 DataSizing::DataFanIndex = this->m_FanIndex;
             }
             if (this->m_FanPlace == FanPlace::BlowThru) {
-                DataAirSystems::PrimaryAirSystem(AirLoopNum).supFanLocation = DataAirSystems::fanPlacement::BlowThru;
+                state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanLocation = DataAirSystems::fanPlacement::BlowThru;
             } else if (this->m_FanPlace == FanPlace::DrawThru) {
-                DataAirSystems::PrimaryAirSystem(AirLoopNum).supFanLocation = DataAirSystems::fanPlacement::DrawThru;
+                state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanLocation = DataAirSystems::fanPlacement::DrawThru;
             }
         } else if (DataSizing::CurZoneEqNum > 0 && this->m_FanExists) {
             if (this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
@@ -2414,7 +2414,7 @@ namespace UnitarySystems {
                     this->m_MaxCoolAirVolFlow = BranchFanFlow;
                 } else {
                     SystemFlow = 0.0;
-                    if (AirLoopNum > 0.0) SystemFlow = DataAirSystems::PrimaryAirSystem(AirLoopNum).DesignVolFlowRate;
+                    if (AirLoopNum > 0.0) SystemFlow = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).DesignVolFlowRate;
                     if (SystemFlow > 0.0) {
                         this->m_MaxCoolAirVolFlow = SystemFlow;
                     } else {
@@ -2630,7 +2630,7 @@ namespace UnitarySystems {
         // Set flow rate for unitary system with no fan
         if (DataSizing::CurOASysNum == 0 && DataSizing::CurZoneEqNum == 0 && this->m_DesignFanVolFlowRate <= 0.0) {
             SystemFlow = 0;
-            if (AirLoopNum > 0) SystemFlow = DataAirSystems::PrimaryAirSystem(AirLoopNum).DesignVolFlowRate;
+            if (AirLoopNum > 0) SystemFlow = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).DesignVolFlowRate;
             if (SystemFlow > 0.0) {
                 this->m_DesignFanVolFlowRate = SystemFlow;
             } else {
@@ -3198,7 +3198,7 @@ namespace UnitarySystems {
 
                 // check if the UnitarySystem is connected as zone equipment
                 if (!thisSys.ATMixerExists && !AirLoopFound && !OASysFound) {
-                    for (int ControlledZoneNum = 1; ControlledZoneNum <= DataGlobals::NumOfZones; ++ControlledZoneNum) {
+                    for (int ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
                         for (int ZoneExhNum = 1; ZoneExhNum <= DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).NumExhaustNodes; ++ZoneExhNum) {
                             if (DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).ExhaustNode(ZoneExhNum) != thisSys.AirInNode) continue;
                             ZoneEquipmentFound = true;
@@ -3243,7 +3243,7 @@ namespace UnitarySystems {
                         }
                     }
                     if (!ZoneInletNodeFound) {
-                        for (int ControlledZoneNum = 1; ControlledZoneNum <= DataGlobals::NumOfZones; ++ControlledZoneNum) {
+                        for (int ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
                             for (int ZoneInletNum = 1; ZoneInletNum <= DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).NumInletNodes;
                                  ++ZoneInletNum) {
                                 if (DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).InletNode(ZoneInletNum) != thisSys.AirOutNode) continue;
@@ -3268,7 +3268,7 @@ namespace UnitarySystems {
                 if (thisSys.ATMixerExists && thisSys.ATMixerType == DataHVACGlobals::ATMixer_InletSide) {
 
                     if (!AirLoopFound && !OASysFound) {
-                        for (int ControlledZoneNum = 1; ControlledZoneNum <= DataGlobals::NumOfZones; ++ControlledZoneNum) {
+                        for (int ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
                             for (int ZoneExhNum = 1; ZoneExhNum <= DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).NumExhaustNodes;
                                  ++ZoneExhNum) {
                                 if (DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).ExhaustNode(ZoneExhNum) != thisSys.m_ATMixerSecNode)
@@ -3313,7 +3313,7 @@ namespace UnitarySystems {
                             }
                         }
                         if (!ZoneInletNodeFound) {
-                            for (int ControlledZoneNum = 1; ControlledZoneNum <= DataGlobals::NumOfZones; ++ControlledZoneNum) {
+                            for (int ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
                                 for (int ZoneInletNum = 1; ZoneInletNum <= DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).NumInletNodes;
                                      ++ZoneInletNum) {
                                     if (DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).InletNode(ZoneInletNum) != thisSys.AirOutNode) continue;
@@ -3338,7 +3338,7 @@ namespace UnitarySystems {
                 if (thisSys.ATMixerExists && thisSys.ATMixerType == DataHVACGlobals::ATMixer_SupplySide) {
 
                     if (!AirLoopFound && !OASysFound) {
-                        for (int ControlledZoneNum = 1; ControlledZoneNum <= DataGlobals::NumOfZones; ++ControlledZoneNum) {
+                        for (int ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
                             for (int ZoneExhNum = 1; ZoneExhNum <= DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).NumExhaustNodes;
                                  ++ZoneExhNum) {
                                 if (DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).ExhaustNode(ZoneExhNum) != thisSys.AirInNode) continue;
@@ -3383,7 +3383,7 @@ namespace UnitarySystems {
                             }
                         }
                         if (!ZoneInletNodeFound) {
-                            for (int ControlledZoneNum = 1; ControlledZoneNum <= DataGlobals::NumOfZones; ++ControlledZoneNum) {
+                            for (int ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
                                 for (int ZoneInletNum = 1; ZoneInletNum <= DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).NumInletNodes;
                                      ++ZoneInletNum) {
                                     if (DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).InletNode(ZoneInletNum) != thisSys.ATMixerOutNode)
@@ -3409,16 +3409,16 @@ namespace UnitarySystems {
                 if (!ZoneEquipmentFound) {
                     // check if the UnitarySystem is connected to an air loop
                     for (int AirLoopNum = 1; AirLoopNum <= DataHVACGlobals::NumPrimaryAirSys; ++AirLoopNum) {
-                        for (int BranchNum = 1; BranchNum <= DataAirSystems::PrimaryAirSystem(AirLoopNum).NumBranches; ++BranchNum) {
-                            for (int CompNum = 1; CompNum <= DataAirSystems::PrimaryAirSystem(AirLoopNum).Branch(BranchNum).TotalComponents;
+                        for (int BranchNum = 1; BranchNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).NumBranches; ++BranchNum) {
+                            for (int CompNum = 1; CompNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).TotalComponents;
                                  ++CompNum) {
-                                if (UtilityRoutines::SameString(DataAirSystems::PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name,
+                                if (UtilityRoutines::SameString(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name,
                                                                 thisObjectName) &&
-                                    UtilityRoutines::SameString(DataAirSystems::PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).TypeOf,
+                                    UtilityRoutines::SameString(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).TypeOf,
                                                                 cCurrentModuleObject)) {
                                     AirLoopNumber = AirLoopNum;
                                     AirLoopFound = true;
-                                    for (int ControlledZoneNum = 1; ControlledZoneNum <= DataGlobals::NumOfZones; ++ControlledZoneNum) {
+                                    for (int ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
                                         if (DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).ActualZoneNum != thisSys.ControlZoneNum) continue;
                                         //             Find the controlled zone number for the specified thermostat location
                                         thisSys.NodeNumOfControlledZone = DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).ZoneNode;
@@ -4423,7 +4423,7 @@ namespace UnitarySystems {
                                 ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
                                 errorsFound = true;
                             }
-                            if (DataGlobals::DoCoilDirectSolutions && thisSys.m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed) {
+                            if (state.dataGlobal->DoCoilDirectSolutions && thisSys.m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed) {
                                 DXCoils::DisableLatentDegradation(thisSys.m_CoolingCoilIndex);
                             }
 
@@ -4636,7 +4636,7 @@ namespace UnitarySystems {
                                 }
                             }
 
-                            if (DataGlobals::DoCoilDirectSolutions && thisSys.m_NumOfSpeedCooling > 1) {
+                            if (state.dataGlobal->DoCoilDirectSolutions && thisSys.m_NumOfSpeedCooling > 1) {
                                 thisSys.FullOutput.resize(thisSys.m_NumOfSpeedCooling + 1);
                             }
 
@@ -6788,7 +6788,7 @@ namespace UnitarySystems {
                             thisSys.m_HeatMassFlowRate.resize(thisSys.m_NumOfSpeedHeating + 1);
                             thisSys.m_HeatVolumeFlowRate.resize(thisSys.m_NumOfSpeedHeating + 1);
                             thisSys.m_MSHeatingSpeedRatio.resize(thisSys.m_NumOfSpeedHeating + 1);
-                            if (DataGlobals::DoCoilDirectSolutions && thisSys.m_NumOfSpeedCooling < thisSys.m_NumOfSpeedHeating) {
+                            if (state.dataGlobal->DoCoilDirectSolutions && thisSys.m_NumOfSpeedCooling < thisSys.m_NumOfSpeedHeating) {
                                 thisSys.FullOutput.resize(thisSys.m_NumOfSpeedHeating + 1);
                             }
                             for (int i = 1; i <= thisSys.m_NumOfSpeedHeating; ++i) {
@@ -6803,7 +6803,7 @@ namespace UnitarySystems {
                             thisSys.m_CoolMassFlowRate.resize(thisSys.m_NumOfSpeedCooling + 1);
                             thisSys.m_CoolVolumeFlowRate.resize(thisSys.m_NumOfSpeedCooling + 1);
                             thisSys.m_MSCoolingSpeedRatio.resize(thisSys.m_NumOfSpeedCooling + 1);
-                            if (DataGlobals::DoCoilDirectSolutions && thisSys.m_NumOfSpeedCooling > thisSys.m_NumOfSpeedHeating) {
+                            if (state.dataGlobal->DoCoilDirectSolutions && thisSys.m_NumOfSpeedCooling > thisSys.m_NumOfSpeedHeating) {
                                 thisSys.FullOutput.resize(thisSys.m_NumOfSpeedCooling + 1);
                                 DXCoils::DisableLatentDegradation(thisSys.m_CoolingCoilIndex);
                             }
@@ -6932,7 +6932,7 @@ namespace UnitarySystems {
                     if (thisSys.m_CoolCoilExists && thisSys.m_CoolingCoilType_Num != DataHVACGlobals::Coil_CoolingWater &&
                         thisSys.m_CoolingCoilType_Num != DataHVACGlobals::Coil_CoolingWaterDetailed &&
                         thisSys.m_CoolingCoilType_Num != DataHVACGlobals::CoilDX_CoolingSingleSpeed) {
-                        if (DataGlobals::DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             ShowWarningError(state, cCurrentModuleObject + ": " + thisObjectName);
                             ShowContinueError(state, "ASHRAE90.1 control method requires specific cooling coil types.");
                             ShowContinueError(state, "Valid cooling coil types are Coil:Cooling:Water, Coil:Cooling:Water:DetailedGeometry and "
@@ -6948,7 +6948,7 @@ namespace UnitarySystems {
                         thisSys.m_HeatingCoilType_Num != DataHVACGlobals::Coil_HeatingGasOrOtherFuel &&
                         thisSys.m_HeatingCoilType_Num != DataHVACGlobals::Coil_HeatingElectric &&
                         thisSys.m_HeatingCoilType_Num != DataHVACGlobals::CoilDX_HeatingEmpirical) {
-                        if (DataGlobals::DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             ShowWarningError(state, cCurrentModuleObject + ": " + thisObjectName);
                             ShowContinueError(state, "ASHRAE90.1 control method requires specific heating coil types.");
                             ShowContinueError(state, "Valid heating coil types are Coil:Heating:Water, Coil:Heating:Fuel, Coil:Heating:Electric and "
@@ -7277,7 +7277,7 @@ namespace UnitarySystems {
                                         state.dataUnitarySystems->unitarySys[sysNum].Name);
                 }
 
-                if (DataGlobals::AnyEnergyManagementSystemInModel) {
+                if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                     SetupEMSActuator("UnitarySystem",
                                      state.dataUnitarySystems->unitarySys[sysNum].Name,
                                      "Autosized Supply Air Flow Rate",
@@ -7307,7 +7307,7 @@ namespace UnitarySystems {
                         "Unitary System Control Zone Mass Flow Fraction", state.dataUnitarySystems->unitarySys[sysNum].Name, "[]", state.dataUnitarySystems->unitarySys[sysNum].ControlZoneMassFlowFrac);
                 }
                 //                    }
-                if (DataGlobals::AnyEnergyManagementSystemInModel) {
+                if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                     SetupEMSInternalVariable(state,
                         "Unitary HVAC Design Heating Capacity", state.dataUnitarySystems->unitarySys[sysNum].Name, "[W]", state.dataUnitarySystems->unitarySys[sysNum].m_DesignHeatingCapacity);
                     SetupEMSInternalVariable(state,
@@ -8243,7 +8243,7 @@ namespace UnitarySystems {
                                                   HeatCoilLoad,
                                                   SupHeaterLoad,
                                                   CompressorONFlag);
-                    if (DataGlobals::DoCoilDirectSolutions && this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedHeating) {
+                    if (state.dataGlobal->DoCoilDirectSolutions && this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedHeating) {
                         this->FullOutput[SpeedNum] = SensOutputOn;
                     }
                     if (this->m_HeatingCoilType_Num != DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit &&
@@ -8298,7 +8298,7 @@ namespace UnitarySystems {
                                                   HeatCoilLoad,
                                                   SupHeaterLoad,
                                                   CompressorONFlag);
-                    if (DataGlobals::DoCoilDirectSolutions &&
+                    if (state.dataGlobal->DoCoilDirectSolutions &&
                         (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling ||
                          (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling && this->m_NumOfSpeedCooling > 1))) {
                         this->FullOutput[SpeedNum] = SensOutputOn;
@@ -8630,7 +8630,7 @@ namespace UnitarySystems {
                             }
                         }
                     }
-                    if (DataGlobals::DoCoilDirectSolutions && state.dataUnitarySystems->CoolingLoad &&
+                    if (state.dataGlobal->DoCoilDirectSolutions && state.dataUnitarySystems->CoolingLoad &&
                         this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed) {
                         CoolPLR = (ZoneLoad - SensOutputOff) / (SensOutputOn - SensOutputOff);
                         HeatPLR = 0.0;
@@ -8647,7 +8647,7 @@ namespace UnitarySystems {
                                                       SupHeaterLoad,
                                                       CompressorONFlag);
                         PartLoadRatio = CoolPLR;
-                    } else if (DataGlobals::DoCoilDirectSolutions && state.dataUnitarySystems->CoolingLoad &&
+                    } else if (state.dataGlobal->DoCoilDirectSolutions && state.dataUnitarySystems->CoolingLoad &&
                                this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling && this->m_NumOfSpeedCooling == 1 &&
                                coilCoolingDXs[this->m_CoolingCoilIndex].SubcoolReheatFlag) {
                         HeatPLR = 0.0;
@@ -8675,7 +8675,7 @@ namespace UnitarySystems {
                                                       SupHeaterLoad,
                                                       CompressorONFlag);
                         PartLoadRatio = CoolPLR;
-                    } else if (DataGlobals::DoCoilDirectSolutions && state.dataUnitarySystems->CoolingLoad && this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling &&
+                    } else if (state.dataGlobal->DoCoilDirectSolutions && state.dataUnitarySystems->CoolingLoad && this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling &&
                                this->m_NumOfSpeedCooling == 1) {
                         CoolPLR = (ZoneLoad - SensOutputOff) / (SensOutputOn - SensOutputOff);
                         HeatPLR = 0.0;
@@ -8691,7 +8691,7 @@ namespace UnitarySystems {
                                                       SupHeaterLoad,
                                                       CompressorONFlag);
                         PartLoadRatio = CoolPLR;
-                    } else if (DataGlobals::DoCoilDirectSolutions && state.dataUnitarySystems->HeatingLoad &&
+                    } else if (state.dataGlobal->DoCoilDirectSolutions && state.dataUnitarySystems->HeatingLoad &&
                                (this->m_HeatingCoilType_Num == DataHVACGlobals::CoilDX_HeatingEmpirical ||
                                 this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingElectric ||
                                 this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingGasOrOtherFuel)) {
@@ -8710,7 +8710,7 @@ namespace UnitarySystems {
                                                       SupHeaterLoad,
                                                       CompressorONFlag);
                         PartLoadRatio = HeatPLR;
-                    } else if (DataGlobals::DoCoilDirectSolutions && state.dataUnitarySystems->HeatingLoad &&
+                    } else if (state.dataGlobal->DoCoilDirectSolutions && state.dataUnitarySystems->HeatingLoad &&
                                this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedHeating) {
                         CoolPLR = 0.0;
                         if (this->m_HeatingSpeedNum == 1) {
@@ -8736,7 +8736,7 @@ namespace UnitarySystems {
                                                       SupHeaterLoad,
                                                       CompressorONFlag);
                         PartLoadRatio = HeatPLR;
-                    } else if (DataGlobals::DoCoilDirectSolutions && state.dataUnitarySystems->CoolingLoad && this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling &&
+                    } else if (state.dataGlobal->DoCoilDirectSolutions && state.dataUnitarySystems->CoolingLoad && this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling &&
                                this->m_NumOfSpeedCooling > 1) {
                         HeatPLR = 0.0;
                         if (this->m_CoolingSpeedNum == 1) {
@@ -8915,7 +8915,7 @@ namespace UnitarySystems {
                                                                    " (watts), sensible output = " + General::TrimSigDigits(TempSensOutput, 2) +
                                                                    " (watts), and the simulation continues.");
                                     }
-                                    ShowRecurringWarningErrorAtEnd(this->UnitType + " \"" + this->Name +
+                                    ShowRecurringWarningErrorAtEnd(state, this->UnitType + " \"" + this->Name +
                                                                        "\" - Iteration limit exceeded in calculating sensible part-load ratio error "
                                                                        "continues. Sensible load statistics:",
                                                                    this->MaxIterIndex,
@@ -8929,7 +8929,7 @@ namespace UnitarySystems {
                                     ShowContinueErrorTimeStamp(state, "Sensible load to be met = " + General::TrimSigDigits(ZoneLoad, 2) +
                                                                " (watts), and the simulation continues.");
                                 }
-                                ShowRecurringWarningErrorAtEnd(
+                                ShowRecurringWarningErrorAtEnd(state,
                                     this->UnitType + " \"" + this->Name +
                                         "\" - sensible part-load ratio out of range error continues. Sensible load statistics:",
                                     this->RegulaFalsiFailedIndex,
@@ -8943,7 +8943,7 @@ namespace UnitarySystems {
                                 ShowContinueErrorTimeStamp(state, "Sensible load to be met = " + General::TrimSigDigits(ZoneLoad, 2) +
                                                            " (watts), and the simulation continues.");
                             }
-                            ShowRecurringWarningErrorAtEnd(
+                            ShowRecurringWarningErrorAtEnd(state,
                                 this->UnitType + " \"" + this->Name +
                                     "\" - sensible part-load ratio out of range error continues. Sensible load statistics:",
                                 this->RegulaFalsiFailedIndex,
@@ -9137,7 +9137,7 @@ namespace UnitarySystems {
                                                       HeatCoilLoad,
                                                       SupHeaterLoad,
                                                       CompressorONFlag);
-                        if (DataGlobals::DoCoilDirectSolutions && this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling) {
+                        if (state.dataGlobal->DoCoilDirectSolutions && this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling) {
                             this->FullOutput[SpeedNum] = SensOutputOn;
                         }
                         // over specified logic? it has to be a water coil? what about other VS coil models?
@@ -9316,7 +9316,7 @@ namespace UnitarySystems {
                                                    " (watts), Latent output = " + General::TrimSigDigits(TempLatOutput, 2) +
                                                    " (watts), and the simulation continues.");
                     }
-                    ShowRecurringWarningErrorAtEnd(
+                    ShowRecurringWarningErrorAtEnd(state,
                         this->UnitType + " \"" + this->Name +
                             "\" - Iteration limit exceeded in calculating Latent part-load ratio error continues. Latent load statistics:",
                         this->warnIndex.m_LatMaxIterIndex,
@@ -9330,7 +9330,7 @@ namespace UnitarySystems {
                     ShowContinueErrorTimeStamp(state, "Latent load to be met = " + General::TrimSigDigits(state.dataUnitarySystems->MoistureLoad, 2) +
                                                " (watts), and the simulation continues.");
                 }
-                ShowRecurringWarningErrorAtEnd(this->UnitType + " \"" + this->Name +
+                ShowRecurringWarningErrorAtEnd(state, this->UnitType + " \"" + this->Name +
                                                    "\" - Latent part-load ratio out of range error continues. Latent load statistics:",
                                                this->warnIndex.m_LatRegulaFalsiFailedIndex,
                                                state.dataUnitarySystems->MoistureLoad,
@@ -9343,7 +9343,7 @@ namespace UnitarySystems {
                 ShowContinueErrorTimeStamp(state, "Latent load to be met = " + General::TrimSigDigits(state.dataUnitarySystems->MoistureLoad, 2) +
                                            " (watts), and the simulation continues.");
             }
-            ShowRecurringWarningErrorAtEnd(this->UnitType + " \"" + this->Name +
+            ShowRecurringWarningErrorAtEnd(state, this->UnitType + " \"" + this->Name +
                                                "\" - Latent part-load ratio out of range error continues. Latent load statistics:",
                                            this->warnIndex.m_LatRegulaFalsiFailedIndex,
                                            state.dataUnitarySystems->MoistureLoad,
@@ -11315,7 +11315,7 @@ namespace UnitarySystems {
             HXUnitOn = false;
         }
 
-        // IF there is a fault of coil SAT Sensor (zrp_Nov2016)
+        // IF there is a fault of coil SAT Sensor
         if (this->m_FaultyCoilSATFlag) {
             // calculate the sensor offset using fault information
             int FaultIndex = this->m_FaultyCoilSATIndex;
@@ -11731,7 +11731,7 @@ namespace UnitarySystems {
                                 TempSolveRoot::SolveRoot(
                                     state, Acc, MaxIte, SolFla, PartLoadFrac, this->HXAssistedCoolCoilTempResidual, TempMinPLR, TempMaxPLR, Par);
                                 if (SolFla == -1) {
-                                    if (!DataGlobals::WarmupFlag) {
+                                    if (!state.dataGlobal->WarmupFlag) {
                                         if (this->warnIndex.m_HXAssistedSensPLRIter < 1) {
                                             ++this->warnIndex.m_HXAssistedSensPLRIter;
                                             ShowWarningError(state,
@@ -11743,7 +11743,7 @@ namespace UnitarySystems {
                                             ShowContinueErrorTimeStamp(state,
                                                 "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
                                         }
-                                        ShowRecurringWarningErrorAtEnd(this->UnitType + " \"" + this->Name +
+                                        ShowRecurringWarningErrorAtEnd(state, this->UnitType + " \"" + this->Name +
                                                                            "\" - Iteration limit exceeded calculating sensible part-load ratio "
                                                                            "error continues. Sensible PLR "
                                                                            "statistics follow.",
@@ -11753,7 +11753,7 @@ namespace UnitarySystems {
                                     }
                                 } else if (SolFla == -2) {
                                     PartLoadFrac = ReqOutput / FullOutput;
-                                    if (!DataGlobals::WarmupFlag) {
+                                    if (!state.dataGlobal->WarmupFlag) {
                                         if (this->warnIndex.m_HXAssistedSensPLRFail < 1) {
                                             ++this->warnIndex.m_HXAssistedSensPLRFail;
                                             ShowWarningError(state, this->UnitType +
@@ -11764,7 +11764,7 @@ namespace UnitarySystems {
                                             ShowContinueErrorTimeStamp(state,
                                                 "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
                                         }
-                                        ShowRecurringWarningErrorAtEnd(this->UnitType + " \"" + this->Name +
+                                        ShowRecurringWarningErrorAtEnd(state, this->UnitType + " \"" + this->Name +
                                                                            "\" - DX unit sensible part-load ratio calculation unexpectedly "
                                                                            "failed error continues. Sensible PLR "
                                                                            "statistics follow.",
@@ -11775,7 +11775,7 @@ namespace UnitarySystems {
                                 }
                             } else if (SolFla == -2) {
                                 PartLoadFrac = ReqOutput / FullOutput;
-                                if (!DataGlobals::WarmupFlag) {
+                                if (!state.dataGlobal->WarmupFlag) {
                                     if (this->warnIndex.m_HXAssistedSensPLRFail2 < 1) {
                                         ++this->warnIndex.m_HXAssistedSensPLRFail2;
                                         ShowWarningError(state, this->UnitType +
@@ -11786,7 +11786,7 @@ namespace UnitarySystems {
                                         ShowContinueErrorTimeStamp(state,
                                             "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
                                     }
-                                    ShowRecurringWarningErrorAtEnd(this->UnitType + " \"" + this->Name +
+                                    ShowRecurringWarningErrorAtEnd(state, this->UnitType + " \"" + this->Name +
                                                                        "\" - DX unit sensible part-load ratio calculation failed error continues. "
                                                                        "Sensible PLR statistics follow.",
                                                                    this->warnIndex.m_HXAssistedSensPLRFailIndex2,
@@ -12147,7 +12147,7 @@ namespace UnitarySystems {
                                                              TempMaxPLR,
                                                              Par);
                                     if (SolFla == -1) {
-                                        if (!DataGlobals::WarmupFlag) {
+                                        if (!state.dataGlobal->WarmupFlag) {
                                             if (this->warnIndex.m_HXAssistedCRLatPLRIter < 1) {
                                                 ++this->warnIndex.m_HXAssistedCRLatPLRIter;
                                                 ShowWarningError(state,
@@ -12160,7 +12160,7 @@ namespace UnitarySystems {
                                                 ShowContinueErrorTimeStamp(state, "The calculated latent part-load ratio will be used and the simulation "
                                                                            "continues. Occurrence info:");
                                             }
-                                            ShowRecurringWarningErrorAtEnd(this->UnitType + " \"" + this->Name +
+                                            ShowRecurringWarningErrorAtEnd(state, this->UnitType + " \"" + this->Name +
                                                                                "\" - Iteration limit exceeded calculating latent part-load ratio "
                                                                                "error continues. Latent PLR "
                                                                                "statistics follow.",
@@ -12172,7 +12172,7 @@ namespace UnitarySystems {
                                     } else if (SolFla == -2) {
 
                                         PartLoadFrac = ReqOutput / FullOutput;
-                                        if (!DataGlobals::WarmupFlag) {
+                                        if (!state.dataGlobal->WarmupFlag) {
                                             if (this->warnIndex.m_HXAssistedCRLatPLRFail < 1) {
                                                 ++this->warnIndex.m_HXAssistedCRLatPLRFail;
                                                 ShowWarningError(state, this->UnitType +
@@ -12183,7 +12183,7 @@ namespace UnitarySystems {
                                                 ShowContinueErrorTimeStamp(state,
                                                     "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
                                             }
-                                            ShowRecurringWarningErrorAtEnd(this->UnitType + " \"" + this->Name +
+                                            ShowRecurringWarningErrorAtEnd(state, this->UnitType + " \"" + this->Name +
                                                                                "\" - DX unit latent part-load ratio calculation failed "
                                                                                "unexpectedly error continues. Latent PLR "
                                                                                "statistics follow.",
@@ -12194,7 +12194,7 @@ namespace UnitarySystems {
                                     }
                                 } else if (SolFla == -2) {
                                     PartLoadFrac = ReqOutput / FullOutput;
-                                    if (!DataGlobals::WarmupFlag) {
+                                    if (!state.dataGlobal->WarmupFlag) {
                                         if (this->warnIndex.m_HXAssistedCRLatPLRFail2 < 1) {
                                             ++this->warnIndex.m_HXAssistedCRLatPLRFail2;
                                             ShowWarningError(state, this->UnitType +
@@ -12205,7 +12205,7 @@ namespace UnitarySystems {
                                             ShowContinueErrorTimeStamp(state,
                                                 "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
                                         }
-                                        ShowRecurringWarningErrorAtEnd(
+                                        ShowRecurringWarningErrorAtEnd(state,
                                             this->UnitType + " \"" + this->Name +
                                                 "\" - DX unit latent part-load ratio calculation failed error continues. Latent PLR statistics "
                                                 "follow.",
@@ -12413,7 +12413,7 @@ namespace UnitarySystems {
         }
 
         if (SolFla == -1) {
-            if (!DataGlobals::WarmupFlag) {
+            if (!state.dataGlobal->WarmupFlag) {
                 if (this->warnIndex.m_SensPLRIter < 1) {
                     ++this->warnIndex.m_SensPLRIter;
                     ShowWarningError(state, this->UnitType + " - Iteration limit exceeded calculating part-load ratio for unit = " + this->Name);
@@ -12421,7 +12421,7 @@ namespace UnitarySystems {
                     ShowContinueError(state, "Calculated part-load ratio = " + General::RoundSigDigits(PartLoadFrac, 3));
                     ShowContinueErrorTimeStamp(state, "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
                 } else {
-                    ShowRecurringWarningErrorAtEnd(
+                    ShowRecurringWarningErrorAtEnd(state,
                         this->UnitType + " \"" + this->Name +
                             "\" - Iteration limit exceeded calculating sensible part-load ratio error continues. Sensible PLR statistics follow.",
                         this->warnIndex.m_SensPLRIterIndex,
@@ -12431,7 +12431,7 @@ namespace UnitarySystems {
             }
         } else if (SolFla == -2) {
             PartLoadFrac = ReqOutput / FullOutput;
-            if (!DataGlobals::WarmupFlag) {
+            if (!state.dataGlobal->WarmupFlag) {
                 if (this->warnIndex.m_SensPLRFail < 1) {
                     ++this->warnIndex.m_SensPLRFail;
                     ShowWarningError(state, this->UnitType +
@@ -12439,7 +12439,7 @@ namespace UnitarySystems {
                     ShowContinueError(state, "Estimated part-load ratio = " + General::RoundSigDigits(PartLoadFrac, 3));
                     ShowContinueErrorTimeStamp(state, "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
                 } else {
-                    ShowRecurringWarningErrorAtEnd(
+                    ShowRecurringWarningErrorAtEnd(state,
                         this->UnitType + " \"" + this->Name +
                             "\" - sensible part-load ratio calculation failed error continues. Sensible PLR statistics follow.",
                         this->warnIndex.m_SensPLRFailIndex,
@@ -12450,7 +12450,7 @@ namespace UnitarySystems {
         }
 
         if (SolFlaLat == -1 && SolFla != -1) {
-            if (!DataGlobals::WarmupFlag) {
+            if (!state.dataGlobal->WarmupFlag) {
                 if (this->warnIndex.m_LatPLRIter < 1) {
                     ++this->warnIndex.m_LatPLRIter;
                     ShowWarningError(state, this->UnitType + " - Iteration limit exceeded calculating latent part-load ratio for unit = " + this->Name);
@@ -12458,7 +12458,7 @@ namespace UnitarySystems {
                     ShowContinueError(state, "Calculated part-load ratio = " + General::RoundSigDigits(PartLoadFrac, 3));
                     ShowContinueErrorTimeStamp(state, "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
                 }
-                ShowRecurringWarningErrorAtEnd(
+                ShowRecurringWarningErrorAtEnd(state,
                     this->UnitType + " \"" + this->Name +
                         "\" - Iteration limit exceeded calculating latent part-load ratio error continues. Latent PLR statistics follow.",
                     this->warnIndex.m_LatPLRIterIndex,
@@ -12472,7 +12472,7 @@ namespace UnitarySystems {
             } else {
                 PartLoadFrac = 1.0;
             }
-            if (!DataGlobals::WarmupFlag) {
+            if (!state.dataGlobal->WarmupFlag) {
                 if (this->warnIndex.m_LatPLRFail < 1) {
                     ++this->warnIndex.m_LatPLRFail;
                     ShowWarningError(state, this->UnitType +
@@ -12480,7 +12480,7 @@ namespace UnitarySystems {
                     ShowContinueError(state, "Estimated part-load ratio = " + General::RoundSigDigits(PartLoadFrac, 3));
                     ShowContinueErrorTimeStamp(state, "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
                 }
-                ShowRecurringWarningErrorAtEnd(this->UnitType + " \"" + this->Name +
+                ShowRecurringWarningErrorAtEnd(state, this->UnitType + " \"" + this->Name +
                                                    "\" - latent part-load ratio calculation failed error continues. Latent PLR statistics follow.",
                                                this->warnIndex.m_LatPLRFailIndex,
                                                PartLoadFrac,
@@ -12613,7 +12613,7 @@ namespace UnitarySystems {
             OutdoorWetBulb = DataEnvironment::OutWetBulbTemp;
         }
 
-        // IF there is a fault of coil SAT Sensor (zrp_Nov2016)
+        // IF there is a fault of coil SAT Sensor
         if (this->m_FaultyCoilSATFlag) {
             // calculate the sensor offset using fault information
             int FaultIndex = this->m_FaultyCoilSATIndex;
@@ -13092,7 +13092,7 @@ namespace UnitarySystems {
 
         if (SolFla < 0) {
             if (SolFla == -1) {
-                if (!DataGlobals::WarmupFlag) {
+                if (!state.dataGlobal->WarmupFlag) {
                     if (this->warnIndex.m_HeatCoilSensPLRIter < 1) {
                         ++this->warnIndex.m_HeatCoilSensPLRIter;
                         ShowWarningError(state, this->UnitType +
@@ -13101,7 +13101,7 @@ namespace UnitarySystems {
                         ShowContinueError(state, "Calculated part-load ratio = " + General::RoundSigDigits(PartLoadFrac, 3));
                         ShowContinueErrorTimeStamp(state, "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
                     } else {
-                        ShowRecurringWarningErrorAtEnd(this->UnitType + " \"" + this->Name +
+                        ShowRecurringWarningErrorAtEnd(state, this->UnitType + " \"" + this->Name +
                                                            "\" - Iteration limit exceeded calculating sensible part-load ratio error continues. "
                                                            "Sensible PLR statistics follow.",
                                                        this->warnIndex.m_HeatCoilSensPLRIterIndex,
@@ -13111,7 +13111,7 @@ namespace UnitarySystems {
                 }
             } else if (SolFla == -2) {
                 PartLoadFrac = ReqOutput / FullOutput;
-                if (!DataGlobals::WarmupFlag) {
+                if (!state.dataGlobal->WarmupFlag) {
                     if (this->warnIndex.m_HeatCoilSensPLRFail < 1) {
                         ++this->warnIndex.m_HeatCoilSensPLRFail;
                         ShowWarningError(state, this->UnitType +
@@ -13119,7 +13119,7 @@ namespace UnitarySystems {
                         ShowContinueError(state, "Estimated part-load ratio = " + General::RoundSigDigits(PartLoadFrac, 3));
                         ShowContinueErrorTimeStamp(state, "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
                     } else {
-                        ShowRecurringWarningErrorAtEnd(
+                        ShowRecurringWarningErrorAtEnd(state,
                             this->UnitType + " \"" + this->Name +
                                 "\" - sensible part-load ratio calculation failed error continues. Sensible PLR statistics follow.",
                             this->warnIndex.m_HeatCoilSensPLRFailIndex,
@@ -13210,7 +13210,7 @@ namespace UnitarySystems {
             state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF = 0.0;
         }
 
-        // IF there is a fault of coil SAT Sensor (zrp_Nov2016)
+        // IF there is a fault of coil SAT Sensor
         if (this->m_FaultyCoilSATFlag) {
             // calculate the sensor offset using fault information
             int FaultIndex = this->m_FaultyCoilSATIndex;
@@ -13468,7 +13468,7 @@ namespace UnitarySystems {
         }
 
         if (SolFla == -1) {
-            if (!DataGlobals::WarmupFlag) {
+            if (!state.dataGlobal->WarmupFlag) {
                 if (this->warnIndex.m_SuppHeatCoilSensPLRIter < 1) {
                     ++this->warnIndex.m_SuppHeatCoilSensPLRIter;
                     ShowWarningError(state, this->UnitType + " - Iteration limit exceeded calculating sensible part-load ratio for unit = " + this->Name);
@@ -13476,7 +13476,7 @@ namespace UnitarySystems {
                     ShowContinueError(state, "Calculated part-load ratio = " + General::RoundSigDigits(PartLoadFrac, 3));
                     ShowContinueErrorTimeStamp(state, "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
                 } else {
-                    ShowRecurringWarningErrorAtEnd(
+                    ShowRecurringWarningErrorAtEnd(state,
                         this->UnitType + " \"" + this->Name +
                             "\" - Iteration limit exceeded calculating sensible part-load ratio error continues. Sensible PLR statistics follow.",
                         this->warnIndex.m_SuppHeatCoilSensPLRIterIndex,
@@ -13486,7 +13486,7 @@ namespace UnitarySystems {
             } // IF(.NOT. WarmupFlag)THEN
         } else if (SolFla == -2) {
             PartLoadFrac = ReqOutput / FullOutput;
-            if (!DataGlobals::WarmupFlag) {
+            if (!state.dataGlobal->WarmupFlag) {
                 if (this->warnIndex.m_SuppHeatCoilSensPLRFail < 1) {
                     ++this->warnIndex.m_SuppHeatCoilSensPLRFail;
                     ShowWarningError(state, this->UnitType +
@@ -13494,7 +13494,7 @@ namespace UnitarySystems {
                     ShowContinueError(state, "Estimated part-load ratio = " + General::RoundSigDigits(PartLoadFrac, 3));
                     ShowContinueErrorTimeStamp(state, "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
                 } else {
-                    ShowRecurringWarningErrorAtEnd(
+                    ShowRecurringWarningErrorAtEnd(state,
                         this->UnitType + " \"" + this->Name +
                             "\" - sensible part-load ratio calculation failed error continues. Sensible PLR statistics follow.",
                         this->warnIndex.m_SuppHeatCoilSensPLRFailIndex,
@@ -14034,7 +14034,7 @@ namespace UnitarySystems {
 
         if (this->m_FirstPass) {
 
-            if (!DataGlobals::SysSizingCalc) {
+            if (!state.dataGlobal->SysSizingCalc) {
 
                 if (DataSizing::CurOASysNum > 0) {
                     DataSizing::OASysEqSizing(DataSizing::CurOASysNum).AirFlow = false;

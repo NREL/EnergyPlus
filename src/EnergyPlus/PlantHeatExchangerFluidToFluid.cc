@@ -153,7 +153,7 @@ namespace PlantHeatExchangerFluidToFluid {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void HeatExchangerStruct::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation))
+    void HeatExchangerStruct::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation)
     {
         this->initialize(state);
     }
@@ -172,8 +172,11 @@ namespace PlantHeatExchangerFluidToFluid {
         }
     }
 
-    void HeatExchangerStruct::simulate(
-        EnergyPlusData &state, const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const EP_UNUSED(RunFlag))
+    void HeatExchangerStruct::simulate(EnergyPlusData &state,
+                                       const PlantLocation &calledFromLocation,
+                                       bool const FirstHVACIteration,
+                                       Real64 &CurLoad,
+                                       [[maybe_unused]] bool const RunFlag)
     {
 
         // SUBROUTINE INFORMATION:
@@ -399,7 +402,7 @@ namespace PlantHeatExchangerFluidToFluid {
                         (FluidHX(CompLoop).ControlMode == CoolingSetPointModulated) || (FluidHX(CompLoop).ControlMode == CoolingSetPointOnOff) ||
                         (FluidHX(CompLoop).ControlMode == CoolingSetPointOnOffWithComponentOverride)) {
                         if (DataLoopNode::Node(FluidHX(CompLoop).SetPointNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) {
-                            if (!DataGlobals::AnyEnergyManagementSystemInModel) {
+                            if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                                 ShowSevereError(state, RoutineName + " Missing temperature setpoint for DataLoopNode::Node = " + cAlphaArgs(9));
                                 ShowContinueError(state, "Occurs for " + cCurrentModuleObject + "=\"" + cAlphaArgs(1));
                                 ShowContinueError(state, " Use a setpoint manager to place a single temperature setpoint on the node");
@@ -421,7 +424,7 @@ namespace PlantHeatExchangerFluidToFluid {
                                (FluidHX(CompLoop).ControlMode == DualDeadBandSetPointOnOff)) {
                         if ((DataLoopNode::Node(FluidHX(CompLoop).SetPointNodeNum).TempSetPointHi == DataLoopNode::SensedNodeFlagValue) ||
                             (DataLoopNode::Node(FluidHX(CompLoop).SetPointNodeNum).TempSetPointLo == DataLoopNode::SensedNodeFlagValue)) {
-                            if (!DataGlobals::AnyEnergyManagementSystemInModel) {
+                            if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                                 ShowSevereError(state, RoutineName + " Missing dual temperature setpoints for node = " + cAlphaArgs(9));
                                 ShowContinueError(state, "Occurs for " + cCurrentModuleObject + "=\"" + cAlphaArgs(1));
                                 ShowContinueError(state, " Use a setpoint manager to place a dual temperature setpoint on the node");
@@ -1045,7 +1048,7 @@ namespace PlantHeatExchangerFluidToFluid {
         }
     }
 
-    void HeatExchangerStruct::control(EnergyPlusData &state, int const EP_UNUSED(LoopNum), Real64 const MyLoad, bool FirstHVACIteration)
+    void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int const LoopNum, Real64 const MyLoad, bool FirstHVACIteration)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2151,7 +2154,7 @@ namespace PlantHeatExchangerFluidToFluid {
                         Acc, MaxIte, SolFla, DmdSideMdot, f, this->DemandSideLoop.MassFlowRateMin, this->DemandSideLoop.MassFlowRateMax, Par);
 
                     if (SolFla == -1) { // no convergence
-                        if (!DataGlobals::WarmupFlag) {
+                        if (!state.dataGlobal->WarmupFlag) {
                             if (this->DmdSideModulatSolvNoConvergeErrorCount < 1) {
                                 ++this->DmdSideModulatSolvNoConvergeErrorCount;
                                 ShowWarningError(state, ComponentClassName + " named " + this->Name +
@@ -2159,7 +2162,7 @@ namespace PlantHeatExchangerFluidToFluid {
                                 ShowContinueError(state, "Simulation continues with calculated demand side mass flow rate = " +
                                                   General::RoundSigDigits(DmdSideMdot, 7));
                             }
-                            ShowRecurringWarningErrorAtEnd(ComponentClassName + " named " + this->Name +
+                            ShowRecurringWarningErrorAtEnd(state, ComponentClassName + " named " + this->Name +
                                                                " - Iteration Limit exceeded calculating demand side loop flow rate continues.",
                                                            this->DmdSideModulatSolvNoConvergeErrorIndex,
                                                            DmdSideMdot,
@@ -2168,7 +2171,7 @@ namespace PlantHeatExchangerFluidToFluid {
                     } else if (SolFla == -2) { // f(x0) and f(x1) have the same sign
                         DmdSideMdot = this->DemandSideLoop.MassFlowRateMax * (LeavingTempFullFlow - TargetSupplySideLoopLeavingTemp) /
                                       (LeavingTempFullFlow - LeavingTempMinFlow);
-                        if (!DataGlobals::WarmupFlag) {
+                        if (!state.dataGlobal->WarmupFlag) {
                             if (this->DmdSideModulatSolvFailErrorCount < 1) {
                                 ++this->DmdSideModulatSolvFailErrorCount;
                                 ShowWarningError(state, ComponentClassName + " named " + this->Name +
@@ -2176,7 +2179,7 @@ namespace PlantHeatExchangerFluidToFluid {
                                 ShowContinueError(state, "Simulation continues with estimated demand side mass flow rate = " +
                                                   General::RoundSigDigits(DmdSideMdot, 7));
                             }
-                            ShowRecurringWarningErrorAtEnd(ComponentClassName + " named " + this->Name +
+                            ShowRecurringWarningErrorAtEnd(state, ComponentClassName + " named " + this->Name +
                                                                " - Solver failed to calculate demand side loop flow rate continues.",
                                                            this->DmdSideModulatSolvFailErrorIndex,
                                                            DmdSideMdot,
@@ -2224,7 +2227,7 @@ namespace PlantHeatExchangerFluidToFluid {
                         Acc, MaxIte, SolFla, DmdSideMdot, f, this->DemandSideLoop.MassFlowRateMin, this->DemandSideLoop.MassFlowRateMax, Par);
 
                     if (SolFla == -1) { // no convergence
-                        if (!DataGlobals::WarmupFlag) {
+                        if (!state.dataGlobal->WarmupFlag) {
                             if (this->DmdSideModulatSolvNoConvergeErrorCount < 1) {
                                 ++this->DmdSideModulatSolvNoConvergeErrorCount;
                                 ShowWarningError(state, ComponentClassName + " named " + this->Name +
@@ -2232,7 +2235,7 @@ namespace PlantHeatExchangerFluidToFluid {
                                 ShowContinueError(state, "Simulation continues with calculated demand side mass flow rate = " +
                                                   General::RoundSigDigits(DmdSideMdot, 7));
                             }
-                            ShowRecurringWarningErrorAtEnd(ComponentClassName + " named " + this->Name +
+                            ShowRecurringWarningErrorAtEnd(state, ComponentClassName + " named " + this->Name +
                                                                " - Iteration Limit exceeded calculating demand side loop flow rate continues.",
                                                            this->DmdSideModulatSolvNoConvergeErrorIndex,
                                                            DmdSideMdot,
@@ -2241,7 +2244,7 @@ namespace PlantHeatExchangerFluidToFluid {
                     } else if (SolFla == -2) { // f(x0) and f(x1) have the same sign
                         DmdSideMdot = this->DemandSideLoop.MassFlowRateMax * (LeavingTempFullFlow - TargetSupplySideLoopLeavingTemp) /
                                       (LeavingTempFullFlow - LeavingTempMinFlow);
-                        if (!DataGlobals::WarmupFlag) {
+                        if (!state.dataGlobal->WarmupFlag) {
                             if (this->DmdSideModulatSolvFailErrorCount < 1) {
                                 ++this->DmdSideModulatSolvFailErrorCount;
                                 ShowWarningError(state, ComponentClassName + " named " + this->Name +
@@ -2249,7 +2252,7 @@ namespace PlantHeatExchangerFluidToFluid {
                                 ShowContinueError(state, "Simulation continues with estimated demand side mass flow rate = " +
                                                   General::RoundSigDigits(DmdSideMdot, 7));
                             }
-                            ShowRecurringWarningErrorAtEnd(ComponentClassName + " named " + this->Name +
+                            ShowRecurringWarningErrorAtEnd(state, ComponentClassName + " named " + this->Name +
                                                                " - Solver failed to calculate demand side loop flow rate continues.",
                                                            this->DmdSideModulatSolvFailErrorIndex,
                                                            DmdSideMdot,

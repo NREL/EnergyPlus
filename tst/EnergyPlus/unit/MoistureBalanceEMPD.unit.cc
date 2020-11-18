@@ -131,7 +131,7 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc)
     MoistureBalanceEMPDManager::InitMoistureBalanceEMPD(state);
 
     // Set up conditions
-    DataGlobals::TimeStepZone = 0.25;
+    state.dataGlobal->TimeStepZone = 0.25;
     DataEnvironment::OutBaroPress = 101325.;
     DataMoistureBalanceEMPD::RVSurface(1) = 0.007077173214149593;
     DataMoistureBalanceEMPD::RVSurfaceOld(1) = DataMoistureBalanceEMPD::RVSurface(1);
@@ -257,7 +257,7 @@ TEST_F(EnergyPlusFixture, EMPDRcoating)
     MoistureBalanceEMPDManager::InitMoistureBalanceEMPD(state);
 
     // Set up conditions
-    DataGlobals::TimeStepZone = 0.25;
+    state.dataGlobal->TimeStepZone = 0.25;
     DataEnvironment::OutBaroPress = 101325.;
     DataMoistureBalanceEMPD::RVSurface(1) = 0.007077173214149593;
     DataMoistureBalanceEMPD::RVSurfaceOld(1) = DataMoistureBalanceEMPD::RVSurface(1);
@@ -349,7 +349,7 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc_Slope)
     MoistureBalanceEMPDManager::InitMoistureBalanceEMPD(state);
 
     // Set up conditions
-    DataGlobals::TimeStepZone = 0.25;
+    state.dataGlobal->TimeStepZone = 0.25;
     DataEnvironment::OutBaroPress = 101325.;
     DataMoistureBalanceEMPD::RVSurface(surfNum) = 0.0070277983586713262;
     DataMoistureBalanceEMPD::RVSurfaceOld(surfNum) = DataMoistureBalanceEMPD::RVSurface( surfNum );
@@ -381,7 +381,7 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc_Slope)
     // Convert stored vapor density to RH.
     Real64 RH_deep_layer_old = PsyRhFnTdbRhov(state, Taver, RV_Deep_Old);
     Real64 RH_surf_layer_old = PsyRhFnTdbRhov(state, Taver, RVaver);
-    Real64 mass_flux_surf_deep_max = material.EMPDDeepDepth * material.Density * dU_dRH * (RH_surf_layer_old - RH_deep_layer_old) / (DataGlobals::TimeStepZone * 3600.0);
+    Real64 mass_flux_surf_deep_max = material.EMPDDeepDepth * material.Density * dU_dRH * (RH_surf_layer_old - RH_deep_layer_old) / (state.dataGlobal->TimeStepZone * 3600.0);
 
     Real64 hm_deep_layer = 6.9551289450635225e-05;
     Real64 mass_flux_surf_deep_result = hm_deep_layer * (RVaver - RV_Deep_Old);

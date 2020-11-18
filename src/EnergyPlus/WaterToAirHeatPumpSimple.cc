@@ -116,7 +116,6 @@ namespace WaterToAirHeatPumpSimple {
     // Use statements for access to subroutines in other modules
     // Using/Aliasing
     using namespace DataLoopNode;
-    using namespace DataGlobals;
     using namespace DataSizing;
     using DataEnvironment::OutBaroPress;
     using DataEnvironment::StdBaroPress;
@@ -755,15 +754,15 @@ namespace WaterToAirHeatPumpSimple {
     //******************************************************************************
 
     void InitSimpleWatertoAirHP(EnergyPlusData &state,
-                                int const HPNum,                           // Current HPNum under simulation
-                                Real64 const MaxONOFFCyclesperHour,        // Maximum cycling rate of heat pump [cycles/hr]
-                                Real64 const HPTimeConstant,               // Heat pump time constant [s]
-                                Real64 const FanDelayTime,                 // Fan delay time, time delay for the HP's fan to
-                                Real64 const SensLoad,                     // Control zone sensible load[W]
-                                Real64 const LatentLoad,                   // Control zone latent load[W]
-                                int const EP_UNUSED(CyclingScheme),        // fan operating mode
-                                Real64 const EP_UNUSED(OnOffAirFlowRatio), // ratio of compressor on flow to average flow over time step
-                                bool const FirstHVACIteration              // Iteration flag
+                                int const HPNum,                                 // Current HPNum under simulation
+                                Real64 const MaxONOFFCyclesperHour,              // Maximum cycling rate of heat pump [cycles/hr]
+                                Real64 const HPTimeConstant,                     // Heat pump time constant [s]
+                                Real64 const FanDelayTime,                       // Fan delay time, time delay for the HP's fan to
+                                Real64 const SensLoad,                           // Control zone sensible load[W]
+                                Real64 const LatentLoad,                         // Control zone latent load[W]
+                                [[maybe_unused]] int const CyclingScheme,        // fan operating mode
+                                [[maybe_unused]] Real64 const OnOffAirFlowRatio, // ratio of compressor on flow to average flow over time step
+                                bool const FirstHVACIteration                    // Iteration flag
     )
     {
 
@@ -782,7 +781,6 @@ namespace WaterToAirHeatPumpSimple {
         // REFERENCES:
 
         // Using/Aliasing
-        using DataGlobals::SysSizingCalc;
         using DataPlant::PlantLoop;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
@@ -848,7 +846,7 @@ namespace WaterToAirHeatPumpSimple {
             MyPlantScanFlag(HPNum) = false;
         }
 
-        if (!SysSizingCalc && MySizeFlag(HPNum) && !MyPlantScanFlag(HPNum)) {
+        if (!state.dataGlobal->SysSizingCalc && MySizeFlag(HPNum) && !MyPlantScanFlag(HPNum)) {
             // for each furnace, do the sizing once.
             SizeHVACWaterToAir(state, HPNum);
 
@@ -1095,7 +1093,6 @@ namespace WaterToAirHeatPumpSimple {
 
         // Using/Aliasing
         using namespace Psychrometrics;
-        using DataAirSystems::PrimaryAirSystem;
         using DataHVACGlobals::SmallAirVolFlow;
         using DataHVACGlobals::SmallLoad;
         using DataPlant::PlantLoop;
@@ -1259,7 +1256,7 @@ namespace WaterToAirHeatPumpSimple {
                                                  RatedAirVolFlowRateDes,
                                                  "User-Specified Rated Air Flow Rate [m3/s]",
                                                  RatedAirVolFlowRateUser);
-                    if (DisplayExtraWarnings) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
                         if ((std::abs(RatedAirVolFlowRateDes - RatedAirVolFlowRateUser) / RatedAirVolFlowRateUser) > AutoVsHardSizingThreshold) {
                             ShowMessage(state, "SizeHVACWaterToAir: Potential issue with equipment sizing for coil " +
                                         state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT \"" +
@@ -1308,7 +1305,7 @@ namespace WaterToAirHeatPumpSimple {
                         } else { // coil is on the main air loop
                             SupTemp = FinalSysSizing(CurSysNum).CoolSupTemp;
                             SupHumRat = FinalSysSizing(CurSysNum).CoolSupHumRat;
-                            if (PrimaryAirSystem(CurSysNum).NumOACoolCoils == 0) { // there is no precooling of the OA stream
+                            if (state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).NumOACoolCoils == 0) { // there is no precooling of the OA stream
                                 MixTemp = FinalSysSizing(CurSysNum).MixTempAtCoolPeak;
                                 MixHumRat = FinalSysSizing(CurSysNum).MixHumRatAtCoolPeak;
                             } else { // there is precooling of OA stream
@@ -1353,9 +1350,9 @@ namespace WaterToAirHeatPumpSimple {
                             }
                             } // end switch
                             Real64 CpAir = PsyCpAirFnW(MixHumRat);
-                            if (PrimaryAirSystem(CurSysNum).supFanLocation == DataAirSystems::fanPlacement::BlowThru) {
+                            if (state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).supFanLocation == DataAirSystems::fanPlacement::BlowThru) {
                                 MixTemp += FanCoolLoad / (CpAir * rhoair * VolFlowRate);
-                            } else if (PrimaryAirSystem(CurSysNum).supFanLocation == DataAirSystems::fanPlacement::DrawThru) {
+                            } else if (state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).supFanLocation == DataAirSystems::fanPlacement::DrawThru) {
                                 SupTemp -= FanCoolLoad / (CpAir * rhoair * VolFlowRate);
                             }
                         }
@@ -1500,7 +1497,7 @@ namespace WaterToAirHeatPumpSimple {
                         } else { // coil is on the main air loop
                             SupTemp = FinalSysSizing(CurSysNum).CoolSupTemp;
                             SupHumRat = FinalSysSizing(CurSysNum).CoolSupHumRat;
-                            if (PrimaryAirSystem(CurSysNum).NumOACoolCoils == 0) { // there is no precooling of the OA stream
+                            if (state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).NumOACoolCoils == 0) { // there is no precooling of the OA stream
                                 MixTemp = FinalSysSizing(CurSysNum).MixTempAtCoolPeak;
                                 MixHumRat = FinalSysSizing(CurSysNum).MixHumRatAtCoolPeak;
                             } else { // there is precooling of OA stream
@@ -1546,9 +1543,9 @@ namespace WaterToAirHeatPumpSimple {
                             }
                             } // end switch
                             Real64 CpAir = PsyCpAirFnW(MixHumRat);
-                            if (PrimaryAirSystem(CurSysNum).supFanLocation == DataAirSystems::fanPlacement::BlowThru) {
+                            if (state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).supFanLocation == DataAirSystems::fanPlacement::BlowThru) {
                                 MixTemp += FanCoolLoad / (CpAir * rhoair * VolFlowRate);
-                            } else if (PrimaryAirSystem(CurSysNum).supFanLocation == DataAirSystems::fanPlacement::DrawThru) {
+                            } else if (state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).supFanLocation == DataAirSystems::fanPlacement::DrawThru) {
                                 SupTemp -= FanCoolLoad / (CpAir * rhoair * VolFlowRate);
                             }
                         }
@@ -1700,7 +1697,7 @@ namespace WaterToAirHeatPumpSimple {
                                                      RatedCapCoolTotalDes,
                                                      "User-Specified Rated Total Cooling Capacity [W]",
                                                      RatedCapCoolTotalUser);
-                        if (DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(RatedCapCoolTotalDes - RatedCapCoolTotalUser) / RatedCapCoolTotalUser) > AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeHVACWaterToAir: Potential issue with equipment sizing for coil " +
                                             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT \"" +
@@ -1755,7 +1752,7 @@ namespace WaterToAirHeatPumpSimple {
                                                      RatedCapCoolSensDes,
                                                      "User-Specified Rated Sensible Cooling Capacity [W]",
                                                      RatedCapCoolSensUser);
-                        if (DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(RatedCapCoolSensDes - RatedCapCoolSensUser) / RatedCapCoolSensUser) > AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeHVACWaterToAir: Potential issue with equipment sizing for coil " +
                                             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT \"" +
@@ -1872,7 +1869,7 @@ namespace WaterToAirHeatPumpSimple {
                                                  RatedCapHeatDes,
                                                  "User-Specified Rated Heating Capacity [W]",
                                                  RatedCapHeatUser);
-                    if (DisplayExtraWarnings) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
                         if ((std::abs(RatedCapHeatDes - RatedCapHeatUser) / RatedCapHeatUser) > AutoVsHardSizingThreshold) {
                             ShowMessage(state, "SizeHVACWaterToAir: Potential issue with equipment sizing for coil " +
                                         state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT \"" +
@@ -2014,7 +2011,7 @@ namespace WaterToAirHeatPumpSimple {
                                              RatedWaterVolFlowRateDes,
                                              "User-Specified Rated Water Flow Rate [m3/s]",
                                              RatedWaterVolFlowRateUser);
-                if (DisplayExtraWarnings) {
+                if (state.dataGlobal->DisplayExtraWarnings) {
                     if ((std::abs(RatedWaterVolFlowRateDes - RatedWaterVolFlowRateUser) / RatedWaterVolFlowRateUser) > AutoVsHardSizingThreshold) {
                         ShowMessage(state, "SizeHVACWaterToAir: Potential issue with equipment sizing for coil " +
                                     state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT \"" +
@@ -2036,14 +2033,15 @@ namespace WaterToAirHeatPumpSimple {
         }
     }
 
-    void CalcHPCoolingSimple(EnergyPlusData &state, int const HPNum,                          // Heat Pump Number
-                             int const CyclingScheme,                  // Fan/Compressor cycling scheme indicator
-                             Real64 const RuntimeFrac,                 // Runtime Fraction of compressor or percent on time (on-time/cycle time)
-                             Real64 const EP_UNUSED(SensDemand),       // Cooling Sensible Demand [W] !unused1208
-                             Real64 const EP_UNUSED(LatentDemand),     // Cooling Latent Demand [W]
-                             int const CompOp,                         // compressor operation flag
-                             Real64 const PartLoadRatio,               // compressor part load ratio
-                             Real64 const EP_UNUSED(OnOffAirFlowRatio) // ratio of compressor on flow to average flow over time step
+    void CalcHPCoolingSimple(EnergyPlusData &state,
+                             int const HPNum,                                // Heat Pump Number
+                             int const CyclingScheme,                        // Fan/Compressor cycling scheme indicator
+                             Real64 const RuntimeFrac,                       // Runtime Fraction of compressor or percent on time (on-time/cycle time)
+                             [[maybe_unused]] Real64 const SensDemand,       // Cooling Sensible Demand [W] !unused1208
+                             [[maybe_unused]] Real64 const LatentDemand,     // Cooling Latent Demand [W]
+                             int const CompOp,                               // compressor operation flag
+                             Real64 const PartLoadRatio,                     // compressor part load ratio
+                             [[maybe_unused]] Real64 const OnOffAirFlowRatio // ratio of compressor on flow to average flow over time step
     )
     {
 
@@ -2397,13 +2395,14 @@ namespace WaterToAirHeatPumpSimple {
         }
     }
 
-    void CalcHPHeatingSimple(EnergyPlusData &state, int const HPNum,                          // Heat Pump Number
-                             int const CyclingScheme,                  // Fan/Compressor cycling scheme indicator
-                             Real64 const RuntimeFrac,                 // Runtime Fraction of compressor
-                             Real64 const EP_UNUSED(SensDemand),       // Cooling Sensible Demand [W] !unused1208
-                             int const CompOp,                         // compressor operation flag
-                             Real64 const PartLoadRatio,               // compressor part load ratio
-                             Real64 const EP_UNUSED(OnOffAirFlowRatio) // ratio of compressor on flow to average flow over time step
+    void CalcHPHeatingSimple(EnergyPlusData &state,
+                             int const HPNum,                                // Heat Pump Number
+                             int const CyclingScheme,                        // Fan/Compressor cycling scheme indicator
+                             Real64 const RuntimeFrac,                       // Runtime Fraction of compressor
+                             [[maybe_unused]] Real64 const SensDemand,       // Cooling Sensible Demand [W] !unused1208
+                             int const CompOp,                               // compressor operation flag
+                             Real64 const PartLoadRatio,                     // compressor part load ratio
+                             [[maybe_unused]] Real64 const OnOffAirFlowRatio // ratio of compressor on flow to average flow over time step
     )
     {
 
@@ -2736,7 +2735,7 @@ namespace WaterToAirHeatPumpSimple {
         }
 
         if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).reportCoilFinalSizes) {
-            if (!DataGlobals::WarmupFlag && !DataGlobals::DoingHVACSizingSimulations && !DataGlobals::DoingSizing) {
+            if (!state.dataGlobal->WarmupFlag && !state.dataGlobal->DoingHVACSizingSimulations && !state.dataGlobal->DoingSizing) {
 
                 if (UtilityRoutines::SameString(state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WatertoAirHPType, "COOLING")) { // cooling
                     coilSelectionReportObj->setCoilFinalSizes(state, state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,

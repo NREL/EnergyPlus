@@ -1750,8 +1750,12 @@ namespace CurveManager {
                             std::size_t rowNum = indVarInstance.at("external_file_starting_row_number").get<std::size_t>() - 1;
 
                             if (!state.dataCurveManager->btwxtManager.tableFiles.count(filePath)) {
-                                state.dataCurveManager->btwxtManager.tableFiles.emplace(filePath, TableFile{state, filePath});
+                                TableFile tableFile;
+                                ErrorsFound |= tableFile.load(state, filePath);
+                                state.dataCurveManager->btwxtManager.tableFiles.emplace(filePath, tableFile);
                             }
+
+                            if (ErrorsFound) continue; // Unable to load file so continue on to see if there are other errors before fataling
 
                             axis = state.dataCurveManager->btwxtManager.tableFiles[filePath].getArray(state, {colNum, rowNum});
 
@@ -1830,7 +1834,7 @@ namespace CurveManager {
                     }
 
                 }
-                // Add grid to state.dataCurveManager->btwxtManager
+                // Add grid to btwxtManager
                 state.dataCurveManager->btwxtManager.addGrid(UtilityRoutines::MakeUPPERCase(thisObjectName), Btwxt::GriddedData(gridAxes));
             }
         }
@@ -1940,9 +1944,14 @@ namespace CurveManager {
                     std::size_t colNum = fields.at("external_file_column_number").get<std::size_t>() - 1;
                     std::size_t rowNum = fields.at("external_file_starting_row_number").get<std::size_t>() - 1;
 
+
                     if (!state.dataCurveManager->btwxtManager.tableFiles.count(filePath)) {
-                        state.dataCurveManager->btwxtManager.tableFiles.emplace(filePath, TableFile{state, filePath});
+                        TableFile tableFile;
+                        ErrorsFound |= tableFile.load(state, filePath);
+                        state.dataCurveManager->btwxtManager.tableFiles.emplace(filePath, tableFile);
                     }
+
+                    if (ErrorsFound) continue; // Unable to load file so continue on to see if there are other errors before fataling
 
                     lookupValues = state.dataCurveManager->btwxtManager.tableFiles[filePath].getArray(state, {colNum, rowNum});
 
@@ -2040,19 +2049,15 @@ namespace CurveManager {
         tableFiles.clear();
     }
 
-    TableFile::TableFile(EnergyPlusData &state, std::string path)
-    {
-        load(state, path);
-    }
-
-    void TableFile::load(EnergyPlusData &state, std::string path)
+    bool TableFile::load(EnergyPlusData &state, std::string path)
     {
         filePath = path;
         bool fileFound;
         std::string fullPath;
-        DataSystemVariables::CheckForActualFileName(state, path, fileFound, fullPath);
-        if (!fileFound) {
-            ShowFatalError(state, "File \"" + filePath + "\" : File not found.");
+        std::string contextString = "CurveManager::TableFile::load: ";
+        DataSystemVariables::CheckForActualFileName(state, path, fileFound, fullPath, contextString);
+        if(!fileFound){
+            return true;
         }
         std::ifstream file(fullPath);
         std::string line("");
@@ -2086,6 +2091,7 @@ namespace CurveManager {
                 ++colNum;
             }
         }
+        return false;
     }
 
     std::vector<double>& TableFile::getArray(EnergyPlusData &state, std::pair<std::size_t, std::size_t> colAndRow) {
@@ -2233,7 +2239,7 @@ namespace CurveManager {
                                 DataBranchAirLoopPlant::PressureCurve(CurveIndex).Name);
         }
 
-        if (DataGlobals::AnyEnergyManagementSystemInModel) { // provide hook for possible EMS control
+        if (state.dataGlobal->AnyEnergyManagementSystemInModel) { // provide hook for possible EMS control
             for (CurveIndex = 1; CurveIndex <= state.dataCurveManager->NumCurves; ++CurveIndex) {
                 SetupEMSActuator("Curve",
                                  state.dataCurveManager->PerfCurve(CurveIndex).Name,
@@ -2243,7 +2249,7 @@ namespace CurveManager {
                                  state.dataCurveManager->PerfCurve(CurveIndex).EMSOverrideCurveValue);
             } // All performance curves
         }
-        if (DataGlobals::AnyEnergyManagementSystemInModel) { // provide hook for possible EMS control
+        if (state.dataGlobal->AnyEnergyManagementSystemInModel) { // provide hook for possible EMS control
             for (CurveIndex = 1; CurveIndex <= DataBranchAirLoopPlant::NumPressureCurves; ++CurveIndex) {
                 SetupEMSActuator("Curve",
                                  DataBranchAirLoopPlant::PressureCurve(CurveIndex).Name,
@@ -2703,7 +2709,7 @@ namespace CurveManager {
         using namespace DataIPShortCuts;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const CurveObjectName("Curve:Functional:PressureDrop");
+        constexpr std::string_view CurveObjectName = "Curve:Functional:PressureDrop";
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumPressure;
@@ -2715,11 +2721,11 @@ namespace CurveManager {
         bool ErrsFound(false); // Set to true if errors in input, fatal at end of routine
         int CurveNum;
 
-        NumPressure = inputProcessor->getNumObjectsFound(state, CurveObjectName);
+        NumPressure = inputProcessor->getNumObjectsFound(state, CurveObjectName.data());
         DataBranchAirLoopPlant::PressureCurve.allocate(NumPressure);
         for (CurveNum = 1; CurveNum <= NumPressure; ++CurveNum) {
             inputProcessor->getObjectItem(state,
-                                          CurveObjectName,
+                                          CurveObjectName.data(),
                                           CurveNum,
                                           Alphas,
                                           NumAlphas,
@@ -2730,7 +2736,7 @@ namespace CurveManager {
                                           _,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurveObjectName, cAlphaFieldNames(1), ErrsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurveObjectName.data(), cAlphaFieldNames(1), ErrsFound);
             DataBranchAirLoopPlant::PressureCurve(CurveNum).Name = Alphas(1);
             DataBranchAirLoopPlant::PressureCurve(CurveNum).EquivDiameter = Numbers(1);
             DataBranchAirLoopPlant::PressureCurve(CurveNum).MinorLossCoeff = Numbers(2);

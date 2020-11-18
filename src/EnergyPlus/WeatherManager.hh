@@ -622,7 +622,7 @@ namespace WeatherManager {
     // Calculate sky temperature from weather data
     Real64 CalcSkyEmissivity(EnergyPlusData &state, EmissivityCalcType ESkyCalcType, Real64 OSky, Real64 DryBulb, Real64 DewPoint, Real64 RelHum);
 
-    void ASHRAETauModel(EnergyPlusData &EP_UNUSED(state), DesignDaySolarModel TauModelType, // ASHRAETau solar model type ASHRAE_Tau or ASHRAE_Tau2017
+    void ASHRAETauModel([[maybe_unused]] EnergyPlusData &state, DesignDaySolarModel TauModelType, // ASHRAETau solar model type ASHRAE_Tau or ASHRAE_Tau2017
                         Real64 ETR,                       // extraterrestrial normal irradiance, W/m2
                         Real64 CosZen,                    // COS( solar zenith angle), 0 - 1
                         Real64 TauB,                      // beam tau factor

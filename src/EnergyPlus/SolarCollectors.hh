@@ -230,7 +230,7 @@ namespace SolarCollectors {
 
         void initialize(EnergyPlusData &state);
 
-        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void CalcTransRefAbsOfCover(EnergyPlusData &state, Real64 IncidentAngle,              // Angle of incidence (radians)
                                     Real64 &TransSys,                  // cover system solar transmittance

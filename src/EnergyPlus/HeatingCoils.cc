@@ -108,7 +108,6 @@ namespace HeatingCoils {
     // Use statements for data only modules
     // Using/Aliasing
     using namespace DataLoopNode;
-    using namespace DataGlobals;
     using namespace DataHVACGlobals;
     using namespace DataGlobalConstants;
     using DataHeatBalance::HeatReclaimDXCoil;
@@ -1248,7 +1247,6 @@ namespace HeatingCoils {
         // Uses the status flags to trigger initializations.
 
         // Using/Aliasing
-        using DataGlobals::AnyEnergyManagementSystemInModel;
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
         using EMSManager::iTemperatureSetPoint;
 
@@ -1278,7 +1276,7 @@ namespace HeatingCoils {
             MySPTestFlag = true;
         }
 
-        if (!SysSizingCalc && MySizeFlag(CoilNum)) {
+        if (!state.dataGlobal->SysSizingCalc && MySizeFlag(CoilNum)) {
             // for each coil, do the sizing once.
             SizeHeatingCoil(state, CoilNum);
 
@@ -1315,7 +1313,7 @@ namespace HeatingCoils {
             HeatingCoil(CoilNum).HCoilType_Num != Coil_HeatingGas_MultiStage) {
 
             //   If the coil is temperature controlled (QCoilReq == -999.0), both a control node and setpoint are required.
-            if (!SysSizingCalc && DoSetPointTest) {
+            if (!state.dataGlobal->SysSizingCalc && DoSetPointTest) {
                 //     3 possibilities here:
                 //     1) TempSetPointNodeNum .GT. 0 and TempSetPoint /= SensedNodeFlagValue, this is correct
                 //     2) TempSetPointNodeNum .EQ. 0, this is not correct, control node is required
@@ -1330,7 +1328,7 @@ namespace HeatingCoils {
                     //     test 3) here (fatal message)
                 } else { // IF(ControlNode .GT. 0)THEN
                     if (Node(ControlNode).TempSetPoint == SensedNodeFlagValue) {
-                        if (!AnyEnergyManagementSystemInModel) {
+                        if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                             ShowSevereError(state, cAllCoilTypes(HeatingCoil(CoilNum).HCoilType_Num) + " \"" + HeatingCoil(CoilNum).Name + "\"");
                             ShowContinueError(state, "... Missing temperature setpoint for heating coil.");
                             ShowContinueError(state, "... use a Setpoint Manager to establish a setpoint at the coil temperature setpoint node.");
@@ -1616,7 +1614,7 @@ namespace HeatingCoils {
                                                          NominalCapacityDes,
                                                          "User-Specified " + SizingString,
                                                          NominalCapacityUser);
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(NominalCapacityDes - NominalCapacityUser) / NominalCapacityUser) > AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeHeatingCoil: Potential issue with equipment sizing for " + CompType + ", " + CompName);
                                     ShowContinueError(state, "User-Specified Nominal Capacity of " + RoundSigDigits(NominalCapacityUser, 2) + " [W]");
@@ -1712,9 +1710,6 @@ namespace HeatingCoils {
         // REFERENCES:
 
         // Using/Aliasing
-        using DataGlobals::DoingSizing;
-        using DataGlobals::KickOffSimulation;
-        using DataGlobals::WarmupFlag;
         using DataHVACGlobals::ElecHeatingCoilPower;
         using DataHVACGlobals::TempControlTol;
         using FaultsManager::FaultsCoilSATSensor;
@@ -1749,8 +1744,8 @@ namespace HeatingCoils {
         Control = HeatingCoil(CoilNum).Control;
         TempSetPoint = HeatingCoil(CoilNum).DesiredOutletTemp;
 
-        // If there is a fault of coil SAT Sensor (zrp_Jul2016)
-        if (HeatingCoil(CoilNum).FaultyCoilSATFlag && (!WarmupFlag) && (!DoingSizing) && (!KickOffSimulation)) {
+        // If there is a fault of coil SAT Sensor
+        if (HeatingCoil(CoilNum).FaultyCoilSATFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
             // calculate the sensor offset using fault information
             int FaultIndex = HeatingCoil(CoilNum).FaultyCoilSATIndex;
             HeatingCoil(CoilNum).FaultyCoilSATOffset = FaultsCoilSATSensor(FaultIndex).CalFaultOffsetAct(state);
@@ -2080,9 +2075,9 @@ namespace HeatingCoils {
     void CalcFuelHeatingCoil(EnergyPlusData &state,
                              int const CoilNum, // index to heating coil
                              Real64 const QCoilReq,
-                             Real64 &QCoilActual,                  // coil load actually delivered (W)
-                             int const FanOpMode,                  // fan operating mode
-                             Real64 const EP_UNUSED(PartLoadRatio) // part-load ratio of heating coil
+                             Real64 &QCoilActual,                        // coil load actually delivered (W)
+                             int const FanOpMode,                        // fan operating mode
+                             [[maybe_unused]] Real64 const PartLoadRatio // part-load ratio of heating coil
     )
     {
         // SUBROUTINE INFORMATION:
@@ -2100,9 +2095,6 @@ namespace HeatingCoils {
 
         // Using/Aliasing
         using CurveManager::CurveValue;
-        using DataGlobals::DoingSizing;
-        using DataGlobals::KickOffSimulation;
-        using DataGlobals::WarmupFlag;
         using DataHVACGlobals::TempControlTol;
         using FaultsManager::FaultsCoilSATSensor;
         using General::TrimSigDigits;
@@ -2142,8 +2134,8 @@ namespace HeatingCoils {
 
         CapacitanceAir = PsyCpAirFnW(Win) * AirMassFlow;
 
-        // If there is a fault of coil SAT Sensor (zrp_Jul2016)
-        if (HeatingCoil(CoilNum).FaultyCoilSATFlag && (!WarmupFlag) && (!DoingSizing) && (!KickOffSimulation)) {
+        // If there is a fault of coil SAT Sensor
+        if (HeatingCoil(CoilNum).FaultyCoilSATFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
             // calculate the sensor offset using fault information
             int FaultIndex = HeatingCoil(CoilNum).FaultyCoilSATIndex;
             HeatingCoil(CoilNum).FaultyCoilSATOffset = FaultsCoilSATSensor(FaultIndex).CalFaultOffsetAct(state);
@@ -2233,7 +2225,7 @@ namespace HeatingCoils {
                         ShowContinueError(state, "PLF curve values must be >= 0.7. PLF has been reset to 0.7 and the simulation continues...");
                         ShowContinueError(state, "Check the IO reference manual for PLF curve guidance [Coil:Heating:Fuel].");
                     } else {
-                        ShowRecurringWarningErrorAtEnd(HeatingCoil(CoilNum).Name + ", Heating coil PLF curve < 0.7 warning continues... ",
+                        ShowRecurringWarningErrorAtEnd(state, HeatingCoil(CoilNum).Name + ", Heating coil PLF curve < 0.7 warning continues... ",
                                                        HeatingCoil(CoilNum).PLFErrorIndex,
                                                        PLF,
                                                        PLF);
@@ -2251,7 +2243,7 @@ namespace HeatingCoils {
                         ShowContinueError(state, "Runtime fraction is set to 1.0 and the simulation continues...");
                         ShowContinueError(state, "Check the IO reference manual for PLF curve guidance [Coil:Heating:Fuel].");
                     } else {
-                        ShowRecurringWarningErrorAtEnd(HeatingCoil(CoilNum).Name + ", Heating coil runtime fraction > 1.0 warning continues... ",
+                        ShowRecurringWarningErrorAtEnd(state, HeatingCoil(CoilNum).Name + ", Heating coil runtime fraction > 1.0 warning continues... ",
                                                        HeatingCoil(CoilNum).RTFErrorIndex,
                                                        HeatingCoil(CoilNum).RTF,
                                                        HeatingCoil(CoilNum).RTF);
@@ -2529,7 +2521,7 @@ namespace HeatingCoils {
                         ShowContinueError(state, "PLF curve values must be >= 0.7. PLF has been reset to 0.7 and the simulation continues...");
                         ShowContinueError(state, "Check the IO reference manual for PLF curve guidance [Coil:Heating:Fuel].");
                     } else {
-                        ShowRecurringWarningErrorAtEnd(HeatingCoil(CoilNum).Name + ", Heating coil PLF curve < 0.7 warning continues... ",
+                        ShowRecurringWarningErrorAtEnd(state, HeatingCoil(CoilNum).Name + ", Heating coil PLF curve < 0.7 warning continues... ",
                                                        HeatingCoil(CoilNum).PLFErrorIndex,
                                                        PLF,
                                                        PLF);
@@ -2547,7 +2539,7 @@ namespace HeatingCoils {
                         ShowContinueError(state, "Runtime fraction is set to 1.0 and the simulation continues...");
                         ShowContinueError(state, "Check the IO reference manual for PLF curve guidance [Coil:Heating:Fuel].");
                     } else {
-                        ShowRecurringWarningErrorAtEnd(HeatingCoil(CoilNum).Name + ", Heating coil runtime fraction > 1.0 warning continues... ",
+                        ShowRecurringWarningErrorAtEnd(state, HeatingCoil(CoilNum).Name + ", Heating coil runtime fraction > 1.0 warning continues... ",
                                                        HeatingCoil(CoilNum).RTFErrorIndex,
                                                        HeatingCoil(CoilNum).RTF,
                                                        HeatingCoil(CoilNum).RTF);
@@ -2598,9 +2590,6 @@ namespace HeatingCoils {
         // REFERENCES:
 
         // Using/Aliasing
-        using DataGlobals::DoingSizing;
-        using DataGlobals::KickOffSimulation;
-        using DataGlobals::WarmupFlag;
         using DataHVACGlobals::TempControlTol;
         using FaultsManager::FaultsCoilSATSensor;
         using namespace DXCoils;
@@ -2637,8 +2626,8 @@ namespace HeatingCoils {
         CapacitanceAir = PsyCpAirFnW(Win) * AirMassFlow;
         TempSetPoint = HeatingCoil(CoilNum).DesiredOutletTemp;
 
-        // If there is a fault of coil SAT Sensor (zrp_Jul2016)
-        if (HeatingCoil(CoilNum).FaultyCoilSATFlag && (!WarmupFlag) && (!DoingSizing) && (!KickOffSimulation)) {
+        // If there is a fault of coil SAT Sensor
+        if (HeatingCoil(CoilNum).FaultyCoilSATFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
             // calculate the sensor offset using fault information
             int FaultIndex = HeatingCoil(CoilNum).FaultyCoilSATIndex;
             HeatingCoil(CoilNum).FaultyCoilSATOffset = FaultsCoilSATSensor(FaultIndex).CalFaultOffsetAct(state);
@@ -2662,7 +2651,7 @@ namespace HeatingCoils {
                 HeatingCoil(CoilNum).RTF = 1.0;
                 if (AvailTemp <= TempAirIn) {
                     HeatingCoil(CoilNum).NominalCapacity = 0.0;
-                    ShowRecurringWarningErrorAtEnd("Coil:Heating:Desuperheater " + HeatingCoil(CoilNum).Name +
+                    ShowRecurringWarningErrorAtEnd(state, "Coil:Heating:Desuperheater " + HeatingCoil(CoilNum).Name +
                                                        " - Waste heat source temperature was too low to be useful.",
                                                    HeatingCoil(CoilNum).InsuffTemperatureWarn);
                 } else {
@@ -2919,7 +2908,7 @@ namespace HeatingCoils {
             }
         }
         if (HeatingCoil(CoilNum).reportCoilFinalSizes) {
-            if (!DataGlobals::WarmupFlag && !DataGlobals::DoingHVACSizingSimulations && !DataGlobals::DoingSizing) {
+            if (!state.dataGlobal->WarmupFlag && !state.dataGlobal->DoingHVACSizingSimulations && !state.dataGlobal->DoingSizing) {
                 coilSelectionReportObj->setCoilFinalSizes(state,
                                                           HeatingCoil(CoilNum).Name,
                                                           coilObjClassName,

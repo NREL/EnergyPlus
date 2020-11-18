@@ -95,7 +95,7 @@ TEST_F(EnergyPlusFixture, SimAirServingZones_ReheatCoilSizing)
     CalcSysSizing.allocate(NumPrimaryAirSys);
     FinalSysSizing.allocate(NumPrimaryAirSys);
     FinalZoneSizing.allocate(NumPrimaryAirSys);
-    PrimaryAirSystem.allocate(NumPrimaryAirSys);
+    state.dataAirSystemsData->PrimaryAirSystems.allocate(NumPrimaryAirSys);
 
     // Inputs: system configurations:
     // 	(1) Central heating coils exist
@@ -103,20 +103,20 @@ TEST_F(EnergyPlusFixture, SimAirServingZones_ReheatCoilSizing)
     // 	(3) No central heating coils, but OA heat-exchangers exist
     // 	(4) No central heating coils; No preheating coils or OA heat-exchangers
 
-    PrimaryAirSystem(1).CentralHeatCoilExists = true;
-    PrimaryAirSystem(2).CentralHeatCoilExists = false;
-    PrimaryAirSystem(3).CentralHeatCoilExists = false;
-    PrimaryAirSystem(4).CentralHeatCoilExists = false;
+    state.dataAirSystemsData->PrimaryAirSystems(1).CentralHeatCoilExists = true;
+    state.dataAirSystemsData->PrimaryAirSystems(2).CentralHeatCoilExists = false;
+    state.dataAirSystemsData->PrimaryAirSystems(3).CentralHeatCoilExists = false;
+    state.dataAirSystemsData->PrimaryAirSystems(4).CentralHeatCoilExists = false;
 
-    PrimaryAirSystem(1).NumOAHeatCoils = 0;
-    PrimaryAirSystem(2).NumOAHeatCoils = 1;
-    PrimaryAirSystem(3).NumOAHeatCoils = 0;
-    PrimaryAirSystem(4).NumOAHeatCoils = 0;
+    state.dataAirSystemsData->PrimaryAirSystems(1).NumOAHeatCoils = 0;
+    state.dataAirSystemsData->PrimaryAirSystems(2).NumOAHeatCoils = 1;
+    state.dataAirSystemsData->PrimaryAirSystems(3).NumOAHeatCoils = 0;
+    state.dataAirSystemsData->PrimaryAirSystems(4).NumOAHeatCoils = 0;
 
-    PrimaryAirSystem(1).NumOAHXs = 0;
-    PrimaryAirSystem(2).NumOAHXs = 0;
-    PrimaryAirSystem(3).NumOAHXs = 1;
-    PrimaryAirSystem(4).NumOAHXs = 0;
+    state.dataAirSystemsData->PrimaryAirSystems(1).NumOAHXs = 0;
+    state.dataAirSystemsData->PrimaryAirSystems(2).NumOAHXs = 0;
+    state.dataAirSystemsData->PrimaryAirSystems(3).NumOAHXs = 1;
+    state.dataAirSystemsData->PrimaryAirSystems(4).NumOAHXs = 0;
 
     // Inputs: sizing parameters
     for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
@@ -138,8 +138,8 @@ TEST_F(EnergyPlusFixture, SimAirServingZones_ReheatCoilSizing)
     for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
         CtrlZoneNum = AirLoopNum;
 
-        FinalZoneSizing(CtrlZoneNum).DesHeatCoilInTempTU = GetHeatingSATempForSizing(AirLoopNum);
-        FinalZoneSizing(CtrlZoneNum).DesHeatCoilInHumRatTU = GetHeatingSATempHumRatForSizing(AirLoopNum);
+        FinalZoneSizing(CtrlZoneNum).DesHeatCoilInTempTU = GetHeatingSATempForSizing(state, AirLoopNum);
+        FinalZoneSizing(CtrlZoneNum).DesHeatCoilInHumRatTU = GetHeatingSATempHumRatForSizing(state, AirLoopNum);
     }
 
     // Check
@@ -156,7 +156,7 @@ TEST_F(EnergyPlusFixture, SimAirServingZones_ReheatCoilSizing)
     CalcSysSizing.deallocate();
     FinalSysSizing.deallocate();
     FinalZoneSizing.deallocate();
-    PrimaryAirSystem.deallocate();
+    state.dataAirSystemsData->PrimaryAirSystems.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, SimAirServingZones_LimitZoneVentEff)
@@ -244,8 +244,8 @@ TEST_F(EnergyPlusFixture, SizingSystem_FlowPerCapacityMethodTest1)
     FinalSysSizing(AirLoopNum).FlowPerCoolingCapacity = 0.00006041;
     // scale cooling flow rate using user input capacity
     ScaledCoolDesignFlowRate = FinalSysSizing(AirLoopNum).ScaledCoolingCapacity * FinalSysSizing(AirLoopNum).FlowPerCoolingCapacity;
-    // do scaleable flow sizing
-    UpdateSysSizingForScalableInputs(AirLoopNum);
+    // do scalable flow sizing
+    UpdateSysSizingForScalableInputs(state, AirLoopNum);
     EXPECT_DOUBLE_EQ(0.755125, ScaledCoolDesignFlowRate);
     EXPECT_DOUBLE_EQ(0.755125, FinalSysSizing(AirLoopNum).InpDesCoolAirFlow);
 
@@ -256,8 +256,8 @@ TEST_F(EnergyPlusFixture, SizingSystem_FlowPerCapacityMethodTest1)
     FinalSysSizing(AirLoopNum).FlowPerHeatingCapacity = 0.00006041;
     // scale heating flow rate using user input capacity
     ScaledHeatDesignFlowRate = FinalSysSizing(AirLoopNum).ScaledHeatingCapacity * FinalSysSizing(AirLoopNum).FlowPerHeatingCapacity;
-    // do scaleable flow sizing
-    UpdateSysSizingForScalableInputs(AirLoopNum);
+    // do scalable flow sizing
+    UpdateSysSizingForScalableInputs(state, AirLoopNum);
     EXPECT_DOUBLE_EQ(0.869904, ScaledHeatDesignFlowRate);
     EXPECT_DOUBLE_EQ(0.869904, FinalSysSizing(AirLoopNum).InpDesHeatAirFlow);
 }
@@ -285,8 +285,8 @@ TEST_F(EnergyPlusFixture, SizingSystem_FlowPerCapacityMethodTest2)
     // scale cooling capacity using floor area
     ScaledCoolDesignCapacity = FinalSysSizing(AirLoopNum).ScaledCoolingCapacity * FinalSysSizing(AirLoopNum).FloorAreaOnAirLoopCooled;
     ScaledCoolDesignFlowRate = FinalSysSizing(AirLoopNum).FlowPerCoolingCapacity * ScaledCoolDesignCapacity;
-    // do scaleable flow sizing
-    UpdateSysSizingForScalableInputs(AirLoopNum);
+    // do scalable flow sizing
+    UpdateSysSizingForScalableInputs(state, AirLoopNum);
     EXPECT_DOUBLE_EQ(0.038878893558427413, ScaledCoolDesignFlowRate);
     EXPECT_DOUBLE_EQ(0.038878893558427413, FinalSysSizing(AirLoopNum).InpDesCoolAirFlow);
 
@@ -299,8 +299,8 @@ TEST_F(EnergyPlusFixture, SizingSystem_FlowPerCapacityMethodTest2)
     // scale heating capacity using floor area
     ScaledHeatDesignCapacity = FinalSysSizing(AirLoopNum).ScaledHeatingCapacity * FinalSysSizing(AirLoopNum).FloorAreaOnAirLoopCooled;
     ScaledHeatDesignFlowRate = FinalSysSizing(AirLoopNum).FlowPerHeatingCapacity * ScaledHeatDesignCapacity;
-    // do scaleable flow sizing
-    UpdateSysSizingForScalableInputs(AirLoopNum);
+    // do scalable flow sizing
+    UpdateSysSizingForScalableInputs(state, AirLoopNum);
     EXPECT_DOUBLE_EQ(0.11880981823487276, ScaledHeatDesignFlowRate);
     EXPECT_DOUBLE_EQ(0.11880981823487276, FinalSysSizing(AirLoopNum).InpDesHeatAirFlow);
 }
@@ -468,8 +468,8 @@ TEST_F(EnergyPlusFixture, GetAirPathData_ControllerLockout1)
 
     // 2 controllers on this AHU for 2 water coils on the branch
     // CanBeLockedOutByEcono should be false for both controller in this test
-    EXPECT_FALSE(PrimaryAirSystem(1).CanBeLockedOutByEcono(1));
-    EXPECT_FALSE(PrimaryAirSystem(1).CanBeLockedOutByEcono(2));
+    EXPECT_FALSE(state.dataAirSystemsData->PrimaryAirSystems(1).CanBeLockedOutByEcono(1));
+    EXPECT_FALSE(state.dataAirSystemsData->PrimaryAirSystems(1).CanBeLockedOutByEcono(2));
 }
 
 TEST_F(EnergyPlusFixture, GetAirPathData_ControllerLockout2)
@@ -629,8 +629,8 @@ TEST_F(EnergyPlusFixture, GetAirPathData_ControllerLockout2)
     // 2 controllers on this AHU for 2 water coils in the OA system
     // CanBeLockedOutByEcono should be false for the heating coil controller #1 in this test
     // CanBeLockedOutByEcono should be true for the cooling coil controller #2 in this test
-    EXPECT_FALSE(PrimaryAirSystem(1).CanBeLockedOutByEcono(1));
-    EXPECT_TRUE(PrimaryAirSystem(1).CanBeLockedOutByEcono(2));
+    EXPECT_FALSE(state.dataAirSystemsData->PrimaryAirSystems(1).CanBeLockedOutByEcono(1));
+    EXPECT_TRUE(state.dataAirSystemsData->PrimaryAirSystems(1).CanBeLockedOutByEcono(2));
 }
 
 TEST_F(EnergyPlusFixture, InitAirLoops_1AirLoop2ADU)

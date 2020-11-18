@@ -96,13 +96,6 @@ namespace PollutionModule {
     using DataEnvironment::DayOfMonth;
     using DataEnvironment::EndMonthFlag;
     using DataEnvironment::Month;
-    using DataGlobals::EndDayFlag;
-    using DataGlobals::EndHourFlag;
-    using DataGlobals::HourOfDay;
-    using DataGlobals::StdMeterRecordCount;
-    using DataGlobals::TimeStep;
-    using DataGlobals::TimeStepZone;
-
     // Data
     // MODULE PARAMETER DEFINITIONS:
     int const ElecPollFactor(1);
@@ -3826,9 +3819,9 @@ namespace PollutionModule {
                 ReportingThisVariable("Environmental Impact Total CH4 Emissions Carbon Equivalent Mass") ||
                 ReportingThisVariable("Environmental Impact Total CO2 Emissions Carbon Equivalent Mass") ||
                 ReportingThisVariable("Carbon Equivalent:Facility") || ReportingThisVariable("CarbonEquivalentEmissions:Carbon Equivalent")) {
-                ShowWarningError(state, 
+                ShowWarningError(state,
                     "GetPollutionFactorInput: Requested reporting for Carbon Equivalent Pollution, but insufficient information is entered.");
-                ShowContinueError(state, 
+                ShowContinueError(state,
                     "Both \"FuelFactors\" and \"EnvironmentalImpactFactors\" must be entered or the displayed carbon pollution will all be zero.");
             }
         }

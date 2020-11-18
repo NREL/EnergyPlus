@@ -82,6 +82,7 @@
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus {
+
 namespace ZoneContaminantPredictorCorrector {
 
     // MODULE INFORMATION:
@@ -98,7 +99,6 @@ namespace ZoneContaminantPredictorCorrector {
     // Similar approach to ZoneTempPredictorCorrector
 
     // Using/Aliasing
-    using namespace DataGlobals;
     using namespace DataHVACGlobals;
     using namespace DataHeatBalance;
     using namespace DataHeatBalFanSys;
@@ -151,13 +151,13 @@ namespace ZoneContaminantPredictorCorrector {
                 CorrectZoneContaminants(state, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
 
             } else if (SELECT_CASE_var == iRevertZoneTimestepHistories) {
-                RevertZoneTimestepHistories();
+                RevertZoneTimestepHistories(state);
 
             } else if (SELECT_CASE_var == iPushZoneTimestepHistories) {
-                PushZoneTimestepHistories();
+                PushZoneTimestepHistories(state);
 
             } else if (SELECT_CASE_var == iPushSystemTimestepHistories) {
-                PushSystemTimestepHistories();
+                PushSystemTimestepHistories(state);
             }
         }
     }
@@ -209,7 +209,7 @@ namespace ZoneContaminantPredictorCorrector {
         Array1D_bool RepVarSet;
         std::string CurrentModuleObject;
 
-        RepVarSet.dimension(NumOfZones, true);
+        RepVarSet.dimension(state.dataGlobal->NumOfZones, true);
 
         MaxAlpha = -100;
         MaxNumber = -100;
@@ -1303,39 +1303,39 @@ namespace ZoneContaminantPredictorCorrector {
         if (state.dataZoneContaminantPredictorCorrector->MyOneTimeFlag) {
             // CO2
             if (Contaminant.CO2Simulation) {
-                ZoneCO2SetPoint.dimension(NumOfZones, 0.0);
-                CO2PredictedRate.dimension(NumOfZones, 0.0);
-                CO2ZoneTimeMinus1.dimension(NumOfZones, 0.0);
-                CO2ZoneTimeMinus2.dimension(NumOfZones, 0.0);
-                CO2ZoneTimeMinus3.dimension(NumOfZones, 0.0);
-                CO2ZoneTimeMinus4.dimension(NumOfZones, 0.0);
-                DSCO2ZoneTimeMinus1.dimension(NumOfZones, 0.0);
-                DSCO2ZoneTimeMinus2.dimension(NumOfZones, 0.0);
-                DSCO2ZoneTimeMinus3.dimension(NumOfZones, 0.0);
-                DSCO2ZoneTimeMinus4.dimension(NumOfZones, 0.0);
-                CO2ZoneTimeMinus1Temp.dimension(NumOfZones, 0.0);
-                CO2ZoneTimeMinus2Temp.dimension(NumOfZones, 0.0);
-                CO2ZoneTimeMinus3Temp.dimension(NumOfZones, 0.0);
-                ZoneCO2MX.dimension(NumOfZones, 0.0);
-                ZoneCO2M2.dimension(NumOfZones, 0.0);
-                ZoneCO21.dimension(NumOfZones, 0.0);
+                ZoneCO2SetPoint.dimension(state.dataGlobal->NumOfZones, 0.0);
+                CO2PredictedRate.dimension(state.dataGlobal->NumOfZones, 0.0);
+                CO2ZoneTimeMinus1.dimension(state.dataGlobal->NumOfZones, 0.0);
+                CO2ZoneTimeMinus2.dimension(state.dataGlobal->NumOfZones, 0.0);
+                CO2ZoneTimeMinus3.dimension(state.dataGlobal->NumOfZones, 0.0);
+                CO2ZoneTimeMinus4.dimension(state.dataGlobal->NumOfZones, 0.0);
+                DSCO2ZoneTimeMinus1.dimension(state.dataGlobal->NumOfZones, 0.0);
+                DSCO2ZoneTimeMinus2.dimension(state.dataGlobal->NumOfZones, 0.0);
+                DSCO2ZoneTimeMinus3.dimension(state.dataGlobal->NumOfZones, 0.0);
+                DSCO2ZoneTimeMinus4.dimension(state.dataGlobal->NumOfZones, 0.0);
+                CO2ZoneTimeMinus1Temp.dimension(state.dataGlobal->NumOfZones, 0.0);
+                CO2ZoneTimeMinus2Temp.dimension(state.dataGlobal->NumOfZones, 0.0);
+                CO2ZoneTimeMinus3Temp.dimension(state.dataGlobal->NumOfZones, 0.0);
+                ZoneCO2MX.dimension(state.dataGlobal->NumOfZones, 0.0);
+                ZoneCO2M2.dimension(state.dataGlobal->NumOfZones, 0.0);
+                ZoneCO21.dimension(state.dataGlobal->NumOfZones, 0.0);
 
-                ZoneSysContDemand.allocate(NumOfZones);
-                ZoneCO2Gain.dimension(NumOfZones, 0.0);
-                ZoneCO2GainFromPeople.dimension(NumOfZones, 0.0);
-                ZoneCO2GainExceptPeople.dimension(NumOfZones, 0.0); // Added for hybrid model
-                MixingMassFlowCO2.dimension(NumOfZones, 0.0);
-                ZoneAirDensityCO.dimension(NumOfZones, 0.0);
-                AZ.dimension(NumOfZones, 0.0);
-                BZ.dimension(NumOfZones, 0.0);
-                CZ.dimension(NumOfZones, 0.0);
+                ZoneSysContDemand.allocate(state.dataGlobal->NumOfZones);
+                ZoneCO2Gain.dimension(state.dataGlobal->NumOfZones, 0.0);
+                ZoneCO2GainFromPeople.dimension(state.dataGlobal->NumOfZones, 0.0);
+                ZoneCO2GainExceptPeople.dimension(state.dataGlobal->NumOfZones, 0.0); // Added for hybrid model
+                MixingMassFlowCO2.dimension(state.dataGlobal->NumOfZones, 0.0);
+                ZoneAirDensityCO.dimension(state.dataGlobal->NumOfZones, 0.0);
+                AZ.dimension(state.dataGlobal->NumOfZones, 0.0);
+                BZ.dimension(state.dataGlobal->NumOfZones, 0.0);
+                CZ.dimension(state.dataGlobal->NumOfZones, 0.0);
             }
 
-            CONTRAT.dimension(NumOfZones, 0.0);
+            CONTRAT.dimension(state.dataGlobal->NumOfZones, 0.0);
 
             // Allocate Derived Types
 
-            for (Loop = 1; Loop <= NumOfZones; ++Loop) {
+            for (Loop = 1; Loop <= state.dataGlobal->NumOfZones; ++Loop) {
                 // Zone CO2
                 if (Contaminant.CO2Simulation) {
                     SetupOutputVariable(state,
@@ -1364,37 +1364,37 @@ namespace ZoneContaminantPredictorCorrector {
 
             // Generic contaminant
             if (Contaminant.GenericContamSimulation) {
-                ZoneGCSetPoint.dimension(NumOfZones, 0.0);
-                GCPredictedRate.dimension(NumOfZones, 0.0);
-                GCZoneTimeMinus1.dimension(NumOfZones, 0.0);
-                GCZoneTimeMinus2.dimension(NumOfZones, 0.0);
-                GCZoneTimeMinus3.dimension(NumOfZones, 0.0);
-                GCZoneTimeMinus4.dimension(NumOfZones, 0.0);
-                DSGCZoneTimeMinus1.dimension(NumOfZones, 0.0);
-                DSGCZoneTimeMinus2.dimension(NumOfZones, 0.0);
-                DSGCZoneTimeMinus3.dimension(NumOfZones, 0.0);
-                DSGCZoneTimeMinus4.dimension(NumOfZones, 0.0);
-                GCZoneTimeMinus1Temp.dimension(NumOfZones, 0.0);
-                GCZoneTimeMinus2Temp.dimension(NumOfZones, 0.0);
-                GCZoneTimeMinus3Temp.dimension(NumOfZones, 0.0);
-                ZoneGCMX.dimension(NumOfZones, 0.0);
-                ZoneGCM2.dimension(NumOfZones, 0.0);
-                ZoneGC1.dimension(NumOfZones, 0.0);
+                ZoneGCSetPoint.dimension(state.dataGlobal->NumOfZones, 0.0);
+                GCPredictedRate.dimension(state.dataGlobal->NumOfZones, 0.0);
+                GCZoneTimeMinus1.dimension(state.dataGlobal->NumOfZones, 0.0);
+                GCZoneTimeMinus2.dimension(state.dataGlobal->NumOfZones, 0.0);
+                GCZoneTimeMinus3.dimension(state.dataGlobal->NumOfZones, 0.0);
+                GCZoneTimeMinus4.dimension(state.dataGlobal->NumOfZones, 0.0);
+                DSGCZoneTimeMinus1.dimension(state.dataGlobal->NumOfZones, 0.0);
+                DSGCZoneTimeMinus2.dimension(state.dataGlobal->NumOfZones, 0.0);
+                DSGCZoneTimeMinus3.dimension(state.dataGlobal->NumOfZones, 0.0);
+                DSGCZoneTimeMinus4.dimension(state.dataGlobal->NumOfZones, 0.0);
+                GCZoneTimeMinus1Temp.dimension(state.dataGlobal->NumOfZones, 0.0);
+                GCZoneTimeMinus2Temp.dimension(state.dataGlobal->NumOfZones, 0.0);
+                GCZoneTimeMinus3Temp.dimension(state.dataGlobal->NumOfZones, 0.0);
+                ZoneGCMX.dimension(state.dataGlobal->NumOfZones, 0.0);
+                ZoneGCM2.dimension(state.dataGlobal->NumOfZones, 0.0);
+                ZoneGC1.dimension(state.dataGlobal->NumOfZones, 0.0);
 
-                if (!allocated(ZoneSysContDemand)) ZoneSysContDemand.allocate(NumOfZones);
-                ZoneGCGain.dimension(NumOfZones, 0.0);
-                MixingMassFlowGC.dimension(NumOfZones, 0.0);
-                ZoneAirDensityGC.dimension(NumOfZones, 0.0);
-                AZGC.dimension(NumOfZones, 0.0);
-                BZGC.dimension(NumOfZones, 0.0);
-                CZGC.dimension(NumOfZones, 0.0);
+                if (!allocated(ZoneSysContDemand)) ZoneSysContDemand.allocate(state.dataGlobal->NumOfZones);
+                ZoneGCGain.dimension(state.dataGlobal->NumOfZones, 0.0);
+                MixingMassFlowGC.dimension(state.dataGlobal->NumOfZones, 0.0);
+                ZoneAirDensityGC.dimension(state.dataGlobal->NumOfZones, 0.0);
+                AZGC.dimension(state.dataGlobal->NumOfZones, 0.0);
+                BZGC.dimension(state.dataGlobal->NumOfZones, 0.0);
+                CZGC.dimension(state.dataGlobal->NumOfZones, 0.0);
             }
 
-            CONTRATGC.dimension(NumOfZones, 0.0);
+            CONTRATGC.dimension(state.dataGlobal->NumOfZones, 0.0);
 
             // Allocate Derived Types
 
-            for (Loop = 1; Loop <= NumOfZones; ++Loop) {
+            for (Loop = 1; Loop <= state.dataGlobal->NumOfZones; ++Loop) {
                 // Zone CO2
                 if (Contaminant.GenericContamSimulation) {
                     SetupOutputVariable(state, "Zone Air Generic Air Contaminant Concentration",
@@ -1493,7 +1493,7 @@ namespace ZoneContaminantPredictorCorrector {
                 for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig(ZoneNum).NumInletNodes; ++zoneInNode) {
                     int AirLoopNum = ZoneEquipConfig(ZoneNum).InletNodeAirLoopNum(zoneInNode);
                     ContaminantControlledZone(ContZoneNum).NumOfZones = 0;
-                    for (Loop = 1; Loop <= NumOfZones; ++Loop) {
+                    for (Loop = 1; Loop <= state.dataGlobal->NumOfZones; ++Loop) {
                         if (!ZoneEquipConfig(Loop).IsControlled) continue;
                         for (int zoneInNode2 = 1; zoneInNode2 <= ZoneEquipConfig(Loop).NumInletNodes; ++zoneInNode2) {
                             if (AirLoopNum == ZoneEquipConfig(Loop).InletNodeAirLoopNum(zoneInNode2)) {
@@ -1505,7 +1505,7 @@ namespace ZoneContaminantPredictorCorrector {
                     if (ContaminantControlledZone(ContZoneNum).NumOfZones > 0) {
                         ContaminantControlledZone(ContZoneNum).ControlZoneNum.allocate(ContaminantControlledZone(ContZoneNum).NumOfZones);
                         I = 1;
-                        for (Loop = 1; Loop <= NumOfZones; ++Loop) {
+                        for (Loop = 1; Loop <= state.dataGlobal->NumOfZones; ++Loop) {
                             if (!ZoneEquipConfig(Loop).IsControlled) continue;
                             for (int zoneInNode2 = 1; zoneInNode2 <= ZoneEquipConfig(Loop).NumInletNodes; ++zoneInNode2) {
                                 if (AirLoopNum == ZoneEquipConfig(Loop).InletNodeAirLoopNum(zoneInNode2)) {
@@ -1541,7 +1541,7 @@ namespace ZoneContaminantPredictorCorrector {
 
         // CO2 gain
         if (Contaminant.CO2Simulation) {
-            for (Loop = 1; Loop <= NumOfZones; ++Loop) {
+            for (Loop = 1; Loop <= state.dataGlobal->NumOfZones; ++Loop) {
                 SumAllInternalCO2Gains(Loop, ZoneCO2Gain(Loop));
                 if (HybridModel::FlagHybridModel_PC) {
                     SumAllInternalCO2GainsExceptPeople(Loop, ZoneCO2GainExceptPeople(Loop));
@@ -1597,10 +1597,10 @@ namespace ZoneContaminantPredictorCorrector {
             for (Loop = 1; Loop <= state.dataZoneContaminantPredictorCorrector->TotGCGenDecay; ++Loop) {
                 Sch = GetCurrentScheduleValue(state, ZoneContamGenericDecay(Loop).GCEmiRateSchedPtr);
                 ZoneNum = ZoneContamGenericDecay(Loop).ActualZoneNum;
-                if (Sch == 0.0 || state.dataGlobal->BeginEnvrnFlag || WarmupFlag) {
+                if (Sch == 0.0 || state.dataGlobal->BeginEnvrnFlag || state.dataGlobal->WarmupFlag) {
                     ZoneContamGenericDecay(Loop).GCTime = 0.0;
                 } else {
-                    ZoneContamGenericDecay(Loop).GCTime += TimeStepZoneSec;
+                    ZoneContamGenericDecay(Loop).GCTime += state.dataGlobal->TimeStepZoneSec;
                 }
                 GCGain = ZoneContamGenericDecay(Loop).GCInitEmiRate * Sch *
                          std::exp(-ZoneContamGenericDecay(Loop).GCTime / ZoneContamGenericDecay(Loop).GCDelayTime);
@@ -1685,7 +1685,7 @@ namespace ZoneContaminantPredictorCorrector {
         Real64 GCGain;             // Zone generic contaminant internal load
 
         // Update zone CO2
-        for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+        for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
 
             if (ShortenTimeStepSys) {
 
@@ -1757,8 +1757,8 @@ namespace ZoneContaminantPredictorCorrector {
 
             if (ZoneAirSolutionAlgo != Use3rdOrder) {
                 if (Contaminant.CO2Simulation) {
-                    if (ShortenTimeStepSys && TimeStepSys < TimeStepZone) {
-                        if (PreviousTimeStep < TimeStepZone) {
+                    if (ShortenTimeStepSys && TimeStepSys < state.dataGlobal->TimeStepZone) {
+                        if (PreviousTimeStep < state.dataGlobal->TimeStepZone) {
                             ZoneCO21(ZoneNum) = ZoneCO2M2(ZoneNum);
                         } else {
                             ZoneCO21(ZoneNum) = ZoneCO2MX(ZoneNum);
@@ -1769,8 +1769,8 @@ namespace ZoneContaminantPredictorCorrector {
                     }
                 }
                 if (Contaminant.GenericContamSimulation) {
-                    if (ShortenTimeStepSys && TimeStepSys < TimeStepZone) {
-                        if (PreviousTimeStep < TimeStepZone) {
+                    if (ShortenTimeStepSys && TimeStepSys < state.dataGlobal->TimeStepZone) {
+                        if (PreviousTimeStep < state.dataGlobal->TimeStepZone) {
                             ZoneGC1(ZoneNum) = ZoneGCM2(ZoneNum);
                         } else {
                             ZoneGC1(ZoneNum) = ZoneGCMX(ZoneNum);
@@ -1998,7 +1998,7 @@ namespace ZoneContaminantPredictorCorrector {
         }
     }
 
-    void PushZoneTimestepHistories()
+    void PushZoneTimestepHistories(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2015,7 +2015,7 @@ namespace ZoneContaminantPredictorCorrector {
 
         // Push the temperature and humidity ratio histories
 
-        for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+        for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             if (Contaminant.CO2Simulation) {
                 CO2ZoneTimeMinus4(ZoneNum) = CO2ZoneTimeMinus3(ZoneNum);
                 CO2ZoneTimeMinus3(ZoneNum) = CO2ZoneTimeMinus2(ZoneNum);
@@ -2044,7 +2044,7 @@ namespace ZoneContaminantPredictorCorrector {
         } // zone loop
     }
 
-    void PushSystemTimestepHistories()
+    void PushSystemTimestepHistories(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2061,7 +2061,7 @@ namespace ZoneContaminantPredictorCorrector {
 
         // Push the temperature and humidity ratio histories back in time
 
-        for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+        for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             if (Contaminant.CO2Simulation) {
                 DSCO2ZoneTimeMinus4(ZoneNum) = DSCO2ZoneTimeMinus3(ZoneNum);
                 DSCO2ZoneTimeMinus3(ZoneNum) = DSCO2ZoneTimeMinus2(ZoneNum);
@@ -2077,7 +2077,7 @@ namespace ZoneContaminantPredictorCorrector {
         } // zone loop
 
         if (ZoneAirSolutionAlgo != Use3rdOrder) {
-            for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+            for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 if (Contaminant.CO2Simulation) {
                     ZoneCO2M2(ZoneNum) = ZoneCO2MX(ZoneNum);
                     ZoneCO2MX(ZoneNum) = ZoneAirCO2Temp(ZoneNum); // using average for whole zone time step.
@@ -2090,7 +2090,7 @@ namespace ZoneContaminantPredictorCorrector {
         }
     }
 
-    void RevertZoneTimestepHistories()
+    void RevertZoneTimestepHistories(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2107,7 +2107,7 @@ namespace ZoneContaminantPredictorCorrector {
 
         // REvert the contaminnants histories
 
-        for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+        for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             if (Contaminant.CO2Simulation) {
                 CO2ZoneTimeMinus1(ZoneNum) = CO2ZoneTimeMinus2(ZoneNum);
                 CO2ZoneTimeMinus2(ZoneNum) = CO2ZoneTimeMinus3(ZoneNum);
@@ -2334,7 +2334,7 @@ namespace ZoneContaminantPredictorCorrector {
         int ZoneNum;
 
         // Update zone CO2
-        for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+        for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
 
             if (Contaminant.CO2Simulation) {
                 AZ(ZoneNum) = 0.0;
@@ -2417,7 +2417,7 @@ namespace ZoneContaminantPredictorCorrector {
 
             // Check to see if this is a controlled zone
             ControlledZoneAirFlag = false;
-            for (ZoneEquipConfigNum = 1; ZoneEquipConfigNum <= NumOfZones; ++ZoneEquipConfigNum) {
+            for (ZoneEquipConfigNum = 1; ZoneEquipConfigNum <= state.dataGlobal->NumOfZones; ++ZoneEquipConfigNum) {
                 if (!Zone(ZoneEquipConfigNum).IsControlled) continue;
                 if (ZoneEquipConfig(ZoneEquipConfigNum).ActualZoneNum != ZoneNum) continue;
                 ControlledZoneAirFlag = true;
@@ -2582,7 +2582,7 @@ namespace ZoneContaminantPredictorCorrector {
 
                 ZoneAirCO2(ZoneNum) = ZoneAirCO2Temp(ZoneNum);
 
-                if ((HybridModelZone(ZoneNum).InfiltrationCalc_C || HybridModelZone(ZoneNum).PeopleCountCalc_C) && (!WarmupFlag) && (!DoingSizing)) {
+                if ((HybridModelZone(ZoneNum).InfiltrationCalc_C || HybridModelZone(ZoneNum).PeopleCountCalc_C) && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing)) {
                     InverseModelCO2(state, ZoneNum, CO2Gain, CO2GainExceptPeople, ZoneMassFlowRate, CO2MassFlowRate, RhoAir);
                 }
                 // Now put the calculated info into the actual zone nodes; ONLY if there is zone air flow, i.e. controlled zone or plenum zone

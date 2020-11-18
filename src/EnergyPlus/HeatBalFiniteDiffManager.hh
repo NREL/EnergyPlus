@@ -227,7 +227,8 @@ namespace HeatBalFiniteDiffManager {
 
     void ReportFiniteDiffInits(EnergyPlusData &state);
 
-    void CalcNodeHeatFlux(int const Surf,    // surface number
+    void CalcNodeHeatFlux(EnergyPlusData &state,
+                          int const Surf,    // surface number
                           int const TotNodes // number of nodes in surface
     );
 

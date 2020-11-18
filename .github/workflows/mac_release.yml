@@ -6,8 +6,11 @@ on:
       - '*'
 
 env:
-  FC: /usr/local/bin/gfortran-9
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  BUILD_TYPE: Release
+  FC: /usr/local/bin/gfortran-9
+  MACOSX_DEPLOYMENT_TARGET: 10.15
+  SDKROOT: /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
 
 jobs:
   mac_release:
@@ -15,7 +18,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-#
+
     - name: Set up Python 3.7
       uses: actions/setup-python@v2
       with:
@@ -26,28 +29,37 @@ jobs:
         python -m pip install --upgrade pip
         pip install aqtinstall
 
-    - name: Install Brew dependencies
-      run: brew cask install mactex
+    - name: Install System dependencies and LaTeX
+      shell: bash
+      run: |
+        set -x
+        echo "Using brew to install mactex and adding it to PATH"
+        brew cask install mactex
+        echo "/Library/TeX/texbin" >> $GITHUB_PATH
 
     - name: Install IFW
-      run: aqt tool mac tools_ifw 3.2.2 qt.tools.ifw.32 --outputdir=${{runner.workspace}}/Qt
-
-    - name: Add IFW to PATH
-      run: echo "${{runner.workspace}}/Qt/Tools/QtInstallerFramework/3.2/bin" >> $GITHUB_PATH
-
-    - name: Add TeX to PATH
-      run: echo "/Library/TeX/texbin" >> $GITHUB_PATH
+      shell: bash
+      run: |
+        set -x
+        out_dir=${{ runner.workspace }}/Qt
+        aqt tool mac tools_ifw 4.0 qt.tools.ifw.40 --outputdir="$out_dir"
+        echo "$out_dir/Tools/QtInstallerFramework/4.0/bin" >> $GITHUB_PATH
 
     - name: Create Build Directory
-      run: cmake -E make_directory ${{runner.workspace}}/EnergyPlus/build
+      run: cmake -E make_directory ./build/
 
     - name: Configure CMake
+      working-directory: ./build
       shell: bash
-      working-directory: ${{runner.workspace}}/EnergyPlus/build
-      run: cmake -DCMAKE_BUILD_TYPE=Release -DLINK_WITH_PYTHON=ON -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 -DDOCUMENTATION_BUILD="BuildWithAll" -DTEX_INTERACTION="batchmode" -DBUILD_FORTRAN=ON -DBUILD_PACKAGE:BOOL=ON ..
+      run: |
+        cmake -DCMAKE_BUILD_TYPE=$BUILD_TYPE \
+              -DCMAKE_OSX_DEPLOYMENT_TARGET=$MACOSX_DEPLOYMENT_TARGET \
+              -DLINK_WITH_PYTHON=ON  -DBUILD_FORTRAN=ON -DBUILD_PACKAGE:BOOL=ON \
+              -DDOCUMENTATION_BUILD="BuildWithAll" -DTEX_INTERACTION="batchmode" \
+              ../
 
     - name: Build Package
-      working-directory: ${{runner.workspace}}/EnergyPlus/build
+      working-directory: ./build
       shell: bash
       run: cmake --build . --target package -j 2
 
@@ -55,18 +67,16 @@ jobs:
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: ${{runner.workspace}}/EnergyPlus/build/EnergyPlus-*-x86_64.tar.gz
+        file: build/EnergyPlus-*-x86_64.tar.gz
         tag: ${{ github.ref }}
         overwrite: true
         file_glob: true
-        asset_name: MacTarball
 
     - name: Upload DMG to release
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: ${{runner.workspace}}/EnergyPlus/build/EnergyPlus-*-x86_64.dmg
+        file: build/EnergyPlus-*-x86_64.dmg
         tag: ${{ github.ref }}
         overwrite: true
         file_glob: true
-        asset_name: MacInstaller

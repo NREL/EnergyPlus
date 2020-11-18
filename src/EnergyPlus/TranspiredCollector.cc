@@ -716,7 +716,6 @@ namespace TranspiredCollector {
         // na
 
         // Using/Aliasing
-        using namespace DataGlobals;
         using DataHVACGlobals::DoSetPointTest;
         using DataHVACGlobals::SetPointErrorFlag;
         using namespace DataLoopNode;
@@ -763,13 +762,13 @@ namespace TranspiredCollector {
         } // first time
 
         // Check that setpoint is active (from test by RJL in HVACEvapComponent)
-        if (!SysSizingCalc && state.dataTranspiredCollector->MySetPointCheckFlag && DoSetPointTest) {
+        if (!state.dataGlobal->SysSizingCalc && state.dataTranspiredCollector->MySetPointCheckFlag && DoSetPointTest) {
             for (UTSCUnitNum = 1; UTSCUnitNum <= state.dataTranspiredCollector->NumUTSC; ++UTSCUnitNum) {
                 for (SplitBranch = 1; SplitBranch <= state.dataTranspiredCollector->UTSC(UTSCUnitNum).NumOASysAttached; ++SplitBranch) {
                     ControlNode = state.dataTranspiredCollector->UTSC(UTSCUnitNum).ControlNode(SplitBranch);
                     if (ControlNode > 0) {
                         if (Node(ControlNode).TempSetPoint == SensedNodeFlagValue) {
-                            if (!AnyEnergyManagementSystemInModel) {
+                            if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                                 ShowSevereError(state, "Missing temperature setpoint for UTSC " + state.dataTranspiredCollector->UTSC(UTSCUnitNum).Name);
                                 ShowContinueError(state, " use a Setpoint Manager to establish a setpoint at the unit control node.");
                                 SetPointErrorFlag = true;
@@ -978,7 +977,7 @@ namespace TranspiredCollector {
                 }
                 ShowContinueError(state, "Occasional suction velocity messages are not unexpected when simulating actual conditions");
             }
-            ShowRecurringWarningErrorAtEnd("Solar Collector:Unglazed Transpired=\"" + state.dataTranspiredCollector->UTSC(UTSCNum).Name + "\", Suction velocity is outside of range",
+            ShowRecurringWarningErrorAtEnd(state, "Solar Collector:Unglazed Transpired=\"" + state.dataTranspiredCollector->UTSC(UTSCNum).Name + "\", Suction velocity is outside of range",
                                            state.dataTranspiredCollector->UTSC(UTSCNum).VsucErrIndex,
                                            Vsuction,
                                            Vsuction,

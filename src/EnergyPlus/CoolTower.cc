@@ -87,7 +87,6 @@ namespace CoolTower {
     // OTHER NOTES: none
 
     // Using/Aliasing
-    using namespace DataGlobals;
     using namespace DataHeatBalance;
 
     void ManageCoolTower(EnergyPlusData &state)

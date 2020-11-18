@@ -144,7 +144,7 @@ namespace EnergyPlus {
             //       MODIFIED       na
             //       RE-ENGINEERED  na
             int numSlabsCheck(inputProcessor->getNumObjectsFound(state, ObjName_ZoneCoupled_Slab));
-            DataGlobals::AnySlabsInModel = (numSlabsCheck > 0);
+            state.dataGlobal->AnySlabsInModel = (numSlabsCheck > 0);
         }
 
         void CheckIfAnyBasements(EnergyPlusData &state) {
@@ -154,10 +154,11 @@ namespace EnergyPlus {
             //       MODIFIED       na
             //       RE-ENGINEERED  na
             int const numBasementsCheck(inputProcessor->getNumObjectsFound(state, ObjName_ZoneCoupled_Basement));
-            DataGlobals::AnyBasementsInModel = (numBasementsCheck > 0);
+            state.dataGlobal->AnyBasementsInModel = (numBasementsCheck > 0);
         }
 
-        PlantComponent *Circuit::factory(EnergyPlusData &state, int EP_UNUSED(objectType), std::string objectName) {
+        PlantComponent *Circuit::factory(EnergyPlusData &state, [[maybe_unused]] int objectType, std::string objectName)
+        {
             // Process the input data for circuits if it hasn't been done already
             if (GetInputFlag) {
                 GetPipingSystemsAndGroundDomainsInput(state);
@@ -176,10 +177,12 @@ namespace EnergyPlus {
             return nullptr; // LCOV_EXCL_LINE
         }
 
-        void Circuit::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
-                               bool const EP_UNUSED(FirstHVACIteration),
-                               Real64 &EP_UNUSED(CurLoad),
-                               bool const EP_UNUSED(RunFlag)) {
+        void Circuit::simulate(EnergyPlusData &state,
+                               [[maybe_unused]] const PlantLocation &calledFromLocation,
+                               [[maybe_unused]] bool const FirstHVACIteration,
+                               [[maybe_unused]] Real64 &CurLoad,
+                               [[maybe_unused]] bool const RunFlag)
+        {
             // Retrieve the parent domain index for this pipe circuit
             auto &thisDomain(domains[this->ParentDomainIndex]);
 
@@ -225,9 +228,9 @@ namespace EnergyPlus {
                 // The time init should be done here before we DoOneTimeInits because the DoOneTimeInits
                 // includes a ground temperature initialization, which is based on the Cur%CurSimTimeSeconds variable
                 // which would be carried over from the previous environment
-                thisDomain.Cur.CurSimTimeStepSize = DataGlobals::TimeStepZone * DataGlobalConstants::SecInHour();
-                thisDomain.Cur.CurSimTimeSeconds = ((state.dataGlobal->DayOfSim - 1) * 24 + (DataGlobals::HourOfDay - 1) +
-                                                    (DataGlobals::TimeStep - 1) * DataGlobals::TimeStepZone +
+                thisDomain.Cur.CurSimTimeStepSize = state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour();
+                thisDomain.Cur.CurSimTimeSeconds = ((state.dataGlobal->DayOfSim - 1) * 24 + (state.dataGlobal->HourOfDay - 1) +
+                                                    (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone +
                                                     DataHVACGlobals::SysTimeElapsed) * DataGlobalConstants::SecInHour();
 
                 // There are also some inits that are "close to one time" inits...( one-time in standalone, each envrn in E+ )
@@ -1478,15 +1481,14 @@ namespace EnergyPlus {
             }
         }
 
-        bool SiteGroundDomainUsingNoMassMat(EnergyPlusData &EP_UNUSED(state), Real64 const MaterialThickness,
-                                            int const MaterialNum) {
+        bool SiteGroundDomainUsingNoMassMat([[maybe_unused]] EnergyPlusData &state, Real64 const MaterialThickness, int const MaterialNum)
+        {
 
             if ( (MaterialThickness <= 0.0) || (dataMaterial.Material(MaterialNum).ROnly) ) {
                 return true;
             } else {
                 return false;
             }
-
         }
 
         void SiteGroundDomainNoMassMatError(EnergyPlusData &state, std::string const &FieldName,
@@ -2187,8 +2189,8 @@ namespace EnergyPlus {
             // includes a ground temperature initialization, which is based on the Cur%CurSimTimeSeconds variable
             // which would be carried over from the previous environment
             this->Cur.CurSimTimeStepSize = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
-            this->Cur.CurSimTimeSeconds = (state.dataGlobal->DayOfSim - 1) * 24 + (DataGlobals::HourOfDay - 1) +
-                                          (DataGlobals::TimeStep - 1) * DataGlobals::TimeStepZone +
+            this->Cur.CurSimTimeSeconds = (state.dataGlobal->DayOfSim - 1) * 24 + (state.dataGlobal->HourOfDay - 1) +
+                                          (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone +
                                           DataHVACGlobals::SysTimeElapsed;
 
             // There are also some inits that are "close to one time" inits...(one-time in standalone, each envrn in E+)
@@ -2764,7 +2766,8 @@ namespace EnergyPlus {
             this->setupPipeCircuitInOutCells();
         }
 
-        void Domain::createPartitionCenterList(EnergyPlusData &EP_UNUSED(state)) {
+        void Domain::createPartitionCenterList([[maybe_unused]] EnergyPlusData &state)
+        {
 
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Edwin Lee

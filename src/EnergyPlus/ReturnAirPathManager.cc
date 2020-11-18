@@ -245,7 +245,7 @@ namespace ReturnAirPathManager {
         }
     }
 
-    void InitReturnAirPath(int &EP_UNUSED(ReturnAirPathNum)) // unused1208
+    void InitReturnAirPath([[maybe_unused]] int &ReturnAirPathNum) // unused1208
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Russ Taylor
@@ -309,7 +309,7 @@ namespace ReturnAirPathManager {
         }
     }
 
-    void ReportReturnAirPath(int &EP_UNUSED(ReturnAirPathNum)) // unused1208
+    void ReportReturnAirPath([[maybe_unused]] int &ReturnAirPathNum) // unused1208
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Russ Taylor

@@ -58,6 +58,9 @@
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+
 namespace OutputReportPredefined {
 
     // Using/Aliasing
@@ -1064,7 +1067,7 @@ namespace OutputReportPredefined {
     // Functions
     void clear_state();
 
-    void SetPredefinedTables();
+    void SetPredefinedTables(EnergyPlusData &state);
 
 
     // Creates an entry for predefined tables when the entry
