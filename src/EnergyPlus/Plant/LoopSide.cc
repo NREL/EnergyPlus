@@ -1315,7 +1315,6 @@ namespace DataPlant {
         using DataBranchAirLoopPlant::ControlType_Bypass;
         using DataBranchAirLoopPlant::ControlType_Passive;
         using DataBranchAirLoopPlant::ControlType_SeriesActive;
-        using DataBranchAirLoopPlant::MassFlowTolerance;
         using DataLoopNode::Node;
         using DataPlant::TypeOf_PumpBankVariableSpeed;
         using DataPlant::TypeOf_PumpVariableSpeed;
@@ -1475,7 +1474,7 @@ namespace DataPlant {
             }
 
             // IF SUFFICIENT FLOW TO MEET ALL PARALLEL BRANCH FLOW REQUESTS
-            if (FlowRemaining < MassFlowTolerance) { // no flow available at all for splitter
+            if (FlowRemaining < DataBranchAirLoopPlant::MassFlowTolerance) { // no flow available at all for splitter
                 for (OutletNum = 1; OutletNum <= NumSplitOutlets; ++OutletNum) {
                     SplitterBranchOut = this->Splitter.BranchNumOut(OutletNum);
                     for (CompCounter = 1;
@@ -1502,11 +1501,11 @@ namespace DataPlant {
                         // branch flow is min of requested flow and remaining flow
                         Node(FirstNodeOnBranch).MassFlowRate = min(Node(FirstNodeOnBranch).MassFlowRate,
                                                                    FlowRemaining);
-                        if (Node(FirstNodeOnBranch).MassFlowRate < MassFlowTolerance)
+                        if (Node(FirstNodeOnBranch).MassFlowRate < DataBranchAirLoopPlant::MassFlowTolerance)
                             Node(FirstNodeOnBranch).MassFlowRate = 0.0;
                         this->PushBranchFlowCharacteristics(SplitterBranchOut, Node(FirstNodeOnBranch).MassFlowRate, FirstHVACIteration);
                         FlowRemaining -= Node(FirstNodeOnBranch).MassFlowRate;
-                        if (FlowRemaining < MassFlowTolerance) FlowRemaining = 0.0;
+                        if (FlowRemaining < DataBranchAirLoopPlant::MassFlowTolerance) FlowRemaining = 0.0;
                     }
                 }
                 // IF the active branches take the entire loop flow, return
@@ -1671,7 +1670,7 @@ namespace DataPlant {
                 }
 
                 // 1b) check if flow all apportioned
-                if (FlowRemaining > MassFlowTolerance) {
+                if (FlowRemaining > DataBranchAirLoopPlant::MassFlowTolerance) {
                     // Call fatal diagnostic error. !The math should work out!
                     ShowSevereError(state, "ResolveParallelFlows: Dev note, failed to redistribute restricted flow");
                     ShowContinueErrorTimeStamp(state, "");
@@ -1965,7 +1964,6 @@ namespace DataPlant {
         //    Therefore they are not included
 
         // Using/Aliasing
-        using DataBranchAirLoopPlant::MassFlowTolerance;
         using DataLoopNode::Node;
         using DataPlant::FlowLocked;
         using DataPlant::FlowUnlocked;
@@ -2017,7 +2015,7 @@ namespace DataPlant {
         }
 
         // Leave early if there wasn't a mass flow rate or request
-        if (ComponentMassFlowRate < MassFlowTolerance) return;
+        if (ComponentMassFlowRate < DataBranchAirLoopPlant::MassFlowTolerance) return;
 
         // Get an average temperature for the property call
         Real64 const InletTemp(Node(InletNode).Temp);

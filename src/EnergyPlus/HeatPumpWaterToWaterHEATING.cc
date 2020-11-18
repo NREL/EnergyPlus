@@ -555,7 +555,6 @@ namespace HeatPumpWaterToWaterHEATING {
         // Using/Aliasing
         using DataHVACGlobals::SysTimeElapsed;
         using namespace FluidProperties;
-        using DataBranchAirLoopPlant::MassFlowTolerance;
         using DataPlant::PlantLoop;
         using General::TrimSigDigits;
         using PlantUtilities::SetComponentFlowRate;
@@ -655,7 +654,7 @@ namespace HeatPumpWaterToWaterHEATING {
                                  this->SourceBranchNum,
                                  this->SourceCompNum);
             // if there's no flow, turn the "heat pump off"
-            if (this->LoadSideWaterMassFlowRate < MassFlowTolerance || this->SourceSideWaterMassFlowRate < MassFlowTolerance) {
+            if (this->LoadSideWaterMassFlowRate < DataBranchAirLoopPlant::MassFlowTolerance || this->SourceSideWaterMassFlowRate < DataBranchAirLoopPlant::MassFlowTolerance) {
                 this->LoadSideWaterMassFlowRate = 0.0;
                 SetComponentFlowRate(state, this->LoadSideWaterMassFlowRate,
                                      this->LoadSideInletNodeNum,

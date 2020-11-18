@@ -625,7 +625,6 @@ namespace PlantUtilities {
         // compare flow rate of splitter inlet to flow rate of mixer outlet
 
         // Using/Aliasing
-        using DataBranchAirLoopPlant::MassFlowTolerance;
         using DataLoopNode::Node;
         using DataPlant::CriteriaDelta_MassFlowRate;
         using DataPlant::DemandSide;
@@ -651,7 +650,7 @@ namespace PlantUtilities {
                 SplitterInletNode = PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter.NodeNumIn;
 
                 AbsDifference = std::abs(Node(SplitterInletNode).MassFlowRate - Node(MixerOutletNode).MassFlowRate);
-                if (AbsDifference > MassFlowTolerance) {
+                if (AbsDifference > DataBranchAirLoopPlant::MassFlowTolerance) {
                     if (PlantLoop(LoopNum).MFErrIndex1 == 0) {
                         ShowSevereMessage(state, "Plant flows do not resolve -- splitter inlet flow does not match mixer outlet flow ");
                         ShowContinueErrorTimeStamp(state, "");
@@ -670,7 +669,7 @@ namespace PlantUtilities {
                                                   _,
                                                   "kg/s",
                                                   "kg/s");
-                    if (AbsDifference > MassFlowTolerance * 10.0) {
+                    if (AbsDifference > DataBranchAirLoopPlant::MassFlowTolerance * 10.0) {
                         ShowSevereError(state, "Plant flows do not resolve -- splitter inlet flow does not match mixer outlet flow ");
                         ShowContinueErrorTimeStamp(state, "");
                         ShowContinueError(state, "PlantLoop name= " + PlantLoop(LoopNum).Name);
@@ -1076,7 +1075,6 @@ namespace PlantUtilities {
         // update outlet conditions if needed or possible
 
         // Using/Aliasing
-        using DataBranchAirLoopPlant::MassFlowTolerance;
         using DataLoopNode::Node;
         using DataPlant::PlantLoop;
         using FluidProperties::GetSpecificHeatGlycol;
@@ -1111,7 +1109,7 @@ namespace PlantUtilities {
 
         if (DidAnythingChange || FirstHVACIteration) {
             // use current mass flow rate and inlet temp from Node and recalculate outlet temp
-            if (Node(InletNodeNum).MassFlowRate > MassFlowTolerance) {
+            if (Node(InletNodeNum).MassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
                 // update node outlet conditions
                 Cp = GetSpecificHeatGlycol(state, PlantLoop(LoopNum).FluidName, ModelInletTemp, PlantLoop(LoopNum).FluidIndex, RoutineName);
                 Node(OutletNodeNum).Temp = Node(InletNodeNum).Temp + ModelCondenserHeatRate / (Node(InletNodeNum).MassFlowRate * Cp);
@@ -1164,7 +1162,6 @@ namespace PlantUtilities {
         // update outlet conditions if needed or possible
 
         // Using/Aliasing
-        using DataBranchAirLoopPlant::MassFlowTolerance;
         using DataLoopNode::Node;
         using DataPlant::PlantLoop;
         using FluidProperties::GetSpecificHeatGlycol;
@@ -1198,7 +1195,7 @@ namespace PlantUtilities {
 
         if (DidAnythingChange || FirstHVACIteration) {
             // use current mass flow rate and inlet temp from Node and recalculate outlet temp
-            if (Node(InletNodeNum).MassFlowRate > MassFlowTolerance) {
+            if (Node(InletNodeNum).MassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
                 // update node outlet conditions
                 Cp = GetSpecificHeatGlycol(state, PlantLoop(LoopNum).FluidName, ModelInletTemp, PlantLoop(LoopNum).FluidIndex, RoutineName);
                 Node(OutletNodeNum).Temp = Node(InletNodeNum).Temp + ModelRecoveryHeatRate / (Node(InletNodeNum).MassFlowRate * Cp);

@@ -63,26 +63,7 @@ namespace DataBranchAirLoopPlant {
     // Certain data needs to be shared from Branch to Airloop to Plant and this module should
     // alleviate cyclic dependencies.
 
-    // METHODOLOGY EMPLOYED:
-    // na
-
-    // REFERENCES:
-    // na
-
-    // OTHER NOTES:
-    // na
-
-    // USE STATEMENTS:
-    // <use statements for data only modules>
-    // Using/Aliasing
-    // <use statements for access to subroutines in other modules>
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // Parameters for tolerance
-    Real64 const MassFlowTolerance(0.000000001); // minimum significant mass flow rate (kg/s)
-
-    // Pressure Curve Type: None, pressure, or generic curve (if generic it will be a postive value which is the curve manager index)
+    // Pressure Curve Type: None, pressure, or generic curve (if generic it will be a positive value which is the curve manager index)
     int const PressureCurve_Error(-1);
     int const PressureCurve_None(0);
     int const PressureCurve_Pressure(1);
