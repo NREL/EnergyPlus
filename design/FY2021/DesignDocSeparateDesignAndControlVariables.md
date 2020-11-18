@@ -63,7 +63,7 @@ University of Illinois at Urbana-Champaign and Center for the Built Environment(
 
 
  - Design document:   
-	 - Send for reviews------------------ Nov X 2020   
+	 - Send for reviews------------------ Nov 18 2020   
 	 - Finalize design document-------- Dec 18 2020
  - Implementation:   
 	 - First draft of Implementation---- Jan 31 2021
