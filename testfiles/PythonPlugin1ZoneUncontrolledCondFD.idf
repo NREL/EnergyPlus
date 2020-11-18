@@ -257,13 +257,6 @@
     0.7,                     !- Solar Absorptance
     0.7;                     !- Visible Absorptance
 
-  Construction,
-    WallExtInsFin1,          !- Name
-    Vinyl&#44 Light,         !- Outside Layer
-    WallSheathing,           !- Layer 2
-    WallStudAndCavityk1,     !- Layer 3
-    Drywall 0.5 in.;         !- Layer 4
-
   Material,
     Drywall 0.5 in.,         !- Name
     Rough,                   !- Roughness
@@ -274,6 +267,13 @@
     0.9,                     !- Thermal Absorptance
     0.5,                     !- Solar Absorptance
     0.1;                     !- Visible Absorptance
+
+  Construction,
+    WallExtInsFin1,          !- Name
+    Vinyl&#44 Light,         !- Outside Layer
+    WallSheathing,           !- Layer 2
+    WallStudAndCavityk1,     !- Layer 3
+    Drywall 0.5 in.;         !- Layer 4
 
   Construction,
     FLOOR,                   !- Name
