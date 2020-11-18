@@ -52,15 +52,14 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
-namespace EnergyPlus::DataBranchAirLoopPlant {
+namespace EnergyPlus {
 
-    // Using/Aliasing
+namespace DataBranchAirLoopPlant {
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
     // Parameters for tolerance
     constexpr Real64 MassFlowTolerance(0.000000001); // minimum significant mass flow rate (kg/s)
 
@@ -83,9 +82,6 @@ namespace EnergyPlus::DataBranchAirLoopPlant {
         Bypass
     };
 
-    // MODULE VARIABLE DECLARATIONS:
-    extern int NumPressureCurves;
-
     // Types
 
     struct PlantPressureCurveData
@@ -100,7 +96,7 @@ namespace EnergyPlus::DataBranchAirLoopPlant {
         Real64 ConstantF;             // - Constant value of f (if applicable)               [-]
         bool EMSOverrideOn;           // if TRUE, then EMS is calling to override curve value
         Real64 EMSOverrideCurveValue; // Value of curve result EMS is directing to use
-        //  report variables.
+                                      //  report variables.
         Real64 CurveOutput;
         Real64 CurveInput1; // - MassFlow                                         [kg/s]
         Real64 CurveInput2; // - Density                                          [kg/m3]
@@ -113,11 +109,19 @@ namespace EnergyPlus::DataBranchAirLoopPlant {
         {
         }
     };
+}
 
-    // Object Data
-    extern Array1D<PlantPressureCurveData> PressureCurve;
+struct DataBranchAirLoopPlantData : BaseGlobalStruct {
 
-    void clear_state();
+    int NumPressureCurves = 0;
+    Array1D<DataBranchAirLoopPlant::PlantPressureCurveData> PressureCurve;
+
+    void clear_state() override
+    {
+        this->NumPressureCurves = 0;
+        this->PressureCurve.deallocate();
+    }
+};
 
 } // namespace EnergyPlus
 
