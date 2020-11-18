@@ -117,7 +117,7 @@ namespace DataSurfaces {
         Fin,
         TDD_Dome,
         TDD_Diffuser,
-        SurfaceClassCount // The counter representing the total number of surface class, always stays at the bottom
+        Count // The counter representing the total number of surface class, always stays at the bottom
     };
 
     // Parameters to indicate exterior boundary conditions for use with
