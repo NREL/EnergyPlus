@@ -55,9 +55,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
-namespace EnergyPlus {
-
-namespace DataBranchAirLoopPlant {
+namespace EnergyPlus::DataBranchAirLoopPlant {
 
     // Using/Aliasing
 
@@ -76,14 +74,14 @@ namespace DataBranchAirLoopPlant {
     };
 
     // Parameters for flow Control Types for branch flow resolution inside splitter/mixers
-    extern int const ControlType_Unknown;
-    extern int const ControlType_Active;       // 'Active'
-    extern int const ControlType_Passive;      // 'Passive'
-    extern int const ControlType_SeriesActive; // 'SeriesActive'
-    extern int const ControlType_Bypass;       // 'Bypass
-    extern Array1D_string const cControlType;
-
-    // DERIVED TYPE DEFINITIONS:
+    enum class ControlTypeEnum
+    {
+        Unknown,
+        Active,
+        Passive,
+        SeriesActive,
+        Bypass
+    };
 
     // MODULE VARIABLE DECLARATIONS:
     extern int NumPressureCurves;
@@ -120,8 +118,6 @@ namespace DataBranchAirLoopPlant {
     extern Array1D<PlantPressureCurveData> PressureCurve;
 
     void clear_state();
-
-} // namespace DataBranchAirLoopPlant
 
 } // namespace EnergyPlus
 

@@ -47,9 +47,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
-namespace EnergyPlus {
-
-namespace DataBranchAirLoopPlant {
+namespace EnergyPlus::DataBranchAirLoopPlant {
 
     // Module containing the routines dealing with the <module_name>
 
@@ -62,16 +60,6 @@ namespace DataBranchAirLoopPlant {
     // PURPOSE OF THIS MODULE:
     // Certain data needs to be shared from Branch to Airloop to Plant and this module should
     // alleviate cyclic dependencies.
-
-    // Parameters for flow Control Types for branch flow resolution inside splitter/mixers
-    int const ControlType_Unknown(0);
-    int const ControlType_Active(1);       // 'Active'
-    int const ControlType_Passive(2);      // 'Passive'
-    int const ControlType_SeriesActive(3); // 'SeriesActive'
-    int const ControlType_Bypass(4);       // 'Bypass
-    Array1D_string const cControlType({0, 4}, {"Unknown", "Active", "Passive", "SeriesActive", "Bypass"});
-
-    // DERIVED TYPE DEFINITIONS:
 
     // MODULE VARIABLE DECLARATIONS:
     int NumPressureCurves(0);
@@ -88,7 +76,5 @@ namespace DataBranchAirLoopPlant {
     // SUBROUTINE SPECIFICATIONS FOR MODULE
 
     //=================================================================================================!
-
-} // namespace DataBranchAirLoopPlant
 
 } // namespace EnergyPlus

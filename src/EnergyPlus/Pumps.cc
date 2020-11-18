@@ -1737,7 +1737,6 @@ namespace Pumps {
         // Energy Calculations, ASHRAE, 1993, pp2-10 to 2-15
 
         // Using/Aliasing
-        using DataBranchAirLoopPlant::ControlType_SeriesActive;
         using DataPlant::PlantLoop;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
@@ -1808,7 +1807,7 @@ namespace Pumps {
                     .LoopSide(PumpEquip(PumpNum).LoopSideNum)
                     .Branch(PumpEquip(PumpNum).BranchNum)
                     .Comp(PumpEquip(PumpNum).CompNum)
-                    .FlowCtrl == ControlType_SeriesActive) {
+                    .FlowCtrl == DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive) {
                 PumpMassFlowRate = 0.0;
             }
         }

@@ -285,7 +285,7 @@ namespace PlantUtilities {
                 DataLoopNode::Node(OutletNode).MassFlowRate = CompFlow;
                 DataLoopNode::Node(InletNode).MassFlowRate = DataLoopNode::Node(OutletNode).MassFlowRate;
             } else { // bound the flow by Min/Max available and hardware limits
-                if (comp.FlowCtrl == DataBranchAirLoopPlant::ControlType_SeriesActive) {
+                if (comp.FlowCtrl == DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive) {
                     // determine highest flow request for all the components on the branch
                     Real64 SeriesBranchHighFlowRequest = 0.0;
                     Real64 SeriesBranchHardwareMaxLim = DataLoopNode::Node(InletNode).MassFlowRateMax;
