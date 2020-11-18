@@ -55,7 +55,6 @@
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataBranchNodeConnections.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
@@ -217,7 +216,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     CoilCoolingDX::clear_state();
     AirflowNetwork::clear_state();
     DataBranchAirLoopPlant::clear_state();
-    DataAirSystems::clear_state();
     DataBranchNodeConnections::clear_state();
     state.dataConstruction->clear_state();
     DataContaminantBalance::clear_state();
