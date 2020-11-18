@@ -1367,7 +1367,7 @@ namespace SurfaceGeometry {
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             // Group air boundary surfaces first within each zone
             for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-                if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass_Moved) continue;
+                if (SurfaceTmpClassMoved(SurfNum)) continue;
                 if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Zone != ZoneNum) continue;
                 int constNum = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Construction;
                 if (constNum == 0) continue;
@@ -1384,7 +1384,7 @@ namespace SurfaceGeometry {
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).BaseSurf = -1; // Default has base surface = base surface
                     Surface(MovedSurfs).BaseSurf = MovedSurfs;
                 }
-                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class = SurfaceClass_Moved; //'Moved'
+                SurfaceTmpClassMoved(SurfNum) = true; //'Moved'
                 // Store list of moved surface numbers in reporting order
                 DataSurfaces::AllSurfaceListReportOrder.push_back(MovedSurfs);
             }
@@ -1395,7 +1395,7 @@ namespace SurfaceGeometry {
 
                 for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
 
-                    if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass_Moved) continue;
+                    if (SurfaceTmpClassMoved(SurfNum)) continue;
                     if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Zone == 0) continue;
 
                     if (!UtilityRoutines::SameString(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ZoneName, Zone(ZoneNum).Name)) continue;
@@ -1413,7 +1413,6 @@ namespace SurfaceGeometry {
                     //  Find all subsurfaces to this surface - just to update the base surface number - don't move these yet
                     for (int SubSurfNum = 1; SubSurfNum <= TotSurfaces; ++SubSurfNum) {
 
-                        if (state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).Class == SurfaceClass_Moved) continue;
                         if (state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).Zone == 0) continue;
                         if (state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).BaseSurf != SurfNum) continue;
                         // Set BaseSurf to negative of new BaseSurfNum (to avoid confusion with other base surfaces)
@@ -1427,7 +1426,7 @@ namespace SurfaceGeometry {
             // Internal mass goes next
             for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
 
-                if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass_Moved) continue;
+                if (SurfaceTmpClassMoved(SurfNum)) continue;
                 if (!UtilityRoutines::SameString(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ZoneName, Zone(ZoneNum).Name)) continue;
                 if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class != SurfaceClass::IntMass) continue;
                 ++MovedSurfs;
