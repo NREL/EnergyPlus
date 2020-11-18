@@ -5000,7 +5000,10 @@ namespace SolarShading {
                         }
                         GSS(NGSS) = GSSNR;
 
-                    } else if ((Surface(GSSNR).BaseSurf == 0) || (Surface(GSSNR).BaseSurf == GSSNR)) { // Detached shadowing surface or | any other base surface
+                    } else if ((Surface(GSSNR).BaseSurf == 0) ||
+                               ((Surface(GSSNR).BaseSurf == GSSNR) &&
+                                ((Surface(GSSNR).ExtBoundCond == ExternalEnvironment) ||
+                                 Surface(GSSNR).ExtBoundCond == OtherSideCondModeledExt))) { // Detached shadowing surface or | any other base surface
                                                                                              // exposed to outside environment
 
                         CHKGSS(GRSNR, GSSNR, ZMIN, CannotShade); // Check to see if this can shade the receiving surface
@@ -6085,7 +6088,7 @@ namespace SolarShading {
             //--------------------------------------------------------------------------------------------------------
             for (int const SurfNum : thisEnclosure.SurfacePtr) {
                 if (Surface(SurfNum).Class != SurfaceClass::Window && Surface(SurfNum).Class != SurfaceClass::TDD_Dome) continue;
-                if (!Surface(SurfNum).ExtSolar) continue;
+                if (!Surface(SurfNum).ExtSolar && SurfWinOriginalClass(SurfNum) != SurfaceClass::TDD_Diffuser) continue;
                 int ConstrNum = Surface(SurfNum).Construction;
                 int ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
                 if (SurfWinStormWinFlag(SurfNum) == 1) {
