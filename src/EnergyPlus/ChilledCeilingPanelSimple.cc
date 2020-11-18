@@ -1704,7 +1704,6 @@ namespace CoolingPanelSimple {
         using DataSurfaces::IntBlindOn;
         using DataSurfaces::IntShadeOn;
         using DataSurfaces::Surface;
-        using DataSurfaces::SurfaceClass_Window;
         using DataSurfaces::SurfWinShadingFlag;
         using DataSurfaces::SurfWinFrameArea;
         using DataSurfaces::SurfWinProjCorrFrIn;
@@ -1731,7 +1730,7 @@ namespace CoolingPanelSimple {
 
             Area = ThisSurf.Area;
 
-            if (ThisSurf.Class == SurfaceClass_Window) {
+            if (ThisSurf.Class == DataSurfaces::SurfaceClass::Window) {
 
                 if (SurfWinShadingFlag(SurfNum) == IntShadeOn || SurfWinShadingFlag(SurfNum) == IntBlindOn) {
                     // The area is the shade or blind area = the sum of the glazing area and the divider area (which is zero if no divider)

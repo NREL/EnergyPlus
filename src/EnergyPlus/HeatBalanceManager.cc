@@ -5905,7 +5905,7 @@ namespace HeatBalanceManager {
 
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
             auto &thisSurface(DataSurfaces::Surface(SurfNum));
-            if (thisSurface.Class == DataSurfaces::SurfaceClass_Window) {
+            if (thisSurface.Class == DataSurfaces::SurfaceClass::Window) {
                 auto &thisConstruct(thisSurface.Construction);
                 if (!state.dataConstruction->Construct(thisConstruct).WindowTypeBSDF && !state.dataConstruction->Construct(thisConstruct).TypeIsAirBoundaryInteriorWindow) {
                     SurfWinFenLaySurfTempFront(1, SurfNum) = TH(1, 1, SurfNum);
@@ -7762,7 +7762,7 @@ namespace HeatBalanceManager {
 
         for (iSurf = Zone(ZoneNum).SurfaceFirst; iSurf <= Zone(ZoneNum).SurfaceLast; ++iSurf) {
             iConst = Surface(iSurf).Construction;
-            if (Surface(iSurf).Class == SurfaceClass_Window) {
+            if (Surface(iSurf).Class == SurfaceClass::Window) {
                 SchedPtr = WindowScheduledSolarAbs(iSurf, iConst);
             } else {
                 SchedPtr = SurfaceScheduledSolarInc(iSurf, iConst);
@@ -7795,7 +7795,7 @@ namespace HeatBalanceManager {
         if ((!ZoneScheduled) && (!ZoneUnscheduled)) {
             for (iSurf = Zone(ZoneNum).SurfaceFirst; iSurf <= Zone(ZoneNum).SurfaceLast; ++iSurf) {
                 iConst = Surface(iSurf).Construction;
-                if (Surface(iSurf).Class == SurfaceClass_Window) {
+                if (Surface(iSurf).Class == SurfaceClass::Window) {
                     SchedPtr = WindowScheduledSolarAbs(iSurf, iConst);
                 } else {
                     SchedPtr = SurfaceScheduledSolarInc(iSurf, iConst);

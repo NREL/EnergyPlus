@@ -132,7 +132,7 @@ namespace PluginManagement {
         return "Linked to Python Version: \"" + sVersion + "\"";
     }
 #else
-    std::string pythonStringForUsage(state)
+    std::string pythonStringForUsage(EnergyPlusData &state)
     {
         return "This version of EnergyPlus not linked to Python library.";
     }
