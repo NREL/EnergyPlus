@@ -123,9 +123,9 @@ TEST_F(EnergyPlusFixture, SkyTempTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
     Array2D<Real64> TomorrowSkyTemp; // Sky temperature
-    DataGlobals::NumOfTimeStepInHour = 4;
-    DataGlobals::MinutesPerTimeStep = 60 / DataGlobals::NumOfTimeStepInHour;
-    TomorrowSkyTemp.allocate(DataGlobals::NumOfTimeStepInHour, 24);
+    state.dataGlobal->NumOfTimeStepInHour = 4;
+    state.dataGlobal->MinutesPerTimeStep = 60 / state.dataGlobal->NumOfTimeStepInHour;
+    TomorrowSkyTemp.allocate(state.dataGlobal->NumOfTimeStepInHour, 24);
     TomorrowSkyTemp = 0.0;
 
     // Febuary 27
@@ -670,7 +670,7 @@ TEST_F(EnergyPlusFixture, WeatherManager_NoLocation) {
     ASSERT_TRUE(process_idf(idf_objects));
 
     state.dataGlobal->BeginSimFlag = false;
-    DataGlobals::NumOfTimeStepInHour = 4;
+    state.dataGlobal->NumOfTimeStepInHour = 4;
     state.dataWeatherManager->LocationGathered = false;
 
     bool Available{false};
@@ -753,8 +753,8 @@ TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
 
     state.dataWeatherManager->Environment(1).DesignDayNum = 1;
     state.dataWeatherManager->Environment(1).WP_Type1 = 0;
-    DataGlobals::MinutesPerTimeStep = 60;
-    DataGlobals::NumOfTimeStepInHour = 1;
+    state.dataGlobal->MinutesPerTimeStep = 60;
+    state.dataGlobal->NumOfTimeStepInHour = 1;
     state.dataGlobal->BeginSimFlag = true;
     DataReportingFlags::DoWeatherInitReporting = true;
 
@@ -770,7 +770,7 @@ TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
 
     unsigned n_RH_not100 = 0;
     for (int Hour = 1; Hour <= 24; ++Hour) {
-        for (int TS = 1; TS <= DataGlobals::NumOfTimeStepInHour; ++TS) {
+        for (int TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
             EXPECT_GE(state.dataWeatherManager->TomorrowOutRelHum(TS, Hour), 0.);
             EXPECT_LE(state.dataWeatherManager->TomorrowOutRelHum(TS, Hour), 100.);
             if (state.dataWeatherManager->TomorrowOutRelHum(TS, Hour) < 100.) {
@@ -1012,7 +1012,7 @@ TEST_F(EnergyPlusFixture, IRHoriz_InterpretWeatherCalculateMissingIRHoriz) {
 
     state.dataWeatherManager->Envrn =1;
 
-    DataGlobals::NumOfTimeStepInHour = 1;
+    state.dataGlobal->NumOfTimeStepInHour = 1;
     state.dataWeatherManager->Environment.allocate(1);
     state.dataWeatherManager->Environment(1).SkyTempModel = EmissivityCalcType::ClarkAllenModel;
 
@@ -1104,7 +1104,7 @@ TEST_F(EnergyPlusFixture, Add_and_InterpolateWeatherInputOutputTest)
 
     state.dataWeatherManager->Envrn = 1;
 
-    DataGlobals::NumOfTimeStepInHour =4;
+    state.dataGlobal->NumOfTimeStepInHour =4;
     state.dataWeatherManager->Environment.allocate(1);
     state.dataWeatherManager->Environment(1).SkyTempModel = EmissivityCalcType::ClarkAllenModel;
     state.dataWeatherManager->Environment(1).StartMonth = 1;

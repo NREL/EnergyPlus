@@ -51,7 +51,6 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -125,7 +124,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest)
     EXPECT_FALSE(has_err_output());
     bool ErrorsFound = false;
     GetZoneData(state, ErrorsFound);
-    AllocateHeatBalArrays();
+    AllocateHeatBalArrays(state);
     GetZoneEquipmentData1(state);
     ZoneEquipInputsFilled = true;
     GetSimpleAirModelInputs(state, ErrorsFound);
@@ -380,23 +379,23 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_MultiCrossMixingTest)
     bool ErrorsFound = false;
     ScheduleManager::ProcessScheduleInput(state);
     GetZoneData(state, ErrorsFound);
-    DataHeatBalFanSys::ZoneReOrder.allocate(NumOfZones);
+    DataHeatBalFanSys::ZoneReOrder.allocate(state.dataGlobal->NumOfZones);
 
     GetSimpleAirModelInputs(state, ErrorsFound);
 
     EXPECT_FALSE(ErrorsFound);
 
-    DataHeatBalFanSys::MAT.allocate(NumOfZones);
-    DataHeatBalFanSys::ZoneAirHumRat.allocate(NumOfZones);
-    DataHeatBalFanSys::MCPM.allocate(NumOfZones);
-    DataHeatBalFanSys::MCPTM.allocate(NumOfZones);
+    DataHeatBalFanSys::MAT.allocate(state.dataGlobal->NumOfZones);
+    DataHeatBalFanSys::ZoneAirHumRat.allocate(state.dataGlobal->NumOfZones);
+    DataHeatBalFanSys::MCPM.allocate(state.dataGlobal->NumOfZones);
+    DataHeatBalFanSys::MCPTM.allocate(state.dataGlobal->NumOfZones);
 
-    DataHeatBalFanSys::MCPI.allocate(NumOfZones);
-    DataHeatBalFanSys::OAMFL.allocate(NumOfZones);
-    DataHeatBalFanSys::MCPTI.allocate(NumOfZones);
+    DataHeatBalFanSys::MCPI.allocate(state.dataGlobal->NumOfZones);
+    DataHeatBalFanSys::OAMFL.allocate(state.dataGlobal->NumOfZones);
+    DataHeatBalFanSys::MCPTI.allocate(state.dataGlobal->NumOfZones);
 
-    DataHeatBalFanSys::MixingMassFlowZone.allocate(NumOfZones);
-    DataHeatBalFanSys::MixingMassFlowXHumRat.allocate(NumOfZones);
+    DataHeatBalFanSys::MixingMassFlowZone.allocate(state.dataGlobal->NumOfZones);
+    DataHeatBalFanSys::MixingMassFlowXHumRat.allocate(state.dataGlobal->NumOfZones);
 
     DataHeatBalFanSys::MAT(1) = 21.0;
     DataHeatBalFanSys::MAT(2) = 22.0;
@@ -418,7 +417,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_MultiCrossMixingTest)
     ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex(state, "MAXOUTDOORTEMP")).CurrentValue = 100.0;
     DataEnvironment::OutBaroPress = 101325.0;
 
-    InitSimpleMixingConvectiveHeatGains();
+    InitSimpleMixingConvectiveHeatGains(state);
 
     CalcAirFlowSimple(state, 2);
 
@@ -511,7 +510,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest2)
     EXPECT_FALSE(has_err_output());
     bool ErrorsFound = false;
     GetZoneData(state, ErrorsFound);
-    AllocateHeatBalArrays();
+    AllocateHeatBalArrays(state);
     GetZoneEquipmentData1(state);
     ZoneEquipInputsFilled = true;
     GetSimpleAirModelInputs(state, ErrorsFound);
@@ -543,17 +542,17 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest2)
     Node(ZoneEquipConfig(ZoneNum).ZoneNode).HumRat = 0.004;
 
     DataHVACGlobals::NumPrimaryAirSys = 3;
-    DataAirSystems::PrimaryAirSystem.allocate(3);
+    state.dataAirSystemsData->PrimaryAirSystems.allocate(3);
     state.dataAirLoop->AirLoopFlow.allocate(3);
 
-    DataAirSystems::PrimaryAirSystem(1).OASysExists = false;
+    state.dataAirSystemsData->PrimaryAirSystems(1).OASysExists = false;
     state.dataAirLoop->AirLoopFlow(1).DesReturnFrac = 1.0;
-    DataAirSystems::PrimaryAirSystem(2).OASysExists = false;
+    state.dataAirSystemsData->PrimaryAirSystems(2).OASysExists = false;
     state.dataAirLoop->AirLoopFlow(2).DesReturnFrac = 1.0;
-    DataAirSystems::PrimaryAirSystem(3).OASysExists = false;
+    state.dataAirSystemsData->PrimaryAirSystems(3).OASysExists = false;
     state.dataAirLoop->AirLoopFlow(3).DesReturnFrac = 1.0;
-    DataGlobals::DoingSizing = false;
-    DataGlobals::isPulseZoneSizing = false;
+    state.dataGlobal->DoingSizing = false;
+    state.dataGlobal->isPulseZoneSizing = false;
 
     // Case 1 - send zero, expect zero back
     Node(inletNode1).MassFlowRate = 0.0;
@@ -645,7 +644,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest3)
     EXPECT_FALSE(has_err_output());
     bool ErrorsFound = false;
     GetZoneData(state, ErrorsFound);
-    AllocateHeatBalArrays();
+    AllocateHeatBalArrays(state);
     GetZoneEquipmentData1(state);
     ZoneEquipInputsFilled = true;
     GetSimpleAirModelInputs(state, ErrorsFound);
@@ -656,13 +655,13 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest3)
     }
 
     DataHVACGlobals::NumPrimaryAirSys = 1;
-    DataAirSystems::PrimaryAirSystem.allocate(1);
+    state.dataAirSystemsData->PrimaryAirSystems.allocate(1);
     state.dataAirLoop->AirLoopFlow.allocate(1);
 
-    DataAirSystems::PrimaryAirSystem(1).OASysExists = false;
+    state.dataAirSystemsData->PrimaryAirSystems(1).OASysExists = false;
     state.dataAirLoop->AirLoopFlow(1).DesReturnFrac = 1.0;
-    DataGlobals::DoingSizing = false;
-    DataGlobals::isPulseZoneSizing = false;
+    state.dataGlobal->DoingSizing = false;
+    state.dataGlobal->isPulseZoneSizing = false;
 
     ZoneEquipConfig(ZoneNum).ReturnNodeAirLoopNum(1) = 1;
     ZoneEquipConfig(ZoneNum).ReturnNodeInletNum(1) = 1;
@@ -745,7 +744,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest4)
     EXPECT_FALSE(has_err_output());
     bool ErrorsFound = false;
     GetZoneData(state, ErrorsFound);
-    AllocateHeatBalArrays();
+    AllocateHeatBalArrays(state);
     GetZoneEquipmentData1(state);
     ZoneEquipInputsFilled = true;
     GetSimpleAirModelInputs(state, ErrorsFound);
@@ -777,20 +776,20 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest4)
     Node(ZoneEquipConfig(ZoneNum).ZoneNode).HumRat = 0.004;
 
     DataHVACGlobals::NumPrimaryAirSys = 3;
-    DataAirSystems::PrimaryAirSystem.allocate(3);
+    state.dataAirSystemsData->PrimaryAirSystems.allocate(3);
     state.dataAirLoop->AirLoopFlow.allocate(3);
 
     // Add an outdoor air system to airloop 2
-    DataAirSystems::PrimaryAirSystem(1).OASysExists = false;
+    state.dataAirSystemsData->PrimaryAirSystems(1).OASysExists = false;
     state.dataAirLoop->AirLoopFlow(1).DesReturnFrac = 1.0;
-    DataAirSystems::PrimaryAirSystem(2).OASysExists = true;
+    state.dataAirSystemsData->PrimaryAirSystems(2).OASysExists = true;
     state.dataAirLoop->AirLoopFlow(2).DesReturnFrac = 0.9;
     state.dataAirLoop->AirLoopFlow(2).MaxOutAir = 0.1;
     state.dataAirLoop->AirLoopFlow(2).OAFlow = 0.1;
-    DataAirSystems::PrimaryAirSystem(3).OASysExists = false;
+    state.dataAirSystemsData->PrimaryAirSystems(3).OASysExists = false;
     state.dataAirLoop->AirLoopFlow(3).DesReturnFrac = 1.0;
-    DataGlobals::DoingSizing = false;
-    DataGlobals::isPulseZoneSizing = false;
+    state.dataGlobal->DoingSizing = false;
+    state.dataGlobal->isPulseZoneSizing = false;
 
     // Case 1 - send zero, expect zero back
     Node(inletNode1).MassFlowRate = 0.0;
@@ -828,7 +827,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest4)
 
     // Case 3 - add exhaust flow, but set system 2 MaxOutAir to zero, expect sum of inlet flow back
     Node(ZoneEquipConfig(ZoneNum).ExhaustNode(1)).MassFlowRate = 1.000000001;
-    DataAirSystems::PrimaryAirSystem(2).OASysExists = true;
+    state.dataAirSystemsData->PrimaryAirSystems(2).OASysExists = true;
     state.dataAirLoop->AirLoopFlow(2).DesReturnFrac = 0.9;
     state.dataAirLoop->AirLoopFlow(2).MaxOutAir = 0.0;
     state.dataAirLoop->AirLoopFlow(2).OAFlow = 0.0;
@@ -938,7 +937,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad)
     EXPECT_FALSE(has_err_output());
     bool ErrorsFound = false;
     GetZoneData(state, ErrorsFound);
-    AllocateHeatBalArrays();
+    AllocateHeatBalArrays(state);
     GetZoneEquipmentData1(state);
     ZoneEquipInputsFilled = true;
     int ZoneNum = 1;
@@ -1113,7 +1112,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformLoad)
     EXPECT_FALSE(has_err_output());
     bool ErrorsFound = false;
     GetZoneData(state, ErrorsFound);
-    AllocateHeatBalArrays();
+    AllocateHeatBalArrays(state);
     GetZoneEquipmentData1(state);
     ZoneEquipInputsFilled = true;
     int ZoneNum = 1;
@@ -1299,7 +1298,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformPLR)
     EXPECT_FALSE(has_err_output());
     bool ErrorsFound = false;
     GetZoneData(state, ErrorsFound);
-    AllocateHeatBalArrays();
+    AllocateHeatBalArrays(state);
     GetZoneEquipmentData1(state);
     ZoneEquipInputsFilled = true;
     int ZoneNum = 1;
@@ -1517,7 +1516,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialUniformPLR)
     EXPECT_FALSE(has_err_output());
     bool ErrorsFound = false;
     GetZoneData(state, ErrorsFound);
-    AllocateHeatBalArrays();
+    AllocateHeatBalArrays(state);
     GetZoneEquipmentData1(state);
     ZoneEquipInputsFilled = true;
     int ZoneNum = 1;
@@ -1843,7 +1842,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     EXPECT_FALSE(has_err_output());
     bool ErrorsFound = false;
     GetZoneData(state, ErrorsFound);
-    AllocateHeatBalArrays();
+    AllocateHeatBalArrays(state);
     GetZoneEquipmentData1(state);
     ZoneEquipInputsFilled = true;
     int ZoneNum = 1;
@@ -2069,7 +2068,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     EXPECT_FALSE(has_err_output());
     bool ErrorsFound = false;
     GetZoneData(state, ErrorsFound);
-    AllocateHeatBalArrays();
+    AllocateHeatBalArrays(state);
     GetZoneEquipmentData1(state);
     ZoneEquipInputsFilled = true;
     int ZoneNum = 1;
@@ -2170,14 +2169,14 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_RezeroZoneSizingArrays) {
     DataEnvironment::TotDesDays = 12;
     DataEnvironment::TotRunDesPersDays = 3;
     int totDesDays = DataEnvironment::TotDesDays + DataEnvironment::TotRunDesPersDays;
-    DataGlobals::NumOfZones = 5;
+    state.dataGlobal->NumOfZones = 5;
     state.dataZoneEquipmentManager->NumOfTimeStepInDay = 4;
-    DataSizing::ZoneSizing.allocate(totDesDays, DataGlobals::NumOfZones);
-    DataSizing::CalcZoneSizing.allocate(totDesDays, DataGlobals::NumOfZones);
-    DataSizing::FinalZoneSizing.allocate(DataGlobals::NumOfZones);
-    DataSizing::CalcFinalZoneSizing.allocate(DataGlobals::NumOfZones);
+    DataSizing::ZoneSizing.allocate(totDesDays, state.dataGlobal->NumOfZones);
+    DataSizing::CalcZoneSizing.allocate(totDesDays, state.dataGlobal->NumOfZones);
+    DataSizing::FinalZoneSizing.allocate(state.dataGlobal->NumOfZones);
+    DataSizing::CalcFinalZoneSizing.allocate(state.dataGlobal->NumOfZones);
 
-    for (int CtrlZoneNum = 1; CtrlZoneNum <= DataGlobals::NumOfZones; ++CtrlZoneNum) {
+    for (int CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
         for (int DesDayNum = 1; DesDayNum <= DataEnvironment::TotDesDays + DataEnvironment::TotRunDesPersDays; ++DesDayNum) {
             auto &thisSizingType(DataSizing::ZoneSizing(DesDayNum, CtrlZoneNum));
             thisSizingType.ZoneName = "test";
@@ -2575,9 +2574,9 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_RezeroZoneSizingArrays) {
         }
     }
 
-    ZoneEquipmentManager::RezeroZoneSizingArrays();
+    ZoneEquipmentManager::RezeroZoneSizingArrays(state);
 
-    for ( int CtrlZoneNum = 1; CtrlZoneNum <= DataGlobals::NumOfZones; ++CtrlZoneNum ) {
+    for ( int CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum ) {
         for ( int DesDayNum = 1; DesDayNum <= DataEnvironment::TotDesDays + DataEnvironment::TotRunDesPersDays; ++DesDayNum ) {
             auto &thisSizingType(DataSizing::ZoneSizing(DesDayNum, CtrlZoneNum));
             //EXPECT_EQ(thisSizingType.ZoneName, "");

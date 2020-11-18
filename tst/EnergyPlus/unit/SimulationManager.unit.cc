@@ -262,12 +262,12 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_DefaultState)
 
     SimulationManager::GetProjectData(state);
 
-    EXPECT_FALSE(DataGlobals::DisplayAllWarnings);
-    EXPECT_FALSE(DataGlobals::DisplayExtraWarnings);
-    EXPECT_FALSE(DataGlobals::DisplayUnusedObjects);
-    EXPECT_FALSE(DataGlobals::DisplayUnusedSchedules);
-    EXPECT_FALSE(DataGlobals::DisplayAdvancedReportVariables);
-    EXPECT_FALSE(DataGlobals::DisplayZoneAirHeatBalanceOffBalance);
+    EXPECT_FALSE(state.dataGlobal->DisplayAllWarnings);
+    EXPECT_FALSE(state.dataGlobal->DisplayExtraWarnings);
+    EXPECT_FALSE(state.dataGlobal->DisplayUnusedObjects);
+    EXPECT_FALSE(state.dataGlobal->DisplayUnusedSchedules);
+    EXPECT_FALSE(state.dataGlobal->DisplayAdvancedReportVariables);
+    EXPECT_FALSE(state.dataGlobal->DisplayZoneAirHeatBalanceOffBalance);
     EXPECT_TRUE(DataReportingFlags::MakeMirroredDetachedShading);
     EXPECT_TRUE(DataReportingFlags::MakeMirroredAttachedShading);
     EXPECT_FALSE(DataSystemVariables::ReportDuringWarmup);
@@ -298,12 +298,12 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_SimpleCase)
 
     SimulationManager::GetProjectData(state);
 
-    EXPECT_TRUE(DataGlobals::DisplayAllWarnings);
-    EXPECT_TRUE(DataGlobals::DisplayExtraWarnings);
-    EXPECT_TRUE(DataGlobals::DisplayUnusedObjects);
-    EXPECT_TRUE(DataGlobals::DisplayUnusedSchedules);
-    EXPECT_TRUE(DataGlobals::DisplayAdvancedReportVariables);
-    EXPECT_FALSE(DataGlobals::DisplayZoneAirHeatBalanceOffBalance);
+    EXPECT_TRUE(state.dataGlobal->DisplayAllWarnings);
+    EXPECT_TRUE(state.dataGlobal->DisplayExtraWarnings);
+    EXPECT_TRUE(state.dataGlobal->DisplayUnusedObjects);
+    EXPECT_TRUE(state.dataGlobal->DisplayUnusedSchedules);
+    EXPECT_TRUE(state.dataGlobal->DisplayAdvancedReportVariables);
+    EXPECT_FALSE(state.dataGlobal->DisplayZoneAirHeatBalanceOffBalance);
     EXPECT_TRUE(DataReportingFlags::MakeMirroredDetachedShading);
     EXPECT_TRUE(DataReportingFlags::MakeMirroredAttachedShading);
     EXPECT_FALSE(DataSystemVariables::ReportDuringWarmup);
@@ -338,12 +338,12 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_AllKeys)
 
     SimulationManager::GetProjectData(state);
 
-    EXPECT_TRUE(DataGlobals::DisplayAllWarnings);
-    EXPECT_TRUE(DataGlobals::DisplayExtraWarnings);
-    EXPECT_TRUE(DataGlobals::DisplayUnusedObjects);
-    EXPECT_TRUE(DataGlobals::DisplayUnusedSchedules);
-    EXPECT_TRUE(DataGlobals::DisplayAdvancedReportVariables);
-    EXPECT_TRUE(DataGlobals::DisplayZoneAirHeatBalanceOffBalance);
+    EXPECT_TRUE(state.dataGlobal->DisplayAllWarnings);
+    EXPECT_TRUE(state.dataGlobal->DisplayExtraWarnings);
+    EXPECT_TRUE(state.dataGlobal->DisplayUnusedObjects);
+    EXPECT_TRUE(state.dataGlobal->DisplayUnusedSchedules);
+    EXPECT_TRUE(state.dataGlobal->DisplayAdvancedReportVariables);
+    EXPECT_TRUE(state.dataGlobal->DisplayZoneAirHeatBalanceOffBalance);
     EXPECT_FALSE(DataReportingFlags::MakeMirroredDetachedShading);
     EXPECT_FALSE(DataReportingFlags::MakeMirroredAttachedShading);
     EXPECT_TRUE(DataSystemVariables::ReportDuringWarmup);
@@ -376,12 +376,12 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_Unicity)
     }
     SimulationManager::GetProjectData(state);
 
-    EXPECT_FALSE(DataGlobals::DisplayAllWarnings);
-    EXPECT_FALSE(DataGlobals::DisplayExtraWarnings);
-    EXPECT_FALSE(DataGlobals::DisplayUnusedObjects);
-    EXPECT_FALSE(DataGlobals::DisplayUnusedSchedules);
-    EXPECT_TRUE(DataGlobals::DisplayAdvancedReportVariables); // Only first object has been processed
-    EXPECT_FALSE(DataGlobals::DisplayZoneAirHeatBalanceOffBalance);
+    EXPECT_FALSE(state.dataGlobal->DisplayAllWarnings);
+    EXPECT_FALSE(state.dataGlobal->DisplayExtraWarnings);
+    EXPECT_FALSE(state.dataGlobal->DisplayUnusedObjects);
+    EXPECT_FALSE(state.dataGlobal->DisplayUnusedSchedules);
+    EXPECT_TRUE(state.dataGlobal->DisplayAdvancedReportVariables); // Only first object has been processed
+    EXPECT_FALSE(state.dataGlobal->DisplayZoneAirHeatBalanceOffBalance);
     EXPECT_TRUE(DataReportingFlags::MakeMirroredDetachedShading);
     EXPECT_TRUE(DataReportingFlags::MakeMirroredAttachedShading);
     EXPECT_FALSE(DataSystemVariables::ReportDuringWarmup);
@@ -421,12 +421,12 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_UndocumentedFlags)
 
     SimulationManager::GetProjectData(state);
 
-    EXPECT_FALSE(DataGlobals::DisplayAllWarnings);
-    EXPECT_FALSE(DataGlobals::DisplayExtraWarnings);
-    EXPECT_FALSE(DataGlobals::DisplayUnusedObjects);
-    EXPECT_FALSE(DataGlobals::DisplayUnusedSchedules);
-    EXPECT_FALSE(DataGlobals::DisplayAdvancedReportVariables);
-    EXPECT_FALSE(DataGlobals::DisplayZoneAirHeatBalanceOffBalance);
+    EXPECT_FALSE(state.dataGlobal->DisplayAllWarnings);
+    EXPECT_FALSE(state.dataGlobal->DisplayExtraWarnings);
+    EXPECT_FALSE(state.dataGlobal->DisplayUnusedObjects);
+    EXPECT_FALSE(state.dataGlobal->DisplayUnusedSchedules);
+    EXPECT_FALSE(state.dataGlobal->DisplayAdvancedReportVariables);
+    EXPECT_FALSE(state.dataGlobal->DisplayZoneAirHeatBalanceOffBalance);
     EXPECT_TRUE(DataReportingFlags::MakeMirroredDetachedShading);
     EXPECT_TRUE(DataReportingFlags::MakeMirroredAttachedShading);
     EXPECT_FALSE(DataSystemVariables::ReportDuringWarmup);
@@ -458,14 +458,14 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_HasEmpty)
 
     ASSERT_NO_THROW(SimulationManager::GetProjectData(state));
 
-    EXPECT_FALSE(DataGlobals::DisplayAllWarnings);
-    EXPECT_FALSE(DataGlobals::DisplayExtraWarnings);
-    EXPECT_FALSE(DataGlobals::DisplayUnusedObjects);
-    EXPECT_FALSE(DataGlobals::DisplayUnusedSchedules);
+    EXPECT_FALSE(state.dataGlobal->DisplayAllWarnings);
+    EXPECT_FALSE(state.dataGlobal->DisplayExtraWarnings);
+    EXPECT_FALSE(state.dataGlobal->DisplayUnusedObjects);
+    EXPECT_FALSE(state.dataGlobal->DisplayUnusedSchedules);
 
-    EXPECT_TRUE(DataGlobals::DisplayAdvancedReportVariables);
+    EXPECT_TRUE(state.dataGlobal->DisplayAdvancedReportVariables);
 
-    EXPECT_FALSE(DataGlobals::DisplayZoneAirHeatBalanceOffBalance);
+    EXPECT_FALSE(state.dataGlobal->DisplayZoneAirHeatBalanceOffBalance);
     EXPECT_TRUE(DataReportingFlags::MakeMirroredDetachedShading);
     EXPECT_TRUE(DataReportingFlags::MakeMirroredAttachedShading);
     EXPECT_FALSE(DataSystemVariables::ReportDuringWarmup);
@@ -496,8 +496,8 @@ TEST_F(EnergyPlusFixture, SimulationManager_HVACSizingSimulationChoiceTest)
 
     SimulationManager::GetProjectData(state);
 
-    EXPECT_TRUE(DataGlobals::DoHVACSizingSimulation);
+    EXPECT_TRUE(state.dataGlobal->DoHVACSizingSimulation);
     // get a default value
-    EXPECT_EQ(DataGlobals::HVACSizingSimMaxIterations, 1);
+    EXPECT_EQ(state.dataGlobal->HVACSizingSimMaxIterations, 1);
 
 }

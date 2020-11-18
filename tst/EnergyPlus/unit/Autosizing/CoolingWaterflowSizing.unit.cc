@@ -49,7 +49,6 @@
 #include <gtest/gtest.h>
 
 #include <EnergyPlus/Autosizing/CoolingWaterflowSizing.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
@@ -267,7 +266,7 @@ TEST_F(AutoSizingFixture, CoolingWaterflowSizingGauntlet)
 
     DataSizing::CurSysNum = 1;
     DataHVACGlobals::NumPrimaryAirSys = 1;
-    DataAirSystems::PrimaryAirSystem.allocate(1);
+    state.dataAirSystemsData->PrimaryAirSystems.allocate(1);
     DataSizing::NumSysSizInput = 1;
     DataSizing::SysSizingRunDone = false;
     DataSizing::DataCapacityUsedForSizing = 5000.0;

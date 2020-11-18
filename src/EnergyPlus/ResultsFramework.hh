@@ -221,7 +221,7 @@ namespace ResultsFramework {
         bool rVariablesScanned() const;
         bool iVariablesScanned() const;
 
-        void newRow(const int month, const int dayOfMonth, int hourOfDay, int curMin);
+        void newRow(EnergyPlusData &state, const int month, const int dayOfMonth, int hourOfDay, int curMin);
 //        void newRow(const std::string &ts);
         virtual void pushVariableValue(const int reportID, double value);
 
@@ -323,8 +323,8 @@ namespace ResultsFramework {
             outputVariableIndices = std::vector<bool>(num_output_variables, false);
         }
 
-        void writeOutput(std::vector<std::string> const & outputVariables, InputOutputFile & outputFile, bool outputControl);
-        void parseTSOutputs(json const &data, std::vector<std::string> const& outputVariables, OutputProcessor::ReportingFrequency reportingFrequency);
+        void writeOutput(EnergyPlusData &state, std::vector<std::string> const & outputVariables, InputOutputFile & outputFile, bool outputControl);
+        void parseTSOutputs(EnergyPlusData &state, json const &data, std::vector<std::string> const& outputVariables, OutputProcessor::ReportingFrequency reportingFrequency);
 
     private:
         friend class EnergyPlus::EnergyPlusFixture;
@@ -335,7 +335,7 @@ namespace ResultsFramework {
         std::map<std::string, std::vector<std::string>> outputs;
         std::vector<bool> outputVariableIndices;
 
-        static std::string &convertToMonth(std::string &datetime);
+        static std::string &convertToMonth(EnergyPlusData &state, std::string &datetime);
         void updateReportingFrequency(OutputProcessor::ReportingFrequency reportingFrequency);
         // void readRVI();
         // void readMVI();

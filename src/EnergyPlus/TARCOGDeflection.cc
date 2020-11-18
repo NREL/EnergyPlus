@@ -82,7 +82,6 @@ namespace TARCOGDeflection {
     // USE STATEMENTS:
 
     // Using/Aliasing
-    using namespace DataGlobals;
     // use TARCOGGassesParams
     using namespace TARCOGParams;
     using namespace TARCOGCommon;

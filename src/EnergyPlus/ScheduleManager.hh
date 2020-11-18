@@ -198,7 +198,7 @@ namespace ScheduleManager {
     void ReportScheduleDetails(EnergyPlusData &state, int const LevelOfDetail); // =1: hourly; =2: timestep; = 3: make IDF excerpt
 
     // Returns the CurrentScheduleValue
-    Real64 GetCurrentScheduleValue(int const ScheduleIndex);
+    Real64 GetCurrentScheduleValue(EnergyPlusData &state, int const ScheduleIndex);
 
     // Updates each schedule value to the current timestep
     // Uses EMS value if actuated, otherwise calls LookUpScheduleValue with ThisHour=DataGlobals::HourOfDay, ThisTimeStep=DataGlobals::TimeStep
@@ -225,11 +225,12 @@ namespace ScheduleManager {
                                     Array2S<Real64> DayValues   // Returned set of values
     );
 
-    void ExternalInterfaceSetSchedule(int &ScheduleIndex,
+    void ExternalInterfaceSetSchedule(EnergyPlusData &state,
+                                      int &ScheduleIndex,
                                       Real64 &Value // The new value for the schedule
     );
 
-    void ProcessIntervalFields(Array1S_string const Untils,
+    void ProcessIntervalFields(EnergyPlusData &state, Array1S_string const Untils,
                                Array1S<Real64> const Numbers,
                                int const NumUntils,
                                int const NumNumbers,
@@ -241,7 +242,7 @@ namespace ScheduleManager {
                                ScheduleInterpolation interpolationKind // enumeration on how to interpolate values in schedule
     );
 
-    void DecodeHHMMField(std::string const &FieldValue,          // Input field value
+    void DecodeHHMMField(EnergyPlusData &state, std::string const &FieldValue,          // Input field value
                          int &RetHH,                             // Returned "hour"
                          int &RetMM,                             // Returned "minute"
                          bool &ErrorsFound,                      // True if errors found in this field
@@ -252,81 +253,86 @@ namespace ScheduleManager {
 
     bool isMinuteMultipleOfTimestep(int minute, int numMinutesPerTimestep);
 
-    void ProcessForDayTypes(std::string const &ForDayField, // Field containing the "FOR:..."
+    void ProcessForDayTypes(EnergyPlusData &state, std::string const &ForDayField, // Field containing the "FOR:..."
                             Array1D_bool &TheseDays,        // Array to contain returned "true" days
                             Array1D_bool &AlReady,          // Array of days already done
                             bool &ErrorsFound               // Will be true if error found.
     );
 
-    bool CheckScheduleValueMinMax(int const ScheduleIndex,      // Which Schedule being tested
+    bool CheckScheduleValueMinMax(EnergyPlusData &state, int const ScheduleIndex,      // Which Schedule being tested
                                   std::string const &MinString, // Minimum indicator ('>', '>=')
                                   Real64 const Minimum          // Minimum desired value
     );
 
-    bool CheckScheduleValueMinMax(int const ScheduleIndex,      // Which Schedule being tested
+    bool CheckScheduleValueMinMax(EnergyPlusData &state, int const ScheduleIndex,      // Which Schedule being tested
                                   std::string const &MinString, // Minimum indicator ('>', '>=')
                                   Real64 const Minimum,         // Minimum desired value
                                   std::string const &MaxString, // Maximum indicator ('<', ',=')
                                   Real64 const Maximum          // Maximum desired value
     );
 
-    bool CheckScheduleValueMinMax(int const ScheduleIndex,      // Which Schedule being tested
+    bool CheckScheduleValueMinMax(EnergyPlusData &state, int const ScheduleIndex,      // Which Schedule being tested
                                   std::string const &MinString, // Minimum indicator ('>', '>=')
                                   Real32 const Minimum          // Minimum desired value
     );
 
-    bool CheckScheduleValueMinMax(int const ScheduleIndex,      // Which Schedule being tested
+    bool CheckScheduleValueMinMax(EnergyPlusData &state, int const ScheduleIndex,      // Which Schedule being tested
                                   std::string const &MinString, // Minimum indicator ('>', '>=')
                                   Real32 const Minimum,         // Minimum desired value
                                   std::string const &MaxString, // Maximum indicator ('<', ',=')
                                   Real32 const Maximum          // Maximum desired value
     );
 
-    bool CheckScheduleValue(int const ScheduleIndex, // Which Schedule being tested
+    bool CheckScheduleValue(EnergyPlusData &state,
+                            int const ScheduleIndex, // Which Schedule being tested
                             Real64 const Value       // Actual desired value
     );
 
-    bool CheckScheduleValue(int const ScheduleIndex, // Which Schedule being tested
+    bool CheckScheduleValue(EnergyPlusData &state,
+                            int const ScheduleIndex, // Which Schedule being tested
                             int const Value          // Actual desired value
     );
 
-    bool CheckDayScheduleValueMinMax(int const ScheduleIndex,            // Which Day Schedule being tested
+    bool CheckDayScheduleValueMinMax(EnergyPlusData &state,
+                                     int const ScheduleIndex,            // Which Day Schedule being tested
                                      Real64 const Minimum,               // Minimum desired value
                                      std::string const &MinString,       // Minimum indicator ('>', '>=')
                                      Optional<Real64 const> Maximum = _, // Maximum desired value
                                      Optional_string_const MaxString = _ // Maximum indicator ('<', ',=')
     );
 
-    bool CheckDayScheduleValueMinMax(int const ScheduleIndex,            // Which Day Schedule being tested
+    bool CheckDayScheduleValueMinMax(EnergyPlusData &state, int const ScheduleIndex,            // Which Day Schedule being tested
                                      Real32 const Minimum,               // Minimum desired value
                                      std::string const &MinString,       // Minimum indicator ('>', '>=')
                                      Optional<Real32 const> Maximum = _, // Maximum desired value
                                      Optional_string_const MaxString = _ // Maximum indicator ('<', ',=')
     );
 
-    bool HasFractionalScheduleValue(int const ScheduleIndex); // Which Schedule being tested
+    bool HasFractionalScheduleValue(EnergyPlusData &state, int const ScheduleIndex); // Which Schedule being tested
 
-    Real64 GetScheduleMinValue(int const ScheduleIndex); // Which Schedule being tested
+    Real64 GetScheduleMinValue(EnergyPlusData &state, int const ScheduleIndex); // Which Schedule being tested
 
-    Real64 GetScheduleMaxValue(int const ScheduleIndex); // Which Schedule being tested
+    Real64 GetScheduleMaxValue(EnergyPlusData &state, int const ScheduleIndex); // Which Schedule being tested
 
     std::string GetScheduleName(EnergyPlusData &state, int const ScheduleIndex);
 
     void ReportScheduleValues(EnergyPlusData &state);
 
-    void ReportOrphanSchedules();
+    void ReportOrphanSchedules(EnergyPlusData &state);
 
-    Real64 ScheduleAnnualFullLoadHours(int const ScheduleIndex,  // Which Schedule being tested
+    Real64 ScheduleAnnualFullLoadHours(EnergyPlusData &state,
+                                       int const ScheduleIndex,  // Which Schedule being tested
                                        int const StartDayOfWeek, // Day of week for start of year
                                        bool const isItLeapYear   // true if it is a leap year containing February 29
     );
 
-    Real64 ScheduleAverageHoursPerWeek(int const ScheduleIndex,  // Which Schedule being tested
+    Real64 ScheduleAverageHoursPerWeek(EnergyPlusData &state,
+                                       int const ScheduleIndex,  // Which Schedule being tested
                                        int const StartDayOfWeek, // Day of week for start of year
                                        bool const isItLeapYear   // true if it is a leap year containing February 29
     );
 
-    Real64 ScheduleHoursGT1perc(int const ScheduleIndex,  // Which Schedule being tested
+    Real64 ScheduleHoursGT1perc(EnergyPlusData &state, int const ScheduleIndex,  // Which Schedule being tested
                                 int const StartDayOfWeek, // Day of week for start of year
                                 bool const isItLeapYear   // true if it is a leap year containing February 29
     );

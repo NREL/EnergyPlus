@@ -431,11 +431,11 @@ namespace HVACVariableRefrigerantFlow {
         // Begin of Methods for New VRF Model: Fluid Temperature Control
         //******************************************************************************
 
-        void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation) override;
+        void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation) override;
 
         void getDesignCapacities(EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
-        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
@@ -445,7 +445,8 @@ namespace HVACVariableRefrigerantFlow {
 
         void CalcVRFIUTeTc_FluidTCtrl();
 
-        void VRFOU_TeTc(int OperationMode,      // Flag for hex operation
+        void VRFOU_TeTc(EnergyPlusData &state,
+                        int OperationMode,      // Flag for hex operation
                         Real64 Q_coil,          // // OU coil heat release at cooling mode or heat extract at heating mode [W]
                         Real64 SHSC,            // SH at cooling or SC at heating [C]
                         Real64 m_air,           // OU coil air mass flow rate [kg/s]
@@ -456,7 +457,8 @@ namespace HVACVariableRefrigerantFlow {
                         Real64 &TeTc                  // VRF Tc at cooling mode, or Te at heating mode [C]
         );
 
-        Real64 VRFOU_FlowRate(int OperationMode, // Flag for hex operation
+        Real64 VRFOU_FlowRate(EnergyPlusData &state,
+                              int OperationMode, // Flag for hex operation
                               Real64 TeTc,       // VRF Tc at cooling mode, or Te at heating mode [C]
                               Real64 SHSC,       // SC for OU condenser or SH for OU evaporator [C]
                               Real64 Q_coil,     // absolute value of OU coil heat release or heat extract [W]
@@ -464,7 +466,8 @@ namespace HVACVariableRefrigerantFlow {
                               Real64 W_coil_in   // Humidity ratio of air at OU coil inlet [kg/kg]
         ) const;
 
-        Real64 VRFOU_Cap(int OperationMode, // Flag for hex operation
+        Real64 VRFOU_Cap(EnergyPlusData &state,
+                         int OperationMode, // Flag for hex operation
                          Real64 TeTc,       // VRF Tc at cooling mode, or Te at heating mode [C]
                          Real64 SHSC,       // SC for OU condenser or SH for OU evaporator [C]
                          Real64 m_air,      // OU coil air mass flow rate [kg/s]
@@ -472,7 +475,8 @@ namespace HVACVariableRefrigerantFlow {
                          Real64 W_coil_in   // Humidity ratio of air at OU coil inlet [kg/kg]
         );
 
-        Real64 VRFOU_SCSH(int OperationMode,     // Mode 0 for running as evaporator, 1 for condenser
+        Real64 VRFOU_SCSH(EnergyPlusData &state,
+                          int OperationMode,     // Mode 0 for running as evaporator, 1 for condenser
                           Real64 Q_coil,         // // OU coil heat release at cooling mode or heat extract at heating mode [W]
                           Real64 TeTc,           // VRF Tc at cooling mode, or Te at heating mode [C]
                           Real64 m_air,          // OU coil air mass flow rate [kg/s]
@@ -932,7 +936,8 @@ namespace HVACVariableRefrigerantFlow {
                        Array1D<Real64> const &Par   // par(1) = VRFTUNum
     );
 
-    void SetAverageAirFlow(int VRFTUNum,         // Unit index
+    void SetAverageAirFlow(EnergyPlusData &state,
+                           int VRFTUNum,         // Unit index
                            Real64 PartLoadRatio, // unit part load ratio
                            Real64 &OnOffAirFlowRatio   // ratio of compressor ON airflow to average airflow over timestep
     );

@@ -169,7 +169,7 @@ void ReportSurfaces(EnergyPlusData &state)
             DXFOut(state, Option1, Option2);
             DXFDone = true;
         } else {
-            ShowWarningError("ReportSurfaces: DXF output already generated.  DXF with option=[" + Option1 + "] will not be generated.");
+            ShowWarningError(state, "ReportSurfaces: DXF output already generated.  DXF with option=[" + Option1 + "] will not be generated.");
         }
     }
 
@@ -182,7 +182,7 @@ void ReportSurfaces(EnergyPlusData &state)
             DXFOutWireFrame(state, Option2);
             DXFDone = true;
         } else {
-            ShowWarningError("ReportSurfaces: DXF output already generated.  DXF:WireFrame will not be generated.");
+            ShowWarningError(state, "ReportSurfaces: DXF output already generated.  DXF:WireFrame will not be generated.");
         }
     }
 
@@ -192,7 +192,7 @@ void ReportSurfaces(EnergyPlusData &state)
             VRMLOut(state, Option1, Option2);
             VRMLDone = true;
         } else {
-            ShowWarningError("ReportSurfaces: VRML output already generated.  VRML with option=[" + Option1 + "] will not be generated.");
+            ShowWarningError(state, "ReportSurfaces: VRML output already generated.  VRML with option=[" + Option1 + "] will not be generated.");
         }
     }
 
@@ -252,15 +252,15 @@ void LinesOut(EnergyPlusData &state, std::string const &option)
     }
 
     if (optiondone) {
-        ShowWarningError("Report of Surfaces/Lines Option has already been completed with option=" + lastoption);
-        ShowContinueError("..option=\"" + option + "\" will not be done this time.");
+        ShowWarningError(state, "Report of Surfaces/Lines Option has already been completed with option=" + lastoption);
+        ShowContinueError(state, "..option=\"" + option + "\" will not be done this time.");
         return;
     }
 
     lastoption = option;
     optiondone = true;
 
-    auto slnfile = state.files.sln.open("LinesOut", state.files.outputControl.sln);
+    auto slnfile = state.files.sln.open(state, "LinesOut", state.files.outputControl.sln);
 
     if (option != "IDF") {
         for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
@@ -324,14 +324,12 @@ static std::string normalizeName(std::string name)
     return name;
 }
 
-static void WriteDXFCommon(InputOutputFile &of, const std::string &ColorScheme)
+static void WriteDXFCommon(EnergyPlusData &state, InputOutputFile &of, const std::string &ColorScheme)
 {
     using DataHeatBalance::BuildingName;
     using DataHeatBalance::Zone;
     using namespace DataSurfaces;
     using namespace DataSurfaceColors;
-    using DataGlobals::NumOfZones;
-
     static constexpr auto Format_800("  0\nTEXT\n  8\n1\n  6\nContinuous\n 62\n{:3}\n 10\n{:15.5F}\n 20\n{:15.5F}\n 30\n{:15.5F}\n 40\n .25\n  "
                                      "1\nTrue North\n 41\n 0.0\n  7\nMONOTXT\n210\n0.0\n220\n0.0\n230\n1.0\n");
     static constexpr auto Format_801("  0\nTEXT\n  8\n1\n  6\nContinuous\n 62\n{:3}\n 10\n{:15.5F}\n 20\n{:15.5F}\n 30\n{:15.5F}\n 40\n .4\n  "
@@ -448,22 +446,21 @@ static void WriteDXFCommon(InputOutputFile &of, const std::string &ColorScheme)
 
     print(of, Format_710, "Zone Names");
 
-    for (int zones = 1; zones <= NumOfZones; ++zones) {
+    for (int zones = 1; zones <= state.dataGlobal->NumOfZones; ++zones) {
         print(of, Format_710, format("Zone={}:{}", zones, normalizeName(Zone(zones).Name)));
     }
 }
 
-static void DXFDaylightingReferencePoints(InputOutputFile &of, bool const DELight)
+static void DXFDaylightingReferencePoints(EnergyPlusData &state, InputOutputFile &of, bool const DELight)
 {
     using namespace DataSurfaceColors;
     using DataDaylighting::ZoneDaylight;
-    using DataGlobals::NumOfZones;
     using DataHeatBalance::Zone;
 
     static constexpr auto Format_709("  0\nCIRCLE\n  8\n{}\n 62\n{:3}\n 10\n{:15.5F}\n 20\n{:15.5F}\n 30\n{:15.5F}\n 40\n{:15.5F}\n");
 
     // Do any daylighting reference points on layer for zone
-    for (int zones = 1; zones <= NumOfZones; ++zones) {
+    for (int zones = 1; zones <= state.dataGlobal->NumOfZones; ++zones) {
         auto curcolorno = ColorNo_DaylSensor1;
 
         for (int refpt = 1; refpt <= ZoneDaylight(zones).TotalDaylRefPoints; ++refpt) {
@@ -509,7 +506,6 @@ void DXFOut(EnergyPlusData &state,
     using namespace DataSurfaceColors;
     using DataDaylighting::IllumMapCalc;
     using DataDaylighting::TotIllumMaps;
-    using DataGlobals::NumOfZones;
     using DataStringGlobals::VerString;
     using namespace DXFEarClipping;
     using General::TrimSigDigits;
@@ -567,9 +563,9 @@ void DXFOut(EnergyPlusData &state,
         ThickPolyline = false;
         PolylineWidth = " 0";
     } else {
-        ShowWarningError("DXFOut: Illegal key specified for Surfaces with > 4 sides=" + PolygonAction);
-        ShowContinueError("...Valid keys are: \"ThickPolyline\", \"RegularPolyline\", \"Triangulate3DFace\".");
-        ShowContinueError("\"Triangulate3DFace\" will be used for any surfaces with > 4 sides.");
+        ShowWarningError(state, "DXFOut: Illegal key specified for Surfaces with > 4 sides=" + PolygonAction);
+        ShowContinueError(state, "...Valid keys are: \"ThickPolyline\", \"RegularPolyline\", \"Triangulate3DFace\".");
+        ShowContinueError(state, "\"Triangulate3DFace\" will be used for any surfaces with > 4 sides.");
         TriangulateFace = true;
         RegularPolyline = false;
         ThickPolyline = false;
@@ -580,7 +576,7 @@ void DXFOut(EnergyPlusData &state,
         return;
     }
 
-    auto dxffile = state.files.dxf.open("DXFOut", state.files.outputControl.dxf);
+    auto dxffile = state.files.dxf.open(state, "DXFOut", state.files.outputControl.dxf);
 
     print(dxffile, Format_702); // Start of Entities section
 
@@ -594,7 +590,7 @@ void DXFOut(EnergyPlusData &state,
         print(dxffile, Format_708, "Polygon Action", ",", PolygonAction);
     }
 
-    WriteDXFCommon(dxffile, ColorScheme);
+    WriteDXFCommon(state, dxffile, ColorScheme);
 
     auto colorindex = ColorNo_ShdDetFix;
     //  Do all detached shading surfaces first
@@ -671,7 +667,7 @@ void DXFOut(EnergyPlusData &state,
     }
 
     // now do zone surfaces, by zone
-    for (int zones = 1; zones <= NumOfZones; ++zones) {
+    for (int zones = 1; zones <= state.dataGlobal->NumOfZones; ++zones) {
         const auto TempZoneName = normalizeName(Zone(zones).Name);
 
         for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
@@ -837,9 +833,9 @@ void DXFOut(EnergyPlusData &state,
     //  712 format(' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5,/,  &
     //             ' 11',/,f15.5,/,' 21',/,f15.5,/,' 31',/,f15.5)
 
-    DXFDaylightingReferencePoints(dxffile, false);
+    DXFDaylightingReferencePoints(state, dxffile, false);
 
-    for (int zones = 1; zones <= NumOfZones; ++zones) {
+    for (int zones = 1; zones <= state.dataGlobal->NumOfZones; ++zones) {
         const auto curcolorno = ColorNo_DaylSensor1;
 
         for (int mapnum = 1; mapnum <= TotIllumMaps; ++mapnum) {
@@ -858,7 +854,7 @@ void DXFOut(EnergyPlusData &state,
         }
     }
 
-    DXFDaylightingReferencePoints(dxffile, true);
+    DXFDaylightingReferencePoints(state, dxffile, true);
 
     print(dxffile, Format_706);
 }
@@ -888,7 +884,6 @@ void DXFOutLines(EnergyPlusData &state, std::string const &ColorScheme)
     using namespace DataSurfaces;
     using namespace DataSurfaceColors;
     using DataDaylighting::ZoneDaylight;
-    using DataGlobals::NumOfZones;
     using DataStringGlobals::VerString;
     using General::TrimSigDigits;
 
@@ -924,7 +919,7 @@ void DXFOutLines(EnergyPlusData &state, std::string const &ColorScheme)
         return;
     }
 
-    auto dxffile = state.files.dxf.open("DXFOutLines", state.files.outputControl.dxf);
+    auto dxffile = state.files.dxf.open(state, "DXFOutLines", state.files.outputControl.dxf);
 
     print(dxffile, Format_702); // Start of Entities section
 
@@ -934,7 +929,7 @@ void DXFOutLines(EnergyPlusData &state, std::string const &ColorScheme)
 
     print(dxffile, Format_708, "DXF using Lines", ' ', ' ');
 
-    WriteDXFCommon(dxffile, ColorScheme);
+    WriteDXFCommon(state, dxffile, ColorScheme);
 
     //  Do all detached shading surfaces first
     int surfcount = 0;
@@ -980,7 +975,7 @@ void DXFOutLines(EnergyPlusData &state, std::string const &ColorScheme)
     }
 
     // now do zone surfaces, by zone
-    for (int zones = 1; zones <= NumOfZones; ++zones) {
+    for (int zones = 1; zones <= state.dataGlobal->NumOfZones; ++zones) {
         auto TempZoneName = normalizeName(Zone(zones).Name);
 
         surfcount = 0;
@@ -1070,8 +1065,8 @@ void DXFOutLines(EnergyPlusData &state, std::string const &ColorScheme)
         }
     }
 
-    DXFDaylightingReferencePoints(dxffile, false);
-    DXFDaylightingReferencePoints(dxffile, true);
+    DXFDaylightingReferencePoints(state, dxffile, false);
+    DXFDaylightingReferencePoints(state, dxffile, true);
 
     print(dxffile, Format_706);
 }
@@ -1101,7 +1096,6 @@ void DXFOutWireFrame(EnergyPlusData &state, std::string const &ColorScheme)
     using namespace DataSurfaces;
     using namespace DataSurfaceColors;
     using DataDaylighting::ZoneDaylight;
-    using DataGlobals::NumOfZones;
     using DataStringGlobals::VerString;
     using General::TrimSigDigits;
 
@@ -1137,7 +1131,7 @@ void DXFOutWireFrame(EnergyPlusData &state, std::string const &ColorScheme)
         return;
     }
 
-    auto dxffile = state.files.dxf.open("DXFOutWireFrame", state.files.outputControl.dxf);
+    auto dxffile = state.files.dxf.open(state, "DXFOutWireFrame", state.files.outputControl.dxf);
 
     print(dxffile, Format_702); // Start of Entities section
 
@@ -1146,7 +1140,7 @@ void DXFOutWireFrame(EnergyPlusData &state, std::string const &ColorScheme)
     print(dxffile, Format_708, "Program Version", ",", VerString);
     print(dxffile, Format_708, "DXF using Wireframe", ' ', ' ');
 
-    WriteDXFCommon(dxffile, ColorScheme);
+    WriteDXFCommon(state, dxffile, ColorScheme);
 
     //  Do all detached shading surfaces first
     int surfcount = 0;
@@ -1181,7 +1175,7 @@ void DXFOutWireFrame(EnergyPlusData &state, std::string const &ColorScheme)
     }
 
     // now do zone surfaces, by zone
-    for (int zones = 1; zones <= NumOfZones; ++zones) {
+    for (int zones = 1; zones <= state.dataGlobal->NumOfZones; ++zones) {
         const auto SaveZoneName = normalizeName(Zone(zones).Name);
 
         surfcount = 0;
@@ -1243,8 +1237,8 @@ void DXFOutWireFrame(EnergyPlusData &state, std::string const &ColorScheme)
     //  712 format(' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5,/,  &
     //             ' 11',/,f15.5,/,' 21',/,f15.5,/,' 31',/,f15.5)
 
-    DXFDaylightingReferencePoints(dxffile, false);
-    DXFDaylightingReferencePoints(dxffile, true);
+    DXFDaylightingReferencePoints(state, dxffile, false);
+    DXFDaylightingReferencePoints(state, dxffile, true);
 
     print(dxffile, Format_706);
 }
@@ -1271,7 +1265,6 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
     // Using/Aliasing
     using namespace DataHeatBalance;
     using namespace DataSurfaces;
-    using DataGlobals::NumOfZones;
     using General::RoundSigDigits;
     using General::TrimSigDigits;
     using ScheduleManager::GetScheduleMaxValue;
@@ -1388,8 +1381,8 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
             if (RptType == 10) {
                 if (Surface(surf).SchedShadowSurfIndex > 0) {
                     ScheduleName = GetScheduleName(state, Surface(surf).SchedShadowSurfIndex);
-                    cSchedMin = RoundSigDigits(GetScheduleMinValue(Surface(surf).SchedShadowSurfIndex), 2);
-                    cSchedMax = RoundSigDigits(GetScheduleMaxValue(Surface(surf).SchedShadowSurfIndex), 2);
+                    cSchedMin = RoundSigDigits(GetScheduleMinValue(state, Surface(surf).SchedShadowSurfIndex), 2);
+                    cSchedMax = RoundSigDigits(GetScheduleMaxValue(state, Surface(surf).SchedShadowSurfIndex), 2);
                 } else {
                     ScheduleName = "";
                     cSchedMin = "0.0";
@@ -1405,8 +1398,8 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
             } else {
                 if (Surface(surf).SchedShadowSurfIndex > 0) {
                     ScheduleName = GetScheduleName(state, Surface(surf).SchedShadowSurfIndex);
-                    cSchedMin = RoundSigDigits(GetScheduleMinValue(Surface(surf).SchedShadowSurfIndex), 2);
-                    cSchedMax = RoundSigDigits(GetScheduleMaxValue(Surface(surf).SchedShadowSurfIndex), 2);
+                    cSchedMin = RoundSigDigits(GetScheduleMinValue(state, Surface(surf).SchedShadowSurfIndex), 2);
+                    cSchedMax = RoundSigDigits(GetScheduleMaxValue(state, Surface(surf).SchedShadowSurfIndex), 2);
                 } else {
                     ScheduleName = "";
                     cSchedMin = "0.0";
@@ -1433,7 +1426,7 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
         }
     }
 
-    for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+    for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
         *eiostream << "Zone Surfaces," << Zone(ZoneNum).Name << "," << (Zone(ZoneNum).SurfaceLast - Zone(ZoneNum).SurfaceFirst + 1) << '\n';
         for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
             if (Surface(surf).Zone != ZoneNum) continue;
@@ -1794,7 +1787,7 @@ void CostInfoOut(EnergyPlusData &state)
         }
     }
 
-    auto scifile = state.files.sci.open("CostInfoOut", state.files.outputControl.sci);
+    auto scifile = state.files.sci.open(state, "CostInfoOut", state.files.outputControl.sci);
 
     print(scifile, "{:12}{:12}\n", TotSurfaces, count(uniqueSurf));
     print(scifile, "{}\n", " data for surfaces useful for cost information");
@@ -1845,7 +1838,6 @@ void VRMLOut(EnergyPlusData &state, const std::string &PolygonAction, const std:
     using DataHeatBalance::Zone;
     using namespace DataSurfaces;
     using DataDaylighting::ZoneDaylight;
-    using DataGlobals::NumOfZones;
     using DataStringGlobals::VerString;
     using namespace DXFEarClipping;
 
@@ -1887,8 +1879,8 @@ void VRMLOut(EnergyPlusData &state, const std::string &PolygonAction, const std:
         RegularPolyline = true;
         PolylineWidth = " 0";
     } else {
-        ShowWarningError("VRMLOut: Illegal key specified for Surfaces with > 4 sides=" + PolygonAction);
-        ShowContinueError("\"TRIANGULATE 3DFACE\" will be used for any surfaces with > 4 sides.");
+        ShowWarningError(state, "VRMLOut: Illegal key specified for Surfaces with > 4 sides=" + PolygonAction);
+        ShowContinueError(state, "\"TRIANGULATE 3DFACE\" will be used for any surfaces with > 4 sides.");
         TriangulateFace = true;
     }
 
@@ -1897,7 +1889,7 @@ void VRMLOut(EnergyPlusData &state, const std::string &PolygonAction, const std:
         return;
     }
 
-    auto wrlfile = state.files.wrl.open("VRMLOut", state.files.outputControl.wrl);
+    auto wrlfile = state.files.wrl.open(state, "VRMLOut", state.files.outputControl.wrl);
 
     print(wrlfile, Format_702);
 
@@ -1908,7 +1900,7 @@ void VRMLOut(EnergyPlusData &state, const std::string &PolygonAction, const std:
     }
 
     print(wrlfile, "# Zone Names\n");
-    for (int zones = 1; zones <= NumOfZones; ++zones) {
+    for (int zones = 1; zones <= state.dataGlobal->NumOfZones; ++zones) {
         print(wrlfile, "# Zone={}:{}\n", zones, normalizeName(Zone(zones).Name));
     }
 
@@ -1976,7 +1968,7 @@ void VRMLOut(EnergyPlusData &state, const std::string &PolygonAction, const std:
         }
     }
     //  ! now do zone surfaces, by zone
-    for (int zoneNum = 1; zoneNum <= NumOfZones; ++zoneNum) {
+    for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
         int oldSurfNum = 0;
         for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
             ++oldSurfNum;

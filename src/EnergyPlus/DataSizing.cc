@@ -859,7 +859,8 @@ namespace DataSizing {
         firstPassFlag = false;
     }
 
-    void GetCoilDesFlowT(int SysNum,           // central air system index
+    void GetCoilDesFlowT(EnergyPlusData &state,
+                         int SysNum,           // central air system index
                          Real64 CpAir,         // specific heat to be used in calculations [J/kgC]
                          Real64 &DesFlow,      // returned design mass flow [kg/s]
                          Real64 &DesExitTemp,  // returned design coil exit temperature [kg/s]
@@ -915,9 +916,9 @@ namespace DataSizing {
             }
         } else {
             if ((CoolCapCtrl == VT) || (CoolCapCtrl == Bypass)) {
-                ShowWarningError("GetCoilDesFlow: AirLoopHVAC=" + SysSizInput(SysNum).AirPriLoopName +
+                ShowWarningError(state, "GetCoilDesFlow: AirLoopHVAC=" + SysSizInput(SysNum).AirPriLoopName +
                                  "has no time of peak cooling load for sizing.");
-                ShowContinueError("Using Central Cooling Capacity Control Method=VAV instead of Bypass or VT.");
+                ShowContinueError(state, "Using Central Cooling Capacity Control Method=VAV instead of Bypass or VT.");
                 CoolCapCtrl = VAV;
             }
         }
@@ -941,7 +942,7 @@ namespace DataSizing {
             DesExitTemp = max(FinalSysSizing(SysNum).CoolSupTemp,
                               AvgZoneTemp - ZoneCoolLoadSum / (DataEnvironment::StdRhoAir * CpAir * FinalSysSizing(SysNum).DesCoolVolFlow));
             DesFlow = FinalSysSizing(SysNum).DesCoolVolFlow;
-            DesExitHumRat = Psychrometrics::PsyWFnTdbRhPb(DesExitTemp, 0.9, DataEnvironment::StdBaroPress, "GetCoilDesFlowT");
+            DesExitHumRat = Psychrometrics::PsyWFnTdbRhPb(state, DesExitTemp, 0.9, DataEnvironment::StdBaroPress, "GetCoilDesFlowT");
         } else if (CoolCapCtrl == Bypass) {
             if (FinalSysSizing(SysNum).CoolingPeakLoadType == SensibleCoolingLoad) {
                 ZoneCoolLoadSum = CalcSysSizing(SysNum).SumZoneCoolLoadSeq(TimeStepAtPeak);
@@ -959,7 +960,7 @@ namespace DataSizing {
             } else {
                 DesFlow = TotFlow;
             }
-            DesExitHumRat = Psychrometrics::PsyWFnTdbRhPb(DesExitTemp, 0.9, DataEnvironment::StdBaroPress, "GetCoilDesFlowT");
+            DesExitHumRat = Psychrometrics::PsyWFnTdbRhPb(state, DesExitTemp, 0.9, DataEnvironment::StdBaroPress, "GetCoilDesFlowT");
         }
     }
 

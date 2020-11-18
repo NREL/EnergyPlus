@@ -188,22 +188,22 @@ namespace SimAirServingZones {
                         bool &SysReSim    // Set to TRUE if mass balance fails and resimulation is needed
     );
 
-    void SizeAirLoops();
+    void SizeAirLoops(EnergyPlusData &state);
 
     void SizeAirLoopBranches(EnergyPlusData &state, int const AirLoopNum, int const BranchNum);
 
-    void SetUpSysSizingArrays();
+    void SetUpSysSizingArrays(EnergyPlusData &state);
 
     void SizeSysOutdoorAir(EnergyPlusData &state);
 
     void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator const CallIndicator);
 
-    void UpdateSysSizingForScalableInputs(int const AirLoopNum);
+    void UpdateSysSizingForScalableInputs(EnergyPlusData &state, int const AirLoopNum);
 
-    Real64 GetHeatingSATempForSizing(int const IndexAirLoop // air loop index
+    Real64 GetHeatingSATempForSizing(EnergyPlusData &state, int const IndexAirLoop // air loop index
     );
 
-    Real64 GetHeatingSATempHumRatForSizing(int const IndexAirLoop // air loop index
+    Real64 GetHeatingSATempHumRatForSizing(EnergyPlusData &state, int const IndexAirLoop // air loop index
     );
 
     // End Algorithm Section of the Module

@@ -70,7 +70,6 @@
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::DataEnvironment;
-using namespace EnergyPlus::DataGlobals;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataRuntimeLanguage;
 using namespace EnergyPlus::DataSurfaces;
@@ -910,19 +909,19 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_setUserTemperatureLocationPerpendicula
     // Test 1: User value is less than zero--should be reset to zero
     userInputValue = -0.25;
     expectedReturnValue = 0.0;
-    actualReturnValue = thisConstruct.setUserTemperatureLocationPerpendicular(userInputValue);
+    actualReturnValue = thisConstruct.setUserTemperatureLocationPerpendicular(state, userInputValue);
     EXPECT_EQ(actualReturnValue,expectedReturnValue);
 
     // Test 2: User value is greater than unity--should be reset to 1.0
     userInputValue = 1.23456;
     expectedReturnValue = 1.0;
-    actualReturnValue = thisConstruct.setUserTemperatureLocationPerpendicular(userInputValue);
+    actualReturnValue = thisConstruct.setUserTemperatureLocationPerpendicular(state, userInputValue);
     EXPECT_EQ(actualReturnValue,expectedReturnValue);
 
     // Test 3: User value is valid (between 0 and 1)--returned value should be equal to user input
     userInputValue = 0.234567;
     expectedReturnValue = 0.234567;
-    actualReturnValue = thisConstruct.setUserTemperatureLocationPerpendicular(userInputValue);
+    actualReturnValue = thisConstruct.setUserTemperatureLocationPerpendicular(state, userInputValue);
     EXPECT_EQ(actualReturnValue,expectedReturnValue);
 
 }

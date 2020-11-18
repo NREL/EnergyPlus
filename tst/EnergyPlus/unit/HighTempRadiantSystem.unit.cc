@@ -57,7 +57,6 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataSurfaces.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HighTempRadiantSystem.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
@@ -65,7 +64,6 @@ using namespace EnergyPlus;
 using namespace EnergyPlus::HighTempRadiantSystem;
 using namespace ObjexxFCL;
 using namespace EnergyPlus::DataHeatBalance;
-using namespace DataGlobals;
 using namespace DataHVACGlobals;
 using namespace EnergyPlus::DataSurfaces;
 using namespace EnergyPlus::DataSizing;

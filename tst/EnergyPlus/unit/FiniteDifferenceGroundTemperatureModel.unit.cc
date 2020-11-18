@@ -53,7 +53,6 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/GroundTemperatureModeling/FiniteDifferenceGroundTemperatureModel.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/WeatherManager.hh>
@@ -279,7 +278,7 @@ TEST_F(EnergyPlusFixture, FiniteDiffGroundTempModel_GetWeather_Weather) {
     // Read the project data, such as Timestep
     state.dataGlobal->BeginSimFlag = true;
     SimulationManager::GetProjectData(state);
-    EXPECT_EQ(DataGlobals::NumOfTimeStepInHour, 4);
+    EXPECT_EQ(state.dataGlobal->NumOfTimeStepInHour, 4);
 
     // Needed to avoid crash in SetupSimulation (from ElectricPowerServiceManager.hh)
     createFacilityElectricPowerServiceObject();

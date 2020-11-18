@@ -90,7 +90,7 @@ std::shared_ptr<SiteDeepGroundTemps> SiteDeepGroundTemps::DeepGTMFactory(EnergyP
     std::shared_ptr<SiteDeepGroundTemps> thisModel(new SiteDeepGroundTemps());
 
     std::string const cCurrentModuleObject = CurrentModuleObjects(objectType_SiteDeepGroundTemp);
-    int numCurrObjects = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+    int numCurrObjects = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     thisModel->objectType = objectType;
     thisModel->objectName = objectName;
@@ -101,7 +101,7 @@ std::shared_ptr<SiteDeepGroundTemps> SiteDeepGroundTemps::DeepGTMFactory(EnergyP
         inputProcessor->getObjectItem(state, cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
 
         if (NumNums < 12) {
-            ShowSevereError(cCurrentModuleObject + ": Less than 12 values entered.");
+            ShowSevereError(state, cCurrentModuleObject + ": Less than 12 values entered.");
             thisModel->errorsFound = true;
         }
 
@@ -113,7 +113,7 @@ std::shared_ptr<SiteDeepGroundTemps> SiteDeepGroundTemps::DeepGTMFactory(EnergyP
         GroundTemp_DeepObjInput = true;
 
     } else if (numCurrObjects > 1) {
-        ShowSevereError(cCurrentModuleObject + ": Too many objects entered. Only one allowed.");
+        ShowSevereError(state, cCurrentModuleObject + ": Too many objects entered. Only one allowed.");
         thisModel->errorsFound = true;
 
     } else {
@@ -127,14 +127,14 @@ std::shared_ptr<SiteDeepGroundTemps> SiteDeepGroundTemps::DeepGTMFactory(EnergyP
         groundTempModels.push_back(thisModel);
         return thisModel;
     } else {
-        ShowContinueError("Site:GroundTemperature:Deep--Errors getting input for ground temperature model");
+        ShowContinueError(state, "Site:GroundTemperature:Deep--Errors getting input for ground temperature model");
         return nullptr;
     }
 }
 
 //******************************************************************************
 
-Real64 SiteDeepGroundTemps::getGroundTemp(EnergyPlusData &EP_UNUSED(state))
+Real64 SiteDeepGroundTemps::getGroundTemp([[maybe_unused]] EnergyPlusData &state)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -150,7 +150,7 @@ Real64 SiteDeepGroundTemps::getGroundTemp(EnergyPlusData &EP_UNUSED(state))
 
 //******************************************************************************
 
-Real64 SiteDeepGroundTemps::getGroundTempAtTimeInSeconds(EnergyPlusData &state, Real64 const EP_UNUSED(_depth), Real64 const _seconds)
+Real64 SiteDeepGroundTemps::getGroundTempAtTimeInSeconds(EnergyPlusData &state, [[maybe_unused]] Real64 const _depth, Real64 const _seconds)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -180,7 +180,7 @@ Real64 SiteDeepGroundTemps::getGroundTempAtTimeInSeconds(EnergyPlusData &state, 
 
 //******************************************************************************
 
-Real64 SiteDeepGroundTemps::getGroundTempAtTimeInMonths(EnergyPlusData &state, Real64 const EP_UNUSED(_depth), int const _month)
+Real64 SiteDeepGroundTemps::getGroundTempAtTimeInMonths(EnergyPlusData &state, [[maybe_unused]] Real64 const _depth, int const _month)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell

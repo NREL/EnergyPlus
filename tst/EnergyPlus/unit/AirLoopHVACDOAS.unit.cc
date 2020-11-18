@@ -55,7 +55,6 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/AirLoopHVACDOAS.hh>
 #include <EnergyPlus/CurveManager.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -81,7 +80,6 @@
 using namespace EnergyPlus;
 using namespace DataSurfaces;
 using namespace DataHeatBalance;
-using namespace DataGlobals;
 using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::ScheduleManager;
 using namespace OutAirNodeManager;
@@ -3964,14 +3962,14 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOASTest)
     SurfaceGeometry::GetGeometryParameters(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
-    SurfaceGeometry::CosBldgRotAppGonly = 1.0;
-    SurfaceGeometry::SinBldgRotAppGonly = 0.0;
-    SurfaceGeometry::CosZoneRelNorth.allocate(6);
-    SurfaceGeometry::SinZoneRelNorth.allocate(6);
-    SurfaceGeometry::CosZoneRelNorth = 1.0;
-    SurfaceGeometry::SinZoneRelNorth = 0.0;
-    SurfaceGeometry::CosBldgRelNorth = 1.0;
-    SurfaceGeometry::SinBldgRelNorth = 0.0;
+    state.dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
+    state.dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
+    state.dataSurfaceGeometry->CosZoneRelNorth.allocate(6);
+    state.dataSurfaceGeometry->SinZoneRelNorth.allocate(6);
+    state.dataSurfaceGeometry->CosZoneRelNorth = 1.0;
+    state.dataSurfaceGeometry->SinZoneRelNorth = 0.0;
+    state.dataSurfaceGeometry->CosBldgRelNorth = 1.0;
+    state.dataSurfaceGeometry->SinBldgRelNorth = 0.0;
     SurfaceGeometry::GetSurfaceData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
@@ -4253,12 +4251,12 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOAS_TestOACompOutletNodeIndex)
     MixedAir::GetOASysInputFlag = false;
     MixedAir::GetOAMixerInputs(state);
 
-    DataAirSystems::PrimaryAirSystem.allocate(5);
-    DataAirSystems::PrimaryAirSystem(1).Name = "PSZ-AC:1";
-    DataAirSystems::PrimaryAirSystem(2).Name = "PSZ-AC:2";
-    DataAirSystems::PrimaryAirSystem(3).Name = "PSZ-AC:3";
-    DataAirSystems::PrimaryAirSystem(4).Name = "PSZ-AC:4";
-    DataAirSystems::PrimaryAirSystem(5).Name = "PSZ-AC:5";
+    state.dataAirSystemsData->PrimaryAirSystems.allocate(5);
+    state.dataAirSystemsData->PrimaryAirSystems(1).Name = "PSZ-AC:1";
+    state.dataAirSystemsData->PrimaryAirSystems(2).Name = "PSZ-AC:2";
+    state.dataAirSystemsData->PrimaryAirSystems(3).Name = "PSZ-AC:3";
+    state.dataAirSystemsData->PrimaryAirSystems(4).Name = "PSZ-AC:4";
+    state.dataAirSystemsData->PrimaryAirSystems(5).Name = "PSZ-AC:5";
 
     AirLoopHVACDOAS::AirLoopDOAS::getAirLoopDOASInput(state);
 

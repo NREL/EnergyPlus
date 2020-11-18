@@ -124,11 +124,11 @@ std::unique_ptr<InputProcessor> InputProcessor::factory()
     return ret;
 }
 
-json const &InputProcessor::getFields(std::string const &objectType, std::string const &objectName)
+json const &InputProcessor::getFields(EnergyPlusData &state, std::string const &objectType, std::string const &objectName)
 {
     auto const it = epJSON.find(objectType);
     if (it == epJSON.end()) {
-        ShowFatalError("ObjectType (" + objectType + ") requested was not found in input");
+        ShowFatalError(state, "ObjectType (" + objectType + ") requested was not found in input");
     }
     auto const &objs = it.value();
     auto const it2 = objs.find(objectName);
@@ -139,27 +139,27 @@ json const &InputProcessor::getFields(std::string const &objectType, std::string
                 return it3.value();
             }
         }
-        ShowFatalError("Name \"" + objectName + "\" requested was not found in input for ObjectType (" + objectType + ")");
+        ShowFatalError(state, "Name \"" + objectName + "\" requested was not found in input for ObjectType (" + objectType + ")");
     }
     return it2.value();
 }
 
-json const &InputProcessor::getFields(std::string const &objectType)
+json const &InputProcessor::getFields(EnergyPlusData &state, std::string const &objectType)
 {
     static const std::string blankString;
     auto const it = epJSON.find(objectType);
     if (it == epJSON.end()) {
-        ShowFatalError("ObjectType (" + objectType + ") requested was not found in input");
+        ShowFatalError(state, "ObjectType (" + objectType + ") requested was not found in input");
     }
     auto const &objs = it.value();
     auto const it2 = objs.find(blankString);
     if (it2 == objs.end()) {
-        ShowFatalError("Name \"\" requested was not found in input for ObjectType (" + objectType + ")");
+        ShowFatalError(state, "Name \"\" requested was not found in input for ObjectType (" + objectType + ")");
     }
     return it2.value();
 }
 
-json const &InputProcessor::getPatternProperties(json const &schema_obj)
+json const &InputProcessor::getPatternProperties(EnergyPlusData &state, json const &schema_obj)
 {
     std::string pattern_property;
     auto const &pattern_properties = schema_obj["patternProperties"];
@@ -170,7 +170,7 @@ json const &InputProcessor::getPatternProperties(json const &schema_obj)
     } else if (no_whitespace_present) {
         pattern_property = R"(^.*\S.*$)";
     } else {
-        ShowFatalError(R"(The patternProperties value is not a valid choice (".*", "^.*\S.*$"))");
+        ShowFatalError(state, R"(The patternProperties value is not a valid choice (".*", "^.*\S.*$"))");
     }
     auto const &schema_obj_props = pattern_properties[pattern_property]["properties"];
     return schema_obj_props;
@@ -254,7 +254,7 @@ void InputProcessor::processInput(EnergyPlusData &state)
 {
     std::ifstream input_stream(DataStringGlobals::inputFileName, std::ifstream::in | std::ifstream::binary);
     if (!input_stream.is_open()) {
-        ShowFatalError("Input file path " + DataStringGlobals::inputFileName + " not found");
+        ShowFatalError(state, "Input file path " + DataStringGlobals::inputFileName + " not found");
         return;
     }
 
@@ -286,17 +286,12 @@ void InputProcessor::processInput(EnergyPlusData &state)
                 input_file.append(line + '\n');
             }
             if (input_file.empty()) {
-                ShowFatalError("Failed to read input file: " + DataStringGlobals::inputFileName);
+                ShowFatalError(state, "Failed to read input file: " + DataStringGlobals::inputFileName);
                 return;
             }
 
             bool success = true;
             epJSON = idf_parser->decode(input_file, schema, success);
-
-            //          bool hasErrors = processErrors();
-            //          if ( !success || hasErrors ) {
-            //              ShowFatalError( "Errors occurred on processing input file. Preceding condition(s) cause termination." );
-            //          }
 
             if (state.dataGlobal->outputEpJSONConversion || state.dataGlobal->outputEpJSONConversionOnly) {
                 json epJSONClean = epJSON;
@@ -320,16 +315,16 @@ void InputProcessor::processInput(EnergyPlusData &state)
             epJSON = json::parse(input_stream);
         }
     } catch (const std::exception &e) {
-        ShowSevereError(e.what());
-        ShowFatalError("Errors occurred on processing input file. Preceding condition(s) cause termination.");
+        ShowSevereError(state, e.what());
+        ShowFatalError(state, "Errors occurred on processing input file. Preceding condition(s) cause termination.");
     }
 
     bool is_valid = validation->validate(epJSON);
-    bool hasErrors = processErrors();
-    bool versionMatch = checkVersionMatch();
+    bool hasErrors = processErrors(state);
+    bool versionMatch = checkVersionMatch(state);
 
     if (!is_valid || hasErrors) {
-        ShowFatalError("Errors occurred on processing input file. Preceding condition(s) cause termination.");
+        ShowFatalError(state, "Errors occurred on processing input file. Preceding condition(s) cause termination.");
     }
 
     if (state.dataGlobal->isEpJSON && (state.dataGlobal->outputEpJSONConversion || state.dataGlobal->outputEpJSONConversionOnly)) {
@@ -340,7 +335,7 @@ void InputProcessor::processInput(EnergyPlusData &state)
             std::ofstream convertedFS(convertedEpJSON, std::ofstream::out);
             convertedFS << encoded << std::endl;
         } else {
-            ShowWarningError("Skipping conversion of epJSON to IDF due to mismatched Version.");
+            ShowWarningError(state, "Skipping conversion of epJSON to IDF due to mismatched Version.");
         }
     }
 
@@ -358,10 +353,10 @@ void InputProcessor::processInput(EnergyPlusData &state)
     DataIPShortCuts::rNumericArgs.dimension(MaxNumeric, 0.0);
     DataIPShortCuts::lNumericFieldBlanks.dimension(MaxNumeric, false);
 
-    reportIDFRecordsStats();
+    reportIDFRecordsStats(state);
 }
 
-bool InputProcessor::checkVersionMatch()
+bool InputProcessor::checkVersionMatch(EnergyPlusData &state)
 {
     using DataStringGlobals::MatchVersion;
     auto it = epJSON.find("Version");
@@ -369,7 +364,7 @@ bool InputProcessor::checkVersionMatch()
         for (auto const &version : it.value()) {
             std::string v = version["version_identifier"];
             if (v.empty()) {
-                ShowWarningError("Input errors occurred and version ID was left blank, verify file version");
+                ShowWarningError(state, "Input errors occurred and version ID was left blank, verify file version");
             } else {
                 std::string::size_type const lenVer(len(MatchVersion));
                 int Which;
@@ -379,7 +374,7 @@ bool InputProcessor::checkVersionMatch()
                     Which = static_cast<int>(index(v, MatchVersion));
                 }
                 if (Which != 0) {
-                    ShowWarningError("Version: in IDF=\"" + v + "\" not the same as expected=\"" + MatchVersion + "\"");
+                    ShowWarningError(state, "Version: in IDF=\"" + v + "\" not the same as expected=\"" + MatchVersion + "\"");
                     return false;
                 }
             }
@@ -388,7 +383,7 @@ bool InputProcessor::checkVersionMatch()
     return true;
 }
 
-bool InputProcessor::processErrors()
+bool InputProcessor::processErrors(EnergyPlusData &state)
 {
     auto const idf_parser_errors = idf_parser->errors();
     auto const idf_parser_warnings = idf_parser->warnings();
@@ -397,16 +392,16 @@ bool InputProcessor::processErrors()
     auto const validation_warnings = validation->warnings();
 
     for (auto const &error : idf_parser_errors) {
-        ShowSevereError(error);
+        ShowSevereError(state, error);
     }
     for (auto const &warning : idf_parser_warnings) {
-        ShowWarningError(warning);
+        ShowWarningError(state, warning);
     }
     for (auto const &error : validation_errors) {
-        ShowSevereError(error);
+        ShowSevereError(state, error);
     }
     for (auto const &warning : validation_warnings) {
-        ShowWarningError(warning);
+        ShowWarningError(state, warning);
     }
 
     bool has_errors = validation->hasErrors() || idf_parser->hasErrors();
@@ -430,7 +425,7 @@ int InputProcessor::getNumSectionsFound(std::string const &SectionWord)
     return static_cast<int>(SectionWord_iter.value().size());
 }
 
-int InputProcessor::getNumObjectsFound(std::string const &ObjectWord)
+int InputProcessor::getNumObjectsFound(EnergyPlusData &state, std::string const &ObjectWord)
 {
 
     // FUNCTION INFORMATION:
@@ -463,7 +458,7 @@ int InputProcessor::getNumObjectsFound(std::string const &ObjectWord)
     if (schema["properties"].find(ObjectWord) == schema["properties"].end()) {
         auto tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(ObjectWord));
         if (tmp_umit == caseInsensitiveObjectMap.end()) {
-            ShowWarningError("Requested Object not found in Definitions: " + ObjectWord);
+            ShowWarningError(state, "Requested Object not found in Definitions: " + ObjectWord);
         }
     }
     return 0;
@@ -511,7 +506,7 @@ bool InputProcessor::findDefault(Real64 &default_value, json const &schema_field
     return false;
 }
 
-bool InputProcessor::getDefaultValue(std::string const &objectWord, std::string const &fieldName, Real64 &value)
+bool InputProcessor::getDefaultValue(EnergyPlusData &state, std::string const &objectWord, std::string const &fieldName, Real64 &value)
 {
     auto find_iterators = objectCacheMap.find(objectWord);
     if (find_iterators == objectCacheMap.end()) {
@@ -523,13 +518,13 @@ bool InputProcessor::getDefaultValue(std::string const &objectWord, std::string 
     }
     auto const &epJSON_schema_it = find_iterators->second.schemaIterator;
     auto const &epJSON_schema_it_val = epJSON_schema_it.value();
-    auto const &schema_obj_props = getPatternProperties(epJSON_schema_it_val);
+    auto const &schema_obj_props = getPatternProperties(state, epJSON_schema_it_val);
     auto const &sizing_factor_schema_field_obj = schema_obj_props.at(fieldName);
     bool defaultFound = findDefault(value, sizing_factor_schema_field_obj);
     return defaultFound;
 }
 
-bool InputProcessor::getDefaultValue(std::string const &objectWord, std::string const &fieldName, std::string &value)
+bool InputProcessor::getDefaultValue(EnergyPlusData &state, std::string const &objectWord, std::string const &fieldName, std::string &value)
 {
     auto find_iterators = objectCacheMap.find(objectWord);
     if (find_iterators == objectCacheMap.end()) {
@@ -541,7 +536,7 @@ bool InputProcessor::getDefaultValue(std::string const &objectWord, std::string 
     }
     auto const &epJSON_schema_it = find_iterators->second.schemaIterator;
     auto const &epJSON_schema_it_val = epJSON_schema_it.value();
-    auto const &schema_obj_props = getPatternProperties(epJSON_schema_it_val);
+    auto const &schema_obj_props = getPatternProperties(state, epJSON_schema_it_val);
     auto const &sizing_factor_schema_field_obj = schema_obj_props.at(fieldName);
     bool defaultFound = findDefault(value, sizing_factor_schema_field_obj);
     return defaultFound;
@@ -761,7 +756,7 @@ void InputProcessor::getObjectItem(EnergyPlusData &state,
     auto const &epJSON_schema_it_val = epJSON_schema_it.value();
 
     // Locations in JSON schema relating to normal fields
-    auto const &schema_obj_props = getPatternProperties(epJSON_schema_it_val);
+    auto const &schema_obj_props = getPatternProperties(state, epJSON_schema_it_val);
 
     // Locations in JSON schema storing the positional aspects from the IDD format, legacy prefixed
     auto const &legacy_idd = epJSON_schema_it_val["legacy_idd"];
@@ -809,7 +804,7 @@ void InputProcessor::getObjectItem(EnergyPlusData &state,
         auto const &field_info = legacy_idd_field_info.find(field);
         auto const &field_info_val = field_info.value();
         if (field_info == legacy_idd_field_info.end()) {
-            ShowFatalError("Could not find field = \"" + field + "\" in \"" + Object + "\" in epJSON Schema.");
+            ShowFatalError(state, "Could not find field = \"" + field + "\" in \"" + Object + "\" in epJSON Schema.");
         }
 
         bool within_idf_fields = (i < maxFields.max_fields);
@@ -865,7 +860,7 @@ void InputProcessor::getObjectItem(EnergyPlusData &state,
                     auto const &field_info_val = field_info.value();
 
                     if (field_info == legacy_idd_field_info.end()) {
-                        ShowFatalError("Could not find field = \"" + field_name + "\" in \"" + Object + "\" in epJSON Schema.");
+                        ShowFatalError(state, "Could not find field = \"" + field_name + "\" in \"" + Object + "\" in epJSON Schema.");
                     }
 
                     bool within_idf_extensible_fields = (extensible_count < maxFields.max_extensible_fields);
@@ -1057,7 +1052,8 @@ int InputProcessor::getObjectItemNum(EnergyPlusData &state,
     return getIDFObjNum(state, ObjType, object_item_num); // if incoming input is idf, then return idf object order
 }
 
-void InputProcessor::rangeCheck(bool &ErrorsFound,                       // Set to true if error detected
+void InputProcessor::rangeCheck(EnergyPlusData &state,
+                                bool &ErrorsFound,                       // Set to true if error detected
                                 std::string const &WhatFieldString,      // Descriptive field for string
                                 std::string const &WhatObjectString,     // Descriptive field for object, Zone Name, etc.
                                 std::string const &ErrorLevel,           // 'Warning','Severe','Fatal')
@@ -1113,22 +1109,22 @@ void InputProcessor::rangeCheck(bool &ErrorsFound,                       // Set 
             auto const errorCheck(ErrorString[0]);
 
             if ((errorCheck == 'W') || (errorCheck == 'w')) {
-                ShowWarningError(Message1);
-                ShowContinueError(Message2);
+                ShowWarningError(state, Message1);
+                ShowContinueError(state, Message2);
 
             } else if ((errorCheck == 'S') || (errorCheck == 's')) {
-                ShowSevereError(Message1);
-                ShowContinueError(Message2);
+                ShowSevereError(state, Message1);
+                ShowContinueError(state, Message2);
                 ErrorsFound = true;
 
             } else if ((errorCheck == 'F') || (errorCheck == 'f')) {
-                ShowSevereError(Message1);
-                ShowContinueError(Message2);
-                ShowFatalError("Program terminates due to preceding condition(s).");
+                ShowSevereError(state, Message1);
+                ShowContinueError(state, Message2);
+                ShowFatalError(state, "Program terminates due to preceding condition(s).");
 
             } else {
-                ShowSevereError(Message1);
-                ShowContinueError(Message2);
+                ShowSevereError(state, Message1);
+                ShowContinueError(state, Message2);
                 ErrorsFound = true;
             }
         }
@@ -1189,7 +1185,8 @@ void InputProcessor::getMaxSchemaArgs(int &NumArgs, int &NumAlpha, int &NumNumer
     NumArgs = NumAlpha + NumNumeric;
 }
 
-void InputProcessor::getObjectDefMaxArgs(std::string const &ObjectWord, // Object for definition
+void InputProcessor::getObjectDefMaxArgs(EnergyPlusData &state,
+                                         std::string const &ObjectWord, // Object for definition
                                          int &NumArgs,                  // How many arguments (max) this Object can have
                                          int &NumAlpha,                 // How many Alpha arguments (max) this Object can have
                                          int &NumNumeric                // How many Numeric arguments (max) this Object can have
@@ -1207,7 +1204,7 @@ void InputProcessor::getObjectDefMaxArgs(std::string const &ObjectWord, // Objec
     if (schema["properties"].find(ObjectWord) == schema["properties"].end()) {
         auto tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(ObjectWord));
         if (tmp_umit == caseInsensitiveObjectMap.end()) {
-            ShowSevereError("getObjectDefMaxArgs: Did not find object=\"" + ObjectWord + "\" in list of objects.");
+            ShowSevereError(state, "getObjectDefMaxArgs: Did not find object=\"" + ObjectWord + "\" in list of objects.");
             return;
         }
         object = &schema["properties"][tmp_umit->second];
@@ -1220,7 +1217,7 @@ void InputProcessor::getObjectDefMaxArgs(std::string const &ObjectWord, // Objec
     if (epJSON.find(ObjectWord) == epJSON.end()) {
         auto tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(ObjectWord));
         if (tmp_umit == caseInsensitiveObjectMap.end()) {
-            ShowSevereError("getObjectDefMaxArgs: Did not find object=\"" + ObjectWord + "\" in list of objects.");
+            ShowSevereError(state, "getObjectDefMaxArgs: Did not find object=\"" + ObjectWord + "\" in list of objects.");
             return;
         }
         objects = &epJSON[tmp_umit->second];
@@ -1264,7 +1261,7 @@ void InputProcessor::getObjectDefMaxArgs(std::string const &ObjectWord, // Objec
     NumArgs = NumAlpha + NumNumeric;
 }
 
-void InputProcessor::reportIDFRecordsStats()
+void InputProcessor::reportIDFRecordsStats(EnergyPlusData &state)
 {
 
     // SUBROUTINE INFORMATION: (previously called GetIDFRecordsStats)
@@ -1370,7 +1367,7 @@ void InputProcessor::reportIDFRecordsStats()
         const json &object_schema = schema_properties.at(objectType);
 
         // Locations in JSON schema relating to normal fields
-        auto const &schema_obj_props = getPatternProperties(object_schema);
+        auto const &schema_obj_props = getPatternProperties(state, object_schema);
         auto const &schema_name_field = object_schema.find("name");
         auto const has_idd_name_field = schema_name_field != object_schema.end();
 
@@ -1438,7 +1435,7 @@ void InputProcessor::reportIDFRecordsStats()
     } // End loop on all objectTypes
 }
 
-void InputProcessor::reportOrphanRecordObjects()
+void InputProcessor::reportOrphanRecordObjects(EnergyPlusData &state)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1454,16 +1451,16 @@ void InputProcessor::reportOrphanRecordObjects()
     std::unordered_set<std::string> unused_object_types;
     unused_object_types.reserve(unusedInputs.size());
 
-    if (unusedInputs.size() && DataGlobals::DisplayUnusedObjects) {
-        ShowWarningError("The following lines are \"Unused Objects\".  These objects are in the input");
-        ShowContinueError(" file but are never obtained by the simulation and therefore are NOT used.");
-        if (!DataGlobals::DisplayAllWarnings) {
-            ShowContinueError(
+    if (unusedInputs.size() && state.dataGlobal->DisplayUnusedObjects) {
+        ShowWarningError(state, "The following lines are \"Unused Objects\".  These objects are in the input");
+        ShowContinueError(state, " file but are never obtained by the simulation and therefore are NOT used.");
+        if (!state.dataGlobal->DisplayAllWarnings) {
+            ShowContinueError(state,
                 " Only the first unused named object of an object class is shown.  Use Output:Diagnostics,DisplayAllWarnings; to see all.");
         } else {
-            ShowContinueError(" Each unused object is shown.");
+            ShowContinueError(state, " Each unused object is shown.");
         }
-        ShowContinueError(" See InputOutputReference document for more details.");
+        ShowContinueError(state, " See InputOutputReference document for more details.");
     }
 
     bool first_iteration = true;
@@ -1474,14 +1471,14 @@ void InputProcessor::reportOrphanRecordObjects()
         // there are some orphans that we are deeming as special, in that they should be warned in detail even if !DisplayUnusedObjects and
         // !DisplayAllWarnings
         if (has_prefix(object_type, "ZoneHVAC:")) {
-            ShowSevereError("Orphaned ZoneHVAC object found.  This was object never referenced in the input, and was not used.");
-            ShowContinueError(" -- Object type: " + object_type);
-            ShowContinueError(" -- Object name: " + name);
+            ShowSevereError(state, "Orphaned ZoneHVAC object found.  This was object never referenced in the input, and was not used.");
+            ShowContinueError(state, " -- Object type: " + object_type);
+            ShowContinueError(state, " -- Object name: " + name);
         }
 
-        if (!DataGlobals::DisplayUnusedObjects) continue;
+        if (!state.dataGlobal->DisplayUnusedObjects) continue;
 
-        if (!DataGlobals::DisplayAllWarnings) {
+        if (!state.dataGlobal->DisplayAllWarnings) {
             auto found_type = unused_object_types.find(object_type);
             if (found_type != unused_object_types.end()) {
                 // only show first unused named object of an object class
@@ -1493,24 +1490,24 @@ void InputProcessor::reportOrphanRecordObjects()
 
         if (first_iteration) {
             if (!name.empty()) {
-                ShowMessage("Object=" + object_type + '=' + name);
+                ShowMessage(state, "Object=" + object_type + '=' + name);
             } else {
-                ShowMessage("Object=" + object_type);
+                ShowMessage(state, "Object=" + object_type);
             }
             first_iteration = false;
         } else {
             if (!name.empty()) {
-                ShowContinueError("Object=" + object_type + '=' + name);
+                ShowContinueError(state, "Object=" + object_type + '=' + name);
             } else {
-                ShowContinueError("Object=" + object_type);
+                ShowContinueError(state, "Object=" + object_type);
             }
         }
     }
 
-    if (unusedInputs.size() && !DataGlobals::DisplayUnusedObjects) {
+    if (unusedInputs.size() && !state.dataGlobal->DisplayUnusedObjects) {
         u64toa(unusedInputs.size(), s);
-        ShowMessage("There are " + std::string(s) + " unused objects in input.");
-        ShowMessage("Use Output:Diagnostics,DisplayUnusedObjects; to see them.");
+        ShowMessage(state, "There are " + std::string(s) + " unused objects in input.");
+        ShowMessage(state, "Use Output:Diagnostics,DisplayUnusedObjects; to see them.");
     }
 }
 
@@ -1562,9 +1559,9 @@ void InputProcessor::preProcessorCheck(EnergyPlusData &state, bool &PreP_Fatal) 
     std::string Multiples;
 
     DataIPShortCuts::cCurrentModuleObject = "Output:PreprocessorMessage";
-    NumPrePM = getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+    NumPrePM = getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
     if (NumPrePM > 0) {
-        getObjectDefMaxArgs(DataIPShortCuts::cCurrentModuleObject, NumParams, NumAlphas, NumNumbers);
+        getObjectDefMaxArgs(state, DataIPShortCuts::cCurrentModuleObject, NumParams, NumAlphas, NumNumbers);
         DataIPShortCuts::cAlphaArgs({1, NumAlphas}) = BlankString;
         for (CountP = 1; CountP <= NumPrePM; ++CountP) {
             getObjectItem(state,
@@ -1589,34 +1586,34 @@ void InputProcessor::preProcessorCheck(EnergyPlusData &state, bool &PreP_Fatal) 
             {
                 auto const errorType(uppercased(DataIPShortCuts::cAlphaArgs(2)));
                 if (errorType == "INFORMATION") {
-                    ShowMessage(DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) +
+                    ShowMessage(state, DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) +
                                 "\" has the following Information message" + Multiples + ':');
                 } else if (errorType == "WARNING") {
-                    ShowWarningError(DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) +
+                    ShowWarningError(state, DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) +
                                      "\" has the following Warning condition" + Multiples + ':');
                 } else if (errorType == "SEVERE") {
-                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) +
+                    ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) +
                                     "\" has the following Severe condition" + Multiples + ':');
                 } else if (errorType == "FATAL") {
-                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) +
+                    ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) +
                                     "\" has the following Fatal condition" + Multiples + ':');
                     PreP_Fatal = true;
                 } else {
-                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\" has the following " +
+                    ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\" has the following " +
                                     DataIPShortCuts::cAlphaArgs(2) + " condition" + Multiples + ':');
                 }
             }
             CountM = 3;
             if (CountM > NumAlphas) {
-                ShowContinueError(DataIPShortCuts::cCurrentModuleObject + " was blank.  Check " + DataIPShortCuts::cAlphaArgs(1) +
+                ShowContinueError(state, DataIPShortCuts::cCurrentModuleObject + " was blank.  Check " + DataIPShortCuts::cAlphaArgs(1) +
                                   " audit trail or error file for possible reasons.");
             }
             while (CountM <= NumAlphas) {
                 if (len(DataIPShortCuts::cAlphaArgs(CountM)) == DataGlobalConstants::MaxNameLength()) {
-                    ShowContinueError(DataIPShortCuts::cAlphaArgs(CountM) + DataIPShortCuts::cAlphaArgs(CountM + 1));
+                    ShowContinueError(state, DataIPShortCuts::cAlphaArgs(CountM) + DataIPShortCuts::cAlphaArgs(CountM + 1));
                     CountM += 2;
                 } else {
-                    ShowContinueError(DataIPShortCuts::cAlphaArgs(CountM));
+                    ShowContinueError(state, DataIPShortCuts::cAlphaArgs(CountM));
                     ++CountM;
                 }
             }
@@ -1624,7 +1621,7 @@ void InputProcessor::preProcessorCheck(EnergyPlusData &state, bool &PreP_Fatal) 
     }
 }
 
-void InputProcessor::preScanReportingVariables()
+void InputProcessor::preScanReportingVariables(EnergyPlusData &state)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda Lawrie
@@ -1675,9 +1672,9 @@ void InputProcessor::preScanReportingVariables()
             json const &fields = obj.value();
             auto it = fields.find("key_value");
             if (it != fields.end() && !it.value().empty()) {
-                addRecordToOutputVariableStructure(it.value(), fields.at("variable_name"));
+                addRecordToOutputVariableStructure(state, it.value(), fields.at("variable_name"));
             } else {
-                addRecordToOutputVariableStructure("*", fields.at("variable_name"));
+                addRecordToOutputVariableStructure(state, "*", fields.at("variable_name"));
             }
         }
     }
@@ -1695,9 +1692,9 @@ void InputProcessor::preScanReportingVariables()
             for (auto const &extensions : fields[extension_key]) {
                 auto it = extensions.find("key_name");
                 if (it != extensions.end() && !obj.key().empty()) {
-                    addRecordToOutputVariableStructure(it.value(), extensions.at("output_variable_or_meter_name"));
+                    addRecordToOutputVariableStructure(state, it.value(), extensions.at("output_variable_or_meter_name"));
                 } else {
-                    addRecordToOutputVariableStructure("*", extensions.at("output_variable_or_meter_name"));
+                    addRecordToOutputVariableStructure(state, "*", extensions.at("output_variable_or_meter_name"));
                 }
             }
         }
@@ -1716,9 +1713,9 @@ void InputProcessor::preScanReportingVariables()
             for (auto const &extensions : fields[extension_key]) {
                 auto it = extensions.find("key_name");
                 if (it != extensions.end() && !obj.key().empty()) {
-                    addRecordToOutputVariableStructure(it.value(), extensions.at("output_variable_or_meter_name"));
+                    addRecordToOutputVariableStructure(state, it.value(), extensions.at("output_variable_or_meter_name"));
                 } else {
-                    addRecordToOutputVariableStructure("*", extensions.at("output_variable_or_meter_name"));
+                    addRecordToOutputVariableStructure(state, "*", extensions.at("output_variable_or_meter_name"));
                 }
             }
         }
@@ -1731,9 +1728,9 @@ void InputProcessor::preScanReportingVariables()
             json const &fields = obj.value();
             auto it = fields.find("output_variable_or_output_meter_index_key_name");
             if (it != fields.end() && !it.value().empty()) {
-                addRecordToOutputVariableStructure(it.value(), fields.at("output_variable_or_output_meter_name"));
+                addRecordToOutputVariableStructure(state, it.value(), fields.at("output_variable_or_output_meter_name"));
             } else {
-                addRecordToOutputVariableStructure("*", fields.at("output_variable_or_output_meter_name"));
+                addRecordToOutputVariableStructure(state, "*", fields.at("output_variable_or_output_meter_name"));
             }
         }
     }
@@ -1742,12 +1739,12 @@ void InputProcessor::preScanReportingVariables()
     if (epJSON_objects != epJSON.end()) {
         auto const &epJSON_object = epJSON_objects.value();
         for (auto obj = epJSON_object.begin(); obj != epJSON_object.end(); ++obj) {
-            addRecordToOutputVariableStructure("*", obj.key());
+            addRecordToOutputVariableStructure(state, "*", obj.key());
         }
     }
 
     for (auto const & requestedVar : OutputProcessor::apiVarRequests) {
-        addRecordToOutputVariableStructure(requestedVar.varKey, requestedVar.varName);
+        addRecordToOutputVariableStructure(state, requestedVar.varKey, requestedVar.varName);
     }
 
     epJSON_objects = epJSON.find(OutputTableTimeBins);
@@ -1756,9 +1753,9 @@ void InputProcessor::preScanReportingVariables()
         for (auto obj = epJSON_object.begin(); obj != epJSON_object.end(); ++obj) {
             json const &fields = obj.value();
             if (!obj.key().empty()) {
-                addRecordToOutputVariableStructure(obj.key(), fields.at("key_value"));
+                addRecordToOutputVariableStructure(state, obj.key(), fields.at("key_value"));
             } else {
-                addRecordToOutputVariableStructure("*", fields.at("key_value"));
+                addRecordToOutputVariableStructure(state, "*", fields.at("key_value"));
             }
         }
     }
@@ -1775,7 +1772,7 @@ void InputProcessor::preScanReportingVariables()
             json const &fields = obj.value();
             for (auto const &extensions : fields[extension_key]) {
                 try {
-                    addRecordToOutputVariableStructure("*", extensions.at("variable_or_meter_name"));
+                    addRecordToOutputVariableStructure(state, "*", extensions.at("variable_or_meter_name"));
                 } catch (...) {
                     continue; // blank or erroneous fields are handled at the get input function for the object
                 }
@@ -1795,7 +1792,7 @@ void InputProcessor::preScanReportingVariables()
             json const &fields = obj.value();
             for (auto const &extensions : fields[extension_key]) {
                 try {
-                    addRecordToOutputVariableStructure("*", extensions.at("variable_or_meter_or_ems_variable_or_field_name"));
+                    addRecordToOutputVariableStructure(state, "*", extensions.at("variable_or_meter_or_ems_variable_or_field_name"));
                 } catch (...) {
                     continue; // blank or erroneous fields are handled at the get input function for the object
                 }
@@ -1818,10 +1815,10 @@ void InputProcessor::preScanReportingVariables()
                     auto const report_name = UtilityRoutines::MakeUPPERCase(extensions.at("report_name"));
                     if (report_name == "ALLMONTHLY" || report_name == "ALLSUMMARYANDMONTHLY") {
                         for (int i = 1; i <= DataOutputs::NumMonthlyReports; ++i) {
-                            addVariablesForMonthlyReport(DataOutputs::MonthlyNamedReports(i));
+                            addVariablesForMonthlyReport(state, DataOutputs::MonthlyNamedReports(i));
                         }
                     } else {
-                        addVariablesForMonthlyReport(report_name);
+                        addVariablesForMonthlyReport(state, report_name);
                     }
                 } catch (...) {
                     continue; // blank or erroneous fields should be warned about during actual get input routines
@@ -1831,7 +1828,7 @@ void InputProcessor::preScanReportingVariables()
     }
 }
 
-void InputProcessor::addVariablesForMonthlyReport(std::string const &reportName)
+void InputProcessor::addVariablesForMonthlyReport(EnergyPlusData &state, std::string const &reportName)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1846,346 +1843,346 @@ void InputProcessor::addVariablesForMonthlyReport(std::string const &reportName)
     // variables are automatically included in the minimized output variable structure.
 
     if (reportName == "ZONECOOLINGSUMMARYMONTHLY") {
-        addRecordToOutputVariableStructure("*", "ZONE AIR SYSTEM SENSIBLE COOLING RATE");
-        addRecordToOutputVariableStructure("*", "SITE OUTDOOR AIR DRYBULB TEMPERATURE");
-        addRecordToOutputVariableStructure("*", "SITE OUTDOOR AIR WETBULB TEMPERATURE");
-        addRecordToOutputVariableStructure("*", "ZONE TOTAL INTERNAL LATENT GAIN ENERGY");
-        addRecordToOutputVariableStructure("*", "ZONE TOTAL INTERNAL LATENT GAIN RATE");
+        addRecordToOutputVariableStructure(state, "*", "ZONE AIR SYSTEM SENSIBLE COOLING RATE");
+        addRecordToOutputVariableStructure(state, "*", "SITE OUTDOOR AIR DRYBULB TEMPERATURE");
+        addRecordToOutputVariableStructure(state, "*", "SITE OUTDOOR AIR WETBULB TEMPERATURE");
+        addRecordToOutputVariableStructure(state, "*", "ZONE TOTAL INTERNAL LATENT GAIN ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "ZONE TOTAL INTERNAL LATENT GAIN RATE");
 
     } else if (reportName == "ZONEHEATINGSUMMARYMONTHLY") {
-        addRecordToOutputVariableStructure("*", "ZONE AIR SYSTEM SENSIBLE HEATING ENERGY"); // on meter
-        addRecordToOutputVariableStructure("*", "ZONE AIR SYSTEM SENSIBLE HEATING RATE");
-        addRecordToOutputVariableStructure("*", "SITE OUTDOOR AIR DRYBULB TEMPERATURE");
+        addRecordToOutputVariableStructure(state, "*", "ZONE AIR SYSTEM SENSIBLE HEATING ENERGY"); // on meter
+        addRecordToOutputVariableStructure(state, "*", "ZONE AIR SYSTEM SENSIBLE HEATING RATE");
+        addRecordToOutputVariableStructure(state, "*", "SITE OUTDOOR AIR DRYBULB TEMPERATURE");
 
     } else if (reportName == "ZONEELECTRICSUMMARYMONTHLY") {
-        addRecordToOutputVariableStructure("*", "ZONE LIGHTS ELECTRICITY ENERGY");
-        addRecordToOutputVariableStructure("*", "ZONE ELECTRIC EQUIPMENT ELECTRICITY ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "ZONE LIGHTS ELECTRICITY ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "ZONE ELECTRIC EQUIPMENT ELECTRICITY ENERGY");
 
     } else if (reportName == "SPACEGAINSMONTHLY") {
-        addRecordToOutputVariableStructure("*", "ZONE PEOPLE TOTAL HEATING ENERGY");
-        addRecordToOutputVariableStructure("*", "ZONE LIGHTS TOTAL HEATING ENERGY");
-        addRecordToOutputVariableStructure("*", "ZONE ELECTRIC EQUIPMENT TOTAL HEATING ENERGY");
-        addRecordToOutputVariableStructure("*", "ZONE GAS EQUIPMENT TOTAL HEATING ENERGY");
-        addRecordToOutputVariableStructure("*", "ZONE HOT WATER EQUIPMENT TOTAL HEATING ENERGY");
-        addRecordToOutputVariableStructure("*", "ZONE STEAM EQUIPMENT TOTAL HEATING ENERGY");
-        addRecordToOutputVariableStructure("*", "ZONE OTHER EQUIPMENT TOTAL HEATING ENERGY");
-        addRecordToOutputVariableStructure("*", "ZONE INFILTRATION SENSIBLE HEAT GAIN ENERGY");
-        addRecordToOutputVariableStructure("*", "ZONE INFILTRATION SENSIBLE HEAT LOSS ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "ZONE PEOPLE TOTAL HEATING ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "ZONE LIGHTS TOTAL HEATING ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "ZONE ELECTRIC EQUIPMENT TOTAL HEATING ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "ZONE GAS EQUIPMENT TOTAL HEATING ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "ZONE HOT WATER EQUIPMENT TOTAL HEATING ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "ZONE STEAM EQUIPMENT TOTAL HEATING ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "ZONE OTHER EQUIPMENT TOTAL HEATING ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "ZONE INFILTRATION SENSIBLE HEAT GAIN ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "ZONE INFILTRATION SENSIBLE HEAT LOSS ENERGY");
 
     } else if (reportName == "PEAKSPACEGAINSMONTHLY") {
-        addRecordToOutputVariableStructure("*", "ZONE PEOPLE TOTAL HEATING ENERGY");
-        addRecordToOutputVariableStructure("*", "ZONE LIGHTS TOTAL HEATING ENERGY");
-        addRecordToOutputVariableStructure("*", "ZONE ELECTRIC EQUIPMENT TOTAL HEATING ENERGY");
-        addRecordToOutputVariableStructure("*", "ZONE GAS EQUIPMENT TOTAL HEATING ENERGY");
-        addRecordToOutputVariableStructure("*", "ZONE HOT WATER EQUIPMENT TOTAL HEATING ENERGY");
-        addRecordToOutputVariableStructure("*", "ZONE STEAM EQUIPMENT TOTAL HEATING ENERGY");
-        addRecordToOutputVariableStructure("*", "ZONE OTHER EQUIPMENT TOTAL HEATING ENERGY");
-        addRecordToOutputVariableStructure("*", "ZONE INFILTRATION SENSIBLE HEAT GAIN ENERGY");
-        addRecordToOutputVariableStructure("*", "ZONE INFILTRATION SENSIBLE HEAT LOSS ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "ZONE PEOPLE TOTAL HEATING ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "ZONE LIGHTS TOTAL HEATING ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "ZONE ELECTRIC EQUIPMENT TOTAL HEATING ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "ZONE GAS EQUIPMENT TOTAL HEATING ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "ZONE HOT WATER EQUIPMENT TOTAL HEATING ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "ZONE STEAM EQUIPMENT TOTAL HEATING ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "ZONE OTHER EQUIPMENT TOTAL HEATING ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "ZONE INFILTRATION SENSIBLE HEAT GAIN ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "ZONE INFILTRATION SENSIBLE HEAT LOSS ENERGY");
 
     } else if (reportName == "SPACEGAINCOMPONENTSATCOOLINGPEAKMONTHLY") {
-        addRecordToOutputVariableStructure("*", "ZONE AIR SYSTEM SENSIBLE COOLING RATE");
-        addRecordToOutputVariableStructure("*", "ZONE PEOPLE TOTAL HEATING ENERGY");
-        addRecordToOutputVariableStructure("*", "ZONE LIGHTS TOTAL HEATING ENERGY");
-        addRecordToOutputVariableStructure("*", "ZONE ELECTRIC EQUIPMENT TOTAL HEATING ENERGY");
-        addRecordToOutputVariableStructure("*", "ZONE GAS EQUIPMENT TOTAL HEATING ENERGY");
-        addRecordToOutputVariableStructure("*", "ZONE HOT WATER EQUIPMENT TOTAL HEATING ENERGY");
-        addRecordToOutputVariableStructure("*", "ZONE STEAM EQUIPMENT TOTAL HEATING ENERGY");
-        addRecordToOutputVariableStructure("*", "ZONE OTHER EQUIPMENT TOTAL HEATING ENERGY");
-        addRecordToOutputVariableStructure("*", "ZONE INFILTRATION SENSIBLE HEAT GAIN ENERGY");
-        addRecordToOutputVariableStructure("*", "ZONE INFILTRATION SENSIBLE HEAT LOSS ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "ZONE AIR SYSTEM SENSIBLE COOLING RATE");
+        addRecordToOutputVariableStructure(state, "*", "ZONE PEOPLE TOTAL HEATING ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "ZONE LIGHTS TOTAL HEATING ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "ZONE ELECTRIC EQUIPMENT TOTAL HEATING ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "ZONE GAS EQUIPMENT TOTAL HEATING ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "ZONE HOT WATER EQUIPMENT TOTAL HEATING ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "ZONE STEAM EQUIPMENT TOTAL HEATING ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "ZONE OTHER EQUIPMENT TOTAL HEATING ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "ZONE INFILTRATION SENSIBLE HEAT GAIN ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "ZONE INFILTRATION SENSIBLE HEAT LOSS ENERGY");
 
     } else if (reportName == "SETPOINTSNOTMETWITHTEMPERATURESMONTHLY") {
-        addRecordToOutputVariableStructure("*", "ZONE HEATING SETPOINT NOT MET TIME");
-        addRecordToOutputVariableStructure("*", "ZONE MEAN AIR TEMPERATURE");
-        addRecordToOutputVariableStructure("*", "ZONE HEATING SETPOINT NOT MET WHILE OCCUPIED TIME");
-        addRecordToOutputVariableStructure("*", "ZONE COOLING SETPOINT NOT MET TIME");
-        addRecordToOutputVariableStructure("*", "ZONE COOLING SETPOINT NOT MET WHILE OCCUPIED TIME");
+        addRecordToOutputVariableStructure(state, "*", "ZONE HEATING SETPOINT NOT MET TIME");
+        addRecordToOutputVariableStructure(state, "*", "ZONE MEAN AIR TEMPERATURE");
+        addRecordToOutputVariableStructure(state, "*", "ZONE HEATING SETPOINT NOT MET WHILE OCCUPIED TIME");
+        addRecordToOutputVariableStructure(state, "*", "ZONE COOLING SETPOINT NOT MET TIME");
+        addRecordToOutputVariableStructure(state, "*", "ZONE COOLING SETPOINT NOT MET WHILE OCCUPIED TIME");
 
     } else if (reportName == "COMFORTREPORTSIMPLE55MONTHLY") {
-        addRecordToOutputVariableStructure("*", "ZONE THERMAL COMFORT ASHRAE 55 SIMPLE MODEL SUMMER CLOTHES NOT COMFORTABLE TIME");
-        addRecordToOutputVariableStructure("*", "ZONE MEAN AIR TEMPERATURE");
-        addRecordToOutputVariableStructure("*", "ZONE THERMAL COMFORT ASHRAE 55 SIMPLE MODEL WINTER CLOTHES NOT COMFORTABLE TIME");
-        addRecordToOutputVariableStructure("*", "ZONE THERMAL COMFORT ASHRAE 55 SIMPLE MODEL SUMMER OR WINTER CLOTHES NOT COMFORTABLE TIME");
+        addRecordToOutputVariableStructure(state, "*", "ZONE THERMAL COMFORT ASHRAE 55 SIMPLE MODEL SUMMER CLOTHES NOT COMFORTABLE TIME");
+        addRecordToOutputVariableStructure(state, "*", "ZONE MEAN AIR TEMPERATURE");
+        addRecordToOutputVariableStructure(state, "*", "ZONE THERMAL COMFORT ASHRAE 55 SIMPLE MODEL WINTER CLOTHES NOT COMFORTABLE TIME");
+        addRecordToOutputVariableStructure(state, "*", "ZONE THERMAL COMFORT ASHRAE 55 SIMPLE MODEL SUMMER OR WINTER CLOTHES NOT COMFORTABLE TIME");
 
     } else if (reportName == "UNGLAZEDTRANSPIREDSOLARCOLLECTORSUMMARYMONTHLY") {
-        addRecordToOutputVariableStructure("*", "SOLAR COLLECTOR SYSTEM EFFICIENCY");
-        addRecordToOutputVariableStructure("*", "SOLAR COLLECTOR OUTSIDE FACE SUCTION VELOCITY");
-        addRecordToOutputVariableStructure("*", "SOLAR COLLECTOR SENSIBLE HEATING RATE");
+        addRecordToOutputVariableStructure(state, "*", "SOLAR COLLECTOR SYSTEM EFFICIENCY");
+        addRecordToOutputVariableStructure(state, "*", "SOLAR COLLECTOR OUTSIDE FACE SUCTION VELOCITY");
+        addRecordToOutputVariableStructure(state, "*", "SOLAR COLLECTOR SENSIBLE HEATING RATE");
 
     } else if (reportName == "OCCUPANTCOMFORTDATASUMMARYMONTHLY") {
-        addRecordToOutputVariableStructure("*", "PEOPLE OCCUPANT COUNT");
-        addRecordToOutputVariableStructure("*", "PEOPLE AIR TEMPERATURE");
-        addRecordToOutputVariableStructure("*", "PEOPLE AIR RELATIVE HUMIDITY");
-        addRecordToOutputVariableStructure("*", "ZONE THERMAL COMFORT FANGER MODEL PMV");
-        addRecordToOutputVariableStructure("*", "ZONE THERMAL COMFORT FANGER MODEL PPD");
+        addRecordToOutputVariableStructure(state, "*", "PEOPLE OCCUPANT COUNT");
+        addRecordToOutputVariableStructure(state, "*", "PEOPLE AIR TEMPERATURE");
+        addRecordToOutputVariableStructure(state, "*", "PEOPLE AIR RELATIVE HUMIDITY");
+        addRecordToOutputVariableStructure(state, "*", "ZONE THERMAL COMFORT FANGER MODEL PMV");
+        addRecordToOutputVariableStructure(state, "*", "ZONE THERMAL COMFORT FANGER MODEL PPD");
 
     } else if (reportName == "CHILLERREPORTMONTHLY") {
-        addRecordToOutputVariableStructure("*", "CHILLER ELECTRICITY ENERGY"); // on meter
-        addRecordToOutputVariableStructure("*", "CHILLER ELECTRICITY RATE");
-        addRecordToOutputVariableStructure("*", "CHILLER EVAPORATOR COOLING ENERGY");      // on meter
-        addRecordToOutputVariableStructure("*", "CHILLER CONDENSER HEAT TRANSFER ENERGY"); // on meter
-        addRecordToOutputVariableStructure("*", "CHILLER COP");
+        addRecordToOutputVariableStructure(state, "*", "CHILLER ELECTRICITY ENERGY"); // on meter
+        addRecordToOutputVariableStructure(state, "*", "CHILLER ELECTRICITY RATE");
+        addRecordToOutputVariableStructure(state, "*", "CHILLER EVAPORATOR COOLING ENERGY");      // on meter
+        addRecordToOutputVariableStructure(state, "*", "CHILLER CONDENSER HEAT TRANSFER ENERGY"); // on meter
+        addRecordToOutputVariableStructure(state, "*", "CHILLER COP");
 
     } else if (reportName == "TOWERREPORTMONTHLY") {
-        addRecordToOutputVariableStructure("*", "COOLING TOWER FAN ELECTRICITY ENERGY"); // on meter
-        addRecordToOutputVariableStructure("*", "COOLING TOWER FAN ELECTRICITY RATE");
-        addRecordToOutputVariableStructure("*", "COOLING TOWER HEAT TRANSFER RATE");
-        addRecordToOutputVariableStructure("*", "COOLING TOWER INLET TEMPERATURE");
-        addRecordToOutputVariableStructure("*", "COOLING TOWER OUTLET TEMPERATURE");
-        addRecordToOutputVariableStructure("*", "COOLING TOWER MASS FLOW RATE");
+        addRecordToOutputVariableStructure(state, "*", "COOLING TOWER FAN ELECTRICITY ENERGY"); // on meter
+        addRecordToOutputVariableStructure(state, "*", "COOLING TOWER FAN ELECTRICITY RATE");
+        addRecordToOutputVariableStructure(state, "*", "COOLING TOWER HEAT TRANSFER RATE");
+        addRecordToOutputVariableStructure(state, "*", "COOLING TOWER INLET TEMPERATURE");
+        addRecordToOutputVariableStructure(state, "*", "COOLING TOWER OUTLET TEMPERATURE");
+        addRecordToOutputVariableStructure(state, "*", "COOLING TOWER MASS FLOW RATE");
 
     } else if (reportName == "BOILERREPORTMONTHLY") {
-        addRecordToOutputVariableStructure("*", "BOILER HEATING ENERGY");  // on meter
-        addRecordToOutputVariableStructure("*", "BOILER NATURALGAS CONSUMPTION"); // on meter
-        addRecordToOutputVariableStructure("*", "BOILER HEATING ENERGY");  // on meter
-        addRecordToOutputVariableStructure("*", "BOILER HEATING RATE");
-        addRecordToOutputVariableStructure("*", "BOILER NATURALGAS CONSUMPTION RATE");
-        addRecordToOutputVariableStructure("*", "BOILER INLET TEMPERATURE");
-        addRecordToOutputVariableStructure("*", "BOILER OUTLET TEMPERATURE");
-        addRecordToOutputVariableStructure("*", "BOILER MASS FLOW RATE");
-        addRecordToOutputVariableStructure("*", "BOILER ANCILLARY ELECTRICITY RATE");
+        addRecordToOutputVariableStructure(state, "*", "BOILER HEATING ENERGY");  // on meter
+        addRecordToOutputVariableStructure(state, "*", "BOILER NATURALGAS CONSUMPTION"); // on meter
+        addRecordToOutputVariableStructure(state, "*", "BOILER HEATING ENERGY");  // on meter
+        addRecordToOutputVariableStructure(state, "*", "BOILER HEATING RATE");
+        addRecordToOutputVariableStructure(state, "*", "BOILER NATURALGAS CONSUMPTION RATE");
+        addRecordToOutputVariableStructure(state, "*", "BOILER INLET TEMPERATURE");
+        addRecordToOutputVariableStructure(state, "*", "BOILER OUTLET TEMPERATURE");
+        addRecordToOutputVariableStructure(state, "*", "BOILER MASS FLOW RATE");
+        addRecordToOutputVariableStructure(state, "*", "BOILER ANCILLARY ELECTRICITY RATE");
 
     } else if (reportName == "DXREPORTMONTHLY") {
-        addRecordToOutputVariableStructure("*", "COOLING COIL TOTAL COOLING ENERGY"); // on meter
-        addRecordToOutputVariableStructure("*", "COOLING COIL ELECTRICITY ENERGY");      // on meter
-        addRecordToOutputVariableStructure("*", "COOLING COIL SENSIBLE COOLING ENERGY");
-        addRecordToOutputVariableStructure("*", "COOLING COIL LATENT COOLING ENERGY");
-        addRecordToOutputVariableStructure("*", "COOLING COIL CRANKCASE HEATER ELECTRICITY ENERGY");
-        addRecordToOutputVariableStructure("*", "COOLING COIL RUNTIME FRACTION");
-        addRecordToOutputVariableStructure("*", "COOLING COIL TOTAL COOLING RATE");
-        addRecordToOutputVariableStructure("*", "COOLING COIL SENSIBLE COOLING RATE");
-        addRecordToOutputVariableStructure("*", "COOLING COIL LATENT COOLING RATE");
-        addRecordToOutputVariableStructure("*", "COOLING COIL ELECTRICITY RATE");
-        addRecordToOutputVariableStructure("*", "COOLING COIL CRANKCASE HEATER ELECTRICITY RATE");
+        addRecordToOutputVariableStructure(state, "*", "COOLING COIL TOTAL COOLING ENERGY"); // on meter
+        addRecordToOutputVariableStructure(state, "*", "COOLING COIL ELECTRICITY ENERGY");      // on meter
+        addRecordToOutputVariableStructure(state, "*", "COOLING COIL SENSIBLE COOLING ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "COOLING COIL LATENT COOLING ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "COOLING COIL CRANKCASE HEATER ELECTRICITY ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "COOLING COIL RUNTIME FRACTION");
+        addRecordToOutputVariableStructure(state, "*", "COOLING COIL TOTAL COOLING RATE");
+        addRecordToOutputVariableStructure(state, "*", "COOLING COIL SENSIBLE COOLING RATE");
+        addRecordToOutputVariableStructure(state, "*", "COOLING COIL LATENT COOLING RATE");
+        addRecordToOutputVariableStructure(state, "*", "COOLING COIL ELECTRICITY RATE");
+        addRecordToOutputVariableStructure(state, "*", "COOLING COIL CRANKCASE HEATER ELECTRICITY RATE");
 
     } else if (reportName == "WINDOWREPORTMONTHLY") {
-        addRecordToOutputVariableStructure("*", "SURFACE WINDOW TRANSMITTED SOLAR RADIATION RATE");
-        addRecordToOutputVariableStructure("*", "SURFACE WINDOW TRANSMITTED BEAM SOLAR RADIATION RATE");
-        addRecordToOutputVariableStructure("*", "SURFACE WINDOW TRANSMITTED DIFFUSE SOLAR RADIATION RATE");
-        addRecordToOutputVariableStructure("*", "SURFACE WINDOW HEAT GAIN RATE");
-        addRecordToOutputVariableStructure("*", "SURFACE WINDOW HEAT LOSS RATE");
-        addRecordToOutputVariableStructure("*", "SURFACE WINDOW INSIDE FACE GLAZING CONDENSATION STATUS");
-        addRecordToOutputVariableStructure("*", "SURFACE SHADING DEVICE IS ON TIME FRACTION");
-        addRecordToOutputVariableStructure("*", "SURFACE STORM WINDOW ON OFF STATUS");
+        addRecordToOutputVariableStructure(state, "*", "SURFACE WINDOW TRANSMITTED SOLAR RADIATION RATE");
+        addRecordToOutputVariableStructure(state, "*", "SURFACE WINDOW TRANSMITTED BEAM SOLAR RADIATION RATE");
+        addRecordToOutputVariableStructure(state, "*", "SURFACE WINDOW TRANSMITTED DIFFUSE SOLAR RADIATION RATE");
+        addRecordToOutputVariableStructure(state, "*", "SURFACE WINDOW HEAT GAIN RATE");
+        addRecordToOutputVariableStructure(state, "*", "SURFACE WINDOW HEAT LOSS RATE");
+        addRecordToOutputVariableStructure(state, "*", "SURFACE WINDOW INSIDE FACE GLAZING CONDENSATION STATUS");
+        addRecordToOutputVariableStructure(state, "*", "SURFACE SHADING DEVICE IS ON TIME FRACTION");
+        addRecordToOutputVariableStructure(state, "*", "SURFACE STORM WINDOW ON OFF STATUS");
 
     } else if (reportName == "WINDOWENERGYREPORTMONTHLY") {
-        addRecordToOutputVariableStructure("*", "SURFACE WINDOW TRANSMITTED SOLAR RADIATION ENERGY");
-        addRecordToOutputVariableStructure("*", "SURFACE WINDOW TRANSMITTED BEAM SOLAR RADIATION ENERGY");
-        addRecordToOutputVariableStructure("*", "SURFACE WINDOW TRANSMITTED DIFFUSE SOLAR RADIATION ENERGY");
-        addRecordToOutputVariableStructure("*", "SURFACE WINDOW HEAT GAIN ENERGY");
-        addRecordToOutputVariableStructure("*", "SURFACE WINDOW HEAT LOSS ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "SURFACE WINDOW TRANSMITTED SOLAR RADIATION ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "SURFACE WINDOW TRANSMITTED BEAM SOLAR RADIATION ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "SURFACE WINDOW TRANSMITTED DIFFUSE SOLAR RADIATION ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "SURFACE WINDOW HEAT GAIN ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "SURFACE WINDOW HEAT LOSS ENERGY");
 
     } else if (reportName == "WINDOWZONESUMMARYMONTHLY") {
-        addRecordToOutputVariableStructure("*", "ZONE WINDOWS TOTAL HEAT GAIN RATE");
-        addRecordToOutputVariableStructure("*", "ZONE WINDOWS TOTAL HEAT LOSS RATE");
-        addRecordToOutputVariableStructure("*", "ZONE WINDOWS TOTAL TRANSMITTED SOLAR RADIATION RATE");
-        addRecordToOutputVariableStructure("*", "ZONE EXTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION RATE");
-        addRecordToOutputVariableStructure("*", "ZONE EXTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION RATE");
-        addRecordToOutputVariableStructure("*", "ZONE INTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION RATE");
-        addRecordToOutputVariableStructure("*", "ZONE INTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION RATE");
+        addRecordToOutputVariableStructure(state, "*", "ZONE WINDOWS TOTAL HEAT GAIN RATE");
+        addRecordToOutputVariableStructure(state, "*", "ZONE WINDOWS TOTAL HEAT LOSS RATE");
+        addRecordToOutputVariableStructure(state, "*", "ZONE WINDOWS TOTAL TRANSMITTED SOLAR RADIATION RATE");
+        addRecordToOutputVariableStructure(state, "*", "ZONE EXTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION RATE");
+        addRecordToOutputVariableStructure(state, "*", "ZONE EXTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION RATE");
+        addRecordToOutputVariableStructure(state, "*", "ZONE INTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION RATE");
+        addRecordToOutputVariableStructure(state, "*", "ZONE INTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION RATE");
 
     } else if (reportName == "WINDOWENERGYZONESUMMARYMONTHLY") {
-        addRecordToOutputVariableStructure("*", "ZONE WINDOWS TOTAL HEAT GAIN ENERGY");
-        addRecordToOutputVariableStructure("*", "ZONE WINDOWS TOTAL HEAT LOSS ENERGY");
-        addRecordToOutputVariableStructure("*", "ZONE WINDOWS TOTAL TRANSMITTED SOLAR RADIATION ENERGY");
-        addRecordToOutputVariableStructure("*", "ZONE EXTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION ENERGY");
-        addRecordToOutputVariableStructure("*", "ZONE EXTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION ENERGY");
-        addRecordToOutputVariableStructure("*", "ZONE INTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION ENERGY");
-        addRecordToOutputVariableStructure("*", "ZONE INTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "ZONE WINDOWS TOTAL HEAT GAIN ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "ZONE WINDOWS TOTAL HEAT LOSS ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "ZONE WINDOWS TOTAL TRANSMITTED SOLAR RADIATION ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "ZONE EXTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "ZONE EXTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "ZONE INTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "ZONE INTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION ENERGY");
 
     } else if (reportName == "AVERAGEOUTDOORCONDITIONSMONTHLY") {
-        addRecordToOutputVariableStructure("*", "SITE OUTDOOR AIR DRYBULB TEMPERATURE");
-        addRecordToOutputVariableStructure("*", "SITE OUTDOOR AIR WETBULB TEMPERATURE");
-        addRecordToOutputVariableStructure("*", "SITE OUTDOOR AIR DEWPOINT TEMPERATURE");
-        addRecordToOutputVariableStructure("*", "SITE WIND SPEED");
-        addRecordToOutputVariableStructure("*", "SITE SKY TEMPERATURE");
-        addRecordToOutputVariableStructure("*", "SITE DIFFUSE SOLAR RADIATION RATE PER AREA");
-        addRecordToOutputVariableStructure("*", "SITE DIRECT SOLAR RADIATION RATE PER AREA");
-        addRecordToOutputVariableStructure("*", "SITE RAIN STATUS");
+        addRecordToOutputVariableStructure(state, "*", "SITE OUTDOOR AIR DRYBULB TEMPERATURE");
+        addRecordToOutputVariableStructure(state, "*", "SITE OUTDOOR AIR WETBULB TEMPERATURE");
+        addRecordToOutputVariableStructure(state, "*", "SITE OUTDOOR AIR DEWPOINT TEMPERATURE");
+        addRecordToOutputVariableStructure(state, "*", "SITE WIND SPEED");
+        addRecordToOutputVariableStructure(state, "*", "SITE SKY TEMPERATURE");
+        addRecordToOutputVariableStructure(state, "*", "SITE DIFFUSE SOLAR RADIATION RATE PER AREA");
+        addRecordToOutputVariableStructure(state, "*", "SITE DIRECT SOLAR RADIATION RATE PER AREA");
+        addRecordToOutputVariableStructure(state, "*", "SITE RAIN STATUS");
 
     } else if (reportName == "OUTDOORCONDITIONSMAXIMUMDRYBULBMONTHLY") {
-        addRecordToOutputVariableStructure("*", "SITE OUTDOOR AIR DRYBULB TEMPERATURE");
-        addRecordToOutputVariableStructure("*", "SITE OUTDOOR AIR WETBULB TEMPERATURE");
-        addRecordToOutputVariableStructure("*", "SITE OUTDOOR AIR DEWPOINT TEMPERATURE");
-        addRecordToOutputVariableStructure("*", "SITE WIND SPEED");
-        addRecordToOutputVariableStructure("*", "SITE SKY TEMPERATURE");
-        addRecordToOutputVariableStructure("*", "SITE DIFFUSE SOLAR RADIATION RATE PER AREA");
-        addRecordToOutputVariableStructure("*", "SITE DIRECT SOLAR RADIATION RATE PER AREA");
+        addRecordToOutputVariableStructure(state, "*", "SITE OUTDOOR AIR DRYBULB TEMPERATURE");
+        addRecordToOutputVariableStructure(state, "*", "SITE OUTDOOR AIR WETBULB TEMPERATURE");
+        addRecordToOutputVariableStructure(state, "*", "SITE OUTDOOR AIR DEWPOINT TEMPERATURE");
+        addRecordToOutputVariableStructure(state, "*", "SITE WIND SPEED");
+        addRecordToOutputVariableStructure(state, "*", "SITE SKY TEMPERATURE");
+        addRecordToOutputVariableStructure(state, "*", "SITE DIFFUSE SOLAR RADIATION RATE PER AREA");
+        addRecordToOutputVariableStructure(state, "*", "SITE DIRECT SOLAR RADIATION RATE PER AREA");
 
     } else if (reportName == "OUTDOORCONDITIONSMINIMUMDRYBULBMONTHLY") {
-        addRecordToOutputVariableStructure("*", "SITE OUTDOOR AIR DRYBULB TEMPERATURE");
-        addRecordToOutputVariableStructure("*", "SITE OUTDOOR AIR WETBULB TEMPERATURE");
-        addRecordToOutputVariableStructure("*", "SITE OUTDOOR AIR DEWPOINT TEMPERATURE");
-        addRecordToOutputVariableStructure("*", "SITE WIND SPEED");
-        addRecordToOutputVariableStructure("*", "SITE SKY TEMPERATURE");
-        addRecordToOutputVariableStructure("*", "SITE DIFFUSE SOLAR RADIATION RATE PER AREA");
-        addRecordToOutputVariableStructure("*", "SITE DIRECT SOLAR RADIATION RATE PER AREA");
+        addRecordToOutputVariableStructure(state, "*", "SITE OUTDOOR AIR DRYBULB TEMPERATURE");
+        addRecordToOutputVariableStructure(state, "*", "SITE OUTDOOR AIR WETBULB TEMPERATURE");
+        addRecordToOutputVariableStructure(state, "*", "SITE OUTDOOR AIR DEWPOINT TEMPERATURE");
+        addRecordToOutputVariableStructure(state, "*", "SITE WIND SPEED");
+        addRecordToOutputVariableStructure(state, "*", "SITE SKY TEMPERATURE");
+        addRecordToOutputVariableStructure(state, "*", "SITE DIFFUSE SOLAR RADIATION RATE PER AREA");
+        addRecordToOutputVariableStructure(state, "*", "SITE DIRECT SOLAR RADIATION RATE PER AREA");
 
     } else if (reportName == "OUTDOORCONDITIONSMAXIMUMWETBULBMONTHLY") {
-        addRecordToOutputVariableStructure("*", "SITE OUTDOOR AIR WETBULB TEMPERATURE");
-        addRecordToOutputVariableStructure("*", "SITE OUTDOOR AIR DRYBULB TEMPERATURE");
-        addRecordToOutputVariableStructure("*", "SITE OUTDOOR AIR DEWPOINT TEMPERATURE");
-        addRecordToOutputVariableStructure("*", "SITE WIND SPEED");
-        addRecordToOutputVariableStructure("*", "SITE SKY TEMPERATURE");
-        addRecordToOutputVariableStructure("*", "SITE DIFFUSE SOLAR RADIATION RATE PER AREA");
-        addRecordToOutputVariableStructure("*", "SITE DIRECT SOLAR RADIATION RATE PER AREA");
+        addRecordToOutputVariableStructure(state, "*", "SITE OUTDOOR AIR WETBULB TEMPERATURE");
+        addRecordToOutputVariableStructure(state, "*", "SITE OUTDOOR AIR DRYBULB TEMPERATURE");
+        addRecordToOutputVariableStructure(state, "*", "SITE OUTDOOR AIR DEWPOINT TEMPERATURE");
+        addRecordToOutputVariableStructure(state, "*", "SITE WIND SPEED");
+        addRecordToOutputVariableStructure(state, "*", "SITE SKY TEMPERATURE");
+        addRecordToOutputVariableStructure(state, "*", "SITE DIFFUSE SOLAR RADIATION RATE PER AREA");
+        addRecordToOutputVariableStructure(state, "*", "SITE DIRECT SOLAR RADIATION RATE PER AREA");
 
     } else if (reportName == "OUTDOORCONDITIONSMAXIMUMDEWPOINTMONTHLY") {
-        addRecordToOutputVariableStructure("*", "SITE OUTDOOR AIR DEWPOINT TEMPERATURE");
-        addRecordToOutputVariableStructure("*", "SITE OUTDOOR AIR DRYBULB TEMPERATURE");
-        addRecordToOutputVariableStructure("*", "SITE OUTDOOR AIR WETBULB TEMPERATURE");
-        addRecordToOutputVariableStructure("*", "SITE WIND SPEED");
-        addRecordToOutputVariableStructure("*", "SITE SKY TEMPERATURE");
-        addRecordToOutputVariableStructure("*", "SITE DIFFUSE SOLAR RADIATION RATE PER AREA");
-        addRecordToOutputVariableStructure("*", "SITE DIRECT SOLAR RADIATION RATE PER AREA");
+        addRecordToOutputVariableStructure(state, "*", "SITE OUTDOOR AIR DEWPOINT TEMPERATURE");
+        addRecordToOutputVariableStructure(state, "*", "SITE OUTDOOR AIR DRYBULB TEMPERATURE");
+        addRecordToOutputVariableStructure(state, "*", "SITE OUTDOOR AIR WETBULB TEMPERATURE");
+        addRecordToOutputVariableStructure(state, "*", "SITE WIND SPEED");
+        addRecordToOutputVariableStructure(state, "*", "SITE SKY TEMPERATURE");
+        addRecordToOutputVariableStructure(state, "*", "SITE DIFFUSE SOLAR RADIATION RATE PER AREA");
+        addRecordToOutputVariableStructure(state, "*", "SITE DIRECT SOLAR RADIATION RATE PER AREA");
 
     } else if (reportName == "OUTDOORGROUNDCONDITIONSMONTHLY") {
-        addRecordToOutputVariableStructure("*", "SITE GROUND TEMPERATURE");
-        addRecordToOutputVariableStructure("*", "SITE SURFACE GROUND TEMPERATURE");
-        addRecordToOutputVariableStructure("*", "SITE DEEP GROUND TEMPERATURE");
-        addRecordToOutputVariableStructure("*", "SITE MAINS WATER TEMPERATURE");
-        addRecordToOutputVariableStructure("*", "SITE GROUND REFLECTED SOLAR RADIATION RATE PER AREA");
-        addRecordToOutputVariableStructure("*", "SITE SNOW ON GROUND STATUS");
+        addRecordToOutputVariableStructure(state, "*", "SITE GROUND TEMPERATURE");
+        addRecordToOutputVariableStructure(state, "*", "SITE SURFACE GROUND TEMPERATURE");
+        addRecordToOutputVariableStructure(state, "*", "SITE DEEP GROUND TEMPERATURE");
+        addRecordToOutputVariableStructure(state, "*", "SITE MAINS WATER TEMPERATURE");
+        addRecordToOutputVariableStructure(state, "*", "SITE GROUND REFLECTED SOLAR RADIATION RATE PER AREA");
+        addRecordToOutputVariableStructure(state, "*", "SITE SNOW ON GROUND STATUS");
 
     } else if (reportName == "WINDOWACREPORTMONTHLY") {
-        addRecordToOutputVariableStructure("*", "ZONE WINDOW AIR CONDITIONER TOTAL COOLING ENERGY");
-        addRecordToOutputVariableStructure("*", "ZONE WINDOW AIR CONDITIONER ELECTRICITY ENERGY");
-        addRecordToOutputVariableStructure("*", "ZONE WINDOW AIR CONDITIONER TOTAL COOLING ENERGY");
-        addRecordToOutputVariableStructure("*", "ZONE WINDOW AIR CONDITIONER SENSIBLE COOLING ENERGY");
-        addRecordToOutputVariableStructure("*", "ZONE WINDOW AIR CONDITIONER LATENT COOLING ENERGY");
-        addRecordToOutputVariableStructure("*", "ZONE WINDOW AIR CONDITIONER TOTAL COOLING RATE");
-        addRecordToOutputVariableStructure("*", "ZONE WINDOW AIR CONDITIONER SENSIBLE COOLING RATE");
-        addRecordToOutputVariableStructure("*", "ZONE WINDOW AIR CONDITIONER LATENT COOLING RATE");
-        addRecordToOutputVariableStructure("*", "ZONE WINDOW AIR CONDITIONER ELECTRICITY RATE");
+        addRecordToOutputVariableStructure(state, "*", "ZONE WINDOW AIR CONDITIONER TOTAL COOLING ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "ZONE WINDOW AIR CONDITIONER ELECTRICITY ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "ZONE WINDOW AIR CONDITIONER TOTAL COOLING ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "ZONE WINDOW AIR CONDITIONER SENSIBLE COOLING ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "ZONE WINDOW AIR CONDITIONER LATENT COOLING ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "ZONE WINDOW AIR CONDITIONER TOTAL COOLING RATE");
+        addRecordToOutputVariableStructure(state, "*", "ZONE WINDOW AIR CONDITIONER SENSIBLE COOLING RATE");
+        addRecordToOutputVariableStructure(state, "*", "ZONE WINDOW AIR CONDITIONER LATENT COOLING RATE");
+        addRecordToOutputVariableStructure(state, "*", "ZONE WINDOW AIR CONDITIONER ELECTRICITY RATE");
 
     } else if (reportName == "WATERHEATERREPORTMONTHLY") {
-        addRecordToOutputVariableStructure("*", "WATER HEATER TOTAL DEMAND HEAT TRANSFER ENERGY");
-        addRecordToOutputVariableStructure("*", "WATER HEATER USE SIDE HEAT TRANSFER ENERGY");
-        addRecordToOutputVariableStructure("*", "WATER HEATER BURNER HEATING ENERGY");
-        addRecordToOutputVariableStructure("*", "WATER HEATER NATURALGAS CONSUMPTION");
-        addRecordToOutputVariableStructure("*", "WATER HEATER TOTAL DEMAND HEAT TRANSFER ENERGY");
-        addRecordToOutputVariableStructure("*", "WATER HEATER LOSS DEMAND ENERGY");
-        addRecordToOutputVariableStructure("*", "WATER HEATER HEAT LOSS ENERGY");
-        addRecordToOutputVariableStructure("*", "WATER HEATER TANK TEMPERATURE");
-        addRecordToOutputVariableStructure("*", "WATER HEATER HEAT RECOVERY SUPPLY ENERGY");
-        addRecordToOutputVariableStructure("*", "WATER HEATER SOURCE ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "WATER HEATER TOTAL DEMAND HEAT TRANSFER ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "WATER HEATER USE SIDE HEAT TRANSFER ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "WATER HEATER BURNER HEATING ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "WATER HEATER NATURALGAS CONSUMPTION");
+        addRecordToOutputVariableStructure(state, "*", "WATER HEATER TOTAL DEMAND HEAT TRANSFER ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "WATER HEATER LOSS DEMAND ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "WATER HEATER HEAT LOSS ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "WATER HEATER TANK TEMPERATURE");
+        addRecordToOutputVariableStructure(state, "*", "WATER HEATER HEAT RECOVERY SUPPLY ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "WATER HEATER SOURCE ENERGY");
 
     } else if (reportName == "GENERATORREPORTMONTHLY") {
-        addRecordToOutputVariableStructure("*", "GENERATOR PRODUCED AC ELECTRICITY ENERGY");
-        addRecordToOutputVariableStructure("*", "GENERATOR DIESEL CONSUMPTION");
-        addRecordToOutputVariableStructure("*", "GENERATOR NATURALGAS CONSUMPTION");
-        addRecordToOutputVariableStructure("*", "GENERATOR PRODUCED AC ELECTRICITY ENERGY");
-        addRecordToOutputVariableStructure("*", "GENERATOR TOTAL HEAT RECOVERY");
-        addRecordToOutputVariableStructure("*", "GENERATOR JACKET HEAT RECOVERY ENERGY");
-        addRecordToOutputVariableStructure("*", "GENERATOR LUBE HEAT RECOVERY");
-        addRecordToOutputVariableStructure("*", "GENERATOR EXHAUST HEAT RECOVERY ENERGY");
-        addRecordToOutputVariableStructure("*", "GENERATOR EXHAUST AIR TEMPERATURE");
+        addRecordToOutputVariableStructure(state, "*", "GENERATOR PRODUCED AC ELECTRICITY ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "GENERATOR DIESEL CONSUMPTION");
+        addRecordToOutputVariableStructure(state, "*", "GENERATOR NATURALGAS CONSUMPTION");
+        addRecordToOutputVariableStructure(state, "*", "GENERATOR PRODUCED AC ELECTRICITY ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "GENERATOR TOTAL HEAT RECOVERY");
+        addRecordToOutputVariableStructure(state, "*", "GENERATOR JACKET HEAT RECOVERY ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "GENERATOR LUBE HEAT RECOVERY");
+        addRecordToOutputVariableStructure(state, "*", "GENERATOR EXHAUST HEAT RECOVERY ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "GENERATOR EXHAUST AIR TEMPERATURE");
 
     } else if (reportName == "DAYLIGHTINGREPORTMONTHLY") {
-        addRecordToOutputVariableStructure("*", "SITE EXTERIOR BEAM NORMAL ILLUMINANCE");
-        addRecordToOutputVariableStructure("*", "DAYLIGHTING LIGHTING POWER MULTIPLIER");
-        addRecordToOutputVariableStructure("*", "DAYLIGHTING LIGHTING POWER MULTIPLIER");
-        addRecordToOutputVariableStructure("*", "DAYLIGHTING REFERENCE POINT 1 ILLUMINANCE");
-        addRecordToOutputVariableStructure("*", "DAYLIGHTING REFERENCE POINT 1 GLARE INDEX");
-        addRecordToOutputVariableStructure("*", "DAYLIGHTING REFERENCE POINT 1 GLARE INDEX SETPOINT EXCEEDED TIME");
-        addRecordToOutputVariableStructure("*", "DAYLIGHTING REFERENCE POINT 1 DAYLIGHT ILLUMINANCE SETPOINT EXCEEDED TIME");
-        addRecordToOutputVariableStructure("*", "DAYLIGHTING REFERENCE POINT 2 ILLUMINANCE");
-        addRecordToOutputVariableStructure("*", "DAYLIGHTING REFERENCE POINT 2 GLARE INDEX");
-        addRecordToOutputVariableStructure("*", "DAYLIGHTING REFERENCE POINT 2 GLARE INDEX SETPOINT EXCEEDED TIME");
-        addRecordToOutputVariableStructure("*", "DAYLIGHTING REFERENCE POINT 2 DAYLIGHT ILLUMINANCE SETPOINT EXCEEDED TIME");
+        addRecordToOutputVariableStructure(state, "*", "SITE EXTERIOR BEAM NORMAL ILLUMINANCE");
+        addRecordToOutputVariableStructure(state, "*", "DAYLIGHTING LIGHTING POWER MULTIPLIER");
+        addRecordToOutputVariableStructure(state, "*", "DAYLIGHTING LIGHTING POWER MULTIPLIER");
+        addRecordToOutputVariableStructure(state, "*", "DAYLIGHTING REFERENCE POINT 1 ILLUMINANCE");
+        addRecordToOutputVariableStructure(state, "*", "DAYLIGHTING REFERENCE POINT 1 GLARE INDEX");
+        addRecordToOutputVariableStructure(state, "*", "DAYLIGHTING REFERENCE POINT 1 GLARE INDEX SETPOINT EXCEEDED TIME");
+        addRecordToOutputVariableStructure(state, "*", "DAYLIGHTING REFERENCE POINT 1 DAYLIGHT ILLUMINANCE SETPOINT EXCEEDED TIME");
+        addRecordToOutputVariableStructure(state, "*", "DAYLIGHTING REFERENCE POINT 2 ILLUMINANCE");
+        addRecordToOutputVariableStructure(state, "*", "DAYLIGHTING REFERENCE POINT 2 GLARE INDEX");
+        addRecordToOutputVariableStructure(state, "*", "DAYLIGHTING REFERENCE POINT 2 GLARE INDEX SETPOINT EXCEEDED TIME");
+        addRecordToOutputVariableStructure(state, "*", "DAYLIGHTING REFERENCE POINT 2 DAYLIGHT ILLUMINANCE SETPOINT EXCEEDED TIME");
 
     } else if (reportName == "COILREPORTMONTHLY") {
-        addRecordToOutputVariableStructure("*", "HEATING COIL HEATING ENERGY");
-        addRecordToOutputVariableStructure("*", "HEATING COIL HEATING RATE");
-        addRecordToOutputVariableStructure("*", "COOLING COIL SENSIBLE COOLING ENERGY");
-        addRecordToOutputVariableStructure("*", "COOLING COIL TOTAL COOLING ENERGY");
-        addRecordToOutputVariableStructure("*", "COOLING COIL TOTAL COOLING RATE");
-        addRecordToOutputVariableStructure("*", "COOLING COIL SENSIBLE COOLING RATE");
-        addRecordToOutputVariableStructure("*", "COOLING COIL WETTED AREA FRACTION");
+        addRecordToOutputVariableStructure(state, "*", "HEATING COIL HEATING ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "HEATING COIL HEATING RATE");
+        addRecordToOutputVariableStructure(state, "*", "COOLING COIL SENSIBLE COOLING ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "COOLING COIL TOTAL COOLING ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "COOLING COIL TOTAL COOLING RATE");
+        addRecordToOutputVariableStructure(state, "*", "COOLING COIL SENSIBLE COOLING RATE");
+        addRecordToOutputVariableStructure(state, "*", "COOLING COIL WETTED AREA FRACTION");
 
     } else if (reportName == "PLANTLOOPDEMANDREPORTMONTHLY") {
-        addRecordToOutputVariableStructure("*", "PLANT SUPPLY SIDE COOLING DEMAND RATE");
-        addRecordToOutputVariableStructure("*", "PLANT SUPPLY SIDE HEATING DEMAND RATE");
+        addRecordToOutputVariableStructure(state, "*", "PLANT SUPPLY SIDE COOLING DEMAND RATE");
+        addRecordToOutputVariableStructure(state, "*", "PLANT SUPPLY SIDE HEATING DEMAND RATE");
 
     } else if (reportName == "FANREPORTMONTHLY") {
-        addRecordToOutputVariableStructure("*", "FAN ELECTRICITY ENERGY");
-        addRecordToOutputVariableStructure("*", "FAN RISE IN AIR TEMPERATURE");
-        addRecordToOutputVariableStructure("*", "FAN ELECTRICITY RATE");
+        addRecordToOutputVariableStructure(state, "*", "FAN ELECTRICITY ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "FAN RISE IN AIR TEMPERATURE");
+        addRecordToOutputVariableStructure(state, "*", "FAN ELECTRICITY RATE");
 
     } else if (reportName == "PUMPREPORTMONTHLY") {
-        addRecordToOutputVariableStructure("*", "PUMP ELECTRICITY ENERGY");
-        addRecordToOutputVariableStructure("*", "PUMP FLUID HEAT GAIN ENERGY");
-        addRecordToOutputVariableStructure("*", "PUMP ELECTRICITY RATE");
-        addRecordToOutputVariableStructure("*", "PUMP SHAFT POWER");
-        addRecordToOutputVariableStructure("*", "PUMP FLUID HEAT GAIN RATE");
-        addRecordToOutputVariableStructure("*", "PUMP OUTLET TEMPERATURE");
-        addRecordToOutputVariableStructure("*", "PUMP MASS FLOW RATE");
+        addRecordToOutputVariableStructure(state, "*", "PUMP ELECTRICITY ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "PUMP FLUID HEAT GAIN ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "PUMP ELECTRICITY RATE");
+        addRecordToOutputVariableStructure(state, "*", "PUMP SHAFT POWER");
+        addRecordToOutputVariableStructure(state, "*", "PUMP FLUID HEAT GAIN RATE");
+        addRecordToOutputVariableStructure(state, "*", "PUMP OUTLET TEMPERATURE");
+        addRecordToOutputVariableStructure(state, "*", "PUMP MASS FLOW RATE");
 
     } else if (reportName == "CONDLOOPDEMANDREPORTMONTHLY") {
-        addRecordToOutputVariableStructure("*", "PLANT SUPPLY SIDE COOLING DEMAND RATE");
-        addRecordToOutputVariableStructure("*", "PLANT SUPPLY SIDE HEATING DEMAND RATE");
-        addRecordToOutputVariableStructure("*", "PLANT SUPPLY SIDE INLET TEMPERATURE");
-        addRecordToOutputVariableStructure("*", "PLANT SUPPLY SIDE OUTLET TEMPERATURE");
+        addRecordToOutputVariableStructure(state, "*", "PLANT SUPPLY SIDE COOLING DEMAND RATE");
+        addRecordToOutputVariableStructure(state, "*", "PLANT SUPPLY SIDE HEATING DEMAND RATE");
+        addRecordToOutputVariableStructure(state, "*", "PLANT SUPPLY SIDE INLET TEMPERATURE");
+        addRecordToOutputVariableStructure(state, "*", "PLANT SUPPLY SIDE OUTLET TEMPERATURE");
 
     } else if (reportName == "ZONETEMPERATUREOSCILLATIONREPORTMONTHLY") {
-        addRecordToOutputVariableStructure("*", "ZONE OSCILLATING TEMPERATURES TIME");
-        addRecordToOutputVariableStructure("*", "ZONE PEOPLE OCCUPANT COUNT");
+        addRecordToOutputVariableStructure(state, "*", "ZONE OSCILLATING TEMPERATURES TIME");
+        addRecordToOutputVariableStructure(state, "*", "ZONE PEOPLE OCCUPANT COUNT");
 
     } else if (reportName == "AIRLOOPSYSTEMENERGYANDWATERUSEMONTHLY") {
-        addRecordToOutputVariableStructure("*", "AIR SYSTEM HOT WATER ENERGY");
-        addRecordToOutputVariableStructure("*", "AIR SYSTEM STEAM ENERGY");
-        addRecordToOutputVariableStructure("*", "AIR SYSTEM CHILLED WATER ENERGY");
-        addRecordToOutputVariableStructure("*", "AIR SYSTEM ELECTRICITY ENERGY");
-        addRecordToOutputVariableStructure("*", "AIR SYSTEM NATURALGAS ENERGY");
-        addRecordToOutputVariableStructure("*", "AIR SYSTEM WATER VOLUME");
+        addRecordToOutputVariableStructure(state, "*", "AIR SYSTEM HOT WATER ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "AIR SYSTEM STEAM ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "AIR SYSTEM CHILLED WATER ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "AIR SYSTEM ELECTRICITY ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "AIR SYSTEM NATURALGAS ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "AIR SYSTEM WATER VOLUME");
 
     } else if (reportName == "AIRLOOPSYSTEMCOMPONENTLOADSMONTHLY") {
-        addRecordToOutputVariableStructure("*", "AIR SYSTEM FAN AIR HEATING ENERGY");
-        addRecordToOutputVariableStructure("*", "AIR SYSTEM COOLING COIL TOTAL COOLING ENERGY");
-        addRecordToOutputVariableStructure("*", "AIR SYSTEM HEATING COIL TOTAL HEATING ENERGY");
-        addRecordToOutputVariableStructure("*", "AIR SYSTEM HEAT EXCHANGER TOTAL HEATING ENERGY");
-        addRecordToOutputVariableStructure("*", "AIR SYSTEM HEAT EXCHANGER TOTAL COOLING ENERGY");
-        addRecordToOutputVariableStructure("*", "AIR SYSTEM HUMIDIFIER TOTAL HEATING ENERGY");
-        addRecordToOutputVariableStructure("*", "AIR SYSTEM EVAPORATIVE COOLER TOTAL COOLING ENERGY");
-        addRecordToOutputVariableStructure("*", "AIR SYSTEM DESICCANT DEHUMIDIFIER TOTAL COOLING ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "AIR SYSTEM FAN AIR HEATING ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "AIR SYSTEM COOLING COIL TOTAL COOLING ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "AIR SYSTEM HEATING COIL TOTAL HEATING ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "AIR SYSTEM HEAT EXCHANGER TOTAL HEATING ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "AIR SYSTEM HEAT EXCHANGER TOTAL COOLING ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "AIR SYSTEM HUMIDIFIER TOTAL HEATING ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "AIR SYSTEM EVAPORATIVE COOLER TOTAL COOLING ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "AIR SYSTEM DESICCANT DEHUMIDIFIER TOTAL COOLING ENERGY");
 
     } else if (reportName == "AIRLOOPSYSTEMCOMPONENTENERGYUSEMONTHLY") {
-        addRecordToOutputVariableStructure("*", "AIR SYSTEM FAN ELECTRICITY ENERGY");
-        addRecordToOutputVariableStructure("*", "AIR SYSTEM HEATING COIL HOT WATER ENERGY");
-        addRecordToOutputVariableStructure("*", "AIR SYSTEM COOLING COIL CHILLED WATER ENERGY");
-        addRecordToOutputVariableStructure("*", "AIR SYSTEM DX HEATING COIL ELECTRICITY ENERGY");
-        addRecordToOutputVariableStructure("*", "AIR SYSTEM DX COOLING COIL ELECTRICITY ENERGY");
-        addRecordToOutputVariableStructure("*", "AIR SYSTEM HEATING COIL ELECTRICITY ENERGY");
-        addRecordToOutputVariableStructure("*", "AIR SYSTEM HEATING COIL NATURALGAS ENERGY");
-        addRecordToOutputVariableStructure("*", "AIR SYSTEM HEATING COIL STEAM ENERGY");
-        addRecordToOutputVariableStructure("*", "AIR SYSTEM HUMIDIFIER ELECTRICITY ENERGY");
-        addRecordToOutputVariableStructure("*", "AIR SYSTEM EVAPORATIVE COOLER ELECTRICITY ENERGY");
-        addRecordToOutputVariableStructure("*", "AIR SYSTEM DESICCANT DEHUMIDIFIER ELECTRICITY ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "AIR SYSTEM FAN ELECTRICITY ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "AIR SYSTEM HEATING COIL HOT WATER ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "AIR SYSTEM COOLING COIL CHILLED WATER ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "AIR SYSTEM DX HEATING COIL ELECTRICITY ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "AIR SYSTEM DX COOLING COIL ELECTRICITY ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "AIR SYSTEM HEATING COIL ELECTRICITY ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "AIR SYSTEM HEATING COIL NATURALGAS ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "AIR SYSTEM HEATING COIL STEAM ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "AIR SYSTEM HUMIDIFIER ELECTRICITY ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "AIR SYSTEM EVAPORATIVE COOLER ELECTRICITY ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "AIR SYSTEM DESICCANT DEHUMIDIFIER ELECTRICITY ENERGY");
 
     } else if (reportName == "MECHANICALVENTILATIONLOADSMONTHLY") {
-        addRecordToOutputVariableStructure("*", "ZONE MECHANICAL VENTILATION NO LOAD HEAT REMOVAL ENERGY");
-        addRecordToOutputVariableStructure("*", "ZONE MECHANICAL VENTILATION COOLING LOAD INCREASE ENERGY");
-        addRecordToOutputVariableStructure("*", "ZONE MECHANICAL VENTILATION COOLING LOAD INCREASE DUE TO OVERHEATING ENERGY");
-        addRecordToOutputVariableStructure("*", "ZONE MECHANICAL VENTILATION COOLING LOAD DECREASE ENERGY");
-        addRecordToOutputVariableStructure("*", "ZONE MECHANICAL VENTILATION NO LOAD HEAT ADDITION ENERGY");
-        addRecordToOutputVariableStructure("*", "ZONE MECHANICAL VENTILATION HEATING LOAD INCREASE ENERGY");
-        addRecordToOutputVariableStructure("*", "ZONE MECHANICAL VENTILATION HEATING LOAD INCREASE DUE TO OVERCOOLING ENERGY");
-        addRecordToOutputVariableStructure("*", "ZONE MECHANICAL VENTILATION HEATING LOAD DECREASE ENERGY");
-        addRecordToOutputVariableStructure("*", "ZONE MECHANICAL VENTILATION AIR CHANGES PER HOUR");
+        addRecordToOutputVariableStructure(state, "*", "ZONE MECHANICAL VENTILATION NO LOAD HEAT REMOVAL ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "ZONE MECHANICAL VENTILATION COOLING LOAD INCREASE ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "ZONE MECHANICAL VENTILATION COOLING LOAD INCREASE DUE TO OVERHEATING ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "ZONE MECHANICAL VENTILATION COOLING LOAD DECREASE ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "ZONE MECHANICAL VENTILATION NO LOAD HEAT ADDITION ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "ZONE MECHANICAL VENTILATION HEATING LOAD INCREASE ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "ZONE MECHANICAL VENTILATION HEATING LOAD INCREASE DUE TO OVERCOOLING ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "ZONE MECHANICAL VENTILATION HEATING LOAD DECREASE ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "ZONE MECHANICAL VENTILATION AIR CHANGES PER HOUR");
 
     } else if (reportName == "HEATEMISSIONSREPORTMONTHLY") {
         // Place holder
-        addRecordToOutputVariableStructure("*", "Site Total Surface Heat Emission to Air");
-        addRecordToOutputVariableStructure("*", "Site Total Zone Exfiltration Heat Loss");
-        addRecordToOutputVariableStructure("*", "Site Total Zone Exhaust Air Heat Loss");
-        addRecordToOutputVariableStructure("*", "Air System Relief Air Total Heat Loss Energy");
-        addRecordToOutputVariableStructure("*", "HVAC System Total Heat Rejection Energy");
+        addRecordToOutputVariableStructure(state, "*", "Site Total Surface Heat Emission to Air");
+        addRecordToOutputVariableStructure(state, "*", "Site Total Zone Exfiltration Heat Loss");
+        addRecordToOutputVariableStructure(state, "*", "Site Total Zone Exhaust Air Heat Loss");
+        addRecordToOutputVariableStructure(state, "*", "Air System Relief Air Total Heat Loss Energy");
+        addRecordToOutputVariableStructure(state, "*", "HVAC System Total Heat Rejection Energy");
     } else {
     }
 }
 
-void InputProcessor::addRecordToOutputVariableStructure(std::string const &KeyValue, std::string const &VariableName)
+void InputProcessor::addRecordToOutputVariableStructure(EnergyPlusData &state, std::string const &KeyValue, std::string const &VariableName)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda Lawrie
@@ -2217,10 +2214,10 @@ void InputProcessor::addRecordToOutputVariableStructure(std::string const &KeyVa
                            UtilityRoutines::case_insensitive_comparator>
             data;
         data.reserve(32);
-        data.emplace(KeyValue, DataOutputs::OutputReportingVariables(KeyValue, VarName));
+        data.emplace(KeyValue, DataOutputs::OutputReportingVariables(state, KeyValue, VarName));
         DataOutputs::OutputVariablesForSimulation.emplace(VarName, std::move(data));
     } else {
-        found->second.emplace(KeyValue, DataOutputs::OutputReportingVariables(KeyValue, VarName));
+        found->second.emplace(KeyValue, DataOutputs::OutputReportingVariables(state, KeyValue, VarName));
     }
     DataOutputs::NumConsideredOutputVariables++;
 }

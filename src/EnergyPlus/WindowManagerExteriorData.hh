@@ -154,7 +154,7 @@ namespace WindowManager {
     private:
         CWindowConstructionsSimplified();
 
-        IGU_Layers getLayers(FenestrationCommon::WavelengthRange const t_Range, int const t_ConstrNum) const;
+        IGU_Layers getLayers(EnergyPlusData &state, FenestrationCommon::WavelengthRange const t_Range, int const t_ConstrNum) const;
 
         static std::unique_ptr<CWindowConstructionsSimplified> p_inst;
 

@@ -65,7 +65,6 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/FanCoilUnits.hh>
 #include <EnergyPlus/Fans.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/MixedAir.hh>
@@ -85,7 +84,6 @@ using namespace CurveManager;
 using namespace DataBranchNodeConnections;
 using namespace DataEnvironment;
 using namespace DataHeatBalance;
-using namespace DataGlobals;
 using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataHVACGlobals;
@@ -251,7 +249,7 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
     CompSets(2).ParentCName = "AirSystem";
 
     DataEnvironment::OutDryBulbTemp = 5.0;
-    OutputReportPredefined::SetPredefinedTables();
+    OutputReportPredefined::SetPredefinedTables(state);
     Psychrometrics::InitializePsychRoutines();
     createCoilSelectionReportObj();
 
@@ -432,9 +430,9 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     DataEnvironment::OutBaroPress = 101325.0;
     DataEnvironment::StdRhoAir = 1.20;
     state.dataWaterCoils->GetWaterCoilsInputFlag = true;
-    DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::TimeStep = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->NumOfTimeStepInHour = 1;
+    state.dataGlobal->TimeStep = 1;
+    state.dataGlobal->MinutesPerTimeStep = 60;
     DataSizing::CurZoneEqNum = 1;
 
     std::string const idf_objects = delimited_string({
@@ -559,9 +557,9 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     DataEnvironment::OutBaroPress = 101325.0;
     DataEnvironment::StdRhoAir = 1.20;
     state.dataWaterCoils->GetWaterCoilsInputFlag = true;
-    DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::TimeStep = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->NumOfTimeStepInHour = 1;
+    state.dataGlobal->TimeStep = 1;
+    state.dataGlobal->MinutesPerTimeStep = 60;
     DataSizing::CurZoneEqNum = 1;
     InitializePsychRoutines();
     GetZoneData(state, ErrorsFound);
@@ -589,10 +587,10 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     DataLoopNode::Node(MixerOA.RetNode).MassFlowRateMax = MaxAirMassFlow;
     DataLoopNode::Node(MixerOA.RetNode).Temp = 20.0;
     DataLoopNode::Node(MixerOA.RetNode).Enthalpy = 36000;
-    DataLoopNode::Node(MixerOA.RetNode).HumRat = PsyWFnTdbH(DataLoopNode::Node(MixerOA.RetNode).Temp, DataLoopNode::Node(MixerOA.RetNode).Enthalpy);
+    DataLoopNode::Node(MixerOA.RetNode).HumRat = PsyWFnTdbH(state, DataLoopNode::Node(MixerOA.RetNode).Temp, DataLoopNode::Node(MixerOA.RetNode).Enthalpy);
     DataLoopNode::Node(MixerOA.InletNode).Temp = 10.0;
     DataLoopNode::Node(MixerOA.InletNode).Enthalpy = 18000;
-    DataLoopNode::Node(MixerOA.InletNode).HumRat = PsyWFnTdbH(DataLoopNode::Node(MixerOA.InletNode).Temp, DataLoopNode::Node(MixerOA.InletNode).Enthalpy);
+    DataLoopNode::Node(MixerOA.InletNode).HumRat = PsyWFnTdbH(state, DataLoopNode::Node(MixerOA.InletNode).Temp, DataLoopNode::Node(MixerOA.InletNode).Enthalpy);
     // chilled water coil
     auto &CWCoil(state.dataWaterCoils->WaterCoil(1));
     CWCoil.UACoilTotal = 470.0;
@@ -639,7 +637,7 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
 
     state.dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
     state.dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
-    DataGlobals::DoingSizing = true;
+    state.dataGlobal->DoingSizing = true;
     state.dataFans->LocalTurnFansOff = false;
     state.dataFans->LocalTurnFansOn = true;
 
@@ -648,7 +646,7 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
 
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
-    DataGlobals::HourOfDay = 1;
+    state.dataGlobal->HourOfDay = 1;
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
@@ -658,7 +656,7 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     ZoneSizingRunDone = true;
     thisFanCoil.DesignHeatingCapacity = 10000.0;
     state.dataGlobal->BeginEnvrnFlag = true;
-    SysSizingCalc = true;
+    state.dataGlobal->SysSizingCalc = true;
     FirstHVACIteration = true;
     zSysEDemand.RemainingOutputReqToCoolSP = 0.0;
     zSysEDemand.RemainingOutputReqToHeatSP = 0.0;
