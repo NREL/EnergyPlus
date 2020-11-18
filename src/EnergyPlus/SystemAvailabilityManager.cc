@@ -111,7 +111,6 @@ namespace SystemAvailabilityManager {
     // Use statements for data only modules
     using namespace DataHVACGlobals;
     using namespace ScheduleManager;
-    using DataAirSystems::PrimaryAirSystem;
     using DataHeatBalance::ZoneList;
 
     // Data
@@ -4289,7 +4288,7 @@ namespace SystemAvailabilityManager {
         int HybridVentNum;
 
         // One time initializations
-        if (MyOneTimeFlag && allocated(ZoneEquipConfig) && allocated(PrimaryAirSystem)) {
+        if (MyOneTimeFlag && allocated(ZoneEquipConfig) && allocated(state.dataAirSystemsData->PrimaryAirSystems)) {
 
             // Ensure the controlled zone is listed and defined in an HVAC Air Loop
             for (SysAvailNum = 1; SysAvailNum <= NumHybridVentSysAvailMgrs; ++SysAvailNum) {
@@ -4308,7 +4307,7 @@ namespace SystemAvailabilityManager {
                 }
                 // Check air loop number
                 for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) { // loop over the primary air systems
-                    if (UtilityRoutines::SameString(PrimaryAirSystem(AirLoopNum).Name, state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).AirLoopName)) {
+                    if (UtilityRoutines::SameString(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Name, state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).AirLoopName)) {
                         state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).AirLoopNum = AirLoopNum;
                     }
                 }
@@ -4398,14 +4397,14 @@ namespace SystemAvailabilityManager {
             for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) { // loop over the primary air systems
                 AirLoopCount = 0;
                 for (SysAvailNum = 1; SysAvailNum <= NumHybridVentSysAvailMgrs; ++SysAvailNum) {
-                    if (UtilityRoutines::SameString(PrimaryAirSystem(AirLoopNum).Name, state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).AirLoopName)) {
+                    if (UtilityRoutines::SameString(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Name, state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).AirLoopName)) {
                         ++AirLoopCount;
                         if (AirLoopCount > 1) SysAvailIndex = SysAvailNum;
                     }
                 }
                 if (AirLoopCount > 1) {
                     ShowSevereError(state, state.dataSystemAvailabilityManager->cValidSysAvailManagerTypes(state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailIndex).MgrType) +
-                                    ", The AirLoopHVAC name found more than once=" + PrimaryAirSystem(AirLoopNum).Name);
+                                    ", The AirLoopHVAC name found more than once=" + state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Name);
                     ShowContinueError(state, "Each AirLoopHVAC allows one hybrid ventilation control object.");
                     ErrorsFound = true;
                 }

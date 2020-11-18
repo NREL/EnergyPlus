@@ -5350,13 +5350,13 @@ namespace HVACVariableRefrigerantFlow {
                     // check if the TU is connected to an air loop
                     if (!VRFTU(TUIndex).isInAirLoop) {
                         for (int AirLoopNum = 1; AirLoopNum <= DataHVACGlobals::NumPrimaryAirSys; ++AirLoopNum) {
-                            for (int BranchNum = 1; BranchNum <= DataAirSystems::PrimaryAirSystem(AirLoopNum).NumBranches; ++BranchNum) {
-                                for (int CompNum = 1; CompNum <= DataAirSystems::PrimaryAirSystem(AirLoopNum).Branch(BranchNum).TotalComponents;
+                            for (int BranchNum = 1; BranchNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).NumBranches; ++BranchNum) {
+                                for (int CompNum = 1; CompNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).TotalComponents;
                                      ++CompNum) {
-                                    if (UtilityRoutines::SameString(DataAirSystems::PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name,
+                                    if (UtilityRoutines::SameString(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name,
                                                                     thisObjectName) &&
                                         UtilityRoutines::SameString(
-                                            DataAirSystems::PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).TypeOf,
+                                            state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).TypeOf,
                                             cCurrentModuleObject)) {
                                         VRFTU(TUIndex).airLoopNum = AirLoopNum;
                                         AirLoopFound = true;
@@ -7140,12 +7140,12 @@ namespace HVACVariableRefrigerantFlow {
                     DataSizing::DataFanPlacement = DataSizing::zoneFanPlacement::zoneDrawThru;
                 }
             } else if (VRFTU(VRFTUNum).isInAirLoop) {
-                DataAirSystems::PrimaryAirSystem(VRFTU(VRFTUNum).airLoopNum).supFanModelTypeEnum = DataAirSystems::objectVectorOOFanSystemModel;
-                DataAirSystems::PrimaryAirSystem(VRFTU(VRFTUNum).airLoopNum).supFanVecIndex = VRFTU(VRFTUNum).FanIndex;
+                state.dataAirSystemsData->PrimaryAirSystems(VRFTU(VRFTUNum).airLoopNum).supFanModelTypeEnum = DataAirSystems::objectVectorOOFanSystemModel;
+                state.dataAirSystemsData->PrimaryAirSystems(VRFTU(VRFTUNum).airLoopNum).supFanVecIndex = VRFTU(VRFTUNum).FanIndex;
                 if (VRFTU(VRFTUNum).FanPlace == DataHVACGlobals::BlowThru) {
-                    DataAirSystems::PrimaryAirSystem(VRFTU(VRFTUNum).airLoopNum).supFanLocation = DataAirSystems::fanPlacement::BlowThru;
+                    state.dataAirSystemsData->PrimaryAirSystems(VRFTU(VRFTUNum).airLoopNum).supFanLocation = DataAirSystems::fanPlacement::BlowThru;
                 } else if (VRFTU(VRFTUNum).FanPlace == DataHVACGlobals::DrawThru) {
-                    DataAirSystems::PrimaryAirSystem(VRFTU(VRFTUNum).airLoopNum).supFanLocation = DataAirSystems::fanPlacement::DrawThru;
+                    state.dataAirSystemsData->PrimaryAirSystems(VRFTU(VRFTUNum).airLoopNum).supFanLocation = DataAirSystems::fanPlacement::DrawThru;
                 }
             }
         } else if (VRFTU(VRFTUNum).FanIndex > 0) {
@@ -7158,12 +7158,12 @@ namespace HVACVariableRefrigerantFlow {
                     DataSizing::DataFanPlacement = DataSizing::zoneFanPlacement::zoneDrawThru;
                 }
             } else if (VRFTU(VRFTUNum).isInAirLoop) {
-                DataAirSystems::PrimaryAirSystem(VRFTU(VRFTUNum).airLoopNum).supFanModelTypeEnum = DataAirSystems::structArrayLegacyFanModels;
-                DataAirSystems::PrimaryAirSystem(VRFTU(VRFTUNum).airLoopNum).supFanVecIndex = VRFTU(VRFTUNum).FanIndex;
+                state.dataAirSystemsData->PrimaryAirSystems(VRFTU(VRFTUNum).airLoopNum).supFanModelTypeEnum = DataAirSystems::structArrayLegacyFanModels;
+                state.dataAirSystemsData->PrimaryAirSystems(VRFTU(VRFTUNum).airLoopNum).supFanVecIndex = VRFTU(VRFTUNum).FanIndex;
                 if (VRFTU(VRFTUNum).FanPlace == DataHVACGlobals::BlowThru) {
-                    DataAirSystems::PrimaryAirSystem(VRFTU(VRFTUNum).airLoopNum).supFanLocation = DataAirSystems::fanPlacement::BlowThru;
+                    state.dataAirSystemsData->PrimaryAirSystems(VRFTU(VRFTUNum).airLoopNum).supFanLocation = DataAirSystems::fanPlacement::BlowThru;
                 } else if (VRFTU(VRFTUNum).FanPlace == DataHVACGlobals::DrawThru) {
-                    DataAirSystems::PrimaryAirSystem(VRFTU(VRFTUNum).airLoopNum).supFanLocation = DataAirSystems::fanPlacement::DrawThru;
+                    state.dataAirSystemsData->PrimaryAirSystems(VRFTU(VRFTUNum).airLoopNum).supFanLocation = DataAirSystems::fanPlacement::DrawThru;
                 }
             }
         }
@@ -7510,7 +7510,7 @@ namespace HVACVariableRefrigerantFlow {
             }
         } else {
             if (VRFTU(VRFTUNum).CoolOutAirVolFlow == DataSizing::AutoSize) {
-                if (DataAirSystems::PrimaryAirSystem(CurSysNum).OASysExists) {
+                if (state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).OASysExists) {
                     VRFTU(VRFTUNum).CoolOutAirVolFlow = 0.0;
                 } else {
                     VRFTU(VRFTUNum).CoolOutAirVolFlow = min(FinalSysSizing(CurSysNum).DesOutAirVolFlow, VRFTU(VRFTUNum).MaxCoolAirVolFlow);
@@ -7573,7 +7573,7 @@ namespace HVACVariableRefrigerantFlow {
             }
         } else {
             if (VRFTU(VRFTUNum).HeatOutAirVolFlow == DataSizing::AutoSize) {
-                if (DataAirSystems::PrimaryAirSystem(CurSysNum).OASysExists) {
+                if (state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).OASysExists) {
                     VRFTU(VRFTUNum).HeatOutAirVolFlow = 0.0;
                 } else {
                     VRFTU(VRFTUNum).HeatOutAirVolFlow = min(FinalSysSizing(CurSysNum).DesOutAirVolFlow, VRFTU(VRFTUNum).MaxHeatAirVolFlow);
@@ -7644,7 +7644,7 @@ namespace HVACVariableRefrigerantFlow {
             }
         } else {
             if (VRFTU(VRFTUNum).NoCoolHeatOutAirVolFlow == DataSizing::AutoSize) {
-                if (DataAirSystems::PrimaryAirSystem(CurSysNum).OASysExists) {
+                if (state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).OASysExists) {
                     VRFTU(VRFTUNum).NoCoolHeatOutAirVolFlow = 0.0;
                 } else {
                     VRFTU(VRFTUNum).NoCoolHeatOutAirVolFlow = min(VRFTU(VRFTUNum).MaxCoolAirVolFlow, VRFTU(VRFTUNum).MaxHeatAirVolFlow);

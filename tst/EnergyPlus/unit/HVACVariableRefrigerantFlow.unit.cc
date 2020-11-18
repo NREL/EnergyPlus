@@ -205,9 +205,9 @@ protected:
         state.dataCurveManager->PerfCurve(2).CurveMax = 1.0;
 
         int NumAirLoops = DataHVACGlobals::NumPrimaryAirSys = 1; // allocate to 1 air loop and adjust/resize as needed
-        DataAirSystems::PrimaryAirSystem.allocate(NumAirLoops);
+        state.dataAirSystemsData->PrimaryAirSystems.allocate(NumAirLoops);
         int thisAirLoop = 1;
-        DataAirSystems::PrimaryAirSystem(thisAirLoop).Branch.allocate(1);
+        state.dataAirSystemsData->PrimaryAirSystems(thisAirLoop).Branch.allocate(1);
         state.dataAirLoop->AirLoopControlInfo.allocate(1);
 
         ZoneSysEnergyDemand.allocate(numZones);
@@ -305,18 +305,18 @@ protected:
         finalSysSizing.MixHumRatAtCoolPeak = 0.009;
 
         // set up air loop
-        DataAirSystems::PrimaryAirSystem(thisAirLoop).NumBranches = 1;
-        DataAirSystems::PrimaryAirSystem(thisAirLoop).NumInletBranches = 1;
-        DataAirSystems::PrimaryAirSystem(thisAirLoop).InletBranchNum.allocate(1);
-        DataAirSystems::PrimaryAirSystem(thisAirLoop).InletBranchNum(1) = 1;
-        DataAirSystems::PrimaryAirSystem(thisAirLoop).NumOutletBranches = 1;
-        DataAirSystems::PrimaryAirSystem(thisAirLoop).OutletBranchNum.allocate(1);
-        DataAirSystems::PrimaryAirSystem(thisAirLoop).OutletBranchNum(1) = 1;
-        DataAirSystems::PrimaryAirSystem(thisAirLoop).Branch.allocate(1);
-        DataAirSystems::PrimaryAirSystem(thisAirLoop).Branch(1).TotalComponents = 1;
-        DataAirSystems::PrimaryAirSystem(thisAirLoop).Branch(1).Comp.allocate(1);
-        DataAirSystems::PrimaryAirSystem(thisAirLoop).Branch(1).Comp(1).Name = "VRFTU1";
-        DataAirSystems::PrimaryAirSystem(thisAirLoop).Branch(1).Comp(1).TypeOf = "ZONEHVAC:TERMINALUNIT:VARIABLEREFRIGERANTFLOW";
+        state.dataAirSystemsData->PrimaryAirSystems(thisAirLoop).NumBranches = 1;
+        state.dataAirSystemsData->PrimaryAirSystems(thisAirLoop).NumInletBranches = 1;
+        state.dataAirSystemsData->PrimaryAirSystems(thisAirLoop).InletBranchNum.allocate(1);
+        state.dataAirSystemsData->PrimaryAirSystems(thisAirLoop).InletBranchNum(1) = 1;
+        state.dataAirSystemsData->PrimaryAirSystems(thisAirLoop).NumOutletBranches = 1;
+        state.dataAirSystemsData->PrimaryAirSystems(thisAirLoop).OutletBranchNum.allocate(1);
+        state.dataAirSystemsData->PrimaryAirSystems(thisAirLoop).OutletBranchNum(1) = 1;
+        state.dataAirSystemsData->PrimaryAirSystems(thisAirLoop).Branch.allocate(1);
+        state.dataAirSystemsData->PrimaryAirSystems(thisAirLoop).Branch(1).TotalComponents = 1;
+        state.dataAirSystemsData->PrimaryAirSystems(thisAirLoop).Branch(1).Comp.allocate(1);
+        state.dataAirSystemsData->PrimaryAirSystems(thisAirLoop).Branch(1).Comp(1).Name = "VRFTU1";
+        state.dataAirSystemsData->PrimaryAirSystems(thisAirLoop).Branch(1).Comp(1).TypeOf = "ZONEHVAC:TERMINALUNIT:VARIABLEREFRIGERANTFLOW";
 
         // set up plant loop for water equipment
         DataPlant::TotNumLoops = 2;

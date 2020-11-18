@@ -296,7 +296,7 @@ protected:
         DataEnvironment::OutBaroPress = 101325.0;
 
         state.dataAirLoop->AirLoopFlow.allocate(1);
-        DataAirSystems::PrimaryAirSystem.allocate(1);
+        state.dataAirSystemsData->PrimaryAirSystems.allocate(1);
         state.dataAirLoop->AirLoopControlInfo.allocate(1);
         OutputReportPredefined::SetPredefinedTables(state);
     }

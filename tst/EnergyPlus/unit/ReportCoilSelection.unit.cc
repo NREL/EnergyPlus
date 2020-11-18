@@ -161,7 +161,7 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_ChWCoil)
     int curSysNum = 1;
     int curZoneEqNum = 0;
     isAutoSized = true; // true if autosized
-    DataAirSystems::PrimaryAirSystem.allocate(1);
+    state.dataAirSystemsData->PrimaryAirSystems.allocate(1);
     state.dataAirLoop->AirToZoneNodeInfo.allocate(1);
     state.dataAirLoop->AirToZoneNodeInfo(1).NumZonesHeated = 2;
     state.dataAirLoop->AirToZoneNodeInfo(1).HeatCtrlZoneNums.allocate(state.dataAirLoop->AirToZoneNodeInfo(1).NumZonesHeated);

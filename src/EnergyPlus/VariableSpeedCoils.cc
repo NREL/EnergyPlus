@@ -3638,7 +3638,6 @@ namespace VariableSpeedCoils {
 
         // Using/Aliasing
         using namespace Psychrometrics;
-        using DataAirSystems::PrimaryAirSystem;
         using DataHVACGlobals::SmallAirVolFlow;
         using DataHVACGlobals::SmallLoad;
         using DataPlant::PlantLoop;
@@ -3884,7 +3883,7 @@ namespace VariableSpeedCoils {
                     } else { // coil is on the main air loop
                         SupTemp = FinalSysSizing(CurSysNum).CoolSupTemp;
                         SupHumRat = FinalSysSizing(CurSysNum).CoolSupHumRat;
-                        if (PrimaryAirSystem(CurSysNum).NumOACoolCoils == 0) { // there is no precooling of the OA stream
+                        if (state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).NumOACoolCoils == 0) { // there is no precooling of the OA stream
                             MixTemp = FinalSysSizing(CurSysNum).MixTempAtCoolPeak;
                             MixHumRat = FinalSysSizing(CurSysNum).MixHumRatAtCoolPeak;
                         } else { // there is precooling of OA stream
@@ -3909,9 +3908,9 @@ namespace VariableSpeedCoils {
                     Real64 FanCoolLoad = DataAirSystems::calcFanDesignHeatGain(state, DataFanEnumType, DataFanIndex, VolFlowRate);
                     // inlet/outlet temp is adjusted after enthalpy is calculcated so fan heat is not double counted
                     Real64 CpAir = PsyCpAirFnW(MixHumRat);
-                    if (PrimaryAirSystem(CurSysNum).supFanLocation == DataAirSystems::fanPlacement::BlowThru) {
+                    if (state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).supFanLocation == DataAirSystems::fanPlacement::BlowThru) {
                         MixTemp += FanCoolLoad / (CpAir * rhoair * VolFlowRate);
-                    } else if (PrimaryAirSystem(CurSysNum).supFanLocation == DataAirSystems::fanPlacement::DrawThru) {
+                    } else if (state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).supFanLocation == DataAirSystems::fanPlacement::DrawThru) {
                         SupTemp -= FanCoolLoad / (CpAir * rhoair * VolFlowRate);
                     }
                     MixWetBulb = PsyTwbFnTdbWPb(state, MixTemp, MixHumRat, OutBaroPress, RoutineName);
