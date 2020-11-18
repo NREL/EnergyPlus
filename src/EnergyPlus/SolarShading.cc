@@ -4709,9 +4709,7 @@ namespace SolarShading {
 
                     for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
 
-                        if (!Surface(SurfNum).ShadowingSurf &&
-                            (!Surface(SurfNum).HeatTransSurf || !Surface(SurfNum).ExtSolar ||
-                             (Surface(SurfNum).ExtBoundCond != ExternalEnvironment && Surface(SurfNum).ExtBoundCond != OtherSideCondModeledExt)))
+                        if (!Surface(SurfNum).ShadowingSurf && (!Surface(SurfNum).HeatTransSurf || !Surface(SurfNum).ExtSolar))
                             continue;
 
                         if (state.dataSolarShading->CTHETA(SurfNum) < 0.0) continue;
@@ -4738,9 +4736,7 @@ namespace SolarShading {
 
             for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
 
-                if (!Surface(SurfNum).ShadowingSurf &&
-                    (!Surface(SurfNum).HeatTransSurf || !Surface(SurfNum).ExtSolar ||
-                     (Surface(SurfNum).ExtBoundCond != ExternalEnvironment && Surface(SurfNum).ExtBoundCond != OtherSideCondModeledExt)))
+                if (!Surface(SurfNum).ShadowingSurf && (!Surface(SurfNum).HeatTransSurf || !Surface(SurfNum).ExtSolar))
                     continue;
 
                 if (std::abs(WoShdgIsoSky(SurfNum)) > Eps) {
@@ -5004,10 +5000,7 @@ namespace SolarShading {
                         }
                         GSS(NGSS) = GSSNR;
 
-                    } else if ((Surface(GSSNR).BaseSurf == 0) ||
-                               ((Surface(GSSNR).BaseSurf == GSSNR) &&
-                                ((Surface(GSSNR).ExtBoundCond == ExternalEnvironment) ||
-                                 Surface(GSSNR).ExtBoundCond == OtherSideCondModeledExt))) { // Detached shadowing surface or | any other base surface
+                    } else if ((Surface(GSSNR).BaseSurf == 0) || (Surface(GSSNR).BaseSurf == GSSNR)) { // Detached shadowing surface or | any other base surface
                                                                                              // exposed to outside environment
 
                         CHKGSS(GRSNR, GSSNR, ZMIN, CannotShade); // Check to see if this can shade the receiving surface
@@ -6092,6 +6085,7 @@ namespace SolarShading {
             //--------------------------------------------------------------------------------------------------------
             for (int const SurfNum : thisEnclosure.SurfacePtr) {
                 if (Surface(SurfNum).Class != SurfaceClass::Window && Surface(SurfNum).Class != SurfaceClass::TDD_Dome) continue;
+                if (!Surface(SurfNum).ExtSolar) continue;
                 int ConstrNum = Surface(SurfNum).Construction;
                 int ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
                 if (SurfWinStormWinFlag(SurfNum) == 1) {
@@ -7856,12 +7850,9 @@ namespace SolarShading {
 
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             for (int SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
-                if (((Surface(SurfNum).ExtBoundCond != ExternalEnvironment) && (Surface(SurfNum).ExtBoundCond != OtherSideCondModeledExt)) &&
-                    SurfWinOriginalClass(SurfNum) != SurfaceClass::TDD_Diffuser)
-                    continue;
                 if (!Surface(SurfNum).HeatTransSurf) continue;
                 // TH added 3/24/2010 while debugging CR 7872
-                if (!Surface(SurfNum).ExtSolar) continue;
+                if (!Surface(SurfNum).ExtSolar && SurfWinOriginalClass(SurfNum) != SurfaceClass::TDD_Diffuser) continue;
                 int ConstrNum = Surface(SurfNum).Construction;
                 int ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
                 if (SurfWinStormWinFlag(SurfNum) == 1) {
@@ -8899,7 +8890,6 @@ namespace SolarShading {
                     }
                 }
 
-                if (Surface(ISurf).Class != SurfaceClass::Window) continue;
                 if (Surface(ISurf).ExtBoundCond != ExternalEnvironment) continue;
                 if (!Surface(ISurf).HasShadeControl) continue;
 
@@ -9556,9 +9546,7 @@ namespace SolarShading {
                 for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
                     ShadowingSurf = Surface(SurfNum).ShadowingSurf;
 
-                    if (!ShadowingSurf &&
-                        (!Surface(SurfNum).HeatTransSurf || !Surface(SurfNum).ExtSolar ||
-                         (Surface(SurfNum).ExtBoundCond != ExternalEnvironment && Surface(SurfNum).ExtBoundCond != OtherSideCondModeledExt)))
+                    if (!ShadowingSurf && (!Surface(SurfNum).HeatTransSurf || !Surface(SurfNum).ExtSolar))
                         continue;
 
                     if (state.dataSolarShading->CTHETA(SurfNum) < 0.0) continue;
@@ -9586,9 +9574,7 @@ namespace SolarShading {
         for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
             ShadowingSurf = Surface(SurfNum).ShadowingSurf;
 
-            if (!ShadowingSurf &&
-                (!Surface(SurfNum).HeatTransSurf || !Surface(SurfNum).ExtSolar ||
-                 (Surface(SurfNum).ExtBoundCond != ExternalEnvironment && Surface(SurfNum).ExtBoundCond != OtherSideCondModeledExt)))
+            if (!ShadowingSurf && (!Surface(SurfNum).HeatTransSurf || !Surface(SurfNum).ExtSolar))
                 continue;
 
             if (std::abs(WoShdgIsoSky(SurfNum)) > Eps) {
@@ -10839,6 +10825,7 @@ namespace SolarShading {
             // Loop over all diffuse solar transmitting surfaces (i.e., exterior windows and TDDs) in the current zone
             for (int const DifTransSurfNum : thisEnclosure.SurfacePtr) {
                 // Skip surfaces that are not exterior, except for TDD_Diffusers
+                // TODO: why not ExtSolar
                 if (((Surface(DifTransSurfNum).ExtBoundCond != ExternalEnvironment) &&
                      (Surface(DifTransSurfNum).ExtBoundCond != OtherSideCondModeledExt)) &&
                     SurfWinOriginalClass(DifTransSurfNum) != SurfaceClass::TDD_Diffuser)

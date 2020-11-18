@@ -915,7 +915,7 @@ namespace HeatBalanceSurfaceManager {
         Real64 frameArea;
         Real64 dividerArea;
         // counts for object count report
-        int SurfaceClassCount = int(SurfaceClass::SurfaceClassCount);
+        int SurfaceClassCount = int(SurfaceClass::Count);
         Array1D_int numSurfaces(SurfaceClassCount);
         Array1D_int numExtSurfaces(SurfaceClassCount);
         int frameDivNum;
@@ -1261,7 +1261,7 @@ namespace HeatBalanceSurfaceManager {
                 }
             }
             int currSurfaceClass = int(Surface(iSurf).Class);
-            assert(currSurfaceClass < int(SurfaceClass::SurfaceClassCount));
+            assert(currSurfaceClass < int(SurfaceClass::Count));
             assert(currSurfaceClass > int(SurfaceClass::None));
             ++numSurfaces(currSurfaceClass);
             if (isExterior) {
