@@ -167,17 +167,17 @@ TEST_F(EnergyPlusFixture, PVWattsGenerator_Calc)
     using namespace PVWatts;
     // USA_AZ_Phoenix-Sky.Harbor.Intl.AP.722780_TMY3.epw
     // 6/15 at 7am
-    DataGlobals::TimeStep = 1;
-    DataGlobals::TimeStepZone = 1.0;
+    state.dataGlobal->TimeStep = 1;
+    state.dataGlobal->TimeStepZone = 1.0;
     DataHVACGlobals::TimeStepSys = 1.0;
     state.dataGlobal->BeginTimeStepFlag = true;
-    DataGlobals::MinutesPerTimeStep = 60;
-    DataGlobals::NumOfTimeStepInHour = 1;
+    state.dataGlobal->MinutesPerTimeStep = 60;
+    state.dataGlobal->NumOfTimeStepInHour = 1;
     WeatherManager::AllocateWeatherData(state); // gets us the albedo array initialized
     DataEnvironment::Year = 1986;
     DataEnvironment::Month = 6;
     DataEnvironment::DayOfMonth = 15;
-    DataGlobals::HourOfDay = 8; // 8th hour of day, 7-8am
+    state.dataGlobal->HourOfDay = 8; // 8th hour of day, 7-8am
     state.dataWeatherManager->WeatherFileLatitude = 33.45;
     state.dataWeatherManager->WeatherFileLongitude = -111.98;
     state.dataWeatherManager->WeatherFileTimeZone = -7;

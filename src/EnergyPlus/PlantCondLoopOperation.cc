@@ -1321,7 +1321,6 @@ CurrentModuleObject, PlantOpSchemeName);
         using NodeInputManager::GetOnlySingleNode;
         using namespace DataSizing;
         using namespace DataIPShortCuts;
-        using DataGlobals::AnyEnergyManagementSystemInModel;
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
         using EMSManager::iTemperatureMaxSetPoint;
         using EMSManager::iTemperatureMinSetPoint;
@@ -1507,7 +1506,7 @@ CurrentModuleObject, PlantOpSchemeName);
                             if (SELECT_CASE_var == SingleSetPoint) {
                                 if (Node(PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum).TempSetPoint ==
                                     SensedNodeFlagValue) {
-                                    if (!AnyEnergyManagementSystemInModel) {
+                                    if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                                         ShowSevereError(state, "Missing temperature setpoint for " + CurrentModuleObject + " named " + cAlphaArgs(1));
                                         ShowContinueError(state, "A temperature setpoint is needed at the node named " +
                                                           PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeName);
@@ -1544,7 +1543,7 @@ CurrentModuleObject, PlantOpSchemeName);
                                 if (PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlTypeNum == CoolingOp) {
                                     if (Node(PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum).TempSetPointHi ==
                                         SensedNodeFlagValue) {
-                                        if (!AnyEnergyManagementSystemInModel) {
+                                        if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                                             ShowSevereError(state, "Missing temperature high setpoint for " + CurrentModuleObject + " named " +
                                                             cAlphaArgs(1));
                                             ShowContinueError(state, "A temperature high setpoint is needed at the node named " +
@@ -1582,7 +1581,7 @@ CurrentModuleObject, PlantOpSchemeName);
                                 } else if (PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlTypeNum == HeatingOp) {
                                     if (Node(PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum).TempSetPointLo ==
                                         SensedNodeFlagValue) {
-                                        if (!AnyEnergyManagementSystemInModel) {
+                                        if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                                             ShowSevereError(state, "Missing temperature low setpoint for " + CurrentModuleObject + " named " +
                                                             cAlphaArgs(1));
                                             ShowContinueError(state, "A temperature low setpoint is needed at the node named " +
@@ -1626,7 +1625,7 @@ CurrentModuleObject, PlantOpSchemeName);
                                          SensedNodeFlagValue) ||
                                         (Node(PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum).TempSetPointLo ==
                                          SensedNodeFlagValue)) {
-                                        if (!AnyEnergyManagementSystemInModel) {
+                                        if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                                             ShowSevereError(state, "Missing temperature dual setpoints for " + CurrentModuleObject + " named " +
                                                             cAlphaArgs(1));
                                             ShowContinueError(state, "A dual temperaturesetpoint is needed at the node named " +
@@ -3047,7 +3046,7 @@ CurrentModuleObject, PlantOpSchemeName);
                                         int const CurCompLevelOpNum, // index for Plant()%LoopSide()%Branch()%Comp()%OpScheme()
                                         int const CurSchemePtr,
                                         Real64 const LoopDemand,
-                                        Real64 &EP_UNUSED(RemLoopDemand))
+                                        [[maybe_unused]] Real64 &RemLoopDemand)
     {
 
         // SUBROUTINE INFORMATION:

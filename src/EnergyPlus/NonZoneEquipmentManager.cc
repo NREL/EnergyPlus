@@ -104,7 +104,6 @@ namespace NonZoneEquipmentManager {
         // one here before it knows what to call for simulation.
 
         // Using/Aliasing
-        using DataGlobals::ZoneSizingCalc;
         using WaterThermalTanks::SimulateWaterHeaterStandAlone;
         using WaterUse::SimulateWaterUse;
 
@@ -124,7 +123,7 @@ namespace NonZoneEquipmentManager {
 
         SimulateWaterUse(state, FirstHVACIteration); // simulate non-plant loop water use.
 
-        if (!ZoneSizingCalc) {
+        if (!state.dataGlobal->ZoneSizingCalc) {
             for (WaterHeaterNum = 1; WaterHeaterNum <= NumOfWaterHeater; ++WaterHeaterNum) {
                 SimulateWaterHeaterStandAlone(state, WaterHeaterNum, FirstHVACIteration);
             }

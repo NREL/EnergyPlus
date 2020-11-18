@@ -95,15 +95,15 @@ protected:
         EnergyPlusFixture::SetUp(); // Sets up the base fixture first.
 
         state.dataGlobal->DayOfSim = 1;
-        DataGlobals::HourOfDay = 1;
+        state.dataGlobal->HourOfDay = 1;
 
         DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, 101325.0, 20.0, 0.0); // initialize StdRhoAir
         DataEnvironment::OutBaroPress = 101325.0;
-        DataGlobals::NumOfZones = 1;
-        DataHeatBalance::Zone.allocate(DataGlobals::NumOfZones);
-        DataZoneEquipment::ZoneEquipConfig.allocate(DataGlobals::NumOfZones);
-        DataZoneEquipment::ZoneEquipList.allocate(DataGlobals::NumOfZones);
-        DataZoneEquipment::ZoneEquipAvail.dimension(DataGlobals::NumOfZones, DataHVACGlobals::NoAction);
+        state.dataGlobal->NumOfZones = 1;
+        DataHeatBalance::Zone.allocate(state.dataGlobal->NumOfZones);
+        DataZoneEquipment::ZoneEquipConfig.allocate(state.dataGlobal->NumOfZones);
+        DataZoneEquipment::ZoneEquipList.allocate(state.dataGlobal->NumOfZones);
+        DataZoneEquipment::ZoneEquipAvail.dimension(state.dataGlobal->NumOfZones, DataHVACGlobals::NoAction);
         DataHeatBalance::Zone(1).Name = "EAST ZONE";
         DataZoneEquipment::NumOfZoneEquipLists = 1;
         DataHeatBalance::Zone(1).IsControlled = true;
@@ -296,9 +296,9 @@ protected:
         DataEnvironment::OutBaroPress = 101325.0;
 
         state.dataAirLoop->AirLoopFlow.allocate(1);
-        DataAirSystems::PrimaryAirSystem.allocate(1);
+        state.dataAirSystemsData->PrimaryAirSystems.allocate(1);
         state.dataAirLoop->AirLoopControlInfo.allocate(1);
-        OutputReportPredefined::SetPredefinedTables();
+        OutputReportPredefined::SetPredefinedTables(state);
     }
 
     virtual void TearDown()
@@ -659,7 +659,7 @@ TEST_F(EnergyPlusFixture, UnitaryBypassVAV_GetInputZoneEquipment)
     ZoneTempPredictorCorrector::InitZoneAirSetPoints(state);
     bool simZone = false;
     bool simAir = false;
-    DataHeatBalance::MassConservation.allocate(DataGlobals::NumOfZones);
+    DataHeatBalance::MassConservation.allocate(state.dataGlobal->NumOfZones);
     ZoneEquipmentManager::ManageZoneEquipment(state, firstHVACIteration, simZone, simAir);
     SimAirServingZones::GetAirPathData(state);
     SplitterComponent::GetSplitterInput(state);
@@ -706,7 +706,7 @@ TEST_F(EnergyPlusFixture, UnitaryBypassVAV_GetInputZoneEquipment)
     // if the loads do not change then there is no need to reset the timer, resetting here as an example.
     cbvav.changeOverTimer = -1.0; // reset timer so GetZoneLoads executes
     state.dataGlobal->DayOfSim = 1;
-    DataGlobals::HourOfDay = 1;
+    state.dataGlobal->HourOfDay = 1;
     // test zone indexing for loads
     HVACUnitaryBypassVAV::GetZoneLoads(state, CBVAVNum);
     // only 1 conditioned zone

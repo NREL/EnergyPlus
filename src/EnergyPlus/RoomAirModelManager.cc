@@ -108,7 +108,6 @@ namespace RoomAirModelManager {
     // na
 
     // Using/Aliasing
-    using namespace DataGlobals;
     using namespace DataRoomAirModel;
     using General::RoundSigDigits;
 
@@ -315,14 +314,12 @@ namespace RoomAirModelManager {
         // different patterns in nested derived types.
 
         // Using/Aliasing
-        using DataGlobals::NumOfZones;
         using namespace DataIPShortCuts;
         using DataErrorTracking::TotalRoomAirPatternTooHigh;
         using DataErrorTracking::TotalRoomAirPatternTooLow;
         using DataErrorTracking::TotalWarningErrors;
         using DataHeatBalance::Zone;
         using DataSurfaces::Surface;
-        using DataSurfaces::SurfaceClass_IntMass;
         using DataZoneEquipment::EquipConfiguration;
         using DataZoneEquipment::ZoneEquipConfig;
         using General::RoundSigDigits;
@@ -372,7 +369,7 @@ namespace RoomAirModelManager {
 
         // now allocate AirPatternZoneInfo to length of all zones for easy indexing
         if (!allocated(AirPatternZoneInfo)) {
-            AirPatternZoneInfo.allocate(NumOfZones);
+            AirPatternZoneInfo.allocate(state.dataGlobal->NumOfZones);
         }
 
         for (ObjNum = 1; ObjNum <= numTempDistContrldZones; ++ObjNum) {
@@ -431,7 +428,7 @@ namespace RoomAirModelManager {
             //   Fill in what we know for nested structure for surfaces
             for (thisSurfinZone = 1; thisSurfinZone <= AirPatternZoneInfo(ZoneNum).totNumSurfs; ++thisSurfinZone) {
                 thisHBsurfID = Zone(ZoneNum).SurfaceFirst + thisSurfinZone - 1;
-                if (Surface(thisHBsurfID).Class == SurfaceClass_IntMass) {
+                if (Surface(thisHBsurfID).Class == DataSurfaces::SurfaceClass::IntMass) {
                     AirPatternZoneInfo(ZoneNum).Surf(thisSurfinZone).SurfID = thisHBsurfID;
                     AirPatternZoneInfo(ZoneNum).Surf(thisSurfinZone).Zeta = 0.5;
                     continue;
@@ -446,7 +443,7 @@ namespace RoomAirModelManager {
         } // loop through number of 'RoomAir:TemperaturePattern:UserDefined' objects
 
         // Check against AirModel.  Make sure there is a match here.
-        for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+        for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             if (AirModel(ZoneNum).AirModelType != RoomAirModel_UserDefined) continue;
             if (AirPatternZoneInfo(ZoneNum).IsUsed) continue; // There is a Room Air Temperatures object for this zone
             ShowSevereError(state, RoutineName + "AirModel for Zone=[" + Zone(ZoneNum).Name + "] is indicated as \"User Defined\".");
@@ -632,7 +629,7 @@ namespace RoomAirModelManager {
 
         // Find and set return and exhaust node ids
 
-        for (i = 1; i <= NumOfZones; ++i) {
+        for (i = 1; i <= state.dataGlobal->NumOfZones; ++i) {
             if (AirPatternZoneInfo(i).IsUsed) {
                 // first get return and exhaust air node index
                 found = UtilityRoutines::FindItemInList(AirPatternZoneInfo(i).ZoneName, ZoneEquipConfig, &EquipConfiguration::ZoneName);
@@ -694,7 +691,7 @@ namespace RoomAirModelManager {
         if (!MundtModelUsed) return;
 
         // Initialize default values for air nodes
-        TotNumOfZoneAirNodes.allocate(NumOfZones);
+        TotNumOfZoneAirNodes.allocate(state.dataGlobal->NumOfZones);
         TotNumOfAirNodes = 0;
         TotNumOfZoneAirNodes = 0;
 
@@ -857,7 +854,7 @@ namespace RoomAirModelManager {
         }
 
         // get number of air nodes in each zone
-        for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+        for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
 
             // this zone uses other air model so skip the rest
             if (AirModel(ZoneNum).AirModelType != RoomAirModel_Mundt) continue;
@@ -906,14 +903,14 @@ namespace RoomAirModelManager {
         if (!MundtModelUsed) return;
 
         // Initialize default values for Mundt model controls
-        ConvectiveFloorSplit.allocate(NumOfZones);
-        InfiltratFloorSplit.allocate(NumOfZones);
+        ConvectiveFloorSplit.allocate(state.dataGlobal->NumOfZones);
+        InfiltratFloorSplit.allocate(state.dataGlobal->NumOfZones);
         ConvectiveFloorSplit = 0.0;
         InfiltratFloorSplit = 0.0;
 
         cCurrentModuleObject = "RoomAirSettings:OneNodeDisplacementVentilation";
         NumOfMundtContrl = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
-        if (NumOfMundtContrl > NumOfZones) {
+        if (NumOfMundtContrl > state.dataGlobal->NumOfZones) {
             ShowSevereError(state, "Too many " + cCurrentModuleObject + " objects in input file");
             ShowContinueError(state, "There cannot be more " + cCurrentModuleObject + " objects than number of zones.");
             ErrorsFound = true;
@@ -1235,7 +1232,7 @@ namespace RoomAirModelManager {
 
         ZoneUCSDUI.allocate(TotUCSDUI);
         ZoneUCSDUE.allocate(TotUCSDUE);
-        ZoneUFPtr.dimension(NumOfZones, 0);
+        ZoneUFPtr.dimension(state.dataGlobal->NumOfZones, 0);
 
         cCurrentModuleObject = "RoomAirSettings:UnderFloorAirDistributionInterior";
         for (Loop = 1; Loop <= TotUCSDUI; ++Loop) {
@@ -1401,7 +1398,6 @@ namespace RoomAirModelManager {
         using DataHVACGlobals::NumZoneHVACTerminalTypes;
         using DataHVACGlobals::ZoneHVACTerminalTypes;
         using DataSurfaces::Surface;
-        using DataSurfaces::SurfaceClass_IntMass;
         using General::RoundSigDigits;
         using InternalHeatGains::GetInternalGainDeviceIndex;
         using ScheduleManager::GetScheduleIndex;
@@ -1442,14 +1438,14 @@ namespace RoomAirModelManager {
         cCurrentModuleObject = "RoomAirSettings:AirflowNetwork";
         NumOfRoomAirflowNetControl = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (NumOfRoomAirflowNetControl == 0) return;
-        if (NumOfRoomAirflowNetControl > NumOfZones) {
+        if (NumOfRoomAirflowNetControl > state.dataGlobal->NumOfZones) {
             ShowSevereError(state, "Too many " + cCurrentModuleObject + " objects in input file");
             ShowContinueError(state, "There cannot be more " + cCurrentModuleObject + " objects than number of zones.");
             ErrorsFound = true;
         }
 
         if (!allocated(RoomAirflowNetworkZoneInfo)) {
-            RoomAirflowNetworkZoneInfo.allocate(NumOfZones);
+            RoomAirflowNetworkZoneInfo.allocate(state.dataGlobal->NumOfZones);
         }
 
         for (Loop = 1; Loop <= NumOfRoomAirflowNetControl; ++Loop) {
@@ -1465,7 +1461,7 @@ namespace RoomAirModelManager {
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            ZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), Zone, NumOfZones);
+            ZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), Zone, state.dataGlobal->NumOfZones);
             if (ZoneNum == 0) {
                 ShowSevereError(state, "GetRoomAirflowNetworkData: Invalid " + cAlphaFieldNames(2) + " = " + cAlphaArgs(2));
                 ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs(2));
@@ -1528,7 +1524,7 @@ namespace RoomAirModelManager {
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            ZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), Zone, NumOfZones);
+            ZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), Zone, state.dataGlobal->NumOfZones);
             if (ZoneNum == 0) {
                 ShowSevereError(state, "GetRoomAirflowNetworkData: Invalid " + cAlphaFieldNames(2) + " = " + cAlphaArgs(2));
                 ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs(1));
@@ -1572,7 +1568,7 @@ namespace RoomAirModelManager {
             foundList = false;
             inputProcessor->getObjectItem(
                 state, cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, status, _, _, cAlphaFieldNames, cNumericFieldNames);
-            for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+            for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 // find surface list
                 if (RoomAirflowNetworkZoneInfo(ZoneNum).NumOfAirNodes > 0) {
                     RAFNNodeNum = UtilityRoutines::FindItemInList(cAlphaArgs(1),
@@ -1639,7 +1635,7 @@ namespace RoomAirModelManager {
                 ErrorsFound = true;
                 break;
             }
-            for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+            for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 // find surface list
                 if (RoomAirflowNetworkZoneInfo(ZoneNum).NumOfAirNodes > 0) {
                     RAFNNodeNum = UtilityRoutines::FindItemInList(cAlphaArgs(1),
@@ -1710,7 +1706,7 @@ namespace RoomAirModelManager {
                 ErrorsFound = true;
                 break;
             }
-            for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+            for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 // find surface list
                 if (RoomAirflowNetworkZoneInfo(ZoneNum).NumOfAirNodes > 0) {
                     RAFNNodeNum = UtilityRoutines::FindItemInList(cAlphaArgs(1),
@@ -1785,7 +1781,7 @@ namespace RoomAirModelManager {
         } // loop thru TotNumOfRAFNNodeHVACLists
 
         // do some checks on input data
-        for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+        for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             if (RoomAirflowNetworkZoneInfo(ZoneNum).NumOfAirNodes > 0) {
                 // Check zone volume fraction
                 SumFraction = 0.0;
@@ -1831,7 +1827,7 @@ namespace RoomAirModelManager {
         }
 
         if (!ErrorsFound) {
-            for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+            for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 if (RoomAirflowNetworkZoneInfo(ZoneNum).IsUsed) {
                     if (RoomAirflowNetworkZoneInfo(ZoneNum).NumOfAirNodes > 0) {
                         for (Loop = 1; Loop <= RoomAirflowNetworkZoneInfo(ZoneNum).NumOfAirNodes; ++Loop) {
@@ -1884,7 +1880,6 @@ namespace RoomAirModelManager {
         using namespace DataEnvironment;
         using namespace DataHeatBalFanSys;
         using namespace DataSurfaces;
-        using DataGlobals::NumOfZones;
         using DataHeatBalance::Zone;
         using DataZoneEquipment::ZoneEquipConfig;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
@@ -1954,20 +1949,20 @@ namespace RoomAirModelManager {
         // Do the one time initializations
         if (MyOneTimeFlag) {
 
-            MyEnvrnFlag.allocate(NumOfZones);
+            MyEnvrnFlag.allocate(state.dataGlobal->NumOfZones);
 
             APos_Wall.allocate(TotSurfaces);
             APos_Floor.allocate(TotSurfaces);
             APos_Ceiling.allocate(TotSurfaces);
-            PosZ_Wall.allocate(NumOfZones * 2);
-            PosZ_Floor.allocate(NumOfZones * 2);
-            PosZ_Ceiling.allocate(NumOfZones * 2);
+            PosZ_Wall.allocate(state.dataGlobal->NumOfZones * 2);
+            PosZ_Floor.allocate(state.dataGlobal->NumOfZones * 2);
+            PosZ_Ceiling.allocate(state.dataGlobal->NumOfZones * 2);
             APos_Window.allocate(TotSurfaces);
             APos_Door.allocate(TotSurfaces);
             APos_Internal.allocate(TotSurfaces);
-            PosZ_Window.allocate(NumOfZones * 2);
-            PosZ_Door.allocate(NumOfZones * 2);
-            PosZ_Internal.allocate(NumOfZones * 2);
+            PosZ_Window.allocate(state.dataGlobal->NumOfZones * 2);
+            PosZ_Door.allocate(state.dataGlobal->NumOfZones * 2);
+            PosZ_Internal.allocate(state.dataGlobal->NumOfZones * 2);
             HCeiling.allocate(TotSurfaces);
             HWall.allocate(TotSurfaces);
             HFloor.allocate(TotSurfaces);
@@ -1975,9 +1970,9 @@ namespace RoomAirModelManager {
             HWindow.allocate(TotSurfaces);
             HDoor.allocate(TotSurfaces);
 
-            AuxSurf.allocate(NumOfZones);
+            AuxSurf.allocate(state.dataGlobal->NumOfZones);
 
-            ZoneCeilingHeight.allocate(NumOfZones * 2);
+            ZoneCeilingHeight.allocate(state.dataGlobal->NumOfZones * 2);
             ZoneCeilingHeight = 0.0;
 
             // Arrays initializations
@@ -2001,7 +1996,7 @@ namespace RoomAirModelManager {
             HDoor = 0.0;
 
             // Put the surface and zone information in Apos and PosZ arrays
-            for (ZNum = 1; ZNum <= NumOfZones; ++ZNum) {
+            for (ZNum = 1; ZNum <= state.dataGlobal->NumOfZones; ++ZNum) {
                 // advance ONE position in the arrays PosZ because this is a new zone
                 contWallBegin = contWall + 1;
                 contFloorBegin = contFloor + 1;
@@ -2013,7 +2008,7 @@ namespace RoomAirModelManager {
 
                 // cycle in this zone for all the surfaces
                 for (SurfNum = Zone(ZNum).SurfaceFirst; SurfNum <= Zone(ZNum).SurfaceLast; ++SurfNum) {
-                    if (Surface(SurfNum).Class != SurfaceClass_IntMass) {
+                    if (Surface(SurfNum).Class != DataSurfaces::SurfaceClass::IntMass) {
                         // Recalculate lowest and highest height for the zone
                         Z1Zone = std::numeric_limits<Real64>::max();
                         Z2Zone = std::numeric_limits<Real64>::lowest();
@@ -2042,19 +2037,19 @@ namespace RoomAirModelManager {
                     Z2Zone = Z2ZoneAux;
 
                     // Put the reference to this surface in the appropriate array
-                    if (Surface(SurfNum).Class == SurfaceClass_Floor) {
+                    if (Surface(SurfNum).Class == SurfaceClass::Floor) {
                         ++contFloor;
                         APos_Floor(contFloor) = SurfNum;
-                    } else if (Surface(SurfNum).Class == SurfaceClass_Wall) {
+                    } else if (Surface(SurfNum).Class == SurfaceClass::Wall) {
                         ++contWall;
                         APos_Wall(contWall) = SurfNum;
-                    } else if (Surface(SurfNum).Class == SurfaceClass_Window) {
+                    } else if (Surface(SurfNum).Class == SurfaceClass::Window) {
                         ++contWindow;
                         APos_Window(contWindow) = SurfNum;
-                    } else if (Surface(SurfNum).Class == SurfaceClass_IntMass) {
+                    } else if (Surface(SurfNum).Class == SurfaceClass::IntMass) {
                         ++contInternal;
                         APos_Internal(contInternal) = SurfNum;
-                    } else if (Surface(SurfNum).Class == SurfaceClass_Door) {
+                    } else if (Surface(SurfNum).Class == SurfaceClass::Door) {
                         ++contDoor;
                         APos_Door(contDoor) = SurfNum;
                     } else {
@@ -2112,17 +2107,17 @@ namespace RoomAirModelManager {
             }
             // calculate maximum number of airflow network surfaces in a single zone
             MaxSurf = AuxSurf(1);
-            for (Loop = 2; Loop <= NumOfZones; ++Loop) {
+            for (Loop = 2; Loop <= state.dataGlobal->NumOfZones; ++Loop) {
                 if (AuxSurf(Loop) > MaxSurf) MaxSurf = AuxSurf(Loop);
             }
 
             if (!allocated(AirflowNetworkSurfaceUCSDCV)) {
-                AirflowNetworkSurfaceUCSDCV.allocate({0, MaxSurf}, NumOfZones);
+                AirflowNetworkSurfaceUCSDCV.allocate({0, MaxSurf}, state.dataGlobal->NumOfZones);
             }
             if (!allocated(CVJetRecFlows)) {
-                CVJetRecFlows.allocate({0, MaxSurf}, NumOfZones);
+                CVJetRecFlows.allocate({0, MaxSurf}, state.dataGlobal->NumOfZones);
             }
-            AuxAirflowNetworkSurf.allocate({0, MaxSurf}, NumOfZones);
+            AuxAirflowNetworkSurf.allocate({0, MaxSurf}, state.dataGlobal->NumOfZones);
             // Width and Height for airflow network surfaces
             if (!allocated(SurfParametersCVDV)) {
                 SurfParametersCVDV.allocate(AirflowNetwork::NumOfLinksMultiZone);
@@ -2130,7 +2125,7 @@ namespace RoomAirModelManager {
 
             AirflowNetworkSurfaceUCSDCV = 0;
             // Organize surfaces in vector AirflowNetworkSurfaceUCSDCV(Zone, surface indexes)
-            for (Loop = 1; Loop <= NumOfZones; ++Loop) {
+            for (Loop = 1; Loop <= state.dataGlobal->NumOfZones; ++Loop) {
                 // the 0 component of the array has the number of relevant AirflowNetwork surfaces for the zone
                 AirflowNetworkSurfaceUCSDCV(0, Loop) = AuxSurf(Loop);
                 if (AuxSurf(Loop) != 0) {
@@ -2226,65 +2221,65 @@ namespace RoomAirModelManager {
             AuxSurf.deallocate();
 
             if (any(IsZoneDV) || any(IsZoneUI)) {
-                MaxTempGrad.allocate(NumOfZones);
-                AvgTempGrad.allocate(NumOfZones);
-                TCMF.allocate(NumOfZones);
-                FracMinFlow.allocate(NumOfZones);
-                ZoneAirSystemON.allocate(NumOfZones);
+                MaxTempGrad.allocate(state.dataGlobal->NumOfZones);
+                AvgTempGrad.allocate(state.dataGlobal->NumOfZones);
+                TCMF.allocate(state.dataGlobal->NumOfZones);
+                FracMinFlow.allocate(state.dataGlobal->NumOfZones);
+                ZoneAirSystemON.allocate(state.dataGlobal->NumOfZones);
                 // Allocate histories of displacement ventilation temperatures PH 3/5/04
-                MATFloor.allocate(NumOfZones);
-                XMATFloor.allocate(NumOfZones);
-                XM2TFloor.allocate(NumOfZones);
-                XM3TFloor.allocate(NumOfZones);
-                XM4TFloor.allocate(NumOfZones);
-                DSXMATFloor.allocate(NumOfZones);
-                DSXM2TFloor.allocate(NumOfZones);
-                DSXM3TFloor.allocate(NumOfZones);
-                DSXM4TFloor.allocate(NumOfZones);
-                MATOC.allocate(NumOfZones);
-                XMATOC.allocate(NumOfZones);
-                XM2TOC.allocate(NumOfZones);
-                XM3TOC.allocate(NumOfZones);
-                XM4TOC.allocate(NumOfZones);
-                DSXMATOC.allocate(NumOfZones);
-                DSXM2TOC.allocate(NumOfZones);
-                DSXM3TOC.allocate(NumOfZones);
-                DSXM4TOC.allocate(NumOfZones);
-                MATMX.allocate(NumOfZones);
-                XMATMX.allocate(NumOfZones);
-                XM2TMX.allocate(NumOfZones);
-                XM3TMX.allocate(NumOfZones);
-                XM4TMX.allocate(NumOfZones);
-                DSXMATMX.allocate(NumOfZones);
-                DSXM2TMX.allocate(NumOfZones);
-                DSXM3TMX.allocate(NumOfZones);
-                DSXM4TMX.allocate(NumOfZones);
-                ZTM1Floor.allocate(NumOfZones);
-                ZTM2Floor.allocate(NumOfZones);
-                ZTM3Floor.allocate(NumOfZones);
-                ZTM1OC.allocate(NumOfZones);
-                ZTM2OC.allocate(NumOfZones);
-                ZTM3OC.allocate(NumOfZones);
-                ZTM1MX.allocate(NumOfZones);
-                ZTM2MX.allocate(NumOfZones);
-                ZTM3MX.allocate(NumOfZones);
-                AIRRATFloor.allocate(NumOfZones);
-                AIRRATOC.allocate(NumOfZones);
-                AIRRATMX.allocate(NumOfZones);
-                ZTOC.allocate(NumOfZones);
-                ZTMX.allocate(NumOfZones);
-                ZTFloor.allocate(NumOfZones);
-                HeightTransition.allocate(NumOfZones);
-                Phi.allocate(NumOfZones);
-                Zone1Floor.allocate(NumOfZones);
-                ZoneMXFloor.allocate(NumOfZones);
-                ZoneM2Floor.allocate(NumOfZones);
-                Zone1OC.allocate(NumOfZones);
-                ZoneMXOC.allocate(NumOfZones);
-                ZoneM2OC.allocate(NumOfZones);
-                Zone1MX.allocate(NumOfZones);
-                ZoneMXMX.allocate(NumOfZones);
-                ZoneM2MX.allocate(NumOfZones);
+                MATFloor.allocate(state.dataGlobal->NumOfZones);
+                XMATFloor.allocate(state.dataGlobal->NumOfZones);
+                XM2TFloor.allocate(state.dataGlobal->NumOfZones);
+                XM3TFloor.allocate(state.dataGlobal->NumOfZones);
+                XM4TFloor.allocate(state.dataGlobal->NumOfZones);
+                DSXMATFloor.allocate(state.dataGlobal->NumOfZones);
+                DSXM2TFloor.allocate(state.dataGlobal->NumOfZones);
+                DSXM3TFloor.allocate(state.dataGlobal->NumOfZones);
+                DSXM4TFloor.allocate(state.dataGlobal->NumOfZones);
+                MATOC.allocate(state.dataGlobal->NumOfZones);
+                XMATOC.allocate(state.dataGlobal->NumOfZones);
+                XM2TOC.allocate(state.dataGlobal->NumOfZones);
+                XM3TOC.allocate(state.dataGlobal->NumOfZones);
+                XM4TOC.allocate(state.dataGlobal->NumOfZones);
+                DSXMATOC.allocate(state.dataGlobal->NumOfZones);
+                DSXM2TOC.allocate(state.dataGlobal->NumOfZones);
+                DSXM3TOC.allocate(state.dataGlobal->NumOfZones);
+                DSXM4TOC.allocate(state.dataGlobal->NumOfZones);
+                MATMX.allocate(state.dataGlobal->NumOfZones);
+                XMATMX.allocate(state.dataGlobal->NumOfZones);
+                XM2TMX.allocate(state.dataGlobal->NumOfZones);
+                XM3TMX.allocate(state.dataGlobal->NumOfZones);
+                XM4TMX.allocate(state.dataGlobal->NumOfZones);
+                DSXMATMX.allocate(state.dataGlobal->NumOfZones);
+                DSXM2TMX.allocate(state.dataGlobal->NumOfZones);
+                DSXM3TMX.allocate(state.dataGlobal->NumOfZones);
+                DSXM4TMX.allocate(state.dataGlobal->NumOfZones);
+                ZTM1Floor.allocate(state.dataGlobal->NumOfZones);
+                ZTM2Floor.allocate(state.dataGlobal->NumOfZones);
+                ZTM3Floor.allocate(state.dataGlobal->NumOfZones);
+                ZTM1OC.allocate(state.dataGlobal->NumOfZones);
+                ZTM2OC.allocate(state.dataGlobal->NumOfZones);
+                ZTM3OC.allocate(state.dataGlobal->NumOfZones);
+                ZTM1MX.allocate(state.dataGlobal->NumOfZones);
+                ZTM2MX.allocate(state.dataGlobal->NumOfZones);
+                ZTM3MX.allocate(state.dataGlobal->NumOfZones);
+                AIRRATFloor.allocate(state.dataGlobal->NumOfZones);
+                AIRRATOC.allocate(state.dataGlobal->NumOfZones);
+                AIRRATMX.allocate(state.dataGlobal->NumOfZones);
+                ZTOC.allocate(state.dataGlobal->NumOfZones);
+                ZTMX.allocate(state.dataGlobal->NumOfZones);
+                ZTFloor.allocate(state.dataGlobal->NumOfZones);
+                HeightTransition.allocate(state.dataGlobal->NumOfZones);
+                Phi.allocate(state.dataGlobal->NumOfZones);
+                Zone1Floor.allocate(state.dataGlobal->NumOfZones);
+                ZoneMXFloor.allocate(state.dataGlobal->NumOfZones);
+                ZoneM2Floor.allocate(state.dataGlobal->NumOfZones);
+                Zone1OC.allocate(state.dataGlobal->NumOfZones);
+                ZoneMXOC.allocate(state.dataGlobal->NumOfZones);
+                ZoneM2OC.allocate(state.dataGlobal->NumOfZones);
+                Zone1MX.allocate(state.dataGlobal->NumOfZones);
+                ZoneMXMX.allocate(state.dataGlobal->NumOfZones);
+                ZoneM2MX.allocate(state.dataGlobal->NumOfZones);
 
                 MaxTempGrad = 0.0;
                 AvgTempGrad = 0.0;
@@ -2357,13 +2352,13 @@ namespace RoomAirModelManager {
             if (any(IsZoneDV)) {
 
                 DVHcIn.allocate(TotSurfaces);
-                ZoneDVMixedFlagRep.allocate(NumOfZones);
-                ZoneDVMixedFlag.allocate(NumOfZones);
+                ZoneDVMixedFlagRep.allocate(state.dataGlobal->NumOfZones);
+                ZoneDVMixedFlag.allocate(state.dataGlobal->NumOfZones);
                 DVHcIn = 0.0;
                 ZoneDVMixedFlagRep = 0.0;
                 ZoneDVMixedFlag = 0;
                 // Output variables and DV zone flag
-                for (Loop = 1; Loop <= NumOfZones; ++Loop) {
+                for (Loop = 1; Loop <= state.dataGlobal->NumOfZones; ++Loop) {
                     if (AirModel(Loop).AirModelType != RoomAirModel_UCSDDV) continue; // don't set these up if they don't make sense
                     // CurrentModuleObject='RoomAirSettings:ThreeNodeDisplacementVentilation'
                     SetupOutputVariable(state,
@@ -2406,12 +2401,12 @@ namespace RoomAirModelManager {
             }
 
             if (any(IsZoneUI)) {
-                ZoneUFMixedFlag.allocate(NumOfZones);
-                ZoneUFMixedFlagRep.allocate(NumOfZones);
+                ZoneUFMixedFlag.allocate(state.dataGlobal->NumOfZones);
+                ZoneUFMixedFlagRep.allocate(state.dataGlobal->NumOfZones);
                 UFHcIn.allocate(TotSurfaces);
-                ZoneUFGamma.allocate(NumOfZones);
-                ZoneUFPowInPlumes.allocate(NumOfZones);
-                ZoneUFPowInPlumesfromWindows.allocate(NumOfZones);
+                ZoneUFGamma.allocate(state.dataGlobal->NumOfZones);
+                ZoneUFPowInPlumes.allocate(state.dataGlobal->NumOfZones);
+                ZoneUFPowInPlumesfromWindows.allocate(state.dataGlobal->NumOfZones);
                 ZoneUFMixedFlag = 0;
                 ZoneUFMixedFlagRep = 0.0;
                 UFHcIn = 0.0;
@@ -2419,7 +2414,7 @@ namespace RoomAirModelManager {
                 ZoneUFPowInPlumes = 0.0;
                 ZoneUFPowInPlumesfromWindows = 0.0;
                 // Output variables and UF zone flag
-                for (Loop = 1; Loop <= NumOfZones; ++Loop) {
+                for (Loop = 1; Loop <= state.dataGlobal->NumOfZones; ++Loop) {
                     if (AirModel(Loop).AirModelType != RoomAirModel_UCSDUFI) continue; // don't set these up if they don't make sense
                     // CurrentModuleObject='RoomAirSettings:UnderFloorAirDistributionInterior'
                     SetupOutputVariable(state,
@@ -2460,14 +2455,14 @@ namespace RoomAirModelManager {
                                         Zone(Loop).Name);
 
                     // set zone equip pointer in the UCSDUI data structure
-                    for (ZoneEquipConfigNum = 1; ZoneEquipConfigNum <= NumOfZones; ++ZoneEquipConfigNum) {
+                    for (ZoneEquipConfigNum = 1; ZoneEquipConfigNum <= state.dataGlobal->NumOfZones; ++ZoneEquipConfigNum) {
                         if (ZoneEquipConfig(ZoneEquipConfigNum).ActualZoneNum == Loop) {
                             ZoneUCSDUI(ZoneUFPtr(Loop)).ZoneEquipPtr = ZoneEquipConfigNum;
                             break;
                         }
                     } // ZoneEquipConfigNum
                 }
-                for (Loop = 1; Loop <= NumOfZones; ++Loop) {
+                for (Loop = 1; Loop <= state.dataGlobal->NumOfZones; ++Loop) {
                     if (AirModel(Loop).AirModelType != RoomAirModel_UCSDUFE) continue; // don't set these up if they don't make sense
                     // CurrentModuleObject='RoomAirSettings:UnderFloorAirDistributionExterior'
                     SetupOutputVariable(state,
@@ -2513,7 +2508,7 @@ namespace RoomAirModelManager {
                                         "State",
                                         Zone(Loop).Name);
                     // set zone equip pointer in the UCSDUE data structure
-                    for (ZoneEquipConfigNum = 1; ZoneEquipConfigNum <= NumOfZones; ++ZoneEquipConfigNum) {
+                    for (ZoneEquipConfigNum = 1; ZoneEquipConfigNum <= state.dataGlobal->NumOfZones; ++ZoneEquipConfigNum) {
                         if (ZoneEquipConfig(ZoneEquipConfigNum).ActualZoneNum == Loop) {
                             ZoneUCSDUE(ZoneUFPtr(Loop)).ZoneEquipPtr = ZoneEquipConfigNum;
                             break;
@@ -2524,25 +2519,25 @@ namespace RoomAirModelManager {
 
             if (any(IsZoneCV)) {
                 CVHcIn.allocate(TotSurfaces);
-                ZTJET.allocate(NumOfZones);
+                ZTJET.allocate(state.dataGlobal->NumOfZones);
                 // Most ZTJet takes defaults
-                ZTREC.allocate(NumOfZones);
-                RoomOutflowTemp.allocate(NumOfZones);
+                ZTREC.allocate(state.dataGlobal->NumOfZones);
+                RoomOutflowTemp.allocate(state.dataGlobal->NumOfZones);
                 // Most ZTREC takes defaults
-                JetRecAreaRatio.allocate(NumOfZones);
-                Urec.allocate(NumOfZones);
-                Ujet.allocate(NumOfZones);
-                Qrec.allocate(NumOfZones);
-                Qtot.allocate(NumOfZones);
-                RecInflowRatio.allocate(NumOfZones);
-                Uhc.allocate(NumOfZones);
-                Ain.allocate(NumOfZones);
-                Tin.allocate(NumOfZones);
-                Droom.allocate(NumOfZones);
-                Dstar.allocate(NumOfZones);
-                ZoneCVisMixing.allocate(NumOfZones);
-                Rfr.allocate(NumOfZones);
-                ZoneCVhasREC.allocate(NumOfZones);
+                JetRecAreaRatio.allocate(state.dataGlobal->NumOfZones);
+                Urec.allocate(state.dataGlobal->NumOfZones);
+                Ujet.allocate(state.dataGlobal->NumOfZones);
+                Qrec.allocate(state.dataGlobal->NumOfZones);
+                Qtot.allocate(state.dataGlobal->NumOfZones);
+                RecInflowRatio.allocate(state.dataGlobal->NumOfZones);
+                Uhc.allocate(state.dataGlobal->NumOfZones);
+                Ain.allocate(state.dataGlobal->NumOfZones);
+                Tin.allocate(state.dataGlobal->NumOfZones);
+                Droom.allocate(state.dataGlobal->NumOfZones);
+                Dstar.allocate(state.dataGlobal->NumOfZones);
+                ZoneCVisMixing.allocate(state.dataGlobal->NumOfZones);
+                Rfr.allocate(state.dataGlobal->NumOfZones);
+                ZoneCVhasREC.allocate(state.dataGlobal->NumOfZones);
 
                 ZTJET = 23.0;
                 RoomOutflowTemp = 23.0;
@@ -2566,7 +2561,7 @@ namespace RoomAirModelManager {
                 HWindow = 0.0;
                 HDoor = 0.0;
 
-                for (Loop = 1; Loop <= NumOfZones; ++Loop) {
+                for (Loop = 1; Loop <= state.dataGlobal->NumOfZones; ++Loop) {
                     if (AirModel(Loop).AirModelType != RoomAirModel_UCSDCV) continue; // don't set these up if they don't make sense
                     ZoneEquipConfigNum = ZoneNum;
                     // check whether this zone is a controlled zone or not
@@ -2773,7 +2768,7 @@ namespace RoomAirModelManager {
 
         Errorfound = false;
         RAFNNodeNum = 0;
-        for (I = 1; I <= NumOfZones; ++I) {
+        for (I = 1; I <= state.dataGlobal->NumOfZones; ++I) {
             if (RoomAirflowNetworkZoneInfo(I).NumOfAirNodes > 0) {
                 RAFNNodeNum =
                     UtilityRoutines::FindItemInList(RAFNNodeName, RoomAirflowNetworkZoneInfo(I).Node, RoomAirflowNetworkZoneInfo(I).NumOfAirNodes);

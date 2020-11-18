@@ -77,8 +77,6 @@ namespace BaseboardElectric {
     //       DATE WRITTEN   Nov 2001
     //       RE-ENGINEERED  na
 
-    using namespace DataGlobals;
-
     // Use statements for access to subroutines in other modules
     using namespace ScheduleManager;
 
@@ -165,7 +163,6 @@ namespace BaseboardElectric {
         // Using/Aliasing
         using GlobalNames::VerifyUniqueBaseboardName;
         using namespace DataIPShortCuts;
-        using DataGlobals::NumOfZones;
         using DataSizing::AutoSize;
         using DataSizing::CapacityPerFloorArea;
         using DataSizing::FractionOfAutosizedHeatingCapacity;
@@ -313,7 +310,7 @@ namespace BaseboardElectric {
                     ErrorsFound = true;
                 }
 
-                for (CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone) {
+                for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                     for (ZoneEquipTypeNum = 1; ZoneEquipTypeNum <= ZoneEquipList(CtrlZone).NumOfEquipTypes; ++ZoneEquipTypeNum) {
                         if (ZoneEquipList(CtrlZone).EquipType_Num(ZoneEquipTypeNum) == BBElectricConvective_Num &&
                             ZoneEquipList(CtrlZone).EquipName(ZoneEquipTypeNum) == thisBaseboard.EquipName) {
@@ -403,13 +400,13 @@ namespace BaseboardElectric {
         if (!baseboard->ZoneEquipmentListChecked && ZoneEquipInputsFilled) {
             baseboard->ZoneEquipmentListChecked = true;
             for (Loop = 1; Loop <= baseboard->NumBaseboards; ++Loop) {
-                if (CheckZoneEquipmentList(baseboard->Baseboard(Loop).EquipType, baseboard->Baseboard(Loop).EquipName)) continue;
+                if (CheckZoneEquipmentList(state, baseboard->Baseboard(Loop).EquipType, baseboard->Baseboard(Loop).EquipName)) continue;
                 ShowSevereError(state, "InitBaseboard: Unit=[" + baseboard->Baseboard(Loop).EquipType + ',' + baseboard->Baseboard(Loop).EquipName +
                                 "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated.");
             }
         }
 
-        if (!SysSizingCalc && baseboard->Baseboard(BaseboardNum).MySizeFlag) {
+        if (!state.dataGlobal->SysSizingCalc && baseboard->Baseboard(BaseboardNum).MySizeFlag) {
             // for each coil, do the sizing once.
             SizeElectricBaseboard(state, BaseboardNum);
             baseboard->Baseboard(BaseboardNum).MySizeFlag = false;

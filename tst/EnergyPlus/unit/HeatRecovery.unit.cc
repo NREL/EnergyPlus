@@ -73,7 +73,6 @@
 
 using namespace EnergyPlus;
 using namespace DataEnvironment;
-using namespace DataGlobals;
 using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataLoopNode;
@@ -486,7 +485,7 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnManinBranch_GetInputTest)
 
     GetReturnAirPathInput(state);
     GetAirPathData(state);
-    ASSERT_EQ(SimAirServingZones::HeatXchngr, PrimaryAirSystem(1).Branch(1).Comp(4).CompType_Num);
+    ASSERT_EQ(SimAirServingZones::HeatXchngr, state.dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(4).CompType_Num);
 }
 
 TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
@@ -3819,7 +3818,7 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
     ManageSimulation(state);                     // run the design day
 
     ASSERT_EQ("DOAS HEAT RECOVERY", ExchCond(1).Name);                       // Name of Heat Recovery Exchange On Main Air Loop
-    ASSERT_EQ(ExchCond(1).Name, PrimaryAirSystem(1).Branch(1).Comp(2).Name); // Heat Recovery Exchange On Main Air Loop
+    ASSERT_EQ(ExchCond(1).Name, state.dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).Name); // Heat Recovery Exchange On Main Air Loop
 
     ASSERT_NEAR(-17.300, ExchCond(1).SupInTemp, 0.001);       // Heat Recovery Exchanger Primary Air Inlet Temp
     ASSERT_GT(ExchCond(1).SupOutTemp, ExchCond(1).SupInTemp); // Heat Recovery Exchanger is On in heating mode

@@ -276,7 +276,7 @@ namespace General {
                       int const EndDate    // End date in sequence
     );
 
-    std::string CreateSysTimeIntervalString();
+    std::string CreateSysTimeIntervalString(EnergyPlusData &state);
 
     int nthDayOfWeekOfMonth(int const &dayOfWeek,  // day of week (Sunday=1, Monday=2, ...)
                             int const &nthTime,    // nth time the day of the week occurs (first monday, third tuesday, ..)
@@ -331,7 +331,7 @@ namespace General {
     );
 
     // TODO: this probably shouldn't be here
-    int DetermineMinuteForReporting(OutputProcessor::TimeStepType t_timeStepType); // kind of reporting, Zone Timestep or System
+    int DetermineMinuteForReporting(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType); // kind of reporting, Zone Timestep or System
 
     void EncodeMonDayHrMin(int &Item,       // word containing encoded month, day, hour, minute
                            int const Month, // month in integer format (1:12)
@@ -342,11 +342,11 @@ namespace General {
 
     int LogicalToInteger(bool const Flag);
 
-    Real64 GetCurrentHVACTime();
+    Real64 GetCurrentHVACTime(EnergyPlusData &state);
 
-    Real64 GetPreviousHVACTime();
+    Real64 GetPreviousHVACTime(EnergyPlusData &state);
 
-    std::string CreateHVACTimeIntervalString();
+    std::string CreateHVACTimeIntervalString(EnergyPlusData &state);
 
     std::string CreateTimeString(Real64 const Time); // Time in seconds
 

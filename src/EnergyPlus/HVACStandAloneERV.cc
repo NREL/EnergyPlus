@@ -110,10 +110,6 @@ namespace HVACStandAloneERV {
     // Using/Aliasing
     using namespace DataLoopNode;
     using DataEnvironment::StdRhoAir;
-    using DataGlobals::DisplayExtraWarnings;
-    using DataGlobals::NumOfZones;
-    using DataGlobals::SysSizingCalc;
-    using DataGlobals::WarmupFlag;
     using namespace DataHVACGlobals;
     using ScheduleManager::GetCurrentScheduleValue;
     using ScheduleManager::GetScheduleIndex;
@@ -236,7 +232,7 @@ namespace HVACStandAloneERV {
 
         CalcStandAloneERV(state, StandAloneERVNum, FirstHVACIteration, SensLoadMet, LatLoadMet);
 
-        ReportStandAloneERV(StandAloneERVNum);
+        ReportStandAloneERV(state, StandAloneERVNum);
     }
 
     void GetStandAloneERV(EnergyPlusData &state)
@@ -563,7 +559,7 @@ namespace HVACStandAloneERV {
             //   Check to make sure inlet and exhaust nodes are listed in a ZoneHVAC:EquipmentConnections object
             ZoneInletNodeFound = false;
             ZoneExhaustNodeFound = false;
-            for (ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum) {
+            for (ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
                 if (!ZoneInletNodeFound) {
                     for (NodeNumber = 1; NodeNumber <= ZoneEquipConfig(ControlledZoneNum).NumInletNodes; ++NodeNumber) {
                         if (ZoneEquipConfig(ControlledZoneNum).InletNode(NodeNumber) == StandAloneERV(StandAloneERVNum).SupplyAirOutletNode) {
@@ -965,7 +961,7 @@ namespace HVACStandAloneERV {
                 if (HStatZoneNum > 0) {
                     ZoneNodeFound = false;
                     HStatFound = false;
-                    for (ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum) {
+                    for (ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
                         if (ZoneEquipConfig(ControlledZoneNum).ActualZoneNum != HStatZoneNum) continue;
                         //         Find the controlled zone number for the specified humidistat location
                         thisOAController.NodeNumofHumidistatZone = ZoneEquipConfig(ControlledZoneNum).ZoneNode;
@@ -1266,13 +1262,13 @@ namespace HVACStandAloneERV {
         if (!ZoneEquipmentListChecked && ZoneEquipInputsFilled) {
             ZoneEquipmentListChecked = true;
             for (Loop = 1; Loop <= NumStandAloneERVs; ++Loop) {
-                if (CheckZoneEquipmentList(StandAloneERV(Loop).UnitType, StandAloneERV(Loop).Name)) continue;
+                if (CheckZoneEquipmentList(state, StandAloneERV(Loop).UnitType, StandAloneERV(Loop).Name)) continue;
                 ShowSevereError(state, "InitStandAloneERV: Unit=[" + StandAloneERV(Loop).UnitType + ',' + StandAloneERV(Loop).Name +
                                 "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated.");
             }
         }
 
-        if (!SysSizingCalc && MySizeFlag(StandAloneERVNum)) {
+        if (!state.dataGlobal->SysSizingCalc && MySizeFlag(StandAloneERVNum)) {
             SizeStandAloneERV(state, StandAloneERVNum);
             MySizeFlag(StandAloneERVNum) = false;
         }
@@ -1454,7 +1450,7 @@ namespace HVACStandAloneERV {
             if (UtilityRoutines::SameString(ZoneName, Zone(ActualZoneNum).Name)) {
                 FloorArea = Zone(ActualZoneNum).FloorArea;
             } else {
-                for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+                for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                     if (!UtilityRoutines::SameString(ZoneName, Zone(ZoneNum).Name)) continue;
                     FloorArea = Zone(ZoneNum).FloorArea;
                     break;
@@ -1556,7 +1552,7 @@ namespace HVACStandAloneERV {
         } else {
             if (StandAloneERV(StandAloneERVNum).DesignSAFanVolFlowRate > 0.0 && DesignSAFanVolFlowRateDes > 0.0) {
                 DesignSAFanVolFlowRateUser = StandAloneERV(StandAloneERVNum).DesignSAFanVolFlowRate;
-                if (DisplayExtraWarnings) {
+                if (state.dataGlobal->DisplayExtraWarnings) {
                     if ((std::abs(DesignSAFanVolFlowRateDes - DesignSAFanVolFlowRateUser) / DesignSAFanVolFlowRateUser) > AutoVsHardSizingThreshold) {
                         ShowMessage(state, "SizeStandAloneERV: Potential issue with equipment sizing for ZoneHVAC:EnergyRecoveryVentilator " +
                                     cFanTypes(StandAloneERV(StandAloneERVNum).SupplyAirFanType_Num) + ' ' +
@@ -1739,7 +1735,7 @@ namespace HVACStandAloneERV {
         }
 
         // Provide a one time message when exhaust flow rate is greater than supply flow rate
-        if (StandAloneERV(StandAloneERVNum).FlowError && !WarmupFlag) {
+        if (StandAloneERV(StandAloneERVNum).FlowError && !state.dataGlobal->WarmupFlag) {
 
             //! Adding up zone inlet/outlet nodes is not working correctly. When imbalance flow occurs, the difference
             //! is placed on the zone return node even when there is nothing connected to it.
@@ -1792,7 +1788,7 @@ namespace HVACStandAloneERV {
         }
     }
 
-    void ReportStandAloneERV(int const StandAloneERVNum) // number of the current Stand Alone ERV being simulated
+    void ReportStandAloneERV(EnergyPlusData &state, int const StandAloneERVNum) // number of the current Stand Alone ERV being simulated
     {
 
         // SUBROUTINE INFORMATION:
@@ -1838,7 +1834,7 @@ namespace HVACStandAloneERV {
         StandAloneERV(StandAloneERVNum).TotHeatingEnergy = StandAloneERV(StandAloneERVNum).TotHeatingRate * ReportingConstant;
 
         if (StandAloneERV(StandAloneERVNum).FirstPass) { // reset sizing flags so other zone equipment can size normally
-            if (!DataGlobals::SysSizingCalc) {
+            if (!state.dataGlobal->SysSizingCalc) {
                 DataSizing::resetHVACSizingGlobals(DataSizing::CurZoneEqNum, 0, StandAloneERV(StandAloneERVNum).FirstPass);
             }
         }

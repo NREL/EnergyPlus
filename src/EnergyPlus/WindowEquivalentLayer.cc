@@ -125,10 +125,6 @@ namespace WindowEquivalentLayer {
     using namespace DataSurfaces;
     using DataEnvironment::DayOfMonth;
     using DataEnvironment::Month;
-    using DataGlobals::CurrentTime;
-    using DataGlobals::HourOfDay;
-    using DataGlobals::TimeStep;
-    using DataGlobals::WarmupFlag;
     using General::TrimSigDigits;
 
     void InitEquivalentLayerWindowCalculations(EnergyPlusData &state)
@@ -668,7 +664,6 @@ namespace WindowEquivalentLayer {
         using DataBSDFWindow::noCondition;
         using DataEnvironment::IsRain;
         using DataEnvironment::SkyTempKelvin;
-        using DataGlobals::AnyLocalEnvironmentsInModel;
         using DataLoopNode::Node;
         using DataZoneEquipment::ZoneEquipConfig;
         using General::InterpSw;
@@ -831,7 +826,7 @@ namespace WindowEquivalentLayer {
             } else { // Exterior window (ExtBoundCond = 0)
                      // Calculate LWR from surrounding surfaces if defined for an exterior window
                 OutSrdIR = 0;
-                if (AnyLocalEnvironmentsInModel) {
+                if (state.dataGlobal->AnyLocalEnvironmentsInModel) {
                     if (Surface(SurfNum).HasSurroundingSurfProperties) {
                         SrdSurfsNum = Surface(SurfNum).SurroundingSurfacesNum;
                         if (SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor != -1) {
@@ -1112,9 +1107,9 @@ namespace WindowEquivalentLayer {
     }
 
     Real64 RB_F(EnergyPlusData &state,
-                Real64 const THETA,       // incidence angle, radians
-                int const EP_UNUSED(OPT), // options (unused)
-                const Array1D<Real64> &P   // parameters
+                Real64 const THETA,             // incidence angle, radians
+                [[maybe_unused]] int const OPT, // options (unused)
+                const Array1D<Real64> &P        // parameters
     )
     {
         //       AUTHOR         ASHRAE 1311-RP
@@ -1983,16 +1978,16 @@ namespace WindowEquivalentLayer {
         }
     }
 
-    void PD_BEAM_CASE_I(Real64 const S,                  // pleat spacing (> 0)
-                        Real64 const W,                  // pleat depth (>=0, same units as S)
-                        Real64 const EP_UNUSED(OMEGA_H), // horizontal profile angle, radians
-                        Real64 const DE,                 // width of illumination on pleat bottom (same units as S)
+    void PD_BEAM_CASE_I(Real64 const S,                        // pleat spacing (> 0)
+                        Real64 const W,                        // pleat depth (>=0, same units as S)
+                        [[maybe_unused]] Real64 const OMEGA_H, // horizontal profile angle, radians
+                        Real64 const DE,                       // width of illumination on pleat bottom (same units as S)
                         Real64 const RHOFF_BT_PARL,
                         Real64 const TAUFF_BB_PARL,
                         Real64 const TAUFF_BD_PARL,
-                        Real64 const EP_UNUSED(RHOBF_BT_PARL),
-                        Real64 const EP_UNUSED(TAUBF_BB_PARL),
-                        Real64 const EP_UNUSED(TAUBF_BD_PARL),
+                        [[maybe_unused]] Real64 const RHOBF_BT_PARL,
+                        [[maybe_unused]] Real64 const TAUBF_BB_PARL,
+                        [[maybe_unused]] Real64 const TAUBF_BD_PARL,
                         Real64 const RHOFF_BT_PERP,
                         Real64 const TAUFF_BB_PERP,
                         Real64 const TAUFF_BD_PERP,
@@ -2409,16 +2404,16 @@ namespace WindowEquivalentLayer {
         RHO_BD = (RHOFF_BT_PARL + TAUBF_DD * G1 + G8) / 2.0;
     }
 
-    void PD_BEAM_CASE_II(Real64 const S,                  // pleat spacing (> 0)
-                         Real64 const W,                  // pleat depth (>=0, same units as S)
-                         Real64 const EP_UNUSED(OMEGA_H), // horizontal profile angle, radians
-                         Real64 const DE,                 // width of illumination on pleat bottom (same units as S)
+    void PD_BEAM_CASE_II(Real64 const S,                        // pleat spacing (> 0)
+                         Real64 const W,                        // pleat depth (>=0, same units as S)
+                         [[maybe_unused]] Real64 const OMEGA_H, // horizontal profile angle, radians
+                         Real64 const DE,                       // width of illumination on pleat bottom (same units as S)
                          Real64 const RHOFF_BT_PARL,
                          Real64 const TAUFF_BB_PARL,
                          Real64 const TAUFF_BD_PARL,
-                         Real64 const EP_UNUSED(RHOBF_BT_PARL),
-                         Real64 const EP_UNUSED(TAUBF_BB_PARL),
-                         Real64 const EP_UNUSED(TAUBF_BD_PARL),
+                         [[maybe_unused]] Real64 const RHOBF_BT_PARL,
+                         [[maybe_unused]] Real64 const TAUBF_BB_PARL,
+                         [[maybe_unused]] Real64 const TAUBF_BD_PARL,
                          Real64 const RHOFF_BT_PERP,
                          Real64 const TAUFF_BB_PERP,
                          Real64 const TAUFF_BD_PERP,
@@ -2748,9 +2743,9 @@ namespace WindowEquivalentLayer {
                           Real64 const RHOFF_BT_PARL,
                           Real64 const TAUFF_BB_PARL,
                           Real64 const TAUFF_BD_PARL,
-                          Real64 const EP_UNUSED(RHOBF_BT_PARL),
-                          Real64 const EP_UNUSED(TAUBF_BB_PARL),
-                          Real64 const EP_UNUSED(TAUBF_BD_PARL),
+                          [[maybe_unused]] Real64 const RHOBF_BT_PARL,
+                          [[maybe_unused]] Real64 const TAUBF_BB_PARL,
+                          [[maybe_unused]] Real64 const TAUBF_BD_PARL,
                           Real64 const RHOFF_BT_PERP,
                           Real64 const TAUFF_BB_PERP,
                           Real64 const TAUFF_BD_PERP,
@@ -3074,16 +3069,16 @@ namespace WindowEquivalentLayer {
         RHO_BD = (RHOFF_BT_PARL + TAUBF_DD * G1 + G7) / 2.0;
     }
 
-    void PD_BEAM_CASE_IV(Real64 const S,                  // pleat spacing (> 0)
-                         Real64 const W,                  // pleat depth (>=0, same units as S)
-                         Real64 const EP_UNUSED(OMEGA_H), // horizontal profile angle, radians
-                         Real64 const EP_UNUSED(DE),      // width of illumination on pleat bottom (same units as S)
+    void PD_BEAM_CASE_IV(Real64 const S,                        // pleat spacing (> 0)
+                         Real64 const W,                        // pleat depth (>=0, same units as S)
+                         [[maybe_unused]] Real64 const OMEGA_H, // horizontal profile angle, radians
+                         [[maybe_unused]] Real64 const DE,      // width of illumination on pleat bottom (same units as S)
                          Real64 const RHOFF_BT_PARL,
                          Real64 const TAUFF_BB_PARL,
                          Real64 const TAUFF_BD_PARL,
-                         Real64 const EP_UNUSED(RHOBF_BT_PARL),
-                         Real64 const EP_UNUSED(TAUBF_BB_PARL),
-                         Real64 const EP_UNUSED(TAUBF_BD_PARL),
+                         [[maybe_unused]] Real64 const RHOBF_BT_PARL,
+                         [[maybe_unused]] Real64 const TAUBF_BB_PARL,
+                         [[maybe_unused]] Real64 const TAUBF_BD_PARL,
                          Real64 const RHOFF_BT_PERP,
                          Real64 const TAUFF_BB_PERP,
                          Real64 const TAUFF_BD_PERP,
@@ -3263,9 +3258,9 @@ namespace WindowEquivalentLayer {
                         Real64 const RHOFF_BT_PARL,
                         Real64 const TAUFF_BB_PARL,
                         Real64 const TAUFF_BD_PARL,
-                        Real64 const EP_UNUSED(RHOBF_BT_PARL),
-                        Real64 const EP_UNUSED(TAUBF_BB_PARL),
-                        Real64 const EP_UNUSED(TAUBF_BD_PARL),
+                        [[maybe_unused]] Real64 const RHOBF_BT_PARL,
+                        [[maybe_unused]] Real64 const TAUBF_BB_PARL,
+                        [[maybe_unused]] Real64 const TAUBF_BD_PARL,
                         Real64 const RHOFF_BT_PERP,
                         Real64 const TAUFF_BB_PERP,
                         Real64 const TAUFF_BD_PERP,
@@ -3485,22 +3480,22 @@ namespace WindowEquivalentLayer {
         RHO_BD = (RHOFF_BT_PARL + TAUBF_DD * G1 + G5) / 2.0;
     }
 
-    void PD_BEAM_CASE_VI(Real64 const S,                  // pleat spacing (> 0)
-                         Real64 const W,                  // pleat depth (>=0, same units as S)
-                         Real64 const EP_UNUSED(OMEGA_H), // horizontal profile angle, radians
-                         Real64 const EP_UNUSED(DE),      // width of illumination on pleat bottom (same units as S)
+    void PD_BEAM_CASE_VI(Real64 const S,                        // pleat spacing (> 0)
+                         Real64 const W,                        // pleat depth (>=0, same units as S)
+                         [[maybe_unused]] Real64 const OMEGA_H, // horizontal profile angle, radians
+                         [[maybe_unused]] Real64 const DE,      // width of illumination on pleat bottom (same units as S)
                          Real64 const RHOFF_BT_PARL,
                          Real64 const TAUFF_BB_PARL,
                          Real64 const TAUFF_BD_PARL,
-                         Real64 const EP_UNUSED(RHOBF_BT_PARL),
-                         Real64 const EP_UNUSED(TAUBF_BB_PARL),
-                         Real64 const EP_UNUSED(TAUBF_BD_PARL),
-                         Real64 const EP_UNUSED(RHOFF_BT_PERP),
-                         Real64 const EP_UNUSED(TAUFF_BB_PERP),
-                         Real64 const EP_UNUSED(TAUFF_BD_PERP),
-                         Real64 const EP_UNUSED(RHOBF_BT_PERP),
-                         Real64 const EP_UNUSED(TAUBF_BB_PERP),
-                         Real64 const EP_UNUSED(TAUBF_BD_PERP),
+                         [[maybe_unused]] Real64 const RHOBF_BT_PARL,
+                         [[maybe_unused]] Real64 const TAUBF_BB_PARL,
+                         [[maybe_unused]] Real64 const TAUBF_BD_PARL,
+                         [[maybe_unused]] Real64 const RHOFF_BT_PERP,
+                         [[maybe_unused]] Real64 const TAUFF_BB_PERP,
+                         [[maybe_unused]] Real64 const TAUFF_BD_PERP,
+                         [[maybe_unused]] Real64 const RHOBF_BT_PERP,
+                         [[maybe_unused]] Real64 const TAUBF_BB_PERP,
+                         [[maybe_unused]] Real64 const TAUBF_BD_PERP,
                          Real64 const RHOBF_DD, // fabric back diffuse-diffuse reflectance
                          Real64 const RHOFF_DD, // fabric front diffuse-diffuse reflectance
                          Real64 const TAUFF_DD, // fabric front diffuse-diffuse transmittance
@@ -4796,7 +4791,7 @@ namespace WindowEquivalentLayer {
                 ShowContinueError(state, "...Convergence tolerance is = " + TrimSigDigits(TOL, 6));
                 ShowContinueErrorTimeStamp(state, "");
             } else {
-                ShowRecurringWarningErrorAtEnd("CONSTRUCTION:WINDOWEQUIVALENTLAYER = \"" + FS.Name + "\"; " + RoutineName +
+                ShowRecurringWarningErrorAtEnd(state, "CONSTRUCTION:WINDOWEQUIVALENTLAYER = \"" + FS.Name + "\"; " + RoutineName +
                                                    "Net radiation analysis did not converge error continues.",
                                                FS.WEQLSolverErrorIndex);
             }
@@ -5272,7 +5267,7 @@ namespace WindowEquivalentLayer {
         //        ShowContinueError(state, "...Convergence tolerance is = " + TrimSigDigits(TOL, 6));
         //        ShowContinueErrorTimeStamp(state, "");
         //    } else {
-        //        ShowRecurringWarningErrorAtEnd("CONSTRUCTION:WINDOWEQUIVALENTLAYER = \"" + FS.Name + "\"; " + RoutineName +
+        //        ShowRecurringWarningErrorAtEnd(state, "CONSTRUCTION:WINDOWEQUIVALENTLAYER = \"" + FS.Name + "\"; " + RoutineName +
         //                                           "Net radiation analysis did not converge error continues.",
         //                                       FS.WEQLSolverErrorIndex);
         //    }
@@ -5904,10 +5899,10 @@ namespace WindowEquivalentLayer {
                Real64 const CK,
                Real64 const ACP, // gas specific heat coeffs, CP = ACP + BCP*TM + CCP*TM*TM
                Real64 const BCP,
-               Real64 const EP_UNUSED(CCP),
+               [[maybe_unused]] Real64 const CCP,
                Real64 const AVISC, // gas viscosity coeffs, VISC = AVISC + BVISC*TM + CVISC*TM*TM
                Real64 const BVISC,
-               Real64 const EP_UNUSED(CVISC),
+               [[maybe_unused]] Real64 const CVISC,
                Real64 const RHOGAS // gas density, kg/m3
     )
     {
@@ -6952,9 +6947,9 @@ namespace WindowEquivalentLayer {
     }
 
     Real64 Specular_F(EnergyPlusData &state,
-                      Real64 const THETA,     // incidence angle, radians
-                      int const OPT,          // options (unused)
-                      const Array1D<Real64> &EP_UNUSED(P) // parameters (none defined)
+                      Real64 const THETA,                       // incidence angle, radians
+                      int const OPT,                            // options (unused)
+                      [[maybe_unused]] const Array1D<Real64> &P // parameters (none defined)
     )
     {
         // FUNCTION INFORMATION:
@@ -8151,7 +8146,7 @@ namespace WindowEquivalentLayer {
         ConstrNum = Surface(SurfNum).Construction;
         EQLNum = state.dataConstruction->Construct(Surface(SurfNum).Construction).EQLConsPtr;
         if (BeamDIffFlag != isDIFF) {
-            if (CosIncAng(TimeStep, HourOfDay, SurfNum) <= 0.0) return;
+            if (CosIncAng(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum) <= 0.0) return;
 
             for (Lay = 1; Lay <= CFS(EQLNum).NL; ++Lay) {
                 if (IsVBLayer(CFS(EQLNum).L(Lay))) {
@@ -8163,7 +8158,7 @@ namespace WindowEquivalentLayer {
                 }
             }
             // Incident angle
-            IncAng = std::acos(CosIncAng(TimeStep, HourOfDay, SurfNum));
+            IncAng = std::acos(CosIncAng(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum));
             CalcEQLWindowOpticalProperty(state, CFS(EQLNum), BeamDIffFlag, Abs1, IncAng, ProfAngVer, ProfAngHor);
             CFSAbs(1, {1, CFSMAXNL + 1}) = Abs1(1, {1, CFSMAXNL + 1});
             CFSAbs(2, {1, CFSMAXNL + 1}) = Abs1(2, {1, CFSMAXNL + 1});
@@ -8178,7 +8173,7 @@ namespace WindowEquivalentLayer {
                         }
                     }
                 }
-                IncAng = std::acos(CosIncAng(TimeStep, HourOfDay, SurfNum));
+                IncAng = std::acos(CosIncAng(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum));
                 CalcEQLWindowOpticalProperty(state, CFS(EQLNum), BeamDIffFlag, Abs1, IncAng, ProfAngVer, ProfAngHor);
                 CFSAbs(_, {1, CFSMAXNL + 1}) = Abs1(_, {1, CFSMAXNL + 1});
                 state.dataWindowEquivalentLayer->CFSDiffAbsTrans(_, {1, CFSMAXNL + 1}, EQLNum) = Abs1(_, {1, CFSMAXNL + 1});

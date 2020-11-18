@@ -477,7 +477,7 @@ void CoilCoolingDX::simulate(EnergyPlus::EnergyPlusData &state, int useAlternate
 
     // after we have made a call to simulate, the component should be fully sized, so we can report standard ratings
     // call that here, and THEN set the one time init flag to false
-    if (!DataGlobals::SysSizingCalc && !DataGlobals::WarmupFlag && this->doStandardRatingFlag) {
+    if (!state.dataGlobal->SysSizingCalc && !state.dataGlobal->WarmupFlag && this->doStandardRatingFlag) {
         //TODO: Re-add this carefully
         // this->performance.calcStandardRatings(this->supplyFanIndex, this->supplyFanType, this->supplyFanName, this->condInletNodeIndex);
         this->doStandardRatingFlag = false;

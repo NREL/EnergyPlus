@@ -119,7 +119,6 @@ namespace PurchasedAirManager {
     // USE STATEMENTS:
     // Use statements for data only modules
     // Using/Aliasing
-    using namespace DataGlobals;
     using namespace DataHVACGlobals;
     using DataEnvironment::OutBaroPress;
     using DataEnvironment::OutEnthalpy;
@@ -543,7 +542,7 @@ namespace PurchasedAirManager {
                         } else {
                             cAlphaArgs(13) = cAlphaArgs(1).substr(0, 75) + " OUTDOOR AIR INLET NODE";
                         }
-                        if (DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " blank field");
                             ShowContinueError(state, cAlphaFieldNames(13) + " is blank, but there is outdoor air requested for this system.");
                             ShowContinueError(state, "Creating node name =" + cAlphaArgs(13));
@@ -560,7 +559,7 @@ namespace PurchasedAirManager {
                                                                                 ObjectIsNotParent);
                     // Check if OA node is initialized in OutdoorAir:Node or OutdoorAir:Nodelist
                     CheckAndAddAirNodeNumber(state, PurchAir(PurchAirNum).OutdoorAirNodeNum, IsOANodeListed);
-                    if ((!IsOANodeListed) && DisplayExtraWarnings) {
+                    if ((!IsOANodeListed) && state.dataGlobal->DisplayExtraWarnings) {
                         ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " missing data");
                         ShowContinueError(state, cAlphaArgs(13) + " does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node.");
                         ShowContinueError(state, "Adding OutdoorAir:Node=" + cAlphaArgs(13));
@@ -626,7 +625,7 @@ namespace PurchasedAirManager {
                 PurchAir(PurchAirNum).HtRecSenEff = rNumericArgs(10);
                 PurchAir(PurchAirNum).HtRecLatEff = rNumericArgs(11);
 
-                for (CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone) {
+                for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                     if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
                     for (NodeNum = 1; NodeNum <= ZoneEquipConfig(CtrlZone).NumInletNodes; ++NodeNum) {
                         if (PurchAir(PurchAirNum).ZoneSupplyAirNodeNum == ZoneEquipConfig(CtrlZone).InletNode(NodeNum)) {
@@ -1056,7 +1055,7 @@ namespace PurchasedAirManager {
                                 "Average",
                                 PurchAir(PurchAirNum).Name);
 
-            if (AnyEnergyManagementSystemInModel) {
+            if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                 SetupEMSActuator("Ideal Loads Air System",
                                  PurchAir(PurchAirNum).Name,
                                  "Air Mass Flow Rate",
@@ -1091,7 +1090,7 @@ namespace PurchasedAirManager {
 
     void InitPurchasedAir(EnergyPlusData &state,
                           int const PurchAirNum,
-                          bool const EP_UNUSED(FirstHVACIteration), // unused1208
+                          [[maybe_unused]] bool const FirstHVACIteration, // unused1208
                           int const ControlledZoneNum,
                           int const ActualZoneNum)
     {
@@ -1175,7 +1174,7 @@ namespace PurchasedAirManager {
                     }
                 }
 
-                if (CheckZoneEquipmentList(PurchAir(Loop).cObjectName, PurchAir(Loop).Name)) continue;
+                if (CheckZoneEquipmentList(state, PurchAir(Loop).cObjectName, PurchAir(Loop).Name)) continue;
                 ShowSevereError(state, "InitPurchasedAir: " + PurchAir(Loop).cObjectName + " = " + PurchAir(Loop).Name +
                                 " is not on any ZoneHVAC:EquipmentList.  It will not be simulated.");
             }
@@ -1246,7 +1245,7 @@ namespace PurchasedAirManager {
             }
         }
 
-        if (!SysSizingCalc && InitPurchasedAirMySizeFlag(PurchAirNum)) {
+        if (!state.dataGlobal->SysSizingCalc && InitPurchasedAirMySizeFlag(PurchAirNum)) {
 
             SizePurchasedAir(state, PurchAirNum);
 
@@ -1306,7 +1305,7 @@ namespace PurchasedAirManager {
                     // could check for optemp control or comfort control here
                     ShowContinueErrorTimeStamp(state, "");
                 }
-                ShowRecurringSevereErrorAtEnd("InitPurchasedAir: For " + PurchAir(PurchAirNum).cObjectName + " = " + PurchAir(PurchAirNum).Name +
+                ShowRecurringSevereErrorAtEnd(state, "InitPurchasedAir: For " + PurchAir(PurchAirNum).cObjectName + " = " + PurchAir(PurchAirNum).Name +
                                                   " serving Zone " + Zone(ActualZoneNum).Name +
                                                   ", the minimum supply air temperature for cooling error continues",
                                               PurchAir(PurchAirNum).CoolErrIndex,
@@ -1348,7 +1347,7 @@ namespace PurchasedAirManager {
                     // could check for optemp control or comfort control here
                     ShowContinueErrorTimeStamp(state, "");
                 }
-                ShowRecurringSevereErrorAtEnd("InitPurchasedAir: For " + PurchAir(PurchAirNum).cObjectName + " = " + PurchAir(PurchAirNum).Name +
+                ShowRecurringSevereErrorAtEnd(state, "InitPurchasedAir: For " + PurchAir(PurchAirNum).cObjectName + " = " + PurchAir(PurchAirNum).Name +
                                                   " serving Zone " + Zone(ActualZoneNum).Name +
                                                   ", maximum supply air temperature for heating error continues",
                                               PurchAir(PurchAirNum).HeatErrIndex,
@@ -1582,7 +1581,7 @@ namespace PurchasedAirManager {
                                                          MaxHeatSensCapDes,
                                                          "User-Specified Maximum Sensible Heating Capacity [W]",
                                                          MaxHeatSensCapUser);
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(MaxHeatSensCapDes - MaxHeatSensCapUser) / MaxHeatSensCapUser) > AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizePurchasedAir: Potential issue with equipment sizing for " + PurchAir(PurchAirNum).cObjectName +
                                                 ' ' + PurchAir(PurchAirNum).Name);
@@ -1743,7 +1742,7 @@ namespace PurchasedAirManager {
                                                          MaxCoolTotCapDes,
                                                          "User-Specified Maximum Total Cooling Capacity [W]",
                                                          MaxCoolTotCapUser);
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(MaxCoolTotCapDes - MaxCoolTotCapUser) / MaxCoolTotCapUser) > AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizePurchasedAir: Potential issue with equipment sizing for " + PurchAir(PurchAirNum).cObjectName +
                                                 ' ' + PurchAir(PurchAirNum).Name);
@@ -1843,7 +1842,7 @@ namespace PurchasedAirManager {
                                                      MaxHeatSensCapDes,
                                                      "User-Specified Maximum Sensible Heating Capacity [W]",
                                                      MaxHeatSensCapUser);
-                        if (DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(MaxHeatSensCapDes - MaxHeatSensCapUser) / MaxHeatSensCapUser) > AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizePurchasedAir: Potential issue with equipment sizing for " + PurchAir(PurchAirNum).cObjectName + ' ' +
                                             PurchAir(PurchAirNum).Name);
@@ -1941,7 +1940,7 @@ namespace PurchasedAirManager {
                                                      MaxCoolTotCapDes,
                                                      "User-Specified Maximum Total Cooling Capacity [W]",
                                                      MaxCoolTotCapUser);
-                        if (DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(MaxCoolTotCapDes - MaxCoolTotCapUser) / MaxCoolTotCapUser) > AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizePurchasedAir: Potential issue with equipment sizing for " + PurchAir(PurchAirNum).cObjectName + ' ' +
                                             PurchAir(PurchAirNum).Name);
@@ -2167,7 +2166,7 @@ namespace PurchasedAirManager {
                                           TrimSigDigits(PurchAir(PurchAirNum).MaxCoolVolFlowRate, 5) + " [m3/s]");
                         ShowContinueErrorTimeStamp(state, "");
                     } else {
-                        ShowRecurringWarningErrorAtEnd(
+                        ShowRecurringWarningErrorAtEnd(state,
                             PurchAir(PurchAirNum).cObjectName + " \"" + PurchAir(PurchAirNum).Name +
                                 "\" Requested outdoor air flow rate [m3/s] reduced to Maximum Cooling Air Flow Rate warning continues...",
                             PurchAir(PurchAirNum).OAFlowMaxCoolOutputIndex,
@@ -2441,7 +2440,7 @@ namespace PurchasedAirManager {
                                           TrimSigDigits(PurchAir(PurchAirNum).MaxHeatVolFlowRate, 5) + " [m3/s]");
                         ShowContinueErrorTimeStamp(state, "");
                     } else {
-                        ShowRecurringWarningErrorAtEnd(
+                        ShowRecurringWarningErrorAtEnd(state,
                             PurchAir(PurchAirNum).cObjectName + " \"" + PurchAir(PurchAirNum).Name +
                                 "\" Requested outdoor air flow rate [m3/s] reduced to Maximum Heating Air Flow Rate warning continues...",
                             PurchAir(PurchAirNum).OAFlowMaxHeatOutputIndex,
@@ -2676,7 +2675,7 @@ namespace PurchasedAirManager {
                         ShowContinueError(state, " Simulation continuing . . . ");
                         ShowContinueErrorTimeStamp(state, "");
                     } else {
-                        ShowRecurringWarningErrorAtEnd(
+                        ShowRecurringWarningErrorAtEnd(state,
                             PurchAir(PurchAirNum).cObjectName + " \"" + PurchAir(PurchAirNum).Name +
                                 "\" Supply humidity ratio exceeds saturation limit warning continues, delta max/min [kgWater/kgDryAir]...",
                             PurchAir(PurchAirNum).SaturationOutputIndex,

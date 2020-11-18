@@ -95,11 +95,11 @@ namespace WindTurbine {
     static std::string const BlankString;
 
     void SimWindTurbine(EnergyPlusData &state,
-                        GeneratorType const EP_UNUSED(GeneratorType), // Type of Generator
-                        std::string const &GeneratorName,   // User specified name of Generator
-                        int &GeneratorIndex,                // Generator index
-                        bool const RunFlag,                 // ON or OFF
-                        Real64 const EP_UNUSED(WTLoad)      // Electrical load on WT (not used)
+                        [[maybe_unused]] GeneratorType const GeneratorType, // Type of Generator
+                        std::string const &GeneratorName,                   // User specified name of Generator
+                        int &GeneratorIndex,                                // Generator index
+                        bool const RunFlag,                                 // ON or OFF
+                        [[maybe_unused]] Real64 const WTLoad                // Electrical load on WT (not used)
     )
     {
 
@@ -151,10 +151,10 @@ namespace WindTurbine {
     }
 
     void GetWTGeneratorResults(EnergyPlusData &state,
-                               GeneratorType const EP_UNUSED(GeneratorType), // Type of Generator
-                               int const GeneratorIndex,           // Generator number
-                               Real64 &GeneratorPower,             // Electrical power
-                               Real64 &GeneratorEnergy,            // Electrical energy
+                               [[maybe_unused]] GeneratorType const GeneratorType, // Type of Generator
+                               int const GeneratorIndex,                           // Generator number
+                               Real64 &GeneratorPower,                             // Electrical power
+                               Real64 &GeneratorEnergy,                            // Electrical energy
                                Real64 &ThermalPower,
                                Real64 &ThermalEnergy)
     {
@@ -724,8 +724,8 @@ namespace WindTurbine {
     }
 
     void CalcWindTurbine(EnergyPlusData &state,
-                         int const WindTurbineNum,     // System is on
-                         bool const EP_UNUSED(RunFlag) // System is on
+                         int const WindTurbineNum,           // System is on
+                         [[maybe_unused]] bool const RunFlag // System is on
     )
     {
 

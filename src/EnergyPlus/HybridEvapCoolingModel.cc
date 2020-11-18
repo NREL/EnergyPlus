@@ -1411,7 +1411,7 @@ namespace HybridEvapCoolingModel {
                     }
                 }
             }
-            if (!WarmupFlag) {
+            if (!state.dataGlobal->WarmupFlag) {
                 // Keep an account of the number of times the supply air temperature and humidity constraints were not met for a given mode but only
                 // do this when its not warmup.
                 if (!SAT_OC_MetinMode) {
@@ -1626,12 +1626,12 @@ namespace HybridEvapCoolingModel {
             }
         }
 
-        Real64 TimeElapsed = DataGlobals::HourOfDay + DataGlobals::TimeStep * DataGlobals::TimeStepZone + SysTimeElapsed;
+        Real64 TimeElapsed = state.dataGlobal->HourOfDay + state.dataGlobal->TimeStep * state.dataGlobal->TimeStepZone + SysTimeElapsed;
 
         // Use the elapsed time to only give a summary of warnings related to the number of Timesteps environmental conditions, or supply air
         // temperature constraints were not met for a given day. ideally there would be a clear flag that indicates "this is the last timestep of the
         // day, so report", but that doesn't seem to exist.
-        if ((TimeElapsed > 24) && WarnOnceFlag && !WarmupFlag) {
+        if ((TimeElapsed > 24) && WarnOnceFlag && !state.dataGlobal->WarmupFlag) {
             if (count_EnvironmentConditionsNotMet > 0)
                 ShowWarningError(state, "In day " + RoundSigDigits((Real64)state.dataGlobal->DayOfSim, 1) + " of simulation, " + Name.c_str() + " was unable to operate for " +
                                  RoundSigDigits((Real64)count_EnvironmentConditionsNotMet, 1) +
@@ -1657,7 +1657,7 @@ namespace HybridEvapCoolingModel {
             count_EnvironmentConditionsNotMet = 0;
             WarnOnceFlag = false;
         }
-        if (DataGlobals::HourOfDay == 1 && !WarnOnceFlag && !WarmupFlag) {
+        if (state.dataGlobal->HourOfDay == 1 && !WarnOnceFlag && !state.dataGlobal->WarmupFlag) {
             WarnOnceFlag = true;
         }
         return ErrorCode;

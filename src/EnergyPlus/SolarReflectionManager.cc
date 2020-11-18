@@ -87,7 +87,6 @@ namespace SolarReflectionManager {
     // OTHER NOTES: na
 
     // Using/Aliasing
-    using namespace DataGlobals;
     using namespace DataHeatBalance;
     using namespace DataSurfaces;
     using namespace ScheduleManager;
@@ -458,14 +457,14 @@ namespace SolarReflectionManager {
                         PierceSurface(ObsSurfNum, RecPt, RayVec, HitPt, hit);
                         if (hit) {
                             // added TH 3/29/2010 to set ObsSurfNumToSkip
-                            if (Surface(ObsSurfNum).Class == SurfaceClass_Window) {
+                            if (Surface(ObsSurfNum).Class == SurfaceClass::Window) {
                                 ObsSurfNumToSkip = Surface(ObsSurfNum).BaseSurf;
                             }
 
                             // If obstruction is a window and its base surface is the nearest obstruction hit so far,
                             // set NearestHitSurfNum to this window. Note that in this case NearestHitDistance has already
                             // been calculated, so does not have to be recalculated.
-                            if (Surface(ObsSurfNum).Class == SurfaceClass_Window && Surface(ObsSurfNum).BaseSurf == NearestHitSurfNum) {
+                            if (Surface(ObsSurfNum).Class == SurfaceClass::Window && Surface(ObsSurfNum).BaseSurf == NearestHitSurfNum) {
                                 NearestHitSurfNum = ObsSurfNum;
                             } else {
                                 ++TotObstructionsHit;
@@ -557,16 +556,15 @@ namespace SolarReflectionManager {
 
         // METHODOLOGY EMPLOYED: call worker routine depending on solar calculation method
 
-        using DataGlobals::HourOfDay;
         using DataSystemVariables::DetailedSolarTimestepIntegration;
 
         static int IHr(0); // Hour number
 
         if (!DetailedSolarTimestepIntegration) {
             if (state.dataGlobal->BeginSimFlag) {
-                DisplayString("Calculating Beam-to-Diffuse Exterior Solar Reflection Factors");
+                DisplayString(state, "Calculating Beam-to-Diffuse Exterior Solar Reflection Factors");
             } else {
-                DisplayString("Updating Beam-to-Diffuse Exterior Solar Reflection Factors");
+                DisplayString(state, "Updating Beam-to-Diffuse Exterior Solar Reflection Factors");
             }
             ReflFacBmToDiffSolObs = 0.0;
             ReflFacBmToDiffSolGnd = 0.0;
@@ -574,9 +572,9 @@ namespace SolarReflectionManager {
                 FigureBeamSolDiffuseReflFactors(state, IHr);
             }    // End of IHr loop
         } else { // timestep integrated solar, use current hour of day
-            ReflFacBmToDiffSolObs(HourOfDay, {1, TotSurfaces}) = 0.0;
-            ReflFacBmToDiffSolGnd(HourOfDay, {1, TotSurfaces}) = 0.0;
-            FigureBeamSolDiffuseReflFactors(state, HourOfDay);
+            ReflFacBmToDiffSolObs(state.dataGlobal->HourOfDay, {1, TotSurfaces}) = 0.0;
+            ReflFacBmToDiffSolGnd(state.dataGlobal->HourOfDay, {1, TotSurfaces}) = 0.0;
+            FigureBeamSolDiffuseReflFactors(state, state.dataGlobal->HourOfDay);
         }
     }
 
@@ -656,7 +654,7 @@ namespace SolarReflectionManager {
                         // If hit point's surface is a window or glass door go to next ray since it is assumed for now
                         // that windows have only beam-to-beam, not beam-to-diffuse, reflection
                         // TH 3/29/2010. Code modified and moved
-                        if (Surface(HitPtSurfNum).Class == SurfaceClass_Window || Surface(HitPtSurfNum).Class == SurfaceClass_GlassDoor) continue;
+                        if (Surface(HitPtSurfNum).Class == SurfaceClass::Window || Surface(HitPtSurfNum).Class == SurfaceClass::GlassDoor) continue;
 
                         // Skip rays that hit non-sunlit surface. Assume first time step of the hour.
                         SunLitFract = SunlitFrac(1, iHour, HitPtSurfNum);
@@ -806,7 +804,6 @@ namespace SolarReflectionManager {
         // REFERENCES: na
 
         // Using/Aliasing
-        using DataGlobals::HourOfDay;
         using DataSystemVariables::DetailedSolarTimestepIntegration;
 
         // Locals
@@ -820,9 +817,9 @@ namespace SolarReflectionManager {
         // FLOW:
         if (!DetailedSolarTimestepIntegration) {
             if (state.dataGlobal->BeginSimFlag) {
-                DisplayString("Calculating Beam-to-Beam Exterior Solar Reflection Factors");
+                DisplayString(state, "Calculating Beam-to-Beam Exterior Solar Reflection Factors");
             } else {
-                DisplayString("Updating Beam-to-Beam Exterior Solar Reflection Factors");
+                DisplayString(state, "Updating Beam-to-Beam Exterior Solar Reflection Factors");
             }
             ReflFacBmToBmSolObs = 0.0;
             CosIncAveBmToBmSolObs = 0.0;
@@ -830,9 +827,9 @@ namespace SolarReflectionManager {
                 FigureBeamSolSpecularReflFactors(state, IHr);
             }    // End of IHr loop
         } else { // timestep integrated solar, use current hour of day
-            ReflFacBmToBmSolObs(HourOfDay, {1, TotSurfaces}) = 0.0;
-            CosIncAveBmToBmSolObs(HourOfDay, {1, TotSurfaces}) = 0.0;
-            FigureBeamSolSpecularReflFactors(state, HourOfDay);
+            ReflFacBmToBmSolObs(state.dataGlobal->HourOfDay, {1, TotSurfaces}) = 0.0;
+            CosIncAveBmToBmSolObs(state.dataGlobal->HourOfDay, {1, TotSurfaces}) = 0.0;
+            FigureBeamSolSpecularReflFactors(state, state.dataGlobal->HourOfDay);
         }
     }
 
@@ -920,10 +917,10 @@ namespace SolarReflectionManager {
                 for (int loop = 1, loop_end = state.dataSolarReflectionManager->SolReflRecSurf(RecSurfNum).NumPossibleObs; loop <= loop_end; ++loop) {
                     int const ReflSurfNum = state.dataSolarReflectionManager->SolReflRecSurf(RecSurfNum).PossibleObsSurfNums(loop); // Reflecting surface number
                     // Keep windows; keep shading surfaces with specular reflectance
-                    if ((Surface(ReflSurfNum).Class == SurfaceClass_Window && Surface(ReflSurfNum).ExtSolar) ||
+                    if ((Surface(ReflSurfNum).Class == SurfaceClass::Window && Surface(ReflSurfNum).ExtSolar) ||
                         (Surface(ReflSurfNum).ShadowSurfGlazingFrac > 0.0 && Surface(ReflSurfNum).ShadowingSurf)) {
                         // Skip if window and not sunlit
-                        if (Surface(ReflSurfNum).Class == SurfaceClass_Window && SunlitFrac(1, iHour, ReflSurfNum) < 0.01) continue;
+                        if (Surface(ReflSurfNum).Class == SurfaceClass::Window && SunlitFrac(1, iHour, ReflSurfNum) < 0.01) continue;
                         // Check if sun is in front of this reflecting surface.
                         ReflNorm = Surface(ReflSurfNum).OutNormVec;
                         CosIncAngRefl = dot(SunVec, ReflNorm);
@@ -958,7 +955,7 @@ namespace SolarReflectionManager {
                                 // There is no obstruction for this ray between rec. pt. and hit point on reflecting surface.
                                 // See if ray from hit pt. on reflecting surface to original (unmirrored) sun position is obstructed
                                 hitObs = false;
-                                if (Surface(ReflSurfNum).Class == SurfaceClass_Window) { // Reflecting surface is a window
+                                if (Surface(ReflSurfNum).Class == SurfaceClass::Window) { // Reflecting surface is a window
                                     // Receiving surface number for this window
                                     int const ReflSurfRecNum =
                                         Surface(ReflSurfNum)
@@ -992,7 +989,7 @@ namespace SolarReflectionManager {
 
                                 // No obstructions. Calculate reflected beam irradiance at receiving pt. from this reflecting surface.
                                 SpecReflectance = 0.0;
-                                if (Surface(ReflSurfNum).Class == SurfaceClass_Window) {
+                                if (Surface(ReflSurfNum).Class == SurfaceClass::Window) {
                                     ConstrNumRefl = Surface(ReflSurfNum).Construction;
                                     SpecReflectance = POLYF(std::abs(CosIncAngRefl), state.dataConstruction->Construct(ConstrNumRefl).ReflSolBeamFrontCoef);
                                 }
@@ -1099,7 +1096,7 @@ namespace SolarReflectionManager {
             cos_Theta.push_back(std::cos(Theta));
         }
 
-        DisplayString("Calculating Sky Diffuse Exterior Solar Reflection Factors");
+        DisplayString(state, "Calculating Sky Diffuse Exterior Solar Reflection Factors");
         ReflSkySolObs = 0.0;
         ReflSkySolGnd = 0.0;
 

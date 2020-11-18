@@ -393,7 +393,7 @@ namespace DaylightingManager {
 
     void DayltgInteriorIllum(EnergyPlusData &state, int &ZoneNum); // Zone number
 
-    void DayltgInteriorTDDIllum();
+    void DayltgInteriorTDDIllum(EnergyPlusData &state);
 
     void DayltgElecLightingControl(EnergyPlusData &state, int &ZoneNum); // Zone number
 
@@ -407,7 +407,8 @@ namespace DaylightingManager {
                                    int const IWin     // Window index
     );
 
-    void ComplexFenestrationLuminances(int const IWin,
+    void ComplexFenestrationLuminances(EnergyPlusData &state,
+                                       int const IWin,
                                        int const WinEl,
                                        int const NBasis,
                                        int const IHR,
@@ -487,7 +488,7 @@ namespace DaylightingManager {
 
     void DayltgInterReflIllFrIntWins(EnergyPlusData &state, int &ZoneNum); // Zone number
 
-    void CalcMinIntWinSolidAngs();
+    void CalcMinIntWinSolidAngs(EnergyPlusData &state);
 
     void CheckForGeometricTransform(EnergyPlusData &state, bool &doTransform, Real64 &OldAspectRatio, Real64 &NewAspectRatio);
 

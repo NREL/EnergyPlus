@@ -1834,7 +1834,7 @@ namespace CurveManager {
                     }
 
                 }
-                // Add grid to state.dataCurveManager->btwxtManager
+                // Add grid to btwxtManager
                 state.dataCurveManager->btwxtManager.addGrid(UtilityRoutines::MakeUPPERCase(thisObjectName), Btwxt::GriddedData(gridAxes));
             }
         }
@@ -2239,7 +2239,7 @@ namespace CurveManager {
                                 DataBranchAirLoopPlant::PressureCurve(CurveIndex).Name);
         }
 
-        if (DataGlobals::AnyEnergyManagementSystemInModel) { // provide hook for possible EMS control
+        if (state.dataGlobal->AnyEnergyManagementSystemInModel) { // provide hook for possible EMS control
             for (CurveIndex = 1; CurveIndex <= state.dataCurveManager->NumCurves; ++CurveIndex) {
                 SetupEMSActuator("Curve",
                                  state.dataCurveManager->PerfCurve(CurveIndex).Name,
@@ -2249,7 +2249,7 @@ namespace CurveManager {
                                  state.dataCurveManager->PerfCurve(CurveIndex).EMSOverrideCurveValue);
             } // All performance curves
         }
-        if (DataGlobals::AnyEnergyManagementSystemInModel) { // provide hook for possible EMS control
+        if (state.dataGlobal->AnyEnergyManagementSystemInModel) { // provide hook for possible EMS control
             for (CurveIndex = 1; CurveIndex <= DataBranchAirLoopPlant::NumPressureCurves; ++CurveIndex) {
                 SetupEMSActuator("Curve",
                                  DataBranchAirLoopPlant::PressureCurve(CurveIndex).Name,
@@ -2709,7 +2709,7 @@ namespace CurveManager {
         using namespace DataIPShortCuts;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const CurveObjectName("Curve:Functional:PressureDrop");
+        constexpr std::string_view CurveObjectName = "Curve:Functional:PressureDrop";
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumPressure;
@@ -2721,11 +2721,11 @@ namespace CurveManager {
         bool ErrsFound(false); // Set to true if errors in input, fatal at end of routine
         int CurveNum;
 
-        NumPressure = inputProcessor->getNumObjectsFound(state, CurveObjectName);
+        NumPressure = inputProcessor->getNumObjectsFound(state, CurveObjectName.data());
         DataBranchAirLoopPlant::PressureCurve.allocate(NumPressure);
         for (CurveNum = 1; CurveNum <= NumPressure; ++CurveNum) {
             inputProcessor->getObjectItem(state,
-                                          CurveObjectName,
+                                          CurveObjectName.data(),
                                           CurveNum,
                                           Alphas,
                                           NumAlphas,
@@ -2736,7 +2736,7 @@ namespace CurveManager {
                                           _,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurveObjectName, cAlphaFieldNames(1), ErrsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurveObjectName.data(), cAlphaFieldNames(1), ErrsFound);
             DataBranchAirLoopPlant::PressureCurve(CurveNum).Name = Alphas(1);
             DataBranchAirLoopPlant::PressureCurve(CurveNum).EquivDiameter = Numbers(1);
             DataBranchAirLoopPlant::PressureCurve(CurveNum).MinorLossCoeff = Numbers(2);

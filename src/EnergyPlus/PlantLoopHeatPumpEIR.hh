@@ -145,13 +145,13 @@ namespace EIRPlantLoopHeatPumps {
 
         void simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation)) override;
+        void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation) override;
 
         void getDesignCapacities(EnergyPlusData &state,
-                                 const PlantLocation &EP_UNUSED(calledFromLocation),
-                                 Real64 &EP_UNUSED(MaxLoad),
-                                 Real64 &EP_UNUSED(MinLoad),
-                                 Real64 &EP_UNUSED(OptLoad)) override;
+                                 [[maybe_unused]] const PlantLocation &calledFromLocation,
+                                 [[maybe_unused]] Real64 &MaxLoad,
+                                 [[maybe_unused]] Real64 &MinLoad,
+                                 [[maybe_unused]] Real64 &OptLoad) override;
 
         void doPhysics(EnergyPlusData &state, Real64 currentLoad);
 
@@ -177,7 +177,7 @@ namespace EIRPlantLoopHeatPumps {
 
         static void clear_state();
 
-        static void checkConcurrentOperation();
+        static void checkConcurrentOperation(EnergyPlusData &state);
 
         static Real64 add(Real64 const a, Real64 const b)
         {

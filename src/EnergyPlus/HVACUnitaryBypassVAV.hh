@@ -378,7 +378,7 @@ namespace HVACUnitaryBypassVAV {
                            Real64 &OnOffAirFlowRatio    // Ratio of compressor ON airflow to average airflow over timestep
     );
 
-    void ReportCBVAV(int const CBVAVNum); // Index of the current CBVAV unit being simulated
+    void ReportCBVAV(EnergyPlusData &state, int const CBVAVNum); // Index of the current CBVAV unit being simulated
 
     void CalcNonDXHeatingCoils(EnergyPlusData &state,
                                int const CBVAVNum,            // Changeover bypass VAV unit index

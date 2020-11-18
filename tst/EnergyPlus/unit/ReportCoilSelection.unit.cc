@@ -161,14 +161,14 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_ChWCoil)
     int curSysNum = 1;
     int curZoneEqNum = 0;
     isAutoSized = true; // true if autosized
-    DataAirSystems::PrimaryAirSystem.allocate(1);
+    state.dataAirSystemsData->PrimaryAirSystems.allocate(1);
     state.dataAirLoop->AirToZoneNodeInfo.allocate(1);
     state.dataAirLoop->AirToZoneNodeInfo(1).NumZonesHeated = 2;
     state.dataAirLoop->AirToZoneNodeInfo(1).HeatCtrlZoneNums.allocate(state.dataAirLoop->AirToZoneNodeInfo(1).NumZonesHeated);
     state.dataAirLoop->AirToZoneNodeInfo(1).HeatCtrlZoneNums(1) = 2;
     state.dataAirLoop->AirToZoneNodeInfo(1).HeatCtrlZoneNums(2) = 3;
-    DataGlobals::NumOfZones = 3;
-    DataHeatBalance::Zone.allocate(DataGlobals::NumOfZones);
+    state.dataGlobal->NumOfZones = 3;
+    DataHeatBalance::Zone.allocate(state.dataGlobal->NumOfZones);
     DataHeatBalance::Zone(1).Name = "Zone 1";
     DataHeatBalance::Zone(2).Name = "Zone 2";
     DataHeatBalance::Zone(3).Name = "Zone 3";
@@ -300,8 +300,8 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_ZoneEqCoil)
     std::string coil1Name("Coil 1");            // user-defined name of the coil
     std::string coil1Type("Coil:Heating:Fuel"); // idf input object class name of coil
 
-    DataGlobals::NumOfZones = 3;
-    DataHeatBalance::Zone.allocate(DataGlobals::NumOfZones);
+    state.dataGlobal->NumOfZones = 3;
+    DataHeatBalance::Zone.allocate(state.dataGlobal->NumOfZones);
     DataHeatBalance::Zone(1).Name = "Zone 1";
     DataHeatBalance::Zone(2).Name = "Zone 2";
     DataHeatBalance::Zone(3).Name = "Zone 3";

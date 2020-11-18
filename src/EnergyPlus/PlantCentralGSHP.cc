@@ -165,7 +165,8 @@ namespace PlantCentralGSHP {
         this->SizeWrapper(state);
     }
 
-    void WrapperSpecs::getDesignCapacities(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
+    void WrapperSpecs::getDesignCapacities(
+        [[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
     {
         MinLoad = 0.0;
         MaxLoad = 0.0;
@@ -195,7 +196,7 @@ namespace PlantCentralGSHP {
     }
 
     void WrapperSpecs::simulate(
-        EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool EP_UNUSED(RunFlag))
+        EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, [[maybe_unused]] bool RunFlag)
     {
         if (calledFromLocation.loopNum != this->GLHELoopNum) {
 
@@ -309,7 +310,7 @@ namespace PlantCentralGSHP {
                                                              "User-Specified Reference Chilled Water Flow Rate [m3/s]",
                                                              EvapVolFlowRateUser);
                                 tmpEvapVolFlowRate = EvapVolFlowRateUser;
-                                if (DataGlobals::DisplayExtraWarnings) {
+                                if (state.dataGlobal->DisplayExtraWarnings) {
                                     if ((std::abs(tmpEvapVolFlowRate - EvapVolFlowRateUser) / EvapVolFlowRateUser) >
                                         DataSizing::AutoVsHardSizingThreshold) {
                                         ShowMessage(state, "SizeChillerHeaterPerformanceElectricEIR: Potential issue with equipment sizing for " +
@@ -403,7 +404,7 @@ namespace PlantCentralGSHP {
                                                              "User-Specified Reference Capacity [W]",
                                                              NomCapUser);
                                 tmpNomCap = NomCapUser;
-                                if (DataGlobals::DisplayExtraWarnings) {
+                                if (state.dataGlobal->DisplayExtraWarnings) {
                                     if ((std::abs(tmpNomCap - NomCapUser) / NomCapUser) > DataSizing::AutoVsHardSizingThreshold) {
                                         ShowMessage(state, "SizeChillerHeaterPerformanceElectricEIR: Potential issue with equipment sizing for " +
                                                     this->ChillerHeater(NumChillerHeater).Name);
@@ -489,7 +490,7 @@ namespace PlantCentralGSHP {
                                                              tmpCondVolFlowRate,
                                                              "User-Specified Reference Condenser Water Flow Rate [m3/s]",
                                                              CondVolFlowRateUser);
-                                if (DataGlobals::DisplayExtraWarnings) {
+                                if (state.dataGlobal->DisplayExtraWarnings) {
                                     if ((std::abs(tmpCondVolFlowRate - CondVolFlowRateUser) / CondVolFlowRateUser) >
                                         DataSizing::AutoVsHardSizingThreshold) {
                                         ShowMessage(state, "SizeChillerHeaterPerformanceElectricEIR: Potential issue with equipment sizing for " +
@@ -1491,7 +1492,7 @@ namespace PlantCentralGSHP {
 
                 // check if setpoint on outlet node - chilled water loop
                 if (DataLoopNode::Node(this->CHWOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) {
-                    if (!DataGlobals::AnyEnergyManagementSystemInModel) {
+                    if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                         if (!this->CoolSetPointErrDone) {
                             ShowWarningError(state, "Missing temperature setpoint on cooling side for CentralHeatPumpSystem named " + this->Name);
                             ShowContinueError(state,
@@ -1521,7 +1522,7 @@ namespace PlantCentralGSHP {
                 }
 
                 if (DataLoopNode::Node(this->HWOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) {
-                    if (!DataGlobals::AnyEnergyManagementSystemInModel) {
+                    if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                         if (!this->HeatSetPointErrDone) {
                             ShowWarningError(state, "Missing temperature setpoint on heating side for CentralHeatPumpSystem named " + this->Name);
                             ShowContinueError(state,
@@ -1909,7 +1910,7 @@ namespace PlantCentralGSHP {
                     CurveManager::CurveValue(state, this->ChillerHeater(ChillerHeaterNum).ChillerCapFTIDX, EvapOutletTempSetPoint, CondTempforCurve);
 
                 if (ChillerCapFT < 0) {
-                    if (this->ChillerHeater(ChillerHeaterNum).ChillerCapFTError < 1 && !DataGlobals::WarmupFlag) {
+                    if (this->ChillerHeater(ChillerHeaterNum).ChillerCapFTError < 1 && !state.dataGlobal->WarmupFlag) {
                         ++this->ChillerHeater(ChillerHeaterNum).ChillerCapFTError;
                         ShowWarningError(state, "ChillerHeaterPerformance:Electric:EIR \"" + this->ChillerHeater(ChillerHeaterNum).Name + "\":");
                         ShowContinueError(state, " ChillerHeater Capacity as a Function of Temperature curve output is negative (" +
@@ -1918,9 +1919,9 @@ namespace PlantCentralGSHP {
                                           General::RoundSigDigits(EvapOutletTempSetPoint, 1) + " and a Condenser Inlet Temp of " +
                                           General::RoundSigDigits(CondInletTemp, 1) + '.');
                         ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
-                    } else if (!DataGlobals::WarmupFlag) {
+                    } else if (!state.dataGlobal->WarmupFlag) {
                         ++this->ChillerHeater(ChillerHeaterNum).ChillerCapFTError;
-                        ShowRecurringWarningErrorAtEnd(
+                        ShowRecurringWarningErrorAtEnd(state,
                             "ChillerHeaterPerformance:Electric:EIR \"" + this->ChillerHeater(ChillerHeaterNum).Name +
                                 "\": ChillerHeater Capacity as a Function of Temperature curve output is negative warning continues...",
                             this->ChillerHeater(ChillerHeaterNum).ChillerCapFTErrorIndex,
@@ -2279,7 +2280,7 @@ namespace PlantCentralGSHP {
                         ShowContinueErrorTimeStamp(state, "");
                         ShowContinueError(state, " Reset reference temperature to one greater than the inlet temperature ");
                     }
-                    ShowRecurringSevereErrorAtEnd("ChillerHeaterPerformance:Electric:EIR=\"" + this->ChillerHeater(ChillerHeaterNum).Name +
+                    ShowRecurringSevereErrorAtEnd(state, "ChillerHeaterPerformance:Electric:EIR=\"" + this->ChillerHeater(ChillerHeaterNum).Name +
                                                       "\": Reference temperature problems continue.",
                                                   this->ChillerHeater(ChillerHeaterNum).ChillerEIRRefTempErrorIndex,
                                                   CondDeltaTemp,
@@ -2406,7 +2407,7 @@ namespace PlantCentralGSHP {
                         CurveManager::CurveValue(state, this->ChillerHeater(ChillerHeaterNum).ChillerCapFTIDX, EvapOutletTempSetPoint, CondTempforCurve);
 
                     if (ChillerCapFT < 0) {
-                        if (this->ChillerHeater(ChillerHeaterNum).ChillerCapFTError < 1 && !DataGlobals::WarmupFlag) {
+                        if (this->ChillerHeater(ChillerHeaterNum).ChillerCapFTError < 1 && !state.dataGlobal->WarmupFlag) {
                             ++this->ChillerHeater(ChillerHeaterNum).ChillerCapFTError;
                             ShowWarningError(state, "ChillerHeaterPerformance:Electric:EIR \"" + this->ChillerHeater(ChillerHeaterNum).Name + "\":");
                             ShowContinueError(state, " ChillerHeater Capacity as a Function of Temperature curve output is negative (" +
@@ -2415,9 +2416,9 @@ namespace PlantCentralGSHP {
                                               General::RoundSigDigits(EvapOutletTempSetPoint, 1) + " and a Condenser Inlet Temp of " +
                                               General::RoundSigDigits(CondInletTemp, 1) + '.');
                             ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
-                        } else if (!DataGlobals::WarmupFlag) {
+                        } else if (!state.dataGlobal->WarmupFlag) {
                             ++this->ChillerHeater(ChillerHeaterNum).ChillerCapFTError;
-                            ShowRecurringWarningErrorAtEnd(
+                            ShowRecurringWarningErrorAtEnd(state,
                                 "ChillerHeaterPerformance:Electric:EIR \"" + this->ChillerHeater(ChillerHeaterNum).Name +
                                     "\": ChillerHeater Capacity as a Function of Temperature curve output is negative warning continues...",
                                 this->ChillerHeater(ChillerHeaterNum).ChillerCapFTErrorIndex,

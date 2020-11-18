@@ -798,7 +798,7 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyHardsizedHeatingWithCompanion)
 
     // set a couple global flags
     state.dataGlobal->BeginEnvrnFlag = true;
-    DataGlobals::DisplayExtraWarnings = true;
+    state.dataGlobal->DisplayExtraWarnings = true;
 
     // initialize so the components can find themselves on the plant
     thisHeatingPLHP->onInitLoopEquip(state, myLoadLocation);
@@ -816,7 +816,7 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyHardsizedHeatingWithCompanion)
     EXPECT_NEAR(1200, thisHeatingPLHP->referenceCapacity, 0.0001);
 
     // Call it again, but this time with PlantSizing on, it should come out the same again
-    DataGlobals::DoPlantSizing = true;
+    state.dataGlobal->DoPlantSizing = true;
     thisHeatingPLHP->sizeLoadSide(state);
     thisHeatingPLHP->sizeSrcSideWSHP(state);
     EXPECT_NEAR(0.01, thisHeatingPLHP->loadSideDesignVolFlowRate, 0.0001);
@@ -1742,7 +1742,7 @@ TEST_F(EnergyPlusFixture, TestConcurrentOperationChecking)
     coil4->running = true;
 
     // check to warn about concurrent operation
-    EIRPlantLoopHeatPump::checkConcurrentOperation();
+    EIRPlantLoopHeatPump::checkConcurrentOperation(state);
 
     // that will just add a recurring warning to the end, so to check whether
     //  a warning was actually made, I'll just check the warning index values

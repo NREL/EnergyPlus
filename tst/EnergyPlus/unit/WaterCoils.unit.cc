@@ -93,7 +93,6 @@ using namespace EnergyPlus;
 using namespace DataAirLoop;
 using namespace DataAirSystems;
 using namespace DataEnvironment;
-using namespace EnergyPlus::DataGlobals;
 using namespace EnergyPlus::DataPlant;
 using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::DataHeatBalance;
@@ -155,7 +154,7 @@ public:
         SysSizPeakDDNum(1).TotCoolPeakDD = 1;
         FinalSysSizing.allocate(1);
         FinalZoneSizing.allocate(1);
-        PrimaryAirSystem.allocate(1);
+        state.dataAirSystemsData->PrimaryAirSystems.allocate(1);
         state.dataAirLoop->AirLoopControlInfo.allocate(1);
         InitializePsychRoutines();
     }
@@ -176,7 +175,7 @@ public:
         SysSizPeakDDNum.clear();
         FinalSysSizing.clear();
         SysSizPeakDDNum.clear();
-        PrimaryAirSystem.clear();
+        state.dataAirSystemsData->PrimaryAirSystems.clear();
         state.dataAirLoop->AirLoopControlInfo.clear();
         cached_Twb.clear();
         cached_Psat.clear();
@@ -1283,9 +1282,9 @@ TEST_F(WaterCoilsTest, FanCoilCoolingWaterFlowTest)
     DataEnvironment::StdRhoAir = 1.20;
     state.dataWaterCoils->GetWaterCoilsInputFlag = true;
     NumCoils = 0;
-    DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::TimeStep = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->NumOfTimeStepInHour = 1;
+    state.dataGlobal->TimeStep = 1;
+    state.dataGlobal->MinutesPerTimeStep = 60;
 
     InitializePsychRoutines();
 
@@ -1568,7 +1567,7 @@ TEST_F(WaterCoilsTest, FanCoilCoolingWaterFlowTest)
     QUnitOut = 0.0;
     QZnReq = -4000.0;
 
-    DataGlobals::DoingSizing = true;
+    state.dataGlobal->DoingSizing = true;
 
     CurZoneEqNum = 1;
     ZoneSizingRunDone = true;

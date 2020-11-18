@@ -233,9 +233,9 @@ namespace ZoneTempPredictorCorrector {
 
     void PushZoneTimestepHistories(EnergyPlusData &state);
 
-    void PushSystemTimestepHistories();
+    void PushSystemTimestepHistories(EnergyPlusData &state);
 
-    void RevertZoneTimestepHistories();
+    void RevertZoneTimestepHistories(EnergyPlusData &state);
 
     void CorrectZoneHumRat(EnergyPlusData &state, int const ZoneNum);
 

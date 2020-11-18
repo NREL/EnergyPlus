@@ -96,7 +96,6 @@
 #include <EnergyPlus/WeatherManager.hh>
 
 using namespace EnergyPlus;
-using namespace EnergyPlus::DataGlobals;
 using namespace EnergyPlus::DataGlobalConstants;
 using namespace EnergyPlus::DataEnvironment;
 using namespace EnergyPlus::DataHeatBalance;
@@ -500,11 +499,11 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_AllocateLoadComponentArraysTes
 {
     TotDesDays = 2;
     TotRunDesPersDays = 3;
-    NumOfZones = 4;
+    state.dataGlobal->NumOfZones = 4;
     TotSurfaces = 7;
-    NumOfTimeStepInHour = 4;
+    state.dataGlobal->NumOfTimeStepInHour = 4;
 
-    AllocateLoadComponentArrays();
+    AllocateLoadComponentArrays(state);
 
     // radiantPulseTimestep.allocate( { 0, TotDesDays + TotRunDesPersDays }, NumOfZones );
     EXPECT_EQ(radiantPulseTimestep.size(), 24u);
@@ -1447,7 +1446,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ZoneMultiplierTest)
         (DataZoneEnergyDemands::ZoneSysEnergyDemand(2).TotalOutputRequired / DataZoneEnergyDemands::ZoneSysEnergyDemand(1).TotalOutputRequired),
         0.00001);
 
-    DataGlobals::DoWeathSim = true;                           // flag to trick tabular reports to scan meters
+    state.dataGlobal->DoWeathSim = true;                           // flag to trick tabular reports to scan meters
     state.dataGlobal->KindOfSim = DataGlobalConstants::KindOfSim::RunPeriodWeather; // fake a weather run since a weather file can't be used (could it?)
     UpdateTabularReports(state, OutputProcessor::TimeStepType::TimeStepSystem);
 
@@ -2475,7 +2474,7 @@ TEST_F(EnergyPlusFixture, AirloopHVAC_ZoneSumTest)
 
     EXPECT_EQ(10.0, (Zone(2).Volume * Zone(2).Multiplier * Zone(2).ListMultiplier) / (Zone(1).Volume * Zone(1).Multiplier * Zone(1).ListMultiplier));
 
-    DataGlobals::DoWeathSim = true;                           // flag to trick tabular reports to scan meters
+    state.dataGlobal->DoWeathSim = true;                           // flag to trick tabular reports to scan meters
     state.dataGlobal->KindOfSim = DataGlobalConstants::KindOfSim::RunPeriodWeather; // fake a weather run since a weather file can't be used (could it?)
     UpdateTabularReports(state, OutputProcessor::TimeStepType::TimeStepSystem);
 
@@ -3450,7 +3449,7 @@ TEST_F(EnergyPlusFixture, AirloopHVAC_ZoneSumTest)
 // EXPECT_EQ( 10.0, ( Zone( 2 ).Volume * Zone( 2 ).Multiplier * Zone( 2 ).ListMultiplier ) / ( Zone( 1 ).Volume * Zone( 1 ).Multiplier * Zone( 1
 // ).ListMultiplier ) );
 
-// DataGlobals::DoWeathSim = true; // flag to trick tabular reports to scan meters
+// state.dataGlobal->DoWeathSim = true; // flag to trick tabular reports to scan meters
 // DataGlobals::KindOfSim = DataGlobalConstants::KindOfSim::RunPeriodWeather; // fake a weather run since a weather file can't be used (could it?)
 // UpdateTabularReports( OutputProcessor::TimeStepType::TimeStepSystem );
 
@@ -3507,9 +3506,9 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_ResetMonthlyGathering)
                         "Exterior Lights",
                         "General");
 
-    DataGlobals::DoWeathSim = true;
-    DataGlobals::TimeStepZone = 0.25;
-    DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * 60.0;
+    state.dataGlobal->DoWeathSim = true;
+    state.dataGlobal->TimeStepZone = 0.25;
+    state.dataGlobal->TimeStepZoneSec = state.dataGlobal->TimeStepZone * 60.0;
 
     GetInputTabularMonthly(state);
     EXPECT_EQ(MonthlyInputCount, 1);
@@ -3572,9 +3571,9 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering)
                         "Exterior Lights",
                         "General");
 
-    DataGlobals::DoWeathSim = true;
-    DataGlobals::TimeStepZone = 1.0;
-    DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * 60.0;
+    state.dataGlobal->DoWeathSim = true;
+    state.dataGlobal->TimeStepZone = 1.0;
+    state.dataGlobal->TimeStepZoneSec = state.dataGlobal->TimeStepZone * 60.0;
     displayTabularBEPS = true;
     // OutputProcessor::TimeValue.allocate(2);
 
@@ -3623,7 +3622,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherPeakDemandForTimestep)
 
     displayDemandEndUse = true;
     displayLEEDSummary = true;
-    DataGlobals::TimeStepZoneSec = 900.0;
+    state.dataGlobal->TimeStepZoneSec = 900.0;
 
     int resourceNum = 1;
     int totalMeterNum = 2;
@@ -3654,11 +3653,11 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherPeakDemandForTimestep)
 
     // first "timestep"
 
-    EnergyMeters(totalMeterNum).CurTSValue = 123.0 * DataGlobals::TimeStepZoneSec;    // create the current value for the total meter
-    EnergyMeters(endUseMeterNum).CurTSValue = 47.0 * DataGlobals::TimeStepZoneSec;    // create the current value for the end use meter
-    EnergyMeters(subEndUseMeterNum).CurTSValue = 28.0 * DataGlobals::TimeStepZoneSec; // create the current value for the sub end use meter
+    EnergyMeters(totalMeterNum).CurTSValue = 123.0 * state.dataGlobal->TimeStepZoneSec;    // create the current value for the total meter
+    EnergyMeters(endUseMeterNum).CurTSValue = 47.0 * state.dataGlobal->TimeStepZoneSec;    // create the current value for the end use meter
+    EnergyMeters(subEndUseMeterNum).CurTSValue = 28.0 * state.dataGlobal->TimeStepZoneSec; // create the current value for the sub end use meter
 
-    GatherPeakDemandForTimestep(OutputProcessor::TimeStepType::TimeStepZone);
+    GatherPeakDemandForTimestep(state, OutputProcessor::TimeStepType::TimeStepZone);
 
     EXPECT_EQ(123., gatherDemandTotal(resourceNum));
 
@@ -3670,11 +3669,11 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherPeakDemandForTimestep)
 
     // next "timestep" total higher
 
-    EnergyMeters(totalMeterNum).CurTSValue = 133.0 * DataGlobals::TimeStepZoneSec;    // create the current value for the total meter
-    EnergyMeters(endUseMeterNum).CurTSValue = 57.0 * DataGlobals::TimeStepZoneSec;    // create the current value for the end use meter
-    EnergyMeters(subEndUseMeterNum).CurTSValue = 38.0 * DataGlobals::TimeStepZoneSec; // create the current value for the sub end use meter
+    EnergyMeters(totalMeterNum).CurTSValue = 133.0 * state.dataGlobal->TimeStepZoneSec;    // create the current value for the total meter
+    EnergyMeters(endUseMeterNum).CurTSValue = 57.0 * state.dataGlobal->TimeStepZoneSec;    // create the current value for the end use meter
+    EnergyMeters(subEndUseMeterNum).CurTSValue = 38.0 * state.dataGlobal->TimeStepZoneSec; // create the current value for the sub end use meter
 
-    GatherPeakDemandForTimestep(OutputProcessor::TimeStepType::TimeStepZone);
+    GatherPeakDemandForTimestep(state, OutputProcessor::TimeStepType::TimeStepZone);
 
     EXPECT_EQ(133., gatherDemandTotal(resourceNum));
 
@@ -3686,11 +3685,11 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherPeakDemandForTimestep)
 
     // next "timestep" total lower but end use higher and sub end use higher
 
-    EnergyMeters(totalMeterNum).CurTSValue = 103.0 * DataGlobals::TimeStepZoneSec;    // create the current value for the total meter
-    EnergyMeters(endUseMeterNum).CurTSValue = 61.0 * DataGlobals::TimeStepZoneSec;    // create the current value for the end use meter
-    EnergyMeters(subEndUseMeterNum).CurTSValue = 42.0 * DataGlobals::TimeStepZoneSec; // create the current value for the sub end use meter
+    EnergyMeters(totalMeterNum).CurTSValue = 103.0 * state.dataGlobal->TimeStepZoneSec;    // create the current value for the total meter
+    EnergyMeters(endUseMeterNum).CurTSValue = 61.0 * state.dataGlobal->TimeStepZoneSec;    // create the current value for the end use meter
+    EnergyMeters(subEndUseMeterNum).CurTSValue = 42.0 * state.dataGlobal->TimeStepZoneSec; // create the current value for the sub end use meter
 
-    GatherPeakDemandForTimestep(OutputProcessor::TimeStepType::TimeStepZone);
+    GatherPeakDemandForTimestep(state, OutputProcessor::TimeStepType::TimeStepZone);
 
     EXPECT_EQ(133., gatherDemandTotal(resourceNum));
 
@@ -3702,11 +3701,11 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherPeakDemandForTimestep)
 
     // next "timestep" total higher but end use lower and sub end use lower
 
-    EnergyMeters(totalMeterNum).CurTSValue = 143.0 * DataGlobals::TimeStepZoneSec;    // create the current value for the total meter
-    EnergyMeters(endUseMeterNum).CurTSValue = 59.0 * DataGlobals::TimeStepZoneSec;    // create the current value for the end use meter
-    EnergyMeters(subEndUseMeterNum).CurTSValue = 39.0 * DataGlobals::TimeStepZoneSec; // create the current value for the sub end use meter
+    EnergyMeters(totalMeterNum).CurTSValue = 143.0 * state.dataGlobal->TimeStepZoneSec;    // create the current value for the total meter
+    EnergyMeters(endUseMeterNum).CurTSValue = 59.0 * state.dataGlobal->TimeStepZoneSec;    // create the current value for the end use meter
+    EnergyMeters(subEndUseMeterNum).CurTSValue = 39.0 * state.dataGlobal->TimeStepZoneSec; // create the current value for the sub end use meter
 
-    GatherPeakDemandForTimestep(OutputProcessor::TimeStepType::TimeStepZone);
+    GatherPeakDemandForTimestep(state, OutputProcessor::TimeStepType::TimeStepZone);
 
     EXPECT_EQ(143., gatherDemandTotal(resourceNum));
 
@@ -3725,7 +3724,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatEmissionReport)
 {
 
     displayHeatEmissionsSummary = true;
-    DoWeathSim = true;
+    state.dataGlobal->DoWeathSim = true;
     DataHVACGlobals::TimeStepSys = 10.0;
     DataEnvironment::OutHumRat = 0.005;
     DataEnvironment::OutDryBulbTemp = 25.0;
@@ -3786,7 +3785,7 @@ TEST_F(EnergyPlusFixture, OutputTableTimeBins_GetInput)
                                                       "Always1; !- Schedule Name"});
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::DoWeathSim = true;
+    state.dataGlobal->DoWeathSim = true;
 
     GetInputTabularTimeBins(state);
 
@@ -6028,7 +6027,7 @@ TEST_F(EnergyPlusFixture, OutputTableTimeBins_GetInput)
 TEST_F(EnergyPlusFixture, OutputReportTabularTest_PredefinedTableRowMatchingTest)
 {
 
-    SetPredefinedTables();
+    SetPredefinedTables(state);
 
     PreDefTableEntry(pdchLeedPerfElEneUse, "Exterior Lighting", 1000., 2);
     EXPECT_EQ("1000.00", RetrievePreDefTableEntry(pdchLeedPerfElEneUse, "Exterior Lighting"));
@@ -6067,7 +6066,7 @@ TEST_F(SQLiteFixture, WriteVeriSumTableAreasTest)
     Surface.allocate(TotSurfaces);
 
     // walls
-    Surface(1).Class = SurfaceClass_Wall;
+    Surface(1).Class = SurfaceClass::Wall;
     Surface(1).HeatTransSurf = true;
     Surface(1).ExtBoundCond = ExternalEnvironment;
     Surface(1).Azimuth = 0.;
@@ -6076,7 +6075,7 @@ TEST_F(SQLiteFixture, WriteVeriSumTableAreasTest)
     Surface(1).Tilt = 90.;
     Surface(1).Zone = 1;
 
-    Surface(2).Class = SurfaceClass_Wall;
+    Surface(2).Class = SurfaceClass::Wall;
     Surface(2).HeatTransSurf = true;
     Surface(2).ExtBoundCond = ExternalEnvironment;
     Surface(2).Azimuth = 90.;
@@ -6086,7 +6085,7 @@ TEST_F(SQLiteFixture, WriteVeriSumTableAreasTest)
     Surface(2).Zone = 1;
 
     // windows
-    Surface(3).Class = SurfaceClass_Window;
+    Surface(3).Class = SurfaceClass::Window;
     Surface(3).HeatTransSurf = true;
     Surface(3).ExtBoundCond = ExternalEnvironment;
     Surface(3).Azimuth = 0.;
@@ -6097,7 +6096,7 @@ TEST_F(SQLiteFixture, WriteVeriSumTableAreasTest)
     Surface(3).Tilt = 90.;
     Surface(3).Zone = 1;
 
-    Surface(4).Class = SurfaceClass_Window;
+    Surface(4).Class = SurfaceClass::Window;
     Surface(4).HeatTransSurf = true;
     Surface(4).ExtBoundCond = ExternalEnvironment;
     Surface(4).Azimuth = 90.;
@@ -6115,8 +6114,8 @@ TEST_F(SQLiteFixture, WriteVeriSumTableAreasTest)
     FrameDivider(2).FrameWidth = 0.2;
 
     // zone
-    NumOfZones = 1;
-    Zone.allocate(NumOfZones);
+    state.dataGlobal->NumOfZones = 1;
+    Zone.allocate(state.dataGlobal->NumOfZones);
     Zone(1).SystemZoneNodeNumber = 1;
     Zone(1).Multiplier = 1.;
     Zone(1).ListMultiplier = 1.;
@@ -6177,7 +6176,7 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal)
     Surface.allocate(TotSurfaces);
 
     // walls
-    Surface(1).Class = SurfaceClass_Wall;
+    Surface(1).Class = SurfaceClass::Wall;
     Surface(1).HeatTransSurf = true;
     Surface(1).ExtBoundCond = ExternalEnvironment;
     Surface(1).Azimuth = 0.;
@@ -6185,7 +6184,7 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal)
     Surface(1).Tilt = 90.;
     Surface(1).Zone = 1;
 
-    Surface(2).Class = SurfaceClass_Wall;
+    Surface(2).Class = SurfaceClass::Wall;
     Surface(2).HeatTransSurf = true;
     Surface(2).ExtBoundCond = ExternalEnvironment;
     Surface(2).Azimuth = 90.;
@@ -6194,7 +6193,7 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal)
     Surface(2).Zone = 2;
 
     // windows
-    Surface(3).Class = SurfaceClass_Window;
+    Surface(3).Class = SurfaceClass::Window;
     Surface(3).HeatTransSurf = true;
     Surface(3).ExtBoundCond = ExternalEnvironment;
     Surface(3).Azimuth = 0.;
@@ -6204,7 +6203,7 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal)
     Surface(3).Tilt = 90.;
     Surface(3).Zone = 1;
 
-    Surface(4).Class = SurfaceClass_Window;
+    Surface(4).Class = SurfaceClass::Window;
     Surface(4).HeatTransSurf = true;
     Surface(4).ExtBoundCond = ExternalEnvironment;
     Surface(4).Azimuth = 90.;
@@ -6246,8 +6245,8 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal)
     ZoneElectric(3).DesignLevel = 5.0;
 
     // zone
-    DataGlobals::NumOfZones = 3;
-    Zone.allocate(DataGlobals::NumOfZones);
+    state.dataGlobal->NumOfZones = 3;
+    Zone.allocate(state.dataGlobal->NumOfZones);
     Zone(1).Name = "PartofTot Conditioned Zone";
     Zone(1).SystemZoneNodeNumber = 1; // Conditioned
     Zone(1).isPartOfTotalArea = true;
@@ -6443,9 +6442,9 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_invalidAggregationOrder)
                         "Exterior Lights",
                         "General");
 
-    DataGlobals::DoWeathSim = true;
-    DataGlobals::TimeStepZone = 0.25;
-    DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * 60.0;
+    state.dataGlobal->DoWeathSim = true;
+    state.dataGlobal->TimeStepZone = 0.25;
+    state.dataGlobal->TimeStepZoneSec = state.dataGlobal->TimeStepZone * 60.0;
 
     GetInputTabularMonthly(state);
     EXPECT_EQ(MonthlyInputCount, 1);
@@ -6473,8 +6472,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_CollectPeakZoneConditions_test
     state.dataWeatherManager->DesDayInput(1).Month = 5;
     state.dataWeatherManager->DesDayInput(1).DayOfMonth = 21;
 
-    DataGlobals::NumOfTimeStepInHour = 4;
-    DataGlobals::MinutesPerTimeStep = 15;
+    state.dataGlobal->NumOfTimeStepInHour = 4;
+    state.dataGlobal->MinutesPerTimeStep = 15;
 
     CoolPeakDateHrMin.allocate(1);
 
@@ -6536,90 +6535,90 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetZoneComponentAreas_test)
     areas.allocate(1);
 
     Zone.allocate(1);
-    NumOfZones = 1;
+    state.dataGlobal->NumOfZones = 1;
     Zone(1).FloorArea = 12.;
 
     Surface.allocate(13);
 
     Surface(1).GrossArea = 5.; // extWall
-    Surface(1).Class = SurfaceClass_Wall;
+    Surface(1).Class = SurfaceClass::Wall;
     Surface(1).ExtBoundCond = ExternalEnvironment;
     Surface(1).Zone = 1;
     Surface(1).HeatTransSurf = true;
 
     Surface(2).GrossArea = 6.; // grdCntWall
-    Surface(2).Class = SurfaceClass_Wall;
+    Surface(2).Class = SurfaceClass::Wall;
     Surface(2).ExtBoundCond = GroundFCfactorMethod;
     Surface(2).Zone = 1;
     Surface(2).HeatTransSurf = true;
 
     Surface(3).GrossArea = 7.; // intZoneWall
-    Surface(3).Class = SurfaceClass_Wall;
+    Surface(3).Class = SurfaceClass::Wall;
     Surface(3).ExtBoundCond = 2;
     Surface(3).Zone = 1;
     Surface(3).HeatTransSurf = true;
 
     Surface(4).GrossArea = 8.; // roof
-    Surface(4).Class = SurfaceClass_Roof;
+    Surface(4).Class = SurfaceClass::Roof;
     Surface(4).ExtBoundCond = ExternalEnvironment;
     Surface(4).Zone = 1;
     Surface(4).HeatTransSurf = true;
 
     Surface(5).GrossArea = 9.; // ceiling
-    Surface(5).Class = SurfaceClass_Roof;
+    Surface(5).Class = SurfaceClass::Roof;
     Surface(5).ExtBoundCond = 5;
     Surface(5).Zone = 1;
     Surface(5).HeatTransSurf = true;
 
     Surface(6).GrossArea = 10.; // extFloor
-    Surface(6).Class = SurfaceClass_Floor;
+    Surface(6).Class = SurfaceClass::Floor;
     Surface(6).ExtBoundCond = ExternalEnvironment;
     Surface(6).Zone = 1;
     Surface(6).HeatTransSurf = true;
 
     Surface(7).GrossArea = 11.; // grndCntFloor
-    Surface(7).Class = SurfaceClass_Floor;
+    Surface(7).Class = SurfaceClass::Floor;
     Surface(7).ExtBoundCond = Ground;
     Surface(7).Zone = 1;
     Surface(7).HeatTransSurf = true;
 
     Surface(8).GrossArea = 12.; // intZoneFloor
-    Surface(8).Class = SurfaceClass_Floor;
+    Surface(8).Class = SurfaceClass::Floor;
     Surface(8).ExtBoundCond = 3;
     Surface(8).Zone = 1;
     Surface(8).HeatTransSurf = true;
 
     Surface(9).GrossArea = 13.; // fenestration
-    Surface(9).Class = SurfaceClass_Window;
+    Surface(9).Class = SurfaceClass::Window;
     Surface(9).ExtBoundCond = ExternalEnvironment;
     Surface(9).Zone = 1;
     Surface(9).HeatTransSurf = true;
 
     Surface(10).GrossArea = 14.; // door
-    Surface(10).Class = SurfaceClass_Door;
+    Surface(10).Class = SurfaceClass::Door;
     Surface(10).ExtBoundCond = ExternalEnvironment;
     Surface(10).Zone = 1;
     Surface(10).HeatTransSurf = true;
 
     Surface(11).GrossArea = 15.; // door (again)
-    Surface(11).Class = SurfaceClass_GlassDoor;
+    Surface(11).Class = SurfaceClass::GlassDoor;
     Surface(11).ExtBoundCond = ExternalEnvironment;
     Surface(11).Zone = 1;
     Surface(11).HeatTransSurf = true;
 
     Surface(12).GrossArea = 16.; // fenestration (again)
-    Surface(12).Class = SurfaceClass_TDD_Dome;
+    Surface(12).Class = SurfaceClass::TDD_Dome;
     Surface(12).ExtBoundCond = ExternalEnvironment;
     Surface(12).Zone = 1;
     Surface(12).HeatTransSurf = true;
 
     Surface(13).GrossArea = 17.; // grndCntFloor (again)
-    Surface(13).Class = SurfaceClass_Floor;
+    Surface(13).Class = SurfaceClass::Floor;
     Surface(13).ExtBoundCond = KivaFoundation;
     Surface(13).Zone = 1;
     Surface(13).HeatTransSurf = true;
 
-    GetZoneComponentAreas(areas);
+    GetZoneComponentAreas(state, areas);
 
     EXPECT_EQ(12., areas(1).floor);
     EXPECT_EQ(8., areas(1).roof);
@@ -6744,11 +6743,11 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_CreateListOfZonesForAirLoop_te
     CompLoadTablesType compLoad;
     Array1D_int zoneToAirLoop;
 
-    NumOfZones = 15;
-    compLoad.zoneIndices.allocate(NumOfZones);
+    state.dataGlobal->NumOfZones = 15;
+    compLoad.zoneIndices.allocate(state.dataGlobal->NumOfZones);
     compLoad.zoneIndices = 0;
 
-    zoneToAirLoop.allocate(NumOfZones);
+    zoneToAirLoop.allocate(state.dataGlobal->NumOfZones);
     zoneToAirLoop(1) = 3;
     zoneToAirLoop(2) = 2;
     zoneToAirLoop(3) = 1;
@@ -6765,7 +6764,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_CreateListOfZonesForAirLoop_te
     zoneToAirLoop(14) = 3;
     zoneToAirLoop(15) = 1;
 
-    CreateListOfZonesForAirLoop(compLoad, zoneToAirLoop, 1);
+    CreateListOfZonesForAirLoop(state, compLoad, zoneToAirLoop, 1);
     EXPECT_EQ(3, compLoad.zoneIndices(1));
     EXPECT_EQ(4, compLoad.zoneIndices(2));
     EXPECT_EQ(7, compLoad.zoneIndices(3));
@@ -6776,7 +6775,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_CreateListOfZonesForAirLoop_te
     EXPECT_EQ(0, compLoad.zoneIndices(8));
 
     compLoad.zoneIndices = 0;
-    CreateListOfZonesForAirLoop(compLoad, zoneToAirLoop, 2);
+    CreateListOfZonesForAirLoop(state, compLoad, zoneToAirLoop, 2);
     EXPECT_EQ(2, compLoad.zoneIndices(1));
     EXPECT_EQ(5, compLoad.zoneIndices(2));
     EXPECT_EQ(9, compLoad.zoneIndices(3));
@@ -6784,7 +6783,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_CreateListOfZonesForAirLoop_te
     EXPECT_EQ(0, compLoad.zoneIndices(5));
 
     compLoad.zoneIndices = 0;
-    CreateListOfZonesForAirLoop(compLoad, zoneToAirLoop, 3);
+    CreateListOfZonesForAirLoop(state, compLoad, zoneToAirLoop, 3);
     EXPECT_EQ(1, compLoad.zoneIndices(1));
     EXPECT_EQ(6, compLoad.zoneIndices(2));
     EXPECT_EQ(13, compLoad.zoneIndices(3));
@@ -6799,10 +6798,10 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesTwice_test)
     int iZone = 1;
     TotDesDays = 2;
     TotRunDesPersDays = 3;
-    NumOfTimeStepInHour = 4;
+    state.dataGlobal->NumOfTimeStepInHour = 4;
 
-    NumOfZones = 4;
-    Zone.allocate(NumOfZones);
+    state.dataGlobal->NumOfZones = 4;
+    Zone.allocate(state.dataGlobal->NumOfZones);
 
     Zone(iZone).SurfaceFirst = 1;
     Zone(iZone).SurfaceLast = 1;
@@ -6811,51 +6810,52 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesTwice_test)
     TotSurfaces = 4;
     Surface.allocate(TotSurfaces);
     Surface(1).HeatTransSurf = true;
-    Surface(1).Class = SurfaceClass_Window;
+    Surface(1).Class = SurfaceClass::Window;
 
     Array1D<Real64> peopleDelaySeq;
-    peopleDelaySeq.allocate(NumOfTimeStepInHour * 24);
+    peopleDelaySeq.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
     peopleDelaySeq = 0.;
 
     Array1D<Real64> peopleDelaySeqCool;
-    peopleDelaySeqCool.allocate(NumOfTimeStepInHour * 24);
+    peopleDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
     peopleDelaySeqCool = 0.;
 
     Array1D<Real64> equipDelaySeqCool;
-    equipDelaySeqCool.allocate(NumOfTimeStepInHour * 24);
+    equipDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
     equipDelaySeqCool = 0.;
 
     Array1D<Real64> hvacLossDelaySeqCool;
-    hvacLossDelaySeqCool.allocate(NumOfTimeStepInHour * 24);
+    hvacLossDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
     hvacLossDelaySeqCool = 0.;
 
     Array1D<Real64> powerGenDelaySeqCool;
-    powerGenDelaySeqCool.allocate(NumOfTimeStepInHour * 24);
+    powerGenDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
     powerGenDelaySeqCool = 0.;
 
     Array1D<Real64> lightDelaySeqCool;
-    lightDelaySeqCool.allocate(NumOfTimeStepInHour * 24);
+    lightDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
     lightDelaySeqCool = 0.;
 
     Array1D<Real64> feneSolarDelaySeqCool;
-    feneSolarDelaySeqCool.allocate(NumOfTimeStepInHour * 24);
+    feneSolarDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
     feneSolarDelaySeqCool = 0.;
 
     Array3D<Real64> feneCondInstantSeq;
-    feneCondInstantSeq.allocate(TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones);
+    feneCondInstantSeq.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataGlobal->NumOfZones);
     feneCondInstantSeq = 0.0;
 
     Array2D<Real64> surfDelaySeqCool;
-    surfDelaySeqCool.allocate(NumOfTimeStepInHour * 24, TotSurfaces);
+    surfDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24, TotSurfaces);
     surfDelaySeqCool = 0.0;
 
-    AllocateLoadComponentArrays();
+    AllocateLoadComponentArrays(state);
 
     feneCondInstantSeq(coolDesSelected, 1, 1) = 0.88;
 
     netSurfRadSeq(coolDesSelected, 1, 1) = 0.05;
 
-    GetDelaySequences(coolDesSelected,
+    GetDelaySequences(state,
+                      coolDesSelected,
                       true,
                       iZone,
                       peopleDelaySeqCool,
@@ -6869,7 +6869,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesTwice_test)
 
     EXPECT_EQ(0.83, feneCondInstantSeq(coolDesSelected, 1, 1)); // the first time the subtraction operation should have occurred
 
-    GetDelaySequences(coolDesSelected,
+    GetDelaySequences(state,
+                      coolDesSelected,
                       true,
                       iZone,
                       peopleDelaySeqCool,
@@ -6899,9 +6900,9 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     DataSizing::CalcSysSizing.allocate(DataHVACGlobals::NumPrimaryAirSys);
     int numDesDays = 2;
     state.dataAirLoop->AirToZoneNodeInfo.allocate(DataHVACGlobals::NumPrimaryAirSys);
-    DataGlobals::NumOfZones = 0;
+    state.dataGlobal->NumOfZones = 0;
     displayAirLoopComponentLoadSummary = true;
-    CompLoadReportIsReq = true;
+    state.dataGlobal->CompLoadReportIsReq = true;
     SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TimeStepAtTotCoolPk.allocate(numDesDays);
 
     SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TotCoolPeakDD = 0; // set to zero to indicate no design day chosen
@@ -6935,7 +6936,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     OutputReportTabular::displayAirLoopComponentLoadSummary = true;
     OutputReportTabular::displayZoneComponentLoadSummary = true;
     OutputReportTabular::displayFacilityComponentLoadSummary = true;
-    DataGlobals::CompLoadReportIsReq = true;
+    state.dataGlobal->CompLoadReportIsReq = true;
 
 
     Psychrometrics::InitializePsychRoutines();
@@ -6952,13 +6953,13 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     state.dataWeatherManager->DesDayInput(2).DayOfMonth = 21;
 
 
-    DataGlobals::NumOfTimeStepInHour = 4;
-    DataGlobals::MinutesPerTimeStep = 15;
+    state.dataGlobal->NumOfTimeStepInHour = 4;
+    state.dataGlobal->MinutesPerTimeStep = 15;
     int numTimeStepInDay = 96;
 
 
     // One Zone
-    DataGlobals::NumOfZones = 1;
+    state.dataGlobal->NumOfZones = 1;
     DataHeatBalance::Zone.allocate(1);
     DataHeatBalance::Zone(1).Multiplier = 1;
     DataHeatBalance::Zone(1).ListMultiplier = 1;
@@ -6970,7 +6971,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
 
 
     // Cool Peak on 1st DD at 16:00 and Heat Peak on 2nd DD at 1:00
-    DataSizing::CalcFinalZoneSizing.allocate(DataGlobals::NumOfZones);
+    DataSizing::CalcFinalZoneSizing.allocate(state.dataGlobal->NumOfZones);
 
     int coolDDNum = 1;
     int coolTimeOfMax = 64;
@@ -7025,7 +7026,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     DataSizing::CalcFinalZoneSizing(1).DesHeatVolFlow = 3.3;
 
 
-    DataSizing::CalcZoneSizing.allocate(numDesDays, DataGlobals::NumOfZones);
+    DataSizing::CalcZoneSizing.allocate(numDesDays, state.dataGlobal->NumOfZones);
     DataSizing::CalcZoneSizing(1, 1).DOASHeatAddSeq.allocate(numTimeStepInDay);
     DataSizing::CalcZoneSizing(1, 1).DOASLatAddSeq.allocate(numTimeStepInDay);
     DataSizing::CalcZoneSizing(2, 1).DOASHeatAddSeq.allocate(numTimeStepInDay);
@@ -7058,7 +7059,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     DataSizing::CalcFinalFacilitySizing.TimeStepNumAtHeatMax = heatTimeOfMax;
 
 
-    AllocateLoadComponentArrays();
+    AllocateLoadComponentArrays(state);
     WriteLoadComponentSummaryTables(state);
 
     // TableName, ReportName, value
@@ -7219,7 +7220,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthlyPredefined_FindNeededOutputV
     }
 
     // We do need to trick it into thinking it's a weather simulation, otherwise the monthly reports aren't reported
-    DataGlobals::DoWeathSim = true; // flag to trick tabular reports to scan meters
+    state.dataGlobal->DoWeathSim = true; // flag to trick tabular reports to scan meters
 
     OutputProcessor::GetReportVariableInput(state);
     OutputReportTabular::GetInputOutputTableSummaryReports(state);
@@ -7256,7 +7257,7 @@ TEST_F(SQLiteFixture, OutputReportTabularTest_PredefinedTableDXConversion)
     SetupUnitConversions();
     OutputReportTabular::unitsStyle = OutputReportTabular::unitsStyleInchPound;
 
-    SetPredefinedTables();
+    SetPredefinedTables(state);
     std::string CompName = "My DX Coil with 10000W cooling";
 
     PreDefTableEntry(pdchDXCoolCoilType, CompName, "Coil:Cooling:DX:SingleSpeed");
@@ -7314,7 +7315,7 @@ TEST_F(SQLiteFixture, OutputReportTabularTest_PredefinedTableCoilHumRat)
     SetupUnitConversions();
     OutputReportTabular::unitsStyle = OutputReportTabular::unitsStyleInchPound;
 
-    SetPredefinedTables();
+    SetPredefinedTables(state);
     std::string CompName = "My DX Coil";
 
     PreDefTableEntry(pdchDXCoolCoilType, CompName, "Coil:Cooling:DX:SingleSpeed");
@@ -7419,11 +7420,11 @@ TEST_F(EnergyPlusFixture, AzimuthToCardinal)
 
         if (i % 2 == 1) {
             // It's a wall
-            DataSurfaces::Surface(i).Class = DataSurfaces::SurfaceClass_Wall;
+            DataSurfaces::Surface(i).Class = DataSurfaces::SurfaceClass::Wall;
             DataSurfaces::Surface(i).Name = "ExtWall_" + std::to_string(i) + "_" + std::to_string(entryIndex);
         } else {
             // It's a window
-            DataSurfaces::Surface(i).Class = DataSurfaces::SurfaceClass_Window;
+            DataSurfaces::Surface(i).Class = DataSurfaces::SurfaceClass::Window;
             DataSurfaces::Surface(i).Name = "ExtWindow_" + std::to_string(i) + "_" + std::to_string(entryIndex);
             // Window references the previous wall
             DataSurfaces::Surface(i).BaseSurf = i - 1;
@@ -7432,7 +7433,7 @@ TEST_F(EnergyPlusFixture, AzimuthToCardinal)
     }
 
     // Setup pre def tables
-    OutputReportPredefined::SetPredefinedTables();
+    OutputReportPredefined::SetPredefinedTables(state);
 
     // Call the routine that fills up the table we care about
     HeatBalanceSurfaceManager::GatherForPredefinedReport(state);
@@ -7528,14 +7529,14 @@ TEST_F(EnergyPlusFixture, InteriorSurfaceEnvelopeSummaryReport)
         if (i % 2 == 1) {
             DataSurfaces::Surface(i).Name = "Interzonal_Wall_" + std::to_string((i + 1) / 2);
             DataSurfaces::Surface(i).GrossArea = 200.;
-            DataSurfaces::Surface(i).Class = DataSurfaces::SurfaceClass_Wall;
+            DataSurfaces::Surface(i).Class = DataSurfaces::SurfaceClass::Wall;
             DataSurfaces::AllSurfaceListReportOrder.push_back(i);
         }else{
             DataSurfaces::Surface(i).Name = "Interzonal_Door_" + std::to_string((i + 1) / 2);
             DataSurfaces::Surface(i).BaseSurfName = DataSurfaces::Surface(i - 1).Name;
             DataSurfaces::Surface(i).BaseSurf = i - 1;
             DataSurfaces::Surface(i).GrossArea = 50.;
-            DataSurfaces::Surface(i).Class = DataSurfaces::SurfaceClass_Door;
+            DataSurfaces::Surface(i).Class = DataSurfaces::SurfaceClass::Door;
             DataSurfaces::AllSurfaceListReportOrder.push_back(i);
         }
         if ((i + 1) / 2 == 1) {
@@ -7554,7 +7555,7 @@ TEST_F(EnergyPlusFixture, InteriorSurfaceEnvelopeSummaryReport)
     DataSurfaces::Surface(4).ExtBoundCondName = "Interzonal_Door_1";
 
     // Setup pre def tables
-    OutputReportPredefined::SetPredefinedTables();
+    OutputReportPredefined::SetPredefinedTables(state);
 
     // Call the routine that fills up the table we care about
     HeatBalanceSurfaceManager::GatherForPredefinedReport(state);
@@ -7646,7 +7647,7 @@ TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummary_TestPerArea) {
     Surface.allocate(TotSurfaces);
 
     // walls
-    Surface(1).Class = SurfaceClass_Wall;
+    Surface(1).Class = SurfaceClass::Wall;
     Surface(1).HeatTransSurf = true;
     Surface(1).ExtBoundCond = ExternalEnvironment;
     Surface(1).Azimuth = 0.;
@@ -7654,7 +7655,7 @@ TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummary_TestPerArea) {
     Surface(1).Tilt = 90.;
     Surface(1).Zone = 1;
 
-    Surface(2).Class = SurfaceClass_Wall;
+    Surface(2).Class = SurfaceClass::Wall;
     Surface(2).HeatTransSurf = true;
     Surface(2).ExtBoundCond = ExternalEnvironment;
     Surface(2).Azimuth = 90.;
@@ -7663,7 +7664,7 @@ TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummary_TestPerArea) {
     Surface(2).Zone = 2;
 
     // windows
-    Surface(3).Class = SurfaceClass_Window;
+    Surface(3).Class = SurfaceClass::Window;
     Surface(3).HeatTransSurf = true;
     Surface(3).ExtBoundCond = ExternalEnvironment;
     Surface(3).Azimuth = 0.;
@@ -7673,7 +7674,7 @@ TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummary_TestPerArea) {
     Surface(3).Tilt = 90.;
     Surface(3).Zone = 1;
 
-    Surface(4).Class = SurfaceClass_Window;
+    Surface(4).Class = SurfaceClass::Window;
     Surface(4).HeatTransSurf = true;
     Surface(4).ExtBoundCond = ExternalEnvironment;
     Surface(4).Azimuth = 90.;
@@ -7715,8 +7716,8 @@ TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummary_TestPerArea) {
     ZoneElectric(3).DesignLevel = 5.0;
 
     // zone
-    DataGlobals::NumOfZones = 3;
-    Zone.allocate(DataGlobals::NumOfZones);
+    state.dataGlobal->NumOfZones = 3;
+    Zone.allocate(state.dataGlobal->NumOfZones);
     Zone(1).Name = "PartofTot Conditioned Zone";
     Zone(1).SystemZoneNodeNumber = 1; // Conditioned
     Zone(1).isPartOfTotalArea = true;
@@ -7827,7 +7828,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
     // Needed to avoid crash (from ElectricPowerServiceManager.hh)
     createFacilityElectricPowerServiceObject();
 
-    SetPredefinedTables();
+    SetPredefinedTables(state);
 
     Real64 extLitUse = 1e8;
     Real64 CoalHeating = 2e8;
@@ -7894,9 +7895,9 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
                         "Propane",
                         "Heating",
                         "General");
-    DataGlobals::DoWeathSim = true;
-    DataGlobals::TimeStepZone = 1.0;
-    DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * 60.0;
+    state.dataGlobal->DoWeathSim = true;
+    state.dataGlobal->TimeStepZone = 1.0;
+    state.dataGlobal->TimeStepZoneSec = state.dataGlobal->TimeStepZone * 60.0;
     displayTabularBEPS = true;
     // OutputProcessor::TimeValue.allocate(2);
 
@@ -7915,7 +7916,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
     UpdateMeterReporting(state);
     UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepZone);
     GatherBEPSResultsForTimestep(OutputProcessor::TimeStepType::TimeStepZone);
-    GatherPeakDemandForTimestep(OutputProcessor::TimeStepType::TimeStepZone);
+    GatherPeakDemandForTimestep(state, OutputProcessor::TimeStepType::TimeStepZone);
     EXPECT_NEAR(extLitUse * 3, gatherEndUseBEPS(1, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)), 1.);
     // General
     EXPECT_NEAR(extLitUse * 2, gatherEndUseSubBEPS(1, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights), 1), 1.);
@@ -7925,7 +7926,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
     UpdateMeterReporting(state);
     UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepZone);
     GatherBEPSResultsForTimestep(OutputProcessor::TimeStepType::TimeStepZone);
-    GatherPeakDemandForTimestep(OutputProcessor::TimeStepType::TimeStepZone);
+    GatherPeakDemandForTimestep(state, OutputProcessor::TimeStepType::TimeStepZone);
     EXPECT_NEAR(extLitUse * 6, gatherEndUseBEPS(1, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)), 1.);
     // General
     EXPECT_NEAR(extLitUse * 4, gatherEndUseSubBEPS(1, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights), 1), 1.);
@@ -7935,7 +7936,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
     UpdateMeterReporting(state);
     UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepZone);
     GatherBEPSResultsForTimestep(OutputProcessor::TimeStepType::TimeStepZone);
-    GatherPeakDemandForTimestep(OutputProcessor::TimeStepType::TimeStepZone);
+    GatherPeakDemandForTimestep(state, OutputProcessor::TimeStepType::TimeStepZone);
     EXPECT_NEAR(extLitUse * 9, gatherEndUseBEPS(1, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)), 1.);
     // General
     EXPECT_NEAR(extLitUse * 6, gatherEndUseSubBEPS(1, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights), 1), 1.);
@@ -8130,10 +8131,10 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesSurfaceOrder_
     int iZone = 1;
     TotDesDays = 2;
     TotRunDesPersDays = 3;
-    NumOfTimeStepInHour = 4;
+    state.dataGlobal->NumOfTimeStepInHour = 4;
 
-    NumOfZones = 1;
-    Zone.allocate(NumOfZones);
+    state.dataGlobal->NumOfZones = 1;
+    Zone.allocate(state.dataGlobal->NumOfZones);
 
     Zone(iZone).SurfaceFirst = 1;
     Zone(iZone).SurfaceLast = 4;
@@ -8144,42 +8145,42 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesSurfaceOrder_
     Surface.allocate(TotSurfaces);
 
     Array1D<Real64> peopleDelaySeq;
-    peopleDelaySeq.allocate(NumOfTimeStepInHour * 24);
+    peopleDelaySeq.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
     peopleDelaySeq = 0.;
 
     Array1D<Real64> peopleDelaySeqCool;
-    peopleDelaySeqCool.allocate(NumOfTimeStepInHour * 24);
+    peopleDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
     peopleDelaySeqCool = 0.;
 
     Array1D<Real64> equipDelaySeqCool;
-    equipDelaySeqCool.allocate(NumOfTimeStepInHour * 24);
+    equipDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
     equipDelaySeqCool = 0.;
 
     Array1D<Real64> hvacLossDelaySeqCool;
-    hvacLossDelaySeqCool.allocate(NumOfTimeStepInHour * 24);
+    hvacLossDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
     hvacLossDelaySeqCool = 0.;
 
     Array1D<Real64> powerGenDelaySeqCool;
-    powerGenDelaySeqCool.allocate(NumOfTimeStepInHour * 24);
+    powerGenDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
     powerGenDelaySeqCool = 0.;
 
     Array1D<Real64> lightDelaySeqCool;
-    lightDelaySeqCool.allocate(NumOfTimeStepInHour * 24);
+    lightDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
     lightDelaySeqCool = 0.;
 
     Array1D<Real64> feneSolarDelaySeqCool;
-    feneSolarDelaySeqCool.allocate(NumOfTimeStepInHour * 24);
+    feneSolarDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
     feneSolarDelaySeqCool = 0.;
 
     Array3D<Real64> feneCondInstantSeq;
-    feneCondInstantSeq.allocate(TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones);
+    feneCondInstantSeq.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataGlobal->NumOfZones);
     feneCondInstantSeq = 0.0;
 
     Array2D<Real64> surfDelaySeqCool;
-    surfDelaySeqCool.allocate(NumOfTimeStepInHour * 24, TotSurfaces);
+    surfDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24, TotSurfaces);
     surfDelaySeqCool = 0.0;
 
-    AllocateLoadComponentArrays();
+    AllocateLoadComponentArrays(state);
 
     // Set surface values
     std::vector<Real64> surfBaseValue{100.0, 200.0, 300.0, 400.0};
@@ -8191,10 +8192,10 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesSurfaceOrder_
     Surface(2).HeatTransSurf = true;
     Surface(3).HeatTransSurf = true;
     Surface(4).HeatTransSurf = false;
-    Surface(1).Class = SurfaceClass_Window;
-    Surface(2).Class = SurfaceClass_Wall;
-    Surface(3).Class = SurfaceClass_Floor;
-    Surface(4).Class = SurfaceClass_Shading;
+    Surface(1).Class = SurfaceClass::Window;
+    Surface(2).Class = SurfaceClass::Wall;
+    Surface(3).Class = SurfaceClass::Floor;
+    Surface(4).Class = SurfaceClass::Shading;
 
     for (int jSurf = 1; jSurf <= 4; ++jSurf) {
         for (int step = 1; step <= 10; ++step) {
@@ -8209,7 +8210,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesSurfaceOrder_
         }
     }
 
-    GetDelaySequences(coolDesSelected,
+    GetDelaySequences(state,
+                      coolDesSelected,
                       true,
                       iZone,
                       peopleDelaySeqCool,
@@ -8239,10 +8241,10 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesSurfaceOrder_
     Surface(4).HeatTransSurf = true;
     Surface(1).HeatTransSurf = true;
     Surface(3).HeatTransSurf = false;
-    Surface(2).Class = SurfaceClass_Window;
-    Surface(4).Class = SurfaceClass_Wall;
-    Surface(1).Class = SurfaceClass_Floor;
-    Surface(3).Class = SurfaceClass_Shading;
+    Surface(2).Class = SurfaceClass::Window;
+    Surface(4).Class = SurfaceClass::Wall;
+    Surface(1).Class = SurfaceClass::Floor;
+    Surface(3).Class = SurfaceClass::Shading;
 
     for (int jSurf = 1; jSurf <= 4; ++jSurf) {
         for (int step = 1; step <= 10; ++step) {
@@ -8257,7 +8259,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesSurfaceOrder_
         }
     }
 
-    GetDelaySequences(coolDesSelected,
+    GetDelaySequences(state,
+                      coolDesSelected,
                       true,
                       iZone,
                       peopleDelaySeqCool,
@@ -8302,14 +8305,14 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_ConfirmConversionFactors)
 TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatGainReport)
 {
     EnergyPlus::OutputReportTabular::clear_state(state);
-    EnergyPlus::DataGlobals::DoWeathSim = true;
+    state.dataGlobal->DoWeathSim = true;
 
     EnergyPlus::OutputReportPredefined::pdrSensibleGain = 1;
     EnergyPlus::OutputReportPredefined::reportName.allocate(1);
     EnergyPlus::OutputReportPredefined::reportName(pdrSensibleGain).show = true;
 
     EnergyPlus::DataHVACGlobals::TimeStepSys = 10.0;
-    EnergyPlus::DataGlobals::TimeStepZone = 20.0;
+    state.dataGlobal->TimeStepZone = 20.0;
     EnergyPlus::DataDefineEquip::NumAirDistUnits = 1;
 
     EnergyPlus::DataHeatBalance::ZonePreDefRep.allocate(1);
@@ -8320,8 +8323,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatGainReport)
     EnergyPlus::DataDefineEquip::AirDistUnit(1).HeatRate = 3.0;
     EnergyPlus::DataDefineEquip::AirDistUnit(1).CoolRate = 4.0;
 
-    EnergyPlus::DataGlobals::NumOfZones = 1;
-    EnergyPlus::DataHeatBalance::Zone.allocate(NumOfZones);
+    state.dataGlobal->NumOfZones = 1;
+    EnergyPlus::DataHeatBalance::Zone.allocate(state.dataGlobal->NumOfZones);
     EnergyPlus::DataHeatBalance::Zone(1).Multiplier = 1;
     EnergyPlus::DataHeatBalance::Zone(1).ListMultiplier = 1;
 
@@ -8400,9 +8403,9 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_8317_ValidateOutputTableMon
                         "Exterior Lights",
                         "General");
 
-    DataGlobals::DoWeathSim = true;
-    DataGlobals::TimeStepZone = 0.25;
-    DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * 60.0;
+    state.dataGlobal->DoWeathSim = true;
+    state.dataGlobal->TimeStepZone = 0.25;
+    state.dataGlobal->TimeStepZoneSec = state.dataGlobal->TimeStepZone * 60.0;
 
     InitializeOutput(state);
 

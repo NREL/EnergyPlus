@@ -133,7 +133,8 @@ namespace SurfaceGroundHeatExchanger {
     int const SurfCond_Ground(1);
     int const SurfCond_Exposed(2);
 
-    PlantComponent *SurfaceGroundHeatExchangerData::factory(EnergyPlusData &state, int const EP_UNUSED(objectType), std::string const objectName)
+    PlantComponent *
+    SurfaceGroundHeatExchangerData::factory(EnergyPlusData &state, [[maybe_unused]] int const objectType, std::string const objectName)
     {
         if (state.dataSurfaceGroundHeatExchangers->GetInputFlag) {
             GetSurfaceGroundHeatExchanger(state);
@@ -151,10 +152,11 @@ namespace SurfaceGroundHeatExchanger {
         return nullptr;
     }
 
-    void SurfaceGroundHeatExchangerData::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
+    void SurfaceGroundHeatExchangerData::simulate(EnergyPlusData &state,
+                                                  [[maybe_unused]] const PlantLocation &calledFromLocation,
                                                   bool const FirstHVACIteration,
-                                                  Real64 &EP_UNUSED(CurLoad),
-                                                  bool const EP_UNUSED(RunFlag))
+                                                  [[maybe_unused]] Real64 &CurLoad,
+                                                  [[maybe_unused]] bool const RunFlag)
     {
         this->InitSurfaceGroundHeatExchanger(state);
         this->CalcSurfaceGroundHeatExchanger(state, FirstHVACIteration);
@@ -676,7 +678,7 @@ namespace SurfaceGroundHeatExchanger {
                                            "\", Did not converge (part 1), Iterations=" + TrimSigDigits(Maxiter));
                         ShowContinueErrorTimeStamp(state, "");
                     }
-                    ShowRecurringWarningErrorAtEnd("CalcSurfaceGroundHeatExchanger=\"" + this->Name + "\", Did not converge (part 1)",
+                    ShowRecurringWarningErrorAtEnd(state, "CalcSurfaceGroundHeatExchanger=\"" + this->Name + "\", Did not converge (part 1)",
                                                    this->ConvErrIndex1);
                     break;
                 }
@@ -771,7 +773,7 @@ namespace SurfaceGroundHeatExchanger {
                                                "\", Did not converge (part 2), Iterations=" + TrimSigDigits(Maxiter));
                             ShowContinueErrorTimeStamp(state, "");
                         }
-                        ShowRecurringWarningErrorAtEnd("CalcSurfaceGroundHeatExchanger=\"" + this->Name + "\", Did not converge (part 2)",
+                        ShowRecurringWarningErrorAtEnd(state, "CalcSurfaceGroundHeatExchanger=\"" + this->Name + "\", Did not converge (part 2)",
                                                        this->ConvErrIndex2);
                         break;
                     }
@@ -790,7 +792,7 @@ namespace SurfaceGroundHeatExchanger {
                                            "\", Did not converge (part 3), Iterations=" + TrimSigDigits(Maxiter));
                         ShowContinueErrorTimeStamp(state, "");
                     }
-                    ShowRecurringWarningErrorAtEnd("CalcSurfaceGroundHeatExchanger=\"" + this->Name + "\", Did not converge (part 3)",
+                    ShowRecurringWarningErrorAtEnd(state, "CalcSurfaceGroundHeatExchanger=\"" + this->Name + "\", Did not converge (part 3)",
                                                    this->ConvErrIndex3);
                     break;
                 }
@@ -1127,7 +1129,7 @@ namespace SurfaceGroundHeatExchanger {
                                        "\", water is frozen; Model not valid. Calculated Water Temperature=[" + RoundSigDigits(this->InletTemp, 2) + "] C");
                     ShowContinueErrorTimeStamp(state, "");
                 }
-                ShowRecurringWarningErrorAtEnd("GroundHeatExchanger:Surface=\"" + this->Name + "\", water is frozen",
+                ShowRecurringWarningErrorAtEnd(state, "GroundHeatExchanger:Surface=\"" + this->Name + "\", water is frozen",
                                                this->FrozenErrIndex1,
                                                this->InletTemp,
                                                this->InletTemp,
@@ -1317,7 +1319,6 @@ namespace SurfaceGroundHeatExchanger {
         // values to the running average.
 
         // Using/Aliasing
-        using DataGlobals::TimeStepZone;
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
         using DataLoopNode::Node;
@@ -1338,11 +1339,11 @@ namespace SurfaceGroundHeatExchanger {
             if (this->LastSysTimeElapsed == SysTimeElapsed) {
                 // Still iterating or reducing system time step, so subtract old values which were
                 // not valid
-                this->QSrcAvg -= this->LastQSrc * this->LastTimeStepSys / TimeStepZone;
+                this->QSrcAvg -= this->LastQSrc * this->LastTimeStepSys / state.dataGlobal->TimeStepZone;
             }
 
             // Update the running average and the "last" values with the current values of the appropriate variables
-            this->QSrcAvg += this->QSrc * TimeStepSys / TimeStepZone;
+            this->QSrcAvg += this->QSrc * TimeStepSys / state.dataGlobal->TimeStepZone;
 
             this->LastQSrc = state.dataSurfaceGroundHeatExchangers->SourceFlux;
             this->LastSysTimeElapsed = SysTimeElapsed;
@@ -1353,7 +1354,7 @@ namespace SurfaceGroundHeatExchanger {
         // appropriate conditions on the correct HVAC node.
         if (PlantLoop(this->LoopNum).FluidName == "WATER") {
             if (InletTemp < 0.0) {
-                ShowRecurringWarningErrorAtEnd(
+                ShowRecurringWarningErrorAtEnd(state,
                     "UpdateSurfaceGroundHeatExchngr: Water is frozen in Surf HX=" + this->Name, this->FrozenErrIndex2, this->InletTemp, this->InletTemp);
             }
             this->InletTemp = max(this->InletTemp, 0.0);

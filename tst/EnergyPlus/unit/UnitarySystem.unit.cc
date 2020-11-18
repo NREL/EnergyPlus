@@ -116,11 +116,11 @@ protected:
 
         DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, 101325.0, 20.0, 0.0); // initialize StdRhoAir
         DataEnvironment::OutBaroPress = 101325.0;
-        DataGlobals::NumOfZones = 1;
-        DataHeatBalance::Zone.allocate(DataGlobals::NumOfZones);
-        DataZoneEquipment::ZoneEquipConfig.allocate(DataGlobals::NumOfZones);
-        DataZoneEquipment::ZoneEquipList.allocate(DataGlobals::NumOfZones);
-        DataZoneEquipment::ZoneEquipAvail.dimension(DataGlobals::NumOfZones, DataHVACGlobals::NoAction);
+        state.dataGlobal->NumOfZones = 1;
+        DataHeatBalance::Zone.allocate(state.dataGlobal->NumOfZones);
+        DataZoneEquipment::ZoneEquipConfig.allocate(state.dataGlobal->NumOfZones);
+        DataZoneEquipment::ZoneEquipList.allocate(state.dataGlobal->NumOfZones);
+        DataZoneEquipment::ZoneEquipAvail.dimension(state.dataGlobal->NumOfZones, DataHVACGlobals::NoAction);
         DataHeatBalance::Zone(1).Name = "EAST ZONE";
         DataZoneEquipment::NumOfZoneEquipLists = 1;
         DataHeatBalance::Zone(1).IsControlled = true;
@@ -275,7 +275,7 @@ public:
         DataSizing::FinalSysSizing.allocate(1);
         DataSizing::FinalZoneSizing.allocate(1);
         DataHVACGlobals::NumPrimaryAirSys = 1;
-        DataAirSystems::PrimaryAirSystem.allocate(1);
+        state.dataAirSystemsData->PrimaryAirSystems.allocate(1);
         state.dataAirLoop->AirLoopControlInfo.allocate(1);
         Psychrometrics::InitializePsychRoutines();
         DataLoopNode::Node.allocate(30);
@@ -298,7 +298,7 @@ public:
         DataSizing::FinalSysSizing.clear();
         DataSizing::SysSizPeakDDNum.clear();
         DataHVACGlobals::NumPrimaryAirSys = 0;
-        DataAirSystems::PrimaryAirSystem.clear();
+        state.dataAirSystemsData->PrimaryAirSystems.clear();
         state.dataAirLoop->AirLoopControlInfo.clear();
         Psychrometrics::cached_Twb.clear();
         Psychrometrics::cached_Psat.clear();
@@ -470,11 +470,11 @@ TEST_F(AirloopUnitarySysTest, MultipleWaterCoolingCoilSizing)
     Fans::Fan(1).MotEff = 0.7;
     Fans::Fan(1).MotInAirFrac = 1.0;
 
-    DataAirSystems::PrimaryAirSystem(1).supFanModelTypeEnum = DataAirSystems::structArrayLegacyFanModels;
-    DataAirSystems::PrimaryAirSystem(1).supFanVecIndex = 1;
-    DataAirSystems::PrimaryAirSystem(1).SupFanNum = 1;
-    DataAirSystems::PrimaryAirSystem(1).supFanLocation = DataAirSystems::fanPlacement::BlowThru;
-    Real64 FanCoolLoad = Fans::FanDesHeatGain(state, DataAirSystems::PrimaryAirSystem(1).SupFanNum, coil1CoolingAirFlowRate);
+    state.dataAirSystemsData->PrimaryAirSystems(1).supFanModelTypeEnum = DataAirSystems::structArrayLegacyFanModels;
+    state.dataAirSystemsData->PrimaryAirSystems(1).supFanVecIndex = 1;
+    state.dataAirSystemsData->PrimaryAirSystems(1).SupFanNum = 1;
+    state.dataAirSystemsData->PrimaryAirSystems(1).supFanLocation = DataAirSystems::fanPlacement::BlowThru;
+    Real64 FanCoolLoad = Fans::FanDesHeatGain(state, state.dataAirSystemsData->PrimaryAirSystems(1).SupFanNum, coil1CoolingAirFlowRate);
     WaterCoils::SizeWaterCoil(state, CoilNum);
 
     EXPECT_NEAR(FanCoolLoad, 106.0, 1.0); // make sure there is enough fan heat to change results
@@ -490,8 +490,8 @@ TEST_F(AirloopUnitarySysTest, MultipleWaterCoolingCoilSizing)
     state.dataWaterCoils->WaterCoil(CoilNum).DesOutletAirHumRat = DataSizing::AutoSize;
     state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate = DataSizing::AutoSize;
     // reset primary air system fan type and location as if is doesn't exist
-    DataAirSystems::PrimaryAirSystem(1).supFanModelTypeEnum = DataAirSystems::fanModelTypeNotYetSet;
-    DataAirSystems::PrimaryAirSystem(1).supFanLocation = DataAirSystems::fanPlacement::fanPlaceNotSet;
+    state.dataAirSystemsData->PrimaryAirSystems(1).supFanModelTypeEnum = DataAirSystems::fanModelTypeNotYetSet;
+    state.dataAirSystemsData->PrimaryAirSystems(1).supFanLocation = DataAirSystems::fanPlacement::fanPlaceNotSet;
 
     // size same coils in UnitarySystem
     int AirLoopNum(1);
@@ -514,8 +514,8 @@ TEST_F(AirloopUnitarySysTest, MultipleWaterCoolingCoilSizing)
     state.dataWaterCoils->MySizeFlag = true;                          // need to size again for UnitarySystem
     state.dataWaterCoils->WaterCoil(1).DesWaterCoolingCoilRate = 0.0; // reset these to be sure they get recalculated
     state.dataWaterCoils->WaterCoil(2).DesWaterHeatingCoilRate = 0.0;
-    OutputReportPredefined::SetPredefinedTables();
-    DataGlobals::DoingSizing = true;
+    OutputReportPredefined::SetPredefinedTables(state);
+    state.dataGlobal->DoingSizing = true;
 
     mySys->sizeSystem(state, FirstHVACIteration, AirLoopNum);
 
@@ -799,7 +799,7 @@ TEST_F(ZoneUnitarySysTest, Test_UnitarySystemModel_factory)
     // test the object name
     EXPECT_EQ(compName, thisSys->Name);
 
-    OutputReportPredefined::SetPredefinedTables();
+    OutputReportPredefined::SetPredefinedTables(state);
 
     ScheduleManager::ProcessScheduleInput(state); // read schedules
 
@@ -834,7 +834,7 @@ TEST_F(ZoneUnitarySysTest, Test_UnitarySystemModel_factory)
     Real64 OAUCoilOutTemp = 0.0;
     Real64 sensOut = 0.0;
     Real64 latOut = 0.0;
-    DataGlobals::SysSizingCalc = false; // permits unitary system sizing
+    state.dataGlobal->SysSizingCalc = false; // permits unitary system sizing
     EXPECT_EQ(compName, thisSys->Name);
     // simulate function is overloaded, but only to report back SysOutputProvided and LatOutputProvided. Either signature should give same result.
     thisSys->simulate(state,
@@ -997,7 +997,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_TwoSpeedDXCoolCoil_Only)
     thisSys->getUnitarySystemInputData(state, compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
     EXPECT_FALSE(ErrorsFound);                                                          // expect no errors
 
-    OutputReportPredefined::SetPredefinedTables();
+    OutputReportPredefined::SetPredefinedTables(state);
 
     // UnitarySystem used as zone equipment will not be modeled when FirstHAVCIteration is true, first time FirstHVACIteration = false will disable
     // the 'return' on FirstHVACIteration = true set FirstHVACIteration to false for unit testing to size water coils
@@ -1280,7 +1280,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoolCoil_Only)
     thisSys->getUnitarySystemInputData(state, compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
     EXPECT_FALSE(ErrorsFound);                                                          // expect no errors
 
-    OutputReportPredefined::SetPredefinedTables();
+    OutputReportPredefined::SetPredefinedTables(state);
 
     // UnitarySystem used as zone equipment will not be modeled when FirstHAVCIteration is true, first time FirstHVACIteration = false will disable
     // the 'return' on FirstHVACIteration = true set FirstHVACIteration to false for unit testing to size water coils
@@ -1502,7 +1502,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiStageGasHeatCoil_Only)
     thisSys->getUnitarySystemInputData(state, compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
     EXPECT_FALSE(ErrorsFound);                                                          // expect no errors
 
-    OutputReportPredefined::SetPredefinedTables();
+    OutputReportPredefined::SetPredefinedTables(state);
 
     // UnitarySystem used as zone equipment will not be modeled when FirstHAVCIteration is true, first time FirstHVACIteration = false will disable
     // the 'return' on FirstHVACIteration = true set FirstHVACIteration to false for unit testing to size water coils
@@ -1740,7 +1740,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiStageElecHeatCoil_Only)
     thisSys->getUnitarySystemInputData(state, compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
     EXPECT_FALSE(ErrorsFound);                                                          // expect no errors
 
-    OutputReportPredefined::SetPredefinedTables();
+    OutputReportPredefined::SetPredefinedTables(state);
 
     // UnitarySystem used as zone equipment will not be modeled when FirstHAVCIteration is true, first time FirstHVACIteration = false will disable
     // the 'return' on FirstHVACIteration = true set FirstHVACIteration to false for unit testing to size water coils
@@ -1974,7 +1974,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_ElecHeatCoil_Only)
     thisSys->getUnitarySystemInputData(state, compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
     EXPECT_FALSE(ErrorsFound);                                                          // expect no errors
 
-    OutputReportPredefined::SetPredefinedTables();
+    OutputReportPredefined::SetPredefinedTables(state);
 
     // UnitarySystem used as zone equipment will not be modeled when FirstHAVCIteration is true, first time FirstHVACIteration = false will disable
     // the 'return' on FirstHVACIteration = true set FirstHVACIteration to false for unit testing to size water coils
@@ -2190,7 +2190,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiStageGasHeatCoil_Only_ContFan
     thisSys->getUnitarySystemInputData(state, compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
     EXPECT_FALSE(ErrorsFound);                                                          // expect no errors
 
-    OutputReportPredefined::SetPredefinedTables();
+    OutputReportPredefined::SetPredefinedTables(state);
 
     // UnitarySystem used as zone equipment will not be modeled when FirstHAVCIteration is true, first time FirstHVACIteration = false will disable
     // the 'return' on FirstHVACIteration = true set FirstHVACIteration to false for unit testing to size water coils
@@ -2689,7 +2689,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultispeedPerformance)
     EXPECT_EQ(thisSys->m_MaxHeatAirVolFlow, DataSizing::AutoSize);
     EXPECT_EQ(thisSys->m_MaxNoCoolHeatAirVolFlow, DataSizing::AutoSize);
 
-    OutputReportPredefined::SetPredefinedTables();
+    OutputReportPredefined::SetPredefinedTables(state);
 
     // UnitarySystem used as zone equipment will not be modeled when FirstHAVCIteration is true, first time FirstHVACIteration = false will disable
     // the 'return' on FirstHVACIteration = true set FirstHVACIteration to false for unit testing to size water coils
@@ -3079,7 +3079,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_WaterCoilSPControl)
     DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(2).NodeNumIn = 8;
     DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(2).NodeNumOut = 9;
 
-    OutputReportPredefined::SetPredefinedTables();
+    OutputReportPredefined::SetPredefinedTables(state);
 
     // UnitarySystem used as zone equipment will not be modeled when FirstHAVCIteration is true, first time FirstHVACIteration = false will disable
     // the 'return' on FirstHVACIteration = true set FirstHVACIteration to false for unit testing to size water coils
@@ -3434,7 +3434,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_WaterCoilSPControl_Latent)
     DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = coolingCoilWaterInletNodeIndex;
     DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = coolingCoilWaterOutletNodeIndex;
 
-    OutputReportPredefined::SetPredefinedTables();
+    OutputReportPredefined::SetPredefinedTables(state);
 
     // UnitarySystem used as zone equipment will not be modeled when FirstHAVCIteration is true, first time FirstHVACIteration = false will disable
     // the 'return' on FirstHVACIteration = true set FirstHVACIteration to false for unit testing to size water coils
@@ -4251,7 +4251,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_CalcUnitaryHeatingSystem)
     thisSys.m_HeatingCoilName = state.dataWaterCoils->WaterCoil(1).Name;
     thisSys.HeatCoilFluidInletNode = state.dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
     thisSys.HeatCoilFluidOutletNodeNum = state.dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
-    DataGlobals::DoingSizing = true;
+    state.dataGlobal->DoingSizing = true;
     state.dataWaterCoils->WaterCoil(1).TotWaterHeatingCoilRate = 0.0;
 
     thisSys.calcUnitaryHeatingSystem(state, AirLoopNum, FirstHVACIteration, thisSys.m_HeatingCycRatio, CompOn, OnOffAirFlowRatio, HeatCoilLoad);
@@ -4406,7 +4406,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_CalcUnitaryCoolingSystem)
 
     state.dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
     state.dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
-    DataGlobals::DoingSizing = true;
+    state.dataGlobal->DoingSizing = true;
 
     state.dataWaterCoils->WaterCoil(1).TotWaterCoolingCoilRate = 0.0;
 
@@ -4651,7 +4651,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInput)
     ASSERT_EQ(1, state.dataUnitarySystems->numUnitarySystems); // only 1 unitary system above so expect 1 as number of unitary system objects
     EXPECT_EQ(thisSys->UnitType, DataHVACGlobals::cFurnaceTypes(compTypeOfNum)); // compare UnitarySystem type string to valid type
 
-    DataGlobals::SysSizingCalc = true; // DISABLE SIZING - don't call UnitarySystem::sizeSystem, much more work needed to set up sizing arrays
+    state.dataGlobal->SysSizingCalc = true; // DISABLE SIZING - don't call UnitarySystem::sizeSystem, much more work needed to set up sizing arrays
 
     InletNode = thisSys->AirInNode;
     OutletNode = thisSys->AirOutNode;
@@ -5529,7 +5529,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_VarSpeedCoils)
     ASSERT_EQ(1, state.dataUnitarySystems->numUnitarySystems); // only 1 unitary system above so expect 1 as number of unitary system objects
     EXPECT_EQ(thisSys->UnitType, DataHVACGlobals::cFurnaceTypes(compTypeOfNum)); // compare UnitarySystem type string to valid type
 
-    DataGlobals::SysSizingCalc = false; // DISABLE SIZING - don't call UnitarySystem::sizeSystem, much more work needed to set up sizing arrays
+    state.dataGlobal->SysSizingCalc = false; // DISABLE SIZING - don't call UnitarySystem::sizeSystem, much more work needed to set up sizing arrays
 
     InletNode = thisSys->AirInNode;
     OutletNode = thisSys->AirOutNode;
@@ -5579,7 +5579,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_VarSpeedCoils)
     DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, 101325.0, 20.0, 0.0); // initialize RhoAir
     DataLoopNode::Node(InletNode).MassFlowRateMaxAvail = thisSys->m_MaxCoolAirVolFlow * DataEnvironment::StdRhoAir;
 
-    OutputReportPredefined::SetPredefinedTables();
+    OutputReportPredefined::SetPredefinedTables(state);
 
     int AirLoopNum = 0;
     int CompIndex = 1;
@@ -5991,7 +5991,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_VarSpeedCoils_CyclingFan)
     ASSERT_EQ(1, state.dataUnitarySystems->numUnitarySystems); // only 1 unitary system above so expect 1 as number of unitary system objects
     EXPECT_EQ(thisSys->UnitType, DataHVACGlobals::cFurnaceTypes(compTypeOfNum)); // compare UnitarySystem type string to valid type
 
-    DataGlobals::SysSizingCalc = false; // DISABLE SIZING - don't call UnitarySystem::sizeSystem, much more work needed to set up sizing arrays
+    state.dataGlobal->SysSizingCalc = false; // DISABLE SIZING - don't call UnitarySystem::sizeSystem, much more work needed to set up sizing arrays
 
     InletNode = thisSys->AirInNode;
     OutletNode = thisSys->AirOutNode;
@@ -6038,7 +6038,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_VarSpeedCoils_CyclingFan)
     DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, 101325.0, 20.0, 0.0); // initialize RhoAir
     DataLoopNode::Node(InletNode).MassFlowRateMaxAvail = thisSys->m_MaxCoolAirVolFlow * DataEnvironment::StdRhoAir;
 
-    OutputReportPredefined::SetPredefinedTables();
+    OutputReportPredefined::SetPredefinedTables(state);
 
     int AirLoopNum = 0;
     int CompIndex = 1;
@@ -6729,8 +6729,8 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ReportingTest)
 
     ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
 
-    DataGlobals::NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
-    DataGlobals::MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
+    state.dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
+    state.dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(state);
 
     HeatBalanceManager::GetZoneData(state, ErrorsFound);   // read zone data
@@ -7465,10 +7465,10 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultispeedDXCoilSizing)
     SimulationManager::GetProjectData(state);
     createFacilityElectricPowerServiceObject();
     state.dataGlobal->BeginSimFlag = true;
-    DataGlobals::DoingSizing = true;
+    state.dataGlobal->DoingSizing = true;
     SizingManager::ManageSizing(state);
-    DataGlobals::DoingSizing = false;
-    DataGlobals::SysSizingCalc = false;
+    state.dataGlobal->DoingSizing = false;
+    state.dataGlobal->SysSizingCalc = false;
     DataSizing::CurZoneEqNum = 1;
     DataSizing::ZoneEqSizing.allocate(1);
 
@@ -7481,7 +7481,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultispeedDXCoilSizing)
     DataZoneEquipment::ZoneEquipInputsFilled = true;
     thisSys->getUnitarySystemInputData(state, compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
 
-    OutputReportPredefined::SetPredefinedTables();
+    OutputReportPredefined::SetPredefinedTables(state);
 
     DataSizing::ZoneSizingRunDone = true;
     DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).DesignSizeFromParent = false;
@@ -7835,7 +7835,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_WaterToAirHeatPump)
     ASSERT_EQ(1, state.dataUnitarySystems->numUnitarySystems); // only 1 unitary system above so expect 1 as number of unitary system objects
     EXPECT_EQ(thisSys->UnitType, DataHVACGlobals::cFurnaceTypes(compTypeOfNum)); // compare UnitarySystem type string to valid type
 
-    DataGlobals::SysSizingCalc = false; // DISABLE SIZING - don't call UnitarySystem::sizeSystem, much more work needed to set up sizing arrays
+    state.dataGlobal->SysSizingCalc = false; // DISABLE SIZING - don't call UnitarySystem::sizeSystem, much more work needed to set up sizing arrays
 
     InletNode = thisSys->AirInNode;
     OutletNode = thisSys->AirOutNode;
@@ -7883,7 +7883,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_WaterToAirHeatPump)
     DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, 101325.0, 20.0, 0.0); // initialize RhoAir
     DataLoopNode::Node(InletNode).MassFlowRateMaxAvail = thisSys->m_DesignFanVolFlowRate * DataEnvironment::StdRhoAir;
 
-    OutputReportPredefined::SetPredefinedTables();
+    OutputReportPredefined::SetPredefinedTables(state);
     // system output should match RemainingOutputRequired = 1000.0 W (heating mode)
 
     int AirLoopNum = 0;
@@ -8171,7 +8171,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ASHRAEModel_WaterCoils)
     ASSERT_EQ(1, state.dataUnitarySystems->numUnitarySystems); // only 1 unitary system above so expect 1 as number of unitary system objects
     EXPECT_EQ(thisSys->UnitType, DataHVACGlobals::cFurnaceTypes(compTypeOfNum)); // compare UnitarySystem type string to valid type
 
-    DataGlobals::SysSizingCalc = false; // DISABLE SIZING - don't call UnitarySystem::sizeSystem, much more work needed to set up sizing arrays
+    state.dataGlobal->SysSizingCalc = false; // DISABLE SIZING - don't call UnitarySystem::sizeSystem, much more work needed to set up sizing arrays
 
     InletNode = thisSys->AirInNode;
     OutletNode = thisSys->AirOutNode;
@@ -8220,7 +8220,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ASHRAEModel_WaterCoils)
     DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, 101325.0, 20.0, 0.0); // initialize RhoAir
     DataLoopNode::Node(InletNode).MassFlowRateMaxAvail = thisSys->m_DesignFanVolFlowRate * DataEnvironment::StdRhoAir;
 
-    OutputReportPredefined::SetPredefinedTables();
+    OutputReportPredefined::SetPredefinedTables(state);
     // call once to initialize some variables (i.e., min air flow rate not correct on first pass)
     int AirLoopNum = 0;
     int CompIndex = 1;
@@ -9136,10 +9136,10 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultispeedDXHeatingCoilOnly)
     SimulationManager::GetProjectData(state);
     createFacilityElectricPowerServiceObject();
     state.dataGlobal->BeginSimFlag = true;
-    DataGlobals::DoingSizing = true;
+    state.dataGlobal->DoingSizing = true;
     SizingManager::ManageSizing(state);
-    DataGlobals::DoingSizing = false;
-    DataGlobals::SysSizingCalc = false;
+    state.dataGlobal->DoingSizing = false;
+    state.dataGlobal->SysSizingCalc = false;
     DataSizing::CurZoneEqNum = 1;
     DataSizing::ZoneEqSizing.allocate(1);
 
@@ -9153,7 +9153,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultispeedDXHeatingCoilOnly)
     thisSys->getUnitarySystemInputData(state, compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
     EXPECT_FALSE(ErrorsFound);                                                          // expect no errors
 
-    OutputReportPredefined::SetPredefinedTables();
+    OutputReportPredefined::SetPredefinedTables(state);
 
     DataSizing::ZoneSizingRunDone = true;
     DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).DesignSizeFromParent = false;
@@ -9925,13 +9925,13 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultiSpeedCoils_SingleMode)
     BranchInputManager::ManageBranchInput(state); // just gets input and returns.
 
     DataHVACGlobals::NumPrimaryAirSys = 1;
-    DataAirSystems::PrimaryAirSystem.allocate(1);
-    DataAirSystems::PrimaryAirSystem(1).NumBranches = 1;
-    DataAirSystems::PrimaryAirSystem(1).Branch.allocate(1);
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).TotalComponents = 1;
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp.allocate(1);
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp(1).Name = "UNITARY SYSTEM MODEL";
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp(1).TypeOf = "AirLoopHVAC:UnitarySystem";
+    state.dataAirSystemsData->PrimaryAirSystems.allocate(1);
+    state.dataAirSystemsData->PrimaryAirSystems(1).NumBranches = 1;
+    state.dataAirSystemsData->PrimaryAirSystems(1).Branch.allocate(1);
+    state.dataAirSystemsData->PrimaryAirSystems(1).Branch(1).TotalComponents = 1;
+    state.dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp.allocate(1);
+    state.dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).Name = "UNITARY SYSTEM MODEL";
+    state.dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).TypeOf = "AirLoopHVAC:UnitarySystem";
 
     DataZoneControls::NumTempControlledZones = 1;
     DataZoneControls::TempControlledZone.allocate(DataZoneControls::NumTempControlledZones);
@@ -9947,7 +9947,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultiSpeedCoils_SingleMode)
     DataZoneEquipment::ZoneEquipInputsFilled = true;
     thisSys->getUnitarySystemInputData(state, compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
 
-    OutputReportPredefined::SetPredefinedTables();
+    OutputReportPredefined::SetPredefinedTables(state);
 
     ControlZoneNum = 1;
     DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(1);
@@ -9978,7 +9978,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultiSpeedCoils_SingleMode)
     DataEnvironment::OutWetBulbTemp = 30.0;
 
     state.dataAirLoop->AirLoopControlInfo.allocate(1);
-    DataGlobals::SysSizingCalc = true;
+    state.dataGlobal->SysSizingCalc = true;
 
     thisSys->m_ZoneInletNode = DataZoneEquipment::ZoneEquipConfig(1).InletNode(1);
 
@@ -11025,10 +11025,10 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultispeedDXCoilHeatRecoveryHandlin
     createFacilityElectricPowerServiceObject();
 
     state.dataGlobal->BeginSimFlag = true;
-    DataGlobals::DoingSizing = true;
+    state.dataGlobal->DoingSizing = true;
     SizingManager::ManageSizing(state);
-    DataGlobals::DoingSizing = false;
-    DataGlobals::SysSizingCalc = false;
+    state.dataGlobal->DoingSizing = false;
+    state.dataGlobal->SysSizingCalc = false;
     DataSizing::CurZoneEqNum = 1;
     DataSizing::ZoneEqSizing.allocate(1);
 
@@ -11154,11 +11154,11 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_SizingWithFans)
     DataSizing::FinalSysSizing(DataSizing::CurSysNum).DesCoolVolFlow = 1.005;
     DataSizing::FinalSysSizing(DataSizing::CurSysNum).DesOutAirVolFlow = 0.2;
 
-    DataAirSystems::PrimaryAirSystem.allocate(1);
-    DataAirSystems::PrimaryAirSystem(DataSizing::CurSysNum).NumOACoolCoils = 0;
-    DataAirSystems::PrimaryAirSystem(DataSizing::CurSysNum).SupFanNum = 0;
-    DataAirSystems::PrimaryAirSystem(DataSizing::CurSysNum).RetFanNum = 0;
-    DataAirSystems::PrimaryAirSystem(DataSizing::CurSysNum).supFanModelTypeEnum = DataAirSystems::fanModelTypeNotYetSet;
+    state.dataAirSystemsData->PrimaryAirSystems.allocate(1);
+    state.dataAirSystemsData->PrimaryAirSystems(DataSizing::CurSysNum).NumOACoolCoils = 0;
+    state.dataAirSystemsData->PrimaryAirSystems(DataSizing::CurSysNum).SupFanNum = 0;
+    state.dataAirSystemsData->PrimaryAirSystems(DataSizing::CurSysNum).RetFanNum = 0;
+    state.dataAirSystemsData->PrimaryAirSystems(DataSizing::CurSysNum).supFanModelTypeEnum = DataAirSystems::fanModelTypeNotYetSet;
 
     DataSizing::SysSizingRunDone = true;
     DataSizing::SysSizInput.allocate(1);
@@ -11230,7 +11230,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_SizingWithFans)
     // clean
     DataSizing::NumSysSizInput = 0;
     DataSizing::FinalSysSizing.deallocate();
-    DataAirSystems::PrimaryAirSystem.deallocate();
+    state.dataAirSystemsData->PrimaryAirSystems.deallocate();
     DataSizing::SysSizInput.deallocate();
     DataSizing::UnitarySysEqSizing.deallocate();
     DataSizing::OASysEqSizing.deallocate();
@@ -11896,7 +11896,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_FractionOfAutoSizedCoolingValueTes
     thisSys->getUnitarySystemInputData(state, compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
     EXPECT_FALSE(ErrorsFound);                                                          // expect no errors
 
-    OutputReportPredefined::SetPredefinedTables();
+    OutputReportPredefined::SetPredefinedTables(state);
     DataSizing::ZoneSizingRunDone = true;
     // DataSizing::NumPltSizInput = 2;
 
@@ -12038,7 +12038,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_FlowPerCoolingCapacityTest)
     thisSys->getUnitarySystemInputData(state, compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
     EXPECT_FALSE(ErrorsFound);                                                          // expect no errors
 
-    OutputReportPredefined::SetPredefinedTables();
+    OutputReportPredefined::SetPredefinedTables(state);
     DataSizing::ZoneSizingRunDone = true;
 
     DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state.dataWaterCoils->WaterCoil(1).Name;
@@ -12476,7 +12476,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInputwithTradeOff)
     UnitarySystems::UnitarySys::factory(state, DataHVACGlobals::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &state.dataUnitarySystems->unitarySys[0];
 
-    DataGlobals::DoCoilDirectSolutions = true;
+    state.dataGlobal->DoCoilDirectSolutions = true;
     DataZoneEquipment::ZoneEquipInputsFilled = true;                                    // indicate zone data is available
     thisSys->getUnitarySystemInputData(state, compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
     EXPECT_FALSE(ErrorsFound);                                                          // expect no errors
@@ -14091,7 +14091,7 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
     bool CoolingActive = true;
     int OAUnitNum = 0;
     Real64 OAUCoilOutTemp = 0.0;
-    DataGlobals::SysSizingCalc = false;
+    state.dataGlobal->SysSizingCalc = false;
     DataSizing::CurSysNum = 1;
     bool ZoneEquipFlag = false;
     // simulate function is overloaded, but only to report back SysOutputProvided and LatOutputProvided. Either signature should give same result.
@@ -14683,7 +14683,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_VariableSpeedDXCoilsNoLoadFlowRate
     EXPECT_EQ(thisSys->m_MaxHeatAirVolFlow, DataSizing::AutoSize);
     EXPECT_EQ(thisSys->m_MaxNoCoolHeatAirVolFlow, DataSizing::AutoSize);
 
-    OutputReportPredefined::SetPredefinedTables();
+    OutputReportPredefined::SetPredefinedTables(state);
     FirstHVACIteration = false;
     state.dataGlobal->BeginEnvrnFlag = false;
     int AirLoopNum = 0;
@@ -14991,7 +14991,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsNoLoadFlowRateSiz
     EXPECT_EQ(thisSys->m_MaxNoCoolHeatAirVolFlow, DataSizing::AutoSize);
     EXPECT_EQ(thisSys->m_NoLoadAirFlowRateRatio, 1.0);
 
-    OutputReportPredefined::SetPredefinedTables();
+    OutputReportPredefined::SetPredefinedTables(state);
     FirstHVACIteration = false;
     state.dataGlobal->BeginEnvrnFlag = false;
     int AirLoopNum = 0;
@@ -15353,7 +15353,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsDirectSolutionTes
                       latOut);
      EXPECT_NEAR(thisSys->m_CycRatio, 0.02422, 0.001);
      EXPECT_NEAR(sensOut, -227.705, 0.1);
-     DataGlobals::DoCoilDirectSolutions = true;
+     state.dataGlobal->DoCoilDirectSolutions = true;
      thisSys->FullOutput.resize(3);
      thisSys->simulate(state,
                       thisSys->Name,
@@ -15373,7 +15373,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsDirectSolutionTes
      DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputRequired = -12000.0;
      DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -12000.0;
      DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = -5000.0;
-     DataGlobals::DoCoilDirectSolutions = false;
+     state.dataGlobal->DoCoilDirectSolutions = false;
      thisSys->simulate(state,
                       thisSys->Name,
                       FirstHVACIteration,
@@ -15390,7 +15390,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsDirectSolutionTes
      EXPECT_NEAR(thisSys->m_SpeedRatio, 0.228062, 0.001);
      EXPECT_NEAR(sensOut, -11998.0, 3.0);
 
-     DataGlobals::DoCoilDirectSolutions = true;
+     state.dataGlobal->DoCoilDirectSolutions = true;
      thisSys->simulate(state,
                       thisSys->Name,
                       FirstHVACIteration,
@@ -15554,8 +15554,8 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_SetpointControlCyclingFan)
     UnitarySystems::UnitarySys::factory(state, DataHVACGlobals::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &state.dataUnitarySystems->unitarySys[0];
 
-    DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->NumOfTimeStepInHour = 1;
+    state.dataGlobal->MinutesPerTimeStep = 60;
     DataZoneEquipment::ZoneEquipInputsFilled = true;                                    // indicate zone data is available
     thisSys->getUnitarySystemInputData(state, compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
     std::string const error_string = delimited_string({
@@ -15690,7 +15690,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_FuelHeatCoilStptNodeTest)
     thisSys->getUnitarySystemInputData(state, compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
     EXPECT_FALSE(ErrorsFound);                                                          // expect no errors
 
-    OutputReportPredefined::SetPredefinedTables();
+    OutputReportPredefined::SetPredefinedTables(state);
 
     // UnitarySystem used as zone equipment will not be modeled when FirstHAVCIteration is true, first time FirstHVACIteration = false will disable
     // the 'return' on FirstHVACIteration = true set FirstHVACIteration to false for unit testing to size water coils
@@ -15886,7 +15886,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_ElecHeatCoilStptNodeTest)
     thisSys->getUnitarySystemInputData(state, compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
     EXPECT_FALSE(ErrorsFound);                                                          // expect no errors
 
-    OutputReportPredefined::SetPredefinedTables();
+    OutputReportPredefined::SetPredefinedTables(state);
 
     // UnitarySystem used as zone equipment will not be modeled when FirstHAVCIteration is true, first time FirstHVACIteration = false will disable
     // the 'return' on FirstHVACIteration = true set FirstHVACIteration to false for unit testing to size water coils
@@ -16200,7 +16200,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_DesuperHeatCoilStptNodeTest)
     thisSys->getUnitarySystemInputData(state, compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
     EXPECT_FALSE(ErrorsFound);                                                          // expect no errors
 
-    OutputReportPredefined::SetPredefinedTables();
+    OutputReportPredefined::SetPredefinedTables(state);
 
     // UnitarySystem used as zone equipment will not be modeled when FirstHAVCIteration is true, first time FirstHVACIteration = false will disable
     // the 'return' on FirstHVACIteration = true set FirstHVACIteration to false for unit testing to size water coils

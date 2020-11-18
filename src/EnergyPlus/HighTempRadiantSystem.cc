@@ -109,8 +109,6 @@ namespace HighTempRadiantSystem {
     // USE STATEMENTS:
     // Use statements for data only modules
     // Using/Aliasing
-    using DataGlobals::DisplayExtraWarnings;
-    using DataGlobals::SysSizingCalc;
     using DataHVACGlobals::SmallLoad;
 
     // Data
@@ -699,7 +697,6 @@ namespace HighTempRadiantSystem {
         // na
 
         // Using/Aliasing
-        using DataGlobals::NumOfZones;
         using DataZoneEquipment::CheckZoneEquipmentList;
         using DataZoneEquipment::ZoneEquipInputsFilled;
 
@@ -721,7 +718,7 @@ namespace HighTempRadiantSystem {
 
         // FLOW:
         if (firstTime) {
-            ZeroSourceSumHATsurf.dimension(NumOfZones, 0.0);
+            ZeroSourceSumHATsurf.dimension(state.dataGlobal->NumOfZones, 0.0);
             QHTRadSource.dimension(NumOfHighTempRadSys, 0.0);
             QHTRadSrcAvg.dimension(NumOfHighTempRadSys, 0.0);
             LastQHTRadSrc.dimension(NumOfHighTempRadSys, 0.0);
@@ -735,13 +732,13 @@ namespace HighTempRadiantSystem {
         if (!ZoneEquipmentListChecked && ZoneEquipInputsFilled) {
             ZoneEquipmentListChecked = true;
             for (Loop = 1; Loop <= NumOfHighTempRadSys; ++Loop) {
-                if (CheckZoneEquipmentList("ZoneHVAC:HighTemperatureRadiant", HighTempRadSys(Loop).Name)) continue;
+                if (CheckZoneEquipmentList(state, "ZoneHVAC:HighTemperatureRadiant", HighTempRadSys(Loop).Name)) continue;
                 ShowSevereError(state, "InitHighTempRadiantSystem: Unit=[ZoneHVAC:HighTemperatureRadiant," + HighTempRadSys(Loop).Name +
                                 "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated.");
             }
         }
 
-        if (!SysSizingCalc && MySizeFlag(RadSysNum)) {
+        if (!state.dataGlobal->SysSizingCalc && MySizeFlag(RadSysNum)) {
             // for each radiant systen do the sizing once.
             SizeHighTempRadiantSystem(state, RadSysNum);
             MySizeFlag(RadSysNum) = false;
@@ -977,8 +974,8 @@ namespace HighTempRadiantSystem {
 
     void CalcHighTempRadiantSystemSP(
         EnergyPlusData &state,
-        bool const EP_UNUSED(FirstHVACIteration), // true if this is the first HVAC iteration at this system time step !unused1208
-        int const RadSysNum                       // name of the low temperature radiant system
+        [[maybe_unused]] bool const FirstHVACIteration, // true if this is the first HVAC iteration at this system time step !unused1208
+        int const RadSysNum                             // name of the low temperature radiant system
     )
     {
 
@@ -1176,7 +1173,6 @@ namespace HighTempRadiantSystem {
         // na
 
         // Using/Aliasing
-        using DataGlobals::TimeStepZone;
         using DataHeatBalFanSys::SumConvHTRadSys;
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
@@ -1200,11 +1196,11 @@ namespace HighTempRadiantSystem {
         if (LastSysTimeElapsed(RadSysNum) == SysTimeElapsed) {
             // Still iterating or reducing system time step, so subtract old values which were
             // not valid
-            QHTRadSrcAvg(RadSysNum) -= LastQHTRadSrc(RadSysNum) * LastTimeStepSys(RadSysNum) / TimeStepZone;
+            QHTRadSrcAvg(RadSysNum) -= LastQHTRadSrc(RadSysNum) * LastTimeStepSys(RadSysNum) / state.dataGlobal->TimeStepZone;
         }
 
         // Update the running average and the "last" values with the current values of the appropriate variables
-        QHTRadSrcAvg(RadSysNum) += QHTRadSource(RadSysNum) * TimeStepSys / TimeStepZone;
+        QHTRadSrcAvg(RadSysNum) += QHTRadSource(RadSysNum) * TimeStepSys / state.dataGlobal->TimeStepZone;
 
         LastQHTRadSrc(RadSysNum) = QHTRadSource(RadSysNum);
         LastSysTimeElapsed(RadSysNum) = SysTimeElapsed;
@@ -1321,7 +1317,6 @@ namespace HighTempRadiantSystem {
         // na
 
         // Using/Aliasing
-        using DataGlobals::NumOfZones;
         using DataHeatBalance::Zone;
         using DataHeatBalFanSys::MaxRadHeatFlux;
         using DataHeatBalFanSys::QHTRadSysSurf;
@@ -1403,7 +1398,7 @@ namespace HighTempRadiantSystem {
         // gets added to the zones, we must account for it somehow.  This assumption
         // that all energy radiated to people is converted to convective energy is
         // not very precise, but at least it conserves energy.
-        for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+        for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             SumConvHTRadSys(ZoneNum) += QHTRadSysToPerson(ZoneNum);
         }
     }
@@ -1505,7 +1500,7 @@ namespace HighTempRadiantSystem {
 
             Area = Surface(SurfNum).Area;
 
-            if (Surface(SurfNum).Class == SurfaceClass_Window) {
+            if (Surface(SurfNum).Class == SurfaceClass::Window) {
                 if (SurfWinShadingFlag(SurfNum) == IntShadeOn || SurfWinShadingFlag(SurfNum) == IntBlindOn) {
                     // The area is the shade or blind area = the sum of the glazing area and the divider area (which is zero if no divider)
                     Area += SurfWinDividerArea(SurfNum);

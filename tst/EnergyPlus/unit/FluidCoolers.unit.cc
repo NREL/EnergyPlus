@@ -60,7 +60,6 @@
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::FluidCoolers;
-using namespace DataGlobals;
 using namespace EnergyPlus::DataSizing;
 using namespace ObjexxFCL;
 

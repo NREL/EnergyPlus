@@ -76,7 +76,6 @@ namespace EnergyPlus {
 namespace ResultsFramework {
 
     using namespace OutputProcessor;
-    using DataGlobals::DisplayExtraWarnings;
     using OutputProcessor::RealVariableType;
     using OutputProcessor::RealVariables;
 

@@ -86,9 +86,9 @@ void BaseSizer::initializeWithinEP(EnergyPlusData &state,
     this->curDuctType = DataSizing::CurDuctType;
     this->numPrimaryAirSys = DataHVACGlobals::NumPrimaryAirSys;
     this->numSysSizInput = DataSizing::NumSysSizInput;
-    this->doSystemSizing = DataGlobals::DoSystemSizing;
+    this->doSystemSizing = state.dataGlobal->DoSystemSizing;
     this->numZoneSizingInput = DataSizing::NumZoneSizingInput;
-    this->doZoneSizing = DataGlobals::DoZoneSizing;
+    this->doZoneSizing = state.dataGlobal->DoZoneSizing;
     this->curTermUnitSizingNum = DataSizing::CurTermUnitSizingNum;
     this->termUnitSingDuct = DataSizing::TermUnitSingDuct;
     this->termUnitPIU = DataSizing::TermUnitPIU;
@@ -109,7 +109,7 @@ void BaseSizer::initializeWithinEP(EnergyPlusData &state,
     this->sysSizingInputData = DataSizing::SysSizInput;
     this->finalSysSizing = DataSizing::FinalSysSizing;
     this->plantSizData = DataSizing::PlantSizData;
-    this->primaryAirSystem = DataAirSystems::PrimaryAirSystem;
+    this->primaryAirSystem = state.dataAirSystemsData->PrimaryAirSystems;
     this->airLoopControlInfo = state.dataAirLoop->AirLoopControlInfo;
     this->airloopDOAS = state.dataAirLoopHVACDOAS->airloopDOAS;
     if (EnergyPlus::BaseSizer::isValidCoilType(this->compType)) { // coil reports fail if compType is not one of DataHVACGlobals::cAllCoilTypes
@@ -396,7 +396,7 @@ void BaseSizer::selectSizerOutput(EnergyPlusData &state, bool &errorsFound)
                     this->reportSizerOutput(state,
                         this->compType, this->compName, "User-Specified " + this->sizingStringScalable + this->sizingString, this->originalValue);
             }
-            if (DataGlobals::DisplayExtraWarnings && this->dataAutosizable) {
+            if (state.dataGlobal->DisplayExtraWarnings && this->dataAutosizable) {
                 if ((std::abs(this->autoSizedValue - this->originalValue) / this->originalValue) > DataSizing::AutoVsHardSizingThreshold) {
                     std::string msg = this->callingRoutine + ": Potential issue with equipment sizing for " + this->compType + ' ' + this->compName;
                     this->addErrorMessage(msg);
@@ -522,7 +522,7 @@ void BaseSizer::select2StgDXHumCtrlSizerOutput(EnergyPlusData &state, bool &erro
                                             this->autoSizedValue);
                 }
             }
-            if (DataGlobals::DisplayExtraWarnings) {
+            if (state.dataGlobal->DisplayExtraWarnings) {
                 if ((std::abs(this->autoSizedValue - this->originalValue) / this->originalValue) > DataSizing::AutoVsHardSizingThreshold) {
                     std::string msg = this->callingRoutine + ": Potential issue with equipment sizing for " + this->compType + ' ' + this->compName;
                     this->addErrorMessage(msg);

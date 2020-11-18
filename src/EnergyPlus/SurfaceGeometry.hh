@@ -71,6 +71,7 @@ namespace SurfaceGeometry {
     // Using/Aliasing
     using DataSurfaces::SurfaceData;
     using DataVectorTypes::Vector;
+    using DataSurfaces::SurfaceClass;
 
     enum enclosureType
     {
@@ -80,7 +81,7 @@ namespace SurfaceGeometry {
 
     void SetupZoneGeometry(EnergyPlusData &state, bool &ErrorsFound);
 
-    void AllocateModuleArrays();
+    void AllocateModuleArrays(EnergyPlusData &state);
 
     void AllocateSurfaceWindows(int NumSurfaces);
 
@@ -115,7 +116,7 @@ namespace SurfaceGeometry {
                           int const TotDetailedRoofs,       // Number of RoofCeiling:Detailed items to obtain
                           int const TotDetailedFloors,      // Number of Floor:Detailed items to obtain
                           const Array1D_string &BaseSurfCls, // Valid Classes for Base Surfaces
-                          const Array1D_int &BaseSurfIDs,
+                          const Array1D<SurfaceClass> &BaseSurfIDs,
                           int &NeedToAddSurfaces // Number of surfaces to add, based on unentered IZ surfaces
     );
 
@@ -132,7 +133,7 @@ namespace SurfaceGeometry {
                          int const TotRectGCFloors,     // Number of Floors with Ground Contact to obtain
                          int const TotRectIntFloors,    // Number of Adiabatic Walls to obtain
                          int const TotRectIZFloors,     // Number of Interzone Floors to obtain
-                         const Array1D_int &BaseSurfIDs, // ID Assignments for valid surface classes
+                         const Array1D<SurfaceClass> &BaseSurfIDs, // ID Assignments for valid surface classes
                          int &NeedToAddSurfaces         // Number of surfaces to add, based on unentered IZ surfaces
     );
 
@@ -150,7 +151,7 @@ namespace SurfaceGeometry {
                              int &SurfNum,                    // Count of Current SurfaceNumber
                              int const TotHTSubs,             // Number of Heat Transfer SubSurfaces to obtain
                              const Array1D_string &SubSurfCls, // Valid Classes for Sub Surfaces
-                             const Array1D_int &SubSurfIDs,    // ID Assignments for valid sub surface classes
+                             const Array1D<SurfaceClass> &SubSurfIDs,    // ID Assignments for valid sub surface classes
                              int &AddedSubSurfaces,           // Subsurfaces added when windows reference Window5
                              int &NeedToAddSurfaces           // Number of surfaces to add, based on unentered IZ surfaces
     );
@@ -164,7 +165,7 @@ namespace SurfaceGeometry {
                             int const TotIZWindows,       // Number of Interzone Window SubSurfaces to obtain
                             int const TotIZDoors,         // Number of Interzone Door SubSurfaces to obtain
                             int const TotIZGlazedDoors,   // Number of Interzone Glass Door SubSurfaces to obtain
-                            const Array1D_int &SubSurfIDs, // ID Assignments for valid sub surface classes
+                            const Array1D<SurfaceClass> &SubSurfIDs, // ID Assignments for valid sub surface classes
                             int &AddedSubSurfaces,        // Subsurfaces added when windows reference Window5
                             int &NeedToAddSubSurfaces     // Number of surfaces to add, based on unentered IZ surfaces
     );
@@ -425,8 +426,8 @@ struct SurfaceGeometryData : BaseGlobalStruct {
 
     Array1D_string const BaseSurfCls;
     Array1D_string const SubSurfCls;
-    Array1D_int const BaseSurfIDs;
-    Array1D_int const SubSurfIDs;
+    Array1D<DataSurfaces::SurfaceClass> const BaseSurfIDs;
+    Array1D<DataSurfaces::SurfaceClass> const SubSurfIDs;
     int const UnenteredAdjacentZoneSurface = -998; // allows users to enter one zone surface ("Zone")
                                                   // referencing another in adjacent zone
     int const UnreconciledZoneSurface = -999; // interim value between entering surfaces ("Surface") and reconciling
@@ -468,8 +469,8 @@ struct SurfaceGeometryData : BaseGlobalStruct {
     SurfaceGeometryData() :
         BaseSurfCls(3, {"WALL", "FLOOR", "ROOF"}),
         SubSurfCls(6, {"WINDOW", "DOOR", "GLASSDOOR", "SHADING", "TUBULARDAYLIGHTDOME", "TUBULARDAYLIGHTDIFFUSER"}),
-        BaseSurfIDs(3, {DataSurfaces::SurfaceClass_Wall, DataSurfaces::SurfaceClass_Floor, DataSurfaces::SurfaceClass_Roof}),
-        SubSurfIDs(6, {DataSurfaces::SurfaceClass_Window, DataSurfaces::SurfaceClass_Door, DataSurfaces::SurfaceClass_GlassDoor, DataSurfaces::SurfaceClass_Shading, DataSurfaces::SurfaceClass_TDD_Dome, DataSurfaces::SurfaceClass_TDD_Diffuser})
+        BaseSurfIDs(3, {DataSurfaces::SurfaceClass::Wall, DataSurfaces::SurfaceClass::Floor, DataSurfaces::SurfaceClass::Roof}),
+        SubSurfIDs(6, {DataSurfaces::SurfaceClass::Window, DataSurfaces::SurfaceClass::Door, DataSurfaces::SurfaceClass::GlassDoor, DataSurfaces::SurfaceClass::Shading, DataSurfaces::SurfaceClass::TDD_Dome, DataSurfaces::SurfaceClass::TDD_Diffuser})
     {}
 };
 } // namespace EnergyPlus

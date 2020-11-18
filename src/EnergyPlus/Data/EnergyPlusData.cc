@@ -59,6 +59,7 @@ namespace EnergyPlus {
         this->dataAirflowNetworkBalanceManager = std::unique_ptr<AirflowNetworkBalanceManagerData>(new AirflowNetworkBalanceManagerData);
         this->dataAirLoop = std::unique_ptr<DataAirLoopData>(new DataAirLoopData);
         this->dataAirLoopHVACDOAS = std::unique_ptr<AirLoopHVACDOASData>(new AirLoopHVACDOASData);
+        this->dataAirSystemsData = std::unique_ptr<AirSystemsData>(new AirSystemsData);
         this->dataBaseboardElectric = std::unique_ptr<BaseboardElectricData>(new BaseboardElectricData);
         this->dataBaseboardRadiator = std::unique_ptr<BaseboardRadiatorData>(new BaseboardRadiatorData);
         this->dataBoilers = std::unique_ptr<BoilersData>(new BoilersData);
@@ -131,6 +132,7 @@ namespace EnergyPlus {
         this->dataAirflowNetworkBalanceManager->clear_state();
         this->dataAirLoop->clear_state();
         this->dataAirLoopHVACDOAS->clear_state();
+        this->dataAirSystemsData->clear_state();
         this->dataBaseboardElectric->clear_state();
         this->dataBaseboardRadiator->clear_state();
         this->dataBoilers->clear_state();
@@ -196,5 +198,15 @@ namespace EnergyPlus {
         this->dataZoneEquipmentManager->clear_state();
         this->dataZonePlenum->clear_state();
         this->dataZoneTempPredictorCorrector->clear_state();
+
+        this->files.eso.close();
+        this->files.err_stream.reset();
+        this->files.debug.close();
+        this->files.zsz.close();
+        this->files.ssz.close();
+        this->files.mtr.close();
+        this->files.shade.close();
+        this->files.mtr.close();
+        this->files.err_stream.reset();
     }
 }

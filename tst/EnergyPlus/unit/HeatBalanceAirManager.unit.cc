@@ -80,7 +80,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceAirManager_RoomAirModelType_Test)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::NumOfZones = 2;
+    state.dataGlobal->NumOfZones = 2;
 
     DataHeatBalance::Zone.allocate(2);
     DataHeatBalance::Zone(1).Name = "SOUTH SKIN";

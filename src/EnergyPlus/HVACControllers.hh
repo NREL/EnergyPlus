@@ -61,6 +61,9 @@
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+
 namespace HVACControllers {
 
     // Using/Aliasing
@@ -377,10 +380,11 @@ namespace HVACControllers {
     // Beginning of Statistics subroutines for the Controller Module
     // *****************************************************************************
 
-    void TrackAirLoopControllers(
+    void TrackAirLoopControllers(EnergyPlusData &state,
         int const AirLoopNum, int const WarmRestartStatus, int const AirLoopIterMax, int const AirLoopIterTot, int const AirLoopNumCalls);
 
-    void TrackAirLoopController(int const AirLoopNum,       // Air loop index
+    void TrackAirLoopController(EnergyPlusData &state,
+                                int const AirLoopNum,       // Air loop index
                                 int const AirLoopControlNum // Controller index on this air loop
     );
 
@@ -418,11 +422,11 @@ namespace HVACControllers {
                                    int const Operation, // Operation to execute
                                    bool const IsConvergedFlag);
 
-    std::string CreateHVACTimeString();
+    std::string CreateHVACTimeString(EnergyPlusData &state);
 
-    std::string CreateHVACStepFullString();
+    std::string CreateHVACStepFullString(EnergyPlusData &state);
 
-    std::string MakeHVACTimeIntervalString();
+    std::string MakeHVACTimeIntervalString(EnergyPlusData &state);
 
     //        End of Tracing subroutines for the Controller Module
 

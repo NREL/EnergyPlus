@@ -119,10 +119,6 @@ namespace OutdoorAirUnit {
 
     // Using/Aliasing
     using namespace DataLoopNode;
-    using DataGlobals::DisplayExtraWarnings;
-    using DataGlobals::SysSizingCalc;
-    using DataGlobals::WarmupFlag;
-    using DataGlobals::ZoneSizingCalc;
     using DataHVACGlobals::BlowThru;
     using DataHVACGlobals::ContFanCycCoil;
     using DataHVACGlobals::DrawThru;
@@ -277,7 +273,7 @@ namespace OutdoorAirUnit {
 
         ZoneEqOutdoorAirUnit = true;
 
-        if (ZoneSizingCalc || SysSizingCalc) return;
+        if (state.dataGlobal->ZoneSizingCalc || state.dataGlobal->SysSizingCalc) return;
 
         InitOutdoorAirUnit(state, OAUnitNum, ZoneNum, FirstHVACIteration);
 
@@ -285,7 +281,7 @@ namespace OutdoorAirUnit {
 
         // CALL UpdateOutdoorAirUnit(OAUnitNum, FirstHVACIteration)
 
-        ReportOutdoorAirUnit(OAUnitNum);
+        ReportOutdoorAirUnit(state, OAUnitNum);
 
         ZoneEqOutdoorAirUnit = false;
     }
@@ -1123,7 +1119,6 @@ CurrentModuleObjects(CO_OAEqList), ComponentListName);
         using DataEnvironment::OutBaroPress;
         using DataEnvironment::OutHumRat;
         using DataEnvironment::StdRhoAir;
-        using DataGlobals::AnyPlantInModel;
         using DataHeatBalFanSys::MAT;
         using DataHeatBalFanSys::ZoneAirHumRat;
         using DataHVACGlobals::ShortenTimeStepSys;
@@ -1232,7 +1227,7 @@ CurrentModuleObjects(CO_OAEqList), ComponentListName);
             }
 
             MyPlantScanFlag(OAUnitNum) = false;
-        } else if (MyPlantScanFlag(OAUnitNum) && !AnyPlantInModel) {
+        } else if (MyPlantScanFlag(OAUnitNum) && !state.dataGlobal->AnyPlantInModel) {
             MyPlantScanFlag(OAUnitNum) = false;
         }
 
@@ -1240,13 +1235,13 @@ CurrentModuleObjects(CO_OAEqList), ComponentListName);
         if (!ZoneEquipmentListChecked && ZoneEquipInputsFilled) {
             ZoneEquipmentListChecked = true;
             for (Loop = 1; Loop <= NumOfOAUnits; ++Loop) {
-                if (CheckZoneEquipmentList(CurrentModuleObject, OutAirUnit(Loop).Name)) continue;
+                if (CheckZoneEquipmentList(state, CurrentModuleObject, OutAirUnit(Loop).Name)) continue;
                 ShowSevereError(state, "InitOutdoorAirUnit: Zone Outdoor Air Unit=[" + CurrentModuleObject + ',' + OutAirUnit(Loop).Name +
                                 "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated.");
             }
         }
 
-        if (!SysSizingCalc && MySizeFlag(OAUnitNum) && !MyPlantScanFlag(OAUnitNum)) {
+        if (!state.dataGlobal->SysSizingCalc && MySizeFlag(OAUnitNum) && !MyPlantScanFlag(OAUnitNum)) {
 
             SizeOutdoorAirUnit(state, OAUnitNum);
 
@@ -1541,7 +1536,7 @@ CurrentModuleObjects(CO_OAEqList), ComponentListName);
                         OutAirVolFlowUser = OutAirUnit(OAUnitNum).OutAirVolFlow;
                         BaseSizer::reportSizerOutput(state,
                             CurrentModuleObjects(1), OutAirUnit(OAUnitNum).Name, "User-Specified Outdoor Air Flow Rate [m3/s]", OutAirVolFlowUser);
-                        if (DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(OutAirVolFlowDes - OutAirVolFlowUser) / OutAirVolFlowUser) > AutoVsHardSizingThreshold) {
                                 BaseSizer::reportSizerOutput(state, CurrentModuleObjects(1),
                                                              OutAirUnit(OAUnitNum).Name,
@@ -1585,7 +1580,7 @@ CurrentModuleObjects(CO_OAEqList), ComponentListName);
                         ExtAirVolFlowUser = OutAirUnit(OAUnitNum).ExtAirVolFlow;
                         BaseSizer::reportSizerOutput(state,
                             CurrentModuleObjects(1), OutAirUnit(OAUnitNum).Name, "User-Specified Exhaust Air Flow Rate [m3/s]", ExtAirVolFlowUser);
-                        if (DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(ExtAirVolFlowDes - ExtAirVolFlowUser) / ExtAirVolFlowUser) > AutoVsHardSizingThreshold) {
                                 BaseSizer::reportSizerOutput(state, CurrentModuleObjects(1),
                                                              OutAirUnit(OAUnitNum).Name,
@@ -2117,7 +2112,7 @@ CurrentModuleObjects(CO_OAEqList), ComponentListName);
                                  std::string const &EquipType, // the component type
                                  std::string const &EquipName, // the component Name
                                  int const EquipNum,
-                                 int const EP_UNUSED(CompTypeNum), // Component Type -- Integerized for this module
+                                 [[maybe_unused]] int const CompTypeNum, // Component Type -- Integerized for this module
                                  bool const FirstHVACIteration,
                                  int &CompIndex,
                                  bool const Sim // if TRUE, simulate component
@@ -2668,7 +2663,7 @@ CurrentModuleObjects(CO_OAEqList), ComponentListName);
 
     // END SUBROUTINE UpdateOutdoorAirUnit
 
-    void ReportOutdoorAirUnit(int const OAUnitNum) // Index for the outdoor air unit under consideration within the derived types
+    void ReportOutdoorAirUnit(EnergyPlusData &state, int const OAUnitNum) // Index for the outdoor air unit under consideration within the derived types
     {
 
         // SUBROUTINE INFORMATION:
@@ -2716,7 +2711,7 @@ CurrentModuleObjects(CO_OAEqList), ComponentListName);
         OutAirUnit(OAUnitNum).ElecFanEnergy = OutAirUnit(OAUnitNum).ElecFanRate * TimeStepSys * DataGlobalConstants::SecInHour();
 
         if (OutAirUnit(OAUnitNum).FirstPass) { // reset sizing flags so other zone equipment can size normally
-            if (!DataGlobals::SysSizingCalc) {
+            if (!state.dataGlobal->SysSizingCalc) {
                 DataSizing::resetHVACSizingGlobals(DataSizing::CurZoneEqNum, 0, OutAirUnit(OAUnitNum).FirstPass);
             }
         }
