@@ -197,6 +197,8 @@ No changes.
 
 All of the current example files that use `ZoneHVAC:LowTemperatureRadiant:VariableFlow`, `ZoneHVAC:LowTemperatureRadiant:ConstantFlow` and `ZoneHVAC:Baseboard:RadiantConvective:Water`, `ZoneHVAC:Baseboard:RadiantConvective:Steam` will be modified so that the design and parameters are different.
 
+Appropriate changes will be made to the Fortran transition InputRulesFiles. 
+
 ## References ##
 
 None.
