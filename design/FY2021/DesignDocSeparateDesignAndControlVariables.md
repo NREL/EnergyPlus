@@ -227,22 +227,22 @@ The metadata to remain same, so it was taken out to improve readability.
        N1 , \field Hydronic Tubing Inside Diameter
        N2 , \field Hydronic Tubing Outside Diameter
        N3 , \field Hydronic Tubing Conductivity      
-       A5, \field Condensation Control Type
-       N4, \field Condensation Control Dewpoint Offset
-       A6, \field Number of Circuits
-       A7; \field Changeover Delay Time Period Schedule
+       A5 , \field Condensation Control Type
+       N4 , \field Condensation Control Dewpoint Offset
+       A6 , \field Number of Circuits
+       A7 ; \field Changeover Delay Time Period Schedule
 
 **ZoneHVAC:Baseboard:RadiantConvective:Design,**
 
            \memo Design parameters for ZoneHVAC:Baseboard:RadiantConvective objects
-      A1,  \field Name
-      A2,  \field Availability Schedule Name
-      A3,  \field Heating Design Capacity Method
+      A1 ,  \field Name
+      A2 ,  \field Availability Schedule Name
+      A3 ,  \field Heating Design Capacity Method
       N1 , \field Heating Design Capacity Per Floor Area
       N2 , \field Fraction of Autosized Heating Design Capacity
-      N3,  \field Convergence Tolerance
-      N4,  \field Fraction Radiant
-      N5,  \field Fraction of Radiant Energy Incident on People
+      N3 ,  \field Convergence Tolerance
+      N4 ,  \field Fraction Radiant
+      N5 ;  \field Fraction of Radiant Energy Incident on People
 
 ### Modified IDD Objects ####
 
@@ -273,7 +273,7 @@ The metadata to remain same, so it was taken out to improve readability.
        A12, \field Cooling Control Temperature Schedule Name
        A13, \field Number of Circuits
        N12, \field Circuit Length
-       A14, \field Design Object Name
+       A14; \field Design Object Name
 
 **ZoneHVAC:LowTemperatureRadiant:ConstantFlow,**
 
@@ -303,7 +303,7 @@ The metadata to remain same, so it was taken out to improve readability.
        A16, \field Cooling Low Control Temperature Schedule Name
        A17, \field Number of Circuits
        N8 , \field Circuit Length
-       A18, \field Design Object Name
+       A18; \field Design Object Name
 
 **ZoneHVAC:Baseboard:RadiantConvective:Water,**
 
