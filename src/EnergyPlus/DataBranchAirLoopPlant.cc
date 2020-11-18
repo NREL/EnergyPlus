@@ -63,12 +63,6 @@ namespace DataBranchAirLoopPlant {
     // Certain data needs to be shared from Branch to Airloop to Plant and this module should
     // alleviate cyclic dependencies.
 
-    // Pressure Curve Type: None, pressure, or generic curve (if generic it will be a positive value which is the curve manager index)
-    int const PressureCurve_Error(-1);
-    int const PressureCurve_None(0);
-    int const PressureCurve_Pressure(1);
-    int const PressureCurve_Generic(2);
-
     // Parameters for flow Control Types for branch flow resolution inside splitter/mixers
     int const ControlType_Unknown(0);
     int const ControlType_Active(1);       // 'Active'

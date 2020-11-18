@@ -401,7 +401,8 @@ namespace SimAirServingZones {
         static Array1D_int NodeNumbers;        // Outlet node numbers from GetLoopSplitter call
         static Array1D_int InletNodeNumbers;   // Component inlet node numbers from GetBranchData call
         static Array1D_int OutletNodeNumbers;  // Component outlet node numbers from GetBranchData call
-        Array1D_int DummyInteger(2);           // Placeholder for corresponding plant loop branch pressure drop info
+        DataBranchAirLoopPlant::PressureCurveType PressCurveType;
+        int PressCurveIndex;
         static bool ErrorsFound(false);        // TRUE if errors detected in input
         static Array1D_bool PackagedUnit;
         int test;
@@ -759,8 +760,8 @@ namespace SimAirServingZones {
                 GetBranchData(state,
                               state.dataAirSystemsData->PrimaryAirSystems(AirSysNum).Name,
                               BranchNames(BranchNum),
-                              DummyInteger(1),
-                              DummyInteger(2),
+                              PressCurveType,
+                              PressCurveIndex,
                               NumCompsOnBranch,
                               CompTypes,
                               CompNames,

@@ -2709,7 +2709,7 @@ namespace CurveManager {
         using namespace DataIPShortCuts;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        constexpr std::string_view CurveObjectName = "Curve:Functional:PressureDrop";
+        constexpr auto CurveObjectName = "Curve:Functional:PressureDrop";
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumPressure;
@@ -2721,11 +2721,11 @@ namespace CurveManager {
         bool ErrsFound(false); // Set to true if errors in input, fatal at end of routine
         int CurveNum;
 
-        NumPressure = inputProcessor->getNumObjectsFound(state, CurveObjectName.data());
+        NumPressure = inputProcessor->getNumObjectsFound(state, CurveObjectName);
         DataBranchAirLoopPlant::PressureCurve.allocate(NumPressure);
         for (CurveNum = 1; CurveNum <= NumPressure; ++CurveNum) {
             inputProcessor->getObjectItem(state,
-                                          CurveObjectName.data(),
+                                          CurveObjectName,
                                           CurveNum,
                                           Alphas,
                                           NumAlphas,
@@ -2736,7 +2736,7 @@ namespace CurveManager {
                                           _,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurveObjectName.data(), cAlphaFieldNames(1), ErrsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurveObjectName, cAlphaFieldNames(1), ErrsFound);
             DataBranchAirLoopPlant::PressureCurve(CurveNum).Name = Alphas(1);
             DataBranchAirLoopPlant::PressureCurve(CurveNum).EquivDiameter = Numbers(1);
             DataBranchAirLoopPlant::PressureCurve(CurveNum).MinorLossCoeff = Numbers(2);
@@ -2759,7 +2759,7 @@ namespace CurveManager {
 
     void GetPressureCurveTypeAndIndex(EnergyPlusData &state,
                                       std::string const &PressureCurveName, // name of the curve
-                                      int &PressureCurveType,
+                                      DataBranchAirLoopPlant::PressureCurveType &PressureCurveType,
                                       int &PressureCurveIndex)
     {
 
@@ -2774,16 +2774,10 @@ namespace CurveManager {
 
         // METHODOLOGY EMPLOYED:
         // Curve types are:
-        //  PressureCurve_Error       = pressure name was given, but curve is not available
-        //  PressureCurve_None        = no pressure curve for this branch
-        //  PressureCurve_Pressure    = pressure curve based on friction/minor loss
-        //  PressureCurve_Generic     = curvemanager held curve which is function of flow rate
-
-        // Using/Aliasing
-        using DataBranchAirLoopPlant::PressureCurve_Error;
-        using DataBranchAirLoopPlant::PressureCurve_Generic;
-        using DataBranchAirLoopPlant::PressureCurve_None;
-        using DataBranchAirLoopPlant::PressureCurve_Pressure;
+        //  PressureCurveType::Error       = pressure name was given, but curve is not available
+        //  PressureCurveType::None        = no pressure curve for this branch
+        //  PressureCurveType::Pressure    = pressure curve based on friction/minor loss
+        //  PressureCurveType::Generic     = curvemanager held curve which is function of flow rate
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int TempCurveIndex;
@@ -2797,7 +2791,7 @@ namespace CurveManager {
         }
 
         // Initialize
-        PressureCurveType = PressureCurve_None;
+        PressureCurveType = DataBranchAirLoopPlant::PressureCurveType::None;
         PressureCurveIndex = 0;
 
         // Try to retrieve a curve manager object
@@ -2809,7 +2803,7 @@ namespace CurveManager {
             GenericCurveType = state.dataCurveManager->PerfCurve(TempCurveIndex).ObjectType;
             {
                 if (state.dataCurveManager->PerfCurve(TempCurveIndex).NumDims == 1) {
-                    PressureCurveType = PressureCurve_Generic;
+                    PressureCurveType = DataBranchAirLoopPlant::PressureCurveType::Generic;
                     PressureCurveIndex = TempCurveIndex;
                 } else {
                     ShowSevereError(state, "Plant Pressure Simulation: Found error for curve: " + PressureCurveName);
@@ -2833,7 +2827,7 @@ namespace CurveManager {
 
         // See if it is valid
         if (TempCurveIndex > 0) {
-            PressureCurveType = PressureCurve_Pressure;
+            PressureCurveType = DataBranchAirLoopPlant::PressureCurveType::Pressure;
             PressureCurveIndex = TempCurveIndex;
             return;
         }
@@ -2842,12 +2836,12 @@ namespace CurveManager {
 
         // Last check, see if it is blank:
         if (PressureCurveName.empty()) {
-            PressureCurveType = PressureCurve_None;
+            PressureCurveType = DataBranchAirLoopPlant::PressureCurveType::None;
             return;
         }
 
         // At this point, we had a non-blank user entry with no match
-        PressureCurveType = PressureCurve_Error;
+        PressureCurveType = DataBranchAirLoopPlant::PressureCurveType::Error;
     }
 
     Real64 PressureCurveValue(EnergyPlusData &state,

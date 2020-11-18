@@ -404,7 +404,7 @@ namespace PlantPressureSystem {
         int FluidIndex;               // Plant loop level Fluid Index
         int InletNodeNum;             // Component inlet node number
         int OutletNodeNum;            // Component outlet node number
-        int PressureCurveType;        // Type of curve used to evaluate pressure drop
+        DataBranchAirLoopPlant::PressureCurveType pressureCurveType;        // Type of curve used to evaluate pressure drop
         int PressureCurveIndex;       // Curve index for PerfCurve structure
         Real64 NodeMassFlow;          // Nodal mass flow rate {kg/s}
         Real64 NodeTemperature;       // Nodal temperature {C}
@@ -424,7 +424,7 @@ namespace PlantPressureSystem {
         FluidIndex = PlantLoop(LoopNum).FluidIndex;
         InletNodeNum = PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).NodeNumIn;
         OutletNodeNum = PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).NodeNumOut;
-        PressureCurveType = PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).PressureCurveType;
+        pressureCurveType = PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).PressureCurveType;
         PressureCurveIndex = PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).PressureCurveIndex;
 
         // Get nodal conditions
@@ -435,12 +435,12 @@ namespace PlantPressureSystem {
 
         // Call the appropriate pressure calculation routine
         {
-            auto const SELECT_CASE_var(PressureCurveType);
-            if (SELECT_CASE_var == PressureCurve_Pressure) {
+            auto const SELECT_CASE_var(pressureCurveType);
+            if (SELECT_CASE_var == DataBranchAirLoopPlant::PressureCurveType::Pressure) {
                 // DeltaP = [f*(L/D) + K] * (rho * V^2) / 2
                 BranchDeltaPress = PressureCurveValue(state, PressureCurveIndex, NodeMassFlow, NodeDensity, NodeViscosity);
 
-            } else if (SELECT_CASE_var == PressureCurve_Generic) {
+            } else if (SELECT_CASE_var == DataBranchAirLoopPlant::PressureCurveType::Generic) {
                 // DeltaP = func(mdot)
                 // Generic curve, only pass V1=mass flow rate
                 BranchDeltaPress = CurveValue(state, PressureCurveIndex, NodeMassFlow);
@@ -557,7 +557,7 @@ namespace PlantPressureSystem {
                 FoundAPumpOnBranch = false;
                 for (BranchNum = NumBranches - 1; BranchNum >= 2; --BranchNum) { // Working backward (not necessary, but consistent)
                     ++ParallelBranchCounter;
-                    DistributePressureOnBranch(state, 
+                    DistributePressureOnBranch(state,
                         LoopNum, LoopSideNum, BranchNum, ParallelBranchPressureDrops(ParallelBranchCounter), FoundAPumpOnBranch);
                     // Store the branch inlet pressure so we can pass it properly across the splitter
                     ParallelBranchInletPressures(ParallelBranchCounter) =

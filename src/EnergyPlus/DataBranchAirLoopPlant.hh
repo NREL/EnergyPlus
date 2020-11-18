@@ -67,10 +67,13 @@ namespace DataBranchAirLoopPlant {
     constexpr Real64 MassFlowTolerance(0.000000001); // minimum significant mass flow rate (kg/s)
 
     // Pressure Curve Type: None, pressure, or generic curve (if generic it will be a positive value which is the curve manager index)
-    extern int const PressureCurve_Error;
-    extern int const PressureCurve_None;
-    extern int const PressureCurve_Pressure;
-    extern int const PressureCurve_Generic;
+    enum class PressureCurveType {
+        Unassigned = -2,
+        Error = -1,
+        None = 0,
+        Pressure = 1,
+        Generic = 2
+    };
 
     // Parameters for flow Control Types for branch flow resolution inside splitter/mixers
     extern int const ControlType_Unknown;
