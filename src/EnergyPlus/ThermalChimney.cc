@@ -627,7 +627,7 @@ namespace ThermalChimney {
 
             // determine major width and minor width
             for (SurfNum = Zone(ZoneNum).SurfaceFirst + 1; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
-                if (Surface(SurfNum).Class != SurfaceClass_Wall) continue;
+                if (Surface(SurfNum).Class != SurfaceClass::Wall) continue;
 
                 if (Surface(SurfNum).Width > majorW) {
                     majorW = Surface(SurfNum).Width;
@@ -652,7 +652,7 @@ namespace ThermalChimney {
 
                 if (!Surface(SurfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
 
-                if (Surface(SurfNum).Class == SurfaceClass_Window) {
+                if (Surface(SurfNum).Class == SurfaceClass::Window) {
 
                     if (Surface(SurfNum).Width > TempmajorW) {
                         TempmajorW = Surface(SurfNum).Width;
