@@ -3944,9 +3944,9 @@ namespace InternalHeatGains {
                     Real64 TAirInSizing = 0.0;
                     // Set the TAirInSizing to the maximun setpoint value to do sizing based on the maximum fan and cpu power of the ite object
                     SetPointManager::GetSetPointManagerInputData(state, ErrorsFound);
-                    for (int SetPtMgrNum = 1; SetPtMgrNum <= SetPointManager::NumSZClSetPtMgrs; ++SetPtMgrNum) {
-                        if (SetPointManager::SingZoneClSetPtMgr(SetPtMgrNum).ControlZoneNum == Loop) {
-                            TAirInSizing = SetPointManager::SingZoneClSetPtMgr(SetPtMgrNum).MaxSetTemp;
+                    for (int SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumSZClSetPtMgrs; ++SetPtMgrNum) {
+                        if (state.dataSetPointManager->SingZoneClSetPtMgr(SetPtMgrNum).ControlZoneNum == Loop) {
+                            TAirInSizing = state.dataSetPointManager->SingZoneClSetPtMgr(SetPtMgrNum).MaxSetTemp;
                         }
                     }
 

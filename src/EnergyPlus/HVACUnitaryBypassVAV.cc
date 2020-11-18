@@ -319,8 +319,8 @@ namespace HVACUnitaryBypassVAV {
             // set outlet node SP for mixed air SP manager
             DataLoopNode::Node(CBVAV(CBVAVNum).AirOutNode).TempSetPoint = CalcSetPointTempTarget(CBVAVNum);
             if (CBVAV(CBVAVNum).OutNodeSPMIndex > 0) {                                          // update mixed air SPM if exists
-                SetPointManager::MixedAirSetPtMgr(CBVAV(CBVAVNum).OutNodeSPMIndex).calculate(state); // update mixed air SP based on new mode
-                SetPointManager::UpdateMixedAirSetPoints(); // need to know control node to fire off just one of these, do this later
+                state.dataSetPointManager->MixedAirSetPtMgr(CBVAV(CBVAVNum).OutNodeSPMIndex).calculate(state); // update mixed air SP based on new mode
+                SetPointManager::UpdateMixedAirSetPoints(state); // need to know control node to fire off just one of these, do this later
             }
         }
 

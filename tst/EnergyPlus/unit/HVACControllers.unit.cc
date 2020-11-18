@@ -132,11 +132,11 @@ TEST_F(EnergyPlusFixture, HVACControllers_ResetHumidityRatioCtrlVarType)
 
     GetSetPointManagerInputs(state);
     // check specified control variable type is "HumidityRatio"
-    ASSERT_EQ(iCtrlVarType::HumRat, AllSetPtMgr(1).CtrlTypeMode);
+    ASSERT_EQ(iCtrlVarType::HumRat, state.dataSetPointManager->AllSetPtMgr(1).CtrlTypeMode);
 
     GetControllerInput(state);
     // check control variable type in AllSetPtMgr is reset to "MaximumHumidityRatio"
-    ASSERT_EQ(iCtrlVarType::MaxHumRat, AllSetPtMgr(1).CtrlTypeMode);
+    ASSERT_EQ(iCtrlVarType::MaxHumRat, state.dataSetPointManager->AllSetPtMgr(1).CtrlTypeMode);
 
     // ControllerProps always expects the control variable type to be "HumididtyRatio"
     ControllerProps(1).HumRatCntrlType = GetHumidityRatioVariableType(state, ControllerProps(1).SensedNode);
@@ -204,11 +204,11 @@ TEST_F(EnergyPlusFixture, HVACControllers_TestTempAndHumidityRatioCtrlVarType)
 
     GetSetPointManagerInputs(state);
     // check specified control variable type is "HumidityRatio"
-    ASSERT_EQ(iCtrlVarType::MaxHumRat, AllSetPtMgr(1).CtrlTypeMode);
+    ASSERT_EQ(iCtrlVarType::MaxHumRat, state.dataSetPointManager->AllSetPtMgr(1).CtrlTypeMode);
 
     GetControllerInput(state);
     // check control variable type in AllSetPtMgr is reset to "MaximumHumidityRatio"
-    ASSERT_EQ(iCtrlVarType::MaxHumRat, AllSetPtMgr(1).CtrlTypeMode);
+    ASSERT_EQ(iCtrlVarType::MaxHumRat, state.dataSetPointManager->AllSetPtMgr(1).CtrlTypeMode);
 
     // ControllerProps expects the control variable type to be "MaximumHumididtyRatio"
     ControllerProps(1).HumRatCntrlType = GetHumidityRatioVariableType(state, ControllerProps(1).SensedNode);
@@ -348,14 +348,14 @@ TEST_F(EnergyPlusFixture, HVACControllers_SchSetPointMgrsOrderTest)
 
     GetSetPointManagerInputs(state);
     // There are two setpoint managers and are schedule type
-    ASSERT_EQ(2, NumSchSetPtMgrs); // 2 schedule set point managers
-    ASSERT_EQ(2, NumAllSetPtMgrs); // 2 all set point managers
+    ASSERT_EQ(2, state.dataSetPointManager->NumSchSetPtMgrs); // 2 schedule set point managers
+    ASSERT_EQ(2, state.dataSetPointManager->NumAllSetPtMgrs); // 2 all set point managers
     // check specified control variable types
     // this was a bug waiting to happen, iTemperature is declared as its own int const in HVACControllers.hh
     // and it just happened to have the same value as the iCtrlVarType_Temperature int const in SetPointManager.hh
     // changing it to iCtrlVarType::Temp
-    ASSERT_EQ(iCtrlVarType::Temp, AllSetPtMgr(1).CtrlTypeMode);           // is "Temperature"
-    ASSERT_EQ(iCtrlVarType::MaxHumRat, AllSetPtMgr(2).CtrlTypeMode); // is "MaximumHumidityRatio"
+    ASSERT_EQ(iCtrlVarType::Temp, state.dataSetPointManager->AllSetPtMgr(1).CtrlTypeMode);           // is "Temperature"
+    ASSERT_EQ(iCtrlVarType::MaxHumRat, state.dataSetPointManager->AllSetPtMgr(2).CtrlTypeMode); // is "MaximumHumidityRatio"
 
     GetControllerInput(state);
     // check ControllerProps control variable is set to "MaximumHumidityRatio"

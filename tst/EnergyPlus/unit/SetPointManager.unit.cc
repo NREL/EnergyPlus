@@ -531,9 +531,9 @@ TEST_F(EnergyPlusFixture, CalcScheduledTESSetPoint)
     int const DualOpComp(2); // a component that heats or cools (ice storage tank)
 
     int schManNum = 1;
-    SetPointManager::SchTESSetPtMgr.allocate(schManNum);
-    SetPointManager::SchTESSetPtMgr(schManNum).NonChargeCHWTemp = 5;
-    SetPointManager::SchTESSetPtMgr(schManNum).ChargeCHWTemp = -5;
+    state.dataSetPointManager->SchTESSetPtMgr.allocate(schManNum);
+    state.dataSetPointManager->SchTESSetPtMgr(schManNum).NonChargeCHWTemp = 5;
+    state.dataSetPointManager->SchTESSetPtMgr(schManNum).ChargeCHWTemp = -5;
 
     // indexes in Schedule
     int const OnSched = 1;
@@ -552,29 +552,29 @@ TEST_F(EnergyPlusFixture, CalcScheduledTESSetPoint)
     DataEnvironment::DayOfYear_Schedule = 1;
     ScheduleManager::UpdateScheduleValues(state);
 
-    SetPointManager::SchTESSetPtMgr(schManNum).CompOpType = CoolOpComp;
+    state.dataSetPointManager->SchTESSetPtMgr(schManNum).CompOpType = CoolOpComp;
 
-    SetPointManager::SchTESSetPtMgr(schManNum).SchedPtr = OnSched;
+    state.dataSetPointManager->SchTESSetPtMgr(schManNum).SchedPtr = OnSched;
 
-    SetPointManager::SchTESSetPtMgr(schManNum).calculate(state);
-    EXPECT_EQ(SetPointManager::SchTESSetPtMgr(schManNum).NonChargeCHWTemp, SetPointManager::SchTESSetPtMgr(schManNum).SetPt);
+    state.dataSetPointManager->SchTESSetPtMgr(schManNum).calculate(state);
+    EXPECT_EQ(state.dataSetPointManager->SchTESSetPtMgr(schManNum).NonChargeCHWTemp, state.dataSetPointManager->SchTESSetPtMgr(schManNum).SetPt);
 
-    SetPointManager::SchTESSetPtMgr(schManNum).SchedPtr = OffSched;
-    SetPointManager::SchTESSetPtMgr(schManNum).SchedPtrCharge = OffSched;
+    state.dataSetPointManager->SchTESSetPtMgr(schManNum).SchedPtr = OffSched;
+    state.dataSetPointManager->SchTESSetPtMgr(schManNum).SchedPtrCharge = OffSched;
 
-    SetPointManager::SchTESSetPtMgr(schManNum).calculate(state);
-    EXPECT_EQ(SetPointManager::SchTESSetPtMgr(schManNum).NonChargeCHWTemp, SetPointManager::SchTESSetPtMgr(schManNum).SetPt);
+    state.dataSetPointManager->SchTESSetPtMgr(schManNum).calculate(state);
+    EXPECT_EQ(state.dataSetPointManager->SchTESSetPtMgr(schManNum).NonChargeCHWTemp, state.dataSetPointManager->SchTESSetPtMgr(schManNum).SetPt);
 
-    SetPointManager::SchTESSetPtMgr(schManNum).SchedPtr = OffSched;
-    SetPointManager::SchTESSetPtMgr(schManNum).SchedPtrCharge = OnSched;
+    state.dataSetPointManager->SchTESSetPtMgr(schManNum).SchedPtr = OffSched;
+    state.dataSetPointManager->SchTESSetPtMgr(schManNum).SchedPtrCharge = OnSched;
 
-    SetPointManager::SchTESSetPtMgr(schManNum).calculate(state);
-    EXPECT_EQ(SetPointManager::SchTESSetPtMgr(schManNum).ChargeCHWTemp, SetPointManager::SchTESSetPtMgr(schManNum).SetPt);
+    state.dataSetPointManager->SchTESSetPtMgr(schManNum).calculate(state);
+    EXPECT_EQ(state.dataSetPointManager->SchTESSetPtMgr(schManNum).ChargeCHWTemp, state.dataSetPointManager->SchTESSetPtMgr(schManNum).SetPt);
 
-    SetPointManager::SchTESSetPtMgr(schManNum).CompOpType = DualOpComp;
+    state.dataSetPointManager->SchTESSetPtMgr(schManNum).CompOpType = DualOpComp;
 
-    SetPointManager::SchTESSetPtMgr(schManNum).calculate(state);
-    EXPECT_EQ(SetPointManager::SchTESSetPtMgr(schManNum).NonChargeCHWTemp, SetPointManager::SchTESSetPtMgr(schManNum).SetPt);
+    state.dataSetPointManager->SchTESSetPtMgr(schManNum).calculate(state);
+    EXPECT_EQ(state.dataSetPointManager->SchTESSetPtMgr(schManNum).NonChargeCHWTemp, state.dataSetPointManager->SchTESSetPtMgr(schManNum).SetPt);
 }
 
 TEST_F(EnergyPlusFixture, SZRHOAFractionImpact)
@@ -701,8 +701,8 @@ TEST_F(EnergyPlusFixture, SZRHOAFractionImpact)
     DataZoneEquipment::ZoneEquipConfig(1).InletNodeAirLoopNum(1) = 1;
 
     SetPointManager::GetSetPointManagerInputs(state);
-    EXPECT_EQ(SetPointManager::SingZoneRhSetPtMgr(1).ControlZoneNum, 1);
-    SetPointManager::SingZoneRhSetPtMgr(1).AirLoopNum = 1;
+    EXPECT_EQ(state.dataSetPointManager->SingZoneRhSetPtMgr(1).ControlZoneNum, 1);
+    state.dataSetPointManager->SingZoneRhSetPtMgr(1).AirLoopNum = 1;
 
     DataZoneEquipment::ZoneEquipInputsFilled = true;
     state.dataAirLoop->AirLoopInputsFilled = true;
@@ -1215,8 +1215,8 @@ TEST_F(EnergyPlusFixture, ColdestSetPointMgrInSingleDuct)
     EXPECT_EQ(0, state.dataAirLoop->AirToZoneNodeInfo(1).NumZonesHeated); // no heated only zone (served by dual-duct)
 
     SetPointManager::GetSetPointManagerInputs(state);
-    SetPointManager::WarmestSetPtMgr(1).AirLoopNum = 1;
-    SetPointManager::ColdestSetPtMgr(1).AirLoopNum = 1;
+    state.dataSetPointManager->WarmestSetPtMgr(1).AirLoopNum = 1;
+    state.dataSetPointManager->ColdestSetPtMgr(1).AirLoopNum = 1;
 
     SetPointManager::InitSetPointManagers(state);
     DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(1);
@@ -1234,7 +1234,7 @@ TEST_F(EnergyPlusFixture, ColdestSetPointMgrInSingleDuct)
     SetPointManager::UpdateSetPointManagers(state);
 
     EXPECT_EQ(DataLoopNode::NodeID(13), "VAV SYS 1 OUTLET NODE");
-    EXPECT_DOUBLE_EQ(16.0, SetPointManager::WarmestSetPtMgr(1).SetPt); // no cooling load, sets to maximum limit value
+    EXPECT_DOUBLE_EQ(16.0, state.dataSetPointManager->WarmestSetPtMgr(1).SetPt); // no cooling load, sets to maximum limit value
 
     Real64 CpAir(0.0);
     Real64 ZoneSetPointTemp(0.0);
@@ -1244,7 +1244,7 @@ TEST_F(EnergyPlusFixture, ColdestSetPointMgrInSingleDuct)
                        DataZoneEnergyDemands::ZoneSysEnergyDemand(1).TotalOutputRequired / (CpAir * DataLoopNode::Node(2).MassFlowRateMax);
     // check the value of ZoneSetPointTemp matches to the value calculated by ColdestSetPtMgr
     EXPECT_EQ(DataLoopNode::NodeID(12), "HCOIL OUTLET NODE");
-    EXPECT_DOUBLE_EQ(ZoneSetPointTemp, SetPointManager::ColdestSetPtMgr(1).SetPt); // 29.74 deg C
+    EXPECT_DOUBLE_EQ(ZoneSetPointTemp, state.dataSetPointManager->ColdestSetPtMgr(1).SetPt); // 29.74 deg C
     EXPECT_DOUBLE_EQ(ZoneSetPointTemp, DataLoopNode::Node(12).TempSetPoint);       // 29.74 deg C
 }
 
@@ -1269,13 +1269,13 @@ TEST_F(EnergyPlusFixture, SetPointManager_OutdoorAirResetMaxTempTest)
 
     SetPointManager::GetSetPointManagerInputs(state);
     // check Set Point Manager get inputs
-    EXPECT_EQ(SetPointManager::OutAirSetPtMgr(1).CtrlVarType, "MAXIMUMTEMPERATURE");
-    EXPECT_EQ(SetPointManager::OutAirSetPtMgr(1).CtrlTypeMode, SetPointManager::iCtrlVarType::MaxTemp);
-    EXPECT_EQ(SetPointManager::AllSetPtMgr(1).SPMType, SetPointManager::SetPointManagerType::OutsideAir);
-    EXPECT_EQ(80.0, SetPointManager::OutAirSetPtMgr(1).OutLowSetPt1);
-    EXPECT_EQ(-17.778, SetPointManager::OutAirSetPtMgr(1).OutLow1);
-    EXPECT_EQ(40.0, SetPointManager::OutAirSetPtMgr(1).OutHighSetPt1);
-    EXPECT_EQ(21.11, SetPointManager::OutAirSetPtMgr(1).OutHigh1);
+    EXPECT_EQ(state.dataSetPointManager->OutAirSetPtMgr(1).CtrlVarType, "MAXIMUMTEMPERATURE");
+    EXPECT_EQ(state.dataSetPointManager->OutAirSetPtMgr(1).CtrlTypeMode, SetPointManager::iCtrlVarType::MaxTemp);
+    EXPECT_EQ(state.dataSetPointManager->AllSetPtMgr(1).SPMType, SetPointManager::SetPointManagerType::OutsideAir);
+    EXPECT_EQ(80.0, state.dataSetPointManager->OutAirSetPtMgr(1).OutLowSetPt1);
+    EXPECT_EQ(-17.778, state.dataSetPointManager->OutAirSetPtMgr(1).OutLow1);
+    EXPECT_EQ(40.0, state.dataSetPointManager->OutAirSetPtMgr(1).OutHighSetPt1);
+    EXPECT_EQ(21.11, state.dataSetPointManager->OutAirSetPtMgr(1).OutHigh1);
     // set out door dry bukb temp
     DataEnvironment::OutDryBulbTemp = -20.0;
     // do init
@@ -1286,7 +1286,7 @@ TEST_F(EnergyPlusFixture, SetPointManager_OutdoorAirResetMaxTempTest)
     // check OA Reset Set Point Manager sim
     EXPECT_EQ(80.0, DataLoopNode::Node(1).TempSetPointHi);
     // change the low outdoor air setpoint reset value to 60.0C
-    SetPointManager::OutAirSetPtMgr(1).OutLowSetPt1 = 60.0;
+    state.dataSetPointManager->OutAirSetPtMgr(1).OutLowSetPt1 = 60.0;
     // re simulate OA Reset Set Point Manager
     SetPointManager::SimSetPointManagers(state);
     SetPointManager::UpdateSetPointManagers(state);
@@ -1325,13 +1325,13 @@ TEST_F(EnergyPlusFixture, SetPointManager_OutdoorAirResetMinTempTest)
 
     SetPointManager::GetSetPointManagerInputs(state);
     // check Set Point Manager get inputs
-    EXPECT_EQ(SetPointManager::OutAirSetPtMgr(1).CtrlVarType, "MINIMUMTEMPERATURE");
-    EXPECT_EQ(SetPointManager::OutAirSetPtMgr(1).CtrlTypeMode, SetPointManager::iCtrlVarType::MinTemp);
-    EXPECT_EQ(SetPointManager::AllSetPtMgr(1).SPMType, SetPointManager::SetPointManagerType::OutsideAir);
-    EXPECT_EQ(80.0, SetPointManager::OutAirSetPtMgr(1).OutLowSetPt1);
-    EXPECT_EQ(-17.778, SetPointManager::OutAirSetPtMgr(1).OutLow1);
-    EXPECT_EQ(40.0, SetPointManager::OutAirSetPtMgr(1).OutHighSetPt1);
-    EXPECT_EQ(21.11, SetPointManager::OutAirSetPtMgr(1).OutHigh1);
+    EXPECT_EQ(state.dataSetPointManager->OutAirSetPtMgr(1).CtrlVarType, "MINIMUMTEMPERATURE");
+    EXPECT_EQ(state.dataSetPointManager->OutAirSetPtMgr(1).CtrlTypeMode, SetPointManager::iCtrlVarType::MinTemp);
+    EXPECT_EQ(state.dataSetPointManager->AllSetPtMgr(1).SPMType, SetPointManager::SetPointManagerType::OutsideAir);
+    EXPECT_EQ(80.0, state.dataSetPointManager->OutAirSetPtMgr(1).OutLowSetPt1);
+    EXPECT_EQ(-17.778, state.dataSetPointManager->OutAirSetPtMgr(1).OutLow1);
+    EXPECT_EQ(40.0, state.dataSetPointManager->OutAirSetPtMgr(1).OutHighSetPt1);
+    EXPECT_EQ(21.11, state.dataSetPointManager->OutAirSetPtMgr(1).OutHigh1);
     // set out door dry bukb temp
     DataEnvironment::OutDryBulbTemp = 22.0;
     // do init
@@ -1342,7 +1342,7 @@ TEST_F(EnergyPlusFixture, SetPointManager_OutdoorAirResetMinTempTest)
     // check OA Reset Set Point Manager sim
     EXPECT_EQ(40.0, DataLoopNode::Node(1).TempSetPointLo);
     // change the low outdoor air setpoint reset value to 60.0C
-    SetPointManager::OutAirSetPtMgr(1).OutHighSetPt1 = 35.0;
+    state.dataSetPointManager->OutAirSetPtMgr(1).OutHighSetPt1 = 35.0;
     // re simulate OA Reset Set Point Manager
     SetPointManager::SimSetPointManagers(state);
     SetPointManager::UpdateSetPointManagers(state);
