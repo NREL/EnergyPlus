@@ -78,9 +78,7 @@
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
-namespace EnergyPlus {
-
-namespace Boilers {
+namespace EnergyPlus::Boilers {
 
     // Module containing the routines dealing with the Boilers
 
@@ -164,7 +162,7 @@ namespace Boilers {
         // standard EnergyPlus input retrieval using input Processor
 
         // Locals
-        static std::string const RoutineName("GetBoilerInput: ");
+        constexpr auto RoutineName("GetBoilerInput: ");
 
         // LOCAL VARIABLES
         bool ErrorsFound(false); // Flag to show errors were found during GetInput
@@ -355,7 +353,7 @@ namespace Boilers {
         }
 
         if (ErrorsFound) {
-            ShowFatalError(state, RoutineName + "Errors found in processing " + DataIPShortCuts::cCurrentModuleObject + " input.");
+            ShowFatalError(state, format("{}{}", RoutineName, "Errors found in processing " + DataIPShortCuts::cCurrentModuleObject + " input."));
         }
     }
 
@@ -424,7 +422,7 @@ namespace Boilers {
         // Uses the status flags to trigger initializations.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("InitBoiler");
+        constexpr auto RoutineName("InitBoiler");
 
         // Init more variables
         if (this->MyFlag) {
@@ -549,7 +547,7 @@ namespace Boilers {
         // the hot water flow rate and the hot water loop design delta T.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SizeBoiler");
+        constexpr auto RoutineName("SizeBoiler");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool ErrorsFound(false); // If errors detected in input
@@ -716,7 +714,7 @@ namespace Boilers {
         // load performance
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("CalcBoilerModel");
+        constexpr auto RoutineName("CalcBoilerModel");
 
         // clean up some operating conditions, may not be necessary
         this->BoilerLoad = 0.0;
@@ -950,7 +948,5 @@ namespace Boilers {
         this->FuelConsumed = this->FuelUsed * ReportingConstant;
         this->ParasiticElecConsumption = this->ParasiticElecPower * ReportingConstant;
     }
-
-} // namespace Boilers
 
 } // namespace EnergyPlus

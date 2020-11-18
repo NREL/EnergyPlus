@@ -47,7 +47,6 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataSurfaceColors.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -208,7 +207,7 @@ namespace DataSurfaceColors {
         // the alphas and numerics required to process the Report:SurfaceColorScheme object.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const CurrentModuleObject("OutputControl:SurfaceColorScheme");
+        constexpr auto CurrentModuleObject("OutputControl:SurfaceColorScheme");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumAlphas;
