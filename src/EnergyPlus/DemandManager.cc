@@ -66,9 +66,7 @@
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
-namespace EnergyPlus {
-
-namespace DemandManager {
+namespace EnergyPlus::DemandManager {
 
     // MODULE INFORMATION:
     //       AUTHOR         Peter Graham Ellis
@@ -112,12 +110,6 @@ namespace DemandManager {
     int const CheckCanReduce(1);
     int const SetLimit(2);
     int const ClearLimit(3);
-
-    static std::string const BlankString;
-
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE TYPE DECLARATIONS:
 
     // MODULE VARIABLE DECLARATIONS:
     int NumDemandManagerList(0);
@@ -412,7 +404,7 @@ namespace DemandManager {
         NumDemandManagerList = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
         if (NumDemandManagerList > 0) {
-            AlphArray.dimension(NumAlphas, BlankString);
+            AlphArray.dimension(NumAlphas, std::string());
             NumArray.dimension(NumNums, 0.0);
 
             DemandManagerList.allocate(NumDemandManagerList);
@@ -719,7 +711,7 @@ namespace DemandManager {
         NumDemandMgr = NumDemandMgrExtLights + NumDemandMgrLights + NumDemandMgrElecEquip + NumDemandMgrThermostats + NumDemandMgrVentilation;
 
         if (NumDemandMgr > 0) {
-            AlphArray.dimension(MaxAlphas, BlankString);
+            AlphArray.dimension(MaxAlphas, std::string());
             NumArray.dimension(MaxNums, 0.0);
 
             DemandMgr.allocate(NumDemandMgr);
@@ -1915,7 +1907,5 @@ namespace DemandManager {
             GetInput = false;
         }
     }
-
-} // namespace DemandManager
 
 } // namespace EnergyPlus

@@ -3210,7 +3210,6 @@ namespace LowTempRadiantSystem {
         //   of Wisconsin-Madison.
 
         // Using/Aliasing
-        using DataBranchAirLoopPlant::MassFlowTolerance;
         using DataHeatBalance::Zone;
         using DataHeatBalance::ZoneData;
         using DataHVACGlobals::SmallLoad;
@@ -3306,7 +3305,7 @@ namespace LowTempRadiantSystem {
 
             // Calculate and limit the water flow rate
             ActWaterFlow = MassFlowFrac * MaxWaterFlow;
-            if (ActWaterFlow < MassFlowTolerance) ActWaterFlow = 0.0;
+            if (ActWaterFlow < DataBranchAirLoopPlant::MassFlowTolerance) ActWaterFlow = 0.0;
             if (this->EMSOverrideOnWaterMdot) ActWaterFlow = this->EMSWaterMdotOverrideValue;
 
             if (this->OperatingMode == HeatingMode) {
@@ -3868,7 +3867,6 @@ namespace LowTempRadiantSystem {
         //   of Wisconsin-Madison.
 
         // Using/Aliasing
-        using DataBranchAirLoopPlant::MassFlowTolerance;
         using DataEnvironment::CurMnDy;
         using DataEnvironment::EnvironmentName;
         using DataHeatBalance::MRT;
@@ -4312,7 +4310,7 @@ namespace LowTempRadiantSystem {
             } // Operating mode (heating or cooling)
 
             // Case when system has been shut down because of condensation issues or other limitations:
-            if (this->WaterMassFlowRate < MassFlowTolerance) {
+            if (this->WaterMassFlowRate < DataBranchAirLoopPlant::MassFlowTolerance) {
                 this->WaterMassFlowRate = 0.0;
                 this->WaterInjectionRate = 0.0;
                 this->WaterRecircRate = 0.0;

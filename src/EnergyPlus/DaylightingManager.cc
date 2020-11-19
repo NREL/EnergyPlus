@@ -160,7 +160,6 @@ namespace DaylightingManager {
 
     // Data
     // MODULE PARAMETER DEFINITIONS:
-    static std::string const BlankString;
     bool CalcDayltghCoefficients_firstTime(true);
     bool refFirstTime(true);
     bool DayltgInteriorIllum_firstTime(true); // true first time routine is called

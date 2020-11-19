@@ -1290,7 +1290,7 @@ namespace PlantChillers {
         }
     }
 
-    void ElectricChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, bool const RunFlag, int const EquipFlowCtrl)
+    void ElectricChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, bool const RunFlag, DataBranchAirLoopPlant::ControlTypeEnum const EquipFlowCtrl)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher / Brandon Anderson
@@ -1351,7 +1351,7 @@ namespace PlantChillers {
         // If Chiller load is 0 or chiller is not running then leave the subroutine.
         if (MyLoad >= 0.0 || !RunFlag) {
             // call for zero flow before leaving
-            if (EquipFlowCtrl == DataBranchAirLoopPlant::ControlType_SeriesActive ||
+            if (EquipFlowCtrl == DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive ||
                 DataPlant::PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock == 1) {
                 this->EvapMassFlowRate = DataLoopNode::Node(this->EvapInletNodeNum).MassFlowRate;
             } else {
@@ -1366,7 +1366,7 @@ namespace PlantChillers {
             }
             if (this->CondenserType == DataPlant::CondenserType::WATERCOOLED) {
                 if (DataPlant::PlantLoop(this->CDLoopNum).LoopSide(this->CDLoopSideNum).Branch(this->CDBranchNum).Comp(this->CDCompNum).FlowCtrl ==
-                    DataBranchAirLoopPlant::ControlType_SeriesActive) {
+                    DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive) {
                     this->CondMassFlowRate = DataLoopNode::Node(this->CondInletNodeNum).MassFlowRate;
                 } else {
                     this->CondMassFlowRate = 0.0;
@@ -3199,7 +3199,7 @@ namespace PlantChillers {
         }
     }
 
-    void EngineDrivenChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, bool const RunFlag, int const EquipFlowCtrl)
+    void EngineDrivenChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, bool const RunFlag, DataBranchAirLoopPlant::ControlTypeEnum const EquipFlowCtrl)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher / Brandon Anderson
@@ -3280,7 +3280,7 @@ namespace PlantChillers {
 
         // If Chiller load is 0 or chiller is not running then leave the subroutine.
         if (MyLoad >= 0.0 || !RunFlag) {
-            if (EquipFlowCtrl == DataBranchAirLoopPlant::ControlType_SeriesActive ||
+            if (EquipFlowCtrl == DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive ||
                 DataPlant::PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock == 1) {
                 this->EvapMassFlowRate = DataLoopNode::Node(this->EvapInletNodeNum).MassFlowRate;
             } else {
@@ -3297,7 +3297,7 @@ namespace PlantChillers {
 
             if (this->CondenserType == DataPlant::CondenserType::WATERCOOLED) {
                 if (DataPlant::PlantLoop(this->CDLoopNum).LoopSide(this->CDLoopSideNum).Branch(this->CDBranchNum).Comp(this->CDCompNum).FlowCtrl ==
-                    DataBranchAirLoopPlant::ControlType_SeriesActive) {
+                    DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive) {
                     this->CondMassFlowRate = DataLoopNode::Node(this->CondInletNodeNum).MassFlowRate;
                 } else {
                     this->CondMassFlowRate = 0.0;
@@ -5106,7 +5106,7 @@ namespace PlantChillers {
         }
     }
 
-    void GTChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, bool const RunFlag, int const EquipFlowCtrl)
+    void GTChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, bool const RunFlag, DataBranchAirLoopPlant::ControlTypeEnum const EquipFlowCtrl)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher / Brandon Anderson
@@ -5182,7 +5182,7 @@ namespace PlantChillers {
         // if the component control is SERIESACTIVE we set the component flow to inlet flow so that
         // flow resolver will not shut down the branch
         if (MyLoad >= 0.0 || !RunFlag) {
-            if (EquipFlowCtrl == DataBranchAirLoopPlant::ControlType_SeriesActive ||
+            if (EquipFlowCtrl == DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive ||
                 DataPlant::PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock == 1) {
                 this->EvapMassFlowRate = DataLoopNode::Node(this->EvapInletNodeNum).MassFlowRate;
             } else {
@@ -5198,7 +5198,7 @@ namespace PlantChillers {
             }
             if (this->CondenserType == DataPlant::CondenserType::WATERCOOLED) {
                 if (DataPlant::PlantLoop(this->CDLoopNum).LoopSide(this->CDLoopSideNum).Branch(this->CDBranchNum).Comp(this->CDCompNum).FlowCtrl ==
-                    DataBranchAirLoopPlant::ControlType_SeriesActive) {
+                    DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive) {
                     this->CondMassFlowRate = DataLoopNode::Node(this->CondInletNodeNum).MassFlowRate;
                 } else {
                     this->CondMassFlowRate = 0.0;
@@ -6662,7 +6662,7 @@ namespace PlantChillers {
         }
     }
 
-    void ConstCOPChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, bool const RunFlag, int const EquipFlowCtrl)
+    void ConstCOPChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, bool const RunFlag, DataBranchAirLoopPlant::ControlTypeEnum const EquipFlowCtrl)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
@@ -6750,7 +6750,7 @@ namespace PlantChillers {
             // If Chiller load is 0 or greater or chiller is not running then leave the subroutine.Before leaving
             // if the component control is SERIESACTIVE we set the component flow to inlet flow so that
             // flow resolver will not shut down the branch
-            if (EquipFlowCtrl == DataBranchAirLoopPlant::ControlType_SeriesActive ||
+            if (EquipFlowCtrl == DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive ||
                 DataPlant::PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock == 1) {
                 this->EvapMassFlowRate = DataLoopNode::Node(this->EvapInletNodeNum).MassFlowRate;
             } else {
@@ -6765,7 +6765,7 @@ namespace PlantChillers {
             }
             if (this->CondenserType == DataPlant::CondenserType::WATERCOOLED) {
                 if (DataPlant::PlantLoop(this->CDLoopNum).LoopSide(this->CDLoopSideNum).Branch(this->CDBranchNum).Comp(this->CDCompNum).FlowCtrl ==
-                    DataBranchAirLoopPlant::ControlType_SeriesActive) {
+                    DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive) {
                     this->CondMassFlowRate = DataLoopNode::Node(this->CondInletNodeNum).MassFlowRate;
                 } else {
                     this->CondMassFlowRate = 0.0;

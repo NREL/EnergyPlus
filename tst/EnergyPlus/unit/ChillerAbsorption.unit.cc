@@ -54,6 +54,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/ChillerAbsorption.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
@@ -1777,7 +1778,7 @@ TEST_F(EnergyPlusFixture, ChillerAbsorption_Calc)
 
     // set conditions for test
     int AbsChillNum = 1;
-    int EquipFlowCtrl = 1;
+    DataBranchAirLoopPlant::ControlTypeEnum EquipFlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
     Real64 AbsChillEvapLoad;
     bool AbsChillRunFlag = true;
     // check chiller inputs
