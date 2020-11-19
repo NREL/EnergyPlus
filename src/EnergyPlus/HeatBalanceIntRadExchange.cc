@@ -338,7 +338,7 @@ namespace HeatBalanceIntRadExchange {
                 } else if (construct.WindowTypeBSDF) {
                     SurfaceTempRad[ZoneSurfNum] = SurfWinEffInsSurfTemp(SurfNum);
                     SurfaceEmiss[ZoneSurfNum] = construct.InsideAbsorpThermal;
-                } else if (construct.TypeIsWindow && SurfWinOriginalClass(SurfNum) != SurfaceClass_TDD_Diffuser) {
+                } else if (construct.TypeIsWindow && SurfWinOriginalClass(SurfNum) != SurfaceClass::TDD_Diffuser) {
                     if (SurfIterations == 0 && SurfWinShadingFlag(SurfNum) <= 0) {
                         // If the window is bare this TS and it is the first time through we use the previous TS glass
                         // temperature whether or not the window was shaded in the previous TS. If the window was shaded
@@ -1453,8 +1453,8 @@ namespace HeatBalanceIntRadExchange {
                 if (i == j) continue;
                 //  Include INTMASS, FLOOR(for others), CEILING, ROOF  and different facing surfaces.
                 //  Roofs/ceilings always see floors
-                if ((Surface(SPtr(j)).Class == SurfaceClass_IntMass) || (Surface(SPtr(j)).Class == SurfaceClass_Floor) ||
-                    (Surface(SPtr(j)).Class == SurfaceClass_Roof && Surface(SPtr(i)).Class == SurfaceClass_Floor) ||
+                if ((Surface(SPtr(j)).Class == SurfaceClass::IntMass) || (Surface(SPtr(j)).Class == SurfaceClass::Floor) ||
+                    (Surface(SPtr(j)).Class == SurfaceClass::Roof && Surface(SPtr(i)).Class == SurfaceClass::Floor) ||
                     ((std::abs(Azimuth(i) - Azimuth(j)) > SameAngleLimit) ||
                      (std::abs(Tilt(i) - Tilt(j)) >
                       SameAngleLimit))) { // Everything sees internal mass surfaces | Everything except other floors sees floors
@@ -1488,8 +1488,8 @@ namespace HeatBalanceIntRadExchange {
 
                 if (i == j) continue;
                 //  Include INTMASS, FLOOR(for others), CEILING/ROOF  and different facing surfaces.
-                if ((Surface(SPtr(j)).Class == SurfaceClass_IntMass) || (Surface(SPtr(j)).Class == SurfaceClass_Floor) ||
-                    (Surface(SPtr(j)).Class == SurfaceClass_Roof) ||
+                if ((Surface(SPtr(j)).Class == SurfaceClass::IntMass) || (Surface(SPtr(j)).Class == SurfaceClass::Floor) ||
+                    (Surface(SPtr(j)).Class == SurfaceClass::Roof) ||
                     ((std::abs(Azimuth(i) - Azimuth(j)) > SameAngleLimit) || (std::abs(Tilt(i) - Tilt(j)) > SameAngleLimit))) {
                     if (ZoneArea(i) > 0.0) F(j, i) = A(j) / (ZoneArea(i));
                 }

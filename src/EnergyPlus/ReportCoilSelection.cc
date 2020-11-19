@@ -441,12 +441,12 @@ void ReportCoilSelection::doAirLoopSetup(EnergyPlusData &state, int const coilVe
 {
     // this routine sets up some things for central air systems, needs to follow setting of an airloop num
     auto &c(coilSelectionDataObjs[coilVecIndex]);
-    if (c->airloopNum > 0 && allocated(DataAirSystems::PrimaryAirSystem)) {
+    if (c->airloopNum > 0 && allocated(state.dataAirSystemsData->PrimaryAirSystems)) {
         // see if there is an OA controller
-        if (DataAirSystems::PrimaryAirSystem(c->airloopNum).OASysExists) {
+        if (state.dataAirSystemsData->PrimaryAirSystems(c->airloopNum).OASysExists) {
             // loop over OA controllers and match node num ?
             for (int loop = 1; loop <= MixedAir::NumOAControllers; ++loop) {
-                if (DataAirSystems::PrimaryAirSystem(c->airloopNum).OASysInletNodeNum == MixedAir::OAController(loop).RetNode) {
+                if (state.dataAirSystemsData->PrimaryAirSystems(c->airloopNum).OASysInletNodeNum == MixedAir::OAController(loop).RetNode) {
                     c->oaControllerNum = loop;
                 }
             }
@@ -505,32 +505,32 @@ void ReportCoilSelection::doZoneEqSetup(EnergyPlusData &state, int const coilVec
     // maybe not needed, would be set in other calls   c->airloopNum = DataZoneEquipment::ZoneEquipConfig( c->zoneEqNum  ).AirLoopNum;
 
     if (c->airloopNum > 0) {
-        if (DataAirSystems::PrimaryAirSystem(c->airloopNum).OASysExists) {
+        if (state.dataAirSystemsData->PrimaryAirSystems(c->airloopNum).OASysExists) {
             // loop over OA controllers and match node num ?
             for (int loop = 1; loop <= MixedAir::NumOAControllers; ++loop) {
-                if (DataAirSystems::PrimaryAirSystem(c->airloopNum).OASysInletNodeNum == MixedAir::OAController(loop).RetNode) {
+                if (state.dataAirSystemsData->PrimaryAirSystems(c->airloopNum).OASysInletNodeNum == MixedAir::OAController(loop).RetNode) {
                     c->oaControllerNum = loop;
                 }
             }
         }
         // fill out supply fan info
-        switch (DataAirSystems::PrimaryAirSystem(c->airloopNum).supFanModelTypeEnum) {
+        switch (state.dataAirSystemsData->PrimaryAirSystems(c->airloopNum).supFanModelTypeEnum) {
         case DataAirSystems::structArrayLegacyFanModels: {
 
             coilSelectionReportObj->setCoilSupplyFanInfo(state, c->coilName_,
                                                          c->coilObjName,
-                                                         Fans::Fan(DataAirSystems::PrimaryAirSystem(c->airloopNum).SupFanNum).FanName,
+                                                         Fans::Fan(state.dataAirSystemsData->PrimaryAirSystems(c->airloopNum).SupFanNum).FanName,
                                                          DataAirSystems::structArrayLegacyFanModels,
-                                                         DataAirSystems::PrimaryAirSystem(c->airloopNum).SupFanNum);
+                                                         state.dataAirSystemsData->PrimaryAirSystems(c->airloopNum).SupFanNum);
             break;
         }
         case DataAirSystems::objectVectorOOFanSystemModel: {
 
             coilSelectionReportObj->setCoilSupplyFanInfo(state, c->coilName_,
                                                          c->coilObjName,
-                                                         HVACFan::fanObjs[DataAirSystems::PrimaryAirSystem(c->airloopNum).supFanVecIndex]->name,
+                                                         HVACFan::fanObjs[state.dataAirSystemsData->PrimaryAirSystems(c->airloopNum).supFanVecIndex]->name,
                                                          DataAirSystems::objectVectorOOFanSystemModel,
-                                                         DataAirSystems::PrimaryAirSystem(c->airloopNum).supFanVecIndex);
+                                                         state.dataAirSystemsData->PrimaryAirSystems(c->airloopNum).supFanVecIndex);
             break;
         }
         case DataAirSystems::fanModelTypeNotYetSet: {
@@ -650,9 +650,9 @@ void ReportCoilSelection::doFinalProcessingOfCoilData(EnergyPlusData &state)
         if (c->airloopNum > 0 && c->zoneEqNum == 0) {
             c->coilLocation = "AirLoop";
             c->typeHVACname = "AirLoopHVAC";
-            c->userNameforHVACsystem = DataAirSystems::PrimaryAirSystem(c->airloopNum).Name;
+            c->userNameforHVACsystem = state.dataAirSystemsData->PrimaryAirSystems(c->airloopNum).Name;
         } else if (c->zoneEqNum > 0 && c->airloopNum > 0) { // e.g. reheat coil, has a system and is zone equipment
-            c->userNameforHVACsystem += " on air system named " + DataAirSystems::PrimaryAirSystem(c->airloopNum).Name;
+            c->userNameforHVACsystem += " on air system named " + state.dataAirSystemsData->PrimaryAirSystems(c->airloopNum).Name;
             c->coilLocation = "Zone Equipment";
         }
 
@@ -1316,7 +1316,7 @@ void ReportCoilSelection::setCoilCoolingCapacity(
             c->coilDesLvgWetBulb = Psychrometrics::PsyTwbFnTdbWPb(state,
                 c->coilDesLvgTemp, c->coilDesLvgHumRat, DataEnvironment::StdBaroPress, "ReportCoilSelection::setCoilCoolingCapacity");
             c->coilDesLvgEnth = Psychrometrics::PsyHFnTdbW(c->coilDesLvgTemp, c->coilDesLvgHumRat);
-            if (DataAirSystems::PrimaryAirSystem(curSysNum).NumOACoolCoils > 0) { // there is precooling of the OA stream
+            if (state.dataAirSystemsData->PrimaryAirSystems(curSysNum).NumOACoolCoils > 0) { // there is precooling of the OA stream
                 c->oaPretreated = true;
             }
         }
@@ -1543,7 +1543,7 @@ void ReportCoilSelection::setCoilHeatingCapacity(
             c->coilDesLvgWetBulb = Psychrometrics::PsyTwbFnTdbWPb(state,
                 c->coilDesLvgTemp, c->coilDesLvgHumRat, DataEnvironment::StdBaroPress, "ReportCoilSelection::setCoilHeatingCapacity");
             c->coilDesLvgEnth = Psychrometrics::PsyHFnTdbW(c->coilDesLvgTemp, c->coilDesLvgHumRat);
-            if (DataAirSystems::PrimaryAirSystem(curSysNum).NumOAHeatCoils > 0) { // there is preHeating of the OA stream
+            if (state.dataAirSystemsData->PrimaryAirSystems(curSysNum).NumOAHeatCoils > 0) { // there is preHeating of the OA stream
                 c->oaPretreated = true;
             }
         }

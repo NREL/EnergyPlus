@@ -836,7 +836,6 @@ namespace Furnaces {
         // Using/Aliasing
         using BranchNodeConnections::SetUpCompSets;
         using BranchNodeConnections::TestCompSet;
-        using DataAirSystems::PrimaryAirSystem;
         using DataHeatBalance::Zone;
         using DataLoopNode::NodeID;
         using DataZoneControls::ComfortControlledZone;
@@ -1139,11 +1138,11 @@ namespace Furnaces {
                     for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig(ControlledZoneNum).NumInletNodes; ++zoneInNode) {
                         int AirLoopNumber = ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum(zoneInNode);
                         if (AirLoopNumber > 0) {
-                            for (BranchNum = 1; BranchNum <= PrimaryAirSystem(AirLoopNumber).NumBranches; ++BranchNum) {
-                                for (CompNum = 1; CompNum <= PrimaryAirSystem(AirLoopNumber).Branch(BranchNum).TotalComponents; ++CompNum) {
-                                    if (!UtilityRoutines::SameString(PrimaryAirSystem(AirLoopNumber).Branch(BranchNum).Comp(CompNum).Name,
+                            for (BranchNum = 1; BranchNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).NumBranches; ++BranchNum) {
+                                for (CompNum = 1; CompNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).TotalComponents; ++CompNum) {
+                                    if (!UtilityRoutines::SameString(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).Comp(CompNum).Name,
                                                                      Furnace(FurnaceNum).Name) ||
-                                        !UtilityRoutines::SameString(PrimaryAirSystem(AirLoopNumber).Branch(BranchNum).Comp(CompNum).TypeOf,
+                                        !UtilityRoutines::SameString(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).Comp(CompNum).TypeOf,
                                                                      CurrentModuleObject))
                                         continue;
                                     AirLoopFound = true;
@@ -1681,11 +1680,11 @@ namespace Furnaces {
                     for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig(ControlledZoneNum).NumInletNodes; ++zoneInNode) {
                         int AirLoopNumber = ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum(zoneInNode);
                         if (AirLoopNumber > 0) {
-                            for (BranchNum = 1; BranchNum <= PrimaryAirSystem(AirLoopNumber).NumBranches; ++BranchNum) {
-                                for (CompNum = 1; CompNum <= PrimaryAirSystem(AirLoopNumber).Branch(BranchNum).TotalComponents; ++CompNum) {
-                                    if (!UtilityRoutines::SameString(PrimaryAirSystem(AirLoopNumber).Branch(BranchNum).Comp(CompNum).Name,
+                            for (BranchNum = 1; BranchNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).NumBranches; ++BranchNum) {
+                                for (CompNum = 1; CompNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).TotalComponents; ++CompNum) {
+                                    if (!UtilityRoutines::SameString(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).Comp(CompNum).Name,
                                                                      Alphas(1)) ||
-                                        !UtilityRoutines::SameString(PrimaryAirSystem(AirLoopNumber).Branch(BranchNum).Comp(CompNum).TypeOf,
+                                        !UtilityRoutines::SameString(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).Comp(CompNum).TypeOf,
                                                                      CurrentModuleObject))
                                         continue;
                                     AirLoopFound = true;
@@ -2874,11 +2873,11 @@ namespace Furnaces {
                     for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig(ControlledZoneNum).NumInletNodes; ++zoneInNode) {
                         int AirLoopNumber = ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum(zoneInNode);
                         if (AirLoopNumber > 0) {
-                            for (BranchNum = 1; BranchNum <= PrimaryAirSystem(AirLoopNumber).NumBranches; ++BranchNum) {
-                                for (CompNum = 1; CompNum <= PrimaryAirSystem(AirLoopNumber).Branch(BranchNum).TotalComponents; ++CompNum) {
-                                    if (!UtilityRoutines::SameString(PrimaryAirSystem(AirLoopNumber).Branch(BranchNum).Comp(CompNum).Name,
+                            for (BranchNum = 1; BranchNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).NumBranches; ++BranchNum) {
+                                for (CompNum = 1; CompNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).TotalComponents; ++CompNum) {
+                                    if (!UtilityRoutines::SameString(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).Comp(CompNum).Name,
                                                                      Alphas(1)) ||
-                                        !UtilityRoutines::SameString(PrimaryAirSystem(AirLoopNumber).Branch(BranchNum).Comp(CompNum).TypeOf,
+                                        !UtilityRoutines::SameString(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).Comp(CompNum).TypeOf,
                                                                      CurrentModuleObject))
                                         continue;
                                     AirLoopFound = true;
@@ -3790,11 +3789,11 @@ namespace Furnaces {
                     for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig(ControlledZoneNum).NumInletNodes; ++zoneInNode) {
                         int AirLoopNumber = ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum(zoneInNode);
                         if (AirLoopNumber > 0) {
-                            for (BranchNum = 1; BranchNum <= PrimaryAirSystem(AirLoopNumber).NumBranches; ++BranchNum) {
-                                for (CompNum = 1; CompNum <= PrimaryAirSystem(AirLoopNumber).Branch(BranchNum).TotalComponents; ++CompNum) {
-                                    if (!UtilityRoutines::SameString(PrimaryAirSystem(AirLoopNumber).Branch(BranchNum).Comp(CompNum).Name,
+                            for (BranchNum = 1; BranchNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).NumBranches; ++BranchNum) {
+                                for (CompNum = 1; CompNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).TotalComponents; ++CompNum) {
+                                    if (!UtilityRoutines::SameString(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).Comp(CompNum).Name,
                                                                      Alphas(1)) ||
-                                        !UtilityRoutines::SameString(PrimaryAirSystem(AirLoopNumber).Branch(BranchNum).Comp(CompNum).TypeOf,
+                                        !UtilityRoutines::SameString(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).Comp(CompNum).TypeOf,
                                                                      CurrentModuleObject))
                                         continue;
                                     AirLoopFound = true;
@@ -6093,20 +6092,20 @@ namespace Furnaces {
         SuppHeatCap = 0.0;
 
         if (Furnace(FurnaceNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-            DataAirSystems::PrimaryAirSystem(CurSysNum).supFanVecIndex = Furnace(FurnaceNum).FanIndex;
-            DataAirSystems::PrimaryAirSystem(CurSysNum).supFanModelTypeEnum = DataAirSystems::objectVectorOOFanSystemModel;
+            state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).supFanVecIndex = Furnace(FurnaceNum).FanIndex;
+            state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).supFanModelTypeEnum = DataAirSystems::objectVectorOOFanSystemModel;
             DataSizing::DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
             DataSizing::DataFanIndex = Furnace(FurnaceNum).FanIndex;
         } else {
-            DataAirSystems::PrimaryAirSystem(CurSysNum).SupFanNum = Furnace(FurnaceNum).FanIndex;
-            DataAirSystems::PrimaryAirSystem(CurSysNum).supFanModelTypeEnum = DataAirSystems::structArrayLegacyFanModels;
+            state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).SupFanNum = Furnace(FurnaceNum).FanIndex;
+            state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).supFanModelTypeEnum = DataAirSystems::structArrayLegacyFanModels;
             DataSizing::DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
             DataSizing::DataFanIndex = Furnace(FurnaceNum).FanIndex;
         }
         if (Furnace(FurnaceNum).FanPlace == BlowThru) {
-            DataAirSystems::PrimaryAirSystem(CurSysNum).supFanLocation = DataAirSystems::fanPlacement::BlowThru;
+            state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).supFanLocation = DataAirSystems::fanPlacement::BlowThru;
         } else if (Furnace(FurnaceNum).FanPlace == DrawThru) {
-            DataAirSystems::PrimaryAirSystem(CurSysNum).supFanLocation = DataAirSystems::fanPlacement::DrawThru;
+            state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).supFanLocation = DataAirSystems::fanPlacement::DrawThru;
         }
 
         if (Furnace(FurnaceNum).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed) {
@@ -9922,7 +9921,6 @@ namespace Furnaces {
         // Calls ControlMSHPOutput to obtain the desired unit output
 
         using namespace DataZoneEnergyDemands;
-        using DataAirSystems::PrimaryAirSystem;
         using DataHVACGlobals::SmallLoad;
         using DataHVACGlobals::SmallMassFlow;
         using DataZoneEquipment::ZoneEquipConfig;
@@ -10184,7 +10182,7 @@ namespace Furnaces {
         Node(OutletNode).MassFlowRateMaxAvail = AirMassFlow;
 
         if (!FirstHVACIteration && AirMassFlow > 0.0 && AirLoopNum > 0) {
-            TotBranchNum = PrimaryAirSystem(AirLoopNum).NumOutletBranches;
+            TotBranchNum = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).NumOutletBranches;
             if (TotBranchNum == 1) {
                 ZoneSideNodeNum = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).ZoneEquipSupplyNodeNum(1);
                 // THE MASS FLOW PRECISION of the system solver is not enough for some small air flow rate iterations , BY DEBUGGING

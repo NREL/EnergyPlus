@@ -536,7 +536,6 @@ namespace HVACControllers {
         //        \units m3/s
 
         // Using/Aliasing
-        using DataAirSystems::PrimaryAirSystem;
         using DataHVACGlobals::NumPrimaryAirSys;
         using DataSystemVariables::TraceAirLoopEnvFlag;
         using DataSystemVariables::TraceHVACControllerEnvFlag;
@@ -593,7 +592,7 @@ namespace HVACControllers {
 
                 // Allocate controller statistics data for each controller on each air loop
                 for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
-                    AirLoopStats(AirLoopNum).ControllerStats.allocate(PrimaryAirSystem(AirLoopNum).NumControllers);
+                    AirLoopStats(AirLoopNum).ControllerStats.allocate(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).NumControllers);
                 }
             }
         }
@@ -2318,7 +2317,7 @@ namespace HVACControllers {
     // Beginning of Statistics subroutines for the Controller Module
     // *****************************************************************************
 
-    void TrackAirLoopControllers(
+    void TrackAirLoopControllers(EnergyPlusData &state,
         int const AirLoopNum, int const WarmRestartStatus, int const AirLoopIterMax, int const AirLoopIterTot, int const AirLoopNumCalls)
     {
 
@@ -2340,7 +2339,6 @@ namespace HVACControllers {
         // na
 
         // Using/Aliasing
-        using DataAirSystems::PrimaryAirSystem;
         using DataHVACGlobals::NumPrimaryAirSys;
 
         // Locals
@@ -2368,7 +2366,7 @@ namespace HVACControllers {
         // FLOW
 
         // If no controllers on this air loop then we have nothig to do
-        if (PrimaryAirSystem(AirLoopNum).NumControllers == 0) return;
+        if (state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).NumControllers == 0) return;
         // To avoid tracking statistics in case of no air loop or no HVAC controllers are defined
         if (NumAirLoopStats == 0) return;
 
@@ -2395,12 +2393,13 @@ namespace HVACControllers {
         AirLoopStats(AirLoopNum).MaxIterations = max(AirLoopStats(AirLoopNum).MaxIterations, AirLoopIterMax);
 
         // Update performance statistics for each controller on air loop
-        for (ControllerNum = 1; ControllerNum <= PrimaryAirSystem(AirLoopNum).NumControllers; ++ControllerNum) {
-            TrackAirLoopController(AirLoopNum, ControllerNum);
+        for (ControllerNum = 1; ControllerNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).NumControllers; ++ControllerNum) {
+            TrackAirLoopController(state, AirLoopNum, ControllerNum);
         }
     }
 
-    void TrackAirLoopController(int const AirLoopNum,       // Air loop index
+    void TrackAirLoopController(EnergyPlusData &state,
+                                int const AirLoopNum,       // Air loop index
                                 int const AirLoopControlNum // Controller index on this air loop
     )
     {
@@ -2423,7 +2422,6 @@ namespace HVACControllers {
         // na
 
         // Using/Aliasing
-        using DataAirSystems::PrimaryAirSystem;
         using DataHVACGlobals::NumPrimaryAirSys;
 
         // Locals
@@ -2448,7 +2446,7 @@ namespace HVACControllers {
 
         // FLOW
 
-        ControlIndex = PrimaryAirSystem(AirLoopNum).ControllerIndex(AirLoopControlNum);
+        ControlIndex = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).ControllerIndex(AirLoopControlNum);
 
         // We use NumCalcCalls instead of the iteration counter used in SolveAirLoopControllers()
         // to avoid having to call TrackAirLoopController() directly from SolveAirLoopControllers().
@@ -2488,7 +2486,6 @@ namespace HVACControllers {
         // na
 
         // Using/Aliasing
-        using DataAirSystems::PrimaryAirSystem;
         using DataHVACGlobals::NumPrimaryAirSys;
         using DataSystemVariables::TrackAirLoopEnvFlag;
 
@@ -2517,7 +2514,7 @@ namespace HVACControllers {
         // note that the AirLoopStats object does not seem to be initialized when this code
         // is executed and it causes a crash here
         for (int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
-            WriteAirLoopStatistics(statisticsFile, PrimaryAirSystem(AirLoopNum), AirLoopStats(AirLoopNum));
+            WriteAirLoopStatistics(statisticsFile, state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum), AirLoopStats(AirLoopNum));
         }
     }
 
@@ -2691,7 +2688,6 @@ namespace HVACControllers {
         // na
 
         // Using/Aliasing
-        using DataAirSystems::PrimaryAirSystem;
         using General::TrimSigDigits;
 
         // Locals
@@ -2709,7 +2705,7 @@ namespace HVACControllers {
         int ControllerNum;
 
         // Open main controller trace file for each air loop
-        const auto TraceFileName = "controller." + PrimaryAirSystem(AirLoopNum).Name + ".csv";
+        const auto TraceFileName = "controller." + state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Name + ".csv";
 
         // Store file unit in air loop stats
         AirLoopStats(AirLoopNum).TraceFile->fileName = TraceFileName;
@@ -2725,8 +2721,8 @@ namespace HVACControllers {
         // List all controllers and their corresponding handles into main trace file
         print(TraceFile, "Num,Name,\n");
 
-        for (ControllerNum = 1; ControllerNum <= PrimaryAirSystem(AirLoopNum).NumControllers; ++ControllerNum) {
-            print(TraceFile, "{},{},\n", ControllerNum, PrimaryAirSystem(AirLoopNum).ControllerName(ControllerNum));
+        for (ControllerNum = 1; ControllerNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).NumControllers; ++ControllerNum) {
+            print(TraceFile, "{},{},\n", ControllerNum, state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).ControllerName(ControllerNum));
             // SAME AS ControllerProps(ControllerIndex)%ControllerName BUT NOT YET AVAILABLE
         }
 
@@ -2739,7 +2735,7 @@ namespace HVACControllers {
               "FirstHVACIteration,AirLoopPass,AirLoopNumCallsTot,AirLoopConverged,");
 
         // Write headers for final state
-        for (ControllerNum = 1; ControllerNum <= PrimaryAirSystem(AirLoopNum).NumControllers; ++ControllerNum) {
+        for (ControllerNum = 1; ControllerNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).NumControllers; ++ControllerNum) {
             print(TraceFile,
                   "Mode{},IterMax{},XRoot{},YRoot{},YSetPoint{},\n",
                   ControllerNum,
@@ -2776,8 +2772,6 @@ namespace HVACControllers {
         // na
 
         // Using/Aliasing
-        using DataAirSystems::PrimaryAirSystem;
-
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
         // TRUE when primary air system & controllers simulation has converged;
@@ -2798,7 +2792,7 @@ namespace HVACControllers {
         // FLOW
 
         // IF no controllers on this air loop then we have nothing to do
-        if (PrimaryAirSystem(AirLoopNum).NumControllers == 0) return;
+        if (state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).NumControllers == 0) return;
         // To avoid tracking statistics in case of no air loop or no HVAC controllers are defined
         if (NumAirLoopStats == 0) return;
 
@@ -2817,8 +2811,8 @@ namespace HVACControllers {
         TraceIterationStamp(state, TraceFile, FirstHVACIteration, AirLoopPass, AirLoopConverged, AirLoopNumCalls);
 
         // Loop over the air sys controllers and write diagnostic to trace file
-        for (ControllerNum = 1; ControllerNum <= PrimaryAirSystem(AirLoopNum).NumControllers; ++ControllerNum) {
-            TraceAirLoopController(TraceFile, PrimaryAirSystem(AirLoopNum).ControllerIndex(ControllerNum));
+        for (ControllerNum = 1; ControllerNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).NumControllers; ++ControllerNum) {
+            TraceAirLoopController(TraceFile, state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).ControllerIndex(ControllerNum));
         }
 
         // Go to next line
@@ -3326,7 +3320,6 @@ namespace HVACControllers {
         // setup data for sensed nodes and compare positions if on the same branch
 
         // Using/Aliasing
-        using DataAirSystems::PrimaryAirSystem;
         using DataHVACGlobals::NumPrimaryAirSys;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -3341,11 +3334,11 @@ namespace HVACControllers {
 
         for (AirSysNum = 1; AirSysNum <= NumPrimaryAirSys; ++AirSysNum) {
 
-            if (PrimaryAirSystem(AirSysNum).NumControllers > 1) {
+            if (state.dataAirSystemsData->PrimaryAirSystems(AirSysNum).NumControllers > 1) {
                 // first see how many are water coil controllers
                 WaterCoilContrlCount = 0; // init
-                for (ContrlNum = 1; ContrlNum <= PrimaryAirSystem(AirSysNum).NumControllers; ++ContrlNum) {
-                    if (UtilityRoutines::SameString(PrimaryAirSystem(AirSysNum).ControllerType(ContrlNum), "CONTROLLER:WATERCOIL")) {
+                for (ContrlNum = 1; ContrlNum <= state.dataAirSystemsData->PrimaryAirSystems(AirSysNum).NumControllers; ++ContrlNum) {
+                    if (UtilityRoutines::SameString(state.dataAirSystemsData->PrimaryAirSystems(AirSysNum).ControllerType(ContrlNum), "CONTROLLER:WATERCOIL")) {
                         ++WaterCoilContrlCount;
                     }
                 }
@@ -3354,11 +3347,11 @@ namespace HVACControllers {
                     ContrlSensedNodeNums.allocate(3, WaterCoilContrlCount);
                     ContrlSensedNodeNums = 0;
                     SensedNodeIndex = 0;
-                    for (ContrlNum = 1; ContrlNum <= PrimaryAirSystem(AirSysNum).NumControllers; ++ContrlNum) {
-                        if (UtilityRoutines::SameString(PrimaryAirSystem(AirSysNum).ControllerType(ContrlNum), "CONTROLLER:WATERCOIL")) {
+                    for (ContrlNum = 1; ContrlNum <= state.dataAirSystemsData->PrimaryAirSystems(AirSysNum).NumControllers; ++ContrlNum) {
+                        if (UtilityRoutines::SameString(state.dataAirSystemsData->PrimaryAirSystems(AirSysNum).ControllerType(ContrlNum), "CONTROLLER:WATERCOIL")) {
                             ++SensedNodeIndex;
                             foundControl = UtilityRoutines::FindItemInList(
-                                PrimaryAirSystem(AirSysNum).ControllerName(ContrlNum), ControllerProps, &ControllerPropsType::ControllerName);
+                                state.dataAirSystemsData->PrimaryAirSystems(AirSysNum).ControllerName(ContrlNum), ControllerProps, &ControllerPropsType::ControllerName);
                             if (foundControl > 0) {
                                 ContrlSensedNodeNums(1, SensedNodeIndex) = ControllerProps(foundControl).SensedNode;
                             }
@@ -3368,12 +3361,12 @@ namespace HVACControllers {
 
                 // fill branch index for sensed nodes
                 if (allocated(ContrlSensedNodeNums)) {
-                    for (BranchNum = 1; BranchNum <= PrimaryAirSystem(AirSysNum).NumBranches; ++BranchNum) {
+                    for (BranchNum = 1; BranchNum <= state.dataAirSystemsData->PrimaryAirSystems(AirSysNum).NumBranches; ++BranchNum) {
                         for (SensedNodeIndex = 1; SensedNodeIndex <= WaterCoilContrlCount; ++SensedNodeIndex) {
-                            for (BranchNodeIndex = 1; BranchNodeIndex <= PrimaryAirSystem(AirSysNum).Branch(BranchNum).TotalNodes;
+                            for (BranchNodeIndex = 1; BranchNodeIndex <= state.dataAirSystemsData->PrimaryAirSystems(AirSysNum).Branch(BranchNum).TotalNodes;
                                  ++BranchNodeIndex) {
                                 if (ContrlSensedNodeNums(1, SensedNodeIndex) ==
-                                    PrimaryAirSystem(AirSysNum).Branch(BranchNum).NodeNum(BranchNodeIndex)) {
+                                    state.dataAirSystemsData->PrimaryAirSystems(AirSysNum).Branch(BranchNum).NodeNum(BranchNodeIndex)) {
                                     ContrlSensedNodeNums(2, SensedNodeIndex) = BranchNodeIndex;
                                     ContrlSensedNodeNums(3, SensedNodeIndex) = BranchNum;
                                 }
@@ -3391,7 +3384,7 @@ namespace HVACControllers {
                                 // we have a flow order problem with water coil controllers
                                 ShowSevereError(state, "CheckControllerListOrder: A water coil controller list has the wrong order");
                                 ShowContinueError(state, "Check the AirLoopHVAC:ControllerList for the air loop called \"" +
-                                                  PrimaryAirSystem(AirSysNum).Name + "\"");
+                                                  state.dataAirSystemsData->PrimaryAirSystems(AirSysNum).Name + "\"");
                                 ShowContinueError(state, "When there are multiple Controller:WaterCoil objects for the same air loop, they need to be "
                                                   "listed in the proper order.");
                                 ShowContinueError(state, "The controllers should be listed in natural flow order with those for upstream coils listed "

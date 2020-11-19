@@ -246,7 +246,7 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirOutletTempSizingGauntlet)
 
     DataSizing::CurSysNum = 1;
     DataHVACGlobals::NumPrimaryAirSys = 1;
-    DataAirSystems::PrimaryAirSystem.allocate(1);
+    state.dataAirSystemsData->PrimaryAirSystems.allocate(1);
     DataSizing::NumSysSizInput = 1;
     DataSizing::SysSizingRunDone = false;
     // start with a hard-sized value as the user input, no system sizing arrays
@@ -291,7 +291,7 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirOutletTempSizingGauntlet)
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 
     // Test 11 - Airloop Equipment - no OA coils, with fan heat
-    DataAirSystems::PrimaryAirSystem(DataSizing::CurSysNum).supFanLocation = DataAirSystems::fanPlacement::DrawThru;
+    state.dataAirSystemsData->PrimaryAirSystems(DataSizing::CurSysNum).supFanLocation = DataAirSystems::fanPlacement::DrawThru;
     DataSizing::DataFanIndex = 1;
     // start with an auto-sized value as the user input
     inputValue = EnergyPlus::DataSizing::AutoSize;
@@ -307,7 +307,7 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirOutletTempSizingGauntlet)
     sizer.autoSizedValue = 0.0; // reset for next test
 
     // Test 12 - Airloop Equipment - 1 OA coil, use PrecoolHumRat
-    DataAirSystems::PrimaryAirSystem(DataSizing::CurSysNum).NumOACoolCoils = 1;
+    state.dataAirSystemsData->PrimaryAirSystems(DataSizing::CurSysNum).NumOACoolCoils = 1;
     EnergyPlus::DataSizing::FinalSysSizing(DataSizing::CurSysNum).PrecoolTemp = 12.21;
 
     // start with an auto-sized value as the user input

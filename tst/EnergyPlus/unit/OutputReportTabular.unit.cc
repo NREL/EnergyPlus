@@ -6066,7 +6066,7 @@ TEST_F(SQLiteFixture, WriteVeriSumTableAreasTest)
     Surface.allocate(TotSurfaces);
 
     // walls
-    Surface(1).Class = SurfaceClass_Wall;
+    Surface(1).Class = SurfaceClass::Wall;
     Surface(1).HeatTransSurf = true;
     Surface(1).ExtBoundCond = ExternalEnvironment;
     Surface(1).Azimuth = 0.;
@@ -6075,7 +6075,7 @@ TEST_F(SQLiteFixture, WriteVeriSumTableAreasTest)
     Surface(1).Tilt = 90.;
     Surface(1).Zone = 1;
 
-    Surface(2).Class = SurfaceClass_Wall;
+    Surface(2).Class = SurfaceClass::Wall;
     Surface(2).HeatTransSurf = true;
     Surface(2).ExtBoundCond = ExternalEnvironment;
     Surface(2).Azimuth = 90.;
@@ -6085,7 +6085,7 @@ TEST_F(SQLiteFixture, WriteVeriSumTableAreasTest)
     Surface(2).Zone = 1;
 
     // windows
-    Surface(3).Class = SurfaceClass_Window;
+    Surface(3).Class = SurfaceClass::Window;
     Surface(3).HeatTransSurf = true;
     Surface(3).ExtBoundCond = ExternalEnvironment;
     Surface(3).Azimuth = 0.;
@@ -6096,7 +6096,7 @@ TEST_F(SQLiteFixture, WriteVeriSumTableAreasTest)
     Surface(3).Tilt = 90.;
     Surface(3).Zone = 1;
 
-    Surface(4).Class = SurfaceClass_Window;
+    Surface(4).Class = SurfaceClass::Window;
     Surface(4).HeatTransSurf = true;
     Surface(4).ExtBoundCond = ExternalEnvironment;
     Surface(4).Azimuth = 90.;
@@ -6176,7 +6176,7 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal)
     Surface.allocate(TotSurfaces);
 
     // walls
-    Surface(1).Class = SurfaceClass_Wall;
+    Surface(1).Class = SurfaceClass::Wall;
     Surface(1).HeatTransSurf = true;
     Surface(1).ExtBoundCond = ExternalEnvironment;
     Surface(1).Azimuth = 0.;
@@ -6184,7 +6184,7 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal)
     Surface(1).Tilt = 90.;
     Surface(1).Zone = 1;
 
-    Surface(2).Class = SurfaceClass_Wall;
+    Surface(2).Class = SurfaceClass::Wall;
     Surface(2).HeatTransSurf = true;
     Surface(2).ExtBoundCond = ExternalEnvironment;
     Surface(2).Azimuth = 90.;
@@ -6193,7 +6193,7 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal)
     Surface(2).Zone = 2;
 
     // windows
-    Surface(3).Class = SurfaceClass_Window;
+    Surface(3).Class = SurfaceClass::Window;
     Surface(3).HeatTransSurf = true;
     Surface(3).ExtBoundCond = ExternalEnvironment;
     Surface(3).Azimuth = 0.;
@@ -6203,7 +6203,7 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal)
     Surface(3).Tilt = 90.;
     Surface(3).Zone = 1;
 
-    Surface(4).Class = SurfaceClass_Window;
+    Surface(4).Class = SurfaceClass::Window;
     Surface(4).HeatTransSurf = true;
     Surface(4).ExtBoundCond = ExternalEnvironment;
     Surface(4).Azimuth = 90.;
@@ -6541,79 +6541,79 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetZoneComponentAreas_test)
     Surface.allocate(13);
 
     Surface(1).GrossArea = 5.; // extWall
-    Surface(1).Class = SurfaceClass_Wall;
+    Surface(1).Class = SurfaceClass::Wall;
     Surface(1).ExtBoundCond = ExternalEnvironment;
     Surface(1).Zone = 1;
     Surface(1).HeatTransSurf = true;
 
     Surface(2).GrossArea = 6.; // grdCntWall
-    Surface(2).Class = SurfaceClass_Wall;
+    Surface(2).Class = SurfaceClass::Wall;
     Surface(2).ExtBoundCond = GroundFCfactorMethod;
     Surface(2).Zone = 1;
     Surface(2).HeatTransSurf = true;
 
     Surface(3).GrossArea = 7.; // intZoneWall
-    Surface(3).Class = SurfaceClass_Wall;
+    Surface(3).Class = SurfaceClass::Wall;
     Surface(3).ExtBoundCond = 2;
     Surface(3).Zone = 1;
     Surface(3).HeatTransSurf = true;
 
     Surface(4).GrossArea = 8.; // roof
-    Surface(4).Class = SurfaceClass_Roof;
+    Surface(4).Class = SurfaceClass::Roof;
     Surface(4).ExtBoundCond = ExternalEnvironment;
     Surface(4).Zone = 1;
     Surface(4).HeatTransSurf = true;
 
     Surface(5).GrossArea = 9.; // ceiling
-    Surface(5).Class = SurfaceClass_Roof;
+    Surface(5).Class = SurfaceClass::Roof;
     Surface(5).ExtBoundCond = 5;
     Surface(5).Zone = 1;
     Surface(5).HeatTransSurf = true;
 
     Surface(6).GrossArea = 10.; // extFloor
-    Surface(6).Class = SurfaceClass_Floor;
+    Surface(6).Class = SurfaceClass::Floor;
     Surface(6).ExtBoundCond = ExternalEnvironment;
     Surface(6).Zone = 1;
     Surface(6).HeatTransSurf = true;
 
     Surface(7).GrossArea = 11.; // grndCntFloor
-    Surface(7).Class = SurfaceClass_Floor;
+    Surface(7).Class = SurfaceClass::Floor;
     Surface(7).ExtBoundCond = Ground;
     Surface(7).Zone = 1;
     Surface(7).HeatTransSurf = true;
 
     Surface(8).GrossArea = 12.; // intZoneFloor
-    Surface(8).Class = SurfaceClass_Floor;
+    Surface(8).Class = SurfaceClass::Floor;
     Surface(8).ExtBoundCond = 3;
     Surface(8).Zone = 1;
     Surface(8).HeatTransSurf = true;
 
     Surface(9).GrossArea = 13.; // fenestration
-    Surface(9).Class = SurfaceClass_Window;
+    Surface(9).Class = SurfaceClass::Window;
     Surface(9).ExtBoundCond = ExternalEnvironment;
     Surface(9).Zone = 1;
     Surface(9).HeatTransSurf = true;
 
     Surface(10).GrossArea = 14.; // door
-    Surface(10).Class = SurfaceClass_Door;
+    Surface(10).Class = SurfaceClass::Door;
     Surface(10).ExtBoundCond = ExternalEnvironment;
     Surface(10).Zone = 1;
     Surface(10).HeatTransSurf = true;
 
     Surface(11).GrossArea = 15.; // door (again)
-    Surface(11).Class = SurfaceClass_GlassDoor;
+    Surface(11).Class = SurfaceClass::GlassDoor;
     Surface(11).ExtBoundCond = ExternalEnvironment;
     Surface(11).Zone = 1;
     Surface(11).HeatTransSurf = true;
 
     Surface(12).GrossArea = 16.; // fenestration (again)
-    Surface(12).Class = SurfaceClass_TDD_Dome;
+    Surface(12).Class = SurfaceClass::TDD_Dome;
     Surface(12).ExtBoundCond = ExternalEnvironment;
     Surface(12).Zone = 1;
     Surface(12).HeatTransSurf = true;
 
     Surface(13).GrossArea = 17.; // grndCntFloor (again)
-    Surface(13).Class = SurfaceClass_Floor;
+    Surface(13).Class = SurfaceClass::Floor;
     Surface(13).ExtBoundCond = KivaFoundation;
     Surface(13).Zone = 1;
     Surface(13).HeatTransSurf = true;
@@ -6810,7 +6810,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesTwice_test)
     TotSurfaces = 4;
     Surface.allocate(TotSurfaces);
     Surface(1).HeatTransSurf = true;
-    Surface(1).Class = SurfaceClass_Window;
+    Surface(1).Class = SurfaceClass::Window;
 
     Array1D<Real64> peopleDelaySeq;
     peopleDelaySeq.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
@@ -7420,11 +7420,11 @@ TEST_F(EnergyPlusFixture, AzimuthToCardinal)
 
         if (i % 2 == 1) {
             // It's a wall
-            DataSurfaces::Surface(i).Class = DataSurfaces::SurfaceClass_Wall;
+            DataSurfaces::Surface(i).Class = DataSurfaces::SurfaceClass::Wall;
             DataSurfaces::Surface(i).Name = "ExtWall_" + std::to_string(i) + "_" + std::to_string(entryIndex);
         } else {
             // It's a window
-            DataSurfaces::Surface(i).Class = DataSurfaces::SurfaceClass_Window;
+            DataSurfaces::Surface(i).Class = DataSurfaces::SurfaceClass::Window;
             DataSurfaces::Surface(i).Name = "ExtWindow_" + std::to_string(i) + "_" + std::to_string(entryIndex);
             // Window references the previous wall
             DataSurfaces::Surface(i).BaseSurf = i - 1;
@@ -7529,14 +7529,14 @@ TEST_F(EnergyPlusFixture, InteriorSurfaceEnvelopeSummaryReport)
         if (i % 2 == 1) {
             DataSurfaces::Surface(i).Name = "Interzonal_Wall_" + std::to_string((i + 1) / 2);
             DataSurfaces::Surface(i).GrossArea = 200.;
-            DataSurfaces::Surface(i).Class = DataSurfaces::SurfaceClass_Wall;
+            DataSurfaces::Surface(i).Class = DataSurfaces::SurfaceClass::Wall;
             DataSurfaces::AllSurfaceListReportOrder.push_back(i);
         }else{
             DataSurfaces::Surface(i).Name = "Interzonal_Door_" + std::to_string((i + 1) / 2);
             DataSurfaces::Surface(i).BaseSurfName = DataSurfaces::Surface(i - 1).Name;
             DataSurfaces::Surface(i).BaseSurf = i - 1;
             DataSurfaces::Surface(i).GrossArea = 50.;
-            DataSurfaces::Surface(i).Class = DataSurfaces::SurfaceClass_Door;
+            DataSurfaces::Surface(i).Class = DataSurfaces::SurfaceClass::Door;
             DataSurfaces::AllSurfaceListReportOrder.push_back(i);
         }
         if ((i + 1) / 2 == 1) {
@@ -7647,7 +7647,7 @@ TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummary_TestPerArea) {
     Surface.allocate(TotSurfaces);
 
     // walls
-    Surface(1).Class = SurfaceClass_Wall;
+    Surface(1).Class = SurfaceClass::Wall;
     Surface(1).HeatTransSurf = true;
     Surface(1).ExtBoundCond = ExternalEnvironment;
     Surface(1).Azimuth = 0.;
@@ -7655,7 +7655,7 @@ TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummary_TestPerArea) {
     Surface(1).Tilt = 90.;
     Surface(1).Zone = 1;
 
-    Surface(2).Class = SurfaceClass_Wall;
+    Surface(2).Class = SurfaceClass::Wall;
     Surface(2).HeatTransSurf = true;
     Surface(2).ExtBoundCond = ExternalEnvironment;
     Surface(2).Azimuth = 90.;
@@ -7664,7 +7664,7 @@ TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummary_TestPerArea) {
     Surface(2).Zone = 2;
 
     // windows
-    Surface(3).Class = SurfaceClass_Window;
+    Surface(3).Class = SurfaceClass::Window;
     Surface(3).HeatTransSurf = true;
     Surface(3).ExtBoundCond = ExternalEnvironment;
     Surface(3).Azimuth = 0.;
@@ -7674,7 +7674,7 @@ TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummary_TestPerArea) {
     Surface(3).Tilt = 90.;
     Surface(3).Zone = 1;
 
-    Surface(4).Class = SurfaceClass_Window;
+    Surface(4).Class = SurfaceClass::Window;
     Surface(4).HeatTransSurf = true;
     Surface(4).ExtBoundCond = ExternalEnvironment;
     Surface(4).Azimuth = 90.;
@@ -8192,10 +8192,10 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesSurfaceOrder_
     Surface(2).HeatTransSurf = true;
     Surface(3).HeatTransSurf = true;
     Surface(4).HeatTransSurf = false;
-    Surface(1).Class = SurfaceClass_Window;
-    Surface(2).Class = SurfaceClass_Wall;
-    Surface(3).Class = SurfaceClass_Floor;
-    Surface(4).Class = SurfaceClass_Shading;
+    Surface(1).Class = SurfaceClass::Window;
+    Surface(2).Class = SurfaceClass::Wall;
+    Surface(3).Class = SurfaceClass::Floor;
+    Surface(4).Class = SurfaceClass::Shading;
 
     for (int jSurf = 1; jSurf <= 4; ++jSurf) {
         for (int step = 1; step <= 10; ++step) {
@@ -8241,10 +8241,10 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesSurfaceOrder_
     Surface(4).HeatTransSurf = true;
     Surface(1).HeatTransSurf = true;
     Surface(3).HeatTransSurf = false;
-    Surface(2).Class = SurfaceClass_Window;
-    Surface(4).Class = SurfaceClass_Wall;
-    Surface(1).Class = SurfaceClass_Floor;
-    Surface(3).Class = SurfaceClass_Shading;
+    Surface(2).Class = SurfaceClass::Window;
+    Surface(4).Class = SurfaceClass::Wall;
+    Surface(1).Class = SurfaceClass::Floor;
+    Surface(3).Class = SurfaceClass::Shading;
 
     for (int jSurf = 1; jSurf <= 4; ++jSurf) {
         for (int step = 1; step <= 10; ++step) {

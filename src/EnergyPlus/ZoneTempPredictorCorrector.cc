@@ -6268,7 +6268,7 @@ namespace ZoneTempPredictorCorrector {
             HA = 0.0;
             Area = Surface(SurfNum).Area; // For windows, this is the glazing area
 
-            if (Surface(SurfNum).Class == SurfaceClass_Window) {
+            if (Surface(SurfNum).Class == SurfaceClass::Window) {
                 auto const shading_flag(SurfWinShadingFlag(SurfNum));
 
                 // Add to the convective internal gains
@@ -6604,7 +6604,7 @@ namespace ZoneTempPredictorCorrector {
                 }
             }
 
-            if (Surface(SurfNum).Class == SurfaceClass_Window) {
+            if (Surface(SurfNum).Class == SurfaceClass::Window) {
 
                 // Add to the convective internal gains
                 if (SurfWinShadingFlag(SurfNum) == IntShadeOn || SurfWinShadingFlag(SurfNum) == IntBlindOn) {
