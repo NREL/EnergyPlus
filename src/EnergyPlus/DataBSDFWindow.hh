@@ -79,8 +79,6 @@ namespace DataBSDFWindow {
     constexpr int summerCondition = 1;
     constexpr int winterCondition = 2;
 
-    extern Array3D<Real64> SUNCOSTS;     // Timestep values of solar direction cosines
-
     struct BasisElemDescr
     {
         // Members
@@ -431,7 +429,7 @@ struct BSDFWindowData : BaseGlobalStruct {
     int TotThermalModels = 0;    // Number of thermal models
 
     // calculation
-//    Array3D<Real64> SUNCOSTS(60, 24, 3); // Timestep values of solar direction cosines
+    Array3D<Real64> SUNCOSTS = Array3D<Real64>(60, 24, 3); // Timestep values of solar direction cosines
     Array2D<Real64> BSDFTempMtrx;        // Temporary matrix for holding axisymmetric input
     Array1D<DataBSDFWindow::BSDFWindowGeomDescr> ComplexWind; // Window geometry structure: set in CalcPerSolarBeam/SolarShading
 
@@ -440,7 +438,7 @@ struct BSDFWindowData : BaseGlobalStruct {
         this->FirstBSDF = 0;
         this->MaxBkSurf = 20;
         this->TotThermalModels = 0;
-//        this->SUNCOSTS.deallocate();
+        this->SUNCOSTS.deallocate();
         this->BSDFTempMtrx.deallocate();
         this->ComplexWind.deallocate();
     }

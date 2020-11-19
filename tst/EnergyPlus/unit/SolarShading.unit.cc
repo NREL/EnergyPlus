@@ -1069,9 +1069,9 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
     state.dataSolarShading->CalcSkyDifShading = false;
 
     ScheduleManager::UpdateScheduleValues(state);
-    DataBSDFWindow::SUNCOSTS(4, 9, 1) = 0.1;
-    DataBSDFWindow::SUNCOSTS(4, 9, 2) = 0.1;
-    DataBSDFWindow::SUNCOSTS(4, 9, 3) = 0.1;
+    state.dataBSDFWindow->SUNCOSTS(4, 9, 1) = 0.1;
+    state.dataBSDFWindow->SUNCOSTS(4, 9, 2) = 0.1;
+    state.dataBSDFWindow->SUNCOSTS(4, 9, 3) = 0.1;
     FigureSolarBeamAtTimestep(state, state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep);
 
     EXPECT_TRUE(DataSystemVariables::shadingMethod == DataSystemVariables::ShadingMethod::Scheduled);

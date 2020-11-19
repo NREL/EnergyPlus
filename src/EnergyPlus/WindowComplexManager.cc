@@ -608,10 +608,10 @@ namespace WindowComplexManager {
             std::size_t lHTI(0); // Linear index for ( Hour, TS, I )
             for (int Hour = 1; Hour <= 24; ++Hour) {
                 for (int TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS, ++lHT) { // [ lHT ] == ( Hour, TS )
-                    SunDir = SUNCOSTS(TS, Hour, {1, 3});
+                    SunDir = state.dataBSDFWindow->SUNCOSTS(TS, Hour, {1, 3});
                     Theta = 0.0;
                     Phi = 0.0;
-                    if (SUNCOSTS(TS, Hour, 3) > SunIsUpValue) {
+                    if (state.dataBSDFWindow->SUNCOSTS(TS, Hour, 3) > SunIsUpValue) {
                         IncRay = FindInBasis(state, SunDir, state.dataWindowComplexManager->Front_Incident, iSurf, iState, complexWindowGeom.Inc, Theta, Phi);
                         complexWindowGeom.ThetaBm[lHT] = Theta;
                         complexWindowGeom.PhiBm[lHT] = Phi;
@@ -656,10 +656,10 @@ namespace WindowComplexManager {
             }                                                                            // Hour loop
         } else {                                                                         // detailed timestep integration
             std::size_t const lHT(complexWindowGeom.ThetaBm.index(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep)); // [ lHT ] == ( HourOfDay, TimeStep )
-            SunDir = SUNCOSTS(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, {1, 3});
+            SunDir = state.dataBSDFWindow->SUNCOSTS(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, {1, 3});
             Theta = 0.0;
             Phi = 0.0;
-            if (SUNCOSTS(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, 3) > SunIsUpValue) {
+            if (state.dataBSDFWindow->SUNCOSTS(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, 3) > SunIsUpValue) {
                 IncRay = FindInBasis(state, SunDir, state.dataWindowComplexManager->Front_Incident, iSurf, iState, complexWindowGeom.Inc, Theta, Phi);
                 complexWindowGeom.ThetaBm[lHT] = Theta;
                 complexWindowGeom.PhiBm[lHT] = Phi;
@@ -848,7 +848,7 @@ namespace WindowComplexManager {
         }
         if (RegWindFnd) {
             Absorb.allocate(State.NLayers);
-            SunDir = SUNCOSTS(TS, Hour, {1, 3});
+            SunDir = state.dataBSDFWindow->SUNCOSTS(TS, Hour, {1, 3});
             BkIncRay = FindInBasis(state, SunDir, state.dataWindowComplexManager->Back_Incident, ISurf, IState, state.dataBSDFWindow->ComplexWind(ISurf).Geom(IState).Trn, Theta, Phi);
             if (BkIncRay > 0) {
                 // Here calculate the back incidence properties for the solar ray

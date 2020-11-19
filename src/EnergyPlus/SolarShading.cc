@@ -138,7 +138,6 @@ namespace SolarShading {
     using DaylightingManager::ProfileAngle;
     using namespace SolarReflectionManager;
     using namespace DataReportingFlags;
-    using DataBSDFWindow::SUNCOSTS;
     using namespace DataVectorTypes;
     using namespace WindowManager;
     using namespace FenestrationCommon;
@@ -4611,7 +4610,7 @@ namespace SolarShading {
             SUNCOSHR(iHour, {1, 3}) = state.dataSolarShading->SUNCOS;
         }
         // Save timestep values for use in WindowComplexManager
-        SUNCOSTS(iTimeStep, iHour, {1, 3}) = state.dataSolarShading->SUNCOS;
+        state.dataBSDFWindow->SUNCOSTS(iTimeStep, iHour, {1, 3}) = state.dataSolarShading->SUNCOS;
     }
 
     void FigureSolarBeamAtTimestep(EnergyPlusData &state, int const iHour, int const iTimeStep)
@@ -4639,7 +4638,7 @@ namespace SolarShading {
         Real64 FracIlluminated; // Fraction of surface area illuminated by a sky patch
 
         // Recover the sun direction from the array stored in previous loop
-        state.dataSolarShading->SUNCOS = SUNCOSTS(iTimeStep, iHour, {1, 3});
+        state.dataSolarShading->SUNCOS = state.dataBSDFWindow->SUNCOSTS(iTimeStep, iHour, {1, 3});
 
         state.dataSolarShading->CTHETA = 0.0;
 
