@@ -93,7 +93,7 @@ namespace BranchNodeConnections {
 
     bool IsParentObject(EnergyPlusData &state, std::string const &ComponentType, std::string const &ComponentName);
 
-    int WhichParentSet(std::string const &ComponentType, std::string const &ComponentName);
+    int WhichParentSet(EnergyPlusData &state, std::string const &ComponentType, std::string const &ComponentName);
 
     void GetParentData(EnergyPlusData &state, std::string const &ComponentType,
                        std::string const &ComponentName,

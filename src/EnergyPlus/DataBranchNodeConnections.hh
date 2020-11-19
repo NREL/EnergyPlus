@@ -60,13 +60,6 @@ namespace EnergyPlus {
 
 namespace DataBranchNodeConnections {
 
-    extern int NumOfActualParents;
-    extern int NumOfAirTerminalNodes;
-    extern int MaxNumOfAirTerminalNodes;
-    extern int EqNodeConnectionAlloc;
-
-    // Types
-
     struct ComponentListData
     {
         // Members
@@ -151,6 +144,10 @@ struct BranchNodeConnectionsData : BaseGlobalStruct {
     int NumOfNodeConnections = 0;
     int MaxNumOfNodeConnections = 0;
     int NodeConnectionAlloc = 1000;
+    int NumOfActualParents = 0;
+    int NumOfAirTerminalNodes = 0;
+    int MaxNumOfAirTerminalNodes = 0;
+    int EqNodeConnectionAlloc = 100;
 
     void clear_state() override
     {
@@ -159,6 +156,10 @@ struct BranchNodeConnectionsData : BaseGlobalStruct {
         this->NumOfNodeConnections = 0;
         this->MaxNumOfNodeConnections = 0;
         this->NodeConnectionAlloc = 1000;
+        this->NumOfActualParents = 0;
+        this->NumOfAirTerminalNodes = 0;
+        this->MaxNumOfAirTerminalNodes = 0;
+        this->EqNodeConnectionAlloc = 100;
     }
 };
 

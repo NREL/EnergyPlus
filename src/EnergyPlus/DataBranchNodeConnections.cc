@@ -80,11 +80,6 @@ namespace DataBranchNodeConnections {
 
     // MODULE VARIABLE DECLARATIONS:
 
-    int NumOfActualParents(0);
-    int NumOfAirTerminalNodes(0);
-    int MaxNumOfAirTerminalNodes(0);
-    int EqNodeConnectionAlloc(100);
-
     // Object Data
     Array1D<ComponentListData> CompSets;
     Array1D<ParentListData> ParentNodeList;
@@ -96,10 +91,6 @@ namespace DataBranchNodeConnections {
     // Needed for unit tests, should not be normally called.
     void clear_state()
     {
-        NumOfActualParents = 0;
-        NumOfAirTerminalNodes = 0;
-        MaxNumOfAirTerminalNodes = 0;
-        EqNodeConnectionAlloc = 100;
         CompSets.deallocate();
         ParentNodeList.deallocate();
         NodeConnections.deallocate();

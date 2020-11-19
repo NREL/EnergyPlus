@@ -2224,7 +2224,7 @@ namespace SimulationManager {
             if (UtilityRoutines::SameString(NodeConnections(Loop).ConnectionType, "Inlet") ||
                 UtilityRoutines::SameString(NodeConnections(Loop).ConnectionType, "Outlet")) {
                 bool ParentComponentFound = false;
-                for (int Loop1 = 1; Loop1 <= NumOfActualParents; ++Loop1) {
+                for (int Loop1 = 1; Loop1 <= state.dataBranchNodeConnections->NumOfActualParents; ++Loop1) {
                     if (ParentNodeList(Loop1).CType != NodeConnections(Loop).ObjectType ||
                         ParentNodeList(Loop1).CName != NodeConnections(Loop).ObjectName)
                         continue;
@@ -2239,15 +2239,15 @@ namespace SimulationManager {
                     }
                 }
                 if (!ParentComponentFound) {
-                    ++NumOfActualParents;
-                    ParentNodeList(NumOfActualParents).CType = NodeConnections(Loop).ObjectType;
-                    ParentNodeList(NumOfActualParents).CName = NodeConnections(Loop).ObjectName;
+                    ++state.dataBranchNodeConnections->NumOfActualParents;
+                    ParentNodeList(state.dataBranchNodeConnections->NumOfActualParents).CType = NodeConnections(Loop).ObjectType;
+                    ParentNodeList(state.dataBranchNodeConnections->NumOfActualParents).CName = NodeConnections(Loop).ObjectName;
                     {
                         auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(NodeConnections(Loop).ConnectionType));
                         if (SELECT_CASE_var == "INLET") {
-                            ParentNodeList(NumOfActualParents).InletNodeName = NodeConnections(Loop).NodeName;
+                            ParentNodeList(state.dataBranchNodeConnections->NumOfActualParents).InletNodeName = NodeConnections(Loop).NodeName;
                         } else if (SELECT_CASE_var == "OUTLET") {
-                            ParentNodeList(NumOfActualParents).OutletNodeName = NodeConnections(Loop).NodeName;
+                            ParentNodeList(state.dataBranchNodeConnections->NumOfActualParents).OutletNodeName = NodeConnections(Loop).NodeName;
                         }
                     }
                 }
@@ -2867,7 +2867,7 @@ namespace SimulationManager {
 
         ErrorsFound = false;
         print(state.files.debug, "{}\n", "Node Type,CompSet Name,Inlet Node,OutletNode");
-        for (Loop = 1; Loop <= NumOfActualParents; ++Loop) {
+        for (Loop = 1; Loop <= state.dataBranchNodeConnections->NumOfActualParents; ++Loop) {
             NumChildren = GetNumChildren(state, ParentNodeList(Loop).CType, ParentNodeList(Loop).CName);
             if (NumChildren > 0) {
                 ChildCType.allocate(NumChildren);

@@ -147,17 +147,17 @@ namespace EnergyPlus::BranchNodeConnections {
 
         if (has_prefixi(ObjectType, "AirTerminal:")) {
             if (present(InputFieldName)) {
-                ++NumOfAirTerminalNodes;
-                if (NumOfAirTerminalNodes > 1 && NumOfAirTerminalNodes > MaxNumOfAirTerminalNodes) {
-                    AirTerminalNodeConnections.redimension(MaxNumOfAirTerminalNodes += EqNodeConnectionAlloc);
-                } else if (NumOfAirTerminalNodes == 1) {
-                    AirTerminalNodeConnections.allocate(EqNodeConnectionAlloc);
-                    MaxNumOfAirTerminalNodes = EqNodeConnectionAlloc;
+                ++state.dataBranchNodeConnections->NumOfAirTerminalNodes;
+                if (state.dataBranchNodeConnections->NumOfAirTerminalNodes > 1 && state.dataBranchNodeConnections->NumOfAirTerminalNodes > state.dataBranchNodeConnections->MaxNumOfAirTerminalNodes) {
+                    AirTerminalNodeConnections.redimension(state.dataBranchNodeConnections->MaxNumOfAirTerminalNodes += state.dataBranchNodeConnections->EqNodeConnectionAlloc);
+                } else if (state.dataBranchNodeConnections->NumOfAirTerminalNodes == 1) {
+                    AirTerminalNodeConnections.allocate(state.dataBranchNodeConnections->EqNodeConnectionAlloc);
+                    state.dataBranchNodeConnections->MaxNumOfAirTerminalNodes = state.dataBranchNodeConnections->EqNodeConnectionAlloc;
                 }
 
                 // Check out AirTerminal inlet/outlet nodes
                 Found =
-                    UtilityRoutines::FindItemInList(NodeName, AirTerminalNodeConnections, &EqNodeConnectionDef::NodeName, NumOfAirTerminalNodes - 1);
+                    UtilityRoutines::FindItemInList(NodeName, AirTerminalNodeConnections, &EqNodeConnectionDef::NodeName, state.dataBranchNodeConnections->NumOfAirTerminalNodes - 1);
                 if (Found != 0) { // Nodename already used
                     ShowSevereError(state, RoutineName + ObjectType + "=\"" + ObjectName + "\" node name duplicated.");
                     ShowContinueError(state, "NodeName=\"" + NodeName + "\", entered as type=" + ConnectionType);
@@ -168,11 +168,11 @@ namespace EnergyPlus::BranchNodeConnections {
                                       ", In Field=" + AirTerminalNodeConnections(Found).InputFieldName);
                     ErrorsFoundHere = true;
                 } else {
-                    AirTerminalNodeConnections(NumOfAirTerminalNodes).NodeName = NodeName;
-                    AirTerminalNodeConnections(NumOfAirTerminalNodes).ObjectType = ObjectType;
-                    AirTerminalNodeConnections(NumOfAirTerminalNodes).ObjectName = ObjectName;
-                    AirTerminalNodeConnections(NumOfAirTerminalNodes).ConnectionType = ConnectionType;
-                    AirTerminalNodeConnections(NumOfAirTerminalNodes).InputFieldName = InputFieldName;
+                    AirTerminalNodeConnections(state.dataBranchNodeConnections->NumOfAirTerminalNodes).NodeName = NodeName;
+                    AirTerminalNodeConnections(state.dataBranchNodeConnections->NumOfAirTerminalNodes).ObjectType = ObjectType;
+                    AirTerminalNodeConnections(state.dataBranchNodeConnections->NumOfAirTerminalNodes).ObjectName = ObjectName;
+                    AirTerminalNodeConnections(state.dataBranchNodeConnections->NumOfAirTerminalNodes).ConnectionType = ConnectionType;
+                    AirTerminalNodeConnections(state.dataBranchNodeConnections->NumOfAirTerminalNodes).InputFieldName = InputFieldName;
                 }
             } else {
                 ShowSevereError(state, RoutineName + ObjectType + ", Developer Error: Input Field Name not included.");
@@ -688,7 +688,7 @@ namespace EnergyPlus::BranchNodeConnections {
         return IsParent;
     }
 
-    int WhichParentSet(std::string const &ComponentType, std::string const &ComponentName)
+    int WhichParentSet(EnergyPlusData &state, std::string const &ComponentType, std::string const &ComponentName)
     {
 
         // FUNCTION INFORMATION:
@@ -708,7 +708,7 @@ namespace EnergyPlus::BranchNodeConnections {
         int Loop;
 
         WhichOne = 0;
-        for (Loop = 1; Loop <= NumOfActualParents; ++Loop) {
+        for (Loop = 1; Loop <= state.dataBranchNodeConnections->NumOfActualParents; ++Loop) {
             if (ParentNodeList(Loop).CType == ComponentType && ParentNodeList(Loop).CName == ComponentName) {
                 WhichOne = Loop;
                 break;
@@ -749,7 +749,7 @@ namespace EnergyPlus::BranchNodeConnections {
         OutletNodeNum = 0;
         ErrInObject = false;
 
-        Which = WhichParentSet(ComponentType, ComponentName);
+        Which = WhichParentSet(state, ComponentType, ComponentName);
         if (Which != 0) {
             InletNodeName = ParentNodeList(Which).InletNodeName;
             OutletNodeName = ParentNodeList(Which).OutletNodeName;
