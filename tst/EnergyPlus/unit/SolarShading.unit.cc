@@ -95,7 +95,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcPerSolarBeamTest)
 
     state.dataGlobal->TimeStep = 1;
     TotSurfaces = 3;
-    MaxBkSurf = 3;
+    state.dataBSDFWindow->MaxBkSurf = 3;
     SurfaceWindow.allocate(TotSurfaces);
     SunlitFracHR.allocate(24, TotSurfaces);
     SunlitFrac.allocate(NumTimeSteps, 24, TotSurfaces);
@@ -104,8 +104,8 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcPerSolarBeamTest)
     CosIncAngHR.allocate(24, TotSurfaces);
     CosIncAng.allocate(NumTimeSteps, 24, TotSurfaces);
     SurfOpaqAO.allocate(TotSurfaces);
-    BackSurfaces.allocate(NumTimeSteps, 24, MaxBkSurf, TotSurfaces);
-    OverlapAreas.allocate(NumTimeSteps, 24, MaxBkSurf, TotSurfaces);
+    BackSurfaces.allocate(NumTimeSteps, 24, state.dataBSDFWindow->MaxBkSurf, TotSurfaces);
+    OverlapAreas.allocate(NumTimeSteps, 24, state.dataBSDFWindow->MaxBkSurf, TotSurfaces);
 
     // Test non-integrated option first, CalcPerSolarBeam should set OutProjSLFracMult and InOutProjSLFracMult to 1.0 for all hours
     for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {

@@ -220,7 +220,8 @@ namespace DaylightingManager {
         //		Optional< Real64 > MapWindowSolidAngAtRefPt = _, //Inactive
         Optional<Real64> MapWindowSolidAngAtRefPtWtd = _);
 
-    void InitializeCFSDaylighting(int const ZoneNum,               // Current zone number
+    void InitializeCFSDaylighting(EnergyPlusData &state,
+                                  int const ZoneNum,               // Current zone number
                                   int const IWin,                  // Complex fenestration number
                                   int const NWX,                   // Number of horizontal divisions
                                   int const NWY,                   // Number of vertical divisions
@@ -230,7 +231,8 @@ namespace DaylightingManager {
                                   int const CalledFrom,
                                   Optional_int_const MapNum = _);
 
-    void InitializeCFSStateData(BSDFRefPoints &StateRefPoint,
+    void InitializeCFSStateData(EnergyPlusData &state,
+                                 BSDFRefPoints &StateRefPoint,
                                 BSDFRefPointsGeomDescr &DaylghtGeomDescr,
                                 int const ZoneNum, // Current zone number
                                 int const iWin,
@@ -255,7 +257,8 @@ namespace DaylightingManager {
 
     void AllocateForCFSRefPointsGeometry(BSDFRefPointsGeomDescr &RefPointsGeomDescr, int const NumOfWinEl);
 
-    void CFSRefPointSolidAngle(Vector3<Real64> const &RefPoint,
+    void CFSRefPointSolidAngle(EnergyPlusData &state,
+                               Vector3<Real64> const &RefPoint,
                                Vector3<Real64> const &RWin,
                                Vector3<Real64> const &WNorm,
                                BSDFRefPoints &RefPointMap,
@@ -266,7 +269,7 @@ namespace DaylightingManager {
                                int const curWinEl,
                                Real64 const WinElArea);
 
-    void CFSRefPointPosFactor(
+    void CFSRefPointPosFactor(EnergyPlusData &state,
         Vector3<Real64> const &RefPoint, BSDFRefPoints &RefPointMap, int const iWin, int const CurFenState, int const NTrnBasis, Real64 const AZVIEW);
 
     Real64 CalcObstrMultiplier(Vector3<Real64> const &GroundHitPt, // Coordinates of point that ray hits ground (m)

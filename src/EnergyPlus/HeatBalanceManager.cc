@@ -4175,7 +4175,6 @@ namespace HeatBalanceManager {
 
         // Using/Aliasing
         using namespace DataStringGlobals;
-        using DataBSDFWindow::TotComplexFenStates;
 
         // If UniqueConstructionNames size, then input has already been gotten
         if (UniqueConstructNames.size()) return;
@@ -4221,14 +4220,14 @@ namespace HeatBalanceManager {
             NoCfactorConstructionsUsed = false;
         }
 
-        TotComplexFenStates = inputProcessor->getNumObjectsFound(state, "Construction:ComplexFenestrationState");
+        state.dataBSDFWindow->TotComplexFenStates = inputProcessor->getNumObjectsFound(state, "Construction:ComplexFenestrationState");
         TotWindow5Constructs = inputProcessor->getNumObjectsFound(state, "Construction:WindowDataFile");
         TotWinEquivLayerConstructs = inputProcessor->getNumObjectsFound(state, "Construction:WindowEquivalentLayer");
 
         WConstructNames.allocate(TotWindow5Constructs);
 
         TotConstructs = TotRegConstructs + TotFfactorConstructs + TotCfactorConstructs + TotSourceConstructs + totAirBoundaryConstructs +
-                        TotComplexFenStates + TotWinEquivLayerConstructs;
+                        state.dataBSDFWindow->TotComplexFenStates + TotWinEquivLayerConstructs;
 
         NominalRforNominalUCalculation.dimension(TotConstructs, 0.0);
         NominalU.dimension(TotConstructs, 0.0);
@@ -4362,12 +4361,12 @@ namespace HeatBalanceManager {
         }
 
         // Added BG 6/2010 for complex fenestration
-        if (TotComplexFenStates > 0) {
+        if (state.dataBSDFWindow->TotComplexFenStates > 0) {
             SetupComplexFenestrationStateInput(state, ConstrNum, ErrorsFound);
             if (ErrorsFound) {
                 ShowSevereError(state, "Errors found in processing complex fenestration input");
             }
-            TotRegConstructs += TotComplexFenStates;
+            TotRegConstructs += state.dataBSDFWindow->TotComplexFenStates;
         }
 
         ConstrNum = 0;
@@ -8540,10 +8539,10 @@ namespace HeatBalanceManager {
 
         // Reading WindowThermalModel:Params
         cCurrentModuleObject = "WindowThermalModel:Params";
-        TotThermalModels = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
-        WindowThermalModel.allocate(TotThermalModels);
+        state.dataBSDFWindow->TotThermalModels = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        WindowThermalModel.allocate(state.dataBSDFWindow->TotThermalModels);
 
-        for (Loop = 1; Loop <= TotThermalModels; ++Loop) {
+        for (Loop = 1; Loop <= state.dataBSDFWindow->TotThermalModels; ++Loop) {
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           Loop,
@@ -8652,7 +8651,7 @@ namespace HeatBalanceManager {
 
         // Reading Construction:ComplexFenestrationState
         locCurrentModuleObject = "Construction:ComplexFenestrationState";
-        TotComplexFenStates = inputProcessor->getNumObjectsFound(state, locCurrentModuleObject);
+        state.dataBSDFWindow->TotComplexFenStates = inputProcessor->getNumObjectsFound(state, locCurrentModuleObject);
 
         inputProcessor->getObjectDefMaxArgs(state, locCurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
         if (!allocated(locAlphaFieldNames)) locAlphaFieldNames.allocate(NumAlphas);
@@ -8662,8 +8661,8 @@ namespace HeatBalanceManager {
         if (!allocated(locAlphaArgs)) locAlphaArgs.allocate(NumAlphas);
         if (!allocated(locNumericArgs)) locNumericArgs.allocate(NumNumbers);
 
-        FirstBSDF = ConstrNum + 1; // Location of first BSDF construction input (They will be consecutive)
-        for (Loop = 1; Loop <= TotComplexFenStates; ++Loop) {
+        state.dataBSDFWindow->FirstBSDF = ConstrNum + 1; // Location of first BSDF construction input (They will be consecutive)
+        for (Loop = 1; Loop <= state.dataBSDFWindow->TotComplexFenStates; ++Loop) {
             inputProcessor->getObjectItem(state,
                                           locCurrentModuleObject,
                                           Loop,
@@ -8700,9 +8699,9 @@ namespace HeatBalanceManager {
             {
                 auto const SELECT_CASE_var(locAlphaArgs(2)); // Basis Type Keyword
                 if (SELECT_CASE_var == "LBNLWINDOW") {
-                    state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisType = BasisType_WINDOW;
+                    state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisType = DataBSDFWindow::BasisType_WINDOW;
                 } else if (SELECT_CASE_var == "USERDEFINED") {
-                    state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisType = BasisType_Custom;
+                    state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisType = DataBSDFWindow::BasisType_Custom;
                 } else {
                     // throw error
                     ErrorsFound = true;
@@ -8715,9 +8714,9 @@ namespace HeatBalanceManager {
             {
                 auto const SELECT_CASE_var(locAlphaArgs(3)); // Basis Symmetry Keyword
                 if (SELECT_CASE_var == "AXISYMMETRIC") {
-                    state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisSymmetryType = BasisSymmetry_Axisymmetric;
+                    state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisSymmetryType = DataBSDFWindow::BasisSymmetry_Axisymmetric;
                 } else if (SELECT_CASE_var == "NONE") {
-                    state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisSymmetryType = BasisSymmetry_None;
+                    state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisSymmetryType = DataBSDFWindow::BasisSymmetry_None;
                 } else {
                     // throw error
                     ErrorsFound = true;
@@ -8755,7 +8754,7 @@ namespace HeatBalanceManager {
             }
             state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisMat.allocate(NumCols, NumRows);
             Get2DMatrix(state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisMatIndex, state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisMat);
-            if (state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisType == BasisType_WINDOW)
+            if (state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisType == DataBSDFWindow::BasisType_WINDOW)
                 CalculateBasisLength(state, state.dataConstruction->Construct(ConstrNum).BSDFInput, ConstrNum, state.dataConstruction->Construct(ConstrNum).BSDFInput.NBasis);
 
             // determine number of layers and optical layers
@@ -8775,7 +8774,7 @@ namespace HeatBalanceManager {
                 ShowContinueError(state, locAlphaArgs(1) + " is missing some of the layers or/and gaps.");
             }
 
-            if (state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisSymmetryType == BasisSymmetry_None) {
+            if (state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisSymmetryType == DataBSDFWindow::BasisSymmetry_None) {
                 // Non-Symmetric basis
 
                 NBasis = state.dataConstruction->Construct(ConstrNum).BSDFInput.NBasis;
@@ -8803,7 +8802,7 @@ namespace HeatBalanceManager {
                     ShowContinueError(state, "Solar front transmittance matrix \"" + locAlphaArgs(6) + "\" must have the same number of rows and columns.");
                 }
 
-                if (state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisType == BasisType_Custom) {
+                if (state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisType == DataBSDFWindow::BasisType_Custom) {
                     state.dataConstruction->Construct(ConstrNum).BSDFInput.NBasis = NumRows; // For custom basis, no rows in transmittance
                                                                      // matrix defines the basis length
                 }
@@ -9011,7 +9010,7 @@ namespace HeatBalanceManager {
             } else {
                 // Axisymmetric basis
                 NBasis = state.dataConstruction->Construct(ConstrNum).BSDFInput.NBasis; // Basis length has already been calculated
-                BSDFTempMtrx.allocate(NBasis, 1);
+                state.dataBSDFWindow->BSDFTempMtrx.allocate(NBasis, 1);
 
                 // *******************************************************************************
                 // Solar front transmittance
@@ -9043,11 +9042,11 @@ namespace HeatBalanceManager {
                                     ", object. Referenced Matrix:TwoDimension is missing from the input file.");
                     ShowContinueError(state, "Solar front transmittance Matrix:TwoDimension = \"" + locAlphaArgs(6) + "\" is missing from the input file.");
                 } else {
-                    Get2DMatrix(state.dataConstruction->Construct(ConstrNum).BSDFInput.SolFrtTransIndex, BSDFTempMtrx);
+                    Get2DMatrix(state.dataConstruction->Construct(ConstrNum).BSDFInput.SolFrtTransIndex, state.dataBSDFWindow->BSDFTempMtrx);
 
                     state.dataConstruction->Construct(ConstrNum).BSDFInput.SolFrtTrans = 0.0;
                     for (I = 1; I <= NBasis; ++I) {
-                        state.dataConstruction->Construct(ConstrNum).BSDFInput.SolFrtTrans(I, I) = BSDFTempMtrx(I, 1);
+                        state.dataConstruction->Construct(ConstrNum).BSDFInput.SolFrtTrans(I, I) = state.dataBSDFWindow->BSDFTempMtrx(I, 1);
                     }
                 }
 
@@ -9081,10 +9080,10 @@ namespace HeatBalanceManager {
                                     ", object. Referenced Matrix:TwoDimension is missing from the input file.");
                     ShowContinueError(state, "Solar back reflectance Matrix:TwoDimension = \"" + locAlphaArgs(7) + "\" is missing from the input file.");
                 } else {
-                    Get2DMatrix(state.dataConstruction->Construct(ConstrNum).BSDFInput.SolBkReflIndex, BSDFTempMtrx);
+                    Get2DMatrix(state.dataConstruction->Construct(ConstrNum).BSDFInput.SolBkReflIndex, state.dataBSDFWindow->BSDFTempMtrx);
                     state.dataConstruction->Construct(ConstrNum).BSDFInput.SolBkRefl = 0.0;
                     for (I = 1; I <= NBasis; ++I) {
-                        state.dataConstruction->Construct(ConstrNum).BSDFInput.SolBkRefl(I, I) = BSDFTempMtrx(I, 1);
+                        state.dataConstruction->Construct(ConstrNum).BSDFInput.SolBkRefl(I, I) = state.dataBSDFWindow->BSDFTempMtrx(I, 1);
                     }
                 }
 
@@ -9120,10 +9119,10 @@ namespace HeatBalanceManager {
                     ShowContinueError(state, "Visible front transmittance Matrix:TwoDimension = \"" + locAlphaArgs(8) +
                                       "\" is missing from the input file.");
                 } else {
-                    Get2DMatrix(state.dataConstruction->Construct(ConstrNum).BSDFInput.VisFrtTransIndex, BSDFTempMtrx);
+                    Get2DMatrix(state.dataConstruction->Construct(ConstrNum).BSDFInput.VisFrtTransIndex, state.dataBSDFWindow->BSDFTempMtrx);
                     state.dataConstruction->Construct(ConstrNum).BSDFInput.VisFrtTrans = 0.0;
                     for (I = 1; I <= NBasis; ++I) {
-                        state.dataConstruction->Construct(ConstrNum).BSDFInput.VisFrtTrans(I, I) = BSDFTempMtrx(I, 1);
+                        state.dataConstruction->Construct(ConstrNum).BSDFInput.VisFrtTrans(I, I) = state.dataBSDFWindow->BSDFTempMtrx(I, 1);
                     }
                 }
 
@@ -9157,10 +9156,10 @@ namespace HeatBalanceManager {
                                     ", object. Referenced Matrix:TwoDimension is missing from the input file.");
                     ShowContinueError(state, "Visible back reflectance Matrix:TwoDimension = \"" + locAlphaArgs(9) + "\" is missing from the input file.");
                 } else {
-                    Get2DMatrix(state.dataConstruction->Construct(ConstrNum).BSDFInput.VisBkReflIndex, BSDFTempMtrx);
+                    Get2DMatrix(state.dataConstruction->Construct(ConstrNum).BSDFInput.VisBkReflIndex, state.dataBSDFWindow->BSDFTempMtrx);
                     state.dataConstruction->Construct(ConstrNum).BSDFInput.VisBkRefl = 0.0;
                     for (I = 1; I <= NBasis; ++I) {
-                        state.dataConstruction->Construct(ConstrNum).BSDFInput.VisBkRefl(I, I) = BSDFTempMtrx(I, 1);
+                        state.dataConstruction->Construct(ConstrNum).BSDFInput.VisBkRefl(I, I) = state.dataBSDFWindow->BSDFTempMtrx(I, 1);
                     }
                 }
 
@@ -9265,7 +9264,7 @@ namespace HeatBalanceManager {
                     } // if (Mod(Layer, 2) <> 0) then
                 }
 
-                BSDFTempMtrx.deallocate();
+                state.dataBSDFWindow->BSDFTempMtrx.deallocate();
             }
             state.dataConstruction->Construct(ConstrNum).TypeIsWindow = true;
             state.dataConstruction->Construct(ConstrNum).WindowTypeBSDF = true;

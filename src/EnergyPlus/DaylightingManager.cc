@@ -153,7 +153,6 @@ namespace DaylightingManager {
     using namespace DataDaylighting;
     using namespace DataDaylightingDevices;
     using DataBSDFWindow::BSDFDaylghtPosition;
-    using DataBSDFWindow::ComplexWind;
 
     using namespace ScheduleManager;
     // USE Vectors
@@ -249,7 +248,6 @@ namespace DaylightingManager {
         TDDFluxTrans.deallocate();
         RefErrIndex.deallocate();
         refFirstTime = true;
-        ComplexWind.deallocate();
         IllumMap.deallocate();
         IllumMapCalc.deallocate();
         DayltgInteriorIllum_firstTime = true;
@@ -2121,16 +2119,16 @@ namespace DaylightingManager {
 
         // Initialize bsdf daylighting coefficients here.  Only one time initialization
         if (SurfWinWindowModelType(IWin) == WindowBSDFModel) {
-            if (!ComplexWind(IWin).DaylightingInitialized) {
+            if (!state.dataBSDFWindow->ComplexWind(IWin).DaylightingInitialized) {
                 if (CalledFrom == CalledForMapPoint) {
                     NRefPts = IllumMapCalc(MapNum).TotalMapRefPoints;
                 } else if (CalledFrom == CalledForRefPoint) {
                     NRefPts = ZoneDaylight(ZoneNum).TotalDaylRefPoints;
                 }
-                InitializeCFSDaylighting(ZoneNum, IWin, NWX, NWY, RREF, NRefPts, iRefPoint, CalledFrom, MapNum);
+                InitializeCFSDaylighting(state, ZoneNum, IWin, NWX, NWY, RREF, NRefPts, iRefPoint, CalledFrom, MapNum);
                 // if ((WinEl == (NWX * NWY)).and.(CalledFrom == CalledForMapPoint).and.(NRefPts == iRefPoint)) then
                 if ((CalledFrom == CalledForMapPoint) && (NRefPts == iRefPoint)) {
-                    ComplexWind(IWin).DaylightingInitialized = true;
+                    state.dataBSDFWindow->ComplexWind(IWin).DaylightingInitialized = true;
                 }
             }
         }
@@ -2454,24 +2452,24 @@ namespace DaylightingManager {
                     // in order to account for changes in exterior surface transmittances
                     CplxFenState = SurfaceWindow(IWin).ComplexFen.CurrentState;
                     if (CalledFrom == CalledForRefPoint) {
-                        NReflSurf = ComplexWind(IWin).DaylghtGeom(CplxFenState).RefPoint(iRefPoint).NReflSurf(WinEl);
+                        NReflSurf = state.dataBSDFWindow->ComplexWind(IWin).DaylghtGeom(CplxFenState).RefPoint(iRefPoint).NReflSurf(WinEl);
                     } else {
-                        NReflSurf = ComplexWind(IWin).DaylghtGeom(CplxFenState).IlluminanceMap(iRefPoint, MapNum).NReflSurf(WinEl);
+                        NReflSurf = state.dataBSDFWindow->ComplexWind(IWin).DaylghtGeom(CplxFenState).IlluminanceMap(iRefPoint, MapNum).NReflSurf(WinEl);
                     }
                     for (ICplxFen = 1; ICplxFen <= NReflSurf; ++ICplxFen) {
                         if (CalledFrom == CalledForRefPoint) {
-                            RayIndex = ComplexWind(IWin).DaylghtGeom(CplxFenState).RefPoint(iRefPoint).RefSurfIndex(ICplxFen, WinEl);
+                            RayIndex = state.dataBSDFWindow->ComplexWind(IWin).DaylghtGeom(CplxFenState).RefPoint(iRefPoint).RefSurfIndex(ICplxFen, WinEl);
                         } else {
-                            RayIndex = ComplexWind(IWin).DaylghtGeom(CplxFenState).IlluminanceMap(iRefPoint, MapNum).RefSurfIndex(ICplxFen, WinEl);
+                            RayIndex = state.dataBSDFWindow->ComplexWind(IWin).DaylghtGeom(CplxFenState).IlluminanceMap(iRefPoint, MapNum).RefSurfIndex(ICplxFen, WinEl);
                         }
-                        RayVector = ComplexWind(IWin).Geom(CplxFenState).sInc(RayIndex);
+                        RayVector = state.dataBSDFWindow->ComplexWind(IWin).Geom(CplxFenState).sInc(RayIndex);
                         // It will get product of all transmittances
                         DayltgHitObstruction(state, state.dataGlobal->HourOfDay, IWin, RWIN, RayVector, TransBeam);
                         // IF (TransBeam > 0.0d0) ObTrans = TransBeam
                         if (CalledFrom == CalledForRefPoint) {
-                            ComplexWind(IWin).DaylghtGeom(CplxFenState).RefPoint(iRefPoint).TransOutSurf(ICplxFen, WinEl) = TransBeam;
+                            state.dataBSDFWindow->ComplexWind(IWin).DaylghtGeom(CplxFenState).RefPoint(iRefPoint).TransOutSurf(ICplxFen, WinEl) = TransBeam;
                         } else {
-                            ComplexWind(IWin).DaylghtGeom(CplxFenState).IlluminanceMap(iRefPoint, MapNum).TransOutSurf(ICplxFen, WinEl) = TransBeam;
+                            state.dataBSDFWindow->ComplexWind(IWin).DaylghtGeom(CplxFenState).IlluminanceMap(iRefPoint, MapNum).TransOutSurf(ICplxFen, WinEl) = TransBeam;
                         }
                     }
                     // This will avoid obstruction multiplier calculations for non-CFS window
@@ -2498,7 +2496,8 @@ namespace DaylightingManager {
         } // End of check if COSB > 0
     }
 
-    void InitializeCFSDaylighting(int const ZoneNum,               // Current zone number
+    void InitializeCFSDaylighting(EnergyPlusData &state,
+                                  int const ZoneNum,               // Current zone number
                                   int const IWin,                  // Complex fenestration number
                                   int const NWX,                   // Number of horizontal divisions
                                   int const NWY,                   // Number of vertical divisions
@@ -2610,44 +2609,45 @@ namespace DaylightingManager {
 
         if (CalledFrom == CalledForMapPoint) {
 
-            if (!allocated(ComplexWind(IWin).IlluminanceMap)) {
-                ComplexWind(IWin).IlluminanceMap.allocate(NRefPts, TotIllumMaps);
+            if (!allocated(state.dataBSDFWindow->ComplexWind(IWin).IlluminanceMap)) {
+                state.dataBSDFWindow->ComplexWind(IWin).IlluminanceMap.allocate(NRefPts, TotIllumMaps);
             }
 
-            AllocateForCFSRefPointsGeometry(ComplexWind(IWin).IlluminanceMap(iRefPoint, MapNum), NumOfWinEl);
+            AllocateForCFSRefPointsGeometry(state.dataBSDFWindow->ComplexWind(IWin).IlluminanceMap(iRefPoint, MapNum), NumOfWinEl);
 
         } else if (CalledFrom == CalledForRefPoint) {
-            if (!allocated(ComplexWind(IWin).RefPoint)) {
-                ComplexWind(IWin).RefPoint.allocate(NRefPts);
+            if (!allocated(state.dataBSDFWindow->ComplexWind(IWin).RefPoint)) {
+                state.dataBSDFWindow->ComplexWind(IWin).RefPoint.allocate(NRefPts);
             }
 
-            AllocateForCFSRefPointsGeometry(ComplexWind(IWin).RefPoint(iRefPoint), NumOfWinEl);
+            AllocateForCFSRefPointsGeometry(state.dataBSDFWindow->ComplexWind(IWin).RefPoint(iRefPoint), NumOfWinEl);
         }
 
         //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         //! Allocation for each complex fenestration state reference points
         //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        if (!allocated(ComplexWind(IWin).DaylghtGeom)) {
-            ComplexWind(IWin).DaylghtGeom.allocate(ComplexWind(IWin).NumStates);
+        if (!allocated(state.dataBSDFWindow->ComplexWind(IWin).DaylghtGeom)) {
+            state.dataBSDFWindow->ComplexWind(IWin).DaylghtGeom.allocate(state.dataBSDFWindow->ComplexWind(IWin).NumStates);
         }
 
         // Calculation needs to be performed for each state
-        for (CurFenState = 1; CurFenState <= ComplexWind(IWin).NumStates; ++CurFenState) {
-            NBasis = ComplexWind(IWin).Geom(CurFenState).Inc.NBasis;
-            NTrnBasis = ComplexWind(IWin).Geom(CurFenState).Trn.NBasis;
+        for (CurFenState = 1; CurFenState <= state.dataBSDFWindow->ComplexWind(IWin).NumStates; ++CurFenState) {
+            NBasis = state.dataBSDFWindow->ComplexWind(IWin).Geom(CurFenState).Inc.NBasis;
+            NTrnBasis = state.dataBSDFWindow->ComplexWind(IWin).Geom(CurFenState).Trn.NBasis;
 
             if (CalledFrom == CalledForMapPoint) {
                 if (TotIllumMaps > 0) {
                     // illuminance map for each state
-                    if (!allocated(ComplexWind(IWin).DaylghtGeom(CurFenState).IlluminanceMap)) {
-                        ComplexWind(IWin).DaylghtGeom(CurFenState).IlluminanceMap.allocate(NRefPts, TotIllumMaps);
+                    if (!allocated(state.dataBSDFWindow->ComplexWind(IWin).DaylghtGeom(CurFenState).IlluminanceMap)) {
+                        state.dataBSDFWindow->ComplexWind(IWin).DaylghtGeom(CurFenState).IlluminanceMap.allocate(NRefPts, TotIllumMaps);
                     }
 
                     AllocateForCFSRefPointsState(
-                        ComplexWind(IWin).DaylghtGeom(CurFenState).IlluminanceMap(iRefPoint, MapNum), NumOfWinEl, NBasis, NTrnBasis);
+                        state.dataBSDFWindow->ComplexWind(IWin).DaylghtGeom(CurFenState).IlluminanceMap(iRefPoint, MapNum), NumOfWinEl, NBasis, NTrnBasis);
 
-                    InitializeCFSStateData(ComplexWind(IWin).DaylghtGeom(CurFenState).IlluminanceMap(iRefPoint, MapNum),
-                                           ComplexWind(IWin).IlluminanceMap(iRefPoint, MapNum),
+                    InitializeCFSStateData(state,
+                                           state.dataBSDFWindow->ComplexWind(IWin).DaylghtGeom(CurFenState).IlluminanceMap(iRefPoint, MapNum),
+                                           state.dataBSDFWindow->ComplexWind(IWin).IlluminanceMap(iRefPoint, MapNum),
                                            ZoneNum,
                                            IWin,
                                            RefPoint,
@@ -2669,14 +2669,15 @@ namespace DaylightingManager {
                 }
 
             } else if (CalledFrom == CalledForRefPoint) {
-                if (!allocated(ComplexWind(IWin).DaylghtGeom(CurFenState).RefPoint)) {
-                    ComplexWind(IWin).DaylghtGeom(CurFenState).RefPoint.allocate(NRefPts);
+                if (!allocated(state.dataBSDFWindow->ComplexWind(IWin).DaylghtGeom(CurFenState).RefPoint)) {
+                    state.dataBSDFWindow->ComplexWind(IWin).DaylghtGeom(CurFenState).RefPoint.allocate(NRefPts);
                 }
 
-                AllocateForCFSRefPointsState(ComplexWind(IWin).DaylghtGeom(CurFenState).RefPoint(iRefPoint), NumOfWinEl, NBasis, NTrnBasis);
+                AllocateForCFSRefPointsState(state.dataBSDFWindow->ComplexWind(IWin).DaylghtGeom(CurFenState).RefPoint(iRefPoint), NumOfWinEl, NBasis, NTrnBasis);
 
-                InitializeCFSStateData(ComplexWind(IWin).DaylghtGeom(CurFenState).RefPoint(iRefPoint),
-                                       ComplexWind(IWin).RefPoint(iRefPoint),
+                InitializeCFSStateData(state,
+                                       state.dataBSDFWindow->ComplexWind(IWin).DaylghtGeom(CurFenState).RefPoint(iRefPoint),
+                                       state.dataBSDFWindow->ComplexWind(IWin).RefPoint(iRefPoint),
                                        ZoneNum,
                                        IWin,
                                        RefPoint,
@@ -2699,7 +2700,8 @@ namespace DaylightingManager {
         }
     }
 
-    void InitializeCFSStateData(BSDFRefPoints &StateRefPoint,
+    void InitializeCFSStateData(EnergyPlusData &state,
+                                BSDFRefPoints &StateRefPoint,
                                 BSDFRefPointsGeomDescr &DaylghtGeomDescr,
                                 [[maybe_unused]] int const ZoneNum, // Current zone number
                                 int const iWin,
@@ -2783,7 +2785,7 @@ namespace DaylightingManager {
         Array1D<Vector> TmpGndPt(NBasis, Vector(0.0, 0.0, 0.0));              // Temporary ground intersection list
         Array2D<Vector> TmpHitPt(TotSurfaces, NBasis, Vector(0.0, 0.0, 0.0)); // Temporary HitPt
 
-        CFSRefPointPosFactor(RefPoint, StateRefPoint, iWin, CurFenState, NTrnBasis, AZVIEW);
+        CFSRefPointPosFactor(state, RefPoint, StateRefPoint, iWin, CurFenState, NTrnBasis, AZVIEW);
 
         curWinEl = 0;
         // loop through window elements. This will calculate sky, ground and reflection bins for each window element
@@ -2796,7 +2798,7 @@ namespace DaylightingManager {
                 Centroid = W2 + (double(IX) - 0.5) * W23 * DWX + (double(IY) - 0.5) * W21 * DWY;
                 RWin = Centroid;
 
-                CFSRefPointSolidAngle(RefPoint, RWin, WNorm, StateRefPoint, DaylghtGeomDescr, iWin, CurFenState, NTrnBasis, curWinEl, WinElArea);
+                CFSRefPointSolidAngle(state, RefPoint, RWin, WNorm, StateRefPoint, DaylghtGeomDescr, iWin, CurFenState, NTrnBasis, curWinEl, WinElArea);
 
                 NSky = 0;
                 NGnd = 0;
@@ -2813,9 +2815,9 @@ namespace DaylightingManager {
                         //  skip the base surface containing the window and any other subsurfaces of that surface
                         if (JSurf == Surface(iWin).BaseSurf || Surface(JSurf).BaseSurf == Surface(iWin).BaseSurf) continue;
                         //  skip surfaces that face away from the window
-                        DotProd = dot(ComplexWind(iWin).Geom(CurFenState).sInc(IRay), Surface(JSurf).NewellSurfaceNormalVector);
+                        DotProd = dot(state.dataBSDFWindow->ComplexWind(iWin).Geom(CurFenState).sInc(IRay), Surface(JSurf).NewellSurfaceNormalVector);
                         if (DotProd >= 0) continue;
-                        PierceSurface(JSurf, Centroid, ComplexWind(iWin).Geom(CurFenState).sInc(IRay), HitPt, hit);
+                        PierceSurface(JSurf, Centroid, state.dataBSDFWindow->ComplexWind(iWin).Geom(CurFenState).sInc(IRay), HitPt, hit);
                         if (!hit) continue; // Miss: Try next surface
                         if (TotHits == 0) {
                             // First hit for this ray
@@ -2895,16 +2897,16 @@ namespace DaylightingManager {
                     } // do JSurf = 1, TotSurfaces
                     if (TotHits <= 0) {
                         // This ray reached the sky or ground unobstructed
-                        if (ComplexWind(iWin).Geom(CurFenState).sInc(IRay).z < 0.0) {
+                        if (state.dataBSDFWindow->ComplexWind(iWin).Geom(CurFenState).sInc(IRay).z < 0.0) {
                             // A ground ray
                             ++NGnd;
                             TmpGndInd(NGnd) = IRay;
                             TmpGndPt(NGnd).x =
                                 Centroid.x -
-                                (ComplexWind(iWin).Geom(CurFenState).sInc(IRay).x / ComplexWind(iWin).Geom(CurFenState).sInc(IRay).z) * Centroid.z;
+                                (state.dataBSDFWindow->ComplexWind(iWin).Geom(CurFenState).sInc(IRay).x / state.dataBSDFWindow->ComplexWind(iWin).Geom(CurFenState).sInc(IRay).z) * Centroid.z;
                             TmpGndPt(NGnd).y =
                                 Centroid.y -
-                                (ComplexWind(iWin).Geom(CurFenState).sInc(IRay).y / ComplexWind(iWin).Geom(CurFenState).sInc(IRay).z) * Centroid.z;
+                                (state.dataBSDFWindow->ComplexWind(iWin).Geom(CurFenState).sInc(IRay).y / state.dataBSDFWindow->ComplexWind(iWin).Geom(CurFenState).sInc(IRay).z) * Centroid.z;
                             TmpGndPt(NGnd).z = 0.0;
 
                             // for solar reflectance calculations, need to precalculate obstruction multipliers
@@ -3084,7 +3086,8 @@ namespace DaylightingManager {
         }
     }
 
-    void CFSRefPointSolidAngle(Vector3<Real64> const &RefPoint,
+    void CFSRefPointSolidAngle(EnergyPlusData &state,
+                               Vector3<Real64> const &RefPoint,
                                Vector3<Real64> const &RWin,
                                Vector3<Real64> const &WNorm,
                                BSDFRefPoints &RefPointMap,
@@ -3132,7 +3135,7 @@ namespace DaylightingManager {
         // figure out outgoing beam direction from current reference point
         BestMatch = 0.0;
         for (iTrnRay = 1; iTrnRay <= NTrnBasis; ++iTrnRay) {
-            V = ComplexWind(iWin).Geom(CurFenState).sTrn(iTrnRay);
+            V = state.dataBSDFWindow->ComplexWind(iWin).Geom(CurFenState).sTrn(iTrnRay);
             temp = dot(Ray, V);
             if (temp > BestMatch) {
                 BestMatch = temp;
@@ -3148,7 +3151,7 @@ namespace DaylightingManager {
         RefPointGeomMap.SolidAngle(curWinEl) = WinElArea * CosB / (Dist * Dist);
     }
 
-    void CFSRefPointPosFactor(
+    void CFSRefPointPosFactor(EnergyPlusData &state,
         Vector3<Real64> const &RefPoint, BSDFRefPoints &RefPointMap, int const iWin, int const CurFenState, int const NTrnBasis, Real64 const AZVIEW)
     {
         // SUBROUTINE INFORMATION:
@@ -3184,7 +3187,7 @@ namespace DaylightingManager {
         // Object Data
         BSDFDaylghtPosition elPos; // altitude and azimuth of intersection element
 
-        auto const &sTrn(ComplexWind(iWin).Geom(CurFenState).sTrn);
+        auto const &sTrn(state.dataBSDFWindow->ComplexWind(iWin).Geom(CurFenState).sTrn);
         for (iTrnRay = 1; iTrnRay <= NTrnBasis; ++iTrnRay) {
             V = sTrn(iTrnRay);
             V.negate();
@@ -8517,13 +8520,13 @@ namespace DaylightingManager {
         CurCplxFenState = SurfaceWindow(IWin).ComplexFen.CurrentState;
 
         // Calculate luminance from sky and sun excluding exterior obstruction transmittances and obstruction multipliers
-        SolBmIndex = ComplexWind(IWin).Geom(CurCplxFenState).SolBmIndex(IHR, state.dataGlobal->TimeStep);
+        SolBmIndex = state.dataBSDFWindow->ComplexWind(IWin).Geom(CurCplxFenState).SolBmIndex(IHR, state.dataGlobal->TimeStep);
         for (iIncElem = 1; iIncElem <= NBasis; ++iIncElem) {
-            LambdaInc = ComplexWind(IWin).Geom(CurCplxFenState).Inc.Lamda(iIncElem);
+            LambdaInc = state.dataBSDFWindow->ComplexWind(IWin).Geom(CurCplxFenState).Inc.Lamda(iIncElem);
             // COSB = ComplexWind(IWin)%Geom(CurCplxFenState)%CosInc(iIncElem)
             // DA = ComplexWind(IWin)%Geom(CurCplxFenState)%DAInc(iIncElem)
-            Altitude = ComplexWind(IWin).Geom(CurCplxFenState).pInc(iIncElem).Altitude;
-            Azimuth = ComplexWind(IWin).Geom(CurCplxFenState).pInc(iIncElem).Azimuth;
+            Altitude = state.dataBSDFWindow->ComplexWind(IWin).Geom(CurCplxFenState).pInc(iIncElem).Altitude;
+            Azimuth = state.dataBSDFWindow->ComplexWind(IWin).Geom(CurCplxFenState).pInc(iIncElem).Azimuth;
             if (Altitude > 0.0) {
                 // Ray from sky element
                 for (iSky = 1; iSky <= 4; ++iSky) {
@@ -8553,17 +8556,17 @@ namespace DaylightingManager {
 
         // add exterior obstructions transmittances to calculated luminances
         if (CalledFrom == CalledForRefPoint) {
-            NRefl = ComplexWind(IWin).DaylghtGeom(CurCplxFenState).RefPoint(iRefPoint).NReflSurf(WinEl);
+            NRefl = state.dataBSDFWindow->ComplexWind(IWin).DaylghtGeom(CurCplxFenState).RefPoint(iRefPoint).NReflSurf(WinEl);
         } else {
-            NRefl = ComplexWind(IWin).DaylghtGeom(CurCplxFenState).IlluminanceMap(iRefPoint, MapNum).NReflSurf(WinEl);
+            NRefl = state.dataBSDFWindow->ComplexWind(IWin).DaylghtGeom(CurCplxFenState).IlluminanceMap(iRefPoint, MapNum).NReflSurf(WinEl);
         }
         for (iReflElem = 1; iReflElem <= NRefl; ++iReflElem) {
             if (CalledFrom == CalledForRefPoint) {
-                ObstrTrans = ComplexWind(IWin).DaylghtGeom(CurCplxFenState).RefPoint(iRefPoint).TransOutSurf(iReflElem, WinEl);
-                iReflElemIndex = ComplexWind(IWin).DaylghtGeom(CurCplxFenState).RefPoint(iRefPoint).RefSurfIndex(iReflElem, WinEl);
+                ObstrTrans = state.dataBSDFWindow->ComplexWind(IWin).DaylghtGeom(CurCplxFenState).RefPoint(iRefPoint).TransOutSurf(iReflElem, WinEl);
+                iReflElemIndex = state.dataBSDFWindow->ComplexWind(IWin).DaylghtGeom(CurCplxFenState).RefPoint(iRefPoint).RefSurfIndex(iReflElem, WinEl);
             } else {
-                ObstrTrans = ComplexWind(IWin).DaylghtGeom(CurCplxFenState).IlluminanceMap(iRefPoint, MapNum).TransOutSurf(iReflElem, WinEl);
-                iReflElemIndex = ComplexWind(IWin).DaylghtGeom(CurCplxFenState).IlluminanceMap(iRefPoint, MapNum).RefSurfIndex(iReflElem, WinEl);
+                ObstrTrans = state.dataBSDFWindow->ComplexWind(IWin).DaylghtGeom(CurCplxFenState).IlluminanceMap(iRefPoint, MapNum).TransOutSurf(iReflElem, WinEl);
+                iReflElemIndex = state.dataBSDFWindow->ComplexWind(IWin).DaylghtGeom(CurCplxFenState).IlluminanceMap(iRefPoint, MapNum).RefSurfIndex(iReflElem, WinEl);
             }
 
             for (iSky = 1; iSky <= 4; ++iSky) {
@@ -8576,21 +8579,21 @@ namespace DaylightingManager {
         // add exterior ground element obstruction multipliers to calculated luminances. For sun reflection, calculate if
         // sun reaches the ground for that point
         if (CalledFrom == CalledForRefPoint) {
-            NGnd = ComplexWind(IWin).DaylghtGeom(CurCplxFenState).RefPoint(iRefPoint).NGnd(WinEl);
+            NGnd = state.dataBSDFWindow->ComplexWind(IWin).DaylghtGeom(CurCplxFenState).RefPoint(iRefPoint).NGnd(WinEl);
         } else {
-            NGnd = ComplexWind(IWin).DaylghtGeom(CurCplxFenState).IlluminanceMap(iRefPoint, MapNum).NGnd(WinEl);
+            NGnd = state.dataBSDFWindow->ComplexWind(IWin).DaylghtGeom(CurCplxFenState).IlluminanceMap(iRefPoint, MapNum).NGnd(WinEl);
         }
         Vector3<Real64> const SUNCOS_IHR(SUNCOSHR(IHR, {1, 3}));
         for (iGndElem = 1; iGndElem <= NGnd; ++iGndElem) {
             // case for sky elements. Integration is done over upper ground hemisphere to determine how many obstructions
             // were hit in the process
             if (CalledFrom == CalledForRefPoint) {
-                BeamObstrMultiplier = ComplexWind(IWin).DaylghtGeom(CurCplxFenState).RefPoint(iRefPoint).GndObstrMultiplier(iGndElem, WinEl);
-                iGndElemIndex = ComplexWind(IWin).DaylghtGeom(CurCplxFenState).RefPoint(iRefPoint).GndIndex(iGndElem, WinEl);
+                BeamObstrMultiplier = state.dataBSDFWindow->ComplexWind(IWin).DaylghtGeom(CurCplxFenState).RefPoint(iRefPoint).GndObstrMultiplier(iGndElem, WinEl);
+                iGndElemIndex = state.dataBSDFWindow->ComplexWind(IWin).DaylghtGeom(CurCplxFenState).RefPoint(iRefPoint).GndIndex(iGndElem, WinEl);
             } else {
                 BeamObstrMultiplier =
-                    ComplexWind(IWin).DaylghtGeom(CurCplxFenState).IlluminanceMap(iRefPoint, MapNum).GndObstrMultiplier(iGndElem, WinEl);
-                iGndElemIndex = ComplexWind(IWin).DaylghtGeom(CurCplxFenState).IlluminanceMap(iRefPoint, MapNum).GndIndex(iGndElem, WinEl);
+                    state.dataBSDFWindow->ComplexWind(IWin).DaylghtGeom(CurCplxFenState).IlluminanceMap(iRefPoint, MapNum).GndObstrMultiplier(iGndElem, WinEl);
+                iGndElemIndex = state.dataBSDFWindow->ComplexWind(IWin).DaylghtGeom(CurCplxFenState).IlluminanceMap(iRefPoint, MapNum).GndIndex(iGndElem, WinEl);
             }
             for (iSky = 1; iSky <= 4; ++iSky) {
                 ElementLuminanceSky(iSky, iGndElemIndex) *= BeamObstrMultiplier;
@@ -8604,13 +8607,13 @@ namespace DaylightingManager {
                 for (ObsSurfNum = 1; ObsSurfNum <= TotSurfaces; ++ObsSurfNum) {
                     if (!Surface(ObsSurfNum).ShadowSurfPossibleObstruction) continue;
                     if (CalledFrom == CalledForRefPoint) {
-                        GroundHitPt(1) = ComplexWind(IWin).DaylghtGeom(CurCplxFenState).RefPoint(iRefPoint).GndPt(iGndElem, WinEl).x;
-                        GroundHitPt(2) = ComplexWind(IWin).DaylghtGeom(CurCplxFenState).RefPoint(iRefPoint).GndPt(iGndElem, WinEl).y;
-                        GroundHitPt(3) = ComplexWind(IWin).DaylghtGeom(CurCplxFenState).RefPoint(iRefPoint).GndPt(iGndElem, WinEl).z;
+                        GroundHitPt(1) = state.dataBSDFWindow->ComplexWind(IWin).DaylghtGeom(CurCplxFenState).RefPoint(iRefPoint).GndPt(iGndElem, WinEl).x;
+                        GroundHitPt(2) = state.dataBSDFWindow->ComplexWind(IWin).DaylghtGeom(CurCplxFenState).RefPoint(iRefPoint).GndPt(iGndElem, WinEl).y;
+                        GroundHitPt(3) = state.dataBSDFWindow->ComplexWind(IWin).DaylghtGeom(CurCplxFenState).RefPoint(iRefPoint).GndPt(iGndElem, WinEl).z;
                     } else {
-                        GroundHitPt(1) = ComplexWind(IWin).DaylghtGeom(CurCplxFenState).IlluminanceMap(iRefPoint, MapNum).GndPt(iGndElem, WinEl).x;
-                        GroundHitPt(2) = ComplexWind(IWin).DaylghtGeom(CurCplxFenState).IlluminanceMap(iRefPoint, MapNum).GndPt(iGndElem, WinEl).y;
-                        GroundHitPt(3) = ComplexWind(IWin).DaylghtGeom(CurCplxFenState).IlluminanceMap(iRefPoint, MapNum).GndPt(iGndElem, WinEl).z;
+                        GroundHitPt(1) = state.dataBSDFWindow->ComplexWind(IWin).DaylghtGeom(CurCplxFenState).IlluminanceMap(iRefPoint, MapNum).GndPt(iGndElem, WinEl).x;
+                        GroundHitPt(2) = state.dataBSDFWindow->ComplexWind(IWin).DaylghtGeom(CurCplxFenState).IlluminanceMap(iRefPoint, MapNum).GndPt(iGndElem, WinEl).y;
+                        GroundHitPt(3) = state.dataBSDFWindow->ComplexWind(IWin).DaylghtGeom(CurCplxFenState).IlluminanceMap(iRefPoint, MapNum).GndPt(iGndElem, WinEl).z;
                     }
 
                     PierceSurface(ObsSurfNum, GroundHitPt, SUNCOS_IHR, ObsHitPt, hitObs);
@@ -8696,7 +8699,7 @@ namespace DaylightingManager {
 
         CurCplxFenState = SurfaceWindow(IWin).ComplexFen.CurrentState;
         iConst = SurfaceWindow(IWin).ComplexFen.State(CurCplxFenState).Konst;
-        NTrnBasis = ComplexWind(IWin).Geom(CurCplxFenState).Trn.NBasis;
+        NTrnBasis = state.dataBSDFWindow->ComplexWind(IWin).Geom(CurCplxFenState).Trn.NBasis;
 
         if (!allocated(FLSK)) FLSK.allocate(4, NTrnBasis);
         FLSK = 0.0;
@@ -8708,7 +8711,7 @@ namespace DaylightingManager {
         if (!allocated(FirstFluxSU)) FirstFluxSU.dimension(NTrnBasis, 0.0);
         if (!allocated(FirstFluxSUdisk)) FirstFluxSUdisk.dimension(NTrnBasis, 0.0);
 
-        NIncBasis = ComplexWind(IWin).Geom(CurCplxFenState).Inc.NBasis;
+        NIncBasis = state.dataBSDFWindow->ComplexWind(IWin).Geom(CurCplxFenState).Inc.NBasis;
         if (!allocated(ElementLuminanceSky)) ElementLuminanceSky.allocate(4, NIncBasis);
         ElementLuminanceSky = 0.0;
         if (!allocated(ElementLuminanceSun)) ElementLuminanceSun.dimension(NIncBasis, 0.0);
@@ -8721,9 +8724,9 @@ namespace DaylightingManager {
             IWin, WinEl, NIncBasis, IHR, iRefPoint, ElementLuminanceSky, ElementLuminanceSun, ElementLuminanceSunDisk, CalledFrom, MapNum);
 
         // luminance from sun disk needs to include fraction of sunlit area
-        SolBmIndex = ComplexWind(IWin).Geom(CurCplxFenState).SolBmIndex(IHR, state.dataGlobal->TimeStep);
+        SolBmIndex = state.dataBSDFWindow->ComplexWind(IWin).Geom(CurCplxFenState).SolBmIndex(IHR, state.dataGlobal->TimeStep);
         if (SolBmIndex > 0) {
-            COSIncSun = ComplexWind(IWin).Geom(CurCplxFenState).CosInc(SolBmIndex);
+            COSIncSun = state.dataBSDFWindow->ComplexWind(IWin).Geom(CurCplxFenState).CosInc(SolBmIndex);
         } else {
             COSIncSun = 0.0;
         }
@@ -8738,7 +8741,7 @@ namespace DaylightingManager {
         // now calculate flux into each outgoing direction by integrating over all incoming directions
         for (iBackElem = 1; iBackElem <= NTrnBasis; ++iBackElem) {
             for (iIncElem = 1; iIncElem <= NIncBasis; ++iIncElem) {
-                LambdaInc = ComplexWind(IWin).Geom(CurCplxFenState).Inc.Lamda(iIncElem);
+                LambdaInc = state.dataBSDFWindow->ComplexWind(IWin).Geom(CurCplxFenState).Inc.Lamda(iIncElem);
                 dirTrans = state.dataConstruction->Construct(iConst).BSDFInput.VisFrtTrans(iBackElem, iIncElem);
 
                 for (iSky = 1; iSky <= 4; ++iSky) {
@@ -8750,15 +8753,15 @@ namespace DaylightingManager {
             }
 
             for (iSky = 1; iSky <= 4; ++iSky) {
-                FirstFluxSK(iSky, iBackElem) = FLSK(iSky, iBackElem) * ComplexWind(IWin).Geom(CurCplxFenState).AveRhoVisOverlap(iBackElem);
+                FirstFluxSK(iSky, iBackElem) = FLSK(iSky, iBackElem) * state.dataBSDFWindow->ComplexWind(IWin).Geom(CurCplxFenState).AveRhoVisOverlap(iBackElem);
                 FFSKTot(iSky) += FirstFluxSK(iSky, iBackElem);
                 //				FLSKTot( iSky ) += FLSK( iSky, iBackElem );
             }
-            FirstFluxSU(iBackElem) = FLSU(iBackElem) * ComplexWind(IWin).Geom(CurCplxFenState).AveRhoVisOverlap(iBackElem);
+            FirstFluxSU(iBackElem) = FLSU(iBackElem) * state.dataBSDFWindow->ComplexWind(IWin).Geom(CurCplxFenState).AveRhoVisOverlap(iBackElem);
             FFSUTot += FirstFluxSU(iBackElem);
             FLSUTot += FLSU(iBackElem);
 
-            FirstFluxSUdisk(iBackElem) = FLSUdisk(iBackElem) * ComplexWind(IWin).Geom(CurCplxFenState).AveRhoVisOverlap(iBackElem);
+            FirstFluxSUdisk(iBackElem) = FLSUdisk(iBackElem) * state.dataBSDFWindow->ComplexWind(IWin).Geom(CurCplxFenState).AveRhoVisOverlap(iBackElem);
             FFSUdiskTot += FirstFluxSUdisk(iBackElem);
             FLSUdiskTot += FLSUdisk(iBackElem);
         }
@@ -8847,7 +8850,7 @@ namespace DaylightingManager {
 
         CurCplxFenState = SurfaceWindow(IWin).ComplexFen.CurrentState;
         iConst = SurfaceWindow(IWin).ComplexFen.State(CurCplxFenState).Konst;
-        NIncBasis = ComplexWind(IWin).Geom(CurCplxFenState).Inc.NBasis;
+        NIncBasis = state.dataBSDFWindow->ComplexWind(IWin).Geom(CurCplxFenState).Inc.NBasis;
 
         if (!allocated(ElementLuminanceSky)) ElementLuminanceSky.allocate(4, NIncBasis);
         ElementLuminanceSky = 0.0;
@@ -8859,13 +8862,13 @@ namespace DaylightingManager {
 
         // find number of outgoing basis towards current reference point
         if (CalledFrom == CalledForRefPoint) {
-            RefPointIndex = ComplexWind(IWin).DaylghtGeom(CurCplxFenState).RefPoint(iRefPoint).RefPointIndex(WinEl);
-            dOmega = ComplexWind(IWin).RefPoint(iRefPoint).SolidAngle(WinEl);
-            zProjection = ComplexWind(IWin).RefPoint(iRefPoint).SolidAngleVec(WinEl).z;
+            RefPointIndex = state.dataBSDFWindow->ComplexWind(IWin).DaylghtGeom(CurCplxFenState).RefPoint(iRefPoint).RefPointIndex(WinEl);
+            dOmega = state.dataBSDFWindow->ComplexWind(IWin).RefPoint(iRefPoint).SolidAngle(WinEl);
+            zProjection = state.dataBSDFWindow->ComplexWind(IWin).RefPoint(iRefPoint).SolidAngleVec(WinEl).z;
         } else {
-            RefPointIndex = ComplexWind(IWin).DaylghtGeom(CurCplxFenState).IlluminanceMap(iRefPoint, MapNum).RefPointIndex(WinEl);
-            dOmega = ComplexWind(IWin).IlluminanceMap(iRefPoint, MapNum).SolidAngle(WinEl);
-            zProjection = ComplexWind(IWin).IlluminanceMap(iRefPoint, MapNum).SolidAngleVec(WinEl).z;
+            RefPointIndex = state.dataBSDFWindow->ComplexWind(IWin).DaylghtGeom(CurCplxFenState).IlluminanceMap(iRefPoint, MapNum).RefPointIndex(WinEl);
+            dOmega = state.dataBSDFWindow->ComplexWind(IWin).IlluminanceMap(iRefPoint, MapNum).SolidAngle(WinEl);
+            zProjection = state.dataBSDFWindow->ComplexWind(IWin).IlluminanceMap(iRefPoint, MapNum).SolidAngleVec(WinEl).z;
         }
 
         WinLumSK = 0.0;
@@ -8961,7 +8964,7 @@ namespace DaylightingManager {
 
         CurCplxFenState = SurfaceWindow(iWin).ComplexFen.CurrentState;
         iConst = SurfaceWindow(iWin).ComplexFen.State(CurCplxFenState).Konst;
-        SolBmIndex = ComplexWind(iWin).Geom(CurCplxFenState).SolBmIndex(iHour, state.dataGlobal->TimeStep);
+        SolBmIndex = state.dataBSDFWindow->ComplexWind(iWin).Geom(CurCplxFenState).SolBmIndex(iHour, state.dataGlobal->TimeStep);
 
         {
             auto const SELECT_CASE_var(CalledFrom);
@@ -8978,21 +8981,21 @@ namespace DaylightingManager {
 
         WinLumSunDisk = 0.0;
         ELumSunDisk = 0.0;
-        NTrnBasis = ComplexWind(iWin).Geom(CurCplxFenState).Trn.NBasis;
+        NTrnBasis = state.dataBSDFWindow->ComplexWind(iWin).Geom(CurCplxFenState).Trn.NBasis;
         for (iTrnElem = 1; iTrnElem <= NTrnBasis; ++iTrnElem) {
             // if ray from any part of the window can reach reference point
             if (CalledFrom == CalledForRefPoint) {
-                refPointIntersect = ComplexWind(iWin).DaylghtGeom(CurCplxFenState).RefPoint(iRefPoint).RefPointIntersection(iTrnElem);
+                refPointIntersect = state.dataBSDFWindow->ComplexWind(iWin).DaylghtGeom(CurCplxFenState).RefPoint(iRefPoint).RefPointIntersection(iTrnElem);
             } else {
-                refPointIntersect = ComplexWind(iWin).DaylghtGeom(CurCplxFenState).IlluminanceMap(iRefPoint, MapNum).RefPointIntersection(iTrnElem);
+                refPointIntersect = state.dataBSDFWindow->ComplexWind(iWin).DaylghtGeom(CurCplxFenState).IlluminanceMap(iRefPoint, MapNum).RefPointIntersection(iTrnElem);
             }
             if (refPointIntersect) {
                 if (CalledFrom == CalledForRefPoint) {
-                    PosFac = ComplexWind(iWin).DaylghtGeom(CurCplxFenState).RefPoint(iRefPoint).RefPtIntPosFac(iTrnElem);
+                    PosFac = state.dataBSDFWindow->ComplexWind(iWin).DaylghtGeom(CurCplxFenState).RefPoint(iRefPoint).RefPtIntPosFac(iTrnElem);
                 } else {
-                    PosFac = ComplexWind(iWin).DaylghtGeom(CurCplxFenState).IlluminanceMap(iRefPoint, MapNum).RefPtIntPosFac(iTrnElem);
+                    PosFac = state.dataBSDFWindow->ComplexWind(iWin).DaylghtGeom(CurCplxFenState).IlluminanceMap(iRefPoint, MapNum).RefPtIntPosFac(iTrnElem);
                 }
-                RayZ = -ComplexWind(iWin).Geom(CurCplxFenState).sTrn(iTrnElem).z;
+                RayZ = -state.dataBSDFWindow->ComplexWind(iWin).Geom(CurCplxFenState).sTrn(iTrnElem).z;
 
                 // Need to recalculate position factor for dominant direction in case of specular bsdf.  Otherwise this will produce
                 // very inaccurate results because of position factor of the sun and bsdf pach can vary by lot
@@ -9009,11 +9012,11 @@ namespace DaylightingManager {
                     } else {
                         dirTrans = 0.0;
                     }
-                    LambdaTrn = ComplexWind(iWin).Geom(CurCplxFenState).Trn.Lamda(iTrnElem);
+                    LambdaTrn = state.dataBSDFWindow->ComplexWind(iWin).Geom(CurCplxFenState).Trn.Lamda(iTrnElem);
 
-                    V(1) = ComplexWind(iWin).Geom(CurCplxFenState).sTrn(iTrnElem).x;
-                    V(2) = ComplexWind(iWin).Geom(CurCplxFenState).sTrn(iTrnElem).y;
-                    V(3) = ComplexWind(iWin).Geom(CurCplxFenState).sTrn(iTrnElem).z;
+                    V(1) = state.dataBSDFWindow->ComplexWind(iWin).Geom(CurCplxFenState).sTrn(iTrnElem).x;
+                    V(2) = state.dataBSDFWindow->ComplexWind(iWin).Geom(CurCplxFenState).sTrn(iTrnElem).y;
+                    V(3) = state.dataBSDFWindow->ComplexWind(iWin).Geom(CurCplxFenState).sTrn(iTrnElem).z;
                     V = -V;
 
                     RWin(1) = Surface(iWin).Centroid.x;
