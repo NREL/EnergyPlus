@@ -42,6 +42,7 @@ endif()
 option( BUILD_PACKAGE "Build package" OFF )
 option( BUILD_TESTING "Build testing targets" OFF )
 option( BUILD_FORTRAN "Build Fortran stuff" OFF )
+option( USE_PSYCHROMETRICS_CACHING "Use pychrometrics cashing routines" ON )
 
 #######################################################################
 
@@ -343,8 +344,6 @@ if (BUILD_DOCS)
   set(DOCS_TESTING ${BUILD_TESTING} CACHE INTERNAL "" FORCE)
   add_subdirectory(doc)
 endif()
-
-option( USE_PSYCHROMETRICS_CACHING "Use pychrometrics cashing routines" ON )
 
 # some parameters are simply not needed for everyday building
 mark_as_advanced(CMAKE_INSTALL_PREFIX)

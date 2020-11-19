@@ -20,12 +20,12 @@ jobs:
     - name: Configure CMake
       shell: bash
       working-directory: ${{runner.workspace}}/EnergyPlus/build
-      run: cmake -DCMAKE_BUILD_TYPE=Release -DLINK_WITH_PYTHON=ON -DUSE_PSYCHROMETRICS_CACHING=OFF -DBUILD_TESTING=ON ..
+      run: cmake -DCMAKE_BUILD_TYPE=Release -DLINK_WITH_PYTHON=ON -DUSE_PSYCHROMETRICS_CACHING=OFF ..
 
     - name: Build EnergyPlus
       working-directory: ${{runner.workspace}}/EnergyPlus/build
       shell: bash
-      run: cmake --build . --target energyplus_tests -j 2
+      run: cmake --build . --target energyplus -j 2
 
   no_python_psychcach:
     runs-on: macos-10.15
@@ -44,12 +44,12 @@ jobs:
       - name: Configure CMake
         shell: bash
         working-directory: ${{runner.workspace}}/EnergyPlus/build
-        run: cmake -DCMAKE_BUILD_TYPE=Release -DLINK_WITH_PYTHON=OFF -DUSE_PSYCHROMETRICS_CACHING=ON -DBUILD_TESTING=ON ..
+        run: cmake -DCMAKE_BUILD_TYPE=Release -DLINK_WITH_PYTHON=OFF -DUSE_PSYCHROMETRICS_CACHING=ON ..
 
       - name: Build EnergyPlus
         working-directory: ${{runner.workspace}}/EnergyPlus/build
         shell: bash
-        run: cmake --build . --target energyplus_tests -j 2
+        run: cmake --build . --target energyplus -j 2
 
   no_python_no_psychcach:
     runs-on: macos-10.15
@@ -68,9 +68,9 @@ jobs:
       - name: Configure CMake
         shell: bash
         working-directory: ${{runner.workspace}}/EnergyPlus/build
-        run: cmake -DCMAKE_BUILD_TYPE=Release -DLINK_WITH_PYTHON=OFF -DUSE_PSYCHROMETRICS_CACHING=OFF -DBUILD_TESTING=ON ..
+        run: cmake -DCMAKE_BUILD_TYPE=Release -DLINK_WITH_PYTHON=OFF -DUSE_PSYCHROMETRICS_CACHING=OFF ..
 
       - name: Build EnergyPlus
         working-directory: ${{runner.workspace}}/EnergyPlus/build
         shell: bash
-        run: cmake --build . --target energyplus_tests -j 2
+        run: cmake --build . --target energyplus -j 2
