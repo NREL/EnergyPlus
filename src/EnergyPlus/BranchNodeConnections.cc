@@ -52,6 +52,7 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/DataBranchNodeConnections.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -647,10 +648,10 @@ namespace EnergyPlus::BranchNodeConnections {
             }
         }
 
-        NumNodeConnectionErrors += ErrorCounter;
+        state.dataBranchNodeConnections->NumNodeConnectionErrors += ErrorCounter;
     }
 
-    bool IsParentObject(std::string const &ComponentType, std::string const &ComponentName)
+    bool IsParentObject(EnergyPlusData &state, std::string const &ComponentType, std::string const &ComponentName)
     {
 
         // FUNCTION INFORMATION:
@@ -681,7 +682,7 @@ namespace EnergyPlus::BranchNodeConnections {
             }
         }
         if (!IsParent) {
-            IsParent = IsParentObjectCompSet(ComponentType, ComponentName);
+            IsParent = IsParentObjectCompSet(state, ComponentType, ComponentName);
         }
 
         return IsParent;
@@ -755,8 +756,8 @@ namespace EnergyPlus::BranchNodeConnections {
             // Get Node Numbers
             InletNodeNum = UtilityRoutines::FindItemInList(InletNodeName, NodeID({1, NumOfNodes}), NumOfNodes);
             OutletNodeNum = UtilityRoutines::FindItemInList(OutletNodeName, NodeID({1, NumOfNodes}), NumOfNodes);
-        } else if (IsParentObjectCompSet(ComponentType, ComponentName)) {
-            Which = WhichCompSet(ComponentType, ComponentName);
+        } else if (IsParentObjectCompSet(state, ComponentType, ComponentName)) {
+            Which = WhichCompSet(state, ComponentType, ComponentName);
             if (Which != 0) {
                 InletNodeName = CompSets(Which).InletNodeName;
                 OutletNodeName = CompSets(Which).OutletNodeName;
@@ -774,7 +775,7 @@ namespace EnergyPlus::BranchNodeConnections {
         if (ErrInObject) ErrorsFound = true;
     }
 
-    bool IsParentObjectCompSet(std::string const &ComponentType, std::string const &ComponentName)
+    bool IsParentObjectCompSet(EnergyPlusData &state, std::string const &ComponentType, std::string const &ComponentName)
     {
 
         // FUNCTION INFORMATION:
@@ -796,7 +797,7 @@ namespace EnergyPlus::BranchNodeConnections {
         int Loop;
 
         IsParent = false;
-        for (Loop = 1; Loop <= NumCompSets; ++Loop) {
+        for (Loop = 1; Loop <= state.dataBranchNodeConnections->NumCompSets; ++Loop) {
             if (CompSets(Loop).ParentCType == ComponentType && CompSets(Loop).ParentCName == ComponentName) {
                 IsParent = true;
                 break;
@@ -806,7 +807,7 @@ namespace EnergyPlus::BranchNodeConnections {
         return IsParent;
     }
 
-    int WhichCompSet(std::string const &ComponentType, std::string const &ComponentName)
+    int WhichCompSet(EnergyPlusData &state, std::string const &ComponentType, std::string const &ComponentName)
     {
 
         // FUNCTION INFORMATION:
@@ -829,7 +830,7 @@ namespace EnergyPlus::BranchNodeConnections {
         int Loop;
 
         WhichOne = 0;
-        for (Loop = 1; Loop <= NumCompSets; ++Loop) {
+        for (Loop = 1; Loop <= state.dataBranchNodeConnections->NumCompSets; ++Loop) {
             if (CompSets(Loop).CType == ComponentType && CompSets(Loop).CName == ComponentName) {
                 WhichOne = Loop;
                 break;
@@ -839,7 +840,7 @@ namespace EnergyPlus::BranchNodeConnections {
         return WhichOne;
     }
 
-    int GetNumChildren(std::string const &ComponentType, std::string const &ComponentName)
+    int GetNumChildren(EnergyPlusData &state, std::string const &ComponentType, std::string const &ComponentName)
     {
 
         // FUNCTION INFORMATION:
@@ -861,8 +862,8 @@ namespace EnergyPlus::BranchNodeConnections {
         int Loop;
 
         NumChildren = 0;
-        if (IsParentObject(ComponentType, ComponentName)) {
-            for (Loop = 1; Loop <= NumCompSets; ++Loop) {
+        if (IsParentObject(state, ComponentType, ComponentName)) {
+            for (Loop = 1; Loop <= state.dataBranchNodeConnections->NumCompSets; ++Loop) {
                 if (CompSets(Loop).ParentCType == ComponentType && CompSets(Loop).ParentCName == ComponentName) {
                     ++NumChildren;
                 }
@@ -940,10 +941,6 @@ namespace EnergyPlus::BranchNodeConnections {
         NumOutlets = 0;
         ErrInObject = false;
 
-        //  IF (IsParentObject(ComponentType,ComponentName)) THEN
-        //    IsParent=.TRUE.
-        //  ENDIF
-
         for (Which = 1; Which <= NumOfNodeConnections; ++Which) {
             if (NodeConnections(Which).ObjectType != ComponentType || NodeConnections(Which).ObjectName != ComponentName) continue;
             if (UtilityRoutines::SameString(NodeConnections(Which).ConnectionType, "Inlet")) {
@@ -1016,8 +1013,8 @@ namespace EnergyPlus::BranchNodeConnections {
         OutletNodeNum = 0;
         ErrInObject = false;
 
-        if (IsParentObject(ComponentType, ComponentName)) {
-            NumChildren = GetNumChildren(ComponentType, ComponentName);
+        if (IsParentObject(state, ComponentType, ComponentName)) {
+            NumChildren = GetNumChildren(state, ComponentType, ComponentName);
             if (NumChildren == 0) {
                 ShowWarningError(state, "GetChildrenData: Parent Node has no children, node=" + ComponentType + ':' + ComponentName);
             } else {
@@ -1036,7 +1033,7 @@ namespace EnergyPlus::BranchNodeConnections {
                 ChildInNodeNum = 0;
                 ChildOutNodeNum = 0;
                 CountNum = 0;
-                for (Loop = 1; Loop <= NumCompSets; ++Loop) {
+                for (Loop = 1; Loop <= state.dataBranchNodeConnections->NumCompSets; ++Loop) {
                     if (CompSets(Loop).ParentCType == ComponentType && CompSets(Loop).ParentCName == ComponentName) {
                         ++CountNum;
                         ChildCType(CountNum) = CompSets(Loop).CType;
@@ -1147,7 +1144,7 @@ namespace EnergyPlus::BranchNodeConnections {
 
         // See if Component-Nodes set is already there - should be unique
         // Try to fill in blanks (passed in as undefined
-        for (Count = 1; Count <= NumCompSets; ++Count) {
+        for (Count = 1; Count <= state.dataBranchNodeConnections->NumCompSets; ++Count) {
             if (CompName != CompSets(Count).CName) continue;
             if (CompTypeUC != "UNDEFINED") {
                 if (CompTypeUC != CompSets(Count).CType) continue;
@@ -1178,7 +1175,7 @@ namespace EnergyPlus::BranchNodeConnections {
             }
         }
         if (Found == 0) {
-            for (Count = 1; Count <= NumCompSets; ++Count) {
+            for (Count = 1; Count <= state.dataBranchNodeConnections->NumCompSets; ++Count) {
                 Found = 0;
                 // Test if inlet node has been used before as an inlet node
                 // If the matching node name does not belong to the parent object, then error
@@ -1199,7 +1196,7 @@ namespace EnergyPlus::BranchNodeConnections {
                         // Due to possibility of grandparents or more, if the matching node name
                         // belongs to a component that appears as a parent, then OK
                         Found2 = 0;
-                        for (Count2 = 1; Count2 <= NumCompSets; ++Count2) {
+                        for (Count2 = 1; Count2 <= state.dataBranchNodeConnections->NumCompSets; ++Count2) {
                             if ((CompSets(Count).CType == CompSets(Count2).ParentCType) && (CompSets(Count).CName == CompSets(Count2).ParentCName))
                                 Found2 = 1;
                             if ((CompTypeUC == CompSets(Count2).ParentCType) && (CompName == CompSets(Count2).ParentCName)) Found2 = 1;
@@ -1230,7 +1227,7 @@ namespace EnergyPlus::BranchNodeConnections {
                         // Due to possibility of grandparents or more, if the matching node name
                         // belongs to a component that appears as a parent, then OK
                         Found2 = 0;
-                        for (Count2 = 1; Count2 <= NumCompSets; ++Count2) {
+                        for (Count2 = 1; Count2 <= state.dataBranchNodeConnections->NumCompSets; ++Count2) {
                             if ((CompSets(Count).CType == CompSets(Count2).ParentCType) && (CompSets(Count).CName == CompSets(Count2).ParentCName))
                                 Found2 = 1;
                             if ((CompTypeUC == CompSets(Count2).ParentCType) && (CompName == CompSets(Count2).ParentCName)) Found2 = 1;
@@ -1253,17 +1250,17 @@ namespace EnergyPlus::BranchNodeConnections {
             }
         }
         if (Found == 0) {
-            CompSets.redimension(++NumCompSets);
-            CompSets(NumCompSets).ParentCType = ParentTypeUC;
-            CompSets(NumCompSets).ParentCName = ParentName;
-            CompSets(NumCompSets).CType = CompTypeUC;
-            CompSets(NumCompSets).CName = CompName;
-            CompSets(NumCompSets).InletNodeName = UtilityRoutines::MakeUPPERCase(InletNode);   // TODO: Fix this....
-            CompSets(NumCompSets).OutletNodeName = UtilityRoutines::MakeUPPERCase(OutletNode); // TODO: Fix this....
+            CompSets.redimension(++state.dataBranchNodeConnections->NumCompSets);
+            CompSets(state.dataBranchNodeConnections->NumCompSets).ParentCType = ParentTypeUC;
+            CompSets(state.dataBranchNodeConnections->NumCompSets).ParentCName = ParentName;
+            CompSets(state.dataBranchNodeConnections->NumCompSets).CType = CompTypeUC;
+            CompSets(state.dataBranchNodeConnections->NumCompSets).CName = CompName;
+            CompSets(state.dataBranchNodeConnections->NumCompSets).InletNodeName = UtilityRoutines::MakeUPPERCase(InletNode);   // TODO: Fix this....
+            CompSets(state.dataBranchNodeConnections->NumCompSets).OutletNodeName = UtilityRoutines::MakeUPPERCase(OutletNode); // TODO: Fix this....
             if (present(Description)) {
-                CompSets(NumCompSets).Description = Description;
+                CompSets(state.dataBranchNodeConnections->NumCompSets).Description = Description;
             } else {
-                CompSets(NumCompSets).Description = "UNDEFINED";
+                CompSets(state.dataBranchNodeConnections->NumCompSets).Description = "UNDEFINED";
             }
         }
     }
@@ -1287,9 +1284,9 @@ namespace EnergyPlus::BranchNodeConnections {
         Array1D_bool AlreadyNoted;
 
         // Test component sets created by branches
-        AlreadyNoted.dimension(NumCompSets, false);
-        for (Count = 1; Count <= NumCompSets; ++Count) {
-            for (Other = 1; Other <= NumCompSets; ++Other) {
+        AlreadyNoted.dimension(state.dataBranchNodeConnections->NumCompSets, false);
+        for (Count = 1; Count <= state.dataBranchNodeConnections->NumCompSets; ++Count) {
+            for (Other = 1; Other <= state.dataBranchNodeConnections->NumCompSets; ++Other) {
                 if (Count == Other) continue;
                 if (CompSets(Count).InletNodeName != CompSets(Other).InletNodeName) continue;
                 if (AlreadyNoted(Count)) continue;
@@ -1308,8 +1305,8 @@ namespace EnergyPlus::BranchNodeConnections {
         }
 
         AlreadyNoted = false;
-        for (Count = 1; Count <= NumCompSets; ++Count) {
-            for (Other = 1; Other <= NumCompSets; ++Other) {
+        for (Count = 1; Count <= state.dataBranchNodeConnections->NumCompSets; ++Count) {
+            for (Other = 1; Other <= state.dataBranchNodeConnections->NumCompSets; ++Other) {
                 if (Count == Other) continue;
                 if (CompSets(Count).OutletNodeName != CompSets(Other).OutletNodeName) continue;
                 if (AlreadyNoted(Count)) continue;
@@ -1369,7 +1366,7 @@ namespace EnergyPlus::BranchNodeConnections {
 
         // See if Already there
         Found = 0;
-        for (Count = 1; Count <= NumCompSets; ++Count) {
+        for (Count = 1; Count <= state.dataBranchNodeConnections->NumCompSets; ++Count) {
             if ((CompTypeUC != CompSets(Count).CType) && (CompSets(Count).CType != "UNDEFINED")) continue;
             if (CompName != CompSets(Count).CName) continue;
             if ((InletNode != CompSets(Count).InletNodeName) && (CompSets(Count).InletNodeName != "UNDEFINED") && (InletNode != "UNDEFINED"))
@@ -1414,9 +1411,9 @@ namespace EnergyPlus::BranchNodeConnections {
         Array1D_bool AlreadyNoted;
 
         // Test component sets created by branches
-        AlreadyNoted.dimension(NumCompSets, false);
-        for (Count = 1; Count <= NumCompSets; ++Count) {
-            for (Other = 1; Other <= NumCompSets; ++Other) {
+        AlreadyNoted.dimension(state.dataBranchNodeConnections->NumCompSets, false);
+        for (Count = 1; Count <= state.dataBranchNodeConnections->NumCompSets; ++Count) {
+            for (Other = 1; Other <= state.dataBranchNodeConnections->NumCompSets; ++Other) {
                 if (Count == Other) continue;
                 if (CompSets(Count).CType == "SOLARCOLLECTOR:UNGLAZEDTRANSPIRED") continue;
                 if (CompSets(Count).CType != CompSets(Other).CType || CompSets(Count).CName != CompSets(Other).CName) continue;

@@ -2349,10 +2349,10 @@ namespace SimulationManager {
         // Component Sets
         print(state.files.bnd, "{}\n", "! ===============================================================");
         print(state.files.bnd, "{}\n", Format_700);
-        print(state.files.bnd, " #Component Sets,{}\n", NumCompSets);
+        print(state.files.bnd, " #Component Sets,{}\n", state.dataBranchNodeConnections->NumCompSets);
         print(state.files.bnd, "{}\n", Format_702);
 
-        for (int Count = 1; Count <= NumCompSets; ++Count) {
+        for (int Count = 1; Count <= state.dataBranchNodeConnections->NumCompSets; ++Count) {
             print(state.files.bnd,
                   " Component Set,{},{},{},{},{},{},{},{}\n",
                   Count,
@@ -2375,7 +2375,7 @@ namespace SimulationManager {
                 ShowContinueError(state, "  " + CompSets(Count).Description + " not on any Branch or Parent Object");
                 ShowContinueError(state, "  Inlet Node : " + CompSets(Count).InletNodeName);
                 ShowContinueError(state, "  Outlet Node: " + CompSets(Count).OutletNodeName);
-                ++NumNodeConnectionErrors;
+                ++state.dataBranchNodeConnections->NumNodeConnectionErrors;
                 if (UtilityRoutines::SameString(CompSets(Count).CType, "SolarCollector:UnglazedTranspired")) {
                     ShowContinueError(state, "This report does not necessarily indicate a problem for a MultiSystem Transpired Collector");
                 }
@@ -2390,12 +2390,12 @@ namespace SimulationManager {
                 ShowContinueError(state, "  Node Types are still UNDEFINED -- See Branch/Node Details file for further information");
                 ShowContinueError(state, "  Inlet Node : " + CompSets(Count).InletNodeName);
                 ShowContinueError(state, "  Outlet Node: " + CompSets(Count).OutletNodeName);
-                ++NumNodeConnectionErrors;
+                ++state.dataBranchNodeConnections->NumNodeConnectionErrors;
             }
         }
 
-        for (int Count = 1; Count <= NumCompSets; ++Count) {
-            for (int Count1 = Count + 1; Count1 <= NumCompSets; ++Count1) {
+        for (int Count = 1; Count <= state.dataBranchNodeConnections->NumCompSets; ++Count) {
+            for (int Count1 = Count + 1; Count1 <= state.dataBranchNodeConnections->NumCompSets; ++Count1) {
                 if (CompSets(Count).CType != CompSets(Count1).CType) continue;
                 if (CompSets(Count).CName != CompSets(Count1).CName) continue;
                 if (CompSets(Count).InletNodeName != CompSets(Count1).InletNodeName) continue;
@@ -2411,7 +2411,7 @@ namespace SimulationManager {
                 ShowContinueError(state, "  Outlet Node: " + CompSets(Count).OutletNodeName);
                 ShowContinueError(state, "  Used by    : " + CompSets(Count).ParentCType + ' ' + CompSets(Count).ParentCName);
                 ShowContinueError(state, "  and  by    : " + CompSets(Count1).ParentCType + ' ' + CompSets(Count1).ParentCName);
-                ++NumNodeConnectionErrors;
+                ++state.dataBranchNodeConnections->NumNodeConnectionErrors;
             }
         }
         //  Plant Loops
@@ -2804,13 +2804,13 @@ namespace SimulationManager {
         // Report Dual Duct Dampers to BND File
         ReportDualDuctConnections(state);
 
-        if (NumNodeConnectionErrors == 0) {
+        if (state.dataBranchNodeConnections->NumNodeConnectionErrors == 0) {
             ShowMessage(state, "No node connection errors were found.");
         } else {
-            if (NumNodeConnectionErrors > 1) {
-                ShowMessage(state, "There were " + std::to_string(NumNodeConnectionErrors) + " node connection errors noted.");
+            if (state.dataBranchNodeConnections->NumNodeConnectionErrors > 1) {
+                ShowMessage(state, "There were " + std::to_string(state.dataBranchNodeConnections->NumNodeConnectionErrors) + " node connection errors noted.");
             } else {
-                ShowMessage(state, "There was " + std::to_string(NumNodeConnectionErrors) + " node connection error noted.");
+                ShowMessage(state, "There was " + std::to_string(state.dataBranchNodeConnections->NumNodeConnectionErrors) + " node connection error noted.");
             }
         }
 
@@ -2870,7 +2870,7 @@ namespace SimulationManager {
         ErrorsFound = false;
         print(state.files.debug, "{}\n", "Node Type,CompSet Name,Inlet Node,OutletNode");
         for (Loop = 1; Loop <= NumOfActualParents; ++Loop) {
-            NumChildren = GetNumChildren(ParentNodeList(Loop).CType, ParentNodeList(Loop).CName);
+            NumChildren = GetNumChildren(state, ParentNodeList(Loop).CType, ParentNodeList(Loop).CName);
             if (NumChildren > 0) {
                 ChildCType.allocate(NumChildren);
                 ChildCName.allocate(NumChildren);
@@ -2980,7 +2980,7 @@ namespace SimulationManager {
         print(state.files.debug, "{}\n", " CompSet,ComponentType,ComponentName,NumMeteredVariables");
         print(state.files.debug, "{}\n", " RepVar,ReportIndex,ReportID,ReportName,Units,ResourceType,EndUse,Group,IndexType");
 
-        for (Loop = 1; Loop <= NumCompSets; ++Loop) {
+        for (Loop = 1; Loop <= state.dataBranchNodeConnections->NumCompSets; ++Loop) {
             NumVariables = GetNumMeteredVariables(CompSets(Loop).CType, CompSets(Loop).CName);
             print(state.files.debug, "CompSet, {}, {}, {:5}\n", CompSets(Loop).CType, CompSets(Loop).CName, NumVariables);
             if (NumVariables <= 0) continue;

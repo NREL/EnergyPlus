@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -68,8 +69,7 @@ namespace DataBranchNodeConnections {
     // DERIVED TYPE DEFINITIONS:
 
     // MODULE VARIABLE DECLARATIONS:
-    extern int NumCompSets;             // Number of Component Sets found in branches
-    extern int NumNodeConnectionErrors; // Count of node connection errors
+
 
     extern int NumOfNodeConnections;
     extern int MaxNumOfNodeConnections;
@@ -142,9 +142,7 @@ namespace DataBranchNodeConnections {
         std::string ConnectionType; // Connection Type (must be valid) for this node connection
 
         // Default Constructor
-        EqNodeConnectionDef()
-        {
-        }
+        EqNodeConnectionDef() = default;
     };
 
     // Object Data
@@ -159,6 +157,18 @@ namespace DataBranchNodeConnections {
     void clear_state();
 
 } // namespace DataBranchNodeConnections
+
+struct BranchNodeConnectionsData : BaseGlobalStruct {
+
+    int NumCompSets = 0;             // Number of Component Sets found in branches
+    int NumNodeConnectionErrors = 0; // Count of node connection errors
+
+    void clear_state() override
+    {
+        this->NumCompSets = 0;
+        this->NumNodeConnectionErrors = 0;
+    }
+};
 
 } // namespace EnergyPlus
 

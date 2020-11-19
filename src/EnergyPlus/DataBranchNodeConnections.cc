@@ -79,8 +79,6 @@ namespace DataBranchNodeConnections {
     // MODULE PARAMETER DEFINITIONS:
 
     // MODULE VARIABLE DECLARATIONS:
-    int NumCompSets(0);             // Number of Component Sets found in branches
-    int NumNodeConnectionErrors(0); // Count of node connection errors
 
     int NumOfNodeConnections(0);
     int MaxNumOfNodeConnections(0);
@@ -101,8 +99,6 @@ namespace DataBranchNodeConnections {
     // Needed for unit tests, should not be normally called.
     void clear_state()
     {
-        NumCompSets = 0;
-        NumNodeConnectionErrors = 0;
         NumOfNodeConnections = 0;
         MaxNumOfNodeConnections = 0;
         NodeConnectionAlloc = 1000;
