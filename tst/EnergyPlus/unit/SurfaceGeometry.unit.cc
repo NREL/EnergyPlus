@@ -2497,6 +2497,7 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_SimpleBox_test)
     Zone.dimension(state.dataGlobal->NumOfZones);
     Zone(1).HasFloor = true;
     Zone(1).SurfaceFirst = 1;
+    Zone(1).AllSurfaceFirst = 1;
     Zone(1).SurfaceLast = 6;
 
     Surface.dimension(6);
@@ -2567,6 +2568,7 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxOneWallMissing_test)
     Zone.dimension(state.dataGlobal->NumOfZones);
     Zone(1).HasFloor = true;
     Zone(1).SurfaceFirst = 1;
+    Zone(1).AllSurfaceFirst = 1;
     Zone(1).SurfaceLast = 5;
 
     Surface.dimension(5);
@@ -2631,6 +2633,7 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxNoCeiling_test)
     Zone.dimension(state.dataGlobal->NumOfZones);
     Zone(1).HasFloor = true;
     Zone(1).SurfaceFirst = 1;
+    Zone(1).AllSurfaceFirst = 1;
     Zone(1).SurfaceLast = 5;
 
     Surface.dimension(5);
@@ -2695,6 +2698,7 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxNoFloor_test)
     Zone.dimension(state.dataGlobal->NumOfZones);
     Zone(1).HasFloor = true;
     Zone(1).SurfaceFirst = 1;
+    Zone(1).AllSurfaceFirst = 1;
     Zone(1).SurfaceLast = 5;
 
     Surface.dimension(5);
@@ -2758,6 +2762,7 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxNoCeilingFloor_test)
     enteredCeilingHeight.dimension(state.dataGlobal->NumOfZones, false);
     Zone.dimension(state.dataGlobal->NumOfZones);
     Zone(1).SurfaceFirst = 1;
+    Zone(1).AllSurfaceFirst = 1;
     Zone(1).SurfaceLast = 4;
 
     Surface.dimension(4);
@@ -5107,18 +5112,18 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresNoAirBoundari
         "    0,1,0,              !- Vertex 1",
         "    0,1,1,              !- Vertex 1",
         "    0,0,1;              !- Vertex 1",
-        });
+    });
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
 
     GetMaterialData(state, ErrorsFound); // read material data
-    EXPECT_FALSE(ErrorsFound);    // expect no errors
+    EXPECT_FALSE(ErrorsFound);           // expect no errors
 
     GetConstructData(state, ErrorsFound); // read construction data
-    EXPECT_FALSE(ErrorsFound);     // expect no errors
+    EXPECT_FALSE(ErrorsFound);            // expect no errors
 
-    GetZoneData(state, ErrorsFound);  // read zone data
-    EXPECT_FALSE(ErrorsFound); // expect no errors
+    GetZoneData(state, ErrorsFound); // read zone data
+    EXPECT_FALSE(ErrorsFound);       // expect no errors
 
     SetupZoneGeometry(state, ErrorsFound);
     // SetupZoneGeometry calls SurfaceGeometry::GetSurfaceData
@@ -5147,7 +5152,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresNoAirBoundari
     EXPECT_EQ(DataHeatBalance::Zone(1).SolarEnclosureNum, 1);
     EXPECT_EQ(DataHeatBalance::Zone(2).SolarEnclosureNum, 2);
     EXPECT_EQ(DataHeatBalance::Zone(3).SolarEnclosureNum, 3);
-
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBoundaries1)
@@ -5243,18 +5247,67 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
         "    0,1,0,              !- Vertex 1",
         "    0,1,1,              !- Vertex 1",
         "    0,0,1;              !- Vertex 1",
-        });
+
+        "BuildingSurface:Detailed,",
+        "    Zone1-Floor,  !- Name",
+        "    Floor,                 !- Surface Type",
+        "    Some Construction,  !- Construction Name",
+        "    Zone 1,       !- Zone Name",
+        "    Ground,                 !- Outside Boundary Condition",
+        "    ,  !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    ,                        !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,0,0,              !- Vertex 1",
+        "    0,1,0,              !- Vertex 2",
+        "    1,1,0,              !- Vertex 3",
+        "    1,0,0;              !- Vertex 4",
+
+        "BuildingSurface:Detailed,",
+        "    Zone2-Floor,  !- Name",
+        "    Floor,                 !- Surface Type",
+        "    Some Construction,  !- Construction Name",
+        "    Zone 2,       !- Zone Name",
+        "    Ground,                 !- Outside Boundary Condition",
+        "    ,  !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    ,                        !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,0,0,              !- Vertex 1",
+        "    0,1,0,              !- Vertex 2",
+        "    1,1,0,              !- Vertex 3",
+        "    1,0,0;              !- Vertex 4",
+
+        "BuildingSurface:Detailed,",
+        "    Zone3-Floor,  !- Name",
+        "    Floor,                 !- Surface Type",
+        "    Some Construction,  !- Construction Name",
+        "    Zone 3,       !- Zone Name",
+        "    Ground,                 !- Outside Boundary Condition",
+        "    ,  !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    ,                        !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,0,0,              !- Vertex 1",
+        "    0,1,0,              !- Vertex 2",
+        "    1,1,0,              !- Vertex 3",
+        "    1,0,0;              !- Vertex 4",
+
+    });
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
 
     GetMaterialData(state, ErrorsFound); // read material data
-    EXPECT_FALSE(ErrorsFound);    // expect no errors
+    EXPECT_FALSE(ErrorsFound);           // expect no errors
 
     GetConstructData(state, ErrorsFound); // read construction data
-    EXPECT_FALSE(ErrorsFound);     // expect no errors
+    EXPECT_FALSE(ErrorsFound);            // expect no errors
 
-    GetZoneData(state, ErrorsFound);  // read zone data
-    EXPECT_FALSE(ErrorsFound); // expect no errors
+    GetZoneData(state, ErrorsFound); // read zone data
+    EXPECT_FALSE(ErrorsFound);       // expect no errors
 
     SetupZoneGeometry(state, ErrorsFound);
     // SetupZoneGeometry calls SurfaceGeometry::GetSurfaceData
@@ -5279,7 +5332,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
     EXPECT_EQ(DataHeatBalance::Zone(1).SolarEnclosureNum, 1);
     EXPECT_EQ(DataHeatBalance::Zone(2).SolarEnclosureNum, 1);
     EXPECT_EQ(DataHeatBalance::Zone(3).SolarEnclosureNum, 1);
-
 }
 
 TEST_F(EnergyPlusFixture, DISABLED_HeatBalanceIntRadExchange_SetupEnclosuresWithAirBoundaries2)
@@ -5384,18 +5436,67 @@ TEST_F(EnergyPlusFixture, DISABLED_HeatBalanceIntRadExchange_SetupEnclosuresWith
         "    0,1,0,              !- Vertex 1",
         "    0,1,1,              !- Vertex 1",
         "    0,0,1;              !- Vertex 1",
-        });
+
+        "BuildingSurface:Detailed,",
+        "    Zone1-Floor,  !- Name",
+        "    Floor,                 !- Surface Type",
+        "    Some Construction,  !- Construction Name",
+        "    Zone 1,       !- Zone Name",
+        "    Ground,                 !- Outside Boundary Condition",
+        "    ,  !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    ,                        !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,0,0,              !- Vertex 1",
+        "    0,1,0,              !- Vertex 2",
+        "    1,1,0,              !- Vertex 3",
+        "    1,0,0;              !- Vertex 4",
+
+        "BuildingSurface:Detailed,",
+        "    Zone2-Floor,  !- Name",
+        "    Floor,                 !- Surface Type",
+        "    Some Construction,  !- Construction Name",
+        "    Zone 2,       !- Zone Name",
+        "    Ground,                 !- Outside Boundary Condition",
+        "    ,  !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    ,                        !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,0,0,              !- Vertex 1",
+        "    0,1,0,              !- Vertex 2",
+        "    1,1,0,              !- Vertex 3",
+        "    1,0,0;              !- Vertex 4",
+
+        "BuildingSurface:Detailed,",
+        "    Zone3-Floor,  !- Name",
+        "    Floor,                 !- Surface Type",
+        "    Some Construction,  !- Construction Name",
+        "    Zone 3,       !- Zone Name",
+        "    Ground,                 !- Outside Boundary Condition",
+        "    ,  !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    ,                        !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,0,0,              !- Vertex 1",
+        "    0,1,0,              !- Vertex 2",
+        "    1,1,0,              !- Vertex 3",
+        "    1,0,0;              !- Vertex 4",
+
+    });
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
 
     GetMaterialData(state, ErrorsFound); // read material data
-    EXPECT_FALSE(ErrorsFound);    // expect no errors
+    EXPECT_FALSE(ErrorsFound);           // expect no errors
 
     GetConstructData(state, ErrorsFound); // read construction data
-    EXPECT_FALSE(ErrorsFound);     // expect no errors
+    EXPECT_FALSE(ErrorsFound);            // expect no errors
 
-    GetZoneData(state, ErrorsFound);  // read zone data
-    EXPECT_FALSE(ErrorsFound); // expect no errors
+    GetZoneData(state, ErrorsFound); // read zone data
+    EXPECT_FALSE(ErrorsFound);       // expect no errors
 
     SetupZoneGeometry(state, ErrorsFound);
     // SetupZoneGeometry calls SurfaceGeometry::GetSurfaceData
@@ -5405,10 +5506,11 @@ TEST_F(EnergyPlusFixture, DISABLED_HeatBalanceIntRadExchange_SetupEnclosuresWith
 
     ErrorsFound = false;
 
-    //std::string const error_string = delimited_string({
-    //"   ** Severe  ** AlignInputViewFactors: ZoneProperty:UserViewFactors:BySurfaceName=\"Zone 6\" did not find a matching radiant or solar enclosure name."
+    // std::string const error_string = delimited_string({
+    //"   ** Severe  ** AlignInputViewFactors: ZoneProperty:UserViewFactors:BySurfaceName=\"Zone 6\" did not find a matching radiant or solar
+    //enclosure name."
     //    });
-    //EXPECT_TRUE(compare_err_stream(error_string, true));
+    // EXPECT_TRUE(compare_err_stream(error_string, true));
 
     // For this test case, Zones 1 and 2 share a radiant enclosure and Zone 1 and 3 share a solar enclosure
 
@@ -5431,7 +5533,6 @@ TEST_F(EnergyPlusFixture, DISABLED_HeatBalanceIntRadExchange_SetupEnclosuresWith
     EXPECT_EQ(DataHeatBalance::Zone(1).SolarEnclosureNum, 1);
     EXPECT_EQ(DataHeatBalance::Zone(2).SolarEnclosureNum, 2);
     EXPECT_EQ(DataHeatBalance::Zone(3).SolarEnclosureNum, 1);
-
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBoundaries3)
@@ -5566,7 +5667,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
         "    0,1,1,              !- Vertex 1",
         "    0,0,1;              !- Vertex 1",
 
-         "BuildingSurface:Detailed,",
+        "BuildingSurface:Detailed,",
         "    Zone4-Surface2,  !- Name",
         "    Wall,                 !- Surface Type",
         "    Grouped Air Boundary,  !- Construction Name",
@@ -5598,7 +5699,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
         "    0,1,1,              !- Vertex 1",
         "    0,0,1;              !- Vertex 1",
 
-       "BuildingSurface:Detailed,",
+        "BuildingSurface:Detailed,",
         "    Zone1-Surface3,  !- Name",
         "    Wall,                 !- Surface Type",
         "    Grouped Air Boundary,  !- Construction Name",
@@ -5630,18 +5731,98 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
         "    0,1,1,              !- Vertex 1",
         "    0,0,1;              !- Vertex 1",
 
-        });
+        "BuildingSurface:Detailed,",
+        "    Zone1-Floor,  !- Name",
+        "    Floor,                 !- Surface Type",
+        "    Some Construction,  !- Construction Name",
+        "    Zone 1,       !- Zone Name",
+        "    Ground,                 !- Outside Boundary Condition",
+        "    ,  !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    ,                        !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,0,0,              !- Vertex 1",
+        "    0,1,0,              !- Vertex 2",
+        "    1,1,0,              !- Vertex 3",
+        "    1,0,0;              !- Vertex 4",
+
+        "BuildingSurface:Detailed,",
+        "    Zone2-Floor,  !- Name",
+        "    Floor,                 !- Surface Type",
+        "    Some Construction,  !- Construction Name",
+        "    Zone 2,       !- Zone Name",
+        "    Ground,                 !- Outside Boundary Condition",
+        "    ,  !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    ,                        !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,0,0,              !- Vertex 1",
+        "    0,1,0,              !- Vertex 2",
+        "    1,1,0,              !- Vertex 3",
+        "    1,0,0;              !- Vertex 4",
+
+        "BuildingSurface:Detailed,",
+        "    Zone3-Floor,  !- Name",
+        "    Floor,                 !- Surface Type",
+        "    Some Construction,  !- Construction Name",
+        "    Zone 3,       !- Zone Name",
+        "    Ground,                 !- Outside Boundary Condition",
+        "    ,  !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    ,                        !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,0,0,              !- Vertex 1",
+        "    0,1,0,              !- Vertex 2",
+        "    1,1,0,              !- Vertex 3",
+        "    1,0,0;              !- Vertex 4",
+
+        "BuildingSurface:Detailed,",
+        "    Zone4-Floor,  !- Name",
+        "    Floor,                 !- Surface Type",
+        "    Some Construction,  !- Construction Name",
+        "    Zone 4,       !- Zone Name",
+        "    Ground,                 !- Outside Boundary Condition",
+        "    ,  !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    ,                        !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,0,0,              !- Vertex 1",
+        "    0,1,0,              !- Vertex 2",
+        "    1,1,0,              !- Vertex 3",
+        "    1,0,0;              !- Vertex 4",
+
+        "BuildingSurface:Detailed,",
+        "    Zone5-Floor,  !- Name",
+        "    Floor,                 !- Surface Type",
+        "    Some Construction,  !- Construction Name",
+        "    Zone 5,       !- Zone Name",
+        "    Ground,                 !- Outside Boundary Condition",
+        "    ,  !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    ,                        !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,0,0,              !- Vertex 1",
+        "    0,1,0,              !- Vertex 2",
+        "    1,1,0,              !- Vertex 3",
+        "    1,0,0;              !- Vertex 4",
+
+    });
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
 
     GetMaterialData(state, ErrorsFound); // read material data
-    EXPECT_FALSE(ErrorsFound);    // expect no errors
+    EXPECT_FALSE(ErrorsFound);           // expect no errors
 
     GetConstructData(state, ErrorsFound); // read construction data
-    EXPECT_FALSE(ErrorsFound);     // expect no errors
+    EXPECT_FALSE(ErrorsFound);            // expect no errors
 
-    GetZoneData(state, ErrorsFound);  // read zone data
-    EXPECT_FALSE(ErrorsFound); // expect no errors
+    GetZoneData(state, ErrorsFound); // read zone data
+    EXPECT_FALSE(ErrorsFound);       // expect no errors
 
     SetupZoneGeometry(state, ErrorsFound);
     // SetupZoneGeometry calls SurfaceGeometry::GetSurfaceData
@@ -5682,7 +5863,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
     EXPECT_EQ(DataHeatBalance::Zone(3).SolarEnclosureNum, 1);
     EXPECT_EQ(DataHeatBalance::Zone(4).SolarEnclosureNum, 1);
     EXPECT_EQ(DataHeatBalance::Zone(5).SolarEnclosureNum, 1);
-
 }
 
 TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
