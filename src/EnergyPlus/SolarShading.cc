@@ -6470,17 +6470,6 @@ namespace SolarShading {
                 SurfWinGlTsolBmDif(SurfNum) = TBmDif;
                 SurfWinGlTsolDifDif(SurfNum) = TDifBare;
 
-                // TODO: Why this is updated after reporting
-                if (ShadeFlag == SwitchableGlazing) {
-                    // Switchable glazing
-                    Real64 SwitchFac = SurfWinSwitchingFactor(SurfNum);
-                    if (!SurfWinSolarDiffusing(SurfNum)) {
-                        TBmBm = InterpSw(SwitchFac, TBmBm, TBmAllShBlSc);
-                    } else {
-                        TBmDif = InterpSw(SwitchFac, TBmDif, TBmAllShBlSc);
-                    }
-                }
-
                 //-----------------------------------------------------------------
                 // Diffuse solar transmittance
                 //-----------------------------------------------------------------
@@ -6727,6 +6716,17 @@ namespace SolarShading {
                         } // End of check if ShadeFlag > 0 and ShadeFlag < 10
                     } // end of checking if not eql window model
                 } // end of checking if sunlitfract > 0
+
+                // TODO: Why this is updated after reporting
+                if (ShadeFlag == SwitchableGlazing) {
+                    // Switchable glazing
+                    Real64 SwitchFac = SurfWinSwitchingFactor(SurfNum);
+                    if (!SurfWinSolarDiffusing(SurfNum)) {
+                        TBmBm = InterpSw(SwitchFac, TBmBm, TBmAllShBlSc);
+                    } else {
+                        TBmDif = InterpSw(SwitchFac, TBmDif, TBmAllShBlSc);
+                    }
+                }
 
                 // The following WinTransBmSolar and WinTransDifSolar will be combined later to give
                 // WinTransSolar for reporting
