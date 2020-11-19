@@ -1897,8 +1897,6 @@ namespace SimulationManager {
         using OutputReportTabular::maxUniqueKeyCount;
         using OutputReportTabular::MonthlyFieldSetInputCount;
         using namespace DataRuntimeLanguage;
-        using DataBranchNodeConnections::MaxNumOfNodeConnections;
-        using DataBranchNodeConnections::NumOfNodeConnections;
         using DataHeatBalance::CondFDRelaxFactor;
         using DataHeatBalance::CondFDRelaxFactorInput;
         using General::RoundSigDigits;
@@ -1965,8 +1963,8 @@ namespace SimulationManager {
         print(state.files.audit, variable_fmt, "numEMSInternalVarsAvailable", numEMSInternalVarsAvailable);
         print(state.files.audit, variable_fmt, "maxEMSInternalVarsAvailable", maxEMSInternalVarsAvailable);
 
-        print(state.files.audit, variable_fmt, "NumOfNodeConnections", NumOfNodeConnections);
-        print(state.files.audit, variable_fmt, "MaxNumOfNodeConnections", MaxNumOfNodeConnections);
+        print(state.files.audit, variable_fmt, "NumOfNodeConnections", state.dataBranchNodeConnections->NumOfNodeConnections);
+        print(state.files.audit, variable_fmt, "MaxNumOfNodeConnections", state.dataBranchNodeConnections->MaxNumOfNodeConnections);
 #ifdef EP_Count_Calls
         print(state.files.audit, variable_fmt, "NumShadow_Calls", NumShadow_Calls);
         print(state.files.audit, variable_fmt, "NumShadowAtTS_Calls", NumShadowAtTS_Calls);
@@ -2199,11 +2197,11 @@ namespace SimulationManager {
         NonConnectedNodes.dimension(NumOfNodes, true);
 
         int NumNonParents = 0;
-        for (int Loop = 1; Loop <= NumOfNodeConnections; ++Loop) {
+        for (int Loop = 1; Loop <= state.dataBranchNodeConnections->NumOfNodeConnections; ++Loop) {
             if (NodeConnections(Loop).ObjectIsParent) continue;
             ++NumNonParents;
         }
-        const auto NumParents = NumOfNodeConnections - NumNonParents;
+        const auto NumParents = state.dataBranchNodeConnections->NumOfNodeConnections - NumNonParents;
         ParentNodeList.allocate(NumParents);
 
         //  Do Parent Objects
@@ -2212,7 +2210,7 @@ namespace SimulationManager {
         print(state.files.bnd, " #Parent Node Connections,{}\n", NumParents);
         print(state.files.bnd, Format_703, "Parent");
 
-        for (int Loop = 1; Loop <= NumOfNodeConnections; ++Loop) {
+        for (int Loop = 1; Loop <= state.dataBranchNodeConnections->NumOfNodeConnections; ++Loop) {
             if (!NodeConnections(Loop).ObjectIsParent) continue;
             NonConnectedNodes(NodeConnections(Loop).NodeNumber) = false;
             print(state.files.bnd,
@@ -2262,7 +2260,7 @@ namespace SimulationManager {
         print(state.files.bnd, " #Non-Parent Node Connections,{}\n", NumNonParents);
         print(state.files.bnd, Format_703, "Non-Parent");
 
-        for (int Loop = 1; Loop <= NumOfNodeConnections; ++Loop) {
+        for (int Loop = 1; Loop <= state.dataBranchNodeConnections->NumOfNodeConnections; ++Loop) {
             if (NodeConnections(Loop).ObjectIsParent) continue;
             NonConnectedNodes(NodeConnections(Loop).NodeNumber) = false;
             print(state.files.bnd,

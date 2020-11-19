@@ -80,9 +80,6 @@ namespace DataBranchNodeConnections {
 
     // MODULE VARIABLE DECLARATIONS:
 
-    int NumOfNodeConnections(0);
-    int MaxNumOfNodeConnections(0);
-    int NodeConnectionAlloc(1000);
     int NumOfActualParents(0);
     int NumOfAirTerminalNodes(0);
     int MaxNumOfAirTerminalNodes(0);
@@ -99,9 +96,6 @@ namespace DataBranchNodeConnections {
     // Needed for unit tests, should not be normally called.
     void clear_state()
     {
-        NumOfNodeConnections = 0;
-        MaxNumOfNodeConnections = 0;
-        NodeConnectionAlloc = 1000;
         NumOfActualParents = 0;
         NumOfAirTerminalNodes = 0;
         MaxNumOfAirTerminalNodes = 0;
