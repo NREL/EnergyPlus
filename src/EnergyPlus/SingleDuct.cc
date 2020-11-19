@@ -3511,7 +3511,7 @@ namespace SingleDuct {
             if (this->MaxReheatTempSetByUser) {
 
                 MaxHeatTemp = this->MaxReheatTemp;
-                if (QToHeatSetPt > SmallLoad) { // zone has a postive load to heating setpoint
+                if (QToHeatSetPt > SmallLoad) { // zone has a positive load to heating setpoint
                     MassFlowReqToLimitLeavingTemp = QToHeatSetPt / (CpAirAvg * (MaxHeatTemp - ZoneTemp));
                 } else {
                     MassFlowReqToLimitLeavingTemp = 0.0;
@@ -3970,7 +3970,7 @@ namespace SingleDuct {
             if (this->MaxReheatTempSetByUser) {
 
                 MaxHeatTemp = this->MaxReheatTemp;
-                if (QToHeatSetPt > SmallLoad) { // zone has a postive load to heating setpoint
+                if (QToHeatSetPt > SmallLoad) { // zone has a positive load to heating setpoint
                     MassFlowReq = QToHeatSetPt / (CpAirZn * (MaxHeatTemp - ZoneTemp));
                 } else {
                     MassFlowReq = MassFlow;

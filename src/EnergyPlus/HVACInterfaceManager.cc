@@ -918,7 +918,6 @@ namespace HVACInterfaceManager {
         // Using/Aliasing
         using DataLoopNode::Node;
         using namespace DataPlant;
-        using DataBranchAirLoopPlant::MassFlowTolerance;
 
         // SUBROUTINE ARGUMENT DEFINITIONS
 
@@ -979,7 +978,7 @@ namespace HVACInterfaceManager {
         // first do mass balances and find common pipe flow rate and direction
         if (MdotPri > MdotSec) {
             MdotPriRCLeg = MdotPri - MdotSec;
-            if (MdotPriRCLeg < MassFlowTolerance) {
+            if (MdotPriRCLeg < DataBranchAirLoopPlant::MassFlowTolerance) {
                 MdotPriRCLeg = 0.0;
                 CPFlowDir = NoRecircFlow;
             } else {
@@ -989,7 +988,7 @@ namespace HVACInterfaceManager {
             CommonPipeTemp = TempPriOutTankOut;
         } else if (MdotPri < MdotSec) {
             MdotSecRCLeg = MdotSec - MdotPri;
-            if (MdotSecRCLeg < MassFlowTolerance) {
+            if (MdotSecRCLeg < DataBranchAirLoopPlant::MassFlowTolerance) {
                 MdotSecRCLeg = 0.0;
                 CPFlowDir = NoRecircFlow;
             } else {
@@ -1051,7 +1050,6 @@ namespace HVACInterfaceManager {
         // reimplementation of CheckTwoWayCommonPipeConditions by Sankaranarayanan K P Jan 2007
 
         // Using/Aliasing
-        using DataBranchAirLoopPlant::MassFlowTolerance;
         using DataLoopNode::Node;
         using DataPlant::DeltaTempTol;
         using DataPlant::DemandSide;
@@ -1182,21 +1180,21 @@ namespace HVACInterfaceManager {
                     if (std::abs(TempSecOutTankOut - TempCPPrimaryCntrlSetPoint) > DeltaTempTol) {
                         MdotPriToSec =
                             MdotPriRCLeg * (TempCPPrimaryCntrlSetPoint - TempPriOutTankOut) / (TempSecOutTankOut - TempCPPrimaryCntrlSetPoint);
-                        if (MdotPriToSec < MassFlowTolerance) MdotPriToSec = 0.0;
+                        if (MdotPriToSec < DataBranchAirLoopPlant::MassFlowTolerance) MdotPriToSec = 0.0;
                         if (MdotPriToSec > MdotSec) MdotPriToSec = MdotSec;
                     } else {
                         MdotPriToSec = MdotSec; //  what to do (?)
                     }
                     // eq. 5
                     MdotPriRCLeg = MdotPri - MdotPriToSec;
-                    if (MdotPriRCLeg < MassFlowTolerance) MdotPriRCLeg = 0.0;
+                    if (MdotPriRCLeg < DataBranchAirLoopPlant::MassFlowTolerance) MdotPriRCLeg = 0.0;
 
                     // eq. 4
                     MdotSecRCLeg = MdotSec - MdotPriToSec;
-                    if (MdotSecRCLeg < MassFlowTolerance) MdotSecRCLeg = 0.0;
+                    if (MdotSecRCLeg < DataBranchAirLoopPlant::MassFlowTolerance) MdotSecRCLeg = 0.0;
 
                     // eq  6
-                    if ((MdotPriToSec + MdotSecRCLeg) > MassFlowTolerance) {
+                    if ((MdotPriToSec + MdotSecRCLeg) > DataBranchAirLoopPlant::MassFlowTolerance) {
                         TempSecInlet = (MdotPriToSec * TempPriOutTankOut + MdotSecRCLeg * TempSecOutTankOut) / (MdotPriToSec + MdotSecRCLeg);
                     } else {
                         TempSecInlet = TempPriOutTankOut;
@@ -1213,7 +1211,7 @@ namespace HVACInterfaceManager {
                             MdotPri = (MdotPriRCLeg * TempPriOutTankOut + MdotPriToSec * TempSecOutTankOut) / (TempCPPrimaryCntrlSetPoint);
 
                             //   ENDDO
-                            if (MdotPri < MassFlowTolerance) MdotPri = 0.0;
+                            if (MdotPri < DataBranchAirLoopPlant::MassFlowTolerance) MdotPri = 0.0;
                         } else {
                             MdotPri = MdotSec;
                         }
@@ -1221,7 +1219,7 @@ namespace HVACInterfaceManager {
                     }
 
                     // eq. 2
-                    if ((MdotPriToSec + MdotPriRCLeg) > MassFlowTolerance) {
+                    if ((MdotPriToSec + MdotPriRCLeg) > DataBranchAirLoopPlant::MassFlowTolerance) {
                         TempPriInlet = (MdotPriToSec * TempSecOutTankOut + MdotPriRCLeg * TempPriOutTankOut) / (MdotPriToSec + MdotPriRCLeg);
                     } else {
                         TempPriInlet = TempSecOutTankOut;
@@ -1235,14 +1233,14 @@ namespace HVACInterfaceManager {
                     // eq 1,
                     if (std::abs(TempPriOutTankOut - TempSecOutTankOut) > DeltaTempTol) {
                         MdotPriToSec = MdotSec * (TempCPSecondaryCntrlSetPoint - TempSecOutTankOut) / (TempPriOutTankOut - TempSecOutTankOut);
-                        if (MdotPriToSec < MassFlowTolerance) MdotPriToSec = 0.0;
+                        if (MdotPriToSec < DataBranchAirLoopPlant::MassFlowTolerance) MdotPriToSec = 0.0;
                         if (MdotPriToSec > MdotSec) MdotPriToSec = MdotSec;
                     } else {
                         MdotPriToSec = MdotSec;
                     }
 
                     // eq. 2,
-                    if ((MdotPriToSec + MdotPriRCLeg) > MassFlowTolerance) {
+                    if ((MdotPriToSec + MdotPriRCLeg) > DataBranchAirLoopPlant::MassFlowTolerance) {
                         TempPriInlet = (MdotPriToSec * TempSecOutTankOut + MdotPriRCLeg * TempPriOutTankOut) / (MdotPriToSec + MdotPriRCLeg);
                     } else {
                         TempPriInlet = TempSecOutTankOut;
@@ -1253,7 +1251,7 @@ namespace HVACInterfaceManager {
                         // MdotPri is a variable to be calculated and flow request made
                         if (std::abs(TempPriOutTankOut - TempPriInlet) > DeltaTempTol) {
                             MdotPri = MdotSec * (TempCPSecondaryCntrlSetPoint - TempSecOutTankOut) / (TempPriOutTankOut - TempPriInlet);
-                            if (MdotPri < MassFlowTolerance) MdotPri = 0.0;
+                            if (MdotPri < DataBranchAirLoopPlant::MassFlowTolerance) MdotPri = 0.0;
                         } else {
                             MdotPri = MdotSec;
                         }
@@ -1262,14 +1260,14 @@ namespace HVACInterfaceManager {
 
                     // eq. 4
                     MdotSecRCLeg = MdotSec - MdotPriToSec;
-                    if (MdotSecRCLeg < MassFlowTolerance) MdotSecRCLeg = 0.0;
+                    if (MdotSecRCLeg < DataBranchAirLoopPlant::MassFlowTolerance) MdotSecRCLeg = 0.0;
 
                     // eq. 5
                     MdotPriRCLeg = MdotPri - MdotPriToSec;
-                    if (MdotPriRCLeg < MassFlowTolerance) MdotPriRCLeg = 0.0;
+                    if (MdotPriRCLeg < DataBranchAirLoopPlant::MassFlowTolerance) MdotPriRCLeg = 0.0;
 
                     // eq  6
-                    if ((MdotPriToSec + MdotSecRCLeg) > MassFlowTolerance) {
+                    if ((MdotPriToSec + MdotSecRCLeg) > DataBranchAirLoopPlant::MassFlowTolerance) {
                         TempSecInlet = (MdotPriToSec * TempPriOutTankOut + MdotSecRCLeg * TempSecOutTankOut) / (MdotPriToSec + MdotSecRCLeg);
                     } else {
                         TempSecInlet = TempPriOutTankOut;

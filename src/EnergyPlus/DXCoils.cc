@@ -175,10 +175,6 @@ namespace DXCoils {
     int const WaterSupplyFromMains(101);
     int const WaterSupplyFromTank(102);
 
-    static std::string const BlankString;
-
-    // DERIVED TYPE DEFINITIONS
-
     // MODULE VARIABLE DECLARATIONS:
     Array1D<Real64> DXCoilOutletTemp;           // DX coil outlet dry bulb temperature [C]
     Array1D<Real64> DXCoilOutletHumRat;         // DX coil outlet humidity ratio [kgWater/kgDryAir]
