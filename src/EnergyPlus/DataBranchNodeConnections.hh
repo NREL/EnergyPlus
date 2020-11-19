@@ -125,8 +125,6 @@ namespace DataBranchNodeConnections {
     };
 
     // Object Data
-    extern Array1D<ParentListData> ParentNodeList;
-    extern Array1D<NodeConnectionDef> NodeConnections;
     extern Array1D<EqNodeConnectionDef> AirTerminalNodeConnections;
     extern Array1D_bool NonConnectedNodes;
 
@@ -149,6 +147,8 @@ struct BranchNodeConnectionsData : BaseGlobalStruct {
     int EqNodeConnectionAlloc = 100;
 
     Array1D<DataBranchNodeConnections::ComponentListData> CompSets;
+    Array1D<DataBranchNodeConnections::ParentListData> ParentNodeList;
+    Array1D<DataBranchNodeConnections::NodeConnectionDef> NodeConnections;
 
     void clear_state() override
     {
@@ -162,6 +162,8 @@ struct BranchNodeConnectionsData : BaseGlobalStruct {
         this->MaxNumOfAirTerminalNodes = 0;
         this->EqNodeConnectionAlloc = 100;
         this->CompSets.deallocate();
+        this->ParentNodeList.deallocate();
+        this->NodeConnections.deallocate();
     }
 };
 

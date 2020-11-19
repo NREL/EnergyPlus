@@ -81,8 +81,6 @@ namespace DataBranchNodeConnections {
     // MODULE VARIABLE DECLARATIONS:
 
     // Object Data
-    Array1D<ParentListData> ParentNodeList;
-    Array1D<NodeConnectionDef> NodeConnections;
     Array1D<EqNodeConnectionDef> AirTerminalNodeConnections;
     Array1D_bool NonConnectedNodes;
 
@@ -90,8 +88,6 @@ namespace DataBranchNodeConnections {
     // Needed for unit tests, should not be normally called.
     void clear_state()
     {
-        ParentNodeList.deallocate();
-        NodeConnections.deallocate();
         NonConnectedNodes.deallocate();
         AirTerminalNodeConnections.deallocate();
     }
