@@ -732,10 +732,11 @@ namespace SolarCollectors {
         }
     }
 
-    void CollectorData::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
-                                 bool const EP_UNUSED(FirstHVACIteration),
-                                 Real64 &EP_UNUSED(CurLoad),
-                                 bool const EP_UNUSED(RunFlag))
+    void CollectorData::simulate(EnergyPlusData &state,
+                                 [[maybe_unused]] const PlantLocation &calledFromLocation,
+                                 [[maybe_unused]] bool const FirstHVACIteration,
+                                 [[maybe_unused]] Real64 &CurLoad,
+                                 [[maybe_unused]] bool const RunFlag)
     {
         this->initialize(state);
 
@@ -792,7 +793,7 @@ namespace SolarCollectors {
             }
         }
 
-        if (!DataGlobals::SysSizingCalc && this->InitSizing) {
+        if (!state.dataGlobal->SysSizingCalc && this->InitSizing) {
             PlantUtilities::RegisterPlantCompDesignFlow(this->InletNode, this->VolFlowRateMax);
             this->InitSizing = false;
         }
@@ -897,7 +898,7 @@ namespace SolarCollectors {
 
         if (this->InitICS) {
 
-            Real64 timeElapsed = DataGlobals::HourOfDay + DataGlobals::TimeStep * DataGlobals::TimeStepZone + DataHVACGlobals::SysTimeElapsed;
+            Real64 timeElapsed = state.dataGlobal->HourOfDay + state.dataGlobal->TimeStep * state.dataGlobal->TimeStepZone + DataHVACGlobals::SysTimeElapsed;
 
             if (this->TimeElapsed != timeElapsed) {
                 // The simulation has advanced to the next system timestep.  Save conditions from the end of the previous
@@ -1117,7 +1118,7 @@ namespace SolarCollectors {
                         ShowContinueError(state, "...coefficients cause negative quadratic equation part in calculating temperature of stagnant fluid.");
                         ShowContinueError(state, "...examine input coefficients for accuracy. Calculation will be treated as linear.");
                     }
-                    ShowRecurringSevereErrorAtEnd("CalcSolarCollector: " + DataPlant::ccSimPlantEquipTypes(this->TypeNum) + "=\"" + this->Name +
+                    ShowRecurringSevereErrorAtEnd(state, "CalcSolarCollector: " + DataPlant::ccSimPlantEquipTypes(this->TypeNum) + "=\"" + this->Name +
                                                       "\", coefficient error continues.",
                                                   this->ErrIndex,
                                                   qEquation,
@@ -1139,7 +1140,7 @@ namespace SolarCollectors {
                     ShowWarningMessage(state, "CalcSolarCollector: " + DataPlant::ccSimPlantEquipTypes(this->TypeNum) + "=\"" + this->Name +
                                        "\":  Solution did not converge.");
                 }
-                ShowRecurringWarningErrorAtEnd("CalcSolarCollector: " + DataPlant::ccSimPlantEquipTypes(this->TypeNum) + "=\"" + this->Name +
+                ShowRecurringWarningErrorAtEnd(state, "CalcSolarCollector: " + DataPlant::ccSimPlantEquipTypes(this->TypeNum) + "=\"" + this->Name +
                                                    "\", solution not converge error continues.",
                                                this->IterErrIndex);
                 break;

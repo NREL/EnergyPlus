@@ -86,7 +86,6 @@
 using namespace EnergyPlus::HeatBalanceManager;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataIPShortCuts;
-using namespace EnergyPlus::DataGlobals;
 using namespace EnergyPlus::ZoneEquipmentManager;
 using namespace EnergyPlus::HeatBalanceAirManager;
 using namespace EnergyPlus::ScheduleManager;
@@ -229,8 +228,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ProcessZoneData)
     int NumNumbers(9);
 
     cCurrentModuleObject = "Zone";
-    NumOfZones = 2;
-    Zone.allocate(NumOfZones);
+    state.dataGlobal->NumOfZones = 2;
+    Zone.allocate(state.dataGlobal->NumOfZones);
 
     // Set up a Zone object
     NumAlphas = 2;
@@ -467,8 +466,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     EXPECT_EQ(ZoneAirMassFlow.InfiltrationZoneType, AllZones);
 
     // setup mixing and infiltration objects
-    NumOfZones = 2;
-    ZoneReOrder.allocate(NumOfZones);
+    state.dataGlobal->NumOfZones = 2;
+    ZoneReOrder.allocate(state.dataGlobal->NumOfZones);
     ErrorsFound = false;
     GetZoneData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -478,7 +477,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     EXPECT_FALSE(ErrorsFound);
     SetZoneMassConservationFlag();
     // setup zone equipment configuration
-    ZoneEquipConfig.allocate(NumOfZones);
+    ZoneEquipConfig.allocate(state.dataGlobal->NumOfZones);
 
     ZoneEquipConfig(1).ZoneName = "Zone 1";
     ZoneEquipConfig(1).ActualZoneNum = 1;
@@ -537,8 +536,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     ZoneEquipInputsFilled = true;
     NumPrimaryAirSys = 1;
     state.dataAirLoop->AirLoopFlow.allocate(1);
-    PrimaryAirSystem.allocate(1);
-    PrimaryAirSystem(1).OASysExists = true;
+    state.dataAirSystemsData->PrimaryAirSystems.allocate(1);
+    state.dataAirSystemsData->PrimaryAirSystems(1).OASysExists = true;
     Node.allocate(8);
 
     // Avoid zero values in volume flow balance check
@@ -576,7 +575,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     ZoneReOrder.deallocate();
     ZoneEquipConfig.deallocate();
     Node.deallocate();
-    PrimaryAirSystem.deallocate();
+    state.dataAirSystemsData->PrimaryAirSystems.deallocate();
     state.dataAirLoop->AirLoopFlow.deallocate();
     NumPrimaryAirSys = 0;
 }
@@ -668,8 +667,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationReportVa
     ErrorsFound = false;
     GetProjectControlData(state, ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
     EXPECT_FALSE(ErrorsFound);
-    NumOfZones = 2;
-    ZoneReOrder.allocate(NumOfZones);
+    state.dataGlobal->NumOfZones = 2;
+    ZoneReOrder.allocate(state.dataGlobal->NumOfZones);
     ErrorsFound = false;
     GetZoneData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -726,26 +725,26 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetMaterialRoofVegetation)
 TEST_F(EnergyPlusFixture, HeatBalanceManager_WarmUpConvergenceSmallLoadTest)
 {
 
-    WarmupFlag = false;
+    state.dataGlobal->WarmupFlag = false;
     state.dataGlobal->DayOfSim = 7;
     MinNumberOfWarmupDays = 25;
-    NumOfZones = 1;
-    WarmupConvergenceValues.allocate(NumOfZones);
+    state.dataGlobal->NumOfZones = 1;
+    WarmupConvergenceValues.allocate(state.dataGlobal->NumOfZones);
     TempConvergTol = 0.01;
     LoadsConvergTol = 0.01;
-    MaxTempPrevDay.allocate(NumOfZones);
+    MaxTempPrevDay.allocate(state.dataGlobal->NumOfZones);
     MaxTempPrevDay(1) = 23.0;
-    MaxTempZone.allocate(NumOfZones);
+    MaxTempZone.allocate(state.dataGlobal->NumOfZones);
     MaxTempZone(1) = 23.0;
-    MinTempPrevDay.allocate(NumOfZones);
+    MinTempPrevDay.allocate(state.dataGlobal->NumOfZones);
     MinTempPrevDay(1) = 23.0;
-    MinTempZone.allocate(NumOfZones);
+    MinTempZone.allocate(state.dataGlobal->NumOfZones);
     MinTempZone(1) = 23.0;
-    MaxHeatLoadZone.allocate(NumOfZones);
-    MaxHeatLoadPrevDay.allocate(NumOfZones);
+    MaxHeatLoadZone.allocate(state.dataGlobal->NumOfZones);
+    MaxHeatLoadPrevDay.allocate(state.dataGlobal->NumOfZones);
     WarmupConvergenceValues(1).TestMaxHeatLoadValue = 0.0;
-    MaxCoolLoadZone.allocate(NumOfZones);
-    MaxCoolLoadPrevDay.allocate(NumOfZones);
+    MaxCoolLoadZone.allocate(state.dataGlobal->NumOfZones);
+    MaxCoolLoadPrevDay.allocate(state.dataGlobal->NumOfZones);
     WarmupConvergenceValues(1).TestMaxCoolLoadValue = 0.0;
 
     // Test 1: All Maxs both less than MinLoad (100.0)
@@ -1219,7 +1218,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
     HeatBalanceManager::GetConstructData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
-    EXPECT_TRUE(DataGlobals::AnyLocalEnvironmentsInModel);
+    EXPECT_TRUE(state.dataGlobal->AnyLocalEnvironmentsInModel);
 
     DataZoneEquipment::ZoneEquipConfig.allocate(1);
     DataZoneEquipment::ZoneEquipConfig(1).ZoneName = "LIVING ZONE";
@@ -1250,9 +1249,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
     DataHeatBalance::HConvIn(5) = 0.5;
     DataHeatBalance::HConvIn(6) = 0.5;
 
-    DataGlobals::KickOffSimulation = true;
+    state.dataGlobal->KickOffSimulation = true;
     DataHeatBalFanSys::ZoneLatentGain.allocate(1);
-    DataGlobals::TimeStepZoneSec = 900;
+    state.dataGlobal->TimeStepZoneSec = 900;
     DataHeatBalance::ZoneWinHeatGain.allocate(1);
     DataHeatBalance::ZoneWinHeatGainRep.allocate(1);
     DataHeatBalance::ZoneWinHeatGainRepEnergy.allocate(1);
@@ -1572,9 +1571,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionTest)
     state.dataWeatherManager->Envrn = 1;
 
     // Test 1 - Set time of day to morning - should use high transmittance window
-    DataGlobals::TimeStep = 1;
-    DataGlobals::HourOfDay = 11;
-    DataGlobals::CurrentTime = 11.0;
+    state.dataGlobal->TimeStep = 1;
+    state.dataGlobal->HourOfDay = 11;
+    state.dataGlobal->CurrentTime = 11.0;
     WeatherManager::SetCurrentWeather(state);
     HeatBalanceManager::ManageHeatBalance(state);
     // For now, must call this twice in order to hit the BeginTimeStepBeforePredictor EMS calling point
@@ -1589,9 +1588,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionTest)
     EXPECT_GT(refPtIllum, 3000.0);
 
     // Test 2 - Set time of day to afternoon - should use low transmittance window
-    DataGlobals::TimeStep = 1;
-    DataGlobals::HourOfDay = 14;
-    DataGlobals::CurrentTime = 14.0;
+    state.dataGlobal->TimeStep = 1;
+    state.dataGlobal->HourOfDay = 14;
+    state.dataGlobal->CurrentTime = 14.0;
     WeatherManager::SetCurrentWeather(state);
     HeatBalanceManager::ManageHeatBalance(state);
     // For now, must call this twice in order to hit the BeginTimeStepBeforePredictor EMS calling point
@@ -1973,9 +1972,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_UpdateWindowFaceTempsNonBSDFWin)
     DataHeatBalance::TotConstructs = 3;
     state.dataConstruction->Construct.allocate( DataHeatBalance::TotConstructs);
 
-    DataSurfaces::Surface(1).Class = DataSurfaces::SurfaceClass_Wall;
-    DataSurfaces::Surface(2).Class = DataSurfaces::SurfaceClass_Window;
-    DataSurfaces::Surface(3).Class = DataSurfaces::SurfaceClass_Window;
+    DataSurfaces::Surface(1).Class = DataSurfaces::SurfaceClass::Wall;
+    DataSurfaces::Surface(2).Class = DataSurfaces::SurfaceClass::Window;
+    DataSurfaces::Surface(3).Class = DataSurfaces::SurfaceClass::Window;
     DataSurfaces::Surface(1).Construction = 1;
     DataSurfaces::Surface(2).Construction = 2;
     DataSurfaces::Surface(3).Construction = 3;

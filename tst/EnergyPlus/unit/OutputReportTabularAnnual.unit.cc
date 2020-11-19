@@ -82,7 +82,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GetInput)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::DoWeathSim = true;
+    state.dataGlobal->DoWeathSim = true;
 
     GetInputTabularAnnual(state);
 
@@ -164,7 +164,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_SetupGathering)
     SetupOutputVariable(state, "Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, "Zone", "Average", "Lite2");
     SetupOutputVariable(state, "Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, "Zone", "Average", "Lite3");
 
-    DataGlobals::DoWeathSim = true;
+    state.dataGlobal->DoWeathSim = true;
 
     GetInputTabularAnnual(state); // this also calls setupGathering
     EXPECT_EQ(OutputReportTabularAnnual::annualTables.size(), 1u);
@@ -235,8 +235,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults)
     SetupOutputVariable(state, "Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, "Zone", "Average", "Lite2");
     SetupOutputVariable(state, "Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, "Zone", "Average", "Lite3");
 
-    DataGlobals::DoWeathSim = true;
-    DataGlobals::TimeStepZone = 0.25;
+    state.dataGlobal->DoWeathSim = true;
+    state.dataGlobal->TimeStepZone = 0.25;
 
     GetInputTabularAnnual(state);
     EXPECT_EQ(OutputReportTabularAnnual::annualTables.size(), 1u);
@@ -255,7 +255,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults)
 
 TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults_MinMaxHrsShown)
 {
-    DataGlobals::TimeStepZone = 1.0;
+    state.dataGlobal->TimeStepZone = 1.0;
     DataHVACGlobals::TimeStepSys = 1.0;
 
 
@@ -345,7 +345,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_columnHeadersToTitleCase)
     OutputProcessor::EnergyMeters(1).Name = "Electricity:Facility"; //"ELECTRICITY:FACILITY";
     OutputProcessor::EnergyMeters(2).Name = "ELECTRICITY:LIGHTING";
 
-    DataGlobals::DoWeathSim = true;
+    state.dataGlobal->DoWeathSim = true;
 
     OutputReportTabularAnnual::GetInputTabularAnnual(state);
 
@@ -402,7 +402,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_invalidAggregationOrder)
     OutputProcessor::EnergyMeters(1).Name = "Electricity:Facility"; //"ELECTRICITY:FACILITY";
     OutputProcessor::EnergyMeters(2).Name = "ELECTRICITY:LIGHTING";
 
-    DataGlobals::DoWeathSim = true;
+    state.dataGlobal->DoWeathSim = true;
 
     OutputReportTabularAnnual::GetInputTabularAnnual(state);
 

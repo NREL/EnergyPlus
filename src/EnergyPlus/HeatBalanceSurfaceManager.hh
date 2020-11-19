@@ -130,7 +130,7 @@ namespace HeatBalanceSurfaceManager {
     // Beginning of Reporting subroutines for the HB Module
     // *****************************************************************************
 
-    void ReportSurfaceHeatBalance();
+    void ReportSurfaceHeatBalance(EnergyPlusData &state);
 
     void ReportIntMovInsInsideSurfTemp(EnergyPlusData &state);
 
@@ -182,9 +182,9 @@ namespace HeatBalanceSurfaceManager {
                              bool &ErrorFlag         // Error flag for movable insulation problem
     );
 
-    void CalcExteriorVentedCavity(EnergyPlusData &state, int const SurfNum); // index of surface
+    void CalcExteriorVentedCavity(EnergyPlusData &state, int SurfNum); // index of surface
 
-    void GatherComponentLoadsSurfAbsFact();
+    void GatherComponentLoadsSurfAbsFact(EnergyPlusData &state);
 
 } // namespace HeatBalanceSurfaceManager
 

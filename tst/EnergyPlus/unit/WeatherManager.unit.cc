@@ -123,9 +123,9 @@ TEST_F(EnergyPlusFixture, SkyTempTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
     Array2D<Real64> TomorrowSkyTemp; // Sky temperature
-    DataGlobals::NumOfTimeStepInHour = 4;
-    DataGlobals::MinutesPerTimeStep = 60 / DataGlobals::NumOfTimeStepInHour;
-    TomorrowSkyTemp.allocate(DataGlobals::NumOfTimeStepInHour, 24);
+    state.dataGlobal->NumOfTimeStepInHour = 4;
+    state.dataGlobal->MinutesPerTimeStep = 60 / state.dataGlobal->NumOfTimeStepInHour;
+    TomorrowSkyTemp.allocate(state.dataGlobal->NumOfTimeStepInHour, 24);
     TomorrowSkyTemp = 0.0;
 
     // Febuary 27
@@ -159,22 +159,22 @@ TEST_F(EnergyPlusFixture, SkyEmissivityTest)
     state.dataWeatherManager->Environment(4).SkyTempModel = EmissivityCalcType::BerdahlMartinModel;
 
     // init local variables
-    Real64 OpagueSkyCover(0.0);
+    Real64 OpaqueSkyCover(0.0);
     Real64 DryBulb(25.0);
     Real64 DewPoint(16.7);
     Real64 RelHum(0.6);
 
-    EXPECT_NEAR(0.832, CalcSkyEmissivity(state, state.dataWeatherManager->Environment(1).SkyTempModel, OpagueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
-    EXPECT_NEAR(0.862, CalcSkyEmissivity(state, state.dataWeatherManager->Environment(2).SkyTempModel, OpagueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
-    EXPECT_NEAR(0.867, CalcSkyEmissivity(state, state.dataWeatherManager->Environment(3).SkyTempModel, OpagueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
-    EXPECT_NEAR(0.862, CalcSkyEmissivity(state, state.dataWeatherManager->Environment(4).SkyTempModel, OpagueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
+    EXPECT_NEAR(0.832, CalcSkyEmissivity(state, state.dataWeatherManager->Environment(1).SkyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
+    EXPECT_NEAR(0.862, CalcSkyEmissivity(state, state.dataWeatherManager->Environment(2).SkyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
+    EXPECT_NEAR(0.867, CalcSkyEmissivity(state, state.dataWeatherManager->Environment(3).SkyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
+    EXPECT_NEAR(0.862, CalcSkyEmissivity(state, state.dataWeatherManager->Environment(4).SkyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
 
     DryBulb = 5.0;
     DewPoint = -2.13;
-    EXPECT_NEAR(0.781, CalcSkyEmissivity(state, state.dataWeatherManager->Environment(1).SkyTempModel, OpagueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
-    EXPECT_NEAR(0.746, CalcSkyEmissivity(state, state.dataWeatherManager->Environment(2).SkyTempModel, OpagueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
-    EXPECT_NEAR(0.760, CalcSkyEmissivity(state, state.dataWeatherManager->Environment(3).SkyTempModel, OpagueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
-    EXPECT_NEAR(0.747, CalcSkyEmissivity(state, state.dataWeatherManager->Environment(4).SkyTempModel, OpagueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
+    EXPECT_NEAR(0.781, CalcSkyEmissivity(state, state.dataWeatherManager->Environment(1).SkyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
+    EXPECT_NEAR(0.746, CalcSkyEmissivity(state, state.dataWeatherManager->Environment(2).SkyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
+    EXPECT_NEAR(0.760, CalcSkyEmissivity(state, state.dataWeatherManager->Environment(3).SkyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
+    EXPECT_NEAR(0.747, CalcSkyEmissivity(state, state.dataWeatherManager->Environment(4).SkyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
 }
 
 TEST_F(EnergyPlusFixture, WaterMainsCorrelationTest)
@@ -670,7 +670,7 @@ TEST_F(EnergyPlusFixture, WeatherManager_NoLocation) {
     ASSERT_TRUE(process_idf(idf_objects));
 
     state.dataGlobal->BeginSimFlag = false;
-    DataGlobals::NumOfTimeStepInHour = 4;
+    state.dataGlobal->NumOfTimeStepInHour = 4;
     state.dataWeatherManager->LocationGathered = false;
 
     bool Available{false};
@@ -753,8 +753,8 @@ TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
 
     state.dataWeatherManager->Environment(1).DesignDayNum = 1;
     state.dataWeatherManager->Environment(1).WP_Type1 = 0;
-    DataGlobals::MinutesPerTimeStep = 60;
-    DataGlobals::NumOfTimeStepInHour = 1;
+    state.dataGlobal->MinutesPerTimeStep = 60;
+    state.dataGlobal->NumOfTimeStepInHour = 1;
     state.dataGlobal->BeginSimFlag = true;
     DataReportingFlags::DoWeatherInitReporting = true;
 
@@ -770,7 +770,7 @@ TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
 
     unsigned n_RH_not100 = 0;
     for (int Hour = 1; Hour <= 24; ++Hour) {
-        for (int TS = 1; TS <= DataGlobals::NumOfTimeStepInHour; ++TS) {
+        for (int TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
             EXPECT_GE(state.dataWeatherManager->TomorrowOutRelHum(TS, Hour), 0.);
             EXPECT_LE(state.dataWeatherManager->TomorrowOutRelHum(TS, Hour), 100.);
             if (state.dataWeatherManager->TomorrowOutRelHum(TS, Hour) < 100.) {
@@ -1012,7 +1012,7 @@ TEST_F(EnergyPlusFixture, IRHoriz_InterpretWeatherCalculateMissingIRHoriz) {
 
     state.dataWeatherManager->Envrn =1;
 
-    DataGlobals::NumOfTimeStepInHour = 1;
+    state.dataGlobal->NumOfTimeStepInHour = 1;
     state.dataWeatherManager->Environment.allocate(1);
     state.dataWeatherManager->Environment(1).SkyTempModel = EmissivityCalcType::ClarkAllenModel;
 
@@ -1104,7 +1104,7 @@ TEST_F(EnergyPlusFixture, Add_and_InterpolateWeatherInputOutputTest)
 
     state.dataWeatherManager->Envrn = 1;
 
-    DataGlobals::NumOfTimeStepInHour =4;
+    state.dataGlobal->NumOfTimeStepInHour =4;
     state.dataWeatherManager->Environment.allocate(1);
     state.dataWeatherManager->Environment(1).SkyTempModel = EmissivityCalcType::ClarkAllenModel;
     state.dataWeatherManager->Environment(1).StartMonth = 1;

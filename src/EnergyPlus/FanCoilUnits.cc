@@ -131,8 +131,6 @@ namespace FanCoilUnits {
     using DataEnvironment::OutBaroPress;
     using DataEnvironment::OutRelHum;
     using DataEnvironment::StdRhoAir;
-    using DataGlobals::DisplayExtraWarnings;
-    using DataGlobals::SysSizingCalc;
     using DataHVACGlobals::ATMixer_InletSide;
     using DataHVACGlobals::ATMixer_SupplySide;
     using DataHVACGlobals::ATMixerExists;
@@ -294,7 +292,7 @@ namespace FanCoilUnits {
         }
 
         // Report the result of the simulation
-        ReportFanCoilUnit(FanCoilNum);
+        ReportFanCoilUnit(state, FanCoilNum);
 
         ZoneEqFanCoil = false;
     }
@@ -327,7 +325,6 @@ namespace FanCoilUnits {
         using WaterCoils::GetCoilWaterInletNode;
         auto &GetHXCoilWaterInletNode(HVACHXAssistedCoolingCoil::GetCoilWaterInletNode);
         auto &GetHeatingCoilCapacity(HeatingCoils::GetCoilCapacity);
-        using DataGlobals::NumOfZones;
         using DataHVACGlobals::FanType_SimpleConstVolume;
         using DataHVACGlobals::FanType_SimpleOnOff;
         using DataHVACGlobals::FanType_SimpleVAV;
@@ -837,7 +834,7 @@ namespace FanCoilUnits {
             } else {
                 // check that the fan coil inlet node is the same as one of the zone exhaust nodes
                 ZoneExNodeNotFound = true;
-                for (CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone) {
+                for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                     if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
                     for (NodeNum = 1; NodeNum <= ZoneEquipConfig(CtrlZone).NumExhaustNodes; ++NodeNum) {
                         if (FanCoil(FanCoilNum).AirInNode == ZoneEquipConfig(CtrlZone).ExhaustNode(NodeNum)) {
@@ -854,7 +851,7 @@ namespace FanCoilUnits {
                 }
                 // check that the fan coil outlet node is the same as one of the zone inlet nodes
                 ZoneInNodeNotFound = true;
-                for (CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone) {
+                for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                     if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
                     for (NodeNum = 1; NodeNum <= ZoneEquipConfig(CtrlZone).NumInletNodes; ++NodeNum) {
                         if (FanCoil(FanCoilNum).AirOutNode == ZoneEquipConfig(CtrlZone).InletNode(NodeNum)) {
@@ -1239,13 +1236,13 @@ namespace FanCoilUnits {
         if (!InitFanCoilUnitsCheckInZoneEquipmentListFlag && ZoneEquipInputsFilled) {
             InitFanCoilUnitsCheckInZoneEquipmentListFlag = true;
             for (Loop = 1; Loop <= NumFanCoils; ++Loop) {
-                if (CheckZoneEquipmentList(FanCoil(Loop).UnitType, FanCoil(Loop).Name)) continue;
+                if (CheckZoneEquipmentList(state, FanCoil(Loop).UnitType, FanCoil(Loop).Name)) continue;
                 ShowSevereError(state, "InitFanCoil: FanCoil Unit=[" + FanCoil(Loop).UnitType + ',' + FanCoil(Loop).Name +
                                 "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated.");
             }
         }
 
-        if (!SysSizingCalc && MySizeFlag(FanCoilNum) && !MyPlantScanFlag(FanCoilNum)) {
+        if (!state.dataGlobal->SysSizingCalc && MySizeFlag(FanCoilNum) && !MyPlantScanFlag(FanCoilNum)) {
 
             SizeFanCoilUnit(state, FanCoilNum, ControlledZoneNum);
 
@@ -1682,7 +1679,7 @@ namespace FanCoilUnits {
                 } else { // Hard size with sizing data
                     if (FanCoil(FanCoilNum).MaxAirVolFlow > 0.0 && MaxAirVolFlowDes > 0.0) {
                         MaxAirVolFlowUser = FanCoil(FanCoilNum).MaxAirVolFlow;
-                        if (DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(MaxAirVolFlowDes - MaxAirVolFlowUser) / MaxAirVolFlowUser) > AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeFanCoilUnit: Potential issue with equipment sizing for " + FanCoil(FanCoilNum).UnitType + ' ' +
                                             FanCoil(FanCoilNum).Name);
@@ -1749,7 +1746,7 @@ namespace FanCoilUnits {
                                                      OutAirVolFlowDes,
                                                      "User-Specified Maximum Outdoor Air Flow Rate [m3/s]",
                                                      OutAirVolFlowUser);
-                        if (DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(OutAirVolFlowDes - OutAirVolFlowUser) / OutAirVolFlowUser) > AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeFanCoilUnit: Potential issue with equipment sizing for " + FanCoil(FanCoilNum).UnitType + ' ' +
                                             FanCoil(FanCoilNum).Name);
@@ -1911,7 +1908,7 @@ namespace FanCoilUnits {
                                                      MaxHotWaterVolFlowDes,
                                                      "User-Specified Maximum Hot Water Flow [m3/s]",
                                                      MaxHotWaterVolFlowUser);
-                        if (DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(MaxHotWaterVolFlowDes - MaxHotWaterVolFlowUser) / MaxHotWaterVolFlowUser) > AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeFanCoilUnit: Potential issue with equipment sizing for " + FanCoil(FanCoilNum).UnitType + ' ' +
                                             FanCoil(FanCoilNum).Name);
@@ -2081,7 +2078,7 @@ namespace FanCoilUnits {
                                                      MaxColdWaterVolFlowDes,
                                                      "User-Specified Maximum Cold Water Flow [m3/s]",
                                                      MaxColdWaterVolFlowUser);
-                        if (DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(MaxColdWaterVolFlowDes - MaxColdWaterVolFlowUser) / MaxColdWaterVolFlowUser) > AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeFanCoilUnit: Potential issue with equipment sizing for " + FanCoil(FanCoilNum).UnitType + ' ' +
                                             FanCoil(FanCoilNum).Name);
@@ -2443,7 +2440,7 @@ namespace FanCoilUnits {
                                     ShowContinueErrorTimeStamp(state, format("Water flow rate on last iteration = {}", CWFlow));
                                     ShowContinueErrorTimeStamp(state, "..Water flow rate set to last iteration value ");
                                 } else {
-                                    ShowRecurringWarningErrorAtEnd("Cold water flow Iteration limit exceeded in fan coil unit " +
+                                    ShowRecurringWarningErrorAtEnd(state, "Cold water flow Iteration limit exceeded in fan coil unit " +
                                                                        FanCoil(FanCoilNum).Name,
                                                                    FanCoil(FanCoilNum).MaxIterIndexC);
                                 }
@@ -2454,7 +2451,7 @@ namespace FanCoilUnits {
                                     ShowContinueError(state, "  Bad cold water mass flow limits");
                                     ShowContinueErrorTimeStamp(state, "..Water flow rate set to lower limit ");
                                 } else {
-                                    ShowRecurringWarningErrorAtEnd("Cold Water control failed in fan coil unit " + FanCoil(FanCoilNum).Name,
+                                    ShowRecurringWarningErrorAtEnd(state, "Cold Water control failed in fan coil unit " + FanCoil(FanCoilNum).Name,
                                                                    FanCoil(FanCoilNum).BadMassFlowLimIndexC);
                                 }
                             }
@@ -2465,7 +2462,7 @@ namespace FanCoilUnits {
                                 ShowContinueError(state, "  Bad cold water mass flow limits");
                                 ShowContinueErrorTimeStamp(state, "..Water flow rate set to lower limit ");
                             } else {
-                                ShowRecurringWarningErrorAtEnd("Cold Water control failed in fan coil unit " + FanCoil(FanCoilNum).Name,
+                                ShowRecurringWarningErrorAtEnd(state, "Cold Water control failed in fan coil unit " + FanCoil(FanCoilNum).Name,
                                                                FanCoil(FanCoilNum).BadMassFlowLimIndexC);
                             }
                         }
@@ -2591,7 +2588,7 @@ namespace FanCoilUnits {
                                         ShowContinueErrorTimeStamp(state, format("Water flow rate on last iteration = {}", HWFlow));
                                         ShowContinueErrorTimeStamp(state, "..Water flow rate set to last iteration value ");
                                     } else {
-                                        ShowRecurringWarningErrorAtEnd("Hot water flow Iteration limit exceeded in fan coil unit " +
+                                        ShowRecurringWarningErrorAtEnd(state, "Hot water flow Iteration limit exceeded in fan coil unit " +
                                                                            FanCoil(FanCoilNum).Name,
                                                                        FanCoil(FanCoilNum).MaxIterIndexH);
                                     }
@@ -2602,7 +2599,7 @@ namespace FanCoilUnits {
                                         ShowContinueError(state, "  Bad hot water mass flow limits");
                                         ShowContinueErrorTimeStamp(state, "..Water flow rate set to lower limit ");
                                     } else {
-                                        ShowRecurringWarningErrorAtEnd("Hot Water control failed in fan coil unit " + FanCoil(FanCoilNum).Name,
+                                        ShowRecurringWarningErrorAtEnd(state, "Hot Water control failed in fan coil unit " + FanCoil(FanCoilNum).Name,
                                                                        FanCoil(FanCoilNum).BadMassFlowLimIndexH);
                                     }
                                 }
@@ -2613,7 +2610,7 @@ namespace FanCoilUnits {
                                     ShowContinueError(state, "  Bad hot water mass flow limits");
                                     ShowContinueErrorTimeStamp(state, "..Water flow rate set to lower limit ");
                                 } else {
-                                    ShowRecurringWarningErrorAtEnd("Hot Water control failed in fan coil unit " + FanCoil(FanCoilNum).Name,
+                                    ShowRecurringWarningErrorAtEnd(state, "Hot Water control failed in fan coil unit " + FanCoil(FanCoilNum).Name,
                                                                    FanCoil(FanCoilNum).BadMassFlowLimIndexH);
                                 }
                             }
@@ -2825,7 +2822,7 @@ namespace FanCoilUnits {
                                     ShowContinueErrorTimeStamp(state, format("Part-load ratio on last iteration = {}", PLR));
                                     ShowContinueErrorTimeStamp(state, "..Part-load ratio set to last iteration value ");
                                 } else {
-                                    ShowRecurringWarningErrorAtEnd("Part-load ratio cooling iteration limit exceeded in fan coil unit " +
+                                    ShowRecurringWarningErrorAtEnd(state, "Part-load ratio cooling iteration limit exceeded in fan coil unit " +
                                                                        FanCoil(FanCoilNum).Name,
                                                                    FanCoil(FanCoilNum).MaxIterIndexC);
                                 }
@@ -2836,7 +2833,7 @@ namespace FanCoilUnits {
                                     ShowContinueError(state, "  Bad part-load ratio limits");
                                     ShowContinueErrorTimeStamp(state, format("..Part-load ratio set to {}", PLRMin));
                                 } else {
-                                    ShowRecurringWarningErrorAtEnd("Part-load ratio cooling control failed in fan coil unit " +
+                                    ShowRecurringWarningErrorAtEnd(state, "Part-load ratio cooling control failed in fan coil unit " +
                                                                        FanCoil(FanCoilNum).Name,
                                                                    FanCoil(FanCoilNum).BadMassFlowLimIndexC);
                                 }
@@ -2848,7 +2845,7 @@ namespace FanCoilUnits {
                                 ShowContinueError(state, "  Bad part-load ratio limits");
                                 ShowContinueErrorTimeStamp(state, "..Part-load ratio set to 0");
                             } else {
-                                ShowRecurringWarningErrorAtEnd("Part-load ratio control failed in fan coil unit " + FanCoil(FanCoilNum).Name,
+                                ShowRecurringWarningErrorAtEnd(state, "Part-load ratio control failed in fan coil unit " + FanCoil(FanCoilNum).Name,
                                                                FanCoil(FanCoilNum).BadMassFlowLimIndexC);
                             }
                         }
@@ -2938,7 +2935,7 @@ namespace FanCoilUnits {
                                         ShowContinueErrorTimeStamp(state, format("Part-load ratio on last iteration = {}", PLR));
                                         ShowContinueErrorTimeStamp(state, "..Part-load ratio set to last iteration value ");
                                     } else {
-                                        ShowRecurringWarningErrorAtEnd("Part-load ratio heating iteration limit exceeded in fan coil unit " +
+                                        ShowRecurringWarningErrorAtEnd(state, "Part-load ratio heating iteration limit exceeded in fan coil unit " +
                                                                            FanCoil(FanCoilNum).Name,
                                                                        FanCoil(FanCoilNum).MaxIterIndexH);
                                     }
@@ -2949,7 +2946,7 @@ namespace FanCoilUnits {
                                         ShowContinueError(state, "  Bad hot part-load ratio limits");
                                         ShowContinueErrorTimeStamp(state, format("..Part-load ratio set to {}", PLRMin));
                                     } else {
-                                        ShowRecurringWarningErrorAtEnd("Part-load ratio heating control failed in fan coil unit " +
+                                        ShowRecurringWarningErrorAtEnd(state, "Part-load ratio heating control failed in fan coil unit " +
                                                                            FanCoil(FanCoilNum).Name,
                                                                        FanCoil(FanCoilNum).BadMassFlowLimIndexH);
                                     }
@@ -2961,7 +2958,7 @@ namespace FanCoilUnits {
                                     ShowContinueError(state, "  Bad part-load ratio limits");
                                     ShowContinueErrorTimeStamp(state, "..Part-load ratio set to 0");
                                 } else {
-                                    ShowRecurringWarningErrorAtEnd("Part-load ratio heating control failed in fan coil unit " +
+                                    ShowRecurringWarningErrorAtEnd(state, "Part-load ratio heating control failed in fan coil unit " +
                                                                        FanCoil(FanCoilNum).Name,
                                                                    FanCoil(FanCoilNum).BadMassFlowLimIndexH);
                                 }
@@ -3267,7 +3264,7 @@ namespace FanCoilUnits {
                                                "within the cooling convergence tolerance.");
                             ShowContinueErrorTimeStamp(state, format("Iterations={}", MaxIterCycl));
                         }
-                        ShowRecurringWarningErrorAtEnd("ZoneHVAC:FourPipeFanCoil=\"" + FanCoil(FanCoilNum).Name +
+                        ShowRecurringWarningErrorAtEnd(state, "ZoneHVAC:FourPipeFanCoil=\"" + FanCoil(FanCoilNum).Name +
                                                            "\"  -- Exceeded max iterations error (sensible runtime) continues...",
                                                        FanCoil(FanCoilNum).MaxIterIndexC);
                     }
@@ -3320,7 +3317,7 @@ namespace FanCoilUnits {
                             ShowContinueError(state, format("...Fan coil capacity   = {:.3T} [W]", QUnitOut));
                             ShowContinueErrorTimeStamp(state, format("Iterations={}", MaxIterCycl));
                         }
-                        ShowRecurringWarningErrorAtEnd("ZoneHVAC:FourPipeFanCoil=\"" + FanCoil(FanCoilNum).Name +
+                        ShowRecurringWarningErrorAtEnd(state, "ZoneHVAC:FourPipeFanCoil=\"" + FanCoil(FanCoilNum).Name +
                                                            "\"  -- Exceeded max iterations error (sensible runtime) continues...",
                                                        FanCoil(FanCoilNum).MaxIterIndexH);
                     }
@@ -4351,7 +4348,7 @@ namespace FanCoilUnits {
                                            "the cooling convergence tolerance.");
                         ShowContinueErrorTimeStamp(state, format("Iterations={}", MaxIterCycl));
                     }
-                    ShowRecurringWarningErrorAtEnd("ZoneHVAC:FourPipeFanCoil=\"" + FanCoil(FanCoilNum).Name +
+                    ShowRecurringWarningErrorAtEnd(state, "ZoneHVAC:FourPipeFanCoil=\"" + FanCoil(FanCoilNum).Name +
                                                        "\"  -- Exceeded max iterations error (sensible runtime) continues...",
                                                    FanCoil(FanCoilNum).MaxIterIndexC);
                 }
@@ -4482,7 +4479,7 @@ namespace FanCoilUnits {
                                 "the heating convergence tolerance.");
                             ShowContinueErrorTimeStamp(state, format("Iterations={}", MaxIterCycl));
                         }
-                        ShowRecurringWarningErrorAtEnd("ZoneHVAC:FourPipeFanCoil=\"" + FanCoil(FanCoilNum).Name +
+                        ShowRecurringWarningErrorAtEnd(state, "ZoneHVAC:FourPipeFanCoil=\"" + FanCoil(FanCoilNum).Name +
                                                            "\"  -- Exceeded max iterations error (sensible runtime) continues...",
                                                        FanCoil(FanCoilNum).MaxIterIndexH);
                     }
@@ -4512,7 +4509,7 @@ namespace FanCoilUnits {
                                 ShowContinueErrorTimeStamp(
                                     state, format("Electric heating coil part load ratio used during last iterations = {}", eHeatCoilPLR));
                             } else {
-                                ShowRecurringWarningErrorAtEnd("Electric heating coil Iteration limit exceeded in fan coil unit " +
+                                ShowRecurringWarningErrorAtEnd(state, "Electric heating coil Iteration limit exceeded in fan coil unit " +
                                                                    FanCoil(FanCoilNum).Name,
                                                                FanCoil(FanCoilNum).MaxIterIndexH);
                             }
@@ -4523,7 +4520,7 @@ namespace FanCoilUnits {
                                 ShowContinueError(state, "  Bad par load ratio limits");
                                 ShowContinueErrorTimeStamp(state, "..Par load ratio set to 0");
                             } else {
-                                ShowRecurringWarningErrorAtEnd("Part load ratio electric heating coil control failed in fan coil unit " +
+                                ShowRecurringWarningErrorAtEnd(state, "Part load ratio electric heating coil control failed in fan coil unit " +
                                                                    FanCoil(FanCoilNum).Name,
                                                                FanCoil(FanCoilNum).BadMassFlowLimIndexH);
                             }
@@ -4629,7 +4626,7 @@ namespace FanCoilUnits {
         PowerMet = QUnitOut;
     }
 
-    void ReportFanCoilUnit(int const FanCoilNum) // number of the current fan coil unit being simulated
+    void ReportFanCoilUnit(EnergyPlusData &state, int const FanCoilNum) // number of the current fan coil unit being simulated
     {
 
         // SUBROUTINE INFORMATION:
@@ -4673,7 +4670,7 @@ namespace FanCoilUnits {
         FanCoil(FanCoilNum).ElecEnergy = FanCoil(FanCoilNum).ElecPower * ReportingConstant;
 
         if (FanCoil(FanCoilNum).FirstPass) { // reset sizing flags so other zone equipment can size normally
-            if (!DataGlobals::SysSizingCalc) {
+            if (!state.dataGlobal->SysSizingCalc) {
                 DataSizing::resetHVACSizingGlobals(DataSizing::CurZoneEqNum, 0, FanCoil(FanCoilNum).FirstPass);
             }
         }

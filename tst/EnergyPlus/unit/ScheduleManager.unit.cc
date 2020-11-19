@@ -97,7 +97,7 @@ TEST_F(EnergyPlusFixture, ScheduleManager_UpdateScheduleValues)
     WeekSchedule(1).DaySchedulePointer.allocate(12);
     WeekSchedule(2).DaySchedulePointer.allocate(12);
     WeekSchedule(3).DaySchedulePointer.allocate(12);
-    DataGlobals::NumOfTimeStepInHour = 1;
+    state.dataGlobal->NumOfTimeStepInHour = 1;
     DaySchedule.allocate(3);
     DaySchedule(1).TSValue.allocate(1, 24);
     DaySchedule(2).TSValue.allocate(1, 24);
@@ -134,8 +134,8 @@ TEST_F(EnergyPlusFixture, ScheduleManager_UpdateScheduleValues)
     DataEnvironment::HolidayIndex = 0;
     DataEnvironment::DayOfWeek = 1;
     DataEnvironment::DayOfWeekTomorrow = 2;
-    DataGlobals::TimeStep = 1;
-    DataGlobals::HourOfDay = 1;
+    state.dataGlobal->TimeStep = 1;
+    state.dataGlobal->HourOfDay = 1;
 
     // check day schedules
     EXPECT_EQ(DaySchedule(1).TSValue(1, 1), 1.0); // day < 250 points to this schedule
@@ -159,19 +159,19 @@ TEST_F(EnergyPlusFixture, ScheduleManager_UpdateScheduleValues)
     EXPECT_EQ(Schedule(1).CurrentValue, 2.0);
 
     // test end of day 250 with daylight savings time active
-    DataGlobals::HourOfDay = 24;
+    state.dataGlobal->HourOfDay = 24;
     DataEnvironment::DSTIndicator = 1;
     UpdateScheduleValues(state);
     // expect a 3 on day 251, which on day 250 at midnight with DST of hour 1 of day 251
     EXPECT_EQ(Schedule(1).CurrentValue, 3.0);
 
-    DataGlobals::HourOfDay = 2;
+    state.dataGlobal->HourOfDay = 2;
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfYear_Schedule = 251;
     UpdateScheduleValues(state);
     // expect 3.0 for remainder of year regardless of DST
     EXPECT_EQ(Schedule(1).CurrentValue, 3.0);
-    DataGlobals::HourOfDay = 24;
+    state.dataGlobal->HourOfDay = 24;
     DataEnvironment::DSTIndicator = 1;
     UpdateScheduleValues(state);
     EXPECT_EQ(Schedule(1).CurrentValue, 3.0);
@@ -229,8 +229,8 @@ TEST_F(EnergyPlusFixture, ScheduleAnnualFullLoadHours_test)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::NumOfTimeStepInHour = 4;
-    DataGlobals::MinutesPerTimeStep = 15;
+    state.dataGlobal->NumOfTimeStepInHour = 4;
+    state.dataGlobal->MinutesPerTimeStep = 15;
 
     int onSchedIndex = GetScheduleIndex(state, "ONSCHED");
     EXPECT_EQ(8760., ScheduleAnnualFullLoadHours(state, onSchedIndex, 1, false));
@@ -300,8 +300,8 @@ TEST_F(EnergyPlusFixture, ScheduleAverageHoursPerWeek_test)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::NumOfTimeStepInHour = 4;
-    DataGlobals::MinutesPerTimeStep = 15;
+    state.dataGlobal->NumOfTimeStepInHour = 4;
+    state.dataGlobal->MinutesPerTimeStep = 15;
 
     int onSchedIndex = GetScheduleIndex(state, "ONSCHED");
     EXPECT_EQ(168., ScheduleAverageHoursPerWeek(state, onSchedIndex, 1, false));
@@ -379,9 +379,9 @@ TEST_F(EnergyPlusFixture, ScheduleHoursGT1perc_test)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::NumOfTimeStepInHour = 4;
-    DataGlobals::MinutesPerTimeStep = 15;
-    DataGlobals::TimeStepZone = 0.25;
+    state.dataGlobal->NumOfTimeStepInHour = 4;
+    state.dataGlobal->MinutesPerTimeStep = 15;
+    state.dataGlobal->TimeStepZone = 0.25;
 
     int onSchedIndex = GetScheduleIndex(state, "ONSCHED");
     EXPECT_EQ(8760., ScheduleHoursGT1perc(state, onSchedIndex, 1, false));
@@ -454,14 +454,14 @@ TEST_F(EnergyPlusFixture, ScheduleDayInterval_SimpLinearInterp)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::NumOfTimeStepInHour = 4;
-    DataGlobals::MinutesPerTimeStep = 15;
-    DataGlobals::TimeStepZone = 0.25;
+    state.dataGlobal->NumOfTimeStepInHour = 4;
+    state.dataGlobal->MinutesPerTimeStep = 15;
+    state.dataGlobal->TimeStepZone = 0.25;
 
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 1;
-    DataGlobals::HourOfDay = 1;
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->HourOfDay = 1;
+    state.dataGlobal->TimeStep = 1;
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
@@ -567,14 +567,14 @@ TEST_F(EnergyPlusFixture, ScheduleDayInterval_PartialHourLinearInterp)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::NumOfTimeStepInHour = 4;
-    DataGlobals::MinutesPerTimeStep = 15;
-    DataGlobals::TimeStepZone = 0.25;
+    state.dataGlobal->NumOfTimeStepInHour = 4;
+    state.dataGlobal->MinutesPerTimeStep = 15;
+    state.dataGlobal->TimeStepZone = 0.25;
 
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 1;
-    DataGlobals::HourOfDay = 1;
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->HourOfDay = 1;
+    state.dataGlobal->TimeStep = 1;
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
@@ -640,14 +640,14 @@ TEST_F(EnergyPlusFixture, ScheduleDayInterval_LinearInterpIntervalNotTimestep)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::NumOfTimeStepInHour = 4;
-    DataGlobals::MinutesPerTimeStep = 15;
-    DataGlobals::TimeStepZone = 0.25;
+    state.dataGlobal->NumOfTimeStepInHour = 4;
+    state.dataGlobal->MinutesPerTimeStep = 15;
+    state.dataGlobal->TimeStepZone = 0.25;
 
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 1;
-    DataGlobals::HourOfDay = 1;
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->HourOfDay = 1;
+    state.dataGlobal->TimeStep = 1;
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
@@ -776,25 +776,25 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::NumOfTimeStepInHour = 4;    // must initialize this to get schedules initialized
-    DataGlobals::MinutesPerTimeStep = 15;    // must initialize this to get schedules initialized
-    DataGlobals::TimeStepZone = 0.25;
-    DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * DataGlobalConstants::SecInHour();
+    state.dataGlobal->NumOfTimeStepInHour = 4;    // must initialize this to get schedules initialized
+    state.dataGlobal->MinutesPerTimeStep = 15;    // must initialize this to get schedules initialized
+    state.dataGlobal->TimeStepZone = 0.25;
+    state.dataGlobal->TimeStepZoneSec = state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour();
 
     ScheduleManager::ProcessScheduleInput(state); // read schedules
 
     DataEnvironment::Month = 5;
     DataEnvironment::DayOfMonth = 31;
-    DataGlobals::HourOfDay = 24;
+    state.dataGlobal->HourOfDay = 24;
     DataEnvironment::DayOfWeek = 4;
     DataEnvironment::DayOfWeekTomorrow = 5;
     DataEnvironment::HolidayIndex = 0;
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
     DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
 
     DataEnvironment::DSTIndicator = 0; // DST IS OFF
     ScheduleManager::UpdateScheduleValues(state);
-    EXPECT_EQ(1.0, ScheduleManager::LookUpScheduleValue(state, 1, DataGlobals::HourOfDay, DataGlobals::TimeStep));
+    EXPECT_EQ(1.0, ScheduleManager::LookUpScheduleValue(state, 1, state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep));
     EXPECT_EQ(1.0, ScheduleManager::Schedule(1).CurrentValue);
     EXPECT_EQ(1.0, ScheduleManager::GetCurrentScheduleValue(state, 1));
 
@@ -804,7 +804,7 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST)
     // so it **should** return 3.0
     EXPECT_EQ(3.0, ScheduleManager::Schedule(1).CurrentValue);
     EXPECT_EQ(3.0, ScheduleManager::GetCurrentScheduleValue(state, 1));
-    EXPECT_EQ(3.0, ScheduleManager::LookUpScheduleValue(state, 1, DataGlobals::HourOfDay, DataGlobals::TimeStep));
+    EXPECT_EQ(3.0, ScheduleManager::LookUpScheduleValue(state, 1, state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep));
 }
 
 TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST_SouthernHemisphere)
@@ -825,25 +825,25 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST_SouthernHemispher
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::NumOfTimeStepInHour = 4;    // must initialize this to get schedules initialized
-    DataGlobals::MinutesPerTimeStep = 15;    // must initialize this to get schedules initialized
-    DataGlobals::TimeStepZone = 0.25;
-    DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * DataGlobalConstants::SecInHour();
+    state.dataGlobal->NumOfTimeStepInHour = 4;    // must initialize this to get schedules initialized
+    state.dataGlobal->MinutesPerTimeStep = 15;    // must initialize this to get schedules initialized
+    state.dataGlobal->TimeStepZone = 0.25;
+    state.dataGlobal->TimeStepZoneSec = state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour();
 
     ScheduleManager::ProcessScheduleInput(state); // read schedules
 
     DataEnvironment::Month = 12;
     DataEnvironment::DayOfMonth = 31;
-    DataGlobals::HourOfDay = 24;
+    state.dataGlobal->HourOfDay = 24;
     DataEnvironment::DayOfWeek = 4;
     DataEnvironment::DayOfWeekTomorrow = 5;
     DataEnvironment::HolidayIndex = 0;
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
     DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
 
     DataEnvironment::DSTIndicator = 0; // DST IS OFF
     ScheduleManager::UpdateScheduleValues(state);
-    EXPECT_EQ(2.0, ScheduleManager::LookUpScheduleValue(state, 1, DataGlobals::HourOfDay, DataGlobals::TimeStep));
+    EXPECT_EQ(2.0, ScheduleManager::LookUpScheduleValue(state, 1, state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep));
     EXPECT_EQ(2.0, ScheduleManager::Schedule(1).CurrentValue);
     EXPECT_EQ(2.0, ScheduleManager::GetCurrentScheduleValue(state, 1));
 
@@ -853,7 +853,7 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST_SouthernHemispher
     // so it **should** return 1.0
     EXPECT_EQ(1.0, ScheduleManager::Schedule(1).CurrentValue);
     EXPECT_EQ(1.0, ScheduleManager::GetCurrentScheduleValue(state, 1));
-    EXPECT_EQ(1.0, ScheduleManager::LookUpScheduleValue(state, 1, DataGlobals::HourOfDay, DataGlobals::TimeStep));
+    EXPECT_EQ(1.0, ScheduleManager::LookUpScheduleValue(state, 1, state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep));
 }
 
 
@@ -890,7 +890,7 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST_RampUp_Leap) {
     state.dataWeatherManager->LeapYearAdd = 1;
 
     int nDays = 366;
-    int NumOfTimeStepInHour = 4;
+    state.dataGlobal->NumOfTimeStepInHour = 4;
 
     ScheduleManager::ScheduleInputProcessed = true;
     EXPECT_TRUE(ScheduleManager::ScheduleInputProcessed);
@@ -911,7 +911,7 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST_RampUp_Leap) {
             }
             ScheduleManager::DaySchedule(day).TSValue.allocate(4, 24);
             for (int whichHour = 1; whichHour <= 24; whichHour++) {
-                for (int TS = 1; TS <= NumOfTimeStepInHour; ++TS) {
+                for (int TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
                     ScheduleManager::DaySchedule(day).TSValue(TS, whichHour) = whichHour + (day-1) * 24;
                 }
             }
@@ -922,24 +922,24 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST_RampUp_Leap) {
     EXPECT_EQ(366, ScheduleManager::WeekSchedule(366).DaySchedulePointer(2));
     EXPECT_EQ(8784.0, ScheduleManager::DaySchedule(366).TSValue(4, 24));
 
-    DataGlobals::NumOfTimeStepInHour = NumOfTimeStepInHour;    // must initialize this to get schedules initialized
-    DataGlobals::MinutesPerTimeStep = 15;    // must initialize this to get schedules initialized
-    DataGlobals::TimeStepZone = 0.25;
-    DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * DataGlobalConstants::SecInHour();
+    state.dataGlobal->NumOfTimeStepInHour = state.dataGlobal->NumOfTimeStepInHour;    // must initialize this to get schedules initialized
+    state.dataGlobal->MinutesPerTimeStep = 15;    // must initialize this to get schedules initialized
+    state.dataGlobal->TimeStepZone = 0.25;
+    state.dataGlobal->TimeStepZoneSec = state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour();
 
     DataEnvironment::Month = 12;
     DataEnvironment::DayOfMonth = 31;
-    DataGlobals::HourOfDay = 24;
+    state.dataGlobal->HourOfDay = 24;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::DayOfWeekTomorrow = 3;
     DataEnvironment::HolidayIndex = 0;
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
     DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
     EXPECT_EQ(366,  DataEnvironment::DayOfYear_Schedule);
 
     DataEnvironment::DSTIndicator = 0; // DST IS OFF
     ScheduleManager::UpdateScheduleValues(state);
-    EXPECT_EQ(8784.0, ScheduleManager::LookUpScheduleValue(state, 1, DataGlobals::HourOfDay, DataGlobals::TimeStep));
+    EXPECT_EQ(8784.0, ScheduleManager::LookUpScheduleValue(state, 1, state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep));
     EXPECT_EQ(8784.0, ScheduleManager::Schedule(1).CurrentValue);
     EXPECT_EQ(8784.0, ScheduleManager::GetCurrentScheduleValue(state, 1));
 
@@ -949,7 +949,7 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST_RampUp_Leap) {
     // so it **should** return 1.0
     EXPECT_EQ(1.0, ScheduleManager::Schedule(1).CurrentValue);
     EXPECT_EQ(1.0, ScheduleManager::GetCurrentScheduleValue(state, 1));
-    EXPECT_EQ(1.0, ScheduleManager::LookUpScheduleValue(state, 1, DataGlobals::HourOfDay, DataGlobals::TimeStep));
+    EXPECT_EQ(1.0, ScheduleManager::LookUpScheduleValue(state, 1, state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep));
 
     Array1D_int EndDayOfMonth(12, {31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31});
 
@@ -978,12 +978,12 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST_RampUp_Leap) {
 
                 for (int hr = 1; hr <= 24; ++hr) {
                     ++HourOfYear;
-                    DataGlobals::HourOfDay = hr;
+                    state.dataGlobal->HourOfDay = hr;
                     for (int ts = 1; ts <= 4; ++ts) {
-                        DataGlobals::TimeStep = ts;
+                        state.dataGlobal->TimeStep = ts;
 
                         ScheduleManager::UpdateScheduleValues(state);
-                        EXPECT_EQ(HourOfYear, ScheduleManager::LookUpScheduleValue(state, 1, DataGlobals::HourOfDay, DataGlobals::TimeStep));
+                        EXPECT_EQ(HourOfYear, ScheduleManager::LookUpScheduleValue(state, 1, state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep));
                         EXPECT_EQ(HourOfYear, ScheduleManager::Schedule(1).CurrentValue);
                         EXPECT_EQ(HourOfYear, ScheduleManager::GetCurrentScheduleValue(state, 1));
                     }
@@ -1017,16 +1017,16 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST_RampUp_Leap) {
 
                 for (int hr = 1; hr <= 24; ++hr) {
                     ++HourOfYear;
-                    DataGlobals::HourOfDay = hr;
+                    state.dataGlobal->HourOfDay = hr;
                     for (int ts = 1; ts <= 4; ++ts) {
-                        DataGlobals::TimeStep = ts;
+                        state.dataGlobal->TimeStep = ts;
 
                         ScheduleManager::UpdateScheduleValues(state);
                         int thisHourOfYear = HourOfYear + 1;
                         if (thisHourOfYear > 8784.0) {
                             thisHourOfYear = 1;
                         }
-                        EXPECT_EQ(thisHourOfYear, ScheduleManager::LookUpScheduleValue(state, 1, DataGlobals::HourOfDay, DataGlobals::TimeStep));
+                        EXPECT_EQ(thisHourOfYear, ScheduleManager::LookUpScheduleValue(state, 1, state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep));
                         EXPECT_EQ(thisHourOfYear, ScheduleManager::Schedule(1).CurrentValue);
                         EXPECT_EQ(thisHourOfYear, ScheduleManager::GetCurrentScheduleValue(state, 1));
                     }
@@ -1072,7 +1072,7 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST_RampUp_NoLeap) {
 
     // ScheduleManager always assume LeapYear really.
     int nDays = 365;
-    int NumOfTimeStepInHour = 4;
+    state.dataGlobal->NumOfTimeStepInHour = 4;
 
     ScheduleManager::ScheduleInputProcessed = true;
     EXPECT_TRUE(ScheduleManager::ScheduleInputProcessed);
@@ -1104,7 +1104,7 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST_RampUp_NoLeap) {
             }
             ScheduleManager::DaySchedule(dayOfYear).TSValue.allocate(4, 24);
             for (int whichHour = 1; whichHour <= 24; whichHour++) {
-                for (int TS = 1; TS <= NumOfTimeStepInHour; ++TS) {
+                for (int TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
                     ScheduleManager::DaySchedule(dayOfYear).TSValue(TS, whichHour) = whichHour + (dayOfYear-1) * 24;
                 }
             }
@@ -1131,24 +1131,24 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST_RampUp_NoLeap) {
     EXPECT_EQ(365, ScheduleManager::WeekSchedule(366).DaySchedulePointer(1));
     EXPECT_EQ(8760.0, ScheduleManager::DaySchedule(365).TSValue(4, 24));
 
-    DataGlobals::NumOfTimeStepInHour = NumOfTimeStepInHour;    // must initialize this to get schedules initialized
-    DataGlobals::MinutesPerTimeStep = 15;    // must initialize this to get schedules initialized
-    DataGlobals::TimeStepZone = 0.25;
-    DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * DataGlobalConstants::SecInHour();
+    state.dataGlobal->NumOfTimeStepInHour = state.dataGlobal->NumOfTimeStepInHour;    // must initialize this to get schedules initialized
+    state.dataGlobal->MinutesPerTimeStep = 15;    // must initialize this to get schedules initialized
+    state.dataGlobal->TimeStepZone = 0.25;
+    state.dataGlobal->TimeStepZoneSec = state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour();
 
     DataEnvironment::Month = 12;
     DataEnvironment::DayOfMonth = 31;
-    DataGlobals::HourOfDay = 24;
+    state.dataGlobal->HourOfDay = 24;
     DataEnvironment::DayOfWeek = 1;
     DataEnvironment::DayOfWeekTomorrow = 2;
     DataEnvironment::HolidayIndex = 0;
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
     DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
     EXPECT_EQ(366,  DataEnvironment::DayOfYear_Schedule);
 
     DataEnvironment::DSTIndicator = 0; // DST IS OFF
     ScheduleManager::UpdateScheduleValues(state);
-    EXPECT_EQ(8760.0, ScheduleManager::LookUpScheduleValue(state, 1, DataGlobals::HourOfDay, DataGlobals::TimeStep));
+    EXPECT_EQ(8760.0, ScheduleManager::LookUpScheduleValue(state, 1, state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep));
     EXPECT_EQ(8760.0, ScheduleManager::Schedule(1).CurrentValue);
     EXPECT_EQ(8760.0, ScheduleManager::GetCurrentScheduleValue(state, 1));
 
@@ -1158,7 +1158,7 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST_RampUp_NoLeap) {
     // so it **should** return 1.0
     EXPECT_EQ(1.0, ScheduleManager::Schedule(1).CurrentValue);
     EXPECT_EQ(1.0, ScheduleManager::GetCurrentScheduleValue(state, 1));
-    EXPECT_EQ(1.0, ScheduleManager::LookUpScheduleValue(state, 1, DataGlobals::HourOfDay, DataGlobals::TimeStep));
+    EXPECT_EQ(1.0, ScheduleManager::LookUpScheduleValue(state, 1, state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep));
 
     {
         DataEnvironment::DSTIndicator = 0; // DST IS OFF
@@ -1183,12 +1183,12 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST_RampUp_NoLeap) {
 
                 for (int hr = 1; hr <= 24; ++hr) {
                     ++HourOfYear;
-                    DataGlobals::HourOfDay = hr;
+                    state.dataGlobal->HourOfDay = hr;
                     for (int ts = 1; ts <= 4; ++ts) {
-                        DataGlobals::TimeStep = ts;
+                        state.dataGlobal->TimeStep = ts;
 
                         ScheduleManager::UpdateScheduleValues(state);
-                        EXPECT_EQ(HourOfYear, ScheduleManager::LookUpScheduleValue(state, 1, DataGlobals::HourOfDay, DataGlobals::TimeStep));
+                        EXPECT_EQ(HourOfYear, ScheduleManager::LookUpScheduleValue(state, 1, state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep));
                         EXPECT_EQ(HourOfYear, ScheduleManager::Schedule(1).CurrentValue);
                         EXPECT_EQ(HourOfYear, ScheduleManager::GetCurrentScheduleValue(state, 1));
                     }
@@ -1222,16 +1222,16 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST_RampUp_NoLeap) {
 
                 for (int hr = 1; hr <= 24; ++hr) {
                     ++HourOfYear;
-                    DataGlobals::HourOfDay = hr;
+                    state.dataGlobal->HourOfDay = hr;
                     for (int ts = 1; ts <= 4; ++ts) {
-                        DataGlobals::TimeStep = ts;
+                        state.dataGlobal->TimeStep = ts;
 
                         ScheduleManager::UpdateScheduleValues(state);
                         int thisHourOfYear = HourOfYear + 1;
                         if (thisHourOfYear > 8760.0) {
                             thisHourOfYear = 1;
                         }
-                        EXPECT_EQ(thisHourOfYear, ScheduleManager::LookUpScheduleValue(state, 1, DataGlobals::HourOfDay, DataGlobals::TimeStep));
+                        EXPECT_EQ(thisHourOfYear, ScheduleManager::LookUpScheduleValue(state, 1, state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep));
                         EXPECT_EQ(thisHourOfYear, ScheduleManager::Schedule(1).CurrentValue);
                         EXPECT_EQ(thisHourOfYear, ScheduleManager::GetCurrentScheduleValue(state, 1));
                     }

@@ -86,7 +86,6 @@ using namespace EnergyPlus;
 using namespace AirflowNetworkBalanceManager;
 using namespace DataSurfaces;
 using namespace DataHeatBalance;
-using namespace DataGlobals;
 using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::ScheduleManager;
 using namespace OutAirNodeManager;
@@ -153,9 +152,9 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneVentingSch)
     Surface(2).Sides = 4;
 
     SurfaceGeometry::AllocateSurfaceWindows(2);
-    SurfWinOriginalClass(1) = 11;
-    SurfWinOriginalClass(2) = 11;
-    NumOfZones = 1;
+    SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
+    SurfWinOriginalClass(2) = DataSurfaces::SurfaceClass::Window;
+    state.dataGlobal->NumOfZones = 1;
 
     std::string const idf_objects = delimited_string({
         "Schedule:Constant,OnSch,,1.0;",
@@ -276,10 +275,10 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestTriangularWindowWarni
     Surface(3).Vertex(3).z = 1.0;
 
     SurfaceGeometry::AllocateSurfaceWindows(3);
-    SurfWinOriginalClass(1) = 11;
-    SurfWinOriginalClass(2) = 11;
-    SurfWinOriginalClass(3) = 11;
-    NumOfZones = 1;
+    SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
+    SurfWinOriginalClass(2) = DataSurfaces::SurfaceClass::Window;
+    SurfWinOriginalClass(3) = DataSurfaces::SurfaceClass::Window;
+    state.dataGlobal->NumOfZones = 1;
 
     std::string const idf_objects = delimited_string({
         "Schedule:Constant,OnSch,,1.0;",
@@ -2326,7 +2325,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPressureStat)
     // Start a test for #5687 to report zero values of AirflowNetwork:Distribution airflow and pressure outputs when a system is off
     AirflowNetwork::AirflowNetworkFanActivated = false;
 
-    state.dataAirflowNetworkBalanceManager->exchangeData.allocate(NumOfZones);
+    state.dataAirflowNetworkBalanceManager->exchangeData.allocate(state.dataGlobal->NumOfZones);
 
     UpdateAirflowNetwork(state);
 
@@ -2351,7 +2350,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPressureStat)
     // Test for #7162
     DataHeatBalFanSys::ZoneAirHumRat.allocate(4);
     DataHeatBalFanSys::MAT.allocate(4);
-    DataHeatBalFanSys::ZoneAirHumRatAvg.allocate(NumOfZones);
+    DataHeatBalFanSys::ZoneAirHumRatAvg.allocate(state.dataGlobal->NumOfZones);
 
     DataHeatBalFanSys::MAT(1) = 23.0;
     DataHeatBalFanSys::MAT(2) = 23.0;
@@ -2425,9 +2424,9 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneVentingSchWithAdaptiveCtrl)
     Surface(2).Sides = 4;
 
     SurfaceGeometry::AllocateSurfaceWindows(2);
-    SurfWinOriginalClass(1) = 11;
-    SurfWinOriginalClass(2) = 11;
-    NumOfZones = 1;
+    SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
+    SurfWinOriginalClass(2) = DataSurfaces::SurfaceClass::Window;
+    state.dataGlobal->NumOfZones = 1;
 
     TotPeople = 1; // Total number of people statements
     People.allocate(TotPeople);
@@ -2842,16 +2841,16 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestPolygonalWindows)
     Surface(11).Vertex(3).z = 2.4384;
 
     SurfaceGeometry::AllocateSurfaceWindows(14);
-    SurfWinOriginalClass(4) = 11;
-    SurfWinOriginalClass(5) = 11;
-    SurfWinOriginalClass(6) = 11;
-    SurfWinOriginalClass(9) = 11;
-    SurfWinOriginalClass(10) = 11;
-    SurfWinOriginalClass(11) = 11;
-    SurfWinOriginalClass(12) = 11;
-    SurfWinOriginalClass(13) = 11;
-    SurfWinOriginalClass(14) = 11;
-    NumOfZones = 1;
+    SurfWinOriginalClass(4) = DataSurfaces::SurfaceClass::Window;
+    SurfWinOriginalClass(5) = DataSurfaces::SurfaceClass::Window;
+    SurfWinOriginalClass(6) = DataSurfaces::SurfaceClass::Window;
+    SurfWinOriginalClass(9) = DataSurfaces::SurfaceClass::Window;
+    SurfWinOriginalClass(10) = DataSurfaces::SurfaceClass::Window;
+    SurfWinOriginalClass(11) = DataSurfaces::SurfaceClass::Window;
+    SurfWinOriginalClass(12) = DataSurfaces::SurfaceClass::Window;
+    SurfWinOriginalClass(13) = DataSurfaces::SurfaceClass::Window;
+    SurfWinOriginalClass(14) = DataSurfaces::SurfaceClass::Window;
+    state.dataGlobal->NumOfZones = 1;
 
     std::string const idf_objects = delimited_string({
         "Schedule:Constant,OnSch,,1.0;",
@@ -4430,7 +4429,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_UserDefinedDuctViewFactor
     HeatBalanceManager::GetHeatBalanceInput(state);
     HeatBalanceManager::AllocateHeatBalArrays(state);
     DataEnvironment::OutBaroPress = 101000;
-    DataHVACGlobals::TimeStepSys = DataGlobals::TimeStepZone;
+    DataHVACGlobals::TimeStepSys = state.dataGlobal->TimeStepZone;
     SurfaceGeometry::GetGeometryParameters(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
@@ -9081,7 +9080,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithLocalAirNode)
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetHeatBalanceInput(state);
     HeatBalanceManager::AllocateHeatBalArrays(state);
-    DataHVACGlobals::TimeStepSys = DataGlobals::TimeStepZone;
+    DataHVACGlobals::TimeStepSys = state.dataGlobal->TimeStepZone;
     SurfaceGeometry::GetGeometryParameters(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
@@ -9095,7 +9094,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithLocalAirNode)
     CurveManager::GetCurveInput(state);
     EXPECT_EQ(state.dataCurveManager->NumCurves, 2);
 
-    DataGlobals::AnyLocalEnvironmentsInModel = true;
+    state.dataGlobal->AnyLocalEnvironmentsInModel = true;
     OutAirNodeManager::SetOutAirNodes(state);
     GetAirflowNetworkInput(state);
     // Issue 7656
@@ -13217,15 +13216,15 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
 
 TEST_F(EnergyPlusFixture, AirflowNetwork_CheckNumOfFansInAirLoopTest)
 {
-    DataAirSystems::PrimaryAirSystem.allocate(1);
-    DataAirSystems::PrimaryAirSystem(1).NumBranches = 1;
-    DataAirSystems::PrimaryAirSystem(1).Branch.allocate(1);
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).TotalComponents = 3;
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp.allocate(3);
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp(1).TypeOf = "Fan:ConstantVolume";
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp(2).TypeOf = "Fan:VariableVolume";
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp(1).Name = "CVF";
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp(2).Name = "VAV";
+    state.dataAirSystemsData->PrimaryAirSystems.allocate(1);
+    state.dataAirSystemsData->PrimaryAirSystems(1).NumBranches = 1;
+    state.dataAirSystemsData->PrimaryAirSystems(1).Branch.allocate(1);
+    state.dataAirSystemsData->PrimaryAirSystems(1).Branch(1).TotalComponents = 3;
+    state.dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp.allocate(3);
+    state.dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).TypeOf = "Fan:ConstantVolume";
+    state.dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).TypeOf = "Fan:VariableVolume";
+    state.dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).Name = "CVF";
+    state.dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).Name = "VAV";
 
     ASSERT_THROW(ValidateDistributionSystem(state), std::runtime_error);
 
@@ -15651,7 +15650,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestFanModel)
 // Missing an AirflowNetwork:Distribution:Node for the Zone Air Node
 TEST_F(EnergyPlusFixture, AirflowNetwork_CheckMultiZoneNodes_NoZoneNode)
 {
-    DataGlobals::NumOfZones = 1;
+    state.dataGlobal->NumOfZones = 1;
     DataHeatBalance::Zone.allocate(1);
     DataHeatBalance::Zone(1).Name = "ATTIC ZONE";
 
@@ -15674,14 +15673,14 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_CheckMultiZoneNodes_NoZoneNode)
     DataSurfaces::Surface(1).Sides = 4;
 
     DataSurfaces::SurfWinOriginalClass.allocate(1);
-    DataSurfaces::SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass_Window;
+    DataSurfaces::SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
 
-    DataAirSystems::PrimaryAirSystem.allocate(1);
-    DataAirSystems::PrimaryAirSystem(1).NumBranches = 1;
-    DataAirSystems::PrimaryAirSystem(1).Branch.allocate(1);
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).TotalComponents = 1;
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp.allocate(1);
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp(1).TypeOf = "Fan:ConstantVolume";
+    state.dataAirSystemsData->PrimaryAirSystems.allocate(1);
+    state.dataAirSystemsData->PrimaryAirSystems(1).NumBranches = 1;
+    state.dataAirSystemsData->PrimaryAirSystems(1).Branch.allocate(1);
+    state.dataAirSystemsData->PrimaryAirSystems(1).Branch(1).TotalComponents = 1;
+    state.dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp.allocate(1);
+    state.dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).TypeOf = "Fan:ConstantVolume";
 
     DataLoopNode::NumOfNodes = 1;
     DataLoopNode::Node.allocate(1);
@@ -15719,7 +15718,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_CheckMultiZoneNodes_NoZoneNode)
 // Can't find an inlet node for a Zone referenced in AirflowNetwork:MultiZone:Zone object
 TEST_F(EnergyPlusFixture, AirflowNetwork_CheckMultiZoneNodes_NoInletNode)
 {
-    DataGlobals::NumOfZones = 1;
+    state.dataGlobal->NumOfZones = 1;
     DataHeatBalance::Zone.allocate(1);
     DataHeatBalance::Zone(1).Name = "ATTIC ZONE";
 
@@ -15742,14 +15741,14 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_CheckMultiZoneNodes_NoInletNode)
     DataSurfaces::Surface(1).Sides = 4;
 
     DataSurfaces::SurfWinOriginalClass.allocate(1);
-    DataSurfaces::SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass_Window;
+    DataSurfaces::SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
 
-    DataAirSystems::PrimaryAirSystem.allocate(1);
-    DataAirSystems::PrimaryAirSystem(1).NumBranches = 1;
-    DataAirSystems::PrimaryAirSystem(1).Branch.allocate(1);
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).TotalComponents = 1;
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp.allocate(1);
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp(1).TypeOf = "Fan:ConstantVolume";
+    state.dataAirSystemsData->PrimaryAirSystems.allocate(1);
+    state.dataAirSystemsData->PrimaryAirSystems(1).NumBranches = 1;
+    state.dataAirSystemsData->PrimaryAirSystems(1).Branch.allocate(1);
+    state.dataAirSystemsData->PrimaryAirSystems(1).Branch(1).TotalComponents = 1;
+    state.dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp.allocate(1);
+    state.dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).TypeOf = "Fan:ConstantVolume";
 
     DataLoopNode::NumOfNodes = 1;
     DataLoopNode::Node.allocate(2);
@@ -17159,7 +17158,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_DuplicatedNodeNameTest)
     HeatBalanceManager::GetHeatBalanceInput(state);
     HeatBalanceManager::AllocateHeatBalArrays(state);
     DataEnvironment::OutBaroPress = 101000;
-    DataHVACGlobals::TimeStepSys = DataGlobals::TimeStepZone;
+    DataHVACGlobals::TimeStepSys = state.dataGlobal->TimeStepZone;
     SurfaceGeometry::GetGeometryParameters(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
@@ -20049,9 +20048,9 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneVentingAirBoundary)
     Surface(3).Sides = 4;
 
     SurfaceGeometry::AllocateSurfaceWindows(2);
-    SurfWinOriginalClass(1) = 11;
-    SurfWinOriginalClass(2) = 11;
-    NumOfZones = 1;
+    SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
+    SurfWinOriginalClass(2) = DataSurfaces::SurfaceClass::Window;
+    state.dataGlobal->NumOfZones = 1;
 
     std::string const idf_objects = delimited_string({
         "Schedule:Constant,OnSch,,1.0;",

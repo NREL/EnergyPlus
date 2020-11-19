@@ -461,7 +461,7 @@ namespace UtilityRoutines {
         }
     }
 
-    bool ValidateFuelType(EnergyPlusData &EP_UNUSED(state),
+    bool ValidateFuelType([[maybe_unused]] EnergyPlusData &state,
                           std::string const &FuelTypeInput,
                           std::string &FuelTypeOutput,
                           bool &FuelTypeErrorsFound,
@@ -716,13 +716,13 @@ namespace UtilityRoutines {
                     " Severe Errors.");
         ShowMessage(state, "EnergyPlus Terminated--Fatal Error Detected. " + NumWarnings + " Warning; " + NumSevere +
                     " Severe Errors; Elapsed Time=" + Elapsed);
-        DisplayString("EnergyPlus Run Time=" + Elapsed);
+        DisplayString(state, "EnergyPlus Run Time=" + Elapsed);
 
         {
             auto tempfl = state.files.endFile.try_open(state.files.outputControl.end);
 
             if (!tempfl.good()) {
-                DisplayString("AbortEnergyPlus: Could not open file " + tempfl.fileName + " for output (write).");
+                DisplayString(state, "AbortEnergyPlus: Could not open file " + tempfl.fileName + " for output (write).");
             }
             print(tempfl,
                   "EnergyPlus Terminated--Fatal Error Detected. {} Warning; {} Severe Errors; Elapsed Time={}\n",
@@ -842,7 +842,7 @@ namespace UtilityRoutines {
         Time_Finish = epElapsedTime();
         if (Time_Finish < Time_Start) Time_Finish += 24.0 * 3600.0;
         Elapsed_Time = Time_Finish - Time_Start;
-        if (DataGlobals::createPerfLog) {
+        if (state.dataGlobal->createPerfLog) {
             UtilityRoutines::appendPerfLog(state, "Run Time [seconds]", format("{:.2R}", Elapsed_Time));
         }
 #ifdef EP_Detailed_Timings
@@ -861,7 +861,7 @@ namespace UtilityRoutines {
         ResultsFramework::resultsFramework->SimulationInformation.setNumErrorsSizing(NumWarningsDuringSizing, NumSevereDuringSizing);
         ResultsFramework::resultsFramework->SimulationInformation.setNumErrorsSummary(NumWarnings, NumSevere);
 
-        if (DataGlobals::createPerfLog) {
+        if (state.dataGlobal->createPerfLog) {
             UtilityRoutines::appendPerfLog(state, "Run Time [string]", Elapsed);
             UtilityRoutines::appendPerfLog(state, "Number of Warnings", NumWarnings);
             UtilityRoutines::appendPerfLog(state, "Number of Severe", NumSevere, true); // last item so write the perfLog file
@@ -871,12 +871,12 @@ namespace UtilityRoutines {
         ShowMessage(state, "EnergyPlus Sizing Error Summary. During Sizing: " + NumWarningsDuringSizing + " Warning; " + NumSevereDuringSizing +
                     " Severe Errors.");
         ShowMessage(state, "EnergyPlus Completed Successfully-- " + NumWarnings + " Warning; " + NumSevere + " Severe Errors; Elapsed Time=" + Elapsed);
-        DisplayString("EnergyPlus Run Time=" + Elapsed);
+        DisplayString(state, "EnergyPlus Run Time=" + Elapsed);
 
         {
             auto tempfl = state.files.endFile.try_open(state.files.outputControl.end);
             if (!tempfl.good()) {
-                DisplayString("EndEnergyPlus: Could not open file " + tempfl.fileName + " for output (write).");
+                DisplayString(state, "EndEnergyPlus: Could not open file " + tempfl.fileName + " for output (write).");
             }
             print(tempfl, "EnergyPlus Completed Successfully-- {} Warning; {} Severe Errors; Elapsed Time={}\n", NumWarnings, NumSevere, Elapsed);
         }
@@ -1040,7 +1040,7 @@ namespace UtilityRoutines {
         using namespace DataErrorTracking;
 
         ShowErrorMessage(state, " **  Fatal  ** " + ErrorMessage, OutUnit1, OutUnit2);
-        DisplayString("**FATAL:" + ErrorMessage);
+        DisplayString(state, "**FATAL:" + ErrorMessage);
 
         ShowErrorMessage(state, " ...Summary of Errors that led to program termination:", OutUnit1, OutUnit2);
         ShowErrorMessage(state, format(" ..... Reference severe error count={}", TotalSevereErrors), OutUnit1, OutUnit2);
@@ -1049,8 +1049,8 @@ namespace UtilityRoutines {
             sqlite->createSQLiteErrorRecord(1, 2, ErrorMessage, 1);
             if (sqlite->sqliteWithinTransaction()) sqlite->sqliteCommit();
         }
-        if (DataGlobals::errorCallback) {
-            DataGlobals::errorCallback(Error::Fatal, ErrorMessage);
+        if (state.dataGlobal->errorCallback) {
+            state.dataGlobal->errorCallback(Error::Fatal, ErrorMessage);
         }
         throw FatalError(ErrorMessage);
     }
@@ -1073,10 +1073,6 @@ namespace UtilityRoutines {
 
         using namespace DataStringGlobals;
         using namespace DataErrorTracking;
-        using DataGlobals::DoingSizing;
-        using DataGlobals::KickOffSimulation;
-        using DataGlobals::WarmupFlag;
-
         int Loop;
 
         for (Loop = 1; Loop <= SearchCounts; ++Loop) {
@@ -1084,8 +1080,8 @@ namespace UtilityRoutines {
         }
 
         ++TotalSevereErrors;
-        if (WarmupFlag && !DoingSizing && !KickOffSimulation && !AbortProcessing) ++TotalSevereErrorsDuringWarmup;
-        if (DoingSizing) ++TotalSevereErrorsDuringSizing;
+        if (state.dataGlobal->WarmupFlag && !state.dataGlobal->DoingSizing && !state.dataGlobal->KickOffSimulation && !AbortProcessing) ++TotalSevereErrorsDuringWarmup;
+        if (state.dataGlobal->DoingSizing) ++TotalSevereErrorsDuringSizing;
         ShowErrorMessage(state, " ** Severe  ** " + ErrorMessage, OutUnit1, OutUnit2);
         LastSevereError = ErrorMessage;
 
@@ -1094,8 +1090,8 @@ namespace UtilityRoutines {
         if (sqlite) {
             sqlite->createSQLiteErrorRecord(1, 1, ErrorMessage, 1);
         }
-        if (DataGlobals::errorCallback) {
-            DataGlobals::errorCallback(Error::Severe, ErrorMessage);
+        if (state.dataGlobal->errorCallback) {
+            state.dataGlobal->errorCallback(Error::Severe, ErrorMessage);
         }
     }
 
@@ -1134,8 +1130,8 @@ namespace UtilityRoutines {
         if (sqlite) {
             sqlite->createSQLiteErrorRecord(1, 1, ErrorMessage, 0);
         }
-        if (DataGlobals::errorCallback) {
-            DataGlobals::errorCallback(Error::Severe, ErrorMessage);
+        if (state.dataGlobal->errorCallback) {
+            state.dataGlobal->errorCallback(Error::Severe, ErrorMessage);
         }
     }
 
@@ -1158,8 +1154,8 @@ namespace UtilityRoutines {
         if (sqlite) {
             sqlite->updateSQLiteErrorRecord(Message);
         }
-        if (DataGlobals::errorCallback) {
-            DataGlobals::errorCallback(Error::Continue, Message);
+        if (state.dataGlobal->errorCallback) {
+            state.dataGlobal->errorCallback(Error::Continue, Message);
         }
     }
 
@@ -1181,20 +1177,18 @@ namespace UtilityRoutines {
         // Using/Aliasing
         using DataEnvironment::CurMnDy;
         using DataEnvironment::EnvironmentName;
-        using DataGlobals::DoingSizing;
-        using DataGlobals::WarmupFlag;
         using General::CreateSysTimeIntervalString;
 
         std::string cEnvHeader;
 
-        if (WarmupFlag) {
-            if (!DoingSizing) {
+        if (state.dataGlobal->WarmupFlag) {
+            if (!state.dataGlobal->DoingSizing) {
                 cEnvHeader = " During Warmup, Environment=";
             } else {
                 cEnvHeader = " During Warmup & Sizing, Environment=";
             }
         } else {
-            if (!DoingSizing) {
+            if (!state.dataGlobal->DoingSizing) {
                 cEnvHeader = " Environment=";
             } else {
                 cEnvHeader = " During Sizing, Environment=";
@@ -1203,20 +1197,20 @@ namespace UtilityRoutines {
 
         if (len(Message) < 50) {
             const auto m = Message + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' +
-                                 CreateSysTimeIntervalString();
+                                 CreateSysTimeIntervalString(state);
             ShowErrorMessage(state, " **   ~~~   ** " + m,
                              OutUnit1,
                              OutUnit2);
             if (sqlite) {
                 sqlite->updateSQLiteErrorRecord(m);
             }
-            if (DataGlobals::errorCallback) {
-                DataGlobals::errorCallback(Error::Continue, m);
+            if (state.dataGlobal->errorCallback) {
+                state.dataGlobal->errorCallback(Error::Continue, m);
             }
         } else {
             const auto m = " **   ~~~   ** " + Message;
             const auto postfix = " **   ~~~   ** " + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' +
-                CreateSysTimeIntervalString();
+                CreateSysTimeIntervalString(state);
             ShowErrorMessage(state, m);
             ShowErrorMessage(state, postfix,
                              OutUnit1,
@@ -1224,9 +1218,9 @@ namespace UtilityRoutines {
             if (sqlite) {
                 sqlite->updateSQLiteErrorRecord(m);
             }
-            if (DataGlobals::errorCallback) {
-                DataGlobals::errorCallback(Error::Continue, m);
-                DataGlobals::errorCallback(Error::Continue, postfix);
+            if (state.dataGlobal->errorCallback) {
+                state.dataGlobal->errorCallback(Error::Continue, m);
+                state.dataGlobal->errorCallback(Error::Continue, postfix);
             }
         }
     }
@@ -1253,8 +1247,8 @@ namespace UtilityRoutines {
             if (sqlite) {
                 sqlite->createSQLiteErrorRecord(1, -1, Message, 0);
             }
-            if (DataGlobals::errorCallback) {
-                DataGlobals::errorCallback(Error::Info, Message);
+            if (state.dataGlobal->errorCallback) {
+                state.dataGlobal->errorCallback(Error::Info, Message);
             }
         }
     }
@@ -1277,10 +1271,6 @@ namespace UtilityRoutines {
 
         using namespace DataStringGlobals;
         using namespace DataErrorTracking;
-        using DataGlobals::DoingSizing;
-        using DataGlobals::KickOffSimulation;
-        using DataGlobals::WarmupFlag;
-
         int Loop;
 
         for (Loop = 1; Loop <= SearchCounts; ++Loop) {
@@ -1288,15 +1278,15 @@ namespace UtilityRoutines {
         }
 
         ++TotalWarningErrors;
-        if (WarmupFlag && !DoingSizing && !KickOffSimulation && !AbortProcessing) ++TotalWarningErrorsDuringWarmup;
-        if (DoingSizing) ++TotalWarningErrorsDuringSizing;
+        if (state.dataGlobal->WarmupFlag && !state.dataGlobal->DoingSizing && !state.dataGlobal->KickOffSimulation && !AbortProcessing) ++TotalWarningErrorsDuringWarmup;
+        if (state.dataGlobal->DoingSizing) ++TotalWarningErrorsDuringSizing;
         ShowErrorMessage(state, " ** Warning ** " + ErrorMessage, OutUnit1, OutUnit2);
 
         if (sqlite) {
             sqlite->createSQLiteErrorRecord(1, 0, ErrorMessage, 1);
         }
-        if (DataGlobals::errorCallback) {
-            DataGlobals::errorCallback(Error::Warning, ErrorMessage);
+        if (state.dataGlobal->errorCallback) {
+            state.dataGlobal->errorCallback(Error::Warning, ErrorMessage);
         }
     }
 
@@ -1328,12 +1318,13 @@ namespace UtilityRoutines {
         if (sqlite) {
             sqlite->createSQLiteErrorRecord(1, 0, ErrorMessage, 0);
         }
-        if (DataGlobals::errorCallback) {
-            DataGlobals::errorCallback(Error::Warning, ErrorMessage);
+        if (state.dataGlobal->errorCallback) {
+            state.dataGlobal->errorCallback(Error::Warning, ErrorMessage);
         }
     }
 
-    void ShowRecurringSevereErrorAtEnd(std::string const &Message,         // Message automatically written to "error file" at end of simulation
+    void ShowRecurringSevereErrorAtEnd(EnergyPlusData &state,
+                                       std::string const &Message,         // Message automatically written to "error file" at end of simulation
                                        int &MsgIndex,                      // Recurring message index, if zero, next available index is assigned
                                        Optional<Real64 const> ReportMaxOf, // Track and report the max of the values passed to this argument
                                        Optional<Real64 const> ReportMinOf, // Track and report the min of the values passed to this argument
@@ -1383,11 +1374,12 @@ namespace UtilityRoutines {
         }
 
         ++TotalSevereErrors;
-        StoreRecurringErrorMessage(
+        StoreRecurringErrorMessage(state,
             " ** Severe  ** " + Message, MsgIndex, ReportMaxOf, ReportMinOf, ReportSumOf, ReportMaxUnits, ReportMinUnits, ReportSumUnits);
     }
 
-    void ShowRecurringWarningErrorAtEnd(std::string const &Message,         // Message automatically written to "error file" at end of simulation
+    void ShowRecurringWarningErrorAtEnd(EnergyPlusData &state,
+                                        std::string const &Message,         // Message automatically written to "error file" at end of simulation
                                         int &MsgIndex,                      // Recurring message index, if zero, next available index is assigned
                                         Optional<Real64 const> ReportMaxOf, // Track and report the max of the values passed to this argument
                                         Optional<Real64 const> ReportMinOf, // Track and report the min of the values passed to this argument
@@ -1437,11 +1429,12 @@ namespace UtilityRoutines {
         }
 
         ++TotalWarningErrors;
-        StoreRecurringErrorMessage(
+        StoreRecurringErrorMessage(state,
             " ** Warning ** " + Message, MsgIndex, ReportMaxOf, ReportMinOf, ReportSumOf, ReportMaxUnits, ReportMinUnits, ReportSumUnits);
     }
 
-    void ShowRecurringContinueErrorAtEnd(std::string const &Message,         // Message automatically written to "error file" at end of simulation
+    void ShowRecurringContinueErrorAtEnd(EnergyPlusData &state,
+                                         std::string const &Message,         // Message automatically written to "error file" at end of simulation
                                          int &MsgIndex,                      // Recurring message index, if zero, next available index is assigned
                                          Optional<Real64 const> ReportMaxOf, // Track and report the max of the values passed to this argument
                                          Optional<Real64 const> ReportMinOf, // Track and report the min of the values passed to this argument
@@ -1490,11 +1483,12 @@ namespace UtilityRoutines {
             MsgIndex = 0;
         }
 
-        StoreRecurringErrorMessage(
+        StoreRecurringErrorMessage(state,
             " **   ~~~   ** " + Message, MsgIndex, ReportMaxOf, ReportMinOf, ReportSumOf, ReportMaxUnits, ReportMinUnits, ReportSumUnits);
     }
 
-    void StoreRecurringErrorMessage(std::string const &ErrorMessage,         // Message automatically written to "error file" at end of simulation
+    void StoreRecurringErrorMessage(EnergyPlusData &state,
+                                    std::string const &ErrorMessage,         // Message automatically written to "error file" at end of simulation
                                     int &ErrorMsgIndex,                      // Recurring message index, if zero, next available index is assigned
                                     Optional<Real64 const> ErrorReportMaxOf, // Track and report the max of the values passed to this argument
                                     Optional<Real64 const> ErrorReportMinOf, // Track and report the min of the values passed to this argument
@@ -1518,9 +1512,6 @@ namespace UtilityRoutines {
         // Using/Aliasing
         using namespace DataStringGlobals;
         using namespace DataErrorTracking;
-        using DataGlobals::DoingSizing;
-        using DataGlobals::WarmupFlag;
-
         // If Index is zero, then assign next available index and reallocate array
         if (ErrorMsgIndex == 0) {
             RecurringErrors.redimension(++NumRecurringErrors);
@@ -1528,8 +1519,8 @@ namespace UtilityRoutines {
             // The message string only needs to be stored once when a new recurring message is created
             RecurringErrors(ErrorMsgIndex).Message = ErrorMessage;
             RecurringErrors(ErrorMsgIndex).Count = 1;
-            if (WarmupFlag) RecurringErrors(ErrorMsgIndex).WarmupCount = 1;
-            if (DoingSizing) RecurringErrors(ErrorMsgIndex).SizingCount = 1;
+            if (state.dataGlobal->WarmupFlag) RecurringErrors(ErrorMsgIndex).WarmupCount = 1;
+            if (state.dataGlobal->DoingSizing) RecurringErrors(ErrorMsgIndex).SizingCount = 1;
 
             // For max, min, and sum values, store the current value when a new recurring message is created
             if (present(ErrorReportMaxOf)) {
@@ -1557,8 +1548,8 @@ namespace UtilityRoutines {
         } else if (ErrorMsgIndex > 0) {
             // Do stats and store
             ++RecurringErrors(ErrorMsgIndex).Count;
-            if (WarmupFlag) ++RecurringErrors(ErrorMsgIndex).WarmupCount;
-            if (DoingSizing) ++RecurringErrors(ErrorMsgIndex).SizingCount;
+            if (state.dataGlobal->WarmupFlag) ++RecurringErrors(ErrorMsgIndex).WarmupCount;
+            if (state.dataGlobal->DoingSizing) ++RecurringErrors(ErrorMsgIndex).SizingCount;
 
             if (present(ErrorReportMaxOf)) {
                 RecurringErrors(ErrorMsgIndex).MaxValue = max(ErrorReportMaxOf, RecurringErrors(ErrorMsgIndex).MaxValue);
@@ -1595,7 +1586,6 @@ namespace UtilityRoutines {
         // If arguments OutUnit1 and/or OutUnit2 are present the
         // error message is written to these as well and the standard one.
 
-        using DataGlobals::DoingInputProcessing;
         using DataStringGlobals::IDDVerString;
         using DataStringGlobals::VerString;
 
@@ -1615,7 +1605,7 @@ namespace UtilityRoutines {
             state.dataUtilityRoutines->outputErrorHeader = false;
         }
 
-        if (!DoingInputProcessing) {
+        if (!state.dataGlobal->DoingInputProcessing) {
            if (err_stream) *err_stream << "  " << ErrorMessage << '\n';
         } else {
             // CacheIPErrorFile is never opened or closed
@@ -1630,7 +1620,7 @@ namespace UtilityRoutines {
             print(OutUnit2(), "  {}", ErrorMessage);
         }
         // std::string tmp = "  " + ErrorMessage + '\n';
-        // if (DataGlobals::errorCallback) DataGlobals::errorCallback(tmp.c_str());
+        // if (state.dataGlobal->errorCallback) DataGlobals::errorCallback(tmp.c_str());
     }
 
     void SummarizeErrors(EnergyPlusData &state)
@@ -1713,8 +1703,8 @@ namespace UtilityRoutines {
                     if (sqlite) {
                         sqlite->updateSQLiteErrorRecord(error.Message);
                     }
-                    if (DataGlobals::errorCallback) {
-                        DataGlobals::errorCallback(Error::Continue, error.Message);
+                    if (state.dataGlobal->errorCallback) {
+                        state.dataGlobal->errorCallback(Error::Continue, error.Message);
                     }
                 } else {
                     const auto warning = has_prefix(error.Message, " ** Warning ** ");
@@ -1732,13 +1722,13 @@ namespace UtilityRoutines {
                             sqlite->createSQLiteErrorRecord(1, 1, error.Message.substr(15), error.Count);
                         }
                     }
-                    if (DataGlobals::errorCallback) {
+                    if (state.dataGlobal->errorCallback) {
                         Error level = Error::Warning;
                         if (severe) {
                             level = Error::Severe;
                         }
-                        DataGlobals::errorCallback(level, error.Message);
-                        DataGlobals::errorCallback(Error::Continue, "");
+                        state.dataGlobal->errorCallback(level, error.Message);
+                        state.dataGlobal->errorCallback(Error::Continue, "");
                     }
                 }
                 StatMessage = "";

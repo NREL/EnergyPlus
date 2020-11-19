@@ -200,9 +200,9 @@ TEST_F(EnergyPlusFixture, Boiler_HotWater_BoilerEfficiency)
     DataPlant::TotNumLoops = 2;
     DataEnvironment::OutBaroPress = 101325.0;
     DataEnvironment::StdRhoAir = 1.20;
-    DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::TimeStep = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->NumOfTimeStepInHour = 1;
+    state.dataGlobal->TimeStep = 1;
+    state.dataGlobal->MinutesPerTimeStep = 60;
 
     Psychrometrics::InitializePsychRoutines();
 
@@ -275,7 +275,7 @@ TEST_F(EnergyPlusFixture, Boiler_HotWater_BoilerEfficiency)
     // run through init again after sizing is complete to set mass flow rate and run calc function
     state.dataGlobal->BeginEnvrnFlag = true;
     thisBoiler.InitBoiler(state);
-    thisBoiler.CalcBoilerModel(state, MyLoad, RunFlag, DataBranchAirLoopPlant::ControlType_SeriesActive);
+    thisBoiler.CalcBoilerModel(state, MyLoad, RunFlag, DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive);
 
     // check boiler part load ratio and the resultant boiler efficiency
     EXPECT_NEAR(thisBoiler.BoilerPLR, 0.24, 0.01);

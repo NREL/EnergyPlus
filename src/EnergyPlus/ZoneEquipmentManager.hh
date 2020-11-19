@@ -96,7 +96,7 @@ namespace ZoneEquipmentManager {
 
     void SetUpZoneSizingArrays(EnergyPlusData &state);
 
-    void RezeroZoneSizingArrays();
+    void RezeroZoneSizingArrays(EnergyPlusData &state);
 
     void UpdateZoneSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator const CallIndicator);
 

@@ -80,7 +80,6 @@
 using namespace EnergyPlus;
 using namespace DataSurfaces;
 using namespace DataHeatBalance;
-using namespace DataGlobals;
 using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::ScheduleManager;
 using namespace OutAirNodeManager;
@@ -4252,12 +4251,12 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOAS_TestOACompOutletNodeIndex)
     MixedAir::GetOASysInputFlag = false;
     MixedAir::GetOAMixerInputs(state);
 
-    DataAirSystems::PrimaryAirSystem.allocate(5);
-    DataAirSystems::PrimaryAirSystem(1).Name = "PSZ-AC:1";
-    DataAirSystems::PrimaryAirSystem(2).Name = "PSZ-AC:2";
-    DataAirSystems::PrimaryAirSystem(3).Name = "PSZ-AC:3";
-    DataAirSystems::PrimaryAirSystem(4).Name = "PSZ-AC:4";
-    DataAirSystems::PrimaryAirSystem(5).Name = "PSZ-AC:5";
+    state.dataAirSystemsData->PrimaryAirSystems.allocate(5);
+    state.dataAirSystemsData->PrimaryAirSystems(1).Name = "PSZ-AC:1";
+    state.dataAirSystemsData->PrimaryAirSystems(2).Name = "PSZ-AC:2";
+    state.dataAirSystemsData->PrimaryAirSystems(3).Name = "PSZ-AC:3";
+    state.dataAirSystemsData->PrimaryAirSystems(4).Name = "PSZ-AC:4";
+    state.dataAirSystemsData->PrimaryAirSystems(5).Name = "PSZ-AC:5";
 
     AirLoopHVACDOAS::AirLoopDOAS::getAirLoopDOASInput(state);
 

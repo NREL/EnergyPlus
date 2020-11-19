@@ -142,7 +142,6 @@ namespace HeatBalanceManager {
     // Use statements for data only modules
     // Using/Aliasing
     using namespace DataComplexFenestration;
-    using namespace DataGlobals;
     using namespace DataEnvironment;
     using namespace DataHeatBalFanSys;
     using namespace DataHeatBalance;
@@ -382,13 +381,13 @@ namespace HeatBalanceManager {
 
         ManageEMS(state, EMSManager::EMSCallFrom::EndZoneTimestepAfterZoneReporting, anyRan, ObjexxFCL::Optional_int_const()); // EMS calling point
 
-        UpdateEMSTrendVariables();
+        UpdateEMSTrendVariables(state);
         EnergyPlus::PluginManagement::PluginManager::updatePluginValues(state);
 
-        if (WarmupFlag && EndDayFlag) {
+        if (state.dataGlobal->WarmupFlag && state.dataGlobal->EndDayFlag) {
 
             CheckWarmupConvergence(state);
-            if (!WarmupFlag) {
+            if (!state.dataGlobal->WarmupFlag) {
                 state.dataGlobal->DayOfSim = 0; // Reset DayOfSim if Warmup converged
                 state.dataGlobal->DayOfSimChr = "0";
 
@@ -396,7 +395,7 @@ namespace HeatBalanceManager {
             }
         }
 
-        if (!WarmupFlag && EndDayFlag && state.dataGlobal->DayOfSim == 1 && !DoingSizing) {
+        if (!state.dataGlobal->WarmupFlag && state.dataGlobal->EndDayFlag && state.dataGlobal->DayOfSim == 1 && !state.dataGlobal->DoingSizing) {
             ReportWarmupConvergence(state);
         }
     }
@@ -466,7 +465,7 @@ namespace HeatBalanceManager {
         // Added TH 1/9/2009 to create thermochromic window constructions
         CreateTCConstructions(state, ErrorsFound);
 
-        if (TotSurfaces > 0 && NumOfZones == 0) {
+        if (TotSurfaces > 0 && state.dataGlobal->NumOfZones == 0) {
             ValidSimulationWithNoZones = CheckValidSimulationObjects(state);
             if (!ValidSimulationWithNoZones) {
                 ShowSevereError(state, "GetHeatBalanceInput: There are surfaces in input but no zones found.  Invalid simulation.");
@@ -548,7 +547,7 @@ namespace HeatBalanceManager {
         Unused =
             TotConstructs - std::count_if(state.dataConstruction->Construct.begin(), state.dataConstruction->Construct.end(), [](Construction::ConstructionProps const &e) { return e.IsUsed; });
         if (Unused > 0) {
-            if (!DisplayExtraWarnings) {
+            if (!state.dataGlobal->DisplayExtraWarnings) {
                 ShowWarningError(state, format("CheckUsedConstructions: There are {} nominally unused constructions in input.", Unused));
                 ShowContinueError(state, "For explicit details on each unused construction, use Output:Diagnostics,DisplayExtraWarnings;");
             } else {
@@ -1023,13 +1022,13 @@ namespace HeatBalanceManager {
                     OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_CondFD;
                     DataHeatBalance::AnyCondFD = true;
                     DataHeatBalance::AllCTF = false;
-                    if (NumOfTimeStepInHour < 20) {
+                    if (state.dataGlobal->NumOfTimeStepInHour < 20) {
                         ShowSevereError(
                             state,
                             format("GetSolutionAlgorithm: {} {} is Conduction Finite Difference but Number of TimeSteps in Hour < 20, Value is {}.",
                                    CurrentModuleObject,
                                    cAlphaFieldNames(1),
-                                   NumOfTimeStepInHour));
+                                   state.dataGlobal->NumOfTimeStepInHour));
                         ShowContinueError(state, "...Suggested minimum number of time steps in hour for Conduction Finite Difference solutions is 20. "
                                           "Errors or inaccurate calculations may occur.");
                     }
@@ -1038,13 +1037,13 @@ namespace HeatBalanceManager {
                     OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_HAMT;
                     DataHeatBalance::AnyHAMT = true;
                     DataHeatBalance::AllCTF = false;
-                    if (NumOfTimeStepInHour < 20) {
+                    if (state.dataGlobal->NumOfTimeStepInHour < 20) {
                         ShowSevereError(state,
                                         format("GetSolutionAlgorithm: {} {} is Combined Heat and Moisture Finite Element but Number of TimeSteps in "
                                                "Hour < 20, Value is {}.",
                                                CurrentModuleObject,
                                                cAlphaFieldNames(1),
-                                               NumOfTimeStepInHour));
+                                               state.dataGlobal->NumOfTimeStepInHour));
                         ShowContinueError(state, "...Suggested minimum number of time steps in hour for Combined Heat and Moisture Finite Element solutions "
                                           "is 20. Errors or inaccurate calculations may occur.");
                         ShowContinueError(state, "...If the simulation crashes, look at material properties (esp porosity), use timestep=60, or less layers "
@@ -3954,7 +3953,7 @@ namespace HeatBalanceManager {
 
         //  FORMATS.
 
-        if (AnyEnergyManagementSystemInModel) { // setup surface property EMS actuators
+        if (state.dataGlobal->AnyEnergyManagementSystemInModel) { // setup surface property EMS actuators
 
             for (MaterNum = 1; MaterNum <= TotMaterials; ++MaterNum) {
                 if (dataMaterial.Material(MaterNum).Group != RegularMaterial) continue;
@@ -4649,12 +4648,12 @@ namespace HeatBalanceManager {
             } else {
                 window5DataFileName = ConstructAlphas(1);
             }
-            DisplayString("Searching Window5 data file for Construction=" + ConstructAlphas(0));
+            DisplayString(state, "Searching Window5 data file for Construction=" + ConstructAlphas(0));
 
             SearchWindow5DataFile(state, window5DataFileName, ConstructAlphas(0), ConstructionFound, EOFonW5File, ErrorsFound);
 
             if (EOFonW5File || !ConstructionFound) {
-                DisplayString("--Construction not found");
+                DisplayString(state, "--Construction not found");
                 ErrorsFound = true;
                 ShowSevereError(state, "No match on WINDOW5 data file for Construction=" + ConstructAlphas(0) + ", or error in data file.");
                 ShowContinueError(state, "...Looking on file=" + window5DataFileName);
@@ -4774,16 +4773,16 @@ namespace HeatBalanceManager {
         int GroupNum;
 
         cCurrentModuleObject = "Zone";
-        NumOfZones = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataGlobal->NumOfZones = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
-        Zone.allocate(NumOfZones);
-        DataViewFactorInformation::ZoneRadiantInfo.allocate(NumOfZones);
-        DataViewFactorInformation::ZoneSolarInfo.allocate(NumOfZones);
-        ZoneDaylight.allocate(NumOfZones);
+        Zone.allocate(state.dataGlobal->NumOfZones);
+        DataViewFactorInformation::ZoneRadiantInfo.allocate(state.dataGlobal->NumOfZones);
+        DataViewFactorInformation::ZoneSolarInfo.allocate(state.dataGlobal->NumOfZones);
+        ZoneDaylight.allocate(state.dataGlobal->NumOfZones);
 
         ZoneLoop = 0;
 
-        for (Loop = 1; Loop <= NumOfZones; ++Loop) {
+        for (Loop = 1; Loop <= state.dataGlobal->NumOfZones; ++Loop) {
 
             rNumericArgs = 0.0; // Zero out just in case
             inputProcessor->getObjectItem(state,
@@ -4827,7 +4826,7 @@ namespace HeatBalanceManager {
 
         } // Loop
 
-        for (Loop = 1; Loop <= NumOfZones; ++Loop) {
+        for (Loop = 1; Loop <= state.dataGlobal->NumOfZones; ++Loop) {
             // Check to see if "nominally" controlled -- Zone Name appears in Zone Equip Configuration
             // relies on zone name being the "name" of the Zone Controlled Equip Configuration
             if (inputProcessor->getObjectItemNum(state, "ZoneHVAC:EquipmentConnections", "zone_name", Zone(Loop).Name) > 0) {
@@ -4970,7 +4969,7 @@ namespace HeatBalanceManager {
         GetZoneLocalEnvData(state, ErrorsFound);
 
         // allocate the array the holds the predefined report data
-        ZonePreDefRep.allocate(NumOfZones);
+        ZonePreDefRep.allocate(state.dataGlobal->NumOfZones);
     }
 
     void GetZoneLocalEnvData(EnergyPlusData &state, bool &ErrorsFound) // Error flag indicator (true if errors found)
@@ -5026,7 +5025,7 @@ namespace HeatBalanceManager {
 
         if (TotZoneEnv > 0) {
             // Check if IDD definition is correct
-            AnyLocalEnvironmentsInModel = true;
+            state.dataGlobal->AnyLocalEnvironmentsInModel = true;
 
             if (!allocated(ZoneLocalEnvironment)) {
                 ZoneLocalEnvironment.allocate(TotZoneEnv);
@@ -5076,7 +5075,7 @@ namespace HeatBalanceManager {
             }
         }
         // Link zone properties to zone object
-        for (ZoneLoop = 1; ZoneLoop <= NumOfZones; ++ZoneLoop) {
+        for (ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) {
             for (Loop = 1; Loop <= TotZoneEnv; ++Loop) {
                 if (ZoneLocalEnvironment(Loop).ZonePtr == ZoneLoop) {
                     if (ZoneLocalEnvironment(Loop).OutdoorAirNodePtr != 0) {
@@ -5095,11 +5094,11 @@ namespace HeatBalanceManager {
                          int &NumAlphas,
                          Array1D<Real64> const &rNumericArgs,
                          int &NumNumbers,
-                         Array1D_bool const &EP_UNUSED(lNumericFieldBlanks), // Unused
+                         [[maybe_unused]] Array1D_bool const &lNumericFieldBlanks, // Unused
                          Array1D_bool const &lAlphaFieldBlanks,
                          Array1D_string const &cAlphaFieldNames,
-                         Array1D_string const &EP_UNUSED(cNumericFieldNames), // Unused
-                         bool &ErrorsFound                                   // If errors found in input
+                         [[maybe_unused]] Array1D_string const &cNumericFieldNames, // Unused
+                         bool &ErrorsFound                                          // If errors found in input
     )
     {
 
@@ -5282,16 +5281,16 @@ namespace HeatBalanceManager {
         if (state.dataGlobal->BeginSimFlag) {
             AllocateHeatBalArrays(state); // Allocate the Module Arrays
             if (DataHeatBalance::AnyCTF || DataHeatBalance::AnyEMPD) {
-                DisplayString("Initializing Response Factors");
+                DisplayString(state, "Initializing Response Factors");
                 InitConductionTransferFunctions(state); // Initialize the response factors
             }
 
-            DisplayString("Initializing Window Optical Properties");
+            DisplayString(state, "Initializing Window Optical Properties");
             InitEquivalentLayerWindowCalculations(state); // Initialize the EQL window optical properties
             // InitGlassOpticalCalculations(); // Initialize the window optical properties
             InitWindowOpticalCalculations(state);
             InitDaylightingDevices(state); // Initialize any daylighting devices
-            DisplayString("Initializing Solar Calculations");
+            DisplayString(state, "Initializing Solar Calculations");
             InitSolarCalculations(state); // Initialize the shadowing calculations
         }
 
@@ -5324,7 +5323,7 @@ namespace HeatBalanceManager {
             }
         }
 
-        if (DataGlobals::AnyEnergyManagementSystemInModel) {
+        if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
             HeatBalanceSurfaceManager::InitEMSControlledConstructions(state);
             HeatBalanceSurfaceManager::InitEMSControlledSurfaceProperties(state);
         }
@@ -5343,12 +5342,12 @@ namespace HeatBalanceManager {
             }
         }
 
-        if (state.dataGlobal->BeginSimFlag && DoWeathSim && ReportExtShadingSunlitFrac) {
+        if (state.dataGlobal->BeginSimFlag && state.dataGlobal->DoWeathSim && ReportExtShadingSunlitFrac) {
             OpenShadingFile(state);
         }
 
         if (state.dataGlobal->BeginDayFlag) {
-            if (!WarmupFlag) {
+            if (!state.dataGlobal->WarmupFlag) {
                 if (state.dataGlobal->DayOfSim == 1) {
                     MaxHeatLoadZone = -9999.0;
                     MaxCoolLoadZone = -9999.0;
@@ -5365,14 +5364,14 @@ namespace HeatBalanceManager {
             PerformSolarCalculations(state);
         }
 
-        if (state.dataGlobal->BeginDayFlag && !WarmupFlag && state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather && ReportExtShadingSunlitFrac) {
+        if (state.dataGlobal->BeginDayFlag && !state.dataGlobal->WarmupFlag && state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather && ReportExtShadingSunlitFrac) {
             for (int iHour = 1; iHour <= 24; ++iHour) { // Do for all hours.
-                for (int TS = 1; TS <= NumOfTimeStepInHour; ++TS) {
+                for (int TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
                     static constexpr auto ShdFracFmt1(" {:02}/{:02} {:02}:{:02},");
-                        if (TS == NumOfTimeStepInHour) {
+                        if (TS == state.dataGlobal->NumOfTimeStepInHour) {
                             print(state.files.shade, ShdFracFmt1, Month, DayOfMonth, iHour, 0);
                         } else {
-                            print(state.files.shade, ShdFracFmt1, Month, DayOfMonth, iHour - 1, (60 / NumOfTimeStepInHour) * TS);
+                            print(state.files.shade, ShdFracFmt1, Month, DayOfMonth, iHour - 1, (60 / state.dataGlobal->NumOfTimeStepInHour) * TS);
                         }
                     for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
                         static constexpr auto ShdFracFmt2("{:10.8F},");
@@ -5394,9 +5393,9 @@ namespace HeatBalanceManager {
         SetZoneWindDirAt();
 
         // Set zone data to linked air node value if defined.
-        if (AnyLocalEnvironmentsInModel) {
+        if (state.dataGlobal->AnyLocalEnvironmentsInModel) {
             SetOutAirNodes(state);
-            for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+            for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 if (Zone(ZoneNum).HasLinkedOutAirNode) {
                     if (Node(Zone(ZoneNum).LinkedOutAirNode).OutAirDryBulbSchedNum > 0) {
                         Zone(ZoneNum).OutDryBulbTemp = GetCurrentScheduleValue(state, Node(Zone(ZoneNum).LinkedOutAirNode).OutAirDryBulbSchedNum);
@@ -5423,8 +5422,8 @@ namespace HeatBalanceManager {
         }
 
         // Overwriting surface and zone level environmental data with EMS override value
-        if (AnyEnergyManagementSystemInModel) {
-            for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+        if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
+            for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 if (Zone(ZoneNum).OutDryBulbTempEMSOverrideOn) {
                     Zone(ZoneNum).OutDryBulbTemp = Zone(ZoneNum).OutDryBulbTempEMSOverrideValue;
                 }
@@ -5482,116 +5481,116 @@ namespace HeatBalanceManager {
         // Allocate real Variables
         // Following used for Calculations
         //  Allocate variables in DataHeatBalSys
-        SumConvHTRadSys.dimension(NumOfZones, 0.0);
-        SumLatentHTRadSys.dimension(NumOfZones, 0.0);
-        SumConvPool.dimension(NumOfZones, 0.0);
-        SumLatentPool.dimension(NumOfZones, 0.0);
-        QHTRadSysToPerson.dimension(NumOfZones, 0.0);
-        QHWBaseboardToPerson.dimension(NumOfZones, 0.0);
-        QSteamBaseboardToPerson.dimension(NumOfZones, 0.0);
-        QElecBaseboardToPerson.dimension(NumOfZones, 0.0);
-        QCoolingPanelToPerson.dimension(NumOfZones, 0.0);
-        XMAT.dimension(NumOfZones, 23.0);
-        XM2T.dimension(NumOfZones, 23.0);
-        XM3T.dimension(NumOfZones, 23.0);
-        XM4T.dimension(NumOfZones, 23.0);
-        DSXMAT.dimension(NumOfZones, 23.0);
-        DSXM2T.dimension(NumOfZones, 23.0);
-        DSXM3T.dimension(NumOfZones, 23.0);
-        DSXM4T.dimension(NumOfZones, 23.0);
-        XMPT.dimension(NumOfZones, 23.0);
-        MCPI.dimension(NumOfZones, 0.0);
-        MCPTI.dimension(NumOfZones, 0.0);
-        MCPV.dimension(NumOfZones, 0.0);
-        MCPTV.dimension(NumOfZones, 0.0);
-        MCPM.dimension(NumOfZones, 0.0);
-        MCPTM.dimension(NumOfZones, 0.0);
-        MixingMassFlowZone.dimension(NumOfZones, 0.0);
-        MixingMassFlowXHumRat.dimension(NumOfZones, 0.0);
-        ZoneReOrder.allocate(NumOfZones);
-        ZoneMassBalanceFlag.dimension(NumOfZones, false);
-        ZoneInfiltrationFlag.dimension(NumOfZones, false);
+        SumConvHTRadSys.dimension(state.dataGlobal->NumOfZones, 0.0);
+        SumLatentHTRadSys.dimension(state.dataGlobal->NumOfZones, 0.0);
+        SumConvPool.dimension(state.dataGlobal->NumOfZones, 0.0);
+        SumLatentPool.dimension(state.dataGlobal->NumOfZones, 0.0);
+        QHTRadSysToPerson.dimension(state.dataGlobal->NumOfZones, 0.0);
+        QHWBaseboardToPerson.dimension(state.dataGlobal->NumOfZones, 0.0);
+        QSteamBaseboardToPerson.dimension(state.dataGlobal->NumOfZones, 0.0);
+        QElecBaseboardToPerson.dimension(state.dataGlobal->NumOfZones, 0.0);
+        QCoolingPanelToPerson.dimension(state.dataGlobal->NumOfZones, 0.0);
+        XMAT.dimension(state.dataGlobal->NumOfZones, 23.0);
+        XM2T.dimension(state.dataGlobal->NumOfZones, 23.0);
+        XM3T.dimension(state.dataGlobal->NumOfZones, 23.0);
+        XM4T.dimension(state.dataGlobal->NumOfZones, 23.0);
+        DSXMAT.dimension(state.dataGlobal->NumOfZones, 23.0);
+        DSXM2T.dimension(state.dataGlobal->NumOfZones, 23.0);
+        DSXM3T.dimension(state.dataGlobal->NumOfZones, 23.0);
+        DSXM4T.dimension(state.dataGlobal->NumOfZones, 23.0);
+        XMPT.dimension(state.dataGlobal->NumOfZones, 23.0);
+        MCPI.dimension(state.dataGlobal->NumOfZones, 0.0);
+        MCPTI.dimension(state.dataGlobal->NumOfZones, 0.0);
+        MCPV.dimension(state.dataGlobal->NumOfZones, 0.0);
+        MCPTV.dimension(state.dataGlobal->NumOfZones, 0.0);
+        MCPM.dimension(state.dataGlobal->NumOfZones, 0.0);
+        MCPTM.dimension(state.dataGlobal->NumOfZones, 0.0);
+        MixingMassFlowZone.dimension(state.dataGlobal->NumOfZones, 0.0);
+        MixingMassFlowXHumRat.dimension(state.dataGlobal->NumOfZones, 0.0);
+        ZoneReOrder.allocate(state.dataGlobal->NumOfZones);
+        ZoneMassBalanceFlag.dimension(state.dataGlobal->NumOfZones, false);
+        ZoneInfiltrationFlag.dimension(state.dataGlobal->NumOfZones, false);
         ZoneReOrder = 0;
-        ZoneLatentGain.dimension(NumOfZones, 0.0);
-        ZoneLatentGainExceptPeople.dimension(NumOfZones, 0.0); // Added for hybrid model
-        OAMFL.dimension(NumOfZones, 0.0);
-        VAMFL.dimension(NumOfZones, 0.0);
-        ZTAV.dimension(NumOfZones, 23.0);
-        ZTAVComf.dimension(NumOfZones, 23.0);
-        ZT.dimension(NumOfZones, 23.0);
-        TempTstatAir.dimension(NumOfZones, 23.0);
-        MAT.dimension(NumOfZones, 23.0);
-        ZoneTMX.dimension(NumOfZones, 23.0);
-        ZoneTM2.dimension(NumOfZones, 23.0);
+        ZoneLatentGain.dimension(state.dataGlobal->NumOfZones, 0.0);
+        ZoneLatentGainExceptPeople.dimension(state.dataGlobal->NumOfZones, 0.0); // Added for hybrid model
+        OAMFL.dimension(state.dataGlobal->NumOfZones, 0.0);
+        VAMFL.dimension(state.dataGlobal->NumOfZones, 0.0);
+        ZTAV.dimension(state.dataGlobal->NumOfZones, 23.0);
+        ZTAVComf.dimension(state.dataGlobal->NumOfZones, 23.0);
+        ZT.dimension(state.dataGlobal->NumOfZones, 23.0);
+        TempTstatAir.dimension(state.dataGlobal->NumOfZones, 23.0);
+        MAT.dimension(state.dataGlobal->NumOfZones, 23.0);
+        ZoneTMX.dimension(state.dataGlobal->NumOfZones, 23.0);
+        ZoneTM2.dimension(state.dataGlobal->NumOfZones, 23.0);
         // Allocate this zone air humidity ratio
-        ZoneAirHumRatAvg.dimension(NumOfZones, 0.01);
-        ZoneAirHumRatAvgComf.dimension(NumOfZones, 0.01);
-        ZoneAirHumRat.dimension(NumOfZones, 0.01);
-        ZoneAirHumRatOld.dimension(NumOfZones, 0.01);
-        SumHmAW.dimension(NumOfZones, 0.0);
-        SumHmARa.dimension(NumOfZones, 0.0);
-        SumHmARaW.dimension(NumOfZones, 0.0);
-        MCPTE.dimension(NumOfZones, 0.0);
-        MCPE.dimension(NumOfZones, 0.0);
-        EAMFL.dimension(NumOfZones, 0.0);
-        EAMFLxHumRat.dimension(NumOfZones, 0.0);
-        MCPTC.dimension(NumOfZones, 0.0);
-        MCPC.dimension(NumOfZones, 0.0);
-        CTMFL.dimension(NumOfZones, 0.0);
-        MDotCPOA.dimension(NumOfZones, 0.0);
-        MDotOA.dimension(NumOfZones, 0.0);
+        ZoneAirHumRatAvg.dimension(state.dataGlobal->NumOfZones, 0.01);
+        ZoneAirHumRatAvgComf.dimension(state.dataGlobal->NumOfZones, 0.01);
+        ZoneAirHumRat.dimension(state.dataGlobal->NumOfZones, 0.01);
+        ZoneAirHumRatOld.dimension(state.dataGlobal->NumOfZones, 0.01);
+        SumHmAW.dimension(state.dataGlobal->NumOfZones, 0.0);
+        SumHmARa.dimension(state.dataGlobal->NumOfZones, 0.0);
+        SumHmARaW.dimension(state.dataGlobal->NumOfZones, 0.0);
+        MCPTE.dimension(state.dataGlobal->NumOfZones, 0.0);
+        MCPE.dimension(state.dataGlobal->NumOfZones, 0.0);
+        EAMFL.dimension(state.dataGlobal->NumOfZones, 0.0);
+        EAMFLxHumRat.dimension(state.dataGlobal->NumOfZones, 0.0);
+        MCPTC.dimension(state.dataGlobal->NumOfZones, 0.0);
+        MCPC.dimension(state.dataGlobal->NumOfZones, 0.0);
+        CTMFL.dimension(state.dataGlobal->NumOfZones, 0.0);
+        MDotCPOA.dimension(state.dataGlobal->NumOfZones, 0.0);
+        MDotOA.dimension(state.dataGlobal->NumOfZones, 0.0);
         if (Contaminant.CO2Simulation) {
             OutdoorCO2 = GetCurrentScheduleValue(state, Contaminant.CO2OutdoorSchedPtr);
-            ZoneAirCO2.dimension(NumOfZones, OutdoorCO2);
-            ZoneAirCO2Temp.dimension(NumOfZones, OutdoorCO2);
-            ZoneAirCO2Avg.dimension(NumOfZones, OutdoorCO2);
+            ZoneAirCO2.dimension(state.dataGlobal->NumOfZones, OutdoorCO2);
+            ZoneAirCO2Temp.dimension(state.dataGlobal->NumOfZones, OutdoorCO2);
+            ZoneAirCO2Avg.dimension(state.dataGlobal->NumOfZones, OutdoorCO2);
         }
         if (Contaminant.GenericContamSimulation) {
             OutdoorGC = GetCurrentScheduleValue(state, Contaminant.GenericContamOutdoorSchedPtr);
-            ZoneAirGC.dimension(NumOfZones, OutdoorGC);
-            ZoneAirGCTemp.dimension(NumOfZones, OutdoorGC);
-            ZoneAirGCAvg.dimension(NumOfZones, OutdoorGC);
+            ZoneAirGC.dimension(state.dataGlobal->NumOfZones, OutdoorGC);
+            ZoneAirGCTemp.dimension(state.dataGlobal->NumOfZones, OutdoorGC);
+            ZoneAirGCAvg.dimension(state.dataGlobal->NumOfZones, OutdoorGC);
         }
-        MaxTempPrevDay.dimension(NumOfZones, 0.0);
-        MinTempPrevDay.dimension(NumOfZones, 0.0);
-        MaxHeatLoadPrevDay.dimension(NumOfZones, 0.0);
-        MaxCoolLoadPrevDay.dimension(NumOfZones, 0.0);
-        MaxHeatLoadZone.dimension(NumOfZones, -9999.0);
-        MaxCoolLoadZone.dimension(NumOfZones, -9999.0);
-        MaxTempZone.dimension(NumOfZones, -9999.0);
-        MinTempZone.dimension(NumOfZones, 1000.0);
-        TempZonePrevDay.dimension(NumOfZones, 0.0);
-        LoadZonePrevDay.dimension(NumOfZones, 0.0);
-        TempZoneSecPrevDay.dimension(NumOfZones, 0.0);
-        LoadZoneSecPrevDay.dimension(NumOfZones, 0.0);
-        WarmupTempDiff.dimension(NumOfZones, 0.0);
-        WarmupLoadDiff.dimension(NumOfZones, 0.0);
-        TempZone.dimension(NumOfZones, 0.0);
-        LoadZone.dimension(NumOfZones, 0.0);
-        TempZoneRpt.dimension(NumOfZones, NumOfTimeStepInHour * 24, 0.0);
-        LoadZoneRpt.dimension(NumOfZones, NumOfTimeStepInHour * 24, 0.0);
-        MaxLoadZoneRpt.dimension(NumOfZones, NumOfTimeStepInHour * 24, 0.0);
-        WarmupConvergenceValues.allocate(NumOfZones);
-        TempZoneRptStdDev.allocate(NumOfTimeStepInHour * 24);
-        LoadZoneRptStdDev.allocate(NumOfTimeStepInHour * 24);
+        MaxTempPrevDay.dimension(state.dataGlobal->NumOfZones, 0.0);
+        MinTempPrevDay.dimension(state.dataGlobal->NumOfZones, 0.0);
+        MaxHeatLoadPrevDay.dimension(state.dataGlobal->NumOfZones, 0.0);
+        MaxCoolLoadPrevDay.dimension(state.dataGlobal->NumOfZones, 0.0);
+        MaxHeatLoadZone.dimension(state.dataGlobal->NumOfZones, -9999.0);
+        MaxCoolLoadZone.dimension(state.dataGlobal->NumOfZones, -9999.0);
+        MaxTempZone.dimension(state.dataGlobal->NumOfZones, -9999.0);
+        MinTempZone.dimension(state.dataGlobal->NumOfZones, 1000.0);
+        TempZonePrevDay.dimension(state.dataGlobal->NumOfZones, 0.0);
+        LoadZonePrevDay.dimension(state.dataGlobal->NumOfZones, 0.0);
+        TempZoneSecPrevDay.dimension(state.dataGlobal->NumOfZones, 0.0);
+        LoadZoneSecPrevDay.dimension(state.dataGlobal->NumOfZones, 0.0);
+        WarmupTempDiff.dimension(state.dataGlobal->NumOfZones, 0.0);
+        WarmupLoadDiff.dimension(state.dataGlobal->NumOfZones, 0.0);
+        TempZone.dimension(state.dataGlobal->NumOfZones, 0.0);
+        LoadZone.dimension(state.dataGlobal->NumOfZones, 0.0);
+        TempZoneRpt.dimension(state.dataGlobal->NumOfZones, state.dataGlobal->NumOfTimeStepInHour * 24, 0.0);
+        LoadZoneRpt.dimension(state.dataGlobal->NumOfZones, state.dataGlobal->NumOfTimeStepInHour * 24, 0.0);
+        MaxLoadZoneRpt.dimension(state.dataGlobal->NumOfZones, state.dataGlobal->NumOfTimeStepInHour * 24, 0.0);
+        WarmupConvergenceValues.allocate(state.dataGlobal->NumOfZones);
+        TempZoneRptStdDev.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
+        LoadZoneRptStdDev.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
         // MassConservation.allocate( NumOfZones );
 
-        ZoneHeatIndex.dimension(NumOfZones, 0.0);
-        ZoneHumidex.dimension(NumOfZones, 0.0);
-        ZoneNumOcc.dimension(NumOfZones, 0);
-        ZoneHeatIndexHourBins.allocate(NumOfZones);
-        ZoneHumidexHourBins.allocate(NumOfZones);
-        ZoneHeatIndexOccuHourBins.allocate(NumOfZones);
-        ZoneHumidexOccuHourBins.allocate(NumOfZones);
-        ZoneCO2LevelHourBins.allocate(NumOfZones);
-        ZoneCO2LevelOccuHourBins.allocate(NumOfZones);
-        ZoneLightingLevelHourBins.allocate(NumOfZones);
-        ZoneLightingLevelOccuHourBins.allocate(NumOfZones);
+        ZoneHeatIndex.dimension(state.dataGlobal->NumOfZones, 0.0);
+        ZoneHumidex.dimension(state.dataGlobal->NumOfZones, 0.0);
+        ZoneNumOcc.dimension(state.dataGlobal->NumOfZones, 0);
+        ZoneHeatIndexHourBins.allocate(state.dataGlobal->NumOfZones);
+        ZoneHumidexHourBins.allocate(state.dataGlobal->NumOfZones);
+        ZoneHeatIndexOccuHourBins.allocate(state.dataGlobal->NumOfZones);
+        ZoneHumidexOccuHourBins.allocate(state.dataGlobal->NumOfZones);
+        ZoneCO2LevelHourBins.allocate(state.dataGlobal->NumOfZones);
+        ZoneCO2LevelOccuHourBins.allocate(state.dataGlobal->NumOfZones);
+        ZoneLightingLevelHourBins.allocate(state.dataGlobal->NumOfZones);
+        ZoneLightingLevelOccuHourBins.allocate(state.dataGlobal->NumOfZones);
 
-        ZoneOccPierceSET.dimension(NumOfZones, 0);
-        ZoneOccPierceSETLastStep.dimension(NumOfZones, 0);
-        ZoneLowSETHours.allocate(NumOfZones);
-        ZoneHighSETHours.allocate(NumOfZones);
+        ZoneOccPierceSET.dimension(state.dataGlobal->NumOfZones, 0);
+        ZoneOccPierceSETLastStep.dimension(state.dataGlobal->NumOfZones, 0);
+        ZoneLowSETHours.allocate(state.dataGlobal->NumOfZones);
+        ZoneHighSETHours.allocate(state.dataGlobal->NumOfZones);
 
         CountWarmupDayPoints = 0;
     }
@@ -5625,7 +5624,7 @@ namespace HeatBalanceManager {
         // FLOW:
 
         // Record Maxs & Mins for individual zone
-        for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+        for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             if (ZTAV(ZoneNum) > MaxTempZone(ZoneNum)) {
                 MaxTempZone(ZoneNum) = ZTAV(ZoneNum);
             }
@@ -5648,7 +5647,7 @@ namespace HeatBalanceManager {
             LoadZone(ZoneNum) = max(SNLoadHeatRate(ZoneNum), std::abs(SNLoadCoolRate(ZoneNum)));
 
             // Calculate differences in temperature and load for the last two warmup days
-            if (!WarmupFlag && state.dataGlobal->DayOfSim == 1 && !DoingSizing) {
+            if (!state.dataGlobal->WarmupFlag && state.dataGlobal->DayOfSim == 1 && !state.dataGlobal->DoingSizing) {
                 WarmupTempDiff(ZoneNum) = std::abs(TempZoneSecPrevDay(ZoneNum) - TempZonePrevDay(ZoneNum));
                 WarmupLoadDiff(ZoneNum) = std::abs(LoadZoneSecPrevDay(ZoneNum) - LoadZonePrevDay(ZoneNum));
                 if (ZoneNum == 1) ++CountWarmupDayPoints;
@@ -5664,7 +5663,7 @@ namespace HeatBalanceManager {
                         FirstWarmupWrite = false;
                     }
                     static constexpr auto Format_731{" Warmup Convergence Information, {},{},{},{:.10R},{:.10R}\n"};
-                    print(state.files.eio, Format_731, Zone(ZoneNum).Name, TimeStep, HourOfDay, WarmupTempDiff(ZoneNum), WarmupLoadDiff(ZoneNum));
+                    print(state.files.eio, Format_731, Zone(ZoneNum).Name, state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, WarmupTempDiff(ZoneNum), WarmupLoadDiff(ZoneNum));
                 }
             }
         }
@@ -5723,10 +5722,10 @@ namespace HeatBalanceManager {
 
         ConvergenceChecksFailed = false;
 
-        if (NumOfZones <= 0) { // if there are no zones, immediate convergence
-            WarmupFlag = false;
+        if (state.dataGlobal->NumOfZones <= 0) { // if there are no zones, immediate convergence
+            state.dataGlobal->WarmupFlag = false;
         } else {
-            for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+            for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
 
                 WarmupConvergenceValues(ZoneNum).TestMaxTempValue = std::abs(MaxTempPrevDay(ZoneNum) - MaxTempZone(ZoneNum));
                 WarmupConvergenceValues(ZoneNum).TestMinTempValue = std::abs(MinTempPrevDay(ZoneNum) - MinTempZone(ZoneNum));
@@ -5774,17 +5773,17 @@ namespace HeatBalanceManager {
                     WarmupConvergenceValues(ZoneNum).PassFlag(4) = 2;
                 }
 
-                if (state.dataGlobal->DayOfSim >= MaxNumberOfWarmupDays && WarmupFlag) {
+                if (state.dataGlobal->DayOfSim >= MaxNumberOfWarmupDays && state.dataGlobal->WarmupFlag) {
                     // Check convergence for individual zone
                     if (sum(WarmupConvergenceValues(ZoneNum).PassFlag) != 8) { // pass=2 * 4 values for convergence
                         ShowSevereError(state,
                                         format("CheckWarmupConvergence: Loads Initialization, Zone=\"{}\" did not converge after {} warmup days.",
                                                Zone(ZoneNum).Name,
                                                MaxNumberOfWarmupDays));
-                        if (!WarmupConvergenceWarning && !DoingSizing) {
+                        if (!WarmupConvergenceWarning && !state.dataGlobal->DoingSizing) {
                             ShowContinueError(state, "See Warmup Convergence Information in .eio file for details.");
                             WarmupConvergenceWarning = true;
-                        } else if (!SizingWarmupConvergenceWarning && DoingSizing) {
+                        } else if (!SizingWarmupConvergenceWarning && state.dataGlobal->DoingSizing) {
                             ShowContinueError(state, "Warmup Convergence failing during sizing.");
                             SizingWarmupConvergenceWarning = true;
                         }
@@ -5835,7 +5834,7 @@ namespace HeatBalanceManager {
             // experience with the (I)BLAST program.  If too many warmup days were
             // required, notify the program user.
 
-            if ((state.dataGlobal->DayOfSim >= MaxNumberOfWarmupDays) && WarmupFlag && ConvergenceChecksFailed) {
+            if ((state.dataGlobal->DayOfSim >= MaxNumberOfWarmupDays) && state.dataGlobal->WarmupFlag && ConvergenceChecksFailed) {
                 if (MaxNumberOfWarmupDays < DefaultMaxNumberOfWarmupDays) {
                     ShowSevereError(state,
                                     format("CheckWarmupConvergence: User supplied maximum warmup days={} is insufficient.", MaxNumberOfWarmupDays));
@@ -5846,15 +5845,15 @@ namespace HeatBalanceManager {
             // Set warmup flag to true depending on value of ConvergenceChecksFailed (true=fail)
             // and minimum number of warmup days
             if (!ConvergenceChecksFailed && state.dataGlobal->DayOfSim >= MinNumberOfWarmupDays) {
-                WarmupFlag = false;
+                state.dataGlobal->WarmupFlag = false;
             } else if (!ConvergenceChecksFailed && state.dataGlobal->DayOfSim < MinNumberOfWarmupDays) {
-                WarmupFlag = true;
+                state.dataGlobal->WarmupFlag = true;
             }
 
             // If max warmup days reached and still WarmupFlag, then go to non-warmup state.
             // prior messages will have been displayed
-            if ((state.dataGlobal->DayOfSim >= MaxNumberOfWarmupDays) && WarmupFlag) {
-                WarmupFlag = false;
+            if ((state.dataGlobal->DayOfSim >= MaxNumberOfWarmupDays) && state.dataGlobal->WarmupFlag) {
+                state.dataGlobal->WarmupFlag = false;
             }
         }
     }
@@ -5908,9 +5907,9 @@ namespace HeatBalanceManager {
             "Temperature Pass/Fail Convergence,Average Warmup Load Difference {{W}},Std Dev Warmup Load Difference "
             "{{W}},Heating Load Pass/Fail Convergence,Cooling Load Pass/Fail Convergence\n");
 
-        if (!WarmupFlag) { // Report out average/std dev
+        if (!state.dataGlobal->WarmupFlag) { // Report out average/std dev
             // Write Warmup Convervence Information to the initialization output file
-            if (ReportWarmupConvergenceFirstWarmupWrite && NumOfZones > 0) {
+            if (ReportWarmupConvergenceFirstWarmupWrite && state.dataGlobal->NumOfZones > 0) {
                 print(state.files.eio, Format_730);
                 ReportWarmupConvergenceFirstWarmupWrite = false;
             }
@@ -5924,7 +5923,7 @@ namespace HeatBalanceManager {
                 EnvHeader = "SizingPeriod:";
             }
 
-            for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+            for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 AverageZoneTemp = sum(TempZoneRpt(ZoneNum, {1, CountWarmupDayPoints})) / double(CountWarmupDayPoints);
                 for (Num = 1; Num <= CountWarmupDayPoints; ++Num) {
                     if (MaxLoadZoneRpt(ZoneNum, Num) > 1.e-4) {
@@ -5967,7 +5966,7 @@ namespace HeatBalanceManager {
 
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
             auto &thisSurface(DataSurfaces::Surface(SurfNum));
-            if (thisSurface.Class == DataSurfaces::SurfaceClass_Window) {
+            if (thisSurface.Class == DataSurfaces::SurfaceClass::Window) {
                 auto &thisConstruct(thisSurface.Construction);
                 if (!state.dataConstruction->Construct(thisConstruct).WindowTypeBSDF && !state.dataConstruction->Construct(thisConstruct).TypeIsAirBoundaryInteriorWindow) {
                     SurfWinFenLaySurfTempFront(1, SurfNum) = TH(1, 1, SurfNum);
@@ -6013,7 +6012,7 @@ namespace HeatBalanceManager {
 
         ReportScheduleValues(state);
 
-        if (!WarmupFlag && DoOutputReporting) {
+        if (!state.dataGlobal->WarmupFlag && state.dataGlobal->DoOutputReporting) {
             CalcMoreNodeInfo(state);
             UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepZone);
             if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeDesignDay || state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeRunPeriodDesign) {
@@ -6022,20 +6021,20 @@ namespace HeatBalanceManager {
 
             UpdateTabularReports(state, OutputProcessor::TimeStepType::TimeStepZone);
             UpdateUtilityBills(state);
-        } else if (!KickOffSimulation && DoOutputReporting && ReportDuringWarmup) {
+        } else if (!state.dataGlobal->KickOffSimulation && state.dataGlobal->DoOutputReporting && ReportDuringWarmup) {
             if (state.dataGlobal->BeginDayFlag && !PrintEnvrnStampWarmupPrinted) {
                 PrintEnvrnStampWarmup = true;
                 PrintEnvrnStampWarmupPrinted = true;
             }
             if (!state.dataGlobal->BeginDayFlag) PrintEnvrnStampWarmupPrinted = false;
             if (PrintEnvrnStampWarmup) {
-                if (PrintEndDataDictionary && DoOutputReporting) {
+                if (PrintEndDataDictionary && state.dataGlobal->DoOutputReporting) {
                     static constexpr auto EndOfHeaderString("End of Data Dictionary"); // End of data dictionary marker
                     print(state.files.eso, "{}\n", EndOfHeaderString);
                     print(state.files.mtr, "{}\n", EndOfHeaderString);
                     PrintEndDataDictionary = false;
                 }
-                if (DoOutputReporting) {
+                if (state.dataGlobal->DoOutputReporting) {
                     static constexpr auto EnvironmentStampFormatStr("{},{},{:7.2F},{:7.2F},{:7.2F},{:7.2F}\n"); // Format descriptor for environ stamp
                     print(state.files.eso,
                           EnvironmentStampFormatStr,
@@ -7124,13 +7123,13 @@ namespace HeatBalanceManager {
             }
 
             if (FrameWidth > 0.0 && DividerWidth(1) > 0.0) {
-                DisplayString("--Construction and associated frame and divider found");
+                DisplayString(state, "--Construction and associated frame and divider found");
             } else if (FrameWidth > 0.0) {
-                DisplayString("--Construction and associated frame found");
+                DisplayString(state, "--Construction and associated frame found");
             } else if (DividerWidth(1) > 0.0) {
-                DisplayString("--Construction and associated divider found");
+                DisplayString(state, "--Construction and associated divider found");
             } else {
-                DisplayString("--Construction without frame or divider found");
+                DisplayString(state, "--Construction without frame or divider found");
             }
         }
 
@@ -7785,7 +7784,7 @@ namespace HeatBalanceManager {
         // Check if scheduled surface gains are assigined to each surface in every zone.  If not then warning message to user will be
         // issued
         if ((TotSurfIncSolSSG > 0) || (TotFenLayAbsSSG > 0)) {
-            for (iZone = 1; iZone <= NumOfZones; ++iZone) {
+            for (iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
                 CheckScheduledSurfaceGains(state, iZone);
             }
         }
@@ -7839,7 +7838,7 @@ namespace HeatBalanceManager {
 
         for (iSurf = Zone(ZoneNum).SurfaceFirst; iSurf <= Zone(ZoneNum).SurfaceLast; ++iSurf) {
             iConst = Surface(iSurf).Construction;
-            if (Surface(iSurf).Class == SurfaceClass_Window) {
+            if (Surface(iSurf).Class == SurfaceClass::Window) {
                 SchedPtr = WindowScheduledSolarAbs(iSurf, iConst);
             } else {
                 SchedPtr = SurfaceScheduledSolarInc(iSurf, iConst);
@@ -7872,7 +7871,7 @@ namespace HeatBalanceManager {
         if ((!ZoneScheduled) && (!ZoneUnscheduled)) {
             for (iSurf = Zone(ZoneNum).SurfaceFirst; iSurf <= Zone(ZoneNum).SurfaceLast; ++iSurf) {
                 iConst = Surface(iSurf).Construction;
-                if (Surface(iSurf).Class == SurfaceClass_Window) {
+                if (Surface(iSurf).Class == SurfaceClass::Window) {
                     SchedPtr = WindowScheduledSolarAbs(iSurf, iConst);
                 } else {
                     SchedPtr = SurfaceScheduledSolarInc(iSurf, iConst);
@@ -7885,7 +7884,7 @@ namespace HeatBalanceManager {
         }
     }
 
-    void CreateTCConstructions(EnergyPlusData &state, bool &EP_UNUSED(ErrorsFound)) // If errors found in input
+    void CreateTCConstructions(EnergyPlusData &state, [[maybe_unused]] bool &ErrorsFound) // If errors found in input
     {
 
         // SUBROUTINE INFORMATION:

@@ -51,7 +51,6 @@
 #include <gtest/gtest.h>
 
 #include "AutosizingFixture.hh"
-#include "../Fixtures/EnergyPlusFixture.hh"
 #include "../Fixtures/SQLiteFixture.hh"
 
 // EnergyPlus Headers
@@ -60,27 +59,20 @@
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
-#include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
-#include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/SimulationManager.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
-#include <EnergyPlus/WeatherManager.hh>
 
 using namespace EnergyPlus;
 using namespace ObjexxFCL;
 using namespace EnergyPlus::DataAirSystems;
-using namespace EnergyPlus::DataGlobals;
 using namespace EnergyPlus::DataEnvironment;
 using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataSizing;
-using namespace EnergyPlus::DataZoneEquipment;
 using namespace EnergyPlus::Fans;
 using namespace EnergyPlus::Psychrometrics;
 
@@ -282,10 +274,10 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystem)
     FinalSysSizing(CurSysNum).DesCoolVolFlow = 1.00;
     FinalSysSizing(CurSysNum).DesOutAirVolFlow = 0.2;
 
-    PrimaryAirSystem.allocate(1);
-    PrimaryAirSystem(CurSysNum).NumOACoolCoils = 0;
-    PrimaryAirSystem(CurSysNum).SupFanNum = 0;
-    PrimaryAirSystem(CurSysNum).RetFanNum = 0;
+    state.dataAirSystemsData->PrimaryAirSystems.allocate(1);
+    state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).NumOACoolCoils = 0;
+    state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).SupFanNum = 0;
+    state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).RetFanNum = 0;
 
     SysSizingRunDone = true;
     SysSizInput.allocate(1);
@@ -458,11 +450,11 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystemWithFans)
     FinalSysSizing(CurSysNum).DesCoolVolFlow = 1.00;
     FinalSysSizing(CurSysNum).DesOutAirVolFlow = 0.2;
 
-    PrimaryAirSystem.allocate(1);
-    PrimaryAirSystem(CurSysNum).NumOACoolCoils = 0;
-    PrimaryAirSystem(CurSysNum).SupFanNum = 0;
-    PrimaryAirSystem(CurSysNum).RetFanNum = 0;
-    PrimaryAirSystem(CurSysNum).supFanModelTypeEnum = DataAirSystems::fanModelTypeNotYetSet;
+    state.dataAirSystemsData->PrimaryAirSystems.allocate(1);
+    state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).NumOACoolCoils = 0;
+    state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).SupFanNum = 0;
+    state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).RetFanNum = 0;
+    state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).supFanModelTypeEnum = DataAirSystems::fanModelTypeNotYetSet;
 
     SysSizingRunDone = true;
     SysSizInput.allocate(1);
@@ -497,9 +489,9 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystemWithFans)
     Real64 dxCoilSizeNoFan = SizingResult;
 
     // With Test Fan 4 fan heat
-    PrimaryAirSystem(CurSysNum).SupFanNum = 1;
-    PrimaryAirSystem(CurSysNum).RetFanNum = 0;
-    PrimaryAirSystem(CurSysNum).supFanModelTypeEnum = DataAirSystems::structArrayLegacyFanModels;
+    state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).SupFanNum = 1;
+    state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).RetFanNum = 0;
+    state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).supFanModelTypeEnum = DataAirSystems::structArrayLegacyFanModels;
     CompType = "COIL:COOLING:DX:SINGLESPEED";
     CompName = "Single Speed DX Cooling Coil";
     SizingType = DataHVACGlobals::CoolingCapacitySizing;
@@ -517,10 +509,10 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystemWithFans)
     EXPECT_NEAR(expectedDXCoilSize, SizingResult, 0.1);
 
     // With Test Fan 3 fan heat - this fails before the #6126 fix
-    PrimaryAirSystem(CurSysNum).SupFanNum = 2;
-    PrimaryAirSystem(CurSysNum).supFanVecIndex = 2;
-    PrimaryAirSystem(CurSysNum).RetFanNum = 0;
-    PrimaryAirSystem(CurSysNum).supFanModelTypeEnum = DataAirSystems::objectVectorOOFanSystemModel;
+    state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).SupFanNum = 2;
+    state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).supFanVecIndex = 2;
+    state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).RetFanNum = 0;
+    state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).supFanModelTypeEnum = DataAirSystems::objectVectorOOFanSystemModel;
     CompType = "COIL:COOLING:DX:SINGLESPEED";
     CompName = "Single Speed DX Cooling Coil";
     SizingType = DataHVACGlobals::CoolingCapacitySizing;
@@ -879,11 +871,11 @@ TEST_F(EnergyPlusFixture, BaseSizer_FanPeak)
 {
 
     // This is needed to compute time of Peak as a string
-    DataGlobals::NumOfTimeStepInHour = 4;
-    DataGlobals::MinutesPerTimeStep = 15;
+    state.dataGlobal->NumOfTimeStepInHour = 4;
+    state.dataGlobal->MinutesPerTimeStep = 15;
 
     // Setup the predefined tables, because that's where the info is written.
-    EnergyPlus::OutputReportPredefined::SetPredefinedTables();
+    EnergyPlus::OutputReportPredefined::SetPredefinedTables(state);
 
     // If you wanted to check SQL, you also need this:
     // We enable the report we care about, making sure it's the right one

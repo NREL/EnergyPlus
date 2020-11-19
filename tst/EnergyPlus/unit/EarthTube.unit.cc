@@ -61,7 +61,6 @@ using namespace EnergyPlus;
 using namespace EnergyPlus::EarthTube;
 using namespace EnergyPlus::DataHeatBalFanSys;
 using namespace ObjexxFCL;
-using namespace DataGlobals;
 using namespace EnergyPlus::DataEnvironment;
 
 namespace EnergyPlus {

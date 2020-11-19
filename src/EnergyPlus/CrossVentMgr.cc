@@ -83,7 +83,6 @@ namespace CrossVentMgr {
     // PURPOSE OF THIS MODULE:
     // Routines that implement the UCSD Cross Ventilation
 
-    using namespace DataGlobals;
     using namespace DataEnvironment;
     using namespace DataHeatBalance;
     using namespace DataHeatBalSurface;
@@ -141,7 +140,7 @@ namespace CrossVentMgr {
 
         // Do the one time initializations
         if (state.dataCrossVentMgr->InitUCSDCV_MyOneTimeFlag) {
-            state.dataCrossVentMgr->InitUCSDCV_MyEnvrnFlag.dimension(NumOfZones, true);
+            state.dataCrossVentMgr->InitUCSDCV_MyEnvrnFlag.dimension(state.dataGlobal->NumOfZones, true);
             state.dataCrossVentMgr->InitUCSDCV_MyOneTimeFlag = false;
         }
 

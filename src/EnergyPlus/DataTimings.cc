@@ -96,7 +96,7 @@ namespace DataTimings {
 
     void epStartTime(
 #ifdef EP_NO_Timings
-        std::string const &EP_UNUSED(ctimingElementstring)
+        [[maybe_unused]] std::string const &ctimingElementstring
 #endif
 #ifdef EP_Timings
             std::string const &ctimingElementstring
@@ -158,12 +158,12 @@ namespace DataTimings {
 
     void epStopTime(
 #ifdef EP_NO_Timings
-        std::string const &EP_UNUSED(ctimingElementstring),
-        Optional_bool_const EP_UNUSED(printit), // true if it should be printed here.
-        Optional_string_const EP_UNUSED(wprint) // only needed (and assumed, if printit is true)
+        [[maybe_unused]] std::string const &ctimingElementstring,
+        [[maybe_unused]] Optional_bool_const printit, // true if it should be printed here.
+        [[maybe_unused]] Optional_string_const wprint // only needed (and assumed, if printit is true)
 #endif
 #ifdef EP_Timings
-        std::string const &ctimingElementstring,
+            std::string const &ctimingElementstring,
         Optional_bool_const printit, // true if it should be printed here.
         Optional_string_const wprint // only needed (and assumed, if printit is true)
 #endif
@@ -244,10 +244,10 @@ namespace DataTimings {
     void epSummaryTimes(
 #ifdef EP_NO_Timings
         InputOutputFile &,
-        Real64 &EP_UNUSED(TimeUsed_CPUTime)
+        [[maybe_unused]] Real64 &TimeUsed_CPUTime
 #endif
 #ifdef EP_Timings
-        InputOutputFile &auditFile,
+            InputOutputFile &auditFile,
         Real64 &TimeUsed_CPUTime
 #endif
     )

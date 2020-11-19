@@ -388,13 +388,13 @@ bool EnergyPlusFixture::process_idd(std::string const &idd, bool &errors_found)
     return errors_found;
 }
 
-bool EnergyPlusFixture::compare_idf(std::string const &EP_UNUSED(name),
-                                    int const EP_UNUSED(num_alphas),
-                                    int const EP_UNUSED(num_numbers),
-                                    std::vector<std::string> const &EP_UNUSED(alphas),
-                                    std::vector<bool> const &EP_UNUSED(alphas_blank),
-                                    std::vector<Real64> const &EP_UNUSED(numbers),
-                                    std::vector<bool> const &EP_UNUSED(numbers_blank))
+bool EnergyPlusFixture::compare_idf([[maybe_unused]] std::string const &name,
+                                    [[maybe_unused]] int const num_alphas,
+                                    [[maybe_unused]] int const num_numbers,
+                                    [[maybe_unused]] std::vector<std::string> const &alphas,
+                                    [[maybe_unused]] std::vector<bool> const &alphas_blank,
+                                    [[maybe_unused]] std::vector<Real64> const &numbers,
+                                    [[maybe_unused]] std::vector<bool> const &numbers_blank)
 {
     // using namespace InputProcessor;
 

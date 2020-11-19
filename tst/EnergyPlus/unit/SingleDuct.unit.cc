@@ -124,14 +124,14 @@ TEST_F(EnergyPlusFixture, VAVNoReheatTerminalUnitSchedule)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
-    DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
+    state.dataGlobal->NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
+    state.dataGlobal->MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(state); // read schedules
     ScheduleManager::ScheduleInputProcessed = true;
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
-    DataGlobals::HourOfDay = 1;
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->HourOfDay = 1;
+    state.dataGlobal->TimeStep = 1;
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
@@ -295,14 +295,14 @@ TEST_F(EnergyPlusFixture, VAVReheatTerminalUnitSchedule)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
-    DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
+    state.dataGlobal->NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
+    state.dataGlobal->MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(state); // read schedules
     ScheduleManager::ScheduleInputProcessed = true;
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
-    DataGlobals::HourOfDay = 1;
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->HourOfDay = 1;
+    state.dataGlobal->TimeStep = 1;
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
@@ -2751,11 +2751,11 @@ TEST_F(EnergyPlusFixture, setATMixerSizingProperties_Test)
     SingleDuct::SysATMixer(1).DesignPrimaryAirVolRate = FinalSysSizing(1).DesMainVolFlow;
     SingleDuct::SysATMixer(1).MixerType = DataHVACGlobals::ATMixer_InletSide;
 
-    DataAirSystems::PrimaryAirSystem.allocate(1);
-    DataAirSystems::PrimaryAirSystem(1).CentralCoolCoilExists = true;
-    DataAirSystems::PrimaryAirSystem(1).CentralHeatCoilExists = true;
-    DataAirSystems::PrimaryAirSystem(1).NumOAHeatCoils = 1;
-    DataAirSystems::PrimaryAirSystem(1).NumOACoolCoils = 1;
+    state.dataAirSystemsData->PrimaryAirSystems.allocate(1);
+    state.dataAirSystemsData->PrimaryAirSystems(1).CentralCoolCoilExists = true;
+    state.dataAirSystemsData->PrimaryAirSystems(1).CentralHeatCoilExists = true;
+    state.dataAirSystemsData->PrimaryAirSystems(1).NumOAHeatCoils = 1;
+    state.dataAirSystemsData->PrimaryAirSystems(1).NumOACoolCoils = 1;
 
     ZoneEqSizing.allocate(1);
 
@@ -2771,8 +2771,8 @@ TEST_F(EnergyPlusFixture, setATMixerSizingProperties_Test)
     EXPECT_DOUBLE_EQ(ZoneEqSizing(1).ATMixerHeatPriDryBulb, FinalSysSizing(1).HeatSupTemp);
     EXPECT_DOUBLE_EQ(ZoneEqSizing(1).ATMixerHeatPriHumRat, FinalSysSizing(1).HeatSupHumRat);
 
-    DataAirSystems::PrimaryAirSystem(1).CentralCoolCoilExists = false;
-    DataAirSystems::PrimaryAirSystem(1).CentralHeatCoilExists = false;
+    state.dataAirSystemsData->PrimaryAirSystems(1).CentralCoolCoilExists = false;
+    state.dataAirSystemsData->PrimaryAirSystems(1).CentralHeatCoilExists = false;
     // set ATMixer properties used for sizing
     SingleDuct::setATMixerSizingProperties(state, ATMixerIndex, ControlledZoneNum, CurZoneEqNum);
 
@@ -2790,8 +2790,8 @@ TEST_F(EnergyPlusFixture, setATMixerSizingProperties_Test)
     EXPECT_NEAR(ZoneEqSizing(1).ATMixerHeatPriDryBulb, FinalSysSizing(1).PreheatTemp, 0.0000001);
     EXPECT_NEAR(ZoneEqSizing(1).ATMixerHeatPriHumRat, FinalSysSizing(1).PreheatHumRat, 0.0000001);
 
-    DataAirSystems::PrimaryAirSystem(1).NumOAHeatCoils = 0;
-    DataAirSystems::PrimaryAirSystem(1).NumOACoolCoils = 0;
+    state.dataAirSystemsData->PrimaryAirSystems(1).NumOAHeatCoils = 0;
+    state.dataAirSystemsData->PrimaryAirSystems(1).NumOACoolCoils = 0;
     SingleDuct::SysATMixer(1).DesignPrimaryAirVolRate *= 2.0;
 
     SingleDuct::setATMixerSizingProperties(state, ATMixerIndex, ControlledZoneNum, CurZoneEqNum);

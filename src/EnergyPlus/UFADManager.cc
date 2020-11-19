@@ -104,7 +104,6 @@ namespace UFADManager {
     // na
 
     // Using/Aliasing
-    using namespace DataGlobals;
     using namespace DataLoopNode;
     using namespace DataEnvironment;
     using namespace DataHeatBalance;
@@ -142,7 +141,6 @@ namespace UFADManager {
         // Note that much of the initialization is done in RoomAirManager, SharedDVCVUFDataInit
 
         // Using/Aliasing
-        using namespace DataGlobals;
         using namespace DataLoopNode;
         using namespace DataEnvironment;
         using namespace DataHeatBalance;
@@ -199,7 +197,7 @@ namespace UFADManager {
             state.dataUFADManager->ThickOccupiedSubzoneMin = 0.2;
             state.dataUFADManager->HeightIntMassDefault = 2.0;
             state.dataUFADManager->MyOneTimeFlag = false;
-            MySizeFlag.dimension(NumOfZones, true);
+            MySizeFlag.dimension(state.dataGlobal->NumOfZones, true);
         }
 
         if (MySizeFlag(ZoneNum)) {
@@ -1020,8 +1018,8 @@ namespace UFADManager {
 
         // Exact solution or Euler method
         if (ZoneAirSolutionAlgo != Use3rdOrder) {
-            if (ShortenTimeStepSysRoomAir && TimeStepSys < TimeStepZone) {
-                if (PreviousTimeStep < TimeStepZone) {
+            if (ShortenTimeStepSysRoomAir && TimeStepSys < state.dataGlobal->TimeStepZone) {
+                if (PreviousTimeStep < state.dataGlobal->TimeStepZone) {
                     Zone1OC(ZoneNum) = ZoneM2OC(ZoneNum);
                     Zone1MX(ZoneNum) = ZoneM2MX(ZoneNum);
                 } else {
@@ -1494,8 +1492,8 @@ namespace UFADManager {
 
         // Exact solution or Euler method
         if (ZoneAirSolutionAlgo != Use3rdOrder) {
-            if (ShortenTimeStepSysRoomAir && TimeStepSys < TimeStepZone) {
-                if (PreviousTimeStep < TimeStepZone) {
+            if (ShortenTimeStepSysRoomAir && TimeStepSys < state.dataGlobal->TimeStepZone) {
+                if (PreviousTimeStep < state.dataGlobal->TimeStepZone) {
                     Zone1OC(ZoneNum) = ZoneM2OC(ZoneNum);
                     Zone1MX(ZoneNum) = ZoneM2MX(ZoneNum);
                 } else {

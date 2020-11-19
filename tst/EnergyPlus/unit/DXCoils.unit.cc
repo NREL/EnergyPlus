@@ -207,7 +207,7 @@ TEST_F(EnergyPlusFixture, DXCoils_Test1)
     state.dataCurveManager->PerfCurve(CurveNum).Var2Min = -100.0;
     state.dataCurveManager->PerfCurve(CurveNum).Var2Max = 100.0;
 
-    SetPredefinedTables();
+    SetPredefinedTables(state);
     SizeDXCoil(state, 2);
     EXPECT_DOUBLE_EQ(5000.0, DXCoil(2).DefrostCapacity);
 
@@ -279,10 +279,10 @@ TEST_F(EnergyPlusFixture, DXCoils_Test2)
     int DXCoilNum;
     int CurveNum;
 
-    DataGlobals::DisplayExtraWarnings = true;
+    state.dataGlobal->DisplayExtraWarnings = true;
     SysSizingRunDone = true;
     FinalSysSizing.allocate(1);
-    PrimaryAirSystem.allocate(1);
+    state.dataAirSystemsData->PrimaryAirSystems.allocate(1);
     state.dataAirLoop->AirLoopControlInfo.allocate(1);
     CurSysNum = 1;
     NumDXCoils = 2;
@@ -359,7 +359,7 @@ TEST_F(EnergyPlusFixture, DXCoils_Test2)
     state.dataCurveManager->PerfCurve(CurveNum).Var2Min = -100.0;
     state.dataCurveManager->PerfCurve(CurveNum).Var2Max = 100.0;
 
-    SetPredefinedTables();
+    SetPredefinedTables(state);
     SizeDXCoil(state, 2);
     EXPECT_DOUBLE_EQ(0.0, DXCoil(2).RatedTotCap(1));
 
@@ -382,7 +382,7 @@ TEST_F(EnergyPlusFixture, DXCoils_Test2)
     // Clean up
     UnitarySysEqSizing.deallocate();
     FinalSysSizing.deallocate();
-    PrimaryAirSystem.deallocate();
+    state.dataAirSystemsData->PrimaryAirSystems.deallocate();
     state.dataAirLoop->AirLoopControlInfo.deallocate();
 }
 
@@ -1070,7 +1070,7 @@ TEST_F(EnergyPlusFixture, DXCoilEvapCondPumpSizingTest)
     ASSERT_EQ(1, NumDXCoils);
     EXPECT_EQ(DataSizing::AutoSize, DXCoil(1).EvapCondPumpElecNomPower(1));
 
-    SetPredefinedTables();
+    SetPredefinedTables(state);
 
     SizeDXCoil(state, 1);
     EXPECT_EQ(25000.0, DXCoil(1).RatedTotCap(1));
@@ -1450,7 +1450,7 @@ TEST_F(EnergyPlusFixture, DXCoil_ValidateADPFunction)
     ProcessScheduleInput(state);
     GetCurveInput(state);
     GetDXCoils(state);
-    SetPredefinedTables();
+    SetPredefinedTables(state);
     CurZoneEqNum = 1;
 
     // Need this to prevent crash in Sizers
@@ -1696,7 +1696,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoolingCrankcaseOutput)
 
     state.dataAirLoop->AirLoopInputsFilled = true;
 
-    DataGlobals::SysSizingCalc = true;
+    state.dataGlobal->SysSizingCalc = true;
 
     InitDXCoil(state, 1);
 
@@ -1705,7 +1705,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoolingCrankcaseOutput)
     EXPECT_EQ("Cooling Coil Crankcase Heater Electricity Rate", OutputProcessor::DDVariableTypes(10).VarNameOnly);
     EXPECT_EQ("Cooling Coil Crankcase Heater Electricity Energy", OutputProcessor::DDVariableTypes(11).VarNameOnly);
 
-    DataGlobals::SysSizingCalc = false;
+    state.dataGlobal->SysSizingCalc = false;
     state.dataAirLoop->AirLoopInputsFilled = false;
 }
 
@@ -2194,10 +2194,10 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_TwoSpeed)
     DataSizing::FinalSysSizing(CurSysNum).DesCoolVolFlow = 1.00;
     DataSizing::FinalSysSizing(CurSysNum).DesOutAirVolFlow = 0.2;
 
-    DataAirSystems::PrimaryAirSystem.allocate(1);
-    DataAirSystems::PrimaryAirSystem(CurSysNum).NumOACoolCoils = 0;
-    DataAirSystems::PrimaryAirSystem(CurSysNum).SupFanNum = 0;
-    DataAirSystems::PrimaryAirSystem(CurSysNum).RetFanNum = 0;
+    state.dataAirSystemsData->PrimaryAirSystems.allocate(1);
+    state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).NumOACoolCoils = 0;
+    state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).SupFanNum = 0;
+    state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).RetFanNum = 0;
 
     DataSizing::SysSizingRunDone = true;
     DataSizing::SysSizInput.allocate(1);
@@ -2220,7 +2220,7 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_TwoSpeed)
     // OutputReportTabular::displayEioSummary = true;
 
     // Setting predefined tables is needed though
-    OutputReportPredefined::SetPredefinedTables();
+    OutputReportPredefined::SetPredefinedTables(state);
 
     // SizeDXCoil is the one doing the sizing AND the reporting
     DXCoils::SizeDXCoil(state, 1);
@@ -2420,10 +2420,10 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_SingleSpeed)
     DataSizing::FinalSysSizing(CurSysNum).DesCoolVolFlow = 1.00;
     DataSizing::FinalSysSizing(CurSysNum).DesOutAirVolFlow = 0.2;
 
-    DataAirSystems::PrimaryAirSystem.allocate(1);
-    DataAirSystems::PrimaryAirSystem(CurSysNum).NumOACoolCoils = 0;
-    DataAirSystems::PrimaryAirSystem(CurSysNum).SupFanNum = 0;
-    DataAirSystems::PrimaryAirSystem(CurSysNum).RetFanNum = 0;
+    state.dataAirSystemsData->PrimaryAirSystems.allocate(1);
+    state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).NumOACoolCoils = 0;
+    state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).SupFanNum = 0;
+    state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).RetFanNum = 0;
 
     DataSizing::SysSizingRunDone = true;
     DataSizing::SysSizInput.allocate(1);
@@ -2445,7 +2445,7 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_SingleSpeed)
     // OutputReportTabular::displayEioSummary = true;
 
     // Setting predefined tables is needed though
-    OutputReportPredefined::SetPredefinedTables();
+    OutputReportPredefined::SetPredefinedTables(state);
 
     // SizeDXCoil is the one doing the sizing AND the reporting
     DXCoils::SizeDXCoil(state, 1);
@@ -2890,7 +2890,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedHeatingCoilSizingOutput)
 
     // get input
     GetDXCoils(state);
-    SetPredefinedTables();
+    SetPredefinedTables(state);
     // check multi-speed DX cooling coil
     EXPECT_EQ("ASHP CLG COIL", DXCoil(1).Name);
     EXPECT_EQ("Coil:Cooling:DX:MultiSpeed", DXCoil(1).DXCoilType);
@@ -3106,7 +3106,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoolingCoilTabularReporting)
     // get input
     GetDXCoils(state);
     // Setup the predefined tables
-    EnergyPlus::OutputReportPredefined::SetPredefinedTables();
+    EnergyPlus::OutputReportPredefined::SetPredefinedTables(state);
     // check multi-speed DX cooling coil
     EXPECT_EQ("ASHP CLG COIL", DXCoil(1).Name);
     EXPECT_EQ("Coil:Cooling:DX:MultiSpeed", DXCoil(1).DXCoilType);
@@ -3509,7 +3509,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoilsAutoSizingOutput)
 
     // get input
     GetDXCoils(state);
-    SetPredefinedTables();
+    SetPredefinedTables(state);
     // check multi-speed DX cooling coil
     EXPECT_EQ("ASHP CLG COIL", DXCoil(1).Name);
     EXPECT_EQ("Coil:Cooling:DX:MultiSpeed", DXCoil(1).DXCoilType);
@@ -3531,10 +3531,10 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoilsAutoSizingOutput)
     DataSizing::FinalSysSizing(CurSysNum).MixHumRatAtCoolPeak = 0.0095218208835786931;
     DataSizing::FinalSysSizing(CurSysNum).OutTempAtCoolPeak = 28.244709704058657;
 
-    DataAirSystems::PrimaryAirSystem.allocate(1);
-    DataAirSystems::PrimaryAirSystem(CurSysNum).NumOACoolCoils = 0;
-    DataAirSystems::PrimaryAirSystem(CurSysNum).SupFanNum = 0;
-    DataAirSystems::PrimaryAirSystem(CurSysNum).RetFanNum = 0;
+    state.dataAirSystemsData->PrimaryAirSystems.allocate(1);
+    state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).NumOACoolCoils = 0;
+    state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).SupFanNum = 0;
+    state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).RetFanNum = 0;
 
     DataSizing::SysSizInput.allocate(1);
     DataSizing::SysSizInput(1).AirLoopNum = CurSysNum;
@@ -3761,7 +3761,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoolingCoilPartialAutoSizeOutput)
 
     // get input
     GetDXCoils(state);
-    SetPredefinedTables();
+    SetPredefinedTables(state);
     // check multi-speed DX cooling coil
     EXPECT_EQ("ASHP CLG COIL", DXCoil(1).Name);
     EXPECT_EQ("Coil:Cooling:DX:MultiSpeed", DXCoil(1).DXCoilType);
@@ -3783,10 +3783,10 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoolingCoilPartialAutoSizeOutput)
     DataSizing::FinalSysSizing(CurSysNum).MixHumRatAtCoolPeak = 0.0095218208835786931;
     DataSizing::FinalSysSizing(CurSysNum).OutTempAtCoolPeak = 28.244709704058657;
 
-    DataAirSystems::PrimaryAirSystem.allocate(1);
-    DataAirSystems::PrimaryAirSystem(CurSysNum).NumOACoolCoils = 0;
-    DataAirSystems::PrimaryAirSystem(CurSysNum).SupFanNum = 0;
-    DataAirSystems::PrimaryAirSystem(CurSysNum).RetFanNum = 0;
+    state.dataAirSystemsData->PrimaryAirSystems.allocate(1);
+    state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).NumOACoolCoils = 0;
+    state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).SupFanNum = 0;
+    state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).RetFanNum = 0;
 
     DataSizing::SysSizInput.allocate(1);
     DataSizing::SysSizInput(1).AirLoopNum = CurSysNum;

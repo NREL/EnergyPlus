@@ -111,7 +111,7 @@ namespace BoilerSteam {
     }
 
     void BoilerSpecs::simulate(
-        EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation), bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
+        EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
     {
         this->initialize(state);
         auto &sim_component(DataPlant::PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).Branch(this->BranchNum).Comp(this->CompNum));
@@ -119,7 +119,8 @@ namespace BoilerSteam {
         this->update(CurLoad, RunFlag, FirstHVACIteration);
     }
 
-    void BoilerSpecs::getDesignCapacities(EnergyPlusData &EP_UNUSED(state), const PlantLocation &, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
+    void
+    BoilerSpecs::getDesignCapacities([[maybe_unused]] EnergyPlusData &state, const PlantLocation &, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
     {
         MinLoad = this->NomCap * this->MinPartLoadRat;
         MaxLoad = this->NomCap * this->MaxPartLoadRat;
@@ -370,7 +371,7 @@ namespace BoilerSteam {
 
             if ((DataLoopNode::Node(this->BoilerOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&
                 (DataLoopNode::Node(this->BoilerOutletNodeNum).TempSetPointLo == DataLoopNode::SensedNodeFlagValue)) {
-                if (!DataGlobals::AnyEnergyManagementSystemInModel) {
+                if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                     if (!this->MissingSetPointErrDone) {
                         ShowWarningError(state, "Missing temperature setpoint for Boiler:Steam = " + this->Name);
                         ShowContinueError(state, " A temperature setpoint is needed at the outlet node of the boiler, use a SetpointManager");
@@ -512,7 +513,7 @@ namespace BoilerSteam {
                                                          tmpNomCap,
                                                          "User-Specified Nominal Capacity [W]",
                                                          NomCapUser);
-                            if (DataGlobals::DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpNomCap - NomCapUser) / NomCapUser) > DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizePump: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError(state, format("User-Specified Nominal Capacity of {:.2R} [W]", NomCapUser));
@@ -551,7 +552,7 @@ namespace BoilerSteam {
     void BoilerSpecs::calculate(EnergyPlusData &state,
                                 Real64 &MyLoad,         // W - hot water demand to be met by boiler
                                 bool const RunFlag,     // TRUE if boiler operating
-                                int const EquipFlowCtrl // Flow control mode for the equipment
+                                DataBranchAirLoopPlant::ControlTypeEnum const EquipFlowCtrl // Flow control mode for the equipment
     )
     {
         // SUBROUTINE INFORMATION:
@@ -592,7 +593,7 @@ namespace BoilerSteam {
         // if the component control is SERIESACTIVE we set the component flow to inlet flow so that flow resolver
         // will not shut down the branch
         if (MyLoad <= 0.0 || !RunFlag) {
-            if (EquipFlowCtrl == DataBranchAirLoopPlant::ControlType_SeriesActive)
+            if (EquipFlowCtrl == DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive)
                 this->BoilerMassFlowRate = DataLoopNode::Node(this->BoilerInletNodeNum).MassFlowRate;
             return;
         }
@@ -609,7 +610,7 @@ namespace BoilerSteam {
                 ShowContinueError(state, format("Steam temperature=[{:.2R}] C", this->BoilerOutletTemp));
                 ShowContinueError(state, format("Refrigerant Saturation Pressure =[{:.0R}] Pa", this->BoilerPressCheck));
             }
-            ShowRecurringSevereErrorAtEnd("Boiler:Steam=\"" + this->Name +
+            ShowRecurringSevereErrorAtEnd(state, "Boiler:Steam=\"" + this->Name +
                                               "\", Saturation Pressure is greater than Maximum Operating Pressure..continues",
                                           this->PressErrIndex,
                                           this->BoilerPressCheck,
@@ -783,9 +784,9 @@ namespace BoilerSteam {
 
     // Beginning of Record Keeping subroutines for the BOILER:SIMPLE Module
 
-    void BoilerSpecs::update(Real64 const MyLoad,                     // boiler operating load
-                             bool const RunFlag,                      // boiler on when TRUE
-                             bool const EP_UNUSED(FirstHVACIteration) // TRUE if First iteration of simulation
+    void BoilerSpecs::update(Real64 const MyLoad,                           // boiler operating load
+                             bool const RunFlag,                            // boiler on when TRUE
+                             [[maybe_unused]] bool const FirstHVACIteration // TRUE if First iteration of simulation
     )
     {
         // SUBROUTINE INFORMATION:

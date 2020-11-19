@@ -304,7 +304,6 @@ void SizingLog::SetupNewEnvironment(int const seedEnvrnNum, int const newEnvrnNu
 
 int SizingLoggerFramework::SetupVariableSizingLog(EnergyPlusData& state, Real64 &rVariable, int stepsInAverage)
 {
-    using DataGlobals::NumOfTimeStepInHour;
     int VectorLength(0);
     int const HoursPerDay(24);
 
@@ -330,10 +329,10 @@ int SizingLoggerFramework::SetupVariableSizingLog(EnergyPlusData& state, Real64 
     for (int i = 1; i <= state.dataWeatherManager->NumOfEnvrn; ++i) {
 
         if (state.dataWeatherManager->Environment(i).KindOfEnvrn == DataGlobalConstants::KindOfSim::DesignDay) {
-            tmpLog.ztStepCountByEnvrnMap[i] = HoursPerDay * NumOfTimeStepInHour;
+            tmpLog.ztStepCountByEnvrnMap[i] = HoursPerDay * state.dataGlobal->NumOfTimeStepInHour;
         }
         if (state.dataWeatherManager->Environment(i).KindOfEnvrn == DataGlobalConstants::KindOfSim::RunPeriodDesign) {
-            tmpLog.ztStepCountByEnvrnMap[i] = HoursPerDay * NumOfTimeStepInHour * state.dataWeatherManager->Environment(i).TotalDays;
+            tmpLog.ztStepCountByEnvrnMap[i] = HoursPerDay * state.dataGlobal->NumOfTimeStepInHour * state.dataWeatherManager->Environment(i).TotalDays;
         }
     }
 
@@ -373,7 +372,7 @@ ZoneTimestepObject SizingLoggerFramework::PrepareZoneTimestepStamp(EnergyPlusDat
 
     int locDayOfSim(1);
 
-    if (DataGlobals::WarmupFlag) { // DayOfSim not okay during warmup, keeps incrementing up during warmup days
+    if (state.dataGlobal->WarmupFlag) { // DayOfSim not okay during warmup, keeps incrementing up during warmup days
         locDayOfSim = 1;
     } else {
         locDayOfSim = state.dataGlobal->DayOfSim;
@@ -383,10 +382,10 @@ ZoneTimestepObject SizingLoggerFramework::PrepareZoneTimestepStamp(EnergyPlusDat
         state.dataGlobal->KindOfSim,
         state.dataWeatherManager->Envrn,
         locDayOfSim,
-        DataGlobals::HourOfDay,
-        DataGlobals::TimeStep,
+        state.dataGlobal->HourOfDay,
+        state.dataGlobal->TimeStep,
         *OutputProcessor::TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep,
-        DataGlobals::NumOfTimeStepInHour);
+        state.dataGlobal->NumOfTimeStepInHour);
 
     return tmpztStepStamp;
 }

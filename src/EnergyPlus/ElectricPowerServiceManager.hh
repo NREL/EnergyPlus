@@ -708,7 +708,7 @@ private: // Methods
 
     void reinitAtBeginEnvironment();
 
-    void updateWholeBuildingRecords();
+    void updateWholeBuildingRecords(EnergyPlusData &state);
 
     void reportPVandWindCapacity();
 

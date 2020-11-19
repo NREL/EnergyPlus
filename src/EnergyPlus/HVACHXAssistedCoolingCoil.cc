@@ -100,7 +100,6 @@ namespace HVACHXAssistedCoolingCoil {
     //  Use statements for data only modules
     // Using/Aliasing
     using namespace DataLoopNode;
-    using namespace DataGlobals;
     using namespace DataHVACGlobals;
     // unused0909USE DataEnvironment, ONLY: CurMnDy, EnvironmentName
 
@@ -1008,7 +1007,7 @@ namespace HVACHXAssistedCoolingCoil {
                                         MaxIter));
                 ShowContinueErrorTimeStamp(state, "");
             } else {
-                ShowRecurringWarningErrorAtEnd(HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilType + " \"" + HXAssistedCoil(HXAssistedCoilNum).Name +
+                ShowRecurringWarningErrorAtEnd(state, HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilType + " \"" + HXAssistedCoil(HXAssistedCoilNum).Name +
                                                    "\" -- Exceeded max iterations error continues...",
                                                HXAssistedCoil(HXAssistedCoilNum).MaxIterIndex);
             }
@@ -1057,7 +1056,8 @@ namespace HVACHXAssistedCoolingCoil {
         }
     }
 
-    void CheckHXAssistedCoolingCoilSchedule(EnergyPlusData &state, std::string const &EP_UNUSED(CompType), // unused1208
+    void CheckHXAssistedCoolingCoilSchedule(EnergyPlusData &state,
+                                            [[maybe_unused]] std::string const &CompType, // unused1208
                                             std::string const &CompName,
                                             Real64 &Value,
                                             int &CompIndex)
@@ -1173,7 +1173,7 @@ namespace HVACHXAssistedCoolingCoil {
                         HXAssistedCoil(WhichCoil).CoolingCoilType, HXAssistedCoil(WhichCoil).CoolingCoilName, errFlag);
                 }
                 if (errFlag) {
-                    ShowRecurringWarningErrorAtEnd("Requested DX Coil from CoilSystem:Cooling:DX:HeatExchangerAssisted not found", ErrCount);
+                    ShowRecurringWarningErrorAtEnd(state, "Requested DX Coil from CoilSystem:Cooling:DX:HeatExchangerAssisted not found", ErrCount);
                 }
             }
         } else if (UtilityRoutines::SameString(CoilType, "CoilSystem:Cooling:Water:HeatExchangerAssisted")) {
@@ -1181,7 +1181,7 @@ namespace HVACHXAssistedCoolingCoil {
                 // coil does not have capacity in input so mine information from DX cooling coil
                 CoilCapacity = GetWaterCoilCapacity(state, HXAssistedCoil(WhichCoil).CoolingCoilType, HXAssistedCoil(WhichCoil).CoolingCoilName, errFlag);
                 if (errFlag) {
-                    ShowRecurringWarningErrorAtEnd("Requested DX Coil from CoilSystem:Cooling:DX:HeatExchangerAssisted not found", ErrCount);
+                    ShowRecurringWarningErrorAtEnd(state, "Requested DX Coil from CoilSystem:Cooling:DX:HeatExchangerAssisted not found", ErrCount);
                 }
             }
         } else {
@@ -1746,7 +1746,7 @@ namespace HVACHXAssistedCoolingCoil {
                 if (WhichCoil != 0) {
                     // coil does not specify MaxWaterFlowRate
                     MaxWaterFlowRate = 0.0;
-                    ShowRecurringWarningErrorAtEnd("Requested Max Water Flow Rate from CoilSystem:Cooling:DX:HeatExchangerAssisted N/A", ErrCount);
+                    ShowRecurringWarningErrorAtEnd(state, "Requested Max Water Flow Rate from CoilSystem:Cooling:DX:HeatExchangerAssisted N/A", ErrCount);
                 }
             } else if (UtilityRoutines::SameString(CoilType, "CoilSystem:Cooling:Water:HeatExchangerAssisted")) {
                 if (WhichCoil != 0) {

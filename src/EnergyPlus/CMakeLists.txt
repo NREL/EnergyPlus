@@ -142,7 +142,6 @@ SET( SRC
   DataAirSystems.hh
   DataBSDFWindow.cc
   DataBSDFWindow.hh
-  DataBranchAirLoopPlant.cc
   DataBranchAirLoopPlant.hh
   DataBranchNodeConnections.cc
   DataBranchNodeConnections.hh
@@ -170,7 +169,6 @@ SET( SRC
   DataGenerators.hh
   DataGlobalConstants.cc
   DataGlobalConstants.hh
-  DataGlobals.cc
   DataGlobals.hh
   DataHVACControllers.cc
   DataHVACControllers.hh

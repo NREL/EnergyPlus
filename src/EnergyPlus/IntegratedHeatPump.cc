@@ -72,7 +72,6 @@ namespace IntegratedHeatPump {
 
     // Using/Aliasing
     using namespace DataLoopNode;
-    using namespace DataGlobals;
 
     // MODULE PARAMETER DEFINITIONS
     static std::string const BlankString;
@@ -89,21 +88,22 @@ namespace IntegratedHeatPump {
         IntegratedHeatPumps.deallocate();
     }
 
-    void SimIHP(EnergyPlusData &state, std::string const &CompName,              // Coil Name
-                int &CompIndex,                           // Index for Component name
-                int const CyclingScheme,                  // Continuous fan OR cycling compressor
-                Real64 &MaxONOFFCyclesperHour,            // Maximum cycling rate of heat pump [cycles/hr]
-                Real64 &HPTimeConstant,                   // Heat pump time constant [s]
-                Real64 &FanDelayTime,                     // Fan delay time, time delay for the HP's fan to
-                int const CompOp,                         // compressor on/off. 0 = off; 1= on
-                Real64 const PartLoadFrac,                // part load fraction
-                int const SpeedNum,                       // compressor speed number
-                Real64 const SpeedRatio,                  // compressor speed ratio
-                Real64 const SensLoad,                    // Sensible demand load [W]
-                Real64 const LatentLoad,                  // Latent demand load [W]
-                bool const IsCallbyWH,                    // whether the call from the water heating loop or air loop, true = from water heating loop
-                bool const EP_UNUSED(FirstHVACIteration), // TRUE if First iteration of simulation
-                Optional<Real64 const> OnOffAirFlowRat    // ratio of comp on to comp off air flow rate
+    void SimIHP(EnergyPlusData &state,
+                std::string const &CompName,   // Coil Name
+                int &CompIndex,                // Index for Component name
+                int const CyclingScheme,       // Continuous fan OR cycling compressor
+                Real64 &MaxONOFFCyclesperHour, // Maximum cycling rate of heat pump [cycles/hr]
+                Real64 &HPTimeConstant,        // Heat pump time constant [s]
+                Real64 &FanDelayTime,          // Fan delay time, time delay for the HP's fan to
+                int const CompOp,              // compressor on/off. 0 = off; 1= on
+                Real64 const PartLoadFrac,     // part load fraction
+                int const SpeedNum,            // compressor speed number
+                Real64 const SpeedRatio,       // compressor speed ratio
+                Real64 const SensLoad,         // Sensible demand load [W]
+                Real64 const LatentLoad,       // Latent demand load [W]
+                bool const IsCallbyWH,         // whether the call from the water heating loop or air loop, true = from water heating loop
+                [[maybe_unused]] bool const FirstHVACIteration, // TRUE if First iteration of simulation
+                Optional<Real64 const> OnOffAirFlowRat          // ratio of comp on to comp off air flow rate
     )
     {
 
@@ -2574,10 +2574,10 @@ namespace IntegratedHeatPump {
     }
 
     int GetIHPDWHCoilPLFFPLR(EnergyPlusData &state,
-                             std::string const &CoilType,            // must match coil types in this module
-                             std::string const &CoilName,            // must match coil names for the coil type
-                             IHPOperationMode const EP_UNUSED(Mode), // mode coil type
-                             bool &ErrorsFound                       // set to true if problem
+                             std::string const &CoilType,                  // must match coil types in this module
+                             std::string const &CoilName,                  // must match coil names for the coil type
+                             [[maybe_unused]] IHPOperationMode const Mode, // mode coil type
+                             bool &ErrorsFound                             // set to true if problem
     )
     {
         // FUNCTION INFORMATION:
@@ -2625,10 +2625,10 @@ namespace IntegratedHeatPump {
     }
 
     Real64 GetDWHCoilCapacityIHP(EnergyPlusData &state,
-                                 std::string const &CoilType,            // must match coil types in this module
-                                 std::string const &CoilName,            // must match coil names for the coil type
-                                 IHPOperationMode const EP_UNUSED(Mode), // mode coil type
-                                 bool &ErrorsFound                       // set to true if problem
+                                 std::string const &CoilType,                  // must match coil types in this module
+                                 std::string const &CoilName,                  // must match coil names for the coil type
+                                 [[maybe_unused]] IHPOperationMode const Mode, // mode coil type
+                                 bool &ErrorsFound                             // set to true if problem
     )
     {
 
@@ -2887,11 +2887,12 @@ namespace IntegratedHeatPump {
         return (AirVolFlowRate);
     }
 
-    Real64 GetWaterVolFlowRateIHP(EnergyPlusData &state,
+    Real64 GetWaterVolFlowRateIHP(
+        EnergyPlusData &state,
         int const DXCoilNum,
         int const SpeedNum,
         Real64 const SpeedRatio,
-        bool const EP_UNUSED(IsCallbyWH) // whether the call from the water heating loop or air loop, true = from water heating loop
+        [[maybe_unused]] bool const IsCallbyWH // whether the call from the water heating loop or air loop, true = from water heating loop
     )
     {
         int IHPCoilIndex(0);

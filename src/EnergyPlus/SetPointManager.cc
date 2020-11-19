@@ -141,9 +141,6 @@ namespace SetPointManager {
     using DataEnvironment::OutDryBulbTemp;
     using DataEnvironment::OutHumRat;
     using DataEnvironment::OutWetBulbTemp;
-    using DataGlobals::MetersHaveBeenInitialized;
-    using DataGlobals::NumOfZones;
-    using DataGlobals::RunOptCondEntTemp;
     using namespace ScheduleManager;
     using DataHVACGlobals::NumPrimaryAirSys;
     using namespace CurveManager;
@@ -3737,7 +3734,7 @@ namespace SetPointManager {
         lNumericFieldBlanks.deallocate();
     }
 
-    void VerifySetPointManagers(EnergyPlusData &state, bool &EP_UNUSED(ErrorsFound)) // flag to denote node conflicts in input. !unused1208
+    void VerifySetPointManagers(EnergyPlusData &state, [[maybe_unused]] bool &ErrorsFound) // flag to denote node conflicts in input. !unused1208
     {
 
         // SUBROUTINE INFORMATION:
@@ -3907,7 +3904,6 @@ namespace SetPointManager {
         // Uses the status flags to trigger initializations.
 
         // Using/Aliasing
-        using DataAirSystems::PrimaryAirSystem;
         using DataHeatBalance::Zone;
         using DataHVACGlobals::NumCondLoops;
         using DataHVACGlobals::NumPlantLoops;
@@ -3972,7 +3968,7 @@ namespace SetPointManager {
                     ZoneNode = SingZoneHtSetPtMgr(SetPtMgrNum).ZoneNodeNum;
                     // find the index in the ZoneEquipConfig array of the control zone (the one with the main or only thermostat)
                     ConZoneNum = 0;
-                    for (ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum) {
+                    for (ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
                         if (ZoneEquipConfig(ControlledZoneNum).ZoneNode == ZoneNode) {
                             ConZoneNum = ControlledZoneNum;
                         }
@@ -4004,7 +4000,7 @@ namespace SetPointManager {
                     ZoneNode = SingZoneClSetPtMgr(SetPtMgrNum).ZoneNodeNum;
                     // find the index in the ZoneEquipConfig array of the control zone (the one with the main or only thermostat)
                     ConZoneNum = 0;
-                    for (ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum) {
+                    for (ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
                         if (ZoneEquipConfig(ControlledZoneNum).ZoneNode == ZoneNode) {
                             ConZoneNum = ControlledZoneNum;
                         }
@@ -4034,7 +4030,7 @@ namespace SetPointManager {
                 for (SetPtMgrNum = 1; SetPtMgrNum <= NumSZMinHumSetPtMgrs; ++SetPtMgrNum) {
                     for (SetZoneNum = 1; SetZoneNum <= SZMinHumSetPtMgr(SetPtMgrNum).NumZones; ++SetZoneNum) {
                         // set the actual and controlled zone numbers
-                        for (ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum) {
+                        for (ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
                             if (ZoneEquipConfig(ControlledZoneNum).ZoneNode == SZMinHumSetPtMgr(SetPtMgrNum).ZoneNodes(SetZoneNum)) {
                                 SZMinHumSetPtMgr(SetPtMgrNum).CtrlZoneNum(SetZoneNum) = ControlledZoneNum;
                                 SZMinHumSetPtMgr(SetPtMgrNum).ZoneNum(SetZoneNum) = ZoneEquipConfig(ControlledZoneNum).ActualZoneNum;
@@ -4070,7 +4066,7 @@ namespace SetPointManager {
                 for (SetPtMgrNum = 1; SetPtMgrNum <= NumSZMaxHumSetPtMgrs; ++SetPtMgrNum) {
                     for (SetZoneNum = 1; SetZoneNum <= SZMaxHumSetPtMgr(SetPtMgrNum).NumZones; ++SetZoneNum) {
                         // set the actual and controlled zone numbers
-                        for (ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum) {
+                        for (ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
                             if (ZoneEquipConfig(ControlledZoneNum).ZoneNode == SZMaxHumSetPtMgr(SetPtMgrNum).ZoneNodes(SetZoneNum)) {
                                 SZMaxHumSetPtMgr(SetPtMgrNum).CtrlZoneNum(SetZoneNum) = ControlledZoneNum;
                                 SZMaxHumSetPtMgr(SetPtMgrNum).ZoneNum(SetZoneNum) = ZoneEquipConfig(ControlledZoneNum).ActualZoneNum;
@@ -4115,7 +4111,7 @@ namespace SetPointManager {
                     ZoneNode = SingZoneRhSetPtMgr(SetPtMgrNum).ZoneNodeNum;
                     // find the index in the ZoneEquipConfig array of the control zone (the one with the main or only thermostat)
                     ConZoneNum = 0;
-                    for (ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum) {
+                    for (ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
                         if (ZoneEquipConfig(ControlledZoneNum).ZoneNode == ZoneNode) {
                             ConZoneNum = ControlledZoneNum;
                         }
@@ -4144,15 +4140,15 @@ namespace SetPointManager {
                             ErrorsFound = true;
                             continue;
                         }
-                        MixedAirNode = PrimaryAirSystem(AirLoopNum).OASysOutletNodeNum;
-                        InletBranchNum = PrimaryAirSystem(AirLoopNum).InletBranchNum(1);
-                        LoopInNode = PrimaryAirSystem(AirLoopNum).Branch(InletBranchNum).NodeNumIn;
+                        MixedAirNode = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).OASysOutletNodeNum;
+                        InletBranchNum = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).InletBranchNum(1);
+                        LoopInNode = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(InletBranchNum).NodeNumIn;
                         // get the supply fan inlet and outlet nodes
                         if (MixedAirNode > 0) {
-                            for (BranchNum = 1; BranchNum <= PrimaryAirSystem(AirLoopNum).NumBranches; ++BranchNum) {
-                                for (CompNum = 1; CompNum <= PrimaryAirSystem(AirLoopNum).Branch(BranchNum).TotalComponents; ++CompNum) {
-                                    CompType = PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).TypeOf;
-                                    if (MixedAirNode == PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).NodeNumIn) {
+                            for (BranchNum = 1; BranchNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).NumBranches; ++BranchNum) {
+                                for (CompNum = 1; CompNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).TotalComponents; ++CompNum) {
+                                    CompType = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).TypeOf;
+                                    if (MixedAirNode == state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).NodeNumIn) {
                                         LookForFan = true;
                                     }
                                     if (LookForFan) {
@@ -4161,24 +4157,24 @@ namespace SetPointManager {
                                             UtilityRoutines::SameString(CompType, "Fan:VariableVolume") ||
                                             UtilityRoutines::SameString(CompType, "Fan:OnOff") ||
                                             UtilityRoutines::SameString(CompType, "Fan:ComponentModel")) {
-                                            FanNodeIn = PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).NodeNumIn;
-                                            FanNodeOut = PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).NodeNumOut;
+                                            FanNodeIn = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).NodeNumIn;
+                                            FanNodeOut = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).NodeNumOut;
                                             break;
                                         }
                                     }
                                 }
                             }
                         } else {
-                            for (BranchNum = 1; BranchNum <= PrimaryAirSystem(AirLoopNum).NumBranches; ++BranchNum) {
-                                for (CompNum = 1; CompNum <= PrimaryAirSystem(AirLoopNum).Branch(BranchNum).TotalComponents; ++CompNum) {
-                                    CompType = PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).TypeOf;
+                            for (BranchNum = 1; BranchNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).NumBranches; ++BranchNum) {
+                                for (CompNum = 1; CompNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).TotalComponents; ++CompNum) {
+                                    CompType = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).TypeOf;
                                     // cpw22Aug2010 Add Fan:ComponentModel (new)
                                     if (UtilityRoutines::SameString(CompType, "Fan:ConstantVolume") ||
                                         UtilityRoutines::SameString(CompType, "Fan:VariableVolume") ||
                                         UtilityRoutines::SameString(CompType, "Fan:OnOff") ||
                                         UtilityRoutines::SameString(CompType, "Fan:ComponentModel")) {
-                                        FanNodeIn = PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).NodeNumIn;
-                                        FanNodeOut = PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).NodeNumOut;
+                                        FanNodeIn = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).NodeNumIn;
+                                        FanNodeOut = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).NodeNumOut;
                                     }
                                 }
                             }
@@ -4187,10 +4183,10 @@ namespace SetPointManager {
                         SingZoneRhSetPtMgr(SetPtMgrNum).FanNodeOut = FanNodeOut;
                         SingZoneRhSetPtMgr(SetPtMgrNum).MixedAirNode = MixedAirNode;
                         SingZoneRhSetPtMgr(SetPtMgrNum).AirLoopNum = AirLoopNum;
-                        SingZoneRhSetPtMgr(SetPtMgrNum).OAInNode = PrimaryAirSystem(AirLoopNum).OAMixOAInNodeNum;
+                        SingZoneRhSetPtMgr(SetPtMgrNum).OAInNode = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).OAMixOAInNodeNum;
                         // this next line assumes that OA system is the first thing on the branch, what if there is a relief fan or heat recovery coil
                         // or other component in there first? does it matter?
-                        SingZoneRhSetPtMgr(SetPtMgrNum).RetNode = PrimaryAirSystem(AirLoopNum).OASysInletNodeNum;
+                        SingZoneRhSetPtMgr(SetPtMgrNum).RetNode = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).OASysInletNodeNum;
 
                         SingZoneRhSetPtMgr(SetPtMgrNum).LoopInNode = LoopInNode;
                     }
@@ -4293,11 +4289,11 @@ namespace SetPointManager {
                             ErrorsFound = true;
                         } else {
                             RABFlowSetPtMgr(SetPtMgrNum).AirLoopNum = AirLoopNum;
-                            if (PrimaryAirSystem(AirLoopNum).RABExists) {
-                                RABFlowSetPtMgr(SetPtMgrNum).RABMixInNode = PrimaryAirSystem(AirLoopNum).RABMixInNode;
-                                RABFlowSetPtMgr(SetPtMgrNum).SupMixInNode = PrimaryAirSystem(AirLoopNum).SupMixInNode;
-                                RABFlowSetPtMgr(SetPtMgrNum).MixOutNode = PrimaryAirSystem(AirLoopNum).MixOutNode;
-                                RABFlowSetPtMgr(SetPtMgrNum).RABSplitOutNode = PrimaryAirSystem(AirLoopNum).RABSplitOutNode;
+                            if (state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).RABExists) {
+                                RABFlowSetPtMgr(SetPtMgrNum).RABMixInNode = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).RABMixInNode;
+                                RABFlowSetPtMgr(SetPtMgrNum).SupMixInNode = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).SupMixInNode;
+                                RABFlowSetPtMgr(SetPtMgrNum).MixOutNode = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).MixOutNode;
+                                RABFlowSetPtMgr(SetPtMgrNum).RABSplitOutNode = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).RABSplitOutNode;
                                 RABFlowSetPtMgr(SetPtMgrNum).SysOutNode = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).AirLoopSupplyNodeNum(1);
                                 RABFlowSetPtMgr(SetPtMgrNum).CtrlNodes(1) = RABFlowSetPtMgr(SetPtMgrNum).RABSplitOutNode;
                                 AllSetPtMgr(RABFlowSetPtMgr(SetPtMgrNum).AllSetPtMgrIndex).CtrlNodes(1) =
@@ -4403,7 +4399,7 @@ namespace SetPointManager {
                                 ShowSevereError(state, cSetPointManagerType + "=\"" + MZAverageMinHumSetPtMgr(SetPtMgrNum).Name +
                                                 "\", invalid humidistat specification");
                                 ShowContinueError(state, "could not locate Humidistat in any of the zones served by the Air loop=" +
-                                                  PrimaryAirSystem(AirLoopNum).Name);
+                                                  state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Name);
                                 ErrorsFound = true;
                             }
                         }
@@ -4445,7 +4441,7 @@ namespace SetPointManager {
                                 ShowSevereError(state, cSetPointManagerType + "=\"" + MZAverageMaxHumSetPtMgr(SetPtMgrNum).Name +
                                                 "\", invalid humidistat specification");
                                 ShowContinueError(state, "could not locate Humidistat in any of the zones served by the Air loop=" +
-                                                  PrimaryAirSystem(AirLoopNum).Name);
+                                                  state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Name);
                                 ErrorsFound = true;
                             }
                         }
@@ -4486,7 +4482,7 @@ namespace SetPointManager {
                                 ShowSevereError(state, cSetPointManagerType + "=\"" + MZMinHumSetPtMgr(SetPtMgrNum).Name +
                                                 "\", invalid humidistat specification");
                                 ShowContinueError(state, "could not locate Humidistat in any of the zones served by the Air loop=" +
-                                                  PrimaryAirSystem(AirLoopNum).Name);
+                                                  state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Name);
                                 ErrorsFound = true;
                             }
                         }
@@ -4526,7 +4522,7 @@ namespace SetPointManager {
                                 ShowSevereError(state, cSetPointManagerType + "=\"" + MZMaxHumSetPtMgr(SetPtMgrNum).Name +
                                                 "\", invalid humidistat specification");
                                 ShowContinueError(state, "could not locate Humidistat in any of the zones served by the Air loop=" +
-                                                  PrimaryAirSystem(AirLoopNum).Name);
+                                                  state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Name);
                                 ErrorsFound = true;
                             }
                         }
@@ -6014,8 +6010,6 @@ namespace SetPointManager {
         // na
 
         // Using/Aliasing
-        using DataGlobals::AnyEnergyManagementSystemInModel;
-        using DataGlobals::SysSizingCalc;
         using DataHVACGlobals::SetPointErrorFlag;
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
         using EMSManager::iTemperatureSetPoint;
@@ -6048,11 +6042,11 @@ namespace SetPointManager {
         MinTemp = this->MinCoolCoilOutTemp;
         this->FreezeCheckEnable = false;
 
-        if (!SysSizingCalc && this->MySetPointCheckFlag) {
+        if (!state.dataGlobal->SysSizingCalc && this->MySetPointCheckFlag) {
 
             RefNode = this->RefNode;
             if (Node(RefNode).TempSetPoint == SensedNodeFlagValue) {
-                if (!AnyEnergyManagementSystemInModel) {
+                if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                     ShowSevereError(state, "CalcMixedAirSetPoint: Missing reference temperature setpoint for Mixed Air Setpoint Manager " + this->Name);
                     ShowContinueError(state, "Node Referenced =" + NodeID(RefNode));
                     ShowContinueError(state,
@@ -6117,8 +6111,6 @@ namespace SetPointManager {
         // na
 
         // Using/Aliasing
-        using DataGlobals::AnyEnergyManagementSystemInModel;
-        using DataGlobals::SysSizingCalc;
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
         using EMSManager::iHumidityRatioMaxSetPoint;
         using EMSManager::iHumidityRatioMinSetPoint;
@@ -6181,10 +6173,10 @@ namespace SetPointManager {
             }
         }
 
-        if (!SysSizingCalc && this->MySetPointCheckFlag) {
+        if (!state.dataGlobal->SysSizingCalc && this->MySetPointCheckFlag) {
             this->MySetPointCheckFlag = false;
             if (RefNodeSetPoint == SensedNodeFlagValue) {
-                if (!AnyEnergyManagementSystemInModel) {
+                if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                     ShowSevereError(state, "CalcOAPretreatSetPoint: Missing reference setpoint for Outdoor Air Pretreat Setpoint Manager " + this->Name);
                     ShowContinueError(state, "Node Referenced =" + NodeID(RefNode));
                     ShowContinueError(state, "use a Setpoint Manager to establish a setpoint at this node.");
@@ -7560,7 +7552,7 @@ namespace SetPointManager {
         static Real64 TotEnergy(0.0);         // Total energy consumptions at this time step
         static Real64 TotEnergyPre(0.0);      // Total energy consumptions at the previous time step
 
-        if (MetersHaveBeenInitialized) {
+        if (state.dataGlobal->MetersHaveBeenInitialized) {
             // Setup meter vars
             if (this->SetupIdealCondEntSetPtVars) {
                 this->SetupMeteredVarsForSetPt(state);
@@ -7568,7 +7560,7 @@ namespace SetPointManager {
             }
         }
 
-        if (MetersHaveBeenInitialized && RunOptCondEntTemp) {
+        if (state.dataGlobal->MetersHaveBeenInitialized && state.dataGlobal->RunOptCondEntTemp) {
 
             // If chiller is on
             CurLoad = std::abs(
@@ -7594,17 +7586,17 @@ namespace SetPointManager {
                 TotEnergy = this->calculateCurrentEnergyUsage(state);
 
                 this->setupSetPointAndFlags(
-                    TotEnergy, TotEnergyPre, CondWaterSetPoint, CondTempLimit, RunOptCondEntTemp, RunSubOptCondEntTemp, RunFinalOptCondEntTemp);
+                    TotEnergy, TotEnergyPre, CondWaterSetPoint, CondTempLimit, state.dataGlobal->RunOptCondEntTemp, RunSubOptCondEntTemp, RunFinalOptCondEntTemp);
 
             } else {
                 CondWaterSetPoint = this->MaxCondEntTemp;
                 TotEnergyPre = 0.0;
-                RunOptCondEntTemp = false;
+                state.dataGlobal->RunOptCondEntTemp = false;
                 RunSubOptCondEntTemp = false;
             }
         } else {
             CondWaterSetPoint = this->MaxCondEntTemp;
-            RunOptCondEntTemp = false;
+            state.dataGlobal->RunOptCondEntTemp = false;
             RunSubOptCondEntTemp = false;
         }
 
@@ -8073,8 +8065,6 @@ namespace SetPointManager {
         // na
 
         // Using/Aliasing
-        using DataGlobals::AnyEnergyManagementSystemInModel;
-        using DataGlobals::SysSizingCalc;
         using DataHVACGlobals::SetPointErrorFlag;
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
         using EMSManager::iTemperatureSetPoint;
@@ -8848,20 +8838,15 @@ namespace SetPointManager {
         // PURPOSE OF THIS SUBROUTINE:
         // Determine if ideal condenser entering set point manager is used in model and set flag
 
-        // Using/Aliasing
-        using DataGlobals::AnyIdealCondEntSetPointInModel;
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
         std::string cCurrentModuleObject;
 
         cCurrentModuleObject = "SetpointManager:CondenserEnteringReset:Ideal";
         NumIdealCondEntSetPtMgrs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (NumIdealCondEntSetPtMgrs > 0) {
-            AnyIdealCondEntSetPointInModel = true;
+            state.dataGlobal->AnyIdealCondEntSetPointInModel = true;
         } else {
-            AnyIdealCondEntSetPointInModel = false;
+            state.dataGlobal->AnyIdealCondEntSetPointInModel = false;
         }
     }
 

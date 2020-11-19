@@ -91,7 +91,6 @@ namespace OutAirNodeManager {
     // Use statements for data only modules
     // Using/Aliasing
     using namespace DataLoopNode;
-    using namespace DataGlobals;
     using namespace DataEnvironment;
     using DataContaminantBalance::Contaminant;
     using DataContaminantBalance::OutdoorCO2;
@@ -365,7 +364,7 @@ namespace OutAirNodeManager {
                 if (NumNums > 0) Node(NodeNums(1)).Height = Numbers(1);
 
                 if (NumAlphas > 1) {
-                    AnyLocalEnvironmentsInModel = true;
+                    state.dataGlobal->AnyLocalEnvironmentsInModel = true;
                 }
 
                 if (NumAlphas > 1 && !lAlphaBlanks(2)) {

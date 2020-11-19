@@ -96,7 +96,6 @@ namespace WaterToAirHeatPump {
     // Oklahoma State University.
 
     using namespace DataLoopNode;
-    using namespace DataGlobals;
     using DataHVACGlobals::ContFanCycCoil;
     using DataHVACGlobals::CycFanCycCoil;
     using DataHVACGlobals::TimeStepSys;
@@ -1035,11 +1034,12 @@ namespace WaterToAirHeatPump {
         state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).OutletWaterEnthalpy = 0.0;
     }
 
-    void CalcWatertoAirHPCooling(EnergyPlusData &state, int const HPNum,               // heat pump number
+    void CalcWatertoAirHPCooling(EnergyPlusData &state,
+                                 int const HPNum,               // heat pump number
                                  int const CyclingScheme,       // fan/compressor cycling scheme indicator
                                  bool const FirstHVACIteration, // first iteration flag
                                  Real64 const RuntimeFrac,
-                                 bool const EP_UNUSED(InitFlag), // suppress property errors if true
+                                 [[maybe_unused]] bool const InitFlag, // suppress property errors if true
                                  Real64 const SensDemand,
                                  int const CompOp,
                                  Real64 const PartLoadRatio)
@@ -1419,8 +1419,8 @@ namespace WaterToAirHeatPump {
                     LoadSidePressure = GetSatPressureRefrig(state, Refrigerant, LoadSideTemp, state.dataWaterToAirHeatPump->RefrigIndex, RoutineNameLoadSideTemp);
 
                     if (LoadSidePressure < LowPressCutoff && !FirstHVACIteration) {
-                        if (!WarmupFlag) {
-                            ShowRecurringWarningErrorAtEnd(format("WaterToAir Heat pump:cooling [{}] shut off on low pressure < {:.0R}",
+                        if (!state.dataGlobal->WarmupFlag) {
+                            ShowRecurringWarningErrorAtEnd(state, format("WaterToAir Heat pump:cooling [{}] shut off on low pressure < {:.0R}",
                                                                   state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name,
                                                                   LowPressCutoff),
                                                            state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LowPressClgError,
@@ -1435,8 +1435,8 @@ namespace WaterToAirHeatPump {
                     }
 
                     if (SourceSidePressure > HighPressCutoff && !FirstHVACIteration) {
-                        if (!WarmupFlag) {
-                            ShowRecurringWarningErrorAtEnd(format("WaterToAir Heat pump:cooling [{}] shut off on high pressure > {:.0R}",
+                        if (!state.dataGlobal->WarmupFlag) {
+                            ShowRecurringWarningErrorAtEnd(state, format("WaterToAir Heat pump:cooling [{}] shut off on high pressure > {:.0R}",
                                                                   state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name,
                                                                   HighPressCutoff),
                                                            state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).HighPressClgError,
@@ -1703,11 +1703,12 @@ namespace WaterToAirHeatPump {
         return Residuum;
     }
 
-    void CalcWatertoAirHPHeating(EnergyPlusData &state, int const HPNum,               // heat pump number
+    void CalcWatertoAirHPHeating(EnergyPlusData &state,
+                                 int const HPNum,               // heat pump number
                                  int const CyclingScheme,       // fan/compressor cycling scheme indicator
                                  bool const FirstHVACIteration, // first iteration flag
                                  Real64 const RuntimeFrac,
-                                 bool const EP_UNUSED(InitFlag), // first iteration flag
+                                 [[maybe_unused]] bool const InitFlag, // first iteration flag
                                  Real64 const SensDemand,
                                  int const CompOp,
                                  Real64 const PartLoadRatio)
@@ -1950,8 +1951,8 @@ namespace WaterToAirHeatPump {
                 SourceSidePressure = GetSatPressureRefrig(state, Refrigerant, SourceSideTemp, state.dataWaterToAirHeatPump->RefrigIndex, RoutineNameSourceSideTemp);
                 LoadSidePressure = GetSatPressureRefrig(state, Refrigerant, LoadSideTemp, state.dataWaterToAirHeatPump->RefrigIndex, RoutineNameLoadSideTemp);
                 if (SourceSidePressure < LowPressCutoff && !FirstHVACIteration) {
-                    if (!WarmupFlag) {
-                        ShowRecurringWarningErrorAtEnd(format("WaterToAir Heat pump:heating [{}] shut off on low pressure < {:.0R}",
+                    if (!state.dataGlobal->WarmupFlag) {
+                        ShowRecurringWarningErrorAtEnd(state, format("WaterToAir Heat pump:heating [{}] shut off on low pressure < {:.0R}",
                                                               state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name,
                                                               LowPressCutoff),
                                                        state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LowPressHtgError,
@@ -1966,8 +1967,8 @@ namespace WaterToAirHeatPump {
                 }
 
                 if (LoadSidePressure > HighPressCutoff && !FirstHVACIteration) {
-                    if (!WarmupFlag) {
-                        ShowRecurringWarningErrorAtEnd(format("WaterToAir Heat pump:heating [{}] shut off on high pressure > {:.0R}",
+                    if (!state.dataGlobal->WarmupFlag) {
+                        ShowRecurringWarningErrorAtEnd(state, format("WaterToAir Heat pump:heating [{}] shut off on high pressure > {:.0R}",
                                                               state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name,
                                                               HighPressCutoff),
                                                        state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).HighPressHtgError,

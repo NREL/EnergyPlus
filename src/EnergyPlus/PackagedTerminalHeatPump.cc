@@ -138,9 +138,6 @@ namespace PackagedTerminalHeatPump {
     // Using/Aliasing
     using namespace DataLoopNode;
     using namespace DataSizing;
-    using DataGlobals::DisplayExtraWarnings;
-    using DataGlobals::NumOfZones;
-    using DataGlobals::SysSizingCalc;
     using namespace DataHVACGlobals;
     using DXCoils::DXCoilPartLoadRatio;
 
@@ -346,7 +343,7 @@ namespace PackagedTerminalHeatPump {
         SimPTUnit(state, PTUnitNum, ZoneNum, FirstHVACIteration, QUnitOut, OnOffAirFlowRatio, QZnReq, LatOutputProvided);
 
         // Report the result of the simulation
-        ReportPTUnit(PTUnitNum);
+        ReportPTUnit(state, PTUnitNum);
 
         ZoneEqDXCoil = false;
     }
@@ -1156,7 +1153,7 @@ namespace PackagedTerminalHeatPump {
             // check that PTUnit inlet node is a zone exhaust node.
             if (!PTUnit(PTUnitNum).ATMixerExists || PTUnit(PTUnitNum).ATMixerType == ATMixer_SupplySide) {
                 ZoneNodeNotFound = true;
-                for (CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone) {
+                for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                     if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
                     for (NodeNum = 1; NodeNum <= ZoneEquipConfig(CtrlZone).NumExhaustNodes; ++NodeNum) {
                         if (PTUnit(PTUnitNum).AirInNode == ZoneEquipConfig(CtrlZone).ExhaustNode(NodeNum)) {
@@ -1176,7 +1173,7 @@ namespace PackagedTerminalHeatPump {
             // check that PTUnit outlet node is a zone inlet node.
             if (!PTUnit(PTUnitNum).ATMixerExists || PTUnit(PTUnitNum).ATMixerType == ATMixer_InletSide) {
                 ZoneNodeNotFound = true;
-                for (CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone) {
+                for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                     if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
                     for (NodeNum = 1; NodeNum <= ZoneEquipConfig(CtrlZone).NumInletNodes; ++NodeNum) {
                         if (PTUnit(PTUnitNum).AirOutNode == ZoneEquipConfig(CtrlZone).InletNode(NodeNum)) {
@@ -1512,7 +1509,7 @@ namespace PackagedTerminalHeatPump {
 
                 // only allowed for DX cooling coils at this time
                 if (PTUnit(PTUnitNum).DXCoolCoilType_Num != CoilDX_CoolingSingleSpeed) {
-                    if (DisplayExtraWarnings) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
                         ShowWarningError(state, CurrentModuleObject + ": " + PTUnit(PTUnitNum).Name);
                         ShowContinueError(state, "Single Zone VAV control method requires specific cooling coil types.");
                         ShowContinueError(state, "Valid cooling coil type is Coil:Cooling:DX:SingleSpeed.");
@@ -1524,7 +1521,7 @@ namespace PackagedTerminalHeatPump {
                 }
                 // only allow for DX heating coils at this time
                 if (PTUnit(PTUnitNum).DXHeatCoilType_Num != CoilDX_HeatingEmpirical) {
-                    if (DisplayExtraWarnings) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
                         ShowWarningError(state, CurrentModuleObject + ": " + PTUnit(PTUnitNum).Name);
                         ShowContinueError(state, "Single Zone VAV control method requires specific heating coil types.");
                         ShowContinueError(state, "Valid heating coil type is Coil:Heating:DX:SingleSpeed.");
@@ -1990,7 +1987,7 @@ namespace PackagedTerminalHeatPump {
             // check that Air-conditioners inlet node is a zone exhaust node or the OA Mixer return node.
             if (!PTUnit(PTUnitNum).ATMixerExists || PTUnit(PTUnitNum).ATMixerType == ATMixer_SupplySide) {
                 ZoneNodeNotFound = true;
-                for (CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone) {
+                for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                     if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
                     for (NodeNum = 1; NodeNum <= ZoneEquipConfig(CtrlZone).NumExhaustNodes; ++NodeNum) {
                         if (PTUnit(PTUnitNum).AirInNode == ZoneEquipConfig(CtrlZone).ExhaustNode(NodeNum)) {
@@ -2010,7 +2007,7 @@ namespace PackagedTerminalHeatPump {
             // check that Air-conditioners outlet node is a zone inlet node.
             if (!PTUnit(PTUnitNum).ATMixerExists || PTUnit(PTUnitNum).ATMixerType == ATMixer_InletSide) {
                 ZoneNodeNotFound = true;
-                for (CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone) {
+                for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                     if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
                     for (NodeNum = 1; NodeNum <= ZoneEquipConfig(CtrlZone).NumInletNodes; ++NodeNum) {
                         if (PTUnit(PTUnitNum).AirOutNode == ZoneEquipConfig(CtrlZone).InletNode(NodeNum)) {
@@ -2321,7 +2318,7 @@ namespace PackagedTerminalHeatPump {
 
                 // only allowed for DX cooling coils at this time
                 if (PTUnit(PTUnitNum).DXCoolCoilType_Num != CoilDX_CoolingSingleSpeed) {
-                    if (DisplayExtraWarnings) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
                         ShowWarningError(state, CurrentModuleObject + ": " + PTUnit(PTUnitNum).Name);
                         ShowContinueError(state, "ASHRAE90.1 control method requires specific cooling coil types.");
                         ShowContinueError(state, "Valid cooling coil type is Coil:Cooling:DX:SingleSpeed.");
@@ -2334,7 +2331,7 @@ namespace PackagedTerminalHeatPump {
                 // only allow for water, fuel, or electric at this time
                 if (PTUnit(PTUnitNum).ACHeatCoilType_Num != Coil_HeatingWater && PTUnit(PTUnitNum).ACHeatCoilType_Num != Coil_HeatingGasOrOtherFuel &&
                     PTUnit(PTUnitNum).ACHeatCoilType_Num != Coil_HeatingElectric) {
-                    if (DisplayExtraWarnings) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
                         ShowWarningError(state, CurrentModuleObject + ": " + PTUnit(PTUnitNum).Name);
                         ShowContinueError(state, "ASHRAE90.1 control method requires specific heating coil types.");
                         ShowContinueError(state, "Valid heating coil type is Coil:Heating:DX:SingleSpeed.");
@@ -2882,7 +2879,7 @@ namespace PackagedTerminalHeatPump {
             // check that PTUnit inlet node is a zone exhaust node.
             if (!PTUnit(PTUnitNum).ATMixerExists || PTUnit(PTUnitNum).ATMixerType == ATMixer_SupplySide) {
                 ZoneNodeNotFound = true;
-                for (CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone) {
+                for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                     if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
                     for (NodeNum = 1; NodeNum <= ZoneEquipConfig(CtrlZone).NumExhaustNodes; ++NodeNum) {
                         if (PTUnit(PTUnitNum).AirInNode == ZoneEquipConfig(CtrlZone).ExhaustNode(NodeNum)) {
@@ -2902,7 +2899,7 @@ namespace PackagedTerminalHeatPump {
             // check that PTUnit outlet node is a zone inlet node.
             if (!PTUnit(PTUnitNum).ATMixerExists || PTUnit(PTUnitNum).ATMixerType == ATMixer_InletSide) {
                 ZoneNodeNotFound = true;
-                for (CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone) {
+                for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                     if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
                     for (NodeNum = 1; NodeNum <= ZoneEquipConfig(CtrlZone).NumInletNodes; ++NodeNum) {
                         if (PTUnit(PTUnitNum).AirOutNode == ZoneEquipConfig(CtrlZone).InletNode(NodeNum)) {
@@ -3777,7 +3774,6 @@ namespace PackagedTerminalHeatPump {
         // Using/Aliasing
         using namespace DataZoneEnergyDemands;
         using DataEnvironment::StdRhoAir;
-        using DataGlobals::AnyPlantInModel;
         using DataZoneEquipment::CheckZoneEquipmentList;
         using DataZoneEquipment::ZoneEquipInputsFilled;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
@@ -4015,7 +4011,7 @@ namespace PackagedTerminalHeatPump {
             } else { // pthp not connected to plant
                 MyPlantScanFlag(PTUnitNum) = false;
             }
-        } else if (MyPlantScanFlag(PTUnitNum) && !AnyPlantInModel) {
+        } else if (MyPlantScanFlag(PTUnitNum) && !state.dataGlobal->AnyPlantInModel) {
             MyPlantScanFlag(PTUnitNum) = false;
         }
 
@@ -4023,10 +4019,10 @@ namespace PackagedTerminalHeatPump {
             if (ZoneEquipInputsFilled) {
                 ZoneEquipmentListNotChecked = false;
                 for (Loop = 1; Loop <= NumPTUs; ++Loop) {
-                    if (CheckZoneEquipmentList(PTUnit(Loop).UnitType, PTUnit(Loop).Name, CtrlZoneNum)) {
+                    if (CheckZoneEquipmentList(state, PTUnit(Loop).UnitType, PTUnit(Loop).Name, CtrlZoneNum)) {
                         // save the ZoneEquipConfig index for this unit
                         PTUnit(Loop).ControlZoneNum = CtrlZoneNum;
-                        for (int ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum) {
+                        for (int ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
                             for (int ZoneExhNum = 1; ZoneExhNum <= ZoneEquipConfig(ControlledZoneNum).NumExhaustNodes; ++ZoneExhNum) {
                                 if (ZoneEquipConfig(ControlledZoneNum).ExhaustNode(ZoneExhNum) != PTUnit(Loop).AirInNode) continue;
                                 // Find the controlled zone number for the specified thermostat location
@@ -4042,7 +4038,7 @@ namespace PackagedTerminalHeatPump {
             }
         }
 
-        if (!SysSizingCalc && MySizeFlag(PTUnitNum)) {
+        if (!state.dataGlobal->SysSizingCalc && MySizeFlag(PTUnitNum)) {
             SizePTUnit(state, PTUnitNum);
             MySizeFlag(PTUnitNum) = false;
 
@@ -5306,7 +5302,7 @@ namespace PackagedTerminalHeatPump {
                                                      CoolOutAirVolFlowDes,
                                                      "User-Specified Outdoor Air Flow Rate During Cooling Operation [m3/s]",
                                                      CoolOutAirVolFlowUser);
-                        if (DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(CoolOutAirVolFlowDes - CoolOutAirVolFlowUser) / CoolOutAirVolFlowUser) > AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizePTUnit: Potential issue with equipment sizing for " + PTUnit(PTUnitNum).UnitType + ' ' +
                                             PTUnit(PTUnitNum).Name);
@@ -5359,7 +5355,7 @@ namespace PackagedTerminalHeatPump {
                                                      HeatOutAirVolFlowDes,
                                                      "User-Specified Outdoor Air Flow Rate During Heating Operation [m3/s]",
                                                      HeatOutAirVolFlowUser);
-                        if (DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(HeatOutAirVolFlowDes - HeatOutAirVolFlowUser) / HeatOutAirVolFlowUser) > AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizePTUnit: Potential issue with equipment sizing for " + PTUnit(PTUnitNum).UnitType + ' ' +
                                             PTUnit(PTUnitNum).Name);
@@ -5412,7 +5408,7 @@ namespace PackagedTerminalHeatPump {
                                                      NoCoolHeatOutAirVolFlowDes,
                                                      "User-Specified Outdoor Air Flow Rate When No Cooling or Heating is Needed [m3/s]",
                                                      NoCoolHeatOutAirVolFlowUser);
-                        if (DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(NoCoolHeatOutAirVolFlowDes - NoCoolHeatOutAirVolFlowUser) / NoCoolHeatOutAirVolFlowUser) >
                                 AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizePTUnit: Potential issue with equipment sizing for " + PTUnit(PTUnitNum).UnitType + ' ' +
@@ -5464,7 +5460,7 @@ namespace PackagedTerminalHeatPump {
                                                      MaxSATSupHeatDes,
                                                      "User-Specified Maximum Supply Air Temperature from Supplemental Heater [C]",
                                                      MaxSATSupHeatUser);
-                        if (DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             if (std::abs(MaxSATSupHeatDes - MaxSATSupHeatUser) > (4.0 * AutoVsHardSizingDeltaTempThreshold)) {
                                 ShowMessage(state, "SizePTUnit: Potential issue with equipment sizing for " + PTUnit(PTUnitNum).UnitType + ' ' +
                                             PTUnit(PTUnitNum).Name);
@@ -5584,8 +5580,6 @@ namespace PackagedTerminalHeatPump {
 
         // Using/Aliasing
         using DataEnvironment::OutDryBulbTemp;
-        using DataGlobals::WarmupFlag;
-
         using General::SolveRoot;
 
         using HeatingCoils::SimulateHeatingCoilComponents;
@@ -5751,7 +5745,7 @@ namespace PackagedTerminalHeatPump {
                     }
                     SolveRoot(state, ErrorToler, MaxIte, SolFla, PartLoadFrac, PLRResidual, TempMinPLR, TempMaxPLR, Par);
                     if (SolFla == -1) {
-                        if (!FirstHVACIteration && !WarmupFlag) {
+                        if (!FirstHVACIteration && !state.dataGlobal->WarmupFlag) {
                             CalcPTUnit(
                                 state, PTUnitNum, FirstHVACIteration, PartLoadFrac, TempOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn);
                             if (PTUnit(PTUnitNum).IterErrIndex == 0) {
@@ -5761,7 +5755,7 @@ namespace PackagedTerminalHeatPump {
                                 ShowContinueErrorTimeStamp(state, format(" Part-load ratio returned = {:.3R}", PartLoadFrac));
                                 ShowContinueError(state, format(" Load requested = {:.5T}, Load delivered = {:.5T}", QZnReq, TempOutput));
                             }
-                            ShowRecurringWarningErrorAtEnd(PTUnit(PTUnitNum).UnitType + " \"" + PTUnit(PTUnitNum).Name +
+                            ShowRecurringWarningErrorAtEnd(state, PTUnit(PTUnitNum).UnitType + " \"" + PTUnit(PTUnitNum).Name +
                                                                "\" - Iteration limit exceeded error continues...",
                                                            PTUnit(PTUnitNum).IterErrIndex,
                                                            TempOutput,
@@ -5776,7 +5770,7 @@ namespace PackagedTerminalHeatPump {
                             ShowContinueError(state, "Packaged terminal unit part-load ratio calculation failed: PLR limits of 0 to 1 exceeded");
                             ShowContinueError(state, "Please fill out a bug report and forward to the EnergyPlus support group.");
                             ShowContinueErrorTimeStamp(state, "");
-                            if (WarmupFlag) ShowContinueError(state, "Error occurred during warmup days.");
+                            if (state.dataGlobal->WarmupFlag) ShowContinueError(state, "Error occurred during warmup days.");
                         }
                         PartLoadFrac = max(MinPLF, std::abs(QZnReq - NoCompOutput) / std::abs(FullOutput - NoCompOutput));
                     }
@@ -5786,7 +5780,7 @@ namespace PackagedTerminalHeatPump {
                         ShowContinueError(state, "Packaged terminal unit part-load ratio calculation failed: PLR limits of 0 to 1 exceeded");
                         ShowContinueError(state, "Please fill out a bug report and forward to the EnergyPlus support group.");
                         ShowContinueErrorTimeStamp(state, "");
-                        if (WarmupFlag) ShowContinueError(state, "Error occurred during warmup days.");
+                        if (state.dataGlobal->WarmupFlag) ShowContinueError(state, "Error occurred during warmup days.");
                     }
                     PartLoadFrac = max(MinPLF, std::abs(QZnReq - NoCompOutput) / std::abs(FullOutput - NoCompOutput));
                 }
@@ -6351,7 +6345,7 @@ namespace PackagedTerminalHeatPump {
                                     ShowContinueError(
                                         state, format("  Iteration limit [{}] exceeded in calculating hot water mass flow rate", SolveMaxIter));
                                 }
-                                ShowRecurringWarningErrorAtEnd(format("CalcPTUnit: Hot water coil control failed (iteration limit [{}]) for {}=\"{}",
+                                ShowRecurringWarningErrorAtEnd(state, format("CalcPTUnit: Hot water coil control failed (iteration limit [{}]) for {}=\"{}",
                                                                       SolveMaxIter,
                                                                       PTUnit(PTUnitNum).UnitType,
                                                                       PTUnit(PTUnitNum).Name),
@@ -6365,7 +6359,7 @@ namespace PackagedTerminalHeatPump {
                                     ShowContinueError(state, format("...Given minimum water flow rate={:.3R} kg/s", MinWaterFlow));
                                     ShowContinueError(state, format("...Given maximum water flow rate={:.3R} kg/s", MaxHotWaterFlow));
                                 }
-                                ShowRecurringWarningErrorAtEnd("CalcPTUnit: Hot water coil control failed (flow limits) for " +
+                                ShowRecurringWarningErrorAtEnd(state, "CalcPTUnit: Hot water coil control failed (flow limits) for " +
                                                                    PTUnit(PTUnitNum).UnitType + "=\"" + PTUnit(PTUnitNum).Name + "\"",
                                                                PTUnit(PTUnitNum).HotWaterCoilMaxIterIndex2,
                                                                MaxHotWaterFlow,
@@ -6854,7 +6848,7 @@ namespace PackagedTerminalHeatPump {
         }
     }
 
-    void ReportPTUnit(int const PTUnitNum) // number of the current AC unit being simulated
+    void ReportPTUnit(EnergyPlusData &state, int const PTUnitNum) // number of the current AC unit being simulated
     {
 
         // SUBROUTINE INFORMATION:
@@ -6908,7 +6902,7 @@ namespace PackagedTerminalHeatPump {
         }
 
         if (PTUnit(PTUnitNum).FirstPass) { // reset sizing flags so other zone equipment can size normally
-            if (!DataGlobals::SysSizingCalc) {
+            if (!state.dataGlobal->SysSizingCalc) {
                 DataSizing::resetHVACSizingGlobals(DataSizing::CurZoneEqNum, 0, PTUnit(PTUnitNum).FirstPass);
             }
         }
@@ -7450,7 +7444,6 @@ namespace PackagedTerminalHeatPump {
 
         // Using/Aliasing
         using DataEnvironment::OutDryBulbTemp;
-        using DataGlobals::WarmupFlag;
         using DataZoneEnergyDemands::CurDeadBandOrSetback;
 
         using General::SolveRoot;
@@ -7657,14 +7650,14 @@ namespace PackagedTerminalHeatPump {
 
                 SolveRoot(state, ErrorToler, MaxIte, SolFla, PartLoadFrac, VSHPCyclingResidual, 0.0, 1.0, Par);
                 if (SolFla == -1) {
-                    if (!WarmupFlag) {
+                    if (!state.dataGlobal->WarmupFlag) {
                         if (ErrCountCyc == 0) {
                             ++ErrCountCyc;
                             ShowWarningError(state, "Iteration limit exceeded calculating VS WSHP unit cycling ratio, for unit=" + PTUnit(PTUnitNum).Name);
                             ShowContinueErrorTimeStamp(state, format("Cycling ratio returned={:.2R}", PartLoadFrac));
                         } else {
                             ++ErrCountCyc;
-                            ShowRecurringWarningErrorAtEnd(
+                            ShowRecurringWarningErrorAtEnd(state,
                                 PTUnit(PTUnitNum).Name + "\": Iteration limit warning exceeding calculating DX unit cycling ratio  continues...",
                                 PTUnit(PTUnitNum).ErrIndexCyc,
                                 PartLoadFrac,
@@ -7739,14 +7732,14 @@ namespace PackagedTerminalHeatPump {
 
                 SolveRoot(state, ErrorToler, MaxIte, SolFla, SpeedRatio, VSHPSpeedResidual, 1.0e-10, 1.0, Par);
                 if (SolFla == -1) {
-                    if (!WarmupFlag) {
+                    if (!state.dataGlobal->WarmupFlag) {
                         if (ErrCountVar == 0) {
                             ++ErrCountVar;
                             ShowWarningError(state, "Iteration limit exceeded calculating VS WSHP unit speed ratio, for unit=" + PTUnit(PTUnitNum).Name);
                             ShowContinueErrorTimeStamp(state, format("Speed ratio returned=[{:.2R}], Speed number ={}", SpeedRatio, SpeedNum));
                         } else {
                             ++ErrCountVar;
-                            ShowRecurringWarningErrorAtEnd(PTUnit(PTUnitNum).Name +
+                            ShowRecurringWarningErrorAtEnd(state, PTUnit(PTUnitNum).Name +
                                                                "\": Iteration limit warning exceeding calculating DX unit speed ratio continues...",
                                                            PTUnit(PTUnitNum).ErrIndexVar,
                                                            SpeedRatio,
@@ -8115,7 +8108,7 @@ namespace PackagedTerminalHeatPump {
                               Real64 const QLatReq,          // Zone latent load []
                               Real64 &OnOffAirFlowRatio,     // ratio of compressor ON airflow to AVERAGE airflow over timestep
                               Real64 &SupHeaterLoad,         // supplemental heater load (W)
-                              bool const EP_UNUSED(HXUnitOn) // flag to enable heat exchanger
+                              [[maybe_unused]] bool const HXUnitOn // flag to enable heat exchanger
     )
     {
         // SUBROUTINE INFORMATION:
@@ -8496,7 +8489,7 @@ namespace PackagedTerminalHeatPump {
                                     ShowContinueError(
                                         state, format("  Iteration limit [{}] exceeded in calculating hot water mass flow rate", SolveMaxIter));
                                 }
-                                ShowRecurringWarningErrorAtEnd(
+                                ShowRecurringWarningErrorAtEnd(state,
                                     format("RoutineName//Hot water coil control failed (iteration limit [{}]) for {}=\"{}",
                                            SolveMaxIter,
                                            PTUnit(PTUnitNum).UnitType,
@@ -8512,7 +8505,7 @@ namespace PackagedTerminalHeatPump {
                                     ShowContinueError(state, format("...Given minimum water flow rate={:.3R} kg/s", MinWaterFlow));
                                     ShowContinueError(state, format("...Given maximum water flow rate={:.3R} kg/s", MaxHotWaterFlow));
                                 }
-                                ShowRecurringWarningErrorAtEnd("RoutineName//Hot water coil control failed (flow limits) for " +
+                                ShowRecurringWarningErrorAtEnd(state, "RoutineName//Hot water coil control failed (flow limits) for " +
                                                                    PTUnit(PTUnitNum).UnitType + "=\"" + PTUnit(PTUnitNum).Name + "\"",
                                                                PTUnit(PTUnitNum).HotWaterCoilMaxIterIndex2,
                                                                MaxHotWaterFlow,
@@ -8580,12 +8573,12 @@ namespace PackagedTerminalHeatPump {
     }
 
     void SetVSHPAirFlow(EnergyPlusData &state,
-                        int const PTUnitNum,              // Unit index
-                        int const EP_UNUSED(ZoneNum),     // Zone index
-                        Real64 const PartLoadRatio,       // unit part load ratio
-                        Real64 &OnOffAirFlowRatio,        // ratio of compressor ON airflow to average airflow over timestep
-                        Optional_int_const SpeedNum,      // Speed number
-                        Optional<Real64 const> SpeedRatio // Speed ratio
+                        int const PTUnitNum,                // Unit index
+                        [[maybe_unused]] int const ZoneNum, // Zone index
+                        Real64 const PartLoadRatio,         // unit part load ratio
+                        Real64 &OnOffAirFlowRatio,          // ratio of compressor ON airflow to average airflow over timestep
+                        Optional_int_const SpeedNum,        // Speed number
+                        Optional<Real64 const> SpeedRatio   // Speed ratio
     )
     {
 
@@ -8754,15 +8747,15 @@ namespace PackagedTerminalHeatPump {
     }
 
     void SetOnOffMassFlowRateVSCoil(EnergyPlusData &state,
-                                    int const PTUnitNum,                  // index to furnace
-                                    int const ZoneNum,                    // index to zone
-                                    bool const FirstHVACIteration,        // Flag for 1st HVAC iteration
-                                    int const EP_UNUSED(AirLoopNum),      // index to air loop !unused1208
-                                    Real64 &OnOffAirFlowRatio,            // ratio of coil on to coil off air flow rate
-                                    int const EP_UNUSED(OpMode),          // fan operating mode
-                                    Real64 const EP_UNUSED(QZnReq),       // sensible load to be met (W) !unused1208
-                                    Real64 const EP_UNUSED(MoistureLoad), // moisture load to be met (W)
-                                    Real64 &PartLoadRatio                 // coil part-load ratio
+                                    int const PTUnitNum,                        // index to furnace
+                                    int const ZoneNum,                          // index to zone
+                                    bool const FirstHVACIteration,              // Flag for 1st HVAC iteration
+                                    [[maybe_unused]] int const AirLoopNum,      // index to air loop !unused1208
+                                    Real64 &OnOffAirFlowRatio,                  // ratio of coil on to coil off air flow rate
+                                    [[maybe_unused]] int const OpMode,          // fan operating mode
+                                    [[maybe_unused]] Real64 const QZnReq,       // sensible load to be met (W) !unused1208
+                                    [[maybe_unused]] Real64 const MoistureLoad, // moisture load to be met (W)
+                                    Real64 &PartLoadRatio                       // coil part-load ratio
     )
     {
 

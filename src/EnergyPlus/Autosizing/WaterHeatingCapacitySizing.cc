@@ -118,7 +118,7 @@ Real64 WaterHeatingCapacitySizer::size(EnergyPlusData &state, Real64 _originalVa
                 NominalCapacityDes = Psychrometrics::PsyCpAirFnW(CoilOutHumRat) * DesMassFlow * (CoilOutTemp - CoilInTemp);
             }
             this->autoSizedValue = NominalCapacityDes * this->dataHeatSizeRatio;
-            if (DataGlobals::DisplayExtraWarnings && this->autoSizedValue <= 0.0) {
+            if (state.dataGlobal->DisplayExtraWarnings && this->autoSizedValue <= 0.0) {
                 std::string msg = this->callingRoutine + ": Potential issue with equipment sizing for " + this->compType + ' ' + this->compName;
                 this->addErrorMessage(msg);
                 ShowWarningMessage(state, msg);

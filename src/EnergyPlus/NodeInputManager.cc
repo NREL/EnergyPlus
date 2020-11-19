@@ -81,13 +81,6 @@ namespace NodeInputManager {
     // To provide utilities for reading and assigning indices for the
     // nodes in the HVAC loops.
 
-    // METHODOLOGY EMPLOYED:
-
-    // REFERENCES:
-
-    // OTHER NOTES:
-
-    using DataGlobals::DisplayAdvancedReportVariables;
     using namespace DataLoopNode;
     using namespace BranchNodeConnections;
 
@@ -428,7 +421,7 @@ namespace NodeInputManager {
                     SetupOutputVariable(state,
                         "System Node Quality", OutputProcessor::Unit::None, Node(NumNode).Quality, "System", "Average", NodeID(NumNode));
                     SetupOutputVariable(state, "System Node Height", OutputProcessor::Unit::m, Node(NumNode).Height, "System", "Average", NodeID(NumNode));
-                    if (DisplayAdvancedReportVariables) {
+                    if (state.dataGlobal->DisplayAdvancedReportVariables) {
                         SetupOutputVariable(state,
                             "System Node Minimum Temperature", OutputProcessor::Unit::C, Node(NumNode).TempMin, "System", "Average", NodeID(NumNode));
                         SetupOutputVariable(state,

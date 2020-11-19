@@ -135,7 +135,8 @@ namespace ChillerReformulatedEIR {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void ReformulatedEIRChillerSpecs::getDesignCapacities(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
+    void ReformulatedEIRChillerSpecs::getDesignCapacities(
+        [[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
     {
         if (calledFromLocation.loopNum == this->CWLoopNum) {
             MinLoad = this->RefCap * this->MinPartLoadRat;
@@ -721,7 +722,7 @@ namespace ChillerReformulatedEIR {
                 "Chiller Effective Heat Rejection Temperature", OutputProcessor::Unit::C, this->ChillerCondAvgTemp, "System", "Average", this->Name);
         }
 
-        if (DataGlobals::AnyEnergyManagementSystemInModel) {
+        if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
             SetupEMSInternalVariable(state, "Chiller Nominal Capacity", this->Name, "[W]", this->RefCap);
         }
     }
@@ -820,7 +821,7 @@ namespace ChillerReformulatedEIR {
                 // check if setpoint on outlet node
                 if ((DataLoopNode::Node(this->EvapOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&
                     (DataLoopNode::Node(this->EvapOutletNodeNum).TempSetPointHi == DataLoopNode::SensedNodeFlagValue)) {
-                    if (!DataGlobals::AnyEnergyManagementSystemInModel) {
+                    if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                         if (!this->ModulatedFlowErrDone) {
                             ShowWarningError(state, "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + this->Name);
                             ShowContinueError(state,
@@ -1057,7 +1058,7 @@ namespace ChillerReformulatedEIR {
                                                                     tmpEvapVolFlowRate,
                                                                     "User-Specified Reference Chilled Water Flow Rate [m3/s]",
                                                                     EvapVolFlowRateUser);
-                            if (DataGlobals::DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpEvapVolFlowRate - EvapVolFlowRateUser) / EvapVolFlowRateUser) >
                                     DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeChillerElectricReformulatedEIR: Potential issue with equipment sizing for " + this->Name);
@@ -1137,7 +1138,7 @@ namespace ChillerReformulatedEIR {
                                                                     tmpNomCap,
                                                                     "User-Specified Reference Capacity [W]",
                                                                     RefCapUser);
-                            if (DataGlobals::DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpNomCap - RefCapUser) / RefCapUser) > DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "Size:ChillerElectricReformulatedEIR: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError(state, format("User-Specified Reference Capacity of {:.2R} [W]", RefCapUser));
@@ -1207,7 +1208,7 @@ namespace ChillerReformulatedEIR {
                                                                     tmpCondVolFlowRate,
                                                                     "User-Specified Reference Condenser Water Flow Rate [m3/s]",
                                                                     CondVolFlowRateUser);
-                            if (DataGlobals::DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpCondVolFlowRate - CondVolFlowRateUser) / CondVolFlowRateUser) >
                                     DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "Size:ChillerElectricReformulatedEIR: Potential issue with equipment sizing for " + this->Name);
@@ -1271,7 +1272,7 @@ namespace ChillerReformulatedEIR {
                                                                     tmpHeatRecVolFlowRate,
                                                                     "User-Specified Design Heat Recovery Fluid Flow Rate [m3/s]",
                                                                     DesignHeatRecVolFlowRateUser);
-                            if (DataGlobals::DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpHeatRecVolFlowRate - DesignHeatRecVolFlowRateUser) / DesignHeatRecVolFlowRateUser) >
                                     DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "Size:ChillerElectricReformulatedEIR: Potential issue with equipment sizing for " + this->Name);
@@ -1582,21 +1583,21 @@ namespace ChillerReformulatedEIR {
                 TempSolveRoot::SolveRoot(state, Acc, MaxIter, SolFla, FalsiCondOutTemp, f, Tmin, Tmax, Par);
 
                 if (SolFla == -1) {
-                    if (!DataGlobals::WarmupFlag) {
+                    if (!state.dataGlobal->WarmupFlag) {
                         ++this->IterLimitExceededNum;
                         if (this->IterLimitExceededNum == 1) {
                             ShowWarningError(state,
                                 this->Name +
                                 ": Iteration limit exceeded calculating condenser outlet temperature and non-converged temperature is used");
                         } else {
-                            ShowRecurringWarningErrorAtEnd(this->Name + ": Iteration limit exceeded calculating condenser outlet temperature.",
+                            ShowRecurringWarningErrorAtEnd(state, this->Name + ": Iteration limit exceeded calculating condenser outlet temperature.",
                                                            this->IterLimitErrIndex,
                                                            this->CondOutletTemp,
                                                            this->CondOutletTemp);
                         }
                     }
                 } else if (SolFla == -2) {
-                    if (!DataGlobals::WarmupFlag) {
+                    if (!state.dataGlobal->WarmupFlag) {
                         ++this->IterFailed;
                         if (this->IterFailed == 1) {
                             ShowWarningError(state, this->Name + ": Solution found when calculating condenser outlet "
@@ -1604,7 +1605,7 @@ namespace ChillerReformulatedEIR {
                                                           "simulation continues...");
                             ShowContinueError(state, "Please check minimum and maximum values of x in EIRFPLR Curve " + this->EIRFPLRName);
                         } else {
-                            ShowRecurringWarningErrorAtEnd(this->Name + ": Solution is not found in calculating condenser outlet temperature.",
+                            ShowRecurringWarningErrorAtEnd(state, this->Name + ": Solution is not found in calculating condenser outlet temperature.",
                                                            this->IterFailedIndex,
                                                            this->CondOutletTemp,
                                                            this->CondOutletTemp);
@@ -1850,13 +1851,13 @@ namespace ChillerReformulatedEIR {
         //  if the component control is SERIESACTIVE we set the component flow to inlet flow so that
         //  flow resolver will not shut down the branch
         if (MyLoad >= 0 || !RunFlag) {
-            if (this->EquipFlowCtrl == DataBranchAirLoopPlant::ControlType_SeriesActive ||
+            if (this->EquipFlowCtrl == DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive ||
                 DataPlant::PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).FlowLock == 1) {
                 this->EvapMassFlowRate = DataLoopNode::Node(this->EvapInletNodeNum).MassFlowRate;
             }
             if (this->CondenserType == DataPlant::CondenserType::WATERCOOLED) {
                 if (DataPlant::PlantLoop(this->CDLoopNum).LoopSide(this->CDLoopSideNum).Branch(this->CDBranchNum).Comp(this->CDCompNum).FlowCtrl ==
-                    DataBranchAirLoopPlant::ControlType_SeriesActive) {
+                    DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive) {
                     this->CondMassFlowRate = DataLoopNode::Node(this->CondInletNodeNum).MassFlowRate;
                 }
             }
@@ -1875,7 +1876,7 @@ namespace ChillerReformulatedEIR {
         Real64 TempLowLimitEout = this->TempLowLimitEvapOut;
 
         // If there is a fault of chiller fouling
-        if (this->FaultyChillerFoulingFlag && (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation)) {
+        if (this->FaultyChillerFoulingFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
             int FaultIndex = this->FaultyChillerFoulingIndex;
             Real64 NomCap_ff = ChillerRefCap;
             Real64 ReferenceCOP_ff = ReferenceCOP;
@@ -1941,7 +1942,7 @@ namespace ChillerReformulatedEIR {
         }
 
         // If there is a fault of Chiller SWT Sensor
-        if (this->FaultyChillerSWTFlag && (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation)) {
+        if (this->FaultyChillerSWTFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
             int FaultIndex = this->FaultyChillerSWTIndex;
             Real64 EvapOutletTempSetPoint_ff = EvapOutletTempSetPoint;
 
@@ -2096,13 +2097,13 @@ namespace ChillerReformulatedEIR {
                     PartLoadRat = 0.0;
                     this->ChillerPartLoadRatio = PartLoadRat;
 
-                    if (this->DeltaTErrCount < 1 && !DataGlobals::WarmupFlag) {
+                    if (this->DeltaTErrCount < 1 && !state.dataGlobal->WarmupFlag) {
                         ++this->DeltaTErrCount;
                         ShowWarningError(state, "Evaporator DeltaTemp = 0 in mass flow calculation (Tevapin = Tevapout setpoint temp).");
                         ShowContinueErrorTimeStamp(state, "");
-                    } else if (!DataGlobals::WarmupFlag) {
+                    } else if (!state.dataGlobal->WarmupFlag) {
                         ++this->ChillerCapFTError;
-                        ShowRecurringWarningErrorAtEnd("CHILLER:ELECTRIC:REFORMULATEDEIR \"" + this->Name +
+                        ShowRecurringWarningErrorAtEnd(state, "CHILLER:ELECTRIC:REFORMULATEDEIR \"" + this->Name +
                                                            "\": Evaporator DeltaTemp = 0 in mass flow calculation warning continues...",
                                                        this->DeltaTErrCountIndex,
                                                        EvapDeltaTemp,
@@ -2112,7 +2113,7 @@ namespace ChillerReformulatedEIR {
             } // End of Constant Variable Flow If Block
 
             // If there is a fault of Chiller SWT Sensor
-            if (this->FaultyChillerSWTFlag && (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation) &&
+            if (this->FaultyChillerSWTFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation) &&
                 (this->EvapMassFlowRate > 0)) {
                 // calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
                 int FaultIndex = this->FaultyChillerSWTIndex;
@@ -2193,7 +2194,7 @@ namespace ChillerReformulatedEIR {
             }
 
             // If there is a fault of Chiller SWT Sensor
-            if (this->FaultyChillerSWTFlag && (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation) &&
+            if (this->FaultyChillerSWTFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation) &&
                 (this->EvapMassFlowRate > 0)) {
                 // calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
                 int FaultIndex = this->FaultyChillerSWTIndex;
@@ -2306,13 +2307,13 @@ namespace ChillerReformulatedEIR {
         // PURPOSE OF THIS SUBROUTINE:
         //  To compare the evaporator/condenser outlet temperatures to curve object min/max values
 
-        // Do not print out warnings if chiller not operating or FirstIteration/DataGlobals::WarmupFlag/FlowLock
+        // Do not print out warnings if chiller not operating or FirstIteration/WarmupFlag/FlowLock
         int PlantLoopNum = this->CWLoopNum;
         int LoopSideNum = this->CWLoopSideNum;
         int BranchNum = this->CWBranchNum;
         int CompNum = this->CWCompNum;
 
-        if (FirstIteration || DataGlobals::WarmupFlag || DataPlant::PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).FlowLock == 0) return;
+        if (FirstIteration || state.dataGlobal->WarmupFlag || DataPlant::PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).FlowLock == 0) return;
 
         // Minimum evaporator leaving temperature allowed by CAPFT curve [C]
         Real64 CAPFTXTmin = this->ChillerCAPFTXTempMin;
@@ -2338,13 +2339,13 @@ namespace ChillerReformulatedEIR {
                            this->EvapOutletTemp,
                            this->CAPFTName));
                 ShowContinueErrorTimeStamp(state, format("The range specified = {:.2T} C to {:.2T} C.", CAPFTXTmin, CAPFTXTmax));
-                ShowRecurringWarningErrorAtEnd("CHILLER:ELECTRIC:REFORMULATEDEIR \"" + this->Name +
+                ShowRecurringWarningErrorAtEnd(state, "CHILLER:ELECTRIC:REFORMULATEDEIR \"" + this->Name +
                                                    "\": The evap outlet temp range in Cooling Capacity Function of Temp curve error continues.",
                                                this->CAPFTXIterIndex,
                                                this->EvapOutletTemp,
                                                this->EvapOutletTemp);
             } else {
-                ShowRecurringWarningErrorAtEnd("CHILLER:ELECTRIC:REFORMULATEDEIR \"" + this->Name +
+                ShowRecurringWarningErrorAtEnd(state, "CHILLER:ELECTRIC:REFORMULATEDEIR \"" + this->Name +
                                                    "\": The evap outlet temp range in Cooling Capacity Function of Temp curve error continues.",
                                                this->CAPFTXIterIndex,
                                                this->EvapOutletTemp,
@@ -2364,14 +2365,14 @@ namespace ChillerReformulatedEIR {
                         this->EvapOutletTemp,
                         this->EIRFTName));
                 ShowContinueErrorTimeStamp(state, format("The range specified = {:.2T} C to {:.2T} C.", EIRFTXTmin, EIRFTXTmax));
-                ShowRecurringWarningErrorAtEnd(
+                ShowRecurringWarningErrorAtEnd(state,
                     "CHILLER:ELECTRIC:REFORMULATEDEIR \"" + this->Name +
                         "\": The evap outlet temp range in Electric Input to Cooling Output Ratio Function of Temp curve error continues.",
                     this->EIRFTXIterIndex,
                     this->EvapOutletTemp,
                     this->EvapOutletTemp);
             } else {
-                ShowRecurringWarningErrorAtEnd(
+                ShowRecurringWarningErrorAtEnd(state,
                     "CHILLER:ELECTRIC:REFORMULATEDEIR \"" + this->Name +
                         "\": The evap outlet temp range in Electric Input to Cooling Output Ratio Function of Temp curve error continues.",
                     this->EIRFTXIterIndex,
@@ -2422,13 +2423,13 @@ namespace ChillerReformulatedEIR {
                            this->CondOutletTemp,
                            this->CAPFTName));
                 ShowContinueErrorTimeStamp(state, format("The range specified = {:.2T} C to {:.2T} C.", CAPFTYTmin, CAPFTYTmax));
-                ShowRecurringWarningErrorAtEnd("CHILLER:ELECTRIC:REFORMULATEDEIR \"" + this->Name +
+                ShowRecurringWarningErrorAtEnd(state, "CHILLER:ELECTRIC:REFORMULATEDEIR \"" + this->Name +
                                                    "\": The cond outlet temp range in Cooling Capacity Function of Temp curve error continues.",
                                                this->CAPFTYIterIndex,
                                                this->CondOutletTemp,
                                                this->CondOutletTemp);
             } else {
-                ShowRecurringWarningErrorAtEnd("CHILLER:ELECTRIC:REFORMULATEDEIR \"" + this->Name +
+                ShowRecurringWarningErrorAtEnd(state, "CHILLER:ELECTRIC:REFORMULATEDEIR \"" + this->Name +
                                                    "\": The cond outlet temp range in Cooling Capacity Function of Temp curve error continues.",
                                                this->CAPFTYIterIndex,
                                                this->CondOutletTemp,
@@ -2448,14 +2449,14 @@ namespace ChillerReformulatedEIR {
                         this->CondOutletTemp,
                         this->EIRFTName));
                 ShowContinueErrorTimeStamp(state, format("The range specified = {:.2T} C to {:.2T} C.", EIRFTYTmin, EIRFTYTmax));
-                ShowRecurringWarningErrorAtEnd(
+                ShowRecurringWarningErrorAtEnd(state,
                     "CHILLER:ELECTRIC:REFORMULATEDEIR \"" + this->Name +
                         "\": The cond outlet temp range in Electric Input to Cooling Output Ratio as a Function of Temp curve error continues.",
                     this->EIRFTYIterIndex,
                     this->CondOutletTemp,
                     this->CondOutletTemp);
             } else {
-                ShowRecurringWarningErrorAtEnd(
+                ShowRecurringWarningErrorAtEnd(state,
                     "CHILLER:ELECTRIC:REFORMULATEDEIR \"" + this->Name +
                         "\": The cond outlet temp range in Electric Input to Cooling Output Ratio as a Function of Temp curve error continues.",
                     this->EIRFTYIterIndex,
@@ -2476,14 +2477,14 @@ namespace ChillerReformulatedEIR {
                                             this->CondOutletTemp,
                                             this->EIRFPLRName));
                     ShowContinueErrorTimeStamp(state, format("The range specified = {:.2T} C to {:.2T} C.", EIRFPLRTmin, EIRFPLRTmax));
-                    ShowRecurringWarningErrorAtEnd(
+                    ShowRecurringWarningErrorAtEnd(state,
                         "CHILLER:ELECTRIC:REFORMULATEDEIR \"" + this->Name +
                             "\": The cond outlet temp range in Electric Input to Cooling Output Ratio Function of PLR curve error continues.",
                         this->EIRFPLRTIterIndex,
                         this->CondOutletTemp,
                         this->CondOutletTemp);
                 } else {
-                    ShowRecurringWarningErrorAtEnd(
+                    ShowRecurringWarningErrorAtEnd(state,
                         "CHILLER:ELECTRIC:REFORMULATEDEIR \"" + this->Name +
                             "\": The cond outlet temp range in Electric Input to Cooling Output Ratio Function of PLR curve error continues.",
                         this->EIRFPLRTIterIndex,
@@ -2504,14 +2505,14 @@ namespace ChillerReformulatedEIR {
                            this->ChillerPartLoadRatio,
                            this->EIRFPLRName));
                 ShowContinueErrorTimeStamp(state, format("The range specified = {:.3T} to {:.3T}.", EIRFPLRPLRmin, EIRFPLRPLRmax));
-                ShowRecurringWarningErrorAtEnd(
+                ShowRecurringWarningErrorAtEnd(state,
                     "CHILLER:ELECTRIC:REFORMULATEDEIR \"" + this->Name +
                         "\": The part-load ratio range in Electric Input to Cooling Output Ratio Function of PLRatio curve error continues.",
                     this->EIRFPLRPLRIterIndex,
                     this->ChillerPartLoadRatio,
                     this->ChillerPartLoadRatio);
             } else {
-                ShowRecurringWarningErrorAtEnd(
+                ShowRecurringWarningErrorAtEnd(state,
                     "CHILLER:ELECTRIC:REFORMULATEDEIR \"" + this->Name +
                         "\": The part-load ratio range in Electric Input to Cooling Output Ratio Function of PLRatio curve error continues.",
                     this->EIRFPLRPLRIterIndex,
@@ -2552,7 +2553,7 @@ namespace ChillerReformulatedEIR {
         this->ChillerCapFT = CurveManager::CurveValue(state, this->ChillerCapFTIndex, EvapOutletTempSetPoint, this->CondOutletTemp);
 
         if (this->ChillerCapFT < 0) {
-            if (this->ChillerCapFTError < 1 && DataPlant::PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).FlowLock != 0 && !DataGlobals::WarmupFlag) {
+            if (this->ChillerCapFTError < 1 && DataPlant::PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).FlowLock != 0 && !state.dataGlobal->WarmupFlag) {
                 ++this->ChillerCapFTError;
                 ShowWarningError(state, "CHILLER:ELECTRIC:REFORMULATEDEIR \"" + this->Name + "\":");
                 ShowContinueError(state,
@@ -2562,9 +2563,9 @@ namespace ChillerReformulatedEIR {
                                          EvapOutletTempSetPoint,
                                          this->CondOutletTemp));
                 ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
-            } else if (DataPlant::PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).FlowLock != 0 && !DataGlobals::WarmupFlag) {
+            } else if (DataPlant::PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).FlowLock != 0 && !state.dataGlobal->WarmupFlag) {
                 ++this->ChillerCapFTError;
-                ShowRecurringWarningErrorAtEnd("CHILLER:ELECTRIC:REFORMULATEDEIR \"" + this->Name +
+                ShowRecurringWarningErrorAtEnd(state, "CHILLER:ELECTRIC:REFORMULATEDEIR \"" + this->Name +
                                                    "\": Chiller Capacity as a Function of Temperature curve output is negative warning continues...",
                                                this->ChillerCapFTErrorIndex,
                                                this->ChillerCapFT,
@@ -2575,7 +2576,7 @@ namespace ChillerReformulatedEIR {
         this->ChillerEIRFT = CurveManager::CurveValue(state, this->ChillerEIRFTIndex, this->EvapOutletTemp, this->CondOutletTemp);
 
         if (this->ChillerEIRFT < 0.0) {
-            if (this->ChillerEIRFTError < 1 && DataPlant::PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).FlowLock != 0 && !DataGlobals::WarmupFlag) {
+            if (this->ChillerEIRFTError < 1 && DataPlant::PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).FlowLock != 0 && !state.dataGlobal->WarmupFlag) {
                 ++this->ChillerEIRFTError;
                 ShowWarningError(state, "CHILLER:ELECTRIC:REFORMULATEDEIR \"" + this->Name + "\":");
                 ShowContinueError(
@@ -2585,9 +2586,9 @@ namespace ChillerReformulatedEIR {
                                          this->EvapOutletTemp,
                                          this->CondOutletTemp));
                 ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
-            } else if (DataPlant::PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).FlowLock != 0 && !DataGlobals::WarmupFlag) {
+            } else if (DataPlant::PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).FlowLock != 0 && !state.dataGlobal->WarmupFlag) {
                 ++this->ChillerEIRFTError;
-                ShowRecurringWarningErrorAtEnd("CHILLER:ELECTRIC:REFORMULATEDEIR \"" + this->Name +
+                ShowRecurringWarningErrorAtEnd(state, "CHILLER:ELECTRIC:REFORMULATEDEIR \"" + this->Name +
                                                    "\": Chiller EIR as a Function of Temperature curve output is negative warning continues...",
                                                this->ChillerEIRFTErrorIndex,
                                                this->ChillerEIRFT,
@@ -2620,7 +2621,7 @@ namespace ChillerReformulatedEIR {
         }
 
         if (this->ChillerEIRFPLR < 0.0) {
-            if (this->ChillerEIRFPLRError < 1 && DataPlant::PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).FlowLock != 0 && !DataGlobals::WarmupFlag) {
+            if (this->ChillerEIRFPLRError < 1 && DataPlant::PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).FlowLock != 0 && !state.dataGlobal->WarmupFlag) {
                 ++this->ChillerEIRFPLRError;
                 ShowWarningError(state, "CHILLER:ELECTRIC:REFORMULATEDEIR \"" + this->Name + "\":");
                 ShowContinueError(state,
@@ -2631,9 +2632,9 @@ namespace ChillerReformulatedEIR {
                                          this->ChillerPartLoadRatio,
                                          this->CondOutletTemp));
                 ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
-            } else if (DataPlant::PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).FlowLock != 0 && !DataGlobals::WarmupFlag) {
+            } else if (DataPlant::PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).FlowLock != 0 && !state.dataGlobal->WarmupFlag) {
                 ++this->ChillerEIRFPLRError;
-                ShowRecurringWarningErrorAtEnd("CHILLER:ELECTRIC:REFORMULATEDEIR \"" + this->Name +
+                ShowRecurringWarningErrorAtEnd(state, "CHILLER:ELECTRIC:REFORMULATEDEIR \"" + this->Name +
                                                    "\": Chiller EIR as a function of PLR curve output is negative warning continues...",
                                                this->ChillerEIRFPLRErrorIndex,
                                                this->ChillerEIRFPLR,

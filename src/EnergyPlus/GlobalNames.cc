@@ -77,8 +77,6 @@ namespace GlobalNames {
     // na
 
     // Using/Aliasing
-    using namespace DataGlobals;
-
     // Data
     // MODULE PARAMETER DEFINITIONS:
     // na

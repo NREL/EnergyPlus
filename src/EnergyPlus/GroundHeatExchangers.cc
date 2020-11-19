@@ -115,10 +115,6 @@ namespace GroundHeatExchangers {
     //   Ground Heat Exchanger.' Applied Energy. Vol 114, 57-69.
 
     // Using/Aliasing
-    using DataGlobals::HourOfDay;
-    using DataGlobals::TimeStep;
-    using DataGlobals::TimeStepZone;
-    using DataGlobals::WarmupFlag;
     using DataHVACGlobals::SysTimeElapsed;
     using DataHVACGlobals::TimeStepSys;
     using namespace DataLoopNode;
@@ -398,20 +394,21 @@ namespace GroundHeatExchangers {
 
     //******************************************************************************
 
-    void GLHEBase::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation))
+    void GLHEBase::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation)
     {
         this->initGLHESimVars(state);
     }
 
     //******************************************************************************
 
-    void GLHEBase::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
-                            bool const EP_UNUSED(FirstHVACIteration),
-                            Real64 &EP_UNUSED(CurLoad),
-                            bool const EP_UNUSED(RunFlag))
+    void GLHEBase::simulate(EnergyPlusData &state,
+                            [[maybe_unused]] const PlantLocation &calledFromLocation,
+                            [[maybe_unused]] bool const FirstHVACIteration,
+                            [[maybe_unused]] Real64 &CurLoad,
+                            [[maybe_unused]] bool const RunFlag)
     {
 
-        if (DataGlobals::KickOffSimulation) {
+        if (state.dataGlobal->KickOffSimulation) {
             this->initGLHESimVars(state);
         } else {
             this->initGLHESimVars(state);
@@ -581,7 +578,7 @@ namespace GroundHeatExchangers {
 
         // No other choice than to calculate the g-functions here
         calcShortTimestepGFunctions(state);
-        calcLongTimestepGFunctions();
+        calcLongTimestepGFunctions(state);
         combineShortAndLongTimestepGFunctions();
 
         // save data for later
@@ -595,7 +592,7 @@ namespace GroundHeatExchangers {
 
     //******************************************************************************
 
-    void GLHEVert::calcLongTimestepGFunctions()
+    void GLHEVert::calcLongTimestepGFunctions(EnergyPlusData &state)
     {
 
         int const numDaysInYear(365);
@@ -634,7 +631,7 @@ namespace GroundHeatExchangers {
             ++index;
         }
 
-        DisplayString("Initializing GroundHeatExchanger:System: " + name);
+        DisplayString(state, "Initializing GroundHeatExchanger:System: " + name);
 
         // Calculate the g-functions
         for (size_t lntts_index = 1; lntts_index <= myRespFactors->LNTTS.size(); ++lntts_index) {
@@ -650,7 +647,7 @@ namespace GroundHeatExchangers {
             std::stringstream ss;
             ss << std::fixed << std::setprecision(1) << float(lntts_index) / myRespFactors->LNTTS.size() * 100;
 
-            DisplayString("...progress: " + ss.str() + "%");
+            DisplayString(state, "...progress: " + ss.str() + "%");
         }
     }
 
@@ -1178,7 +1175,7 @@ namespace GroundHeatExchangers {
 
     //******************************************************************************
 
-    void GLHESlinky::calcGFunctions(EnergyPlusData &EP_UNUSED(state))
+    void GLHESlinky::calcGFunctions([[maybe_unused]] EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Matt Mitchell
@@ -1219,7 +1216,7 @@ namespace GroundHeatExchangers {
         Real64 doubleIntegralVal;
         Real64 midFieldVal;
 
-        DisplayString("Initializing GroundHeatExchanger:Slinky: " + name);
+        DisplayString(state, "Initializing GroundHeatExchanger:Slinky: " + name);
 
         X0.allocate(numCoils);
         Y0.allocate(numTrenches);
@@ -1371,7 +1368,7 @@ namespace GroundHeatExchangers {
 
     //******************************************************************************
 
-    void GLHESlinky::readCacheFileAndCompareWithThisGLHECache(EnergyPlusData &EP_UNUSED(state))
+    void GLHESlinky::readCacheFileAndCompareWithThisGLHECache([[maybe_unused]] EnergyPlusData &state)
     {
     }
 
@@ -1786,7 +1783,7 @@ namespace GroundHeatExchangers {
         // Get time constants
         getAnnualTimeConstant();
 
-        if (triggerDesignDayReset && WarmupFlag) updateCurSimTime = true;
+        if (triggerDesignDayReset && state.dataGlobal->WarmupFlag) updateCurSimTime = true;
         if (state.dataGlobal->DayOfSim == 1 && updateCurSimTime) {
             currentSimTime = 0.0;
             prevTimeSteps = 0.0;
@@ -1799,7 +1796,7 @@ namespace GroundHeatExchangers {
             triggerDesignDayReset = false;
         }
 
-        currentSimTime = (state.dataGlobal->DayOfSim - 1) * 24 + HourOfDay - 1 + (TimeStep - 1) * TimeStepZone + SysTimeElapsed; //+ TimeStepsys
+        currentSimTime = (state.dataGlobal->DayOfSim - 1) * 24 + state.dataGlobal->HourOfDay - 1 + (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone + SysTimeElapsed; //+ TimeStepsys
         locHourOfDay = mod(currentSimTime, hrsPerDay) + 1;
         locDayOfSim = currentSimTime / 24 + 1;
 
@@ -1807,7 +1804,7 @@ namespace GroundHeatExchangers {
             updateCurSimTime = true;
         }
 
-        if (!WarmupFlag) {
+        if (!state.dataGlobal->WarmupFlag) {
             triggerDesignDayReset = true;
         }
 
@@ -2039,7 +2036,7 @@ namespace GroundHeatExchangers {
 
         GLHEdeltaTemp = std::abs(outletTemp - inletTemp);
 
-        if (GLHEdeltaTemp > deltaTempLimit && this->numErrorCalls < numVerticalGLHEs && !WarmupFlag) {
+        if (GLHEdeltaTemp > deltaTempLimit && this->numErrorCalls < numVerticalGLHEs && !state.dataGlobal->WarmupFlag) {
             fluidDensity = GetDensityGlycol(state, PlantLoop(loopNum).FluidName, inletTemp, PlantLoop(loopNum).FluidIndex, RoutineName);
             designMassFlow = designFlow * fluidDensity;
             ShowWarningError(state, "Check GLHE design inputs & g-functions for consistency");
@@ -3316,7 +3313,7 @@ namespace GroundHeatExchangers {
         Real64 fluidDensity;
         bool errFlag;
 
-        Real64 currTime = ((state.dataGlobal->DayOfSim - 1) * 24 + (HourOfDay - 1) + (TimeStep - 1) * TimeStepZone + SysTimeElapsed) * DataGlobalConstants::SecInHour();
+        Real64 currTime = ((state.dataGlobal->DayOfSim - 1) * 24 + (state.dataGlobal->HourOfDay - 1) + (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone + SysTimeElapsed) * DataGlobalConstants::SecInHour();
 
         // Init more variables
         if (myFlag) {
@@ -3425,7 +3422,7 @@ namespace GroundHeatExchangers {
         bool errFlag;
         Real64 CurTime;
 
-        CurTime = ((state.dataGlobal->DayOfSim - 1) * 24 + (HourOfDay - 1) + (TimeStep - 1) * TimeStepZone + SysTimeElapsed) * DataGlobalConstants::SecInHour();
+        CurTime = ((state.dataGlobal->DayOfSim - 1) * 24 + (state.dataGlobal->HourOfDay - 1) + (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone + SysTimeElapsed) * DataGlobalConstants::SecInHour();
 
         // Init more variables
         if (myFlag) {

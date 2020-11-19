@@ -83,7 +83,6 @@ namespace ZoneAirLoopEquipmentManager {
     //       AUTHOR         Russ Taylor
     //       DATE WRITTEN   May 1997
 
-    using DataGlobals::NumOfZones;
     using namespace DataDefineEquip;
 
     void ManageZoneAirLoopEquipment(EnergyPlusData &state, std::string const &ZoneAirLoopEquipName,

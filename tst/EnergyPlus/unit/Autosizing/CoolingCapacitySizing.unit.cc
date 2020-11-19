@@ -316,7 +316,7 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 
     DataSizing::SysSizingRunDone = true;
-    DataAirSystems::PrimaryAirSystem.allocate(1);
+    state.dataAirSystemsData->PrimaryAirSystems.allocate(1);
     DataSizing::SysSizInput.allocate(1);
     DataSizing::SysSizInput(1).AirLoopNum = 1;
     DataSizing::FinalSysSizing.allocate(1);
@@ -357,7 +357,7 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
     sizer.autoSizedValue = 0.0;             // reset for next test
 
     // Test 13 - Airloop Equipment, with OA and precooling of OA stream
-    DataAirSystems::PrimaryAirSystem(1).NumOACoolCoils = 1;
+    state.dataAirSystemsData->PrimaryAirSystems(1).NumOACoolCoils = 1;
     DataSizing::FinalSysSizing(1).PrecoolTemp = 12.0;
     DataSizing::FinalSysSizing(1).PrecoolHumRat = 0.008;
     // start with an autosized value
@@ -379,8 +379,8 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
     Fans::Fan(1).FanEff = 0.6;
     Fans::Fan(1).MotInAirFrac = 0.5;
     Fans::Fan(1).FanType_Num = DataHVACGlobals::FanType_SimpleConstVolume;
-    DataAirSystems::PrimaryAirSystem(1).SupFanNum = 1;
-    DataAirSystems::PrimaryAirSystem(1).supFanModelTypeEnum = DataAirSystems::structArrayLegacyFanModels;
+    state.dataAirSystemsData->PrimaryAirSystems(1).SupFanNum = 1;
+    state.dataAirSystemsData->PrimaryAirSystems(1).supFanModelTypeEnum = DataAirSystems::structArrayLegacyFanModels;
     DataSizing::DataFanPlacement = DataSizing::zoneFanPlacement::zoneBlowThru;
 
     // Test 14 - Airloop Equipment, with OA and precooling of OA stream, add fan heat
@@ -403,7 +403,7 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
     // Test 15 - Airloop Equipment, with OA and precooling of OA stream, add fan heat, add scalable capacity sizing
     DataSizing::FinalSysSizing(1).CoolingCapMethod = DataSizing::FractionOfAutosizedCoolingCapacity;
     DataSizing::FinalSysSizing(1).FractionOfAutosizedCoolingCapacity = 0.5;
-    DataAirSystems::PrimaryAirSystem(1).supFanLocation = DataAirSystems::fanPlacement::BlowThru;
+    state.dataAirSystemsData->PrimaryAirSystems(1).supFanLocation = DataAirSystems::fanPlacement::BlowThru;
     // start with an autosized value
     inputValue = DataSizing::AutoSize;
     // do sizing

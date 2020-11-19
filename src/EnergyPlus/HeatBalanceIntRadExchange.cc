@@ -105,7 +105,6 @@ namespace HeatBalanceIntRadExchange {
     // OTHER NOTES: none
 
     // Using/Aliasing
-    using namespace DataGlobals;
     using namespace DataHeatBalance;
     using namespace DataSurfaces;
     using namespace DataSystemVariables;
@@ -142,7 +141,7 @@ namespace HeatBalanceIntRadExchange {
 #ifdef EP_Count_Calls
                                  std::string const &CalledFrom)
 #else
-                                 std::string const &EP_UNUSED(CalledFrom))
+                                 [[maybe_unused]] std::string const &CalledFrom)
 #endif
     {
 
@@ -193,11 +192,11 @@ namespace HeatBalanceIntRadExchange {
             SurfaceEmiss.allocate(MaxNumOfRadEnclosureSurfs);
             CalcInteriorRadExchangefirstTime = false;
             if (DeveloperFlag) {
-                DisplayString(" OMP turned off, HBIRE loop executed in serial");
+                DisplayString(state, " OMP turned off, HBIRE loop executed in serial");
             }
         }
 
-        if (KickOffSimulation || KickOffSizing) return;
+        if (state.dataGlobal->KickOffSimulation || state.dataGlobal->KickOffSizing) return;
 
         bool const PartialResimulate(present(ZoneToResimulate));
 
@@ -339,7 +338,7 @@ namespace HeatBalanceIntRadExchange {
                 } else if (construct.WindowTypeBSDF) {
                     SurfaceTempRad[ZoneSurfNum] = SurfWinEffInsSurfTemp(SurfNum);
                     SurfaceEmiss[ZoneSurfNum] = construct.InsideAbsorpThermal;
-                } else if (construct.TypeIsWindow && SurfWinOriginalClass(SurfNum) != SurfaceClass_TDD_Diffuser) {
+                } else if (construct.TypeIsWindow && SurfWinOriginalClass(SurfNum) != SurfaceClass::TDD_Diffuser) {
                     if (SurfIterations == 0 && SurfWinShadingFlag(SurfNum) <= 0) {
                         // If the window is bare this TS and it is the first time through we use the previous TS glass
                         // temperature whether or not the window was shaded in the previous TS. If the window was shaded
@@ -431,10 +430,10 @@ namespace HeatBalanceIntRadExchange {
 
                             // Per BG -- this should never happened.  (CR6346,CR6550 caused this to be put in.  Now removed. LKL 1/2013)
                             //          IF (SurfaceWindow(RecSurfNum)%IRfromParentZone < 0.0) THEN
-                            //            CALL ShowRecurringWarningErrorAtEnd('CalcInteriorRadExchange: Window_IRFromParentZone negative, Window="'// &
+                            //            CALL ShowRecurringWarningErrorAtEnd(state, 'CalcInteriorRadExchange: Window_IRFromParentZone negative, Window="'// &
                             //                TRIM(Surface(RecSurfNum)%Name)//'"',  &
                             //                SurfaceWindow(RecSurfNum)%IRErrCount)
-                            //            CALL ShowRecurringContinueErrorAtEnd('..occurs in Zone="'//TRIM(Surface(RecSurfNum)%ZoneName)//  &
+                            //            CALL ShowRecurringContinueErrorAtEnd(state, '..occurs in Zone="'//TRIM(Surface(RecSurfNum)%ZoneName)//  &
                             //                '", reset to 0.0 for remaining calculations.',SurfaceWindow(RecSurfNum)%IRErrCountC)
                             //            SurfaceWindow(RecSurfNum)%IRfromParentZone=0.0
                             //          ENDIF
@@ -541,7 +540,7 @@ namespace HeatBalanceIntRadExchange {
         for (int enclosureNum = 1; enclosureNum <= DataViewFactorInformation::NumOfRadiantEnclosures; ++enclosureNum) {
             auto &thisEnclosure(DataViewFactorInformation::ZoneRadiantInfo(enclosureNum));
             if (enclosureNum == 1) {
-                if (DisplayAdvancedReportVariables) {
+                if (state.dataGlobal->DisplayAdvancedReportVariables) {
                     print(state.files.eio,
                           "{}\n",
                           "! <Surface View Factor Check Values>,Zone/Enclosure Name,Original Check Value,Calculated Fixed Check Value,Final Check "
@@ -604,7 +603,7 @@ namespace HeatBalanceIntRadExchange {
                 thisEnclosure.ScriptF = 0.0;
                 thisEnclosure.Fp = 0.0;
                 thisEnclosure.FMRT = 0.0;
-                if (DisplayAdvancedReportVariables)
+                if (state.dataGlobal->DisplayAdvancedReportVariables)
                     print(state.files.eio, "Surface View Factor Check Values,{},0,0,0,-1,0,0\n", thisEnclosure.Name);
                 continue; // Go to the next enclosure in the loop
             }
@@ -798,7 +797,7 @@ namespace HeatBalanceIntRadExchange {
                 }
                 RowSum = std::abs(RowSum - thisEnclosure.NumOfSurfaces);
                 FixedRowSum = std::abs(FixedRowSum - thisEnclosure.NumOfSurfaces);
-                if (DisplayAdvancedReportVariables) {
+                if (state.dataGlobal->DisplayAdvancedReportVariables) {
                     print(state.files.eio,
                           "Surface View Factor Check Values,{},{:.6R},{:.6R},{:.6R},{},{:.6R},{:.6R}\n",
                           thisEnclosure.Name,
@@ -845,7 +844,7 @@ namespace HeatBalanceIntRadExchange {
         for (int enclosureNum = 1; enclosureNum <= DataViewFactorInformation::NumOfSolarEnclosures; ++enclosureNum) {
             auto &thisEnclosure(DataViewFactorInformation::ZoneSolarInfo(enclosureNum));
             if (enclosureNum == 1) {
-                if (DisplayAdvancedReportVariables)
+                if (state.dataGlobal->DisplayAdvancedReportVariables)
                     print(state.files.eio, "{}\n", "! <Solar View Factor Check Values>,Zone/Enclosure Name,Original Check Value,Calculated Fixed Check "
                            "Value,Final Check Value,Number of Iterations,Fixed RowSum Convergence,Used RowSum "
                            "Convergence");
@@ -916,7 +915,7 @@ namespace HeatBalanceIntRadExchange {
 
             if (thisEnclosure.NumOfSurfaces == 1) {
                 // If there is only one surface in a zone, then there is no solar distribution
-                if (DisplayAdvancedReportVariables)
+                if (state.dataGlobal->DisplayAdvancedReportVariables)
                     print(state.files.eio, "Solar View Factor Check Values,{},0,0,0,-1,0,0\n", thisEnclosure.Name);
                 continue; // Go to the next enclosure in the loop
             }
@@ -1084,7 +1083,7 @@ namespace HeatBalanceIntRadExchange {
             }
             RowSum = std::abs(RowSum - thisEnclosure.NumOfSurfaces);
             FixedRowSum = std::abs(FixedRowSum - thisEnclosure.NumOfSurfaces);
-            if (DisplayAdvancedReportVariables) {
+            if (state.dataGlobal->DisplayAdvancedReportVariables) {
                 print(state.files.eio,
                       "Solar View Factor Check Values,{},{:.6R},{:.6R},{:.6R},{},{:.6R},{:.6R}\n",
                       thisEnclosure.Name,
@@ -1103,12 +1102,12 @@ namespace HeatBalanceIntRadExchange {
     }
 
     void GetInputViewFactors(EnergyPlusData &state,
-                             std::string const &ZoneName, // Needed to check for user input view factors.
-                             int const N,                 // NUMBER OF SURFACES
-                             Array2A<Real64> F,           // USER INPUT DIRECT VIEW FACTOR MATRIX (N X N)
-                             const Array1D_int &EP_UNUSED(SPtr),     // pointer to actual surface number
-                             bool &NoUserInputF,          // Flag signifying no input F's for this
-                             bool &ErrorsFound            // True when errors are found in number of fields vs max args
+                             std::string const &ZoneName,              // Needed to check for user input view factors.
+                             int const N,                              // NUMBER OF SURFACES
+                             Array2A<Real64> F,                        // USER INPUT DIRECT VIEW FACTOR MATRIX (N X N)
+                             [[maybe_unused]] const Array1D_int &SPtr, // pointer to actual surface number
+                             bool &NoUserInputF,                       // Flag signifying no input F's for this
+                             bool &ErrorsFound                         // True when errors are found in number of fields vs max args
     )
     {
 
@@ -1454,8 +1453,8 @@ namespace HeatBalanceIntRadExchange {
                 if (i == j) continue;
                 //  Include INTMASS, FLOOR(for others), CEILING, ROOF  and different facing surfaces.
                 //  Roofs/ceilings always see floors
-                if ((Surface(SPtr(j)).Class == SurfaceClass_IntMass) || (Surface(SPtr(j)).Class == SurfaceClass_Floor) ||
-                    (Surface(SPtr(j)).Class == SurfaceClass_Roof && Surface(SPtr(i)).Class == SurfaceClass_Floor) ||
+                if ((Surface(SPtr(j)).Class == SurfaceClass::IntMass) || (Surface(SPtr(j)).Class == SurfaceClass::Floor) ||
+                    (Surface(SPtr(j)).Class == SurfaceClass::Roof && Surface(SPtr(i)).Class == SurfaceClass::Floor) ||
                     ((std::abs(Azimuth(i) - Azimuth(j)) > SameAngleLimit) ||
                      (std::abs(Tilt(i) - Tilt(j)) >
                       SameAngleLimit))) { // Everything sees internal mass surfaces | Everything except other floors sees floors
@@ -1489,8 +1488,8 @@ namespace HeatBalanceIntRadExchange {
 
                 if (i == j) continue;
                 //  Include INTMASS, FLOOR(for others), CEILING/ROOF  and different facing surfaces.
-                if ((Surface(SPtr(j)).Class == SurfaceClass_IntMass) || (Surface(SPtr(j)).Class == SurfaceClass_Floor) ||
-                    (Surface(SPtr(j)).Class == SurfaceClass_Roof) ||
+                if ((Surface(SPtr(j)).Class == SurfaceClass::IntMass) || (Surface(SPtr(j)).Class == SurfaceClass::Floor) ||
+                    (Surface(SPtr(j)).Class == SurfaceClass::Roof) ||
                     ((std::abs(Azimuth(i) - Azimuth(j)) > SameAngleLimit) || (std::abs(Tilt(i) - Tilt(j)) > SameAngleLimit))) {
                     if (ZoneArea(i) > 0.0) F(j, i) = A(j) / (ZoneArea(i));
                 }

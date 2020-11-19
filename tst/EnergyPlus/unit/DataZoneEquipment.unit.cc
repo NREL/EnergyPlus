@@ -68,8 +68,8 @@ using namespace ObjexxFCL;
 TEST_F(EnergyPlusFixture, DataZoneEquipment_TestGetSystemNodeNumberForZone)
 {
 
-    NumOfZones = 2;
-    ZoneEquipConfig.allocate(NumOfZones);
+    state.dataGlobal->NumOfZones = 2;
+    ZoneEquipConfig.allocate(state.dataGlobal->NumOfZones);
 
     ZoneEquipConfig(1).ZoneName = "Zone1";
     ZoneEquipConfig(1).ActualZoneNum = 1;

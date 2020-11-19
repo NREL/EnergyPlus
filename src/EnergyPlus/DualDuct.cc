@@ -100,8 +100,6 @@ namespace DualDuct {
     // Using/Aliasing
     using namespace DataLoopNode;
     using DataEnvironment::StdRhoAir;
-    using DataGlobals::NumOfZones;
-    using DataGlobals::SysSizingCalc;
     using DataHVACGlobals::SmallAirVolFlow;
     using DataHVACGlobals::SmallMassFlow;
     using namespace DataSizing;
@@ -403,7 +401,7 @@ namespace DualDuct {
                 } else {
 
                     // Fill the Zone Equipment data with the inlet node numbers of this unit.
-                    for (CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone) {
+                    for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                         if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
                         for (SupAirIn = 1; SupAirIn <= ZoneEquipConfig(CtrlZone).NumInletNodes; ++SupAirIn) {
                             if (dd_airterminal(DDNum).OutletNodeNum == ZoneEquipConfig(CtrlZone).InletNode(SupAirIn)) {
@@ -544,7 +542,7 @@ namespace DualDuct {
                 } else {
 
                     // Fill the Zone Equipment data with the inlet node numbers of this unit.
-                    for (CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone) {
+                    for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                         if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
                         for (SupAirIn = 1; SupAirIn <= ZoneEquipConfig(CtrlZone).NumInletNodes; ++SupAirIn) {
                             if (dd_airterminal(DDNum).OutletNodeNum == ZoneEquipConfig(CtrlZone).InletNode(SupAirIn)) {
@@ -726,7 +724,7 @@ namespace DualDuct {
                 } else {
 
                     // Fill the Zone Equipment data with the inlet node numbers of this unit.
-                    for (CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone) {
+                    for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                         if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
                         for (SupAirIn = 1; SupAirIn <= ZoneEquipConfig(CtrlZone).NumInletNodes; ++SupAirIn) {
                             if (dd_airterminal(DDNum).OutletNodeNum == ZoneEquipConfig(CtrlZone).InletNode(SupAirIn)) {
@@ -896,7 +894,7 @@ namespace DualDuct {
             // Check to see if there is a Air Distribution Unit on the Zone Equipment List
             for (Loop = 1; Loop <= NumDDAirTerminal; ++Loop) {
                 if (this->ADUNum == 0) continue;
-                if (CheckZoneEquipmentList("ZONEHVAC:AIRDISTRIBUTIONUNIT", AirDistUnit(this->ADUNum).Name)) continue;
+                if (CheckZoneEquipmentList(state, "ZONEHVAC:AIRDISTRIBUTIONUNIT", AirDistUnit(this->ADUNum).Name)) continue;
                 ShowSevereError(state, "InitDualDuct: ADU=[Air Distribution Unit," + AirDistUnit(this->ADUNum).Name +
                                 "] is not on any ZoneHVAC:EquipmentList.");
                 if (this->DamperType == DualDuct_ConstantVolume) {
@@ -911,7 +909,7 @@ namespace DualDuct {
             }
         }
 
-        if (!SysSizingCalc && this->MySizeFlag) {
+        if (!state.dataGlobal->SysSizingCalc && this->MySizeFlag) {
 
             this->SizeDualDuct(state);
 
@@ -1585,7 +1583,6 @@ namespace DualDuct {
         using namespace DataZoneEnergyDemands;
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyTdbFnHW;
-        using namespace DataGlobals;
         using DataHeatBalFanSys::ZoneThermostatSetPointHi;
         using DataHeatBalFanSys::ZoneThermostatSetPointLo;
         using DataHVACGlobals::SmallTempDiff;
@@ -2279,7 +2276,10 @@ namespace DualDuct {
         }
     }
 
-    void GetDualDuctOutdoorAirRecircUse(EnergyPlusData &state, std::string const &EP_UNUSED(CompTypeName), std::string const &CompName, bool &RecircIsUsed)
+    void GetDualDuctOutdoorAirRecircUse(EnergyPlusData &state,
+                                        [[maybe_unused]] std::string const &CompTypeName,
+                                        std::string const &CompName,
+                                        bool &RecircIsUsed)
     {
 
         // SUBROUTINE INFORMATION:

@@ -519,7 +519,7 @@ namespace TARCOGOutput {
     }
 
     void WriteModifiedArguments(InputOutputFile &InArgumentsFile,
-                                std::string const &EP_UNUSED(DBGD),
+                                [[maybe_unused]] std::string const &DBGD,
                                 Real64 const esky,
                                 Real64 const trmout,
                                 Real64 const trmin,
@@ -633,7 +633,7 @@ namespace TARCOGOutput {
     }
 
     void WriteOutputArguments(InputOutputFile &OutArgumentsFile,
-                              std::string const &EP_UNUSED(DBGD),
+                              [[maybe_unused]] std::string const &DBGD,
                               int const nlayer,
                               Real64 const tamb,
                               const Array1D<Real64> &q,
@@ -936,7 +936,7 @@ namespace TARCOGOutput {
     }
 
     void WriteOutputEN673(InputOutputFile &OutArgumentsFile,
-                          std::string const &EP_UNUSED(DBGD),
+                          [[maybe_unused]] std::string const &DBGD,
                           int const nlayer,
                           Real64 const ufactor,
                           Real64 const hout,
@@ -946,7 +946,7 @@ namespace TARCOGOutput {
                           const Array1D<Real64> &hg,
                           const Array1D<Real64> &hr,
                           const Array1D<Real64> &hs,
-                          int &EP_UNUSED(nperr))
+                          [[maybe_unused]] int &nperr)
     {
 
         // Argument array dimensioning

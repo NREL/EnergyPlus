@@ -159,8 +159,6 @@ void ControlCompOutput(EnergyPlusData &state, std::string const &CompName,      
     // Using/Aliasing
     using namespace DataLoopNode;
     using BaseboardRadiator::SimHWConvective;
-    using DataBranchAirLoopPlant::MassFlowTolerance;
-    using DataGlobals::WarmupFlag;
     using FanCoilUnits::Calc4PipeFanCoil;
 
     using HWBaseboardRadiator::CalcHWBaseboard;
@@ -463,7 +461,7 @@ void ControlCompOutput(EnergyPlusData &state, std::string const &CompName,      
         }
 
         // check if hunting down around the limit of a significant mass flow in systems.
-        if ((Iter > MaxIter / 2) && (ZoneController.CalculatedSetPoint < MassFlowTolerance)) {
+        if ((Iter > MaxIter / 2) && (ZoneController.CalculatedSetPoint < DataBranchAirLoopPlant::MassFlowTolerance)) {
             ZoneController.CalculatedSetPoint = ZoneController.MinSetPoint;
             Converged = true;
             ZoneInterHalf.MaxFlowCalc = true;
@@ -624,7 +622,7 @@ void ControlCompOutput(EnergyPlusData &state, std::string const &CompName,      
         }
 
         ++Iter;
-        if ((Iter > MaxIter) && (!WarmupFlag)) {
+        if ((Iter > MaxIter) && (!state.dataGlobal->WarmupFlag)) {
             // if ( CompErrIndex == 0 ) {
             ShowWarningMessage(state, "ControlCompOutput: Maximum iterations exceeded for " + CompType + " = " + CompName);
             ShowContinueError(state, format("... Load met       = {:.5T} W.", LoadMet));
@@ -634,7 +632,7 @@ void ControlCompOutput(EnergyPlusData &state, std::string const &CompName,      
             ShowContinueError(state, "... Error          = (Load met - Load requested) / MAXIMUM(Load requested, 100)");
             ShowContinueError(state, format("... Actuated Node Mass Flow Rate ={:.9R} kg/s", Node(ActuatedNode).MassFlowRate));
             ShowContinueErrorTimeStamp(state, "");
-            ShowRecurringWarningErrorAtEnd("ControlCompOutput: Maximum iterations error for " + CompType + " = " + CompName,
+            ShowRecurringWarningErrorAtEnd(state, "ControlCompOutput: Maximum iterations error for " + CompType + " = " + CompName,
                                            CompErrIndex,
                                            std::abs((LoadMet - QZnReq) * 100.0 / Denom),
                                            std::abs((LoadMet - QZnReq) * 100.0 / Denom),
@@ -642,7 +640,7 @@ void ControlCompOutput(EnergyPlusData &state, std::string const &CompName,      
                                            "%",
                                            "%");
             //}
-            ShowRecurringWarningErrorAtEnd("ControlCompOutput: Maximum iterations error for " + CompType + " = " + CompName,
+            ShowRecurringWarningErrorAtEnd(state, "ControlCompOutput: Maximum iterations error for " + CompType + " = " + CompName,
                                            CompErrIndex,
                                            std::abs((LoadMet - QZnReq) * 100.0 / Denom),
                                            std::abs((LoadMet - QZnReq) * 100.0 / Denom),
@@ -718,7 +716,6 @@ void CheckSysSizing(EnergyPlusData &state,
     // na
 
     // Using/Aliasing
-    using DataGlobals::DoSystemSizing;
     using DataSizing::NumSysSizInput;
     using DataSizing::SysSizingRunDone;
 
@@ -741,7 +738,7 @@ void CheckSysSizing(EnergyPlusData &state,
         if (NumSysSizInput == 0) {
             ShowContinueError(state, "No \"Sizing:System\" objects were entered.");
         }
-        if (!DoSystemSizing) {
+        if (!state.dataGlobal->DoSystemSizing) {
             ShowContinueError(state, "The \"SimulationControl\" object did not have the field \"Do System Sizing Calculation\" set to Yes.");
         }
         ShowFatalError(state, "Program terminates due to previously shown condition(s).");
@@ -820,7 +817,6 @@ void CheckZoneSizing(EnergyPlusData &state,
     // na
 
     // Using/Aliasing
-    using DataGlobals::DoZoneSizing;
     using DataSizing::NumZoneSizingInput;
     using DataSizing::ZoneSizingRunDone;
 
@@ -843,7 +839,7 @@ void CheckZoneSizing(EnergyPlusData &state,
         if (NumZoneSizingInput == 0) {
             ShowContinueError(state, "No \"Sizing:Zone\" objects were entered.");
         }
-        if (!DoZoneSizing) {
+        if (!state.dataGlobal->DoZoneSizing) {
             ShowContinueError(state, "The \"SimulationControl\" object did not have the field \"Do Zone Sizing Calculation\" set to Yes.");
         }
         ShowFatalError(state, "Program terminates due to previously shown condition(s).");
