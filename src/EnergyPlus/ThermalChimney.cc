@@ -105,8 +105,6 @@ namespace ThermalChimney {
     // Use statements for access to subroutines in other modules
     using namespace Psychrometrics;
 
-    static std::string const BlankString;
-
     void ManageThermalChimney(EnergyPlusData &state)
     {
 

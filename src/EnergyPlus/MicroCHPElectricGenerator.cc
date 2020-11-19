@@ -58,7 +58,6 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGenerators.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -561,7 +560,7 @@ namespace MicroCHPElectricGenerator {
 
     void MicroCHPDataStruct::onInitLoopEquip(EnergyPlusData &state, const EnergyPlus::PlantLocation &)
     {
-        static std::string const RoutineName("MicroCHPDataStruct::onInitLoopEquip");
+        constexpr auto RoutineName("MicroCHPDataStruct::onInitLoopEquip");
 
         Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                        DataPlant::PlantLoop(this->CWLoopNum).FluidName,
@@ -606,8 +605,6 @@ namespace MicroCHPElectricGenerator {
         //       DATE WRITTEN   March 2007
         //       MODIFIED       na
         //       RE-ENGINEERED  na
-
-        static std::string const RoutineName("InitMicroCHPNoNormalizeGenerators");
 
         bool errFlag;
 
@@ -752,7 +749,7 @@ namespace MicroCHPElectricGenerator {
         // IEA Annex 42 FC-COGEN-SIM "A Generic Model Specification for Combustion-based Residential CHP Devices"
         // Alex Ferguson, Nick Kelly, Version 3, June 26, 2006
 
-        static std::string const RoutineName("CalcMicroCHPNoNormalizeGeneratorModel");
+        constexpr auto RoutineName("CalcMicroCHPNoNormalizeGeneratorModel");
 
         int CurrentOpMode = 0;
         Real64 AllowedLoad = 0.0;
@@ -1308,7 +1305,7 @@ namespace MicroCHPElectricGenerator {
         // PURPOSE OF THIS SUBROUTINE:
         // update plant loop interactions, do any calcs needed
 
-        static std::string const RoutineName("CalcUpdateHeatRecovery");
+        constexpr auto RoutineName("CalcUpdateHeatRecovery");
 
         PlantUtilities::SafeCopyPlantNode(this->PlantInletNodeID, this->PlantOutletNodeID);
 
@@ -1340,7 +1337,7 @@ namespace MicroCHPElectricGenerator {
         // PURPOSE OF THIS SUBROUTINE:
         // update variables in structures linked to output reports
 
-        static std::string const RoutineName("UpdateMicroCHPGeneratorRecords");
+        constexpr auto RoutineName("UpdateMicroCHPGeneratorRecords");
 
         this->A42Model.ACPowerGen = this->A42Model.Pnet;                                                          // electrical power produced [W]
         this->A42Model.ACEnergyGen = this->A42Model.Pnet * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour(); // energy produced (J)

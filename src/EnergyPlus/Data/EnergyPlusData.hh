@@ -89,6 +89,7 @@ struct CrossVentMgrData;
 struct CTElectricGeneratorData;
 struct CurveManagerData;
 struct DataAirLoopData;
+struct DataBranchAirLoopPlantData;
 struct DataGlobal;
 struct DataTimingsData;
 struct DataWaterData;
@@ -148,6 +149,7 @@ struct EnergyPlusData : BaseGlobalStruct {
     std::unique_ptr<BaseboardRadiatorData> dataBaseboardRadiator;
     std::unique_ptr<BoilersData> dataBoilers;
     std::unique_ptr<BoilerSteamData> dataBoilerSteam;
+    std::unique_ptr<DataBranchAirLoopPlantData> dataBranchAirLoopPlant;
     std::unique_ptr<BranchInputManagerData> dataBranchInputManager;
     std::unique_ptr<ChilledCeilingPanelSimpleData> dataChilledCeilingPanelSimple;
     std::unique_ptr<ChillerAbsorberData> dataChillerAbsorber;
