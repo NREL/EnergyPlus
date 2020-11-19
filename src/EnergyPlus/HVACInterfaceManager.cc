@@ -602,9 +602,6 @@ namespace HVACInterfaceManager {
         // na
 
         // Using/Aliasing
-        using DataGlobals::HourOfDay;
-        using DataGlobals::TimeStep;
-        using DataGlobals::TimeStepZone;
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
         using DataLoopNode::Node;
@@ -650,7 +647,7 @@ namespace HVACInterfaceManager {
         TankInletTemp = Node(TankInletNode).Temp;
 
         // This needs to be based on time to deal with system downstepping and repeated timesteps
-        TimeElapsed = (HourOfDay - 1) + TimeStep * TimeStepZone + SysTimeElapsed;
+        TimeElapsed = (state.dataGlobal->HourOfDay - 1) + state.dataGlobal->TimeStep * state.dataGlobal->TimeStepZone + SysTimeElapsed;
         if (PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).TimeElapsed != TimeElapsed) {
             PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).LastTempInterfaceTankOutlet =
                 PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).TempInterfaceTankOutlet;
@@ -765,9 +762,6 @@ namespace HVACInterfaceManager {
         // na
 
         // Using/Aliasing
-        using DataGlobals::HourOfDay;
-        using DataGlobals::TimeStep;
-        using DataGlobals::TimeStepZone;
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
         using DataLoopNode::Node;
@@ -825,7 +819,7 @@ namespace HVACInterfaceManager {
         }
 
         // This needs to be based on time to deal with system downstepping and repeated timesteps
-        TimeElapsed = (HourOfDay - 1) + TimeStep * TimeStepZone + SysTimeElapsed;
+        TimeElapsed = (state.dataGlobal->HourOfDay - 1) + state.dataGlobal->TimeStep * state.dataGlobal->TimeStepZone + SysTimeElapsed;
         if (PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).TimeElapsed != TimeElapsed) {
             PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).LastTempInterfaceTankOutlet =
                 PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).TempInterfaceTankOutlet;
@@ -1223,7 +1217,7 @@ namespace HVACInterfaceManager {
                         } else {
                             MdotPri = MdotSec;
                         }
-                        SetActuatedBranchFlowRate(MdotPri, NodeNumPriIn, LoopNum, SupplySide, 1, false);
+                        SetActuatedBranchFlowRate(state, MdotPri, NodeNumPriIn, LoopNum, SupplySide, 1, false);
                     }
 
                     // eq. 2
@@ -1263,7 +1257,7 @@ namespace HVACInterfaceManager {
                         } else {
                             MdotPri = MdotSec;
                         }
-                        SetActuatedBranchFlowRate(MdotPri, NodeNumPriIn, LoopNum, SupplySide, 1, false);
+                        SetActuatedBranchFlowRate(state, MdotPri, NodeNumPriIn, LoopNum, SupplySide, 1, false);
                     }
 
                     // eq. 4
@@ -1369,10 +1363,10 @@ namespace HVACInterfaceManager {
 
                     if (first_supply_component_typenum == TypeOf_PumpVariableSpeed) {
                         // If/when the model supports variable-pumping primary, this can be removed.
-                        ShowWarningError("SetupCommonPipes: detected variable speed pump on supply inlet of CommonPipe plant loop");
-                        ShowContinueError("Occurs on plant loop name = " + PlantLoop(CurLoopNum).Name);
-                        ShowContinueError("The common pipe model does not support varying the flow rate on the primary/supply side");
-                        ShowContinueError("The primary/supply side will operate as if constant speed, and the simulation continues");
+                        ShowWarningError(state, "SetupCommonPipes: detected variable speed pump on supply inlet of CommonPipe plant loop");
+                        ShowContinueError(state, "Occurs on plant loop name = " + PlantLoop(CurLoopNum).Name);
+                        ShowContinueError(state, "The common pipe model does not support varying the flow rate on the primary/supply side");
+                        ShowContinueError(state, "The primary/supply side will operate as if constant speed, and the simulation continues");
                     }
 
                 } else if (SELECT_CASE_var == CommonPipe_TwoWay) { // Controlled ('two-way') common pipe
@@ -1408,10 +1402,10 @@ namespace HVACInterfaceManager {
                     } else if (first_supply_component_typenum == TypeOf_PumpVariableSpeed) {
                         PlantCommonPipe(CurLoopNum).SupplySideInletPumpType = VariableFlow;
                         // If/when the model supports variable-pumping primary, this can be removed.
-                        ShowWarningError("SetupCommonPipes: detected variable speed pump on supply inlet of TwoWayCommonPipe plant loop");
-                        ShowContinueError("Occurs on plant loop name = " + PlantLoop(CurLoopNum).Name);
-                        ShowContinueError("The common pipe model does not support varying the flow rate on the primary/supply side");
-                        ShowContinueError("The primary/supply side will operate as if constant speed, and the simulation continues");
+                        ShowWarningError(state, "SetupCommonPipes: detected variable speed pump on supply inlet of TwoWayCommonPipe plant loop");
+                        ShowContinueError(state, "Occurs on plant loop name = " + PlantLoop(CurLoopNum).Name);
+                        ShowContinueError(state, "The common pipe model does not support varying the flow rate on the primary/supply side");
+                        ShowContinueError(state, "The primary/supply side will operate as if constant speed, and the simulation continues");
                     }
                     // check type of pump on demand side inlet
                     if (first_demand_component_typenum == TypeOf_PumpConstantSpeed) {

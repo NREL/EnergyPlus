@@ -182,7 +182,7 @@ namespace DXFEarClipping {
                     Real64 const surfazimuth,    // surface azimuth angle (outward facing normal)
                     Real64 const surftilt,       // surface tilt angle
                     std::string const &surfname, // surface name (for error messages)
-                    int const surfclass          // surface class
+                    DataSurfaces::SurfaceClass surfclass          // surface class
     )
     {
 
@@ -205,11 +205,8 @@ namespace DXFEarClipping {
 
         // Use statements:
         // Using/Aliasing
-        using DataGlobals::DisplayExtraWarnings;
         using DataSurfaces::cSurfaceClass;
-        using DataSurfaces::SurfaceClass_Floor;
-        using DataSurfaces::SurfaceClass_Overhang;
-        using DataSurfaces::SurfaceClass_Roof;
+        using DataSurfaces::SurfaceClass;
 
         // Return value
         int Triangulate;
@@ -272,7 +269,7 @@ namespace DXFEarClipping {
         //  else
         //    trackit=.FALSE.
         //  endif
-        if (surfclass == SurfaceClass_Floor || surfclass == SurfaceClass_Roof || surfclass == SurfaceClass_Overhang) {
+        if (surfclass == SurfaceClass::Floor || surfclass == SurfaceClass::Roof || surfclass == SurfaceClass::Overhang) {
             CalcRfFlrCoordinateTransformation(nsides, polygon, surfazimuth, surftilt, xvt, yvt, zvt);
             for (svert = 1; svert <= nsides; ++svert) {
                 for (mvert = svert + 1; mvert <= nsides; ++mvert) {
@@ -309,21 +306,21 @@ namespace DXFEarClipping {
         while (nvertcur > 3) {
             generate_ears(state, nsides, vertex, ears, nears, r_angles, nrangles, c_vertices, ncverts, removed, earverts, rangles);
             if (!any_gt(ears, 0)) {
-                ShowWarningError("DXFOut: Could not triangulate surface=\"" + surfname + "\", type=\"" + cSurfaceClass(surfclass) +
+                ShowWarningError(state, "DXFOut: Could not triangulate surface=\"" + surfname + "\", type=\"" + cSurfaceClass(surfclass) +
                                  "\", check surface vertex order(entry)");
                 ++errcount;
-                if (errcount == 1 && !DisplayExtraWarnings) {
-                    ShowContinueError("...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual surfaces.");
+                if (errcount == 1 && !state.dataGlobal->DisplayExtraWarnings) {
+                    ShowContinueError(state, "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual surfaces.");
                 }
-                if (DisplayExtraWarnings) {
-                    ShowMessage(format(" surface={} class={}", surfname, cSurfaceClass(surfclass)));
+                if (state.dataGlobal->DisplayExtraWarnings) {
+                    ShowMessage(state, format(" surface={} class={}", surfname, cSurfaceClass(surfclass)));
 
                     for (int j = 1; j <= nsides; ++j) {
-                        ShowMessage(format(" side={} ({:.1R},{:.1R},{:.1R})",j,polygon(j).x,polygon(j).y, polygon(j).z));
+                        ShowMessage(state, format(" side={} ({:.1R},{:.1R},{:.1R})",j,polygon(j).x,polygon(j).y, polygon(j).z));
                     }
-                    ShowMessage(format(" number of triangles found={:12}", ncount));
+                    ShowMessage(state, format(" number of triangles found={:12}", ncount));
                     for (int j = 1; j <= nrangles; ++j) {
-                        ShowMessage(format(" r angle={} vert={} deg={:.1R}", j, r_angles(j), rangles(j) * DataGlobalConstants::RadToDeg()));
+                        ShowMessage(state, format(" r angle={} vert={} deg={:.1R}", j, r_angles(j), rangles(j) * DataGlobalConstants::RadToDeg()));
                     }
                 }
                 break; // while loop
@@ -668,7 +665,7 @@ namespace DXFEarClipping {
     void CalcWallCoordinateTransformation(int const nsides,
                                           Array1D<Vector> &polygon,
                                           Real64 const surfazimuth,
-                                          Real64 const EP_UNUSED(surftilt), // unused1208
+                                          [[maybe_unused]] Real64 const surftilt, // unused1208
                                           Array1D<Real64> &xvt,
                                           Array1D<Real64> &yvt,
                                           Array1D<Real64> &zvt)
@@ -731,7 +728,7 @@ namespace DXFEarClipping {
 
     void CalcRfFlrCoordinateTransformation(int const nsides,
                                            Array1D<Vector> &polygon,
-                                           Real64 const EP_UNUSED(surfazimuth), // unused1208
+                                           [[maybe_unused]] Real64 const surfazimuth, // unused1208
                                            Real64 const surftilt,
                                            Array1D<Real64> &xvt,
                                            Array1D<Real64> &yvt,
@@ -789,7 +786,7 @@ namespace DXFEarClipping {
         }
     }
 
-    void reorder(int &EP_UNUSED(nvert)) // unused1208
+    void reorder([[maybe_unused]] int &nvert) // unused1208
     {
 
         // Locals

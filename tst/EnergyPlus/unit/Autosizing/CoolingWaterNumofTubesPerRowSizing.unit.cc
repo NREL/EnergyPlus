@@ -49,7 +49,6 @@
 #include <gtest/gtest.h>
 
 #include <EnergyPlus/Autosizing/CoolingWaterNumofTubesPerRowSizing.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataSizing.hh>
 
 namespace EnergyPlus {

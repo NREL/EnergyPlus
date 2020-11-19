@@ -295,8 +295,8 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetActuatedBranchFlo
     EXPECT_NEAR(PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideValue, 0.0, 0.000001);
 
     // expect node data to represent full flow
-    // SetActuatedBranchFlowRate( CompFlow, ActuatedNode, LoopNum, LoopSideNum, BranchNum, ResetMode )
-    SetActuatedBranchFlowRate(NodeMdot, 1, 1, 1, 1, false);
+    // SetActuatedBranchFlowRate(state, CompFlow, ActuatedNode, LoopNum, LoopSideNum, BranchNum, ResetMode )
+    SetActuatedBranchFlowRate(state, NodeMdot, 1, 1, 1, 1, false);
     EXPECT_EQ(Node(1).MassFlowRate, NodeMdot);
     EXPECT_EQ(Node(1).MassFlowRateMax, NodeMdot);
     EXPECT_EQ(Node(1).MassFlowRateMaxAvail, NodeMdot);
@@ -305,7 +305,7 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetActuatedBranchFlo
     EXPECT_EQ(Node(2).MassFlowRateMax, NodeMdot);
     EXPECT_EQ(Node(2).MassFlowRateMaxAvail, NodeMdot);
     EXPECT_EQ(Node(2).MassFlowRateRequest, NodeMdot);
-    SetActuatedBranchFlowRate(NodeMdot, 2, 1, 1, 1, false);
+    SetActuatedBranchFlowRate(state, NodeMdot, 2, 1, 1, 1, false);
     EXPECT_EQ(Node(2).MassFlowRate, NodeMdot);
     EXPECT_EQ(Node(2).MassFlowRateMax, NodeMdot);
     EXPECT_EQ(Node(2).MassFlowRateMaxAvail, NodeMdot);
@@ -323,7 +323,7 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetActuatedBranchFlo
 
     EXPECT_FALSE(PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideOn);
     EXPECT_NEAR(PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideValue, 1.0, 0.000001);
-    SetActuatedBranchFlowRate(NodeMdot, 1, 1, 1, 1, false);
+    SetActuatedBranchFlowRate(state, NodeMdot, 1, 1, 1, 1, false);
     EXPECT_EQ(Node(1).MassFlowRate, NodeMdot);
     EXPECT_EQ(Node(1).MassFlowRateMax, NodeMdot);
     EXPECT_EQ(Node(1).MassFlowRateMaxAvail, NodeMdot);
@@ -332,7 +332,7 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetActuatedBranchFlo
     EXPECT_EQ(Node(2).MassFlowRateMax, NodeMdot);
     EXPECT_EQ(Node(2).MassFlowRateMaxAvail, NodeMdot);
     EXPECT_EQ(Node(2).MassFlowRateRequest, NodeMdot);
-    SetActuatedBranchFlowRate(NodeMdot, 2, 1, 1, 1, false);
+    SetActuatedBranchFlowRate(state, NodeMdot, 2, 1, 1, 1, false);
     EXPECT_EQ(Node(2).MassFlowRate, NodeMdot);
     EXPECT_EQ(Node(2).MassFlowRateMax, NodeMdot);
     EXPECT_EQ(Node(2).MassFlowRateMaxAvail, NodeMdot);
@@ -350,7 +350,7 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetActuatedBranchFlo
     EXPECT_NEAR(PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideValue, 0.0, 0.000001);
 
     // expect node data to represent no flow. Request is also 0's in this function. Max and MaxAvail are not changed
-    SetActuatedBranchFlowRate(NodeMdot, 1, 1, 1, 1, false);
+    SetActuatedBranchFlowRate(state, NodeMdot, 1, 1, 1, 1, false);
     EXPECT_EQ(Node(1).MassFlowRate, 0.0);
     EXPECT_EQ(Node(1).MassFlowRateMax, NodeMdot);
     EXPECT_EQ(Node(1).MassFlowRateMaxAvail, NodeMdot);
@@ -359,7 +359,7 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetActuatedBranchFlo
     EXPECT_EQ(Node(2).MassFlowRateMax, NodeMdot);
     EXPECT_EQ(Node(2).MassFlowRateMaxAvail, NodeMdot);
     EXPECT_EQ(Node(2).MassFlowRateRequest, 0.0);
-    SetActuatedBranchFlowRate(NodeMdot, 2, 1, 1, 1, false);
+    SetActuatedBranchFlowRate(state, NodeMdot, 2, 1, 1, 1, false);
     EXPECT_EQ(Node(2).MassFlowRate, 0.0);
     EXPECT_EQ(Node(2).MassFlowRateMax, NodeMdot);
     EXPECT_EQ(Node(2).MassFlowRateMaxAvail, NodeMdot);
@@ -458,8 +458,8 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetComponentFlowRate
     EXPECT_NEAR(PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideValue, 0.0, 0.000001);
 
     // expect node data to represent full flow
-    // SetComponentFlowRate( CompFlow, InletNode, OutletNode, LoopNum, LoopSideNum, BranchIndex, CompIndex )
-    SetComponentFlowRate(NodeMdot, 1, 2, 1, 1, 1, 1);
+    // SetComponentFlowRate(state, CompFlow, InletNode, OutletNode, LoopNum, LoopSideNum, BranchIndex, CompIndex )
+    SetComponentFlowRate(state, NodeMdot, 1, 2, 1, 1, 1, 1);
     EXPECT_EQ(Node(1).MassFlowRate, NodeMdot);
     EXPECT_EQ(Node(1).MassFlowRateMax, NodeMdot);
     EXPECT_EQ(Node(1).MassFlowRateMaxAvail, NodeMdot);
@@ -468,7 +468,7 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetComponentFlowRate
     EXPECT_EQ(Node(2).MassFlowRateMax, NodeMdot);
     EXPECT_EQ(Node(2).MassFlowRateMaxAvail, NodeMdot);
     EXPECT_EQ(Node(2).MassFlowRateRequest, NodeMdot);
-    SetComponentFlowRate(NodeMdot, 2, 3, 1, 1, 1, 1);
+    SetComponentFlowRate(state, NodeMdot, 2, 3, 1, 1, 1, 1);
     EXPECT_EQ(Node(2).MassFlowRate, NodeMdot);
     EXPECT_EQ(Node(2).MassFlowRateMax, NodeMdot);
     EXPECT_EQ(Node(2).MassFlowRateMaxAvail, NodeMdot);
@@ -488,7 +488,7 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetComponentFlowRate
     EXPECT_NEAR(PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideValue, 1.0, 0.000001);
 
     // expect node data to represent full flow
-    SetComponentFlowRate(NodeMdot, 1, 2, 1, 1, 1, 1);
+    SetComponentFlowRate(state, NodeMdot, 1, 2, 1, 1, 1, 1);
     EXPECT_EQ(Node(1).MassFlowRate, NodeMdot);
     EXPECT_EQ(Node(1).MassFlowRateMax, NodeMdot);
     EXPECT_EQ(Node(1).MassFlowRateMaxAvail, NodeMdot);
@@ -497,7 +497,7 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetComponentFlowRate
     EXPECT_EQ(Node(2).MassFlowRateMax, NodeMdot);
     EXPECT_EQ(Node(2).MassFlowRateMaxAvail, NodeMdot);
     EXPECT_EQ(Node(2).MassFlowRateRequest, NodeMdot);
-    SetComponentFlowRate(NodeMdot, 2, 3, 1, 1, 1, 1);
+    SetComponentFlowRate(state, NodeMdot, 2, 3, 1, 1, 1, 1);
     EXPECT_EQ(Node(2).MassFlowRate, NodeMdot);
     EXPECT_EQ(Node(2).MassFlowRateMax, NodeMdot);
     EXPECT_EQ(Node(2).MassFlowRateMaxAvail, NodeMdot);
@@ -516,7 +516,7 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetComponentFlowRate
     Real64 tempNodeMdot(NodeMdot);
 
     // expect node data to represent no flow. Max, MaxAvail, and Request are not changed
-    SetComponentFlowRate(tempNodeMdot, 1, 2, 1, 1, 1, 1);
+    SetComponentFlowRate(state, tempNodeMdot, 1, 2, 1, 1, 1, 1);
     EXPECT_EQ(Node(1).MassFlowRate, 0.0);
     EXPECT_EQ(Node(1).MassFlowRateMax, NodeMdot);
     EXPECT_EQ(Node(1).MassFlowRateMaxAvail, NodeMdot);
@@ -526,7 +526,7 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetComponentFlowRate
     EXPECT_EQ(Node(2).MassFlowRateMaxAvail, NodeMdot);
     EXPECT_EQ(Node(2).MassFlowRateRequest, NodeMdot);
     tempNodeMdot = NodeMdot;
-    SetComponentFlowRate(tempNodeMdot, 2, 3, 1, 1, 1, 1);
+    SetComponentFlowRate(state, tempNodeMdot, 2, 3, 1, 1, 1, 1);
     EXPECT_EQ(Node(2).MassFlowRate, 0.0);
     EXPECT_EQ(Node(2).MassFlowRateMax, NodeMdot);
     EXPECT_EQ(Node(2).MassFlowRateMaxAvail, NodeMdot);
@@ -931,8 +931,6 @@ TEST_F(EnergyPlusFixture, TestUnInitializedEMSVariable2)
 TEST_F(EnergyPlusFixture, EMSManager_CheckIfAnyEMS_OutEMS)
 {
 
-    using DataGlobals::AnyEnergyManagementSystemInModel;
-
     std::string const idf_objects = delimited_string({
         "  Output:EnergyManagementSystem,                                                                ",
         "    Verbose,                 !- Actuator Availability Dictionary Reporting                      ",
@@ -943,7 +941,7 @@ TEST_F(EnergyPlusFixture, EMSManager_CheckIfAnyEMS_OutEMS)
     ASSERT_TRUE(process_idf(idf_objects));
 
     CheckIfAnyEMS(state);
-    EXPECT_TRUE(AnyEnergyManagementSystemInModel);
+    EXPECT_TRUE(state.dataGlobal->AnyEnergyManagementSystemInModel);
 }
 
 TEST_F(EnergyPlusFixture, EMSManager_TestFuntionCall)
@@ -1082,7 +1080,7 @@ TEST_F(EnergyPlusFixture, EMSManager_TestFuntionCall)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::TimeStepZone = 0.25;
+    state.dataGlobal->TimeStepZone = 0.25;
 
     EMSManager::CheckIfAnyEMS(state); // get EMS input
     EMSManager::FinishProcessingUserInput = true;
@@ -1595,8 +1593,8 @@ TEST_F(EnergyPlusFixture, EMSManager_TestWindowShadingControlExteriorScreenOptio
     DataSurfaces::Surface(2).Name = "Surface2";
     DataSurfaces::Surface(1).Zone = 1;
     DataSurfaces::Surface(2).Zone = 1;
-    DataSurfaces::Surface(1).Class = DataSurfaces::SurfaceClass_Window;
-    DataSurfaces::Surface(2).Class = DataSurfaces::SurfaceClass_Window;
+    DataSurfaces::Surface(1).Class = DataSurfaces::SurfaceClass::Window;
+    DataSurfaces::Surface(2).Class = DataSurfaces::SurfaceClass::Window;
     DataSurfaces::Surface(1).ExtBoundCond = DataSurfaces::ExternalEnvironment;
     DataSurfaces::Surface(2).ExtBoundCond = DataSurfaces::ExternalEnvironment;
     DataSurfaces::Surface(1).windowShadingControlList.push_back(1);
@@ -1616,8 +1614,8 @@ TEST_F(EnergyPlusFixture, EMSManager_TestWindowShadingControlExteriorScreenOptio
 
     DataSurfaces::TotSurfaces = 2;
 
-    DataSurfaces::Surface(1).activeWindowShadingControl = DataSurfaces::Surface(1).windowShadingControlList[SolarShading::selectActiveWindowShadingControlIndex(1)];
-    DataSurfaces::Surface(2).activeWindowShadingControl = DataSurfaces::Surface(1).windowShadingControlList[SolarShading::selectActiveWindowShadingControlIndex(2)];
+    DataSurfaces::Surface(1).activeWindowShadingControl = DataSurfaces::Surface(1).windowShadingControlList[SolarShading::selectActiveWindowShadingControlIndex(state, 1)];
+    DataSurfaces::Surface(2).activeWindowShadingControl = DataSurfaces::Surface(1).windowShadingControlList[SolarShading::selectActiveWindowShadingControlIndex(state, 2)];
 
     SetupWindowShadingControlActuators(state);
 
@@ -1627,7 +1625,7 @@ TEST_F(EnergyPlusFixture, EMSManager_TestWindowShadingControlExteriorScreenOptio
     DataHeatBalance::Zone.allocate(1);
     DataHeatBalance::Zone(1).WindowSurfaceFirst = 1;
     DataHeatBalance::Zone(1).WindowSurfaceLast = 2;
-    DataGlobals::NumOfZones = 1;
+    state.dataGlobal->NumOfZones = 1;
     DataSurfaces::SurfWinShadingFlagEMSOn(2) = true;
     DataSurfaces::SurfWinShadingFlagEMSValue(2) = 1.0;
     SolarShading::WindowShadingManager(state);
@@ -1736,7 +1734,7 @@ TEST_F(EnergyPlusFixture, EMS_WeatherDataActuators)
     ASSERT_TRUE(process_idf(idf_objects));
 
     state.dataGlobal->BeginSimFlag = true;
-    DataGlobals::NumOfTimeStepInHour = 4;
+    state.dataGlobal->NumOfTimeStepInHour = 4;
     state.dataWeatherManager->LocationGathered = false;
 
     EMSManager::CheckIfAnyEMS(state);
@@ -1748,8 +1746,8 @@ TEST_F(EnergyPlusFixture, EMS_WeatherDataActuators)
     EMSManager::FinishProcessingUserInput = true;
 
     // Initialize all sorts of weather stuff
-    DataGlobals::TimeStep = 1;
-    DataGlobals::HourOfDay = 1;
+    state.dataGlobal->TimeStep = 1;
+    state.dataGlobal->HourOfDay = 1;
     state.dataGlobal->DayOfSim = 1;
     state.dataGlobal->BeginEnvrnFlag = true;
     state.dataGlobal->BeginDayFlag = true;
@@ -1763,8 +1761,8 @@ TEST_F(EnergyPlusFixture, EMS_WeatherDataActuators)
     EXPECT_NEAR(DataEnvironment::WindSpeed, 5.5, 0.000001);
     EXPECT_NEAR(DataEnvironment::WindDir, 32.1, 0.000001);
 
-    DataGlobals::TimeStep = 3;
-    DataGlobals::HourOfDay = 8;
+    state.dataGlobal->TimeStep = 3;
+    state.dataGlobal->HourOfDay = 8;
     state.dataGlobal->DayOfSim = 1;
     state.dataGlobal->BeginEnvrnFlag = false;
     state.dataGlobal->BeginDayFlag = false;
@@ -1864,7 +1862,7 @@ TEST_F(EnergyPlusFixture, EMS_TodayTomorrowFunctions)
     ASSERT_TRUE(process_idf(idf_objects));
 
     state.dataGlobal->BeginSimFlag = true;
-    DataGlobals::NumOfTimeStepInHour = 4;
+    state.dataGlobal->NumOfTimeStepInHour = 4;
     state.dataWeatherManager->LocationGathered = false;
 
     EMSManager::CheckIfAnyEMS(state);
@@ -1876,8 +1874,8 @@ TEST_F(EnergyPlusFixture, EMS_TodayTomorrowFunctions)
     EMSManager::FinishProcessingUserInput = true;
 
     // Initialize all sorts of weather stuff
-    DataGlobals::TimeStep = 1;
-    DataGlobals::HourOfDay = 1;
+    state.dataGlobal->TimeStep = 1;
+    state.dataGlobal->HourOfDay = 1;
     state.dataGlobal->DayOfSim = 1;
     state.dataGlobal->BeginEnvrnFlag = true;
     state.dataGlobal->BeginDayFlag = true;

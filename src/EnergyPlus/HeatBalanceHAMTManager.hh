@@ -166,12 +166,12 @@ namespace HeatBalanceHAMTManager {
 
     void CalcHeatBalHAMT(EnergyPlusData &state, int const sid, Real64 &TempSurfInTmp, Real64 &TempSurfOutTmp);
 
-    void UpdateHeatBalHAMT(int const sid);
+    void UpdateHeatBalHAMT(EnergyPlusData &state, int const sid);
 
     void
     interp(int const ndata, const Array1D<Real64> &xx, const Array1D<Real64> &yy, Real64 const invalue, Real64 &outvalue, Optional<Real64> outgrad = _);
 
-    Real64 RHtoVP(Real64 const RH, Real64 const Temperature);
+    Real64 RHtoVP(EnergyPlusData &state, Real64 const RH, Real64 const Temperature);
 
     Real64 WVDC(Real64 const Temperature, Real64 const ambp);
 

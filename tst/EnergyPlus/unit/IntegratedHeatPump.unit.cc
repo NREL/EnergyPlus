@@ -51,7 +51,6 @@
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/IntegratedHeatPump.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
 
 using namespace EnergyPlus;

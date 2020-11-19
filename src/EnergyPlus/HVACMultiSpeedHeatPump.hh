@@ -339,11 +339,12 @@ namespace HVACMultiSpeedHeatPump {
 
     //******************************************************************************
 
-    void SizeMSHeatPump(int const MSHeatPumpNum); // Engine driven heat pump number
+    void SizeMSHeatPump(EnergyPlusData &state, int const MSHeatPumpNum); // Engine driven heat pump number
 
     //******************************************************************************
 
-    void ControlMSHPOutput(EnergyPlusData &state, int const MSHeatPumpNum,       // Unit index of engine driven heat pump
+    void ControlMSHPOutput(EnergyPlusData &state,
+                           int const MSHeatPumpNum,       // Unit index of engine driven heat pump
                            bool const FirstHVACIteration, // flag for 1st HVAC iteration in the time step
                            int const CompOp,              // compressor operation; 1=on, 0=off
                            int const OpMode,              // operating mode: CycFanCycCoil | ContFanCycCoil
@@ -388,11 +389,12 @@ namespace HVACMultiSpeedHeatPump {
 
     //******************************************************************************
 
-    void ReportMSHeatPump(int const MSHeatPumpNum); // Engine driven heat pump number
+    void ReportMSHeatPump(EnergyPlusData &state, int const MSHeatPumpNum); // Engine driven heat pump number
 
     void MSHPHeatRecovery(EnergyPlusData &state, int const MSHeatPumpNum); // Number of the current electric MSHP being simulated
 
-    void SetAverageAirFlow(int const MSHeatPumpNum,              // Unit index
+    void SetAverageAirFlow(EnergyPlusData &state,
+                           int const MSHeatPumpNum,              // Unit index
                            Real64 const PartLoadRatio,           // unit part load ratio
                            Real64 &OnOffAirFlowRatio,            // ratio of compressor ON airflow to average airflow over timestep
                            Optional_int_const SpeedNum = _,      // Speed number

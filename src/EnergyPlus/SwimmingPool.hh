@@ -160,7 +160,7 @@ namespace SwimmingPool {
         {
         }
 
-        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void ErrorCheckSetupPoolSurface(EnergyPlusData &state,
                                         std::string const Alpha1,
@@ -181,13 +181,13 @@ namespace SwimmingPool {
 
         void calculate(EnergyPlusData &state);
 
-        void calcSwimmingPoolEvap(Real64 &EvapRate, // Evaporation rate
+        void calcSwimmingPoolEvap(EnergyPlusData &state, Real64 &EvapRate, // Evaporation rate
                                   int SurfNum,      // Surface index
                                   Real64 MAT,       // mean air temperature
                                   Real64 HumRat     // zone air humidity ratio
         );
 
-        void update();
+        void update(EnergyPlusData &state);
     };
 
     void GetSwimmingPool(EnergyPlusData &state);

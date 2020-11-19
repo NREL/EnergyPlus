@@ -54,7 +54,6 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -163,19 +162,19 @@ TEST_F(EnergyPlusFixture, ParallelPIUTest1)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
-    DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
+    state.dataGlobal->NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
+    state.dataGlobal->MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(state); // read schedules
     ScheduleManager::ScheduleInputProcessed = true;
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
-    DataGlobals::HourOfDay = 1;
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->HourOfDay = 1;
+    state.dataGlobal->TimeStep = 1;
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
     DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
-    DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(101325.0, 20.0, 0.0);
+    DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, 101325.0, 20.0, 0.0);
     ScheduleManager::UpdateScheduleValues(state);
 
     bool ErrorsFound = false;
@@ -392,19 +391,19 @@ TEST_F(EnergyPlusFixture, SeriesPIUTest1)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
-    DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
+    state.dataGlobal->NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
+    state.dataGlobal->MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(state); // read schedules
     ScheduleManager::ScheduleInputProcessed = true;
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
-    DataGlobals::HourOfDay = 1;
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->HourOfDay = 1;
+    state.dataGlobal->TimeStep = 1;
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
     DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
-    DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(101325.0, 20.0, 0.0);
+    DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, 101325.0, 20.0, 0.0);
     ScheduleManager::UpdateScheduleValues(state);
 
     bool ErrorsFound = false;
@@ -673,19 +672,19 @@ TEST_F(EnergyPlusFixture, SeriesPIUZoneOAVolumeFlowRateTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
-    DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
+    state.dataGlobal->NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
+    state.dataGlobal->MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(state); // read schedules
     ScheduleManager::ScheduleInputProcessed = true;
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
-    DataGlobals::HourOfDay = 1;
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->HourOfDay = 1;
+    state.dataGlobal->TimeStep = 1;
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
     DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
-    DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(101325.0, 20.0, 0.0);
+    DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, 101325.0, 20.0, 0.0);
     ScheduleManager::UpdateScheduleValues(state);
 
     bool ErrorsFound = false;

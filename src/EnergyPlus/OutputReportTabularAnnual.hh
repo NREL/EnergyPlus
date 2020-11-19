@@ -76,9 +76,9 @@ namespace OutputReportTabularAnnual {
 
     void GetInputTabularAnnual(EnergyPlusData &state);
 
-    void checkAggregationOrderForAnnual();
+    void checkAggregationOrderForAnnual(EnergyPlusData &state);
 
-    void GatherAnnualResultsForTimeStep(OutputProcessor::TimeStepType kindOfTypeStep);
+    void GatherAnnualResultsForTimeStep(EnergyPlusData &state, OutputProcessor::TimeStepType kindOfTypeStep);
 
     void ResetAnnualGathering();
 
@@ -86,7 +86,7 @@ namespace OutputReportTabularAnnual {
 
     void AddAnnualTableOfContents(std::ostream &);
 
-    AnnualFieldSet::AggregationKind stringToAggKind(std::string inString);
+    AnnualFieldSet::AggregationKind stringToAggKind(EnergyPlusData &state, std::string inString);
 
     void clear_state(); // for unit tests
 
@@ -115,9 +115,9 @@ namespace OutputReportTabularAnnual {
 
         void setupGathering(EnergyPlusData &state);
 
-        bool invalidAggregationOrder();
+        bool invalidAggregationOrder(EnergyPlusData &state);
 
-        void gatherForTimestep(OutputProcessor::TimeStepType kindOfTypeStep);
+        void gatherForTimestep(EnergyPlusData &state, OutputProcessor::TimeStepType kindOfTypeStep);
 
         void resetGathering();
 
@@ -144,11 +144,11 @@ namespace OutputReportTabularAnnual {
         std::vector<std::string> m_objectNames;     // for each row of annual table
         std::vector<AnnualFieldSet> m_annualFields; // for each column
 
-        Real64 getElapsedTime(OutputProcessor::TimeStepType kindOfTimeStep);
+        Real64 getElapsedTime(EnergyPlusData &state, OutputProcessor::TimeStepType kindOfTimeStep);
 
-        Real64 getSecondsInTimeStep(OutputProcessor::TimeStepType kindOfTimeStep);
+        Real64 getSecondsInTimeStep(EnergyPlusData &state, OutputProcessor::TimeStepType kindOfTimeStep);
 
-        void computeBinColumns();
+        void computeBinColumns(EnergyPlusData &state);
 
         std::vector<std::string> setupAggString();
 
@@ -162,7 +162,7 @@ namespace OutputReportTabularAnnual {
 
         bool allRowsSameSizeDefferedVectors(std::vector<AnnualFieldSet>::iterator fldStIt);
 
-        void convertUnitForDeferredResults(std::vector<AnnualFieldSet>::iterator fldStIt, int const unitsStyle);
+        void convertUnitForDeferredResults(EnergyPlusData &state, std::vector<AnnualFieldSet>::iterator fldStIt, int const unitsStyle);
 
         std::vector<Real64> calculateBins(int const numberOfBins,
                                           std::vector<Real64> const valuesToBin,

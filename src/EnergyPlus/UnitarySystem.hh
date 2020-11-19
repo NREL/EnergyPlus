@@ -82,7 +82,7 @@ namespace UnitarySystems {
         bool m_SingleModeFlag;
 
         static void getDesignSpecMSHP(EnergyPlusData &state);
-        static void getDesignSpecMSHPdata(EnergyPlusData &EP_UNUSED(state), bool errorsFound);
+        static void getDesignSpecMSHPdata([[maybe_unused]] EnergyPlusData &state, bool errorsFound);
     };
 
     struct UnitarySys : HVACSystemData
@@ -550,7 +550,7 @@ namespace UnitarySystems {
                                Real64 const OAUCoilOutTemp // the coil inlet temperature of OutdoorAirUnit
         );
 
-        void frostControlSetPointLimit(Real64 &TempSetPoint,       // temperature setpoint of the sensor node
+        void frostControlSetPointLimit(EnergyPlusData &state, Real64 &TempSetPoint,       // temperature setpoint of the sensor node
                                        Real64 &HumRatSetPoint,     // humidity ratio setpoint of the sensor node
                                        Real64 const BaroPress,     // baromtric pressure, Pa [N/m^2]
                                        Real64 const TfrostControl, // minimum temperature limit for forst control

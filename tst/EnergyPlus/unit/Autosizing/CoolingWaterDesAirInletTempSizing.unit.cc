@@ -49,7 +49,6 @@
 #include <gtest/gtest.h>
 
 #include <EnergyPlus/Autosizing/CoolingWaterDesAirInletTempSizing.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataSizing.hh>
@@ -262,7 +261,7 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirInletTempSizingGauntlet)
 
     DataSizing::CurSysNum = 1;
     DataHVACGlobals::NumPrimaryAirSys = 1;
-    DataAirSystems::PrimaryAirSystem.allocate(1);
+    state.dataAirSystemsData->PrimaryAirSystems.allocate(1);
     DataSizing::NumSysSizInput = 1;
     DataSizing::SysSizingRunDone = false;
     // start with a hard-sized value as the user input, no system sizing arrays
@@ -292,7 +291,7 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirInletTempSizingGauntlet)
     inputValue = EnergyPlus::DataSizing::AutoSize;
 
     // do sizing
-    DataAirSystems::PrimaryAirSystem(DataSizing::CurSysNum).NumOACoolCoils = 1;
+    state.dataAirSystemsData->PrimaryAirSystems(DataSizing::CurSysNum).NumOACoolCoils = 1;
     DataSizing::DataDesInletAirTemp = 19.155;
     sizer.wasAutoSized = false;
     sizer.initializeWithinEP(this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_CoolingWater), "MyWaterCoil", printFlag, routineName);
@@ -302,7 +301,7 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirInletTempSizingGauntlet)
     EXPECT_NEAR(19.155, sizedValue, 0.001);
     sizer.autoSizedValue = 0.0; // reset for next test
     DataSizing::DataDesInletAirTemp = 0.0;
-    DataAirSystems::PrimaryAirSystem(DataSizing::CurSysNum).NumOACoolCoils = 0;
+    state.dataAirSystemsData->PrimaryAirSystems(DataSizing::CurSysNum).NumOACoolCoils = 0;
     DataSizing::DataDesInletAirTemp = 0.0;
 
     // Test 13 - Airloop Equipment - no OA coils
@@ -325,7 +324,7 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirInletTempSizingGauntlet)
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 
     // Test 14 - Airloop Equipment - 1 OA coil, use PrecoolHumRat
-    DataAirSystems::PrimaryAirSystem(DataSizing::CurSysNum).NumOACoolCoils = 1;
+    state.dataAirSystemsData->PrimaryAirSystems(DataSizing::CurSysNum).NumOACoolCoils = 1;
     EnergyPlus::DataSizing::FinalSysSizing(DataSizing::CurSysNum).PrecoolTemp = 12.21;
 
     // start with an auto-sized value as the user input

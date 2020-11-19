@@ -53,7 +53,6 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 
 // EnergyPlus Headers
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
@@ -75,7 +74,6 @@
 
 using namespace EnergyPlus;
 using namespace ObjexxFCL;
-using namespace EnergyPlus::DataGlobals;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataHeatBalFanSys;
 using namespace EnergyPlus::DataHVACGlobals;
@@ -287,7 +285,7 @@ TEST_F(EnergyPlusFixture, IdealLoadsAirSystem_GetInput)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::DoWeathSim = true;
+    state.dataGlobal->DoWeathSim = true;
 
     GetPurchasedAir(state);
 
@@ -387,14 +385,14 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_PlenumTest)
 
     ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
 
-    DataGlobals::DoWeathSim = true;
+    state.dataGlobal->DoWeathSim = true;
 
     bool ErrorsFound = false;
     GetZoneData(state, ErrorsFound);
     Zone(1).SurfaceFirst = 1;
     Zone(1).SurfaceLast = 1;
     ScheduleManager::Schedule.allocate(1);
-    AllocateHeatBalArrays();
+    AllocateHeatBalArrays(state);
     EXPECT_FALSE(ErrorsFound); // expect no errors
 
     bool FirstHVACIteration(true);
@@ -497,14 +495,14 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_ExhaustNodeTest)
 
     ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
 
-    DataGlobals::DoWeathSim = true;
+    state.dataGlobal->DoWeathSim = true;
 
     bool ErrorsFound = false;
     GetZoneData(state, ErrorsFound);
     Zone(1).SurfaceFirst = 1;
     Zone(1).SurfaceLast = 1;
     ScheduleManager::Schedule.allocate(1);
-    AllocateHeatBalArrays();
+    AllocateHeatBalArrays(state);
     EXPECT_FALSE(ErrorsFound); // expect no errors
 
     bool FirstHVACIteration(true);
@@ -627,14 +625,14 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_EMSOverrideTest)
 
     ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
 
-    DataGlobals::DoWeathSim = true;
+    state.dataGlobal->DoWeathSim = true;
 
     bool ErrorsFound = false;
     GetZoneData(state, ErrorsFound);
     Zone(1).SurfaceFirst = 1;
     Zone(1).SurfaceLast = 1;
     ScheduleManager::Schedule.allocate(1);
-    AllocateHeatBalArrays();
+    AllocateHeatBalArrays(state);
     EXPECT_FALSE(ErrorsFound); // expect no errors
     ZoneEquipConfig.allocate(1);
 
@@ -646,7 +644,7 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_EMSOverrideTest)
     ZoneEquipConfig(1).ExhaustNode.allocate(1);
     ZoneEquipConfig(1).NumExhaustNodes = 1;
     ZoneEquipConfig(1).ExhaustNode(1) = 2;
-    DataGlobals::TimeStepZone = 0.25;
+    state.dataGlobal->TimeStepZone = 0.25;
 
     EMSManager::CheckIfAnyEMS(state); // get EMS input
     EMSManager::GetEMSInput(state);
@@ -668,7 +666,7 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_EMSOverrideTest)
     Real64 SysOutputProvided;
     Real64 MoistOutputProvided;
 
-    CalcPurchAirLoads(1, SysOutputProvided, MoistOutputProvided, 1, 1);
+    CalcPurchAirLoads(state, 1, SysOutputProvided, MoistOutputProvided, 1, 1);
 
     EXPECT_EQ(PurchAir(1).EMSValueMassFlowRate, 0.0);
     EXPECT_EQ(PurchAir(1).EMSValueSupplyTemp, 0.0);

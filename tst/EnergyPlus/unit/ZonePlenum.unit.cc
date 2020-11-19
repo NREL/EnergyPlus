@@ -51,7 +51,6 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -61,7 +60,6 @@
 
 using namespace EnergyPlus;
 using namespace ObjexxFCL;
-using namespace DataGlobals;
 using namespace EnergyPlus::ZonePlenum;
 using namespace EnergyPlus::DataLoopNode;
 using DataContaminantBalance::Contaminant;

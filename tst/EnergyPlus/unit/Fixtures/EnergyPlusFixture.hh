@@ -56,7 +56,6 @@
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Data/CommonIncludes.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 #include <memory>
@@ -124,7 +123,7 @@ protected:
         // Gets information about the currently running test.
         // Do NOT delete the returned object - it's managed by the UnitTest class.
         const ::testing::TestInfo *const test_info = ::testing::UnitTest::GetInstance()->current_test_info();
-        ShowMessage("Begin Test: " + std::string(test_info->test_case_name()) + ", " + std::string(test_info->name()));
+        ShowMessage(state, "Begin Test: " + std::string(test_info->test_case_name()) + ", " + std::string(test_info->name()));
     }
 
     // This will compare either a STL container or ObjexxFCL container

@@ -56,7 +56,6 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 
@@ -69,8 +68,8 @@ using namespace ObjexxFCL;
 TEST_F(EnergyPlusFixture, DataZoneEquipment_TestGetSystemNodeNumberForZone)
 {
 
-    NumOfZones = 2;
-    ZoneEquipConfig.allocate(NumOfZones);
+    state.dataGlobal->NumOfZones = 2;
+    ZoneEquipConfig.allocate(state.dataGlobal->NumOfZones);
 
     ZoneEquipConfig(1).ZoneName = "Zone1";
     ZoneEquipConfig(1).ActualZoneNum = 1;
@@ -128,23 +127,23 @@ TEST_F(EnergyPlusFixture, DataZoneEquipment_TestCalcDesignSpecificationOutdoorAi
     Real64 OAVolumeFlowRate;
     // Test ZOAM_ProportionalControlSchOcc
     DataContaminantBalance::ZoneAirCO2(1) = 500.0;
-    OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir(1, 1, false, false);
+    OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir(state, 1, 1, false, false);
     EXPECT_NEAR(0.031, OAVolumeFlowRate, 0.00001);
 
     DataContaminantBalance::ZoneAirCO2(1) = 405.0;
-    OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir(1, 1, false, false);
+    OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir(state, 1, 1, false, false);
     EXPECT_NEAR(0.0308115, OAVolumeFlowRate, 0.00001);
 
     // Test ZOAM_ProportionalControlDesOcc
     DataContaminantBalance::ZoneAirCO2(1) = 500.0;
     DataSizing::OARequirements(1).OAFlowMethod = DataSizing::ZOAM_ProportionalControlDesOcc;
-    OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir(1, 1, false, false);
+    OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir(state, 1, 1, false, false);
     EXPECT_NEAR(0.0315879, OAVolumeFlowRate, 0.00001);
 
     // Test ZOAM_IAQP
     DataSizing::OARequirements(1).OAFlowMethod = DataSizing::ZOAM_IAQP;
     DataContaminantBalance::ZoneSysContDemand(1).OutputRequiredToCO2SP = 0.2 * DataEnvironment::StdRhoAir;
-    OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir(1, 1, false, false);
+    OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir(state, 1, 1, false, false);
     EXPECT_NEAR(0.2, OAVolumeFlowRate, 0.00001);
 
     // Cleanup

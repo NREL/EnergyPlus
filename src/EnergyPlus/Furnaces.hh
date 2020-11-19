@@ -355,7 +355,8 @@ namespace Furnaces {
                      bool const FirstHVACIteration // TRUE if first HVAC iteration
     );
 
-    void SetOnOffMassFlowRate(int const FurnaceNum,      // index to furnace
+    void SetOnOffMassFlowRate(EnergyPlusData &state,
+                              int const FurnaceNum,      // index to furnace
                               int const AirLoopNum,      // index to air loop !unused1208
                               Real64 &OnOffAirFlowRatio, // ratio of coil on to coil off air flow rate
                               int const OpMode,          // fan operating mode
@@ -424,7 +425,8 @@ namespace Furnaces {
                                   Array1D<Real64> const &Par   // Function parameters
     );
 
-    void SetAverageAirFlow(int const FurnaceNum,       // Unit index
+    void SetAverageAirFlow(EnergyPlusData &state,
+                           int const FurnaceNum,       // Unit index
                            Real64 const PartLoadRatio, // unit part load ratio
                            Real64 &OnOffAirFlowRatio   // ratio of compressor ON airflow to AVERAGE airflow over timestep
     );

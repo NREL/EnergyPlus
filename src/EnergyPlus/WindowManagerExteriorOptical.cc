@@ -51,7 +51,6 @@
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/Material.hh>
@@ -72,8 +71,6 @@ using namespace SingleLayerOptics;
 using namespace DataEnvironment;
 using namespace DataSurfaces;
 using namespace DataHeatBalance;
-using namespace DataGlobals;
-
 namespace WindowManager {
 
     std::shared_ptr<CBSDFLayer> getBSDFLayer(EnergyPlusData &state, const Material::MaterialProperties & t_Material, const WavelengthRange t_Range )
@@ -178,7 +175,7 @@ namespace WindowManager {
         // Calculate optical properties of blind-type layers entered with MATERIAL:WindowBlind
         // Calculation from this is used for IR properties. Need to make sure that properties
         // are calculated with new WCE optical engine (for both blinds and screens)
-        if (TotBlinds > 0) CalcWindowBlindProperties();
+        if (TotBlinds > 0) CalcWindowBlindProperties(state);
 
         // Initialize SurfaceScreen structure
         NumSurfaceScreens = TotScreens;
@@ -327,7 +324,7 @@ namespace WindowManager {
     {
     }
 
-    void CWCEMaterialDualBandFactory::init(EnergyPlusData &EP_UNUSED(state))
+    void CWCEMaterialDualBandFactory::init([[maybe_unused]] EnergyPlusData &state)
     {
         if (m_Range == WavelengthRange::Visible) {
             m_Material = createVisibleRangeMaterial();

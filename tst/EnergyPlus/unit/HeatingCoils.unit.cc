@@ -52,7 +52,6 @@
 // Google Test Headers
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/DataGlobalConstants.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/DataEnvironment.hh>

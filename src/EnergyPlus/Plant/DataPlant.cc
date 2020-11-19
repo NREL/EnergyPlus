@@ -61,7 +61,6 @@ namespace DataPlant {
     // Condenser Loops.
 
     // Using/Aliasing
-    using DataGlobals::DoingSizing;
     using DataLoopNode::NodeID;
     using DataLoopNode::SensedNodeFlagValue;
 

@@ -53,11 +53,8 @@
 #include <EnergyPlus/Coils/CoilCoolingDX.hh>
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/CurveManager.hh>
-#include <EnergyPlus/DElightManagerF.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataAirLoop.hh>
-#include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataBranchNodeConnections.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
@@ -66,7 +63,6 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataErrorTracking.hh>
 #include <EnergyPlus/DataGenerators.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
@@ -146,9 +142,6 @@
 #include <EnergyPlus/HybridModel.hh>
 #include <EnergyPlus/HybridUnitaryAirConditioners.hh>
 #include <EnergyPlus/IceThermalStorage.hh>
-#include <EnergyPlus/InputProcessing/IdfParser.hh>
-#include <EnergyPlus/InputProcessing/InputProcessor.hh>
-#include <EnergyPlus/InputProcessing/InputValidation.hh>
 #include <EnergyPlus/IntegratedHeatPump.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/LowTempRadiantSystem.hh>
@@ -207,7 +200,10 @@
 #include <EnergyPlus/SingleDuct.hh>
 #include <EnergyPlus/SizingAnalysisObjects.hh>
 #include <EnergyPlus/SizingManager.hh>
-#include <EnergyPlus/SurfaceGeometry.hh>
+#include <EnergyPlus/SolarCollectors.hh>
+#include <EnergyPlus/SolarShading.hh>
+#include <EnergyPlus/SplitterComponent.hh>
+#include <EnergyPlus/SteamCoils.hh>
 
 void EnergyPlus::clearAllStates(EnergyPlusData &state)
 {
@@ -220,7 +216,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     CoilCoolingDX::clear_state();
     AirflowNetwork::clear_state();
     DataBranchAirLoopPlant::clear_state();
-    DataAirSystems::clear_state();
     DataBranchNodeConnections::clear_state();
     state.dataConstruction->clear_state();
     DataContaminantBalance::clear_state();
@@ -229,7 +224,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     DataEnvironment::clear_state();
     DataErrorTracking::clear_state();
     DataGenerators::clear_state();
-    DataGlobals::clear_state(state.files);
     DataHeatBalance::clear_state();
     DataHeatBalFanSys::clear_state();
     DataHeatBalSurface::clear_state();
@@ -369,8 +363,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     SingleDuct::clear_state();
     SizingAnalysisObjects_clear_state(); // SizingAnalysisObjects does not have a namespace
     SizingManager::clear_state();
-    SurfaceGeometry::clear_state();
-    UtilityRoutines::clear_state();
     EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::clear_state();
     ResultsFramework::clear_state();
 }

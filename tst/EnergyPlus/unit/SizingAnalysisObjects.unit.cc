@@ -65,7 +65,6 @@
 
 using namespace EnergyPlus;
 using namespace OutputProcessor;
-using namespace DataGlobals;
 using namespace DataPlant;
 using namespace DataSizing;
 using namespace OutputReportPredefined;
@@ -84,8 +83,8 @@ protected:
         midLogVal = 75.0;
         hiLogVal = 100.0;
 
-        NumOfTimeStepInHour = 4; // in DataGlobals
-        TimeStepZone = 0.25;
+        state.dataGlobal->NumOfTimeStepInHour = 4; // in DataGlobals
+        state.dataGlobal->TimeStepZone = 0.25;
 
         // setup weather manager state needed
         state.dataWeatherManager->NumOfEnvrn = 2;
@@ -110,8 +109,8 @@ protected:
         state.dataWeatherManager->Environment(4).DesignDayNum = 2;
         state.dataWeatherManager->Environment(4).SeedEnvrnNum = 2;
 
-        OutputProcessor::SetupTimePointers("ZONE", TimeStepZone);
-        OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
+        OutputProcessor::SetupTimePointers(state, "ZONE", state.dataGlobal->TimeStepZone);
+        OutputProcessor::SetupTimePointers(state, "HVAC", DataHVACGlobals::TimeStepSys);
 
         PlantSizData.allocate(1);
 
@@ -131,7 +130,7 @@ protected:
         PlantLoop(1).MaxMassFlowRate = 2.0;
         PlantLoop(1).VolumeWasAutoSized = true;
 
-        SetPredefinedTables();
+        SetPredefinedTables(state);
 
     }
 
@@ -152,16 +151,16 @@ public:
 
 TEST_F(SizingAnalysisObjectsTest, testZoneUpdateInLoggerFramework)
 {
-    ShowMessage("Begin Test: SizingAnalysisObjectsTest, testZoneUpdateInLoggerFramework");
+    ShowMessage(state, "Begin Test: SizingAnalysisObjectsTest, testZoneUpdateInLoggerFramework");
 
     // first step
     state.dataGlobal->KindOfSim = DataGlobalConstants::KindOfSim::HVACSizeDesignDay;
     state.dataGlobal->DayOfSim = 1;
-    HourOfDay = 1;
+    state.dataGlobal->HourOfDay = 1;
     state.dataWeatherManager->Envrn = 3;
     state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum = 1;
     sizingLoggerFrameObj.SetupSizingLogsNewEnvironment(state);
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->TimeStep = 1;
 
     LogVal = lowLogVal;
     sizingLoggerFrameObj.UpdateSizingLogValuesZoneStep(state);
@@ -169,16 +168,16 @@ TEST_F(SizingAnalysisObjectsTest, testZoneUpdateInLoggerFramework)
     EXPECT_DOUBLE_EQ(lowLogVal, sizingLoggerFrameObj.logObjs[logIndex].ztStepObj[0].logDataValue);
 
     // last step of first design day
-    HourOfDay = 24;
-    DataGlobals::TimeStep = 4;
+    state.dataGlobal->HourOfDay = 24;
+    state.dataGlobal->TimeStep = 4;
     LogVal = hiLogVal;
     sizingLoggerFrameObj.UpdateSizingLogValuesZoneStep(state);
 
     EXPECT_DOUBLE_EQ(hiLogVal, sizingLoggerFrameObj.logObjs[logIndex].ztStepObj[95].logDataValue);
 
     // first step of second design day
-    HourOfDay = 1;
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->HourOfDay = 1;
+    state.dataGlobal->TimeStep = 1;
     state.dataWeatherManager->Envrn = 4;
     state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum = 2;
     sizingLoggerFrameObj.SetupSizingLogsNewEnvironment(state);
@@ -190,7 +189,7 @@ TEST_F(SizingAnalysisObjectsTest, testZoneUpdateInLoggerFramework)
 
 TEST_F(SizingAnalysisObjectsTest, BasicLogging4stepsPerHour)
 {
-    ShowMessage("Begin Test: SizingAnalysisObjectsTest, BasicLogging4stepsPerHour");
+    ShowMessage(state, "Begin Test: SizingAnalysisObjectsTest, BasicLogging4stepsPerHour");
 
     // basic test of method FillZoneStep and zone time stamp constructor
     // setup a log for 4 timesteps per hour and fill the first 4 steps, then check that values are there
@@ -260,7 +259,7 @@ TEST_F(SizingAnalysisObjectsTest, BasicLogging4stepsPerHour)
 
 TEST_F(SizingAnalysisObjectsTest, LoggingDDWrap1stepPerHour)
 {
-    ShowMessage("Begin Test: SizingAnalysisObjectsTest, LoggingDDWrap1stepPerHour");
+    ShowMessage(state, "Begin Test: SizingAnalysisObjectsTest, LoggingDDWrap1stepPerHour");
 
     // this test uses one timestep per hour and checks as for two design days
 
@@ -318,7 +317,7 @@ TEST_F(SizingAnalysisObjectsTest, LoggingDDWrap1stepPerHour)
 
 TEST_F(SizingAnalysisObjectsTest, PlantCoincidentAnalyObjTest)
 {
-    ShowMessage("Begin Test: SizingAnalysisObjectsTest, PlantCoincidentAnalyObjTest");
+    ShowMessage(state, "Begin Test: SizingAnalysisObjectsTest, PlantCoincidentAnalyObjTest");
 
     std::string loopName;
     int loopNum;
@@ -371,7 +370,7 @@ TEST_F(SizingAnalysisObjectsTest, PlantCoincidentAnalyObjTest)
 
 TEST_F(SizingAnalysisObjectsTest, LoggingSubStep4stepPerHour)
 {
-    ShowMessage("Begin Test: SizingAnalysisObjectsTest, LoggingSubStep4stepPerHour");
+    ShowMessage(state, "Begin Test: SizingAnalysisObjectsTest, LoggingSubStep4stepPerHour");
 
     // this test uses 4 zone timesteps per hour and 5 sub system time steps per zone timestep
     // tests FillSysStep over two design days

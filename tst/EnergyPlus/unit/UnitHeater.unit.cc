@@ -81,10 +81,8 @@
 
 using namespace EnergyPlus;
 using namespace ObjexxFCL;
-using namespace DataGlobals;
 using namespace EnergyPlus::UnitHeater;
 using namespace EnergyPlus::DataEnvironment;
-using namespace EnergyPlus::DataGlobals;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataLoopNode;
@@ -1100,8 +1098,8 @@ TEST_F(EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest)
     });
     ASSERT_TRUE(process_idf(idf_objects));
 
-    NumOfTimeStepInHour = 4; // must initialize this to get schedules initialized
-    MinutesPerTimeStep = 15; // must initialize this to get schedules initialized
+    state.dataGlobal->NumOfTimeStepInHour = 4; // must initialize this to get schedules initialized
+    state.dataGlobal->MinutesPerTimeStep = 15; // must initialize this to get schedules initialized
     ProcessScheduleInput(state);  // read schedule data
 
     ErrorsFound = false;
@@ -1112,12 +1110,12 @@ TEST_F(EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest)
     state.dataGlobal->DDOnlySimulation = true;
 
     GetProjectData(state);
-    OutputReportPredefined::SetPredefinedTables();
+    OutputReportPredefined::SetPredefinedTables(state);
     SetPreConstructionInputParameters(state); // establish array bounds for constructions early
 
     state.dataGlobal->BeginSimFlag = true;
     state.dataGlobal->BeginEnvrnFlag = true;
-    ZoneSizingCalc = true;
+    state.dataGlobal->ZoneSizingCalc = true;
     createFacilityElectricPowerServiceObject();
     SizingManager::ManageSizing(state);
 
@@ -1132,7 +1130,8 @@ TEST_F(EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest)
     InitUnitHeater(state, UnitHeatNum, ZoneNum, FirstHVACIteration);
     InitWaterCoil(state, CoilNum, FirstHVACIteration); // init hot water heating coil
 
-    PltSizHeatNum = PlantUtilities::MyPlantSizingIndex("Coil:Heating:Water",
+    PltSizHeatNum = PlantUtilities::MyPlantSizingIndex(state,
+                                                       "Coil:Heating:Water",
                                                        state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoilName,
                                                        state.dataWaterCoils->WaterCoil(CoilNum).WaterInletNodeNum,
                                                        state.dataWaterCoils->WaterCoil(CoilNum).WaterOutletNodeNum,
@@ -1274,8 +1273,8 @@ TEST_F(EnergyPlusFixture, UnitHeater_SimUnitHeaterTest)
     });
     ASSERT_TRUE(process_idf(idf_objects));
 
-    NumOfTimeStepInHour = 4; // must initialize this to get schedules initialized
-    MinutesPerTimeStep = 15; // must initialize this to get schedules initialized
+    state.dataGlobal->NumOfTimeStepInHour = 4; // must initialize this to get schedules initialized
+    state.dataGlobal->MinutesPerTimeStep = 15; // must initialize this to get schedules initialized
     ProcessScheduleInput(state);  // read schedule data
 
     ErrorsFound = false;
@@ -1334,7 +1333,7 @@ TEST_F(EnergyPlusFixture, UnitHeater_SimUnitHeaterTest)
     ZoneSizingRunDone = true;
     ZoneEqSizing.allocate(1);
     ZoneEqSizing(CurZoneEqNum).DesignSizeFromParent = false;
-    DataGlobals::DoingSizing = true;
+    state.dataGlobal->DoingSizing = true;
 
     ZoneCompTurnFansOn = true;
     ZoneCompTurnFansOff = false;
@@ -1344,16 +1343,16 @@ TEST_F(EnergyPlusFixture, UnitHeater_SimUnitHeaterTest)
     CurDeadBandOrSetback(ZoneNum) = false;
 
     Node(Fan(1).InletNodeNum).Temp = 16.6;
-    Node(Fan(1).InletNodeNum).HumRat = PsyWFnTdbRhPb(16.6, 0.5, 101325.0, "UnitTest");
+    Node(Fan(1).InletNodeNum).HumRat = PsyWFnTdbRhPb(state, 16.6, 0.5, 101325.0, "UnitTest");
     Node(Fan(1).InletNodeNum).Enthalpy = Psychrometrics::PsyHFnTdbW(Node(Fan(1).InletNodeNum).Temp, Node(Fan(1).InletNodeNum).HumRat);
-    DataEnvironment::StdRhoAir = PsyRhoAirFnPbTdbW(101325.0, 20.0, 0.0);
+    DataEnvironment::StdRhoAir = PsyRhoAirFnPbTdbW(state, 101325.0, 20.0, 0.0);
 
     WCWaterInletNode = state.dataWaterCoils->WaterCoil(CoilNum).WaterInletNodeNum;
     WCWaterOutletNode = state.dataWaterCoils->WaterCoil(CoilNum).WaterOutletNodeNum;
     Node(WCWaterInletNode).Temp = 60.0;
 
     state.dataGlobal->BeginEnvrnFlag = true;
-    SysSizingCalc = true;
+    state.dataGlobal->SysSizingCalc = true;
 
     UHAirInletNode = state.dataUnitHeaters->UnitHeat(UnitHeatNum).AirInNode;
     UHAirOutletNode = state.dataUnitHeaters->UnitHeat(UnitHeatNum).AirOutNode;
@@ -2439,9 +2438,9 @@ TEST_F(EnergyPlusFixture, UnitHeater_SecondPriorityZoneEquipment)
     EXPECT_EQ(HeatingCoils::HeatingCoil(2).HeatingCoilRate, 0.0);
 
     // re-set the hour of the day
-    DataGlobals::TimeStep = 1;
-    DataGlobals::HourOfDay = 24;
-    DataGlobals::CurrentTime = 24.0;
+    state.dataGlobal->TimeStep = 1;
+    state.dataGlobal->HourOfDay = 24;
+    state.dataGlobal->CurrentTime = 24.0;
     // set zone air node condition
     Node(ZoneEquipConfig(1).ZoneNode).Temp = 20.0;
     Node(ZoneEquipConfig(1).ZoneNode).HumRat = 0.005;

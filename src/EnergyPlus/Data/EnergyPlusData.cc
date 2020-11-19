@@ -59,6 +59,7 @@ namespace EnergyPlus {
         this->dataAirflowNetworkBalanceManager = std::unique_ptr<AirflowNetworkBalanceManagerData>(new AirflowNetworkBalanceManagerData);
         this->dataAirLoop = std::unique_ptr<DataAirLoopData>(new DataAirLoopData);
         this->dataAirLoopHVACDOAS = std::unique_ptr<AirLoopHVACDOASData>(new AirLoopHVACDOASData);
+        this->dataAirSystemsData = std::unique_ptr<AirSystemsData>(new AirSystemsData);
         this->dataBaseboardElectric = std::unique_ptr<BaseboardElectricData>(new BaseboardElectricData);
         this->dataBaseboardRadiator = std::unique_ptr<BaseboardRadiatorData>(new BaseboardRadiatorData);
         this->dataBoilers = std::unique_ptr<BoilersData>(new BoilersData);
@@ -90,17 +91,20 @@ namespace EnergyPlus {
         this->dataSplitterComponent = std::unique_ptr<SplitterComponentData>(new SplitterComponentData);
         this->dataSteamBaseboardRadiator = std::unique_ptr<SteamBaseboardRadiatorData>(new SteamBaseboardRadiatorData);
         this->dataSteamCoils = std::unique_ptr<SteamCoilsData>(new SteamCoilsData);
+        this->dataSurfaceGeometry = std::unique_ptr<SurfaceGeometryData>(new SurfaceGeometryData);
         this->dataSurfaceGroundHeatExchangers = std::unique_ptr<SurfaceGroundHeatExchangersData>(new SurfaceGroundHeatExchangersData);
         this->dataSwimmingPools = std::unique_ptr<SwimmingPoolsData>(new SwimmingPoolsData);
         this->dataSystemAvailabilityManager = std::unique_ptr<SystemAvailabilityManagerData>(new SystemAvailabilityManagerData);
         this->dataThermalChimneys = std::unique_ptr<ThermalChimneysData>(new ThermalChimneysData);
         this->dataThermalComforts = std::unique_ptr<ThermalComfortsData>(new ThermalComfortsData);
         this->dataTranspiredCollector = std::unique_ptr<TranspiredCollectorData>(new TranspiredCollectorData);
+        this->dataTimingsData = std::unique_ptr<DataTimingsData>(new DataTimingsData);
         this->dataUFADManager = std::unique_ptr<UFADManagerData>(new UFADManagerData);
         this->dataUnitarySystems = std::unique_ptr<UnitarySystemsData>(new UnitarySystemsData);
         this->dataUnitHeaters = std::unique_ptr<UnitHeatersData>(new UnitHeatersData);
         this->dataUnitVentilators = std::unique_ptr<UnitVentilatorsData>(new UnitVentilatorsData);
         this->dataUserDefinedComponents = std::unique_ptr<UserDefinedComponentsData>(new UserDefinedComponentsData);
+        this->dataUtilityRoutines = std::unique_ptr<UtilityRoutinesData>(new UtilityRoutinesData);
         this->dataVariableSpeedCoils = std::unique_ptr<VariableSpeedCoilsData>(new VariableSpeedCoilsData);
         this->dataVentilatedSlab = std::unique_ptr<VentilatedSlabData>(new VentilatedSlabData);
         this->dataWaterCoils = std::unique_ptr<WaterCoilsData>(new WaterCoilsData);
@@ -128,6 +132,7 @@ namespace EnergyPlus {
         this->dataAirflowNetworkBalanceManager->clear_state();
         this->dataAirLoop->clear_state();
         this->dataAirLoopHVACDOAS->clear_state();
+        this->dataAirSystemsData->clear_state();
         this->dataBaseboardElectric->clear_state();
         this->dataBaseboardRadiator->clear_state();
         this->dataBoilers->clear_state();
@@ -158,9 +163,11 @@ namespace EnergyPlus {
         this->dataSplitterComponent->clear_state();
         this->dataSteamBaseboardRadiator->clear_state();
         this->dataSteamCoils->clear_state();
+        this->dataSurfaceGeometry->clear_state();
         this->dataSurfaceGroundHeatExchangers->clear_state();
         this->dataSwimmingPools->clear_state();
         this->dataSystemAvailabilityManager->clear_state();
+        this->dataTimingsData->clear_state();
         this->dataThermalChimneys->clear_state();
         this->dataThermalComforts->clear_state();
         this->dataTranspiredCollector->clear_state();
@@ -169,6 +176,7 @@ namespace EnergyPlus {
         this->dataUnitHeaters->clear_state();
         this->dataUnitVentilators->clear_state();
         this->dataUserDefinedComponents->clear_state();
+        this->dataUtilityRoutines->clear_state();
         this->dataVariableSpeedCoils->clear_state();
         this->dataVentilatedSlab->clear_state();
         this->dataWaterCoils->clear_state();
@@ -190,5 +198,15 @@ namespace EnergyPlus {
         this->dataZoneEquipmentManager->clear_state();
         this->dataZonePlenum->clear_state();
         this->dataZoneTempPredictorCorrector->clear_state();
+
+        this->files.eso.close();
+        this->files.err_stream.reset();
+        this->files.debug.close();
+        this->files.zsz.close();
+        this->files.ssz.close();
+        this->files.mtr.close();
+        this->files.shade.close();
+        this->files.mtr.close();
+        this->files.err_stream.reset();
     }
 }

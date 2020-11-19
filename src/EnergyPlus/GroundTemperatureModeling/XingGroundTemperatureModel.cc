@@ -90,7 +90,7 @@ std::shared_ptr<XingGroundTempsModel> XingGroundTempsModel::XingGTMFactory(Energ
     std::shared_ptr<XingGroundTempsModel> thisModel(new XingGroundTempsModel());
 
     std::string const cCurrentModuleObject = CurrentModuleObjects(objectType_XingGroundTemp);
-    int numCurrModels = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+    int numCurrModels = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     for (int modelNum = 1; modelNum <= numCurrModels; ++modelNum) {
 
@@ -117,7 +117,7 @@ std::shared_ptr<XingGroundTempsModel> XingGroundTempsModel::XingGTMFactory(Energ
         groundTempModels.push_back(thisModel);
         return thisModel;
     } else {
-        ShowFatalError("Site:GroundTemperature:Undisturbed:Xing--Errors getting input for ground temperature model");
+        ShowFatalError(state, "Site:GroundTemperature:Undisturbed:Xing--Errors getting input for ground temperature model");
         return nullptr;
     }
 }

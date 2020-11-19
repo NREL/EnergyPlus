@@ -211,7 +211,8 @@ namespace HeatBalFiniteDiffManager {
 
     void ReportFiniteDiffInits(EnergyPlusData &state);
 
-    void CalcNodeHeatFlux(int const Surf,    // surface number
+    void CalcNodeHeatFlux(EnergyPlusData &state,
+                          int const Surf,    // surface number
                           int const TotNodes // number of nodes in surface
     );
 
@@ -285,7 +286,8 @@ namespace HeatBalFiniteDiffManager {
                         Array1D<Real64> &TDreport    // Temperature value from previous HeatSurfaceHeatManager titeration's value
     );
 
-    void CheckFDSurfaceTempLimits(int const SurfNum,            // surface number
+    void CheckFDSurfaceTempLimits(EnergyPlusData &state,
+                                  int const SurfNum,            // surface number
                                   Real64 const CheckTemperature // calculated temperature, not reset
     );
 

@@ -53,7 +53,6 @@
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/CurveManager.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -80,7 +79,6 @@
 using namespace EnergyPlus;
 using namespace EnergyPlus::CurveManager;
 using namespace EnergyPlus::DataEnvironment;
-using namespace EnergyPlus::DataGlobals;
 using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataHeatBalFanSys;
 using namespace EnergyPlus::DataHeatBalance;
@@ -295,7 +293,7 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_AutoSize)
     DataSizing::CurZoneEqNum = 1;
     DataEnvironment::OutBaroPress = 101325;          // sea level
     DataZoneEquipment::ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
-    DataEnvironment::StdRhoAir = PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress, 20.0, 0.0);
+    DataEnvironment::StdRhoAir = PsyRhoAirFnPbTdbW(state, DataEnvironment::OutBaroPress, 20.0, 0.0);
     ZoneEqSizing.allocate(1);
     ZoneSizingRunDone = true;
     ZoneEqSizing(CurZoneEqNum).DesignSizeFromParent = false;
@@ -341,7 +339,7 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_AutoSize)
     DataLoopNode::Node(EAFanInletNode).MassFlowRate = 0.60215437;         // zone exhaust flow rate
     DataLoopNode::Node(EAFanInletNode).MassFlowRateMaxAvail = 0.60215437; // exhaust fan will not turn on unless max avail is set
 
-    SetPredefinedTables();
+    SetPredefinedTables(state);
     SimOutdoorAirUnit(state,
         "ZONE1OUTAIR", CurZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr));
 
@@ -550,10 +548,10 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_WaterCoolingCoilAutoSizeTest)
     ASSERT_TRUE(process_idf(idf_objects));
 
     DataEnvironment::OutBaroPress = 101325.0;
-    DataGlobals::TimeStep = 1;
-    DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
-    DataGlobals::DoingSizing = true;
+    state.dataGlobal->TimeStep = 1;
+    state.dataGlobal->NumOfTimeStepInHour = 1;
+    state.dataGlobal->MinutesPerTimeStep = 60;
+    state.dataGlobal->DoingSizing = true;
 
     InitializePsychRoutines();
 
@@ -617,13 +615,13 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_WaterCoolingCoilAutoSizeTest)
     state.dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
     state.dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
 
-    DataGlobals::HourOfDay = 15;
+    state.dataGlobal->HourOfDay = 15;
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::Month = 7;
     DataEnvironment::DayOfMonth = 21;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, HourOfDay);
+    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, state.dataGlobal->HourOfDay);
 
     UpdateScheduleValues(state);
 
@@ -645,7 +643,7 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_WaterCoolingCoilAutoSizeTest)
     FinalZoneSizing(CurZoneEqNum).DesCoolCoilInTemp = 30.0;
     FinalZoneSizing(CurZoneEqNum).DesCoolCoilInHumRat = 0.01;
 
-    DataEnvironment::StdRhoAir = PsyRhoAirFnPbTdbW(OutBaroPress, 30.0, 0.0);
+    DataEnvironment::StdRhoAir = PsyRhoAirFnPbTdbW(state, OutBaroPress, 30.0, 0.0);
 
     FinalZoneSizing(CurZoneEqNum).CoolDesTemp = 12.8;
     FinalZoneSizing(CurZoneEqNum).CoolDesHumRat = 0.0080;
@@ -856,10 +854,10 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_SteamHeatingCoilAutoSizeTest)
 
     DataEnvironment::StdRhoAir = 1.20;
     DataEnvironment::OutBaroPress = 101325.0;
-    DataGlobals::TimeStep = 1;
-    DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
-    DataGlobals::DoingSizing = true;
+    state.dataGlobal->TimeStep = 1;
+    state.dataGlobal->NumOfTimeStepInHour = 1;
+    state.dataGlobal->MinutesPerTimeStep = 60;
+    state.dataGlobal->DoingSizing = true;
 
     InitializePsychRoutines();
 
@@ -923,13 +921,13 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_SteamHeatingCoilAutoSizeTest)
     state.dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
     state.dataWaterCoils->MyUAAndFlowCalcFlag(2) = true;
 
-    DataGlobals::HourOfDay = 15;
+    state.dataGlobal->HourOfDay = 15;
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, HourOfDay);
+    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, state.dataGlobal->HourOfDay);
 
     UpdateScheduleValues(state);
 
@@ -951,7 +949,7 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_SteamHeatingCoilAutoSizeTest)
     FinalZoneSizing(CurZoneEqNum).DesHeatCoilInTemp = 5.0;
     FinalZoneSizing(CurZoneEqNum).DesHeatCoilInHumRat = 0.005;
 
-    DataEnvironment::StdRhoAir = PsyRhoAirFnPbTdbW(OutBaroPress, 5.0, 0.0);
+    DataEnvironment::StdRhoAir = PsyRhoAirFnPbTdbW(state, OutBaroPress, 5.0, 0.0);
     OutAirUnit(OAUnitNum).OAEquip(1).MaxVolWaterFlow = DataSizing::AutoSize;
 
     FinalZoneSizing(CurZoneEqNum).HeatDesTemp = 50.0;

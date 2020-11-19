@@ -58,7 +58,6 @@
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
@@ -84,7 +83,6 @@
 using namespace EnergyPlus::DataAirLoop;
 using namespace EnergyPlus::DataAirSystems;
 using namespace EnergyPlus::DataEnvironment;
-using namespace EnergyPlus::DataGlobals;
 using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataZoneEquipment;
 using namespace EnergyPlus::HeatBalanceManager;
@@ -180,8 +178,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVReheat_GetInputTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    NumOfTimeStepInHour = 1;                           // must initialize this to get schedules initialized
-    MinutesPerTimeStep = 60;                           // must initialize this to get schedules initialized
+    state.dataGlobal->NumOfTimeStepInHour = 1;                           // must initialize this to get schedules initialized
+    state.dataGlobal->MinutesPerTimeStep = 60;                           // must initialize this to get schedules initialized
     ProcessScheduleInput(state); // read schedules
 
     GetZoneData(state, ErrorsFound);
@@ -310,8 +308,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuct4PipeInduction_GetInputTest)
 
     process_idf(idf_objects);
 
-    NumOfTimeStepInHour = 1;                           // must initialize this to get schedules initialized
-    MinutesPerTimeStep = 60;                           // must initialize this to get schedules initialized
+    state.dataGlobal->NumOfTimeStepInHour = 1;                           // must initialize this to get schedules initialized
+    state.dataGlobal->MinutesPerTimeStep = 60;                           // must initialize this to get schedules initialized
     ProcessScheduleInput(state); // read schedules
 
     GetZoneData(state, ErrorsFound);
@@ -399,8 +397,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctVAVHeatCool_GetInputTest)
 
     process_idf(idf_objects);
 
-    NumOfTimeStepInHour = 1;                           // must initialize this to get schedules initialized
-    MinutesPerTimeStep = 60;                           // must initialize this to get schedules initialized
+    state.dataGlobal->NumOfTimeStepInHour = 1;                           // must initialize this to get schedules initialized
+    state.dataGlobal->MinutesPerTimeStep = 60;                           // must initialize this to get schedules initialized
     ProcessScheduleInput(state); // read schedules
 
     GetZoneData(state, ErrorsFound);
@@ -522,8 +520,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctVAVReheatVarSpeedFan_GetInputTest
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    NumOfTimeStepInHour = 1;                           // must initialize this to get schedules initialized
-    MinutesPerTimeStep = 60;                           // must initialize this to get schedules initialized
+    state.dataGlobal->NumOfTimeStepInHour = 1;                           // must initialize this to get schedules initialized
+    state.dataGlobal->MinutesPerTimeStep = 60;                           // must initialize this to get schedules initialized
     ProcessScheduleInput(state); // read schedules
 
     GetZoneData(state, ErrorsFound);
@@ -619,8 +617,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctVAVReheat_NormalActionTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    NumOfTimeStepInHour = 1;
-    MinutesPerTimeStep = 60;
+    state.dataGlobal->NumOfTimeStepInHour = 1;
+    state.dataGlobal->MinutesPerTimeStep = 60;
     ProcessScheduleInput(state);
     bool ErrorsFound(false);
     GetZoneData(state, ErrorsFound);
@@ -631,9 +629,9 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctVAVReheat_NormalActionTest)
     GetSysInput(state);
     SingleDuct::GetInputFlag = false;
 
-    auto &thisZoneEquip(ZoneEquipConfig(NumOfZones));
+    auto &thisZoneEquip(ZoneEquipConfig(state.dataGlobal->NumOfZones));
 
-    DataGlobals::SysSizingCalc = true;
+    state.dataGlobal->SysSizingCalc = true;
     state.dataGlobal->BeginEnvrnFlag = true;
     DataEnvironment::StdRhoAir = 1.0;
     DataEnvironment::OutBaroPress = 101325.0;
@@ -1018,19 +1016,19 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatAirTerminal_MinFlowTurnDownTest)
     bool ErrorsFound = false;
     bool FirstHVACIteration = true;
 
-    DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->NumOfTimeStepInHour = 1;
+    state.dataGlobal->MinutesPerTimeStep = 60;
     ScheduleManager::ProcessScheduleInput(state);
     ScheduleManager::ScheduleInputProcessed = true;
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
-    DataGlobals::HourOfDay = 1;
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->HourOfDay = 1;
+    state.dataGlobal->TimeStep = 1;
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
     DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
-    DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(101325.0, 20.0, 0.0);
+    DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, 101325.0, 20.0, 0.0);
     ScheduleManager::UpdateScheduleValues(state);
     DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(1);
     DataHeatBalFanSys::TempControlType.allocate(1);
@@ -1223,19 +1221,19 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatVSFanAirTerminal_MinFlowTurnDownTes
     bool ErrorsFound = false;
     bool FirstHVACIteration = true;
 
-    DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->NumOfTimeStepInHour = 1;
+    state.dataGlobal->MinutesPerTimeStep = 60;
     ScheduleManager::ProcessScheduleInput(state);
     ScheduleManager::ScheduleInputProcessed = true;
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
-    DataGlobals::HourOfDay = 1;
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->HourOfDay = 1;
+    state.dataGlobal->TimeStep = 1;
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
     DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
-    DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(101325.0, 20.0, 0.0);
+    DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, 101325.0, 20.0, 0.0);
     ScheduleManager::UpdateScheduleValues(state);
     DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(1);
     DataHeatBalFanSys::TempControlType.allocate(1);
@@ -1395,19 +1393,19 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVHeatCoolReheatAirTerminal_MinFlowTurnDown
     bool ErrorsFound = false;
     bool FirstHVACIteration = true;
 
-    DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->NumOfTimeStepInHour = 1;
+    state.dataGlobal->MinutesPerTimeStep = 60;
     ScheduleManager::ProcessScheduleInput(state);
     ScheduleManager::ScheduleInputProcessed = true;
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
-    DataGlobals::HourOfDay = 1;
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->HourOfDay = 1;
+    state.dataGlobal->TimeStep = 1;
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
     DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
-    DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(101325.0, 20.0, 0.0);
+    DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, 101325.0, 20.0, 0.0);
     ScheduleManager::UpdateScheduleValues(state);
     DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(1);
     DataHeatBalFanSys::TempControlType.allocate(1);
@@ -1578,19 +1576,19 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatVSFan_DamperPositionTest)
     bool ErrorsFound = false;
     bool FirstHVACIteration = true;
 
-    DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->NumOfTimeStepInHour = 1;
+    state.dataGlobal->MinutesPerTimeStep = 60;
     ScheduleManager::ProcessScheduleInput(state);
     ScheduleManager::ScheduleInputProcessed = true;
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
-    DataGlobals::HourOfDay = 1;
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->HourOfDay = 1;
+    state.dataGlobal->TimeStep = 1;
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
     DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
-    DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(101325.0, 20.0, 0.0);
+    DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, 101325.0, 20.0, 0.0);
     ScheduleManager::UpdateScheduleValues(state);
     DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(1);
     DataHeatBalFanSys::TempControlType.allocate(1);
@@ -1723,19 +1721,19 @@ TEST_F(EnergyPlusFixture, VAVHeatCoolReheatAirTerminal_ZoneOAVolumeFlowRateTest)
     bool ErrorsFound = false;
     bool FirstHVACIteration = true;
 
-    DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->NumOfTimeStepInHour = 1;
+    state.dataGlobal->MinutesPerTimeStep = 60;
     ScheduleManager::ProcessScheduleInput(state);
     ScheduleManager::ScheduleInputProcessed = true;
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
-    DataGlobals::HourOfDay = 1;
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->HourOfDay = 1;
+    state.dataGlobal->TimeStep = 1;
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
     DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
-    DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(101325.0, 20.0, 0.0);
+    DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, 101325.0, 20.0, 0.0);
     ScheduleManager::UpdateScheduleValues(state);
     DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(1);
     DataHeatBalFanSys::TempControlType.allocate(1);
