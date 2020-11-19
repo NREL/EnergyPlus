@@ -253,7 +253,7 @@ TEST_F(AutoSizingFixture, HeatingWaterDesAirInletTempSizingGauntlet)
     EnergyPlus::DataSizing::FinalSysSizing(1).HeatRetTemp = 12.0;
     EnergyPlus::DataSizing::SysSizInput.allocate(1);
     EnergyPlus::DataSizing::SysSizInput(1).AirLoopNum = 1;
-    DataAirSystems::PrimaryAirSystem.allocate(1);
+    state.dataAirSystemsData->PrimaryAirSystems.allocate(1);
 
     // start with an auto-sized value as the user input
     inputValue = EnergyPlus::DataSizing::AutoSize;

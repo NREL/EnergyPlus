@@ -9871,7 +9871,7 @@ namespace WaterThermalTanks {
                                                         SideEnum const WaterThermalTankSide,
                                                         int const PlantLoopSide,
                                                         [[maybe_unused]] bool const PlumbedInSeries,
-                                                        int const BranchControlType,
+                                                        DataBranchAirLoopPlant::ControlTypeEnum const BranchControlType,
                                                         Real64 const OutletTemp,
                                                         Real64 const DeadBandTemp,
                                                         Real64 const SetPointTemp_loc)
@@ -9918,13 +9918,13 @@ namespace WaterThermalTanks {
 
             //  2.  Might be Requesting Flow.
             if (FirstHVACIteration) {
-                if (BranchControlType == DataBranchAirLoopPlant::ControlType_Bypass) {
+                if (BranchControlType == DataBranchAirLoopPlant::ControlTypeEnum::Bypass) {
                     CurrentMode = PassingFlowThru;
                 } else {
                     CurrentMode = MaybeRequestingFlow;
                 }
             } else {
-                if (BranchControlType == DataBranchAirLoopPlant::ControlType_Bypass) {
+                if (BranchControlType == DataBranchAirLoopPlant::ControlTypeEnum::Bypass) {
                     CurrentMode = PassingFlowThru;
                 } else {
                     CurrentMode = ThrottlingFlow;

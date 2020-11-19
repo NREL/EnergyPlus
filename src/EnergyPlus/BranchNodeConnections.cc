@@ -58,9 +58,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
-namespace EnergyPlus {
-
-namespace BranchNodeConnections {
+namespace EnergyPlus::BranchNodeConnections {
 
     // Module containing the routines dealing with the Branch/Node Connections (CompSets, etc)
 
@@ -99,7 +97,7 @@ namespace BranchNodeConnections {
         // structure is intended to help with HVAC diagramming as well as validation of nodes.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("RegisterNodeConnection: ");
+        constexpr auto RoutineName = "RegisterNodeConnection: ";
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool ErrorsFoundHere;
@@ -109,7 +107,7 @@ namespace BranchNodeConnections {
 
         ErrorsFoundHere = false;
         if (!IsValidConnectionType(ConnectionType)) {
-            ShowSevereError(state, RoutineName + "Invalid ConnectionType=" + ConnectionType);
+            ShowSevereError(state, format("{}{}{}", RoutineName, "Invalid ConnectionType=", ConnectionType));
             ShowContinueError(state, "Occurs for Node=" + NodeName + ", ObjectType=" + ObjectType + ", ObjectName=" + ObjectName);
             ErrorsFoundHere = true;
         }
@@ -122,8 +120,8 @@ namespace BranchNodeConnections {
             if (!UtilityRoutines::SameString(NodeConnections(Count).ConnectionType, ConnectionType)) continue;
             if (NodeConnections(Count).FluidStream != FluidStream) continue;
             if ((NodeConnections(Count).ObjectIsParent && !IsParent) || (!NodeConnections(Count).ObjectIsParent && IsParent)) {
-                ShowSevereError(state, RoutineName + "Node registered for both Parent and \"not\" Parent");
-                ShowContinueError(state, "Occurs for Node=" + NodeName + ", ObjectType=" + ObjectType + ", ObjectName=" + ObjectName);
+                ShowSevereError(state, format("{}{}", RoutineName,  "Node registered for both Parent and \"not\" Parent"));
+                ShowContinueError(state, format("{}{}{}{}{}{}", "Occurs for Node=", NodeName, ", ObjectType=", ObjectType, ", ObjectName=", ObjectName));
                 ErrorsFoundHere = true;
             }
             MakeNew = false;
@@ -206,10 +204,10 @@ namespace BranchNodeConnections {
         // structure is intended to help with HVAC diagramming as well as validation of nodes. This function
         // is a based on RegisterNodeConnection.
 
-        static std::string const RoutineName("ModifyNodeConnectionType: ");
+        constexpr auto RoutineName("ModifyNodeConnectionType: ");
 
         if (!IsValidConnectionType(ConnectionType)) {
-            ShowSevereError(state, RoutineName + "Invalid ConnectionType=" + ConnectionType);
+            ShowSevereError(state, format("{}{}{}", RoutineName, "Invalid ConnectionType=", ConnectionType));
             ShowContinueError(state, "Occurs for Node=" + NodeName + ", ObjectType=" + ObjectType + ", ObjectName=" + ObjectName);
             errFlag = true;
         }
@@ -228,7 +226,7 @@ namespace BranchNodeConnections {
         if (Found > 0) {
             NodeConnections(Found).ConnectionType = ConnectionType;
         } else {
-            ShowSevereError(state, RoutineName + "Existing node connection not found.");
+            ShowSevereError(state, format("{}{}", RoutineName, "Existing node connection not found."));
             ShowContinueError(state, "Occurs for Node=" + NodeName + ", ObjectType=" + ObjectType + ", ObjectName=" + ObjectName);
             errFlag = true;
         }
@@ -485,8 +483,8 @@ namespace BranchNodeConnections {
                 IsValid = false;
             }
             if (!IsValid && !MatchedAtLeastOne) {
-                ShowSevereError(state, "Node Connection Error, Node=\"" + NodeConnections(Loop1).NodeName +
-                                "\", Inlet node did not find an appropriate matching \"outlet\" node.");
+                ShowSevereError(state, format("{}{}{}", "Node Connection Error, Node=\"", NodeConnections(Loop1).NodeName,
+                                R"(", Inlet node did not find an appropriate matching "outlet" node.)"));
                 ShowContinueError(state, "If this is an outdoor air inlet node, it must be listed in an OutdoorAir:Node or OutdoorAir:NodeList object.");
                 ShowContinueError(state, "Reference Object=" + NodeConnections(Loop1).ObjectType + ", Name=" + NodeConnections(Loop1).ObjectName);
                 ++ErrorCounter;
@@ -550,8 +548,8 @@ namespace BranchNodeConnections {
                 break;
             }
             if (!IsValid) {
-                ShowSevereError(state, "Node Connection Error, Node=\"" + NodeConnections(Loop1).NodeName +
-                                "\", Outdoor Air Reference did not find an appropriate \"outdoor air\" node.");
+                ShowSevereError(state, format("{}{}{}", "Node Connection Error, Node=\"", NodeConnections(Loop1).NodeName,
+                                "\", Outdoor Air Reference did not find an appropriate \"outdoor air\" node."));
                 ShowContinueError(state, "This node must be listed in an OutdoorAir:Node or OutdoorAir:NodeList object in order to set its conditions.");
                 ShowContinueError(state, "Reference Object=" + NodeConnections(Loop1).ObjectType + ", Name=" + NodeConnections(Loop1).ObjectName);
                 ++ErrorCounter;
@@ -1210,8 +1208,8 @@ namespace BranchNodeConnections {
                             ShowWarningError(state, "Node used as an inlet more than once: " + InletNode);
                             ShowContinueError(state, "  Used by     : " + CompSets(Count).ParentCType + ", name=" + CompSets(Count).ParentCName);
                             ShowContinueError(state, "  as inlet for: " + CompSets(Count).CType + ", name=" + CompSets(Count).CName);
-                            ShowContinueError(state, "  and  by     : " + ParentTypeUC + ", name=" + ParentName);
-                            ShowContinueError(state, "  as inlet for: " + CompTypeUC + ", name=" + CompName);
+                            ShowContinueError(state, format("{}{}{}", "  and  by     : ", ParentTypeUC + ", name=", ParentName));
+                            ShowContinueError(state, format("{}{}{}", "  as inlet for: ", CompTypeUC + ", name=", CompName));
                         }
                     }
                 }
@@ -1243,8 +1241,8 @@ namespace BranchNodeConnections {
                             ShowWarningError(state, "Node used as an outlet more than once: " + OutletNode);
                             ShowContinueError(state, "  Used by     : " + CompSets(Count).ParentCType + ", name=" + CompSets(Count).ParentCName);
                             ShowContinueError(state, "  as outlet for: " + CompSets(Count).CType + ", name=" + CompSets(Count).CName);
-                            ShowContinueError(state, "  and  by     : " + ParentTypeUC + ", name=" + ParentName);
-                            ShowContinueError(state, "  as outlet for: " + CompTypeUC + ", name=" + CompName);
+                            ShowContinueError(state, format("{}{}{}", "  and  by     : ", ParentTypeUC + ", name=", ParentName));
+                            ShowContinueError(state, format("{}{}{}", "  as outlet for: ", CompTypeUC + ", name=", CompName));
                         }
                     }
                 }
@@ -1526,6 +1524,4 @@ namespace BranchNodeConnections {
         }
     }
 
-} // namespace BranchNodeConnections
-
-} // namespace EnergyPlus
+} // namespace EnergyPlus::BranchNodeConnections

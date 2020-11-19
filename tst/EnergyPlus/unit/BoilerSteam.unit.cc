@@ -181,7 +181,7 @@ TEST_F(EnergyPlusFixture, BoilerSteam_BoilerEfficiency)
 
     state.dataGlobal->BeginEnvrnFlag = true;
     thisBoiler.initialize(state);
-    thisBoiler.calculate(state, MyLoad, RunFlag, DataBranchAirLoopPlant::ControlType_SeriesActive);
+    thisBoiler.calculate(state, MyLoad, RunFlag, DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive);
 
     // check boiler fuel used and the resultant boiler efficiency
     EXPECT_EQ(thisBoiler.BoilerLoad, 1000000);

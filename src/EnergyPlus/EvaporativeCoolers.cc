@@ -1100,7 +1100,6 @@ namespace EvaporativeCoolers {
 
         // Using/Aliasing
         using namespace DataSizing;
-        using DataAirSystems::PrimaryAirSystem;
         using Fans::SetFanData;
         using General::RoundSigDigits;
 
@@ -1171,10 +1170,10 @@ namespace EvaporativeCoolers {
         if (CurSysNum > 0) { // central system
             // where is this cooler located, is it on OA system or main loop?
             // search for this component in Air loop branches.
-            for (AirSysBranchLoop = 1; AirSysBranchLoop <= PrimaryAirSystem(CurSysNum).NumBranches; ++AirSysBranchLoop) {
-                for (BranchComp = 1; BranchComp <= PrimaryAirSystem(CurSysNum).Branch(AirSysBranchLoop).TotalComponents; ++BranchComp) {
+            for (AirSysBranchLoop = 1; AirSysBranchLoop <= state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).NumBranches; ++AirSysBranchLoop) {
+                for (BranchComp = 1; BranchComp <= state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).Branch(AirSysBranchLoop).TotalComponents; ++BranchComp) {
 
-                    if (UtilityRoutines::SameString(PrimaryAirSystem(CurSysNum).Branch(AirSysBranchLoop).Comp(BranchComp).Name,
+                    if (UtilityRoutines::SameString(state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).Branch(AirSysBranchLoop).Comp(BranchComp).Name,
                                                     EvapCond(EvapCoolNum).EvapCoolerName)) {
                         CoolerOnMainAirLoop = true;
                     }
@@ -1485,9 +1484,9 @@ namespace EvaporativeCoolers {
             if (CurSysNum > 0) { // central system
                 // where is this cooler located, is it on OA system or main loop?
                 // search for this component in Air loop branches.
-                for (AirSysBranchLoop = 1; AirSysBranchLoop <= PrimaryAirSystem(CurSysNum).NumBranches; ++AirSysBranchLoop) {
-                    for (BranchComp = 1; BranchComp <= PrimaryAirSystem(CurSysNum).Branch(AirSysBranchLoop).TotalComponents; ++BranchComp) {
-                        if (UtilityRoutines::SameString(PrimaryAirSystem(CurSysNum).Branch(AirSysBranchLoop).Comp(BranchComp).Name,
+                for (AirSysBranchLoop = 1; AirSysBranchLoop <= state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).NumBranches; ++AirSysBranchLoop) {
+                    for (BranchComp = 1; BranchComp <= state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).Branch(AirSysBranchLoop).TotalComponents; ++BranchComp) {
+                        if (UtilityRoutines::SameString(state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).Branch(AirSysBranchLoop).Comp(BranchComp).Name,
                                                         EvapCond(EvapCoolNum).EvapCoolerName)) {
                             CoolerOnMainAirLoop = true;
                         }

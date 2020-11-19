@@ -1198,11 +1198,11 @@ namespace HVACUnitaryBypassVAV {
 
             //   Find air loop associated with CBVAV system
             for (int AirLoopNum = 1; AirLoopNum <= DataHVACGlobals::NumPrimaryAirSys; ++AirLoopNum) {
-                for (int BranchNum = 1; BranchNum <= DataAirSystems::PrimaryAirSystem(AirLoopNum).NumBranches; ++BranchNum) {
-                    for (int CompNum = 1; CompNum <= DataAirSystems::PrimaryAirSystem(AirLoopNum).Branch(BranchNum).TotalComponents; ++CompNum) {
-                        if (!UtilityRoutines::SameString(DataAirSystems::PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name,
+                for (int BranchNum = 1; BranchNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).NumBranches; ++BranchNum) {
+                    for (int CompNum = 1; CompNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).TotalComponents; ++CompNum) {
+                        if (!UtilityRoutines::SameString(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name,
                                                          CBVAV(CBVAVNum).Name) ||
-                            !UtilityRoutines::SameString(DataAirSystems::PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).TypeOf,
+                            !UtilityRoutines::SameString(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).TypeOf,
                                                          CBVAV(CBVAVNum).UnitType))
                             continue;
                         CBVAV(CBVAVNum).AirLoopNumber = AirLoopNum;
@@ -1987,16 +1987,16 @@ namespace HVACUnitaryBypassVAV {
 
         if (curSysNum > 0 && curOASysNum == 0) {
             if (CBVAV(CBVAVNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                DataAirSystems::PrimaryAirSystem(curSysNum).supFanVecIndex = CBVAV(CBVAVNum).FanIndex;
-                DataAirSystems::PrimaryAirSystem(curSysNum).supFanModelTypeEnum = DataAirSystems::objectVectorOOFanSystemModel;
+                state.dataAirSystemsData->PrimaryAirSystems(curSysNum).supFanVecIndex = CBVAV(CBVAVNum).FanIndex;
+                state.dataAirSystemsData->PrimaryAirSystems(curSysNum).supFanModelTypeEnum = DataAirSystems::objectVectorOOFanSystemModel;
             } else {
-                DataAirSystems::PrimaryAirSystem(curSysNum).SupFanNum = CBVAV(CBVAVNum).FanIndex;
-                DataAirSystems::PrimaryAirSystem(curSysNum).supFanModelTypeEnum = DataAirSystems::structArrayLegacyFanModels;
+                state.dataAirSystemsData->PrimaryAirSystems(curSysNum).SupFanNum = CBVAV(CBVAVNum).FanIndex;
+                state.dataAirSystemsData->PrimaryAirSystems(curSysNum).supFanModelTypeEnum = DataAirSystems::structArrayLegacyFanModels;
             }
             if (CBVAV(CBVAVNum).FanPlace == DataHVACGlobals::BlowThru) {
-                DataAirSystems::PrimaryAirSystem(curSysNum).supFanLocation = DataAirSystems::fanPlacement::BlowThru;
+                state.dataAirSystemsData->PrimaryAirSystems(curSysNum).supFanLocation = DataAirSystems::fanPlacement::BlowThru;
             } else if (CBVAV(CBVAVNum).FanPlace == DataHVACGlobals::DrawThru) {
-                DataAirSystems::PrimaryAirSystem(curSysNum).supFanLocation = DataAirSystems::fanPlacement::DrawThru;
+                state.dataAirSystemsData->PrimaryAirSystems(curSysNum).supFanLocation = DataAirSystems::fanPlacement::DrawThru;
             }
         }
 

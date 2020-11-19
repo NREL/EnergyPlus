@@ -2105,7 +2105,6 @@ namespace PackagedThermalStorageCoil {
 
         // Using/Aliasing
         using namespace DataSizing;
-        using DataAirSystems::PrimaryAirSystem;
         using DataEnvironment::StdRhoAir;
         using namespace OutputReportPredefined;
         using CurveManager::CurveValue;
@@ -2189,7 +2188,7 @@ namespace PackagedThermalStorageCoil {
                         //     MixHumRat = FinalSysSizing(CurSysNum)%MixHumRatAtCoolPeak
                         SupTemp = FinalSysSizing(CurSysNum).CoolSupTemp;
                         SupHumRat = FinalSysSizing(CurSysNum).CoolSupHumRat;
-                        if (PrimaryAirSystem(CurSysNum).NumOACoolCoils == 0) { // there is no precooling of the OA stream
+                        if (state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).NumOACoolCoils == 0) { // there is no precooling of the OA stream
                             MixTemp = FinalSysSizing(CurSysNum).MixTempAtCoolPeak;
                             MixHumRat = FinalSysSizing(CurSysNum).MixHumRatAtCoolPeak;
                         } else { // there is precooling of OA stream
@@ -4536,7 +4535,6 @@ namespace PackagedThermalStorageCoil {
         // na
 
         // Using/Aliasing
-        using DataBranchAirLoopPlant::MassFlowTolerance;
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
         using DataPlant::PlantLoop;
@@ -4629,7 +4627,7 @@ namespace PackagedThermalStorageCoil {
                                             TESCoil(TESCoilNum).TESPlantEffectiveness * (UseInletTemp - NewTankTemp);
             TESCoil(TESCoilNum).Q_Plant = TESCoil(TESCoilNum).QdotPlant * TimeStepSys * DataGlobalConstants::SecInHour();
             // now get correct outlet temp with actual massflow (not modified by effectiveness)
-            if (Node(TESCoil(TESCoilNum).TESPlantInletNodeNum).MassFlowRate > MassFlowTolerance) {
+            if (Node(TESCoil(TESCoilNum).TESPlantInletNodeNum).MassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
                 NewOutletTemp =
                     UseInletTemp - TESCoil(TESCoilNum).QdotPlant / (Node(TESCoil(TESCoilNum).TESPlantInletNodeNum).MassFlowRate * CpPlantConnection);
             } else {
@@ -4673,7 +4671,6 @@ namespace PackagedThermalStorageCoil {
         // na
 
         // Using/Aliasing
-        using DataBranchAirLoopPlant::MassFlowTolerance;
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
         using DataPlant::PlantLoop;
@@ -4717,7 +4714,7 @@ namespace PackagedThermalStorageCoil {
                                             (Node(TESCoil(TESCoilNum).TESPlantInletNodeNum).Temp - FreezingTemp);
             TESCoil(TESCoilNum).Q_Plant = TESCoil(TESCoilNum).QdotPlant * TimeStepSys * DataGlobalConstants::SecInHour();
             // now get correct outlet temp with actual massflow (not modified by effectiveness)
-            if (Node(TESCoil(TESCoilNum).TESPlantInletNodeNum).MassFlowRate > MassFlowTolerance) {
+            if (Node(TESCoil(TESCoilNum).TESPlantInletNodeNum).MassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
                 NewOutletTemp = Node(TESCoil(TESCoilNum).TESPlantInletNodeNum).Temp +
                                 TESCoil(TESCoilNum).QdotPlant / (Node(TESCoil(TESCoilNum).TESPlantInletNodeNum).MassFlowRate * Cp);
             } else {
