@@ -765,7 +765,7 @@ namespace HeatBalanceHAMTManager {
         errorCount = 0;
         TotCellsMax = 0;
         for (sid = 1; sid <= TotSurfaces; ++sid) {
-            if (Surface(sid).Class == SurfaceClass_Window) continue;
+            if (Surface(sid).Class == SurfaceClass::Window) continue;
             if (Surface(sid).HeatTransferAlgorithm != HeatTransferModel_HAMT) continue;
             conid = Surface(sid).Construction;
             if (conid == 0) continue;
@@ -863,7 +863,7 @@ namespace HeatBalanceHAMTManager {
         // Set up surface cell structure
         for (sid = 1; sid <= TotSurfaces; ++sid) {
             if (!Surface(sid).HeatTransSurf) continue;
-            if (Surface(sid).Class == SurfaceClass_Window) continue;
+            if (Surface(sid).Class == SurfaceClass::Window) continue;
             if (Surface(sid).HeatTransferAlgorithm != HeatTransferModel_HAMT) continue;
             // Boundary Cells
             runor = -0.02;
@@ -1004,7 +1004,7 @@ namespace HeatBalanceHAMTManager {
         // cCurrentModuleObject='MaterialProperty:HeatAndMoistureTransfer:*'
         for (sid = 1; sid <= TotSurfaces; ++sid) {
             if (!Surface(sid).HeatTransSurf) continue;
-            if (Surface(sid).Class == SurfaceClass_Window) continue;
+            if (Surface(sid).Class == SurfaceClass::Window) continue;
             if (Surface(sid).HeatTransferAlgorithm != HeatTransferModel_HAMT) continue;
             cells(Extcell(sid)).origin(1) += cells(Extcell(sid)).length(1) / 2.0;
             cells(Intcell(sid)).origin(1) -= cells(Intcell(sid)).length(1) / 2.0;

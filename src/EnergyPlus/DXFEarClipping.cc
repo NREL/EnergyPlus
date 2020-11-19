@@ -182,7 +182,7 @@ namespace DXFEarClipping {
                     Real64 const surfazimuth,    // surface azimuth angle (outward facing normal)
                     Real64 const surftilt,       // surface tilt angle
                     std::string const &surfname, // surface name (for error messages)
-                    int const surfclass          // surface class
+                    DataSurfaces::SurfaceClass surfclass          // surface class
     )
     {
 
@@ -206,9 +206,7 @@ namespace DXFEarClipping {
         // Use statements:
         // Using/Aliasing
         using DataSurfaces::cSurfaceClass;
-        using DataSurfaces::SurfaceClass_Floor;
-        using DataSurfaces::SurfaceClass_Overhang;
-        using DataSurfaces::SurfaceClass_Roof;
+        using DataSurfaces::SurfaceClass;
 
         // Return value
         int Triangulate;
@@ -271,7 +269,7 @@ namespace DXFEarClipping {
         //  else
         //    trackit=.FALSE.
         //  endif
-        if (surfclass == SurfaceClass_Floor || surfclass == SurfaceClass_Roof || surfclass == SurfaceClass_Overhang) {
+        if (surfclass == SurfaceClass::Floor || surfclass == SurfaceClass::Roof || surfclass == SurfaceClass::Overhang) {
             CalcRfFlrCoordinateTransformation(nsides, polygon, surfazimuth, surftilt, xvt, yvt, zvt);
             for (svert = 1; svert <= nsides; ++svert) {
                 for (mvert = svert + 1; mvert <= nsides; ++mvert) {

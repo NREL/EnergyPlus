@@ -646,15 +646,15 @@ namespace HeatBalanceKivaManager {
         int surfNum = 1;
 
         for (auto &surface : Surfaces) {
-            if (surface.ExtBoundCond == DataSurfaces::KivaFoundation && surface.Class == DataSurfaces::SurfaceClass_Floor) {
+            if (surface.ExtBoundCond == DataSurfaces::KivaFoundation && surface.Class == DataSurfaces::SurfaceClass::Floor) {
 
                 // Find other surfaces associated with the same floor
                 std::vector<int> wallSurfaces;
 
                 for (auto &wl : foundationInputs[surface.OSCPtr].surfaces) {
                     if (Surfaces(wl).Zone == surface.Zone && wl != surfNum) {
-                        if (Surfaces(wl).Class != DataSurfaces::SurfaceClass_Wall) {
-                            if (Surfaces(wl).Class == DataSurfaces::SurfaceClass_Floor) {
+                        if (Surfaces(wl).Class != DataSurfaces::SurfaceClass::Wall) {
+                            if (Surfaces(wl).Class == DataSurfaces::SurfaceClass::Floor) {
                                 ErrorsFound = true;
                                 ShowSevereError(state, "Foundation:Kiva=\"" + foundationInputs[surface.OSCPtr].name +
                                                 "\", only one floor per Foundation:Kiva Object allowed.");
@@ -1028,11 +1028,11 @@ namespace HeatBalanceKivaManager {
                     ErrorsFound = true;
                     ShowSevereError(state, "Surface=\"" + Surfaces(surfNum).Name + "\" has a 'Foundation' Outside Boundary Condition");
                     ShowContinueError(state, "  referencing Foundation:Kiva=\"" + foundationInputs[Surfaces(surfNum).OSCPtr].name + "\".");
-                    if (Surfaces(surfNum).Class == DataSurfaces::SurfaceClass_Wall) {
+                    if (Surfaces(surfNum).Class == DataSurfaces::SurfaceClass::Wall) {
                         ShowContinueError(state, "  You must also reference Foundation:Kiva=\"" + foundationInputs[Surfaces(surfNum).OSCPtr].name + "\"");
                         ShowContinueError(state, "  in a floor surface within the same Zone=\"" + DataHeatBalance::Zone(Surfaces(surfNum).Zone).Name +
                                           "\".");
-                    } else if (Surfaces(surfNum).Class == DataSurfaces::SurfaceClass_Floor) {
+                    } else if (Surfaces(surfNum).Class == DataSurfaces::SurfaceClass::Floor) {
                         ShowContinueError(state, "  However, this floor was never assigned to a Kiva instance.");
                         ShowContinueError(state, "  This should not occur for floor surfaces. Please report to EnergyPlus Development Team.");
                     } else {

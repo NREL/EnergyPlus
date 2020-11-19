@@ -170,9 +170,7 @@ namespace AirflowNetworkBalanceManager {
     using DataSurfaces::ExternalEnvironment;
     using DataSurfaces::OtherSideCoefNoCalcExt;
     using DataSurfaces::Surface;
-    using DataSurfaces::SurfaceClass_Door;
-    using DataSurfaces::SurfaceClass_GlassDoor;
-    using DataSurfaces::SurfaceClass_Window;
+    using DataSurfaces::SurfaceClass;
     using DataSurfaces::TotSurfaces;
     using DataSurfaces::WorldCoordSystem;
     using DataZoneEquipment::ZoneEquipConfig;
@@ -212,7 +210,6 @@ namespace AirflowNetworkBalanceManager {
         // This subroutine performs simulation of air distribution system.
 
         // Using/Aliasing
-        using DataAirSystems::PrimaryAirSystem;
         using DataHVACGlobals::TurnFansOn;
         using DataHVACGlobals::VerySmallMassFlow;
 
@@ -288,7 +285,7 @@ namespace AirflowNetworkBalanceManager {
                 }
             }
         }
-        if (allocated(ZoneEquipConfig) && NumHybridVentSysAvailMgrs > 0 && allocated(PrimaryAirSystem)) HybridVentilationControl(state);
+        if (allocated(ZoneEquipConfig) && NumHybridVentSysAvailMgrs > 0 && allocated(state.dataAirSystemsData->PrimaryAirSystems)) HybridVentilationControl(state);
         if (state.dataAirflowNetworkBalanceManager->VentilationCtrl == 1 && NumHybridVentSysAvailMgrs > 0) AirflowNetworkFanActivated = false;
 
         if (present(Iter) && present(ResimulateAirZone) && SimulateAirflowNetwork >= AirflowNetworkControlSimpleADS) {
@@ -1578,9 +1575,9 @@ namespace AirflowNetworkBalanceManager {
         Array1D<Real64> Numbers;       // Numeric input items for object
         Array1D_bool lAlphaBlanks;     // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;   // Logical array, numeric field input BLANK = .TRUE.
-        static int MaxNums(0);         // Maximum number of numeric input fields
-        static int MaxAlphas(0);       // Maximum number of alpha input fields
-        static int TotalArgs(0);       // Total number of alpha and numeric arguments (max) for a
+        int MaxNums(0);         // Maximum number of numeric input fields
+        int MaxAlphas(0);       // Maximum number of alpha input fields
+        int TotalArgs(0);       // Total number of alpha and numeric arguments (max) for a
         bool Errorfound1;
         Real64 minHeight;
         Real64 maxHeight;
@@ -3205,8 +3202,8 @@ namespace AirflowNetworkBalanceManager {
         // Assign occupant ventilation control number from zone to surface
         for (int i = 1; i <= AirflowNetworkNumOfSurfaces; ++i) {
             j = MultizoneSurfaceData(i).SurfNum;
-            if (SurfWinOriginalClass(j) == SurfaceClass_Window || SurfWinOriginalClass(j) == SurfaceClass_Door ||
-                SurfWinOriginalClass(j) == SurfaceClass_GlassDoor) {
+            if (SurfWinOriginalClass(j) == SurfaceClass::Window || SurfWinOriginalClass(j) == SurfaceClass::Door ||
+                SurfWinOriginalClass(j) == SurfaceClass::GlassDoor) {
                 for (n = 1; n <= AirflowNetworkNumOfZones; ++n) {
                     if (MultizoneZoneData(n).ZoneNum == Surface(j).Zone) {
                         if (MultizoneZoneData(n).OccupantVentilationControlNum > 0 && MultizoneSurfaceData(i).OccupantVentilationControlNum == 0) {
@@ -4192,17 +4189,17 @@ namespace AirflowNetworkBalanceManager {
                         ShowContinueError(state, "10 deg of being horizontal. Airflows through large horizontal openings are poorly");
                         ShowContinueError(state, "modeled in the AirflowNetwork model resulting in only one-way airflow.");
                     }
-                    if (!(SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass_Window ||
-                          SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass_GlassDoor ||
-                          SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass_Door ||
+                    if (!(SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass::Window ||
+                          SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass::GlassDoor ||
+                          SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass::Door ||
                           Surface(MultizoneSurfaceData(count).SurfNum).IsAirBoundarySurf)) {
                         ShowSevereError(state, RoutineName +
                                         "AirflowNetworkComponent: The opening must be assigned to a window, door, glassdoor or air boundary at " +
                                         AirflowNetworkLinkageData(count).Name);
                         ErrorsFound = true;
                     }
-                    if (SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass_Door ||
-                        SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass_GlassDoor) {
+                    if (SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass::Door ||
+                        SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass::GlassDoor) {
                         if (MultizoneCompDetOpeningData(AirflowNetworkCompData(compnum).TypeNum).LVOType == 2) {
                             ShowSevereError(state, RoutineName +
                                             "AirflowNetworkComponent: The opening with horizontally pivoted type must be assigned to a "
@@ -4222,9 +4219,10 @@ namespace AirflowNetworkBalanceManager {
                         ShowContinueError(state, "AirflowNetwork:Multizone:Component:SimpleOpening = " + AirflowNetworkCompData(compnum).Name);
                         ErrorsFound = true;
                     }
-                    if (!(SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass_Window ||
-                          SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass_GlassDoor ||
-                          SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass_Door ||
+
+                    if (!(SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass::Window ||
+                          SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass::GlassDoor ||
+                          SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass::Door ||
                           Surface(MultizoneSurfaceData(count).SurfNum).IsAirBoundarySurf)) {
                         ShowSevereError(state, RoutineName +
                                         "AirflowNetworkComponent: The opening must be assigned to a window, door, glassdoor or air boundary at " +
@@ -4269,9 +4267,9 @@ namespace AirflowNetworkBalanceManager {
                         ShowContinueError(state, "with the object of AirflowNetwork:Multizone:Component:HorizontalOpening = " +
                                           AirflowNetworkCompData(compnum).Name);
                     }
-                    if (!(SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass_Window ||
-                          SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass_GlassDoor ||
-                          SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass_Door ||
+                    if (!(SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass::Window ||
+                          SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass::GlassDoor ||
+                          SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass::Door ||
                           Surface(MultizoneSurfaceData(count).SurfNum).IsAirBoundarySurf)) {
                         ShowSevereError(state, RoutineName +
                                         "AirflowNetworkComponent: The opening must be assigned to a window, door, glassdoor or air boundary at " +
@@ -5804,8 +5802,8 @@ namespace AirflowNetworkBalanceManager {
             if (i > AirflowNetworkNumOfSurfaces - NumOfLinksIntraZone) continue;
             if (MultizoneSurfaceData(i).OccupantVentilationControlNum == 0) MultizoneSurfaceData(i).OpenFactor = 0.0;
             j = MultizoneSurfaceData(i).SurfNum;
-            if (SurfWinOriginalClass(j) == SurfaceClass_Window || SurfWinOriginalClass(j) == SurfaceClass_Door ||
-                SurfWinOriginalClass(j) == SurfaceClass_GlassDoor || Surface(j).IsAirBoundarySurf) {
+            if (SurfWinOriginalClass(j) == SurfaceClass::Window || SurfWinOriginalClass(j) == SurfaceClass::Door ||
+                SurfWinOriginalClass(j) == SurfaceClass::GlassDoor || Surface(j).IsAirBoundarySurf) {
                 if (MultizoneSurfaceData(i).OccupantVentilationControlNum > 0) {
                     if (MultizoneSurfaceData(i).OpeningStatus == OpenStatus::FreeOperation) {
                         if (MultizoneSurfaceData(i).OpeningProbStatus == ProbabilityCheck::ForceChange) {
@@ -5881,8 +5879,8 @@ namespace AirflowNetworkBalanceManager {
             for (i = 1; i <= AirflowNetworkNumOfSurfaces; ++i) {
                 if (i > AirflowNetworkNumOfSurfaces - NumOfLinksIntraZone) continue;
                 j = MultizoneSurfaceData(i).SurfNum;
-                if (SurfWinOriginalClass(j) == SurfaceClass_Window || SurfWinOriginalClass(j) == SurfaceClass_Door ||
-                    SurfWinOriginalClass(j) == SurfaceClass_GlassDoor) {
+                if (SurfWinOriginalClass(j) == SurfaceClass::Window || SurfWinOriginalClass(j) == SurfaceClass::Door ||
+                    SurfWinOriginalClass(j) == SurfaceClass::GlassDoor) {
                     if (MultizoneSurfaceData(i).HybridCtrlGlobal) {
                         MultizoneSurfaceData(i).OpenFactor = GlobalOpenFactor;
                     }
@@ -9466,7 +9464,6 @@ namespace AirflowNetworkBalanceManager {
 
         // Using/Aliasing
         using BranchNodeConnections::GetNodeConnectionType;
-        using DataAirSystems::PrimaryAirSystem;
         using DataZoneEquipment::ZoneEquipConfig;
         using MixedAir::GetNumOAMixers;
         using MixedAir::GetOAMixerInletNodeNumber;
@@ -9742,8 +9739,8 @@ namespace AirflowNetworkBalanceManager {
                 ShowSevereError(state, "The AirLoopNum defined in both AIRFLOWNETWORK:DISTRIBUTION:NODE objects in " + AirflowNetworkLinkageData(i).Name +
                                 " are not the same. Please make sure both nodes should be listed in the same AirLoop as a valid linkage.");
                 ShowContinueError(state, "AirLoop defined in " + AirflowNetworkNodeData(j).Name + " is " +
-                                  PrimaryAirSystem(AirflowNetworkNodeData(j).AirLoopNum).Name + ", and AirLoop defined in " +
-                                  AirflowNetworkNodeData(k).Name + " is " + PrimaryAirSystem(AirflowNetworkNodeData(k).AirLoopNum).Name);
+                                  state.dataAirSystemsData->PrimaryAirSystems(AirflowNetworkNodeData(j).AirLoopNum).Name + ", and AirLoop defined in " +
+                                  AirflowNetworkNodeData(k).Name + " is " + state.dataAirSystemsData->PrimaryAirSystems(AirflowNetworkNodeData(k).AirLoopNum).Name);
                 ErrorsFound = true;
             }
             // Set AirLoopNum to fans and coils
@@ -10222,7 +10219,7 @@ namespace AirflowNetworkBalanceManager {
                         if (ZoneEquipConfig(j).InletNodeAirLoopNum(k) > 0) {
                             PressureControllerData(i).AirLoopNum = ZoneEquipConfig(j).InletNodeAirLoopNum(k);
                             if (PressureControllerData(i).ControlTypeSet == PressureCtrlRelief) {
-                                PressureControllerData(i).OANodeNum = PrimaryAirSystem(PressureControllerData(i).AirLoopNum).OAMixOAInNodeNum;
+                                PressureControllerData(i).OANodeNum = state.dataAirSystemsData->PrimaryAirSystems(PressureControllerData(i).AirLoopNum).OAMixOAInNodeNum;
                                 for (n = 1; n <= state.dataAirflowNetworkBalanceManager->NumOfReliefFans; ++n) {
                                     if (DisSysCompReliefAirData(n).OutletNode == PressureControllerData(i).OANodeNum) {
                                         DisSysCompReliefAirData(n).PressCtrlNum = i;
@@ -10248,26 +10245,26 @@ namespace AirflowNetworkBalanceManager {
         int CompNum;
         int NumOfFans;
         std::string FanNames;
-        for (BranchNum = 1; BranchNum <= PrimaryAirSystem(1).NumBranches; ++BranchNum) {
+        for (BranchNum = 1; BranchNum <= state.dataAirSystemsData->PrimaryAirSystems(1).NumBranches; ++BranchNum) {
             NumOfFans = 0;
             FanNames = "";
-            for (CompNum = 1; CompNum <= PrimaryAirSystem(1).Branch(BranchNum).TotalComponents; ++CompNum) {
-                if (UtilityRoutines::SameString(PrimaryAirSystem(1).Branch(BranchNum).Comp(CompNum).TypeOf, "Fan:ConstantVolume") ||
-                    UtilityRoutines::SameString(PrimaryAirSystem(1).Branch(BranchNum).Comp(CompNum).TypeOf, "Fan:OnOff") ||
-                    UtilityRoutines::SameString(PrimaryAirSystem(1).Branch(BranchNum).Comp(CompNum).TypeOf, "Fan:VariableVolume")) {
+            for (CompNum = 1; CompNum <= state.dataAirSystemsData->PrimaryAirSystems(1).Branch(BranchNum).TotalComponents; ++CompNum) {
+                if (UtilityRoutines::SameString(state.dataAirSystemsData->PrimaryAirSystems(1).Branch(BranchNum).Comp(CompNum).TypeOf, "Fan:ConstantVolume") ||
+                    UtilityRoutines::SameString(state.dataAirSystemsData->PrimaryAirSystems(1).Branch(BranchNum).Comp(CompNum).TypeOf, "Fan:OnOff") ||
+                    UtilityRoutines::SameString(state.dataAirSystemsData->PrimaryAirSystems(1).Branch(BranchNum).Comp(CompNum).TypeOf, "Fan:VariableVolume")) {
                     NumOfFans++;
                     if (NumOfFans > 1) {
-                        FanNames += PrimaryAirSystem(1).Branch(BranchNum).Comp(CompNum).Name;
+                        FanNames += state.dataAirSystemsData->PrimaryAirSystems(1).Branch(BranchNum).Comp(CompNum).Name;
                         break;
                     } else {
-                        FanNames += PrimaryAirSystem(1).Branch(BranchNum).Comp(CompNum).Name + ",";
+                        FanNames += state.dataAirSystemsData->PrimaryAirSystems(1).Branch(BranchNum).Comp(CompNum).Name + ",";
                     }
                 }
             }
             if (NumOfFans > 1) break;
         }
         if (NumOfFans > 1) {
-            ShowSevereError(state, RoutineName + "An AirLoop branch, " + PrimaryAirSystem(1).Branch(BranchNum).Name + ", has two or more fans: " + FanNames);
+            ShowSevereError(state, RoutineName + "An AirLoop branch, " + state.dataAirSystemsData->PrimaryAirSystems(1).Branch(BranchNum).Name + ", has two or more fans: " + FanNames);
             ShowContinueError(state,
                 "The AirflowNetwork model allows a single supply fan in an AirLoop only. Please make changes in the input file accordingly.");
             ErrorsFound = true;
@@ -10512,9 +10509,9 @@ namespace AirflowNetworkBalanceManager {
                                 if (ControlType == GlobalCtrlType) {
                                     MultizoneSurfaceData(ANSurfaceNum).HybridCtrlGlobal = true;
                                     if (HybridVentSysAvailMaster(SysAvailNum) == ActualZoneNum) {
-                                        if ((DataSurfaces::SurfWinOriginalClass(SurfNum) == SurfaceClass_Window ||
-                                             DataSurfaces::SurfWinOriginalClass(SurfNum) == SurfaceClass_Door ||
-                                             DataSurfaces::SurfWinOriginalClass(SurfNum) == SurfaceClass_GlassDoor) &&
+                                        if ((DataSurfaces::SurfWinOriginalClass(SurfNum) == SurfaceClass::Window ||
+                                             DataSurfaces::SurfWinOriginalClass(SurfNum) == SurfaceClass::Door ||
+                                             DataSurfaces::SurfWinOriginalClass(SurfNum) == SurfaceClass::GlassDoor) &&
                                             Surface(SurfNum).ExtBoundCond == ExternalEnvironment) {
                                             MultizoneSurfaceData(ANSurfaceNum).HybridCtrlMaster = true;
                                             Found = true;
@@ -10932,7 +10929,6 @@ namespace AirflowNetworkBalanceManager {
         using BranchNodeConnections::GetChildrenData;
         using BranchNodeConnections::GetNumChildren;
         using BranchNodeConnections::IsParentObject;
-        using DataAirSystems::PrimaryAirSystem;
         using DataHVACGlobals::NumPrimaryAirSys;
         using DataZoneEquipment::NumReturnAirPaths;
         using DataZoneEquipment::NumSupplyAirPaths;
@@ -10966,27 +10962,27 @@ namespace AirflowNetworkBalanceManager {
 
         for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
             // Check OAMixer OA inlet node
-            if (NodeNumber == PrimaryAirSystem(AirLoopNum).OAMixOAInNodeNum) {
+            if (NodeNumber == state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).OAMixOAInNodeNum) {
                 return AirLoopNum;
             }
             // Check branch
-            for (BranchNum = 1; BranchNum <= PrimaryAirSystem(AirLoopNum).NumBranches; ++BranchNum) {
-                NumOfNodes = PrimaryAirSystem(AirLoopNum).Branch(BranchNum).TotalNodes;
+            for (BranchNum = 1; BranchNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).NumBranches; ++BranchNum) {
+                NumOfNodes = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).TotalNodes;
                 for (NodeNum = 1; NodeNum <= NumOfNodes; ++NodeNum) {
-                    if (NodeNumber == PrimaryAirSystem(AirLoopNum).Branch(BranchNum).NodeNum(NodeNum)) {
+                    if (NodeNumber == state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).NodeNum(NodeNum)) {
                         return AirLoopNum;
                     }
                 }
-                for (NumOfComp = 1; NumOfComp <= PrimaryAirSystem(AirLoopNum).Branch(BranchNum).TotalComponents; ++NumOfComp) {
-                    if (NodeNumber == PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(NumOfComp).NodeNumIn) {
+                for (NumOfComp = 1; NumOfComp <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).TotalComponents; ++NumOfComp) {
+                    if (NodeNumber == state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(NumOfComp).NodeNumIn) {
                         return AirLoopNum;
                     }
-                    if (NodeNumber == PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(NumOfComp).NodeNumOut) {
+                    if (NodeNumber == state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(NumOfComp).NodeNumOut) {
                         return AirLoopNum;
                     }
-                    if (PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(NumOfComp).NumSubComps == 0) {
-                        std::string TypeOfComp = PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(NumOfComp).TypeOf;
-                        std::string NameOfComp = PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(NumOfComp).Name;
+                    if (state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(NumOfComp).NumSubComps == 0) {
+                        std::string TypeOfComp = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(NumOfComp).TypeOf;
+                        std::string NameOfComp = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(NumOfComp).Name;
                         if (IsParentObject(TypeOfComp, NameOfComp)) {
 
                             int NumChildren = GetNumChildren(TypeOfComp, NameOfComp);
@@ -11116,19 +11112,19 @@ namespace AirflowNetworkBalanceManager {
                             OutletNodeNumbers.deallocate();
                         }
                     } else {
-                        for (NumOfSubComp = 1; NumOfSubComp <= PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(NumOfComp).NumSubComps;
+                        for (NumOfSubComp = 1; NumOfSubComp <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(NumOfComp).NumSubComps;
                              ++NumOfSubComp) {
-                            if (NodeNumber == PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(NumOfComp).SubComp(NumOfSubComp).NodeNumIn) {
+                            if (NodeNumber == state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(NumOfComp).SubComp(NumOfSubComp).NodeNumIn) {
                                 return AirLoopNum;
                             }
-                            if (NodeNumber == PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(NumOfComp).SubComp(NumOfSubComp).NodeNumOut) {
+                            if (NodeNumber == state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(NumOfComp).SubComp(NumOfSubComp).NodeNumOut) {
                                 return AirLoopNum;
                             }
                             for (NumOfSubSubComp = 1;
                                  NumOfSubSubComp <=
-                                 PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(NumOfComp).SubComp(NumOfSubComp).NumSubSubComps;
+                                 state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(NumOfComp).SubComp(NumOfSubComp).NumSubSubComps;
                                  ++NumOfSubSubComp) {
-                                if (NodeNumber == PrimaryAirSystem(AirLoopNum)
+                                if (NodeNumber == state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum)
                                                       .Branch(BranchNum)
                                                       .Comp(NumOfComp)
                                                       .SubComp(NumOfSubComp)
@@ -11136,7 +11132,7 @@ namespace AirflowNetworkBalanceManager {
                                                       .NodeNumIn) {
                                     return AirLoopNum;
                                 }
-                                if (NodeNumber == PrimaryAirSystem(AirLoopNum)
+                                if (NodeNumber == state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum)
                                                       .Branch(BranchNum)
                                                       .Comp(NumOfComp)
                                                       .SubComp(NumOfSubComp)

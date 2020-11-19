@@ -115,7 +115,6 @@ namespace MoistureBalanceEMPDManager {
     using namespace DataHeatBalance;
     using DataHeatBalFanSys::ZoneAirHumRat;
     using DataSurfaces::Surface;
-    using DataSurfaces::SurfaceClass_Window;
     using DataSurfaces::TotSurfaces;
     using namespace DataMoistureBalanceEMPD;
     using DataMoistureBalance::HConvInFD;
@@ -286,7 +285,7 @@ namespace MoistureBalanceEMPDManager {
         // Ensure at least one interior EMPD surface for each zone
         EMPDzone.dimension(state.dataGlobal->NumOfZones, false);
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-            if (!Surface(SurfNum).HeatTransSurf || Surface(SurfNum).Class == SurfaceClass_Window)
+            if (!Surface(SurfNum).HeatTransSurf || Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Window)
                 continue; // Heat transfer surface only and not a window
             if (Surface(SurfNum).HeatTransferAlgorithm != HeatTransferModel_EMPD) continue;
             ConstrNum = Surface(SurfNum).Construction;
@@ -414,7 +413,7 @@ namespace MoistureBalanceEMPDManager {
 
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
             if (!Surface(SurfNum).HeatTransSurf) continue;
-            if (Surface(SurfNum).Class == SurfaceClass_Window) continue;
+            if (Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Window) continue;
             EMPDReportVarsData &rvd = EMPDReportVars(SurfNum);
             const std::string surf_name = Surface(SurfNum).Name;
             SetupOutputVariable(state,
