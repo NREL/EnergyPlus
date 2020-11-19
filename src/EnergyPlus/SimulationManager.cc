@@ -2194,7 +2194,7 @@ namespace SimulationManager {
         static constexpr auto Format_703(
             "! <{} Node Connection>,<Node Name>,<Node ObjectType>,<Node ObjectName>,<Node ConnectionType>,<Node FluidStream>\n");
 
-        NonConnectedNodes.dimension(NumOfNodes, true);
+        state.dataBranchNodeConnections->NonConnectedNodes.dimension(NumOfNodes, true);
 
         int NumNonParents = 0;
         for (int Loop = 1; Loop <= state.dataBranchNodeConnections->NumOfNodeConnections; ++Loop) {
@@ -2212,7 +2212,7 @@ namespace SimulationManager {
 
         for (int Loop = 1; Loop <= state.dataBranchNodeConnections->NumOfNodeConnections; ++Loop) {
             if (!state.dataBranchNodeConnections->NodeConnections(Loop).ObjectIsParent) continue;
-            NonConnectedNodes(state.dataBranchNodeConnections->NodeConnections(Loop).NodeNumber) = false;
+            state.dataBranchNodeConnections->NonConnectedNodes(state.dataBranchNodeConnections->NodeConnections(Loop).NodeNumber) = false;
             print(state.files.bnd,
                   " Parent Node Connection,{},{},{},{},{}\n",
                   state.dataBranchNodeConnections->NodeConnections(Loop).NodeName,
@@ -2262,7 +2262,7 @@ namespace SimulationManager {
 
         for (int Loop = 1; Loop <= state.dataBranchNodeConnections->NumOfNodeConnections; ++Loop) {
             if (state.dataBranchNodeConnections->NodeConnections(Loop).ObjectIsParent) continue;
-            NonConnectedNodes(state.dataBranchNodeConnections->NodeConnections(Loop).NodeNumber) = false;
+            state.dataBranchNodeConnections->NonConnectedNodes(state.dataBranchNodeConnections->NodeConnections(Loop).NodeNumber) = false;
             print(state.files.bnd,
                   " Non-Parent Node Connection,{},{},{},{},{}\n",
                   state.dataBranchNodeConnections->NodeConnections(Loop).NodeName,
@@ -2274,7 +2274,7 @@ namespace SimulationManager {
 
         int NumNonConnected = 0;
         for (int Loop = 1; Loop <= NumOfNodes; ++Loop) {
-            if (NonConnectedNodes(Loop)) ++NumNonConnected;
+            if (state.dataBranchNodeConnections->NonConnectedNodes(Loop)) ++NumNonConnected;
         }
 
         if (NumNonConnected > 0) {
@@ -2284,12 +2284,12 @@ namespace SimulationManager {
             static constexpr auto Format_706("! <NonConnected Node>,<NonConnected Node Number>,<NonConnected Node Name>");
             print(state.files.bnd, "{}\n", Format_706);
             for (int Loop = 1; Loop <= NumOfNodes; ++Loop) {
-                if (!NonConnectedNodes(Loop)) continue;
+                if (!state.dataBranchNodeConnections->NonConnectedNodes(Loop)) continue;
                 print(state.files.bnd, " NonConnected Node,{},{}\n", Loop, NodeID(Loop));
             }
         }
 
-        NonConnectedNodes.deallocate();
+        state.dataBranchNodeConnections->NonConnectedNodes.deallocate();
     }
 
     void ReportLoopConnections(EnergyPlusData &state)

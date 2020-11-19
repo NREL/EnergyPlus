@@ -124,14 +124,6 @@ namespace DataBranchNodeConnections {
         EqNodeConnectionDef() = default;
     };
 
-    // Object Data
-    extern Array1D<EqNodeConnectionDef> AirTerminalNodeConnections;
-    extern Array1D_bool NonConnectedNodes;
-
-    // Clears the global data in DataBranchNodeConnections.
-    // Needed for unit tests, should not be normally called.
-    void clear_state();
-
 } // namespace DataBranchNodeConnections
 
 struct BranchNodeConnectionsData : BaseGlobalStruct {
@@ -149,6 +141,8 @@ struct BranchNodeConnectionsData : BaseGlobalStruct {
     Array1D<DataBranchNodeConnections::ComponentListData> CompSets;
     Array1D<DataBranchNodeConnections::ParentListData> ParentNodeList;
     Array1D<DataBranchNodeConnections::NodeConnectionDef> NodeConnections;
+    Array1D<DataBranchNodeConnections::EqNodeConnectionDef> AirTerminalNodeConnections;
+    Array1D_bool NonConnectedNodes;
 
     void clear_state() override
     {
@@ -164,6 +158,8 @@ struct BranchNodeConnectionsData : BaseGlobalStruct {
         this->CompSets.deallocate();
         this->ParentNodeList.deallocate();
         this->NodeConnections.deallocate();
+        this->AirTerminalNodeConnections.deallocate();
+        this->NonConnectedNodes.deallocate();
     }
 };
 

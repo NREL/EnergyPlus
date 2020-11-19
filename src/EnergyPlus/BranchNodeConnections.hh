@@ -157,8 +157,7 @@ namespace BranchNodeConnections {
 
     void GetNodeConnectionType(EnergyPlusData &state, int NodeNumber, Array1D_int &NodeConnectType, bool &errFlag);
 
-    void FindAllNodeNumbersInList(EnergyPlusData &state,
-                                  int WhichNumber,
+    void FindAllNodeNumbersInList(int WhichNumber,
                                   Array1D<DataBranchNodeConnections::NodeConnectionDef> const &NodeConnections,
                                   int NumItems,
                                   int &CountOfItems,            // Number of items found

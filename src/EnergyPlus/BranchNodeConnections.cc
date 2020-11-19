@@ -149,30 +149,30 @@ namespace EnergyPlus::BranchNodeConnections {
             if (present(InputFieldName)) {
                 ++state.dataBranchNodeConnections->NumOfAirTerminalNodes;
                 if (state.dataBranchNodeConnections->NumOfAirTerminalNodes > 1 && state.dataBranchNodeConnections->NumOfAirTerminalNodes > state.dataBranchNodeConnections->MaxNumOfAirTerminalNodes) {
-                    AirTerminalNodeConnections.redimension(state.dataBranchNodeConnections->MaxNumOfAirTerminalNodes += state.dataBranchNodeConnections->EqNodeConnectionAlloc);
+                    state.dataBranchNodeConnections->AirTerminalNodeConnections.redimension(state.dataBranchNodeConnections->MaxNumOfAirTerminalNodes += state.dataBranchNodeConnections->EqNodeConnectionAlloc);
                 } else if (state.dataBranchNodeConnections->NumOfAirTerminalNodes == 1) {
-                    AirTerminalNodeConnections.allocate(state.dataBranchNodeConnections->EqNodeConnectionAlloc);
+                    state.dataBranchNodeConnections->AirTerminalNodeConnections.allocate(state.dataBranchNodeConnections->EqNodeConnectionAlloc);
                     state.dataBranchNodeConnections->MaxNumOfAirTerminalNodes = state.dataBranchNodeConnections->EqNodeConnectionAlloc;
                 }
 
                 // Check out AirTerminal inlet/outlet nodes
                 Found =
-                    UtilityRoutines::FindItemInList(NodeName, AirTerminalNodeConnections, &EqNodeConnectionDef::NodeName, state.dataBranchNodeConnections->NumOfAirTerminalNodes - 1);
+                    UtilityRoutines::FindItemInList(NodeName, state.dataBranchNodeConnections->AirTerminalNodeConnections, &EqNodeConnectionDef::NodeName, state.dataBranchNodeConnections->NumOfAirTerminalNodes - 1);
                 if (Found != 0) { // Nodename already used
                     ShowSevereError(state, RoutineName + ObjectType + "=\"" + ObjectName + "\" node name duplicated.");
                     ShowContinueError(state, "NodeName=\"" + NodeName + "\", entered as type=" + ConnectionType);
                     ShowContinueError(state, "In Field=" + InputFieldName());
-                    ShowContinueError(state, "Already used in " + AirTerminalNodeConnections(Found).ObjectType + "=\"" +
-                                      AirTerminalNodeConnections(Found).ObjectName + "\".");
-                    ShowContinueError(state, " as type=" + AirTerminalNodeConnections(Found).ConnectionType +
-                                      ", In Field=" + AirTerminalNodeConnections(Found).InputFieldName);
+                    ShowContinueError(state, "Already used in " + state.dataBranchNodeConnections->AirTerminalNodeConnections(Found).ObjectType + "=\"" +
+                                      state.dataBranchNodeConnections->AirTerminalNodeConnections(Found).ObjectName + "\".");
+                    ShowContinueError(state, " as type=" + state.dataBranchNodeConnections->AirTerminalNodeConnections(Found).ConnectionType +
+                                      ", In Field=" + state.dataBranchNodeConnections->AirTerminalNodeConnections(Found).InputFieldName);
                     ErrorsFoundHere = true;
                 } else {
-                    AirTerminalNodeConnections(state.dataBranchNodeConnections->NumOfAirTerminalNodes).NodeName = NodeName;
-                    AirTerminalNodeConnections(state.dataBranchNodeConnections->NumOfAirTerminalNodes).ObjectType = ObjectType;
-                    AirTerminalNodeConnections(state.dataBranchNodeConnections->NumOfAirTerminalNodes).ObjectName = ObjectName;
-                    AirTerminalNodeConnections(state.dataBranchNodeConnections->NumOfAirTerminalNodes).ConnectionType = ConnectionType;
-                    AirTerminalNodeConnections(state.dataBranchNodeConnections->NumOfAirTerminalNodes).InputFieldName = InputFieldName;
+                    state.dataBranchNodeConnections->AirTerminalNodeConnections(state.dataBranchNodeConnections->NumOfAirTerminalNodes).NodeName = NodeName;
+                    state.dataBranchNodeConnections->AirTerminalNodeConnections(state.dataBranchNodeConnections->NumOfAirTerminalNodes).ObjectType = ObjectType;
+                    state.dataBranchNodeConnections->AirTerminalNodeConnections(state.dataBranchNodeConnections->NumOfAirTerminalNodes).ObjectName = ObjectName;
+                    state.dataBranchNodeConnections->AirTerminalNodeConnections(state.dataBranchNodeConnections->NumOfAirTerminalNodes).ConnectionType = ConnectionType;
+                    state.dataBranchNodeConnections->AirTerminalNodeConnections(state.dataBranchNodeConnections->NumOfAirTerminalNodes).InputFieldName = InputFieldName;
                 }
             } else {
                 ShowSevereError(state, RoutineName + ObjectType + ", Developer Error: Input Field Name not included.");
@@ -1456,7 +1456,7 @@ namespace EnergyPlus::BranchNodeConnections {
 
         if (allocated(NodeConnectType)) NodeConnectType.deallocate();
 
-        FindAllNodeNumbersInList(state, NodeNumber, state.dataBranchNodeConnections->NodeConnections, state.dataBranchNodeConnections->NumOfNodeConnections, NumInList, ListArray);
+        FindAllNodeNumbersInList(NodeNumber, state.dataBranchNodeConnections->NodeConnections, state.dataBranchNodeConnections->NumOfNodeConnections, NumInList, ListArray);
 
         NodeConnectType.allocate(NumInList);
 
@@ -1475,8 +1475,7 @@ namespace EnergyPlus::BranchNodeConnections {
         }
     }
 
-    void FindAllNodeNumbersInList(EnergyPlusData &state,
-                                  int const WhichNumber,
+    void FindAllNodeNumbersInList(int const WhichNumber,
                                   Array1D<DataBranchNodeConnections::NodeConnectionDef> const &NodeConnections,
                                   int const NumItems,
                                   int &CountOfItems,            // Number of items found
@@ -1503,7 +1502,7 @@ namespace EnergyPlus::BranchNodeConnections {
         if (allocated(AllNumbersInList)) AllNumbersInList.deallocate();
 
         for (Count = 1; Count <= NumItems; ++Count) {
-            if (WhichNumber == state.dataBranchNodeConnections->NodeConnections(Count).NodeNumber) {
+            if (WhichNumber == NodeConnections(Count).NodeNumber) {
                 ++CountOfItems;
             }
         }
@@ -1514,7 +1513,7 @@ namespace EnergyPlus::BranchNodeConnections {
             CountOfItems = 0;
 
             for (Count = 1; Count <= NumItems; ++Count) {
-                if (WhichNumber == state.dataBranchNodeConnections->NodeConnections(Count).NodeNumber) {
+                if (WhichNumber == NodeConnections(Count).NodeNumber) {
                     ++CountOfItems;
                     AllNumbersInList(CountOfItems) = Count;
                 }
