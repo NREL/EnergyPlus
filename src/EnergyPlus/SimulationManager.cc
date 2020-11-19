@@ -2354,61 +2354,61 @@ namespace SimulationManager {
             print(state.files.bnd,
                   " Component Set,{},{},{},{},{},{},{},{}\n",
                   Count,
-                  CompSets(Count).ParentCType,
-                  CompSets(Count).ParentCName,
-                  CompSets(Count).CType,
-                  CompSets(Count).CName,
-                  CompSets(Count).InletNodeName,
-                  CompSets(Count).OutletNodeName,
-                  CompSets(Count).Description);
+                  state.dataBranchNodeConnections->CompSets(Count).ParentCType,
+                  state.dataBranchNodeConnections->CompSets(Count).ParentCName,
+                  state.dataBranchNodeConnections->CompSets(Count).CType,
+                  state.dataBranchNodeConnections->CompSets(Count).CName,
+                  state.dataBranchNodeConnections->CompSets(Count).InletNodeName,
+                  state.dataBranchNodeConnections->CompSets(Count).OutletNodeName,
+                  state.dataBranchNodeConnections->CompSets(Count).Description);
 
-            if (CompSets(Count).ParentCType == "UNDEFINED" || CompSets(Count).InletNodeName == "UNDEFINED" ||
-                CompSets(Count).OutletNodeName == "UNDEFINED") {
+            if (state.dataBranchNodeConnections->CompSets(Count).ParentCType == "UNDEFINED" || state.dataBranchNodeConnections->CompSets(Count).InletNodeName == "UNDEFINED" ||
+                state.dataBranchNodeConnections->CompSets(Count).OutletNodeName == "UNDEFINED") {
                 if (AbortProcessing && WarningOut) {
                     ShowWarningError(state, "Node Connection errors shown during \"fatal error\" processing may be false because not all inputs may have "
                                      "been retrieved.");
                     WarningOut = false;
                 }
-                ShowWarningError(state, "Node Connection Error for object " + CompSets(Count).CType + ", name=" + CompSets(Count).CName);
-                ShowContinueError(state, "  " + CompSets(Count).Description + " not on any Branch or Parent Object");
-                ShowContinueError(state, "  Inlet Node : " + CompSets(Count).InletNodeName);
-                ShowContinueError(state, "  Outlet Node: " + CompSets(Count).OutletNodeName);
+                ShowWarningError(state, "Node Connection Error for object " + state.dataBranchNodeConnections->CompSets(Count).CType + ", name=" + state.dataBranchNodeConnections->CompSets(Count).CName);
+                ShowContinueError(state, "  " + state.dataBranchNodeConnections->CompSets(Count).Description + " not on any Branch or Parent Object");
+                ShowContinueError(state, "  Inlet Node : " + state.dataBranchNodeConnections->CompSets(Count).InletNodeName);
+                ShowContinueError(state, "  Outlet Node: " + state.dataBranchNodeConnections->CompSets(Count).OutletNodeName);
                 ++state.dataBranchNodeConnections->NumNodeConnectionErrors;
-                if (UtilityRoutines::SameString(CompSets(Count).CType, "SolarCollector:UnglazedTranspired")) {
+                if (UtilityRoutines::SameString(state.dataBranchNodeConnections->CompSets(Count).CType, "SolarCollector:UnglazedTranspired")) {
                     ShowContinueError(state, "This report does not necessarily indicate a problem for a MultiSystem Transpired Collector");
                 }
             }
-            if (CompSets(Count).Description == "UNDEFINED") {
+            if (state.dataBranchNodeConnections->CompSets(Count).Description == "UNDEFINED") {
                 if (AbortProcessing && WarningOut) {
                     ShowWarningError(state, "Node Connection errors shown during \"fatal error\" processing may be false because not all inputs may have "
                                      "been retrieved.");
                     WarningOut = false;
                 }
-                ShowWarningError(state, "Potential Node Connection Error for object " + CompSets(Count).CType + ", name=" + CompSets(Count).CName);
+                ShowWarningError(state, "Potential Node Connection Error for object " + state.dataBranchNodeConnections->CompSets(Count).CType + ", name=" + state.dataBranchNodeConnections->CompSets(Count).CName);
                 ShowContinueError(state, "  Node Types are still UNDEFINED -- See Branch/Node Details file for further information");
-                ShowContinueError(state, "  Inlet Node : " + CompSets(Count).InletNodeName);
-                ShowContinueError(state, "  Outlet Node: " + CompSets(Count).OutletNodeName);
+                ShowContinueError(state, "  Inlet Node : " + state.dataBranchNodeConnections->CompSets(Count).InletNodeName);
+                ShowContinueError(state, "  Outlet Node: " + state.dataBranchNodeConnections->CompSets(Count).OutletNodeName);
                 ++state.dataBranchNodeConnections->NumNodeConnectionErrors;
             }
         }
 
         for (int Count = 1; Count <= state.dataBranchNodeConnections->NumCompSets; ++Count) {
             for (int Count1 = Count + 1; Count1 <= state.dataBranchNodeConnections->NumCompSets; ++Count1) {
-                if (CompSets(Count).CType != CompSets(Count1).CType) continue;
-                if (CompSets(Count).CName != CompSets(Count1).CName) continue;
-                if (CompSets(Count).InletNodeName != CompSets(Count1).InletNodeName) continue;
-                if (CompSets(Count).OutletNodeName != CompSets(Count1).OutletNodeName) continue;
+                if (state.dataBranchNodeConnections->CompSets(Count).CType != state.dataBranchNodeConnections->CompSets(Count1).CType) continue;
+                if (state.dataBranchNodeConnections->CompSets(Count).CName != state.dataBranchNodeConnections->CompSets(Count1).CName) continue;
+                if (state.dataBranchNodeConnections->CompSets(Count).InletNodeName != state.dataBranchNodeConnections->CompSets(Count1).InletNodeName) continue;
+                if (state.dataBranchNodeConnections->CompSets(Count).OutletNodeName != state.dataBranchNodeConnections->CompSets(Count1).OutletNodeName) continue;
                 if (AbortProcessing && WarningOut) {
                     ShowWarningError(state, "Node Connection errors shown during \"fatal error\" processing may be false because not all inputs may have "
                                      "been retrieved.");
                     WarningOut = false;
                 }
                 ShowWarningError(state, "Component plus inlet/outlet node pair used more than once:");
-                ShowContinueError(state, "  Component  : " + CompSets(Count).CType + ", name=" + CompSets(Count).CName);
-                ShowContinueError(state, "  Inlet Node : " + CompSets(Count).InletNodeName);
-                ShowContinueError(state, "  Outlet Node: " + CompSets(Count).OutletNodeName);
-                ShowContinueError(state, "  Used by    : " + CompSets(Count).ParentCType + ' ' + CompSets(Count).ParentCName);
-                ShowContinueError(state, "  and  by    : " + CompSets(Count1).ParentCType + ' ' + CompSets(Count1).ParentCName);
+                ShowContinueError(state, "  Component  : " + state.dataBranchNodeConnections->CompSets(Count).CType + ", name=" + state.dataBranchNodeConnections->CompSets(Count).CName);
+                ShowContinueError(state, "  Inlet Node : " + state.dataBranchNodeConnections->CompSets(Count).InletNodeName);
+                ShowContinueError(state, "  Outlet Node: " + state.dataBranchNodeConnections->CompSets(Count).OutletNodeName);
+                ShowContinueError(state, "  Used by    : " + state.dataBranchNodeConnections->CompSets(Count).ParentCType + ' ' + state.dataBranchNodeConnections->CompSets(Count).ParentCName);
+                ShowContinueError(state, "  and  by    : " + state.dataBranchNodeConnections->CompSets(Count1).ParentCType + ' ' + state.dataBranchNodeConnections->CompSets(Count1).ParentCName);
                 ++state.dataBranchNodeConnections->NumNodeConnectionErrors;
             }
         }
@@ -2979,8 +2979,8 @@ namespace SimulationManager {
         print(state.files.debug, "{}\n", " RepVar,ReportIndex,ReportID,ReportName,Units,ResourceType,EndUse,Group,IndexType");
 
         for (Loop = 1; Loop <= state.dataBranchNodeConnections->NumCompSets; ++Loop) {
-            NumVariables = GetNumMeteredVariables(CompSets(Loop).CType, CompSets(Loop).CName);
-            print(state.files.debug, "CompSet, {}, {}, {:5}\n", CompSets(Loop).CType, CompSets(Loop).CName, NumVariables);
+            NumVariables = GetNumMeteredVariables(state.dataBranchNodeConnections->CompSets(Loop).CType, state.dataBranchNodeConnections->CompSets(Loop).CName);
+            print(state.files.debug, "CompSet, {}, {}, {:5}\n", state.dataBranchNodeConnections->CompSets(Loop).CType, state.dataBranchNodeConnections->CompSets(Loop).CName, NumVariables);
             if (NumVariables <= 0) continue;
             VarIndexes.dimension(NumVariables, 0);
             VarIDs.dimension(NumVariables, 0);
@@ -2995,8 +2995,8 @@ namespace SimulationManager {
 
             EndUses.allocate(NumVariables);
             Groups.allocate(NumVariables);
-            GetMeteredVariables(state, CompSets(Loop).CType,
-                                CompSets(Loop).CName,
+            GetMeteredVariables(state, state.dataBranchNodeConnections->CompSets(Loop).CType,
+                                state.dataBranchNodeConnections->CompSets(Loop).CName,
                                 VarIndexes,
                                 VarTypes,
                                 IndexTypes,

@@ -759,8 +759,8 @@ namespace EnergyPlus::BranchNodeConnections {
         } else if (IsParentObjectCompSet(state, ComponentType, ComponentName)) {
             Which = WhichCompSet(state, ComponentType, ComponentName);
             if (Which != 0) {
-                InletNodeName = CompSets(Which).InletNodeName;
-                OutletNodeName = CompSets(Which).OutletNodeName;
+                InletNodeName = state.dataBranchNodeConnections->CompSets(Which).InletNodeName;
+                OutletNodeName = state.dataBranchNodeConnections->CompSets(Which).OutletNodeName;
                 InletNodeNum = UtilityRoutines::FindItemInList(InletNodeName, NodeID({1, NumOfNodes}), NumOfNodes);
                 OutletNodeNum = UtilityRoutines::FindItemInList(OutletNodeName, NodeID({1, NumOfNodes}), NumOfNodes);
             } else {
@@ -798,7 +798,7 @@ namespace EnergyPlus::BranchNodeConnections {
 
         IsParent = false;
         for (Loop = 1; Loop <= state.dataBranchNodeConnections->NumCompSets; ++Loop) {
-            if (CompSets(Loop).ParentCType == ComponentType && CompSets(Loop).ParentCName == ComponentName) {
+            if (state.dataBranchNodeConnections->CompSets(Loop).ParentCType == ComponentType && state.dataBranchNodeConnections->CompSets(Loop).ParentCName == ComponentName) {
                 IsParent = true;
                 break;
             }
@@ -831,7 +831,7 @@ namespace EnergyPlus::BranchNodeConnections {
 
         WhichOne = 0;
         for (Loop = 1; Loop <= state.dataBranchNodeConnections->NumCompSets; ++Loop) {
-            if (CompSets(Loop).CType == ComponentType && CompSets(Loop).CName == ComponentName) {
+            if (state.dataBranchNodeConnections->CompSets(Loop).CType == ComponentType && state.dataBranchNodeConnections->CompSets(Loop).CName == ComponentName) {
                 WhichOne = Loop;
                 break;
             }
@@ -864,7 +864,7 @@ namespace EnergyPlus::BranchNodeConnections {
         NumChildren = 0;
         if (IsParentObject(state, ComponentType, ComponentName)) {
             for (Loop = 1; Loop <= state.dataBranchNodeConnections->NumCompSets; ++Loop) {
-                if (CompSets(Loop).ParentCType == ComponentType && CompSets(Loop).ParentCName == ComponentName) {
+                if (state.dataBranchNodeConnections->CompSets(Loop).ParentCType == ComponentType && state.dataBranchNodeConnections->CompSets(Loop).ParentCName == ComponentName) {
                     ++NumChildren;
                 }
             }
@@ -1034,12 +1034,12 @@ namespace EnergyPlus::BranchNodeConnections {
                 ChildOutNodeNum = 0;
                 CountNum = 0;
                 for (Loop = 1; Loop <= state.dataBranchNodeConnections->NumCompSets; ++Loop) {
-                    if (CompSets(Loop).ParentCType == ComponentType && CompSets(Loop).ParentCName == ComponentName) {
+                    if (state.dataBranchNodeConnections->CompSets(Loop).ParentCType == ComponentType && state.dataBranchNodeConnections->CompSets(Loop).ParentCName == ComponentName) {
                         ++CountNum;
-                        ChildCType(CountNum) = CompSets(Loop).CType;
-                        ChildCName(CountNum) = CompSets(Loop).CName;
-                        ChildInNodeName(CountNum) = CompSets(Loop).InletNodeName;
-                        ChildOutNodeName(CountNum) = CompSets(Loop).OutletNodeName;
+                        ChildCType(CountNum) = state.dataBranchNodeConnections->CompSets(Loop).CType;
+                        ChildCName(CountNum) = state.dataBranchNodeConnections->CompSets(Loop).CName;
+                        ChildInNodeName(CountNum) = state.dataBranchNodeConnections->CompSets(Loop).InletNodeName;
+                        ChildOutNodeName(CountNum) = state.dataBranchNodeConnections->CompSets(Loop).OutletNodeName;
                         // Get Node Numbers
                         ChildInNodeNum(CountNum) = UtilityRoutines::FindItemInList(ChildInNodeName(CountNum), NodeID({1, NumOfNodes}), NumOfNodes);
                         ChildOutNodeNum(CountNum) = UtilityRoutines::FindItemInList(ChildOutNodeName(CountNum), NodeID({1, NumOfNodes}), NumOfNodes);
@@ -1145,31 +1145,31 @@ namespace EnergyPlus::BranchNodeConnections {
         // See if Component-Nodes set is already there - should be unique
         // Try to fill in blanks (passed in as undefined
         for (Count = 1; Count <= state.dataBranchNodeConnections->NumCompSets; ++Count) {
-            if (CompName != CompSets(Count).CName) continue;
+            if (CompName != state.dataBranchNodeConnections->CompSets(Count).CName) continue;
             if (CompTypeUC != "UNDEFINED") {
-                if (CompTypeUC != CompSets(Count).CType) continue;
+                if (CompTypeUC != state.dataBranchNodeConnections->CompSets(Count).CType) continue;
             }
             // Component name matches, component type matches or is undefined
             if (InletNode != "UNDEFINED") {
-                if (CompSets(Count).InletNodeName != "UNDEFINED") {
-                    if (InletNode != CompSets(Count).InletNodeName) continue;
+                if (state.dataBranchNodeConnections->CompSets(Count).InletNodeName != "UNDEFINED") {
+                    if (InletNode != state.dataBranchNodeConnections->CompSets(Count).InletNodeName) continue;
                 } else {
-                    CompSets(Count).InletNodeName = InletNode;
+                    state.dataBranchNodeConnections->CompSets(Count).InletNodeName = InletNode;
                 }
             }
             if (OutletNode != "UNDEFINED") {
-                if (CompSets(Count).OutletNodeName != "UNDEFINED") {
-                    if (OutletNode != CompSets(Count).OutletNodeName) continue;
+                if (state.dataBranchNodeConnections->CompSets(Count).OutletNodeName != "UNDEFINED") {
+                    if (OutletNode != state.dataBranchNodeConnections->CompSets(Count).OutletNodeName) continue;
                 } else {
-                    CompSets(Count).OutletNodeName = OutletNode;
+                    state.dataBranchNodeConnections->CompSets(Count).OutletNodeName = OutletNode;
                 }
             }
             //  See if something undefined and set here
-            if (CompSets(Count).ParentCType == "UNDEFINED" && CompSets(Count).ParentCName == "UNDEFINED") {
+            if (state.dataBranchNodeConnections->CompSets(Count).ParentCType == "UNDEFINED" && state.dataBranchNodeConnections->CompSets(Count).ParentCName == "UNDEFINED") {
                 // Assume this is a further definition for this compset
-                CompSets(Count).ParentCType = ParentTypeUC;
-                CompSets(Count).ParentCName = ParentName;
-                if (present(Description)) CompSets(Count).Description = Description;
+                state.dataBranchNodeConnections->CompSets(Count).ParentCType = ParentTypeUC;
+                state.dataBranchNodeConnections->CompSets(Count).ParentCName = ParentName;
+                if (present(Description)) state.dataBranchNodeConnections->CompSets(Count).Description = Description;
                 Found = Count;
                 break;
             }
@@ -1180,31 +1180,31 @@ namespace EnergyPlus::BranchNodeConnections {
                 // Test if inlet node has been used before as an inlet node
                 // If the matching node name does not belong to the parent object, then error
                 // For example a fan may share the same inlet node as the furnace object which is its parent
-                if (InletNode != CompSets(Count).InletNodeName) {
+                if (InletNode != state.dataBranchNodeConnections->CompSets(Count).InletNodeName) {
                     continue;
                     // If parent type is "UNDEFINED" then no error
-                } else if ((ParentTypeUC == "UNDEFINED") || (CompSets(Count).ParentCType == "UNDEFINED")) {
+                } else if ((ParentTypeUC == "UNDEFINED") || (state.dataBranchNodeConnections->CompSets(Count).ParentCType == "UNDEFINED")) {
                     // If node name is "UNDEFINED" then no error
                 } else if (InletNode != "UNDEFINED") {
                     // If the matching node name does not belong to the parent or child object, then error
                     // For example a fan may share the same inlet node as the furnace object which is its parent
-                    if ((ParentTypeUC == CompSets(Count).CType) && (ParentName == CompSets(Count).CName)) {
+                    if ((ParentTypeUC == state.dataBranchNodeConnections->CompSets(Count).CType) && (ParentName == state.dataBranchNodeConnections->CompSets(Count).CName)) {
                         // OK - The duplicate inlet node belongs to this component's parent
-                    } else if ((CompTypeUC == CompSets(Count).ParentCType) && (CompName == CompSets(Count).ParentCName)) {
+                    } else if ((CompTypeUC == state.dataBranchNodeConnections->CompSets(Count).ParentCType) && (CompName == state.dataBranchNodeConnections->CompSets(Count).ParentCName)) {
                         // OK - The duplicate inlet node belongs to a child of this component
                     } else {
                         // Due to possibility of grandparents or more, if the matching node name
                         // belongs to a component that appears as a parent, then OK
                         Found2 = 0;
                         for (Count2 = 1; Count2 <= state.dataBranchNodeConnections->NumCompSets; ++Count2) {
-                            if ((CompSets(Count).CType == CompSets(Count2).ParentCType) && (CompSets(Count).CName == CompSets(Count2).ParentCName))
+                            if ((state.dataBranchNodeConnections->CompSets(Count).CType == state.dataBranchNodeConnections->CompSets(Count2).ParentCType) && (state.dataBranchNodeConnections->CompSets(Count).CName == state.dataBranchNodeConnections->CompSets(Count2).ParentCName))
                                 Found2 = 1;
-                            if ((CompTypeUC == CompSets(Count2).ParentCType) && (CompName == CompSets(Count2).ParentCName)) Found2 = 1;
+                            if ((CompTypeUC == state.dataBranchNodeConnections->CompSets(Count2).ParentCType) && (CompName == state.dataBranchNodeConnections->CompSets(Count2).ParentCName)) Found2 = 1;
                         }
                         if (Found2 == 0) {
                             ShowWarningError(state, "Node used as an inlet more than once: " + InletNode);
-                            ShowContinueError(state, "  Used by     : " + CompSets(Count).ParentCType + ", name=" + CompSets(Count).ParentCName);
-                            ShowContinueError(state, "  as inlet for: " + CompSets(Count).CType + ", name=" + CompSets(Count).CName);
+                            ShowContinueError(state, "  Used by     : " + state.dataBranchNodeConnections->CompSets(Count).ParentCType + ", name=" + state.dataBranchNodeConnections->CompSets(Count).ParentCName);
+                            ShowContinueError(state, "  as inlet for: " + state.dataBranchNodeConnections->CompSets(Count).CType + ", name=" + state.dataBranchNodeConnections->CompSets(Count).CName);
                             ShowContinueError(state, format("{}{}{}", "  and  by     : ", ParentTypeUC + ", name=", ParentName));
                             ShowContinueError(state, format("{}{}{}", "  as inlet for: ", CompTypeUC + ", name=", CompName));
                         }
@@ -1213,54 +1213,54 @@ namespace EnergyPlus::BranchNodeConnections {
                 // Test if outlet node has been used before as an outlet node
                 // If the matching node name does not belong to the parent or child object, then error
                 // For example a fan may share the same outlet node as the furnace object which is its parent
-                if (OutletNode != CompSets(Count).OutletNodeName) {
+                if (OutletNode != state.dataBranchNodeConnections->CompSets(Count).OutletNodeName) {
                     continue;
                     // If parent type is "UNDEFINED" then no error
-                } else if ((ParentTypeUC == "UNDEFINED") || (CompSets(Count).ParentCType == "UNDEFINED")) {
+                } else if ((ParentTypeUC == "UNDEFINED") || (state.dataBranchNodeConnections->CompSets(Count).ParentCType == "UNDEFINED")) {
                     // If node name is "UNDEFINED" then no error
                 } else if (OutletNode != "UNDEFINED") {
-                    if ((ParentTypeUC == CompSets(Count).CType) && (ParentName == CompSets(Count).CName)) {
+                    if ((ParentTypeUC == state.dataBranchNodeConnections->CompSets(Count).CType) && (ParentName == state.dataBranchNodeConnections->CompSets(Count).CName)) {
                         // OK - The duplicate outlet node belongs to this component's parent
-                    } else if ((CompTypeUC == CompSets(Count).ParentCType) && (CompName == CompSets(Count).ParentCName)) {
+                    } else if ((CompTypeUC == state.dataBranchNodeConnections->CompSets(Count).ParentCType) && (CompName == state.dataBranchNodeConnections->CompSets(Count).ParentCName)) {
                         // OK - The duplicate outlet node belongs to a child of this component
                     } else {
                         // Due to possibility of grandparents or more, if the matching node name
                         // belongs to a component that appears as a parent, then OK
                         Found2 = 0;
                         for (Count2 = 1; Count2 <= state.dataBranchNodeConnections->NumCompSets; ++Count2) {
-                            if ((CompSets(Count).CType == CompSets(Count2).ParentCType) && (CompSets(Count).CName == CompSets(Count2).ParentCName))
+                            if ((state.dataBranchNodeConnections->CompSets(Count).CType == state.dataBranchNodeConnections->CompSets(Count2).ParentCType) && (state.dataBranchNodeConnections->CompSets(Count).CName == state.dataBranchNodeConnections->CompSets(Count2).ParentCName))
                                 Found2 = 1;
-                            if ((CompTypeUC == CompSets(Count2).ParentCType) && (CompName == CompSets(Count2).ParentCName)) Found2 = 1;
+                            if ((CompTypeUC == state.dataBranchNodeConnections->CompSets(Count2).ParentCType) && (CompName == state.dataBranchNodeConnections->CompSets(Count2).ParentCName)) Found2 = 1;
                         }
                         // This rule is violated by dual duct units, so let it pass
-                        if ((Found2 == 0) && (!has_prefixi(CompSets(Count).CType, "AirTerminal:DualDuct:")) &&
+                        if ((Found2 == 0) && (!has_prefixi(state.dataBranchNodeConnections->CompSets(Count).CType, "AirTerminal:DualDuct:")) &&
                             (!has_prefixi(CompTypeUC, "AirTerminal:DualDuct:"))) {
                             ShowWarningError(state, "Node used as an outlet more than once: " + OutletNode);
-                            ShowContinueError(state, "  Used by     : " + CompSets(Count).ParentCType + ", name=" + CompSets(Count).ParentCName);
-                            ShowContinueError(state, "  as outlet for: " + CompSets(Count).CType + ", name=" + CompSets(Count).CName);
+                            ShowContinueError(state, "  Used by     : " + state.dataBranchNodeConnections->CompSets(Count).ParentCType + ", name=" + state.dataBranchNodeConnections->CompSets(Count).ParentCName);
+                            ShowContinueError(state, "  as outlet for: " + state.dataBranchNodeConnections->CompSets(Count).CType + ", name=" + state.dataBranchNodeConnections->CompSets(Count).CName);
                             ShowContinueError(state, format("{}{}{}", "  and  by     : ", ParentTypeUC + ", name=", ParentName));
                             ShowContinueError(state, format("{}{}{}", "  as outlet for: ", CompTypeUC + ", name=", CompName));
                         }
                     }
                 }
-                if (CompTypeUC != CompSets(Count).CType && CompTypeUC != "UNDEFINED") continue;
-                if (CompName != CompSets(Count).CName) continue;
+                if (CompTypeUC != state.dataBranchNodeConnections->CompSets(Count).CType && CompTypeUC != "UNDEFINED") continue;
+                if (CompName != state.dataBranchNodeConnections->CompSets(Count).CName) continue;
                 Found = Count;
                 break;
             }
         }
         if (Found == 0) {
-            CompSets.redimension(++state.dataBranchNodeConnections->NumCompSets);
-            CompSets(state.dataBranchNodeConnections->NumCompSets).ParentCType = ParentTypeUC;
-            CompSets(state.dataBranchNodeConnections->NumCompSets).ParentCName = ParentName;
-            CompSets(state.dataBranchNodeConnections->NumCompSets).CType = CompTypeUC;
-            CompSets(state.dataBranchNodeConnections->NumCompSets).CName = CompName;
-            CompSets(state.dataBranchNodeConnections->NumCompSets).InletNodeName = UtilityRoutines::MakeUPPERCase(InletNode);   // TODO: Fix this....
-            CompSets(state.dataBranchNodeConnections->NumCompSets).OutletNodeName = UtilityRoutines::MakeUPPERCase(OutletNode); // TODO: Fix this....
+            state.dataBranchNodeConnections->CompSets.redimension(++state.dataBranchNodeConnections->NumCompSets);
+            state.dataBranchNodeConnections->CompSets(state.dataBranchNodeConnections->NumCompSets).ParentCType = ParentTypeUC;
+            state.dataBranchNodeConnections->CompSets(state.dataBranchNodeConnections->NumCompSets).ParentCName = ParentName;
+            state.dataBranchNodeConnections->CompSets(state.dataBranchNodeConnections->NumCompSets).CType = CompTypeUC;
+            state.dataBranchNodeConnections->CompSets(state.dataBranchNodeConnections->NumCompSets).CName = CompName;
+            state.dataBranchNodeConnections->CompSets(state.dataBranchNodeConnections->NumCompSets).InletNodeName = UtilityRoutines::MakeUPPERCase(InletNode);   // TODO: Fix this....
+            state.dataBranchNodeConnections->CompSets(state.dataBranchNodeConnections->NumCompSets).OutletNodeName = UtilityRoutines::MakeUPPERCase(OutletNode); // TODO: Fix this....
             if (present(Description)) {
-                CompSets(state.dataBranchNodeConnections->NumCompSets).Description = Description;
+                state.dataBranchNodeConnections->CompSets(state.dataBranchNodeConnections->NumCompSets).Description = Description;
             } else {
-                CompSets(state.dataBranchNodeConnections->NumCompSets).Description = "UNDEFINED";
+                state.dataBranchNodeConnections->CompSets(state.dataBranchNodeConnections->NumCompSets).Description = "UNDEFINED";
             }
         }
     }
@@ -1288,17 +1288,17 @@ namespace EnergyPlus::BranchNodeConnections {
         for (Count = 1; Count <= state.dataBranchNodeConnections->NumCompSets; ++Count) {
             for (Other = 1; Other <= state.dataBranchNodeConnections->NumCompSets; ++Other) {
                 if (Count == Other) continue;
-                if (CompSets(Count).InletNodeName != CompSets(Other).InletNodeName) continue;
+                if (state.dataBranchNodeConnections->CompSets(Count).InletNodeName != state.dataBranchNodeConnections->CompSets(Other).InletNodeName) continue;
                 if (AlreadyNoted(Count)) continue;
                 //  All other values must match
-                if (CompSets(Count).CType != CompSets(Other).CType || CompSets(Count).CName != CompSets(Other).CName ||
-                    CompSets(Count).OutletNodeName != CompSets(Other).OutletNodeName) {
+                if (state.dataBranchNodeConnections->CompSets(Count).CType != state.dataBranchNodeConnections->CompSets(Other).CType || state.dataBranchNodeConnections->CompSets(Count).CName != state.dataBranchNodeConnections->CompSets(Other).CName ||
+                    state.dataBranchNodeConnections->CompSets(Count).OutletNodeName != state.dataBranchNodeConnections->CompSets(Other).OutletNodeName) {
                     AlreadyNoted(Other) = true;
-                    ShowWarningError(state, "Node used as an inlet more than once: " + CompSets(Count).InletNodeName);
-                    ShowContinueError(state, "  Used by     : " + CompSets(Count).ParentCType + ", name=" + CompSets(Count).ParentCName);
-                    ShowContinueError(state, "  as inlet for: " + CompSets(Count).CType + ", name=" + CompSets(Count).CName);
-                    ShowContinueError(state, "  and  by     : " + CompSets(Other).ParentCType + ", name=" + CompSets(Other).ParentCName);
-                    ShowContinueError(state, "  as inlet for: " + CompSets(Other).CType + ", name=" + CompSets(Other).CName);
+                    ShowWarningError(state, "Node used as an inlet more than once: " + state.dataBranchNodeConnections->CompSets(Count).InletNodeName);
+                    ShowContinueError(state, "  Used by     : " + state.dataBranchNodeConnections->CompSets(Count).ParentCType + ", name=" + state.dataBranchNodeConnections->CompSets(Count).ParentCName);
+                    ShowContinueError(state, "  as inlet for: " + state.dataBranchNodeConnections->CompSets(Count).CType + ", name=" + state.dataBranchNodeConnections->CompSets(Count).CName);
+                    ShowContinueError(state, "  and  by     : " + state.dataBranchNodeConnections->CompSets(Other).ParentCType + ", name=" + state.dataBranchNodeConnections->CompSets(Other).ParentCName);
+                    ShowContinueError(state, "  as inlet for: " + state.dataBranchNodeConnections->CompSets(Other).CType + ", name=" + state.dataBranchNodeConnections->CompSets(Other).CName);
                     //        ErrorsFound=.TRUE.
                 }
             }
@@ -1308,17 +1308,17 @@ namespace EnergyPlus::BranchNodeConnections {
         for (Count = 1; Count <= state.dataBranchNodeConnections->NumCompSets; ++Count) {
             for (Other = 1; Other <= state.dataBranchNodeConnections->NumCompSets; ++Other) {
                 if (Count == Other) continue;
-                if (CompSets(Count).OutletNodeName != CompSets(Other).OutletNodeName) continue;
+                if (state.dataBranchNodeConnections->CompSets(Count).OutletNodeName != state.dataBranchNodeConnections->CompSets(Other).OutletNodeName) continue;
                 if (AlreadyNoted(Count)) continue;
                 //  All other values must match
-                if (CompSets(Count).CType != CompSets(Other).CType || CompSets(Count).CName != CompSets(Other).CName ||
-                    CompSets(Count).InletNodeName != CompSets(Other).InletNodeName) {
+                if (state.dataBranchNodeConnections->CompSets(Count).CType != state.dataBranchNodeConnections->CompSets(Other).CType || state.dataBranchNodeConnections->CompSets(Count).CName != state.dataBranchNodeConnections->CompSets(Other).CName ||
+                    state.dataBranchNodeConnections->CompSets(Count).InletNodeName != state.dataBranchNodeConnections->CompSets(Other).InletNodeName) {
                     AlreadyNoted(Other) = true;
-                    ShowWarningError(state, "Node used as an outlet more than once: " + CompSets(Count).OutletNodeName);
-                    ShowContinueError(state, "  Used by      : " + CompSets(Count).ParentCType + ", name=" + CompSets(Count).ParentCName);
-                    ShowContinueError(state, "  as outlet for: " + CompSets(Count).CType + ", name=" + CompSets(Count).CName);
-                    ShowContinueError(state, "  and  by      : " + CompSets(Other).ParentCType + ", name=" + CompSets(Other).ParentCName);
-                    ShowContinueError(state, "  as outlet for: " + CompSets(Other).CType + ", name=" + CompSets(Other).CName);
+                    ShowWarningError(state, "Node used as an outlet more than once: " + state.dataBranchNodeConnections->CompSets(Count).OutletNodeName);
+                    ShowContinueError(state, "  Used by      : " + state.dataBranchNodeConnections->CompSets(Count).ParentCType + ", name=" + state.dataBranchNodeConnections->CompSets(Count).ParentCName);
+                    ShowContinueError(state, "  as outlet for: " + state.dataBranchNodeConnections->CompSets(Count).CType + ", name=" + state.dataBranchNodeConnections->CompSets(Count).CName);
+                    ShowContinueError(state, "  and  by      : " + state.dataBranchNodeConnections->CompSets(Other).ParentCType + ", name=" + state.dataBranchNodeConnections->CompSets(Other).ParentCName);
+                    ShowContinueError(state, "  as outlet for: " + state.dataBranchNodeConnections->CompSets(Other).CType + ", name=" + state.dataBranchNodeConnections->CompSets(Other).CName);
                     //        ErrorsFound=.TRUE.
                 }
             }
@@ -1367,11 +1367,11 @@ namespace EnergyPlus::BranchNodeConnections {
         // See if Already there
         Found = 0;
         for (Count = 1; Count <= state.dataBranchNodeConnections->NumCompSets; ++Count) {
-            if ((CompTypeUC != CompSets(Count).CType) && (CompSets(Count).CType != "UNDEFINED")) continue;
-            if (CompName != CompSets(Count).CName) continue;
-            if ((InletNode != CompSets(Count).InletNodeName) && (CompSets(Count).InletNodeName != "UNDEFINED") && (InletNode != "UNDEFINED"))
+            if ((CompTypeUC != state.dataBranchNodeConnections->CompSets(Count).CType) && (state.dataBranchNodeConnections->CompSets(Count).CType != "UNDEFINED")) continue;
+            if (CompName != state.dataBranchNodeConnections->CompSets(Count).CName) continue;
+            if ((InletNode != state.dataBranchNodeConnections->CompSets(Count).InletNodeName) && (state.dataBranchNodeConnections->CompSets(Count).InletNodeName != "UNDEFINED") && (InletNode != "UNDEFINED"))
                 continue;
-            if ((OutletNode != CompSets(Count).OutletNodeName) && (CompSets(Count).OutletNodeName != "UNDEFINED") && (OutletNode != "UNDEFINED"))
+            if ((OutletNode != state.dataBranchNodeConnections->CompSets(Count).OutletNodeName) && (state.dataBranchNodeConnections->CompSets(Count).OutletNodeName != "UNDEFINED") && (OutletNode != "UNDEFINED"))
                 continue;
 
             Found = Count;
@@ -1385,10 +1385,10 @@ namespace EnergyPlus::BranchNodeConnections {
             //   If the parent object did not specify a component type or inlet or outlet node, then that value
             //   is UNDEFINED in CompSets.  When a component calls TestCompSet, the comp type and inlet and
             //   outlet nodes are known, so they can be filled in for future reference.
-            if (CompSets(Found).CType == "UNDEFINED") CompSets(Found).CType = CompTypeUC;
-            if (CompSets(Found).InletNodeName == "UNDEFINED") CompSets(Found).InletNodeName = InletNode;
-            if (CompSets(Found).OutletNodeName == "UNDEFINED") CompSets(Found).OutletNodeName = OutletNode;
-            if (CompSets(Found).Description == "UNDEFINED") CompSets(Found).Description = Description;
+            if (state.dataBranchNodeConnections->CompSets(Found).CType == "UNDEFINED") state.dataBranchNodeConnections->CompSets(Found).CType = CompTypeUC;
+            if (state.dataBranchNodeConnections->CompSets(Found).InletNodeName == "UNDEFINED") state.dataBranchNodeConnections->CompSets(Found).InletNodeName = InletNode;
+            if (state.dataBranchNodeConnections->CompSets(Found).OutletNodeName == "UNDEFINED") state.dataBranchNodeConnections->CompSets(Found).OutletNodeName = OutletNode;
+            if (state.dataBranchNodeConnections->CompSets(Found).Description == "UNDEFINED") state.dataBranchNodeConnections->CompSets(Found).Description = Description;
         }
     }
 
@@ -1415,21 +1415,21 @@ namespace EnergyPlus::BranchNodeConnections {
         for (Count = 1; Count <= state.dataBranchNodeConnections->NumCompSets; ++Count) {
             for (Other = 1; Other <= state.dataBranchNodeConnections->NumCompSets; ++Other) {
                 if (Count == Other) continue;
-                if (CompSets(Count).CType == "SOLARCOLLECTOR:UNGLAZEDTRANSPIRED") continue;
-                if (CompSets(Count).CType != CompSets(Other).CType || CompSets(Count).CName != CompSets(Other).CName) continue;
-                if (CompSets(Count).Description != CompSets(Other).Description) {
-                    if (CompSets(Count).Description != "UNDEFINED" && CompSets(Other).Description != "UNDEFINED") continue;
+                if (state.dataBranchNodeConnections->CompSets(Count).CType == "SOLARCOLLECTOR:UNGLAZEDTRANSPIRED") continue;
+                if (state.dataBranchNodeConnections->CompSets(Count).CType != state.dataBranchNodeConnections->CompSets(Other).CType || state.dataBranchNodeConnections->CompSets(Count).CName != state.dataBranchNodeConnections->CompSets(Other).CName) continue;
+                if (state.dataBranchNodeConnections->CompSets(Count).Description != state.dataBranchNodeConnections->CompSets(Other).Description) {
+                    if (state.dataBranchNodeConnections->CompSets(Count).Description != "UNDEFINED" && state.dataBranchNodeConnections->CompSets(Other).Description != "UNDEFINED") continue;
                 }
-                if (CompSets(Count).InletNodeName == CompSets(Other).InletNodeName) continue;
-                if (CompSets(Count).OutletNodeName == CompSets(Other).OutletNodeName) continue;
+                if (state.dataBranchNodeConnections->CompSets(Count).InletNodeName == state.dataBranchNodeConnections->CompSets(Other).InletNodeName) continue;
+                if (state.dataBranchNodeConnections->CompSets(Count).OutletNodeName == state.dataBranchNodeConnections->CompSets(Other).OutletNodeName) continue;
                 if (AlreadyNoted(Count)) continue;
                 //  All other values must match
                 AlreadyNoted(Other) = true;
                 ShowSevereError(state, "Same component name and type has differing Node Names.");
-                ShowContinueError(state, "   Component:    " + CompSets(Count).CType + ", name=" + CompSets(Count).CName);
-                ShowContinueError(state, "   Nodes, inlet: " + CompSets(Count).InletNodeName + ", outlet: " + CompSets(Count).OutletNodeName);
-                ShowContinueError(state, " & Nodes, inlet: " + CompSets(Other).InletNodeName + ", outlet: " + CompSets(Other).OutletNodeName);
-                ShowContinueError(state, "   Node Types:   " + CompSets(Count).Description + " & " + CompSets(Other).Description);
+                ShowContinueError(state, "   Component:    " + state.dataBranchNodeConnections->CompSets(Count).CType + ", name=" + state.dataBranchNodeConnections->CompSets(Count).CName);
+                ShowContinueError(state, "   Nodes, inlet: " + state.dataBranchNodeConnections->CompSets(Count).InletNodeName + ", outlet: " + state.dataBranchNodeConnections->CompSets(Count).OutletNodeName);
+                ShowContinueError(state, " & Nodes, inlet: " + state.dataBranchNodeConnections->CompSets(Other).InletNodeName + ", outlet: " + state.dataBranchNodeConnections->CompSets(Other).OutletNodeName);
+                ShowContinueError(state, "   Node Types:   " + state.dataBranchNodeConnections->CompSets(Count).Description + " & " + state.dataBranchNodeConnections->CompSets(Other).Description);
                 ErrorsFound = true;
             }
         }
