@@ -63,6 +63,7 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SetPointManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 namespace PlantManager {
@@ -81,7 +82,7 @@ namespace PlantManager {
         PlantLoop(1).CirculationTime = 2;
         PlantLoop(1).FluidType = NodeType_Water;
         PlantLoop(1).FluidIndex = 1;
-        SizePlantLoop(state, 1, true);
+        SizePlantLoop(*state, 1, true);
         int TestVolume = 600;
         EXPECT_EQ(TestVolume, PlantLoop(1).Volume);
     }
@@ -208,7 +209,7 @@ namespace PlantManager {
         // get input and checks if there are two setpointmanagers
         // for a TwoWayCommonPipe and one of them setpoints can be
         // a SetpointManager:OutdoorAirReset type.
-        GetPlantLoopData(state);
+        GetPlantLoopData(*state);
         ASSERT_FALSE(ErrorsFound);
         // there two setpoint amanegrs in the loop
         EXPECT_EQ(1, NumSchSetPtMgrs);    // SetpointManager:Scheduled

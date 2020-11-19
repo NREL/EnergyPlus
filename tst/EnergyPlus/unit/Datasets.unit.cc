@@ -58,6 +58,7 @@
 #include <EnergyPlus/ConfiguredFunctions.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 
@@ -81,7 +82,7 @@ TEST_F(DataSetFixture, California_Title_24_2008)
 }
 TEST_F(DataSetFixture, Chillers)
 {
-    state.dataGlobal->preserveIDFOrder = false;
+    state->dataGlobal->preserveIDFOrder = false;
     ASSERT_TRUE(process_idf(delimited_string(read_lines_in_file(configured_source_directory() + "/datasets/Chillers.idf"))));
 }
 TEST_F(DataSetFixture, CompositeWallConstructions)
@@ -112,7 +113,7 @@ TEST_F(DataSetFixture, ExhaustFiredChiller)
 }
 TEST_F(DataSetFixture, FluidPropertiesRefData)
 {
-    state.dataGlobal->preserveIDFOrder = false;
+    state->dataGlobal->preserveIDFOrder = false;
     ASSERT_TRUE(process_idf(delimited_string(read_lines_in_file(configured_source_directory() + "/datasets/FluidPropertiesRefData.idf"))));
 }
 TEST_F(DataSetFixture, FossilFuelEnvironmentalImpactFactors)
@@ -170,16 +171,16 @@ TEST_F(DataSetFixture, PerfCurves)
 }
 TEST_F(DataSetFixture, PrecipitationSchedulesUSA)
 {
-    state.dataGlobal->preserveIDFOrder = false;
+    state->dataGlobal->preserveIDFOrder = false;
     ASSERT_TRUE(process_idf(delimited_string(read_lines_in_file(configured_source_directory() + "/datasets/PrecipitationSchedulesUSA.idf"))));
 }
 TEST_F(DataSetFixture, RefrigerationCasesDataSet)
 {
-    state.dataGlobal->preserveIDFOrder = false;
+    state->dataGlobal->preserveIDFOrder = false;
     ASSERT_TRUE(process_idf(delimited_string(read_lines_in_file(configured_source_directory() + "/datasets/RefrigerationCasesDataSet.idf"))));
 }
 // TEST_F( DataSetFixture, RefrigerationCompressorCurves ) {
-//	state.dataGlobal->preserveIDFOrder = false;
+//	state->dataGlobal->preserveIDFOrder = false;
 //	ASSERT_TRUE( process_idf( delimited_string( read_lines_in_file( configured_source_directory() + "/datasets/RefrigerationCompressorCurves.idf"
 //) ) ) );
 //}

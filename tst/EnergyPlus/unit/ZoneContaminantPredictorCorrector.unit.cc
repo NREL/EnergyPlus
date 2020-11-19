@@ -53,6 +53,7 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <AirflowNetwork/Elements.hpp>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -108,7 +109,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_AddMDotOATest)
     ZT.allocate(1);
     MixingMassFlowZone.allocate(1);
 
-    state.dataGlobal->NumOfZones = 1;
+    state->dataGlobal->NumOfZones = 1;
     DataContaminantBalance::Contaminant.CO2Simulation = true;
     DataContaminantBalance::Contaminant.GenericContamSimulation = true;
 
@@ -206,8 +207,8 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_AddMDotOATest)
     HybridModelZone(1).InfiltrationCalc_C = false;
     HybridModelZone(1).PeopleCountCalc_C = false;
 
-    state.dataZonePlenum->NumZoneReturnPlenums = 0;
-    state.dataZonePlenum->NumZoneSupplyPlenums = 0;
+    state->dataZonePlenum->NumZoneReturnPlenums = 0;
+    state->dataZonePlenum->NumZoneSupplyPlenums = 0;
 
     OAMFL.allocate(1);
     VAMFL.allocate(1);
@@ -253,11 +254,11 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_AddMDotOATest)
     DataContaminantBalance::ContaminantControlledZone(1).NumOfZones = 1;
     DataContaminantBalance::ZoneGCSetPoint(1) = 0.0025;
 
-    PredictZoneContaminants(state, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+    PredictZoneContaminants(*state, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
     EXPECT_NEAR(1.041692180, DataContaminantBalance::CO2PredictedRate(1), 0.00001);
     EXPECT_NEAR(76.89754831, DataContaminantBalance::GCPredictedRate(1), 0.00001);
 
-    CorrectZoneContaminants(state, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+    CorrectZoneContaminants(*state, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
     EXPECT_NEAR(489.931000, Node(5).CO2, 0.00001);
     EXPECT_NEAR(0.09093100, Node(5).GenContam, 0.00001);
 
@@ -275,7 +276,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_CorrectZoneContamina
     ZT.allocate(1);
     MixingMassFlowZone.allocate(1);
 
-    state.dataGlobal->NumOfZones = 1;
+    state->dataGlobal->NumOfZones = 1;
     DataContaminantBalance::Contaminant.CO2Simulation = true;
     DataContaminantBalance::Contaminant.GenericContamSimulation = true;
 
@@ -363,8 +364,8 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_CorrectZoneContamina
     HybridModelZone(1).InfiltrationCalc_C = false;
     HybridModelZone(1).PeopleCountCalc_C = false;
 
-    state.dataZonePlenum->NumZoneReturnPlenums = 0;
-    state.dataZonePlenum->NumZoneSupplyPlenums = 0;
+    state->dataZonePlenum->NumZoneReturnPlenums = 0;
+    state->dataZonePlenum->NumZoneSupplyPlenums = 0;
 
     OAMFL.allocate(1);
     VAMFL.allocate(1);
@@ -396,7 +397,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_CorrectZoneContamina
     ZT(1) = 24.0;
     MixingMassFlowZone(1) = 0.0;
 
-    CorrectZoneContaminants(state, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+    CorrectZoneContaminants(*state, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
     EXPECT_NEAR(490.0, Node(5).CO2, 0.00001);
     EXPECT_NEAR(90.000999, Node(5).GenContam, 0.00001);
 
@@ -414,7 +415,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneCO2ControlT
     ZT.allocate(3);
     MixingMassFlowZone.allocate(3);
 
-    state.dataGlobal->NumOfZones = 3;
+    state->dataGlobal->NumOfZones = 3;
 
     DataContaminantBalance::Contaminant.CO2Simulation = true;
 
@@ -547,8 +548,8 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneCO2ControlT
 
     OutBaroPress = 101325.0;
 
-    state.dataZonePlenum->NumZoneReturnPlenums = 0;
-    state.dataZonePlenum->NumZoneSupplyPlenums = 0;
+    state->dataZonePlenum->NumZoneReturnPlenums = 0;
+    state->dataZonePlenum->NumZoneSupplyPlenums = 0;
 
     OAMFL.allocate(3);
     VAMFL.allocate(3);
@@ -616,7 +617,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneCO2ControlT
     DataContaminantBalance::ContaminantControlledZone(3).ActualZoneNum = 3;
     DataContaminantBalance::ContaminantControlledZone(3).NumOfZones = 1;
 
-    PredictZoneContaminants(state, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+    PredictZoneContaminants(*state, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
     EXPECT_NEAR(1.0416921806, DataContaminantBalance::CO2PredictedRate(1), 0.00001);
     EXPECT_NEAR(1.0434496257, DataContaminantBalance::CO2PredictedRate(2), 0.00001);
     EXPECT_NEAR(1.0399406399, DataContaminantBalance::CO2PredictedRate(3), 0.00001);
@@ -632,7 +633,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneGCControlTe
     ZT.allocate(3);
     MixingMassFlowZone.allocate(3);
 
-    state.dataGlobal->NumOfZones = 3;
+    state->dataGlobal->NumOfZones = 3;
 
     DataContaminantBalance::Contaminant.CO2Simulation = false;
     DataContaminantBalance::Contaminant.GenericContamSimulation = true;
@@ -755,8 +756,8 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneGCControlTe
 
     OutBaroPress = 101325.0;
 
-    state.dataZonePlenum->NumZoneReturnPlenums = 0;
-    state.dataZonePlenum->NumZoneSupplyPlenums = 0;
+    state->dataZonePlenum->NumZoneReturnPlenums = 0;
+    state->dataZonePlenum->NumZoneSupplyPlenums = 0;
 
     OAMFL.allocate(3);
     VAMFL.allocate(3);
@@ -826,7 +827,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneGCControlTe
     DataContaminantBalance::ContaminantControlledZone(3).ActualZoneNum = 3;
     DataContaminantBalance::ContaminantControlledZone(3).NumOfZones = 1;
 
-    PredictZoneContaminants(state, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+    PredictZoneContaminants(*state, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
 
     EXPECT_NEAR(19.549478386, DataContaminantBalance::GCPredictedRate(1), 0.00001);
     EXPECT_NEAR(20.887992514, DataContaminantBalance::GCPredictedRate(2), 0.00001);
