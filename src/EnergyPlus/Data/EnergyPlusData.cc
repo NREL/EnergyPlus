@@ -159,6 +159,7 @@ namespace EnergyPlus {
         this->dataPipes->clear_state();
         this->dataPlantChillers->clear_state();
         this->dataSolarCollectors->clear_state();
+        this->dataSolarReflectionManager->clear_state();
         this->dataSolarShading->clear_state();
         this->dataSplitterComponent->clear_state();
         this->dataSteamBaseboardRadiator->clear_state();
