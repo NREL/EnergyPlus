@@ -164,9 +164,9 @@ public:
     {
         EnergyPlusFixture::TearDown(); // Remember to tear down the base fixture after cleaning up derived fixture!
 
-        state->dataWaterCoils->NumWaterCoils = 0;
-        state->dataWaterCoils->WaterCoil.clear();
-        state->dataWaterCoils->WaterCoilNumericFields.clear();
+//        state->dataWaterCoils->NumWaterCoils = 0;
+//        state->dataWaterCoils->WaterCoil.clear();
+//        state->dataWaterCoils->WaterCoilNumericFields.clear();
         PlantLoop.clear();
         PlantSizData.clear();
         ZoneEqSizing.clear();
@@ -176,8 +176,8 @@ public:
         SysSizPeakDDNum.clear();
         FinalSysSizing.clear();
         SysSizPeakDDNum.clear();
-        state->dataAirSystemsData->PrimaryAirSystems.clear();
-        state->dataAirLoop->AirLoopControlInfo.clear();
+//        state->dataAirSystemsData->PrimaryAirSystems.clear();
+//        state->dataAirLoop->AirLoopControlInfo.clear();
         cached_Twb.clear();
         cached_Psat.clear();
     }

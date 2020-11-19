@@ -286,9 +286,9 @@ public:
     {
         EnergyPlusFixture::TearDown(); // Remember to tear down the base fixture after cleaning up derived fixture!
 
-        state->dataWaterCoils->NumWaterCoils = 0;
-        state->dataWaterCoils->WaterCoil.clear();
-        state->dataWaterCoils->WaterCoilNumericFields.clear();
+//        state->dataWaterCoils->NumWaterCoils = 0;
+//        state->dataWaterCoils->WaterCoil.clear();
+//        state->dataWaterCoils->WaterCoilNumericFields.clear();
         DataPlant::PlantLoop.clear();
         DataSizing::PlantSizData.clear();
         DataSizing::ZoneEqSizing.clear();
@@ -299,8 +299,8 @@ public:
         DataSizing::FinalSysSizing.clear();
         DataSizing::SysSizPeakDDNum.clear();
         DataHVACGlobals::NumPrimaryAirSys = 0;
-        state->dataAirSystemsData->PrimaryAirSystems.clear();
-        state->dataAirLoop->AirLoopControlInfo.clear();
+//        state->dataAirSystemsData->PrimaryAirSystems.clear();
+//        state->dataAirLoop->AirLoopControlInfo.clear();
         Psychrometrics::cached_Twb.clear();
         Psychrometrics::cached_Psat.clear();
         DataLoopNode::Node.clear();
