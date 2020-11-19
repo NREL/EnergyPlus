@@ -119,6 +119,7 @@
 	,						 ! - Grid Response Cooling coil name
 	Coil:LiquidDesiccant:Simple, ! -- dehumidification coil type
 	DehumLDCoil, 			 !--dehumidification coil name
+	OUTDOOR,				 ! - dehumidification coil placement: OUTDOOR; UPSTREAM; DOWNSTREAM
 	Coil:LiquidDesiccant:Simple, ! -- regeneration coil type
 	RegenLDCoil, 			 !--Regeneration coil name
 	EvaporativeCooler:Indirect:CelDekPad,  !- First Evaporative Cooler Object Type

@@ -85,13 +85,21 @@ namespace IntegratedHeatPump {
         LIQUIDDESICCANT,
     };
 
+    enum class DehumPlacement : int
+    {
+        OUTDOOR,
+        UPSTRREAM,
+        DOWNSTREAM,
+    };
+
     struct IntegratedHeatPumpData // variable speed coil
     {
         // Members
         std::string Name;    // Name of the  Coil
         std::string IHPtype; // type of coil
 
-        IHPStorageType StorageType; 
+        IHPStorageType StorageType; //hot side storage type, either hot water storage or liquid desiccant storage
+        DehumPlacement DehumPlace; //dehumidifier placement
 
         std::string SCCoilType; // Numeric Equivalent for SC Coil Type
         std::string SCCoilName;
@@ -300,15 +308,14 @@ namespace IntegratedHeatPump {
 
         // Default Constructor
         IntegratedHeatPumpData()
-            : SCCoilIndex(0), EnDehumCoilIndex(0), SHCoilIndex(0), SCWHCoilIndex(0), DWHCoilIndex(0), SCDWHCoolCoilIndex(0), SCDWHWHCoilIndex(0), SHDWHHeatCoilIndex(0), 
-              GridSCCoilIndex(0), SHDWHWHCoilIndex(0), AirCoolInletNodeNum(0), AirHeatInletNodeNum(0), AirOutletNodeNum(0),
-              WaterInletNodeNum(0), WaterOutletNodeNum(0),
-              WaterTankoutNod(0), ModeMatchSCWH(0), MinSpedSCWH(1), MinSpedSCDWH(1), MinSpedSHDWH(1), TindoorOverCoolAllow(0.0),
-              TambientOverCoolAllow(0.0), TindoorWHHighPriority(0.0), TambientWHHighPriority(0.0), WaterVolSCDWH(0.0), TimeLimitSHDWH(0.0),
-              WHtankType(0), WHtankID(0), LoopNum(0), LoopSideNum(0), IsWHCallAvail(false), CheckWHCall(false), CurMode(IHPOperationMode::IdleMode),
-              ControlledZoneTemp(0), WaterFlowAccumVol(0), SHDWHRunTime(0), CoolVolFlowScale(0), HeatVolFlowScale(0), MaxHeatAirMassFlow(0),
-              MaxHeatAirVolFlow(0), MaxCoolAirMassFlow(0), MaxCoolAirVolFlow(0), IHPCoilsSized(false), IDFanID(0), IDFanPlace(0),
-              ODAirInletNodeNum(0),                                                                                   // oudoor coil inlet Nod
+            : SCCoilIndex(0), EnDehumCoilIndex(0), SHCoilIndex(0), SCWHCoilIndex(0), DWHCoilIndex(0), SCDWHCoolCoilIndex(0), SCDWHWHCoilIndex(0),
+              SHDWHHeatCoilIndex(0), GridSCCoilIndex(0), SHDWHWHCoilIndex(0), AirCoolInletNodeNum(0), AirHeatInletNodeNum(0), AirOutletNodeNum(0),
+              WaterInletNodeNum(0), WaterOutletNodeNum(0), WaterTankoutNod(0), ModeMatchSCWH(0), MinSpedSCWH(1), MinSpedSCDWH(1), MinSpedSHDWH(1),
+              TindoorOverCoolAllow(0.0), TambientOverCoolAllow(0.0), TindoorWHHighPriority(0.0), TambientWHHighPriority(0.0), WaterVolSCDWH(0.0),
+              TimeLimitSHDWH(0.0), WHtankType(0), WHtankID(0), LoopNum(0), LoopSideNum(0), IsWHCallAvail(false), CheckWHCall(false),
+              CurMode(IHPOperationMode::IdleMode), ControlledZoneTemp(0), WaterFlowAccumVol(0), SHDWHRunTime(0), CoolVolFlowScale(0),
+              HeatVolFlowScale(0), MaxHeatAirMassFlow(0), MaxHeatAirVolFlow(0), MaxCoolAirMassFlow(0), MaxCoolAirVolFlow(0), IHPCoilsSized(false),
+              IDFanID(0), IDFanPlace(0), ODAirInletNodeNum(0),                                                        // oudoor coil inlet Nod
               ODAirOutletNodeNum(0),                                                                                  // oudoor coil outlet Nod
               TankSourceWaterMassFlowRate(0), AirFlowSavInWaterLoop(0), AirFlowSavInAirLoop(0), AirLoopFlowRate(0.0), // air loop mass flow rate
               TotalCoolingRate(0.0),                                                                                  // total cooling rate [w]
@@ -323,20 +330,12 @@ namespace IntegratedHeatPump {
               EnergyLoadTotalWaterHeating(0.0), // total heating energy [J]
               EnergyLatent(0.0),                // total latent energy [J]
               EnergySource(0.0),                // total source energy
-              TotalCOP(0.0),                     // total COP
-              bIsEnhanchedDumLastMoment(false),   //whether the last moment dehumidification
-              SHCoilSize(1.0), 
-              DWHCoilSize(1.0),    
-              SCWHCoilSize(1.0),
-              SCDWHCoolCoilSize(1.0),
-              SCDWHWHCoilSize(0.13),  
-              SHDWHHeatCoilSize(0.9),
-              SHDWHWHCoilSize(0.1),
-              EnDehumCoilSize(0.95),
-              GridSCCoilSize(1.0), 
-              GridSHCoilSize(1.0), 
-              ChillerSize(1.0),
+              TotalCOP(0.0),                    // total COP
+              bIsEnhanchedDumLastMoment(false), // whether the last moment dehumidification
+              SHCoilSize(1.0), DWHCoilSize(1.0), SCWHCoilSize(1.0), SCDWHCoolCoilSize(1.0), SCDWHWHCoilSize(0.13), SHDWHHeatCoilSize(0.9),
+              SHDWHWHCoilSize(0.1), EnDehumCoilSize(0.95), GridSCCoilSize(1.0), GridSHCoilSize(1.0), ChillerSize(1.0),
               StorageType(IHPStorageType::HOTWATER), 
+              DehumPlace(DehumPlacement::OUTDOOR),
               LDDehumCoilIndex(0),
               LDRegenCoilIndex(0), 
               EvapCoolCoilIndex(0), 
