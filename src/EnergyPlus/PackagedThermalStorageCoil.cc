@@ -4535,7 +4535,6 @@ namespace PackagedThermalStorageCoil {
         // na
 
         // Using/Aliasing
-        using DataBranchAirLoopPlant::MassFlowTolerance;
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
         using DataPlant::PlantLoop;
@@ -4628,7 +4627,7 @@ namespace PackagedThermalStorageCoil {
                                             TESCoil(TESCoilNum).TESPlantEffectiveness * (UseInletTemp - NewTankTemp);
             TESCoil(TESCoilNum).Q_Plant = TESCoil(TESCoilNum).QdotPlant * TimeStepSys * DataGlobalConstants::SecInHour();
             // now get correct outlet temp with actual massflow (not modified by effectiveness)
-            if (Node(TESCoil(TESCoilNum).TESPlantInletNodeNum).MassFlowRate > MassFlowTolerance) {
+            if (Node(TESCoil(TESCoilNum).TESPlantInletNodeNum).MassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
                 NewOutletTemp =
                     UseInletTemp - TESCoil(TESCoilNum).QdotPlant / (Node(TESCoil(TESCoilNum).TESPlantInletNodeNum).MassFlowRate * CpPlantConnection);
             } else {
@@ -4672,7 +4671,6 @@ namespace PackagedThermalStorageCoil {
         // na
 
         // Using/Aliasing
-        using DataBranchAirLoopPlant::MassFlowTolerance;
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
         using DataPlant::PlantLoop;
@@ -4716,7 +4714,7 @@ namespace PackagedThermalStorageCoil {
                                             (Node(TESCoil(TESCoilNum).TESPlantInletNodeNum).Temp - FreezingTemp);
             TESCoil(TESCoilNum).Q_Plant = TESCoil(TESCoilNum).QdotPlant * TimeStepSys * DataGlobalConstants::SecInHour();
             // now get correct outlet temp with actual massflow (not modified by effectiveness)
-            if (Node(TESCoil(TESCoilNum).TESPlantInletNodeNum).MassFlowRate > MassFlowTolerance) {
+            if (Node(TESCoil(TESCoilNum).TESPlantInletNodeNum).MassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
                 NewOutletTemp = Node(TESCoil(TESCoilNum).TESPlantInletNodeNum).Temp +
                                 TESCoil(TESCoilNum).QdotPlant / (Node(TESCoil(TESCoilNum).TESPlantInletNodeNum).MassFlowRate * Cp);
             } else {

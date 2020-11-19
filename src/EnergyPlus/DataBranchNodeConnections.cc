@@ -77,9 +77,6 @@ namespace DataBranchNodeConnections {
 
     // Data
     // MODULE PARAMETER DEFINITIONS:
-    static std::string const BlankString;
-
-    // DERIVED TYPE DEFINITIONS:
 
     // MODULE VARIABLE DECLARATIONS:
     int NumCompSets(0);             // Number of Component Sets found in branches
