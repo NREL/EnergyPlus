@@ -409,7 +409,8 @@ namespace WaterCoils {
     );
 
        
-    double CalculateDesHdAvVt(Real64 Qlat, // Coil latent load
+    double CalculateDesHdAvVt(EnergyPlusData &state,
+                              Real64 Qlat, // Coil latent load
                               Real64 msi,  // Solution mass flow rate IN to this function(kg/s)
                               Real64 Tsi,  // Solution temperature IN to this function (C)
                               Real64 Xsi,  // Solution concentration IN to this function (weight fraction)
@@ -431,7 +432,7 @@ namespace WaterCoils {
 
 
     double TSHSX(double t, double x, double h);
-    double WSSE(int MatlOfLiqDesiccant, double h, double x, double p);
+    double WSSE(EnergyPlusData &state, int MatlOfLiqDesiccant, double h, double x, double p);
 
     double SolnWFnTX(int MatlOfLiqDesiccant, double t, double x);
     double WFnTX(int MatlOfLiqDesiccant, double t, double xi);
@@ -446,7 +447,7 @@ namespace WaterCoils {
 
     double LDSatEnthalpy(int MatlOfLiqDesiccant, double t, double x, double dPatm);
 
-    Real64 SolnTFnHX(int MatlOfLiqDesiccant, Real64 h, Real64 x);
+    Real64 SolnTFnHX(EnergyPlusData &state, int MatlOfLiqDesiccant, Real64 h, Real64 x);
     Real64 SolnTempResidual(Real64 const t,              // test value of Tdb [C]
                             Array1D<Real64> const &Par); // Par(1) = desired enthaply H [J/kg]
 

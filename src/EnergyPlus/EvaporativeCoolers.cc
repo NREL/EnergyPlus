@@ -5122,7 +5122,7 @@ namespace EvaporativeCoolers {
         if (WhichEvapCond != 0) {
             IndexNum = WhichEvapCond;
         } else {
-            ShowSevereError("GetOutletNodeNum: Could not find EvaporativeCooler = \"" + EvapCondName + "\"");
+            ShowSevereError(state, "GetOutletNodeNum: Could not find EvaporativeCooler = \"" + EvapCondName + "\"");
             ErrorsFound = true;
             IndexNum = 0;
         }
