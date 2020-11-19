@@ -6467,6 +6467,12 @@ namespace SolarShading {
                         // surface incorrectly assuming wall heat transfer routines for windows.
                         // Construct( Surface( SurfNum ).Construction ).TransDiff = NomDiffTrans;
                     }
+                } else if (SurfWinWindowModelType(SurfNum) == WindowEQLModel) {
+                    if (SurfWinOriginalClass(SurfNum) == SurfaceClass::TDD_Diffuser) {
+                        DiffTrans = TransTDD(state, PipeNum, CosInc, SolarAniso);
+                    } else {
+                        DiffTrans = state.dataConstruction->Construct(ConstrNum).TransDiff;
+                    }
                 }
                 //-----------------------------------------------------------------
                 // BEAM SOLAR ON EXTERIOR WINDOW TRANSMITTED AS BEAM AND/OR DIFFUSE
