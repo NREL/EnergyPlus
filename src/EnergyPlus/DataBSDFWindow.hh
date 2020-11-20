@@ -438,7 +438,7 @@ struct BSDFWindowData : BaseGlobalStruct {
         this->FirstBSDF = 0;
         this->MaxBkSurf = 20;
         this->TotThermalModels = 0;
-        this->SUNCOSTS.deallocate();
+        this->SUNCOSTS = Array3D<Real64>(60, 24, 3);
         this->BSDFTempMtrx.deallocate();
         this->ComplexWind.deallocate();
     }
