@@ -142,10 +142,8 @@ SET( SRC
   DataAirSystems.hh
   DataBSDFWindow.cc
   DataBSDFWindow.hh
-  DataBranchAirLoopPlant.cc
   DataBranchAirLoopPlant.hh
-  DataBranchNodeConnections.cc
-  DataBranchNodeConnections.hh
+        DataBranchNodeConnections.hh
   DataComplexFenestration.cc
   DataComplexFenestration.hh
   DataContaminantBalance.cc

@@ -489,7 +489,7 @@ struct SolarShadingData : BaseGlobalStruct {
         TrackTooManyFigures.deallocate();
         TrackTooManyVertices.deallocate();
         TrackBaseSubSurround.deallocate();
-        DataSurfaces::DBZoneIntWin.deallocate();
+        DataSurfaces::EnclSolDBIntWin.deallocate();
         ISABSF.deallocate();
         InitComplexOnce = true;
         ShadowOneTimeFlag = true;

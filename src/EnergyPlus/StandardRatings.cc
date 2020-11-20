@@ -512,7 +512,6 @@ namespace StandardRatings {
 
         // Using/Aliasing
         using CurveManager::CurveValue;
-        using DataBranchAirLoopPlant::MassFlowTolerance;
 
         // Return value
         Real64 Residuum; // Residual to be minimized to zero
@@ -570,7 +569,7 @@ namespace StandardRatings {
 
         QCond = Power * Par(11) + QEvap;
 
-        if (Par(6) > MassFlowTolerance) {
+        if (Par(6) > DataBranchAirLoopPlant::MassFlowTolerance) {
             CondenserInletTemp = CondenserOutletTemp - QCond / Par(5) / Par(3);
         }
 
