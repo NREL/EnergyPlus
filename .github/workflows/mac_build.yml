@@ -74,3 +74,27 @@ jobs:
         working-directory: ${{runner.workspace}}/EnergyPlus/build
         shell: bash
         run: cmake --build . --target energyplus -j 2
+
+  no_glcol_cache:
+    runs-on: macos-10.15
+
+    steps:
+      - uses: actions/checkout@v2
+      #
+      - name: Set up Python 3.7
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+
+      - name: Create Build Directory
+        run: cmake -E make_directory ${{runner.workspace}}/EnergyPlus/build
+
+      - name: Configure CMake
+        shell: bash
+        working-directory: ${{runner.workspace}}/EnergyPlus/build
+        run: cmake -DCMAKE_BUILD_TYPE=Release -DUSE_GLYCOL_CACHING=OFF ..
+
+      - name: Build EnergyPlus
+        working-directory: ${{runner.workspace}}/EnergyPlus/build
+        shell: bash
+        run: cmake --build . --target energyplus -j 2

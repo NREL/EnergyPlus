@@ -21,6 +21,10 @@ else()
   add_definitions("-DEP_nocache_Psychrometrics")
 endif()
 
+if(USE_GLYCOL_CACHING)
+  add_definitions("-DEP_cache_GlycolSpecificHeat")
+endif()
+
 SET( SRC
   "${PROJECT_SOURCE_DIR}/third_party/milo/dtoa.h"
   "${PROJECT_SOURCE_DIR}/third_party/milo/itoa.h"
