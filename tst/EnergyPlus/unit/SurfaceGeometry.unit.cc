@@ -5334,7 +5334,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
     EXPECT_EQ(DataHeatBalance::Zone(3).SolarEnclosureNum, 1);
 }
 
-TEST_F(EnergyPlusFixture, DISABLED_HeatBalanceIntRadExchange_SetupEnclosuresWithAirBoundaries2)
+TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBoundaries2)
 {
 
     std::string const idf_objects = delimited_string({
@@ -5362,24 +5362,16 @@ TEST_F(EnergyPlusFixture, DISABLED_HeatBalanceIntRadExchange_SetupEnclosuresWith
         "    Some Material;        !- Outside Layer",
 
         "Construction:AirBoundary,",
-        "Grouped Radiant Air Boundary, !- Name",
-        "InteriorWindow,            !- Solar and Daylighting Method",
-        "GroupedZones,            !- Radiant Exchange Method",
-        "None;                    !- Air Exchange Method",
-
-        "Construction:AirBoundary,",
-        "Grouped Solar Air Boundary, !- Name",
-        "GroupedZones,            !- Solar and Daylighting Method",
-        "IRTSurface,            !- Radiant Exchange Method",
+        "Grouped Air Boundary, !- Name",
         "None;                    !- Air Exchange Method",
 
         "BuildingSurface:Detailed,",
         "    Zone1-Surface1,  !- Name",
         "    Wall,                 !- Surface Type",
-        "    Grouped Radiant Air Boundary,  !- Construction Name",
+        "    Some Construction,  !- Construction Name",
         "    Zone 1,       !- Zone Name",
-        "    Surface,                 !- Outside Boundary Condition",
-        "    Zone2-Surface1,  !- Outside Boundary Condition Object",
+        "    Outdoors,                 !- Outside Boundary Condition",
+        "    ,  !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
         "    NoWind,                  !- Wind Exposure",
         "    ,                        !- View Factor to Ground",
@@ -5392,10 +5384,10 @@ TEST_F(EnergyPlusFixture, DISABLED_HeatBalanceIntRadExchange_SetupEnclosuresWith
         "BuildingSurface:Detailed,",
         "    Zone2-Surface1,  !- Name",
         "    Wall,                 !- Surface Type",
-        "    Grouped Radiant Air Boundary,  !- Construction Name",
+        "    Some Construction,  !- Construction Name",
         "    Zone 2,       !- Zone Name",
-        "    Surface,                 !- Outside Boundary Condition",
-        "    Zone1-Surface1,  !- Outside Boundary Condition Object",
+        "    Outdoors,                 !- Outside Boundary Condition",
+        "    ,  !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
         "    NoWind,                  !- Wind Exposure",
         "    ,                        !- View Factor to Ground",
@@ -5408,7 +5400,7 @@ TEST_F(EnergyPlusFixture, DISABLED_HeatBalanceIntRadExchange_SetupEnclosuresWith
         "BuildingSurface:Detailed,",
         "    Zone1-Surface2,  !- Name",
         "    Wall,                 !- Surface Type",
-        "    Grouped Solar Air Boundary,  !- Construction Name",
+        "    Grouped Air Boundary,  !- Construction Name",
         "    Zone 1,       !- Zone Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Zone3-Surface1,  !- Outside Boundary Condition Object",
@@ -5424,7 +5416,7 @@ TEST_F(EnergyPlusFixture, DISABLED_HeatBalanceIntRadExchange_SetupEnclosuresWith
         "BuildingSurface:Detailed,",
         "    Zone3-Surface1,  !- Name",
         "    Wall,                 !- Surface Type",
-        "    Grouped Solar Air Boundary,  !- Construction Name",
+        "    Grouped Air Boundary,  !- Construction Name",
         "    Zone 3,       !- Zone Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Zone1-Surface2,  !- Outside Boundary Condition Object",
@@ -5512,17 +5504,17 @@ TEST_F(EnergyPlusFixture, DISABLED_HeatBalanceIntRadExchange_SetupEnclosuresWith
     //    });
     // EXPECT_TRUE(compare_err_stream(error_string, true));
 
-    // For this test case, Zones 1 and 2 share a radiant enclosure and Zone 1 and 3 share a solar enclosure
+    // For this test case, Zones 1 and 3 share radiant and solar enclosures
 
     EXPECT_EQ(DataViewFactorInformation::NumOfRadiantEnclosures, 2);
     EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(1).Name, "Radiant Enclosure 1"));
     EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(1).ZoneNames[0], "Zone 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(1).ZoneNames[1], "Zone 2"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(2).Name, "Zone 3"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(2).ZoneNames[0], "Zone 3"));
+    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(1).ZoneNames[1], "Zone 3"));
+    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(2).Name, "Zone 2"));
+    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(2).ZoneNames[0], "Zone 2"));
     EXPECT_EQ(DataHeatBalance::Zone(1).RadiantEnclosureNum, 1);
-    EXPECT_EQ(DataHeatBalance::Zone(2).RadiantEnclosureNum, 1);
-    EXPECT_EQ(DataHeatBalance::Zone(3).RadiantEnclosureNum, 2);
+    EXPECT_EQ(DataHeatBalance::Zone(2).RadiantEnclosureNum, 2);
+    EXPECT_EQ(DataHeatBalance::Zone(3).RadiantEnclosureNum, 1);
 
     EXPECT_EQ(DataViewFactorInformation::NumOfSolarEnclosures, 2);
     EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(1).Name, "Solar Enclosure 1"));
@@ -5533,6 +5525,34 @@ TEST_F(EnergyPlusFixture, DISABLED_HeatBalanceIntRadExchange_SetupEnclosuresWith
     EXPECT_EQ(DataHeatBalance::Zone(1).SolarEnclosureNum, 1);
     EXPECT_EQ(DataHeatBalance::Zone(2).SolarEnclosureNum, 2);
     EXPECT_EQ(DataHeatBalance::Zone(3).SolarEnclosureNum, 1);
+
+    // Check surface order
+    int Zone1Surface1 =
+        UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Zone1-Surface1"), DataSurfaces::Surface);
+    int Zone1Surface2 =
+        UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Zone1-Surface2"), DataSurfaces::Surface);
+    int Zone2Surface1 =
+        UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Zone2-Surface1"), DataSurfaces::Surface);
+    int Zone3Surface1 =
+        UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Zone3-Surface1"), DataSurfaces::Surface);
+    int Zone1Floor =
+        UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Zone1-Floor"), DataSurfaces::Surface);
+    int Zone2Floor =
+        UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Zone2-Floor"), DataSurfaces::Surface);
+    int Zone3Floor =
+        UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Zone3-Floor"), DataSurfaces::Surface);
+
+    EXPECT_EQ(DataHeatBalance::Zone(1).AllSurfaceFirst, Zone1Surface2); // air boundary surface
+    EXPECT_EQ(DataHeatBalance::Zone(1).AllSurfaceFirst + 1, Zone1Surface1); // air boundary surface
+    EXPECT_EQ(DataHeatBalance::Zone(2).AllSurfaceFirst, Zone2Surface1); // no air boundary surfaces in Zone 2
+    EXPECT_EQ(DataHeatBalance::Zone(3).AllSurfaceFirst, Zone3Surface1); // air boundary surface
+    EXPECT_EQ(DataHeatBalance::Zone(1).SurfaceFirst, Zone1Surface1); // first non-air boundary surface
+    EXPECT_EQ(DataHeatBalance::Zone(2).SurfaceFirst, Zone2Surface1); // first non-air boundary surface
+    EXPECT_EQ(DataHeatBalance::Zone(3).SurfaceFirst, Zone3Floor); // first non-air boundary surface
+    EXPECT_EQ(DataHeatBalance::Zone(1).SurfaceLast, Zone1Floor);
+    EXPECT_EQ(DataHeatBalance::Zone(2).SurfaceLast, Zone2Floor);
+    EXPECT_EQ(DataHeatBalance::Zone(3).SurfaceLast, Zone3Floor);
+
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBoundaries3)
