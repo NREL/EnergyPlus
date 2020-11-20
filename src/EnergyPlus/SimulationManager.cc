@@ -2808,9 +2808,9 @@ namespace SimulationManager {
             ShowMessage(state, "No node connection errors were found.");
         } else {
             if (state.dataBranchNodeConnections->NumNodeConnectionErrors > 1) {
-                ShowMessage(state, format("There were {} node connection errors noted.", NumNodeConnectionErrors));
+                ShowMessage(state, format("There were {} node connection errors noted.", state.dataBranchNodeConnections->NumNodeConnectionErrors));
             } else {
-                ShowMessage(state, format("There was {} node connection error noted.", NumNodeConnectionErrors));
+                ShowMessage(state, format("There was {} node connection error noted.", state.dataBranchNodeConnections->NumNodeConnectionErrors));
             }
         }
 
