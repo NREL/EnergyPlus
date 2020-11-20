@@ -14669,10 +14669,6 @@ namespace DXCoils {
         // PURPOSE OF THIS FUNCTION:
         // This function looks up the given DX heating coil and returns the companion DX cooling coil.
 
-        // Using/Aliasing
-        using DataBranchNodeConnections::CompSets;
-        using DataBranchNodeConnections::NumCompSets;
-
         // Return value
         int DXCoolingCoilIndex; // Index of HP DX cooling coil returned from this function
 
@@ -14687,45 +14683,45 @@ namespace DXCoils {
 
         DXCoolingCoilIndex = 0;
 
-        for (WhichComp = 1; WhichComp <= NumCompSets; ++WhichComp) {
-            if (!UtilityRoutines::SameString(HeatingCoilType, CompSets(WhichComp).CType) ||
-                !UtilityRoutines::SameString(HeatingCoilName, CompSets(WhichComp).CName))
+        for (WhichComp = 1; WhichComp <= state.dataBranchNodeConnections->NumCompSets; ++WhichComp) {
+            if (!UtilityRoutines::SameString(HeatingCoilType, state.dataBranchNodeConnections->CompSets(WhichComp).CType) ||
+                !UtilityRoutines::SameString(HeatingCoilName, state.dataBranchNodeConnections->CompSets(WhichComp).CName))
                 continue;
-            CompSetsParentType = CompSets(WhichComp).ParentCType;
-            CompSetsParentName = CompSets(WhichComp).ParentCName;
+            CompSetsParentType = state.dataBranchNodeConnections->CompSets(WhichComp).ParentCType;
+            CompSetsParentName = state.dataBranchNodeConnections->CompSets(WhichComp).ParentCName;
             if (UtilityRoutines::SameString(CompSetsParentType, "AirLoopHVAC:UnitaryHeatPump:AirToAir") ||
                 UtilityRoutines::SameString(CompSetsParentType, "ZoneHVAC:PackagedTerminalHeatPump") ||
                 UtilityRoutines::SameString(CompSetsParentType, "AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed") ||
                 UtilityRoutines::SameString(CompSetsParentType, "AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass") ||
                 UtilityRoutines::SameString(CompSetsParentType, "AirLoopHVAC:UnitarySystem")) {
                 //       Search for DX cooling coils
-                for (WhichCompanionComp = 1; WhichCompanionComp <= NumCompSets; ++WhichCompanionComp) {
-                    if (!UtilityRoutines::SameString(CompSets(WhichCompanionComp).ParentCName, CompSetsParentName) ||
-                        !UtilityRoutines::SameString(CompSets(WhichCompanionComp).CType, "Coil:Cooling:DX:SingleSpeed"))
+                for (WhichCompanionComp = 1; WhichCompanionComp <= state.dataBranchNodeConnections->NumCompSets; ++WhichCompanionComp) {
+                    if (!UtilityRoutines::SameString(state.dataBranchNodeConnections->CompSets(WhichCompanionComp).ParentCName, CompSetsParentName) ||
+                        !UtilityRoutines::SameString(state.dataBranchNodeConnections->CompSets(WhichCompanionComp).CType, "Coil:Cooling:DX:SingleSpeed"))
                         continue;
-                    DXCoolingCoilIndex = UtilityRoutines::FindItemInList(CompSets(WhichCompanionComp).CName, DXCoil);
+                    DXCoolingCoilIndex = UtilityRoutines::FindItemInList(state.dataBranchNodeConnections->CompSets(WhichCompanionComp).CName, DXCoil);
                     break;
                 }
-                for (WhichCompanionComp = 1; WhichCompanionComp <= NumCompSets; ++WhichCompanionComp) {
-                    if (!UtilityRoutines::SameString(CompSets(WhichCompanionComp).ParentCName, CompSetsParentName) ||
-                        !UtilityRoutines::SameString(CompSets(WhichCompanionComp).CType, "Coil:Cooling:DX:MultiSpeed"))
+                for (WhichCompanionComp = 1; WhichCompanionComp <= state.dataBranchNodeConnections->NumCompSets; ++WhichCompanionComp) {
+                    if (!UtilityRoutines::SameString(state.dataBranchNodeConnections->CompSets(WhichCompanionComp).ParentCName, CompSetsParentName) ||
+                        !UtilityRoutines::SameString(state.dataBranchNodeConnections->CompSets(WhichCompanionComp).CType, "Coil:Cooling:DX:MultiSpeed"))
                         continue;
-                    DXCoolingCoilIndex = UtilityRoutines::FindItemInList(CompSets(WhichCompanionComp).CName, DXCoil);
+                    DXCoolingCoilIndex = UtilityRoutines::FindItemInList(state.dataBranchNodeConnections->CompSets(WhichCompanionComp).CName, DXCoil);
                     break;
                 }
                 //       Search for Heat Exchanger Assisted DX cooling coils
                 if (DXCoolingCoilIndex == 0) {
-                    for (WhichHXAssistedComp = 1; WhichHXAssistedComp <= NumCompSets; ++WhichHXAssistedComp) {
-                        if (!UtilityRoutines::SameString(CompSets(WhichHXAssistedComp).ParentCName, CompSetsParentName) ||
-                            !UtilityRoutines::SameString(CompSets(WhichHXAssistedComp).CType, "CoilSystem:Cooling:DX:HeatExchangerAssisted"))
+                    for (WhichHXAssistedComp = 1; WhichHXAssistedComp <= state.dataBranchNodeConnections->NumCompSets; ++WhichHXAssistedComp) {
+                        if (!UtilityRoutines::SameString(state.dataBranchNodeConnections->CompSets(WhichHXAssistedComp).ParentCName, CompSetsParentName) ||
+                            !UtilityRoutines::SameString(state.dataBranchNodeConnections->CompSets(WhichHXAssistedComp).CType, "CoilSystem:Cooling:DX:HeatExchangerAssisted"))
                             continue;
-                        HXCompSetsParentType = CompSets(WhichHXAssistedComp).CType;
-                        HXCompSetsParentName = CompSets(WhichHXAssistedComp).CName;
-                        for (WhichCompanionComp = 1; WhichCompanionComp <= NumCompSets; ++WhichCompanionComp) {
-                            if (!UtilityRoutines::SameString(CompSets(WhichCompanionComp).ParentCName, HXCompSetsParentName) ||
-                                !UtilityRoutines::SameString(CompSets(WhichCompanionComp).CType, "Coil:Cooling:DX:SingleSpeed"))
+                        HXCompSetsParentType = state.dataBranchNodeConnections->CompSets(WhichHXAssistedComp).CType;
+                        HXCompSetsParentName = state.dataBranchNodeConnections->CompSets(WhichHXAssistedComp).CName;
+                        for (WhichCompanionComp = 1; WhichCompanionComp <= state.dataBranchNodeConnections->NumCompSets; ++WhichCompanionComp) {
+                            if (!UtilityRoutines::SameString(state.dataBranchNodeConnections->CompSets(WhichCompanionComp).ParentCName, HXCompSetsParentName) ||
+                                !UtilityRoutines::SameString(state.dataBranchNodeConnections->CompSets(WhichCompanionComp).CType, "Coil:Cooling:DX:SingleSpeed"))
                                 continue;
-                            DXCoolingCoilIndex = UtilityRoutines::FindItemInList(CompSets(WhichCompanionComp).CName, DXCoil);
+                            DXCoolingCoilIndex = UtilityRoutines::FindItemInList(state.dataBranchNodeConnections->CompSets(WhichCompanionComp).CName, DXCoil);
                             break;
                         }
                         break;

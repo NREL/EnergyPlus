@@ -73,6 +73,7 @@ struct BaseboardRadiatorData;
 struct BoilersData;
 struct BoilerSteamData;
 struct BranchInputManagerData;
+struct BranchNodeConnectionsData;
 struct ChilledCeilingPanelSimpleData;
 struct ChillerAbsorberData;
 struct ChillerElectricEIRData;
@@ -149,6 +150,7 @@ struct EnergyPlusData : BaseGlobalStruct {
     std::unique_ptr<BaseboardRadiatorData> dataBaseboardRadiator;
     std::unique_ptr<BoilersData> dataBoilers;
     std::unique_ptr<BoilerSteamData> dataBoilerSteam;
+    std::unique_ptr<BranchNodeConnectionsData> dataBranchNodeConnections;
     std::unique_ptr<DataBranchAirLoopPlantData> dataBranchAirLoopPlant;
     std::unique_ptr<BranchInputManagerData> dataBranchInputManager;
     std::unique_ptr<ChilledCeilingPanelSimpleData> dataChilledCeilingPanelSimple;
