@@ -1575,9 +1575,9 @@ namespace AirflowNetworkBalanceManager {
         Array1D<Real64> Numbers;       // Numeric input items for object
         Array1D_bool lAlphaBlanks;     // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;   // Logical array, numeric field input BLANK = .TRUE.
-        static int MaxNums(0);         // Maximum number of numeric input fields
-        static int MaxAlphas(0);       // Maximum number of alpha input fields
-        static int TotalArgs(0);       // Total number of alpha and numeric arguments (max) for a
+        int MaxNums(0);         // Maximum number of numeric input fields
+        int MaxAlphas(0);       // Maximum number of alpha input fields
+        int TotalArgs(0);       // Total number of alpha and numeric arguments (max) for a
         bool Errorfound1;
         Real64 minHeight;
         Real64 maxHeight;
@@ -9470,8 +9470,6 @@ namespace AirflowNetworkBalanceManager {
         using MixedAir::GetOAMixerReliefNodeNumber;
         using SingleDuct::GetHVACSingleDuctSysIndex;
         using namespace DataLoopNode;
-        using DataBranchNodeConnections::NodeConnections;
-        using DataBranchNodeConnections::NumOfNodeConnections;
         using DataHVACGlobals::NumPrimaryAirSys;
         using DXCoils::SetDXCoilAirLoopNumber;
         using Fans::SetFanAirLoopNumber;
@@ -9560,10 +9558,10 @@ namespace AirflowNetworkBalanceManager {
         }
 
         // Eliminate node not related to AirLoopHVAC
-        for (k = 1; k <= NumOfNodeConnections; ++k) {
-            if (NodeFound(NodeConnections(k).NodeNumber)) continue;
-            if (NodeConnections(k).FluidStream == 2) {
-                NodeFound(NodeConnections(k).NodeNumber) = true;
+        for (k = 1; k <= state.dataBranchNodeConnections->NumOfNodeConnections; ++k) {
+            if (NodeFound(state.dataBranchNodeConnections->NodeConnections(k).NodeNumber)) continue;
+            if (state.dataBranchNodeConnections->NodeConnections(k).FluidStream == 2) {
+                NodeFound(state.dataBranchNodeConnections->NodeConnections(k).NodeNumber) = true;
             }
         }
 
@@ -10983,9 +10981,9 @@ namespace AirflowNetworkBalanceManager {
                     if (state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(NumOfComp).NumSubComps == 0) {
                         std::string TypeOfComp = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(NumOfComp).TypeOf;
                         std::string NameOfComp = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(NumOfComp).Name;
-                        if (IsParentObject(TypeOfComp, NameOfComp)) {
+                        if (IsParentObject(state, TypeOfComp, NameOfComp)) {
 
-                            int NumChildren = GetNumChildren(TypeOfComp, NameOfComp);
+                            int NumChildren = GetNumChildren(state, TypeOfComp, NameOfComp);
                             Array1D_string SubCompTypes;
                             Array1D_string SubCompNames;
                             Array1D_string InletNodeNames;
@@ -11035,9 +11033,9 @@ namespace AirflowNetworkBalanceManager {
                             for (NumOfSubComp = 1; NumOfSubComp <= NumChildren; ++NumOfSubComp) {
                                 std::string TypeOfComp = SubCompTypes(NumOfSubComp);
                                 std::string NameOfComp = SubCompNames(NumOfSubComp);
-                                if (IsParentObject(TypeOfComp, NameOfComp)) {
+                                if (IsParentObject(state, TypeOfComp, NameOfComp)) {
 
-                                    int NumGrandChildren = GetNumChildren(TypeOfComp, NameOfComp);
+                                    int NumGrandChildren = GetNumChildren(state, TypeOfComp, NameOfComp);
                                     Array1D_string SubSubCompTypes;
                                     Array1D_string SubSubCompNames;
                                     Array1D_string SubSubInletNodeNames;

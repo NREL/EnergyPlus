@@ -159,7 +159,6 @@ void ControlCompOutput(EnergyPlusData &state, std::string const &CompName,      
     // Using/Aliasing
     using namespace DataLoopNode;
     using BaseboardRadiator::SimHWConvective;
-    using DataBranchAirLoopPlant::MassFlowTolerance;
     using FanCoilUnits::Calc4PipeFanCoil;
     using General::RoundSigDigits;
     using General::TrimSigDigits;
@@ -464,7 +463,7 @@ void ControlCompOutput(EnergyPlusData &state, std::string const &CompName,      
         }
 
         // check if hunting down around the limit of a significant mass flow in systems.
-        if ((Iter > MaxIter / 2) && (ZoneController.CalculatedSetPoint < MassFlowTolerance)) {
+        if ((Iter > MaxIter / 2) && (ZoneController.CalculatedSetPoint < DataBranchAirLoopPlant::MassFlowTolerance)) {
             ZoneController.CalculatedSetPoint = ZoneController.MinSetPoint;
             Converged = true;
             ZoneInterHalf.MaxFlowCalc = true;

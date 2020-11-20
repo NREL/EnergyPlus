@@ -86,14 +86,7 @@ namespace MatrixDataManager {
 
     // Data
     // MODULE PARAMETER DEFINITIONS:
-    // INTEGER, PARAMETER :: OneDimensional = 1
     int const TwoDimensional(2);
-    // INTEGER, PARAMETER :: ThreeDimensional = 3
-    static std::string const BlankString;
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
 
     int NumMats; // number of matracies in input file
 

@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -168,7 +169,7 @@ namespace Boilers {
         void CalcBoilerModel(EnergyPlusData &state,
                              Real64 MyLoad,    // W - hot water demand to be met by boiler
                              bool RunFlag,     // TRUE if boiler operating
-                             int EquipFlowCtrl // Flow control mode for the equipment
+                             DataBranchAirLoopPlant::ControlTypeEnum EquipFlowCtrl // Flow control mode for the equipment
         );
 
         void UpdateBoilerRecords(Real64 MyLoad, // boiler operating load

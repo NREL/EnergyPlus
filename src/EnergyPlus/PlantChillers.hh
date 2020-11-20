@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -248,7 +249,7 @@ namespace PlantChillers {
         void calculate(EnergyPlusData &state,
                        Real64 &MyLoad,   // operating load
                        bool RunFlag,     // TRUE when chiller operating
-                       int EquipFlowCtrl // Flow control mode for the equipment
+                       DataBranchAirLoopPlant::ControlTypeEnum EquipFlowCtrl // Flow control mode for the equipment
         );
 
         void update(Real64 MyLoad, // current load
@@ -347,7 +348,7 @@ namespace PlantChillers {
         void calculate(EnergyPlusData &state,
                        Real64 &MyLoad,   // operating load
                        bool RunFlag,     // TRUE when chiller operating
-                       int EquipFlowCtrl // Flow control mode for the equipment
+                       DataBranchAirLoopPlant::ControlTypeEnum EquipFlowCtrl // Flow control mode for the equipment
         );
 
         void calcHeatRecovery(EnergyPlusData &state,
@@ -441,7 +442,7 @@ namespace PlantChillers {
         void calculate(EnergyPlusData &state,
                        Real64 &MyLoad,   // operating load
                        bool RunFlag,     // TRUE when chiller operating
-                       int EquipFlowCtrl // Flow control mode for the equipment
+                       DataBranchAirLoopPlant::ControlTypeEnum EquipFlowCtrl // Flow control mode for the equipment
         );
 
         void update(Real64 MyLoad, // current load
@@ -471,7 +472,7 @@ namespace PlantChillers {
 
         void size(EnergyPlusData &state) override;
 
-        void calculate(EnergyPlusData &state, Real64 &MyLoad, bool RunFlag, int EquipFlowCtrl);
+        void calculate(EnergyPlusData &state, Real64 &MyLoad, bool RunFlag, DataBranchAirLoopPlant::ControlTypeEnum EquipFlowCtrl);
 
         void update(Real64 MyLoad, bool RunFlag);
     };
