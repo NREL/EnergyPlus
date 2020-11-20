@@ -53,9 +53,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
-namespace EnergyPlus {
-
-namespace DataPlant {
+namespace EnergyPlus::DataPlant {
 
     void PlantLoopData::UpdateLoopSideReportVars(
         EnergyPlusData &state,
@@ -118,8 +116,8 @@ namespace DataPlant {
         using FluidProperties::GetSpecificHeatGlycol;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("PlantLoopSolver::EvaluateLoopSetPointLoad");
-        static std::string const RoutineNameAlt("PlantSupplySide:EvaluateLoopSetPointLoad");
+        constexpr auto RoutineName("PlantLoopSolver::EvaluateLoopSetPointLoad");
+        constexpr auto RoutineNameAlt("PlantSupplySide:EvaluateLoopSetPointLoad");
 
         //~ General variables
         Real64 MassFlowRate;
@@ -243,7 +241,6 @@ namespace DataPlant {
         // at the loop setpoint temperature.
 
         // Using/Aliasing
-        using DataBranchAirLoopPlant::MassFlowTolerance;
         using DataLoopNode::Node;
         using DataLoopNode::NodeID;
         using DataPlant::SupplySide;
@@ -259,7 +256,7 @@ namespace DataPlant {
         LoopOutlet = supplySide.NodeNumOut;
         // Check continuity invalid...loop pumps now turned on and off
         if (!FirstHVACIteration && !state.dataGlobal->WarmupFlag) {
-            if (std::abs(Node(LoopOutlet).MassFlowRate - Node(LoopInlet).MassFlowRate) > MassFlowTolerance) {
+            if (std::abs(Node(LoopOutlet).MassFlowRate - Node(LoopInlet).MassFlowRate) > DataBranchAirLoopPlant::MassFlowTolerance) {
                 if (this->MFErrIndex == 0) {
                     ShowWarningError(state, "PlantSupplySide: PlantLoop=\"" + this->Name +
                                      "\", Error (CheckLoopExitNode) -- Mass Flow Rate Calculation. Outlet and Inlet differ by more than tolerance.");
@@ -281,5 +278,4 @@ namespace DataPlant {
         Node(LoopOutlet).MassFlowRateMax = Node(LoopInlet).MassFlowRateMax;
     }
 
-}
 }

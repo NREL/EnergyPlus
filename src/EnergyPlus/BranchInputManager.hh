@@ -54,6 +54,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -129,14 +130,14 @@ namespace BranchInputManager {
         // Members
         std::string Name;                 // Name for this Branch
         std::string AssignedLoopName;     // Loop Name for this branch
-        int PressureCurveType;            // Integer index of pressure curve type
+        DataBranchAirLoopPlant::PressureCurveType PressureCurveType;            // Integer index of pressure curve type
         int PressureCurveIndex;           // Integer index of pressure curve
         int FluidType;                    // Fluid type (see DataLoopNode)
         int NumOfComponents;              // Number of Components on this Branch
         Array1D<ComponentData> Component; // Component definitions for each component
 
         // Default Constructor
-        BranchData() : PressureCurveType(0), PressureCurveIndex(0), FluidType(DataLoopNode::NodeType_Unknown), NumOfComponents(0)
+        BranchData() : PressureCurveType(DataBranchAirLoopPlant::PressureCurveType::Unassigned), PressureCurveIndex(0), FluidType(DataLoopNode::NodeType_Unknown), NumOfComponents(0)
         {
         }
 
@@ -195,7 +196,7 @@ namespace BranchInputManager {
     void GetBranchData(EnergyPlusData &state,
                        std::string const &LoopName,         // Loop Name of this Branch
                        std::string const &BranchName,       // Requested Branch Name
-                       int &PressCurveType,                 // Index of a pressure curve object
+                       DataBranchAirLoopPlant::PressureCurveType &PressCurveType,                 // Index of a pressure curve object
                        int &PressCurveIndex,                // Index of a pressure curve object
                        int &NumComps,                       // Number of Components on Branch
                        Array1D_string &CompType,            // Component Type for each item on Branch
@@ -219,7 +220,7 @@ namespace BranchInputManager {
     void GetInternalBranchData(EnergyPlusData &state,
                                std::string const &LoopName,         // Loop Name for Branch
                                std::string const &BranchName,       // Requested Branch Name
-                               int &PressCurveType,                 // Index of pressure curve object
+                               DataBranchAirLoopPlant::PressureCurveType &PressCurveType,                 // Index of pressure curve object
                                int &PressCurveIndex,                // Index of pressure curve object
                                int &NumComps,                       // Number of Components on Branch
                                Array1D<ComponentData> &BComponents, // Component data returned

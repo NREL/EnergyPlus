@@ -2775,7 +2775,6 @@ namespace WaterCoils {
         // See for instance ASHRAE HVAC 2 Toolkit, page 4-4, formula (4-7)
 
         // Using/Aliasing
-        using DataBranchAirLoopPlant::MassFlowTolerance;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2833,7 +2832,7 @@ namespace WaterCoils {
             WaterMassFlowRate = state.dataWaterCoils->WaterCoil(CoilNum).InletWaterMassFlowRate;
         }
 
-        if (WaterMassFlowRate > MassFlowTolerance) { // If the coil is operating
+        if (WaterMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) { // If the coil is operating
             CapacitanceAir = PsyCpAirFnW(Win) * AirMassFlow;
             Cp = GetSpecificHeatGlycol(state, PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidName,
                                        TempWaterIn,
@@ -6665,7 +6664,6 @@ namespace WaterCoils {
         // na
 
         // Using/Aliasing
-        using DataBranchAirLoopPlant::MassFlowTolerance;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -6720,7 +6718,7 @@ namespace WaterCoils {
             AirMassFlow = state.dataWaterCoils->WaterCoil(CoilNum).InletAirMassFlowRate;
             WaterMassFlowRate = state.dataWaterCoils->WaterCoil(CoilNum).InletWaterMassFlowRate;
         }
-        if (WaterMassFlowRate > MassFlowTolerance) { // if the coil is operating
+        if (WaterMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) { // if the coil is operating
             CapacitanceAir = PsyCpAirFnW(Win) * AirMassFlow;
             Cp = GetSpecificHeatGlycol(state,
                                        PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidName,

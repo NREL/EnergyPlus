@@ -667,7 +667,7 @@ TEST_F(AutoSizingFixture, CoolingAirFlowSizingGauntlet)
 
     // Test 41 - Airloop Equipment - ems override is on
     DataSizing::SysSizingRunDone = true;
-    DataAirSystems::PrimaryAirSystem.allocate(1);
+    state.dataAirSystemsData->PrimaryAirSystems.allocate(1);
     DataEnvironment::TotDesDays = 2;
     DataSizing::SysSizPeakDDNum.allocate(2);
     DataSizing::SysSizPeakDDNum(1).CoolFlowPeakDD = 1;

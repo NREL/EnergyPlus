@@ -3421,7 +3421,7 @@ namespace EnergyPlus::SingleDuct {
             if (this->MaxReheatTempSetByUser) {
 
                 MaxHeatTemp = this->MaxReheatTemp;
-                if (QToHeatSetPt > SmallLoad) { // zone has a postive load to heating setpoint
+                if (QToHeatSetPt > SmallLoad) { // zone has a positive load to heating setpoint
                     MassFlowReqToLimitLeavingTemp = QToHeatSetPt / (CpAirAvg * (MaxHeatTemp - ZoneTemp));
                 } else {
                     MassFlowReqToLimitLeavingTemp = 0.0;
@@ -3880,7 +3880,7 @@ namespace EnergyPlus::SingleDuct {
             if (this->MaxReheatTempSetByUser) {
 
                 MaxHeatTemp = this->MaxReheatTemp;
-                if (QToHeatSetPt > SmallLoad) { // zone has a postive load to heating setpoint
+                if (QToHeatSetPt > SmallLoad) { // zone has a positive load to heating setpoint
                     MassFlowReq = QToHeatSetPt / (CpAirZn * (MaxHeatTemp - ZoneTemp));
                 } else {
                     MassFlowReq = MassFlow;
@@ -6042,11 +6042,11 @@ namespace EnergyPlus::SingleDuct {
             ZoneEqSizing(curZoneEqNum).ATMixerVolFlow = state.dataSingleDuct->SysATMixer(inletATMixerIndex).DesignPrimaryAirVolRate;
 
             // If air loop has heating coil use SA conditions, else if OA sys has coils then use precool conditions, else use OA conditions
-            if (DataAirSystems::PrimaryAirSystem(airLoopIndex).CentralHeatCoilExists) {
+            if (state.dataAirSystemsData->PrimaryAirSystems(airLoopIndex).CentralHeatCoilExists) {
                 // if central heating coil exists, ATMixer outlet is assumed to be at supply air conditions described in sizing input
                 ZoneEqSizing(curZoneEqNum).ATMixerHeatPriDryBulb = FinalSysSizing(airLoopIndex).HeatSupTemp;
                 ZoneEqSizing(curZoneEqNum).ATMixerHeatPriHumRat = FinalSysSizing(airLoopIndex).HeatSupHumRat;
-            } else if (DataAirSystems::PrimaryAirSystem(airLoopIndex).NumOAHeatCoils > 0) {
+            } else if (state.dataAirSystemsData->PrimaryAirSystems(airLoopIndex).NumOAHeatCoils > 0) {
                 // if no central heating coil exists and an outdoor air coil does exist, then ATMixer outlet is mixture of preheat and return
                 if (FinalSysSizing(airLoopIndex).DesMainVolFlow == 0.0) { // protect divide by 0
                     // doesn't matter, just pick a condition
@@ -6104,11 +6104,11 @@ namespace EnergyPlus::SingleDuct {
             }
 
             // If air loop has cooling coil use SA conditions, else if OA sys has coils then use precool conditions, else use OA conditions
-            if (DataAirSystems::PrimaryAirSystem(airLoopIndex).CentralCoolCoilExists) {
+            if (state.dataAirSystemsData->PrimaryAirSystems(airLoopIndex).CentralCoolCoilExists) {
                 // if central cooling coil exists, ATMixer outlet is assumed to be at supply air conditions described in sizing input
                 ZoneEqSizing(curZoneEqNum).ATMixerCoolPriDryBulb = FinalSysSizing(airLoopIndex).CoolSupTemp;
                 ZoneEqSizing(curZoneEqNum).ATMixerCoolPriHumRat = FinalSysSizing(airLoopIndex).CoolSupHumRat;
-            } else if (DataAirSystems::PrimaryAirSystem(airLoopIndex).NumOACoolCoils > 0) {
+            } else if (state.dataAirSystemsData->PrimaryAirSystems(airLoopIndex).NumOACoolCoils > 0) {
                 // if no central cooling coil exists and an outdoor air coil does exist, then ATMixer outlet is mixture of precool and return
                 if (FinalSysSizing(airLoopIndex).DesMainVolFlow == 0.0) { // protect divide by 0
                     // doesn't matter, just pick a condition

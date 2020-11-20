@@ -1140,7 +1140,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils5)
 
     FinalSysSizing.allocate(1);
     UnitarySysEqSizing.allocate(1);
-    PrimaryAirSystem.allocate(1);
+    state.dataAirSystemsData->PrimaryAirSystems.allocate(1);
     state.dataAirLoop->AirLoopControlInfo.allocate(1);
     TotNumLoops = 1;
     PlantLoop.allocate(TotNumLoops);
@@ -1212,7 +1212,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils5)
     state.dataWaterCoils->MyUAAndFlowCalcFlag.deallocate();
     FinalSysSizing.deallocate();
     UnitarySysEqSizing.deallocate();
-    PrimaryAirSystem.deallocate();
+    state.dataAirSystemsData->PrimaryAirSystems.deallocate();
     state.dataAirLoop->AirLoopControlInfo.deallocate();
 }
 

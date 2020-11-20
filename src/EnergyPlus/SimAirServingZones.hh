@@ -170,13 +170,11 @@ namespace SimAirServingZones {
 
     void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator CallIndicator);
 
-    void UpdateSysSizingForScalableInputs(int AirLoopNum);
+    void UpdateSysSizingForScalableInputs(EnergyPlusData &state, int AirLoopNum);
 
-    Real64 GetHeatingSATempForSizing(int IndexAirLoop // air loop index
-    );
+    Real64 GetHeatingSATempForSizing(EnergyPlusData &state, int IndexAirLoop);
 
-    Real64 GetHeatingSATempHumRatForSizing(int IndexAirLoop // air loop index
-    );
+    Real64 GetHeatingSATempHumRatForSizing(EnergyPlusData &state, int IndexAirLoop);
 
     void LimitZoneVentEff(Real64 Xs,              // ratio of uncorrected system outdoor air flow rate to the design system supply flow rate
                           Real64 Voz,             // corrected (divided by distribution efficiency) zone outside air flow rate [m3/s]

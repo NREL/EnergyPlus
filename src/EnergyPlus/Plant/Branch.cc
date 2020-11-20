@@ -81,7 +81,7 @@ namespace DataPlant {
         int const BranchOutletNodeNum = this->NodeNumOut;
         Real64 OverallFlowRequest = 0.0;
 
-        if (this->ControlType != DataBranchAirLoopPlant::ControlType_SeriesActive) {
+        if (this->ControlType != DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive) {
             OverallFlowRequest = DataLoopNode::Node(BranchInletNodeNum).MassFlowRateRequest;
         } else { // is series active, so take largest request of all the component inlet nodes
             for (int CompCounter = 1; CompCounter <= this->TotalComponents; ++CompCounter) {

@@ -1602,7 +1602,7 @@ namespace SizingManager {
                     if (MatchingCooledZoneNum == 0) {
                         OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchS62zvpAlN,
                                                                  TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
-                                                                 DataAirSystems::PrimaryAirSystem(AirLoopNum).Name); // Air loop name
+                                                                 state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Name); // Air loop name
                         OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchS62zvpRp,
                                                                  TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
                                                                  TermUnitFinalZoneSizing(termUnitSizingIndex).DesOAFlowPPer,

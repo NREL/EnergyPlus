@@ -59,10 +59,12 @@ namespace EnergyPlus {
         this->dataAirflowNetworkBalanceManager = std::make_unique<AirflowNetworkBalanceManagerData>();
         this->dataAirLoop = std::make_unique<DataAirLoopData>();
         this->dataAirLoopHVACDOAS = std::make_unique<AirLoopHVACDOASData>();
+        this->dataAirSystemsData = std::make_unique<AirSystemsData>();
         this->dataBaseboardElectric = std::make_unique<BaseboardElectricData>();
         this->dataBaseboardRadiator = std::make_unique<BaseboardRadiatorData>();
         this->dataBoilers = std::make_unique<BoilersData>();
         this->dataBoilerSteam = std::make_unique<BoilerSteamData>();
+        this->dataBranchAirLoopPlant = std::make_unique<DataBranchAirLoopPlantData>();
         this->dataBranchInputManager = std::make_unique<BranchInputManagerData>();
         this->dataChilledCeilingPanelSimple = std::make_unique<ChilledCeilingPanelSimpleData>();
         this->dataChillerAbsorber = std::make_unique<ChillerAbsorberData>();
@@ -137,10 +139,12 @@ namespace EnergyPlus {
         this->dataAirflowNetworkBalanceManager->clear_state();
         this->dataAirLoop->clear_state();
         this->dataAirLoopHVACDOAS->clear_state();
+        this->dataAirSystemsData->clear_state();
         this->dataBaseboardElectric->clear_state();
         this->dataBaseboardRadiator->clear_state();
         this->dataBoilers->clear_state();
         this->dataBoilerSteam->clear_state();
+        this->dataBranchAirLoopPlant->clear_state();
         this->dataBranchInputManager->clear_state();
         this->dataChilledCeilingPanelSimple->clear_state();
         this->dataChillerAbsorber->clear_state();

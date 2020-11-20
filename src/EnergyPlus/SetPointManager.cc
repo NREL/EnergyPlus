@@ -3507,7 +3507,6 @@ namespace EnergyPlus::SetPointManager {
         // Uses the status flags to trigger initializations.
 
         // Using/Aliasing
-        using DataAirSystems::PrimaryAirSystem;
         using DataHeatBalance::Zone;
         using DataHVACGlobals::NumCondLoops;
         using DataHVACGlobals::NumPlantLoops;
@@ -3744,15 +3743,15 @@ namespace EnergyPlus::SetPointManager {
                             ErrorsFound = true;
                             continue;
                         }
-                        MixedAirNode = PrimaryAirSystem(AirLoopNum).OASysOutletNodeNum;
-                        InletBranchNum = PrimaryAirSystem(AirLoopNum).InletBranchNum(1);
-                        LoopInNode = PrimaryAirSystem(AirLoopNum).Branch(InletBranchNum).NodeNumIn;
+                        MixedAirNode = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).OASysOutletNodeNum;
+                        InletBranchNum = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).InletBranchNum(1);
+                        LoopInNode = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(InletBranchNum).NodeNumIn;
                         // get the supply fan inlet and outlet nodes
                         if (MixedAirNode > 0) {
-                            for (BranchNum = 1; BranchNum <= PrimaryAirSystem(AirLoopNum).NumBranches; ++BranchNum) {
-                                for (CompNum = 1; CompNum <= PrimaryAirSystem(AirLoopNum).Branch(BranchNum).TotalComponents; ++CompNum) {
-                                    CompType = PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).TypeOf;
-                                    if (MixedAirNode == PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).NodeNumIn) {
+                            for (BranchNum = 1; BranchNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).NumBranches; ++BranchNum) {
+                                for (CompNum = 1; CompNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).TotalComponents; ++CompNum) {
+                                    CompType = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).TypeOf;
+                                    if (MixedAirNode == state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).NodeNumIn) {
                                         LookForFan = true;
                                     }
                                     if (LookForFan) {
@@ -3761,24 +3760,24 @@ namespace EnergyPlus::SetPointManager {
                                             UtilityRoutines::SameString(CompType, "Fan:VariableVolume") ||
                                             UtilityRoutines::SameString(CompType, "Fan:OnOff") ||
                                             UtilityRoutines::SameString(CompType, "Fan:ComponentModel")) {
-                                            FanNodeIn = PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).NodeNumIn;
-                                            FanNodeOut = PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).NodeNumOut;
+                                            FanNodeIn = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).NodeNumIn;
+                                            FanNodeOut = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).NodeNumOut;
                                             break;
                                         }
                                     }
                                 }
                             }
                         } else {
-                            for (BranchNum = 1; BranchNum <= PrimaryAirSystem(AirLoopNum).NumBranches; ++BranchNum) {
-                                for (CompNum = 1; CompNum <= PrimaryAirSystem(AirLoopNum).Branch(BranchNum).TotalComponents; ++CompNum) {
-                                    CompType = PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).TypeOf;
+                            for (BranchNum = 1; BranchNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).NumBranches; ++BranchNum) {
+                                for (CompNum = 1; CompNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).TotalComponents; ++CompNum) {
+                                    CompType = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).TypeOf;
                                     // cpw22Aug2010 Add Fan:ComponentModel (new)
                                     if (UtilityRoutines::SameString(CompType, "Fan:ConstantVolume") ||
                                         UtilityRoutines::SameString(CompType, "Fan:VariableVolume") ||
                                         UtilityRoutines::SameString(CompType, "Fan:OnOff") ||
                                         UtilityRoutines::SameString(CompType, "Fan:ComponentModel")) {
-                                        FanNodeIn = PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).NodeNumIn;
-                                        FanNodeOut = PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).NodeNumOut;
+                                        FanNodeIn = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).NodeNumIn;
+                                        FanNodeOut = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).NodeNumOut;
                                     }
                                 }
                             }
@@ -3787,11 +3786,10 @@ namespace EnergyPlus::SetPointManager {
                         state.dataSetPointManager->SingZoneRhSetPtMgr(SetPtMgrNum).FanNodeOut = FanNodeOut;
                         state.dataSetPointManager->SingZoneRhSetPtMgr(SetPtMgrNum).MixedAirNode = MixedAirNode;
                         state.dataSetPointManager->SingZoneRhSetPtMgr(SetPtMgrNum).AirLoopNum = AirLoopNum;
-                        state.dataSetPointManager->SingZoneRhSetPtMgr(SetPtMgrNum).OAInNode = PrimaryAirSystem(AirLoopNum).OAMixOAInNodeNum;
+                        state.dataSetPointManager->SingZoneRhSetPtMgr(SetPtMgrNum).OAInNode = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).OAMixOAInNodeNum;
                         // this next line assumes that OA system is the first thing on the branch, what if there is a relief fan or heat recovery coil
                         // or other component in there first? does it matter?
-                        state.dataSetPointManager->SingZoneRhSetPtMgr(SetPtMgrNum).RetNode = PrimaryAirSystem(AirLoopNum).OASysInletNodeNum;
-
+                        state.dataSetPointManager->SingZoneRhSetPtMgr(SetPtMgrNum).RetNode = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).OASysInletNodeNum;
                         state.dataSetPointManager->SingZoneRhSetPtMgr(SetPtMgrNum).LoopInNode = LoopInNode;
                     }
                 }
@@ -3893,11 +3891,11 @@ namespace EnergyPlus::SetPointManager {
                             ErrorsFound = true;
                         } else {
                             state.dataSetPointManager->RABFlowSetPtMgr(SetPtMgrNum).AirLoopNum = AirLoopNum;
-                            if (PrimaryAirSystem(AirLoopNum).RABExists) {
-                                state.dataSetPointManager->RABFlowSetPtMgr(SetPtMgrNum).RABMixInNode = PrimaryAirSystem(AirLoopNum).RABMixInNode;
-                                state.dataSetPointManager->RABFlowSetPtMgr(SetPtMgrNum).SupMixInNode = PrimaryAirSystem(AirLoopNum).SupMixInNode;
-                                state.dataSetPointManager->RABFlowSetPtMgr(SetPtMgrNum).MixOutNode = PrimaryAirSystem(AirLoopNum).MixOutNode;
-                                state.dataSetPointManager->RABFlowSetPtMgr(SetPtMgrNum).RABSplitOutNode = PrimaryAirSystem(AirLoopNum).RABSplitOutNode;
+                            if (state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).RABExists) {
+                                state.dataSetPointManager->RABFlowSetPtMgr(SetPtMgrNum).RABMixInNode = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).RABMixInNode;
+                                state.dataSetPointManager->RABFlowSetPtMgr(SetPtMgrNum).SupMixInNode = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).SupMixInNode;
+                                state.dataSetPointManager->RABFlowSetPtMgr(SetPtMgrNum).MixOutNode = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).MixOutNode;
+                                state.dataSetPointManager->RABFlowSetPtMgr(SetPtMgrNum).RABSplitOutNode = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).RABSplitOutNode;
                                 state.dataSetPointManager->RABFlowSetPtMgr(SetPtMgrNum).SysOutNode = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).AirLoopSupplyNodeNum(1);
                                 state.dataSetPointManager->RABFlowSetPtMgr(SetPtMgrNum).CtrlNodes(1) = state.dataSetPointManager->RABFlowSetPtMgr(SetPtMgrNum).RABSplitOutNode;
                                 state.dataSetPointManager->AllSetPtMgr(state.dataSetPointManager->RABFlowSetPtMgr(SetPtMgrNum).AllSetPtMgrIndex).CtrlNodes(1) =
@@ -4003,7 +4001,7 @@ namespace EnergyPlus::SetPointManager {
                                 ShowSevereError(state, cSetPointManagerType + "=\"" + state.dataSetPointManager->MZAverageMinHumSetPtMgr(SetPtMgrNum).Name +
                                                 "\", invalid humidistat specification");
                                 ShowContinueError(state, "could not locate Humidistat in any of the zones served by the Air loop=" +
-                                                  PrimaryAirSystem(AirLoopNum).Name);
+                                                  state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Name);
                                 ErrorsFound = true;
                             }
                         }
@@ -4045,7 +4043,7 @@ namespace EnergyPlus::SetPointManager {
                                 ShowSevereError(state, cSetPointManagerType + "=\"" + state.dataSetPointManager->MZAverageMaxHumSetPtMgr(SetPtMgrNum).Name +
                                                 "\", invalid humidistat specification");
                                 ShowContinueError(state, "could not locate Humidistat in any of the zones served by the Air loop=" +
-                                                  PrimaryAirSystem(AirLoopNum).Name);
+                                                  state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Name);
                                 ErrorsFound = true;
                             }
                         }
@@ -4086,7 +4084,7 @@ namespace EnergyPlus::SetPointManager {
                                 ShowSevereError(state, cSetPointManagerType + "=\"" + state.dataSetPointManager->MZMinHumSetPtMgr(SetPtMgrNum).Name +
                                                 "\", invalid humidistat specification");
                                 ShowContinueError(state, "could not locate Humidistat in any of the zones served by the Air loop=" +
-                                                  PrimaryAirSystem(AirLoopNum).Name);
+                                                  state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Name);
                                 ErrorsFound = true;
                             }
                         }
@@ -4126,7 +4124,7 @@ namespace EnergyPlus::SetPointManager {
                                 ShowSevereError(state, cSetPointManagerType + "=\"" + state.dataSetPointManager->MZMaxHumSetPtMgr(SetPtMgrNum).Name +
                                                 "\", invalid humidistat specification");
                                 ShowContinueError(state, "could not locate Humidistat in any of the zones served by the Air loop=" +
-                                                  PrimaryAirSystem(AirLoopNum).Name);
+                                                  state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Name);
                                 ErrorsFound = true;
                             }
                         }
