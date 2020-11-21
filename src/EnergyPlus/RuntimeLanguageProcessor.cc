@@ -777,7 +777,7 @@ namespace RuntimeLanguageProcessor {
         if (NestedIfDepth == 1) {
             AddError(StackNum, 0, "Missing an ENDIF instruction needed to terminate an earlier IF instruction.");
         } else if (NestedIfDepth > 1) {
-            AddError(StackNum, 0, "Missing " + fmt::to_string(NestedIfDepth) + " ENDIF instructions needed to terminate earlier IF instructions.");
+            AddError(StackNum, 0, format("Missing {} ENDIF instructions needed to terminate earlier IF instructions.", NestedIfDepth));
         }
 
         //  ALLOCATE(DummyError(ErlStack(StackNum)%NumErrors))
@@ -875,7 +875,7 @@ namespace RuntimeLanguageProcessor {
 
         ErrorNum = ErlStack(StackNum).NumErrors;
         if (LineNum > 0) {
-            ErlStack(StackNum).Error(ErrorNum) = "Line " + fmt::to_string(LineNum) + ":  " + Error + " \"" + ErlStack(StackNum).Line(LineNum) + "\"";
+            ErlStack(StackNum).Error(ErrorNum) = format("Line {}:  {} \"{}\"", LineNum, Error, ErlStack(StackNum).Line(LineNum));
         } else {
             ErlStack(StackNum).Error(ErrorNum) = Error;
         }
@@ -1822,8 +1822,6 @@ namespace RuntimeLanguageProcessor {
         // Using/Aliasing
         using namespace Psychrometrics;
         using CurveManager::CurveValue;
-        using General::RoundSigDigits;
-        using General::TrimSigDigits;
 
         // Return value
         ErlValueType ReturnValue;
@@ -1992,8 +1990,10 @@ namespace RuntimeLanguageProcessor {
                             if (std::isnan(TestValue)) {
                                 // throw Error
                                 ReturnValue.Type = ValueError;
-                                ReturnValue.Error = "EvaluateExpression: Attempted to raise to power with incompatible numbers: " +
-                                                    TrimSigDigits(Operand(1).Number, 6) + " raised to " + TrimSigDigits(Operand(2).Number, 6);
+                                ReturnValue.Error =
+                                    format("EvaluateExpression: Attempted to raise to power with incompatible numbers: {:.6T} raised to {:.6T}",
+                                           Operand(1).Number,
+                                           Operand(2).Number);
                                 if (!state.dataGlobal->DoingSizing && !state.dataGlobal->KickOffSimulation && !EMSManager::FinishProcessingUserInput) {
                                     seriousErrorFound = true;
                                 }
@@ -2040,8 +2040,8 @@ namespace RuntimeLanguageProcessor {
                             ReturnValue = SetErlValueNumber(0.0);
                         } else {
                             // throw Error
-                            ReturnValue.Error = "EvaluateExpression: Attempted to calculate exponential value of too large a number: " +
-                                                TrimSigDigits(Operand(1).Number, 4);
+                            ReturnValue.Error = format("EvaluateExpression: Attempted to calculate exponential value of too large a number: {:.4T}",
+                                                       Operand(1).Number);
                             ReturnValue.Type = ValueError;
                             if (!state.dataGlobal->DoingSizing && !state.dataGlobal->KickOffSimulation && !EMSManager::FinishProcessingUserInput) {
                                 seriousErrorFound = true;
@@ -2053,8 +2053,7 @@ namespace RuntimeLanguageProcessor {
                         } else {
                             // throw error,
                             ReturnValue.Type = ValueError;
-                            ReturnValue.Error =
-                                "EvaluateExpression: Natural Log of zero or less! ln of value = " + TrimSigDigits(Operand(1).Number, 4);
+                            ReturnValue.Error = format("EvaluateExpression: Natural Log of zero or less! ln of value = {:.4T}", Operand(1).Number);
                             if (!state.dataGlobal->DoingSizing && !state.dataGlobal->KickOffSimulation && !EMSManager::FinishProcessingUserInput) {
                                 seriousErrorFound = true;
                             }
@@ -2238,16 +2237,16 @@ namespace RuntimeLanguageProcessor {
 
                         ShowSevereError(state, "EMS user program found serious problem and is halting simulation");
                         ShowContinueErrorTimeStamp(state, "");
-                        ShowFatalError(state, "EMS user program halted simulation with error code = " + TrimSigDigits(Operand(1).Number, 2));
+                        ShowFatalError(state, format("EMS user program halted simulation with error code = {:.2T}", Operand(1).Number));
                         ReturnValue = SetErlValueNumber(Operand(1).Number); // returns back the error code
                     } else if (SELECT_CASE_var == FuncSevereWarnEp) {
 
-                        ShowSevereError(state, "EMS user program issued severe warning with error code = " + TrimSigDigits(Operand(1).Number, 2));
+                        ShowSevereError(state, format("EMS user program issued severe warning with error code = {:.2T}", Operand(1).Number));
                         ShowContinueErrorTimeStamp(state, "");
                         ReturnValue = SetErlValueNumber(Operand(1).Number); // returns back the error code
                     } else if (SELECT_CASE_var == FuncWarnEp) {
 
-                        ShowWarningError(state, "EMS user program issued warning with error code = " + TrimSigDigits(Operand(1).Number, 2));
+                        ShowWarningError(state, format("EMS user program issued warning with error code = {:.2T}", Operand(1).Number));
                         ShowContinueErrorTimeStamp(state, "");
                         ReturnValue = SetErlValueNumber(Operand(1).Number); // returns back the error code
                     } else if (SELECT_CASE_var == FuncTrendValue) {
@@ -2551,9 +2550,10 @@ namespace RuntimeLanguageProcessor {
             ReturnVal = SetErlValueNumber(TodayTomorrowWeatherSource(iTimeStep, iHour));
         } else {
             ReturnVal.Type = DataRuntimeLanguage::ValueError;
-            ReturnVal.Error = DataRuntimeLanguage::PossibleOperators(FunctionCode).Symbol +
-                              " function called with invalid arguments: Hour=" + General::RoundSigDigits(Operand1, 1) +
-                              ", Timestep=" + General::RoundSigDigits(Operand2, 1);
+            ReturnVal.Error = format("{} function called with invalid arguments: Hour={:.1R}, Timestep={:.1R}",
+                                     DataRuntimeLanguage::PossibleOperators(FunctionCode).Symbol,
+                                     Operand1,
+                                     Operand2);
         }
     }
 
@@ -2571,9 +2571,10 @@ namespace RuntimeLanguageProcessor {
             }
         } else {
             ReturnVal.Type = DataRuntimeLanguage::ValueError;
-            ReturnVal.Error = DataRuntimeLanguage::PossibleOperators(FunctionCode).Symbol +
-                              " function called with invalid arguments: Hour=" + General::RoundSigDigits(Operand1, 1) +
-                              ", Timestep=" + General::RoundSigDigits(Operand2, 1);
+            ReturnVal.Error = format("{} function called with invalid arguments: Hour={:.1R}, Timestep={:.1R}",
+                                     DataRuntimeLanguage::PossibleOperators(FunctionCode).Symbol,
+                                     Operand1,
+                                     Operand2);
         }
     }
 
@@ -2621,7 +2622,6 @@ namespace RuntimeLanguageProcessor {
 
         // Using/Aliasing
         using CurveManager::GetCurveIndex;
-        using General::TrimSigDigits;
 
         // Locals
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -3115,7 +3115,7 @@ namespace RuntimeLanguageProcessor {
                         }
                     } else {
                         ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
-                        ShowContinueError(state, "Invalid " + cNumericFieldNames(1) + '=' + TrimSigDigits(rNumericArgs(1), 2));
+                        ShowContinueError(state, format("Invalid {}={:.2T}", cNumericFieldNames(1), rNumericArgs(1)));
                         ShowContinueError(state, "must be greater than zero");
                         ErrorsFound = true;
                     }
@@ -3777,7 +3777,6 @@ namespace RuntimeLanguageProcessor {
         // na
 
         // Using/Aliasing
-        using General::TrimSigDigits;
 
         // Return value
         std::string String;
@@ -3794,7 +3793,7 @@ namespace RuntimeLanguageProcessor {
                 if (Value.Number == 0.0) {
                     String = "0.0";
                 } else {
-                    String = TrimSigDigits(Value.Number, 6); //(String)
+                    String = format("{:.6T}", Value.Number); //(String)
                 }
 
             } else if (SELECT_CASE_var == ValueString) {

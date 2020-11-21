@@ -115,7 +115,6 @@ namespace UFADManager {
     using DataHVACGlobals::ShortenTimeStepSysRoomAir;
     using DataHVACGlobals::SysTimeElapsed;
     using namespace DataUCSDSharedData;
-    using General::RoundSigDigits;
 
     // Data
     // MODULE VARIABLE DECLARATIONS:
@@ -684,8 +683,8 @@ namespace UFADManager {
                 if (std::abs(ZInfSurf - ZSupSurf) < 1.e-10) {
                     ShowSevereError(state, "RoomAirModelUFAD:HcUCSDUF: Surface values will cause divide by zero.");
                     ShowContinueError(state, "Zone=\"" + Zone(Surface(SurfNum).Zone).Name + "\", Surface=\"" + Surface(SurfNum).Name + "\".");
-                    ShowContinueError(state, "ZInfSurf=[" + RoundSigDigits(ZInfSurf, 4) + "], LayH=[" + RoundSigDigits(LayH, 4) + "].");
-                    ShowContinueError(state, "ZSupSurf=[" + RoundSigDigits(ZSupSurf, 4) + "], LayH=[" + RoundSigDigits(LayH, 4) + "].");
+                    ShowContinueError(state, format("ZInfSurf=[{:.4R}], LayH=[{:.4R}].", ZInfSurf, LayH));
+                    ShowContinueError(state, format("ZSupSurf=[{:.4R}], LayH=[{:.4R}].", ZSupSurf, LayH));
                     ShowFatalError(state, "...Previous condition causes termination.");
                 }
 

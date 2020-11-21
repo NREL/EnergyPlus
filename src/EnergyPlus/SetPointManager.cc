@@ -257,7 +257,7 @@ namespace EnergyPlus::SetPointManager {
         using DataZoneControls::StageZoneLogic;
         using DataZoneEquipment::GetSystemNodeNumberForZone;
         using General::FindNumberInList;
-        using General::RoundSigDigits;
+
         using NodeInputManager::GetNodeNums;
         using NodeInputManager::GetOnlySingleNode;
         using ScheduleManager::CheckScheduleValueMinMax;
@@ -750,8 +750,12 @@ namespace EnergyPlus::SetPointManager {
             state.dataSetPointManager->OutAirSetPtMgr(SetPtMgrNum).CtrlNodeListName = cAlphaArgs(3);
             if (state.dataSetPointManager->OutAirSetPtMgr(SetPtMgrNum).OutHigh1 < state.dataSetPointManager->OutAirSetPtMgr(SetPtMgrNum).OutLow1) {
                 ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid setpoints.");
-                ShowContinueError(state, "..." + cNumericFieldNames(4) + "=[" + RoundSigDigits(state.dataSetPointManager->OutAirSetPtMgr(SetPtMgrNum).OutHigh1, 1) + "] is less than " +
-                                  cNumericFieldNames(2) + "=[" + RoundSigDigits(state.dataSetPointManager->OutAirSetPtMgr(SetPtMgrNum).OutLow1, 1) + "].");
+                ShowContinueError(state,
+                                  format("...{}=[{:.1R}] is less than {}=[{:.1R}].",
+                                         cNumericFieldNames(4),
+                                         state.dataSetPointManager->OutAirSetPtMgr(SetPtMgrNum).OutHigh1,
+                                         cNumericFieldNames(2),
+                                         state.dataSetPointManager->OutAirSetPtMgr(SetPtMgrNum).OutLow1));
             }
             // Get optional input: schedule and 2nd reset rule
             if (NumAlphas == 4 && NumNums == 8) {
@@ -764,9 +768,12 @@ namespace EnergyPlus::SetPointManager {
                 state.dataSetPointManager->OutAirSetPtMgr(SetPtMgrNum).OutHigh2 = rNumericArgs(8);
                 if (state.dataSetPointManager->OutAirSetPtMgr(SetPtMgrNum).OutHigh2 < state.dataSetPointManager->OutAirSetPtMgr(SetPtMgrNum).OutLow2) {
                     ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid setpoints.");
-                    ShowContinueError(state, "..." + cNumericFieldNames(8) + "=[" + RoundSigDigits(state.dataSetPointManager->OutAirSetPtMgr(SetPtMgrNum).OutHigh2, 1) +
-                                      "] is less than " + cNumericFieldNames(6) + "=[" + RoundSigDigits(state.dataSetPointManager->OutAirSetPtMgr(SetPtMgrNum).OutLow2, 1) +
-                                      "].");
+                    ShowContinueError(state,
+                                      format("...{}=[{:.1R}] is less than {}=[{:.1R}].",
+                                             cNumericFieldNames(8),
+                                             state.dataSetPointManager->OutAirSetPtMgr(SetPtMgrNum).OutHigh2,
+                                             cNumericFieldNames(6),
+                                             state.dataSetPointManager->OutAirSetPtMgr(SetPtMgrNum).OutLow2));
                 }
             } else {
                 state.dataSetPointManager->OutAirSetPtMgr(SetPtMgrNum).Sched = "";
@@ -857,9 +864,12 @@ namespace EnergyPlus::SetPointManager {
             state.dataSetPointManager->SingZoneRhSetPtMgr(SetPtMgrNum).MaxSetTemp = rNumericArgs(2);
             if (state.dataSetPointManager->SingZoneRhSetPtMgr(SetPtMgrNum).MaxSetTemp < state.dataSetPointManager->SingZoneRhSetPtMgr(SetPtMgrNum).MinSetTemp) {
                 ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
-                ShowContinueError(state, "..." + cNumericFieldNames(2) + "=[" + RoundSigDigits(state.dataSetPointManager->SingZoneRhSetPtMgr(SetPtMgrNum).MaxSetTemp, 1) +
-                                  "] is less than " + cNumericFieldNames(1) + "=[" + RoundSigDigits(state.dataSetPointManager->SingZoneRhSetPtMgr(SetPtMgrNum).MinSetTemp, 1) +
-                                  "].");
+                ShowContinueError(state,
+                                  format("...{}=[{:.1R}] is less than {}=[{:.1R}].",
+                                         cNumericFieldNames(2),
+                                         state.dataSetPointManager->SingZoneRhSetPtMgr(SetPtMgrNum).MaxSetTemp,
+                                         cNumericFieldNames(1),
+                                         state.dataSetPointManager->SingZoneRhSetPtMgr(SetPtMgrNum).MinSetTemp));
             }
             state.dataSetPointManager->SingZoneRhSetPtMgr(SetPtMgrNum).ZoneNodeNum = GetOnlySingleNode(state,
                 cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
@@ -955,9 +965,12 @@ namespace EnergyPlus::SetPointManager {
             state.dataSetPointManager->SingZoneHtSetPtMgr(SetPtMgrNum).MaxSetTemp = rNumericArgs(2);
             if (state.dataSetPointManager->SingZoneHtSetPtMgr(SetPtMgrNum).MaxSetTemp < state.dataSetPointManager->SingZoneHtSetPtMgr(SetPtMgrNum).MinSetTemp) {
                 ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
-                ShowContinueError(state, "..." + cNumericFieldNames(2) + "=[" + RoundSigDigits(state.dataSetPointManager->SingZoneHtSetPtMgr(SetPtMgrNum).MaxSetTemp, 1) +
-                                  "] is less than " + cNumericFieldNames(1) + "=[" + RoundSigDigits(state.dataSetPointManager->SingZoneHtSetPtMgr(SetPtMgrNum).MinSetTemp, 1) +
-                                  "].");
+                ShowContinueError(state,
+                                  format("...{}=[{:.1R}] is less than {}=[{:.1R}].",
+                                         cNumericFieldNames(2),
+                                         state.dataSetPointManager->SingZoneHtSetPtMgr(SetPtMgrNum).MaxSetTemp,
+                                         cNumericFieldNames(1),
+                                         state.dataSetPointManager->SingZoneHtSetPtMgr(SetPtMgrNum).MinSetTemp));
             }
             state.dataSetPointManager->SingZoneHtSetPtMgr(SetPtMgrNum).ZoneNodeNum = GetOnlySingleNode(
                 state, cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
@@ -1052,9 +1065,12 @@ namespace EnergyPlus::SetPointManager {
             state.dataSetPointManager->SingZoneClSetPtMgr(SetPtMgrNum).MaxSetTemp = rNumericArgs(2);
             if (state.dataSetPointManager->SingZoneClSetPtMgr(SetPtMgrNum).MaxSetTemp < state.dataSetPointManager->SingZoneClSetPtMgr(SetPtMgrNum).MinSetTemp) {
                 ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
-                ShowContinueError(state, "..." + cNumericFieldNames(2) + "=[" + RoundSigDigits(state.dataSetPointManager->SingZoneClSetPtMgr(SetPtMgrNum).MaxSetTemp, 1) +
-                                  "] is less than " + cNumericFieldNames(1) + "=[" + RoundSigDigits(state.dataSetPointManager->SingZoneClSetPtMgr(SetPtMgrNum).MinSetTemp, 1) +
-                                  "].");
+                ShowContinueError(state,
+                                  format("...{}=[{:.1R}] is less than {}=[{:.1R}].",
+                                         cNumericFieldNames(2),
+                                         state.dataSetPointManager->SingZoneClSetPtMgr(SetPtMgrNum).MaxSetTemp,
+                                         cNumericFieldNames(1),
+                                         state.dataSetPointManager->SingZoneClSetPtMgr(SetPtMgrNum).MinSetTemp));
             }
             state.dataSetPointManager->SingZoneClSetPtMgr(SetPtMgrNum).ZoneNodeNum = GetOnlySingleNode(state,
                 cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
@@ -1483,17 +1499,23 @@ namespace EnergyPlus::SetPointManager {
             state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).MaxSetTemp = rNumericArgs(2);
             if (state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).MaxSetTemp < state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).MinSetTemp) {
                 ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
-                ShowContinueError(state, "..." + cNumericFieldNames(2) + "=[" + RoundSigDigits(state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).MaxSetTemp, 1) +
-                                  "] is less than " + cNumericFieldNames(1) + "=[" + RoundSigDigits(state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).MinSetTemp, 1) +
-                                  "].");
+                ShowContinueError(state,
+                                  format("...{}=[{:.1R}] is less than {}=[{:.1R}].",
+                                         cNumericFieldNames(2),
+                                         state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).MaxSetTemp,
+                                         cNumericFieldNames(1),
+                                         state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).MinSetTemp));
             }
             state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).MinSetHumRat = rNumericArgs(3);
             state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).MaxSetHumRat = rNumericArgs(4);
             if (state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).MaxSetHumRat < state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).MinSetHumRat) {
                 ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
-                ShowContinueError(state, "..." + cNumericFieldNames(4) + "=[" + RoundSigDigits(state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).MaxSetHumRat, 1) +
-                                  "] is less than " + cNumericFieldNames(3) + "=[" + RoundSigDigits(state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).MinSetHumRat, 1) +
-                                  "].");
+                ShowContinueError(state,
+                                  format("...{}=[{:.1R}] is less than {}=[{:.1R}].",
+                                         cNumericFieldNames(4),
+                                         state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).MaxSetHumRat,
+                                         cNumericFieldNames(3),
+                                         state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).MinSetHumRat));
             }
 
             // Because a zero humidity ratio setpoint is a special value indicating "off" or "no load"
@@ -1612,9 +1634,12 @@ namespace EnergyPlus::SetPointManager {
             state.dataSetPointManager->WarmestSetPtMgr(SetPtMgrNum).MaxSetTemp = rNumericArgs(2);
             if (state.dataSetPointManager->WarmestSetPtMgr(SetPtMgrNum).MaxSetTemp < state.dataSetPointManager->WarmestSetPtMgr(SetPtMgrNum).MinSetTemp) {
                 ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
-                ShowContinueError(state, "..." + cNumericFieldNames(2) + "=[" + RoundSigDigits(state.dataSetPointManager->WarmestSetPtMgr(SetPtMgrNum).MaxSetTemp, 1) +
-                                  "] is less than " + cNumericFieldNames(1) + "=[" + RoundSigDigits(state.dataSetPointManager->WarmestSetPtMgr(SetPtMgrNum).MinSetTemp, 1) +
-                                  "].");
+                ShowContinueError(state,
+                                  format("...{}=[{:.1R}] is less than {}=[{:.1R}].",
+                                         cNumericFieldNames(2),
+                                         state.dataSetPointManager->WarmestSetPtMgr(SetPtMgrNum).MaxSetTemp,
+                                         cNumericFieldNames(1),
+                                         state.dataSetPointManager->WarmestSetPtMgr(SetPtMgrNum).MinSetTemp));
             }
 
             {
@@ -1711,9 +1736,12 @@ namespace EnergyPlus::SetPointManager {
             state.dataSetPointManager->ColdestSetPtMgr(SetPtMgrNum).MaxSetTemp = rNumericArgs(2);
             if (state.dataSetPointManager->ColdestSetPtMgr(SetPtMgrNum).MaxSetTemp < state.dataSetPointManager->ColdestSetPtMgr(SetPtMgrNum).MinSetTemp) {
                 ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
-                ShowContinueError(state, "..." + cNumericFieldNames(2) + "=[" + RoundSigDigits(state.dataSetPointManager->ColdestSetPtMgr(SetPtMgrNum).MaxSetTemp, 1) +
-                                  "] is less than " + cNumericFieldNames(1) + "=[" + RoundSigDigits(state.dataSetPointManager->ColdestSetPtMgr(SetPtMgrNum).MinSetTemp, 1) +
-                                  "].");
+                ShowContinueError(state,
+                                  format("...{}=[{:.1R}] is less than {}=[{:.1R}].",
+                                         cNumericFieldNames(2),
+                                         state.dataSetPointManager->ColdestSetPtMgr(SetPtMgrNum).MaxSetTemp,
+                                         cNumericFieldNames(1),
+                                         state.dataSetPointManager->ColdestSetPtMgr(SetPtMgrNum).MinSetTemp));
             }
 
             {
@@ -1811,15 +1839,18 @@ namespace EnergyPlus::SetPointManager {
             state.dataSetPointManager->WarmestSetPtMgrTempFlow(SetPtMgrNum).MaxSetTemp = rNumericArgs(2);
             if (state.dataSetPointManager->WarmestSetPtMgrTempFlow(SetPtMgrNum).MaxSetTemp < state.dataSetPointManager->WarmestSetPtMgrTempFlow(SetPtMgrNum).MinSetTemp) {
                 ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
-                ShowContinueError(state, "..." + cNumericFieldNames(2) + "=[" + RoundSigDigits(state.dataSetPointManager->WarmestSetPtMgrTempFlow(SetPtMgrNum).MaxSetTemp, 1) +
-                                  "] is less than " + cNumericFieldNames(1) + "=[" +
-                                  RoundSigDigits(state.dataSetPointManager->WarmestSetPtMgrTempFlow(SetPtMgrNum).MinSetTemp, 1) + "].");
+                ShowContinueError(state,
+                                  format("...{}=[{:.1R}] is less than {}=[{:.1R}].",
+                                         cNumericFieldNames(2),
+                                         state.dataSetPointManager->WarmestSetPtMgrTempFlow(SetPtMgrNum).MaxSetTemp,
+                                         cNumericFieldNames(1),
+                                         state.dataSetPointManager->WarmestSetPtMgrTempFlow(SetPtMgrNum).MinSetTemp));
             }
             state.dataSetPointManager->WarmestSetPtMgrTempFlow(SetPtMgrNum).MinTurndown = rNumericArgs(3);
             if (state.dataSetPointManager->WarmestSetPtMgrTempFlow(SetPtMgrNum).MinTurndown >= 0.8) {
                 ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
-                ShowContinueError(state, "..." + cNumericFieldNames(3) + "=[" + RoundSigDigits(state.dataSetPointManager->WarmestSetPtMgrTempFlow(SetPtMgrNum).MinTurndown, 2) +
-                                  "] is greater than 0.8;");
+                ShowContinueError(
+                    state, format("...{}=[{:.2R}] is greater than 0.8;", cNumericFieldNames(3), state.dataSetPointManager->WarmestSetPtMgrTempFlow(SetPtMgrNum).MinTurndown));
                 ShowContinueError(state, "...typical values for " + cNumericFieldNames(3) + " are less than 0.8.");
             }
             {
@@ -1978,9 +2009,12 @@ namespace EnergyPlus::SetPointManager {
 
             if (state.dataSetPointManager->MZAverageCoolingSetPtMgr(SetPtMgrNum).MaxSetTemp < state.dataSetPointManager->MZAverageCoolingSetPtMgr(SetPtMgrNum).MinSetTemp) {
                 ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
-                ShowContinueError(state, "..." + cNumericFieldNames(2) + "=[" + RoundSigDigits(state.dataSetPointManager->MZAverageCoolingSetPtMgr(SetPtMgrNum).MaxSetTemp, 1) +
-                                  "] is less than " + cNumericFieldNames(1) + "=[" +
-                                  RoundSigDigits(state.dataSetPointManager->MZAverageCoolingSetPtMgr(SetPtMgrNum).MinSetTemp, 1) + "].");
+                ShowContinueError(state,
+                                  format("...{}=[{:.1R}] is less than {}=[{:.1R}].",
+                                         cNumericFieldNames(2),
+                                         state.dataSetPointManager->MZAverageCoolingSetPtMgr(SetPtMgrNum).MaxSetTemp,
+                                         cNumericFieldNames(1),
+                                         state.dataSetPointManager->MZAverageCoolingSetPtMgr(SetPtMgrNum).MinSetTemp));
             }
 
             NodeListError = false;
@@ -2058,9 +2092,12 @@ namespace EnergyPlus::SetPointManager {
 
             if (state.dataSetPointManager->MZAverageHeatingSetPtMgr(SetPtMgrNum).MaxSetTemp < state.dataSetPointManager->MZAverageHeatingSetPtMgr(SetPtMgrNum).MinSetTemp) {
                 ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
-                ShowContinueError(state, "..." + cNumericFieldNames(2) + "=[" + RoundSigDigits(state.dataSetPointManager->MZAverageHeatingSetPtMgr(SetPtMgrNum).MaxSetTemp, 1) +
-                                  "] is less than " + cNumericFieldNames(1) + "=[" +
-                                  RoundSigDigits(state.dataSetPointManager->MZAverageHeatingSetPtMgr(SetPtMgrNum).MinSetTemp, 1) + "].");
+                ShowContinueError(state,
+                                  format("...{}=[{:.1R}] is less than {}=[{:.1R}].",
+                                         cNumericFieldNames(2),
+                                         state.dataSetPointManager->MZAverageHeatingSetPtMgr(SetPtMgrNum).MaxSetTemp,
+                                         cNumericFieldNames(1),
+                                         state.dataSetPointManager->MZAverageHeatingSetPtMgr(SetPtMgrNum).MinSetTemp));
             }
 
             NodeListError = false;
@@ -2138,9 +2175,12 @@ namespace EnergyPlus::SetPointManager {
 
             if (state.dataSetPointManager->MZAverageMinHumSetPtMgr(SetPtMgrNum).MaxSetHum < state.dataSetPointManager->MZAverageMinHumSetPtMgr(SetPtMgrNum).MinSetHum) {
                 ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
-                ShowContinueError(state, "..." + cNumericFieldNames(2) + "=[" + RoundSigDigits(state.dataSetPointManager->MZAverageMinHumSetPtMgr(SetPtMgrNum).MaxSetHum, 3) +
-                                  "] is less than " + cNumericFieldNames(1) + "=[" +
-                                  RoundSigDigits(state.dataSetPointManager->MZAverageMinHumSetPtMgr(SetPtMgrNum).MinSetHum, 3) + "].");
+                ShowContinueError(state,
+                                  format("...{}=[{:.3R}] is less than {}=[{:.3R}].",
+                                         cNumericFieldNames(2),
+                                         state.dataSetPointManager->MZAverageMinHumSetPtMgr(SetPtMgrNum).MaxSetHum,
+                                         cNumericFieldNames(1),
+                                         state.dataSetPointManager->MZAverageMinHumSetPtMgr(SetPtMgrNum).MinSetHum));
             }
 
             NodeListError = false;
@@ -2219,9 +2259,12 @@ namespace EnergyPlus::SetPointManager {
 
             if (state.dataSetPointManager->MZAverageMaxHumSetPtMgr(SetPtMgrNum).MaxSetHum < state.dataSetPointManager->MZAverageMaxHumSetPtMgr(SetPtMgrNum).MinSetHum) {
                 ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
-                ShowContinueError(state, "..." + cNumericFieldNames(2) + "=[" + RoundSigDigits(state.dataSetPointManager->MZAverageMaxHumSetPtMgr(SetPtMgrNum).MaxSetHum, 3) +
-                                  "] is less than " + cNumericFieldNames(1) + "=[" +
-                                  RoundSigDigits(state.dataSetPointManager->MZAverageMaxHumSetPtMgr(SetPtMgrNum).MinSetHum, 3) + "].");
+                ShowContinueError(state,
+                                  format("...{}=[{:.3R}] is less than {}=[{:.3R}].",
+                                         cNumericFieldNames(2),
+                                         state.dataSetPointManager->MZAverageMaxHumSetPtMgr(SetPtMgrNum).MaxSetHum,
+                                         cNumericFieldNames(1),
+                                         state.dataSetPointManager->MZAverageMaxHumSetPtMgr(SetPtMgrNum).MinSetHum));
             }
 
             NodeListError = false;
@@ -2300,9 +2343,12 @@ namespace EnergyPlus::SetPointManager {
 
             if (state.dataSetPointManager->MZMinHumSetPtMgr(SetPtMgrNum).MaxSetHum < state.dataSetPointManager->MZMinHumSetPtMgr(SetPtMgrNum).MinSetHum) {
                 ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
-                ShowContinueError(state, "..." + cNumericFieldNames(2) + "=[" + RoundSigDigits(state.dataSetPointManager->MZMinHumSetPtMgr(SetPtMgrNum).MaxSetHum, 3) +
-                                  "] is less than " + cNumericFieldNames(1) + "=[" + RoundSigDigits(state.dataSetPointManager->MZMinHumSetPtMgr(SetPtMgrNum).MinSetHum, 3) +
-                                  "].");
+                ShowContinueError(state,
+                                  format("...{}=[{:.3R}] is less than {}=[{:.3R}].",
+                                         cNumericFieldNames(2),
+                                         state.dataSetPointManager->MZMinHumSetPtMgr(SetPtMgrNum).MaxSetHum,
+                                         cNumericFieldNames(1),
+                                         state.dataSetPointManager->MZMinHumSetPtMgr(SetPtMgrNum).MinSetHum));
             }
 
             NodeListError = false;
@@ -2381,9 +2427,12 @@ namespace EnergyPlus::SetPointManager {
 
             if (state.dataSetPointManager->MZMaxHumSetPtMgr(SetPtMgrNum).MaxSetHum < state.dataSetPointManager->MZMaxHumSetPtMgr(SetPtMgrNum).MinSetHum) {
                 ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
-                ShowContinueError(state, "..." + cNumericFieldNames(2) + "=[" + RoundSigDigits(state.dataSetPointManager->MZMaxHumSetPtMgr(SetPtMgrNum).MaxSetHum, 3) +
-                                  "] is less than " + cNumericFieldNames(1) + "=[" + RoundSigDigits(state.dataSetPointManager->MZMaxHumSetPtMgr(SetPtMgrNum).MinSetHum, 3) +
-                                  "].");
+                ShowContinueError(state,
+                                  format("...{}=[{:.3R}] is less than {}=[{:.3R}].",
+                                         cNumericFieldNames(2),
+                                         state.dataSetPointManager->MZMaxHumSetPtMgr(SetPtMgrNum).MaxSetHum,
+                                         cNumericFieldNames(1),
+                                         state.dataSetPointManager->MZMaxHumSetPtMgr(SetPtMgrNum).MinSetHum));
             }
 
             NodeListError = false;
@@ -2485,9 +2534,12 @@ namespace EnergyPlus::SetPointManager {
             state.dataSetPointManager->FollowOATempSetPtMgr(SetPtMgrNum).MinSetTemp = rNumericArgs(3);
             if (state.dataSetPointManager->FollowOATempSetPtMgr(SetPtMgrNum).MaxSetTemp < state.dataSetPointManager->FollowOATempSetPtMgr(SetPtMgrNum).MinSetTemp) {
                 ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
-                ShowContinueError(state, "..." + cNumericFieldNames(2) + "=[" + RoundSigDigits(state.dataSetPointManager->FollowOATempSetPtMgr(SetPtMgrNum).MaxSetTemp, 1) +
-                                  "] is less than " + cNumericFieldNames(3) + "=[" + RoundSigDigits(state.dataSetPointManager->FollowOATempSetPtMgr(SetPtMgrNum).MinSetTemp, 1) +
-                                  "].");
+                ShowContinueError(state,
+                                  format("...{}=[{:.1R}] is less than {}=[{:.1R}].",
+                                         cNumericFieldNames(2),
+                                         state.dataSetPointManager->FollowOATempSetPtMgr(SetPtMgrNum).MaxSetTemp,
+                                         cNumericFieldNames(3),
+                                         state.dataSetPointManager->FollowOATempSetPtMgr(SetPtMgrNum).MinSetTemp));
             }
 
             NodeListError = false;
@@ -2592,9 +2644,12 @@ namespace EnergyPlus::SetPointManager {
             state.dataSetPointManager->FollowSysNodeTempSetPtMgr(SetPtMgrNum).MinSetTemp = rNumericArgs(3);
             if (state.dataSetPointManager->FollowSysNodeTempSetPtMgr(SetPtMgrNum).MaxSetTemp < state.dataSetPointManager->FollowSysNodeTempSetPtMgr(SetPtMgrNum).MinSetTemp) {
                 ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
-                ShowContinueError(state, "..." + cNumericFieldNames(2) + "=[" + RoundSigDigits(state.dataSetPointManager->FollowSysNodeTempSetPtMgr(SetPtMgrNum).MaxSetTemp, 1) +
-                                  "] is less than " + cNumericFieldNames(3) + "=[" +
-                                  RoundSigDigits(state.dataSetPointManager->FollowSysNodeTempSetPtMgr(SetPtMgrNum).MinSetTemp, 1) + "].");
+                ShowContinueError(state,
+                                  format("...{}=[{:.1R}] is less than {}=[{:.1R}].",
+                                         cNumericFieldNames(2),
+                                         state.dataSetPointManager->FollowSysNodeTempSetPtMgr(SetPtMgrNum).MaxSetTemp,
+                                         cNumericFieldNames(3),
+                                         state.dataSetPointManager->FollowSysNodeTempSetPtMgr(SetPtMgrNum).MinSetTemp));
             }
 
             NodeListError = false;
@@ -2686,8 +2741,8 @@ namespace EnergyPlus::SetPointManager {
                 if (state.dataSetPointManager->NoSurfaceGroundTempObjWarning) {
                     if (!GroundTempObjInput) {
                         ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
-                                         R"(" requires "Site:GroundTemperature:BuildingSurface" in the input.)");
-                        ShowContinueError(state, "Defaults, constant throughout the year of (" + RoundSigDigits(GroundTemp, 1) + ") will be used.");
+                                         "\" requires \"Site:GroundTemperature:BuildingSurface\" in the input.");
+                        ShowContinueError(state, format("Defaults, constant throughout the year of ({:.1R}) will be used.", GroundTemp));
                     }
                     state.dataSetPointManager->NoSurfaceGroundTempObjWarning = false;
                 }
@@ -2696,8 +2751,8 @@ namespace EnergyPlus::SetPointManager {
                 if (state.dataSetPointManager->NoShallowGroundTempObjWarning) {
                     if (!GroundTemp_SurfaceObjInput) {
                         ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
-                                         R"(" requires "Site:GroundTemperature:Shallow" in the input.)");
-                        ShowContinueError(state, "Defaults, constant throughout the year of (" + RoundSigDigits(GroundTemp_Surface, 1) + ") will be used.");
+                                         "\" requires \"Site:GroundTemperature:Shallow\" in the input.");
+                        ShowContinueError(state, format("Defaults, constant throughout the year of ({:.1R}) will be used.", GroundTemp_Surface));
                     }
                     state.dataSetPointManager->NoShallowGroundTempObjWarning = false;
                 }
@@ -2706,8 +2761,8 @@ namespace EnergyPlus::SetPointManager {
                 if (state.dataSetPointManager->NoDeepGroundTempObjWarning) {
                     if (!GroundTemp_DeepObjInput) {
                         ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
-                                         R"(" requires "Site:GroundTemperature:Deep" in the input.)");
-                        ShowContinueError(state, "Defaults, constant throughout the year of (" + RoundSigDigits(GroundTemp_Deep, 1) + ") will be used.");
+                                         "\" requires \"Site:GroundTemperature:Deep\" in the input.");
+                        ShowContinueError(state, format("Defaults, constant throughout the year of ({:.1R}) will be used.", GroundTemp_Deep));
                     }
                     state.dataSetPointManager->NoDeepGroundTempObjWarning = false;
                 }
@@ -2716,8 +2771,8 @@ namespace EnergyPlus::SetPointManager {
                 if (state.dataSetPointManager->NoFCGroundTempObjWarning) {
                     if (!FCGroundTemps) {
                         ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
-                                         R"(" requires "Site:GroundTemperature:FCfactorMethod" in the input.)");
-                        ShowContinueError(state, "Defaults, constant throughout the year of (" + RoundSigDigits(GroundTempFC, 1) + ") will be used.");
+                                         "\" requires \"Site:GroundTemperature:FCfactorMethod\" in the input.");
+                        ShowContinueError(state, format("Defaults, constant throughout the year of ({:.1R}) will be used.", GroundTempFC));
                     }
                     state.dataSetPointManager->NoFCGroundTempObjWarning = false;
                 }
@@ -2734,9 +2789,12 @@ namespace EnergyPlus::SetPointManager {
             state.dataSetPointManager->GroundTempSetPtMgr(SetPtMgrNum).MinSetTemp = rNumericArgs(3);
             if (state.dataSetPointManager->GroundTempSetPtMgr(SetPtMgrNum).MaxSetTemp < state.dataSetPointManager->GroundTempSetPtMgr(SetPtMgrNum).MinSetTemp) {
                 ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
-                ShowContinueError(state, "..." + cNumericFieldNames(2) + "=[" + RoundSigDigits(state.dataSetPointManager->GroundTempSetPtMgr(SetPtMgrNum).MaxSetTemp, 1) +
-                                  "] is less than " + cNumericFieldNames(3) + "=[" + RoundSigDigits(state.dataSetPointManager->GroundTempSetPtMgr(SetPtMgrNum).MinSetTemp, 1) +
-                                  "].");
+                ShowContinueError(state,
+                                  format("...{}=[{:.1R}] is less than {}=[{:.1R}].",
+                                         cNumericFieldNames(2),
+                                         state.dataSetPointManager->GroundTempSetPtMgr(SetPtMgrNum).MaxSetTemp,
+                                         cNumericFieldNames(3),
+                                         state.dataSetPointManager->GroundTempSetPtMgr(SetPtMgrNum).MinSetTemp));
             }
 
             NodeListError = false;
@@ -2843,9 +2901,12 @@ namespace EnergyPlus::SetPointManager {
             state.dataSetPointManager->CondEntSetPtMgr(SetPtMgrNum).CtrlNodeListName = cAlphaArgs(7);
             if (state.dataSetPointManager->CondEntSetPtMgr(SetPtMgrNum).MaxCondEntTemp < state.dataSetPointManager->CondEntSetPtMgr(SetPtMgrNum).TowerDsnInletAirWetBulb) {
                 ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
-                ShowContinueError(state, "..." + cNumericFieldNames(2) + "=[" + RoundSigDigits(state.dataSetPointManager->CondEntSetPtMgr(SetPtMgrNum).MaxCondEntTemp, 1) +
-                                  "] is less than " + cNumericFieldNames(1) + "=[" +
-                                  RoundSigDigits(state.dataSetPointManager->CondEntSetPtMgr(SetPtMgrNum).TowerDsnInletAirWetBulb, 1) + "].");
+                ShowContinueError(state,
+                                  format("...{}=[{:.1R}] is less than {}=[{:.1R}].",
+                                         cNumericFieldNames(2),
+                                         state.dataSetPointManager->CondEntSetPtMgr(SetPtMgrNum).MaxCondEntTemp,
+                                         cNumericFieldNames(1),
+                                         state.dataSetPointManager->CondEntSetPtMgr(SetPtMgrNum).TowerDsnInletAirWetBulb));
             }
 
             NodeListError = false;
@@ -3004,9 +3065,12 @@ namespace EnergyPlus::SetPointManager {
             if (state.dataSetPointManager->SZOneStageCoolingSetPtMgr(SetPtMgrNum).CoolingOffTemp < state.dataSetPointManager->SZOneStageCoolingSetPtMgr(SetPtMgrNum).CoolingOnTemp) {
                 // throw warning, off must be warmer than on
                 ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
-                ShowContinueError(state, "..." + cNumericFieldNames(2) + "=[" + RoundSigDigits(state.dataSetPointManager->SZOneStageCoolingSetPtMgr(SetPtMgrNum).CoolingOffTemp, 1) +
-                                  "] is less than " + cNumericFieldNames(1) + "=[" +
-                                  RoundSigDigits(state.dataSetPointManager->SZOneStageCoolingSetPtMgr(SetPtMgrNum).CoolingOnTemp, 1) + "].");
+                ShowContinueError(state,
+                                  format("...{}=[{:.1R}] is less than {}=[{:.1R}].",
+                                         cNumericFieldNames(2),
+                                         state.dataSetPointManager->SZOneStageCoolingSetPtMgr(SetPtMgrNum).CoolingOffTemp,
+                                         cNumericFieldNames(1),
+                                         state.dataSetPointManager->SZOneStageCoolingSetPtMgr(SetPtMgrNum).CoolingOnTemp));
             }
 
             state.dataSetPointManager->SZOneStageCoolingSetPtMgr(SetPtMgrNum).ControlZoneName = cAlphaArgs(2);
@@ -3099,9 +3163,12 @@ namespace EnergyPlus::SetPointManager {
             if (state.dataSetPointManager->SZOneStageHeatingSetPtMgr(SetPtMgrNum).HeatingOffTemp > state.dataSetPointManager->SZOneStageHeatingSetPtMgr(SetPtMgrNum).HeatingOnTemp) {
                 // throw warning, off must be cooler than on
                 ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
-                ShowContinueError(state, "..." + cNumericFieldNames(2) + "=[" + RoundSigDigits(state.dataSetPointManager->SZOneStageHeatingSetPtMgr(SetPtMgrNum).HeatingOnTemp, 1) +
-                                  "] is less than " + cNumericFieldNames(1) + "=[" +
-                                  RoundSigDigits(state.dataSetPointManager->SZOneStageHeatingSetPtMgr(SetPtMgrNum).HeatingOffTemp, 1) + "].");
+                ShowContinueError(state,
+                                  format("...{}=[{:.1R}] is less than {}=[{:.1R}].",
+                                         cNumericFieldNames(2),
+                                         state.dataSetPointManager->SZOneStageHeatingSetPtMgr(SetPtMgrNum).HeatingOnTemp,
+                                         cNumericFieldNames(1),
+                                         state.dataSetPointManager->SZOneStageHeatingSetPtMgr(SetPtMgrNum).HeatingOffTemp));
             }
 
             state.dataSetPointManager->SZOneStageHeatingSetPtMgr(SetPtMgrNum).ControlZoneName = cAlphaArgs(2);
@@ -8628,7 +8695,7 @@ namespace EnergyPlus::SetPointManager {
         state.dataSetPointManager->AllSetPtMgr(state.dataSetPointManager->NumAllSetPtMgrs).CtrlNodes.allocate(1);
         state.dataSetPointManager->AllSetPtMgr(state.dataSetPointManager->NumAllSetPtMgrs).CtrlNodes(1) = state.dataSetPointManager->SchTESSetPtMgr(state.dataSetPointManager->NumSchTESSetPtMgrs).CtrlNodeNum;
         // Give it a Name just in case it's used for error reporting
-        state.dataSetPointManager->AllSetPtMgr(state.dataSetPointManager->NumAllSetPtMgrs).Name = "Auto generated TES SPM " + General::TrimSigDigits(state.dataSetPointManager->NumSchTESSetPtMgrs);
+        state.dataSetPointManager->AllSetPtMgr(state.dataSetPointManager->NumAllSetPtMgrs).Name = format("Auto generated TES SPM {}", state.dataSetPointManager->NumSchTESSetPtMgrs);
         state.dataSetPointManager->AllSetPtMgr(state.dataSetPointManager->NumAllSetPtMgrs).SPMType = SetPointManagerType::TESScheduled;
         state.dataSetPointManager->AllSetPtMgr(state.dataSetPointManager->NumAllSetPtMgrs).CtrlTypeMode = iCtrlVarType::Temp;
         state.dataSetPointManager->AllSetPtMgr(state.dataSetPointManager->NumAllSetPtMgrs).NumCtrlNodes = 1;

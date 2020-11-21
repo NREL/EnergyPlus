@@ -85,7 +85,6 @@ namespace PlantValves {
     // Collect "valve" type models for Plant loops
 
     using namespace DataLoopNode;
-    using General::TrimSigDigits;
 
     PlantComponent *TemperValveData::factory(EnergyPlusData &state, std::string objectName) {
         // Process the input data for valves if it hasn't been done already

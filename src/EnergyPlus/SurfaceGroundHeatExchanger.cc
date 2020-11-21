@@ -188,7 +188,7 @@ namespace SurfaceGroundHeatExchanger {
         using DataEnvironment::GroundTemp_SurfaceObjInput;
         using FluidProperties::CheckFluidPropertyName;
         using FluidProperties::FindGlycol;
-        using General::RoundSigDigits;
+
         using NodeInputManager::GetOnlySingleNode;
         using namespace DataLoopNode;
 
@@ -266,13 +266,13 @@ namespace SurfaceGroundHeatExchanger {
             state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).TubeSpacing = rNumericArgs(3);
 
             if (rNumericArgs(2) == 0) {
-                ShowSevereError(state, "Invalid " + cNumericFieldNames(2) + '=' + RoundSigDigits(rNumericArgs(2), 2));
+                ShowSevereError(state, format("Invalid {}={:.2R}", cNumericFieldNames(2), rNumericArgs(2)));
                 ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                 ShowContinueError(state, "Value must be greater than 0.0");
                 ErrorsFound = true;
             }
             if (rNumericArgs(3) == 0.0) {
-                ShowSevereError(state, "Invalid " + cNumericFieldNames(3) + '=' + RoundSigDigits(rNumericArgs(3), 2));
+                ShowSevereError(state, format("Invalid {}={:.2R}", cNumericFieldNames(3), rNumericArgs(3)));
                 ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                 ShowContinueError(state, "Value must be greater than 0.0");
                 ErrorsFound = true;
@@ -282,13 +282,13 @@ namespace SurfaceGroundHeatExchanger {
             state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).SurfaceLength = rNumericArgs(4);
             state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).SurfaceWidth = rNumericArgs(5);
             if (rNumericArgs(4) <= 0.0) {
-                ShowSevereError(state, "Invalid " + cNumericFieldNames(4) + '=' + RoundSigDigits(rNumericArgs(4), 2));
+                ShowSevereError(state, format("Invalid {}={:.2R}", cNumericFieldNames(4), rNumericArgs(4)));
                 ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                 ShowContinueError(state, "Value must be greater than 0.0");
                 ErrorsFound = true;
             }
             if (rNumericArgs(5) <= 0.0) {
-                ShowSevereError(state, "Invalid " + cNumericFieldNames(5) + '=' + RoundSigDigits(rNumericArgs(5), 2));
+                ShowSevereError(state, format("Invalid {}={:.2R}", cNumericFieldNames(5), rNumericArgs(5)));
                 ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                 ShowContinueError(state, "Value must be greater than 0.0");
                 ErrorsFound = true;
@@ -392,7 +392,7 @@ namespace SurfaceGroundHeatExchanger {
         if (state.dataSurfaceGroundHeatExchangers->NoSurfaceGroundTempObjWarning) {
             if (!GroundTemp_SurfaceObjInput) {
                 ShowWarningError(state, "GetSurfaceGroundHeatExchanger: No \"Site:GroundTemperature:Shallow\" were input.");
-                ShowContinueError(state, "Defaults, constant throughout the year of (" + RoundSigDigits(GroundTemp_Surface, 1) + ") will be used.");
+                ShowContinueError(state, format("Defaults, constant throughout the year of ({:.1R}) will be used.", GroundTemp_Surface));
             }
             state.dataSurfaceGroundHeatExchangers->NoSurfaceGroundTempObjWarning = false;
         }
@@ -591,7 +591,6 @@ namespace SurfaceGroundHeatExchanger {
         using DataLoopNode::Node;
         using namespace DataEnvironment;
         using DataPlant::PlantLoop;
-        using General::TrimSigDigits;
 
         Real64 const SurfFluxTol(0.001); // tolerance on the surface fluxes
         Real64 const SrcFluxTol(0.001);  // tolerance on the source flux
@@ -674,8 +673,8 @@ namespace SurfaceGroundHeatExchanger {
                 // Check for non-convergence
                 if (iter > Maxiter) {
                     if (this->ConvErrIndex1 == 0) {
-                        ShowWarningMessage(state, "CalcSurfaceGroundHeatExchanger=\"" + this->Name +
-                                           "\", Did not converge (part 1), Iterations=" + TrimSigDigits(Maxiter));
+                        ShowWarningMessage(
+                            state, format("CalcSurfaceGroundHeatExchanger=\"{}\", Did not converge (part 1), Iterations={}", this->Name, Maxiter));
                         ShowContinueErrorTimeStamp(state, "");
                     }
                     ShowRecurringWarningErrorAtEnd(state, "CalcSurfaceGroundHeatExchanger=\"" + this->Name + "\", Did not converge (part 1)",
@@ -735,7 +734,7 @@ namespace SurfaceGroundHeatExchanger {
                     ++iter1;
                     // update top coefficients
                     CalcTopFluxCoefficents(TempBtm, TempTop);
-                    // calc top surface fluxe
+                    // calc top surface flux
                     FluxTop = this->QtopConstCoef + this->QtopVarCoef * state.dataSurfaceGroundHeatExchangers->SourceFlux;
                     // calc new surface temps
                     CalcTopSurfTemp(-FluxTop,
@@ -769,8 +768,9 @@ namespace SurfaceGroundHeatExchanger {
                     // Check for non-convergence
                     if (iter1 > Maxiter1) {
                         if (this->ConvErrIndex2 == 0) {
-                            ShowWarningMessage(state, "CalcSurfaceGroundHeatExchanger=\"" + this->Name +
-                                               "\", Did not converge (part 2), Iterations=" + TrimSigDigits(Maxiter));
+                            ShowWarningMessage(
+                                state,
+                                format("CalcSurfaceGroundHeatExchanger=\"{}\", Did not converge (part 2), Iterations={}", this->Name, Maxiter));
                             ShowContinueErrorTimeStamp(state, "");
                         }
                         ShowRecurringWarningErrorAtEnd(state, "CalcSurfaceGroundHeatExchanger=\"" + this->Name + "\", Did not converge (part 2)",
@@ -788,8 +788,8 @@ namespace SurfaceGroundHeatExchanger {
                 // Check for non-convergence
                 if (iter > Maxiter) {
                     if (this->ConvErrIndex3 == 0) {
-                        ShowWarningMessage(state, "CalcSurfaceGroundHeatExchanger=\"" + this->Name +
-                                           "\", Did not converge (part 3), Iterations=" + TrimSigDigits(Maxiter));
+                        ShowWarningMessage(
+                            state, format("CalcSurfaceGroundHeatExchanger=\"{}\", Did not converge (part 3), Iterations={}", this->Name, Maxiter));
                         ShowContinueErrorTimeStamp(state, "");
                     }
                     ShowRecurringWarningErrorAtEnd(state, "CalcSurfaceGroundHeatExchanger=\"" + this->Name + "\", Did not converge (part 3)",
@@ -1056,7 +1056,6 @@ namespace SurfaceGroundHeatExchanger {
         // Using/Aliasing
         using DataPlant::PlantLoop;
         using FluidProperties::GetSpecificHeatGlycol;
-        using General::RoundSigDigits;
 
         // Return value
         Real64 CalcHXEffectTerm;
@@ -1125,8 +1124,11 @@ namespace SurfaceGroundHeatExchanger {
         if (Temperature < 0.0) { // check if fluid is water and would be freezing
             if (PlantLoop(this->LoopNum).FluidIndex == WaterIndex) {
                 if (this->FrozenErrIndex1 == 0) {
-                    ShowWarningMessage(state, "GroundHeatExchanger:Surface=\"" + this->Name +
-                                       "\", water is frozen; Model not valid. Calculated Water Temperature=[" + RoundSigDigits(this->InletTemp, 2) + "] C");
+                    ShowWarningMessage(
+                        state,
+                        format("GroundHeatExchanger:Surface=\"{}\", water is frozen; Model not valid. Calculated Water Temperature=[{:.2R}] C",
+                               this->Name,
+                               this->InletTemp));
                     ShowContinueErrorTimeStamp(state, "");
                 }
                 ShowRecurringWarningErrorAtEnd(state, "GroundHeatExchanger:Surface=\"" + this->Name + "\", water is frozen",

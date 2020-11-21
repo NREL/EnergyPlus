@@ -96,7 +96,8 @@ namespace DataBranchAirLoopPlant {
         Real64 ConstantF;             // - Constant value of f (if applicable)               [-]
         bool EMSOverrideOn;           // if TRUE, then EMS is calling to override curve value
         Real64 EMSOverrideCurveValue; // Value of curve result EMS is directing to use
-                                      //  report variables.
+
+        //  report variables.
         Real64 CurveOutput;
         Real64 CurveInput1; // - MassFlow                                         [kg/s]
         Real64 CurveInput2; // - Density                                          [kg/m3]

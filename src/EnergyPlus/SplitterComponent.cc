@@ -53,7 +53,6 @@
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -92,9 +91,6 @@ namespace SplitterComponent {
         // It is called from the SimAirLoopComponent
         // at the system time step.
 
-        // Using/Aliasing
-        using General::TrimSigDigits;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int SplitterNum; // The Splitter that you are currently loading input for
 
@@ -113,13 +109,19 @@ namespace SplitterComponent {
         } else {
             SplitterNum = CompIndex;
             if (SplitterNum > state.dataSplitterComponent->NumSplitters || SplitterNum < 1) {
-                ShowFatalError(state, "SimAirLoopSplitter: Invalid CompIndex passed=" + TrimSigDigits(SplitterNum) +
-                               ", Number of Splitters=" + TrimSigDigits(state.dataSplitterComponent->NumSplitters) + ", Splitter name=" + CompName);
+                ShowFatalError(state,
+                               format("SimAirLoopSplitter: Invalid CompIndex passed={}, Number of Splitters={}, Splitter name={}",
+                                      SplitterNum,
+                                      state.dataSplitterComponent->NumSplitters,
+                                      CompName));
             }
             if (state.dataSplitterComponent->CheckEquipName(SplitterNum)) {
                 if (CompName != state.dataSplitterComponent->SplitterCond(SplitterNum).SplitterName) {
-                    ShowFatalError(state, "SimAirLoopSplitter: Invalid CompIndex passed=" + TrimSigDigits(SplitterNum) + ", Splitter name=" + CompName +
-                                   ", stored Splitter Name for that index=" + state.dataSplitterComponent->SplitterCond(SplitterNum).SplitterName);
+                    ShowFatalError(state,
+                                   format("SimAirLoopSplitter: Invalid CompIndex passed={}, Splitter name={}, stored Splitter Name for that index={}",
+                                          SplitterNum,
+                                          CompName,
+                                          state.dataSplitterComponent->SplitterCond(SplitterNum).SplitterName));
                 }
                 state.dataSplitterComponent->CheckEquipName(SplitterNum) = false;
             }
@@ -159,7 +161,6 @@ namespace SplitterComponent {
         // Uses the status flags to trigger events.
 
         // Using/Aliasing
-        using General::TrimSigDigits;
         using NodeInputManager::GetOnlySingleNode;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -260,7 +261,7 @@ namespace SplitterComponent {
                 ShowSevereError(state, CurrentModuleObject + " = " + state.dataSplitterComponent->SplitterCond(SplitterNum).SplitterName +
                                 " specifies an outlet node name the same as the inlet node.");
                 ShowContinueError(state, ".." + cAlphaFields(2) + '=' + NodeID(NodeNum));
-                ShowContinueError(state, "..Outlet Node #" + TrimSigDigits(OutNodeNum1) + " is duplicate.");
+                ShowContinueError(state, format("..Outlet Node #{} is duplicate.", OutNodeNum1));
                 ErrorsFound = true;
             }
             for (OutNodeNum1 = 1; OutNodeNum1 <= state.dataSplitterComponent->SplitterCond(SplitterNum).NumOutletNodes; ++OutNodeNum1) {
@@ -268,8 +269,8 @@ namespace SplitterComponent {
                     if (state.dataSplitterComponent->SplitterCond(SplitterNum).OutletNode(OutNodeNum1) != state.dataSplitterComponent->SplitterCond(SplitterNum).OutletNode(OutNodeNum2)) continue;
                     ShowSevereError(state, CurrentModuleObject + " = " + state.dataSplitterComponent->SplitterCond(SplitterNum).SplitterName +
                                     " specifies duplicate outlet nodes in its outlet node list.");
-                    ShowContinueError(state, "..Outlet Node #" + TrimSigDigits(OutNodeNum1) + " Name=" + NodeID(OutNodeNum1));
-                    ShowContinueError(state, "..Outlet Node #" + TrimSigDigits(OutNodeNum2) + " is duplicate.");
+                    ShowContinueError(state, format("..Outlet Node #{} Name={}", OutNodeNum1, NodeID(OutNodeNum1)));
+                    ShowContinueError(state, format("..Outlet Node #{} is duplicate.", OutNodeNum2));
                     ErrorsFound = true;
                 }
             }

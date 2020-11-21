@@ -1618,7 +1618,6 @@ namespace ThermalComfort {
         using namespace DataHeatBalance;
         using DataSurfaces::Surface;
         using namespace DataIPShortCuts;
-        using General::RoundSigDigits;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const AngleFacLimit(0.01); // To set the limit of sum of angle factors
@@ -1709,8 +1708,10 @@ namespace ThermalComfort {
 
             if (std::abs(AllAngleFacSummed - 1.0) > AngleFacLimit) {
                 ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid - Sum[AngleFactors]");
-                ShowContinueError(state, "...Sum of Angle Factors [" + RoundSigDigits(AllAngleFacSummed, 3) +
-                                  "] exceed expected sum [1.0] by more than limit [" + RoundSigDigits(AngleFacLimit, 3) + "].");
+                ShowContinueError(state,
+                                  format("...Sum of Angle Factors [{:.3R}] exceed expected sum [1.0] by more than limit [{:.3R}].",
+                                         AllAngleFacSummed,
+                                         AngleFacLimit));
                 ErrorsFound = true;
             }
         }
@@ -1977,7 +1978,7 @@ namespace ThermalComfort {
         using DataEnvironment::EnvironmentName;
         using DataEnvironment::EnvironmentStartEnd;
         using DataEnvironment::RunPeriodEnvironment;
-        using General::RoundSigDigits;
+
         using OutputReportTabular::isInQuadrilateral;
         using namespace OutputReportPredefined;
 
@@ -2099,7 +2100,7 @@ namespace ThermalComfort {
             }
             // if any zones should be warning print it out
             if (showWarning) {
-                ShowWarningError(state, "More than 4% of time (" + RoundSigDigits(allowedHours, 1) + " hours) uncomfortable in one or more zones ");
+                ShowWarningError(state, format("More than 4% of time ({:.1R} hours) uncomfortable in one or more zones ", allowedHours));
                 ShowContinueError(state, "Based on ASHRAE 55-2004 graph (Section 5.2.1.1)");
                 if (RunPeriodEnvironment) {
                     ShowContinueError(state, "During Environment [" + EnvironmentStartEnd + "]: " + EnvironmentName);
@@ -2109,8 +2110,10 @@ namespace ThermalComfort {
                 for (iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
                     if (state.dataThermalComforts->ThermalComfortInASH55(iZone).Enable55Warning) {
                         if (state.dataThermalComforts->ThermalComfortInASH55(iZone).totalTimeNotEither > allowedHours) {
-                            ShowContinueError(state, RoundSigDigits(state.dataThermalComforts->ThermalComfortInASH55(iZone).totalTimeNotEither, 1) +
-                                              " hours were uncomfortable in zone: " + Zone(iZone).Name);
+                            ShowContinueError(state,
+                                              format("{:.1R} hours were uncomfortable in zone: {}",
+                                                     state.dataThermalComforts->ThermalComfortInASH55(iZone).totalTimeNotEither,
+                                                     Zone(iZone).Name));
                         }
                     }
                 }

@@ -66,6 +66,7 @@ namespace EnergyPlus {
         this->dataBoilerSteam = std::make_unique<BoilerSteamData>();
         this->dataBranchAirLoopPlant = std::make_unique<DataBranchAirLoopPlantData>();
         this->dataBranchInputManager = std::make_unique<BranchInputManagerData>();
+        this->dataBranchNodeConnections = std::unique_ptr<BranchNodeConnectionsData>(new BranchNodeConnectionsData);
         this->dataChilledCeilingPanelSimple = std::make_unique<ChilledCeilingPanelSimpleData>();
         this->dataChillerAbsorber = std::make_unique<ChillerAbsorberData>();
         this->dataChillerElectricEIR = std::make_unique<ChillerElectricEIRData>();
@@ -146,6 +147,7 @@ namespace EnergyPlus {
         this->dataBoilerSteam->clear_state();
         this->dataBranchAirLoopPlant->clear_state();
         this->dataBranchInputManager->clear_state();
+        this->dataBranchNodeConnections->clear_state();
         this->dataChilledCeilingPanelSimple->clear_state();
         this->dataChillerAbsorber->clear_state();
         this->dataChillerElectricEIR->clear_state();
