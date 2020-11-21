@@ -101,8 +101,8 @@ if __name__ == '__main__':
     sc.validate_member_variable_construction()
     sc.validate_member_variable_clear_state()
     all_good = True
-    for v in sc.member_variables:
-        if not v.validate():
+    for mv in sc.member_variables:
+        if not mv.validate():
             all_good = False
     if not all_good:
         print("::error file=EnergyPlusData.cc::Problems with State Variables!")
