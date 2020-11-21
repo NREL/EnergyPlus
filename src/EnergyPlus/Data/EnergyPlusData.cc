@@ -66,7 +66,7 @@ namespace EnergyPlus {
         this->dataBoilerSteam = std::make_unique<BoilerSteamData>();
         this->dataBranchAirLoopPlant = std::make_unique<DataBranchAirLoopPlantData>();
         this->dataBranchInputManager = std::make_unique<BranchInputManagerData>();
-        this->dataBranchNodeConnections = std::unique_ptr<BranchNodeConnectionsData>(new BranchNodeConnectionsData);
+        this->dataBranchNodeConnections = std::make_unique<BranchNodeConnectionsData>();
         this->dataChilledCeilingPanelSimple = std::make_unique<ChilledCeilingPanelSimpleData>();
         this->dataChillerAbsorber = std::make_unique<ChillerAbsorberData>();
         this->dataChillerElectricEIR = std::make_unique<ChillerElectricEIRData>();
@@ -163,6 +163,7 @@ namespace EnergyPlus {
         this->dataCrossVentMgr->clear_state();
         this->dataCTElectricGenerator->clear_state();
         this->dataCurveManager->clear_state();
+        this->dataEIRPlantLoopHeatPump->clear_state();
         this->dataExteriorEnergyUse->clear_state();
         this->dataFans->clear_state();
         this->dataGlobal->clear_state();
@@ -172,7 +173,9 @@ namespace EnergyPlus {
         this->dataSetPointManager->clear_state();
         this->dataSimulationManager->clear_state();
         this->dataSingleDuct->clear_state();
+        this->dataSizingManager->clear_state();
         this->dataSolarCollectors->clear_state();
+        this->dataSolarReflectionManager->clear_state();
         this->dataSolarShading->clear_state();
         this->dataSplitterComponent->clear_state();
         this->dataSteamBaseboardRadiator->clear_state();
