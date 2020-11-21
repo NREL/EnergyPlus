@@ -1,3 +1,8 @@
+#include <fstream>
+std::ofstream static myFile("Sched.csv", std::ofstream::out);
+std::ofstream static myFile1("Sched1.csv", std::ofstream::out);
+std::ofstream static myFile2("Sched2.csv", std::ofstream::out);
+std::ofstream static myFile3("Sched3.csv", std::ofstream::out);
 // EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
@@ -924,16 +929,31 @@ namespace ScheduleManager {
                 for (Hr = 1; Hr <= 24; ++Hr) {
                     CurMinute = MinutesPerTimeStep;
                     for (TS = 1; TS <= NumOfTimeStepInHour; ++TS) {
-                        DaySchedule(Count).TSValue(TS, Hr) = MinuteValue(CurMinute, Hr);
+                        DaySchedule(Count).TSValue(TS, Hr) =  MinuteValue(CurMinute, Hr);
+                        //myFile3 << TS << "," << Hr << "," << MinuteValue(CurMinute, Hr) << "\n";
                         CurMinute += MinutesPerTimeStep;
                     }
                 }
             }
 
             SchedTypePtr = DaySchedule(Count).ScheduleTypePtr;
+
+            for (int hr = 1; hr <= 24; ++hr) {
+                for (int TS = 1; TS <= 4; ++TS) {
+                    myFile3 << Real64(DaySchedule(Count).TSValue(TS, hr)) << "," << TS << "," << hr << ","
+                            << Real64(ScheduleType(SchedTypePtr).Maximum) << ","
+                            << (Real64(DaySchedule(Count).TSValue(TS, hr)) - Real64(ScheduleType(SchedTypePtr).Maximum)) << "\n";                    
+                }
+            }
+
+            
+            bool PleaseWork = any_gt(DaySchedule(Count).TSValue, ScheduleType(SchedTypePtr).Maximum);
+            
             if (ScheduleType(SchedTypePtr).Limited) {
                 if (any_lt(DaySchedule(Count).TSValue, ScheduleType(SchedTypePtr).Minimum) ||
                     any_gt(DaySchedule(Count).TSValue, ScheduleType(SchedTypePtr).Maximum)) {
+                    myFile3 << "Break" << "\n" << DaySchedule(Count).TSValue.size1() << ","
+                            << DaySchedule(Count).TSValue.size2() << "," << ScheduleType(SchedTypePtr).Maximum << "\n";
                     ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", Values are outside of range for " +
                                      cAlphaFields(2) + '=' + Alphas(2));
                 }
@@ -3248,6 +3268,9 @@ namespace ScheduleManager {
         int totalMinutes;
         Real64 incrementPerMinute;
         Real64 curValue;
+        double FakeincrementPerMinute;
+        double FakecurValue;
+
 
         MinuteValue = 0.0;
         SetMinuteValue = false;
@@ -3310,6 +3333,10 @@ namespace ScheduleManager {
 
             if (interpolationKind == ScheduleInterpolation::Linear) {
                 totalMinutes = (EHr - SHr) * 60 + (EMin - SMin) + 1;
+                //if (EHr == 25 || EMin == 00) {
+                //    totalMinutes = (EHr - SHr) * 60 + (EMin - SMin) + 2;
+                //}
+
                 if (totalMinutes == 0) totalMinutes = 1; // protect future division
                 if (Count == 1) {
                     StartValue = Numbers(Count); // assume first period is flat
@@ -3319,9 +3346,13 @@ namespace ScheduleManager {
                     EndValue = Numbers(Count);
                 }
                 incrementPerMinute = (EndValue - StartValue) / totalMinutes;
+                FakeincrementPerMinute = (double (EndValue) - double (StartValue)) / totalMinutes;
                 curValue = StartValue + incrementPerMinute;
+                FakecurValue = double (StartValue) + FakeincrementPerMinute;
+                /*myFile << curValue << "," << StartValue << "," << EndValue << "," << incrementPerMinute << "," << totalMinutes << "," << EHr << ","
+                       << EMin << "\n";*/
             }
-
+            int countofincrements = 1;
             if (SHr == EHr) {
                 for (Min = SMin; Min <= EMin; ++Min) {
                     if (SetMinuteValue(Min, SHr)) {
@@ -3349,23 +3380,41 @@ namespace ScheduleManager {
                                 '=' + DayScheduleName);
                 ErrorsFound = true;
             } else {
+                std::cout << "Jermy\n";
                 if (interpolationKind == ScheduleInterpolation::Linear) {
                     for (Min = SMin; Min <= 60; ++Min) { // for portion of starting hour
+                        
+                        
+                        if (incrementPerMinute != 0) {
+                            myFile2 << Min << "," << SHr << "," << 67 - (countofincrements * incrementPerMinute + 65) << ","
+                                    << 67 - curValue << "," << (67 - (countofincrements * incrementPerMinute + 65)) - (67 - curValue) << "\n";                        
+                        }
+                        countofincrements++;
                         MinuteValue(Min, SHr) = curValue;
                         curValue += incrementPerMinute;
                         SetMinuteValue(Min, SHr) = true;
+                        
                     }
                     for (Hr = SHr + 1; Hr <= EHr - 1; ++Hr) { // for intermediate hours
                         for (Min = 1; Min <= 60; ++Min) {
+
+                            
+                            if (incrementPerMinute != 0) {
+                                myFile1 << Min << "," << Hr << "," << 67 - (countofincrements * incrementPerMinute + 65)
+                                        << ","  << 67 - curValue << "," << (67 - (countofincrements * incrementPerMinute + 65)) - (67 - curValue) << "\n";
+                            }
+                            countofincrements++;
                             MinuteValue(Min, Hr) = curValue;
                             curValue += incrementPerMinute;
                             SetMinuteValue(Min, Hr) = true;
+                            
                         }
                     }
                     for (Min = 1; Min <= EMin; ++Min) { // for ending hour
                         MinuteValue(Min, EHr) = curValue;
                         curValue += incrementPerMinute;
                         SetMinuteValue(Min, EHr) = true;
+                        
                     }
                 } else { // either no interpolation or "average" interpolation (average just is when the interval does not match the timestep)
                     for (Min = SMin; Min <= 60; ++Min) { // for portion of starting hour

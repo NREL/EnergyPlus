@@ -1776,7 +1776,11 @@ public: // Comparison: Predicate: Any
 		assert( a.size_bounded() );
 		if ( a.empty() ) return false;
 		for ( size_type i = 0, e = a.size_; i < e; ++i ) {
-			if ( t < a[ i ] ) return true;
+			if (t < a[i]) { 
+				Real64 dunnoThis = a[i];
+				//if (e == 96) Real64 dunnoThisToo = a[94];
+				return true; 
+			}
 		}
 		return false;
 	}
