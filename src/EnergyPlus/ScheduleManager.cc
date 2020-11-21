@@ -228,8 +228,6 @@ namespace ScheduleManager {
 
         // Using/Aliasing
         using General::ProcessDateString;
-        using General::RoundSigDigits;
-        using General::TrimSigDigits;
         using DataStringGlobals::CharComma;
         using DataStringGlobals::CharSemicolon;
         using DataStringGlobals::CharSpace;
@@ -626,8 +624,13 @@ namespace ScheduleManager {
                             if (errFlag) {
                                 ++numerrors;
                                 columnValue = 0.0;
-                                ShowWarningError(state, RoutineName + ":\"" + ShadingSunlitFracFileName + "\": found error processing column: " + std::to_string(colCnt) +
-                                                 ", row:" + std::to_string(rowCnt) + " in " + ShadingSunlitFracFileName + ".");
+                                ShowWarningError(state,
+                                                 format("{}:\"{}\": found error processing column: {}, row:{} in {}.",
+                                                        RoutineName,
+                                                        ShadingSunlitFracFileName,
+                                                        colCnt,
+                                                        rowCnt,
+                                                        ShadingSunlitFracFileName));
                                 ShowContinueError(state, "This value is set to 0.");
                             }
                             CSVAllColumnNameAndValues[colCnt - 1](rowCnt - 1) = columnValue;
@@ -639,13 +642,14 @@ namespace ScheduleManager {
 
             if (rowCnt - 2 != rowLimitCount) {
                 if (rowCnt - 2 < rowLimitCount) {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\" " + std::to_string((rowCnt - 2)) + " data values read.");
+                    ShowSevereError(state, format("{}{}=\"{}\" {} data values read.", RoutineName, CurrentModuleObject, Alphas(1), rowCnt - 2));
                 }
                 else if (rowCnt - 2 > rowLimitCount) {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\" too many data values read.");
                 }
-                ShowContinueError(state, "Number of rows in the shading file must be a full year multiplied by the simulation TimeStep: " +
-                    std::to_string(rowLimitCount) + ".");
+                ShowContinueError(
+                    state,
+                    format("Number of rows in the shading file must be a full year multiplied by the simulation TimeStep: {}.", rowLimitCount));
                 ShowFatalError(state, "Program terminates due to previous condition.");
             }
 
@@ -653,8 +657,9 @@ namespace ScheduleManager {
             ScheduleFileShadingProcessed = true;
 
             if (numerrors > 0) {
-                ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\" " + RoundSigDigits(numerrors) +
-                                 " records had errors - these values are set to 0.");
+                ShowWarningError(
+                    state,
+                    format("{}{}=\"{}\" {} records had errors - these values are set to 0.", RoutineName, CurrentModuleObject, Alphas(1), numerrors));
             }
         }
 
@@ -757,14 +762,26 @@ namespace ScheduleManager {
             if (ScheduleType(LoopIndex).Limited) {
                 if (ScheduleType(LoopIndex).Minimum > ScheduleType(LoopIndex).Maximum) {
                     if (ScheduleType(LoopIndex).IsReal) {
-                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cNumericFields(1) + " [" +
-                                        RoundSigDigits(ScheduleType(LoopIndex).Minimum, 2) + "] > " + cNumericFields(2) + " [" +
-                                        RoundSigDigits(ScheduleType(LoopIndex).Maximum, 2) + "].");
+                        ShowSevereError(state,
+                                        format("{}=\"{}\", {} [{:.2R}] > {} [{:.2R}].",
+                                               RoutineName,
+                                               CurrentModuleObject,
+                                               Alphas(1),
+                                               cNumericFields(1),
+                                               ScheduleType(LoopIndex).Minimum,
+                                               cNumericFields(2),
+                                               ScheduleType(LoopIndex).Maximum));
                         ShowContinueError(state, "  Other warning/severes about schedule values may appear.");
                     } else {
-                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cNumericFields(1) + " [" +
-                                        RoundSigDigits(ScheduleType(LoopIndex).Minimum, 0) + "] > " + cNumericFields(2) + " [" +
-                                        RoundSigDigits(ScheduleType(LoopIndex).Maximum, 0) + "].");
+                        ShowSevereError(state,
+                                        format("{}=\"{}\", {} [{:.0R}] > {} [{:.0R}].",
+                                               RoutineName,
+                                               CurrentModuleObject,
+                                               Alphas(1),
+                                               cNumericFields(1),
+                                               ScheduleType(LoopIndex).Minimum,
+                                               cNumericFields(2),
+                                               ScheduleType(LoopIndex).Maximum));
                         ShowContinueError(state, "  Other warning/severes about schedule values may appear.");
                     }
                 }
@@ -877,7 +894,7 @@ namespace ScheduleManager {
             // check to see if numfield=0
             if (NumFields == 0) {
                 ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", Insufficient data entered for a full schedule day.");
-                ShowContinueError(state, "...Number of interval fields = = [" + RoundSigDigits(NumFields) + "].");
+                ShowContinueError(state, format("...Number of interval fields = = [{}].", NumFields));
                 ErrorsFound = true;
             }
 
@@ -1000,31 +1017,31 @@ namespace ScheduleManager {
             // check to see if there are any fields
             if (Numbers(1) <= 0.0) {
                 ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", Insufficient data entered for a full schedule day.");
-                ShowContinueError(state, "...Minutes per Item field = [" + RoundSigDigits(int(Numbers(1))) + "].");
+                ShowContinueError(state, format("...Minutes per Item field = [{}].", Numbers(1)));
                 ErrorsFound = true;
                 continue;
             }
             if (NumNumbers < 25) {
                 ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", Insufficient data entered for a full schedule day.");
-                ShowContinueError(state, "...Minutes per Item field = [" + RoundSigDigits(int(Numbers(1))) + "] and only [" +
-                                  RoundSigDigits(NumNumbers - 1) + "] to apply to list fields.");
+                ShowContinueError(state,
+                                  format("...Minutes per Item field = [{}] and only [{}] to apply to list fields.", Numbers(1), NumNumbers - 1));
                 ErrorsFound = true;
                 continue;
             }
             MinutesPerItem = int(Numbers(1));
             NumExpectedItems = 1440 / MinutesPerItem;
             if ((NumNumbers - 1) != NumExpectedItems) {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", Number of Entered Items=" +
-                                RoundSigDigits(NumNumbers - 1) + " not equal number of expected items=" + RoundSigDigits(NumExpectedItems));
-                ShowContinueError(state, "based on " + cNumericFields(1) + " field value=" + RoundSigDigits(MinutesPerItem));
+                ShowSevereError(state,
+                                RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", Number of Entered Items=" +
+                                    format("{} not equal number of expected items={}", NumNumbers - 1, NumExpectedItems));
+                ShowContinueError(state, format("based on {} field value={}", cNumericFields(1), MinutesPerItem));
                 ErrorsFound = true;
                 continue;
             }
 
             if (mod(60, MinutesPerItem) != 0) {
                 ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1));
-                ShowContinueError(state, "Requested " + cNumericFields(1) + " field value (" + RoundSigDigits(MinutesPerItem) +
-                                  ") not evenly divisible into 60");
+                ShowContinueError(state, format("Requested {} field value ({}) not evenly divisible into 60", cNumericFields(1), MinutesPerItem));
                 ErrorsFound = true;
                 continue;
             }
@@ -1384,7 +1401,7 @@ namespace ScheduleManager {
                 }
                 ++WkCount;
                 ++AddWeekSch;
-                WeekSchedule(AddWeekSch).Name = Alphas(1) + "_wk_" + fmt::to_string(WkCount);
+                WeekSchedule(AddWeekSch).Name = format("{}_wk_{}", Alphas(1), WkCount);
                 WeekSchedule(AddWeekSch).Used = true;
                 for (Hr = StartPointer; Hr <= EndPointer; ++Hr) {
                     Schedule(SchNum).WeekSchedulePointer(Hr) = AddWeekSch;
@@ -1400,7 +1417,7 @@ namespace ScheduleManager {
                     if (has_prefix(Alphas(NumField), "FOR")) {
                         ++DyCount;
                         ++AddDaySch;
-                        DaySchedule(AddDaySch).Name = Alphas(1) + "_dy_" + fmt::to_string(DyCount);
+                        DaySchedule(AddDaySch).Name = format("{}_dy_{}", Alphas(1), DyCount);
                         DaySchedule(AddDaySch).ScheduleTypePtr = Schedule(SchNum).ScheduleTypePtr;
                         DaySchedule(AddDaySch).Used = true;
                         TheseDays = false;
@@ -1663,7 +1680,7 @@ namespace ScheduleManager {
             if (Numbers(3) != 8760 && Numbers(3) != 8784) {
                 ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cNumericFields(3) +
                                 " must = 8760 or 8784 (for a leap year)");
-                ShowContinueError(state, "..Value for field = " + TrimSigDigits(Numbers(3), 0) + ", Schedule not processed.");
+                ShowContinueError(state, format("..Value for field = {:.0T}, Schedule not processed.", Numbers(3)));
                 ErrorsFound = true;
                 continue;
             }
@@ -1705,8 +1722,7 @@ namespace ScheduleManager {
                 NumExpectedItems = 1440 / MinutesPerItem;
                 if (mod(60, MinutesPerItem) != 0) {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1));
-                    ShowContinueError(state, "Requested " + cNumericFields(4) + " field value (" + RoundSigDigits(MinutesPerItem) +
-                                      ") not evenly divisible into 60");
+                    ShowContinueError(state, format("Requested {} field value ({}) not evenly divisible into 60", cNumericFields(4), MinutesPerItem));
                     ErrorsFound = true;
                     continue;
                 }
@@ -1851,19 +1867,27 @@ namespace ScheduleManager {
                 // schedule values have been filled into the hourlyFileValues array.
 
                 if (numerrors > 0) {
-                    ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\" " + RoundSigDigits(numerrors) +
-                                     " records had errors - these values are set to 0.");
+                    ShowWarningError(state,
+                                     format("{}{}=\"{}\" {} records had errors - these values are set to 0.",
+                                            RoutineName,
+                                            CurrentModuleObject,
+                                            Alphas(1),
+                                            numerrors));
                     ShowContinueError(state, "Use Output:Diagnostics,DisplayExtraWarnings; to see individual records in error.");
                 }
                 if (rowCnt < rowLimitCount) {
-                    ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\" less than " + RoundSigDigits(numHourlyValues) +
-                                     " hourly values read from file.");
-                    ShowContinueError(state, "..Number read=" + TrimSigDigits((rowCnt * 60) / MinutesPerItem) + '.');
+                    ShowWarningError(
+                        state,
+                        format(
+                            "{}{}=\"{}\" less than {} hourly values read from file.", RoutineName, CurrentModuleObject, Alphas(1), numHourlyValues));
+                    ShowContinueError(state, format("..Number read={}.", (rowCnt * 60) / MinutesPerItem));
                 }
                 if (rowCnt < rowLimitCount) {
                     ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\" less than specified hourly values read from file.");
-                    ShowContinueError(state, "..Specified Number of Hourly Values=" + TrimSigDigits(numHourlyValues) +
-                                      " Actual number of hourly values included=" + TrimSigDigits((rowCnt * 60) / MinutesPerItem));
+                    ShowContinueError(state,
+                                      format("..Specified Number of Hourly Values={} Actual number of hourly values included={}",
+                                             numHourlyValues,
+                                             (rowCnt * 60) / MinutesPerItem));
                 }
                 // process the data into the normal schedule data structures
                 // note -- schedules are ALWAYS 366 days so some special measures have to be done at 29 Feb "day of year" (60)
@@ -1875,7 +1899,7 @@ namespace ScheduleManager {
                     ++iDay;
                     ++hDay;
                     if (iDay > 366) break;
-                    ExtraField = RoundSigDigits(iDay);
+                    ExtraField = fmt::to_string(iDay);
                     // increment both since a week schedule is being defined for each day so that a day is valid
                     // no matter what the day type that is used in a design day.
                     ++AddWeekSch;
@@ -1965,7 +1989,7 @@ namespace ScheduleManager {
                 if (iDay > 366) {
                     break;
                 }
-                ExtraField = RoundSigDigits(iDay);
+                ExtraField = fmt::to_string(iDay);
                 // increment both since a week schedule is being defined for each day so that a day is valid
                 // no matter what the day type that is used in a design day.
                 ++AddWeekSch;
@@ -2254,8 +2278,10 @@ namespace ScheduleManager {
             if (CheckScheduleValueMinMax(state, SchNum, ">=", ScheduleType(NumPointer).Minimum, "<=", ScheduleType(NumPointer).Maximum)) continue;
             ShowSevereError(state, RoutineName + "Schedule=\"" + Schedule(SchNum).Name + "\" has values outside its Schedule Type (" +
                             ScheduleType(NumPointer).Name + ") range");
-            ShowContinueError(state, "  Minimum should be >=" + RoundSigDigits(ScheduleType(NumPointer).Minimum, 3) +
-                              " and Maximum should be <=" + RoundSigDigits(ScheduleType(NumPointer).Maximum, 3));
+            ShowContinueError(state,
+                              format("  Minimum should be >={:.3R} and Maximum should be <={:.3R}",
+                                     ScheduleType(NumPointer).Minimum,
+                                     ScheduleType(NumPointer).Maximum));
             ErrorsFound = true;
         }
 
@@ -2327,7 +2353,6 @@ namespace ScheduleManager {
         // na
 
         // Using/Aliasing
-        using General::RoundSigDigits;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2431,9 +2456,9 @@ namespace ScheduleManager {
                 for (Count = 1; Count <= NumScheduleTypes; ++Count) {
                     if (ScheduleType(Count).Limited) {
                         NoAverageLinear = "Average";
-                        Num1 = RoundSigDigits(ScheduleType(Count).Minimum, 2);
+                        Num1 = format("{:.2R}", ScheduleType(Count).Minimum);
                         strip(Num1);
-                        Num2 = RoundSigDigits(ScheduleType(Count).Maximum, 2);
+                        Num2 = format("{:.2R}", ScheduleType(Count).Maximum);
                         strip(Num2);
                         if (ScheduleType(Count).IsReal) {
                             YesNo2 = "Yes";
@@ -2469,7 +2494,7 @@ namespace ScheduleManager {
                     }
                     for (Hr = 1; Hr <= 24; ++Hr) {
                         for (TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
-                            RoundTSValue(TS, Hr) = RoundSigDigits(DaySchedule(Count).TSValue(TS, Hr), 2);
+                            RoundTSValue(TS, Hr) = format("{:.2R}", DaySchedule(Count).TSValue(TS, Hr));
                         }
                     }
                     static constexpr auto SchDFmtdata0("DaySchedule,{},{},{},{}");
@@ -2815,7 +2840,7 @@ namespace ScheduleManager {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
 
         if (ThisHour > 24) {
-            ShowFatalError(state, "LookUpScheduleValue called with thisHour=" + fmt::to_string(ThisHour));
+            ShowFatalError(state, format("LookUpScheduleValue called with thisHour={}", ThisHour));
         }
 
         if (ScheduleIndex == -1) {
@@ -4845,28 +4870,6 @@ namespace ScheduleManager {
         // PURPOSE OF THIS SUBROUTINE:
         // In response to CR7498, report orphan (unused) schedule items.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using General::RoundSigDigits;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool NeedOrphanMessage;
         bool NeedUseMessage;
@@ -4892,7 +4895,7 @@ namespace ScheduleManager {
         }
 
         if (NumCount > 0) {
-            ShowMessage(state, "There are " + RoundSigDigits(NumCount) + " unused schedules in input.");
+            ShowMessage(state, fmt::format("There are {} unused schedules in input.", NumCount));
             NeedUseMessage = true;
         }
 
@@ -4915,7 +4918,7 @@ namespace ScheduleManager {
         }
 
         if (NumCount > 0) {
-            ShowMessage(state, "There are " + RoundSigDigits(NumCount) + " unused week schedules in input.");
+            ShowMessage(state, fmt::format("There are {} unused week schedules in input.", NumCount));
             NeedUseMessage = true;
         }
 
@@ -4938,7 +4941,7 @@ namespace ScheduleManager {
         }
 
         if (NumCount > 0) {
-            ShowMessage(state, "There are " + RoundSigDigits(NumCount) + " unused day schedules in input.");
+            ShowMessage(state, fmt::format("There are {} unused day schedules in input.", NumCount));
             NeedUseMessage = true;
         }
 

@@ -212,15 +212,15 @@ namespace PlantManager {
         GetPlantLoopData(*state);
         ASSERT_FALSE(ErrorsFound);
         // there two setpoint amanegrs in the loop
-        EXPECT_EQ(1, NumSchSetPtMgrs);    // SetpointManager:Scheduled
-        EXPECT_EQ(1, NumOutAirSetPtMgrs); // SetpointManager:OutdoorAirReset
-        EXPECT_EQ(2, NumAllSetPtMgrs);
+        EXPECT_EQ(1, state.dataSetPointManager->NumSchSetPtMgrs);    // SetpointManager:Scheduled
+        EXPECT_EQ(1, state.dataSetPointManager->NumOutAirSetPtMgrs); // SetpointManager:OutdoorAirReset
+        EXPECT_EQ(2, state.dataSetPointManager->NumAllSetPtMgrs);
         // Schedule Setpoint Manager assigned at a plant loop supply outlet node
-        EXPECT_EQ(SchSetPtMgr(1).CtrlVarType, "TEMPERATURE");
-        EXPECT_EQ(SchSetPtMgr(1).CtrlNodeListName, "CHILLED WATER LOOP SUPPLY OUTLET");
+        EXPECT_EQ(state.dataSetPointManager->SchSetPtMgr(1).CtrlVarType, "TEMPERATURE");
+        EXPECT_EQ(state.dataSetPointManager->SchSetPtMgr(1).CtrlNodeListName, "CHILLED WATER LOOP SUPPLY OUTLET");
         // OAReset Setpoint Manager assigned at a plant loop supply inlet node
-        EXPECT_EQ(OutAirSetPtMgr(1).CtrlVarType, "TEMPERATURE");
-        EXPECT_EQ(OutAirSetPtMgr(1).CtrlNodeListName, "CHILLED WATER LOOP SUPPLY INLET");
+        EXPECT_EQ(state.dataSetPointManager->OutAirSetPtMgr(1).CtrlVarType, "TEMPERATURE");
+        EXPECT_EQ(state.dataSetPointManager->OutAirSetPtMgr(1).CtrlNodeListName, "CHILLED WATER LOOP SUPPLY INLET");
     }
 } // namespace PlantManager
 } // namespace EnergyPlus

@@ -109,7 +109,6 @@ using namespace EnergyPlus::OutputReportPredefined;
 using namespace EnergyPlus::OutputReportTabular;
 using namespace EnergyPlus::OutputProcessor;
 using namespace SimulationManager;
-using namespace ObjexxFCL;
 
 TEST_F(EnergyPlusFixture, OutputReportTabularTest_ConfirmSetUnitsStyleFromString)
 {
@@ -7422,11 +7421,11 @@ TEST_F(EnergyPlusFixture, AzimuthToCardinal)
         if (i % 2 == 1) {
             // It's a wall
             DataSurfaces::Surface(i).Class = DataSurfaces::SurfaceClass::Wall;
-            DataSurfaces::Surface(i).Name = "ExtWall_" + std::to_string(i) + "_" + std::to_string(entryIndex);
+            DataSurfaces::Surface(i).Name = format("ExtWall_{}_{}", i, entryIndex);
         } else {
             // It's a window
             DataSurfaces::Surface(i).Class = DataSurfaces::SurfaceClass::Window;
-            DataSurfaces::Surface(i).Name = "ExtWindow_" + std::to_string(i) + "_" + std::to_string(entryIndex);
+            DataSurfaces::Surface(i).Name = format("ExtWindow_{}_{}", i, entryIndex);
             // Window references the previous wall
             DataSurfaces::Surface(i).BaseSurf = i - 1;
         }
@@ -7460,8 +7459,7 @@ TEST_F(EnergyPlusFixture, AzimuthToCardinal)
         std::string cardinalDir = expectedAzimuthToCard.second;
 
         // Internal: Just to ensure that we gets the same one with round
-        EXPECT_EQ(General::RoundSigDigits(round(oriAzimuth * 100.0) / 100.0, 2),
-                  General::RoundSigDigits(oriAzimuth, 2));
+        EXPECT_EQ(format("{:.2R}", round(oriAzimuth * 100.0) / 100.0), format("{:.2R}", oriAzimuth));
 
         /****************************************************************************
         *                            Wall (odd entries)                             *
@@ -7471,9 +7469,9 @@ TEST_F(EnergyPlusFixture, AzimuthToCardinal)
         EXPECT_EQ(oriAzimuth, DataSurfaces::Surface(i).Azimuth) << "Surface Name = " << DataSurfaces::Surface(i).Name;
 
         // Check that the azimuth entry is the rounded version indeed
-        EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchOpAzimuth,
-                                                                   DataSurfaces::Surface(i).Name),
-                  General::RoundSigDigits(expectedAzimuthToCard.first, 2)) << "Surface Name = " << DataSurfaces::Surface(i).Name;
+        EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchOpAzimuth, DataSurfaces::Surface(i).Name),
+                  format("{:.2R}", expectedAzimuthToCard.first))
+            << "Surface Name = " << DataSurfaces::Surface(i).Name;
         // Check that we do get the expected cardinal direction
         EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchOpDir,
                                                                    DataSurfaces::Surface(i).Name),
@@ -7488,9 +7486,9 @@ TEST_F(EnergyPlusFixture, AzimuthToCardinal)
         EXPECT_EQ(oriAzimuth, DataSurfaces::Surface(i+1).Azimuth) << "Surface Name = " << DataSurfaces::Surface(i+1).Name;
 
         // Check that the azimuth entry is the rounded version indeed
-        EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchFenAzimuth,
-                                                                   DataSurfaces::Surface(i+1).Name),
-                  General::RoundSigDigits(expectedAzimuthToCard.first, 2)) << "Surface Name = " << DataSurfaces::Surface(i+1).Name;
+        EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchFenAzimuth, DataSurfaces::Surface(i + 1).Name),
+                  format("{:.2R}", expectedAzimuthToCard.first))
+            << "Surface Name = " << DataSurfaces::Surface(i + 1).Name;
         // Check that we do get the expected cardinal direction
         EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchFenDir,
                                                                    DataSurfaces::Surface(i+1).Name),
@@ -7528,12 +7526,12 @@ TEST_F(EnergyPlusFixture, InteriorSurfaceEnvelopeSummaryReport)
         DataSurfaces::Surface(i).Construction = 1;
         // odd number - wall, even number - door
         if (i % 2 == 1) {
-            DataSurfaces::Surface(i).Name = "Interzonal_Wall_" + std::to_string((i + 1) / 2);
+            DataSurfaces::Surface(i).Name = "Interzonal_Wall_" + fmt::to_string((i + 1) / 2);
             DataSurfaces::Surface(i).GrossArea = 200.;
             DataSurfaces::Surface(i).Class = DataSurfaces::SurfaceClass::Wall;
             DataSurfaces::AllSurfaceListReportOrder.push_back(i);
         }else{
-            DataSurfaces::Surface(i).Name = "Interzonal_Door_" + std::to_string((i + 1) / 2);
+            DataSurfaces::Surface(i).Name = "Interzonal_Door_" + fmt::to_string((i + 1) / 2);
             DataSurfaces::Surface(i).BaseSurfName = DataSurfaces::Surface(i - 1).Name;
             DataSurfaces::Surface(i).BaseSurf = i - 1;
             DataSurfaces::Surface(i).GrossArea = 50.;

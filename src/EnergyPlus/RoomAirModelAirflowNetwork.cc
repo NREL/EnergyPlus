@@ -274,7 +274,7 @@ namespace RoomAirModelAirflowNetwork {
         using DataLoopNode::NumOfNodes;
         using DataZoneEquipment::ZoneEquipConfig;
         using DataZoneEquipment::ZoneEquipList;
-        using General::RoundSigDigits;
+
         using InternalHeatGains::SumInternalLatentGainsByTypes;
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
@@ -505,7 +505,7 @@ namespace RoomAirModelAirflowNetwork {
                             ShowContinueError(state, "Entered in " + ZoneEquipList(LoopZone).EquipName(I) +
                                               " defined in RoomAir:Node:AirflowNetwork:HVACEquipment");
                             ShowContinueError(state, "The Fraction of supply fraction values across all the roomair nodes in a zone needs to sum to 1.0.");
-                            ShowContinueError(state, "The sum of fractions entered = " + RoundSigDigits(SupplyFrac(I), 3));
+                            ShowContinueError(state, format("The sum of fractions entered = {:.3R}", SupplyFrac(I)));
                             ErrorsFound = true;
                         }
                         if (std::abs(ReturnFrac(I) - 1.0) > 0.001) {
@@ -513,7 +513,7 @@ namespace RoomAirModelAirflowNetwork {
                             ShowContinueError(state, "Entered in " + ZoneEquipList(LoopZone).EquipName(I) +
                                               " defined in RoomAir:Node:AirflowNetwork:HVACEquipment");
                             ShowContinueError(state, "The Fraction of return fraction values across all the roomair nodes in a zone needs to sum to 1.0.");
-                            ShowContinueError(state, "The sum of fractions entered = " + RoundSigDigits(ReturnFrac(I), 3));
+                            ShowContinueError(state, format("The sum of fractions entered = {:.3R}", ReturnFrac(I)));
                             ErrorsFound = true;
                         }
                     }

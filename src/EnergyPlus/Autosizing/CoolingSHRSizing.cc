@@ -149,9 +149,9 @@ void CoolingSHRSizer::updateSizingString()
         }
     } else if (this->coilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling) {
         if (this->isEpJSON) {
-            this->sizingString = "speed_" + General::TrimSigDigits(DataSizing::DataDXSpeedNum) + "_rated_sensible_heat_ratio";
+            this->sizingString = fmt::format("speed_{}_rated_sensible_heat_ratio", DataSizing::DataDXSpeedNum);
         } else {
-            this->sizingString = "Speed " + General::TrimSigDigits(DataSizing::DataDXSpeedNum) + " Rated Sensible Heat Ratio";
+            this->sizingString = fmt::format("Speed {} Rated Sensible Heat Ratio", DataSizing::DataDXSpeedNum);
         }
     } else if (this->coilType_Num == DataHVACGlobals::CoilVRF_FluidTCtrl_Cooling) {
         if (this->isEpJSON) {

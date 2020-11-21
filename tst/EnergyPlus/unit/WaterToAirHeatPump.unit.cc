@@ -72,7 +72,6 @@ using namespace EnergyPlus::DataPlant;
 using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::Psychrometrics;
 using namespace EnergyPlus::WaterToAirHeatPump;
-using General::RoundSigDigits;
 
 TEST_F(EnergyPlusFixture, WaterToAirHeatPumpTest_SimWaterToAir)
 {

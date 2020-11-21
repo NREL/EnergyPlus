@@ -60,7 +60,6 @@
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/DualDuct.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/HVACCooledBeam.hh>
 #include <EnergyPlus/HVACFourPipeBeam.hh>
@@ -105,7 +104,6 @@ namespace ZoneAirLoopEquipmentManager {
         // (water-air, refrigerant-air, steam-air, electric-electric,
         // water-water, etc)
 
-        using General::TrimSigDigits;
 
         int AirDistUnitNum;
 
@@ -123,12 +121,18 @@ namespace ZoneAirLoopEquipmentManager {
         } else {
             AirDistUnitNum = CompIndex;
             if (AirDistUnitNum > NumAirDistUnits || AirDistUnitNum < 1) {
-                ShowFatalError(state, "ManageZoneAirLoopEquipment:  Invalid CompIndex passed=" + TrimSigDigits(AirDistUnitNum) +
-                               ", Number of Units=" + TrimSigDigits(NumAirDistUnits) + ", Entered Unit name=" + ZoneAirLoopEquipName);
+                ShowFatalError(state,
+                               format("ManageZoneAirLoopEquipment:  Invalid CompIndex passed={}, Number of Units={}, Entered Unit name={}",
+                                      AirDistUnitNum,
+                                      NumAirDistUnits,
+                                      ZoneAirLoopEquipName));
             }
             if (ZoneAirLoopEquipName != AirDistUnit(AirDistUnitNum).Name) {
-                ShowFatalError(state, "ManageZoneAirLoopEquipment: Invalid CompIndex passed=" + TrimSigDigits(AirDistUnitNum) +
-                               ", Unit name=" + ZoneAirLoopEquipName + ", stored Unit Name for that index=" + AirDistUnit(AirDistUnitNum).Name);
+                ShowFatalError(state,
+                               format("ManageZoneAirLoopEquipment: Invalid CompIndex passed={}, Unit name={}, stored Unit Name for that index={}",
+                                      AirDistUnitNum,
+                                      ZoneAirLoopEquipName,
+                                      AirDistUnit(AirDistUnitNum).Name));
             }
         }
         DataSizing::CurTermUnitSizingNum = AirDistUnit(AirDistUnitNum).TermUnitSizingNum;

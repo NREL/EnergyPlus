@@ -56,7 +56,6 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
-#include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataConvergParams.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
@@ -172,7 +171,6 @@ namespace DualDuct {
         // at the system time step.
 
         // Using/Aliasing
-        using General::TrimSigDigits;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int DDNum; // The Damper that you are currently loading input into
@@ -195,13 +193,19 @@ namespace DualDuct {
         } else {
             DDNum = CompIndex;
             if (DDNum > NumDDAirTerminal || DDNum < 1) {
-                ShowFatalError(state, "SimulateDualDuct: Invalid CompIndex passed=" + TrimSigDigits(CompIndex) +
-                               ", Number of Dampers=" + TrimSigDigits(NumDDAirTerminal) + ", Damper name=" + CompName);
+                ShowFatalError(state,
+                               format("SimulateDualDuct: Invalid CompIndex passed={}, Number of Dampers={}, Damper name={}",
+                                      CompIndex,
+                                      NumDDAirTerminal,
+                                      CompName));
             }
             if (CheckEquipName(DDNum)) {
                 if (CompName != dd_airterminal(DDNum).Name) {
-                    ShowFatalError(state, "SimulateDualDuct: Invalid CompIndex passed=" + TrimSigDigits(CompIndex) + ", Damper name=" + CompName +
-                                   ", stored Damper Name for that index=" + dd_airterminal(DDNum).Name);
+                    ShowFatalError(state,
+                                   format("SimulateDualDuct: Invalid CompIndex passed={}, Damper name={}, stored Damper Name for that index={}",
+                                          CompIndex,
+                                          CompName,
+                                          dd_airterminal(DDNum).Name));
                 }
                 CheckEquipName(DDNum) = false;
             }
@@ -267,7 +271,6 @@ namespace DualDuct {
         using DataZoneEquipment::ZoneEquipConfig;
         using NodeInputManager::GetOnlySingleNode;
         using namespace DataHeatBalance;
-        using General::RoundSigDigits;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("GetDualDuctInput: "); // include trailing bla
@@ -771,11 +774,13 @@ namespace DualDuct {
                                                          dd_airterminal(DDNum).DesignRecircFlowRate);
                         } else {
                             if (dd_airterminal(DDNum).MaxAirVolFlowRate < dd_airterminal(DDNum).DesignOAFlowRate) {
-                                ShowSevereError(state, "The value " + RoundSigDigits(dd_airterminal(DDNum).MaxAirVolFlowRate, 5) + " in " +
-                                                cNumericFields(1) + "is lower than the outdoor air requirement.");
+                                ShowSevereError(state,
+                                                format("The value {:.5R} in {}is lower than the outdoor air requirement.",
+                                                       dd_airterminal(DDNum).MaxAirVolFlowRate,
+                                                       cNumericFields(1)));
                                 ShowContinueError(state, "Occurs in " + cCMO_DDVarVolOA + " = " + dd_airterminal(DDNum).Name);
-                                ShowContinueError(state, "The design outdoor air requirement is " +
-                                                  RoundSigDigits(dd_airterminal(DDNum).DesignOAFlowRate, 5));
+                                ShowContinueError(state,
+                                                  format("The design outdoor air requirement is {:.5R}", dd_airterminal(DDNum).DesignOAFlowRate));
                                 ErrorsFound = true;
                             }
                         }
@@ -1581,7 +1586,6 @@ namespace DualDuct {
         using DataHeatBalFanSys::ZoneThermostatSetPointHi;
         using DataHeatBalFanSys::ZoneThermostatSetPointLo;
         using DataHVACGlobals::SmallTempDiff;
-        using General::TrimSigDigits;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:

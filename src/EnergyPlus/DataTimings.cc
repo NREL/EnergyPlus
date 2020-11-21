@@ -266,6 +266,24 @@ namespace DataTimings {
         // METHODOLOGY EMPLOYED:
         // structure similar to recurring error structure.
 
+        // REFERENCES:
+        // na
+
+        // Using/Aliasing
+
+        // Locals
+        // SUBROUTINE ARGUMENT DEFINITIONS:
+
+        // SUBROUTINE PARAMETER DEFINITIONS:
+
+        // INTERFACE BLOCK SPECIFICATIONS:
+        // na
+
+        // DERIVED TYPE DEFINITIONS:
+        // na
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+
 #ifdef EP_NO_Timings
         return;
 #endif

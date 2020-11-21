@@ -219,7 +219,6 @@ namespace DaylightingDevices {
 
         // Using/Aliasing
         using DataHeatBalance::IntGainTypeOf_DaylightingDeviceTubular;
-        using General::RoundSigDigits;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS: na
@@ -428,10 +427,14 @@ namespace DaylightingDevices {
                 if (Shelf(ShelfNum).ViewFactor < 0) CalcViewFactorToShelf(state, ShelfNum);
 
                 if (Shelf(ShelfNum).ViewFactor + Surface(WinSurf).ViewFactorSky + Surface(WinSurf).ViewFactorGround > 1.0) {
-                    ShowWarningError(state, "DaylightingDevice:Shelf = " + Shelf(ShelfNum).Name + ":  Window view factors to sky [" +
-                                     RoundSigDigits(Surface(WinSurf).ViewFactorSky, 2) + "],");
-                    ShowContinueError(state, "ground [" + RoundSigDigits(Surface(WinSurf).ViewFactorGround, 2) + "], and outside shelf [" +
-                                      RoundSigDigits(Shelf(ShelfNum).ViewFactor, 2) + "] add up to > 1.0.");
+                    ShowWarningError(state,
+                                     format("DaylightingDevice:Shelf = {}:  Window view factors to sky [{:.2R}],",
+                                            Shelf(ShelfNum).Name,
+                                            Surface(WinSurf).ViewFactorSky));
+                    ShowContinueError(state,
+                                      format("ground [{:.2R}], and outside shelf [{:.2R}] add up to > 1.0.",
+                                             Surface(WinSurf).ViewFactorGround,
+                                             Shelf(ShelfNum).ViewFactor));
                 }
 
                 // Report calculated view factor so that user knows what to make the view factor to ground
@@ -480,7 +483,7 @@ namespace DaylightingDevices {
 
         // Using/Aliasing
         using namespace DataIPShortCuts;
-        using General::RoundSigDigits;
+
         using General::SafeDivide;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -599,8 +602,9 @@ namespace DaylightingDevices {
                     if (state.dataConstruction->Construct(Surface(SurfNum).Construction).TransDiff <= 1.0e-10) {
                         ShowSevereError(state, cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Diffuser " + cAlphaArgs(3) + " construction (" +
                                         state.dataConstruction->Construct(Surface(SurfNum).Construction).Name + ") invalid value.");
-                        ShowContinueError(state, "Diffuse solar transmittance of construction [" +
-                                          RoundSigDigits(state.dataConstruction->Construct(Surface(SurfNum).Construction).TransDiff, 4) + "] too small for calculations.");
+                        ShowContinueError(state,
+                                          format("Diffuse solar transmittance of construction [{:.4R}] too small for calculations.",
+                                                 state.dataConstruction->Construct(Surface(SurfNum).Construction).TransDiff));
                         ErrorsFound = true;
                     }
 
@@ -609,13 +613,15 @@ namespace DaylightingDevices {
                             0.1) { // greater than 10%
                             ShowSevereError(state, cCurrentModuleObject + " = " + cAlphaArgs(1) +
                                             ":  Dome and diffuser areas are significantly different (>10%).");
-                            ShowContinueError(state, "...Diffuser Area=[" + RoundSigDigits(Surface(SurfNum).Area, 4) + "]; Dome Area=[" +
-                                              RoundSigDigits(Surface(TDDPipe(PipeNum).Dome).Area, 4) + "].");
+                            ShowContinueError(
+                                state,
+                                format("...Diffuser Area=[{:.4R}]; Dome Area=[{:.4R}].", Surface(SurfNum).Area, Surface(TDDPipe(PipeNum).Dome).Area));
                             ErrorsFound = true;
                         } else {
                             ShowWarningError(state, cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Dome and diffuser areas differ by > .1 m2.");
-                            ShowContinueError(state, "...Diffuser Area=[" + RoundSigDigits(Surface(SurfNum).Area, 4) + "]; Dome Area=[" +
-                                              RoundSigDigits(Surface(TDDPipe(PipeNum).Dome).Area, 4) + "].");
+                            ShowContinueError(
+                                state,
+                                format("...Diffuser Area=[{:.4R}]; Dome Area=[{:.4R}].", Surface(SurfNum).Area, Surface(TDDPipe(PipeNum).Dome).Area));
                         }
                     }
 
@@ -666,13 +672,13 @@ namespace DaylightingDevices {
                         0.1) { // greater than 10%
                         ShowSevereError(state, cCurrentModuleObject + " = " + cAlphaArgs(1) +
                                         ":  Pipe and dome/diffuser areas are significantly different (>10%).");
-                        ShowContinueError(state, "...Pipe Area=[" + RoundSigDigits(PipeArea, 4) + "]; Dome/Diffuser Area=[" +
-                                          RoundSigDigits(Surface(TDDPipe(PipeNum).Dome).Area, 4) + "].");
+                        ShowContinueError(
+                            state, format("...Pipe Area=[{:.4R}]; Dome/Diffuser Area=[{:.4R}].", PipeArea, Surface(TDDPipe(PipeNum).Dome).Area));
                         ErrorsFound = true;
                     } else {
                         ShowWarningError(state, cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Pipe and dome/diffuser areas differ by > .1 m2.");
-                        ShowContinueError(state, "...Pipe Area=[" + RoundSigDigits(PipeArea, 4) + "]; Dome/Diffuser Area=[" +
-                                          RoundSigDigits(Surface(TDDPipe(PipeNum).Dome).Area, 4) + "].");
+                        ShowContinueError(
+                            state, format("...Pipe Area=[{:.4R}]; Dome/Diffuser Area=[{:.4R}].", PipeArea, Surface(TDDPipe(PipeNum).Dome).Area));
                     }
                 }
 
