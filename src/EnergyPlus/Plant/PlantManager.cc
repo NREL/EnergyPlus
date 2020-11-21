@@ -311,7 +311,7 @@ namespace EnergyPlus {
             using namespace DataIPShortCuts; // Data for field names, blank numerics
             using ScheduleManager::GetScheduleIndex;
             using SetPointManager::IsNodeOnSetPtManager;
-            auto &localTempSetPt(SetPointManager::iCtrlVarType_Temp);
+            auto localTempSetPt = SetPointManager::iCtrlVarType::Temp;
             using NodeInputManager::GetOnlySingleNode;
             using namespace BranchInputManager;
             using DataConvergParams::PlantConvergence;

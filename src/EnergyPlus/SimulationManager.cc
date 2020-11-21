@@ -173,29 +173,6 @@ namespace SimulationManager {
     // MODULE PARAMETER DEFINITIONS:
     static std::string const BlankString;
 
-    // MODULE VARIABLE DECLARATIONS:
-    bool RunPeriodsInInput(false);
-    bool RunControlInInput(false);
-
-    namespace {
-        // These were static variables within different functions. They were pulled out into the namespace
-        // to facilitate easier unit testing of those functions.
-        // These are purposefully not in the header file as an extern variable. No one outside of SimulationManager should
-        // use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
-        // This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
-        bool PreP_Fatal(false);
-        bool WarningOut(true);
-    } // namespace
-
-    // Functions
-    void clear_state()
-    {
-        RunPeriodsInInput = false;
-        RunControlInInput = false;
-        PreP_Fatal = false;
-        WarningOut = true;
-    }
-
     void ManageSimulation(EnergyPlusData &state)
     {
 
@@ -318,7 +295,7 @@ namespace SimulationManager {
         state.dataGlobal->DoOutputReporting = false;
         DisplayPerfSimulationFlag = false;
         DoWeatherInitReporting = false;
-        RunPeriodsInInput =
+        state.dataSimulationManager->RunPeriodsInInput =
             (inputProcessor->getNumObjectsFound(state, "RunPeriod") > 0 || inputProcessor->getNumObjectsFound(state, "RunPeriod:CustomRange") > 0 || FullAnnualRun);
         AskForConnectionsReport = false; // set to false until sizing is finished
 
@@ -366,7 +343,7 @@ namespace SimulationManager {
         }
         state.dataGlobal->DoingSizing = false;
 
-        if ((state.dataGlobal->DoZoneSizing || state.dataGlobal->DoSystemSizing || state.dataGlobal->DoPlantSizing) && !(state.dataGlobal->DoDesDaySim || (state.dataGlobal->DoWeathSim && RunPeriodsInInput))) {
+        if ((state.dataGlobal->DoZoneSizing || state.dataGlobal->DoSystemSizing || state.dataGlobal->DoPlantSizing) && !(state.dataGlobal->DoDesDaySim || (state.dataGlobal->DoWeathSim && state.dataSimulationManager->RunPeriodsInInput))) {
             ShowWarningError(state, "ManageSimulation: Input file has requested Sizing Calculations but no Simulations are requested (in SimulationControl "
                              "object). Succeeding warnings/errors may be confusing.");
         }
@@ -657,7 +634,7 @@ namespace SimulationManager {
         }
 
         if (!SimsDone && state.dataGlobal->DoWeathSim) {
-            if (!RunPeriodsInInput) { // if no run period requested, and sims not done
+            if (!state.dataSimulationManager->RunPeriodsInInput) { // if no run period requested, and sims not done
                 ShowWarningError(state, "ManageSimulation: Weather Simulation was requested in SimulationControl but no RunPeriods in input.");
             }
         }
@@ -1182,7 +1159,7 @@ namespace SimulationManager {
         CurrentModuleObject = "SimulationControl";
         NumRunControl = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (NumRunControl > 0) {
-            RunControlInInput = true;
+            state.dataSimulationManager->RunControlInInput = true;
             inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           1,
@@ -1564,7 +1541,7 @@ namespace SimulationManager {
 
         WeatherFileAttached = FileSystem::fileExists(state.files.inputWeatherFileName.fileName);
 
-        if (RunControlInInput) {
+        if (state.dataSimulationManager->RunControlInInput) {
             if (state.dataGlobal->DoZoneSizing) {
                 if (NumZoneSizing > 0 && NumSizingDays == 0) {
                     ErrorsFound = true;
@@ -1615,11 +1592,11 @@ namespace SimulationManager {
                 ShowSevereError(state, "CheckEnvironmentSpecifications: SimulationControl specified doing design day simulations; weather file design "
                                 "environments specified; but no weather file specified.");
             }
-            if (state.dataGlobal->DoWeathSim && !RunPeriodsInInput) {
+            if (state.dataGlobal->DoWeathSim && !state.dataSimulationManager->RunPeriodsInInput) {
                 ShowWarningError(state, "CheckEnvironmentSpecifications: SimulationControl specified doing weather simulations, but no run periods for "
                                  "weather file specified.  No annual results produced.");
             }
-            if (state.dataGlobal->DoWeathSim && RunPeriodsInInput && !WeatherFileAttached) {
+            if (state.dataGlobal->DoWeathSim && state.dataSimulationManager->RunPeriodsInInput && !WeatherFileAttached) {
                 ShowWarningError(state, "CheckEnvironmentSpecifications: SimulationControl specified doing weather simulations; run periods for weather "
                                  "file specified; but no weather file specified.");
             }
@@ -2366,10 +2343,10 @@ namespace SimulationManager {
 
             if (state.dataBranchNodeConnections->CompSets(Count).ParentCType == "UNDEFINED" || state.dataBranchNodeConnections->CompSets(Count).InletNodeName == "UNDEFINED" ||
                 state.dataBranchNodeConnections->CompSets(Count).OutletNodeName == "UNDEFINED") {
-                if (AbortProcessing && WarningOut) {
+                if (AbortProcessing && state.dataSimulationManager->WarningOut) {
                     ShowWarningError(state, "Node Connection errors shown during \"fatal error\" processing may be false because not all inputs may have "
                                      "been retrieved.");
-                    WarningOut = false;
+                    state.dataSimulationManager->WarningOut = false;
                 }
                 ShowWarningError(state, "Node Connection Error for object " + state.dataBranchNodeConnections->CompSets(Count).CType + ", name=" + state.dataBranchNodeConnections->CompSets(Count).CName);
                 ShowContinueError(state, "  " + state.dataBranchNodeConnections->CompSets(Count).Description + " not on any Branch or Parent Object");
@@ -2381,10 +2358,10 @@ namespace SimulationManager {
                 }
             }
             if (state.dataBranchNodeConnections->CompSets(Count).Description == "UNDEFINED") {
-                if (AbortProcessing && WarningOut) {
+                if (AbortProcessing && state.dataSimulationManager->WarningOut) {
                     ShowWarningError(state, "Node Connection errors shown during \"fatal error\" processing may be false because not all inputs may have "
                                      "been retrieved.");
-                    WarningOut = false;
+                    state.dataSimulationManager->WarningOut = false;
                 }
                 ShowWarningError(state, "Potential Node Connection Error for object " + state.dataBranchNodeConnections->CompSets(Count).CType + ", name=" + state.dataBranchNodeConnections->CompSets(Count).CName);
                 ShowContinueError(state, "  Node Types are still UNDEFINED -- See Branch/Node Details file for further information");
@@ -2400,10 +2377,10 @@ namespace SimulationManager {
                 if (state.dataBranchNodeConnections->CompSets(Count).CName != state.dataBranchNodeConnections->CompSets(Count1).CName) continue;
                 if (state.dataBranchNodeConnections->CompSets(Count).InletNodeName != state.dataBranchNodeConnections->CompSets(Count1).InletNodeName) continue;
                 if (state.dataBranchNodeConnections->CompSets(Count).OutletNodeName != state.dataBranchNodeConnections->CompSets(Count1).OutletNodeName) continue;
-                if (AbortProcessing && WarningOut) {
+                if (AbortProcessing && state.dataSimulationManager->WarningOut) {
                     ShowWarningError(state, "Node Connection errors shown during \"fatal error\" processing may be false because not all inputs may have "
                                      "been retrieved.");
-                    WarningOut = false;
+                    state.dataSimulationManager->WarningOut = false;
                 }
                 ShowWarningError(state, "Component plus inlet/outlet node pair used more than once:");
                 ShowContinueError(state, "  Component  : " + state.dataBranchNodeConnections->CompSets(Count).CType + ", name=" + state.dataBranchNodeConnections->CompSets(Count).CName);
@@ -3052,9 +3029,9 @@ namespace SimulationManager {
 
         state.dataGlobal->DoingInputProcessing = false;
 
-        inputProcessor->preProcessorCheck(state, PreP_Fatal); // Check Preprocessor objects for warning, severe, etc errors.
+        inputProcessor->preProcessorCheck(state, state.dataSimulationManager->PreP_Fatal); // Check Preprocessor objects for warning, severe, etc errors.
 
-        if (PreP_Fatal) {
+        if (state.dataSimulationManager->PreP_Fatal) {
             ShowFatalError(state, "Preprocessor condition(s) cause termination.");
         }
 

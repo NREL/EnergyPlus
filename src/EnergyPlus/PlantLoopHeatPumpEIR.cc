@@ -74,18 +74,7 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
-namespace EnergyPlus {
-namespace EIRPlantLoopHeatPumps {
-
-    bool getInputsPLHP(true);
-    std::vector<EIRPlantLoopHeatPump> heatPumps;
-    std::string static const __EQUIP__ = "EIRPlantLoopHeatPump "; // NOLINT(cert-err58-cpp)
-
-    void EIRPlantLoopHeatPump::clear_state()
-    {
-        getInputsPLHP = true;
-        heatPumps.clear();
-    }
+namespace EnergyPlus::EIRPlantLoopHeatPumps {
 
     void EIRPlantLoopHeatPump::simulate(EnergyPlusData &state,
                                         const EnergyPlus::PlantLocation &calledFromLocation,
@@ -93,8 +82,6 @@ namespace EIRPlantLoopHeatPumps {
                                         Real64 &CurLoad,
                                         bool const RunFlag)
     {
-
-        std::string const routineName = "PlantLoopHeatPumpEIR::simulate";
 
         // Call initialize to set flow rates, run flag, and entering temperatures
         this->running = RunFlag;
@@ -133,7 +120,7 @@ namespace EIRPlantLoopHeatPumps {
         DataLoopNode::Node(this->sourceSideNodes.outlet).Temp = this->sourceSideOutletTemp;
     }
 
-    Real64 EIRPlantLoopHeatPump::getLoadSideOutletSetPointTemp(EnergyPlusData &state)
+    Real64 EIRPlantLoopHeatPump::getLoadSideOutletSetPointTemp(EnergyPlusData &state) const
     {
         auto &thisLoadPlantLoop = DataPlant::PlantLoop(this->loadSideLocation.loopNum);
         auto &thisLoadLoopSide = thisLoadPlantLoop.LoopSide(this->loadSideLocation.loopSideNum);
@@ -355,7 +342,7 @@ namespace EIRPlantLoopHeatPumps {
     void EIRPlantLoopHeatPump::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation)
     {
         // This function does all one-time and begin-environment initialization
-        std::string const routineName = EIRPlantLoopHeatPumps::__EQUIP__ + ':' + __FUNCTION__;
+        std::string static const routineName = std::string("EIRPlantLoopHeatPump :") + __FUNCTION__;
         if (this->oneTimeInit) {
             bool errFlag = false;
 
@@ -913,15 +900,15 @@ namespace EIRPlantLoopHeatPumps {
         }
     }
 
-    PlantComponent *EIRPlantLoopHeatPump::factory(EnergyPlusData &state, int hp_type_of_num, std::string hp_name)
+    PlantComponent *EIRPlantLoopHeatPump::factory(EnergyPlusData &state, int hp_type_of_num, const std::string& hp_name)
     {
-        if (getInputsPLHP) {
+        if (state.dataEIRPlantLoopHeatPump->getInputsPLHP) {
             EIRPlantLoopHeatPump::processInputForEIRPLHP(state);
             EIRPlantLoopHeatPump::pairUpCompanionCoils(state);
-            getInputsPLHP = false;
+            state.dataEIRPlantLoopHeatPump->getInputsPLHP = false;
         }
 
-        for (auto &plhp : heatPumps) {
+        for (auto &plhp : state.dataEIRPlantLoopHeatPump->heatPumps) {
             if (plhp.name == UtilityRoutines::MakeUPPERCase(hp_name) && plhp.plantTypeOfNum == hp_type_of_num) {
                 return &plhp;
             }
@@ -933,12 +920,12 @@ namespace EIRPlantLoopHeatPumps {
 
     void EIRPlantLoopHeatPump::pairUpCompanionCoils(EnergyPlusData &state)
     {
-        for (auto &thisHP : heatPumps) {
+        for (auto &thisHP : state.dataEIRPlantLoopHeatPump->heatPumps) {
             if (!thisHP.companionCoilName.empty()) {
                 auto thisCoilName = UtilityRoutines::MakeUPPERCase(thisHP.name);
                 auto &thisCoilType = thisHP.plantTypeOfNum;
                 auto targetCompanionName = UtilityRoutines::MakeUPPERCase(thisHP.companionCoilName);
-                for (auto &potentialCompanionCoil : heatPumps) {
+                for (auto &potentialCompanionCoil : state.dataEIRPlantLoopHeatPump->heatPumps) {
                     auto &potentialCompanionType = potentialCompanionCoil.plantTypeOfNum;
                     auto potentialCompanionName = UtilityRoutines::MakeUPPERCase(potentialCompanionCoil.name);
                     if (potentialCompanionName == thisCoilName) {
@@ -1177,7 +1164,7 @@ namespace EIRPlantLoopHeatPumps {
                     thisPLHP.calcSourceOutletTemp = classToInput.calcSourceOutletTemp;
 
                     if (!errorsFound) {
-                        heatPumps.push_back(thisPLHP);
+                        state.dataEIRPlantLoopHeatPump->heatPumps.push_back(thisPLHP);
                     }
                 }
             }
@@ -1200,7 +1187,7 @@ namespace EIRPlantLoopHeatPumps {
         //  companion index values as I warn against their partner, so then I would have to add the values to the
         //  vector each pass, and check then each loop.  This seemed really bulky and inefficient, so I chose to
         //  leave a tight loop here of just reporting for each coil if it and the companion are running.
-        for (auto &thisPLHP : heatPumps) {
+        for (auto &thisPLHP : state.dataEIRPlantLoopHeatPump->heatPumps) {
             if (!thisPLHP.companionHeatPumpCoil) {
                 continue;
             }
@@ -1211,5 +1198,4 @@ namespace EIRPlantLoopHeatPumps {
             }
         }
     }
-} // namespace EIRPlantLoopHeatPumps
-} // namespace EnergyPlus
+} // namespace EnergyPlus::EIRPlantLoopHeatPumps
