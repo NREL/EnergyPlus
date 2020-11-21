@@ -138,7 +138,7 @@ namespace TranspiredCollector {
         // Using/Aliasing
         using DataHVACGlobals::TempControlTol;
         using DataLoopNode::Node;
-        using General::TrimSigDigits;
+
         using ScheduleManager::GetCurrentScheduleValue;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -160,13 +160,20 @@ namespace TranspiredCollector {
         } else {
             UTSCNum = CompIndex;
             if (UTSCNum > state.dataTranspiredCollector->NumUTSC || UTSCNum < 1) {
-                ShowFatalError(state, "SimTranspiredCollector: Invalid CompIndex passed=" + TrimSigDigits(UTSCNum) +
-                               ", Number of Transpired Collectors=" + TrimSigDigits(state.dataTranspiredCollector->NumUTSC) + ", UTSC name=" + CompName);
+                ShowFatalError(state,
+                               format("SimTranspiredCollector: Invalid CompIndex passed={}, Number of Transpired Collectors={}, UTSC name={}",
+                                      UTSCNum,
+                                      state.dataTranspiredCollector->NumUTSC,
+                                      CompName));
             }
             if (state.dataTranspiredCollector->CheckEquipName(UTSCNum)) {
                 if (CompName != state.dataTranspiredCollector->UTSC(UTSCNum).Name) {
-                    ShowFatalError(state, "SimTranspiredCollector: Invalid CompIndex passed=" + TrimSigDigits(UTSCNum) + ", Transpired Collector name=" +
-                                   CompName + ", stored Transpired Collector Name for that index=" + state.dataTranspiredCollector->UTSC(UTSCNum).Name);
+                    ShowFatalError(state,
+                                   format("SimTranspiredCollector: Invalid CompIndex passed={}, Transpired Collector name={}, stored Transpired "
+                                          "Collector Name for that index={}",
+                                          UTSCNum,
+                                          CompName,
+                                          state.dataTranspiredCollector->UTSC(UTSCNum).Name));
                 }
                 state.dataTranspiredCollector->CheckEquipName(UTSCNum) = false;
             }
@@ -239,8 +246,7 @@ namespace TranspiredCollector {
         using DataSurfaces::OtherSideCondModeledExt;
         using DataSurfaces::Surface;
         using DataSurfaces::SurfaceData;
-        using General::RoundSigDigits;
-        using General::TrimSigDigits;
+
         using NodeInputManager::GetOnlySingleNode;
         using ScheduleManager::GetScheduleIndex;
 
@@ -286,8 +292,10 @@ namespace TranspiredCollector {
         inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Dummy, MaxNumAlphas, MaxNumNumbers);
 
         if (MaxNumNumbers != 11) {
-            ShowSevereError(state, "GetTranspiredCollectorInput: " + CurrentModuleObject +
-                            " Object Definition indicates not = 11 Number Objects, Number Indicated=" + TrimSigDigits(MaxNumNumbers));
+            ShowSevereError(state,
+                            format("GetTranspiredCollectorInput: {} Object Definition indicates not = 11 Number Objects, Number Indicated={}",
+                                   CurrentModuleObject,
+                                   MaxNumNumbers));
             ErrorsFound = true;
         }
         Alphas.allocate(MaxNumAlphas);
@@ -324,8 +332,10 @@ namespace TranspiredCollector {
                 inputProcessor->getObjectDefMaxArgs(state, CurrentModuleMultiObject, Dummy, MaxNumAlphasSplit, MaxNumNumbersSplit);
 
                 if (MaxNumNumbersSplit != 0) {
-                    ShowSevereError(state, "GetTranspiredCollectorInput: " + CurrentModuleMultiObject +
-                                    " Object Definition indicates not = 0 Number Objects, Number Indicated=" + TrimSigDigits(MaxNumNumbersSplit));
+                    ShowSevereError(state,
+                                    format("GetTranspiredCollectorInput: {} Object Definition indicates not = 0 Number Objects, Number Indicated={}",
+                                           CurrentModuleMultiObject,
+                                           MaxNumNumbersSplit));
                     ErrorsFound = true;
                 }
                 if (!allocated(AlphasSplit)) AlphasSplit.allocate(MaxNumAlphasSplit);
@@ -531,7 +541,7 @@ namespace TranspiredCollector {
                     ShowWarningError(state, "Suspected input problem with collector surface = " + Alphas(ThisSurf + AlphaOffset));
                     ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataTranspiredCollector->UTSC(Item).Name);
                     ShowContinueError(state, "Surface used for solar collector faces down");
-                    ShowContinueError(state, "Surface tilt angle (degrees from ground outward normal) = " + RoundSigDigits(Surface(Found).Tilt, 2));
+                    ShowContinueError(state, format("Surface tilt angle (degrees from ground outward normal) = {:.2R}", Surface(Found).Tilt));
                 }
 
                 state.dataTranspiredCollector->UTSC(Item).SurfPtrs(ThisSurf) = Found;
@@ -851,7 +861,7 @@ namespace TranspiredCollector {
         using DataHVACGlobals::TimeStepSys;
         using DataSurfaces::Surface;
         using DataSurfaces::SurfaceData;
-        using General::RoundSigDigits;
+
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyHFnTdbW;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
@@ -968,7 +978,7 @@ namespace TranspiredCollector {
             if (state.dataTranspiredCollector->UTSC(UTSCNum).VsucErrIndex == 0) {
                 ShowWarningMessage(state, "Solar Collector:Unglazed Transpired=\"" + state.dataTranspiredCollector->UTSC(UTSCNum).Name +
                                    "\", Suction velocity is outside of range for a good design");
-                ShowContinueErrorTimeStamp(state, "Suction velocity =" + RoundSigDigits(Vsuction, 4));
+                ShowContinueErrorTimeStamp(state, format("Suction velocity ={:.4R}", Vsuction));
                 if (Vsuction < 0.003) {
                     ShowContinueError(state, "Velocity is low -- suggest decreasing area of transpired collector");
                 }

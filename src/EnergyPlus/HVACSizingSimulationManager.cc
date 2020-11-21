@@ -60,7 +60,6 @@
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <EnergyPlus/FluidProperties.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/HVACSizingSimulationManager.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
@@ -220,7 +219,7 @@ void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound)
     using DataSystemVariables::ReportDuringHVACSizingSimulation;
     using EMSManager::ManageEMS;
     using ExteriorEnergyUse::ManageExteriorEnergyUse;
-    using General::TrimSigDigits;
+
     using PlantPipingSystemsManager::SimulateGroundDomains;
 
     using namespace WeatherManager;
@@ -315,10 +314,10 @@ void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound)
 
                 if (state.dataGlobal->WarmupFlag) {
                     ++NumOfWarmupDays;
-                    cWarmupDay = TrimSigDigits(NumOfWarmupDays);
+                    cWarmupDay = fmt::to_string(NumOfWarmupDays);
                     DisplayString(state, "Warming up {" + cWarmupDay + '}');
                 } else if (state.dataGlobal->DayOfSim == 1) {
-                    DisplayString(state, "Starting HVAC Sizing Simulation at " + CurMnDy + " for " + EnvironmentName);
+                    DisplayString(state, fmt::format("Starting HVAC Sizing Simulation at {} for {}", CurMnDy, EnvironmentName));
                     static constexpr auto Format_700("Environment:WarmupDays,{:3}\n");
                     print(state.files.eio, Format_700, NumOfWarmupDays);
                 } else if (DisplayPerfSimulationFlag) {

@@ -1587,30 +1587,6 @@ namespace General {
         return POLY2F;
     }
 
-    std::string TrimSigDigits(Real64 const RealValue, int const SigDigits)
-    {
-        return format("{:.{}T}", RealValue, SigDigits);
-    }
-
-    std::string TrimSigDigits(int const IntegerValue,
-                              [[maybe_unused]] Optional_int_const SigDigits // ignored
-    )
-    {
-        return format("{}", IntegerValue);
-    }
-
-    std::string RoundSigDigits(Real64 const RealValue, int const SigDigits)
-    {
-        return format("{:.{}R}", RealValue, SigDigits);
-    }
-
-    std::string RoundSigDigits(int const IntegerValue,
-                               [[maybe_unused]] Optional_int_const SigDigits // ignored
-    )
-    {
-        return format("{}", IntegerValue);
-    }
-
     std::string RemoveTrailingZeros(std::string const &InputString)
     {
 
@@ -3589,10 +3565,13 @@ namespace General {
             ShowWarningError(state, calledFrom + CurrentObject + " Combination of ZoneList and Object Name generate a name too long.");
             ShowContinueError(state, "Object Name=\"" + ItemName + "\".");
             ShowContinueError(state, "ZoneList/Zone Name=\"" + ZoneName + "\".");
-            ShowContinueError(state, "Item length=[" + RoundSigDigits(int(ItemLength)) + "] > Maximum Length=[" + RoundSigDigits(DataGlobalConstants::MaxNameLength()) +
-                              "]. You may need to shorten the names.");
-            ShowContinueError(state, "Shortening the Object Name by [" + RoundSigDigits(int(MaxZoneNameLength + 1 + ItemNameLength - DataGlobalConstants::MaxNameLength())) +
-                              "] characters will assure uniqueness for this ZoneList.");
+            ShowContinueError(state,
+                              format("Item length=[{}] > Maximum Length=[{}]. You may need to shorten the names.",
+                                     ItemLength,
+                                     DataGlobalConstants::MaxNameLength()));
+            ShowContinueError(state,
+                              format("Shortening the Object Name by [{}] characters will assure uniqueness for this ZoneList.",
+                                     MaxZoneNameLength + 1 + ItemNameLength - DataGlobalConstants::MaxNameLength()));
             ShowContinueError(state, "name that will be used (may be needed in reporting)=\"" + ResultName + "\".");
             TooLong = true;
         }
@@ -3601,8 +3580,8 @@ namespace General {
 
         if (FoundItem != 0) {
             ShowSevereError(state, calledFrom + CurrentObject + "=\"" + ItemName + "\", Duplicate Generated name encountered.");
-            ShowContinueError(state, "name=\"" + ResultName + "\" has already been generated or entered as " + CurrentObject + " item=[" +
-                              RoundSigDigits(FoundItem) + "].");
+            ShowContinueError(state,
+                              format("name=\"{}\" has already been generated or entered as {} item=[{}].", ResultName, CurrentObject, FoundItem));
             if (TooLong) ShowContinueError(state, "Duplicate name likely caused by the previous \"too long\" warning.");
             ResultName = "xxxxxxx";
             errFlag = true;

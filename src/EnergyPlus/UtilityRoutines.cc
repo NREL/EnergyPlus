@@ -614,7 +614,7 @@ namespace UtilityRoutines {
         using BranchNodeConnections::TestCompSetInletOutletNodes;
         using ExternalInterface::CloseSocket;
         using ExternalInterface::NumExternalInterfaces;
-        using General::RoundSigDigits;
+
         using NodeInputManager::CheckMarkedNodes;
         using NodeInputManager::SetupNodeVarsForReporting;
         using PlantManager::CheckPlantOnAbort;
@@ -805,7 +805,7 @@ namespace UtilityRoutines {
         using ExternalInterface::CloseSocket;
         using ExternalInterface::haveExternalInterfaceBCVTB;
         using ExternalInterface::NumExternalInterfaces;
-        using General::RoundSigDigits;
+
         using SolarShading::ReportSurfaceErrors;
 
         std::string NumWarnings;
@@ -826,24 +826,24 @@ namespace UtilityRoutines {
         ShowRecurringErrors(state);
         SummarizeErrors(state);
         CloseMiscOpenFiles(state);
-        NumWarnings = RoundSigDigits(TotalWarningErrors);
+        NumWarnings = fmt::to_string(TotalWarningErrors);
         strip(NumWarnings);
-        NumSevere = RoundSigDigits(TotalSevereErrors);
+        NumSevere = fmt::to_string(TotalSevereErrors);
         strip(NumSevere);
-        NumWarningsDuringWarmup = RoundSigDigits(TotalWarningErrorsDuringWarmup);
+        NumWarningsDuringWarmup = fmt::to_string(TotalWarningErrorsDuringWarmup);
         strip(NumWarningsDuringWarmup);
-        NumSevereDuringWarmup = RoundSigDigits(TotalSevereErrorsDuringWarmup);
+        NumSevereDuringWarmup = fmt::to_string(TotalSevereErrorsDuringWarmup);
         strip(NumSevereDuringWarmup);
-        NumWarningsDuringSizing = RoundSigDigits(TotalWarningErrorsDuringSizing);
+        NumWarningsDuringSizing = fmt::to_string(TotalWarningErrorsDuringSizing);
         strip(NumWarningsDuringSizing);
-        NumSevereDuringSizing = RoundSigDigits(TotalSevereErrorsDuringSizing);
+        NumSevereDuringSizing = fmt::to_string(TotalSevereErrorsDuringSizing);
         strip(NumSevereDuringSizing);
 
         Time_Finish = epElapsedTime();
         if (Time_Finish < Time_Start) Time_Finish += 24.0 * 3600.0;
         Elapsed_Time = Time_Finish - Time_Start;
         if (state.dataGlobal->createPerfLog) {
-            UtilityRoutines::appendPerfLog(state, "Run Time [seconds]", RoundSigDigits(Elapsed_Time, 2));
+            UtilityRoutines::appendPerfLog(state, "Run Time [seconds]", format("{:.2R}", Elapsed_Time));
         }
 #ifdef EP_Detailed_Timings
         epStopTime("EntireRun=");
@@ -1038,13 +1038,12 @@ namespace UtilityRoutines {
         // Calls AbortEnergyPlus
 
         using namespace DataErrorTracking;
-        using General::RoundSigDigits;
 
         ShowErrorMessage(state, " **  Fatal  ** " + ErrorMessage, OutUnit1, OutUnit2);
         DisplayString(state, "**FATAL:" + ErrorMessage);
 
         ShowErrorMessage(state, " ...Summary of Errors that led to program termination:", OutUnit1, OutUnit2);
-        ShowErrorMessage(state, " ..... Reference severe error count=" + RoundSigDigits(TotalSevereErrors), OutUnit1, OutUnit2);
+        ShowErrorMessage(state, format(" ..... Reference severe error count={}", TotalSevereErrors), OutUnit1, OutUnit2);
         ShowErrorMessage(state, " ..... Last severe error=" + LastSevereError, OutUnit1, OutUnit2);
         if (sqlite) {
             sqlite->createSQLiteErrorRecord(1, 2, ErrorMessage, 1);
@@ -1681,7 +1680,7 @@ namespace UtilityRoutines {
 
         // Using/Aliasing
         using namespace DataErrorTracking;
-        using General::RoundSigDigits;
+
         using General::strip_trailing_zeros;
 
         static std::string const StatMessageStart(" **   ~~~   ** ");
@@ -1713,9 +1712,9 @@ namespace UtilityRoutines {
 
                     ShowMessage(state, "");
                     ShowMessage(state, error.Message);
-                    ShowMessage(state, StatMessageStart + "  This error occurred " + RoundSigDigits(error.Count) + " total times;");
-                    ShowMessage(state, StatMessageStart + "  during Warmup " + RoundSigDigits(error.WarmupCount) + " times;");
-                    ShowMessage(state, StatMessageStart + "  during Sizing " + RoundSigDigits(error.SizingCount) + " times.");
+                    ShowMessage(state, format("{}  This error occurred {} total times;", StatMessageStart, error.Count));
+                    ShowMessage(state, format("{}  during Warmup {} times;", StatMessageStart, error.WarmupCount));
+                    ShowMessage(state, format("{}  during Sizing {} times.", StatMessageStart, error.SizingCount));
                     if (sqlite) {
                         if (warning) {
                             sqlite->createSQLiteErrorRecord(1, 0, error.Message.substr(15), error.Count);
@@ -1734,19 +1733,19 @@ namespace UtilityRoutines {
                 }
                 StatMessage = "";
                 if (error.ReportMax) {
-                    MaxOut = RoundSigDigits(error.MaxValue, 6);
+                    MaxOut = format("{:.6R}", error.MaxValue);
                     strip_trailing_zeros(MaxOut);
                     StatMessage += "  Max=" + MaxOut;
                     if (!error.MaxUnits.empty()) StatMessage += ' ' + error.MaxUnits;
                 }
                 if (error.ReportMin) {
-                    MinOut = RoundSigDigits(error.MinValue, 6);
+                    MinOut = format("{:.6R}", error.MinValue);
                     strip_trailing_zeros(MinOut);
                     StatMessage += "  Min=" + MinOut;
                     if (!error.MinUnits.empty()) StatMessage += ' ' + error.MinUnits;
                 }
                 if (error.ReportSum) {
-                    SumOut = RoundSigDigits(error.SumValue, 6);
+                    SumOut = format("{:.6R}", error.SumValue);
                     strip_trailing_zeros(SumOut);
                     StatMessage += "  Sum=" + SumOut;
                     if (!error.SumUnits.empty()) StatMessage += ' ' + error.SumUnits;

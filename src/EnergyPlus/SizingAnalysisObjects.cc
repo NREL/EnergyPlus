@@ -450,8 +450,7 @@ void PlantCoinicidentAnalysis::ResolveDesignFlowRate(EnergyPlusData& state, int 
     using DataSizing::LoopComponentSizingFactorMode;
     using DataSizing::NoSizingFactorMode;
     using DataSizing::PlantSizData;
-    using General::RoundSigDigits;
-    using General::TrimSigDigits;
+
     using namespace DataPlant;
     using namespace OutputReportPredefined;
     using DataHVACGlobals::SmallWaterVolFlow;
@@ -553,7 +552,7 @@ void PlantCoinicidentAnalysis::ResolveDesignFlowRate(EnergyPlusData& state, int 
                                              "{},Normalized Change {},Specific Heat{J/kg-K},Density {kg/m3}\n");
         eioHeaderDoneOnce = true;
     }
-    chIteration = TrimSigDigits(HVACSizingIterCount);
+    chIteration = fmt::to_string(HVACSizingIterCount);
     if (setNewSizes) {
         chSetSizes = "Yes";
     } else {
