@@ -122,7 +122,6 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/ThermalComfort.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-#include <EnergyPlus/VariableSpeedCoils.hh>
 #include <EnergyPlus/VentilatedSlab.hh>
 #include <EnergyPlus/WaterThermalTanks.hh>
 #include <EnergyPlus/WeatherManager.hh>
@@ -1946,7 +1945,7 @@ namespace OutputReportTabular {
         using DataStringGlobals::CharComma;
         using DataStringGlobals::CharSpace;
         using DataStringGlobals::CharTab;
-        using General::RoundSigDigits;
+
         using OutputProcessor::EndUseCategory;
         using OutputProcessor::MaxNumSubcategories;
         using OutputReportPredefined::numReportName;
@@ -2228,8 +2227,10 @@ namespace OutputReportTabular {
                     }
                 }
                 if (!nameFound) {
-                    ShowSevereError(state, CurrentModuleObject + " Field[" + RoundSigDigits(iReport) + "]=\"" + AlphArray(iReport) +
-                                    "\", invalid report name -- will not be reported.");
+                    ShowSevereError(
+                        state,
+                        format(
+                            "{} Field[{}]=\"{}\", invalid report name -- will not be reported.", CurrentModuleObject, iReport, AlphArray(iReport)));
                     //      ErrorsFound=.TRUE.
                 }
             }
@@ -2497,7 +2498,6 @@ namespace OutputReportTabular {
 
         // Using/Aliasing
         using namespace DataOutputs;
-        using General::RoundSigDigits;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2581,14 +2581,17 @@ namespace OutputReportTabular {
         namedMonthly(63).title = "HeatEmissionsReportMonthly";
 
         if (numNamedMonthly != NumMonthlyReports) {
-            ShowFatalError(state, "InitializePredefinedMonthlyTitles: Number of Monthly Reports in OutputReportTabular=[" + RoundSigDigits(numNamedMonthly) +
-                           "] does not match number in DataOutputs=[" + RoundSigDigits(NumMonthlyReports) + "].");
+            ShowFatalError(state,
+                           format("InitializePredefinedMonthlyTitles: Number of Monthly Reports in OutputReportTabular=[{}] does not match number in "
+                                  "DataOutputs=[{}].",
+                                  numNamedMonthly,
+                                  NumMonthlyReports));
         } else {
             for (xcount = 1; xcount <= numNamedMonthly; ++xcount) {
                 if (!UtilityRoutines::SameString(MonthlyNamedReports(xcount), namedMonthly(xcount).title)) {
                     ShowSevereError(state,
                         "InitializePredefinedMonthlyTitles: Monthly Report Titles in OutputReportTabular do not match titles in DataOutput.");
-                    ShowContinueError(state, "first mismatch at ORT [" + RoundSigDigits(numNamedMonthly) + "] =\"" + namedMonthly(xcount).title + "\".");
+                    ShowContinueError(state, format("first mismatch at ORT [{}] =\"{}\".", numNamedMonthly, namedMonthly(xcount).title));
                     ShowContinueError(state, "same location in DO =\"" + MonthlyNamedReports(xcount) + "\".");
                     ShowFatalError(state, "Preceding condition causes termination.");
                 }
@@ -6412,7 +6415,7 @@ namespace OutputReportTabular {
         using DataOutputs::iTotalAutoCalculatableFields;
         using DataOutputs::iTotalAutoSizableFields;
         using DataOutputs::iTotalFieldsWithDefaults;
-        using General::RoundSigDigits;
+
         using ScheduleManager::GetScheduleName;
         using ScheduleManager::ScheduleAverageHoursPerWeek;
 
@@ -7301,7 +7304,7 @@ namespace OutputReportTabular {
             tableBody(1, 1) = "less than";
             tableBody(1, 2) = RealToStr(curIntervalStart, numIntervalDigits);
             for (nCol = 1; nCol <= curIntervalCount; ++nCol) {
-                columnHead(nCol + 1) = std::to_string(nCol) + " [hr]";
+                columnHead(nCol + 1) = format("{} [hr]", nCol);
                 // beginning of interval
                 tableBody(nCol + 1, 1) = RealToStr(curIntervalStart + (nCol - 1) * curIntervalSize, numIntervalDigits) + "<=";
                 // end of interval
@@ -7581,26 +7584,29 @@ namespace OutputReportTabular {
             collapsedTotal(13) = gatherTotalsBEPS(7);                       // water
 
             if (state.dataGlobal->createPerfLog) {
-                UtilityRoutines::appendPerfLog(state, "Electricity ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(1), 3));
-                UtilityRoutines::appendPerfLog(state, "Natural Gas ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(2), 3));
-                UtilityRoutines::appendPerfLog(state, "Gasoline ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(3), 3));
-                UtilityRoutines::appendPerfLog(state, "Diesel ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(4), 3));
-                UtilityRoutines::appendPerfLog(state, "Coal ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(5), 3));
-                UtilityRoutines::appendPerfLog(state, "Fuel Oil No 1 ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(6), 3));
-                UtilityRoutines::appendPerfLog(state, "Fuel Oil No 2 ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(7), 3));
-                UtilityRoutines::appendPerfLog(state, "Propane ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(8), 3));
-                UtilityRoutines::appendPerfLog(state, "Other Fuel 1 ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(9), 3));
-                UtilityRoutines::appendPerfLog(state, "Other Fuel 2 ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(10), 3));
-                UtilityRoutines::appendPerfLog(state, "District Cooling ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(11), 3));
-                UtilityRoutines::appendPerfLog(state, "District Heating ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(12), 3));
-                UtilityRoutines::appendPerfLog(state, "Water ABUPS Total [m3]", General::RoundSigDigits(collapsedTotal(13), 3));
-                UtilityRoutines::appendPerfLog(state, "Values Gathered Over [hours]", General::RoundSigDigits(gatherElapsedTimeBEPS, 2));
-                UtilityRoutines::appendPerfLog(state, "Facility Any Zone Oscillating Temperatures Time [hours]",
-                                               General::RoundSigDigits(state.dataZoneTempPredictorCorrector->AnnualAnyZoneTempOscillate, 2));
-                UtilityRoutines::appendPerfLog(state, "Facility Any Zone Oscillating Temperatures During Occupancy Time [hours]",
-                                               General::RoundSigDigits(state.dataZoneTempPredictorCorrector->AnnualAnyZoneTempOscillateDuringOccupancy, 2));
-                UtilityRoutines::appendPerfLog(state, "Facility Any Zone Oscillating Temperatures in Deadband Time [hours]",
-                                               General::RoundSigDigits(state.dataZoneTempPredictorCorrector->AnnualAnyZoneTempOscillateInDeadband, 2));
+                UtilityRoutines::appendPerfLog(state, "Electricity ABUPS Total [J]", format("{:.3R}", collapsedTotal(1)));
+                UtilityRoutines::appendPerfLog(state, "Natural Gas ABUPS Total [J]", format("{:.3R}", collapsedTotal(2)));
+                UtilityRoutines::appendPerfLog(state, "Gasoline ABUPS Total [J]", format("{:.3R}", collapsedTotal(3)));
+                UtilityRoutines::appendPerfLog(state, "Diesel ABUPS Total [J]", format("{:.3R}", collapsedTotal(4)));
+                UtilityRoutines::appendPerfLog(state, "Coal ABUPS Total [J]", format("{:.3R}", collapsedTotal(5)));
+                UtilityRoutines::appendPerfLog(state, "Fuel Oil No 1 ABUPS Total [J]", format("{:.3R}", collapsedTotal(6)));
+                UtilityRoutines::appendPerfLog(state, "Fuel Oil No 2 ABUPS Total [J]", format("{:.3R}", collapsedTotal(7)));
+                UtilityRoutines::appendPerfLog(state, "Propane ABUPS Total [J]", format("{:.3R}", collapsedTotal(8)));
+                UtilityRoutines::appendPerfLog(state, "Other Fuel 1 ABUPS Total [J]", format("{:.3R}", collapsedTotal(9)));
+                UtilityRoutines::appendPerfLog(state, "Other Fuel 2 ABUPS Total [J]", format("{:.3R}", collapsedTotal(10)));
+                UtilityRoutines::appendPerfLog(state, "District Cooling ABUPS Total [J]", format("{:.3R}", collapsedTotal(11)));
+                UtilityRoutines::appendPerfLog(state, "District Heating ABUPS Total [J]", format("{:.3R}", collapsedTotal(12)));
+                UtilityRoutines::appendPerfLog(state, "Water ABUPS Total [m3]", format("{:.3R}", collapsedTotal(13)));
+                UtilityRoutines::appendPerfLog(state, "Values Gathered Over [hours]", format("{:.2R}", gatherElapsedTimeBEPS));
+                UtilityRoutines::appendPerfLog(state,
+                                               "Facility Any Zone Oscillating Temperatures Time [hours]",
+                                               format("{:.2R}", state.dataZoneTempPredictorCorrector->AnnualAnyZoneTempOscillate));
+                UtilityRoutines::appendPerfLog(state,
+                                               "Facility Any Zone Oscillating Temperatures During Occupancy Time [hours]",
+                                               format("{:.2R}", state.dataZoneTempPredictorCorrector->AnnualAnyZoneTempOscillateDuringOccupancy));
+                UtilityRoutines::appendPerfLog(state,
+                                               "Facility Any Zone Oscillating Temperatures in Deadband Time [hours]",
+                                               format("{:.2R}", state.dataZoneTempPredictorCorrector->AnnualAnyZoneTempOscillateInDeadband));
             }
             for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
                 for (kEndUseSub = 1; kEndUseSub <= EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
@@ -10189,7 +10195,7 @@ namespace OutputReportTabular {
         columnWidth = {7, 30, 16, 10, 16, 16}; // array assignment - for all columns
 
         for (item = 1; item <= state.dataCostEstimateManager->NumLineItems; ++item) {
-            tableBody(1, item) = std::to_string(state.dataCostEstimateManager->CostLineItem(item).LineNumber);
+            tableBody(1, item) = fmt::to_string(state.dataCostEstimateManager->CostLineItem(item).LineNumber);
             tableBody(2, item) = state.dataCostEstimateManager->CostLineItem(item).LineName;
             if (unitsStyle == unitsStyleInchPound) {
                 LookupSItoIP(state, state.dataCostEstimateManager->CostLineItem(item).Units, unitConvIndex, IPunitName);
@@ -10282,7 +10288,7 @@ namespace OutputReportTabular {
         using DataSurfaces::Surface;
         using DataSurfaces::SurfaceClass;
         using DataSurfaces::TotSurfaces;
-        using General::RoundSigDigits;
+
         using General::SafeDivide;
         using ScheduleManager::GetScheduleName;
         using ScheduleManager::ScheduleAverageHoursPerWeek;
@@ -10482,7 +10488,7 @@ namespace OutputReportTabular {
             tableBody(1, 8) = RealToStr(BuildingAzimuth, 2);           // north axis angle
             tableBody(1, 9) = RealToStr(BuildingRotationAppendixG, 2); // Rotation for Appendix G
             tableBody(1, 10) = RealToStr(gatherElapsedTimeBEPS, 2);    // hours simulated
-            //  tableBody(9,1) = TRIM(std::to_string(numTableEntry)) !number of table entries for predefined tables
+            //  tableBody(9,1) = TRIM(fmt::to_string(numTableEntry)) !number of table entries for predefined tables
 
             WriteSubtitle("General");
             WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
@@ -10865,8 +10871,10 @@ namespace OutputReportTabular {
                 if (pdiff > 0.019) {
                     ShowWarningError(state,
                         "WriteVeriSumTable: InputVerificationsAndResultsSummary: Wall area based on [>=60,<=120] degrees (tilt) as walls");
-                    ShowContinueError(state, "differs ~" + RoundSigDigits(pdiff * 100.0, 1) +
-                                      "% from user entered Wall class surfaces. Degree calculation based on ASHRAE 90.1 wall definitions.");
+                    ShowContinueError(
+                        state,
+                        format("differs ~{:.1R}% from user entered Wall class surfaces. Degree calculation based on ASHRAE 90.1 wall definitions.",
+                               pdiff * 100.0));
                     //      CALL ShowContinueError(state, 'Calculated based on degrees=['//  &
                     //         TRIM(ADJUSTL(RealToStr((wallAreaN + wallAreaS + wallAreaE + wallAreaW),3)))//  &
                     //         '] m2, Calculated from user entered Wall class surfaces=['//  &
@@ -12085,7 +12093,7 @@ namespace OutputReportTabular {
                                 ++rowNum;
                                 if (rowNum > countOfMatchingLines) break; // should never happen since same test as original could
                                 std::vector<std::string> dataFields = splitCommaString(bodyLine);
-                                rowHead(rowNum) = std::to_string(rowNum);
+                                rowHead(rowNum) = fmt::to_string(rowNum);
                                 for (int iCol = 1; iCol <= numCols && iCol < int(dataFields.size()); ++iCol) {
                                     if (unitsStyle == unitsStyleInchPound || unitsStyle == unitsStyleJtoKWH) {
                                         if (isNumber(dataFields[iCol]) && colUnitConv(iCol) > 0) { // if it is a number that has a conversion
@@ -13654,9 +13662,10 @@ namespace OutputReportTabular {
             if (isCooling) {
                 // Time of Peak Load
                 if ((size_t)desDaySelected <= state.dataWeatherManager->DesDayInput.size()) {
-                    compLoad.peakDateHrMin = General::TrimSigDigits(state.dataWeatherManager->DesDayInput(desDaySelected).Month) + "/" +
-                                             General::TrimSigDigits(state.dataWeatherManager->DesDayInput(desDaySelected).DayOfMonth) + " " +
-                                             coilSelectionReportObj->getTimeText(state, timeOfMax);
+                    compLoad.peakDateHrMin = format("{}/{} {}",
+                                                    state.dataWeatherManager->DesDayInput(desDaySelected).Month,
+                                                    state.dataWeatherManager->DesDayInput(desDaySelected).DayOfMonth,
+                                                    coilSelectionReportObj->getTimeText(state, timeOfMax));
                 } else {
                     compLoad.peakDateHrMin = CoolPeakDateHrMin(zoneIndex);
                 }
@@ -13707,9 +13716,10 @@ namespace OutputReportTabular {
             } else {
                 // Time of Peak Load
                 if ((size_t)desDaySelected <= state.dataWeatherManager->DesDayInput.size()) {
-                    compLoad.peakDateHrMin = General::TrimSigDigits(state.dataWeatherManager->DesDayInput(desDaySelected).Month) + "/" +
-                                             General::TrimSigDigits(state.dataWeatherManager->DesDayInput(desDaySelected).DayOfMonth) + " " +
-                                             coilSelectionReportObj->getTimeText(state, timeOfMax);
+                    compLoad.peakDateHrMin = format("{}/{} {}",
+                                                    state.dataWeatherManager->DesDayInput(desDaySelected).Month,
+                                                    state.dataWeatherManager->DesDayInput(desDaySelected).DayOfMonth,
+                                                    coilSelectionReportObj->getTimeText(state, timeOfMax));
                 } else {
                     compLoad.peakDateHrMin = HeatPeakDateHrMin(zoneIndex);
                 }
@@ -14365,7 +14375,7 @@ namespace OutputReportTabular {
 
                     columnHead(1) = "Zone Name";
                     for (int zi = 1; zi <= maxRow; ++zi) {
-                        rowHead(zi) = std::to_string(zi);
+                        rowHead(zi) = fmt::to_string(zi);
                         if (curCompLoad.zoneIndices(zi) > 0) {
                             tableBody(1, zi) = Zone(curCompLoad.zoneIndices(zi)).Name;
                         }

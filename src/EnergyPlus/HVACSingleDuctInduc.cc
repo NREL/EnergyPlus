@@ -56,11 +56,9 @@
 #include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
@@ -69,7 +67,6 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/HVACSingleDuctInduc.hh>
-#include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/MixerComponent.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -185,7 +182,6 @@ namespace HVACSingleDuctInduc {
 
         // Using/Aliasing
         using DataSizing::TermUnitIU;
-        using General::TrimSigDigits;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int IUNum; // index of terminal unit being simulated
@@ -206,13 +202,18 @@ namespace HVACSingleDuctInduc {
         } else {
             IUNum = CompIndex;
             if (IUNum > NumIndUnits || IUNum < 1) {
-                ShowFatalError(state, "SimIndUnit: Invalid CompIndex passed=" + TrimSigDigits(CompIndex) +
-                               ", Number of Induction Units=" + TrimSigDigits(NumIndUnits) + ", System name=" + CompName);
+                ShowFatalError(
+                    state,
+                    format(
+                        "SimIndUnit: Invalid CompIndex passed={}, Number of Induction Units={}, System name={}", CompIndex, NumIndUnits, CompName));
             }
             if (CheckEquipName(IUNum)) {
                 if (CompName != IndUnit(IUNum).Name) {
-                    ShowFatalError(state, "SimIndUnit: Invalid CompIndex passed=" + TrimSigDigits(CompIndex) + ", Induction Unit name=" + CompName +
-                                   ", stored Induction Unit for that index=" + IndUnit(IUNum).Name);
+                    ShowFatalError(state,
+                                   format("SimIndUnit: Invalid CompIndex passed={}, Induction Unit name={}, stored Induction Unit for that index={}",
+                                          CompIndex,
+                                          CompName,
+                                          IndUnit(IUNum).Name));
                 }
                 CheckEquipName(IUNum) = false;
             }
@@ -275,7 +276,6 @@ namespace HVACSingleDuctInduc {
         using DataDefineEquip::AirDistUnit;
         using DataDefineEquip::NumAirDistUnits;
         using WaterCoils::GetCoilWaterInletNode;
-        using namespace DataIPShortCuts;
         using DataPlant::TypeOf_CoilWaterCooling;
         using DataPlant::TypeOf_CoilWaterDetailedFlatCooling;
         using DataPlant::TypeOf_CoilWaterSimpleHeating;
@@ -764,7 +764,7 @@ namespace HVACSingleDuctInduc {
         using DataPlant::PlantLoop;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
-        using General::RoundSigDigits;
+
         using PlantUtilities::MyPlantSizingIndex;
         using WaterCoils::GetCoilWaterInletNode;
         using WaterCoils::GetCoilWaterOutletNode;
@@ -847,10 +847,9 @@ namespace HVACSingleDuctInduc {
                             if ((std::abs(MaxTotAirVolFlowDes - MaxTotAirVolFlowUser) / MaxTotAirVolFlowUser) > AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeHVACSingleDuctInduction: Potential issue with equipment sizing for " + IndUnit(IUNum).UnitType +
                                             " = \"" + IndUnit(IUNum).Name + "\".");
-                                ShowContinueError(state, "User-Specified Maximum Total Air Flow Rate of " + RoundSigDigits(MaxTotAirVolFlowUser, 5) +
-                                                  " [m3/s]");
-                                ShowContinueError(state, "differs from Design Size Maximum Total Air Flow Rate of " +
-                                                  RoundSigDigits(MaxTotAirVolFlowDes, 5) + " [m3/s]");
+                                ShowContinueError(state, format("User-Specified Maximum Total Air Flow Rate of {:.5R} [m3/s]", MaxTotAirVolFlowUser));
+                                ShowContinueError(
+                                    state, format("differs from Design Size Maximum Total Air Flow Rate of {:.5R} [m3/s]", MaxTotAirVolFlowDes));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }
@@ -947,10 +946,11 @@ namespace HVACSingleDuctInduc {
                                 if ((std::abs(MaxVolHotWaterFlowDes - MaxVolHotWaterFlowUser) / MaxVolHotWaterFlowUser) > AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeHVACSingleDuctInduction: Potential issue with equipment sizing for " + IndUnit(IUNum).UnitType +
                                                 " = \"" + IndUnit(IUNum).Name + "\".");
-                                    ShowContinueError(state, "User-Specified Maximum Hot Water Flow Rate of " + RoundSigDigits(MaxVolHotWaterFlowUser, 5) +
-                                                      " [m3/s]");
-                                    ShowContinueError(state, "differs from Design Size Maximum Hot Water Flow Rate of " +
-                                                      RoundSigDigits(MaxVolHotWaterFlowDes, 5) + " [m3/s]");
+                                    ShowContinueError(state,
+                                                      format("User-Specified Maximum Hot Water Flow Rate of {:.5R} [m3/s]", MaxVolHotWaterFlowUser));
+                                    ShowContinueError(
+                                        state,
+                                        format("differs from Design Size Maximum Hot Water Flow Rate of {:.5R} [m3/s]", MaxVolHotWaterFlowDes));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -1039,10 +1039,11 @@ namespace HVACSingleDuctInduc {
                                     AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeHVACSingleDuctInduction: Potential issue with equipment sizing for " + IndUnit(IUNum).UnitType +
                                                 " = \"" + IndUnit(IUNum).Name + "\".");
-                                    ShowContinueError(state, "User-Specified Maximum Cold Water Flow Rate of " + RoundSigDigits(MaxVolColdWaterFlowUser, 5) +
-                                                      " [m3/s]");
-                                    ShowContinueError(state, "differs from Design Size Maximum Cold Water Flow Rate of " +
-                                                      RoundSigDigits(MaxVolColdWaterFlowDes, 5) + " [m3/s]");
+                                    ShowContinueError(
+                                        state, format("User-Specified Maximum Cold Water Flow Rate of {:.5R} [m3/s]", MaxVolColdWaterFlowUser));
+                                    ShowContinueError(
+                                        state,
+                                        format("differs from Design Size Maximum Cold Water Flow Rate of {:.5R} [m3/s]", MaxVolColdWaterFlowDes));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -1108,7 +1109,7 @@ namespace HVACSingleDuctInduc {
         // Using/Aliasing
         using namespace DataZoneEnergyDemands;
         using DataPlant::PlantLoop;
-        using General::RoundSigDigits;
+
         using General::SolveRoot;
         using PlantUtilities::SetComponentFlowRate;
         using TempSolveRoot::SolveRoot;
@@ -1250,21 +1251,22 @@ namespace HVACSingleDuctInduc {
                             ShowWarningMessage(state, "SimFourPipeIndUnit: Hot water coil control failed for " + IndUnit(IUNum).UnitType + "=\"" +
                                                IndUnit(IUNum).Name + "\"");
                             ShowContinueErrorTimeStamp(state, "");
-                            ShowContinueError(state, "  Iteration limit [" + RoundSigDigits(SolveMaxIter) +
-                                              "] exceeded in calculating hot water mass flow rate");
+                            ShowContinueError(state, format("  Iteration limit [{}] exceeded in calculating hot water mass flow rate", SolveMaxIter));
                         }
-                        ShowRecurringWarningErrorAtEnd(state, "SimFourPipeIndUnit: Hot water coil control failed (iteration limit [" +
-                                                           RoundSigDigits(SolveMaxIter) + "]) for " + IndUnit(IUNum).UnitType + "=\"" +
-                                                           IndUnit(IUNum).Name + "\"",
-                                                       IndUnit(IUNum).HWCoilFailNum1);
+                        ShowRecurringWarningErrorAtEnd(state,
+                            format("SimFourPipeIndUnit: Hot water coil control failed (iteration limit [{}]) for {}=\"{}\"",
+                                   SolveMaxIter,
+                                   IndUnit(IUNum).UnitType,
+                                   IndUnit(IUNum).Name),
+                            IndUnit(IUNum).HWCoilFailNum1);
                     } else if (SolFlag == -2) {
                         if (IndUnit(IUNum).HWCoilFailNum2 == 0) {
                             ShowWarningMessage(state, "SimFourPipeIndUnit: Hot water coil control failed (maximum flow limits) for " +
                                                IndUnit(IUNum).UnitType + "=\"" + IndUnit(IUNum).Name + "\"");
                             ShowContinueErrorTimeStamp(state, "");
                             ShowContinueError(state, "...Bad hot water maximum flow rate limits");
-                            ShowContinueError(state, "...Given minimum water flow rate=" + RoundSigDigits(MinHotWaterFlow, 3) + " kg/s");
-                            ShowContinueError(state, "...Given maximum water flow rate=" + RoundSigDigits(MaxHotWaterFlow, 3) + " kg/s");
+                            ShowContinueError(state, format("...Given minimum water flow rate={:.3R} kg/s", MinHotWaterFlow));
+                            ShowContinueError(state, format("...Given maximum water flow rate={:.3R} kg/s", MaxHotWaterFlow));
                         }
                         ShowRecurringWarningErrorAtEnd(state, "SimFourPipeIndUnit: Hot water coil control failed (flow limits) for " +
                                                            IndUnit(IUNum).UnitType + "=\"" + IndUnit(IUNum).Name + "\"",
@@ -1299,12 +1301,13 @@ namespace HVACSingleDuctInduc {
                             ShowWarningMessage(state, "SimFourPipeIndUnit: Cold water coil control failed for " + IndUnit(IUNum).UnitType + "=\"" +
                                                IndUnit(IUNum).Name + "\"");
                             ShowContinueErrorTimeStamp(state, "");
-                            ShowContinueError(state, "  Iteration limit [" + RoundSigDigits(SolveMaxIter) +
-                                              "] exceeded in calculating cold water mass flow rate");
+                            ShowContinueError(state,
+                                              format("  Iteration limit [{}] exceeded in calculating cold water mass flow rate", SolveMaxIter));
                         }
-                        ShowRecurringWarningErrorAtEnd(state, "SimFourPipeIndUnit: Cold water coil control failed (iteration limit [" +
-                                                           RoundSigDigits(SolveMaxIter) + "]) for " + IndUnit(IUNum).UnitType + "=\"" +
-                                                           IndUnit(IUNum).Name,
+                        ShowRecurringWarningErrorAtEnd(state, format("SimFourPipeIndUnit: Cold water coil control failed (iteration limit [{}]) for {}=\"{}",
+                                                                     SolveMaxIter,
+                                                                     IndUnit(IUNum).UnitType,
+                                                                     IndUnit(IUNum).Name),
                                                        IndUnit(IUNum).CWCoilFailNum1);
                     } else if (SolFlag == -2) {
                         if (IndUnit(IUNum).CWCoilFailNum2 == 0) {
@@ -1312,8 +1315,8 @@ namespace HVACSingleDuctInduc {
                                                IndUnit(IUNum).UnitType + "=\"" + IndUnit(IUNum).Name + "\"");
                             ShowContinueErrorTimeStamp(state, "");
                             ShowContinueError(state, "...Bad cold water maximum flow rate limits");
-                            ShowContinueError(state, "...Given minimum water flow rate=" + RoundSigDigits(MinColdWaterFlow, 3) + " kg/s");
-                            ShowContinueError(state, "...Given maximum water flow rate=" + RoundSigDigits(MaxColdWaterFlow, 3) + " kg/s");
+                            ShowContinueError(state, format("...Given minimum water flow rate={:.3R} kg/s", MinColdWaterFlow));
+                            ShowContinueError(state, format("...Given maximum water flow rate={:.3R} kg/s", MaxColdWaterFlow));
                         }
                         ShowRecurringWarningErrorAtEnd(state, "SimFourPipeIndUnit: Cold water coil control failed (flow limits) for " +
                                                            IndUnit(IUNum).UnitType + "=\"" + IndUnit(IUNum).Name + "\"",
