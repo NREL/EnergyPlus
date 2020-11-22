@@ -123,7 +123,6 @@ namespace EnergyPlus::DataSurfaceLists {
         // Using/Aliasing
         using namespace DataSurfaces;
         using DataHeatBalance::Zone;
-        using General::RoundSigDigits;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         constexpr auto CurrentModuleObject1("ZoneHVAC:LowTemperatureRadiant:SurfaceGroup");
@@ -237,8 +236,10 @@ namespace EnergyPlus::DataSurfaceLists {
                     if (SurfList(Item).SurfFlowFrac(SurfNum) < SurfListMinFlowFrac) {
                         ShowSevereError(state, "The Flow Fraction for Surface " + SurfList(Item).SurfName(SurfNum) + " in Surface Group " +
                                         SurfList(Item).Name + " is too low");
-                        ShowContinueError(state, "Flow fraction of " + RoundSigDigits(SurfList(Item).SurfFlowFrac(SurfNum), 6) +
-                                          " is less than minimum criteria = " + RoundSigDigits(SurfListMinFlowFrac, 6));
+                        ShowContinueError(state,
+                                          format("Flow fraction of {:.6R} is less than minimum criteria = {:.6R}",
+                                                 SurfList(Item).SurfFlowFrac(SurfNum),
+                                                 SurfListMinFlowFrac));
                         ShowContinueError(state, "Zero or extremely low flow fractions are not allowed. Remove this surface from the surface group or "
                                           "combine small surfaces together.");
                         ErrorsFound = true;

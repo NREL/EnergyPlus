@@ -140,7 +140,7 @@ namespace GeneratorFuelSupply {
         using DataLoopNode::NodeConnectionType_Sensor;
         using DataLoopNode::NodeType_Air;
         using DataLoopNode::ObjectIsNotParent;
-        using General::RoundSigDigits;
+
         using NodeInputManager::GetOnlySingleNode;
         using ScheduleManager::GetScheduleIndex;
 
@@ -243,7 +243,7 @@ namespace GeneratorFuelSupply {
                     // check for molar fractions summing to 1.0.
                     if (std::abs(sum(FuelSupply(FuelSupNum).ConstitMolalFract) - 1.0) > 0.0001) {
                         ShowSevereError(state, cCurrentModuleObject + " molar fractions do not sum to 1.0");
-                        ShowContinueError(state, "Sum was=" + RoundSigDigits(sum(FuelSupply(FuelSupNum).ConstitMolalFract), 5));
+                        ShowContinueError(state, format("Sum was={:.5R}", sum(FuelSupply(FuelSupNum).ConstitMolalFract)));
                         ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + AlphArray(1));
                         ErrorsFound = true;
                     }

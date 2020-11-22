@@ -4144,8 +4144,7 @@ namespace OutputProcessor {
             break;
         default:
             if (sqlite) {
-                std::string str("Illegal reportingInterval passed to WriteTimeStampFormatData: " +
-                                fmt::to_string(static_cast<int>(reportingInterval)));
+                std::string str(format("Illegal reportingInterval passed to WriteTimeStampFormatData: {}", static_cast<int>(reportingInterval)));
                 sqlite->sqliteWriteMessage(str);
             }
             break;
@@ -5459,7 +5458,6 @@ void SetupOutputVariable(EnergyPlusData &state,
 
     // Using/Aliasing
     using namespace OutputProcessor;
-    using General::TrimSigDigits;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int CV;
@@ -5701,7 +5699,6 @@ void SetupOutputVariable(EnergyPlusData &state,
 
     // Using/Aliasing
     using namespace OutputProcessor;
-    using General::TrimSigDigits;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int CV;
@@ -6986,7 +6983,6 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
 
     // Using/Aliasing
     using namespace OutputProcessor;
-    using General::TrimSigDigits;
 
     // Locals
     // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -7050,7 +7046,7 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
                                          EnergyMeters(WhichMeter).TSAccRptNum,
                                          indexGroupKey,
                                          indexGroup,
-                                         TrimSigDigits(EnergyMeters(WhichMeter).TSAccRptNum),
+                                         fmt::to_string(EnergyMeters(WhichMeter).TSAccRptNum),
                                          EnergyMeters(WhichMeter).Name,
                                          EnergyMeters(WhichMeter).Units,
                                          true,
@@ -7104,7 +7100,7 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
                                          EnergyMeters(WhichMeter).HRAccRptNum,
                                          indexGroupKey,
                                          indexGroup,
-                                         TrimSigDigits(EnergyMeters(WhichMeter).HRAccRptNum),
+                                         fmt::to_string(EnergyMeters(WhichMeter).HRAccRptNum),
                                          EnergyMeters(WhichMeter).Name,
                                          EnergyMeters(WhichMeter).Units,
                                          true,
@@ -7158,7 +7154,7 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
                                          EnergyMeters(WhichMeter).DYAccRptNum,
                                          indexGroupKey,
                                          indexGroup,
-                                         TrimSigDigits(EnergyMeters(WhichMeter).DYAccRptNum),
+                                         fmt::to_string(EnergyMeters(WhichMeter).DYAccRptNum),
                                          EnergyMeters(WhichMeter).Name,
                                          EnergyMeters(WhichMeter).Units,
                                          true,
@@ -7212,7 +7208,7 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
                                          EnergyMeters(WhichMeter).MNAccRptNum,
                                          indexGroupKey,
                                          indexGroup,
-                                         TrimSigDigits(EnergyMeters(WhichMeter).MNAccRptNum),
+                                         fmt::to_string(EnergyMeters(WhichMeter).MNAccRptNum),
                                          EnergyMeters(WhichMeter).Name,
                                          EnergyMeters(WhichMeter).Units,
                                          true,
@@ -7266,7 +7262,7 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
                                          EnergyMeters(WhichMeter).YRAccRptNum,
                                          indexGroupKey,
                                          indexGroup,
-                                         TrimSigDigits(EnergyMeters(WhichMeter).YRAccRptNum),
+                                         fmt::to_string(EnergyMeters(WhichMeter).YRAccRptNum),
                                          EnergyMeters(WhichMeter).Name,
                                          EnergyMeters(WhichMeter).Units,
                                          true,
@@ -7320,7 +7316,7 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
                                          EnergyMeters(WhichMeter).SMAccRptNum,
                                          indexGroupKey,
                                          indexGroup,
-                                         TrimSigDigits(EnergyMeters(WhichMeter).SMAccRptNum),
+                                         fmt::to_string(EnergyMeters(WhichMeter).SMAccRptNum),
                                          EnergyMeters(WhichMeter).Name,
                                          EnergyMeters(WhichMeter).Units,
                                          true,
@@ -7712,11 +7708,10 @@ Real64 GetInternalVariableValue(EnergyPlusData &state,
     } else if (varType == 1) { // Integer
         if (keyVarIndex > NumOfIVariable) {
             ShowFatalError(state, "GetInternalVariableValue: Integer variable passed index beyond range of array.");
-            ShowContinueError(state, "Index = " + General::TrimSigDigits(keyVarIndex) +
-                              " Number of integer variables = " + General::TrimSigDigits(NumOfIVariable));
+            ShowContinueError(state, format("Index = {} Number of integer variables = {}", keyVarIndex, NumOfIVariable));
         }
         if (keyVarIndex < 1) {
-            ShowFatalError(state, "GetInternalVariableValue: Integer variable passed index <1. Index = " + General::TrimSigDigits(keyVarIndex));
+            ShowFatalError(state, format("GetInternalVariableValue: Integer variable passed index <1. Index = {}", keyVarIndex));
         }
 
         // must use %Which, %Value is always zero if variable is not a requested report variable
@@ -7724,11 +7719,10 @@ Real64 GetInternalVariableValue(EnergyPlusData &state,
     } else if (varType == 2) { // real
         if (keyVarIndex > NumOfRVariable) {
             ShowFatalError(state, "GetInternalVariableValue: Real variable passed index beyond range of array.");
-            ShowContinueError(state, "Index = " + General::TrimSigDigits(keyVarIndex) +
-                              " Number of real variables = " + General::TrimSigDigits(NumOfRVariable));
+            ShowContinueError(state, format("Index = {} Number of real variables = {}", keyVarIndex, NumOfRVariable));
         }
         if (keyVarIndex < 1) {
-            ShowFatalError(state, "GetInternalVariableValue: Integer variable passed index <1. Index = " + General::TrimSigDigits(keyVarIndex));
+            ShowFatalError(state, format("GetInternalVariableValue: Integer variable passed index <1. Index = {}", keyVarIndex));
         }
 
         // must use %Which, %Value is always zero if variable is not a requested report variable

@@ -349,7 +349,7 @@ namespace RoomAirModelUserTempPattern {
 
             if (CurPatrnID == 0) {
                 // throw error here ? way to test schedules before getting to this point?
-                ShowFatalError(state, "User defined room air pattern index not found: " + std::to_string(CurntPatternKey));
+                ShowFatalError(state, format("User defined room air pattern index not found: {}", CurntPatternKey));
                 return;
             }
 
@@ -833,7 +833,6 @@ namespace RoomAirModelUserTempPattern {
         using DataHeatBalance::Zone;
         using DataSurfaces::Surface;
         using DataVectorTypes::Vector;
-        using General::RoundSigDigits;
 
         // Return value
         Real64 FigureNDheightInZone;
@@ -914,8 +913,8 @@ namespace RoomAirModelUserTempPattern {
             if (state.dataGlobal->DisplayExtraWarnings) {
                 ShowWarningError(state, "RoomAirModelUserTempPattern: Problem in non-dimensional height calculation");
                 ShowContinueError(state, "too low surface: " + Surface(thisHBsurf).Name + " in zone: " + Zone(thisZone).Name);
-                ShowContinueError(state, "**** Average floor height of zone is: " + RoundSigDigits(ZoneZorig, 3));
-                ShowContinueError(state, "**** Surface minimum height is: " + RoundSigDigits(SurfMinZ, 3));
+                ShowContinueError(state, format("**** Average floor height of zone is: {:.3R}", ZoneZorig));
+                ShowContinueError(state, format("**** Surface minimum height is: {:.3R}", SurfMinZ));
             } else {
                 ++TotalRoomAirPatternTooLow;
             }
@@ -925,8 +924,8 @@ namespace RoomAirModelUserTempPattern {
             if (state.dataGlobal->DisplayExtraWarnings) {
                 ShowWarningError(state, "RoomAirModelUserTempPattern: Problem in non-dimensional height calculation");
                 ShowContinueError(state, " too high surface: " + Surface(thisHBsurf).Name + " in zone: " + Zone(thisZone).Name);
-                ShowContinueError(state, "**** Average Ceiling height of zone is: " + RoundSigDigits((ZoneZorig + ZoneCeilHeight), 3));
-                ShowContinueError(state, "**** Surface Maximum height is: " + RoundSigDigits(SurfMaxZ, 3));
+                ShowContinueError(state, format("**** Average Ceiling height of zone is: {:.3R}", (ZoneZorig + ZoneCeilHeight)));
+                ShowContinueError(state, format("**** Surface Maximum height is: {:.3R}", SurfMaxZ));
             } else {
                 ++TotalRoomAirPatternTooHigh;
             }
