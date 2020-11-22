@@ -194,7 +194,6 @@ namespace PackagedThermalStorageCoil {
         // <description>
 
         // Using/Aliasing
-        using General::TrimSigDigits;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int TESCoilNum;
@@ -213,13 +212,19 @@ namespace PackagedThermalStorageCoil {
         } else {
             TESCoilNum = CompIndex;
             if (TESCoilNum > NumTESCoils || TESCoilNum < 1) {
-                ShowFatalError(state, "SimTESCoil: Invalid CompIndex passed=" + TrimSigDigits(TESCoilNum) +
-                               ", Number of Thermal Energy Storage Cooling Coil Coils=" + TrimSigDigits(NumTESCoils) + ", Coil name=" + CompName);
+                ShowFatalError(state,
+                               format("SimTESCoil: Invalid CompIndex passed={}, Number of Thermal Energy Storage Cooling Coil Coils={}, Coil name={}",
+                                      TESCoilNum,
+                                      NumTESCoils,
+                                      CompName));
             }
             if (CheckEquipName(TESCoilNum)) {
                 if (!CompName.empty() && CompName != TESCoil(TESCoilNum).Name) {
-                    ShowFatalError(state, "SimTESCoil: Invalid CompIndex passed=" + TrimSigDigits(TESCoilNum) + ", Coil name=" + CompName +
-                                   ", stored Coil Name for that index=" + TESCoil(TESCoilNum).Name);
+                    ShowFatalError(state,
+                                   format("SimTESCoil: Invalid CompIndex passed={}, Coil name={}, stored Coil Name for that index={}",
+                                          TESCoilNum,
+                                          CompName,
+                                          TESCoil(TESCoilNum).Name));
                 }
                 CheckEquipName(TESCoilNum) = false;
             }
@@ -1840,7 +1845,7 @@ namespace PackagedThermalStorageCoil {
         // Using/Aliasing
         using DataPlant::PlantLoop;
         using DataPlant::TypeOf_PackagedTESCoolingCoil;
-        using General::RoundSigDigits;
+
         using PlantUtilities::ScanPlantLoopsForObject;
         using ScheduleManager::GetCurrentScheduleValue;
 
@@ -1987,7 +1992,7 @@ namespace PackagedThermalStorageCoil {
                         if (TESCoil(TESCoilNum).ControlModeErrorIndex == 0) {
                             ShowSevereMessage(state, "InitTESCoil: Invalid control schedule value for operating mode");
                             ShowContinueError(state, "Occurs for Coil:Cooling:DX:SingleSpeed:ThermalStorage name = " + TESCoil(TESCoilNum).Name);
-                            ShowContinueError(state, "Value returned from schedule =" + RoundSigDigits(tmpSchedValue, 8));
+                            ShowContinueError(state, format("Value returned from schedule ={:.8R}", tmpSchedValue));
                             ShowContinueError(state, "Operating mode will be set to Off, and the simulation continues");
                         }
                         ShowRecurringSevereErrorAtEnd(state, "InitTESCoil: Invalid control schedule value for TES operating mode, set to Off",
@@ -2050,7 +2055,7 @@ namespace PackagedThermalStorageCoil {
                             if (TESCoil(TESCoilNum).ControlModeErrorIndex == 0) {
                                 ShowSevereMessage(state, "InitTESCoil: Invalid control value for operating mode");
                                 ShowContinueError(state, "Occurs for Coil:Cooling:DX:SingleSpeed:ThermalStorage name = " + TESCoil(TESCoilNum).Name);
-                                ShowContinueError(state, "Value returned from EMS =" + RoundSigDigits(TESCoil(TESCoilNum).EMSControlModeValue, 8));
+                                ShowContinueError(state, format("Value returned from EMS ={:.8R}", TESCoil(TESCoilNum).EMSControlModeValue));
                                 ShowContinueError(state, "Operating mode will be set to Off, and the simulation continues");
                             }
                             ShowRecurringSevereErrorAtEnd(state, "InitTESCoil: Invalid control schedule value for TES operating mode, set to Off",
@@ -4116,7 +4121,7 @@ namespace PackagedThermalStorageCoil {
         // na
 
         // Using/Aliasing
-        using General::RoundSigDigits;
+
         using General::SolveRoot;
         using TempSolveRoot::SolveRoot;
 
@@ -4197,8 +4202,8 @@ namespace PackagedThermalStorageCoil {
                                 ++SensPLRIter;
                                 ShowWarningError(state, SystemType +
                                                  " - Iteration limit exceeded calculating DX unit sensible part-load ratio for unit = " + CoilName);
-                                ShowContinueError(state, "Estimated part-load ratio  = " + RoundSigDigits((ReqOutput / FullOutput), 3));
-                                ShowContinueError(state, "Calculated part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
+                                ShowContinueError(state, format("Estimated part-load ratio  = {:.3R}", ReqOutput / FullOutput));
+                                ShowContinueError(state, format("Calculated part-load ratio = {:.3R}", PartLoadFrac));
                                 ShowContinueErrorTimeStamp(state,
                                     "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
                             }
@@ -4218,7 +4223,7 @@ namespace PackagedThermalStorageCoil {
                                     SystemType +
                                     " - DX unit sensible part-load ratio calculation failed: part-load ratio limits exceeded, for unit = " +
                                     CoilName);
-                                ShowContinueError(state, "Estimated part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
+                                ShowContinueError(state, format("Estimated part-load ratio = {:.3R}", PartLoadFrac));
                                 ShowContinueErrorTimeStamp(state,
                                     "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
                             }
@@ -4264,8 +4269,8 @@ namespace PackagedThermalStorageCoil {
                                     ++LatPLRIter;
                                     ShowWarningError(state, SystemType +
                                                      " - Iteration limit exceeded calculating DX unit latent part-load ratio for unit = " + CoilName);
-                                    ShowContinueError(state, "Estimated part-load ratio   = " + RoundSigDigits((ReqOutput / FullOutput), 3));
-                                    ShowContinueError(state, "Calculated part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
+                                    ShowContinueError(state, format("Estimated part-load ratio   = {:.3R}", ReqOutput / FullOutput));
+                                    ShowContinueError(state, format("Calculated part-load ratio = {:.3R}", PartLoadFrac));
                                     ShowContinueErrorTimeStamp(state,
                                         "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
                                 }
@@ -4290,7 +4295,7 @@ namespace PackagedThermalStorageCoil {
                                         SystemType +
                                         " - DX unit latent part-load ratio calculation failed: part-load ratio limits exceeded, for unit = " +
                                         CoilName);
-                                    ShowContinueError(state, "Estimated part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
+                                    ShowContinueError(state, format("Estimated part-load ratio = {:.3R}", PartLoadFrac));
                                     ShowContinueErrorTimeStamp(state,
                                         "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
                                 }

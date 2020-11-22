@@ -182,8 +182,7 @@ namespace ZoneContaminantPredictorCorrector {
         using DataSurfaces::ExternalEnvironment;
         using DataSurfaces::Surface;
         using General::FindNumberInList;
-        using General::RoundSigDigits;
-        using General::TrimSigDigits;
+
         using ScheduleManager::CheckScheduleValue;
         using ScheduleManager::CheckScheduleValueMinMax;
         using ScheduleManager::GetScheduleIndex;
@@ -292,15 +291,13 @@ namespace ZoneContaminantPredictorCorrector {
                     if (SchMin < 0.0) {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
                                         ", minimum is < 0.0");
-                        ShowContinueError(state, "Schedule=\"" + AlphaName(3) + "\". Minimum is [" + RoundSigDigits(SchMin, 1) +
-                                          "]. Values must be >= 0.0.");
+                        ShowContinueError(state, format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
                         ErrorsFound = true;
                     }
                     if (SchMax < 0.0) {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
                                         ", maximum is < 0.0");
-                        ShowContinueError(state, "Schedule=\"" + AlphaName(3) + "\". Maximum is [" + RoundSigDigits(SchMax, 1) +
-                                          "]. Values must be >= 0.0.");
+                        ShowContinueError(state, format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
                         ErrorsFound = true;
                     }
                 }
@@ -325,15 +322,13 @@ namespace ZoneContaminantPredictorCorrector {
                     if (SchMin < 0.0) {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(4) +
                                         ", minimum is < 0.0");
-                        ShowContinueError(state, "Schedule=\"" + AlphaName(4) + "\". Minimum is [" + RoundSigDigits(SchMin, 1) +
-                                          "]. Values must be >= 0.0.");
+                        ShowContinueError(state, format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(4), SchMin));
                         ErrorsFound = true;
                     }
                     if (SchMax < 0.0) {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(4) +
                                         ", maximum is < 0.0");
-                        ShowContinueError(state, "Schedule=\"" + AlphaName(4) + "\". Maximum is [" + RoundSigDigits(SchMax, 1) +
-                                          "]. Values must be >= 0.0.");
+                        ShowContinueError(state, format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(4), SchMax));
                         ErrorsFound = true;
                     }
                 }
@@ -428,15 +423,13 @@ namespace ZoneContaminantPredictorCorrector {
                     if (SchMin < 0.0) {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
                                         ", minimum is < 0.0");
-                        ShowContinueError(state, "Schedule=\"" + AlphaName(3) + "\". Minimum is [" + RoundSigDigits(SchMin, 1) +
-                                          "]. Values must be >= 0.0.");
+                        ShowContinueError(state, format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
                         ErrorsFound = true;
                     }
                     if (SchMax < 0.0) {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
                                         ", maximum is < 0.0");
-                        ShowContinueError(state, "Schedule=\"" + AlphaName(3) + "\". Maximum is [" + RoundSigDigits(SchMax, 1) +
-                                          "]. Values must be >= 0.0.");
+                        ShowContinueError(state, format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
                         ErrorsFound = true;
                     }
                 }
@@ -446,7 +439,7 @@ namespace ZoneContaminantPredictorCorrector {
             if (IHGNumbers(1) < 0.0) {
                 ShowSevereError(state, RoutineName + "Negative values are not allowed for " + cNumericFieldNames(1) + " in " + CurrentModuleObject + " = " +
                                 AlphaName(1));
-                ShowContinueError(state, "The input value is " + RoundSigDigits(IHGNumbers(1), 2));
+                ShowContinueError(state, format("The input value is {:.2R}", IHGNumbers(1)));
                 ErrorsFound = true;
             }
 
@@ -454,13 +447,13 @@ namespace ZoneContaminantPredictorCorrector {
             if (IHGNumbers(2) <= 0.0) {
                 ShowSevereError(state, RoutineName + "Negative or zero value is not allowed for " + cNumericFieldNames(2) + " in " + CurrentModuleObject +
                                 " = " + AlphaName(1));
-                ShowContinueError(state, "The input value is " + RoundSigDigits(IHGNumbers(2), 2));
+                ShowContinueError(state, format("The input value is {:.2R}", IHGNumbers(2)));
                 ErrorsFound = true;
             }
             if (IHGNumbers(2) > 1.0) {
                 ShowSevereError(state, RoutineName + "The value greater than 1.0 is not allowed for " + cNumericFieldNames(2) + " in " +
                                 CurrentModuleObject + " = " + AlphaName(1));
-                ShowContinueError(state, "The input value is " + RoundSigDigits(IHGNumbers(2), 2));
+                ShowContinueError(state, format("The input value is {:.2R}", IHGNumbers(2)));
                 ErrorsFound = true;
             }
 
@@ -547,15 +540,13 @@ namespace ZoneContaminantPredictorCorrector {
                     if (SchMin < 0.0) {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
                                         ", minimum is < 0.0");
-                        ShowContinueError(state, "Schedule=\"" + AlphaName(3) + "\". Minimum is [" + RoundSigDigits(SchMin, 1) +
-                                          "]. Values must be >= 0.0.");
+                        ShowContinueError(state, format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
                         ErrorsFound = true;
                     }
                     if (SchMax < 0.0) {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
                                         ", maximum is < 0.0");
-                        ShowContinueError(state, "Schedule=\"" + AlphaName(3) + "\". Maximum is [" + RoundSigDigits(SchMax, 1) +
-                                          "]. Values must be >= 0.0.");
+                        ShowContinueError(state, format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
                         ErrorsFound = true;
                     }
                 }
@@ -567,13 +558,13 @@ namespace ZoneContaminantPredictorCorrector {
             if (IHGNumbers(1) < 0.0) {
                 ShowSevereError(state, RoutineName + "Negative values are not allowed for " + cNumericFieldNames(1) + " in " + CurrentModuleObject + " = " +
                                 AlphaName(1));
-                ShowContinueError(state, "The input value is " + RoundSigDigits(IHGNumbers(1), 2));
+                ShowContinueError(state, format("The input value is {:.2R}", IHGNumbers(1)));
                 ErrorsFound = true;
             }
             if (IHGNumbers(2) <= 0.0) {
                 ShowSevereError(state, RoutineName + "Negative values or zero are not allowed for " + cNumericFieldNames(2) + " in " + CurrentModuleObject +
                                 " = " + AlphaName(1));
-                ShowContinueError(state, "The input value is " + RoundSigDigits(IHGNumbers(2), 2));
+                ShowContinueError(state, format("The input value is {:.2R}", IHGNumbers(2)));
                 ErrorsFound = true;
             }
 
@@ -655,15 +646,13 @@ namespace ZoneContaminantPredictorCorrector {
                     if (SchMin < 0.0) {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
                                         ", minimum is < 0.0");
-                        ShowContinueError(state, "Schedule=\"" + AlphaName(3) + "\". Minimum is [" + RoundSigDigits(SchMin, 1) +
-                                          "]. Values must be >= 0.0.");
+                        ShowContinueError(state, format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
                         ErrorsFound = true;
                     }
                     if (SchMax < 0.0) {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
                                         ", maximum is < 0.0");
-                        ShowContinueError(state, "Schedule=\"" + AlphaName(3) + "\". Maximum is [" + RoundSigDigits(SchMax, 1) +
-                                          "]. Values must be >= 0.0.");
+                        ShowContinueError(state, format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
                         ErrorsFound = true;
                     }
                 }
@@ -675,13 +664,13 @@ namespace ZoneContaminantPredictorCorrector {
             if (IHGNumbers(1) < 0.0) {
                 ShowSevereError(state, RoutineName + "Negative values are not allowed for " + cNumericFieldNames(1) + " in " + CurrentModuleObject + " = " +
                                 AlphaName(1));
-                ShowContinueError(state, "The input value is " + RoundSigDigits(IHGNumbers(1), 2));
+                ShowContinueError(state, format("The input value is {:.2R}", IHGNumbers(1)));
                 ErrorsFound = true;
             }
             if (IHGNumbers(2) <= 0.0) {
                 ShowSevereError(state, RoutineName + "Negative values or zero are not allowed for " + cNumericFieldNames(2) + " in " + CurrentModuleObject +
                                 " = " + AlphaName(1));
-                ShowContinueError(state, "The input value is " + RoundSigDigits(IHGNumbers(2), 2));
+                ShowContinueError(state, format("The input value is {:.2R}", IHGNumbers(2)));
                 ErrorsFound = true;
             }
 
@@ -769,15 +758,13 @@ namespace ZoneContaminantPredictorCorrector {
                     if (SchMin < 0.0) {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
                                         ", minimum is < 0.0");
-                        ShowContinueError(state, "Schedule=\"" + AlphaName(3) + "\". Minimum is [" + RoundSigDigits(SchMin, 1) +
-                                          "]. Values must be >= 0.0.");
+                        ShowContinueError(state, format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
                         ErrorsFound = true;
                     }
                     if (SchMax < 0.0) {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
                                         ", maximum is < 0.0");
-                        ShowContinueError(state, "Schedule=\"" + AlphaName(3) + "\". Maximum is [" + RoundSigDigits(SchMax, 1) +
-                                          "]. Values must be >= 0.0.");
+                        ShowContinueError(state, format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
                         ErrorsFound = true;
                     }
                 }
@@ -788,13 +775,13 @@ namespace ZoneContaminantPredictorCorrector {
             if (IHGNumbers(1) < 0.0) {
                 ShowSevereError(state, RoutineName + "Negative values are not allowed for " + cNumericFieldNames(1) + " in " + CurrentModuleObject + " = " +
                                 AlphaName(1));
-                ShowContinueError(state, "The input value is " + RoundSigDigits(IHGNumbers(1), 2));
+                ShowContinueError(state, format("The input value is {:.2R}", IHGNumbers(1)));
                 ErrorsFound = true;
             }
             if (IHGNumbers(2) <= 0.0) {
                 ShowSevereError(state, RoutineName + "Negative values or zero are not allowed for " + cNumericFieldNames(2) + " in " + CurrentModuleObject +
                                 " = " + AlphaName(1));
-                ShowContinueError(state, "The input value is " + RoundSigDigits(IHGNumbers(2), 2));
+                ShowContinueError(state, format("The input value is {:.2R}", IHGNumbers(2)));
                 ErrorsFound = true;
             }
 
@@ -884,15 +871,13 @@ namespace ZoneContaminantPredictorCorrector {
                     if (SchMin < 0.0) {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
                                         ", minimum is < 0.0");
-                        ShowContinueError(state, "Schedule=\"" + AlphaName(3) + "\". Minimum is [" + RoundSigDigits(SchMin, 1) +
-                                          "]. Values must be >= 0.0.");
+                        ShowContinueError(state, format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
                         ErrorsFound = true;
                     }
                     if (SchMax < 0.0) {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
                                         ", maximum is < 0.0");
-                        ShowContinueError(state, "Schedule=\"" + AlphaName(3) + "\". Maximum is [" + RoundSigDigits(SchMax, 1) +
-                                          "]. Values must be >= 0.0.");
+                        ShowContinueError(state, format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
                         ErrorsFound = true;
                     }
                 }
@@ -902,7 +887,7 @@ namespace ZoneContaminantPredictorCorrector {
             if (IHGNumbers(1) < 0.0) {
                 ShowSevereError(state, RoutineName + "Negative values are not allowed for " + cNumericFieldNames(1) + " in " + CurrentModuleObject + " = " +
                                 AlphaName(1));
-                ShowContinueError(state, "The input value is " + RoundSigDigits(IHGNumbers(1), 2));
+                ShowContinueError(state, format("The input value is {:.2R}", IHGNumbers(1)));
                 ErrorsFound = true;
             }
 
@@ -984,15 +969,13 @@ namespace ZoneContaminantPredictorCorrector {
                     if (SchMin < 0.0) {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
                                         ", minimum is < 0.0");
-                        ShowContinueError(state, "Schedule=\"" + AlphaName(3) + "\". Minimum is [" + RoundSigDigits(SchMin, 1) +
-                                          "]. Values must be >= 0.0.");
+                        ShowContinueError(state, format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
                         ErrorsFound = true;
                     }
                     if (SchMax < 0.0) {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(3) +
                                         ", maximum is < 0.0");
-                        ShowContinueError(state, "Schedule=\"" + AlphaName(3) + "\". Maximum is [" + RoundSigDigits(SchMax, 1) +
-                                          "]. Values must be >= 0.0.");
+                        ShowContinueError(state, format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
                         ErrorsFound = true;
                     }
                 }
@@ -1003,7 +986,7 @@ namespace ZoneContaminantPredictorCorrector {
             if (IHGNumbers(1) < 0.0) {
                 ShowSevereError(state, RoutineName + "Negative values are not allowed for " + cNumericFieldNames(1) + " in " + CurrentModuleObject + " = " +
                                 AlphaName(1));
-                ShowContinueError(state, "The input value is " + RoundSigDigits(IHGNumbers(1), 2));
+                ShowContinueError(state, format("The input value is {:.2R}", IHGNumbers(1)));
                 ErrorsFound = true;
             }
 
@@ -1065,7 +1048,7 @@ namespace ZoneContaminantPredictorCorrector {
 
         // Using/Aliasing
         using namespace DataIPShortCuts;
-        using General::TrimSigDigits;
+
         using ScheduleManager::CheckScheduleValue;
         using ScheduleManager::CheckScheduleValueMinMax;
         using ScheduleManager::GetScheduleIndex;
@@ -1662,7 +1645,7 @@ namespace ZoneContaminantPredictorCorrector {
 
         // Using/Aliasing
         using DataLoopNode::Node;
-        using General::RoundSigDigits;
+
         using ScheduleManager::GetCurrentScheduleValue;
 
         static std::string const RoutineName("PredictZoneContaminants");

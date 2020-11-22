@@ -605,33 +605,34 @@ namespace HeatBalanceSurfaceManager {
                      } else {
                          elOpened = false;
                      }
-                    //            IF (iwriteStatus /= 0) THEN
-                    //              CALL ShowFatalError('InitSurfaceHeatBalance: Could not open file "eplusout.delighteldmp" for output (readwrite).')
-                    //            ENDIF
-                    //            Open(unit=iDElightErrorFile, file='eplusout.delighteldmp', action='READ')
+                     //            IF (iwriteStatus /= 0) THEN
+                     //              CALL ShowFatalError(state, 'InitSurfaceHeatBalance: Could not open file "eplusout.delighteldmp" for output
+                     //              (readwrite).')
+                     //            ENDIF
+                     //            Open(unit=iDElightErrorFile, file='eplusout.delighteldmp', action='READ')
 
-                    // Sequentially read lines in DElight Electric Lighting Error File
-                    // and process them using standard EPlus warning/error handling calls
-                    bEndofErrFile = false;
-                    iReadStatus = 0;
-                    while (!bEndofErrFile && elOpened) {
-                        auto cErrorLine = iDElightErrorFile.readLine();
-                        if (cErrorLine.eof) {
-                            bEndofErrFile = true;
-                            continue;
-                        }
+                     // Sequentially read lines in DElight Electric Lighting Error File
+                     // and process them using standard EPlus warning/error handling calls
+                     bEndofErrFile = false;
+                     iReadStatus = 0;
+                     while (!bEndofErrFile && elOpened) {
+                         auto cErrorLine = iDElightErrorFile.readLine();
+                         if (cErrorLine.eof) {
+                             bEndofErrFile = true;
+                             continue;
+                         }
 
-                        // Is the current line a Warning message?
-                        if (has_prefix(cErrorLine.data, "WARNING: ")) {
-                            cErrorMsg = cErrorLine.data.substr(9);
-                            ShowWarningError(state, cErrorMsg);
-                        }
-                        // Is the current line an Error message?
-                        if (has_prefix(cErrorLine.data, "ERROR: ")) {
-                            cErrorMsg = cErrorLine.data.substr(7);
-                            ShowSevereError(state, cErrorMsg);
-                            iErrorFlag = 1;
-                        }
+                         // Is the current line a Warning message?
+                         if (has_prefix(cErrorLine.data, "WARNING: ")) {
+                             cErrorMsg = cErrorLine.data.substr(9);
+                             ShowWarningError(state, cErrorMsg);
+                         }
+                         // Is the current line an Error message?
+                         if (has_prefix(cErrorLine.data, "ERROR: ")) {
+                             cErrorMsg = cErrorLine.data.substr(7);
+                             ShowSevereError(state, cErrorMsg);
+                             iErrorFlag = 1;
+                         }
                     }
 
                     // Close DElight Error File and delete
@@ -4420,7 +4421,6 @@ namespace HeatBalanceSurfaceManager {
         // Using/Aliasing
         using DataRuntimeLanguage::EMSConstructActuatorChecked;
         using DataRuntimeLanguage::EMSConstructActuatorIsOkay;
-        using General::TrimSigDigits;
         using HeatBalFiniteDiffManager::ConstructFD;
 
         // Locals
@@ -4475,12 +4475,14 @@ namespace HeatBalanceSurfaceManager {
                                 ShowWarningError(state, "InitEMSControlledConstructions: EMS Construction State Actuator may be unrealistic, incompatible "
                                                  "CTF timescales are being used.");
                                 ShowContinueError(state,
-                                    "Construction named = " + state.dataConstruction->Construct(Surface(SurfNum).Construction).Name +
-                                    " has CTF timesteps = " + TrimSigDigits(state.dataConstruction->Construct(Surface(SurfNum).Construction).NumHistories));
-                                ShowContinueError(state,
-                                    "While construction named = " + state.dataConstruction->Construct(Surface(SurfNum).EMSConstructionOverrideValue).Name +
-                                    " has CTF timesteps = " +
-                                    TrimSigDigits(state.dataConstruction->Construct(Surface(SurfNum).EMSConstructionOverrideValue).NumHistories));
+                                                  format("Construction named = {} has CTF timesteps = {}",
+                                                         state.dataConstruction->Construct(Surface(SurfNum).Construction).Name,
+                                                         state.dataConstruction->Construct(Surface(SurfNum).Construction).NumHistories));
+                                ShowContinueError(
+                                    state,
+                                    format("While construction named = {} has CTF timesteps = {}",
+                                           state.dataConstruction->Construct(Surface(SurfNum).EMSConstructionOverrideValue).Name,
+                                           state.dataConstruction->Construct(Surface(SurfNum).EMSConstructionOverrideValue).NumHistories));
                                 ShowContinueError(state, "Transient heat transfer modeling may not be valid for surface name = " + Surface(SurfNum).Name +
                                                   ", and the simulation continues");
                             }
@@ -4489,13 +4491,15 @@ namespace HeatBalanceSurfaceManager {
                                 // thow warning, but allow
                                 ShowWarningError(state, "InitEMSControlledConstructions: EMS Construction State Actuator may be unrealistic, incompatible "
                                                  "CTF terms are being used.");
-                                ShowContinueError(state, "Construction named = " + state.dataConstruction->Construct(Surface(SurfNum).Construction).Name +
-                                                  " has number of CTF terms = " +
-                                                  TrimSigDigits(state.dataConstruction->Construct(Surface(SurfNum).Construction).NumCTFTerms));
                                 ShowContinueError(state,
-                                    "While construction named = " + state.dataConstruction->Construct(Surface(SurfNum).EMSConstructionOverrideValue).Name +
-                                    " has number of CTF terms = " +
-                                    TrimSigDigits(state.dataConstruction->Construct(Surface(SurfNum).EMSConstructionOverrideValue).NumCTFTerms));
+                                                  format("Construction named = {} has number of CTF terms = {}",
+                                                         state.dataConstruction->Construct(Surface(SurfNum).Construction).Name,
+                                                         state.dataConstruction->Construct(Surface(SurfNum).Construction).NumCTFTerms));
+                                ShowContinueError(
+                                    state,
+                                    format("While construction named = {} has number of CTF terms = {}",
+                                           state.dataConstruction->Construct(Surface(SurfNum).EMSConstructionOverrideValue).Name,
+                                           state.dataConstruction->Construct(Surface(SurfNum).EMSConstructionOverrideValue).NumCTFTerms));
                                 ShowContinueError(state,
                                     "The actuator is allowed but the transient heat transfer modeling may not be valid for surface name = " +
                                     Surface(SurfNum).Name + ", and the simulation continues");
@@ -4529,12 +4533,13 @@ namespace HeatBalanceSurfaceManager {
                                 // thow warning, and do not allow
                                 ShowSevereError(state, "InitEMSControlledConstructions: EMS Construction State Actuator not valid.");
                                 ShowContinueError(state,
-                                    "Construction named = " + state.dataConstruction->Construct(Surface(SurfNum).Construction).Name +
-                                    " has number of finite difference nodes =" + TrimSigDigits(ConstructFD(Surface(SurfNum).Construction).TotNodes));
+                                                  format("Construction named = {} has number of finite difference nodes ={}",
+                                                         state.dataConstruction->Construct(Surface(SurfNum).Construction).Name,
+                                                         ConstructFD(Surface(SurfNum).Construction).TotNodes));
                                 ShowContinueError(state,
-                                    "While construction named = " + state.dataConstruction->Construct(Surface(SurfNum).EMSConstructionOverrideValue).Name +
-                                    "has number of finite difference nodes =" +
-                                    TrimSigDigits(ConstructFD(Surface(SurfNum).EMSConstructionOverrideValue).TotNodes));
+                                                  format("While construction named = {}has number of finite difference nodes ={}",
+                                                         state.dataConstruction->Construct(Surface(SurfNum).EMSConstructionOverrideValue).Name,
+                                                         ConstructFD(Surface(SurfNum).EMSConstructionOverrideValue).TotNodes));
                                 ShowContinueError(state, "This actuator is not allowed for surface name = " + Surface(SurfNum).Name +
                                                   ", and the simulation continues without the override");
 
@@ -6992,14 +6997,18 @@ namespace HeatBalanceSurfaceManager {
                     ++calcHeatBalInsideSurfErrCount;
                     if (calcHeatBalInsideSurfErrCount < 16) {
                         if (!DataHeatBalance::AnyCondFD) {
-                            ShowWarningError(state, "Inside surface heat balance did not converge with Max Temp Difference [C] =" +
-                                             General::RoundSigDigits(MaxDelTemp, 3) +
-                                             " vs Max Allowed Temp Diff [C] =" + General::RoundSigDigits(MaxAllowedDelTemp, 3));
+                            ShowWarningError(state,
+                                             format("Inside surface heat balance did not converge with Max Temp Difference [C] ={:.3R} vs Max "
+                                                    "Allowed Temp Diff [C] ={:.3R}",
+                                                    MaxDelTemp,
+                                                    MaxAllowedDelTemp));
                             ShowContinueErrorTimeStamp(state, "");
                         } else {
-                            ShowWarningError(state, "Inside surface heat balance did not converge with Max Temp Difference [C] =" +
-                                             General::RoundSigDigits(MaxDelTemp, 3) +
-                                             " vs Max Allowed Temp Diff [C] =" + General::RoundSigDigits(MaxAllowedDelTempCondFD, 6));
+                            ShowWarningError(state,
+                                             format("Inside surface heat balance did not converge with Max Temp Difference [C] ={:.3R} vs Max "
+                                                    "Allowed Temp Diff [C] ={:.6R}",
+                                                    MaxDelTemp,
+                                                    MaxAllowedDelTempCondFD));
                             ShowContinueErrorTimeStamp(state, "");
                         }
                     } else {
@@ -7689,8 +7698,10 @@ namespace HeatBalanceSurfaceManager {
                     ++calcHeatBalInsideSurfErrCount;
                     if (calcHeatBalInsideSurfErrCount < 16) {
                         ShowWarningError(state,
-                            "Inside surface heat balance did not converge with Max Temp Difference [C] =" + General::RoundSigDigits(MaxDelTemp, 3) +
-                            " vs Max Allowed Temp Diff [C] =" + General::RoundSigDigits(MaxAllowedDelTempCondFD, 6));
+                                         format("Inside surface heat balance did not converge with Max Temp Difference [C] ={:.3R} vs Max Allowed "
+                                                "Temp Diff [C] ={:.6R}",
+                                                MaxDelTemp,
+                                                MaxAllowedDelTempCondFD));
                         ShowContinueErrorTimeStamp(state, "");
                     } else {
                         ShowRecurringWarningErrorAtEnd(state, "Inside surface heat balance convergence problem continues",
@@ -7766,26 +7777,26 @@ namespace HeatBalanceSurfaceManager {
 
     void TestSurfTempCalcHeatBalanceInsideSurf(EnergyPlusData &state, Real64 TH12, SurfaceData &surface, ZoneData &zone, int WarmupSurfTemp)
     {
-        using General::RoundSigDigits;
 
         if ((TH12 > MaxSurfaceTempLimit) || (TH12 < MinSurfaceTempLimit)) {
             if (state.dataGlobal->WarmupFlag) ++WarmupSurfTemp;
             if (!state.dataGlobal->WarmupFlag || WarmupSurfTemp > 10 || state.dataGlobal->DisplayExtraWarnings) {
                 if (TH12 < MinSurfaceTempLimit) {
                     if (surface.LowTempErrCount == 0) {
-                        ShowSevereMessage(state, "Temperature (low) out of bounds [" + RoundSigDigits(TH12, 2) + "] for zone=\"" + zone.Name +
-                                          "\", for surface=\"" + surface.Name + "\"");
+                        ShowSevereMessage(
+                            state,
+                            format("Temperature (low) out of bounds [{:.2R}] for zone=\"{}\", for surface=\"{}\"", TH12, zone.Name, surface.Name));
                         ShowContinueErrorTimeStamp(state, "");
                         if (!zone.TempOutOfBoundsReported) {
                             ShowContinueError(state, "Zone=\"" + zone.Name + "\", Diagnostic Details:");
                             if (zone.FloorArea > 0.0) {
-                                ShowContinueError(state, "...Internal Heat Gain [" + RoundSigDigits(zone.InternalHeatGains / zone.FloorArea, 3) + "] W/m2");
+                                ShowContinueError(state, format("...Internal Heat Gain [{:.3R}] W/m2", zone.InternalHeatGains / zone.FloorArea));
                             } else {
-                                ShowContinueError(state, "...Internal Heat Gain (no floor) [" + RoundSigDigits(zone.InternalHeatGains, 3) + "] W");
+                                ShowContinueError(state, format("...Internal Heat Gain (no floor) [{:.3R}] W", zone.InternalHeatGains));
                             }
                             if (AirflowNetwork::SimulateAirflowNetwork <= AirflowNetwork::AirflowNetworkControlSimple) {
-                                ShowContinueError(state, "...Infiltration/Ventilation [" + RoundSigDigits(zone.NominalInfilVent, 3) + "] m3/s");
-                                ShowContinueError(state, "...Mixing/Cross Mixing [" + RoundSigDigits(zone.NominalMixing, 3) + "] m3/s");
+                                ShowContinueError(state, format("...Infiltration/Ventilation [{:.3R}] m3/s", zone.NominalInfilVent));
+                                ShowContinueError(state, format("...Mixing/Cross Mixing [{:.3R}] m3/s", zone.NominalMixing));
                             } else {
                                 ShowContinueError(state, "...Airflow Network Simulation: Nominal Infiltration/Ventilation/Mixing not available.");
                             }
@@ -7814,19 +7825,20 @@ namespace HeatBalanceSurfaceManager {
                     }
                 } else {
                     if (surface.HighTempErrCount == 0) {
-                        ShowSevereMessage(state, "Temperature (high) out of bounds (" + RoundSigDigits(TH12, 2) + "] for zone=\"" + zone.Name +
-                                          "\", for surface=\"" + surface.Name + "\"");
+                        ShowSevereMessage(
+                            state,
+                            format("Temperature (high) out of bounds ({:.2R}] for zone=\"{}\", for surface=\"{}\"", TH12, zone.Name, surface.Name));
                         ShowContinueErrorTimeStamp(state, "");
                         if (!zone.TempOutOfBoundsReported) {
                             ShowContinueError(state, "Zone=\"" + zone.Name + "\", Diagnostic Details:");
                             if (zone.FloorArea > 0.0) {
-                                ShowContinueError(state, "...Internal Heat Gain [" + RoundSigDigits(zone.InternalHeatGains / zone.FloorArea, 3) + "] W/m2");
+                                ShowContinueError(state, format("...Internal Heat Gain [{:.3R}] W/m2", zone.InternalHeatGains / zone.FloorArea));
                             } else {
-                                ShowContinueError(state, "...Internal Heat Gain (no floor) [" + RoundSigDigits(zone.InternalHeatGains, 3) + "] W");
+                                ShowContinueError(state, format("...Internal Heat Gain (no floor) [{:.3R}] W", zone.InternalHeatGains));
                             }
                             if (AirflowNetwork::SimulateAirflowNetwork <= AirflowNetwork::AirflowNetworkControlSimple) {
-                                ShowContinueError(state, "...Infiltration/Ventilation [" + RoundSigDigits(zone.NominalInfilVent, 3) + "] m3/s");
-                                ShowContinueError(state, "...Mixing/Cross Mixing [" + RoundSigDigits(zone.NominalMixing, 3) + "] m3/s");
+                                ShowContinueError(state, format("...Infiltration/Ventilation [{:.3R}] m3/s", zone.NominalInfilVent));
+                                ShowContinueError(state, format("...Mixing/Cross Mixing [{:.3R}] m3/s", zone.NominalMixing));
                             } else {
                                 ShowContinueError(state, "...Airflow Network Simulation: Nominal Infiltration/Ventilation/Mixing not available.");
                             }
@@ -7868,20 +7880,19 @@ namespace HeatBalanceSurfaceManager {
         if ((TH12 > MaxSurfaceTempLimitBeforeFatal) || (TH12 < MinSurfaceTempLimitBeforeFatal)) {
             if (!state.dataGlobal->WarmupFlag) {
                 if (TH12 < MinSurfaceTempLimitBeforeFatal) {
-                    ShowSevereError(state, "Temperature (low) out of bounds [" + RoundSigDigits(TH12, 2) + "] for zone=\"" + zone.Name +
-                                    "\", for surface=\"" + surface.Name + "\"");
+                    ShowSevereError(
+                        state, format("Temperature (low) out of bounds [{:.2R}] for zone=\"{}\", for surface=\"{}\"", TH12, zone.Name, surface.Name));
                     ShowContinueErrorTimeStamp(state, "");
                     if (!zone.TempOutOfBoundsReported) {
                         ShowContinueError(state, "Zone=\"" + zone.Name + "\", Diagnostic Details:");
                         if (zone.FloorArea > 0.0) {
-                            ShowContinueError(state, "...Internal Heat Gain [" + RoundSigDigits(zone.InternalHeatGains / zone.FloorArea, 3) + "] W/m2");
+                            ShowContinueError(state, format("...Internal Heat Gain [{:.3R}] W/m2", zone.InternalHeatGains / zone.FloorArea));
                         } else {
-                            ShowContinueError(state, "...Internal Heat Gain (no floor) [" + RoundSigDigits(zone.InternalHeatGains / zone.FloorArea, 3) +
-                                              "] W");
+                            ShowContinueError(state, format("...Internal Heat Gain (no floor) [{:.3R}] W", zone.InternalHeatGains / zone.FloorArea));
                         }
                         if (AirflowNetwork::SimulateAirflowNetwork <= AirflowNetwork::AirflowNetworkControlSimple) {
-                            ShowContinueError(state, "...Infiltration/Ventilation [" + RoundSigDigits(zone.NominalInfilVent, 3) + "] m3/s");
-                            ShowContinueError(state, "...Mixing/Cross Mixing [" + RoundSigDigits(zone.NominalMixing, 3) + "] m3/s");
+                            ShowContinueError(state, format("...Infiltration/Ventilation [{:.3R}] m3/s", zone.NominalInfilVent));
+                            ShowContinueError(state, format("...Mixing/Cross Mixing [{:.3R}] m3/s", zone.NominalMixing));
                         } else {
                             ShowContinueError(state, "...Airflow Network Simulation: Nominal Infiltration/Ventilation/Mixing not available.");
                         }
@@ -7894,20 +7905,20 @@ namespace HeatBalanceSurfaceManager {
                     }
                     ShowFatalError(state, "Program terminates due to preceding condition.");
                 } else {
-                    ShowSevereError(state, "Temperature (high) out of bounds [" + RoundSigDigits(TH12, 2) + "] for zone=\"" + zone.Name +
-                                    "\", for surface=\"" + surface.Name + "\"");
+                    ShowSevereError(
+                        state,
+                        format("Temperature (high) out of bounds [{:.2R}] for zone=\"{}\", for surface=\"{}\"", TH12, zone.Name, surface.Name));
                     ShowContinueErrorTimeStamp(state, "");
                     if (!zone.TempOutOfBoundsReported) {
                         ShowContinueError(state, "Zone=\"" + zone.Name + "\", Diagnostic Details:");
                         if (zone.FloorArea > 0.0) {
-                            ShowContinueError(state, "...Internal Heat Gain [" + RoundSigDigits(zone.InternalHeatGains / zone.FloorArea, 3) + "] W/m2");
+                            ShowContinueError(state, format("...Internal Heat Gain [{:.3R}] W/m2", zone.InternalHeatGains / zone.FloorArea));
                         } else {
-                            ShowContinueError(state, "...Internal Heat Gain (no floor) [" + RoundSigDigits(zone.InternalHeatGains / zone.FloorArea, 3) +
-                                              "] W");
+                            ShowContinueError(state, format("...Internal Heat Gain (no floor) [{:.3R}] W", zone.InternalHeatGains / zone.FloorArea));
                         }
                         if (AirflowNetwork::SimulateAirflowNetwork <= AirflowNetwork::AirflowNetworkControlSimple) {
-                            ShowContinueError(state, "...Infiltration/Ventilation [" + RoundSigDigits(zone.NominalInfilVent, 3) + "] m3/s");
-                            ShowContinueError(state, "...Mixing/Cross Mixing [" + RoundSigDigits(zone.NominalMixing, 3) + "] m3/s");
+                            ShowContinueError(state, format("...Infiltration/Ventilation [{:.3R}] m3/s", zone.NominalInfilVent));
+                            ShowContinueError(state, format("...Mixing/Cross Mixing [{:.3R}] m3/s", zone.NominalMixing));
                         } else {
                             ShowContinueError(state, "...Airflow Network Simulation: Nominal Infiltration/Ventilation/Mixing not available.");
                         }
@@ -7922,8 +7933,11 @@ namespace HeatBalanceSurfaceManager {
                 }
             } else {
                 if (TH12 < -10000. || TH12 > 10000.) {
-                    ShowSevereError(state, "CalcHeatBalanceInsideSurf: The temperature of " + RoundSigDigits(TH12, 2) + " C for zone=\"" + zone.Name +
-                                    "\", for surface=\"" + surface.Name + "\"");
+                    ShowSevereError(state,
+                                    format("CalcHeatBalanceInsideSurf: The temperature of {:.2R} C for zone=\"{}\", for surface=\"{}\"",
+                                           TH12,
+                                           zone.Name,
+                                           surface.Name));
                     ShowContinueError(state, "..is very far out of bounds during warmup. This may be an indication of a malformed zone.");
                     ShowContinueErrorTimeStamp(state, "");
                     ShowFatalError(state, "Program terminates due to preceding condition.");

@@ -399,7 +399,7 @@ TEST_F(EnergyPlusFixture, HPWHWrappedDummyNodeConfig)
                                         "    0,                       !- Minimum Value of x",
                                         "    1;                       !- Maximum Value of x"});
     for (int i = 1; i <= 2; ++i) {
-        std::string const i_str = std::to_string(i);
+        std::string const i_str = fmt::to_string(i);
         idf_lines.push_back("Coil:WaterHeating:AirToWaterHeatPump:Wrapped,");
         idf_lines.push_back("    HPWH Coil " + i_str + ",               !- Name");
         idf_lines.push_back("    2349.6,                  !- Rated Heating Capacity {W}");

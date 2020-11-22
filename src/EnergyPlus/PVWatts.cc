@@ -86,7 +86,7 @@ namespace PVWatts {
         : m_lastCellTemperature(20.0), m_lastPlaneOfArrayIrradiance(0.0), m_cellTemperature(20.0), m_planeOfArrayIrradiance(0.0),
           m_outputDCPower(1000.0)
     {
-        using General::RoundSigDigits;
+
         bool errorsFound(false);
 
         if (name.empty()) {
@@ -147,7 +147,7 @@ namespace PVWatts {
         }
 
         if (systemLosses > 1.0 || systemLosses < 0.0) {
-            ShowSevereError(state, "PVWatts: Invalid system loss value " + RoundSigDigits(systemLosses, 2));
+            ShowSevereError(state, format("PVWatts: Invalid system loss value {:.2R}", systemLosses));
             errorsFound = true;
         }
         m_systemLosses = systemLosses;
@@ -156,17 +156,17 @@ namespace PVWatts {
 
         if (m_geometryType == GeometryType::TILT_AZIMUTH) {
             if (tilt < 0 || tilt > 90) {
-                ShowSevereError(state, "PVWatts: Invalid tilt: " + RoundSigDigits(tilt, 2));
+                ShowSevereError(state, format("PVWatts: Invalid tilt: {:.2R}", tilt));
                 errorsFound = true;
             }
             m_tilt = tilt;
             if (azimuth < 0 || azimuth >= 360) {
-                ShowSevereError(state, "PVWatts: Invalid azimuth: " + RoundSigDigits(azimuth, 2));
+                ShowSevereError(state, format("PVWatts: Invalid azimuth: {:.2R}", azimuth));
             }
             m_azimuth = azimuth;
         } else if (m_geometryType == GeometryType::SURFACE) {
             if (surfaceNum == 0 || surfaceNum > DataSurfaces::Surface.size()) {
-                ShowSevereError(state, "PVWatts: SurfaceNum not in Surfaces: " + std::to_string(surfaceNum));
+                ShowSevereError(state, format("PVWatts: SurfaceNum not in Surfaces: {}", surfaceNum));
                 errorsFound = true;
             } else {
                 m_surfaceNum = surfaceNum;
@@ -179,7 +179,7 @@ namespace PVWatts {
         }
 
         if (groundCoverageRatio > 1.0 || groundCoverageRatio < 0.0) {
-            ShowSevereError(state, "PVWatts: Invalid ground coverage ratio: " + RoundSigDigits(groundCoverageRatio, 2));
+            ShowSevereError(state, format("PVWatts: Invalid ground coverage ratio: {:.2R}", groundCoverageRatio));
             errorsFound = true;
         }
         m_groundCoverageRatio = groundCoverageRatio;
@@ -460,8 +460,6 @@ namespace PVWatts {
     PVWattsGenerator::powerout(EnergyPlusData &state, Real64 &shad_beam, Real64 shad_diff, Real64 dni, Real64 alb, Real64 wspd, Real64 tdry, IrradianceOutput &irr_st)
     {
 
-        using General::RoundSigDigits;
-
         const Real64 &gcr = m_groundCoverageRatio;
 
         Real64 poa, tpoa, pvt, dc;
@@ -501,14 +499,14 @@ namespace PVWatts {
                     if (Fskydiff >= 0 && Fskydiff <= 1)
                         irr_st.iskydiff *= Fskydiff;
                     else
-                        ShowWarningError(state, "PVWatts: sky diffuse reduction factor invalid: fskydiff=" + RoundSigDigits(Fskydiff, 7) +
-                                         ", stilt=" + RoundSigDigits(irr_st.stilt, 7));
+                        ShowWarningError(
+                            state, format("PVWatts: sky diffuse reduction factor invalid: fskydiff={:.7R}, stilt={:.7R}", Fskydiff, irr_st.stilt));
 
                     if (Fgnddiff >= 0 && Fgnddiff <= 1)
                         irr_st.ignddiff *= Fgnddiff;
                     else
-                        ShowWarningError(state, "PVWatts: gnd diffuse reduction factor invalid: fgnddiff=" + RoundSigDigits(Fgnddiff, 7) +
-                                         ", stilt=" + RoundSigDigits(irr_st.stilt, 7));
+                        ShowWarningError(
+                            state, format("PVWatts: gnd diffuse reduction factor invalid: fgnddiff={:.7R}, stilt={:.7R}", Fgnddiff, irr_st.stilt));
                 }
             }
 

@@ -216,18 +216,6 @@ namespace General {
                   int &N             // number of terms in polynomial
     );
 
-    std::string TrimSigDigits(Real64 const RealValue, int const SigDigits);
-
-    std::string TrimSigDigits(int const IntegerValue,
-                              Optional_int_const SigDigits = _ // ignored
-    );
-
-    std::string RoundSigDigits(Real64 const RealValue, int const SigDigits);
-
-    std::string RoundSigDigits(int const IntegerValue,
-                               Optional_int_const SigDigits = _ // ignored
-    );
-
     std::string RemoveTrailingZeros(std::string const &InputString);
 
     std::string &strip_trailing_zeros(std::string &InputString);
