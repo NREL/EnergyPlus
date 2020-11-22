@@ -71,9 +71,8 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WeatherManager.hh>
 
-namespace EnergyPlus {
+namespace EnergyPlus::ScheduleManager {
 
-namespace ScheduleManager {
     // Module containing the Schedule Manager routines
 
     // MODULE INFORMATION:
@@ -90,13 +89,8 @@ namespace ScheduleManager {
     // validating it, and storing it in such a manner that the schedule manager
     // can provide the scheduling value needs for the simulation.
 
-    // METHODOLOGY EMPLOYED:
-    // na
-
     // REFERENCES:
     // Proposal for Schedule Manager in EnergyPlus (Rick Strand)
-
-    // OTHER NOTES:
 
     // Using/Aliasing
     using DataEnvironment::DayOfMonthTomorrow;
@@ -106,52 +100,8 @@ namespace ScheduleManager {
     using DataEnvironment::HolidayIndex;
     using DataEnvironment::HolidayIndexTomorrow;
     using DataEnvironment::MonthTomorrow;
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-    int const MaxDayTypes(12);
+
     static std::string const BlankString;
-    Array1D_string const ValidDayTypes(MaxDayTypes,
-                                       {"Sunday",
-                                        "Monday",
-                                        "Tuesday",
-                                        "Wednesday",
-                                        "Thursday",
-                                        "Friday",
-                                        "Saturday",
-                                        "Holiday",
-                                        "SummerDesignDay",
-                                        "WinterDesignDay",
-                                        "CustomDay1",
-                                        "CustomDay2"});
-
-    int const NumScheduleTypeLimitUnitTypes(14);
-    Array1D_string const ScheduleTypeLimitUnitTypes(NumScheduleTypeLimitUnitTypes,
-                                                    {"Dimensionless",
-                                                     "Temperature",
-                                                     "DeltaTemperature",
-                                                     "PrecipitationRate",
-                                                     "Angle",
-                                                     "ConvectionCoefficient",
-                                                     "ActivityLevel",
-                                                     "Velocity",
-                                                     "Capacity",
-                                                     "Power",
-                                                     "Availability",
-                                                     "Percent",
-                                                     "Control",
-                                                     "Mode"});
-
-    int const ScheduleInput_year(1);
-    int const ScheduleInput_compact(2);
-    int const ScheduleInput_file(3);
-    int const ScheduleInput_constant(4);
-    int const ScheduleInput_external(5);
-
-    // DERIVED TYPE DEFINITIONS
-
-    // INTERFACE BLOCK SPECIFICATIONS
-
-    // MODULE VARIABLE DECLARATIONS:
 
     // Integer Variables for the Module
     int NumScheduleTypes(0);
@@ -184,11 +134,6 @@ namespace ScheduleManager {
     std::unordered_map<std::string, std::string> UniqueWeekScheduleNames;
     Array1D<ScheduleData> Schedule; // Schedule Storage
     std::unordered_map<std::string, std::string> UniqueScheduleNames;
-
-    // MODULE SUBROUTINES:
-    //*************************************************************************
-
-    // Functions
 
     // Clears the global data in ScheduleManager.
     // Needed for unit tests, should not be normally called.
@@ -751,6 +696,22 @@ namespace ScheduleManager {
             }
             if (NumAlphas >= 3) {
                 if (!lAlphaBlanks(3)) {
+                    int constexpr NumScheduleTypeLimitUnitTypes = 14;
+                    Array1D_string const ScheduleTypeLimitUnitTypes(NumScheduleTypeLimitUnitTypes, {
+                                                                           "Dimensionless",
+                                                                            "Temperature",
+                                                                            "DeltaTemperature",
+                                                                            "PrecipitationRate",
+                                                                            "Angle",
+                                                                            "ConvectionCoefficient",
+                                                                            "ActivityLevel",
+                                                                            "Velocity",
+                                                                            "Capacity",
+                                                                            "Power",
+                                                                            "Availability",
+                                                                            "Percent",
+                                                                            "Control",
+                                                                            "Mode"});
                     ScheduleType(LoopIndex).UnitType =
                         UtilityRoutines::FindItem(Alphas(3), ScheduleTypeLimitUnitTypes, NumScheduleTypeLimitUnitTypes);
                     if (ScheduleType(LoopIndex).UnitType == 0) {
@@ -1215,7 +1176,7 @@ namespace ScheduleManager {
                                           cNumericFields);
             GlobalNames::VerifyUniqueInterObjectName(state, UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             Schedule(LoopIndex).Name = Alphas(1);
-            Schedule(LoopIndex).SchType = ScheduleInput_year;
+            Schedule(LoopIndex).SchType = ScheduleInput::Year;
             // Validate ScheduleType
             if (NumScheduleTypes > 0) {
                 CheckIndex = UtilityRoutines::FindItemInList(Alphas(2), ScheduleType({1, NumScheduleTypes}));
@@ -1335,7 +1296,7 @@ namespace ScheduleManager {
             GlobalNames::VerifyUniqueInterObjectName(state, UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             ++SchNum;
             Schedule(SchNum).Name = Alphas(1);
-            Schedule(SchNum).SchType = ScheduleInput_compact;
+            Schedule(SchNum).SchType = ScheduleInput::Compact;
             // Validate ScheduleType
             CheckIndex = UtilityRoutines::FindItemInList(Alphas(2), ScheduleType({1, NumScheduleTypes}));
             if (CheckIndex == 0) {
@@ -1378,12 +1339,12 @@ namespace ScheduleManager {
                 ErrorHere = false;
                 ProcessDateString(state, Alphas(NumField), EndMonth, EndDay, PWeekDay, PDateType, ErrorHere);
                 if (PDateType == WeatherManager::DateType::NthDayInMonth || PDateType == WeatherManager::DateType::LastDayInMonth) {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Schedule(SchNum).Name + "\", Invalid \"Through:\" date");
+                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Schedule(SchNum).Name + R"(", Invalid "Through:" date)");
                     ShowContinueError(state, "Found entry=" + Alphas(NumField));
                     ErrorsFound = true;
                     goto Through_exit;
                 } else if (ErrorHere) {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Schedule(SchNum).Name + "\", Invalid \"Through:\" date");
+                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Schedule(SchNum).Name + R"(", Invalid "Through:" date)");
                     ShowContinueError(state, "Found entry=" + Alphas(NumField));
                     ErrorsFound = true;
                     goto Through_exit;
@@ -1392,7 +1353,7 @@ namespace ScheduleManager {
                     if (EndPointer == 366) {
                         if (FullYearSet) {
                             ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Schedule(SchNum).Name +
-                                            "\", New \"Through\" entry when \"full year\" already set");
+                                            R"(", New "Through" entry when "full year" already set)");
                             ShowContinueError(state, "\"Through\" field=" + CurrentThrough);
                             ErrorsFound = true;
                         }
@@ -1437,7 +1398,7 @@ namespace ScheduleManager {
                         }
                     } else {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) +
-                                        "\", Looking for \"For\" field, found=" + Alphas(NumField));
+                                        R"(", Looking for "For" field, found=)" + Alphas(NumField));
                         ErrorsFound = true;
                         //          CALL ShowSevereError(state, RoutineName//TRIM(CurrentModuleObject)//'="'//TRIM(Schedule(SchNum)%Name)//  &
                         //               '", Expecting "For:" day types')
@@ -1496,7 +1457,7 @@ namespace ScheduleManager {
                             Alphas(UntilFld + xxcount) = Alphas(NumField); // Incase next is "until"
                         } else {
                             ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) +
-                                            "\", Looking for \"Until\" field, found=" + Alphas(NumField));
+                                            R"(", Looking for "Until" field, found=)" + Alphas(NumField));
                             ErrorsFound = true;
                             goto Through_exit;
                         }
@@ -1554,7 +1515,7 @@ namespace ScheduleManager {
                     for (kdy = 1; kdy <= MaxDayTypes; ++kdy) {
                         if (AllDays(kdy)) continue;
                         errmsg.erase(errmsg.length() - 1);
-                        errmsg += "\"" + ValidDayTypes(kdy) + "\",-";
+                        errmsg += format("\"{}\",-", ValidDayTypes(kdy));
                     }
                     errmsg.erase(errmsg.length() - 2);
                     ShowContinueError(state, errmsg);
@@ -1653,7 +1614,7 @@ namespace ScheduleManager {
             GlobalNames::VerifyUniqueInterObjectName(state, UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             ++SchNum;
             Schedule(SchNum).Name = Alphas(1);
-            Schedule(SchNum).SchType = ScheduleInput_file;
+            Schedule(SchNum).SchType = ScheduleInput::File;
             // Validate ScheduleType
             if (NumScheduleTypes > 0) {
                 CheckIndex = 0;
@@ -1852,7 +1813,6 @@ namespace ScheduleManager {
                     if (colCnt == curcolCount) {
                         columnValue = UtilityRoutines::ProcessNumber(subString, errFlag);
                         if (errFlag) {
-                            std::string test = subString;
                             ++numerrors;
                             columnValue = 0.0;
                         }
@@ -1979,7 +1939,7 @@ namespace ScheduleManager {
             GlobalNames::VerifyUniqueInterObjectName(state, UniqueScheduleNames, curName, CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             ++SchNum;
             Schedule(SchNum).Name = curName;
-            Schedule(SchNum).SchType = ScheduleInput_file;
+            Schedule(SchNum).SchType = ScheduleInput::File;
 
             iDay = 0;
             ifld = 0;
@@ -2042,7 +2002,7 @@ namespace ScheduleManager {
             GlobalNames::VerifyUniqueInterObjectName(state, UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             ++SchNum;
             Schedule(SchNum).Name = Alphas(1);
-            Schedule(SchNum).SchType = ScheduleInput_constant;
+            Schedule(SchNum).SchType = ScheduleInput::Constant;
             // Validate ScheduleType
             if (NumScheduleTypes > 0) {
                 CheckIndex = UtilityRoutines::FindItemInList(Alphas(2), ScheduleType({1, NumScheduleTypes}));
@@ -2098,7 +2058,7 @@ namespace ScheduleManager {
             GlobalNames::VerifyUniqueInterObjectName(state, UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             ++SchNum;
             Schedule(SchNum).Name = Alphas(1);
-            Schedule(SchNum).SchType = ScheduleInput_external;
+            Schedule(SchNum).SchType = ScheduleInput::External;
 
             // Validate ScheduleType
             CheckIndex = UtilityRoutines::FindItemInList(Alphas(2), ScheduleType({1, NumScheduleTypes}));
@@ -2165,7 +2125,7 @@ namespace ScheduleManager {
             }
             ++SchNum;
             Schedule(SchNum).Name = Alphas(1);
-            Schedule(SchNum).SchType = ScheduleInput_external;
+            Schedule(SchNum).SchType = ScheduleInput::External;
 
             // Validate ScheduleType
             CheckIndex = UtilityRoutines::FindItemInList(Alphas(2), ScheduleType({1, NumScheduleTypes}));
@@ -2233,7 +2193,7 @@ namespace ScheduleManager {
 
             ++SchNum;
             Schedule(SchNum).Name = Alphas(1);
-            Schedule(SchNum).SchType = ScheduleInput_external;
+            Schedule(SchNum).SchType = ScheduleInput::External;
 
             // Validate ScheduleType
             CheckIndex = UtilityRoutines::FindItemInList(Alphas(2), ScheduleType({1, NumScheduleTypes}));
@@ -2315,7 +2275,7 @@ namespace ScheduleManager {
                         ReportScheduleDetails(state, RptLevel);
 
                     } else {
-                        ShowWarningError(state, RoutineName + "Report for Schedules should specify \"HOURLY\" or \"TIMESTEP\" (\"DETAILED\")");
+                        ShowWarningError(state, RoutineName + R"(Report for Schedules should specify "HOURLY" or "TIMESTEP" ("DETAILED"))");
                         ShowContinueError(state, "HOURLY report will be done");
                         RptLevel = 1;
                         ReportScheduleDetails(state, RptLevel);
@@ -2447,7 +2407,7 @@ namespace ScheduleManager {
                 // SchWFmt Header (WeekSchedule)
                 std::string SchWFmt("! <WeekSchedule>,Name");
                 for (Count = 1; Count <= MaxDayTypes; ++Count) {
-                    SchWFmt += "," + ValidDayTypes(Count);
+                    SchWFmt += format(",{}", ValidDayTypes(Count));
                 }
                 print(state.files.eio, "{}\n", SchWFmt);
                 static constexpr auto SchSFmt("! <Schedule>,Name,ScheduleType,{Until Date,WeekSchedule}** Repeated until Dec 31");
@@ -2721,7 +2681,7 @@ namespace ScheduleManager {
 
         if (!ScheduleDSTSFileWarningIssued) {
             if (DSTIndicator == 1) {
-                if (Schedule(ScheduleIndex).SchType == ScheduleInput_file) {
+                if (Schedule(ScheduleIndex).SchType == ScheduleInput::File) {
                     ShowWarningError(state, "GetCurrentScheduleValue: Schedule=\"" + Schedule(ScheduleIndex).Name + "\" is a Schedule:File");
                     ShowContinueError(state, "...Use of Schedule:File when DaylightSavingTime is in effect is not recommended.");
                     ShowContinueError(state, "...1) Remove RunperiodControl:DaylightSavingTime object or remove DST period from Weather File.");
@@ -5106,7 +5066,5 @@ namespace ScheduleManager {
 
         return NumberOfSchedules;
     }
-
-} // namespace ScheduleManager
 
 } // namespace EnergyPlus
