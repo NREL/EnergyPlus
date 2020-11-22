@@ -946,9 +946,6 @@ namespace ScheduleManager {
                 }
             }
 
-            
-            bool PleaseWork = any_gt(DaySchedule(Count).TSValue, ScheduleType(SchedTypePtr).Maximum);
-            
             if (ScheduleType(SchedTypePtr).Limited) {
                 if (any_lt(DaySchedule(Count).TSValue, ScheduleType(SchedTypePtr).Minimum) ||
                     any_gt(DaySchedule(Count).TSValue, ScheduleType(SchedTypePtr).Maximum)) {
@@ -3968,16 +3965,16 @@ namespace ScheduleManager {
 
         //  Min/max for schedule has been set.  Test.
         if (MinString == ">") {
-            MinValueOk = (Schedule(ScheduleIndex).MinValue > Minimum);
+            MinValueOk = (FLT_EPSILON > Minimum - Schedule(ScheduleIndex).MinValue );
         } else {
-            MinValueOk = (Schedule(ScheduleIndex).MinValue >= Minimum);
+            MinValueOk = ( FLT_EPSILON >= Minimum - Schedule(ScheduleIndex).MinValue);
         }
 
-        MaxValueOk = (Schedule(ScheduleIndex).MaxValue <= Maximum);
+        MaxValueOk = (Schedule(ScheduleIndex).MaxValue - Maximum <= FLT_EPSILON );
         if (MaxString == "<") {
-            MaxValueOk = (Schedule(ScheduleIndex).MaxValue < Maximum);
+            MaxValueOk = (Schedule(ScheduleIndex).MaxValue - Maximum < FLT_EPSILON);
         } else {
-            MaxValueOk = (Schedule(ScheduleIndex).MaxValue <= Maximum);
+            MaxValueOk = (Schedule(ScheduleIndex).MaxValue - Maximum <= FLT_EPSILON);
         }
 
         CheckScheduleValueMinMax = (MinValueOk && MaxValueOk);
@@ -4170,16 +4167,16 @@ namespace ScheduleManager {
         MinValueOk = true;
         MaxValueOk = true;
         if (MinString == ">") {
-            MinValueOk = (Schedule(ScheduleIndex).MinValue > Minimum);
+            MinValueOk = (FLT_EPSILON > Minimum - Schedule(ScheduleIndex).MinValue);
         } else {
-            MinValueOk = (Schedule(ScheduleIndex).MinValue >= Minimum);
+            MinValueOk = (FLT_EPSILON >= Minimum - Schedule(ScheduleIndex).MinValue);
         }
 
-        MaxValueOk = (Schedule(ScheduleIndex).MaxValue <= Maximum);
+        MaxValueOk = (Schedule(ScheduleIndex).MaxValue - Maximum <= FLT_EPSILON);
         if (MaxString == "<") {
-            MaxValueOk = (Schedule(ScheduleIndex).MaxValue < Maximum);
+            MaxValueOk = (Schedule(ScheduleIndex).MaxValue - Maximum < FLT_EPSILON);
         } else {
-            MaxValueOk = (Schedule(ScheduleIndex).MaxValue <= Maximum);
+            MaxValueOk = (Schedule(ScheduleIndex).MaxValue - Maximum <= FLT_EPSILON);
         }
 
         CheckScheduleValueMinMax = (MinValueOk && MaxValueOk);
