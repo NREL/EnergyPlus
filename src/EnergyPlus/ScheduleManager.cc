@@ -1,8 +1,3 @@
-#include <fstream>
-std::ofstream static myFile("Sched.csv", std::ofstream::out);
-std::ofstream static myFile1("Sched1.csv", std::ofstream::out);
-std::ofstream static myFile2("Sched2.csv", std::ofstream::out);
-std::ofstream static myFile3("Sched3.csv", std::ofstream::out);
 // EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
@@ -75,6 +70,11 @@ std::ofstream static myFile3("Sched3.csv", std::ofstream::out);
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WeatherManager.hh>
+#include <fstream>
+std::ofstream static myFile("Sched.csv", std::ofstream::out);
+std::ofstream static myFile1("Sched1.csv", std::ofstream::out);
+std::ofstream static myFile2("Sched2.csv", std::ofstream::out);
+std::ofstream static myFile3("Sched3.csv", std::ofstream::out);
 
 namespace EnergyPlus {
 
