@@ -6086,7 +6086,6 @@ namespace SolarShading {
             // TODO: use opaq and window loop after airboundary is sorted
 //            int const firstSurfOpaq = Zone(enclosureNum).NonWindowSurfaceFirst;
 //            int const lastSurfOpaq = Zone(enclosureNum).NonWindowSurfaceLast;
-
             for (int const SurfNum : thisEnclosure.SurfacePtr) {
                 if (Surface(SurfNum).Class != SurfaceClass::Window && Surface(SurfNum).Class != SurfaceClass::TDD_Dome) {
                     if (!Surface(SurfNum).HeatTransSurf) continue;
@@ -6095,8 +6094,6 @@ namespace SolarShading {
                     if (SurfWinStormWinFlag(SurfNum) == 1) {
                         ConstrNum = Surface(SurfNum).StormWinConstruction;
                     }
-//                    Real64 CosInc = CosIncAng(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum);
-//                    Real64 SunLitFract = SunlitFrac(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum);
                     SurfOpaqAO(SurfNum) = state.dataConstruction->Construct(ConstrNum).OutsideAbsorpSolar * CosIncHourly(SurfNum) * SunLitFractHourly(SurfNum);
                 }
             }
