@@ -381,17 +381,17 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_AlignInputViewFactorsTest)
     DataViewFactorInformation::ZoneRadiantInfo.allocate(3);
     DataViewFactorInformation::ZoneRadiantInfo(1).Name = "Enclosure 1";
     DataViewFactorInformation::ZoneRadiantInfo(1).ZoneNums.push_back(UtilityRoutines::FindItemInList(
-        UtilityRoutines::MakeUPPERCase("Zone 2"), DataHeatBalance::Zone, DataGlobals::NumOfZones));
+        UtilityRoutines::MakeUPPERCase("Zone 2"), DataHeatBalance::Zone, state.dataGlobal->NumOfZones));
     DataViewFactorInformation::ZoneRadiantInfo(1).ZoneNums.push_back(UtilityRoutines::FindItemInList(
-        UtilityRoutines::MakeUPPERCase("Zone 1"), DataHeatBalance::Zone, DataGlobals::NumOfZones));
+        UtilityRoutines::MakeUPPERCase("Zone 1"), DataHeatBalance::Zone, state.dataGlobal->NumOfZones));
     DataViewFactorInformation::ZoneRadiantInfo(2).Name = "Enclosure 2";
     DataViewFactorInformation::ZoneRadiantInfo(2).ZoneNums.push_back(UtilityRoutines::FindItemInList(
-        UtilityRoutines::MakeUPPERCase("Zone 4"), DataHeatBalance::Zone, DataGlobals::NumOfZones));
+        UtilityRoutines::MakeUPPERCase("Zone 4"), DataHeatBalance::Zone, state.dataGlobal->NumOfZones));
     DataViewFactorInformation::ZoneRadiantInfo(2).ZoneNums.push_back(UtilityRoutines::FindItemInList(
-        UtilityRoutines::MakeUPPERCase("Zone 5"), DataHeatBalance::Zone, DataGlobals::NumOfZones));
+        UtilityRoutines::MakeUPPERCase("Zone 5"), DataHeatBalance::Zone, state.dataGlobal->NumOfZones));
     DataViewFactorInformation::ZoneRadiantInfo(3).Name = "Zone 3";
     DataViewFactorInformation::ZoneRadiantInfo(3).ZoneNums.push_back(UtilityRoutines::FindItemInList(
-        UtilityRoutines::MakeUPPERCase("Zone 3"), DataHeatBalance::Zone, DataGlobals::NumOfZones));
+        UtilityRoutines::MakeUPPERCase("Zone 3"), DataHeatBalance::Zone, state.dataGlobal->NumOfZones));
 
     ErrorsFound = false;
     HeatBalanceIntRadExchange::AlignInputViewFactors(state, "ZoneProperty:UserViewFactors:BySurfaceName", ErrorsFound);
@@ -461,17 +461,17 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_AlignInputViewFactorsTest2)
     DataViewFactorInformation::ZoneSolarInfo.allocate(3);
     DataViewFactorInformation::ZoneSolarInfo(1).Name = "Enclosure 1";
     DataViewFactorInformation::ZoneSolarInfo(1).ZoneNums.push_back(UtilityRoutines::FindItemInList(
-        UtilityRoutines::MakeUPPERCase("Zone 2"), DataHeatBalance::Zone, DataGlobals::NumOfZones));
+        UtilityRoutines::MakeUPPERCase("Zone 2"), DataHeatBalance::Zone, state.dataGlobal->NumOfZones));
     DataViewFactorInformation::ZoneSolarInfo(1).ZoneNums.push_back(UtilityRoutines::FindItemInList(
-        UtilityRoutines::MakeUPPERCase("Zone 5"), DataHeatBalance::Zone, DataGlobals::NumOfZones));
+        UtilityRoutines::MakeUPPERCase("Zone 5"), DataHeatBalance::Zone, state.dataGlobal->NumOfZones));
     DataViewFactorInformation::ZoneSolarInfo(2).Name = "Enclosure 2";
     DataViewFactorInformation::ZoneSolarInfo(2).ZoneNums.push_back(UtilityRoutines::FindItemInList(
-        UtilityRoutines::MakeUPPERCase("Zone 4"), DataHeatBalance::Zone, DataGlobals::NumOfZones));
+        UtilityRoutines::MakeUPPERCase("Zone 4"), DataHeatBalance::Zone, state.dataGlobal->NumOfZones));
     DataViewFactorInformation::ZoneSolarInfo(2).ZoneNums.push_back(UtilityRoutines::FindItemInList(
-        UtilityRoutines::MakeUPPERCase("Zone 5"), DataHeatBalance::Zone, DataGlobals::NumOfZones));
+        UtilityRoutines::MakeUPPERCase("Zone 5"), DataHeatBalance::Zone, state.dataGlobal->NumOfZones));
     DataViewFactorInformation::ZoneSolarInfo(3).Name = "Zone 3";
     DataViewFactorInformation::ZoneSolarInfo(3).ZoneNums.push_back(UtilityRoutines::FindItemInList(
-        UtilityRoutines::MakeUPPERCase("Zone 3"), DataHeatBalance::Zone, DataGlobals::NumOfZones));
+        UtilityRoutines::MakeUPPERCase("Zone 3"), DataHeatBalance::Zone, state.dataGlobal->NumOfZones));
 
     ErrorsFound = false;
     HeatBalanceIntRadExchange::AlignInputViewFactors(state, "ZoneProperty:UserViewFactors:BySurfaceName", ErrorsFound);
@@ -540,17 +540,17 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_AlignInputViewFactorsTest3)
     DataViewFactorInformation::ZoneSolarInfo.allocate(3);
     DataViewFactorInformation::ZoneSolarInfo(1).Name = "Enclosure 1";
     DataViewFactorInformation::ZoneSolarInfo(1).ZoneNums.push_back(UtilityRoutines::FindItemInList(
-        UtilityRoutines::MakeUPPERCase("Zone 2"), DataHeatBalance::Zone, DataGlobals::NumOfZones));
+        UtilityRoutines::MakeUPPERCase("Zone 2"), DataHeatBalance::Zone, state.dataGlobal->NumOfZones));
     DataViewFactorInformation::ZoneSolarInfo(1).ZoneNums.push_back(UtilityRoutines::FindItemInList(
-        UtilityRoutines::MakeUPPERCase("Zone 1"), DataHeatBalance::Zone, DataGlobals::NumOfZones));
+        UtilityRoutines::MakeUPPERCase("Zone 1"), DataHeatBalance::Zone, state.dataGlobal->NumOfZones));
     DataViewFactorInformation::ZoneSolarInfo(2).Name = "Enclosure 2";
     DataViewFactorInformation::ZoneSolarInfo(2).ZoneNums.push_back(UtilityRoutines::FindItemInList(
-        UtilityRoutines::MakeUPPERCase("Zone 4"), DataHeatBalance::Zone, DataGlobals::NumOfZones));
+        UtilityRoutines::MakeUPPERCase("Zone 4"), DataHeatBalance::Zone, state.dataGlobal->NumOfZones));
     DataViewFactorInformation::ZoneSolarInfo(2).ZoneNums.push_back(UtilityRoutines::FindItemInList(
-        UtilityRoutines::MakeUPPERCase("Zone 5"), DataHeatBalance::Zone, DataGlobals::NumOfZones));
+        UtilityRoutines::MakeUPPERCase("Zone 5"), DataHeatBalance::Zone, state.dataGlobal->NumOfZones));
     DataViewFactorInformation::ZoneSolarInfo(3).Name = "Zone 3";
     DataViewFactorInformation::ZoneSolarInfo(3).ZoneNums.push_back(UtilityRoutines::FindItemInList(
-        UtilityRoutines::MakeUPPERCase("Zone 3"), DataHeatBalance::Zone, DataGlobals::NumOfZones));
+        UtilityRoutines::MakeUPPERCase("Zone 3"), DataHeatBalance::Zone, state.dataGlobal->NumOfZones));
 
     ErrorsFound = false;
     HeatBalanceIntRadExchange::AlignInputViewFactors(state, "ZoneProperty:UserViewFactors:BySurfaceName", ErrorsFound);
@@ -620,17 +620,17 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_AlignInputViewFactorsTest4)
     DataViewFactorInformation::ZoneRadiantInfo.allocate(3);
     DataViewFactorInformation::ZoneRadiantInfo(1).Name = "Enclosure 1";
     DataViewFactorInformation::ZoneRadiantInfo(1).ZoneNums.push_back(UtilityRoutines::FindItemInList(
-        UtilityRoutines::MakeUPPERCase("Zone 2"), DataHeatBalance::Zone, DataGlobals::NumOfZones));
+        UtilityRoutines::MakeUPPERCase("Zone 2"), DataHeatBalance::Zone, state.dataGlobal->NumOfZones));
     DataViewFactorInformation::ZoneRadiantInfo(1).ZoneNums.push_back(UtilityRoutines::FindItemInList(
-        UtilityRoutines::MakeUPPERCase("Zone 5"), DataHeatBalance::Zone, DataGlobals::NumOfZones));
+        UtilityRoutines::MakeUPPERCase("Zone 5"), DataHeatBalance::Zone, state.dataGlobal->NumOfZones));
     DataViewFactorInformation::ZoneRadiantInfo(2).Name = "Enclosure 2";
     DataViewFactorInformation::ZoneRadiantInfo(2).ZoneNums.push_back(UtilityRoutines::FindItemInList(
-        UtilityRoutines::MakeUPPERCase("Zone 4"), DataHeatBalance::Zone, DataGlobals::NumOfZones));
+        UtilityRoutines::MakeUPPERCase("Zone 4"), DataHeatBalance::Zone, state.dataGlobal->NumOfZones));
     DataViewFactorInformation::ZoneRadiantInfo(2).ZoneNums.push_back(UtilityRoutines::FindItemInList(
-        UtilityRoutines::MakeUPPERCase("Zone 5"), DataHeatBalance::Zone, DataGlobals::NumOfZones));
+        UtilityRoutines::MakeUPPERCase("Zone 5"), DataHeatBalance::Zone, state.dataGlobal->NumOfZones));
     DataViewFactorInformation::ZoneRadiantInfo(3).Name = "Zone 3";
     DataViewFactorInformation::ZoneRadiantInfo(3).ZoneNums.push_back(UtilityRoutines::FindItemInList(
-        UtilityRoutines::MakeUPPERCase("Zone 3"), DataHeatBalance::Zone, DataGlobals::NumOfZones));
+        UtilityRoutines::MakeUPPERCase("Zone 3"), DataHeatBalance::Zone, state.dataGlobal->NumOfZones));
 
     ErrorsFound = false;
     HeatBalanceIntRadExchange::AlignInputViewFactors(state, "ZoneProperty:UserViewFactors:BySurfaceName", ErrorsFound);

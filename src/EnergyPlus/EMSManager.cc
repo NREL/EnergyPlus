@@ -141,7 +141,6 @@ namespace EMSManager {
         // global logical AnyEnergyManagementSystemInModel
 
         // Using/Aliasing
-        using DataGlobals::AnyEnergyManagementSystemInModel;
         using General::ScanForReports;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -213,14 +212,14 @@ namespace EMSManager {
              NumEMSConstructionIndices + NumEMSMeteredOutputVariables + NumExternalInterfaceFunctionalMockupUnitImportActuatorsUsed +
              NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables + NumExternalInterfaceFunctionalMockupUnitExportActuatorsUsed +
              NumExternalInterfaceFunctionalMockupUnitExportGlobalVariables + NumOutputEMSs + numPythonPlugins + numActiveCallbacks) > 0) {
-            AnyEnergyManagementSystemInModel = true;
+            state.dataGlobal->AnyEnergyManagementSystemInModel = true;
         } else {
-            AnyEnergyManagementSystemInModel = false;
+            state.dataGlobal->AnyEnergyManagementSystemInModel = false;
         }
 
-        AnyEnergyManagementSystemInModel = AnyEnergyManagementSystemInModel || state.dataGlobal->externalHVACManager;
+        state.dataGlobal->AnyEnergyManagementSystemInModel = state.dataGlobal->AnyEnergyManagementSystemInModel || state.dataGlobal->externalHVACManager;
 
-        if (AnyEnergyManagementSystemInModel) {
+        if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
 
             ScanForReports(state, "EnergyManagementSystem", OutputEDDFile);
             if (OutputEDDFile) {
@@ -260,7 +259,6 @@ namespace EMSManager {
         // Standard EnergyPlus methodology.
 
         // Using/Aliasing
-        using DataGlobals::AnyEnergyManagementSystemInModel;
         using OutputProcessor::MeterType;
         using OutputProcessor::RealVariables;
         using OutputProcessor::RealVariableType;
@@ -281,7 +279,7 @@ namespace EMSManager {
 
         // FLOW:
         anyProgramRan = false;
-        if (!AnyEnergyManagementSystemInModel) return; // quick return if nothing to do
+        if (!state.dataGlobal->AnyEnergyManagementSystemInModel) return; // quick return if nothing to do
 
         if (iCalledFrom == EMSCallFrom::BeginNewEnvironment) {
             BeginEnvrnInitializeRuntimeLanguage();
@@ -394,8 +392,6 @@ namespace EMSManager {
         // na
 
         // Using/Aliasing
-        using DataGlobals::DoingSizing;
-        using DataGlobals::KickOffSimulation;
         using DataZoneControls::GetZoneAirStatsInputFlag;
         using RuntimeLanguageProcessor::InitializeRuntimeLanguage;
         using RuntimeLanguageProcessor::SetErlValueNumber;
@@ -427,7 +423,7 @@ namespace EMSManager {
             SetupSurfaceConvectionActuators();
             SetupSurfaceConstructionActuators();
             SetupSurfaceOutdoorBoundaryConditionActuators();
-            SetupZoneOutdoorBoundaryConditionActuators();
+            SetupZoneOutdoorBoundaryConditionActuators(state);
             GetEMSInput(state);
             GetEMSUserInput = false;
         }
@@ -438,7 +434,7 @@ namespace EMSManager {
         }
 
         // need to delay setup of HVAC actuator until after the systems input has been processed (if present)
-        if (FinishProcessingUserInput && !DoingSizing && !KickOffSimulation) {
+        if (FinishProcessingUserInput && !state.dataGlobal->DoingSizing && !state.dataGlobal->KickOffSimulation) {
             SetupNodeSetPointsAsActuators();
             SetupPrimaryAirSystemAvailMgrAsActuators(state);
             //    CALL SetupWindowShadingControlActuators !this is too late for including in sizing, moved to GetEMSUserInput
@@ -540,7 +536,6 @@ namespace EMSManager {
         // Standard EnergyPlus methodology.
 
         // Using/Aliasing
-        using DataGlobals::AnyEnergyManagementSystemInModel;
         using RuntimeLanguageProcessor::ExternalInterfaceInitializeErlVariable;
         using RuntimeLanguageProcessor::FindEMSVariable;
         using RuntimeLanguageProcessor::InitializeRuntimeLanguage;
@@ -1597,7 +1592,7 @@ namespace EMSManager {
         }
     }
 
-    void UpdateEMSTrendVariables()
+    void UpdateEMSTrendVariables(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1614,34 +1609,13 @@ namespace EMSManager {
         // Trend arrays are pushed so that the latest value is
         //  always at index 1.  old values get lost.
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using DataGlobals::AnyEnergyManagementSystemInModel;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
         static int TrendNum(0); // local loop counter
         static int ErlVarNum(0);
         static int TrendDepth(0);
         static Real64 currentVal(0.0);
 
         // checks with quick return if no updates needed.
-        if (!AnyEnergyManagementSystemInModel) return;
+        if (!state.dataGlobal->AnyEnergyManagementSystemInModel) return;
         if (NumErlTrendVariables == 0) return;
 
         for (TrendNum = 1; TrendNum <= NumErlTrendVariables; ++TrendNum) {
@@ -1762,7 +1736,7 @@ namespace EMSManager {
 
         if ((!ErrorFlag) && (!FoundControl)) {
             int numPythonPlugins = inputProcessor->getNumObjectsFound(state, "PythonPlugin:Instance");
-            int numActiveCallbacks = PluginManagement::PluginManager::numActiveCallbacks(); // EnergyPlus::DataGlobals::eplusRunningViaAPI;
+            int numActiveCallbacks = PluginManagement::PluginManager::numActiveCallbacks(); // errorCallback;
             if ((numPythonPlugins + numActiveCallbacks) == 0) {
                 ErrorFlag = true;
             } else {
@@ -1894,8 +1868,6 @@ namespace EMSManager {
         // na
 
         // Using/Aliasing
-        using DataAirSystems::PrimaryAirSystem;
-
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
         // na
@@ -1920,7 +1892,7 @@ namespace EMSManager {
             numAirLoops = isize(state.dataAirLoop->PriAirSysAvailMgr);
             for (Loop = 1; Loop <= numAirLoops; ++Loop) {
                 SetupEMSActuator(
-                    "AirLoopHVAC", PrimaryAirSystem(Loop).Name, "Availability Status", "[ ]", lDummy, state.dataAirLoop->PriAirSysAvailMgr(Loop).AvailStatus);
+                    "AirLoopHVAC", state.dataAirSystemsData->PrimaryAirSystems(Loop).Name, "Availability Status", "[ ]", lDummy, state.dataAirLoop->PriAirSysAvailMgr(Loop).AvailStatus);
             }
 
         } else {
@@ -1948,7 +1920,6 @@ namespace EMSManager {
         // Using/Aliasing
         using DataSurfaces::ExternalEnvironment;
         using DataSurfaces::Surface;
-        using DataSurfaces::SurfaceClass_Window;
         using DataSurfaces::TotSurfaces;
         using DataSurfaces::WindowShadingControl;
         using DataSurfaces::WSC_ST_SwitchableGlazing;
@@ -1972,7 +1943,7 @@ namespace EMSManager {
 
         for (loopSurfNum = 1; loopSurfNum <= TotSurfaces; ++loopSurfNum) {
 
-            if (Surface(loopSurfNum).Class != SurfaceClass_Window) continue;
+            if (Surface(loopSurfNum).Class != DataSurfaces::SurfaceClass::Window) continue;
             if (Surface(loopSurfNum).ExtBoundCond != ExternalEnvironment) continue;
             if (!Surface(loopSurfNum).HasShadeControl) continue;
 
@@ -2301,7 +2272,6 @@ namespace EMSManager {
         // na
 
         // Using/Aliasing
-        using DataGlobals::NumOfZones;
         using DataHeatBalance::Zone;
 
         // Locals
@@ -2322,7 +2292,7 @@ namespace EMSManager {
         int ZoneNum;
 
         if (allocated(Zone)) {
-            for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+            for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
 
                 SetupEMSInternalVariable(state, "Zone Floor Area", Zone(ZoneNum).Name, "[m2]", Zone(ZoneNum).FloorArea);
                 SetupEMSInternalVariable(state, "Zone Air Volume", Zone(ZoneNum).Name, "[m3]", Zone(ZoneNum).Volume);
@@ -2332,7 +2302,7 @@ namespace EMSManager {
         }
     }
 
-    void SetupZoneOutdoorBoundaryConditionActuators()
+    void SetupZoneOutdoorBoundaryConditionActuators(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2351,13 +2321,12 @@ namespace EMSManager {
         // na
 
         // Using/Aliasing
-        using DataGlobals::NumOfZones;
         using DataHeatBalance::Zone;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneNum; // local loop index.
 
-        for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+        for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
 
             SetupEMSActuator("Zone",
                              Zone(ZoneNum).Name,

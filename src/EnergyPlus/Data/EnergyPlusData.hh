@@ -67,11 +67,13 @@ namespace EnergyPlus {
 // forward declare all structs
 struct AirflowNetworkBalanceManagerData;
 struct AirLoopHVACDOASData;
+struct AirSystemsData;
 struct BaseboardElectricData;
 struct BaseboardRadiatorData;
 struct BoilersData;
 struct BoilerSteamData;
 struct BranchInputManagerData;
+struct BranchNodeConnectionsData;
 struct ChilledCeilingPanelSimpleData;
 struct ChillerAbsorberData;
 struct ChillerElectricEIRData;
@@ -88,6 +90,7 @@ struct CrossVentMgrData;
 struct CTElectricGeneratorData;
 struct CurveManagerData;
 struct DataAirLoopData;
+struct DataBranchAirLoopPlantData;
 struct DataGlobal;
 struct DataTimingsData;
 struct DataWaterData;
@@ -142,10 +145,13 @@ struct EnergyPlusData : BaseGlobalStruct {
     // module globals
     std::unique_ptr<AirflowNetworkBalanceManagerData> dataAirflowNetworkBalanceManager;
     std::unique_ptr<AirLoopHVACDOASData> dataAirLoopHVACDOAS;
+    std::unique_ptr<AirSystemsData> dataAirSystemsData;
     std::unique_ptr<BaseboardElectricData> dataBaseboardElectric;
     std::unique_ptr<BaseboardRadiatorData> dataBaseboardRadiator;
     std::unique_ptr<BoilersData> dataBoilers;
     std::unique_ptr<BoilerSteamData> dataBoilerSteam;
+    std::unique_ptr<BranchNodeConnectionsData> dataBranchNodeConnections;
+    std::unique_ptr<DataBranchAirLoopPlantData> dataBranchAirLoopPlant;
     std::unique_ptr<BranchInputManagerData> dataBranchInputManager;
     std::unique_ptr<ChilledCeilingPanelSimpleData> dataChilledCeilingPanelSimple;
     std::unique_ptr<ChillerAbsorberData> dataChillerAbsorber;

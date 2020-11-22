@@ -966,7 +966,7 @@ namespace EvaporativeFluidCoolers {
         _SizFac = this->SizFac;
     }
 
-    void EvapFluidCoolerSpecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation))
+    void EvapFluidCoolerSpecs::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation)
     {
         this->InitEvapFluidCooler(state);
         this->SizeEvapFluidCooler(state);
@@ -992,9 +992,9 @@ namespace EvaporativeFluidCoolers {
     }
 
     void EvapFluidCoolerSpecs::simulate(EnergyPlusData &state,
-                                        const PlantLocation &EP_UNUSED(calledFromLocation),
-                                        bool EP_UNUSED(FirstHVACIteration),
-                                        Real64 &EP_UNUSED(CurLoad),
+                                        [[maybe_unused]] const PlantLocation &calledFromLocation,
+                                        [[maybe_unused]] bool FirstHVACIteration,
+                                        [[maybe_unused]] Real64 &CurLoad,
                                         bool RunFlag)
     {
 
@@ -2469,7 +2469,7 @@ namespace EvaporativeFluidCoolers {
 
         DataLoopNode::Node(this->WaterOutletNode).Temp = this->OutletWaterTemp;
 
-        if (DataPlant::PlantLoop(this->LoopNum).LoopSide(LoopSideNum).FlowLock == 0 || DataGlobals::WarmupFlag) return;
+        if (DataPlant::PlantLoop(this->LoopNum).LoopSide(LoopSideNum).FlowLock == 0 || state.dataGlobal->WarmupFlag) return;
 
         // Check flow rate through evaporative fluid cooler and compare to design flow rate,
         // show warning if greater than Design * Mulitplier
@@ -2483,7 +2483,7 @@ namespace EvaporativeFluidCoolers {
                 ShowContinueError(state, " Evaporative Fluid Cooler Design Mass Flow Rate   = " + General::TrimSigDigits(this->DesWaterMassFlowRate, 6));
                 ShowContinueErrorTimeStamp(state, "");
             } else {
-                ShowRecurringWarningErrorAtEnd(
+                ShowRecurringWarningErrorAtEnd(state,
                     this->EvapFluidCoolerType + " \"" + this->Name +
                         "\"  Condenser Loop Mass Flow Rate is much greater than the evaporative fluid coolers design mass flow rate error",
                     this->HighMassFlowErrorIndex,
@@ -2505,7 +2505,7 @@ namespace EvaporativeFluidCoolers {
                     LoopMinTemp));
                 ShowContinueErrorTimeStamp(state, "");
             } else {
-                ShowRecurringWarningErrorAtEnd(
+                ShowRecurringWarningErrorAtEnd(state,
                     this->EvapFluidCoolerType + " \"" + this->Name +
                         "\" Evaporative fluid cooler water outlet temperature is below the specified minimum condenser loop temp error",
                     this->OutletWaterTempErrorIndex,
@@ -2523,7 +2523,7 @@ namespace EvaporativeFluidCoolers {
                 ShowContinueErrorTimeStamp(state, "");
                 ShowContinueError(state, "Actual Mass flow = " + General::TrimSigDigits(this->WaterMassFlowRate, 2));
             } else {
-                ShowRecurringWarningErrorAtEnd(this->EvapFluidCoolerType + " \"" + this->Name +
+                ShowRecurringWarningErrorAtEnd(state, this->EvapFluidCoolerType + " \"" + this->Name +
                                                    "\" Evaporative fluid cooler water mass flow rate near zero error continues...",
                                                this->SmallWaterMassFlowErrorIndex,
                                                this->WaterMassFlowRate,

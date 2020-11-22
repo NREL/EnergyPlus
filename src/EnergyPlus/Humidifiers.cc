@@ -101,8 +101,6 @@ namespace Humidifiers {
     // REFERENCES: ASHRAE HVAC 2 Toolkit, page 4-112
 
     // Using/Aliasing
-    using DataGlobals::DisplayExtraWarnings;
-    using DataGlobals::SysSizingCalc;
     using namespace DataLoopNode;
     using DataEnvironment::OutBaroPress;
     using DataEnvironment::OutDryBulbTemp;
@@ -153,9 +151,9 @@ namespace Humidifiers {
     }
 
     void SimHumidifier(EnergyPlusData &state,
-                       std::string const &CompName,              // name of the humidifier unit
-                       bool const EP_UNUSED(FirstHVACIteration), // TRUE if 1st HVAC simulation of system timestep
-                       int &CompIndex                            // Pointer to Humidifier Unit
+                       std::string const &CompName,                    // name of the humidifier unit
+                       [[maybe_unused]] bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
+                       int &CompIndex                                  // Pointer to Humidifier Unit
     )
     {
 
@@ -619,7 +617,6 @@ namespace Humidifiers {
         // na
 
         // Using/Aliasing
-        using DataGlobals::AnyEnergyManagementSystemInModel;
         using DataHVACGlobals::DoSetPointTest;
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
         using EMSManager::iHumidityRatioMinSetPoint;
@@ -646,10 +643,10 @@ namespace Humidifiers {
             MySizeFlag = false;
         }
 
-        if (!SysSizingCalc && MySetPointCheckFlag && DoSetPointTest) {
+        if (!state.dataGlobal->SysSizingCalc && MySetPointCheckFlag && DoSetPointTest) {
             if (AirOutNode > 0) {
                 if (Node(AirOutNode).HumRatMin == SensedNodeFlagValue) {
-                    if (!AnyEnergyManagementSystemInModel) {
+                    if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                         ShowSevereError(state, "Humidifiers: Missing humidity setpoint for " + HumidifierType(HumType_Code) + " = " + Name);
                         ShowContinueError(state, "  use a Setpoint Manager with Control Variable = \"MinimumHumidityRatio\" to establish a setpoint at the "
                                           "humidifier outlet node.");
@@ -875,7 +872,7 @@ namespace Humidifiers {
                                                      NomCapVolDes,
                                                      "User-Specified Nominal Capacity Volume [m3/s]",
                                                      NomCapVolUser);
-                        if (DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(NomCapVolDes - NomCapVolUser) / NomCapVolUser) > AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeHumidifier: Potential issue with equipment sizing for " + HumidifierType(HumType_Code) + " = \"" +
                                             Name + "\".");
@@ -945,7 +942,7 @@ namespace Humidifiers {
                                                  NomPowerDes,
                                                  "User-Specified Rated Power [W]",
                                                  NomPowerUser);
-                    if (DisplayExtraWarnings) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
                         if ((std::abs(NomPowerDes - NomPowerUser) / NomPowerUser) > AutoVsHardSizingThreshold) {
                             ShowMessage(state, "SizeHumidifier: Potential issue with equipment sizing for " + HumidifierType(HumType_Code) + " =\"" + Name +
                                         "\".");

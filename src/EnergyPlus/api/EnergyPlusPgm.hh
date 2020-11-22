@@ -68,8 +68,8 @@ int ENERGYPLUSLIB_API RunEnergyPlus(EnergyPlus::EnergyPlusData &state, std::stri
 
 int runEnergyPlusAsLibrary(EnergyPlus::EnergyPlusData &state, int argc, const char *argv[]);
 
-void ENERGYPLUSLIB_API StoreProgressCallback(void (*f)(int const));
+void ENERGYPLUSLIB_API StoreProgressCallback(EnergyPlus::EnergyPlusData &state, void (*f)(int const));
 
-void ENERGYPLUSLIB_API StoreMessageCallback(void (*f)(std::string const &));
+void ENERGYPLUSLIB_API StoreMessageCallback(EnergyPlus::EnergyPlusData &state, void (*f)(std::string const &));
 
 #endif

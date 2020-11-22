@@ -170,7 +170,6 @@ namespace Furnaces {
     // Use statements for data only modules
     // Using/Aliasing
     using namespace DataLoopNode;
-    using namespace DataGlobals;
     using namespace DataHVACGlobals;
     using DataEnvironment::OutDryBulbTemp;
     using DataEnvironment::StdRhoAir;
@@ -837,7 +836,6 @@ namespace Furnaces {
         // Using/Aliasing
         using BranchNodeConnections::SetUpCompSets;
         using BranchNodeConnections::TestCompSet;
-        using DataAirSystems::PrimaryAirSystem;
         using DataHeatBalance::Zone;
         using DataLoopNode::NodeID;
         using DataZoneControls::ComfortControlledZone;
@@ -1132,7 +1130,7 @@ namespace Furnaces {
             if (Furnace(FurnaceNum).ControlZoneNum > 0) {
                 AirNodeFound = false;
                 AirLoopFound = false;
-                for (ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum) {
+                for (ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
                     if (ZoneEquipConfig(ControlledZoneNum).ActualZoneNum != Furnace(FurnaceNum).ControlZoneNum) continue;
                     //             Find the controlled zone number for the specified thermostat location
                     Furnace(FurnaceNum).NodeNumOfControlledZone = ZoneEquipConfig(ControlledZoneNum).ZoneNode;
@@ -1140,11 +1138,11 @@ namespace Furnaces {
                     for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig(ControlledZoneNum).NumInletNodes; ++zoneInNode) {
                         int AirLoopNumber = ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum(zoneInNode);
                         if (AirLoopNumber > 0) {
-                            for (BranchNum = 1; BranchNum <= PrimaryAirSystem(AirLoopNumber).NumBranches; ++BranchNum) {
-                                for (CompNum = 1; CompNum <= PrimaryAirSystem(AirLoopNumber).Branch(BranchNum).TotalComponents; ++CompNum) {
-                                    if (!UtilityRoutines::SameString(PrimaryAirSystem(AirLoopNumber).Branch(BranchNum).Comp(CompNum).Name,
+                            for (BranchNum = 1; BranchNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).NumBranches; ++BranchNum) {
+                                for (CompNum = 1; CompNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).TotalComponents; ++CompNum) {
+                                    if (!UtilityRoutines::SameString(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).Comp(CompNum).Name,
                                                                      Furnace(FurnaceNum).Name) ||
-                                        !UtilityRoutines::SameString(PrimaryAirSystem(AirLoopNumber).Branch(BranchNum).Comp(CompNum).TypeOf,
+                                        !UtilityRoutines::SameString(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).Comp(CompNum).TypeOf,
                                                                      CurrentModuleObject))
                                         continue;
                                     AirLoopFound = true;
@@ -1674,7 +1672,7 @@ namespace Furnaces {
             if (Furnace(FurnaceNum).ControlZoneNum > 0) {
                 AirNodeFound = false;
                 AirLoopFound = false;
-                for (ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum) {
+                for (ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
                     if (ZoneEquipConfig(ControlledZoneNum).ActualZoneNum != Furnace(FurnaceNum).ControlZoneNum) continue;
                     //             Find the controlled zone number for the specified thermostat location
                     Furnace(FurnaceNum).NodeNumOfControlledZone = ZoneEquipConfig(ControlledZoneNum).ZoneNode;
@@ -1682,11 +1680,11 @@ namespace Furnaces {
                     for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig(ControlledZoneNum).NumInletNodes; ++zoneInNode) {
                         int AirLoopNumber = ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum(zoneInNode);
                         if (AirLoopNumber > 0) {
-                            for (BranchNum = 1; BranchNum <= PrimaryAirSystem(AirLoopNumber).NumBranches; ++BranchNum) {
-                                for (CompNum = 1; CompNum <= PrimaryAirSystem(AirLoopNumber).Branch(BranchNum).TotalComponents; ++CompNum) {
-                                    if (!UtilityRoutines::SameString(PrimaryAirSystem(AirLoopNumber).Branch(BranchNum).Comp(CompNum).Name,
+                            for (BranchNum = 1; BranchNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).NumBranches; ++BranchNum) {
+                                for (CompNum = 1; CompNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).TotalComponents; ++CompNum) {
+                                    if (!UtilityRoutines::SameString(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).Comp(CompNum).Name,
                                                                      Alphas(1)) ||
-                                        !UtilityRoutines::SameString(PrimaryAirSystem(AirLoopNumber).Branch(BranchNum).Comp(CompNum).TypeOf,
+                                        !UtilityRoutines::SameString(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).Comp(CompNum).TypeOf,
                                                                      CurrentModuleObject))
                                         continue;
                                     AirLoopFound = true;
@@ -2867,7 +2865,7 @@ namespace Furnaces {
             if (Furnace(FurnaceNum).ControlZoneNum > 0) {
                 AirNodeFound = false;
                 AirLoopFound = false;
-                for (ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum) {
+                for (ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
                     if (ZoneEquipConfig(ControlledZoneNum).ActualZoneNum != Furnace(FurnaceNum).ControlZoneNum) continue;
                     //             Find the controlled zone number for the specified thermostat location
                     Furnace(FurnaceNum).NodeNumOfControlledZone = ZoneEquipConfig(ControlledZoneNum).ZoneNode;
@@ -2875,11 +2873,11 @@ namespace Furnaces {
                     for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig(ControlledZoneNum).NumInletNodes; ++zoneInNode) {
                         int AirLoopNumber = ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum(zoneInNode);
                         if (AirLoopNumber > 0) {
-                            for (BranchNum = 1; BranchNum <= PrimaryAirSystem(AirLoopNumber).NumBranches; ++BranchNum) {
-                                for (CompNum = 1; CompNum <= PrimaryAirSystem(AirLoopNumber).Branch(BranchNum).TotalComponents; ++CompNum) {
-                                    if (!UtilityRoutines::SameString(PrimaryAirSystem(AirLoopNumber).Branch(BranchNum).Comp(CompNum).Name,
+                            for (BranchNum = 1; BranchNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).NumBranches; ++BranchNum) {
+                                for (CompNum = 1; CompNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).TotalComponents; ++CompNum) {
+                                    if (!UtilityRoutines::SameString(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).Comp(CompNum).Name,
                                                                      Alphas(1)) ||
-                                        !UtilityRoutines::SameString(PrimaryAirSystem(AirLoopNumber).Branch(BranchNum).Comp(CompNum).TypeOf,
+                                        !UtilityRoutines::SameString(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).Comp(CompNum).TypeOf,
                                                                      CurrentModuleObject))
                                         continue;
                                     AirLoopFound = true;
@@ -3783,7 +3781,7 @@ namespace Furnaces {
             if (Furnace(FurnaceNum).ControlZoneNum > 0) {
                 AirNodeFound = false;
                 AirLoopFound = false;
-                for (ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum) {
+                for (ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
                     if (ZoneEquipConfig(ControlledZoneNum).ActualZoneNum != Furnace(FurnaceNum).ControlZoneNum) continue;
                     //             Find the controlled zone number for the specified thermostat location
                     Furnace(FurnaceNum).NodeNumOfControlledZone = ZoneEquipConfig(ControlledZoneNum).ZoneNode;
@@ -3791,11 +3789,11 @@ namespace Furnaces {
                     for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig(ControlledZoneNum).NumInletNodes; ++zoneInNode) {
                         int AirLoopNumber = ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum(zoneInNode);
                         if (AirLoopNumber > 0) {
-                            for (BranchNum = 1; BranchNum <= PrimaryAirSystem(AirLoopNumber).NumBranches; ++BranchNum) {
-                                for (CompNum = 1; CompNum <= PrimaryAirSystem(AirLoopNumber).Branch(BranchNum).TotalComponents; ++CompNum) {
-                                    if (!UtilityRoutines::SameString(PrimaryAirSystem(AirLoopNumber).Branch(BranchNum).Comp(CompNum).Name,
+                            for (BranchNum = 1; BranchNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).NumBranches; ++BranchNum) {
+                                for (CompNum = 1; CompNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).TotalComponents; ++CompNum) {
+                                    if (!UtilityRoutines::SameString(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).Comp(CompNum).Name,
                                                                      Alphas(1)) ||
-                                        !UtilityRoutines::SameString(PrimaryAirSystem(AirLoopNumber).Branch(BranchNum).Comp(CompNum).TypeOf,
+                                        !UtilityRoutines::SameString(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).Comp(CompNum).TypeOf,
                                                                      CurrentModuleObject))
                                         continue;
                                     AirLoopFound = true;
@@ -4522,7 +4520,7 @@ namespace Furnaces {
                                 "System",
                                 "Average",
                                 Furnace(FurnaceNum).Name);
-            if (AnyEnergyManagementSystemInModel) {
+            if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                 SetupEMSActuator("AirLoopHVAC:Unitary:Furnace:HeatOnly",
                                  Furnace(FurnaceNum).Name,
                                  "Autosized Supply Air Flow Rate",
@@ -4541,7 +4539,7 @@ namespace Furnaces {
                                 "System",
                                 "Average",
                                 Furnace(FurnaceNum).Name);
-            if (AnyEnergyManagementSystemInModel) {
+            if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                 SetupEMSActuator("AirLoopHVAC:UnitaryHeatOnly",
                                  Furnace(FurnaceNum).Name,
                                  "Autosized Supply Air Flow Rate",
@@ -4567,7 +4565,7 @@ namespace Furnaces {
                                 "Average",
                                 Furnace(FurnaceNum).Name);
 
-            if (AnyEnergyManagementSystemInModel) {
+            if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                 SetupEMSActuator("AirLoopHVAC:Unitary:Furnace:HeatCool",
                                  Furnace(FurnaceNum).Name,
                                  "Autosized Supply Air Flow Rate",
@@ -4612,7 +4610,7 @@ namespace Furnaces {
                                 "System",
                                 "Average",
                                 Furnace(FurnaceNum).Name);
-            if (AnyEnergyManagementSystemInModel) {
+            if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                 SetupEMSActuator("AirLoopHVAC:UnitaryHeatCool",
                                  Furnace(FurnaceNum).Name,
                                  "Autosized Supply Air Flow Rate",
@@ -4664,7 +4662,7 @@ namespace Furnaces {
                                 "Average",
                                 Furnace(FurnaceNum).Name);
 
-            if (AnyEnergyManagementSystemInModel) {
+            if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                 SetupEMSActuator("AirLoopHVAC:UnitaryHeatPump:AirToAir",
                                  Furnace(FurnaceNum).Name,
                                  "Autosized Supply Air Flow Rate",
@@ -4715,7 +4713,7 @@ namespace Furnaces {
                                 "Average",
                                 Furnace(FurnaceNum).Name);
 
-            if (AnyEnergyManagementSystemInModel) {
+            if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                 SetupEMSActuator("AirLoopHVAC:UnitaryHeatPump:WaterToAir",
                                  Furnace(FurnaceNum).Name,
                                  "Autosized Supply Air Flow Rate",
@@ -4725,7 +4723,7 @@ namespace Furnaces {
             }
         }
 
-        if (AnyEnergyManagementSystemInModel) {
+        if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
             for (FurnaceNum = 1; FurnaceNum <= NumFurnaces; ++FurnaceNum) {
                 SetupEMSInternalVariable(state,
                     "Unitary HVAC Design Heating Capacity", Furnace(FurnaceNum).Name, "[W]", Furnace(FurnaceNum).DesignHeatingCapacity);
@@ -4915,7 +4913,7 @@ namespace Furnaces {
         ++AirLoopPass;
         if (AirLoopPass > 2) AirLoopPass = 1;
 
-        if (!SysSizingCalc && MySizeFlag(FurnaceNum)) {
+        if (!state.dataGlobal->SysSizingCalc && MySizeFlag(FurnaceNum)) {
             // for each furnace, do the sizing once.
             SizeFurnace(state, FurnaceNum, FirstHVACIteration);
             Furnace(FurnaceNum).ControlZoneMassFlowFrac = 1.0;
@@ -4938,7 +4936,7 @@ namespace Furnaces {
             }
         }
 
-        if (!DoingSizing && MySecondOneTimeFlag(FurnaceNum)) {
+        if (!state.dataGlobal->DoingSizing && MySecondOneTimeFlag(FurnaceNum)) {
             // sizing all done.  check fan air flow rates
             errFlag = false;
             FanVolFlowRate = GetFanDesignVolumeFlowRate(state, BlankString, BlankString, errFlag, Furnace(FurnaceNum).FanIndex);
@@ -5032,7 +5030,7 @@ namespace Furnaces {
             } else { // pthp not connected to plant
                 MyPlantScanFlag(FurnaceNum) = false;
             }
-        } else if (MyPlantScanFlag(FurnaceNum) && !AnyPlantInModel) {
+        } else if (MyPlantScanFlag(FurnaceNum) && !state.dataGlobal->AnyPlantInModel) {
             MyPlantScanFlag(FurnaceNum) = false;
         }
 
@@ -5104,7 +5102,7 @@ namespace Furnaces {
                 MySuppCoilPlantScanFlag(FurnaceNum) = false;
             }
 
-        } else if (MySuppCoilPlantScanFlag(FurnaceNum) && !AnyPlantInModel) {
+        } else if (MySuppCoilPlantScanFlag(FurnaceNum) && !state.dataGlobal->AnyPlantInModel) {
             MySuppCoilPlantScanFlag(FurnaceNum) = false;
         }
 
@@ -5874,13 +5872,13 @@ namespace Furnaces {
     }
 
     void SetOnOffMassFlowRate(EnergyPlusData &state,
-                              int const FurnaceNum,             // index to furnace
-                              int const EP_UNUSED(AirLoopNum),  // index to air loop !unused1208
-                              Real64 &OnOffAirFlowRatio,        // ratio of coil on to coil off air flow rate
-                              int const OpMode,                 // fan operating mode
-                              Real64 const EP_UNUSED(ZoneLoad), // sensible load to be met (W) !unused1208
-                              Real64 const MoistureLoad,        // moisture load to be met (W)
-                              Real64 const PartLoadRatio        // coil part-load ratio
+                              int const FurnaceNum,                   // index to furnace
+                              [[maybe_unused]] int const AirLoopNum,  // index to air loop !unused1208
+                              Real64 &OnOffAirFlowRatio,              // ratio of coil on to coil off air flow rate
+                              int const OpMode,                       // fan operating mode
+                              [[maybe_unused]] Real64 const ZoneLoad, // sensible load to be met (W) !unused1208
+                              Real64 const MoistureLoad,              // moisture load to be met (W)
+                              Real64 const PartLoadRatio              // coil part-load ratio
     )
     {
 
@@ -6094,20 +6092,20 @@ namespace Furnaces {
         SuppHeatCap = 0.0;
 
         if (Furnace(FurnaceNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-            DataAirSystems::PrimaryAirSystem(CurSysNum).supFanVecIndex = Furnace(FurnaceNum).FanIndex;
-            DataAirSystems::PrimaryAirSystem(CurSysNum).supFanModelTypeEnum = DataAirSystems::objectVectorOOFanSystemModel;
+            state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).supFanVecIndex = Furnace(FurnaceNum).FanIndex;
+            state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).supFanModelTypeEnum = DataAirSystems::objectVectorOOFanSystemModel;
             DataSizing::DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
             DataSizing::DataFanIndex = Furnace(FurnaceNum).FanIndex;
         } else {
-            DataAirSystems::PrimaryAirSystem(CurSysNum).SupFanNum = Furnace(FurnaceNum).FanIndex;
-            DataAirSystems::PrimaryAirSystem(CurSysNum).supFanModelTypeEnum = DataAirSystems::structArrayLegacyFanModels;
+            state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).SupFanNum = Furnace(FurnaceNum).FanIndex;
+            state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).supFanModelTypeEnum = DataAirSystems::structArrayLegacyFanModels;
             DataSizing::DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
             DataSizing::DataFanIndex = Furnace(FurnaceNum).FanIndex;
         }
         if (Furnace(FurnaceNum).FanPlace == BlowThru) {
-            DataAirSystems::PrimaryAirSystem(CurSysNum).supFanLocation = DataAirSystems::fanPlacement::BlowThru;
+            state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).supFanLocation = DataAirSystems::fanPlacement::BlowThru;
         } else if (Furnace(FurnaceNum).FanPlace == DrawThru) {
-            DataAirSystems::PrimaryAirSystem(CurSysNum).supFanLocation = DataAirSystems::fanPlacement::DrawThru;
+            state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).supFanLocation = DataAirSystems::fanPlacement::DrawThru;
         }
 
         if (Furnace(FurnaceNum).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed) {
@@ -6640,7 +6638,7 @@ namespace Furnaces {
                                                ") while adjusting furnace runtime.");
                             ShowContinueErrorTimeStamp(state, "");
                         }
-                        ShowRecurringWarningErrorAtEnd(cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num) + " \"" + Furnace(FurnaceNum).Name +
+                        ShowRecurringWarningErrorAtEnd(state, cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num) + " \"" + Furnace(FurnaceNum).Name +
                                                            "\" -- Exceeded max heating iterations error continues...",
                                                        Furnace(FurnaceNum).HeatingMaxIterIndex2);
                     }
@@ -7041,7 +7039,7 @@ namespace Furnaces {
                                                 " (watts), sensible output of DX heating coil = " + TrimSigDigits(TempHeatOutput, 2) +
                                                 " (watts), and the simulation continues.");
                                         }
-                                        ShowRecurringWarningErrorAtEnd(
+                                        ShowRecurringWarningErrorAtEnd(state,
                                             cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num) + " \"" + Furnace(FurnaceNum).Name +
                                                 "\" - Iteration limit exceeded in calculating DX sensible heating part-load ratio error continues. "
                                                 "Sensible load statistics:",
@@ -7057,7 +7055,7 @@ namespace Furnaces {
                                         ShowContinueErrorTimeStamp(state, "Sensible load to be met by DX heating coil = " +
                                                                    TrimSigDigits(SystemSensibleLoad, 2) + " (watts), and the simulation continues.");
                                     }
-                                    ShowRecurringWarningErrorAtEnd(
+                                    ShowRecurringWarningErrorAtEnd(state,
                                         cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num) + " \"" + Furnace(FurnaceNum).Name +
                                             "\" -  DX sensible heating part-load ratio out of range error continues. Sensible load statistics:",
                                         Furnace(FurnaceNum).DXHeatingRegulaFalsiFailedIndex,
@@ -7310,7 +7308,7 @@ namespace Furnaces {
                                             " (watts), sensible output of heating coil = " + TrimSigDigits(TempHeatOutput, 2) +
                                             " (watts), and the simulation continues.");
                                     }
-                                    ShowRecurringWarningErrorAtEnd(cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num) + " \"" +
+                                    ShowRecurringWarningErrorAtEnd(state, cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num) + " \"" +
                                                                        Furnace(FurnaceNum).Name +
                                                                        "\" - Iteration limit exceeded in calculating sensible heating part-load "
                                                                        "ratio error continues. Sensible load statistics:",
@@ -7326,7 +7324,7 @@ namespace Furnaces {
                                     ShowContinueErrorTimeStamp(state, "Sensible load to be met by heating coil = " + TrimSigDigits(SystemSensibleLoad, 2) +
                                                                " (watts), and the simulation continues.");
                                 }
-                                ShowRecurringWarningErrorAtEnd(
+                                ShowRecurringWarningErrorAtEnd(state,
                                     cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num) + " \"" + Furnace(FurnaceNum).Name +
                                         "\" -  Sensible heating part-load ratio out of range error continues. Sensible load statistics:",
                                     Furnace(FurnaceNum).HeatingRegulaFalsiFailedIndex,
@@ -7517,7 +7515,7 @@ namespace Furnaces {
                                                       TempLatentOutput,
                                                       OnOffAirFlowRatio,
                                                       HXUnitOn);
-                                    if (!WarmupFlag) {
+                                    if (!state.dataGlobal->WarmupFlag) {
                                         if (std::abs(CoolCoilLoad - TempCoolOutput) > SmallLoad) {
                                             if (Furnace(FurnaceNum).SensibleMaxIterIndex == 0) {
                                                 ShowWarningMessage(state, "Cooling coil control failed to converge for " +
@@ -7530,7 +7528,7 @@ namespace Furnaces {
                                                     " (watts), sensible output of DX coil = " + TrimSigDigits(TempCoolOutput, 2) +
                                                     " (watts), and the simulation continues.");
                                             }
-                                            ShowRecurringWarningErrorAtEnd(cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num) + " \"" +
+                                            ShowRecurringWarningErrorAtEnd(state, cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num) + " \"" +
                                                                                Furnace(FurnaceNum).Name +
                                                                                "\" - Iteration limit exceeded in calculating sensible cooling "
                                                                                "part-load ratio error continues. Sensible load statistics:",
@@ -7540,14 +7538,14 @@ namespace Furnaces {
                                         }
                                     }
                                 } else if (SolFlag == -2) {
-                                    if (!WarmupFlag) {
+                                    if (!state.dataGlobal->WarmupFlag) {
                                         if (Furnace(FurnaceNum).SensibleRegulaFalsiFailedIndex == 0) {
                                             ShowWarningMessage(state, "Cooling coil control failed for " +
                                                                cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num) + ':' + Furnace(FurnaceNum).Name);
                                             ShowContinueError(state, "  Cooling sensible part-load ratio determined to be outside the range of 0-1.");
                                             ShowContinueErrorTimeStamp(state, "  Cooling sensible load = " + TrimSigDigits(CoolCoilLoad, 2));
                                         }
-                                        ShowRecurringWarningErrorAtEnd(
+                                        ShowRecurringWarningErrorAtEnd(state,
                                             cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num) + " \"" + Furnace(FurnaceNum).Name +
                                                 "\" - Cooling sensible part-load ratio out of range error continues. Sensible cooling load "
                                                 "statistics:",
@@ -7799,7 +7797,7 @@ namespace Furnaces {
                                                       CoolingHeatingPLRRatio);
                                     if (std::abs((SystemMoistureLoad - TempLatentOutput) / SystemMoistureLoad) > CoolErrorToler &&
                                         std::abs(SystemMoistureLoad - TempLatentOutput) > 10.0) {
-                                        if (!WarmupFlag) {
+                                        if (!state.dataGlobal->WarmupFlag) {
                                             if (Furnace(FurnaceNum).LatentMaxIterIndex == 0) {
                                                 ShowWarningMessage(state, "Cooling coil control failed to converge for " +
                                                                    cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num) + ':' +
@@ -7813,7 +7811,7 @@ namespace Furnaces {
                                                     " (watts), Latent output of DX coil = " + TrimSigDigits(TempLatentOutput, 2) +
                                                     " (watts), and the simulation continues.");
                                             }
-                                            ShowRecurringWarningErrorAtEnd(
+                                            ShowRecurringWarningErrorAtEnd(state,
                                                 cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num) + " \"" + Furnace(FurnaceNum).Name +
                                                     "\" - Iteration limit exceeded in calculating latent part-load ratio error continues. Latent "
                                                     "load convergence error (percent) statistics follow.",
@@ -7831,7 +7829,7 @@ namespace Furnaces {
                                         ShowContinueErrorTimeStamp(state, "A PLR of " + TrimSigDigits(TempMinPLR, 3) +
                                                                    " will be used and the simulation continues.");
                                     }
-                                    ShowRecurringWarningErrorAtEnd(
+                                    ShowRecurringWarningErrorAtEnd(state,
                                         cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num) + " \"" + Furnace(FurnaceNum).Name +
                                             "\" - Cooling sensible part-load ratio out of range error continues. System moisture load statistics:",
                                         Furnace(FurnaceNum).LatentRegulaFalsiFailedIndex2,
@@ -7846,7 +7844,7 @@ namespace Furnaces {
                                     ShowContinueError(state, "  Latent part-load ratio determined to be outside the range of 0-1.");
                                     ShowContinueErrorTimeStamp(state, "A PLR of 0 will be used and the simulation continues.");
                                 }
-                                ShowRecurringWarningErrorAtEnd(
+                                ShowRecurringWarningErrorAtEnd(state,
                                     cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num) + " \"" + Furnace(FurnaceNum).Name +
                                         "\" - Latent part-load ratio out of range or 0-1 error continues. System moisture load statistics:",
                                     Furnace(FurnaceNum).LatentRegulaFalsiFailedIndex,
@@ -8257,7 +8255,7 @@ namespace Furnaces {
                 Par(9) = 0.0;                         // HX is off for water-to-air HP
                 //         CoolErrorToler is in fraction of load, MaxIter = 600, SolFalg = # of iterations or error as appropriate
                 TempSolveRoot::SolveRoot(state, CoolErrorToler, MaxIter, SolFlag, CoolPartLoadRatio, CalcWaterToAirResidual, 0.0, 1.0, Par);
-                if (SolFlag == -1 && !WarmupFlag && !FirstHVACIteration) {
+                if (SolFlag == -1 && !state.dataGlobal->WarmupFlag && !FirstHVACIteration) {
                     OnOffFanPartLoadFraction = OnOffFanPartLoadFractionSave;
                     CalcFurnaceOutput(state,
                                       FurnaceNum,
@@ -8281,14 +8279,14 @@ namespace Furnaces {
                                                        " (watts), sensible output of DX coil = " + TrimSigDigits(ZoneSensLoadMet, 2) +
                                                        " (watts), and the simulation continues.");
                         }
-                        ShowRecurringWarningErrorAtEnd(cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num) + " \"" + Furnace(FurnaceNum).Name +
+                        ShowRecurringWarningErrorAtEnd(state, cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num) + " \"" + Furnace(FurnaceNum).Name +
                                                            "\" - Iteration limit exceeded in calculating sensible cooling part-load ratio error "
                                                            "continues. Sensible load statistics:",
                                                        Furnace(FurnaceNum).SensibleMaxIterIndex,
                                                        TotalZoneSensLoad,
                                                        TotalZoneSensLoad);
                     }
-                } else if (SolFlag == -2 && !WarmupFlag && !FirstHVACIteration) {
+                } else if (SolFlag == -2 && !state.dataGlobal->WarmupFlag && !FirstHVACIteration) {
                     CoolPartLoadRatio = max(MinPLR, min(1.0, std::abs(HPCoilSensDemand) / std::abs(HPCoilSensCapacity)));
                     OnOffFanPartLoadFraction = 1.0;
                     CalcFurnaceOutput(state,
@@ -8315,7 +8313,7 @@ namespace Furnaces {
                                               TrimSigDigits(ZoneSensLoadMet, 2));
                             ShowContinueErrorTimeStamp(state, "  Cooling sensible load required = " + TrimSigDigits(TotalZoneSensLoad, 2));
                         }
-                        ShowRecurringWarningErrorAtEnd(
+                        ShowRecurringWarningErrorAtEnd(state,
                             cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num) + " \"" + Furnace(FurnaceNum).Name +
                                 "\" - Cooling sensible part-load ratio out of range error continues. Sensible cooling load statistics:",
                             Furnace(FurnaceNum).SensibleRegulaFalsiFailedIndex,
@@ -8461,7 +8459,7 @@ namespace Furnaces {
                                   ZoneLatLoadMet,
                                   OnOffAirFlowRatio,
                                   false);
-                if (SolFlag == -1 && !WarmupFlag && !FirstHVACIteration) {
+                if (SolFlag == -1 && !state.dataGlobal->WarmupFlag && !FirstHVACIteration) {
                     if (std::abs(ZoneSensLoadMet - TotalZoneSensLoad) / TotalZoneSensLoad > HeatErrorToler) {
                         if (Furnace(FurnaceNum).WSHPHeatMaxIterIndex == 0) {
                             ShowWarningMessage(state, "Heating coil control failed to converge for " + cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num) +
@@ -8471,7 +8469,7 @@ namespace Furnaces {
                                                        " (watts), sensible output of DX coil = " + TrimSigDigits(ZoneSensLoadMet, 2) +
                                                        " (watts), and the simulation continues.");
                         }
-                        ShowRecurringWarningErrorAtEnd(
+                        ShowRecurringWarningErrorAtEnd(state,
                             cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num) + " \"" + Furnace(FurnaceNum).Name +
                                 "\" - Iteration limit exceeded in calculating sensible heating part-load ratio error continues.",
                             Furnace(FurnaceNum).WSHPHeatMaxIterIndex,
@@ -8504,7 +8502,7 @@ namespace Furnaces {
                                               TrimSigDigits(ZoneSensLoadMet, 2));
                             ShowContinueErrorTimeStamp(state, "  Heating sensible load required = " + TrimSigDigits(TotalZoneSensLoad, 2));
                         }
-                        ShowRecurringWarningErrorAtEnd(cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num) + " \"" + Furnace(FurnaceNum).Name +
+                        ShowRecurringWarningErrorAtEnd(state, cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num) + " \"" + Furnace(FurnaceNum).Name +
                                                            "\" - Heating sensible part-load ratio out of range error continues.",
                                                        Furnace(FurnaceNum).WSHPHeatRegulaFalsiFailedIndex,
                                                        TotalZoneSensLoad,
@@ -9642,7 +9640,7 @@ namespace Furnaces {
             }
         }
         if (Furnace(FurnaceNum).FirstPass) {
-            if (!SysSizingCalc) {
+            if (!state.dataGlobal->SysSizingCalc) {
                 DataSizing::resetHVACSizingGlobals(0, DataSizing::CurSysNum, Furnace(FurnaceNum).FirstPass);
             }
         }
@@ -9770,7 +9768,7 @@ namespace Furnaces {
                                 ShowContinueError(state, "  Iteration limit [" + RoundSigDigits(SolveMaxIter) +
                                                   "] exceeded in calculating hot water mass flow rate");
                             }
-                            ShowRecurringWarningErrorAtEnd("CalcNonDXHeatingCoils: Hot water coil control failed (iteration limit [" +
+                            ShowRecurringWarningErrorAtEnd(state, "CalcNonDXHeatingCoils: Hot water coil control failed (iteration limit [" +
                                                                RoundSigDigits(SolveMaxIter) + "]) for " +
                                                                cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num) + "=\"" + Furnace(FurnaceNum).Name,
                                                            Furnace(FurnaceNum).HotWaterCoilMaxIterIndex);
@@ -9783,7 +9781,7 @@ namespace Furnaces {
                                 ShowContinueError(state, "...Given minimum water flow rate=" + RoundSigDigits(MinWaterFlow, 3) + " kg/s");
                                 ShowContinueError(state, "...Given maximum water flow rate=" + RoundSigDigits(MaxHotWaterFlow, 3) + " kg/s");
                             }
-                            ShowRecurringWarningErrorAtEnd("CalcNonDXHeatingCoils: Hot water coil control failed (flow limits) for " +
+                            ShowRecurringWarningErrorAtEnd(state, "CalcNonDXHeatingCoils: Hot water coil control failed (flow limits) for " +
                                                                cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num) + "=\"" + Furnace(FurnaceNum).Name +
                                                                "\"",
                                                            Furnace(FurnaceNum).HotWaterCoilMaxIterIndex2,
@@ -9923,7 +9921,6 @@ namespace Furnaces {
         // Calls ControlMSHPOutput to obtain the desired unit output
 
         using namespace DataZoneEnergyDemands;
-        using DataAirSystems::PrimaryAirSystem;
         using DataHVACGlobals::SmallLoad;
         using DataHVACGlobals::SmallMassFlow;
         using DataZoneEquipment::ZoneEquipConfig;
@@ -10185,7 +10182,7 @@ namespace Furnaces {
         Node(OutletNode).MassFlowRateMaxAvail = AirMassFlow;
 
         if (!FirstHVACIteration && AirMassFlow > 0.0 && AirLoopNum > 0) {
-            TotBranchNum = PrimaryAirSystem(AirLoopNum).NumOutletBranches;
+            TotBranchNum = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).NumOutletBranches;
             if (TotBranchNum == 1) {
                 ZoneSideNodeNum = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).ZoneEquipSupplyNodeNum(1);
                 // THE MASS FLOW PRECISION of the system solver is not enough for some small air flow rate iterations , BY DEBUGGING
@@ -10264,7 +10261,6 @@ namespace Furnaces {
         // Use RegulaFalsi technique to iterate on part-load ratio until convergence is achieved.
 
         // Using/Aliasing
-        using DataGlobals::WarmupFlag;
         using General::RoundSigDigits;
         using General::SolveRoot;
         using General::TrimSigDigits;
@@ -10435,7 +10431,7 @@ namespace Furnaces {
                     SpeedNum = 1;
                     TempSolveRoot::SolveRoot(state, ErrorToler, MaxIte, SolFla, PartLoadFrac, VSHPCyclingResidual, 0.0, 1.0, Par);
                     if (SolFla == -1) {
-                        if (!WarmupFlag) {
+                        if (!state.dataGlobal->WarmupFlag) {
                             if (ErrCountCyc == 0) {
                                 ++ErrCountCyc;
                                 ShowWarningError(state, "Iteration limit exceeded calculating VS WSHP unit cycling ratio, for unit=" +
@@ -10443,7 +10439,7 @@ namespace Furnaces {
                                 ShowContinueErrorTimeStamp(state, "Cycling ratio returned=" + RoundSigDigits(PartLoadFrac, 2));
                             } else {
                                 ++ErrCountCyc;
-                                ShowRecurringWarningErrorAtEnd(
+                                ShowRecurringWarningErrorAtEnd(state,
                                     Furnace(FurnaceNum).Name +
                                         "\": Iteration limit warning exceeding calculating DX unit cycling ratio  continues...",
                                     Furnace(FurnaceNum).ErrIndexCyc,
@@ -10504,7 +10500,7 @@ namespace Furnaces {
                     Par(8) = SpeedNum;
                     TempSolveRoot::SolveRoot(state, ErrorToler, MaxIte, SolFla, SpeedRatio, VSHPSpeedResidual, 1.0e-10, 1.0, Par);
                     if (SolFla == -1) {
-                        if (!WarmupFlag) {
+                        if (!state.dataGlobal->WarmupFlag) {
                             if (ErrCountVar == 0) {
                                 ++ErrCountVar;
                                 ShowWarningError(state, "Iteration limit exceeded calculating VS WSHP unit speed ratio, for unit=" +
@@ -10513,7 +10509,7 @@ namespace Furnaces {
                                                            "], Speed number =" + RoundSigDigits(SpeedNum));
                             } else {
                                 ++ErrCountVar;
-                                ShowRecurringWarningErrorAtEnd(
+                                ShowRecurringWarningErrorAtEnd(state,
                                     Furnace(FurnaceNum).Name + "\": Iteration limit warning exceeding calculating DX unit speed ratio continues...",
                                     Furnace(FurnaceNum).ErrIndexVar,
                                     SpeedRatio,
@@ -10578,7 +10574,7 @@ namespace Furnaces {
                     TempSolveRoot::SolveRoot(state, ErrorToler, MaxIte, SolFla, SpeedRatio, VSHPSpeedResidual, 1.0e-10, 1.0, Par);
                 }
                 if (SolFla == -1) {
-                    if (!WarmupFlag) {
+                    if (!state.dataGlobal->WarmupFlag) {
                         if (ErrCountVar == 0) {
                             ++ErrCountVar;
                             ShowWarningError(state, "Iteration limit exceeded calculating VS WSHP unit speed ratio, for unit=" + Furnace(FurnaceNum).Name);
@@ -10586,7 +10582,7 @@ namespace Furnaces {
                                                        "], Speed number =" + RoundSigDigits(SpeedNum));
                         } else {
                             ++ErrCountVar;
-                            ShowRecurringWarningErrorAtEnd(Furnace(FurnaceNum).Name +
+                            ShowRecurringWarningErrorAtEnd(state, Furnace(FurnaceNum).Name +
                                                                "\": Iteration limit warning exceeding calculating DX unit speed ratio continues...",
                                                            Furnace(FurnaceNum).ErrIndexVar,
                                                            SpeedRatio,
@@ -11745,15 +11741,15 @@ namespace Furnaces {
     }
 
     void SetOnOffMassFlowRateVSCoil(EnergyPlusData &state,
-                                    int const FurnaceNum,                 // index to furnace
-                                    int const ZoneNum,                    // index to zone
-                                    bool const FirstHVACIteration,        // Flag for 1st HVAC iteration
-                                    int const EP_UNUSED(AirLoopNum),      // index to air loop !unused1208
-                                    Real64 &OnOffAirFlowRatio,            // ratio of coil on to coil off air flow rate
-                                    int const EP_UNUSED(OpMode),          // fan operating mode
-                                    Real64 const EP_UNUSED(QZnReq),       // sensible load to be met (W) !unused1208
-                                    Real64 const EP_UNUSED(MoistureLoad), // moisture load to be met (W)
-                                    Real64 &PartLoadRatio                 // coil part-load ratio
+                                    int const FurnaceNum,                       // index to furnace
+                                    int const ZoneNum,                          // index to zone
+                                    bool const FirstHVACIteration,              // Flag for 1st HVAC iteration
+                                    [[maybe_unused]] int const AirLoopNum,      // index to air loop !unused1208
+                                    Real64 &OnOffAirFlowRatio,                  // ratio of coil on to coil off air flow rate
+                                    [[maybe_unused]] int const OpMode,          // fan operating mode
+                                    [[maybe_unused]] Real64 const QZnReq,       // sensible load to be met (W) !unused1208
+                                    [[maybe_unused]] Real64 const MoistureLoad, // moisture load to be met (W)
+                                    Real64 &PartLoadRatio                       // coil part-load ratio
     )
     {
 

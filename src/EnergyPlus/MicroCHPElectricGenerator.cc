@@ -58,7 +58,6 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGenerators.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -537,10 +536,11 @@ namespace MicroCHPElectricGenerator {
         }
     }
 
-    void MicroCHPDataStruct::simulate(EnergyPlusData &state, const EnergyPlus::PlantLocation &EP_UNUSED(calledFromLocation),
+    void MicroCHPDataStruct::simulate(EnergyPlusData &state,
+                                      [[maybe_unused]] const EnergyPlus::PlantLocation &calledFromLocation,
                                       bool FirstHVACIteration,
-                                      Real64 &EP_UNUSED(CurLoad),
-                                      bool EP_UNUSED(RunFlag))
+                                      [[maybe_unused]] Real64 &CurLoad,
+                                      [[maybe_unused]] bool RunFlag)
     {
         // empty function to emulate current behavior as of conversion to using the PlantComponent calling structure.
         // calls from the plant side only update the nodes.
@@ -560,7 +560,7 @@ namespace MicroCHPElectricGenerator {
 
     void MicroCHPDataStruct::onInitLoopEquip(EnergyPlusData &state, const EnergyPlus::PlantLocation &)
     {
-        static std::string const RoutineName("MicroCHPDataStruct::onInitLoopEquip");
+        constexpr auto RoutineName("MicroCHPDataStruct::onInitLoopEquip");
 
         Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                        DataPlant::PlantLoop(this->CWLoopNum).FluidName,
@@ -606,8 +606,6 @@ namespace MicroCHPElectricGenerator {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        static std::string const RoutineName("InitMicroCHPNoNormalizeGenerators");
-
         bool errFlag;
 
         if (this->myFlag) {
@@ -646,7 +644,7 @@ namespace MicroCHPElectricGenerator {
             this->MyPlantScanFlag = false;
         }
 
-        if (!DataGlobals::SysSizingCalc && this->MySizeFlag && !this->MyPlantScanFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
+        if (!state.dataGlobal->SysSizingCalc && this->MySizeFlag && !this->MyPlantScanFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
             this->MySizeFlag = false;
         }
 
@@ -706,7 +704,7 @@ namespace MicroCHPElectricGenerator {
             this->MyEnvrnFlag = true;
         }
 
-        Real64 TimeElapsed = DataGlobals::HourOfDay + DataGlobals::TimeStep * DataGlobals::TimeStepZone + DataHVACGlobals::SysTimeElapsed;
+        Real64 TimeElapsed = state.dataGlobal->HourOfDay + state.dataGlobal->TimeStep * state.dataGlobal->TimeStepZone + DataHVACGlobals::SysTimeElapsed;
         if (this->A42Model.TimeElapsed != TimeElapsed) {
             // The simulation has advanced to the next system timestep.  Save conditions from the end of the previous system
             // timestep for use as the initial conditions of each iteration that does not advance the system timestep.
@@ -751,7 +749,7 @@ namespace MicroCHPElectricGenerator {
         // IEA Annex 42 FC-COGEN-SIM "A Generic Model Specification for Combustion-based Residential CHP Devices"
         // Alex Ferguson, Nick Kelly, Version 3, June 26, 2006
 
-        static std::string const RoutineName("CalcMicroCHPNoNormalizeGeneratorModel");
+        constexpr auto RoutineName("CalcMicroCHPNoNormalizeGeneratorModel");
 
         int CurrentOpMode = 0;
         Real64 AllowedLoad = 0.0;
@@ -1307,7 +1305,7 @@ namespace MicroCHPElectricGenerator {
         // PURPOSE OF THIS SUBROUTINE:
         // update plant loop interactions, do any calcs needed
 
-        static std::string const RoutineName("CalcUpdateHeatRecovery");
+        constexpr auto RoutineName("CalcUpdateHeatRecovery");
 
         PlantUtilities::SafeCopyPlantNode(this->PlantInletNodeID, this->PlantOutletNodeID);
 
@@ -1319,7 +1317,8 @@ namespace MicroCHPElectricGenerator {
         DataLoopNode::Node(this->PlantOutletNodeID).Enthalpy = this->A42Model.TcwOut * Cp;
     }
 
-    void MicroCHPDataStruct::getDesignCapacities(EnergyPlusData &EP_UNUSED(state), const EnergyPlus::PlantLocation &, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
+    void MicroCHPDataStruct::getDesignCapacities(
+        [[maybe_unused]] EnergyPlusData &state, const EnergyPlus::PlantLocation &, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
     {
         MaxLoad = DataGenerators::GeneratorDynamics(this->DynamicsControlID).QdotHXMax;
         MinLoad = DataGenerators::GeneratorDynamics(this->DynamicsControlID).QdotHXMin;
@@ -1338,7 +1337,7 @@ namespace MicroCHPElectricGenerator {
         // PURPOSE OF THIS SUBROUTINE:
         // update variables in structures linked to output reports
 
-        static std::string const RoutineName("UpdateMicroCHPGeneratorRecords");
+        constexpr auto RoutineName("UpdateMicroCHPGeneratorRecords");
 
         this->A42Model.ACPowerGen = this->A42Model.Pnet;                                                          // electrical power produced [W]
         this->A42Model.ACEnergyGen = this->A42Model.Pnet * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour(); // energy produced (J)

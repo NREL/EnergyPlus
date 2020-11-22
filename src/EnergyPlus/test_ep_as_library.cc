@@ -63,15 +63,15 @@ void progress_callback_handler(int const progress)
 int main(int argc, char *argv[])
 {
     std::cout << "Using EnergyPlus as a library." << std::endl;
-    StoreMessageCallback(message_callback_handler);
-    StoreProgressCallback(progress_callback_handler);
+    EnergyPlus::EnergyPlusData state;
+    StoreMessageCallback(state, message_callback_handler);
+    StoreProgressCallback(state, progress_callback_handler);
 
     int status(EXIT_FAILURE);
     if (argc < 2) {
         std::cout << "Call this with a path to run EnergyPlus as the only argument" << std::endl;
         return EXIT_FAILURE;
     } else {
-        EnergyPlus::EnergyPlusData state;
         status = RunEnergyPlus(state, argv[1]);
     }
     if (!std::cin.good()) std::cin.clear();

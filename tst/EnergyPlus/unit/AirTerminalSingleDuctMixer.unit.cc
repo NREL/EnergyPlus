@@ -88,7 +88,6 @@
 using namespace EnergyPlus::BranchInputManager;
 using namespace EnergyPlus::DataDefineEquip;
 using namespace EnergyPlus::DataEnvironment;
-using namespace EnergyPlus::DataGlobals;
 using namespace EnergyPlus::DataHeatBalFanSys;
 using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataLoopNode;
@@ -346,8 +345,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_GetInputPTAC_InletSide)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
-    MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
+    state.dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
+    state.dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ProcessScheduleInput(state);  // read schedules
 
     GetZoneData(state, ErrorsFound);
@@ -593,12 +592,12 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMInletSide)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::TimeStep = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->NumOfTimeStepInHour = 1;
+    state.dataGlobal->TimeStep = 1;
+    state.dataGlobal->MinutesPerTimeStep = 60;
     ProcessScheduleInput(state); // read schedules
     InitializePsychRoutines();
-    OutputReportPredefined::SetPredefinedTables();
+    OutputReportPredefined::SetPredefinedTables(state);
 
     GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
@@ -671,7 +670,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMInletSide)
     PTUnit(1).ControlZoneNum = 1;
     SysSizingRunDone = true;
     ZoneSizingRunDone = true;
-    SysSizingCalc = true;
+    state.dataGlobal->SysSizingCalc = true;
 
     ZoneSysEnergyDemand.allocate(1);
     ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 0.0;
@@ -924,12 +923,12 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMSupplySide)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::TimeStep = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->NumOfTimeStepInHour = 1;
+    state.dataGlobal->TimeStep = 1;
+    state.dataGlobal->MinutesPerTimeStep = 60;
     ProcessScheduleInput(state); // read schedules
     InitializePsychRoutines();
-    OutputReportPredefined::SetPredefinedTables();
+    OutputReportPredefined::SetPredefinedTables(state);
 
     GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
@@ -1002,7 +1001,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMSupplySide)
     PTUnit(1).ControlZoneNum = 1;
     SysSizingRunDone = true;
     ZoneSizingRunDone = true;
-    SysSizingCalc = true;
+    state.dataGlobal->SysSizingCalc = true;
 
     ZoneSysEnergyDemand.allocate(1);
     ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 0.0;
@@ -1338,12 +1337,12 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMInletSide)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::TimeStep = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->NumOfTimeStepInHour = 1;
+    state.dataGlobal->TimeStep = 1;
+    state.dataGlobal->MinutesPerTimeStep = 60;
     ProcessScheduleInput(state); // read schedules
     InitializePsychRoutines();
-    OutputReportPredefined::SetPredefinedTables();
+    OutputReportPredefined::SetPredefinedTables(state);
 
     GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
@@ -1416,7 +1415,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMInletSide)
     PTUnit(1).ControlZoneNum = 1;
     SysSizingRunDone = true;
     ZoneSizingRunDone = true;
-    SysSizingCalc = true;
+    state.dataGlobal->SysSizingCalc = true;
 
     ZoneSysEnergyDemand.allocate(1);
     ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 0.0;
@@ -1751,12 +1750,12 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMSupplySide)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::TimeStep = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->NumOfTimeStepInHour = 1;
+    state.dataGlobal->TimeStep = 1;
+    state.dataGlobal->MinutesPerTimeStep = 60;
     ProcessScheduleInput(state); // read schedules
     InitializePsychRoutines();
-    OutputReportPredefined::SetPredefinedTables();
+    OutputReportPredefined::SetPredefinedTables(state);
 
     GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
@@ -1829,7 +1828,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMSupplySide)
     PTUnit(1).ControlZoneNum = 1;
     SysSizingRunDone = true;
     ZoneSizingRunDone = true;
-    SysSizingCalc = true;
+    state.dataGlobal->SysSizingCalc = true;
 
     ZoneSysEnergyDemand.allocate(1);
     ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 0.0;
@@ -2423,12 +2422,12 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRF_ATMInletSide)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::TimeStep = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->NumOfTimeStepInHour = 1;
+    state.dataGlobal->TimeStep = 1;
+    state.dataGlobal->MinutesPerTimeStep = 60;
     ProcessScheduleInput(state); // read schedules
     InitializePsychRoutines();
-    OutputReportPredefined::SetPredefinedTables();
+    OutputReportPredefined::SetPredefinedTables(state);
 
     GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
@@ -2510,7 +2509,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRF_ATMInletSide)
     VRFTU(1).ZoneNum = 1;
     SysSizingRunDone = true;
     ZoneSizingRunDone = true;
-    SysSizingCalc = true;
+    state.dataGlobal->SysSizingCalc = true;
 
     ZoneSysEnergyDemand.allocate(1);
     ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 0.0;
@@ -3102,12 +3101,12 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRF_ATMSupplySide)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::TimeStep = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->NumOfTimeStepInHour = 1;
+    state.dataGlobal->TimeStep = 1;
+    state.dataGlobal->MinutesPerTimeStep = 60;
     ProcessScheduleInput(state); // read schedules
     InitializePsychRoutines();
-    OutputReportPredefined::SetPredefinedTables();
+    OutputReportPredefined::SetPredefinedTables(state);
 
     GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
@@ -3186,7 +3185,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRF_ATMSupplySide)
     VRFTU(1).ZoneNum = 1;
     SysSizingRunDone = true;
     ZoneSizingRunDone = true;
-    SysSizingCalc = true;
+    state.dataGlobal->SysSizingCalc = true;
 
     ZoneSysEnergyDemand.allocate(1);
     ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 0.0;
@@ -4852,12 +4851,12 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMInletSi
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::TimeStep = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->NumOfTimeStepInHour = 1;
+    state.dataGlobal->TimeStep = 1;
+    state.dataGlobal->MinutesPerTimeStep = 60;
     ProcessScheduleInput(state); // read schedules
     InitializePsychRoutines();
-    OutputReportPredefined::SetPredefinedTables();
+    OutputReportPredefined::SetPredefinedTables(state);
 
     GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
@@ -4938,7 +4937,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMInletSi
     VRFTU(1).ZoneNum = 1;
     SysSizingRunDone = true;
     ZoneSizingRunDone = true;
-    SysSizingCalc = true;
+    state.dataGlobal->SysSizingCalc = true;
 
     ZoneSysEnergyDemand.allocate(1);
     ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 0.0;
@@ -6606,12 +6605,12 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMSupplyS
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::TimeStep = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->NumOfTimeStepInHour = 1;
+    state.dataGlobal->TimeStep = 1;
+    state.dataGlobal->MinutesPerTimeStep = 60;
     ProcessScheduleInput(state); // read schedules
     InitializePsychRoutines();
-    OutputReportPredefined::SetPredefinedTables();
+    OutputReportPredefined::SetPredefinedTables(state);
 
     GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
@@ -6690,7 +6689,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMSupplyS
     VRFTU(1).ZoneNum = 1;
     SysSizingRunDone = true;
     ZoneSizingRunDone = true;
-    SysSizingCalc = true;
+    state.dataGlobal->SysSizingCalc = true;
 
     ZoneSysEnergyDemand.allocate(1);
     ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 0.0;
@@ -6853,12 +6852,12 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimUnitVent_ATMInletSide)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::TimeStep = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->NumOfTimeStepInHour = 1;
+    state.dataGlobal->TimeStep = 1;
+    state.dataGlobal->MinutesPerTimeStep = 60;
     ProcessScheduleInput(state); // read schedules
     InitializePsychRoutines();
-    OutputReportPredefined::SetPredefinedTables();
+    OutputReportPredefined::SetPredefinedTables(state);
 
     GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
@@ -6927,7 +6926,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimUnitVent_ATMInletSide)
     state.dataUnitVentilators->UnitVent(1).ZonePtr = 1;
     SysSizingRunDone = true;
     ZoneSizingRunDone = true;
-    SysSizingCalc = true;
+    state.dataGlobal->SysSizingCalc = true;
 
     CurDeadBandOrSetback.allocate(1);
     CurDeadBandOrSetback(1) = false;
@@ -7090,12 +7089,12 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimUnitVent_ATMSupplySide)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::TimeStep = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->NumOfTimeStepInHour = 1;
+    state.dataGlobal->TimeStep = 1;
+    state.dataGlobal->MinutesPerTimeStep = 60;
     ProcessScheduleInput(state); // read schedules
     InitializePsychRoutines();
-    OutputReportPredefined::SetPredefinedTables();
+    OutputReportPredefined::SetPredefinedTables(state);
 
     GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
@@ -7164,7 +7163,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimUnitVent_ATMSupplySide)
     state.dataUnitVentilators->UnitVent(1).ZonePtr = 1;
     SysSizingRunDone = true;
     ZoneSizingRunDone = true;
-    SysSizingCalc = true;
+    state.dataGlobal->SysSizingCalc = true;
 
     CurDeadBandOrSetback.allocate(1);
     CurDeadBandOrSetback(1) = false;
@@ -7530,12 +7529,12 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimFCU_ATMInletSideTest)
     DataEnvironment::OutBaroPress = 101325.0;
     DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, OutBaroPress, 20.0, 0.0);
     state.dataWaterCoils->GetWaterCoilsInputFlag = true;
-    DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::TimeStep = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->NumOfTimeStepInHour = 1;
+    state.dataGlobal->TimeStep = 1;
+    state.dataGlobal->MinutesPerTimeStep = 60;
     ProcessScheduleInput(state); // read schedules
     InitializePsychRoutines();
-    OutputReportPredefined::SetPredefinedTables();
+    OutputReportPredefined::SetPredefinedTables(state);
     GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
@@ -7624,12 +7623,12 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimFCU_ATMInletSideTest)
     HWLoopSizingData.DeltaT = 10.0;
     DataPlant::PlantFirstSizesOkayToFinalize = true;
     state.dataGlobal->BeginEnvrnFlag = true;
-    DataGlobals::DoingSizing = true;
+    state.dataGlobal->DoingSizing = true;
     state.dataFans->LocalTurnFansOff = false;
     state.dataFans->LocalTurnFansOn = true;
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
-    DataGlobals::HourOfDay = 1;
+    state.dataGlobal->HourOfDay = 1;
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
@@ -7741,7 +7740,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimFCU_ATMInletSideTest)
 
     SysSizingRunDone = true;
     ZoneSizingRunDone = true;
-    SysSizingCalc = true;
+    state.dataGlobal->SysSizingCalc = true;
     state.dataGlobal->BeginEnvrnFlag = true;
     // set predicted cooling load
     zoneSysEnergyDemand.RemainingOutputReqToHeatSP = 0.0;
@@ -7958,12 +7957,12 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
     DataEnvironment::OutBaroPress = 101325.0;
     DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, OutBaroPress, 20.0, 0.0);
     state.dataWaterCoils->GetWaterCoilsInputFlag = true;
-    DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::TimeStep = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->NumOfTimeStepInHour = 1;
+    state.dataGlobal->TimeStep = 1;
+    state.dataGlobal->MinutesPerTimeStep = 60;
     ProcessScheduleInput(state); // read schedules
     InitializePsychRoutines();
-    OutputReportPredefined::SetPredefinedTables();
+    OutputReportPredefined::SetPredefinedTables(state);
     GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
@@ -8055,12 +8054,12 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
     HWLoopSizingData.DeltaT = 10.0;
     DataPlant::PlantFirstSizesOkayToFinalize = true;
     state.dataGlobal->BeginEnvrnFlag = true;
-    DataGlobals::DoingSizing = true;
+    state.dataGlobal->DoingSizing = true;
     state.dataFans->LocalTurnFansOff = false;
     state.dataFans->LocalTurnFansOn = true;
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
-    DataGlobals::HourOfDay = 1;
+    state.dataGlobal->HourOfDay = 1;
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
@@ -8153,7 +8152,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
     int const ZoneEquipType = 1;
     int const CompNum = 1;
     // current time is within the run time period, starting time is less than stopping time
-    DataGlobals::SimTimeSteps = 0;
+    state.dataGlobal->SimTimeSteps = 0;
     DataHVACGlobals::ZoneComp(1).ZoneCompAvailMgrs(1).StartTime = 0.0;
     DataHVACGlobals::ZoneComp(1).ZoneCompAvailMgrs(1).StopTime = 4.0;
     state.dataSystemAvailabilityManager->NCycSysAvailMgrData(1).AvailStatus = 0;

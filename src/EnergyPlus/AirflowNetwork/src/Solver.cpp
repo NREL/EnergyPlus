@@ -108,8 +108,6 @@ namespace AirflowNetwork {
 
     int const NrInt(20); // Number of intervals for a large opening
 
-    static std::string const BlankString;
-
     // Common block AFEDAT
     Array1D<Real64> AFECTL;
     Array1D<Real64> AFLOW2;
@@ -812,7 +810,7 @@ namespace AirflowNetwork {
             ShowContinueError(state, "..Iterations=" + std::to_string(ITER) + ", Max allowed=" + std::to_string(AirflowNetworkSimu.MaxIteration));
             ShowFatalError(state, "AirflowNetwork: SOLVER, The previous error causes termination.");
         } else {
-            ShowRecurringWarningErrorAtEnd("AirFlowNetwork: Too many iterations (SOLVZP) in AirflowNetwork simulation continues.",
+            ShowRecurringWarningErrorAtEnd(state, "AirFlowNetwork: Too many iterations (SOLVZP) in AirflowNetwork simulation continues.",
                                            AirflowNetworkSimu.ExtLargeOpeningErrIndex);
         }
     }

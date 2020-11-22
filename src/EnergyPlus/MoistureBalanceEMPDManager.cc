@@ -113,10 +113,8 @@ namespace MoistureBalanceEMPDManager {
     // Using/Aliasing
     using DataEnvironment::OutBaroPress;
     using namespace DataHeatBalance;
-    using namespace DataGlobals;
     using DataHeatBalFanSys::ZoneAirHumRat;
     using DataSurfaces::Surface;
-    using DataSurfaces::SurfaceClass_Window;
     using DataSurfaces::TotSurfaces;
     using namespace DataMoistureBalanceEMPD;
     using DataMoistureBalance::HConvInFD;
@@ -285,9 +283,9 @@ namespace MoistureBalanceEMPDManager {
         }
 
         // Ensure at least one interior EMPD surface for each zone
-        EMPDzone.dimension(NumOfZones, false);
+        EMPDzone.dimension(state.dataGlobal->NumOfZones, false);
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-            if (!Surface(SurfNum).HeatTransSurf || Surface(SurfNum).Class == SurfaceClass_Window)
+            if (!Surface(SurfNum).HeatTransSurf || Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Window)
                 continue; // Heat transfer surface only and not a window
             if (Surface(SurfNum).HeatTransferAlgorithm != HeatTransferModel_EMPD) continue;
             ConstrNum = Surface(SurfNum).Construction;
@@ -296,11 +294,11 @@ namespace MoistureBalanceEMPDManager {
                 EMPDzone(Surface(SurfNum).Zone) = true;
             } else {
                 ++ErrCount;
-                if (ErrCount == 1 && !DisplayExtraWarnings) {
+                if (ErrCount == 1 && !state.dataGlobal->DisplayExtraWarnings) {
                     ShowMessage(state, "GetMoistureBalanceEMPDInput: EMPD properties are not assigned to the inside layer of Surfaces");
                     ShowContinueError(state, "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual surfaces.");
                 }
-                if (DisplayExtraWarnings) {
+                if (state.dataGlobal->DisplayExtraWarnings) {
                     ShowMessage(state, "GetMoistureBalanceEMPDInput: EMPD properties are not assigned to the inside layer in Surface=" +
                                 Surface(SurfNum).Name);
                     ShowContinueError(state, "with Construction=" + state.dataConstruction->Construct(ConstrNum).Name);
@@ -329,7 +327,7 @@ namespace MoistureBalanceEMPDManager {
             }
         }
 
-        for (Loop = 1; Loop <= NumOfZones; ++Loop) {
+        for (Loop = 1; Loop <= state.dataGlobal->NumOfZones; ++Loop) {
             if (!EMPDzone(Loop)) {
                 ShowSevereError(state, "GetMoistureBalanceEMPDInput: None of the constructions for zone = " + Zone(Loop).Name +
                                 " has an inside layer with EMPD properties");
@@ -415,7 +413,7 @@ namespace MoistureBalanceEMPDManager {
 
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
             if (!Surface(SurfNum).HeatTransSurf) continue;
-            if (Surface(SurfNum).Class == SurfaceClass_Window) continue;
+            if (Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Window) continue;
             EMPDReportVarsData &rvd = EMPDReportVars(SurfNum);
             const std::string surf_name = Surface(SurfNum).Name;
             SetupOutputVariable(state,
@@ -607,13 +605,13 @@ namespace MoistureBalanceEMPDManager {
 
         // Calculate vapor flux leaving surface layer, entering deep layer, and entering zone.
         mass_flux_surf_deep_max =
-            material.EMPDDeepDepth * material.Density * dU_dRH * (RH_surf_layer_old - RH_deep_layer_old) / (TimeStepZone * 3600.0);
+            material.EMPDDeepDepth * material.Density * dU_dRH * (RH_surf_layer_old - RH_deep_layer_old) / (state.dataGlobal->TimeStepZone * 3600.0);
         mass_flux_surf_deep = hm_deep_layer * (rv_surf_layer_old - rv_deep_old);
         if (std::abs(mass_flux_surf_deep_max) < std::abs(mass_flux_surf_deep)) {
             mass_flux_surf_deep = mass_flux_surf_deep_max;
         }
 
-        mass_flux_zone_surf_max = material.EMPDSurfaceDepth * material.Density * dU_dRH * (RHZone - RH_surf_layer_old) / (TimeStepZone * 3600.0);
+        mass_flux_zone_surf_max = material.EMPDSurfaceDepth * material.Density * dU_dRH * (RHZone - RH_surf_layer_old) / (state.dataGlobal->TimeStepZone * 3600.0);
         mass_flux_zone_surf = hm_surf_layer * (rho_vapor_air_in - rv_surf_layer_old);
         if (std::abs(mass_flux_zone_surf_max) < std::abs(mass_flux_zone_surf)) {
             mass_flux_zone_surf = mass_flux_zone_surf_max;
@@ -629,7 +627,7 @@ namespace MoistureBalanceEMPDManager {
 
         // Calculate new surface layer RH using mass balance on surface layer
         RH_surf_layer_tmp =
-            RH_surf_layer_old + TimeStepZone * 3600.0 * (-mass_flux_surf_layer / (material.Density * material.EMPDSurfaceDepth * dU_dRH));
+            RH_surf_layer_old + state.dataGlobal->TimeStepZone * 3600.0 * (-mass_flux_surf_layer / (material.Density * material.EMPDSurfaceDepth * dU_dRH));
 
         //	RH_surf_layer = RH_surf_layer_tmp;
 
@@ -677,7 +675,7 @@ namespace MoistureBalanceEMPDManager {
         if (material.EMPDDeepDepth <= 0.0) {
             RH_deep_layer = RH_deep_layer_old;
         } else {
-            RH_deep_layer = RH_deep_layer_old + TimeStepZone * 3600.0 * mass_flux_deep_layer / (material.Density * material.EMPDDeepDepth * dU_dRH);
+            RH_deep_layer = RH_deep_layer_old + state.dataGlobal->TimeStepZone * 3600.0 * mass_flux_deep_layer / (material.Density * material.EMPDDeepDepth * dU_dRH);
         }
         // Convert calculated RH back to vapor density of surface and deep layers.
         rv_surf_layer = PsyRhovFnTdbRh(state, Taver, RH_surf_layer);

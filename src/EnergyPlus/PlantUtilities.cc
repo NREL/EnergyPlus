@@ -55,6 +55,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/BranchInputManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -126,12 +127,12 @@ namespace PlantUtilities {
 
     void InitComponentNodes(Real64 const MinCompMdot,
                             Real64 const MaxCompMdot,
-                            int const InletNode,              // component's inlet node index in node structure
-                            int const OutletNode,             // component's outlet node index in node structure
-                            int const EP_UNUSED(LoopNum),     // plant loop index for PlantLoop structure
-                            int const EP_UNUSED(LoopSideNum), // Loop side index for PlantLoop structure
-                            int const EP_UNUSED(BranchIndex), // branch index for PlantLoop
-                            int const EP_UNUSED(CompIndex)    // component index for PlantLoop
+                            int const InletNode,                    // component's inlet node index in node structure
+                            int const OutletNode,                   // component's outlet node index in node structure
+                            [[maybe_unused]] int const LoopNum,     // plant loop index for PlantLoop structure
+                            [[maybe_unused]] int const LoopSideNum, // Loop side index for PlantLoop structure
+                            [[maybe_unused]] int const BranchIndex, // branch index for PlantLoop
+                            [[maybe_unused]] int const CompIndex    // component index for PlantLoop
     )
     {
 
@@ -267,7 +268,7 @@ namespace PlantUtilities {
         if (DataLoopNode::Node(InletNode).MassFlowRateMax >= 0.0) {
             DataLoopNode::Node(OutletNode).MassFlowRateMaxAvail = min(DataLoopNode::Node(InletNode).MassFlowRateMaxAvail, DataLoopNode::Node(InletNode).MassFlowRateMax);
         } else {
-            if (!DataGlobals::SysSizingCalc && DataPlant::PlantFirstSizesOkayToFinalize) {
+            if (!state.dataGlobal->SysSizingCalc && DataPlant::PlantFirstSizesOkayToFinalize) {
                 // throw error for developers, need to change a component model to set hardware limits on inlet
                 if (!DataLoopNode::Node(InletNode).plantNodeErrorMsgIssued) {
                     ShowSevereError(state, "SetComponentFlowRate: check component model implementation for component with inlet node named=" +
@@ -284,7 +285,7 @@ namespace PlantUtilities {
                 DataLoopNode::Node(OutletNode).MassFlowRate = CompFlow;
                 DataLoopNode::Node(InletNode).MassFlowRate = DataLoopNode::Node(OutletNode).MassFlowRate;
             } else { // bound the flow by Min/Max available and hardware limits
-                if (comp.FlowCtrl == DataBranchAirLoopPlant::ControlType_SeriesActive) {
+                if (comp.FlowCtrl == DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive) {
                     // determine highest flow request for all the components on the branch
                     Real64 SeriesBranchHighFlowRequest = 0.0;
                     Real64 SeriesBranchHardwareMaxLim = DataLoopNode::Node(InletNode).MassFlowRateMax;
@@ -624,9 +625,6 @@ namespace PlantUtilities {
         // compare flow rate of splitter inlet to flow rate of mixer outlet
 
         // Using/Aliasing
-        using DataBranchAirLoopPlant::MassFlowTolerance;
-        using DataGlobals::DoingSizing;
-        using DataGlobals::WarmupFlag;
         using DataLoopNode::Node;
         using DataPlant::CriteriaDelta_MassFlowRate;
         using DataPlant::DemandSide;
@@ -645,14 +643,14 @@ namespace PlantUtilities {
         int LastNodeOnBranch;
 
         if (!PlantLoop(LoopNum).LoopHasConnectionComp) {
-            if (!DoingSizing && !WarmupFlag && PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer.Exists && !FirstHVACIteration) {
+            if (!state.dataGlobal->DoingSizing && !state.dataGlobal->WarmupFlag && PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer.Exists && !FirstHVACIteration) {
                 // Find mixer outlet node number
                 MixerOutletNode = PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer.NodeNumOut;
                 // Find splitter inlet node number
                 SplitterInletNode = PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter.NodeNumIn;
 
                 AbsDifference = std::abs(Node(SplitterInletNode).MassFlowRate - Node(MixerOutletNode).MassFlowRate);
-                if (AbsDifference > MassFlowTolerance) {
+                if (AbsDifference > DataBranchAirLoopPlant::MassFlowTolerance) {
                     if (PlantLoop(LoopNum).MFErrIndex1 == 0) {
                         ShowSevereMessage(state, "Plant flows do not resolve -- splitter inlet flow does not match mixer outlet flow ");
                         ShowContinueErrorTimeStamp(state, "");
@@ -663,7 +661,7 @@ namespace PlantUtilities {
                         ShowContinueError(state, "Splitter inlet mass flow rate= " + RoundSigDigits(Node(SplitterInletNode).MassFlowRate, 6) + " {kg/s}");
                         ShowContinueError(state, "Difference in two mass flow rates= " + RoundSigDigits(AbsDifference, 6) + " {kg/s}");
                     }
-                    ShowRecurringSevereErrorAtEnd("Plant Flows (Loop=" + PlantLoop(LoopNum).Name +
+                    ShowRecurringSevereErrorAtEnd(state, "Plant Flows (Loop=" + PlantLoop(LoopNum).Name +
                                                       ") splitter inlet flow not match mixer outlet flow",
                                                   PlantLoop(LoopNum).MFErrIndex1,
                                                   AbsDifference,
@@ -671,7 +669,7 @@ namespace PlantUtilities {
                                                   _,
                                                   "kg/s",
                                                   "kg/s");
-                    if (AbsDifference > MassFlowTolerance * 10.0) {
+                    if (AbsDifference > DataBranchAirLoopPlant::MassFlowTolerance * 10.0) {
                         ShowSevereError(state, "Plant flows do not resolve -- splitter inlet flow does not match mixer outlet flow ");
                         ShowContinueErrorTimeStamp(state, "");
                         ShowContinueError(state, "PlantLoop name= " + PlantLoop(LoopNum).Name);
@@ -709,7 +707,7 @@ namespace PlantUtilities {
                         ShowContinueError(state, "Splitter inlet mass flow rate= " + RoundSigDigits(Node(SplitterInletNode).MassFlowRate, 6) + " {kg/s}");
                         ShowContinueError(state, "Difference in two mass flow rates= " + RoundSigDigits(AbsDifference, 6) + " {kg/s}");
                     }
-                    ShowRecurringSevereErrorAtEnd("Plant Flows (Loop=" + PlantLoop(LoopNum).Name +
+                    ShowRecurringSevereErrorAtEnd(state, "Plant Flows (Loop=" + PlantLoop(LoopNum).Name +
                                                       ") splitter inlet flow does not match branch outlet flows",
                                                   PlantLoop(LoopNum).MFErrIndex2,
                                                   AbsDifference,
@@ -744,8 +742,6 @@ namespace PlantUtilities {
         // na
 
         // Using/Aliasing
-        using DataGlobals::DoingSizing;
-        using DataGlobals::WarmupFlag;
         using DataLoopNode::Node;
         using DataLoopNode::NodeID;
         using DataPlant::DemandSide;
@@ -785,7 +781,7 @@ namespace PlantUtilities {
         if (Node(PlantLoop(LoopNum).LoopSide(LoopSideNum).NodeNumOut).Temp > (PlantLoop(LoopNum).MaxTemp + OverShootOffset)) {
 
             // first stage, throw recurring warning that plant loop is getting out of control
-            ShowRecurringWarningErrorAtEnd("Plant loop exceeding upper temperature limit, PlantLoop=\"" + PlantLoop(LoopNum).Name + "\"",
+            ShowRecurringWarningErrorAtEnd(state, "Plant loop exceeding upper temperature limit, PlantLoop=\"" + PlantLoop(LoopNum).Name + "\"",
                                            PlantLoop(LoopNum).MaxTempErrIndex,
                                            Node(PlantLoop(LoopNum).LoopSide(LoopSideNum).NodeNumOut).Temp);
 
@@ -798,7 +794,7 @@ namespace PlantUtilities {
         if (Node(PlantLoop(LoopNum).LoopSide(LoopSideNum).NodeNumOut).Temp < (PlantLoop(LoopNum).MinTemp - UnderShootOffset)) {
 
             // first stage, throw recurring warning that plant loop is getting out of control
-            ShowRecurringWarningErrorAtEnd("Plant loop falling below lower temperature limit, PlantLoop=\"" + PlantLoop(LoopNum).Name + "\"",
+            ShowRecurringWarningErrorAtEnd(state, "Plant loop falling below lower temperature limit, PlantLoop=\"" + PlantLoop(LoopNum).Name + "\"",
                                            PlantLoop(LoopNum).MinTempErrIndex,
                                            _,
                                            Node(PlantLoop(LoopNum).LoopSide(LoopSideNum).NodeNumOut).Temp);
@@ -1052,15 +1048,15 @@ namespace PlantUtilities {
     }
 
     void UpdateChillerComponentCondenserSide(EnergyPlusData &state,
-                                             int const LoopNum,                   // component's loop index
-                                             int const LoopSide,                  // component's loop side number
-                                             int const EP_UNUSED(TypeOfNum),      // Component's type index
-                                             int const InletNodeNum,              // Component's inlet node pointer
-                                             int const OutletNodeNum,             // Component's outlet node pointer
-                                             Real64 const ModelCondenserHeatRate, // model's heat rejection rate at condenser (W)
-                                             Real64 const ModelInletTemp,         // model's inlet temperature (C)
-                                             Real64 const ModelOutletTemp,        // model's outlet temperature (C)
-                                             Real64 const ModelMassFlowRate,      // model's condenser water mass flow rate (kg/s)
+                                             int const LoopNum,                    // component's loop index
+                                             int const LoopSide,                   // component's loop side number
+                                             [[maybe_unused]] int const TypeOfNum, // Component's type index
+                                             int const InletNodeNum,               // Component's inlet node pointer
+                                             int const OutletNodeNum,              // Component's outlet node pointer
+                                             Real64 const ModelCondenserHeatRate,  // model's heat rejection rate at condenser (W)
+                                             Real64 const ModelInletTemp,          // model's inlet temperature (C)
+                                             Real64 const ModelOutletTemp,         // model's outlet temperature (C)
+                                             Real64 const ModelMassFlowRate,       // model's condenser water mass flow rate (kg/s)
                                              bool const FirstHVACIteration)
     {
 
@@ -1079,7 +1075,6 @@ namespace PlantUtilities {
         // update outlet conditions if needed or possible
 
         // Using/Aliasing
-        using DataBranchAirLoopPlant::MassFlowTolerance;
         using DataLoopNode::Node;
         using DataPlant::PlantLoop;
         using FluidProperties::GetSpecificHeatGlycol;
@@ -1114,7 +1109,7 @@ namespace PlantUtilities {
 
         if (DidAnythingChange || FirstHVACIteration) {
             // use current mass flow rate and inlet temp from Node and recalculate outlet temp
-            if (Node(InletNodeNum).MassFlowRate > MassFlowTolerance) {
+            if (Node(InletNodeNum).MassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
                 // update node outlet conditions
                 Cp = GetSpecificHeatGlycol(state, PlantLoop(LoopNum).FluidName, ModelInletTemp, PlantLoop(LoopNum).FluidIndex, RoutineName);
                 Node(OutletNodeNum).Temp = Node(InletNodeNum).Temp + ModelCondenserHeatRate / (Node(InletNodeNum).MassFlowRate * Cp);
@@ -1140,15 +1135,15 @@ namespace PlantUtilities {
     }
 
     void UpdateComponentHeatRecoverySide(EnergyPlusData &state,
-                                         int const LoopNum,                  // component's loop index
-                                         int const LoopSide,                 // component's loop side number
-                                         int const EP_UNUSED(TypeOfNum),     // Component's type index
-                                         int const InletNodeNum,             // Component's inlet node pointer
-                                         int const OutletNodeNum,            // Component's outlet node pointer
-                                         Real64 const ModelRecoveryHeatRate, // model's heat rejection rate at recovery (W)
-                                         Real64 const ModelInletTemp,        // model's inlet temperature (C)
-                                         Real64 const ModelOutletTemp,       // model's outlet temperature (C)
-                                         Real64 const ModelMassFlowRate,     // model's condenser water mass flow rate (kg/s)
+                                         int const LoopNum,                    // component's loop index
+                                         int const LoopSide,                   // component's loop side number
+                                         [[maybe_unused]] int const TypeOfNum, // Component's type index
+                                         int const InletNodeNum,               // Component's inlet node pointer
+                                         int const OutletNodeNum,              // Component's outlet node pointer
+                                         Real64 const ModelRecoveryHeatRate,   // model's heat rejection rate at recovery (W)
+                                         Real64 const ModelInletTemp,          // model's inlet temperature (C)
+                                         Real64 const ModelOutletTemp,         // model's outlet temperature (C)
+                                         Real64 const ModelMassFlowRate,       // model's condenser water mass flow rate (kg/s)
                                          bool const FirstHVACIteration)
     {
 
@@ -1167,7 +1162,6 @@ namespace PlantUtilities {
         // update outlet conditions if needed or possible
 
         // Using/Aliasing
-        using DataBranchAirLoopPlant::MassFlowTolerance;
         using DataLoopNode::Node;
         using DataPlant::PlantLoop;
         using FluidProperties::GetSpecificHeatGlycol;
@@ -1201,7 +1195,7 @@ namespace PlantUtilities {
 
         if (DidAnythingChange || FirstHVACIteration) {
             // use current mass flow rate and inlet temp from Node and recalculate outlet temp
-            if (Node(InletNodeNum).MassFlowRate > MassFlowTolerance) {
+            if (Node(InletNodeNum).MassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
                 // update node outlet conditions
                 Cp = GetSpecificHeatGlycol(state, PlantLoop(LoopNum).FluidName, ModelInletTemp, PlantLoop(LoopNum).FluidIndex, RoutineName);
                 Node(OutletNodeNum).Temp = Node(InletNodeNum).Temp + ModelRecoveryHeatRate / (Node(InletNodeNum).MassFlowRate * Cp);
@@ -1226,14 +1220,14 @@ namespace PlantUtilities {
         }
     }
 
-    void UpdateAbsorberChillerComponentGeneratorSide(int const LoopNum,                   // component's loop index
-                                                     int const LoopSide,                  // component's loop side number
-                                                     int const EP_UNUSED(TypeOfNum),      // Component's type index
-                                                     int const InletNodeNum,              // Component's inlet node pointer
-                                                     int const EP_UNUSED(OutletNodeNum),  // Component's outlet node pointer
-                                                     int const EP_UNUSED(HeatSourceType),            // Type of fluid in Generator loop
-                                                     Real64 const ModelGeneratorHeatRate, // model's generator heat rate (W)
-                                                     Real64 const ModelMassFlowRate,      // model's generator mass flow rate (kg/s)
+    void UpdateAbsorberChillerComponentGeneratorSide(int const LoopNum,                         // component's loop index
+                                                     int const LoopSide,                        // component's loop side number
+                                                     [[maybe_unused]] int const TypeOfNum,      // Component's type index
+                                                     int const InletNodeNum,                    // Component's inlet node pointer
+                                                     [[maybe_unused]] int const OutletNodeNum,  // Component's outlet node pointer
+                                                     [[maybe_unused]] int const HeatSourceType, // Type of fluid in Generator loop
+                                                     Real64 const ModelGeneratorHeatRate,       // model's generator heat rate (W)
+                                                     Real64 const ModelMassFlowRate,            // model's generator mass flow rate (kg/s)
                                                      bool const FirstHVACIteration)
     {
 
@@ -1510,7 +1504,7 @@ namespace PlantUtilities {
     void SafeCopyPlantNode(int const InletNodeNum,
                            int const OutletNodeNum,
                            Optional_int_const LoopNum,
-                           Optional<Real64 const> EP_UNUSED(OutletTemp) // set on outlet node if present and water.
+                           [[maybe_unused]] Optional<Real64 const> OutletTemp // set on outlet node if present and water.
     )
     {
 
@@ -1758,7 +1752,6 @@ namespace PlantUtilities {
         // Standard EnergyPlus methodology.
 
         // Using/Aliasing
-        using namespace DataGlobals;
         using BranchInputManager::AuditBranches;
         using General::RoundSigDigits;
 
@@ -1887,7 +1880,6 @@ namespace PlantUtilities {
         // na
 
         // Using/Aliasing
-        using namespace DataGlobals;
         using General::RoundSigDigits;
 
         // Locals
@@ -1952,7 +1944,7 @@ namespace PlantUtilities {
         if (!FoundNode) {
             ShowSevereError(state, "ScanPlantLoopsForNodeNum: Plant Node was not found as inlet node (for component) on any plant loops");
             ShowContinueError(state, "Node Name=\"" + DataLoopNode::NodeID(NodeNum) + "\"");
-            if (!DoingSizing) {
+            if (!state.dataGlobal->DoingSizing) {
                 ShowContinueError(state, "called by " + CallerName);
             } else {
                 ShowContinueError(state, "during sizing: called by " + CallerName);
@@ -2082,12 +2074,13 @@ namespace PlantUtilities {
         }
     }
 
-    int MyPlantSizingIndex(EnergyPlusData &state, std::string const &CompType,      // component description
-                           std::string const &CompName,      // user name of component
-                           int const NodeNumIn,              // component water inlet node
-                           int const EP_UNUSED(NodeNumOut),  // component water outlet node
-                           bool &ErrorsFound,                // set to true if there's an error, unchanged otherwise
-                           Optional_bool_const SupressErrors // used for WSHP's where condenser loop may not be on a plant loop
+    int MyPlantSizingIndex(EnergyPlusData &state,
+                           std::string const &CompType,           // component description
+                           std::string const &CompName,           // user name of component
+                           int const NodeNumIn,                   // component water inlet node
+                           [[maybe_unused]] int const NodeNumOut, // component water outlet node
+                           bool &ErrorsFound,                     // set to true if there's an error, unchanged otherwise
+                           Optional_bool_const SupressErrors      // used for WSHP's where condenser loop may not be on a plant loop
     )
     {
 

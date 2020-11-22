@@ -329,15 +329,15 @@ TEST_F(EnergyPlusFixture, DElightManagerF_GetInputDElightComplexFenestration_Tes
     SurfaceGeometry::SetupZoneGeometry(state, foundErrors); // this calls GetSurfaceData()
     EXPECT_FALSE(foundErrors);                       // expect no errors
 
-    DataGlobals::NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
-    DataGlobals::MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
+    state.dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
+    state.dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(state);
     ScheduleManager::ScheduleInputProcessed = true;
-    DataGlobals::TimeStep = 1;
-    DataGlobals::HourOfDay = 1;
+    state.dataGlobal->TimeStep = 1;
+    state.dataGlobal->HourOfDay = 1;
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
-    DataGlobals::HourOfDay = 1;
+    state.dataGlobal->HourOfDay = 1;
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;

@@ -90,10 +90,6 @@ namespace HeatPumpWaterToWaterHEATING {
     // Which are obtained using Parameter Estimation technique.
 
     // Using/Aliasing
-    using DataGlobals::HourOfDay;
-    using DataGlobals::TimeStep;
-    using DataGlobals::TimeStepZone;
-    using DataGlobals::WarmupFlag;
     using namespace DataLoopNode;
 
     // MODULE PARAMETER DEFINITIONS
@@ -132,9 +128,9 @@ namespace HeatPumpWaterToWaterHEATING {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-
-    void GshpPeHeatingSpecs::simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad,
-                                      bool EP_UNUSED(RunFlag)) {
+    void GshpPeHeatingSpecs::simulate(
+        EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, [[maybe_unused]] bool RunFlag)
+    {
 
         // Simulate the model for the Demand "MyLoad"
         if (calledFromLocation.loopNum == this->LoadLoopNum) { // chilled water loop
@@ -158,17 +154,19 @@ namespace HeatPumpWaterToWaterHEATING {
         }
     }
 
-    void GshpPeHeatingSpecs::getDesignCapacities(EnergyPlusData &EP_UNUSED(state),
-                                                 const PlantLocation &EP_UNUSED(calledFromLocation),
+    void GshpPeHeatingSpecs::getDesignCapacities([[maybe_unused]] EnergyPlusData &state,
+                                                 [[maybe_unused]] const PlantLocation &calledFromLocation,
                                                  Real64 &MaxLoad,
                                                  Real64 &MinLoad,
-                                                 Real64 &OptLoad) {
+                                                 Real64 &OptLoad)
+    {
         MinLoad = this->NomCap * this->MinPartLoadRat;
         MaxLoad = this->NomCap * this->MaxPartLoadRat;
         OptLoad = this->NomCap * this->OptPartLoadRat;
     }
 
-    void GshpPeHeatingSpecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation)) {
+    void GshpPeHeatingSpecs::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation)
+    {
         if (this->plantScanFlag) {
             // Locate the heating on the plant loops for later usage
             bool errFlag = false;
@@ -211,7 +209,6 @@ namespace HeatPumpWaterToWaterHEATING {
             this->plantScanFlag = false;
         }
     }
-
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "readability-magic-numbers"
@@ -558,7 +555,6 @@ namespace HeatPumpWaterToWaterHEATING {
         // Using/Aliasing
         using DataHVACGlobals::SysTimeElapsed;
         using namespace FluidProperties;
-        using DataBranchAirLoopPlant::MassFlowTolerance;
         using DataPlant::PlantLoop;
         using General::TrimSigDigits;
         using PlantUtilities::SetComponentFlowRate;
@@ -594,7 +590,7 @@ namespace HeatPumpWaterToWaterHEATING {
 
         // CALCULATE THE SIMULATION TIME
         Real64 const hoursInDay = 24.0;
-        CurrentSimTime = (state.dataGlobal->DayOfSim - 1) * hoursInDay + HourOfDay - 1 + (TimeStep - 1) * TimeStepZone + SysTimeElapsed;
+        CurrentSimTime = (state.dataGlobal->DayOfSim - 1) * hoursInDay + state.dataGlobal->HourOfDay - 1 + (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone + SysTimeElapsed;
 
         if (MyLoad > 0.0) {
             this->MustRun = true;
@@ -658,7 +654,7 @@ namespace HeatPumpWaterToWaterHEATING {
                                  this->SourceBranchNum,
                                  this->SourceCompNum);
             // if there's no flow, turn the "heat pump off"
-            if (this->LoadSideWaterMassFlowRate < MassFlowTolerance || this->SourceSideWaterMassFlowRate < MassFlowTolerance) {
+            if (this->LoadSideWaterMassFlowRate < DataBranchAirLoopPlant::MassFlowTolerance || this->SourceSideWaterMassFlowRate < DataBranchAirLoopPlant::MassFlowTolerance) {
                 this->LoadSideWaterMassFlowRate = 0.0;
                 SetComponentFlowRate(state, this->LoadSideWaterMassFlowRate,
                                      this->LoadSideInletNodeNum,

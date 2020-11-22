@@ -371,7 +371,7 @@ namespace FanCoilUnits {
                                     Real64 &PowerMet               // Sensible power supplied (W)
     );
 
-    void ReportFanCoilUnit(int const FanCoilNum); // number of the current fan coil unit being simulated
+    void ReportFanCoilUnit(EnergyPlusData &state, int const FanCoilNum); // number of the current fan coil unit being simulated
 
     int GetFanCoilZoneInletAirNode(EnergyPlusData &state, int const FanCoilNum);
 

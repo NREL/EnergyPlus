@@ -99,8 +99,6 @@ namespace ElectricBaseboardRadiator {
     // Convective electric baseboard module (ZoneHVAC:Baseboard:Convective:Electric)
 
     // Using/Aliasing
-    using namespace DataGlobals;
-
     // PARAMETER DEFINITIONS
     int const BaseboardRadiator_Electric(1);
     std::string const cCMO_BBRadiator_Electric("ZoneHVAC:Baseboard:RadiantConvective:Electric");
@@ -146,7 +144,7 @@ namespace ElectricBaseboardRadiator {
 
     void SimElecBaseboard(EnergyPlusData &state,
                           std::string const &EquipName,
-                          int const EP_UNUSED(ActualZoneNum),
+                          [[maybe_unused]] int const ActualZoneNum,
                           int const ControlledZoneNum,
                           bool const FirstHVACIteration,
                           Real64 &PowerMet,
@@ -215,7 +213,7 @@ namespace ElectricBaseboardRadiator {
 
         PowerMet = ElecBaseboard(BaseboardNum).TotPower;
 
-        UpdateElectricBaseboard(BaseboardNum);
+        UpdateElectricBaseboard(state, BaseboardNum);
         ReportElectricBaseboard(BaseboardNum);
     }
 
@@ -439,7 +437,7 @@ namespace ElectricBaseboardRadiator {
             ElecBaseboard(BaseboardNum).FracDistribToSurf = 0.0;
 
             // search zone equipment list structure for zone index
-            for (int ctrlZone = 1; ctrlZone <= DataGlobals::NumOfZones; ++ctrlZone) {
+            for (int ctrlZone = 1; ctrlZone <= state.dataGlobal->NumOfZones; ++ctrlZone) {
                 for (int zoneEquipTypeNum = 1; zoneEquipTypeNum <= DataZoneEquipment::ZoneEquipList(ctrlZone).NumOfEquipTypes; ++zoneEquipTypeNum) {
                     if (DataZoneEquipment::ZoneEquipList(ctrlZone).EquipType_Num(zoneEquipTypeNum) == DataZoneEquipment::BBElectric_Num &&
                         DataZoneEquipment::ZoneEquipList(ctrlZone).EquipName(zoneEquipTypeNum) == ElecBaseboard(BaseboardNum).EquipName) {
@@ -597,7 +595,7 @@ namespace ElectricBaseboardRadiator {
             // initialize the environment and sizing flags
             MyEnvrnFlag.allocate(NumElecBaseboards);
             MySizeFlag.allocate(NumElecBaseboards);
-            ZeroSourceSumHATsurf.dimension(NumOfZones, 0.0);
+            ZeroSourceSumHATsurf.dimension(state.dataGlobal->NumOfZones, 0.0);
             QBBElecRadSource.dimension(NumElecBaseboards, 0.0);
             QBBElecRadSrcAvg.dimension(NumElecBaseboards, 0.0);
             LastQBBElecRadSrc.dimension(NumElecBaseboards, 0.0);
@@ -611,7 +609,7 @@ namespace ElectricBaseboardRadiator {
 
         if (ElecBaseboard(BaseboardNum).ZonePtr <= 0) ElecBaseboard(BaseboardNum).ZonePtr = ZoneEquipConfig(ControlledZoneNumSub).ActualZoneNum;
 
-        if (!SysSizingCalc && MySizeFlag(BaseboardNum)) {
+        if (!state.dataGlobal->SysSizingCalc && MySizeFlag(BaseboardNum)) {
             // for each coil, do the sizing once.
             SizeElectricBaseboard(state, BaseboardNum);
             MySizeFlag(BaseboardNum) = false;
@@ -621,7 +619,7 @@ namespace ElectricBaseboardRadiator {
         if (!ZoneEquipmentListChecked && ZoneEquipInputsFilled) {
             ZoneEquipmentListChecked = true;
             for (Loop = 1; Loop <= NumElecBaseboards; ++Loop) {
-                if (CheckZoneEquipmentList(cCMO_BBRadiator_Electric, ElecBaseboard(Loop).EquipName)) continue;
+                if (CheckZoneEquipmentList(state, cCMO_BBRadiator_Electric, ElecBaseboard(Loop).EquipName)) continue;
                 ShowSevereError(state, "InitBaseboard: Unit=[" + cCMO_BBRadiator_Electric + ',' + ElecBaseboard(Loop).EquipName +
                                 "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated.");
             }
@@ -769,7 +767,7 @@ namespace ElectricBaseboardRadiator {
         }
     }
 
-    void CalcElectricBaseboard(EnergyPlusData &state, int const BaseboardNum, int const EP_UNUSED(ControlledZoneNum))
+    void CalcElectricBaseboard(EnergyPlusData &state, int const BaseboardNum, [[maybe_unused]] int const ControlledZoneNum)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
@@ -952,7 +950,7 @@ namespace ElectricBaseboardRadiator {
         ElecUseRate = QBBCap / Effic;
     }
 
-    void UpdateElectricBaseboard(int const BaseboardNum)
+    void UpdateElectricBaseboard(EnergyPlusData &state, int const BaseboardNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -963,16 +961,15 @@ namespace ElectricBaseboardRadiator {
         //       MODIFIED       Feb 2010 Daeho Kang for radiant component
 
         // Using/Aliasing
-        using DataGlobals::TimeStepZone;
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
 
         // First, update the running average if necessary...
         if (LastSysTimeElapsed(BaseboardNum) == SysTimeElapsed) {
-            QBBElecRadSrcAvg(BaseboardNum) -= LastQBBElecRadSrc(BaseboardNum) * LastTimeStepSys(BaseboardNum) / TimeStepZone;
+            QBBElecRadSrcAvg(BaseboardNum) -= LastQBBElecRadSrc(BaseboardNum) * LastTimeStepSys(BaseboardNum) / state.dataGlobal->TimeStepZone;
         }
         // Update the running average and the "last" values with the current values of the appropriate variables
-        QBBElecRadSrcAvg(BaseboardNum) += QBBElecRadSource(BaseboardNum) * TimeStepSys / TimeStepZone;
+        QBBElecRadSrcAvg(BaseboardNum) += QBBElecRadSource(BaseboardNum) * TimeStepSys / state.dataGlobal->TimeStepZone;
 
         LastQBBElecRadSrc(BaseboardNum) = QBBElecRadSource(BaseboardNum);
         LastSysTimeElapsed(BaseboardNum) = SysTimeElapsed;
@@ -1148,7 +1145,7 @@ namespace ElectricBaseboardRadiator {
 
             Area = Surface(SurfNum).Area;
 
-            if (Surface(SurfNum).Class == SurfaceClass_Window) {
+            if (Surface(SurfNum).Class == SurfaceClass::Window) {
                 if (SurfWinShadingFlag(SurfNum) == IntShadeOn || SurfWinShadingFlag(SurfNum) == IntBlindOn) {
                     // The area is the shade or blind area = the sum of the glazing area and the divider area (which is zero if no divider)
                     Area += SurfWinDividerArea(SurfNum);

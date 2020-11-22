@@ -255,7 +255,7 @@ namespace HybridUnitaryAirConditioners {
         if (!ZoneEquipmentListChecked && ZoneEquipInputsFilled) {
             ZoneEquipmentListChecked = true;
             for (Loop = 1; Loop <= NumZoneHybridEvap; ++Loop) {
-                if (CheckZoneEquipmentList("ZoneHVAC:HybridUnitaryHVAC", ZoneHybridUnitaryAirConditioner(Loop).Name)) {
+                if (CheckZoneEquipmentList(state, "ZoneHVAC:HybridUnitaryHVAC", ZoneHybridUnitaryAirConditioner(Loop).Name)) {
                     ZoneHybridUnitaryAirConditioner(Loop).ZoneNodeNum = ZoneEquipConfig(ZoneNum).ZoneNode;
                 } else {
                     ShowSevereError(state,

@@ -196,7 +196,7 @@ namespace ChillerElectricEIR {
         Real64 CondenserFanEnergyConsumption; // reporting: Air-cooled condenser fan energy [J]
         Real64 BasinHeaterConsumption;        // Basin heater energy consumption (J)
         bool IPLVFlag;
-        int EquipFlowCtrl;
+        DataBranchAirLoopPlant::ControlTypeEnum EquipFlowCtrl;
 
         // Default Constructor
         ElectricEIRChillerSpecs()
@@ -221,7 +221,7 @@ namespace ChillerElectricEIR {
               CondenserFanPower(0.0), ChillerCapFT(0.0), ChillerEIRFT(0.0), ChillerEIRFPLR(0.0), ChillerPartLoadRatio(0.0), ChillerCyclingRatio(0.0),
               BasinHeaterPower(0.0), ChillerFalseLoadRate(0.0), ChillerFalseLoad(0.0), Energy(0.0), EvapEnergy(0.0), CondEnergy(0.0),
               CondInletTemp(0.0), EvapInletTemp(0.0), ActualCOP(0.0), EnergyHeatRecovery(0.0), HeatRecInletTemp(0.0), HeatRecMassFlow(0.0),
-              ChillerCondAvgTemp(0.0), CondenserFanEnergyConsumption(0.0), BasinHeaterConsumption(0.0), IPLVFlag(true), EquipFlowCtrl(true)
+              ChillerCondAvgTemp(0.0), CondenserFanEnergyConsumption(0.0), BasinHeaterConsumption(0.0), IPLVFlag(true), EquipFlowCtrl(DataBranchAirLoopPlant::ControlTypeEnum::Unknown)
         {
         }
 
@@ -229,7 +229,7 @@ namespace ChillerElectricEIR {
 
         void setupOutputVars(EnergyPlusData &state);
 
-        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void getDesignCapacities(EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 

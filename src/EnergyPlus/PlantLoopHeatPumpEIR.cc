@@ -352,7 +352,7 @@ namespace EIRPlantLoopHeatPumps {
         this->sourceSideOutletTemp = this->calcSourceOutletTemp(this->sourceSideInletTemp, this->sourceSideHeatTransfer / sourceMCp);
     }
 
-    void EIRPlantLoopHeatPump::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation))
+    void EIRPlantLoopHeatPump::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation)
     {
         // This function does all one-time and begin-environment initialization
         std::string const routineName = EIRPlantLoopHeatPumps::__EQUIP__ + ':' + __FUNCTION__;
@@ -627,7 +627,7 @@ namespace EIRPlantLoopHeatPumps {
                         // then the capacity was hard-sized to a good value and the tmpCapacity was calculated to a good value too
                         Real64 hardSizedCapacity = this->referenceCapacity;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            if (DataGlobals::DoPlantSizing) {
+                            if (state.dataGlobal->DoPlantSizing) {
                                 BaseSizer::reportSizerOutput(state, typeName,
                                                              this->name,
                                                              "Design Size Nominal Capacity [W]",
@@ -638,7 +638,7 @@ namespace EIRPlantLoopHeatPumps {
                                 BaseSizer::reportSizerOutput(state, typeName, this->name, "User-Specified Nominal Capacity [W]", hardSizedCapacity);
                             }
                             // we can warn here if there is a bit mismatch between hard- and auto-sized
-                            if (DataGlobals::DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpCapacity - hardSizedCapacity) / hardSizedCapacity) > DataSizing::AutoVsHardSizingThreshold) {
                                     ShowWarningMessage(state, "EIRPlantLoopHeatPump::size(): Potential issue with equipment sizing for " + this->name);
                                     ShowContinueError(state, "User-Specified Nominal Capacity of " + General::RoundSigDigits(hardSizedCapacity, 2) + " [W]");
@@ -666,7 +666,7 @@ namespace EIRPlantLoopHeatPumps {
                     if (this->loadSideDesignVolFlowRate > 0.0 && tmpLoadVolFlow > 0.0) {
                         Real64 hardSizedLoadSideFlow = this->loadSideDesignVolFlowRate;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            if (DataGlobals::DoPlantSizing) {
+                            if (state.dataGlobal->DoPlantSizing) {
                                 BaseSizer::reportSizerOutput(state, typeName,
                                                              this->name,
                                                              "Design Size Load Side Volume Flow Rate [m3/s]",
@@ -677,7 +677,7 @@ namespace EIRPlantLoopHeatPumps {
                                 BaseSizer::reportSizerOutput(state,
                                     typeName, this->name, "User-Specified Load Side Volume Flow Rate [m3/s]", hardSizedLoadSideFlow);
                             }
-                            if (DataGlobals::DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpLoadVolFlow - hardSizedLoadSideFlow) / hardSizedLoadSideFlow) >
                                     DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "EIRPlantLoopHeatPump::size(): Potential issue with equipment sizing for " + this->name);
@@ -804,7 +804,7 @@ namespace EIRPlantLoopHeatPumps {
             if (this->sourceSideDesignVolFlowRate > 0.0 && tmpSourceVolFlow > 0.0) {
                 Real64 const hardSizedSourceSideFlow = this->sourceSideDesignVolFlowRate;
                 if (DataPlant::PlantFinalSizesOkayToReport) {
-                    if (DataGlobals::DoPlantSizing) {
+                    if (state.dataGlobal->DoPlantSizing) {
                         BaseSizer::reportSizerOutput(state, typeName,
                                                      this->name,
                                                      "Design Size Source Side Volume Flow Rate [m3/s]",
@@ -815,7 +815,7 @@ namespace EIRPlantLoopHeatPumps {
                         BaseSizer::reportSizerOutput(state,
                             typeName, this->name, "User-Specified Source Side Volume Flow Rate [m3/s]", hardSizedSourceSideFlow);
                     }
-                    if (DataGlobals::DisplayExtraWarnings) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
                         if ((std::abs(tmpSourceVolFlow - hardSizedSourceSideFlow) / hardSizedSourceSideFlow) >
                             DataSizing::AutoVsHardSizingThreshold) {
                             ShowMessage(state, "EIRPlantLoopHeatPump::size(): Potential issue with equipment sizing for " + this->name);
@@ -1190,7 +1190,7 @@ namespace EIRPlantLoopHeatPumps {
         }
     }
 
-    void EIRPlantLoopHeatPump::checkConcurrentOperation()
+    void EIRPlantLoopHeatPump::checkConcurrentOperation(EnergyPlusData &state)
     {
         // This will do a recurring warning for concurrent companion operation.
         // This function should be called at the end of the time-step to ensure any iteration-level operation
@@ -1205,7 +1205,7 @@ namespace EIRPlantLoopHeatPumps {
                 continue;
             }
             if (thisPLHP.running && thisPLHP.companionHeatPumpCoil->running) {
-                ShowRecurringWarningErrorAtEnd("Companion heat pump objects running concurrently, check operation.  Base object name: " +
+                ShowRecurringWarningErrorAtEnd(state, "Companion heat pump objects running concurrently, check operation.  Base object name: " +
                                                    thisPLHP.name,
                                                thisPLHP.recurringConcurrentOperationWarningIndex);
             }

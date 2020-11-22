@@ -50,7 +50,6 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/Material.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -59,7 +58,6 @@
 // Windows library headers
 #include <WCETarcog.hpp>
 
-#include "WindowManagerExteriorData.hh"
 #include "WindowManagerExteriorThermal.hh"
 
 namespace EnergyPlus {
@@ -71,7 +69,6 @@ using namespace FenestrationCommon;
 using namespace DataEnvironment;
 using namespace DataSurfaces;
 using namespace DataHeatBalance;
-using namespace DataGlobals;
 using namespace General;
 
 namespace WindowManager {
@@ -154,7 +151,7 @@ namespace WindowManager {
         HConvIn(SurfNum) = aSystem->getHc(Environment::Indoor);
         if (SurfWinShadingFlag(SurfNum) == IntShadeOn || SurfWinShadingFlag(SurfNum) == IntBlindOn || aFactory.isInteriorShade()) {
             // It is not clear why EnergyPlus keeps this interior calculations separately for interior shade. This does create different
-            // soltuion from heat transfer from tarcog itself. Need to confirm with LBNL team about this approach. Note that heat flow
+            // solution from heat transfer from tarcog itself. Need to confirm with LBNL team about this approach. Note that heat flow
             // through shade (consider case when openings are zero) is different from heat flow obtained by these equations. Will keep
             // these calculations just to confirm that current exterior engine is giving close results to what is in here. (Simon)
             auto totLayers = aLayers.size();

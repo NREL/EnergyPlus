@@ -113,9 +113,6 @@ namespace SingleDuct {
     using BranchNodeConnections::SetUpCompSets;
     using BranchNodeConnections::TestCompSet;
     using DataEnvironment::StdRhoAir;
-    using DataGlobals::DisplayExtraWarnings;
-    using DataGlobals::NumOfZones;
-    using DataGlobals::SysSizingCalc;
     using DataHeatBalFanSys::TempControlType;
     using DataHVACGlobals::ATMixer_InletSide;
     using DataHVACGlobals::ATMixer_SupplySide;
@@ -350,7 +347,6 @@ namespace SingleDuct {
         using Fans::GetFanOutletNode;
         using namespace DataIPShortCuts;
         using namespace DataHeatBalance;
-        using DataGlobals::DoZoneSizing;
         using DataPlant::TypeOf_CoilSteamAirHeating;
         using DataPlant::TypeOf_CoilWaterSimpleHeating;
         using DataSizing::OARequirements;
@@ -645,7 +641,7 @@ namespace SingleDuct {
             } else {
 
                 // Fill the Zone Equipment data with the inlet node number of this unit.
-                for (CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone) {
+                for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                     if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
                     for (SupAirIn = 1; SupAirIn <= ZoneEquipConfig(CtrlZone).NumInletNodes; ++SupAirIn) {
                         if (sd_airterminal(SysNum).ReheatAirOutletNode == ZoneEquipConfig(CtrlZone).InletNode(SupAirIn)) {
@@ -924,7 +920,7 @@ namespace SingleDuct {
             } else {
 
                 // Fill the Zone Equipment data with the inlet node number of this unit
-                for (CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone) {
+                for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                     if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
                     for (SupAirIn = 1; SupAirIn <= ZoneEquipConfig(CtrlZone).NumInletNodes; ++SupAirIn) {
                         if (sd_airterminal(SysNum).ReheatAirOutletNode == ZoneEquipConfig(CtrlZone).InletNode(SupAirIn)) {
@@ -1152,7 +1148,7 @@ namespace SingleDuct {
             } else {
 
                 // Fill the Zone Equipment data with the inlet node number of this unit.
-                for (CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone) {
+                for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                     if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
                     for (SupAirIn = 1; SupAirIn <= ZoneEquipConfig(CtrlZone).NumInletNodes; ++SupAirIn) {
                         if (sd_airterminal(SysNum).OutletNodeNum == ZoneEquipConfig(CtrlZone).InletNode(SupAirIn)) {
@@ -1287,7 +1283,7 @@ namespace SingleDuct {
             } else {
 
                 // Fill the Zone Equipment data with the inlet node number of this unit.
-                for (CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone) {
+                for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                     if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
                     for (SupAirIn = 1; SupAirIn <= ZoneEquipConfig(CtrlZone).NumInletNodes; ++SupAirIn) {
                         if (sd_airterminal(SysNum).OutletNodeNum == ZoneEquipConfig(CtrlZone).InletNode(SupAirIn)) {
@@ -1343,7 +1339,7 @@ namespace SingleDuct {
                 }
             }
 
-            if (DataGlobals::AnyEnergyManagementSystemInModel) {
+            if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                 // model results related actuators
                 SetupEMSActuator("AirTerminal:SingleDuct:ConstantVolume:NoReheat",
                                  sd_airterminal(SysNum).SysName,
@@ -1502,7 +1498,7 @@ namespace SingleDuct {
             } else {
 
                 // Fill the Zone Equipment data with the inlet node number of this unit.
-                for (CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone) {
+                for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                     if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
                     for (SupAirIn = 1; SupAirIn <= ZoneEquipConfig(CtrlZone).NumInletNodes; ++SupAirIn) {
                         if (sd_airterminal(SysNum).ReheatAirOutletNode == ZoneEquipConfig(CtrlZone).InletNode(SupAirIn)) {
@@ -1670,7 +1666,7 @@ namespace SingleDuct {
             } else {
 
                 // Fill the Zone Equipment data with the inlet node number of this unit.
-                for (CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone) {
+                for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                     if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
                     for (SupAirIn = 1; SupAirIn <= ZoneEquipConfig(CtrlZone).NumInletNodes; ++SupAirIn) {
                         if (sd_airterminal(SysNum).ReheatAirOutletNode == ZoneEquipConfig(CtrlZone).InletNode(SupAirIn)) {
@@ -1958,7 +1954,7 @@ namespace SingleDuct {
                 // Fill the Zone Equipment data with the inlet node number of this unit.
                 // what if not found?  error?
                 IsNotOK = true;
-                for (CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone) {
+                for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                     if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
                     for (SupAirIn = 1; SupAirIn <= ZoneEquipConfig(CtrlZone).NumInletNodes; ++SupAirIn) {
                         if (sd_airterminal(SysNum).ReheatAirOutletNode == ZoneEquipConfig(CtrlZone).InletNode(SupAirIn)) {
@@ -2046,7 +2042,7 @@ namespace SingleDuct {
         if (NumZoneSiz > 0) {
             for (SysIndex = 1; SysIndex <= NumSDAirTerminal; ++SysIndex) {
                 for (ZoneSizIndex = 1; ZoneSizIndex <= NumZoneSiz; ++ZoneSizIndex) {
-                    if (DoZoneSizing) {
+                    if (state.dataGlobal->DoZoneSizing) {
                         if (FinalZoneSizing(ZoneSizIndex).ActualZoneNum == sd_airterminal(SysIndex).ActualZoneNum) {
                             if (FinalZoneSizing(ZoneSizIndex).ZoneSecondaryRecirculation > 0.0) {
                                 ShowWarningError(state, RoutineName + "A zone secondary recirculation fraction is specified for zone served by ");
@@ -2098,7 +2094,6 @@ namespace SingleDuct {
 
         // Using/Aliasing
         using DataDefineEquip::AirDistUnit;
-        using DataGlobals::AnyPlantInModel;
         using DataPlant::PlantLoop;
         using DataPlant::TypeOf_CoilSteamAirHeating;
         using DataPlant::TypeOf_CoilWaterSimpleHeating;
@@ -2173,7 +2168,7 @@ namespace SingleDuct {
             } else {
                 this->PlantLoopScanFlag = false;
             }
-        } else if (this->PlantLoopScanFlag && !AnyPlantInModel) {
+        } else if (this->PlantLoopScanFlag && !state.dataGlobal->AnyPlantInModel) {
             this->PlantLoopScanFlag = false;
         }
 
@@ -2182,7 +2177,7 @@ namespace SingleDuct {
             // Check to see if there is a Air Distribution Unit on the Zone Equipment List
             for (SysIndex = 1; SysIndex <= NumSDAirTerminal; ++SysIndex) {
                 if (sd_airterminal(SysIndex).ADUNum == 0) continue;
-                if (CheckZoneEquipmentList("ZoneHVAC:AirDistributionUnit", AirDistUnit(sd_airterminal(SysIndex).ADUNum).Name)) continue;
+                if (CheckZoneEquipmentList(state, "ZoneHVAC:AirDistributionUnit", AirDistUnit(sd_airterminal(SysIndex).ADUNum).Name)) continue;
                 ShowSevereError(state, "InitSingleDuctSystems: ADU=[Air Distribution Unit," + AirDistUnit(sd_airterminal(SysIndex).ADUNum).Name +
                                 "] is not on any ZoneHVAC:EquipmentList.");
                 ShowContinueError(state, "...System=[" + sd_airterminal(SysIndex).SysType + ',' + sd_airterminal(SysIndex).SysName +
@@ -2197,7 +2192,7 @@ namespace SingleDuct {
             this->ZoneTurndownMinAirFrac = 1.0;
         }
 
-        if (!SysSizingCalc && this->MySizeFlag) {
+        if (!state.dataGlobal->SysSizingCalc && this->MySizeFlag) {
 
             this->SizeSys(state);
 
@@ -2574,7 +2569,7 @@ namespace SingleDuct {
                                                      MaxAirVolFlowRateDes,
                                                      "User-Specified Maximum Air Flow Rate [m3/s]",
                                                      MaxAirVolFlowRateUser);
-                        if (DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(MaxAirVolFlowRateDes - MaxAirVolFlowRateUser) / MaxAirVolFlowRateUser) > AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeHVACSingleDuct: Potential issue with equipment sizing for " + this->SysType + " = \"" +
                                             this->SysName + "\".");
@@ -2622,7 +2617,7 @@ namespace SingleDuct {
                                                      MaxHeatAirVolFlowRateDes,
                                                      "User-Specified Maximum Heating Air Flow Rate [m3/s]",
                                                      MaxHeatAirVolFlowRateUser);
-                        if (DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(MaxHeatAirVolFlowRateDes - MaxHeatAirVolFlowRateUser) / MaxHeatAirVolFlowRateUser) >
                                 AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeHVACSingleDuct: Potential issue with equipment sizing for " + this->SysType + " = \"" +
@@ -2685,7 +2680,7 @@ namespace SingleDuct {
                                              MinAirFlowFracDes * this->ZoneTurndownMinAirFrac,
                                              "User-Specified Constant Minimum Air Flow Fraction",
                                              MinAirFlowFracUser * this->ZoneTurndownMinAirFrac);
-                if (DisplayExtraWarnings) {
+                if (state.dataGlobal->DisplayExtraWarnings) {
                     if ((std::abs(MinAirFlowFracDes - MinAirFlowFracUser) / MinAirFlowFracUser) > AutoVsHardSizingThreshold) {
                         ShowMessage(state, "SizeHVACSingleDuct: Potential issue with equipment sizing for " + this->SysType + " = \"" + this->SysName +
                                     "\".");
@@ -2745,7 +2740,7 @@ namespace SingleDuct {
                                              FixedMinAirDes * this->ZoneTurndownMinAirFrac,
                                              "User-Specified Fixed Minimum Air Flow Rate [m3/s]",
                                              FixedMinAirUser * this->ZoneTurndownMinAirFrac);
-                if (DisplayExtraWarnings) {
+                if (state.dataGlobal->DisplayExtraWarnings) {
                     if ((std::abs(FixedMinAirDes - FixedMinAirUser) / FixedMinAirUser) > AutoVsHardSizingThreshold) {
                         ShowMessage(state, "SizeHVACSingleDuct: Potential issue with equipment sizing for " + this->SysType + " = \"" + this->SysName +
                                     "\".");
@@ -2840,7 +2835,7 @@ namespace SingleDuct {
                                                  MaxAirVolFlowRateDuringReheatDes / this->ZoneFloorArea);
                 }
                 this->MaxAirVolFlowRateDuringReheat = MaxAirVolFlowRateDuringReheatDes;
-                if (DisplayExtraWarnings) {
+                if (state.dataGlobal->DisplayExtraWarnings) {
                     if ((std::abs(MaxAirVolFractionDuringReheatDes - MaxAirVolFractionDuringReheatUser) / MaxAirVolFractionDuringReheatUser) >
                         AutoVsHardSizingThreshold) {
                         ShowMessage(state, "SizeHVACSingleDuct: Potential issue with equipment sizing for " + this->SysType + " = \"" + this->SysName +
@@ -2873,7 +2868,7 @@ namespace SingleDuct {
                                                  MaxAirVolFlowRateDuringReheatUser / this->ZoneFloorArea);
                 }
                 this->MaxAirVolFractionDuringReheat = MaxAirVolFractionDuringReheatDes;
-                if (DisplayExtraWarnings) {
+                if (state.dataGlobal->DisplayExtraWarnings) {
                     if ((std::abs(MaxAirVolFlowRateDuringReheatDes - MaxAirVolFlowRateDuringReheatUser) / MaxAirVolFlowRateDuringReheatUser) >
                         AutoVsHardSizingThreshold) {
                         ShowMessage(state, "SizeHVACSingleDuct: Potential issue with equipment sizing for " + this->SysType + " = \"" + this->SysName +
@@ -2908,7 +2903,7 @@ namespace SingleDuct {
                 }
                 this->MaxAirVolFlowRateDuringReheat =
                     max(this->MaxAirVolFlowRateDuringReheat, this->MaxAirVolFractionDuringReheat * this->MaxAirVolFlowRate);
-                if (DisplayExtraWarnings) {
+                if (state.dataGlobal->DisplayExtraWarnings) {
                     if ((std::abs(MaxAirVolFractionDuringReheatDes - MaxAirVolFractionDuringReheatUser) / MaxAirVolFractionDuringReheatUser) >
                         AutoVsHardSizingThreshold) {
                         ShowMessage(state, "SizeHVACSingleDuct: Potential issue with equipment sizing for " + this->SysType + " = \"" + this->SysName +
@@ -2921,7 +2916,7 @@ namespace SingleDuct {
                         ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                     }
                 }
-                if (DisplayExtraWarnings) {
+                if (state.dataGlobal->DisplayExtraWarnings) {
                     if ((std::abs(MaxAirVolFlowRateDuringReheatDes - MaxAirVolFlowRateDuringReheatUser) / MaxAirVolFlowRateDuringReheatUser) >
                         AutoVsHardSizingThreshold) {
                         ShowMessage(state, "SizeHVACSingleDuct: Potential issue with equipment sizing for " + this->SysType + " = \"" + this->SysName +
@@ -3111,7 +3106,7 @@ namespace SingleDuct {
                                                          MaxReheatWaterVolFlowDes,
                                                          "User-Specified Maximum Reheat Water Flow Rate [m3/s]",
                                                          MaxReheatWaterVolFlowUser);
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(MaxReheatWaterVolFlowDes - MaxReheatWaterVolFlowUser) / MaxReheatWaterVolFlowUser) >
                                     AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeHVACSingleDuct: Potential issue with equipment sizing for " + this->SysType + " = \"" +
@@ -3194,7 +3189,7 @@ namespace SingleDuct {
                                                          MaxReheatSteamVolFlowDes,
                                                          "User-Specified Maximum Reheat Steam Flow Rate [m3/s]",
                                                          MaxReheatSteamVolFlowUser);
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(MaxReheatSteamVolFlowDes - MaxReheatSteamVolFlowUser) / MaxReheatSteamVolFlowUser) >
                                     AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeHVACSingleDuct: Potential issue with equipment sizing for " + this->SysType + " = \"" +
@@ -3516,7 +3511,7 @@ namespace SingleDuct {
             if (this->MaxReheatTempSetByUser) {
 
                 MaxHeatTemp = this->MaxReheatTemp;
-                if (QToHeatSetPt > SmallLoad) { // zone has a postive load to heating setpoint
+                if (QToHeatSetPt > SmallLoad) { // zone has a positive load to heating setpoint
                     MassFlowReqToLimitLeavingTemp = QToHeatSetPt / (CpAirAvg * (MaxHeatTemp - ZoneTemp));
                 } else {
                     MassFlowReqToLimitLeavingTemp = 0.0;
@@ -3975,7 +3970,7 @@ namespace SingleDuct {
             if (this->MaxReheatTempSetByUser) {
 
                 MaxHeatTemp = this->MaxReheatTemp;
-                if (QToHeatSetPt > SmallLoad) { // zone has a postive load to heating setpoint
+                if (QToHeatSetPt > SmallLoad) { // zone has a positive load to heating setpoint
                     MassFlowReq = QToHeatSetPt / (CpAirZn * (MaxHeatTemp - ZoneTemp));
                 } else {
                     MassFlowReq = MassFlow;
@@ -4381,14 +4376,14 @@ namespace SingleDuct {
                         ShowWarningError(state, "Supply air flow control failed in VS VAV terminal unit " + this->SysName);
                         ShowContinueError(state, "  Iteration limit exceeded in calculating air flow rate");
                     }
-                    ShowRecurringWarningErrorAtEnd("Supply air flow Iteration limit exceeded in VS VAV terminal unit " + this->SysName,
+                    ShowRecurringWarningErrorAtEnd(state, "Supply air flow Iteration limit exceeded in VS VAV terminal unit " + this->SysName,
                                                    this->IterationLimit);
                 } else if (SolFlag == -2) {
                     if (this->IterationFailed == 0) {
                         ShowWarningError(state, "Supply air flow control failed in VS VAV terminal unit " + this->SysName);
                         ShowContinueError(state, "  Bad air flow limits");
                     }
-                    ShowRecurringWarningErrorAtEnd("Supply air flow control failed in VS VAV terminal unit " + this->SysName, this->IterationFailed);
+                    ShowRecurringWarningErrorAtEnd(state, "Supply air flow control failed in VS VAV terminal unit " + this->SysName, this->IterationFailed);
                 }
 
             } else {
@@ -4438,11 +4433,11 @@ namespace SingleDuct {
                     ErrTolerance = this->ControllerOffset;
                     SolveRoot(state, ErrTolerance, 500, SolFlag, HWFlow, this->VAVVSHWNoFanResidual, MinFlowWater, MaxFlowWater, Par);
                     if (SolFlag == -1) {
-                        ShowRecurringWarningErrorAtEnd("Hot Water flow control failed in VS VAV terminal unit " + this->SysName, this->ErrCount1);
-                        ShowRecurringContinueErrorAtEnd("...Iteration limit (500) exceeded in calculating the hot water flow rate", this->ErrCount1c);
+                        ShowRecurringWarningErrorAtEnd(state, "Hot Water flow control failed in VS VAV terminal unit " + this->SysName, this->ErrCount1);
+                        ShowRecurringContinueErrorAtEnd(state, "...Iteration limit (500) exceeded in calculating the hot water flow rate", this->ErrCount1c);
                         this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, HCType, HWFlow, 0.0, FanType, MassFlow, FanOp, QDelivered);
                     } else if (SolFlag == -2) {
-                        ShowRecurringWarningErrorAtEnd("Hot Water flow control failed (bad air flow limits) in VS VAV terminal unit " + this->SysName,
+                        ShowRecurringWarningErrorAtEnd(state, "Hot Water flow control failed (bad air flow limits) in VS VAV terminal unit " + this->SysName,
                                                        this->ErrCount2);
                     }
                 } else if (QTotLoad >= QHeatFanOffMax - SmallLoad && QTotLoad <= QHeatFanOnMin + SmallLoad) {
@@ -4470,14 +4465,14 @@ namespace SingleDuct {
                             ShowWarningError(state, "Supply air flow control failed in VS VAV terminal unit " + this->SysName);
                             ShowContinueError(state, "  Iteration limit exceeded in calculating air flow rate");
                         }
-                        ShowRecurringWarningErrorAtEnd("Supply air flow Iteration limit exceeded in VS VAV terminal unit " + this->SysName,
+                        ShowRecurringWarningErrorAtEnd(state, "Supply air flow Iteration limit exceeded in VS VAV terminal unit " + this->SysName,
                                                        this->IterationLimit);
                     } else if (SolFlag == -2) {
                         if (this->IterationFailed == 0) {
                             ShowWarningError(state, "Supply air flow control failed in VS VAV terminal unit " + this->SysName);
                             ShowContinueError(state, "  Bad air flow limits");
                         }
-                        ShowRecurringWarningErrorAtEnd("Supply air flow control failed in VS VAV terminal unit " + this->SysName,
+                        ShowRecurringWarningErrorAtEnd(state, "Supply air flow control failed in VS VAV terminal unit " + this->SysName,
                                                        this->IterationFailed);
                     }
                 } else {
@@ -4509,11 +4504,11 @@ namespace SingleDuct {
                     ErrTolerance = this->ControllerOffset;
                     SolveRoot(state, ErrTolerance, 500, SolFlag, HWFlow, this->VAVVSHWNoFanResidual, MinFlowSteam, MaxFlowSteam, Par);
                     if (SolFlag == -1) {
-                        ShowRecurringWarningErrorAtEnd("Steam flow control failed in VS VAV terminal unit " + this->SysName, this->ErrCount1);
-                        ShowRecurringContinueErrorAtEnd("...Iteration limit (500) exceeded in calculating the hot water flow rate", this->ErrCount1c);
+                        ShowRecurringWarningErrorAtEnd(state, "Steam flow control failed in VS VAV terminal unit " + this->SysName, this->ErrCount1);
+                        ShowRecurringContinueErrorAtEnd(state, "...Iteration limit (500) exceeded in calculating the hot water flow rate", this->ErrCount1c);
                         this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, HCType, HWFlow, 0.0, FanType, MassFlow, FanOp, QDelivered);
                     } else if (SolFlag == -2) {
-                        ShowRecurringWarningErrorAtEnd("Steam flow control failed (bad air flow limits) in VS VAV terminal unit " + this->SysName,
+                        ShowRecurringWarningErrorAtEnd(state, "Steam flow control failed (bad air flow limits) in VS VAV terminal unit " + this->SysName,
                                                        this->ErrCount2);
                     }
                 } else if (QTotLoad >= QHeatFanOffMax - SmallLoad && QTotLoad <= QHeatFanOnMin + SmallLoad) {
@@ -4540,14 +4535,14 @@ namespace SingleDuct {
                             ShowWarningError(state, "Steam heating coil control failed in VS VAV terminal unit " + this->SysName);
                             ShowContinueError(state, "  Iteration limit exceeded in calculating air flow rate");
                         }
-                        ShowRecurringWarningErrorAtEnd("Steam heating coil iteration limit exceeded in VS VAV terminal unit " + this->SysName,
+                        ShowRecurringWarningErrorAtEnd(state, "Steam heating coil iteration limit exceeded in VS VAV terminal unit " + this->SysName,
                                                        this->IterationLimit);
                     } else if (SolFlag == -2) {
                         if (this->IterationFailed == 0) {
                             ShowWarningError(state, "Steam heating coil control failed in VS VAV terminal unit " + this->SysName);
                             ShowContinueError(state, "  Bad air flow limits");
                         }
-                        ShowRecurringWarningErrorAtEnd("Steam heating coil control failed in VS VAV terminal unit " + this->SysName,
+                        ShowRecurringWarningErrorAtEnd(state, "Steam heating coil control failed in VS VAV terminal unit " + this->SysName,
                                                        this->IterationFailed);
                     }
                 } else {
@@ -4582,14 +4577,14 @@ namespace SingleDuct {
                             ShowWarningError(state, "Heating coil control failed in VS VAV terminal unit " + this->SysName);
                             ShowContinueError(state, "  Iteration limit exceeded in calculating air flow rate");
                         }
-                        ShowRecurringWarningErrorAtEnd("Heating coil control iteration limit exceeded in VS VAV terminal unit " + this->SysName,
+                        ShowRecurringWarningErrorAtEnd(state, "Heating coil control iteration limit exceeded in VS VAV terminal unit " + this->SysName,
                                                        this->IterationLimit);
                     } else if (SolFlag == -2) {
                         if (this->IterationFailed == 0) {
                             ShowWarningError(state, "Heating coil control failed in VS VAV terminal unit " + this->SysName);
                             ShowContinueError(state, "  Bad air flow limits");
                         }
-                        ShowRecurringWarningErrorAtEnd("Heating coil control failed in VS VAV terminal unit " + this->SysName, this->IterationFailed);
+                        ShowRecurringWarningErrorAtEnd(state, "Heating coil control failed in VS VAV terminal unit " + this->SysName, this->IterationFailed);
                     }
                 } else {
                     MassFlow = MaxHeatMassFlow;
@@ -4827,15 +4822,15 @@ namespace SingleDuct {
     }
 
     void SingleDuctAirTerminal::CalcVAVVS(EnergyPlusData &state,
-                                          bool const FirstHVACIteration,  // flag for 1st HVAV iteration in the time step
-                                          int const ZoneNode,             // zone node number
-                                          int const EP_UNUSED(HCoilType), // type of hot water coil !unused1208
-                                          Real64 const HWFlow,            // hot water flow (kg/s)
-                                          Real64 const HCoilReq,          // gas or elec coil demand requested
-                                          int const FanType,              // type of fan
-                                          Real64 const AirFlow,           // air flow rate (kg/s)
-                                          int const FanOn,                // 1 means fan is on
-                                          Real64 &LoadMet                 // load met by unit (watts)
+                                          bool const FirstHVACIteration,        // flag for 1st HVAV iteration in the time step
+                                          int const ZoneNode,                   // zone node number
+                                          [[maybe_unused]] int const HCoilType, // type of hot water coil !unused1208
+                                          Real64 const HWFlow,                  // hot water flow (kg/s)
+                                          Real64 const HCoilReq,                // gas or elec coil demand requested
+                                          int const FanType,                    // type of fan
+                                          Real64 const AirFlow,                 // air flow rate (kg/s)
+                                          int const FanOn,                      // 1 means fan is on
+                                          Real64 &LoadMet                       // load met by unit (watts)
     )
     {
 
@@ -5495,7 +5490,6 @@ namespace SingleDuct {
         using BranchNodeConnections::TestCompSet;
         using DataDefineEquip::AirDistUnit;
         using DataDefineEquip::NumAirDistUnits;
-        using DataGlobals::NumOfZones;
         using DataHVACGlobals::ATMixer_InletSide;
         using DataHVACGlobals::ATMixer_SupplySide;
         using DataSizing::NumZoneSizingInput;
@@ -5657,7 +5651,7 @@ namespace SingleDuct {
                 if (SysATMixer(ATMixerNum).MixerType == ATMixer_InletSide) {
                     // Air Terminal inlet node must be the same as a zone exhaust node
                     ZoneNodeNotFound = true;
-                    for (CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone) {
+                    for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                         if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
                         for (NodeNum = 1; NodeNum <= ZoneEquipConfig(CtrlZone).NumExhaustNodes; ++NodeNum) {
                             if (SysATMixer(ATMixerNum).SecInNode == ZoneEquipConfig(CtrlZone).ExhaustNode(NodeNum)) {
@@ -5689,7 +5683,7 @@ namespace SingleDuct {
 
                 if (SysATMixer(ATMixerNum).MixerType == ATMixer_SupplySide) {
                     ZoneNodeNotFound = true;
-                    for (CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone) {
+                    for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                         if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
                         for (NodeNum = 1; NodeNum <= ZoneEquipConfig(CtrlZone).NumInletNodes; ++NodeNum) {
                             if (SysATMixer(ATMixerNum).MixedAirOutNode == ZoneEquipConfig(CtrlZone).InletNode(NodeNum)) {
@@ -6140,11 +6134,11 @@ namespace SingleDuct {
             ZoneEqSizing(curZoneEqNum).ATMixerVolFlow = SingleDuct::SysATMixer(inletATMixerIndex).DesignPrimaryAirVolRate;
 
             // If air loop has heating coil use SA conditions, else if OA sys has coils then use precool conditions, else use OA conditions
-            if (DataAirSystems::PrimaryAirSystem(airLoopIndex).CentralHeatCoilExists) {
+            if (state.dataAirSystemsData->PrimaryAirSystems(airLoopIndex).CentralHeatCoilExists) {
                 // if central heating coil exists, ATMixer outlet is assumed to be at supply air conditions described in sizing input
                 ZoneEqSizing(curZoneEqNum).ATMixerHeatPriDryBulb = FinalSysSizing(airLoopIndex).HeatSupTemp;
                 ZoneEqSizing(curZoneEqNum).ATMixerHeatPriHumRat = FinalSysSizing(airLoopIndex).HeatSupHumRat;
-            } else if (DataAirSystems::PrimaryAirSystem(airLoopIndex).NumOAHeatCoils > 0) {
+            } else if (state.dataAirSystemsData->PrimaryAirSystems(airLoopIndex).NumOAHeatCoils > 0) {
                 // if no central heating coil exists and an outdoor air coil does exist, then ATMixer outlet is mixture of preheat and return
                 if (FinalSysSizing(airLoopIndex).DesMainVolFlow == 0.0) { // protect divide by 0
                     // doesn't matter, just pick a condition
@@ -6202,11 +6196,11 @@ namespace SingleDuct {
             }
 
             // If air loop has cooling coil use SA conditions, else if OA sys has coils then use precool conditions, else use OA conditions
-            if (DataAirSystems::PrimaryAirSystem(airLoopIndex).CentralCoolCoilExists) {
+            if (state.dataAirSystemsData->PrimaryAirSystems(airLoopIndex).CentralCoolCoilExists) {
                 // if central cooling coil exists, ATMixer outlet is assumed to be at supply air conditions described in sizing input
                 ZoneEqSizing(curZoneEqNum).ATMixerCoolPriDryBulb = FinalSysSizing(airLoopIndex).CoolSupTemp;
                 ZoneEqSizing(curZoneEqNum).ATMixerCoolPriHumRat = FinalSysSizing(airLoopIndex).CoolSupHumRat;
-            } else if (DataAirSystems::PrimaryAirSystem(airLoopIndex).NumOACoolCoils > 0) {
+            } else if (state.dataAirSystemsData->PrimaryAirSystems(airLoopIndex).NumOACoolCoils > 0) {
                 // if no central cooling coil exists and an outdoor air coil does exist, then ATMixer outlet is mixture of precool and return
                 if (FinalSysSizing(airLoopIndex).DesMainVolFlow == 0.0) { // protect divide by 0
                     // doesn't matter, just pick a condition

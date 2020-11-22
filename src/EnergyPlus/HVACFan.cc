@@ -185,7 +185,7 @@ namespace HVACFan {
 
     void FanSystem::init(EnergyPlusData &state)
     {
-        if (!DataGlobals::SysSizingCalc && m_objSizingFlag) {
+        if (!state.dataGlobal->SysSizingCalc && m_objSizingFlag) {
             set_size(state);
             m_objSizingFlag = false;
         }
@@ -634,7 +634,7 @@ namespace HVACFan {
             }
         }
 
-        if (DataGlobals::AnyEnergyManagementSystemInModel) {
+        if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
             SetupEMSInternalVariable(state, "Fan Maximum Mass Flow Rate", name, "[kg/s]", m_maxAirMassFlowRate);
             SetupEMSActuator("Fan", name, "Fan Air Mass Flow Rate", "[kg/s]", m_eMSMaxMassFlowOverrideOn, m_eMSAirMassFlowValue);
             SetupEMSInternalVariable(state, "Fan Nominal Pressure Rise", name, "[Pa]", deltaPress);
@@ -739,8 +739,8 @@ namespace HVACFan {
         Real64 localFaultMaxAirMassFlow = 0.0;
         bool faultActive = false;
         Real64 localFaultPressureRise = 0.0;
-        if (m_faultyFilterFlag && (FaultsManager::NumFaultyAirFilter > 0) && (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) &&
-            DataGlobals::DoWeathSim && (!m_eMSMaxMassFlowOverrideOn) && (!m_eMSFanPressureOverrideOn)) {
+        if (m_faultyFilterFlag && (FaultsManager::NumFaultyAirFilter > 0) && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) &&
+            state.dataGlobal->DoWeathSim && (!m_eMSMaxMassFlowOverrideOn) && (!m_eMSFanPressureOverrideOn)) {
             if (ScheduleManager::GetCurrentScheduleValue(state, FaultsManager::FaultsFouledAirFilters(m_faultyFilterIndex).AvaiSchedPtr) > 0) {
                 faultActive = true;
                 Real64 FanDesignFlowRateDec = 0; // Decrease of the Fan Design Volume Flow Rate [m3/sec]

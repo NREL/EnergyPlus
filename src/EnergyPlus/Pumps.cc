@@ -102,7 +102,6 @@ namespace Pumps {
     // Energy Calculations, ASHRAE, 1993, pp2-10 to 2-15
 
     // Using/Aliasing
-    using DataGlobals::AnyEnergyManagementSystemInModel;
     using DataHVACGlobals::CycleOn;
     using DataHVACGlobals::ForceOff;
     using DataHVACGlobals::NumCondLoops;
@@ -1173,7 +1172,7 @@ namespace Pumps {
                                     PumpEquip(PumpNum).Name);
             }
 
-            if (AnyEnergyManagementSystemInModel) {
+            if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                 SetupEMSInternalVariable(state, "Pump Maximum Mass Flow Rate", PumpEquip(PumpNum).Name, "[kg/s]", PumpEquip(PumpNum).MassFlowRateMax);
                 SetupEMSActuator("Pump",
                                  PumpEquip(PumpNum).Name,
@@ -1289,7 +1288,6 @@ namespace Pumps {
         // This subroutine does one-time and begin-envrn inits for the pump
 
         // Using/Aliasing
-        using DataGlobals::RedoSizesHVACSimulation;
         using DataPlant::LoopFlowStatus_NeedyAndTurnsLoopOn;
         using DataPlant::PlantLoop;
         using DataPlant::PlantReSizingCompleted;
@@ -1429,7 +1427,7 @@ namespace Pumps {
         }
 
         // HVAC Sizing Simulation resizing calls if needed
-        if (RedoSizesHVACSimulation && !PlantReSizingCompleted) {
+        if (state.dataGlobal->RedoSizesHVACSimulation && !PlantReSizingCompleted) {
             SizePump(state, PumpNum);
         }
 
@@ -1739,8 +1737,6 @@ namespace Pumps {
         // Energy Calculations, ASHRAE, 1993, pp2-10 to 2-15
 
         // Using/Aliasing
-        using DataBranchAirLoopPlant::ControlType_SeriesActive;
-        using DataBranchAirLoopPlant::MassFlowTolerance;
         using DataPlant::PlantLoop;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
@@ -1793,7 +1789,7 @@ namespace Pumps {
         // Also, on flowlock == locked, we will just use the inlet node flow rate
         // The flow resolver can take care of argument resolution beyond that.
         // For a typical situation, the flow request should be within the values of min/max avail, so the pump will get this flow rate.
-        if (FlowRequest > MassFlowTolerance) {
+        if (FlowRequest > DataBranchAirLoopPlant::MassFlowTolerance) {
             PumpMassFlowRate = FlowRequest;
         } else {
             PumpMassFlowRate = 0.0;
@@ -1811,7 +1807,7 @@ namespace Pumps {
                     .LoopSide(PumpEquip(PumpNum).LoopSideNum)
                     .Branch(PumpEquip(PumpNum).BranchNum)
                     .Comp(PumpEquip(PumpNum).CompNum)
-                    .FlowCtrl == ControlType_SeriesActive) {
+                    .FlowCtrl == DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive) {
                 PumpMassFlowRate = 0.0;
             }
         }
@@ -1833,7 +1829,7 @@ namespace Pumps {
         if (PlantLoop(PumpEquip(PumpNum).LoopNum).UsePressureForPumpCalcs && PumpEquip(PumpNum).HasVFD) {
             RotSpeed_Min = GetCurrentScheduleValue(state, PumpEquip(PumpNum).VFD.MinRPMSchedIndex);
             RotSpeed_Max = GetCurrentScheduleValue(state, PumpEquip(PumpNum).VFD.MaxRPMSchedIndex);
-            if (PumpEquip(PumpNum).PumpMassFlowRateMaxRPM < MassFlowTolerance || PumpEquip(PumpNum).PumpMassFlowRateMinRPM < MassFlowTolerance) {
+            if (PumpEquip(PumpNum).PumpMassFlowRateMaxRPM < DataBranchAirLoopPlant::MassFlowTolerance || PumpEquip(PumpNum).PumpMassFlowRateMinRPM < DataBranchAirLoopPlant::MassFlowTolerance) {
                 PumpEquip(PumpNum).VFD.PumpActualRPM = 0.0;
             } else {
                 PumpActualRPMValueOne = (PumpMassFlowRate / PumpEquip(PumpNum).PumpMassFlowRateMaxRPM) * RotSpeed_Max;
@@ -1846,7 +1842,7 @@ namespace Pumps {
         //** DETERMINE IF PUMP IS ON *!
         //****************************!
         // Since we don't allow series pumping, if there is ANY flow rate for this pump, THIS PUMP is driving the flow!  Therefore...
-        PumpRunning = (PumpMassFlowRate > MassFlowTolerance);
+        PumpRunning = (PumpMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance);
 
         //****************************!
         //** UPDATE PUMP BANK USAGE **!
@@ -1876,7 +1872,7 @@ namespace Pumps {
         //****************************!
         //***** EXIT IF NO FLOW ******!
         //****************************!
-        if (PumpMassFlowRate <= MassFlowTolerance) {
+        if (PumpMassFlowRate <= DataBranchAirLoopPlant::MassFlowTolerance) {
             Node(OutletNode).Temp = Node(InletNode).Temp;
             Node(OutletNode).Press = Node(InletNode).Press;
             Node(OutletNode).Quality = Node(InletNode).Quality;
@@ -1929,12 +1925,12 @@ namespace Pumps {
                 ShowContinueError(state, "...Pump coefficients should be checked for producing this negative value.");
             }
             Power = 0.0;
-            ShowRecurringWarningErrorAtEnd(RoutineName + " Calculated Pump Power < 0, " + cPumpTypes(PumpType) + ", Name=\"" +
+            ShowRecurringWarningErrorAtEnd(state, RoutineName + " Calculated Pump Power < 0, " + cPumpTypes(PumpType) + ", Name=\"" +
                                                PumpEquip(PumpNum).Name + "\", PLR=",
                                            PumpEquip(PumpNum).PowerErrIndex1,
                                            PartLoadRatio,
                                            PartLoadRatio);
-            ShowRecurringContinueErrorAtEnd("...Fraction Full Load Power=", PumpEquip(PumpNum).PowerErrIndex2, FracFullLoadPower, FracFullLoadPower);
+            ShowRecurringContinueErrorAtEnd(state, "...Fraction Full Load Power=", PumpEquip(PumpNum).PowerErrIndex2, FracFullLoadPower, FracFullLoadPower);
         }
 
         //****************************!
@@ -2234,7 +2230,6 @@ namespace Pumps {
         // na
 
         // Using/Aliasing
-        using DataBranchAirLoopPlant::MassFlowTolerance;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2258,7 +2253,7 @@ namespace Pumps {
         InletNode = PumpEquip(PumpNum).InletNodeNum;
         OutletNode = PumpEquip(PumpNum).OutletNodeNum;
 
-        if (PumpMassFlowRate <= MassFlowTolerance) {
+        if (PumpMassFlowRate <= DataBranchAirLoopPlant::MassFlowTolerance) {
             PumpEquipReport(PumpNum).PumpMassFlowRate = 0.0;
             PumpEquipReport(PumpNum).PumpHeattoFluid = 0.0;
             PumpEquipReport(PumpNum).OutletTemp = Node(OutletNode).Temp;

@@ -115,8 +115,8 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_OtherEquipment_CheckFuelType)
 
     bool ErrorsFound(false);
 
-    DataGlobals::NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
-    DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
+    state.dataGlobal->NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
+    state.dataGlobal->MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(state); // read schedules
 
     HeatBalanceManager::GetZoneData(state, ErrorsFound);
@@ -164,8 +164,8 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_OtherEquipment_NegativeDesignLevel)
 
     bool ErrorsFound(false);
 
-    DataGlobals::NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
-    DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
+    state.dataGlobal->NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
+    state.dataGlobal->MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(state); // read schedules
 
     HeatBalanceManager::GetZoneData(state, ErrorsFound);
@@ -216,8 +216,8 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_OtherEquipment_BadFuelType)
 
     bool ErrorsFound(false);
 
-    DataGlobals::NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
-    DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
+    state.dataGlobal->NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
+    state.dataGlobal->MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(state); // read schedules
 
     HeatBalanceManager::GetZoneData(state, ErrorsFound);
@@ -467,8 +467,8 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_BeginEnvironmentRes
     EXPECT_FALSE(has_err_output());
 
     bool ErrorsFound(false);
-    DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->NumOfTimeStepInHour = 1;
+    state.dataGlobal->MinutesPerTimeStep = 60;
 
     HeatBalanceManager::GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
@@ -671,7 +671,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_CheckZoneComponentLoadSubtotals)
         SetupZoneInternalGain(state, zoneNum, DataHeatBalance::ccZoneIntGainDeviceTypes(gainType), "Gain", gainType, &convGains(gainType));
     }
 
-    InternalHeatGains::UpdateInternalGainValues();
+    InternalHeatGains::UpdateInternalGainValues(state);
 
     // Check total of all convective gains
     InternalHeatGains::SumAllInternalConvectionGains(zoneNum, totConvGains);
@@ -681,15 +681,15 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_CheckZoneComponentLoadSubtotals)
     DataEnvironment::TotDesDays = 1;
     DataEnvironment::TotRunDesPersDays = 0;
     DataSizing::CurOverallSimDay = 1;
-    DataGlobals::HourOfDay = 1;
-    DataGlobals::NumOfTimeStepInHour = 10;
-    DataGlobals::TimeStep = 1;
-    OutputReportTabular::AllocateLoadComponentArrays();
-    int timeStepInDay = (DataGlobals::HourOfDay - 1) * DataGlobals::NumOfTimeStepInHour + DataGlobals::TimeStep;
+    state.dataGlobal->HourOfDay = 1;
+    state.dataGlobal->NumOfTimeStepInHour = 10;
+    state.dataGlobal->TimeStep = 1;
+    OutputReportTabular::AllocateLoadComponentArrays(state);
+    int timeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
 
-    DataGlobals::CompLoadReportIsReq = true;
-    DataGlobals::isPulseZoneSizing = false;
-    InternalHeatGains::GatherComponentLoadsIntGain();
+    state.dataGlobal->CompLoadReportIsReq = true;
+    state.dataGlobal->isPulseZoneSizing = false;
+    InternalHeatGains::GatherComponentLoadsIntGain(state);
     totConvGains = OutputReportTabular::peopleInstantSeq(DataSizing::CurOverallSimDay, timeStepInDay, zoneNum) +
                    OutputReportTabular::lightInstantSeq(DataSizing::CurOverallSimDay, timeStepInDay, zoneNum) +
                    OutputReportTabular::equipInstantSeq(DataSizing::CurOverallSimDay, timeStepInDay, zoneNum) +
@@ -879,8 +879,8 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_ApproachTemperature
     EXPECT_FALSE(has_err_output());
 
     bool ErrorsFound(false);
-    DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->NumOfTimeStepInHour = 1;
+    state.dataGlobal->MinutesPerTimeStep = 60;
 
     HeatBalanceManager::GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
@@ -1296,14 +1296,14 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ZnRpt_Outputs)
 
     bool ErrorsFound(false);
 
-    DataGlobals::NumOfTimeStepInHour = 1;                 // must initialize this to get schedules initialized
-    DataGlobals::MinutesPerTimeStep = 60;                 // must initialize this to get schedules initialized
+    state.dataGlobal->NumOfTimeStepInHour = 1;                 // must initialize this to get schedules initialized
+    state.dataGlobal->MinutesPerTimeStep = 60;                 // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(state); // read schedules
     DataEnvironment::DayOfYear_Schedule = 1;
     DataEnvironment::DayOfMonth = 1;
     DataEnvironment::DayOfWeek = 1;
-    DataGlobals::HourOfDay = 1;
-    DataGlobals::TimeStep = 1;
+    state.dataGlobal->HourOfDay = 1;
+    state.dataGlobal->TimeStep = 1;
     ScheduleManager::UpdateScheduleValues(state);
 
     HeatBalanceManager::GetZoneData(state, ErrorsFound);
@@ -1556,8 +1556,8 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_AdjustedSupplyGoodInletNode)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound(false);
-    DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->NumOfTimeStepInHour = 1;
+    state.dataGlobal->MinutesPerTimeStep = 60;
 
     HeatBalanceManager::GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
@@ -1779,8 +1779,8 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_AdjustedSupplyBadInletNode)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound(false);
-    DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->NumOfTimeStepInHour = 1;
+    state.dataGlobal->MinutesPerTimeStep = 60;
 
     HeatBalanceManager::GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
@@ -2005,8 +2005,8 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_FlowControlWithApproachTemperaturesG
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound(false);
-    DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->NumOfTimeStepInHour = 1;
+    state.dataGlobal->MinutesPerTimeStep = 60;
 
     HeatBalanceManager::GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
@@ -2232,8 +2232,8 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_FlowControlWithApproachTemperaturesB
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound(false);
-    DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->NumOfTimeStepInHour = 1;
+    state.dataGlobal->MinutesPerTimeStep = 60;
 
     HeatBalanceManager::GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
@@ -2458,8 +2458,8 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_WarnMissingInletNode)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound(false);
-    DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->NumOfTimeStepInHour = 1;
+    state.dataGlobal->MinutesPerTimeStep = 60;
 
     HeatBalanceManager::GetZoneData(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);

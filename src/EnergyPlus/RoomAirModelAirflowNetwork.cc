@@ -113,7 +113,6 @@ namespace RoomAirModelAirflowNetwork {
     // na
 
     // Using/Aliasing
-    using DataGlobals::NumOfZones;
     using namespace DataRoomAirModel;
     using namespace DataHeatBalSurface;
     using namespace DataMoistureBalance;
@@ -266,7 +265,6 @@ namespace RoomAirModelAirflowNetwork {
 
         // Using/Aliasing
         using DataEnvironment::OutBaroPress;
-        using DataGlobals::NumOfZones;
         using DataHeatBalance::Zone;
         using DataHeatBalFanSys::NonAirSystemResponse;
         using DataHeatBalFanSys::SumLatentHTRadSys;
@@ -318,7 +316,7 @@ namespace RoomAirModelAirflowNetwork {
         if (InitRoomAirModelAirflowNetworkOneTimeFlag) { // then do one - time setup inits
 
             // loop over all zones with RoomAirflowNetwork model
-            for (LoopZone = 1; LoopZone <= NumOfZones; ++LoopZone) {
+            for (LoopZone = 1; LoopZone <= state.dataGlobal->NumOfZones; ++LoopZone) {
                 if (!RoomAirflowNetworkZoneInfo(LoopZone).IsUsed) continue;
                 NumSurfs = Zone(LoopZone).SurfaceLast - Zone(LoopZone).SurfaceFirst + 1;
                 for (LoopAirNode = 1; LoopAirNode <= RoomAirflowNetworkZoneInfo(LoopZone).NumOfAirNodes;
@@ -361,7 +359,7 @@ namespace RoomAirModelAirflowNetwork {
                 MaxNodeNum = 0;
                 MaxEquipNum = 0;
                 ErrorsFound = false;
-                for (LoopZone = 1; LoopZone <= NumOfZones; ++LoopZone) {
+                for (LoopZone = 1; LoopZone <= state.dataGlobal->NumOfZones; ++LoopZone) {
                     if (!Zone(LoopZone).IsControlled) continue;
                     MaxEquipNum = max(MaxEquipNum, ZoneEquipList(LoopZone).NumOfEquipTypes);
                     MaxNodeNum = max(MaxNodeNum, ZoneEquipConfig(LoopZone).NumInletNodes);
@@ -380,11 +378,11 @@ namespace RoomAirModelAirflowNetwork {
                 }
 
                 // loop over all zones with RoomAirflowNetwork model
-                for (LoopZone = 1; LoopZone <= NumOfZones; ++LoopZone) {
+                for (LoopZone = 1; LoopZone <= state.dataGlobal->NumOfZones; ++LoopZone) {
                     if (!Zone(LoopZone).IsControlled) continue;
                     if (!RoomAirflowNetworkZoneInfo(LoopZone).IsUsed) continue;
                     // find actualZoneID in ZoneEquipConfig
-                    for (IdZone = 1; IdZone <= NumOfZones; ++IdZone) {
+                    for (IdZone = 1; IdZone <= state.dataGlobal->NumOfZones; ++IdZone) {
                         if (ZoneEquipConfig(IdZone).ActualZoneNum == LoopZone) {
                             RoomAirflowNetworkZoneInfo(LoopZone).ActualZoneID = IdZone;
                             break;
@@ -529,7 +527,7 @@ namespace RoomAirModelAirflowNetwork {
         } // End of InitRoomAirModelAirflowNetworkOneTimeFlagConf
 
         if (state.dataGlobal->BeginEnvrnFlag && InitRoomAirModelAirflowNetworkEnvrnFlag) {
-            for (LoopZone = 1; LoopZone <= NumOfZones; ++LoopZone) {
+            for (LoopZone = 1; LoopZone <= state.dataGlobal->NumOfZones; ++LoopZone) {
                 if (!RoomAirflowNetworkZoneInfo(LoopZone).IsUsed) continue;
                 for (LoopAirNode = 1; LoopAirNode <= RoomAirflowNetworkZoneInfo(LoopZone).NumOfAirNodes;
                      ++LoopAirNode) { // loop over all the modeled room air nodes
@@ -770,7 +768,6 @@ namespace RoomAirModelAirflowNetwork {
         // na
 
         // Using/Aliasing
-        using DataGlobals::ZoneSizingCalc;
         using DataHeatBalance::Zone;
         using DataHeatBalFanSys::TempTstatAir;
         using DataLoopNode::Node;
@@ -792,7 +789,7 @@ namespace RoomAirModelAirflowNetwork {
 
         if (!ThisRAFNZone.IsUsed) return;
 
-        if (!ZoneSizingCalc) SumSystemDepResponseForNode(state);
+        if (!state.dataGlobal->ZoneSizingCalc) SumSystemDepResponseForNode(state);
 
         AirNodeNum = RoomAirflowNetworkZoneInfo(ZoneNum).ControlAirNodeID;
 
@@ -855,14 +852,11 @@ namespace RoomAirModelAirflowNetwork {
 
         // USE STATEMENTS:
         using DataDefineEquip::AirDistUnit;
-        using DataGlobals::NumOfZones;
-        using DataGlobals::TimeStepZone;
         using DataHeatBalance::Zone;
         using DataHeatBalFanSys::MAT;
         using DataHeatBalFanSys::ZoneAirHumRat;
         using DataLoopNode::Node;
         using DataSurfaces::Surface;
-        using DataSurfaces::SurfaceClass_Window;
         using DataZoneEquipment::ZoneEquipConfig;
         using InternalHeatGains::SumInternalConvectionGainsByIndices;
         //using InternalHeatGains::SumInternalConvectionGainsByTypes;
@@ -953,7 +947,7 @@ namespace RoomAirModelAirflowNetwork {
         // Check to see if this is a controlled zone
 
         ControlledZoneAirFlag = false;
-        for (ZoneEquipConfigNum = 1; ZoneEquipConfigNum <= NumOfZones; ++ZoneEquipConfigNum) {
+        for (ZoneEquipConfigNum = 1; ZoneEquipConfigNum <= state.dataGlobal->NumOfZones; ++ZoneEquipConfigNum) {
             if (!Zone(ZoneEquipConfigNum).IsControlled) continue;
             if (ZoneEquipConfig(ZoneEquipConfigNum).ActualZoneNum != ZoneNum) continue;
             ControlledZoneAirFlag = true;
@@ -1065,7 +1059,7 @@ namespace RoomAirModelAirflowNetwork {
             HA = 0.0;
             Area = Surface(SurfNum).Area; // For windows, this is the glazing area
 
-            if (Surface(SurfNum).Class == SurfaceClass_Window) {
+            if (Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Window) {
 
                 // Add to the convective internal gains
                 if (SurfWinShadingFlag(SurfNum) == IntShadeOn || SurfWinShadingFlag(SurfNum) == IntBlindOn) {
@@ -1087,13 +1081,13 @@ namespace RoomAirModelAirflowNetwork {
                         SurfWinHeatTransfer(SurfNum) += SurfWinRetHeatGainToZoneAir(SurfNum);
                         if (SurfWinHeatGain(SurfNum) >= 0.0) {
                             SurfWinHeatGainRep(SurfNum) = SurfWinHeatGain(SurfNum);
-                            SurfWinHeatGainRepEnergy(SurfNum) = SurfWinHeatGainRep(SurfNum) * TimeStepZone * DataGlobalConstants::SecInHour();
+                            SurfWinHeatGainRepEnergy(SurfNum) = SurfWinHeatGainRep(SurfNum) * state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour();
                         } else {
                             SurfWinHeatLossRep(SurfNum) = - SurfWinHeatGain(SurfNum);
-                            SurfWinHeatLossRepEnergy(SurfNum) = SurfWinHeatLossRep(SurfNum) * TimeStepZone * DataGlobalConstants::SecInHour();
+                            SurfWinHeatLossRepEnergy(SurfNum) = SurfWinHeatLossRep(SurfNum) * state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour();
                         }
                         SurfWinHeatTransfer(SurfNum) = SurfWinHeatGain(SurfNum);
-                        SurfWinHeatTransferRepEnergy(SurfNum) = SurfWinHeatGain(SurfNum) * TimeStepZone * DataGlobalConstants::SecInHour();
+                        SurfWinHeatTransferRepEnergy(SurfNum) = SurfWinHeatGain(SurfNum) * state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour();
                     }
                 }
 
@@ -1152,8 +1146,12 @@ namespace RoomAirModelAirflowNetwork {
 
     } // CalcNodeSums
 
-    void RAFNData::CalcSurfaceMoistureSums(
-        EnergyPlusData &state, int const RoomAirNode, Real64 &SumHmAW, Real64 &SumHmARa, Real64 &SumHmARaW, Array1D<bool> const &EP_UNUSED(SurfMask))
+    void RAFNData::CalcSurfaceMoistureSums(EnergyPlusData &state,
+                                           int const RoomAirNode,
+                                           Real64 &SumHmAW,
+                                           Real64 &SumHmARa,
+                                           Real64 &SumHmARaW,
+                                           [[maybe_unused]] Array1D<bool> const &SurfMask)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1197,7 +1195,7 @@ namespace RoomAirModelAirflowNetwork {
 
         for (SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
             if (!Surface(SurfNum).HeatTransSurf) continue; // Skip non - heat transfer surfaces
-            if (Surface(SurfNum).Class == SurfaceClass_Window) continue;
+            if (Surface(SurfNum).Class == SurfaceClass::Window) continue;
 
             if (RoomAirflowNetworkZoneInfo(ZoneNum).ControlAirNodeID == RoomAirNode) {
                 Found = false;

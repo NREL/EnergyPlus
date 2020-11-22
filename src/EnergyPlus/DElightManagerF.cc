@@ -127,7 +127,6 @@ namespace DElightManagerF {
         // This subroutine creates a DElight input file from EnergyPlus processed input.
 
         // USE STATEMENTS:
-        using namespace DataGlobals;       // Gives access to too many things to keep track of
         using namespace DataHeatBalance;   // Gives access to Building, Zone and Lights data
         using namespace DataEnvironment;   // Gives access to Site data
         using namespace DataSurfaces;      // Gives access to Surface data
@@ -312,9 +311,9 @@ namespace DElightManagerF {
 
                     for (int isurf = iSurfaceFirst; isurf <= iSurfaceLast; ++isurf) {
                         auto &surf(Surface(isurf));
-                        if (surf.Class == SurfaceClass_Wall) ++iNumOpaqueSurfs;
-                        if (surf.Class == SurfaceClass_Roof) ++iNumOpaqueSurfs;
-                        if (surf.Class == SurfaceClass_Floor) ++iNumOpaqueSurfs;
+                        if (surf.Class == SurfaceClass::Wall) ++iNumOpaqueSurfs;
+                        if (surf.Class == SurfaceClass::Roof) ++iNumOpaqueSurfs;
+                        if (surf.Class == SurfaceClass::Floor) ++iNumOpaqueSurfs;
                     } // Zone Opaque Surface loop
 
                     print(delightInFile, Format_906, iNumOpaqueSurfs);
@@ -325,7 +324,7 @@ namespace DElightManagerF {
                         auto &surf(Surface(isurf));
 
                         // Only process "opaque bounding" surface types
-                        if ((surf.Class == SurfaceClass_Wall) || (surf.Class == SurfaceClass_Roof) || (surf.Class == SurfaceClass_Floor)) {
+                        if ((surf.Class == SurfaceClass::Wall) || (surf.Class == SurfaceClass::Roof) || (surf.Class == SurfaceClass::Floor)) {
 
                             // Get the Construction index for this Surface
                             iconstruct = surf.Construction;
@@ -362,7 +361,7 @@ namespace DElightManagerF {
                             // Count each Window hosted by the current opaque bounding Surface
                             iNumWindows = 0;
                             for (int iwndo = iSurfaceFirst; iwndo <= iSurfaceLast; ++iwndo) {
-                                if (Surface(iwndo).Class == SurfaceClass_Window) {
+                                if (Surface(iwndo).Class == SurfaceClass::Window) {
                                     auto &wndo(Surface(iwndo));
                                     if (wndo.BaseSurfName == surf.Name) {
 
@@ -408,7 +407,7 @@ namespace DElightManagerF {
                             // and track the Window Construction type for later writing
                             if (iNumWindows > 0) {
                                 for (int iwndo2 = iSurfaceFirst; iwndo2 <= iSurfaceLast; ++iwndo2) {
-                                    if (Surface(iwndo2).Class == SurfaceClass_Window) {
+                                    if (Surface(iwndo2).Class == SurfaceClass::Window) {
 
                                         auto &wndo2(Surface(iwndo2));
 
@@ -495,7 +494,7 @@ namespace DElightManagerF {
 
                                         auto &wndo3(Surface(iwndo3));
 
-                                        if (wndo3.Class == SurfaceClass_Window) {
+                                        if (wndo3.Class == SurfaceClass::Window) {
 
                                             // Is the current Window Surface the Doppelganger for the current CFS?
                                             if (wndo3.Name == cfs.wndwName) {
@@ -692,7 +691,7 @@ namespace DElightManagerF {
         int IOStat;
         int CFSNum = 0;
 
-        static std::string const cCurrentModuleObject("Daylighting:DELight:ComplexFenestration");
+        constexpr auto cCurrentModuleObject("Daylighting:DELight:ComplexFenestration");
 
         TotDElightCFS = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         DElightComplexFene.allocate(TotDElightCFS);
@@ -713,17 +712,17 @@ namespace DElightManagerF {
             cfs.ComplexFeneType = cAlphaArgs(2);
             cfs.surfName = cAlphaArgs(3);
             if (UtilityRoutines::FindItemInList(cfs.surfName, Surface) == 0) {
-                ShowSevereError(state, cCurrentModuleObject + ": " + cfs.Name + ", invalid " + cAlphaFieldNames(3) + "=\"" + cfs.surfName + "\".");
+                ShowSevereError(state, format("{}{}", cCurrentModuleObject, ": " + cfs.Name + ", invalid " + cAlphaFieldNames(3) + "=\"" + cfs.surfName + "\"."));
                 ErrorsFound = true;
             }
             cfs.wndwName = cAlphaArgs(4);
             if (UtilityRoutines::FindItemInList(cfs.surfName, Surface) == 0) {
-                ShowSevereError(state, cCurrentModuleObject + ": " + cfs.Name + ", invalid " + cAlphaFieldNames(4) + "=\"" + cfs.wndwName + "\".");
+                ShowSevereError(state, format("{}{}", cCurrentModuleObject, ": " + cfs.Name + ", invalid " + cAlphaFieldNames(4) + "=\"" + cfs.wndwName + "\"."));
                 ErrorsFound = true;
             }
             cfs.feneRota = rNumericArgs(1);
             if (cfs.feneRota < 0. || cfs.feneRota > 360.) {
-                ShowSevereError(state, cCurrentModuleObject + ": " + cfs.Name + ", invalid " + cNumericFieldNames(1) + " outside of range 0 to 360.");
+                ShowSevereError(state, format("{}{}", cCurrentModuleObject, ": " + cfs.Name + ", invalid " + cNumericFieldNames(1) + " outside of range 0 to 360."));
                 ErrorsFound = true;
             }
         }
@@ -754,7 +753,7 @@ namespace DElightManagerF {
         using DataSurfaces::WorldCoordSystem;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const CurrentModuleObject("GeometryTransform");
+        constexpr auto CurrentModuleObject("GeometryTransform");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Array1D_string cAlphas(1);
@@ -785,7 +784,7 @@ namespace DElightManagerF {
             OldAspectRatio = rNumerics(1);
             NewAspectRatio = rNumerics(2);
             if (cAlphas(1) != "XY") {
-                ShowWarningError(state, CurrentModuleObject + ": invalid " + cAlphaFieldNames(1) + "=" + cAlphas(1) + "...ignored.");
+                ShowWarningError(state, format("{}{}", CurrentModuleObject, ": invalid " + cAlphaFieldNames(1) + "=" + cAlphas(1) + "...ignored."));
             }
             doTransform = true;
             AspectTransform = true;

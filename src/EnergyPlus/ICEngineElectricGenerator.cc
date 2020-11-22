@@ -409,17 +409,19 @@ namespace ICEngineElectricGenerator {
         }
     }
 
-    void ICEngineGeneratorSpecs::getDesignCapacities(EnergyPlusData &EP_UNUSED(state), const EnergyPlus::PlantLocation &, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
+    void ICEngineGeneratorSpecs::getDesignCapacities(
+        [[maybe_unused]] EnergyPlusData &state, const EnergyPlus::PlantLocation &, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
     {
         MaxLoad = 0.0;
         MinLoad = 0.0;
         OptLoad = 0.0;
     }
 
-    void ICEngineGeneratorSpecs::simulate(EnergyPlusData &state, const EnergyPlus::PlantLocation &EP_UNUSED(calledFromLocation),
+    void ICEngineGeneratorSpecs::simulate(EnergyPlusData &state,
+                                          [[maybe_unused]] const EnergyPlus::PlantLocation &calledFromLocation,
                                           bool FirstHVACIteration,
-                                          Real64 &EP_UNUSED(CurLoad),
-                                          bool EP_UNUSED(RunFlag))
+                                          [[maybe_unused]] Real64 &CurLoad,
+                                          [[maybe_unused]] bool RunFlag)
     {
         // empty function to emulate current behavior as of conversion to using the PlantComponent calling structure.
         // calls from the plant side only update the plant nodes.
@@ -582,7 +584,7 @@ namespace ICEngineElectricGenerator {
                                       General::RoundSigDigits(PLR, 3) + "].");
                     ShowContinueError(state, "...simulation will continue with exhaust heat reclaim set to 0.");
                 }
-                ShowRecurringWarningErrorAtEnd("CalcICEngineGeneratorModel: " + this->TypeOf + "=\"" + this->Name +
+                ShowRecurringWarningErrorAtEnd(state, "CalcICEngineGeneratorModel: " + this->TypeOf + "=\"" + this->Name +
                                                    "\" low Exhaust Temperature continues...",
                                                this->ErrExhaustTempIndex,
                                                exhaustTemp,

@@ -134,7 +134,6 @@ namespace WaterCoils {
     // Use statements for data only modules
     // Using/Aliasing
     using namespace DataLoopNode;
-    using namespace DataGlobals;
     using DataEnvironment::OutBaroPress;
     using DataEnvironment::StdBaroPress;
     using DataEnvironment::StdRhoAir;
@@ -1078,7 +1077,7 @@ namespace WaterCoils {
             }
             PlantLoopScanFlag(CoilNum) = false;
         }
-        if (!SysSizingCalc && state.dataWaterCoils->MySizeFlag(CoilNum)) {
+        if (!state.dataGlobal->SysSizingCalc && state.dataWaterCoils->MySizeFlag(CoilNum)) {
             // for each coil, do the sizing once.
             SizeWaterCoil(state, CoilNum);
 
@@ -1603,7 +1602,7 @@ namespace WaterCoils {
             MyEnvrnFlag(CoilNum) = true;
         }
 
-        if (!DoingSizing) {
+        if (!state.dataGlobal->DoingSizing) {
             if (MyCoilReportFlag(CoilNum)) {
                 // create predefined report entries
                 MyCoilReportFlag(CoilNum) = false;
@@ -1881,7 +1880,7 @@ namespace WaterCoils {
             // calculate the Faulty Coil Fouling (thermal insulance) Factor using fault information
             if (state.dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingFlag &&
                 // The fault shouldn't apply during sizing.
-                (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation) &&
+                (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation) &&
                 // This was preexisting
                 !(state.dataWaterCoils->MyUAAndFlowCalcFlag(CoilNum)))
             {
@@ -1944,7 +1943,7 @@ namespace WaterCoils {
             // If Fouling
             if (state.dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingFlag &&
                 // The fault shouldn't apply during sizing.
-                (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation) &&
+                (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation) &&
                 // This was preexisting
                 !(state.dataWaterCoils->MyUAAndFlowCalcFlag(CoilNum)))
             {
@@ -2776,7 +2775,6 @@ namespace WaterCoils {
         // See for instance ASHRAE HVAC 2 Toolkit, page 4-4, formula (4-7)
 
         // Using/Aliasing
-        using DataBranchAirLoopPlant::MassFlowTolerance;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2834,7 +2832,7 @@ namespace WaterCoils {
             WaterMassFlowRate = state.dataWaterCoils->WaterCoil(CoilNum).InletWaterMassFlowRate;
         }
 
-        if (WaterMassFlowRate > MassFlowTolerance) { // If the coil is operating
+        if (WaterMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) { // If the coil is operating
             CapacitanceAir = PsyCpAirFnW(Win) * AirMassFlow;
             Cp = GetSpecificHeatGlycol(state, PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidName,
                                        TempWaterIn,
@@ -3305,8 +3303,8 @@ namespace WaterCoils {
             //      predicted coil surface temperature at the outlet is less than
             //      the dew point coil is apparently all wet but a solution
             //      cannot be obtained
-            if (!WaterTempConvg && !WarmupFlag && (OutCoilSurfTemp < EnterAirDewPoint)) {
-                ShowRecurringWarningErrorAtEnd(state.dataWaterCoils->WaterCoil(CoilNum).Name + " not converged (8 iterations) due to \"Wet Convergence\" conditions.",
+            if (!WaterTempConvg && !state.dataGlobal->WarmupFlag && (OutCoilSurfTemp < EnterAirDewPoint)) {
+                ShowRecurringWarningErrorAtEnd(state, state.dataWaterCoils->WaterCoil(CoilNum).Name + " not converged (8 iterations) due to \"Wet Convergence\" conditions.",
                                                state.dataWaterCoils->WaterTempCoolCoilErrs(CoilNum),
                                                std::abs(MeanWaterTemp - WetSideEffctvWaterTemp),
                                                std::abs(MeanWaterTemp - WetSideEffctvWaterTemp));
@@ -3492,8 +3490,8 @@ namespace WaterCoils {
                 }
             }
             //      error checking to see if convergence has been achieved
-            if (!CoilPartWetConvg && !WarmupFlag) {
-                ShowRecurringWarningErrorAtEnd(state.dataWaterCoils->WaterCoil(CoilNum).Name +
+            if (!CoilPartWetConvg && !state.dataGlobal->WarmupFlag) {
+                ShowRecurringWarningErrorAtEnd(state, state.dataWaterCoils->WaterCoil(CoilNum).Name +
                                                    " not converged (40 iterations) due to \"Partial Wet Convergence\" conditions.",
                                                state.dataWaterCoils->PartWetCoolCoilErrs(CoilNum));
                 //      CoolCoilErrs = CoolCoilErrs + 1
@@ -4231,7 +4229,7 @@ namespace WaterCoils {
 
             // Wet Dry Interface temperature not converged after maximum specified iterations.
             // Print error message, set return error flag
-            if ((itT > itmax) && (!WarmupFlag)) {
+            if ((itT > itmax) && (!state.dataGlobal->WarmupFlag)) {
                 ShowWarningError(state, "For Coil:Cooling:Water " + state.dataWaterCoils->WaterCoil(CoilNum).Name);
                 ShowContinueError(state, "CoilPartWetPartDry: Maximum iterations exceeded for Liq Temp, at Interface");
             }
@@ -4398,7 +4396,7 @@ namespace WaterCoils {
         }
 
         // If not converged after itmax iterations, return error code
-        if ((iter > itmax) && (!WarmupFlag)) {
+        if ((iter > itmax) && (!state.dataGlobal->WarmupFlag)) {
             ShowWarningError(state, "For Coil:Cooling:Water " + state.dataWaterCoils->WaterCoil(CoilNum).Name);
             ShowContinueError(state, "CalcCoilUAbyEffectNTU: Maximum iterations exceeded:Coil UA calculation");
             CalcCoilUAbyEffectNTU = 0.0; // Autodesk:Return Line added to set return value: Using non-converged CoilUA value may be preferred but
@@ -4762,7 +4760,7 @@ namespace WaterCoils {
         Real64 ReportingConstant;
 
         if (state.dataWaterCoils->WaterCoil(CoilNum).reportCoilFinalSizes) {
-            if (!DataGlobals::WarmupFlag && !DataGlobals::DoingHVACSizingSimulations && !DataGlobals::DoingSizing) {
+            if (!state.dataGlobal->WarmupFlag && !state.dataGlobal->DoingHVACSizingSimulations && !state.dataGlobal->DoingSizing) {
                 std::string coilObjClassName;
                 if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType_Num == state.dataWaterCoils->WaterCoil_SimpleHeating) {
                     coilObjClassName = "Coil:Heating:Water";
@@ -5597,7 +5595,8 @@ namespace WaterCoils {
         }
     }
 
-    void CheckWaterCoilSchedule(EnergyPlusData &state, std::string const &EP_UNUSED(CompType), // unused1208
+    void CheckWaterCoilSchedule(EnergyPlusData &state,
+                                [[maybe_unused]] std::string const &CompType, // unused1208
                                 std::string const &CompName,
                                 Real64 &Value,
                                 int &CompIndex)
@@ -6460,13 +6459,14 @@ namespace WaterCoils {
         return Capacity;
     }
 
-    void UpdateWaterToAirCoilPlantConnection(EnergyPlusData &state, int const CoilTypeNum,
+    void UpdateWaterToAirCoilPlantConnection(EnergyPlusData &state,
+                                             int const CoilTypeNum,
                                              std::string const &CoilName,
-                                             int const EP_UNUSED(EquipFlowCtrl), // Flow control mode for the equipment
-                                             int const LoopNum,                  // Plant loop index for where called from
-                                             int const LoopSide,                 // Plant loop side index for where called from
-                                             int &CompIndex,                     // Chiller number pointer
-                                             bool const EP_UNUSED(FirstHVACIteration),
+                                             [[maybe_unused]] int const EquipFlowCtrl, // Flow control mode for the equipment
+                                             int const LoopNum,                        // Plant loop index for where called from
+                                             int const LoopSide,                       // Plant loop side index for where called from
+                                             int &CompIndex,                           // Chiller number pointer
+                                             [[maybe_unused]] bool const FirstHVACIteration,
                                              bool &InitLoopEquip // If not zero, calculate the max load for operating conditions
     )
     {
@@ -6481,7 +6481,6 @@ namespace WaterCoils {
         // update sim routine called from plant
 
         // Using/Aliasing
-        using DataGlobals::KickOffSimulation;
         using DataHVACGlobals::SimAirLoopsFlag;
         using DataHVACGlobals::SimZoneEquipmentFlag;
         using DataLoopNode::Node;
@@ -6509,7 +6508,7 @@ namespace WaterCoils {
                 ShowFatalError(state, "UpdateWaterToAirCoilPlantConnection:  Invalid CompIndex passed=" + TrimSigDigits(CoilNum) +
                                ", Number of Coils=" + TrimSigDigits(state.dataWaterCoils->NumWaterCoils) + ", Entered Coil name=" + CoilName);
             }
-            if (KickOffSimulation) {
+            if (state.dataGlobal->KickOffSimulation) {
                 if (CoilName != state.dataWaterCoils->WaterCoil(CoilNum).Name) {
                     ShowFatalError(state, "UpdateWaterToAirCoilPlantConnection: Invalid CompIndex passed=" + TrimSigDigits(CoilNum) +
                                    ", Coil name=" + CoilName + ", stored Coil Name for that index=" + state.dataWaterCoils->WaterCoil(CoilNum).Name);
@@ -6666,7 +6665,6 @@ namespace WaterCoils {
         // na
 
         // Using/Aliasing
-        using DataBranchAirLoopPlant::MassFlowTolerance;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -6721,7 +6719,7 @@ namespace WaterCoils {
             AirMassFlow = state.dataWaterCoils->WaterCoil(CoilNum).InletAirMassFlowRate;
             WaterMassFlowRate = state.dataWaterCoils->WaterCoil(CoilNum).InletWaterMassFlowRate;
         }
-        if (WaterMassFlowRate > MassFlowTolerance) { // if the coil is operating
+        if (WaterMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) { // if the coil is operating
             CapacitanceAir = PsyCpAirFnW(Win) * AirMassFlow;
             Cp = GetSpecificHeatGlycol(state,
                                        PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidName,

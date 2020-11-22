@@ -48,6 +48,7 @@
 
 #include <EnergyPlus/api/func.h>
 #include <EnergyPlus/api/state.h>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -65,8 +66,9 @@ const char * apiVersionFromEPlus(EnergyPlusState) {
     return EnergyPlus::DataStringGlobals::PythonAPIVersion.c_str();
 }
 
-void registerErrorCallback(EnergyPlusState, std::function<void(EnergyPlus::Error, const std::string &)> f) {
-    EnergyPlus::DataGlobals::errorCallback = f;
+void registerErrorCallback(EnergyPlusState state, std::function<void(EnergyPlus::Error, const std::string &)> f) {
+    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    thisState->dataGlobal->errorCallback = f;
 }
 
 void registerErrorCallback(EnergyPlusState state, void (*f)(int, const char *)) {

@@ -91,7 +91,7 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
                                     "/" +
                                     General::TrimSigDigits(
                                         state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).DayOfMonth) +
-                                    " " + coilSelectionReportObj->getTimeText(this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax);
+                                    " " + coilSelectionReportObj->getTimeText(state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax);
                             }
                         } else if (this->autoSizedValue == this->finalZoneSizing(this->curZoneEqNum).DesHeatVolFlow) {
                             if (this->finalZoneSizing(this->curZoneEqNum).HeatDDNum > 0 &&
@@ -102,7 +102,7 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
                                     "/" +
                                     General::TrimSigDigits(
                                         state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).DayOfMonth) +
-                                    " " + coilSelectionReportObj->getTimeText(this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax);
+                                    " " + coilSelectionReportObj->getTimeText(state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax);
                             }
                         } else if (this->autoSizedValue == this->zoneEqSizing(this->curZoneEqNum).AirVolFlow) {
                             DDNameFanPeak = "Unknown";
@@ -118,7 +118,7 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
                                     "/" +
                                     General::TrimSigDigits(
                                         state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).DayOfMonth) +
-                                    " " + coilSelectionReportObj->getTimeText(this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax);
+                                    " " + coilSelectionReportObj->getTimeText(state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax);
                             }
                         } else if (this->zoneHeatingOnlyFan) {
                             this->autoSizedValue = this->finalZoneSizing(this->curZoneEqNum).DesHeatVolFlow;
@@ -130,7 +130,7 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
                                     "/" +
                                     General::TrimSigDigits(
                                         state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).DayOfMonth) +
-                                    " " + coilSelectionReportObj->getTimeText(this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax);
+                                    " " + coilSelectionReportObj->getTimeText(state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax);
                             }
                         } else if (this->zoneEqSizing(this->curZoneEqNum).CoolingAirFlow && !this->zoneEqSizing(this->curZoneEqNum).HeatingAirFlow) {
                             this->autoSizedValue = this->zoneEqSizing(this->curZoneEqNum).CoolingAirVolFlow;
@@ -142,7 +142,7 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
                                     "/" +
                                     General::TrimSigDigits(
                                         state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).DayOfMonth) +
-                                    " " + coilSelectionReportObj->getTimeText(this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax);
+                                    " " + coilSelectionReportObj->getTimeText(state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax);
                             }
                         } else if (this->zoneEqSizing(this->curZoneEqNum).HeatingAirFlow && !this->zoneEqSizing(this->curZoneEqNum).CoolingAirFlow) {
                             this->autoSizedValue = this->zoneEqSizing(this->curZoneEqNum).HeatingAirVolFlow;
@@ -154,7 +154,7 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
                                     "/" +
                                     General::TrimSigDigits(
                                         state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).DayOfMonth) +
-                                    " " + coilSelectionReportObj->getTimeText(this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax);
+                                    " " + coilSelectionReportObj->getTimeText(state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax);
                             }
                         } else if (this->zoneEqSizing(this->curZoneEqNum).HeatingAirFlow && this->zoneEqSizing(this->curZoneEqNum).CoolingAirFlow) {
                             this->autoSizedValue = max(this->zoneEqSizing(this->curZoneEqNum).CoolingAirVolFlow,
@@ -169,7 +169,7 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
                                         "/" +
                                         General::TrimSigDigits(
                                             state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).DayOfMonth) +
-                                        " " + coilSelectionReportObj->getTimeText(this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax);
+                                        " " + coilSelectionReportObj->getTimeText(state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax);
                                 }
                             } else if (this->autoSizedValue == this->zoneEqSizing(this->curZoneEqNum).HeatingAirVolFlow) {
                                 if (this->finalZoneSizing(this->curZoneEqNum).HeatDDNum > 0 &&
@@ -181,7 +181,7 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
                                         "/" +
                                         General::TrimSigDigits(
                                             state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).DayOfMonth) +
-                                        " " + coilSelectionReportObj->getTimeText(this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax);
+                                        " " + coilSelectionReportObj->getTimeText(state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax);
                                 }
                             }
                         } else {
@@ -197,7 +197,7 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
                                         "/" +
                                         General::TrimSigDigits(
                                             state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).DayOfMonth) +
-                                        " " + coilSelectionReportObj->getTimeText(this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax);
+                                        " " + coilSelectionReportObj->getTimeText(state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax);
                                 }
                             } else if (this->autoSizedValue == this->finalZoneSizing(this->curZoneEqNum).DesHeatVolFlow) {
                                 if (this->finalZoneSizing(this->curZoneEqNum).HeatDDNum > 0 &&
@@ -209,7 +209,7 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
                                         "/" +
                                         General::TrimSigDigits(
                                             state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).DayOfMonth) +
-                                        " " + coilSelectionReportObj->getTimeText(this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax);
+                                        " " + coilSelectionReportObj->getTimeText(state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax);
                                 }
                             }
                         }
@@ -223,7 +223,7 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
                             dateTimeFanPeak =
                                 General::TrimSigDigits(state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).Month) + "/" +
                                 General::TrimSigDigits(state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).DayOfMonth) +
-                                " " + coilSelectionReportObj->getTimeText(this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax);
+                                " " + coilSelectionReportObj->getTimeText(state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax);
                         }
                     } else if (this->zoneHeatingOnlyFan) {
                         this->autoSizedValue = this->dataFracOfAutosizedHeatingAirflow * this->finalZoneSizing(this->curZoneEqNum).DesHeatVolFlow;
@@ -233,7 +233,7 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
                             dateTimeFanPeak =
                                 General::TrimSigDigits(state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).Month) + "/" +
                                 General::TrimSigDigits(state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).DayOfMonth) +
-                                " " + coilSelectionReportObj->getTimeText(this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax);
+                                " " + coilSelectionReportObj->getTimeText(state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax);
                         }
                     } else if (this->zoneEqSizing(this->curZoneEqNum).CoolingAirFlow && !this->zoneEqSizing(this->curZoneEqNum).HeatingAirFlow) {
                         this->autoSizedValue = this->dataFracOfAutosizedCoolingAirflow * this->zoneEqSizing(this->curZoneEqNum).CoolingAirVolFlow;
@@ -243,7 +243,7 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
                             dateTimeFanPeak =
                                 General::TrimSigDigits(state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).Month) + "/" +
                                 General::TrimSigDigits(state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).DayOfMonth) +
-                                " " + coilSelectionReportObj->getTimeText(this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax);
+                                " " + coilSelectionReportObj->getTimeText(state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax);
                         }
                     } else if (this->zoneEqSizing(this->curZoneEqNum).HeatingAirFlow && !this->zoneEqSizing(this->curZoneEqNum).CoolingAirFlow) {
                         this->autoSizedValue = this->dataFracOfAutosizedHeatingAirflow * this->zoneEqSizing(this->curZoneEqNum).HeatingAirVolFlow;
@@ -253,7 +253,7 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
                             dateTimeFanPeak =
                                 General::TrimSigDigits(state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).Month) + "/" +
                                 General::TrimSigDigits(state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).DayOfMonth) +
-                                " " + coilSelectionReportObj->getTimeText(this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax);
+                                " " + coilSelectionReportObj->getTimeText(state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax);
                         }
                     } else if (this->zoneEqSizing(this->curZoneEqNum).HeatingAirFlow && this->zoneEqSizing(this->curZoneEqNum).CoolingAirFlow) {
                         this->autoSizedValue =
@@ -269,7 +269,7 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
                                     "/" +
                                     General::TrimSigDigits(
                                         state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).DayOfMonth) +
-                                    " " + coilSelectionReportObj->getTimeText(this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax);
+                                    " " + coilSelectionReportObj->getTimeText(state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax);
                             }
                         } else if (this->autoSizedValue ==
                                    this->dataFracOfAutosizedHeatingAirflow * this->zoneEqSizing(this->curZoneEqNum).HeatingAirVolFlow) {
@@ -281,7 +281,7 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
                                     "/" +
                                     General::TrimSigDigits(
                                         state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).DayOfMonth) +
-                                    " " + coilSelectionReportObj->getTimeText(this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax);
+                                    " " + coilSelectionReportObj->getTimeText(state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax);
                             }
                         }
                     } else {
@@ -298,7 +298,7 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
                                     "/" +
                                     General::TrimSigDigits(
                                         state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).DayOfMonth) +
-                                    " " + coilSelectionReportObj->getTimeText(this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax);
+                                    " " + coilSelectionReportObj->getTimeText(state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax);
                             }
                         } else if (this->autoSizedValue ==
                                    this->dataFracOfAutosizedHeatingAirflow * this->finalZoneSizing(this->curZoneEqNum).DesHeatVolFlow) {
@@ -310,7 +310,7 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
                                     "/" +
                                     General::TrimSigDigits(
                                         state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).DayOfMonth) +
-                                    " " + coilSelectionReportObj->getTimeText(this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax);
+                                    " " + coilSelectionReportObj->getTimeText(state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax);
                             }
                         }
                     }
@@ -323,7 +323,7 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
                             dateTimeFanPeak =
                                 General::TrimSigDigits(state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).Month) + "/" +
                                 General::TrimSigDigits(state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).DayOfMonth) +
-                                " " + coilSelectionReportObj->getTimeText(this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax);
+                                " " + coilSelectionReportObj->getTimeText(state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax);
                         }
                     } else if (this->zoneHeatingOnlyFan) {
                         this->autoSizedValue = this->dataFracOfAutosizedHeatingAirflow * this->finalZoneSizing(this->curZoneEqNum).DesHeatVolFlow;
@@ -333,7 +333,7 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
                             dateTimeFanPeak =
                                 General::TrimSigDigits(state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).Month) + "/" +
                                 General::TrimSigDigits(state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).DayOfMonth) +
-                                " " + coilSelectionReportObj->getTimeText(this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax);
+                                " " + coilSelectionReportObj->getTimeText(state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax);
                         }
                     } else if (this->zoneEqSizing(this->curZoneEqNum).CoolingAirFlow && !this->zoneEqSizing(this->curZoneEqNum).HeatingAirFlow) {
                         this->autoSizedValue = this->dataFracOfAutosizedCoolingAirflow * this->zoneEqSizing(this->curZoneEqNum).CoolingAirVolFlow;
@@ -343,7 +343,7 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
                             dateTimeFanPeak =
                                 General::TrimSigDigits(state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).Month) + "/" +
                                 General::TrimSigDigits(state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).DayOfMonth) +
-                                " " + coilSelectionReportObj->getTimeText(this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax);
+                                " " + coilSelectionReportObj->getTimeText(state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax);
                         }
                     } else if (this->zoneEqSizing(this->curZoneEqNum).HeatingAirFlow && !this->zoneEqSizing(this->curZoneEqNum).CoolingAirFlow) {
                         this->autoSizedValue = this->dataFracOfAutosizedHeatingAirflow * this->zoneEqSizing(this->curZoneEqNum).HeatingAirVolFlow;
@@ -353,7 +353,7 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
                             dateTimeFanPeak =
                                 General::TrimSigDigits(state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).Month) + "/" +
                                 General::TrimSigDigits(state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).DayOfMonth) +
-                                " " + coilSelectionReportObj->getTimeText(this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax);
+                                " " + coilSelectionReportObj->getTimeText(state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax);
                         }
                     } else if (this->zoneEqSizing(this->curZoneEqNum).HeatingAirFlow && this->zoneEqSizing(this->curZoneEqNum).CoolingAirFlow) {
                         this->autoSizedValue =
@@ -369,7 +369,7 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
                                     "/" +
                                     General::TrimSigDigits(
                                         state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).DayOfMonth) +
-                                    " " + coilSelectionReportObj->getTimeText(this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax);
+                                    " " + coilSelectionReportObj->getTimeText(state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax);
                             }
                         } else if (this->autoSizedValue ==
                                    this->dataFracOfAutosizedHeatingAirflow * this->zoneEqSizing(this->curZoneEqNum).HeatingAirVolFlow) {
@@ -381,7 +381,7 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
                                     "/" +
                                     General::TrimSigDigits(
                                         state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).DayOfMonth) +
-                                    " " + coilSelectionReportObj->getTimeText(this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax);
+                                    " " + coilSelectionReportObj->getTimeText(state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax);
                             }
                         }
                     } else {
@@ -398,7 +398,7 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
                                     "/" +
                                     General::TrimSigDigits(
                                         state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).DayOfMonth) +
-                                    " " + coilSelectionReportObj->getTimeText(this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax);
+                                    " " + coilSelectionReportObj->getTimeText(state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax);
                             }
                         } else if (this->autoSizedValue ==
                                    this->dataFracOfAutosizedHeatingAirflow * this->finalZoneSizing(this->curZoneEqNum).DesHeatVolFlow) {
@@ -410,7 +410,7 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
                                     "/" +
                                     General::TrimSigDigits(
                                         state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).DayOfMonth) +
-                                    " " + coilSelectionReportObj->getTimeText(this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax);
+                                    " " + coilSelectionReportObj->getTimeText(state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax);
                             }
                         }
                     }
@@ -423,7 +423,7 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
                             dateTimeFanPeak =
                                 General::TrimSigDigits(state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).Month) + "/" +
                                 General::TrimSigDigits(state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).DayOfMonth) +
-                                " " + coilSelectionReportObj->getTimeText(this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax);
+                                " " + coilSelectionReportObj->getTimeText(state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax);
                         }
                     } else if (this->zoneHeatingOnlyFan) {
                         this->autoSizedValue = this->dataFlowPerHeatingCapacity * this->dataAutosizedHeatingCapacity;
@@ -433,7 +433,7 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
                             dateTimeFanPeak =
                                 General::TrimSigDigits(state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).Month) + "/" +
                                 General::TrimSigDigits(state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).DayOfMonth) +
-                                " " + coilSelectionReportObj->getTimeText(this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax);
+                                " " + coilSelectionReportObj->getTimeText(state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax);
                         }
                     } else if (this->zoneEqSizing(this->curZoneEqNum).CoolingAirFlow && !this->zoneEqSizing(this->curZoneEqNum).HeatingAirFlow) {
                         this->autoSizedValue = this->dataFlowPerCoolingCapacity * this->dataAutosizedCoolingCapacity;
@@ -443,7 +443,7 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
                             dateTimeFanPeak =
                                 General::TrimSigDigits(state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).Month) + "/" +
                                 General::TrimSigDigits(state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).DayOfMonth) +
-                                " " + coilSelectionReportObj->getTimeText(this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax);
+                                " " + coilSelectionReportObj->getTimeText(state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax);
                         }
                     } else if (this->zoneEqSizing(this->curZoneEqNum).HeatingAirFlow && !this->zoneEqSizing(this->curZoneEqNum).CoolingAirFlow) {
                         this->autoSizedValue = this->dataFlowPerHeatingCapacity * this->dataAutosizedHeatingCapacity;
@@ -453,7 +453,7 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
                             dateTimeFanPeak =
                                 General::TrimSigDigits(state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).Month) + "/" +
                                 General::TrimSigDigits(state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).DayOfMonth) +
-                                " " + coilSelectionReportObj->getTimeText(this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax);
+                                " " + coilSelectionReportObj->getTimeText(state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax);
                         }
                     } else if (this->zoneEqSizing(this->curZoneEqNum).HeatingAirFlow && this->zoneEqSizing(this->curZoneEqNum).CoolingAirFlow) {
                         this->autoSizedValue = max(this->dataFlowPerCoolingCapacity * this->dataAutosizedCoolingCapacity,
@@ -467,7 +467,7 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
                                     "/" +
                                     General::TrimSigDigits(
                                         state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).DayOfMonth) +
-                                    " " + coilSelectionReportObj->getTimeText(this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax);
+                                    " " + coilSelectionReportObj->getTimeText(state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax);
                             }
                         } else if (this->autoSizedValue == this->dataFlowPerHeatingCapacity * this->dataAutosizedHeatingCapacity) {
                             if (this->finalZoneSizing(this->curZoneEqNum).HeatDDNum > 0 &&
@@ -478,7 +478,7 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
                                     "/" +
                                     General::TrimSigDigits(
                                         state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).DayOfMonth) +
-                                    " " + coilSelectionReportObj->getTimeText(this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax);
+                                    " " + coilSelectionReportObj->getTimeText(state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax);
                             }
                         }
                     } else {
@@ -493,7 +493,7 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
                                     "/" +
                                     General::TrimSigDigits(
                                         state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).DayOfMonth) +
-                                    " " + coilSelectionReportObj->getTimeText(this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax);
+                                    " " + coilSelectionReportObj->getTimeText(state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax);
                             }
                         } else if (this->autoSizedValue == this->dataFlowPerHeatingCapacity * this->dataAutosizedHeatingCapacity) {
                             if (this->finalZoneSizing(this->curZoneEqNum).HeatDDNum > 0 &&
@@ -504,7 +504,7 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
                                     "/" +
                                     General::TrimSigDigits(
                                         state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).DayOfMonth) +
-                                    " " + coilSelectionReportObj->getTimeText(this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax);
+                                    " " + coilSelectionReportObj->getTimeText(state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax);
                             }
                         }
                     }
@@ -517,7 +517,7 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
                             dateTimeFanPeak =
                                 General::TrimSigDigits(state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).Month) + "/" +
                                 General::TrimSigDigits(state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).DayOfMonth) +
-                                " " + coilSelectionReportObj->getTimeText(this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax);
+                                " " + coilSelectionReportObj->getTimeText(state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax);
                         }
                     } else if (this->zoneHeatingOnlyFan) {
                         this->autoSizedValue = this->dataFlowPerHeatingCapacity * this->dataAutosizedHeatingCapacity;
@@ -527,7 +527,7 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
                             dateTimeFanPeak =
                                 General::TrimSigDigits(state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).Month) + "/" +
                                 General::TrimSigDigits(state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).DayOfMonth) +
-                                " " + coilSelectionReportObj->getTimeText(this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax);
+                                " " + coilSelectionReportObj->getTimeText(state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax);
                         }
                     } else if (this->zoneEqSizing(this->curZoneEqNum).CoolingAirFlow && !this->zoneEqSizing(this->curZoneEqNum).HeatingAirFlow) {
                         this->autoSizedValue = this->dataFlowPerCoolingCapacity * this->dataAutosizedCoolingCapacity;
@@ -537,7 +537,7 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
                             dateTimeFanPeak =
                                 General::TrimSigDigits(state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).Month) + "/" +
                                 General::TrimSigDigits(state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).DayOfMonth) +
-                                " " + coilSelectionReportObj->getTimeText(this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax);
+                                " " + coilSelectionReportObj->getTimeText(state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax);
                         }
                     } else if (this->zoneEqSizing(this->curZoneEqNum).HeatingAirFlow && !this->zoneEqSizing(this->curZoneEqNum).CoolingAirFlow) {
                         this->autoSizedValue = this->dataFlowPerHeatingCapacity * this->dataAutosizedHeatingCapacity;
@@ -547,7 +547,7 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
                             dateTimeFanPeak =
                                 General::TrimSigDigits(state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).Month) + "/" +
                                 General::TrimSigDigits(state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).DayOfMonth) +
-                                " " + coilSelectionReportObj->getTimeText(this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax);
+                                " " + coilSelectionReportObj->getTimeText(state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax);
                         }
                     } else if (this->zoneEqSizing(this->curZoneEqNum).HeatingAirFlow && this->zoneEqSizing(this->curZoneEqNum).CoolingAirFlow) {
                         this->autoSizedValue = max(this->dataFlowPerCoolingCapacity * this->dataAutosizedCoolingCapacity,
@@ -561,7 +561,7 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
                                     "/" +
                                     General::TrimSigDigits(
                                         state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).DayOfMonth) +
-                                    " " + coilSelectionReportObj->getTimeText(this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax);
+                                    " " + coilSelectionReportObj->getTimeText(state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax);
                             }
                         } else if (this->autoSizedValue == this->dataFlowPerHeatingCapacity * this->dataAutosizedHeatingCapacity) {
                             if (this->finalZoneSizing(this->curZoneEqNum).HeatDDNum > 0 &&
@@ -572,7 +572,7 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
                                     "/" +
                                     General::TrimSigDigits(
                                         state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).DayOfMonth) +
-                                    " " + coilSelectionReportObj->getTimeText(this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax);
+                                    " " + coilSelectionReportObj->getTimeText(state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax);
                             }
                         }
                     } else {
@@ -587,7 +587,7 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
                                     "/" +
                                     General::TrimSigDigits(
                                         state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).DayOfMonth) +
-                                    " " + coilSelectionReportObj->getTimeText(this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax);
+                                    " " + coilSelectionReportObj->getTimeText(state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax);
                             }
                         } else if (this->autoSizedValue == this->dataFlowPerHeatingCapacity * this->dataAutosizedHeatingCapacity) {
                             if (this->finalZoneSizing(this->curZoneEqNum).HeatDDNum > 0 &&
@@ -598,7 +598,7 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
                                     "/" +
                                     General::TrimSigDigits(
                                         state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).DayOfMonth) +
-                                    " " + coilSelectionReportObj->getTimeText(this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax);
+                                    " " + coilSelectionReportObj->getTimeText(state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax);
                             }
                         }
                     }
@@ -611,7 +611,7 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
                             dateTimeFanPeak =
                                 General::TrimSigDigits(state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).Month) + "/" +
                                 General::TrimSigDigits(state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).DayOfMonth) +
-                                " " + coilSelectionReportObj->getTimeText(this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax);
+                                " " + coilSelectionReportObj->getTimeText(state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax);
                         }
                     } else if (this->zoneEqSizing(this->curZoneEqNum).HeatingAirFlow && !this->zoneEqSizing(this->curZoneEqNum).CoolingAirFlow) {
                         this->autoSizedValue = this->zoneEqSizing(this->curZoneEqNum).HeatingAirVolFlow;
@@ -621,7 +621,7 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
                             dateTimeFanPeak =
                                 General::TrimSigDigits(state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).Month) + "/" +
                                 General::TrimSigDigits(state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).DayOfMonth) +
-                                " " + coilSelectionReportObj->getTimeText(this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax);
+                                " " + coilSelectionReportObj->getTimeText(state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax);
                         }
                     } else if (this->zoneEqSizing(this->curZoneEqNum).HeatingAirFlow && this->zoneEqSizing(this->curZoneEqNum).CoolingAirFlow) {
                         this->autoSizedValue =
@@ -635,7 +635,7 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
                                     "/" +
                                     General::TrimSigDigits(
                                         state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).DayOfMonth) +
-                                    " " + coilSelectionReportObj->getTimeText(this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax);
+                                    " " + coilSelectionReportObj->getTimeText(state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax);
                             }
                         } else if (this->autoSizedValue == this->zoneEqSizing(this->curZoneEqNum).HeatingAirVolFlow) {
                             if (this->finalZoneSizing(this->curZoneEqNum).HeatDDNum > 0 &&
@@ -646,7 +646,7 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
                                     "/" +
                                     General::TrimSigDigits(
                                         state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).DayOfMonth) +
-                                    " " + coilSelectionReportObj->getTimeText(this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax);
+                                    " " + coilSelectionReportObj->getTimeText(state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax);
                             }
                         }
                     } else {
@@ -664,7 +664,7 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
                                     "/" +
                                     General::TrimSigDigits(
                                         state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).DayOfMonth) +
-                                    " " + coilSelectionReportObj->getTimeText(this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax);
+                                    " " + coilSelectionReportObj->getTimeText(state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax);
                             }
                         } else if (this->zoneHeatingOnlyFan) {
                             this->autoSizedValue = this->finalZoneSizing(this->curZoneEqNum).DesHeatVolFlow;
@@ -676,7 +676,7 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
                                     "/" +
                                     General::TrimSigDigits(
                                         state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).DayOfMonth) +
-                                    " " + coilSelectionReportObj->getTimeText(this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax);
+                                    " " + coilSelectionReportObj->getTimeText(state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax);
                             }
                         } else {
                             this->autoSizedValue = max(this->finalZoneSizing(this->curZoneEqNum).DesCoolVolFlow,
@@ -691,7 +691,7 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
                                         "/" +
                                         General::TrimSigDigits(
                                             state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).DayOfMonth) +
-                                        " " + coilSelectionReportObj->getTimeText(this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax);
+                                        " " + coilSelectionReportObj->getTimeText(state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax);
                                 }
                             } else if (this->autoSizedValue == this->finalZoneSizing(this->curZoneEqNum).DesHeatVolFlow) {
                                 if (this->finalZoneSizing(this->curZoneEqNum).HeatDDNum > 0 &&
@@ -703,7 +703,7 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
                                         "/" +
                                         General::TrimSigDigits(
                                             state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).DayOfMonth) +
-                                        " " + coilSelectionReportObj->getTimeText(this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax);
+                                        " " + coilSelectionReportObj->getTimeText(state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax);
                                 }
                             }
                         }
@@ -769,7 +769,7 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
                                         General::TrimSigDigits(
                                             state.dataWeatherManager->DesDayInput(DataSizing::SysSizPeakDDNum(this->curSysNum).CoolFlowPeakDD).DayOfMonth) +
                                         " " +
-                                        coilSelectionReportObj->getTimeText(
+                                        coilSelectionReportObj->getTimeText(state,
                                             DataSizing::SysSizPeakDDNum(this->curSysNum)
                                                 .TimeStepAtCoolFlowPk(DataSizing::SysSizPeakDDNum(this->curSysNum).CoolFlowPeakDD));
                                 }
@@ -783,7 +783,7 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
                                         "/" +
                                         General::TrimSigDigits(
                                             state.dataWeatherManager->DesDayInput(this->finalSysSizing(this->curSysNum).HeatDDNum).DayOfMonth) +
-                                        " " + coilSelectionReportObj->getTimeText(this->finalSysSizing(this->curSysNum).SysHeatAirTimeStepPk);
+                                        " " + coilSelectionReportObj->getTimeText(state, this->finalSysSizing(this->curSysNum).SysHeatAirTimeStepPk);
                                 }
                             }
                         } else if (this->unitarySysEqSizing(this->curSysNum).CoolingAirFlow) {
@@ -798,7 +798,7 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
                                     General::TrimSigDigits(
                                         state.dataWeatherManager->DesDayInput(DataSizing::SysSizPeakDDNum(this->curSysNum).CoolFlowPeakDD).DayOfMonth) +
                                     " " +
-                                    coilSelectionReportObj->getTimeText(
+                                    coilSelectionReportObj->getTimeText(state,
                                         DataSizing::SysSizPeakDDNum(this->curSysNum)
                                             .TimeStepAtCoolFlowPk(DataSizing::SysSizPeakDDNum(this->curSysNum).CoolFlowPeakDD));
                             }
@@ -810,7 +810,7 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
                                 dateTimeFanPeak =
                                     General::TrimSigDigits(state.dataWeatherManager->DesDayInput(this->finalSysSizing(this->curSysNum).HeatDDNum).Month) + "/" +
                                     General::TrimSigDigits(state.dataWeatherManager->DesDayInput(this->finalSysSizing(this->curSysNum).HeatDDNum).DayOfMonth) +
-                                    " " + coilSelectionReportObj->getTimeText(this->finalSysSizing(this->curSysNum).SysHeatAirTimeStepPk);
+                                    " " + coilSelectionReportObj->getTimeText(state, this->finalSysSizing(this->curSysNum).SysHeatAirTimeStepPk);
                             }
 
                         } else {
@@ -824,7 +824,7 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
                                         "/" +
                                         General::TrimSigDigits(
                                             state.dataWeatherManager->DesDayInput(this->finalSysSizing(this->curSysNum).HeatDDNum).DayOfMonth) +
-                                        " " + coilSelectionReportObj->getTimeText(this->finalSysSizing(this->curSysNum).SysHeatAirTimeStepPk);
+                                        " " + coilSelectionReportObj->getTimeText(state, this->finalSysSizing(this->curSysNum).SysHeatAirTimeStepPk);
                                 }
                             } else if (this->autoSizedValue == this->finalSysSizing(this->curSysNum).DesCoolVolFlow) {
                                 if (DataSizing::SysSizPeakDDNum(this->curSysNum).CoolFlowPeakDD > 0 &&
@@ -837,7 +837,7 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
                                         General::TrimSigDigits(
                                             state.dataWeatherManager->DesDayInput(DataSizing::SysSizPeakDDNum(this->curSysNum).CoolFlowPeakDD).DayOfMonth) +
                                         " " +
-                                        coilSelectionReportObj->getTimeText(
+                                        coilSelectionReportObj->getTimeText(state,
                                             DataSizing::SysSizPeakDDNum(this->curSysNum)
                                                 .TimeStepAtCoolFlowPk(DataSizing::SysSizPeakDDNum(this->curSysNum).CoolFlowPeakDD));
                                 }
@@ -852,7 +852,7 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
                                 dateTimeFanPeak =
                                     General::TrimSigDigits(state.dataWeatherManager->DesDayInput(this->finalSysSizing(this->curSysNum).HeatDDNum).Month) + "/" +
                                     General::TrimSigDigits(state.dataWeatherManager->DesDayInput(this->finalSysSizing(this->curSysNum).HeatDDNum).DayOfMonth) +
-                                    " " + coilSelectionReportObj->getTimeText(this->finalSysSizing(this->curSysNum).SysHeatAirTimeStepPk);
+                                    " " + coilSelectionReportObj->getTimeText(state, this->finalSysSizing(this->curSysNum).SysHeatAirTimeStepPk);
                             }
                         } else if (this->autoSizedValue == this->finalSysSizing(this->curSysNum).DesCoolVolFlow) {
                             if (DataSizing::SysSizPeakDDNum(this->curSysNum).CoolFlowPeakDD > 0 &&
@@ -865,7 +865,7 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
                                     General::TrimSigDigits(
                                         state.dataWeatherManager->DesDayInput(DataSizing::SysSizPeakDDNum(this->curSysNum).CoolFlowPeakDD).DayOfMonth) +
                                     " " +
-                                    coilSelectionReportObj->getTimeText(
+                                    coilSelectionReportObj->getTimeText(state,
                                         DataSizing::SysSizPeakDDNum(this->curSysNum)
                                             .TimeStepAtCoolFlowPk(DataSizing::SysSizPeakDDNum(this->curSysNum).CoolFlowPeakDD));
                             }

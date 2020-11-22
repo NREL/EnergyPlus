@@ -85,7 +85,6 @@ namespace BranchInputManager {
     // information about these objects.
 
     // Using/Aliasing
-    using DataGlobals::DisplayExtraWarnings;
     using namespace DataLoopNode;
     using namespace DataBranchAirLoopPlant;
     using namespace NodeInputManager;
@@ -227,7 +226,7 @@ namespace BranchInputManager {
     void GetBranchData(EnergyPlusData &state,
                        std::string const &LoopName,         // Loop Name of this Branch
                        std::string const &BranchName,       // Requested Branch Name
-                       int &PressCurveType,                 // Index of a pressure curve object
+                       DataBranchAirLoopPlant::PressureCurveType &PressCurveType,                 // Index of a pressure curve object
                        int &PressCurveIndex,                // Index of a pressure curve object
                        int &NumComps,                       // Number of Components on Branch
                        Array1D_string &CompType,            // Component Type for each item on Branch
@@ -429,7 +428,7 @@ namespace BranchInputManager {
     void GetInternalBranchData(EnergyPlusData &state,
                                std::string const &LoopName,         // Loop Name for Branch
                                std::string const &BranchName,       // Requested Branch Name
-                               int &PressCurveType,                 // Index of pressure curve object
+                               DataBranchAirLoopPlant::PressureCurveType &PressCurveType,                 // Index of pressure curve object
                                int &PressCurveIndex,                // Index of pressure curve object
                                int &NumComps,                       // Number of Components on Branch
                                Array1D<ComponentData> &BComponents, // Component data returned
@@ -619,7 +618,7 @@ namespace BranchInputManager {
         int Count;    // Loop Counter
         int Loop;     // Loop Counter
         int NumComps; // Number of Components on this Branch
-        int PressCurveType;
+        DataBranchAirLoopPlant::PressureCurveType PressCurveType;
         int PressCurveIndex;
         bool errFlag; // Error flag from RegisterNodeConnection
         int NumParams;
@@ -762,7 +761,7 @@ namespace BranchInputManager {
         int Count;    // Loop Counter
         int Loop;     // Loop Counter
         int NumComps; // Number of Components on this Branch
-        int PressCurveType;
+        DataBranchAirLoopPlant::PressureCurveType PressCurveType;
         int PressCurveIndex;
         bool errFlag; // Error flag from RegisterNodeConnection
         int NumParams;
@@ -1091,7 +1090,7 @@ namespace BranchInputManager {
         using General::RoundSigDigits;
 
         // Locals
-        int PressureCurveType;
+        PressureCurveType pressureCurveType;
         int PressureCurveIndex;
         bool ErrFound;      // Flag for error detection
         int Comp;           // Loop Counter
@@ -1103,8 +1102,8 @@ namespace BranchInputManager {
         std::string CurrentModuleObject = "Branch";
 
         state.dataBranchInputManager->Branch(BCount).Name = Alphas(1);
-        GetPressureCurveTypeAndIndex(state, Alphas(2), PressureCurveType, PressureCurveIndex);
-        if (PressureCurveType == PressureCurve_Error) {
+        GetPressureCurveTypeAndIndex(state, Alphas(2), pressureCurveType, PressureCurveIndex);
+        if (pressureCurveType == DataBranchAirLoopPlant::PressureCurveType::Error) {
             ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid data.");
             ShowContinueError(state, "..Invalid " + cAlphaFields(2) + "=\"" + Alphas(2) + "\".");
             ShowContinueError(state, "This curve could not be found in the input deck.  Ensure that this curve has been entered");
@@ -1112,7 +1111,7 @@ namespace BranchInputManager {
             ShowContinueError(state, "This error could be caused by a misspelled curve name");
             ErrFound = true;
         }
-        state.dataBranchInputManager->Branch(BCount).PressureCurveType = PressureCurveType;
+        state.dataBranchInputManager->Branch(BCount).PressureCurveType = pressureCurveType;
         state.dataBranchInputManager->Branch(BCount).PressureCurveIndex = PressureCurveIndex;
         state.dataBranchInputManager->Branch(BCount).NumOfComponents = (NumAlphas - 2) / 4;
         if (state.dataBranchInputManager->Branch(BCount).NumOfComponents * 4 != (NumAlphas - 2)) ++state.dataBranchInputManager->Branch(BCount).NumOfComponents;
@@ -2386,7 +2385,7 @@ namespace BranchInputManager {
             }
             if (Found != 0) continue;
             ++NumDanglingCount;
-            if (DisplayExtraWarnings || mustprint) {
+            if (state.dataGlobal->DisplayExtraWarnings || mustprint) {
                 if (mustprint) {
                     ShowContinueError(state, "AuditBranches: Branch=\"" + state.dataBranchInputManager->Branch(BrN).Name + "\" not found on any BranchLists.");
                     if (!FoundBranchName.empty()) {

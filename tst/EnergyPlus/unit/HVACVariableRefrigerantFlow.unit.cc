@@ -99,7 +99,6 @@ using namespace EnergyPlus::BranchInputManager;
 using namespace EnergyPlus::CurveManager;
 using namespace EnergyPlus::DataEnvironment;
 using namespace EnergyPlus::DataGlobalConstants;
-using namespace EnergyPlus::DataGlobals;
 using namespace EnergyPlus::DataHeatBalFanSys;
 using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataLoopNode;
@@ -152,7 +151,7 @@ protected:
         DataEnvironment::OutBaroPress = 101325;          // sea level
         DataZoneEquipment::ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
 
-        int numZones = DataGlobals::NumOfZones = 5;
+        int numZones = state.dataGlobal->NumOfZones = 5;
         int numAirloops = 5;
         DataLoopNode::Node.allocate(50);
         DataLoopNode::NodeID.allocate(50);
@@ -206,9 +205,9 @@ protected:
         state.dataCurveManager->PerfCurve(2).CurveMax = 1.0;
 
         int NumAirLoops = DataHVACGlobals::NumPrimaryAirSys = 1; // allocate to 1 air loop and adjust/resize as needed
-        DataAirSystems::PrimaryAirSystem.allocate(NumAirLoops);
+        state.dataAirSystemsData->PrimaryAirSystems.allocate(NumAirLoops);
         int thisAirLoop = 1;
-        DataAirSystems::PrimaryAirSystem(thisAirLoop).Branch.allocate(1);
+        state.dataAirSystemsData->PrimaryAirSystems(thisAirLoop).Branch.allocate(1);
         state.dataAirLoop->AirLoopControlInfo.allocate(1);
 
         ZoneSysEnergyDemand.allocate(numZones);
@@ -306,18 +305,18 @@ protected:
         finalSysSizing.MixHumRatAtCoolPeak = 0.009;
 
         // set up air loop
-        DataAirSystems::PrimaryAirSystem(thisAirLoop).NumBranches = 1;
-        DataAirSystems::PrimaryAirSystem(thisAirLoop).NumInletBranches = 1;
-        DataAirSystems::PrimaryAirSystem(thisAirLoop).InletBranchNum.allocate(1);
-        DataAirSystems::PrimaryAirSystem(thisAirLoop).InletBranchNum(1) = 1;
-        DataAirSystems::PrimaryAirSystem(thisAirLoop).NumOutletBranches = 1;
-        DataAirSystems::PrimaryAirSystem(thisAirLoop).OutletBranchNum.allocate(1);
-        DataAirSystems::PrimaryAirSystem(thisAirLoop).OutletBranchNum(1) = 1;
-        DataAirSystems::PrimaryAirSystem(thisAirLoop).Branch.allocate(1);
-        DataAirSystems::PrimaryAirSystem(thisAirLoop).Branch(1).TotalComponents = 1;
-        DataAirSystems::PrimaryAirSystem(thisAirLoop).Branch(1).Comp.allocate(1);
-        DataAirSystems::PrimaryAirSystem(thisAirLoop).Branch(1).Comp(1).Name = "VRFTU1";
-        DataAirSystems::PrimaryAirSystem(thisAirLoop).Branch(1).Comp(1).TypeOf = "ZONEHVAC:TERMINALUNIT:VARIABLEREFRIGERANTFLOW";
+        state.dataAirSystemsData->PrimaryAirSystems(thisAirLoop).NumBranches = 1;
+        state.dataAirSystemsData->PrimaryAirSystems(thisAirLoop).NumInletBranches = 1;
+        state.dataAirSystemsData->PrimaryAirSystems(thisAirLoop).InletBranchNum.allocate(1);
+        state.dataAirSystemsData->PrimaryAirSystems(thisAirLoop).InletBranchNum(1) = 1;
+        state.dataAirSystemsData->PrimaryAirSystems(thisAirLoop).NumOutletBranches = 1;
+        state.dataAirSystemsData->PrimaryAirSystems(thisAirLoop).OutletBranchNum.allocate(1);
+        state.dataAirSystemsData->PrimaryAirSystems(thisAirLoop).OutletBranchNum(1) = 1;
+        state.dataAirSystemsData->PrimaryAirSystems(thisAirLoop).Branch.allocate(1);
+        state.dataAirSystemsData->PrimaryAirSystems(thisAirLoop).Branch(1).TotalComponents = 1;
+        state.dataAirSystemsData->PrimaryAirSystems(thisAirLoop).Branch(1).Comp.allocate(1);
+        state.dataAirSystemsData->PrimaryAirSystems(thisAirLoop).Branch(1).Comp(1).Name = "VRFTU1";
+        state.dataAirSystemsData->PrimaryAirSystems(thisAirLoop).Branch(1).Comp(1).TypeOf = "ZONEHVAC:TERMINALUNIT:VARIABLEREFRIGERANTFLOW";
 
         // set up plant loop for water equipment
         DataPlant::TotNumLoops = 2;
@@ -2257,7 +2256,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
     FluidProperties::GetFluidPropertiesData(state); // read refrigerant properties
 
     // set up ZoneEquipConfig data
-    DataGlobals::NumOfZones = 1;
+    state.dataGlobal->NumOfZones = 1;
     DataZoneEquipment::ZoneEquipConfig.allocate(1);
     DataZoneEquipment::ZoneEquipConfig(1).IsControlled = true;
     DataZoneEquipment::ZoneEquipConfig(1).NumInletNodes = 1;
@@ -5560,9 +5559,9 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
     DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(1);
 
     Array2D<Real64> DummyArray; // Sky temperature
-    DataGlobals::NumOfTimeStepInHour = 4;
-    DataGlobals::MinutesPerTimeStep = 60 / DataGlobals::NumOfTimeStepInHour;
-    DummyArray.allocate(DataGlobals::NumOfTimeStepInHour, 24);
+    state.dataGlobal->NumOfTimeStepInHour = 4;
+    state.dataGlobal->MinutesPerTimeStep = 60 / state.dataGlobal->NumOfTimeStepInHour;
+    DummyArray.allocate(state.dataGlobal->NumOfTimeStepInHour, 24);
     DummyArray = 0.0;
     ScheduleManager::GetScheduleValuesForDay(state, 1, DummyArray, 58, 3);
 
@@ -6433,9 +6432,9 @@ TEST_F(EnergyPlusFixture, VRFTest_TU_NoLoad_OAMassFlowRateTest)
     DataEnvironment::OutBaroPress = 101325;          // sea level
     DataZoneEquipment::ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
     DataEnvironment::StdRhoAir = PsyRhoAirFnPbTdbW(state, DataEnvironment::OutBaroPress, 20.0, 0.0);
-    DataGlobals::SysSizingCalc = true;
-    DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->SysSizingCalc = true;
+    state.dataGlobal->NumOfTimeStepInHour = 1;
+    state.dataGlobal->MinutesPerTimeStep = 60;
     DataSizing::ZoneEqSizing.allocate(1);
 
     CurveManager::GetCurveInput(state);                // read curves
@@ -6567,8 +6566,8 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest)
 
     // set up environment
     state.dataGlobal->DayOfSim = 1;
-    DataGlobals::CurrentTime = 0.25;
-    DataGlobals::TimeStepZone = 0.25;
+    state.dataGlobal->CurrentTime = 0.25;
+    state.dataGlobal->TimeStepZone = 0.25;
     DataHVACGlobals::SysTimeElapsed = 0.0;
     DataEnvironment::OutDryBulbTemp = 35.0;
     DataEnvironment::OutHumRat = 0.01;
@@ -6668,7 +6667,7 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest)
     EXPECT_EQ(VRF(VRFCond).ElecHeatingPower, VRF(VRFCond).RatedHeatingPower * VRF(VRFCond).VRFCondPLR);
 
     // increment time step
-    DataGlobals::CurrentTime += DataGlobals::TimeStepZone; // 0.5
+    state.dataGlobal->CurrentTime += state.dataGlobal->TimeStepZone; // 0.5
     // set TU's to request both cooling and heating
     TerminalUnitList(1).TotalCoolLoad(1) = 0.0;
     TerminalUnitList(1).HRCoolRequest(1) = false;
@@ -6722,7 +6721,7 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest)
     LastModeCooling(VRFCond) = true;
     LastModeHeating(VRFCond) = false;
 
-    DataGlobals::CurrentTime += DataGlobals::TimeStepZone; // 0.75 - CalcVRFCondenser saves last time stamp for use in exponential curve, increment by
+    state.dataGlobal->CurrentTime += state.dataGlobal->TimeStepZone; // 0.75 - CalcVRFCondenser saves last time stamp for use in exponential curve, increment by
                                                            // 1 time step to get same answer
     CalcVRFCondenser(state, VRFCond);
     EXPECT_TRUE(VRF(VRFCond).HRHeatingActive);
@@ -6741,7 +6740,7 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest)
     EXPECT_NEAR(HREIRAdjustment, 1.06321, 0.00001);
 
     // simulate again and see that power has exponential changed from previous time step
-    DataGlobals::CurrentTime += DataGlobals::TimeStepZone; // 1.0
+    state.dataGlobal->CurrentTime += state.dataGlobal->TimeStepZone; // 1.0
     CoolingLoad(VRFCond) = false;
     HeatingLoad(VRFCond) = true;
     LastModeCooling(VRFCond) = false;
@@ -6756,7 +6755,7 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest)
     EXPECT_NEAR(HREIRAdjustment, 1.08646, 0.00001); // will exponentially rise towards VRF( VRFCond ).HREIRFTHeatConst = 1.1
 
     // simulate again and see that power has exponential changed from previous time step
-    DataGlobals::CurrentTime += DataGlobals::TimeStepZone; // 1.25
+    state.dataGlobal->CurrentTime += state.dataGlobal->TimeStepZone; // 1.25
     CalcVRFCondenser(state, VRFCond);
     HREIRAdjustment = HRInitialEIRFrac + (HREIRFTConst - HRInitialEIRFrac) * VRF(VRFCond).SUMultiplier;
     EXPECT_NEAR(VRF(VRFCond).SUMultiplier, 0.95021, 0.00001); // will exponentially rise towards 1.0
@@ -6764,7 +6763,7 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest)
     EXPECT_NEAR(HREIRAdjustment, 1.09502, 0.00001); // will exponentially rise towards VRF( VRFCond ).HREIRFTHeatConst = 1.1
 
     // simulate again and see that power has exponential changed from previous time step
-    DataGlobals::CurrentTime += DataGlobals::TimeStepZone; // 1.5
+    state.dataGlobal->CurrentTime += state.dataGlobal->TimeStepZone; // 1.5
     CalcVRFCondenser(state, VRFCond);
     HREIRAdjustment = HRInitialEIRFrac + (HREIRFTConst - HRInitialEIRFrac) * VRF(VRFCond).SUMultiplier;
     EXPECT_NEAR(VRF(VRFCond).SUMultiplier, 0.98168, 0.00001); // will exponentially rise towards 1.0
@@ -6772,7 +6771,7 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest)
     EXPECT_NEAR(HREIRAdjustment, 1.09817, 0.00001); // will exponentially rise towards VRF( VRFCond ).HREIRFTHeatConst = 1.1
 
     // simulate again and see that power has exponential changed from previous time step
-    DataGlobals::CurrentTime += DataGlobals::TimeStepZone; // 1.75
+    state.dataGlobal->CurrentTime += state.dataGlobal->TimeStepZone; // 1.75
     CalcVRFCondenser(state, VRFCond);
     HREIRAdjustment = HRInitialEIRFrac + (HREIRFTConst - HRInitialEIRFrac) * VRF(VRFCond).SUMultiplier;
     EXPECT_NEAR(VRF(VRFCond).SUMultiplier, 1.0, 0.00001); // will exponentially rise towards 1.0
@@ -7932,7 +7931,7 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilElectric)
     HeatingCoils::CheckEquipName.dimension(HeatingCoils::NumHeatingCoils, true);
     HeatingCoils::ValidSourceType.dimension(HeatingCoils::NumHeatingCoils, true);
 
-    SysSizingCalc = true;
+    state.dataGlobal->SysSizingCalc = true;
     DataEnvironment::OutDryBulbTemp = 5.0;
     // init coil inlet condition
     DataLoopNode::Node(HeatingCoil(CoilNum).AirInletNodeNum).MassFlowRate = 1.0;
@@ -7996,7 +7995,7 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilFuel)
     HeatingCoils::CheckEquipName.dimension(HeatingCoils::NumHeatingCoils, true);
     HeatingCoils::ValidSourceType.dimension(HeatingCoils::NumHeatingCoils, true);
 
-    SysSizingCalc = true;
+    state.dataGlobal->SysSizingCalc = true;
     DataEnvironment::OutDryBulbTemp = 5.0;
     // init coil inlet condition
     DataLoopNode::Node(HeatingCoil(CoilNum).AirInletNodeNum).MassFlowRate = 1.0;
@@ -8106,8 +8105,8 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilWater)
     state.dataWaterCoils->MySizeFlag.allocate(CoilNum);
     state.dataWaterCoils->MySizeFlag(CoilNum) = true;
 
-    DataGlobals::DoingSizing = true;
-    SysSizingCalc = true;
+    state.dataGlobal->DoingSizing = true;
+    state.dataGlobal->SysSizingCalc = true;
     DataEnvironment::OutDryBulbTemp = 5.0;
     // init coil inlet condition
     DataLoopNode::Node(state.dataWaterCoils->WaterCoil(CoilNum).AirInletNodeNum).MassFlowRate = 1.0;
@@ -8216,7 +8215,7 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilSteam)
     PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilSteamAirHeating;
     PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state.dataSteamCoils->SteamCoil(CoilNum).SteamInletNodeNum;
 
-    SysSizingCalc = true;
+    state.dataGlobal->SysSizingCalc = true;
     state.dataGlobal->BeginEnvrnFlag = true;
     DataEnvironment::OutDryBulbTemp = 5.0;
     // init coil inlet condition
@@ -11174,7 +11173,7 @@ TEST_F(EnergyPlusFixture, VRFTU_SysCurve_ReportOutputVerificationTest)
     ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToCoolSP = -5000.0;
     ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToHeatSP = 0.0;
 
-    auto &thisZoneEquip(ZoneEquipConfig(NumOfZones));
+    auto &thisZoneEquip(ZoneEquipConfig(state.dataGlobal->NumOfZones));
     // set zone air node properties
     Node(thisZoneEquip.ZoneNode).Temp = 24.0;
     Node(thisZoneEquip.ZoneNode).HumRat = 0.0075;
@@ -12906,7 +12905,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_ReportOutputVerificationTest)
     ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToCoolSP = -5000.0;
     ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToHeatSP = 0.0;
 
-    auto &thisZoneEquip(ZoneEquipConfig(NumOfZones));
+    auto &thisZoneEquip(ZoneEquipConfig(state.dataGlobal->NumOfZones));
     // set zone air node properties
     Node(thisZoneEquip.ZoneNode).Temp = 24.0;
     Node(thisZoneEquip.ZoneNode).HumRat = 0.0075;
@@ -13111,8 +13110,8 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest_HREIRFTHeat)
 
     // set up environment
     state.dataGlobal->DayOfSim = 2; // user a higher day than previous unit test to get around static timer variables problem
-    DataGlobals::CurrentTime = 0.25;
-    DataGlobals::TimeStepZone = 0.25;
+    state.dataGlobal->CurrentTime = 0.25;
+    state.dataGlobal->TimeStepZone = 0.25;
     DataHVACGlobals::TimeStepSys = 0.25;
     DataHVACGlobals::SysTimeElapsed = 0.0;
     DataEnvironment::OutDryBulbTemp = 35.0;
@@ -13128,7 +13127,7 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest_HREIRFTHeat)
     CalcVRFCondenser(state, VRFCond);
 
     // increment time step
-    DataGlobals::CurrentTime += DataGlobals::TimeStepZone; // 0.5
+    state.dataGlobal->CurrentTime += state.dataGlobal->TimeStepZone; // 0.5
 
     // set TU's to request both cooling and heating
     CoolingLoad(VRFCond) = false;
@@ -14931,9 +14930,9 @@ TEST_F(EnergyPlusFixture, VRFTest_TU_NotOnZoneHVACEquipmentList)
     DataEnvironment::OutBaroPress = 101325;          // sea level
     DataZoneEquipment::ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
     DataEnvironment::StdRhoAir = PsyRhoAirFnPbTdbW(state, DataEnvironment::OutBaroPress, 20.0, 0.0);
-    DataGlobals::SysSizingCalc = true;
-    DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state.dataGlobal->SysSizingCalc = true;
+    state.dataGlobal->NumOfTimeStepInHour = 1;
+    state.dataGlobal->MinutesPerTimeStep = 60;
     DataSizing::ZoneEqSizing.allocate(1);
 
     CurveManager::GetCurveInput(state);                // read curves

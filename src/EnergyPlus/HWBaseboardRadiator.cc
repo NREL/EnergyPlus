@@ -114,7 +114,6 @@ namespace HWBaseboardRadiator {
     // USE STATEMENTS:
     // Use statements for data only modules
     // Using/Aliasing
-    using namespace DataGlobals;
     using DataHVACGlobals::SmallLoad;
     using DataHVACGlobals::SysTimeElapsed;
     using DataHVACGlobals::TimeStepSys;
@@ -564,7 +563,7 @@ namespace HWBaseboardRadiator {
             HWBaseboard(BaseboardNum).FracDistribToSurf = 0.0;
 
             // search zone equipment list structure for zone index
-            for (int ctrlZone = 1; ctrlZone <= DataGlobals::NumOfZones; ++ctrlZone) {
+            for (int ctrlZone = 1; ctrlZone <= state.dataGlobal->NumOfZones; ++ctrlZone) {
                 for (int zoneEquipTypeNum = 1; zoneEquipTypeNum <= DataZoneEquipment::ZoneEquipList(ctrlZone).NumOfEquipTypes; ++zoneEquipTypeNum) {
                     if (DataZoneEquipment::ZoneEquipList(ctrlZone).EquipType_Num(zoneEquipTypeNum) == DataZoneEquipment::BBWater_Num &&
                         DataZoneEquipment::ZoneEquipList(ctrlZone).EquipName(zoneEquipTypeNum) == HWBaseboard(BaseboardNum).EquipID) {
@@ -750,7 +749,6 @@ namespace HWBaseboardRadiator {
 
         // Using/Aliasing
         using DataEnvironment::StdRhoAir;
-        using DataGlobals::NumOfZones;
         using DataLoopNode::Node;
         using PlantUtilities::InitComponentNodes;
         using PlantUtilities::ScanPlantLoopsForObject;
@@ -788,7 +786,7 @@ namespace HWBaseboardRadiator {
             // Initialize the environment and sizing flags
             MyEnvrnFlag.allocate(NumHWBaseboards);
             MySizeFlag.allocate(NumHWBaseboards);
-            ZeroSourceSumHATsurf.dimension(NumOfZones, 0.0);
+            ZeroSourceSumHATsurf.dimension(state.dataGlobal->NumOfZones, 0.0);
             QBBRadSource.dimension(NumHWBaseboards, 0.0);
             QBBRadSrcAvg.dimension(NumHWBaseboards, 0.0);
             LastQBBRadSrc.dimension(NumHWBaseboards, 0.0);
@@ -812,7 +810,7 @@ namespace HWBaseboardRadiator {
         if (!ZoneEquipmentListChecked && ZoneEquipInputsFilled) {
             ZoneEquipmentListChecked = true;
             for (Loop = 1; Loop <= NumHWBaseboards; ++Loop) {
-                if (CheckZoneEquipmentList(cCMO_BBRadiator_Water, HWBaseboard(Loop).EquipID)) continue;
+                if (CheckZoneEquipmentList(state, cCMO_BBRadiator_Water, HWBaseboard(Loop).EquipID)) continue;
                 ShowSevereError(state, "InitBaseboard: Unit=[" + cCMO_BBRadiator_Water + ',' + HWBaseboard(Loop).EquipID +
                                 "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated.");
             }
@@ -841,7 +839,7 @@ namespace HWBaseboardRadiator {
             }
         }
 
-        if (!SysSizingCalc && MySizeFlag(BaseboardNum) && !SetLoopIndexFlag(BaseboardNum)) {
+        if (!state.dataGlobal->SysSizingCalc && MySizeFlag(BaseboardNum) && !SetLoopIndexFlag(BaseboardNum)) {
             // For each coil, do the sizing once
             SizeHWBaseboard(state, BaseboardNum);
             MySizeFlag(BaseboardNum) = false;
@@ -1116,7 +1114,7 @@ namespace HWBaseboardRadiator {
                                                          WaterVolFlowRateMaxDes,
                                                          "User-Specified Maximum Water Flow Rate [m3/s]",
                                                          WaterVolFlowRateMaxUser);
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(WaterVolFlowRateMaxDes - WaterVolFlowRateMaxUser) / WaterVolFlowRateMaxUser) >
                                     AutoVsHardSizingThreshold) {
                                     ShowMessage(state,
@@ -1446,7 +1444,6 @@ namespace HWBaseboardRadiator {
         // na
 
         // Using/Aliasing
-        using DataGlobals::TimeStepZone;
         using DataLoopNode::Node;
         using PlantUtilities::SafeCopyPlantNode;
 
@@ -1478,10 +1475,10 @@ namespace HWBaseboardRadiator {
 
         // First, update the running average if necessary...
         if (LastSysTimeElapsed(BaseboardNum) == SysTimeElapsed) {
-            QBBRadSrcAvg(BaseboardNum) -= LastQBBRadSrc(BaseboardNum) * LastTimeStepSys(BaseboardNum) / TimeStepZone;
+            QBBRadSrcAvg(BaseboardNum) -= LastQBBRadSrc(BaseboardNum) * LastTimeStepSys(BaseboardNum) / state.dataGlobal->TimeStepZone;
         }
         // Update the running average and the "last" values with the current values of the appropriate variables
-        QBBRadSrcAvg(BaseboardNum) += QBBRadSource(BaseboardNum) * TimeStepSys / TimeStepZone;
+        QBBRadSrcAvg(BaseboardNum) += QBBRadSource(BaseboardNum) * TimeStepSys / state.dataGlobal->TimeStepZone;
 
         LastQBBRadSrc(BaseboardNum) = QBBRadSource(BaseboardNum);
         LastSysTimeElapsed(BaseboardNum) = SysTimeElapsed;
@@ -1733,7 +1730,7 @@ namespace HWBaseboardRadiator {
 
             Area = Surface(SurfNum).Area;
 
-            if (Surface(SurfNum).Class == SurfaceClass_Window) {
+            if (Surface(SurfNum).Class == SurfaceClass::Window) {
                 if (SurfWinShadingFlag(SurfNum) == IntShadeOn || SurfWinShadingFlag(SurfNum) == IntBlindOn) {
                     // The area is the shade or blind area = the sum of the glazing area and the divider area (which is zero if no divider)
                     Area += SurfWinDividerArea(SurfNum);
@@ -1760,13 +1757,13 @@ namespace HWBaseboardRadiator {
     }
 
     void UpdateHWBaseboardPlantConnection(EnergyPlusData &state,
-                                          int const BaseboardTypeNum,         // type index
-                                          std::string const &BaseboardName,   // component name
-                                          int const EP_UNUSED(EquipFlowCtrl), // Flow control mode for the equipment
-                                          int const EP_UNUSED(LoopNum),       // Plant loop index for where called from
-                                          int const EP_UNUSED(LoopSide),      // Plant loop side index for where called from
-                                          int &CompIndex,                     // Chiller number pointer
-                                          bool const EP_UNUSED(FirstHVACIteration),
+                                          int const BaseboardTypeNum,               // type index
+                                          std::string const &BaseboardName,         // component name
+                                          [[maybe_unused]] int const EquipFlowCtrl, // Flow control mode for the equipment
+                                          [[maybe_unused]] int const LoopNum,       // Plant loop index for where called from
+                                          [[maybe_unused]] int const LoopSide,      // Plant loop side index for where called from
+                                          int &CompIndex,                           // Chiller number pointer
+                                          [[maybe_unused]] bool const FirstHVACIteration,
                                           bool &InitLoopEquip // If not zero, calculate the max load for operating conditions
     )
     {
@@ -1784,7 +1781,6 @@ namespace HWBaseboardRadiator {
         // check input, provide comp index, call utility routines
 
         // Using/Aliasing
-        using DataGlobals::KickOffSimulation;
         using DataPlant::ccSimPlantEquipTypes;
         using DataPlant::CriteriaType_HeatTransferRate;
         using DataPlant::CriteriaType_MassFlowRate;
@@ -1810,7 +1806,7 @@ namespace HWBaseboardRadiator {
                 ShowFatalError(state, "UpdateHWBaseboardPlantConnection:  Invalid CompIndex passed=" + TrimSigDigits(BaseboardNum) +
                                ", Number of baseboards=" + TrimSigDigits(NumHWBaseboards) + ", Entered baseboard name=" + BaseboardName);
             }
-            if (KickOffSimulation) {
+            if (state.dataGlobal->KickOffSimulation) {
                 if (BaseboardName != HWBaseboard(BaseboardNum).EquipID) {
                     ShowFatalError(state, "UpdateHWBaseboardPlantConnection: Invalid CompIndex passed=" + TrimSigDigits(BaseboardNum) + ", baseboard name=" +
                                    BaseboardName + ", stored baseboard Name for that index=" + HWBaseboard(BaseboardNum).EquipID);

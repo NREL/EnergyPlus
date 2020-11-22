@@ -88,7 +88,6 @@ namespace NodeInputManager {
 
     // OTHER NOTES:
 
-    using DataGlobals::DisplayAdvancedReportVariables;
     using General::TrimSigDigits;
     using namespace DataLoopNode;
     using namespace BranchNodeConnections;
@@ -430,7 +429,7 @@ namespace NodeInputManager {
                     SetupOutputVariable(state,
                         "System Node Quality", OutputProcessor::Unit::None, Node(NumNode).Quality, "System", "Average", NodeID(NumNode));
                     SetupOutputVariable(state, "System Node Height", OutputProcessor::Unit::m, Node(NumNode).Height, "System", "Average", NodeID(NumNode));
-                    if (DisplayAdvancedReportVariables) {
+                    if (state.dataGlobal->DisplayAdvancedReportVariables) {
                         SetupOutputVariable(state,
                             "System Node Minimum Temperature", OutputProcessor::Unit::C, Node(NumNode).TempMin, "System", "Average", NodeID(NumNode));
                         SetupOutputVariable(state,

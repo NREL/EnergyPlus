@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -173,7 +174,7 @@ namespace ChillerAbsorption {
         bool MyEnvrnFlag;
         bool GenInputOutputNodesUsed;
         ReportVars Report;
-        int EquipFlowCtrl;
+        DataBranchAirLoopPlant::ControlTypeEnum EquipFlowCtrl;
 
         // Default Constructor
         BLASTAbsorberSpecs()
@@ -189,15 +190,15 @@ namespace ChillerAbsorption {
               FaultyChillerSWTFlag(false), FaultyChillerSWTIndex(0), FaultyChillerSWTOffset(0.0), PossibleSubcooling(false), CondMassFlowRate(0.0),
               EvapMassFlowRate(0.0), SteamMassFlowRate(0.0), CondOutletTemp(0.0), EvapOutletTemp(0.0), GenOutletTemp(0.0), SteamOutletEnthalpy(0.0),
               PumpingPower(0.0), PumpingEnergy(0.0), QGenerator(0.0), GeneratorEnergy(0.0), QEvaporator(0.0), EvaporatorEnergy(0.0), QCondenser(0.0),
-              CondenserEnergy(0.0), MyOneTimeFlag(true), MyEnvrnFlag(true), GenInputOutputNodesUsed(false), EquipFlowCtrl(0)
+              CondenserEnergy(0.0), MyOneTimeFlag(true), MyEnvrnFlag(true), GenInputOutputNodesUsed(false), EquipFlowCtrl(DataBranchAirLoopPlant::ControlTypeEnum::Unknown)
         {
         }
 
         static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
-        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation) override;
+        void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation) override;
 
         void getDesignCapacities(EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 

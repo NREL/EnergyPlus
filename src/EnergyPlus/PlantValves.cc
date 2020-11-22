@@ -121,10 +121,14 @@ namespace PlantValves {
         TemperValve.deallocate();
     }
 
-    void TemperValveData::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation), bool EP_UNUSED(FirstHVACIteration), Real64 &EP_UNUSED(CurLoad),
-                                   bool EP_UNUSED(RunFlag)) {
+    void TemperValveData::simulate(EnergyPlusData &state,
+                                   [[maybe_unused]] const PlantLocation &calledFromLocation,
+                                   [[maybe_unused]] bool FirstHVACIteration,
+                                   [[maybe_unused]] Real64 &CurLoad,
+                                   [[maybe_unused]] bool RunFlag)
+    {
         this->initialize(state);
-        this->calculate();
+        this->calculate(state);
         PlantUtilities::SafeCopyPlantNode(this->PltInletNodeNum, this->PltOutletNodeNum);
         Real64 mdot = this->MixedMassFlowRate * this->FlowDivFract;
         if (this->LoopNum > 0) {
@@ -140,8 +144,8 @@ namespace PlantValves {
         }
     }
 
-    void TemperValveData::getDesignCapacities(EnergyPlusData &EP_UNUSED(state),
-                                              const PlantLocation &EP_UNUSED(calledFromLocation),
+    void TemperValveData::getDesignCapacities([[maybe_unused]] EnergyPlusData &state,
+                                              [[maybe_unused]] const PlantLocation &calledFromLocation,
                                               Real64 &MaxLoad,
                                               Real64 &MinLoad,
                                               Real64 &OptLoad)
@@ -305,7 +309,7 @@ namespace PlantValves {
                                     (thisComp.Name == this->Name)) { // we found it.
 
                                     // is branch control type 'Active'
-                                    if (thisBranch.ControlType == DataBranchAirLoopPlant::ControlType_Active) IsBranchActive = true;
+                                    if (thisBranch.ControlType == DataBranchAirLoopPlant::ControlTypeEnum::Active) IsBranchActive = true;
 
                                     // is Valve inlet node an outlet node of a splitter
                                     if (thisLoopSide.Splitter.Exists) {
@@ -437,7 +441,7 @@ namespace PlantValves {
 
     }
 
-    void TemperValveData::calculate()
+    void TemperValveData::calculate(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -459,7 +463,7 @@ namespace PlantValves {
         Real64 Tset; // local working variable for Setpoint Temperature (C)
         Real64 Ts2;  // local Working Variable for Stream 2 outlet Temperature (C)
 
-        if (DataGlobals::KickOffSimulation) return;
+        if (state.dataGlobal->KickOffSimulation) return;
 
         if (DataPlant::PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock == 0) {
             Tin = this->InletTemp;
