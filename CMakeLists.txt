@@ -42,9 +42,10 @@ endif()
 option( BUILD_PACKAGE "Build package" OFF )
 option( BUILD_TESTING "Build testing targets" OFF )
 option( BUILD_FORTRAN "Build Fortran stuff" OFF )
-option( USE_PSYCHROMETRICS_CACHING "Use pychrometrics cashing routines" ON )
+option( USE_PSYCHROMETRICS_CACHING "Use psychrometrics cashing routines" ON )
 option( USE_GLYCOL_CACHING "Use glycol cashing routines" ON )
-option( USE_PSYCH_STATS "Compute psychrometric stats" OFF)
+option( USE_PSYCH_STATS "Compute psychrometric stats" OFF )
+option( USE_PSYCH_ERRORS "Report psychrometric errors " ON )
 
 #######################################################################
 
@@ -398,3 +399,4 @@ mark_as_advanced(BUILD_WCE_TESTING)
 mark_as_advanced(USE_PSYCHROMETRICS_CACHING)
 mark_as_advanced(USE_GLYCOL_CACHING)
 mark_as_advanced(USE_PSYCH_STATS)
+mark_as_advanced(USE_PSYCH_ERRORS)
