@@ -54,6 +54,7 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/MixerComponent.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::MixerComponent;
@@ -74,10 +75,10 @@ TEST_F(EnergyPlusFixture, GetZoneMixerIndex)
     MixerCond(1).MixerName = "SPACE1-1 ATU Mixer";
     MixerCond(2).MixerName = "SPACE2-1 ATU Mixer";
     MixerCond(3).MixerName = "SPACE3-1 ATU Mixer";
-    GetZoneMixerIndex(state, MixerCond(2).MixerName, MixerIndex, errFlag, CurrentModuleObject);
+    GetZoneMixerIndex(*state, MixerCond(2).MixerName, MixerIndex, errFlag, CurrentModuleObject);
     EXPECT_EQ(2, MixerIndex);
     EXPECT_FALSE(errFlag);
-    GetZoneMixerIndex(state, "SPACE3-3 ATU Mixer", MixerIndex, errFlag, CurrentModuleObject);
+    GetZoneMixerIndex(*state, "SPACE3-3 ATU Mixer", MixerIndex, errFlag, CurrentModuleObject);
     EXPECT_EQ(0, MixerIndex);
     EXPECT_TRUE(errFlag);
 }

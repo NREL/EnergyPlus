@@ -52,10 +52,9 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/Data/EnergyPlusData.hh>
+//#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/CommonIncludes.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 #include <memory>
@@ -118,13 +117,7 @@ protected:
     // This will output the "Begin Test" ShowMessage for every unit test that uses or inherits from this fixture.
     // Now this does not need to be manually entered for every unit test as well as it will automatically be updated as the
     // unit test names change.
-    inline void show_message()
-    {
-        // Gets information about the currently running test.
-        // Do NOT delete the returned object - it's managed by the UnitTest class.
-        const ::testing::TestInfo *const test_info = ::testing::UnitTest::GetInstance()->current_test_info();
-        ShowMessage(state, "Begin Test: " + std::string(test_info->test_case_name()) + ", " + std::string(test_info->name()));
-    }
+    void show_message();
 
     // This will compare either a STL container or ObjexxFCL container
     // Pass a container you want to compare against an expected container. You can pass in an existing
@@ -278,7 +271,7 @@ protected:
     void openOutputFiles(EnergyPlusData &state);
 
 public:
-    EnergyPlusData state;
+    EnergyPlusData* state;
 
 private:
     friend class InputProcessorFixture;

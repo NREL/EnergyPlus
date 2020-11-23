@@ -48,6 +48,8 @@
 #ifndef SingleDuct_hh_INCLUDED
 #define SingleDuct_hh_INCLUDED
 
+#include <unordered_map>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Optional.hh>
