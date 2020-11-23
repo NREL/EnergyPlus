@@ -52,7 +52,6 @@
 #include <ObjexxFCL/Array2A.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/DataComplexFenestration.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -61,7 +60,7 @@ namespace TARCOGCommon {
 
     // Functions
 
-    bool IsShadingLayer(DataComplexFenestration::iComplexShadeType const layertype);
+    bool IsShadingLayer(int const layertype);
 
     Real64 LDSumMax(Real64 const Width, Real64 const Height);
 

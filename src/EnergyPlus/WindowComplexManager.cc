@@ -60,6 +60,7 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataComplexFenestration.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -2574,7 +2575,7 @@ namespace WindowComplexManager {
         //               outdoor and indoor environment [m/s] {maxlay+1} ***
         static Array1D<Real64> tvent(maxlay + 1, 0.0); // Vector of temperatures of ventilation gas for forced ventilation, for each
         //  gap, and for outdoor and indoor environment [K] {maxlay+1}
-        static Array1D<DataComplexFenestration::iComplexShadeType> LayerType(maxlay, DataComplexFenestration::iComplexShadeType::Unassigned); // Glazing layer type flag {maxlay}:
+        static Array1D_int LayerType(maxlay, 0); // Glazing layer type flag {maxlay}:
         //                 0 - Specular layer,
         //                 1 - Venetian blind (SD)
         //                 2 - Woven shade (SD) (not implemented)
@@ -2985,7 +2986,7 @@ namespace WindowComplexManager {
 
             if ((dataMaterial.Material(LayPtr).Group == WindowGlass) || (dataMaterial.Material(LayPtr).Group == WindowSimpleGlazing)) {
                 ++IGlass;
-                LayerType(IGlass) = DataComplexFenestration::iComplexShadeType::Specular; // this marks specular layer type
+                LayerType(IGlass) = 0; // this marks specular layer type
                 thick(IGlass) = dataMaterial.Material(LayPtr).Thickness;
                 scon(IGlass) = dataMaterial.Material(LayPtr).Conductivity;
                 emis(2 * IGlass - 1) = dataMaterial.Material(LayPtr).AbsorpThermalFront;
@@ -3077,7 +3078,7 @@ namespace WindowComplexManager {
         if (CalcCondition == DataBSDFWindow::noCondition) {
             // now calculate correct areas for multipliers
             for (Lay = 1; Lay <= nlayer; ++Lay) {
-                if (LayerType(Lay) != iComplexShadeType::Unassigned) { // Layer is shading
+                if (LayerType(Lay) != 0) { // Layer is shading
                     // before changing multipliers, need to determine which one is dominant gap width
                     if (Lay == 1) { // Exterior shading device
                         dominantGapWidth = gap(Lay);

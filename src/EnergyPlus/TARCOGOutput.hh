@@ -53,7 +53,6 @@
 
 // EnergyPlus Headers
 #include "IOFiles.hh"
-#include <EnergyPlus/DataComplexFenestration.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -123,7 +122,7 @@ namespace TARCOGOutput {
                              Real64 const tilt,
                              Real64 const totsol,
                              int const nlayer,
-                             const Array1D<DataComplexFenestration::iComplexShadeType> &LayerType,
+                             const Array1D_int &LayerType,
                              const Array1D<Real64> &thick,
                              const Array1D<Real64> &scon,
                              const Array1D<Real64> &asol,
@@ -166,7 +165,7 @@ namespace TARCOGOutput {
                                 Real64 const Gout,
                                 Real64 const Gin,
                                 int const nlayer,
-                                const Array1D<DataComplexFenestration::iComplexShadeType> &LayerType,
+                                const Array1D_int &LayerType,
                                 const Array1D_int &nmix,
                                 Array2A<Real64> const frct,
                                 const Array1D<Real64> &thick,
@@ -202,7 +201,7 @@ namespace TARCOGOutput {
                               Real64 const hrout,
                               const Array1D<Real64> &Ra,
                               const Array1D<Real64> &Nu,
-                              const Array1D<DataComplexFenestration::iComplexShadeType> &LayerType,
+                              const Array1D_int &LayerType,
                               const Array1D<Real64> &Ebf,
                               const Array1D<Real64> &Ebb,
                               const Array1D<Real64> &Rf,
@@ -267,7 +266,7 @@ namespace TARCOGOutput {
                               Real64 const tilt,
                               Real64 const totsol,
                               int const nlayer,
-                              const Array1D<DataComplexFenestration::iComplexShadeType> &LayerType,
+                              const Array1D_int &LayerType,
                               const Array1D<Real64> &thick,
                               const Array1D<Real64> &scon,
                               const Array1D<Real64> &YoungsMod,

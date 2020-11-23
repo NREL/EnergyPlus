@@ -50,7 +50,6 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/DataComplexFenestration.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/TARCOGCommon.hh>
 #include <EnergyPlus/TARCOGParams.hh>
@@ -84,23 +83,13 @@ namespace TARCOGCommon {
     // Using/Aliasing
     // Functions
 
-    bool IsShadingLayer(DataComplexFenestration::iComplexShadeType const layertype)
+    bool IsShadingLayer(int const layertype)
     {
 
         // Using/Aliasing
         using namespace TARCOGParams;
 
-        if (layertype == DataComplexFenestration::iComplexShadeType::VenetianHorizontal ||
-            layertype == DataComplexFenestration::iComplexShadeType::VenetianVertical ||
-            layertype == DataComplexFenestration::iComplexShadeType::Woven ||
-            layertype == DataComplexFenestration::iComplexShadeType::Perforated ||
-            layertype == DataComplexFenestration::iComplexShadeType::BSDF ||
-            layertype == DataComplexFenestration::iComplexShadeType::OtherShadingType)
-        {
-            return true;
-        } else {
-            return false;
-        }
+        return layertype == VENETBLIND_HORIZ || layertype == VENETBLIND_VERT || layertype == WOVSHADE || layertype == PERFORATED || layertype == BSDF || layertype == DIFFSHADE;
     }
 
     Real64 LDSumMax(Real64 const Width, Real64 const Height)

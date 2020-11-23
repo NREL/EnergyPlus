@@ -61,7 +61,6 @@
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/ConvectionCoefficients.hh>
 #include <EnergyPlus/CurveManager.hh>
-#include <EnergyPlus/DataComplexFenestration.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
@@ -72,6 +71,7 @@
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
+#include <EnergyPlus/HeatBalanceIntRadExchange.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/IOFiles.hh>
@@ -2862,7 +2862,7 @@ TEST_F(EnergyPlusFixture, WindowMaterialComplexShadeTest)
     HeatBalanceManager::GetMaterialData(*state, errors_found);
     EXPECT_FALSE(errors_found);
     EXPECT_EQ(DataHeatBalance::ComplexShade(1).Name, "SHADE_14_LAYER");
-    EXPECT_EQ(DataHeatBalance::ComplexShade(1).LayerType, DataComplexFenestration::iComplexShadeType::VenetianHorizontal);
+    EXPECT_EQ(DataHeatBalance::ComplexShade(1).LayerType, 1);
     EXPECT_NEAR(DataHeatBalance::ComplexShade(1).Thickness, 1.016000e-003, 1e-5);
     EXPECT_NEAR(DataHeatBalance::ComplexShade(1).Conductivity, 1.592276e+002, 1e-5);
     EXPECT_NEAR(DataHeatBalance::ComplexShade(1).IRTransmittance, 0, 1e-5);

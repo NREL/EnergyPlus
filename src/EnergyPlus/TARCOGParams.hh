@@ -90,6 +90,15 @@ namespace TARCOGParams {
     // to keep info that certain file is not open for writing
     extern int const statusClosed;
 
+    //  Layer types:
+    extern int const SPECULAR;
+    extern int const VENETBLIND_VERT;
+    extern int const WOVSHADE;
+    extern int const PERFORATED;
+    extern int const DIFFSHADE;
+    extern int const BSDF;
+    extern int const VENETBLIND_HORIZ;
+
     extern int const MinLayType;
     extern int const MaxLayType;
 

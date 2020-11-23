@@ -8380,17 +8380,17 @@ namespace HeatBalanceManager {
                 auto const SELECT_CASE_var(cAlphaArgs(2));
 
                 if (SELECT_CASE_var == "OTHERSHADINGTYPE") {
-                    ComplexShade(Loop).LayerType = iComplexShadeType::OtherShadingType;
+                    ComplexShade(Loop).LayerType = csOtherShadingType;
                 } else if (SELECT_CASE_var == "VENETIANHORIZONTAL") {
-                    ComplexShade(Loop).LayerType = iComplexShadeType::VenetianHorizontal;
+                    ComplexShade(Loop).LayerType = csVenetianHorizontal;
                 } else if (SELECT_CASE_var == "VENETIANVERTICAL") {
-                    ComplexShade(Loop).LayerType = iComplexShadeType::VenetianVertical;
+                    ComplexShade(Loop).LayerType = csVenetianVertical;
                 } else if (SELECT_CASE_var == "WOVEN") {
-                    ComplexShade(Loop).LayerType = iComplexShadeType::Woven;
+                    ComplexShade(Loop).LayerType = csWoven;
                 } else if (SELECT_CASE_var == "PERFORATED") {
-                    ComplexShade(Loop).LayerType = iComplexShadeType::Perforated;
+                    ComplexShade(Loop).LayerType = csPerforated;
                 } else if (SELECT_CASE_var == "BSDF") {
-                    ComplexShade(Loop).LayerType = iComplexShadeType::BSDF;
+                    ComplexShade(Loop).LayerType = csBSDF;
                 } else {
                     ErrorsFound = true;
                     ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
@@ -8504,7 +8504,7 @@ namespace HeatBalanceManager {
                 ShowContinueError(state, format("{} must be >=0 or <=1, entered value = {:.2R}", cNumericFieldNames(10), rNumericArgs(10)));
             }
 
-            if (ComplexShade(Loop).LayerType == iComplexShadeType::VenetianHorizontal || ComplexShade(Loop).LayerType == iComplexShadeType::VenetianVertical) {
+            if (ComplexShade(Loop).LayerType == csVenetianHorizontal || ComplexShade(Loop).LayerType == csVenetianVertical) {
                 if (rNumericArgs(11) <= 0.0) {
                     ErrorsFound = true;
                     ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +

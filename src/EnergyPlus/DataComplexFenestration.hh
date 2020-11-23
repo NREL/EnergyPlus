@@ -62,16 +62,12 @@ namespace DataComplexFenestration {
 
     // Data
     // Parameters for complex shade
-    enum class iComplexShadeType {
-        Unassigned,
-        VenetianHorizontal,
-        Woven,
-        Perforated,
-        OtherShadingType,
-        BSDF,
-        VenetianVertical,
-        Specular
-    };
+    extern int const csVenetianHorizontal;
+    extern int const csWoven;
+    extern int const csPerforated;
+    extern int const csOtherShadingType;
+    extern int const csBSDF;
+    extern int const csVenetianVertical;
 
     // Parameters for gas definitions
     extern int const GasCoeffsCustom;
@@ -131,7 +127,7 @@ namespace DataComplexFenestration {
     {
         // Members
         std::string Name;               // Name for complex shade
-        iComplexShadeType LayerType;    // Layer type (OtherShadingType, Venetian, Woven, Perforated)
+        int LayerType;                  // Layer type (OtherShadingType, Venetian, Woven, Perforated)
         Real64 Thickness;               // Layer thickness (m)
         Real64 Conductivity;            // Layer conductivity (W/m2K)
         Real64 IRTransmittance;         // IR Transmittance
@@ -151,7 +147,7 @@ namespace DataComplexFenestration {
 
         // Default Constructor
         WindowComplexShade()
-            : LayerType(iComplexShadeType::Unassigned), Thickness(0.0), Conductivity(0.0), IRTransmittance(0.0), FrontEmissivity(0.0), BackEmissivity(0.0),
+            : LayerType(-1), Thickness(0.0), Conductivity(0.0), IRTransmittance(0.0), FrontEmissivity(0.0), BackEmissivity(0.0),
               TopOpeningMultiplier(0.0), BottomOpeningMultiplier(0.0), LeftOpeningMultiplier(0.0), RightOpeningMultiplier(0.0),
               FrontOpeningMultiplier(0.0), SlatWidth(0.0), SlatSpacing(0.0), SlatThickness(0.0), SlatAngle(0.0), SlatConductivity(0.0), SlatCurve(0.0)
         {
