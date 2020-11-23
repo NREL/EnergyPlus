@@ -57,6 +57,7 @@
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/EconomicTariff.hh>
 #include <EnergyPlus/EconomicLifeCycleCost.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -253,7 +254,7 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_GetInput)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetInputForLifeCycleCost(state);
+    GetInputForLifeCycleCost(*state);
 
     EXPECT_EQ(disConvEndOfYear, discountConvension);
     EXPECT_EQ(inflAppConstantDollar, inflationApproach);
@@ -390,7 +391,7 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_ProcessMaxInput)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetInputForLifeCycleCost(state);
+    GetInputForLifeCycleCost(*state);
 
     EXPECT_EQ(disConvEndOfYear, discountConvension);
     EXPECT_EQ(inflAppConstantDollar, inflationApproach);
@@ -545,7 +546,7 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_ExpressAsCashFlows)
     NonrecurringCost(1).startOfCosts = startServicePeriod;
     NonrecurringCost(1).totalMonthsFromStart = 10;
 
-    ExpressAsCashFlows(state);
+    ExpressAsCashFlows(*state);
 
     EXPECT_NEAR(CashFlow(17).mnAmount(47), 123456., 0.001);  // 36 months plus 10 months plus one month
 
