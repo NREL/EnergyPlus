@@ -3207,6 +3207,7 @@ namespace UnitarySystems {
                     if (!thisSys.ATMixerExists) {
                         ZoneExhaustNodeFound = searchExhaustNodes(state, thisSys.AirInNode, ControlledZoneNum, ZoneExhNum);
                         if (ZoneExhaustNodeFound) {
+                            ZoneEquipmentFound = true;
                             // The Node was found among the exhaust nodes, now check that a matching inlet node exists
                             thisSys.m_ZoneInletNode = DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).ExhaustNode(ZoneExhNum);
                             thisSys.ControlZoneNum = ControlledZoneNum;
@@ -3216,6 +3217,7 @@ namespace UnitarySystems {
                     } else if (thisSys.ATMixerType == DataHVACGlobals::ATMixer_InletSide) {
                         ZoneExhaustNodeFound = searchExhaustNodes(state, thisSys.m_ATMixerSecNode, ControlledZoneNum, ZoneExhNum);
                         if (ZoneExhaustNodeFound) {
+                            ZoneEquipmentFound = true;
                             thisSys.m_ZoneInletNode = thisSys.AirOutNode;
                             thisSys.ControlZoneNum = ControlledZoneNum;
                             setSystemParams(thisSys, TotalFloorAreaOnAirLoop, thisObjectName);
@@ -3225,6 +3227,7 @@ namespace UnitarySystems {
                     } else if (thisSys.ATMixerType == DataHVACGlobals::ATMixer_SupplySide) {
                         ZoneExhaustNodeFound = searchExhaustNodes(state, thisSys.AirInNode, ControlledZoneNum, ZoneExhNum);
                         if (ZoneExhaustNodeFound) {
+                            ZoneEquipmentFound = true;
                             thisSys.m_ZoneInletNode = thisSys.ATMixerOutNode;
                             thisSys.ControlZoneNum = ControlledZoneNum;
                             setSystemParams(thisSys, TotalFloorAreaOnAirLoop, thisObjectName);
@@ -3333,7 +3336,7 @@ namespace UnitarySystems {
                                           " name does not match any controlled zone exhaust node name. Check ZoneHVAC:EquipmentConnections "
                                           "object inputs.");
                         errorsFound = true;
-                    } else if (!ZoneInletNodeFound) {
+                    } else if (ZoneEquipmentFound && !ZoneInletNodeFound) {
                         bool ZoneInletNodeExists = false;
                         int InletControlledZoneNum = 0;
                         int ZoneInletNum = 0;
