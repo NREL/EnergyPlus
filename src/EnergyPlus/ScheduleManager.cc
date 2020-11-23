@@ -113,18 +113,8 @@ namespace EnergyPlus::ScheduleManager {
     bool ScheduleInputProcessed(false); // This is false until the Schedule Input has been processed.
     bool ScheduleDSTSFileWarningIssued(false);
     bool ScheduleFileShadingProcessed(false);
-
-    namespace {
-        // These were static variables within different functions. They were pulled out into the namespace
-        // to facilitate easier unit testing of those functions.
-        // These are purposefully not in the header file as an extern variable. No one outside of this should
-        // use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
-        // This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
-        bool CheckScheduleValueMinMaxRunOnceOnly(true);
-        bool DoScheduleReportingSetup(true);
-    } // namespace
-
-    // Derived Types Variables
+    bool CheckScheduleValueMinMaxRunOnceOnly(true);
+    bool DoScheduleReportingSetup(true);
 
     // Object Data
     Array1D<ScheduleTypeData> ScheduleType; // Allowed Schedule Types
@@ -134,6 +124,7 @@ namespace EnergyPlus::ScheduleManager {
     std::unordered_map<std::string, std::string> UniqueWeekScheduleNames;
     Array1D<ScheduleData> Schedule; // Schedule Storage
     std::unordered_map<std::string, std::string> UniqueScheduleNames;
+    std::vector<InterpretedScheduleFileData> interpretedFileData;
 
     // Clears the global data in ScheduleManager.
     // Needed for unit tests, should not be normally called.
@@ -547,10 +538,10 @@ namespace EnergyPlus::ScheduleManager {
                     if (colCnt > 1) {
                         if (rowCnt == 1) {
                             if (subString == BlankString) {
-                                ShowWarningError(state, RoutineName + ":\"" + ShadingSunlitFracFileName + "\": invalid blank column hearder.");
+                                ShowWarningError(state, RoutineName + ":\"" + ShadingSunlitFracFileName + "\": invalid blank column header.");
                                 errFlag = true;
                             } else if (CSVAllColumnNames.count(subString)) {
-                                ShowWarningError(state, RoutineName + ":\"" + ShadingSunlitFracFileName + "\": duplicated column hearder: \"" + subString +
+                                ShowWarningError(state, RoutineName + ":\"" + ShadingSunlitFracFileName + "\": duplicated column header: \"" + subString +
                                                  "\".");
                                 ShowContinueError(state, "The first occurrence of the same surface name would be used.");
                                 errFlag = true;
@@ -1737,92 +1728,128 @@ namespace EnergyPlus::ScheduleManager {
             if (!FileExists) {
                 ErrorsFound = true;
             } else {
-                auto SchdFile = state.files.TempFullFileName.try_open();
-                if (!SchdFile.good()) {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(3) + "=\"" + Alphas(3) +
-                                    "\" cannot be opened.");
-                    ShowContinueError(state, "... It may be open in another program (such as Excel).  Please close and try again.");
-                    ShowFatalError(state, "Program terminates due to previous condition.");
-                }
-                // check for stripping
-                auto LineIn = SchdFile.readLine();
-                const auto endLine = len(LineIn.data);
-                if (endLine > 0) {
-                    if (int(LineIn.data[endLine - 1]) == iUnicode_end) {
-                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(3) + "=\"" + Alphas(3) +
-                                        " appears to be a Unicode or binary file.");
-                        ShowContinueError(state, "...This file cannot be read by this program. Please save as PC or Unix file and try again");
-                        ShowFatalError(state, "Program terminates due to previous condition.");
+
+                ExternalFileReadMode TryingToReadFrom = ExternalFileReadMode::ReadingFromFile;
+                Array1D<Real64> * cachedData = nullptr;
+                for (auto & cache : interpretedFileData) {
+                    if (cache.isItAMatch(state.files.TempFullFileName.fileName, ColumnSep, skiprowCount)) {
+                        cachedData = &cache.getColumnData(curcolCount - 1);
+                        TryingToReadFrom = ExternalFileReadMode::ReadingFromCache;
+                        break;
                     }
                 }
-                SchdFile.backspace();
 
-                // skip lines if any need to be skipped.
-                numerrors = 0;
-                rowCnt = 0;
-                if (skiprowCount > 0) {      // Numbers(2) has number of rows to skip
+                if (TryingToReadFrom == ExternalFileReadMode::ReadingFromFile) {
+                    InterpretedScheduleFileData cacheToWrite(state.files.TempFullFileName.fileName, ColumnSep, skiprowCount);
+
+                    auto SchdFile = state.files.TempFullFileName.try_open();
+                    if (!SchdFile.good()) {
+                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", " +
+                                               cAlphaFields(3) + "=\"" + Alphas(3) +
+                                               "\" cannot be opened.");
+                        ShowContinueError(state,
+                                          "... It may be open in another program (such as Excel).  Please close and try again.");
+                        ShowFatalError(state, "Program terminates due to previous condition.");
+                    }
+                    // check for stripping
+                    auto LineIn = SchdFile.readLine();
+                    const auto endLine = len(LineIn.data);
+                    if (endLine > 0) {
+                        if (int(LineIn.data[endLine - 1]) == iUnicode_end) {
+                            ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", " +
+                                                   cAlphaFields(3) + "=\"" + Alphas(3) +
+                                                   " appears to be a Unicode or binary file.");
+                            ShowContinueError(state,
+                                              "...This file cannot be read by this program. Please save as PC or Unix file and try again");
+                            ShowFatalError(state, "Program terminates due to previous condition.");
+                        }
+                    }
+                    SchdFile.backspace();
+
+                    // skip lines if any need to be skipped.
+                    numerrors = 0;
+                    rowCnt = 0;
+                    if (skiprowCount > 0) {      // Numbers(2) has number of rows to skip
+                        while (!LineIn.eof) { // end of file
+                            LineIn = SchdFile.readLine();
+                            ++rowCnt;
+                            if (rowCnt == skiprowCount) {
+                                break;
+                            }
+                        }
+                    }
+
+                    //  proper number of lines are skipped.  read the file
+                    // for the rest of the lines read from the file
+                    rowCnt = 0;
+                    firstLine = true;
                     while (!LineIn.eof) { // end of file
                         LineIn = SchdFile.readLine();
                         ++rowCnt;
-                        if (rowCnt == skiprowCount) {
-                            break;
-                        }
-                    }
-                }
-
-                //  proper number of lines are skipped.  read the file
-                // for the rest of the lines read from the file
-                rowCnt = 0;
-                firstLine = true;
-                while (!LineIn.eof) { // end of file
-                    LineIn = SchdFile.readLine();
-                    ++rowCnt;
-                    colCnt = 0;
-                    wordStart = 0;
-                    columnValue = 0.0;
-                    // scan through the line looking for a specific column
-                    while (true) {
-                        sepPos = index(LineIn.data, ColumnSep);
-                        ++colCnt;
-                        if (sepPos != std::string::npos) {
-                            if (sepPos > 0) {
-                                wordEnd = sepPos - 1;
-                            } else {
-                                wordEnd = wordStart;
-                            }
-                            subString = LineIn.data.substr(wordStart, wordEnd - wordStart + 1);
-                            // the next word will start after the comma
-                            wordStart = sepPos + 1;
-                            // get rid of separator so next INDEX will find next separator
-                            LineIn.data.erase(0, wordStart);
-                            firstLine = false;
-                            wordStart = 0;
-                        } else {
-                            // no more commas
-                            subString = LineIn.data.substr(wordStart);
-                            if (firstLine && subString == BlankString) {
-                                ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) +
-                                                 "\" first line does not contain the indicated column separator=" + Alphas(4) + '.');
-                                ShowContinueError(state, "...first 40 characters of line=[" + LineIn.data.substr(0, 40) + ']');
+                        colCnt = 0;
+                        wordStart = 0;
+                        columnValue = 0.0;
+                        // scan through the line looking for a specific column
+                        while (true) {
+                            sepPos = index(LineIn.data, ColumnSep);
+                            ++colCnt;
+                            if (sepPos != std::string::npos) {
+                                if (sepPos > 0) {
+                                    wordEnd = sepPos - 1;
+                                } else {
+                                    wordEnd = wordStart;
+                                }
+                                subString = LineIn.data.substr(wordStart, wordEnd - wordStart + 1);
+                                // the next word will start after the comma
+                                wordStart = sepPos + 1;
+                                // get rid of separator so next INDEX will find next separator
+                                LineIn.data.erase(0, wordStart);
                                 firstLine = false;
+                                wordStart = 0;
+                            } else {
+                                // no more commas
+                                subString = LineIn.data.substr(wordStart);
+                                if (firstLine && subString == BlankString) {
+                                    ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) +
+                                                            "\" first line does not contain the indicated column separator=" +
+                                                            Alphas(4) + '.');
+                                    ShowContinueError(state,
+                                                      "...first 40 characters of line=[" + LineIn.data.substr(0, 40) +
+                                                      ']');
+                                    firstLine = false;
+                                }
+                                break;
                             }
-                            break;
+                            // do a one-time processing of every value into the cache
+                            columnValue = UtilityRoutines::ProcessNumber(subString, errFlag);
+                            if (errFlag) {
+                                cacheToWrite.columnsOfDataInThisFile[colCnt - 1].push_back(0.0);
+                            } else {
+                                if (colCnt > cacheToWrite.maxColCount) {
+                                    cacheToWrite.maxColCount = colCnt;
+                                    cacheToWrite.columnsOfDataInThisFile.emplace_back();
+                                }
+                                cacheToWrite.columnsOfDataInThisFile[colCnt - 1].push_back(columnValue);
+                            }
+
+                            if (colCnt == curcolCount) break;
                         }
-                        if (colCnt == curcolCount) break;
-                    }
-                    if (colCnt == curcolCount) {
-                        columnValue = UtilityRoutines::ProcessNumber(subString, errFlag);
-                        if (errFlag) {
-                            ++numerrors;
+                        if (colCnt == curcolCount) {
+                            columnValue = UtilityRoutines::ProcessNumber(subString, errFlag);
+                            if (errFlag) {
+                                ++numerrors;
+                                columnValue = 0.0;
+                            }
+                        } else {
                             columnValue = 0.0;
                         }
-                    } else {
-                        columnValue = 0.0;
+                        hourlyFileValues(rowCnt) = columnValue;
+                        if (rowCnt == rowLimitCount) break;
                     }
-                    hourlyFileValues(rowCnt) = columnValue;
-                    if (rowCnt == rowLimitCount) break;
+                    SchdFile.close();
+                } else {
+                    hourlyFileValues = *cachedData;
                 }
-                SchdFile.close();
 
                 // schedule values have been filled into the hourlyFileValues array.
 

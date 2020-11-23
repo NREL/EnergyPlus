@@ -303,6 +303,24 @@ namespace ScheduleManager {
 
     int GetNumberOfSchedules();
 
+    struct InterpretedScheduleFileData {
+        std::string fileName;
+        std::string delimiter;
+        int rowsToSkip = 0;
+        int maxColCount = 0;
+        std::vector<Array1D<Real64>> columnsOfDataInThisFile;
+        InterpretedScheduleFileData(std::string _fileName, std::string _delimiter, int _rowsToSkip) :
+            fileName(std::move(_fileName)), delimiter(std::move(_delimiter)), rowsToSkip(_rowsToSkip) {}
+        bool isItAMatch(std::string const & _fileName, std::string const & _delimiter, int _rowsToSkip) const {
+            return this->fileName == _fileName && this->delimiter == _delimiter && this->rowsToSkip == _rowsToSkip;
+        }
+        Array1D<Real64> & getColumnData(int columnNumZeroIndex) {
+            return this->columnsOfDataInThisFile[columnNumZeroIndex];
+        }
+    };
+    extern std::vector<InterpretedScheduleFileData> interpretedFileData;
+    enum class ExternalFileReadMode { ReadingFromFile, ReadingFromCache };
+
     extern int NumScheduleTypes;
     extern int NumDaySchedules;
     extern int NumWeekSchedules;
@@ -310,6 +328,8 @@ namespace ScheduleManager {
     extern bool ScheduleInputProcessed; // This is false until the Schedule Input has been processed.
     extern bool ScheduleDSTSFileWarningIssued;
     extern bool ScheduleFileShadingProcessed; // This is false unless there is a Schedule:File:Shading object.
+    extern bool CheckScheduleValueMinMaxRunOnceOnly;
+    extern bool DoScheduleReportingSetup;
     extern Array1D<ScheduleTypeData> ScheduleType; // Allowed Schedule Types
     extern Array1D<DayScheduleData> DaySchedule;   // Day Schedule Storage
     extern Array1D<WeekScheduleData> WeekSchedule; // Week Schedule Storage
