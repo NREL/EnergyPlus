@@ -5271,12 +5271,12 @@ namespace SystemReports {
                 std::string ChrOut;
                 std::string ChrOut2;
                 if (state.dataAirLoop->AirToOANodeInfo(Count).OASysInletNodeNum > 0) {
-                    ChrOut = std::to_string(state.dataAirLoop->AirToOANodeInfo(Count).OASysInletNodeNum);
+                    ChrOut = fmt::to_string(state.dataAirLoop->AirToOANodeInfo(Count).OASysInletNodeNum);
                 } else {
                     ChrOut = errstring;
                 }
                 if (state.dataAirLoop->AirToOANodeInfo(Count).OASysOutletNodeNum > 0) {
-                    ChrOut2 = std::to_string(state.dataAirLoop->AirToOANodeInfo(Count).OASysOutletNodeNum);
+                    ChrOut2 = fmt::to_string(state.dataAirLoop->AirToOANodeInfo(Count).OASysOutletNodeNum);
                 } else {
                     ChrOut2 = errstring;
                 }

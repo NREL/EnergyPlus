@@ -332,7 +332,7 @@ namespace SimAirServingZones {
         using BranchInputManager::NumBranchesInBranchList;
         using BranchInputManager::NumCompsInBranch;
         using DataConvergParams::AirLoopConvergence;
-        using General::RoundSigDigits;
+
         using HVACControllers::CheckCoilWaterInletNode;
         using HVACControllers::GetControllerActuatorNodeNum;
         using MixedAir::FindOAMixerMatchForOASystem;
@@ -709,9 +709,10 @@ namespace SimAirServingZones {
             }
             if (NumNodes != state.dataAirLoop->AirToZoneNodeInfo(AirSysNum).NumSupplyNodes) {
                 ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", node mismatch.");
-                ShowContinueError(state, "...number of air system exit nodes [" + RoundSigDigits(NumNodes) +
-                                  "] must match number of zone equip inlet nodes [" + RoundSigDigits(state.dataAirLoop->AirToZoneNodeInfo(AirSysNum).NumSupplyNodes) +
-                                  "].");
+                ShowContinueError(state,
+                                  format("...number of air system exit nodes [{}] must match number of zone equip inlet nodes [{}].",
+                                         NumNodes,
+                                         state.dataAirLoop->AirToZoneNodeInfo(AirSysNum).NumSupplyNodes));
                 ErrorsFound = true;
             }
             for (I = 1; I <= state.dataAirLoop->AirToZoneNodeInfo(AirSysNum).NumSupplyNodes; ++I) {
@@ -4163,10 +4164,12 @@ namespace SimAirServingZones {
             }
 
             if (state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).DesignVolFlowRate < SmallAirVolFlow) {
-                ShowSevereError(state, "SizeAirLoopBranches: AirLoopHVAC " + state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Name + " has air flow less than " +
-                                General::RoundSigDigits(DataHVACGlobals::SmallAirVolFlow, 4) + " m3/s.");
-                ShowContinueError(state, "Primary air system volumetric flow rate = " +
-                                  General::RoundSigDigits(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).DesignVolFlowRate, 4) + " m3/s.");
+                ShowSevereError(state,
+                                format("SizeAirLoopBranches: AirLoopHVAC {} has air flow less than {:.4R} m3/s.",
+                                       state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Name,
+                                       SmallAirVolFlow));
+                ShowContinueError(state,
+                                  format("Primary air system volumetric flow rate = {:.4R} m3/s.", state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).DesignVolFlowRate));
                 ShowContinueError(state, "Check flow rate inputs for components in this air loop and,");
                 ShowContinueError(state, "if autosized, check Sizing:Zone and Sizing:System objects and related inputs.");
                 ShowFatalError(state, "Previous condition causes termination.");

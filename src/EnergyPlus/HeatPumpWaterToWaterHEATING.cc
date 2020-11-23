@@ -556,7 +556,7 @@ namespace HeatPumpWaterToWaterHEATING {
         using DataHVACGlobals::SysTimeElapsed;
         using namespace FluidProperties;
         using DataPlant::PlantLoop;
-        using General::TrimSigDigits;
+
         using PlantUtilities::SetComponentFlowRate;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -730,14 +730,17 @@ namespace HeatPumpWaterToWaterHEATING {
             // check cutoff pressures
             if (SourceSidePressure < this->LowPressCutoff) {
                 ShowSevereError(state, ModuleCompName + "=\"" + this->Name + "\" Heating Source Side Pressure Less than the Design Minimum");
-                ShowContinueError(state, "Source Side Pressure=" + TrimSigDigits(SourceSidePressure, 2) +
-                                  " and user specified Design Minimum Pressure=" + TrimSigDigits(this->LowPressCutoff, 2));
+                ShowContinueError(state,
+                                  format("Source Side Pressure={:.2T} and user specified Design Minimum Pressure={:.2T}",
+                                         SourceSidePressure,
+                                         this->LowPressCutoff));
                 ShowFatalError(state, "Preceding Conditions cause termination.");
             }
             if (LoadSidePressure > this->HighPressCutoff) {
                 ShowSevereError(state, ModuleCompName + "=\"" + this->Name + "\" Heating Load Side Pressure greater than the Design Maximum");
-                ShowContinueError(state, "Load Side Pressure=" + TrimSigDigits(LoadSidePressure, 2) +
-                                  " and user specified Design Maximum Pressure=" + TrimSigDigits(this->HighPressCutoff, 2));
+                ShowContinueError(
+                    state,
+                    format("Load Side Pressure={:.2T} and user specified Design Maximum Pressure={:.2T}", LoadSidePressure, this->HighPressCutoff));
                 ShowFatalError(state, "Preceding Conditions cause termination.");
             }
 
@@ -748,14 +751,17 @@ namespace HeatPumpWaterToWaterHEATING {
             // check cutoff pressures
             if (SuctionPr < this->LowPressCutoff) {
                 ShowSevereError(state, ModuleCompName + "=\"" + this->Name + "\" Heating Suction Pressure Less than the Design Minimum");
-                ShowContinueError(state, "Heating Suction Pressure=" + TrimSigDigits(SuctionPr, 2) +
-                                  " and user specified Design Minimum Pressure=" + TrimSigDigits(this->LowPressCutoff, 2));
+                ShowContinueError(
+                    state,
+                    format("Heating Suction Pressure={:.2T} and user specified Design Minimum Pressure={:.2T}", SuctionPr, this->LowPressCutoff));
                 ShowFatalError(state, "Preceding Conditions cause termination.");
             }
             if (DischargePr > this->HighPressCutoff) {
                 ShowSevereError(state, ModuleCompName + "=\"" + this->Name + "\" Heating Discharge Pressure greater than the Design Maximum");
-                ShowContinueError(state, "Heating Discharge Pressure=" + TrimSigDigits(DischargePr, 2) +
-                                  " and user specified Design Maximum Pressure=" + TrimSigDigits(this->HighPressCutoff, 2));
+                ShowContinueError(state,
+                                  format("Heating Discharge Pressure={:.2T} and user specified Design Maximum Pressure={:.2T}",
+                                         DischargePr,
+                                         this->HighPressCutoff));
                 ShowFatalError(state, "Preceding Conditions cause termination.");
             }
 

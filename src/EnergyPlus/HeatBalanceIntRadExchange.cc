@@ -504,7 +504,7 @@ namespace HeatBalanceIntRadExchange {
 
         // Using/Aliasing
         using namespace DataIPShortCuts;
-        using General::RoundSigDigits;
+
         using General::ScanForReports;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -1109,7 +1109,6 @@ namespace HeatBalanceIntRadExchange {
 
         // Using/Aliasing
         using namespace DataIPShortCuts;
-        using General::TrimSigDigits;
 
         // Argument array dimensioning
         F.dim(N, N);
@@ -1146,8 +1145,7 @@ namespace HeatBalanceIntRadExchange {
 
             if (NumNums < 3 * pow_2(N)) {
                 ShowSevereError(state, "GetInputViewFactors: " + cCurrentModuleObject + "=\"" + ZoneName + "\", not enough values.");
-                ShowContinueError(state, "...Number of input values [" + TrimSigDigits(NumNums) + "] is less than the required number=[" +
-                                  TrimSigDigits(3 * pow_2(N)) + "].");
+                ShowContinueError(state, format("...Number of input values [{}] is less than the required number=[{}].", NumNums, 3 * pow_2(N)));
                 ErrorsFound = true;
                 NumNums = 0;
             }
@@ -1296,7 +1294,6 @@ namespace HeatBalanceIntRadExchange {
 
         // Using/Aliasing
         using namespace DataIPShortCuts;
-        using General::TrimSigDigits;
 
         // Argument array dimensioning
         F.dim(N, N);
@@ -1338,8 +1335,11 @@ namespace HeatBalanceIntRadExchange {
 
             if (NumNums < pow_2(N)) {
                 ShowWarningError(state, "GetInputViewFactors: " + cCurrentModuleObject + "=\"" + EnclosureName + "\", not enough values.");
-                ShowContinueError(state, "...Number of input values [" + TrimSigDigits(NumNums) + "] is less than the required number=[" +
-                                  TrimSigDigits(pow_2(N)) + "] Missing surface pairs will have a zero view factor.");
+                ShowContinueError(
+                    state,
+                    format("...Number of input values [{}] is less than the required number=[{}] Missing surface pairs will have a zero view factor.",
+                           NumNums,
+                           pow_2(N)));
             }
             F = 0.0;
             numinx1 = 0;
@@ -1528,7 +1528,6 @@ namespace HeatBalanceIntRadExchange {
         // na
 
         // Using/Aliasing
-        using General::RoundSigDigits;
 
         // Argument array dimensioning
         EP_SIZE_CHECK(A, N);
@@ -1701,8 +1700,11 @@ namespace HeatBalanceIntRadExchange {
                 if (CheckConvergeTolerance > 0.005) {
                     ShowWarningError(state, "FixViewFactors: View factors not complete. Check for bad surface descriptions or unenclosed zone=\"" +
                                      enclName + "\".");
-                    ShowContinueError(state, "Enforced reciprocity has tolerance (ideal is 0)=[" + RoundSigDigits(CheckConvergeTolerance, 6) +
-                                      "], Row Sum (ideal is " + RoundSigDigits(N) + ")=[" + RoundSigDigits(RowSum, 2) + "].");
+                    ShowContinueError(state,
+                                      format("Enforced reciprocity has tolerance (ideal is 0)=[{:.6R}], Row Sum (ideal is {})=[{:.2R}].",
+                                             CheckConvergeTolerance,
+                                             N,
+                                             RowSum));
                     ShowContinueError(state, "If zone is unusual, or tolerance is on the order of 0.001, view factors are probably OK.");
                 }
                 if (std::abs(FixedCheckValue) < std::abs(OriginalCheckValue)) {

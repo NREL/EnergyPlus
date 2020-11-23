@@ -517,7 +517,7 @@ namespace ExternalInterface {
         // This subroutine is for initializations of the ExternalInterface
 
         // Using/Aliasing
-        using General::TrimSigDigits;
+
         using RuntimeLanguageProcessor::FindEMSVariable;
         using RuntimeLanguageProcessor::isExternalInterfaceErlVariable;
         using ScheduleManager::GetDayScheduleIndex;
@@ -555,7 +555,7 @@ namespace ExternalInterface {
             if (FileSystem::fileExists(socCfgFilNam)) {
                 socketFD = establishclientsocket(socCfgFilNam.c_str());
                 if (socketFD < 0) {
-                    ShowSevereError(state, "ExternalInterface: Could not open socket. File descriptor = " + TrimSigDigits(socketFD) + '.');
+                    ShowSevereError(state, format("ExternalInterface: Could not open socket. File descriptor = {}.", socketFD));
                     ErrorsFound = true;
                 }
             } else {
@@ -643,9 +643,9 @@ namespace ExternalInterface {
 
             if (nOutVal + nInpVar > maxVar) {
                 ShowSevereError(state, "ExternalInterface: Too many variables to be exchanged.");
-                ShowContinueError(state, "Attempted to exchange " + TrimSigDigits(nOutVal) + " outputs");
-                ShowContinueError(state, "plus " + TrimSigDigits(nOutVal) + " inputs.");
-                ShowContinueError(state, "Maximum allowed is sum is " + TrimSigDigits(maxVar) + '.');
+                ShowContinueError(state, format("Attempted to exchange {} outputs", nOutVal));
+                ShowContinueError(state, format("plus {} inputs.", nOutVal));
+                ShowContinueError(state, format("Maximum allowed is sum is {}.", maxVar));
                 ShowContinueError(state, "To fix, increase maxVar in ExternalInterface.cc");
                 ErrorsFound = true;
             }
@@ -668,8 +668,8 @@ namespace ExternalInterface {
             }
             StopExternalInterfaceIfError(state);
 
-            DisplayString(state, "Number of outputs in ExternalInterface = " + TrimSigDigits(nOutVal));
-            DisplayString(state, "Number of inputs  in ExternalInterface = " + TrimSigDigits(nInpVar));
+            DisplayString(state, format("Number of outputs in ExternalInterface = {}", nOutVal));
+            DisplayString(state, format("Number of inputs  in ExternalInterface = {}", nInpVar));
 
             InitExternalInterfacefirstCall = false;
 
@@ -731,7 +731,7 @@ namespace ExternalInterface {
 
         // Using/Aliasing
         using EMSManager::ManageEMS;
-        using General::TrimSigDigits;
+
         using RuntimeLanguageProcessor::ExternalInterfaceSetErlVariable;
         using RuntimeLanguageProcessor::FindEMSVariable;
         using RuntimeLanguageProcessor::isExternalInterfaceErlVariable;
@@ -790,7 +790,7 @@ namespace ExternalInterface {
                         if (FMU(i).Instance(j).fmistatus != fmiOK) {
                             ShowSevereError(state, "ExternalInterface/GetSetVariablesAndDoStepFMUImport: Error when trying to get outputs");
                             ShowContinueError(state, "in instance \"" + FMU(i).Instance(j).Name + "\" of FMU \"" + FMU(i).Name + "\"");
-                            ShowContinueError(state, "Error Code = \"" + TrimSigDigits(FMU(i).Instance(j).fmistatus) + "\"");
+                            ShowContinueError(state, format("Error Code = \"{}\"", FMU(i).Instance(j).fmistatus));
                             ErrorsFound = true;
                             StopExternalInterfaceIfError(state);
                         }
@@ -821,7 +821,7 @@ namespace ExternalInterface {
                         if (FMU(i).Instance(j).fmistatus != fmiOK) {
                             ShowSevereError(state, "ExternalInterface/GetSetVariablesAndDoStepFMUImport: Error when trying to get outputs");
                             ShowContinueError(state, "in instance \"" + FMU(i).Instance(j).Name + "\" of FMU \"" + FMU(i).Name + "\"");
-                            ShowContinueError(state, "Error Code = \"" + TrimSigDigits(FMU(i).Instance(j).fmistatus) + "\"");
+                            ShowContinueError(state, format("Error Code = \"{}\"", FMU(i).Instance(j).fmistatus));
                             ErrorsFound = true;
                             StopExternalInterfaceIfError(state);
                         }
@@ -852,7 +852,7 @@ namespace ExternalInterface {
                         if (FMU(i).Instance(j).fmistatus != fmiOK) {
                             ShowSevereError(state, "ExternalInterface/GetSetVariablesAndDoStepFMUImport: Error when trying to get outputs");
                             ShowContinueError(state, "in instance \"" + FMU(i).Instance(j).Name + "\" of FMU \"" + FMU(i).Name + "\"");
-                            ShowContinueError(state, "Error Code = \"" + TrimSigDigits(FMU(i).Instance(j).fmistatus) + "\"");
+                            ShowContinueError(state, format("Error Code = \"{}\"", FMU(i).Instance(j).fmistatus));
                             ErrorsFound = true;
                             StopExternalInterfaceIfError(state);
                         }
@@ -916,7 +916,7 @@ namespace ExternalInterface {
                     if (FMU(i).Instance(j).fmistatus != fmiOK) {
                         ShowSevereError(state, "ExternalInterface/GetSetVariablesAndDoStepFMUImport: Error when trying to set inputs");
                         ShowContinueError(state, "in instance \"" + FMU(i).Instance(j).Name + "\" of FMU \"" + FMU(i).Name + "\"");
-                        ShowContinueError(state, "Error Code = \"" + TrimSigDigits(FMU(i).Instance(j).fmistatus) + "\"");
+                        ShowContinueError(state, format("Error Code = \"{}\"", FMU(i).Instance(j).fmistatus));
                         ErrorsFound = true;
                         StopExternalInterfaceIfError(state);
                     }
@@ -929,7 +929,7 @@ namespace ExternalInterface {
                     ShowSevereError(state, "ExternalInterface/GetSetVariablesAndDoStepFMUImport: Error when trying to");
                     ShowContinueError(state, "do the coSimulation with instance \"" + FMU(i).Instance(j).Name + "\"");
                     ShowContinueError(state, "of FMU \"" + FMU(i).Name + "\"");
-                    ShowContinueError(state, "Error Code = \"" + TrimSigDigits(FMU(i).Instance(j).fmistatus) + "\"");
+                    ShowContinueError(state, format("Error Code = \"{}\"", FMU(i).Instance(j).fmistatus));
                     ErrorsFound = true;
                     StopExternalInterfaceIfError(state);
                 }
@@ -957,7 +957,6 @@ namespace ExternalInterface {
         // This routine instantiates and initializes FMUs.
 
         // Using/Aliasing
-        using General::TrimSigDigits;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int i, j; // Loop counters
@@ -991,7 +990,7 @@ namespace ExternalInterface {
                 if (FMU(i).Instance(j).fmistatus != fmiOK) {
                     ShowSevereError(state, "ExternalInterface/CalcExternalInterfaceFMUImport: Error when trying to initialize");
                     ShowContinueError(state, "instance \"" + FMU(i).Instance(j).Name + "\" of FMU \"" + FMU(i).Name + "\"");
-                    ShowContinueError(state, "Error Code = \"" + TrimSigDigits(FMU(i).Instance(j).fmistatus) + "\"");
+                    ShowContinueError(state, format("Error Code = \"{}\"", FMU(i).Instance(j).fmistatus));
                     ErrorsFound = true;
                     StopExternalInterfaceIfError(state);
                 }
@@ -1011,7 +1010,6 @@ namespace ExternalInterface {
         // This routine reinitializes FMUs.
 
         // Using/Aliasing
-        using General::TrimSigDigits;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int i, j; // Loop counters
@@ -1025,7 +1023,7 @@ namespace ExternalInterface {
                 if (FMU(i).Instance(j).fmistatus != fmiOK) {
                     ShowSevereError(state, "ExternalInterface/CalcExternalInterfaceFMUImport: Error when trying to initialize");
                     ShowContinueError(state, "instance \"" + FMU(i).Instance(j).Name + "\" of FMU \"" + FMU(i).Name + "\"");
-                    ShowContinueError(state, "Error Code = \"" + TrimSigDigits(FMU(i).Instance(j).fmistatus) + "\"");
+                    ShowContinueError(state, format("Error Code = \"{}\"", FMU(i).Instance(j).fmistatus));
                     ErrorsFound = true;
                     StopExternalInterfaceIfError(state);
                 }
@@ -1087,7 +1085,7 @@ namespace ExternalInterface {
         using DataStringGlobals::CurrentWorkingFolder;
         using DataStringGlobals::pathChar;
         using DataSystemVariables::CheckForActualFileName;
-        using General::TrimSigDigits;
+
         using RuntimeLanguageProcessor::FindEMSVariable;
         using RuntimeLanguageProcessor::isExternalInterfaceErlVariable;
         using ScheduleManager::GetDayScheduleIndex;
@@ -1491,20 +1489,22 @@ namespace ExternalInterface {
                 for (j = 1; j <= FMU(i).NumInstances; ++j) {
                     // check whether the number of input variables in fmu is bigger than in the idf
                     if (FMU(i).Instance(j).NumInputVariablesInFMU > FMU(i).Instance(j).NumInputVariablesInIDF) {
-                        ShowWarningError(state, "InitExternalInterfaceFMUImport: The number of input variables defined in input file (" +
-                                         TrimSigDigits(FMU(i).Instance(j).NumInputVariablesInIDF) + ')');
+                        ShowWarningError(state,
+                                         format("InitExternalInterfaceFMUImport: The number of input variables defined in input file ({})",
+                                                FMU(i).Instance(j).NumInputVariablesInIDF));
                         ShowContinueError(state, "of instance \"" + FMU(i).Instance(j).Name + "\" of FMU \"" + FMU(i).Name +
                                           "\" is less than the number of input variables");
-                        ShowContinueError(state, "in the modelDescription file (" + TrimSigDigits(FMU(i).Instance(j).NumInputVariablesInFMU) + ").");
+                        ShowContinueError(state, format("in the modelDescription file ({}).", FMU(i).Instance(j).NumInputVariablesInFMU));
                         ShowContinueError(state, "Check the input file and the modelDescription file again.");
                     }
                     // check whether the number of input variables in fmu is less than in the idf
                     if (FMU(i).Instance(j).NumInputVariablesInFMU < FMU(i).Instance(j).NumInputVariablesInIDF) {
-                        ShowWarningError(state, "InitExternalInterfaceFMUImport: The number of input variables defined in input file (" +
-                                         TrimSigDigits(FMU(i).Instance(j).NumInputVariablesInIDF) + ')');
+                        ShowWarningError(state,
+                                         format("InitExternalInterfaceFMUImport: The number of input variables defined in input file ({})",
+                                                FMU(i).Instance(j).NumInputVariablesInIDF));
                         ShowContinueError(state, "of instance \"" + FMU(i).Instance(j).Name + "\" of FMU \"" + FMU(i).Name +
                                           "\" is bigger than the number of input variables");
-                        ShowContinueError(state, "in the modelDescription file (" + TrimSigDigits(FMU(i).Instance(j).NumInputVariablesInFMU) + ").");
+                        ShowContinueError(state, format("in the modelDescription file ({}).", FMU(i).Instance(j).NumInputVariablesInFMU));
                         ShowContinueError(state, "Check the input file and the modelDescription file again.");
                     }
                 }
@@ -1821,27 +1821,33 @@ namespace ExternalInterface {
                                                                  FMU(i).Instance(j).NumOutputVariablesActuator;
                     // check whether the number of output variables in fmu is bigger than in the idf
                     if (FMU(i).Instance(j).NumOutputVariablesInFMU > FMU(i).Instance(j).NumOutputVariablesInIDF) {
-                        ShowWarningError(state, "InitExternalInterfaceFMUImport: The number of output variables defined in input file (" +
-                                         TrimSigDigits(FMU(i).Instance(j).NumOutputVariablesInIDF) + ')');
+                        ShowWarningError(state,
+                                         format("InitExternalInterfaceFMUImport: The number of output variables defined in input file ({})",
+                                                FMU(i).Instance(j).NumOutputVariablesInIDF));
                         ShowContinueError(state, "of instance \"" + FMU(i).Instance(j).Name + "\" of FMU \"" + FMU(i).Name +
                                           "\" is less than the number of output variables");
-                        ShowContinueError(state, "in the modelDescription file (" + TrimSigDigits(FMU(i).Instance(j).NumOutputVariablesInFMU) + ").");
+                        ShowContinueError(state, format("in the modelDescription file ({}).", FMU(i).Instance(j).NumOutputVariablesInFMU));
                         ShowContinueError(state, "Check the input file and the modelDescription file again.");
                     }
                     // check whether the number of output variables in fmu is less than in the idf
                     if (FMU(i).Instance(j).NumOutputVariablesInFMU < FMU(i).Instance(j).NumOutputVariablesInIDF) {
-                        ShowWarningError(state, "InitExternalInterfaceFMUImport: The number of output variables defined in input file (" +
-                                         TrimSigDigits(FMU(i).Instance(j).NumOutputVariablesInIDF) + ')');
+                        ShowWarningError(state,
+                                         format("InitExternalInterfaceFMUImport: The number of output variables defined in input file ({})",
+                                                FMU(i).Instance(j).NumOutputVariablesInIDF));
                         ShowContinueError(state, "of instance \"" + FMU(i).Instance(j).Name + "\" of FMU \"" + FMU(i).Name +
                                           "\" is bigger than the number of output variables");
-                        ShowContinueError(state, "in the modelDescription file (" + TrimSigDigits(FMU(i).Instance(j).NumOutputVariablesInFMU) + ").");
+                        ShowContinueError(state, format("in the modelDescription file ({}).", FMU(i).Instance(j).NumOutputVariablesInFMU));
                         ShowContinueError(state, "Check the input file and the modelDescription file again.");
                     }
 
-                    DisplayString(state, "Number of inputs in instance \"" + FMU(i).Instance(j).Name + "\" of FMU \"" + FMU(i).Name + "\" = \"" +
-                                  TrimSigDigits(FMU(i).Instance(j).NumInputVariablesInIDF) + "\".");
-                    DisplayString(state, "Number of outputs in instance \"" + FMU(i).Instance(j).Name + "\" of FMU \"" + FMU(i).Name + "\" = \"" +
-                                  TrimSigDigits(FMU(i).Instance(j).NumOutputVariablesInIDF) + "\".");
+                    DisplayString(state, format("Number of inputs in instance \"{}\" of FMU \"{}\" = \"{}\".",
+                                         FMU(i).Instance(j).Name,
+                                         FMU(i).Name,
+                                         FMU(i).Instance(j).NumInputVariablesInIDF));
+                    DisplayString(state, format("Number of outputs in instance \"{}\" of FMU \"{}\" = \"{}\".",
+                                         FMU(i).Instance(j).Name,
+                                         FMU(i).Name,
+                                         FMU(i).Instance(j).NumOutputVariablesInIDF));
                 }
             }
             StopExternalInterfaceIfError(state);
@@ -1983,7 +1989,7 @@ namespace ExternalInterface {
         using DataEnvironment::TotDesDays;
         using DataSystemVariables::UpdateDataDuringWarmupExternalInterface;
         using EMSManager::ManageEMS;
-        using General::TrimSigDigits;
+
         using RuntimeLanguageProcessor::ExternalInterfaceSetErlVariable;
         using RuntimeLanguageProcessor::FindEMSVariable;
         using RuntimeLanguageProcessor::isExternalInterfaceErlVariable;
@@ -2112,8 +2118,7 @@ namespace ExternalInterface {
                                 ShowSevereError(state,
                                     "ExternalInterface/CalcExternalInterfaceFMUImport: Error when trying to set an input value in instance \"" +
                                     FMU(i).Instance(j).Name + "\"");
-                                ShowContinueError(state, "of FMU \"" + FMU(i).Name + "\"; Error Code = \"" + TrimSigDigits(FMU(i).Instance(j).fmistatus) +
-                                                  "\"");
+                                ShowContinueError(state, format("of FMU \"{}\"; Error Code = \"{}\"", FMU(i).Name, FMU(i).Instance(j).fmistatus));
                                 ErrorsFound = true;
                                 StopExternalInterfaceIfError(state);
                             }
@@ -2170,7 +2175,7 @@ namespace ExternalInterface {
                             ShowSevereError(state, "ExternalInterface/CalcExternalInterfaceFMUImport: ");
                             ShowContinueError(state, "Error when trying to set inputs in instance");
                             ShowContinueError(state, "\"" + FMU(i).Instance(j).Name + "\" of FMU \"" + FMU(i).Name + "\"");
-                            ShowContinueError(state, "Error Code = \"" + TrimSigDigits(FMU(i).Instance(j).fmistatus) + "\"");
+                            ShowContinueError(state, format("Error Code = \"{}\"", FMU(i).Instance(j).fmistatus));
                             ErrorsFound = true;
                             StopExternalInterfaceIfError(state);
                         }
@@ -2281,7 +2286,7 @@ namespace ExternalInterface {
 
         // Using/Aliasing
         using EMSManager::ManageEMS;
-        using General::TrimSigDigits;
+
         using RuntimeLanguageProcessor::ExternalInterfaceSetErlVariable;
         using ScheduleManager::ExternalInterfaceSetSchedule;
         // using DataPrecisionGlobals;
@@ -2315,8 +2320,9 @@ namespace ExternalInterface {
         // Socket asked to terminate simulation, but simulation continues
         if (noMoreValues && showContinuationWithoutUpdate) {
             if (haveExternalInterfaceBCVTB) {
-                ShowWarningError(state, "ExternalInterface: Continue simulation without updated values from server at t =" +
-                                 TrimSigDigits(preSimTim / 3600.0, 2) + " hours");
+                ShowWarningError(
+                    state,
+                    format("ExternalInterface: Continue simulation without updated values from server at t ={:.2T} hours", preSimTim / 3600.0));
             }
             showContinuationWithoutUpdate = false;
         }
@@ -2377,8 +2383,7 @@ namespace ExternalInterface {
 
             // Make sure we get the right number of double values, unless retVal != 0
             if ((flaRea == 0) && (!ErrorsFound) && continueSimulation && (nDblRea != isize(varInd))) {
-                ShowSevereError(state, "ExternalInterface: Received \"" + TrimSigDigits(nDblRea) + "\" double values, expected \"" +
-                                TrimSigDigits(size(varInd)) + "\".");
+                ShowSevereError(state, format("ExternalInterface: Received \"{}\" double values, expected \"{}\".", nDblRea, size(varInd)));
                 ErrorsFound = true;
                 StopExternalInterfaceIfError(state);
             }
@@ -2392,7 +2397,7 @@ namespace ExternalInterface {
                         ExternalInterfaceSetErlVariable(varInd(i), dblValRea(i));
                     } else {
                         ShowContinueError(state, "ExternalInterface: Error in finding the type of the input variable for EnergyPlus");
-                        ShowContinueError(state, "variable index: " + std::to_string(i) + ". Variable will not be updated.");
+                        ShowContinueError(state, format("variable index: {}. Variable will not be updated.", i));
                     }
                 }
             }

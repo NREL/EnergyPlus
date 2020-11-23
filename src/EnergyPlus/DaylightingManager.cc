@@ -62,7 +62,6 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/DElightManagerF.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBSDFWindow.hh>
@@ -520,7 +519,6 @@ namespace DaylightingManager {
         using DataSystemVariables::DetailedSolarTimestepIntegration;
         using DaylightingDevices::TransTDD;
         using General::BlindBeamBeamTrans;
-        using General::RoundSigDigits;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -867,7 +865,7 @@ namespace DaylightingManager {
         // Using/Aliasing
         using DaylightingDevices::TransTDD;
         using General::BlindBeamBeamTrans;
-        using General::RoundSigDigits;
+
         using General::SafeDivide;
 
         // Locals
@@ -953,7 +951,7 @@ namespace DaylightingManager {
         // Using/Aliasing
         using DaylightingDevices::TransTDD;
         using General::BlindBeamBeamTrans;
-        using General::RoundSigDigits;
+
         using General::SafeDivide;
         using DataEnvironment::SunIsUp;
         using DataSystemVariables::DetailedSolarTimestepIntegration;
@@ -1351,7 +1349,7 @@ namespace DaylightingManager {
         // Using/Aliasing
         using DaylightingDevices::TransTDD;
         using General::BlindBeamBeamTrans;
-        using General::RoundSigDigits;
+
         using General::SafeDivide;
         using DataEnvironment::SunIsUp;
         using DataSystemVariables::DetailedSolarTimestepIntegration;
@@ -1786,7 +1784,7 @@ namespace DaylightingManager {
         using DataSystemVariables::DetailedSolarTimestepIntegration;
         using General::BlindBeamBeamTrans;
         using General::POLYF;
-        using General::RoundSigDigits;
+
         using General::SafeDivide;
 
         // Locals
@@ -1962,10 +1960,13 @@ namespace DaylightingManager {
 
                 //            ! Error message if ref pt is too close to window.
                 if (D1a > 0.0 && D1b > 0.0 && D1b <= HW && D1a <= WW) {
-                    ShowSevereError(state, "CalcDaylightCoeffRefPoints: Daylighting calculation cannot be done for zone " + Zone(ZoneNum).Name +
-                                    " because reference point #" + RoundSigDigits(iRefPoint) + " is less than 0.15m (6\") from window plane " +
-                                    Surface(IWin).Name);
-                    ShowContinueError(state, "Distance=[" + RoundSigDigits(ALF, 5) + "]. This is too close; check position of reference point.");
+                    ShowSevereError(state,
+                                    format("CalcDaylightCoeffRefPoints: Daylighting calculation cannot be done for zone {} because reference point "
+                                           "#{} is less than 0.15m (6\") from window plane {}",
+                                           Zone(ZoneNum).Name,
+                                           iRefPoint,
+                                           Surface(IWin).Name));
+                    ShowContinueError(state, format("Distance=[{:.5R}]. This is too close; check position of reference point.", ALF));
                     ShowFatalError(state, "Program terminates due to preceding condition.");
                 }
             } else if (ALF < 0.1524 && ExtWinType == AdjZoneExtWin) {
@@ -1973,9 +1974,12 @@ namespace DaylightingManager {
                     ShowWarningError(state, "CalcDaylightCoeffRefPoints: For Zone=\"" + Zone(ZoneNum).Name + "\" External Window=\"" + Surface(IWin).Name +
                                      "\"in Zone=\"" + Zone(Surface(IWin).Zone).Name +
                                      "\" reference point is less than 0.15m (6\") from window plane ");
-                    ShowContinueError(state, "Distance=[" + RoundSigDigits(ALF, 1) + " m] to ref point=[" + RoundSigDigits(RREF(1), 1) + ',' +
-                                      RoundSigDigits(RREF(2), 1) + ',' + RoundSigDigits(RREF(3), 1) +
-                                      "], Inaccuracy in Daylighting Calcs may result.");
+                    ShowContinueError(state,
+                                      format("Distance=[{:.1R} m] to ref point=[{:.1R},{:.1R},{:.1R}], Inaccuracy in Daylighting Calcs may result.",
+                                             ALF,
+                                             RREF(1),
+                                             RREF(2),
+                                             RREF(3)));
                     RefErrIndex(iRefPoint, IWin) = 1;
                 }
             }
@@ -1984,8 +1988,12 @@ namespace DaylightingManager {
                 if (MapErrIndex(iRefPoint, IWin) == 0) { // only show error message once
                     ShowWarningError(state, "CalcDaylightCoeffMapPoints: For Zone=\"" + Zone(ZoneNum).Name + "\" External Window=\"" + Surface(IWin).Name +
                                      "\"in Zone=\"" + Zone(Surface(IWin).Zone).Name + "\" map point is less than 0.15m (6\") from window plane ");
-                    ShowContinueError(state, "Distance=[" + RoundSigDigits(ALF, 1) + " m] map point=[" + RoundSigDigits(RREF(1), 1) + ',' +
-                                      RoundSigDigits(RREF(2), 1) + ',' + RoundSigDigits(RREF(3), 1) + "], Inaccuracy in Map Calcs may result.");
+                    ShowContinueError(state,
+                                      format("Distance=[{:.1R} m] map point=[{:.1R},{:.1R},{:.1R}], Inaccuracy in Map Calcs may result.",
+                                             ALF,
+                                             RREF(1),
+                                             RREF(2),
+                                             RREF(3)));
                     MapErrIndex(iRefPoint, IWin) = 1;
                 }
             }
@@ -4517,13 +4525,15 @@ namespace DaylightingManager {
                     if (ZoneDaylight(zoneOfSurf).TotalDaylRefPoints > 0 && !Zone(zoneOfSurf).HasInterZoneWindow &&
                         ZoneDaylight(zoneOfSurf).DaylightMethod == SplitFluxDaylighting) {
                         for (int refPtNum = 1; refPtNum <= ZoneDaylight(zoneOfSurf).TotalDaylRefPoints; ++refPtNum) {
-                            SetupOutputVariable(state, "Daylighting Window Reference Point " + std::to_string(refPtNum) + " Illuminance",
+                            SetupOutputVariable(state,
+                                                format("Daylighting Window Reference Point {} Illuminance", refPtNum),
                                                 OutputProcessor::Unit::lux,
                                                 SurfaceWindow(SurfLoop).IllumFromWinAtRefPtRep(refPtNum),
                                                 "Zone",
                                                 "Average",
                                                 Surface(SurfLoop).Name);
-                            SetupOutputVariable(state, "Daylighting Window Reference Point " + std::to_string(refPtNum) + " View Luminance",
+                            SetupOutputVariable(state,
+                                                format("Daylighting Window Reference Point {} View Luminance", refPtNum),
                                                 OutputProcessor::Unit::cd_m2,
                                                 SurfaceWindow(SurfLoop).LumWinFromRefPtRep(refPtNum),
                                                 "Zone",
@@ -4660,8 +4670,6 @@ namespace DaylightingManager {
         using DataStringGlobals::CharComma;
         using DataStringGlobals::CharSpace;
         using DataStringGlobals::CharTab;
-        using General::RoundSigDigits;
-        using General::TrimSigDigits;
 
         Array1D_int ZoneMapCount;
         int MapNum;
@@ -4745,8 +4753,9 @@ namespace DaylightingManager {
                 IllumMap(MapNum).Xmax = rNumericArgs(3);
                 if (rNumericArgs(2) > rNumericArgs(3)) {
                     ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid entry.");
-                    ShowContinueError(state, "..." + cNumericFieldNames(2) + '[' + RoundSigDigits(rNumericArgs(2), 2) +
-                                      "] must be <= " + cNumericFieldNames(3) + '[' + RoundSigDigits(rNumericArgs(3), 2) + "].");
+                    ShowContinueError(
+                        state,
+                        format("...{}[:.2R] must be <= {} [:.2R].", cNumericFieldNames(2), rNumericArgs(2), cNumericFieldNames(3), rNumericArgs(3)));
                     ErrorsFound = true;
                 }
                 IllumMap(MapNum).Xnum = rNumericArgs(4);
@@ -4760,8 +4769,9 @@ namespace DaylightingManager {
                 IllumMap(MapNum).Ymax = rNumericArgs(6);
                 if (rNumericArgs(5) > rNumericArgs(6)) {
                     ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid entry.");
-                    ShowContinueError(state, "..." + cNumericFieldNames(5) + '[' + RoundSigDigits(rNumericArgs(5), 2) +
-                                      "] must be <= " + cNumericFieldNames(6) + '[' + RoundSigDigits(rNumericArgs(6), 2) + "].");
+                    ShowContinueError(
+                        state,
+                        format("...{}[:.2R] must be <= {} [:.2R].", cNumericFieldNames(5), rNumericArgs(5), cNumericFieldNames(6), rNumericArgs(6)));
                     ErrorsFound = true;
                 }
                 IllumMap(MapNum).Ynum = rNumericArgs(7);
@@ -4772,10 +4782,14 @@ namespace DaylightingManager {
                 }
                 if (IllumMap(MapNum).Xnum * IllumMap(MapNum).Ynum > MaxMapRefPoints) {
                     ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", too many map points specified.");
-                    ShowContinueError(state, "..." + cNumericFieldNames(4) + '[' + RoundSigDigits(IllumMap(MapNum).Xnum) + "] * " + cNumericFieldNames(7) +
-                                      '[' + RoundSigDigits(IllumMap(MapNum).Ynum) + "].= [" +
-                                      RoundSigDigits(IllumMap(MapNum).Xnum * IllumMap(MapNum).Ynum) + "] must be <= [" +
-                                      RoundSigDigits(MaxMapRefPoints) + "].");
+                    ShowContinueError(state,
+                                      format("...{}[{}] * {}[{}].= [{}] must be <= [{}].",
+                                             cNumericFieldNames(4),
+                                             IllumMap(MapNum).Xnum,
+                                             cNumericFieldNames(7),
+                                             IllumMap(MapNum).Ynum,
+                                             IllumMap(MapNum).Xnum * IllumMap(MapNum).Ynum,
+                                             MaxMapRefPoints));
                     ErrorsFound = true;
                 }
             } // MapNum
@@ -4858,8 +4872,10 @@ namespace DaylightingManager {
                     if (AddMapPoints > MaxMapRefPoints) {
                         ShowSevereError(state, "GetDaylighting Parameters: Total Map Reference points entered is greater than maximum allowed.");
                         ShowContinueError(state, "Occurs in Zone=" + zone.Name);
-                        ShowContinueError(state, "Maximum reference points allowed=" + TrimSigDigits(MaxMapRefPoints) +
-                                          ", entered amount ( when error first occurred )=" + TrimSigDigits(AddMapPoints));
+                        ShowContinueError(state,
+                                          format("Maximum reference points allowed={}, entered amount ( when error first occurred )={}",
+                                                 MaxMapRefPoints,
+                                                 AddMapPoints));
                         ErrorsFound = true;
                         break;
                     }
@@ -4948,49 +4964,70 @@ namespace DaylightingManager {
                                 if ((IllumMapCalc(MapNum).MapRefPtAbsCoord(1, RefPt) < zone.MinimumX ||
                                      IllumMapCalc(MapNum).MapRefPtAbsCoord(1, RefPt) > zone.MaximumX) &&
                                     !IllumMapCalc(MapNum).MapRefPtInBounds(RefPt)) {
-                                    ShowWarningError(state, "GetInputIlluminanceMap: Reference Map point #[" + RoundSigDigits(RefPt) +
-                                                     "], X Value outside Zone Min/Max X, Zone=" + zone.Name);
-                                    ShowContinueError(state, "...X Reference Point= " + RoundSigDigits(IllumMapCalc(MapNum).MapRefPtAbsCoord(1, RefPt), 2) +
-                                                      ", Zone Minimum X= " + RoundSigDigits(zone.MinimumX, 2) +
-                                                      ", Zone Maximum X= " + RoundSigDigits(zone.MaximumX, 2));
+                                    ShowWarningError(
+                                        state,
+                                        format("GetInputIlluminanceMap: Reference Map point #[{}], X Value outside Zone Min/Max X, Zone={}",
+                                               RefPt,
+                                               zone.Name));
+                                    ShowContinueError(state,
+                                                      format("...X Reference Point= {:.2R}, Zone Minimum X= {:.2R}, Zone Maximum X= {:.2R}",
+                                                             IllumMapCalc(MapNum).MapRefPtAbsCoord(1, RefPt),
+                                                             zone.MinimumX,
+                                                             zone.MaximumX));
                                     if (IllumMapCalc(MapNum).MapRefPtAbsCoord(1, RefPt) < zone.MinimumX) {
-                                        ShowContinueError(state, "...X Reference Distance Outside MinimumX= " +
-                                                          RoundSigDigits(zone.MinimumX - IllumMapCalc(MapNum).MapRefPtAbsCoord(1, RefPt), 4) + " m.");
+                                        ShowContinueError(state,
+                                                          format("...X Reference Distance Outside MinimumX= {:.4R} m.",
+                                                                 zone.MinimumX - IllumMapCalc(MapNum).MapRefPtAbsCoord(1, RefPt)));
                                     } else {
-                                        ShowContinueError(state, "...X Reference Distance Outside MaximumX= " +
-                                                          RoundSigDigits(IllumMapCalc(MapNum).MapRefPtAbsCoord(1, RefPt) - zone.MaximumX, 4) + " m.");
+                                        ShowContinueError(state,
+                                                          format("...X Reference Distance Outside MaximumX= {:.4R} m.",
+                                                                 IllumMapCalc(MapNum).MapRefPtAbsCoord(1, RefPt) - zone.MaximumX));
                                     }
                                 }
                                 if ((IllumMapCalc(MapNum).MapRefPtAbsCoord(2, RefPt) < zone.MinimumY ||
                                      IllumMapCalc(MapNum).MapRefPtAbsCoord(2, RefPt) > zone.MaximumY) &&
                                     !IllumMapCalc(MapNum).MapRefPtInBounds(RefPt)) {
-                                    ShowWarningError(state, "GetInputIlluminanceMap: Reference Map point #[" + RoundSigDigits(RefPt) +
-                                                     "], Y Value outside Zone Min/Max Y, Zone=" + zone.Name);
-                                    ShowContinueError(state, "...Y Reference Point= " + RoundSigDigits(IllumMapCalc(MapNum).MapRefPtAbsCoord(2, RefPt), 2) +
-                                                      ", Zone Minimum Y= " + RoundSigDigits(zone.MinimumY, 2) +
-                                                      ", Zone Maximum Y= " + RoundSigDigits(zone.MaximumY, 2));
+                                    ShowWarningError(
+                                        state,
+                                        format("GetInputIlluminanceMap: Reference Map point #[{}], Y Value outside Zone Min/Max Y, Zone={}",
+                                               RefPt,
+                                               zone.Name));
+                                    ShowContinueError(state,
+                                                      format("...Y Reference Point= {:.2R}, Zone Minimum Y= {:.2R}, Zone Maximum Y= {:.2R}",
+                                                             IllumMapCalc(MapNum).MapRefPtAbsCoord(2, RefPt),
+                                                             zone.MinimumY,
+                                                             zone.MaximumY));
                                     if (IllumMapCalc(MapNum).MapRefPtAbsCoord(2, RefPt) < zone.MinimumY) {
-                                        ShowContinueError(state, "...Y Reference Distance Outside MinimumY= " +
-                                                          RoundSigDigits(zone.MinimumY - IllumMapCalc(MapNum).MapRefPtAbsCoord(2, RefPt), 4) + " m.");
+                                        ShowContinueError(state,
+                                                          format("...Y Reference Distance Outside MinimumY= {:.4R} m.",
+                                                                 zone.MinimumY - IllumMapCalc(MapNum).MapRefPtAbsCoord(2, RefPt)));
                                     } else {
-                                        ShowContinueError(state, "...Y Reference Distance Outside MaximumY= " +
-                                                          RoundSigDigits(IllumMapCalc(MapNum).MapRefPtAbsCoord(2, RefPt) - zone.MaximumY, 4) + " m.");
+                                        ShowContinueError(state,
+                                                          format("...Y Reference Distance Outside MaximumY= {:.4R} m.",
+                                                                 IllumMapCalc(MapNum).MapRefPtAbsCoord(2, RefPt) - zone.MaximumY));
                                     }
                                 }
                                 if ((IllumMapCalc(MapNum).MapRefPtAbsCoord(3, RefPt) < zone.MinimumZ ||
                                      IllumMapCalc(MapNum).MapRefPtAbsCoord(3, RefPt) > zone.MaximumZ) &&
                                     !IllumMapCalc(MapNum).MapRefPtInBounds(RefPt)) {
-                                    ShowWarningError(state, "GetInputIlluminanceMap: Reference Map point #[" + RoundSigDigits(RefPt) +
-                                                     "], Z Value outside Zone Min/Max Z, Zone=" + zone.Name);
-                                    ShowContinueError(state, "...Z Reference Point= " + RoundSigDigits(IllumMapCalc(MapNum).MapRefPtAbsCoord(3, RefPt), 2) +
-                                                      ", Zone Minimum Z= " + RoundSigDigits(zone.MinimumZ, 2) +
-                                                      ", Zone Maximum Z= " + RoundSigDigits(zone.MaximumZ, 2));
+                                    ShowWarningError(
+                                        state,
+                                        format("GetInputIlluminanceMap: Reference Map point #[{}], Z Value outside Zone Min/Max Z, Zone={}",
+                                               RefPt,
+                                               zone.Name));
+                                    ShowContinueError(state,
+                                                      format("...Z Reference Point= {:.2R}, Zone Minimum Z= {:.2R}, Zone Maximum Z= {:.2R}",
+                                                             IllumMapCalc(MapNum).MapRefPtAbsCoord(3, RefPt),
+                                                             zone.MinimumZ,
+                                                             zone.MaximumZ));
                                     if (IllumMapCalc(MapNum).MapRefPtAbsCoord(3, RefPt) < zone.MinimumZ) {
-                                        ShowContinueError(state, "...Z Reference Distance Outside MinimumZ= " +
-                                                          RoundSigDigits(zone.MinimumZ - IllumMapCalc(MapNum).MapRefPtAbsCoord(3, RefPt), 4) + " m.");
+                                        ShowContinueError(state,
+                                                          format("...Z Reference Distance Outside MinimumZ= {:.4R} m.",
+                                                                 zone.MinimumZ - IllumMapCalc(MapNum).MapRefPtAbsCoord(3, RefPt)));
                                     } else {
-                                        ShowContinueError(state, "...Z Reference Distance Outside MaximumZ= " +
-                                                          RoundSigDigits(IllumMapCalc(MapNum).MapRefPtAbsCoord(3, RefPt) - zone.MaximumZ, 4) + " m.");
+                                        ShowContinueError(state,
+                                                          format("...Z Reference Distance Outside MaximumZ= {:.4R} m.",
+                                                                 IllumMapCalc(MapNum).MapRefPtAbsCoord(3, RefPt) - zone.MaximumZ));
                                     }
                                 }
                             }
@@ -5042,7 +5079,6 @@ namespace DaylightingManager {
         //       MODIFIED       Glazer - July 2016 - Move geometry transformation portion, rearrange input, allow more than three reference points
         // Obtain the user input data for Daylighting:Controls object in the input file.
         using namespace DataIPShortCuts;
-        using General::RoundSigDigits;
 
         int IOStat;
         int NumAlpha;
@@ -5200,25 +5236,29 @@ namespace DaylightingManager {
                 zone_daylight.IllumSetPoint(refPtNum) = rNumericArgs(7 + refPtNum * 2);  // Field: Illuminance Setpoint at Reference Point
 
                 if (zone_daylight.DaylightMethod == SplitFluxDaylighting) {
-                    SetupOutputVariable(state, "Daylighting Reference Point " + std::to_string(refPtNum) + " Illuminance",
+                    SetupOutputVariable(state,
+                                        format("Daylighting Reference Point {} Illuminance", refPtNum),
                                         OutputProcessor::Unit::lux,
                                         zone_daylight.DaylIllumAtRefPt(refPtNum),
                                         "Zone",
                                         "Average",
                                         zone_daylight.Name);
-                    SetupOutputVariable(state, "Daylighting Reference Point " + std::to_string(refPtNum) + " Daylight Illuminance Setpoint Exceeded Time",
+                    SetupOutputVariable(state,
+                                        format("Daylighting Reference Point {} Daylight Illuminance Setpoint Exceeded Time", refPtNum),
                                         OutputProcessor::Unit::hr,
                                         zone_daylight.TimeExceedingDaylightIlluminanceSPAtRefPt(refPtNum),
                                         "Zone",
                                         "Sum",
                                         zone_daylight.Name);
-                    SetupOutputVariable(state, "Daylighting Reference Point " + std::to_string(refPtNum) + " Glare Index",
+                    SetupOutputVariable(state,
+                                        format("Daylighting Reference Point {} Glare Index", refPtNum),
                                         OutputProcessor::Unit::None,
                                         zone_daylight.GlareIndexAtRefPt(refPtNum),
                                         "Zone",
                                         "Average",
                                         zone_daylight.Name);
-                    SetupOutputVariable(state, "Daylighting Reference Point " + std::to_string(refPtNum) + " Glare Index Setpoint Exceeded Time",
+                    SetupOutputVariable(state,
+                                        format("Daylighting Reference Point {} Glare Index Setpoint Exceeded Time", refPtNum),
                                         OutputProcessor::Unit::hr,
                                         zone_daylight.TimeExceedingGlareIndexSPAtRefPt(refPtNum),
                                         "Zone",
@@ -5235,12 +5275,18 @@ namespace DaylightingManager {
             Real64 sumFracs = sum(zone_daylight.FracZoneDaylit);
             if ( (1.0 - sumFracs) > FractionTolerance) {
                 ShowWarningError(state, "GetDaylightingControls: Fraction of Zone controlled by the Daylighting reference points is < 1.0.");
-                ShowContinueError(state, "..discovered in \"" + cCurrentModuleObject + "\" for Zone=\"" + cAlphaArgs(2) + "\", only " +
-                        RoundSigDigits(sum(zone_daylight.FracZoneDaylit), 3) + " of the zone is controlled.");
+                ShowContinueError(state,
+                                  format("..discovered in \"{}\" for Zone=\"{}\", only {:.3R} of the zone is controlled.",
+                                         cCurrentModuleObject,
+                                         cAlphaArgs(2),
+                                         sum(zone_daylight.FracZoneDaylit)));
             } else if ((sumFracs - 1.0) > FractionTolerance) {
                 ShowSevereError(state, "GetDaylightingControls: Fraction of Zone controlled by the Daylighting reference points is > 1.0.");
-                ShowContinueError(state, "..discovered in \"" + cCurrentModuleObject + "\" for Zone=\"" + cAlphaArgs(2) + "\", trying to control " +
-                        RoundSigDigits(sum(zone_daylight.FracZoneDaylit), 3) + " of the zone.");
+                ShowContinueError(state,
+                                  format("..discovered in \"{}\" for Zone=\"{}\", trying to control {:.3R} of the zone.",
+                                         cCurrentModuleObject,
+                                         cAlphaArgs(2),
+                                         sum(zone_daylight.FracZoneDaylit)));
                 ErrorsFound = true;
             }
 
@@ -5265,8 +5311,6 @@ namespace DaylightingManager {
         //       MODIFIED       Glazer - July 2016 - separated this from GetInput function
         // For splitflux daylighting, transform the geometry
 
-        using General::RoundSigDigits;
-        using General::TrimSigDigits;
         using InternalHeatGains::CheckLightsReplaceableMinMaxForZone;
         using InternalHeatGains::GetDesignLightingLevelForZone;
         using namespace OutputReportPredefined;
@@ -5372,43 +5416,55 @@ namespace DaylightingManager {
                     if (daylCntrl.DaylRefPtAbsCoord(1, refPtNum) < zone.MinimumX || daylCntrl.DaylRefPtAbsCoord(1, refPtNum) > zone.MaximumX) {
                         daylCntrl.DaylRefPtInBounds(refPtNum) = false;
                         ShowWarningError(state, "GeometryTransformForDaylighting: Reference point X Value outside Zone Min/Max X, Zone=" + zone.Name);
-                        ShowContinueError(state, "...X Reference Point= " + RoundSigDigits(daylCntrl.DaylRefPtAbsCoord(1, refPtNum), 2) +
-                                          ", Zone Minimum X= " + RoundSigDigits(zone.MinimumX, 2) +
-                                          ", Zone Maximum X= " + RoundSigDigits(zone.MaximumX, 2));
+                        ShowContinueError(state,
+                                          format("...X Reference Point= {:.2R}, Zone Minimum X= {:.2R}, Zone Maximum X= {:.2R}",
+                                                 daylCntrl.DaylRefPtAbsCoord(1, refPtNum),
+                                                 zone.MinimumX,
+                                                 zone.MaximumX));
                         if (daylCntrl.DaylRefPtAbsCoord(1, refPtNum) < zone.MinimumX) {
-                            ShowContinueError(state, "...X Reference Distance Outside MinimumX= " +
-                                              RoundSigDigits(zone.MinimumX - daylCntrl.DaylRefPtAbsCoord(1, refPtNum), 4) + " m.");
+                            ShowContinueError(state,
+                                              format("...X Reference Distance Outside MinimumX= {:.4R} m.",
+                                                     zone.MinimumX - daylCntrl.DaylRefPtAbsCoord(1, refPtNum)));
                         } else {
-                            ShowContinueError(state, "...X Reference Distance Outside MaximumX= " +
-                                              RoundSigDigits(daylCntrl.DaylRefPtAbsCoord(1, refPtNum) - zone.MaximumX, 4) + " m.");
+                            ShowContinueError(state,
+                                              format("...X Reference Distance Outside MaximumX= {:.4R} m.",
+                                                     daylCntrl.DaylRefPtAbsCoord(1, refPtNum) - zone.MaximumX));
                         }
                     }
                     if (daylCntrl.DaylRefPtAbsCoord(2, refPtNum) < zone.MinimumY || daylCntrl.DaylRefPtAbsCoord(2, refPtNum) > zone.MaximumY) {
                         daylCntrl.DaylRefPtInBounds(refPtNum) = false;
                         ShowWarningError(state, "GeometryTransformForDaylighting: Reference point Y Value outside Zone Min/Max Y, Zone=" + zone.Name);
-                        ShowContinueError(state, "...Y Reference Point= " + RoundSigDigits(daylCntrl.DaylRefPtAbsCoord(2, refPtNum), 2) +
-                                          ", Zone Minimum Y= " + RoundSigDigits(zone.MinimumY, 2) +
-                                          ", Zone Maximum Y= " + RoundSigDigits(zone.MaximumY, 2));
+                        ShowContinueError(state,
+                                          format("...Y Reference Point= {:.2R}, Zone Minimum Y= {:.2R}, Zone Maximum Y= {:.2R}",
+                                                 daylCntrl.DaylRefPtAbsCoord(2, refPtNum),
+                                                 zone.MinimumY,
+                                                 zone.MaximumY));
                         if (daylCntrl.DaylRefPtAbsCoord(2, refPtNum) < zone.MinimumY) {
-                            ShowContinueError(state, "...Y Reference Distance Outside MinimumY= " +
-                                              RoundSigDigits(zone.MinimumY - daylCntrl.DaylRefPtAbsCoord(2, refPtNum), 4) + " m.");
+                            ShowContinueError(state,
+                                              format("...Y Reference Distance Outside MinimumY= {:.4R} m.",
+                                                     zone.MinimumY - daylCntrl.DaylRefPtAbsCoord(2, refPtNum)));
                         } else {
-                            ShowContinueError(state, "...Y Reference Distance Outside MaximumY= " +
-                                              RoundSigDigits(daylCntrl.DaylRefPtAbsCoord(2, refPtNum) - zone.MaximumY, 4) + " m.");
+                            ShowContinueError(state,
+                                              format("...Y Reference Distance Outside MaximumY= {:.4R} m.",
+                                                     daylCntrl.DaylRefPtAbsCoord(2, refPtNum) - zone.MaximumY));
                         }
                     }
                     if (daylCntrl.DaylRefPtAbsCoord(3, refPtNum) < zone.MinimumZ || daylCntrl.DaylRefPtAbsCoord(3, refPtNum) > zone.MaximumZ) {
                         daylCntrl.DaylRefPtInBounds(refPtNum) = false;
                         ShowWarningError(state, "GeometryTransformForDaylighting: Reference point Z Value outside Zone Min/Max Z, Zone=" + zone.Name);
-                        ShowContinueError(state, "...Z Reference Point= " + RoundSigDigits(daylCntrl.DaylRefPtAbsCoord(3, refPtNum), 2) +
-                                          ", Zone Minimum Z= " + RoundSigDigits(zone.MinimumZ, 2) +
-                                          ", Zone Maximum Z= " + RoundSigDigits(zone.MaximumZ, 2));
+                        ShowContinueError(state,
+                                          format("...Z Reference Point= {:.2R}, Zone Minimum Z= {:.2R}, Zone Maximum Z= {:.2R}",
+                                                 daylCntrl.DaylRefPtAbsCoord(3, refPtNum),
+                                                 zone.MinimumZ,
+                                                 zone.MaximumZ));
                         if (daylCntrl.DaylRefPtAbsCoord(3, refPtNum) < zone.MinimumZ) {
-                            ShowContinueError(state, "...Z Reference Distance Outside MinimumZ= " +
-                                              RoundSigDigits(zone.MinimumZ - daylCntrl.DaylRefPtAbsCoord(3, refPtNum), 4) + " m.");
+                            ShowContinueError(state,
+                                              format("...Z Reference Distance Outside MinimumZ= {:.4R} m.",
+                                                     zone.MinimumZ - daylCntrl.DaylRefPtAbsCoord(3, refPtNum)));
                         } else {
-                            ShowContinueError(state, "...Z Reference Distance Outside MaximumZ= " +
-                                              RoundSigDigits(daylCntrl.DaylRefPtAbsCoord(3, refPtNum) - zone.MaximumZ, 4) + " m.");
+                            ShowContinueError(state,
+                                              format("...Z Reference Distance Outside MaximumZ= {:.4R} m.",
+                                                     daylCntrl.DaylRefPtAbsCoord(3, refPtNum) - zone.MaximumZ));
                         }
                     }
                 } // refPtNum
@@ -5491,7 +5547,6 @@ namespace DaylightingManager {
         using DataDaylighting::ZoneDaylight;
         using DataHeatBalance::Zone;
         using namespace DataDaylightingDevices;
-        using General::RoundSigDigits;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -5589,7 +5644,6 @@ namespace DaylightingManager {
 
         // Using/Aliasing
         using namespace DataIPShortCuts;
-        using General::RoundSigDigits;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -5655,8 +5709,8 @@ namespace DaylightingManager {
                 // Warning if light well area is less than window area
                 if (AreaWell < (Surface(SurfNum).Area + SurfWinDividerArea(SurfNum) - 0.1)) {
                     ShowSevereError(state, cCurrentModuleObject + ": invalid " + cAlphaFieldNames(1) + "=\"" + cAlphaArgs(1) + "\" - Areas.");
-                    ShowContinueError(state, "has Area of Bottom of Well=" + RoundSigDigits(Surface(SurfNum).Area, 1) +
-                                      " that is less than window area=" + RoundSigDigits(AreaWell, 1));
+                    ShowContinueError(
+                        state, format("has Area of Bottom of Well={:.1R} that is less than window area={:.1R}", Surface(SurfNum).Area, AreaWell));
                 }
 
                 if (HeightWell >= 0.0 && PerimWell > 0.0 && AreaWell > 0.0) {
@@ -6674,7 +6728,7 @@ namespace DaylightingManager {
             int count = 0;
             for (std::size_t igroup = 1; igroup <= ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size(); igroup++) {
                 std::vector<int> listOfExtWin = ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins[igroup - 1];
-                for (auto IWin : listOfExtWin) {
+                for (const auto IWin : listOfExtWin) {
                     ++count;
                     // need to map back to the original order of the "loop" to not change all the other data structures
                     loop = ZoneDaylight(ZoneNum).MapShdOrdToLoopNum(count);
@@ -6719,7 +6773,7 @@ namespace DaylightingManager {
 
                 std::vector<int> listOfExtWin = ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins[igroup - 1];
 
-                for (auto IWin : listOfExtWin) {
+                for (const auto IWin : listOfExtWin) {
                     ++count;
                     // need to map back to the original order of the "loop" to not change all the other data structures
                     loop = ZoneDaylight(ZoneNum).MapShdOrdToLoopNum(count);
@@ -6839,7 +6893,7 @@ namespace DaylightingManager {
                 int countBeforeListOfExtWinLoop = count;
                 bool atLeastOneGlareControlIsActive = false;
 
-                for (auto IWin : listOfExtWin) {
+                for (const auto IWin : listOfExtWin) {
                     ++count;
                     // need to map back to the original order of the "loop" to not change all the other data structures
                     loop = ZoneDaylight(ZoneNum).MapShdOrdToLoopNum(count);
@@ -6954,7 +7008,7 @@ namespace DaylightingManager {
                 count = countBeforeListOfExtWinLoop;
                 breakOuterLoop = false;
 
-                for (auto IWin : listOfExtWin) {
+                for (const auto IWin : listOfExtWin) {
                     ++count;
                     // need to map back to the original order of the "loop" to not change all the other data structures
                     loop = ZoneDaylight(ZoneNum).MapShdOrdToLoopNum(count);
@@ -9922,7 +9976,6 @@ namespace DaylightingManager {
         using DataStringGlobals::CharComma;
         using DataStringGlobals::CharSpace;
         using DataStringGlobals::CharTab;
-        using General::RoundSigDigits;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -9993,7 +10046,7 @@ namespace DaylightingManager {
 
             SavedMnDy(MapNum) = CurMnDyHr.substr(0, 5);
 
-            IllumMap(MapNum).Name = IllumMap(MapNum).Name + " at " + RoundSigDigits(IllumMap(MapNum).Z, 2) + 'm';
+            IllumMap(MapNum).Name = format("{} at {:.2R}m", IllumMap(MapNum).Name, IllumMap(MapNum).Z);
 
             for (R = 1; R <= ZoneDaylight(IllumMap(MapNum).Zone).TotalDaylRefPoints; ++R) {
                 RefPts(IllumMap(MapNum).Zone, R) = format("RefPt{}=({:.2R}:{:.2R}:{:.2R})", R,
@@ -10038,11 +10091,12 @@ namespace DaylightingManager {
                 if (IllumMap(MapNum).HeaderXLineLengthNeeded) {
                     IllumMap(MapNum).HeaderXLineLength = linelen;
                     if (static_cast<std::string::size_type>(IllumMap(MapNum).HeaderXLineLength) > len(mapLine)) {
-                        ShowWarningError(state, "ReportIllumMap: Map=\"" + IllumMap(MapNum).Name +
-                                         "\" -- the X Header overflows buffer -- will be truncated at " + RoundSigDigits(int(len(mapLine))) +
-                                         " characters.");
-                        ShowContinueError(state, "...needed " + RoundSigDigits(IllumMap(MapNum).HeaderXLineLength) +
-                                          " characters. Please contact EnergyPlus support.");
+                        ShowWarningError(state,
+                                         format("ReportIllumMap: Map=\"{}\" -- the X Header overflows buffer -- will be truncated at {} characters.",
+                                                IllumMap(MapNum).Name,
+                                                int(len(mapLine))));
+                        ShowContinueError(state,
+                                          format("...needed {} characters. Please contact EnergyPlus support.", IllumMap(MapNum).HeaderXLineLength));
                     }
                     IllumMap(MapNum).HeaderXLineLengthNeeded = false;
                 }
@@ -10052,14 +10106,14 @@ namespace DaylightingManager {
                 // Write Y scale prefix and illuminance values
                 RefPt = 1;
                 for (Y = 1; Y <= IllumMap(MapNum).Ynum; ++Y) {
-                    mapLine = "(" + RoundSigDigits(IllumMapCalc(MapNum).MapRefPtAbsCoord(1, RefPt), 2) + ';' +
-                              RoundSigDigits(IllumMapCalc(MapNum).MapRefPtAbsCoord(2, RefPt), 2) + ")=";
+                    mapLine =
+                        format("({:.2R};{:.2R})=", IllumMapCalc(MapNum).MapRefPtAbsCoord(1, RefPt), IllumMapCalc(MapNum).MapRefPtAbsCoord(2, RefPt));
                     for (R = RefPt; R <= RefPt + IllumMap(MapNum).Xnum - 1; ++R) {
                         IllumOut = nint(IllumMapCalc(MapNum).DaylIllumAtMapPtHr(R));
                         if (IllumMapCalc(MapNum).MapRefPtInBounds(R)) {
-                            String = RoundSigDigits(IllumOut);
+                            String = fmt::to_string(IllumOut);
                         } else {
-                            String = RoundSigDigits(IllumOut);
+                            String = fmt::to_string(IllumOut);
                             String = "*" + String;
                         }
                         mapLine += MapColSep + String;
@@ -10130,7 +10184,6 @@ namespace DaylightingManager {
         using DataStringGlobals::CharComma;
         using DataStringGlobals::CharSpace;
         using DataStringGlobals::CharTab;
-        using General::TrimSigDigits;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -10237,8 +10290,6 @@ namespace DaylightingManager {
         // Sets the daylighting factor pointers for each Daylighting:Detailed zone. The pointer
         // may be associated with an exterior window in a daylit target zone's enclosure or an exterior window in
         // an adjacent enclosure, daylit or not, that shares interior windows with the target zone's enclosure.
-
-        using General::RoundSigDigits;
 
         Array1D_int ZoneExtWin;
         int WinSize;

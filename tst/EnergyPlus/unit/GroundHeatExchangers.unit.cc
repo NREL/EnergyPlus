@@ -61,6 +61,7 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 // Testing Headers
 #include "Fixtures/EnergyPlusFixture.hh"
@@ -196,19 +197,19 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_Slinky_CalcHXResistance)
     thisGLHE.pipe.k = 0.4;
 
     // Re < 2300 mass flow rate
-    EXPECT_NEAR(0.13487, thisGLHE.calcHXResistance(state), 0.0001);
+    EXPECT_NEAR(0.13487, thisGLHE.calcHXResistance(*state), 0.0001);
 
     // 4000 > Re > 2300 mass flow rate
     thisGLHE.massFlowRate = 0.07;
-    EXPECT_NEAR(0.08582, thisGLHE.calcHXResistance(state), 0.0001);
+    EXPECT_NEAR(0.08582, thisGLHE.calcHXResistance(*state), 0.0001);
 
     // Re > 4000 mass flow rate
     thisGLHE.massFlowRate = 0.1;
-    EXPECT_NEAR(0.077185, thisGLHE.calcHXResistance(state), 0.0001);
+    EXPECT_NEAR(0.077185, thisGLHE.calcHXResistance(*state), 0.0001);
 
     // Zero mass flow rate
     thisGLHE.massFlowRate = 0.0;
-    EXPECT_NEAR(0.07094, thisGLHE.calcHXResistance(state), 0.0001);
+    EXPECT_NEAR(0.07094, thisGLHE.calcHXResistance(*state), 0.0001);
 }
 
 TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_Slinky_CalcGroundHeatExchanger)
@@ -233,12 +234,12 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_Slinky_CalcGroundHeatExchanger
     thisGLHE.SubAGG = 15;
 
     // Horizontal G-Functions
-    thisGLHE.calcGFunctions(state);
+    thisGLHE.calcGFunctions(*state);
     EXPECT_NEAR(19.08237, thisGLHE.myRespFactors->GFNC(28), 0.0001);
 
     // Vertical G-Functions
     thisGLHE.verticalConfig = true;
-    thisGLHE.calcGFunctions(state);
+    thisGLHE.calcGFunctions(*state);
     EXPECT_NEAR(18.91819, thisGLHE.myRespFactors->GFNC(28), 0.0001);
 }
 
@@ -254,7 +255,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_Properties_IDF_Check)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetGroundHeatExchangerInput(state);
+    GetGroundHeatExchangerInput(*state);
 
     EXPECT_EQ(1u, vertPropsVector.size());
 
@@ -448,7 +449,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_Resp_Factors_IDF_Check)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetGroundHeatExchangerInput(state);
+    GetGroundHeatExchangerInput(*state);
 
     EXPECT_EQ(1u, responseFactorsVector.size());
 
@@ -491,7 +492,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_Vertical_Array_IDF_Chec
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetGroundHeatExchangerInput(state);
+    GetGroundHeatExchangerInput(*state);
 
     EXPECT_EQ(1u, vertArraysVector.size());
 
@@ -700,7 +701,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_Given_Response_Factors_
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetGroundHeatExchangerInput(state);
+    GetGroundHeatExchangerInput(*state);
 
     EXPECT_EQ(1u, vertPropsVector.size());
     EXPECT_EQ(1u, responseFactorsVector.size());
@@ -770,7 +771,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_Given_Array_IDF_Check)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetGroundHeatExchangerInput(state);
+    GetGroundHeatExchangerInput(*state);
 
     EXPECT_EQ(1u, vertPropsVector.size());
     EXPECT_EQ(1u, vertArraysVector.size());
@@ -861,7 +862,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_Given_Single_BHs_IDF_Ch
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetGroundHeatExchangerInput(state);
+    GetGroundHeatExchangerInput(*state);
 
     EXPECT_EQ(2u, vertPropsVector.size());
     EXPECT_EQ(4u, singleBoreholesVector.size());
@@ -1179,12 +1180,12 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcGFunction_Check)
 
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
-    ProcessScheduleInput(state);
+    ProcessScheduleInput(*state);
     ScheduleInputProcessed = true;
-    GetPlantLoopData(state);
-    GetPlantInput(state);
+    GetPlantLoopData(*state);
+    GetPlantInput(*state);
     SetupInitialPlantCallingOrder();
-    SetupBranchControlTypes(state);
+    SetupBranchControlTypes(*state);
 
     auto &thisGLHE(verticalGLHE[0]);
     thisGLHE.loopNum = 1;
@@ -1196,7 +1197,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcGFunction_Check)
 
     thisGLHE.myRespFactors->maxSimYears = 1;
 
-    thisGLHE.calcGFunctions(state);
+    thisGLHE.calcGFunctions(*state);
 
     Real64 const tolerance = 0.1;
 
@@ -1286,7 +1287,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calc_pipe_conduction_re
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetGroundHeatExchangerInput(state);
+    GetGroundHeatExchangerInput(*state);
 
     auto &thisGLHE(verticalGLHE[0]);
 
@@ -1347,7 +1348,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_friction_factor)
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetGroundHeatExchangerInput(state);
+    GetGroundHeatExchangerInput(*state);
 
     auto &thisGLHE(verticalGLHE[0]);
 
@@ -1661,12 +1662,12 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calc_pipe_convection_re
 
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
-    ProcessScheduleInput(state);
+    ProcessScheduleInput(*state);
     ScheduleInputProcessed = true;
-    GetPlantLoopData(state);
-    GetPlantInput(state);
+    GetPlantLoopData(*state);
+    GetPlantInput(*state);
     SetupInitialPlantCallingOrder();
-    SetupBranchControlTypes(state);
+    SetupBranchControlTypes(*state);
 
     auto &thisGLHE(verticalGLHE[0]);
     thisGLHE.loopNum = 1;
@@ -1679,15 +1680,15 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calc_pipe_convection_re
     Real64 const tolerance = 0.00001;
 
     // Turbulent
-    EXPECT_NEAR(thisGLHE.calcPipeConvectionResistance(state), 0.004453, tolerance);
+    EXPECT_NEAR(thisGLHE.calcPipeConvectionResistance(*state), 0.004453, tolerance);
 
     // Transitional
     thisGLHE.massFlowRate = thisGLHE.designFlow * rho / 4;
-    EXPECT_NEAR(thisGLHE.calcPipeConvectionResistance(state), 0.019185, tolerance);
+    EXPECT_NEAR(thisGLHE.calcPipeConvectionResistance(*state), 0.019185, tolerance);
 
     // Laminar
     thisGLHE.massFlowRate = thisGLHE.designFlow * rho / 10;
-    EXPECT_NEAR(thisGLHE.calcPipeConvectionResistance(state), 0.135556, tolerance);
+    EXPECT_NEAR(thisGLHE.calcPipeConvectionResistance(*state), 0.135556, tolerance);
 }
 
 TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calc_pipe_resistance)
@@ -1965,12 +1966,12 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calc_pipe_resistance)
 
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
-    ProcessScheduleInput(state);
+    ProcessScheduleInput(*state);
     ScheduleInputProcessed = true;
-    GetPlantLoopData(state);
-    GetPlantInput(state);
+    GetPlantLoopData(*state);
+    GetPlantInput(*state);
     SetupInitialPlantCallingOrder();
-    SetupBranchControlTypes(state);
+    SetupBranchControlTypes(*state);
 
     auto &thisGLHE(verticalGLHE[0]);
     thisGLHE.loopNum = 1;
@@ -1982,7 +1983,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calc_pipe_resistance)
 
     Real64 const tolerance = 0.00001;
 
-    EXPECT_NEAR(thisGLHE.calcPipeResistance(state), 0.082204 + 0.004453, tolerance);
+    EXPECT_NEAR(thisGLHE.calcPipeResistance(*state), 0.082204 + 0.004453, tolerance);
 }
 
 TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_1)
@@ -2261,12 +2262,12 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_1
 
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
-    ProcessScheduleInput(state);
+    ProcessScheduleInput(*state);
     ScheduleInputProcessed = true;
-    GetPlantLoopData(state);
-    GetPlantInput(state);
+    GetPlantLoopData(*state);
+    GetPlantInput(*state);
     SetupInitialPlantCallingOrder();
-    SetupBranchControlTypes(state);
+    SetupBranchControlTypes(*state);
 
     auto &thisGLHE(verticalGLHE[0]);
     thisGLHE.loopNum = 1;
@@ -2280,7 +2281,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_1
     EXPECT_NEAR(thisGLHE.theta_2, 3.0, tolerance);
     EXPECT_NEAR(thisGLHE.theta_3, 1 / (2 * thisGLHE.theta_1 * thisGLHE.theta_2), tolerance);
     EXPECT_NEAR(thisGLHE.sigma, (thisGLHE.grout.k - thisGLHE.soil.k) / (thisGLHE.grout.k + thisGLHE.soil.k), tolerance);
-    EXPECT_NEAR(thisGLHE.calcBHGroutResistance(state), 0.17701, tolerance);
+    EXPECT_NEAR(thisGLHE.calcBHGroutResistance(*state), 0.17701, tolerance);
 }
 
 TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_2)
@@ -2559,12 +2560,12 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_2
 
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
-    ProcessScheduleInput(state);
+    ProcessScheduleInput(*state);
     ScheduleInputProcessed = true;
-    GetPlantLoopData(state);
-    GetPlantInput(state);
+    GetPlantLoopData(*state);
+    GetPlantInput(*state);
     SetupInitialPlantCallingOrder();
-    SetupBranchControlTypes(state);
+    SetupBranchControlTypes(*state);
 
     auto &thisGLHE(verticalGLHE[0]);
     thisGLHE.loopNum = 1;
@@ -2578,7 +2579,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_2
     EXPECT_NEAR(thisGLHE.theta_2, 3.0, tolerance);
     EXPECT_NEAR(thisGLHE.theta_3, 1 / (2 * thisGLHE.theta_1 * thisGLHE.theta_2), tolerance);
     EXPECT_NEAR(thisGLHE.sigma, (thisGLHE.grout.k - thisGLHE.soil.k) / (thisGLHE.grout.k + thisGLHE.soil.k), tolerance);
-    EXPECT_NEAR(thisGLHE.calcBHGroutResistance(state), 0.14724, tolerance);
+    EXPECT_NEAR(thisGLHE.calcBHGroutResistance(*state), 0.14724, tolerance);
 }
 
 TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_3)
@@ -2857,12 +2858,12 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_3
 
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
-    ProcessScheduleInput(state);
+    ProcessScheduleInput(*state);
     ScheduleInputProcessed = true;
-    GetPlantLoopData(state);
-    GetPlantInput(state);
+    GetPlantLoopData(*state);
+    GetPlantInput(*state);
     SetupInitialPlantCallingOrder();
-    SetupBranchControlTypes(state);
+    SetupBranchControlTypes(*state);
 
     auto &thisGLHE(verticalGLHE[0]);
     thisGLHE.loopNum = 1;
@@ -2876,7 +2877,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_3
     EXPECT_NEAR(thisGLHE.theta_2, 9.0, tolerance);
     EXPECT_NEAR(thisGLHE.theta_3, 1 / (2 * thisGLHE.theta_1 * thisGLHE.theta_2), tolerance);
     EXPECT_NEAR(thisGLHE.sigma, (thisGLHE.grout.k - thisGLHE.soil.k) / (thisGLHE.grout.k + thisGLHE.soil.k), tolerance);
-    EXPECT_NEAR(thisGLHE.calcBHGroutResistance(state), 0.11038, tolerance);
+    EXPECT_NEAR(thisGLHE.calcBHGroutResistance(*state), 0.11038, tolerance);
 }
 
 TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResistance_1)
@@ -3155,12 +3156,12 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResi
 
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
-    ProcessScheduleInput(state);
+    ProcessScheduleInput(*state);
     ScheduleInputProcessed = true;
-    GetPlantLoopData(state);
-    GetPlantInput(state);
+    GetPlantLoopData(*state);
+    GetPlantInput(*state);
     SetupInitialPlantCallingOrder();
-    SetupBranchControlTypes(state);
+    SetupBranchControlTypes(*state);
 
     auto &thisGLHE(verticalGLHE[0]);
     thisGLHE.loopNum = 1;
@@ -3174,7 +3175,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResi
     EXPECT_NEAR(thisGLHE.theta_2, 3.0, tolerance);
     EXPECT_NEAR(thisGLHE.theta_3, 1 / (2 * thisGLHE.theta_1 * thisGLHE.theta_2), tolerance);
     EXPECT_NEAR(thisGLHE.sigma, (thisGLHE.grout.k - thisGLHE.soil.k) / (thisGLHE.grout.k + thisGLHE.soil.k), tolerance);
-    EXPECT_NEAR(thisGLHE.calcBHTotalInternalResistance(state), 0.32365, tolerance);
+    EXPECT_NEAR(thisGLHE.calcBHTotalInternalResistance(*state), 0.32365, tolerance);
 }
 
 TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResistance_2)
@@ -3453,12 +3454,12 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResi
 
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
-    ProcessScheduleInput(state);
+    ProcessScheduleInput(*state);
     ScheduleInputProcessed = true;
-    GetPlantLoopData(state);
-    GetPlantInput(state);
+    GetPlantLoopData(*state);
+    GetPlantInput(*state);
     SetupInitialPlantCallingOrder();
-    SetupBranchControlTypes(state);
+    SetupBranchControlTypes(*state);
 
     auto &thisGLHE(verticalGLHE[0]);
     thisGLHE.loopNum = 1;
@@ -3472,7 +3473,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResi
     EXPECT_NEAR(thisGLHE.theta_2, 6.0, tolerance);
     EXPECT_NEAR(thisGLHE.theta_3, 1 / (2 * thisGLHE.theta_1 * thisGLHE.theta_2), tolerance);
     EXPECT_NEAR(thisGLHE.sigma, (thisGLHE.grout.k - thisGLHE.soil.k) / (thisGLHE.grout.k + thisGLHE.soil.k), tolerance);
-    EXPECT_NEAR(thisGLHE.calcBHTotalInternalResistance(state), 0.16310, tolerance);
+    EXPECT_NEAR(thisGLHE.calcBHTotalInternalResistance(*state), 0.16310, tolerance);
 }
 
 TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResistance_3)
@@ -3751,12 +3752,12 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResi
 
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
-    ProcessScheduleInput(state);
+    ProcessScheduleInput(*state);
     ScheduleInputProcessed = true;
-    GetPlantLoopData(state);
-    GetPlantInput(state);
+    GetPlantLoopData(*state);
+    GetPlantInput(*state);
     SetupInitialPlantCallingOrder();
-    SetupBranchControlTypes(state);
+    SetupBranchControlTypes(*state);
 
     auto &thisGLHE(verticalGLHE[0]);
     thisGLHE.loopNum = 1;
@@ -3770,5 +3771,5 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResi
     EXPECT_NEAR(thisGLHE.theta_2, 9.0, tolerance);
     EXPECT_NEAR(thisGLHE.theta_3, 1 / (2 * thisGLHE.theta_1 * thisGLHE.theta_2), tolerance);
     EXPECT_NEAR(thisGLHE.sigma, (thisGLHE.grout.k - thisGLHE.soil.k) / (thisGLHE.grout.k + thisGLHE.soil.k), tolerance);
-    EXPECT_NEAR(thisGLHE.calcBHTotalInternalResistance(state), 0.31582, tolerance);
+    EXPECT_NEAR(thisGLHE.calcBHTotalInternalResistance(*state), 0.31582, tolerance);
 }

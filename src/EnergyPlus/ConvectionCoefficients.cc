@@ -111,7 +111,6 @@ namespace ConvectionCoefficients {
     using namespace DataHeatBalance;
     using namespace DataSurfaces;
     using namespace DataVectorTypes;
-    using General::RoundSigDigits;
 
     // Coefficients that modify the convection coeff based on surface roughness
     Array1D<Real64> const RoughnessMultiplier(6, {2.17, 1.67, 1.52, 1.13, 1.11, 1.0});
@@ -1254,10 +1253,14 @@ namespace ConvectionCoefficients {
                                 UserExtConvectionCoeffs(TotExtConvCoeff).WhichSurface = Found;
                                 if (Numbers(NumField) < LowHConvLimit || Numbers(NumField) > HighHConvLimit) {
                                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", out of range value");
-                                    ShowContinueError(state, cAlphaFieldNames(Ptr) + '=' + Alphas(Ptr) + ", " + cNumericFieldNames(NumField) + "=[" +
-                                                      RoundSigDigits(Numbers(NumField), 5) + "].");
-                                    ShowContinueError(state, "Out-of-range from low/high limits=[>=" + RoundSigDigits(LowHConvLimit, 9) +
-                                                      ", <=" + RoundSigDigits(HighHConvLimit, 1) + "].");
+                                    ShowContinueError(state,
+                                                      format("{}={}, {}=[{:.5R}].",
+                                                             cAlphaFieldNames(Ptr),
+                                                             Alphas(Ptr),
+                                                             cNumericFieldNames(NumField),
+                                                             Numbers(NumField)));
+                                    ShowContinueError(
+                                        state, format("Out-of-range from low/high limits=[>={:.9R}, <={:.1R}].", LowHConvLimit, HighHConvLimit));
                                     ShowContinueError(state, "Limits are set (or default) in HeatBalanceAlgorithm object.");
                                     ErrorsFound = true;
                                 }
@@ -1333,10 +1336,14 @@ namespace ConvectionCoefficients {
                                 UserIntConvectionCoeffs(TotIntConvCoeff).WhichSurface = Found;
                                 if (Numbers(NumField) < LowHConvLimit || Numbers(NumField) > HighHConvLimit) {
                                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", out of range value");
-                                    ShowContinueError(state, cAlphaFieldNames(Ptr) + '=' + Alphas(Ptr) + ", " + cNumericFieldNames(NumField) + "=[" +
-                                                      RoundSigDigits(Numbers(NumField), 5) + "].");
-                                    ShowContinueError(state, "Out-of-range from low/high limits=[>=" + RoundSigDigits(LowHConvLimit, 9) +
-                                                      ", <=" + RoundSigDigits(HighHConvLimit, 1) + "].");
+                                    ShowContinueError(state,
+                                                      format("{}={}, {}=[{:.5R}].",
+                                                             cAlphaFieldNames(Ptr),
+                                                             Alphas(Ptr),
+                                                             cNumericFieldNames(NumField),
+                                                             Numbers(NumField)));
+                                    ShowContinueError(
+                                        state, format("Out-of-range from low/high limits=[>={:.9R}, <={:.1R}].", LowHConvLimit, HighHConvLimit));
                                     ShowContinueError(state, "Limits are set (or default) in HeatBalanceAlgorithm object.");
                                     ErrorsFound = true;
                                 }
@@ -1465,10 +1472,14 @@ namespace ConvectionCoefficients {
                                 UserExtConvectionCoeffs(TotExtConvCoeff).WhichSurface = -999;
                                 if (Numbers(NumField) < LowHConvLimit || Numbers(NumField) > HighHConvLimit) {
                                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", out of range value");
-                                    ShowContinueError(state, cAlphaFieldNames(Ptr) + '=' + Alphas(Ptr) + ", " + cNumericFieldNames(NumField) + "=[" +
-                                                      RoundSigDigits(Numbers(NumField), 5) + "].");
-                                    ShowContinueError(state, "Out-of-range from low/high limits=[>=" + RoundSigDigits(LowHConvLimit, 9) +
-                                                      ", <=" + RoundSigDigits(HighHConvLimit, 1) + "].");
+                                    ShowContinueError(state,
+                                                      format("{}={}, {}=[{:.5R}].",
+                                                             cAlphaFieldNames(Ptr),
+                                                             Alphas(Ptr),
+                                                             cNumericFieldNames(NumField),
+                                                             Numbers(NumField)));
+                                    ShowContinueError(
+                                        state, format("Out-of-range from low/high limits=[>={:.9R}, <={:.1R}].", LowHConvLimit, HighHConvLimit));
                                     ShowContinueError(state, "Limits are set (or default) in HeatBalanceAlgorithm object.");
                                     ErrorsFound = true;
                                 }
@@ -1546,10 +1557,14 @@ namespace ConvectionCoefficients {
                                 UserIntConvectionCoeffs(TotIntConvCoeff).WhichSurface = -999;
                                 if (Numbers(NumField) < LowHConvLimit || Numbers(NumField) > HighHConvLimit) {
                                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", out of range value");
-                                    ShowContinueError(state, cAlphaFieldNames(Ptr) + '=' + Alphas(Ptr) + ", " + cNumericFieldNames(NumField) + "=[" +
-                                                      RoundSigDigits(Numbers(NumField), 5) + "].");
-                                    ShowContinueError(state, "Out-of-range from low/high limits=[>=" + RoundSigDigits(LowHConvLimit, 9) +
-                                                      ", <=" + RoundSigDigits(HighHConvLimit, 1) + "].");
+                                    ShowContinueError(state,
+                                                      format("{}={}, {}=[{:.5R}].",
+                                                             cAlphaFieldNames(Ptr),
+                                                             Alphas(Ptr),
+                                                             cNumericFieldNames(NumField),
+                                                             Numbers(NumField)));
+                                    ShowContinueError(
+                                        state, format("Out-of-range from low/high limits=[>={:.9R}, <={:.1R}].", LowHConvLimit, HighHConvLimit));
                                     ShowContinueError(state, "Limits are set (or default) in HeatBalanceAlgorithm object.");
                                     ErrorsFound = true;
                                 }
@@ -1637,8 +1652,8 @@ namespace ConvectionCoefficients {
             if (CheckScheduleValueMinMax(state, UserIntConvectionCoeffs(Loop).ScheduleIndex, ">=", LowHConvLimit, "<=", HighHConvLimit)) continue;
             ShowSevereError(state, RoutineName + "Surface=\"" + UserIntConvectionCoeffs(Loop).SurfaceName + "\", out-of-range convection coefficient:");
             ShowContinueError(state, "Out-of-range value found in schedule=" + UserIntConvectionCoeffs(Loop).ScheduleName);
-            ShowContinueError(state, "User supplied convection coefficients must be in range [>=" + RoundSigDigits(LowHConvLimit, 9) +
-                              ", <=" + RoundSigDigits(HighHConvLimit, 1) + ']');
+            ShowContinueError(state,
+                              format("User supplied convection coefficients must be in range [>={:.9R}, <={:.1R}]", LowHConvLimit, HighHConvLimit));
             ShowContinueError(state, "Limits are set (or default) in HeatBalanceAlgorithm object.");
             ErrorsFound = true;
         }
@@ -1649,8 +1664,8 @@ namespace ConvectionCoefficients {
             if (CheckScheduleValueMinMax(state, UserExtConvectionCoeffs(Loop).ScheduleIndex, ">=", LowHConvLimit, "<=", HighHConvLimit)) continue;
             ShowSevereError(state, RoutineName + "Surface=\"" + UserExtConvectionCoeffs(Loop).SurfaceName + "\", out-of-range convection coefficient:");
             ShowContinueError(state, "Out-of-range value found in schedule=" + UserExtConvectionCoeffs(Loop).ScheduleName);
-            ShowContinueError(state, "User supplied convection coefficients must be in range [>=" + RoundSigDigits(LowHConvLimit, 9) +
-                              ", <=" + RoundSigDigits(HighHConvLimit, 1) + ']');
+            ShowContinueError(state,
+                              format("User supplied convection coefficients must be in range [>={:.9R}, <={:.1R}]", LowHConvLimit, HighHConvLimit));
             ShowContinueError(state, "Limits are set (or default) in HeatBalanceAlgorithm object.");
             ErrorsFound = true;
         }
@@ -1677,7 +1692,7 @@ namespace ConvectionCoefficients {
                 }
             }
             if (Count > 0) {
-                ShowSevereMessage(state, RoutineName + RoundSigDigits(Count) + " surfaces had different outside convection algorithms specified when");
+                ShowSevereMessage(state, RoutineName + format("{} surfaces had different outside convection algorithms specified when", Count));
                 ShowContinueError(state,
                     "the Zone Outside Convection Algorithm specifies \"SimpleCombined\". SimpleCombined will be used for these surfaces.");
                 if (!state.dataGlobal->DisplayExtraWarnings) {
@@ -1839,7 +1854,6 @@ namespace ConvectionCoefficients {
         // type to that surface.
 
         // Using/Aliasing
-        using General::TrimSigDigits;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int SurfNum;
@@ -1886,10 +1900,10 @@ namespace ConvectionCoefficients {
                 }
                 if (!state.dataGlobal->DisplayExtraWarnings && (SurfaceCountOutside > 0 || SurfaceCountInside > 0)) {
                     if (SurfaceCountOutside > 0) {
-                        OverwriteMessage = TrimSigDigits(SurfaceCountOutside) + " Outside";
+                        OverwriteMessage = format("{} Outside", SurfaceCountOutside);
                     }
                     if (SurfaceCountInside > 0) {
-                        OverwriteMessage = TrimSigDigits(SurfaceCountInside) + " Inside";
+                        OverwriteMessage = format("{} Inside", SurfaceCountInside);
                     }
                     ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                      "\", not overwriting already assigned values for " + OverwriteMessage + " assignments.");
@@ -1931,10 +1945,10 @@ namespace ConvectionCoefficients {
                 }
                 if (!state.dataGlobal->DisplayExtraWarnings && (SurfaceCountOutside > 0 || SurfaceCountInside > 0)) {
                     if (SurfaceCountOutside > 0) {
-                        OverwriteMessage = TrimSigDigits(SurfaceCountOutside) + " Outside";
+                        OverwriteMessage = format("{} Outside", SurfaceCountOutside);
                     }
                     if (SurfaceCountInside > 0) {
-                        OverwriteMessage = TrimSigDigits(SurfaceCountInside) + " Inside";
+                        OverwriteMessage = format("{} Inside", SurfaceCountInside);
                     }
                     ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                      "\", not overwriting already assigned values for " + OverwriteMessage + " assignments.");
@@ -1976,10 +1990,10 @@ namespace ConvectionCoefficients {
                 }
                 if (!state.dataGlobal->DisplayExtraWarnings && (SurfaceCountOutside > 0 || SurfaceCountInside > 0)) {
                     if (SurfaceCountOutside > 0) {
-                        OverwriteMessage = TrimSigDigits(SurfaceCountOutside) + " Outside";
+                        OverwriteMessage = format("{} Outside", SurfaceCountOutside);
                     }
                     if (SurfaceCountInside > 0) {
-                        OverwriteMessage = TrimSigDigits(SurfaceCountInside) + " Inside";
+                        OverwriteMessage = format("{} Inside", SurfaceCountInside);
                     }
                     ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                      "\", not overwriting already assigned values for " + OverwriteMessage + " assignments.");
@@ -2021,10 +2035,10 @@ namespace ConvectionCoefficients {
                 }
                 if (!state.dataGlobal->DisplayExtraWarnings && (SurfaceCountOutside > 0 || SurfaceCountInside > 0)) {
                     if (SurfaceCountOutside > 0) {
-                        OverwriteMessage = TrimSigDigits(SurfaceCountOutside) + " Outside";
+                        OverwriteMessage = format("{} Outside", SurfaceCountOutside);
                     }
                     if (SurfaceCountInside > 0) {
-                        OverwriteMessage = TrimSigDigits(SurfaceCountInside) + " Inside";
+                        OverwriteMessage = format("{} Inside", SurfaceCountInside);
                     }
                     ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                      "\", not overwriting already assigned values for " + OverwriteMessage + " assignments.");
@@ -2066,10 +2080,10 @@ namespace ConvectionCoefficients {
                 }
                 if (!state.dataGlobal->DisplayExtraWarnings && (SurfaceCountOutside > 0 || SurfaceCountInside > 0)) {
                     if (SurfaceCountOutside > 0) {
-                        OverwriteMessage = TrimSigDigits(SurfaceCountOutside) + " Outside";
+                        OverwriteMessage = format("{} Outside", SurfaceCountOutside);
                     }
                     if (SurfaceCountInside > 0) {
-                        OverwriteMessage = TrimSigDigits(SurfaceCountInside) + " Inside";
+                        OverwriteMessage = format("{} Inside", SurfaceCountInside);
                     }
                     ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                      "\", not overwriting already assigned values for " + OverwriteMessage + " assignments.");
@@ -2110,10 +2124,10 @@ namespace ConvectionCoefficients {
                 }
                 if (!state.dataGlobal->DisplayExtraWarnings && (SurfaceCountOutside > 0 || SurfaceCountInside > 0)) {
                     if (SurfaceCountOutside > 0) {
-                        OverwriteMessage = TrimSigDigits(SurfaceCountOutside) + " Outside";
+                        OverwriteMessage = format("{} Outside", SurfaceCountOutside);
                     }
                     if (SurfaceCountInside > 0) {
-                        OverwriteMessage = TrimSigDigits(SurfaceCountInside) + " Inside";
+                        OverwriteMessage = format("{} Inside", SurfaceCountInside);
                     }
                     ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                      "\", not overwriting already assigned values for " + OverwriteMessage + " assignments.");
@@ -2155,10 +2169,10 @@ namespace ConvectionCoefficients {
                 }
                 if (!state.dataGlobal->DisplayExtraWarnings && (SurfaceCountOutside > 0 || SurfaceCountInside > 0)) {
                     if (SurfaceCountOutside > 0) {
-                        OverwriteMessage = TrimSigDigits(SurfaceCountOutside) + " Outside";
+                        OverwriteMessage = format("{} Outside", SurfaceCountOutside);
                     }
                     if (SurfaceCountInside > 0) {
-                        OverwriteMessage = TrimSigDigits(SurfaceCountInside) + " Inside";
+                        OverwriteMessage = format("{} Inside", SurfaceCountInside);
                     }
                     ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                      "\", not overwriting already assigned values for " + OverwriteMessage + " assignments.");
@@ -2200,10 +2214,10 @@ namespace ConvectionCoefficients {
                 }
                 if (!state.dataGlobal->DisplayExtraWarnings && (SurfaceCountOutside > 0 || SurfaceCountInside > 0)) {
                     if (SurfaceCountOutside > 0) {
-                        OverwriteMessage = TrimSigDigits(SurfaceCountOutside) + " Outside";
+                        OverwriteMessage = format("{} Outside", SurfaceCountOutside);
                     }
                     if (SurfaceCountInside > 0) {
-                        OverwriteMessage = TrimSigDigits(SurfaceCountInside) + " Inside";
+                        OverwriteMessage = format("{} Inside", SurfaceCountInside);
                     }
                     ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                      "\", not overwriting already assigned values for " + OverwriteMessage + " assignments.");
@@ -2245,10 +2259,10 @@ namespace ConvectionCoefficients {
                 }
                 if (!state.dataGlobal->DisplayExtraWarnings && (SurfaceCountOutside > 0 || SurfaceCountInside > 0)) {
                     if (SurfaceCountOutside > 0) {
-                        OverwriteMessage = TrimSigDigits(SurfaceCountOutside) + " Outside";
+                        OverwriteMessage = format("{} Outside", SurfaceCountOutside);
                     }
                     if (SurfaceCountInside > 0) {
-                        OverwriteMessage = TrimSigDigits(SurfaceCountInside) + " Inside";
+                        OverwriteMessage = format("{} Inside", SurfaceCountInside);
                     }
                     ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                      "\", not overwriting already assigned values for " + OverwriteMessage + " assignments.");
@@ -2290,10 +2304,10 @@ namespace ConvectionCoefficients {
                 }
                 if (!state.dataGlobal->DisplayExtraWarnings && (SurfaceCountOutside > 0 || SurfaceCountInside > 0)) {
                     if (SurfaceCountOutside > 0) {
-                        OverwriteMessage = TrimSigDigits(SurfaceCountOutside) + " Outside";
+                        OverwriteMessage = format("{} Outside", SurfaceCountOutside);
                     }
                     if (SurfaceCountInside > 0) {
-                        OverwriteMessage = TrimSigDigits(SurfaceCountInside) + " Inside";
+                        OverwriteMessage = format("{} Inside", SurfaceCountInside);
                     }
                     ShowWarningError(state, "User Supplied Convection Coefficients, Multiple Surface Assignments=\"" + SurfaceTypes +
                                      "\", not overwriting already assigned values for " + OverwriteMessage + " assignments.");
@@ -3237,7 +3251,7 @@ namespace ConvectionCoefficients {
         using Psychrometrics::PsyRhoAirFnPbTdbW;
 
         // Locals
-        Real64 const OneThird((1.0 / 3.0)); // 1/3 in highest precision
+        static constexpr Real64 OneThird((1.0 / 3.0)); // 1/3 in highest precision
         static Real64 const pow_5_25(0.56 * root_4(1.0E+5));
         static Real64 const pow_11_25(0.56 * root_4(1.0E+11));
         static Real64 const pow_11_2(0.58 * std::pow(1.0E+11, 0.2));
@@ -3378,7 +3392,7 @@ namespace ConvectionCoefficients {
         // for adaptive convection algorithm
 
         // Using/Aliasing
-        using General::RoundSigDigits;
+
         using General::ScanForReports;
         using Vectors::CreateNewellAreaVector;
         using Vectors::CreateNewellSurfaceNormalVector;
@@ -4219,7 +4233,6 @@ namespace ConvectionCoefficients {
         //  - then calls a routine with a large case statement that calls model equations.
 
         // USE STATEMENTS:
-        using General::TrimSigDigits;
 
         // this next call sets up the flow regime and assigns a classification to surface
         //  TODO: candidate for rework to do zone level calcs once rather than for each surface
@@ -4232,7 +4245,7 @@ namespace ConvectionCoefficients {
         // if ( std::isnan( HConvIn( SurfNum ) ) ) { // Use IEEE_IS_NAN when GFortran supports it
         //// throw Error
         // ShowSevereError(state,  "Inside convection coefficient is out of bound = " + Surface( SurfNum ).Name );
-        // ShowFatalError( "Inside convection coefficient model number = " + TrimSigDigits( Surface( SurfNum ).IntConvHcModelEq ) );
+        // ShowFatalError(state,  "Inside convection coefficient model number = " + TrimSigDigits( Surface( SurfNum ).IntConvHcModelEq ) );
         //}
     }
 
@@ -4973,7 +4986,6 @@ namespace ConvectionCoefficients {
         //       RE-ENGINEERED  na
 
         // Using/Aliasing
-        using General::RoundSigDigits;
 
         {
             auto const SELECT_CASE_var(Surface(SurfNum).OutConvClassification);
@@ -5016,8 +5028,9 @@ namespace ConvectionCoefficients {
                     Surface(SurfNum).OutConvHfUserCurveIndex = state.dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.HNatUstableHorizUserCurveNum;
                 }
             } else {
-                ShowSevereError(state, "MapExtConvClassificationToHcModels: caught unknown outdoor surfce classification:" +
-                                RoundSigDigits(Surface(SurfNum).OutConvClassification));
+                ShowSevereError(state,
+                                format("MapExtConvClassificationToHcModels: caught unknown outdoor surfce classification:{}",
+                                       Surface(SurfNum).OutConvClassification));
             }
         }
     }
@@ -7420,7 +7433,7 @@ namespace ConvectionCoefficients {
                     if (state.dataConvectionCoefficient->CalcGoldsteinNovoselacCeilingDiffuserWindowErrorIDX1 == 0) {
                         ShowSevereMessage(state,
                             "CalcGoldsteinNovoselacCeilingDiffuserWindow: Convection model not evaluated (bad relative window location)");
-                        ShowContinueError(state, "Value for window location = " + RoundSigDigits(WindowLocationType));
+                        ShowContinueError(state, format("Value for window location = {}", WindowLocationType));
                         ShowContinueError(state, "Occurs for zone named = " + Zone(ZoneNum).Name);
                         ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
                     }
@@ -7433,7 +7446,7 @@ namespace ConvectionCoefficients {
             if (state.dataConvectionCoefficient->CalcGoldsteinNovoselacCeilingDiffuserWindowErrorIDX2 == 0) {
                 ShowSevereMessage(state,
                     "CalcGoldsteinNovoselacCeilingDiffuserWindow: Convection model not evaluated (zero zone exterior perimeter length)");
-                ShowContinueError(state, "Value for zone exterior perimeter length = " + RoundSigDigits(ZoneExtPerimLength, 5));
+                ShowContinueError(state, format("Value for zone exterior perimeter length = {:.5R}", ZoneExtPerimLength));
                 ShowContinueError(state, "Occurs for zone named = " + Zone(ZoneNum).Name);
                 ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
             }
@@ -7495,7 +7508,7 @@ namespace ConvectionCoefficients {
                 WindowLocationType != InConvWinLoc_NotSet) {
                 if (state.dataConvectionCoefficient->CalcGoldsteinNovoselacCeilingDiffuserWallErrorIDX1 == 0) {
                     ShowSevereMessage(state, "CalcGoldsteinNovoselacCeilingDiffuserWall: Convection model not evaluated (bad relative window location)");
-                    ShowContinueError(state, "Value for window location = " + RoundSigDigits(WindowLocationType));
+                    ShowContinueError(state, format("Value for window location = {}", WindowLocationType));
                     ShowContinueError(state, "Occurs for zone named = " + Zone(ZoneNum).Name);
                     ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
                 }
@@ -7506,7 +7519,7 @@ namespace ConvectionCoefficients {
         } else {
             if (state.dataConvectionCoefficient->CalcGoldsteinNovoselacCeilingDiffuserWallErrorIDX2 == 0) {
                 ShowSevereMessage(state, "CalcGoldsteinNovoselacCeilingDiffuserWall: Convection model not evaluated (zero zone exterior perimeter length)");
-                ShowContinueError(state, "Value for zone exterior perimeter length = " + RoundSigDigits(ZoneExtPerimLength, 5));
+                ShowContinueError(state, format("Value for zone exterior perimeter length = {:.5R}", ZoneExtPerimLength));
                 ShowContinueError(state, "Occurs for zone named = " + Zone(ZoneNum).Name);
                 ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
             }
@@ -7557,7 +7570,7 @@ namespace ConvectionCoefficients {
         if (ZoneExtPerimLength <= 0.0) {
             if (state.dataConvectionCoefficient->CalcGoldsteinNovoselacCeilingDiffuserFloorErrorIDX == 0) {
                 ShowSevereMessage(state, "CalcGoldsteinNovoselacCeilingDiffuserFloor: Convection model not evaluated (zero zone exterior perimeter length)");
-                ShowContinueError(state, "Value for zone exterior perimeter length = " + RoundSigDigits(ZoneExtPerimLength, 5));
+                ShowContinueError(state, format("Value for zone exterior perimeter length = {:.5R}", ZoneExtPerimLength));
                 ShowContinueError(state, "Occurs for zone named = " + Zone(ZoneNum).Name);
                 ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
             }
@@ -7635,7 +7648,7 @@ namespace ConvectionCoefficients {
         } else {
             if (state.dataConvectionCoefficient->CalcSparrowWindwardErrorIDX == 0) {
                 ShowSevereMessage(state, "CalcSparrowWindward: Convection model not evaluated (bad face area)");
-                ShowContinueError(state, "Value for effective face area = " + RoundSigDigits(FaceArea, 5));
+                ShowContinueError(state, format("Value for effective face area = {:.5R}", FaceArea));
                 ShowContinueError(state, "Occurs for surface named = " + Surface(SurfNum).Name);
                 ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
             }
@@ -7652,7 +7665,7 @@ namespace ConvectionCoefficients {
         } else {
             if (state.dataConvectionCoefficient->CalcSparrowLeewardErrorIDX == 0) {
                 ShowSevereMessage(state, "CalcSparrowLeeward: Convection model not evaluated (bad face area)");
-                ShowContinueError(state, "Value for effective face area = " + RoundSigDigits(FaceArea, 5));
+                ShowContinueError(state, format("Value for effective face area = {:.5R}", FaceArea));
                 ShowContinueError(state, "Occurs for surface named = " + Surface(SurfNum).Name);
                 ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
             }
@@ -7883,7 +7896,7 @@ namespace ConvectionCoefficients {
         } else {
             if (state.dataConvectionCoefficient->CalcMitchellErrorIDX == 0) {
                 ShowSevereMessage(state, "CalcMitchell: Convection model not evaluated (bad length scale)");
-                ShowContinueError(state, "Value for effective length scale = " + RoundSigDigits(LengthScale, 5));
+                ShowContinueError(state, format("Value for effective length scale = {:.5R}", LengthScale));
                 ShowContinueError(state, "Occurs for surface named = " + Surface(SurfNum).Name);
                 ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
             }
@@ -7987,7 +8000,7 @@ namespace ConvectionCoefficients {
         } else {
             if (state.dataConvectionCoefficient->CalcEmmelVerticalErrorIDX == 0) {
                 ShowSevereMessage(state, "CalcEmmelVertical: Convection model wind angle calculation suspect (developer issue)");
-                ShowContinueError(state, "Value for theta angle = " + RoundSigDigits(Theta, 5));
+                ShowContinueError(state, format("Value for theta angle = {:.5R}", Theta));
                 ShowContinueError(state, "Occurs for surface named = " + Surface(SurfNum).Name);
                 ShowContinueError(state, "Convection model uses high theta correlation and the simulation continues");
             }
@@ -8045,7 +8058,7 @@ namespace ConvectionCoefficients {
         } else {
             if (state.dataConvectionCoefficient->CalcEmmelRoofErrorIDX == 0) {
                 ShowSevereMessage(state, "CalcEmmelRoof: Convection model wind angle calculation suspect (developer issue)");
-                ShowContinueError(state, "Value for theta angle = " + RoundSigDigits(Theta, 5));
+                ShowContinueError(state, format("Value for theta angle = {:.5R}", Theta));
                 ShowContinueError(state, "Occurs for surface named = " + Surface(SurfNum).Name);
                 ShowContinueError(state, "Convection model uses high theta correlation and the simulation continues");
             }
@@ -8137,7 +8150,7 @@ namespace ConvectionCoefficients {
         } else {
             if (state.dataConvectionCoefficient->CalcClearRoofErrorIDX == 0) {
                 ShowSevereMessage(state, "CalcClearRoof: Convection model not evaluated (bad value for distance to roof edge)");
-                ShowContinueError(state, "Value for distance to roof edge =" + RoundSigDigits(x, 3));
+                ShowContinueError(state, format("Value for distance to roof edge ={:.3R}", x));
                 ShowContinueError(state, "Occurs for surface named = " + Surface(SurfNum).Name);
                 ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
             }

@@ -370,7 +370,6 @@ namespace DataEnvironment {
         // 1976 U.S. Standard Atmosphere. 1976. U.S. Government Printing Office, Washington, D.C.
 
         // Using/Aliasing
-        using General::RoundSigDigits;
 
         // Return value
         Real64 LocalOutDryBulbTemp; // Return result for function (C)
@@ -393,7 +392,7 @@ namespace DataEnvironment {
 
         if (LocalOutDryBulbTemp < -100.0) {
             ShowSevereError(state, "OutDryBulbTempAt: outdoor drybulb temperature < -100 C");
-            ShowContinueError(state, "...check heights, this height=[" + RoundSigDigits(Z, 0) + "].");
+            ShowContinueError(state, format("...check heights, this height=[{:.0R}].", Z));
             ShowFatalError(state, "Program terminates due to preceding condition(s).");
         }
 
@@ -419,7 +418,6 @@ namespace DataEnvironment {
         // 1976 U.S. Standard Atmosphere. 1976. U.S. Government Printing Office, Washington, D.C.
 
         // Using/Aliasing
-        using General::RoundSigDigits;
 
         // Return value
         Real64 LocalOutWetBulbTemp; // Return result for function (C)
@@ -442,7 +440,7 @@ namespace DataEnvironment {
 
         if (LocalOutWetBulbTemp < -100.0) {
             ShowSevereError(state, "OutWetBulbTempAt: outdoor wetbulb temperature < -100 C");
-            ShowContinueError(state, "...check heights, this height=[" + RoundSigDigits(Z, 0) + "].");
+            ShowContinueError(state, format("...check heights, this height=[{:.0R}].", Z));
             ShowFatalError(state, "Program terminates due to preceding condition(s).");
         }
 
@@ -469,7 +467,6 @@ namespace DataEnvironment {
         // 1976 U.S. Standard Atmosphere. 1976. U.S. Government Printing Office, Washington, D.C.
 
         // Using/Aliasing
-        using General::RoundSigDigits;
 
         // Return value
         Real64 LocalOutDewPointTemp; // Return result for function (C)
@@ -492,7 +489,7 @@ namespace DataEnvironment {
 
         if (LocalOutDewPointTemp < -100.0) {
             ShowSevereError(state, "OutDewPointTempAt: outdoor dewpoint temperature < -100 C");
-            ShowContinueError(state, "...check heights, this height=[" + RoundSigDigits(Z, 0) + "].");
+            ShowContinueError(state, format("...check heights, this height=[{:.0R}].", Z));
             ShowFatalError(state, "Program terminates due to preceding condition(s).");
         }
 
@@ -589,10 +586,9 @@ namespace DataEnvironment {
     void SetOutBulbTempAt_error(EnergyPlusData &state, std::string const &Settings, Real64 const max_height, std::string const &SettingsName)
     {
         // Using/Aliasing
-        using General::RoundSigDigits;
 
         ShowSevereError(state, "SetOutBulbTempAt: " + Settings + " Outdoor Temperatures < -100 C");
-        ShowContinueError(state, "...check " + Settings + " Heights - Maximum " + Settings + " Height=[" + RoundSigDigits(max_height, 0) + "].");
+        ShowContinueError(state, format("...check {} Heights - Maximum {} Height=[{:.0R}].", Settings, Settings, max_height));
         if (max_height >= 20000.0) {
             ShowContinueError(state, "...according to your maximum Z height, your building is somewhere in the Stratosphere.");
             ShowContinueError(state, "...look at " + Settings + " Name= " + SettingsName);

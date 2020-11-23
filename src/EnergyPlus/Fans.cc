@@ -57,7 +57,6 @@
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -188,7 +187,6 @@ namespace Fans {
         // This subroutine manages Fan component simulation.
 
         // Using/Aliasing
-        using General::TrimSigDigits;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int FanNum; // current fan number
@@ -210,13 +208,19 @@ namespace Fans {
         } else {
             FanNum = CompIndex;
             if (FanNum > state.dataFans->NumFans || FanNum < 1) {
-                ShowFatalError(state, "SimulateFanComponents: Invalid CompIndex passed=" + TrimSigDigits(FanNum) +
-                               ", Number of Fans=" + TrimSigDigits(state.dataFans->NumFans) + ", Fan name=" + CompName);
+                ShowFatalError(state,
+                               format("SimulateFanComponents: Invalid CompIndex passed={}, Number of Fans={}, Fan name={}",
+                                      FanNum,
+                                      state.dataFans->NumFans,
+                                      CompName));
             }
             if (CheckEquipName(FanNum)) {
                 if (!CompName.empty() && CompName != Fan(FanNum).FanName) {
-                    ShowFatalError(state, "SimulateFanComponents: Invalid CompIndex passed=" + TrimSigDigits(FanNum) + ", Fan name=" + CompName +
-                                   ", stored Fan Name for that index=" + Fan(FanNum).FanName);
+                    ShowFatalError(state,
+                                   format("SimulateFanComponents: Invalid CompIndex passed={}, Fan name={}, stored Fan Name for that index={}",
+                                          FanNum,
+                                          CompName,
+                                          Fan(FanNum).FanName));
                 }
                 CheckEquipName(FanNum) = false;
             }
@@ -1186,7 +1190,6 @@ namespace Fans {
         using namespace OutputReportPredefined;
         using CurveManager::CurveValue;
         using CurveManager::GetCurveIndex;
-        using General::RoundSigDigits;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1319,7 +1322,7 @@ namespace Fans {
             if (MotorSpeed > (Fan(FanNum).MotorMaxSpd + 1.e-5)) {
                 ShowWarningError(state, "Drive ratio for " + Fan(FanNum).FanType + ": " + Fan(FanNum).FanName +
                                  " is too low at design conditions -- check motor speed and drive ratio inputs");
-                ShowContinueError(state, "...Design fan speed [rev/min]: " + RoundSigDigits(Fan(FanNum).FanSpd, 2));
+                ShowContinueError(state, format("...Design fan speed [rev/min]: {:.2R}", Fan(FanNum).FanSpd));
             }
 
             Fan(FanNum).FanTrq = Fan(FanNum).FanShaftPower / FanSpdRadS; //[N-m]
@@ -1335,7 +1338,7 @@ namespace Fans {
             if (Fan(FanNum).FanTrq > (Fan(FanNum).BeltMaxTorque + 1.e-5)) {
                 ShowWarningError(state, "Belt for " + Fan(FanNum).FanType + ": " + Fan(FanNum).FanName +
                                  " is undersized at design conditions -- check belt inputs");
-                ShowContinueError(state, "...Design belt output torque (without oversizing) [Nm]: " + RoundSigDigits(Fan(FanNum).FanTrq, 2));
+                ShowContinueError(state, format("...Design belt output torque (without oversizing) [Nm]: {:.2R}", Fan(FanNum).FanTrq));
             }
 
             // Calculate belt max efficiency using correlations and coefficients based on AMCA data
@@ -1377,7 +1380,7 @@ namespace Fans {
             if (Fan(FanNum).BeltInputPower > (Fan(FanNum).MotorMaxOutPwr + 1.e-5)) {
                 ShowWarningError(state, "Motor for " + Fan(FanNum).FanType + ": " + Fan(FanNum).FanName +
                                  " is undersized at design conditions -- check motor inputs");
-                ShowContinueError(state, "...Design motor output power (without oversizing) [W]: " + RoundSigDigits(Fan(FanNum).BeltInputPower, 2));
+                ShowContinueError(state, format("...Design motor output power (without oversizing) [W]: {:.2R}", Fan(FanNum).BeltInputPower));
             }
 
             // Calculate motor max efficiency using correlations and coefficients based on MotorMaster+ data
@@ -1418,7 +1421,7 @@ namespace Fans {
                     if (Fan(FanNum).MotorInputPower > (Fan(FanNum).VFDMaxOutPwr + 1.e-5)) {
                         ShowWarningError(state, "VFD for " + Fan(FanNum).FanType + ": " + Fan(FanNum).FanName +
                                          " is undersized at design conditions -- check VFD inputs");
-                        ShowContinueError(state, "...Design VFD output power (without oversizing) [W]: " + RoundSigDigits(Fan(FanNum).MotorInputPower, 2));
+                        ShowContinueError(state, format("...Design VFD output power (without oversizing) [W]: {:.2R}", Fan(FanNum).MotorInputPower));
                     }
 
                     VFDOutPwrRatio = Fan(FanNum).MotorInputPower / Fan(FanNum).VFDMaxOutPwr;       //[-]
@@ -1902,7 +1905,6 @@ namespace Fans {
 
         // Using/Aliasing
         using CurveManager::CurveValue;
-        using General::TrimSigDigits;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2015,8 +2017,7 @@ namespace Fans {
                         if (Fan(FanNum).OneTimePowerRatioCheck && !state.dataGlobal->WarmupFlag) {
                             ShowSevereError(state, cFanTypes(Fan(FanNum).FanType_Num) + " = " + Fan(FanNum).FanName + "\"");
                             ShowContinueError(state, "Error in Fan Power Ratio curve. Curve output less than 0.0.");
-                            ShowContinueError(state, "Curve output = " + TrimSigDigits(SpeedRaisedToPower, 5) +
-                                              ", fan speed ratio = " + TrimSigDigits(SpeedRatio, 5));
+                            ShowContinueError(state, format("Curve output = {:.5T}, fan speed ratio = {:.5T}", SpeedRaisedToPower, SpeedRatio));
                             ShowContinueError(state, "Check curve coefficients to ensure proper power ratio as a function of fan speed ratio.");
                             ShowContinueError(state, "Resetting Fan Power Ratio curve output to 0.0 and the simulation continues.");
                             ShowContinueErrorTimeStamp(state, "Occurrence info:");
@@ -2030,8 +2031,7 @@ namespace Fans {
                             if (Fan(FanNum).OneTimeEffRatioCheck && !state.dataGlobal->WarmupFlag) {
                                 ShowSevereError(state, cFanTypes(Fan(FanNum).FanType_Num) + " = " + Fan(FanNum).FanName + "\"");
                                 ShowContinueError(state, "Error in Fan Efficiency Ratio curve. Curve output less than 0.01.");
-                                ShowContinueError(state, "Curve output = " + TrimSigDigits(EffRatioAtSpeedRatio, 5) +
-                                                  ", fan speed ratio = " + TrimSigDigits(SpeedRatio, 5));
+                                ShowContinueError(state, format("Curve output = {:.5T}, fan speed ratio = {:.5T}", EffRatioAtSpeedRatio, SpeedRatio));
                                 ShowContinueError(state, "Check curve coefficients to ensure proper efficiency ratio as a function of fan speed ratio.");
                                 ShowContinueError(state, "Resetting Fan Efficiency Ratio curve output to 0.01 and the simulation continues.");
                                 ShowContinueErrorTimeStamp(state, "Occurrence info:");
@@ -2236,7 +2236,6 @@ namespace Fans {
         using DataEnvironment::CurMnDy;
         using DataEnvironment::EnvironmentName;
         using General::CreateSysTimeIntervalString;
-        using General::RoundSigDigits;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3064,7 +3063,6 @@ namespace Fans {
         // na
 
         // Using/Aliasing
-        using General::TrimSigDigits;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
