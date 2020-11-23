@@ -15566,13 +15566,13 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_CheckBadInputOutputNodes)
     bool zoneEquipment = true;
     UnitarySys mySys;
     mySys.Name = "Bath_ZN_1_FLR_1 ZN-PTAC Unitary";
-    state.dataUnitarySystems->unitarySys.push_back(mySys);
+    state->dataUnitarySystems->unitarySys.push_back(mySys);
     DataZoneEquipment::ZoneEquipInputsFilled = true;
-    state.dataGlobal->NumOfZones = 1;
+    state->dataGlobal->NumOfZones = 1;
     DataZoneEquipment::ZoneEquipConfig.allocate(1);
     DataZoneEquipment::ZoneEquipConfig(1).NumExhaustNodes = 1;
     DataZoneEquipment::ZoneEquipConfig(1).ExhaustNode.allocate(1);
-    mySys.getUnitarySystemInputData(state, compName, zoneEquipment, 0, ErrorsFound);
+    mySys.getUnitarySystemInputData(*state, compName, zoneEquipment, 0, ErrorsFound);
     ASSERT_EQ(ErrorsFound, true);
 }
 
