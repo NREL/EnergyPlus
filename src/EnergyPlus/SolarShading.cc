@@ -55,7 +55,6 @@
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/Vector3.hh>
 #include <ObjexxFCL/member.functions.hh>
-#include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/CommandLineInterface.hh>
@@ -368,7 +367,7 @@ namespace SolarShading {
         // This subroutine gets the Shadowing Calculation object.
 
         // Using/Aliasing
-        using General::RoundSigDigits;
+
         using namespace DataIPShortCuts;
         using DataSystemVariables::DetailedSkyDiffuseAlgorithm;
         using DataSystemVariables::DetailedSolarTimestepIntegration;
@@ -422,7 +421,7 @@ namespace SolarShading {
         }
         if (state.dataSolarShading->ShadowingCalcFrequency > 31) {
             ShowWarningError(state, cCurrentModuleObject + ": suspect " + cNumericFieldNames(1));
-            ShowContinueError(state, "Value entered=[" + RoundSigDigits(rNumericArgs(1), 0) + "], Shadowing Calculations will be inaccurate.");
+            ShowContinueError(state, format("Value entered=[{:.0R}], Shadowing Calculations will be inaccurate.", rNumericArgs(1)));
         }
 
         if (rNumericArgs(2) > 199.0) {
@@ -756,8 +755,6 @@ namespace SolarShading {
 
         // METHODOLOGY EMPLOYED:
         // Allocation is dependent on the user input file.
-
-        using General::RoundSigDigits;
 
         int SurfLoop;
         int I;
@@ -1186,7 +1183,8 @@ namespace SolarShading {
                     }
                     for (I = 1; I <= NumOfLayers; ++I) {
                         if (state.dataConstruction->Construct(Surface(SurfLoop).Construction).WindowTypeBSDF) {
-                            SetupOutputVariable(state, "Surface Window Total Absorbed Shortwave Radiation Rate Layer " + RoundSigDigits(I) + "",
+                            SetupOutputVariable(state,
+                                                format("Surface Window Total Absorbed Shortwave Radiation Rate Layer {}", I),
                                                 OutputProcessor::Unit::W,
                                                 SurfWinQRadSWwinAbsLayer(I, SurfLoop),
                                                 "Zone",
@@ -1194,7 +1192,8 @@ namespace SolarShading {
                                                 Surface(SurfLoop).Name);
                         }
                         if (state.dataConstruction->Construct(Surface(SurfLoop).Construction).WindowTypeBSDF || (I == 1)) {
-                            SetupOutputVariable(state, "Surface Window Front Face Temperature Layer " + RoundSigDigits(I) + "",
+                            SetupOutputVariable(state,
+                                                format("Surface Window Front Face Temperature Layer {}", I),
                                                 OutputProcessor::Unit::C,
                                                 SurfWinFenLaySurfTempFront(I, SurfLoop),
                                                 "Zone",
@@ -1202,7 +1201,8 @@ namespace SolarShading {
                                                 Surface(SurfLoop).Name);
                         }
                         if (state.dataConstruction->Construct(Surface(SurfLoop).Construction).WindowTypeBSDF || (I == NumOfLayers)) {
-                            SetupOutputVariable(state, "Surface Window Back Face Temperature Layer " + RoundSigDigits(I) + "",
+                            SetupOutputVariable(state,
+                                                format("Surface Window Back Face Temperature Layer {}", I),
                                                 OutputProcessor::Unit::C,
                                                 SurfWinFenLaySurfTempBack(I, SurfLoop),
                                                 "Zone",
@@ -2253,7 +2253,6 @@ namespace SolarShading {
 
         // Using/Aliasing
         using DataSystemVariables::DetailedSkyDiffuseAlgorithm;
-        using General::TrimSigDigits;
 
         // Locals
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -2330,7 +2329,7 @@ namespace SolarShading {
                     ShowSevereError(state, "Cosine of incident angle of beam solar on surface out of range...too high");
                     ShowContinueError(state, "This is a diagnostic error that should not be encountered under normal circumstances");
                     ShowContinueError(state, "Occurs on surface: " + Surface(SurfNum).Name);
-                    ShowContinueError(state, "Current value = " + TrimSigDigits(CosIncAngBeamOnSurface) + " ... should be within [-1, +1]");
+                    ShowContinueError(state, format("Current value = {} ... should be within [-1, +1]", CosIncAngBeamOnSurface));
                     ShowFatalError(state, "Anisotropic solar calculation causes fatal error");
                 }
                 CosIncAngBeamOnSurface = 1.0;
@@ -2339,7 +2338,7 @@ namespace SolarShading {
                     ShowSevereError(state, "Cosine of incident angle of beam solar on surface out of range...too low");
                     ShowContinueError(state, "This is a diagnostic error that should not be encountered under normal circumstances");
                     ShowContinueError(state, "Occurs on surface: " + Surface(SurfNum).Name);
-                    ShowContinueError(state, "Current value = " + TrimSigDigits(CosIncAngBeamOnSurface) + " ... should be within [-1, +1]");
+                    ShowContinueError(state, format("Current value = {} ... should be within [-1, +1]", CosIncAngBeamOnSurface));
                     ShowFatalError(state, "Anisotropic solar calculation causes fatal error");
                 }
                 CosIncAngBeamOnSurface = -1.0;
@@ -2427,8 +2426,12 @@ namespace SolarShading {
             if (DOTP > 0.0009) {
                 ShowSevereError(state, "Problem in interior solar distribution calculation (CHKBKS)");
                 ShowContinueError(state, "   Solar Distribution = FullInteriorExterior will not work in Zone=" + Surface(NRS).ZoneName);
-                ShowContinueError(state, "   because one or more of vertices, such as Vertex " + std::to_string(N) + " of back surface=" + Surface(NBS).Name +
-                                  ", is in front of receiving surface=" + Surface(NRS).Name);
+                ShowContinueError(
+                    state,
+                    format("   because one or more of vertices, such as Vertex {} of back surface={}, is in front of receiving surface={}",
+                           N,
+                           Surface(NBS).Name,
+                           Surface(NRS).Name));
                 ShowContinueError(state, format("   (Dot Product indicator={:20.4F})", DOTP));
                 ShowContinueError(state, "   Check surface geometry; if OK, use Solar Distribution = FullExterior instead. Use Output:Diagnostics, DisplayExtraWarnings; for more details.");
                 if (!state.dataGlobal->DisplayExtraWarnings) break;
@@ -2898,7 +2901,6 @@ namespace SolarShading {
         // REFERENCES:
         // BLAST/IBLAST code, original author George Walton
 
-        using General::RoundSigDigits;
         using namespace DataWindowEquivalentLayer;
 
         Real64 AreaSum;       // Intermediate calculation value
@@ -2930,7 +2932,7 @@ namespace SolarShading {
                 thisEnclosure.FloorArea = HorizAreaSum;
                 ShowWarningError(state, "ComputeIntSolarAbsorpFactors: Solar distribution model is set to place solar gains on the zone floor,");
                 ShowContinueError(state, "...Enclosure=\"" + thisEnclosure.Name + "\" has no floor, but has approximate horizontal surfaces.");
-                ShowContinueError(state, "...these Tilt > 120 degrees, (area=[" + RoundSigDigits(HorizAreaSum, 2) + "] m2) will be used.");
+                ShowContinueError(state, format("...these Tilt > 120 degrees, (area=[{:.2R}] m2) will be used.", HorizAreaSum));
             }
 
             // Compute ISABSF
@@ -3208,14 +3210,13 @@ namespace SolarShading {
         // 'CRC Math Tables', 22 ED, 'Analytic Geometry', P.369
 
         // Using/Aliasing
-        using General::TrimSigDigits;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
         //                1 - Compute H.C. of vertices & sides
 
         if (NS > 2 * state.dataSolarShading->MaxHCS) {
-            ShowFatalError(state, "Solar Shading: HTrans: Too many Figures (>" + TrimSigDigits(state.dataSolarShading->MaxHCS) + ')');
+            ShowFatalError(state, format("Solar Shading: HTrans: Too many Figures (>{})", state.dataSolarShading->MaxHCS));
         }
 
         state.dataSolarShading->HCNV(NS) = NumVertices;
@@ -3273,12 +3274,11 @@ namespace SolarShading {
     )
     {
         // Using/Aliasing
-        using General::TrimSigDigits;
 
         // Locals
 
         if (NS > 2 * state.dataSolarShading->MaxHCS) {
-            ShowFatalError(state, "Solar Shading: HTrans0: Too many Figures (>" + TrimSigDigits(state.dataSolarShading->MaxHCS) + ')');
+            ShowFatalError(state, format("Solar Shading: HTrans0: Too many Figures (>{})", state.dataSolarShading->MaxHCS));
         }
 
         state.dataSolarShading->HCNV(NS) = NumVertices;
@@ -3319,10 +3319,9 @@ namespace SolarShading {
     )
     {
         // Using/Aliasing
-        using General::TrimSigDigits;
 
         if (NS > 2 * state.dataSolarShading->MaxHCS) {
-            ShowFatalError(state, "Solar Shading: HTrans1: Too many Figures (>" + TrimSigDigits(state.dataSolarShading->MaxHCS) + ')');
+            ShowFatalError(state, format("Solar Shading: HTrans1: Too many Figures (>{})", state.dataSolarShading->MaxHCS));
         }
 
         state.dataSolarShading->HCNV(NS) = NumVertices;
@@ -4343,7 +4342,6 @@ namespace SolarShading {
 
         // Using/Aliasing
         using DataSystemVariables::SutherlandHodgman;
-        using General::RoundSigDigits;
 
         int N;    // Loop index
         int NV1;  // Number of vertices of figure NS1
@@ -4362,8 +4360,10 @@ namespace SolarShading {
             state.dataSolarShading->OverlapStatus = state.dataSolarShading->TooManyFigures;
 
             if (!state.dataSolarShading->TooManyFiguresMessage && !state.dataGlobal->DisplayExtraWarnings) {
-                ShowWarningError(state, "DeterminePolygonOverlap: Too many figures [>" + RoundSigDigits(state.dataSolarShading->MaxHCS) +
-                                 "]  detected in an overlap calculation. Use Output:Diagnostics,DisplayExtraWarnings; for more details.");
+                ShowWarningError(state,
+                                 format("DeterminePolygonOverlap: Too many figures [>{}]  detected in an overlap calculation. Use "
+                                        "Output:Diagnostics,DisplayExtraWarnings; for more details.",
+                                        state.dataSolarShading->MaxHCS));
                 state.dataSolarShading->TooManyFiguresMessage = true;
             }
 
@@ -4448,8 +4448,10 @@ namespace SolarShading {
             state.dataSolarShading->OverlapStatus = state.dataSolarShading->TooManyVertices;
 
             if (!state.dataSolarShading->TooManyVerticesMessage && !state.dataGlobal->DisplayExtraWarnings) {
-                ShowWarningError(state, "DeterminePolygonOverlap: Too many vertices [>" + RoundSigDigits(state.dataSolarShading->MaxHCV) +
-                                 "] detected in an overlap calculation. Use Output:Diagnostics,DisplayExtraWarnings; for more details.");
+                ShowWarningError(state,
+                                 format("DeterminePolygonOverlap: Too many vertices [>{}] detected in an overlap calculation. Use "
+                                        "Output:Diagnostics,DisplayExtraWarnings; for more details.",
+                                        state.dataSolarShading->MaxHCV));
                 state.dataSolarShading->TooManyVerticesMessage = true;
             }
 
@@ -4464,8 +4466,10 @@ namespace SolarShading {
             state.dataSolarShading->OverlapStatus = state.dataSolarShading->TooManyFigures;
 
             if (!state.dataSolarShading->TooManyFiguresMessage && !state.dataGlobal->DisplayExtraWarnings) {
-                ShowWarningError(state, "DeterminePolygonOverlap: Too many figures [>" + RoundSigDigits(state.dataSolarShading->MaxHCS) +
-                                 "]  detected in an overlap calculation. Use Output:Diagnostics,DisplayExtraWarnings; for more details.");
+                ShowWarningError(state,
+                                 format("DeterminePolygonOverlap: Too many figures [>{}]  detected in an overlap calculation. Use "
+                                        "Output:Diagnostics,DisplayExtraWarnings; for more details.",
+                                        state.dataSolarShading->MaxHCS));
                 state.dataSolarShading->TooManyFiguresMessage = true;
             }
 
@@ -4805,7 +4809,6 @@ namespace SolarShading {
 
         // Using/Aliasing
         using namespace DataErrorTracking;
-        using General::TrimSigDigits;
 
         Array1D_int GSS;             // List of shadowing surfaces numbers for a receiving surface
         Array1D_int BKS;             // List of back surface numbers for a receiving surface
@@ -5192,16 +5195,18 @@ namespace SolarShading {
             }
 
             if (TotalReceivingNonConvexSurfaces > 0) {
-                ShowWarningMessage(state, "DetermineShadowingCombinations: There are " + TrimSigDigits(TotalReceivingNonConvexSurfaces) +
-                    " surfaces which are receiving surfaces and are non-convex.");
+                ShowWarningMessage(state,
+                                   format("DetermineShadowingCombinations: There are {} surfaces which are receiving surfaces and are non-convex.",
+                                          TotalReceivingNonConvexSurfaces));
                 ShowContinueError(state, "...Shadowing values may be inaccurate. Check .shd report file for more surface shading details");
                 ShowContinueError(state, "...Add Output:Diagnostics,DisplayExtraWarnings; to see individual warnings for each surface.");
                 TotalWarningErrors += TotalReceivingNonConvexSurfaces;
             }
 
             if (TotalCastingNonConvexSurfaces > 0) {
-                ShowSevereMessage(state, "DetermineShadowingCombinations: There are " + TrimSigDigits(TotalCastingNonConvexSurfaces) +
-                    " surfaces which are casting surfaces and are non-convex.");
+                ShowSevereMessage(state,
+                                  format("DetermineShadowingCombinations: There are {} surfaces which are casting surfaces and are non-convex.",
+                                         TotalCastingNonConvexSurfaces));
                 ShowContinueError(state, "...Shadowing values may be inaccurate. Check .shd report file for more surface shading details");
                 ShowContinueError(state, "...Add Output:Diagnostics,DisplayExtraWarnings; to see individual severes for each surface.");
                 TotalSevereErrors += TotalCastingNonConvexSurfaces;
@@ -10529,7 +10534,6 @@ namespace SolarShading {
         // errors in the error file.
 
         using namespace DataErrorTracking; // for error tracking
-        using General::RoundSigDigits;
 
         static Array1D_string const MSG(4, {"misses", "", "within", "overlaps"});
 
@@ -10568,7 +10572,7 @@ namespace SolarShading {
                 TotalWarningErrors += Count - 1;
                 ShowWarningError(state, "Base surface does not surround subsurface (CHKSBS), Overlap Status=" +
                                  state.dataSolarShading->cOverLapStatus(state.dataSolarShading->TrackBaseSubSurround(Loop1).MiscIndex));
-                ShowContinueError(state, "  The base surround errors occurred " + std::to_string(Count) + " times.");
+                ShowContinueError(state, format("  The base surround errors occurred {} times.", Count));
                 for (Loop2 = 1; Loop2 <= state.dataSolarShading->NumBaseSubSurround; ++Loop2) {
                     if (state.dataSolarShading->TrackBaseSubSurround(Loop1).SurfIndex1 == state.dataSolarShading->TrackBaseSubSurround(Loop2).SurfIndex1 &&
                         state.dataSolarShading->TrackBaseSubSurround(Loop1).MiscIndex == state.dataSolarShading->TrackBaseSubSurround(Loop2).MiscIndex) {
@@ -10581,7 +10585,7 @@ namespace SolarShading {
             }
             if (TotCount > 0) {
                 ShowMessage(state, "");
-                ShowContinueError(state, "  The base surround errors occurred " + std::to_string(TotCount) + " times (total).");
+                ShowContinueError(state, format("  The base surround errors occurred {} times (total).", TotCount));
                 ShowMessage(state, "");
             }
 
@@ -10589,7 +10593,7 @@ namespace SolarShading {
             SurfErrorReported = false;
             TotCount = 0;
             if (state.dataSolarShading->NumTooManyVertices > 0) {
-                ShowMessage(state, "Too many vertices [>=" + RoundSigDigits(state.dataSolarShading->MaxHCV) + "] in shadow overlap errors occurring...");
+                ShowMessage(state, format("Too many vertices [>={}] in shadow overlap errors occurring...", state.dataSolarShading->MaxHCV));
                 ShowMessage(state, "These occur throughout the year and may occur several times for the same surfaces. You may be able to reduce them by "
                             "adding Output:Diagnostics,DoNotMirrorDetachedShading;");
             }
@@ -10605,10 +10609,10 @@ namespace SolarShading {
                 TotCount += Count;
                 TotalWarningErrors += Count - 1;
                 ShowMessage(state, "");
-                ShowWarningError(state, "Too many vertices [>=" + RoundSigDigits(state.dataSolarShading->MaxHCV) + "] in a shadow overlap");
+                ShowWarningError(state, format("Too many vertices [>={}] in a shadow overlap", state.dataSolarShading->MaxHCV));
                 ShowContinueError(state, "Overlapping figure=" + Surface(state.dataSolarShading->TrackTooManyVertices(Loop1).SurfIndex1).Name + ", Surface Class=[" +
                                   cSurfaceClass(Surface(state.dataSolarShading->TrackTooManyVertices(Loop1).SurfIndex1).Class) + ']');
-                ShowContinueError(state, "  This error occurred " + std::to_string(Count) + " times.");
+                ShowContinueError(state, format("  This error occurred {} times.", Count));
                 for (Loop2 = 1; Loop2 <= state.dataSolarShading->NumTooManyVertices; ++Loop2) {
                     if (state.dataSolarShading->TrackTooManyVertices(Loop1).SurfIndex1 == state.dataSolarShading->TrackTooManyVertices(Loop2).SurfIndex1) {
                         if (SurfErrorReported2(state.dataSolarShading->TrackTooManyVertices(Loop2).SurfIndex2)) continue;
@@ -10621,14 +10625,14 @@ namespace SolarShading {
             }
             if (TotCount > 0) {
                 ShowMessage(state, "");
-                ShowContinueError(state, "  The too many vertices errors occurred " + std::to_string(TotCount) + " times (total).");
+                ShowContinueError(state, format("  The too many vertices errors occurred {} times (total).", TotCount));
                 ShowMessage(state, "");
             }
 
             SurfErrorReported = false;
             TotCount = 0;
             if (state.dataSolarShading->NumTooManyFigures > 0) {
-                ShowMessage(state, "Too many figures [>=" + RoundSigDigits(state.dataSolarShading->MaxHCS) + "] in shadow overlap errors occurring...");
+                ShowMessage(state, format("Too many figures [>={}] in shadow overlap errors occurring...", state.dataSolarShading->MaxHCS));
                 ShowMessage(state, "These occur throughout the year and may occur several times for the same surfaces. You may be able to reduce them by "
                             "adding OutputDiagnostics,DoNotMirrorDetachedShading;");
             }
@@ -10644,10 +10648,10 @@ namespace SolarShading {
                 TotCount += Count;
                 TotalWarningErrors += Count - 1;
                 ShowMessage(state, "");
-                ShowWarningError(state, "Too many figures [>=" + RoundSigDigits(state.dataSolarShading->MaxHCS) + "] in a shadow overlap");
+                ShowWarningError(state, format("Too many figures [>={}] in a shadow overlap", state.dataSolarShading->MaxHCS));
                 ShowContinueError(state, "Overlapping figure=" + Surface(state.dataSolarShading->TrackTooManyFigures(Loop1).SurfIndex1).Name + ", Surface Class=[" +
                                   cSurfaceClass(Surface(state.dataSolarShading->TrackTooManyFigures(Loop1).SurfIndex1).Class) + ']');
-                ShowContinueError(state, "  This error occurred " + std::to_string(Count) + " times.");
+                ShowContinueError(state, format("  This error occurred {} times.", Count));
                 for (Loop2 = 1; Loop2 <= state.dataSolarShading->NumTooManyFigures; ++Loop2) {
                     if (state.dataSolarShading->TrackTooManyFigures(Loop1).SurfIndex1 == state.dataSolarShading->TrackTooManyFigures(Loop2).SurfIndex1) {
                         if (SurfErrorReported2(state.dataSolarShading->TrackTooManyFigures(Loop2).SurfIndex2)) continue;
@@ -10660,7 +10664,7 @@ namespace SolarShading {
             }
             if (TotCount > 0) {
                 ShowMessage(state, "");
-                ShowContinueError(state, "  The too many figures errors occurred " + std::to_string(TotCount) + " times (total).");
+                ShowContinueError(state, format("  The too many figures errors occurred {} times (total).", TotCount));
                 ShowMessage(state, "");
             }
             SurfErrorReported.deallocate();

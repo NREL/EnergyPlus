@@ -138,7 +138,7 @@ namespace PluginManagement {
     }
 #endif
 
-    void PluginManager::setupOutputVariables(EnergyPlusData &state)
+    void PluginManager::setupOutputVariables([[maybe_unused]] EnergyPlusData &state)
     {
 #if LINK_WITH_PYTHON == 1
         // with the PythonPlugin:Variables all set in memory, we can now set them up as outputs as needed
@@ -651,7 +651,7 @@ namespace PluginManagement {
     }
 #endif
 
-    void PluginInstance::reportPythonError(EnergyPlusData &state)
+    void PluginInstance::reportPythonError([[maybe_unused]] EnergyPlusData &state)
     {
 #if LINK_WITH_PYTHON == 1
         PyObject *exc_type = nullptr;
@@ -724,7 +724,7 @@ namespace PluginManagement {
 #endif
     }
 
-    void PluginInstance::setup(EnergyPlusData &state)
+    void PluginInstance::setup([[maybe_unused]] EnergyPlusData &state)
     {
 #if LINK_WITH_PYTHON == 1
         // this first section is really all about just ultimately getting a full Python class instance
@@ -1093,7 +1093,7 @@ namespace PluginManagement {
         }
     }
 #else
-    void PluginManager::addToPythonPath(EnergyPlusData &state, [[maybe_unused]] const std::string &path, [[maybe_unused]] bool userDefinedPath)
+    void PluginManager::addToPythonPath([[maybe_unused]] EnergyPlusData &state, const std::string &EP_UNUSED(path), bool EP_UNUSED(userDefinedPath))
     {
     }
 #endif
@@ -1134,9 +1134,9 @@ namespace PluginManagement {
         }
     }
 #else
-    int PluginManager::getGlobalVariableHandle(EnergyPlusData &state,
-                                               [[maybe_unused]] const std::string &name,
-                                               [[maybe_unused]] bool const suppress_warning)
+    int PluginManager::getGlobalVariableHandle([[maybe_unused]] EnergyPlusData &state,
+                                               const std::string &EP_UNUSED(name),
+                                               bool const EP_UNUSED(suppress_warning))
     {
         return -1;
     }
@@ -1278,7 +1278,7 @@ namespace PluginManagement {
     }
 #endif
 
-    void PluginManager::updatePluginValues(EnergyPlusData &state)
+    void PluginManager::updatePluginValues([[maybe_unused]] EnergyPlusData &state)
     {
 #if LINK_WITH_PYTHON == 1
         for (auto &trend : trends) {
@@ -1299,14 +1299,14 @@ namespace PluginManagement {
         try {
             return PluginManagement::globalVariableValues[handle];  // TODO: This won't be caught as an exception I think
         } catch (...) {
-            EnergyPlus::ShowSevereError(state, "Tried to access plugin global variable value at index " + std::to_string(handle));
-            EnergyPlus::ShowContinueError(state, "Available handles range from 0 to " + std::to_string(PluginManagement::globalVariableValues.size() - 1));
+            EnergyPlus::ShowSevereError(state, format("Tried to access plugin global variable value at index {}", handle));
+            EnergyPlus::ShowContinueError(state, format("Available handles range from 0 to {}", PluginManagement::globalVariableValues.size() - 1));
             EnergyPlus::ShowFatalError(state, "Plugin global variable problem causes program termination");
         }
         return 0.0;
     }
 #else
-    Real64 PluginManager::getGlobalVariableValue(EnergyPlusData &state, [[maybe_unused]] int handle)
+    Real64 PluginManager::getGlobalVariableValue([[maybe_unused]] EnergyPlusData &state, int EP_UNUSED(handle))
     {
         return 0.0;
     }
@@ -1322,13 +1322,13 @@ namespace PluginManagement {
         try {
             PluginManagement::globalVariableValues[handle] = value;  // TODO: This won't be caught as an exception I think
         } catch (...) {
-            EnergyPlus::ShowSevereError(state, "Tried to set plugin global variable value at index " + std::to_string(handle));
-            EnergyPlus::ShowContinueError(state, "Available handles range from 0 to " + std::to_string(PluginManagement::globalVariableValues.size() - 1));
+            EnergyPlus::ShowSevereError(state, format("Tried to set plugin global variable value at index {}", handle));
+            EnergyPlus::ShowContinueError(state, format("Available handles range from 0 to {}", PluginManagement::globalVariableValues.size() - 1));
             EnergyPlus::ShowFatalError(state, "Plugin global variable problem causes program termination");
         }
     }
 #else
-    void PluginManager::setGlobalVariableValue(EnergyPlusData &state, [[maybe_unused]] int handle, [[maybe_unused]] Real64 value)
+    void PluginManager::setGlobalVariableValue([[maybe_unused]] EnergyPlusData &state, int EP_UNUSED(handle), Real64 EP_UNUSED(value))
     {
     }
 #endif
@@ -1384,7 +1384,7 @@ namespace PluginManagement {
         return numTotalThings > 0;
     }
 #else
-    bool PluginManager::anyUnexpectedPluginObjects(EnergyPlusData &state)
+    bool PluginManager::anyUnexpectedPluginObjects([[maybe_unused]] EnergyPlusData &state)
     {
         return false;
     }

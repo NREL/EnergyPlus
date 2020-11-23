@@ -74,18 +74,7 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
-namespace EnergyPlus {
-namespace EIRPlantLoopHeatPumps {
-
-    bool getInputsPLHP(true);
-    std::vector<EIRPlantLoopHeatPump> heatPumps;
-    std::string static const __EQUIP__ = "EIRPlantLoopHeatPump "; // NOLINT(cert-err58-cpp)
-
-    void EIRPlantLoopHeatPump::clear_state()
-    {
-        getInputsPLHP = true;
-        heatPumps.clear();
-    }
+namespace EnergyPlus::EIRPlantLoopHeatPumps {
 
     void EIRPlantLoopHeatPump::simulate(EnergyPlusData &state,
                                         const EnergyPlus::PlantLocation &calledFromLocation,
@@ -93,8 +82,6 @@ namespace EIRPlantLoopHeatPumps {
                                         Real64 &CurLoad,
                                         bool const RunFlag)
     {
-
-        std::string const routineName = "PlantLoopHeatPumpEIR::simulate";
 
         // Call initialize to set flow rates, run flag, and entering temperatures
         this->running = RunFlag;
@@ -133,7 +120,7 @@ namespace EIRPlantLoopHeatPumps {
         DataLoopNode::Node(this->sourceSideNodes.outlet).Temp = this->sourceSideOutletTemp;
     }
 
-    Real64 EIRPlantLoopHeatPump::getLoadSideOutletSetPointTemp(EnergyPlusData &state)
+    Real64 EIRPlantLoopHeatPump::getLoadSideOutletSetPointTemp(EnergyPlusData &state) const
     {
         auto &thisLoadPlantLoop = DataPlant::PlantLoop(this->loadSideLocation.loopNum);
         auto &thisLoadLoopSide = thisLoadPlantLoop.LoopSide(this->loadSideLocation.loopSideNum);
@@ -355,7 +342,7 @@ namespace EIRPlantLoopHeatPumps {
     void EIRPlantLoopHeatPump::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation)
     {
         // This function does all one-time and begin-environment initialization
-        std::string const routineName = EIRPlantLoopHeatPumps::__EQUIP__ + ':' + __FUNCTION__;
+        std::string static const routineName = std::string("EIRPlantLoopHeatPump :") + __FUNCTION__;
         if (this->oneTimeInit) {
             bool errFlag = false;
 
@@ -641,9 +628,8 @@ namespace EIRPlantLoopHeatPumps {
                             if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpCapacity - hardSizedCapacity) / hardSizedCapacity) > DataSizing::AutoVsHardSizingThreshold) {
                                     ShowWarningMessage(state, "EIRPlantLoopHeatPump::size(): Potential issue with equipment sizing for " + this->name);
-                                    ShowContinueError(state, "User-Specified Nominal Capacity of " + General::RoundSigDigits(hardSizedCapacity, 2) + " [W]");
-                                    ShowContinueError(state, "differs from Design Size Nominal Capacity of " + General::RoundSigDigits(tmpCapacity, 2) +
-                                                      " [W]");
+                                    ShowContinueError(state, format("User-Specified Nominal Capacity of {:.2R} [W]", hardSizedCapacity));
+                                    ShowContinueError(state, format("differs from Design Size Nominal Capacity of {:.2R} [W]", tmpCapacity));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -681,10 +667,10 @@ namespace EIRPlantLoopHeatPumps {
                                 if ((std::abs(tmpLoadVolFlow - hardSizedLoadSideFlow) / hardSizedLoadSideFlow) >
                                     DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "EIRPlantLoopHeatPump::size(): Potential issue with equipment sizing for " + this->name);
-                                    ShowContinueError(state, "User-Specified Load Side Volume Flow Rate of " +
-                                                      General::RoundSigDigits(hardSizedLoadSideFlow, 2) + " [m3/s]");
-                                    ShowContinueError(state, "differs from Design Size Load Side Volume Flow Rate of " +
-                                                      General::RoundSigDigits(tmpLoadVolFlow, 2) + " [m3/s]");
+                                    ShowContinueError(state,
+                                                      format("User-Specified Load Side Volume Flow Rate of {:.2R} [m3/s]", hardSizedLoadSideFlow));
+                                    ShowContinueError(state,
+                                                      format("differs from Design Size Load Side Volume Flow Rate of {:.2R} [m3/s]", tmpLoadVolFlow));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -819,10 +805,9 @@ namespace EIRPlantLoopHeatPumps {
                         if ((std::abs(tmpSourceVolFlow - hardSizedSourceSideFlow) / hardSizedSourceSideFlow) >
                             DataSizing::AutoVsHardSizingThreshold) {
                             ShowMessage(state, "EIRPlantLoopHeatPump::size(): Potential issue with equipment sizing for " + this->name);
-                            ShowContinueError(state, "User-Specified Source Side Volume Flow Rate of " +
-                                              General::RoundSigDigits(hardSizedSourceSideFlow, 2) + " [m3/s]");
-                            ShowContinueError(state, "differs from Design Size Source Side Volume Flow Rate of " +
-                                              General::RoundSigDigits(tmpSourceVolFlow, 2) + " [m3/s]");
+                            ShowContinueError(state, format("User-Specified Source Side Volume Flow Rate of {:.2R} [m3/s]", hardSizedSourceSideFlow));
+                            ShowContinueError(state,
+                                              format("differs from Design Size Source Side Volume Flow Rate of {:.2R} [m3/s]", tmpSourceVolFlow));
                             ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                             ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                         }
@@ -898,8 +883,10 @@ namespace EIRPlantLoopHeatPumps {
             // protected by the input processor to be >0.0
             // fatal out just in case
             errorsFound = true;                                                                                      // LCOV_EXCL_LINE
-            ShowSevereError(state, "Invalid condenser flow rate for EIR PLHP (name="                                        // LCOV_EXCL_LINE
-                            + this->name + "; entered value: " + std::to_string(this->sourceSideDesignVolFlowRate)); // LCOV_EXCL_LINE
+            ShowSevereError(state,
+                            format("Invalid condenser flow rate for EIR PLHP (name={}; entered value: {}",
+                                   this->name,
+                                   this->sourceSideDesignVolFlowRate)); // LCOV_EXCL_LINE
         } else {
             // can't imagine how it would ever get to this point
             // just assume it's the same as the load side if we don't have any sizing information
@@ -913,15 +900,15 @@ namespace EIRPlantLoopHeatPumps {
         }
     }
 
-    PlantComponent *EIRPlantLoopHeatPump::factory(EnergyPlusData &state, int hp_type_of_num, std::string hp_name)
+    PlantComponent *EIRPlantLoopHeatPump::factory(EnergyPlusData &state, int hp_type_of_num, const std::string& hp_name)
     {
-        if (getInputsPLHP) {
+        if (state.dataEIRPlantLoopHeatPump->getInputsPLHP) {
             EIRPlantLoopHeatPump::processInputForEIRPLHP(state);
             EIRPlantLoopHeatPump::pairUpCompanionCoils(state);
-            getInputsPLHP = false;
+            state.dataEIRPlantLoopHeatPump->getInputsPLHP = false;
         }
 
-        for (auto &plhp : heatPumps) {
+        for (auto &plhp : state.dataEIRPlantLoopHeatPump->heatPumps) {
             if (plhp.name == UtilityRoutines::MakeUPPERCase(hp_name) && plhp.plantTypeOfNum == hp_type_of_num) {
                 return &plhp;
             }
@@ -933,12 +920,12 @@ namespace EIRPlantLoopHeatPumps {
 
     void EIRPlantLoopHeatPump::pairUpCompanionCoils(EnergyPlusData &state)
     {
-        for (auto &thisHP : heatPumps) {
+        for (auto &thisHP : state.dataEIRPlantLoopHeatPump->heatPumps) {
             if (!thisHP.companionCoilName.empty()) {
                 auto thisCoilName = UtilityRoutines::MakeUPPERCase(thisHP.name);
                 auto &thisCoilType = thisHP.plantTypeOfNum;
                 auto targetCompanionName = UtilityRoutines::MakeUPPERCase(thisHP.companionCoilName);
-                for (auto &potentialCompanionCoil : heatPumps) {
+                for (auto &potentialCompanionCoil : state.dataEIRPlantLoopHeatPump->heatPumps) {
                     auto &potentialCompanionType = potentialCompanionCoil.plantTypeOfNum;
                     auto potentialCompanionName = UtilityRoutines::MakeUPPERCase(potentialCompanionCoil.name);
                     if (potentialCompanionName == thisCoilName) {
@@ -1177,7 +1164,7 @@ namespace EIRPlantLoopHeatPumps {
                     thisPLHP.calcSourceOutletTemp = classToInput.calcSourceOutletTemp;
 
                     if (!errorsFound) {
-                        heatPumps.push_back(thisPLHP);
+                        state.dataEIRPlantLoopHeatPump->heatPumps.push_back(thisPLHP);
                     }
                 }
             }
@@ -1200,7 +1187,7 @@ namespace EIRPlantLoopHeatPumps {
         //  companion index values as I warn against their partner, so then I would have to add the values to the
         //  vector each pass, and check then each loop.  This seemed really bulky and inefficient, so I chose to
         //  leave a tight loop here of just reporting for each coil if it and the companion are running.
-        for (auto &thisPLHP : heatPumps) {
+        for (auto &thisPLHP : state.dataEIRPlantLoopHeatPump->heatPumps) {
             if (!thisPLHP.companionHeatPumpCoil) {
                 continue;
             }
@@ -1211,5 +1198,4 @@ namespace EIRPlantLoopHeatPumps {
             }
         }
     }
-} // namespace EIRPlantLoopHeatPumps
-} // namespace EnergyPlus
+} // namespace EnergyPlus::EIRPlantLoopHeatPumps

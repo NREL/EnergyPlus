@@ -62,13 +62,9 @@
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
-#include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
-#include <EnergyPlus/DataVectorTypes.hh>
 #include <EnergyPlus/DataZoneControls.hh>
-#include <EnergyPlus/DisplayRoutines.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/HeatBalanceKivaManager.hh>
 #include <EnergyPlus/Material.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -136,8 +132,11 @@ namespace HeatBalanceKivaManager {
             constructionName = DataHeatBalance::Construct(constructionNum).Name;
         }
 
-        ss.dir = FileSystem::getAbsolutePath(DataStringGlobals::outDirPathName) + "/" + DataSurfaces::Surface(floorSurface).Name + " " +
-                 General::RoundSigDigits(ground.foundation.foundationDepth, 2) + " " + constructionName;
+        ss.dir = format("{}/{} {:.2R} {}",
+                        FileSystem::getAbsolutePath(DataStringGlobals::outDirPathName),
+                        DataSurfaces::Surface(floorSurface).Name,
+                        ground.foundation.foundationDepth,
+                        constructionName);
 
         debugDir = ss.dir;
         plotNum = 0;
@@ -293,9 +292,11 @@ namespace HeatBalanceKivaManager {
 
                 } else {
                     Tin = 0.0;
-                    ShowSevereError(state, "Illegal control type for Zone=" + DataHeatBalance::Zone(zoneNum).Name +
-                                    ", Found value=" + General::TrimSigDigits(controlType) +
-                                    ", in Schedule=" + DataZoneControls::TempControlledZone(zoneControlNum).ControlTypeSchedName);
+                    ShowSevereError(state,
+                                    format("Illegal control type for Zone={}, Found value={}, in Schedule={}",
+                                           DataHeatBalance::Zone(zoneNum).Name,
+                                           controlType,
+                                           DataZoneControls::TempControlledZone(zoneControlNum).ControlTypeSchedName));
                 }
                 break;
             }
@@ -772,7 +773,7 @@ namespace HeatBalanceKivaManager {
                                              "\", wall surfaces with more than four vertices referencing");
                             ShowContinueError(state,
                                 "...Foundation Outside Boundary Conditions may not be interpreted correctly in the 2D finite difference model.");
-                            ShowContinueError(state, "Surface=\"" + Surfaces(wl).Name + "\", has " + General::TrimSigDigits(numVs) + " vertices.");
+                            ShowContinueError(state, format("Surface=\"{}\", has {} vertices.", Surfaces(wl).Name, numVs));
                             ShowContinueError(state, "Consider separating the wall into separate surfaces, each spanning from the floor slab to the top of "
                                               "the foundation wall.");
                         }
@@ -969,11 +970,14 @@ namespace HeatBalanceKivaManager {
                     }
 
                     if (fnd.deepGroundDepth > initDeepGroundDepth) {
-                        ShowWarningError(state, "Foundation:Kiva=\"" + foundationInputs[surface.OSCPtr].name + "\", the autocalculated deep ground depth (" +
-                                         General::TrimSigDigits(initDeepGroundDepth, 3) + " m) is shallower than foundation construction elements (" +
-                                         General::TrimSigDigits(fnd.deepGroundDepth - 1.0, 3) + " m)");
-                        ShowContinueError(state, "The deep ground depth will be set one meter below the lowest element (" +
-                                          General::TrimSigDigits(fnd.deepGroundDepth, 3) + " m)");
+                        ShowWarningError(state,
+                                         format("Foundation:Kiva=\"{}\", the autocalculated deep ground depth ({:.3T} m) is shallower than "
+                                                "foundation construction elements ({:.3T} m)",
+                                                foundationInputs[surface.OSCPtr].name,
+                                                initDeepGroundDepth,
+                                                fnd.deepGroundDepth - 1.0));
+                        ShowContinueError(
+                            state, format("The deep ground depth will be set one meter below the lowest element ({:.3T} m)", fnd.deepGroundDepth));
                     }
 
                     // polygon
@@ -1144,8 +1148,8 @@ namespace HeatBalanceKivaManager {
             }
         }
 
-        gp.createFrame(std::to_string(DataEnvironment::Month) + "/" + std::to_string(DataEnvironment::DayOfMonth) + " " +
-                       std::to_string(state.dataGlobal->HourOfDay) + ":00");
+        gp.createFrame(fmt::to_string(DataEnvironment::Month) + "/" + fmt::to_string(DataEnvironment::DayOfMonth) + " " +
+                       fmt::to_string(state.dataGlobal->HourOfDay) + ":00");
 
 #ifndef NDEBUG
 

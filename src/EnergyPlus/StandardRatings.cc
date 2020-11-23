@@ -262,7 +262,7 @@ namespace StandardRatings {
         using DataPlant::TypeOf_Chiller_ElectricReformEIR;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
-        using General::RoundSigDigits;
+
         using General::SolveRoot;
 
         // Locals
@@ -462,21 +462,22 @@ namespace StandardRatings {
                     }
                 }
                 if (RefCap <= 0.0) {
-                    ShowContinueError(state, " Check the chiller autosized or user specified capacity. Autosized or specified chiller capacity = " +
-                                      RoundSigDigits(RefCap, 2));
+                    ShowContinueError(
+                        state,
+                        format(" Check the chiller autosized or user specified capacity. Autosized or specified chiller capacity = {:.2R}", RefCap));
                 }
                 if (RefCOP <= 0.0) {
-                    ShowContinueError(state, " Check the chiller reference or rated COP specified. Specified COP = " + RoundSigDigits(RefCOP, 2));
+                    ShowContinueError(state, format(" Check the chiller reference or rated COP specified. Specified COP = {:.2R}", RefCOP));
                 }
                 if (ChillerCapFT <= 0.0) {
                     ShowContinueError(state, " Check limits in Cooling Capacity Function of Temperature Curve, Curve Type = " +
                                       state.dataCurveManager->PerfCurve(CapFTempCurveIndex).ObjectType + ", Curve Name = " + GetCurveName(state, CapFTempCurveIndex) + '.');
-                    ShowContinueError(state, " ..ChillerCapFT value at standard test condition = " + RoundSigDigits(ChillerCapFT, 2));
+                    ShowContinueError(state, format(" ..ChillerCapFT value at standard test condition = {:.2R}", ChillerCapFT));
                 }
                 if (ChillerEIRFT <= 0.0) {
                     ShowContinueError(state, " Check limits in EIR Function of Temperature Curve, Curve Type = " + state.dataCurveManager->PerfCurve(EIRFTempCurveIndex).ObjectType +
                                       ", Curve Name = " + GetCurveName(state, EIRFTempCurveIndex) + '.');
-                    ShowContinueError(state, " ..ChillerEIRFT value at standard test condition = " + RoundSigDigits(ChillerEIRFT, 2));
+                    ShowContinueError(state, format(" ..ChillerEIRFT value at standard test condition = {:.2R}", ChillerEIRFT));
                 }
                 IPLV = 0.0;
                 break;
@@ -600,7 +601,6 @@ namespace StandardRatings {
         using namespace OutputReportPredefined;
         using DataPlant::TypeOf_Chiller_ElectricEIR;
         using DataPlant::TypeOf_Chiller_ElectricReformEIR;
-        using General::RoundSigDigits;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static bool MyOneTimeFlag(true);
@@ -880,7 +880,6 @@ namespace StandardRatings {
         using DataHVACGlobals::CoilDX_HeatingEmpirical;
         using DataHVACGlobals::CoilDX_MultiSpeedCooling;
         using DataHVACGlobals::CoilDX_MultiSpeedHeating;
-        using General::RoundSigDigits;
 
         // Argument array dimensioning
         RatedTotalCapacity.dim(ns);
@@ -1182,7 +1181,6 @@ namespace StandardRatings {
         using CurveManager::CurveValue;
         using CurveManager::GetCurveMinMaxValues;
         using CurveManager::GetCurveName;
-        using General::RoundSigDigits;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1308,37 +1306,58 @@ namespace StandardRatings {
         if (TotCapTempModFacRated < 0.0 || CapTempModFacH2Test < 0.0 || CapTempModFacH3Test < 0.0 || EIRTempModFacRated < 0.0 ||
             EIRTempModFacH2Test < 0.0 || EIRTempModFacH3Test < 0.0) {
             if (TotCapTempModFacRated < 0.0) {
-                ShowSevereError(state, " Invalid Total Heating Capacity Function of Temperature Curve value = " + RoundSigDigits(TotCapTempModFacRated, 2) +
-                                ", Curve Type = " + state.dataCurveManager->PerfCurve(CapFTempCurveIndex).ObjectType + ", Curve Name = " + GetCurveName(state, CapFTempCurveIndex));
+                ShowSevereError(
+                    state,
+                    format(" Invalid Total Heating Capacity Function of Temperature Curve value = {:.2R}, Curve Type = {}, Curve Name = {}",
+                           TotCapTempModFacRated,
+                           state.dataCurveManager->PerfCurve(CapFTempCurveIndex).ObjectType,
+                           GetCurveName(state, CapFTempCurveIndex)));
                 ShowContinueError(state, " ...Net heating capacity at high temperature is set to zero. The curve value must be > 0. Check the curve.");
                 NetHeatingCapRated = 0.0;
             }
             if (CapTempModFacH3Test < 0.0) {
-                ShowSevereError(state, " Invalid Total Heating Capacity Function of Temperature Curve value = " + RoundSigDigits(CapTempModFacH3Test, 2) +
-                                ", Curve Type = " + state.dataCurveManager->PerfCurve(CapFTempCurveIndex).ObjectType + ", Curve Name = " + GetCurveName(state, CapFTempCurveIndex));
+                ShowSevereError(
+                    state,
+                    format(" Invalid Total Heating Capacity Function of Temperature Curve value = {:.2R}, Curve Type = {}, Curve Name = {}",
+                           CapTempModFacH3Test,
+                           state.dataCurveManager->PerfCurve(CapFTempCurveIndex).ObjectType,
+                           GetCurveName(state, CapFTempCurveIndex)));
                 ShowContinueError(state, " ...Net heating capacity at low temperature is set to zero. The curve value must be > 0. Check the curve.");
                 NetHeatingCapH3Test = 0.0;
             }
             if (CapTempModFacH2Test < 0.0) {
-                ShowSevereError(state, " Invalid Total Heating Capacity Function of Temperature Curve value = " + RoundSigDigits(CapTempModFacH2Test, 2) +
-                                ", Curve Type = " + state.dataCurveManager->PerfCurve(CapFTempCurveIndex).ObjectType + ", Curve Name = " + GetCurveName(state, CapFTempCurveIndex));
+                ShowSevereError(
+                    state,
+                    format(" Invalid Total Heating Capacity Function of Temperature Curve value = {:.2R}, Curve Type = {}, Curve Name = {}",
+                           CapTempModFacH2Test,
+                           state.dataCurveManager->PerfCurve(CapFTempCurveIndex).ObjectType,
+                           GetCurveName(state, CapFTempCurveIndex)));
                 ShowContinueError(state, " ...HSPF calculation is incorrect. The curve value must be > 0. Check the curve.");
                 NetHeatingCapH3Test = 0.0;
             }
             // check EIR curve values
             if (EIRTempModFacRated < 0.0) {
-                ShowSevereError(state, " Invalid EIR Function of Temperature Curve value = " + RoundSigDigits(EIRTempModFacRated, 2) +
-                                ", Curve Type = " + state.dataCurveManager->PerfCurve(EIRFTempCurveIndex).ObjectType + ", Curve Name = " + GetCurveName(state, EIRFTempCurveIndex));
+                ShowSevereError(state,
+                                format(" Invalid EIR Function of Temperature Curve value = {:.2R}, Curve Type = {}, Curve Name = {}",
+                                       EIRTempModFacRated,
+                                       state.dataCurveManager->PerfCurve(EIRFTempCurveIndex).ObjectType,
+                                       GetCurveName(state, EIRFTempCurveIndex)));
                 ShowContinueError(state, " ...HSPF calculation is incorrect. The curve value must be > 0. Check the curve.");
             }
             if (EIRTempModFacH2Test < 0.0) {
-                ShowSevereError(state, " Invalid EIR Function of Temperature Curve value = " + RoundSigDigits(EIRTempModFacH2Test, 2) +
-                                ", Curve Type = " + state.dataCurveManager->PerfCurve(EIRFTempCurveIndex).ObjectType + ", Curve Name = " + GetCurveName(state, EIRFTempCurveIndex));
+                ShowSevereError(state,
+                                format(" Invalid EIR Function of Temperature Curve value = {:.2R}, Curve Type = {}, Curve Name = {}",
+                                       EIRTempModFacH2Test,
+                                       state.dataCurveManager->PerfCurve(EIRFTempCurveIndex).ObjectType,
+                                       GetCurveName(state, EIRFTempCurveIndex)));
                 ShowContinueError(state, " ...HSPF calculation is incorrect. The curve value must be > 0. Check the curve.");
             }
             if (EIRTempModFacH3Test < 0.0) {
-                ShowSevereError(state, " Invalid EIR Function of Temperature Curve value = " + RoundSigDigits(EIRTempModFacH3Test, 2) +
-                                ", Curve Type = " + state.dataCurveManager->PerfCurve(EIRFTempCurveIndex).ObjectType + ", Curve Name = " + GetCurveName(state, EIRFTempCurveIndex));
+                ShowSevereError(state,
+                                format(" Invalid EIR Function of Temperature Curve value = {:.2R}, Curve Type = {}, Curve Name = {}",
+                                       EIRTempModFacH3Test,
+                                       state.dataCurveManager->PerfCurve(EIRFTempCurveIndex).ObjectType,
+                                       GetCurveName(state, EIRFTempCurveIndex)));
                 ShowContinueError(state, " ...HSPF calculation is incorrect. The curve value must be > 0. Check the curve.");
             }
             ShowContinueError(state, " ...HSPF value has been reset to 0.0 and simulation is continuing.");
@@ -2401,7 +2420,7 @@ namespace StandardRatings {
         // na
 
         // Using/Aliasing
-        using General::RoundSigDigits;
+
         using namespace OutputReportPredefined;
         using DataHVACGlobals::CoilDX_CoolingSingleSpeed;
         using DataHVACGlobals::CoilDX_HeatingEmpirical;
@@ -2525,7 +2544,7 @@ namespace StandardRatings {
         //                                 Room Unitary Air Conditioners
 
         // Using/Aliasing
-        using General::RoundSigDigits;
+
         using namespace OutputReportPredefined;
         using DataHVACGlobals::CoilDX_CoolingSingleSpeed;
 
@@ -2566,8 +2585,8 @@ namespace StandardRatings {
                 }
                 for (ClassNum = 1; ClassNum <= 4; ++ClassNum) {
                     Num = (ClassNum - 1) * 4;
-                    ClassName = "Class " + RoundSigDigits(ClassNum);
-                    CompNameNew = CompName + "(" + ClassName + ")";
+                    ClassName = format("Class {}", ClassNum);
+                    CompNameNew = fmt::format("{}({})", CompName, ClassName);
                     static constexpr auto Format_102(" DX Cooling Coil ASHRAE 127 Standard Ratings Information, {}, {}, {}, {:.1R}, {:.1R}, {:.1R}, "
                                                      "{:.1R}, {:.1R}, {:.1R}, {:.1R}, {:.1R}\n");
                     print(state.files.eio,
@@ -2584,10 +2603,10 @@ namespace StandardRatings {
                           NetCoolingCapRated(Num + 4),
                           TotElectricPowerRated(Num + 4));
                     PreDefTableEntry(pdchDXCoolCoilType, CompNameNew, CompType);
-                    // Note: If you call RoundSigDigits(NetCoolingCapRated(Num + 1), 1),
+                    // Note: If you call format("{:.1R}", NetCoolingCapRated(Num + 1)),
                     // Then it's not the OutputReportPredefined::PreDefTableEntry prototype with Real64 that is called.
                     // As a result, the entry isn't marked as being Real (origEntryIsReal) and unit conversion does not occur
-                    // Bad: PreDefTableEntry(pdchDXCoolCoilNetCapSIA, CompNameNew, RoundSigDigits(NetCoolingCapRated(Num + 1), 1));
+                    // Bad: PreDefTableEntry(pdchDXCoolCoilNetCapSIA, CompNameNew, format("{:.1R}", NetCoolingCapRated(Num + 1)));
                     PreDefTableEntry(pdchDXCoolCoilNetCapSIA, CompNameNew, NetCoolingCapRated(Num + 1), 1);
                     PreDefTableEntry(pdchDXCoolCoilNetCapSIB, CompNameNew, NetCoolingCapRated(Num + 2), 1);
                     PreDefTableEntry(pdchDXCoolCoilNetCapSIC, CompNameNew, NetCoolingCapRated(Num + 3), 1);

@@ -54,6 +54,7 @@
 #include <EnergyPlus/PierceSurface.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
