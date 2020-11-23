@@ -1299,8 +1299,8 @@ namespace PluginManagement {
         try {
             return PluginManagement::globalVariableValues[handle];  // TODO: This won't be caught as an exception I think
         } catch (...) {
-            EnergyPlus::ShowSevereError(state, "Tried to access plugin global variable value at index " + std::to_string(handle));
-            EnergyPlus::ShowContinueError(state, "Available handles range from 0 to " + std::to_string(PluginManagement::globalVariableValues.size() - 1));
+            EnergyPlus::ShowSevereError(state, format("Tried to access plugin global variable value at index {}", handle));
+            EnergyPlus::ShowContinueError(state, format("Available handles range from 0 to {}", PluginManagement::globalVariableValues.size() - 1));
             EnergyPlus::ShowFatalError(state, "Plugin global variable problem causes program termination");
         }
         return 0.0;
@@ -1322,8 +1322,8 @@ namespace PluginManagement {
         try {
             PluginManagement::globalVariableValues[handle] = value;  // TODO: This won't be caught as an exception I think
         } catch (...) {
-            EnergyPlus::ShowSevereError(state, "Tried to set plugin global variable value at index " + std::to_string(handle));
-            EnergyPlus::ShowContinueError(state, "Available handles range from 0 to " + std::to_string(PluginManagement::globalVariableValues.size() - 1));
+            EnergyPlus::ShowSevereError(state, format("Tried to set plugin global variable value at index {}", handle));
+            EnergyPlus::ShowContinueError(state, format("Available handles range from 0 to {}", PluginManagement::globalVariableValues.size() - 1));
             EnergyPlus::ShowFatalError(state, "Plugin global variable problem causes program termination");
         }
     }

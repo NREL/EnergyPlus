@@ -74,6 +74,7 @@
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace ObjexxFCL;
 using namespace EnergyPlus;
@@ -232,8 +233,8 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils1)
     TotNumLoops = 1;
     PlantLoop.allocate(TotNumLoops);
     PlantSizData.allocate(1);
-    state.dataWaterCoils->MySizeFlag.allocate(1);
-    state.dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
+    state->dataWaterCoils->MySizeFlag.allocate(1);
+    state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
     NumPltSizInput = 1;
     for (int l = 1; l <= TotNumLoops; ++l) {
         auto &loop(PlantLoop(l));
@@ -245,36 +246,36 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils1)
         loopsidebranch.TotalComponents = 1;
         loopsidebranch.Comp.allocate(1);
     }
-    GetZoneData(state, ErrorsFound);
+    GetZoneData(*state, ErrorsFound);
     EXPECT_EQ("SPACE1-1", Zone(1).Name);
-    GetOARequirements(state);      // get the OA requirements object
-    GetZoneAirDistribution(state); // get zone air distribution objects
-    GetZoneSizingInput(state);
-    GetZoneEquipmentData1(state);
-    ProcessScheduleInput(state);
+    GetOARequirements(*state);      // get the OA requirements object
+    GetZoneAirDistribution(*state); // get zone air distribution objects
+    GetZoneSizingInput(*state);
+    GetZoneEquipmentData1(*state);
+    ProcessScheduleInput(*state);
     ScheduleInputProcessed = true;
-    GetZoneAirLoopEquipment(state);
-    GetWaterCoilInput(state);
-    state.dataWaterCoils->GetWaterCoilsInputFlag = false;
-    state.dataWaterCoils->MySizeFlag(1) = true;
-    state.dataWaterCoils->MyUAAndFlowCalcFlag(1) = false;
-    GetSysInput(state);
+    GetZoneAirLoopEquipment(*state);
+    GetWaterCoilInput(*state);
+    state->dataWaterCoils->GetWaterCoilsInputFlag = false;
+    state->dataWaterCoils->MySizeFlag(1) = true;
+    state->dataWaterCoils->MyUAAndFlowCalcFlag(1) = false;
+    GetSysInput(*state);
     DataSizing::TermUnitSingDuct = true;
-    state.dataWaterCoils->WaterCoil(1).WaterLoopNum = 1;
-    state.dataWaterCoils->WaterCoil(1).WaterLoopSide = 1;
-    state.dataWaterCoils->WaterCoil(1).WaterLoopBranchNum = 1;
-    state.dataWaterCoils->WaterCoil(1).WaterLoopCompNum = 1;
+    state->dataWaterCoils->WaterCoil(1).WaterLoopNum = 1;
+    state->dataWaterCoils->WaterCoil(1).WaterLoopSide = 1;
+    state->dataWaterCoils->WaterCoil(1).WaterLoopBranchNum = 1;
+    state->dataWaterCoils->WaterCoil(1).WaterLoopCompNum = 1;
     PlantLoop(1).Name = "HotWaterLoop";
     PlantLoop(1).FluidName = "HotWater";
     PlantLoop(1).FluidIndex = 1;
     PlantLoop(1).FluidName = "WATER";
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state.dataWaterCoils->WaterCoil(1).Name;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state.dataWaterCoils->WaterCoil_SimpleHeating;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state.dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state.dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
-    sd_airterminal(1).HWLoopNum = 1;
-    sd_airterminal(1).HWLoopSide = 1;
-    sd_airterminal(1).HWBranchIndex = 1;
+    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
+    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_SimpleHeating;
+    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
+    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
+    state->dataSingleDuct->sd_airterminal(1).HWLoopNum = 1;
+    state->dataSingleDuct->sd_airterminal(1).HWLoopSide = 1;
+    state->dataSingleDuct->sd_airterminal(1).HWBranchIndex = 1;
     PlantSizData(1).DeltaT = 11.0;
     PlantSizData(1).ExitTemp = 82;
     PlantSizData(1).PlantLoopName = "HotWaterLoop";
@@ -315,11 +316,11 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils1)
             max(FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow, FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow) *
                 FinalZoneSizing(CurZoneEqNum).DesHeatMaxAirFlowFrac);
     TermUnitFinalZoneSizing(CurTermUnitSizingNum) = FinalZoneSizing(CurZoneEqNum);
-    sd_airterminal(1).ZoneFloorArea = Zone(1).FloorArea;
-    OutputReportPredefined::SetPredefinedTables(state);
-    sd_airterminal(1).SizeSys(state);
-    SizeWaterCoil(state, 1);
-    EXPECT_NEAR(state.dataWaterCoils->WaterCoil(1).UACoil, 199.86, 0.01);
+    state->dataSingleDuct->sd_airterminal(1).ZoneFloorArea = Zone(1).FloorArea;
+    OutputReportPredefined::SetPredefinedTables(*state);
+    state->dataSingleDuct->sd_airterminal(1).SizeSys(*state);
+    SizeWaterCoil(*state, 1);
+    EXPECT_NEAR(state->dataWaterCoils->WaterCoil(1).UACoil, 199.86, 0.01);
 
     Node.deallocate();
     ZoneEquipConfig.deallocate();
@@ -328,12 +329,12 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils1)
     TermUnitFinalZoneSizing.deallocate();
     CalcFinalZoneSizing.deallocate();
     TermUnitSizing.deallocate();
-    sd_airterminal.deallocate();
+    state->dataSingleDuct->sd_airterminal.deallocate();
     ZoneEqSizing.deallocate();
     PlantLoop.deallocate();
     PlantSizData.deallocate();
-    state.dataWaterCoils->MySizeFlag.deallocate();
-    state.dataWaterCoils->MyUAAndFlowCalcFlag.deallocate();
+    state->dataWaterCoils->MySizeFlag.deallocate();
+    state->dataWaterCoils->MyUAAndFlowCalcFlag.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils2)
@@ -470,8 +471,8 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils2)
     TotNumLoops = 1;
     PlantLoop.allocate(TotNumLoops);
     PlantSizData.allocate(1);
-    state.dataWaterCoils->MySizeFlag.allocate(1);
-    state.dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
+    state->dataWaterCoils->MySizeFlag.allocate(1);
+    state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
     NumPltSizInput = 1;
     for (int l = 1; l <= TotNumLoops; ++l) {
         auto &loop(PlantLoop(l));
@@ -483,36 +484,36 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils2)
         loopsidebranch.TotalComponents = 1;
         loopsidebranch.Comp.allocate(1);
     }
-    GetZoneData(state, ErrorsFound);
+    GetZoneData(*state, ErrorsFound);
     EXPECT_EQ("SPACE1-1", Zone(1).Name);
-    GetOARequirements(state);      // get the OA requirements object
-    GetZoneAirDistribution(state); // get zone air distribution objects
-    GetZoneSizingInput(state);
-    GetZoneEquipmentData1(state);
-    ProcessScheduleInput(state);
+    GetOARequirements(*state);      // get the OA requirements object
+    GetZoneAirDistribution(*state); // get zone air distribution objects
+    GetZoneSizingInput(*state);
+    GetZoneEquipmentData1(*state);
+    ProcessScheduleInput(*state);
     ScheduleInputProcessed = true;
-    GetZoneAirLoopEquipment(state);
-    GetWaterCoilInput(state);
-    state.dataWaterCoils->GetWaterCoilsInputFlag = false;
-    state.dataWaterCoils->MySizeFlag(1) = true;
-    state.dataWaterCoils->MyUAAndFlowCalcFlag(1) = false;
-    GetSysInput(state);
+    GetZoneAirLoopEquipment(*state);
+    GetWaterCoilInput(*state);
+    state->dataWaterCoils->GetWaterCoilsInputFlag = false;
+    state->dataWaterCoils->MySizeFlag(1) = true;
+    state->dataWaterCoils->MyUAAndFlowCalcFlag(1) = false;
+    GetSysInput(*state);
     DataSizing::TermUnitSingDuct = true;
-    state.dataWaterCoils->WaterCoil(1).WaterLoopNum = 1;
-    state.dataWaterCoils->WaterCoil(1).WaterLoopSide = 1;
-    state.dataWaterCoils->WaterCoil(1).WaterLoopBranchNum = 1;
-    state.dataWaterCoils->WaterCoil(1).WaterLoopCompNum = 1;
+    state->dataWaterCoils->WaterCoil(1).WaterLoopNum = 1;
+    state->dataWaterCoils->WaterCoil(1).WaterLoopSide = 1;
+    state->dataWaterCoils->WaterCoil(1).WaterLoopBranchNum = 1;
+    state->dataWaterCoils->WaterCoil(1).WaterLoopCompNum = 1;
     PlantLoop(1).Name = "HotWaterLoop";
     PlantLoop(1).FluidName = "HotWater";
     PlantLoop(1).FluidIndex = 1;
     PlantLoop(1).FluidName = "WATER";
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state.dataWaterCoils->WaterCoil(1).Name;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state.dataWaterCoils->WaterCoil_SimpleHeating;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state.dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state.dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
-    sd_airterminal(1).HWLoopNum = 1;
-    sd_airterminal(1).HWLoopSide = 1;
-    sd_airterminal(1).HWBranchIndex = 1;
+    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
+    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_SimpleHeating;
+    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
+    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
+    state->dataSingleDuct->sd_airterminal(1).HWLoopNum = 1;
+    state->dataSingleDuct->sd_airterminal(1).HWLoopSide = 1;
+    state->dataSingleDuct->sd_airterminal(1).HWBranchIndex = 1;
     PlantSizData(1).DeltaT = 11.0;
     PlantSizData(1).ExitTemp = 82;
     PlantSizData(1).PlantLoopName = "HotWaterLoop";
@@ -552,12 +553,12 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils2)
             max(FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow, FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow) *
                 FinalZoneSizing(CurZoneEqNum).DesHeatMaxAirFlowFrac);
     TermUnitFinalZoneSizing(CurTermUnitSizingNum) = FinalZoneSizing(CurZoneEqNum);
-    sd_airterminal(1).ZoneFloorArea = Zone(1).FloorArea;
-    sd_airterminal(1).ZoneFloorArea = Zone(1).FloorArea;
-    sd_airterminal(1).SizeSys(state);
-    SizeWaterCoil(state, 1);
-    EXPECT_NEAR(state.dataWaterCoils->WaterCoil(1).MaxWaterVolFlowRate, .0000850575, 0.000000001);
-    EXPECT_NEAR(state.dataWaterCoils->WaterCoil(1).UACoil, 85.97495, 0.01);
+    state->dataSingleDuct->sd_airterminal(1).ZoneFloorArea = Zone(1).FloorArea;
+    state->dataSingleDuct->sd_airterminal(1).ZoneFloorArea = Zone(1).FloorArea;
+    state->dataSingleDuct->sd_airterminal(1).SizeSys(*state);
+    SizeWaterCoil(*state, 1);
+    EXPECT_NEAR(state->dataWaterCoils->WaterCoil(1).MaxWaterVolFlowRate, .0000850575, 0.000000001);
+    EXPECT_NEAR(state->dataWaterCoils->WaterCoil(1).UACoil, 85.97495, 0.01);
 
     Node.deallocate();
     ZoneEquipConfig.deallocate();
@@ -566,12 +567,12 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils2)
     TermUnitFinalZoneSizing.deallocate();
     CalcFinalZoneSizing.deallocate();
     TermUnitSizing.deallocate();
-    sd_airterminal.deallocate();
+    state->dataSingleDuct->sd_airterminal.deallocate();
     ZoneEqSizing.deallocate();
     PlantLoop.deallocate();
     PlantSizData.deallocate();
-    state.dataWaterCoils->MySizeFlag.deallocate();
-    state.dataWaterCoils->MyUAAndFlowCalcFlag.deallocate();
+    state->dataWaterCoils->MySizeFlag.deallocate();
+    state->dataWaterCoils->MyUAAndFlowCalcFlag.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils3)
@@ -707,8 +708,8 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils3)
     TotNumLoops = 1;
     PlantLoop.allocate(TotNumLoops);
     PlantSizData.allocate(1);
-    state.dataWaterCoils->MySizeFlag.allocate(1);
-    state.dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
+    state->dataWaterCoils->MySizeFlag.allocate(1);
+    state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
     NumPltSizInput = 1;
     for (int l = 1; l <= TotNumLoops; ++l) {
         auto &loop(PlantLoop(l));
@@ -720,36 +721,36 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils3)
         loopsidebranch.TotalComponents = 1;
         loopsidebranch.Comp.allocate(1);
     }
-    GetZoneData(state, ErrorsFound);
+    GetZoneData(*state, ErrorsFound);
     EXPECT_EQ("SPACE1-1", Zone(1).Name);
-    GetOARequirements(state);      // get the OA requirements object
-    GetZoneAirDistribution(state); // get zone air distribution objects
-    GetZoneSizingInput(state);
-    GetZoneEquipmentData1(state);
-    ProcessScheduleInput(state);
+    GetOARequirements(*state);      // get the OA requirements object
+    GetZoneAirDistribution(*state); // get zone air distribution objects
+    GetZoneSizingInput(*state);
+    GetZoneEquipmentData1(*state);
+    ProcessScheduleInput(*state);
     ScheduleInputProcessed = true;
-    GetZoneAirLoopEquipment(state);
-    GetWaterCoilInput(state);
-    state.dataWaterCoils->GetWaterCoilsInputFlag = false;
-    state.dataWaterCoils->MySizeFlag(1) = true;
-    state.dataWaterCoils->MyUAAndFlowCalcFlag(1) = false;
-    GetSysInput(state);
+    GetZoneAirLoopEquipment(*state);
+    GetWaterCoilInput(*state);
+    state->dataWaterCoils->GetWaterCoilsInputFlag = false;
+    state->dataWaterCoils->MySizeFlag(1) = true;
+    state->dataWaterCoils->MyUAAndFlowCalcFlag(1) = false;
+    GetSysInput(*state);
     DataSizing::TermUnitSingDuct = true;
-    state.dataWaterCoils->WaterCoil(1).WaterLoopNum = 1;
-    state.dataWaterCoils->WaterCoil(1).WaterLoopSide = 1;
-    state.dataWaterCoils->WaterCoil(1).WaterLoopBranchNum = 1;
-    state.dataWaterCoils->WaterCoil(1).WaterLoopCompNum = 1;
+    state->dataWaterCoils->WaterCoil(1).WaterLoopNum = 1;
+    state->dataWaterCoils->WaterCoil(1).WaterLoopSide = 1;
+    state->dataWaterCoils->WaterCoil(1).WaterLoopBranchNum = 1;
+    state->dataWaterCoils->WaterCoil(1).WaterLoopCompNum = 1;
     PlantLoop(1).Name = "HotWaterLoop";
     PlantLoop(1).FluidName = "HotWater";
     PlantLoop(1).FluidIndex = 1;
     PlantLoop(1).FluidName = "WATER";
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state.dataWaterCoils->WaterCoil(1).Name;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state.dataWaterCoils->WaterCoil_SimpleHeating;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state.dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state.dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
-    sd_airterminal(1).HWLoopNum = 1;
-    sd_airterminal(1).HWLoopSide = 1;
-    sd_airterminal(1).HWBranchIndex = 1;
+    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
+    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_SimpleHeating;
+    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
+    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
+    state->dataSingleDuct->sd_airterminal(1).HWLoopNum = 1;
+    state->dataSingleDuct->sd_airterminal(1).HWLoopSide = 1;
+    state->dataSingleDuct->sd_airterminal(1).HWBranchIndex = 1;
     PlantSizData(1).DeltaT = 11.0;
     PlantSizData(1).ExitTemp = 82;
     PlantSizData(1).PlantLoopName = "HotWaterLoop";
@@ -789,11 +790,11 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils3)
             max(FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow, FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow) *
                 FinalZoneSizing(CurZoneEqNum).DesHeatMaxAirFlowFrac);
     TermUnitFinalZoneSizing(CurTermUnitSizingNum) = FinalZoneSizing(CurZoneEqNum);
-    sd_airterminal(1).ZoneFloorArea = Zone(1).FloorArea;
-    sd_airterminal(1).SizeSys(state);
-    SizeWaterCoil(state, 1);
-    EXPECT_NEAR(state.dataWaterCoils->WaterCoil(1).MaxWaterVolFlowRate, .0000850575, 0.000000001);
-    EXPECT_NEAR(state.dataWaterCoils->WaterCoil(1).UACoil, 85.97495, 0.01);
+    state->dataSingleDuct->sd_airterminal(1).ZoneFloorArea = Zone(1).FloorArea;
+    state->dataSingleDuct->sd_airterminal(1).SizeSys(*state);
+    SizeWaterCoil(*state, 1);
+    EXPECT_NEAR(state->dataWaterCoils->WaterCoil(1).MaxWaterVolFlowRate, .0000850575, 0.000000001);
+    EXPECT_NEAR(state->dataWaterCoils->WaterCoil(1).UACoil, 85.97495, 0.01);
 
     Node.deallocate();
     ZoneEquipConfig.deallocate();
@@ -802,12 +803,12 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils3)
     TermUnitFinalZoneSizing.deallocate();
     CalcFinalZoneSizing.deallocate();
     TermUnitSizing.deallocate();
-    sd_airterminal.deallocate();
+    state->dataSingleDuct->sd_airterminal.deallocate();
     ZoneEqSizing.deallocate();
     PlantLoop.deallocate();
     PlantSizData.deallocate();
-    state.dataWaterCoils->MySizeFlag.deallocate();
-    state.dataWaterCoils->MyUAAndFlowCalcFlag.deallocate();
+    state->dataWaterCoils->MySizeFlag.deallocate();
+    state->dataWaterCoils->MyUAAndFlowCalcFlag.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils4)
@@ -944,8 +945,8 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils4)
     TotNumLoops = 1;
     PlantLoop.allocate(TotNumLoops);
     PlantSizData.allocate(1);
-    state.dataWaterCoils->MySizeFlag.allocate(1);
-    state.dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
+    state->dataWaterCoils->MySizeFlag.allocate(1);
+    state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
     NumPltSizInput = 1;
     for (int l = 1; l <= TotNumLoops; ++l) {
         auto &loop(PlantLoop(l));
@@ -957,36 +958,36 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils4)
         loopsidebranch.TotalComponents = 1;
         loopsidebranch.Comp.allocate(1);
     }
-    GetZoneData(state, ErrorsFound);
+    GetZoneData(*state, ErrorsFound);
     EXPECT_EQ("SPACE1-1", Zone(1).Name);
-    GetOARequirements(state);      // get the OA requirements object
-    GetZoneAirDistribution(state); // get zone air distribution objects
-    GetZoneSizingInput(state);
-    GetZoneEquipmentData1(state);
-    ProcessScheduleInput(state);
+    GetOARequirements(*state);      // get the OA requirements object
+    GetZoneAirDistribution(*state); // get zone air distribution objects
+    GetZoneSizingInput(*state);
+    GetZoneEquipmentData1(*state);
+    ProcessScheduleInput(*state);
     ScheduleInputProcessed = true;
-    GetZoneAirLoopEquipment(state);
-    GetWaterCoilInput(state);
-    state.dataWaterCoils->GetWaterCoilsInputFlag = false;
-    state.dataWaterCoils->MySizeFlag(1) = true;
-    state.dataWaterCoils->MyUAAndFlowCalcFlag(1) = false;
-    GetSysInput(state);
+    GetZoneAirLoopEquipment(*state);
+    GetWaterCoilInput(*state);
+    state->dataWaterCoils->GetWaterCoilsInputFlag = false;
+    state->dataWaterCoils->MySizeFlag(1) = true;
+    state->dataWaterCoils->MyUAAndFlowCalcFlag(1) = false;
+    GetSysInput(*state);
     DataSizing::TermUnitSingDuct = true;
-    state.dataWaterCoils->WaterCoil(1).WaterLoopNum = 1;
-    state.dataWaterCoils->WaterCoil(1).WaterLoopSide = 1;
-    state.dataWaterCoils->WaterCoil(1).WaterLoopBranchNum = 1;
-    state.dataWaterCoils->WaterCoil(1).WaterLoopCompNum = 1;
+    state->dataWaterCoils->WaterCoil(1).WaterLoopNum = 1;
+    state->dataWaterCoils->WaterCoil(1).WaterLoopSide = 1;
+    state->dataWaterCoils->WaterCoil(1).WaterLoopBranchNum = 1;
+    state->dataWaterCoils->WaterCoil(1).WaterLoopCompNum = 1;
     PlantLoop(1).Name = "HotWaterLoop";
     PlantLoop(1).FluidName = "HotWater";
     PlantLoop(1).FluidIndex = 1;
     PlantLoop(1).FluidName = "WATER";
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state.dataWaterCoils->WaterCoil(1).Name;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state.dataWaterCoils->WaterCoil_SimpleHeating;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state.dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state.dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
-    sd_airterminal(1).HWLoopNum = 1;
-    sd_airterminal(1).HWLoopSide = 1;
-    sd_airterminal(1).HWBranchIndex = 1;
+    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
+    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_SimpleHeating;
+    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
+    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
+    state->dataSingleDuct->sd_airterminal(1).HWLoopNum = 1;
+    state->dataSingleDuct->sd_airterminal(1).HWLoopSide = 1;
+    state->dataSingleDuct->sd_airterminal(1).HWBranchIndex = 1;
     PlantSizData(1).DeltaT = 11.0;
     PlantSizData(1).ExitTemp = 82;
     PlantSizData(1).PlantLoopName = "HotWaterLoop";
@@ -1026,11 +1027,11 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils4)
             max(FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow, FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow) *
                 FinalZoneSizing(CurZoneEqNum).DesHeatMaxAirFlowFrac);
     TermUnitFinalZoneSizing(CurTermUnitSizingNum) = FinalZoneSizing(CurZoneEqNum);
-    sd_airterminal(1).ZoneFloorArea = Zone(1).FloorArea;
-    sd_airterminal(1).SizeSys(state);
-    SizeWaterCoil(state, 1);
-    EXPECT_NEAR(state.dataWaterCoils->WaterCoil(1).MaxWaterVolFlowRate, .0000850575, 0.000000001);
-    EXPECT_NEAR(state.dataWaterCoils->WaterCoil(1).UACoil, 300.00, 0.01);
+    state->dataSingleDuct->sd_airterminal(1).ZoneFloorArea = Zone(1).FloorArea;
+    state->dataSingleDuct->sd_airterminal(1).SizeSys(*state);
+    SizeWaterCoil(*state, 1);
+    EXPECT_NEAR(state->dataWaterCoils->WaterCoil(1).MaxWaterVolFlowRate, .0000850575, 0.000000001);
+    EXPECT_NEAR(state->dataWaterCoils->WaterCoil(1).UACoil, 300.00, 0.01);
 
     Node.deallocate();
     ZoneEquipConfig.deallocate();
@@ -1039,12 +1040,12 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils4)
     TermUnitFinalZoneSizing.deallocate();
     CalcFinalZoneSizing.deallocate();
     TermUnitSizing.deallocate();
-    sd_airterminal.deallocate();
+    state->dataSingleDuct->sd_airterminal.deallocate();
     ZoneEqSizing.deallocate();
     PlantLoop.deallocate();
     PlantSizData.deallocate();
-    state.dataWaterCoils->MySizeFlag.deallocate();
-    state.dataWaterCoils->MyUAAndFlowCalcFlag.deallocate();
+    state->dataWaterCoils->MySizeFlag.deallocate();
+    state->dataWaterCoils->MyUAAndFlowCalcFlag.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils5)
@@ -1140,13 +1141,13 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils5)
 
     FinalSysSizing.allocate(1);
     UnitarySysEqSizing.allocate(1);
-    state.dataAirSystemsData->PrimaryAirSystems.allocate(1);
-    state.dataAirLoop->AirLoopControlInfo.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
+    state->dataAirLoop->AirLoopControlInfo.allocate(1);
     TotNumLoops = 1;
     PlantLoop.allocate(TotNumLoops);
     PlantSizData.allocate(1);
-    state.dataWaterCoils->MySizeFlag.allocate(1);
-    state.dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
+    state->dataWaterCoils->MySizeFlag.allocate(1);
+    state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
     NumPltSizInput = 1;
     for (int l = 1; l <= TotNumLoops; ++l) {
         auto &loop(PlantLoop(l));
@@ -1158,27 +1159,27 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils5)
         loopsidebranch.TotalComponents = 1;
         loopsidebranch.Comp.allocate(1);
     }
-    GetZoneData(state, ErrorsFound);
+    GetZoneData(*state, ErrorsFound);
     EXPECT_EQ("SPACE1-1", Zone(1).Name);
-    ProcessScheduleInput(state);
+    ProcessScheduleInput(*state);
     ScheduleInputProcessed = true;
-    GetWaterCoilInput(state);
-    state.dataWaterCoils->GetWaterCoilsInputFlag = false;
-    state.dataWaterCoils->MySizeFlag(1) = true;
-    state.dataWaterCoils->MyUAAndFlowCalcFlag(1) = false;
+    GetWaterCoilInput(*state);
+    state->dataWaterCoils->GetWaterCoilsInputFlag = false;
+    state->dataWaterCoils->MySizeFlag(1) = true;
+    state->dataWaterCoils->MyUAAndFlowCalcFlag(1) = false;
     DataSizing::TermUnitSingDuct = true;
-    state.dataWaterCoils->WaterCoil(1).WaterLoopNum = 1;
-    state.dataWaterCoils->WaterCoil(1).WaterLoopSide = 1;
-    state.dataWaterCoils->WaterCoil(1).WaterLoopBranchNum = 1;
-    state.dataWaterCoils->WaterCoil(1).WaterLoopCompNum = 1;
+    state->dataWaterCoils->WaterCoil(1).WaterLoopNum = 1;
+    state->dataWaterCoils->WaterCoil(1).WaterLoopSide = 1;
+    state->dataWaterCoils->WaterCoil(1).WaterLoopBranchNum = 1;
+    state->dataWaterCoils->WaterCoil(1).WaterLoopCompNum = 1;
     PlantLoop(1).Name = "HotWaterLoop";
     PlantLoop(1).FluidName = "HotWater";
     PlantLoop(1).FluidIndex = 1;
     PlantLoop(1).FluidName = "WATER";
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state.dataWaterCoils->WaterCoil(1).Name;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state.dataWaterCoils->WaterCoil_SimpleHeating;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state.dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state.dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
+    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
+    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_SimpleHeating;
+    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
+    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
     PlantSizData(1).DeltaT = 11.0;
     PlantSizData(1).ExitTemp = 82;
     PlantSizData(1).PlantLoopName = "HotWaterLoop";
@@ -1200,20 +1201,20 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils5)
     UnitarySysEqSizing(CurSysNum).CoolingCapacity = false;
     UnitarySysEqSizing(CurSysNum).HeatingCapacity = false;
     DataHVACGlobals::NumPrimaryAirSys = 1;
-    SizeWaterCoil(state, 1);
-    EXPECT_NEAR(state.dataWaterCoils->WaterCoil(1).MaxWaterMassFlowRate, .258323, 0.00001);
-    EXPECT_NEAR(state.dataWaterCoils->WaterCoil(1).UACoil, 239.835, 0.01);
+    SizeWaterCoil(*state, 1);
+    EXPECT_NEAR(state->dataWaterCoils->WaterCoil(1).MaxWaterMassFlowRate, .258323, 0.00001);
+    EXPECT_NEAR(state->dataWaterCoils->WaterCoil(1).UACoil, 239.835, 0.01);
 
     Node.deallocate();
     Zone.deallocate();
     PlantLoop.deallocate();
     PlantSizData.deallocate();
-    state.dataWaterCoils->MySizeFlag.deallocate();
-    state.dataWaterCoils->MyUAAndFlowCalcFlag.deallocate();
+    state->dataWaterCoils->MySizeFlag.deallocate();
+    state->dataWaterCoils->MyUAAndFlowCalcFlag.deallocate();
     FinalSysSizing.deallocate();
     UnitarySysEqSizing.deallocate();
-    state.dataAirSystemsData->PrimaryAirSystems.deallocate();
-    state.dataAirLoop->AirLoopControlInfo.deallocate();
+    state->dataAirSystemsData->PrimaryAirSystems.deallocate();
+    state->dataAirLoop->AirLoopControlInfo.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils6)
@@ -1356,8 +1357,8 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils6)
     TermUnitSizing.allocate(1);
     TotNumLoops = 1;
     PlantLoop.allocate(TotNumLoops);
-    state.dataWaterCoils->MySizeFlag.allocate(1);
-    state.dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
+    state->dataWaterCoils->MySizeFlag.allocate(1);
+    state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
     for (int l = 1; l <= TotNumLoops; ++l) {
         auto &loop(PlantLoop(l));
         loop.LoopSide.allocate(2);
@@ -1368,60 +1369,60 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils6)
         loopsidebranch.TotalComponents = 1;
         loopsidebranch.Comp.allocate(1);
     }
-    GetZoneData(state, ErrorsFound);
+    GetZoneData(*state, ErrorsFound);
     EXPECT_EQ("SPACE1-1", Zone(1).Name);
-    GetOARequirements(state);      // get the OA requirements object
-    GetZoneAirDistribution(state); // get zone air distribution objects
-    GetZoneSizingInput(state);
-    GetZoneEquipmentData1(state);
-    ProcessScheduleInput(state);
+    GetOARequirements(*state);      // get the OA requirements object
+    GetZoneAirDistribution(*state); // get zone air distribution objects
+    GetZoneSizingInput(*state);
+    GetZoneEquipmentData1(*state);
+    ProcessScheduleInput(*state);
     ScheduleInputProcessed = true;
-    GetZoneAirLoopEquipment(state);
-    GetWaterCoilInput(state);
-    state.dataWaterCoils->GetWaterCoilsInputFlag = false;
-    state.dataWaterCoils->MySizeFlag(1) = true;
-    state.dataWaterCoils->MyUAAndFlowCalcFlag(1) = false;
-    GetSysInput(state);
+    GetZoneAirLoopEquipment(*state);
+    GetWaterCoilInput(*state);
+    state->dataWaterCoils->GetWaterCoilsInputFlag = false;
+    state->dataWaterCoils->MySizeFlag(1) = true;
+    state->dataWaterCoils->MyUAAndFlowCalcFlag(1) = false;
+    GetSysInput(*state);
     DataSizing::TermUnitSingDuct = true;
-    state.dataWaterCoils->WaterCoil(1).WaterLoopNum = 1;
-    state.dataWaterCoils->WaterCoil(1).WaterLoopSide = 1;
-    state.dataWaterCoils->WaterCoil(1).WaterLoopBranchNum = 1;
-    state.dataWaterCoils->WaterCoil(1).WaterLoopCompNum = 1;
+    state->dataWaterCoils->WaterCoil(1).WaterLoopNum = 1;
+    state->dataWaterCoils->WaterCoil(1).WaterLoopSide = 1;
+    state->dataWaterCoils->WaterCoil(1).WaterLoopBranchNum = 1;
+    state->dataWaterCoils->WaterCoil(1).WaterLoopCompNum = 1;
     PlantLoop(1).Name = "HotWaterLoop";
     PlantLoop(1).FluidName = "HotWater";
     PlantLoop(1).FluidIndex = 1;
     PlantLoop(1).FluidName = "WATER";
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state.dataWaterCoils->WaterCoil(1).Name;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state.dataWaterCoils->WaterCoil_SimpleHeating;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state.dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state.dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
-    sd_airterminal(1).HWLoopNum = 1;
-    sd_airterminal(1).HWLoopSide = 1;
-    sd_airterminal(1).HWBranchIndex = 1;
+    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
+    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_SimpleHeating;
+    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
+    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
+    state->dataSingleDuct->sd_airterminal(1).HWLoopNum = 1;
+    state->dataSingleDuct->sd_airterminal(1).HWLoopSide = 1;
+    state->dataSingleDuct->sd_airterminal(1).HWBranchIndex = 1;
     CurZoneEqNum = 1;
     CurTermUnitSizingNum = 1;
     CurSysNum = 0;
     Zone(1).FloorArea = 99.16;
-    sd_airterminal(1).ZoneFloorArea = Zone(1).FloorArea;
+    state->dataSingleDuct->sd_airterminal(1).ZoneFloorArea = Zone(1).FloorArea;
 
-    OutputReportPredefined::SetPredefinedTables(state);
-    sd_airterminal(1).SizeSys(state);
-    state.dataGlobal->BeginEnvrnFlag = true;
+    OutputReportPredefined::SetPredefinedTables(*state);
+    state->dataSingleDuct->sd_airterminal(1).SizeSys(*state);
+    state->dataGlobal->BeginEnvrnFlag = true;
 
     // water coil is user input for water flow and UA with performance input method = UFactorTimesAreaAndDesignWaterFlowRate and Rated Capacity =
     // autosize
-    EXPECT_NEAR(state.dataWaterCoils->WaterCoil(1).MaxWaterVolFlowRate, .0000850575, 0.000000001); // water flow rate input by user
-    EXPECT_NEAR(state.dataWaterCoils->WaterCoil(1).UACoil, 300.00, 0.01);                          // Ua input by user
-    EXPECT_EQ(state.dataWaterCoils->WaterCoil(1).DesTotWaterCoilLoad, DataSizing::AutoSize);       // Rated Capacity input by user
-    EXPECT_EQ(state.dataWaterCoils->WaterCoil(1).DesWaterHeatingCoilRate, 0.0);                    // model output not yet set
+    EXPECT_NEAR(state->dataWaterCoils->WaterCoil(1).MaxWaterVolFlowRate, .0000850575, 0.000000001); // water flow rate input by user
+    EXPECT_NEAR(state->dataWaterCoils->WaterCoil(1).UACoil, 300.00, 0.01);                          // Ua input by user
+    EXPECT_EQ(state->dataWaterCoils->WaterCoil(1).DesTotWaterCoilLoad, DataSizing::AutoSize);       // Rated Capacity input by user
+    EXPECT_EQ(state->dataWaterCoils->WaterCoil(1).DesWaterHeatingCoilRate, 0.0);                    // model output not yet set
 
     // sizing will be called and skipped with Init setting DesWaterHeatingCoilRate based on above inputs
-    InitWaterCoil(state, 1, false);
-    EXPECT_NEAR(state.dataWaterCoils->WaterCoil(1).DesWaterHeatingCoilRate, 7390.73, 0.01);
+    InitWaterCoil(*state, 1, false);
+    EXPECT_NEAR(state->dataWaterCoils->WaterCoil(1).DesWaterHeatingCoilRate, 7390.73, 0.01);
     // not set in Init for water heating coils and not used elsewhere other than sizing
-    EXPECT_EQ(state.dataWaterCoils->WaterCoil(1).DesTotWaterCoilLoad, DataSizing::AutoSize);
+    EXPECT_EQ(state->dataWaterCoils->WaterCoil(1).DesTotWaterCoilLoad, DataSizing::AutoSize);
 
-    sd_airterminal.deallocate();
+    state->dataSingleDuct->sd_airterminal.deallocate();
 }
 
 } // namespace EnergyPlus

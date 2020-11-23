@@ -49,7 +49,6 @@
 #include <cmath>
 #include <string>
 #include <algorithm>
-#include <fstream>
 #include <limits>
 
 // ObjexxFCL Headers
@@ -66,7 +65,6 @@
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -262,7 +260,6 @@ namespace CurveManager {
 
         // Using/Aliasing
         using namespace DataIPShortCuts; // Data for field names, blank numerics
-        using General::RoundSigDigits;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumBiQuad;                   // Number of biquadratic curve objects in the input data file
@@ -379,14 +376,12 @@ namespace CurveManager {
 
             if (Numbers(7) > Numbers(8)) { // error
                 ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state, cNumericFieldNames(7) + " [" + RoundSigDigits(Numbers(7), 2) + "] > " + cNumericFieldNames(8) + " [" +
-                                  RoundSigDigits(Numbers(8), 2) + ']');
+                ShowContinueError(state, format("{} [{:.R2}] > {} [{.R2}]", cNumericFieldNames(7), Numbers(7), cNumericFieldNames(8), Numbers(8)));
                 ErrorsFound = true;
             }
             if (Numbers(9) > Numbers(10)) { // error
                 ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state, cNumericFieldNames(9) + " [" + RoundSigDigits(Numbers(9), 2) + "] > " + cNumericFieldNames(10) + " [" +
-                                  RoundSigDigits(Numbers(10), 2) + ']');
+                ShowContinueError(state, format("{} [{:.R2}] > {} [{.R2}]", cNumericFieldNames(9), Numbers(9), cNumericFieldNames(10), Numbers(10)));
                 ErrorsFound = true;
             }
             if (NumAlphas >= 2) {
@@ -520,8 +515,7 @@ namespace CurveManager {
 
             if (Numbers(5) > Numbers(6)) { // error
                 ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state, cNumericFieldNames(5) + '[' + RoundSigDigits(Numbers(5), 2) + "] > " + cNumericFieldNames(6) + " [" +
-                                  RoundSigDigits(Numbers(6), 2) + ']');
+                ShowContinueError(state, format("{}[{:.R2}] > {} [{.R2}]", cNumericFieldNames(5), Numbers(5), cNumericFieldNames(6), Numbers(6)));
                 ErrorsFound = true;
             }
             if (NumAlphas >= 2) {
@@ -576,8 +570,7 @@ namespace CurveManager {
 
             if (Numbers(6) > Numbers(7)) { // error
                 ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state, cNumericFieldNames(6) + '[' + RoundSigDigits(Numbers(6), 2) + "] > " + cNumericFieldNames(7) + " [" +
-                                  RoundSigDigits(Numbers(7), 2) + ']');
+                ShowContinueError(state, format("{}[{:.R2}] > {} [{.R2}]", cNumericFieldNames(6), Numbers(6), cNumericFieldNames(7), Numbers(7)));
                 ErrorsFound = true;
             }
             if (NumAlphas >= 2) {
@@ -630,8 +623,7 @@ namespace CurveManager {
 
             if (Numbers(4) > Numbers(5)) { // error
                 ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state, cNumericFieldNames(4) + " [" + RoundSigDigits(Numbers(4), 2) + "] > " + cNumericFieldNames(5) + " [" +
-                                  RoundSigDigits(Numbers(5), 2) + ']');
+                ShowContinueError(state, format("{} [{:.R2}] > {} [{.R2}]", cNumericFieldNames(4), Numbers(4), cNumericFieldNames(5), Numbers(5)));
                 ErrorsFound = true;
             }
             if (NumAlphas >= 2) {
@@ -689,14 +681,12 @@ namespace CurveManager {
 
             if (Numbers(7) > Numbers(8)) { // error
                 ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state, cNumericFieldNames(7) + " [" + RoundSigDigits(Numbers(7), 2) + "] > " + cNumericFieldNames(8) + " [" +
-                                  RoundSigDigits(Numbers(8), 2) + ']');
+                ShowContinueError(state, format("{} [{:.R2}] > {} [{.R2}]", cNumericFieldNames(7), Numbers(7), cNumericFieldNames(8), Numbers(8)));
                 ErrorsFound = true;
             }
             if (Numbers(9) > Numbers(10)) { // error
                 ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state, cNumericFieldNames(9) + " [" + RoundSigDigits(Numbers(9), 2) + "] > " + cNumericFieldNames(10) + " [" +
-                                  RoundSigDigits(Numbers(10), 2) + ']');
+                ShowContinueError(state, format("{} [{:.R2}] > {} [{.R2}]", cNumericFieldNames(9), Numbers(9), cNumericFieldNames(10), Numbers(10)));
                 ErrorsFound = true;
             }
             if (NumAlphas >= 2) {
@@ -759,14 +749,12 @@ namespace CurveManager {
 
             if (Numbers(7) > Numbers(8)) { // error
                 ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state, cNumericFieldNames(7) + " [" + RoundSigDigits(Numbers(7), 2) + "] > " + cNumericFieldNames(8) + " [" +
-                                  RoundSigDigits(Numbers(8), 2) + ']');
+                ShowContinueError(state, format("{} [{:.R2}] > {} [{.R2}]", cNumericFieldNames(7), Numbers(7), cNumericFieldNames(8), Numbers(8)));
                 ErrorsFound = true;
             }
             if (Numbers(9) > Numbers(10)) { // error
                 ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state, cNumericFieldNames(9) + " [" + RoundSigDigits(Numbers(9), 2) + "] > " + cNumericFieldNames(10) + " [" +
-                                  RoundSigDigits(Numbers(10), 2) + ']');
+                ShowContinueError(state, format("{} [{:.R2}] > {} [{.R2}]", cNumericFieldNames(9), Numbers(9), cNumericFieldNames(10), Numbers(10)));
                 ErrorsFound = true;
             }
             if (NumAlphas >= 2) {
@@ -823,8 +811,7 @@ namespace CurveManager {
 
             if (Numbers(3) > Numbers(4)) { // error
                 ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state, cNumericFieldNames(3) + " [" + RoundSigDigits(Numbers(3), 2) + "] > " + cNumericFieldNames(4) + " [" +
-                                  RoundSigDigits(Numbers(4), 2) + ']');
+                ShowContinueError(state, format("{} [{:.R2}] > {} [{.R2}]", cNumericFieldNames(3), Numbers(3), cNumericFieldNames(4), Numbers(4)));
                 ErrorsFound = true;
             }
             if (NumAlphas >= 2) {
@@ -886,14 +873,14 @@ namespace CurveManager {
 
             if (Numbers(11) > Numbers(12)) { // error
                 ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state, cNumericFieldNames(11) + " [" + RoundSigDigits(Numbers(11), 2) + "] > " + cNumericFieldNames(12) + " [" +
-                                  RoundSigDigits(Numbers(12), 2) + ']');
+                ShowContinueError(state,
+                                  format("{} [{:.R2}] > {} [{.R2}]", cNumericFieldNames(11), Numbers(11), cNumericFieldNames(12), Numbers(12)));
                 ErrorsFound = true;
             }
             if (Numbers(13) > Numbers(14)) { // error
                 ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state, cNumericFieldNames(13) + " [" + RoundSigDigits(Numbers(13), 2) + "] > " + cNumericFieldNames(14) + " [" +
-                                  RoundSigDigits(Numbers(14), 2) + ']');
+                ShowContinueError(state,
+                                  format("{} [{:.R2}] > {} [{.R2}]", cNumericFieldNames(13), Numbers(13), cNumericFieldNames(14), Numbers(14)));
                 ErrorsFound = true;
             }
             if (NumAlphas >= 2) {
@@ -982,20 +969,20 @@ namespace CurveManager {
 
             if (Numbers(28) > Numbers(29)) { // error
                 ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state, cNumericFieldNames(28) + " [" + RoundSigDigits(Numbers(28), 2) + "] > " + cNumericFieldNames(29) + " [" +
-                                  RoundSigDigits(Numbers(29), 2) + ']');
+                ShowContinueError(state,
+                                  format("{} [{:.R2}] > {} [{.R2}]", cNumericFieldNames(28), Numbers(28), cNumericFieldNames(29), Numbers(29)));
                 ErrorsFound = true;
             }
             if (Numbers(30) > Numbers(31)) { // error
                 ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state, cNumericFieldNames(30) + " [" + RoundSigDigits(Numbers(30), 2) + "] > " + cNumericFieldNames(31) + " [" +
-                                  RoundSigDigits(Numbers(31), 2) + ']');
+                ShowContinueError(state,
+                                  format("{} [{:.R2}] > {} [{.R2}]", cNumericFieldNames(30), Numbers(30), cNumericFieldNames(31), Numbers(31)));
                 ErrorsFound = true;
             }
             if (Numbers(32) > Numbers(33)) { // error
                 ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state, cNumericFieldNames(32) + " [" + RoundSigDigits(Numbers(32), 2) + "] > " + cNumericFieldNames(33) + " [" +
-                                  RoundSigDigits(Numbers(33), 2) + ']');
+                ShowContinueError(state,
+                                  format("{} [{:.R2}] > {} [{.R2}]", cNumericFieldNames(32), Numbers(32), cNumericFieldNames(33), Numbers(33)));
                 ErrorsFound = true;
             }
             if (NumAlphas >= 2) {
@@ -1067,26 +1054,24 @@ namespace CurveManager {
 
             if (Numbers(6) > Numbers(7)) { // error
                 ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state, cNumericFieldNames(6) + " [" + RoundSigDigits(Numbers(6), 2) + "] > " + cNumericFieldNames(7) + " [" +
-                                  RoundSigDigits(Numbers(7), 2) + ']');
+                ShowContinueError(state, format("{} [{:.R2}] > {} [{.R2}]", cNumericFieldNames(6), Numbers(6), cNumericFieldNames(7), Numbers(7)));
                 ErrorsFound = true;
             }
             if (Numbers(8) > Numbers(9)) { // error
                 ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state, cNumericFieldNames(8) + " [" + RoundSigDigits(Numbers(8), 2) + "] > " + cNumericFieldNames(9) + " [" +
-                                  RoundSigDigits(Numbers(9), 2) + ']');
+                ShowContinueError(state, format("{} [{:.R2}] > {} [{.R2}]", cNumericFieldNames(8), Numbers(8), cNumericFieldNames(9), Numbers(9)));
                 ErrorsFound = true;
             }
             if (Numbers(10) > Numbers(11)) { // error
                 ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state, cNumericFieldNames(10) + " [" + RoundSigDigits(Numbers(10), 2) + "] > " + cNumericFieldNames(11) + " [" +
-                                  RoundSigDigits(Numbers(11), 2) + ']');
+                ShowContinueError(state,
+                                  format("{} [{:.R2}] > {} [{.R2}]", cNumericFieldNames(10), Numbers(10), cNumericFieldNames(11), Numbers(11)));
                 ErrorsFound = true;
             }
             if (Numbers(12) > Numbers(13)) { // error
                 ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state, cNumericFieldNames(12) + " [" + RoundSigDigits(Numbers(12), 2) + "] > " + cNumericFieldNames(13) + " [" +
-                                  RoundSigDigits(Numbers(13), 2) + ']');
+                ShowContinueError(state,
+                                  format("{} [{:.R2}] > {} [{.R2}]", cNumericFieldNames(12), Numbers(12), cNumericFieldNames(13), Numbers(13)));
                 ErrorsFound = true;
             }
 
@@ -1205,14 +1190,12 @@ namespace CurveManager {
 
             if (Numbers(5) > Numbers(6)) { // error
                 ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state, cNumericFieldNames(5) + '[' + RoundSigDigits(Numbers(5), 2) + "] > " + cNumericFieldNames(6) + " [" +
-                                  RoundSigDigits(Numbers(6), 2) + ']');
+                ShowContinueError(state, format("{}[{:.R2}] > {} [{.R2}]", cNumericFieldNames(5), Numbers(5), cNumericFieldNames(6), Numbers(6)));
                 ErrorsFound = true;
             }
             if (Numbers(7) > Numbers(8)) { // error
                 ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state, cNumericFieldNames(7) + '[' + RoundSigDigits(Numbers(7), 2) + "] > " + cNumericFieldNames(8) + " [" +
-                                  RoundSigDigits(Numbers(8), 2) + ']');
+                ShowContinueError(state, format("{}[{:.R2}] > {} [{.R2}]", cNumericFieldNames(7), Numbers(7), cNumericFieldNames(8), Numbers(8)));
                 ErrorsFound = true;
             }
 
@@ -1258,8 +1241,7 @@ namespace CurveManager {
 
             if (Numbers(5) > Numbers(6)) { // error
                 ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state, cNumericFieldNames(5) + '[' + RoundSigDigits(Numbers(5), 2) + "] > " + cNumericFieldNames(6) + " [" +
-                                  RoundSigDigits(Numbers(6), 2) + ']');
+                ShowContinueError(state, format("{}[{:.R2}] > {} [{.R2}]", cNumericFieldNames(5), Numbers(5), cNumericFieldNames(6), Numbers(6)));
                 ErrorsFound = true;
             }
 
@@ -1316,8 +1298,7 @@ namespace CurveManager {
 
             if (Numbers(6) > Numbers(7)) { // error
                 ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state, cNumericFieldNames(6) + '[' + RoundSigDigits(Numbers(6), 2) + "] > " + cNumericFieldNames(7) + " [" +
-                                  RoundSigDigits(Numbers(7), 2) + ']');
+                ShowContinueError(state, format("{}[{:.R2}] > {} [{.R2}]", cNumericFieldNames(6), Numbers(6), cNumericFieldNames(7), Numbers(7)));
                 ErrorsFound = true;
             }
 
@@ -1372,8 +1353,7 @@ namespace CurveManager {
 
             if (Numbers(4) > Numbers(5)) { // error
                 ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state, cNumericFieldNames(4) + '[' + RoundSigDigits(Numbers(4), 2) + "] > " + cNumericFieldNames(5) + " [" +
-                                  RoundSigDigits(Numbers(5), 2) + ']');
+                ShowContinueError(state, format("{}[{:.R2}] > {} [{.R2}]", cNumericFieldNames(4), Numbers(4), cNumericFieldNames(5), Numbers(5)));
                 ErrorsFound = true;
             }
 
@@ -1428,8 +1408,7 @@ namespace CurveManager {
 
             if (Numbers(4) > Numbers(5)) { // error
                 ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state, cNumericFieldNames(4) + '[' + RoundSigDigits(Numbers(4), 2) + "] > " + cNumericFieldNames(5) + " [" +
-                                  RoundSigDigits(Numbers(5), 2) + ']');
+                ShowContinueError(state, format("{}[{:.R2}] > {} [{.R2}]", cNumericFieldNames(4), Numbers(4), cNumericFieldNames(5), Numbers(5)));
                 ErrorsFound = true;
             }
 
@@ -1484,8 +1463,7 @@ namespace CurveManager {
 
             if (Numbers(4) > Numbers(5)) { // error
                 ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state, cNumericFieldNames(4) + '[' + RoundSigDigits(Numbers(4), 2) + "] > " + cNumericFieldNames(5) + " [" +
-                                  RoundSigDigits(Numbers(5), 2) + ']');
+                ShowContinueError(state, format("{}[{:.R2}] > {} [{.R2}]", cNumericFieldNames(4), Numbers(4), cNumericFieldNames(5), Numbers(5)));
                 ErrorsFound = true;
             }
 
@@ -1592,8 +1570,10 @@ namespace CurveManager {
                             ShowContinueError(state, "has either the same values for two consecutive wind directions, or a lower wind direction value after "
                                               "a higher wind direction value.");
                             ShowContinueError(state, "Wind direction values must be entered in ascending order.");
-                            ShowContinueError(state, cNumericFieldNames(j) + " = " + RoundSigDigits(windDirs[j - 2], 2) + ' ' + cNumericFieldNames[j + 1] +
-                                              " = " + RoundSigDigits(windDirs[j - 1], 2));
+                            ShowContinueError(
+                                state,
+                                format(
+                                    "{} = {:.2R} {} = {:.2R}", cNumericFieldNames(j), windDirs[j - 2], cNumericFieldNames[j + 1], windDirs[j - 1]));
                             ErrorsFound = true;
                         }
                     }
@@ -1601,7 +1581,7 @@ namespace CurveManager {
                 // Check that the first table value is zero
                 if (dirMin != 0.0) {
                     ShowSevereError(state, "GetCurveInput: An " + CurrentModuleObject + " object ");
-                    ShowContinueError(state, "has a nonzero minimum value of " + RoundSigDigits(dirMin, 2));
+                    ShowContinueError(state, format("has a nonzero minimum value of {:.2R}", dirMin));
                     ShowContinueError(state, "Wind direction values must begin at zero.");
                     ErrorsFound = true;
                 }
@@ -1656,9 +1636,10 @@ namespace CurveManager {
                     MaxTableNums = NumNumbers;
                     if (NumNumbers != numWindDir) {
                         ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                        ShowContinueError(state, "The number of data entries must match the number of wind directions given in the wind pressure "
-                                          "coefficient array. Number of data entries = " +
-                                          RoundSigDigits(NumNumbers));
+                        ShowContinueError(state,
+                                          format("The number of data entries must match the number of wind directions given in the wind pressure "
+                                                 "coefficient array. Number of data entries = {}",
+                                                 NumNumbers));
                         ErrorsFound = true;
                     } else {
                         std::vector<double> axis;
@@ -2101,10 +2082,12 @@ namespace CurveManager {
             std::size_t row = colAndRow.second;  // 0 indexed
             auto &content = contents[col];
             if (col >= numColumns) {
-                ShowFatalError(state, "File \"" + filePath + "\" : Requested column (" + General::RoundSigDigits(col+1) + ") exceeds the number of columns (" + General::RoundSigDigits(numColumns) + ").");
+                ShowFatalError(state,
+                               format("File \"{}\" : Requested column ({}) exceeds the number of columns ({}).", filePath, col + 1, numColumns));
             }
             if (row >= numRows) {
-                ShowFatalError(state, "File \"" + filePath + "\" : Requested starting row (" + General::RoundSigDigits(row+1) + ") exceeds the number of rows (" + General::RoundSigDigits(numRows) + ").");
+                ShowFatalError(state,
+                               format("File \"{}\" : Requested starting row ({}) exceeds the number of rows ({}).", filePath, row + 1, numRows));
             }
             std::vector<double> array(numRows - row);
             std::transform(content.begin() + row, content.end(), array.begin(), [](const std::string &str) {
@@ -2146,7 +2129,7 @@ namespace CurveManager {
 
         for (CurveIndex = 1; CurveIndex <= state.dataCurveManager->NumCurves; ++CurveIndex) {
             for (int dim = 1; dim <= state.dataCurveManager->PerfCurve(CurveIndex).NumDims; ++dim) {
-                std::string numStr = std::to_string(dim);
+                std::string numStr = fmt::to_string(dim);
 
                 // TODO: Make CurveInput an Array for better looping here...
                 switch (dim) {
@@ -2520,13 +2503,14 @@ namespace CurveManager {
             // Not compatible
             ShowSevereError(state, routineName + objectType + "=\"" + objectName + "\"");
             ShowContinueError(state, "...Invalid curve for " + curveFieldText + ".");
-            std::string validString = std::to_string(validDims[0]);
+            std::string validString = fmt::to_string(validDims[0]);
             for (std::size_t i = 1; i < validDims.size(); i++) {
-                validString += " or " + std::to_string(validDims[i]);
+                validString += format(" or {}", validDims[i]);
             }
             std::string plural1 = curveDim > 1 ? "s" : "";
             std::string plural2 = validDims[validDims.size()-1] > 1 ? "s" : "";
-            ShowContinueError(state, "...Input curve=\"" + state.dataCurveManager->PerfCurve(CurveIndex).Name + "\" has " + std::to_string(curveDim) + " dimension" + plural1 + ".");
+            ShowContinueError(
+                state, format("...Input curve=\"{}\" has {} dimension{}.", state.dataCurveManager->PerfCurve(CurveIndex).Name, curveDim, plural1));
             ShowContinueError(state, "...Curve type must have " + validString + " dimension" + plural2 + ".");
             return true;
         }
@@ -2668,7 +2652,6 @@ namespace CurveManager {
         // Certain curve types have set limits (e.g., PLF curve should not be greater than 1 or less than 0.7).
 
         // Using/Aliasing
-        using General::TrimSigDigits;
 
         if (CurveIndex > 0 && CurveIndex <= state.dataCurveManager->NumCurves) {
 
@@ -2684,8 +2667,9 @@ namespace CurveManager {
 
         } else {
 
-            ShowSevereError(state, "SetCurveOutputMinMaxValues: CurveIndex=[" + TrimSigDigits(CurveIndex) +
-                            "] not in range of curves=[1:" + TrimSigDigits(state.dataCurveManager->NumCurves) + "].");
+            ShowSevereError(
+                state,
+                format("SetCurveOutputMinMaxValues: CurveIndex=[{}] not in range of curves=[1:{}].", CurveIndex, state.dataCurveManager->NumCurves));
             ErrorsFound = true;
         }
     }
@@ -2944,7 +2928,6 @@ namespace CurveManager {
         //   Trans. ASIVIE, J. of Fluids Engineering 103: 89-90.
 
         // Using/Aliasing
-        using General::RoundSigDigits;
 
         // Return value
         Real64 CalculateMoodyFrictionFactor;
@@ -2975,8 +2958,8 @@ namespace CurveManager {
             CalculateMoodyFrictionFactor = std::pow(Term3, -2.0);
         } else {
             if (!state.dataCurveManager->FrictionFactorErrorHasOccurred) {
-                RR = RoundSigDigits(RoughnessRatio, 7);
-                Re = RoundSigDigits(ReynoldsNumber, 1);
+                RR = format("{:.7R}", RoughnessRatio);
+                Re = format("{:.1R}", ReynoldsNumber);
                 ShowSevereError(state, "Plant Pressure System: Error in moody friction factor calculation");
                 ShowContinueError(state, "Current Conditions: Roughness Ratio=" + RR + "; Reynolds Number=" + Re);
                 ShowContinueError(state, "These conditions resulted in an unhandled numeric issue.");
@@ -3019,7 +3002,7 @@ namespace CurveManager {
             if (CurveVal > 1.10 || CurveVal < 0.90) {
                 ShowWarningError(state, callingRoutineObj + "=\"" + objectName + "\" curve values");
                 ShowContinueError(state, "... " + cFieldName + " = " + cFieldValue + " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
-                ShowContinueError(state, "... Curve output at rated conditions = " + General::TrimSigDigits(CurveVal, 3));
+                ShowContinueError(state, format("... Curve output at rated conditions = {:.3T}", CurveVal));
             }
         }
     }
