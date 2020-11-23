@@ -249,9 +249,9 @@ namespace Psychrometrics {
     }
 
 #ifdef EP_psych_stats
-    void ShowPsychrometricSummary(OutputFile &auditFile)
+    void ShowPsychrometricSummary(InputOutputFile &auditFile)
 #else
-    void ShowPsychrometricSummary(InputOutputFile &)
+    void ShowPsychrometricSummary(InputOutputFile &auditFile)
 #endif
     {
 

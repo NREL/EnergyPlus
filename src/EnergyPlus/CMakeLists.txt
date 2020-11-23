@@ -25,6 +25,10 @@ if(USE_GLYCOL_CACHING)
   add_definitions("-DEP_cache_GlycolSpecificHeat")
 endif()
 
+if(USE_PSYCH_STATS)
+  add_definitions("-DEP_psych_stats")
+endif()
+
 SET( SRC
   "${PROJECT_SOURCE_DIR}/third_party/milo/dtoa.h"
   "${PROJECT_SOURCE_DIR}/third_party/milo/itoa.h"
