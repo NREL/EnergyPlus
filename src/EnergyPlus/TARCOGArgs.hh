@@ -53,6 +53,7 @@
 
 // EnergyPlus Headers
 #include "TARCOGOutput.hh"
+#include <EnergyPlus/DataComplexFenestration.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -123,7 +124,7 @@ namespace TARCOGArgs {
                  const Array1D<Real64> &SlatCurve,
                  const Array1D<Real64> &vvent,
                  const Array1D<Real64> &tvent,
-                 const Array1D_int &LayerType,
+                 const Array1D<DataComplexFenestration::iComplexShadeType> &LayerType,
                  const Array1D_int &nslice,
                  const Array1D<Real64> &LaminateA,
                  const Array1D<Real64> &LaminateB,
@@ -156,7 +157,7 @@ namespace TARCOGArgs {
                                const Array1D<Real64> &SlatWidth,
                                const Array1D<Real64> &SlatAngle,
                                const Array1D<Real64> &SlatCond,
-                               const Array1D_int &LayerType,
+                               const Array1D<DataComplexFenestration::iComplexShadeType> &LayerType,
                                int const ThermalMod,
                                Real64 const SDScalar,
                                Real64 &ShadeEmisRatioOut,

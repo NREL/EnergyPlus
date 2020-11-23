@@ -138,7 +138,7 @@ namespace ThermalISO15099Calc {
                        const Array1D<Real64> &SlatCurve,
                        const Array1D<Real64> &vvent,
                        const Array1D<Real64> &tvent,
-                       const Array1D_int &LayerType,
+                       const Array1D<DataComplexFenestration::iComplexShadeType> &LayerType,
                        const Array1D_int &nslice,
                        const Array1D<Real64> &LaminateA,
                        const Array1D<Real64> &LaminateB,
@@ -225,7 +225,7 @@ namespace ThermalISO15099Calc {
                  const Array1D<Real64> &EffectiveOpenness,
                  const Array1D<Real64> &vvent,
                  const Array1D<Real64> &tvent,
-                 const Array1D_int &LayerType,
+                 const Array1D<DataComplexFenestration::iComplexShadeType> &LayerType,
                  Array1D<Real64> &Ra,
                  Array1D<Real64> &Nu,
                  Array1D<Real64> &vfreevent,
@@ -276,7 +276,7 @@ namespace ThermalISO15099Calc {
                 Array1D<Real64> &Theta,
                 Array1D<Real64> &qlayer,
                 const Array1D<Real64> &qv,
-                const Array1D_int &LayerType,
+                const Array1D<DataComplexFenestration::iComplexShadeType> &LayerType,
                 const Array1D<Real64> &thick,
                 const Array1D<Real64> &scon,
                 Real64 &ufactor,
@@ -335,7 +335,7 @@ namespace ThermalISO15099Calc {
                 Array1D<Real64> &Nu);
 
     void effectiveLayerCond(int const nlayer,
-                            const Array1D_int &LayerType,             // Layer type
+                            const Array1D<DataComplexFenestration::iComplexShadeType> &LayerType,             // Layer type
                             const Array1D<Real64> &scon,              // Layer thermal conductivity
                             const Array1D<Real64> &thick,             // Layer thickness
                             Array2A_int const iprop,                 // Gas type in gaps

@@ -112,14 +112,14 @@ namespace TARCOGParams {
     // to keep info that certain file is not open for writing
     int const statusClosed(0);
 
-    //  Layer types:
-    int const SPECULAR(0);
-    int const VENETBLIND_HORIZ(1);
-    int const WOVSHADE(2);
-    int const PERFORATED(3);
-    int const DIFFSHADE(4);
-    int const BSDF(5);
-    int const VENETBLIND_VERT(6);
+//    //  Layer types:
+//    int const SPECULAR(0);
+//    int const VENETBLIND_HORIZ(1);
+//    int const WOVSHADE(2);
+//    int const PERFORATED(3);
+//    int const DIFFSHADE(4);
+//    int const BSDF(5);
+//    int const VENETBLIND_VERT(6);
 
     int const MinLayType(0);
     int const MaxLayType(6);

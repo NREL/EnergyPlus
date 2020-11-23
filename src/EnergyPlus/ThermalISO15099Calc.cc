@@ -247,7 +247,7 @@ namespace ThermalISO15099Calc {
                        const Array1D<Real64> &SlatCurve,
                        const Array1D<Real64> &vvent,
                        const Array1D<Real64> &tvent,
-                       const Array1D_int &LayerType,
+                       const Array1D<DataComplexFenestration::iComplexShadeType> &LayerType,
                        const Array1D_int &nslice,
                        const Array1D<Real64> &LaminateA,
                        const Array1D<Real64> &LaminateB,
@@ -424,7 +424,7 @@ namespace ThermalISO15099Calc {
         Real64 hrout_NOSD;
         Real64 tamb_NOSD;
         Real64 troom_NOSD;
-        static Array1D_int LayerType_NOSD(maxlay);
+        static Array1D<DataComplexFenestration::iComplexShadeType> LayerType_NOSD(maxlay);
         Real64 ufactor_NOSD;
         Real64 sc_NOSD;
         Real64 hflux_NOSD;
@@ -1355,7 +1355,7 @@ namespace ThermalISO15099Calc {
                  const Array1D<Real64> &EffectiveOpenness,
                  const Array1D<Real64> &vvent,
                  const Array1D<Real64> &tvent,
-                 const Array1D_int &LayerType,
+                 const Array1D<DataComplexFenestration::iComplexShadeType> &LayerType,
                  Array1D<Real64> &Ra,
                  Array1D<Real64> &Nu,
                  Array1D<Real64> &vfreevent,
@@ -2291,7 +2291,7 @@ namespace ThermalISO15099Calc {
                 Array1D<Real64> &Theta,
                 Array1D<Real64> &qlayer,
                 const Array1D<Real64> &qv,
-                const Array1D_int &LayerType,
+                const Array1D<DataComplexFenestration::iComplexShadeType> &LayerType,
                 const Array1D<Real64> &thick,
                 const Array1D<Real64> &scon,
                 Real64 &ufactor,
@@ -2594,7 +2594,7 @@ namespace ThermalISO15099Calc {
     }
 
     void effectiveLayerCond(int const nlayer,
-                            const Array1D_int &LayerType,             // Layer type
+                            const Array1D<DataComplexFenestration::iComplexShadeType> &LayerType,             // Layer type
                             const Array1D<Real64> &scon,              // Layer thermal conductivity
                             const Array1D<Real64> &thick,             // Layer thickness
                             Array2A_int const iprop,                 // Gas type in gaps
@@ -2606,7 +2606,7 @@ namespace ThermalISO15099Calc {
                             Array2A<Real64> const gvis,              // Gas specific viscosity
                             Array2A<Real64> const gcp,               // Gas specific heat
                             const Array1D<Real64> &EffectiveOpenness, // Layer effective openneess [m2]
-                            Array1D<Real64> &theta,                   // Layer surface tempeartures [K]
+                            Array1D<Real64> &theta,                   // Layer surface tmperatures  [K]
                             Array1D<Real64> &sconScaled,             // Layer conductivity divided by thickness
                             int &nperr,                              // Error message flag
                             std::string &ErrorMessage                // Error message
@@ -2616,7 +2616,7 @@ namespace ThermalISO15099Calc {
         static Array1D<Real64> frct1(maxgas);
 
         for (auto i = 1; i <= nlayer; ++i) {
-            if (LayerType(i) != SPECULAR) {
+            if (LayerType(i) != DataComplexFenestration::iComplexShadeType::Specular) {
                 auto tLayer = (theta(2 * i - 1) + theta(2 * i)) / 2;
                 auto nmix1 = nmix(i);
                 auto press1 = (pressure(i) + pressure(i + 1)) / 2.0;

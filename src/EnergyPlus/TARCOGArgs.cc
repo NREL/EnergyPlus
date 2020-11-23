@@ -45,7 +45,7 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-
+#include <EnergyPlus/DataComplexFenestration.hh>
 #include <EnergyPlus/DataGlobals.hh>
 
 // EnergyPlus Headers
@@ -152,7 +152,7 @@ namespace TARCOGArgs {
                  const Array1D<Real64> &SlatCurve,
                  const Array1D<Real64> &vvent,
                  const Array1D<Real64> &tvent,
-                 const Array1D_int &LayerType,
+                 const Array1D<DataComplexFenestration::iComplexShadeType> &LayerType,
                  const Array1D_int &nslice,
                  const Array1D<Real64> &LaminateA,
                  const Array1D<Real64> &LaminateB,
@@ -422,7 +422,7 @@ namespace TARCOGArgs {
             }
             // Deflection cannot be calculated with IGU containing shading layer. This error check is to be
             // removed once that extension is programmed
-            if ((CalcDeflection > 0.0) && (LayerType(i) != SPECULAR)) {
+            if ((CalcDeflection > 0.0) && (LayerType(i) != DataComplexFenestration::iComplexShadeType::Specular)) {
                 ArgCheck = 42;
                 ErrorMessage = "Cannot calculate deflection with IGU containing shading devices.";
                 return ArgCheck;
@@ -461,7 +461,14 @@ namespace TARCOGArgs {
                 return ArgCheck;
             }
 
-            if ((LayerType(i) < MinLayType) || (LayerType(i) > MaxLayType)) {
+            if ((LayerType(i) != DataComplexFenestration::iComplexShadeType::Specular) ||
+                (LayerType(i) != DataComplexFenestration::iComplexShadeType::VenetianHorizontal) ||
+                (LayerType(i) != DataComplexFenestration::iComplexShadeType::Woven) ||
+                (LayerType(i) != DataComplexFenestration::iComplexShadeType::Perforated) ||
+                (LayerType(i) != DataComplexFenestration::iComplexShadeType::OtherShadingType) ||
+                (LayerType(i) != DataComplexFenestration::iComplexShadeType::BSDF) ||
+                (LayerType(i) != DataComplexFenestration::iComplexShadeType::VenetianVertical)
+                ) {
                 ArgCheck = 22;
                 ErrorMessage = format("Incorrect layer type for layer #{:3}"
                                ".  Layer type can either be 0 (glazing layer), 1 (Venetian blind), 2 (woven shade), 3 (perforated), 4 (diffuse "
@@ -481,7 +488,8 @@ namespace TARCOGArgs {
                 return ArgCheck;
             }
 
-            if (LayerType(i) == VENETBLIND_HORIZ || LayerType(i) == VENETBLIND_VERT) { // Venetian blind specific:
+            if (LayerType(i) == DataComplexFenestration::iComplexShadeType::VenetianHorizontal ||
+                LayerType(i) == DataComplexFenestration::iComplexShadeType::VenetianVertical) { // Venetian blind specific:
                 if (SlatThick(i) <= 0) {
                     ArgCheck = 31;
                     ErrorMessage = format("Invalid slat thickness (must be >0). Layer #{:3}", i);
@@ -564,7 +572,7 @@ namespace TARCOGArgs {
                                const Array1D<Real64> &SlatWidth,
                                const Array1D<Real64> &SlatAngle,
                                const Array1D<Real64> &SlatCond,
-                               const Array1D_int &LayerType,
+                               const Array1D<DataComplexFenestration::iComplexShadeType> &LayerType,
                                int const ThermalMod,
                                Real64 const SDScalar,
                                Real64 &ShadeEmisRatioOut,
@@ -657,7 +665,8 @@ namespace TARCOGArgs {
 
         // Adjust shading layer properties
         for (int i = 1; i <= nlayer; ++i) {
-            if (LayerType(i) == VENETBLIND_HORIZ || LayerType(i) == VENETBLIND_VERT) {
+            if (LayerType(i) == DataComplexFenestration::iComplexShadeType::VenetianHorizontal ||
+                LayerType(i) == DataComplexFenestration::iComplexShadeType::VenetianVertical) {
                 scon(i) = SlatCond(i);
                 if (ThermalMod == THERM_MOD_SCW) {
                     // bi...the idea here is to have glass-to-glass width the same as before scaling
@@ -671,10 +680,10 @@ namespace TARCOGArgs {
                     thick(i) = SlatThick(i);
                     const Real64 slatAngRad = SlatAngle(i) * 2.0 * DataGlobalConstants::Pi() / 360.0;
                     Real64 C4_VENET(0);
-                    if (LayerType(i) == VENETBLIND_HORIZ) {
+                    if (LayerType(i) == DataComplexFenestration::iComplexShadeType::VenetianHorizontal) {
                         C4_VENET = C4_VENET_HORIZONTAL;
                     }
-                    if (LayerType(i) == VENETBLIND_VERT) {
+                    if (LayerType(i) == DataComplexFenestration::iComplexShadeType::VenetianVertical) {
                         C4_VENET = C4_VENET_VERTICAL;
                     }
                     thick(i) = C4_VENET * (SlatWidth(i) * cos(slatAngRad) + thick(i) * sin(slatAngRad));

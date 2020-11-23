@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array2A.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/DataComplexFenestration.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -140,7 +141,7 @@ namespace TARCOGMain {
                   const Array1D<Real64> &SlatCurve,    // Curvature radius of the slat [m]
                   const Array1D<Real64> &vvent,        // Vector of velocities for forced ventilation, for each gap, and for
                   const Array1D<Real64> &tvent,        // Vector of temperatures of ventilation gas for forced ventilation,
-                  const Array1D_int &LayerType,         // Glazing layer type flag
+                  const Array1D<DataComplexFenestration::iComplexShadeType> &LayerType,         // Glazing layer type flag
                   const Array1D_int &nslice,            // Vector of numbers of slices in a laminated glazing layers
                   const Array1D<Real64> &LaminateA,    // Left-hand side array for creating slice equations
                   const Array1D<Real64> &LaminateB,    // Right-hand side array for creating slice equations
