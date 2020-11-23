@@ -67,6 +67,7 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
@@ -302,51 +303,51 @@ TEST_F(EnergyPlusFixture, DElightManagerF_GetInputDElightComplexFenestration_Tes
 
     bool foundErrors = false;
 
-    HeatBalanceManager::GetProjectControlData(state, foundErrors); // read project control data
+    HeatBalanceManager::GetProjectControlData(*state, foundErrors); // read project control data
     EXPECT_FALSE(foundErrors);                              // expect no errors
 
-    HeatBalanceManager::GetMaterialData(state, foundErrors); // read material data
+    HeatBalanceManager::GetMaterialData(*state, foundErrors); // read material data
     EXPECT_FALSE(foundErrors);                        // expect no errors
 
-    HeatBalanceManager::GetConstructData(state, foundErrors); // read construction data
+    HeatBalanceManager::GetConstructData(*state, foundErrors); // read construction data
     compare_err_stream("");
     EXPECT_FALSE(foundErrors); // expect no errors
 
-    HeatBalanceManager::GetZoneData(state, foundErrors); // read zone data
+    HeatBalanceManager::GetZoneData(*state, foundErrors); // read zone data
     EXPECT_FALSE(foundErrors);                    // expect no errors
 
-    state.dataSurfaceGeometry->CosZoneRelNorth.allocate(1);
-    state.dataSurfaceGeometry->SinZoneRelNorth.allocate(1);
+    state->dataSurfaceGeometry->CosZoneRelNorth.allocate(1);
+    state->dataSurfaceGeometry->SinZoneRelNorth.allocate(1);
 
-    state.dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-DataHeatBalance::Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
-    state.dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-DataHeatBalance::Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
-    state.dataSurfaceGeometry->CosBldgRelNorth = 1.0;
-    state.dataSurfaceGeometry->SinBldgRelNorth = 0.0;
+    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-DataHeatBalance::Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
+    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-DataHeatBalance::Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
+    state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
+    state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(state, foundErrors); // setup zone geometry and get zone data
+    SurfaceGeometry::GetSurfaceData(*state, foundErrors); // setup zone geometry and get zone data
     EXPECT_FALSE(foundErrors);                    // expect no errors
 
-    SurfaceGeometry::SetupZoneGeometry(state, foundErrors); // this calls GetSurfaceData()
+    SurfaceGeometry::SetupZoneGeometry(*state, foundErrors); // this calls GetSurfaceData()
     EXPECT_FALSE(foundErrors);                       // expect no errors
 
-    state.dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
-    state.dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(state);
+    state->dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
+    state->dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
+    ScheduleManager::ProcessScheduleInput(*state);
     ScheduleManager::ScheduleInputProcessed = true;
-    state.dataGlobal->TimeStep = 1;
-    state.dataGlobal->HourOfDay = 1;
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->HourOfDay = 1;
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
-    state.dataGlobal->HourOfDay = 1;
+    state->dataGlobal->HourOfDay = 1;
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
     DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
-    ScheduleManager::UpdateScheduleValues(state);
-    InternalHeatGains::GetInternalHeatGainsInput(state);
+    ScheduleManager::UpdateScheduleValues(*state);
+    InternalHeatGains::GetInternalHeatGainsInput(*state);
     InternalHeatGains::GetInternalHeatGainsInputFlag = false;
 
-    GetInputDElightComplexFenestration(state, foundErrors);
+    GetInputDElightComplexFenestration(*state, foundErrors);
     compare_err_stream("");
     EXPECT_FALSE(foundErrors); // expect no errors
 

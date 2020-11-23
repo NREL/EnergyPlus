@@ -125,7 +125,6 @@ namespace WindowEquivalentLayer {
     using namespace DataSurfaces;
     using DataEnvironment::DayOfMonth;
     using DataEnvironment::Month;
-    using General::TrimSigDigits;
 
     void InitEquivalentLayerWindowCalculations(EnergyPlusData &state)
     {
@@ -445,7 +444,7 @@ namespace WindowEquivalentLayer {
         }
         if (!CFSURated) {
             ShowWarningMessage(state, RoutineName + "Fenestration U-Value calculation failed for " + FS.Name);
-            ShowContinueError(state, "...Calculated U-value = " + TrimSigDigits(U, 4));
+            ShowContinueError(state, format("...Calculated U-value = {:.4T}", U));
             ShowContinueError(state, "...Check consistency of inputs");
         }
         UNFRC = U;
@@ -557,8 +556,8 @@ namespace WindowEquivalentLayer {
 
         if (!CFSSHGC) {
             ShowWarningMessage(state, RoutineName + "Solar heat gain coefficient calculation failed for " + FS.Name);
-            ShowContinueError(state, "...Calculated SHGC = " + TrimSigDigits(SHGC, 4));
-            ShowContinueError(state, "...Calculated U-Value = " + TrimSigDigits(UCG, 4));
+            ShowContinueError(state, format("...Calculated SHGC = {:.4T}", SHGC));
+            ShowContinueError(state, format("...Calculated U-Value = {:.4T}", UCG));
             ShowContinueError(state, "...Check consistency of inputs.");
             return;
         }
@@ -973,7 +972,7 @@ namespace WindowEquivalentLayer {
 
         if (P < -0.05 || P > 1.05) {
             ShowWarningMessage(state, RoutineName + "property value should have been between 0 and 1");
-            ShowContinueError(state, WHAT + "=:  property value is =" + TrimSigDigits(P, 4));
+            ShowContinueError(state, format("{}=:  property value is ={:.4T}", WHAT, P));
             if (P < 0.0) {
                 ShowContinueError(state, "property value is reset to 0.0");
             } else if (P > 1.0) {
@@ -1098,9 +1097,9 @@ namespace WindowEquivalentLayer {
         if (RHO_DD + TAU_DD > 1.0) {
             SumRefAndTran = RHO_DD + TAU_DD;
             ShowWarningMessage(state, RoutineName + "Roller blind diffuse-diffuse properties are inconsistent");
-            ShowContinueError(state, "...The diffuse-diffuse reflectance = " + TrimSigDigits(RHO_DD, 4));
-            ShowContinueError(state, "...The diffuse-diffuse tansmittance = " + TrimSigDigits(TAU_DD, 4));
-            ShowContinueError(state, "...Sum of diffuse reflectance and tansmittance = " + TrimSigDigits(SumRefAndTran, 4));
+            ShowContinueError(state, format("...The diffuse-diffuse reflectance = {:.4T}", RHO_DD));
+            ShowContinueError(state, format("...The diffuse-diffuse tansmittance = {:.4T}", TAU_DD));
+            ShowContinueError(state, format("...Sum of diffuse reflectance and tansmittance = {:.4T}", SumRefAndTran));
             ShowContinueError(state, "...This sum cannot be > 1.0. Transmittance will be reset to 1 minus reflectance");
             TAU_DD = 1.0 - RHO_DD;
         }
@@ -1234,9 +1233,9 @@ namespace WindowEquivalentLayer {
         if (RHO_DD + TAU_DD > 1.0) {
             SumRefAndTran = RHO_DD + TAU_DD;
             ShowWarningMessage(state, RoutineName + "Calculated insect screen diffuse-diffuse properties are inconsistent");
-            ShowContinueError(state, "...The diffuse-diffuse reflectance = " + TrimSigDigits(RHO_DD, 4));
-            ShowContinueError(state, "...The diffuse-diffuse tansmittance = " + TrimSigDigits(TAU_DD, 4));
-            ShowContinueError(state, "...Sum of diffuse reflectance and tansmittance = " + TrimSigDigits(SumRefAndTran, 4));
+            ShowContinueError(state, format("...The diffuse-diffuse reflectance = {:.4T}", RHO_DD));
+            ShowContinueError(state, format("...The diffuse-diffuse tansmittance = {:.4T}", TAU_DD));
+            ShowContinueError(state, format("...Sum of diffuse reflectance and tansmittance = {:.4T}", SumRefAndTran));
             ShowContinueError(state, "...This sum cannot be > 1.0. Transmittance will be reset to 1 minus reflectance");
             TAU_DD = 1.0 - RHO_DD;
         }
@@ -1419,9 +1418,9 @@ namespace WindowEquivalentLayer {
         if (RHO_DD + TAU_DD > 1.0) {
             SumRefAndTran = RHO_DD + TAU_DD;
             ShowWarningMessage(state, RoutineName + "Calculated drape fabric diffuse-diffuse properties are inconsistent");
-            ShowContinueError(state, "...The diffuse-diffuse reflectance = " + TrimSigDigits(RHO_DD, 4));
-            ShowContinueError(state, "...The diffuse-diffuse tansmittance = " + TrimSigDigits(TAU_DD, 4));
-            ShowContinueError(state, "...Sum of diffuse reflectance and tansmittance = " + TrimSigDigits(SumRefAndTran, 4));
+            ShowContinueError(state, format("...The diffuse-diffuse reflectance = {:.4T}", RHO_DD));
+            ShowContinueError(state, format("...The diffuse-diffuse tansmittance = {:.4T}", TAU_DD));
+            ShowContinueError(state, format("...Sum of diffuse reflectance and tansmittance = {:.4T}", SumRefAndTran));
             ShowContinueError(state, "...This sum cannot be > 1.0. Transmittance will be reset to 1 minus reflectance");
             TAU_DD = 1.0 - RHO_DD;
         }
@@ -4787,8 +4786,8 @@ namespace WindowEquivalentLayer {
                 ++FS.WEQLSolverErrorIndex;
                 ShowSevereError(state, "CONSTRUCTION:WINDOWEQUIVALENTLAYER = \"" + FS.Name + "\"");
                 ShowContinueError(state, RoutineName + "Net radiation analysis did not converge");
-                ShowContinueError(state, "...Maximum error is = " + TrimSigDigits(MAXERR, 6));
-                ShowContinueError(state, "...Convergence tolerance is = " + TrimSigDigits(TOL, 6));
+                ShowContinueError(state, format("...Maximum error is = {:.6T}", MAXERR));
+                ShowContinueError(state, format("...Convergence tolerance is = {:.6T}", TOL));
                 ShowContinueErrorTimeStamp(state, "");
             } else {
                 ShowRecurringWarningErrorAtEnd(state, "CONSTRUCTION:WINDOWEQUIVALENTLAYER = \"" + FS.Name + "\"; " + RoutineName +
@@ -5263,8 +5262,8 @@ namespace WindowEquivalentLayer {
         //        ++FS.WEQLSolverErrorIndex;
         //        ShowSevereError(state, "CONSTRUCTION:WINDOWEQUIVALENTLAYER = \"" + FS.Name + "\"");
         //        ShowContinueError(state, RoutineName + "Net radiation analysis did not converge");
-        //        ShowContinueError(state, "...Maximum error is = " + TrimSigDigits(MAXERR, 6));
-        //        ShowContinueError(state, "...Convergence tolerance is = " + TrimSigDigits(TOL, 6));
+        //        ShowContinueError(state, format("...Maximum error is = {:.6T}", MAXERR));
+        //        ShowContinueError(state, format("...Convergence tolerance is = {:.6T}", TOL));
         //        ShowContinueErrorTimeStamp(state, "");
         //    } else {
         //        ShowRecurringWarningErrorAtEnd(state, "CONSTRUCTION:WINDOWEQUIVALENTLAYER = \"" + FS.Name + "\"; " + RoutineName +

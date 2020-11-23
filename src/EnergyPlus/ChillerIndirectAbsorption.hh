@@ -190,7 +190,7 @@ namespace ChillerIndirectAbsorption {
         bool MyOneTimeFlag;
         bool MyEnvrnFlag;
         ReportVars Report;
-        int EquipFlowCtrl;
+        DataBranchAirLoopPlant::ControlTypeEnum EquipFlowCtrl;
 
         // Default Constructor
         IndirectAbsorberSpecs()
@@ -210,7 +210,7 @@ namespace ChillerIndirectAbsorption {
               CondOutletTemp(0.0), EvapOutletTemp(0.0), GenOutletTemp(0.0), SteamOutletEnthalpy(0.0), PumpingPower(0.0), PumpingEnergy(0.0),
               QGenerator(0.0), GeneratorEnergy(0.0), QEvaporator(0.0), EvaporatorEnergy(0.0), QCondenser(0.0), CondenserEnergy(0.0),
               ChillerONOFFCyclingFrac(0.0), EnergyLossToEnvironment(0.0), GenInputOutputNodesUsed(false), MyOneTimeFlag(true), MyEnvrnFlag(true),
-              EquipFlowCtrl(0)
+              EquipFlowCtrl(DataBranchAirLoopPlant::ControlTypeEnum::Unknown)
         {
         }
 

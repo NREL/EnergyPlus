@@ -59,7 +59,6 @@
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
@@ -207,7 +206,6 @@ namespace HeatingCoils {
         // This subroutine manages HeatingCoil component simulation.
 
         // Using/Aliasing
-        using General::TrimSigDigits;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -238,13 +236,20 @@ namespace HeatingCoils {
             } else {
                 CoilNum = CompIndex;
                 if (CoilNum > NumHeatingCoils || CoilNum < 1) {
-                    ShowFatalError(state, "SimulateHeatingCoilComponents: Invalid CompIndex passed=" + TrimSigDigits(CoilNum) +
-                                   ", Number of Heating Coils=" + TrimSigDigits(NumHeatingCoils) + ", Coil name=" + CompName);
+                    ShowFatalError(state,
+                                   format("SimulateHeatingCoilComponents: Invalid CompIndex passed={}, Number of Heating Coils={}, Coil name={}",
+                                          CoilNum,
+                                          NumHeatingCoils,
+                                          CompName));
                 }
                 if (CheckEquipName(CoilNum)) {
                     if (!CompName.empty() && CompName != HeatingCoil(CoilNum).Name) {
-                        ShowFatalError(state, "SimulateHeatingCoilComponents: Invalid CompIndex passed=" + TrimSigDigits(CoilNum) +
-                                       ", Coil name=" + CompName + ", stored Coil Name for that index=" + HeatingCoil(CoilNum).Name);
+                        ShowFatalError(
+                            state,
+                            format("SimulateHeatingCoilComponents: Invalid CompIndex passed={}, Coil name={}, stored Coil Name for that index={}",
+                                   CoilNum,
+                                   CompName,
+                                   HeatingCoil(CoilNum).Name));
                     }
                     CheckEquipName(CoilNum) = false;
                 }
@@ -1500,8 +1505,7 @@ namespace HeatingCoils {
 
         // Using/Aliasing
         using namespace DataSizing;
-        using General::RoundSigDigits;
-        using General::TrimSigDigits;
+
         using namespace OutputReportPredefined;
 
         // Locals
@@ -1617,9 +1621,8 @@ namespace HeatingCoils {
                             if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(NominalCapacityDes - NominalCapacityUser) / NominalCapacityUser) > AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeHeatingCoil: Potential issue with equipment sizing for " + CompType + ", " + CompName);
-                                    ShowContinueError(state, "User-Specified Nominal Capacity of " + RoundSigDigits(NominalCapacityUser, 2) + " [W]");
-                                    ShowContinueError(state, "differs from Design Size Nominal Capacity of " + RoundSigDigits(NominalCapacityDes, 2) +
-                                                      " [W]");
+                                    ShowContinueError(state, format("User-Specified Nominal Capacity of {:.2R} [W]", NominalCapacityUser));
+                                    ShowContinueError(state, format("differs from Design Size Nominal Capacity of {:.2R} [W]", NominalCapacityDes));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -1639,11 +1642,15 @@ namespace HeatingCoils {
             // Ensure capacity at lower Stage must be lower or equal to the capacity at higher Stage.
             for (StageNum = 1; StageNum <= HeatingCoil(CoilNum).NumOfStages - 1; ++StageNum) {
                 if (HeatingCoil(CoilNum).MSNominalCapacity(StageNum) > HeatingCoil(CoilNum).MSNominalCapacity(StageNum + 1)) {
-                    ShowSevereError(state, "SizeHeatingCoil: " + HeatingCoil(CoilNum).HeatingCoilType + ' ' + HeatingCoil(CoilNum).Name + ", Stage " +
-                                    TrimSigDigits(StageNum) + " Nominal Capacity (" +
-                                    RoundSigDigits(HeatingCoil(CoilNum).MSNominalCapacity(StageNum), 2) + " W) must be less than or equal to Stage " +
-                                    TrimSigDigits(StageNum + 1) + " Nominal Capacity (" +
-                                    RoundSigDigits(HeatingCoil(CoilNum).MSNominalCapacity(StageNum + 1), 2) + " W).");
+                    ShowSevereError(state,
+                                    format("SizeHeatingCoil: {} {}, Stage {} Nominal Capacity ({:.2R} W) must be less than or equal to Stage {} "
+                                           "Nominal Capacity ({:.2R} W).",
+                                           HeatingCoil(CoilNum).HeatingCoilType,
+                                           HeatingCoil(CoilNum).Name,
+                                           StageNum,
+                                           HeatingCoil(CoilNum).MSNominalCapacity(StageNum),
+                                           StageNum + 1,
+                                           HeatingCoil(CoilNum).MSNominalCapacity(StageNum + 1)));
                     ShowFatalError(state, "Preceding conditions cause termination.");
                 }
             }
@@ -1884,8 +1891,7 @@ namespace HeatingCoils {
         using DataHVACGlobals::ElecHeatingCoilPower;
         using DataHVACGlobals::MSHPMassFlowRateHigh;
         using DataHVACGlobals::MSHPMassFlowRateLow;
-        using General::RoundSigDigits;
-        using General::TrimSigDigits;
+
         using Psychrometrics::PsyRhFnTdbWPb;
         using Psychrometrics::PsyTdbFnHW;
         using Psychrometrics::PsyTsatFnHPb;
@@ -2097,7 +2103,6 @@ namespace HeatingCoils {
         using CurveManager::CurveValue;
         using DataHVACGlobals::TempControlTol;
         using FaultsManager::FaultsCoilSATSensor;
-        using General::TrimSigDigits;
 
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -2220,8 +2225,7 @@ namespace HeatingCoils {
                         ++HeatingCoil(CoilNum).PLFErrorCount;
                         ShowWarningError(state, "CalcFuelHeatingCoil: " + cAllCoilTypes(HeatingCoil(CoilNum).HCoilType_Num) + "=\"" +
                                          HeatingCoil(CoilNum).Name + "\", PLF curve values");
-                        ShowContinueError(state, "The PLF curve value = " + TrimSigDigits(PLF, 5) +
-                                          " for part-load ratio = " + TrimSigDigits(PartLoadRat, 5));
+                        ShowContinueError(state, format("The PLF curve value = {:.5T} for part-load ratio = {:.5T}", PLF, PartLoadRat));
                         ShowContinueError(state, "PLF curve values must be >= 0.7. PLF has been reset to 0.7 and the simulation continues...");
                         ShowContinueError(state, "Check the IO reference manual for PLF curve guidance [Coil:Heating:Fuel].");
                     } else {
@@ -2239,7 +2243,7 @@ namespace HeatingCoils {
                         ++HeatingCoil(CoilNum).RTFErrorCount;
                         ShowWarningError(state, "CalcFuelHeatingCoil: " + cAllCoilTypes(HeatingCoil(CoilNum).HCoilType_Num) + "=\"" +
                                          HeatingCoil(CoilNum).Name + "\", runtime fraction");
-                        ShowContinueError(state, "The runtime fraction exceeded 1.0. [" + TrimSigDigits(HeatingCoil(CoilNum).RTF, 4) + "].");
+                        ShowContinueError(state, format("The runtime fraction exceeded 1.0. [{:.4T}].", HeatingCoil(CoilNum).RTF));
                         ShowContinueError(state, "Runtime fraction is set to 1.0 and the simulation continues...");
                         ShowContinueError(state, "Check the IO reference manual for PLF curve guidance [Coil:Heating:Fuel].");
                     } else {
@@ -2314,8 +2318,7 @@ namespace HeatingCoils {
         using DataHVACGlobals::ElecHeatingCoilPower;
         using DataHVACGlobals::MSHPMassFlowRateHigh;
         using DataHVACGlobals::MSHPMassFlowRateLow;
-        using General::RoundSigDigits;
-        using General::TrimSigDigits;
+
         using Psychrometrics::PsyRhFnTdbWPb;
         using Psychrometrics::PsyTdbFnHW;
         using Psychrometrics::PsyTsatFnHPb;
@@ -2516,8 +2519,7 @@ namespace HeatingCoils {
                         ++HeatingCoil(CoilNum).PLFErrorCount;
                         ShowWarningError(state, "CalcFuelHeatingCoil: " + cAllCoilTypes(HeatingCoil(CoilNum).HCoilType_Num) + "=\"" +
                                          HeatingCoil(CoilNum).Name + "\", PLF curve values");
-                        ShowContinueError(state, "The PLF curve value = " + TrimSigDigits(PLF, 5) +
-                                          " for part-load ratio = " + TrimSigDigits(PartLoadRat, 5));
+                        ShowContinueError(state, format("The PLF curve value = {:.5T} for part-load ratio = {:.5T}", PLF, PartLoadRat));
                         ShowContinueError(state, "PLF curve values must be >= 0.7. PLF has been reset to 0.7 and the simulation continues...");
                         ShowContinueError(state, "Check the IO reference manual for PLF curve guidance [Coil:Heating:Fuel].");
                     } else {
@@ -2535,7 +2537,7 @@ namespace HeatingCoils {
                         ++HeatingCoil(CoilNum).RTFErrorCount;
                         ShowWarningError(state, "CalcFuelHeatingCoil: " + cAllCoilTypes(HeatingCoil(CoilNum).HCoilType_Num) + "=\"" +
                                          HeatingCoil(CoilNum).Name + "\", runtime fraction");
-                        ShowContinueError(state, "The runtime fraction exceeded 1.0. [" + TrimSigDigits(HeatingCoil(CoilNum).RTF, 4) + "].");
+                        ShowContinueError(state, format("The runtime fraction exceeded 1.0. [{:.4T}].", HeatingCoil(CoilNum).RTF));
                         ShowContinueError(state, "Runtime fraction is set to 1.0 and the simulation continues...");
                         ShowContinueError(state, "Check the IO reference manual for PLF curve guidance [Coil:Heating:Fuel].");
                     } else {
@@ -2967,7 +2969,6 @@ namespace HeatingCoils {
         // the heating coil is scheduled to be on.
 
         // Using/Aliasing
-        using General::TrimSigDigits;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int CoilNum;
@@ -2995,12 +2996,18 @@ namespace HeatingCoils {
         } else {
             CoilNum = CompIndex;
             if (CoilNum > NumHeatingCoils || CoilNum < 1) {
-                ShowFatalError(state, "CheckHeatingCoilSchedule: Invalid CompIndex passed=" + TrimSigDigits(CoilNum) +
-                               ", Number of Heating Coils=" + TrimSigDigits(NumHeatingCoils) + ", Coil name=" + CompName);
+                ShowFatalError(state,
+                               format("CheckHeatingCoilSchedule: Invalid CompIndex passed={}, Number of Heating Coils={}, Coil name={}",
+                                      CoilNum,
+                                      NumHeatingCoils,
+                                      CompName));
             }
             if (CompName != HeatingCoil(CoilNum).Name) {
-                ShowSevereError(state, "CheckHeatingCoilSchedule: Invalid CompIndex passed=" + TrimSigDigits(CoilNum) + ", Coil name=" + CompName +
-                                ", stored Coil Name for that index=" + HeatingCoil(CoilNum).Name);
+                ShowSevereError(state,
+                                format("CheckHeatingCoilSchedule: Invalid CompIndex passed={}, Coil name={}, stored Coil Name for that index={}",
+                                       CoilNum,
+                                       CompName,
+                                       HeatingCoil(CoilNum).Name));
                 ShowContinueError(state, "...expected type=\"" + CompType + "\", actual type=\"" + cAllCoilTypes(HeatingCoil(CoilNum).HCoilType_Num) +
                                   "\".");
                 ShowFatalError(state, "Program terminates due to preceding conditions.");
@@ -3575,7 +3582,6 @@ namespace HeatingCoils {
         // This function sets data to Heating Coil using the coil index and arguments passed
 
         // Using/Aliasing
-        using General::TrimSigDigits;
 
         if (GetCoilsInputFlag) {
             GetHeatingCoilInput(state);
@@ -3583,8 +3589,8 @@ namespace HeatingCoils {
         }
 
         if (CoilNum <= 0 || CoilNum > NumHeatingCoils) {
-            ShowSevereError(state, "SetHeatingCoilData: called with heating coil Number out of range=" + TrimSigDigits(CoilNum) + " should be >0 and <" +
-                            TrimSigDigits(NumHeatingCoils));
+            ShowSevereError(
+                state, format("SetHeatingCoilData: called with heating coil Number out of range={} should be >0 and <{}", CoilNum, NumHeatingCoils));
             ErrorsFound = true;
             return;
         }

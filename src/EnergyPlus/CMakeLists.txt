@@ -142,10 +142,8 @@ SET( SRC
   DataAirSystems.hh
   DataBSDFWindow.cc
   DataBSDFWindow.hh
-  DataBranchAirLoopPlant.cc
   DataBranchAirLoopPlant.hh
-  DataBranchNodeConnections.cc
-  DataBranchNodeConnections.hh
+        DataBranchNodeConnections.hh
   DataComplexFenestration.cc
   DataComplexFenestration.hh
   DataContaminantBalance.cc
@@ -764,7 +762,7 @@ endif()
 
 add_library( energyplusparser STATIC ${INPUTPARSING_SRC} )
 add_dependencies( energyplusparser GenerateEmbeddedEpJSONSchema )
-target_link_libraries( energyplusparser re2 )
+target_link_libraries( energyplusparser re2 fmt::fmt)
 if(UNIX AND NOT APPLE)
   target_link_libraries( energyplusparser dl )
 endif()

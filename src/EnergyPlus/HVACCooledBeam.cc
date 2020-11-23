@@ -65,7 +65,6 @@
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/FluidProperties.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/HVACCooledBeam.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -168,9 +167,6 @@ namespace HVACCooledBeam {
         // Manages the simulation of a cooled beam unit.
         // Called from SimZoneAirLoopEquipment in module ZoneAirLoopEquipmentManager.
 
-        // Using/Aliasing
-        using General::TrimSigDigits;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int CBNum; // index of cooled beam unit being simulated
 
@@ -190,13 +186,17 @@ namespace HVACCooledBeam {
         } else {
             CBNum = CompIndex;
             if (CBNum > NumCB || CBNum < 1) {
-                ShowFatalError(state, "SimCoolBeam: Invalid CompIndex passed=" + TrimSigDigits(CompIndex) +
-                               ", Number of Cool Beam Units=" + TrimSigDigits(NumCB) + ", System name=" + CompName);
+                ShowFatalError(
+                    state,
+                    format("SimCoolBeam: Invalid CompIndex passed={}, Number of Cool Beam Units={}, System name={}", CompIndex, NumCB, CompName));
             }
             if (CheckEquipName(CBNum)) {
                 if (CompName != CoolBeam(CBNum).Name) {
-                    ShowFatalError(state, "SimCoolBeam: Invalid CompIndex passed=" + TrimSigDigits(CompIndex) + ", Cool Beam Unit name=" + CompName +
-                                   ", stored Cool Beam Unit for that index=" + CoolBeam(CBNum).Name);
+                    ShowFatalError(state,
+                                   format("SimCoolBeam: Invalid CompIndex passed={}, Cool Beam Unit name={}, stored Cool Beam Unit for that index={}",
+                                          CompIndex,
+                                          CompName,
+                                          CoolBeam(CBNum).Name));
                 }
                 CheckEquipName(CBNum) = false;
             }
@@ -931,7 +931,6 @@ namespace HVACCooledBeam {
 
         // Using/Aliasing
         using namespace DataZoneEnergyDemands;
-        using General::SolveRoot;
         using PlantUtilities::SetComponentFlowRate;
 
         // Locals

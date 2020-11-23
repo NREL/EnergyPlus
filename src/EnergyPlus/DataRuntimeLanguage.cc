@@ -462,8 +462,8 @@ namespace DataRuntimeLanguage {
         }
         //  pos=SCAN(cFieldValue(1:1),InvalidStartCharacters)
         //  IF (pos > 0) THEN
-        //    CALL ShowSevereError(TRIM(cModuleObject)//'="'//TRIM(cFieldValue)//'", Invalid variable name entered.')
-        //    CALL ShowContinueError('...'//TRIM(cFieldName)//'; Names used as EMS variables cannot start with numeric characters.')
+        //    CALL ShowSevereError(state, TRIM(cModuleObject)//'="'//TRIM(cFieldValue)//'", Invalid variable name entered.')
+        //    CALL ShowContinueError(state, '...'//TRIM(cFieldName)//'; Names used as EMS variables cannot start with numeric characters.')
         //    errFlag=.TRUE.
         //    ErrorsFound = .TRUE.
         //  ENDIF

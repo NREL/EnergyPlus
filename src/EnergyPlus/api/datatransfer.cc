@@ -212,7 +212,7 @@ Real64 getVariableValue(EnergyPlusState state, const int handle) {
         } else {
             // must be running from python plugin, need to fatal out once the plugin is done
             // throw an error, set the fatal flag, and then return zero
-            EnergyPlus::ShowSevereError(*thisState, "Data Exchange API: Index error in getVariableValue; received handle: " + std::to_string(handle));
+            EnergyPlus::ShowSevereError(*thisState, fmt::format("Data Exchange API: Index error in getVariableValue; received handle: {}", handle));
             EnergyPlus::ShowContinueError(*thisState, "The getVariableValue function will return 0 for now to allow the plugin to finish, then EnergyPlus will abort");
         }
         EnergyPlus::PluginManagement::apiErrorFlag = true;
@@ -242,7 +242,7 @@ Real64 getMeterValue(EnergyPlusState state, int handle) {
         } else {
             // must be running from python plugin, need to fatal out once the plugin is done
             // throw an error, set the fatal flag, and then return zero
-            EnergyPlus::ShowSevereError(*thisState, "Data Exchange API: Index error in getMeterValue; received handle: " + std::to_string(handle));
+            EnergyPlus::ShowSevereError(*thisState, fmt::format("Data Exchange API: Index error in getMeterValue; received handle: {}", handle));
             EnergyPlus::ShowContinueError(*thisState, "The getMeterValue function will return 0 for now to allow the plugin to finish, then EnergyPlus will abort");
         }
         EnergyPlus::PluginManagement::apiErrorFlag = true;
@@ -276,8 +276,10 @@ int getActuatorHandle(EnergyPlusState state, const char* componentType, const ch
                                 + usedActuator.Name + "'.");
                         EnergyPlus::ShowContinueError(*thisState, "Occurred for componentType='" + typeUC + "', controlType='" + controlUC
                                 + "', uniqueKey='" + keyUC + "'.");
-                        EnergyPlus::ShowContinueError(*thisState, "The getActuatorHandle function will still return the handle (= " + std::to_string(handle)
-                                + ") but caller should take note that there is a risk of overwritting.");
+                        EnergyPlus::ShowContinueError(*thisState,
+                                                      fmt::format("The getActuatorHandle function will still return the handle (= {}) but caller "
+                                                                  "should take note that there is a risk of overwritting.",
+                                                                  handle));
                         foundActuator = true;
                         break;
                     }
@@ -286,9 +288,10 @@ int getActuatorHandle(EnergyPlusState state, const char* componentType, const ch
                     EnergyPlus::ShowWarningError(*thisState, "Data Exchange API: You seem to already have tried to get an Actuator Handle on this one.");
                     EnergyPlus::ShowContinueError(*thisState, "Occurred for componentType='" + typeUC + "', controlType='" + controlUC
                                 + "', uniqueKey='" + keyUC + "'.");
-                    EnergyPlus::ShowContinueError(*thisState, "The getActuatorHandle function will still return the handle (= " + std::to_string(handle)
-                                + ") but caller should take note that there is a risk of overwritting.");
-
+                    EnergyPlus::ShowContinueError(*thisState,
+                                                  fmt::format("The getActuatorHandle function will still return the handle (= {}) but caller should "
+                                                              "take note that there is a risk of overwritting.",
+                                                              handle));
                 }
             }
             ++availActuator.handleCount;
@@ -311,7 +314,7 @@ void resetActuator(EnergyPlusState state, int handle) {
         } else {
             // must be running from python plugin, need to fatal out once the plugin is done
             // throw an error, set the fatal flag, and then return
-            EnergyPlus::ShowSevereError(*thisState, "Data Exchange API: index error in resetActuator; received handle: " + std::to_string(handle));
+            EnergyPlus::ShowSevereError(*thisState, fmt::format("Data Exchange API: index error in resetActuator; received handle: {}", handle));
             EnergyPlus::ShowContinueError(*thisState, "The resetActuator function will return to allow the plugin to finish, then EnergyPlus will abort");
         }
         EnergyPlus::PluginManagement::apiErrorFlag = true;
@@ -337,7 +340,7 @@ void setActuatorValue(EnergyPlusState state, const int handle, const Real64 valu
         } else {
             // must be running from python plugin, need to fatal out once the plugin is done
             // throw an error, set the fatal flag, and then return
-            EnergyPlus::ShowSevereError(*thisState, "Data Exchange API: index error in setActuatorValue; received handle: " + std::to_string(handle));
+            EnergyPlus::ShowSevereError(*thisState, fmt::format("Data Exchange API: index error in setActuatorValue; received handle: {}", handle));
             EnergyPlus::ShowContinueError(*thisState, "The setActuatorValue function will return to allow the plugin to finish, then EnergyPlus will abort");
         }
         EnergyPlus::PluginManagement::apiErrorFlag = true;
@@ -366,7 +369,7 @@ Real64 getActuatorValue(EnergyPlusState state, const int handle) {
         } else {
             // must be running from python plugin, need to fatal out once the plugin is done
             // throw an error, set the fatal flag, and then return 0
-            EnergyPlus::ShowSevereError(*thisState, "Data Exchange API: index error in getActuatorValue; received handle: " + std::to_string(handle));
+            EnergyPlus::ShowSevereError(*thisState, fmt::format("Data Exchange API: index error in getActuatorValue; received handle: {}", handle));
             EnergyPlus::ShowContinueError(*thisState, "The getActuatorValue function will return 0 for now to allow the plugin to finish, then EnergyPlus will abort");
         }
         EnergyPlus::PluginManagement::apiErrorFlag = true;
@@ -410,7 +413,8 @@ Real64 getInternalVariableValue(EnergyPlusState state, int handle) {
         } else {
             // must be running from python plugin, need to fatal out once the plugin is done
             // throw an error, set the fatal flag, and then return 0
-            EnergyPlus::ShowSevereError(*thisState, "Data Exchange API: index error in getInternalVariableValue; received handle: " + std::to_string(handle));
+            EnergyPlus::ShowSevereError(*thisState,
+                                        fmt::format("Data Exchange API: index error in getInternalVariableValue; received handle: {}", handle));
             EnergyPlus::ShowContinueError(*thisState, "The getInternalVariableValue function will return 0 for now to allow the plugin to finish, then EnergyPlus will abort");
         }
         EnergyPlus::PluginManagement::apiErrorFlag = true;
@@ -429,7 +433,8 @@ Real64 getPluginGlobalVariableValue(EnergyPlusState state, int handle) {
     if (handle < 0 || handle > EnergyPlus::PluginManagement::pluginManager->maxGlobalVariableIndex) {
         // need to fatal out once the plugin is done
         // throw an error, set the fatal flag, and then return 0
-        EnergyPlus::ShowSevereError(*thisState, "Data Exchange API: Problem -- index error in getPluginGlobalVariableValue; received handle: " + std::to_string(handle));
+        EnergyPlus::ShowSevereError(
+            *thisState, fmt::format("Data Exchange API: Problem -- index error in getPluginGlobalVariableValue; received handle: {}", handle));
         EnergyPlus::ShowContinueError(*thisState, "The getPluginGlobalVariableValue function will return 0 for now to allow the plugin to finish, then EnergyPlus will abort");
         EnergyPlus::PluginManagement::apiErrorFlag = true;
         return 0;
@@ -442,7 +447,8 @@ void setPluginGlobalVariableValue(EnergyPlusState state, int handle, Real64 valu
     if (handle < 0 || handle > EnergyPlus::PluginManagement::pluginManager->maxGlobalVariableIndex) {
         // need to fatal out once the plugin is done
         // throw an error, set the fatal flag, and then return
-        EnergyPlus::ShowSevereError(*thisState, "Data Exchange API: Problem -- index error in setPluginGlobalVariableValue; received handle: " + std::to_string(handle));
+        EnergyPlus::ShowSevereError(
+            *thisState, fmt::format("Data Exchange API: Problem -- index error in setPluginGlobalVariableValue; received handle: {}", handle));
         EnergyPlus::ShowContinueError(*thisState, "The getPluginGlobalVariableValue function will return to allow the plugin to finish, then EnergyPlus will abort");
         EnergyPlus::PluginManagement::apiErrorFlag = true;
     }
@@ -458,7 +464,8 @@ Real64 getPluginTrendVariableValue(EnergyPlusState state, int handle, int timeIn
     if (handle < 0 || handle > EnergyPlus::PluginManagement::pluginManager->maxTrendVariableIndex) {
         // need to fatal out once the plugin is done
         // throw an error, set the fatal flag, and then return
-        EnergyPlus::ShowSevereError(*thisState, "Data Exchange API: Problem -- index error in getPluginTrendVariableValue; received handle: " + std::to_string(handle));
+        EnergyPlus::ShowSevereError(
+            *thisState, fmt::format("Data Exchange API: Problem -- index error in getPluginTrendVariableValue; received handle: {}", handle));
         EnergyPlus::ShowContinueError(*thisState, "The getPluginTrendVariableValue function will return 0 to allow the plugin to finish, then EnergyPlus will abort");
         EnergyPlus::PluginManagement::apiErrorFlag = true;
         return 0;
@@ -466,7 +473,10 @@ Real64 getPluginTrendVariableValue(EnergyPlusState state, int handle, int timeIn
     if (timeIndex < 1 || timeIndex > ((int)EnergyPlus::PluginManagement::PluginManager::getTrendVariableHistorySize(handle))) {
         // need to fatal out once the plugin is done
         // throw an error, set the fatal flag, and then return
-        EnergyPlus::ShowSevereError(*thisState, "Data Exchange API: Problem -- trend history count argument out of range in getPluginTrendVariableValue; received value: " + std::to_string(timeIndex));
+        EnergyPlus::ShowSevereError(
+            *thisState,
+            fmt::format("Data Exchange API: Problem -- trend history count argument out of range in getPluginTrendVariableValue; received value: {}",
+                        timeIndex));
         EnergyPlus::ShowContinueError(*thisState, "The getPluginTrendVariableValue function will return 0 to allow the plugin to finish, then EnergyPlus will abort");
         EnergyPlus::PluginManagement::apiErrorFlag = true;
         return 0;
@@ -479,7 +489,8 @@ Real64 getPluginTrendVariableAverage(EnergyPlusState state, int handle, int coun
     if (handle < 0 || handle > EnergyPlus::PluginManagement::pluginManager->maxTrendVariableIndex) {
         // need to fatal out once the plugin is done
         // throw an error, set the fatal flag, and then return
-        EnergyPlus::ShowSevereError(*thisState, "Data Exchange API: Problem -- index error in getPluginTrendVariableAverage; received handle: " + std::to_string(handle));
+        EnergyPlus::ShowSevereError(
+            *thisState, fmt::format("Data Exchange API: Problem -- index error in getPluginTrendVariableAverage; received handle: {}", handle));
         EnergyPlus::ShowContinueError(*thisState, "The getPluginTrendVariableAverage function will return 0 to allow the plugin to finish, then EnergyPlus will abort");
         EnergyPlus::PluginManagement::apiErrorFlag = true;
         return 0;
@@ -487,7 +498,11 @@ Real64 getPluginTrendVariableAverage(EnergyPlusState state, int handle, int coun
     if (count < 2 || count > ((int)EnergyPlus::PluginManagement::PluginManager::getTrendVariableHistorySize(handle))) {
         // need to fatal out once the plugin is done
         // throw an error, set the fatal flag, and then return
-        EnergyPlus::ShowSevereError(*thisState, "Data Exchange API: Problem -- trend history count argument out of range in getPluginTrendVariableAverage; received value: " + std::to_string(count));
+        EnergyPlus::ShowSevereError(
+            *thisState,
+            fmt::format(
+                "Data Exchange API: Problem -- trend history count argument out of range in getPluginTrendVariableAverage; received value: {}",
+                count));
         EnergyPlus::ShowContinueError(*thisState, "The getPluginTrendVariableAverage function will return 0 to allow the plugin to finish, then EnergyPlus will abort");
         EnergyPlus::PluginManagement::apiErrorFlag = true;
         return 0;
@@ -500,7 +515,8 @@ Real64 getPluginTrendVariableMin(EnergyPlusState state, int handle, int count) {
     if (handle < 0 || handle > EnergyPlus::PluginManagement::pluginManager->maxTrendVariableIndex) {
         // need to fatal out once the plugin is done
         // throw an error, set the fatal flag, and then return
-        EnergyPlus::ShowSevereError(*thisState, "Data Exchange API: Problem -- index error in getPluginTrendVariableMin; received handle: " + std::to_string(handle));
+        EnergyPlus::ShowSevereError(
+            *thisState, fmt::format("Data Exchange API: Problem -- index error in getPluginTrendVariableMin; received handle: {}", handle));
         EnergyPlus::ShowContinueError(*thisState, "The getPluginTrendVariableMin function will return 0 to allow the plugin to finish, then EnergyPlus will abort");
         EnergyPlus::PluginManagement::apiErrorFlag = true;
         return 0;
@@ -508,7 +524,10 @@ Real64 getPluginTrendVariableMin(EnergyPlusState state, int handle, int count) {
     if (count < 2 || count > ((int)EnergyPlus::PluginManagement::PluginManager::getTrendVariableHistorySize(handle))) {
         // need to fatal out once the plugin is done
         // throw an error, set the fatal flag, and then return
-        EnergyPlus::ShowSevereError(*thisState, "Data Exchange API: Problem -- trend history count argument out of range in getPluginTrendVariableMin; received value: " + std::to_string(count));
+        EnergyPlus::ShowSevereError(
+            *thisState,
+            fmt::format("Data Exchange API: Problem -- trend history count argument out of range in getPluginTrendVariableMin; received value: {}",
+                        count));
         EnergyPlus::ShowContinueError(*thisState, "The getPluginTrendVariableMin function will return 0 to allow the plugin to finish, then EnergyPlus will abort");
         EnergyPlus::PluginManagement::apiErrorFlag = true;
         return 0;
@@ -521,7 +540,8 @@ Real64 getPluginTrendVariableMax(EnergyPlusState state, int handle, int count) {
     if (handle < 0 || handle > EnergyPlus::PluginManagement::pluginManager->maxTrendVariableIndex) {
         // need to fatal out once the plugin is done
         // throw an error, set the fatal flag, and then return
-        EnergyPlus::ShowSevereError(*thisState, "Data Exchange API: Problem -- index error in getPluginTrendVariableMax; received handle: " + std::to_string(handle));
+        EnergyPlus::ShowSevereError(
+            *thisState, fmt::format("Data Exchange API: Problem -- index error in getPluginTrendVariableMax; received handle: {}", handle));
         EnergyPlus::ShowContinueError(*thisState, "The getPluginTrendVariableMax function will return 0 to allow the plugin to finish, then EnergyPlus will abort");
         EnergyPlus::PluginManagement::apiErrorFlag = true;
         return 0;
@@ -529,7 +549,10 @@ Real64 getPluginTrendVariableMax(EnergyPlusState state, int handle, int count) {
     if (count < 2 || count > ((int)EnergyPlus::PluginManagement::PluginManager::getTrendVariableHistorySize(handle))) {
         // need to fatal out once the plugin is done
         // throw an error, set the fatal flag, and then return
-        EnergyPlus::ShowSevereError(*thisState, "Data Exchange API: Problem -- trend history count argument out of range in getPluginTrendVariableMax; received value: " + std::to_string(count));
+        EnergyPlus::ShowSevereError(
+            *thisState,
+            fmt::format("Data Exchange API: Problem -- trend history count argument out of range in getPluginTrendVariableMax; received value: {}",
+                        count));
         EnergyPlus::ShowContinueError(*thisState, "The getPluginTrendVariableMax function will return 0 to allow the plugin to finish, then EnergyPlus will abort");
         EnergyPlus::PluginManagement::apiErrorFlag = true;
         return 0;
@@ -542,7 +565,8 @@ Real64 getPluginTrendVariableSum(EnergyPlusState state, int handle, int count) {
     if (handle < 0 || handle > EnergyPlus::PluginManagement::pluginManager->maxTrendVariableIndex) {
         // need to fatal out once the plugin is done
         // throw an error, set the fatal flag, and then return
-        EnergyPlus::ShowSevereError(*thisState, "Data Exchange API: Problem -- index error in getPluginTrendVariableSum; received handle: " + std::to_string(handle));
+        EnergyPlus::ShowSevereError(
+            *thisState, fmt::format("Data Exchange API: Problem -- index error in getPluginTrendVariableSum; received handle: {}", handle));
         EnergyPlus::ShowContinueError(*thisState, "The getPluginTrendVariableSum function will return 0 to allow the plugin to finish, then EnergyPlus will abort");
         EnergyPlus::PluginManagement::apiErrorFlag = true;
         return 0;
@@ -550,7 +574,10 @@ Real64 getPluginTrendVariableSum(EnergyPlusState state, int handle, int count) {
     if (count < 2 || count > ((int)EnergyPlus::PluginManagement::PluginManager::getTrendVariableHistorySize(handle))) {
         // need to fatal out once the plugin is done
         // throw an error, set the fatal flag, and then return
-        EnergyPlus::ShowSevereError(*thisState, "Data Exchange API: Problem -- trend history count argument out of range in getPluginTrendVariableSum; received value: " + std::to_string(count));
+        EnergyPlus::ShowSevereError(
+            *thisState,
+            fmt::format("Data Exchange API: Problem -- trend history count argument out of range in getPluginTrendVariableSum; received value: {}",
+                        count));
         EnergyPlus::ShowContinueError(*thisState, "The getPluginTrendVariableSum function will return 0 to allow the plugin to finish, then EnergyPlus will abort");
         EnergyPlus::PluginManagement::apiErrorFlag = true;
         return 0;
@@ -563,7 +590,8 @@ Real64 getPluginTrendVariableDirection(EnergyPlusState state, int handle, int co
     if (handle < 0 || handle > EnergyPlus::PluginManagement::pluginManager->maxTrendVariableIndex) {
         // need to fatal out once the plugin is done
         // throw an error, set the fatal flag, and then return
-        EnergyPlus::ShowSevereError(*thisState, "Data Exchange API: Problem -- index error in getPluginTrendVariableDirection; received handle: " + std::to_string(handle));
+        EnergyPlus::ShowSevereError(
+            *thisState, fmt::format("Data Exchange API: Problem -- index error in getPluginTrendVariableDirection; received handle: {}", handle));
         EnergyPlus::ShowContinueError(*thisState, "The getPluginTrendVariableDirection function will return 0 to allow the plugin to finish, then EnergyPlus will abort");
         EnergyPlus::PluginManagement::apiErrorFlag = true;
         return 0;
@@ -571,7 +599,11 @@ Real64 getPluginTrendVariableDirection(EnergyPlusState state, int handle, int co
     if (count < 2 || count > ((int)EnergyPlus::PluginManagement::PluginManager::getTrendVariableHistorySize(handle))) {
         // need to fatal out once the plugin is done
         // throw an error, set the fatal flag, and then return
-        EnergyPlus::ShowSevereError(*thisState, "Data Exchange API: Problem -- trend history count argument out of range in getPluginTrendVariableDirection; received value: " + std::to_string(count));
+        EnergyPlus::ShowSevereError(
+            *thisState,
+            fmt::format(
+                "Data Exchange API: Problem -- trend history count argument out of range in getPluginTrendVariableDirection; received value: {}",
+                count));
         EnergyPlus::ShowContinueError(*thisState, "The getPluginTrendVariableDirection function will return 0 to allow the plugin to finish, then EnergyPlus will abort");
         EnergyPlus::PluginManagement::apiErrorFlag = true;
         return 0;

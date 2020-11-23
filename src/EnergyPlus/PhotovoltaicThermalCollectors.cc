@@ -271,8 +271,9 @@ namespace PhotovoltaicThermalCollectors {
                     ShowWarningError(state, "Suspected input problem with " + DataIPShortCuts::cAlphaFieldNames(2) + " = " + DataIPShortCuts::cAlphaArgs(2));
                     ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1));
                     ShowContinueError(state, "Surface used for solar collector faces down");
-                    ShowContinueError(state, "Surface tilt angle (degrees from ground outward normal) = " +
-                                      General::RoundSigDigits(DataSurfaces::Surface(PVT(Item).SurfNum).Tilt, 2));
+                    ShowContinueError(
+                        state,
+                        format("Surface tilt angle (degrees from ground outward normal) = {:.2R}", DataSurfaces::Surface(PVT(Item).SurfNum).Tilt));
                 }
 
             } // check surface
@@ -715,9 +716,8 @@ namespace PhotovoltaicThermalCollectors {
                         if ((std::abs(DesignVolFlowRateDes - DesignVolFlowRateUser) / DesignVolFlowRateUser) >
                             DataSizing::AutoVsHardSizingThreshold) {
                             ShowMessage(state, "SizeSolarCollector: Potential issue with equipment sizing for " + this->Name);
-                            ShowContinueError(state, "User-Specified Design Flow Rate of " + General::RoundSigDigits(DesignVolFlowRateUser, 5) + " [W]");
-                            ShowContinueError(state, "differs from Design Size Design Flow Rate of " + General::RoundSigDigits(DesignVolFlowRateDes, 5) +
-                                              " [W]");
+                            ShowContinueError(state, format("User-Specified Design Flow Rate of {:.5R} [W]", DesignVolFlowRateUser));
+                            ShowContinueError(state, format("differs from Design Size Design Flow Rate of {:.5R} [W]", DesignVolFlowRateDes));
                             ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                             ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                         }
@@ -779,10 +779,8 @@ namespace PhotovoltaicThermalCollectors {
                                 if ((std::abs(DesignVolFlowRateDes - DesignVolFlowRateUser) / DesignVolFlowRateUser) >
                                     DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeSolarCollector: Potential issue with equipment sizing for " + this->Name);
-                                    ShowContinueError(state, "User-Specified Design Flow Rate of " + General::RoundSigDigits(DesignVolFlowRateUser, 5) +
-                                                      " [W]");
-                                    ShowContinueError(state, "differs from Design Size Design Flow Rate of " +
-                                                      General::RoundSigDigits(DesignVolFlowRateDes, 5) + " [W]");
+                                    ShowContinueError(state, format("User-Specified Design Flow Rate of {:.5R} [W]", DesignVolFlowRateUser));
+                                    ShowContinueError(state, format("differs from Design Size Design Flow Rate of {:.5R} [W]", DesignVolFlowRateDes));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }

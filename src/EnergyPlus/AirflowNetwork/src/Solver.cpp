@@ -108,8 +108,6 @@ namespace AirflowNetwork {
 
     int const NrInt(20); // Number of intervals for a large opening
 
-    static std::string const BlankString;
-
     // Common block AFEDAT
     Array1D<Real64> AFECTL;
     Array1D<Real64> AFLOW2;
