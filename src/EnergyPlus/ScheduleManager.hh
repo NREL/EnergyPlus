@@ -303,19 +303,51 @@ namespace ScheduleManager {
 
     int GetNumberOfSchedules();
 
+    struct SingleColumnOfData {
+        int columnNumber = 0;
+        int numErrors = 0;
+        Array1D<Real64> dataInThisFile;
+        explicit SingleColumnOfData(int _columnNumber) : columnNumber(_columnNumber) {}
+    };
+
     struct InterpretedScheduleFileData {
         std::string fileName;
         std::string delimiter;
         int rowsToSkip = 0;
-        int maxColCount = 0;
-        std::vector<Array1D<Real64>> columnsOfDataInThisFile;
+        std::vector<SingleColumnOfData> columnarData;
+        SingleColumnOfData dummyColumnarData;
         InterpretedScheduleFileData(std::string _fileName, std::string _delimiter, int _rowsToSkip) :
-            fileName(std::move(_fileName)), delimiter(std::move(_delimiter)), rowsToSkip(_rowsToSkip) {}
-        bool isItAMatch(std::string const & _fileName, std::string const & _delimiter, int _rowsToSkip) const {
+            fileName(std::move(_fileName)), delimiter(std::move(_delimiter)), rowsToSkip(_rowsToSkip), dummyColumnarData(-1) {}
+        [[nodiscard]] bool isItAMatch(std::string const & _fileName, std::string const & _delimiter, int _rowsToSkip) const {
             return this->fileName == _fileName && this->delimiter == _delimiter && this->rowsToSkip == _rowsToSkip;
         }
-        Array1D<Real64> & getColumnData(int columnNumZeroIndex) {
-            return this->columnsOfDataInThisFile[columnNumZeroIndex];
+        SingleColumnOfData & getDataReferenceForColumn(int _columnNumber, bool & errorFlag) {
+            errorFlag = false;
+            for (auto & column : this->columnarData) {
+                if (column.columnNumber == _columnNumber) {
+                    return column;
+                }
+            }
+            errorFlag = true;
+            return this->dummyColumnarData;
+        }
+        bool hasColumnInData(int _columnNumber) {
+            return std::any_of(this->columnarData.begin(), this->columnarData.end(), [=](const SingleColumnOfData& c) {return c.columnNumber == _columnNumber;});
+        }
+        void addColumnDataStruct(int _columnNumber) {
+            this->columnarData.emplace_back(_columnNumber);
+        }
+        void addColumnarValue(int _columnNumber, Real64 _columnValue, bool errFlag) {
+            if (!this->hasColumnInData(_columnNumber)) {
+                this->addColumnDataStruct(_columnNumber);
+            }
+            for (auto & column : this->columnarData) {
+                if (column.columnNumber == _columnNumber) {
+                    column.dataInThisFile.push_back(_columnValue);
+                    if (errFlag) column.numErrors++;
+                    return;
+                }
+            }
         }
     };
     extern std::vector<InterpretedScheduleFileData> interpretedFileData;

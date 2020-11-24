@@ -1723,23 +1723,21 @@ namespace EnergyPlus::ScheduleManager {
 
             CheckForActualFileName(state, Alphas(3), FileExists, state.files.TempFullFileName.fileName, contextString);
 
-            //    INQUIRE(file=Alphas(3),EXIST=FileExists)
             // Setup file reading parameters
             if (!FileExists) {
                 ErrorsFound = true;
             } else {
 
-                ExternalFileReadMode TryingToReadFrom = ExternalFileReadMode::ReadingFromFile;
+                bool fileConfigFoundInCache = false;
                 Array1D<Real64> * cachedData = nullptr;
                 for (auto & cache : interpretedFileData) {
                     if (cache.isItAMatch(state.files.TempFullFileName.fileName, ColumnSep, skiprowCount)) {
-                        cachedData = &cache.getColumnData(curcolCount - 1);
-                        TryingToReadFrom = ExternalFileReadMode::ReadingFromCache;
+                        fileConfigFoundInCache = true;
                         break;
                     }
                 }
 
-                if (TryingToReadFrom == ExternalFileReadMode::ReadingFromFile) {
+                if (!fileConfigFoundInCache) {
                     InterpretedScheduleFileData cacheToWrite(state.files.TempFullFileName.fileName, ColumnSep, skiprowCount);
 
                     auto SchdFile = state.files.TempFullFileName.try_open();
@@ -1767,7 +1765,6 @@ namespace EnergyPlus::ScheduleManager {
                     SchdFile.backspace();
 
                     // skip lines if any need to be skipped.
-                    numerrors = 0;
                     rowCnt = 0;
                     if (skiprowCount > 0) {      // Numbers(2) has number of rows to skip
                         while (!LineIn.eof) { // end of file
@@ -1791,8 +1788,23 @@ namespace EnergyPlus::ScheduleManager {
                         columnValue = 0.0;
                         // scan through the line looking for a specific column
                         while (true) {
+                            // find the initial instance of the separator
                             sepPos = index(LineIn.data, ColumnSep);
+
+                            // if we didn't find a separator on the first line, and the line is empty, throw a warning
+                            if (sepPos == std::string::npos && firstLine && LineIn.data.substr(wordStart).empty()) {
+                                ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) +
+                                                        "\" first line does not contain the indicated column separator=" +
+                                                        Alphas(4) + '.');
+                                ShowContinueError(state,
+                                                  "...first 40 characters of line=[" + LineIn.data.substr(0, 40) +
+                                                  ']');
+                            }
+
+                            // otherwise keep going, increment the column counter and start parsing data
                             ++colCnt;
+
+                            // if we find a delimiter on the remaining data, parse it and continue, otherwise break
                             if (sepPos != std::string::npos) {
                                 if (sepPos > 0) {
                                     wordEnd = sepPos - 1;
@@ -1807,59 +1819,50 @@ namespace EnergyPlus::ScheduleManager {
                                 firstLine = false;
                                 wordStart = 0;
                             } else {
-                                // no more commas
-                                subString = LineIn.data.substr(wordStart);
-                                if (firstLine && subString == BlankString) {
-                                    ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) +
-                                                            "\" first line does not contain the indicated column separator=" +
-                                                            Alphas(4) + '.');
-                                    ShowContinueError(state,
-                                                      "...first 40 characters of line=[" + LineIn.data.substr(0, 40) +
-                                                      ']');
-                                    firstLine = false;
+                                if (LineIn.data.empty()) {
+                                    break;
+                                } else {
+                                    subString = LineIn.data;
+                                    LineIn.data = "";
                                 }
-                                break;
-                            }
-                            // do a one-time processing of every value into the cache
-                            columnValue = UtilityRoutines::ProcessNumber(subString, errFlag);
-                            if (errFlag) {
-                                cacheToWrite.columnsOfDataInThisFile[colCnt - 1].push_back(0.0);
-                            } else {
-                                if (colCnt > cacheToWrite.maxColCount) {
-                                    cacheToWrite.maxColCount = colCnt;
-                                    cacheToWrite.columnsOfDataInThisFile.emplace_back();
-                                }
-                                cacheToWrite.columnsOfDataInThisFile[colCnt - 1].push_back(columnValue);
                             }
 
-                            if (colCnt == curcolCount) break;
-                        }
-                        if (colCnt == curcolCount) {
+                            // do a one-time processing of every value into the cache
                             columnValue = UtilityRoutines::ProcessNumber(subString, errFlag);
-                            if (errFlag) {
-                                ++numerrors;
-                                columnValue = 0.0;
-                            }
-                        } else {
-                            columnValue = 0.0;
+                            cacheToWrite.addColumnarValue(colCnt, columnValue, errFlag);
+
                         }
-                        hourlyFileValues(rowCnt) = columnValue;
                         if (rowCnt == rowLimitCount) break;
                     }
                     SchdFile.close();
-                } else {
-                    hourlyFileValues = *cachedData;
+                    interpretedFileData.push_back(cacheToWrite);
+                }
+
+                // whether we had to read from the file or we got it from the cache, just get the values now
+                int numErrors = 0;
+                for (auto & cache : interpretedFileData) {
+                    if (cache.isItAMatch(state.files.TempFullFileName.fileName, ColumnSep, skiprowCount)) {
+                        bool errorFlag = false;
+                        auto & singleColumnData = cache.getDataReferenceForColumn(curcolCount, errorFlag);
+                        cachedData = &singleColumnData.dataInThisFile;
+                        if (errorFlag) {
+                            // something went very wrong
+                        }
+                        hourlyFileValues = *cachedData;
+                        numErrors = singleColumnData.numErrors;
+                        break;
+                    }
                 }
 
                 // schedule values have been filled into the hourlyFileValues array.
 
-                if (numerrors > 0) {
+                if (numErrors > 0) {
                     ShowWarningError(state,
                                      format("{}{}=\"{}\" {} records had errors - these values are set to 0.",
                                             RoutineName,
                                             CurrentModuleObject,
                                             Alphas(1),
-                                            numerrors));
+                                            numErrors));
                     ShowContinueError(state, "Use Output:Diagnostics,DisplayExtraWarnings; to see individual records in error.");
                 }
                 if (rowCnt < rowLimitCount) {
