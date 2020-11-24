@@ -25,7 +25,7 @@ SET(SRC
 ADD_LIBRARY( epfmiimport STATIC ${SRC} )
 
 IF (UNIX)
-  ADD_DEFINITIONS("-fPIC")
+  ADD_DEFINITIONS("-fPIC -Wall -Werror")
 ENDIF()
 
 TARGET_LINK_LIBRARIES( epfmiimport epexpat miniziplib )

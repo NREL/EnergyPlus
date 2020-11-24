@@ -21,7 +21,7 @@ SET(SRC
 #ADD_LIBRARY( parser SHARED ${SRC} )
 
 IF (UNIX)
-  ADD_DEFINITIONS("-fPIC")
+  ADD_DEFINITIONS("-fPIC -Wall -Werror")
 ENDIF()
 
 ADD_EXECUTABLE( parser ${SRC} )
