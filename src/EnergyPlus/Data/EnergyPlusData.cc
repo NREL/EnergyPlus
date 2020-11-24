@@ -67,6 +67,7 @@ namespace EnergyPlus {
         this->dataBranchAirLoopPlant = std::make_unique<DataBranchAirLoopPlantData>();
         this->dataBranchInputManager = std::make_unique<BranchInputManagerData>();
         this->dataBranchNodeConnections = std::make_unique<BranchNodeConnectionsData>();
+        this->dataBSDFWindow = std::make_unique<BSDFWindowData>();
         this->dataChilledCeilingPanelSimple = std::make_unique<ChilledCeilingPanelSimpleData>();
         this->dataChillerAbsorber = std::make_unique<ChillerAbsorberData>();
         this->dataChillerElectricEIR = std::make_unique<ChillerElectricEIRData>();
@@ -76,6 +77,7 @@ namespace EnergyPlus {
         this->dataChillerReformulatedEIR = std::make_unique<ChillerReformulatedEIRData>();
         this->dataCondenserLoopTowers = std::make_unique<CondenserLoopTowersData>();
         this->dataConstruction = std::make_unique<ConstructionData>();
+        this->dataContaminantBalance = std::make_unique<ContaminantBalanceData>();
         this->dataConvectionCoefficient = std::make_unique<ConvectionCoefficientsData>();
         this->dataCoolTower = std::make_unique<CoolTowerData>();
         this->dataCostEstimateManager = std::make_unique<CostEstimateManagerData>();
@@ -148,6 +150,7 @@ namespace EnergyPlus {
         this->dataBranchAirLoopPlant->clear_state();
         this->dataBranchInputManager->clear_state();
         this->dataBranchNodeConnections->clear_state();
+        this->dataBSDFWindow->clear_state();
         this->dataChilledCeilingPanelSimple->clear_state();
         this->dataChillerAbsorber->clear_state();
         this->dataChillerElectricEIR->clear_state();
@@ -157,6 +160,7 @@ namespace EnergyPlus {
         this->dataChillerReformulatedEIR->clear_state();
         this->dataCondenserLoopTowers->clear_state();
         this->dataConstruction->clear_state();
+        this->dataContaminantBalance->clear_state();
         this->dataConvectionCoefficient->clear_state();
         this->dataCoolTower->clear_state();
         this->dataCostEstimateManager->clear_state();

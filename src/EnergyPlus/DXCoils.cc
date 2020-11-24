@@ -364,7 +364,7 @@ namespace DXCoils {
         }
 
         // Update the unit outlet nodes
-        UpdateDXCoil(DXCoilNum);
+        UpdateDXCoil(state, DXCoilNum);
 
         // Report the result of the simulation
         ReportDXCoil(state, DXCoilNum);
@@ -484,7 +484,7 @@ namespace DXCoils {
         }
 
         // Update the unit outlet nodes
-        UpdateDXCoil(DXCoilNum);
+        UpdateDXCoil(state, DXCoilNum);
 
         // Report the result of the simulation
         ReportDXCoil(state, DXCoilNum);
@@ -817,7 +817,7 @@ namespace DXCoils {
         }
 
         // Update the unit outlet nodes
-        UpdateDXCoil(DXCoilNum);
+        UpdateDXCoil(state, DXCoilNum);
 
         // Report the result of the simulation
         ReportDXCoil(state, DXCoilNum);
@@ -13421,7 +13421,7 @@ namespace DXCoils {
         }
     }
 
-    void UpdateDXCoil(int const DXCoilNum) // number of the current fan coil unit being simulated
+    void UpdateDXCoil(EnergyPlusData &state, int const DXCoilNum) // number of the current fan coil unit being simulated
     {
 
         // SUBROUTINE INFORMATION:
@@ -13430,9 +13430,6 @@ namespace DXCoils {
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine is for passing results to the outlet air node.
-
-        // Using/Aliasing
-        using DataContaminantBalance::Contaminant;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int AirOutletNode; // air outlet node number
@@ -13453,10 +13450,10 @@ namespace DXCoils {
         Node(AirOutletNode).MassFlowRateMinAvail = Node(AirInletNode).MassFlowRateMinAvail;
         Node(AirOutletNode).MassFlowRateMaxAvail = Node(AirInletNode).MassFlowRateMaxAvail;
 
-        if (Contaminant.CO2Simulation) {
+        if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
             Node(AirOutletNode).CO2 = Node(AirInletNode).CO2;
         }
-        if (Contaminant.GenericContamSimulation) {
+        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
             Node(AirOutletNode).GenContam = Node(AirInletNode).GenContam;
         }
     }

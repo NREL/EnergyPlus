@@ -174,7 +174,7 @@ namespace HVACDuct {
 
         CalcDuct(DuctNum);
 
-        UpdateDuct(DuctNum);
+        UpdateDuct(state, DuctNum);
 
         ReportDuct(DuctNum);
     }
@@ -335,7 +335,7 @@ namespace HVACDuct {
         // na
     }
 
-    void UpdateDuct(int const DuctNum) // number of the current duct being simulated
+    void UpdateDuct(EnergyPlusData &state, int const DuctNum) // number of the current duct being simulated
     {
 
         // SUBROUTINE INFORMATION:
@@ -346,27 +346,6 @@ namespace HVACDuct {
 
         // PURPOSE OF THIS SUBROUTINE:
         // Moves duct output to the outlet nodes
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using DataContaminantBalance::Contaminant;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int InNode;  // inlet node number
@@ -386,11 +365,11 @@ namespace HVACDuct {
         Node(OutNode).MassFlowRateMinAvail = Node(InNode).MassFlowRateMinAvail;
         Node(OutNode).MassFlowRateMaxAvail = Node(InNode).MassFlowRateMaxAvail;
 
-        if (Contaminant.CO2Simulation) {
+        if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
             Node(OutNode).CO2 = Node(InNode).CO2;
         }
 
-        if (Contaminant.GenericContamSimulation) {
+        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
             Node(OutNode).GenContam = Node(InNode).GenContam;
         }
     }

@@ -155,7 +155,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HRTest)
     // HXUnitOn is false so expect outlet = inlet
     InitHeatRecovery(*state, ExchNum, CompanionCoilNum, 0);
     CalcAirToAirGenericHeatExch(*state, ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag);
-    UpdateHeatRecovery(ExchNum);
+    UpdateHeatRecovery(*state, ExchNum);
     Toutlet = ExchCond(ExchNum).SupInTemp;
     Tnode = ExchCond(ExchNum).SupOutTemp;
     EXPECT_DOUBLE_EQ(Toutlet, Tnode);
@@ -168,7 +168,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HRTest)
     ExchCond(ExchNum).ExchConfigNum = Plate;
     InitHeatRecovery(*state, ExchNum, CompanionCoilNum, 0);
     CalcAirToAirGenericHeatExch(*state, ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag);
-    UpdateHeatRecovery(ExchNum);
+    UpdateHeatRecovery(*state, ExchNum);
     Toutlet = (ExchCond(ExchNum).SupInTemp + (ExchCond(ExchNum).CoolEffectSensible75 * (ExchCond(ExchNum).SecInTemp - ExchCond(ExchNum).SupInTemp)));
     Tnode = ExchCond(ExchNum).SupOutTemp;
     EXPECT_DOUBLE_EQ(Toutlet, Tnode);
@@ -177,7 +177,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HRTest)
     HXUnitOn = true;
     InitHeatRecovery(*state, ExchNum, CompanionCoilNum, 0);
     CalcAirToAirGenericHeatExch(*state, ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag);
-    UpdateHeatRecovery(ExchNum);
+    UpdateHeatRecovery(*state, ExchNum);
     Toutlet = (ExchCond(ExchNum).SupInTemp + (ExchCond(ExchNum).CoolEffectSensible75 * (ExchCond(ExchNum).SecInTemp - ExchCond(ExchNum).SupInTemp)));
     Tnode = ExchCond(ExchNum).SupOutTemp;
     EXPECT_DOUBLE_EQ(Toutlet, Tnode);
@@ -190,7 +190,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HRTest)
     ExchCond(ExchNum).ExchConfigNum = Plate;
     InitHeatRecovery(*state, ExchNum, CompanionCoilNum, 0);
     CalcAirToAirGenericHeatExch(*state, ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag);
-    UpdateHeatRecovery(ExchNum);
+    UpdateHeatRecovery(*state, ExchNum);
     Toutlet = SetPointTemp;
     Tnode = ExchCond(ExchNum).SupOutTemp;
     EXPECT_DOUBLE_EQ(Toutlet, Tnode);
@@ -199,7 +199,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HRTest)
     HXUnitOn = true;
     InitHeatRecovery(*state, ExchNum, CompanionCoilNum, 0);
     CalcAirToAirGenericHeatExch(*state, ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag);
-    UpdateHeatRecovery(ExchNum);
+    UpdateHeatRecovery(*state, ExchNum);
     Toutlet = Node(ExchCond(ExchNum).SupOutletNode).TempSetPoint;
     Tnode = Node(ExchCond(ExchNum).SupOutletNode).Temp;
     EXPECT_DOUBLE_EQ(Toutlet, Tnode);
@@ -225,7 +225,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HRTest)
     HXUnitOn = false;
     InitHeatRecovery(*state, ExchNum, CompanionCoilNum, 0);
     CalcAirToAirGenericHeatExch(*state, ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag);
-    UpdateHeatRecovery(ExchNum);
+    UpdateHeatRecovery(*state, ExchNum);
     EXPECT_DOUBLE_EQ(ExchCond(ExchNum).SupInTemp, Node(ExchCond(ExchNum).SupOutletNode).Temp);
 
     ExchCond(ExchNum).ControlToTemperatureSetPoint = false;
@@ -236,7 +236,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HRTest)
     ExchCond(ExchNum).ExchConfigNum = Plate;
     InitHeatRecovery(*state, ExchNum, CompanionCoilNum, 0);
     CalcAirToAirGenericHeatExch(*state, ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag);
-    UpdateHeatRecovery(ExchNum);
+    UpdateHeatRecovery(*state, ExchNum);
     EXPECT_DOUBLE_EQ(
         (ExchCond(ExchNum).SupInTemp + (ExchCond(ExchNum).CoolEffectSensible75 * (ExchCond(ExchNum).SecInTemp - ExchCond(ExchNum).SupInTemp))),
         Node(ExchCond(ExchNum).SupOutletNode).Temp);
@@ -245,7 +245,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HRTest)
     HXUnitOn = true;
     InitHeatRecovery(*state, ExchNum, CompanionCoilNum, 0);
     CalcAirToAirGenericHeatExch(*state, ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag);
-    UpdateHeatRecovery(ExchNum);
+    UpdateHeatRecovery(*state, ExchNum);
     EXPECT_DOUBLE_EQ(
         (ExchCond(ExchNum).SupInTemp + (ExchCond(ExchNum).CoolEffectSensible75 * (ExchCond(ExchNum).SecInTemp - ExchCond(ExchNum).SupInTemp))),
         Node(ExchCond(ExchNum).SupOutletNode).Temp);
@@ -258,14 +258,14 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HRTest)
     ExchCond(ExchNum).ExchConfigNum = Plate;
     InitHeatRecovery(*state, ExchNum, CompanionCoilNum, 0);
     CalcAirToAirGenericHeatExch(*state, ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag);
-    UpdateHeatRecovery(ExchNum);
+    UpdateHeatRecovery(*state, ExchNum);
     EXPECT_DOUBLE_EQ(Node(ExchCond(ExchNum).SupOutletNode).TempSetPoint, Node(ExchCond(ExchNum).SupOutletNode).Temp);
 
     ExchCond(ExchNum).ExchConfigNum = Rotary;
     HXUnitOn = true;
     InitHeatRecovery(*state, ExchNum, CompanionCoilNum, 0);
     CalcAirToAirGenericHeatExch(*state, ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag);
-    UpdateHeatRecovery(ExchNum);
+    UpdateHeatRecovery(*state, ExchNum);
     EXPECT_DOUBLE_EQ(Node(ExchCond(ExchNum).SupOutletNode).TempSetPoint, Node(ExchCond(ExchNum).SupOutletNode).Temp);
 
     // test cycling fan case
@@ -275,7 +275,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HRTest)
     ExchCond(ExchNum).ControlToTemperatureSetPoint = false;
     InitHeatRecovery(*state, ExchNum, CompanionCoilNum, 0);
     CalcAirToAirGenericHeatExch(*state, ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag, PartLoadRatio);
-    UpdateHeatRecovery(ExchNum);
+    UpdateHeatRecovery(*state, ExchNum);
     EXPECT_DOUBLE_EQ(
         (ExchCond(ExchNum).SupInTemp + (ExchCond(ExchNum).CoolEffectSensible75 * (ExchCond(ExchNum).SecInTemp - ExchCond(ExchNum).SupInTemp))),
         Node(ExchCond(ExchNum).SupOutletNode).Temp);
@@ -4105,7 +4105,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HeatExchangerGenericCalcTest)
     Node(thisHX.SupOutletNode).TempSetPoint = 19.0;
     InitHeatRecovery(*state, ExchNum, CompanionCoilNum, 0);
     CalcAirToAirGenericHeatExch(*state, ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag);
-    UpdateHeatRecovery(ExchNum);
+    UpdateHeatRecovery(*state, ExchNum);
     EXPECT_DOUBLE_EQ(10.0, thisHX.SupInTemp);
     EXPECT_DOUBLE_EQ(20.0, thisHX.SecInTemp);
     EXPECT_NEAR(0.70, thisHX.SensEffectiveness, 0.0001);
@@ -4121,7 +4121,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HeatExchangerGenericCalcTest)
     Node(thisHX.SupOutletNode).TempSetPoint = 19.0;
     InitHeatRecovery(*state, ExchNum, CompanionCoilNum, 0);
     CalcAirToAirGenericHeatExch(*state, ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag);
-    UpdateHeatRecovery(ExchNum);
+    UpdateHeatRecovery(*state, ExchNum);
     EXPECT_DOUBLE_EQ(10.0, thisHX.SupInTemp);
     EXPECT_DOUBLE_EQ(20.0, thisHX.SecInTemp);
     EXPECT_NEAR(0.70, thisHX.SensEffectiveness, 0.0001);

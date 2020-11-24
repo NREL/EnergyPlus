@@ -222,22 +222,22 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     ZT(1) = 0.0;
 
     // CorrectZoneContaminants variable initialization
-    AZ.allocate(1);
-    BZ.allocate(1);
-    CZ.allocate(1);
-    AZGC.allocate(1);
-    BZGC.allocate(1);
-    CZGC.allocate(1);
-    AZ(1) = 0.0;
-    BZ(1) = 0.0;
-    CZ(1) = 0.0;
-    AZGC(1) = 0.0;
-    BZGC(1) = 0.0;
-    CZGC(1) = 0.0;
-    ZoneAirDensityCO.allocate(1);
-    ZoneAirDensityCO(1) = 0.0;
-    ZoneGCGain.allocate(1);
-    ZoneGCGain(1) = 0.0;
+    state->dataContaminantBalance->AZ.allocate(1);
+    state->dataContaminantBalance->BZ.allocate(1);
+    state->dataContaminantBalance->CZ.allocate(1);
+    state->dataContaminantBalance->AZGC.allocate(1);
+    state->dataContaminantBalance->BZGC.allocate(1);
+    state->dataContaminantBalance->CZGC.allocate(1);
+    state->dataContaminantBalance->AZ(1) = 0.0;
+    state->dataContaminantBalance->BZ(1) = 0.0;
+    state->dataContaminantBalance->CZ(1) = 0.0;
+    state->dataContaminantBalance->AZGC(1) = 0.0;
+    state->dataContaminantBalance->BZGC(1) = 0.0;
+    state->dataContaminantBalance->CZGC(1) = 0.0;
+    state->dataContaminantBalance->ZoneAirDensityCO.allocate(1);
+    state->dataContaminantBalance->ZoneAirDensityCO(1) = 0.0;
+    state->dataContaminantBalance->ZoneGCGain.allocate(1);
+    state->dataContaminantBalance->ZoneGCGain(1) = 0.0;
 
     // Parameter setup
     state->dataGlobal->NumOfZones = 1;
@@ -617,8 +617,8 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     EAMFL.deallocate();
     EAMFLxHumRat.deallocate();
     CTMFL.deallocate();
-    ZoneAirDensityCO.deallocate();
-    ZoneGCGain.deallocate();
+    state->dataContaminantBalance->ZoneAirDensityCO.deallocate();
+    state->dataContaminantBalance->ZoneGCGain.deallocate();
     Schedule.deallocate();
 }
 
@@ -645,12 +645,12 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     PreviousMeasuredZT1.allocate(1);
     PreviousMeasuredZT2.allocate(1);
     PreviousMeasuredZT3.allocate(1);
-    CO2ZoneTimeMinus1Temp.allocate(1);
-    CO2ZoneTimeMinus2Temp.allocate(1);
-    CO2ZoneTimeMinus3Temp.allocate(1);
-    CO2ZoneTimeMinus1.allocate(1);
-    CO2ZoneTimeMinus2.allocate(1);
-    CO2ZoneTimeMinus3.allocate(1);
+    state->dataContaminantBalance->CO2ZoneTimeMinus1Temp.allocate(1);
+    state->dataContaminantBalance->CO2ZoneTimeMinus2Temp.allocate(1);
+    state->dataContaminantBalance->CO2ZoneTimeMinus3Temp.allocate(1);
+    state->dataContaminantBalance->CO2ZoneTimeMinus1.allocate(1);
+    state->dataContaminantBalance->CO2ZoneTimeMinus2.allocate(1);
+    state->dataContaminantBalance->CO2ZoneTimeMinus3.allocate(1);
     Schedule.allocate(7);
 
     // CalcZoneComponentLoadSums variable initialization
@@ -706,32 +706,32 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     CTMFL(1) = 0.0;
     ZT.allocate(1);
     ZT(1) = 0.0;
-    AZ.allocate(1);
-    BZ.allocate(1);
-    CZ.allocate(1);
-    AZGC.allocate(1);
-    BZGC.allocate(1);
-    CZGC.allocate(1);
-    AZ(1) = 0.0;
-    BZ(1) = 0.0;
-    CZ(1) = 0.0;
-    AZGC(1) = 0.0;
-    BZGC(1) = 0.0;
-    CZGC(1) = 0.0;
-    ZoneAirCO2.allocate(1);
-    ZoneAirCO2(1) = 0.0;
-    ZoneAirCO2Temp.allocate(1);
-    ZoneAirCO2Temp(1) = 0.0;
-    ZoneAirDensityCO.allocate(1);
-    ZoneAirDensityCO(1) = 0.0;
-    ZoneCO2Gain.allocate(1);
-    ZoneCO2Gain(1) = 0.0;
-    ZoneCO2GainExceptPeople.allocate(1);
-    ZoneCO2GainExceptPeople(1) = 0.0;
-    ZoneGCGain.allocate(1);
-    ZoneGCGain(1) = 0.0;
-    MixingMassFlowCO2.allocate(1);
-    MixingMassFlowCO2(1) = 0.0;
+    state->dataContaminantBalance->AZ.allocate(1);
+    state->dataContaminantBalance->BZ.allocate(1);
+    state->dataContaminantBalance->CZ.allocate(1);
+    state->dataContaminantBalance->AZGC.allocate(1);
+    state->dataContaminantBalance->BZGC.allocate(1);
+    state->dataContaminantBalance->CZGC.allocate(1);
+    state->dataContaminantBalance->AZ(1) = 0.0;
+    state->dataContaminantBalance->BZ(1) = 0.0;
+    state->dataContaminantBalance->CZ(1) = 0.0;
+    state->dataContaminantBalance->AZGC(1) = 0.0;
+    state->dataContaminantBalance->BZGC(1) = 0.0;
+    state->dataContaminantBalance->CZGC(1) = 0.0;
+    state->dataContaminantBalance->ZoneAirCO2.allocate(1);
+    state->dataContaminantBalance->ZoneAirCO2(1) = 0.0;
+    state->dataContaminantBalance->ZoneAirCO2Temp.allocate(1);
+    state->dataContaminantBalance->ZoneAirCO2Temp(1) = 0.0;
+    state->dataContaminantBalance->ZoneAirDensityCO.allocate(1);
+    state->dataContaminantBalance->ZoneAirDensityCO(1) = 0.0;
+    state->dataContaminantBalance->ZoneCO2Gain.allocate(1);
+    state->dataContaminantBalance->ZoneCO2Gain(1) = 0.0;
+    state->dataContaminantBalance->ZoneCO2GainExceptPeople.allocate(1);
+    state->dataContaminantBalance->ZoneCO2GainExceptPeople(1) = 0.0;
+    state->dataContaminantBalance->ZoneGCGain.allocate(1);
+    state->dataContaminantBalance->ZoneGCGain(1) = 0.0;
+    state->dataContaminantBalance->MixingMassFlowCO2.allocate(1);
+    state->dataContaminantBalance->MixingMassFlowCO2(1) = 0.0;
 
     // Parameter setup
     state->dataGlobal->NumOfZones = 1;
@@ -757,7 +757,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
 
     // Case 1: Hybrid model infiltration with measured CO2 concentration (free-floating)
 
-    Contaminant.CO2Simulation = true;
+    state->dataContaminantBalance->Contaminant.CO2Simulation = true;
     HybridModelZone(1).InternalThermalMassCalc_T = false;
     HybridModelZone(1).InfiltrationCalc_T = false;
     HybridModelZone(1).InfiltrationCalc_H = false;
@@ -769,12 +769,12 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     HybridModelZone(1).HybridEndDayOfYear = 2;
     Zone(1).ZoneVolCapMultpCO2 = 1.0;
     ZoneAirHumRat(1) = 0.001120003;
-    OutdoorCO2 = 387.6064554;
+    state->dataContaminantBalance->OutdoorCO2 = 387.6064554;
     OutHumRat = 0.001147;
     OutBaroPress = 99500;
-    CO2ZoneTimeMinus1(1) = 388.595225;
-    CO2ZoneTimeMinus2(1) = 389.084601;
-    CO2ZoneTimeMinus3(1) = 388.997009;
+    state->dataContaminantBalance->CO2ZoneTimeMinus1(1) = 388.595225;
+    state->dataContaminantBalance->CO2ZoneTimeMinus2(1) = 389.084601;
+    state->dataContaminantBalance->CO2ZoneTimeMinus3(1) = 388.997009;
     HybridModelZone(1).ZoneMeasuredCO2ConcentrationSchedulePtr = 1;
     Schedule(HybridModelZone(1).ZoneMeasuredCO2ConcentrationSchedulePtr).CurrentValue = 388.238646;
 
@@ -783,7 +783,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
 
     // Case 2: Hybrid model people count with measured CO2 concentration (free-floating)
 
-    Contaminant.CO2Simulation = true;
+    state->dataContaminantBalance->Contaminant.CO2Simulation = true;
     HybridModelZone(1).InternalThermalMassCalc_T = false;
     HybridModelZone(1).InfiltrationCalc_T = false;
     HybridModelZone(1).InfiltrationCalc_H = false;
@@ -798,20 +798,20 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     Zone(1).OutDryBulbTemp = -1.0394166434012677;
     ZT(1) = -2.92;
     ZoneAirHumRat(1) = 0.00112;
-    OutdoorCO2 = 387.6064554;
+    state->dataContaminantBalance->OutdoorCO2 = 387.6064554;
     OutBaroPress = 98916.7;
     OAMFL(1) = 0.700812;
-    ZoneCO2Gain(1) = 0.00001989;
-    CO2ZoneTimeMinus1(1) = 387.9962885;
-    CO2ZoneTimeMinus2(1) = 387.676037;
-    CO2ZoneTimeMinus3(1) = 387.2385685;
+    state->dataContaminantBalance->ZoneCO2Gain(1) = 0.00001989;
+    state->dataContaminantBalance->CO2ZoneTimeMinus1(1) = 387.9962885;
+    state->dataContaminantBalance->CO2ZoneTimeMinus2(1) = 387.676037;
+    state->dataContaminantBalance->CO2ZoneTimeMinus3(1) = 387.2385685;
     HybridModelZone(1).ZoneMeasuredCO2ConcentrationSchedulePtr = 1;
     Schedule(HybridModelZone(1).ZoneMeasuredCO2ConcentrationSchedulePtr).CurrentValue = 389.8511796;
     CorrectZoneContaminants(*state, false, true, 10 / 60);
     EXPECT_NEAR(4, Zone(1).NumOccHM, 0.1);
 
     // Case 3: Hybrid model infiltration with measured CO2 concentration (with HVAC)
-    Contaminant.CO2Simulation = true;
+    state->dataContaminantBalance->Contaminant.CO2Simulation = true;
     HybridModelZone(1).InternalThermalMassCalc_T = false;
     HybridModelZone(1).InfiltrationCalc_T = false;
     HybridModelZone(1).InfiltrationCalc_H = false;
@@ -827,10 +827,10 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     ZoneAirHumRat(1) = 0.00809;
     Zone(1).OutDryBulbTemp = -10.7;
     OutBaroPress = 99500;
-    ZoneCO2Gain(1) = 0.0;
-    CO2ZoneTimeMinus1(1) = 388.54049;
-    CO2ZoneTimeMinus2(1) = 389.0198771;
-    CO2ZoneTimeMinus3(1) = 388.9201464;
+    state->dataContaminantBalance->ZoneCO2Gain(1) = 0.0;
+    state->dataContaminantBalance->CO2ZoneTimeMinus1(1) = 388.54049;
+    state->dataContaminantBalance->CO2ZoneTimeMinus2(1) = 389.0198771;
+    state->dataContaminantBalance->CO2ZoneTimeMinus3(1) = 388.9201464;
     HybridModelZone(1).ZoneMeasuredCO2ConcentrationSchedulePtr = 1;
     HybridModelZone(1).ZoneSupplyAirCO2ConcentrationSchedulePtr = 2;
     HybridModelZone(1).ZoneSupplyAirMassFlowRateSchedulePtr = 3;
@@ -843,7 +843,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
 
     // Case 4: Hybrid model people count with measured CO2 concentration (with HVAC)
 
-    Contaminant.CO2Simulation = true;
+    state->dataContaminantBalance->Contaminant.CO2Simulation = true;
     HybridModelZone(1).InternalThermalMassCalc_T = false;
     HybridModelZone(1).InfiltrationCalc_T = false;
     HybridModelZone(1).InfiltrationCalc_H = false;
@@ -858,11 +858,11 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     ZT(1) = 21.1;
     ZoneAirHumRat(1) = 0.01102;
     OutBaroPress = 98933.3;
-    ZoneCO2Gain(1) = 0.00003333814;
-    ZoneCO2GainExceptPeople(1) = 0.0;
-    CO2ZoneTimeMinus1(1) = 387.2253194;
-    CO2ZoneTimeMinus2(1) = 387.1898423;
-    CO2ZoneTimeMinus3(1) = 387.4064128;
+    state->dataContaminantBalance->ZoneCO2Gain(1) = 0.00003333814;
+    state->dataContaminantBalance->ZoneCO2GainExceptPeople(1) = 0.0;
+    state->dataContaminantBalance->CO2ZoneTimeMinus1(1) = 387.2253194;
+    state->dataContaminantBalance->CO2ZoneTimeMinus2(1) = 387.1898423;
+    state->dataContaminantBalance->CO2ZoneTimeMinus3(1) = 387.4064128;
     HybridModelZone(1).ZoneMeasuredCO2ConcentrationSchedulePtr = 1;
     HybridModelZone(1).ZoneSupplyAirCO2ConcentrationSchedulePtr = 2;
     HybridModelZone(1).ZoneSupplyAirMassFlowRateSchedulePtr = 3;
@@ -886,12 +886,12 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     HybridModelZone.deallocate();
     AirModel.deallocate();
     ZTOC.deallocate();
-    CO2ZoneTimeMinus1Temp.deallocate();
-    CO2ZoneTimeMinus2Temp.deallocate();
-    CO2ZoneTimeMinus3Temp.deallocate();
-    CO2ZoneTimeMinus1.deallocate();
-    CO2ZoneTimeMinus2.deallocate();
-    CO2ZoneTimeMinus3.deallocate();
+    state->dataContaminantBalance->CO2ZoneTimeMinus1Temp.deallocate();
+    state->dataContaminantBalance->CO2ZoneTimeMinus2Temp.deallocate();
+    state->dataContaminantBalance->CO2ZoneTimeMinus3Temp.deallocate();
+    state->dataContaminantBalance->CO2ZoneTimeMinus1.deallocate();
+    state->dataContaminantBalance->CO2ZoneTimeMinus2.deallocate();
+    state->dataContaminantBalance->CO2ZoneTimeMinus3.deallocate();
     AIRRAT.deallocate();
     ZoneAirHumRat.deallocate();
     NonAirSystemResponse.deallocate();
@@ -936,12 +936,12 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     EAMFL.deallocate();
     EAMFLxHumRat.deallocate();
     CTMFL.deallocate();
-    ZoneAirCO2.deallocate();
-    ZoneAirCO2Temp.deallocate();
-    ZoneAirDensityCO.deallocate();
-    ZoneCO2Gain.deallocate();
-    ZoneCO2GainExceptPeople.deallocate();
-    ZoneGCGain.deallocate();
-    MixingMassFlowCO2.deallocate();
+    state->dataContaminantBalance->ZoneAirCO2.deallocate();
+    state->dataContaminantBalance->ZoneAirCO2Temp.deallocate();
+    state->dataContaminantBalance->ZoneAirDensityCO.deallocate();
+    state->dataContaminantBalance->ZoneCO2Gain.deallocate();
+    state->dataContaminantBalance->ZoneCO2GainExceptPeople.deallocate();
+    state->dataContaminantBalance->ZoneGCGain.deallocate();
+    state->dataContaminantBalance->MixingMassFlowCO2.deallocate();
     Schedule.deallocate();
 }
