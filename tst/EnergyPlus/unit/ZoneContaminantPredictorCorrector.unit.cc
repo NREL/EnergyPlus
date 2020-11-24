@@ -120,9 +120,9 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_AddMDotOATest)
     DataContaminantBalance::BZGC.allocate(1);
     DataContaminantBalance::CZGC.allocate(1);
 
-    DataContaminantBalance::CO2ZoneTimeMinus1Temp.allocate(1);
-    DataContaminantBalance::CO2ZoneTimeMinus2Temp.allocate(1);
-    DataContaminantBalance::CO2ZoneTimeMinus3Temp.allocate(1);
+    state->dataContaminantBalance->CO2ZoneTimeMinus1Temp.allocate(1);
+    state->dataContaminantBalance->CO2ZoneTimeMinus2Temp.allocate(1);
+    state->dataContaminantBalance->CO2ZoneTimeMinus3Temp.allocate(1);
     state->dataContaminantBalance->DSCO2ZoneTimeMinus1.allocate(1);
     state->dataContaminantBalance->DSCO2ZoneTimeMinus2.allocate(1);
     state->dataContaminantBalance->DSCO2ZoneTimeMinus3.allocate(1);
@@ -135,8 +135,8 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_AddMDotOATest)
 
     DataContaminantBalance::MixingMassFlowCO2.allocate(1);
     DataContaminantBalance::MixingMassFlowGC.allocate(1);
-    DataContaminantBalance::ZoneAirCO2Temp.allocate(1);
-    DataContaminantBalance::ZoneCO21.allocate(1);
+    state->dataContaminantBalance->ZoneAirCO2Temp.allocate(1);
+    state->dataContaminantBalance->ZoneCO21.allocate(1);
     state->dataContaminantBalance->ZoneAirCO2.allocate(1);
     DataContaminantBalance::ZoneAirGCTemp.allocate(1);
     DataContaminantBalance::ZoneGC1.allocate(1);
@@ -163,10 +163,10 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_AddMDotOATest)
     state->dataContaminantBalance->DSCO2ZoneTimeMinus3(1) = 200.0;
     DataContaminantBalance::OutdoorCO2 = 400.0;
     DataContaminantBalance::OutdoorGC = 0.001;
-    DataContaminantBalance::ZoneCO21(1) = DataContaminantBalance::OutdoorCO2;
+    state->dataContaminantBalance->ZoneCO21(1) = DataContaminantBalance::OutdoorCO2;
     DataContaminantBalance::ZoneGC1(1) = DataContaminantBalance::OutdoorGC;
     state->dataContaminantBalance->ZoneCO2SetPoint(1) = 450.0;
-    state->dataContaminantBalance->ZoneAirCO2(1) = DataContaminantBalance::ZoneCO21(1);
+    state->dataContaminantBalance->ZoneAirCO2(1) = state->dataContaminantBalance->ZoneCO21(1);
     DataContaminantBalance::ZoneAirGC(1) = DataContaminantBalance::ZoneGC1(1);
 
     Real64 PriorTimeStep;
@@ -287,9 +287,9 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_CorrectZoneContamina
     DataContaminantBalance::BZGC.allocate(1);
     DataContaminantBalance::CZGC.allocate(1);
 
-    DataContaminantBalance::CO2ZoneTimeMinus1Temp.allocate(1);
-    DataContaminantBalance::CO2ZoneTimeMinus2Temp.allocate(1);
-    DataContaminantBalance::CO2ZoneTimeMinus3Temp.allocate(1);
+    state->dataContaminantBalance->CO2ZoneTimeMinus1Temp.allocate(1);
+    state->dataContaminantBalance->CO2ZoneTimeMinus2Temp.allocate(1);
+    state->dataContaminantBalance->CO2ZoneTimeMinus3Temp.allocate(1);
     state->dataContaminantBalance->DSCO2ZoneTimeMinus1.allocate(1);
     state->dataContaminantBalance->DSCO2ZoneTimeMinus2.allocate(1);
     state->dataContaminantBalance->DSCO2ZoneTimeMinus3.allocate(1);
@@ -302,8 +302,8 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_CorrectZoneContamina
 
     DataContaminantBalance::MixingMassFlowCO2.allocate(1);
     DataContaminantBalance::MixingMassFlowGC.allocate(1);
-    DataContaminantBalance::ZoneAirCO2Temp.allocate(1);
-    DataContaminantBalance::ZoneCO21.allocate(1);
+    state->dataContaminantBalance->ZoneAirCO2Temp.allocate(1);
+    state->dataContaminantBalance->ZoneCO21.allocate(1);
     state->dataContaminantBalance->ZoneAirCO2.allocate(1);
     DataContaminantBalance::ZoneAirGCTemp.allocate(1);
     DataContaminantBalance::ZoneGC1.allocate(1);
@@ -323,7 +323,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_CorrectZoneContamina
     state->dataContaminantBalance->DSCO2ZoneTimeMinus3(1) = 200.0;
     DataContaminantBalance::OutdoorCO2 = 400.0;
     DataContaminantBalance::OutdoorGC = 0.001;
-    DataContaminantBalance::ZoneCO21(1) = DataContaminantBalance::OutdoorCO2;
+    state->dataContaminantBalance->ZoneCO21(1) = DataContaminantBalance::OutdoorCO2;
     DataContaminantBalance::ZoneGC1(1) = DataContaminantBalance::OutdoorGC;
 
     Real64 PriorTimeStep;
@@ -423,9 +423,9 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneCO2ControlT
     DataContaminantBalance::BZ.allocate(3);
     DataContaminantBalance::CZ.allocate(3);
 
-    DataContaminantBalance::CO2ZoneTimeMinus1Temp.allocate(3);
-    DataContaminantBalance::CO2ZoneTimeMinus2Temp.allocate(3);
-    DataContaminantBalance::CO2ZoneTimeMinus3Temp.allocate(3);
+    state->dataContaminantBalance->CO2ZoneTimeMinus1Temp.allocate(3);
+    state->dataContaminantBalance->CO2ZoneTimeMinus2Temp.allocate(3);
+    state->dataContaminantBalance->CO2ZoneTimeMinus3Temp.allocate(3);
     state->dataContaminantBalance->DSCO2ZoneTimeMinus1.allocate(3);
     state->dataContaminantBalance->DSCO2ZoneTimeMinus2.allocate(3);
     state->dataContaminantBalance->DSCO2ZoneTimeMinus3.allocate(3);
@@ -439,8 +439,8 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneCO2ControlT
 
     DataContaminantBalance::MixingMassFlowCO2.allocate(3);
     DataContaminantBalance::MixingMassFlowGC.allocate(3);
-    DataContaminantBalance::ZoneAirCO2Temp.allocate(3);
-    DataContaminantBalance::ZoneCO21.allocate(3);
+    state->dataContaminantBalance->ZoneAirCO2Temp.allocate(3);
+    state->dataContaminantBalance->ZoneCO21.allocate(3);
     state->dataContaminantBalance->ZoneAirCO2.allocate(3);
     DataContaminantBalance::ZoneAirGCTemp.allocate(3);
 
@@ -467,15 +467,15 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneCO2ControlT
     state->dataContaminantBalance->DSCO2ZoneTimeMinus2(3) = 200.0;
     state->dataContaminantBalance->DSCO2ZoneTimeMinus3(3) = 200.0;
     DataContaminantBalance::OutdoorCO2 = 400.0;
-    DataContaminantBalance::ZoneCO21(1) = DataContaminantBalance::OutdoorCO2;
-    DataContaminantBalance::ZoneCO21(2) = DataContaminantBalance::OutdoorCO2;
-    DataContaminantBalance::ZoneCO21(3) = DataContaminantBalance::OutdoorCO2;
+    state->dataContaminantBalance->ZoneCO21(1) = DataContaminantBalance::OutdoorCO2;
+    state->dataContaminantBalance->ZoneCO21(2) = DataContaminantBalance::OutdoorCO2;
+    state->dataContaminantBalance->ZoneCO21(3) = DataContaminantBalance::OutdoorCO2;
     state->dataContaminantBalance->ZoneCO2SetPoint(1) = 450.0;
     state->dataContaminantBalance->ZoneCO2SetPoint(2) = 500.0;
     state->dataContaminantBalance->ZoneCO2SetPoint(3) = 550.0;
-    state->dataContaminantBalance->ZoneAirCO2(1) = DataContaminantBalance::ZoneCO21(1);
-    state->dataContaminantBalance->ZoneAirCO2(2) = DataContaminantBalance::ZoneCO21(2);
-    state->dataContaminantBalance->ZoneAirCO2(3) = DataContaminantBalance::ZoneCO21(3);
+    state->dataContaminantBalance->ZoneAirCO2(1) = state->dataContaminantBalance->ZoneCO21(1);
+    state->dataContaminantBalance->ZoneAirCO2(2) = state->dataContaminantBalance->ZoneCO21(2);
+    state->dataContaminantBalance->ZoneAirCO2(3) = state->dataContaminantBalance->ZoneCO21(3);
 
     Real64 PriorTimeStep;
 

@@ -224,7 +224,6 @@ namespace HVACManager {
         using DataContaminantBalance::Contaminant;
         using DataContaminantBalance::OutdoorCO2;
         using DataContaminantBalance::OutdoorGC;
-        using DataContaminantBalance::ZoneAirCO2Temp;
         using DataContaminantBalance::ZoneAirGC;
         using DataContaminantBalance::ZoneAirGCAvg;
         using DataContaminantBalance::ZoneAirGCTemp;

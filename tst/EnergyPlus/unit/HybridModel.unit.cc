@@ -645,9 +645,9 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     PreviousMeasuredZT1.allocate(1);
     PreviousMeasuredZT2.allocate(1);
     PreviousMeasuredZT3.allocate(1);
-    CO2ZoneTimeMinus1Temp.allocate(1);
-    CO2ZoneTimeMinus2Temp.allocate(1);
-    CO2ZoneTimeMinus3Temp.allocate(1);
+    state->dataContaminantBalance->CO2ZoneTimeMinus1Temp.allocate(1);
+    state->dataContaminantBalance->CO2ZoneTimeMinus2Temp.allocate(1);
+    state->dataContaminantBalance->CO2ZoneTimeMinus3Temp.allocate(1);
     state->dataContaminantBalance->CO2ZoneTimeMinus1.allocate(1);
     state->dataContaminantBalance->CO2ZoneTimeMinus2.allocate(1);
     state->dataContaminantBalance->CO2ZoneTimeMinus3.allocate(1);
@@ -720,8 +720,8 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     CZGC(1) = 0.0;
     state->dataContaminantBalance->ZoneAirCO2.allocate(1);
     state->dataContaminantBalance->ZoneAirCO2(1) = 0.0;
-    ZoneAirCO2Temp.allocate(1);
-    ZoneAirCO2Temp(1) = 0.0;
+    state->dataContaminantBalance->ZoneAirCO2Temp.allocate(1);
+    state->dataContaminantBalance->ZoneAirCO2Temp(1) = 0.0;
     ZoneAirDensityCO.allocate(1);
     ZoneAirDensityCO(1) = 0.0;
     state->dataContaminantBalance->ZoneCO2Gain.allocate(1);
@@ -886,9 +886,9 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     HybridModelZone.deallocate();
     AirModel.deallocate();
     ZTOC.deallocate();
-    CO2ZoneTimeMinus1Temp.deallocate();
-    CO2ZoneTimeMinus2Temp.deallocate();
-    CO2ZoneTimeMinus3Temp.deallocate();
+    state->dataContaminantBalance->CO2ZoneTimeMinus1Temp.deallocate();
+    state->dataContaminantBalance->CO2ZoneTimeMinus2Temp.deallocate();
+    state->dataContaminantBalance->CO2ZoneTimeMinus3Temp.deallocate();
     state->dataContaminantBalance->CO2ZoneTimeMinus1.deallocate();
     state->dataContaminantBalance->CO2ZoneTimeMinus2.deallocate();
     state->dataContaminantBalance->CO2ZoneTimeMinus3.deallocate();
@@ -937,7 +937,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     EAMFLxHumRat.deallocate();
     CTMFL.deallocate();
     state->dataContaminantBalance->ZoneAirCO2.deallocate();
-    ZoneAirCO2Temp.deallocate();
+    state->dataContaminantBalance->ZoneAirCO2Temp.deallocate();
     ZoneAirDensityCO.deallocate();
     state->dataContaminantBalance->ZoneCO2Gain.deallocate();
     state->dataContaminantBalance->ZoneCO2GainExceptPeople.deallocate();

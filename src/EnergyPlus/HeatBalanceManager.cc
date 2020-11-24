@@ -151,7 +151,6 @@ namespace HeatBalanceManager {
     using DataContaminantBalance::Contaminant;
     using DataContaminantBalance::OutdoorCO2;
     using DataContaminantBalance::OutdoorGC;
-    using DataContaminantBalance::ZoneAirCO2Temp;
     using DataContaminantBalance::ZoneAirGC;
     using DataContaminantBalance::ZoneAirGCAvg;
     using DataContaminantBalance::ZoneAirGCTemp;
@@ -5539,7 +5538,7 @@ namespace HeatBalanceManager {
         if (Contaminant.CO2Simulation) {
             OutdoorCO2 = GetCurrentScheduleValue(state, Contaminant.CO2OutdoorSchedPtr);
             state.dataContaminantBalance->ZoneAirCO2.dimension(state.dataGlobal->NumOfZones, OutdoorCO2);
-            ZoneAirCO2Temp.dimension(state.dataGlobal->NumOfZones, OutdoorCO2);
+            state.dataContaminantBalance->ZoneAirCO2Temp.dimension(state.dataGlobal->NumOfZones, OutdoorCO2);
             state.dataContaminantBalance->ZoneAirCO2Avg.dimension(state.dataGlobal->NumOfZones, OutdoorCO2);
         }
         if (Contaminant.GenericContamSimulation) {

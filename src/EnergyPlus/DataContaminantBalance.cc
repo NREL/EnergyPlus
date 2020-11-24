@@ -70,16 +70,6 @@ namespace DataContaminantBalance {
     // module should be available to other modules and routines.  Thus,
     // all variables in this module must be PUBLIC.
 
-    Array1D<Real64> ZoneAirCO2Temp;        // Temp zone air CO2 at time plus 1
-    Array1D<Real64> CO2ZoneTimeMinus1Temp; // Zone air CO2 at previous timestep
-    Array1D<Real64> CO2ZoneTimeMinus2Temp; // Zone air CO2 at timestep T-2
-    Array1D<Real64> CO2ZoneTimeMinus3Temp; // Zone air CO2 at timestep T-3
-    Array1D<Real64> ZoneAirCO2Old;         // Last Time Steps Zone AIR Humidity Ratio
-
-    Array1D<Real64> ZoneCO2MX; // TEMPORARY ZONE CO2 TO TEST CONVERGENCE in Exact and Euler method
-    Array1D<Real64> ZoneCO2M2; // TEMPORARY ZONE CO2 at timestep t-2 in Exact and Euler method
-    Array1D<Real64> ZoneCO21;  // Zone CO2 at the previous time step used in Exact and Euler method
-
     Array1D<Real64> CONTRAT; // Zone CO2 at the previous time step used in Exact and Euler method
 
     Array1D<Real64> MixingMassFlowCO2; // Mixing MASS FLOW * CO2
@@ -152,14 +142,6 @@ namespace DataContaminantBalance {
     // Needed for unit tests, should not be normally called.
     void clear_state()
     {
-        ZoneAirCO2Temp.deallocate();
-        CO2ZoneTimeMinus1Temp.deallocate();
-        CO2ZoneTimeMinus2Temp.deallocate();
-        CO2ZoneTimeMinus3Temp.deallocate();
-        ZoneAirCO2Old.deallocate();
-        ZoneCO2MX.deallocate();
-        ZoneCO2M2.deallocate();
-        ZoneCO21.deallocate();
         CONTRAT.deallocate();
         MixingMassFlowCO2.deallocate();
         NumContControlledZones = 0;

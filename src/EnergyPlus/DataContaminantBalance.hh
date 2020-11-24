@@ -62,16 +62,6 @@ struct EnergyPlusData;
 
 namespace DataContaminantBalance {
 
-    extern Array1D<Real64> ZoneAirCO2Temp;        // Temp zone air CO2 at time plus 1
-    extern Array1D<Real64> CO2ZoneTimeMinus1Temp; // Zone air CO2 at previous timestep
-    extern Array1D<Real64> CO2ZoneTimeMinus2Temp; // Zone air CO2 at timestep T-2
-    extern Array1D<Real64> CO2ZoneTimeMinus3Temp; // Zone air CO2 at timestep T-3
-    extern Array1D<Real64> ZoneAirCO2Old;         // Last Time Steps Zone AIR Humidity Ratio
-
-    extern Array1D<Real64> ZoneCO2MX; // TEMPORARY ZONE CO2 TO TEST CONVERGENCE in Exact and Euler method
-    extern Array1D<Real64> ZoneCO2M2; // TEMPORARY ZONE CO2 at timestep t-2 in Exact and Euler method
-    extern Array1D<Real64> ZoneCO21;  // Zone CO2 at the previous time step used in Exact and Euler method
-
     extern Array1D<Real64> CONTRAT; // Zone CO2 at the previous time step used in Exact and Euler method
 
     extern Array1D<Real64> MixingMassFlowCO2; // Mixing MASS FLOW * CO2
@@ -360,6 +350,16 @@ struct ContaminantBalanceData : BaseGlobalStruct {
     Array1D<Real64> DSCO2ZoneTimeMinus3; // DownStepped Time Minus 3 Zone Time Steps Term
     Array1D<Real64> DSCO2ZoneTimeMinus4; // DownStepped Time Minus 4 Zone Time Steps Term
 
+    Array1D<Real64> ZoneAirCO2Temp;        // Temp zone air CO2 at time plus 1
+    Array1D<Real64> CO2ZoneTimeMinus1Temp; // Zone air CO2 at previous timestep
+    Array1D<Real64> CO2ZoneTimeMinus2Temp; // Zone air CO2 at timestep T-2
+    Array1D<Real64> CO2ZoneTimeMinus3Temp; // Zone air CO2 at timestep T-3
+    Array1D<Real64> ZoneAirCO2Old;         // Last Time Steps Zone AIR Humidity Ratio
+
+    Array1D<Real64> ZoneCO2MX; // TEMPORARY ZONE CO2 TO TEST CONVERGENCE in Exact and Euler method
+    Array1D<Real64> ZoneCO2M2; // TEMPORARY ZONE CO2 at timestep t-2 in Exact and Euler method
+    Array1D<Real64> ZoneCO21;  // Zone CO2 at the previous time step used in Exact and Euler method
+
     void clear_state() override
     {
         this->ZoneCO2SetPoint.deallocate();
@@ -377,6 +377,14 @@ struct ContaminantBalanceData : BaseGlobalStruct {
         this->DSCO2ZoneTimeMinus2.deallocate();
         this->DSCO2ZoneTimeMinus3.deallocate();
         this->DSCO2ZoneTimeMinus4.deallocate();
+        this->ZoneAirCO2Temp.deallocate();
+        this->CO2ZoneTimeMinus1Temp.deallocate();
+        this->CO2ZoneTimeMinus2Temp.deallocate();
+        this->CO2ZoneTimeMinus3Temp.deallocate();
+        this->ZoneAirCO2Old.deallocate();
+        this->ZoneCO2MX.deallocate();
+        this->ZoneCO2M2.deallocate();
+        this->ZoneCO21.deallocate();
     }
 };
 
