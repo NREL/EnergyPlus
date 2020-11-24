@@ -86,6 +86,7 @@ struct CondenserLoopTowersData;
 struct ConstructionData;
 struct ContaminantBalanceData;
 struct ConvectionCoefficientsData;
+struct ConvergParamsData;
 struct CoolTowerData;
 struct CostEstimateManagerData;
 struct CrossVentMgrData;
@@ -173,6 +174,7 @@ struct EnergyPlusData : BaseGlobalStruct {
     std::unique_ptr<ConstructionData> dataConstruction;
     std::unique_ptr<ContaminantBalanceData> dataContaminantBalance;
     std::unique_ptr<ConvectionCoefficientsData> dataConvectionCoefficient;
+    std::unique_ptr<ConvergParamsData> dataConvergeParams;
     std::unique_ptr<CoolTowerData> dataCoolTower;
     std::unique_ptr<CostEstimateManagerData> dataCostEstimateManager;
     std::unique_ptr<CrossVentMgrData> dataCrossVentMgr;

@@ -4521,7 +4521,6 @@ namespace ZoneEquipmentManager {
         // to the air loop side, allowing for multiple return air nodes
 
         // Using/Aliasing
-        using DataConvergParams::CalledFromAirSystemDemandSide;
         using DataHVACGlobals::NumPrimaryAirSys;
         using HVACInterfaceManager::UpdateHVACInterface;
 
@@ -4535,7 +4534,7 @@ namespace ZoneEquipmentManager {
             for (RetAirPathNum = 1; RetAirPathNum <= state.dataAirLoop->AirToZoneNodeInfo(ZoneGroupNum).NumReturnNodes; ++RetAirPathNum) {
                 UpdateHVACInterface(state,
                                     ZoneGroupNum,
-                                    CalledFromAirSystemDemandSide,
+                                    DataConvergParams::iCalledFrom::AirSystemDemandSide,
                                     state.dataAirLoop->AirToZoneNodeInfo(ZoneGroupNum).ZoneEquipReturnNodeNum(RetAirPathNum),
                                     state.dataAirLoop->AirToZoneNodeInfo(ZoneGroupNum).AirLoopReturnNodeNum(RetAirPathNum),
                                     SimAir);

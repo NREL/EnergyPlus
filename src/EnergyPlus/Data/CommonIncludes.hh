@@ -82,6 +82,7 @@
 #include <EnergyPlus/DataBranchNodeConnections.hh>
 #include <EnergyPlus/DataBSDFWindow.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
+#include <EnergyPlus/DataConvergParams.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataWater.hh>
 #include <EnergyPlus/DataTimings.hh>

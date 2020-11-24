@@ -79,6 +79,7 @@ namespace EnergyPlus {
         this->dataConstruction = std::make_unique<ConstructionData>();
         this->dataContaminantBalance = std::make_unique<ContaminantBalanceData>();
         this->dataConvectionCoefficient = std::make_unique<ConvectionCoefficientsData>();
+        this->dataConvergeParams = std::make_unique<ConvergParamsData>();
         this->dataCoolTower = std::make_unique<CoolTowerData>();
         this->dataCostEstimateManager = std::make_unique<CostEstimateManagerData>();
         this->dataCrossVentMgr = std::make_unique<CrossVentMgrData>();
@@ -162,6 +163,7 @@ namespace EnergyPlus {
         this->dataConstruction->clear_state();
         this->dataContaminantBalance->clear_state();
         this->dataConvectionCoefficient->clear_state();
+        this->dataConvergeParams->clear_state();
         this->dataCoolTower->clear_state();
         this->dataCostEstimateManager->clear_state();
         this->dataCrossVentMgr->clear_state();

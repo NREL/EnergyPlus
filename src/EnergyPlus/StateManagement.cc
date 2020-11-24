@@ -55,9 +55,7 @@
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataBranchNodeConnections.hh>
-#include <EnergyPlus/DataConvergParams.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataErrorTracking.hh>
@@ -203,7 +201,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     autosizing_clear_state();
     CoilCoolingDX::clear_state();
     AirflowNetwork::clear_state();
-    DataConvergParams::clear_state();
     DataDefineEquip::clear_state();
     DataEnvironment::clear_state();
     DataErrorTracking::clear_state();
