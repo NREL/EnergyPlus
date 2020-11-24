@@ -1088,13 +1088,13 @@ namespace ZoneContaminantPredictorCorrector {
         };
 
         cCurrentModuleObject = "ZoneControl:ContaminantController";
-        NumContControlledZones = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataContaminantBalance->NumContControlledZones = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
-        if (NumContControlledZones > 0) {
-            ContaminantControlledZone.allocate(NumContControlledZones);
+        if (state.dataContaminantBalance->NumContControlledZones > 0) {
+            ContaminantControlledZone.allocate(state.dataContaminantBalance->NumContControlledZones);
         }
 
-        for (ContControlledZoneNum = 1; ContControlledZoneNum <= NumContControlledZones; ++ContControlledZoneNum) {
+        for (ContControlledZoneNum = 1; ContControlledZoneNum <= state.dataContaminantBalance->NumContControlledZones; ++ContControlledZoneNum) {
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           ContControlledZoneNum,
@@ -1276,7 +1276,7 @@ namespace ZoneContaminantPredictorCorrector {
         bool ErrorsFound(false);
 
         if (Contaminant.CO2Simulation) {
-            OutdoorCO2 = GetCurrentScheduleValue(state, Contaminant.CO2OutdoorSchedPtr);
+            state.dataContaminantBalance->OutdoorCO2 = GetCurrentScheduleValue(state, Contaminant.CO2OutdoorSchedPtr);
         }
 
         if (Contaminant.GenericContamSimulation) {
@@ -1307,14 +1307,14 @@ namespace ZoneContaminantPredictorCorrector {
                 state.dataContaminantBalance->ZoneCO2Gain.dimension(state.dataGlobal->NumOfZones, 0.0);
                 state.dataContaminantBalance->ZoneCO2GainFromPeople.dimension(state.dataGlobal->NumOfZones, 0.0);
                 state.dataContaminantBalance->ZoneCO2GainExceptPeople.dimension(state.dataGlobal->NumOfZones, 0.0); // Added for hybrid model
-                MixingMassFlowCO2.dimension(state.dataGlobal->NumOfZones, 0.0);
-                ZoneAirDensityCO.dimension(state.dataGlobal->NumOfZones, 0.0);
-                AZ.dimension(state.dataGlobal->NumOfZones, 0.0);
-                BZ.dimension(state.dataGlobal->NumOfZones, 0.0);
-                CZ.dimension(state.dataGlobal->NumOfZones, 0.0);
+                state.dataContaminantBalance->MixingMassFlowCO2.dimension(state.dataGlobal->NumOfZones, 0.0);
+                state.dataContaminantBalance->ZoneAirDensityCO.dimension(state.dataGlobal->NumOfZones, 0.0);
+                state.dataContaminantBalance->AZ.dimension(state.dataGlobal->NumOfZones, 0.0);
+                state.dataContaminantBalance->BZ.dimension(state.dataGlobal->NumOfZones, 0.0);
+                state.dataContaminantBalance->CZ.dimension(state.dataGlobal->NumOfZones, 0.0);
             }
 
-            CONTRAT.dimension(state.dataGlobal->NumOfZones, 0.0);
+            state.dataContaminantBalance->CONTRAT.dimension(state.dataGlobal->NumOfZones, 0.0);
 
             // Allocate Derived Types
 
@@ -1407,28 +1407,28 @@ namespace ZoneContaminantPredictorCorrector {
         // Do the Begin Environment initializations
         if (state.dataZoneContaminantPredictorCorrector->MyEnvrnFlag && state.dataGlobal->BeginEnvrnFlag) {
             if (Contaminant.CO2Simulation) {
-                CONTRAT = 0.0;
-                state.dataContaminantBalance->CO2ZoneTimeMinus1 = OutdoorCO2;
-                state.dataContaminantBalance->CO2ZoneTimeMinus2 = OutdoorCO2;
-                state.dataContaminantBalance->CO2ZoneTimeMinus3 = OutdoorCO2;
-                state.dataContaminantBalance->CO2ZoneTimeMinus4 = OutdoorCO2;
-                state.dataContaminantBalance->DSCO2ZoneTimeMinus1 = OutdoorCO2;
-                state.dataContaminantBalance->DSCO2ZoneTimeMinus2 = OutdoorCO2;
-                state.dataContaminantBalance->DSCO2ZoneTimeMinus3 = OutdoorCO2;
-                state.dataContaminantBalance->DSCO2ZoneTimeMinus4 = OutdoorCO2;
+                state.dataContaminantBalance->CONTRAT = 0.0;
+                state.dataContaminantBalance->CO2ZoneTimeMinus1 = state.dataContaminantBalance->OutdoorCO2;
+                state.dataContaminantBalance->CO2ZoneTimeMinus2 = state.dataContaminantBalance->OutdoorCO2;
+                state.dataContaminantBalance->CO2ZoneTimeMinus3 = state.dataContaminantBalance->OutdoorCO2;
+                state.dataContaminantBalance->CO2ZoneTimeMinus4 = state.dataContaminantBalance->OutdoorCO2;
+                state.dataContaminantBalance->DSCO2ZoneTimeMinus1 = state.dataContaminantBalance->OutdoorCO2;
+                state.dataContaminantBalance->DSCO2ZoneTimeMinus2 = state.dataContaminantBalance->OutdoorCO2;
+                state.dataContaminantBalance->DSCO2ZoneTimeMinus3 = state.dataContaminantBalance->OutdoorCO2;
+                state.dataContaminantBalance->DSCO2ZoneTimeMinus4 = state.dataContaminantBalance->OutdoorCO2;
                 state.dataContaminantBalance->CO2ZoneTimeMinus1Temp = 0.0;
                 state.dataContaminantBalance->CO2ZoneTimeMinus2Temp = 0.0;
                 state.dataContaminantBalance->CO2ZoneTimeMinus3Temp = 0.0;
-                state.dataContaminantBalance->ZoneAirCO2Temp = OutdoorCO2;
+                state.dataContaminantBalance->ZoneAirCO2Temp = state.dataContaminantBalance->OutdoorCO2;
                 state.dataContaminantBalance->ZoneCO2SetPoint = 0.0;
                 state.dataContaminantBalance->CO2PredictedRate = 0.0;
-                state.dataContaminantBalance->ZoneAirCO2 = OutdoorCO2;
-                state.dataContaminantBalance->ZoneCO21 = OutdoorCO2;
-                state.dataContaminantBalance->ZoneCO2MX = OutdoorCO2;
-                state.dataContaminantBalance->ZoneCO2M2 = OutdoorCO2;
+                state.dataContaminantBalance->ZoneAirCO2 = state.dataContaminantBalance->OutdoorCO2;
+                state.dataContaminantBalance->ZoneCO21 = state.dataContaminantBalance->OutdoorCO2;
+                state.dataContaminantBalance->ZoneCO2MX = state.dataContaminantBalance->OutdoorCO2;
+                state.dataContaminantBalance->ZoneCO2M2 = state.dataContaminantBalance->OutdoorCO2;
             }
             if (Contaminant.GenericContamSimulation) {
-                CONTRAT = 0.0;
+                state.dataContaminantBalance->CONTRAT = 0.0;
                 GCZoneTimeMinus1 = OutdoorGC;
                 GCZoneTimeMinus2 = OutdoorGC;
                 GCZoneTimeMinus3 = OutdoorGC;
@@ -1471,7 +1471,7 @@ namespace ZoneContaminantPredictorCorrector {
         }
 
         if (allocated(ZoneEquipConfig) && state.dataZoneContaminantPredictorCorrector->MyConfigOneTimeFlag) {
-            for (ContZoneNum = 1; ContZoneNum <= NumContControlledZones; ++ContZoneNum) {
+            for (ContZoneNum = 1; ContZoneNum <= state.dataContaminantBalance->NumContControlledZones; ++ContZoneNum) {
                 ZoneNum = ContaminantControlledZone(ContZoneNum).ActualZoneNum;
                 for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig(ZoneNum).NumInletNodes; ++zoneInNode) {
                     int AirLoopNum = ZoneEquipConfig(ZoneNum).InletNodeAirLoopNum(zoneInNode);
@@ -1511,7 +1511,7 @@ namespace ZoneContaminantPredictorCorrector {
             }
         }
 
-        for (Loop = 1; Loop <= NumContControlledZones; ++Loop) {
+        for (Loop = 1; Loop <= state.dataContaminantBalance->NumContControlledZones; ++Loop) {
             if (Contaminant.CO2Simulation) {
                 ZoneNum = ContaminantControlledZone(Loop).ActualZoneNum;
                 state.dataContaminantBalance->ZoneCO2SetPoint(ZoneNum) = GetCurrentScheduleValue(state, ContaminantControlledZone(Loop).SPSchedIndex);
@@ -1774,7 +1774,7 @@ namespace ZoneContaminantPredictorCorrector {
                 // Check to see if this is a "CO2 controlled zone"
                 ControlledCO2ZoneFlag = false;
                 // Check all the controlled zones to see if it matches the zone simulated
-                for (ContControlledZoneNum = 1; ContControlledZoneNum <= NumContControlledZones; ++ContControlledZoneNum) {
+                for (ContControlledZoneNum = 1; ContControlledZoneNum <= state.dataContaminantBalance->NumContControlledZones; ++ContControlledZoneNum) {
                     if (ContaminantControlledZone(ContControlledZoneNum).ActualZoneNum == ZoneNum) {
                         if (GetCurrentScheduleValue(state, ContaminantControlledZone(ContControlledZoneNum).AvaiSchedPtr) > 0.0) {
                             ZoneAirCO2SetPoint = state.dataContaminantBalance->ZoneCO2SetPoint(ContaminantControlledZone(ContControlledZoneNum).ActualZoneNum);
@@ -1787,7 +1787,7 @@ namespace ZoneContaminantPredictorCorrector {
                     }
                 }
                 if (!ControlledCO2ZoneFlag) {
-                    for (ContControlledZoneNum = 1; ContControlledZoneNum <= NumContControlledZones; ++ContControlledZoneNum) {
+                    for (ContControlledZoneNum = 1; ContControlledZoneNum <= state.dataContaminantBalance->NumContControlledZones; ++ContControlledZoneNum) {
                         if (GetCurrentScheduleValue(state, ContaminantControlledZone(ContControlledZoneNum).AvaiSchedPtr) > 0.0) {
                             ZoneAirCO2SetPoint = state.dataContaminantBalance->ZoneCO2SetPoint(ContaminantControlledZone(ContControlledZoneNum).ActualZoneNum);
                             if (ContaminantControlledZone(ContControlledZoneNum).EMSOverrideCO2SetPointOn) {
@@ -1833,8 +1833,8 @@ namespace ZoneContaminantPredictorCorrector {
                             state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMMHrCO;
                         A = state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMHr + state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMMHr;
                     } else {
-                        B = CO2Gain + ((OAMFL(ZoneNum) + VAMFL(ZoneNum) + EAMFL(ZoneNum) + CTMFL(ZoneNum)) * OutdoorCO2) +
-                            MixingMassFlowCO2(ZoneNum) + MDotOA(ZoneNum) * OutdoorCO2;
+                        B = CO2Gain + ((OAMFL(ZoneNum) + VAMFL(ZoneNum) + EAMFL(ZoneNum) + CTMFL(ZoneNum)) * state.dataContaminantBalance->OutdoorCO2) +
+                            state.dataContaminantBalance->MixingMassFlowCO2(ZoneNum) + MDotOA(ZoneNum) * state.dataContaminantBalance->OutdoorCO2;
                         A = OAMFL(ZoneNum) + VAMFL(ZoneNum) + EAMFL(ZoneNum) + CTMFL(ZoneNum) + MixingMassFlowZone(ZoneNum) + MDotOA(ZoneNum);
                     }
                     C = RhoAir * Zone(ZoneNum).Volume * Zone(ZoneNum).ZoneVolCapMultpCO2 / SysTimeStepInSeconds;
@@ -1862,8 +1862,8 @@ namespace ZoneContaminantPredictorCorrector {
                             LoadToCO2SetPoint = C * (ZoneAirCO2SetPoint - state.dataContaminantBalance->ZoneCO21(ZoneNum)) + A * ZoneAirCO2SetPoint - B;
                         }
                     }
-                    if (ZoneAirCO2SetPoint > OutdoorCO2 && LoadToCO2SetPoint < 0.0) {
-                        ZoneSysContDemand(ZoneNum).OutputRequiredToCO2SP = LoadToCO2SetPoint / (OutdoorCO2 - ZoneAirCO2SetPoint);
+                    if (ZoneAirCO2SetPoint > state.dataContaminantBalance->OutdoorCO2 && LoadToCO2SetPoint < 0.0) {
+                        ZoneSysContDemand(ZoneNum).OutputRequiredToCO2SP = LoadToCO2SetPoint / (state.dataContaminantBalance->OutdoorCO2 - ZoneAirCO2SetPoint);
                     }
                 }
 
@@ -1881,7 +1881,7 @@ namespace ZoneContaminantPredictorCorrector {
                 // Check to see if this is a "GC controlled zone"
                 ControlledGCZoneFlag = false;
                 // Check all the controlled zones to see if it matches the zone simulated
-                for (ContControlledZoneNum = 1; ContControlledZoneNum <= NumContControlledZones; ++ContControlledZoneNum) {
+                for (ContControlledZoneNum = 1; ContControlledZoneNum <= state.dataContaminantBalance->NumContControlledZones; ++ContControlledZoneNum) {
                     if (ContaminantControlledZone(ContControlledZoneNum).ActualZoneNum == ZoneNum) {
                         if (GetCurrentScheduleValue(state, ContaminantControlledZone(ContControlledZoneNum).AvaiSchedPtr) > 0.0) {
                             ZoneAirGCSetPoint = ZoneGCSetPoint(ContaminantControlledZone(ContControlledZoneNum).ActualZoneNum);
@@ -1894,7 +1894,7 @@ namespace ZoneContaminantPredictorCorrector {
                     }
                 }
                 if (!ControlledGCZoneFlag) {
-                    for (ContControlledZoneNum = 1; ContControlledZoneNum <= NumContControlledZones; ++ContControlledZoneNum) {
+                    for (ContControlledZoneNum = 1; ContControlledZoneNum <= state.dataContaminantBalance->NumContControlledZones; ++ContControlledZoneNum) {
                         if (GetCurrentScheduleValue(state, ContaminantControlledZone(ContControlledZoneNum).AvaiSchedPtr) > 0.0) {
                             ZoneAirGCSetPoint = ZoneGCSetPoint(ContaminantControlledZone(ContControlledZoneNum).ActualZoneNum);
                             if (ContaminantControlledZone(ContControlledZoneNum).EMSOverrideCO2SetPointOn) {
@@ -2166,13 +2166,13 @@ namespace ZoneContaminantPredictorCorrector {
                     SumSysMxCO2_HM = Zone(ZoneNum).ZoneMeasuredSupplyAirFlowRate * Zone(ZoneNum).ZoneMeasuredSupplyAirCO2Concentration;
 
                     AA = SumSysM_HM + VAMFL(ZoneNum) + EAMFL(ZoneNum) + CTMFL(ZoneNum) + MixingMassFlowZone(ZoneNum) + MDotOA(ZoneNum);
-                    BB = SumSysMxCO2_HM + CO2Gain + ((VAMFL(ZoneNum) + EAMFL(ZoneNum) + CTMFL(ZoneNum)) * OutdoorCO2) + MixingMassFlowCO2(ZoneNum) +
-                         MDotOA(ZoneNum) * OutdoorCO2;
+                    BB = SumSysMxCO2_HM + CO2Gain + ((VAMFL(ZoneNum) + EAMFL(ZoneNum) + CTMFL(ZoneNum)) * state.dataContaminantBalance->OutdoorCO2) + state.dataContaminantBalance->MixingMassFlowCO2(ZoneNum) +
+                         MDotOA(ZoneNum) * state.dataContaminantBalance->OutdoorCO2;
 
                 } else {
                     AA = VAMFL(ZoneNum) + EAMFL(ZoneNum) + CTMFL(ZoneNum) + MixingMassFlowZone(ZoneNum) + MDotOA(ZoneNum);
-                    BB = CO2Gain + ((VAMFL(ZoneNum) + EAMFL(ZoneNum) + CTMFL(ZoneNum)) * OutdoorCO2) + MixingMassFlowCO2(ZoneNum) +
-                         MDotOA(ZoneNum) * OutdoorCO2;
+                    BB = CO2Gain + ((VAMFL(ZoneNum) + EAMFL(ZoneNum) + CTMFL(ZoneNum)) * state.dataContaminantBalance->OutdoorCO2) + state.dataContaminantBalance->MixingMassFlowCO2(ZoneNum) +
+                         MDotOA(ZoneNum) * state.dataContaminantBalance->OutdoorCO2;
                 }
 
                 CC = RhoAir * Zone(ZoneNum).Volume * Zone(ZoneNum).ZoneVolCapMultpCO2 / SysTimeStepInSeconds;
@@ -2180,11 +2180,11 @@ namespace ZoneContaminantPredictorCorrector {
                       (1.0 / 3.0) * state.dataContaminantBalance->CO2ZoneTimeMinus3Temp(ZoneNum));
 
                 zone_M_CO2 = Zone(ZoneNum).ZoneMeasuredCO2Concentration;
-                delta_CO2 = (Zone(ZoneNum).ZoneMeasuredCO2Concentration - OutdoorCO2) / 1000;
+                delta_CO2 = (Zone(ZoneNum).ZoneMeasuredCO2Concentration - state.dataContaminantBalance->OutdoorCO2) / 1000;
                 CpAir = PsyCpAirFnW(OutHumRat);
                 AirDensity = PsyRhoAirFnPbTdbW(state, OutBaroPress, Zone(ZoneNum).OutDryBulbTemp, OutHumRat, RoutineNameInfiltration);
 
-                if (Zone(ZoneNum).ZoneMeasuredCO2Concentration == OutdoorCO2) {
+                if (Zone(ZoneNum).ZoneMeasuredCO2Concentration == state.dataContaminantBalance->OutdoorCO2) {
                     M_inf = 0.0;
                 } else {
                     M_inf = (CC * DD + BB - ((11.0 / 6.0) * CC + AA) * Zone(ZoneNum).ZoneMeasuredCO2Concentration) / delta_CO2;
@@ -2223,14 +2223,14 @@ namespace ZoneContaminantPredictorCorrector {
 
                     AA = SumSysM_HM + OAMFL(ZoneNum) + VAMFL(ZoneNum) + EAMFL(ZoneNum) + CTMFL(ZoneNum) + MixingMassFlowZone(ZoneNum) +
                          MDotOA(ZoneNum);
-                    BB = CO2GainExceptPeople + ((OAMFL(ZoneNum) + VAMFL(ZoneNum) + EAMFL(ZoneNum) + CTMFL(ZoneNum)) * OutdoorCO2) + (SumSysMxCO2_HM) +
-                         MixingMassFlowCO2(ZoneNum) + MDotOA(ZoneNum) * OutdoorCO2;
+                    BB = CO2GainExceptPeople + ((OAMFL(ZoneNum) + VAMFL(ZoneNum) + EAMFL(ZoneNum) + CTMFL(ZoneNum)) * state.dataContaminantBalance->OutdoorCO2) + (SumSysMxCO2_HM) +
+                         state.dataContaminantBalance->MixingMassFlowCO2(ZoneNum) + MDotOA(ZoneNum) * state.dataContaminantBalance->OutdoorCO2;
 
                 } else {
                     AA = ZoneMassFlowRate + OAMFL(ZoneNum) + VAMFL(ZoneNum) + EAMFL(ZoneNum) + CTMFL(ZoneNum) + MixingMassFlowZone(ZoneNum) +
                          MDotOA(ZoneNum);
-                    BB = CO2GainExceptPeople + ((OAMFL(ZoneNum) + VAMFL(ZoneNum) + EAMFL(ZoneNum) + CTMFL(ZoneNum)) * OutdoorCO2) +
-                         (CO2MassFlowRate) + MixingMassFlowCO2(ZoneNum) + MDotOA(ZoneNum) * OutdoorCO2;
+                    BB = CO2GainExceptPeople + ((OAMFL(ZoneNum) + VAMFL(ZoneNum) + EAMFL(ZoneNum) + CTMFL(ZoneNum)) * state.dataContaminantBalance->OutdoorCO2) +
+                         (CO2MassFlowRate) + state.dataContaminantBalance->MixingMassFlowCO2(ZoneNum) + MDotOA(ZoneNum) * state.dataContaminantBalance->OutdoorCO2;
                 }
 
                 CC = RhoAir * Zone(ZoneNum).Volume * Zone(ZoneNum).ZoneVolCapMultpCO2 / SysTimeStepInSeconds;
@@ -2320,9 +2320,9 @@ namespace ZoneContaminantPredictorCorrector {
         for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
 
             if (Contaminant.CO2Simulation) {
-                AZ(ZoneNum) = 0.0;
-                BZ(ZoneNum) = 0.0;
-                CZ(ZoneNum) = 0.0;
+                state.dataContaminantBalance->AZ(ZoneNum) = 0.0;
+                state.dataContaminantBalance->BZ(ZoneNum) = 0.0;
+                state.dataContaminantBalance->CZ(ZoneNum) = 0.0;
             }
             if (Contaminant.GenericContamSimulation) {
                 AZGC(ZoneNum) = 0.0;
@@ -2503,17 +2503,17 @@ namespace ZoneContaminantPredictorCorrector {
             // operating and system shutdown.
 
             RhoAir = PsyRhoAirFnPbTdbW(state, OutBaroPress, ZT(ZoneNum), ZoneAirHumRat(ZoneNum), RoutineName);
-            //    RhoAir = ZoneAirDensityCO(ZoneNum)
+            //    RhoAir = state.dataContaminantBalance->ZoneAirDensityCO(ZoneNum)
 
-            if (Contaminant.CO2Simulation) ZoneAirDensityCO(ZoneNum) = RhoAir;
+            if (Contaminant.CO2Simulation) state.dataContaminantBalance->ZoneAirDensityCO(ZoneNum) = RhoAir;
             // Calculate Co2 internal gain
             if (Contaminant.CO2Simulation) CO2Gain = state.dataContaminantBalance->ZoneCO2Gain(ZoneNum) * RhoAir * 1.0e6;
             if (Contaminant.CO2Simulation) CO2GainExceptPeople = state.dataContaminantBalance->ZoneCO2GainExceptPeople(ZoneNum) * RhoAir * 1.0e6; // Addded for hybrid model
             if (Contaminant.GenericContamSimulation) GCGain = ZoneGCGain(ZoneNum) * RhoAir * 1.0e6;
 
             if (Contaminant.CO2Simulation) {
-                B = CO2Gain + ((OAMFL(ZoneNum) + VAMFL(ZoneNum) + EAMFL(ZoneNum) + CTMFL(ZoneNum)) * OutdoorCO2) + (CO2MassFlowRate) +
-                    MixingMassFlowCO2(ZoneNum) + MDotOA(ZoneNum) * OutdoorCO2;
+                B = CO2Gain + ((OAMFL(ZoneNum) + VAMFL(ZoneNum) + EAMFL(ZoneNum) + CTMFL(ZoneNum)) * state.dataContaminantBalance->OutdoorCO2) + (CO2MassFlowRate) +
+                    state.dataContaminantBalance->MixingMassFlowCO2(ZoneNum) + MDotOA(ZoneNum) * state.dataContaminantBalance->OutdoorCO2;
                 A = ZoneMassFlowRate + OAMFL(ZoneNum) + VAMFL(ZoneNum) + EAMFL(ZoneNum) + CTMFL(ZoneNum) + MixingMassFlowZone(ZoneNum) +
                     MDotOA(ZoneNum);
                 if (AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultizone ||
@@ -2536,9 +2536,9 @@ namespace ZoneContaminantPredictorCorrector {
                     B += state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).TotalCO2;
                 }
 
-                AZ(ZoneNum) = A;
-                BZ(ZoneNum) = B;
-                CZ(ZoneNum) = C;
+                state.dataContaminantBalance->AZ(ZoneNum) = A;
+                state.dataContaminantBalance->BZ(ZoneNum) = B;
+                state.dataContaminantBalance->CZ(ZoneNum) = C;
 
                 // Use a 3rd order derivative to predict final zone CO2 and
                 // smooth the changes using the zone air capacitance.

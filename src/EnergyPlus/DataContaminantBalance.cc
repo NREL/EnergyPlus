@@ -70,19 +70,6 @@ namespace DataContaminantBalance {
     // module should be available to other modules and routines.  Thus,
     // all variables in this module must be PUBLIC.
 
-    Array1D<Real64> CONTRAT; // Zone CO2 at the previous time step used in Exact and Euler method
-
-    Array1D<Real64> MixingMassFlowCO2; // Mixing MASS FLOW * CO2
-
-    int NumContControlledZones(0);
-
-    Real64 OutdoorCO2(0.0); // Outdoor CO2 level
-
-    Array1D<Real64> ZoneAirDensityCO; // Mixing MASS FLOW * CO2
-    Array1D<Real64> AZ;
-    Array1D<Real64> BZ;
-    Array1D<Real64> CZ;
-
     // Generic contaminant
 
     Array1D<Real64> ZoneGCSetPoint;
@@ -142,14 +129,6 @@ namespace DataContaminantBalance {
     // Needed for unit tests, should not be normally called.
     void clear_state()
     {
-        CONTRAT.deallocate();
-        MixingMassFlowCO2.deallocate();
-        NumContControlledZones = 0;
-        OutdoorCO2 = 0.0;
-        ZoneAirDensityCO.deallocate();
-        AZ.deallocate();
-        BZ.deallocate();
-        CZ.deallocate();
         ZoneGCSetPoint.deallocate();
         GCPredictedRate.deallocate();
         ZoneGCGain.deallocate();

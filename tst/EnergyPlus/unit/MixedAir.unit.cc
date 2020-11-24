@@ -780,7 +780,7 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOccupancyTest)
     Schedule(4).CurrentValue = 1.0;
     state->dataContaminantBalance->ZoneCO2GainFromPeople.allocate(1);
     state->dataContaminantBalance->ZoneCO2GainFromPeople(1) = 3.82E-8;
-    OutdoorCO2 = 400;
+    state->dataContaminantBalance->OutdoorCO2 = 400;
     state->dataContaminantBalance->ZoneAirCO2.allocate(1);
     state->dataContaminantBalance->ZoneAirCO2(1) = 600.0;
     ZoneEquipConfig.allocate(1);
@@ -1376,7 +1376,7 @@ TEST_F(EnergyPlusFixture, MixedAir_ControllerTypeTest)
     Node(OAController(OAControllerNum).RelNode).MassFlowRate = OAController(OAControllerNum).RelMassFlow;
     Node(OAController(OAControllerNum).InletNode).CO2 = 600.0;
     Node(OAController(OAControllerNum).RelNode).CO2 = 500.0;
-    OutdoorCO2 = 400.0;
+    state->dataContaminantBalance->OutdoorCO2 = 400.0;
 
     Node(OAController(OAControllerNum).InletNode).GenContam = 0.5;
     Node(OAController(OAControllerNum).RelNode).GenContam = 0.3;
@@ -5645,7 +5645,7 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOARateTest)
     Schedule(4).CurrentValue = 1.0;
     state->dataContaminantBalance->ZoneCO2GainFromPeople.allocate(1);
     state->dataContaminantBalance->ZoneCO2GainFromPeople(1) = 3.82E-8;
-    OutdoorCO2 = 400;
+    state->dataContaminantBalance->OutdoorCO2 = 400;
     state->dataContaminantBalance->ZoneAirCO2.allocate(1);
     state->dataContaminantBalance->ZoneAirCO2(1) = 600.0;
     ZoneEquipConfig.allocate(1);

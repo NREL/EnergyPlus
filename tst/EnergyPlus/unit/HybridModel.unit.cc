@@ -222,20 +222,20 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     ZT(1) = 0.0;
 
     // CorrectZoneContaminants variable initialization
-    AZ.allocate(1);
-    BZ.allocate(1);
-    CZ.allocate(1);
+    state->dataContaminantBalance->AZ.allocate(1);
+    state->dataContaminantBalance->BZ.allocate(1);
+    state->dataContaminantBalance->CZ.allocate(1);
     AZGC.allocate(1);
     BZGC.allocate(1);
     CZGC.allocate(1);
-    AZ(1) = 0.0;
-    BZ(1) = 0.0;
-    CZ(1) = 0.0;
+    state->dataContaminantBalance->AZ(1) = 0.0;
+    state->dataContaminantBalance->BZ(1) = 0.0;
+    state->dataContaminantBalance->CZ(1) = 0.0;
     AZGC(1) = 0.0;
     BZGC(1) = 0.0;
     CZGC(1) = 0.0;
-    ZoneAirDensityCO.allocate(1);
-    ZoneAirDensityCO(1) = 0.0;
+    state->dataContaminantBalance->ZoneAirDensityCO.allocate(1);
+    state->dataContaminantBalance->ZoneAirDensityCO(1) = 0.0;
     ZoneGCGain.allocate(1);
     ZoneGCGain(1) = 0.0;
 
@@ -617,7 +617,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     EAMFL.deallocate();
     EAMFLxHumRat.deallocate();
     CTMFL.deallocate();
-    ZoneAirDensityCO.deallocate();
+    state->dataContaminantBalance->ZoneAirDensityCO.deallocate();
     ZoneGCGain.deallocate();
     Schedule.deallocate();
 }
@@ -706,15 +706,15 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     CTMFL(1) = 0.0;
     ZT.allocate(1);
     ZT(1) = 0.0;
-    AZ.allocate(1);
-    BZ.allocate(1);
-    CZ.allocate(1);
+    state->dataContaminantBalance->AZ.allocate(1);
+    state->dataContaminantBalance->BZ.allocate(1);
+    state->dataContaminantBalance->CZ.allocate(1);
     AZGC.allocate(1);
     BZGC.allocate(1);
     CZGC.allocate(1);
-    AZ(1) = 0.0;
-    BZ(1) = 0.0;
-    CZ(1) = 0.0;
+    state->dataContaminantBalance->AZ(1) = 0.0;
+    state->dataContaminantBalance->BZ(1) = 0.0;
+    state->dataContaminantBalance->CZ(1) = 0.0;
     AZGC(1) = 0.0;
     BZGC(1) = 0.0;
     CZGC(1) = 0.0;
@@ -722,16 +722,16 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     state->dataContaminantBalance->ZoneAirCO2(1) = 0.0;
     state->dataContaminantBalance->ZoneAirCO2Temp.allocate(1);
     state->dataContaminantBalance->ZoneAirCO2Temp(1) = 0.0;
-    ZoneAirDensityCO.allocate(1);
-    ZoneAirDensityCO(1) = 0.0;
+    state->dataContaminantBalance->ZoneAirDensityCO.allocate(1);
+    state->dataContaminantBalance->ZoneAirDensityCO(1) = 0.0;
     state->dataContaminantBalance->ZoneCO2Gain.allocate(1);
     state->dataContaminantBalance->ZoneCO2Gain(1) = 0.0;
     state->dataContaminantBalance->ZoneCO2GainExceptPeople.allocate(1);
     state->dataContaminantBalance->ZoneCO2GainExceptPeople(1) = 0.0;
     ZoneGCGain.allocate(1);
     ZoneGCGain(1) = 0.0;
-    MixingMassFlowCO2.allocate(1);
-    MixingMassFlowCO2(1) = 0.0;
+    state->dataContaminantBalance->MixingMassFlowCO2.allocate(1);
+    state->dataContaminantBalance->MixingMassFlowCO2(1) = 0.0;
 
     // Parameter setup
     state->dataGlobal->NumOfZones = 1;
@@ -769,7 +769,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     HybridModelZone(1).HybridEndDayOfYear = 2;
     Zone(1).ZoneVolCapMultpCO2 = 1.0;
     ZoneAirHumRat(1) = 0.001120003;
-    OutdoorCO2 = 387.6064554;
+    state->dataContaminantBalance->OutdoorCO2 = 387.6064554;
     OutHumRat = 0.001147;
     OutBaroPress = 99500;
     state->dataContaminantBalance->CO2ZoneTimeMinus1(1) = 388.595225;
@@ -798,7 +798,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     Zone(1).OutDryBulbTemp = -1.0394166434012677;
     ZT(1) = -2.92;
     ZoneAirHumRat(1) = 0.00112;
-    OutdoorCO2 = 387.6064554;
+    state->dataContaminantBalance->OutdoorCO2 = 387.6064554;
     OutBaroPress = 98916.7;
     OAMFL(1) = 0.700812;
     state->dataContaminantBalance->ZoneCO2Gain(1) = 0.00001989;
@@ -938,10 +938,10 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     CTMFL.deallocate();
     state->dataContaminantBalance->ZoneAirCO2.deallocate();
     state->dataContaminantBalance->ZoneAirCO2Temp.deallocate();
-    ZoneAirDensityCO.deallocate();
+    state->dataContaminantBalance->ZoneAirDensityCO.deallocate();
     state->dataContaminantBalance->ZoneCO2Gain.deallocate();
     state->dataContaminantBalance->ZoneCO2GainExceptPeople.deallocate();
     ZoneGCGain.deallocate();
-    MixingMassFlowCO2.deallocate();
+    state->dataContaminantBalance->MixingMassFlowCO2.deallocate();
     Schedule.deallocate();
 }

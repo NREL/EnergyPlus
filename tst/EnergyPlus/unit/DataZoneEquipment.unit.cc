@@ -113,7 +113,7 @@ TEST_F(EnergyPlusFixture, DataZoneEquipment_TestCalcDesignSpecificationOutdoorAi
     DataHeatBalance::People(1).NumberOfPeople = DataHeatBalance::Zone(1).TotOccupants;
 
     DataContaminantBalance::Contaminant.CO2Simulation = true;
-    DataContaminantBalance::OutdoorCO2 = 400.0;
+    state->dataContaminantBalance->OutdoorCO2 = 400.0;
     state->dataContaminantBalance->ZoneCO2GainFromPeople(1) = 3.82E-8 * 5.0;
 
     DataSizing::NumOARequirements = 1;

@@ -222,7 +222,6 @@ namespace HVACManager {
 
         using AirflowNetworkBalanceManager::ManageAirflowNetworkBalance;
         using DataContaminantBalance::Contaminant;
-        using DataContaminantBalance::OutdoorCO2;
         using DataContaminantBalance::OutdoorGC;
         using DataContaminantBalance::ZoneAirGC;
         using DataContaminantBalance::ZoneAirGCAvg;
@@ -308,7 +307,7 @@ namespace HVACManager {
         ZoneAirHumRatAvg = 0.0;
         PrintedWarmup = false;
         if (Contaminant.CO2Simulation) {
-            OutdoorCO2 = GetCurrentScheduleValue(state, Contaminant.CO2OutdoorSchedPtr);
+            state.dataContaminantBalance->OutdoorCO2 = GetCurrentScheduleValue(state, Contaminant.CO2OutdoorSchedPtr);
             state.dataContaminantBalance->ZoneAirCO2Avg = 0.0;
         }
         if (Contaminant.GenericContamSimulation) {

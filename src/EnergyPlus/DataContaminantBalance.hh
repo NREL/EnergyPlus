@@ -62,19 +62,6 @@ struct EnergyPlusData;
 
 namespace DataContaminantBalance {
 
-    extern Array1D<Real64> CONTRAT; // Zone CO2 at the previous time step used in Exact and Euler method
-
-    extern Array1D<Real64> MixingMassFlowCO2; // Mixing MASS FLOW * CO2
-
-    extern int NumContControlledZones;
-
-    extern Real64 OutdoorCO2; // Outdoor CO2 level
-
-    extern Array1D<Real64> ZoneAirDensityCO; // Mixing MASS FLOW * CO2
-    extern Array1D<Real64> AZ;
-    extern Array1D<Real64> BZ;
-    extern Array1D<Real64> CZ;
-
     // Generic contaminant
 
     extern Array1D<Real64> ZoneGCSetPoint;
@@ -360,6 +347,16 @@ struct ContaminantBalanceData : BaseGlobalStruct {
     Array1D<Real64> ZoneCO2M2; // TEMPORARY ZONE CO2 at timestep t-2 in Exact and Euler method
     Array1D<Real64> ZoneCO21;  // Zone CO2 at the previous time step used in Exact and Euler method
 
+    Array1D<Real64> CONTRAT; // Zone CO2 at the previous time step used in Exact and Euler method
+    Array1D<Real64> MixingMassFlowCO2; // Mixing MASS FLOW * CO2
+    int NumContControlledZones = 0;
+    Real64 OutdoorCO2 = 0.0; // Outdoor CO2 level
+
+    Array1D<Real64> ZoneAirDensityCO; // Mixing MASS FLOW * CO2
+    Array1D<Real64> AZ;
+    Array1D<Real64> BZ;
+    Array1D<Real64> CZ;
+
     void clear_state() override
     {
         this->ZoneCO2SetPoint.deallocate();
@@ -385,6 +382,14 @@ struct ContaminantBalanceData : BaseGlobalStruct {
         this->ZoneCO2MX.deallocate();
         this->ZoneCO2M2.deallocate();
         this->ZoneCO21.deallocate();
+        this->CONTRAT.deallocate();
+        this->MixingMassFlowCO2.deallocate();
+        this->NumContControlledZones = 0;
+        this->OutdoorCO2 = 0.0;
+        this->ZoneAirDensityCO.deallocate();
+        this->AZ.deallocate();
+        this->BZ.deallocate();
+        this->CZ.deallocate();
     }
 };
 

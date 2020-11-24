@@ -1459,7 +1459,6 @@ namespace SimAirServingZones {
 
         // Using/Aliasing
         using DataContaminantBalance::Contaminant;
-        using DataContaminantBalance::OutdoorCO2;
         using DataContaminantBalance::OutdoorGC;
         using DataConvergParams::AirLoopConvergence;
         using DataConvergParams::HVACFlowRateToler;
@@ -2215,7 +2214,7 @@ namespace SimAirServingZones {
                         Node(NodeNum).Press = StdBaroPress;
                         Node(NodeNum).Quality = 0.0;
                         if (Contaminant.CO2Simulation) {
-                            Node(NodeNum).CO2 = OutdoorCO2;
+                            Node(NodeNum).CO2 = state.dataContaminantBalance->OutdoorCO2;
                         }
                         if (Contaminant.GenericContamSimulation) {
                             Node(NodeNum).GenContam = OutdoorGC;
