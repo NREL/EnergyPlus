@@ -353,7 +353,6 @@ namespace HeatBalanceSurfaceManager {
         // na
 
         // Using/Aliasing
-        using DataDaylightingDevices::NumOfTDDPipes;
         using DataDElight::LUX2FC;
         using namespace SolarShading;
         using ConvectionCoefficients::InitInteriorConvectionCoeffs;
@@ -555,7 +554,7 @@ namespace HeatBalanceSurfaceManager {
                 if (!state.dataGlobal->DoingSizing) DayltgInteriorMapIllum(state, NZ);
             }
 
-            if (SunIsUp && NumOfTDDPipes > 0 && NZ == 1) {
+            if (SunIsUp && state.dataDaylightingDevicesData->NumOfTDDPipes > 0 && NZ == 1) {
                 if (InitSurfaceHeatBalancefirstTime) DisplayString(state, "Computing Interior Daylighting Illumination for TDD pipes");
                 DayltgInteriorTDDIllum(state);
             }
@@ -2330,7 +2329,6 @@ namespace HeatBalanceSurfaceManager {
         using General::InterpSlatAng;
         using General::InterpSw;
         using General::POLYF;
-        using namespace DataDaylightingDevices;
         using DaylightingDevices::TransTDD;
         using namespace DataWindowEquivalentLayer;
         using SolarShading::SurfaceScheduledSolarInc;
@@ -2569,8 +2567,8 @@ namespace HeatBalanceSurfaceManager {
                 }
             }
 
-            if (NumOfTDDPipes > 0) {
-                for (auto &e : TDDPipe) {
+            if (state.dataDaylightingDevicesData->NumOfTDDPipes > 0) {
+                for (auto &e : state.dataDaylightingDevicesData->TDDPipe) {
                     e.TransSolBeam = 0.0;
                     e.TransSolDiff = 0.0;
                     e.TransVisBeam = 0.0;
@@ -2785,9 +2783,9 @@ namespace HeatBalanceSurfaceManager {
                     }
                 }
             }
-            for (int PipeNum = 1; PipeNum <= NumOfTDDPipes; ++PipeNum) {
-                int SurfNum = TDDPipe(PipeNum).Diffuser; // TDD: Diffuser object number
-                int SurfNum2 = TDDPipe(PipeNum).Dome; // TDD: DOME object number
+            for (int PipeNum = 1; PipeNum <= state.dataDaylightingDevicesData->NumOfTDDPipes; ++PipeNum) {
+                int SurfNum = state.dataDaylightingDevicesData->TDDPipe(PipeNum).Diffuser; // TDD: Diffuser object number
+                int SurfNum2 = state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome; // TDD: DOME object number
                 int ConstrNum = Surface(SurfNum).Construction;
                 if (SurfWinStormWinFlag(SurfNum) == 1) ConstrNum = Surface(SurfNum).StormWinConstruction;
 
@@ -2795,15 +2793,15 @@ namespace HeatBalanceSurfaceManager {
 
                 // Reconstruct the beam, sky, and ground radiation transmittance of just the TDD:DOME and TDD pipe
                 // by dividing out diffuse solar transmittance of TDD:DIFFUSER
-                currBeamSolar(SurfNum) = BeamSolarRad * TransTDD(state, PipeNum, currCosInc(SurfNum), SolarBeam) /
+                currBeamSolar(SurfNum) = BeamSolarRad * TransTDD(state, PipeNum, currCosInc(SurfNum), DataDaylightingDevices::iRadType::SolarBeam) /
                                          state.dataConstruction->Construct(ConstrNum).TransDiff;
 
                 currSkySolarInc(SurfNum) = DifSolarRad * AnisoSkyMult(SurfNum2) *
-                                           TransTDD(state, PipeNum, currCosInc(SurfNum), SolarAniso) /
+                                           TransTDD(state, PipeNum, currCosInc(SurfNum), DataDaylightingDevices::iRadType::SolarAniso) /
                                            state.dataConstruction->Construct(ConstrNum).TransDiff;
 
                 currGndSolarInc(SurfNum) =
-                        GndSolarRad * Surface(SurfNum2).ViewFactorGround * TDDPipe(PipeNum).TransSolIso /
+                        GndSolarRad * Surface(SurfNum2).ViewFactorGround * state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransSolIso /
                         state.dataConstruction->Construct(ConstrNum).TransDiff;
                 // Incident direct (unreflected) beam
                 SurfQRadSWOutIncidentBeam(SurfNum) =
@@ -2816,9 +2814,9 @@ namespace HeatBalanceSurfaceManager {
                         SurfQRadSWOutIncidentBeam(SurfNum) + SurfQRadSWOutIncidentSkyDiffuse(SurfNum) +
                         SurfQRadSWOutIncBmToDiffReflGnd(SurfNum) + SurfQRadSWOutIncSkyDiffReflGnd(SurfNum);
             }
-            for (int ShelfNum = 1; ShelfNum <= NumOfShelf; ++ShelfNum) {
-                int SurfNum = Shelf(ShelfNum).Window; // Daylighting shelf object number
-                int OutShelfSurf = Shelf(ShelfNum).OutSurf; // Outside daylighting shelf present if > 0
+            for (int ShelfNum = 1; ShelfNum <= state.dataDaylightingDevicesData->NumOfShelf; ++ShelfNum) {
+                int SurfNum = state.dataDaylightingDevicesData->Shelf(ShelfNum).Window; // Daylighting shelf object number
+                int OutShelfSurf = state.dataDaylightingDevicesData->Shelf(ShelfNum).OutSurf; // Outside daylighting shelf present if > 0
                 currCosInc(SurfNum) = CosIncAng(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum);
                 currBeamSolar(SurfNum) = BeamSolarRad;
                 currSkySolarInc(SurfNum) = DifSolarRad * AnisoSkyMult(SurfNum);
@@ -2826,12 +2824,12 @@ namespace HeatBalanceSurfaceManager {
                 Real64 ShelfSolarRad = (BeamSolarRad * SunlitFrac(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, OutShelfSurf) *
                                         CosIncAng(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, OutShelfSurf) +
                                         DifSolarRad * AnisoSkyMult(OutShelfSurf)) *
-                                       Shelf(ShelfNum).OutReflectSol;
+                                       state.dataDaylightingDevicesData->Shelf(ShelfNum).OutReflectSol;
 
                 // Add all reflected solar from the outside shelf to the ground solar
                 // NOTE:  If the shelf blocks part of the view to the ground, the user must reduce the ground view factor!!
                 currGndSolarInc(SurfNum) = GndSolarRad * Surface(SurfNum).ViewFactorGround +
-                                           ShelfSolarRad * Shelf(ShelfNum).ViewFactor;
+                                           ShelfSolarRad * state.dataDaylightingDevicesData->Shelf(ShelfNum).ViewFactor;
             }
 
             for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
@@ -2869,7 +2867,7 @@ namespace HeatBalanceSurfaceManager {
                                     int ShelfNum = Surface(SurfNum).Shelf; // Daylighting shelf object number
                                     int InShelfSurf = 0; // Inside daylighting shelf surface number
                                     if (ShelfNum > 0) {
-                                        InShelfSurf = Shelf(ShelfNum).InSurf; // Inside daylighting shelf present if > 0
+                                        InShelfSurf = state.dataDaylightingDevicesData->Shelf(ShelfNum).InSurf; // Inside daylighting shelf present if > 0
                                     }
                                     SurfOpaqQRadSWInAbs(SurfNum) += SurfOpaqAI(SurfNum) * BeamSolarRad;
                                     if (InShelfSurf > 0) { // Inside daylighting shelf
@@ -3104,7 +3102,7 @@ namespace HeatBalanceSurfaceManager {
                                 } else if (state.dataWindowManager->inExtWindowModel->isExternalLibraryModel()) {
                                     int SurfNum2 = SurfNum;
                                     if (SurfWinOriginalClass(SurfNum) == SurfaceClass::TDD_Diffuser) {
-                                        SurfNum2 = TDDPipe(SurfWinTDDPipeNum(SurfNum)).Dome;
+                                        SurfNum2 = state.dataDaylightingDevicesData->TDDPipe(SurfWinTDDPipeNum(SurfNum)).Dome;
                                     }
 
                                     std::pair<Real64, Real64> incomingAngle =
@@ -3407,8 +3405,8 @@ namespace HeatBalanceSurfaceManager {
                     } // Surface(SurfNum)%ExtSolar
                 } // end of surface window loop
             } // end of zone loop
-            for (int PipeNum = 1; PipeNum <= NumOfTDDPipes; ++PipeNum) {
-                int SurfNum = TDDPipe(PipeNum).Dome; // TDD: DOME object number
+            for (int PipeNum = 1; PipeNum <= state.dataDaylightingDevicesData->NumOfTDDPipes; ++PipeNum) {
+                int SurfNum = state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome; // TDD: DOME object number
                 int ConstrNum = Surface(SurfNum).Construction;
                 int TotGlassLay = state.dataConstruction->Construct(ConstrNum).TotGlassLayers; // Number of glass layers
                 SurfWinQRadSWwinAbsTot(SurfNum) = 0.0;
@@ -6782,9 +6780,9 @@ namespace HeatBalanceSurfaceManager {
                 if (SurfWinOriginalClass(SurfNum) == SurfaceClass::TDD_Diffuser) { // Tubular daylighting device
                     // Lookup up the TDD:DOME object
                     int const pipeNum = SurfWinTDDPipeNum(SurfNum);
-                    int const domeNum = DataDaylightingDevices::TDDPipe(pipeNum).Dome;
+                    int const domeNum = state.dataDaylightingDevicesData->TDDPipe(pipeNum).Dome;
                     // Ueff = 1 / effective R value between TDD:DOME and TDD:DIFFUSER
-                    Real64 Ueff = 1.0 / DataDaylightingDevices::TDDPipe(pipeNum).Reff;
+                    Real64 Ueff = 1.0 / state.dataDaylightingDevicesData->TDDPipe(pipeNum).Reff;
 
                     // Similar to opaque surface but outside surface temp of TDD:DOME is used, and no embedded sources/sinks.
                     // Absorbed shortwave radiation is treated similar to a regular window, but only 1 glass layer is allowed.
@@ -6924,7 +6922,7 @@ namespace HeatBalanceSurfaceManager {
                     // and the outside face of the TDD:DIFFUSER for reporting.
 
                     // Set inside temp variables of TDD:DOME equal to inside temp of TDD:DIFFUSER
-                    int domeNum = DataDaylightingDevices::TDDPipe(SurfWinTDDPipeNum(SurfNum)).Dome;
+                    int domeNum = state.dataDaylightingDevicesData->TDDPipe(SurfWinTDDPipeNum(SurfNum)).Dome;
                     TH(2, 1, domeNum) = TempSurfIn(domeNum) = TempSurfInTmp(domeNum) = TempSurfInRep(domeNum) = TempSurfIn(SurfNum);
 
                     // Set outside temp reporting variable of TDD:DOME (since it gets skipped otherwise)
@@ -7059,8 +7057,8 @@ namespace HeatBalanceSurfaceManager {
                 DataSurfaces::SurfWinHeatTransferRepEnergy(surfNum) = DataSurfaces::SurfWinHeatGain(surfNum) * state.dataGlobal->TimeStepZoneSec;
                 if (DataSurfaces::SurfWinOriginalClass(surfNum) == DataSurfaces::SurfaceClass::TDD_Diffuser) { // Tubular daylighting device
                     int pipeNum = DataSurfaces::SurfWinTDDPipeNum(surfNum);
-                    DataDaylightingDevices::TDDPipe(pipeNum).HeatGain = DataSurfaces::SurfWinHeatGainRep(surfNum);
-                    DataDaylightingDevices::TDDPipe(pipeNum).HeatLoss = DataSurfaces::SurfWinHeatLossRep(surfNum);
+                    state.dataDaylightingDevicesData->TDDPipe(pipeNum).HeatGain = DataSurfaces::SurfWinHeatGainRep(surfNum);
+                    state.dataDaylightingDevicesData->TDDPipe(pipeNum).HeatLoss = DataSurfaces::SurfWinHeatLossRep(surfNum);
                 }
                 if (DataSurfaces::Surface(surfNum).ExtSolar) { // WindowManager's definition of ZoneWinHeatGain/Loss
                     int zoneNum = DataSurfaces::Surface(surfNum).Zone;
@@ -7491,9 +7489,9 @@ namespace HeatBalanceSurfaceManager {
                     if (SurfWinOriginalClass(surfNum) == SurfaceClass::TDD_Diffuser) { // Tubular daylighting device
                         // Lookup up the TDD:DOME object
                         int const pipeNum = SurfWinTDDPipeNum(surfNum);
-                        int const domeNum = DataDaylightingDevices::TDDPipe(pipeNum).Dome;
+                        int const domeNum = state.dataDaylightingDevicesData->TDDPipe(pipeNum).Dome;
                         // Ueff = 1 / effective R value between TDD:DOME and TDD:DIFFUSER
-                        Real64 Ueff = 1.0 / DataDaylightingDevices::TDDPipe(pipeNum).Reff;
+                        Real64 Ueff = 1.0 / state.dataDaylightingDevicesData->TDDPipe(pipeNum).Reff;
 
                         // Similar to opaque surface but outside surface temp of TDD:DOME is used, and no embedded sources/sinks.
                         // Absorbed shortwave radiation is treated similar to a regular window, but only 1 glass layer is allowed.
@@ -7636,7 +7634,7 @@ namespace HeatBalanceSurfaceManager {
                         // and the outside face of the TDD:DIFFUSER for reporting.
 
                         // Set inside temp variables of TDD:DOME equal to inside temp of TDD:DIFFUSER
-                        int domeNum = DataDaylightingDevices::TDDPipe(SurfWinTDDPipeNum(surfNum)).Dome;
+                        int domeNum = state.dataDaylightingDevicesData->TDDPipe(SurfWinTDDPipeNum(surfNum)).Dome;
                         TH(2, 1, domeNum) = TempSurfIn(domeNum) = TempSurfInTmp(domeNum) = TempSurfInRep(domeNum) = TempSurfIn(surfNum);
 
                         // Set outside temp reporting variable of TDD:DOME (since it gets skipped otherwise)
@@ -7755,8 +7753,8 @@ namespace HeatBalanceSurfaceManager {
                     DataSurfaces::SurfWinHeatTransferRepEnergy(surfNum) = DataSurfaces::SurfWinHeatGain(surfNum) * state.dataGlobal->TimeStepZoneSec;
                     if (DataSurfaces::SurfWinOriginalClass(surfNum) == DataSurfaces::SurfaceClass::TDD_Diffuser) { // Tubular daylighting device
                         int pipeNum = DataSurfaces::SurfWinTDDPipeNum(surfNum);
-                        DataDaylightingDevices::TDDPipe(pipeNum).HeatGain = DataSurfaces::SurfWinHeatGainRep(surfNum);
-                        DataDaylightingDevices::TDDPipe(pipeNum).HeatLoss = DataSurfaces::SurfWinHeatLossRep(surfNum);
+                        state.dataDaylightingDevicesData->TDDPipe(pipeNum).HeatGain = DataSurfaces::SurfWinHeatGainRep(surfNum);
+                        state.dataDaylightingDevicesData->TDDPipe(pipeNum).HeatLoss = DataSurfaces::SurfWinHeatLossRep(surfNum);
                     }
                     if (DataSurfaces::Surface(surfNum).ExtSolar) { // WindowManager's definition of ZoneWinHeatGain/Loss
                         int zoneNum = DataSurfaces::Surface(surfNum).Zone;
@@ -7997,7 +7995,6 @@ namespace HeatBalanceSurfaceManager {
         using DataMoistureBalance::RhoVaporAirOut;
         using DataMoistureBalance::RhoVaporSurfIn;
         using DataMoistureBalance::TempOutsideAirFD;
-        using namespace DataDaylightingDevices;
         using namespace Psychrometrics;
 
         // Locals
@@ -8053,9 +8050,9 @@ namespace HeatBalanceSurfaceManager {
 
             // Lookup up the TDD:DIFFUSER object
             int PipeNum = SurfWinTDDPipeNum(SurfNum);
-            int SurfNum2 = TDDPipe(PipeNum).Diffuser;
+            int SurfNum2 = state.dataDaylightingDevicesData->TDDPipe(PipeNum).Diffuser;
             int ZoneNum2 = Surface(SurfNum2).Zone;
-            Real64 Ueff = 1.0 / TDDPipe(PipeNum).Reff; // 1 / effective R value between TDD:DOME and TDD:DIFFUSER
+            Real64 Ueff = 1.0 / state.dataDaylightingDevicesData->TDDPipe(PipeNum).Reff; // 1 / effective R value between TDD:DOME and TDD:DIFFUSER
             F1 = Ueff / (Ueff + HConvIn(SurfNum2));
 
             // Similar to opaque surface but inside conditions of TDD:DIFFUSER are used, and no embedded sources/sinks.

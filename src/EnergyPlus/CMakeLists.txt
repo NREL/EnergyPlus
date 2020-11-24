@@ -150,7 +150,6 @@ SET( SRC
   DataDElight.cc
   DataDElight.hh
   DataDaylighting.hh
-  DataDaylightingDevices.cc
   DataDaylightingDevices.hh
   DataDefineEquip.cc
   DataDefineEquip.hh

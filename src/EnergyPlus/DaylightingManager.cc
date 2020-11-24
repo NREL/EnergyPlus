@@ -148,7 +148,6 @@ namespace DaylightingManager {
     using namespace DataHeatBalance;
     using namespace DataSurfaces;
     using namespace DataEnvironment;
-    using namespace DataDaylightingDevices;
     using DataBSDFWindow::BSDFDaylghtPosition;
 
     using namespace ScheduleManager;
@@ -432,7 +431,7 @@ namespace DaylightingManager {
 
                 // Daylighting shelf simplification:  All light goes up to the ceiling regardless of orientation of shelf
                 if (Surface(IWin).Shelf > 0) {
-                    if (Shelf(Surface(IWin).Shelf).InSurf > 0) SurfWinFractionUpgoing(IWin) = 1.0;
+                    if (state.dataDaylightingDevicesData->Shelf(Surface(IWin).Shelf).InSurf > 0) SurfWinFractionUpgoing(IWin) = 1.0;
                 }
             }
         }
@@ -585,9 +584,9 @@ namespace DaylightingManager {
             // Used in calculating daylighting through interior windows.
             CalcMinIntWinSolidAngs(state);
 
-            TDDTransVisBeam.allocate(24, NumOfTDDPipes);
-            TDDFluxInc.allocate(24, 4, NumOfTDDPipes);
-            TDDFluxTrans.allocate(24, 4, NumOfTDDPipes);
+            TDDTransVisBeam.allocate(24, state.dataDaylightingDevicesData->NumOfTDDPipes);
+            TDDFluxInc.allocate(24, 4, state.dataDaylightingDevicesData->NumOfTDDPipes);
+            TDDFluxTrans.allocate(24, 4, state.dataDaylightingDevicesData->NumOfTDDPipes);
 
             // Warning if detailed daylighting has been requested for a zone with no associated exterior windows.
             for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
@@ -614,9 +613,9 @@ namespace DaylightingManager {
             TDDFluxInc = 0.0;
             TDDFluxTrans = 0.0;
         } else {
-            TDDTransVisBeam(state.dataGlobal->HourOfDay, {1, NumOfTDDPipes}) = 0.0;
-            TDDFluxInc(state.dataGlobal->HourOfDay, {1, 4}, {1, NumOfTDDPipes}) = 0.0;
-            TDDFluxTrans(state.dataGlobal->HourOfDay, {1, 4}, {1, NumOfTDDPipes}) = 0.0;
+            TDDTransVisBeam(state.dataGlobal->HourOfDay, {1, state.dataDaylightingDevicesData->NumOfTDDPipes}) = 0.0;
+            TDDFluxInc(state.dataGlobal->HourOfDay, {1, 4}, {1, state.dataDaylightingDevicesData->NumOfTDDPipes}) = 0.0;
+            TDDFluxTrans(state.dataGlobal->HourOfDay, {1, 4}, {1, state.dataDaylightingDevicesData->NumOfTDDPipes}) = 0.0;
         }
 
         if (!DetailedSolarTimestepIntegration) {
@@ -1876,7 +1875,7 @@ namespace DaylightingManager {
 
         ShelfNum = Surface(IWin).Shelf;
         if (ShelfNum > 0) {
-            InShelfSurf = Shelf(Surface(IWin).Shelf).InSurf; // Inside daylighting shelf present if > 0
+            InShelfSurf = state.dataDaylightingDevicesData->Shelf(Surface(IWin).Shelf).InSurf; // Inside daylighting shelf present if > 0
         } else {
             InShelfSurf = 0;
         }
@@ -2033,7 +2032,7 @@ namespace DaylightingManager {
 
             // Look up the TDD:DOME object
             PipeNum = SurfWinTDDPipeNum(IWin);
-            IWin2 = TDDPipe(PipeNum).Dome;
+            IWin2 = state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome;
 
             // Calculate reference point coords relative to the diffuser coordinate system
             // W21, W23, and WNORM are the unit vectors
@@ -2354,7 +2353,7 @@ namespace DaylightingManager {
                 // Look up the TDD:DOME object
                 PipeNum = SurfWinTDDPipeNum(IWin);
                 // Unshaded visible transmittance of TDD for a single ray from sky/ground element
-                TVISB = TransTDD(state, PipeNum, COSB, VisibleBeam) * SurfWinGlazedFrac(IWin);
+                TVISB = TransTDD(state, PipeNum, COSB, DataDaylightingDevices::iRadType::VisibleBeam) * SurfWinGlazedFrac(IWin);
 
             } else { // Regular window
                 if (SurfWinWindowModelType(IWin) != WindowBSDFModel) {
@@ -5544,8 +5543,6 @@ namespace DaylightingManager {
 
         // Using/Aliasing
         using DataHeatBalance::Zone;
-        using namespace DataDaylightingDevices;
-
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
         // na
@@ -5566,8 +5563,8 @@ namespace DaylightingManager {
 
         ErrorsFound = false;
 
-        for (PipeNum = 1; PipeNum <= NumOfTDDPipes; ++PipeNum) {
-            SurfNum = TDDPipe(PipeNum).Diffuser;
+        for (PipeNum = 1; PipeNum <= state.dataDaylightingDevicesData->NumOfTDDPipes; ++PipeNum) {
+            SurfNum = state.dataDaylightingDevicesData->TDDPipe(PipeNum).Diffuser;
             if (SurfNum > 0) {
                 bool daylightControlFound = false;
                 int const pipeEnclNum = Zone(Surface(SurfNum).Zone).SolarEnclosureNum;
@@ -5577,21 +5574,21 @@ namespace DaylightingManager {
                     }
                 }
                 if (!daylightControlFound) {
-                    ShowWarningError(state, "DaylightingDevice:Tubular = " + TDDPipe(PipeNum).Name + ":  is not connected to a Zone that has Daylighting, no visible transmittance will be modeled through the daylighting device.");
+                    ShowWarningError(state, "DaylightingDevice:Tubular = " + state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name + ":  is not connected to a Zone that has Daylighting, no visible transmittance will be modeled through the daylighting device.");
                 }
 
             } else { // SurfNum == 0
                 // should not come here (would have already been caught in TDD get input), but is an error
-                ShowSevereError(state, "DaylightingDevice:Tubular = " + TDDPipe(PipeNum).Name + ":  Diffuser surface not found ");
+                ShowSevereError(state, "DaylightingDevice:Tubular = " + state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name + ":  Diffuser surface not found ");
                 ErrorsFound = true;
             }
         } // PipeNum
 
-        for (ShelfNum = 1; ShelfNum <= NumOfShelf; ++ShelfNum) {
-            SurfNum = Shelf(ShelfNum).Window;
+        for (ShelfNum = 1; ShelfNum <= state.dataDaylightingDevicesData->NumOfShelf; ++ShelfNum) {
+            SurfNum = state.dataDaylightingDevicesData->Shelf(ShelfNum).Window;
             if (SurfNum == 0) {
                 // should not come here (would have already been caught in shelf get input), but is an error
-                ShowSevereError(state, "DaylightingDevice:Shelf = " + Shelf(ShelfNum).Name + ":  window not found ");
+                ShowSevereError(state, "DaylightingDevice:Shelf = " + state.dataDaylightingDevicesData->Shelf(ShelfNum).Name + ":  window not found ");
                 ErrorsFound = true;
             }
         } // ShelfNum
@@ -7296,9 +7293,9 @@ namespace DaylightingManager {
         }
 
         // Calculate and report TDD visible transmittances
-        for (PipeNum = 1; PipeNum <= NumOfTDDPipes; ++PipeNum) {
+        for (PipeNum = 1; PipeNum <= state.dataDaylightingDevicesData->NumOfTDDPipes; ++PipeNum) {
 
-            TDDPipe(PipeNum).TransVisBeam =
+            state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransVisBeam =
                 state.dataGlobal->WeightNow * TDDTransVisBeam(state.dataGlobal->HourOfDay, PipeNum) + state.dataGlobal->WeightPreviousHour * TDDTransVisBeam(state.dataGlobal->PreviousHour, PipeNum);
 
             for (ISky = 1; ISky <= 4; ++ISky) {
@@ -7317,7 +7314,7 @@ namespace DaylightingManager {
                 TDDTransVisDiff(ISky) = state.dataGlobal->WeightNow * TDDTransVisDiffNow + state.dataGlobal->WeightPreviousHour * TDDTransVisDiffPrev;
             } // ISky
 
-            TDDPipe(PipeNum).TransVisDiff = SkyWeight * TDDTransVisDiff(ISky1) + (1.0 - SkyWeight) * TDDTransVisDiff(ISky2);
+            state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransVisDiff = SkyWeight * TDDTransVisDiff(ISky1) + (1.0 - SkyWeight) * TDDTransVisDiff(ISky2);
         } // PipeNum
     }
 
@@ -7807,8 +7804,8 @@ namespace DaylightingManager {
 
         ShelfNum = Surface(IWin).Shelf;
         if (ShelfNum > 0) {
-            InShelfSurf = Shelf(ShelfNum).InSurf;   // Inside daylighting shelf present if > 0
-            OutShelfSurf = Shelf(ShelfNum).OutSurf; // Outside daylighting shelf present if > 0
+            InShelfSurf = state.dataDaylightingDevicesData->Shelf(ShelfNum).InSurf;   // Inside daylighting shelf present if > 0
+            OutShelfSurf = state.dataDaylightingDevicesData->Shelf(ShelfNum).OutSurf; // Outside daylighting shelf present if > 0
         } else {
             InShelfSurf = 0;
             OutShelfSurf = 0;
@@ -8001,7 +7998,7 @@ namespace DaylightingManager {
 
                 if (SurfWinOriginalClass(IWin) == SurfaceClass::TDD_Dome) {
                     // Unshaded visible transmittance of TDD for a single ray from sky/ground element
-                    TVISBR = TransTDD(state, PipeNum, COSB, VisibleBeam) * SurfWinGlazedFrac(IWin);
+                    TVISBR = TransTDD(state, PipeNum, COSB, DataDaylightingDevices::iRadType::VisibleBeam) * SurfWinGlazedFrac(IWin);
 
                     // Make all transmitted light diffuse for a TDD with a bare diffuser
                     for (ISky = 1; ISky <= 4; ++ISky) {
@@ -8122,7 +8119,7 @@ namespace DaylightingManager {
                     if (ShadeOn) { // Shade
                         if (SurfWinOriginalClass(IWin) == SurfaceClass::TDD_Dome) {
                             // Shaded visible transmittance of TDD for a single ray from sky/ground element
-                            TransMult(1) = TransTDD(state, PipeNum, COSB, VisibleBeam) * SurfWinGlazedFrac(IWin);
+                            TransMult(1) = TransTDD(state, PipeNum, COSB, DataDaylightingDevices::iRadType::VisibleBeam) * SurfWinGlazedFrac(IWin);
                         } else { // Shade only, no TDD
                             // Calculate transmittance of the combined window and shading device for this sky/ground element
                             TransMult(1) = POLYF(COSB, state.dataConstruction->Construct(IConstShaded).TransVisBeamCoef) * SurfWinGlazedFrac(IWin) *
@@ -8246,13 +8243,13 @@ namespace DaylightingManager {
             for (ISky = 1; ISky <= 4; ++ISky) {
                 // This is only an estimate because the anisotropic sky view of the shelf is not yet taken into account.
                 // AnisoSkyMult would be great to use but it is not available until the heat balance starts up.
-                ZSK(ISky) = GILSK(IHR, ISky) * 1.0 * Shelf(ShelfNum).OutReflectVis * Shelf(ShelfNum).ViewFactor;
+                ZSK(ISky) = GILSK(IHR, ISky) * 1.0 * state.dataDaylightingDevicesData->Shelf(ShelfNum).OutReflectVis * state.dataDaylightingDevicesData->Shelf(ShelfNum).ViewFactor;
 
                 // SurfaceWindow(IWin)%FractionUpgoing is already set to 1.0 earlier
                 FLCWSK(1, ISky) += ZSK(ISky) * TVISBR * SurfWinFractionUpgoing(IWin);
 
                 if (ISky == 1) {
-                    ZSU = GILSU(IHR) * SunlitFracHR(IHR, OutShelfSurf) * Shelf(ShelfNum).OutReflectVis * Shelf(ShelfNum).ViewFactor;
+                    ZSU = GILSU(IHR) * SunlitFracHR(IHR, OutShelfSurf) * state.dataDaylightingDevicesData->Shelf(ShelfNum).OutReflectVis * state.dataDaylightingDevicesData->Shelf(ShelfNum).ViewFactor;
                     FLCWSU(1) += ZSU * TVISBR * SurfWinFractionUpgoing(IWin);
                 }
             } // ISKY
@@ -8296,7 +8293,7 @@ namespace DaylightingManager {
 
                 if (SurfWinOriginalClass(IWin) == SurfaceClass::TDD_Dome) {
                     // Unshaded visible transmittance of TDD for collimated beam from the sun
-                    TVISBSun = TransTDD(state, PipeNum, COSBSun, VisibleBeam) * SurfWinGlazedFrac(IWin);
+                    TVISBSun = TransTDD(state, PipeNum, COSBSun, DataDaylightingDevices::iRadType::VisibleBeam) * SurfWinGlazedFrac(IWin);
                     TDDTransVisBeam(IHR, PipeNum) = TVISBSun;
 
                     FLFWSUdisk(1) = 0.0; // Diffuse light only
@@ -8335,7 +8332,7 @@ namespace DaylightingManager {
                         if (ShadeOn || ScreenOn || SurfWinSolarDiffusing(IWin)) { // Shade or screen on or diffusing glass
                             if (SurfWinOriginalClass(IWin) == SurfaceClass::TDD_Dome) {
                                 // Shaded visible transmittance of TDD for collimated beam from the sun
-                                TransMult(1) = TransTDD(state, PipeNum, COSBSun, VisibleBeam) * SurfWinGlazedFrac(IWin);
+                                TransMult(1) = TransTDD(state, PipeNum, COSBSun, DataDaylightingDevices::iRadType::VisibleBeam) * SurfWinGlazedFrac(IWin);
                             } else {
                                 if (ScreenOn) {
                                     TransMult(1) = SurfaceScreens(SurfWinScreenNumber(IWin)).BmBmTransVis * SurfWinGlazedFrac(IWin) *

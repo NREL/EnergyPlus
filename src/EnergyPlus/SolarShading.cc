@@ -5961,7 +5961,6 @@ namespace SolarShading {
         using General::InterpSw;
         using General::POLYF;
         using ScheduleManager::GetCurrentScheduleValue;
-        using namespace DataDaylightingDevices;
         using DaylightingDevices::TransTDD;
         using namespace DataWindowEquivalentLayer;
 
@@ -6048,8 +6047,8 @@ namespace SolarShading {
                 SurfOpaqAO(SurfNum) = 0.0;
             }
         }
-        if (NumOfTDDPipes > 0) {
-            for (auto &e : TDDPipe) {
+        if (state.dataDaylightingDevicesData->NumOfTDDPipes > 0) {
+            for (auto &e : state.dataDaylightingDevicesData->TDDPipe) {
                 int SurfDome = e.Dome;
                 for (int lay = 1; lay <= CFSMAXNL + 1; ++lay) {
                     SurfWinA(lay, SurfDome) = 0.0;
@@ -6110,14 +6109,14 @@ namespace SolarShading {
                 int SurfNum2 = SurfNum;
                 int PipeNum = SurfWinTDDPipeNum(SurfNum);
                 if (SurfWinOriginalClass(SurfNum) == SurfaceClass::TDD_Diffuser) {
-                    SurfNum2 = TDDPipe(PipeNum).Dome;
+                    SurfNum2 = state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome;
                 }
                 int InShelfSurf = 0; // Inside daylighting shelf surface number
                 int OutShelfSurf = 0; // Outside daylighting shelf surface number
                 int ShelfNum = Surface(SurfNum).Shelf;
                 if (ShelfNum > 0) { // Daylighting shelf
-                    InShelfSurf = Shelf(ShelfNum).InSurf;
-                    OutShelfSurf = Shelf(ShelfNum).OutSurf;
+                    InShelfSurf = state.dataDaylightingDevicesData->Shelf(ShelfNum).InSurf;
+                    OutShelfSurf = state.dataDaylightingDevicesData->Shelf(ShelfNum).OutSurf;
                 }
                 Real64 CosInc = CosIncAng(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum2);
                 Real64 SunLitFract = SunlitFrac(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum2);
@@ -6520,7 +6519,7 @@ namespace SolarShading {
                         // Construct( Surface( SurfNum ).Construction ).TransDiff = NomDiffTrans;
                     }
                 } else if (SurfWinOriginalClass(SurfNum) == SurfaceClass::TDD_Diffuser) {
-                    DiffTrans = TransTDD(state, PipeNum, CosInc, SolarAniso);
+                    DiffTrans = TransTDD(state, PipeNum, CosInc, DataDaylightingDevices::iRadType::SolarAniso);
                 } else {
                     DiffTrans = state.dataConstruction->Construct(ConstrNum).TransDiff;
                 }
@@ -6566,8 +6565,8 @@ namespace SolarShading {
                 // Beam-beam transmittance for bare exterior window
                 if (SunLitFract > 0.0) {
                     if (SurfWinOriginalClass(SurfNum) == SurfaceClass::TDD_Diffuser) {
-                        TBmDif = TransTDD(state, PipeNum, CosInc, SolarBeam);
-                        TDDPipe(PipeNum).TransSolBeam = TBmDif; // Report variable
+                        TBmDif = TransTDD(state, PipeNum, CosInc, DataDaylightingDevices::iRadType::SolarBeam);
+                        state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransSolBeam = TBmDif; // Report variable
                     } else if (SurfWinWindowModelType(SurfNum) != WindowBSDFModel &&
                                SurfWinWindowModelType(SurfNum) != WindowEQLModel) { // Regular window
                         if (!SurfWinSolarDiffusing(SurfNum)) {                      // Clear glazing
@@ -6597,7 +6596,7 @@ namespace SolarShading {
 
                 // Diffuse-diffuse transmittance for bare exterior window
                 if (SurfWinOriginalClass(SurfNum) == SurfaceClass::TDD_Diffuser) {
-                    TDifBare = TransTDD(state, PipeNum, CosInc, SolarAniso);
+                    TDifBare = TransTDD(state, PipeNum, CosInc, DataDaylightingDevices::iRadType::SolarAniso);
                 } else {
                     if (SurfWinWindowModelType(SurfNum) == WindowBSDFModel) {
                         // Complex Fenestration: use hemispherical ave of directional-hemispherical transmittance
@@ -7738,20 +7737,20 @@ namespace SolarShading {
                         int ShelfNum = Surface(SurfNum).Shelf;
                         int OutShelfSurf = 0;
                         if (ShelfNum > 0) { // Outside daylighting shelf
-                            OutShelfSurf = Shelf(ShelfNum).OutSurf;
+                            OutShelfSurf = state.dataDaylightingDevicesData->Shelf(ShelfNum).OutSurf;
                         }
 
                         // This lookup may be avoid if this 2nd surf loop can be combined with the 1st
                         if (SurfWinOriginalClass(SurfNum) == SurfaceClass::TDD_Diffuser) {
                             int PipeNum = SurfWinTDDPipeNum(SurfNum);
-                            int SurfNum2 = TDDPipe(PipeNum).Dome;
+                            int SurfNum2 = state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome;
                             Real64 CosInc = CosIncAng(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum2);
                             // Exterior diffuse solar incident on window (W/m2)
                             Real64 DifSolarInc = DifSolarRad * AnisoSkyMult(SurfNum2) + GndSolarRad * Surface(SurfNum2).ViewFactorGround;
                             // Exterior diffuse sky solar transmitted by TDD (W/m2)
-                            Real64 SkySolarTrans = DifSolarRad * TransTDD(state, PipeNum, CosInc, SolarAniso) * AnisoSkyMult(SurfNum2);
+                            Real64 SkySolarTrans = DifSolarRad * TransTDD(state, PipeNum, CosInc, DataDaylightingDevices::iRadType::SolarAniso) * AnisoSkyMult(SurfNum2);
                             // Exterior diffuse ground solar transmitted by TDD (W/m2)
-                            Real64 GndSolarTrans = GndSolarRad * TDDPipe(PipeNum).TransSolIso * Surface(SurfNum2).ViewFactorGround;
+                            Real64 GndSolarTrans = GndSolarRad * state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransSolIso * Surface(SurfNum2).ViewFactorGround;
 
                             SurfWinBmSolar(SurfNum) = BeamSolarRad * WinTransBmSolar(SurfNum);
                             SurfWinDifSolar(SurfNum) = SkySolarTrans * Surface(SurfNum).Area + GndSolarTrans * Surface(SurfNum).Area;
@@ -7761,22 +7760,22 @@ namespace SolarShading {
                             SurfWinTransSolar(SurfNum) = SurfWinBmSolar(SurfNum) + SurfWinDifSolar(SurfNum); //[W]
                             SurfWinTransSolarEnergy(SurfNum) = SurfWinTransSolar(SurfNum) * state.dataGlobal->TimeStepZoneSec;
 
-                            TDDPipe(PipeNum).TransmittedSolar = SurfWinTransSolar(SurfNum);
+                            state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransmittedSolar = SurfWinTransSolar(SurfNum);
                             // TDDPipe(PipeNum)%TransSolBeam = TBmBm ! Reported above
                             if (DifSolarInc > 0) {
-                                TDDPipe(PipeNum).TransSolDiff = (SkySolarTrans + GndSolarTrans) / DifSolarInc;
+                                state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransSolDiff = (SkySolarTrans + GndSolarTrans) / DifSolarInc;
                             } else {
-                                TDDPipe(PipeNum).TransSolDiff = 0.0;
+                                state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransSolDiff = 0.0;
                             }
 
                         } else if (OutShelfSurf > 0) { // Outside daylighting shelf
                             Real64 ShelfSolarRad =
                                     (BeamSolarRad * SunlitFrac(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, OutShelfSurf) * CosIncAng(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, OutShelfSurf) +
                                      DifSolarRad * AnisoSkyMult(OutShelfSurf)) *
-                                    Shelf(ShelfNum).OutReflectSol;
+                                    state.dataDaylightingDevicesData->Shelf(ShelfNum).OutReflectSol;
 
                             Real64 DifSolarInc = DifSolarRad * AnisoSkyMult(SurfNum) + GndSolarRad * Surface(SurfNum).ViewFactorGround +
-                                          ShelfSolarRad * Shelf(ShelfNum).ViewFactor;
+                                          ShelfSolarRad * state.dataDaylightingDevicesData->Shelf(ShelfNum).ViewFactor;
 
                             SurfWinBmSolar(SurfNum) = BeamSolarRad * WinTransBmSolar(SurfNum);
                             SurfWinDifSolar(SurfNum) = DifSolarInc * WinTransDifSolar(SurfNum);
@@ -7854,8 +7853,6 @@ namespace SolarShading {
         // PURPOSE OF THIS SUBROUTINE:
         // Calculates solar energy absorbed on exterior opaque surfaces
 
-        using namespace DataDaylightingDevices;
-
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             for (int SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
                 if (((Surface(SurfNum).ExtBoundCond != ExternalEnvironment) && (Surface(SurfNum).ExtBoundCond != OtherSideCondModeledExt)) &&
@@ -7874,7 +7871,7 @@ namespace SolarShading {
                 int SurfNum2 = 0;
                 if (SurfWinOriginalClass(SurfNum) == SurfaceClass::TDD_Diffuser) {
                     int PipeNum = SurfWinTDDPipeNum(SurfNum);
-                    SurfNum2 = TDDPipe(PipeNum).Dome;
+                    SurfNum2 = state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome;
                 } else {
                     SurfNum2 = SurfNum;
                 }
@@ -7928,7 +7925,6 @@ namespace SolarShading {
         // and interior beam from exterior window that is absorbed/transmitted by back surfaces
 
         using ScheduleManager::GetCurrentScheduleValue;
-        using namespace DataDaylightingDevices;
         using namespace MultiLayerOptics;
 
         if (state.dataSolarShading->MustAllocSolarShading) {
@@ -7957,7 +7953,7 @@ namespace SolarShading {
                 int SurfNum2 = 0;
                 if (SurfWinOriginalClass(SurfNum) == SurfaceClass::TDD_Diffuser) {
                     int PipeNum = SurfWinTDDPipeNum(SurfNum);
-                    SurfNum2 = TDDPipe(PipeNum).Dome;
+                    SurfNum2 = state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome;
                 } else {
                     SurfNum2 = SurfNum;
                 }
