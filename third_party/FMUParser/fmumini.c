@@ -304,7 +304,6 @@ const char *password;
     uInt size_buf;
 
     unz_file_info64 file_info;
-    uLong ratio = 0;
     err = unzGetCurrentFileInfo64(uf, &file_info, filename_inzip, sizeof(filename_inzip), NULL, 0, NULL, 0);
 
     if (err != UNZ_OK) {
@@ -428,7 +427,6 @@ const char *password;
     uLong i;
     unz_global_info64 gi;
     int err;
-    FILE *fout = NULL;
 
     err = unzGetGlobalInfo64(uf, &gi);
     if (err != UNZ_OK) printf("error %d with zipfile in unzGetGlobalInfo \n", err);
@@ -454,7 +452,6 @@ int opt_extract_without_path;
 int opt_overwrite;
 const char *password;
 {
-    int err = UNZ_OK;
     if (unzLocateFile(uf, filename, CASESENSITIVITY) != UNZ_OK) {
         printf("file %s not found in the zipfile\n", filename);
         return 2;
@@ -476,14 +473,11 @@ const char *password;
 int unpackmz(const char *filNam, char *tmpPat)
 {
     const char *zipfilename = filNam;
-    const char *filename_to_extract = NULL;
     const char *password = NULL;
     char filename_try[MAXFILENAME + 16] = "";
     int ret_value = 0;
-    int opt_do_extract = 1;
     int opt_do_extract_withoutpath = 0;
     int opt_overwrite = 1;
-    int opt_extractdir = 1;
     const char *dirname = tmpPat;
     char *cmd;
     char cwd[1024];

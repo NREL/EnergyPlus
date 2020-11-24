@@ -50,9 +50,7 @@ void doubleToCommaString(char *buffer, double r)
 /////////////////////////////////////////////////////////////////////////
 int delete (char *tmpPat)
 {
-    int version = 0;
     char *cmd;
-    char *filenames;
     struct stat st;
 
     // Ceck if the folder present

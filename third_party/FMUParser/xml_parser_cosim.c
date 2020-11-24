@@ -929,11 +929,8 @@ void printidf(const char *fmuFilNam, ModelDescription *md)
 {
     FILE *fp;
 
-    char type[12];
     int i, j, varname, vardes = -1;
     void **list;
-    ScalarVariable *se;
-    Element *ee;
 
     fp = fopen("tmp.idf", "w");
 

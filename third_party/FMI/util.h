@@ -23,6 +23,7 @@
 #define HANDLE void *
 /* See http://www.yolinux.com/TUTORIALS/LibraryArchives-StaticAndDynamic.html */
 #include <sys/stat.h> // for creating dirs on Linux
+#include <stddef.h>   // defines size_t
 #endif
 
 // static char* getfmuPat(const char* fmuFilNam);

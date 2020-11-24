@@ -17,6 +17,7 @@
 /// in .dll
 ///////////////////////////////////////////////////////
 
+#include "FMI/fmiModelFunctions.h"
 #include "fmiModelTypes.h"
 #include <stdlib.h>
 /* Export fmi functions on Windows */

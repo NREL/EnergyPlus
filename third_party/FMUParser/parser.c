@@ -45,7 +45,7 @@ int callparser(const char *fmuFilNam, const char *tmpPat)
     char *filNam, *tmp, *ext;
 
     // Get the model description
-    xmlPat = calloc(strlen(fmuFilNam) + strlen(XML_FILE) - 1, sizeof(char));
+    xmlPat = (char *)calloc(strlen(fmuFilNam) + strlen(XML_FILE) - 1, sizeof(char));
     printfDebug("fmuFilNam is \"%s\"\n", fmuFilNam);
     printfDebug("Start to parse model description file\n", xmlPat);
     sprintf(xmlPat, "%s%s%s", tmpPat, PATH_SEP, XML_FILE);
@@ -231,8 +231,9 @@ int main(int argc, char *argv[])
         }
 
         return -1;
-    } else
+    } else {
         printfDebug("FMU file/folder name is \"%s\".\n", fmuFilNam);
+    }
 
     // Check command line arguments
     switch (opt) {
