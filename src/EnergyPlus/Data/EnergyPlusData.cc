@@ -85,6 +85,7 @@ namespace EnergyPlus {
         this->dataCrossVentMgr = std::make_unique<CrossVentMgrData>();
         this->dataCTElectricGenerator = std::make_unique<CTElectricGeneratorData>();
         this->dataCurveManager = std::make_unique<CurveManagerData>();
+        this->dataDaylightingData = std::make_unique<DaylightingData>();
         this->dataEIRPlantLoopHeatPump = std::make_unique<EIRPlantLoopHeatPumpsData>();
         this->dataExteriorEnergyUse = std::make_unique<ExteriorEnergyUseData>();
         this->dataFans = std::make_unique<FansData>();
@@ -169,6 +170,7 @@ namespace EnergyPlus {
         this->dataCrossVentMgr->clear_state();
         this->dataCTElectricGenerator->clear_state();
         this->dataCurveManager->clear_state();
+        this->dataDaylightingData->clear_state();
         this->dataEIRPlantLoopHeatPump->clear_state();
         this->dataExteriorEnergyUse->clear_state();
         this->dataFans->clear_state();

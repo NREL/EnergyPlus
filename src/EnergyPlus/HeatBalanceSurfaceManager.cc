@@ -353,10 +353,6 @@ namespace HeatBalanceSurfaceManager {
         // na
 
         // Using/Aliasing
-        using DataDaylighting::mapResultsToReport;
-        using DataDaylighting::NoDaylighting;
-        using DataDaylighting::TotIllumMaps;
-        using DataDaylighting::ZoneDaylight;
         using DataDaylightingDevices::NumOfTDDPipes;
         using DataDElight::LUX2FC;
         using namespace SolarShading;
@@ -543,17 +539,17 @@ namespace HeatBalanceSurfaceManager {
         }
 
         for (int NZ = 1; NZ <= state.dataGlobal->NumOfZones; ++NZ) {
-            if (ZoneDaylight(NZ).DaylightMethod == NoDaylighting) continue;
-            ZoneDaylight(NZ).DaylIllumAtRefPt = 0.0;
-            ZoneDaylight(NZ).GlareIndexAtRefPt = 0.0;
-            ZoneDaylight(NZ).ZonePowerReductionFactor = 1.0;
-            ZoneDaylight(NZ).InterReflIllFrIntWins = 0.0; // inter-reflected illuminance from interior windows
-            if (ZoneDaylight(NZ).TotalDaylRefPoints != 0) {
-                ZoneDaylight(NZ).TimeExceedingGlareIndexSPAtRefPt = 0.0;
-                ZoneDaylight(NZ).TimeExceedingDaylightIlluminanceSPAtRefPt = 0.0;
+            if (state.dataDaylightingData->ZoneDaylight(NZ).DaylightMethod == DataDaylighting::iDaylightingMethod::NoDaylighting) continue;
+            state.dataDaylightingData->ZoneDaylight(NZ).DaylIllumAtRefPt = 0.0;
+            state.dataDaylightingData->ZoneDaylight(NZ).GlareIndexAtRefPt = 0.0;
+            state.dataDaylightingData->ZoneDaylight(NZ).ZonePowerReductionFactor = 1.0;
+            state.dataDaylightingData->ZoneDaylight(NZ).InterReflIllFrIntWins = 0.0; // inter-reflected illuminance from interior windows
+            if (state.dataDaylightingData->ZoneDaylight(NZ).TotalDaylRefPoints != 0) {
+                state.dataDaylightingData->ZoneDaylight(NZ).TimeExceedingGlareIndexSPAtRefPt = 0.0;
+                state.dataDaylightingData->ZoneDaylight(NZ).TimeExceedingDaylightIlluminanceSPAtRefPt = 0.0;
             }
 
-            if (SunIsUp && ZoneDaylight(NZ).TotalDaylRefPoints != 0) {
+            if (SunIsUp && state.dataDaylightingData->ZoneDaylight(NZ).TotalDaylRefPoints != 0) {
                 if (InitSurfaceHeatBalancefirstTime) DisplayString(state, "Computing Interior Daylighting Illumination");
                 DayltgInteriorIllum(state, NZ);
                 if (!state.dataGlobal->DoingSizing) DayltgInteriorMapIllum(state, NZ);
@@ -566,7 +562,7 @@ namespace HeatBalanceSurfaceManager {
 
             // RJH DElight Modification Begin - Call to DElight electric lighting control subroutine
             // Check if the sun is up and the current Thermal Zone hosts a Daylighting:DElight object
-            if (SunIsUp && ZoneDaylight(NZ).TotalDaylRefPoints != 0 && (ZoneDaylight(NZ).DaylightMethod == DataDaylighting::DElightDaylighting)) {
+            if (SunIsUp && state.dataDaylightingData->ZoneDaylight(NZ).TotalDaylRefPoints != 0 && (state.dataDaylightingData->ZoneDaylight(NZ).DaylightMethod == DataDaylighting::iDaylightingMethod::DElightDaylighting)) {
                 // Call DElight interior illuminance and electric lighting control subroutine
                 Real64 dPowerReducFac = 1.0;       // Return value Electric Lighting Power Reduction Factor for current Zone and Timestep
                 Real64 dHISKFFC = HISKF * LUX2FC;
@@ -670,8 +666,8 @@ namespace HeatBalanceSurfaceManager {
                         // Increment refpt counter
                         ++iDElightRefPt;
                         // Assure refpt index does not exceed number of refpts in this zone
-                        if (iDElightRefPt <= ZoneDaylight(NZ).TotalDaylRefPoints) {
-                            ZoneDaylight(NZ).DaylIllumAtRefPt(iDElightRefPt) = dRefPtIllum;
+                        if (iDElightRefPt <= state.dataDaylightingData->ZoneDaylight(NZ).TotalDaylRefPoints) {
+                            state.dataDaylightingData->ZoneDaylight(NZ).DaylIllumAtRefPt(iDElightRefPt) = dRefPtIllum;
                         }
                     }
 
@@ -683,7 +679,7 @@ namespace HeatBalanceSurfaceManager {
                 }
                 // Store the calculated total zone Power Reduction Factor due to DElight daylighting
                 // in the ZoneDaylight structure for later use
-                ZoneDaylight(NZ).ZonePowerReductionFactor = dPowerReducFac;
+                state.dataDaylightingData->ZoneDaylight(NZ).ZonePowerReductionFactor = dPowerReducFac;
             }
             // RJH DElight Modification End - Call to DElight electric lighting control subroutine
         }
@@ -713,19 +709,19 @@ namespace HeatBalanceSurfaceManager {
         InitSolarHeatGains(state);
         if (SunIsUp && (BeamSolarRad + GndSolarRad + DifSolarRad > 0.0)) {
             for (int NZ = 1; NZ <= state.dataGlobal->NumOfZones; ++NZ) {
-                if (ZoneDaylight(NZ).TotalDaylRefPoints > 0) {
+                if (state.dataDaylightingData->ZoneDaylight(NZ).TotalDaylRefPoints > 0) {
                     if (Zone(NZ).HasInterZoneWindow) {
                         DayltgInterReflIllFrIntWins(state, NZ);
-                        DayltgGlareWithIntWins(ZoneDaylight(NZ).GlareIndexAtRefPt, NZ);
+                        DayltgGlareWithIntWins(state, state.dataDaylightingData->ZoneDaylight(NZ).GlareIndexAtRefPt, NZ);
                     }
                     DayltgElecLightingControl(state, NZ);
                 }
             }
-        } else if (mapResultsToReport && state.dataGlobal->TimeStep == state.dataGlobal->NumOfTimeStepInHour) {
-            for (int MapNum = 1; MapNum <= TotIllumMaps; ++MapNum) {
+        } else if (state.dataDaylightingData->mapResultsToReport && state.dataGlobal->TimeStep == state.dataGlobal->NumOfTimeStepInHour) {
+            for (int MapNum = 1; MapNum <= state.dataDaylightingData->TotIllumMaps; ++MapNum) {
                 ReportIllumMap(state, MapNum);
             }
-            mapResultsToReport = false;
+            state.dataDaylightingData->mapResultsToReport = false;
         }
 
         if (InitSurfaceHeatBalancefirstTime) DisplayString(state, "Initializing Internal Heat Gains");
@@ -5307,7 +5303,7 @@ namespace HeatBalanceSurfaceManager {
             reportVisualResilienceFirstTime = false;
             bool hasDayLighting = false;
             for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-                if (DataDaylighting::ZoneDaylight(ZoneNum).DaylightMethod != DataDaylighting::NoDaylighting) {
+                if (state.dataDaylightingData->ZoneDaylight(ZoneNum).DaylightMethod != DataDaylighting::iDaylightingMethod::NoDaylighting) {
                     hasDayLighting = true;
                     break;
                 }
@@ -5330,18 +5326,18 @@ namespace HeatBalanceSurfaceManager {
             }
             for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 // Place holder
-                if (DataDaylighting::ZoneDaylight(ZoneNum).DaylightMethod == DataDaylighting::NoDaylighting)
+                if (state.dataDaylightingData->ZoneDaylight(ZoneNum).DaylightMethod == DataDaylighting::iDaylightingMethod::NoDaylighting)
                     continue;
 
-                Array1D<Real64> ZoneIllumRef = DataDaylighting::ZoneDaylight(ZoneNum).DaylIllumAtRefPt;
+                Array1D<Real64> ZoneIllumRef = state.dataDaylightingData->ZoneDaylight(ZoneNum).DaylIllumAtRefPt;
                 Real64 ZoneIllum = 0.0;
                 for (size_t i = 1; i <= ZoneIllumRef.size(); i++) {
                     ZoneIllum += ZoneIllumRef(i);
                 }
                 ZoneIllum /= ZoneIllumRef.size();
 
-                if (DataDaylighting::ZoneDaylight(ZoneNum).ZonePowerReductionFactor > 0) {
-                    Array1D<Real64> ZoneIllumSetpoint = DataDaylighting::ZoneDaylight(ZoneNum).IllumSetPoint;
+                if (state.dataDaylightingData->ZoneDaylight(ZoneNum).ZonePowerReductionFactor > 0) {
+                    Array1D<Real64> ZoneIllumSetpoint = state.dataDaylightingData->ZoneDaylight(ZoneNum).IllumSetPoint;
                     ZoneIllum = 0.0;
                     for (size_t i = 1; i <= ZoneIllumSetpoint.size(); i++) {
                         ZoneIllum += ZoneIllumSetpoint(i);

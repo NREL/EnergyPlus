@@ -149,7 +149,6 @@ SET( SRC
   DataConversions.hh
   DataDElight.cc
   DataDElight.hh
-  DataDaylighting.cc
   DataDaylighting.hh
   DataDaylightingDevices.cc
   DataDaylightingDevices.hh

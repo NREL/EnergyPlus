@@ -138,7 +138,6 @@ namespace HVACManager {
     using namespace DataHVACGlobals;
     using namespace DataLoopNode;
     using namespace DataAirLoop;
-    using namespace DataConvergParams;
     using namespace DataReportingFlags;
 
     // Data
@@ -3044,7 +3043,7 @@ namespace HVACManager {
         int ZoneNum;
         int NodeIndex;
         int NodeNum;
-        Array1D<Real64> tmpRealARR(ConvergLogStackDepth);
+        Array1D<Real64> tmpRealARR(DataConvergParams::ConvergLogStackDepth);
 
         for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
 

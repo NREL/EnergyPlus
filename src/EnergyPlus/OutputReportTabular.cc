@@ -11341,7 +11341,7 @@ namespace OutputReportTabular {
         using DataHeatBalFanSys::ZoneLightingLevelOccuHourBins;
 
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-            if (DataDaylighting::ZoneDaylight(ZoneNum).DaylightMethod == DataDaylighting::NoDaylighting) {
+            if (state.dataDaylightingData->ZoneDaylight(ZoneNum).DaylightMethod == DataDaylighting::iDaylightingMethod::NoDaylighting) {
                 if (displayVisualResilienceSummaryExplicitly) {
                     ShowWarningError(state, "Writing Annual Visual Resilience Summary - Lighting Level Hours reports: "
                                      "Zone Average Daylighting Reference Point Illuminance output is required, "

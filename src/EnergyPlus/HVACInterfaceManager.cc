@@ -142,8 +142,6 @@ namespace HVACInterfaceManager {
         // to the inlet node of the corresponding other side of the loop.
 
         using DataLoopNode::Node;
-        using namespace DataConvergParams;
-
         static Array1D<Real64> TmpRealARR(DataConvergParams::ConvergLogStackDepth); // Tuned Made static
         Real64 DeltaEnergy;
 
@@ -431,7 +429,6 @@ namespace HVACInterfaceManager {
 
         // Using/Aliasing
         using DataLoopNode::Node;
-        using namespace DataConvergParams;
         using DataPlant::DemandSide;
         using DataPlant::PlantLoop;
         using FluidProperties::GetSpecificHeatGlycol;

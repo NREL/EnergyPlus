@@ -703,7 +703,6 @@ namespace SimulationManager {
 
         // Using/Aliasing
         using DataStringGlobals::MatchVersion;
-        using namespace DataConvergParams;
         using namespace DataSystemVariables;
         using DataEnvironment::DisplayWeatherMissingDataWarnings;
         using DataEnvironment::IgnoreBeamRadiation;

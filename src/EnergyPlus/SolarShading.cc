@@ -8836,7 +8836,6 @@ namespace SolarShading {
         // na
 
         // Using/Aliasing
-        using DataDaylighting::ZoneDaylight;
         using DataHeatBalFanSys::MAT;
         using DataWindowEquivalentLayer::CFS;
         using General::POLYF;
@@ -8967,7 +8966,7 @@ namespace SolarShading {
                         SchedAllowsControl = false;
                 }
 
-                Real64 GlareControlIsActive = (ZoneDaylight(IZone).TotalDaylRefPoints > 0 && SunIsUp &&
+                Real64 GlareControlIsActive = (state.dataDaylightingData->ZoneDaylight(IZone).TotalDaylRefPoints > 0 && SunIsUp &&
                                         WindowShadingControl(IShadingCtrl).GlareControlIsActive); // True if glare control is active
 
                 Real64 SolarOnWindow = 0.0; // Direct plus diffuse solar intensity on window (W/m2)
