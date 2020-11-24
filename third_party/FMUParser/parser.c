@@ -45,7 +45,7 @@ int callparser(const char *fmuFilNam, const char *tmpPat)
     char *filNam, *tmp, *ext;
 
     // Get the model description
-    xmlPat = calloc(sizeof(char), strlen(fmuFilNam) + strlen(XML_FILE) - 1);
+    xmlPat = calloc(strlen(fmuFilNam) + strlen(XML_FILE) - 1, sizeof(char));
     printfDebug("fmuFilNam is \"%s\"\n", fmuFilNam);
     printfDebug("Start to parse model description file\n", xmlPat);
     sprintf(xmlPat, "%s%s%s", tmpPat, PATH_SEP, XML_FILE);

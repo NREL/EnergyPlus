@@ -467,7 +467,7 @@ fmiInteger getfmiEPlusVersion(char *fmuWorkingFolder, fmiInteger *sizefmuWorking
                     "been exported for Co-Simulation. FMU for Model Exchange is not supported yet.";
 
     // allocate memory for the FMU-working folder trimmed
-    trimfmuWorkingFolder = (char *)calloc(sizeof(char), *sizefmuWorkingFolder + 1);
+    trimfmuWorkingFolder = (char *)calloc(*sizefmuWorkingFolder + 1, sizeof(char));
     // write fmuWorkingFolder withouth blanks
     strncpy(trimfmuWorkingFolder, fmuWorkingFolder, *sizefmuWorkingFolder);
 
@@ -526,7 +526,7 @@ fmiComponent fmiEPlusInstantiateSlave(char *fmuResFolder,
     callbacks.logger = fmuLogger;
 
     // allocate memory for fmu resources folder
-    trimfmuResFolder = (char *)calloc(sizeof(char), *sizefmuResFolder + 1);
+    trimfmuResFolder = (char *)calloc(*sizefmuResFolder + 1, sizeof(char));
 
     // write fmuResFolder without blanks
     strncpy(trimfmuResFolder, fmuResFolder, *sizefmuResFolder);
@@ -766,7 +766,7 @@ fmiValueReference getValueReferenceByNameFMUInputVariables(char *variableName, f
     fmiValueReference valueRef;
 
     // allocate memory for the FMU-variable trimmed
-    trimVariableName = (char *)calloc(sizeof(char), *sizeVariableName + 1);
+    trimVariableName = (char *)calloc(*sizeVariableName + 1, sizeof(char));
 
     // write FMU-variable withouth blanks
     strncpy(trimVariableName, variableName, *sizeVariableName);
@@ -814,7 +814,7 @@ fmiValueReference getValueReferenceByNameFMUOutputVariables(char *variableName, 
     fmiValueReference valueRef;
 
     // allocate memory for the FMU-variable trimmed
-    trimVariableName = (char *)calloc(sizeof(char), *sizeVariableName + 1);
+    trimVariableName = (char *)calloc(*sizeVariableName + 1, sizeof(char));
 
     // write FMU-variable withouth blanks
     strncpy(trimVariableName, variableName, *sizeVariableName);
@@ -862,12 +862,12 @@ fmiInteger addFMURootFolderName(char *fmuOutputWorkingFolder, char *fmuWorkingFo
     char *trimfmuWorkingFolderWithRoot;
 
     // allocate memory for the FMU-working folder trimmed
-    trimfmuWorkingFolder = (char *)calloc(sizeof(char), *sizefmuWorkingFolder + 1);
+    trimfmuWorkingFolder = (char *)calloc(*sizefmuWorkingFolder + 1, sizeof(char));
 
     // write fmuWorkingFolder withouth blanks
     strncpy(trimfmuWorkingFolder, fmuWorkingFolder, *sizefmuWorkingFolder);
 
-    trimfmuWorkingFolderWithRoot = (char *)calloc(sizeof(char), *sizefmuWorkingFolder + strlen(FMU_ROOT_DIR) + 1);
+    trimfmuWorkingFolderWithRoot = (char *)calloc(*sizefmuWorkingFolder + strlen(FMU_ROOT_DIR) + 1, sizeof(char));
     sprintf(trimfmuWorkingFolderWithRoot, "%s%s", trimfmuWorkingFolder, FMU_ROOT_DIR);
 
     // write fmuOutputWorkingFolder
@@ -911,7 +911,7 @@ addLibPathCurrentWorkingFolder(char *trimfmuOutputWorkingFolder_wLiB, char *fmuW
 #endif
 
     // allocate memory for the FMU-working folder trimmed
-    trimfmuWorkingFolder = (char *)calloc(sizeof(char), *sizefmuWorkingFolder + 1);
+    trimfmuWorkingFolder = (char *)calloc(*sizefmuWorkingFolder + 1, sizeof(char));
 
     // write fmuWorkingFolder withouth blanks
     strncpy(trimfmuWorkingFolder, fmuWorkingFolder, *sizefmuWorkingFolder);
@@ -921,7 +921,7 @@ addLibPathCurrentWorkingFolder(char *trimfmuOutputWorkingFolder_wLiB, char *fmuW
 
 #ifdef _MSC_VER
     len_LibPath = (fmiInteger)(strlen(trimfmuWorkingFolder) + strlen(BIN_WIN) + strlen(fmuInstances[_c->index]->modelID) + strlen(LIB_EXT));
-    librPath_w32 = (char *)calloc(sizeof(char), len_LibPath + 1);
+    librPath_w32 = (char *)calloc(len_LibPath + 1, sizeof(char));
 
     // write the path to the binaries for Windows 32 bit
     sprintf(librPath_w32, "%s%s%s%s", trimfmuWorkingFolder, BIN_WIN32, fmuInstances[_c->index]->modelID, LIB_EXT);
@@ -929,7 +929,7 @@ addLibPathCurrentWorkingFolder(char *trimfmuOutputWorkingFolder_wLiB, char *fmuW
     bRes_w32 = (stat(librPath_w32, &st) == 0);
 
     // write the path to the binaries for Windows 64 bit
-    librPath_w64 = (char *)calloc(sizeof(char), len_LibPath + 1);
+    librPath_w64 = (char *)calloc(len_LibPath + 1, sizeof(char));
     sprintf(librPath_w64, "%s%s%s%s", trimfmuWorkingFolder, BIN_WIN64, fmuInstances[_c->index]->modelID, LIB_EXT);
     // check whether the dlls for Windows 32 bit exist in the binaries folder
     bRes_w64 = (stat(librPath_w64, &st) == 0);
@@ -961,7 +961,7 @@ addLibPathCurrentWorkingFolder(char *trimfmuOutputWorkingFolder_wLiB, char *fmuW
 #if __linux__
 
     len_LibPath = strlen(trimfmuWorkingFolder) + strlen(BIN_LIN) + strlen(fmuInstances[_c->index]->modelID) + strlen(LIB_EXT);
-    librPath_l32 = (char *)calloc(sizeof(char), len_LibPath + 10);
+    librPath_l32 = (char *)calloc(len_LibPath + 10, sizeof(char));
 
     // write the path to the binaries for Windows 32 bit
     sprintf(librPath_l32, "%s%s%s%s", trimfmuWorkingFolder, BIN_LIN32, fmuInstances[_c->index]->modelID, LIB_EXT);
@@ -969,7 +969,7 @@ addLibPathCurrentWorkingFolder(char *trimfmuOutputWorkingFolder_wLiB, char *fmuW
     bRes_l32 = (stat(librPath_l32, &st) == 0);
 
     // write the path to the binaries for Windows 64 bit
-    librPath_l64 = (char *)calloc(sizeof(char), len_LibPath + 10);
+    librPath_l64 = (char *)calloc(len_LibPath + 10, sizeof(char));
     sprintf(librPath_l64, "%s%s%s%s", trimfmuWorkingFolder, BIN_LIN64, fmuInstances[_c->index]->modelID, LIB_EXT);
     // check whether the so for Linux 64 bit exist in the binaries folder
     bRes_l64 = (stat(librPath_l64, &st) == 0);
@@ -1052,7 +1052,7 @@ model_ID_GUID(char *fmuInstanceName, char *fmuWorkingFolder, fmiInteger *sizefmu
     // retValIns=insNum;
 
     // allocate memory for the FMU-working folder trimmed
-    trimfmuWorkingFolder = (char *)calloc(sizeof(char), *sizefmuWorkingFolder + 1);
+    trimfmuWorkingFolder = (char *)calloc(*sizefmuWorkingFolder + 1, sizeof(char));
     // write fmuWorkingFolder withouth blanks
     strncpy(trimfmuWorkingFolder, fmuWorkingFolder, *sizefmuWorkingFolder);
 
@@ -1065,7 +1065,7 @@ model_ID_GUID(char *fmuInstanceName, char *fmuWorkingFolder, fmiInteger *sizefmu
     fmuInstances[_c->index]->modelDescription = parse(xmlPath);
 
     // Initialize instance Name
-    fmuInstances[_c->index]->instanceName = (char *)calloc(sizeof(char), *fmuInstanceName + 1);
+    fmuInstances[_c->index]->instanceName = (char *)calloc(*fmuInstanceName + 1, sizeof(char));
 
     // write fmu instance Name
     strncpy(fmuInstances[_c->index]->instanceName, fmuInstanceName, strlen(fmuInstanceName));
@@ -1147,10 +1147,10 @@ fmiInteger fmiEPlusUnpack(char *fmuName, char *fmuOutputWorkingFolder, fmiIntege
     int retVal;
 
     // allocate memory for the FMU-Name trimmed
-    trimfmuName = (char *)calloc(sizeof(char), *sizefmuName + 1);
+    trimfmuName = (char *)calloc(*sizefmuName + 1, sizeof(char));
 
     // allocate memory for the FMU-working folder trimmed
-    trimfmuOutputWorkingFolder = (char *)calloc(sizeof(char), *sizefmuOutputWorkingFolder + 1);
+    trimfmuOutputWorkingFolder = (char *)calloc(*sizefmuOutputWorkingFolder + 1, sizeof(char));
 
     // write fmuName withouth blanks
     strncpy(trimfmuName, fmuName, *sizefmuName);

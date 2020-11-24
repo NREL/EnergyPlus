@@ -61,7 +61,7 @@ int delete (char *tmpPat)
         return -1;
     }
 
-    cmd = calloc(sizeof(char), strlen(tmpPat) + 20);
+    cmd = calloc(strlen(tmpPat) + 20, sizeof(char));
     if (cmd == NULL) {
         printfError("Fail to allocate memory for cmd.\n", tmpPat);
         return -1;
@@ -95,7 +95,7 @@ char *getTmpPath(const char *nam, size_t length)
 {
     char *tmpPat;
 
-    tmpPat = calloc(sizeof(char), length + 2);
+    tmpPat = calloc(length + 2, sizeof(char));
 
     // Define the temporary folder
     if (strncpy(tmpPat, nam, length) == NULL) {

@@ -276,8 +276,8 @@ DllExport fmiStatus fmiSetString(fmiComponent c, const fmiValueReference vr[], s
 // DllExport fmiStatus fmiGetEventIndicators(fmiComponent c, fmiReal eventIndicators[], size_t ni);	// Zuo: not in cos-im V1.0
 // DllExport fmiStatus fmiEventUpdate               (fmiComponent c, fmiBoolean intermediateResults, fmiEventInfo* eventInfo);	// Zuo: not in co-sim
 // V1.0
-// DllExport fmiStatus fmiGetContinuousStates       (fmiComponent c, fmiReal states[], size_t nx);								// Zuo: not
-// in co-sim V1.0 DllExport fmiStatus fmiGetNominalContinuousStates(fmiComponent c, fmiReal x_nominal[], size_t nx);
+// DllExport fmiStatus fmiGetContinuousStates       (fmiComponent c, fmiReal states[], size_t nx);								// Zuo:
+// not in co-sim V1.0 DllExport fmiStatus fmiGetNominalContinuousStates(fmiComponent c, fmiReal x_nominal[], size_t nx);
 // // Zuo: not in co-sim V1.0 DllExport fmiStatus fmiGetStateValueReferences   (fmiComponent c, fmiValueReference vrx[], size_t nx);
 // // Zuo: not in co-sim V1.0
 // DllExport fmiStatus fmiTerminate                 (fmiComponent c);

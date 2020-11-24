@@ -526,7 +526,7 @@ int unpackmz(const char *filNam, char *tmpPat)
 
     printfDebug("%s opened\n", filename_try);
 
-    cmd = calloc(sizeof(char), strlen(dirname) + 11);
+    cmd = calloc(strlen(dirname) + 11, sizeof(char));
     if (cmd == NULL) {
         printfError("Fail to allocate memory for cmd.\n", tmpPat);
         return -1;
