@@ -45,10 +45,10 @@ int callparser(const char *fmuFilNam, const char *tmpPat)
     char *filNam, *tmp, *ext;
 
     // Get the model description
-    xmlPat = (char *)calloc(strlen(fmuFilNam) + strlen(XML_FILE) - 1, sizeof(char));
+    xmlPat = (char *)calloc(strlen(fmuFilNam) + strlen(XML_FILE) + strlen(PATH_SEP) + 1, sizeof(char));
     printfDebug("fmuFilNam is \"%s\"\n", fmuFilNam);
-    printfDebug("Start to parse model description file\n", xmlPat);
     sprintf(xmlPat, "%s%s%s", tmpPat, PATH_SEP, XML_FILE);
+    printfDebug("Start to parse model description file: \"%s\".\n", xmlPat);
 
     fmu.modelDescription = parse(xmlPat);
     printfDebug("Parsed model description file: \"%s\"\n", xmlPat);
@@ -58,6 +58,8 @@ int callparser(const char *fmuFilNam, const char *tmpPat)
         free(xmlPat);
         return -1;
     }
+
+    free(xmlPat);
 
     length = strlen(fmuFilNam);
     tmp = (char *)malloc((length+1) * sizeof(char));
@@ -88,10 +90,10 @@ int callparser(const char *fmuFilNam, const char *tmpPat)
     printfDebug("***** Model description is \"%s\".\n", getModelIdentifier(fmu.modelDescription));
 
     // Clean up memory
-    // free(xmlPat);
-    // free(tmp);
-    // free(filNam);
-    // free(ext);
+    // free(xmlPat); // Done above
+    free(tmp);
+    free(filNam);
+    free(ext);
     return 0;
 }
 
