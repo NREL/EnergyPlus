@@ -304,7 +304,6 @@ namespace SplitterComponent {
         // Uses the status flags to trigger events.
 
         using DataContaminantBalance::Contaminant;
-        using DataContaminantBalance::OutdoorGC;
         using DataEnvironment::OutBaroPress;
         using DataEnvironment::OutHumRat;
         using Psychrometrics::PsyHFnTdbW;
@@ -331,7 +330,7 @@ namespace SplitterComponent {
                 Node(InletNode).CO2 = state.dataContaminantBalance->OutdoorCO2;
             }
             if (Contaminant.GenericContamSimulation) {
-                Node(InletNode).GenContam = OutdoorGC;
+                Node(InletNode).GenContam = state.dataContaminantBalance->OutdoorGC;
             }
 
             state.dataSplitterComponent->MyEnvrnFlag = false;

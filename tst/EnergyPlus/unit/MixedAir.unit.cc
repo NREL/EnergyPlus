@@ -1380,7 +1380,7 @@ TEST_F(EnergyPlusFixture, MixedAir_ControllerTypeTest)
 
     Node(OAController(OAControllerNum).InletNode).GenContam = 0.5;
     Node(OAController(OAControllerNum).RelNode).GenContam = 0.3;
-    OutdoorGC = 0.1;
+    state->dataContaminantBalance->OutdoorGC = 0.1;
 
     Contaminant.CO2Simulation = true;
     Contaminant.GenericContamSimulation = true;

@@ -148,7 +148,6 @@ namespace MixedAir {
     using namespace ScheduleManager;
     using namespace DataSizing;
     using DataContaminantBalance::Contaminant;
-    using DataContaminantBalance::OutdoorGC;
     using namespace FaultsManager;
 
     // Data
@@ -5173,7 +5172,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                 Node(MixNode).GenContam = Node(RetNode).GenContam;
             } else {
                 Node(MixNode).GenContam = ((Node(RetNode).MassFlowRate - Node(RelNode).MassFlowRate) * Node(RetNode).GenContam +
-                                           OAMixer(OAMixerNum).OAMassFlowRate * OutdoorGC) /
+                                           OAMixer(OAMixerNum).OAMassFlowRate * state.dataContaminantBalance->OutdoorGC) /
                                           OAMixer(OAMixerNum).MixMassFlowRate;
             }
         }

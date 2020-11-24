@@ -225,19 +225,19 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     state->dataContaminantBalance->AZ.allocate(1);
     state->dataContaminantBalance->BZ.allocate(1);
     state->dataContaminantBalance->CZ.allocate(1);
-    AZGC.allocate(1);
-    BZGC.allocate(1);
-    CZGC.allocate(1);
+    state->dataContaminantBalance->AZGC.allocate(1);
+    state->dataContaminantBalance->BZGC.allocate(1);
+    state->dataContaminantBalance->CZGC.allocate(1);
     state->dataContaminantBalance->AZ(1) = 0.0;
     state->dataContaminantBalance->BZ(1) = 0.0;
     state->dataContaminantBalance->CZ(1) = 0.0;
-    AZGC(1) = 0.0;
-    BZGC(1) = 0.0;
-    CZGC(1) = 0.0;
+    state->dataContaminantBalance->AZGC(1) = 0.0;
+    state->dataContaminantBalance->BZGC(1) = 0.0;
+    state->dataContaminantBalance->CZGC(1) = 0.0;
     state->dataContaminantBalance->ZoneAirDensityCO.allocate(1);
     state->dataContaminantBalance->ZoneAirDensityCO(1) = 0.0;
-    ZoneGCGain.allocate(1);
-    ZoneGCGain(1) = 0.0;
+    state->dataContaminantBalance->ZoneGCGain.allocate(1);
+    state->dataContaminantBalance->ZoneGCGain(1) = 0.0;
 
     // Parameter setup
     state->dataGlobal->NumOfZones = 1;
@@ -618,7 +618,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     EAMFLxHumRat.deallocate();
     CTMFL.deallocate();
     state->dataContaminantBalance->ZoneAirDensityCO.deallocate();
-    ZoneGCGain.deallocate();
+    state->dataContaminantBalance->ZoneGCGain.deallocate();
     Schedule.deallocate();
 }
 
@@ -709,15 +709,15 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     state->dataContaminantBalance->AZ.allocate(1);
     state->dataContaminantBalance->BZ.allocate(1);
     state->dataContaminantBalance->CZ.allocate(1);
-    AZGC.allocate(1);
-    BZGC.allocate(1);
-    CZGC.allocate(1);
+    state->dataContaminantBalance->AZGC.allocate(1);
+    state->dataContaminantBalance->BZGC.allocate(1);
+    state->dataContaminantBalance->CZGC.allocate(1);
     state->dataContaminantBalance->AZ(1) = 0.0;
     state->dataContaminantBalance->BZ(1) = 0.0;
     state->dataContaminantBalance->CZ(1) = 0.0;
-    AZGC(1) = 0.0;
-    BZGC(1) = 0.0;
-    CZGC(1) = 0.0;
+    state->dataContaminantBalance->AZGC(1) = 0.0;
+    state->dataContaminantBalance->BZGC(1) = 0.0;
+    state->dataContaminantBalance->CZGC(1) = 0.0;
     state->dataContaminantBalance->ZoneAirCO2.allocate(1);
     state->dataContaminantBalance->ZoneAirCO2(1) = 0.0;
     state->dataContaminantBalance->ZoneAirCO2Temp.allocate(1);
@@ -728,8 +728,8 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     state->dataContaminantBalance->ZoneCO2Gain(1) = 0.0;
     state->dataContaminantBalance->ZoneCO2GainExceptPeople.allocate(1);
     state->dataContaminantBalance->ZoneCO2GainExceptPeople(1) = 0.0;
-    ZoneGCGain.allocate(1);
-    ZoneGCGain(1) = 0.0;
+    state->dataContaminantBalance->ZoneGCGain.allocate(1);
+    state->dataContaminantBalance->ZoneGCGain(1) = 0.0;
     state->dataContaminantBalance->MixingMassFlowCO2.allocate(1);
     state->dataContaminantBalance->MixingMassFlowCO2(1) = 0.0;
 
@@ -941,7 +941,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     state->dataContaminantBalance->ZoneAirDensityCO.deallocate();
     state->dataContaminantBalance->ZoneCO2Gain.deallocate();
     state->dataContaminantBalance->ZoneCO2GainExceptPeople.deallocate();
-    ZoneGCGain.deallocate();
+    state->dataContaminantBalance->ZoneGCGain.deallocate();
     state->dataContaminantBalance->MixingMassFlowCO2.deallocate();
     Schedule.deallocate();
 }

@@ -62,50 +62,6 @@ struct EnergyPlusData;
 
 namespace DataContaminantBalance {
 
-    // Generic contaminant
-
-    extern Array1D<Real64> ZoneGCSetPoint;
-    extern Array1D<Real64> GCPredictedRate;
-
-    extern Array1D<Real64> ZoneGCGain; // Generic contaminant gain from each Zone (People, equipment)
-
-    // Zone Air Contaminant conditions variables
-    extern Array1D<Real64> ZoneAirGCAvg;       // AIR generic contaminant averaged over the zone time step
-    extern Array1D<Real64> ZoneAirGC;          // AIR generic contaminant
-    extern Array1D<Real64> GCZoneTimeMinus1;   // Generic contaminant history terms for 3rd order derivative
-    extern Array1D<Real64> GCZoneTimeMinus2;   // Time Minus 2 Zone Time Steps Term
-    extern Array1D<Real64> GCZoneTimeMinus3;   // Time Minus 3 Zone Time Steps Term
-    extern Array1D<Real64> GCZoneTimeMinus4;   // Time Minus 4 Zone Time Steps Term
-    extern Array1D<Real64> DSGCZoneTimeMinus1; // DownStepped generic contaminant history terms for 3rd order
-    // derivative
-    extern Array1D<Real64> DSGCZoneTimeMinus2; // DownStepped Time Minus 2 Zone Time Steps Term
-    extern Array1D<Real64> DSGCZoneTimeMinus3; // DownStepped Time Minus 3 Zone Time Steps Term
-    extern Array1D<Real64> DSGCZoneTimeMinus4; // DownStepped Time Minus 4 Zone Time Steps Term
-
-    extern Array1D<Real64> ZoneAirGCTemp;        // Temp zone air generic contaminant at time plus 1
-    extern Array1D<Real64> GCZoneTimeMinus1Temp; // Zone air generic contaminant at previous timestep
-    extern Array1D<Real64> GCZoneTimeMinus2Temp; // Zone air generic contaminant at timestep T-2
-    extern Array1D<Real64> GCZoneTimeMinus3Temp; // Zone air generic contaminant at timestep T-3
-    extern Array1D<Real64> ZoneAirGCOld;         // Last Time Steps Zone AIR generic contaminant
-
-    extern Array1D<Real64> ZoneGCMX; // TEMPORARY ZONE CO2 TO TEST CONVERGENCE in Exact and Euler method
-    extern Array1D<Real64> ZoneGCM2; // TEMPORARY ZONE CO2 at timestep t-2 in Exact and Euler method
-    extern Array1D<Real64> ZoneGC1;  // Zone CO2 at the previous time step used in Exact and Euler method
-
-    extern Array1D<Real64> CONTRATGC; // Zone generic contaminant at the previous time step used in
-    // Exact and Euler method
-
-    extern Array1D<Real64> MixingMassFlowGC; // Mixing MASS FLOW * generic contaminant
-
-    extern Real64 OutdoorGC; // Outdoor generic contaminant level
-
-    extern Array1D<Real64> ZoneAirDensityGC; // Mixing MASS FLOW * generic contaminant
-    extern Array1D<Real64> AZGC;
-    extern Array1D<Real64> BZGC;
-    extern Array1D<Real64> CZGC;
-
-    // Types
-
     struct ContaminantData
     {
         // Members
@@ -357,6 +313,46 @@ struct ContaminantBalanceData : BaseGlobalStruct {
     Array1D<Real64> BZ;
     Array1D<Real64> CZ;
 
+    Array1D<Real64> ZoneGCSetPoint;
+    Array1D<Real64> GCPredictedRate;
+
+    Array1D<Real64> ZoneGCGain; // Generic contaminant gain from each Zone (People, equipment)
+
+    // Zone Air Contaminant conditions variables
+    Array1D<Real64> ZoneAirGCAvg;       // AIR generic contaminant averaged over the zone time step
+    Array1D<Real64> ZoneAirGC;          // AIR generic contaminant
+    Array1D<Real64> GCZoneTimeMinus1;   // Generic contaminant history terms for 3rd order derivative
+    Array1D<Real64> GCZoneTimeMinus2;   // Time Minus 2 Zone Time Steps Term
+    Array1D<Real64> GCZoneTimeMinus3;   // Time Minus 3 Zone Time Steps Term
+    Array1D<Real64> GCZoneTimeMinus4;   // Time Minus 4 Zone Time Steps Term
+    Array1D<Real64> DSGCZoneTimeMinus1; // DownStepped generic contaminant history terms for 3rd order
+    // derivative
+    Array1D<Real64> DSGCZoneTimeMinus2; // DownStepped Time Minus 2 Zone Time Steps Term
+    Array1D<Real64> DSGCZoneTimeMinus3; // DownStepped Time Minus 3 Zone Time Steps Term
+    Array1D<Real64> DSGCZoneTimeMinus4; // DownStepped Time Minus 4 Zone Time Steps Term
+
+    Array1D<Real64> ZoneAirGCTemp;        // Temp zone air generic contaminant at time plus 1
+    Array1D<Real64> GCZoneTimeMinus1Temp; // Zone air generic contaminant at previous timestep
+    Array1D<Real64> GCZoneTimeMinus2Temp; // Zone air generic contaminant at timestep T-2
+    Array1D<Real64> GCZoneTimeMinus3Temp; // Zone air generic contaminant at timestep T-3
+    Array1D<Real64> ZoneAirGCOld;         // Last Time Steps Zone AIR generic contaminant
+
+    Array1D<Real64> ZoneGCMX; // TEMPORARY ZONE CO2 TO TEST CONVERGENCE in Exact and Euler method
+    Array1D<Real64> ZoneGCM2; // TEMPORARY ZONE CO2 at timestep t-2 in Exact and Euler method
+    Array1D<Real64> ZoneGC1;  // Zone CO2 at the previous time step used in Exact and Euler method
+
+    Array1D<Real64> CONTRATGC; // Zone generic contaminant at the previous time step used in
+    // Exact and Euler method
+
+    Array1D<Real64> MixingMassFlowGC; // Mixing MASS FLOW * generic contaminant
+
+    Real64 OutdoorGC = 0.0; // Outdoor generic contaminant level
+
+    Array1D<Real64> ZoneAirDensityGC; // Mixing MASS FLOW * generic contaminant
+    Array1D<Real64> AZGC;
+    Array1D<Real64> BZGC;
+    Array1D<Real64> CZGC;
+
     void clear_state() override
     {
         this->ZoneCO2SetPoint.deallocate();
@@ -390,6 +386,34 @@ struct ContaminantBalanceData : BaseGlobalStruct {
         this->AZ.deallocate();
         this->BZ.deallocate();
         this->CZ.deallocate();
+        this->ZoneGCSetPoint.deallocate();
+        this->GCPredictedRate.deallocate();
+        this->ZoneGCGain.deallocate();
+        this->ZoneAirGCAvg.deallocate();
+        this->ZoneAirGC.deallocate();
+        this->GCZoneTimeMinus1.deallocate();
+        this->GCZoneTimeMinus2.deallocate();
+        this->GCZoneTimeMinus3.deallocate();
+        this->GCZoneTimeMinus4.deallocate();
+        this->DSGCZoneTimeMinus1.deallocate();
+        this->DSGCZoneTimeMinus2.deallocate();
+        this->DSGCZoneTimeMinus3.deallocate();
+        this->DSGCZoneTimeMinus4.deallocate();
+        this->ZoneAirGCTemp.deallocate();
+        this->GCZoneTimeMinus1Temp.deallocate();
+        this->GCZoneTimeMinus2Temp.deallocate();
+        this->GCZoneTimeMinus3Temp.deallocate();
+        this->ZoneAirGCOld.deallocate();
+        this->ZoneGCMX.deallocate();
+        this->ZoneGCM2.deallocate();
+        this->ZoneGC1.deallocate();
+        this->CONTRATGC.deallocate();
+        this->MixingMassFlowGC.deallocate();
+        this->OutdoorGC = 0.0;
+        this->ZoneAirDensityGC.deallocate();
+        this->AZGC.deallocate();
+        this->BZGC.deallocate();
+        this->CZGC.deallocate();
     }
 };
 

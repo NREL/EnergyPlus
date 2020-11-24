@@ -63,55 +63,6 @@ namespace DataContaminantBalance {
     // This module is revised from humidity ratio data straucture and contains the information
     // that is needed to pass from the Contaminant Balance Module.
 
-    // Using/Aliasing
-    using DataSurfaces::MaxSlatAngs;
-
-    // Data
-    // module should be available to other modules and routines.  Thus,
-    // all variables in this module must be PUBLIC.
-
-    // Generic contaminant
-
-    Array1D<Real64> ZoneGCSetPoint;
-    Array1D<Real64> GCPredictedRate;
-
-    Array1D<Real64> ZoneGCGain; // Generic contaminant gain from each Zone (People, equipment)
-
-    // Zone Air Contaminant conditions variables
-    Array1D<Real64> ZoneAirGCAvg;       // AIR generic contaminant averaged over the zone time step
-    Array1D<Real64> ZoneAirGC;          // AIR generic contaminant
-    Array1D<Real64> GCZoneTimeMinus1;   // Generic contaminant history terms for 3rd order derivative
-    Array1D<Real64> GCZoneTimeMinus2;   // Time Minus 2 Zone Time Steps Term
-    Array1D<Real64> GCZoneTimeMinus3;   // Time Minus 3 Zone Time Steps Term
-    Array1D<Real64> GCZoneTimeMinus4;   // Time Minus 4 Zone Time Steps Term
-    Array1D<Real64> DSGCZoneTimeMinus1; // DownStepped generic contaminant history terms for 3rd order
-    // derivative
-    Array1D<Real64> DSGCZoneTimeMinus2; // DownStepped Time Minus 2 Zone Time Steps Term
-    Array1D<Real64> DSGCZoneTimeMinus3; // DownStepped Time Minus 3 Zone Time Steps Term
-    Array1D<Real64> DSGCZoneTimeMinus4; // DownStepped Time Minus 4 Zone Time Steps Term
-
-    Array1D<Real64> ZoneAirGCTemp;        // Temp zone air generic contaminant at time plus 1
-    Array1D<Real64> GCZoneTimeMinus1Temp; // Zone air generic contaminant at previous timestep
-    Array1D<Real64> GCZoneTimeMinus2Temp; // Zone air generic contaminant at timestep T-2
-    Array1D<Real64> GCZoneTimeMinus3Temp; // Zone air generic contaminant at timestep T-3
-    Array1D<Real64> ZoneAirGCOld;         // Last Time Steps Zone AIR generic contaminant
-
-    Array1D<Real64> ZoneGCMX; // TEMPORARY ZONE CO2 TO TEST CONVERGENCE in Exact and Euler method
-    Array1D<Real64> ZoneGCM2; // TEMPORARY ZONE CO2 at timestep t-2 in Exact and Euler method
-    Array1D<Real64> ZoneGC1;  // Zone CO2 at the previous time step used in Exact and Euler method
-
-    Array1D<Real64> CONTRATGC; // Zone generic contaminant at the previous time step used in
-    // Exact and Euler method
-
-    Array1D<Real64> MixingMassFlowGC; // Mixing MASS FLOW * generic contaminant
-
-    Real64 OutdoorGC(0.0); // Outdoor generic contaminant level
-
-    Array1D<Real64> ZoneAirDensityGC; // Mixing MASS FLOW * generic contaminant
-    Array1D<Real64> AZGC;
-    Array1D<Real64> BZGC;
-    Array1D<Real64> CZGC;
-
     // Object Data
     Array1D<ZoneSystemContaminantDemandData> ZoneSysContDemand;
     ContaminantData Contaminant; // A logical flag to determine whether any contaminants are simulated or not | CO2 simulation flag | CO2 outdoor
@@ -129,34 +80,6 @@ namespace DataContaminantBalance {
     // Needed for unit tests, should not be normally called.
     void clear_state()
     {
-        ZoneGCSetPoint.deallocate();
-        GCPredictedRate.deallocate();
-        ZoneGCGain.deallocate();
-        ZoneAirGCAvg.deallocate();
-        ZoneAirGC.deallocate();
-        GCZoneTimeMinus1.deallocate();
-        GCZoneTimeMinus2.deallocate();
-        GCZoneTimeMinus3.deallocate();
-        GCZoneTimeMinus4.deallocate();
-        DSGCZoneTimeMinus1.deallocate();
-        DSGCZoneTimeMinus2.deallocate();
-        DSGCZoneTimeMinus3.deallocate();
-        DSGCZoneTimeMinus4.deallocate();
-        ZoneAirGCTemp.deallocate();
-        GCZoneTimeMinus1Temp.deallocate();
-        GCZoneTimeMinus2Temp.deallocate();
-        GCZoneTimeMinus3Temp.deallocate();
-        ZoneAirGCOld.deallocate();
-        ZoneGCMX.deallocate();
-        ZoneGCM2.deallocate();
-        ZoneGC1.deallocate();
-        CONTRATGC.deallocate();
-        MixingMassFlowGC.deallocate();
-        OutdoorGC = 0.0;
-        ZoneAirDensityGC.deallocate();
-        AZGC.deallocate();
-        BZGC.deallocate();
-        CZGC.deallocate();
         ZoneSysContDemand.deallocate();
         Contaminant.SimulateContaminants = false;
         Contaminant.CO2Simulation = false;

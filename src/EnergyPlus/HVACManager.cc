@@ -222,10 +222,6 @@ namespace HVACManager {
 
         using AirflowNetworkBalanceManager::ManageAirflowNetworkBalance;
         using DataContaminantBalance::Contaminant;
-        using DataContaminantBalance::OutdoorGC;
-        using DataContaminantBalance::ZoneAirGC;
-        using DataContaminantBalance::ZoneAirGCAvg;
-        using DataContaminantBalance::ZoneAirGCTemp;
         using DataHeatBalFanSys::QRadSurfAFNDuct;
         using DataHeatBalFanSys::SysDepZoneLoads;
         using DataHeatBalFanSys::SysDepZoneLoadsLagged;
@@ -311,8 +307,8 @@ namespace HVACManager {
             state.dataContaminantBalance->ZoneAirCO2Avg = 0.0;
         }
         if (Contaminant.GenericContamSimulation) {
-            OutdoorGC = GetCurrentScheduleValue(state, Contaminant.GenericContamOutdoorSchedPtr);
-            if (allocated(ZoneAirGCAvg)) ZoneAirGCAvg = 0.0;
+            state.dataContaminantBalance->OutdoorGC = GetCurrentScheduleValue(state, Contaminant.GenericContamOutdoorSchedPtr);
+            if (allocated(state.dataContaminantBalance->ZoneAirGCAvg)) state.dataContaminantBalance->ZoneAirGCAvg = 0.0;
         }
 
         if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag) {
@@ -456,7 +452,7 @@ namespace HVACManager {
                 ZTAV(ZoneNum) += ZT(ZoneNum) * FracTimeStepZone;
                 ZoneAirHumRatAvg(ZoneNum) += ZoneAirHumRat(ZoneNum) * FracTimeStepZone;
                 if (Contaminant.CO2Simulation) state.dataContaminantBalance->ZoneAirCO2Avg(ZoneNum) += state.dataContaminantBalance->ZoneAirCO2(ZoneNum) * FracTimeStepZone;
-                if (Contaminant.GenericContamSimulation) ZoneAirGCAvg(ZoneNum) += ZoneAirGC(ZoneNum) * FracTimeStepZone;
+                if (Contaminant.GenericContamSimulation) state.dataContaminantBalance->ZoneAirGCAvg(ZoneNum) += state.dataContaminantBalance->ZoneAirGC(ZoneNum) * FracTimeStepZone;
                 if (state.dataZoneTempPredictorCorrector->NumOnOffCtrZone > 0) {
                     ZoneThermostatSetPointHiAver(ZoneNum) += ZoneThermostatSetPointHi(ZoneNum) * FracTimeStepZone;
                     ZoneThermostatSetPointLoAver(ZoneNum) += ZoneThermostatSetPointLo(ZoneNum) * FracTimeStepZone;

@@ -149,10 +149,6 @@ namespace HeatBalanceManager {
     using namespace DataRoomAirModel;
     using namespace DataIPShortCuts;
     using DataContaminantBalance::Contaminant;
-    using DataContaminantBalance::OutdoorGC;
-    using DataContaminantBalance::ZoneAirGC;
-    using DataContaminantBalance::ZoneAirGCAvg;
-    using DataContaminantBalance::ZoneAirGCTemp;
     using DataSurfaces::CalcSolRefl;
     using DataSurfaces::DividedLite;
     using DataSurfaces::FrameDivider;
@@ -5541,10 +5537,10 @@ namespace HeatBalanceManager {
             state.dataContaminantBalance->ZoneAirCO2Avg.dimension(state.dataGlobal->NumOfZones, state.dataContaminantBalance->OutdoorCO2);
         }
         if (Contaminant.GenericContamSimulation) {
-            OutdoorGC = GetCurrentScheduleValue(state, Contaminant.GenericContamOutdoorSchedPtr);
-            ZoneAirGC.dimension(state.dataGlobal->NumOfZones, OutdoorGC);
-            ZoneAirGCTemp.dimension(state.dataGlobal->NumOfZones, OutdoorGC);
-            ZoneAirGCAvg.dimension(state.dataGlobal->NumOfZones, OutdoorGC);
+            state.dataContaminantBalance->OutdoorGC = GetCurrentScheduleValue(state, Contaminant.GenericContamOutdoorSchedPtr);
+            state.dataContaminantBalance->ZoneAirGC.dimension(state.dataGlobal->NumOfZones, state.dataContaminantBalance->OutdoorGC);
+            state.dataContaminantBalance->ZoneAirGCTemp.dimension(state.dataGlobal->NumOfZones, state.dataContaminantBalance->OutdoorGC);
+            state.dataContaminantBalance->ZoneAirGCAvg.dimension(state.dataGlobal->NumOfZones, state.dataContaminantBalance->OutdoorGC);
         }
         MaxTempPrevDay.dimension(state.dataGlobal->NumOfZones, 0.0);
         MinTempPrevDay.dimension(state.dataGlobal->NumOfZones, 0.0);
