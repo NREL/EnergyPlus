@@ -487,7 +487,11 @@ static int checkElementType(void *element, Elm e)
 static int checkPeek(int e)
 {
     if (stackIsEmpty(stack)) {
-        printf("Illegal document structure, expected %s\n", elmNames[e]);
+        if (e == ANY_TYPE) {
+            printf("Illegal document structure, expected ANY_TYPE (-1)\n");
+        } else {
+            printf("Illegal document structure, expected %s\n", elmNames[e]);
+        }
         XML_StopParser(parser, XML_FALSE);
         return 0; // error
     }
