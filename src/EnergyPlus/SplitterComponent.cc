@@ -303,7 +303,6 @@ namespace SplitterComponent {
         // METHODOLOGY EMPLOYED:
         // Uses the status flags to trigger events.
 
-        using DataContaminantBalance::Contaminant;
         using DataEnvironment::OutBaroPress;
         using DataEnvironment::OutHumRat;
         using Psychrometrics::PsyHFnTdbW;
@@ -326,10 +325,10 @@ namespace SplitterComponent {
             Node(InletNode).HumRat = OutHumRat;
             Node(InletNode).Enthalpy = AirEnthalpy;
             Node(InletNode).Press = OutBaroPress;
-            if (Contaminant.CO2Simulation) {
+            if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
                 Node(InletNode).CO2 = state.dataContaminantBalance->OutdoorCO2;
             }
-            if (Contaminant.GenericContamSimulation) {
+            if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
                 Node(InletNode).GenContam = state.dataContaminantBalance->OutdoorGC;
             }
 
@@ -482,8 +481,6 @@ namespace SplitterComponent {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        using DataContaminantBalance::Contaminant;
-
         Real64 const FlowRateToler(0.01); // Tolerance for mass flow rate convergence (in kg/s)
 
         int InletNode;
@@ -504,10 +501,10 @@ namespace SplitterComponent {
                 Node(OutletNode).Enthalpy = state.dataSplitterComponent->SplitterCond(SplitterNum).OutletEnthalpy(NodeNum);
                 Node(OutletNode).Quality = Node(InletNode).Quality;
                 Node(OutletNode).Press = state.dataSplitterComponent->SplitterCond(SplitterNum).OutletPressure(NodeNum);
-                if (Contaminant.CO2Simulation) {
+                if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
                     Node(OutletNode).CO2 = Node(InletNode).CO2;
                 }
-                if (Contaminant.GenericContamSimulation) {
+                if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
                     Node(OutletNode).GenContam = Node(InletNode).GenContam;
                 }
             }

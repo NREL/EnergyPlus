@@ -92,7 +92,6 @@ namespace OutAirNodeManager {
     // Using/Aliasing
     using namespace DataLoopNode;
     using namespace DataEnvironment;
-    using DataContaminantBalance::Contaminant;
     // USE DataHVACGlobals, ONLY: FirstTimeStepSysFlag
 
     // Data
@@ -659,8 +658,8 @@ namespace OutAirNodeManager {
         Node(NodeNum).Press = OutBaroPress;
         Node(NodeNum).Quality = 0.0;
         // Add contaminants
-        if (Contaminant.CO2Simulation) Node(NodeNum).CO2 = state.dataContaminantBalance->OutdoorCO2;
-        if (Contaminant.GenericContamSimulation) Node(NodeNum).GenContam = state.dataContaminantBalance->OutdoorGC;
+        if (state.dataContaminantBalance->Contaminant.CO2Simulation) Node(NodeNum).CO2 = state.dataContaminantBalance->OutdoorCO2;
+        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) Node(NodeNum).GenContam = state.dataContaminantBalance->OutdoorGC;
 
     }
 

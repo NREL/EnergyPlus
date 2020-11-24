@@ -5263,7 +5263,7 @@ namespace HeatBalanceSurfaceManager {
                 ZoneCO2LevelOccuHourBins(ZoneNum).assign(NoBins, 0.0);
             }
             reportCO2ResilienceFirstTime = false;
-            if (!DataContaminantBalance::Contaminant.CO2Simulation) {
+            if (!state.dataContaminantBalance->Contaminant.CO2Simulation) {
                 if (OutputReportTabular::displayCO2ResilienceSummaryExplicitly) {
                     ShowWarningError(state, "Writing Annual CO2 Resilience Summary - CO2 Level Hours reports: "
                                      "Zone Air CO2 Concentration output is required, "

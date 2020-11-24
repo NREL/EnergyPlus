@@ -221,7 +221,6 @@ namespace HVACManager {
         using ZoneTempPredictorCorrector::ManageZoneAirUpdates;
 
         using AirflowNetworkBalanceManager::ManageAirflowNetworkBalance;
-        using DataContaminantBalance::Contaminant;
         using DataHeatBalFanSys::QRadSurfAFNDuct;
         using DataHeatBalFanSys::SysDepZoneLoads;
         using DataHeatBalFanSys::SysDepZoneLoadsLagged;
@@ -302,12 +301,12 @@ namespace HVACManager {
         ZoneThermostatSetPointLoAver = 0.0;
         ZoneAirHumRatAvg = 0.0;
         PrintedWarmup = false;
-        if (Contaminant.CO2Simulation) {
-            state.dataContaminantBalance->OutdoorCO2 = GetCurrentScheduleValue(state, Contaminant.CO2OutdoorSchedPtr);
+        if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
+            state.dataContaminantBalance->OutdoorCO2 = GetCurrentScheduleValue(state, state.dataContaminantBalance->Contaminant.CO2OutdoorSchedPtr);
             state.dataContaminantBalance->ZoneAirCO2Avg = 0.0;
         }
-        if (Contaminant.GenericContamSimulation) {
-            state.dataContaminantBalance->OutdoorGC = GetCurrentScheduleValue(state, Contaminant.GenericContamOutdoorSchedPtr);
+        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
+            state.dataContaminantBalance->OutdoorGC = GetCurrentScheduleValue(state, state.dataContaminantBalance->Contaminant.GenericContamOutdoorSchedPtr);
             if (allocated(state.dataContaminantBalance->ZoneAirGCAvg)) state.dataContaminantBalance->ZoneAirGCAvg = 0.0;
         }
 
@@ -340,7 +339,7 @@ namespace HVACManager {
 
         // ZONE INITIALIZATION  'Get Zone Setpoints'
         ManageZoneAirUpdates(state, iGetZoneSetPoints, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
-        if (Contaminant.SimulateContaminants)
+        if (state.dataContaminantBalance->Contaminant.SimulateContaminants)
             ManageZoneContaminanUpdates(state, iGetZoneSetPoints, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
 
         ManageHybridVentilation(state);
@@ -359,7 +358,7 @@ namespace HVACManager {
 
         ManageZoneAirUpdates(state, iPredictStep, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
 
-        if (Contaminant.SimulateContaminants) ManageZoneContaminanUpdates(state, iPredictStep, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+        if (state.dataContaminantBalance->Contaminant.SimulateContaminants) ManageZoneContaminanUpdates(state, iPredictStep, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
 
         SimHVAC(state);
 
@@ -380,7 +379,7 @@ namespace HVACManager {
         state.dataGlobal->BeginTimeStepFlag = false; // At this point, we have been through the first pass through SimHVAC so this needs to be set
 
         ManageZoneAirUpdates(state, iCorrectStep, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
-        if (Contaminant.SimulateContaminants) ManageZoneContaminanUpdates(state, iCorrectStep, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+        if (state.dataContaminantBalance->Contaminant.SimulateContaminants) ManageZoneContaminanUpdates(state, iCorrectStep, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
 
         if (ZoneTempChange > MaxZoneTempDiff && !state.dataGlobal->KickOffSimulation) {
             // determine value of adaptive system time step
@@ -415,7 +414,7 @@ namespace HVACManager {
                 ManageZoneAirUpdates(state, iPredictStep, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory,
                                      PriorTimeStep);
 
-                if (Contaminant.SimulateContaminants)
+                if (state.dataContaminantBalance->Contaminant.SimulateContaminants)
                     ManageZoneContaminanUpdates(state, iPredictStep, ShortenTimeStepSys, UseZoneTimeStepHistory,
                                                 PriorTimeStep);
                 SimHVAC(state);
@@ -434,13 +433,13 @@ namespace HVACManager {
 
                 ManageZoneAirUpdates(state, iCorrectStep, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory,
                                      PriorTimeStep);
-                if (Contaminant.SimulateContaminants)
+                if (state.dataContaminantBalance->Contaminant.SimulateContaminants)
                     ManageZoneContaminanUpdates(state, iCorrectStep, ShortenTimeStepSys, UseZoneTimeStepHistory,
                                                 PriorTimeStep);
 
                 ManageZoneAirUpdates(state, iPushSystemTimestepHistories, ZoneTempChange, ShortenTimeStepSys,
                                      UseZoneTimeStepHistory, PriorTimeStep);
-                if (Contaminant.SimulateContaminants)
+                if (state.dataContaminantBalance->Contaminant.SimulateContaminants)
                     ManageZoneContaminanUpdates(state, iPushSystemTimestepHistories, ShortenTimeStepSys,
                                                 UseZoneTimeStepHistory, PriorTimeStep);
                 PreviousTimeStep = TimeStepSys;
@@ -451,8 +450,8 @@ namespace HVACManager {
             for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 ZTAV(ZoneNum) += ZT(ZoneNum) * FracTimeStepZone;
                 ZoneAirHumRatAvg(ZoneNum) += ZoneAirHumRat(ZoneNum) * FracTimeStepZone;
-                if (Contaminant.CO2Simulation) state.dataContaminantBalance->ZoneAirCO2Avg(ZoneNum) += state.dataContaminantBalance->ZoneAirCO2(ZoneNum) * FracTimeStepZone;
-                if (Contaminant.GenericContamSimulation) state.dataContaminantBalance->ZoneAirGCAvg(ZoneNum) += state.dataContaminantBalance->ZoneAirGC(ZoneNum) * FracTimeStepZone;
+                if (state.dataContaminantBalance->Contaminant.CO2Simulation) state.dataContaminantBalance->ZoneAirCO2Avg(ZoneNum) += state.dataContaminantBalance->ZoneAirCO2(ZoneNum) * FracTimeStepZone;
+                if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) state.dataContaminantBalance->ZoneAirGCAvg(ZoneNum) += state.dataContaminantBalance->ZoneAirGC(ZoneNum) * FracTimeStepZone;
                 if (state.dataZoneTempPredictorCorrector->NumOnOffCtrZone > 0) {
                     ZoneThermostatSetPointHiAver(ZoneNum) += ZoneThermostatSetPointHi(ZoneNum) * FracTimeStepZone;
                     ZoneThermostatSetPointLoAver(ZoneNum) += ZoneThermostatSetPointLo(ZoneNum) * FracTimeStepZone;
@@ -583,7 +582,7 @@ namespace HVACManager {
         } // system time step  loop (loops once if no downstepping)
 
         ManageZoneAirUpdates(state, iPushZoneTimestepHistories, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
-        if (Contaminant.SimulateContaminants)
+        if (state.dataContaminantBalance->Contaminant.SimulateContaminants)
             ManageZoneContaminanUpdates(state, iPushZoneTimestepHistories, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
 
         NumOfSysTimeStepsLastZoneTimeStep = NumOfSysTimeSteps;

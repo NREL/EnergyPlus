@@ -251,25 +251,6 @@ namespace DataContaminantBalance {
         }
     };
 
-    // Object Data
-    extern Array1D<ZoneSystemContaminantDemandData> ZoneSysContDemand;
-    extern ContaminantData Contaminant; // A logical flag to determine whether any contaminants are simulated or not | CO2 simulation flag | CO2
-                                        // outdoor level schedule pointer | Generic contaminant simulation flag | Generic contaminant outdoor level
-                                        // schedule pointer
-    extern Array1D<ZoneContControls> ContaminantControlledZone;
-    extern Array1D<ZoneContamGenericDataConstant> ZoneContamGenericConstant;
-    extern Array1D<ZoneContamGenericDataPDriven> ZoneContamGenericPDriven;
-    extern Array1D<ZoneContamGenericDataCutoff> ZoneContamGenericCutoff;
-    extern Array1D<ZoneContamGenericDataDecay> ZoneContamGenericDecay;
-    extern Array1D<ZoneContamGenericDataBLDiff> ZoneContamGenericBLDiff;
-    extern Array1D<ZoneContamGenericDataDVS> ZoneContamGenericDVS;
-    extern Array1D<ZoneContamGenericDataDRS> ZoneContamGenericDRS;
-
-
-    // Clears the global data in DataContaminantBalance.
-    // Needed for unit tests, should not be normally called.
-    void clear_state();
-
 } // namespace DataContaminantBalance
 
 struct ContaminantBalanceData : BaseGlobalStruct {
@@ -353,6 +334,18 @@ struct ContaminantBalanceData : BaseGlobalStruct {
     Array1D<Real64> BZGC;
     Array1D<Real64> CZGC;
 
+    Array1D<DataContaminantBalance::ZoneSystemContaminantDemandData> ZoneSysContDemand;
+    DataContaminantBalance::ContaminantData Contaminant; // A logical flag to determine whether any contaminants are simulated or not | CO2 simulation flag | CO2 outdoor
+    // level schedule pointer | Generic contaminant simulation flag | Generic contaminant outdoor level schedule pointer
+    Array1D<DataContaminantBalance::ZoneContControls> ContaminantControlledZone;
+    Array1D<DataContaminantBalance::ZoneContamGenericDataConstant> ZoneContamGenericConstant;
+    Array1D<DataContaminantBalance::ZoneContamGenericDataPDriven> ZoneContamGenericPDriven;
+    Array1D<DataContaminantBalance::ZoneContamGenericDataCutoff> ZoneContamGenericCutoff;
+    Array1D<DataContaminantBalance::ZoneContamGenericDataDecay> ZoneContamGenericDecay;
+    Array1D<DataContaminantBalance::ZoneContamGenericDataBLDiff> ZoneContamGenericBLDiff;
+    Array1D<DataContaminantBalance::ZoneContamGenericDataDVS> ZoneContamGenericDVS;
+    Array1D<DataContaminantBalance::ZoneContamGenericDataDRS> ZoneContamGenericDRS;
+
     void clear_state() override
     {
         this->ZoneCO2SetPoint.deallocate();
@@ -414,6 +407,20 @@ struct ContaminantBalanceData : BaseGlobalStruct {
         this->AZGC.deallocate();
         this->BZGC.deallocate();
         this->CZGC.deallocate();
+        this->ZoneSysContDemand.deallocate();
+        this->Contaminant.SimulateContaminants = false;
+        this->Contaminant.CO2Simulation = false;
+        this->Contaminant.CO2OutdoorSchedPtr = 0;
+        this->Contaminant.GenericContamSimulation = false;
+        this->Contaminant.GenericContamOutdoorSchedPtr = 0;
+        this->ContaminantControlledZone.deallocate();
+        this->ZoneContamGenericConstant.deallocate();
+        this->ZoneContamGenericPDriven.deallocate();
+        this->ZoneContamGenericCutoff.deallocate();
+        this->ZoneContamGenericDecay.deallocate();
+        this->ZoneContamGenericBLDiff.deallocate();
+        this->ZoneContamGenericDVS.deallocate();
+        this->ZoneContamGenericDRS.deallocate();
     }
 };
 

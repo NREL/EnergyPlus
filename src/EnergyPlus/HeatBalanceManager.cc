@@ -148,7 +148,6 @@ namespace HeatBalanceManager {
     using namespace DataHeatBalSurface;
     using namespace DataRoomAirModel;
     using namespace DataIPShortCuts;
-    using DataContaminantBalance::Contaminant;
     using DataSurfaces::CalcSolRefl;
     using DataSurfaces::DividedLite;
     using DataSurfaces::FrameDivider;
@@ -1172,25 +1171,25 @@ namespace HeatBalanceManager {
                 {
                     auto const SELECT_CASE_var(AlphaName(1));
                     if (SELECT_CASE_var == "YES") {
-                        Contaminant.CO2Simulation = true;
-                        Contaminant.SimulateContaminants = true;
+                        state.dataContaminantBalance->Contaminant.CO2Simulation = true;
+                        state.dataContaminantBalance->Contaminant.SimulateContaminants = true;
                     } else if (SELECT_CASE_var == "NO") {
-                        Contaminant.CO2Simulation = false;
+                        state.dataContaminantBalance->Contaminant.CO2Simulation = false;
                     } else {
-                        Contaminant.CO2Simulation = false;
+                        state.dataContaminantBalance->Contaminant.CO2Simulation = false;
                         AlphaName(1) = "NO";
                         ShowWarningError(state, CurrentModuleObject + ": Invalid input of " + cAlphaFieldNames(1) + ". The default choice is assigned = NO");
                     }
                 }
             }
-            if (NumAlpha == 1 && Contaminant.CO2Simulation) {
-                if (Contaminant.CO2Simulation) {
+            if (NumAlpha == 1 && state.dataContaminantBalance->Contaminant.CO2Simulation) {
+                if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
                     ShowSevereError(state, CurrentModuleObject + ", " + cAlphaFieldNames(2) + " is required and not given.");
                     ErrorsFound = true;
                 }
-            } else if (NumAlpha > 1 && Contaminant.CO2Simulation) {
-                Contaminant.CO2OutdoorSchedPtr = GetScheduleIndex(state, AlphaName(2));
-                if (Contaminant.CO2OutdoorSchedPtr == 0) {
+            } else if (NumAlpha > 1 && state.dataContaminantBalance->Contaminant.CO2Simulation) {
+                state.dataContaminantBalance->Contaminant.CO2OutdoorSchedPtr = GetScheduleIndex(state, AlphaName(2));
+                if (state.dataContaminantBalance->Contaminant.CO2OutdoorSchedPtr == 0) {
                     ShowSevereError(state, CurrentModuleObject + ", " + cAlphaFieldNames(2) + " not found: " + AlphaName(2));
                     ErrorsFound = true;
                 }
@@ -1199,33 +1198,33 @@ namespace HeatBalanceManager {
                 {
                     auto const SELECT_CASE_var(AlphaName(3));
                     if (SELECT_CASE_var == "YES") {
-                        Contaminant.GenericContamSimulation = true;
-                        if (!Contaminant.CO2Simulation) Contaminant.SimulateContaminants = true;
+                        state.dataContaminantBalance->Contaminant.GenericContamSimulation = true;
+                        if (!state.dataContaminantBalance->Contaminant.CO2Simulation) state.dataContaminantBalance->Contaminant.SimulateContaminants = true;
                     } else if (SELECT_CASE_var == "NO") {
-                        Contaminant.GenericContamSimulation = false;
+                        state.dataContaminantBalance->Contaminant.GenericContamSimulation = false;
                     } else {
-                        Contaminant.GenericContamSimulation = false;
+                        state.dataContaminantBalance->Contaminant.GenericContamSimulation = false;
                         AlphaName(3) = "NO";
                         ShowWarningError(state, CurrentModuleObject + ": Invalid input of " + cAlphaFieldNames(3) + ". The default choice is assigned = NO");
                     }
                 }
-                if (NumAlpha == 3 && Contaminant.GenericContamSimulation) {
-                    if (Contaminant.GenericContamSimulation) {
+                if (NumAlpha == 3 && state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
+                    if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
                         ShowSevereError(state, CurrentModuleObject + ", " + cAlphaFieldNames(4) + " is required and not given.");
                         ErrorsFound = true;
                     }
-                } else if (NumAlpha > 3 && Contaminant.GenericContamSimulation) {
-                    Contaminant.GenericContamOutdoorSchedPtr = GetScheduleIndex(state, AlphaName(4));
-                    if (Contaminant.GenericContamOutdoorSchedPtr == 0) {
+                } else if (NumAlpha > 3 && state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
+                    state.dataContaminantBalance->Contaminant.GenericContamOutdoorSchedPtr = GetScheduleIndex(state, AlphaName(4));
+                    if (state.dataContaminantBalance->Contaminant.GenericContamOutdoorSchedPtr == 0) {
                         ShowSevereError(state, CurrentModuleObject + ", " + cAlphaFieldNames(4) + " not found: " + AlphaName(4));
                         ErrorsFound = true;
                     }
                 }
             }
         } else {
-            Contaminant.SimulateContaminants = false;
-            Contaminant.CO2Simulation = false;
-            Contaminant.GenericContamSimulation = false;
+            state.dataContaminantBalance->Contaminant.SimulateContaminants = false;
+            state.dataContaminantBalance->Contaminant.CO2Simulation = false;
+            state.dataContaminantBalance->Contaminant.GenericContamSimulation = false;
             AlphaName(1) = "NO";
             AlphaName(3) = "NO";
         }
@@ -1236,7 +1235,7 @@ namespace HeatBalanceManager {
             "! <Zone Air Carbon Dioxide Balance Simulation>, Simulation {{Yes/No}}, Carbon Dioxide Concentration\n");
         print(state.files.eio, Format_728);
         static constexpr auto Format_730(" Zone Air Carbon Dioxide Balance Simulation, {},{}\n");
-        if (Contaminant.SimulateContaminants && Contaminant.CO2Simulation) {
+        if (state.dataContaminantBalance->Contaminant.SimulateContaminants && state.dataContaminantBalance->Contaminant.CO2Simulation) {
             print(state.files.eio, Format_730, "Yes", AlphaName(1));
         } else {
             print(state.files.eio, Format_730, "No", "N/A");
@@ -1246,7 +1245,7 @@ namespace HeatBalanceManager {
             "! <Zone Air Generic Contaminant Balance Simulation>, Simulation {{Yes/No}}, Generic Contaminant Concentration\n");
         static constexpr auto Format_731(" Zone Air Generic Contaminant Balance Simulation, {},{}\n");
         print(state.files.eio, Format_729);
-        if (Contaminant.SimulateContaminants && Contaminant.GenericContamSimulation) {
+        if (state.dataContaminantBalance->Contaminant.SimulateContaminants && state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
             print(state.files.eio, Format_731, "Yes", AlphaName(3));
         } else {
             print(state.files.eio, Format_731, "No", "N/A");
@@ -1294,12 +1293,12 @@ namespace HeatBalanceManager {
                         ZoneAirMassFlow.InfiltrationTreatment = AddInfiltrationFlow;
                         ZoneAirMassFlow.EnforceZoneMassBalance = true;
                         AlphaName(2) = "AddInfiltrationFlow";
-                        if (!Contaminant.CO2Simulation) Contaminant.SimulateContaminants = true;
+                        if (!state.dataContaminantBalance->Contaminant.CO2Simulation) state.dataContaminantBalance->Contaminant.SimulateContaminants = true;
                     } else if (SELECT_CASE_var == "ADJUSTINFILTRATIONFLOW") {
                         ZoneAirMassFlow.InfiltrationTreatment = AdjustInfiltrationFlow;
                         ZoneAirMassFlow.EnforceZoneMassBalance = true;
                         AlphaName(2) = "AddInfiltrationFlow";
-                        if (!Contaminant.CO2Simulation) Contaminant.SimulateContaminants = true;
+                        if (!state.dataContaminantBalance->Contaminant.CO2Simulation) state.dataContaminantBalance->Contaminant.SimulateContaminants = true;
                     } else if (SELECT_CASE_var == "NONE") {
                         ZoneAirMassFlow.InfiltrationTreatment = NoInfiltrationFlow;
                         AlphaName(2) = "None";
@@ -5530,14 +5529,14 @@ namespace HeatBalanceManager {
         CTMFL.dimension(state.dataGlobal->NumOfZones, 0.0);
         MDotCPOA.dimension(state.dataGlobal->NumOfZones, 0.0);
         MDotOA.dimension(state.dataGlobal->NumOfZones, 0.0);
-        if (Contaminant.CO2Simulation) {
-            state.dataContaminantBalance->OutdoorCO2 = GetCurrentScheduleValue(state, Contaminant.CO2OutdoorSchedPtr);
+        if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
+            state.dataContaminantBalance->OutdoorCO2 = GetCurrentScheduleValue(state, state.dataContaminantBalance->Contaminant.CO2OutdoorSchedPtr);
             state.dataContaminantBalance->ZoneAirCO2.dimension(state.dataGlobal->NumOfZones, state.dataContaminantBalance->OutdoorCO2);
             state.dataContaminantBalance->ZoneAirCO2Temp.dimension(state.dataGlobal->NumOfZones, state.dataContaminantBalance->OutdoorCO2);
             state.dataContaminantBalance->ZoneAirCO2Avg.dimension(state.dataGlobal->NumOfZones, state.dataContaminantBalance->OutdoorCO2);
         }
-        if (Contaminant.GenericContamSimulation) {
-            state.dataContaminantBalance->OutdoorGC = GetCurrentScheduleValue(state, Contaminant.GenericContamOutdoorSchedPtr);
+        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
+            state.dataContaminantBalance->OutdoorGC = GetCurrentScheduleValue(state, state.dataContaminantBalance->Contaminant.GenericContamOutdoorSchedPtr);
             state.dataContaminantBalance->ZoneAirGC.dimension(state.dataGlobal->NumOfZones, state.dataContaminantBalance->OutdoorGC);
             state.dataContaminantBalance->ZoneAirGCTemp.dimension(state.dataGlobal->NumOfZones, state.dataContaminantBalance->OutdoorGC);
             state.dataContaminantBalance->ZoneAirGCAvg.dimension(state.dataGlobal->NumOfZones, state.dataContaminantBalance->OutdoorGC);

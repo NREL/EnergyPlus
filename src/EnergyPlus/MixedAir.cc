@@ -147,7 +147,6 @@ namespace MixedAir {
     using namespace DataHVACGlobals;
     using namespace ScheduleManager;
     using namespace DataSizing;
-    using DataContaminantBalance::Contaminant;
     using namespace FaultsManager;
 
     // Data
@@ -1365,7 +1364,6 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
         using NodeInputManager::GetOnlySingleNode;
         using namespace OutputReportPredefined;
 
-        using DataContaminantBalance::Contaminant;
         using OutAirNodeManager::CheckOutAirNodeNumber;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -1566,7 +1564,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                         thisVentilationMechanical.SystemOAMethod = SOAM_VRP;
                     } else if ((SELECT_CASE_var == "INDOORAIRQUALITYPROCEDURE")) { // Indoor Air Quality Procedure based on ASHRAE Standard 62.1-2007
                         thisVentilationMechanical.SystemOAMethod = SOAM_IAQP;
-                        if (!Contaminant.CO2Simulation) {
+                        if (!state.dataContaminantBalance->Contaminant.CO2Simulation) {
                             ShowSevereError(state, CurrentModuleObject + "=\"" + AlphArray(1) + "\" valid " + cAlphaFields(2) + "=\"" + AlphArray(2) +
                                             "\" requires CO2 simulation.");
                             ShowContinueError(state, "The choice must be Yes for the field Carbon Dioxide Concentration in ZoneAirContaminantBalance");
@@ -1575,7 +1573,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                     } else if (SELECT_CASE_var ==
                                "PROPORTIONALCONTROLBASEDONOCCUPANCYSCHEDULE") { // Proportional Control based on ASHRAE Standard 62.1-2004
                         thisVentilationMechanical.SystemOAMethod = SOAM_ProportionalControlSchOcc;
-                        if (!Contaminant.CO2Simulation) {
+                        if (!state.dataContaminantBalance->Contaminant.CO2Simulation) {
                             ShowSevereError(state, CurrentModuleObject + "=\"" + AlphArray(1) + "\" valid " + cAlphaFields(2) + "=\"" + AlphArray(2) +
                                             "\" requires CO2 simulation.");
                             ShowContinueError(state, "The choice must be Yes for the field Carbon Dioxide Concentration in ZoneAirContaminantBalance");
@@ -1584,7 +1582,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                     } else if (SELECT_CASE_var ==
                                "PROPORTIONALCONTROLBASEDONDESIGNOCCUPANCY") { // Proportional Control based on ASHRAE Standard 62.1-2004
                         thisVentilationMechanical.SystemOAMethod = SOAM_ProportionalControlDesOcc;
-                        if (!Contaminant.CO2Simulation) {
+                        if (!state.dataContaminantBalance->Contaminant.CO2Simulation) {
                             ShowSevereError(state, CurrentModuleObject + "=\"" + AlphArray(1) + "\" valid " + cAlphaFields(2) + "=\"" + AlphArray(2) +
                                             "\" requires CO2 simulation.");
                             ShowContinueError(state, "The choice must be Yes for the field Carbon Dioxide Concentration in ZoneAirContaminantBalance");
@@ -1592,7 +1590,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                         }
                     } else if (SELECT_CASE_var == "PROPORTIONALCONTROLBASEDONDESIGNOARATE") { // Proportional Control based on design OA rate
                         thisVentilationMechanical.SystemOAMethod = SOAM_ProportionalControlDesOARate;
-                        if (!Contaminant.CO2Simulation) {
+                        if (!state.dataContaminantBalance->Contaminant.CO2Simulation) {
                             ShowSevereError(state, CurrentModuleObject + "=\"" + AlphArray(1) + "\" valid " + cAlphaFields(2) + "=\"" + AlphArray(2) +
                                             "\" requires CO2 simulation.");
                             ShowContinueError(state, "The choice must be Yes for the field Carbon Dioxide Concentration in ZoneAirContaminantBalance");
@@ -1601,7 +1599,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                     } else if (SELECT_CASE_var ==
                                "INDOORAIRQUALITYPROCEDUREGENERICCONTAMINANT") { // Indoor Air Quality Procedure based on generic contaminant setpoint
                         thisVentilationMechanical.SystemOAMethod = SOAM_IAQPGC;
-                        if (!Contaminant.GenericContamSimulation) {
+                        if (!state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
                             ShowSevereError(state, CurrentModuleObject + "=\"" + AlphArray(1) + "\" valid " + cAlphaFields(2) + "=\"" + AlphArray(2) +
                                             "\" requires generic contaminant simulation.");
                             ShowContinueError(state, "The choice must be Yes for the field Generic Contaminant Concentration in ZoneAirContaminantBalance");
@@ -1610,13 +1608,13 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                     } else if (SELECT_CASE_var == "INDOORAIRQUALITYPROCEDURECOMBINED") { // Indoor Air Quality Procedure based on both generic
                                                                                          // contaminant and CO2 setpoint
                         thisVentilationMechanical.SystemOAMethod = SOAM_IAQPCOM;
-                        if (!Contaminant.GenericContamSimulation) {
+                        if (!state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
                             ShowSevereError(state, CurrentModuleObject + "=\"" + AlphArray(1) + "\" valid " + cAlphaFields(2) + "=\"" + AlphArray(2) +
                                             "\" requires generic contaminant simulation.");
                             ShowContinueError(state, "The choice must be Yes for the field Generic Contaminant Concentration in ZoneAirContaminantBalance");
                             ErrorsFound = true;
                         }
-                        if (!Contaminant.CO2Simulation) {
+                        if (!state.dataContaminantBalance->Contaminant.CO2Simulation) {
                             ShowSevereError(state, CurrentModuleObject + "=\"" + AlphArray(1) + "\" valid " + cAlphaFields(2) + "=\"" + AlphArray(2) +
                                             "\" requires CO2 simulation.");
                             ShowContinueError(state, "The choice must be Yes for the field Carbon Dioxide Concentration in ZoneAirContaminantBalance");
@@ -2258,7 +2256,6 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
         using NodeInputManager::GetOnlySingleNode;
         using namespace OutputReportPredefined;
 
-        using DataContaminantBalance::Contaminant;
         using DataZoneControls::HumidityControlZone;
         using DataZoneControls::NumHumidityControlZones;
         using OutAirNodeManager::CheckOutAirNodeNumber;
@@ -3853,7 +3850,6 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
         Real64 &MechVentOAMassFlow // outside air mass flow rate calculated by mechanical ventilation object [kg/s]
     )
     {
-        using DataContaminantBalance::ZoneSysContDemand;
         using DataHeatBalance::People;
         using DataHeatBalance::TotPeople;
         using DataHeatBalance::Zone;
@@ -3922,7 +3918,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                 SysOAMassFlow = 0.0;
                 for (int ZoneIndex = 1; ZoneIndex <= this->NumofVentMechZones; ++ZoneIndex) {
                     int ZoneNum = this->VentMechZone(ZoneIndex);
-                    SysOAMassFlow += ZoneSysContDemand(ZoneNum).OutputRequiredToCO2SP * GetCurrentScheduleValue(state, this->ZoneOASchPtr(ZoneIndex));
+                    SysOAMassFlow += state.dataContaminantBalance->ZoneSysContDemand(ZoneNum).OutputRequiredToCO2SP * GetCurrentScheduleValue(state, this->ZoneOASchPtr(ZoneIndex));
                 }
                 MechVentOAMassFlow = SysOAMassFlow;
             } else if (this->SystemOAMethod == SOAM_IAQPGC) {
@@ -3930,7 +3926,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                 SysOAMassFlow = 0.0;
                 for (int ZoneIndex = 1; ZoneIndex <= this->NumofVentMechZones; ++ZoneIndex) {
                     int ZoneNum = this->VentMechZone(ZoneIndex);
-                    SysOAMassFlow += ZoneSysContDemand(ZoneNum).OutputRequiredToGCSP * GetCurrentScheduleValue(state, this->ZoneOASchPtr(ZoneIndex));
+                    SysOAMassFlow += state.dataContaminantBalance->ZoneSysContDemand(ZoneNum).OutputRequiredToGCSP * GetCurrentScheduleValue(state, this->ZoneOASchPtr(ZoneIndex));
                 }
                 MechVentOAMassFlow = SysOAMassFlow;
             } else if (this->SystemOAMethod == SOAM_IAQPCOM) {
@@ -3938,13 +3934,13 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                 SysOAMassFlow = 0.0;
                 for (int ZoneIndex = 1; ZoneIndex <= this->NumofVentMechZones; ++ZoneIndex) {
                     int ZoneNum = this->VentMechZone(ZoneIndex);
-                    SysOAMassFlow += ZoneSysContDemand(ZoneNum).OutputRequiredToCO2SP * GetCurrentScheduleValue(state, this->ZoneOASchPtr(ZoneIndex));
+                    SysOAMassFlow += state.dataContaminantBalance->ZoneSysContDemand(ZoneNum).OutputRequiredToCO2SP * GetCurrentScheduleValue(state, this->ZoneOASchPtr(ZoneIndex));
                 }
                 MechVentOAMassFlow = SysOAMassFlow;
                 SysOAMassFlow = 0.0;
                 for (int ZoneIndex = 1; ZoneIndex <= this->NumofVentMechZones; ++ZoneIndex) {
                     int ZoneNum = this->VentMechZone(ZoneIndex);
-                    SysOAMassFlow += ZoneSysContDemand(ZoneNum).OutputRequiredToGCSP * GetCurrentScheduleValue(state, this->ZoneOASchPtr(ZoneIndex));
+                    SysOAMassFlow += state.dataContaminantBalance->ZoneSysContDemand(ZoneNum).OutputRequiredToGCSP * GetCurrentScheduleValue(state, this->ZoneOASchPtr(ZoneIndex));
                 }
                 MechVentOAMassFlow = max(SysOAMassFlow, MechVentOAMassFlow);
             } else {
@@ -5155,7 +5151,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
         Node(RelNode).Press = OAMixer(OAMixerNum).RelPressure;
         Node(RelNode).MassFlowRateMaxAvail = OAMixer(OAMixerNum).RelMassFlowRate;
 
-        if (Contaminant.CO2Simulation) {
+        if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
             Node(RelNode).CO2 = Node(RetNode).CO2;
             if (OAMixer(OAMixerNum).MixMassFlowRate <= VerySmallMassFlow) {
                 Node(MixNode).CO2 = Node(RetNode).CO2;
@@ -5166,7 +5162,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
             }
         }
 
-        if (Contaminant.GenericContamSimulation) {
+        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
             Node(RelNode).GenContam = Node(RetNode).GenContam;
             if (OAMixer(OAMixerNum).MixMassFlowRate <= VerySmallMassFlow) {
                 Node(MixNode).GenContam = Node(RetNode).GenContam;

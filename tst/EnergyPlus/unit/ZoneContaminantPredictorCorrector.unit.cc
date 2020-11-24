@@ -110,8 +110,8 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_AddMDotOATest)
     MixingMassFlowZone.allocate(1);
 
     state->dataGlobal->NumOfZones = 1;
-    DataContaminantBalance::Contaminant.CO2Simulation = true;
-    DataContaminantBalance::Contaminant.GenericContamSimulation = true;
+    state->dataContaminantBalance->Contaminant.CO2Simulation = true;
+    state->dataContaminantBalance->Contaminant.GenericContamSimulation = true;
 
     state->dataContaminantBalance->AZ.allocate(1);
     state->dataContaminantBalance->BZ.allocate(1);
@@ -145,7 +145,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_AddMDotOATest)
     state->dataContaminantBalance->ZoneCO2SetPoint.allocate(1);
     state->dataContaminantBalance->CO2PredictedRate.allocate(1);
     state->dataContaminantBalance->GCPredictedRate.allocate(1);
-    DataContaminantBalance::ContaminantControlledZone.allocate(1);
+    state->dataContaminantBalance->ContaminantControlledZone.allocate(1);
     state->dataContaminantBalance->ZoneGCSetPoint.allocate(1);
 
     state->dataContaminantBalance->ZoneAirDensityCO.allocate(1);
@@ -244,14 +244,14 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_AddMDotOATest)
     MixingMassFlowZone(1) = 0.0;
 
     state->dataContaminantBalance->CO2PredictedRate.allocate(1);
-    DataContaminantBalance::ZoneSysContDemand.allocate(1);
+    state->dataContaminantBalance->ZoneSysContDemand.allocate(1);
     state->dataContaminantBalance->NumContControlledZones = 1;
 
-    DataContaminantBalance::ContaminantControlledZone.allocate(1);
+    state->dataContaminantBalance->ContaminantControlledZone.allocate(1);
 
-    DataContaminantBalance::ContaminantControlledZone(1).AvaiSchedPtr = 1;
-    DataContaminantBalance::ContaminantControlledZone(1).ActualZoneNum = 1;
-    DataContaminantBalance::ContaminantControlledZone(1).NumOfZones = 1;
+    state->dataContaminantBalance->ContaminantControlledZone(1).AvaiSchedPtr = 1;
+    state->dataContaminantBalance->ContaminantControlledZone(1).ActualZoneNum = 1;
+    state->dataContaminantBalance->ContaminantControlledZone(1).NumOfZones = 1;
     state->dataContaminantBalance->ZoneGCSetPoint(1) = 0.0025;
 
     PredictZoneContaminants(*state, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
@@ -262,8 +262,8 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_AddMDotOATest)
     EXPECT_NEAR(489.931000, Node(5).CO2, 0.00001);
     EXPECT_NEAR(0.09093100, Node(5).GenContam, 0.00001);
 
-    DataContaminantBalance::Contaminant.CO2Simulation = false;
-    DataContaminantBalance::Contaminant.GenericContamSimulation = false;
+    state->dataContaminantBalance->Contaminant.CO2Simulation = false;
+    state->dataContaminantBalance->Contaminant.GenericContamSimulation = false;
 }
 
 TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_CorrectZoneContaminantsTest)
@@ -277,8 +277,8 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_CorrectZoneContamina
     MixingMassFlowZone.allocate(1);
 
     state->dataGlobal->NumOfZones = 1;
-    DataContaminantBalance::Contaminant.CO2Simulation = true;
-    DataContaminantBalance::Contaminant.GenericContamSimulation = true;
+    state->dataContaminantBalance->Contaminant.CO2Simulation = true;
+    state->dataContaminantBalance->Contaminant.GenericContamSimulation = true;
 
     state->dataContaminantBalance->AZ.allocate(1);
     state->dataContaminantBalance->BZ.allocate(1);
@@ -401,8 +401,8 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_CorrectZoneContamina
     EXPECT_NEAR(490.0, Node(5).CO2, 0.00001);
     EXPECT_NEAR(90.000999, Node(5).GenContam, 0.00001);
 
-    DataContaminantBalance::Contaminant.CO2Simulation = false;
-    DataContaminantBalance::Contaminant.GenericContamSimulation = false;
+    state->dataContaminantBalance->Contaminant.CO2Simulation = false;
+    state->dataContaminantBalance->Contaminant.GenericContamSimulation = false;
 }
 
 TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneCO2ControlTest)
@@ -417,7 +417,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneCO2ControlT
 
     state->dataGlobal->NumOfZones = 3;
 
-    DataContaminantBalance::Contaminant.CO2Simulation = true;
+    state->dataContaminantBalance->Contaminant.CO2Simulation = true;
 
     state->dataContaminantBalance->AZ.allocate(3);
     state->dataContaminantBalance->BZ.allocate(3);
@@ -602,20 +602,20 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneCO2ControlT
     Node(9).MassFlowRate = 0.01;
 
     state->dataContaminantBalance->CO2PredictedRate.allocate(3);
-    DataContaminantBalance::ZoneSysContDemand.allocate(3);
+    state->dataContaminantBalance->ZoneSysContDemand.allocate(3);
     state->dataContaminantBalance->NumContControlledZones = 3;
 
-    DataContaminantBalance::ContaminantControlledZone.allocate(3);
+    state->dataContaminantBalance->ContaminantControlledZone.allocate(3);
 
-    DataContaminantBalance::ContaminantControlledZone(1).AvaiSchedPtr = 1;
-    DataContaminantBalance::ContaminantControlledZone(1).ActualZoneNum = 1;
-    DataContaminantBalance::ContaminantControlledZone(1).NumOfZones = 1;
-    DataContaminantBalance::ContaminantControlledZone(2).AvaiSchedPtr = 1;
-    DataContaminantBalance::ContaminantControlledZone(2).ActualZoneNum = 2;
-    DataContaminantBalance::ContaminantControlledZone(2).NumOfZones = 1;
-    DataContaminantBalance::ContaminantControlledZone(3).AvaiSchedPtr = 1;
-    DataContaminantBalance::ContaminantControlledZone(3).ActualZoneNum = 3;
-    DataContaminantBalance::ContaminantControlledZone(3).NumOfZones = 1;
+    state->dataContaminantBalance->ContaminantControlledZone(1).AvaiSchedPtr = 1;
+    state->dataContaminantBalance->ContaminantControlledZone(1).ActualZoneNum = 1;
+    state->dataContaminantBalance->ContaminantControlledZone(1).NumOfZones = 1;
+    state->dataContaminantBalance->ContaminantControlledZone(2).AvaiSchedPtr = 1;
+    state->dataContaminantBalance->ContaminantControlledZone(2).ActualZoneNum = 2;
+    state->dataContaminantBalance->ContaminantControlledZone(2).NumOfZones = 1;
+    state->dataContaminantBalance->ContaminantControlledZone(3).AvaiSchedPtr = 1;
+    state->dataContaminantBalance->ContaminantControlledZone(3).ActualZoneNum = 3;
+    state->dataContaminantBalance->ContaminantControlledZone(3).NumOfZones = 1;
 
     PredictZoneContaminants(*state, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
     EXPECT_NEAR(1.0416921806, state->dataContaminantBalance->CO2PredictedRate(1), 0.00001);
@@ -635,8 +635,8 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneGCControlTe
 
     state->dataGlobal->NumOfZones = 3;
 
-    DataContaminantBalance::Contaminant.CO2Simulation = false;
-    DataContaminantBalance::Contaminant.GenericContamSimulation = true;
+    state->dataContaminantBalance->Contaminant.CO2Simulation = false;
+    state->dataContaminantBalance->Contaminant.GenericContamSimulation = true;
 
     state->dataContaminantBalance->AZGC.allocate(3);
     state->dataContaminantBalance->BZGC.allocate(3);
@@ -812,20 +812,20 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneGCControlTe
 
     state->dataContaminantBalance->GCPredictedRate.allocate(3);
 
-    DataContaminantBalance::ZoneSysContDemand.allocate(3);
+    state->dataContaminantBalance->ZoneSysContDemand.allocate(3);
     state->dataContaminantBalance->NumContControlledZones = 3;
 
-    DataContaminantBalance::ContaminantControlledZone.allocate(3);
+    state->dataContaminantBalance->ContaminantControlledZone.allocate(3);
 
-    DataContaminantBalance::ContaminantControlledZone(1).AvaiSchedPtr = 1;
-    DataContaminantBalance::ContaminantControlledZone(1).ActualZoneNum = 1;
-    DataContaminantBalance::ContaminantControlledZone(1).NumOfZones = 1;
-    DataContaminantBalance::ContaminantControlledZone(2).AvaiSchedPtr = 1;
-    DataContaminantBalance::ContaminantControlledZone(2).ActualZoneNum = 2;
-    DataContaminantBalance::ContaminantControlledZone(2).NumOfZones = 1;
-    DataContaminantBalance::ContaminantControlledZone(3).AvaiSchedPtr = 1;
-    DataContaminantBalance::ContaminantControlledZone(3).ActualZoneNum = 3;
-    DataContaminantBalance::ContaminantControlledZone(3).NumOfZones = 1;
+    state->dataContaminantBalance->ContaminantControlledZone(1).AvaiSchedPtr = 1;
+    state->dataContaminantBalance->ContaminantControlledZone(1).ActualZoneNum = 1;
+    state->dataContaminantBalance->ContaminantControlledZone(1).NumOfZones = 1;
+    state->dataContaminantBalance->ContaminantControlledZone(2).AvaiSchedPtr = 1;
+    state->dataContaminantBalance->ContaminantControlledZone(2).ActualZoneNum = 2;
+    state->dataContaminantBalance->ContaminantControlledZone(2).NumOfZones = 1;
+    state->dataContaminantBalance->ContaminantControlledZone(3).AvaiSchedPtr = 1;
+    state->dataContaminantBalance->ContaminantControlledZone(3).ActualZoneNum = 3;
+    state->dataContaminantBalance->ContaminantControlledZone(3).NumOfZones = 1;
 
     PredictZoneContaminants(*state, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
 

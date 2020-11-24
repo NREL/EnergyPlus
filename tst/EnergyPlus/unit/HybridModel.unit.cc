@@ -757,7 +757,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
 
     // Case 1: Hybrid model infiltration with measured CO2 concentration (free-floating)
 
-    Contaminant.CO2Simulation = true;
+    state->dataContaminantBalance->Contaminant.CO2Simulation = true;
     HybridModelZone(1).InternalThermalMassCalc_T = false;
     HybridModelZone(1).InfiltrationCalc_T = false;
     HybridModelZone(1).InfiltrationCalc_H = false;
@@ -783,7 +783,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
 
     // Case 2: Hybrid model people count with measured CO2 concentration (free-floating)
 
-    Contaminant.CO2Simulation = true;
+    state->dataContaminantBalance->Contaminant.CO2Simulation = true;
     HybridModelZone(1).InternalThermalMassCalc_T = false;
     HybridModelZone(1).InfiltrationCalc_T = false;
     HybridModelZone(1).InfiltrationCalc_H = false;
@@ -811,7 +811,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     EXPECT_NEAR(4, Zone(1).NumOccHM, 0.1);
 
     // Case 3: Hybrid model infiltration with measured CO2 concentration (with HVAC)
-    Contaminant.CO2Simulation = true;
+    state->dataContaminantBalance->Contaminant.CO2Simulation = true;
     HybridModelZone(1).InternalThermalMassCalc_T = false;
     HybridModelZone(1).InfiltrationCalc_T = false;
     HybridModelZone(1).InfiltrationCalc_H = false;
@@ -843,7 +843,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
 
     // Case 4: Hybrid model people count with measured CO2 concentration (with HVAC)
 
-    Contaminant.CO2Simulation = true;
+    state->dataContaminantBalance->Contaminant.CO2Simulation = true;
     HybridModelZone(1).InternalThermalMassCalc_T = false;
     HybridModelZone(1).InfiltrationCalc_T = false;
     HybridModelZone(1).InfiltrationCalc_H = false;
