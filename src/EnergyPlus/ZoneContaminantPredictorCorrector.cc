@@ -1286,8 +1286,8 @@ namespace ZoneContaminantPredictorCorrector {
         if (state.dataZoneContaminantPredictorCorrector->MyOneTimeFlag) {
             // CO2
             if (Contaminant.CO2Simulation) {
-                ZoneCO2SetPoint.dimension(state.dataGlobal->NumOfZones, 0.0);
-                CO2PredictedRate.dimension(state.dataGlobal->NumOfZones, 0.0);
+                state.dataContaminantBalance->ZoneCO2SetPoint.dimension(state.dataGlobal->NumOfZones, 0.0);
+                state.dataContaminantBalance->CO2PredictedRate.dimension(state.dataGlobal->NumOfZones, 0.0);
                 CO2ZoneTimeMinus1.dimension(state.dataGlobal->NumOfZones, 0.0);
                 CO2ZoneTimeMinus2.dimension(state.dataGlobal->NumOfZones, 0.0);
                 CO2ZoneTimeMinus3.dimension(state.dataGlobal->NumOfZones, 0.0);
@@ -1325,13 +1325,13 @@ namespace ZoneContaminantPredictorCorrector {
                         "Zone Air CO2 Concentration", OutputProcessor::Unit::ppm, ZoneAirCO2(Loop), "System", "Average", Zone(Loop).Name);
                     SetupOutputVariable(state, "Zone Air CO2 Predicted Load to Setpoint Mass Flow Rate",
                                         OutputProcessor::Unit::kg_s,
-                                        CO2PredictedRate(Loop),
+                                        state.dataContaminantBalance->CO2PredictedRate(Loop),
                                         "System",
                                         "Average",
                                         Zone(Loop).Name);
                     SetupOutputVariable(state, "Zone Air CO2 Setpoint Concentration",
                                         OutputProcessor::Unit::ppm,
-                                        ZoneCO2SetPoint(Loop),
+                                        state.dataContaminantBalance->ZoneCO2SetPoint(Loop),
                                         "System",
                                         "Average",
                                         Zone(Loop).Name);
@@ -1420,8 +1420,8 @@ namespace ZoneContaminantPredictorCorrector {
                 CO2ZoneTimeMinus2Temp = 0.0;
                 CO2ZoneTimeMinus3Temp = 0.0;
                 ZoneAirCO2Temp = OutdoorCO2;
-                ZoneCO2SetPoint = 0.0;
-                CO2PredictedRate = 0.0;
+                state.dataContaminantBalance->ZoneCO2SetPoint = 0.0;
+                state.dataContaminantBalance->CO2PredictedRate = 0.0;
                 ZoneAirCO2 = OutdoorCO2;
                 ZoneCO21 = OutdoorCO2;
                 ZoneCO2MX = OutdoorCO2;
@@ -1514,7 +1514,7 @@ namespace ZoneContaminantPredictorCorrector {
         for (Loop = 1; Loop <= NumContControlledZones; ++Loop) {
             if (Contaminant.CO2Simulation) {
                 ZoneNum = ContaminantControlledZone(Loop).ActualZoneNum;
-                ZoneCO2SetPoint(ZoneNum) = GetCurrentScheduleValue(state, ContaminantControlledZone(Loop).SPSchedIndex);
+                state.dataContaminantBalance->ZoneCO2SetPoint(ZoneNum) = GetCurrentScheduleValue(state, ContaminantControlledZone(Loop).SPSchedIndex);
             }
             if (Contaminant.GenericContamSimulation) {
                 ZoneNum = ContaminantControlledZone(Loop).ActualZoneNum;
@@ -1767,7 +1767,7 @@ namespace ZoneContaminantPredictorCorrector {
 
             if (Contaminant.CO2Simulation) {
 
-                CO2PredictedRate(ZoneNum) = 0.0;
+                state.dataContaminantBalance->CO2PredictedRate(ZoneNum) = 0.0;
                 LoadToCO2SetPoint = 0.0;
                 ZoneSysContDemand(ZoneNum).OutputRequiredToCO2SP = 0.0;
 
@@ -1777,7 +1777,7 @@ namespace ZoneContaminantPredictorCorrector {
                 for (ContControlledZoneNum = 1; ContControlledZoneNum <= NumContControlledZones; ++ContControlledZoneNum) {
                     if (ContaminantControlledZone(ContControlledZoneNum).ActualZoneNum == ZoneNum) {
                         if (GetCurrentScheduleValue(state, ContaminantControlledZone(ContControlledZoneNum).AvaiSchedPtr) > 0.0) {
-                            ZoneAirCO2SetPoint = ZoneCO2SetPoint(ContaminantControlledZone(ContControlledZoneNum).ActualZoneNum);
+                            ZoneAirCO2SetPoint = state.dataContaminantBalance->ZoneCO2SetPoint(ContaminantControlledZone(ContControlledZoneNum).ActualZoneNum);
                             if (ContaminantControlledZone(ContControlledZoneNum).EMSOverrideCO2SetPointOn) {
                                 ZoneAirCO2SetPoint = ContaminantControlledZone(ContControlledZoneNum).EMSOverrideCO2SetPointValue;
                             }
@@ -1789,7 +1789,7 @@ namespace ZoneContaminantPredictorCorrector {
                 if (!ControlledCO2ZoneFlag) {
                     for (ContControlledZoneNum = 1; ContControlledZoneNum <= NumContControlledZones; ++ContControlledZoneNum) {
                         if (GetCurrentScheduleValue(state, ContaminantControlledZone(ContControlledZoneNum).AvaiSchedPtr) > 0.0) {
-                            ZoneAirCO2SetPoint = ZoneCO2SetPoint(ContaminantControlledZone(ContControlledZoneNum).ActualZoneNum);
+                            ZoneAirCO2SetPoint = state.dataContaminantBalance->ZoneCO2SetPoint(ContaminantControlledZone(ContControlledZoneNum).ActualZoneNum);
                             if (ContaminantControlledZone(ContControlledZoneNum).EMSOverrideCO2SetPointOn) {
                                 ZoneAirCO2SetPoint = ContaminantControlledZone(ContControlledZoneNum).EMSOverrideCO2SetPointValue;
                             }
@@ -1869,7 +1869,7 @@ namespace ZoneContaminantPredictorCorrector {
 
                 // Apply the Zone Multiplier to the total zone moisture load
                 ZoneSysContDemand(ZoneNum).OutputRequiredToCO2SP *= Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier;
-                CO2PredictedRate(ZoneNum) = ZoneSysContDemand(ZoneNum).OutputRequiredToCO2SP;
+                state.dataContaminantBalance->CO2PredictedRate(ZoneNum) = ZoneSysContDemand(ZoneNum).OutputRequiredToCO2SP;
             }
 
             if (Contaminant.GenericContamSimulation) {

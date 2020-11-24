@@ -81,6 +81,7 @@
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataBranchNodeConnections.hh>
 #include <EnergyPlus/DataBSDFWindow.hh>
+#include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataWater.hh>
 #include <EnergyPlus/DataTimings.hh>

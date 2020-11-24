@@ -62,19 +62,6 @@ struct EnergyPlusData;
 
 namespace DataContaminantBalance {
 
-    // Using/Aliasing
-
-    // Data
-    // module should be available to other modules and routines.  Thus,
-    // all variables in this module must be PUBLIC.
-
-    // MODULE PARAMETER DEFINITIONS:
-
-    // MODULE VARIABLE Type DECLARATIONS:
-
-    extern Array1D<Real64> ZoneCO2SetPoint;
-    extern Array1D<Real64> CO2PredictedRate;
-
     extern Array1D<Real64> ZoneCO2Gain;             // CO2 gain from each Zone (People, equipment)
     extern Array1D<Real64> ZoneCO2GainFromPeople;   // CO2 gain from each Zone (From People only)
     extern Array1D<Real64> ZoneCO2GainExceptPeople; // Added for hybrid model CO2 gain from each Zone (Except People)
@@ -367,6 +354,18 @@ namespace DataContaminantBalance {
     void clear_state();
 
 } // namespace DataContaminantBalance
+
+struct ContaminantBalanceData : BaseGlobalStruct {
+
+    Array1D<Real64> ZoneCO2SetPoint;
+    Array1D<Real64> CO2PredictedRate;
+
+    void clear_state() override
+    {
+        this->ZoneCO2SetPoint.deallocate();
+        this->CO2PredictedRate.deallocate();
+    }
+};
 
 } // namespace EnergyPlus
 

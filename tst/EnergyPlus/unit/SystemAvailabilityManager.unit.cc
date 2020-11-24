@@ -449,7 +449,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_HybridVentilation_OT_CO2Control)
     DataHeatBalFanSys::MAT.allocate(1);
     DataHeatBalance::MRT.allocate(1);
     DataContaminantBalance::ZoneAirCO2.allocate(1);
-    DataContaminantBalance::ZoneCO2SetPoint.allocate(1);
+    state->dataContaminantBalance->ZoneCO2SetPoint.allocate(1);
     state->dataAirLoop->PriAirSysAvailMgr.allocate(1);
     state->dataSystemAvailabilityManager->SchedSysAvailMgrData.allocate(1);
     ScheduleManager::Schedule.allocate(1);
@@ -505,7 +505,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_HybridVentilation_OT_CO2Control)
 
     state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).ControlMode = 7; // CO2 control with an AirLoop
     DataContaminantBalance::ZoneAirCO2(1) = 900.0;
-    DataContaminantBalance::ZoneCO2SetPoint(1) = 800.0;
+    state->dataContaminantBalance->ZoneCO2SetPoint(1) = 800.0;
     state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).HybridVentMgrConnectedToAirLoop = true;
     state->dataAirLoop->PriAirSysAvailMgr(1).NumAvailManagers = 1;
     state->dataAirLoop->PriAirSysAvailMgr(1).AvailManagerType.allocate(1);
@@ -524,7 +524,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_HybridVentilation_OT_CO2Control)
     EXPECT_EQ(1, state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).VentilationCtrl); // Vent open
 
     DataContaminantBalance::ZoneAirCO2(1) = 500.0;
-    DataContaminantBalance::ZoneCO2SetPoint(1) = 800.0;
+    state->dataContaminantBalance->ZoneCO2SetPoint(1) = 800.0;
     SystemAvailabilityManager::CalcHybridVentSysAvailMgr(*state, 1, 1);
     EXPECT_EQ(0, state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).VentilationCtrl); // No action
 
@@ -570,7 +570,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_HybridVentilation_OT_CO2Control)
     DataHeatBalFanSys::MAT.deallocate();
     DataHeatBalance::MRT.deallocate();
     DataContaminantBalance::ZoneAirCO2.deallocate();
-    DataContaminantBalance::ZoneCO2SetPoint.deallocate();
+    state->dataContaminantBalance->ZoneCO2SetPoint.deallocate();
     state->dataAirLoop->PriAirSysAvailMgr.deallocate();
     state->dataSystemAvailabilityManager->SchedSysAvailMgrData.deallocate();
     ScheduleManager::Schedule.deallocate();

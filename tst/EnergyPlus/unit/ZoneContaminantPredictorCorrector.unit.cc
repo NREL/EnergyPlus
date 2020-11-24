@@ -142,8 +142,8 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_AddMDotOATest)
     DataContaminantBalance::ZoneGC1.allocate(1);
     DataContaminantBalance::ZoneAirGC.allocate(1);
 
-    DataContaminantBalance::ZoneCO2SetPoint.allocate(1);
-    DataContaminantBalance::CO2PredictedRate.allocate(1);
+    state->dataContaminantBalance->ZoneCO2SetPoint.allocate(1);
+    state->dataContaminantBalance->CO2PredictedRate.allocate(1);
     DataContaminantBalance::GCPredictedRate.allocate(1);
     DataContaminantBalance::ContaminantControlledZone.allocate(1);
     DataContaminantBalance::ZoneGCSetPoint.allocate(1);
@@ -165,7 +165,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_AddMDotOATest)
     DataContaminantBalance::OutdoorGC = 0.001;
     DataContaminantBalance::ZoneCO21(1) = DataContaminantBalance::OutdoorCO2;
     DataContaminantBalance::ZoneGC1(1) = DataContaminantBalance::OutdoorGC;
-    DataContaminantBalance::ZoneCO2SetPoint(1) = 450.0;
+    state->dataContaminantBalance->ZoneCO2SetPoint(1) = 450.0;
     DataContaminantBalance::ZoneAirCO2(1) = DataContaminantBalance::ZoneCO21(1);
     DataContaminantBalance::ZoneAirGC(1) = DataContaminantBalance::ZoneGC1(1);
 
@@ -243,7 +243,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_AddMDotOATest)
     ZT(1) = 24.0;
     MixingMassFlowZone(1) = 0.0;
 
-    DataContaminantBalance::CO2PredictedRate.allocate(1);
+    state->dataContaminantBalance->CO2PredictedRate.allocate(1);
     DataContaminantBalance::ZoneSysContDemand.allocate(1);
     DataContaminantBalance::NumContControlledZones = 1;
 
@@ -255,7 +255,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_AddMDotOATest)
     DataContaminantBalance::ZoneGCSetPoint(1) = 0.0025;
 
     PredictZoneContaminants(*state, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
-    EXPECT_NEAR(1.041692180, DataContaminantBalance::CO2PredictedRate(1), 0.00001);
+    EXPECT_NEAR(1.041692180, state->dataContaminantBalance->CO2PredictedRate(1), 0.00001);
     EXPECT_NEAR(76.89754831, DataContaminantBalance::GCPredictedRate(1), 0.00001);
 
     CorrectZoneContaminants(*state, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
@@ -444,8 +444,8 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneCO2ControlT
     DataContaminantBalance::ZoneAirCO2.allocate(3);
     DataContaminantBalance::ZoneAirGCTemp.allocate(3);
 
-    DataContaminantBalance::ZoneCO2SetPoint.allocate(3);
-    DataContaminantBalance::CO2PredictedRate.allocate(3);
+    state->dataContaminantBalance->ZoneCO2SetPoint.allocate(3);
+    state->dataContaminantBalance->CO2PredictedRate.allocate(3);
 
     DataContaminantBalance::ZoneAirDensityCO.allocate(3);
     DataContaminantBalance::ZoneCO2Gain.allocate(3);
@@ -470,9 +470,9 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneCO2ControlT
     DataContaminantBalance::ZoneCO21(1) = DataContaminantBalance::OutdoorCO2;
     DataContaminantBalance::ZoneCO21(2) = DataContaminantBalance::OutdoorCO2;
     DataContaminantBalance::ZoneCO21(3) = DataContaminantBalance::OutdoorCO2;
-    DataContaminantBalance::ZoneCO2SetPoint(1) = 450.0;
-    DataContaminantBalance::ZoneCO2SetPoint(2) = 500.0;
-    DataContaminantBalance::ZoneCO2SetPoint(3) = 550.0;
+    state->dataContaminantBalance->ZoneCO2SetPoint(1) = 450.0;
+    state->dataContaminantBalance->ZoneCO2SetPoint(2) = 500.0;
+    state->dataContaminantBalance->ZoneCO2SetPoint(3) = 550.0;
     DataContaminantBalance::ZoneAirCO2(1) = DataContaminantBalance::ZoneCO21(1);
     DataContaminantBalance::ZoneAirCO2(2) = DataContaminantBalance::ZoneCO21(2);
     DataContaminantBalance::ZoneAirCO2(3) = DataContaminantBalance::ZoneCO21(3);
@@ -601,7 +601,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneCO2ControlT
     Node(8).MassFlowRate = 0.01;
     Node(9).MassFlowRate = 0.01;
 
-    DataContaminantBalance::CO2PredictedRate.allocate(3);
+    state->dataContaminantBalance->CO2PredictedRate.allocate(3);
     DataContaminantBalance::ZoneSysContDemand.allocate(3);
     DataContaminantBalance::NumContControlledZones = 3;
 
@@ -618,9 +618,9 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneCO2ControlT
     DataContaminantBalance::ContaminantControlledZone(3).NumOfZones = 1;
 
     PredictZoneContaminants(*state, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
-    EXPECT_NEAR(1.0416921806, DataContaminantBalance::CO2PredictedRate(1), 0.00001);
-    EXPECT_NEAR(1.0434496257, DataContaminantBalance::CO2PredictedRate(2), 0.00001);
-    EXPECT_NEAR(1.0399406399, DataContaminantBalance::CO2PredictedRate(3), 0.00001);
+    EXPECT_NEAR(1.0416921806, state->dataContaminantBalance->CO2PredictedRate(1), 0.00001);
+    EXPECT_NEAR(1.0434496257, state->dataContaminantBalance->CO2PredictedRate(2), 0.00001);
+    EXPECT_NEAR(1.0399406399, state->dataContaminantBalance->CO2PredictedRate(3), 0.00001);
 }
 
 TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneGCControlTest)

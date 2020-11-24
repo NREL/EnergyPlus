@@ -70,13 +70,6 @@ namespace DataContaminantBalance {
     // module should be available to other modules and routines.  Thus,
     // all variables in this module must be PUBLIC.
 
-    // MODULE PARAMETER DEFINITIONS:
-
-    // MODULE VARIABLE Type DECLARATIONS:
-
-    Array1D<Real64> ZoneCO2SetPoint;
-    Array1D<Real64> CO2PredictedRate;
-
     Array1D<Real64> ZoneCO2Gain;             // CO2 gain from each Zone (People, equipment)
     Array1D<Real64> ZoneCO2GainFromPeople;   // CO2 gain from each Zone (From People only)
     Array1D<Real64> ZoneCO2GainExceptPeople; // Added for hybrid model, CO2 gain from each Zone (except People)
@@ -175,8 +168,6 @@ namespace DataContaminantBalance {
     // Needed for unit tests, should not be normally called.
     void clear_state()
     {
-        ZoneCO2SetPoint.deallocate();
-        CO2PredictedRate.deallocate();
         ZoneCO2Gain.deallocate();
         ZoneCO2GainFromPeople.deallocate();
         ZoneCO2GainExceptPeople.deallocate(); // Added for hybrid model
