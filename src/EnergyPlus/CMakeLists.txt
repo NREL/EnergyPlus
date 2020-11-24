@@ -143,8 +143,7 @@ SET( SRC
         DataBSDFWindow.hh
   DataBranchAirLoopPlant.hh
         DataBranchNodeConnections.hh
-  DataComplexFenestration.cc
-  DataComplexFenestration.hh
+        DataComplexFenestration.hh
   DataContaminantBalance.cc
   DataContaminantBalance.hh
   DataConvergParams.cc
