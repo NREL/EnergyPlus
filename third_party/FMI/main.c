@@ -476,7 +476,7 @@ fmiInteger getfmiEPlusVersion(char *fmuWorkingFolder, fmiInteger *sizefmuWorking
 
     // load lib by specifying path to the binaries
     if (loadLib(trimfmuWorkingFolder, fmuInstances[_c->index]->modelID, fmuInstances[_c->index])) {
-        strncpy(fmiVersionNumber, err_msg, strlen(err_msg));
+        memcpy(fmiVersionNumber, err_msg, strlen(err_msg));
         return -1;
     }
 
@@ -485,7 +485,7 @@ fmiInteger getfmiEPlusVersion(char *fmuWorkingFolder, fmiInteger *sizefmuWorking
 
     // get the modelID of the FMU
     verID = fmuInstances[_c->index]->getVersion();
-    strncpy(fmiVersionNumber, verID, strlen(verID) + 1);
+    memcpy(fmiVersionNumber, verID, strlen(verID) + 1);
 
     return 0;
 }
@@ -914,7 +914,7 @@ addLibPathCurrentWorkingFolder(char *trimfmuOutputWorkingFolder_wLiB, char *fmuW
     trimfmuWorkingFolder = (char *)calloc(*sizefmuWorkingFolder + 1, sizeof(char));
 
     // write fmuWorkingFolder withouth blanks
-    strncpy(trimfmuWorkingFolder, fmuWorkingFolder, *sizefmuWorkingFolder);
+    memcpy(trimfmuWorkingFolder, fmuWorkingFolder, *sizefmuWorkingFolder);
 
     // get index value
     _c->index = *index;
@@ -937,18 +937,18 @@ addLibPathCurrentWorkingFolder(char *trimfmuOutputWorkingFolder_wLiB, char *fmuW
     // check whether we have folders for Windows 32 and Windows 64 bit
     if (bRes_w32 && bRes_w64) {
         if (OperSys == 1) {
-            strncpy(trimfmuOutputWorkingFolder_wLiB, librPath_w32, strlen(librPath_w32));
+            memcpy(trimfmuOutputWorkingFolder_wLiB, librPath_w32, strlen(librPath_w32));
         } else {
-            strncpy(trimfmuOutputWorkingFolder_wLiB, librPath_w64, strlen(librPath_w64));
+            memcpy(trimfmuOutputWorkingFolder_wLiB, librPath_w64, strlen(librPath_w64));
         }
     }
     // check whether we just have folder for Windows 32 bit
     else if (bRes_w32 && !bRes_w64) {
-        strncpy(trimfmuOutputWorkingFolder_wLiB, librPath_w32, strlen(librPath_w32));
+        memcpy(trimfmuOutputWorkingFolder_wLiB, librPath_w32, strlen(librPath_w32));
     }
     // check whether we just have folder for Windows 64 bit
     else if (!bRes_w32 && bRes_w64) {
-        strncpy(trimfmuOutputWorkingFolder_wLiB, librPath_w64, strlen(librPath_w64));
+        memcpy(trimfmuOutputWorkingFolder_wLiB, librPath_w64, strlen(librPath_w64));
     } else {
         printf("Error: FMU does not contain binaries folder for this operating system.");
         free(trimfmuWorkingFolder);
@@ -977,18 +977,18 @@ addLibPathCurrentWorkingFolder(char *trimfmuOutputWorkingFolder_wLiB, char *fmuW
     // check whether we have folders for Linux 32 and Linux 64 bit
     if (bRes_l32 && bRes_l64) {
         if (OperSys == 3) {
-            strncpy(trimfmuOutputWorkingFolder_wLiB, librPath_l32, strlen(librPath_l32));
+            memcpy(trimfmuOutputWorkingFolder_wLiB, librPath_l32, strlen(librPath_l32));
         } else {
-            strncpy(trimfmuOutputWorkingFolder_wLiB, librPath_l64, strlen(librPath_l64));
+            memcpy(trimfmuOutputWorkingFolder_wLiB, librPath_l64, strlen(librPath_l64));
         }
     }
     // check whether we just have folder for Linux 32 bit
     else if (bRes_l32 && !bRes_l64) {
-        strncpy(trimfmuOutputWorkingFolder_wLiB, librPath_l32, strlen(librPath_l32));
+        memcpy(trimfmuOutputWorkingFolder_wLiB, librPath_l32, strlen(librPath_l32));
     }
     // check whether we just have folder for Linux 64 bit
     else if (!bRes_l32 && bRes_l64) {
-        strncpy(trimfmuOutputWorkingFolder_wLiB, librPath_l64, strlen(librPath_l64));
+        memcpy(trimfmuOutputWorkingFolder_wLiB, librPath_l64, strlen(librPath_l64));
     } else {
         printf("Error: FMU does not contain binaries folder for this operating system.");
         free(trimfmuWorkingFolder);
@@ -1065,10 +1065,10 @@ model_ID_GUID(char *fmuInstanceName, char *fmuWorkingFolder, fmiInteger *sizefmu
     fmuInstances[_c->index]->modelDescription = parse(xmlPath);
 
     // Initialize instance Name
-    fmuInstances[_c->index]->instanceName = (char *)calloc(*fmuInstanceName + 1, sizeof(char));
+    fmuInstances[_c->index]->instanceName = (char *)calloc(strlen(fmuInstanceName) + 1, sizeof(char));
 
     // write fmu instance Name
-    strncpy(fmuInstances[_c->index]->instanceName, fmuInstanceName, strlen(fmuInstanceName));
+    strcpy(fmuInstances[_c->index]->instanceName, fmuInstanceName);
 
     // check whether modelDescription exists or not
     if (!fmuInstances[_c->index]->modelDescription) {

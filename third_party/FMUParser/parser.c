@@ -60,18 +60,18 @@ int callparser(const char *fmuFilNam, const char *tmpPat)
     }
 
     length = strlen(fmuFilNam);
-    tmp = malloc(length * sizeof(char));
+    tmp = (char *)malloc((length+1) * sizeof(char));
     strcpy(tmp, fmuFilNam);
 
 #ifdef _MSC_VER // Command in windows
-    filNam = malloc(length * sizeof(char));
+    filNam = (char *)malloc(length * sizeof(char));
     if (filNam == NULL) {
         printError("Can not allocate memory for filName\n");
         free(tmp);
         return -1;
     }
 
-    ext = malloc(length * sizeof(char));
+    ext = (char *)malloc(length * sizeof(char));
     if (ext == NULL) {
         printError("Can not allocate memory for ext\n");
         free(filNam);
@@ -247,14 +247,15 @@ int main(int argc, char *argv[])
                 return -1;
             }
 
-            objNam = calloc((length + 1), sizeof(char));
+            objNam = (char *)calloc((length + 1), sizeof(char));
             // Copy the fmufilNam without extension as objNam
-            if (strncpy(objNam, fmuFilNam, length) == NULL) {
+            if (memcpy(objNam, fmuFilNam, length) == NULL) {
                 printError("Can not get name \"objNam\" for new folder.\n");
                 free(objNam);
                 return -1;
             }
 
+            // This is pretty useless as calloc will initialize to 0 (which is in effect the null-terminator)
             if (strcat(objNam, "\0") == NULL) {
                 printError("Can not add ending for objNam.\n");
                 free(objNam);
