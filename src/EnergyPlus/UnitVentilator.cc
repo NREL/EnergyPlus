@@ -3601,8 +3601,6 @@ namespace UnitVentilator {
         // rates and perform an energy balance on the mixing of the return and
         // outdoor air streams.
 
-        using DataContaminantBalance::Contaminant;
-
         int AirRelNode;            // relief air node number in unit ventilator loop
         int InletNode;             // inlet node number for unit ventilator loop
         Real64 OAFraction;         // Outside air fraction of inlet air
@@ -3656,11 +3654,11 @@ namespace UnitVentilator {
         Node(OAMixOutNode).Temp = PsyTdbFnHW(Node(OAMixOutNode).Enthalpy, Node(OAMixOutNode).HumRat);
         Node(OAMixOutNode).Press = Node(InletNode).Press;
 
-        if (Contaminant.CO2Simulation) {
+        if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
             Node(AirRelNode).CO2 = Node(InletNode).CO2;
             Node(OAMixOutNode).CO2 = OAFraction * Node(OutsideAirNode).CO2 + (1.0 - OAFraction) * Node(InletNode).CO2;
         }
-        if (Contaminant.GenericContamSimulation) {
+        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
             Node(AirRelNode).GenContam = Node(InletNode).GenContam;
             Node(OAMixOutNode).GenContam = OAFraction * Node(OutsideAirNode).GenContam + (1.0 - OAFraction) * Node(InletNode).GenContam;
         }

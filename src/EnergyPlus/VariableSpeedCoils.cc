@@ -7147,7 +7147,6 @@ namespace VariableSpeedCoils {
         // Data is moved from the HP data structure to the HP outlet nodes.
 
         // Using/Aliasing
-        using DataContaminantBalance::Contaminant;
         using DataHVACGlobals::TimeStepSys;
         using PlantUtilities::SafeCopyPlantNode;
 
@@ -7216,7 +7215,7 @@ namespace VariableSpeedCoils {
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EnergyLatent = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).QLatent * ReportingConstant;
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EnergySource = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).QSource * ReportingConstant;
 
-        if (Contaminant.CO2Simulation) {
+        if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
             Node(AirOutletNode).CO2 = Node(AirInletNode).CO2;
         }
 

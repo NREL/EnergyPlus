@@ -3755,7 +3755,6 @@ namespace SystemAvailabilityManager {
         using CurveManager::CurveValue;
         using CurveManager::GetCurveIndex;
         using CurveManager::GetCurveMinMaxValues;
-        using DataContaminantBalance::Contaminant;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("GetHybridVentilationInputs: "); // include trailing blank
@@ -3848,7 +3847,7 @@ namespace SystemAvailabilityManager {
                 ShowContinueError(state, format("the minimum entered value in the schedule is {:.1T}", SchedMin));
                 ErrorsFound = true;
             }
-            if (SchedMax == 7.0 && !Contaminant.CO2Simulation) {
+            if (SchedMax == 7.0 && !state.dataContaminantBalance->Contaminant.CO2Simulation) {
                 ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
                 ShowContinueError(state, cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) +
                                   "\", When the schedule value is 7, carbon dioxide (CO2) control is requested. ");
@@ -4502,8 +4501,6 @@ namespace SystemAvailabilityManager {
         using AirflowNetworkBalanceManager::GetZoneInfilAirChangeRate;
         using AirflowNetworkBalanceManager::ManageAirflowNetworkBalance;
         using CurveManager::CurveValue;
-        using DataContaminantBalance::ZoneAirCO2;
-        using DataContaminantBalance::ZoneCO2SetPoint;
         using DataEnvironment::IsRain;
         using DataEnvironment::OutBaroPress;
         using DataEnvironment::OutDewPointTemp;
@@ -4671,8 +4668,8 @@ namespace SystemAvailabilityManager {
                     }
 
                 } else if (SELECT_CASE_var == state.dataSystemAvailabilityManager->HybridVentMode_CO2) {
-                    state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).CO2 = ZoneAirCO2(ZoneNum);
-                    if (ZoneAirCO2(ZoneNum) > ZoneCO2SetPoint(ZoneNum)) {
+                    state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).CO2 = state.dataContaminantBalance->ZoneAirCO2(ZoneNum);
+                    if (state.dataContaminantBalance->ZoneAirCO2(ZoneNum) > state.dataContaminantBalance->ZoneCO2SetPoint(ZoneNum)) {
                         if (state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).HybridVentMgrConnectedToAirLoop) {
                             AirLoopNum = state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).AirLoopNum;
                             for (Num = 1; Num <= state.dataAirLoop->PriAirSysAvailMgr(state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).AirLoopNum).NumAvailManagers; ++Num) {

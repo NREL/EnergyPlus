@@ -678,8 +678,8 @@ TEST_F(EnergyPlusFixture, MixedAir_HXBypassOptionTest)
 
 TEST_F(EnergyPlusFixture, CO2ControlDesignOccupancyTest)
 {
-    Contaminant.CO2Simulation = true;
-    Contaminant.CO2OutdoorSchedPtr = 1;
+    state->dataContaminantBalance->Contaminant.CO2Simulation = true;
+    state->dataContaminantBalance->Contaminant.CO2OutdoorSchedPtr = 1;
 
     std::string const idf_objects = delimited_string({
         "  OutdoorAir:Node,",
@@ -778,11 +778,11 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOccupancyTest)
     People(1).NumberOfPeople = 3;
     Zone(1).TotOccupants = 3;
     Schedule(4).CurrentValue = 1.0;
-    ZoneCO2GainFromPeople.allocate(1);
-    ZoneCO2GainFromPeople(1) = 3.82E-8;
-    OutdoorCO2 = 400;
-    ZoneAirCO2.allocate(1);
-    ZoneAirCO2(1) = 600.0;
+    state->dataContaminantBalance->ZoneCO2GainFromPeople.allocate(1);
+    state->dataContaminantBalance->ZoneCO2GainFromPeople(1) = 3.82E-8;
+    state->dataContaminantBalance->OutdoorCO2 = 400;
+    state->dataContaminantBalance->ZoneAirCO2.allocate(1);
+    state->dataContaminantBalance->ZoneAirCO2(1) = 600.0;
     ZoneEquipConfig.allocate(1);
     ZoneEquipConfig(1).NumInletNodes = 1;
     ZoneEquipConfig(1).AirDistUnitCool.allocate(1);
@@ -840,8 +840,8 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOccupancyTest)
     OAMixer.deallocate();
     state->dataAirLoop->AirLoopZoneInfo.deallocate();
     state->dataAirSystemsData->PrimaryAirSystems.deallocate();
-    ZoneAirCO2.deallocate();
-    ZoneCO2GainFromPeople.deallocate();
+    state->dataContaminantBalance->ZoneAirCO2.deallocate();
+    state->dataContaminantBalance->ZoneCO2GainFromPeople.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, MissingDesignOccupancyTest)
@@ -1376,22 +1376,22 @@ TEST_F(EnergyPlusFixture, MixedAir_ControllerTypeTest)
     Node(OAController(OAControllerNum).RelNode).MassFlowRate = OAController(OAControllerNum).RelMassFlow;
     Node(OAController(OAControllerNum).InletNode).CO2 = 600.0;
     Node(OAController(OAControllerNum).RelNode).CO2 = 500.0;
-    OutdoorCO2 = 400.0;
+    state->dataContaminantBalance->OutdoorCO2 = 400.0;
 
     Node(OAController(OAControllerNum).InletNode).GenContam = 0.5;
     Node(OAController(OAControllerNum).RelNode).GenContam = 0.3;
-    OutdoorGC = 0.1;
+    state->dataContaminantBalance->OutdoorGC = 0.1;
 
-    Contaminant.CO2Simulation = true;
-    Contaminant.GenericContamSimulation = true;
+    state->dataContaminantBalance->Contaminant.CO2Simulation = true;
+    state->dataContaminantBalance->Contaminant.GenericContamSimulation = true;
 
     OAController(OAControllerNum).UpdateOAController(*state);
     // Expect no value changes of relief node due to no actions.
     EXPECT_NEAR(500.0, Node(OAController(OAControllerNum).RelNode).CO2, 0.00001);
     EXPECT_NEAR(0.3, Node(OAController(OAControllerNum).RelNode).GenContam, 0.00001);
 
-    Contaminant.CO2Simulation = false;
-    Contaminant.GenericContamSimulation = false;
+    state->dataContaminantBalance->Contaminant.CO2Simulation = false;
+    state->dataContaminantBalance->Contaminant.GenericContamSimulation = false;
     OAController.deallocate();
     Node.deallocate();
 }
@@ -5230,8 +5230,8 @@ TEST_F(EnergyPlusFixture, MixedAir_MiscGetsPart2)
 
 TEST_F(EnergyPlusFixture, MechVentController_IAQPTests)
 {
-    Contaminant.CO2Simulation = true;
-    Contaminant.GenericContamSimulation = true;
+    state->dataContaminantBalance->Contaminant.CO2Simulation = true;
+    state->dataContaminantBalance->Contaminant.GenericContamSimulation = true;
 
     std::string const idf_objects = delimited_string({"  Controller:MechanicalVentilation,",
                                                       "    DCVObject, !- Name",
@@ -5257,11 +5257,11 @@ TEST_F(EnergyPlusFixture, MechVentController_IAQPTests)
     int NumZones(2);
     Real64 SysMassFlow(0.0); // System supply mass flow rate [kg/s]
     Real64 OAMassFlow(0.0);  // OA mass flow rate [kg/s]
-    DataContaminantBalance::ZoneSysContDemand.allocate(NumZones);
-    DataContaminantBalance::ZoneSysContDemand(1).OutputRequiredToCO2SP = 0.2;
-    DataContaminantBalance::ZoneSysContDemand(2).OutputRequiredToCO2SP = 0.3;
-    DataContaminantBalance::ZoneSysContDemand(1).OutputRequiredToGCSP = 1.0;
-    DataContaminantBalance::ZoneSysContDemand(2).OutputRequiredToGCSP = 0.5;
+    state->dataContaminantBalance->ZoneSysContDemand.allocate(NumZones);
+    state->dataContaminantBalance->ZoneSysContDemand(1).OutputRequiredToCO2SP = 0.2;
+    state->dataContaminantBalance->ZoneSysContDemand(2).OutputRequiredToCO2SP = 0.3;
+    state->dataContaminantBalance->ZoneSysContDemand(1).OutputRequiredToGCSP = 1.0;
+    state->dataContaminantBalance->ZoneSysContDemand(2).OutputRequiredToGCSP = 0.5;
 
     GetOAControllerInputs(*state);
 
@@ -5295,14 +5295,14 @@ TEST_F(EnergyPlusFixture, MechVentController_IAQPTests)
     VentilationMechanical(1).CalcMechVentController(*state, SysMassFlow, OAMassFlow);
     EXPECT_EQ(0.0, OAMassFlow);
 
-    DataContaminantBalance::ZoneSysContDemand.deallocate();
+    state->dataContaminantBalance->ZoneSysContDemand.deallocate();
     ScheduleManager::Schedule.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, MechVentController_ZoneSumTests)
 {
-    Contaminant.CO2Simulation = true;
-    Contaminant.CO2OutdoorSchedPtr = 1;
+    state->dataContaminantBalance->Contaminant.CO2Simulation = true;
+    state->dataContaminantBalance->Contaminant.CO2OutdoorSchedPtr = 1;
 
     std::string const idf_objects = delimited_string({"  Controller:MechanicalVentilation,",
                                                       "    DCVObject, !- Name",
@@ -5519,8 +5519,8 @@ TEST_F(EnergyPlusFixture, MechVentController_ZoneSumTests)
 TEST_F(EnergyPlusFixture, CO2ControlDesignOARateTest)
 {
     // Test a new feature: Proportional Demand Control Ventilation (DCV) Enhancements
-    Contaminant.CO2Simulation = true;
-    Contaminant.CO2OutdoorSchedPtr = 1;
+    state->dataContaminantBalance->Contaminant.CO2Simulation = true;
+    state->dataContaminantBalance->Contaminant.CO2OutdoorSchedPtr = 1;
 
     std::string const idf_objects = delimited_string({
         "  OutdoorAir:Node,",
@@ -5591,11 +5591,11 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOARateTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ContaminantControlledZone.allocate(1);
-    ContaminantControlledZone(1).AvaiSchedPtr = 4;
-    ContaminantControlledZone(1).SPSchedIndex = 5;
-    ContaminantControlledZone(1).ZoneMinCO2SchedIndex = 6;
-    ContaminantControlledZone(1).ZoneMaxCO2SchedIndex = 7;
+    state->dataContaminantBalance->ContaminantControlledZone.allocate(1);
+    state->dataContaminantBalance->ContaminantControlledZone(1).AvaiSchedPtr = 4;
+    state->dataContaminantBalance->ContaminantControlledZone(1).SPSchedIndex = 5;
+    state->dataContaminantBalance->ContaminantControlledZone(1).ZoneMinCO2SchedIndex = 6;
+    state->dataContaminantBalance->ContaminantControlledZone(1).ZoneMaxCO2SchedIndex = 7;
 
     state->dataAirLoop->AirLoopControlInfo.allocate(1);
     state->dataAirLoop->AirLoopControlInfo(1).LoopFlowRateSet = true;
@@ -5643,11 +5643,11 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOARateTest)
     Zone(1).TotOccupants = 3;
     Schedule(3).CurrentValue = 0.1;
     Schedule(4).CurrentValue = 1.0;
-    ZoneCO2GainFromPeople.allocate(1);
-    ZoneCO2GainFromPeople(1) = 3.82E-8;
-    OutdoorCO2 = 400;
-    ZoneAirCO2.allocate(1);
-    ZoneAirCO2(1) = 600.0;
+    state->dataContaminantBalance->ZoneCO2GainFromPeople.allocate(1);
+    state->dataContaminantBalance->ZoneCO2GainFromPeople(1) = 3.82E-8;
+    state->dataContaminantBalance->OutdoorCO2 = 400;
+    state->dataContaminantBalance->ZoneAirCO2.allocate(1);
+    state->dataContaminantBalance->ZoneAirCO2(1) = 600.0;
     ZoneEquipConfig.allocate(1);
     ZoneEquipConfig(1).NumInletNodes = 1;
     ZoneEquipConfig(1).AirDistUnitCool.allocate(1);
@@ -5694,12 +5694,12 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOARateTest)
     Zone.deallocate();
     state->dataAirLoop->AirLoopFlow.deallocate();
     People.deallocate();
-    ZoneAirCO2.deallocate();
+    state->dataContaminantBalance->ZoneAirCO2.deallocate();
     ZoneEquipConfig.deallocate();
     Node.deallocate();
     ZoneSysEnergyDemand.deallocate();
-    ZoneCO2GainFromPeople.deallocate();
-    ContaminantControlledZone.deallocate();
+    state->dataContaminantBalance->ZoneCO2GainFromPeople.deallocate();
+    state->dataContaminantBalance->ContaminantControlledZone.deallocate();
     ZoneIntGain.deallocate();
 }
 

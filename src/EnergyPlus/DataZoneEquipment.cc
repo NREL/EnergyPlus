@@ -1485,10 +1485,6 @@ namespace DataZoneEquipment {
         // na
 
         // Using/Aliasing
-        using DataContaminantBalance::OutdoorCO2;
-        using DataContaminantBalance::ZoneAirCO2;
-        using DataContaminantBalance::ZoneCO2GainFromPeople;
-        using DataContaminantBalance::ZoneSysContDemand;
         using DataEnvironment::StdRhoAir;
         using DataHeatBalance::People;
         using DataHeatBalance::TotPeople;
@@ -1568,7 +1564,7 @@ namespace DataZoneEquipment {
         }
 
         if (OARequirements(DSOAPtr).OAFlowMethod == ZOAM_IAQP && MyEnvrnFlag(DSOAPtr)) {
-            if (!DataContaminantBalance::Contaminant.CO2Simulation) {
+            if (!state.dataContaminantBalance->Contaminant.CO2Simulation) {
                 ShowSevereError(state, "DesignSpecification:OutdoorAir=\"" + OARequirements(DSOAPtr).Name +
                                 "\" valid Outdoor Air Method =\" IndoorAirQualityProcedure\" requires CO2 simulation.");
                 ShowContinueError(state, "The choice must be Yes for the field Carbon Dioxide Concentration in ZoneAirContaminantBalance");
@@ -1577,7 +1573,7 @@ namespace DataZoneEquipment {
             MyEnvrnFlag(DSOAPtr) = false;
         }
         if (OARequirements(DSOAPtr).OAFlowMethod == ZOAM_ProportionalControlSchOcc && MyEnvrnFlag(DSOAPtr)) {
-            if (!DataContaminantBalance::Contaminant.CO2Simulation) {
+            if (!state.dataContaminantBalance->Contaminant.CO2Simulation) {
                 ShowSevereError(state, "DesignSpecification:OutdoorAir=\"" + OARequirements(DSOAPtr).Name +
                                 "\" valid Outdoor Air Method =\" ProportionalControlBasedOnDesignOccupancy\" requires CO2 simulation.");
                 ShowContinueError(state, "The choice must be Yes for the field Carbon Dioxide Concentration in ZoneAirContaminantBalance");
@@ -1586,7 +1582,7 @@ namespace DataZoneEquipment {
             MyEnvrnFlag(DSOAPtr) = false;
         }
         if (OARequirements(DSOAPtr).OAFlowMethod == ZOAM_ProportionalControlDesOcc && MyEnvrnFlag(DSOAPtr)) {
-            if (!DataContaminantBalance::Contaminant.CO2Simulation) {
+            if (!state.dataContaminantBalance->Contaminant.CO2Simulation) {
                 ShowSevereError(state, "DesignSpecification:OutdoorAir=\"" + OARequirements(DSOAPtr).Name +
                                 "\" valid Outdoor Air Method =\" ProportionalControlBasedonOccupancySchedule\" requires CO2 simulation.");
                 ShowContinueError(state, "The choice must be Yes for the field Carbon Dioxide Concentration in ZoneAirContaminantBalance");
@@ -1665,7 +1661,7 @@ namespace DataZoneEquipment {
                     DSOAFlowACH = OARequirements(DSOAPtr).OAFlowACH * Zone(ActualZoneNum).Volume / 3600.0;
                     OAVolumeFlowRate = DSOAFlowPeople + DSOAFlowPerZone + DSOAFlowPerArea + DSOAFlowACH;
                 } else {
-                    OAVolumeFlowRate = ZoneSysContDemand(ActualZoneNum).OutputRequiredToCO2SP / StdRhoAir;
+                    OAVolumeFlowRate = state.dataContaminantBalance->ZoneSysContDemand(ActualZoneNum).OutputRequiredToCO2SP / StdRhoAir;
                 }
 
             } else if (SELECT_CASE_var == ZOAM_ProportionalControlSchOcc || SELECT_CASE_var == ZOAM_ProportionalControlDesOcc) {
@@ -1696,22 +1692,22 @@ namespace DataZoneEquipment {
                     ZoneContamControllerSched = GetCurrentScheduleValue(state, Zone(ActualZoneNum).ZoneContamControllerSchedIndex);
                     if (ZoneContamControllerSched > 0.0) {
                         if (ZoneOAPeople > 0.0) {
-                            if (ZoneCO2GainFromPeople(ActualZoneNum) > 0.0) {
+                            if (state.dataContaminantBalance->ZoneCO2GainFromPeople(ActualZoneNum) > 0.0) {
                                 if (Zone(ActualZoneNum).ZoneMinCO2SchedIndex > 0.0) {
                                     // Take the schedule value of "Minimum Carbon Dioxide Concentration Schedule Name"
                                     // in the ZoneControl:ContaminantController
                                     ZoneMinCO2 = GetCurrentScheduleValue(state, Zone(ActualZoneNum).ZoneMinCO2SchedIndex);
                                 } else {
-                                    ZoneMinCO2 = OutdoorCO2;
+                                    ZoneMinCO2 = state.dataContaminantBalance->OutdoorCO2;
                                 }
 
                                 // Calculate zone maximum target CO2 concentration in PPM
                                 if (OARequirements(DSOAPtr).OAFlowMethod == ZOAM_ProportionalControlDesOcc) {
-                                    ZoneMaxCO2 = OutdoorCO2 +
+                                    ZoneMaxCO2 = state.dataContaminantBalance->OutdoorCO2 +
                                                  (CO2PeopleGeneration * Zone(ActualZoneNum).Multiplier * Zone(ActualZoneNum).ListMultiplier * 1.0e6) /
                                                      ZoneOAMax;
                                 } else {
-                                    ZoneMaxCO2 = OutdoorCO2 + (ZoneCO2GainFromPeople(ActualZoneNum) * Zone(ActualZoneNum).Multiplier *
+                                    ZoneMaxCO2 = state.dataContaminantBalance->OutdoorCO2 + (state.dataContaminantBalance->ZoneCO2GainFromPeople(ActualZoneNum) * Zone(ActualZoneNum).Multiplier *
                                                                Zone(ActualZoneNum).ListMultiplier * 1.0e6) /
                                                                   ZoneOAMax;
                                 }
@@ -1764,11 +1760,11 @@ namespace DataZoneEquipment {
                                     OAVolumeFlowRate = ZoneOAMax / ZoneEz;
                                 } else {
 
-                                    if (ZoneAirCO2(ActualZoneNum) <= ZoneMinCO2) {
+                                    if (state.dataContaminantBalance->ZoneAirCO2(ActualZoneNum) <= ZoneMinCO2) {
                                         // Zone air CO2 concentration is less than minimum zone CO2 concentration, set the Zone OA flow rate to
                                         // minimum Zone OA flow rate when the zone is unoccupied
                                         OAVolumeFlowRate = ZoneOAMin;
-                                    } else if (ZoneAirCO2(ActualZoneNum) >= ZoneMaxCO2) {
+                                    } else if (state.dataContaminantBalance->ZoneAirCO2(ActualZoneNum) >= ZoneMaxCO2) {
                                         // Zone air CO2 concentration is greater than maximum zone CO2 concentration, set the Zone OA flow rate to
                                         // maximum Zone OA flow rate (i.e. ZoneOAArea + ZoneOAPeople)
                                         OAVolumeFlowRate = ZoneOAMax;
@@ -1776,7 +1772,7 @@ namespace DataZoneEquipment {
                                         // Zone air CO2 concentration is between maximum and minimum limits of zone CO2 concentration,
                                         // set Zone OA flow rate by proportionally adjusting between ZoneOAMin and ZoneOAMax
                                         OAVolumeFlowRate = ZoneOAMin + (ZoneOAMax - ZoneOAMin) *
-                                                                           ((ZoneAirCO2(ActualZoneNum) - ZoneMinCO2) / (ZoneMaxCO2 - ZoneMinCO2));
+                                                                           ((state.dataContaminantBalance->ZoneAirCO2(ActualZoneNum) - ZoneMinCO2) / (ZoneMaxCO2 - ZoneMinCO2));
                                     }
                                 }
                             } else {

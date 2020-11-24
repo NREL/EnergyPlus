@@ -2503,24 +2503,6 @@ namespace Fans {
         // METHODOLOGY EMPLOYED:
         // Data is moved from the fan data structure to the fan outlet nodes.
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using DataContaminantBalance::Contaminant;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int OutletNode;
         int InletNode;
@@ -2559,11 +2541,11 @@ namespace Fans {
             Fan(FanNum).BalancedOutletMassFlowRate = BalancedExhMassFlow;
         }
 
-        if (Contaminant.CO2Simulation) {
+        if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
             Node(OutletNode).CO2 = Node(InletNode).CO2;
         }
 
-        if (Contaminant.GenericContamSimulation) {
+        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
             Node(OutletNode).GenContam = Node(InletNode).GenContam;
         }
     }

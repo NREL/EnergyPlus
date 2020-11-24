@@ -1400,7 +1400,6 @@ namespace SteamCoils {
         // METHODOLOGY EMPLOYED:
         // Data is moved from the coil data structure to the coil outlet nodes.
 
-        using DataContaminantBalance::Contaminant;
         using PlantUtilities::SafeCopyPlantNode;
 
         int AirInletNode;
@@ -1452,10 +1451,10 @@ namespace SteamCoils {
         //     Node(SteamOutletNode)%MassFlowRateMinAvail= 0.0
         //   END IF
 
-        if (Contaminant.CO2Simulation) {
+        if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
             Node(AirOutletNode).CO2 = Node(AirInletNode).CO2;
         }
-        if (Contaminant.GenericContamSimulation) {
+        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
             Node(AirOutletNode).GenContam = Node(AirInletNode).GenContam;
         }
     }

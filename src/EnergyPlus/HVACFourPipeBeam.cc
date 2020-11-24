@@ -513,7 +513,7 @@ namespace FourPipeBeam {
             this->control(state, FirstHVACIteration, NonAirSysOutput);
 
             // Update the current unit's outlet nodes.
-            this->update();
+            this->update(state);
 
             // Fill the report variables.
             this->report(state);
@@ -1436,10 +1436,9 @@ namespace FourPipeBeam {
 
         return Residuum;
     }
-    void HVACFourPipeBeam::update() const // update node date elsewhere in EnergyPlus, does not change state of this
+    void HVACFourPipeBeam::update(EnergyPlusData &state) const // update node date elsewhere in EnergyPlus, does not change state of this
     {
 
-        using DataContaminantBalance::Contaminant;
         using PlantUtilities::SafeCopyPlantNode;
 
         // Set the outlet air nodes of the unit; note that all quantities are unchanged from inlet to outlet
@@ -1454,11 +1453,11 @@ namespace FourPipeBeam {
         DataLoopNode::Node(this->airOutNodeNum).MassFlowRateMinAvail = DataLoopNode::Node(this->airInNodeNum).MassFlowRateMinAvail;
         DataLoopNode::Node(this->airOutNodeNum).MassFlowRateMaxAvail = DataLoopNode::Node(this->airInNodeNum).MassFlowRateMaxAvail;
 
-        if (Contaminant.CO2Simulation) {
+        if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
             DataLoopNode::Node(this->airOutNodeNum).CO2 = DataLoopNode::Node(this->airInNodeNum).CO2;
         }
 
-        if (Contaminant.GenericContamSimulation) {
+        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
             DataLoopNode::Node(this->airOutNodeNum).GenContam = DataLoopNode::Node(this->airInNodeNum).GenContam;
         }
 

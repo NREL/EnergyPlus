@@ -1458,9 +1458,6 @@ namespace SimAirServingZones {
         //     initialized at the start of an environment (run period or design day).
 
         // Using/Aliasing
-        using DataContaminantBalance::Contaminant;
-        using DataContaminantBalance::OutdoorCO2;
-        using DataContaminantBalance::OutdoorGC;
         using DataConvergParams::AirLoopConvergence;
         using DataConvergParams::HVACFlowRateToler;
         using DataConvergParams::ZoneInletConvergence;
@@ -2214,11 +2211,11 @@ namespace SimAirServingZones {
                         Node(NodeNum).MassFlowRateMinAvail = 0.0;
                         Node(NodeNum).Press = StdBaroPress;
                         Node(NodeNum).Quality = 0.0;
-                        if (Contaminant.CO2Simulation) {
-                            Node(NodeNum).CO2 = OutdoorCO2;
+                        if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
+                            Node(NodeNum).CO2 = state.dataContaminantBalance->OutdoorCO2;
                         }
-                        if (Contaminant.GenericContamSimulation) {
-                            Node(NodeNum).GenContam = OutdoorGC;
+                        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
+                            Node(NodeNum).GenContam = state.dataContaminantBalance->OutdoorGC;
                         }
 
                     } // end of loop over nodes on each branch
@@ -3746,7 +3743,6 @@ namespace SimAirServingZones {
 
         // USE STATEMENTS
         // Using/Aliasing
-        using DataContaminantBalance::Contaminant;
         using Psychrometrics::PsyTdbFnHW;
 
         // Locals
@@ -3799,10 +3795,10 @@ namespace SimAirServingZones {
                     Node(OutletNodeNum).Enthalpy = Node(InletNodeNum).Enthalpy;
                     Node(OutletNodeNum).Press = Node(InletNodeNum).Press;
                     MassFlowRateSetSum += min(Node(OutletNodeNum).MassFlowRateSetPoint, Node(OutletNodeNum).MassFlowRateMaxAvail);
-                    if (Contaminant.CO2Simulation) {
+                    if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
                         Node(OutletNodeNum).CO2 = Node(InletNodeNum).CO2;
                     }
-                    if (Contaminant.GenericContamSimulation) {
+                    if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
                         Node(OutletNodeNum).GenContam = Node(InletNodeNum).GenContam;
                     }
                 }
@@ -3859,10 +3855,10 @@ namespace SimAirServingZones {
                         OutletHumRat += (Node(InletNodeNum).MassFlowRate * Node(InletNodeNum).HumRat) / MassFlowRateOut;
                         OutletEnthalpy += (Node(InletNodeNum).MassFlowRate * Node(InletNodeNum).Enthalpy) / MassFlowRateOut;
                         OutletPress += (Node(InletNodeNum).MassFlowRate * Node(InletNodeNum).Press) / MassFlowRateOut;
-                        if (Contaminant.CO2Simulation) {
+                        if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
                             OutletCO2 += (Node(InletNodeNum).MassFlowRate * Node(InletNodeNum).CO2) / MassFlowRateOut;
                         }
-                        if (Contaminant.GenericContamSimulation) {
+                        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
                             OutletGC += (Node(InletNodeNum).MassFlowRate * Node(InletNodeNum).GenContam) / MassFlowRateOut;
                         }
                     }
@@ -3871,10 +3867,10 @@ namespace SimAirServingZones {
                     OutletHumRat = Node(InletNodeNum).HumRat;
                     OutletEnthalpy = Node(InletNodeNum).Enthalpy;
                     OutletPress = Node(InletNodeNum).Press;
-                    if (Contaminant.CO2Simulation) {
+                    if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
                         OutletCO2 = Node(InletNodeNum).CO2;
                     }
-                    if (Contaminant.GenericContamSimulation) {
+                    if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
                         OutletGC = Node(InletNodeNum).GenContam;
                     }
                 }
@@ -3883,10 +3879,10 @@ namespace SimAirServingZones {
                 Node(OutletNodeNum).Press = OutletPress;
                 // calculate the outlet temperature
                 Node(OutletNodeNum).Temp = PsyTdbFnHW(OutletEnthalpy, OutletHumRat);
-                if (Contaminant.CO2Simulation) {
+                if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
                     Node(OutletNodeNum).CO2 = OutletCO2;
                 }
-                if (Contaminant.GenericContamSimulation) {
+                if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
                     Node(OutletNodeNum).GenContam = OutletGC;
                 }
             }

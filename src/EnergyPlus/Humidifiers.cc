@@ -233,7 +233,7 @@ namespace Humidifiers {
 
         thisHum.UpdateReportWaterSystem(state);
 
-        thisHum.UpdateHumidifier();
+        thisHum.UpdateHumidifier(state);
 
         thisHum.ReportHumidifier();
     }
@@ -1339,7 +1339,7 @@ namespace Humidifiers {
         }
     }
 
-    void HumidifierData::UpdateHumidifier() // number of the current humidifier being simulated
+    void HumidifierData::UpdateHumidifier(EnergyPlusData &state) // number of the current humidifier being simulated
     {
 
         // SUBROUTINE INFORMATION:
@@ -1350,29 +1350,6 @@ namespace Humidifiers {
 
         // PURPOSE OF THIS SUBROUTINE:
         // Moves humidifier output to the outlet nodes.
-
-        // METHODOLOGY EMPLOYED:
-        // NA
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using DataContaminantBalance::Contaminant;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         // Set the outlet air node of the humidifier
         Node(AirOutNode).MassFlowRate = AirOutMassFlowRate;
@@ -1388,10 +1365,10 @@ namespace Humidifiers {
         Node(AirOutNode).MassFlowRateMinAvail = Node(AirInNode).MassFlowRateMinAvail;
         Node(AirOutNode).MassFlowRateMaxAvail = Node(AirInNode).MassFlowRateMaxAvail;
 
-        if (Contaminant.CO2Simulation) {
+        if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
             Node(AirOutNode).CO2 = Node(AirInNode).CO2;
         }
-        if (Contaminant.GenericContamSimulation) {
+        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
             Node(AirOutNode).GenContam = Node(AirInNode).GenContam;
         }
     }

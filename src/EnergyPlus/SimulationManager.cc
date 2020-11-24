@@ -3118,13 +3118,10 @@ void Resimulate(EnergyPlusData &state,
     using HVACManager::SimHVAC;
     using RefrigeratedCase::ManageRefrigeratedCaseRacks;
     using ZoneTempPredictorCorrector::ManageZoneAirUpdates;
-    // using HVACManager::CalcAirFlowSimple;
-    using DataContaminantBalance::Contaminant;
     using DataHeatBalance::ZoneAirMassFlow;
     using DataHVACGlobals::UseZoneTimeStepHistory; // , InitDSwithZoneHistory
     using ZoneContaminantPredictorCorrector::ManageZoneContaminanUpdates;
     using namespace ZoneEquipmentManager;
-    // using ZoneEquipmentManager::CalcAirFlowSimple;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 ZoneTempChange(0.0); // Dummy variable needed for calling ManageZoneAirUpdates
@@ -3153,10 +3150,10 @@ void Resimulate(EnergyPlusData &state,
     if (ResimHVAC) {
         // HVAC simulation
         ManageZoneAirUpdates(state, iGetZoneSetPoints, ZoneTempChange, false, UseZoneTimeStepHistory, 0.0);
-        if (Contaminant.SimulateContaminants) ManageZoneContaminanUpdates(state, iGetZoneSetPoints, false, UseZoneTimeStepHistory, 0.0);
+        if (state.dataContaminantBalance->Contaminant.SimulateContaminants) ManageZoneContaminanUpdates(state, iGetZoneSetPoints, false, UseZoneTimeStepHistory, 0.0);
         CalcAirFlowSimple(state, 0, ZoneAirMassFlow.EnforceZoneMassBalance);
         ManageZoneAirUpdates(state, iPredictStep, ZoneTempChange, false, UseZoneTimeStepHistory, 0.0);
-        if (Contaminant.SimulateContaminants) ManageZoneContaminanUpdates(state, iPredictStep, false, UseZoneTimeStepHistory, 0.0);
+        if (state.dataContaminantBalance->Contaminant.SimulateContaminants) ManageZoneContaminanUpdates(state, iPredictStep, false, UseZoneTimeStepHistory, 0.0);
         SimHVAC(state);
 
         ++DemandManagerHVACIterations;
