@@ -228,8 +228,6 @@ namespace EnergyPlus::ScheduleManager {
         Array2D_bool SetMinuteValue;   // Temporary for processing interval schedules
         int NumFields;
         int SCount;
-        //  LOGICAL RptSchedule
-        int RptLevel;
         int CurMinute;
         int MinutesPerItem;
         int NumExpectedItems;
@@ -2284,7 +2282,6 @@ namespace EnergyPlus::ScheduleManager {
             NumFields = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
             //    RptSchedule=.FALSE.
-            RptLevel = 1;
             for (Count = 1; Count <= NumFields; ++Count) {
                 inputProcessor->getObjectItem(state, CurrentModuleObject, Count, Alphas, NumAlphas, Numbers, NumNumbers, Status);
                 //      RptSchedule=.TRUE.
@@ -2293,22 +2290,18 @@ namespace EnergyPlus::ScheduleManager {
                     auto const SELECT_CASE_var(Alphas(1));
 
                     if (SELECT_CASE_var == "HOURLY") {
-                        RptLevel = 1;
-                        ReportScheduleDetails(state, RptLevel);
+                        ReportScheduleDetails(state, ReportLevelDetail::Hourly);
 
                     } else if ((SELECT_CASE_var == "TIMESTEP") || (SELECT_CASE_var == "DETAILED")) {
-                        RptLevel = 2;
-                        ReportScheduleDetails(state, RptLevel);
+                        ReportScheduleDetails(state, ReportLevelDetail::TimeStepDetailed);
 
                     } else if (SELECT_CASE_var == "IDF") {
-                        RptLevel = 3;
-                        ReportScheduleDetails(state, RptLevel);
+                        ReportScheduleDetails(state, ReportLevelDetail::IDF);
 
                     } else {
                         ShowWarningError(state, RoutineName + R"(Report for Schedules should specify "HOURLY" or "TIMESTEP" ("DETAILED"))");
                         ShowContinueError(state, "HOURLY report will be done");
-                        RptLevel = 1;
-                        ReportScheduleDetails(state, RptLevel);
+                        ReportScheduleDetails(state, ReportLevelDetail::Hourly);
                     }
                 }
             }
@@ -2324,7 +2317,7 @@ namespace EnergyPlus::ScheduleManager {
         print(state.files.audit, "{}\n", "  Processing Schedule Input -- Complete");
     }
 
-    void ReportScheduleDetails(EnergyPlusData &state, int const LevelOfDetail) // =1: hourly; =2: timestep; = 3: make IDF excerpt
+    void ReportScheduleDetails(EnergyPlusData &state, ReportLevelDetail const LevelOfDetail)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2336,28 +2329,10 @@ namespace EnergyPlus::ScheduleManager {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine puts the details of the Schedules on the .eio file (Inits file).
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static Array1D_string const Months(12, {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"});
         static Array1D_string const HrField({0, 24}, {"00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12",
                                                       "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24"});
-
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Count;
@@ -2393,13 +2368,12 @@ namespace EnergyPlus::ScheduleManager {
         }
         ShowMinute(state.dataGlobal->NumOfTimeStepInHour) = "00";
 
-        {
-            auto const SELECT_CASE_var(LevelOfDetail);
-
-            if ((SELECT_CASE_var >= 1) && (SELECT_CASE_var <= 2)) {
+        switch (LevelOfDetail) {
+            case ReportLevelDetail::Hourly:
+            case ReportLevelDetail::TimeStepDetailed: {
                 NumF = 1;
                 for (Hr = 1; Hr <= 24; ++Hr) {
-                    if (LevelOfDetail == 2) {
+                    if (LevelOfDetail == ReportLevelDetail::TimeStepDetailed) {
                         for (TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour - 1; ++TS) {
                             TimeHHMM(NumF) = HrField(Hr - 1) + ':' + ShowMinute(TS);
                             ++NumF;
@@ -2414,13 +2388,14 @@ namespace EnergyPlus::ScheduleManager {
                 static constexpr auto SchTFmt0("! Schedule Details Report={} =====================\n");
                 static constexpr auto SchDFmt{",{}"};
                 static constexpr auto SchDFmtdata{",{}"};
-                if (LevelOfDetail == 1) {
+                if (LevelOfDetail == ReportLevelDetail::Hourly) {
                     print(state.files.eio, SchTFmt0, "Hourly");
                 } else {
                     print(state.files.eio, SchTFmt0, "Timestep");
                 }
 
-                static constexpr auto SchTFmt("! <ScheduleType>,Name,Limited? {Yes/No},Minimum,Maximum,Continuous? {Yes/No - Discrete}");
+                static constexpr auto SchTFmt(
+                        "! <ScheduleType>,Name,Limited? {Yes/No},Minimum,Maximum,Continuous? {Yes/No - Discrete}");
                 print(state.files.eio, "{}\n", SchTFmt);
                 // SchDFmt Header (DaySchedule) builds the appropriate set of commas/times based on detail level
                 //      DO Count=1,NumF
@@ -2428,7 +2403,8 @@ namespace EnergyPlus::ScheduleManager {
                 //        IF (Count /= NumF) SchDFmt=TRIM(SchDFmt)//",',',"
                 //      ENDDO
                 //      SchDFmt=TRIM(SchDFmt)//')'
-                static constexpr auto SchDFmt0("! <DaySchedule>,Name,ScheduleType,Interpolated {Yes/No},Time (HH:MM) =>");
+                static constexpr auto SchDFmt0(
+                        "! <DaySchedule>,Name,ScheduleType,Interpolated {Yes/No},Time (HH:MM) =>");
                 print(state.files.eio, "{}", SchDFmt0);
                 for (Count = 1; Count <= NumF; ++Count) {
                     print(state.files.eio, SchDFmt, TimeHHMM(Count));
@@ -2440,7 +2416,8 @@ namespace EnergyPlus::ScheduleManager {
                     SchWFmt += format(",{}", ValidDayTypes(Count));
                 }
                 print(state.files.eio, "{}\n", SchWFmt);
-                static constexpr auto SchSFmt("! <Schedule>,Name,ScheduleType,{Until Date,WeekSchedule}** Repeated until Dec 31");
+                static constexpr auto SchSFmt(
+                        "! <Schedule>,Name,ScheduleType,{Until Date,WeekSchedule}** Repeated until Dec 31");
                 print(state.files.eio, "{}\n", SchSFmt);
 
                 for (Count = 1; Count <= NumScheduleTypes; ++Count) {
@@ -2472,15 +2449,15 @@ namespace EnergyPlus::ScheduleManager {
                 //      SchDFmtdata=TRIM(SchDFmtdata)//TRIM(Num1)//"(',',A))"
                 for (Count = 1; Count <= NumDaySchedules; ++Count) {
                     switch (DaySchedule(Count).IntervalInterpolated) {
-                    case ScheduleInterpolation::Average:
-                        NoAverageLinear = "Average";
-                        break;
-                    case ScheduleInterpolation::Linear:
-                        NoAverageLinear = "Linear";
-                        break;
-                    case ScheduleInterpolation::No:
-                        NoAverageLinear = "No";
-                        break;
+                        case ScheduleInterpolation::Average:
+                            NoAverageLinear = "Average";
+                            break;
+                        case ScheduleInterpolation::Linear:
+                            NoAverageLinear = "Linear";
+                            break;
+                        case ScheduleInterpolation::No:
+                            NoAverageLinear = "No";
+                            break;
                     }
                     for (Hr = 1; Hr <= 24; ++Hr) {
                         for (TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
@@ -2488,7 +2465,7 @@ namespace EnergyPlus::ScheduleManager {
                         }
                     }
                     static constexpr auto SchDFmtdata0("DaySchedule,{},{},{},{}");
-                    if (LevelOfDetail == 1) {
+                    if (LevelOfDetail == ReportLevelDetail::Hourly) {
                         print(state.files.eio,
                               SchDFmtdata0,
                               DaySchedule(Count).Name,
@@ -2496,10 +2473,11 @@ namespace EnergyPlus::ScheduleManager {
                               NoAverageLinear,
                               "Values:");
                         for (Hr = 1; Hr <= 24; ++Hr) {
-                            print(state.files.eio, SchDFmtdata, RoundTSValue(state.dataGlobal->NumOfTimeStepInHour, Hr));
+                            print(state.files.eio, SchDFmtdata,
+                                  RoundTSValue(state.dataGlobal->NumOfTimeStepInHour, Hr));
                         }
                         print(state.files.eio, "\n");
-                    } else if (LevelOfDetail == 2) {
+                    } else if (LevelOfDetail == ReportLevelDetail::TimeStepDetailed) {
                         print(state.files.eio,
                               SchDFmtdata0,
                               DaySchedule(Count).Name,
@@ -2526,7 +2504,8 @@ namespace EnergyPlus::ScheduleManager {
 
                 for (Count = 1; Count <= NumSchedules; ++Count) {
                     NumF = 1;
-                    print(state.files.eio, "Schedule,{},{}",Schedule(Count).Name, ScheduleType(Schedule(Count).ScheduleTypePtr).Name);
+                    print(state.files.eio, "Schedule,{},{}", Schedule(Count).Name,
+                          ScheduleType(Schedule(Count).ScheduleTypePtr).Name);
                     while (NumF <= 366) {
                         TS = Schedule(Count).WeekSchedulePointer(NumF);
                         static constexpr auto ThruFmt(",Through {} {:02},{}");
@@ -2545,19 +2524,76 @@ namespace EnergyPlus::ScheduleManager {
                     }
                     print(state.files.eio, "\n");
                 }
-
-            } else if (SELECT_CASE_var == 3) {
-                for (Count = 1; Count <= NumSchedules; ++Count) {
-                    print(state.files.debug, "\n");
-                    print(state.files.debug, "  Schedule:Compact,\n");
-                    print(state.files.debug, "    {},           !- Name\n", Schedule(Count).Name);
-                    print(state.files.debug, "    {},          !- ScheduleTypeLimits\n", ScheduleType(Schedule(Count).ScheduleTypePtr).Name);
-                    NumF = 1;
-                    while (NumF <= 366) {
-                        TS = Schedule(Count).WeekSchedulePointer(NumF);
-                        while (Schedule(Count).WeekSchedulePointer(NumF) == TS && NumF <= 366) {
-                            if (NumF == 366) {
-                                General::InvOrdinalDay(NumF, PMon, PDay, 1);
+            }
+                break;
+            case ReportLevelDetail::IDF: {
+                {
+                    for (Count = 1; Count <= NumSchedules; ++Count) {
+                        print(state.files.debug, "\n");
+                        print(state.files.debug, "  Schedule:Compact,\n");
+                        print(state.files.debug, "    {},           !- Name\n", Schedule(Count).Name);
+                        print(state.files.debug, "    {},          !- ScheduleTypeLimits\n",
+                              ScheduleType(Schedule(Count).ScheduleTypePtr).Name);
+                        NumF = 1;
+                        while (NumF <= 366) {
+                            TS = Schedule(Count).WeekSchedulePointer(NumF);
+                            while (Schedule(Count).WeekSchedulePointer(NumF) == TS && NumF <= 366) {
+                                if (NumF == 366) {
+                                    General::InvOrdinalDay(NumF, PMon, PDay, 1);
+                                    print(state.files.debug, "    Through: {}/{},\n", PMon, PDay);
+                                    iDayP = 0;
+                                    for (DT = 2; DT <= 6; ++DT) {
+                                        print(state.files.debug, "    For: {},\n", ValidDayTypes(DT));
+                                        iWeek = Schedule(Count).WeekSchedulePointer(NumF - 1);
+                                        iDay = WeekSchedule(iWeek).DaySchedulePointer(DT);
+                                        if (iDay != iDayP) {
+                                            for (Hr = 1; Hr <= 24; ++Hr) {
+                                                print(state.files.debug, "    Until: {}:{},{:.2R},\n", Hr,
+                                                      ShowMinute(state.dataGlobal->NumOfTimeStepInHour),
+                                                      DaySchedule(iDay).TSValue(state.dataGlobal->NumOfTimeStepInHour,
+                                                                                Hr));
+                                            }
+                                        } else {
+                                            print(state.files.debug, "    Same as previous\n");
+                                        }
+                                        iDayP = iDay;
+                                    }
+                                    DT = 1;
+                                    print(state.files.debug, "    For: {},\n", ValidDayTypes(DT));
+                                    iWeek = Schedule(Count).WeekSchedulePointer(NumF - 1);
+                                    iDay = WeekSchedule(iWeek).DaySchedulePointer(DT);
+                                    if (iDay != iDayP) {
+                                        for (Hr = 1; Hr <= 24; ++Hr) {
+                                            print(state.files.debug, "    Until: {}:{},{:.2R},\n", Hr,
+                                                  ShowMinute(state.dataGlobal->NumOfTimeStepInHour),
+                                                  DaySchedule(iDay).TSValue(state.dataGlobal->NumOfTimeStepInHour, Hr));
+                                        }
+                                    } else {
+                                        print(state.files.debug, "    Same as previous\n");
+                                    }
+                                    iDayP = iDay;
+                                    for (DT = 7; DT <= MaxDayTypes; ++DT) {
+                                        print(state.files.debug, "    For: {},\n", ValidDayTypes(DT));
+                                        iWeek = Schedule(Count).WeekSchedulePointer(NumF - 1);
+                                        iDay = WeekSchedule(iWeek).DaySchedulePointer(DT);
+                                        if (iDay != iDayP) {
+                                            for (Hr = 1; Hr <= 24; ++Hr) {
+                                                print(state.files.debug, "    Until: {}:{},{:.2R},\n", Hr,
+                                                      ShowMinute(state.dataGlobal->NumOfTimeStepInHour),
+                                                      DaySchedule(iDay).TSValue(state.dataGlobal->NumOfTimeStepInHour,
+                                                                                Hr));
+                                            }
+                                        } else {
+                                            print(state.files.debug, "    Same as previous\n");
+                                        }
+                                        iDayP = iDay;
+                                    }
+                                }
+                                ++NumF;
+                                if (NumF > 366) break; // compound If might have a problem unless this included.
+                            }
+                            if (NumF <= 366) {
+                                General::InvOrdinalDay(NumF - 1, PMon, PDay, 1);
                                 print(state.files.debug, "    Through: {}/{},\n", PMon, PDay);
                                 iDayP = 0;
                                 for (DT = 2; DT <= 6; ++DT) {
@@ -2566,7 +2602,11 @@ namespace EnergyPlus::ScheduleManager {
                                     iDay = WeekSchedule(iWeek).DaySchedulePointer(DT);
                                     if (iDay != iDayP) {
                                         for (Hr = 1; Hr <= 24; ++Hr) {
-                                            print(state.files.debug, "    Until: {}:{},{:.2R},\n", Hr, ShowMinute(state.dataGlobal->NumOfTimeStepInHour), DaySchedule(iDay).TSValue(state.dataGlobal->NumOfTimeStepInHour, Hr));
+                                            print(state.files.debug,
+                                                  "    Until: {}:{},{:.2R},\n",
+                                                  Hr,
+                                                  ShowMinute(state.dataGlobal->NumOfTimeStepInHour),
+                                                  DaySchedule(iDay).TSValue(state.dataGlobal->NumOfTimeStepInHour, Hr));
                                         }
                                     } else {
                                         print(state.files.debug, "    Same as previous\n");
@@ -2579,7 +2619,11 @@ namespace EnergyPlus::ScheduleManager {
                                 iDay = WeekSchedule(iWeek).DaySchedulePointer(DT);
                                 if (iDay != iDayP) {
                                     for (Hr = 1; Hr <= 24; ++Hr) {
-                                        print(state.files.debug, "    Until: {}:{},{:.2R},\n", Hr, ShowMinute(state.dataGlobal->NumOfTimeStepInHour), DaySchedule(iDay).TSValue(state.dataGlobal->NumOfTimeStepInHour, Hr));
+                                        print(state.files.debug,
+                                              "    Until: {}:{},{:.2R},\n",
+                                              Hr,
+                                              ShowMinute(state.dataGlobal->NumOfTimeStepInHour),
+                                              DaySchedule(iDay).TSValue(state.dataGlobal->NumOfTimeStepInHour, Hr));
                                     }
                                 } else {
                                     print(state.files.debug, "    Same as previous\n");
@@ -2591,7 +2635,11 @@ namespace EnergyPlus::ScheduleManager {
                                     iDay = WeekSchedule(iWeek).DaySchedulePointer(DT);
                                     if (iDay != iDayP) {
                                         for (Hr = 1; Hr <= 24; ++Hr) {
-                                            print(state.files.debug, "    Until: {}:{},{:.2R},\n", Hr, ShowMinute(state.dataGlobal->NumOfTimeStepInHour), DaySchedule(iDay).TSValue(state.dataGlobal->NumOfTimeStepInHour, Hr));
+                                            print(state.files.debug,
+                                                  "    Until: {}:{},{:.2R},\n",
+                                                  Hr,
+                                                  ShowMinute(state.dataGlobal->NumOfTimeStepInHour),
+                                                  DaySchedule(iDay).TSValue(state.dataGlobal->NumOfTimeStepInHour, Hr));
                                         }
                                     } else {
                                         print(state.files.debug, "    Same as previous\n");
@@ -2599,68 +2647,10 @@ namespace EnergyPlus::ScheduleManager {
                                     iDayP = iDay;
                                 }
                             }
-                            ++NumF;
-                            if (NumF > 366) break; // compound If might have a problem unless this included.
-                        }
-                        if (NumF <= 366) {
-                            General::InvOrdinalDay(NumF - 1, PMon, PDay, 1);
-                            print(state.files.debug, "    Through: {}/{},\n", PMon, PDay);
-                            iDayP = 0;
-                            for (DT = 2; DT <= 6; ++DT) {
-                                print(state.files.debug, "    For: {},\n", ValidDayTypes(DT));
-                                iWeek = Schedule(Count).WeekSchedulePointer(NumF - 1);
-                                iDay = WeekSchedule(iWeek).DaySchedulePointer(DT);
-                                if (iDay != iDayP) {
-                                    for (Hr = 1; Hr <= 24; ++Hr) {
-                                        print(state.files.debug,
-                                              "    Until: {}:{},{:.2R},\n",
-                                              Hr,
-                                              ShowMinute(state.dataGlobal->NumOfTimeStepInHour),
-                                              DaySchedule(iDay).TSValue(state.dataGlobal->NumOfTimeStepInHour, Hr));
-                                    }
-                                } else {
-                                    print(state.files.debug, "    Same as previous\n");
-                                }
-                                iDayP = iDay;
-                            }
-                            DT = 1;
-                            print(state.files.debug, "    For: {},\n", ValidDayTypes(DT));
-                            iWeek = Schedule(Count).WeekSchedulePointer(NumF - 1);
-                            iDay = WeekSchedule(iWeek).DaySchedulePointer(DT);
-                            if (iDay != iDayP) {
-                                for (Hr = 1; Hr <= 24; ++Hr) {
-                                    print(state.files.debug,
-                                          "    Until: {}:{},{:.2R},\n",
-                                          Hr,
-                                          ShowMinute(state.dataGlobal->NumOfTimeStepInHour),
-                                          DaySchedule(iDay).TSValue(state.dataGlobal->NumOfTimeStepInHour, Hr));
-                                }
-                            } else {
-                                print(state.files.debug, "    Same as previous\n");
-                            }
-                            iDayP = iDay;
-                            for (DT = 7; DT <= MaxDayTypes; ++DT) {
-                                print(state.files.debug, "    For: {},\n", ValidDayTypes(DT));
-                                iWeek = Schedule(Count).WeekSchedulePointer(NumF - 1);
-                                iDay = WeekSchedule(iWeek).DaySchedulePointer(DT);
-                                if (iDay != iDayP) {
-                                    for (Hr = 1; Hr <= 24; ++Hr) {
-                                        print(state.files.debug,
-                                              "    Until: {}:{},{:.2R},\n",
-                                              Hr,
-                                              ShowMinute(state.dataGlobal->NumOfTimeStepInHour),
-                                              DaySchedule(iDay).TSValue(state.dataGlobal->NumOfTimeStepInHour, Hr));
-                                    }
-                                } else {
-                                    print(state.files.debug, "    Same as previous\n");
-                                }
-                                iDayP = iDay;
-                            }
                         }
                     }
                 }
-
-            } else {
+                break;
             }
         }
 

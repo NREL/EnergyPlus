@@ -73,7 +73,7 @@ namespace ScheduleManager {
             "DUMMYZERO", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday",
             "Holiday", "SummerDesignDay", "WinterDesignDay", "CustomDay1", "CustomDay2"
         };
-        return dayTypesVector[i-1];
+        return dayTypesVector[i];
     }
 
     enum class ScheduleInput {
@@ -160,7 +160,8 @@ namespace ScheduleManager {
 
     void ProcessScheduleInput(EnergyPlusData &state);
 
-    void ReportScheduleDetails(EnergyPlusData &state, int LevelOfDetail); // =1: hourly; =2: timestep; = 3: make IDF excerpt
+    enum class ReportLevelDetail {Hourly, TimeStepDetailed, IDF};
+    void ReportScheduleDetails(EnergyPlusData &state, ReportLevelDetail LevelOfDetail);
 
     Real64 GetCurrentScheduleValue(EnergyPlusData &state, int ScheduleIndex);
 
@@ -350,9 +351,8 @@ namespace ScheduleManager {
             }
         }
     };
-    extern std::vector<InterpretedScheduleFileData> interpretedFileData;
-    enum class ExternalFileReadMode { ReadingFromFile, ReadingFromCache };
 
+    extern std::vector<InterpretedScheduleFileData> interpretedFileData;
     extern int NumScheduleTypes;
     extern int NumDaySchedules;
     extern int NumWeekSchedules;
