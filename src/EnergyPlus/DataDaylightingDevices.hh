@@ -136,7 +136,7 @@ namespace DataDaylightingDevices {
 
 } // namespace DataDaylightingDevices
 
-struct DaylightingDevicesData : BaseGlobalStruct {
+struct DataDaylightingDevicesData : BaseGlobalStruct {
 
     int NumOfTDDPipes = 0; // Number of TDD pipes in the input file
     int NumOfShelf = 0;    // Number of daylighting shelves in the input file

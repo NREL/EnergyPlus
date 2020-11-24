@@ -88,6 +88,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataWater.hh>
 #include <EnergyPlus/DataTimings.hh>
+#include <EnergyPlus/DaylightingDevices.hh>
 #include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/Pipes.hh>

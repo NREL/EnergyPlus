@@ -175,26 +175,6 @@ namespace DaylightingDevices {
     using DataSurfaces::Surface;
     using DataSurfaces::SurfaceClass;
     using DataSurfaces::TotSurfaces;
-    // Data
-    // MODULE PARAMETER DEFINITIONS: na
-    // DERIVED TYPE DEFINITIONS: na
-    // MODULE VARIABLE TYPE DECLARATIONS: na
-
-    // MODULE VARIABLE DECLARATIONS:
-    Array1D<Real64> COSAngle(DataDaylightingDevices::NumOfAngles); // List of cosines of incident angle
-    bool ShelfReported = false;
-
-    // SUBROUTINE SPECIFICATIONS:
-
-    // MODULE SUBROUTINES:
-
-    void clear_state() {
-        COSAngle.clear();
-        COSAngle.allocate(DataDaylightingDevices::NumOfAngles);
-        ShelfReported = false;
-    }
-
-    // Functions
 
     void InitDaylightingDevices(EnergyPlusData &state)
     {
@@ -212,16 +192,8 @@ namespace DaylightingDevices {
         // METHODOLOGY EMPLOYED:
         // Daylighting and thermal variables are calculated.  BeamTrans/COSAngle table is calculated.
 
-        // REFERENCES: na
-
         // Using/Aliasing
         using DataHeatBalance::IntGainTypeOf_DaylightingDeviceTubular;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS: na
-
-        // DERIVED TYPE DEFINITIONS:
-
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PipeNum;   // TDD pipe object number
@@ -263,14 +235,14 @@ namespace DaylightingDevices {
         if (state.dataDaylightingDevicesData->NumOfTDDPipes > 0) {
             DisplayString(state, "Initializing Tubular Daylighting Devices");
             // Setup COSAngle list for all TDDs
-            COSAngle(1) = 0.0;
-            COSAngle(DataDaylightingDevices::NumOfAngles) = 1.0;
+            state.dataDaylightingDevices->COSAngle(1) = 0.0;
+            state.dataDaylightingDevices->COSAngle(DataDaylightingDevices::NumOfAngles) = 1.0;
 
             dTheta = 90.0 * DataGlobalConstants::DegToRadians() / (DataDaylightingDevices::NumOfAngles - 1.0);
             Theta = 90.0 * DataGlobalConstants::DegToRadians();
             for (AngleNum = 2; AngleNum <= DataDaylightingDevices::NumOfAngles - 1; ++AngleNum) {
                 Theta -= dTheta;
-                COSAngle(AngleNum) = std::cos(Theta);
+                state.dataDaylightingDevices->COSAngle(AngleNum) = std::cos(Theta);
             } // AngleNum
 
             TDDPipeStored.allocate(state.dataDaylightingDevicesData->NumOfTDDPipes * 2);
@@ -435,10 +407,10 @@ namespace DaylightingDevices {
                 }
 
                 // Report calculated view factor so that user knows what to make the view factor to ground
-                if (!ShelfReported) {
+                if (!state.dataDaylightingDevices->ShelfReported) {
                     print(state.files.eio,
                         "! <Shelf Details>,Name,View Factor to Outside Shelf,Window Name,Window View Factor to Sky,Window View Factor to Ground\n");
-                    ShelfReported = true;
+                    state.dataDaylightingDevices->ShelfReported = true;
                 }
                 print(state.files.eio,
                       "{},{:.2R},{},{:.2R},{:.2R}\n",
@@ -1300,14 +1272,14 @@ namespace DaylightingDevices {
 
             if (SELECT_CASE_var == DataDaylightingDevices::iRadType::VisibleBeam) {
                 transDome = POLYF(COSI, state.dataConstruction->Construct(constDome).TransVisBeamCoef);
-                transPipe = InterpolatePipeTransBeam(COSI, state.dataDaylightingDevicesData->TDDPipe(PipeNum).PipeTransVisBeam);
+                transPipe = InterpolatePipeTransBeam(state, COSI, state.dataDaylightingDevicesData->TDDPipe(PipeNum).PipeTransVisBeam);
                 transDiff = state.dataConstruction->Construct(constDiff).TransDiffVis; // May want to change to POLYF also!
 
                 TransTDD = transDome * transPipe * transDiff;
 
             } else if (SELECT_CASE_var == DataDaylightingDevices::iRadType::SolarBeam) {
                 transDome = POLYF(COSI, state.dataConstruction->Construct(constDome).TransSolBeamCoef);
-                transPipe = InterpolatePipeTransBeam(COSI, state.dataDaylightingDevicesData->TDDPipe(PipeNum).PipeTransSolBeam);
+                transPipe = InterpolatePipeTransBeam(state, COSI, state.dataDaylightingDevicesData->TDDPipe(PipeNum).PipeTransSolBeam);
                 transDiff = state.dataConstruction->Construct(constDiff).TransDiff; // May want to change to POLYF also!
 
                 TransTDD = transDome * transPipe * transDiff;
@@ -1323,7 +1295,8 @@ namespace DaylightingDevices {
         return TransTDD;
     }
 
-    Real64 InterpolatePipeTransBeam(Real64 const COSI,               // Cosine of the incident angle
+    Real64 InterpolatePipeTransBeam(EnergyPlusData &state,
+                                    Real64 const COSI,               // Cosine of the incident angle
                                     const Array1D<Real64> &transBeam // Table of beam transmittance vs. cosine angle
     )
     {
@@ -1362,12 +1335,12 @@ namespace DaylightingDevices {
         InterpolatePipeTransBeam = 0.0;
 
         // Linearly interpolate transBeam/COSAngle table to get value at current cosine of the angle
-        Lo = FindArrayIndex(COSI, COSAngle);
+        Lo = FindArrayIndex(COSI, state.dataDaylightingDevices->COSAngle);
         Hi = Lo + 1;
 
         if (Lo > 0 && Hi <= DataDaylightingDevices::NumOfAngles) {
-            m = (transBeam(Hi) - transBeam(Lo)) / (COSAngle(Hi) - COSAngle(Lo));
-            b = transBeam(Lo) - m * COSAngle(Lo);
+            m = (transBeam(Hi) - transBeam(Lo)) / (state.dataDaylightingDevices->COSAngle(Hi) - state.dataDaylightingDevices->COSAngle(Lo));
+            b = transBeam(Lo) - m * state.dataDaylightingDevices->COSAngle(Lo);
 
             InterpolatePipeTransBeam = m * COSI + b;
         } else {

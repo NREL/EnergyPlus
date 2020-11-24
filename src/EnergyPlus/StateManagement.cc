@@ -83,7 +83,6 @@
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
-#include <EnergyPlus/DaylightingDevices.hh>
 #include <EnergyPlus/DaylightingManager.hh>
 #include <EnergyPlus/DemandManager.hh>
 #include <EnergyPlus/DesiccantDehumidifiers.hh>
@@ -229,7 +228,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     DataZoneControls::clear_state();
     DataZoneEnergyDemands::clear_state();
     DataZoneEquipment::clear_state();
-    DaylightingDevices::clear_state();
     DaylightingManager::clear_state();
     DemandManager::clear_state();
     DesiccantDehumidifiers::clear_state();

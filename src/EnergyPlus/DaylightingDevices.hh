@@ -59,8 +59,6 @@ struct EnergyPlusData;
 
 namespace DaylightingDevices {
 
-    extern Array1D<Real64> COSAngle; // List of cosines of incident angle
-
     void InitDaylightingDevices(EnergyPlusData &state);
 
     void GetTDDInput(EnergyPlusData &state);
@@ -87,7 +85,8 @@ namespace DaylightingDevices {
                     DataDaylightingDevices::iRadType const RadiationType // Radiation type flag
     );
 
-    Real64 InterpolatePipeTransBeam(Real64 const COSI,               // Cosine of the incident angle
+    Real64 InterpolatePipeTransBeam(EnergyPlusData &state,
+                                    Real64 const COSI,               // Cosine of the incident angle
                                     const Array1D<Real64> &transBeam // Table of beam transmittance vs. cosine angle
     );
 
@@ -99,9 +98,19 @@ namespace DaylightingDevices {
 
     void FigureTDDZoneGains(EnergyPlusData &state);
 
-    void clear_state();
-
 } // namespace DaylightingDevices
+
+struct DaylightingDevicesData : BaseGlobalStruct {
+
+    Array1D<Real64> COSAngle = Array1D<Real64>(DataDaylightingDevices::NumOfAngles); // List of cosines of incident angle
+    bool ShelfReported = false;
+
+    void clear_state() override
+    {
+        this->COSAngle = Array1D<Real64>(DataDaylightingDevices::NumOfAngles);
+        this->ShelfReported = false;
+    }
+};
 
 } // namespace EnergyPlus
 
