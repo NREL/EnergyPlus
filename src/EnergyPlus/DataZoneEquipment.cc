@@ -1486,8 +1486,6 @@ namespace DataZoneEquipment {
 
         // Using/Aliasing
         using DataContaminantBalance::OutdoorCO2;
-        using DataContaminantBalance::ZoneAirCO2;
-        using DataContaminantBalance::ZoneCO2GainFromPeople;
         using DataContaminantBalance::ZoneSysContDemand;
         using DataEnvironment::StdRhoAir;
         using DataHeatBalance::People;
@@ -1696,7 +1694,7 @@ namespace DataZoneEquipment {
                     ZoneContamControllerSched = GetCurrentScheduleValue(state, Zone(ActualZoneNum).ZoneContamControllerSchedIndex);
                     if (ZoneContamControllerSched > 0.0) {
                         if (ZoneOAPeople > 0.0) {
-                            if (ZoneCO2GainFromPeople(ActualZoneNum) > 0.0) {
+                            if (state.dataContaminantBalance->ZoneCO2GainFromPeople(ActualZoneNum) > 0.0) {
                                 if (Zone(ActualZoneNum).ZoneMinCO2SchedIndex > 0.0) {
                                     // Take the schedule value of "Minimum Carbon Dioxide Concentration Schedule Name"
                                     // in the ZoneControl:ContaminantController
@@ -1711,7 +1709,7 @@ namespace DataZoneEquipment {
                                                  (CO2PeopleGeneration * Zone(ActualZoneNum).Multiplier * Zone(ActualZoneNum).ListMultiplier * 1.0e6) /
                                                      ZoneOAMax;
                                 } else {
-                                    ZoneMaxCO2 = OutdoorCO2 + (ZoneCO2GainFromPeople(ActualZoneNum) * Zone(ActualZoneNum).Multiplier *
+                                    ZoneMaxCO2 = OutdoorCO2 + (state.dataContaminantBalance->ZoneCO2GainFromPeople(ActualZoneNum) * Zone(ActualZoneNum).Multiplier *
                                                                Zone(ActualZoneNum).ListMultiplier * 1.0e6) /
                                                                   ZoneOAMax;
                                 }
@@ -1764,11 +1762,11 @@ namespace DataZoneEquipment {
                                     OAVolumeFlowRate = ZoneOAMax / ZoneEz;
                                 } else {
 
-                                    if (ZoneAirCO2(ActualZoneNum) <= ZoneMinCO2) {
+                                    if (state.dataContaminantBalance->ZoneAirCO2(ActualZoneNum) <= ZoneMinCO2) {
                                         // Zone air CO2 concentration is less than minimum zone CO2 concentration, set the Zone OA flow rate to
                                         // minimum Zone OA flow rate when the zone is unoccupied
                                         OAVolumeFlowRate = ZoneOAMin;
-                                    } else if (ZoneAirCO2(ActualZoneNum) >= ZoneMaxCO2) {
+                                    } else if (state.dataContaminantBalance->ZoneAirCO2(ActualZoneNum) >= ZoneMaxCO2) {
                                         // Zone air CO2 concentration is greater than maximum zone CO2 concentration, set the Zone OA flow rate to
                                         // maximum Zone OA flow rate (i.e. ZoneOAArea + ZoneOAPeople)
                                         OAVolumeFlowRate = ZoneOAMax;
@@ -1776,7 +1774,7 @@ namespace DataZoneEquipment {
                                         // Zone air CO2 concentration is between maximum and minimum limits of zone CO2 concentration,
                                         // set Zone OA flow rate by proportionally adjusting between ZoneOAMin and ZoneOAMax
                                         OAVolumeFlowRate = ZoneOAMin + (ZoneOAMax - ZoneOAMin) *
-                                                                           ((ZoneAirCO2(ActualZoneNum) - ZoneMinCO2) / (ZoneMaxCO2 - ZoneMinCO2));
+                                                                           ((state.dataContaminantBalance->ZoneAirCO2(ActualZoneNum) - ZoneMinCO2) / (ZoneMaxCO2 - ZoneMinCO2));
                                     }
                                 }
                             } else {

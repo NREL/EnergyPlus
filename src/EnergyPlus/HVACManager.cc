@@ -224,8 +224,6 @@ namespace HVACManager {
         using DataContaminantBalance::Contaminant;
         using DataContaminantBalance::OutdoorCO2;
         using DataContaminantBalance::OutdoorGC;
-        using DataContaminantBalance::ZoneAirCO2;
-        using DataContaminantBalance::ZoneAirCO2Avg;
         using DataContaminantBalance::ZoneAirCO2Temp;
         using DataContaminantBalance::ZoneAirGC;
         using DataContaminantBalance::ZoneAirGCAvg;
@@ -312,7 +310,7 @@ namespace HVACManager {
         PrintedWarmup = false;
         if (Contaminant.CO2Simulation) {
             OutdoorCO2 = GetCurrentScheduleValue(state, Contaminant.CO2OutdoorSchedPtr);
-            ZoneAirCO2Avg = 0.0;
+            state.dataContaminantBalance->ZoneAirCO2Avg = 0.0;
         }
         if (Contaminant.GenericContamSimulation) {
             OutdoorGC = GetCurrentScheduleValue(state, Contaminant.GenericContamOutdoorSchedPtr);
@@ -459,7 +457,7 @@ namespace HVACManager {
             for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 ZTAV(ZoneNum) += ZT(ZoneNum) * FracTimeStepZone;
                 ZoneAirHumRatAvg(ZoneNum) += ZoneAirHumRat(ZoneNum) * FracTimeStepZone;
-                if (Contaminant.CO2Simulation) ZoneAirCO2Avg(ZoneNum) += ZoneAirCO2(ZoneNum) * FracTimeStepZone;
+                if (Contaminant.CO2Simulation) state.dataContaminantBalance->ZoneAirCO2Avg(ZoneNum) += state.dataContaminantBalance->ZoneAirCO2(ZoneNum) * FracTimeStepZone;
                 if (Contaminant.GenericContamSimulation) ZoneAirGCAvg(ZoneNum) += ZoneAirGC(ZoneNum) * FracTimeStepZone;
                 if (state.dataZoneTempPredictorCorrector->NumOnOffCtrZone > 0) {
                     ZoneThermostatSetPointHiAver(ZoneNum) += ZoneThermostatSetPointHi(ZoneNum) * FracTimeStepZone;

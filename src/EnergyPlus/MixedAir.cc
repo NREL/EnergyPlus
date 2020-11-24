@@ -151,8 +151,6 @@ namespace MixedAir {
     using DataContaminantBalance::Contaminant;
     using DataContaminantBalance::OutdoorCO2;
     using DataContaminantBalance::OutdoorGC;
-    using DataContaminantBalance::ZoneAirCO2;
-    using DataContaminantBalance::ZoneCO2GainFromPeople;
     using namespace FaultsManager;
 
     // Data
@@ -4162,7 +4160,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                                     }
 
                                     if (ZoneOAPeople > 0.0) {
-                                        if (ZoneCO2GainFromPeople(ZoneNum) > 0.0) {
+                                        if (state.dataContaminantBalance->ZoneCO2GainFromPeople(ZoneNum) > 0.0) {
                                             if (curZone.ZoneMinCO2SchedIndex > 0.0) {
                                                 // Take the schedule value of "Minimum Carbon Dioxide Concentration Schedule Name"
                                                 // in the ZoneControl:ContaminantController
@@ -4179,7 +4177,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                                                 ZoneMaxCO2 = GetCurrentScheduleValue(state, curZone.ZoneMaxCO2SchedIndex);
                                             } else {
                                                 ZoneMaxCO2 = OutdoorCO2 +
-                                                             (ZoneCO2GainFromPeople(ZoneNum) * curZone.Multiplier * curZone.ListMultiplier * 1.0e6) /
+                                                             (state.dataContaminantBalance->ZoneCO2GainFromPeople(ZoneNum) * curZone.Multiplier * curZone.ListMultiplier * 1.0e6) /
                                                                  ZoneOAMax;
                                             }
 
@@ -4257,11 +4255,11 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                                                 ZoneOA = ZoneOABZ / ZoneEz;
                                             } else {
 
-                                                if (ZoneAirCO2(ZoneNum) <= ZoneMinCO2) {
+                                                if (state.dataContaminantBalance->ZoneAirCO2(ZoneNum) <= ZoneMinCO2) {
                                                     // Zone air CO2 concentration is less than minimum zone CO2 concentration, set the Zone OA flow
                                                     // rate to minimum Zone OA flow rate when the zone is unoccupied
                                                     ZoneOA = ZoneOAMin;
-                                                } else if (ZoneAirCO2(ZoneNum) >= ZoneMaxCO2) {
+                                                } else if (state.dataContaminantBalance->ZoneAirCO2(ZoneNum) >= ZoneMaxCO2) {
                                                     // Zone air CO2 concentration is greater than maximum zone CO2 concentration, set the Zone OA flow
                                                     // rate to maximum Zone OA flow rate (i.e. ZoneOAArea + ZoneOAPeople)
                                                     ZoneOA = ZoneOAMax;
@@ -4269,7 +4267,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                                                     // Zone air CO2 concentration is between maximum and minimum limits of zone CO2 concentration,
                                                     // set Zone OA flow rate by proportionally adjusting between ZoneOAMin and ZoneOAMax
                                                     ZoneOA = ZoneOAMin + (ZoneOAMax - ZoneOAMin) *
-                                                                             ((ZoneAirCO2(ZoneNum) - ZoneMinCO2) / (ZoneMaxCO2 - ZoneMinCO2));
+                                                                             ((state.dataContaminantBalance->ZoneAirCO2(ZoneNum) - ZoneMinCO2) / (ZoneMaxCO2 - ZoneMinCO2));
                                                 }
                                             }
                                         } else {

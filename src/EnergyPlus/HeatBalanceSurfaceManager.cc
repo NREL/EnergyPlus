@@ -5280,7 +5280,7 @@ namespace HeatBalanceSurfaceManager {
                 ZoneNumOcc(ZoneNum) = People(iPeople).NumberOfPeople * GetCurrentScheduleValue(state, People(iPeople).NumberOfPeoplePtr);
             }
             for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-                Real64 ZoneAirCO2 = DataContaminantBalance::ZoneAirCO2Avg(ZoneNum);
+                Real64 ZoneAirCO2 = state.dataContaminantBalance->ZoneAirCO2Avg(ZoneNum);
 
                 int NumOcc = ZoneNumOcc(ZoneNum);
                 if (ZoneAirCO2 <= 1000) {

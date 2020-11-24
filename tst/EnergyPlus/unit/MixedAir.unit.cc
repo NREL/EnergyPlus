@@ -778,11 +778,11 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOccupancyTest)
     People(1).NumberOfPeople = 3;
     Zone(1).TotOccupants = 3;
     Schedule(4).CurrentValue = 1.0;
-    ZoneCO2GainFromPeople.allocate(1);
-    ZoneCO2GainFromPeople(1) = 3.82E-8;
+    state->dataContaminantBalance->ZoneCO2GainFromPeople.allocate(1);
+    state->dataContaminantBalance->ZoneCO2GainFromPeople(1) = 3.82E-8;
     OutdoorCO2 = 400;
-    ZoneAirCO2.allocate(1);
-    ZoneAirCO2(1) = 600.0;
+    state->dataContaminantBalance->ZoneAirCO2.allocate(1);
+    state->dataContaminantBalance->ZoneAirCO2(1) = 600.0;
     ZoneEquipConfig.allocate(1);
     ZoneEquipConfig(1).NumInletNodes = 1;
     ZoneEquipConfig(1).AirDistUnitCool.allocate(1);
@@ -840,8 +840,8 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOccupancyTest)
     OAMixer.deallocate();
     state->dataAirLoop->AirLoopZoneInfo.deallocate();
     state->dataAirSystemsData->PrimaryAirSystems.deallocate();
-    ZoneAirCO2.deallocate();
-    ZoneCO2GainFromPeople.deallocate();
+    state->dataContaminantBalance->ZoneAirCO2.deallocate();
+    state->dataContaminantBalance->ZoneCO2GainFromPeople.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, MissingDesignOccupancyTest)
@@ -5643,11 +5643,11 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOARateTest)
     Zone(1).TotOccupants = 3;
     Schedule(3).CurrentValue = 0.1;
     Schedule(4).CurrentValue = 1.0;
-    ZoneCO2GainFromPeople.allocate(1);
-    ZoneCO2GainFromPeople(1) = 3.82E-8;
+    state->dataContaminantBalance->ZoneCO2GainFromPeople.allocate(1);
+    state->dataContaminantBalance->ZoneCO2GainFromPeople(1) = 3.82E-8;
     OutdoorCO2 = 400;
-    ZoneAirCO2.allocate(1);
-    ZoneAirCO2(1) = 600.0;
+    state->dataContaminantBalance->ZoneAirCO2.allocate(1);
+    state->dataContaminantBalance->ZoneAirCO2(1) = 600.0;
     ZoneEquipConfig.allocate(1);
     ZoneEquipConfig(1).NumInletNodes = 1;
     ZoneEquipConfig(1).AirDistUnitCool.allocate(1);
@@ -5694,11 +5694,11 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOARateTest)
     Zone.deallocate();
     state->dataAirLoop->AirLoopFlow.deallocate();
     People.deallocate();
-    ZoneAirCO2.deallocate();
+    state->dataContaminantBalance->ZoneAirCO2.deallocate();
     ZoneEquipConfig.deallocate();
     Node.deallocate();
     ZoneSysEnergyDemand.deallocate();
-    ZoneCO2GainFromPeople.deallocate();
+    state->dataContaminantBalance->ZoneCO2GainFromPeople.deallocate();
     ContaminantControlledZone.deallocate();
     ZoneIntGain.deallocate();
 }

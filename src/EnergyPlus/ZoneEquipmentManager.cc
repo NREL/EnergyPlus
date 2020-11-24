@@ -4579,7 +4579,6 @@ namespace ZoneEquipmentManager {
         using DataContaminantBalance::Contaminant;
         using DataContaminantBalance::MixingMassFlowCO2;
         using DataContaminantBalance::MixingMassFlowGC;
-        using DataContaminantBalance::ZoneAirCO2;
         using DataContaminantBalance::ZoneAirGC;
         using DataHeatBalance::Ventilation;
         using DataHVACGlobals::CycleOn;
@@ -5094,7 +5093,7 @@ namespace ZoneEquipmentManager {
                     MixingMassFlowZone(n) += Mixing(j).DesiredAirFlowRate * AirDensity;
                     MixingMassFlowXHumRat(n) += Mixing(j).DesiredAirFlowRate * AirDensity * ZHumRat(m);
                     if (Contaminant.CO2Simulation) {
-                        MixingMassFlowCO2(n) += Mixing(j).DesiredAirFlowRate * AirDensity * ZoneAirCO2(m);
+                        MixingMassFlowCO2(n) += Mixing(j).DesiredAirFlowRate * AirDensity * state.dataContaminantBalance->ZoneAirCO2(m);
                     }
                     if (Contaminant.GenericContamSimulation) {
                         MixingMassFlowGC(n) += Mixing(j).DesiredAirFlowRate * AirDensity * ZoneAirGC(m);
@@ -5124,7 +5123,7 @@ namespace ZoneEquipmentManager {
                     MixingMassFlowZone(n) += Mixing(j).DesiredAirFlowRate * AirDensity;
                     MixingMassFlowXHumRat(n) += Mixing(j).DesiredAirFlowRate * AirDensity * ZHumRat(m);
                     if (Contaminant.CO2Simulation) {
-                        MixingMassFlowCO2(n) += Mixing(j).DesiredAirFlowRate * AirDensity * ZoneAirCO2(m);
+                        MixingMassFlowCO2(n) += Mixing(j).DesiredAirFlowRate * AirDensity * state.dataContaminantBalance->ZoneAirCO2(m);
                     }
                     if (Contaminant.GenericContamSimulation) {
                         MixingMassFlowGC(n) += Mixing(j).DesiredAirFlowRate * AirDensity * ZoneAirGC(m);
@@ -5154,7 +5153,7 @@ namespace ZoneEquipmentManager {
                 MixingMassFlowZone(n) += Mixing(j).DesiredAirFlowRate * AirDensity;
                 MixingMassFlowXHumRat(n) += Mixing(j).DesiredAirFlowRate * AirDensity * ZHumRat(m);
                 if (Contaminant.CO2Simulation) {
-                    MixingMassFlowCO2(n) += Mixing(j).DesiredAirFlowRate * AirDensity * ZoneAirCO2(m);
+                    MixingMassFlowCO2(n) += Mixing(j).DesiredAirFlowRate * AirDensity * state.dataContaminantBalance->ZoneAirCO2(m);
                 }
                 if (Contaminant.GenericContamSimulation) {
                     MixingMassFlowGC(n) += Mixing(j).DesiredAirFlowRate * AirDensity * ZoneAirGC(m);
@@ -5288,8 +5287,8 @@ namespace ZoneEquipmentManager {
                     MixingMassFlowZone(n) += CrossMixing(j).DesiredAirFlowRate * AirDensity;
                     MixingMassFlowXHumRat(n) += CrossMixing(j).DesiredAirFlowRate * AirDensity * ZHumRat(m);
                     if (Contaminant.CO2Simulation) {
-                        MixingMassFlowCO2(m) += CrossMixing(j).DesiredAirFlowRate * AirDensity * ZoneAirCO2(n);
-                        MixingMassFlowCO2(n) += CrossMixing(j).DesiredAirFlowRate * AirDensity * ZoneAirCO2(m);
+                        MixingMassFlowCO2(m) += CrossMixing(j).DesiredAirFlowRate * AirDensity * state.dataContaminantBalance->ZoneAirCO2(n);
+                        MixingMassFlowCO2(n) += CrossMixing(j).DesiredAirFlowRate * AirDensity * state.dataContaminantBalance->ZoneAirCO2(m);
                     }
                     if (Contaminant.GenericContamSimulation) {
                         MixingMassFlowGC(m) += CrossMixing(j).DesiredAirFlowRate * AirDensity * ZoneAirGC(n);
@@ -5370,8 +5369,8 @@ namespace ZoneEquipmentManager {
 
                     // Now to determine the CO2 and generic contaminant conditions
                     if (Contaminant.CO2Simulation) {
-                        MixingMassFlowCO2(ZoneA) += MassFlowToA * ZoneAirCO2(ZoneB);
-                        MixingMassFlowCO2(ZoneB) += MassFlowToB * ZoneAirCO2(ZoneA);
+                        MixingMassFlowCO2(ZoneA) += MassFlowToA * state.dataContaminantBalance->ZoneAirCO2(ZoneB);
+                        MixingMassFlowCO2(ZoneB) += MassFlowToB * state.dataContaminantBalance->ZoneAirCO2(ZoneA);
                     }
                     if (Contaminant.GenericContamSimulation) {
                         MixingMassFlowCO2(ZoneA) += MassFlowToA * ZoneAirGC(ZoneB);

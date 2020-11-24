@@ -2751,11 +2751,11 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
 
     DataHeatBalFanSys::ZoneCO2LevelHourBins.allocate(state->dataGlobal->NumOfZones);
     DataHeatBalFanSys::ZoneCO2LevelOccuHourBins.allocate(state->dataGlobal->NumOfZones);
-    DataContaminantBalance::ZoneAirCO2Avg.allocate(state->dataGlobal->NumOfZones);
+    state->dataContaminantBalance->ZoneAirCO2Avg.allocate(state->dataGlobal->NumOfZones);
     DataContaminantBalance::Contaminant.CO2Simulation = true;
     ScheduleManager::Schedule(1).CurrentValue = 1;
     OutputReportTabular::displayCO2ResilienceSummary = true;
-    DataContaminantBalance::ZoneAirCO2Avg(1) = 1100;
+    state->dataContaminantBalance->ZoneAirCO2Avg(1) = 1100;
     ReportCO2Resilience(*state);
     EXPECT_EQ(1, DataHeatBalFanSys::ZoneCO2LevelHourBins(1)[1]);
     EXPECT_EQ(2, DataHeatBalFanSys::ZoneCO2LevelOccuHourBins(1)[1]);

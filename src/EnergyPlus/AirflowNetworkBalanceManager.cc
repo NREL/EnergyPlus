@@ -120,12 +120,10 @@ namespace AirflowNetworkBalanceManager {
     // Using/Aliasing
     using CurveManager::CurveValue;
     using CurveManager::GetCurveIndex;
-    using DataContaminantBalance::CO2ZoneTimeMinus1;
     using DataContaminantBalance::Contaminant;
     using DataContaminantBalance::GCZoneTimeMinus1;
     using DataContaminantBalance::OutdoorCO2;
     using DataContaminantBalance::OutdoorGC;
-    using DataContaminantBalance::ZoneAirCO2;
     using DataContaminantBalance::ZoneAirGC;
     using DataEnvironment::CurMnDy;
     using DataEnvironment::EnvironmentName;
@@ -4921,7 +4919,7 @@ namespace AirflowNetworkBalanceManager {
             for (i = 1; i <= state.dataGlobal->NumOfZones; ++i) {
                 AirflowNetworkBalanceManager::ANZT(i) = AirflowNetworkBalanceManager::MAT(i);
                 AirflowNetworkBalanceManager::ANZW(i) = AirflowNetworkBalanceManager::ZoneAirHumRat(i);
-                if (AirflowNetworkBalanceManager::Contaminant.CO2Simulation) AirflowNetworkBalanceManager::ANCO(i) = AirflowNetworkBalanceManager::ZoneAirCO2(i);
+                if (AirflowNetworkBalanceManager::Contaminant.CO2Simulation) AirflowNetworkBalanceManager::ANCO(i) = state.dataContaminantBalance->ZoneAirCO2(i);
                 if (AirflowNetworkBalanceManager::Contaminant.GenericContamSimulation) AirflowNetworkBalanceManager::ANGC(i) = AirflowNetworkBalanceManager::ZoneAirGC(i);
             }
             if (state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfOccuVentCtrls > 0) {
@@ -4947,14 +4945,14 @@ namespace AirflowNetworkBalanceManager {
                         AirflowNetworkBalanceManager::ANZT(i) = AirflowNetworkBalanceManager::XMAT(i);
                         AirflowNetworkBalanceManager::ANZW(i) = AirflowNetworkBalanceManager::WZoneTimeMinus1(i);
                         if (AirflowNetworkBalanceManager::Contaminant.CO2Simulation)
-                            AirflowNetworkBalanceManager::ANCO(i) = AirflowNetworkBalanceManager::CO2ZoneTimeMinus1(i);
+                            AirflowNetworkBalanceManager::ANCO(i) = state.dataContaminantBalance->CO2ZoneTimeMinus1(i);
                         if (AirflowNetworkBalanceManager::Contaminant.GenericContamSimulation) AirflowNetworkBalanceManager::ANGC(i) = AirflowNetworkBalanceManager::GCZoneTimeMinus1(i);
                     }
                 } else {
                     for (i = 1; i <= state.dataGlobal->NumOfZones; ++i) {
                         AirflowNetworkBalanceManager::ANZT(i) = AirflowNetworkBalanceManager::MAT(i);
                         AirflowNetworkBalanceManager::ANZW(i) = AirflowNetworkBalanceManager::ZoneAirHumRat(i);
-                        if (AirflowNetworkBalanceManager::Contaminant.CO2Simulation) AirflowNetworkBalanceManager::ANCO(i) = AirflowNetworkBalanceManager::ZoneAirCO2(i);
+                        if (AirflowNetworkBalanceManager::Contaminant.CO2Simulation) AirflowNetworkBalanceManager::ANCO(i) = state.dataContaminantBalance->ZoneAirCO2(i);
                         if (AirflowNetworkBalanceManager::Contaminant.GenericContamSimulation) AirflowNetworkBalanceManager::ANGC(i) = AirflowNetworkBalanceManager::ZoneAirGC(i);
                     }
                 }

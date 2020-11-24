@@ -62,22 +62,6 @@ struct EnergyPlusData;
 
 namespace DataContaminantBalance {
 
-    extern Array1D<Real64> ZoneCO2Gain;             // CO2 gain from each Zone (People, equipment)
-    extern Array1D<Real64> ZoneCO2GainFromPeople;   // CO2 gain from each Zone (From People only)
-    extern Array1D<Real64> ZoneCO2GainExceptPeople; // Added for hybrid model CO2 gain from each Zone (Except People)
-
-    // Zone Air Contaminant conditions variables
-    extern Array1D<Real64> ZoneAirCO2Avg;       // AIR CO2 averaged over the zone time step
-    extern Array1D<Real64> ZoneAirCO2;          // AIR CO2
-    extern Array1D<Real64> CO2ZoneTimeMinus1;   // CO2 history terms for 3rd order derivative
-    extern Array1D<Real64> CO2ZoneTimeMinus2;   // Time Minus 2 Zone Time Steps Term
-    extern Array1D<Real64> CO2ZoneTimeMinus3;   // Time Minus 3 Zone Time Steps Term
-    extern Array1D<Real64> CO2ZoneTimeMinus4;   // Time Minus 4 Zone Time Steps Term
-    extern Array1D<Real64> DSCO2ZoneTimeMinus1; // DownStepped CO2 history terms for 3rd order derivative
-    extern Array1D<Real64> DSCO2ZoneTimeMinus2; // DownStepped Time Minus 2 Zone Time Steps Term
-    extern Array1D<Real64> DSCO2ZoneTimeMinus3; // DownStepped Time Minus 3 Zone Time Steps Term
-    extern Array1D<Real64> DSCO2ZoneTimeMinus4; // DownStepped Time Minus 4 Zone Time Steps Term
-
     extern Array1D<Real64> ZoneAirCO2Temp;        // Temp zone air CO2 at time plus 1
     extern Array1D<Real64> CO2ZoneTimeMinus1Temp; // Zone air CO2 at previous timestep
     extern Array1D<Real64> CO2ZoneTimeMinus2Temp; // Zone air CO2 at timestep T-2
@@ -360,10 +344,39 @@ struct ContaminantBalanceData : BaseGlobalStruct {
     Array1D<Real64> ZoneCO2SetPoint;
     Array1D<Real64> CO2PredictedRate;
 
+    Array1D<Real64> ZoneCO2Gain;             // CO2 gain from each Zone (People, equipment)
+    Array1D<Real64> ZoneCO2GainFromPeople;   // CO2 gain from each Zone (From People only)
+    Array1D<Real64> ZoneCO2GainExceptPeople; // Added for hybrid model, CO2 gain from each Zone (except People)
+
+    // Zone Air Contaminant conditions variables
+    Array1D<Real64> ZoneAirCO2Avg;       // AIR CO2 averaged over the zone time step
+    Array1D<Real64> ZoneAirCO2;          // AIR CO2
+    Array1D<Real64> CO2ZoneTimeMinus1;   // CO2 history terms for 3rd order derivative
+    Array1D<Real64> CO2ZoneTimeMinus2;   // Time Minus 2 Zone Time Steps Term
+    Array1D<Real64> CO2ZoneTimeMinus3;   // Time Minus 3 Zone Time Steps Term
+    Array1D<Real64> CO2ZoneTimeMinus4;   // Time Minus 4 Zone Time Steps Term
+    Array1D<Real64> DSCO2ZoneTimeMinus1; // DownStepped CO2 history terms for 3rd order derivative
+    Array1D<Real64> DSCO2ZoneTimeMinus2; // DownStepped Time Minus 2 Zone Time Steps Term
+    Array1D<Real64> DSCO2ZoneTimeMinus3; // DownStepped Time Minus 3 Zone Time Steps Term
+    Array1D<Real64> DSCO2ZoneTimeMinus4; // DownStepped Time Minus 4 Zone Time Steps Term
+
     void clear_state() override
     {
         this->ZoneCO2SetPoint.deallocate();
         this->CO2PredictedRate.deallocate();
+        this->ZoneCO2Gain.deallocate();
+        this->ZoneCO2GainFromPeople.deallocate();
+        this->ZoneCO2GainExceptPeople.deallocate(); // Added for hybrid model
+        this->ZoneAirCO2Avg.deallocate();
+        this->ZoneAirCO2.deallocate();
+        this->CO2ZoneTimeMinus1.deallocate();
+        this->CO2ZoneTimeMinus2.deallocate();
+        this->CO2ZoneTimeMinus3.deallocate();
+        this->CO2ZoneTimeMinus4.deallocate();
+        this->DSCO2ZoneTimeMinus1.deallocate();
+        this->DSCO2ZoneTimeMinus2.deallocate();
+        this->DSCO2ZoneTimeMinus3.deallocate();
+        this->DSCO2ZoneTimeMinus4.deallocate();
     }
 };
 
