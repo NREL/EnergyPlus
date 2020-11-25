@@ -4040,7 +4040,7 @@ namespace ScheduleManager {
         //  Min/max for schedule has been set.  Test.
         MinValueOk = (FLT_EPSILON >= Minimum - Schedule(ScheduleIndex).MinValue);
         if (MinString == ">") {
-            MinValueOk = MinValueOk = (Schedule(ScheduleIndex).MinValue > Minimum);
+            MinValueOk = (Schedule(ScheduleIndex).MinValue > Minimum);
         } else {
             MinValueOk = (FLT_EPSILON >= Minimum - Schedule(ScheduleIndex).MinValue);
         }
