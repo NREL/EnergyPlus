@@ -700,7 +700,7 @@ namespace PondGroundHeatExchanger {
         Real64 Reflectance = Absorbtance - Transmitance;
 
         // apply reflectance to beam and diffuse solar to find flux
-        CalcSolarFlux = (1.0 - Reflectance) * (DataEnvironment::SOLCOS(3) * state.dataEnvrn->BeamSolarRad + DataEnvironment::DifSolarRad);
+        CalcSolarFlux = (1.0 - Reflectance) * (DataEnvironment::SOLCOS(3) * state.dataEnvrn->BeamSolarRad + state.dataEnvrn->DifSolarRad);
 
         return CalcSolarFlux;
     }

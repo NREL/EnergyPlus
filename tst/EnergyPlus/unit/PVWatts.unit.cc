@@ -183,7 +183,7 @@ TEST_F(EnergyPlusFixture, PVWattsGenerator_Calc)
     state->dataWeatherManager->WeatherFileLongitude = -111.98;
     state->dataWeatherManager->WeatherFileTimeZone = -7;
     state->dataEnvrn->BeamSolarRad = 728;
-    DataEnvironment::DifSolarRad = 70;
+    state->dataEnvrn->DifSolarRad = 70;
     DataEnvironment::WindSpeed = 3.1;
     DataEnvironment::OutDryBulbTemp = 31.7;
 

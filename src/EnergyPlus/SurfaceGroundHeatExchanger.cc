@@ -520,7 +520,7 @@ namespace SurfaceGroundHeatExchanger {
             // initialize past weather variables
             state.dataSurfaceGroundHeatExchangers->PastBeamSolarRad = state.dataEnvrn->BeamSolarRad;
             state.dataSurfaceGroundHeatExchangers->PastSolarDirCosVert = SOLCOS(3);
-            state.dataSurfaceGroundHeatExchangers->PastDifSolarRad = DifSolarRad;
+            state.dataSurfaceGroundHeatExchangers->PastDifSolarRad = state.dataEnvrn->DifSolarRad;
             state.dataSurfaceGroundHeatExchangers->PastGroundTemp = GroundTemp_Surface;
             state.dataSurfaceGroundHeatExchangers->PastIsRain = IsRain;
             state.dataSurfaceGroundHeatExchangers->PastIsSnow = IsSnow;
@@ -711,7 +711,7 @@ namespace SurfaceGroundHeatExchanger {
             // get current env. conditions
             state.dataSurfaceGroundHeatExchangers->PastBeamSolarRad = state.dataEnvrn->BeamSolarRad;
             state.dataSurfaceGroundHeatExchangers->PastSolarDirCosVert = SOLCOS(3);
-            state.dataSurfaceGroundHeatExchangers->PastDifSolarRad = DifSolarRad;
+            state.dataSurfaceGroundHeatExchangers->PastDifSolarRad = state.dataEnvrn->DifSolarRad;
             state.dataSurfaceGroundHeatExchangers->PastGroundTemp = GroundTemp_Surface;
             state.dataSurfaceGroundHeatExchangers->PastIsRain = IsRain;
             state.dataSurfaceGroundHeatExchangers->PastIsSnow = IsSnow;

@@ -405,7 +405,7 @@ namespace PVWatts {
                                                     state.dataWeatherManager->WeatherFileLongitude,
                                                     state.dataWeatherManager->WeatherFileTimeZone,
                                                     state.dataEnvrn->BeamSolarRad,
-                                                    DataEnvironment::DifSolarRad,
+                                                    state.dataEnvrn->DifSolarRad,
                                                     albedo);
 
         // powerout

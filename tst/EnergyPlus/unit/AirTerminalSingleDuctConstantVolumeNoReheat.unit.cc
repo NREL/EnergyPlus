@@ -547,7 +547,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OASpecification)
     Node(InletNode).MassFlowRateMaxAvail = MassFlowRateMaxAvail;
     EXPECT_EQ(3.0, MassFlowRateMaxAvail);
 
-    DataEnvironment::DSTIndicator = 0;
+    state->dataEnvrn->DSTIndicator = 0;
     state->dataEnvrn->DayOfYear_Schedule = 1;
     state->dataEnvrn->DayOfWeek = 1;
     DataEnvironment::HolidayIndex = 0;
@@ -890,7 +890,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OAVolumeFlowRateReport
     Node(InletNode).MassFlowRateMaxAvail = MassFlowRateMaxAvail;
     EXPECT_EQ(3.0, MassFlowRateMaxAvail);
 
-    DataEnvironment::DSTIndicator = 0;
+    state->dataEnvrn->DSTIndicator = 0;
     state->dataEnvrn->DayOfYear_Schedule = 1;
     state->dataEnvrn->DayOfWeek = 1;
     DataEnvironment::HolidayIndex = 0;

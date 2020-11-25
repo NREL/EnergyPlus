@@ -398,7 +398,7 @@ namespace EnergyPlus {
         DataEnvironment::Month = 1;
         state->dataEnvrn->DayOfMonth = 21;
         state->dataGlobal->HourOfDay = 1;
-        DataEnvironment::DSTIndicator = 0;
+        state->dataEnvrn->DSTIndicator = 0;
         state->dataEnvrn->DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 0;
         state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(Month, state->dataEnvrn->DayOfMonth, 1);
@@ -712,7 +712,7 @@ namespace EnergyPlus {
         DataEnvironment::Month = 1;
         state->dataEnvrn->DayOfMonth = 21;
         state->dataGlobal->HourOfDay = 1;
-        DataEnvironment::DSTIndicator = 0;
+        state->dataEnvrn->DSTIndicator = 0;
         state->dataEnvrn->DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 0;
         state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(Month, state->dataEnvrn->DayOfMonth, 1);
@@ -1047,7 +1047,7 @@ namespace EnergyPlus {
         DataEnvironment::Month = 1;
         state->dataEnvrn->DayOfMonth = 21;
         state->dataGlobal->HourOfDay = 1;
-        DataEnvironment::DSTIndicator = 0;
+        state->dataEnvrn->DSTIndicator = 0;
         state->dataEnvrn->DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 0;
         state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(Month, state->dataEnvrn->DayOfMonth, 1);
@@ -1400,7 +1400,7 @@ namespace EnergyPlus {
         DataEnvironment::Month = 1;
         state->dataEnvrn->DayOfMonth = 21;
         state->dataGlobal->HourOfDay = 1;
-        DataEnvironment::DSTIndicator = 0;
+        state->dataEnvrn->DSTIndicator = 0;
         state->dataEnvrn->DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 0;
         state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(Month, state->dataEnvrn->DayOfMonth, 1);
@@ -1745,7 +1745,7 @@ namespace EnergyPlus {
         DataEnvironment::Month = 1;
         state->dataEnvrn->DayOfMonth = 21;
         state->dataGlobal->HourOfDay = 1;
-        DataEnvironment::DSTIndicator = 0;
+        state->dataEnvrn->DSTIndicator = 0;
         state->dataEnvrn->DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 0;
         state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(Month, state->dataEnvrn->DayOfMonth, 1);
@@ -2079,7 +2079,7 @@ namespace EnergyPlus {
         DataEnvironment::Month = 1;
         state->dataEnvrn->DayOfMonth = 21;
         state->dataGlobal->HourOfDay = 1;
-        DataEnvironment::DSTIndicator = 0;
+        state->dataEnvrn->DSTIndicator = 0;
         state->dataEnvrn->DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 0;
         state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(Month, state->dataEnvrn->DayOfMonth, 1);
@@ -2789,7 +2789,7 @@ namespace EnergyPlus {
         DataEnvironment::Month = 1;
         state->dataEnvrn->DayOfMonth = 21;
         state->dataGlobal->HourOfDay = 1;
-        DataEnvironment::DSTIndicator = 0;
+        state->dataEnvrn->DSTIndicator = 0;
         state->dataEnvrn->DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 0;
         state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(Month, state->dataEnvrn->DayOfMonth, 1);
@@ -3202,7 +3202,7 @@ namespace EnergyPlus {
         DataEnvironment::Month = 1;
         state->dataEnvrn->DayOfMonth = 21;
         state->dataGlobal->HourOfDay = 1;
-        DataEnvironment::DSTIndicator = 0;
+        state->dataEnvrn->DSTIndicator = 0;
         state->dataEnvrn->DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 0;
         state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(Month, state->dataEnvrn->DayOfMonth, 1);
@@ -3565,7 +3565,7 @@ namespace EnergyPlus {
         DataEnvironment::Month = 1;
         state->dataEnvrn->DayOfMonth = 21;
         state->dataGlobal->HourOfDay = 1;
-        DataEnvironment::DSTIndicator = 0;
+        state->dataEnvrn->DSTIndicator = 0;
         state->dataEnvrn->DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 0;
         state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(Month, state->dataEnvrn->DayOfMonth, 1);
@@ -3932,7 +3932,7 @@ namespace EnergyPlus {
         DataEnvironment::Month = 1;
         state->dataEnvrn->DayOfMonth = 21;
         state->dataGlobal->HourOfDay = 1;
-        DataEnvironment::DSTIndicator = 0;
+        state->dataEnvrn->DSTIndicator = 0;
         state->dataEnvrn->DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 0;
         state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(Month, state->dataEnvrn->DayOfMonth, 1);
@@ -4299,7 +4299,7 @@ namespace EnergyPlus {
         DataEnvironment::Month = 1;
         state->dataEnvrn->DayOfMonth = 21;
         state->dataGlobal->HourOfDay = 1;
-        DataEnvironment::DSTIndicator = 0;
+        state->dataEnvrn->DSTIndicator = 0;
         state->dataEnvrn->DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 0;
         state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(Month, state->dataEnvrn->DayOfMonth, 1);
@@ -4610,7 +4610,7 @@ namespace EnergyPlus {
         DataEnvironment::Month = 1;
         state->dataEnvrn->DayOfMonth = 21;
         state->dataGlobal->HourOfDay = 1;
-        DataEnvironment::DSTIndicator = 0;
+        state->dataEnvrn->DSTIndicator = 0;
         state->dataEnvrn->DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 0;
         state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(Month, state->dataEnvrn->DayOfMonth, 1);

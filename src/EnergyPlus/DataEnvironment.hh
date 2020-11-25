@@ -68,10 +68,6 @@ namespace DataEnvironment {
     Real64 constexpr StdPressureSeaLevel(101325.0);   // Standard barometric pressure at sea level (Pa)
 
     // MODULE VARIABLE DECLARATIONS:
-    extern Real64 DifSolarRad;                  // Current sky diffuse solar horizontal irradiance
-    extern bool EMSDifSolarRadOverrideOn;       // EMS flag for sky diffuse solar horizontal irradiance
-    extern Real64 EMSDifSolarRadOverrideValue;  // EMS override value for sky diffuse solar horizontal irradiance
-    extern int DSTIndicator;                    // Daylight Saving Time Indicator (1=yes, 0=no) for Today
     extern Real64 Elevation;                    // Elevation of this building site
     extern bool EndMonthFlag;                   // Set to true on last day of month
     extern bool EndYearFlag;                    // Set to true on last day of year
@@ -214,6 +210,10 @@ struct EnvironmentData : BaseGlobalStruct {
     int DayOfWeekTomorrow = 0;                          // Tomorrow's day of the week (Sunday=1, Monday=2, ...)
     int DayOfYear = 0;                                  // Current day of the year (01JAN=1, 02JAN=2, ...)
     int DayOfYear_Schedule = 0;                         // Schedule manager always assumes leap years...
+    Real64 DifSolarRad = 0.0;                           // Current sky diffuse solar horizontal irradiance
+    bool EMSDifSolarRadOverrideOn = false;              // EMS flag for sky diffuse solar horizontal irradiance
+    Real64 EMSDifSolarRadOverrideValue = 0.0;           // EMS override value for sky diffuse solar horizontal irradiance
+    int DSTIndicator = 0;                               // Daylight Saving Time Indicator (1=yes, 0=no) for Today
 
     void clear_state() override
     {
@@ -226,6 +226,10 @@ struct EnvironmentData : BaseGlobalStruct {
         this->DayOfWeekTomorrow = 0;
         this->DayOfYear = 0;
         this->DayOfYear_Schedule = 0;
+        this->DifSolarRad = 0.0;
+        this->EMSBeamSolarRadOverrideOn = false;
+        this->EMSBeamSolarRadOverrideValue = 0.0;
+        this->DSTIndicator = 0;
     }
 };
 

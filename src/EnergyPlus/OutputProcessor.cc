@@ -107,7 +107,6 @@ namespace OutputProcessor {
     // na
 
     // Using/Aliasing
-    using DataEnvironment::DSTIndicator;
     using DataEnvironment::HolidayIndex;
     using DataEnvironment::Month;
     using DataEnvironment::Year;
@@ -3121,7 +3120,7 @@ namespace OutputProcessor {
                                          state.dataGlobal->HourOfDay,
                                          EndMinute,
                                          StartMinute,
-                                         DSTIndicator,
+                                         state.dataEnvrn->DSTIndicator,
                                          DayTypes(CurDayType));
                 if (ResultsFramework::resultsFramework->TSMeters.rDataFrameEnabled()) {
                     ResultsFramework::resultsFramework->TSMeters.newRow(state, Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, EndMinute);
@@ -3147,7 +3146,7 @@ namespace OutputProcessor {
                                          state.dataGlobal->HourOfDay,
                                          EndMinute,
                                          StartMinute,
-                                         DSTIndicator,
+                                         state.dataEnvrn->DSTIndicator,
                                          DayTypes(CurDayType));
                 PrintESOTimeStamp = false;
             }
@@ -3248,7 +3247,7 @@ namespace OutputProcessor {
                                          state.dataGlobal->HourOfDay,
                                          _,
                                          _,
-                                         DSTIndicator,
+                                         state.dataEnvrn->DSTIndicator,
                                          DayTypes(CurDayType));
                 if (ResultsFramework::resultsFramework->HRMeters.rDataFrameEnabled()) {
                     ResultsFramework::resultsFramework->HRMeters.newRow(state, Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, 0);
@@ -3348,7 +3347,7 @@ namespace OutputProcessor {
                                          _,
                                          _,
                                          _,
-                                         DSTIndicator,
+                                         state.dataEnvrn->DSTIndicator,
                                          DayTypes(CurDayType));
                 if (ResultsFramework::resultsFramework->DYMeters.rDataFrameEnabled()) {
                     ResultsFramework::resultsFramework->DYMeters.newRow(state, Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, 0);
@@ -6077,7 +6076,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                                              state.dataGlobal->HourOfDay,
                                              TimeValue.at(t_TimeStepTypeKey).CurMinute,
                                              StartMinute,
-                                             DSTIndicator,
+                                             state.dataEnvrn->DSTIndicator,
                                              DayTypes(CurDayType));
                     LHourP = state.dataGlobal->HourOfDay;
                     LStartMin = StartMinute;
@@ -6161,7 +6160,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                                              state.dataGlobal->HourOfDay,
                                              TimeValue.at(t_TimeStepTypeKey).CurMinute,
                                              StartMinute,
-                                             DSTIndicator,
+                                             state.dataEnvrn->DSTIndicator,
                                              DayTypes(CurDayType));
                     LHourP = state.dataGlobal->HourOfDay;
                     LStartMin = StartMinute;
@@ -6250,7 +6249,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                                                      state.dataGlobal->HourOfDay,
                                                      TimeValue.at(thisTimeStepType).CurMinute,
                                                      StartMinute,
-                                                     DSTIndicator,
+                                                     state.dataEnvrn->DSTIndicator,
                                                      DayTypes(CurDayType));
                             LHourP = state.dataGlobal->HourOfDay;
                             LStartMin = StartMinute;
@@ -6306,7 +6305,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                                                      state.dataGlobal->HourOfDay,
                                                      TimeValue.at(thisTimeStepType).CurMinute,
                                                      StartMinute,
-                                                     DSTIndicator,
+                                                     state.dataEnvrn->DSTIndicator,
                                                      DayTypes(CurDayType));
                             LHourP = state.dataGlobal->HourOfDay;
                             LStartMin = StartMinute;
@@ -6352,7 +6351,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                                      state.dataGlobal->HourOfDay,
                                      _,
                                      _,
-                                     DSTIndicator,
+                                     state.dataEnvrn->DSTIndicator,
                                      DayTypes(CurDayType));
             TimePrint = false;
         }
@@ -6453,7 +6452,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                                      _,
                                      _,
                                      _,
-                                     DSTIndicator,
+                                     state.dataEnvrn->DSTIndicator,
                                      DayTypes(CurDayType));
             TimePrint = false;
         }

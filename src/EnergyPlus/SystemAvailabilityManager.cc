@@ -2297,7 +2297,6 @@ namespace SystemAvailabilityManager {
 
         // Using/Aliasing
         using namespace DataAirLoop;
-        using DataEnvironment::DSTIndicator;
         using DataHeatBalFanSys::TempControlType;
         using DataHeatBalFanSys::TempTstatAir;
         using DataHeatBalFanSys::TempZoneThermostatSetPoint;
@@ -2459,7 +2458,7 @@ namespace SystemAvailabilityManager {
                 OptStartData.ActualZoneNum(actZoneNum) = actZoneNum;
             }
 
-            if (DSTIndicator > 0) {
+            if (state.dataEnvrn->DSTIndicator > 0) {
                 --FanStartTime;
                 --FanStartTimeTmr;
             }

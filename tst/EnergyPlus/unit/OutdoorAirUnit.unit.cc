@@ -617,7 +617,7 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_WaterCoolingCoilAutoSizeTest)
     state->dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
 
     state->dataGlobal->HourOfDay = 15;
-    DataEnvironment::DSTIndicator = 0;
+    state->dataEnvrn->DSTIndicator = 0;
     DataEnvironment::Month = 7;
     state->dataEnvrn->DayOfMonth = 21;
     state->dataEnvrn->DayOfWeek = 2;
@@ -923,7 +923,7 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_SteamHeatingCoilAutoSizeTest)
     state->dataWaterCoils->MyUAAndFlowCalcFlag(2) = true;
 
     state->dataGlobal->HourOfDay = 15;
-    DataEnvironment::DSTIndicator = 0;
+    state->dataEnvrn->DSTIndicator = 0;
     DataEnvironment::Month = 1;
     state->dataEnvrn->DayOfMonth = 21;
     state->dataEnvrn->DayOfWeek = 2;

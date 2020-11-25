@@ -635,8 +635,9 @@ int dayOfYear(EnergyPlusState state) {
     return thisState->dataEnvrn->DayOfYear;
 }
 
-int daylightSavingsTimeIndicator(EnergyPlusState) {
-    return EnergyPlus::DataEnvironment::DSTIndicator;
+int daylightSavingsTimeIndicator(EnergyPlusState state) {
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    return thisState->dataEnvrn->DSTIndicator;
 }
 
 int hour(EnergyPlusState state) {

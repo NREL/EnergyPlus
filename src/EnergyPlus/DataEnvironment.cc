@@ -72,10 +72,6 @@ namespace DataEnvironment {
     // current weather variables)
 
     // MODULE VARIABLE DECLARATIONS:
-    Real64 DifSolarRad;                    // Current sky diffuse solar horizontal irradiance
-    bool EMSDifSolarRadOverrideOn(false);  // EMS flag for sky diffuse solar horizontal irradiance
-    Real64 EMSDifSolarRadOverrideValue;    // EMS override value for sky diffuse solar horizontal irradiance
-    int DSTIndicator;                      // Daylight Saving Time Indicator (1=yes, 0=no) for Today
     Real64 Elevation;                      // Elevation of this building site
     bool EndMonthFlag;                     // Set to true on last day of month
     bool EndYearFlag;                      // Set to true on the last day of year
@@ -193,10 +189,6 @@ namespace DataEnvironment {
 
     void clear_state()
     {
-        DifSolarRad = Real64();
-        EMSDifSolarRadOverrideOn = false;
-        EMSDifSolarRadOverrideValue = Real64();
-        DSTIndicator = int();
         Elevation = Real64();
         EndMonthFlag = bool();
         GndReflectanceForDayltg = Real64();

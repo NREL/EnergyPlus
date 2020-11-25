@@ -2772,7 +2772,7 @@ namespace EconomicTariff {
                     } else {
                         // #7814 - Have to be careful with DST. tariff::seasonForMonth is overwritten at each timestep, and only the last value is
                         // retained, so make sure to capture the right one
-                        if ((state.dataGlobal->HourOfDay + DataEnvironment::DSTIndicator) <= 24) {
+                        if ((state.dataGlobal->HourOfDay + state.dataEnvrn->DSTIndicator) <= 24) {
                             curMonth = DataEnvironment::Month;
                         } else {
                             curMonth = DataEnvironment::MonthTomorrow;

@@ -158,7 +158,7 @@ namespace OutputProcessor {
         state->dataGlobal->HourOfDay = 1;
         DataEnvironment::Month = 12;
         state->dataEnvrn->DayOfMonth = 21;
-        DataEnvironment::DSTIndicator = 0;
+        state->dataEnvrn->DSTIndicator = 0;
         state->dataEnvrn->DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 3;
         int EndMinute = 10;
@@ -224,7 +224,7 @@ namespace OutputProcessor {
         state->dataGlobal->HourOfDay = 1;
         DataEnvironment::Month = 12;
         state->dataEnvrn->DayOfMonth = 21;
-        DataEnvironment::DSTIndicator = 0;
+        state->dataEnvrn->DSTIndicator = 0;
         state->dataEnvrn->DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 3;
         int EndMinute = 10;
@@ -288,7 +288,7 @@ namespace OutputProcessor {
         state->dataGlobal->HourOfDay = 1;
         DataEnvironment::Month = 12;
         state->dataEnvrn->DayOfMonth = 21;
-        DataEnvironment::DSTIndicator = 0;
+        state->dataEnvrn->DSTIndicator = 0;
         state->dataEnvrn->DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 3;
 
@@ -356,7 +356,7 @@ namespace OutputProcessor {
         state->dataGlobal->HourOfDay = 1;
         DataEnvironment::Month = 12;
         state->dataEnvrn->DayOfMonth = 21;
-        DataEnvironment::DSTIndicator = 0;
+        state->dataEnvrn->DSTIndicator = 0;
         state->dataEnvrn->DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 3;
 
@@ -428,7 +428,7 @@ namespace OutputProcessor {
         state->dataGlobal->HourOfDay = 1;
         DataEnvironment::Month = 12;
         state->dataEnvrn->DayOfMonth = 21;
-        DataEnvironment::DSTIndicator = 0;
+        state->dataEnvrn->DSTIndicator = 0;
         state->dataEnvrn->DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 3;
 
@@ -500,7 +500,7 @@ namespace OutputProcessor {
         state->dataGlobal->HourOfDay = 1;
         DataEnvironment::Month = 12;
         state->dataEnvrn->DayOfMonth = 21;
-        DataEnvironment::DSTIndicator = 0;
+        state->dataEnvrn->DSTIndicator = 0;
         state->dataEnvrn->DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 3;
 
@@ -574,7 +574,7 @@ namespace OutputProcessor {
         state->dataGlobal->CalendarYearChr = "2017";
         DataEnvironment::Month = 12;
         state->dataEnvrn->DayOfMonth = 21;
-        DataEnvironment::DSTIndicator = 0;
+        state->dataEnvrn->DSTIndicator = 0;
         state->dataEnvrn->DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 3;
 
@@ -4114,7 +4114,7 @@ namespace OutputProcessor {
         state->dataGlobal->DayOfSimChr = "365";
         DataEnvironment::Month = 12;
         state->dataEnvrn->DayOfMonth = 31;
-        DataEnvironment::DSTIndicator = 0;
+        state->dataEnvrn->DSTIndicator = 0;
         state->dataEnvrn->DayOfWeek = 3;
         DataEnvironment::HolidayIndex = 0;
         state->dataGlobal->HourOfDay = 24;
@@ -4358,7 +4358,7 @@ namespace OutputProcessor {
         state->dataGlobal->DayOfSimChr = "365";
         DataEnvironment::Month = 12;
         state->dataEnvrn->DayOfMonth = 31;
-        DataEnvironment::DSTIndicator = 0;
+        state->dataEnvrn->DSTIndicator = 0;
         state->dataEnvrn->DayOfWeek = 3;
         DataEnvironment::HolidayIndex = 0;
         state->dataGlobal->HourOfDay = 24;
@@ -4615,7 +4615,7 @@ namespace OutputProcessor {
         state->dataGlobal->DayOfSimChr = "365";
         DataEnvironment::Month = 12;
         state->dataEnvrn->DayOfMonth = 31;
-        DataEnvironment::DSTIndicator = 0;
+        state->dataEnvrn->DSTIndicator = 0;
         state->dataEnvrn->DayOfWeek = 3;
         DataEnvironment::HolidayIndex = 0;
         state->dataGlobal->HourOfDay = 24;
@@ -4820,7 +4820,7 @@ namespace OutputProcessor {
         state->dataGlobal->DayOfSimChr = "365";
         DataEnvironment::Month = 12;
         state->dataEnvrn->DayOfMonth = 31;
-        DataEnvironment::DSTIndicator = 0;
+        state->dataEnvrn->DSTIndicator = 0;
         state->dataEnvrn->DayOfWeek = 3;
         DataEnvironment::HolidayIndex = 0;
         state->dataGlobal->HourOfDay = 24;
@@ -4960,7 +4960,7 @@ namespace OutputProcessor {
         state->dataGlobal->DayOfSimChr = "365";
         DataEnvironment::Month = 12;
         state->dataEnvrn->DayOfMonth = 31;
-        DataEnvironment::DSTIndicator = 0;
+        state->dataEnvrn->DSTIndicator = 0;
         state->dataEnvrn->DayOfWeek = 3;
         DataEnvironment::HolidayIndex = 0;
         state->dataGlobal->HourOfDay = 24;
@@ -5038,7 +5038,7 @@ namespace OutputProcessor {
         state->dataGlobal->DayOfSimChr = "365";
         DataEnvironment::Month = 12;
         state->dataEnvrn->DayOfMonth = 31;
-        DataEnvironment::DSTIndicator = 0;
+        state->dataEnvrn->DSTIndicator = 0;
         state->dataEnvrn->DayOfWeek = 3;
         DataEnvironment::HolidayIndex = 0;
         state->dataGlobal->HourOfDay = 24;

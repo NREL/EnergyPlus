@@ -99,7 +99,6 @@ namespace ScheduleManager {
     // OTHER NOTES:
 
     // Using/Aliasing
-    using DataEnvironment::DSTIndicator;
     using DataEnvironment::HolidayIndex;
     using DataEnvironment::HolidayIndexTomorrow;
     using DataEnvironment::MonthTomorrow;
@@ -2717,7 +2716,7 @@ namespace ScheduleManager {
         // na
 
         if (!ScheduleDSTSFileWarningIssued) {
-            if (DSTIndicator == 1) {
+            if (state.dataEnvrn->DSTIndicator == 1) {
                 if (Schedule(ScheduleIndex).SchType == ScheduleInput_file) {
                     ShowWarningError(state, "GetCurrentScheduleValue: Schedule=\"" + Schedule(ScheduleIndex).Name + "\" is a Schedule:File");
                     ShowContinueError(state, "...Use of Schedule:File when DaylightSavingTime is in effect is not recommended.");
@@ -2854,7 +2853,7 @@ namespace ScheduleManager {
         //  so, current date, but maybe TimeStep added
 
         // Hourly Value
-        int thisHour = ThisHour + DSTIndicator;
+        int thisHour = ThisHour + state.dataEnvrn->DSTIndicator;
         int thisDayOfYear = state.dataEnvrn->DayOfYear_Schedule;
         int thisDayOfWeek = state.dataEnvrn->DayOfWeek;
         int thisHolidayIndex = DataEnvironment::HolidayIndex;

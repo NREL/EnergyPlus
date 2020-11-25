@@ -627,7 +627,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GatherForEconomics)
     DataEnvironment::Month = 5;
     state->dataEnvrn->DayOfMonth = 31;
     state->dataGlobal->HourOfDay = 23;
-    DataEnvironment::DSTIndicator = 1; // DST IS ON
+    state->dataEnvrn->DSTIndicator = 1; // DST IS ON
     DataEnvironment::MonthTomorrow = 6;
     state->dataEnvrn->DayOfWeek = 4;
     state->dataEnvrn->DayOfWeekTomorrow = 5;
@@ -658,7 +658,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GatherForEconomics)
     DataEnvironment::Month = 5;
     state->dataEnvrn->DayOfMonth = 31;
     state->dataGlobal->HourOfDay = 24;
-    DataEnvironment::DSTIndicator = 1; // DST IS ON
+    state->dataEnvrn->DSTIndicator = 1; // DST IS ON
     DataEnvironment::MonthTomorrow = 6;
     state->dataEnvrn->DayOfWeek = 4;
     state->dataEnvrn->DayOfWeekTomorrow = 5;
