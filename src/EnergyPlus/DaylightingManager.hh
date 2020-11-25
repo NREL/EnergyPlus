@@ -69,10 +69,6 @@ struct EnergyPlusData;
 
 namespace DaylightingManager {
 
-    // Using/Aliasing
-    using DataBSDFWindow::BSDFRefPoints;
-    using DataBSDFWindow::BSDFRefPointsGeomDescr;
-
     // Surface count crossover for using octree algorithm
     // The octree gives lower computational complexity for much higher performance
     //  as the surface count increases but has some overhead such that the direct
@@ -192,8 +188,8 @@ namespace DaylightingManager {
                                   Optional_int_const MapNum = _);
 
     void InitializeCFSStateData(EnergyPlusData &state,
-                                 BSDFRefPoints &StateRefPoint,
-                                BSDFRefPointsGeomDescr &DaylghtGeomDescr,
+                                DataBSDFWindow::BSDFRefPoints &StateRefPoint,
+                                DataBSDFWindow::BSDFRefPointsGeomDescr &DaylghtGeomDescr,
                                 int const ZoneNum, // Current zone number
                                 int const iWin,
                                 Vector3<Real64> const &RefPoint, // reference point
@@ -213,16 +209,16 @@ namespace DaylightingManager {
                                 DataDaylighting::iCalledFor const CalledFrom,
                                 Optional_int_const MapNum = _);
 
-    void AllocateForCFSRefPointsState(BSDFRefPoints &StateRefPoint, int const NumOfWinEl, int const NBasis, int const NTrnBasis);
+    void AllocateForCFSRefPointsState(DataBSDFWindow::BSDFRefPoints &StateRefPoint, int const NumOfWinEl, int const NBasis, int const NTrnBasis);
 
-    void AllocateForCFSRefPointsGeometry(BSDFRefPointsGeomDescr &RefPointsGeomDescr, int const NumOfWinEl);
+    void AllocateForCFSRefPointsGeometry(DataBSDFWindow::BSDFRefPointsGeomDescr &RefPointsGeomDescr, int const NumOfWinEl);
 
     void CFSRefPointSolidAngle(EnergyPlusData &state,
                                Vector3<Real64> const &RefPoint,
                                Vector3<Real64> const &RWin,
                                Vector3<Real64> const &WNorm,
-                               BSDFRefPoints &RefPointMap,
-                               BSDFRefPointsGeomDescr &RefPointGeomMap,
+                               DataBSDFWindow::BSDFRefPoints &RefPointMap,
+                               DataBSDFWindow::BSDFRefPointsGeomDescr &RefPointGeomMap,
                                int const iWin,
                                int const CurFenState,
                                int const NTrnBasis,
@@ -230,7 +226,7 @@ namespace DaylightingManager {
                                Real64 const WinElArea);
 
     void CFSRefPointPosFactor(EnergyPlusData &state,
-        Vector3<Real64> const &RefPoint, BSDFRefPoints &RefPointMap, int const iWin, int const CurFenState, int const NTrnBasis, Real64 const AZVIEW);
+        Vector3<Real64> const &RefPoint, DataBSDFWindow::BSDFRefPoints &RefPointMap, int const iWin, int const CurFenState, int const NTrnBasis, Real64 const AZVIEW);
 
     Real64 CalcObstrMultiplier(Vector3<Real64> const &GroundHitPt, // Coordinates of point that ray hits ground (m)
                                int const AltSteps,                 // Number of steps in altitude angle for solar reflection calc
