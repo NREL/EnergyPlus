@@ -10014,7 +10014,7 @@ namespace EnergyPlus::DaylightingManager {
                     // otherwise if you run a TMY file, you'll get for eg 1977, 1981, etc
                     SQYear = state.dataGlobal->CalendarYear;
                     SQMonth = DataEnvironment::Month;
-                    SQDayOfMonth = DataEnvironment::DayOfMonth;
+                    SQDayOfMonth = state.dataEnvrn->DayOfMonth;
 
                     for (Y = 1; Y <= state.dataDaylightingData->IllumMap(MapNum).Ynum; ++Y) {
                         YValue(Y) = state.dataDaylightingData->IllumMap(MapNum).Ymin + (Y - 1) * state.dataDaylightingData->IllumMap(MapNum).Yinc;

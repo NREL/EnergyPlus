@@ -434,13 +434,13 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case3)
     ScheduleManager::ProcessScheduleInput(*state); // read schedules
     ScheduleManager::ScheduleInputProcessed = true;
     DataEnvironment::Month = 1;
-    DataEnvironment::DayOfMonth = 21;
+    state->dataEnvrn->DayOfMonth = 21;
     state->dataGlobal->HourOfDay = 1;
     state->dataGlobal->TimeStep = 1;
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
+    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, state->dataEnvrn->DayOfMonth, 1);
     ScheduleManager::UpdateScheduleValues(*state);
 
     createFacilityElectricPowerServiceObject();
@@ -546,13 +546,13 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case4)
     ScheduleManager::ProcessScheduleInput(*state); // read schedules
     ScheduleManager::ScheduleInputProcessed = true;
     DataEnvironment::Month = 1;
-    DataEnvironment::DayOfMonth = 21;
+    state->dataEnvrn->DayOfMonth = 21;
     state->dataGlobal->HourOfDay = 1;
     state->dataGlobal->TimeStep = 1;
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
+    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, state->dataEnvrn->DayOfMonth, 1);
     ScheduleManager::UpdateScheduleValues(*state);
 
     // Case 4 DCBussInverterDCStorage    Inverter = 5000,
@@ -639,13 +639,13 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case5)
     ScheduleManager::ProcessScheduleInput(*state); // read schedules
     ScheduleManager::ScheduleInputProcessed = true;
     DataEnvironment::Month = 1;
-    DataEnvironment::DayOfMonth = 21;
+    state->dataEnvrn->DayOfMonth = 21;
     state->dataGlobal->HourOfDay = 1;
     state->dataGlobal->TimeStep = 1;
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
+    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, state->dataEnvrn->DayOfMonth, 1);
     ScheduleManager::UpdateScheduleValues(*state);
 
     createFacilityElectricPowerServiceObject();
@@ -785,14 +785,14 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_TransformerLossTest)
     state->dataGlobal->HourOfDay = 1;
     state->dataGlobal->TimeStep = 1;
     DataEnvironment::Month = 1;
-    DataEnvironment::DayOfMonth = 21;
+    state->dataEnvrn->DayOfMonth = 21;
     DataHVACGlobals::TimeStepSys = 1.0;
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
     ScheduleManager::ProcessScheduleInput(*state);
     ScheduleManager::ScheduleInputProcessed = true;
-    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
+    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, state->dataEnvrn->DayOfMonth, 1);
     ScheduleManager::UpdateScheduleValues(*state);
 
     createFacilityElectricPowerServiceObject();

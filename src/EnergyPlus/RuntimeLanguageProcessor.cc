@@ -233,7 +233,6 @@ namespace RuntimeLanguageProcessor {
 
         // Using/Aliasing
         using DataEnvironment::CurEnvirNum;
-        using DataEnvironment::DayOfMonth;
         using DataEnvironment::DayOfWeek;
         using DataEnvironment::DayOfYear;
         using DataEnvironment::DSTIndicator;
@@ -322,7 +321,7 @@ namespace RuntimeLanguageProcessor {
         // Update built-in variables
         ErlVariable(YearVariableNum).Value = SetErlValueNumber(double(Year));
         ErlVariable(MonthVariableNum).Value = SetErlValueNumber(double(Month));
-        ErlVariable(DayOfMonthVariableNum).Value = SetErlValueNumber(double(DayOfMonth));
+        ErlVariable(DayOfMonthVariableNum).Value = SetErlValueNumber(double(state.dataEnvrn->DayOfMonth));
         ErlVariable(DayOfWeekVariableNum).Value = SetErlValueNumber(double(DayOfWeek));
         ErlVariable(DayOfYearVariableNum).Value = SetErlValueNumber(double(DayOfYear));
         ErlVariable(TimeStepNumVariableNum).Value = SetErlValueNumber(double(state.dataGlobal->TimeStep));

@@ -625,7 +625,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GatherForEconomics)
     EXPECT_EQ(0, EconomicTariff::tariff(1).seasonForMonth(6));
 
     DataEnvironment::Month = 5;
-    DataEnvironment::DayOfMonth = 31;
+    state->dataEnvrn->DayOfMonth = 31;
     state->dataGlobal->HourOfDay = 23;
     DataEnvironment::DSTIndicator = 1; // DST IS ON
     DataEnvironment::MonthTomorrow = 6;
@@ -633,7 +633,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GatherForEconomics)
     DataEnvironment::DayOfWeekTomorrow = 5;
     DataEnvironment::HolidayIndex = 0;
     state->dataGlobal->TimeStep = 4;
-    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
+    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, state->dataEnvrn->DayOfMonth, 1);
 
     ScheduleManager::UpdateScheduleValues(*state);
     EXPECT_EQ(1.0, ScheduleManager::LookUpScheduleValue(*state, 1, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep));
@@ -656,7 +656,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GatherForEconomics)
 
 
     DataEnvironment::Month = 5;
-    DataEnvironment::DayOfMonth = 31;
+    state->dataEnvrn->DayOfMonth = 31;
     state->dataGlobal->HourOfDay = 24;
     DataEnvironment::DSTIndicator = 1; // DST IS ON
     DataEnvironment::MonthTomorrow = 6;
@@ -664,7 +664,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GatherForEconomics)
     DataEnvironment::DayOfWeekTomorrow = 5;
     DataEnvironment::HolidayIndex = 0;
     state->dataGlobal->TimeStep = 1;
-    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
+    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, state->dataEnvrn->DayOfMonth, 1);
 
     ScheduleManager::UpdateScheduleValues(*state);
     EXPECT_EQ(3.0, ScheduleManager::GetCurrentScheduleValue(*state, tariff(1).seasonSchIndex));

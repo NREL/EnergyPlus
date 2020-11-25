@@ -125,7 +125,6 @@ namespace SizingManager {
         // purchased hot and cold water, yielding central heating and cooling capacities.
 
         // Using/Aliasing
-        using DataEnvironment::DayOfMonth;
         using DataEnvironment::EndMonthFlag;
         using DataEnvironment::EnvironmentName;
         using DataEnvironment::Month;
@@ -362,7 +361,7 @@ namespace SizingManager {
                                 if (!state.dataGlobal->WarmupFlag) {
                                     TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
                                     if (state.dataGlobal->HourOfDay == 1 && state.dataGlobal->TimeStep == 1) {
-                                        DesDayWeath(CurOverallSimDay).DateString = fmt::format("{}/{}", Month, DayOfMonth);
+                                        DesDayWeath(CurOverallSimDay).DateString = fmt::format("{}/{}", Month, state.dataEnvrn->DayOfMonth);
                                     }
                                     DesDayWeath(CurOverallSimDay).Temp(TimeStepInDay) = OutDryBulbTemp;
                                     DesDayWeath(CurOverallSimDay).HumRat(TimeStepInDay) = OutHumRat;
@@ -394,7 +393,7 @@ namespace SizingManager {
                     } // ... End day loop.
 
                     LastMonth = Month;
-                    LastDayOfMonth = DayOfMonth;
+                    LastDayOfMonth = state.dataEnvrn->DayOfMonth;
 
                 } // ... End environment loop
 
@@ -425,7 +424,7 @@ namespace SizingManager {
         state.dataGlobal->ZoneSizingCalc = false;
         state.dataGlobal->DoOutputReporting = false;
         Month = LastMonth;
-        DayOfMonth = LastDayOfMonth;
+        state.dataEnvrn->DayOfMonth = LastDayOfMonth;
 
         if ((state.dataGlobal->DoSystemSizing) && (NumSysSizInput == 0) && (state.dataSizingManager->NumAirLoops > 0)) {
             ShowWarningError(state,

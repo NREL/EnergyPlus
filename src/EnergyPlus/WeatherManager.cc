@@ -503,8 +503,8 @@ namespace WeatherManager {
                                  "Environment",
                                  "Direct Solar",
                                  "[W/m2]",
-                                 DataEnvironment::EMSBeamSolarRadOverrideOn,
-                                 DataEnvironment::EMSBeamSolarRadOverrideValue);
+                                 state.dataEnvrn->EMSBeamSolarRadOverrideOn,
+                                 state.dataEnvrn->EMSBeamSolarRadOverrideValue);
                 SetupEMSActuator("Weather Data",
                                  "Environment",
                                  "Wind Speed",
@@ -596,7 +596,7 @@ namespace WeatherManager {
         } else {
             state.dataGlobal->KindOfSim = state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn;
             DataEnvironment::DayOfYear = state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).StartJDay;
-            DataEnvironment::DayOfMonth = state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).StartDay;
+            state.dataEnvrn->DayOfMonth = state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).StartDay;
             state.dataGlobal->CalendarYear = state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).StartYear;
             state.dataGlobal->CalendarYearChr = fmt::to_string(state.dataGlobal->CalendarYear);
             DataEnvironment::Month = state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).StartMonth;
@@ -1625,20 +1625,20 @@ namespace WeatherManager {
             }
 
             DataEnvironment::EndYearFlag = false;
-            if (DataEnvironment::DayOfMonth == state.dataWeatherManager->EndDayOfMonth(DataEnvironment::Month)) {
+            if (state.dataEnvrn->DayOfMonth == state.dataWeatherManager->EndDayOfMonth(DataEnvironment::Month)) {
                 DataEnvironment::EndMonthFlag = true;
                 DataEnvironment::EndYearFlag = (DataEnvironment::Month == 12);
             }
 
             // Set Tomorrow's date data
             DataEnvironment::MonthTomorrow = state.dataWeatherManager->TomorrowVariables.Month;
-            DataEnvironment::DayOfMonthTomorrow = state.dataWeatherManager->TomorrowVariables.DayOfMonth;
+            state.dataEnvrn->DayOfMonthTomorrow = state.dataWeatherManager->TomorrowVariables.DayOfMonth;
             DataEnvironment::DayOfWeekTomorrow = state.dataWeatherManager->TomorrowVariables.DayOfWeek;
             DataEnvironment::HolidayIndexTomorrow = state.dataWeatherManager->TomorrowVariables.HolidayIndex;
             DataEnvironment::YearTomorrow = state.dataWeatherManager->TomorrowVariables.Year;
 
             if (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
-                if (DataEnvironment::Month == 1 && DataEnvironment::DayOfMonth == 1 && state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).ActualWeather) {
+                if (DataEnvironment::Month == 1 && state.dataEnvrn->DayOfMonth == 1 && state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).ActualWeather) {
                     if (state.dataWeatherManager->DatesShouldBeReset) {
                         if (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).TreatYearsAsConsecutive) {
                             ++state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).CurrentYear;
@@ -1683,7 +1683,7 @@ namespace WeatherManager {
                             SetSpecialDayDates(state, state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).MonWeekDay);
                         }
                     }
-                } else if ((DataEnvironment::Month == 1 && DataEnvironment::DayOfMonth == 1) && state.dataWeatherManager->DatesShouldBeReset && (state.dataWeatherManager->Jan1DatesShouldBeReset)) {
+                } else if ((DataEnvironment::Month == 1 && state.dataEnvrn->DayOfMonth == 1) && state.dataWeatherManager->DatesShouldBeReset && (state.dataWeatherManager->Jan1DatesShouldBeReset)) {
                     if (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).TreatYearsAsConsecutive) {
                         ++state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).CurrentYear;
                         state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).IsLeapYear = isLeapYear(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).CurrentYear);
@@ -1721,7 +1721,7 @@ namespace WeatherManager {
         } // ... end of DataGlobals::BeginDayFlag IF-THEN block.
 
         if (!state.dataGlobal->BeginDayFlag && !state.dataGlobal->WarmupFlag &&
-            (DataEnvironment::Month != state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).StartMonth || DataEnvironment::DayOfMonth != state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).StartDay) &&
+            (DataEnvironment::Month != state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).StartMonth || state.dataEnvrn->DayOfMonth != state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).StartDay) &&
             !state.dataWeatherManager->DatesShouldBeReset && state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
             state.dataWeatherManager->DatesShouldBeReset = true;
         }
@@ -1804,7 +1804,7 @@ namespace WeatherManager {
         DataEnvironment::DayOfYear = state.dataWeatherManager->TodayVariables.DayOfYear;
         DataEnvironment::Year = state.dataWeatherManager->TodayVariables.Year;
         DataEnvironment::Month = state.dataWeatherManager->TodayVariables.Month;
-        DataEnvironment::DayOfMonth = state.dataWeatherManager->TodayVariables.DayOfMonth;
+        state.dataEnvrn->DayOfMonth = state.dataWeatherManager->TodayVariables.DayOfMonth;
         DataEnvironment::DayOfWeek = state.dataWeatherManager->TodayVariables.DayOfWeek;
         DataEnvironment::HolidayIndex = state.dataWeatherManager->TodayVariables.HolidayIndex;
         if (DataEnvironment::HolidayIndex > 0) {
@@ -1858,22 +1858,22 @@ namespace WeatherManager {
         }
 
         if (state.dataGlobal->HourOfDay == 1) { // Should investigate whether DataGlobals::BeginDayFlag is always set here and use that instead
-            DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
+            DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, state.dataEnvrn->DayOfMonth, 1);
         }
 
         ScheduleManager::UpdateScheduleValues(state);
 
         char time_stamp[10];
         std::sprintf(
-            time_stamp, "%02d/%02d %02hu", DataEnvironment::Month, DataEnvironment::DayOfMonth, (unsigned short)(state.dataGlobal->HourOfDay - 1));
+            time_stamp, "%02d/%02d %02hu", DataEnvironment::Month, state.dataEnvrn->DayOfMonth, (unsigned short)(state.dataGlobal->HourOfDay - 1));
         DataEnvironment::CurMnDyHr = time_stamp;
 
         char day_stamp[6];
-        std::sprintf(day_stamp, "%02d/%02d", DataEnvironment::Month, DataEnvironment::DayOfMonth);
+        std::sprintf(day_stamp, "%02d/%02d", DataEnvironment::Month, state.dataEnvrn->DayOfMonth);
         DataEnvironment::CurMnDy = day_stamp;
 
         char day_year_stamp[11];
-        std::sprintf(day_year_stamp, "%02d/%02d/%04d", DataEnvironment::Month, DataEnvironment::DayOfMonth, state.dataGlobal->CalendarYear);
+        std::sprintf(day_year_stamp, "%02d/%02d/%04d", DataEnvironment::Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->CalendarYear);
         DataEnvironment::CurMnDyYr = day_year_stamp;
 
         state.dataGlobal->WeightNow = state.dataWeatherManager->Interpolation(state.dataGlobal->TimeStep);
@@ -1970,7 +1970,7 @@ namespace WeatherManager {
         DataEnvironment::DifSolarRad = state.dataWeatherManager->TodayDifSolarRad(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay);
         if (DataEnvironment::EMSDifSolarRadOverrideOn) DataEnvironment::DifSolarRad = DataEnvironment::EMSDifSolarRadOverrideValue;
         state.dataEnvrn->BeamSolarRad = state.dataWeatherManager->TodayBeamSolarRad(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay);
-        if (DataEnvironment::EMSBeamSolarRadOverrideOn) state.dataEnvrn->BeamSolarRad = DataEnvironment::EMSBeamSolarRadOverrideValue;
+        if (state.dataEnvrn->EMSBeamSolarRadOverrideOn) state.dataEnvrn->BeamSolarRad = state.dataEnvrn->EMSBeamSolarRadOverrideValue;
         DataEnvironment::LiquidPrecipitation = state.dataWeatherManager->TodayLiquidPrecip(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay) / 1000.0; // convert from mm to m
         DataEnvironment::TotalCloudCover = state.dataWeatherManager->TodayTotalSkyCover(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay);
         DataEnvironment::OpaqueCloudCover = state.dataWeatherManager->TodayOpaqueSkyCover(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay);
@@ -2615,7 +2615,7 @@ namespace WeatherManager {
                         }
 
                         if (state.dataWeatherManager->Environment(Environ).ActualWeather && DataEnvironment::CurrentYearIsLeapYear) {
-                            if (WMonth == 3 && WDay == 1 && DataEnvironment::Month == 2 && DataEnvironment::DayOfMonth == 28) {
+                            if (WMonth == 3 && WDay == 1 && DataEnvironment::Month == 2 && state.dataEnvrn->DayOfMonth == 28) {
                                 ShowFatalError(state, "ReadEPlusWeatherForDay: Current year is a leap year, but Feb29 data is missing.");
                             }
                         }

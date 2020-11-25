@@ -1708,12 +1708,12 @@ TEST_F(EnergyPlusFixture, StratifiedTankSourceTemperatures)
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->HourOfDay = 1;
     DataEnvironment::Month = 7;
-    DataEnvironment::DayOfMonth = 21;
+    state->dataEnvrn->DayOfMonth = 21;
     state->dataGlobal->HourOfDay = 1;
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
+    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, state->dataEnvrn->DayOfMonth, 1);
     ScheduleManager::UpdateScheduleValues(*state);
 
     int TankNum(1);
@@ -2374,12 +2374,12 @@ TEST_F(EnergyPlusFixture, DesuperheaterTimeAdvanceCheck)
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->HourOfDay = 1;
     DataEnvironment::Month = 7;
-    DataEnvironment::DayOfMonth = 21;
+    state->dataEnvrn->DayOfMonth = 21;
     state->dataGlobal->HourOfDay = 1;
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
+    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, state->dataEnvrn->DayOfMonth, 1);
     ScheduleManager::UpdateScheduleValues(*state);
 
     int TankNum = 1;
@@ -2605,12 +2605,12 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->HourOfDay = 1;
     DataEnvironment::Month = 7;
-    DataEnvironment::DayOfMonth = 21;
+    state->dataEnvrn->DayOfMonth = 21;
     state->dataGlobal->HourOfDay = 1;
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
+    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, state->dataEnvrn->DayOfMonth, 1);
     ScheduleManager::UpdateScheduleValues(*state);
     DataPlant::TotNumLoops = 1;
     int TankNum(1);
@@ -3000,12 +3000,12 @@ TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->HourOfDay = 1;
     DataEnvironment::Month = 7;
-    DataEnvironment::DayOfMonth = 21;
+    state->dataEnvrn->DayOfMonth = 21;
     state->dataGlobal->HourOfDay = 1;
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
+    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, state->dataEnvrn->DayOfMonth, 1);
     ScheduleManager::UpdateScheduleValues(*state);
 
     int TankNum(1);
@@ -3159,12 +3159,12 @@ TEST_F(EnergyPlusFixture, MixedTankAlternateSchedule)
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->HourOfDay = 1;
     DataEnvironment::Month = 7;
-    DataEnvironment::DayOfMonth = 21;
+    state->dataEnvrn->DayOfMonth = 21;
     state->dataGlobal->HourOfDay = 1;
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
+    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, state->dataEnvrn->DayOfMonth, 1);
     ScheduleManager::UpdateScheduleValues(*state);
 
     EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(*state));
@@ -3654,12 +3654,12 @@ TEST_F(EnergyPlusFixture, MultipleDesuperheaterSingleSource)
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->HourOfDay = 1;
     DataEnvironment::Month = 7;
-    DataEnvironment::DayOfMonth = 21;
+    state->dataEnvrn->DayOfMonth = 21;
     state->dataGlobal->HourOfDay = 1;
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
+    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, state->dataEnvrn->DayOfMonth, 1);
     ScheduleManager::UpdateScheduleValues(*state);
 
     // Initiate tank conditions

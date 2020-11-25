@@ -4055,7 +4055,6 @@ namespace OutputReportTabular {
         //   holding the data that will be reported later.
 
         // Using/Aliasing
-        using DataEnvironment::DayOfMonth;
         using DataEnvironment::Month;
         using DataHVACGlobals::TimeStepSys;
         using General::DetermineMinuteForReporting;
@@ -4175,7 +4174,7 @@ namespace OutputReportTabular {
                     //      minuteCalculated = (CurrentTime - INT(CurrentTime))*60
                     //      IF (t_timeStepType .EQ. OutputProcessor::TimeStepType::TimeStepSystem) minuteCalculated = minuteCalculated +
                     //      SysTimeElapsed * 60 minuteCalculated = INT((TimeStep-1) * TimeStepZone * 60) + INT((SysTimeElapsed + TimeStepSys) * 60)
-                    EncodeMonDayHrMin(timestepTimeStamp, Month, DayOfMonth, state.dataGlobal->HourOfDay, minuteCalculated);
+                    EncodeMonDayHrMin(timestepTimeStamp, Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, minuteCalculated);
                     // perform the selected aggregation type
                     // use next lines since it is faster was: SELECT CASE (MonthlyColumns(curCol)%aggType)
                     {
@@ -4716,7 +4715,6 @@ namespace OutputReportTabular {
         // na
 
         // Using/Aliasing
-        using DataEnvironment::DayOfMonth;
         using DataEnvironment::Month;
         using DataStringGlobals::CharComma;
         using DataStringGlobals::CharSpace;
@@ -4758,7 +4756,7 @@ namespace OutputReportTabular {
                         // save the time that the peak demand occurred
                         //        minuteCalculated = (CurrentTime - INT(CurrentTime))*60
                         minuteCalculated = DetermineMinuteForReporting(state, t_timeStepType);
-                        EncodeMonDayHrMin(timestepTimeStamp, Month, DayOfMonth, state.dataGlobal->HourOfDay, minuteCalculated);
+                        EncodeMonDayHrMin(timestepTimeStamp, Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, minuteCalculated);
                         gatherDemandTimeStamp(iResource) = timestepTimeStamp;
                         // if new peak demand is set, then gather all of the end use values at this particular
                         // time to find the components of the peak demand
@@ -5117,7 +5115,6 @@ namespace OutputReportTabular {
         // The peak reports follow a similar example.
 
         // Using/Aliasing
-        using DataEnvironment::DayOfMonth;
         using DataEnvironment::Month;
         using DataHeatBalance::BuildingPreDefRep;
         using DataHeatBalance::ZnAirRpt;
@@ -5315,7 +5312,7 @@ namespace OutputReportTabular {
                     //      ActualTimeHrS=INT(ActualTimeS)
                     //      ActualTimeMin=NINT((ActualtimeE - ActualTimeHrS)*FracToMin)
                     ActualTimeMin = DetermineMinuteForReporting(state, t_timeStepType);
-                    EncodeMonDayHrMin(timestepTimeStamp, Month, DayOfMonth, state.dataGlobal->HourOfDay, ActualTimeMin);
+                    EncodeMonDayHrMin(timestepTimeStamp, Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, ActualTimeMin);
                     ZonePreDefRep(iZone).htPtTimeStamp = timestepTimeStamp;
                     // HVAC Input Sensible Air Heating
                     // HVAC Input Sensible Air Cooling
@@ -5394,7 +5391,7 @@ namespace OutputReportTabular {
                     //      ActualTimeHrS=INT(ActualTimeS)
                     //      ActualTimeMin=NINT((ActualtimeE - ActualTimeHrS)*FracToMin)
                     ActualTimeMin = DetermineMinuteForReporting(state, t_timeStepType);
-                    EncodeMonDayHrMin(timestepTimeStamp, Month, DayOfMonth, state.dataGlobal->HourOfDay, ActualTimeMin);
+                    EncodeMonDayHrMin(timestepTimeStamp, Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, ActualTimeMin);
                     ZonePreDefRep(iZone).clPtTimeStamp = timestepTimeStamp;
                     // HVAC Input Sensible Air Heating
                     // HVAC Input Sensible Air Cooling
@@ -5485,7 +5482,7 @@ namespace OutputReportTabular {
             //  ActualTimeHrS=INT(ActualTimeS)
             //  ActualTimeMin=NINT((ActualtimeE - ActualTimeHrS)*FracToMin)
             ActualTimeMin = DetermineMinuteForReporting(state, t_timeStepType);
-            EncodeMonDayHrMin(timestepTimeStamp, Month, DayOfMonth, state.dataGlobal->HourOfDay, ActualTimeMin);
+            EncodeMonDayHrMin(timestepTimeStamp, Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, ActualTimeMin);
             BuildingPreDefRep.htPtTimeStamp = timestepTimeStamp;
             // reset building level results to zero prior to accumulating across zones
             BuildingPreDefRep.SHGSHtHvacHt = 0.0;
@@ -5573,7 +5570,7 @@ namespace OutputReportTabular {
             //  ActualTimeHrS=INT(ActualTimeS)
             //  ActualTimeMin=NINT((ActualtimeE - ActualTimeHrS)*FracToMin)
             ActualTimeMin = DetermineMinuteForReporting(state, t_timeStepType);
-            EncodeMonDayHrMin(timestepTimeStamp, Month, DayOfMonth, state.dataGlobal->HourOfDay, ActualTimeMin);
+            EncodeMonDayHrMin(timestepTimeStamp, Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, ActualTimeMin);
             BuildingPreDefRep.clPtTimeStamp = timestepTimeStamp;
             // reset building level results to zero prior to accumulating across zones
             BuildingPreDefRep.SHGSClHvacHt = 0.0;

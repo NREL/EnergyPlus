@@ -253,7 +253,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_OptimumStart)
     ScheduleManager::ProcessScheduleInput(*state); // read schedules
     ScheduleManager::ScheduleInputProcessed = true;
     DataEnvironment::Month = 1;
-    DataEnvironment::DayOfMonth = 1;
+    state->dataEnvrn->DayOfMonth = 1;
     state->dataGlobal->HourOfDay = 1;
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->DayOfSim = 1;
@@ -261,7 +261,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_OptimumStart)
     DataEnvironment::DayOfWeek = 1;
     DataEnvironment::DayOfWeekTomorrow = 2;
     DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
+    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, state->dataEnvrn->DayOfMonth, 1);
     ScheduleManager::UpdateScheduleValues(*state);
 
     DataZoneEquipment::ZoneEquipAvail.allocate(6);

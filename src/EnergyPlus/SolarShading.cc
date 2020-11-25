@@ -10480,7 +10480,7 @@ namespace SolarShading {
         }
         // added for predefined reporting
         RepCol = 0;
-        if (Month == 3 && DayOfMonth == 21) {
+        if (Month == 3 && state.dataEnvrn->DayOfMonth == 21) {
             if ((state.dataGlobal->HourOfDay == 9) && (state.dataGlobal->TimeStep == 4)) {
                 RepCol = pdchSlfMar21_9;
             } else if ((state.dataGlobal->HourOfDay == 12) && (state.dataGlobal->TimeStep == 4)) {
@@ -10488,7 +10488,7 @@ namespace SolarShading {
             } else if ((state.dataGlobal->HourOfDay == 15) && (state.dataGlobal->TimeStep == 4)) {
                 RepCol = pdchSlfMar21_15;
             }
-        } else if (Month == 6 && DayOfMonth == 21) {
+        } else if (Month == 6 && state.dataEnvrn->DayOfMonth == 21) {
             if ((state.dataGlobal->HourOfDay == 9) && (state.dataGlobal->TimeStep == 4)) {
                 RepCol = pdchSlfJun21_9;
             } else if ((state.dataGlobal->HourOfDay == 12) && (state.dataGlobal->TimeStep == 4)) {
@@ -10496,7 +10496,7 @@ namespace SolarShading {
             } else if ((state.dataGlobal->HourOfDay == 15) && (state.dataGlobal->TimeStep == 4)) {
                 RepCol = pdchSlfJun21_15;
             }
-        } else if (Month == 12 && DayOfMonth == 21) {
+        } else if (Month == 12 && state.dataEnvrn->DayOfMonth == 21) {
             if ((state.dataGlobal->HourOfDay == 9) && (state.dataGlobal->TimeStep == 4)) {
                 RepCol = pdchSlfDec21_9;
             } else if ((state.dataGlobal->HourOfDay == 12) && (state.dataGlobal->TimeStep == 4)) {

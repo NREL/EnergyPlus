@@ -5355,9 +5355,9 @@ namespace HeatBalanceManager {
                 for (int TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
                     static constexpr auto ShdFracFmt1(" {:02}/{:02} {:02}:{:02},");
                         if (TS == state.dataGlobal->NumOfTimeStepInHour) {
-                            print(state.files.shade, ShdFracFmt1, Month, DayOfMonth, iHour, 0);
+                            print(state.files.shade, ShdFracFmt1, Month, state.dataEnvrn->DayOfMonth, iHour, 0);
                         } else {
-                            print(state.files.shade, ShdFracFmt1, Month, DayOfMonth, iHour - 1, (60 / state.dataGlobal->NumOfTimeStepInHour) * TS);
+                            print(state.files.shade, ShdFracFmt1, Month, state.dataEnvrn->DayOfMonth, iHour - 1, (60 / state.dataGlobal->NumOfTimeStepInHour) * TS);
                         }
                     for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
                         static constexpr auto ShdFracFmt2("{:10.8F},");

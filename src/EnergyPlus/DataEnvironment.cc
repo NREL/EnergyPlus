@@ -72,10 +72,6 @@ namespace DataEnvironment {
     // current weather variables)
 
     // MODULE VARIABLE DECLARATIONS:
-    bool EMSBeamSolarRadOverrideOn(false); // EMS flag for beam normal solar irradiance
-    Real64 EMSBeamSolarRadOverrideValue;   // EMS override value for beam normal solar irradiance
-    int DayOfMonth;                        // Current day of the month
-    int DayOfMonthTomorrow;                // Tomorrow's day of the month
     int DayOfWeek;                         // Current day of the week (Sunday=1, Monday=2, ...)
     int DayOfWeekTomorrow;                 // Tomorrow's day of the week (Sunday=1, Monday=2, ...)
     int DayOfYear;                         // Current day of the year (01JAN=1, 02JAN=2, ...)
@@ -201,10 +197,6 @@ namespace DataEnvironment {
 
     void clear_state()
     {
-        EMSBeamSolarRadOverrideOn = false;
-        EMSBeamSolarRadOverrideValue = Real64();
-        DayOfMonth = int();
-        DayOfMonthTomorrow = int();
         DayOfWeek = int();
         DayOfWeekTomorrow = int();
         DayOfYear = int();

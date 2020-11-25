@@ -1101,7 +1101,7 @@ namespace HeatBalanceKivaManager {
             kv.setBoundaryConditions(state);
             kv.instance.calculate(timestep);
             kv.instance.calculate_surface_averages();
-            if (DataEnvironment::Month == 1 && DataEnvironment::DayOfMonth == 1 && state.dataGlobal->HourOfDay == 1 && state.dataGlobal->TimeStep == 1) {
+            if (DataEnvironment::Month == 1 && state.dataEnvrn->DayOfMonth == 1 && state.dataGlobal->HourOfDay == 1 && state.dataGlobal->TimeStep == 1) {
                 kv.plotDomain();
             }
         }
@@ -1148,7 +1148,7 @@ namespace HeatBalanceKivaManager {
             }
         }
 
-        gp.createFrame(fmt::to_string(DataEnvironment::Month) + "/" + fmt::to_string(DataEnvironment::DayOfMonth) + " " +
+        gp.createFrame(fmt::to_string(DataEnvironment::Month) + "/" + fmt::to_string(state.dataEnvrn->DayOfMonth) + " " +
                        fmt::to_string(state.dataGlobal->HourOfDay) + ":00");
 
 #ifndef NDEBUG

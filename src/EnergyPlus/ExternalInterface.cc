@@ -1876,7 +1876,6 @@ namespace ExternalInterface {
 
         // Using/Aliasing
         using DataEnvironment::CurrentYearIsLeapYear;
-        using DataEnvironment::DayOfMonth;
         using DataEnvironment::Month;
         // Locals
         Real64 simtime;
@@ -1965,7 +1964,7 @@ namespace ExternalInterface {
             }
         }
 
-        simtime = 24 * (simtime + (DayOfMonth - 1)); // day of month does not need to be stubtracted??
+        simtime = 24 * (simtime + (state.dataEnvrn->DayOfMonth - 1)); // day of month does not need to be stubtracted??
         simtime = 60 * (simtime + (state.dataGlobal->HourOfDay - 1));  // hours to minutes
         simtime = 60 * (simtime);                    // minutes to seconds
 

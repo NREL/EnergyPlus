@@ -1301,7 +1301,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ZnRpt_Outputs)
     state->dataGlobal->MinutesPerTimeStep = 60;                 // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(*state); // read schedules
     DataEnvironment::DayOfYear_Schedule = 1;
-    DataEnvironment::DayOfMonth = 1;
+    state->dataEnvrn->DayOfMonth = 1;
     DataEnvironment::DayOfWeek = 1;
     state->dataGlobal->HourOfDay = 1;
     state->dataGlobal->TimeStep = 1;

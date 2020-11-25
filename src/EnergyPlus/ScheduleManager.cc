@@ -99,7 +99,6 @@ namespace ScheduleManager {
     // OTHER NOTES:
 
     // Using/Aliasing
-    using DataEnvironment::DayOfMonthTomorrow;
     using DataEnvironment::DayOfWeek;
     using DataEnvironment::DayOfWeekTomorrow;
     using DataEnvironment::DSTIndicator;

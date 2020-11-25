@@ -5205,7 +5205,7 @@ namespace HeatBalanceSurfaceManager {
                             ZoneLowSETHours(ZoneNum)[1] += (12.2 - PierceSET) * NumOcc * state.dataGlobal->TimeStepZone;
                             // Reset duration when last step is out of range.
                             if (PierceSETLast == -1 || PierceSETLast > 12.2) {
-                                General::EncodeMonDayHrMin(encodedMonDayHrMin, Month, DayOfMonth, state.dataGlobal->HourOfDay,
+                                General::EncodeMonDayHrMin(encodedMonDayHrMin, Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay,
                                                            state.dataGlobal->TimeStepZone * (state.dataGlobal->TimeStep - 1) * 60);
                                 lowSETLongestHours[ZoneNum - 1] = 0;
                                 lowSETLongestStart[ZoneNum - 1] = encodedMonDayHrMin;
@@ -5220,7 +5220,7 @@ namespace HeatBalanceSurfaceManager {
                             ZoneHighSETHours(ZoneNum)[0] += (PierceSET - 30) * state.dataGlobal->TimeStepZone;
                             ZoneHighSETHours(ZoneNum)[1] += (PierceSET - 30) * NumOcc * state.dataGlobal->TimeStepZone;
                             if (PierceSETLast == -1 || PierceSETLast <= 30) {
-                                General::EncodeMonDayHrMin(encodedMonDayHrMin, Month, DayOfMonth, state.dataGlobal->HourOfDay,
+                                General::EncodeMonDayHrMin(encodedMonDayHrMin, Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay,
                                                            state.dataGlobal->TimeStepZone * (state.dataGlobal->TimeStep - 1) * 60);
                                 highSETLongestHours[ZoneNum - 1] = 0;
                                 highSETLongestStart[ZoneNum - 1] = encodedMonDayHrMin;

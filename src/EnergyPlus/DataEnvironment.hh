@@ -68,10 +68,6 @@ namespace DataEnvironment {
     Real64 constexpr StdPressureSeaLevel(101325.0);   // Standard barometric pressure at sea level (Pa)
 
     // MODULE VARIABLE DECLARATIONS:
-    extern bool EMSBeamSolarRadOverrideOn;      // EMS flag for beam normal solar irradiance
-    extern Real64 EMSBeamSolarRadOverrideValue; // EMS override value for beam normal solar irradiance
-    extern int DayOfMonth;                      // Current day of the month
-    extern int DayOfMonthTomorrow;              // Tomorrow's day of the month
     extern int DayOfWeek;                       // Current day of the week (Sunday=1, Monday=2, ...)
     extern int DayOfWeekTomorrow;               // Tomorrow's day of the week (Sunday=1, Monday=2, ...)
     extern int DayOfYear;                       // Current day of the year (01JAN=1, 02JAN=2, ...)
@@ -213,11 +209,20 @@ namespace DataEnvironment {
 
 struct EnvironmentData : BaseGlobalStruct {
 
-    Real64 BeamSolarRad = 0.0;              // Current beam normal solar irradiance
+    Real64 BeamSolarRad = 0.0;                          // Current beam normal solar irradiance
+    bool EMSBeamSolarRadOverrideOn  = false;            // EMS flag for beam normal solar irradiance
+    Real64 EMSBeamSolarRadOverrideValue = 0.0;          // EMS override value for beam normal solar irradiance
+    int DayOfMonth = 0;                                 // Current day of the month
+    int DayOfMonthTomorrow = 0;                         // Tomorrow's day of the month
+
 
     void clear_state() override
     {
         this->BeamSolarRad = 0.0;
+        this->EMSBeamSolarRadOverrideOn = false;
+        this->EMSBeamSolarRadOverrideValue = 0.0;
+        this->DayOfMonth = 0;
+        DayOfMonthTomorrow = 0;
     }
 };
 

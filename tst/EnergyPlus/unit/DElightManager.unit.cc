@@ -337,12 +337,12 @@ TEST_F(EnergyPlusFixture, DElightManagerF_GetInputDElightComplexFenestration_Tes
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->HourOfDay = 1;
     DataEnvironment::Month = 1;
-    DataEnvironment::DayOfMonth = 21;
+    state->dataEnvrn->DayOfMonth = 21;
     state->dataGlobal->HourOfDay = 1;
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
+    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, state->dataEnvrn->DayOfMonth, 1);
     ScheduleManager::UpdateScheduleValues(*state);
     InternalHeatGains::GetInternalHeatGainsInput(*state);
     InternalHeatGains::GetInternalHeatGainsInputFlag = false;

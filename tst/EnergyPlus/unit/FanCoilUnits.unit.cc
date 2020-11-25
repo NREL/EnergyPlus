@@ -396,12 +396,12 @@ namespace EnergyPlus {
         state->dataFans->LocalTurnFansOn = true;
 
         DataEnvironment::Month = 1;
-        DataEnvironment::DayOfMonth = 21;
+        state->dataEnvrn->DayOfMonth = 21;
         state->dataGlobal->HourOfDay = 1;
         DataEnvironment::DSTIndicator = 0;
         DataEnvironment::DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 0;
-        DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, 1);
+        DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, state->dataEnvrn->DayOfMonth, 1);
         UpdateScheduleValues(*state);
 
         CalcMultiStage4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QZnReq, SpeedRatio, PartLoadRatio, QUnitOut);
@@ -710,12 +710,12 @@ namespace EnergyPlus {
         state->dataFans->LocalTurnFansOn = true;
 
         DataEnvironment::Month = 1;
-        DataEnvironment::DayOfMonth = 21;
+        state->dataEnvrn->DayOfMonth = 21;
         state->dataGlobal->HourOfDay = 1;
         DataEnvironment::DSTIndicator = 0;
         DataEnvironment::DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 0;
-        DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, 1);
+        DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, state->dataEnvrn->DayOfMonth, 1);
         UpdateScheduleValues(*state);
 
         CalcMultiStage4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QZnReq, SpeedRatio, PartLoadRatio, QUnitOut);
@@ -1045,12 +1045,12 @@ namespace EnergyPlus {
         state->dataFans->LocalTurnFansOn = true;
 
         DataEnvironment::Month = 1;
-        DataEnvironment::DayOfMonth = 21;
+        state->dataEnvrn->DayOfMonth = 21;
         state->dataGlobal->HourOfDay = 1;
         DataEnvironment::DSTIndicator = 0;
         DataEnvironment::DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 0;
-        DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, 1);
+        DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, state->dataEnvrn->DayOfMonth, 1);
         UpdateScheduleValues(*state);
 
         // Normal heating simulation for fan coil with constant fan, variable water flow
@@ -1398,12 +1398,12 @@ namespace EnergyPlus {
         state->dataFans->LocalTurnFansOn = true;
 
         DataEnvironment::Month = 1;
-        DataEnvironment::DayOfMonth = 21;
+        state->dataEnvrn->DayOfMonth = 21;
         state->dataGlobal->HourOfDay = 1;
         DataEnvironment::DSTIndicator = 0;
         DataEnvironment::DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 0;
-        DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, 1);
+        DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, state->dataEnvrn->DayOfMonth, 1);
         UpdateScheduleValues(*state);
 
         // Normal heating simulation for fan coil with constant fan, electric heating
@@ -1743,12 +1743,12 @@ namespace EnergyPlus {
         state->dataFans->LocalTurnFansOn = true;
 
         DataEnvironment::Month = 1;
-        DataEnvironment::DayOfMonth = 21;
+        state->dataEnvrn->DayOfMonth = 21;
         state->dataGlobal->HourOfDay = 1;
         DataEnvironment::DSTIndicator = 0;
         DataEnvironment::DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 0;
-        DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, 1);
+        DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, state->dataEnvrn->DayOfMonth, 1);
         UpdateScheduleValues(*state);
         // normal cooling simulation for constant fan variable flow fan coil
         Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
@@ -2077,12 +2077,12 @@ namespace EnergyPlus {
         state->dataFans->LocalTurnFansOn = true;
 
         DataEnvironment::Month = 1;
-        DataEnvironment::DayOfMonth = 21;
+        state->dataEnvrn->DayOfMonth = 21;
         state->dataGlobal->HourOfDay = 1;
         DataEnvironment::DSTIndicator = 0;
         DataEnvironment::DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 0;
-        DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, 1);
+        DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, state->dataEnvrn->DayOfMonth, 1);
         UpdateScheduleValues(*state);
 
         ZoneEqSizing.allocate(1);
@@ -2787,12 +2787,12 @@ namespace EnergyPlus {
         state->dataFans->LocalTurnFansOn = true;
 
         DataEnvironment::Month = 1;
-        DataEnvironment::DayOfMonth = 21;
+        state->dataEnvrn->DayOfMonth = 21;
         state->dataGlobal->HourOfDay = 1;
         DataEnvironment::DSTIndicator = 0;
         DataEnvironment::DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 0;
-        DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, 1);
+        DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, state->dataEnvrn->DayOfMonth, 1);
         UpdateScheduleValues(*state);
 
         ZoneEqSizing.allocate(1);
@@ -3200,12 +3200,12 @@ namespace EnergyPlus {
         state->dataFans->LocalTurnFansOn = true;
 
         DataEnvironment::Month = 1;
-        DataEnvironment::DayOfMonth = 21;
+        state->dataEnvrn->DayOfMonth = 21;
         state->dataGlobal->HourOfDay = 1;
         DataEnvironment::DSTIndicator = 0;
         DataEnvironment::DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 0;
-        DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, 1);
+        DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, state->dataEnvrn->DayOfMonth, 1);
         UpdateScheduleValues(*state);
 
         ZoneEqSizing.allocate(1);
@@ -3563,12 +3563,12 @@ namespace EnergyPlus {
 
         StdRhoAir = 1.2;
         DataEnvironment::Month = 1;
-        DataEnvironment::DayOfMonth = 21;
+        state->dataEnvrn->DayOfMonth = 21;
         state->dataGlobal->HourOfDay = 1;
         DataEnvironment::DSTIndicator = 0;
         DataEnvironment::DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 0;
-        DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, 1);
+        DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, state->dataEnvrn->DayOfMonth, 1);
         UpdateScheduleValues(*state);
         ZoneEqSizing.allocate(1);
         ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
@@ -3930,12 +3930,12 @@ namespace EnergyPlus {
 
         StdRhoAir = 1.2;
         DataEnvironment::Month = 1;
-        DataEnvironment::DayOfMonth = 21;
+        state->dataEnvrn->DayOfMonth = 21;
         state->dataGlobal->HourOfDay = 1;
         DataEnvironment::DSTIndicator = 0;
         DataEnvironment::DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 0;
-        DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, 1);
+        DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, state->dataEnvrn->DayOfMonth, 1);
         UpdateScheduleValues(*state);
         ZoneEqSizing.allocate(1);
         ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
@@ -4297,12 +4297,12 @@ namespace EnergyPlus {
 
         StdRhoAir = 1.2;
         DataEnvironment::Month = 1;
-        DataEnvironment::DayOfMonth = 21;
+        state->dataEnvrn->DayOfMonth = 21;
         state->dataGlobal->HourOfDay = 1;
         DataEnvironment::DSTIndicator = 0;
         DataEnvironment::DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 0;
-        DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, 1);
+        DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, state->dataEnvrn->DayOfMonth, 1);
         UpdateScheduleValues(*state);
         ZoneEqSizing.allocate(1);
         ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
@@ -4608,12 +4608,12 @@ namespace EnergyPlus {
         auto &zSysEDemand(ZoneSysEnergyDemand(1));
 
         DataEnvironment::Month = 1;
-        DataEnvironment::DayOfMonth = 21;
+        state->dataEnvrn->DayOfMonth = 21;
         state->dataGlobal->HourOfDay = 1;
         DataEnvironment::DSTIndicator = 0;
         DataEnvironment::DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 0;
-        DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, 1);
+        DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, state->dataEnvrn->DayOfMonth, 1);
         UpdateScheduleValues(*state);
         ZoneEqSizing.allocate(1);
         CurDeadBandOrSetback.allocate(1);

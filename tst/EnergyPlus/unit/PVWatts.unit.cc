@@ -177,7 +177,7 @@ TEST_F(EnergyPlusFixture, PVWattsGenerator_Calc)
     WeatherManager::AllocateWeatherData(*state); // gets us the albedo array initialized
     DataEnvironment::Year = 1986;
     DataEnvironment::Month = 6;
-    DataEnvironment::DayOfMonth = 15;
+    state->dataEnvrn->DayOfMonth = 15;
     state->dataGlobal->HourOfDay = 8; // 8th hour of day, 7-8am
     state->dataWeatherManager->WeatherFileLatitude = 33.45;
     state->dataWeatherManager->WeatherFileLongitude = -111.98;

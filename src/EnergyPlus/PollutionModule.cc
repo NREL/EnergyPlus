@@ -93,7 +93,6 @@ namespace PollutionModule {
     // USE STATEMENTS:
     // <use statements for data only modules>
     // Using/Aliasing
-    using DataEnvironment::DayOfMonth;
     using DataEnvironment::EndMonthFlag;
     using DataEnvironment::Month;
     // Data

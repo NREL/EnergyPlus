@@ -620,8 +620,9 @@ int month(EnergyPlusState) {
     return EnergyPlus::DataEnvironment::Month;
 }
 
-int dayOfMonth(EnergyPlusState) {
-    return EnergyPlus::DataEnvironment::DayOfMonth;
+int dayOfMonth(EnergyPlusState state) {
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    return thisState->dataEnvrn->DayOfMonth;
 }
 
 int dayOfWeek(EnergyPlusState) {

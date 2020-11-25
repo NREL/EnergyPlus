@@ -157,7 +157,7 @@ namespace OutputProcessor {
         state->dataGlobal->DayOfSimChr = "1";
         state->dataGlobal->HourOfDay = 1;
         DataEnvironment::Month = 12;
-        DataEnvironment::DayOfMonth = 21;
+        state->dataEnvrn->DayOfMonth = 21;
         DataEnvironment::DSTIndicator = 0;
         DataEnvironment::DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 3;
@@ -223,7 +223,7 @@ namespace OutputProcessor {
         state->dataGlobal->DayOfSimChr = "1";
         state->dataGlobal->HourOfDay = 1;
         DataEnvironment::Month = 12;
-        DataEnvironment::DayOfMonth = 21;
+        state->dataEnvrn->DayOfMonth = 21;
         DataEnvironment::DSTIndicator = 0;
         DataEnvironment::DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 3;
@@ -287,7 +287,7 @@ namespace OutputProcessor {
         state->dataGlobal->DayOfSimChr = "1";
         state->dataGlobal->HourOfDay = 1;
         DataEnvironment::Month = 12;
-        DataEnvironment::DayOfMonth = 21;
+        state->dataEnvrn->DayOfMonth = 21;
         DataEnvironment::DSTIndicator = 0;
         DataEnvironment::DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 3;
@@ -355,7 +355,7 @@ namespace OutputProcessor {
         state->dataGlobal->DayOfSimChr = "1";
         state->dataGlobal->HourOfDay = 1;
         DataEnvironment::Month = 12;
-        DataEnvironment::DayOfMonth = 21;
+        state->dataEnvrn->DayOfMonth = 21;
         DataEnvironment::DSTIndicator = 0;
         DataEnvironment::DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 3;
@@ -427,7 +427,7 @@ namespace OutputProcessor {
         state->dataGlobal->DayOfSimChr = "1";
         state->dataGlobal->HourOfDay = 1;
         DataEnvironment::Month = 12;
-        DataEnvironment::DayOfMonth = 21;
+        state->dataEnvrn->DayOfMonth = 21;
         DataEnvironment::DSTIndicator = 0;
         DataEnvironment::DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 3;
@@ -499,7 +499,7 @@ namespace OutputProcessor {
         state->dataGlobal->DayOfSimChr = "1";
         state->dataGlobal->HourOfDay = 1;
         DataEnvironment::Month = 12;
-        DataEnvironment::DayOfMonth = 21;
+        state->dataEnvrn->DayOfMonth = 21;
         DataEnvironment::DSTIndicator = 0;
         DataEnvironment::DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 3;
@@ -573,7 +573,7 @@ namespace OutputProcessor {
         state->dataGlobal->CalendarYear = 2017;
         state->dataGlobal->CalendarYearChr = "2017";
         DataEnvironment::Month = 12;
-        DataEnvironment::DayOfMonth = 21;
+        state->dataEnvrn->DayOfMonth = 21;
         DataEnvironment::DSTIndicator = 0;
         DataEnvironment::DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 3;
@@ -4113,7 +4113,7 @@ namespace OutputProcessor {
         state->dataGlobal->DayOfSim = 365;
         state->dataGlobal->DayOfSimChr = "365";
         DataEnvironment::Month = 12;
-        DataEnvironment::DayOfMonth = 31;
+        state->dataEnvrn->DayOfMonth = 31;
         DataEnvironment::DSTIndicator = 0;
         DataEnvironment::DayOfWeek = 3;
         DataEnvironment::HolidayIndex = 0;
@@ -4131,7 +4131,7 @@ namespace OutputProcessor {
             }
         }
 
-        if (DataEnvironment::DayOfMonth == state->dataWeatherManager->EndDayOfMonth(DataEnvironment::Month)) {
+        if (state->dataEnvrn->DayOfMonth == state->dataWeatherManager->EndDayOfMonth(DataEnvironment::Month)) {
             DataEnvironment::EndMonthFlag = true;
         }
 
@@ -4357,7 +4357,7 @@ namespace OutputProcessor {
         state->dataGlobal->DayOfSim = 365;
         state->dataGlobal->DayOfSimChr = "365";
         DataEnvironment::Month = 12;
-        DataEnvironment::DayOfMonth = 31;
+        state->dataEnvrn->DayOfMonth = 31;
         DataEnvironment::DSTIndicator = 0;
         DataEnvironment::DayOfWeek = 3;
         DataEnvironment::HolidayIndex = 0;
@@ -4375,7 +4375,7 @@ namespace OutputProcessor {
             }
         }
 
-        if (DataEnvironment::DayOfMonth == state->dataWeatherManager->EndDayOfMonth(DataEnvironment::Month)) {
+        if (state->dataEnvrn->DayOfMonth == state->dataWeatherManager->EndDayOfMonth(DataEnvironment::Month)) {
             DataEnvironment::EndMonthFlag = true;
         }
 
@@ -4614,7 +4614,7 @@ namespace OutputProcessor {
         state->dataGlobal->DayOfSim = 365;
         state->dataGlobal->DayOfSimChr = "365";
         DataEnvironment::Month = 12;
-        DataEnvironment::DayOfMonth = 31;
+        state->dataEnvrn->DayOfMonth = 31;
         DataEnvironment::DSTIndicator = 0;
         DataEnvironment::DayOfWeek = 3;
         DataEnvironment::HolidayIndex = 0;
@@ -4632,7 +4632,7 @@ namespace OutputProcessor {
             }
         }
 
-        if (DataEnvironment::DayOfMonth == state->dataWeatherManager->EndDayOfMonth(DataEnvironment::Month)) {
+        if (state->dataEnvrn->DayOfMonth == state->dataWeatherManager->EndDayOfMonth(DataEnvironment::Month)) {
             DataEnvironment::EndMonthFlag = true;
         }
 
@@ -4819,7 +4819,7 @@ namespace OutputProcessor {
         state->dataGlobal->DayOfSim = 365;
         state->dataGlobal->DayOfSimChr = "365";
         DataEnvironment::Month = 12;
-        DataEnvironment::DayOfMonth = 31;
+        state->dataEnvrn->DayOfMonth = 31;
         DataEnvironment::DSTIndicator = 0;
         DataEnvironment::DayOfWeek = 3;
         DataEnvironment::HolidayIndex = 0;
@@ -4837,7 +4837,7 @@ namespace OutputProcessor {
             }
         }
 
-        if (DataEnvironment::DayOfMonth == state->dataWeatherManager->EndDayOfMonth(DataEnvironment::Month)) {
+        if (state->dataEnvrn->DayOfMonth == state->dataWeatherManager->EndDayOfMonth(DataEnvironment::Month)) {
             DataEnvironment::EndMonthFlag = true;
         }
         // OutputProcessor::TimeValue.allocate(2);
@@ -4959,7 +4959,7 @@ namespace OutputProcessor {
         state->dataGlobal->DayOfSim = 365;
         state->dataGlobal->DayOfSimChr = "365";
         DataEnvironment::Month = 12;
-        DataEnvironment::DayOfMonth = 31;
+        state->dataEnvrn->DayOfMonth = 31;
         DataEnvironment::DSTIndicator = 0;
         DataEnvironment::DayOfWeek = 3;
         DataEnvironment::HolidayIndex = 0;
@@ -4977,7 +4977,7 @@ namespace OutputProcessor {
             }
         }
 
-        if (DataEnvironment::DayOfMonth == state->dataWeatherManager->EndDayOfMonth(DataEnvironment::Month)) {
+        if (state->dataEnvrn->DayOfMonth == state->dataWeatherManager->EndDayOfMonth(DataEnvironment::Month)) {
             DataEnvironment::EndMonthFlag = true;
         }
 
@@ -5037,7 +5037,7 @@ namespace OutputProcessor {
         state->dataGlobal->DayOfSim = 365;
         state->dataGlobal->DayOfSimChr = "365";
         DataEnvironment::Month = 12;
-        DataEnvironment::DayOfMonth = 31;
+        state->dataEnvrn->DayOfMonth = 31;
         DataEnvironment::DSTIndicator = 0;
         DataEnvironment::DayOfWeek = 3;
         DataEnvironment::HolidayIndex = 0;
@@ -5055,7 +5055,7 @@ namespace OutputProcessor {
             }
         }
 
-        if (DataEnvironment::DayOfMonth == state->dataWeatherManager->EndDayOfMonth(DataEnvironment::Month)) {
+        if (state->dataEnvrn->DayOfMonth == state->dataWeatherManager->EndDayOfMonth(DataEnvironment::Month)) {
             DataEnvironment::EndMonthFlag = true;
         }
 

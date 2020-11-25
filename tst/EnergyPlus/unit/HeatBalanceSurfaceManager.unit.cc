@@ -2618,7 +2618,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     state->dataGlobal->KindOfSim = DataGlobalConstants::KindOfSim::RunPeriodWeather;
     OutputReportTabular::displayThermalResilienceSummary = true;
     DataEnvironment::Month = 7;
-    DataEnvironment::DayOfMonth = 1;
+    state->dataEnvrn->DayOfMonth = 1;
 
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->TimeStepZone = 1;
