@@ -1343,7 +1343,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
     InternalHeatGains::GetInternalHeatGainsInputFlag = false;
     DaylightingManager::GetInputDayliteRefPt(*state, foundErrors);
     DaylightingManager::GetDaylightingParametersInput(*state);
-    DaylightingManager::GILSK = 100.0;
+    state->dataDaylightingManager->GILSK = 100.0;
     state->dataGlobal->WeightNow = 1.0;
     DataEnvironment::HISUNF = 100.0;
     DataEnvironment::HISKF = 100.0;

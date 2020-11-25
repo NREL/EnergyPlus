@@ -59,6 +59,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DataBSDFWindow.hh>
+#include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -84,43 +85,6 @@ namespace DaylightingManager {
     // A reasonable, conservative crossover is selected but may be refined as more
     //  experience is gained.
     constexpr int octreeCrossover(100); // Octree surface count crossover
-
-    // In the following I,J,K arrays:
-    // I = 1 for clear sky, 2 for clear turbid, 3 for intermediate, 4 for overcast;
-    // J = 1 for bare window, 2 - 12 for shaded;
-    // K = sun position index.
-    extern Array3D<Real64> EINTSK; // Sky-related portion of internally reflected illuminance
-    extern Array2D<Real64> EINTSU; // Sun-related portion of internally reflected illuminance,
-    // excluding entering beam
-    extern Array2D<Real64> EINTSUdisk; // Sun-related portion of internally reflected illuminance
-    // due to entering beam
-    extern Array3D<Real64> WLUMSK;     // Sky-related window luminance
-    extern Array2D<Real64> WLUMSU;     // Sun-related window luminance, excluding view of solar disk
-    extern Array2D<Real64> WLUMSUdisk; // Sun-related window luminance, due to view of solar disk
-
-    extern Array2D<Real64> GILSK; // Horizontal illuminance from sky, by sky type, for each hour of the day
-    extern Array1D<Real64> GILSU; // Horizontal illuminance from sun for each hour of the day
-
-    extern Array3D<Real64> EDIRSK;     // Sky-related component of direct illuminance
-    extern Array2D<Real64> EDIRSU;     // Sun-related component of direct illuminance (excluding beam solar at ref pt)
-    extern Array2D<Real64> EDIRSUdisk; // Sun-related component of direct illuminance due to beam solar at ref pt
-    extern Array3D<Real64> AVWLSK;     // Sky-related average window luminance
-    extern Array2D<Real64> AVWLSU;     // Sun-related average window luminance, excluding view of solar disk
-    extern Array2D<Real64> AVWLSUdisk; // Sun-related average window luminance due to view of solar disk
-
-    // Allocatable daylight factor arrays  -- are in the ZoneDaylight Structure
-
-    extern Array2D<Real64> TDDTransVisBeam;
-    extern Array3D<Real64> TDDFluxInc;
-    extern Array3D<Real64> TDDFluxTrans;
-
-    extern Array2D_int MapErrIndex;
-    extern Array2D_int RefErrIndex;
-
-    extern Array1D_bool CheckTDDZone;
-
-    // Functions
-    void clear_state();
 
     void DayltgAveInteriorReflectance(EnergyPlusData &state, int &ZoneNum); // Zone number
 
@@ -538,6 +502,38 @@ struct DaylightingManagerData : BaseGlobalStruct {
     Array1D<Real64> CPHSUNHR = Array1D<Real64>(24, 0.0); // Hourly values of the cosine of PHSUN
     Array1D<Real64> THSUNHR = Array1D<Real64>(24, 0.0);  // Hourly values of THSUN
 
+    // In the following I,J,K arrays:
+    // I = 1 for clear sky, 2 for clear turbid, 3 for intermediate, 4 for overcast;
+    // J = 1 for bare window, 2 - 12 for shaded;
+    // K = sun position index.
+    Array3D<Real64> EINTSK = Array3D<Real64>(24, DataSurfaces::MaxSlatAngs + 1, 4, 0.0); // Sky-related portion of internally reflected illuminance
+    Array2D<Real64> EINTSU = Array2D<Real64>(24, DataSurfaces::MaxSlatAngs + 1, 0.0);    // Sun-related portion of internally reflected illuminance,
+    // excluding entering beam
+    Array2D<Real64> EINTSUdisk = Array2D<Real64>(24, DataSurfaces::MaxSlatAngs + 1, 0.0); // Sun-related portion of internally reflected illuminance
+    // due to entering beam
+    Array3D<Real64> WLUMSK = Array3D<Real64>(24, DataSurfaces::MaxSlatAngs + 1, 4, 0.0);  // Sky-related window luminance
+    Array2D<Real64> WLUMSU = Array2D<Real64>(24, DataSurfaces::MaxSlatAngs + 1, 0.0);     // Sun-related window luminance, excluding view of solar disk
+    Array2D<Real64> WLUMSUdisk = Array2D<Real64>(24, DataSurfaces::MaxSlatAngs + 1, 0.0); // Sun-related window luminance, due to view of solar disk
+
+    Array2D<Real64> GILSK = Array2D<Real64>(24, 4, 0.0); // Horizontal illuminance from sky, by sky type, for each hour of the day
+    Array1D<Real64> GILSU = Array1D<Real64>(24, 0.0);    // Horizontal illuminance from sun for each hour of the day
+
+    Array3D<Real64> EDIRSK = Array3D<Real64>(24, DataSurfaces::MaxSlatAngs + 1, 4);  // Sky-related component of direct illuminance
+    Array2D<Real64> EDIRSU = Array2D<Real64>(24, DataSurfaces::MaxSlatAngs + 1);     // Sun-related component of direct illuminance (excluding beam solar at ref pt)
+    Array2D<Real64> EDIRSUdisk = Array2D<Real64>(24, DataSurfaces::MaxSlatAngs + 1); // Sun-related component of direct illuminance due to beam solar at ref pt
+    Array3D<Real64> AVWLSK = Array3D<Real64>(24, DataSurfaces::MaxSlatAngs + 1, 4);  // Sky-related average window luminance
+    Array2D<Real64> AVWLSU = Array2D<Real64>(24, DataSurfaces::MaxSlatAngs + 1);     // Sun-related average window luminance, excluding view of solar disk
+    Array2D<Real64> AVWLSUdisk = Array2D<Real64>(24, DataSurfaces::MaxSlatAngs + 1); // Sun-related average window luminance due to view of solar disk
+
+    // Allocatable daylight factor arrays  -- are in the ZoneDaylight Structure
+
+    Array2D<Real64> TDDTransVisBeam;
+    Array3D<Real64> TDDFluxInc;
+    Array3D<Real64> TDDFluxTrans;
+
+    Array2D_int MapErrIndex;
+    Array2D_int RefErrIndex;
+
     void clear_state() override
     {
         this->CalcDayltghCoefficients_firstTime = true;
@@ -565,6 +561,25 @@ struct DaylightingManagerData : BaseGlobalStruct {
         this->SPHSUNHR = Array1D<Real64>(24, 0.0);
         this->CPHSUNHR = Array1D<Real64>(24, 0.0);
         this->THSUNHR = Array1D<Real64>(24, 0.0);
+        this->EINTSK = Array3D<Real64>(24, DataSurfaces::MaxSlatAngs + 1, 4, 0.0);
+        this->EINTSU = Array2D<Real64>(24, DataSurfaces::MaxSlatAngs + 1, 0.0);
+        this->EINTSUdisk = Array2D<Real64>(24, DataSurfaces::MaxSlatAngs + 1, 0.0);
+        this->WLUMSK = Array3D<Real64>(24, DataSurfaces::MaxSlatAngs + 1, 4, 0.0);
+        this->WLUMSU = Array2D<Real64>(24, DataSurfaces::MaxSlatAngs + 1, 0.0);
+        this->WLUMSUdisk = Array2D<Real64>(24, DataSurfaces::MaxSlatAngs + 1, 0.0);
+        this->GILSK = Array2D<Real64>(24, 4, 0.0);
+        this->GILSU = Array1D<Real64>(24, 0.0);
+        this->EDIRSK = Array3D<Real64>(24, DataSurfaces::MaxSlatAngs + 1, 4);
+        this->EDIRSU = Array2D<Real64>(24, DataSurfaces::MaxSlatAngs + 1);
+        this->EDIRSUdisk = Array2D<Real64>(24, DataSurfaces::MaxSlatAngs + 1);
+        this->AVWLSK = Array3D<Real64>(24, DataSurfaces::MaxSlatAngs + 1, 4);
+        this->AVWLSU = Array2D<Real64>(24, DataSurfaces::MaxSlatAngs + 1);
+        this->AVWLSUdisk = Array2D<Real64>(24, DataSurfaces::MaxSlatAngs + 1);
+        this->TDDTransVisBeam.deallocate();
+        this->TDDFluxInc.deallocate();
+        this->TDDFluxTrans.deallocate();
+        this->MapErrIndex.deallocate();
+        this->RefErrIndex.deallocate();
     }
 };
 
