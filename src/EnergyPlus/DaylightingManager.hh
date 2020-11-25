@@ -72,23 +72,18 @@ namespace DaylightingManager {
     using DataBSDFWindow::BSDFRefPoints;
     using DataBSDFWindow::BSDFRefPointsGeomDescr;
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    extern int const octreeCrossover; // Surface count crossover for switching to octree algorithm
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern int TotWindowsWithDayl;    // Total number of exterior windows in all daylit zones
-    extern Array1D<Real64> DaylIllum; // Daylight illuminance at reference points (lux)
-    extern int maxNumRefPtInAnyZone;  // The most number of reference points that any single zone has
-    extern int maxNumRefPtInAnyEncl;  // The most number of reference points that any single enclosure has
-    extern Real64 PHSUN;              // Solar altitude (radians)
-    extern Real64 SPHSUN;             // Sine of solar altitude
-    extern Real64 CPHSUN;             // Cosine of solar altitude
-    extern Real64 THSUN;              // Solar azimuth (rad) in Absolute Coordinate System (azimuth=0 along east)
-    extern Array1D<Real64> PHSUNHR;   // Hourly values of PHSUN
-    extern Array1D<Real64> SPHSUNHR;  // Hourly values of the sine of PHSUN
-    extern Array1D<Real64> CPHSUNHR;  // Hourly values of the cosine of PHSUN
-    extern Array1D<Real64> THSUNHR;   // Hourly values of THSUN
+    // Surface count crossover for using octree algorithm
+    // The octree gives lower computational complexity for much higher performance
+    //  as the surface count increases but has some overhead such that the direct
+    //  algorithm can be more efficient at small surface counts.
+    // Testing to date shows that the octree performance is close to that of the
+    //  direct algorithm even with small surface counts and that there is no single
+    //  crossover that is ideal for all models: some cases with 10-30 surfaces were
+    //  faster with the octree but another with 80 surfaces was faster with the
+    //  direct algorithm.
+    // A reasonable, conservative crossover is selected but may be refined as more
+    //  experience is gained.
+    constexpr int octreeCrossover(100); // Octree surface count crossover
 
     // In the following I,J,K arrays:
     // I = 1 for clear sky, 2 for clear turbid, 3 for intermediate, 4 for overcast;
@@ -457,7 +452,8 @@ namespace DaylightingManager {
                                                 Optional_int_const MapNum = _,
                                                 Optional<Real64 const> MapWindowSolidAngAtRefPtWtd = _);
 
-    Real64 DayltgSkyLuminance(int const ISky,     // Sky type: 1=clear, 2=clear turbid, 3=intermediate, 4=overcast
+    Real64 DayltgSkyLuminance(EnergyPlusData &state,
+                              int const ISky,     // Sky type: 1=clear, 2=clear turbid, 3=intermediate, 4=overcast
                               Real64 const THSKY, // Azimuth and altitude of sky element (radians)
                               Real64 const PHSKY);
 
@@ -529,6 +525,19 @@ struct DaylightingManagerData : BaseGlobalStruct {
     bool doSkyReporting = true;
     bool CreateDFSReportFile = true;
 
+    int TotWindowsWithDayl = 0;         // Total number of exterior windows in all daylit zones
+    Array1D<Real64> DaylIllum;         // Daylight illuminance at reference points (lux)
+    int maxNumRefPtInAnyZone = 0;       // The most number of reference points that any single zone has
+    int maxNumRefPtInAnyEncl = 0;       // The most number of reference points that any single enclosure has
+    Real64 PHSUN = 0.0;                 // Solar altitude (radians)
+    Real64 SPHSUN = 0.0;                // Sine of solar altitude
+    Real64 CPHSUN = 0.0;                // Cosine of solar altitude
+    Real64 THSUN = 0.0;                 // Solar azimuth (rad) in Absolute Coordinate System (azimuth=0 along east)
+    Array1D<Real64> PHSUNHR = Array1D<Real64>(24, 0.0);  // Hourly values of PHSUN
+    Array1D<Real64> SPHSUNHR = Array1D<Real64>(24, 0.0); // Hourly values of the sine of PHSUN
+    Array1D<Real64> CPHSUNHR = Array1D<Real64>(24, 0.0); // Hourly values of the cosine of PHSUN
+    Array1D<Real64> THSUNHR = Array1D<Real64>(24, 0.0);  // Hourly values of THSUN
+
     void clear_state() override
     {
         this->CalcDayltghCoefficients_firstTime = true;
@@ -544,6 +553,18 @@ struct DaylightingManagerData : BaseGlobalStruct {
         this->SQFirstTime = true;
         this->doSkyReporting = true;
         this->CreateDFSReportFile = true;
+        this->TotWindowsWithDayl = 0;
+        this->DaylIllum.deallocate();
+        this->maxNumRefPtInAnyZone = 0;
+        this->maxNumRefPtInAnyEncl = 0;
+        this->PHSUN = 0.0;
+        this->SPHSUN = 0.0;
+        this->CPHSUN = 0.0;
+        this->THSUN = 0.0;
+        this->PHSUNHR = Array1D<Real64>(24, 0.0);
+        this->SPHSUNHR = Array1D<Real64>(24, 0.0);
+        this->CPHSUNHR = Array1D<Real64>(24, 0.0);
+        this->THSUNHR = Array1D<Real64>(24, 0.0);
     }
 };
 
