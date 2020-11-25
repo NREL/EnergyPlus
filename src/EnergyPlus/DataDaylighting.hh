@@ -94,9 +94,9 @@ namespace DataDaylighting {
 
     // Parameters for "Lighting Control Type"
     enum class iLtgCtrlType {
-        Continuous,
-        Stepped,
-        ContinuousOff
+        Continuous = 1,
+        Stepped = 2,
+        ContinuousOff = 3
     };
 
     struct IntWinAdjZoneExtWinStruct // nested structure for ZoneDaylight
