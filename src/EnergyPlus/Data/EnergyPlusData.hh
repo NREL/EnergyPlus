@@ -100,6 +100,7 @@ struct DataWaterData;
 struct DaylightingData;
 struct DataDaylightingDevicesData;
 struct DaylightingDevicesData;
+struct DaylightingManagerData;
 struct EIRPlantLoopHeatPumpsData;
 struct ExteriorEnergyUseData;
 struct FansData;
@@ -189,6 +190,7 @@ struct EnergyPlusData : BaseGlobalStruct {
     std::unique_ptr<DaylightingData> dataDaylightingData;
     std::unique_ptr<DataDaylightingDevicesData> dataDaylightingDevicesData;
     std::unique_ptr<DaylightingDevicesData> dataDaylightingDevices;
+    std::unique_ptr<DaylightingManagerData> dataDaylightingManager;
     std::unique_ptr<EIRPlantLoopHeatPumpsData> dataEIRPlantLoopHeatPump;
     std::unique_ptr<ExteriorEnergyUseData> dataExteriorEnergyUse;
     std::unique_ptr<FansData> dataFans;

@@ -374,7 +374,8 @@ namespace DaylightingManager {
                                 int const ZoneNum        // Zone number
     );
 
-    void DayltgExtHorizIllum(Array1A<Real64> HISK, // Horizontal illuminance from sky for different sky types
+    void DayltgExtHorizIllum(EnergyPlusData &state,
+                             Array1A<Real64> HISK, // Horizontal illuminance from sky for different sky types
                              Real64 &HISU          // Horizontal illuminance from sun for unit beam normal
     );
 
@@ -511,6 +512,40 @@ namespace DaylightingManager {
                                Real64 const zcoord);
 
 } // namespace DaylightingManager
+
+struct DaylightingManagerData : BaseGlobalStruct {
+
+    bool CalcDayltghCoefficients_firstTime = true;
+    bool refFirstTime = true;
+    bool DayltgInteriorIllum_firstTime = true; // true first time routine is called
+    bool FirstTimeDaylFacCalc = true;
+    bool VeryFirstTime = true;
+    bool mapFirstTime = true;
+    bool CheckTDDs_firstTime = true;
+    bool DayltgExtHorizIllum_firstTime = true; // flag for first time thru to initialize
+    bool DayltgInteriorMapIllum_FirstTimeFlag = true;
+    bool ReportIllumMap_firstTime = true;
+    bool SQFirstTime = true;
+    bool doSkyReporting = true;
+    bool CreateDFSReportFile = true;
+
+    void clear_state() override
+    {
+        this->CalcDayltghCoefficients_firstTime = true;
+        this->refFirstTime = true;
+        this->DayltgInteriorIllum_firstTime = true;
+        this->FirstTimeDaylFacCalc = true;
+        this->VeryFirstTime = true;
+        this->mapFirstTime = true;
+        this->CheckTDDs_firstTime = true;
+        this->DayltgExtHorizIllum_firstTime = true;
+        this->DayltgInteriorMapIllum_FirstTimeFlag = true;
+        this->ReportIllumMap_firstTime = true;
+        this->SQFirstTime = true;
+        this->doSkyReporting = true;
+        this->CreateDFSReportFile = true;
+    }
+};
 
 } // namespace EnergyPlus
 

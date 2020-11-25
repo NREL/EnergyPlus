@@ -88,6 +88,7 @@ namespace EnergyPlus {
         this->dataDaylightingData = std::make_unique<DaylightingData>();
         this->dataDaylightingDevicesData = std::make_unique<DataDaylightingDevicesData>();
         this->dataDaylightingDevices = std::make_unique<DaylightingDevicesData>();
+        this->dataDaylightingManager = std::make_unique<DaylightingManagerData>();
         this->dataEIRPlantLoopHeatPump = std::make_unique<EIRPlantLoopHeatPumpsData>();
         this->dataExteriorEnergyUse = std::make_unique<ExteriorEnergyUseData>();
         this->dataFans = std::make_unique<FansData>();
@@ -175,6 +176,7 @@ namespace EnergyPlus {
         this->dataDaylightingData->clear_state();
         this->dataDaylightingDevicesData->clear_state();
         this->dataDaylightingDevices->clear_state();
+        this->dataDaylightingManager->clear_state();
         this->dataEIRPlantLoopHeatPump->clear_state();
         this->dataExteriorEnergyUse->clear_state();
         this->dataFans->clear_state();

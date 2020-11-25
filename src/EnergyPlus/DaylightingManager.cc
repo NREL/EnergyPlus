@@ -155,19 +155,7 @@ namespace DaylightingManager {
 
     // Data
     // MODULE PARAMETER DEFINITIONS:
-    bool CalcDayltghCoefficients_firstTime(true);
-    bool refFirstTime(true);
-    bool DayltgInteriorIllum_firstTime(true); // true first time routine is called
-    bool FirstTimeDaylFacCalc(true);
-    bool VeryFirstTime(true);
-    bool mapFirstTime(true);
-    bool CheckTDDs_firstTime(true);
-    bool DayltgExtHorizIllum_firstTime(true); // flag for first time thru to initialize
-    bool DayltgInteriorMapIllum_FirstTimeFlag(true);
-    bool ReportIllumMap_firstTime(true);
-    bool SQFirstTime(true);
-    bool doSkyReporting(true);
-    bool CreateDFSReportFile(true);
+
 
     // Surface count crossover for using octree algorithm
     // The octree gives lower computational complexity for much higher performance
@@ -237,21 +225,10 @@ namespace DaylightingManager {
     void clear_state()
     {
         // this will need a lot more, but it is a start
-        CalcDayltghCoefficients_firstTime = true;
         TDDTransVisBeam.deallocate();
         TDDFluxInc.deallocate();
         TDDFluxTrans.deallocate();
         RefErrIndex.deallocate();
-        refFirstTime = true;
-        DayltgInteriorIllum_firstTime = true;
-        FirstTimeDaylFacCalc = true;
-        VeryFirstTime = true;
-        mapFirstTime = true;
-        CheckTDDs_firstTime = true;
-        DayltgExtHorizIllum_firstTime = true;
-        DayltgInteriorMapIllum_FirstTimeFlag = true;
-        ReportIllumMap_firstTime = true;
-        SQFirstTime = true;
         TotWindowsWithDayl = 0;
         DaylIllum.deallocate();
         maxNumRefPtInAnyZone = 0;
@@ -266,8 +243,6 @@ namespace DaylightingManager {
         TDDFluxTrans.deallocate();
         MapErrIndex.deallocate();
         RefErrIndex.deallocate();
-        doSkyReporting = true;
-        CreateDFSReportFile = true;
     }
 
     void DayltgAveInteriorReflectance(EnergyPlusData &state, int &ZoneNum) // Zone number
@@ -542,11 +517,11 @@ namespace DaylightingManager {
         int ISlatAngle;
 
         // FLOW:
-        if (CalcDayltghCoefficients_firstTime) {
+        if (state.dataDaylightingManager->CalcDayltghCoefficients_firstTime) {
             GetDaylightingParametersInput(state);
             CheckTDDsAndLightShelvesInDaylitZones(state);
             AssociateWindowShadingControlWithDaylighting(state);
-            CalcDayltghCoefficients_firstTime = false;
+            state.dataDaylightingManager->CalcDayltghCoefficients_firstTime = false;
         } // End of check if firstTime
 
         // Find the total number of exterior windows associated with all Daylighting:Detailed zones.
@@ -643,7 +618,7 @@ namespace DaylightingManager {
                     THSUN = THSUNHR(IHR);
                     SPHSUN = SPHSUNHR(IHR);
                     CPHSUN = CPHSUNHR(IHR);
-                    DayltgExtHorizIllum(GILSK(IHR, 1), GILSU(IHR));
+                    DayltgExtHorizIllum(state, GILSK(IHR, 1), GILSU(IHR));
                 }
             }
         } else { // timestep integrated calculations
@@ -668,7 +643,7 @@ namespace DaylightingManager {
                 THSUN = THSUNHR(state.dataGlobal->HourOfDay);
                 SPHSUN = SPHSUNHR(state.dataGlobal->HourOfDay);
                 CPHSUN = CPHSUNHR(state.dataGlobal->HourOfDay);
-                DayltgExtHorizIllum(GILSK(state.dataGlobal->HourOfDay, 1), GILSU(state.dataGlobal->HourOfDay));
+                DayltgExtHorizIllum(state, GILSK(state.dataGlobal->HourOfDay, 1), GILSU(state.dataGlobal->HourOfDay));
             }
         }
 
@@ -689,9 +664,9 @@ namespace DaylightingManager {
 
         } // End of zone loop, ZoneNum
 
-        if (doSkyReporting) {
+        if (state.dataDaylightingManager->doSkyReporting) {
             if (!state.dataGlobal->KickOffSizing && !state.dataGlobal->KickOffSimulation) {
-                if (FirstTimeDaylFacCalc && TotWindowsWithDayl > 0) {
+                if (state.dataDaylightingManager->FirstTimeDaylFacCalc && TotWindowsWithDayl > 0) {
                     // Write the bare-window four sky daylight factors at noon time to the eio file; this is done only
                     // for first time that daylight factors are calculated and so is insensitive to possible variation
                     // due to change in ground reflectance from month to month, or change in storm window status.
@@ -736,8 +711,8 @@ namespace DaylightingManager {
                             }
                         }
                     }
-                    FirstTimeDaylFacCalc = false;
-                    doSkyReporting = false;
+                    state.dataDaylightingManager->FirstTimeDaylFacCalc = false;
+                    state.dataDaylightingManager->doSkyReporting = false;
                 }
             }
         }
@@ -764,14 +739,14 @@ namespace DaylightingManager {
         }
 
         // open a new file eplusout.dfs for saving the daylight factors
-        if (CreateDFSReportFile) {
+        if (state.dataDaylightingManager->CreateDFSReportFile) {
             InputOutputFile &dfs = state.files.dfs.ensure_open(state, "CalcDayltgCoefficients", state.files.outputControl.dfs);
             print(dfs, "{}\n", "This file contains daylight factors for all exterior windows of daylight zones.");
             print(dfs, "{}\n", "MonthAndDay,Zone Name,Window Name,Window State");
             print(dfs, "{}\n",
                    "Hour,Reference Point,Daylight Factor for Clear Sky,Daylight Factor for Clear Turbid Sky,"
                    "Daylight Factor for Intermediate Sky,Daylight Factor for Overcast Sky");
-            CreateDFSReportFile = false;
+            state.dataDaylightingManager->CreateDFSReportFile = false;
         }
 
         for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
@@ -879,7 +854,7 @@ namespace DaylightingManager {
         bool ErrorsFound;
         int MapNum;
 
-        if (VeryFirstTime) {
+        if (state.dataDaylightingManager->VeryFirstTime) {
             // make sure all necessary surfaces match to pipes
             ErrorsFound = false;
             for (TZoneNum = 1; TZoneNum <= state.dataGlobal->NumOfZones; ++TZoneNum) {
@@ -900,7 +875,7 @@ namespace DaylightingManager {
             if (ErrorsFound) {
                 ShowFatalError(state, "Not all TubularDaylightDome objects have corresponding DaylightingDevice:Tubular objects. Program terminates.");
             }
-            VeryFirstTime = false;
+            state.dataDaylightingManager->VeryFirstTime = false;
         }
 
         // Calc for daylighting reference points
@@ -1026,11 +1001,11 @@ namespace DaylightingManager {
 
         int WinEl; // Current window element
 
-        if (refFirstTime &&
+        if (state.dataDaylightingManager->refFirstTime &&
             std::any_of(state.dataDaylightingData->ZoneDaylight.begin(), state.dataDaylightingData->ZoneDaylight.end(), [](DataDaylighting::ZoneDaylightCalc const &e) { return e.TotalDaylRefPoints > 0; })) {
             RefErrIndex.allocate(maxval(state.dataDaylightingData->ZoneDaylight, &DataDaylighting::ZoneDaylightCalc::TotalDaylRefPoints), TotSurfaces);
             RefErrIndex = 0;
-            refFirstTime = false;
+            state.dataDaylightingManager->refFirstTime = false;
         }
 
         // Azimuth of view vector in absolute coord sys
@@ -1428,13 +1403,13 @@ namespace DaylightingManager {
         static bool MySunIsUpFlag(false);
         int WinEl; // window elements counter
 
-        if (mapFirstTime && state.dataDaylightingData->TotIllumMaps > 0) {
+        if (state.dataDaylightingManager->mapFirstTime && state.dataDaylightingData->TotIllumMaps > 0) {
             IL = -999;
             for (MapNum = 1; MapNum <= state.dataDaylightingData->TotIllumMaps; ++MapNum) {
                 IL = max(IL, state.dataDaylightingData->IllumMapCalc(MapNum).TotalMapRefPoints);
             }
             MapErrIndex.dimension(IL, TotSurfaces, 0);
-            mapFirstTime = false;
+            state.dataDaylightingManager->mapFirstTime = false;
         }
 
         // Azimuth of view vector in absolute coord sys
@@ -5874,7 +5849,8 @@ namespace DaylightingManager {
         }
     }
 
-    void DayltgExtHorizIllum(Array1A<Real64> HISK, // Horizontal illuminance from sky for different sky types
+    void DayltgExtHorizIllum(EnergyPlusData &state,
+                             Array1A<Real64> HISK, // Horizontal illuminance from sky for different sky types
                              Real64 &HISU          // Horizontal illuminance from sun for unit beam normal
     )
     {
@@ -5933,7 +5909,7 @@ namespace DaylightingManager {
         // is L(TH,PH)*SIN(PH)*COS(PH)*DTH*DPH, where L(TH,PH) is the luminance
         // of the patch in cd/m2.
         //  Init
-        if (DayltgExtHorizIllum_firstTime) {
+        if (state.dataDaylightingManager->DayltgExtHorizIllum_firstTime) {
             for (IPH = 1; IPH <= NPH; ++IPH) {
                 PH(IPH) = (IPH - 0.5) * DPH;
                 SPHCPH(IPH) = std::sin(PH(IPH)) * std::cos(PH(IPH)); // DA = COS(PH)*DTH*DPH
@@ -5941,7 +5917,7 @@ namespace DaylightingManager {
             for (ITH = 1; ITH <= NTH; ++ITH) {
                 TH(ITH) = (ITH - 0.5) * DTH;
             }
-            DayltgExtHorizIllum_firstTime = false;
+            state.dataDaylightingManager->DayltgExtHorizIllum_firstTime = false;
         }
 
         HISK = 0.0;
@@ -6367,7 +6343,7 @@ namespace DaylightingManager {
 
         // Three arrays to save original clear and dark (fully switched) states'
         //  zone/window daylighting properties.
-        if (DayltgInteriorIllum_firstTime) {
+        if (state.dataDaylightingManager->DayltgInteriorIllum_firstTime) {
             int const d1(max(maxval(Zone, &ZoneData::NumSubSurfaces), maxval(state.dataDaylightingData->ZoneDaylight, &DataDaylighting::ZoneDaylightCalc::NumOfDayltgExtWins)));
             tmpIllumFromWinAtRefPt.allocate(d1, 2, maxNumRefPtInAnyZone);
             tmpBackLumFromWinAtRefPt.allocate(d1, 2, maxNumRefPtInAnyZone);
@@ -6378,7 +6354,7 @@ namespace DaylightingManager {
             GLRNDX.allocate(maxNumRefPtInAnyZone);
             GLRNEW.allocate(maxNumRefPtInAnyZone);
 
-            DayltgInteriorIllum_firstTime = false;
+            state.dataDaylightingManager->DayltgInteriorIllum_firstTime = false;
         }
         tmpIllumFromWinAtRefPt = 0.0;
         tmpBackLumFromWinAtRefPt = 0.0;
@@ -9567,11 +9543,11 @@ namespace DaylightingManager {
         int MapNum;
         int ILM;
 
-        if (DayltgInteriorMapIllum_FirstTimeFlag) {
+        if (state.dataDaylightingManager->DayltgInteriorMapIllum_FirstTimeFlag) {
             daylight_illum.allocate(DataDaylighting::MaxMapRefPoints);
             BACLUM.allocate(DataDaylighting::MaxMapRefPoints);
             GLRNDX.allocate(DataDaylighting::MaxMapRefPoints);
-            DayltgInteriorMapIllum_FirstTimeFlag = false;
+            state.dataDaylightingManager->DayltgInteriorMapIllum_FirstTimeFlag = false;
         }
 
         if (state.dataGlobal->WarmupFlag) return;
@@ -10012,8 +9988,8 @@ namespace DaylightingManager {
         // BSLLC Finish
 
         // FLOW:
-        if (ReportIllumMap_firstTime) {
-            ReportIllumMap_firstTime = false;
+        if (state.dataDaylightingManager->ReportIllumMap_firstTime) {
+            state.dataDaylightingManager->ReportIllumMap_firstTime = false;
             FirstTimeMaps.dimension(state.dataDaylightingData->TotIllumMaps, true);
             EnvrnPrint.dimension(state.dataDaylightingData->TotIllumMaps, true);
             RefPts.allocate(state.dataGlobal->NumOfZones, DataDaylighting::MaxRefPoints);
@@ -10123,13 +10099,13 @@ namespace DaylightingManager {
                 } // X
 
                 if (sqlite) {
-                    if (SQFirstTime) {
+                    if (state.dataDaylightingManager->SQFirstTime) {
                         int const nX(maxval(state.dataDaylightingData->IllumMap, &DataDaylighting::IllumMapData::Xnum));
                         int const nY(maxval(state.dataDaylightingData->IllumMap, &DataDaylighting::IllumMapData::Ynum));
                         XValue.allocate(nX);
                         YValue.allocate(nY);
                         IllumValue.allocate(nX, nY);
-                        SQFirstTime = false;
+                        state.dataDaylightingManager->SQFirstTime = false;
                     }
 
                     // We need DataGlobals::CalendarYear, and not DataEnvironment::Year because
