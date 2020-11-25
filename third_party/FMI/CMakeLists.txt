@@ -25,7 +25,7 @@ SET(SRC
 ADD_LIBRARY( epfmiimport STATIC ${SRC} )
 
 IF (UNIX)
-  ADD_DEFINITIONS("-fPIC -Wall -Wno-maybe-uninitialized -Wno-switch -Wno-unused-variable -Wno-unused-but-set-variable -Wno-unused-function -Werror")
+  ADD_DEFINITIONS("-fPIC")
 ENDIF()
 
 TARGET_LINK_LIBRARIES( epfmiimport epexpat miniziplib )

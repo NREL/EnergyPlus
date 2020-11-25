@@ -21,7 +21,7 @@ SET(SRC
 #ADD_LIBRARY( parser SHARED ${SRC} )
 
 IF (UNIX)
-  ADD_DEFINITIONS("-fPIC -Wall -Wno-maybe-uninitialized -Wno-switch -Wno-unused-variable -Wno-unused-but-set-variable -Wno-unused-function -Werror")
+  ADD_DEFINITIONS("-fPIC")
 ENDIF()
 
 ADD_EXECUTABLE( parser ${SRC} )
