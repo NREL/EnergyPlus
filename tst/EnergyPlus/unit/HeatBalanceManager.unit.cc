@@ -161,7 +161,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_WindowMaterial_Gap_Duplicate_Names)
 
     ASSERT_FALSE(process_idf(idf_objects, false)); // expect errors
     std::string const error_string = delimited_string({
-        "   ** Severe  ** Duplicate name found. name: \"Gap_1_Layer\". Overwriting existing object.",
+        "   ** Severe  ** Duplicate name found for object of type \"WindowMaterial:Gap\" named \"Gap_1_Layer\". Overwriting existing object.",
     });
     EXPECT_TRUE(compare_err_stream(error_string, true));
 
@@ -198,7 +198,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_WindowMaterial_Gap_Duplicate_Names_
 
     ASSERT_FALSE(process_idf(idf_objects, false)); // expect errors
     std::string const error_string = delimited_string({
-        "   ** Severe  ** Duplicate name found. name: \"Gap_1_Layer\". Overwriting existing object.",
+        "   ** Severe  ** Duplicate name found for object of type \"WindowMaterial:Gap\" named \"Gap_1_Layer\". Overwriting existing object.",
     });
     EXPECT_TRUE(compare_err_stream(error_string, true));
 
