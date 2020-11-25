@@ -361,7 +361,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_GetInputPTAC_InletSide)
     ASSERT_EQ(1, state->dataSingleDuct->NumATMixers);
     EXPECT_EQ("SPACE1-1 DOAS AIR TERMINAL", state->dataSingleDuct->SysATMixer(1).Name);              // single duct air terminal mixer name
     EXPECT_EQ(DataHVACGlobals::ATMixer_InletSide, state->dataSingleDuct->SysATMixer(1).MixerType);   // air terminal mixer connection type
-    EXPECT_EQ("AIRTERMINAL:SINGLEDUCT:MIXER", AirDistUnit(1).EquipType(1));   // Air distribution unit equipment type
+    EXPECT_EQ("AIRTERMINAL:SINGLEDUCT:MIXER", state->dataDefineEquipment->AirDistUnit(1).EquipType(1));   // Air distribution unit equipment type
     EXPECT_EQ("ZoneHVAC:PackagedTerminalAirConditioner", PTUnit(1).UnitType); // zoneHVAC equipment type
 }
 
@@ -613,7 +613,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMInletSide)
     ASSERT_EQ(1, state->dataSingleDuct->NumATMixers);
     EXPECT_EQ("SPACE1-1 DOAS AIR TERMINAL", state->dataSingleDuct->SysATMixer(1).Name);              // single duct air terminal mixer name
     EXPECT_EQ(DataHVACGlobals::ATMixer_InletSide, state->dataSingleDuct->SysATMixer(1).MixerType);   // air terminal mixer connection type
-    EXPECT_EQ("AIRTERMINAL:SINGLEDUCT:MIXER", AirDistUnit(1).EquipType(1));   // Air distribution unit equipment type
+    EXPECT_EQ("AIRTERMINAL:SINGLEDUCT:MIXER", state->dataDefineEquipment->AirDistUnit(1).EquipType(1));   // Air distribution unit equipment type
     EXPECT_EQ("ZoneHVAC:PackagedTerminalAirConditioner", PTUnit(1).UnitType); // zoneHVAC equipment type
 
     state->dataGlobal->BeginEnvrnFlag = false;
@@ -944,7 +944,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMSupplySide)
     ASSERT_EQ(1, state->dataSingleDuct->NumATMixers);
     EXPECT_EQ("SPACE1-1 DOAS AIR TERMINAL", state->dataSingleDuct->SysATMixer(1).Name);              // single duct air terminal mixer name
     EXPECT_EQ(DataHVACGlobals::ATMixer_SupplySide, state->dataSingleDuct->SysATMixer(1).MixerType);  // air terminal mixer connection type
-    EXPECT_EQ("AIRTERMINAL:SINGLEDUCT:MIXER", AirDistUnit(1).EquipType(1));   // Air distribution unit equipment type
+    EXPECT_EQ("AIRTERMINAL:SINGLEDUCT:MIXER", state->dataDefineEquipment->AirDistUnit(1).EquipType(1));   // Air distribution unit equipment type
     EXPECT_EQ("ZoneHVAC:PackagedTerminalAirConditioner", PTUnit(1).UnitType); // zoneHVAC equipment type
 
     // set input variables
@@ -1358,7 +1358,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMInletSide)
     ASSERT_EQ(1, state->dataSingleDuct->NumATMixers);
     EXPECT_EQ("SPACE1-1 DOAS AIR TERMINAL", state->dataSingleDuct->SysATMixer(1).Name);            // single duct air terminal mixer name
     EXPECT_EQ(DataHVACGlobals::ATMixer_InletSide, state->dataSingleDuct->SysATMixer(1).MixerType); // air terminal mixer connection type
-    EXPECT_EQ("AIRTERMINAL:SINGLEDUCT:MIXER", AirDistUnit(1).EquipType(1)); // Air distribution unit equipment type
+    EXPECT_EQ("AIRTERMINAL:SINGLEDUCT:MIXER", state->dataDefineEquipment->AirDistUnit(1).EquipType(1)); // Air distribution unit equipment type
     EXPECT_EQ("ZoneHVAC:PackagedTerminalHeatPump", PTUnit(1).UnitType);     // zoneHVAC equipment type
 
     state->dataGlobal->BeginEnvrnFlag = false;
@@ -1771,7 +1771,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMSupplySide)
     ASSERT_EQ(1, state->dataSingleDuct->NumATMixers);
     EXPECT_EQ("SPACE1-1 DOAS AIR TERMINAL", state->dataSingleDuct->SysATMixer(1).Name);             // single duct air terminal mixer name
     EXPECT_EQ(DataHVACGlobals::ATMixer_SupplySide, state->dataSingleDuct->SysATMixer(1).MixerType); // air terminal mixer connection type
-    EXPECT_EQ("AIRTERMINAL:SINGLEDUCT:MIXER", AirDistUnit(1).EquipType(1));  // Air distribution unit equipment type
+    EXPECT_EQ("AIRTERMINAL:SINGLEDUCT:MIXER", state->dataDefineEquipment->AirDistUnit(1).EquipType(1));  // Air distribution unit equipment type
     EXPECT_EQ("ZoneHVAC:PackagedTerminalHeatPump", PTUnit(1).UnitType);      // zoneHVAC equipment type
 
     // set input variables
@@ -2444,7 +2444,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRF_ATMInletSide)
     ASSERT_EQ(1, state->dataSingleDuct->NumATMixers);
     EXPECT_EQ("SPACE1-1 DOAS AIR TERMINAL", state->dataSingleDuct->SysATMixer(1).Name);            // single duct air terminal mixer name
     EXPECT_EQ(DataHVACGlobals::ATMixer_InletSide, state->dataSingleDuct->SysATMixer(1).MixerType); // air terminal mixer connection type
-    EXPECT_EQ("AIRTERMINAL:SINGLEDUCT:MIXER", AirDistUnit(1).EquipType(1)); // Air distribution unit equipment type
+    EXPECT_EQ("AIRTERMINAL:SINGLEDUCT:MIXER", state->dataDefineEquipment->AirDistUnit(1).EquipType(1)); // Air distribution unit equipment type
     EXPECT_EQ("TU1", VRFTU(1).Name);                                        // zoneHVAC equipment name
     // EXPECT_EQ( "ZoneHVAC:TerminalUnit:VariableRefrigerantFlow", VRFTU( 1 ).Name ); // zoneHVAC equipment type
 
@@ -3123,7 +3123,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRF_ATMSupplySide)
     ASSERT_EQ(1, state->dataSingleDuct->NumATMixers);
     EXPECT_EQ("SPACE1-1 DOAS AIR TERMINAL", state->dataSingleDuct->SysATMixer(1).Name);             // single duct air terminal mixer name
     EXPECT_EQ(DataHVACGlobals::ATMixer_SupplySide, state->dataSingleDuct->SysATMixer(1).MixerType); // air terminal mixer connection type
-    EXPECT_EQ("AIRTERMINAL:SINGLEDUCT:MIXER", AirDistUnit(1).EquipType(1));  // Air distribution unit equipment type
+    EXPECT_EQ("AIRTERMINAL:SINGLEDUCT:MIXER", state->dataDefineEquipment->AirDistUnit(1).EquipType(1));  // Air distribution unit equipment type
     EXPECT_EQ("TU1", VRFTU(1).Name);                                         // zoneHVAC equipment name
 
     state->dataGlobal->BeginEnvrnFlag = false;
@@ -4873,7 +4873,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMInletSi
     ASSERT_EQ(1, state->dataSingleDuct->NumATMixers);
     EXPECT_EQ("SPACE1-1 DOAS AIR TERMINAL", state->dataSingleDuct->SysATMixer(1).Name);            // single duct air terminal mixer name
     EXPECT_EQ(DataHVACGlobals::ATMixer_InletSide, state->dataSingleDuct->SysATMixer(1).MixerType); // air terminal mixer connection type
-    EXPECT_EQ("AIRTERMINAL:SINGLEDUCT:MIXER", AirDistUnit(1).EquipType(1)); // Air distribution unit equipment type
+    EXPECT_EQ("AIRTERMINAL:SINGLEDUCT:MIXER", state->dataDefineEquipment->AirDistUnit(1).EquipType(1)); // Air distribution unit equipment type
     EXPECT_EQ("TU1", VRFTU(1).Name);                                        // zoneHVAC equipment name
 
     state->dataGlobal->BeginEnvrnFlag = false;
@@ -6627,7 +6627,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMSupplyS
     ASSERT_EQ(1, state->dataSingleDuct->NumATMixers);
     EXPECT_EQ("SPACE1-1 DOAS AIR TERMINAL", state->dataSingleDuct->SysATMixer(1).Name);             // single duct air terminal mixer name
     EXPECT_EQ(DataHVACGlobals::ATMixer_SupplySide, state->dataSingleDuct->SysATMixer(1).MixerType); // air terminal mixer connection type
-    EXPECT_EQ("AIRTERMINAL:SINGLEDUCT:MIXER", AirDistUnit(1).EquipType(1));  // Air distribution unit equipment type
+    EXPECT_EQ("AIRTERMINAL:SINGLEDUCT:MIXER", state->dataDefineEquipment->AirDistUnit(1).EquipType(1));  // Air distribution unit equipment type
     EXPECT_EQ("TU1", VRFTU(1).Name);                                         // zoneHVAC equipment name
 
     state->dataGlobal->BeginEnvrnFlag = false;
@@ -6873,7 +6873,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimUnitVent_ATMInletSide)
     ASSERT_EQ(1, state->dataSingleDuct->NumATMixers);
     EXPECT_EQ("SPACE1-1 DOAS AIR TERMINAL", state->dataSingleDuct->SysATMixer(1).Name);            // single duct air terminal mixer name
     EXPECT_EQ(DataHVACGlobals::ATMixer_InletSide, state->dataSingleDuct->SysATMixer(1).MixerType); // air terminal mixer connection type
-    EXPECT_EQ("AIRTERMINAL:SINGLEDUCT:MIXER", AirDistUnit(1).EquipType(1)); // Air distribution unit equipment type
+    EXPECT_EQ("AIRTERMINAL:SINGLEDUCT:MIXER", state->dataDefineEquipment->AirDistUnit(1).EquipType(1)); // Air distribution unit equipment type
 
     state->dataGlobal->BeginEnvrnFlag = false;
 
@@ -7110,7 +7110,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimUnitVent_ATMSupplySide)
     ASSERT_EQ(1, state->dataSingleDuct->NumATMixers);
     EXPECT_EQ("SPACE1-1 DOAS AIR TERMINAL", state->dataSingleDuct->SysATMixer(1).Name);             // single duct air terminal mixer name
     EXPECT_EQ(DataHVACGlobals::ATMixer_SupplySide, state->dataSingleDuct->SysATMixer(1).MixerType); // air terminal mixer connection type
-    EXPECT_EQ("AIRTERMINAL:SINGLEDUCT:MIXER", AirDistUnit(1).EquipType(1));  // Air distribution unit equipment type
+    EXPECT_EQ("AIRTERMINAL:SINGLEDUCT:MIXER", state->dataDefineEquipment->AirDistUnit(1).EquipType(1));  // Air distribution unit equipment type
 
     // set input variables
     DataEnvironment::OutBaroPress = 101325.0;
@@ -7350,12 +7350,12 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_GetInputDOASpecs)
     ASSERT_EQ(2, state->dataSingleDuct->NumATMixers);
     EXPECT_EQ("SPACE1-1 DOAS AIR TERMINAL", state->dataSingleDuct->SysATMixer(1).Name);            // single duct air terminal mixer name
     EXPECT_EQ(DataHVACGlobals::ATMixer_InletSide, state->dataSingleDuct->SysATMixer(1).MixerType); // air terminal mixer connection type
-    EXPECT_EQ("AIRTERMINAL:SINGLEDUCT:MIXER", AirDistUnit(1).EquipType(1)); // Air distribution unit equipment type
+    EXPECT_EQ("AIRTERMINAL:SINGLEDUCT:MIXER", state->dataDefineEquipment->AirDistUnit(1).EquipType(1)); // Air distribution unit equipment type
     EXPECT_EQ(1, state->dataSingleDuct->SysATMixer(1).OARequirementsPtr);                          // design spec OA pointer - for both mixers this pointer should be 1
 
     EXPECT_EQ("SPACE1-2 DOAS AIR TERMINAL", state->dataSingleDuct->SysATMixer(2).Name);             // single duct air terminal mixer name
     EXPECT_EQ(DataHVACGlobals::ATMixer_SupplySide, state->dataSingleDuct->SysATMixer(2).MixerType); // air terminal mixer connection type
-    EXPECT_EQ("AIRTERMINAL:SINGLEDUCT:MIXER", AirDistUnit(2).EquipType(1));  // Air distribution unit equipment type
+    EXPECT_EQ("AIRTERMINAL:SINGLEDUCT:MIXER", state->dataDefineEquipment->AirDistUnit(2).EquipType(1));  // Air distribution unit equipment type
     // design spec OA pointer - for both mixers this pointer should be 1
     // before the fix, this was 2 which later caused an array bounds error
     EXPECT_EQ(1, state->dataSingleDuct->SysATMixer(2).OARequirementsPtr);
@@ -7553,7 +7553,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimFCU_ATMInletSideTest)
     ASSERT_EQ(1, state->dataSingleDuct->NumATMixers);
     EXPECT_EQ("INLET SIDE MIXER", thisATMixer.Name);                        // single duct air terminal mixer name
     EXPECT_EQ(DataHVACGlobals::ATMixer_InletSide, thisATMixer.MixerType);   // air terminal mixer connection type
-    EXPECT_EQ("AIRTERMINAL:SINGLEDUCT:MIXER", AirDistUnit(1).EquipType(1)); // Air distribution unit equipment type
+    EXPECT_EQ("AIRTERMINAL:SINGLEDUCT:MIXER", state->dataDefineEquipment->AirDistUnit(1).EquipType(1)); // Air distribution unit equipment type
     EXPECT_EQ("FAN:VARIABLEVOLUME", thisFanCoil.FanType);
     EXPECT_EQ("COIL:COOLING:WATER", thisFanCoil.CCoilType);
     EXPECT_EQ("FCU COOLING COIL", thisFanCoil.CCoilName);
@@ -7982,7 +7982,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
     ASSERT_EQ(1, state->dataSingleDuct->NumATMixers);
     EXPECT_EQ("INLET SIDE MIXER", thisATMixer.Name);                        // single duct air terminal mixer name
     EXPECT_EQ(DataHVACGlobals::ATMixer_InletSide, thisATMixer.MixerType);   // air terminal mixer connection type
-    EXPECT_EQ("AIRTERMINAL:SINGLEDUCT:MIXER", AirDistUnit(1).EquipType(1)); // Air distribution unit equipment type
+    EXPECT_EQ("AIRTERMINAL:SINGLEDUCT:MIXER", state->dataDefineEquipment->AirDistUnit(1).EquipType(1)); // Air distribution unit equipment type
     EXPECT_EQ("FAN:VARIABLEVOLUME", thisFanCoil.FanType);
     EXPECT_EQ("COIL:COOLING:WATER", thisFanCoil.CCoilType);
     EXPECT_EQ("FCU COOLING COIL", thisFanCoil.CCoilName);

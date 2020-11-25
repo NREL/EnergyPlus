@@ -3897,13 +3897,13 @@ namespace ZoneEquipmentManager {
         BuildingZoneMixingFlowOld = 0.0;
 
         // Total loop supply and recirc flows (these have been zeroed earlier in InitZoneEquipment
-        for (int airDistUnit = 1; airDistUnit <= DataDefineEquip::NumAirDistUnits; ++airDistUnit) {
-            int airLoop = DataDefineEquip::AirDistUnit(airDistUnit).AirLoopNum;
+        for (int airDistUnit = 1; airDistUnit <= state.dataDefineEquipment->NumAirDistUnits; ++airDistUnit) {
+            int airLoop = state.dataDefineEquipment->AirDistUnit(airDistUnit).AirLoopNum;
             if (airLoop > 0) {
-                state.dataAirLoop->AirLoopFlow(airLoop).SupFlow += DataDefineEquip::AirDistUnit(airDistUnit).MassFlowRateSup;
-                state.dataAirLoop->AirLoopFlow(airLoop).RecircFlow += DataDefineEquip::AirDistUnit(airDistUnit).MassFlowRatePlenInd;
+                state.dataAirLoop->AirLoopFlow(airLoop).SupFlow += state.dataDefineEquipment->AirDistUnit(airDistUnit).MassFlowRateSup;
+                state.dataAirLoop->AirLoopFlow(airLoop).RecircFlow += state.dataDefineEquipment->AirDistUnit(airDistUnit).MassFlowRatePlenInd;
                 state.dataAirLoop->AirLoopFlow(airLoop).LeakFlow +=
-                    DataDefineEquip::AirDistUnit(airDistUnit).MassFlowRateDnStrLk + DataDefineEquip::AirDistUnit(airDistUnit).MassFlowRateUpStrLk;
+                    state.dataDefineEquipment->AirDistUnit(airDistUnit).MassFlowRateDnStrLk + state.dataDefineEquipment->AirDistUnit(airDistUnit).MassFlowRateUpStrLk;
             }
         }
 
@@ -4230,8 +4230,8 @@ namespace ZoneEquipmentManager {
                         // Zone return node could carry supply flow to zone without leaks plus any induced flow from plenum (but don't include other
                         // secondary flows from exhaust nodes)
                         inletMassFlow =
-                            DataDefineEquip::AirDistUnit(ADUNum).MassFlowRateZSup + DataDefineEquip::AirDistUnit(ADUNum).MassFlowRatePlenInd;
-                        maxMinNodeNum = DataDefineEquip::AirDistUnit(ADUNum).OutletNodeNum;
+                            state.dataDefineEquipment->AirDistUnit(ADUNum).MassFlowRateZSup + state.dataDefineEquipment->AirDistUnit(ADUNum).MassFlowRatePlenInd;
+                        maxMinNodeNum = state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum;
                     } else if (inletNum > 0) {
                         // If not connected to an ADU, then use the inlet node flow
                         inletMassFlow = DataLoopNode::Node(thisZoneEquip.InletNode(inletNum)).MassFlowRate;

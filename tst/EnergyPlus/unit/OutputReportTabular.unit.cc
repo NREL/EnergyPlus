@@ -8312,15 +8312,15 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatGainReport)
 
     EnergyPlus::DataHVACGlobals::TimeStepSys = 10.0;
     state->dataGlobal->TimeStepZone = 20.0;
-    EnergyPlus::DataDefineEquip::NumAirDistUnits = 1;
+    state->dataDefineEquipment->NumAirDistUnits = 1;
 
     EnergyPlus::DataHeatBalance::ZonePreDefRep.allocate(1);
-    EnergyPlus::DataDefineEquip::AirDistUnit.allocate(1);
-    EnergyPlus::DataDefineEquip::AirDistUnit(1).ZoneNum = 1;
-    EnergyPlus::DataDefineEquip::AirDistUnit(1).HeatGain = 1000.0;
-    EnergyPlus::DataDefineEquip::AirDistUnit(1).CoolGain = 2000.0;
-    EnergyPlus::DataDefineEquip::AirDistUnit(1).HeatRate = 3.0;
-    EnergyPlus::DataDefineEquip::AirDistUnit(1).CoolRate = 4.0;
+    state->dataDefineEquipment->AirDistUnit.allocate(1);
+    state->dataDefineEquipment->AirDistUnit(1).ZoneNum = 1;
+    state->dataDefineEquipment->AirDistUnit(1).HeatGain = 1000.0;
+    state->dataDefineEquipment->AirDistUnit(1).CoolGain = 2000.0;
+    state->dataDefineEquipment->AirDistUnit(1).HeatRate = 3.0;
+    state->dataDefineEquipment->AirDistUnit(1).CoolRate = 4.0;
 
     state->dataGlobal->NumOfZones = 1;
     EnergyPlus::DataHeatBalance::Zone.allocate(state->dataGlobal->NumOfZones);

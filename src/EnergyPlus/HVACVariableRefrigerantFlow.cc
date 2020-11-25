@@ -5657,9 +5657,9 @@ namespace HVACVariableRefrigerantFlow {
                         for (int inletNode = 1; inletNode <= DataZoneEquipment::ZoneEquipConfig(ctrlZoneNum).NumInletNodes; inletNode++) {
                             if (DataZoneEquipment::ZoneEquipConfig(ctrlZoneNum).InletNodeAirLoopNum(inletNode) != VRFTU(TUIndex).airLoopNum) continue;
                             inletNodeADUNum = DataZoneEquipment::ZoneEquipConfig(ctrlZoneNum).InletNodeADUNum(inletNode);
-                            if (inletNodeADUNum > 0 && inletNodeADUNum <= DataDefineEquip::NumAirDistUnits) {
+                            if (inletNodeADUNum > 0 && inletNodeADUNum <= state.dataDefineEquipment->NumAirDistUnits) {
                                 sysType_Num = DataZoneEquipment::AirDistUnit_Num;
-                                sysName = DataDefineEquip::AirDistUnit(inletNodeADUNum).Name;
+                                sysName = state.dataDefineEquipment->AirDistUnit(inletNodeADUNum).Name;
                                 break;
                             }
                         }

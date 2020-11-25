@@ -5117,8 +5117,6 @@ namespace OutputReportTabular {
         // The peak reports follow a similar example.
 
         // Using/Aliasing
-        using DataDefineEquip::AirDistUnit;
-        using DataDefineEquip::NumAirDistUnits;
         using DataEnvironment::DayOfMonth;
         using DataEnvironment::Month;
         using DataHeatBalance::BuildingPreDefRep;
@@ -5186,14 +5184,14 @@ namespace OutputReportTabular {
         //--------------------
         // HVAC annual heating by ATU
         // HVAC annual cooling by ATU
-        for (iunit = 1; iunit <= NumAirDistUnits; ++iunit) {
+        for (iunit = 1; iunit <= state.dataDefineEquipment->NumAirDistUnits; ++iunit) {
             // HVAC equipment should already have the multipliers included, no "* mult" needed (assumes autosized or multiplied hard-sized air flow).
-            curZone = AirDistUnit(iunit).ZoneNum;
+            curZone = state.dataDefineEquipment->AirDistUnit(iunit).ZoneNum;
             if ((curZone > 0) && (curZone <= state.dataGlobal->NumOfZones)) {
-                ZonePreDefRep(curZone).SHGSAnHvacATUHt += AirDistUnit(iunit).HeatGain;
-                ZonePreDefRep(curZone).SHGSAnHvacATUCl -= AirDistUnit(iunit).CoolGain;
-                ATUHeat(curZone) += AirDistUnit(iunit).HeatRate;
-                ATUCool(curZone) -= AirDistUnit(iunit).CoolRate;
+                ZonePreDefRep(curZone).SHGSAnHvacATUHt += state.dataDefineEquipment->AirDistUnit(iunit).HeatGain;
+                ZonePreDefRep(curZone).SHGSAnHvacATUCl -= state.dataDefineEquipment->AirDistUnit(iunit).CoolGain;
+                ATUHeat(curZone) += state.dataDefineEquipment->AirDistUnit(iunit).HeatRate;
+                ATUCool(curZone) -= state.dataDefineEquipment->AirDistUnit(iunit).CoolRate;
             }
         }
         timeStepRatio = TimeStepSys / state.dataGlobal->TimeStepZone; // the fraction of the zone time step used by the system timestep

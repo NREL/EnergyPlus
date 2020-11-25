@@ -1922,24 +1922,24 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                                         for (EquipNum = 1; EquipNum <= ZoneEquipList(EquipListNum).NumOfEquipTypes; ++EquipNum) {
                                             if (UtilityRoutines::SameString(ZoneEquipList(EquipListNum).EquipType(EquipNum),
                                                                             "ZONEHVAC:AIRDISTRIBUTIONUNIT")) {
-                                                for (ADUNum = 1; ADUNum <= NumAirDistUnits; ++ADUNum) {
+                                                for (ADUNum = 1; ADUNum <= state.dataDefineEquipment->NumAirDistUnits; ++ADUNum) {
                                                     if (UtilityRoutines::SameString(ZoneEquipList(EquipListNum).EquipName(EquipNum),
-                                                                                    AirDistUnit(ADUNum).Name)) {
-                                                        if ((AirDistUnit(ADUNum).EquipType_Num(EquipNum) == DataDefineEquip::iZnAirLoopEquipType::SingleDuctVAVReheat) ||
-                                                            (AirDistUnit(ADUNum).EquipType_Num(EquipNum) == DataDefineEquip::iZnAirLoopEquipType::SingleDuctConstVolNoReheat) ||
-                                                            (AirDistUnit(ADUNum).EquipType_Num(EquipNum) == DataDefineEquip::iZnAirLoopEquipType::SingleDuctConstVolReheat) ||
-                                                            (AirDistUnit(ADUNum).EquipType_Num(EquipNum) == DataDefineEquip::iZnAirLoopEquipType::SingleDuctVAVNoReheat) ||
-                                                            (AirDistUnit(ADUNum).EquipType_Num(EquipNum) == DataDefineEquip::iZnAirLoopEquipType::SingleDuctVAVReheatVSFan) ||
-                                                            (AirDistUnit(ADUNum).EquipType_Num(EquipNum) == DataDefineEquip::iZnAirLoopEquipType::SingleDuctCBVAVReheat) ||
-                                                            (AirDistUnit(ADUNum).EquipType_Num(EquipNum) == DataDefineEquip::iZnAirLoopEquipType::SingleDuctCBVAVNoReheat) ||
-                                                            (AirDistUnit(ADUNum).EquipType_Num(EquipNum) == DataDefineEquip::iZnAirLoopEquipType::SingleDuctConstVolCooledBeam) ||
-                                                            (AirDistUnit(ADUNum).EquipType_Num(EquipNum) == DataDefineEquip::iZnAirLoopEquipType::SingleDuctConstVolFourPipeBeam) ||
-                                                            (AirDistUnit(ADUNum).EquipType_Num(EquipNum) == DataDefineEquip::iZnAirLoopEquipType::DualDuctVAVOutdoorAir)) {
+                                                                                    state.dataDefineEquipment->AirDistUnit(ADUNum).Name)) {
+                                                        if ((state.dataDefineEquipment->AirDistUnit(ADUNum).EquipType_Num(EquipNum) == DataDefineEquip::iZnAirLoopEquipType::SingleDuctVAVReheat) ||
+                                                            (state.dataDefineEquipment->AirDistUnit(ADUNum).EquipType_Num(EquipNum) == DataDefineEquip::iZnAirLoopEquipType::SingleDuctConstVolNoReheat) ||
+                                                            (state.dataDefineEquipment->AirDistUnit(ADUNum).EquipType_Num(EquipNum) == DataDefineEquip::iZnAirLoopEquipType::SingleDuctConstVolReheat) ||
+                                                            (state.dataDefineEquipment->AirDistUnit(ADUNum).EquipType_Num(EquipNum) == DataDefineEquip::iZnAirLoopEquipType::SingleDuctVAVNoReheat) ||
+                                                            (state.dataDefineEquipment->AirDistUnit(ADUNum).EquipType_Num(EquipNum) == DataDefineEquip::iZnAirLoopEquipType::SingleDuctVAVReheatVSFan) ||
+                                                            (state.dataDefineEquipment->AirDistUnit(ADUNum).EquipType_Num(EquipNum) == DataDefineEquip::iZnAirLoopEquipType::SingleDuctCBVAVReheat) ||
+                                                            (state.dataDefineEquipment->AirDistUnit(ADUNum).EquipType_Num(EquipNum) == DataDefineEquip::iZnAirLoopEquipType::SingleDuctCBVAVNoReheat) ||
+                                                            (state.dataDefineEquipment->AirDistUnit(ADUNum).EquipType_Num(EquipNum) == DataDefineEquip::iZnAirLoopEquipType::SingleDuctConstVolCooledBeam) ||
+                                                            (state.dataDefineEquipment->AirDistUnit(ADUNum).EquipType_Num(EquipNum) == DataDefineEquip::iZnAirLoopEquipType::SingleDuctConstVolFourPipeBeam) ||
+                                                            (state.dataDefineEquipment->AirDistUnit(ADUNum).EquipType_Num(EquipNum) == DataDefineEquip::iZnAirLoopEquipType::DualDuctVAVOutdoorAir)) {
                                                             ShowWarningError(state, CurrentModuleObject + "=\"" + thisVentilationMechanical.Name +
                                                                              "\", inappropriate use of Zone secondary recirculation");
                                                             ShowContinueError(state,
                                                                 "A zone secondary recirculation fraction is specified for zone served by ");
-                                                            ShowContinueError(state, "...terminal unit \"" + AirDistUnit(ADUNum).Name +
+                                                            ShowContinueError(state, "...terminal unit \"" + state.dataDefineEquipment->AirDistUnit(ADUNum).Name +
                                                                               "\" , that indicates a single path system");
                                                             ShowContinueError(state, "For Zone=\"" + thisVentilationMechanical.VentMechZoneName(jZone) +
                                                                               "\".");

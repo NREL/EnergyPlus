@@ -62,13 +62,6 @@ namespace EnergyPlus {
 
 namespace DataDefineEquip {
 
-    // Using/Aliasing
-
-    // Data
-    // -only module should be available to other modules and routines.
-    // Thus, all variables in this module must be PUBLIC.
-
-    // MODULE PARAMETER DEFINITIONS
     constexpr int MaxZoneAirComponents = 1;
 
     // Equipment Types covered by ZoneAirLoopEquipment:
@@ -92,10 +85,6 @@ namespace DataDefineEquip {
         SingleDuctATMixer,
         SingleDuctConstVolFourPipeBeam,
     };
-
-    extern int NumAirDistUnits;
-
-    // Types
 
     struct ZoneAirEquip
     {
@@ -150,14 +139,19 @@ namespace DataDefineEquip {
         }
     };
 
-    // Object Data
-    extern Array1D<ZoneAirEquip> AirDistUnit; // Used to specify zone related
-
-    // Clears the global data in DataDefineEquip.
-    // Needed for unit tests, should not be normally called.
-    void clear_state();
-
 } // namespace DataDefineEquip
+
+struct DefineEquipData : BaseGlobalStruct {
+
+    int NumAirDistUnits = 0;
+    Array1D<DataDefineEquip::ZoneAirEquip> AirDistUnit; // Used to specify zone related
+
+    void clear_state() override
+    {
+        this->NumAirDistUnits = 0;
+        this->AirDistUnit.deallocate();
+    }
+};
 
 } // namespace EnergyPlus
 

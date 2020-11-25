@@ -227,7 +227,7 @@ namespace PoweredInductionUnits {
             }
         }
 
-        DataSizing::CurTermUnitSizingNum = DataDefineEquip::AirDistUnit(PIU(PIUNum).ADUNum).TermUnitSizingNum;
+        DataSizing::CurTermUnitSizingNum = state.dataDefineEquipment->AirDistUnit(PIU(PIUNum).ADUNum).TermUnitSizingNum;
         // initialize the unit
         InitPIU(state, PIUNum, FirstHVACIteration);
 
@@ -280,8 +280,6 @@ namespace PoweredInductionUnits {
         // Using/Aliasing
         using BranchNodeConnections::SetUpCompSets;
         using BranchNodeConnections::TestCompSet;
-        using DataDefineEquip::AirDistUnit;
-        using DataDefineEquip::NumAirDistUnits;
         using DataZoneEquipment::ZoneEquipConfig;
         using FluidProperties::FindRefrigerant;
         using NodeInputManager::GetOnlySingleNode;
@@ -475,10 +473,10 @@ namespace PoweredInductionUnits {
             TestCompSet(state, PIU(PIUNum).UnitType, PIU(PIUNum).Name, NodeID(PIU(PIUNum).PriAirInNode), NodeID(PIU(PIUNum).OutAirNode), "Air Nodes");
 
             AirNodeFound = false;
-            for (ADUNum = 1; ADUNum <= NumAirDistUnits; ++ADUNum) {
-                if (PIU(PIUNum).OutAirNode == AirDistUnit(ADUNum).OutletNodeNum) {
+            for (ADUNum = 1; ADUNum <= state.dataDefineEquipment->NumAirDistUnits; ++ADUNum) {
+                if (PIU(PIUNum).OutAirNode == state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum) {
                     PIU(PIUNum).ADUNum = ADUNum;
-                    AirDistUnit(ADUNum).InletNodeNum = PIU(PIUNum).PriAirInNode;
+                    state.dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum = PIU(PIUNum).PriAirInNode;
                 }
             }
             // one assumes if there isn't one assigned, it's an error?
@@ -496,9 +494,9 @@ namespace PoweredInductionUnits {
                         if (PIU(PIUNum).OutAirNode == ZoneEquipConfig(CtrlZone).InletNode(SupAirIn)) {
                             ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).InNode = PIU(PIUNum).PriAirInNode;
                             ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode = PIU(PIUNum).OutAirNode;
-                            AirDistUnit(PIU(PIUNum).ADUNum).TermUnitSizingNum =
+                            state.dataDefineEquipment->AirDistUnit(PIU(PIUNum).ADUNum).TermUnitSizingNum =
                                 ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).TermUnitSizingIndex;
-                            AirDistUnit(PIU(PIUNum).ADUNum).ZoneEqNum = CtrlZone;
+                            state.dataDefineEquipment->AirDistUnit(PIU(PIUNum).ADUNum).ZoneEqNum = CtrlZone;
                             AirNodeFound = true;
                             PIU(PIUNum).CtrlZoneNum = CtrlZone; // fill index for later use in finding air loop index
                             PIU(PIUNum).ctrlZoneInNodeIndex = SupAirIn;
@@ -683,10 +681,10 @@ namespace PoweredInductionUnits {
             TestCompSet(state, PIU(PIUNum).UnitType, PIU(PIUNum).Name, NodeID(PIU(PIUNum).PriAirInNode), NodeID(PIU(PIUNum).OutAirNode), "Air Nodes");
 
             AirNodeFound = false;
-            for (ADUNum = 1; ADUNum <= NumAirDistUnits; ++ADUNum) {
-                if (PIU(PIUNum).OutAirNode == AirDistUnit(ADUNum).OutletNodeNum) {
+            for (ADUNum = 1; ADUNum <= state.dataDefineEquipment->NumAirDistUnits; ++ADUNum) {
+                if (PIU(PIUNum).OutAirNode == state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum) {
                     //      AirDistUnit(ADUNum)%InletNodeNum = PIU(PIUNum)%InletNodeNum
-                    AirDistUnit(ADUNum).InletNodeNum = PIU(PIUNum).PriAirInNode;
+                    state.dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum = PIU(PIUNum).PriAirInNode;
                     PIU(PIUNum).ADUNum = ADUNum;
                 }
             }
@@ -706,9 +704,9 @@ namespace PoweredInductionUnits {
                         if (PIU(PIUNum).OutAirNode == ZoneEquipConfig(CtrlZone).InletNode(SupAirIn)) {
                             ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).InNode = PIU(PIUNum).PriAirInNode;
                             ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode = PIU(PIUNum).OutAirNode;
-                            AirDistUnit(PIU(PIUNum).ADUNum).TermUnitSizingNum =
+                            state.dataDefineEquipment->AirDistUnit(PIU(PIUNum).ADUNum).TermUnitSizingNum =
                                 ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).TermUnitSizingIndex;
-                            AirDistUnit(PIU(PIUNum).ADUNum).ZoneEqNum = CtrlZone;
+                            state.dataDefineEquipment->AirDistUnit(PIU(PIUNum).ADUNum).ZoneEqNum = CtrlZone;
                             PIU(PIUNum).CtrlZoneNum = CtrlZone;
                             PIU(PIUNum).ctrlZoneInNodeIndex = SupAirIn;
                             AirNodeFound = true;
@@ -768,7 +766,6 @@ namespace PoweredInductionUnits {
         // Uses the status flags to trigger initializations.
 
         // Using/Aliasing
-        using DataDefineEquip::AirDistUnit;
         using DataPlant::PlantLoop;
         using DataPlant::TypeOf_CoilSteamAirHeating;
         using DataPlant::TypeOf_CoilWaterSimpleHeating;
@@ -842,8 +839,8 @@ namespace PoweredInductionUnits {
             // Check to see if there is a Air Distribution Unit on the Zone Equipment List
             for (Loop = 1; Loop <= NumPIUs; ++Loop) {
                 if (PIU(Loop).ADUNum == 0) continue;
-                if (CheckZoneEquipmentList(state, "ZoneHVAC:AirDistributionUnit", AirDistUnit(PIU(Loop).ADUNum).Name)) continue;
-                ShowSevereError(state, "InitPIU: ADU=[Air Distribution Unit," + AirDistUnit(PIU(Loop).ADUNum).Name +
+                if (CheckZoneEquipmentList(state, "ZoneHVAC:AirDistributionUnit", state.dataDefineEquipment->AirDistUnit(PIU(Loop).ADUNum).Name)) continue;
+                ShowSevereError(state, "InitPIU: ADU=[Air Distribution Unit," + state.dataDefineEquipment->AirDistUnit(PIU(Loop).ADUNum).Name +
                                 "] is not on any ZoneHVAC:EquipmentList.");
                 ShowContinueError(state, "...PIU=[" + PIU(Loop).UnitType + ',' + PIU(Loop).Name + "] will not be simulated.");
             }
@@ -919,7 +916,7 @@ namespace PoweredInductionUnits {
                 if (PIU(PIUNum).CtrlZoneNum > 0 && PIU(PIUNum).ctrlZoneInNodeIndex > 0) {
                     PIU(PIUNum).AirLoopNum =
                         DataZoneEquipment::ZoneEquipConfig(PIU(PIUNum).CtrlZoneNum).InletNodeAirLoopNum(PIU(PIUNum).ctrlZoneInNodeIndex);
-                    AirDistUnit(PIU(PIUNum).ADUNum).AirLoopNum = PIU(PIUNum).AirLoopNum;
+                    state.dataDefineEquipment->AirDistUnit(PIU(PIUNum).ADUNum).AirLoopNum = PIU(PIUNum).AirLoopNum;
                 }
             }
 
@@ -1782,7 +1779,7 @@ namespace PoweredInductionUnits {
         } else {
             PlenumInducedMassFlow = 0.0;
         }
-        DataDefineEquip::AirDistUnit(PIU(PIUNum).ADUNum).MassFlowRatePlenInd = PlenumInducedMassFlow;
+        state.dataDefineEquipment->AirDistUnit(PIU(PIUNum).ADUNum).MassFlowRatePlenInd = PlenumInducedMassFlow;
         Node(OutletNode).MassFlowRateMax = PIU(PIUNum).MaxTotAirMassFlow;
     }
 
@@ -2071,7 +2068,7 @@ namespace PoweredInductionUnits {
         } else {
             PlenumInducedMassFlow = 0.0;
         }
-        DataDefineEquip::AirDistUnit(PIU(PIUNum).ADUNum).MassFlowRatePlenInd = PlenumInducedMassFlow;
+        state.dataDefineEquipment->AirDistUnit(PIU(PIUNum).ADUNum).MassFlowRatePlenInd = PlenumInducedMassFlow;
         Node(OutletNode).MassFlowRateMax = PIU(PIUNum).MaxPriAirMassFlow;
     }
 

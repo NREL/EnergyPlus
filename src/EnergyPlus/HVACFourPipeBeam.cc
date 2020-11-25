@@ -104,8 +104,6 @@ namespace FourPipeBeam {
         using NodeInputManager::GetOnlySingleNode;
         using namespace DataSizing;
         using CurveManager::GetCurveIndex;
-        using DataDefineEquip::AirDistUnit;
-        using DataDefineEquip::NumAirDistUnits;
         using namespace DataIPShortCuts;
         using ScheduleManager::GetScheduleIndex;
         static std::string const routineName("FourPipeBeamFactory "); // include trailing blank space
@@ -428,10 +426,10 @@ namespace FourPipeBeam {
                             thisBeam->name);
 
         airNodeFound = false;
-        for (aDUIndex = 1; aDUIndex <= NumAirDistUnits; ++aDUIndex) {
-            if (thisBeam->airOutNodeNum == AirDistUnit(aDUIndex).OutletNodeNum) {
+        for (aDUIndex = 1; aDUIndex <= state.dataDefineEquipment->NumAirDistUnits; ++aDUIndex) {
+            if (thisBeam->airOutNodeNum == state.dataDefineEquipment->AirDistUnit(aDUIndex).OutletNodeNum) {
                 thisBeam->aDUNum = aDUIndex;
-                AirDistUnit(aDUIndex).InletNodeNum = thisBeam->airInNodeNum;
+                state.dataDefineEquipment->AirDistUnit(aDUIndex).InletNodeNum = thisBeam->airInNodeNum;
             }
         }
         // assumes if there isn't one assigned, it's an error
@@ -451,9 +449,9 @@ namespace FourPipeBeam {
                         thisBeam->ctrlZoneInNodeIndex = supAirIn;
                         ZoneEquipConfig(ctrlZone).AirDistUnitCool(supAirIn).InNode = thisBeam->airInNodeNum;
                         ZoneEquipConfig(ctrlZone).AirDistUnitCool(supAirIn).OutNode = thisBeam->airOutNodeNum;
-                        AirDistUnit(thisBeam->aDUNum).TermUnitSizingNum = ZoneEquipConfig(ctrlZone).AirDistUnitCool(supAirIn).TermUnitSizingIndex;
-                        thisBeam->termUnitSizingNum = AirDistUnit(thisBeam->aDUNum).TermUnitSizingNum;
-                        AirDistUnit(thisBeam->aDUNum).ZoneEqNum = ctrlZone;
+                        state.dataDefineEquipment->AirDistUnit(thisBeam->aDUNum).TermUnitSizingNum = ZoneEquipConfig(ctrlZone).AirDistUnitCool(supAirIn).TermUnitSizingIndex;
+                        thisBeam->termUnitSizingNum = state.dataDefineEquipment->AirDistUnit(thisBeam->aDUNum).TermUnitSizingNum;
+                        state.dataDefineEquipment->AirDistUnit(thisBeam->aDUNum).ZoneEqNum = ctrlZone;
                         if (thisBeam->beamHeatingPresent) {
                             ZoneEquipConfig(ctrlZone).AirDistUnitHeat(supAirIn).InNode = thisBeam->airInNodeNum;
                             ZoneEquipConfig(ctrlZone).AirDistUnitHeat(supAirIn).OutNode = thisBeam->airOutNodeNum;
@@ -526,7 +524,6 @@ namespace FourPipeBeam {
     {
 
         // Using
-        using DataDefineEquip::AirDistUnit;
         using DataLoopNode::Node;
         using DataPlant::PlantLoop;
         using DataPlant::TypeOf_FourPipeBeamAirTerminal;
@@ -585,8 +582,8 @@ namespace FourPipeBeam {
         if (!this->zoneEquipmentListChecked && ZoneEquipInputsFilled) {
             // Check to see if there is a Air Distribution Unit on the Zone Equipment List
             if (this->aDUNum != 0) {
-                if (!CheckZoneEquipmentList(state, "ZONEHVAC:AIRDISTRIBUTIONUNIT", AirDistUnit(this->aDUNum).Name)) {
-                    ShowSevereError(state, routineName + ": ADU=[Air Distribution Unit," + AirDistUnit(this->aDUNum).Name +
+                if (!CheckZoneEquipmentList(state, "ZONEHVAC:AIRDISTRIBUTIONUNIT", state.dataDefineEquipment->AirDistUnit(this->aDUNum).Name)) {
+                    ShowSevereError(state, routineName + ": ADU=[Air Distribution Unit," + state.dataDefineEquipment->AirDistUnit(this->aDUNum).Name +
                                     "] is not on any ZoneHVAC:EquipmentList.");
                     ShowContinueError(state, "...Unit=[" + this->unitType + ',' + this->name + "] will not be simulated.");
                 }
@@ -597,7 +594,7 @@ namespace FourPipeBeam {
         if (!state.dataGlobal->SysSizingCalc && this->mySizeFlag && !this->plantLoopScanFlag) {
             //	if ( state.dataGlobal->SysSizingCalc && this->mySizeFlag && ! this->plantLoopScanFlag ) {
             this->airLoopNum = DataZoneEquipment::ZoneEquipConfig(this->zoneIndex).InletNodeAirLoopNum(this->ctrlZoneInNodeIndex);
-            AirDistUnit(this->aDUNum).AirLoopNum = this->airLoopNum;
+            state.dataDefineEquipment->AirDistUnit(this->aDUNum).AirLoopNum = this->airLoopNum;
             this->set_size(state);               // calculate autosize values (in any) and convert volume flow rates to mass flow rates
             if (this->beamCoolingPresent) { // initialize chilled water design mass flow rate in plant routines
                 InitComponentNodes(0.0,

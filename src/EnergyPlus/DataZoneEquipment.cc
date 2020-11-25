@@ -1851,7 +1851,8 @@ namespace DataZoneEquipment {
         return OAVolumeFlowRate;
     }
 
-    void EquipList::getPrioritiesforInletNode(int const inletNodeNum, // Zone inlet node number to match
+    void EquipList::getPrioritiesForInletNode(EnergyPlusData &state,
+                                              int const inletNodeNum, // Zone inlet node number to match
                                               int &coolingPriority,   // Cooling priority num for matching equipment
                                               int &heatingPriority    // Heating priority num for matching equipment
     )
@@ -1859,7 +1860,7 @@ namespace DataZoneEquipment {
         bool equipFound = false;
         for (int equipNum = 1; equipNum <= this->NumOfEquipTypes; ++equipNum) {
             if (this->EquipType_Num(equipNum) == AirDistUnit_Num) {
-                if (inletNodeNum == DataDefineEquip::AirDistUnit(this->EquipIndex(equipNum)).OutletNodeNum) {
+                if (inletNodeNum == state.dataDefineEquipment->AirDistUnit(this->EquipIndex(equipNum)).OutletNodeNum) {
                     equipFound = true;
                 }
             }

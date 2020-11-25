@@ -2278,7 +2278,6 @@ namespace ZoneContaminantPredictorCorrector {
         // for BLAST.
 
         // Using/Aliasing
-        using DataDefineEquip::AirDistUnit;
         using DataEnvironment::DayOfYear;
         using DataLoopNode::Node;
         using DataZoneEquipment::ZoneEquipConfig;
@@ -2457,25 +2456,25 @@ namespace ZoneContaminantPredictorCorrector {
                   // add in the leak flow
                 for (ADUListIndex = 1; ADUListIndex <= state.dataZonePlenum->ZoneRetPlenCond(ZoneRetPlenumNum).NumADUs; ++ADUListIndex) {
                     ADUNum = state.dataZonePlenum->ZoneRetPlenCond(ZoneRetPlenumNum).ADUIndex(ADUListIndex);
-                    if (AirDistUnit(ADUNum).UpStreamLeak) {
-                        ADUInNode = AirDistUnit(ADUNum).InletNodeNum;
+                    if (state.dataDefineEquipment->AirDistUnit(ADUNum).UpStreamLeak) {
+                        ADUInNode = state.dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum;
                         if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-                            CO2MassFlowRate += (AirDistUnit(ADUNum).MassFlowRateUpStrLk * Node(ADUInNode).CO2) / ZoneMult;
+                            CO2MassFlowRate += (state.dataDefineEquipment->AirDistUnit(ADUNum).MassFlowRateUpStrLk * Node(ADUInNode).CO2) / ZoneMult;
                         }
                         if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-                            GCMassFlowRate += (AirDistUnit(ADUNum).MassFlowRateUpStrLk * Node(ADUInNode).GenContam) / ZoneMult;
+                            GCMassFlowRate += (state.dataDefineEquipment->AirDistUnit(ADUNum).MassFlowRateUpStrLk * Node(ADUInNode).GenContam) / ZoneMult;
                         }
-                        ZoneMassFlowRate += AirDistUnit(ADUNum).MassFlowRateUpStrLk / ZoneMult;
+                        ZoneMassFlowRate += state.dataDefineEquipment->AirDistUnit(ADUNum).MassFlowRateUpStrLk / ZoneMult;
                     }
-                    if (AirDistUnit(ADUNum).DownStreamLeak) {
-                        ADUOutNode = AirDistUnit(ADUNum).OutletNodeNum;
+                    if (state.dataDefineEquipment->AirDistUnit(ADUNum).DownStreamLeak) {
+                        ADUOutNode = state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum;
                         if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-                            CO2MassFlowRate += (AirDistUnit(ADUNum).MassFlowRateDnStrLk * Node(ADUOutNode).CO2) / ZoneMult;
+                            CO2MassFlowRate += (state.dataDefineEquipment->AirDistUnit(ADUNum).MassFlowRateDnStrLk * Node(ADUOutNode).CO2) / ZoneMult;
                         }
                         if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-                            GCMassFlowRate += (AirDistUnit(ADUNum).MassFlowRateDnStrLk * Node(ADUOutNode).GenContam) / ZoneMult;
+                            GCMassFlowRate += (state.dataDefineEquipment->AirDistUnit(ADUNum).MassFlowRateDnStrLk * Node(ADUOutNode).GenContam) / ZoneMult;
                         }
-                        ZoneMassFlowRate += AirDistUnit(ADUNum).MassFlowRateDnStrLk / ZoneMult;
+                        ZoneMassFlowRate += state.dataDefineEquipment->AirDistUnit(ADUNum).MassFlowRateDnStrLk / ZoneMult;
                     }
                 }
 

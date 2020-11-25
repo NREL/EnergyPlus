@@ -356,7 +356,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_Sim)
     FirstHVACIteration = true;
     state->dataSingleDuct->GetInputFlag = false;
     // run SimulateSingleDuct(state, ) function
-    SimulateSingleDuct(*state, AirDistUnit(1).EquipName(1), FirstHVACIteration, ZonePtr, ZoneAirNodeNum, AirDistUnit(1).EquipIndex(1));
+    SimulateSingleDuct(*state, state->dataDefineEquipment->AirDistUnit(1).EquipName(1), FirstHVACIteration, ZonePtr, ZoneAirNodeNum, state->dataDefineEquipment->AirDistUnit(1).EquipIndex(1));
     // check AT air mass flow rates
     EXPECT_EQ(MassFlowRateMaxAvail, state->dataSingleDuct->sd_airterminal(SysNum).AirMassFlowRateMax); // design maximum mass flow rate
     EXPECT_EQ(0.0, state->dataSingleDuct->sd_airterminal(SysNum).sd_airterminalInlet.AirMassFlowRateMaxAvail);        // maximum available mass flow rate
@@ -367,7 +367,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_Sim)
     Node(InletNode).MassFlowRateMaxAvail = MassFlowRateMaxAvail;
     EXPECT_EQ(1.0, MassFlowRateMaxAvail);
     // run SimulateSingleDuct(*state, ) function
-    SimulateSingleDuct(*state, AirDistUnit(1).EquipName(1), FirstHVACIteration, ZonePtr, ZoneAirNodeNum, AirDistUnit(1).EquipIndex(1));
+    SimulateSingleDuct(*state, state->dataDefineEquipment->AirDistUnit(1).EquipName(1), FirstHVACIteration, ZonePtr, ZoneAirNodeNum, state->dataDefineEquipment->AirDistUnit(1).EquipIndex(1));
     // check AT air mass flow rates
     EXPECT_EQ(MassFlowRateMaxAvail, state->dataSingleDuct->sd_airterminal(SysNum).sd_airterminalInlet.AirMassFlowRate);
     EXPECT_EQ(MassFlowRateMaxAvail, state->dataSingleDuct->sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRate);
@@ -531,7 +531,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OASpecification)
     FirstHVACIteration = true;
     state->dataSingleDuct->GetInputFlag = false;
     // run SimulateSingleDuct(state, ) function
-    SimulateSingleDuct(*state, AirDistUnit(1).EquipName(1), FirstHVACIteration, ZonePtr, ZoneAirNodeNum, AirDistUnit(1).EquipIndex(1));
+    SimulateSingleDuct(*state, state->dataDefineEquipment->AirDistUnit(1).EquipName(1), FirstHVACIteration, ZonePtr, ZoneAirNodeNum, state->dataDefineEquipment->AirDistUnit(1).EquipIndex(1));
     // check AT air mass flow rates
     EXPECT_EQ(MassFlowRateMaxAvail, state->dataSingleDuct->sd_airterminal(SysNum).AirMassFlowRateMax); // design maximum mass flow rate
     EXPECT_EQ(0.0, state->dataSingleDuct->sd_airterminal(SysNum).sd_airterminalInlet.AirMassFlowRateMaxAvail);        // maximum available mass flow rate
@@ -561,7 +561,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OASpecification)
     Real64 expectedMassFlow = 1.0 * ((3.0 * 0.1) + 0.5);
 
     // run SimulateSingleDuct() function
-    SimulateSingleDuct(*state, AirDistUnit(1).EquipName(1), FirstHVACIteration, ZonePtr, ZoneAirNodeNum, AirDistUnit(1).EquipIndex(1));
+    SimulateSingleDuct(*state, state->dataDefineEquipment->AirDistUnit(1).EquipName(1), FirstHVACIteration, ZonePtr, ZoneAirNodeNum, state->dataDefineEquipment->AirDistUnit(1).EquipIndex(1));
     // check AT air mass flow rates
     EXPECT_EQ(expectedMassFlow, state->dataSingleDuct->sd_airterminal(SysNum).sd_airterminalInlet.AirMassFlowRate);
     EXPECT_EQ(expectedMassFlow, state->dataSingleDuct->sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRate);
@@ -572,7 +572,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OASpecification)
     // Just set number of people directly, too many other things that have to be in place to call ManagerInternalHeatGains()
     DataHeatBalance::ZoneIntGain(1).NOFOCC = 1.5;
     expectedMassFlow = 1.0 * ((1.5 * 0.1) + 0.5);
-    SimulateSingleDuct(*state, AirDistUnit(1).EquipName(1), FirstHVACIteration, ZonePtr, ZoneAirNodeNum, AirDistUnit(1).EquipIndex(1));
+    SimulateSingleDuct(*state, state->dataDefineEquipment->AirDistUnit(1).EquipName(1), FirstHVACIteration, ZonePtr, ZoneAirNodeNum, state->dataDefineEquipment->AirDistUnit(1).EquipIndex(1));
     // check AT air mass flow rates
     EXPECT_EQ(expectedMassFlow, state->dataSingleDuct->sd_airterminal(SysNum).sd_airterminalInlet.AirMassFlowRate);
     EXPECT_EQ(expectedMassFlow, state->dataSingleDuct->sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRate);
@@ -583,7 +583,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OASpecification)
     // Just set number of people directly, too many other things that have to be in place to call ManagerInternalHeatGains()
     DataHeatBalance::ZoneIntGain(1).NOFOCC = 1.5;
     expectedMassFlow = 0.0 * ((1.5 * 0.1) + 0.5);
-    SimulateSingleDuct(*state, AirDistUnit(1).EquipName(1), FirstHVACIteration, ZonePtr, ZoneAirNodeNum, AirDistUnit(1).EquipIndex(1));
+    SimulateSingleDuct(*state, state->dataDefineEquipment->AirDistUnit(1).EquipName(1), FirstHVACIteration, ZonePtr, ZoneAirNodeNum, state->dataDefineEquipment->AirDistUnit(1).EquipIndex(1));
     // check AT air mass flow rates
     EXPECT_EQ(expectedMassFlow, state->dataSingleDuct->sd_airterminal(SysNum).sd_airterminalInlet.AirMassFlowRate);
     EXPECT_EQ(expectedMassFlow, state->dataSingleDuct->sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRate);
@@ -692,7 +692,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_EMSOverrideAirFlow)
     Node(InletNode).MassFlowRateMaxAvail = MassFlowRateMaxAvail;
     EXPECT_EQ(1.0, MassFlowRateMaxAvail);
     // run SimulateSingleDuct(*state, ) function
-    SimulateSingleDuct(*state, AirDistUnit(1).EquipName(1), FirstHVACIteration, ZonePtr, ZoneAirNodeNum, AirDistUnit(1).EquipIndex(1));
+    SimulateSingleDuct(*state, state->dataDefineEquipment->AirDistUnit(1).EquipName(1), FirstHVACIteration, ZonePtr, ZoneAirNodeNum, state->dataDefineEquipment->AirDistUnit(1).EquipIndex(1));
     // check AT air mass flow rates
     EXPECT_EQ(MassFlowRateMaxAvail, state->dataSingleDuct->sd_airterminal(SysNum).sd_airterminalInlet.AirMassFlowRate);
     EXPECT_EQ(MassFlowRateMaxAvail, state->dataSingleDuct->sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRate);
@@ -705,7 +705,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_EMSOverrideAirFlow)
     state->dataSingleDuct->sd_airterminal(SysNum).EMSOverrideAirFlow = true;
     state->dataSingleDuct->sd_airterminal(SysNum).EMSMassFlowRateValue = 0.5;
     // run SimulateSingleDuct(state, ) function
-    SimulateSingleDuct(*state, AirDistUnit(1).EquipName(1), FirstHVACIteration, ZonePtr, ZoneAirNodeNum, AirDistUnit(1).EquipIndex(1));
+    SimulateSingleDuct(*state, state->dataDefineEquipment->AirDistUnit(1).EquipName(1), FirstHVACIteration, ZonePtr, ZoneAirNodeNum, state->dataDefineEquipment->AirDistUnit(1).EquipIndex(1));
     // check AT air mass flow rates
     EXPECT_EQ(state->dataSingleDuct->sd_airterminal(SysNum).EMSMassFlowRateValue, state->dataSingleDuct->sd_airterminal(SysNum).sd_airterminalInlet.AirMassFlowRate);
     EXPECT_EQ(state->dataSingleDuct->sd_airterminal(SysNum).EMSMassFlowRateValue, state->dataSingleDuct->sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRate);
@@ -846,7 +846,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OAVolumeFlowRateReport
     auto &thisAirTerminal = state->dataSingleDuct->sd_airterminal(SysNum);
     auto &thisAirTerminalInlet = thisAirTerminal.sd_airterminalInlet;
     auto &thisAirTerminalOutlet = thisAirTerminal.sd_airterminalOutlet;
-    auto &thisAirDisUnit = AirDistUnit(1);
+    auto &thisAirDisUnit = state->dataDefineEquipment->AirDistUnit(1);
     auto &thisAirLoop = state->dataAirLoop->AirLoopFlow(1);
 
     int const InletNode = thisAirTerminal.InletNodeNum;

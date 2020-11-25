@@ -673,7 +673,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctVAVReheat_NormalActionTest)
     Real64 expectedMassFlowAirReheatMin = 0.2 * MassFlowRateMaxAvail;
     bool FirstHVACIteration = false;
 
-    auto &thisAirDistUnit(DataDefineEquip::AirDistUnit(ZonePtr));
+    auto &thisAirDistUnit(state->dataDefineEquipment->AirDistUnit(ZonePtr));
     // run SimulateSingleDuct(*state, ) function
     SimulateSingleDuct(*state, thisAirDistUnit.EquipName(1), FirstHVACIteration, ZonePtr, ZoneAirNodeNum, thisAirDistUnit.EquipIndex(1));
     // check min, actual and max air mass flow rates during reheat with Normal Action

@@ -867,7 +867,7 @@ namespace SizingManager {
                     for (int singleDuctATUNum = 1; singleDuctATUNum <= state.dataSingleDuct->NumSDAirTerminal; ++singleDuctATUNum) {
                         if (AirLoopNum == state.dataSingleDuct->sd_airterminal(singleDuctATUNum).AirLoopNum) {
                             int termUnitSizingIndex =
-                                DataDefineEquip::AirDistUnit(state.dataSingleDuct->sd_airterminal(singleDuctATUNum).ADUNum).TermUnitSizingNum;
+                                state.dataDefineEquipment->AirDistUnit(state.dataSingleDuct->sd_airterminal(singleDuctATUNum).ADUNum).TermUnitSizingNum;
                             airLoopMaxFlowRateSum += state.dataSingleDuct->sd_airterminal(singleDuctATUNum).MaxAirVolFlowRate;
 
                             DataSizing::VpzClgByZone(termUnitSizingIndex) =
@@ -938,7 +938,7 @@ namespace SizingManager {
                 if (allocated(DualDuct::dd_airterminal) && DualDuct::NumDDAirTerminal > 0) {
                     for (int dualDuctATUNum = 1; dualDuctATUNum <= DualDuct::NumDDAirTerminal; ++dualDuctATUNum) {
                         if (AirLoopNum == DualDuct::dd_airterminal(dualDuctATUNum).AirLoopNum) {
-                            int termUnitSizingIndex = DataDefineEquip::AirDistUnit(DualDuct::dd_airterminal(dualDuctATUNum).ADUNum).TermUnitSizingNum;
+                            int termUnitSizingIndex = state.dataDefineEquipment->AirDistUnit(DualDuct::dd_airterminal(dualDuctATUNum).ADUNum).TermUnitSizingNum;
                             airLoopMaxFlowRateSum += DualDuct::dd_airterminal(dualDuctATUNum).MaxAirVolFlowRate;
                             DataSizing::VpzClgByZone(termUnitSizingIndex) =
                                 DualDuct::dd_airterminal(dualDuctATUNum).MaxAirVolFlowRate; // store std 62.1 value
@@ -1003,7 +1003,7 @@ namespace SizingManager {
                 if (allocated(PoweredInductionUnits::PIU) && PoweredInductionUnits::NumPIUs > 0) {
                     for (int pIUATUNum = 1; pIUATUNum <= PoweredInductionUnits::NumPIUs; ++pIUATUNum) {
                         if (AirLoopNum == PoweredInductionUnits::PIU(pIUATUNum).AirLoopNum) {
-                            int termUnitSizingIndex = DataDefineEquip::AirDistUnit(PoweredInductionUnits::PIU(pIUATUNum).ADUNum).TermUnitSizingNum;
+                            int termUnitSizingIndex = state.dataDefineEquipment->AirDistUnit(PoweredInductionUnits::PIU(pIUATUNum).ADUNum).TermUnitSizingNum;
                             airLoopMaxFlowRateSum += PoweredInductionUnits::PIU(pIUATUNum).MaxPriAirVolFlow;
                             if (PoweredInductionUnits::PIU(pIUATUNum).UnitType_Num == DataDefineEquip::iZnAirLoopEquipType::SingleDuct_SeriesPIU_Reheat) {
                                 airLoopHeatingMaximumFlowRateSum +=
@@ -1085,7 +1085,7 @@ namespace SizingManager {
                 if (allocated(HVACSingleDuctInduc::IndUnit) && (HVACSingleDuctInduc::NumIndUnits > 0)) {
                     for (int indUnitNum = 1; indUnitNum <= HVACSingleDuctInduc::NumIndUnits; ++indUnitNum) {
                         if (AirLoopNum == HVACSingleDuctInduc::IndUnit(indUnitNum).AirLoopNum) {
-                            int termUnitSizingIndex = DataDefineEquip::AirDistUnit(HVACSingleDuctInduc::IndUnit(indUnitNum).ADUNum).TermUnitSizingNum;
+                            int termUnitSizingIndex = state.dataDefineEquipment->AirDistUnit(HVACSingleDuctInduc::IndUnit(indUnitNum).ADUNum).TermUnitSizingNum;
 
                             airLoopHeatingMaximumFlowRateSum +=
                                 HVACSingleDuctInduc::IndUnit(indUnitNum).MaxPriAirMassFlow / DataEnvironment::StdRhoAir;
@@ -1113,7 +1113,7 @@ namespace SizingManager {
                 if (allocated(HVACCooledBeam::CoolBeam) && (HVACCooledBeam::NumCB > 0)) {
                     for (int coolBeamNum = 1; coolBeamNum <= HVACCooledBeam::NumCB; ++coolBeamNum) {
                         if (AirLoopNum == HVACCooledBeam::CoolBeam(coolBeamNum).AirLoopNum) {
-                            int termUnitSizingIndex = DataDefineEquip::AirDistUnit(HVACCooledBeam::CoolBeam(coolBeamNum).ADUNum).TermUnitSizingNum;
+                            int termUnitSizingIndex = state.dataDefineEquipment->AirDistUnit(HVACCooledBeam::CoolBeam(coolBeamNum).ADUNum).TermUnitSizingNum;
                             airLoopHeatingMaximumFlowRateSum += HVACCooledBeam::CoolBeam(coolBeamNum).MaxAirVolFlow;
                             airLoopHeatingMinimumFlowRateSum += HVACCooledBeam::CoolBeam(coolBeamNum).MaxAirVolFlow;
                             airLoopMaxFlowRateSum += HVACCooledBeam::CoolBeam(coolBeamNum).MaxAirVolFlow;
@@ -1133,31 +1133,31 @@ namespace SizingManager {
                 }
 
                 // sum up heating and max flows for any four pipe cooled beam terminal units (the only one using the airTerminalPtr at this point)
-                if (allocated(DataDefineEquip::AirDistUnit) && DataDefineEquip::NumAirDistUnits > 0) {
-                    for (int aDUNum = 1; aDUNum <= DataDefineEquip::NumAirDistUnits; ++aDUNum) {
-                        if (DataDefineEquip::AirDistUnit(aDUNum).airTerminalPtr.get() != nullptr) {
-                            if (AirLoopNum == DataDefineEquip::AirDistUnit(aDUNum).airTerminalPtr->getAirLoopNum()) {
-                                airLoopHeatingMaximumFlowRateSum += DataDefineEquip::AirDistUnit(aDUNum).airTerminalPtr->getPrimAirDesignVolFlow();
-                                airLoopHeatingMinimumFlowRateSum += DataDefineEquip::AirDistUnit(aDUNum).airTerminalPtr->getPrimAirDesignVolFlow();
-                                airLoopMaxFlowRateSum += DataDefineEquip::AirDistUnit(aDUNum).airTerminalPtr->getPrimAirDesignVolFlow();
+                if (allocated(state.dataDefineEquipment->AirDistUnit) && state.dataDefineEquipment->NumAirDistUnits > 0) {
+                    for (int aDUNum = 1; aDUNum <= state.dataDefineEquipment->NumAirDistUnits; ++aDUNum) {
+                        if (state.dataDefineEquipment->AirDistUnit(aDUNum).airTerminalPtr.get() != nullptr) {
+                            if (AirLoopNum == state.dataDefineEquipment->AirDistUnit(aDUNum).airTerminalPtr->getAirLoopNum()) {
+                                airLoopHeatingMaximumFlowRateSum += state.dataDefineEquipment->AirDistUnit(aDUNum).airTerminalPtr->getPrimAirDesignVolFlow();
+                                airLoopHeatingMinimumFlowRateSum += state.dataDefineEquipment->AirDistUnit(aDUNum).airTerminalPtr->getPrimAirDesignVolFlow();
+                                airLoopMaxFlowRateSum += state.dataDefineEquipment->AirDistUnit(aDUNum).airTerminalPtr->getPrimAirDesignVolFlow();
                                 // store Std 62.1 values, have no modeling of secondary flow rates for induced flow from beam
-                                int termUnitSizingIndex = DataDefineEquip::AirDistUnit(aDUNum).airTerminalPtr->getTermUnitSizingIndex();
+                                int termUnitSizingIndex = state.dataDefineEquipment->AirDistUnit(aDUNum).airTerminalPtr->getTermUnitSizingIndex();
                                 DataSizing::VpzClgByZone(termUnitSizingIndex) =
-                                    DataDefineEquip::AirDistUnit(aDUNum).airTerminalPtr->getPrimAirDesignVolFlow();
+                                    state.dataDefineEquipment->AirDistUnit(aDUNum).airTerminalPtr->getPrimAirDesignVolFlow();
                                 DataSizing::VpzMinClgByZone(termUnitSizingIndex) =
-                                    DataDefineEquip::AirDistUnit(aDUNum).airTerminalPtr->getPrimAirDesignVolFlow();
+                                    state.dataDefineEquipment->AirDistUnit(aDUNum).airTerminalPtr->getPrimAirDesignVolFlow();
                                 DataSizing::VpzHtgByZone(termUnitSizingIndex) =
-                                    DataDefineEquip::AirDistUnit(aDUNum).airTerminalPtr->getPrimAirDesignVolFlow();
+                                    state.dataDefineEquipment->AirDistUnit(aDUNum).airTerminalPtr->getPrimAirDesignVolFlow();
                                 DataSizing::VpzMinHtgByZone(termUnitSizingIndex) =
-                                    DataDefineEquip::AirDistUnit(aDUNum).airTerminalPtr->getPrimAirDesignVolFlow();
+                                    state.dataDefineEquipment->AirDistUnit(aDUNum).airTerminalPtr->getPrimAirDesignVolFlow();
                                 DataSizing::VdzClgByZone(termUnitSizingIndex) =
-                                    DataDefineEquip::AirDistUnit(aDUNum).airTerminalPtr->getPrimAirDesignVolFlow();
+                                    state.dataDefineEquipment->AirDistUnit(aDUNum).airTerminalPtr->getPrimAirDesignVolFlow();
                                 DataSizing::VdzMinClgByZone(termUnitSizingIndex) =
-                                    DataDefineEquip::AirDistUnit(aDUNum).airTerminalPtr->getPrimAirDesignVolFlow();
+                                    state.dataDefineEquipment->AirDistUnit(aDUNum).airTerminalPtr->getPrimAirDesignVolFlow();
                                 DataSizing::VdzHtgByZone(termUnitSizingIndex) =
-                                    DataDefineEquip::AirDistUnit(aDUNum).airTerminalPtr->getPrimAirDesignVolFlow();
+                                    state.dataDefineEquipment->AirDistUnit(aDUNum).airTerminalPtr->getPrimAirDesignVolFlow();
                                 DataSizing::VdzMinHtgByZone(termUnitSizingIndex) =
-                                    DataDefineEquip::AirDistUnit(aDUNum).airTerminalPtr->getPrimAirDesignVolFlow();
+                                    state.dataDefineEquipment->AirDistUnit(aDUNum).airTerminalPtr->getPrimAirDesignVolFlow();
                             }
                         }
                     }
@@ -1167,7 +1167,7 @@ namespace SizingManager {
                 if (allocated(state.dataSingleDuct->SysATMixer) && (state.dataSingleDuct->NumATMixers > 0)) {
                     for (int aTMixerNum = 1; aTMixerNum <= state.dataSingleDuct->NumATMixers; ++aTMixerNum) {
                         if (AirLoopNum == state.dataSingleDuct->SysATMixer(aTMixerNum).AirLoopNum) {
-                            int termUnitSizingIndex = DataDefineEquip::AirDistUnit(state.dataSingleDuct->SysATMixer(aTMixerNum).ADUNum).TermUnitSizingNum;
+                            int termUnitSizingIndex = state.dataDefineEquipment->AirDistUnit(state.dataSingleDuct->SysATMixer(aTMixerNum).ADUNum).TermUnitSizingNum;
                             airLoopHeatingMaximumFlowRateSum += state.dataSingleDuct->SysATMixer(aTMixerNum).DesignPrimaryAirVolRate;
                             airLoopHeatingMinimumFlowRateSum += state.dataSingleDuct->SysATMixer(aTMixerNum).DesignPrimaryAirVolRate;
                             airLoopMaxFlowRateSum += state.dataSingleDuct->SysATMixer(aTMixerNum).DesignPrimaryAirVolRate;
@@ -1703,12 +1703,12 @@ namespace SizingManager {
                         OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchS62zcdAlN,
                                                                  TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
                                                                  state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).AirLoopName); // Air loop name
-                        for (int iAirDistUnit = 1; iAirDistUnit <= DataDefineEquip::NumAirDistUnits; ++iAirDistUnit) {
-                            if (DataDefineEquip::AirDistUnit(iAirDistUnit).TermUnitSizingNum == termUnitSizingIndex) {
+                        for (int iAirDistUnit = 1; iAirDistUnit <= state.dataDefineEquipment->NumAirDistUnits; ++iAirDistUnit) {
+                            if (state.dataDefineEquipment->AirDistUnit(iAirDistUnit).TermUnitSizingNum == termUnitSizingIndex) {
                                 OutputReportPredefined::PreDefTableEntry(
                                     OutputReportPredefined::pdchS62zcdBox,
                                     TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
-                                    DataDefineEquip::AirDistUnit(iAirDistUnit).EquipType(1)); // use first type of equipment listed
+                                    state.dataDefineEquipment->AirDistUnit(iAirDistUnit).EquipType(1)); // use first type of equipment listed
                                 break;                                                        // if it has been found no more searching is needed
                             }
                         }
@@ -1764,12 +1764,12 @@ namespace SizingManager {
                         OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchS62zhdAlN,
                                                                  TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
                                                                  state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).AirLoopName); // Air loop name
-                        for (int iAirDistUnit = 1; iAirDistUnit <= DataDefineEquip::NumAirDistUnits; ++iAirDistUnit) {
-                            if (DataDefineEquip::AirDistUnit(iAirDistUnit).TermUnitSizingNum == termUnitSizingIndex) {
+                        for (int iAirDistUnit = 1; iAirDistUnit <= state.dataDefineEquipment->NumAirDistUnits; ++iAirDistUnit) {
+                            if (state.dataDefineEquipment->AirDistUnit(iAirDistUnit).TermUnitSizingNum == termUnitSizingIndex) {
                                 OutputReportPredefined::PreDefTableEntry(
                                     OutputReportPredefined::pdchS62zhdBox,
                                     TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
-                                    DataDefineEquip::AirDistUnit(iAirDistUnit).EquipType(1)); // use first type of equipment listed
+                                    state.dataDefineEquipment->AirDistUnit(iAirDistUnit).EquipType(1)); // use first type of equipment listed
                                 break;                                                        // if it has been found no more searching is needed
                             }
                         }

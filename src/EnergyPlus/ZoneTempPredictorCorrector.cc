@@ -5459,7 +5459,6 @@ namespace ZoneTempPredictorCorrector {
         // for BLAST.
 
         // Using/Aliasing
-        using DataDefineEquip::AirDistUnit;
         using DataLoopNode::Node;
         using DataSurfaces::HeatTransferModel_EMPD;
         using DataSurfaces::HeatTransferModel_HAMT;
@@ -5535,15 +5534,15 @@ namespace ZoneTempPredictorCorrector {
             // add in the leak flow
             for (ADUListIndex = 1; ADUListIndex <= state.dataZonePlenum->ZoneRetPlenCond(ZoneRetPlenumNum).NumADUs; ++ADUListIndex) {
                 ADUNum = state.dataZonePlenum->ZoneRetPlenCond(ZoneRetPlenumNum).ADUIndex(ADUListIndex);
-                if (AirDistUnit(ADUNum).UpStreamLeak) {
-                    ADUInNode = AirDistUnit(ADUNum).InletNodeNum;
-                    MoistureMassFlowRate += (AirDistUnit(ADUNum).MassFlowRateUpStrLk * Node(ADUInNode).HumRat) / ZoneMult;
-                    ZoneMassFlowRate += AirDistUnit(ADUNum).MassFlowRateUpStrLk / ZoneMult;
+                if (state.dataDefineEquipment->AirDistUnit(ADUNum).UpStreamLeak) {
+                    ADUInNode = state.dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum;
+                    MoistureMassFlowRate += (state.dataDefineEquipment->AirDistUnit(ADUNum).MassFlowRateUpStrLk * Node(ADUInNode).HumRat) / ZoneMult;
+                    ZoneMassFlowRate += state.dataDefineEquipment->AirDistUnit(ADUNum).MassFlowRateUpStrLk / ZoneMult;
                 }
-                if (AirDistUnit(ADUNum).DownStreamLeak) {
-                    ADUOutNode = AirDistUnit(ADUNum).OutletNodeNum;
-                    MoistureMassFlowRate += (AirDistUnit(ADUNum).MassFlowRateDnStrLk * Node(ADUOutNode).HumRat) / ZoneMult;
-                    ZoneMassFlowRate += AirDistUnit(ADUNum).MassFlowRateDnStrLk / ZoneMult;
+                if (state.dataDefineEquipment->AirDistUnit(ADUNum).DownStreamLeak) {
+                    ADUOutNode = state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum;
+                    MoistureMassFlowRate += (state.dataDefineEquipment->AirDistUnit(ADUNum).MassFlowRateDnStrLk * Node(ADUOutNode).HumRat) / ZoneMult;
+                    ZoneMassFlowRate += state.dataDefineEquipment->AirDistUnit(ADUNum).MassFlowRateDnStrLk / ZoneMult;
                 }
             }
 
@@ -6190,7 +6189,6 @@ namespace ZoneTempPredictorCorrector {
         using namespace DataSurfaces;
         using namespace DataHeatBalance;
         using namespace DataHeatBalSurface;
-        using DataDefineEquip::AirDistUnit;
         using DataLoopNode::Node;
         using DataZoneEquipment::ZoneEquipConfig;
         using InternalHeatGains::SumAllInternalConvectionGains;
@@ -6300,19 +6298,19 @@ namespace ZoneTempPredictorCorrector {
                      ADUListIndex <= ADUListIndex_end;
                      ++ADUListIndex) {
                     ADUNum = state.dataZonePlenum->ZoneRetPlenCond(ZoneRetPlenumNum).ADUIndex(ADUListIndex);
-                    if (AirDistUnit(ADUNum).UpStreamLeak) {
-                        ADUInNode = AirDistUnit(ADUNum).InletNodeNum;
+                    if (state.dataDefineEquipment->AirDistUnit(ADUNum).UpStreamLeak) {
+                        ADUInNode = state.dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum;
                         NodeTemp = Node(ADUInNode).Temp;
-                        MassFlowRate = AirDistUnit(ADUNum).MassFlowRateUpStrLk;
+                        MassFlowRate = state.dataDefineEquipment->AirDistUnit(ADUNum).MassFlowRateUpStrLk;
                         CpAir = PsyCpAirFnW(air_hum_rat);
                         Real64 const MassFlowRate_CpAir(MassFlowRate * CpAir);
                         SumSysMCp += MassFlowRate_CpAir;
                         SumSysMCpT += MassFlowRate_CpAir * NodeTemp;
                     }
-                    if (AirDistUnit(ADUNum).DownStreamLeak) {
-                        ADUOutNode = AirDistUnit(ADUNum).OutletNodeNum;
+                    if (state.dataDefineEquipment->AirDistUnit(ADUNum).DownStreamLeak) {
+                        ADUOutNode = state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum;
                         NodeTemp = Node(ADUOutNode).Temp;
-                        MassFlowRate = AirDistUnit(ADUNum).MassFlowRateDnStrLk;
+                        MassFlowRate = state.dataDefineEquipment->AirDistUnit(ADUNum).MassFlowRateDnStrLk;
                         CpAir = PsyCpAirFnW(air_hum_rat);
                         Real64 const MassFlowRate_CpAir(MassFlowRate * CpAir);
                         SumSysMCp += MassFlowRate_CpAir;
@@ -6480,7 +6478,6 @@ namespace ZoneTempPredictorCorrector {
         using namespace DataSurfaces;
         using namespace DataHeatBalance;
         using namespace DataHeatBalSurface;
-        using DataDefineEquip::AirDistUnit;
         using DataLoopNode::Node;
         using DataZoneEquipment::ZoneEquipConfig;
 
@@ -6584,13 +6581,13 @@ namespace ZoneTempPredictorCorrector {
 
                 ADUNum = ZoneEquipConfig(ZoneEquipConfigNum).InletNodeADUNum(NodeNum);
                 if (ADUNum > 0) {
-                    NodeTemp = Node(AirDistUnit(ADUNum).OutletNodeNum).Temp;
-                    MassFlowRate = Node(AirDistUnit(ADUNum).OutletNodeNum).MassFlowRate;
+                    NodeTemp = Node(state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum).Temp;
+                    MassFlowRate = Node(state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum).MassFlowRate;
                     CalcZoneSensibleOutput(MassFlowRate, NodeTemp, MAT(ZoneNum), ZoneAirHumRat(ZoneNum), ADUHeatAddRate);
-                    AirDistUnit(ADUNum).HeatRate = max(0.0, ADUHeatAddRate);
-                    AirDistUnit(ADUNum).CoolRate = std::abs(min(0.0, ADUHeatAddRate));
-                    AirDistUnit(ADUNum).HeatGain = AirDistUnit(ADUNum).HeatRate * TimeStepSys * DataGlobalConstants::SecInHour();
-                    AirDistUnit(ADUNum).CoolGain = AirDistUnit(ADUNum).CoolRate * TimeStepSys * DataGlobalConstants::SecInHour();
+                    state.dataDefineEquipment->AirDistUnit(ADUNum).HeatRate = max(0.0, ADUHeatAddRate);
+                    state.dataDefineEquipment->AirDistUnit(ADUNum).CoolRate = std::abs(min(0.0, ADUHeatAddRate));
+                    state.dataDefineEquipment->AirDistUnit(ADUNum).HeatGain = state.dataDefineEquipment->AirDistUnit(ADUNum).HeatRate * TimeStepSys * DataGlobalConstants::SecInHour();
+                    state.dataDefineEquipment->AirDistUnit(ADUNum).CoolGain = state.dataDefineEquipment->AirDistUnit(ADUNum).CoolRate * TimeStepSys * DataGlobalConstants::SecInHour();
                 }
 
             } // NodeNum
@@ -6608,17 +6605,17 @@ namespace ZoneTempPredictorCorrector {
             // add in the leaks
             for (ADUListIndex = 1; ADUListIndex <= state.dataZonePlenum->ZoneRetPlenCond(ZoneRetPlenumNum).NumADUs; ++ADUListIndex) {
                 ADUNum = state.dataZonePlenum->ZoneRetPlenCond(ZoneRetPlenumNum).ADUIndex(ADUListIndex);
-                if (AirDistUnit(ADUNum).UpStreamLeak) {
-                    ADUInNode = AirDistUnit(ADUNum).InletNodeNum;
+                if (state.dataDefineEquipment->AirDistUnit(ADUNum).UpStreamLeak) {
+                    ADUInNode = state.dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum;
                     NodeTemp = Node(ADUInNode).Temp;
-                    MassFlowRate = AirDistUnit(ADUNum).MassFlowRateUpStrLk;
+                    MassFlowRate = state.dataDefineEquipment->AirDistUnit(ADUNum).MassFlowRateUpStrLk;
                     CalcZoneSensibleOutput(MassFlowRate, NodeTemp, MAT(ZoneNum), ZoneAirHumRat(ZoneNum), QSensRate);
                     SumMCpDTsystem += QSensRate;
                 }
-                if (AirDistUnit(ADUNum).DownStreamLeak) {
-                    ADUOutNode = AirDistUnit(ADUNum).OutletNodeNum;
+                if (state.dataDefineEquipment->AirDistUnit(ADUNum).DownStreamLeak) {
+                    ADUOutNode = state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum;
                     NodeTemp = Node(ADUOutNode).Temp;
-                    MassFlowRate = AirDistUnit(ADUNum).MassFlowRateDnStrLk;
+                    MassFlowRate = state.dataDefineEquipment->AirDistUnit(ADUNum).MassFlowRateDnStrLk;
                     CalcZoneSensibleOutput(MassFlowRate, NodeTemp, MAT(ZoneNum), ZoneAirHumRat(ZoneNum), QSensRate);
                     SumMCpDTsystem += QSensRate;
                 }

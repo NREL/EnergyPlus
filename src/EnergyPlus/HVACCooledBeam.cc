@@ -205,7 +205,7 @@ namespace HVACCooledBeam {
             ShowFatalError(state, "Cool Beam Unit not found = " + CompName);
         }
 
-        DataSizing::CurTermUnitSizingNum = DataDefineEquip::AirDistUnit(CoolBeam(CBNum).ADUNum).TermUnitSizingNum;
+        DataSizing::CurTermUnitSizingNum = state.dataDefineEquipment->AirDistUnit(CoolBeam(CBNum).ADUNum).TermUnitSizingNum;
         // initialize the unit
         InitCoolBeam(state, CBNum, FirstHVACIteration);
 
@@ -240,8 +240,6 @@ namespace HVACCooledBeam {
         using DataZoneEquipment::ZoneEquipConfig;
         using NodeInputManager::GetOnlySingleNode;
         using namespace DataSizing;
-        using DataDefineEquip::AirDistUnit;
-        using DataDefineEquip::NumAirDistUnits;
         using WaterCoils::GetCoilWaterInletNode;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -449,10 +447,10 @@ namespace HVACCooledBeam {
                                 "Average",
                                 CoolBeam(CBNum).Name);
 
-            for (ADUNum = 1; ADUNum <= NumAirDistUnits; ++ADUNum) {
-                if (CoolBeam(CBNum).AirOutNode == AirDistUnit(ADUNum).OutletNodeNum) {
+            for (ADUNum = 1; ADUNum <= state.dataDefineEquipment->NumAirDistUnits; ++ADUNum) {
+                if (CoolBeam(CBNum).AirOutNode == state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum) {
                     CoolBeam(CBNum).ADUNum = ADUNum;
-                    AirDistUnit(ADUNum).InletNodeNum = CoolBeam(CBNum).AirInNode;
+                    state.dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum = CoolBeam(CBNum).AirInNode;
                 }
             }
             // one assumes if there isn't one assigned, it's an error?
@@ -471,9 +469,9 @@ namespace HVACCooledBeam {
                         if (CoolBeam(CBNum).AirOutNode == ZoneEquipConfig(CtrlZone).InletNode(SupAirIn)) {
                             ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).InNode = CoolBeam(CBNum).AirInNode;
                             ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode = CoolBeam(CBNum).AirOutNode;
-                            AirDistUnit(CoolBeam(CBNum).ADUNum).TermUnitSizingNum =
+                            state.dataDefineEquipment->AirDistUnit(CoolBeam(CBNum).ADUNum).TermUnitSizingNum =
                                 ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).TermUnitSizingIndex;
-                            AirDistUnit(CoolBeam(CBNum).ADUNum).ZoneEqNum = CtrlZone;
+                            state.dataDefineEquipment->AirDistUnit(CoolBeam(CBNum).ADUNum).ZoneEqNum = CtrlZone;
                             CoolBeam(CBNum).CtrlZoneNum = CtrlZone;
                             CoolBeam(CBNum).ctrlZoneInNodeIndex = SupAirIn;
                             AirNodeFound = true;
@@ -520,7 +518,6 @@ namespace HVACCooledBeam {
         // Uses the status flags to trigger initializations.
 
         // Using/Aliasing
-        using DataDefineEquip::AirDistUnit;
         using DataPlant::PlantLoop;
         using DataPlant::TypeOf_CooledBeamAirTerminal;
         using DataZoneEquipment::CheckZoneEquipmentList;
@@ -572,8 +569,8 @@ namespace HVACCooledBeam {
             // Check to see if there is a Air Distribution Unit on the Zone Equipment List
             for (Loop = 1; Loop <= NumCB; ++Loop) {
                 if (CoolBeam(Loop).ADUNum == 0) continue;
-                if (CheckZoneEquipmentList(state, "ZONEHVAC:AIRDISTRIBUTIONUNIT", AirDistUnit(CoolBeam(Loop).ADUNum).Name)) continue;
-                ShowSevereError(state, "InitCoolBeam: ADU=[Air Distribution Unit," + AirDistUnit(CoolBeam(Loop).ADUNum).Name +
+                if (CheckZoneEquipmentList(state, "ZONEHVAC:AIRDISTRIBUTIONUNIT", state.dataDefineEquipment->AirDistUnit(CoolBeam(Loop).ADUNum).Name)) continue;
+                ShowSevereError(state, "InitCoolBeam: ADU=[Air Distribution Unit," + state.dataDefineEquipment->AirDistUnit(CoolBeam(Loop).ADUNum).Name +
                                 "] is not on any ZoneHVAC:EquipmentList.");
                 ShowContinueError(state, "...Unit=[" + CurrentModuleObject + ',' + CoolBeam(Loop).Name + "] will not be simulated.");
             }
@@ -628,7 +625,7 @@ namespace HVACCooledBeam {
                 if (CoolBeam(CBNum).CtrlZoneNum > 0 && CoolBeam(CBNum).ctrlZoneInNodeIndex > 0) {
                     CoolBeam(CBNum).AirLoopNum =
                         DataZoneEquipment::ZoneEquipConfig(CoolBeam(CBNum).CtrlZoneNum).InletNodeAirLoopNum(CoolBeam(CBNum).ctrlZoneInNodeIndex);
-                    AirDistUnit(CoolBeam(CBNum).ADUNum).AirLoopNum = CoolBeam(CBNum).AirLoopNum;
+                    state.dataDefineEquipment->AirDistUnit(CoolBeam(CBNum).ADUNum).AirLoopNum = CoolBeam(CBNum).AirLoopNum;
                 }
             }
 

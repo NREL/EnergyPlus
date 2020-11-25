@@ -151,7 +151,6 @@ SET( SRC
   DataDElight.hh
   DataDaylighting.hh
   DataDaylightingDevices.hh
-  DataDefineEquip.cc
   DataDefineEquip.hh
   DataEnvironment.cc
   DataEnvironment.hh
