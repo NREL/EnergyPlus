@@ -1262,7 +1262,6 @@ namespace PipeHeatTransfer {
 
         // Using/Aliasing
         using ConvectionCoefficients::CalcASHRAESimpExtConvectCoeff;
-        using DataEnvironment::BeamSolarRad;
         using DataEnvironment::DifSolarRad;
         using DataEnvironment::OutDryBulbTemp;
         using DataEnvironment::SkyTemp;
@@ -1358,7 +1357,7 @@ namespace PipeHeatTransfer {
                             }
 
                             // total absorbed solar - no ground solar
-                            QSolAbsorbed = TopSolarAbs * (max(SOLCOS(3), 0.0) * BeamSolarRad + DifSolarRad);
+                            QSolAbsorbed = TopSolarAbs * (max(SOLCOS(3), 0.0) * state.dataEnvrn->BeamSolarRad + DifSolarRad);
 
                             // If sun is not exposed, then turn off both solar and thermal radiation
                             if (!this->SolarExposed) {

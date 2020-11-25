@@ -317,7 +317,7 @@ namespace EcoRoofManager {
                                         HAirExtSurf(SurfNum));
         }
 
-        RS = BeamSolarRad + AnisoSkyMult(SurfNum) * DifSolarRad;
+        RS = state.dataEnvrn->BeamSolarRad + AnisoSkyMult(SurfNum) * DifSolarRad;
 
         Latm = 1.0 * Sigma * 1.0 * Surface(SurfNum).ViewFactorGround * pow_4(GroundTempKelvin) +
                1.0 * Sigma * 1.0 * Surface(SurfNum).ViewFactorSky * pow_4(SkyTempKelvin);

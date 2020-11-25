@@ -604,7 +604,7 @@ namespace PondGroundHeatExchanger {
         Real64 FluxLongwave = StefBoltzmann * ThermalAbs * (pow_4(SurfTempAbs) - pow_4(SkyTempAbs));
 
         // total absorbed solar using function - no ground solar
-        Real64 FluxSolAbsorbed = CalcSolarFlux();
+        Real64 FluxSolAbsorbed = CalcSolarFlux(state);
 
         // specific heat from fluid prop routines
         Real64 SpecHeat = FluidProperties::GetSpecificHeatGlycol(
@@ -642,7 +642,7 @@ namespace PondGroundHeatExchanger {
         return CalcTotalFLux;
     }
 
-    Real64 PondGroundHeatExchangerData::CalcSolarFlux() const
+    Real64 PondGroundHeatExchangerData::CalcSolarFlux(EnergyPlusData &state) const
     {
 
         // FUNCTION INFORMATION:
@@ -700,7 +700,7 @@ namespace PondGroundHeatExchanger {
         Real64 Reflectance = Absorbtance - Transmitance;
 
         // apply reflectance to beam and diffuse solar to find flux
-        CalcSolarFlux = (1.0 - Reflectance) * (DataEnvironment::SOLCOS(3) * DataEnvironment::BeamSolarRad + DataEnvironment::DifSolarRad);
+        CalcSolarFlux = (1.0 - Reflectance) * (DataEnvironment::SOLCOS(3) * state.dataEnvrn->BeamSolarRad + DataEnvironment::DifSolarRad);
 
         return CalcSolarFlux;
     }

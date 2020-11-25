@@ -408,7 +408,7 @@ namespace WeatherManager {
                                 "Environment");
             SetupOutputVariable(state, "Site Direct Solar Radiation Rate per Area",
                                 OutputProcessor::Unit::W_m2,
-                                DataEnvironment::BeamSolarRad,
+                                state.dataEnvrn->BeamSolarRad,
                                 "Zone",
                                 "Average",
                                 "Environment");
@@ -1969,8 +1969,8 @@ namespace WeatherManager {
         DataEnvironment::SkyTempKelvin = DataEnvironment::SkyTemp + DataGlobalConstants::KelvinConv();
         DataEnvironment::DifSolarRad = state.dataWeatherManager->TodayDifSolarRad(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay);
         if (DataEnvironment::EMSDifSolarRadOverrideOn) DataEnvironment::DifSolarRad = DataEnvironment::EMSDifSolarRadOverrideValue;
-        DataEnvironment::BeamSolarRad = state.dataWeatherManager->TodayBeamSolarRad(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay);
-        if (DataEnvironment::EMSBeamSolarRadOverrideOn) DataEnvironment::BeamSolarRad = DataEnvironment::EMSBeamSolarRadOverrideValue;
+        state.dataEnvrn->BeamSolarRad = state.dataWeatherManager->TodayBeamSolarRad(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay);
+        if (DataEnvironment::EMSBeamSolarRadOverrideOn) state.dataEnvrn->BeamSolarRad = DataEnvironment::EMSBeamSolarRadOverrideValue;
         DataEnvironment::LiquidPrecipitation = state.dataWeatherManager->TodayLiquidPrecip(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay) / 1000.0; // convert from mm to m
         DataEnvironment::TotalCloudCover = state.dataWeatherManager->TodayTotalSkyCover(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay);
         DataEnvironment::OpaqueCloudCover = state.dataWeatherManager->TodayOpaqueSkyCover(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay);
@@ -1992,11 +1992,11 @@ namespace WeatherManager {
         }
 
         DataEnvironment::GndSolarRad =
-            max((DataEnvironment::BeamSolarRad * DataEnvironment::SOLCOS(3) + DataEnvironment::DifSolarRad) * DataEnvironment::GndReflectance, 0.0);
+            max((state.dataEnvrn->BeamSolarRad * DataEnvironment::SOLCOS(3) + DataEnvironment::DifSolarRad) * DataEnvironment::GndReflectance, 0.0);
 
         if (!DataEnvironment::SunIsUp) {
             DataEnvironment::DifSolarRad = 0.0;
-            DataEnvironment::BeamSolarRad = 0.0;
+            state.dataEnvrn->BeamSolarRad = 0.0;
             DataEnvironment::GndSolarRad = 0.0;
         }
 
@@ -2007,7 +2007,7 @@ namespace WeatherManager {
         if (DataEnvironment::OutDryBulbTemp < DataEnvironment::OutWetBulbTemp) DataEnvironment::OutWetBulbTemp = DataEnvironment::OutDryBulbTemp;
         if (DataEnvironment::OutDewPointTemp > DataEnvironment::OutWetBulbTemp) DataEnvironment::OutDewPointTemp = DataEnvironment::OutWetBulbTemp;
 
-        DayltgCurrentExtHorizIllum();
+        DayltgCurrentExtHorizIllum(state);
 
         if (!DataEnvironment::IsRain) {
              state.dataWeatherManager->RptIsRain = 0;
@@ -7181,7 +7181,7 @@ namespace WeatherManager {
               DataEnvironment::WeatherFileTempModCoeff);
     }
 
-    void DayltgCurrentExtHorizIllum()
+    void DayltgCurrentExtHorizIllum(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -7205,7 +7205,7 @@ namespace WeatherManager {
         // SOLCOS(3), below, is the cosine of the solar zenith angle.
         if (DataEnvironment::SunIsUp) {
             // Exterior horizontal beam irradiance (W/m2)
-            Real64 SDIRH = DataEnvironment::BeamSolarRad * DataEnvironment::SOLCOS(3);
+            Real64 SDIRH = state.dataEnvrn->BeamSolarRad * DataEnvironment::SOLCOS(3);
             // Exterior horizontal sky diffuse irradiance (W/m2)
             Real64 SDIFH = DataEnvironment::DifSolarRad;
             // Fraction of sky covered by clouds
@@ -7214,10 +7214,10 @@ namespace WeatherManager {
             // Horizontal illuminance from sky and horizontal beam illuminance (lux)
             // obtained from solar quantities on weather file and luminous efficacy.
 
-            DayltgLuminousEfficacy(DataEnvironment::PDIFLW, DataEnvironment::PDIRLW);
+            DayltgLuminousEfficacy(state, DataEnvironment::PDIFLW, DataEnvironment::PDIRLW);
             DataEnvironment::HISKF = SDIFH * DataEnvironment::PDIFLW;
             DataEnvironment::HISUNF = SDIRH * DataEnvironment::PDIRLW;
-            DataEnvironment::HISUNFnorm = DataEnvironment::BeamSolarRad * DataEnvironment::PDIRLW;
+            DataEnvironment::HISUNFnorm = state.dataEnvrn->BeamSolarRad * DataEnvironment::PDIRLW;
         } else {
             DataEnvironment::CloudFraction = 0.0;
             DataEnvironment::PDIFLW = 0.0;
@@ -7230,7 +7230,8 @@ namespace WeatherManager {
         }
     }
 
-    void DayltgLuminousEfficacy(Real64 &DiffLumEff, // Luminous efficacy of sky diffuse solar radiation (lum/W)
+    void DayltgLuminousEfficacy(EnergyPlusData &state,
+                                Real64 &DiffLumEff, // Luminous efficacy of sky diffuse solar radiation (lum/W)
                                 Real64 &DirLumEff   // Luminous efficacy of beam solar radiation (lum/W)
     )
     {
@@ -7284,7 +7285,7 @@ namespace WeatherManager {
         // BeamSolarRad is the direct normal irradiance.
         Real64 const Zeta = 1.041 * pow_3(SunZenith);
         DataEnvironment::SkyClearness =
-            ((DataEnvironment::DifSolarRad + DataEnvironment::BeamSolarRad) / (DataEnvironment::DifSolarRad + 0.0001) + Zeta) / (1.0 + Zeta);
+            ((DataEnvironment::DifSolarRad + state.dataEnvrn->BeamSolarRad) / (DataEnvironment::DifSolarRad + 0.0001) + Zeta) / (1.0 + Zeta);
         // Relative optical air mass
         Real64 const AirMass = (1.0 - 0.1 * DataEnvironment::Elevation / 1000.0) /
                                (SinSunAltitude + 0.15 / std::pow(SunAltitude / DataGlobalConstants::DegToRadians() + 3.885, 1.253));

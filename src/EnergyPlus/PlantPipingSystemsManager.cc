@@ -4143,7 +4143,7 @@ namespace EnergyPlus {
             //       RE-ENGINEERED  na
 
             // Always do start of time step inits
-            this->DoStartOfTimeStepInitializations();
+            this->DoStartOfTimeStepInitializations(state);
 
             // Begin iterating for this time step
             for (int IterationIndex = 1; IterationIndex <= this->SimControls.MaxIterationsPerTS; ++IterationIndex) {
@@ -5727,14 +5727,14 @@ namespace EnergyPlus {
             }
         }
 
-        void Domain::DoStartOfTimeStepInitializations() {
+        void Domain::DoStartOfTimeStepInitializations(EnergyPlusData &state) {
             static std::string const RoutineName("PipingSystemCircuit::DoStartOfTimeStepInitializations");
 
             // Update environmental conditions
             this->Cur.CurAirTemp = DataEnvironment::OutDryBulbTemp;
             this->Cur.CurWindSpeed = DataEnvironment::WindSpeed;
             this->Cur.CurRelativeHumidity = DataEnvironment::OutRelHum;
-            this->Cur.CurIncidentSolar = DataEnvironment::BeamSolarRad;
+            this->Cur.CurIncidentSolar = state.dataEnvrn->BeamSolarRad;
 
             //'now update cell properties
             auto &cells(this->Cells);
@@ -5798,7 +5798,7 @@ namespace EnergyPlus {
             Real64 FluidPrandtl;
 
             // do the regular, non-circuit related inits
-            this->DoStartOfTimeStepInitializations();
+            this->DoStartOfTimeStepInitializations(state);
 
             // retrieve fluid properties based on the circuit inlet temperature -- which varies during the simulation
             // but need to verify the value of inlet temperature during warm up, etc.

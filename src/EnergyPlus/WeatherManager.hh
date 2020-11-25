@@ -708,9 +708,10 @@ namespace WeatherManager {
 
     void GetWeatherStation(EnergyPlusData &state, bool &ErrorsFound);
 
-    void DayltgCurrentExtHorizIllum();
+    void DayltgCurrentExtHorizIllum(EnergyPlusData &state);
 
-    void DayltgLuminousEfficacy(Real64 &DiffLumEff, // Luminous efficacy of sky diffuse solar radiation (lum/W)
+    void DayltgLuminousEfficacy(EnergyPlusData &state,
+                                Real64 &DiffLumEff, // Luminous efficacy of sky diffuse solar radiation (lum/W)
                                 Real64 &DirLumEff   // Luminous efficacy of beam solar radiation (lum/W)
     );
 

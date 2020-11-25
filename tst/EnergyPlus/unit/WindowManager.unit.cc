@@ -258,7 +258,7 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
     Real64 h_exterior_f = 4 + v_ws * 4;
     Real64 h_exterior;
 
-    DataEnvironment::BeamSolarRad = I_s;
+    state->dataEnvrn->BeamSolarRad = I_s;
 
     if (I_s > 0.0) {
         DataEnvironment::SunIsUp = true;

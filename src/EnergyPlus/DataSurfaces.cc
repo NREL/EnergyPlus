@@ -750,7 +750,6 @@ namespace DataSurfaces {
         // Routine provides facility for doing bulk Set Temperature at Height.
 
         // Using/Aliasing
-        using DataEnvironment::EarthRadius;
         using DataEnvironment::SiteTempGradient;
         using DataEnvironment::WeatherFileTempModCoeff;
 
@@ -767,8 +766,8 @@ namespace DataSurfaces {
                 OutDryBulbTemp = BaseDryTemp;
                 OutWetBulbTemp = BaseWetTemp;
             } else {
-                OutDryBulbTemp = BaseDryTemp - SiteTempGradient * EarthRadius * Z / (EarthRadius + Z);
-                OutWetBulbTemp = BaseWetTemp - SiteTempGradient * EarthRadius * Z / (EarthRadius + Z);
+                OutDryBulbTemp = BaseDryTemp - SiteTempGradient * DataEnvironment::EarthRadius * Z / (DataEnvironment::EarthRadius + Z);
+                OutWetBulbTemp = BaseWetTemp - SiteTempGradient * DataEnvironment::EarthRadius * Z / (DataEnvironment::EarthRadius + Z);
             }
         }
     }

@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -61,24 +62,12 @@ struct EnergyPlusData;
 
 namespace DataEnvironment {
 
-    // Data
-    // -only module should be available to other modules and routines.
-    // Thus, all variables in this module must be PUBLIC.
-
-    // MODULE PARAMETER DEFINITIONS:
-    extern Real64 const EarthRadius;             // Radius of the Earth (m)
-    extern Real64 const AtmosphericTempGradient; // Standard atmospheric air temperature gradient (K/m)
-    extern Real64 const SunIsUpValue;            // if Cos Zenith Angle of the sun is >= this value, the sun is "up"
-    extern Real64 const StdPressureSeaLevel;     // Standard barometric pressure at sea level (Pa)
-
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS:
-    // na
+    Real64 constexpr EarthRadius(6356000.0);          // Radius of the Earth (m)
+    Real64 constexpr AtmosphericTempGradient(0.0065); // Standard atmospheric air temperature gradient (K/m)
+    Real64 constexpr SunIsUpValue(0.00001);           // if Cos Zenith Angle of the sun is >= this value, the sun is "up"
+    Real64 constexpr StdPressureSeaLevel(101325.0);   // Standard barometric pressure at sea level (Pa)
 
     // MODULE VARIABLE DECLARATIONS:
-    extern Real64 BeamSolarRad;                 // Current beam normal solar irradiance
     extern bool EMSBeamSolarRadOverrideOn;      // EMS flag for beam normal solar irradiance
     extern Real64 EMSBeamSolarRadOverrideValue; // EMS override value for beam normal solar irradiance
     extern int DayOfMonth;                      // Current day of the month
@@ -206,14 +195,6 @@ namespace DataEnvironment {
     // for PerformancePrecisionTradeoffs
     extern bool forceBeginEnvResetSuppress;
 
-    // SUBROUTINE SPECIFICATIONS FOR MODULE DataEnvironment:
-    // PUBLIC OutBaroPressAt
-    // PUBLIC OutAirDensityAt
-
-    // Functions
-
-    // Clears the global data in DataEnvironment.
-    // Needed for unit tests, should not be normally called.
     void clear_state();
 
     Real64 OutDryBulbTempAt(EnergyPlusData &state, Real64 Z); // Height above ground (m)
@@ -229,6 +210,16 @@ namespace DataEnvironment {
     void SetOutBulbTempAt_error(EnergyPlusData &state, std::string const &Settings, Real64 max_height, std::string const &SettingsName);
 
 } // namespace DataEnvironment
+
+struct EnvironmentData : BaseGlobalStruct {
+
+    Real64 BeamSolarRad = 0.0;              // Current beam normal solar irradiance
+
+    void clear_state() override
+    {
+        this->BeamSolarRad = 0.0;
+    }
+};
 
 } // namespace EnergyPlus
 

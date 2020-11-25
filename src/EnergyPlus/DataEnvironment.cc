@@ -71,34 +71,7 @@ namespace DataEnvironment {
     // to the "environment" (i.e. current date data, tomorrow's date data, and
     // current weather variables)
 
-    // METHODOLOGY EMPLOYED:
-    // na
-
-    // REFERENCES:
-    // na
-
-    // OTHER NOTES:
-    // na
-
-    // Using/Aliasing
-    // Data
-    // -only module should be available to other modules and routines.
-    // Thus, all variables in this module must be PUBLIC.
-
-    // MODULE PARAMETER DEFINITIONS:
-    Real64 const EarthRadius(6356000.0);          // Radius of the Earth (m)
-    Real64 const AtmosphericTempGradient(0.0065); // Standard atmospheric air temperature gradient (K/m)
-    Real64 const SunIsUpValue(0.00001);           // if Cos Zenith Angle of the sun is >= this value, the sun is "up"
-    Real64 const StdPressureSeaLevel(101325.0);   // Standard barometric pressure at sea level (Pa)
-
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS:
-    // na
-
     // MODULE VARIABLE DECLARATIONS:
-    Real64 BeamSolarRad;                   // Current beam normal solar irradiance
     bool EMSBeamSolarRadOverrideOn(false); // EMS flag for beam normal solar irradiance
     Real64 EMSBeamSolarRadOverrideValue;   // EMS override value for beam normal solar irradiance
     int DayOfMonth;                        // Current day of the month
@@ -170,7 +143,7 @@ namespace DataEnvironment {
     Real64 SkyBrightness;                     // Sky brightness (see subr. DayltgLuminousEfficacy)
     Real64 TotalCloudCover(5.0);              // Total Sky Cover (tenth of sky)
     Real64 OpaqueCloudCover(5.0);             // Opaque Sky Cover (tenth of sky)
-    Real64 StdBaroPress(StdPressureSeaLevel); // Standard "atmospheric pressure" based on elevation (ASHRAE HOF p6.1)
+    Real64 StdBaroPress(DataEnvironment::StdPressureSeaLevel); // Standard "atmospheric pressure" based on elevation (ASHRAE HOF p6.1)
     Real64 StdRhoAir;                         // Standard "rho air" set in WeatherManager - based on StdBaroPress
     Real64 rhoAirSTP;                         // Standard density of dry air at 101325 Pa, 20.0C temperaure
     Real64 TimeZoneNumber;                    // Time Zone Number of building location
@@ -226,17 +199,8 @@ namespace DataEnvironment {
     // for PerformancePrecisionTradeoffs
     bool forceBeginEnvResetSuppress(false);
 
-    // SUBROUTINE SPECIFICATIONS FOR MODULE DataEnvironment:
-    // PUBLIC OutBaroPressAt
-    // PUBLIC OutAirDensityAt
-
-    // Functions
-
-    // Clears the global data in DataEnvironment.
-    // Needed for unit tests, should not be normally called.
     void clear_state()
     {
-        BeamSolarRad = Real64();
         EMSBeamSolarRadOverrideOn = false;
         EMSBeamSolarRadOverrideValue = Real64();
         DayOfMonth = int();
@@ -387,7 +351,7 @@ namespace DataEnvironment {
         } else if (Z <= 0.0) {
             LocalOutDryBulbTemp = BaseTemp;
         } else {
-            LocalOutDryBulbTemp = BaseTemp - SiteTempGradient * EarthRadius * Z / (EarthRadius + Z);
+            LocalOutDryBulbTemp = BaseTemp - SiteTempGradient * DataEnvironment::EarthRadius * Z / (DataEnvironment::EarthRadius + Z);
         }
 
         if (LocalOutDryBulbTemp < -100.0) {
@@ -417,13 +381,8 @@ namespace DataEnvironment {
         // REFERENCES:
         // 1976 U.S. Standard Atmosphere. 1976. U.S. Government Printing Office, Washington, D.C.
 
-        // Using/Aliasing
-
         // Return value
         Real64 LocalOutWetBulbTemp; // Return result for function (C)
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 BaseTemp; // Base temperature at Z = 0 (C)
@@ -435,7 +394,7 @@ namespace DataEnvironment {
         } else if (Z <= 0.0) {
             LocalOutWetBulbTemp = BaseTemp;
         } else {
-            LocalOutWetBulbTemp = BaseTemp - SiteTempGradient * EarthRadius * Z / (EarthRadius + Z);
+            LocalOutWetBulbTemp = BaseTemp - SiteTempGradient * DataEnvironment::EarthRadius * Z / (DataEnvironment::EarthRadius + Z);
         }
 
         if (LocalOutWetBulbTemp < -100.0) {
@@ -466,13 +425,8 @@ namespace DataEnvironment {
         // REFERENCES:
         // 1976 U.S. Standard Atmosphere. 1976. U.S. Government Printing Office, Washington, D.C.
 
-        // Using/Aliasing
-
         // Return value
         Real64 LocalOutDewPointTemp; // Return result for function (C)
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 BaseTemp; // Base temperature at Z = 0 (C)
@@ -484,7 +438,7 @@ namespace DataEnvironment {
         } else if (Z <= 0.0) {
             LocalOutDewPointTemp = BaseTemp;
         } else {
-            LocalOutDewPointTemp = BaseTemp - SiteTempGradient * EarthRadius * Z / (EarthRadius + Z);
+            LocalOutDewPointTemp = BaseTemp - SiteTempGradient * DataEnvironment::EarthRadius * Z / (DataEnvironment::EarthRadius + Z);
         }
 
         if (LocalOutDewPointTemp < -100.0) {
@@ -517,9 +471,6 @@ namespace DataEnvironment {
 
         // Return value
         Real64 LocalWindSpeed; // Return result for function (m/s)
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
 
         if (Z <= 0.0) {
             LocalWindSpeed = 0.0;
@@ -556,15 +507,12 @@ namespace DataEnvironment {
         // Return value
         Real64 LocalAirPressure; // Return result for function (Pa)
 
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
         // FNCTION PARAMETER DEFINITIONS:
-        Real64 const StdGravity(9.80665);    // The acceleration of gravity at the sea level (m/s2)
-        Real64 const AirMolarMass(0.028964); // Molar mass of Earth's air (kg/mol)
-        Real64 const GasConstant(8.31432);   // Molar gas constant (J/Mol-K)
-        Real64 const TempGradient(-0.0065);  // Molecular-scale temperature gradient (K/m)
-        Real64 const GeopotentialH(0.0);     // Geopotential height (zero within 11km from the sea level) (m)
+        Real64 constexpr StdGravity(9.80665);    // The acceleration of gravity at the sea level (m/s2)
+        Real64 constexpr AirMolarMass(0.028964); // Molar mass of Earth's air (kg/mol)
+        Real64 constexpr GasConstant(8.31432);   // Molar gas constant (J/Mol-K)
+        Real64 constexpr TempGradient(-0.0065);  // Molecular-scale temperature gradient (K/m)
+        Real64 constexpr GeopotentialH(0.0);     // Geopotential height (zero within 11km from the sea level) (m)
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 BaseTemp; // Base temperature at Z
@@ -608,30 +556,6 @@ namespace DataEnvironment {
 
         // PURPOSE OF THIS SUBROUTINE:
         // Routine provides facility for doing bulk Set Windspeed at Height.
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-
-        // Argument array dimensioning
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         if (SiteWindExp == 0.0) {
             LocalWindSpeed = WindSpeed;

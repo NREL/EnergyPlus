@@ -305,7 +305,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
                 airDensity_num += OutAirDensity;
                 relHum_num += OutRelHumValue;
                 windSpeed_num += WindSpeed;
-                horizSolarRad_num += BeamSolarRad + DifSolarRad;
+                horizSolarRad_num += state.dataEnvrn->BeamSolarRad + DifSolarRad;
 
                 state.dataGlobal->BeginHourFlag = false;
                 state.dataGlobal->BeginDayFlag = false;
