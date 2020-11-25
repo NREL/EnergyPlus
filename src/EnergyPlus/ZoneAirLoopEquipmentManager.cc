@@ -281,7 +281,7 @@ namespace ZoneAirLoopEquipmentManager {
                 }
                 // Validate EquipType for Air Distribution Unit
                 if (UtilityRoutines::SameString(AirDistUnit(AirDistUnitNum).EquipType(AirDistCompUnitNum), "AirTerminal:DualDuct:ConstantVolume")) {
-                    AirDistUnit(AirDistUnitNum).EquipType_Num(AirDistCompUnitNum) = DualDuctConstVolume;
+                    AirDistUnit(AirDistUnitNum).EquipType_Num(AirDistCompUnitNum) = DataDefineEquip::iZnAirLoopEquipType::DualDuctConstVolume;
                     if (AirDistUnit(AirDistUnitNum).UpStreamLeak || AirDistUnit(AirDistUnitNum).DownStreamLeak) {
                         ShowSevereError(state, "Error found in " + CurrentModuleObject + " = " + AirDistUnit(AirDistUnitNum).Name);
                         ShowContinueError(state, "Simple duct leakage model not available for " + cAlphaFields(3) + " = " +
@@ -289,7 +289,7 @@ namespace ZoneAirLoopEquipmentManager {
                         ErrorsFound = true;
                     }
                 } else if (UtilityRoutines::SameString(AirDistUnit(AirDistUnitNum).EquipType(AirDistCompUnitNum), "AirTerminal:DualDuct:VAV")) {
-                    AirDistUnit(AirDistUnitNum).EquipType_Num(AirDistCompUnitNum) = DualDuctVAV;
+                    AirDistUnit(AirDistUnitNum).EquipType_Num(AirDistCompUnitNum) = DataDefineEquip::iZnAirLoopEquipType::DualDuctVAV;
                     if (AirDistUnit(AirDistUnitNum).UpStreamLeak || AirDistUnit(AirDistUnitNum).DownStreamLeak) {
                         ShowSevereError(state, "Error found in " + CurrentModuleObject + " = " + AirDistUnit(AirDistUnitNum).Name);
                         ShowContinueError(state, "Simple duct leakage model not available for " + cAlphaFields(3) + " = " +
@@ -298,7 +298,7 @@ namespace ZoneAirLoopEquipmentManager {
                     }
                 } else if (UtilityRoutines::SameString(AirDistUnit(AirDistUnitNum).EquipType(AirDistCompUnitNum),
                                                        "AirTerminal:DualDuct:VAV:OutdoorAir")) {
-                    AirDistUnit(AirDistUnitNum).EquipType_Num(AirDistCompUnitNum) = DualDuctVAVOutdoorAir;
+                    AirDistUnit(AirDistUnitNum).EquipType_Num(AirDistCompUnitNum) = DataDefineEquip::iZnAirLoopEquipType::DualDuctVAVOutdoorAir;
                     if (AirDistUnit(AirDistUnitNum).UpStreamLeak || AirDistUnit(AirDistUnitNum).DownStreamLeak) {
                         ShowSevereError(state, "Error found in " + CurrentModuleObject + " = " + AirDistUnit(AirDistUnitNum).Name);
                         ShowContinueError(state, "Simple duct leakage model not available for " + cAlphaFields(3) + " = " +
@@ -307,25 +307,25 @@ namespace ZoneAirLoopEquipmentManager {
                     }
                 } else if (UtilityRoutines::SameString(AirDistUnit(AirDistUnitNum).EquipType(AirDistCompUnitNum),
                                                        "AirTerminal:SingleDuct:ConstantVolume:Reheat")) {
-                    AirDistUnit(AirDistUnitNum).EquipType_Num(AirDistCompUnitNum) = SingleDuctConstVolReheat;
+                    AirDistUnit(AirDistUnitNum).EquipType_Num(AirDistCompUnitNum) = DataDefineEquip::iZnAirLoopEquipType::SingleDuctConstVolReheat;
                 } else if (UtilityRoutines::SameString(AirDistUnit(AirDistUnitNum).EquipType(AirDistCompUnitNum),
                                                        "AirTerminal:SingleDuct:ConstantVolume:NoReheat")) {
-                    AirDistUnit(AirDistUnitNum).EquipType_Num(AirDistCompUnitNum) = SingleDuctConstVolNoReheat;
+                    AirDistUnit(AirDistUnitNum).EquipType_Num(AirDistCompUnitNum) = DataDefineEquip::iZnAirLoopEquipType::SingleDuctConstVolNoReheat;
                 } else if (UtilityRoutines::SameString(AirDistUnit(AirDistUnitNum).EquipType(AirDistCompUnitNum),
                                                        "AirTerminal:SingleDuct:VAV:Reheat")) {
-                    AirDistUnit(AirDistUnitNum).EquipType_Num(AirDistCompUnitNum) = SingleDuctVAVReheat;
+                    AirDistUnit(AirDistUnitNum).EquipType_Num(AirDistCompUnitNum) = DataDefineEquip::iZnAirLoopEquipType::SingleDuctVAVReheat;
                 } else if (UtilityRoutines::SameString(AirDistUnit(AirDistUnitNum).EquipType(AirDistCompUnitNum),
                                                        "AirTerminal:SingleDuct:VAV:NoReheat")) {
-                    AirDistUnit(AirDistUnitNum).EquipType_Num(AirDistCompUnitNum) = SingleDuctVAVNoReheat;
+                    AirDistUnit(AirDistUnitNum).EquipType_Num(AirDistCompUnitNum) = DataDefineEquip::iZnAirLoopEquipType::SingleDuctVAVNoReheat;
                 } else if (UtilityRoutines::SameString(AirDistUnit(AirDistUnitNum).EquipType(AirDistCompUnitNum),
                                                        "AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat")) {
-                    AirDistUnit(AirDistUnitNum).EquipType_Num(AirDistCompUnitNum) = SingleDuctCBVAVReheat;
+                    AirDistUnit(AirDistUnitNum).EquipType_Num(AirDistCompUnitNum) = DataDefineEquip::iZnAirLoopEquipType::SingleDuctCBVAVReheat;
                 } else if (UtilityRoutines::SameString(AirDistUnit(AirDistUnitNum).EquipType(AirDistCompUnitNum),
                                                        "AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat")) {
-                    AirDistUnit(AirDistUnitNum).EquipType_Num(AirDistCompUnitNum) = SingleDuctCBVAVNoReheat;
+                    AirDistUnit(AirDistUnitNum).EquipType_Num(AirDistCompUnitNum) = DataDefineEquip::iZnAirLoopEquipType::SingleDuctCBVAVNoReheat;
                 } else if (UtilityRoutines::SameString(AirDistUnit(AirDistUnitNum).EquipType(AirDistCompUnitNum),
                                                        "AirTerminal:SingleDuct:SeriesPIU:Reheat")) {
-                    AirDistUnit(AirDistUnitNum).EquipType_Num(AirDistCompUnitNum) = SingleDuct_SeriesPIU_Reheat;
+                    AirDistUnit(AirDistUnitNum).EquipType_Num(AirDistCompUnitNum) = DataDefineEquip::iZnAirLoopEquipType::SingleDuct_SeriesPIU_Reheat;
                     if (AirDistUnit(AirDistUnitNum).UpStreamLeak || AirDistUnit(AirDistUnitNum).DownStreamLeak) {
                         ShowSevereError(state, "Error found in " + CurrentModuleObject + " = " + AirDistUnit(AirDistUnitNum).Name);
                         ShowContinueError(state, "Simple duct leakage model not available for " + cAlphaFields(3) + " = " +
@@ -334,7 +334,7 @@ namespace ZoneAirLoopEquipmentManager {
                     }
                 } else if (UtilityRoutines::SameString(AirDistUnit(AirDistUnitNum).EquipType(AirDistCompUnitNum),
                                                        "AirTerminal:SingleDuct:ParallelPIU:Reheat")) {
-                    AirDistUnit(AirDistUnitNum).EquipType_Num(AirDistCompUnitNum) = SingleDuct_ParallelPIU_Reheat;
+                    AirDistUnit(AirDistUnitNum).EquipType_Num(AirDistCompUnitNum) = DataDefineEquip::iZnAirLoopEquipType::SingleDuct_ParallelPIU_Reheat;
                     if (AirDistUnit(AirDistUnitNum).UpStreamLeak || AirDistUnit(AirDistUnitNum).DownStreamLeak) {
                         ShowSevereError(state, "Error found in " + CurrentModuleObject + " = " + AirDistUnit(AirDistUnitNum).Name);
                         ShowContinueError(state, "Simple duct leakage model not available for " + cAlphaFields(3) + " = " +
@@ -343,7 +343,7 @@ namespace ZoneAirLoopEquipmentManager {
                     }
                 } else if (UtilityRoutines::SameString(AirDistUnit(AirDistUnitNum).EquipType(AirDistCompUnitNum),
                                                        "AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction")) {
-                    AirDistUnit(AirDistUnitNum).EquipType_Num(AirDistCompUnitNum) = SingleDuct_ConstVol_4PipeInduc;
+                    AirDistUnit(AirDistUnitNum).EquipType_Num(AirDistCompUnitNum) = DataDefineEquip::iZnAirLoopEquipType::SingleDuct_ConstVol_4PipeInduc;
                     if (AirDistUnit(AirDistUnitNum).UpStreamLeak || AirDistUnit(AirDistUnitNum).DownStreamLeak) {
                         ShowSevereError(state, "Error found in " + CurrentModuleObject + " = " + AirDistUnit(AirDistUnitNum).Name);
                         ShowContinueError(state, "Simple duct leakage model not available for " + cAlphaFields(3) + " = " +
@@ -352,7 +352,7 @@ namespace ZoneAirLoopEquipmentManager {
                     }
                 } else if (UtilityRoutines::SameString(AirDistUnit(AirDistUnitNum).EquipType(AirDistCompUnitNum),
                                                        "AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan")) {
-                    AirDistUnit(AirDistUnitNum).EquipType_Num(AirDistCompUnitNum) = SingleDuctVAVReheatVSFan;
+                    AirDistUnit(AirDistUnitNum).EquipType_Num(AirDistCompUnitNum) = DataDefineEquip::iZnAirLoopEquipType::SingleDuctVAVReheatVSFan;
                     if (AirDistUnit(AirDistUnitNum).UpStreamLeak || AirDistUnit(AirDistUnitNum).DownStreamLeak) {
                         ShowSevereError(state, "Error found in " + CurrentModuleObject + " = " + AirDistUnit(AirDistUnitNum).Name);
                         ShowContinueError(state, "Simple duct leakage model not available for " + cAlphaFields(3) + " = " +
@@ -361,7 +361,7 @@ namespace ZoneAirLoopEquipmentManager {
                     }
                 } else if (UtilityRoutines::SameString(AirDistUnit(AirDistUnitNum).EquipType(AirDistCompUnitNum),
                                                        "AirTerminal:SingleDuct:ConstantVolume:CooledBeam")) {
-                    AirDistUnit(AirDistUnitNum).EquipType_Num(AirDistCompUnitNum) = SingleDuctConstVolCooledBeam;
+                    AirDistUnit(AirDistUnitNum).EquipType_Num(AirDistCompUnitNum) = DataDefineEquip::iZnAirLoopEquipType::SingleDuctConstVolCooledBeam;
                     if (AirDistUnit(AirDistUnitNum).UpStreamLeak || AirDistUnit(AirDistUnitNum).DownStreamLeak) {
                         ShowSevereError(state, "Error found in " + CurrentModuleObject + " = " + AirDistUnit(AirDistUnitNum).Name);
                         ShowContinueError(state, "Simple duct leakage model not available for " + cAlphaFields(3) + " = " +
@@ -370,7 +370,7 @@ namespace ZoneAirLoopEquipmentManager {
                     }
                 } else if (UtilityRoutines::SameString(AirDistUnit(AirDistUnitNum).EquipType(AirDistCompUnitNum),
                                                        "AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam")) {
-                    AirDistUnit(AirDistUnitNum).EquipType_Num(AirDistCompUnitNum) = SingleDuctConstVolFourPipeBeam;
+                    AirDistUnit(AirDistUnitNum).EquipType_Num(AirDistCompUnitNum) = DataDefineEquip::iZnAirLoopEquipType::SingleDuctConstVolFourPipeBeam;
                     AirDistUnit(AirDistUnitNum).airTerminalPtr =
                         FourPipeBeam::HVACFourPipeBeam::fourPipeBeamFactory(state, AirDistUnit(AirDistUnitNum).EquipName(1));
                     if (AirDistUnit(AirDistUnitNum).UpStreamLeak || AirDistUnit(AirDistUnitNum).DownStreamLeak) {
@@ -381,9 +381,9 @@ namespace ZoneAirLoopEquipmentManager {
                     }
                 } else if (UtilityRoutines::SameString(AirDistUnit(AirDistUnitNum).EquipType(AirDistCompUnitNum),
                                                        "AirTerminal:SingleDuct:UserDefined")) {
-                    AirDistUnit(AirDistUnitNum).EquipType_Num(AirDistCompUnitNum) = SingleDuctUserDefined;
+                    AirDistUnit(AirDistUnitNum).EquipType_Num(AirDistCompUnitNum) = DataDefineEquip::iZnAirLoopEquipType::SingleDuctUserDefined;
                 } else if (UtilityRoutines::SameString(AirDistUnit(AirDistUnitNum).EquipType(AirDistCompUnitNum), "AirTerminal:SingleDuct:Mixer")) {
-                    AirDistUnit(AirDistUnitNum).EquipType_Num(AirDistCompUnitNum) = SingleDuctATMixer;
+                    AirDistUnit(AirDistUnitNum).EquipType_Num(AirDistCompUnitNum) = DataDefineEquip::iZnAirLoopEquipType::SingleDuctATMixer;
                     if (AirDistUnit(AirDistUnitNum).UpStreamLeak || AirDistUnit(AirDistUnitNum).DownStreamLeak) {
                         ShowSevereError(state, "Error found in " + CurrentModuleObject + " = " + AirDistUnit(AirDistUnitNum).Name);
                         ShowContinueError(state, "Simple duct leakage model not available for " + cAlphaFields(3) + " = " +
@@ -397,8 +397,8 @@ namespace ZoneAirLoopEquipmentManager {
                 }
 
                 // Set up component set for air terminal unit
-                if ((AirDistUnit(AirDistUnitNum).EquipType_Num(AirDistCompUnitNum) == DualDuctConstVolume) ||
-                    (AirDistUnit(AirDistUnitNum).EquipType_Num(AirDistCompUnitNum) == DualDuctVAV)) {
+                if ((AirDistUnit(AirDistUnitNum).EquipType_Num(AirDistCompUnitNum) == DataDefineEquip::iZnAirLoopEquipType::DualDuctConstVolume) ||
+                    (AirDistUnit(AirDistUnitNum).EquipType_Num(AirDistCompUnitNum) == DataDefineEquip::iZnAirLoopEquipType::DualDuctVAV)) {
                     //  For dual duct units, set up two component sets, one for heat and one for cool
                     SetUpCompSets(state, CurrentModuleObject,
                                   AirDistUnit(AirDistUnitNum).Name,
@@ -414,7 +414,7 @@ namespace ZoneAirLoopEquipmentManager {
                                   AlphArray(2));
                     //  For dual duct units with decoupled OA and RA, set up two component sets, one for OA (Outdoor Air)
                     //  and one for RA (Recirculated Air)
-                } else if (AirDistUnit(AirDistUnitNum).EquipType_Num(AirDistCompUnitNum) == DualDuctVAVOutdoorAir) {
+                } else if (AirDistUnit(AirDistUnitNum).EquipType_Num(AirDistCompUnitNum) == DataDefineEquip::iZnAirLoopEquipType::DualDuctVAVOutdoorAir) {
                     SetUpCompSets(state, CurrentModuleObject,
                                   AirDistUnit(AirDistUnitNum).Name,
                                   AirDistUnit(AirDistUnitNum).EquipType(AirDistCompUnitNum) + ":OutdoorAir",
@@ -520,8 +520,8 @@ namespace ZoneAirLoopEquipmentManager {
 
             if (AirDistUnit(AirDistUnitNum).ZoneNum != 0 && DataHeatBalance::Zone(AirDistUnit(AirDistUnitNum).ZoneNum).HasAdjustedReturnTempByITE) {
                 for (int AirDistCompNum = 1; AirDistCompNum <= AirDistUnit(AirDistUnitNum).NumComponents; ++AirDistCompNum) {
-                    if (AirDistUnit(AirDistUnitNum).EquipType_Num(AirDistCompNum) != SingleDuctVAVReheat &&
-                        AirDistUnit(AirDistUnitNum).EquipType_Num(AirDistCompNum) != SingleDuctVAVNoReheat) {
+                    if (AirDistUnit(AirDistUnitNum).EquipType_Num(AirDistCompNum) != DataDefineEquip::iZnAirLoopEquipType::SingleDuctVAVReheat &&
+                        AirDistUnit(AirDistUnitNum).EquipType_Num(AirDistCompNum) != DataDefineEquip::iZnAirLoopEquipType::SingleDuctVAVNoReheat) {
                         ShowSevereError(state, "The FlowControlWithApproachTemperatures only works with ITE zones with single duct VAV terminal unit.");
                         ShowContinueError(state, "The return air temperature of the ITE will not be overwritten.");
                         ShowFatalError(state, "Preceding condition causes termination.");
@@ -627,98 +627,98 @@ namespace ZoneAirLoopEquipmentManager {
             {
                 auto const SELECT_CASE_var(AirDistUnit(AirDistUnitNum).EquipType_Num(AirDistCompNum));
 
-                if (SELECT_CASE_var == DualDuctConstVolume) {
+                if (SELECT_CASE_var == DataDefineEquip::iZnAirLoopEquipType::DualDuctConstVolume) {
                     SimulateDualDuct(state, AirDistUnit(AirDistUnitNum).EquipName(AirDistCompNum),
                                      FirstHVACIteration,
                                      ActualZoneNum,
                                      ZoneEquipConfig(ControlledZoneNum).ZoneNode,
                                      AirDistUnit(AirDistUnitNum).EquipIndex(AirDistCompNum));
 
-                } else if (SELECT_CASE_var == DualDuctVAV) {
+                } else if (SELECT_CASE_var == DataDefineEquip::iZnAirLoopEquipType::DualDuctVAV) {
                     SimulateDualDuct(state, AirDistUnit(AirDistUnitNum).EquipName(AirDistCompNum),
                                      FirstHVACIteration,
                                      ActualZoneNum,
                                      ZoneEquipConfig(ControlledZoneNum).ZoneNode,
                                      AirDistUnit(AirDistUnitNum).EquipIndex(AirDistCompNum));
 
-                } else if (SELECT_CASE_var == DualDuctVAVOutdoorAir) {
+                } else if (SELECT_CASE_var == DataDefineEquip::iZnAirLoopEquipType::DualDuctVAVOutdoorAir) {
                     SimulateDualDuct(state, AirDistUnit(AirDistUnitNum).EquipName(AirDistCompNum),
                                      FirstHVACIteration,
                                      ActualZoneNum,
                                      ZoneEquipConfig(ControlledZoneNum).ZoneNode,
                                      AirDistUnit(AirDistUnitNum).EquipIndex(AirDistCompNum));
 
-                } else if (SELECT_CASE_var == SingleDuctVAVReheat) {
+                } else if (SELECT_CASE_var == DataDefineEquip::iZnAirLoopEquipType::SingleDuctVAVReheat) {
                     SimulateSingleDuct(state, AirDistUnit(AirDistUnitNum).EquipName(AirDistCompNum),
                                        FirstHVACIteration,
                                        ActualZoneNum,
                                        ZoneEquipConfig(ControlledZoneNum).ZoneNode,
                                        AirDistUnit(AirDistUnitNum).EquipIndex(AirDistCompNum));
 
-                } else if (SELECT_CASE_var == SingleDuctCBVAVReheat) {
+                } else if (SELECT_CASE_var == DataDefineEquip::iZnAirLoopEquipType::SingleDuctCBVAVReheat) {
                     SimulateSingleDuct(state, AirDistUnit(AirDistUnitNum).EquipName(AirDistCompNum),
                                        FirstHVACIteration,
                                        ActualZoneNum,
                                        ZoneEquipConfig(ControlledZoneNum).ZoneNode,
                                        AirDistUnit(AirDistUnitNum).EquipIndex(AirDistCompNum));
 
-                } else if (SELECT_CASE_var == SingleDuctVAVNoReheat) {
+                } else if (SELECT_CASE_var == DataDefineEquip::iZnAirLoopEquipType::SingleDuctVAVNoReheat) {
                     SimulateSingleDuct(state, AirDistUnit(AirDistUnitNum).EquipName(AirDistCompNum),
                                        FirstHVACIteration,
                                        ActualZoneNum,
                                        ZoneEquipConfig(ControlledZoneNum).ZoneNode,
                                        AirDistUnit(AirDistUnitNum).EquipIndex(AirDistCompNum));
 
-                } else if (SELECT_CASE_var == SingleDuctCBVAVNoReheat) {
+                } else if (SELECT_CASE_var == DataDefineEquip::iZnAirLoopEquipType::SingleDuctCBVAVNoReheat) {
                     SimulateSingleDuct(state, AirDistUnit(AirDistUnitNum).EquipName(AirDistCompNum),
                                        FirstHVACIteration,
                                        ActualZoneNum,
                                        ZoneEquipConfig(ControlledZoneNum).ZoneNode,
                                        AirDistUnit(AirDistUnitNum).EquipIndex(AirDistCompNum));
 
-                } else if (SELECT_CASE_var == SingleDuctConstVolReheat) {
+                } else if (SELECT_CASE_var == DataDefineEquip::iZnAirLoopEquipType::SingleDuctConstVolReheat) {
                     SimulateSingleDuct(state, AirDistUnit(AirDistUnitNum).EquipName(AirDistCompNum),
                                        FirstHVACIteration,
                                        ActualZoneNum,
                                        ZoneEquipConfig(ControlledZoneNum).ZoneNode,
                                        AirDistUnit(AirDistUnitNum).EquipIndex(AirDistCompNum));
 
-                } else if (SELECT_CASE_var == SingleDuctConstVolNoReheat) {
+                } else if (SELECT_CASE_var == DataDefineEquip::iZnAirLoopEquipType::SingleDuctConstVolNoReheat) {
                     SimulateSingleDuct(state, AirDistUnit(AirDistUnitNum).EquipName(AirDistCompNum),
                                        FirstHVACIteration,
                                        ActualZoneNum,
                                        ZoneEquipConfig(ControlledZoneNum).ZoneNode,
                                        AirDistUnit(AirDistUnitNum).EquipIndex(AirDistCompNum));
 
-                } else if (SELECT_CASE_var == SingleDuct_SeriesPIU_Reheat) {
+                } else if (SELECT_CASE_var == DataDefineEquip::iZnAirLoopEquipType::SingleDuct_SeriesPIU_Reheat) {
                     SimPIU(state, AirDistUnit(AirDistUnitNum).EquipName(AirDistCompNum),
                            FirstHVACIteration,
                            ActualZoneNum,
                            ZoneEquipConfig(ControlledZoneNum).ZoneNode,
                            AirDistUnit(AirDistUnitNum).EquipIndex(AirDistCompNum));
 
-                } else if (SELECT_CASE_var == SingleDuct_ParallelPIU_Reheat) {
+                } else if (SELECT_CASE_var == DataDefineEquip::iZnAirLoopEquipType::SingleDuct_ParallelPIU_Reheat) {
                     SimPIU(state, AirDistUnit(AirDistUnitNum).EquipName(AirDistCompNum),
                            FirstHVACIteration,
                            ActualZoneNum,
                            ZoneEquipConfig(ControlledZoneNum).ZoneNode,
                            AirDistUnit(AirDistUnitNum).EquipIndex(AirDistCompNum));
 
-                } else if (SELECT_CASE_var == SingleDuct_ConstVol_4PipeInduc) {
+                } else if (SELECT_CASE_var == DataDefineEquip::iZnAirLoopEquipType::SingleDuct_ConstVol_4PipeInduc) {
                     SimIndUnit(state, AirDistUnit(AirDistUnitNum).EquipName(AirDistCompNum),
                                FirstHVACIteration,
                                ActualZoneNum,
                                ZoneEquipConfig(ControlledZoneNum).ZoneNode,
                                AirDistUnit(AirDistUnitNum).EquipIndex(AirDistCompNum));
 
-                } else if (SELECT_CASE_var == SingleDuctVAVReheatVSFan) {
+                } else if (SELECT_CASE_var == DataDefineEquip::iZnAirLoopEquipType::SingleDuctVAVReheatVSFan) {
                     SimulateSingleDuct(state, AirDistUnit(AirDistUnitNum).EquipName(AirDistCompNum),
                                        FirstHVACIteration,
                                        ActualZoneNum,
                                        ZoneEquipConfig(ControlledZoneNum).ZoneNode,
                                        AirDistUnit(AirDistUnitNum).EquipIndex(AirDistCompNum));
 
-                } else if (SELECT_CASE_var == SingleDuctConstVolCooledBeam) {
+                } else if (SELECT_CASE_var == DataDefineEquip::iZnAirLoopEquipType::SingleDuctConstVolCooledBeam) {
                     SimCoolBeam(state,
                                 AirDistUnit(AirDistUnitNum).EquipName(AirDistCompNum),
                                 FirstHVACIteration,
@@ -727,10 +727,10 @@ namespace ZoneAirLoopEquipmentManager {
                                 AirDistUnit(AirDistUnitNum).EquipIndex(AirDistCompNum),
                                 NonAirSysOutput);
 
-                } else if (SELECT_CASE_var == SingleDuctConstVolFourPipeBeam) {
+                } else if (SELECT_CASE_var == DataDefineEquip::iZnAirLoopEquipType::SingleDuctConstVolFourPipeBeam) {
                     AirDistUnit(AirDistUnitNum).airTerminalPtr->simulate(state, FirstHVACIteration, NonAirSysOutput);
 
-                } else if (SELECT_CASE_var == SingleDuctUserDefined) {
+                } else if (SELECT_CASE_var == DataDefineEquip::iZnAirLoopEquipType::SingleDuctUserDefined) {
                     SimAirTerminalUserDefined(state,
                                               AirDistUnit(AirDistUnitNum).EquipName(AirDistCompNum),
                                               FirstHVACIteration,
@@ -738,7 +738,7 @@ namespace ZoneAirLoopEquipmentManager {
                                               ZoneEquipConfig(ControlledZoneNum).ZoneNode,
                                               AirDistUnit(AirDistUnitNum).EquipIndex(AirDistCompNum));
 
-                } else if (SELECT_CASE_var == SingleDuctATMixer) {
+                } else if (SELECT_CASE_var == DataDefineEquip::iZnAirLoopEquipType::SingleDuctATMixer) {
                     GetATMixers(state); // Needed here if mixer used only with unitarysystem which gets its input late
                     ProvideSysOutput = false;
 
@@ -776,8 +776,8 @@ namespace ZoneAirLoopEquipmentManager {
                     AirDistUnit(AirDistUnitNum).MinAvailDelta = MassFlowRateMinAvail - Node(OutNodeNum).MassFlowRateMinAvail;
                 } else {
                     // if no leaks, or a terminal unit type not supported for leaks
-                    int termUnitType = AirDistUnit(AirDistUnitNum).EquipType_Num(AirDistCompNum);
-                    if ((termUnitType == DualDuctConstVolume) || (termUnitType == DualDuctVAV) || (termUnitType == DualDuctVAVOutdoorAir)) {
+                    DataDefineEquip::iZnAirLoopEquipType termUnitType = AirDistUnit(AirDistUnitNum).EquipType_Num(AirDistCompNum);
+                    if ((termUnitType == DataDefineEquip::iZnAirLoopEquipType::DualDuctConstVolume) || (termUnitType == DataDefineEquip::iZnAirLoopEquipType::DualDuctVAV) || (termUnitType == DataDefineEquip::iZnAirLoopEquipType::DualDuctVAVOutdoorAir)) {
                         // Use ADU outlet node flow for dual duct terminal units (which don't support leaks)
                         AirDistUnit(AirDistUnitNum).MassFlowRateTU = Node(OutNodeNum).MassFlowRate;
                         AirDistUnit(AirDistUnitNum).MassFlowRateZSup = Node(OutNodeNum).MassFlowRate;

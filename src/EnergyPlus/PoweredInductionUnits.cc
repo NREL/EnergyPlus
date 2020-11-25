@@ -127,8 +127,6 @@ namespace PoweredInductionUnits {
     using DataHeatBalFanSys::TempControlType;
 
     // MODULE PARAMETER DEFINITIONS
-    int const SingleDuct_SeriesPIU_Reheat(6);
-    int const SingleDuct_ParallelPIU_Reheat(7);
     // coil types in this module
     int const HCoilType_Gas(1);
     int const HCoilType_Electric(2);
@@ -239,11 +237,11 @@ namespace PoweredInductionUnits {
         {
             auto const SELECT_CASE_var(PIU(PIUNum).UnitType_Num);
 
-            if (SELECT_CASE_var == SingleDuct_SeriesPIU_Reheat) { //  'AirTerminal:SingleDuct:SeriesPIU:Reheat'
+            if (SELECT_CASE_var == DataDefineEquip::iZnAirLoopEquipType::SingleDuct_SeriesPIU_Reheat) { //  'AirTerminal:SingleDuct:SeriesPIU:Reheat'
 
                 CalcSeriesPIU(state, PIUNum, ZoneNum, ZoneNodeNum, FirstHVACIteration);
 
-            } else if (SELECT_CASE_var == SingleDuct_ParallelPIU_Reheat) { // 'AirTerminal:SingleDuct:ParallelPIU:Reheat'
+            } else if (SELECT_CASE_var == DataDefineEquip::iZnAirLoopEquipType::SingleDuct_ParallelPIU_Reheat) { // 'AirTerminal:SingleDuct:ParallelPIU:Reheat'
 
                 CalcParallelPIU(state, PIUNum, ZoneNum, ZoneNodeNum, FirstHVACIteration);
 
@@ -342,7 +340,7 @@ namespace PoweredInductionUnits {
             GlobalNames::VerifyUniqueInterObjectName(state, PiuUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             PIU(PIUNum).Name = cAlphaArgs(1);
             PIU(PIUNum).UnitType = cCurrentModuleObject;
-            PIU(PIUNum).UnitType_Num = SingleDuct_SeriesPIU_Reheat;
+            PIU(PIUNum).UnitType_Num = DataDefineEquip::iZnAirLoopEquipType::SingleDuct_SeriesPIU_Reheat;
             PIU(PIUNum).Sched = cAlphaArgs(2);
             if (lAlphaFieldBlanks(2)) {
                 PIU(PIUNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
@@ -537,7 +535,7 @@ namespace PoweredInductionUnits {
             GlobalNames::VerifyUniqueInterObjectName(state, PiuUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             PIU(PIUNum).Name = cAlphaArgs(1);
             PIU(PIUNum).UnitType = cCurrentModuleObject;
-            PIU(PIUNum).UnitType_Num = SingleDuct_ParallelPIU_Reheat;
+            PIU(PIUNum).UnitType_Num = DataDefineEquip::iZnAirLoopEquipType::SingleDuct_ParallelPIU_Reheat;
             PIU(PIUNum).Sched = cAlphaArgs(2);
             if (lAlphaFieldBlanks(2)) {
                 PIU(PIUNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
@@ -1252,9 +1250,9 @@ namespace PoweredInductionUnits {
         if (CurTermUnitSizingNum > 0) {
             {
                 auto const SELECT_CASE_var(PIU(PIUNum).UnitType_Num);
-                if (SELECT_CASE_var == SingleDuct_SeriesPIU_Reheat) {
+                if (SELECT_CASE_var == DataDefineEquip::iZnAirLoopEquipType::SingleDuct_SeriesPIU_Reheat) {
                     TermUnitSizing(CurTermUnitSizingNum).AirVolFlow = PIU(PIUNum).MaxTotAirVolFlow;
-                } else if (SELECT_CASE_var == SingleDuct_ParallelPIU_Reheat) {
+                } else if (SELECT_CASE_var == DataDefineEquip::iZnAirLoopEquipType::SingleDuct_ParallelPIU_Reheat) {
                     TermUnitSizing(CurTermUnitSizingNum).AirVolFlow =
                         PIU(PIUNum).MaxSecAirVolFlow + PIU(PIUNum).MinPriAirFlowFrac * PIU(PIUNum).MaxPriAirVolFlow;
                 }

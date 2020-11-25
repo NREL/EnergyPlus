@@ -555,7 +555,7 @@ TEST_F(EnergyPlusFixture, PIUArrayOutOfBounds) {
     PoweredInductionUnits::PIU.allocate(1);
     int PIUNum = 1;
     PoweredInductionUnits::PIU(PIUNum).Name = "Series PIU";
-    PoweredInductionUnits::PIU(PIUNum).UnitType = PoweredInductionUnits::SingleDuct_SeriesPIU_Reheat;
+    PoweredInductionUnits::PIU(PIUNum).UnitType_Num = DataDefineEquip::iZnAirLoopEquipType::SingleDuct_SeriesPIU_Reheat;
     PoweredInductionUnits::PIU(PIUNum).HCoilType_Num = PoweredInductionUnits::HCoilType_Electric;
 
     // Go into all of the autosize blocks (aside from Heating/Steam coils)

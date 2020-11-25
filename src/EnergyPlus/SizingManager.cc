@@ -52,7 +52,6 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
@@ -1006,7 +1005,7 @@ namespace SizingManager {
                         if (AirLoopNum == PoweredInductionUnits::PIU(pIUATUNum).AirLoopNum) {
                             int termUnitSizingIndex = DataDefineEquip::AirDistUnit(PoweredInductionUnits::PIU(pIUATUNum).ADUNum).TermUnitSizingNum;
                             airLoopMaxFlowRateSum += PoweredInductionUnits::PIU(pIUATUNum).MaxPriAirVolFlow;
-                            if (PoweredInductionUnits::PIU(pIUATUNum).UnitType_Num == PoweredInductionUnits::SingleDuct_SeriesPIU_Reheat) {
+                            if (PoweredInductionUnits::PIU(pIUATUNum).UnitType_Num == DataDefineEquip::iZnAirLoopEquipType::SingleDuct_SeriesPIU_Reheat) {
                                 airLoopHeatingMaximumFlowRateSum +=
                                     PoweredInductionUnits::PIU(pIUATUNum).MinPriAirFlowFrac * PoweredInductionUnits::PIU(pIUATUNum).MaxPriAirVolFlow;
                                 airLoopHeatingMinimumFlowRateSum +=
@@ -1040,7 +1039,7 @@ namespace SizingManager {
                                 DataSizing::TermUnitFinalZoneSizing(termUnitSizingIndex).ZonePrimaryAirFractionHtg =
                                     DataSizing::VpzMinHtgByZone(termUnitSizingIndex) / DataSizing::VdzHtgByZone(termUnitSizingIndex);
 
-                            } else if (PoweredInductionUnits::PIU(pIUATUNum).UnitType_Num == PoweredInductionUnits::SingleDuct_ParallelPIU_Reheat) {
+                            } else if (PoweredInductionUnits::PIU(pIUATUNum).UnitType_Num == DataDefineEquip::iZnAirLoopEquipType::SingleDuct_ParallelPIU_Reheat) {
                                 airLoopHeatingMaximumFlowRateSum +=
                                     PoweredInductionUnits::PIU(pIUATUNum).MinPriAirFlowFrac * PoweredInductionUnits::PIU(pIUATUNum).MaxPriAirVolFlow;
                                 airLoopHeatingMinimumFlowRateSum +=

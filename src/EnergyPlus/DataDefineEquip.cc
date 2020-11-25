@@ -72,26 +72,6 @@ namespace DataDefineEquip {
     // Thus, all variables in this module must be PUBLIC.
 
     // MODULE PARAMETER DEFINITIONS
-    int const MaxZoneAirComponents(1);
-    // INTEGER, PARAMETER :: MaxZoneAirControls = 4
-    // Equipment Types covered by ZoneAirLoopEquipment:
-    int const DualDuctConstVolume(1);
-    int const DualDuctVAV(2);
-    int const SingleDuctVAVReheat(3);
-    int const SingleDuctVAVNoReheat(4);
-    int const SingleDuctConstVolReheat(5);
-    int const SingleDuctConstVolNoReheat(6);
-    int const SingleDuct_SeriesPIU_Reheat(7);
-    int const SingleDuct_ParallelPIU_Reheat(8);
-    int const SingleDuct_ConstVol_4PipeInduc(9);
-    int const SingleDuctVAVReheatVSFan(10);
-    int const SingleDuctCBVAVReheat(11);
-    int const SingleDuctCBVAVNoReheat(12);
-    int const SingleDuctConstVolCooledBeam(13);
-    int const DualDuctVAVOutdoorAir(14);
-    int const SingleDuctUserDefined(15);
-    int const SingleDuctATMixer(16);
-    int const SingleDuctConstVolFourPipeBeam(17);
 
     // DERIVED TYPE DEFINITIONS
 
