@@ -620,9 +620,9 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_WaterCoolingCoilAutoSizeTest)
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::Month = 7;
     state->dataEnvrn->DayOfMonth = 21;
-    DataEnvironment::DayOfWeek = 2;
+    state->dataEnvrn->DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, state->dataEnvrn->DayOfMonth, state->dataGlobal->HourOfDay);
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(Month, state->dataEnvrn->DayOfMonth, state->dataGlobal->HourOfDay);
 
     UpdateScheduleValues(*state);
 
@@ -926,9 +926,9 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_SteamHeatingCoilAutoSizeTest)
     DataEnvironment::DSTIndicator = 0;
     DataEnvironment::Month = 1;
     state->dataEnvrn->DayOfMonth = 21;
-    DataEnvironment::DayOfWeek = 2;
+    state->dataEnvrn->DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, state->dataEnvrn->DayOfMonth, state->dataGlobal->HourOfDay);
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(Month, state->dataEnvrn->DayOfMonth, state->dataGlobal->HourOfDay);
 
     UpdateScheduleValues(*state);
 

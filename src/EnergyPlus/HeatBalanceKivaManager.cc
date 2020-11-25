@@ -155,7 +155,7 @@ namespace HeatBalanceKivaManager {
         int numAccelaratedTimesteps = 3;
         int acceleratedTimestep = 30; // days
         int accDate =
-            DataEnvironment::DayOfYear - 1 - acceleratedTimestep * (numAccelaratedTimesteps + 1); // date time = last timestep from the day before
+            state.dataEnvrn->DayOfYear - 1 - acceleratedTimestep * (numAccelaratedTimesteps + 1); // date time = last timestep from the day before
         while (accDate < 0) {
             accDate = accDate + 365 + state.dataWeatherManager->LeapYearAdd;
         }

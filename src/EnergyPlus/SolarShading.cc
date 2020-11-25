@@ -8267,7 +8267,7 @@ namespace SolarShading {
                     DisplayPerfSimulationFlag = true;
                 }
 
-                PerDayOfYear = DayOfYear;
+                PerDayOfYear = state.dataEnvrn->DayOfYear;
                 SumDec = 0.0;
                 SumET = 0.0;
                 for (Count = 1; Count <= state.dataSolarShading->ShadowingDaysLeft; ++Count) {
@@ -8282,7 +8282,7 @@ namespace SolarShading {
                 AvgCosSolarDeclin = std::sqrt(1.0 - pow_2(AvgSinSolarDeclin));
                 AvgEqOfTime = SumET / double(state.dataSolarShading->ShadowingDaysLeft);
             } else {
-                SUN3(DayOfYear, AvgSinSolarDeclin, AvgEqOfTime);
+                SUN3(state.dataEnvrn->DayOfYear, AvgSinSolarDeclin, AvgEqOfTime);
                 AvgCosSolarDeclin = std::sqrt(1.0 - pow_2(AvgSinSolarDeclin));
                 // trigger display of progress in the simulation every two weeks
                 if (!state.dataGlobal->WarmupFlag && state.dataGlobal->BeginDayFlag && (state.dataGlobal->DayOfSim % 14 == 0)) {

@@ -133,8 +133,8 @@ TEST_F(EnergyPlusFixture, ScheduleManager_UpdateScheduleValues)
     }
 
     DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfWeek = 1;
-    DataEnvironment::DayOfWeekTomorrow = 2;
+    state->dataEnvrn->DayOfWeek = 1;
+    state->dataEnvrn->DayOfWeekTomorrow = 2;
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->HourOfDay = 1;
 
@@ -149,12 +149,12 @@ TEST_F(EnergyPlusFixture, ScheduleManager_UpdateScheduleValues)
     EXPECT_EQ(DaySchedule(3).TSValue(1, 24), 3.0);
 
     // schedule values are 1 through day 249, 2 for day 250, and 3 for remainder of year
-    DataEnvironment::DayOfYear_Schedule = 1;
+    state->dataEnvrn->DayOfYear_Schedule = 1;
     UpdateScheduleValues(*state);
     // expect 1.0 on day 1
     EXPECT_EQ(Schedule(1).CurrentValue, 1.0);
 
-    DataEnvironment::DayOfYear_Schedule = 250;
+    state->dataEnvrn->DayOfYear_Schedule = 250;
     UpdateScheduleValues(*state);
     // expect 2.0 on day 250
     EXPECT_EQ(Schedule(1).CurrentValue, 2.0);
@@ -168,7 +168,7 @@ TEST_F(EnergyPlusFixture, ScheduleManager_UpdateScheduleValues)
 
     state->dataGlobal->HourOfDay = 2;
     DataEnvironment::DSTIndicator = 0;
-    DataEnvironment::DayOfYear_Schedule = 251;
+    state->dataEnvrn->DayOfYear_Schedule = 251;
     UpdateScheduleValues(*state);
     // expect 3.0 for remainder of year regardless of DST
     EXPECT_EQ(Schedule(1).CurrentValue, 3.0);
@@ -464,9 +464,9 @@ TEST_F(EnergyPlusFixture, ScheduleDayInterval_SimpLinearInterp)
     state->dataGlobal->HourOfDay = 1;
     state->dataGlobal->TimeStep = 1;
     DataEnvironment::DSTIndicator = 0;
-    DataEnvironment::DayOfWeek = 2;
+    state->dataEnvrn->DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, state->dataEnvrn->DayOfMonth, 1);
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, state->dataEnvrn->DayOfMonth, 1);
 
     int ASchedIndex = GetScheduleIndex(*state, "SCHYR_A"); // interpolate Linear
     EXPECT_NEAR(0.001, LookUpScheduleValue(*state, ASchedIndex, 7, 4), 0.000001);
@@ -577,9 +577,9 @@ TEST_F(EnergyPlusFixture, ScheduleDayInterval_PartialHourLinearInterp)
     state->dataGlobal->HourOfDay = 1;
     state->dataGlobal->TimeStep = 1;
     DataEnvironment::DSTIndicator = 0;
-    DataEnvironment::DayOfWeek = 2;
+    state->dataEnvrn->DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, state->dataEnvrn->DayOfMonth, 1);
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, state->dataEnvrn->DayOfMonth, 1);
 
     int ASchedIndex = GetScheduleIndex(*state, "SCHYR_A"); // interpolate Linear
     EXPECT_NEAR(0.001, LookUpScheduleValue(*state, ASchedIndex, 7, 4), 0.000001);
@@ -650,9 +650,9 @@ TEST_F(EnergyPlusFixture, ScheduleDayInterval_LinearInterpIntervalNotTimestep)
     state->dataGlobal->HourOfDay = 1;
     state->dataGlobal->TimeStep = 1;
     DataEnvironment::DSTIndicator = 0;
-    DataEnvironment::DayOfWeek = 2;
+    state->dataEnvrn->DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, state->dataEnvrn->DayOfMonth, 1);
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, state->dataEnvrn->DayOfMonth, 1);
 
     int ASchedIndex = GetScheduleIndex(*state, "SCHYR_A"); // interpolate Linear
     EXPECT_NEAR(0.0, LookUpScheduleValue(*state, ASchedIndex, 7, 4), 0.000001);
@@ -787,11 +787,11 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST)
     DataEnvironment::Month = 5;
     state->dataEnvrn->DayOfMonth = 31;
     state->dataGlobal->HourOfDay = 24;
-    DataEnvironment::DayOfWeek = 4;
-    DataEnvironment::DayOfWeekTomorrow = 5;
+    state->dataEnvrn->DayOfWeek = 4;
+    state->dataEnvrn->DayOfWeekTomorrow = 5;
     DataEnvironment::HolidayIndex = 0;
     state->dataGlobal->TimeStep = 1;
-    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, state->dataEnvrn->DayOfMonth, 1);
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, state->dataEnvrn->DayOfMonth, 1);
 
     DataEnvironment::DSTIndicator = 0; // DST IS OFF
     ScheduleManager::UpdateScheduleValues(*state);
@@ -836,11 +836,11 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST_SouthernHemispher
     DataEnvironment::Month = 12;
     state->dataEnvrn->DayOfMonth = 31;
     state->dataGlobal->HourOfDay = 24;
-    DataEnvironment::DayOfWeek = 4;
-    DataEnvironment::DayOfWeekTomorrow = 5;
+    state->dataEnvrn->DayOfWeek = 4;
+    state->dataEnvrn->DayOfWeekTomorrow = 5;
     DataEnvironment::HolidayIndex = 0;
     state->dataGlobal->TimeStep = 1;
-    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, state->dataEnvrn->DayOfMonth, 1);
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, state->dataEnvrn->DayOfMonth, 1);
 
     DataEnvironment::DSTIndicator = 0; // DST IS OFF
     ScheduleManager::UpdateScheduleValues(*state);
@@ -931,12 +931,12 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST_RampUp_Leap) {
     DataEnvironment::Month = 12;
     state->dataEnvrn->DayOfMonth = 31;
     state->dataGlobal->HourOfDay = 24;
-    DataEnvironment::DayOfWeek = 2;
-    DataEnvironment::DayOfWeekTomorrow = 3;
+    state->dataEnvrn->DayOfWeek = 2;
+    state->dataEnvrn->DayOfWeekTomorrow = 3;
     DataEnvironment::HolidayIndex = 0;
     state->dataGlobal->TimeStep = 1;
-    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, state->dataEnvrn->DayOfMonth, 1);
-    EXPECT_EQ(366,  DataEnvironment::DayOfYear_Schedule);
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, state->dataEnvrn->DayOfMonth, 1);
+    EXPECT_EQ(366,  state->dataEnvrn->DayOfYear_Schedule);
 
     DataEnvironment::DSTIndicator = 0; // DST IS OFF
     ScheduleManager::UpdateScheduleValues(*state);
@@ -957,8 +957,8 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST_RampUp_Leap) {
 
     {
         DataEnvironment::DSTIndicator = 0; // DST IS OFF
-        DataEnvironment::DayOfWeek = 0;
-        DataEnvironment::DayOfWeekTomorrow = 1;
+        state->dataEnvrn->DayOfWeek = 0;
+        state->dataEnvrn->DayOfWeekTomorrow = 1;
 
         Real64 HourOfYear = 0.0;
 
@@ -966,16 +966,16 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST_RampUp_Leap) {
             DataEnvironment::Month = month;
             for (int day = 1; day <= EndDayOfMonth(month); ++day) {
                 state->dataEnvrn->DayOfMonth = day;
-                ++DataEnvironment::DayOfWeek;
-                if (DataEnvironment::DayOfWeek > 7) {
-                    DataEnvironment::DayOfWeek = 1;
+                ++state->dataEnvrn->DayOfWeek;
+                if (state->dataEnvrn->DayOfWeek > 7) {
+                    state->dataEnvrn->DayOfWeek = 1;
                 }
-                ++DataEnvironment::DayOfWeekTomorrow;
-                if (DataEnvironment::DayOfWeekTomorrow > 7) {
-                    DataEnvironment::DayOfWeekTomorrow = 1;
+                ++state->dataEnvrn->DayOfWeekTomorrow;
+                if (state->dataEnvrn->DayOfWeekTomorrow > 7) {
+                    state->dataEnvrn->DayOfWeekTomorrow = 1;
                 }
 
-                DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, state->dataEnvrn->DayOfMonth, 1);
+                state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, state->dataEnvrn->DayOfMonth, 1);
 
                 for (int hr = 1; hr <= 24; ++hr) {
                     ++HourOfYear;
@@ -997,24 +997,24 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST_RampUp_Leap) {
 
     {
         DataEnvironment::DSTIndicator = 1; // DST IS ON
-        DataEnvironment::DayOfWeek = 0;
-        DataEnvironment::DayOfWeekTomorrow = 1;
+        state->dataEnvrn->DayOfWeek = 0;
+        state->dataEnvrn->DayOfWeekTomorrow = 1;
 
         Real64 HourOfYear = 0.0;
         for (int month=1; month <= 12; ++month) {
             DataEnvironment::Month = month;
             for (int day = 1; day <= EndDayOfMonth(month); ++day) {
                 state->dataEnvrn->DayOfMonth = day;
-                ++DataEnvironment::DayOfWeek;
-                if (DataEnvironment::DayOfWeek > 7) {
-                    DataEnvironment::DayOfWeek = 1;
+                ++state->dataEnvrn->DayOfWeek;
+                if (state->dataEnvrn->DayOfWeek > 7) {
+                    state->dataEnvrn->DayOfWeek = 1;
                 }
-                ++DataEnvironment::DayOfWeekTomorrow;
-                if (DataEnvironment::DayOfWeekTomorrow > 7) {
-                    DataEnvironment::DayOfWeekTomorrow = 1;
+                ++state->dataEnvrn->DayOfWeekTomorrow;
+                if (state->dataEnvrn->DayOfWeekTomorrow > 7) {
+                    state->dataEnvrn->DayOfWeekTomorrow = 1;
                 }
 
-                DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, state->dataEnvrn->DayOfMonth, 1);
+                state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, state->dataEnvrn->DayOfMonth, 1);
 
                 for (int hr = 1; hr <= 24; ++hr) {
                     ++HourOfYear;
@@ -1140,12 +1140,12 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST_RampUp_NoLeap) {
     DataEnvironment::Month = 12;
     state->dataEnvrn->DayOfMonth = 31;
     state->dataGlobal->HourOfDay = 24;
-    DataEnvironment::DayOfWeek = 1;
-    DataEnvironment::DayOfWeekTomorrow = 2;
+    state->dataEnvrn->DayOfWeek = 1;
+    state->dataEnvrn->DayOfWeekTomorrow = 2;
     DataEnvironment::HolidayIndex = 0;
     state->dataGlobal->TimeStep = 1;
-    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, state->dataEnvrn->DayOfMonth, 1);
-    EXPECT_EQ(366,  DataEnvironment::DayOfYear_Schedule);
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, state->dataEnvrn->DayOfMonth, 1);
+    EXPECT_EQ(366,  state->dataEnvrn->DayOfYear_Schedule);
 
     DataEnvironment::DSTIndicator = 0; // DST IS OFF
     ScheduleManager::UpdateScheduleValues(*state);
@@ -1163,24 +1163,24 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST_RampUp_NoLeap) {
 
     {
         DataEnvironment::DSTIndicator = 0; // DST IS OFF
-        DataEnvironment::DayOfWeek = 0;
-        DataEnvironment::DayOfWeekTomorrow = 1;
+        state->dataEnvrn->DayOfWeek = 0;
+        state->dataEnvrn->DayOfWeekTomorrow = 1;
 
         Real64 HourOfYear = 0.0;
         for (int month=1; month <= 12; ++month) {
             DataEnvironment::Month = month;
             for (int day = 1; day <= EndDayOfMonth(month); ++day) {
                 state->dataEnvrn->DayOfMonth = day;
-                ++DataEnvironment::DayOfWeek;
-                if (DataEnvironment::DayOfWeek > 7) {
-                    DataEnvironment::DayOfWeek = 1;
+                ++state->dataEnvrn->DayOfWeek;
+                if (state->dataEnvrn->DayOfWeek > 7) {
+                    state->dataEnvrn->DayOfWeek = 1;
                 }
-                ++DataEnvironment::DayOfWeekTomorrow;
-                if (DataEnvironment::DayOfWeekTomorrow > 7) {
-                    DataEnvironment::DayOfWeekTomorrow = 1;
+                ++state->dataEnvrn->DayOfWeekTomorrow;
+                if (state->dataEnvrn->DayOfWeekTomorrow > 7) {
+                    state->dataEnvrn->DayOfWeekTomorrow = 1;
                 }
 
-                DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, state->dataEnvrn->DayOfMonth, 1);
+                state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, state->dataEnvrn->DayOfMonth, 1);
 
                 for (int hr = 1; hr <= 24; ++hr) {
                     ++HourOfYear;
@@ -1202,24 +1202,24 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST_RampUp_NoLeap) {
 
     {
         DataEnvironment::DSTIndicator = 1; // DST IS ON
-        DataEnvironment::DayOfWeek = 0;
-        DataEnvironment::DayOfWeekTomorrow = 1;
+        state->dataEnvrn->DayOfWeek = 0;
+        state->dataEnvrn->DayOfWeekTomorrow = 1;
 
         Real64 HourOfYear = 0.0;
         for (int month=1; month <= 12; ++month) {
             DataEnvironment::Month = month;
             for (int day = 1; day <= EndDayOfMonth(month); ++day) {
                 state->dataEnvrn->DayOfMonth = day;
-                ++DataEnvironment::DayOfWeek;
-                if (DataEnvironment::DayOfWeek > 7) {
-                    DataEnvironment::DayOfWeek = 1;
+                ++state->dataEnvrn->DayOfWeek;
+                if (state->dataEnvrn->DayOfWeek > 7) {
+                    state->dataEnvrn->DayOfWeek = 1;
                 }
-                ++DataEnvironment::DayOfWeekTomorrow;
-                if (DataEnvironment::DayOfWeekTomorrow > 7) {
-                    DataEnvironment::DayOfWeekTomorrow = 1;
+                ++state->dataEnvrn->DayOfWeekTomorrow;
+                if (state->dataEnvrn->DayOfWeekTomorrow > 7) {
+                    state->dataEnvrn->DayOfWeekTomorrow = 1;
                 }
 
-                DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, state->dataEnvrn->DayOfMonth, 1);
+                state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, state->dataEnvrn->DayOfMonth, 1);
 
                 for (int hr = 1; hr <= 24; ++hr) {
                     ++HourOfYear;

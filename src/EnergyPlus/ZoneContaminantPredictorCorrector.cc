@@ -2120,9 +2120,6 @@ namespace ZoneContaminantPredictorCorrector {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine inversely solve infiltration airflow rate or people count with zone air CO2 concentration measurements.
 
-        // Using/Aliasing
-        using DataEnvironment::DayOfYear;
-
         static std::string const RoutineName("InverseModelCO2");
 
         Real64 AA(0.0);
@@ -2148,7 +2145,7 @@ namespace ZoneContaminantPredictorCorrector {
 
         Zone(ZoneNum).ZoneMeasuredCO2Concentration = GetCurrentScheduleValue(state, HybridModelZone(ZoneNum).ZoneMeasuredCO2ConcentrationSchedulePtr);
 
-        if (DayOfYear >= HybridModelZone(ZoneNum).HybridStartDayOfYear && DayOfYear <= HybridModelZone(ZoneNum).HybridEndDayOfYear) {
+        if (state.dataEnvrn->DayOfYear >= HybridModelZone(ZoneNum).HybridStartDayOfYear && state.dataEnvrn->DayOfYear <= HybridModelZone(ZoneNum).HybridEndDayOfYear) {
             state.dataContaminantBalance->ZoneAirCO2(ZoneNum) = Zone(ZoneNum).ZoneMeasuredCO2Concentration;
 
             if (HybridModelZone(ZoneNum).InfiltrationCalc_C && UseZoneTimeStepHistory) {
@@ -2278,7 +2275,6 @@ namespace ZoneContaminantPredictorCorrector {
         // for BLAST.
 
         // Using/Aliasing
-        using DataEnvironment::DayOfYear;
         using DataLoopNode::Node;
         using DataZoneEquipment::ZoneEquipConfig;
         //using ZonePlenum::NumZoneReturnPlenums;

@@ -99,8 +99,6 @@ namespace ScheduleManager {
     // OTHER NOTES:
 
     // Using/Aliasing
-    using DataEnvironment::DayOfWeek;
-    using DataEnvironment::DayOfWeekTomorrow;
     using DataEnvironment::DSTIndicator;
     using DataEnvironment::HolidayIndex;
     using DataEnvironment::HolidayIndexTomorrow;
@@ -2857,13 +2855,13 @@ namespace ScheduleManager {
 
         // Hourly Value
         int thisHour = ThisHour + DSTIndicator;
-        int thisDayOfYear = DataEnvironment::DayOfYear_Schedule;
-        int thisDayOfWeek = DataEnvironment::DayOfWeek;
+        int thisDayOfYear = state.dataEnvrn->DayOfYear_Schedule;
+        int thisDayOfWeek = state.dataEnvrn->DayOfWeek;
         int thisHolidayIndex = DataEnvironment::HolidayIndex;
         if (thisHour > 24) { // In case HourOfDay is 24 and DSTIndicator is 1, you're actually the next day
             thisDayOfYear += 1;
             thisHour -= 24;
-            thisDayOfWeek = DataEnvironment::DayOfWeekTomorrow;
+            thisDayOfWeek = state.dataEnvrn->DayOfWeekTomorrow;
             thisHolidayIndex = DataEnvironment::HolidayIndexTomorrow;
         }
 
@@ -3041,26 +3039,6 @@ namespace ScheduleManager {
         // METHODOLOGY EMPLOYED:
         // Use internal data to fill DayValues array.
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using DataEnvironment::DayOfYear_Schedule;
-
-        // Argument array dimensioning
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int WeekSchedulePointer;
         int DaySchedulePointer;
@@ -3080,17 +3058,17 @@ namespace ScheduleManager {
 
         // Determine which Week Schedule is used
         if (!present(JDay)) {
-            WeekSchedulePointer = Schedule(ScheduleIndex).WeekSchedulePointer(DayOfYear_Schedule);
+            WeekSchedulePointer = Schedule(ScheduleIndex).WeekSchedulePointer(state.dataEnvrn->DayOfYear_Schedule);
         } else {
             WeekSchedulePointer = Schedule(ScheduleIndex).WeekSchedulePointer(JDay);
         }
 
         // Now, which day?
         if (!present(CurDayofWeek)) {
-            if (DayOfWeek <= 7 && HolidayIndex > 0) {
+            if (state.dataEnvrn->DayOfWeek <= 7 && HolidayIndex > 0) {
                 DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(7 + HolidayIndex);
             } else {
-                DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(DayOfWeek);
+                DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(state.dataEnvrn->DayOfWeek);
             }
         } else if (CurDayofWeek <= 7 && HolidayIndex > 0) {
             DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(7 + HolidayIndex);
@@ -4808,30 +4786,6 @@ namespace ScheduleManager {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine puts the proper current schedule values into the "reporting"
         // slot for later reporting.
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using DataEnvironment::DayOfYear_Schedule;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         if (!ScheduleInputProcessed) {
             ProcessScheduleInput(state);

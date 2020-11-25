@@ -1935,8 +1935,8 @@ namespace SizingManager {
         WeatherManager::CalcSpecialDayTypes(state);
         for (int DayLoop = 1; DayLoop <= DaysInYear; ++DayLoop) { // loop over all days in year
             DataEnvironment::HolidayIndex = state.dataWeatherManager->SpecialDayTypes(DayLoop);
-            DataEnvironment::DayOfYear_Schedule = DayLoop;
-            DataEnvironment::DayOfWeek = dayOfWeekType;
+            state.dataEnvrn->DayOfYear_Schedule = DayLoop;
+            state.dataEnvrn->DayOfWeek = dayOfWeekType;
             ++dayOfWeekType;
             if (dayOfWeekType > 7) dayOfWeekType = 1;
             for (int hrOfDay = 1; hrOfDay <= 24; ++hrOfDay) {       // loop over all hours in day

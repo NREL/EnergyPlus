@@ -180,14 +180,13 @@ TEST_F(EnergyPlusFixture, SkyEmissivityTest)
 
 TEST_F(EnergyPlusFixture, WaterMainsCorrelationTest)
 {
-    using DataEnvironment::DayOfYear;
     using DataEnvironment::Latitude;
     using DataEnvironment::WaterMainsTemp;
 
     state->dataWeatherManager->WaterMainsTempsMethod = WeatherManager::WaterMainsTempCalcMethod::Correlation;
     state->dataWeatherManager->WaterMainsTempsAnnualAvgAirTemp = 9.69;
     state->dataWeatherManager->WaterMainsTempsMaxDiffAirTemp = 28.1;
-    DayOfYear = 50;
+    state->dataEnvrn->DayOfYear = 50;
 
     Latitude = 40.0;
     CalcWaterMainsTemp(*state);
@@ -367,7 +366,6 @@ TEST_F(EnergyPlusFixture, UnderwaterBoundaryConditionConvectionCoefficients)
 
 TEST_F(EnergyPlusFixture, WaterMainsCorrelationFromWeatherFileTest)
 {
-    using DataEnvironment::DayOfYear;
     using DataEnvironment::Latitude;
     using DataEnvironment::WaterMainsTemp;
 
@@ -396,19 +394,18 @@ TEST_F(EnergyPlusFixture, WaterMainsCorrelationFromWeatherFileTest)
     DataEnvironment::Latitude = 42.00; // CHICAGO_IL_USA_WMO_725300
 
     // January 15th water mains temperature test
-    DataEnvironment::DayOfYear = 15; // January 15th
+    state->dataEnvrn->DayOfYear = 15; // January 15th
     WeatherManager::CalcWaterMainsTemp(*state);
     EXPECT_NEAR(DataEnvironment::WaterMainsTemp, 7.5145, 0.0001);
 
     // July 15th water mains temperature test
-    DataEnvironment::DayOfYear = 196; // July 15th
+    state->dataEnvrn->DayOfYear = 196; // July 15th
     WeatherManager::CalcWaterMainsTemp(*state);
     EXPECT_NEAR(DataEnvironment::WaterMainsTemp, 19.0452, 0.0001);
 }
 
 TEST_F(EnergyPlusFixture, WaterMainsCorrelationFromStatFileTest)
 {
-    using DataEnvironment::DayOfYear;
     using DataEnvironment::Latitude;
     using DataEnvironment::WaterMainsTemp;
 
@@ -457,12 +454,12 @@ TEST_F(EnergyPlusFixture, WaterMainsCorrelationFromStatFileTest)
     DataEnvironment::Latitude = 42.00; // CHICAGO_IL_USA_WMO_725300
 
     // January 21st water mains temperature test
-    DataEnvironment::DayOfYear = 21; // January 21st
+    state->dataEnvrn->DayOfYear = 21; // January 21st
     WeatherManager::CalcWaterMainsTemp(*state);
     EXPECT_NEAR(DataEnvironment::WaterMainsTemp, 7.23463, 0.00001);
 
     // July 21st water mains temperature test
-    DataEnvironment::DayOfYear = 202; // July 21st
+    state->dataEnvrn->DayOfYear = 202; // July 21st
     WeatherManager::CalcWaterMainsTemp(*state);
     EXPECT_NEAR(DataEnvironment::WaterMainsTemp, 19.33812, 0.00001);
 }

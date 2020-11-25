@@ -160,10 +160,10 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     state->dataEnvrn->DayOfMonth = 21;
     state->dataGlobal->HourOfDay = 1;
     DataEnvironment::DSTIndicator = 0;
-    DataEnvironment::DayOfWeek = 2;
+    state->dataEnvrn->DayOfWeek = 2;
     DataEnvironment::HolidayIndex = 0;
     state->dataGlobal->WarmupFlag = false;
-    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, state->dataEnvrn->DayOfMonth, 1);
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(Month, state->dataEnvrn->DayOfMonth, 1);
     ScheduleManager::UpdateScheduleValues(*state);
     // Initialize zone areas and volumes - too many other things need to be set up to do these in the normal routines
     DataHeatBalance::Zone(1).FloorArea = 232.26;

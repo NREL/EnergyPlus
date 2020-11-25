@@ -620,7 +620,7 @@ namespace EarthTube {
                               EarthTubeSys(Loop).ApmlSoilSurTemp *
                                   std::exp(-EarthTubeSys(Loop).z * std::sqrt(DataGlobalConstants::Pi() / 365.0 / EarthTubeSys(Loop).SoilThermDiff)) *
                                   std::cos(2.0 * DataGlobalConstants::Pi() / 365.0 *
-                                           (DayOfYear - EarthTubeSys(Loop).SoilSurPhaseConst -
+                                           (state.dataEnvrn->DayOfYear - EarthTubeSys(Loop).SoilSurPhaseConst -
                                             EarthTubeSys(Loop).z / 2.0 * std::sqrt(365.0 / DataGlobalConstants::Pi() / EarthTubeSys(Loop).SoilThermDiff)));
             EarthTubeSys(Loop).GroundTempz1z2t = GroundTempz1z2t;
 

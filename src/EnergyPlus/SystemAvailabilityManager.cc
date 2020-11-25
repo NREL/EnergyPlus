@@ -2297,8 +2297,6 @@ namespace SystemAvailabilityManager {
 
         // Using/Aliasing
         using namespace DataAirLoop;
-        using DataEnvironment::DayOfWeekTomorrow;
-        using DataEnvironment::DayOfYear;
         using DataEnvironment::DSTIndicator;
         using DataHeatBalFanSys::TempControlType;
         using DataHeatBalFanSys::TempTstatAir;
@@ -2395,9 +2393,9 @@ namespace SystemAvailabilityManager {
             AvailStatus = NoAction;
         } else {
             ScheduleIndex = GetScheduleIndex(state, OptStartMgr.FanSched);
-            JDay = DayOfYear;
+            JDay = state.dataEnvrn->DayOfYear;
             TmrJDay = JDay + 1;
-            TmrDayOfWeek = DayOfWeekTomorrow;
+            TmrDayOfWeek = state.dataEnvrn->DayOfWeekTomorrow;
 
             DayValues.allocate(state.dataGlobal->NumOfTimeStepInHour, 24);
             DayValuesTmr.allocate(state.dataGlobal->NumOfTimeStepInHour, 24);

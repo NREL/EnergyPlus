@@ -159,7 +159,7 @@ namespace OutputProcessor {
         DataEnvironment::Month = 12;
         state->dataEnvrn->DayOfMonth = 21;
         DataEnvironment::DSTIndicator = 0;
-        DataEnvironment::DayOfWeek = 2;
+        state->dataEnvrn->DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 3;
         int EndMinute = 10;
         int StartMinute = 0;
@@ -225,7 +225,7 @@ namespace OutputProcessor {
         DataEnvironment::Month = 12;
         state->dataEnvrn->DayOfMonth = 21;
         DataEnvironment::DSTIndicator = 0;
-        DataEnvironment::DayOfWeek = 2;
+        state->dataEnvrn->DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 3;
         int EndMinute = 10;
         int StartMinute = 0;
@@ -289,7 +289,7 @@ namespace OutputProcessor {
         DataEnvironment::Month = 12;
         state->dataEnvrn->DayOfMonth = 21;
         DataEnvironment::DSTIndicator = 0;
-        DataEnvironment::DayOfWeek = 2;
+        state->dataEnvrn->DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 3;
 
         ReportHRMeters(*state, true);
@@ -357,7 +357,7 @@ namespace OutputProcessor {
         DataEnvironment::Month = 12;
         state->dataEnvrn->DayOfMonth = 21;
         DataEnvironment::DSTIndicator = 0;
-        DataEnvironment::DayOfWeek = 2;
+        state->dataEnvrn->DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 3;
 
         ReportDYMeters(*state, true);
@@ -429,7 +429,7 @@ namespace OutputProcessor {
         DataEnvironment::Month = 12;
         state->dataEnvrn->DayOfMonth = 21;
         DataEnvironment::DSTIndicator = 0;
-        DataEnvironment::DayOfWeek = 2;
+        state->dataEnvrn->DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 3;
 
         ReportMNMeters(*state, true);
@@ -501,7 +501,7 @@ namespace OutputProcessor {
         DataEnvironment::Month = 12;
         state->dataEnvrn->DayOfMonth = 21;
         DataEnvironment::DSTIndicator = 0;
-        DataEnvironment::DayOfWeek = 2;
+        state->dataEnvrn->DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 3;
 
         ReportSMMeters(*state, true);
@@ -575,7 +575,7 @@ namespace OutputProcessor {
         DataEnvironment::Month = 12;
         state->dataEnvrn->DayOfMonth = 21;
         DataEnvironment::DSTIndicator = 0;
-        DataEnvironment::DayOfWeek = 2;
+        state->dataEnvrn->DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 3;
 
         OutputProcessor::ReportYRMeters(*state, true);
@@ -4115,7 +4115,7 @@ namespace OutputProcessor {
         DataEnvironment::Month = 12;
         state->dataEnvrn->DayOfMonth = 31;
         DataEnvironment::DSTIndicator = 0;
-        DataEnvironment::DayOfWeek = 3;
+        state->dataEnvrn->DayOfWeek = 3;
         DataEnvironment::HolidayIndex = 0;
         state->dataGlobal->HourOfDay = 24;
         state->dataGlobal->NumOfDayInEnvrn = 365;
@@ -4359,7 +4359,7 @@ namespace OutputProcessor {
         DataEnvironment::Month = 12;
         state->dataEnvrn->DayOfMonth = 31;
         DataEnvironment::DSTIndicator = 0;
-        DataEnvironment::DayOfWeek = 3;
+        state->dataEnvrn->DayOfWeek = 3;
         DataEnvironment::HolidayIndex = 0;
         state->dataGlobal->HourOfDay = 24;
         state->dataGlobal->NumOfDayInEnvrn = 365;
@@ -4616,7 +4616,7 @@ namespace OutputProcessor {
         DataEnvironment::Month = 12;
         state->dataEnvrn->DayOfMonth = 31;
         DataEnvironment::DSTIndicator = 0;
-        DataEnvironment::DayOfWeek = 3;
+        state->dataEnvrn->DayOfWeek = 3;
         DataEnvironment::HolidayIndex = 0;
         state->dataGlobal->HourOfDay = 24;
         state->dataGlobal->NumOfDayInEnvrn = 365;
@@ -4821,7 +4821,7 @@ namespace OutputProcessor {
         DataEnvironment::Month = 12;
         state->dataEnvrn->DayOfMonth = 31;
         DataEnvironment::DSTIndicator = 0;
-        DataEnvironment::DayOfWeek = 3;
+        state->dataEnvrn->DayOfWeek = 3;
         DataEnvironment::HolidayIndex = 0;
         state->dataGlobal->HourOfDay = 24;
         state->dataGlobal->NumOfDayInEnvrn = 365;
@@ -4961,7 +4961,7 @@ namespace OutputProcessor {
         DataEnvironment::Month = 12;
         state->dataEnvrn->DayOfMonth = 31;
         DataEnvironment::DSTIndicator = 0;
-        DataEnvironment::DayOfWeek = 3;
+        state->dataEnvrn->DayOfWeek = 3;
         DataEnvironment::HolidayIndex = 0;
         state->dataGlobal->HourOfDay = 24;
         state->dataGlobal->NumOfDayInEnvrn = 365;
@@ -5039,7 +5039,7 @@ namespace OutputProcessor {
         DataEnvironment::Month = 12;
         state->dataEnvrn->DayOfMonth = 31;
         DataEnvironment::DSTIndicator = 0;
-        DataEnvironment::DayOfWeek = 3;
+        state->dataEnvrn->DayOfWeek = 3;
         DataEnvironment::HolidayIndex = 0;
         state->dataGlobal->HourOfDay = 24;
         state->dataGlobal->NumOfDayInEnvrn = 365;

@@ -107,7 +107,6 @@ namespace OutputProcessor {
     // na
 
     // Using/Aliasing
-    using DataEnvironment::DayOfWeek;
     using DataEnvironment::DSTIndicator;
     using DataEnvironment::HolidayIndex;
     using DataEnvironment::Month;
@@ -3106,7 +3105,7 @@ namespace OutputProcessor {
             EnergyMeters(Loop).CurTSValue = EnergyMeters(Loop).TSValue;
             if (!EnergyMeters(Loop).RptTS && !EnergyMeters(Loop).RptAccTS) continue;
             if (PrintTimeStamp) {
-                CurDayType = DayOfWeek;
+                CurDayType = state.dataEnvrn->DayOfWeek;
                 if (HolidayIndex > 0) {
                     CurDayType = 7 + HolidayIndex;
                 }
@@ -3132,7 +3131,7 @@ namespace OutputProcessor {
             }
 
             if (PrintESOTimeStamp && !EnergyMeters(Loop).RptTSFO && !EnergyMeters(Loop).RptAccTSFO) {
-                CurDayType = DayOfWeek;
+                CurDayType = state.dataEnvrn->DayOfWeek;
                 if (HolidayIndex > 0) {
                     CurDayType = 7 + HolidayIndex;
                 }
@@ -3233,7 +3232,7 @@ namespace OutputProcessor {
         for (Loop = 1; Loop <= NumEnergyMeters; ++Loop) {
             if (!EnergyMeters(Loop).RptHR && !EnergyMeters(Loop).RptAccHR) continue;
             if (PrintTimeStamp) {
-                CurDayType = DayOfWeek;
+                CurDayType = state.dataEnvrn->DayOfWeek;
                 if (HolidayIndex > 0) {
                     CurDayType = 7 + HolidayIndex;
                 }
@@ -3333,7 +3332,7 @@ namespace OutputProcessor {
         for (Loop = 1; Loop <= NumEnergyMeters; ++Loop) {
             if (!EnergyMeters(Loop).RptDY && !EnergyMeters(Loop).RptAccDY) continue;
             if (PrintTimeStamp) {
-                CurDayType = DayOfWeek;
+                CurDayType = state.dataEnvrn->DayOfWeek;
                 if (HolidayIndex > 0) {
                     CurDayType = 7 + HolidayIndex;
                 }
@@ -6062,7 +6061,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
             if (TimePrint) {
                 if (LHourP != state.dataGlobal->HourOfDay || std::abs(LStartMin - StartMinute) > 0.001 ||
                     std::abs(LEndMin - TimeValue.at(t_TimeStepTypeKey).CurMinute) > 0.001) {
-                    CurDayType = DayOfWeek;
+                    CurDayType = state.dataEnvrn->DayOfWeek;
                     if (HolidayIndex > 0) {
                         CurDayType = 7 + HolidayIndex;
                     }
@@ -6146,7 +6145,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
             if (TimePrint) {
                 if (LHourP != state.dataGlobal->HourOfDay || std::abs(LStartMin - StartMinute) > 0.001 ||
                     std::abs(LEndMin - TimeValue.at(t_TimeStepTypeKey).CurMinute) > 0.001) {
-                    CurDayType = DayOfWeek;
+                    CurDayType = state.dataEnvrn->DayOfWeek;
                     if (HolidayIndex > 0) {
                         CurDayType = 7 + HolidayIndex;
                     }
@@ -6235,7 +6234,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                     if (TimePrint) {
                         if (LHourP != state.dataGlobal->HourOfDay || std::abs(LStartMin - StartMinute) > 0.001 ||
                             std::abs(LEndMin - TimeValue.at(thisTimeStepType).CurMinute) > 0.001) {
-                            CurDayType = DayOfWeek;
+                            CurDayType = state.dataEnvrn->DayOfWeek;
                             if (HolidayIndex > 0) {
                                 CurDayType = 7 + HolidayIndex;
                             }
@@ -6291,7 +6290,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                     if (TimePrint) {
                         if (LHourP != state.dataGlobal->HourOfDay || std::abs(LStartMin - StartMinute) > 0.001 ||
                             std::abs(LEndMin - TimeValue.at(thisTimeStepType).CurMinute) > 0.001) {
-                            CurDayType = DayOfWeek;
+                            CurDayType = state.dataEnvrn->DayOfWeek;
                             if (HolidayIndex > 0) {
                                 CurDayType = 7 + HolidayIndex;
                             }
@@ -6337,7 +6336,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
     // Hour Block
     if (state.dataGlobal->EndHourFlag) {
         if (TrackingHourlyVariables) {
-            CurDayType = DayOfWeek;
+            CurDayType = state.dataEnvrn->DayOfWeek;
             if (HolidayIndex > 0) {
                 CurDayType = 7 + HolidayIndex;
             }
@@ -6438,7 +6437,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
     // Day Block
     if (state.dataGlobal->EndDayFlag) {
         if (TrackingDailyVariables) {
-            CurDayType = DayOfWeek;
+            CurDayType = state.dataEnvrn->DayOfWeek;
             if (HolidayIndex > 0) {
                 CurDayType = 7 + HolidayIndex;
             }

@@ -2381,7 +2381,6 @@ namespace ThermalComfort {
         // the relevant file once to initialize, and then operates within the loop.
 
         // Using/Aliasing
-        using DataEnvironment::DayOfYear;
         using DataEnvironment::Month;
         using DataEnvironment::OutDryBulbTemp;
         using DataHVACGlobals::SysTimeElapsed;
@@ -2459,7 +2458,7 @@ namespace ThermalComfort {
                 for (i = 1; i <= 8; ++i) { // Headers
                     epwLine = epwFile.readLine().data;
                 }
-                jStartDay = DayOfYear - 1;
+                jStartDay = state.dataEnvrn->DayOfYear - 1;
                 calcStartDay = jStartDay - 30;
                 if (calcStartDay >= 0) {
                     calcStartHr = 24 * calcStartDay + 1;
@@ -2621,7 +2620,6 @@ namespace ThermalComfort {
         // moving average of the outdoor air temperature.
 
         // Using/Aliasing
-        using DataEnvironment::DayOfYear;
         using DataEnvironment::Month;
         using DataEnvironment::OutDryBulbTemp;
         using DataHVACGlobals::SysTimeElapsed;
@@ -2673,7 +2671,7 @@ namespace ThermalComfort {
                 for (i = 1; i <= 9; ++i) { // Headers
                     epwFile.readLine();
                 }
-                jStartDay = DayOfYear - 1;
+                jStartDay = state.dataEnvrn->DayOfYear - 1;
                 calcStartDay = jStartDay - 7;
                 if (calcStartDay > 0) {
                     calcStartHr = 24 * (calcStartDay - 1) + 1;

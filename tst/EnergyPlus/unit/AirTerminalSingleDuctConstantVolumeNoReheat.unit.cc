@@ -548,8 +548,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OASpecification)
     EXPECT_EQ(3.0, MassFlowRateMaxAvail);
 
     DataEnvironment::DSTIndicator = 0;
-    DataEnvironment::DayOfYear_Schedule = 1;
-    DataEnvironment::DayOfWeek = 1;
+    state->dataEnvrn->DayOfYear_Schedule = 1;
+    state->dataEnvrn->DayOfWeek = 1;
     DataEnvironment::HolidayIndex = 0;
     state->dataGlobal->TimeStep = 1;
 
@@ -891,8 +891,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OAVolumeFlowRateReport
     EXPECT_EQ(3.0, MassFlowRateMaxAvail);
 
     DataEnvironment::DSTIndicator = 0;
-    DataEnvironment::DayOfYear_Schedule = 1;
-    DataEnvironment::DayOfWeek = 1;
+    state->dataEnvrn->DayOfYear_Schedule = 1;
+    state->dataEnvrn->DayOfWeek = 1;
     DataEnvironment::HolidayIndex = 0;
     state->dataGlobal->TimeStep = 1;
 

@@ -72,10 +72,6 @@ namespace DataEnvironment {
     // current weather variables)
 
     // MODULE VARIABLE DECLARATIONS:
-    int DayOfWeek;                         // Current day of the week (Sunday=1, Monday=2, ...)
-    int DayOfWeekTomorrow;                 // Tomorrow's day of the week (Sunday=1, Monday=2, ...)
-    int DayOfYear;                         // Current day of the year (01JAN=1, 02JAN=2, ...)
-    int DayOfYear_Schedule;                // Schedule manager always assumes leap years...
     Real64 DifSolarRad;                    // Current sky diffuse solar horizontal irradiance
     bool EMSDifSolarRadOverrideOn(false);  // EMS flag for sky diffuse solar horizontal irradiance
     Real64 EMSDifSolarRadOverrideValue;    // EMS override value for sky diffuse solar horizontal irradiance
@@ -197,10 +193,6 @@ namespace DataEnvironment {
 
     void clear_state()
     {
-        DayOfWeek = int();
-        DayOfWeekTomorrow = int();
-        DayOfYear = int();
-        DayOfYear_Schedule = int();
         DifSolarRad = Real64();
         EMSDifSolarRadOverrideOn = false;
         EMSDifSolarRadOverrideValue = Real64();

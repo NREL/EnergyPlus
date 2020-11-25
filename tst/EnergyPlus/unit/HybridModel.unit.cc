@@ -260,7 +260,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     FlagHybridModel_TM = true;
     state->dataGlobal->WarmupFlag = false;
     state->dataGlobal->DoingSizing = false;
-    DayOfYear = 1;
+    state->dataEnvrn->DayOfYear = 1;
 
     // Case 1: Hybrid model internal thermal mass (free-floating)
 
@@ -753,7 +753,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     FlagHybridModel_TM = false;
     state->dataGlobal->WarmupFlag = false;
     state->dataGlobal->DoingSizing = false;
-    DayOfYear = 1;
+    state->dataEnvrn->DayOfYear = 1;
 
     // Case 1: Hybrid model infiltration with measured CO2 concentration (free-floating)
 

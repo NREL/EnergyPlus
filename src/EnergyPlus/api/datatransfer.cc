@@ -625,12 +625,14 @@ int dayOfMonth(EnergyPlusState state) {
     return thisState->dataEnvrn->DayOfMonth;
 }
 
-int dayOfWeek(EnergyPlusState) {
-    return EnergyPlus::DataEnvironment::DayOfWeek;
+int dayOfWeek(EnergyPlusState state) {
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    return thisState->dataEnvrn->DayOfWeek;
 }
 
-int dayOfYear(EnergyPlusState) {
-    return EnergyPlus::DataEnvironment::DayOfYear;
+int dayOfYear(EnergyPlusState state) {
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    return thisState->dataEnvrn->DayOfYear;
 }
 
 int daylightSavingsTimeIndicator(EnergyPlusState) {

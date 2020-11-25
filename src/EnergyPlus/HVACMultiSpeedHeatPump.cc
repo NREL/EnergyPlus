@@ -127,7 +127,6 @@ namespace HVACMultiSpeedHeatPump {
     // Using/Aliasing
     using namespace DataLoopNode;
     using DataEnvironment::CurMnDy;
-    using DataEnvironment::DayOfYear;
     using DataEnvironment::EnvironmentName;
     using DataEnvironment::OutBaroPress;
     using DataEnvironment::OutDryBulbTemp;
