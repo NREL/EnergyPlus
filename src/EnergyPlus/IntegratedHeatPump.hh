@@ -196,6 +196,7 @@ namespace IntegratedHeatPump {
         Real64 TregenTarget;//target regeneration temperature
         Real64 Concen_Set;//salt concentration setting 
         Real64 Concen_band;//salt concentration deadband
+        Real64 SHR; //cooling side sensible heat ratio
         
         Real64 EnDehumCoilSize; //sizing factor
         Real64 GridSCCoilSize; // sizing factor
@@ -300,11 +301,13 @@ namespace IntegratedHeatPump {
         Real64 RegenAirMasslowRate;
         Real64 RegenAirMasslowSize; 
         Real64 SupHeatRate;//supplemental heating rate
+        Real64 SupHeatEnergy;//supplemental heat energy
         Real64 SaltConcentration;//liquid desiccant salt concentration
         int LDHeatMode; 
         Real64 TankLDMass;//liquid dessicant mass in storgae tank
         Real64 TankSaltMass;//salt mass in the tank
         Real64 CompressorPartLoadRatio;//compressor part load ratio
+        int iWorkMode; 
 
         // Default Constructor
         IntegratedHeatPumpData()
@@ -355,13 +358,13 @@ namespace IntegratedHeatPump {
               IceStoreMode(0), //ice storage off
               ChargFracLow(0.9),//charing fraction
               AirCoolOutletNodeNum(0), 
-              DehumLDMassFlowRate(0.0), SupHeatRate(0.0), WaterMiddleNodeNum(0), 
+              DehumLDMassFlowRate(0.0), SupHeatRate(0.0), SupHeatEnergy(0), WaterMiddleNodeNum(0), 
               LDLoopChecked(false),
               SaltConcentration(0.0), LDHeatMode(0), TankLDMass(0.0), TankSaltMass(0.0), 
               DehumLDMassFlowSize(1.0), GridSHCoilIndex(0),
               DehumAirMasslowRate(0.0), DehumAirMasslowSize(1.0), RegenAirMasslowRate(0.0), 
               RegenAirMasslowSize(1.0), RegenLDMassFlowRate(0.0),
-              CompressorPartLoadRatio(0.0)
+              CompressorPartLoadRatio(0.0), SHR(1.0), iWorkMode(0)
         {
         }
     };
