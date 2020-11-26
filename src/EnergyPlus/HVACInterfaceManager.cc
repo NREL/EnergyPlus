@@ -143,7 +143,6 @@ namespace HVACInterfaceManager {
 
         using DataLoopNode::Node;
         using namespace DataConvergParams;
-        using DataContaminantBalance::Contaminant;
 
         static Array1D<Real64> TmpRealARR(ConvergLogStackDepth); // Tuned Made static
         Real64 DeltaEnergy;
@@ -376,11 +375,11 @@ namespace HVACInterfaceManager {
         Node(InletNode).Enthalpy = Node(OutletNode).Enthalpy;
         Node(InletNode).HumRat = Node(OutletNode).HumRat;
 
-        if (Contaminant.CO2Simulation) {
+        if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
             Node(InletNode).CO2 = Node(OutletNode).CO2;
         }
 
-        if (Contaminant.GenericContamSimulation) {
+        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
             Node(InletNode).GenContam = Node(OutletNode).GenContam;
         }
     }

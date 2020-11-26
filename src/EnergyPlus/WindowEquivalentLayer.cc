@@ -722,7 +722,7 @@ namespace WindowEquivalentLayer {
         Real64 SrdSurfViewFac; // View factor of a surrounding surface
         Real64 OutSrdIR;
 
-        if (CalcCondition != noCondition) return;
+        if (CalcCondition != DataBSDFWindow::noCondition) return;
 
         ConstrNum = Surface(SurfNum).Construction;
         QXConv = 0.0;
@@ -731,7 +731,7 @@ namespace WindowEquivalentLayer {
         EQLNum = state.dataConstruction->Construct(ConstrNum).EQLConsPtr;
         HcIn = HConvIn(SurfNum); // windows inside surface convective film conductance
 
-        if (CalcCondition == noCondition) {
+        if (CalcCondition == DataBSDFWindow::noCondition) {
             ZoneNum = Surface(SurfNum).Zone;
             SurfNumAdj = Surface(SurfNum).ExtBoundCond;
 
