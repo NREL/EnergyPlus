@@ -204,7 +204,7 @@ TEST_F(EnergyPlusFixture, WaterManager_Fill)
     calcVolume -= draw;
     EXPECT_DOUBLE_EQ(calcVolume, state->dataWaterData->WaterStorage(TankNum).ThisTimeStepVolume);
     EXPECT_DOUBLE_EQ(0.235, calcVolume);
-    //EXPECT_FALSE(state->dataWaterData->WaterStorage(TankNum).LastTimeStepFilling);
+    EXPECT_FALSE(state->dataWaterData->WaterStorage(TankNum).LastTimeStepFilling);
 
     WaterManager::UpdateWaterManager(*state);
 
@@ -213,7 +213,7 @@ TEST_F(EnergyPlusFixture, WaterManager_Fill)
     calcVolume -= draw;
     EXPECT_DOUBLE_EQ(calcVolume, state->dataWaterData->WaterStorage(TankNum).ThisTimeStepVolume);
     EXPECT_DOUBLE_EQ(0.21, calcVolume);
-    //EXPECT_FALSE(state->dataWaterData->WaterStorage(TankNum).LastTimeStepFilling);
+    EXPECT_FALSE(state->dataWaterData->WaterStorage(TankNum).LastTimeStepFilling);
 
     WaterManager::UpdateWaterManager(*state);
 
@@ -223,7 +223,7 @@ TEST_F(EnergyPlusFixture, WaterManager_Fill)
     calcVolume += state->dataWaterData->WaterStorage(TankNum).MaxInFlowRate * (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour());
     EXPECT_DOUBLE_EQ(calcVolume, state->dataWaterData->WaterStorage(TankNum).ThisTimeStepVolume);
     EXPECT_DOUBLE_EQ(1.985, calcVolume);
-    //EXPECT_TRUE(state->dataWaterData->WaterStorage(TankNum).LastTimeStepFilling);
+    EXPECT_TRUE(state->dataWaterData->WaterStorage(TankNum).LastTimeStepFilling);
 
 
     WaterManager::UpdateWaterManager(*state);
@@ -236,7 +236,7 @@ TEST_F(EnergyPlusFixture, WaterManager_Fill)
     calcVolume = min(calcVolume, state->dataWaterData->WaterStorage(TankNum).MaxCapacity);
     EXPECT_DOUBLE_EQ(calcVolume, state->dataWaterData->WaterStorage(TankNum).ThisTimeStepVolume);
     EXPECT_DOUBLE_EQ(3.0, calcVolume);
-    //EXPECT_FALSE(state->dataWaterData->WaterStorage(TankNum).LastTimeStepFilling);
+    EXPECT_FALSE(state->dataWaterData->WaterStorage(TankNum).LastTimeStepFilling);
 
     WaterManager::UpdateWaterManager(*state);
 
@@ -245,7 +245,7 @@ TEST_F(EnergyPlusFixture, WaterManager_Fill)
     calcVolume -= draw;
     EXPECT_DOUBLE_EQ(calcVolume, state->dataWaterData->WaterStorage(TankNum).ThisTimeStepVolume);
     EXPECT_DOUBLE_EQ(2.975, calcVolume);
-   // EXPECT_FALSE(state->dataWaterData->WaterStorage(TankNum).LastTimeStepFilling);
+    EXPECT_FALSE(state->dataWaterData->WaterStorage(TankNum).LastTimeStepFilling);
 
     WaterManager::UpdateWaterManager(*state);
 
@@ -254,7 +254,7 @@ TEST_F(EnergyPlusFixture, WaterManager_Fill)
     calcVolume -= draw;
     EXPECT_DOUBLE_EQ(calcVolume, state->dataWaterData->WaterStorage(TankNum).ThisTimeStepVolume);
     EXPECT_DOUBLE_EQ(2.95, calcVolume);
-   // EXPECT_FALSE(state->dataWaterData->WaterStorage(TankNum).LastTimeStepFilling);
+    EXPECT_FALSE(state->dataWaterData->WaterStorage(TankNum).LastTimeStepFilling);
 
     WaterManager::UpdateWaterManager(*state);
 
