@@ -6448,6 +6448,8 @@ namespace HVACVariableRefrigerantFlow {
                         if (VRFTU(VRFTUNum).ActualFanVolFlowRate > 0.0) {
                             VRFTU(VRFTUNum).HeatingSpeedRatio = VRFTU(VRFTUNum).MaxHeatAirVolFlow / VRFTU(VRFTUNum).ActualFanVolFlowRate;
                             VRFTU(VRFTUNum).CoolingSpeedRatio = VRFTU(VRFTUNum).MaxCoolAirVolFlow / VRFTU(VRFTUNum).ActualFanVolFlowRate;
+                            VRFTU(VRFTUNum).NoHeatingSpeedRatio = VRFTU(VRFTUNum).MaxNoHeatAirVolFlow / VRFTU(VRFTUNum).ActualFanVolFlowRate;
+                            VRFTU(VRFTUNum).NoCoolingSpeedRatio = VRFTU(VRFTUNum).MaxNoCoolAirVolFlow / VRFTU(VRFTUNum).ActualFanVolFlowRate;
                         }
 
                         MyVRFFlag(VRFTUNum) = false;
@@ -7070,31 +7072,37 @@ namespace HVACVariableRefrigerantFlow {
             CompOffMassFlow = VRFTU(VRFTUNum).MaxNoCoolAirMassFlow;
             OACompOnMassFlow = VRFTU(VRFTUNum).CoolOutAirMassFlow;
             OACompOffMassFlow = VRFTU(VRFTUNum).NoCoolHeatOutAirMassFlow;
+            CompOnFlowRatio = VRFTU(VRFTUNum).CoolingSpeedRatio;
         } else if (TerminalUnitList(TUListIndex).HRHeatRequest(IndexToTUInTUList)) {
             CompOnMassFlow = VRFTU(VRFTUNum).MaxHeatAirMassFlow;
             CompOffMassFlow = VRFTU(VRFTUNum).MaxNoHeatAirMassFlow;
             OACompOnMassFlow = VRFTU(VRFTUNum).HeatOutAirMassFlow;
             OACompOffMassFlow = VRFTU(VRFTUNum).NoCoolHeatOutAirMassFlow;
+            CompOnFlowRatio = VRFTU(VRFTUNum).HeatingSpeedRatio;
         } else if (CoolingLoad(VRFCond) && QZnReq != 0.0) {
             CompOnMassFlow = VRFTU(VRFTUNum).MaxCoolAirMassFlow;
             CompOffMassFlow = VRFTU(VRFTUNum).MaxNoCoolAirMassFlow;
             OACompOnMassFlow = VRFTU(VRFTUNum).CoolOutAirMassFlow;
             OACompOffMassFlow = VRFTU(VRFTUNum).NoCoolHeatOutAirMassFlow;
+            CompOnFlowRatio = VRFTU(VRFTUNum).CoolingSpeedRatio;
         } else if (HeatingLoad(VRFCond) && QZnReq != 0.0) {
             CompOnMassFlow = VRFTU(VRFTUNum).MaxHeatAirMassFlow;
             CompOffMassFlow = VRFTU(VRFTUNum).MaxNoHeatAirMassFlow;
             OACompOnMassFlow = VRFTU(VRFTUNum).HeatOutAirMassFlow;
             OACompOffMassFlow = VRFTU(VRFTUNum).NoCoolHeatOutAirMassFlow;
+            CompOnFlowRatio = VRFTU(VRFTUNum).HeatingSpeedRatio;
         } else {
             if (LastModeCooling(VRFCond)) {
                 CompOnMassFlow = VRFTU(VRFTUNum).MaxNoCoolAirMassFlow;
                 CompOffMassFlow = VRFTU(VRFTUNum).MaxNoCoolAirMassFlow;
                 OACompOnMassFlow = VRFTU(VRFTUNum).CoolOutAirMassFlow;
+                CompOnFlowRatio = VRFTU(VRFTUNum).NoCoolingSpeedRatio;
             }
             if (LastModeHeating(VRFCond)) {
                 CompOnMassFlow = VRFTU(VRFTUNum).MaxNoHeatAirMassFlow;
                 CompOffMassFlow = VRFTU(VRFTUNum).MaxNoHeatAirMassFlow;
                 OACompOnMassFlow = VRFTU(VRFTUNum).HeatOutAirMassFlow;
+                CompOnFlowRatio = VRFTU(VRFTUNum).NoHeatingSpeedRatio;
             }
             OACompOffMassFlow = VRFTU(VRFTUNum).NoCoolHeatOutAirMassFlow;
         }
