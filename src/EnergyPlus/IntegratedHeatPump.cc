@@ -5994,15 +5994,17 @@ namespace IntegratedHeatPump {
             IntegratedHeatPumps(DXCoilNum).LDLoopChecked = true;             
         }
       
+        double dRegenMass = state.dataWaterCoils->WaterCoil(IntegratedHeatPumps(DXCoilNum).LDRegenCoilIndex).DesiccantWaterLoss; 
+        double dDeHumMass = state.dataWaterCoils->WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex)
+                                .DesiccantWaterLoss; 
+                
         if ((SensLoad > SmallLoad) || (IntegratedHeatPumps(DXCoilNum).TankLDMass == 0.0)) { // heating mode no change
             bWHCall = false;
         } else {
 
             double dMassLoss = state.dataWaterCoils->WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).DesiccantWaterLoss +
                 state.dataWaterCoils->WaterCoil(IntegratedHeatPumps(DXCoilNum).LDRegenCoilIndex).DesiccantWaterLoss; 
-            IntegratedHeatPumps(DXCoilNum).TankLDMass = IntegratedHeatPumps(DXCoilNum).TankLDMass -
-                                                        state.dataWaterCoils->WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).DesiccantWaterLoss -
-                                                        state.dataWaterCoils->WaterCoil(IntegratedHeatPumps(DXCoilNum).LDRegenCoilIndex).DesiccantWaterLoss;
+            IntegratedHeatPumps(DXCoilNum).TankLDMass = IntegratedHeatPumps(DXCoilNum).TankLDMass - dDeHumMass - dRegenMass;
             IntegratedHeatPumps(DXCoilNum).SaltConcentration =
                 IntegratedHeatPumps(DXCoilNum).TankSaltMass / IntegratedHeatPumps(DXCoilNum).TankLDMass;
 

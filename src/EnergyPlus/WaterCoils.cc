@@ -4720,10 +4720,14 @@ namespace WaterCoils {
 
             // Step 2: Calculate the capacitance ratio
             m_star = (ma * csat) / (msi * cps); // P30 (3.24)
+
+            if (m_star > 1.0) m_star = 1.0/ m_star; 
             // double Cr = ma / msi;
 
             // Step 3: Calculate the effectiveness
             Effect = (1 - exp(-Ntu * (1 - m_star))) / (1 - m_star * (exp(-Ntu * (1 - m_star)))); // p31 (3.26)
+
+            if (Effect < 0.1) Effect = 0.1; 
 
             // Step 4: Calculate the air outlet enthalpy
             RHai = PsyRhFnTdbWPb(state, Tai, Wai, Patm);                     //  FluidRH(Tai, Wai, Patm, m_iFLD, 2); // place hold Res 8
@@ -4836,7 +4840,10 @@ namespace WaterCoils {
 
         
         if (min(Tsi, Tso) < Tcri) {
-            ShowWarningError(state, "the liquid desiccant has a crystallization risk");
+            ShowWarningError(state,
+                             format("the liquid desiccant has a crystallization risk = {:.2R} C versus  Tsi {:.2R} C, Tso {:.2R} C", 
+                                 Tcri, Tsi, Tso));
+            ShowContinueErrorTimeStamp(state, "");
         }
 
 
@@ -5901,6 +5908,8 @@ namespace WaterCoils {
         // p - psi
 
         double tc = t; // (t - 32.e0) / 1.8e0;
+        if (tc < 0.0) tc = 0.0; 
+
         double tk = tc + 273.15e0;
         double tau = 1.0e0 - tk / 647.14e0;
         if (tau < 1e-6) {
