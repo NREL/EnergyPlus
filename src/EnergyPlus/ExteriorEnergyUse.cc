@@ -108,7 +108,7 @@ namespace ExteriorEnergyUse {
 
         // Using/Aliasing
         using namespace DataIPShortCuts;
-        using General::RoundSigDigits;
+
         using ScheduleManager::GetScheduleIndex;
         using ScheduleManager::GetScheduleMaxValue;
         using ScheduleManager::GetScheduleMinValue;
@@ -178,13 +178,13 @@ namespace ExteriorEnergyUse {
                     if (SchMin < 0.0) {
                         ShowSevereError(state, RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " minimum, is < 0.0 for " +
                                         cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
-                        ShowContinueError(state, cAlphaArgs(2) + "\". Minimum is [" + RoundSigDigits(SchMin, 1) + "]. Values must be >= 0.0.");
+                        ShowContinueError(state, format("{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", cAlphaArgs(2), SchMin));
                         ErrorsFound = true;
                     }
                     if (SchMax < 0.0) {
                         ShowSevereError(state, RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " maximum, is < 0.0 for " +
                                         cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
-                        ShowContinueError(state, cAlphaArgs(2) + "\". Maximum is [" + RoundSigDigits(SchMax, 1) + "]. Values must be >= 0.0.");
+                        ShowContinueError(state, format("{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", cAlphaArgs(2), SchMax));
                         ErrorsFound = true;
                     }
                 }
@@ -335,13 +335,13 @@ namespace ExteriorEnergyUse {
                     if (SchMin < 0.0) {
                         ShowSevereError(state, RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(3) + " minimum, is < 0.0 for " +
                                         cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
-                        ShowContinueError(state, cAlphaArgs(3) + "\". Minimum is [" + RoundSigDigits(SchMin, 1) + "]. Values must be >= 0.0.");
+                        ShowContinueError(state, format("{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", cAlphaArgs(3), SchMin));
                         ErrorsFound = true;
                     }
                     if (SchMax < 0.0) {
                         ShowSevereError(state, RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(3) + " maximum, is < 0.0 for " +
                                         cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
-                        ShowContinueError(state, cAlphaArgs(3) + "\". Maximum is [" + RoundSigDigits(SchMax, 1) + "]. Values must be >= 0.0.");
+                        ShowContinueError(state, format("{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", cAlphaArgs(3), SchMax));
                         ErrorsFound = true;
                     }
                 }
@@ -388,13 +388,13 @@ namespace ExteriorEnergyUse {
                     if (SchMin < 0.0) {
                         ShowSevereError(state, RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(3) + " minimum, is < 0.0 for " +
                                         cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
-                        ShowContinueError(state, cAlphaArgs(3) + "\". Minimum is [" + RoundSigDigits(SchMin, 1) + "]. Values must be >= 0.0.");
+                        ShowContinueError(state, format("{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", cAlphaArgs(3), SchMin));
                         ErrorsFound = true;
                     }
                     if (SchMax < 0.0) {
                         ShowSevereError(state, RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(3) + " maximum, is < 0.0 for " +
                                         cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
-                        ShowContinueError(state, cAlphaArgs(3) + "\". Maximum is [" + RoundSigDigits(SchMax, 1) + "]. Values must be >= 0.0.");
+                        ShowContinueError(state, format("{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", cAlphaArgs(3), SchMax));
                         ErrorsFound = true;
                     }
                 }

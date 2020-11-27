@@ -78,6 +78,10 @@
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
+#include <EnergyPlus/DataBranchAirLoopPlant.hh>
+#include <EnergyPlus/DataBranchNodeConnections.hh>
+#include <EnergyPlus/DataBSDFWindow.hh>
+#include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataWater.hh>
 #include <EnergyPlus/DataTimings.hh>
@@ -85,6 +89,12 @@
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/Pipes.hh>
 #include <EnergyPlus/PlantChillers.hh>
+#include <EnergyPlus/PlantLoopHeatPumpEIR.hh>
+#include <EnergyPlus/PlantValves.hh>
+#include <EnergyPlus/SetPointManager.hh>
+#include <EnergyPlus/SimulationManager.hh>
+#include <EnergyPlus/SingleDuct.hh>
+#include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/SolarCollectors.hh>
 #include <EnergyPlus/SolarReflectionManager.hh>
 #include <EnergyPlus/SolarShading.hh>

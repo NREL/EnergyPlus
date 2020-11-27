@@ -192,7 +192,6 @@ namespace PoweredInductionUnits {
 
         // Using/Aliasing
         using DataSizing::TermUnitPIU;
-        using General::TrimSigDigits;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PIUNum; // index of powered induction unit being simulated
@@ -215,13 +214,16 @@ namespace PoweredInductionUnits {
         } else {
             PIUNum = CompIndex;
             if (PIUNum > NumPIUs || PIUNum < 1) {
-                ShowFatalError(state, "SimPIU: Invalid CompIndex passed=" + TrimSigDigits(CompIndex) + ", Number of PIU Units=" + TrimSigDigits(NumPIUs) +
-                               ", PIU Unit name=" + CompName);
+                ShowFatalError(state,
+                               format("SimPIU: Invalid CompIndex passed={}, Number of PIU Units={}, PIU Unit name={}", CompIndex, NumPIUs, CompName));
             }
             if (CheckEquipName(PIUNum)) {
                 if (CompName != PIU(PIUNum).Name) {
-                    ShowFatalError(state, "SimPIU: Invalid CompIndex passed=" + TrimSigDigits(CompIndex) + ", PIU Unit name=" + CompName +
-                                   ", stored PIU Unit Name for that index=" + PIU(PIUNum).Name);
+                    ShowFatalError(state,
+                                   format("SimPIU: Invalid CompIndex passed={}, PIU Unit name={}, stored PIU Unit Name for that index={}",
+                                          CompIndex,
+                                          CompName,
+                                          PIU(PIUNum).Name));
                 }
                 CheckEquipName(PIUNum) = false;
             }
@@ -1001,7 +1003,7 @@ namespace PoweredInductionUnits {
         using DataPlant::PlantLoop;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
-        using General::RoundSigDigits;
+
         using PlantUtilities::MyPlantSizingIndex;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -1097,9 +1099,9 @@ namespace PoweredInductionUnits {
                         if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(MaxPriAirVolFlowDes - MaxPriAirVolFlowUser) / MaxPriAirVolFlowUser) > AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizePIU: Potential issue with equipment sizing for " + PIU(PIUNum).UnitType + ' ' + PIU(PIUNum).Name);
-                                ShowContinueError(state, "User-Specified Primary Air Flow Rate of " + RoundSigDigits(MaxPriAirVolFlowUser, 5) + " [m3/s]");
-                                ShowContinueError(state, "differs from Design Size Primary Air Flow Rate of " + RoundSigDigits(MaxPriAirVolFlowDes, 5) +
-                                                  " [m3/s]");
+                                ShowContinueError(state, format("User-Specified Primary Air Flow Rate of {:.5R} [m3/s]", MaxPriAirVolFlowUser));
+                                ShowContinueError(state,
+                                                  format("differs from Design Size Primary Air Flow Rate of {:.5R} [m3/s]", MaxPriAirVolFlowDes));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }
@@ -1142,9 +1144,9 @@ namespace PoweredInductionUnits {
                         if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(MaxTotAirVolFlowDes - MaxTotAirVolFlowUser) / MaxTotAirVolFlowUser) > AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizePIU: Potential issue with equipment sizing for " + PIU(PIUNum).UnitType + ' ' + PIU(PIUNum).Name);
-                                ShowContinueError(state, "User-Specified Maximum Air Flow Rate of " + RoundSigDigits(MaxTotAirVolFlowUser, 5) + " [m3/s]");
-                                ShowContinueError(state, "differs from Design Size Maximum Air Flow Rate of " + RoundSigDigits(MaxTotAirVolFlowDes, 5) +
-                                                  " [m3/s]");
+                                ShowContinueError(state, format("User-Specified Maximum Air Flow Rate of {:.5R} [m3/s]", MaxTotAirVolFlowUser));
+                                ShowContinueError(state,
+                                                  format("differs from Design Size Maximum Air Flow Rate of {:.5R} [m3/s]", MaxTotAirVolFlowDes));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }
@@ -1189,10 +1191,10 @@ namespace PoweredInductionUnits {
                         if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(MaxSecAirVolFlowDes - MaxSecAirVolFlowUser) / MaxSecAirVolFlowUser) > AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizePIU: Potential issue with equipment sizing for " + PIU(PIUNum).UnitType + ' ' + PIU(PIUNum).Name);
-                                ShowContinueError(state, "User-Specified Maximum Secondary Air Flow Rate of " + RoundSigDigits(MaxSecAirVolFlowUser, 5) +
-                                                  " [m3/s]");
-                                ShowContinueError(state, "differs from Design Size Maximum Secondary Air Flow Rate of " +
-                                                  RoundSigDigits(MaxSecAirVolFlowDes, 5) + " [m3/s]");
+                                ShowContinueError(state,
+                                                  format("User-Specified Maximum Secondary Air Flow Rate of {:.5R} [m3/s]", MaxSecAirVolFlowUser));
+                                ShowContinueError(
+                                    state, format("differs from Design Size Maximum Secondary Air Flow Rate of {:.5R} [m3/s]", MaxSecAirVolFlowDes));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }
@@ -1235,9 +1237,9 @@ namespace PoweredInductionUnits {
                         if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(MinPriAirFlowFracDes - MinPriAirFlowFracUser) / MinPriAirFlowFracUser) > AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizePIU: Potential issue with equipment sizing for " + PIU(PIUNum).UnitType + ' ' + PIU(PIUNum).Name);
-                                ShowContinueError(state, "User-Specified Minimum Primary Air Flow Fraction of " + RoundSigDigits(MinPriAirFlowFracUser, 1));
-                                ShowContinueError(state, "differs from Design Size Minimum Primary Air Flow Fraction of " +
-                                                  RoundSigDigits(MinPriAirFlowFracDes, 1));
+                                ShowContinueError(state, format("User-Specified Minimum Primary Air Flow Fraction of {:.1R}", MinPriAirFlowFracUser));
+                                ShowContinueError(
+                                    state, format("differs from Design Size Minimum Primary Air Flow Fraction of {:.1R}", MinPriAirFlowFracDes));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }
@@ -1287,8 +1289,8 @@ namespace PoweredInductionUnits {
                         if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(FanOnFlowFracDes - FanOnFlowFracUser) / FanOnFlowFracUser) > AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizePIU: Potential issue with equipment sizing for " + PIU(PIUNum).UnitType + ' ' + PIU(PIUNum).Name);
-                                ShowContinueError(state, "User-Specified Fan On Flow Fraction of " + RoundSigDigits(FanOnFlowFracUser, 1));
-                                ShowContinueError(state, "differs from Design Size Fan On Flow Fraction of " + RoundSigDigits(FanOnFlowFracDes, 1));
+                                ShowContinueError(state, format("User-Specified Fan On Flow Fraction of {:.1R}", FanOnFlowFracUser));
+                                ShowContinueError(state, format("differs from Design Size Fan On Flow Fraction of {:.1R}", FanOnFlowFracDes));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }
@@ -1375,10 +1377,11 @@ namespace PoweredInductionUnits {
                                 if ((std::abs(MaxVolHotWaterFlowDes - MaxVolHotWaterFlowUser) / MaxVolHotWaterFlowUser) > AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizePIU: Potential issue with equipment sizing for " + PIU(PIUNum).UnitType + ' ' +
                                                 PIU(PIUNum).Name);
-                                    ShowContinueError(state, "User-Specified Maximum Reheat Water Flow Rate of " +
-                                                      RoundSigDigits(MaxVolHotWaterFlowUser, 5) + " [m3/s]");
-                                    ShowContinueError(state, "differs from Design Size Maximum Reheat Water Flow Rate of " +
-                                                      RoundSigDigits(MaxVolHotWaterFlowDes, 5) + " [m3/s]");
+                                    ShowContinueError(
+                                        state, format("User-Specified Maximum Reheat Water Flow Rate of {:.5R} [m3/s]", MaxVolHotWaterFlowUser));
+                                    ShowContinueError(
+                                        state,
+                                        format("differs from Design Size Maximum Reheat Water Flow Rate of {:.5R} [m3/s]", MaxVolHotWaterFlowDes));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -1453,10 +1456,10 @@ namespace PoweredInductionUnits {
                                 if ((std::abs(MaxVolHotSteamFlowDes - MaxVolHotSteamFlowUser) / MaxVolHotSteamFlowUser) > AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizePIU: Potential issue with equipment sizing for " + PIU(PIUNum).UnitType + ' ' +
                                                 PIU(PIUNum).Name);
-                                    ShowContinueError(state, "User-Specified Maximum Reheat Steam Flow of " + RoundSigDigits(MaxVolHotSteamFlowUser, 5) +
-                                                      " [m3/s]");
-                                    ShowContinueError(state, "differs from Design Size Maximum Reheat Steam Flow of " +
-                                                      RoundSigDigits(MaxVolHotSteamFlowDes, 5) + " [m3/s]");
+                                    ShowContinueError(state,
+                                                      format("User-Specified Maximum Reheat Steam Flow of {:.5R} [m3/s]", MaxVolHotSteamFlowUser));
+                                    ShowContinueError(
+                                        state, format("differs from Design Size Maximum Reheat Steam Flow of {:.5R} [m3/s]", MaxVolHotSteamFlowDes));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }

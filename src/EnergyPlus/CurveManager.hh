@@ -68,6 +68,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -369,7 +370,7 @@ namespace CurveManager {
 
     void GetPressureCurveTypeAndIndex(EnergyPlusData &state,
                                       std::string const &PressureCurveName, // name of the curve
-                                      int &PressureCurveType,
+                                      DataBranchAirLoopPlant::PressureCurveType &PressureCurveType,
                                       int &PressureCurveIndex);
 
     Real64 PressureCurveValue(EnergyPlusData &state, int PressureCurveIndex, Real64 MassFlow, Real64 Density, Real64 Viscosity);

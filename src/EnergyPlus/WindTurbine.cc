@@ -114,7 +114,6 @@ namespace WindTurbine {
         // This drivers manages the calls to all of the other drivers and simulation algorithms.
 
         // Using/Aliasing
-        using General::TrimSigDigits;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int WindTurbineNum;
@@ -134,12 +133,18 @@ namespace WindTurbine {
         } else {
             WindTurbineNum = GeneratorIndex;
             if (WindTurbineNum > state.dataWindTurbine->NumWindTurbines || WindTurbineNum < 1) {
-                ShowFatalError(state, "SimWindTurbine: Invalid GeneratorIndex passed=" + TrimSigDigits(WindTurbineNum) +
-                               ", Number of Wind Turbine Generators=" + TrimSigDigits(state.dataWindTurbine->NumWindTurbines) + ", Generator name=" + GeneratorName);
+                ShowFatalError(state,
+                               format("SimWindTurbine: Invalid GeneratorIndex passed={}, Number of Wind Turbine Generators={}, Generator name={}",
+                                      WindTurbineNum,
+                                      state.dataWindTurbine->NumWindTurbines,
+                                      GeneratorName));
             }
             if (GeneratorName != state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Name) {
-                ShowFatalError(state, "SimMWindTurbine: Invalid GeneratorIndex passed=" + TrimSigDigits(WindTurbineNum) +
-                               ", Generator name=" + GeneratorName + ", stored Generator Name for that index=" + state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Name);
+                ShowFatalError(state,
+                               format("SimMWindTurbine: Invalid GeneratorIndex passed={}, Generator name={}, stored Generator Name for that index={}",
+                                      WindTurbineNum,
+                                      GeneratorName,
+                                      state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Name));
             }
         }
 
@@ -190,7 +195,7 @@ namespace WindTurbine {
         // and stores it in the wind turbine data structure.
 
         // Using/Aliasing
-        using General::RoundSigDigits;
+
         using ScheduleManager::GetScheduleIndex;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -294,8 +299,12 @@ namespace WindTurbine {
                     ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cNumericFields(1) +
                                     " is required but input is blank.");
                 } else {
-                    ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cNumericFields(1) + "=[" +
-                                    RoundSigDigits(rNumericArgs(1), 2) + "] must be greater than zero.");
+                    ShowSevereError(state,
+                                    format("{}=\"{}\" invalid {}=[{:.2R}] must be greater than zero.",
+                                           CurrentModuleObject,
+                                           cAlphaArgs(1),
+                                           cNumericFields(1),
+                                           rNumericArgs(1)));
                 }
                 ErrorsFound = true;
             }
@@ -306,8 +315,12 @@ namespace WindTurbine {
                     ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cNumericFields(2) +
                                     " is required but input is blank.");
                 } else {
-                    ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cNumericFields(2) + "=[" +
-                                    RoundSigDigits(rNumericArgs(2), 1) + "] must be greater than zero.");
+                    ShowSevereError(state,
+                                    format("{}=\"{}\" invalid {}=[{:.1R}] must be greater than zero.",
+                                           CurrentModuleObject,
+                                           cAlphaArgs(1),
+                                           cNumericFields(2),
+                                           rNumericArgs(2)));
                 }
                 ErrorsFound = true;
             }
@@ -318,16 +331,24 @@ namespace WindTurbine {
                     ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cNumericFields(3) +
                                     " is required but input is blank.");
                 } else {
-                    ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cNumericFields(3) + "=[" +
-                                    RoundSigDigits(rNumericArgs(3), 1) + "] must be greater than zero.");
+                    ShowSevereError(state,
+                                    format("{}=\"{}\" invalid {}=[{:.1R}] must be greater than zero.",
+                                           CurrentModuleObject,
+                                           cAlphaArgs(1),
+                                           cNumericFields(3),
+                                           rNumericArgs(3)));
                 }
                 ErrorsFound = true;
             }
 
             state.dataWindTurbine->WindTurbineSys(WindTurbineNum).NumOfBlade = rNumericArgs(4); // Total number of blade
             if (state.dataWindTurbine->WindTurbineSys(WindTurbineNum).NumOfBlade == 0) {
-                ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cNumericFields(4) + "=[" +
-                                RoundSigDigits(rNumericArgs(4), 0) + "] must be greater than zero.");
+                ShowSevereError(state,
+                                format("{}=\"{}\" invalid {}=[{:.0R}] must be greater than zero.",
+                                       CurrentModuleObject,
+                                       cAlphaArgs(1),
+                                       cNumericFields(4),
+                                       rNumericArgs(4)));
                 ErrorsFound = true;
             }
 
@@ -337,8 +358,12 @@ namespace WindTurbine {
                     ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cNumericFields(5) +
                                     " is required but input is blank.");
                 } else {
-                    ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cNumericFields(5) + "=[" +
-                                    RoundSigDigits(rNumericArgs(5), 2) + "] must be greater than zero.");
+                    ShowSevereError(state,
+                                    format("{}=\"{}\" invalid {}=[{:.2R}] must be greater than zero.",
+                                           CurrentModuleObject,
+                                           cAlphaArgs(1),
+                                           cNumericFields(5),
+                                           rNumericArgs(5)));
                 }
                 ErrorsFound = true;
             }
@@ -349,8 +374,12 @@ namespace WindTurbine {
                     ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cNumericFields(6) +
                                     " is required but input is blank.");
                 } else {
-                    ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cNumericFields(6) + "=[" +
-                                    RoundSigDigits(rNumericArgs(6), 2) + "] must be greater than zero.");
+                    ShowSevereError(state,
+                                    format("{}=\"{}\" invalid {}=[{:.2R}] must be greater than zero.",
+                                           CurrentModuleObject,
+                                           cAlphaArgs(1),
+                                           cNumericFields(6),
+                                           rNumericArgs(6)));
                 }
                 ErrorsFound = true;
             }
@@ -361,8 +390,12 @@ namespace WindTurbine {
                     ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cNumericFields(7) +
                                     " is required but input is blank.");
                 } else {
-                    ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cNumericFields(7) + "=[" +
-                                    RoundSigDigits(rNumericArgs(7), 2) + "] must be greater than zero.");
+                    ShowSevereError(state,
+                                    format("{}=\"{}\" invalid {}=[{:.2R}] must be greater than zero.",
+                                           CurrentModuleObject,
+                                           cAlphaArgs(1),
+                                           cNumericFields(7),
+                                           rNumericArgs(7)));
                 }
                 ErrorsFound = true;
             }
@@ -370,15 +403,24 @@ namespace WindTurbine {
             state.dataWindTurbine->WindTurbineSys(WindTurbineNum).CutOutSpeed = rNumericArgs(8); // Minimum wind speed for system operation
             if (state.dataWindTurbine->WindTurbineSys(WindTurbineNum).CutOutSpeed == 0.0) {
                 if (lNumericBlanks(8)) {
-                    ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cNumericFields(8) +
-                                    " is required but input is blank.");
+                    ShowSevereError(
+                        state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cNumericFields(8) + " is required but input is blank.");
                 } else if (state.dataWindTurbine->WindTurbineSys(WindTurbineNum).CutOutSpeed <= state.dataWindTurbine->WindTurbineSys(WindTurbineNum).RatedWindSpeed) {
-                    ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cNumericFields(8) + "=[" +
-                                    RoundSigDigits(rNumericArgs(8), 2) + "] must be greater than " + cNumericFields(6) + "=[" +
-                                    RoundSigDigits(rNumericArgs(6), 2) + "].");
+                    ShowSevereError(state,
+                                    format("{}=\"{}\" invalid {}=[{:.2R}] must be greater than {}=[{:.2R}].",
+                                           CurrentModuleObject,
+                                           cAlphaArgs(1),
+                                           cNumericFields(8),
+                                           rNumericArgs(8),
+                                           cNumericFields(6),
+                                           rNumericArgs(6)));
                 } else {
-                    ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cNumericFields(8) + "=[" +
-                                    RoundSigDigits(rNumericArgs(8), 2) + "] must be greater than zero");
+                    ShowSevereError(state,
+                                    format("{}=\"{}\" invalid {}=[{:.2R}] must be greater than zero",
+                                           CurrentModuleObject,
+                                           cAlphaArgs(1),
+                                           cNumericFields(8),
+                                           rNumericArgs(8)));
                 }
                 ErrorsFound = true;
             }
@@ -386,9 +428,9 @@ namespace WindTurbine {
             state.dataWindTurbine->WindTurbineSys(WindTurbineNum).SysEfficiency = rNumericArgs(9); // Overall wind turbine system efficiency
             if (lNumericBlanks(9) || state.dataWindTurbine->WindTurbineSys(WindTurbineNum).SysEfficiency == 0.0 || state.dataWindTurbine->WindTurbineSys(WindTurbineNum).SysEfficiency > 1.0) {
                 state.dataWindTurbine->WindTurbineSys(WindTurbineNum).SysEfficiency = SysEffDefault;
-                ShowWarningError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cNumericFields(9) + "=[" +
-                                 RoundSigDigits(rNumericArgs(9), 2) + "].");
-                ShowContinueError(state, "...The default value of " + RoundSigDigits(SysEffDefault, 3) + " for " + cNumericFields(9) + " was assumed.");
+                ShowWarningError(state,
+                                 format("{}=\"{}\" invalid {}=[{:.2R}].", CurrentModuleObject, cAlphaArgs(1), cNumericFields(9), rNumericArgs(9)));
+                ShowContinueError(state, format("...The default value of {:.3R} was assumed. for {}", SysEffDefault, cNumericFields(9)));
             }
 
             state.dataWindTurbine->WindTurbineSys(WindTurbineNum).MaxTipSpeedRatio = rNumericArgs(10); // Maximum tip speed ratio
@@ -397,16 +439,20 @@ namespace WindTurbine {
                     ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cNumericFields(10) +
                                     " is required but input is blank.");
                 } else {
-                    ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cNumericFields(10) + "=[" +
-                                    RoundSigDigits(rNumericArgs(10), 2) + "] must be greater than zero.");
+                    ShowSevereError(state,
+                                    format("{}=\"{}\" invalid {}=[{:.2R}] must be greater than zero.",
+                                           CurrentModuleObject,
+                                           cAlphaArgs(1),
+                                           cNumericFields(10),
+                                           rNumericArgs(10)));
                 }
                 ErrorsFound = true;
             }
             if (state.dataWindTurbine->WindTurbineSys(WindTurbineNum).SysEfficiency > MaxTSR) {
                 state.dataWindTurbine->WindTurbineSys(WindTurbineNum).SysEfficiency = MaxTSR;
-                ShowWarningError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cNumericFields(10) + "=[" +
-                                 RoundSigDigits(rNumericArgs(10), 2) + "].");
-                ShowContinueError(state, "...The default value of " + RoundSigDigits(MaxTSR, 1) + " for " + cNumericFields(10) + " was assumed.");
+                ShowWarningError(state,
+                                 format("{}=\"{}\" invalid {}=[{:.2R}].", CurrentModuleObject, cAlphaArgs(1), cNumericFields(10), rNumericArgs(10)));
+                ShowContinueError(state, format("...The default value of {:.1R} was assumed. for {}", MaxTSR, cNumericFields(10)));
             }
 
             state.dataWindTurbine->WindTurbineSys(WindTurbineNum).MaxPowerCoeff = rNumericArgs(11); // Maximum power coefficient
@@ -415,16 +461,20 @@ namespace WindTurbine {
                     ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cNumericFields(11) +
                                     " is required but input is blank.");
                 } else {
-                    ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cNumericFields(11) + "=[" +
-                                    RoundSigDigits(rNumericArgs(11), 2) + "] must be greater than zero.");
+                    ShowSevereError(state,
+                                    format("{}=\"{}\" invalid {}=[{:.2R}] must be greater than zero.",
+                                           CurrentModuleObject,
+                                           cAlphaArgs(1),
+                                           cNumericFields(11),
+                                           rNumericArgs(11)));
                 }
                 ErrorsFound = true;
             }
             if (state.dataWindTurbine->WindTurbineSys(WindTurbineNum).MaxPowerCoeff > MaxPowerCoeff) {
                 state.dataWindTurbine->WindTurbineSys(WindTurbineNum).MaxPowerCoeff = DefaultPC;
-                ShowWarningError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cNumericFields(11) + "=[" +
-                                 RoundSigDigits(rNumericArgs(11), 2) + "].");
-                ShowContinueError(state, "...The default value of " + RoundSigDigits(DefaultPC, 2) + " for " + cNumericFields(11) + " will be used.");
+                ShowWarningError(state,
+                                 format("{}=\"{}\" invalid {}=[{:.2R}].", CurrentModuleObject, cAlphaArgs(1), cNumericFields(11), rNumericArgs(11)));
+                ShowContinueError(state, format("...The default value of {:.2R} will be used. for {}", DefaultPC, cNumericFields(11)));
             }
 
             state.dataWindTurbine->WindTurbineSys(WindTurbineNum).LocalAnnualAvgWS = rNumericArgs(12); // Local wind speed annually averaged
@@ -433,8 +483,12 @@ namespace WindTurbine {
                     ShowWarningError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cNumericFields(12) +
                                      " is necessary for accurate prediction but input is blank.");
                 } else {
-                    ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cNumericFields(12) + "=[" +
-                                    RoundSigDigits(rNumericArgs(12), 2) + "] must be greater than zero.");
+                    ShowSevereError(state,
+                                    format("{}=\"{}\" invalid {}=[{:.2R}] must be greater than zero.",
+                                           CurrentModuleObject,
+                                           cAlphaArgs(1),
+                                           cNumericFields(12),
+                                           rNumericArgs(12)));
                     ErrorsFound = true;
                 }
             }
@@ -448,10 +502,14 @@ namespace WindTurbine {
                     if (lNumericBlanks(13)) {
                         ShowWarningError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cNumericFields(13) +
                                          " is necessary for accurate prediction but input is blank.");
-                        ShowContinueError(state, "...The default value of " + RoundSigDigits(DefaultH, 2) + " for " + cNumericFields(13) + " will be used.");
+                        ShowContinueError(state, format("...The default value of {:.2R} will be used. for {}", DefaultH, cNumericFields(13)));
                     } else {
-                        ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cNumericFields(13) + "=[" +
-                                        RoundSigDigits(rNumericArgs(13), 2) + "] must be greater than zero.");
+                        ShowSevereError(state,
+                                        format("{}=\"{}\" invalid {}=[{:.2R}] must be greater than zero.",
+                                               CurrentModuleObject,
+                                               cAlphaArgs(1),
+                                               cNumericFields(13),
+                                               rNumericArgs(13)));
                         ErrorsFound = true;
                     }
                 }
@@ -463,8 +521,12 @@ namespace WindTurbine {
                     ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cNumericFields(14) +
                                     " is required but input is blank.");
                 } else {
-                    ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cNumericFields(14) + "=[" +
-                                    RoundSigDigits(rNumericArgs(14), 2) + "] must be greater than zero.");
+                    ShowSevereError(state,
+                                    format("{}=\"{}\" invalid {}=[{:.2R}] must be greater than zero.",
+                                           CurrentModuleObject,
+                                           cAlphaArgs(1),
+                                           cNumericFields(14),
+                                           rNumericArgs(14)));
                 }
                 ErrorsFound = true;
             }
@@ -475,8 +537,12 @@ namespace WindTurbine {
                     ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cNumericFields(15) +
                                     " is required but input is blank.");
                 } else {
-                    ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cNumericFields(15) + "=[" +
-                                    RoundSigDigits(rNumericArgs(15), 2) + "] must be greater than zero.");
+                    ShowSevereError(state,
+                                    format("{}=\"{}\" invalid {}=[{:.2R}] must be greater than zero.",
+                                           CurrentModuleObject,
+                                           cAlphaArgs(1),
+                                           cNumericFields(15),
+                                           rNumericArgs(15)));
                 }
                 ErrorsFound = true;
             }
@@ -487,8 +553,12 @@ namespace WindTurbine {
                     ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cNumericFields(16) +
                                     " is required but input is blank.");
                 } else {
-                    ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cNumericFields(16) + "=[" +
-                                    RoundSigDigits(rNumericArgs(16), 2) + "] must be greater than zero.");
+                    ShowSevereError(state,
+                                    format("{}=\"{}\" invalid {}=[{:.2R}] must be greater than zero.",
+                                           CurrentModuleObject,
+                                           cAlphaArgs(1),
+                                           cNumericFields(16),
+                                           rNumericArgs(16)));
                 }
                 ErrorsFound = true;
             }

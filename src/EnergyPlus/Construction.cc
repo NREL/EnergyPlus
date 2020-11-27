@@ -232,17 +232,20 @@ namespace Construction {
                             ShowSevereError(state, "InitConductionTransferFunctions: Found Material that is too thin and/or too highly conductive, "
                                             "material name = " +
                                             dataMaterial.Material(CurrentLayer).Name);
-                            ShowContinueError(state, "High conductivity Material layers are not well supported for internal source constructions, "
-                                              "material conductivity = " +
-                                              General::RoundSigDigits(dataMaterial.Material(CurrentLayer).Conductivity, 3) + " [W/m-K]");
-                            ShowContinueError(state, "Material thermal diffusivity = " + General::RoundSigDigits(Alpha, 3) + " [m2/s]");
-                            ShowContinueError(state, "Material with this thermal diffusivity should have thickness > " +
-                                                      General::RoundSigDigits(ThicknessThreshold, 5) + " [m]");
+                            ShowContinueError(state,
+                                              format("High conductivity Material layers are not well supported for internal source constructions, "
+                                                     "material conductivity = {:.3R} [W/m-K]",
+                                                     dataMaterial.Material(CurrentLayer).Conductivity));
+                            ShowContinueError(state, format("Material thermal diffusivity = {:.3R} [m2/s]", Alpha));
+                            ShowContinueError(
+                                state, format("Material with this thermal diffusivity should have thickness > {:.5R} [m]", ThicknessThreshold));
                             if (dataMaterial.Material(CurrentLayer).Thickness < DataHeatBalance::ThinMaterialLayerThreshold) {
-                                ShowContinueError(state, "Material may be too thin to be modeled well, thickness = " +
-                                                          General::RoundSigDigits(dataMaterial.Material(CurrentLayer).Thickness, 5) + " [m]");
-                                ShowContinueError(state, "Material with this thermal diffusivity should have thickness > " +
-                                                  General::RoundSigDigits(DataHeatBalance::ThinMaterialLayerThreshold, 5) + " [m]");
+                                ShowContinueError(state,
+                                                  format("Material may be too thin to be modeled well, thickness = {:.5R} [m]",
+                                                         dataMaterial.Material(CurrentLayer).Thickness));
+                                ShowContinueError(state,
+                                                  format("Material with this thermal diffusivity should have thickness > {:.5R} [m]",
+                                                         DataHeatBalance::ThinMaterialLayerThreshold));
                             }
                             dataMaterial.Material(CurrentLayer).WarnedForHighDiffusivity = true;
                         }
@@ -275,8 +278,7 @@ namespace Construction {
 
                     ShowSevereError(state, "InitConductionTransferFunctions: Material=" + dataMaterial.Material(CurrentLayer).Name +
                                     "R Value below lowest allowed value");
-                    ShowContinueError(state, "Lowest allowed value=[" + General::RoundSigDigits(RValueLowLimit, 3) + "], Material R Value=[" +
-                                      General::RoundSigDigits(lr(Layer), 3) + "].");
+                    ShowContinueError(state, format("Lowest allowed value=[{:.3R}], Material R Value=[{:.3R}].", RValueLowLimit, lr(Layer)));
                     ErrorsFound = true;
 
                 } else { // A valid user defined R-value is available.
@@ -956,7 +958,7 @@ namespace Construction {
                         DoCTFErrorReport = true;
                         ErrorsFound = true;
                         break;
-                        //            CALL ShowFatalError('Program terminated for reasons listed (InitConductionTransferFunctions) ')
+                        //            CALL ShowFatalError(state, 'Program terminated for reasons listed (InitConductionTransferFunctions) ')
                     }
 
                 } // ... end of CTF calculation loop.

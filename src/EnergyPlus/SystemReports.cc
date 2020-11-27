@@ -2510,10 +2510,10 @@ namespace SystemReports {
                     TypeOfComp = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).TypeOf;
                     NameOfComp = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name;
                     // Get complete list of components for complex branches
-                    if (IsParentObject(TypeOfComp, NameOfComp)) {
+                    if (IsParentObject(state, TypeOfComp, NameOfComp)) {
 
                         state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).Parent = true;
-                        NumChildren = GetNumChildren(TypeOfComp, NameOfComp);
+                        NumChildren = GetNumChildren(state, TypeOfComp, NameOfComp);
 
                         SubCompTypes.allocate(NumChildren);
                         SubCompNames.allocate(NumChildren);
@@ -2563,8 +2563,8 @@ namespace SystemReports {
                     for (SubCompNum = 1; SubCompNum <= NumChildren; ++SubCompNum) {
                         TypeOfComp = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).SubComp(SubCompNum).TypeOf;
                         NameOfComp = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).SubComp(SubCompNum).Name;
-                        if (IsParentObject(TypeOfComp, NameOfComp)) {
-                            NumGrandChildren = GetNumChildren(TypeOfComp, NameOfComp);
+                        if (IsParentObject(state, TypeOfComp, NameOfComp)) {
+                            NumGrandChildren = GetNumChildren(state, TypeOfComp, NameOfComp);
                             SubCompTypes.allocate(NumGrandChildren);
                             SubCompNames.allocate(NumGrandChildren);
                             InletNodeNames.allocate(NumGrandChildren);
@@ -2594,7 +2594,7 @@ namespace SystemReports {
                                     thisSubSubComponent.NodeNameOut = OutletNodeNames(SubSubCompNum);
                                     thisSubSubComponent.NodeNumIn = InletNodeNumbers(SubSubCompNum);
                                     thisSubSubComponent.NodeNumOut = OutletNodeNumbers(SubSubCompNum);
-                                    NumLeft = GetNumChildren(SubCompTypes(SubSubCompNum), SubCompNames(SubSubCompNum));
+                                    NumLeft = GetNumChildren(state, SubCompTypes(SubSubCompNum), SubCompNames(SubSubCompNum));
                                     if (NumLeft > 0) {
                                         ShowSevereError(state, "Hanging Children for component=" + SubCompTypes(SubSubCompNum) + ':' +
                                                         SubCompNames(SubSubCompNum));
@@ -2931,8 +2931,8 @@ namespace SystemReports {
                         Names.deallocate();
                     }
 
-                    if (IsParentObject(TypeOfComp, NameOfComp)) {
-                        NumChildren = GetNumChildren(TypeOfComp, NameOfComp);
+                    if (IsParentObject(state, TypeOfComp, NameOfComp)) {
+                        NumChildren = GetNumChildren(state, TypeOfComp, NameOfComp);
                         thisEquipData.NumSubEquip = NumChildren;
 
                         SubCompTypes.allocate(NumChildren);
@@ -2974,8 +2974,8 @@ namespace SystemReports {
                     for (SubCompNum = 1; SubCompNum <= NumChildren; ++SubCompNum) {
                         TypeOfComp = thisEquipData.SubEquipData(SubCompNum).TypeOf;
                         NameOfComp = thisEquipData.SubEquipData(SubCompNum).Name;
-                        if (IsParentObject(TypeOfComp, NameOfComp)) {
-                            NumGrandChildren = GetNumChildren(TypeOfComp, NameOfComp);
+                        if (IsParentObject(state, TypeOfComp, NameOfComp)) {
+                            NumGrandChildren = GetNumChildren(state, TypeOfComp, NameOfComp);
                             thisEquipData.SubEquipData(SubCompNum).NumSubSubEquip = NumGrandChildren;
                             SubCompTypes.allocate(NumGrandChildren);
                             SubCompNames.allocate(NumGrandChildren);
@@ -3214,9 +3214,9 @@ namespace SystemReports {
                             TypeOfComp = thisComp.TypeOf;
                             NameOfComp = thisComp.Name;
                             // Get complete list of components for complex branches
-                            if (IsParentObject(TypeOfComp, NameOfComp)) {
+                            if (IsParentObject(state, TypeOfComp, NameOfComp)) {
 
-                                NumChildren = GetNumChildren(TypeOfComp, NameOfComp);
+                                NumChildren = GetNumChildren(state, TypeOfComp, NameOfComp);
 
                                 SubCompTypes.allocate(NumChildren);
                                 SubCompNames.allocate(NumChildren);
@@ -3262,8 +3262,8 @@ namespace SystemReports {
                             for (SubCompNum = 1; SubCompNum <= NumChildren; ++SubCompNum) {
                                 TypeOfComp = thisComp.SubComp(SubCompNum).TypeOf;
                                 NameOfComp = thisComp.SubComp(SubCompNum).Name;
-                                if (IsParentObject(TypeOfComp, NameOfComp)) {
-                                    NumGrandChildren = GetNumChildren(TypeOfComp, NameOfComp);
+                                if (IsParentObject(state, TypeOfComp, NameOfComp)) {
+                                    NumGrandChildren = GetNumChildren(state, TypeOfComp, NameOfComp);
                                     SubCompTypes.allocate(NumGrandChildren);
                                     SubCompNames.allocate(NumGrandChildren);
                                     InletNodeNames.allocate(NumGrandChildren);
@@ -5274,12 +5274,12 @@ namespace SystemReports {
                 std::string ChrOut;
                 std::string ChrOut2;
                 if (state.dataAirLoop->AirToOANodeInfo(Count).OASysInletNodeNum > 0) {
-                    ChrOut = std::to_string(state.dataAirLoop->AirToOANodeInfo(Count).OASysInletNodeNum);
+                    ChrOut = fmt::to_string(state.dataAirLoop->AirToOANodeInfo(Count).OASysInletNodeNum);
                 } else {
                     ChrOut = errstring;
                 }
                 if (state.dataAirLoop->AirToOANodeInfo(Count).OASysOutletNodeNum > 0) {
-                    ChrOut2 = std::to_string(state.dataAirLoop->AirToOANodeInfo(Count).OASysOutletNodeNum);
+                    ChrOut2 = fmt::to_string(state.dataAirLoop->AirToOANodeInfo(Count).OASysOutletNodeNum);
                 } else {
                     ChrOut2 = errstring;
                 }

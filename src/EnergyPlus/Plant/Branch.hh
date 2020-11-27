@@ -49,6 +49,7 @@
 #define PlantTopologyBranch_hh_INCLUDED
 
 #include <EnergyPlus/Plant/Component.hh>
+#include <EnergyPlus/DataBranchAirLoopPlant.hh>
 
 namespace EnergyPlus {
 namespace DataPlant {
@@ -57,7 +58,7 @@ namespace DataPlant {
     {
         // Members
         std::string Name; // Name of the branch
-        int ControlType;
+        DataBranchAirLoopPlant::ControlTypeEnum ControlType;
         Real64 RequestedMassFlow;
         bool HasConstantSpeedBranchPump;    // true if branch has a constant speed branch pump
         Real64 ConstantSpeedBranchMassFlow; // nominal flow rate if constant speed branch pump on
@@ -75,7 +76,7 @@ namespace DataPlant {
         Array1D<CompData> Comp;      // Component type list
         bool HasPressureComponents;
         Real64 PressureDrop;
-        int PressureCurveType;  // Either none, pressure curve, or generic curve
+        DataBranchAirLoopPlant::PressureCurveType PressureCurveType;  // Either none, pressure curve, or generic curve
         int PressureCurveIndex; // Curve: index for pressure drop calculations
         Real64 PressureEffectiveK;
         bool disableOverrideForCSBranchPumping;
@@ -83,9 +84,9 @@ namespace DataPlant {
 
         // Default Constructor
         BranchData()
-            : ControlType(0), RequestedMassFlow(0.0), HasConstantSpeedBranchPump(false), ConstantSpeedBranchMassFlow(0.0), BranchLevel(0),
+            : ControlType(DataBranchAirLoopPlant::ControlTypeEnum::Unknown), RequestedMassFlow(0.0), HasConstantSpeedBranchPump(false), ConstantSpeedBranchMassFlow(0.0), BranchLevel(0),
               FlowErrCount(0), FlowErrIndex(0), TotalComponents(0), NodeNumIn(0), NodeNumOut(0), IsBypass(false), PumpIndex(0), PumpSizFac(1.0),
-              EMSCtrlOverrideOn(false), EMSCtrlOverrideValue(0.0), HasPressureComponents(false), PressureDrop(0.0), PressureCurveType(0),
+              EMSCtrlOverrideOn(false), EMSCtrlOverrideValue(0.0), HasPressureComponents(false), PressureDrop(0.0), PressureCurveType(DataBranchAirLoopPlant::PressureCurveType::Unassigned),
               PressureCurveIndex(0), PressureEffectiveK(0.0), disableOverrideForCSBranchPumping(false), lastComponentSimulated(0)
         {
         }

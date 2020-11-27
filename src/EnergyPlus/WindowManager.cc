@@ -171,7 +171,7 @@ namespace WindowManager {
 
         // Using/Aliasing
         using namespace Vectors;
-        using General::TrimSigDigits;
+
         using WindowEquivalentLayer::InitEquivalentLayerWindowCalculations;
 
         int CoefNum;                    // Polynomial coefficient number
@@ -601,10 +601,13 @@ namespace WindowManager {
             } // End of loop over glass layers in the construction for front calculation
 
             if (TotalIPhi > state.dataWindowManager->MaxNumOfIncidentAngles) {
-                ShowSevereError(state, "WindowManage::InitGlassOpticalCalculations = " + state.dataConstruction->Construct(ConstrNum).Name +
-                                ", Invalid maximum value of common incidet angles = " + TrimSigDigits(TotalIPhi) + ".");
-                ShowContinueError(state, "The maximum number of incident angles for each construct is " + TrimSigDigits(state.dataWindowManager->MaxNumOfIncidentAngles) +
-                                  ". Please rearrange the dataset.");
+                ShowSevereError(state,
+                                format("WindowManage::InitGlassOpticalCalculations = {}, Invalid maximum value of common incidet angles = {}.",
+                                       state.dataConstruction->Construct(ConstrNum).Name,
+                                       TotalIPhi));
+                ShowContinueError(state,
+                                  format("The maximum number of incident angles for each construct is {}. Please rearrange the dataset.",
+                                         state.dataWindowManager->MaxNumOfIncidentAngles));
                 ShowFatalError(state, "Errors found getting inputs. Previous error(s) cause program termination.");
             }
 
@@ -1518,8 +1521,6 @@ namespace WindowManager {
     {
         // Initializes variables used in the window optical and thermal calculation.
 
-        using General::RoundSigDigits;
-
         int ConstrNum;        // Construction number
         int SurfNum;          // Surface number
         int IPhi;             // Angle of incidence counter
@@ -1656,11 +1657,13 @@ namespace WindowManager {
 
         if (DifOverrideCount > 0) {
             if (!state.dataGlobal->DisplayExtraWarnings) {
-                ShowWarningError(state, "W5InitGlassParameters: " + RoundSigDigits(DifOverrideCount) +
-                                 " Windows had Solar Diffusing=Yes overridden by presence of Window Shading Device.");
+                ShowWarningError(state,
+                                 format("W5InitGlassParameters: {} Windows had Solar Diffusing=Yes overridden by presence of Window Shading Device.",
+                                        DifOverrideCount));
             } else {
-                ShowMessage(state, "W5InitGlassParameters: " + RoundSigDigits(DifOverrideCount) +
-                            " Windows had Solar Diffusing=Yes overridden by presence of Window Shading Device.");
+                ShowMessage(state,
+                            format("W5InitGlassParameters: {} Windows had Solar Diffusing=Yes overridden by presence of Window Shading Device.",
+                                   DifOverrideCount));
             }
         }
 
@@ -2141,7 +2144,7 @@ namespace WindowManager {
             temp = 0;
 
             // Simon: Complex fenestration state works only with tarcog
-            CalcComplexWindowThermal(state, SurfNum, temp, HextConvCoeff, SurfInsideTemp, SurfOutsideTemp, SurfOutsideEmiss, noCondition);
+            CalcComplexWindowThermal(state, SurfNum, temp, HextConvCoeff, SurfInsideTemp, SurfOutsideTemp, SurfOutsideEmiss, DataBSDFWindow::noCondition);
 
             ConstrNum = surface.Construction;
             TotGlassLay = state.dataConstruction->Construct(ConstrNum).TotGlassLayers;
@@ -2172,7 +2175,7 @@ namespace WindowManager {
 
         } else if (SurfWinWindowModelType(SurfNum) == WindowEQLModel) {
 
-            EQLWindowSurfaceHeatBalance(state, SurfNum, HextConvCoeff, SurfInsideTemp, SurfOutsideTemp, SurfOutsideEmiss, noCondition);
+            EQLWindowSurfaceHeatBalance(state, SurfNum, HextConvCoeff, SurfInsideTemp, SurfOutsideTemp, SurfOutsideEmiss, DataBSDFWindow::noCondition);
             state.dataWindowManager->hcout = HextConvCoeff;
             // Required for report variables calculations.
             if (surface.ExtWind) { // Window is exposed to wind (and possibly rain)
@@ -2851,8 +2854,7 @@ namespace WindowManager {
         using ConvectionCoefficients::CalcISO15099WindowIntConvCoeff;
         using General::InterpSlatAng;
         using General::InterpSw;
-        using General::RoundSigDigits;
-        using General::TrimSigDigits;
+
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyHFnTdbW;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
@@ -3412,7 +3414,9 @@ namespace WindowManager {
                     }
 
                 } else {
-                    ShowFatalError(state, "SolveForWindowTemperatures: Invalid number of Glass Layers=" + TrimSigDigits(state.dataWindowManager->ngllayer) + ", up to 4 allowed.");
+                    ShowFatalError(
+                        state,
+                        format("SolveForWindowTemperatures: Invalid number of Glass Layers={}, up to 4 allowed.", state.dataWindowManager->ngllayer));
                 }
             }
 
@@ -3573,9 +3577,11 @@ namespace WindowManager {
             if (state.dataGlobal->DisplayExtraWarnings) {
                 // report out temperatures
                 for (i = 1; i <= state.dataWindowManager->nglfacep; ++i) {
-                    ShowContinueError(state, "Glazing face index = " + RoundSigDigits(i) +
-                                      " ; new temperature =" + RoundSigDigits(state.dataWindowManager->thetas(i) - DataGlobalConstants::KelvinConv(), 4) +
-                                      "C  ; previous temperature = " + RoundSigDigits(state.dataWindowManager->thetasPrev(i) - DataGlobalConstants::KelvinConv(), 4) + 'C');
+                    ShowContinueError(state,
+                                      format("Glazing face index = {} ; new temperature ={:.4R}C  ; previous temperature = {:.4R}C",
+                                             i,
+                                             state.dataWindowManager->thetas(i) - DataGlobalConstants::KelvinConv(),
+                                             state.dataWindowManager->thetasPrev(i) - DataGlobalConstants::KelvinConv()));
                 }
             }
 
@@ -6786,10 +6792,8 @@ namespace WindowManager {
         // the calculation parameters for windows and their associated
         // materials.
 
-        using DataBSDFWindow::summerCondition;
-        using DataBSDFWindow::winterCondition;
         using General::POLYF;
-        using General::RoundSigDigits;
+
         using General::ScanForReports;
         // InterpBlind ! Blind profile angle interpolation function
         using WindowComplexManager::CalcComplexWindowThermal;
@@ -6929,8 +6933,8 @@ namespace WindowManager {
                 if (state.dataConstruction->Construct(ThisNum).WindowTypeBSDF) {
 
                     i = ThisNum;
-                    CalcComplexWindowThermal(state, 0, i, TempVar, TempVar, TempVar, TempVar, winterCondition);
-                    CalcComplexWindowThermal(state, 0, i, TempVar, TempVar, TempVar, TempVar, summerCondition);
+                    CalcComplexWindowThermal(state, 0, i, TempVar, TempVar, TempVar, TempVar, DataBSDFWindow::winterCondition);
+                    CalcComplexWindowThermal(state, 0, i, TempVar, TempVar, TempVar, TempVar, DataBSDFWindow::summerCondition);
 
                     static constexpr auto Format_800(" WindowConstruction:Complex,{},{},{},{:.3R},{:.3R}\n");
                     print(state.files.eio,
@@ -7460,8 +7464,6 @@ namespace WindowManager {
         // METHODOLOGY EMPLOYED:
         // Loop through all surfaces to determine which window has an exterior screen. Static
         // variables are defined here, dynamic variables are calculated in CalcScreenTransmittance.
-
-        using General::RoundSigDigits;
 
         // Locals
         // SUBROUTINE PARAMETER DEFINITIONS:

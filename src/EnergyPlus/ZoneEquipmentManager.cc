@@ -233,9 +233,6 @@ namespace ZoneEquipmentManager {
         // This subroutine initializes the zone equipment prior to simulation.
 
         // Using/Aliasing
-        using DataContaminantBalance::Contaminant;
-        using DataContaminantBalance::OutdoorCO2;
-        using DataContaminantBalance::OutdoorGC;
         using DataEnvironment::OutBaroPress;
         using DataEnvironment::OutHumRat;
         using DataHVACGlobals::NoAction;
@@ -306,11 +303,11 @@ namespace ZoneEquipmentManager {
                 Node(ZoneNodeNum).Press = OutBaroPress;
                 Node(ZoneNodeNum).HumRat = OutHumRat;
                 Node(ZoneNodeNum).Enthalpy = PsyHFnTdbW(Node(ZoneNodeNum).Temp, Node(ZoneNodeNum).HumRat);
-                if (Contaminant.CO2Simulation) {
-                    Node(ZoneNodeNum).CO2 = OutdoorCO2;
+                if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
+                    Node(ZoneNodeNum).CO2 = state.dataContaminantBalance->OutdoorCO2;
                 }
-                if (Contaminant.GenericContamSimulation) {
-                    Node(ZoneNodeNum).GenContam = OutdoorGC;
+                if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
+                    Node(ZoneNodeNum).GenContam = state.dataContaminantBalance->OutdoorGC;
                 }
 
                 for (ZoneInNode = 1; ZoneInNode <= ZoneEquipConfig(ControlledZoneNum).NumInletNodes; ++ZoneInNode) {
@@ -322,11 +319,11 @@ namespace ZoneEquipmentManager {
                     Node(InNodeNum).Press = OutBaroPress;
                     Node(InNodeNum).HumRat = OutHumRat;
                     Node(InNodeNum).Enthalpy = PsyHFnTdbW(Node(InNodeNum).Temp, Node(InNodeNum).HumRat);
-                    if (Contaminant.CO2Simulation) {
-                        Node(InNodeNum).CO2 = OutdoorCO2;
+                    if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
+                        Node(InNodeNum).CO2 = state.dataContaminantBalance->OutdoorCO2;
                     }
-                    if (Contaminant.GenericContamSimulation) {
-                        Node(InNodeNum).GenContam = OutdoorGC;
+                    if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
+                        Node(InNodeNum).GenContam = state.dataContaminantBalance->OutdoorGC;
                     }
                 }
 
@@ -339,11 +336,11 @@ namespace ZoneEquipmentManager {
                     Node(ExhNodeNum).Press = OutBaroPress;
                     Node(ExhNodeNum).HumRat = OutHumRat;
                     Node(ExhNodeNum).Enthalpy = PsyHFnTdbW(Node(ExhNodeNum).Temp, Node(ExhNodeNum).HumRat);
-                    if (Contaminant.CO2Simulation) {
-                        Node(ExhNodeNum).CO2 = OutdoorCO2;
+                    if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
+                        Node(ExhNodeNum).CO2 = state.dataContaminantBalance->OutdoorCO2;
                     }
-                    if (Contaminant.GenericContamSimulation) {
-                        Node(ExhNodeNum).GenContam = OutdoorGC;
+                    if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
+                        Node(ExhNodeNum).GenContam = state.dataContaminantBalance->OutdoorGC;
                     }
                 }
 
@@ -358,11 +355,11 @@ namespace ZoneEquipmentManager {
                         Node(returnNode).Press = OutBaroPress;
                         Node(returnNode).HumRat = OutHumRat;
                         Node(returnNode).Enthalpy = PsyHFnTdbW(Node(returnNode).Temp, Node(returnNode).HumRat);
-                        if (Contaminant.CO2Simulation) {
-                            Node(returnNode).CO2 = OutdoorCO2;
+                        if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
+                            Node(returnNode).CO2 = state.dataContaminantBalance->OutdoorCO2;
                         }
-                        if (Contaminant.GenericContamSimulation) {
-                            Node(returnNode).GenContam = OutdoorGC;
+                        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
+                            Node(returnNode).GenContam = state.dataContaminantBalance->OutdoorGC;
                         }
                     }
                 }
@@ -393,10 +390,10 @@ namespace ZoneEquipmentManager {
                     Node(ExhNodeNum).MassFlowRate = 0.0;
                     Node(ExhNodeNum).MassFlowRateMaxAvail = 0.0;
                     Node(ExhNodeNum).MassFlowRateMinAvail = 0.0;
-                    if (Contaminant.CO2Simulation) {
+                    if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
                         Node(ExhNodeNum).CO2 = Node(ZoneNodeNum).CO2;
                     }
-                    if (Contaminant.GenericContamSimulation) {
+                    if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
                         Node(ExhNodeNum).GenContam = Node(ZoneNodeNum).GenContam;
                     }
                 }
@@ -443,7 +440,6 @@ namespace ZoneEquipmentManager {
         using DataLoopNode::Node;
         using DataZoneEnergyDemands::DeadBandOrSetback;
         using DataZoneEnergyDemands::ZoneSysEnergyDemand;
-        using General::RoundSigDigits;
 
         // Parameters
         static std::string const RoutineName("SizeZoneEquipment");
@@ -1421,7 +1417,6 @@ namespace ZoneEquipmentManager {
         using DataHVACGlobals::SmallTempDiff;
         using EMSManager::ManageEMS;
         using General::MovingAvg;
-        using General::RoundSigDigits;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
 
@@ -1859,33 +1854,30 @@ namespace ZoneEquipmentManager {
                                 }
                                 ShowContinueError(state, "...check zone thermostat set point and design supply air temperatures");
                                 ShowContinueError(state, "...zone name = " + CalcFinalZoneSizing(I).ZoneName);
-                                ShowContinueError(state, "...design sensible cooling load = " + RoundSigDigits(CalcFinalZoneSizing(I).DesCoolLoad, 2) +
-                                                  " W");
-                                ShowContinueError(state, "...thermostat set point temp    = " + RoundSigDigits(CalcFinalZoneSizing(I).CoolTstatTemp, 3) +
-                                                  " C");
+                                ShowContinueError(state, format("...design sensible cooling load = {:.2R} W", CalcFinalZoneSizing(I).DesCoolLoad));
+                                ShowContinueError(state, format("...thermostat set point temp    = {:.3R} C", CalcFinalZoneSizing(I).CoolTstatTemp));
                                 ShowContinueError(state,
-                                    "...zone temperature             = " + RoundSigDigits(CalcFinalZoneSizing(I).ZoneTempAtCoolPeak, 3) + " C");
-                                ShowContinueError(state, "...supply air temperature       = " + RoundSigDigits(SupplyTemp, 3) + " C");
-                                ShowContinueError(state, "...temperature difference       = " + RoundSigDigits(DeltaTemp, 5) + " C");
-                                ShowContinueError(state, "...calculated volume flow rate  = " + RoundSigDigits((CalcFinalZoneSizing(I).DesCoolVolFlow), 5) +
-                                                  " m3/s");
-                                ShowContinueError(state, "...calculated mass flow rate    = " + RoundSigDigits((CalcFinalZoneSizing(I).DesCoolMassFlow), 5) +
-                                                  " kg/s");
+                                                  format("...zone temperature             = {:.3R} C", CalcFinalZoneSizing(I).ZoneTempAtCoolPeak));
+                                ShowContinueError(state, format("...supply air temperature       = {:.3R} C", SupplyTemp));
+                                ShowContinueError(state, format("...temperature difference       = {:.5R} C", DeltaTemp));
+                                ShowContinueError(state,
+                                                  format("...calculated volume flow rate  = {:.5R} m3/s", (CalcFinalZoneSizing(I).DesCoolVolFlow)));
+                                ShowContinueError(state,
+                                                  format("...calculated mass flow rate    = {:.5R} kg/s", (CalcFinalZoneSizing(I).DesCoolMassFlow)));
                                 if (SupplyTemp > CalcFinalZoneSizing(I).ZoneTempAtCoolPeak)
                                     ShowContinueError(state,
                                         "...Note: supply air temperature should be less than zone temperature during cooling air flow calculations");
                             } else if (std::abs(DeltaTemp) > SmallTempDiff && SupplyTemp > CalcFinalZoneSizing(I).ZoneTempAtCoolPeak) {
                                 ShowSevereError(state,
                                     "UpdateZoneSizing: Supply air temperature is greater than zone temperature during cooling air flow calculations");
-                                ShowContinueError(state, "...calculated volume flow rate  = " + RoundSigDigits((CalcFinalZoneSizing(I).DesCoolVolFlow), 5) +
-                                                  " m3/s");
-                                ShowContinueError(state, "...calculated mass flow rate    = " + RoundSigDigits((CalcFinalZoneSizing(I).DesCoolMassFlow), 5) +
-                                                  " kg/s");
-                                ShowContinueError(state, "...thermostat set point temp    = " + RoundSigDigits(CalcFinalZoneSizing(I).CoolTstatTemp, 3) +
-                                                  " C");
-                                ShowContinueError(state, "...zone temperature            = " + RoundSigDigits(CalcFinalZoneSizing(I).ZoneTempAtCoolPeak, 3) +
-                                                  " C");
-                                ShowContinueError(state, "...supply air temperature      = " + RoundSigDigits(SupplyTemp, 3) + " C");
+                                ShowContinueError(state,
+                                                  format("...calculated volume flow rate  = {:.5R} m3/s", (CalcFinalZoneSizing(I).DesCoolVolFlow)));
+                                ShowContinueError(state,
+                                                  format("...calculated mass flow rate    = {:.5R} kg/s", (CalcFinalZoneSizing(I).DesCoolMassFlow)));
+                                ShowContinueError(state, format("...thermostat set point temp    = {:.3R} C", CalcFinalZoneSizing(I).CoolTstatTemp));
+                                ShowContinueError(state,
+                                                  format("...zone temperature            = {:.3R} C", CalcFinalZoneSizing(I).ZoneTempAtCoolPeak));
+                                ShowContinueError(state, format("...supply air temperature      = {:.3R} C", SupplyTemp));
                                 ShowContinueError(state, "...occurs in zone              = " + CalcFinalZoneSizing(I).ZoneName);
                                 ShowContinueError(state,
                                     "...Note: supply air temperature should be less than zone temperature during cooling air flow calculations");
@@ -1910,32 +1902,32 @@ namespace ZoneEquipmentManager {
                                 }
                                 ShowContinueError(state, "...check zone thermostat set point and design supply air temperatures");
                                 ShowContinueError(state, "...zone name = " + CalcFinalZoneSizing(I).ZoneName);
-                                ShowContinueError(state, "...design heating load         = " + RoundSigDigits(CalcFinalZoneSizing(I).DesHeatLoad, 2) + " W");
-                                ShowContinueError(state, "...thermostat set point temp   = " + RoundSigDigits(CalcFinalZoneSizing(I).HeatTstatTemp, 3) +
-                                                  " C");
-                                ShowContinueError(state, "...zone temperature            = " + RoundSigDigits(CalcFinalZoneSizing(I).ZoneTempAtHeatPeak, 3) +
-                                                  " C");
-                                ShowContinueError(state, "...supply air temperature      = " + RoundSigDigits(SupplyTemp, 3) + " C");
-                                ShowContinueError(state, "...temperature difference      = " + RoundSigDigits(DeltaTemp, 5) + " C");
-                                ShowContinueError(state, "...calculated volume flow rate = " + RoundSigDigits((CalcFinalZoneSizing(I).DesHeatVolFlow), 5) +
-                                                  " m3/s");
-                                ShowContinueError(state, "...calculated mass flow rate   = " + RoundSigDigits((CalcFinalZoneSizing(I).DesHeatMassFlow), 5) +
-                                                  " kg/s");
+                                ShowContinueError(state, format("...design heating load         = {:.2R} W", CalcFinalZoneSizing(I).DesHeatLoad));
+                                ShowContinueError(state, format("...thermostat set point temp   = {:.3R} C", CalcFinalZoneSizing(I).HeatTstatTemp));
+                                ShowContinueError(state,
+                                                  format("...zone temperature            = {:.3R} C", CalcFinalZoneSizing(I).ZoneTempAtHeatPeak));
+                                ShowContinueError(state, format("...supply air temperature      = {:.3R} C", SupplyTemp));
+                                ShowContinueError(state, format("...temperature difference      = {:.5R} C", DeltaTemp));
+                                ShowContinueError(state,
+                                                  format("...calculated volume flow rate = {:.5R} m3/s", (CalcFinalZoneSizing(I).DesHeatVolFlow)));
+                                ShowContinueError(state,
+                                                  format("...calculated mass flow rate   = {:.5R} kg/s", (CalcFinalZoneSizing(I).DesHeatMassFlow)));
                                 if (SupplyTemp < CalcFinalZoneSizing(I).ZoneTempAtHeatPeak)
                                     ShowContinueError(state, "...Note: supply air temperature should be greater than zone temperature during heating air "
                                                       "flow calculations");
                             } else if (std::abs(DeltaTemp) > SmallTempDiff && SupplyTemp < CalcFinalZoneSizing(I).ZoneTempAtHeatPeak) {
                                 ShowSevereError(state,
                                     "UpdateZoneSizing: Supply air temperature is less than zone temperature during heating air flow calculations");
-                                ShowContinueError(state, "...calculated design heating volume flow rate = " +
-                                                  RoundSigDigits((CalcFinalZoneSizing(I).DesHeatVolFlow), 5) + " m3/s");
-                                ShowContinueError(state, "...calculated design heating mass flow rate   = " +
-                                                  RoundSigDigits((CalcFinalZoneSizing(I).DesHeatMassFlow), 5) + " kg/s");
-                                ShowContinueError(state, "...thermostat set piont temp   = " + RoundSigDigits(CalcFinalZoneSizing(I).HeatTstatTemp, 3) +
-                                                  " C");
-                                ShowContinueError(state, "...zone temperature            = " + RoundSigDigits(CalcFinalZoneSizing(I).ZoneTempAtHeatPeak, 3) +
-                                                  " C");
-                                ShowContinueError(state, "...supply air temperature      = " + RoundSigDigits(SupplyTemp, 3) + " C");
+                                ShowContinueError(
+                                    state,
+                                    format("...calculated design heating volume flow rate = {:.5R} m3/s", (CalcFinalZoneSizing(I).DesHeatVolFlow)));
+                                ShowContinueError(
+                                    state,
+                                    format("...calculated design heating mass flow rate   = {:.5R} kg/s", (CalcFinalZoneSizing(I).DesHeatMassFlow)));
+                                ShowContinueError(state, format("...thermostat set piont temp   = {:.3R} C", CalcFinalZoneSizing(I).HeatTstatTemp));
+                                ShowContinueError(state,
+                                                  format("...zone temperature            = {:.3R} C", CalcFinalZoneSizing(I).ZoneTempAtHeatPeak));
+                                ShowContinueError(state, format("...supply air temperature      = {:.3R} C", SupplyTemp));
                                 ShowContinueError(state, "...occurs in zone              = " + CalcFinalZoneSizing(I).ZoneName);
                                 ShowContinueError(state, "...Note: supply air temperature should be greater than zone temperature during heating air "
                                                   "flow calculations");
@@ -4156,18 +4148,21 @@ namespace ZoneEquipmentManager {
                                                      " there is unbalanced air flow. Load due to induced outdoor air is neglected.");
                                     ShowContinueErrorTimeStamp(state, "");
                                     ShowContinueError(state,
-                                        "  Flows [m3/s]: Inlets: " +
-                                        General::RoundSigDigits(thisZoneEquip.TotInletAirMassFlowRate / DataEnvironment::StdRhoAir, 6) +
-                                        "  Unbalanced exhausts: " + General::RoundSigDigits(sysUnbalExhaust / DataEnvironment::StdRhoAir, 6) +
-                                        "  Returns: " + General::RoundSigDigits(totalZoneReturnMassFlow / DataEnvironment::StdRhoAir, 6));
+                                                      format("  Flows [m3/s]: Inlets: {:.6R}  Unbalanced exhausts: {:.6R}  Returns: {:.6R}",
+                                                             thisZoneEquip.TotInletAirMassFlowRate / DataEnvironment::StdRhoAir,
+                                                             sysUnbalExhaust / DataEnvironment::StdRhoAir,
+                                                             totalZoneReturnMassFlow / DataEnvironment::StdRhoAir));
                                     ShowContinueError(state,
-                                        "  Infiltration: " + General::RoundSigDigits(DataHeatBalFanSys::OAMFL(actualZone) / rhoZone, 6) +
-                                        "  Zone Ventilation: " + General::RoundSigDigits(DataHeatBalFanSys::VAMFL(actualZone) / rhoZone, 6) +
-                                        "  Mixing (incoming): " +
-                                        General::RoundSigDigits(DataHeatBalFanSys::MixingMassFlowZone(actualZone) / rhoZone, 6));
-                                    ShowContinueError(state, "  Imbalance (excess outflow): " + General::RoundSigDigits(unbalancedVolFlow, 6) +
-                                                      "  Total system OA flow (for all airloops serving this zone): " +
-                                                      General::RoundSigDigits(thisZoneEquip.TotAvailAirLoopOA / DataEnvironment::StdRhoAir, 6));
+                                                      format("  Infiltration: {:.6R}  Zone Ventilation: {:.6R}  Mixing (incoming): {:.6R}",
+                                                             DataHeatBalFanSys::OAMFL(actualZone) / rhoZone,
+                                                             DataHeatBalFanSys::VAMFL(actualZone) / rhoZone,
+                                                             DataHeatBalFanSys::MixingMassFlowZone(actualZone) / rhoZone));
+                                    ShowContinueError(
+                                        state,
+                                        format(
+                                            "  Imbalance (excess outflow): {:.6R}  Total system OA flow (for all airloops serving this zone): {:.6R}",
+                                            unbalancedVolFlow,
+                                            thisZoneEquip.TotAvailAirLoopOA / DataEnvironment::StdRhoAir));
                                     ShowContinueError(state, "  This error will only be reported once per zone.");
                                     thisZoneEquip.FlowError = true;
                                 }
@@ -4341,7 +4336,6 @@ namespace ZoneEquipmentManager {
         // Energy Balance.
 
         // Using/Aliasing
-        using DataContaminantBalance::Contaminant;
         using DataEnvironment::OutBaroPress;
         using DataHeatBalance::RefrigCaseCredit;
         using DataHeatBalance::Zone;
@@ -4503,8 +4497,8 @@ namespace ZoneEquipmentManager {
 
                 Node(ReturnNode).Enthalpy = PsyHFnTdbW(Node(ReturnNode).Temp, Node(ReturnNode).HumRat);
 
-                if (Contaminant.CO2Simulation) Node(ReturnNode).CO2 = Node(ZoneNode).CO2;
-                if (Contaminant.GenericContamSimulation) Node(ReturnNode).GenContam = Node(ZoneNode).GenContam;
+                if (state.dataContaminantBalance->Contaminant.CO2Simulation) Node(ReturnNode).CO2 = Node(ZoneNode).CO2;
+                if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) Node(ReturnNode).GenContam = Node(ZoneNode).GenContam;
 
             } // End of check for a return air node, which implies a return air system.
 
@@ -4578,11 +4572,6 @@ namespace ZoneEquipmentManager {
         using namespace DataHeatBalFanSys;
         using namespace DataHeatBalance;
         using CoolTower::ManageCoolTower;
-        using DataContaminantBalance::Contaminant;
-        using DataContaminantBalance::MixingMassFlowCO2;
-        using DataContaminantBalance::MixingMassFlowGC;
-        using DataContaminantBalance::ZoneAirCO2;
-        using DataContaminantBalance::ZoneAirGC;
         using DataHeatBalance::Ventilation;
         using DataHVACGlobals::CycleOn;
         using DataHVACGlobals::CycleOnZoneFansOnly;
@@ -4697,8 +4686,8 @@ namespace ZoneEquipmentManager {
         MixingMassFlowXHumRat = 0.0;
         CrossMixingReportFlag = false;
         MixingReportFlag = false;
-        if (Contaminant.CO2Simulation && TotMixing + TotCrossMixing + TotRefDoorMixing > 0) MixingMassFlowCO2 = 0.0;
-        if (Contaminant.GenericContamSimulation && TotMixing + TotCrossMixing + TotRefDoorMixing > 0) MixingMassFlowGC = 0.0;
+        if (state.dataContaminantBalance->Contaminant.CO2Simulation && TotMixing + TotCrossMixing + TotRefDoorMixing > 0) state.dataContaminantBalance->MixingMassFlowCO2 = 0.0;
+        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation && TotMixing + TotCrossMixing + TotRefDoorMixing > 0) state.dataContaminantBalance->MixingMassFlowGC = 0.0;
 
         IVF = 0.0;
         MCPTI = 0.0;
@@ -5095,11 +5084,11 @@ namespace ZoneEquipmentManager {
                     // Now to determine the moisture conditions
                     MixingMassFlowZone(n) += Mixing(j).DesiredAirFlowRate * AirDensity;
                     MixingMassFlowXHumRat(n) += Mixing(j).DesiredAirFlowRate * AirDensity * ZHumRat(m);
-                    if (Contaminant.CO2Simulation) {
-                        MixingMassFlowCO2(n) += Mixing(j).DesiredAirFlowRate * AirDensity * ZoneAirCO2(m);
+                    if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
+                        state.dataContaminantBalance->MixingMassFlowCO2(n) += Mixing(j).DesiredAirFlowRate * AirDensity * state.dataContaminantBalance->ZoneAirCO2(m);
                     }
-                    if (Contaminant.GenericContamSimulation) {
-                        MixingMassFlowGC(n) += Mixing(j).DesiredAirFlowRate * AirDensity * ZoneAirGC(m);
+                    if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
+                        state.dataContaminantBalance->MixingMassFlowGC(n) += Mixing(j).DesiredAirFlowRate * AirDensity * state.dataContaminantBalance->ZoneAirGC(m);
                     }
                     MixingReportFlag(j) = true;
                 }
@@ -5125,11 +5114,11 @@ namespace ZoneEquipmentManager {
                     // Now to determine the moisture conditions
                     MixingMassFlowZone(n) += Mixing(j).DesiredAirFlowRate * AirDensity;
                     MixingMassFlowXHumRat(n) += Mixing(j).DesiredAirFlowRate * AirDensity * ZHumRat(m);
-                    if (Contaminant.CO2Simulation) {
-                        MixingMassFlowCO2(n) += Mixing(j).DesiredAirFlowRate * AirDensity * ZoneAirCO2(m);
+                    if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
+                        state.dataContaminantBalance->MixingMassFlowCO2(n) += Mixing(j).DesiredAirFlowRate * AirDensity * state.dataContaminantBalance->ZoneAirCO2(m);
                     }
-                    if (Contaminant.GenericContamSimulation) {
-                        MixingMassFlowGC(n) += Mixing(j).DesiredAirFlowRate * AirDensity * ZoneAirGC(m);
+                    if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
+                        state.dataContaminantBalance->MixingMassFlowGC(n) += Mixing(j).DesiredAirFlowRate * AirDensity * state.dataContaminantBalance->ZoneAirGC(m);
                     }
                     MixingReportFlag(j) = true;
                 }
@@ -5155,11 +5144,11 @@ namespace ZoneEquipmentManager {
                 // Now to determine the moisture conditions
                 MixingMassFlowZone(n) += Mixing(j).DesiredAirFlowRate * AirDensity;
                 MixingMassFlowXHumRat(n) += Mixing(j).DesiredAirFlowRate * AirDensity * ZHumRat(m);
-                if (Contaminant.CO2Simulation) {
-                    MixingMassFlowCO2(n) += Mixing(j).DesiredAirFlowRate * AirDensity * ZoneAirCO2(m);
+                if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
+                    state.dataContaminantBalance->MixingMassFlowCO2(n) += Mixing(j).DesiredAirFlowRate * AirDensity * state.dataContaminantBalance->ZoneAirCO2(m);
                 }
-                if (Contaminant.GenericContamSimulation) {
-                    MixingMassFlowGC(n) += Mixing(j).DesiredAirFlowRate * AirDensity * ZoneAirGC(m);
+                if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
+                    state.dataContaminantBalance->MixingMassFlowGC(n) += Mixing(j).DesiredAirFlowRate * AirDensity * state.dataContaminantBalance->ZoneAirGC(m);
                 }
                 MixingReportFlag(j) = true;
             }
@@ -5289,13 +5278,13 @@ namespace ZoneEquipmentManager {
 
                     MixingMassFlowZone(n) += CrossMixing(j).DesiredAirFlowRate * AirDensity;
                     MixingMassFlowXHumRat(n) += CrossMixing(j).DesiredAirFlowRate * AirDensity * ZHumRat(m);
-                    if (Contaminant.CO2Simulation) {
-                        MixingMassFlowCO2(m) += CrossMixing(j).DesiredAirFlowRate * AirDensity * ZoneAirCO2(n);
-                        MixingMassFlowCO2(n) += CrossMixing(j).DesiredAirFlowRate * AirDensity * ZoneAirCO2(m);
+                    if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
+                        state.dataContaminantBalance->MixingMassFlowCO2(m) += CrossMixing(j).DesiredAirFlowRate * AirDensity * state.dataContaminantBalance->ZoneAirCO2(n);
+                        state.dataContaminantBalance->MixingMassFlowCO2(n) += CrossMixing(j).DesiredAirFlowRate * AirDensity * state.dataContaminantBalance->ZoneAirCO2(m);
                     }
-                    if (Contaminant.GenericContamSimulation) {
-                        MixingMassFlowGC(m) += CrossMixing(j).DesiredAirFlowRate * AirDensity * ZoneAirGC(n);
-                        MixingMassFlowGC(n) += CrossMixing(j).DesiredAirFlowRate * AirDensity * ZoneAirGC(m);
+                    if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
+                        state.dataContaminantBalance->MixingMassFlowGC(m) += CrossMixing(j).DesiredAirFlowRate * AirDensity * state.dataContaminantBalance->ZoneAirGC(n);
+                        state.dataContaminantBalance->MixingMassFlowGC(n) += CrossMixing(j).DesiredAirFlowRate * AirDensity * state.dataContaminantBalance->ZoneAirGC(m);
                     }
                 }
             }
@@ -5371,13 +5360,13 @@ namespace ZoneEquipmentManager {
                     MixingMassFlowXHumRat(ZoneB) += MassFlowXHumRatToB;
 
                     // Now to determine the CO2 and generic contaminant conditions
-                    if (Contaminant.CO2Simulation) {
-                        MixingMassFlowCO2(ZoneA) += MassFlowToA * ZoneAirCO2(ZoneB);
-                        MixingMassFlowCO2(ZoneB) += MassFlowToB * ZoneAirCO2(ZoneA);
+                    if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
+                        state.dataContaminantBalance->MixingMassFlowCO2(ZoneA) += MassFlowToA * state.dataContaminantBalance->ZoneAirCO2(ZoneB);
+                        state.dataContaminantBalance->MixingMassFlowCO2(ZoneB) += MassFlowToB * state.dataContaminantBalance->ZoneAirCO2(ZoneA);
                     }
-                    if (Contaminant.GenericContamSimulation) {
-                        MixingMassFlowCO2(ZoneA) += MassFlowToA * ZoneAirGC(ZoneB);
-                        MixingMassFlowCO2(ZoneB) += MassFlowToB * ZoneAirGC(ZoneA);
+                    if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
+                        state.dataContaminantBalance->MixingMassFlowCO2(ZoneA) += MassFlowToA * state.dataContaminantBalance->ZoneAirGC(ZoneB);
+                        state.dataContaminantBalance->MixingMassFlowCO2(ZoneB) += MassFlowToB * state.dataContaminantBalance->ZoneAirGC(ZoneA);
                     }
 
                 } // J=1,RefDoorMixing(ZoneA)%NumRefDoorConnections
@@ -5766,7 +5755,6 @@ namespace ZoneEquipmentManager {
         // This subroutine writes the DOAS Sizing:Zone input for 1 zone to the eio file
 
         // Using/Aliasing
-        using General::RoundSigDigits;
 
         // Formats
         static constexpr auto Format_990(

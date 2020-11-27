@@ -221,15 +221,6 @@ namespace HVACManager {
         using ZoneTempPredictorCorrector::ManageZoneAirUpdates;
 
         using AirflowNetworkBalanceManager::ManageAirflowNetworkBalance;
-        using DataContaminantBalance::Contaminant;
-        using DataContaminantBalance::OutdoorCO2;
-        using DataContaminantBalance::OutdoorGC;
-        using DataContaminantBalance::ZoneAirCO2;
-        using DataContaminantBalance::ZoneAirCO2Avg;
-        using DataContaminantBalance::ZoneAirCO2Temp;
-        using DataContaminantBalance::ZoneAirGC;
-        using DataContaminantBalance::ZoneAirGCAvg;
-        using DataContaminantBalance::ZoneAirGCTemp;
         using DataHeatBalFanSys::QRadSurfAFNDuct;
         using DataHeatBalFanSys::SysDepZoneLoads;
         using DataHeatBalFanSys::SysDepZoneLoadsLagged;
@@ -310,13 +301,13 @@ namespace HVACManager {
         ZoneThermostatSetPointLoAver = 0.0;
         ZoneAirHumRatAvg = 0.0;
         PrintedWarmup = false;
-        if (Contaminant.CO2Simulation) {
-            OutdoorCO2 = GetCurrentScheduleValue(state, Contaminant.CO2OutdoorSchedPtr);
-            ZoneAirCO2Avg = 0.0;
+        if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
+            state.dataContaminantBalance->OutdoorCO2 = GetCurrentScheduleValue(state, state.dataContaminantBalance->Contaminant.CO2OutdoorSchedPtr);
+            state.dataContaminantBalance->ZoneAirCO2Avg = 0.0;
         }
-        if (Contaminant.GenericContamSimulation) {
-            OutdoorGC = GetCurrentScheduleValue(state, Contaminant.GenericContamOutdoorSchedPtr);
-            if (allocated(ZoneAirGCAvg)) ZoneAirGCAvg = 0.0;
+        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
+            state.dataContaminantBalance->OutdoorGC = GetCurrentScheduleValue(state, state.dataContaminantBalance->Contaminant.GenericContamOutdoorSchedPtr);
+            if (allocated(state.dataContaminantBalance->ZoneAirGCAvg)) state.dataContaminantBalance->ZoneAirGCAvg = 0.0;
         }
 
         if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag) {
@@ -348,7 +339,7 @@ namespace HVACManager {
 
         // ZONE INITIALIZATION  'Get Zone Setpoints'
         ManageZoneAirUpdates(state, iGetZoneSetPoints, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
-        if (Contaminant.SimulateContaminants)
+        if (state.dataContaminantBalance->Contaminant.SimulateContaminants)
             ManageZoneContaminanUpdates(state, iGetZoneSetPoints, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
 
         ManageHybridVentilation(state);
@@ -367,7 +358,7 @@ namespace HVACManager {
 
         ManageZoneAirUpdates(state, iPredictStep, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
 
-        if (Contaminant.SimulateContaminants) ManageZoneContaminanUpdates(state, iPredictStep, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+        if (state.dataContaminantBalance->Contaminant.SimulateContaminants) ManageZoneContaminanUpdates(state, iPredictStep, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
 
         SimHVAC(state);
 
@@ -388,7 +379,7 @@ namespace HVACManager {
         state.dataGlobal->BeginTimeStepFlag = false; // At this point, we have been through the first pass through SimHVAC so this needs to be set
 
         ManageZoneAirUpdates(state, iCorrectStep, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
-        if (Contaminant.SimulateContaminants) ManageZoneContaminanUpdates(state, iCorrectStep, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+        if (state.dataContaminantBalance->Contaminant.SimulateContaminants) ManageZoneContaminanUpdates(state, iCorrectStep, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
 
         if (ZoneTempChange > MaxZoneTempDiff && !state.dataGlobal->KickOffSimulation) {
             // determine value of adaptive system time step
@@ -423,7 +414,7 @@ namespace HVACManager {
                 ManageZoneAirUpdates(state, iPredictStep, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory,
                                      PriorTimeStep);
 
-                if (Contaminant.SimulateContaminants)
+                if (state.dataContaminantBalance->Contaminant.SimulateContaminants)
                     ManageZoneContaminanUpdates(state, iPredictStep, ShortenTimeStepSys, UseZoneTimeStepHistory,
                                                 PriorTimeStep);
                 SimHVAC(state);
@@ -442,13 +433,13 @@ namespace HVACManager {
 
                 ManageZoneAirUpdates(state, iCorrectStep, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory,
                                      PriorTimeStep);
-                if (Contaminant.SimulateContaminants)
+                if (state.dataContaminantBalance->Contaminant.SimulateContaminants)
                     ManageZoneContaminanUpdates(state, iCorrectStep, ShortenTimeStepSys, UseZoneTimeStepHistory,
                                                 PriorTimeStep);
 
                 ManageZoneAirUpdates(state, iPushSystemTimestepHistories, ZoneTempChange, ShortenTimeStepSys,
                                      UseZoneTimeStepHistory, PriorTimeStep);
-                if (Contaminant.SimulateContaminants)
+                if (state.dataContaminantBalance->Contaminant.SimulateContaminants)
                     ManageZoneContaminanUpdates(state, iPushSystemTimestepHistories, ShortenTimeStepSys,
                                                 UseZoneTimeStepHistory, PriorTimeStep);
                 PreviousTimeStep = TimeStepSys;
@@ -459,8 +450,8 @@ namespace HVACManager {
             for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 ZTAV(ZoneNum) += ZT(ZoneNum) * FracTimeStepZone;
                 ZoneAirHumRatAvg(ZoneNum) += ZoneAirHumRat(ZoneNum) * FracTimeStepZone;
-                if (Contaminant.CO2Simulation) ZoneAirCO2Avg(ZoneNum) += ZoneAirCO2(ZoneNum) * FracTimeStepZone;
-                if (Contaminant.GenericContamSimulation) ZoneAirGCAvg(ZoneNum) += ZoneAirGC(ZoneNum) * FracTimeStepZone;
+                if (state.dataContaminantBalance->Contaminant.CO2Simulation) state.dataContaminantBalance->ZoneAirCO2Avg(ZoneNum) += state.dataContaminantBalance->ZoneAirCO2(ZoneNum) * FracTimeStepZone;
+                if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) state.dataContaminantBalance->ZoneAirGCAvg(ZoneNum) += state.dataContaminantBalance->ZoneAirGC(ZoneNum) * FracTimeStepZone;
                 if (state.dataZoneTempPredictorCorrector->NumOnOffCtrZone > 0) {
                     ZoneThermostatSetPointHiAver(ZoneNum) += ZoneThermostatSetPointHi(ZoneNum) * FracTimeStepZone;
                     ZoneThermostatSetPointLoAver(ZoneNum) += ZoneThermostatSetPointLo(ZoneNum) * FracTimeStepZone;
@@ -591,7 +582,7 @@ namespace HVACManager {
         } // system time step  loop (loops once if no downstepping)
 
         ManageZoneAirUpdates(state, iPushZoneTimestepHistories, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
-        if (Contaminant.SimulateContaminants)
+        if (state.dataContaminantBalance->Contaminant.SimulateContaminants)
             ManageZoneContaminanUpdates(state, iPushZoneTimestepHistories, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
 
         NumOfSysTimeStepsLastZoneTimeStep = NumOfSysTimeSteps;
@@ -685,7 +676,7 @@ namespace HVACManager {
         using DataPlant::TotNumLoops;
         using EMSManager::ManageEMS;
         using General::CreateSysTimeIntervalString;
-        using General::RoundSigDigits;
+
         using NonZoneEquipmentManager::ManageNonZoneEquipment;
         using PlantCondLoopOperation::SetupPlantEMSActuators;
         using PlantManager::GetPlantInput;
@@ -974,8 +965,12 @@ namespace HVACManager {
             ++ErrCount;
             if (ErrCount < 15) {
                 ErrEnvironmentName = EnvironmentName;
-                ShowWarningError(state, "SimHVAC: Maximum iterations (" + fmt::to_string(MaxIter) + ") exceeded for all HVAC loops, at " + EnvironmentName + ", " +
-                                 CurMnDy + ' ' + CreateSysTimeIntervalString(state));
+                ShowWarningError(state,
+                                 format("SimHVAC: Maximum iterations ({}) exceeded for all HVAC loops, at {}, {} {}",
+                                        MaxIter,
+                                        EnvironmentName,
+                                        CurMnDy,
+                                        CreateSysTimeIntervalString(state)));
                 if (SimAirLoopsFlag) {
                     ShowContinueError(state, "The solution for one or more of the Air Loop HVAC systems did not appear to converge");
                 }
@@ -1005,14 +1000,13 @@ namespace HVACManager {
                             ShowContinueError(state, "Check values should be zero. Most Recent values listed first.");
                             HistoryTrace = "";
                             for (StackDepth = 1; StackDepth <= ConvergLogStackDepth; ++StackDepth) {
-                                HistoryTrace += RoundSigDigits(AirLoopConvergence(AirSysNum).HVACFlowDemandToSupplyTolValue(StackDepth), 6) + ',';
+                                HistoryTrace += format("{:.6R},", AirLoopConvergence(AirSysNum).HVACFlowDemandToSupplyTolValue(StackDepth));
                             }
 
                             ShowContinueError(state, "Demand-to-Supply interface mass flow rate check value iteration history trace: " + HistoryTrace);
                             HistoryTrace = "";
                             for (StackDepth = 1; StackDepth <= ConvergLogStackDepth; ++StackDepth) {
-                                HistoryTrace +=
-                                    RoundSigDigits(AirLoopConvergence(AirSysNum).HVACFlowSupplyDeck1ToDemandTolValue(StackDepth), 6) + ',';
+                                HistoryTrace += format("{:.6R},", AirLoopConvergence(AirSysNum).HVACFlowSupplyDeck1ToDemandTolValue(StackDepth));
                             }
                             ShowContinueError(state, "Supply-to-demand interface deck 1 mass flow rate check value iteration history trace: " +
                                               HistoryTrace);
@@ -1020,8 +1014,7 @@ namespace HVACManager {
                             if (state.dataAirLoop->AirToZoneNodeInfo(AirSysNum).NumSupplyNodes >= 2) {
                                 HistoryTrace = "";
                                 for (StackDepth = 1; StackDepth <= ConvergLogStackDepth; ++StackDepth) {
-                                    HistoryTrace +=
-                                        RoundSigDigits(AirLoopConvergence(AirSysNum).HVACFlowSupplyDeck2ToDemandTolValue(StackDepth), 6) + ',';
+                                    HistoryTrace += format("{:.6R},", AirLoopConvergence(AirSysNum).HVACFlowSupplyDeck2ToDemandTolValue(StackDepth));
                                 }
                                 ShowContinueError(state, "Supply-to-demand interface deck 2 mass flow rate check value iteration history trace: " +
                                                   HistoryTrace);
@@ -1035,12 +1028,12 @@ namespace HVACManager {
                             ShowContinueError(state, "Check values should be zero. Most Recent values listed first.");
                             HistoryTrace = "";
                             for (StackDepth = 1; StackDepth <= ConvergLogStackDepth; ++StackDepth) {
-                                HistoryTrace += RoundSigDigits(AirLoopConvergence(AirSysNum).HVACHumDemandToSupplyTolValue(StackDepth), 6) + ',';
+                                HistoryTrace += format("{:.6R},", AirLoopConvergence(AirSysNum).HVACHumDemandToSupplyTolValue(StackDepth));
                             }
                             ShowContinueError(state, "Demand-to-Supply interface humidity ratio check value iteration history trace: " + HistoryTrace);
                             HistoryTrace = "";
                             for (StackDepth = 1; StackDepth <= ConvergLogStackDepth; ++StackDepth) {
-                                HistoryTrace += RoundSigDigits(AirLoopConvergence(AirSysNum).HVACHumSupplyDeck1ToDemandTolValue(StackDepth), 6) + ',';
+                                HistoryTrace += format("{:.6R},", AirLoopConvergence(AirSysNum).HVACHumSupplyDeck1ToDemandTolValue(StackDepth));
                             }
                             ShowContinueError(state, "Supply-to-demand interface deck 1 humidity ratio check value iteration history trace: " +
                                               HistoryTrace);
@@ -1048,8 +1041,7 @@ namespace HVACManager {
                             if (state.dataAirLoop->AirToZoneNodeInfo(AirSysNum).NumSupplyNodes >= 2) {
                                 HistoryTrace = "";
                                 for (StackDepth = 1; StackDepth <= ConvergLogStackDepth; ++StackDepth) {
-                                    HistoryTrace +=
-                                        RoundSigDigits(AirLoopConvergence(AirSysNum).HVACHumSupplyDeck2ToDemandTolValue(StackDepth), 6) + ',';
+                                    HistoryTrace += format("{:.6R},", AirLoopConvergence(AirSysNum).HVACHumSupplyDeck2ToDemandTolValue(StackDepth));
                                 }
                                 ShowContinueError(state, "Supply-to-demand interface deck 2 humidity ratio check value iteration history trace: " +
                                                   HistoryTrace);
@@ -1062,21 +1054,19 @@ namespace HVACManager {
                             ShowContinueError(state, "Check values should be zero. Most Recent values listed first.");
                             HistoryTrace = "";
                             for (StackDepth = 1; StackDepth <= ConvergLogStackDepth; ++StackDepth) {
-                                HistoryTrace += RoundSigDigits(AirLoopConvergence(AirSysNum).HVACTempDemandToSupplyTolValue(StackDepth), 6) + ',';
+                                HistoryTrace += format("{:.6R},", AirLoopConvergence(AirSysNum).HVACTempDemandToSupplyTolValue(StackDepth));
                             }
                             ShowContinueError(state, "Demand-to-Supply interface temperature check value iteration history trace: " + HistoryTrace);
                             HistoryTrace = "";
                             for (StackDepth = 1; StackDepth <= ConvergLogStackDepth; ++StackDepth) {
-                                HistoryTrace +=
-                                    RoundSigDigits(AirLoopConvergence(AirSysNum).HVACTempSupplyDeck1ToDemandTolValue(StackDepth), 6) + ',';
+                                HistoryTrace += format("{:.6R},", AirLoopConvergence(AirSysNum).HVACTempSupplyDeck1ToDemandTolValue(StackDepth));
                             }
                             ShowContinueError(state, "Supply-to-demand interface deck 1 temperature check value iteration history trace: " + HistoryTrace);
 
                             if (state.dataAirLoop->AirToZoneNodeInfo(AirSysNum).NumSupplyNodes >= 2) {
                                 HistoryTrace = "";
                                 for (StackDepth = 1; StackDepth <= ConvergLogStackDepth; ++StackDepth) {
-                                    HistoryTrace +=
-                                        RoundSigDigits(AirLoopConvergence(AirSysNum).HVACTempSupplyDeck1ToDemandTolValue(StackDepth), 6) + ',';
+                                    HistoryTrace += format("{:.6R},", AirLoopConvergence(AirSysNum).HVACTempSupplyDeck1ToDemandTolValue(StackDepth));
                                 }
                                 ShowContinueError(state, "Supply-to-demand interface deck 2 temperature check value iteration history trace: " +
                                                   HistoryTrace);
@@ -1088,13 +1078,12 @@ namespace HVACManager {
                             ShowContinueError(state, "Check values should be zero. Most Recent values listed first.");
                             HistoryTrace = "";
                             for (StackDepth = 1; StackDepth <= ConvergLogStackDepth; ++StackDepth) {
-                                HistoryTrace += RoundSigDigits(AirLoopConvergence(AirSysNum).HVACEnergyDemandToSupplyTolValue(StackDepth), 6) + ',';
+                                HistoryTrace += format("{:.6R},", AirLoopConvergence(AirSysNum).HVACEnergyDemandToSupplyTolValue(StackDepth));
                             }
                             ShowContinueError(state, "Demand-to-Supply interface energy check value iteration history trace: " + HistoryTrace);
                             HistoryTrace = "";
                             for (StackDepth = 1; StackDepth <= ConvergLogStackDepth; ++StackDepth) {
-                                HistoryTrace +=
-                                    RoundSigDigits(AirLoopConvergence(AirSysNum).HVACEnergySupplyDeck1ToDemandTolValue(StackDepth), 6) + ',';
+                                HistoryTrace += format("{:.6R},", AirLoopConvergence(AirSysNum).HVACEnergySupplyDeck1ToDemandTolValue(StackDepth));
                             }
                             ShowContinueError(state, "Supply-to-demand interface deck 1 energy check value iteration history trace: " + HistoryTrace);
 
@@ -1102,7 +1091,7 @@ namespace HVACManager {
                                 HistoryTrace = "";
                                 for (StackDepth = 1; StackDepth <= ConvergLogStackDepth; ++StackDepth) {
                                     HistoryTrace +=
-                                        RoundSigDigits(AirLoopConvergence(AirSysNum).HVACEnergySupplyDeck2ToDemandTolValue(StackDepth), 6) + ',';
+                                        format("{:.6R},", AirLoopConvergence(AirSysNum).HVACEnergySupplyDeck2ToDemandTolValue(StackDepth));
                                 }
                                 ShowContinueError(state, "Supply-to-demand interface deck 2 energy check value iteration history trace: " + HistoryTrace);
                             }
@@ -1129,9 +1118,11 @@ namespace HVACManager {
                                                  ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).HumidityRatio(StackDepth)) <
                                         HVACHumRatOscillationToler) {
                                         FoundOscillationByDuplicate = true;
-                                        ShowContinueError(state, "Node named " + NodeID(ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum) +
-                                                          " shows oscillating humidity ratio across iterations with a repeated value of " +
-                                                          RoundSigDigits(ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).HumidityRatio(1), 6));
+                                        ShowContinueError(
+                                            state,
+                                            format("Node named {} shows oscillating humidity ratio across iterations with a repeated value of {:.6R}",
+                                                   NodeID(ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum),
+                                                   ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).HumidityRatio(1)));
                                         break;
                                     }
                                 }
@@ -1153,9 +1144,10 @@ namespace HVACManager {
                                             }
                                             if (MonotonicDecreaseFound) {
                                                 ShowContinueError(state,
-                                                    "Node named " + NodeID(ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum) +
-                                                    " shows monotonically decreasing humidity ratio with a trend rate across iterations of " +
-                                                    RoundSigDigits(SlopeHumRat, 6) + " [ kg-water/kg-dryair/iteration]");
+                                                                  format("Node named {} shows monotonically decreasing humidity ratio with a trend "
+                                                                         "rate across iterations of {:.6R} [ kg-water/kg-dryair/iteration]",
+                                                                         NodeID(ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum),
+                                                                         SlopeHumRat));
                                             }
                                         } else { // check for monotic incrase
                                             MonotonicIncreaseFound = true;
@@ -1168,9 +1160,10 @@ namespace HVACManager {
                                             }
                                             if (MonotonicIncreaseFound) {
                                                 ShowContinueError(state,
-                                                    "Node named " + NodeID(ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum) +
-                                                    " shows monotonically increasing humidity ratio with a trend rate across iterations of " +
-                                                    RoundSigDigits(SlopeHumRat, 6) + " [ kg-water/kg-dryair/iteration]");
+                                                                  format("Node named {} shows monotonically increasing humidity ratio with a trend "
+                                                                         "rate across iterations of {:.6R} [ kg-water/kg-dryair/iteration]",
+                                                                         NodeID(ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum),
+                                                                         SlopeHumRat));
                                             }
                                         }
                                     } // significant slope in iterates
@@ -1180,8 +1173,7 @@ namespace HVACManager {
                             if (MonotonicDecreaseFound || MonotonicIncreaseFound || FoundOscillationByDuplicate) {
                                 HistoryTrace = "";
                                 for (StackDepth = 1; StackDepth <= ConvergLogStackDepth; ++StackDepth) {
-                                    HistoryTrace +=
-                                        RoundSigDigits(ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).HumidityRatio(StackDepth), 6) + ',';
+                                    HistoryTrace += format("{:.6R},", ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).HumidityRatio(StackDepth));
                                 }
                                 ShowContinueError(state,
                                     "Node named " + NodeID(ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum) +
@@ -1203,9 +1195,11 @@ namespace HVACManager {
                                                  ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).MassFlowRate(StackDepth)) <
                                         HVACFlowRateOscillationToler) {
                                         FoundOscillationByDuplicate = true;
-                                        ShowContinueError(state, "Node named " + NodeID(ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum) +
-                                                          " shows oscillating mass flow rate across iterations with a repeated value of " +
-                                                          RoundSigDigits(ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).MassFlowRate(1), 6));
+                                        ShowContinueError(
+                                            state,
+                                            format("Node named {} shows oscillating mass flow rate across iterations with a repeated value of {:.6R}",
+                                                   NodeID(ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum),
+                                                   ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).MassFlowRate(1)));
                                         break;
                                     }
                                 }
@@ -1226,9 +1220,10 @@ namespace HVACManager {
                                             }
                                             if (MonotonicDecreaseFound) {
                                                 ShowContinueError(state,
-                                                    "Node named " + NodeID(ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum) +
-                                                    " shows monotonically decreasing mass flow rate with a trend rate across iterations of " +
-                                                    RoundSigDigits(SlopeMdot, 6) + " [kg/s/iteration]");
+                                                                  format("Node named {} shows monotonically decreasing mass flow rate with a trend "
+                                                                         "rate across iterations of {:.6R} [kg/s/iteration]",
+                                                                         NodeID(ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum),
+                                                                         SlopeMdot));
                                             }
                                         } else { // check for monotic incrase
                                             MonotonicIncreaseFound = true;
@@ -1241,9 +1236,10 @@ namespace HVACManager {
                                             }
                                             if (MonotonicIncreaseFound) {
                                                 ShowContinueError(state,
-                                                    "Node named " + NodeID(ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum) +
-                                                    " shows monotonically increasing mass flow rate with a trend rate across iterations of " +
-                                                    RoundSigDigits(SlopeMdot, 6) + " [kg/s/iteration]");
+                                                                  format("Node named {} shows monotonically increasing mass flow rate with a trend "
+                                                                         "rate across iterations of {:.6R} [kg/s/iteration]",
+                                                                         NodeID(ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum),
+                                                                         SlopeMdot));
                                             }
                                         }
                                     } // significant slope in iterates
@@ -1253,8 +1249,7 @@ namespace HVACManager {
                             if (MonotonicDecreaseFound || MonotonicIncreaseFound || FoundOscillationByDuplicate) {
                                 HistoryTrace = "";
                                 for (StackDepth = 1; StackDepth <= ConvergLogStackDepth; ++StackDepth) {
-                                    HistoryTrace +=
-                                        RoundSigDigits(ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).MassFlowRate(StackDepth), 6) + ',';
+                                    HistoryTrace += format("{:.6R},", ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).MassFlowRate(StackDepth));
                                 }
                                 ShowContinueError(state, "Node named " + NodeID(ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum) +
                                                   " mass flow rate [kg/s] iteration history trace (most recent first): " + HistoryTrace);
@@ -1275,9 +1270,11 @@ namespace HVACManager {
                                                  ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).Temperature(StackDepth)) <
                                         HVACTemperatureOscillationToler) {
                                         FoundOscillationByDuplicate = true;
-                                        ShowContinueError(state, "Node named " + NodeID(ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum) +
-                                                          " shows oscillating temperatures across iterations with a repeated value of " +
-                                                          RoundSigDigits(ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).Temperature(1), 6));
+                                        ShowContinueError(
+                                            state,
+                                            format("Node named {} shows oscillating temperatures across iterations with a repeated value of {:.6R}",
+                                                   NodeID(ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum),
+                                                   ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).Temperature(1)));
                                         break;
                                     }
                                 }
@@ -1298,9 +1295,10 @@ namespace HVACManager {
                                             }
                                             if (MonotonicDecreaseFound) {
                                                 ShowContinueError(state,
-                                                    "Node named " + NodeID(ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum) +
-                                                    " shows monotonically decreasing temperature with a trend rate across iterations of " +
-                                                    RoundSigDigits(SlopeTemps, 4) + " [C/iteration]");
+                                                                  format("Node named {} shows monotonically decreasing temperature with a trend rate "
+                                                                         "across iterations of {:.4R} [C/iteration]",
+                                                                         NodeID(ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum),
+                                                                         SlopeTemps));
                                             }
                                         } else { // check for monotic incrase
                                             MonotonicIncreaseFound = true;
@@ -1313,9 +1311,10 @@ namespace HVACManager {
                                             }
                                             if (MonotonicIncreaseFound) {
                                                 ShowContinueError(state,
-                                                    "Node named " + NodeID(ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum) +
-                                                    " shows monotonically increasing temperatures with a trend rate across iterations of " +
-                                                    RoundSigDigits(SlopeTemps, 4) + " [C/iteration]");
+                                                                  format("Node named {} shows monotonically increasing temperatures with a trend "
+                                                                         "rate across iterations of {:.4R} [C/iteration]",
+                                                                         NodeID(ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum),
+                                                                         SlopeTemps));
                                             }
                                         }
                                     } // significant slope in iterates
@@ -1325,8 +1324,7 @@ namespace HVACManager {
                             if (MonotonicDecreaseFound || MonotonicIncreaseFound || FoundOscillationByDuplicate) {
                                 HistoryTrace = "";
                                 for (StackDepth = 1; StackDepth <= ConvergLogStackDepth; ++StackDepth) {
-                                    HistoryTrace +=
-                                        RoundSigDigits(ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).Temperature(StackDepth), 6) + ',';
+                                    HistoryTrace += format("{:.6R},", ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).Temperature(StackDepth));
                                 }
                                 ShowContinueError(state, "Node named " + NodeID(ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum) +
                                                   " temperature [C] iteration history trace (most recent first): " + HistoryTrace);
@@ -1343,12 +1341,12 @@ namespace HVACManager {
                             ShowContinueError(state, "Check values should be zero. Most Recent values listed first.");
                             HistoryTrace = "";
                             for (StackDepth = 1; StackDepth <= ConvergLogStackDepth; ++StackDepth) {
-                                HistoryTrace += RoundSigDigits(PlantConvergence(LoopNum).PlantFlowDemandToSupplyTolValue(StackDepth), 6) + ',';
+                                HistoryTrace += format("{:.6R},", PlantConvergence(LoopNum).PlantFlowDemandToSupplyTolValue(StackDepth));
                             }
                             ShowContinueError(state, "Demand-to-Supply interface mass flow rate check value iteration history trace: " + HistoryTrace);
                             HistoryTrace = "";
                             for (StackDepth = 1; StackDepth <= ConvergLogStackDepth; ++StackDepth) {
-                                HistoryTrace += RoundSigDigits(PlantConvergence(LoopNum).PlantFlowSupplyToDemandTolValue(StackDepth), 6) + ',';
+                                HistoryTrace += format("{:.6R},", PlantConvergence(LoopNum).PlantFlowSupplyToDemandTolValue(StackDepth));
                             }
                             ShowContinueError(state, "Supply-to-Demand interface mass flow rate check value iteration history trace: " + HistoryTrace);
 
@@ -1368,10 +1366,11 @@ namespace HVACManager {
                                                      PlantLoop(LoopNum).LoopSide(ThisLoopSide).InletNode.MassFlowRateHistory(StackDepth)) <
                                             PlantFlowRateOscillationToler) {
                                             FoundOscillationByDuplicate = true;
-                                            ShowContinueError(state,
-                                                "Node named " + PlantLoop(LoopNum).LoopSide(ThisLoopSide).NodeNameIn +
-                                                " shows oscillating flow rates across iterations with a repeated value of " +
-                                                RoundSigDigits(PlantLoop(LoopNum).LoopSide(ThisLoopSide).InletNode.MassFlowRateHistory(1), 7));
+                                            ShowContinueError(
+                                                state,
+                                                format("Node named {} shows oscillating flow rates across iterations with a repeated value of {:.7R}",
+                                                       PlantLoop(LoopNum).LoopSide(ThisLoopSide).NodeNameIn,
+                                                       PlantLoop(LoopNum).LoopSide(ThisLoopSide).InletNode.MassFlowRateHistory(1)));
                                             break;
                                         }
                                     }
@@ -1394,9 +1393,10 @@ namespace HVACManager {
                                             }
                                             if (MonotonicDecreaseFound) {
                                                 ShowContinueError(state,
-                                                    "Node named " + PlantLoop(LoopNum).LoopSide(ThisLoopSide).NodeNameIn +
-                                                    " shows monotonically decreasing mass flow rate with a trend rate across iterations of " +
-                                                    RoundSigDigits(SlopeMdot, 7) + " [kg/s/iteration]");
+                                                                  format("Node named {} shows monotonically decreasing mass flow rate with a trend "
+                                                                         "rate across iterations of {:.7R} [kg/s/iteration]",
+                                                                         PlantLoop(LoopNum).LoopSide(ThisLoopSide).NodeNameIn,
+                                                                         SlopeMdot));
                                             }
                                         } else { // check for monotonic incrase
                                             MonotonicIncreaseFound = true;
@@ -1409,9 +1409,10 @@ namespace HVACManager {
                                             }
                                             if (MonotonicIncreaseFound) {
                                                 ShowContinueError(state,
-                                                    "Node named " + PlantLoop(LoopNum).LoopSide(ThisLoopSide).NodeNameIn +
-                                                    " shows monotonically increasing mass flow rate with a trend rate across iterations of " +
-                                                    RoundSigDigits(SlopeMdot, 7) + " [kg/s/iteration]");
+                                                                  format("Node named {} shows monotonically increasing mass flow rate with a trend "
+                                                                         "rate across iterations of {:.7R} [kg/s/iteration]",
+                                                                         PlantLoop(LoopNum).LoopSide(ThisLoopSide).NodeNameIn,
+                                                                         SlopeMdot));
                                             }
                                         }
                                     } // significant slope found
@@ -1421,8 +1422,7 @@ namespace HVACManager {
                                     HistoryTrace = "";
                                     for (StackDepth = 1; StackDepth <= NumConvergenceHistoryTerms; ++StackDepth) {
                                         HistoryTrace +=
-                                            RoundSigDigits(PlantLoop(LoopNum).LoopSide(ThisLoopSide).InletNode.MassFlowRateHistory(StackDepth), 7) +
-                                            ',';
+                                            format("{:.7R},", PlantLoop(LoopNum).LoopSide(ThisLoopSide).InletNode.MassFlowRateHistory(StackDepth));
                                     }
                                     ShowContinueError(state, "Node named " + PlantLoop(LoopNum).LoopSide(ThisLoopSide).NodeNameIn +
                                                       " mass flow rate [kg/s] iteration history trace (most recent first): " + HistoryTrace);
@@ -1443,10 +1443,11 @@ namespace HVACManager {
                                                      PlantLoop(LoopNum).LoopSide(ThisLoopSide).OutletNode.MassFlowRateHistory(StackDepth)) <
                                             PlantFlowRateOscillationToler) {
                                             FoundOscillationByDuplicate = true;
-                                            ShowContinueError(state,
-                                                "Node named " + PlantLoop(LoopNum).LoopSide(ThisLoopSide).NodeNameOut +
-                                                " shows oscillating flow rates across iterations with a repeated value of " +
-                                                RoundSigDigits(PlantLoop(LoopNum).LoopSide(ThisLoopSide).OutletNode.MassFlowRateHistory(1), 7));
+                                            ShowContinueError(
+                                                state,
+                                                format("Node named {} shows oscillating flow rates across iterations with a repeated value of {:.7R}",
+                                                       PlantLoop(LoopNum).LoopSide(ThisLoopSide).NodeNameOut,
+                                                       PlantLoop(LoopNum).LoopSide(ThisLoopSide).OutletNode.MassFlowRateHistory(1)));
                                             break;
                                         }
                                     }
@@ -1470,9 +1471,10 @@ namespace HVACManager {
                                             }
                                             if (MonotonicDecreaseFound) {
                                                 ShowContinueError(state,
-                                                    "Node named " + PlantLoop(LoopNum).LoopSide(ThisLoopSide).NodeNameOut +
-                                                    " shows monotonically decreasing mass flow rate with a trend rate across iterations of " +
-                                                    RoundSigDigits(SlopeMdot, 7) + " [kg/s/iteration]");
+                                                                  format("Node named {} shows monotonically decreasing mass flow rate with a trend "
+                                                                         "rate across iterations of {:.7R} [kg/s/iteration]",
+                                                                         PlantLoop(LoopNum).LoopSide(ThisLoopSide).NodeNameOut,
+                                                                         SlopeMdot));
                                             }
                                         } else { // check for monotonic incrase
                                             MonotonicIncreaseFound = true;
@@ -1485,9 +1487,10 @@ namespace HVACManager {
                                             }
                                             if (MonotonicIncreaseFound) {
                                                 ShowContinueError(state,
-                                                    "Node named " + PlantLoop(LoopNum).LoopSide(ThisLoopSide).NodeNameOut +
-                                                    " shows monotonically increasing mass flow rate with a trend rate across iterations of " +
-                                                    RoundSigDigits(SlopeMdot, 7) + " [kg/s/iteration]");
+                                                                  format("Node named {} shows monotonically increasing mass flow rate with a trend "
+                                                                         "rate across iterations of {:.7R} [kg/s/iteration]",
+                                                                         PlantLoop(LoopNum).LoopSide(ThisLoopSide).NodeNameOut,
+                                                                         SlopeMdot));
                                             }
                                         }
                                     } // significant slope found
@@ -1497,8 +1500,7 @@ namespace HVACManager {
                                     HistoryTrace = "";
                                     for (StackDepth = 1; StackDepth <= NumConvergenceHistoryTerms; ++StackDepth) {
                                         HistoryTrace +=
-                                            RoundSigDigits(PlantLoop(LoopNum).LoopSide(ThisLoopSide).OutletNode.MassFlowRateHistory(StackDepth), 7) +
-                                            ',';
+                                            format("{:.7R},", PlantLoop(LoopNum).LoopSide(ThisLoopSide).OutletNode.MassFlowRateHistory(StackDepth));
                                     }
                                     ShowContinueError(state, "Node named " + PlantLoop(LoopNum).LoopSide(ThisLoopSide).NodeNameOut +
                                                       " mass flow rate [kg/s] iteration history trace (most recent first): " + HistoryTrace);
@@ -1514,12 +1516,12 @@ namespace HVACManager {
                             ShowContinueError(state, "Check values should be zero. Most Recent values listed first.");
                             HistoryTrace = "";
                             for (StackDepth = 1; StackDepth <= ConvergLogStackDepth; ++StackDepth) {
-                                HistoryTrace += RoundSigDigits(PlantConvergence(LoopNum).PlantTempDemandToSupplyTolValue(StackDepth), 6) + ',';
+                                HistoryTrace += format("{:.6R},", PlantConvergence(LoopNum).PlantTempDemandToSupplyTolValue(StackDepth));
                             }
                             ShowContinueError(state, "Demand-to-Supply interface temperature check value iteration history trace: " + HistoryTrace);
                             HistoryTrace = "";
                             for (StackDepth = 1; StackDepth <= ConvergLogStackDepth; ++StackDepth) {
-                                HistoryTrace += RoundSigDigits(PlantConvergence(LoopNum).PlantTempSupplyToDemandTolValue(StackDepth), 6) + ',';
+                                HistoryTrace += format("{:.6R},", PlantConvergence(LoopNum).PlantTempSupplyToDemandTolValue(StackDepth));
                             }
                             ShowContinueError(state, "Supply-to-Demand interface temperature check value iteration history trace: " + HistoryTrace);
 
@@ -1539,10 +1541,12 @@ namespace HVACManager {
                                                      PlantLoop(LoopNum).LoopSide(ThisLoopSide).InletNode.TemperatureHistory(StackDepth)) <
                                             PlantTemperatureOscillationToler) {
                                             FoundOscillationByDuplicate = true;
-                                            ShowContinueError(state,
-                                                "Node named " + PlantLoop(LoopNum).LoopSide(ThisLoopSide).NodeNameIn +
-                                                " shows oscillating temperatures across iterations with a repeated value of " +
-                                                RoundSigDigits(PlantLoop(LoopNum).LoopSide(ThisLoopSide).InletNode.TemperatureHistory(1), 5));
+                                            ShowContinueError(
+                                                state,
+                                                format(
+                                                    "Node named {} shows oscillating temperatures across iterations with a repeated value of {:.5R}",
+                                                    PlantLoop(LoopNum).LoopSide(ThisLoopSide).NodeNameIn,
+                                                    PlantLoop(LoopNum).LoopSide(ThisLoopSide).InletNode.TemperatureHistory(1)));
                                             break;
                                         }
                                     }
@@ -1565,9 +1569,10 @@ namespace HVACManager {
                                             }
                                             if (MonotonicDecreaseFound) {
                                                 ShowContinueError(state,
-                                                    "Node named " + PlantLoop(LoopNum).LoopSide(ThisLoopSide).NodeNameIn +
-                                                    " shows monotonically decreasing temperatures with a trend rate across iterations of " +
-                                                    RoundSigDigits(SlopeTemps, 5) + " [C/iteration]");
+                                                                  format("Node named {} shows monotonically decreasing temperatures with a trend "
+                                                                         "rate across iterations of {:.5R} [C/iteration]",
+                                                                         PlantLoop(LoopNum).LoopSide(ThisLoopSide).NodeNameIn,
+                                                                         SlopeTemps));
                                             }
                                         } else { // check for monotic incrase
                                             MonotonicIncreaseFound = true;
@@ -1580,9 +1585,10 @@ namespace HVACManager {
                                             }
                                             if (MonotonicIncreaseFound) {
                                                 ShowContinueError(state,
-                                                    "Node named " + PlantLoop(LoopNum).LoopSide(ThisLoopSide).NodeNameIn +
-                                                    " shows monotonically increasing temperatures with a trend rate across iterations of " +
-                                                    RoundSigDigits(SlopeTemps, 5) + " [C/iteration]");
+                                                                  format("Node named {} shows monotonically increasing temperatures with a trend "
+                                                                         "rate across iterations of {:.5R} [C/iteration]",
+                                                                         PlantLoop(LoopNum).LoopSide(ThisLoopSide).NodeNameIn,
+                                                                         SlopeTemps));
                                             }
                                         }
                                     } // significant slope found
@@ -1592,8 +1598,7 @@ namespace HVACManager {
                                     HistoryTrace = "";
                                     for (StackDepth = 1; StackDepth <= NumConvergenceHistoryTerms; ++StackDepth) {
                                         HistoryTrace +=
-                                            RoundSigDigits(PlantLoop(LoopNum).LoopSide(ThisLoopSide).InletNode.TemperatureHistory(StackDepth), 5) +
-                                            ',';
+                                            format("{:.5R},", PlantLoop(LoopNum).LoopSide(ThisLoopSide).InletNode.TemperatureHistory(StackDepth));
                                     }
                                     ShowContinueError(state, "Node named " + PlantLoop(LoopNum).LoopSide(ThisLoopSide).NodeNameIn +
                                                       " temperature [C] iteration history trace (most recent first): " + HistoryTrace);
@@ -1614,10 +1619,12 @@ namespace HVACManager {
                                                      PlantLoop(LoopNum).LoopSide(ThisLoopSide).OutletNode.TemperatureHistory(StackDepth)) <
                                             PlantTemperatureOscillationToler) {
                                             FoundOscillationByDuplicate = true;
-                                            ShowContinueError(state,
-                                                "Node named " + PlantLoop(LoopNum).LoopSide(ThisLoopSide).NodeNameOut +
-                                                " shows oscillating temperatures across iterations with a repeated value of " +
-                                                RoundSigDigits(PlantLoop(LoopNum).LoopSide(ThisLoopSide).OutletNode.TemperatureHistory(1), 5));
+                                            ShowContinueError(
+                                                state,
+                                                format(
+                                                    "Node named {} shows oscillating temperatures across iterations with a repeated value of {:.5R}",
+                                                    PlantLoop(LoopNum).LoopSide(ThisLoopSide).NodeNameOut,
+                                                    PlantLoop(LoopNum).LoopSide(ThisLoopSide).OutletNode.TemperatureHistory(1)));
                                             break;
                                         }
                                     }
@@ -1640,9 +1647,10 @@ namespace HVACManager {
                                             }
                                             if (MonotonicDecreaseFound) {
                                                 ShowContinueError(state,
-                                                    "Node named " + PlantLoop(LoopNum).LoopSide(ThisLoopSide).NodeNameOut +
-                                                    " shows monotonically decreasing temperatures with a trend rate across iterations of " +
-                                                    RoundSigDigits(SlopeTemps, 5) + " [C/iteration]");
+                                                                  format("Node named {} shows monotonically decreasing temperatures with a trend "
+                                                                         "rate across iterations of {:.5R} [C/iteration]",
+                                                                         PlantLoop(LoopNum).LoopSide(ThisLoopSide).NodeNameOut,
+                                                                         SlopeTemps));
                                             }
                                         } else { // check for monotic incrase
                                             MonotonicIncreaseFound = true;
@@ -1655,9 +1663,10 @@ namespace HVACManager {
                                             }
                                             if (MonotonicIncreaseFound) {
                                                 ShowContinueError(state,
-                                                    "Node named " + PlantLoop(LoopNum).LoopSide(ThisLoopSide).NodeNameOut +
-                                                    " shows monotonically increasing temperatures with a trend rate across iterations of " +
-                                                    RoundSigDigits(SlopeTemps, 5) + " [C/iteration]");
+                                                                  format("Node named {} shows monotonically increasing temperatures with a trend "
+                                                                         "rate across iterations of {:.5R} [C/iteration]",
+                                                                         PlantLoop(LoopNum).LoopSide(ThisLoopSide).NodeNameOut,
+                                                                         SlopeTemps));
                                             }
                                         }
                                     } // significant slope found
@@ -1667,8 +1676,7 @@ namespace HVACManager {
                                     HistoryTrace = "";
                                     for (StackDepth = 1; StackDepth <= NumConvergenceHistoryTerms; ++StackDepth) {
                                         HistoryTrace +=
-                                            RoundSigDigits(PlantLoop(LoopNum).LoopSide(ThisLoopSide).OutletNode.TemperatureHistory(StackDepth), 5) +
-                                            ',';
+                                            format("{:.5R},", PlantLoop(LoopNum).LoopSide(ThisLoopSide).OutletNode.TemperatureHistory(StackDepth));
                                     }
                                     ShowContinueError(state, "Node named " + PlantLoop(LoopNum).LoopSide(ThisLoopSide).NodeNameOut +
                                                       " temperature [C] iteration history trace (most recent first): " + HistoryTrace);
@@ -3092,11 +3100,12 @@ namespace HVACManager {
                         ShowSevereError(state, "CheckAirLoopFlowBalance: AirLoopHVAC " + state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Name +
                                         " is unbalanced. Supply is > return plus outdoor air.");
                         ShowContinueErrorTimeStamp(state, "");
-                        ShowContinueError(state, "  Flows [m3/s at standard density]: Supply=" +
-                                          General::RoundSigDigits(thisAirLoopFlow.SupFlow / DataEnvironment::StdRhoAir, 6) +
-                                          "  Return=" + General::RoundSigDigits(thisAirLoopFlow.SysRetFlow / DataEnvironment::StdRhoAir, 6) +
-                                          "  Outdoor Air=" + General::RoundSigDigits(thisAirLoopFlow.OAFlow / DataEnvironment::StdRhoAir, 6));
-                        ShowContinueError(state, "  Imbalance=" + General::RoundSigDigits(unbalancedExhaustDelta / DataEnvironment::StdRhoAir, 6));
+                        ShowContinueError(state,
+                                          format("  Flows [m3/s at standard density]: Supply={:.6R}  Return={:.6R}  Outdoor Air={:.6R}",
+                                                 thisAirLoopFlow.SupFlow / DataEnvironment::StdRhoAir,
+                                                 thisAirLoopFlow.SysRetFlow / DataEnvironment::StdRhoAir,
+                                                 thisAirLoopFlow.OAFlow / DataEnvironment::StdRhoAir));
+                        ShowContinueError(state, format("  Imbalance={:.6R}", unbalancedExhaustDelta / DataEnvironment::StdRhoAir));
                         ShowContinueError(state, "  This error will only be reported once per system.");
                         thisAirLoopFlow.FlowError = true;
                     }

@@ -333,7 +333,7 @@ namespace SimAirServingZones {
         using BranchInputManager::NumBranchesInBranchList;
         using BranchInputManager::NumCompsInBranch;
         using DataConvergParams::AirLoopConvergence;
-        using General::RoundSigDigits;
+
         using HVACControllers::CheckCoilWaterInletNode;
         using HVACControllers::GetControllerActuatorNodeNum;
         using MixedAir::FindOAMixerMatchForOASystem;
@@ -402,7 +402,8 @@ namespace SimAirServingZones {
         static Array1D_int NodeNumbers;        // Outlet node numbers from GetLoopSplitter call
         static Array1D_int InletNodeNumbers;   // Component inlet node numbers from GetBranchData call
         static Array1D_int OutletNodeNumbers;  // Component outlet node numbers from GetBranchData call
-        Array1D_int DummyInteger(2);           // Placeholder for corresponding plant loop branch pressure drop info
+        DataBranchAirLoopPlant::PressureCurveType PressCurveType;
+        int PressCurveIndex;
         static bool ErrorsFound(false);        // TRUE if errors detected in input
         static Array1D_bool PackagedUnit;
         int test;
@@ -709,9 +710,10 @@ namespace SimAirServingZones {
             }
             if (NumNodes != state.dataAirLoop->AirToZoneNodeInfo(AirSysNum).NumSupplyNodes) {
                 ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", node mismatch.");
-                ShowContinueError(state, "...number of air system exit nodes [" + RoundSigDigits(NumNodes) +
-                                  "] must match number of zone equip inlet nodes [" + RoundSigDigits(state.dataAirLoop->AirToZoneNodeInfo(AirSysNum).NumSupplyNodes) +
-                                  "].");
+                ShowContinueError(state,
+                                  format("...number of air system exit nodes [{}] must match number of zone equip inlet nodes [{}].",
+                                         NumNodes,
+                                         state.dataAirLoop->AirToZoneNodeInfo(AirSysNum).NumSupplyNodes));
                 ErrorsFound = true;
             }
             for (I = 1; I <= state.dataAirLoop->AirToZoneNodeInfo(AirSysNum).NumSupplyNodes; ++I) {
@@ -760,8 +762,8 @@ namespace SimAirServingZones {
                 GetBranchData(state,
                               state.dataAirSystemsData->PrimaryAirSystems(AirSysNum).Name,
                               BranchNames(BranchNum),
-                              DummyInteger(1),
-                              DummyInteger(2),
+                              PressCurveType,
+                              PressCurveIndex,
                               NumCompsOnBranch,
                               CompTypes,
                               CompNames,
@@ -1461,9 +1463,6 @@ namespace SimAirServingZones {
         //     initialized at the start of an environment (run period or design day).
 
         // Using/Aliasing
-        using DataContaminantBalance::Contaminant;
-        using DataContaminantBalance::OutdoorCO2;
-        using DataContaminantBalance::OutdoorGC;
         using DataConvergParams::AirLoopConvergence;
         using DataConvergParams::HVACFlowRateToler;
         using DataConvergParams::ZoneInletConvergence;
@@ -2217,11 +2216,11 @@ namespace SimAirServingZones {
                         Node(NodeNum).MassFlowRateMinAvail = 0.0;
                         Node(NodeNum).Press = StdBaroPress;
                         Node(NodeNum).Quality = 0.0;
-                        if (Contaminant.CO2Simulation) {
-                            Node(NodeNum).CO2 = OutdoorCO2;
+                        if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
+                            Node(NodeNum).CO2 = state.dataContaminantBalance->OutdoorCO2;
                         }
-                        if (Contaminant.GenericContamSimulation) {
-                            Node(NodeNum).GenContam = OutdoorGC;
+                        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
+                            Node(NodeNum).GenContam = state.dataContaminantBalance->OutdoorGC;
                         }
 
                     } // end of loop over nodes on each branch
@@ -3754,7 +3753,6 @@ namespace SimAirServingZones {
 
         // USE STATEMENTS
         // Using/Aliasing
-        using DataContaminantBalance::Contaminant;
         using Psychrometrics::PsyTdbFnHW;
 
         // Locals
@@ -3807,10 +3805,10 @@ namespace SimAirServingZones {
                     Node(OutletNodeNum).Enthalpy = Node(InletNodeNum).Enthalpy;
                     Node(OutletNodeNum).Press = Node(InletNodeNum).Press;
                     MassFlowRateSetSum += min(Node(OutletNodeNum).MassFlowRateSetPoint, Node(OutletNodeNum).MassFlowRateMaxAvail);
-                    if (Contaminant.CO2Simulation) {
+                    if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
                         Node(OutletNodeNum).CO2 = Node(InletNodeNum).CO2;
                     }
-                    if (Contaminant.GenericContamSimulation) {
+                    if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
                         Node(OutletNodeNum).GenContam = Node(InletNodeNum).GenContam;
                     }
                 }
@@ -3867,10 +3865,10 @@ namespace SimAirServingZones {
                         OutletHumRat += (Node(InletNodeNum).MassFlowRate * Node(InletNodeNum).HumRat) / MassFlowRateOut;
                         OutletEnthalpy += (Node(InletNodeNum).MassFlowRate * Node(InletNodeNum).Enthalpy) / MassFlowRateOut;
                         OutletPress += (Node(InletNodeNum).MassFlowRate * Node(InletNodeNum).Press) / MassFlowRateOut;
-                        if (Contaminant.CO2Simulation) {
+                        if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
                             OutletCO2 += (Node(InletNodeNum).MassFlowRate * Node(InletNodeNum).CO2) / MassFlowRateOut;
                         }
-                        if (Contaminant.GenericContamSimulation) {
+                        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
                             OutletGC += (Node(InletNodeNum).MassFlowRate * Node(InletNodeNum).GenContam) / MassFlowRateOut;
                         }
                     }
@@ -3879,10 +3877,10 @@ namespace SimAirServingZones {
                     OutletHumRat = Node(InletNodeNum).HumRat;
                     OutletEnthalpy = Node(InletNodeNum).Enthalpy;
                     OutletPress = Node(InletNodeNum).Press;
-                    if (Contaminant.CO2Simulation) {
+                    if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
                         OutletCO2 = Node(InletNodeNum).CO2;
                     }
-                    if (Contaminant.GenericContamSimulation) {
+                    if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
                         OutletGC = Node(InletNodeNum).GenContam;
                     }
                 }
@@ -3891,10 +3889,10 @@ namespace SimAirServingZones {
                 Node(OutletNodeNum).Press = OutletPress;
                 // calculate the outlet temperature
                 Node(OutletNodeNum).Temp = PsyTdbFnHW(OutletEnthalpy, OutletHumRat);
-                if (Contaminant.CO2Simulation) {
+                if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
                     Node(OutletNodeNum).CO2 = OutletCO2;
                 }
-                if (Contaminant.GenericContamSimulation) {
+                if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
                     Node(OutletNodeNum).GenContam = OutletGC;
                 }
             }
@@ -4172,10 +4170,12 @@ namespace SimAirServingZones {
             }
 
             if (state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).DesignVolFlowRate < SmallAirVolFlow) {
-                ShowSevereError(state, "SizeAirLoopBranches: AirLoopHVAC " + state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Name + " has air flow less than " +
-                                General::RoundSigDigits(DataHVACGlobals::SmallAirVolFlow, 4) + " m3/s.");
-                ShowContinueError(state, "Primary air system volumetric flow rate = " +
-                                  General::RoundSigDigits(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).DesignVolFlowRate, 4) + " m3/s.");
+                ShowSevereError(state,
+                                format("SizeAirLoopBranches: AirLoopHVAC {} has air flow less than {:.4R} m3/s.",
+                                       state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Name,
+                                       SmallAirVolFlow));
+                ShowContinueError(state,
+                                  format("Primary air system volumetric flow rate = {:.4R} m3/s.", state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).DesignVolFlowRate));
                 ShowContinueError(state, "Check flow rate inputs for components in this air loop and,");
                 ShowContinueError(state, "if autosized, check Sizing:Zone and Sizing:System objects and related inputs.");
                 ShowFatalError(state, "Previous condition causes termination.");

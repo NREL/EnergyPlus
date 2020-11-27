@@ -1303,13 +1303,13 @@ namespace Psychrometrics {
         // returns sensible enthalpy difference between equipment supply air (TDB2) and zone air (TDB1) evaluated
         // using the zone air node humidity ratio. This enthalpy difference multiplied by supply
         // air mass flow rate yields the sensible heat transfer rate in Watts.
-        // postive value is heating, negative value is cooling
+        // positive value is heating, negative value is cooling
 
         // When called across a component (from PsyDeltaHSenFnTdb2W2Tdb1W1 by CalcComponentSensibleLatentOutput):
         // returns sensible enthalpy difference between state 1 (TDB1) and state 2 (TDB2) using the minimum
         // humidity ratio from states 1 and 2. This enthalpy difference multiplied by supply air mass flow
         // rate yields the sensible heat transfer rate in Watts.
-        // postive value is heating, negative value is cooling
+        // positive value is heating, negative value is cooling
 
         // the following two functions for calculating enthalpy difference are equivalent:
         // PsyDeltaHSenFnTdb2Tdb1W() = PsyHFnTdbW(TDB2, W) - PsyHFnTdbW(TDB1, W)
@@ -1328,7 +1328,7 @@ namespace Psychrometrics {
         // returns sensible enthalpy difference of moist air going from state 1 to state 2 (e.g across coils)
         // using the minimum humidity ratio state points 1 and 2. This enthalpy difference multiplied by
         // supply air mass flow rate yields sensible heat transfer rate across coils in Watts
-        // postive value is heating, negative value is cooling
+        // positive value is heating, negative value is cooling
 
         // the following two functions for calculating enthalpy difference are equivalent:
         // PsyDeltaHSenFnTdb2W2Tdb1W1() = PsyHFnTdbW(TDB2, min(W1, W2)) - PsyHFnTdbW(TDB1, min(W1,W2))

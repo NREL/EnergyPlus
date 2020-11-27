@@ -57,7 +57,6 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataBranchNodeConnections.hh>
-#include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataConvergParams.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -173,11 +172,9 @@
 #include <EnergyPlus/PlantCondLoopOperation.hh>
 #include <EnergyPlus/PlantHeatExchangerFluidToFluid.hh>
 #include <EnergyPlus/PlantLoadProfile.hh>
-#include <EnergyPlus/PlantLoopHeatPumpEIR.hh>
 #include <EnergyPlus/PlantPipingSystemsManager.hh>
 #include <EnergyPlus/PlantPressureSystem.hh>
 #include <EnergyPlus/PlantUtilities.hh>
-#include <EnergyPlus/PlantValves.hh>
 #include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/PollutionModule.hh>
 #include <EnergyPlus/PondGroundHeatExchanger.hh>
@@ -194,16 +191,7 @@
 #include <EnergyPlus/RoomAirModelUserTempPattern.hh>
 #include <EnergyPlus/RuntimeLanguageProcessor.hh>
 #include <EnergyPlus/ScheduleManager.hh>
-#include <EnergyPlus/SetPointManager.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
-#include <EnergyPlus/SimulationManager.hh>
-#include <EnergyPlus/SingleDuct.hh>
-#include <EnergyPlus/SizingAnalysisObjects.hh>
-#include <EnergyPlus/SizingManager.hh>
-#include <EnergyPlus/SolarCollectors.hh>
-#include <EnergyPlus/SolarShading.hh>
-#include <EnergyPlus/SplitterComponent.hh>
-#include <EnergyPlus/SteamCoils.hh>
 
 void EnergyPlus::clearAllStates(EnergyPlusData &state)
 {
@@ -215,10 +203,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     autosizing_clear_state();
     CoilCoolingDX::clear_state();
     AirflowNetwork::clear_state();
-    DataBranchAirLoopPlant::clear_state();
-    DataBranchNodeConnections::clear_state();
-    state.dataConstruction->clear_state();
-    DataContaminantBalance::clear_state();
     DataConvergParams::clear_state();
     DataDefineEquip::clear_state();
     DataEnvironment::clear_state();
@@ -340,7 +324,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     PlantPressureSystem::clear_state();
     PlantUtilities::clear_state();
     PlantPipingSystemsManager::clear_state();
-    PlantValves::clear_state();
     PluginManagement::clear_state();
     PollutionModule::clear_state();
     PondGroundHeatExchanger::clear_state();
@@ -357,12 +340,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     RoomAirModelUserTempPattern::clear_state();
     RuntimeLanguageProcessor::clear_state();
     ScheduleManager::clear_state();
-    SetPointManager::clear_state();
     SimAirServingZones::clear_state();
-    SimulationManager::clear_state();
-    SingleDuct::clear_state();
-    SizingAnalysisObjects_clear_state(); // SizingAnalysisObjects does not have a namespace
-    SizingManager::clear_state();
-    EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::clear_state();
     ResultsFramework::clear_state();
 }
