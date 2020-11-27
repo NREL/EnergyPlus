@@ -3903,7 +3903,7 @@ namespace EnergyPlus {
                                     this_component.FlowPriority = LoopFlowStatus_NeedyIfLoopOn;
                                     this_component.HowLoadServed = HowMet_PassiveCap;
                                 } else if (SELECT_CASE_var == TypeOf_TS_PcmSimple) { //                    = 29
-                                    this_component.FlowCtrl = ControlType_Active;
+                                    this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
                                     this_component.FlowPriority = LoopFlowStatus_NeedyIfLoopOn;
                                     this_component.HowLoadServed = HowMet_PassiveCap;
                                 } else if (SELECT_CASE_var == TypeOf_ValveTempering) { //                  = 30
@@ -3960,7 +3960,7 @@ namespace EnergyPlus {
                                     this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
                                     this_component.HowLoadServed = HowMet_NoneDemand;
                                 } else if (SELECT_CASE_var == TypeOf_CoilLiqDesiccantDehum) { //               = 97  ! demand side component
-                                    this_component.FlowCtrl = ControlType_Active;
+                                    this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
                                     this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
                                     this_component.HowLoadServed = HowMet_NoneDemand;
                                 } else if (SELECT_CASE_var ==

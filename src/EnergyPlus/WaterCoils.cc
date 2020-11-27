@@ -2136,7 +2136,6 @@ namespace WaterCoils {
 
         // Using/Aliasing
         using General::Iterate;
-        using General::RoundSigDigits;
         using General::SafeDivide;
         using General::SolveRoot;
         using namespace OutputReportPredefined;
@@ -6056,7 +6055,6 @@ namespace WaterCoils {
         // none
 
         // Using/Aliasing
-        using General::RoundSigDigits;
         using General::SolveRoot;
 
         // Return value
