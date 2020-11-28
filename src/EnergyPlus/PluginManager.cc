@@ -1093,7 +1093,7 @@ namespace PluginManagement {
         }
     }
 #else
-    void PluginManager::addToPythonPath([[maybe_unused]] EnergyPlusData &state, const std::string &EP_UNUSED(path), bool EP_UNUSED(userDefinedPath))
+    void PluginManager::addToPythonPath([[maybe_unused]] EnergyPlusData &state, const std::string &path, bool userDefinedPath)
     {
     }
 #endif
@@ -1135,8 +1135,8 @@ namespace PluginManagement {
     }
 #else
     int PluginManager::getGlobalVariableHandle([[maybe_unused]] EnergyPlusData &state,
-                                               const std::string &EP_UNUSED(name),
-                                               bool const EP_UNUSED(suppress_warning))
+                                               const std::string &name,
+                                               bool const suppress_warning)
     {
         return -1;
     }
@@ -1306,7 +1306,7 @@ namespace PluginManagement {
         return 0.0;
     }
 #else
-    Real64 PluginManager::getGlobalVariableValue([[maybe_unused]] EnergyPlusData &state, int EP_UNUSED(handle))
+    Real64 PluginManager::getGlobalVariableValue([[maybe_unused]] EnergyPlusData &state, int handle)
     {
         return 0.0;
     }
@@ -1328,7 +1328,7 @@ namespace PluginManagement {
         }
     }
 #else
-    void PluginManager::setGlobalVariableValue([[maybe_unused]] EnergyPlusData &state, int EP_UNUSED(handle), Real64 EP_UNUSED(value))
+    void PluginManager::setGlobalVariableValue([[maybe_unused]] EnergyPlusData &state, int handle, Real64 value)
     {
     }
 #endif

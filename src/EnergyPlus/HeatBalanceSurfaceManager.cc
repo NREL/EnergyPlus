@@ -2903,11 +2903,9 @@ namespace HeatBalanceSurfaceManager {
 
                             if (Surface(SurfNum).MaterialMovInsulExt > 0)
                                 EvalOutsideMovableInsulation(state, SurfNum, HMovInsul, RoughIndexMovInsul, AbsExt);
-                            int ConstrNum = 0 ;
-                            if (Surface(SurfNum).HeatTransSurf) {
-                                ConstrNum = Surface(SurfNum).Construction;
-                                if (SurfWinStormWinFlag(SurfNum) == 1) ConstrNum = Surface(SurfNum).StormWinConstruction;
-                            }
+
+                            int ConstrNum = Surface(SurfNum).Construction;
+                            if (SurfWinStormWinFlag(SurfNum) == 1) ConstrNum = Surface(SurfNum).StormWinConstruction;
                             if (RoughIndexMovInsul <= 0) { // No movable insulation present
                                 Real64 CosInc = currCosInc(SurfNum); // Cosine of incidence angle of beam solar on glass
                                 Real64 BeamSolar = currBeamSolar(SurfNum); // Local variable for BeamSolarRad
@@ -3550,7 +3548,7 @@ namespace HeatBalanceSurfaceManager {
             int const radEnclosureNum = Zone(zoneNum).RadiantEnclosureNum;
             int const solEnclosureNum = Zone(zoneNum).SolarEnclosureNum;
             for (int SurfNum = firstSurfOpaque; SurfNum <= lastSurfOpaque; ++SurfNum) {
-                if (!Surface(SurfNum).HeatTransSurf || zoneNum == 0) continue; // Skip non-heat transfer surfaces
+                if (!Surface(SurfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
                 if (Surface(SurfNum).Class == DataSurfaces::SurfaceClass::TDD_Dome) continue; // Skip tubular daylighting device domes
                 int ConstrNum = Surface(SurfNum).Construction;
 
@@ -3596,7 +3594,7 @@ namespace HeatBalanceSurfaceManager {
             int const lastSurfWin = Zone(zoneNum).WindowSurfaceLast;
             if (firstSurfWin == -1) continue;
             for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) { // Window
-                if (!Surface(SurfNum).HeatTransSurf || zoneNum == 0) continue; // Skip non-heat transfer surfaces
+                if (!Surface(SurfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
                 if (Surface(SurfNum).Class == SurfaceClass::TDD_Dome) continue; // Skip tubular daylighting device domes
                 int ConstrNum = Surface(SurfNum).Construction;
 
@@ -6919,6 +6917,10 @@ namespace HeatBalanceSurfaceManager {
                 Real64 &TH12(TH(2, 1, SurfNum));
                 TH12 = TempSurfInRep(SurfNum) = TempSurfIn(SurfNum);
                 SurfTempOut(SurfNum) = TH11; // For reporting
+                if (Surface(SurfNum).IsAirBoundarySurf) {
+                    double test = SurfTempOut(SurfNum);
+                    test = 0;
+                }
 
                 if (SurfWinOriginalClass(SurfNum) == SurfaceClass::TDD_Diffuser) { // Tubular daylighting device
                     // Tubular daylighting devices are treated as one big object with an effective R value.

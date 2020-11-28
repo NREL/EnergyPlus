@@ -5003,10 +5003,7 @@ namespace SolarShading {
                         }
                         GSS(NGSS) = GSSNR;
 
-                    } else if ((Surface(GSSNR).BaseSurf == 0) ||
-                               ((Surface(GSSNR).BaseSurf == GSSNR) &&
-                                ((Surface(GSSNR).ExtBoundCond == ExternalEnvironment) ||
-                                 Surface(GSSNR).ExtBoundCond == OtherSideCondModeledExt))) { // Detached shadowing surface or | any other base surface
+                    } else if ((Surface(GSSNR).BaseSurf == 0) || (Surface(GSSNR).BaseSurf == GSSNR)) { // Detached shadowing surface or | any other base surface
                                                                                              // exposed to outside environment
 
                         CHKGSS(GRSNR, GSSNR, ZMIN, CannotShade); // Check to see if this can shade the receiving surface
@@ -6010,7 +6007,7 @@ namespace SolarShading {
             ExtBeamAbsByShadFac(SurfNum) = 0.0;
         }
 
-        // TODO: this should be settled once calculated, no need to check at every solar functions
+        // this should be determined once calculated, no need to check at every solar functions
         for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
             if (!Surface(SurfNum).ExtSolar && SurfWinOriginalClass(SurfNum) != SurfaceClass::TDD_Diffuser) continue;
             int SurfNum2 = SurfNum;
