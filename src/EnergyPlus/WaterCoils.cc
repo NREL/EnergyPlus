@@ -4684,7 +4684,6 @@ namespace WaterCoils {
         // na
 
         // Using/Aliasing
-        using DataContaminantBalance::Contaminant;
         using PlantUtilities::SetComponentFlowRate;
 
         // Locals
@@ -4726,10 +4725,10 @@ namespace WaterCoils {
         Node(AirOutletNode).MassFlowRateMax = Node(AirInletNode).MassFlowRateMax;
         Node(AirOutletNode).MassFlowRateMinAvail = Node(AirInletNode).MassFlowRateMinAvail;
         Node(AirOutletNode).MassFlowRateMaxAvail = Node(AirInletNode).MassFlowRateMaxAvail;
-        if (Contaminant.CO2Simulation) {
+        if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
             Node(AirOutletNode).CO2 = Node(AirInletNode).CO2;
         }
-        if (Contaminant.GenericContamSimulation) {
+        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
             Node(AirOutletNode).GenContam = Node(AirInletNode).GenContam;
         }
     }

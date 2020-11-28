@@ -997,8 +997,6 @@ namespace ZoneDehumidifier {
         // na
 
         // Using/Aliasing
-        using DataContaminantBalance::Contaminant;
-
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -1034,10 +1032,10 @@ namespace ZoneDehumidifier {
         Node(AirOutletNodeNum).MassFlowRateMinAvail = Node(AirInletNodeNum).MassFlowRateMinAvail;
         Node(AirOutletNodeNum).MassFlowRateMaxAvail = Node(AirInletNodeNum).MassFlowRateMaxAvail;
 
-        if (Contaminant.CO2Simulation) {
+        if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
             Node(AirOutletNodeNum).CO2 = Node(AirInletNodeNum).CO2;
         }
-        if (Contaminant.GenericContamSimulation) {
+        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
             Node(AirOutletNodeNum).GenContam = Node(AirInletNodeNum).GenContam;
         }
     }
