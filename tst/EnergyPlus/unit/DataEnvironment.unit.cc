@@ -52,6 +52,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 

@@ -57,6 +57,7 @@
 #include <EnergyPlus/PlantCentralGSHP.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus;
 
@@ -138,22 +139,22 @@ TEST_F(EnergyPlusFixture, ChillerHeater_Autosize)
     PlantCentralGSHP::Wrapper(1).GLHELoopNum = PltSizCondNum;
 
     // Calculate expected values
-    Real64 rho_evap = FluidProperties::GetDensityGlycol(state, DataPlant::PlantLoop(PltSizNum).FluidName,
+    Real64 rho_evap = FluidProperties::GetDensityGlycol(*state, DataPlant::PlantLoop(PltSizNum).FluidName,
                                                         DataGlobalConstants::CWInitConvTemp(),
                                                         DataPlant::PlantLoop(PltSizNum).FluidIndex,
                                                         "ChillerHeater_Autosize_TEST");
 
-    Real64 Cp_evap = FluidProperties::GetSpecificHeatGlycol(state, DataPlant::PlantLoop(PltSizNum).FluidName,
+    Real64 Cp_evap = FluidProperties::GetSpecificHeatGlycol(*state, DataPlant::PlantLoop(PltSizNum).FluidName,
                                                             DataGlobalConstants::CWInitConvTemp(),
                                                             DataPlant::PlantLoop(PltSizNum).FluidIndex,
                                                             "ChillerHeater_Autosize_TEST");
 
-    Real64 rho_cond = FluidProperties::GetDensityGlycol(state, DataPlant::PlantLoop(PltSizCondNum).FluidName,
+    Real64 rho_cond = FluidProperties::GetDensityGlycol(*state, DataPlant::PlantLoop(PltSizCondNum).FluidName,
                                                         DataGlobalConstants::CWInitConvTemp(),
                                                         DataPlant::PlantLoop(PltSizCondNum).FluidIndex,
                                                         "ChillerHeater_Autosize_TEST");
 
-    Real64 Cp_cond = FluidProperties::GetSpecificHeatGlycol(state, DataPlant::PlantLoop(PltSizCondNum).FluidName,
+    Real64 Cp_cond = FluidProperties::GetSpecificHeatGlycol(*state, DataPlant::PlantLoop(PltSizCondNum).FluidName,
                                                             PlantCentralGSHP::Wrapper(1).ChillerHeater(1).TempRefCondInCooling,
                                                             DataPlant::PlantLoop(PltSizCondNum).FluidIndex,
                                                             "ChillerHeater_Autosize_TEST");
@@ -172,7 +173,7 @@ TEST_F(EnergyPlusFixture, ChillerHeater_Autosize)
 
     // now call sizing routine
     DataPlant::PlantFirstSizesOkayToFinalize = true;
-    PlantCentralGSHP::Wrapper(1).SizeWrapper(state);
+    PlantCentralGSHP::Wrapper(1).SizeWrapper(*state);
 
     // Careful of actually using PlantCentralGSHP::Wrapper(1).ChillerHeater(1) and not PlantCentralGSHP::ChillerHeater since this array isn't used
     // anymore by the module

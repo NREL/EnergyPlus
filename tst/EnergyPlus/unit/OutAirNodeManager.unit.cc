@@ -57,6 +57,7 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 //#include <EnergyPlus/UtilityRoutines.hh>
 
@@ -75,7 +76,7 @@ TEST_F(EnergyPlusFixture, OutAirNodeManager_OATdbTwbOverrideTest)
     DataEnvironment::WindSpeed = 2.0;
     DataEnvironment::WindDir = 0.0;
     DataEnvironment::OutBaroPress = 101325;
-    DataEnvironment::OutHumRat = Psychrometrics::PsyWFnTdbTwbPb(state, DataEnvironment::OutDryBulbTemp, DataEnvironment::OutWetBulbTemp, DataEnvironment::OutBaroPress);
+    DataEnvironment::OutHumRat = Psychrometrics::PsyWFnTdbTwbPb(*state, DataEnvironment::OutDryBulbTemp, DataEnvironment::OutWetBulbTemp, DataEnvironment::OutBaroPress);
 
     ScheduleManager::Schedule(1).CurrentValue = 24.0;
     OutsideAirNodeList(1) = 1;
@@ -98,7 +99,7 @@ TEST_F(EnergyPlusFixture, OutAirNodeManager_OATdbTwbOverrideTest)
     DataLoopNode::Node(3).OutAirDryBulb = DataEnvironment::OutDryBulbTemp;
     DataLoopNode::Node(3).OutAirWetBulb = DataEnvironment::OutWetBulbTemp;
 
-    InitOutAirNodes(state);
+    InitOutAirNodes(*state);
 
     EXPECT_NEAR(14.6467, DataLoopNode::Node(1).OutAirWetBulb, 0.0001);
     EXPECT_NEAR(0.007253013, DataLoopNode::Node(2).HumRat, 0.000001);

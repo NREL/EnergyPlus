@@ -49,6 +49,7 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -187,7 +188,7 @@ namespace MixerComponent {
         CalcAirMixer(MixerNum);
 
         // Update the current Mixer to the outlet nodes
-        UpdateAirMixer(MixerNum);
+        UpdateAirMixer(state, MixerNum);
 
         // Report the current Mixer
         ReportMixer(MixerNum);
@@ -518,7 +519,7 @@ namespace MixerComponent {
     // Beginning of Update subroutines for the Mixer Module
     // *****************************************************************************
 
-    void UpdateAirMixer(int const MixerNum)
+    void UpdateAirMixer(EnergyPlusData &state, int const MixerNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -526,30 +527,6 @@ namespace MixerComponent {
         //       DATE WRITTEN   March 2000
         //       MODIFIED       na
         //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine needs a description.
-
-        // METHODOLOGY EMPLOYED:
-        // Needs description, as appropriate.
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using DataContaminantBalance::Contaminant;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int OutletNode;
@@ -570,7 +547,7 @@ namespace MixerComponent {
         // Set the outlet nodes for properties that just pass through & not used
         Node(OutletNode).Quality = Node(InletNode).Quality;
 
-        if (Contaminant.CO2Simulation) {
+        if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
             if (MixerCond(MixerNum).OutletMassFlowRate > 0.0) {
                 // CO2 balance to get outlet air CO2
                 Node(OutletNode).CO2 = 0.0;
@@ -583,7 +560,7 @@ namespace MixerComponent {
             }
         }
 
-        if (Contaminant.GenericContamSimulation) {
+        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
             if (MixerCond(MixerNum).OutletMassFlowRate > 0.0) {
                 // Generic contaminant balance to get outlet air CO2
                 Node(OutletNode).GenContam = 0.0;

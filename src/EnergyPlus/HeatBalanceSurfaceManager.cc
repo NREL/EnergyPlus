@@ -5263,7 +5263,7 @@ namespace HeatBalanceSurfaceManager {
                 ZoneCO2LevelOccuHourBins(ZoneNum).assign(NoBins, 0.0);
             }
             reportCO2ResilienceFirstTime = false;
-            if (!DataContaminantBalance::Contaminant.CO2Simulation) {
+            if (!state.dataContaminantBalance->Contaminant.CO2Simulation) {
                 if (OutputReportTabular::displayCO2ResilienceSummaryExplicitly) {
                     ShowWarningError(state, "Writing Annual CO2 Resilience Summary - CO2 Level Hours reports: "
                                      "Zone Air CO2 Concentration output is required, "
@@ -5280,7 +5280,7 @@ namespace HeatBalanceSurfaceManager {
                 ZoneNumOcc(ZoneNum) = People(iPeople).NumberOfPeople * GetCurrentScheduleValue(state, People(iPeople).NumberOfPeoplePtr);
             }
             for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-                Real64 ZoneAirCO2 = DataContaminantBalance::ZoneAirCO2Avg(ZoneNum);
+                Real64 ZoneAirCO2 = state.dataContaminantBalance->ZoneAirCO2Avg(ZoneNum);
 
                 int NumOcc = ZoneNumOcc(ZoneNum);
                 if (ZoneAirCO2 <= 1000) {

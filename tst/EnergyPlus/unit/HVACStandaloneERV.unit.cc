@@ -62,6 +62,7 @@
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::HVACStandAloneERV;
@@ -142,7 +143,7 @@ TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test1)
     StandAloneERV(1).ExhaustAirFanIndex = 2;
     Zone(1).Multiplier = 1.0;
     Zone(1).FloorArea = 1000.0;
-    SizeStandAloneERV(state, 1);
+    SizeStandAloneERV(*state, 1);
     EXPECT_EQ(1000.0, StandAloneERV(1).SupplyAirVolFlow);
 
     // size on occupancy
@@ -152,7 +153,7 @@ TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test1)
     StandAloneERV(1).AirVolFlowPerOccupant = 10.0;
     Zone(1).Multiplier = 1.0;
     Zone(1).FloorArea = 1000.0;
-    SizeStandAloneERV(state, 1);
+    SizeStandAloneERV(*state, 1);
     EXPECT_EQ(3000.0, StandAloneERV(1).SupplyAirVolFlow);
 
     // size on floor area and occupancy
@@ -162,14 +163,14 @@ TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test1)
     StandAloneERV(1).AirVolFlowPerOccupant = 10.0;
     Zone(1).Multiplier = 1.0;
     Zone(1).FloorArea = 1000.0;
-    SizeStandAloneERV(state, 1);
+    SizeStandAloneERV(*state, 1);
     EXPECT_EQ(4000.0, StandAloneERV(1).SupplyAirVolFlow);
 
     // size on floor area and occupancy using zone multiplier
     StandAloneERV(1).SupplyAirVolFlow = AutoSize;
     StandAloneERV(1).ExhaustAirVolFlow = AutoSize;
     Zone(1).Multiplier = 5.0;
-    SizeStandAloneERV(state, 1);
+    SizeStandAloneERV(*state, 1);
     EXPECT_EQ(20000.0, StandAloneERV(1).SupplyAirVolFlow);
 }
 
@@ -210,11 +211,11 @@ TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test2)
     ASSERT_TRUE(process_idf(idf_objects));
     DataEnvironment::StdRhoAir = 1.0;
 
-    state.dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
-    state.dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ProcessScheduleInput(state);  // read schedules
+    state->dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
+    state->dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
+    ProcessScheduleInput(*state);  // read schedules
 
-    GetFanInput(state);
+    GetFanInput(*state);
 
     EnergyPlus::DataSizing::CurZoneEqNum = 1;
 
@@ -260,7 +261,7 @@ TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test2)
     StandAloneERV(1).AirVolFlowPerOccupant = 0.0;
     StandAloneERV(1).HighRHOAFlowRatio = 1.2;
 
-    SizeStandAloneERV(state, 1);
+    SizeStandAloneERV(*state, 1);
 
     EXPECT_EQ(1.0, StandAloneERV(1).SupplyAirVolFlow);
     EXPECT_EQ(1.2, StandAloneERV(1).DesignSAFanVolFlowRate);

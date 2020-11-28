@@ -54,6 +54,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DemandManager.hh>
 #include <EnergyPlus/MixedAir.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus;
 using namespace ObjexxFCL;
@@ -77,7 +78,7 @@ TEST_F(EnergyPlusFixture, DemandManagerGetInput)
     OAController.allocate(NumOAControllers);
     OAController(1).Name = "OA CONTROLLER 1";
 
-    GetDemandManagerInput(state);
+    GetDemandManagerInput(*state);
 
     EXPECT_EQ(DataGlobalConstants::ScheduleAlwaysOn(), DemandMgr(1).AvailSchedule);
     EXPECT_EQ(ManagerLimitFixed, DemandMgr(1).LimitControl);

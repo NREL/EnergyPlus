@@ -1054,10 +1054,10 @@ namespace HVACFan {
         // make sure inlet has the same mass flow
         DataLoopNode::Node(inletNodeNum).MassFlowRate = m_outletAirMassFlowRate;
 
-        if (DataContaminantBalance::Contaminant.CO2Simulation) {
+        if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
             DataLoopNode::Node(outletNodeNum).CO2 = DataLoopNode::Node(inletNodeNum).CO2;
         }
-        if (DataContaminantBalance::Contaminant.GenericContamSimulation) {
+        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
             DataLoopNode::Node(outletNodeNum).GenContam = DataLoopNode::Node(inletNodeNum).GenContam;
         }
 

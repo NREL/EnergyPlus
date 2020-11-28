@@ -6511,8 +6511,6 @@ namespace InternalHeatGains {
         //       RE-ENGINEERED  na
 
         // Using/Aliasing
-        using DataContaminantBalance::Contaminant;
-        using DataContaminantBalance::ZoneGCGain;
         using DataHeatBalFanSys::ZoneLatentGain;
         using DataHeatBalFanSys::ZoneLatentGainExceptPeople; // Added for hybrid model
 
@@ -6553,10 +6551,10 @@ namespace InternalHeatGains {
             }
         }
 
-        if (Contaminant.GenericContamSimulation && allocated(ZoneGCGain)) {
+        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation && allocated(state.dataContaminantBalance->ZoneGCGain)) {
             for (NZ = 1; NZ <= state.dataGlobal->NumOfZones; ++NZ) {
-                SumAllInternalGenericContamGains(NZ, ZoneGCGain(NZ));
-                ZnRpt(NZ).GCRate = ZoneGCGain(NZ);
+                SumAllInternalGenericContamGains(NZ, state.dataContaminantBalance->ZoneGCGain(NZ));
+                ZnRpt(NZ).GCRate = state.dataContaminantBalance->ZoneGCGain(NZ);
             }
         }
     }

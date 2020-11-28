@@ -55,6 +55,7 @@
 #include <fstream>
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/FileSystem.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 
 TEST(FileSystem, movefile_test)

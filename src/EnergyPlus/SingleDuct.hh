@@ -48,6 +48,8 @@
 #ifndef SingleDuct_hh_INCLUDED
 #define SingleDuct_hh_INCLUDED
 
+#include <unordered_map>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Optional.hh>
@@ -229,11 +231,11 @@ namespace SingleDuct {
 
         static Real64 VAVVSHCFanOnResidual(EnergyPlusData &state, Real64 HeatingFrac, Array1D<Real64> const &Par);
 
-        void SimConstVolNoReheat();
+        void SimConstVolNoReheat(EnergyPlusData &state);
 
         void CalcOutdoorAirVolumeFlowRate(EnergyPlusData &state);
 
-        void UpdateSys() const;
+        void UpdateSys(EnergyPlusData &state) const;
 
         void ReportSys(EnergyPlusData &state);
 

@@ -292,7 +292,6 @@ namespace NodeInputManager {
         // na
 
         // Using/Aliasing
-        using DataContaminantBalance::Contaminant;
         using DataErrorTracking::AbortProcessing; // used here to determine if this routine called during fatal error processing
 
         // Locals
@@ -475,11 +474,11 @@ namespace NodeInputManager {
                                             "Average",
                                             NodeID(NumNode));
                     }
-                    if (Contaminant.CO2Simulation) {
+                    if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
                         SetupOutputVariable(state,
                             "System Node CO2 Concentration", OutputProcessor::Unit::ppm, Node(NumNode).CO2, "System", "Average", NodeID(NumNode));
                     }
-                    if (Contaminant.GenericContamSimulation) {
+                    if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
                         SetupOutputVariable(state, "System Node Generic Air Contaminant Concentration",
                                             OutputProcessor::Unit::ppm,
                                             Node(NumNode).GenContam,
