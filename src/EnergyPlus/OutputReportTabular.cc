@@ -10250,7 +10250,6 @@ namespace OutputReportTabular {
         // na
 
         // Using/Aliasing
-        using DataEnvironment::Elevation;
         using DataEnvironment::EnvironmentName;
         using DataEnvironment::Latitude;
         using DataEnvironment::Longitude;
@@ -10478,7 +10477,7 @@ namespace OutputReportTabular {
             tableBody(1, 3) = WeatherFileLocationTitle;                // weather
             tableBody(1, 4) = RealToStr(Latitude, 2);                  // latitude
             tableBody(1, 5) = RealToStr(Longitude, 2);                 // longitude
-            tableBody(1, 6) = RealToStr(Elevation * m_unitConv, 2);    // Elevation
+            tableBody(1, 6) = RealToStr(state.dataEnvrn->Elevation * m_unitConv, 2);    // Elevation
             tableBody(1, 7) = RealToStr(TimeZoneNumber, 2);            // Time Zone
             tableBody(1, 8) = RealToStr(BuildingAzimuth, 2);           // north axis angle
             tableBody(1, 9) = RealToStr(BuildingRotationAppendixG, 2); // Rotation for Appendix G

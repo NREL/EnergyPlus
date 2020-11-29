@@ -745,7 +745,7 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
 
         state->dataGlobal->BeginEnvrnFlag = true;
         state->dataGlobal->EndEnvrnFlag = false;
-        DataEnvironment::EndMonthFlag = false;
+        state->dataEnvrn->EndMonthFlag = false;
         state->dataGlobal->WarmupFlag = true;
         state->dataGlobal->DayOfSim = 0;
         state->dataGlobal->DayOfSimChr = "0";

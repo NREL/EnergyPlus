@@ -52,7 +52,6 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -72,13 +71,6 @@ namespace DataEnvironment {
     // current weather variables)
 
     // MODULE VARIABLE DECLARATIONS:
-    Real64 Elevation;                      // Elevation of this building site
-    bool EndMonthFlag;                     // Set to true on last day of month
-    bool EndYearFlag;                      // Set to true on the last day of year
-    Real64 GndReflectanceForDayltg;        // Ground visible reflectance for use in daylighting calc
-    Real64 GndReflectance;                 // Ground visible reflectance from input
-    Real64 GndSolarRad;                    // Current ground reflected radiation
-    Real64 GroundTemp;                     // Current ground temperature {C}
     Real64 GroundTempKelvin;               // Current ground temperature {K}
     Real64 GroundTempFC;                   // Current ground temperature defined for F or C factor method {C}
     Real64 GroundTemp_Surface;             // Current surface ground temperature {C}
@@ -189,12 +181,6 @@ namespace DataEnvironment {
 
     void clear_state()
     {
-        Elevation = Real64();
-        EndMonthFlag = bool();
-        GndReflectanceForDayltg = Real64();
-        GndReflectance = Real64();
-        GndSolarRad = Real64();
-        GroundTemp = Real64();
         GroundTempKelvin = Real64();
         GroundTempFC = Real64();
         GroundTemp_Surface = Real64();

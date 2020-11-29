@@ -6029,7 +6029,7 @@ namespace HeatBalanceManager {
                           Latitude,
                           Longitude,
                           TimeZoneNumber,
-                          Elevation);
+                          state.dataEnvrn->Elevation);
 
                     print(state.files.mtr,
                           EnvironmentStampFormatStr,
@@ -6038,7 +6038,7 @@ namespace HeatBalanceManager {
                           Latitude,
                           Longitude,
                           TimeZoneNumber,
-                          Elevation);
+                          state.dataEnvrn->Elevation);
                     PrintEnvrnStampWarmup = false;
                 }
             }

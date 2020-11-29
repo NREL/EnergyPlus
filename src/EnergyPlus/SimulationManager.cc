@@ -198,7 +198,6 @@ namespace SimulationManager {
         using DataEnvironment::CurMnDy;
         using DataEnvironment::CurrentOverallSimDay;
         using DataEnvironment::CurrentYearIsLeapYear;
-        using DataEnvironment::EndMonthFlag;
         using DataEnvironment::EnvironmentName;
         using DataEnvironment::TotalOverallSimDays;
         using DataEnvironment::TotDesDays;
@@ -490,7 +489,7 @@ namespace SimulationManager {
                 state.dataGlobal->beginEnvrnWarmStartFlag = false;
             }
             state.dataGlobal->EndEnvrnFlag = false;
-            EndMonthFlag = false;
+            state.dataEnvrn->EndMonthFlag = false;
             state.dataGlobal->WarmupFlag = true;
             state.dataGlobal->DayOfSim = 0;
             state.dataGlobal->DayOfSimChr = "0";
@@ -2066,7 +2065,6 @@ namespace SimulationManager {
 
         // Using/Aliasing
         using CostEstimateManager::SimCostEstimate;
-        using DataEnvironment::EndMonthFlag;
         using DataEnvironment::EnvironmentName;
         using ExteriorEnergyUse::ManageExteriorEnergyUse;
 
@@ -2085,7 +2083,7 @@ namespace SimulationManager {
 
             state.dataGlobal->BeginEnvrnFlag = true;
             state.dataGlobal->EndEnvrnFlag = false;
-            EndMonthFlag = false;
+            state.dataEnvrn->EndMonthFlag = false;
             state.dataGlobal->WarmupFlag = true;
             state.dataGlobal->DayOfSim = 0;
 

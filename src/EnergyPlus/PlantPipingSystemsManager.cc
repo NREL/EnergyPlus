@@ -4509,7 +4509,7 @@ namespace EnergyPlus {
                       (std::sin(Solar_Angle_2) - std::sin(Solar_Angle_1)));
 
             // Calculate another Q term...
-            QRAD_SO = (A_s + B_s + 0.00002 * DataEnvironment::Elevation) * QRAD_A;
+            QRAD_SO = (A_s + B_s + 0.00002 * state.dataEnvrn->Elevation) * QRAD_A;
 
             // Correct the Qrad term ... better way??
             if (IncidentSolar_MJhrmin < 0.01) {

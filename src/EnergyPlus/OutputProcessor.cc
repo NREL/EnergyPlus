@@ -5920,8 +5920,6 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
 
     // Using/Aliasing
     using namespace OutputProcessor;
-    using DataEnvironment::EndMonthFlag;
-    using DataEnvironment::EndYearFlag;
     using General::EncodeMonDayHrMin;
     using ScheduleManager::GetCurrentScheduleValue;
 
@@ -6489,7 +6487,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
     if (!state.dataGlobal->EndDayFlag) return;
 
     // Month Block
-    if (EndMonthFlag || state.dataGlobal->EndEnvrnFlag) {
+    if (state.dataEnvrn->EndMonthFlag || state.dataGlobal->EndEnvrnFlag) {
         if (TrackingMonthlyVariables) {
             WriteTimeStampFormatData(state,
                                      state.files.eso,
@@ -6513,7 +6511,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
         }
 
         NumHoursInSim += NumHoursInMonth;
-        EndMonthFlag = false;
+        state.dataEnvrn->EndMonthFlag = false;
         for (auto &thisTimeStepType : {TimeStepType::TimeStepZone, TimeStepType::TimeStepSystem}) { // Zone, HVAC
             for (Loop = 1; Loop <= NumOfRVariable; ++Loop) {
                 if (RVariableTypes(Loop).timeStepType == thisTimeStepType) {
@@ -6575,7 +6573,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
     }
 
     // Yearly Block
-    if (EndYearFlag) {
+    if (state.dataEnvrn->EndYearFlag) {
         if (TrackingYearlyVariables) {
             WriteYearlyTimeStamp(state, state.files.eso, YearlyStampReportChr, state.dataGlobal->CalendarYearChr, true);
             TimePrint = false;

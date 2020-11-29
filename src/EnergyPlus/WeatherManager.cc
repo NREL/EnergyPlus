@@ -415,11 +415,11 @@ namespace WeatherManager {
                 "Site Precipitation Depth", OutputProcessor::Unit::m, DataEnvironment::LiquidPrecipitation, "Zone", "Sum", "Environment");
             SetupOutputVariable(state, "Site Ground Reflected Solar Radiation Rate per Area",
                                 OutputProcessor::Unit::W_m2,
-                                DataEnvironment::GndSolarRad,
+                                state.dataEnvrn->GndSolarRad,
                                 "Zone",
                                 "Average",
                                 "Environment");
-            SetupOutputVariable(state, "Site Ground Temperature", OutputProcessor::Unit::C, DataEnvironment::GroundTemp, "Zone", "Average", "Environment");
+            SetupOutputVariable(state, "Site Ground Temperature", OutputProcessor::Unit::C, state.dataEnvrn->GroundTemp, "Zone", "Average", "Environment");
             SetupOutputVariable(state,
                 "Site Surface Ground Temperature", OutputProcessor::Unit::C, DataEnvironment::GroundTemp_Surface, "Zone", "Average", "Environment");
             SetupOutputVariable(state,
@@ -1504,7 +1504,7 @@ namespace WeatherManager {
         if (state.dataGlobal->BeginSimFlag && state.dataWeatherManager->FirstCall) {
 
             state.dataWeatherManager->FirstCall = false;
-            DataEnvironment::EndMonthFlag = false;
+            state.dataEnvrn->EndMonthFlag = false;
 
         } // ... end of DataGlobals::BeginSimFlag IF-THEN block.
 
@@ -1623,10 +1623,10 @@ namespace WeatherManager {
                 }
             }
 
-            DataEnvironment::EndYearFlag = false;
+            state.dataEnvrn->EndYearFlag = false;
             if (state.dataEnvrn->DayOfMonth == state.dataWeatherManager->EndDayOfMonth(DataEnvironment::Month)) {
-                DataEnvironment::EndMonthFlag = true;
-                DataEnvironment::EndYearFlag = (DataEnvironment::Month == 12);
+                state.dataEnvrn->EndMonthFlag = true;
+                state.dataEnvrn->EndYearFlag = (DataEnvironment::Month == 12);
             }
 
             // Set Tomorrow's date data
@@ -1882,13 +1882,13 @@ namespace WeatherManager {
         state.dataGlobal->SimTimeSteps = (state.dataGlobal->DayOfSim - 1) * 24 * state.dataGlobal->NumOfTimeStepInHour +
                                     (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
 
-        DataEnvironment::GroundTemp = state.dataWeatherManager->siteBuildingSurfaceGroundTempsPtr->getGroundTempAtTimeInMonths(state, 0, DataEnvironment::Month);
-        DataEnvironment::GroundTempKelvin = DataEnvironment::GroundTemp + DataGlobalConstants::KelvinConv();
+        state.dataEnvrn->GroundTemp = state.dataWeatherManager->siteBuildingSurfaceGroundTempsPtr->getGroundTempAtTimeInMonths(state, 0, DataEnvironment::Month);
+        DataEnvironment::GroundTempKelvin = state.dataEnvrn->GroundTemp + DataGlobalConstants::KelvinConv();
         DataEnvironment::GroundTempFC = state.dataWeatherManager->siteFCFactorMethodGroundTempsPtr->getGroundTempAtTimeInMonths(state, 0, DataEnvironment::Month);
         DataEnvironment::GroundTemp_Surface = state.dataWeatherManager->siteShallowGroundTempsPtr->getGroundTempAtTimeInMonths(state, 0, DataEnvironment::Month);
         DataEnvironment::GroundTemp_Deep = state.dataWeatherManager->siteDeepGroundTempsPtr->getGroundTempAtTimeInMonths(state, 0, DataEnvironment::Month);
-        DataEnvironment::GndReflectance = state.dataWeatherManager->GroundReflectances(DataEnvironment::Month);
-        DataEnvironment::GndReflectanceForDayltg = DataEnvironment::GndReflectance;
+        state.dataEnvrn->GndReflectance = state.dataWeatherManager->GroundReflectances(DataEnvironment::Month);
+        state.dataEnvrn->GndReflectanceForDayltg = state.dataEnvrn->GndReflectance;
 
         CalcWaterMainsTemp(state);
 
@@ -1986,17 +1986,17 @@ namespace WeatherManager {
         }
 
         if (DataEnvironment::IsSnow) {
-            DataEnvironment::GndReflectance = max(min(DataEnvironment::GndReflectance * state.dataWeatherManager->SnowGndRefModifier, 1.0), 0.0);
-            DataEnvironment::GndReflectanceForDayltg = max(min(DataEnvironment::GndReflectanceForDayltg * state.dataWeatherManager->SnowGndRefModifierForDayltg, 1.0), 0.0);
+            state.dataEnvrn->GndReflectance = max(min(state.dataEnvrn->GndReflectance * state.dataWeatherManager->SnowGndRefModifier, 1.0), 0.0);
+            state.dataEnvrn->GndReflectanceForDayltg = max(min(state.dataEnvrn->GndReflectanceForDayltg * state.dataWeatherManager->SnowGndRefModifierForDayltg, 1.0), 0.0);
         }
 
-        DataEnvironment::GndSolarRad =
-            max((state.dataEnvrn->BeamSolarRad * DataEnvironment::SOLCOS(3) + state.dataEnvrn->DifSolarRad) * DataEnvironment::GndReflectance, 0.0);
+        state.dataEnvrn->GndSolarRad =
+            max((state.dataEnvrn->BeamSolarRad * DataEnvironment::SOLCOS(3) + state.dataEnvrn->DifSolarRad) * state.dataEnvrn->GndReflectance, 0.0);
 
         if (!DataEnvironment::SunIsUp) {
             state.dataEnvrn->DifSolarRad = 0.0;
             state.dataEnvrn->BeamSolarRad = 0.0;
-            DataEnvironment::GndSolarRad = 0.0;
+            state.dataEnvrn->GndSolarRad = 0.0;
         }
 
         DataEnvironment::OutEnthalpy = Psychrometrics::PsyHFnTdbW(DataEnvironment::OutDryBulbTemp, DataEnvironment::OutHumRat);
@@ -4359,7 +4359,7 @@ namespace WeatherManager {
                 if (std::abs(DataEnvironment::Latitude - state.dataWeatherManager->WeatherFileLatitude) > 1.0 ||
                     std::abs(DataEnvironment::Longitude - state.dataWeatherManager->WeatherFileLongitude) > 1.0 ||
                     std::abs(DataEnvironment::TimeZoneNumber - state.dataWeatherManager->WeatherFileTimeZone) > 0.0 ||
-                    std::abs(DataEnvironment::Elevation - state.dataWeatherManager->WeatherFileElevation) / max(DataEnvironment::Elevation, 1.0) > 0.10) {
+                    std::abs(state.dataEnvrn->Elevation - state.dataWeatherManager->WeatherFileElevation) / max(state.dataEnvrn->Elevation, 1.0) > 0.10) {
                     ShowWarningError(state, "Weather file location will be used rather than entered (IDF) Location object.");
                     ShowContinueError(state, "..Location object=" + state.dataWeatherManager->LocationTitle);
                     ShowContinueError(state, "..Weather File Location=" + DataEnvironment::WeatherFileLocationTitle);
@@ -4371,9 +4371,9 @@ namespace WeatherManager {
                     ShowContinueError(state,
                                       format("..Time Zone difference=[{:.1R}] hour(s), Elevation difference=[{:.2R}] percent, [{:.2R}] meters.",
                                              std::abs(DataEnvironment::TimeZoneNumber - state.dataWeatherManager->WeatherFileTimeZone),
-                                             std::abs((DataEnvironment::Elevation - state.dataWeatherManager->WeatherFileElevation) /
-                                                      max(DataEnvironment::Elevation, 1.0) * 100.0),
-                                             std::abs(DataEnvironment::Elevation - state.dataWeatherManager->WeatherFileElevation)));
+                                             std::abs((state.dataEnvrn->Elevation - state.dataWeatherManager->WeatherFileElevation) /
+                                                      max(state.dataEnvrn->Elevation, 1.0) * 100.0),
+                                             std::abs(state.dataEnvrn->Elevation - state.dataWeatherManager->WeatherFileElevation)));
                 }
             }
 
@@ -4381,7 +4381,7 @@ namespace WeatherManager {
             DataEnvironment::Latitude = state.dataWeatherManager->WeatherFileLatitude;
             DataEnvironment::Longitude = state.dataWeatherManager->WeatherFileLongitude;
             DataEnvironment::TimeZoneNumber = state.dataWeatherManager->WeatherFileTimeZone;
-            DataEnvironment::Elevation = state.dataWeatherManager->WeatherFileElevation;
+            state.dataEnvrn->Elevation = state.dataWeatherManager->WeatherFileElevation;
         } else if (!state.dataWeatherManager->LocationGathered) {
             state.dataWeatherManager->LocationTitle = "Not Entered";
             ShowSevereError(state, "No Location given. Must have location information for simulation.");
@@ -4389,7 +4389,7 @@ namespace WeatherManager {
         }
 
         if (!ErrorsFound) {
-            DataEnvironment::StdBaroPress = DataEnvironment::StdPressureSeaLevel * std::pow(1.0 - 2.25577e-05 * DataEnvironment::Elevation, 5.2559);
+            DataEnvironment::StdBaroPress = DataEnvironment::StdPressureSeaLevel * std::pow(1.0 - 2.25577e-05 * state.dataEnvrn->Elevation, 5.2559);
             DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state,
                 DataEnvironment::StdBaroPress, DataPrecisionGlobals::constant_twenty, DataPrecisionGlobals::constant_zero);
             // Write Final Location Information to the initialization output file
@@ -4404,7 +4404,7 @@ namespace WeatherManager {
                   DataEnvironment::Latitude,
                   DataEnvironment::Longitude,
                   DataEnvironment::TimeZoneNumber,
-                  DataEnvironment::Elevation,
+                  state.dataEnvrn->Elevation,
                   DataEnvironment::StdBaroPress,
                   DataEnvironment::StdRhoAir);
         }
@@ -4646,7 +4646,7 @@ namespace WeatherManager {
                           DataEnvironment::Latitude,
                           DataEnvironment::Longitude,
                           DataEnvironment::TimeZoneNumber,
-                          DataEnvironment::Elevation);
+                          state.dataEnvrn->Elevation);
                     print(state.files.mtr,
                           EnvironmentStampFormatStr,
                           state.dataWeatherManager->EnvironmentReportChr,
@@ -4654,7 +4654,7 @@ namespace WeatherManager {
                           DataEnvironment::Latitude,
                           DataEnvironment::Longitude,
                           DataEnvironment::TimeZoneNumber,
-                          DataEnvironment::Elevation);
+                          state.dataEnvrn->Elevation);
                     printEnvrnStamp = false;
                 }
             }
@@ -6588,7 +6588,7 @@ namespace WeatherManager {
             DataEnvironment::Latitude = LocProps(1);
             DataEnvironment::Longitude = LocProps(2);
             DataEnvironment::TimeZoneNumber = LocProps(3);
-            DataEnvironment::Elevation = LocProps(4);
+            state.dataEnvrn->Elevation = LocProps(4);
             state.dataWeatherManager->LocationGathered = true;
         }
     }
@@ -7286,7 +7286,7 @@ namespace WeatherManager {
         DataEnvironment::SkyClearness =
             ((state.dataEnvrn->DifSolarRad + state.dataEnvrn->BeamSolarRad) / (state.dataEnvrn->DifSolarRad + 0.0001) + Zeta) / (1.0 + Zeta);
         // Relative optical air mass
-        Real64 const AirMass = (1.0 - 0.1 * DataEnvironment::Elevation / 1000.0) /
+        Real64 const AirMass = (1.0 - 0.1 * state.dataEnvrn->Elevation / 1000.0) /
                                (SinSunAltitude + 0.15 / std::pow(SunAltitude / DataGlobalConstants::DegToRadians() + 3.885, 1.253));
         // In the following, 93.73 is the extraterrestrial luminous efficacy
         DataEnvironment::SkyBrightness = (state.dataEnvrn->DifSolarRad * 93.73) * AirMass / ExtraDirNormIll(DataEnvironment::Month);

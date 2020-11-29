@@ -200,7 +200,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
     int HourOfDay_reset = state.dataGlobal->HourOfDay;
     bool BeginEnvrnFlag_reset = state.dataGlobal->BeginEnvrnFlag;
     bool EndEnvrnFlag_reset = state.dataGlobal->EndEnvrnFlag;
-    bool EndMonthFlag_reset = EndMonthFlag;
+    bool EndMonthFlag_reset = state.dataEnvrn->EndMonthFlag;
     bool WarmupFlag_reset = state.dataGlobal->WarmupFlag;
     int DayOfSim_reset = state.dataGlobal->DayOfSim;
     std::string DayOfSimChr_reset = state.dataGlobal->DayOfSimChr;
@@ -248,7 +248,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
 
     state.dataGlobal->BeginEnvrnFlag = true;
     state.dataGlobal->EndEnvrnFlag = false;
-    EndMonthFlag = false;
+    state.dataEnvrn->EndMonthFlag = false;
     state.dataGlobal->WarmupFlag = false;
     state.dataGlobal->DayOfSim = 0;
     state.dataGlobal->DayOfSimChr = "0";
@@ -356,7 +356,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
     state.dataGlobal->HourOfDay = HourOfDay_reset;
     state.dataGlobal->BeginEnvrnFlag = BeginEnvrnFlag_reset;
     state.dataGlobal->EndEnvrnFlag = EndEnvrnFlag_reset;
-    EndMonthFlag = EndMonthFlag_reset;
+    state.dataEnvrn->EndMonthFlag = EndMonthFlag_reset;
     state.dataGlobal->WarmupFlag = WarmupFlag_reset;
     state.dataGlobal->DayOfSim = DayOfSim_reset;
     state.dataGlobal->DayOfSimChr = DayOfSimChr_reset;

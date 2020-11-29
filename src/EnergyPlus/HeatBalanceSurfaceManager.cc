@@ -706,7 +706,7 @@ namespace HeatBalanceSurfaceManager {
         if (InitSurfaceHeatBalancefirstTime) DisplayString(state, "Initializing Solar Heat Gains");
 
         InitSolarHeatGains(state);
-        if (SunIsUp && (state.dataEnvrn->BeamSolarRad + GndSolarRad + state.dataEnvrn->DifSolarRad > 0.0)) {
+        if (SunIsUp && (state.dataEnvrn->BeamSolarRad + state.dataEnvrn->GndSolarRad + state.dataEnvrn->DifSolarRad > 0.0)) {
             for (int NZ = 1; NZ <= state.dataGlobal->NumOfZones; ++NZ) {
                 if (state.dataDaylightingData->ZoneDaylight(NZ).TotalDaylRefPoints > 0) {
                     if (Zone(NZ).HasInterZoneWindow) {
@@ -2250,8 +2250,8 @@ namespace HeatBalanceSurfaceManager {
 
             } else if (Surface(SurfNum).ExtBoundCond == Ground) {
 
-                THM(1, {1, state.dataConstruction->Construct(Surface(SurfNum).Construction).NumCTFTerms + 1}, SurfNum) = GroundTemp;
-                TH(1, {1, state.dataConstruction->Construct(Surface(SurfNum).Construction).NumCTFTerms + 1}, SurfNum) = GroundTemp;
+                THM(1, {1, state.dataConstruction->Construct(Surface(SurfNum).Construction).NumCTFTerms + 1}, SurfNum) = state.dataEnvrn->GroundTemp;
+                TH(1, {1, state.dataConstruction->Construct(Surface(SurfNum).Construction).NumCTFTerms + 1}, SurfNum) = state.dataEnvrn->GroundTemp;
 
             } else if (Surface(SurfNum).ExtBoundCond == GroundFCfactorMethod) {
 
@@ -2531,7 +2531,7 @@ namespace HeatBalanceSurfaceManager {
             }
         }
 
-        if (!SunIsUp || (state.dataEnvrn->BeamSolarRad + GndSolarRad + state.dataEnvrn->DifSolarRad <= 0.0)) { // Sun is down
+        if (!SunIsUp || (state.dataEnvrn->BeamSolarRad + state.dataEnvrn->GndSolarRad + state.dataEnvrn->DifSolarRad <= 0.0)) { // Sun is down
 
             for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
                 EnclSolQD(zoneNum) = 0.0;
@@ -2598,7 +2598,7 @@ namespace HeatBalanceSurfaceManager {
             assert(equal_dimensions(ReflFacBmToBmSolObs, ReflFacBmToDiffSolGnd)); // For linear indexing
             for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
                 SurfSkySolarInc(SurfNum) = state.dataEnvrn->DifSolarRad * AnisoSkyMult(SurfNum);
-                SurfGndSolarInc(SurfNum) = GndSolarRad * Surface(SurfNum).ViewFactorGround;
+                SurfGndSolarInc(SurfNum) = state.dataEnvrn->GndSolarRad * Surface(SurfNum).ViewFactorGround;
                 SurfWinSkyGndSolarInc(SurfNum) = SurfGndSolarInc(SurfNum);
                 SurfWinBmGndSolarInc(SurfNum) = 0.0;
             }
@@ -2608,8 +2608,8 @@ namespace HeatBalanceSurfaceManager {
                 Array1D<Real64>::size_type lSP = ReflFacBmToBmSolObs.index(state.dataGlobal->PreviousHour, 1) - 1;
                 // For Complex Fenestrations:
                 for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-                    SurfWinSkyGndSolarInc(SurfNum) = state.dataEnvrn->DifSolarRad * GndReflectance * ReflFacSkySolGnd(SurfNum);
-                    SurfWinBmGndSolarInc(SurfNum) = state.dataEnvrn->BeamSolarRad * SOLCOS(3) * GndReflectance * SurfBmToDiffReflFacGnd(SurfNum);
+                    SurfWinSkyGndSolarInc(SurfNum) = state.dataEnvrn->DifSolarRad * state.dataEnvrn->GndReflectance * ReflFacSkySolGnd(SurfNum);
+                    SurfWinBmGndSolarInc(SurfNum) = state.dataEnvrn->BeamSolarRad * SOLCOS(3) * state.dataEnvrn->GndReflectance * SurfBmToDiffReflFacGnd(SurfNum);
                     SurfBmToBmReflFacObs(SurfNum) = state.dataGlobal->WeightNow * ReflFacBmToBmSolObs[lSH + SurfNum] +
                                                     state.dataGlobal->WeightPreviousHour * ReflFacBmToBmSolObs[lSP + SurfNum];
                     SurfBmToDiffReflFacObs(SurfNum) = state.dataGlobal->WeightNow * ReflFacBmToDiffSolObs[lSH + SurfNum] +
@@ -2619,8 +2619,8 @@ namespace HeatBalanceSurfaceManager {
                     // TH2 CR 9056
                     SurfSkySolarInc(SurfNum) +=
                         state.dataEnvrn->BeamSolarRad * (SurfBmToBmReflFacObs(SurfNum) + SurfBmToDiffReflFacObs(SurfNum)) + state.dataEnvrn->DifSolarRad * ReflFacSkySolObs(SurfNum);
-                    SurfGndSolarInc(SurfNum) = state.dataEnvrn->BeamSolarRad * SOLCOS(3) * GndReflectance * SurfBmToDiffReflFacGnd(SurfNum) +
-                                                         state.dataEnvrn->DifSolarRad * GndReflectance * ReflFacSkySolGnd(SurfNum);
+                    SurfGndSolarInc(SurfNum) = state.dataEnvrn->BeamSolarRad * SOLCOS(3) * state.dataEnvrn->GndReflectance * SurfBmToDiffReflFacGnd(SurfNum) +
+                                                         state.dataEnvrn->DifSolarRad * state.dataEnvrn->GndReflectance * ReflFacSkySolGnd(SurfNum);
                     SurfSkyDiffReflFacGnd(SurfNum) = ReflFacSkySolGnd(SurfNum);
                 }
             }
@@ -2725,9 +2725,9 @@ namespace HeatBalanceSurfaceManager {
                     SurfQRadSWOutIncidentGndDiffuse(SurfNum) = SurfGndSolarInc(SurfNum);
                     // Incident diffuse solar from beam-to-diffuse reflection from ground
                     SurfQRadSWOutIncBmToDiffReflGnd(SurfNum) =
-                            state.dataEnvrn->BeamSolarRad * SOLCOS(3) * GndReflectance * SurfBmToDiffReflFacGnd(SurfNum);
+                            state.dataEnvrn->BeamSolarRad * SOLCOS(3) * state.dataEnvrn->GndReflectance * SurfBmToDiffReflFacGnd(SurfNum);
                     // Incident diffuse solar from sky diffuse reflection from ground
-                    SurfQRadSWOutIncSkyDiffReflGnd(SurfNum) = state.dataEnvrn->DifSolarRad * GndReflectance * SurfSkyDiffReflFacGnd(SurfNum);
+                    SurfQRadSWOutIncSkyDiffReflGnd(SurfNum) = state.dataEnvrn->DifSolarRad * state.dataEnvrn->GndReflectance * SurfSkyDiffReflFacGnd(SurfNum);
                     // Total incident solar. Beam and sky reflection from obstructions, if calculated, is included
                     // in SkySolarInc.
                     SurfQRadSWOutIncident(SurfNum) =
@@ -2756,11 +2756,11 @@ namespace HeatBalanceSurfaceManager {
                     SurfQRadSWOutIncidentGndDiffuse(SurfNum) = currGndSolarInc(SurfNum);
                     // Incident diffuse solar from beam-to-diffuse reflection from ground
                     SurfQRadSWOutIncBmToDiffReflGnd(SurfNum) =
-                            state.dataEnvrn->BeamSolarRad * SOLCOS(3) * GndReflectance * SurfBmToDiffReflFacGnd(SurfNum);
+                            state.dataEnvrn->BeamSolarRad * SOLCOS(3) * state.dataEnvrn->GndReflectance * SurfBmToDiffReflFacGnd(SurfNum);
 
                     // Incident diffuse solar from sky diffuse reflection from ground
                     SurfQRadSWOutIncSkyDiffReflGnd(SurfNum) =
-                            state.dataEnvrn->DifSolarRad * GndReflectance * SurfSkyDiffReflFacGnd(SurfNum);
+                            state.dataEnvrn->DifSolarRad * state.dataEnvrn->GndReflectance * SurfSkyDiffReflFacGnd(SurfNum);
                     // Total incident solar. Beam and sky reflection from obstructions, if calculated, is included
                     // in SkySolarInc.
                     // QRadSWOutIncident(SurfNum) = QRadSWOutIncidentBeam(SurfNum) + SkySolarInc + GndSolarInc
@@ -2801,7 +2801,7 @@ namespace HeatBalanceSurfaceManager {
                                            state.dataConstruction->Construct(ConstrNum).TransDiff;
 
                 currGndSolarInc(SurfNum) =
-                        GndSolarRad * Surface(SurfNum2).ViewFactorGround * state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransSolIso /
+                        state.dataEnvrn->GndSolarRad * Surface(SurfNum2).ViewFactorGround * state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransSolIso /
                         state.dataConstruction->Construct(ConstrNum).TransDiff;
                 // Incident direct (unreflected) beam
                 SurfQRadSWOutIncidentBeam(SurfNum) =
@@ -2828,7 +2828,7 @@ namespace HeatBalanceSurfaceManager {
 
                 // Add all reflected solar from the outside shelf to the ground solar
                 // NOTE:  If the shelf blocks part of the view to the ground, the user must reduce the ground view factor!!
-                currGndSolarInc(SurfNum) = GndSolarRad * Surface(SurfNum).ViewFactorGround +
+                currGndSolarInc(SurfNum) = state.dataEnvrn->GndSolarRad * Surface(SurfNum).ViewFactorGround +
                                            ShelfSolarRad * state.dataDaylightingDevicesData->Shelf(ShelfNum).ViewFactor;
             }
 
@@ -5668,7 +5668,7 @@ namespace HeatBalanceSurfaceManager {
 
                     if (SELECT_CASE_var == Ground) { // Surface in contact with ground
 
-                        TH(1, 1, SurfNum) = GroundTemp;
+                        TH(1, 1, SurfNum) = state.dataEnvrn->GroundTemp;
 
                         // Set the only radiant system heat balance coefficient that is non-zero for this case
                         if (state.dataConstruction->Construct(ConstrNum).SourceSinkPresent)
@@ -5677,13 +5677,13 @@ namespace HeatBalanceSurfaceManager {
                         // start HAMT
                         if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_HAMT) {
                             // Set variables used in the HAMT moisture balance
-                            TempOutsideAirFD(SurfNum) = GroundTemp;
-                            RhoVaporAirOut(SurfNum) = PsyRhovFnTdbRh(state, GroundTemp, 1.0, HBSurfManGroundHAMT);
+                            TempOutsideAirFD(SurfNum) = state.dataEnvrn->GroundTemp;
+                            RhoVaporAirOut(SurfNum) = PsyRhovFnTdbRh(state, state.dataEnvrn->GroundTemp, 1.0, HBSurfManGroundHAMT);
                             HConvExtFD(SurfNum) = HighHConvLimit;
 
                             HMassConvExtFD(SurfNum) = HConvExtFD(SurfNum) /
-                                                      ((PsyRhoAirFnPbTdbW(state, OutBaroPress, GroundTemp,
-                                                                          PsyWFnTdbRhPb(state, GroundTemp, 1.0, OutBaroPress,
+                                                      ((PsyRhoAirFnPbTdbW(state, OutBaroPress, state.dataEnvrn->GroundTemp,
+                                                                          PsyWFnTdbRhPb(state, state.dataEnvrn->GroundTemp, 1.0, OutBaroPress,
                                                                                         RoutineNameGroundTemp)) +
                                                         RhoVaporAirOut(SurfNum)) * PsyCpAirFnW(OutHumRat));
 
@@ -5695,12 +5695,12 @@ namespace HeatBalanceSurfaceManager {
 
                         if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CondFD) {
                             // Set variables used in the FD moisture balance
-                            TempOutsideAirFD(SurfNum) = GroundTemp;
-                            RhoVaporAirOut(SurfNum) = PsyRhovFnTdbRhLBnd0C(GroundTemp, 1.0);
+                            TempOutsideAirFD(SurfNum) = state.dataEnvrn->GroundTemp;
+                            RhoVaporAirOut(SurfNum) = PsyRhovFnTdbRhLBnd0C(state.dataEnvrn->GroundTemp, 1.0);
                             HConvExtFD(SurfNum) = HighHConvLimit;
                             HMassConvExtFD(SurfNum) = HConvExtFD(SurfNum) /
-                                                      ((PsyRhoAirFnPbTdbW(state, OutBaroPress, GroundTemp,
-                                                                          PsyWFnTdbRhPb(state, GroundTemp, 1.0, OutBaroPress,
+                                                      ((PsyRhoAirFnPbTdbW(state, OutBaroPress, state.dataEnvrn->GroundTemp,
+                                                                          PsyWFnTdbRhPb(state, state.dataEnvrn->GroundTemp, 1.0, OutBaroPress,
                                                                                         RoutineNameGroundTemp)) +
                                                         RhoVaporAirOut(SurfNum)) * PsyCpAirFnW(OutHumRat));
                             HSkyFD(SurfNum) = HSky;
@@ -5774,7 +5774,7 @@ namespace HeatBalanceSurfaceManager {
                         OSC(OPtr).OSCTempCalc = (OSC(OPtr).ZoneAirTempCoef * MAT(zoneNum) +
                                                  OSC(OPtr).ExtDryBulbCoef * Surface(SurfNum).OutDryBulbTemp +
                                                  ConstantTempCoef * OSC(OPtr).ConstTemp +
-                                                 OSC(OPtr).GroundTempCoef * GroundTemp +
+                                                 OSC(OPtr).GroundTempCoef * state.dataEnvrn->GroundTemp +
                                                  OSC(OPtr).WindSpeedCoef * Surface(SurfNum).WindSpeed *
                                                  Surface(SurfNum).OutDryBulbTemp +
                                                  OSC(OPtr).TPreviousCoef * OSC(OPtr).TOutsideSurfPast);
@@ -5831,7 +5831,7 @@ namespace HeatBalanceSurfaceManager {
                         OSC(OPtr).OSCTempCalc = (OSC(OPtr).ZoneAirTempCoef * MAT(zoneNum) +
                                                  OSC(OPtr).ExtDryBulbCoef * Surface(SurfNum).OutDryBulbTemp +
                                                  OSC(OPtr).ConstTempCoef * OSC(OPtr).ConstTemp +
-                                                 OSC(OPtr).GroundTempCoef * GroundTemp +
+                                                 OSC(OPtr).GroundTempCoef * state.dataEnvrn->GroundTemp +
                                                  OSC(OPtr).WindSpeedCoef * Surface(SurfNum).WindSpeed *
                                                  Surface(SurfNum).OutDryBulbTemp +
                                                  OSC(OPtr).TPreviousCoef * OSC(OPtr).TOutsideSurfPast);

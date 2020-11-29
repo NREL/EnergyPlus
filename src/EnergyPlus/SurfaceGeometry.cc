@@ -3175,7 +3175,7 @@ namespace SurfaceGeometry {
                         if (!GroundTempObjInput) {
                             ShowWarningError(state, "GetHTSurfaceData: Surfaces with interface to Ground found but no \"Ground Temperatures\" were input.");
                             ShowContinueError(state, "Found first in surface=" + cAlphaArgs(1));
-                            ShowContinueError(state, format("Defaults, constant throughout the year of ({:.1R}) will be used.", GroundTemp));
+                            ShowContinueError(state, format("Defaults, constant throughout the year of ({:.1R}) will be used.", state.dataEnvrn->GroundTemp));
                         }
                         state.dataSurfaceGeometry->NoGroundTempObjWarning = false;
                     }
@@ -3270,7 +3270,7 @@ namespace SurfaceGeometry {
                         if (!state.dataSurfaceGeometry->kivaManager.defaultSet) {
                             // Apply default foundation if no other foundation object specified
                             if (state.dataSurfaceGeometry->kivaManager.foundationInputs.size() == 0) {
-                                state.dataSurfaceGeometry->kivaManager.defineDefaultFoundation();
+                                state.dataSurfaceGeometry->kivaManager.defineDefaultFoundation(state);
                             }
                             state.dataSurfaceGeometry->kivaManager.addDefaultFoundation();
                         }
@@ -3710,7 +3710,7 @@ namespace SurfaceGeometry {
                         if (!GroundTempObjInput) {
                             ShowWarningError(state, "GetRectSurfaces: Surfaces with interface to Ground found but no \"Ground Temperatures\" were input.");
                             ShowContinueError(state, "Found first in surface=" + cAlphaArgs(1));
-                            ShowContinueError(state, format("Defaults, constant throughout the year of ({:.1R}) will be used.", GroundTemp));
+                            ShowContinueError(state, format("Defaults, constant throughout the year of ({:.1R}) will be used.", state.dataEnvrn->GroundTemp));
                         }
                         state.dataSurfaceGeometry->NoGroundTempObjWarning = false;
                     }
@@ -9283,7 +9283,7 @@ namespace SurfaceGeometry {
         int TotKivaFnds = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (TotKivaFnds > 0) {
-            state.dataSurfaceGeometry->kivaManager.defineDefaultFoundation();
+            state.dataSurfaceGeometry->kivaManager.defineDefaultFoundation(state);
 
             Array1D_string fndNames;
             fndNames.allocate(TotKivaFnds + 1);

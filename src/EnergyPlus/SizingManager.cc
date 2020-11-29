@@ -125,7 +125,6 @@ namespace SizingManager {
         // purchased hot and cold water, yielding central heating and cooling capacities.
 
         // Using/Aliasing
-        using DataEnvironment::EndMonthFlag;
         using DataEnvironment::EnvironmentName;
         using DataEnvironment::Month;
         using DataEnvironment::OutBaroPress;
@@ -294,7 +293,7 @@ namespace SizingManager {
                         state.dataGlobal->beginEnvrnWarmStartFlag = false;
                     }
                     state.dataGlobal->EndEnvrnFlag = false;
-                    EndMonthFlag = false;
+                    state.dataEnvrn->EndMonthFlag = false;
                     state.dataGlobal->WarmupFlag = true;
                     state.dataGlobal->DayOfSim = 0;
                     state.dataGlobal->DayOfSimChr = "0";
@@ -3901,11 +3900,6 @@ namespace SizingManager {
         // Using global flag (kickoff sizing simulation), only a few time steps are executed.
         // global flag is used in other parts of simulation to terminate quickly.
 
-        // Using/Aliasing
-        using DataEnvironment::EndMonthFlag;
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
         bool Available = true;
 
         CurOverallSimDay = 0;
@@ -3923,7 +3917,7 @@ namespace SizingManager {
 
             state.dataGlobal->BeginEnvrnFlag = true;
             state.dataGlobal->EndEnvrnFlag = false;
-            EndMonthFlag = false;
+            state.dataEnvrn->EndMonthFlag = false;
             state.dataGlobal->WarmupFlag = true;
             state.dataGlobal->DayOfSim = 0;
 

@@ -1205,7 +1205,7 @@ namespace HeatBalanceKivaManager {
         Kiva::setMessageCallback(kivaErrorCallback, nullptr);
     }
 
-    void KivaManager::defineDefaultFoundation()
+    void KivaManager::defineDefaultFoundation(EnergyPlusData &state)
     {
 
         Kiva::Foundation defFnd;
@@ -1217,7 +1217,7 @@ namespace HeatBalanceKivaManager {
         defFnd.grade.roughness = settings.groundRoughness;
         defFnd.farFieldWidth = settings.farFieldWidth;
 
-        Real64 waterTableDepth = 0.1022 * DataEnvironment::Elevation;
+        Real64 waterTableDepth = 0.1022 * state.dataEnvrn->Elevation;
 
         if (settings.deepGroundBoundary == Settings::AUTO) {
             if (waterTableDepth <= 40.) {

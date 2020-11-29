@@ -1178,7 +1178,7 @@ namespace MicroturbineElectricGenerator {
 
         //   Calculate power modifier curve value (function of inlet air temperature and elevation)
         // Power ratio as a function of inlet air temperature and elevation
-        Real64 PowerFTempElev = CurveManager::CurveValue(state, this->ElecPowFTempElevCurveNum, CombustionAirInletTemp, DataEnvironment::Elevation);
+        Real64 PowerFTempElev = CurveManager::CurveValue(state, this->ElecPowFTempElevCurveNum, CombustionAirInletTemp, state.dataEnvrn->Elevation);
 
         //   Warn user if power modifier curve output is less than 0
         if (PowerFTempElev < 0.0) {
@@ -1190,7 +1190,7 @@ namespace MicroturbineElectricGenerator {
                     format("... Electrical Power Modifier curve (function of temperature and elevation) output is less than zero ({:.4T}).",
                            PowerFTempElev));
                 ShowContinueError(state, format("... Value occurs using a combustion inlet air temperature of {:.2T} C.", CombustionAirInletTemp));
-                ShowContinueError(state, format("... and an elevation of {:.2T} m.", DataEnvironment::Elevation));
+                ShowContinueError(state, format("... and an elevation of {:.2T} m.", state.dataEnvrn->Elevation));
                 ShowContinueErrorTimeStamp(state, "... Resetting curve output to zero and continuing simulation.");
             }
             ShowRecurringWarningErrorAtEnd(state, "GENERATOR:MICROTURBINE \"" + this->Name +
@@ -1375,7 +1375,7 @@ namespace MicroturbineElectricGenerator {
             // Thermal efficiency as a function of air temperature and elevation
             Real64 ThermalEffFTempElev;
             if (this->ThermEffFTempElevCurveNum > 0) {
-                ThermalEffFTempElev = CurveManager::CurveValue(state, this->ThermEffFTempElevCurveNum, CombustionAirInletTemp, DataEnvironment::Elevation);
+                ThermalEffFTempElev = CurveManager::CurveValue(state, this->ThermEffFTempElevCurveNum, CombustionAirInletTemp, state.dataEnvrn->Elevation);
                 //       Warn user if power modifier curve output is less than 0
                 if (ThermalEffFTempElev < 0.0) {
                     if (this->ThermEffFTempElevErrorIndex == 0) {
@@ -1386,7 +1386,7 @@ namespace MicroturbineElectricGenerator {
                                    PowerFTempElev));
                         ShowContinueError(state,
                                           format("... Value occurs using a combustion inlet air temperature of {:.2T} C.", CombustionAirInletTemp));
-                        ShowContinueError(state, format("... and an elevation of {:.2T} m.", DataEnvironment::Elevation));
+                        ShowContinueError(state, format("... and an elevation of {:.2T} m.", state.dataEnvrn->Elevation));
                         ShowContinueErrorTimeStamp(state, "... Resetting curve output to zero and continuing simulation.");
                     }
                     ShowRecurringWarningErrorAtEnd(state, "GENERATOR:MICROTURBINE \"" + this->Name +

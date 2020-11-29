@@ -960,7 +960,6 @@ namespace Photovoltaics {
         //    integrated photovoltaics. Solar 2002, Sunrise on the Reliable Energy Economy, June 15-19, 2002 Reno, NV
 
         // Using/Aliasing
-        using DataEnvironment::Elevation;
         using DataEnvironment::SOLCOS;
         using DataHeatBalance::SurfCosIncidenceAngle;
         using DataHeatBalance::SurfQRadSWOutIncident;
@@ -982,7 +981,7 @@ namespace Photovoltaics {
         PVarray(PVnum).SNLPVinto.ZenithAngle = std::acos(SOLCOS(3)) / DataGlobalConstants::DegToRadians();                         //(degrees),
         PVarray(PVnum).SNLPVinto.Tamb = Surface(ThisSurf).OutDryBulbTemp;                                   //(deg. C)
         PVarray(PVnum).SNLPVinto.WindSpeed = Surface(ThisSurf).WindSpeed;                                   // (m/s)
-        PVarray(PVnum).SNLPVinto.Altitude = Elevation;                                                      // from DataEnvironment via USE
+        PVarray(PVnum).SNLPVinto.Altitude = state.dataEnvrn->Elevation;                                                      // from DataEnvironment via USE
 
         if (((PVarray(PVnum).SNLPVinto.IcBeam + PVarray(PVnum).SNLPVinto.IcDiffuse) > MinIrradiance) && (RunFlag)) {
 

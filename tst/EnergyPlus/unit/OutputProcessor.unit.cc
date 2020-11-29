@@ -4132,7 +4132,7 @@ namespace OutputProcessor {
         }
 
         if (state->dataEnvrn->DayOfMonth == state->dataWeatherManager->EndDayOfMonth(DataEnvironment::Month)) {
-            DataEnvironment::EndMonthFlag = true;
+            state->dataEnvrn->EndMonthFlag = true;
         }
 
         // OutputProcessor::TimeValue.allocate(2);
@@ -4376,7 +4376,7 @@ namespace OutputProcessor {
         }
 
         if (state->dataEnvrn->DayOfMonth == state->dataWeatherManager->EndDayOfMonth(DataEnvironment::Month)) {
-            DataEnvironment::EndMonthFlag = true;
+            state->dataEnvrn->EndMonthFlag = true;
         }
 
         // OutputProcessor::TimeValue.allocate(2);
@@ -4633,7 +4633,7 @@ namespace OutputProcessor {
         }
 
         if (state->dataEnvrn->DayOfMonth == state->dataWeatherManager->EndDayOfMonth(DataEnvironment::Month)) {
-            DataEnvironment::EndMonthFlag = true;
+            state->dataEnvrn->EndMonthFlag = true;
         }
 
         // OutputProcessor::TimeValue.allocate(2);
@@ -4838,7 +4838,7 @@ namespace OutputProcessor {
         }
 
         if (state->dataEnvrn->DayOfMonth == state->dataWeatherManager->EndDayOfMonth(DataEnvironment::Month)) {
-            DataEnvironment::EndMonthFlag = true;
+            state->dataEnvrn->EndMonthFlag = true;
         }
         // OutputProcessor::TimeValue.allocate(2);
         auto timeStep = 1.0 / 6;
@@ -4978,7 +4978,7 @@ namespace OutputProcessor {
         }
 
         if (state->dataEnvrn->DayOfMonth == state->dataWeatherManager->EndDayOfMonth(DataEnvironment::Month)) {
-            DataEnvironment::EndMonthFlag = true;
+            state->dataEnvrn->EndMonthFlag = true;
         }
 
         // OutputProcessor::TimeValue.allocate(2);
@@ -5056,7 +5056,7 @@ namespace OutputProcessor {
         }
 
         if (state->dataEnvrn->DayOfMonth == state->dataWeatherManager->EndDayOfMonth(DataEnvironment::Month)) {
-            DataEnvironment::EndMonthFlag = true;
+            state->dataEnvrn->EndMonthFlag = true;
         }
 
         // OutputProcessor::TimeValue.allocate(2);

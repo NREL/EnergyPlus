@@ -5757,10 +5757,7 @@ namespace ZoneTempPredictorCorrector {
         //       RE-ENGINEERED
 
         // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine inversely solve infiltration airflow rate or people count with zone air tempearture measurements.
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        constexpr auto RoutineName("InverseModelTemperature");
+        // This subroutine inversely solve infiltration airflow rate or people count with zone air temperatures measurements.
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 CpAir;                   // specific heat of air
@@ -5772,7 +5769,7 @@ namespace ZoneTempPredictorCorrector {
         Real64 BB(0.0);
         Real64 CC(0.0);
         Real64 DD(0.0);
-        Real64 SumIntGainPeople(0.0); // Inversely solved convectice heat gain from people
+        Real64 SumIntGainPeople(0.0); // Inversely solved convective heat gain from people
         Real64 SumSysMCp_HM(0.0);
         Real64 SumSysMCpT_HM(0.0);
         Real64 NumPeople(0.0);          // Inversely solved number of people in the zone
@@ -6459,8 +6456,8 @@ namespace ZoneTempPredictorCorrector {
         // Go back and calculate each of the 6 terms in Equation 5 and fill report variables.
         // notes on these raw terms for zone air heat balance model :
         //  these are state variables at the end of the last system timestep.
-        //  they are not necessarily proper averages for what happend over entire zone time step
-        //  these are not mulitplied by zone multipliers.
+        //  they are not necessarily proper averages for what happened over entire zone time step
+        //  these are not multiplied by zone multipliers.
         //  The values are all Watts.
 
         // REFERENCES:
@@ -6475,8 +6472,6 @@ namespace ZoneTempPredictorCorrector {
 
         using InternalHeatGains::SumAllInternalConvectionGains;
         using InternalHeatGains::SumAllReturnAirConvectionGains;
-        //using ZonePlenum::ZoneRetPlenCond;
-        //using ZonePlenum::ZoneSupPlenCond;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NodeNum;          // System node number

@@ -516,7 +516,7 @@ namespace HVACManager {
                               Latitude,
                               Longitude,
                               TimeZoneNumber,
-                              Elevation);
+                              state.dataEnvrn->Elevation);
                         print(state.files.mtr,
                               EnvironmentStampFormatStr,
                               "1",
@@ -524,7 +524,7 @@ namespace HVACManager {
                               Latitude,
                               Longitude,
                               TimeZoneNumber,
-                              Elevation);
+                              state.dataEnvrn->Elevation);
                         PrintEnvrnStampWarmup = false;
                     }
                     PrintedWarmup = true;
@@ -554,7 +554,7 @@ namespace HVACManager {
                               Latitude,
                               Longitude,
                               TimeZoneNumber,
-                              Elevation);
+                              state.dataEnvrn->Elevation);
                         print(state.files.mtr,
                               EnvironmentStampFormatStr,
                               "1",
@@ -562,7 +562,7 @@ namespace HVACManager {
                               Latitude,
                               Longitude,
                               TimeZoneNumber,
-                              Elevation);
+                              state.dataEnvrn->Elevation);
                         PrintEnvrnStampWarmup = false;
                     }
                     PrintedWarmup = true;

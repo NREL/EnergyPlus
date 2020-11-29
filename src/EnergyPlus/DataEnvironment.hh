@@ -68,13 +68,6 @@ namespace DataEnvironment {
     Real64 constexpr StdPressureSeaLevel(101325.0);   // Standard barometric pressure at sea level (Pa)
 
     // MODULE VARIABLE DECLARATIONS:
-    extern Real64 Elevation;                    // Elevation of this building site
-    extern bool EndMonthFlag;                   // Set to true on last day of month
-    extern bool EndYearFlag;                    // Set to true on last day of year
-    extern Real64 GndReflectanceForDayltg;      // Ground visible reflectance for use in daylighting calc
-    extern Real64 GndReflectance;               // Ground visible reflectance from input
-    extern Real64 GndSolarRad;                  // Current ground reflected radiation
-    extern Real64 GroundTemp;                   // Current ground temperature {C}
     extern Real64 GroundTempKelvin;             // Current ground temperature {K}
     extern Real64 GroundTempFC;                 // Current ground temperature defined for F or C factor method {C}
     extern Real64 GroundTemp_Surface;           // Current surface ground temperature {C}
@@ -214,6 +207,13 @@ struct EnvironmentData : BaseGlobalStruct {
     bool EMSDifSolarRadOverrideOn = false;              // EMS flag for sky diffuse solar horizontal irradiance
     Real64 EMSDifSolarRadOverrideValue = 0.0;           // EMS override value for sky diffuse solar horizontal irradiance
     int DSTIndicator = 0;                               // Daylight Saving Time Indicator (1=yes, 0=no) for Today
+    Real64 Elevation = 0.0;                             // Elevation of this building site
+    bool EndMonthFlag = false;                          // Set to true on last day of month
+    bool EndYearFlag = false;                           // Set to true on the last day of year
+    Real64 GndReflectanceForDayltg = 0.0;               // Ground visible reflectance for use in daylighting calc
+    Real64 GndReflectance = 0.0;                        // Ground visible reflectance from input
+    Real64 GndSolarRad = 0.0;                           // Current ground reflected radiation
+    Real64 GroundTemp = 0.0;                            // Current ground temperature {C}
 
     void clear_state() override
     {
@@ -230,6 +230,13 @@ struct EnvironmentData : BaseGlobalStruct {
         this->EMSBeamSolarRadOverrideOn = false;
         this->EMSBeamSolarRadOverrideValue = 0.0;
         this->DSTIndicator = 0;
+        this->Elevation = 0.0;
+        this->EndMonthFlag = false;
+        this->EndYearFlag = false;
+        this->GndReflectanceForDayltg = 0.0;
+        this->GndReflectance = 0.0;
+        this->GndSolarRad = 0.0;
+        this->GroundTemp = 0.0;
     }
 };
 

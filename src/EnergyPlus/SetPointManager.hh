@@ -224,7 +224,7 @@ namespace SetPointManager {
         }
         return "*UNKNOWN*";  // not sure how we would get here, the switch block cases are exhaustive
     }
-    
+
     struct SPBase {
         std::string Name;
         iCtrlVarType CtrlTypeMode; // set to iCtrlVarType::*
@@ -758,7 +758,7 @@ namespace SetPointManager {
         {
         }
 
-        void calculate();
+        void calculate(EnergyPlusData &state);
     };
 
     struct DefineCondEntSetPointManager : SPBase // derived type for SetpointManager:CondenserEnteringReset data
@@ -1043,7 +1043,7 @@ struct SetPointManagerData : BaseGlobalStruct {
 
     bool ManagerOn = false;
     bool GetInputFlag = true; // First time, input is "gotten"
-    
+
     bool InitSetPointManagersOneTimeFlag = true;
     bool InitSetPointManagersOneTimeFlag2 = true;
     Real64 DCESPMDsn_EntCondTemp = 0.0;
