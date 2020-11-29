@@ -1029,7 +1029,6 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
     // USE STATEMENTS:
 
     // Using/Aliasing
-    using DataEnvironment::IsRain;
     using DataEnvironment::OutBaroPress;
     using DataEnvironment::SkyTemp;
     using DataEnvironment::WindSpeedAt;
@@ -1122,7 +1121,7 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
 
     RhoAir = PsyRhoAirFnPbTdbW(state, OutBaroPress, LocalOutDryBulbTemp, LocalOutHumRat, RoutineName);
     CpAir = PsyCpAirFnW(LocalOutHumRat);
-    if (!IsRain) {
+    if (!state.dataEnvrn->IsRain) {
         Tamb = LocalOutDryBulbTemp;
     } else { // when raining we use wetbulb not drybulb
         Tamb = LocalWetBulbTemp;
@@ -1205,7 +1204,7 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
     HExt = sum(HExtARR * Area) / A;
     HExtARR.deallocate();
 
-    if (IsRain) HExt = 1000.0;
+    if (state.dataEnvrn->IsRain) HExt = 1000.0;
 
     //	Tso = sum( TH( 1, 1, SurfPtrARR ) * Surface( SurfPtrARR ).Area ) / A; //Autodesk:F2C++ Array subscript usage: Replaced by below
     Tso = sum_product_sub(TH(1, 1, _), Surface, &SurfaceData::Area, SurfPtrARR) / A; // Autodesk:F2C++ Functions handle array subscript usage

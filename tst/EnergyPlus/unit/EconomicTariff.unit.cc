@@ -631,7 +631,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GatherForEconomics)
     DataEnvironment::MonthTomorrow = 6;
     state->dataEnvrn->DayOfWeek = 4;
     state->dataEnvrn->DayOfWeekTomorrow = 5;
-    DataEnvironment::HolidayIndex = 0;
+    state->dataEnvrn->HolidayIndex = 0;
     state->dataGlobal->TimeStep = 4;
     state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, state->dataEnvrn->DayOfMonth, 1);
 
@@ -662,7 +662,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GatherForEconomics)
     DataEnvironment::MonthTomorrow = 6;
     state->dataEnvrn->DayOfWeek = 4;
     state->dataEnvrn->DayOfWeekTomorrow = 5;
-    DataEnvironment::HolidayIndex = 0;
+    state->dataEnvrn->HolidayIndex = 0;
     state->dataGlobal->TimeStep = 1;
     state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, state->dataEnvrn->DayOfMonth, 1);
 

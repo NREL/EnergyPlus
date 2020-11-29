@@ -905,7 +905,7 @@ namespace DataSurfaces {
         } else {
             if (ExtWind) {
                 // Window is exposed to wind (and possibly rain)
-                if (IsRain) {
+                if (state.dataEnvrn->IsRain) {
                     // Raining: since wind exposed, outside window surface gets wet
                     temperature = OutWetBulbTemp;
                 } else {

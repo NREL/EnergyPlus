@@ -850,7 +850,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
     state->dataGlobal->HourOfDay = 1;
     state->dataEnvrn->DSTIndicator = 0;
     state->dataEnvrn->DayOfWeek = 2;
-    DataEnvironment::HolidayIndex = 0;
+    state->dataEnvrn->HolidayIndex = 0;
     state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, state->dataEnvrn->DayOfMonth, 1);
     ScheduleManager::UpdateScheduleValues(*state);
     InternalHeatGains::GetInternalHeatGainsInput(*state);
@@ -1318,7 +1318,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
     state->dataEnvrn->DayOfMonth = 21;
     state->dataEnvrn->DSTIndicator = 0;
     state->dataEnvrn->DayOfWeek = 2;
-    DataEnvironment::HolidayIndex = 0;
+    state->dataEnvrn->HolidayIndex = 0;
 
     bool foundErrors = false;
     HeatBalanceManager::GetProjectControlData(*state, foundErrors); // read project control data
@@ -2123,7 +2123,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
     state->dataGlobal->HourOfDay = 1;
     state->dataEnvrn->DSTIndicator = 0;
     state->dataEnvrn->DayOfWeek = 2;
-    DataEnvironment::HolidayIndex = 0;
+    state->dataEnvrn->HolidayIndex = 0;
     DataEnvironment::CurMnDy = "01/21";
     state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, state->dataEnvrn->DayOfMonth, 1);
     ScheduleManager::UpdateScheduleValues(*state);

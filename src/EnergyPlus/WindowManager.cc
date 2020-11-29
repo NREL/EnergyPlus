@@ -2160,7 +2160,7 @@ namespace WindowManager {
             // This is code repeating and it is necessary to calculate report variables.  Do not know
             // how to solve this in more elegant way :(
             if (surface.ExtWind) { // Window is exposed to wind (and possibly rain)
-                if (IsRain) {      // Raining: since wind exposed, outside window surface gets wet
+                if (state.dataEnvrn->IsRain) {      // Raining: since wind exposed, outside window surface gets wet
                     state.dataWindowManager->tout = surface.OutWetBulbTemp + state.dataWindowManager->TKelvin;
                 } else { // Dry
                     state.dataWindowManager->tout = surface.OutDryBulbTemp + state.dataWindowManager->TKelvin;
@@ -2179,7 +2179,7 @@ namespace WindowManager {
             state.dataWindowManager->hcout = HextConvCoeff;
             // Required for report variables calculations.
             if (surface.ExtWind) { // Window is exposed to wind (and possibly rain)
-                if (IsRain) {      // Raining: since wind exposed, outside window surface gets wet
+                if (state.dataEnvrn->IsRain) {      // Raining: since wind exposed, outside window surface gets wet
                     state.dataWindowManager->tout = surface.OutWetBulbTemp + state.dataWindowManager->TKelvin;
                 } else { // Dry
                     state.dataWindowManager->tout = surface.OutDryBulbTemp + state.dataWindowManager->TKelvin;
@@ -2540,7 +2540,7 @@ namespace WindowManager {
                     }
                 }
                 if (surface.ExtWind) { // Window is exposed to wind (and possibly rain)
-                    if (IsRain) {      // Raining: since wind exposed, outside window surface gets wet
+                    if (state.dataEnvrn->IsRain) {      // Raining: since wind exposed, outside window surface gets wet
                         state.dataWindowManager->tout = surface.OutWetBulbTemp + state.dataWindowManager->TKelvin;
                     } else { // Dry
                         state.dataWindowManager->tout = surface.OutDryBulbTemp + state.dataWindowManager->TKelvin;

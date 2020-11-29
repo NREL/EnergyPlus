@@ -246,11 +246,8 @@ namespace EnergyPlus::SetPointManager {
 
         // Using/Aliasing
         using DataEnvironment::FCGroundTemps;
-        using DataEnvironment::GroundTemp_Deep;
         using DataEnvironment::GroundTemp_DeepObjInput;
-        using DataEnvironment::GroundTemp_Surface;
         using DataEnvironment::GroundTemp_SurfaceObjInput;
-        using DataEnvironment::GroundTempFC;
         using DataEnvironment::GroundTempObjInput;
         using DataHeatBalance::Zone;
         using DataZoneControls::StageZoneLogic;
@@ -2751,7 +2748,7 @@ namespace EnergyPlus::SetPointManager {
                     if (!GroundTemp_SurfaceObjInput) {
                         ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
                                          "\" requires \"Site:GroundTemperature:Shallow\" in the input.");
-                        ShowContinueError(state, format("Defaults, constant throughout the year of ({:.1R}) will be used.", GroundTemp_Surface));
+                        ShowContinueError(state, format("Defaults, constant throughout the year of ({:.1R}) will be used.", state.dataEnvrn->GroundTemp_Surface));
                     }
                     state.dataSetPointManager->NoShallowGroundTempObjWarning = false;
                 }
@@ -2761,7 +2758,7 @@ namespace EnergyPlus::SetPointManager {
                     if (!GroundTemp_DeepObjInput) {
                         ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
                                          "\" requires \"Site:GroundTemperature:Deep\" in the input.");
-                        ShowContinueError(state, format("Defaults, constant throughout the year of ({:.1R}) will be used.", GroundTemp_Deep));
+                        ShowContinueError(state, format("Defaults, constant throughout the year of ({:.1R}) will be used.", state.dataEnvrn->GroundTemp_Deep));
                     }
                     state.dataSetPointManager->NoDeepGroundTempObjWarning = false;
                 }
@@ -2771,7 +2768,7 @@ namespace EnergyPlus::SetPointManager {
                     if (!FCGroundTemps) {
                         ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
                                          "\" requires \"Site:GroundTemperature:FCfactorMethod\" in the input.");
-                        ShowContinueError(state, format("Defaults, constant throughout the year of ({:.1R}) will be used.", GroundTempFC));
+                        ShowContinueError(state, format("Defaults, constant throughout the year of ({:.1R}) will be used.", state.dataEnvrn->GroundTempFC));
                     }
                     state.dataSetPointManager->NoFCGroundTempObjWarning = false;
                 }
@@ -3581,9 +3578,6 @@ namespace EnergyPlus::SetPointManager {
         using DataZoneEquipment::ZoneEquipConfig;
         using DataZoneEquipment::ZoneEquipInputsFilled;
         using namespace DataPlant;
-        using DataEnvironment::GroundTemp_Deep;
-        using DataEnvironment::GroundTemp_Surface;
-        using DataEnvironment::GroundTempFC;
         using OutAirNodeManager::CheckOutAirNodeNumber;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -4736,27 +4730,27 @@ namespace EnergyPlus::SetPointManager {
                         }
                     } else if (state.dataSetPointManager->GroundTempSetPtMgr(SetPtMgrNum).RefTypeMode == ReferenceGroundTempObjectType::Shallow) {
                         if (state.dataSetPointManager->GroundTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::Temp) {
-                            Node(NodeNum).TempSetPoint = GroundTemp_Surface; // Set the setpoint
+                            Node(NodeNum).TempSetPoint = state.dataEnvrn->GroundTemp_Surface; // Set the setpoint
                         } else if (state.dataSetPointManager->GroundTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::MaxTemp) {
-                            Node(NodeNum).TempSetPointHi = GroundTemp_Surface; // Set the setpoint
+                            Node(NodeNum).TempSetPointHi = state.dataEnvrn->GroundTemp_Surface; // Set the setpoint
                         } else if (state.dataSetPointManager->GroundTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::MinTemp) {
-                            Node(NodeNum).TempSetPointLo = GroundTemp_Surface; // Set the setpoint
+                            Node(NodeNum).TempSetPointLo = state.dataEnvrn->GroundTemp_Surface; // Set the setpoint
                         }
                     } else if (state.dataSetPointManager->GroundTempSetPtMgr(SetPtMgrNum).RefTypeMode == ReferenceGroundTempObjectType::Deep) {
                         if (state.dataSetPointManager->GroundTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::Temp) {
-                            Node(NodeNum).TempSetPoint = GroundTemp_Deep; // Set the setpoint
+                            Node(NodeNum).TempSetPoint = state.dataEnvrn->GroundTemp_Deep; // Set the setpoint
                         } else if (state.dataSetPointManager->GroundTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::MaxTemp) {
-                            Node(NodeNum).TempSetPointHi = GroundTemp_Deep; // Set the setpoint
+                            Node(NodeNum).TempSetPointHi = state.dataEnvrn->GroundTemp_Deep; // Set the setpoint
                         } else if (state.dataSetPointManager->GroundTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::MinTemp) {
-                            Node(NodeNum).TempSetPointLo = GroundTemp_Deep; // Set the setpoint
+                            Node(NodeNum).TempSetPointLo = state.dataEnvrn->GroundTemp_Deep; // Set the setpoint
                         }
                     } else if (state.dataSetPointManager->GroundTempSetPtMgr(SetPtMgrNum).RefTypeMode == ReferenceGroundTempObjectType::FCFactorMethod) {
                         if (state.dataSetPointManager->GroundTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::Temp) {
-                            Node(NodeNum).TempSetPoint = GroundTempFC; // Set the setpoint
+                            Node(NodeNum).TempSetPoint = state.dataEnvrn->GroundTempFC; // Set the setpoint
                         } else if (state.dataSetPointManager->GroundTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::MaxTemp) {
-                            Node(NodeNum).TempSetPointHi = GroundTempFC; // Set the setpoint
+                            Node(NodeNum).TempSetPointHi = state.dataEnvrn->GroundTempFC; // Set the setpoint
                         } else if (state.dataSetPointManager->GroundTempSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::MinTemp) {
-                            Node(NodeNum).TempSetPointLo = GroundTempFC; // Set the setpoint
+                            Node(NodeNum).TempSetPointLo = state.dataEnvrn->GroundTempFC; // Set the setpoint
                         }
                     }
                 }
@@ -6892,26 +6886,7 @@ namespace EnergyPlus::SetPointManager {
         // The sign convention is that a positive Offset will increase the resulting setpoint.
         // Final value of the setpoint is limited by the Max and Min limit specified in the setpoint manager.
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using DataEnvironment::GroundTemp_Deep;
-        using DataEnvironment::GroundTemp_Surface;
-        using DataEnvironment::GroundTempFC;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        //  INTEGER      :: CtrldNodeNum    ! index of the items in the controlled node list
         Real64 MinSetPoint; // minimum allowed setpoint
         Real64 MaxSetPoint; // maximum allowed setpoint
 
@@ -6923,11 +6898,11 @@ namespace EnergyPlus::SetPointManager {
             if (SELECT_CASE_var == ReferenceGroundTempObjectType::BuildingSurface) {
                 this->SetPt = state.dataEnvrn->GroundTemp + this->Offset;
             } else if (SELECT_CASE_var == ReferenceGroundTempObjectType::Shallow) {
-                this->SetPt = GroundTemp_Surface + this->Offset;
+                this->SetPt = state.dataEnvrn->GroundTemp_Surface + this->Offset;
             } else if (SELECT_CASE_var == ReferenceGroundTempObjectType::Deep) {
-                this->SetPt = GroundTemp_Deep + this->Offset;
+                this->SetPt = state.dataEnvrn->GroundTemp_Deep + this->Offset;
             } else if (SELECT_CASE_var == ReferenceGroundTempObjectType::FCFactorMethod) {
-                this->SetPt = GroundTempFC + this->Offset;
+                this->SetPt = state.dataEnvrn->GroundTempFC + this->Offset;
             }
         }
 

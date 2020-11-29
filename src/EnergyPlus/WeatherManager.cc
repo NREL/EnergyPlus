@@ -421,12 +421,12 @@ namespace WeatherManager {
                                 "Environment");
             SetupOutputVariable(state, "Site Ground Temperature", OutputProcessor::Unit::C, state.dataEnvrn->GroundTemp, "Zone", "Average", "Environment");
             SetupOutputVariable(state,
-                "Site Surface Ground Temperature", OutputProcessor::Unit::C, DataEnvironment::GroundTemp_Surface, "Zone", "Average", "Environment");
+                "Site Surface Ground Temperature", OutputProcessor::Unit::C, state.dataEnvrn->GroundTemp_Surface, "Zone", "Average", "Environment");
             SetupOutputVariable(state,
-                "Site Deep Ground Temperature", OutputProcessor::Unit::C, DataEnvironment::GroundTemp_Deep, "Zone", "Average", "Environment");
+                "Site Deep Ground Temperature", OutputProcessor::Unit::C, state.dataEnvrn->GroundTemp_Deep, "Zone", "Average", "Environment");
             SetupOutputVariable(state, "Site Simple Factor Model Ground Temperature",
                                 OutputProcessor::Unit::C,
-                                DataEnvironment::GroundTempFC,
+                                state.dataEnvrn->GroundTempFC,
                                 "Zone",
                                 "Average",
                                 "Environment");
@@ -1633,7 +1633,7 @@ namespace WeatherManager {
             DataEnvironment::MonthTomorrow = state.dataWeatherManager->TomorrowVariables.Month;
             state.dataEnvrn->DayOfMonthTomorrow = state.dataWeatherManager->TomorrowVariables.DayOfMonth;
             state.dataEnvrn->DayOfWeekTomorrow = state.dataWeatherManager->TomorrowVariables.DayOfWeek;
-            DataEnvironment::HolidayIndexTomorrow = state.dataWeatherManager->TomorrowVariables.HolidayIndex;
+            state.dataEnvrn->HolidayIndexTomorrow = state.dataWeatherManager->TomorrowVariables.HolidayIndex;
             DataEnvironment::YearTomorrow = state.dataWeatherManager->TomorrowVariables.Year;
 
             if (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
@@ -1805,9 +1805,9 @@ namespace WeatherManager {
         DataEnvironment::Month = state.dataWeatherManager->TodayVariables.Month;
         state.dataEnvrn->DayOfMonth = state.dataWeatherManager->TodayVariables.DayOfMonth;
         state.dataEnvrn->DayOfWeek = state.dataWeatherManager->TodayVariables.DayOfWeek;
-        DataEnvironment::HolidayIndex = state.dataWeatherManager->TodayVariables.HolidayIndex;
-        if (DataEnvironment::HolidayIndex > 0) {
-             state.dataWeatherManager->RptDayType = 7 + DataEnvironment::HolidayIndex;
+        state.dataEnvrn->HolidayIndex = state.dataWeatherManager->TodayVariables.HolidayIndex;
+        if (state.dataEnvrn->HolidayIndex > 0) {
+             state.dataWeatherManager->RptDayType = 7 + state.dataEnvrn->HolidayIndex;
         } else {
              state.dataWeatherManager->RptDayType = state.dataEnvrn->DayOfWeek;
         }
@@ -1883,10 +1883,10 @@ namespace WeatherManager {
                                     (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
 
         state.dataEnvrn->GroundTemp = state.dataWeatherManager->siteBuildingSurfaceGroundTempsPtr->getGroundTempAtTimeInMonths(state, 0, DataEnvironment::Month);
-        DataEnvironment::GroundTempKelvin = state.dataEnvrn->GroundTemp + DataGlobalConstants::KelvinConv();
-        DataEnvironment::GroundTempFC = state.dataWeatherManager->siteFCFactorMethodGroundTempsPtr->getGroundTempAtTimeInMonths(state, 0, DataEnvironment::Month);
-        DataEnvironment::GroundTemp_Surface = state.dataWeatherManager->siteShallowGroundTempsPtr->getGroundTempAtTimeInMonths(state, 0, DataEnvironment::Month);
-        DataEnvironment::GroundTemp_Deep = state.dataWeatherManager->siteDeepGroundTempsPtr->getGroundTempAtTimeInMonths(state, 0, DataEnvironment::Month);
+        state.dataEnvrn->GroundTempKelvin = state.dataEnvrn->GroundTemp + DataGlobalConstants::KelvinConv();
+        state.dataEnvrn->GroundTempFC = state.dataWeatherManager->siteFCFactorMethodGroundTempsPtr->getGroundTempAtTimeInMonths(state, 0, DataEnvironment::Month);
+        state.dataEnvrn->GroundTemp_Surface = state.dataWeatherManager->siteShallowGroundTempsPtr->getGroundTempAtTimeInMonths(state, 0, DataEnvironment::Month);
+        state.dataEnvrn->GroundTemp_Deep = state.dataWeatherManager->siteDeepGroundTempsPtr->getGroundTempAtTimeInMonths(state, 0, DataEnvironment::Month);
         state.dataEnvrn->GndReflectance = state.dataWeatherManager->GroundReflectances(DataEnvironment::Month);
         state.dataEnvrn->GndReflectanceForDayltg = state.dataEnvrn->GndReflectance;
 
@@ -1975,17 +1975,17 @@ namespace WeatherManager {
         DataEnvironment::OpaqueCloudCover = state.dataWeatherManager->TodayOpaqueSkyCover(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay);
 
         if (state.dataWeatherManager->UseRainValues) {
-            DataEnvironment::IsRain = state.dataWeatherManager->TodayIsRain(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay); //.or. LiquidPrecipitation >= .8d0)  ! > .8 mm
+            state.dataEnvrn->IsRain = state.dataWeatherManager->TodayIsRain(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay); //.or. LiquidPrecipitation >= .8d0)  ! > .8 mm
         } else {
-            DataEnvironment::IsRain = false;
+            state.dataEnvrn->IsRain = false;
         }
         if (state.dataWeatherManager->UseSnowValues) {
-            DataEnvironment::IsSnow = state.dataWeatherManager->TodayIsSnow(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay);
+            state.dataEnvrn->IsSnow = state.dataWeatherManager->TodayIsSnow(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay);
         } else {
-            DataEnvironment::IsSnow = false;
+            state.dataEnvrn->IsSnow = false;
         }
 
-        if (DataEnvironment::IsSnow) {
+        if (state.dataEnvrn->IsSnow) {
             state.dataEnvrn->GndReflectance = max(min(state.dataEnvrn->GndReflectance * state.dataWeatherManager->SnowGndRefModifier, 1.0), 0.0);
             state.dataEnvrn->GndReflectanceForDayltg = max(min(state.dataEnvrn->GndReflectanceForDayltg * state.dataWeatherManager->SnowGndRefModifierForDayltg, 1.0), 0.0);
         }
@@ -2008,13 +2008,13 @@ namespace WeatherManager {
 
         DayltgCurrentExtHorizIllum(state);
 
-        if (!DataEnvironment::IsRain) {
+        if (!state.dataEnvrn->IsRain) {
              state.dataWeatherManager->RptIsRain = 0;
         } else {
              state.dataWeatherManager->RptIsRain = 1;
         }
 
-        if (!DataEnvironment::IsSnow) {
+        if (!state.dataEnvrn->IsSnow) {
              state.dataWeatherManager->RptIsSnow = 0;
         } else {
              state.dataWeatherManager->RptIsSnow = 1;

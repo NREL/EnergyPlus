@@ -161,7 +161,7 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     state->dataGlobal->HourOfDay = 1;
     state->dataEnvrn->DSTIndicator = 0;
     state->dataEnvrn->DayOfWeek = 2;
-    DataEnvironment::HolidayIndex = 0;
+    state->dataEnvrn->HolidayIndex = 0;
     state->dataGlobal->WarmupFlag = false;
     state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(Month, state->dataEnvrn->DayOfMonth, 1);
     ScheduleManager::UpdateScheduleValues(*state);

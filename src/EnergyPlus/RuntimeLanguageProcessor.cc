@@ -233,8 +233,6 @@ namespace RuntimeLanguageProcessor {
 
         // Using/Aliasing
         using DataEnvironment::CurEnvirNum;
-        using DataEnvironment::HolidayIndex;
-        using DataEnvironment::IsRain;
         using DataEnvironment::Month;
         using DataEnvironment::SunIsUp;
         using DataEnvironment::Year;
@@ -337,13 +335,13 @@ namespace RuntimeLanguageProcessor {
         ErlVariable(CurrentTimeVariableNum).Value = SetErlValueNumber(tmpCurrentTime);
         tmpMinutes = ((tmpCurrentTime - double(state.dataGlobal->HourOfDay - 1)) * 60.0); // -1.0 // off by 1
         ErlVariable(MinuteVariableNum).Value = SetErlValueNumber(tmpMinutes);
-        ErlVariable(HolidayVariableNum).Value = SetErlValueNumber(double(HolidayIndex));
+        ErlVariable(HolidayVariableNum).Value = SetErlValueNumber(double(state.dataEnvrn->HolidayIndex));
         if (SunIsUp) {
             ErlVariable(SunIsUpVariableNum).Value = SetErlValueNumber(1.0);
         } else {
             ErlVariable(SunIsUpVariableNum).Value = SetErlValueNumber(0.0);
         }
-        if (IsRain) {
+        if (state.dataEnvrn->IsRain) {
             ErlVariable(IsRainingVariableNum).Value = SetErlValueNumber(1.0);
         } else {
             ErlVariable(IsRainingVariableNum).Value = SetErlValueNumber(0.0);

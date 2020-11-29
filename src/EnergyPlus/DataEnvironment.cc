@@ -71,15 +71,6 @@ namespace DataEnvironment {
     // current weather variables)
 
     // MODULE VARIABLE DECLARATIONS:
-    Real64 GroundTempKelvin;               // Current ground temperature {K}
-    Real64 GroundTempFC;                   // Current ground temperature defined for F or C factor method {C}
-    Real64 GroundTemp_Surface;             // Current surface ground temperature {C}
-    Real64 GroundTemp_Deep;                // Current deep ground temperature
-    int HolidayIndex;                      // Indicates whether current day is a holiday and if so what type
-    // HolidayIndex=(0-no holiday, 1-holiday type 1, ...)
-    int HolidayIndexTomorrow;                 // Tomorrow's Holiday Index
-    bool IsRain;                              // Surfaces are wet for this time interval
-    bool IsSnow;                              // Snow on the ground for this time interval
     Real64 Latitude;                          // Latitude of building location
     Real64 Longitude;                         // Longitude of building location
     int Month;                                // Current calendar month
@@ -181,14 +172,6 @@ namespace DataEnvironment {
 
     void clear_state()
     {
-        GroundTempKelvin = Real64();
-        GroundTempFC = Real64();
-        GroundTemp_Surface = Real64();
-        GroundTemp_Deep = Real64();
-        HolidayIndex = int();
-        HolidayIndexTomorrow = int();
-        IsRain = bool();
-        IsSnow = bool();
         Latitude = Real64();
         Longitude = Real64();
         Month = int();

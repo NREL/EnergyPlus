@@ -68,15 +68,6 @@ namespace DataEnvironment {
     Real64 constexpr StdPressureSeaLevel(101325.0);   // Standard barometric pressure at sea level (Pa)
 
     // MODULE VARIABLE DECLARATIONS:
-    extern Real64 GroundTempKelvin;             // Current ground temperature {K}
-    extern Real64 GroundTempFC;                 // Current ground temperature defined for F or C factor method {C}
-    extern Real64 GroundTemp_Surface;           // Current surface ground temperature {C}
-    extern Real64 GroundTemp_Deep;              // Current deep ground temperature
-    extern int HolidayIndex;                    // Indicates whether current day is a holiday and if so what type
-    // HolidayIndex=(0-no holiday, 1-holiday type 1, ...)
-    extern int HolidayIndexTomorrow;               // Tomorrow's Holiday Index
-    extern bool IsRain;                            // Surfaces are wet for this time interval
-    extern bool IsSnow;                            // Snow on the ground for this time interval
     extern Real64 Latitude;                        // Latitude of building location
     extern Real64 Longitude;                       // Longitude of building location
     extern int Month;                              // Current calendar month
@@ -214,6 +205,14 @@ struct EnvironmentData : BaseGlobalStruct {
     Real64 GndReflectance = 0.0;                        // Ground visible reflectance from input
     Real64 GndSolarRad = 0.0;                           // Current ground reflected radiation
     Real64 GroundTemp = 0.0;                            // Current ground temperature {C}
+    Real64 GroundTempKelvin = 0.0;                      // Current ground temperature {K}
+    Real64 GroundTempFC = 0.0;                          // Current ground temperature defined for F or C factor method {C}
+    Real64 GroundTemp_Surface = 0.0;                    // Current surface ground temperature {C}
+    Real64 GroundTemp_Deep = 0.0;                       // Current deep ground temperature
+    int HolidayIndex = 0;                               // Indicates whether current day is a holiday and if so what type - HolidayIndex=(0-no holiday, 1-holiday type 1, ...)
+    int HolidayIndexTomorrow = 0;                       // Tomorrow's Holiday Index
+    bool IsRain = false;                                // Surfaces are wet for this time interval
+    bool IsSnow = false;                                // Snow on the ground for this time interval
 
     void clear_state() override
     {
@@ -237,6 +236,14 @@ struct EnvironmentData : BaseGlobalStruct {
         this->GndReflectance = 0.0;
         this->GndSolarRad = 0.0;
         this->GroundTemp = 0.0;
+        this->GroundTempKelvin = 0.0;
+        this->GroundTempFC = 0.0;
+        this->GroundTemp_Surface = 0.0;
+        this->GroundTemp_Deep = 0.0;
+        this->HolidayIndex = 0;
+        this->HolidayIndexTomorrow = 0;
+        this->IsRain = false;
+        this->IsSnow = false;
     }
 };
 

@@ -123,7 +123,6 @@ namespace HeatBalanceHAMTManager {
     using DataHeatBalSurface::SurfOpaqQRadSWOutAbs;
     using namespace DataHeatBalance;
     using namespace Psychrometrics;
-    using DataEnvironment::IsRain;
     using DataEnvironment::OutBaroPress;
     using DataEnvironment::OutEnthalpy;
     using DataEnvironment::SkyTemp;
@@ -1289,7 +1288,7 @@ namespace HeatBalanceHAMTManager {
                 if (matid > 0) {
                     interp(
                         dataMaterial.Material(matid).niso, dataMaterial.Material(matid).isorh, dataMaterial.Material(matid).isodata, cells(cid).rhp1, cells(cid).water, cells(cid).dwdphi);
-                    if (IsRain && rainswitch) {
+                    if (state.dataEnvrn->IsRain && rainswitch) {
                         interp(dataMaterial.Material(matid).nsuc, dataMaterial.Material(matid).sucwater, dataMaterial.Material(matid).sucdata, cells(cid).water, cells(cid).dw);
                     } else {
                         interp(dataMaterial.Material(matid).nred, dataMaterial.Material(matid).redwater, dataMaterial.Material(matid).reddata, cells(cid).water, cells(cid).dw);

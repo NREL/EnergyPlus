@@ -184,7 +184,6 @@ namespace SurfaceGroundHeatExchanger {
         // Using/Aliasing
         using namespace DataIPShortCuts; // Data for field names, blank numerics
         using BranchNodeConnections::TestCompSet;
-        using DataEnvironment::GroundTemp_Surface;
         using DataEnvironment::GroundTemp_SurfaceObjInput;
         using FluidProperties::CheckFluidPropertyName;
         using FluidProperties::FindGlycol;
@@ -392,7 +391,7 @@ namespace SurfaceGroundHeatExchanger {
         if (state.dataSurfaceGroundHeatExchangers->NoSurfaceGroundTempObjWarning) {
             if (!GroundTemp_SurfaceObjInput) {
                 ShowWarningError(state, "GetSurfaceGroundHeatExchanger: No \"Site:GroundTemperature:Shallow\" were input.");
-                ShowContinueError(state, format("Defaults, constant throughout the year of ({:.1R}) will be used.", GroundTemp_Surface));
+                ShowContinueError(state, format("Defaults, constant throughout the year of ({:.1R}) will be used.", state.dataEnvrn->GroundTemp_Surface));
             }
             state.dataSurfaceGroundHeatExchangers->NoSurfaceGroundTempObjWarning = false;
         }
@@ -521,9 +520,9 @@ namespace SurfaceGroundHeatExchanger {
             state.dataSurfaceGroundHeatExchangers->PastBeamSolarRad = state.dataEnvrn->BeamSolarRad;
             state.dataSurfaceGroundHeatExchangers->PastSolarDirCosVert = SOLCOS(3);
             state.dataSurfaceGroundHeatExchangers->PastDifSolarRad = state.dataEnvrn->DifSolarRad;
-            state.dataSurfaceGroundHeatExchangers->PastGroundTemp = GroundTemp_Surface;
-            state.dataSurfaceGroundHeatExchangers->PastIsRain = IsRain;
-            state.dataSurfaceGroundHeatExchangers->PastIsSnow = IsSnow;
+            state.dataSurfaceGroundHeatExchangers->PastGroundTemp = state.dataEnvrn->GroundTemp_Surface;
+            state.dataSurfaceGroundHeatExchangers->PastIsRain = state.dataEnvrn->IsRain;
+            state.dataSurfaceGroundHeatExchangers->PastIsSnow = state.dataEnvrn->IsSnow;
             state.dataSurfaceGroundHeatExchangers->PastOutDryBulbTemp = OutDryBulbTempAt(state, SurfaceHXHeight);
             state.dataSurfaceGroundHeatExchangers->PastOutWetBulbTemp = OutWetBulbTempAt(state, SurfaceHXHeight);
             state.dataSurfaceGroundHeatExchangers->PastSkyTemp = SkyTemp;
@@ -712,9 +711,9 @@ namespace SurfaceGroundHeatExchanger {
             state.dataSurfaceGroundHeatExchangers->PastBeamSolarRad = state.dataEnvrn->BeamSolarRad;
             state.dataSurfaceGroundHeatExchangers->PastSolarDirCosVert = SOLCOS(3);
             state.dataSurfaceGroundHeatExchangers->PastDifSolarRad = state.dataEnvrn->DifSolarRad;
-            state.dataSurfaceGroundHeatExchangers->PastGroundTemp = GroundTemp_Surface;
-            state.dataSurfaceGroundHeatExchangers->PastIsRain = IsRain;
-            state.dataSurfaceGroundHeatExchangers->PastIsSnow = IsSnow;
+            state.dataSurfaceGroundHeatExchangers->PastGroundTemp = state.dataEnvrn->GroundTemp_Surface;
+            state.dataSurfaceGroundHeatExchangers->PastIsRain = state.dataEnvrn->IsRain;
+            state.dataSurfaceGroundHeatExchangers->PastIsSnow = state.dataEnvrn->IsSnow;
             state.dataSurfaceGroundHeatExchangers->PastOutDryBulbTemp = OutDryBulbTempAt(state, SurfaceHXHeight);
             state.dataSurfaceGroundHeatExchangers->PastOutWetBulbTemp = OutWetBulbTempAt(state, SurfaceHXHeight);
             state.dataSurfaceGroundHeatExchangers->PastSkyTemp = SkyTemp;
@@ -758,7 +757,7 @@ namespace SurfaceGroundHeatExchanger {
                         break;
 
                     // calc new surface temps
-                    CalcBottomSurfTemp(FluxBtm, TempB, state.dataSurfaceGroundHeatExchangers->PastOutDryBulbTemp, state.dataSurfaceGroundHeatExchangers->PastOutDryBulbTemp, GroundTemp_Surface);
+                    CalcBottomSurfTemp(FluxBtm, TempB, state.dataSurfaceGroundHeatExchangers->PastOutDryBulbTemp, state.dataSurfaceGroundHeatExchangers->PastOutDryBulbTemp, state.dataEnvrn->GroundTemp_Surface);
                     // under-relax
                     TempBtm = TempBtm * (1.0 - RelaxT) + RelaxT * TempB;
                     // update flux record

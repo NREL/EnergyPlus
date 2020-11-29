@@ -4498,7 +4498,6 @@ namespace SystemAvailabilityManager {
         using AirflowNetworkBalanceManager::GetZoneInfilAirChangeRate;
         using AirflowNetworkBalanceManager::ManageAirflowNetworkBalance;
         using CurveManager::CurveValue;
-        using DataEnvironment::IsRain;
         using DataEnvironment::OutBaroPress;
         using DataEnvironment::OutDewPointTemp;
         using DataEnvironment::OutEnthalpy;
@@ -4817,7 +4816,7 @@ namespace SystemAvailabilityManager {
             state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl = state.dataSystemAvailabilityManager->HybridVentCtrl_Close;
         }
 
-        if (IsRain && state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).UseRainIndicator) {
+        if (state.dataEnvrn->IsRain && state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).UseRainIndicator) {
             state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl = state.dataSystemAvailabilityManager->HybridVentCtrl_Close;
         }
         // Sent a signal to the AirflowNetwork to ensure large onpenings are close or open based on this logic

@@ -99,8 +99,6 @@ namespace ScheduleManager {
     // OTHER NOTES:
 
     // Using/Aliasing
-    using DataEnvironment::HolidayIndex;
-    using DataEnvironment::HolidayIndexTomorrow;
     using DataEnvironment::MonthTomorrow;
     // Data
     // MODULE PARAMETER DEFINITIONS
@@ -2856,12 +2854,12 @@ namespace ScheduleManager {
         int thisHour = ThisHour + state.dataEnvrn->DSTIndicator;
         int thisDayOfYear = state.dataEnvrn->DayOfYear_Schedule;
         int thisDayOfWeek = state.dataEnvrn->DayOfWeek;
-        int thisHolidayIndex = DataEnvironment::HolidayIndex;
+        int thisHolidayIndex = state.dataEnvrn->HolidayIndex;
         if (thisHour > 24) { // In case HourOfDay is 24 and DSTIndicator is 1, you're actually the next day
             thisDayOfYear += 1;
             thisHour -= 24;
             thisDayOfWeek = state.dataEnvrn->DayOfWeekTomorrow;
-            thisHolidayIndex = DataEnvironment::HolidayIndexTomorrow;
+            thisHolidayIndex = state.dataEnvrn->HolidayIndexTomorrow;
         }
 
         // In the case where DST is applied on 12/31 at 24:00, which is the case for a Southern Hemisphere location for eg
@@ -3064,13 +3062,13 @@ namespace ScheduleManager {
 
         // Now, which day?
         if (!present(CurDayofWeek)) {
-            if (state.dataEnvrn->DayOfWeek <= 7 && HolidayIndex > 0) {
-                DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(7 + HolidayIndex);
+            if (state.dataEnvrn->DayOfWeek <= 7 && state.dataEnvrn->HolidayIndex > 0) {
+                DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(7 + state.dataEnvrn->HolidayIndex);
             } else {
                 DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(state.dataEnvrn->DayOfWeek);
             }
-        } else if (CurDayofWeek <= 7 && HolidayIndex > 0) {
-            DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(7 + HolidayIndex);
+        } else if (CurDayofWeek <= 7 && state.dataEnvrn->HolidayIndex > 0) {
+            DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(7 + state.dataEnvrn->HolidayIndex);
         } else {
             DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(CurDayofWeek);
         }

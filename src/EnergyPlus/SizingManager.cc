@@ -1933,7 +1933,7 @@ namespace SizingManager {
         int dayOfWeekType(1); // assume year starts on Sunday
         WeatherManager::CalcSpecialDayTypes(state);
         for (int DayLoop = 1; DayLoop <= DaysInYear; ++DayLoop) { // loop over all days in year
-            DataEnvironment::HolidayIndex = state.dataWeatherManager->SpecialDayTypes(DayLoop);
+            state.dataEnvrn->HolidayIndex = state.dataWeatherManager->SpecialDayTypes(DayLoop);
             state.dataEnvrn->DayOfYear_Schedule = DayLoop;
             state.dataEnvrn->DayOfWeek = dayOfWeekType;
             ++dayOfWeekType;

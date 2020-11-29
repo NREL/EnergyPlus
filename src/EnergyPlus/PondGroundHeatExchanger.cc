@@ -348,7 +348,7 @@ namespace PondGroundHeatExchanger {
 
         if (!DataEnvironment::GroundTemp_DeepObjInput) {
             ShowWarningError(state, "GetPondGroundHeatExchanger:  No \"Site:GroundTemperature:Deep\" were input.");
-            ShowContinueError(state, format("Defaults, constant throughout the year of ({:.1R}) will be used.", DataEnvironment::GroundTemp_Deep));
+            ShowContinueError(state, format("Defaults, constant throughout the year of ({:.1R}) will be used.", state.dataEnvrn->GroundTemp_Deep));
         }
     }
 
@@ -400,7 +400,7 @@ namespace PondGroundHeatExchanger {
         if (this->OneTimeFlag || state.dataGlobal->WarmupFlag) {
             // initialize pond temps to mean of drybulb and ground temps.
             this->BulkTemperature = this->PastBulkTemperature =
-                0.5 * (DataEnvironment::OutDryBulbTempAt(state, PondHeight) + DataEnvironment::GroundTemp_Deep);
+                0.5 * (DataEnvironment::OutDryBulbTempAt(state, PondHeight) + state.dataEnvrn->GroundTemp_Deep);
             this->OneTimeFlag = false;
         }
 
@@ -584,7 +584,7 @@ namespace PondGroundHeatExchanger {
         Real64 OutWetBulb = DataEnvironment::OutWetBulbTempAt(state, PondHeight);
 
         Real64 ExternalTemp; // external environmental temp - drybulb or wetbulb
-        if (DataEnvironment::IsSnow || DataEnvironment::IsRain) {
+        if (state.dataEnvrn->IsSnow || state.dataEnvrn->IsRain) {
             ExternalTemp = OutWetBulb;
         } else { // normal dry conditions
             ExternalTemp = OutDryBulb;
@@ -635,7 +635,7 @@ namespace PondGroundHeatExchanger {
         Real64 UvalueGround = 0.999 * (this->GrndConductivity / this->Depth) + 1.37 * (this->GrndConductivity * Perimeter / this->Area);
 
         // ground heat transfer flux
-        Real64 FluxGround = UvalueGround * (PondBulkTemp - DataEnvironment::GroundTemp_Deep);
+        Real64 FluxGround = UvalueGround * (PondBulkTemp - state.dataEnvrn->GroundTemp_Deep);
 
         CalcTotalFLux = Qfluid + this->Area * (FluxSolAbsorbed - FluxConvect - FluxLongwave - FluxEvap - FluxGround);
 

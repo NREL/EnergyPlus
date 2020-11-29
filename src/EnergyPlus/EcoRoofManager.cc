@@ -319,7 +319,7 @@ namespace EcoRoofManager {
 
         RS = state.dataEnvrn->BeamSolarRad + AnisoSkyMult(SurfNum) * state.dataEnvrn->DifSolarRad;
 
-        Latm = 1.0 * Sigma * 1.0 * Surface(SurfNum).ViewFactorGround * pow_4(GroundTempKelvin) +
+        Latm = 1.0 * Sigma * 1.0 * Surface(SurfNum).ViewFactorGround * pow_4(state.dataEnvrn->GroundTempKelvin) +
                1.0 * Sigma * 1.0 * Surface(SurfNum).ViewFactorSky * pow_4(SkyTempKelvin);
 
         if (EcoRoofbeginFlag) {

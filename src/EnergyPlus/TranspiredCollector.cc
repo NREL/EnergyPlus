@@ -810,7 +810,7 @@ namespace TranspiredCollector {
 
         // determine average ambient temperature
         Real64 const surfaceArea(sum_sub(Surface, &SurfaceData::Area, state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs));
-        if (!DataEnvironment::IsRain) {
+        if (!state.dataEnvrn->IsRain) {
             Tamb = sum_product_sub(Surface, &SurfaceData::OutDryBulbTemp, &SurfaceData::Area, state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) / surfaceArea;
         } else { // when raining we use wet bulb not drybulb
             Tamb = sum_product_sub(Surface, &SurfaceData::OutWetBulbTemp, &SurfaceData::Area, state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) / surfaceArea;
@@ -853,7 +853,6 @@ namespace TranspiredCollector {
 
         // Using/Aliasing
         using ConvectionCoefficients::InitExteriorConvectionCoeff;
-        using DataEnvironment::IsRain;
         using DataEnvironment::OutBaroPress;
         using DataEnvironment::OutHumRat;
         using DataEnvironment::SkyTemp;
@@ -947,7 +946,7 @@ namespace TranspiredCollector {
         // Active UTSC calculation
         // first do common things for both correlations
         Real64 const surfaceArea(sum_sub(Surface, &SurfaceData::Area, state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs));
-        if (!IsRain) {
+        if (!state.dataEnvrn->IsRain) {
             //			Tamb = sum( Surface( UTSC( UTSCNum ).SurfPtrs ).OutDryBulbTemp * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / sum(
             // Surface(  UTSC(  UTSCNum ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
             Tamb = sum_product_sub(Surface, &SurfaceData::OutDryBulbTemp, &SurfaceData::Area, state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) /
@@ -1083,7 +1082,7 @@ namespace TranspiredCollector {
             HcWind = 0.0;
         }
 
-        if (IsRain) HcWind = 1000.0;
+        if (state.dataEnvrn->IsRain) HcWind = 1000.0;
 
         HXeff = 0.0; // init
 

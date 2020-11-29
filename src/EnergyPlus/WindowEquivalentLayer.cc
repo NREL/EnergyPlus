@@ -660,7 +660,6 @@ namespace WindowEquivalentLayer {
         // uses the solar-thermal routine developed for ASHRAE RP-1311 (ASHWAT Model).
 
         using DataBSDFWindow::noCondition;
-        using DataEnvironment::IsRain;
         using DataEnvironment::SkyTempKelvin;
         using DataLoopNode::Node;
         using DataZoneEquipment::ZoneEquipConfig;
@@ -842,7 +841,7 @@ namespace WindowEquivalentLayer {
                     }
                 }
                 if (Surface(SurfNum).ExtWind) { // Window is exposed to wind (and possibly rain)
-                    if (IsRain) {               // Raining: since wind exposed, outside window surface gets wet
+                    if (state.dataEnvrn->IsRain) {               // Raining: since wind exposed, outside window surface gets wet
                         Tout = Surface(SurfNum).OutWetBulbTemp + DataGlobalConstants::KelvinConv();
                     } else { // Dry
                         Tout = Surface(SurfNum).OutDryBulbTemp + DataGlobalConstants::KelvinConv();

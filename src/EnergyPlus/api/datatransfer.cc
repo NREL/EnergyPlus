@@ -677,8 +677,9 @@ int zoneTimeStepNum([[maybe_unused]] EnergyPlusState state)
     return thisState->dataGlobal->TimeStep;
 }
 
-int holidayIndex(EnergyPlusState) {
-    return EnergyPlus::DataEnvironment::HolidayIndex;
+int holidayIndex(EnergyPlusState state) {
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    return thisState->dataEnvrn->HolidayIndex;
 }
 
 int sunIsUp(EnergyPlusState) { // maintain response convention from previous (EMS) implementation
@@ -689,8 +690,9 @@ int sunIsUp(EnergyPlusState) { // maintain response convention from previous (EM
     }
 }
 
-int isRaining(EnergyPlusState) {
-    if (EnergyPlus::DataEnvironment::IsRain) {
+int isRaining(EnergyPlusState state) {
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    if (thisState->dataEnvrn->IsRain) {
         return 1;
     } else {
         return 0;

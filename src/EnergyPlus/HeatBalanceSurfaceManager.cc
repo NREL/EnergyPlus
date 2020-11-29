@@ -2255,8 +2255,8 @@ namespace HeatBalanceSurfaceManager {
 
             } else if (Surface(SurfNum).ExtBoundCond == GroundFCfactorMethod) {
 
-                THM(1, {1, state.dataConstruction->Construct(Surface(SurfNum).Construction).NumCTFTerms + 1}, SurfNum) = GroundTempFC;
-                TH(1, {1, state.dataConstruction->Construct(Surface(SurfNum).Construction).NumCTFTerms + 1}, SurfNum) = GroundTempFC;
+                THM(1, {1, state.dataConstruction->Construct(Surface(SurfNum).Construction).NumCTFTerms + 1}, SurfNum) = state.dataEnvrn->GroundTempFC;
+                TH(1, {1, state.dataConstruction->Construct(Surface(SurfNum).Construction).NumCTFTerms + 1}, SurfNum) = state.dataEnvrn->GroundTempFC;
             }
 
             if (Surface(SurfNum).ExtCavityPresent) {
@@ -5711,7 +5711,7 @@ namespace HeatBalanceSurfaceManager {
                         // Added for FCfactor grounds
                     } else if (SELECT_CASE_var == GroundFCfactorMethod) { // Surface in contact with ground
 
-                        TH(1, 1, SurfNum) = GroundTempFC;
+                        TH(1, 1, SurfNum) = state.dataEnvrn->GroundTempFC;
 
                         // Set the only radiant system heat balance coefficient that is non-zero for this case
                         if (state.dataConstruction->Construct(ConstrNum).SourceSinkPresent)
@@ -5719,13 +5719,13 @@ namespace HeatBalanceSurfaceManager {
 
                         if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_HAMT) {
                             // Set variables used in the HAMT moisture balance
-                            TempOutsideAirFD(SurfNum) = GroundTempFC;
-                            RhoVaporAirOut(SurfNum) = PsyRhovFnTdbRh(state, GroundTempFC, 1.0, HBSurfManGroundHAMT);
+                            TempOutsideAirFD(SurfNum) = state.dataEnvrn->GroundTempFC;
+                            RhoVaporAirOut(SurfNum) = PsyRhovFnTdbRh(state, state.dataEnvrn->GroundTempFC, 1.0, HBSurfManGroundHAMT);
                             HConvExtFD(SurfNum) = HighHConvLimit;
 
                             HMassConvExtFD(SurfNum) = HConvExtFD(SurfNum) /
-                                                      ((PsyRhoAirFnPbTdbW(state, OutBaroPress, GroundTempFC,
-                                                                          PsyWFnTdbRhPb(state, GroundTempFC, 1.0, OutBaroPress,
+                                                      ((PsyRhoAirFnPbTdbW(state, OutBaroPress, state.dataEnvrn->GroundTempFC,
+                                                                          PsyWFnTdbRhPb(state, state.dataEnvrn->GroundTempFC, 1.0, OutBaroPress,
                                                                                         RoutineNameGroundTempFC)) +
                                                         RhoVaporAirOut(SurfNum)) * PsyCpAirFnW(OutHumRat));
 
@@ -5736,12 +5736,12 @@ namespace HeatBalanceSurfaceManager {
 
                         if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CondFD) {
                             // Set variables used in the FD moisture balance
-                            TempOutsideAirFD(SurfNum) = GroundTempFC;
-                            RhoVaporAirOut(SurfNum) = PsyRhovFnTdbRhLBnd0C(GroundTempFC, 1.0);
+                            TempOutsideAirFD(SurfNum) = state.dataEnvrn->GroundTempFC;
+                            RhoVaporAirOut(SurfNum) = PsyRhovFnTdbRhLBnd0C(state.dataEnvrn->GroundTempFC, 1.0);
                             HConvExtFD(SurfNum) = HighHConvLimit;
                             HMassConvExtFD(SurfNum) = HConvExtFD(SurfNum) /
-                                                      ((PsyRhoAirFnPbTdbW(state, OutBaroPress, GroundTempFC,
-                                                                          PsyWFnTdbRhPb(state, GroundTempFC, 1.0, OutBaroPress,
+                                                      ((PsyRhoAirFnPbTdbW(state, OutBaroPress, state.dataEnvrn->GroundTempFC,
+                                                                          PsyWFnTdbRhPb(state, state.dataEnvrn->GroundTempFC, 1.0, OutBaroPress,
                                                                                         RoutineNameGroundTempFC)) +
                                                         RhoVaporAirOut(SurfNum)) * PsyCpAirFnW(OutHumRat));
                             HSkyFD(SurfNum) = HSky;
@@ -5971,7 +5971,7 @@ namespace HeatBalanceSurfaceManager {
                                                         HSkyExtSurf(SurfNum), HGrdExtSurf(SurfNum),
                                                         HAirExtSurf(SurfNum));
 
-                            if (IsRain) { // Raining: since wind exposed, outside surface gets wet
+                            if (state.dataEnvrn->IsRain) { // Raining: since wind exposed, outside surface gets wet
 
                                 if (Surface(SurfNum).ExtConvCoeff <= 0) { // Reset HcExtSurf because of wetness
                                     HcExtSurf(SurfNum) = 1000.0;
@@ -6163,7 +6163,7 @@ namespace HeatBalanceSurfaceManager {
 
                 // fill in reporting values for outside face
 
-                QdotConvOutRepPerArea(SurfNum) = GetQdotConvOutRepPerArea(SurfNum);
+                QdotConvOutRepPerArea(SurfNum) = GetQdotConvOutRepPerArea(state, SurfNum);
 
                 QdotConvOutRep(SurfNum) = QdotConvOutRepPerArea(SurfNum) * Surface(SurfNum).Area;
 
@@ -6174,13 +6174,13 @@ namespace HeatBalanceSurfaceManager {
         } // ...end of DO loop over all surface (actually heat transfer surfaces)
     }
 
-    Real64 GetQdotConvOutRepPerArea(int const SurfNum)
+    Real64 GetQdotConvOutRepPerArea(EnergyPlusData &state, int const SurfNum)
     {
         int OPtr = Surface(SurfNum).OSCMPtr;
         if (Surface(SurfNum).OSCMPtr > 0) { // Optr is set above in this case, use OSCM boundary data
             return -OSCM(OPtr).HConv * (TH(1, 1, SurfNum) - OSCM(OPtr).TConv);
         } else {
-            if (IsRain) {
+            if (state.dataEnvrn->IsRain) {
                 return -HcExtSurf(SurfNum) * (TH(1, 1, SurfNum) - Surface(SurfNum).OutWetBulbTemp);
             } else {
                 return -HcExtSurf(SurfNum) * (TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp);
@@ -6863,7 +6863,7 @@ namespace HeatBalanceSurfaceManager {
                                                                                     HGrdExtSurf(SurfNum),
                                                                                     HAirExtSurf(SurfNum));
 
-                                if (IsRain) {                    // Raining: since wind exposed, outside window surface gets wet
+                                if (state.dataEnvrn->IsRain) {                    // Raining: since wind exposed, outside window surface gets wet
                                     HcExtSurf(SurfNum) = 1000.0; // Reset HcExtSurf because of wetness
                                 }
 
@@ -7573,7 +7573,7 @@ namespace HeatBalanceSurfaceManager {
                                                                                         HGrdExtSurf(surfNum),
                                                                                         HAirExtSurf(surfNum));
 
-                                    if (IsRain) {                    // Raining: since wind exposed, outside window surface gets wet
+                                    if (state.dataEnvrn->IsRain) {                    // Raining: since wind exposed, outside window surface gets wet
                                         HcExtSurf(surfNum) = 1000.0; // Reset HcExtSurf because of wetness
                                     }
 
@@ -8244,7 +8244,6 @@ namespace HeatBalanceSurfaceManager {
         // na
 
         // Using/Aliasing
-        using DataEnvironment::IsRain;
         using DataEnvironment::OutBaroPress;
         using DataEnvironment::SkyTemp;
         using DataEnvironment::SunIsUp;

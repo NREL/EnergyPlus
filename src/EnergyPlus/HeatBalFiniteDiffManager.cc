@@ -96,7 +96,6 @@ namespace HeatBalFiniteDiffManager {
 
     // Using/Aliasing
     using namespace DataMoistureBalance;
-    using DataEnvironment::IsRain;
     using DataEnvironment::SkyTemp;
     using DataHeatBalance::Air;
     using DataHeatBalance::SurfQRadThermInAbs;
@@ -1441,7 +1440,7 @@ namespace HeatBalFiniteDiffManager {
             Tsky = SkyTemp;
         }
 
-        if (surface_ExtBoundCond == Ground || IsRain) {
+        if (surface_ExtBoundCond == Ground || state.dataEnvrn->IsRain) {
             TDT(i) = TT(i) = TempOutsideAirFD(Surf);
             RhoT(i) = RhoVaporAirOut(Surf);
             SurfaceFD(Surf).CpDelXRhoS1(i) = 0.0;  // Outside face  does not have an outer half node

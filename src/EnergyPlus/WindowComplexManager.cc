@@ -99,7 +99,6 @@ namespace WindowComplexManager {
     using namespace DataBSDFWindow;
     using namespace DataSurfaces; // , ONLY: TotSurfaces,TotWindows,Surface,SurfaceWindow   !update this later
     using DataEnvironment::CloudFraction;
-    using DataEnvironment::IsRain;
     using DataEnvironment::OutBaroPress;
     using DataEnvironment::OutHumRat;
     using DataEnvironment::SkyTempKelvin;
@@ -2906,7 +2905,7 @@ namespace WindowComplexManager {
                     }
                 }
                 if (Surface(SurfNum).ExtWind) { // Window is exposed to wind (and possibly rain)
-                    if (IsRain) {               // Raining: since wind exposed, outside window surface gets wet
+                    if (state.dataEnvrn->IsRain) {               // Raining: since wind exposed, outside window surface gets wet
                         tout = Surface(SurfNum).OutWetBulbTemp + DataGlobalConstants::KelvinConv();
                     } else { // Dry
                         tout = Surface(SurfNum).OutDryBulbTemp + DataGlobalConstants::KelvinConv();
