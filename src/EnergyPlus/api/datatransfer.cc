@@ -616,8 +616,9 @@ int year(EnergyPlusState) {
     return EnergyPlus::DataEnvironment::Year;
 }
 
-int month(EnergyPlusState) {
-    return EnergyPlus::DataEnvironment::Month;
+int month(EnergyPlusState state) {
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    return thisState->dataEnvrn->Month;
 }
 
 int dayOfMonth(EnergyPlusState state) {

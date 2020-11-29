@@ -139,7 +139,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest)
     ZoneEquipConfig(ZoneNum).ReturnNodeInletNum(1) = 1;
     // Avoid zero values in volume flow balance check
     DataEnvironment::StdRhoAir = 1.2;
-    DataEnvironment::OutBaroPress = 100000.0;
+    state->dataEnvrn->OutBaroPress = 100000.0;
     Node(ZoneEquipConfig(ZoneNum).ZoneNode).Temp = 20.0;
     Node(ZoneEquipConfig(ZoneNum).ZoneNode).HumRat = 0.004;
 
@@ -416,7 +416,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_MultiCrossMixingTest)
     ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex(*state, "DELTATEMP")).CurrentValue = 2.0;
     ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex(*state, "MINOUTDOORTEMP")).CurrentValue = -100.0;
     ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex(*state, "MAXOUTDOORTEMP")).CurrentValue = 100.0;
-    DataEnvironment::OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
 
     InitSimpleMixingConvectiveHeatGains(*state);
 
@@ -538,7 +538,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest2)
 
     // Avoid zero values in volume flow balance check
     DataEnvironment::StdRhoAir = 1.2;
-    DataEnvironment::OutBaroPress = 100000.0;
+    state->dataEnvrn->OutBaroPress = 100000.0;
     Node(ZoneEquipConfig(ZoneNum).ZoneNode).Temp = 20.0;
     Node(ZoneEquipConfig(ZoneNum).ZoneNode).HumRat = 0.004;
 
@@ -670,7 +670,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest3)
 
     // Avoid zero values in volume flow balance check
     DataEnvironment::StdRhoAir = 1.2;
-    DataEnvironment::OutBaroPress = 100000.0;
+    state->dataEnvrn->OutBaroPress = 100000.0;
     Node(ZoneEquipConfig(ZoneNum).ZoneNode).Temp = 20.0;
     Node(ZoneEquipConfig(ZoneNum).ZoneNode).HumRat = 0.004;
 
@@ -772,7 +772,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest4)
 
     // Avoid zero values in volume flow balance check
     DataEnvironment::StdRhoAir = 1.2;
-    DataEnvironment::OutBaroPress = 100000.0;
+    state->dataEnvrn->OutBaroPress = 100000.0;
     Node(ZoneEquipConfig(ZoneNum).ZoneNode).Temp = 20.0;
     Node(ZoneEquipConfig(ZoneNum).ZoneNode).HumRat = 0.004;
 

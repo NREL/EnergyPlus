@@ -156,7 +156,7 @@ namespace OutputProcessor {
         state->dataGlobal->DayOfSim = 1;
         state->dataGlobal->DayOfSimChr = "1";
         state->dataGlobal->HourOfDay = 1;
-        DataEnvironment::Month = 12;
+        state->dataEnvrn->Month = 12;
         state->dataEnvrn->DayOfMonth = 21;
         state->dataEnvrn->DSTIndicator = 0;
         state->dataEnvrn->DayOfWeek = 2;
@@ -222,7 +222,7 @@ namespace OutputProcessor {
         state->dataGlobal->DayOfSim = 1;
         state->dataGlobal->DayOfSimChr = "1";
         state->dataGlobal->HourOfDay = 1;
-        DataEnvironment::Month = 12;
+        state->dataEnvrn->Month = 12;
         state->dataEnvrn->DayOfMonth = 21;
         state->dataEnvrn->DSTIndicator = 0;
         state->dataEnvrn->DayOfWeek = 2;
@@ -286,7 +286,7 @@ namespace OutputProcessor {
         state->dataGlobal->DayOfSim = 1;
         state->dataGlobal->DayOfSimChr = "1";
         state->dataGlobal->HourOfDay = 1;
-        DataEnvironment::Month = 12;
+        state->dataEnvrn->Month = 12;
         state->dataEnvrn->DayOfMonth = 21;
         state->dataEnvrn->DSTIndicator = 0;
         state->dataEnvrn->DayOfWeek = 2;
@@ -354,7 +354,7 @@ namespace OutputProcessor {
         state->dataGlobal->DayOfSim = 1;
         state->dataGlobal->DayOfSimChr = "1";
         state->dataGlobal->HourOfDay = 1;
-        DataEnvironment::Month = 12;
+        state->dataEnvrn->Month = 12;
         state->dataEnvrn->DayOfMonth = 21;
         state->dataEnvrn->DSTIndicator = 0;
         state->dataEnvrn->DayOfWeek = 2;
@@ -426,7 +426,7 @@ namespace OutputProcessor {
         state->dataGlobal->DayOfSim = 1;
         state->dataGlobal->DayOfSimChr = "1";
         state->dataGlobal->HourOfDay = 1;
-        DataEnvironment::Month = 12;
+        state->dataEnvrn->Month = 12;
         state->dataEnvrn->DayOfMonth = 21;
         state->dataEnvrn->DSTIndicator = 0;
         state->dataEnvrn->DayOfWeek = 2;
@@ -498,7 +498,7 @@ namespace OutputProcessor {
         state->dataGlobal->DayOfSim = 1;
         state->dataGlobal->DayOfSimChr = "1";
         state->dataGlobal->HourOfDay = 1;
-        DataEnvironment::Month = 12;
+        state->dataEnvrn->Month = 12;
         state->dataEnvrn->DayOfMonth = 21;
         state->dataEnvrn->DSTIndicator = 0;
         state->dataEnvrn->DayOfWeek = 2;
@@ -572,7 +572,7 @@ namespace OutputProcessor {
         state->dataGlobal->HourOfDay = 1;
         state->dataGlobal->CalendarYear = 2017;
         state->dataGlobal->CalendarYearChr = "2017";
-        DataEnvironment::Month = 12;
+        state->dataEnvrn->Month = 12;
         state->dataEnvrn->DayOfMonth = 21;
         state->dataEnvrn->DSTIndicator = 0;
         state->dataEnvrn->DayOfWeek = 2;
@@ -3511,7 +3511,7 @@ namespace OutputProcessor {
 
         GetReportVariableInput(*state);
         SetupOutputVariable(*state,
-            "Site Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, DataEnvironment::OutDryBulbTemp, "Zone", "Average", "Environment");
+            "Site Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, state->dataEnvrn->OutDryBulbTemp, "Zone", "Average", "Environment");
 
         auto reportDataDictionaryResults = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
 
@@ -4112,7 +4112,7 @@ namespace OutputProcessor {
 
         state->dataGlobal->DayOfSim = 365;
         state->dataGlobal->DayOfSimChr = "365";
-        DataEnvironment::Month = 12;
+        state->dataEnvrn->Month = 12;
         state->dataEnvrn->DayOfMonth = 31;
         state->dataEnvrn->DSTIndicator = 0;
         state->dataEnvrn->DayOfWeek = 3;
@@ -4131,7 +4131,7 @@ namespace OutputProcessor {
             }
         }
 
-        if (state->dataEnvrn->DayOfMonth == state->dataWeatherManager->EndDayOfMonth(DataEnvironment::Month)) {
+        if (state->dataEnvrn->DayOfMonth == state->dataWeatherManager->EndDayOfMonth(state->dataEnvrn->Month)) {
             state->dataEnvrn->EndMonthFlag = true;
         }
 
@@ -4147,7 +4147,7 @@ namespace OutputProcessor {
 
         GetReportVariableInput(*state);
         SetupOutputVariable(*state,
-            "Site Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, DataEnvironment::OutDryBulbTemp, "Zone", "Average", "Environment");
+            "Site Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, state->dataEnvrn->OutDryBulbTemp, "Zone", "Average", "Environment");
         Real64 light_consumption = 999;
         SetupOutputVariable(*state, "Lights Electricity Energy",
                             OutputProcessor::Unit::J,
@@ -4356,7 +4356,7 @@ namespace OutputProcessor {
 
         state->dataGlobal->DayOfSim = 365;
         state->dataGlobal->DayOfSimChr = "365";
-        DataEnvironment::Month = 12;
+        state->dataEnvrn->Month = 12;
         state->dataEnvrn->DayOfMonth = 31;
         state->dataEnvrn->DSTIndicator = 0;
         state->dataEnvrn->DayOfWeek = 3;
@@ -4375,7 +4375,7 @@ namespace OutputProcessor {
             }
         }
 
-        if (state->dataEnvrn->DayOfMonth == state->dataWeatherManager->EndDayOfMonth(DataEnvironment::Month)) {
+        if (state->dataEnvrn->DayOfMonth == state->dataWeatherManager->EndDayOfMonth(state->dataEnvrn->Month)) {
             state->dataEnvrn->EndMonthFlag = true;
         }
 
@@ -4391,7 +4391,7 @@ namespace OutputProcessor {
 
         GetReportVariableInput(*state);
         SetupOutputVariable(*state,
-            "Site Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, DataEnvironment::OutDryBulbTemp, "Zone", "Average", "Environment");
+            "Site Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, state->dataEnvrn->OutDryBulbTemp, "Zone", "Average", "Environment");
         Real64 light_consumption = 999;
         SetupOutputVariable(*state, "Lights Electricity Energy",
                             OutputProcessor::Unit::J,
@@ -4613,7 +4613,7 @@ namespace OutputProcessor {
 
         state->dataGlobal->DayOfSim = 365;
         state->dataGlobal->DayOfSimChr = "365";
-        DataEnvironment::Month = 12;
+        state->dataEnvrn->Month = 12;
         state->dataEnvrn->DayOfMonth = 31;
         state->dataEnvrn->DSTIndicator = 0;
         state->dataEnvrn->DayOfWeek = 3;
@@ -4632,7 +4632,7 @@ namespace OutputProcessor {
             }
         }
 
-        if (state->dataEnvrn->DayOfMonth == state->dataWeatherManager->EndDayOfMonth(DataEnvironment::Month)) {
+        if (state->dataEnvrn->DayOfMonth == state->dataWeatherManager->EndDayOfMonth(state->dataEnvrn->Month)) {
             state->dataEnvrn->EndMonthFlag = true;
         }
 
@@ -4648,7 +4648,7 @@ namespace OutputProcessor {
 
         GetReportVariableInput(*state);
         SetupOutputVariable(*state,
-            "Site Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, DataEnvironment::OutDryBulbTemp, "Zone", "Average", "Environment");
+            "Site Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, state->dataEnvrn->OutDryBulbTemp, "Zone", "Average", "Environment");
         Real64 light_consumption = 999;
         SetupOutputVariable(*state, "Lights Electricity Energy",
                             OutputProcessor::Unit::J,
@@ -4818,7 +4818,7 @@ namespace OutputProcessor {
         // Setup so that UpdateDataandReport can be called.
         state->dataGlobal->DayOfSim = 365;
         state->dataGlobal->DayOfSimChr = "365";
-        DataEnvironment::Month = 12;
+        state->dataEnvrn->Month = 12;
         state->dataEnvrn->DayOfMonth = 31;
         state->dataEnvrn->DSTIndicator = 0;
         state->dataEnvrn->DayOfWeek = 3;
@@ -4837,7 +4837,7 @@ namespace OutputProcessor {
             }
         }
 
-        if (state->dataEnvrn->DayOfMonth == state->dataWeatherManager->EndDayOfMonth(DataEnvironment::Month)) {
+        if (state->dataEnvrn->DayOfMonth == state->dataWeatherManager->EndDayOfMonth(state->dataEnvrn->Month)) {
             state->dataEnvrn->EndMonthFlag = true;
         }
         // OutputProcessor::TimeValue.allocate(2);
@@ -4958,7 +4958,7 @@ namespace OutputProcessor {
 
         state->dataGlobal->DayOfSim = 365;
         state->dataGlobal->DayOfSimChr = "365";
-        DataEnvironment::Month = 12;
+        state->dataEnvrn->Month = 12;
         state->dataEnvrn->DayOfMonth = 31;
         state->dataEnvrn->DSTIndicator = 0;
         state->dataEnvrn->DayOfWeek = 3;
@@ -4977,7 +4977,7 @@ namespace OutputProcessor {
             }
         }
 
-        if (state->dataEnvrn->DayOfMonth == state->dataWeatherManager->EndDayOfMonth(DataEnvironment::Month)) {
+        if (state->dataEnvrn->DayOfMonth == state->dataWeatherManager->EndDayOfMonth(state->dataEnvrn->Month)) {
             state->dataEnvrn->EndMonthFlag = true;
         }
 
@@ -4993,7 +4993,7 @@ namespace OutputProcessor {
 
         GetReportVariableInput(*state);
         SetupOutputVariable(*state,
-            "Site Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, DataEnvironment::OutDryBulbTemp, "Zone", "Average", "Environment");
+            "Site Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, state->dataEnvrn->OutDryBulbTemp, "Zone", "Average", "Environment");
         Real64 light_consumption = 999;
         SetupOutputVariable(*state, "Lights Electricity Energy",
                             OutputProcessor::Unit::J,
@@ -5036,7 +5036,7 @@ namespace OutputProcessor {
 
         state->dataGlobal->DayOfSim = 365;
         state->dataGlobal->DayOfSimChr = "365";
-        DataEnvironment::Month = 12;
+        state->dataEnvrn->Month = 12;
         state->dataEnvrn->DayOfMonth = 31;
         state->dataEnvrn->DSTIndicator = 0;
         state->dataEnvrn->DayOfWeek = 3;
@@ -5055,7 +5055,7 @@ namespace OutputProcessor {
             }
         }
 
-        if (state->dataEnvrn->DayOfMonth == state->dataWeatherManager->EndDayOfMonth(DataEnvironment::Month)) {
+        if (state->dataEnvrn->DayOfMonth == state->dataWeatherManager->EndDayOfMonth(state->dataEnvrn->Month)) {
             state->dataEnvrn->EndMonthFlag = true;
         }
 
@@ -5074,7 +5074,7 @@ namespace OutputProcessor {
 
         GetReportVariableInput(*state);
         SetupOutputVariable(*state,
-            "Site Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, DataEnvironment::OutDryBulbTemp, "Zone", "Average", "Environment");
+            "Site Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, state->dataEnvrn->OutDryBulbTemp, "Zone", "Average", "Environment");
         Real64 light_consumption = 999;
         SetupOutputVariable(*state, "Lights Electricity Energy",
                             OutputProcessor::Unit::J,

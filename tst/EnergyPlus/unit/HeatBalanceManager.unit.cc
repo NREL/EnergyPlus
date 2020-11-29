@@ -543,7 +543,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
 
     // Avoid zero values in volume flow balance check
     DataEnvironment::StdRhoAir = 1.2;
-    DataEnvironment::OutBaroPress = 100000.0;
+    state->dataEnvrn->OutBaroPress = 100000.0;
     Node(ZoneEquipConfig(1).ZoneNode).Temp = 20.0;
     Node(ZoneEquipConfig(1).ZoneNode).HumRat = 0.004;
     Node(ZoneEquipConfig(2).ZoneNode).Temp = 20.0;
@@ -1259,7 +1259,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
 
     // Set up
     OutAirNodeManager::GetOutAirNodesInput(*state);
-    DataEnvironment::OutBaroPress = 101325;
+    state->dataEnvrn->OutBaroPress = 101325;
     ScheduleManager::Schedule(1).CurrentValue = 25.0;
     ScheduleManager::Schedule(2).CurrentValue = 20.0;
     ScheduleManager::Schedule(3).CurrentValue = 1.5;
@@ -1288,7 +1288,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
     DataLoopNode::Node(1).OutAirWetBulbSchedNum = 0;
     DataLoopNode::Node(1).OutAirWindSpeedSchedNum = 0;
     DataLoopNode::Node(1).OutAirWindDirSchedNum = 0;
-    DataEnvironment::OutDryBulbTemp = 25.0;
+    state->dataEnvrn->OutDryBulbTemp = 25.0;
     DataEnvironment::OutWetBulbTemp = 20.0;
     DataEnvironment::WindSpeed = 1.5;
     DataEnvironment::WindDir = 90.0;

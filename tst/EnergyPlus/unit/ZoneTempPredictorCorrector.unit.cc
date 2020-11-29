@@ -56,7 +56,6 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <AirflowNetwork/Elements.hpp>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
@@ -71,7 +70,6 @@
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HybridModel.hh>
 #include <EnergyPlus/IOFiles.hh>
-#include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -139,7 +137,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     SumLatentHTRadSys(1) = 0.0;
     SumLatentPool.allocate(1);
     SumLatentPool(1) = 0.0;
-    OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
     ZT.allocate(1); // Zone temperature C
     ZT(1) = 24.0;
     ZoneAirHumRat.allocate(1);
@@ -996,7 +994,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CalcZoneSums_SurfConvection
     SumLatentHTRadSys(1) = 0.0;
     SumLatentPool.allocate(1);
     SumLatentPool(1) = 0.0;
-    OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
     MAT.allocate(1); // Zone temperature C
     MAT(1) = 24.0;
     ZoneAirHumRat.allocate(1);
@@ -1156,7 +1154,7 @@ TEST_F(EnergyPlusFixture, temperatureAndCountInSch_test)
     std::string monthAssumed;
     const int wednesday = 4;
 
-    DataEnvironment::Latitude = 30.; // northern hemisphere
+    state->dataEnvrn->Latitude = 30.; // northern hemisphere
     int sched1Index = GetScheduleIndex(*state, "SCHED1");
     std::tie(valueAtTime, numDays, monthAssumed) = temperatureAndCountInSch(*state, sched1Index, false, wednesday, 11);
 
@@ -1168,14 +1166,14 @@ TEST_F(EnergyPlusFixture, temperatureAndCountInSch_test)
     std::tie(valueAtTime, numDays, monthAssumed) = temperatureAndCountInSch(*state, sched1Index, true, wednesday, 11);
     EXPECT_EQ("July", monthAssumed);
 
-    DataEnvironment::Latitude = -30.; // southern hemisphere
+    state->dataEnvrn->Latitude = -30.; // southern hemisphere
     std::tie(valueAtTime, numDays, monthAssumed) = temperatureAndCountInSch(*state, sched1Index, false, wednesday, 11);
     EXPECT_EQ("July", monthAssumed);
 
     std::tie(valueAtTime, numDays, monthAssumed) = temperatureAndCountInSch(*state, sched1Index, true, wednesday, 11);
     EXPECT_EQ("January", monthAssumed);
 
-    DataEnvironment::Latitude = 30.; // northern hemisphere
+    state->dataEnvrn->Latitude = 30.; // northern hemisphere
     int sched2Index = GetScheduleIndex(*state, "SCHED2");
     std::tie(valueAtTime, numDays, monthAssumed) = temperatureAndCountInSch(*state, sched2Index, false, wednesday, 11);
 

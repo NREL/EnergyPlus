@@ -765,7 +765,7 @@ namespace SurfaceGeometry {
         SetupEnclosuresAndAirBoundaries(state, DataViewFactorInformation::ZoneSolarInfo, SurfaceGeometry::enclosureType::SolarEnclosures, ErrorsFound);
 
         // Do the Stratosphere check
-        SetZoneOutBulbTempAt();
+        SetZoneOutBulbTempAt(state);
         CheckZoneOutBulbTempAt(state);
     }
 
@@ -8927,8 +8927,8 @@ namespace SurfaceGeometry {
 
             // Check for reversal of on and off times
             if (SurfNum > 0) {
-                if ((Latitude > 0.0 && (StormWindow(StormWinNum).MonthOn < StormWindow(StormWinNum).MonthOff)) ||
-                    (Latitude <= 0.0 && (StormWindow(StormWinNum).MonthOn > StormWindow(StormWinNum).MonthOff))) {
+                if ((state.dataEnvrn->Latitude > 0.0 && (StormWindow(StormWinNum).MonthOn < StormWindow(StormWinNum).MonthOff)) ||
+                    (state.dataEnvrn->Latitude <= 0.0 && (StormWindow(StormWinNum).MonthOn > StormWindow(StormWinNum).MonthOff))) {
                     ShowWarningError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" check times that storm window");
                     ShowContinueError(state,
                                       format("is put on (month={}, day={}) and taken off (month={}, day={});",
@@ -8936,7 +8936,7 @@ namespace SurfaceGeometry {
                                              StormWindow(StormWinNum).DayOfMonthOn,
                                              StormWindow(StormWinNum).MonthOff,
                                              StormWindow(StormWinNum).DayOfMonthOff));
-                    ShowContinueError(state, format("these times may be reversed for your building latitude={:.2R} deg.", Latitude));
+                    ShowContinueError(state, format("these times may be reversed for your building latitude={:.2R} deg.", state.dataEnvrn->Latitude));
                 }
             }
         }

@@ -5625,7 +5625,7 @@ namespace PlantChillers {
 
             Real64 AmbientDeltaT; // (ATAIR) Difference between ambient actual and ambient design temperatures
             if (this->CondenserType == DataPlant::CondenserType::WATERCOOLED) {
-                AmbientDeltaT = DataEnvironment::OutDryBulbTemp - 25.0;
+                AmbientDeltaT = state.dataEnvrn->OutDryBulbTemp - 25.0;
             } else { // air or evap cooled
                 AmbientDeltaT = DataLoopNode::Node(this->CondInletNodeNum).OutAirDryBulb - 25.0;
             }

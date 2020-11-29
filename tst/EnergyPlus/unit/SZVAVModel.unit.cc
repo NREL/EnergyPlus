@@ -54,10 +54,8 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/CurveManager.hh>
-#include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/DataBranchNodeConnections.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -77,7 +75,6 @@
 #include <EnergyPlus/ReportCoilSelection.hh>
 #include <EnergyPlus/SZVAVModel.hh>
 #include <EnergyPlus/ScheduleManager.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterCoils.hh>
 
 using namespace EnergyPlus;
@@ -90,7 +87,6 @@ using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataZoneEquipment;
 using namespace EnergyPlus::DataZoneEnergyDemands;
-using namespace EnergyPlus::DXCoils;
 using namespace EnergyPlus::FanCoilUnits;
 using namespace EnergyPlus::Fans;
 using namespace EnergyPlus::HeatBalanceManager;
@@ -249,7 +245,7 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
     state->dataBranchNodeConnections->CompSets(2).ParentCType = "ZoneHVAC:PackagedTerminalHeatPump";
     state->dataBranchNodeConnections->CompSets(2).ParentCName = "AirSystem";
 
-    DataEnvironment::OutDryBulbTemp = 5.0;
+    state->dataEnvrn->OutDryBulbTemp = 5.0;
     OutputReportPredefined::SetPredefinedTables(*state);
     Psychrometrics::InitializePsychRoutines();
     createCoilSelectionReportObj();
@@ -296,7 +292,7 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
     // set fan inlet max avail so fan doesn't shut down flow
     DataLoopNode::Node(1).MassFlowRateMaxAvail = 0.2;
     DataEnvironment::StdRhoAir = 1.2; // fan used this to convert volume to mass flow rate
-    DataEnvironment::OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
     // second pass through will run model
 
     // Region 1 of control, low air flow rate, modulate coil capacity
@@ -428,7 +424,7 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     Real64 OnOffAirFlowRatio(1.0);
     Real64 PLR(0.0);
 
-    DataEnvironment::OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
     DataEnvironment::StdRhoAir = 1.20;
     state->dataWaterCoils->GetWaterCoilsInputFlag = true;
     state->dataGlobal->NumOfTimeStepInHour = 1;
@@ -555,7 +551,7 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     ASSERT_TRUE(process_idf(idf_objects));
     DataEnvironment::StdRhoAir = 1.0;
 
-    DataEnvironment::OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
     DataEnvironment::StdRhoAir = 1.20;
     state->dataWaterCoils->GetWaterCoilsInputFlag = true;
     state->dataGlobal->NumOfTimeStepInHour = 1;
@@ -645,13 +641,13 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     ZoneSysEnergyDemand.allocate(1);
     auto &zSysEDemand(ZoneSysEnergyDemand(1));
 
-    DataEnvironment::Month = 1;
+    state->dataEnvrn->Month = 1;
     state->dataEnvrn->DayOfMonth = 21;
     state->dataGlobal->HourOfDay = 1;
     state->dataEnvrn->DSTIndicator = 0;
     state->dataEnvrn->DayOfWeek = 2;
     state->dataEnvrn->HolidayIndex = 0;
-    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(Month, state->dataEnvrn->DayOfMonth, 1);
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
     UpdateScheduleValues(*state);
     ZoneEqSizing.allocate(1);
     ZoneSizingRunDone = true;

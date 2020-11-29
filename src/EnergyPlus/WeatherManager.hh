@@ -634,7 +634,8 @@ namespace WeatherManager {
 
     void AllocateWeatherData(EnergyPlusData &state);
 
-    void CalculateDailySolarCoeffs(int DayOfYear,                 // Day of year (1 - 366)
+    void CalculateDailySolarCoeffs(EnergyPlusData &state,
+                                   int DayOfYear,                 // Day of year (1 - 366)
                                    Real64 &A,                     // ASHRAE "A" - Apparent solar irradiation at air mass = 0 [W/M**2]
                                    Real64 &B,                     // ASHRAE "B" - Atmospheric extinction coefficient
                                    Real64 &C,                     // ASHRAE "C" - Diffuse radiation factor
@@ -644,7 +645,8 @@ namespace WeatherManager {
                                    Real64 &CosineSolarDeclination // Cosine of Solar Declination
     );
 
-    void CalculateSunDirectionCosines(Real64 TimeValue,    // Current Time of Day
+    void CalculateSunDirectionCosines(EnergyPlusData &state,
+                                      Real64 TimeValue,    // Current Time of Day
                                       Real64 EqOfTime,     // Equation of Time
                                       Real64 SinSolDeclin, // Sine of Solar Declination
                                       Real64 CosSolDeclin, // Cosine of Solar Declination

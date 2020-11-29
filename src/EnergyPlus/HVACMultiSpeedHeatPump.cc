@@ -128,8 +128,6 @@ namespace HVACMultiSpeedHeatPump {
     using namespace DataLoopNode;
     using DataEnvironment::CurMnDy;
     using DataEnvironment::EnvironmentName;
-    using DataEnvironment::OutBaroPress;
-    using DataEnvironment::OutDryBulbTemp;
     using DataEnvironment::OutHumRat;
     using DataEnvironment::StdRhoAir;
     using DataHVACGlobals::BlowThru;
@@ -2943,7 +2941,7 @@ namespace HVACMultiSpeedHeatPump {
         SpeedRatio = 0.0;
         SpeedNum = 1;
 
-        OutsideDryBulbTemp = OutDryBulbTemp;
+        OutsideDryBulbTemp = state.dataEnvrn->OutDryBulbTemp;
 
         //!!LKL Discrepancy with < 0
         if (GetCurrentScheduleValue(state, MSHeatPump(MSHeatPumpNum).AvaiSchedPtr) == 0.0) return;
@@ -3474,7 +3472,6 @@ namespace HVACMultiSpeedHeatPump {
         // REFERENCES: na
 
         // Using/Aliasing
-        using DataEnvironment::OutDryBulbTemp;
         using DataHeatBalFanSys::ZT;
         using DXCoils::DXCoil;
         using DXCoils::DXCoilPartLoadRatio;
@@ -3515,16 +3512,16 @@ namespace HVACMultiSpeedHeatPump {
             if (DXCoil(MSHeatPump(MSHeatPumpNum).DXHeatCoilIndex).IsSecondaryDXCoilInZone) {
                 OutsideDryBulbTemp = ZT(DXCoil(MSHeatPump(MSHeatPumpNum).DXHeatCoilIndex).SecZonePtr);
             } else {
-                OutsideDryBulbTemp = OutDryBulbTemp;
+                OutsideDryBulbTemp = state.dataEnvrn->OutDryBulbTemp;
             }
         } else if (MSHeatPump(MSHeatPumpNum).DXCoolCoilIndex > 0) {
             if (DXCoil(MSHeatPump(MSHeatPumpNum).DXCoolCoilIndex).IsSecondaryDXCoilInZone) {
                 OutsideDryBulbTemp = ZT(DXCoil(MSHeatPump(MSHeatPumpNum).DXCoolCoilIndex).SecZonePtr);
             } else {
-                OutsideDryBulbTemp = OutDryBulbTemp;
+                OutsideDryBulbTemp = state.dataEnvrn->OutDryBulbTemp;
             }
         } else {
-            OutsideDryBulbTemp = OutDryBulbTemp;
+            OutsideDryBulbTemp = state.dataEnvrn->OutDryBulbTemp;
         }
         FanOutletNode = MSHeatPump(MSHeatPumpNum).FanOutletNode;
         FanInletNode = MSHeatPump(MSHeatPumpNum).FanInletNode;

@@ -1258,7 +1258,7 @@ namespace UnitarySystems {
             if (this->m_ISHundredPercentDOASDXCoil) {
                 this->frostControlSetPointLimit(state, this->m_DesiredOutletTemp,
                                                 DataLoopNode::Node(ControlNode).HumRatMax,
-                                                DataEnvironment::OutBaroPress,
+                                                state.dataEnvrn->OutBaroPress,
                                                 this->DesignMinOutletTemp,
                                                 1);
             }
@@ -7879,7 +7879,7 @@ namespace UnitarySystems {
                             if (DataLoopNode::Node(ControlNode).HumRatMax > 0.0) humRatMaxSP = DataLoopNode::Node(ControlNode).HumRatMax;
                             this->frostControlSetPointLimit(state, DataLoopNode::Node(ControlNode).TempSetPoint,
                                                             humRatMaxSP,
-                                                            DataEnvironment::OutBaroPress,
+                                                            state.dataEnvrn->OutBaroPress,
                                                             this->DesignMinOutletTemp,
                                                             1);
                         }
@@ -7892,7 +7892,7 @@ namespace UnitarySystems {
                             if (this->m_ISHundredPercentDOASDXCoil && this->m_RunOnLatentLoad) {
                                 this->frostControlSetPointLimit(state, DataLoopNode::Node(ControlNode).TempSetPoint,
                                                                 humRatMaxSP,
-                                                                DataEnvironment::OutBaroPress,
+                                                                state.dataEnvrn->OutBaroPress,
                                                                 this->DesignMinOutletTemp,
                                                                 2);
                             }
@@ -7904,7 +7904,7 @@ namespace UnitarySystems {
                         if (this->m_ISHundredPercentDOASDXCoil && this->m_RunOnSensibleLoad) {
                             this->frostControlSetPointLimit(state, DataLoopNode::Node(ControlNode).TempSetPoint,
                                                             humRatMaxSP,
-                                                            DataEnvironment::OutBaroPress,
+                                                            state.dataEnvrn->OutBaroPress,
                                                             this->DesignMinOutletTemp,
                                                             1);
                         }
@@ -7914,7 +7914,7 @@ namespace UnitarySystems {
                             if (this->m_ISHundredPercentDOASDXCoil && this->m_RunOnLatentLoad) {
                                 this->frostControlSetPointLimit(state, DataLoopNode::Node(ControlNode).TempSetPoint,
                                                                 humRatMaxSP,
-                                                                DataEnvironment::OutBaroPress,
+                                                                state.dataEnvrn->OutBaroPress,
                                                                 this->DesignMinOutletTemp,
                                                                 2);
                             }
@@ -10708,7 +10708,7 @@ namespace UnitarySystems {
             OutdoorPressure = DataLoopNode::Node(this->m_CondenserNodeNum).Press;
             // IF node is not connected to anything, pressure = default, use weather data
             if (OutdoorPressure == DataLoopNode::DefaultNodeValues.Press) {
-                OutsideDryBulbTemp = DataEnvironment::OutDryBulbTemp;
+                OutsideDryBulbTemp = state.dataEnvrn->OutDryBulbTemp;
                 //      OutdoorHumRat   = OutHumRat
                 //      OutdoorPressure = OutBaroPress
                 //      OutdoorWetBulb  = OutWetBulbTemp
@@ -10718,7 +10718,7 @@ namespace UnitarySystems {
                 //      OutdoorWetBulb  = PsyTwbFnTdbWPb(state, OutdoorDryBulb,OutdoorHumRat,OutdoorPressure,RoutineName)
             }
         } else {
-            OutsideDryBulbTemp = DataEnvironment::OutDryBulbTemp;
+            OutsideDryBulbTemp = state.dataEnvrn->OutDryBulbTemp;
             //    OutdoorHumRat   = OutHumRat
             //    OutdoorPressure = OutBaroPress
             //    OutdoorWetBulb  = OutWetBulbTemp
@@ -10965,7 +10965,7 @@ namespace UnitarySystems {
             OutdoorPressure = DataLoopNode::Node(this->m_CondenserNodeNum).Press;
             // IF node is not connected to anything, pressure = default, use weather data
             if (OutdoorPressure == DataLoopNode::DefaultNodeValues.Press) {
-                OutsideDryBulbTemp = DataEnvironment::OutDryBulbTemp;
+                OutsideDryBulbTemp = state.dataEnvrn->OutDryBulbTemp;
                 //      OutdoorHumRat   = OutHumRat
                 //      OutdoorPressure = OutBaroPress
                 //      OutdoorWetBulb  = OutWetBulbTemp
@@ -10975,7 +10975,7 @@ namespace UnitarySystems {
                 //      OutdoorWetBulb  = PsyTwbFnTdbWPb(state, OutdoorDryBulb,OutdoorHumRat,OutdoorPressure,RoutineName)
             }
         } else {
-            OutsideDryBulbTemp = DataEnvironment::OutDryBulbTemp;
+            OutsideDryBulbTemp = state.dataEnvrn->OutDryBulbTemp;
             //    OutdoorHumRat   = OutHumRat
             //    OutdoorPressure = OutBaroPress
             //    OutdoorWetBulb  = OutWetBulbTemp
@@ -11175,7 +11175,7 @@ namespace UnitarySystems {
         // work is needed to figure out how to adjust other coil types if outlet temp exceeds maximum
         // this works for gas and electric heating coils
         std::string CompName = this->m_SuppHeatCoilName;
-        if (DataEnvironment::OutDryBulbTemp <= this->m_MaxOATSuppHeat || (state.dataUnitarySystems->MoistureLoad < 0.0 && this->m_CoolingPartLoadFrac > 0.0)) {
+        if (state.dataEnvrn->OutDryBulbTemp <= this->m_MaxOATSuppHeat || (state.dataUnitarySystems->MoistureLoad < 0.0 && this->m_CoolingPartLoadFrac > 0.0)) {
             SuppHeatCoilLoad = SuppCoilLoad;
             //} else {
             //    SuppHeatCoilLoad = this->m_DesignSuppHeatingCapacity * PartLoadRatio;
@@ -11334,7 +11334,7 @@ namespace UnitarySystems {
         if (this->m_CondenserNodeNum != 0) {
             OutdoorDryBulb = DataLoopNode::Node(this->m_CondenserNodeNum).Temp;
         } else {
-            OutdoorDryBulb = DataEnvironment::OutDryBulbTemp;
+            OutdoorDryBulb = state.dataEnvrn->OutDryBulbTemp;
         }
 
         // Check the dehumidification control type. IF it's multimode, turn off the HX to find the sensible PLR. Then check to
@@ -12619,15 +12619,15 @@ namespace UnitarySystems {
             OutdoorDryBulb = DataLoopNode::Node(this->m_CondenserNodeNum).Temp;
             if (this->m_CondenserType == DataHVACGlobals::WaterCooled) {
                 OutdoorHumRat = DataEnvironment::OutHumRat;
-                OutdoorPressure = DataEnvironment::OutBaroPress;
+                OutdoorPressure = state.dataEnvrn->OutBaroPress;
                 OutdoorWetBulb = DataEnvironment::OutWetBulbTemp;
             } else {
                 OutdoorPressure = DataLoopNode::Node(this->m_CondenserNodeNum).Press;
                 // IF node is not connected to anything, pressure = default, use weather data
                 if (OutdoorPressure == DataLoopNode::DefaultNodeValues.Press) {
-                    OutdoorDryBulb = DataEnvironment::OutDryBulbTemp;
+                    OutdoorDryBulb = state.dataEnvrn->OutDryBulbTemp;
                     OutdoorHumRat = DataEnvironment::OutHumRat;
-                    OutdoorPressure = DataEnvironment::OutBaroPress;
+                    OutdoorPressure = state.dataEnvrn->OutBaroPress;
                     OutdoorWetBulb = DataEnvironment::OutWetBulbTemp;
                 } else {
                     OutdoorHumRat = DataLoopNode::Node(this->m_CondenserNodeNum).HumRat;
@@ -12636,9 +12636,9 @@ namespace UnitarySystems {
                 }
             }
         } else {
-            OutdoorDryBulb = DataEnvironment::OutDryBulbTemp;
+            OutdoorDryBulb = state.dataEnvrn->OutDryBulbTemp;
             OutdoorHumRat = DataEnvironment::OutHumRat;
-            OutdoorPressure = DataEnvironment::OutBaroPress;
+            OutdoorPressure = state.dataEnvrn->OutBaroPress;
             OutdoorWetBulb = DataEnvironment::OutWetBulbTemp;
         }
 

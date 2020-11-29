@@ -185,8 +185,8 @@ public:
 
 TEST_F(WaterCoilsTest, WaterCoolingCoilSizing)
 {
-    OutBaroPress = 101325.0;
-    StdRhoAir = PsyRhoAirFnPbTdbW(*state, OutBaroPress, 20.0, 0.0);
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
 
     // set up sizing flags
     SysSizingRunDone = true;
@@ -419,8 +419,8 @@ TEST_F(WaterCoilsTest, TdbFnHRhPbTest)
 
 TEST_F(WaterCoilsTest, CoilHeatingWaterUASizing)
 {
-    OutBaroPress = 101325.0;
-    StdRhoAir = PsyRhoAirFnPbTdbW(*state, OutBaroPress, 20.0, 0.0);
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
 
     // set up sizing flags
     SysSizingRunDone = true;
@@ -571,8 +571,8 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterUASizing)
 
 TEST_F(WaterCoilsTest, CoilHeatingWaterLowAirFlowUASizing)
 {
-    OutBaroPress = 101325.0;
-    StdRhoAir = PsyRhoAirFnPbTdbW(*state, OutBaroPress, 20.0, 0.0);
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
 
     // set up sizing flags
     SysSizingRunDone = true;
@@ -727,8 +727,8 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterLowAirFlowUASizing)
 
 TEST_F(WaterCoilsTest, CoilHeatingWaterUASizingLowHwaterInletTemp)
 {
-    OutBaroPress = 101325.0;
-    StdRhoAir = PsyRhoAirFnPbTdbW(*state, OutBaroPress, 20.0, 0.0);
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
 
     // set up sizing flags
     SysSizingRunDone = true;
@@ -843,8 +843,8 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterUASizingLowHwaterInletTemp)
 TEST_F(WaterCoilsTest, CoilCoolingWaterSimpleSizing)
 {
     InitializePsychRoutines();
-    OutBaroPress = 101325.0;
-    StdRhoAir = PsyRhoAirFnPbTdbW(*state, OutBaroPress, 20.0, 0.0);
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
     ShowMessage(*state, "Begin Test: state->dataWaterCoils->WaterCoilsTest, CoilCoolingWaterSimpleSizing");
 
     // set up sizing flags
@@ -944,8 +944,8 @@ TEST_F(WaterCoilsTest, CoilCoolingWaterSimpleSizing)
 TEST_F(WaterCoilsTest, CoilCoolingWaterDetailedSizing)
 {
     InitializePsychRoutines();
-    OutBaroPress = 101325.0;
-    StdRhoAir = PsyRhoAirFnPbTdbW(*state, OutBaroPress, 20.0, 0.0);
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
     ShowMessage(*state, "Begin Test: state->dataWaterCoils->WaterCoilsTest, CoilCoolingWaterDetailedSizing");
 
     // set up sizing flags
@@ -1057,8 +1057,8 @@ TEST_F(WaterCoilsTest, CoilCoolingWaterDetailedSizing)
 TEST_F(WaterCoilsTest, CoilHeatingWaterSimpleSizing)
 {
     InitializePsychRoutines();
-    OutBaroPress = 101325.0;
-    StdRhoAir = PsyRhoAirFnPbTdbW(*state, OutBaroPress, 20.0, 0.0);
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
     ShowMessage(*state, "Begin Test: state->dataWaterCoils->WaterCoilsTest, CoilHeatingWaterSimpleSizing");
 
     // set up sizing flags
@@ -1154,8 +1154,8 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterSimpleSizing)
 }
 TEST_F(WaterCoilsTest, HotWaterHeatingCoilAutoSizeTempTest)
 {
-    OutBaroPress = 101325.0;
-    StdRhoAir = PsyRhoAirFnPbTdbW(*state, OutBaroPress, 20.0, 0.0);
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
 
     // set up sizing flags
     SysSizingRunDone = true;
@@ -1279,7 +1279,7 @@ TEST_F(WaterCoilsTest, FanCoilCoolingWaterFlowTest)
     Real64 MaxAirMassFlow(0.0);
     Real64 LatOutputProvided(0.0);
 
-    DataEnvironment::OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
     DataEnvironment::StdRhoAir = 1.20;
     state->dataWaterCoils->GetWaterCoilsInputFlag = true;
     NumCoils = 0;

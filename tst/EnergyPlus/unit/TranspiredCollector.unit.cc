@@ -230,10 +230,10 @@ TEST_F(EnergyPlusFixture, TranspiredCollectors_InitTranspiredCollectorTest)
     GetSurfaceData(*state, ErrorsFound); // setup zone geometry and get zone data
     EXPECT_FALSE(ErrorsFound);   // expect no errors
 
-    DataEnvironment::OutDryBulbTemp = 20.0;
+    state->dataEnvrn->OutDryBulbTemp = 20.0;
     DataEnvironment::OutWetBulbTemp = 15.0;
 
-    SetSurfaceOutBulbTempAt();
+    SetSurfaceOutBulbTempAt(*state);
 
     InitializePsychRoutines();
 
@@ -241,7 +241,7 @@ TEST_F(EnergyPlusFixture, TranspiredCollectors_InitTranspiredCollectorTest)
     EXPECT_FALSE(ErrorsFound);
 
     state->dataGlobal->BeginEnvrnFlag = true;
-    OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
     SkyTemp = 24.0;
     state->dataEnvrn->IsRain = false;
 

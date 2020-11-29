@@ -978,14 +978,14 @@ namespace PhotovoltaicThermalCollectors {
                 if (this->WorkingFluidType == WorkingFluidEnum::AIR) {
                     Real64 Winlet = DataLoopNode::Node(InletNode).HumRat;
                     CpInlet = Psychrometrics::PsyCpAirFnW(Winlet);
-                    WetBulbInlet = Psychrometrics::PsyTwbFnTdbWPb(state, Tinlet, Winlet, DataEnvironment::OutBaroPress, RoutineName);
-                    DewPointInlet = Psychrometrics::PsyTdpFnTdbTwbPb(state, Tinlet, WetBulbInlet, DataEnvironment::OutBaroPress, RoutineName);
+                    WetBulbInlet = Psychrometrics::PsyTwbFnTdbWPb(state, Tinlet, Winlet, state.dataEnvrn->OutBaroPress, RoutineName);
+                    DewPointInlet = Psychrometrics::PsyTdpFnTdbTwbPb(state, Tinlet, WetBulbInlet, state.dataEnvrn->OutBaroPress, RoutineName);
                 } else if (this->WorkingFluidType == WorkingFluidEnum::LIQUID) {
                     CpInlet = Psychrometrics::CPHW(Tinlet);
                 }
 
                 Real64 Tcollector =
-                    (2.0 * mdot * CpInlet * Tinlet + this->AreaCol * (HrGround * DataEnvironment::OutDryBulbTemp + HrSky * DataEnvironment::SkyTemp +
+                    (2.0 * mdot * CpInlet * Tinlet + this->AreaCol * (HrGround * state.dataEnvrn->OutDryBulbTemp + HrSky * DataEnvironment::SkyTemp +
                                                                       HrAir * DataSurfaces::Surface(this->SurfNum).OutDryBulbTemp +
                                                                       HcExt * DataSurfaces::Surface(this->SurfNum).OutDryBulbTemp)) /
                     (2.0 * mdot * CpInlet + this->AreaCol * (HrGround + HrSky + HrAir + HcExt));

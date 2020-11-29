@@ -78,7 +78,7 @@ TEST_F(EnergyPlusFixture, EarthTube_CalcEarthTubeHumRatTest)
 
     // Set environmental variables for all cases
     OutHumRat = 0.009;
-    OutBaroPress = 101400.0;
+    state->dataEnvrn->OutBaroPress = 101400.0;
 
     // Allocate and set earth tube parameters necessary to run the tests
     EarthTubeSys.allocate(ETnum);

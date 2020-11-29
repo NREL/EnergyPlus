@@ -93,9 +93,6 @@ namespace AirflowNetwork {
     // USE STATEMENTS:
 
     // Using/Aliasing
-    using DataEnvironment::Latitude;
-    using DataEnvironment::OutBaroPress;
-    using DataEnvironment::OutDryBulbTemp;
     using DataEnvironment::OutHumRat;
     using DataEnvironment::StdBaroPress;
     using DataSurfaces::Surface;
@@ -517,8 +514,8 @@ namespace AirflowNetwork {
             properties[n].density = AIRDENSITY(state, StdBaroPress + PZ(n), properties[n].temperature, properties[n].humidityRatio);
             // RHOZ(n) = PsyRhoAirFnPbTdbW(StdBaroPress + PZ(n), TZ(n), WZ(n));
             if (AirflowNetworkNodeData(n).ExtNodeNum > 0) {
-                properties[n].density = AIRDENSITY(state, StdBaroPress + PZ(n), OutDryBulbTemp, OutHumRat);
-                properties[n].temperature = OutDryBulbTemp;
+                properties[n].density = AIRDENSITY(state, StdBaroPress + PZ(n), state.dataEnvrn->OutDryBulbTemp, OutHumRat);
+                properties[n].temperature = state.dataEnvrn->OutDryBulbTemp;
                 properties[n].humidityRatio = OutHumRat;
             }
             properties[n].sqrtDensity = std::sqrt(properties[n].density);
@@ -2024,13 +2021,13 @@ namespace AirflowNetwork {
         Real64 CONV;
 
         // FLOW:
-        RhoREF = AIRDENSITY(state, PSea, OutDryBulbTemp, OutHumRat);
+        RhoREF = AIRDENSITY(state, PSea, state.dataEnvrn->OutDryBulbTemp, OutHumRat);
 
-        CONV = Latitude * 2.0 * DataGlobalConstants::Pi() / 360.0;
+        CONV = state.dataEnvrn->Latitude * 2.0 * DataGlobalConstants::Pi() / 360.0;
         G = 9.780373 * (1.0 + 0.0052891 * pow_2(std::sin(CONV)) - 0.0000059 * pow_2(std::sin(2.0 * CONV)));
 
         Hfl = 1.0;
-        Pbz = OutBaroPress;
+        Pbz = state.dataEnvrn->OutBaroPress;
         Nl = NumOfLinksMultiZone;
         OpenNum = 0;
         RhoLd(1) = 1.2;
@@ -2105,8 +2102,8 @@ namespace AirflowNetwork {
             }
 
             // RhoDrL is Rho at link level without pollutant but with humidity
-            RhoDrL(i, 1) = AIRDENSITY(state, OutBaroPress + PzFrom, TempL1, Xhl1);
-            RhoDrL(i, 2) = AIRDENSITY(state, OutBaroPress + PzTo, TempL2, Xhl2);
+            RhoDrL(i, 1) = AIRDENSITY(state, state.dataEnvrn->OutBaroPress + PzFrom, TempL1, Xhl1);
+            RhoDrL(i, 2) = AIRDENSITY(state, state.dataEnvrn->OutBaroPress + PzTo, TempL2, Xhl2);
 
             // End initialisation
 

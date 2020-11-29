@@ -264,7 +264,6 @@ namespace RoomAirModelAirflowNetwork {
         // Perform one-time checking and term calculations
 
         // Using/Aliasing
-        using DataEnvironment::OutBaroPress;
         using DataHeatBalance::Zone;
         using DataHeatBalFanSys::NonAirSystemResponse;
         using DataHeatBalFanSys::SumLatentHTRadSys;
@@ -621,7 +620,7 @@ namespace RoomAirModelAirflowNetwork {
         ThisRAFNNode.SumLinkMW = SumLinkMW;
         ThisRAFNNode.SysDepZoneLoadsLagged = ThisRAFNNode.SysDepZoneLoadsLaggedOld;
 
-        ThisRAFNNode.RhoAir = PsyRhoAirFnPbTdbW(state, OutBaroPress, ThisRAFNNode.AirTemp, ThisRAFNNode.HumRat, "InitRoomAirModelAirflowNetwork");
+        ThisRAFNNode.RhoAir = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, ThisRAFNNode.AirTemp, ThisRAFNNode.HumRat, "InitRoomAirModelAirflowNetwork");
 
         ThisRAFNNode.CpAir = PsyCpAirFnW(ThisRAFNNode.HumRat);
 
@@ -649,7 +648,6 @@ namespace RoomAirModelAirflowNetwork {
         // na
 
         // Using/Aliasing
-        using DataEnvironment::OutBaroPress;
         using DataHeatBalFanSys::MAT;
         using DataHeatBalFanSys::ZoneAirHumRat;
         using DataHVACGlobals::TimeStepSys;
@@ -745,7 +743,7 @@ namespace RoomAirModelAirflowNetwork {
         ThisRAFNNode.AirCap = AirCap;
         ThisRAFNNode.AirHumRat = C;
 
-        ThisRAFNNode.RelHumidity = PsyRhFnTdbWPb(state, TempTmp, HumRatTmp, OutBaroPress, "CalcRoomAirModelAirflowNetwork") * 100.0;
+        ThisRAFNNode.RelHumidity = PsyRhFnTdbWPb(state, TempTmp, HumRatTmp, state.dataEnvrn->OutBaroPress, "CalcRoomAirModelAirflowNetwork") * 100.0;
 
     } // CalcRoomAirModelAirflowNetwork
 
@@ -1170,7 +1168,6 @@ namespace RoomAirModelAirflowNetwork {
         // na
 
         // Using/Aliasing
-        using DataEnvironment::OutBaroPress;
         using DataHeatBalFanSys::MAT;
         using DataHeatBalSurface::TempSurfInTmp;
         using DataMoistureBalanceEMPD::RVSurface;
@@ -1218,9 +1215,9 @@ namespace RoomAirModelAirflowNetwork {
                 SumHmAW += HMassConvInFD(SurfNum) * Surface(SurfNum).Area * (RhoVaporSurfIn(SurfNum) - RhoVaporAirIn(SurfNum));
 
                 RhoAirZone = PsyRhoAirFnPbTdbW(state,
-                    OutBaroPress, MAT(Surface(SurfNum).Zone), PsyRhFnTdbRhov(state, MAT(Surface(SurfNum).Zone), RhoVaporAirIn(SurfNum), "RhoAirZone"));
+                    state.dataEnvrn->OutBaroPress, MAT(Surface(SurfNum).Zone), PsyRhFnTdbRhov(state, MAT(Surface(SurfNum).Zone), RhoVaporAirIn(SurfNum), "RhoAirZone"));
 
-                Wsurf = PsyWFnTdbRhPb(state, TempSurfInTmp(SurfNum), PsyRhFnTdbRhov(state, TempSurfInTmp(SurfNum), RhoVaporSurfIn(SurfNum), "Wsurf"), OutBaroPress);
+                Wsurf = PsyWFnTdbRhPb(state, TempSurfInTmp(SurfNum), PsyRhFnTdbRhov(state, TempSurfInTmp(SurfNum), RhoVaporSurfIn(SurfNum), "Wsurf"), state.dataEnvrn->OutBaroPress);
 
                 SumHmARa = SumHmARa + HMassConvInFD(SurfNum) * Surface(SurfNum).Area * RhoAirZone;
 
@@ -1234,11 +1231,11 @@ namespace RoomAirModelAirflowNetwork {
 
                 SumHmAW = SumHmAW + HMassConvInFD(SurfNum) * Surface(SurfNum).Area * (RhoVaporSurfIn(SurfNum) - RhoVaporAirIn(SurfNum));
                 SumHmARa = SumHmARa + HMassConvInFD(SurfNum) * Surface(SurfNum).Area *
-                                          PsyRhoAirFnPbTdbW(state, OutBaroPress,
+                                          PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress,
                                                             TempSurfInTmp(SurfNum),
                                                             PsyWFnTdbRhPb(state, TempSurfInTmp(SurfNum),
                                                                           PsyRhFnTdbRhovLBnd0C(state, TempSurfInTmp(SurfNum), RhoVaporAirIn(SurfNum)),
-                                                                          OutBaroPress));
+                                                                          state.dataEnvrn->OutBaroPress));
                 SumHmARaW = SumHmARaW + HMassConvInFD(SurfNum) * Surface(SurfNum).Area * RhoVaporSurfIn(SurfNum);
             }
         }

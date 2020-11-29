@@ -142,7 +142,7 @@ TEST_F(EnergyPlusFixture, HeatingCoils_OutletAirPropertiesTest)
     HeatingCoils::HeatingCoil(CoilNum).InletAirTemp = 0.0;
     HeatingCoils::HeatingCoil(CoilNum).InletAirHumRat = 0.001;
     HeatingCoils::HeatingCoil(CoilNum).InletAirEnthalpy = Psychrometrics::PsyHFnTdbW(HeatingCoils::HeatingCoil(CoilNum).InletAirTemp, HeatingCoils::HeatingCoil(CoilNum).InletAirHumRat);
-    DataEnvironment::OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
     HeatingCoils::HeatingCoil(CoilNum).SchedPtr = 1;
     ScheduleManager::Schedule.allocate(1);
     ScheduleManager::Schedule(1).CurrentValue = 1.0;

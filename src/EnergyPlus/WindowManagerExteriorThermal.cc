@@ -596,7 +596,7 @@ namespace WindowManager {
 
         auto IR = m_Surface.getInsideIR(m_SurfNum);
 
-        std::shared_ptr<CEnvironment> Indoor = std::make_shared<CIndoorEnvironment>(tin, OutBaroPress);
+        std::shared_ptr<CEnvironment> Indoor = std::make_shared<CIndoorEnvironment>(tin, state.dataEnvrn->OutBaroPress);
         Indoor->setHCoeffModel(BoundaryConditionsCoeffModel::CalculateH, hcin);
         Indoor->setEnvironmentIR(IR);
         return Indoor;
@@ -625,7 +625,7 @@ namespace WindowManager {
         double fclr = 1 - CloudFraction;
         AirHorizontalDirection airDirection = AirHorizontalDirection::Windward;
         std::shared_ptr<CEnvironment> Outdoor =
-            std::make_shared<COutdoorEnvironment>(tout, OutBaroPress, airSpeed, swRadiation, airDirection, tSky, SkyModel::AllSpecified, fclr);
+            std::make_shared<COutdoorEnvironment>(tout, state.dataEnvrn->OutBaroPress, airSpeed, swRadiation, airDirection, tSky, SkyModel::AllSpecified, fclr);
         Outdoor->setHCoeffModel(BoundaryConditionsCoeffModel::HcPrescribed, t_Hext);
         Outdoor->setEnvironmentIR(IR);
         return Outdoor;

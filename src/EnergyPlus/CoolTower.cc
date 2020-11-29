@@ -519,8 +519,6 @@ namespace CoolTower {
         //     John Wiley & Sons, Inc.
 
         // Using/Aliasing
-        using DataEnvironment::OutBaroPress;
-        using DataEnvironment::OutDryBulbTemp;
         using DataEnvironment::OutEnthalpy;
         using DataEnvironment::OutHumRat;
         using DataEnvironment::OutWetBulbTemp;
@@ -586,14 +584,14 @@ namespace CoolTower {
                         AirVolFlowRate = min(AirVolFlowRate, state.dataCoolTower->CoolTowerSys(CoolTowerNum).MaxAirVolFlowRate);
                     }
                     WaterFlowRate = min(WaterFlowRate, (state.dataCoolTower->CoolTowerSys(CoolTowerNum).MaxWaterFlowRate * UCFactor));
-                    OutletTemp = OutDryBulbTemp - (OutDryBulbTemp - OutWetBulbTemp) *
+                    OutletTemp = state.dataEnvrn->OutDryBulbTemp - (state.dataEnvrn->OutDryBulbTemp - OutWetBulbTemp) *
                                                       (1.0 - std::exp(-0.8 * state.dataCoolTower->CoolTowerSys(CoolTowerNum).TowerHeight)) *
                                                       (1.0 - std::exp(-0.15 * WaterFlowRate));
                 } else if (state.dataCoolTower->CoolTowerSys(CoolTowerNum).FlowCtrlType == FlowCtrlEnum::FlowSchedule) {
                     WaterFlowRate = state.dataCoolTower->CoolTowerSys(CoolTowerNum).MaxWaterFlowRate * UCFactor;
                     AirVolFlowRate = 0.0125 * WaterFlowRate * std::sqrt(state.dataCoolTower->CoolTowerSys(CoolTowerNum).TowerHeight);
                     AirVolFlowRate = min(AirVolFlowRate, state.dataCoolTower->CoolTowerSys(CoolTowerNum).MaxAirVolFlowRate);
-                    OutletTemp = OutDryBulbTemp - (OutDryBulbTemp - OutWetBulbTemp) *
+                    OutletTemp = state.dataEnvrn->OutDryBulbTemp - (state.dataEnvrn->OutDryBulbTemp - OutWetBulbTemp) *
                                                       (1.0 - std::exp(-0.8 * state.dataCoolTower->CoolTowerSys(CoolTowerNum).TowerHeight)) *
                                                       (1.0 - std::exp(-0.15 * WaterFlowRate));
                 }
@@ -626,16 +624,16 @@ namespace CoolTower {
                 }
 
                 // Determine air mass flow rate and volume flow rate
-                InletHumRat = PsyWFnTdbTwbPb(state, OutDryBulbTemp, OutWetBulbTemp, OutBaroPress);
+                InletHumRat = PsyWFnTdbTwbPb(state, state.dataEnvrn->OutDryBulbTemp, OutWetBulbTemp, state.dataEnvrn->OutBaroPress);
                 // Assume no pressure drops and no changes in enthalpy between inlet and outlet air
                 IntHumRat = PsyWFnTdbH(state, OutletTemp, OutEnthalpy); // Initialized humidity ratio
-                AirDensity = PsyRhoAirFnPbTdbW(state, OutBaroPress, OutletTemp, IntHumRat);
+                AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, OutletTemp, IntHumRat);
                 AirMassFlowRate = AirDensity * state.dataCoolTower->CoolTowerSys(CoolTowerNum).ActualAirVolFlowRate;
                 // From the mass balance W_in*(m_air + m_water) = W_out*m_air
                 RhoWater = RhoH2O(OutletTemp); // Assume T_water = T_outlet
                 OutletHumRat = (InletHumRat * (AirMassFlowRate + (state.dataCoolTower->CoolTowerSys(CoolTowerNum).ActualWaterFlowRate * RhoWater))) / AirMassFlowRate;
                 AirSpecHeat = PsyCpAirFnW(OutletHumRat);
-                AirDensity = PsyRhoAirFnPbTdbW(state, OutBaroPress, OutletTemp, OutletHumRat); // Outlet air density
+                AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, OutletTemp, OutletHumRat); // Outlet air density
                 CVF_ZoneNum = state.dataCoolTower->CoolTowerSys(CoolTowerNum).ActualAirVolFlowRate * GetCurrentScheduleValue(state, state.dataCoolTower->CoolTowerSys(CoolTowerNum).SchedPtr);
                 MCPC(ZoneNum) = CVF_ZoneNum * AirDensity * AirSpecHeat;
                 MCPTC(ZoneNum) = MCPC(ZoneNum) * OutletTemp;

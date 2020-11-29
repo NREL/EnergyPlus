@@ -5355,9 +5355,9 @@ namespace HeatBalanceManager {
                 for (int TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
                     static constexpr auto ShdFracFmt1(" {:02}/{:02} {:02}:{:02},");
                         if (TS == state.dataGlobal->NumOfTimeStepInHour) {
-                            print(state.files.shade, ShdFracFmt1, Month, state.dataEnvrn->DayOfMonth, iHour, 0);
+                            print(state.files.shade, ShdFracFmt1, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, iHour, 0);
                         } else {
-                            print(state.files.shade, ShdFracFmt1, Month, state.dataEnvrn->DayOfMonth, iHour - 1, (60 / state.dataGlobal->NumOfTimeStepInHour) * TS);
+                            print(state.files.shade, ShdFracFmt1, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, iHour - 1, (60 / state.dataGlobal->NumOfTimeStepInHour) * TS);
                         }
                     for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
                         static constexpr auto ShdFracFmt2("{:10.8F},");
@@ -5371,7 +5371,7 @@ namespace HeatBalanceManager {
         // Initialize zone outdoor environmental variables
         // Bulk Initialization for Temperatures & WindSpeed
         // using the zone, modify the zone  Dry/Wet BulbTemps
-        SetZoneOutBulbTempAt();
+        SetZoneOutBulbTempAt(state);
         CheckZoneOutBulbTempAt(state);
 
         // set zone level wind dir to global value
@@ -6026,8 +6026,8 @@ namespace HeatBalanceManager {
                           EnvironmentStampFormatStr,
                           "1",
                           "Warmup {" + cWarmupDay + "} " + EnvironmentName,
-                          Latitude,
-                          Longitude,
+                          state.dataEnvrn->Latitude,
+                          state.dataEnvrn->Longitude,
                           TimeZoneNumber,
                           state.dataEnvrn->Elevation);
 
@@ -6035,8 +6035,8 @@ namespace HeatBalanceManager {
                           EnvironmentStampFormatStr,
                           "1",
                           "Warmup {" + cWarmupDay + "} " + EnvironmentName,
-                          Latitude,
-                          Longitude,
+                          state.dataEnvrn->Latitude,
+                          state.dataEnvrn->Longitude,
                           TimeZoneNumber,
                           state.dataEnvrn->Elevation);
                     PrintEnvrnStampWarmup = false;

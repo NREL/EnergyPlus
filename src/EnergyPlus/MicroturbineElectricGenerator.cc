@@ -1148,9 +1148,9 @@ namespace MicroturbineElectricGenerator {
 
         //   Set combustion inlet air temperature, humidity ratio and pressure local variables
         if (this->CombustionAirInletNodeNum == 0) { // no inlet air node specified, so use weather file values
-            CombustionAirInletTemp = DataEnvironment::OutDryBulbTemp;
+            CombustionAirInletTemp = state.dataEnvrn->OutDryBulbTemp;
             CombustionAirInletW = DataEnvironment::OutHumRat;
-            CombustionAirInletPress = DataEnvironment::OutBaroPress;
+            CombustionAirInletPress = state.dataEnvrn->OutBaroPress;
         } else { // use inlet node information
             CombustionAirInletTemp = DataLoopNode::Node(this->CombustionAirInletNodeNum).Temp;
             CombustionAirInletW = DataLoopNode::Node(this->CombustionAirInletNodeNum).HumRat;

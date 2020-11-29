@@ -123,8 +123,6 @@ namespace WindowEquivalentLayer {
     // Using/Aliasing
     using namespace DataHeatBalance;
     using namespace DataSurfaces;
-    using DataEnvironment::Month;
-
     void InitEquivalentLayerWindowCalculations(EnergyPlusData &state)
     {
 

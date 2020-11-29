@@ -711,7 +711,7 @@ namespace SetPointManager {
         {
         }
 
-        void calculate();
+        void calculate(EnergyPlusData &state);
     };
 
     struct DefineFollowSysNodeTempSetPointManager : SPBase

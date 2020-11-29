@@ -624,16 +624,16 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GatherForEconomics)
     EXPECT_EQ(0, EconomicTariff::tariff(1).seasonForMonth(5));
     EXPECT_EQ(0, EconomicTariff::tariff(1).seasonForMonth(6));
 
-    DataEnvironment::Month = 5;
+    state->dataEnvrn->Month = 5;
     state->dataEnvrn->DayOfMonth = 31;
     state->dataGlobal->HourOfDay = 23;
     state->dataEnvrn->DSTIndicator = 1; // DST IS ON
-    DataEnvironment::MonthTomorrow = 6;
+    state->dataEnvrn->MonthTomorrow = 6;
     state->dataEnvrn->DayOfWeek = 4;
     state->dataEnvrn->DayOfWeekTomorrow = 5;
     state->dataEnvrn->HolidayIndex = 0;
     state->dataGlobal->TimeStep = 4;
-    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, state->dataEnvrn->DayOfMonth, 1);
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
 
     ScheduleManager::UpdateScheduleValues(*state);
     EXPECT_EQ(1.0, ScheduleManager::LookUpScheduleValue(*state, 1, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep));
@@ -646,7 +646,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GatherForEconomics)
     EXPECT_EQ(state->dataExteriorEnergyUse->ExteriorLights(1).Power * state->dataGlobal->TimeStepZoneSec, state->dataExteriorEnergyUse->ExteriorLights(1).CurrentUse);
 
     int curPeriod = 1;
-    EXPECT_EQ(0, EconomicTariff::tariff(1).gatherEnergy(DataEnvironment::Month, curPeriod));
+    EXPECT_EQ(0, EconomicTariff::tariff(1).gatherEnergy(state->dataEnvrn->Month, curPeriod));
 
     // This Should now call GatherForEconomics
     state->dataGlobal->DoOutputReporting = true;
@@ -655,16 +655,16 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GatherForEconomics)
     EXPECT_EQ(0, EconomicTariff::tariff(1).seasonForMonth(6));
 
 
-    DataEnvironment::Month = 5;
+    state->dataEnvrn->Month = 5;
     state->dataEnvrn->DayOfMonth = 31;
     state->dataGlobal->HourOfDay = 24;
     state->dataEnvrn->DSTIndicator = 1; // DST IS ON
-    DataEnvironment::MonthTomorrow = 6;
+    state->dataEnvrn->MonthTomorrow = 6;
     state->dataEnvrn->DayOfWeek = 4;
     state->dataEnvrn->DayOfWeekTomorrow = 5;
     state->dataEnvrn->HolidayIndex = 0;
     state->dataGlobal->TimeStep = 1;
-    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, state->dataEnvrn->DayOfMonth, 1);
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
 
     ScheduleManager::UpdateScheduleValues(*state);
     EXPECT_EQ(3.0, ScheduleManager::GetCurrentScheduleValue(*state, tariff(1).seasonSchIndex));

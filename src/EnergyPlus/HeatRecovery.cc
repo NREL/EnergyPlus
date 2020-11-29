@@ -111,7 +111,6 @@ namespace HeatRecovery {
     using namespace DataLoopNode;
     using DataEnvironment::CurMnDy;
     using DataEnvironment::EnvironmentName;
-    using DataEnvironment::OutBaroPress;
     using DataEnvironment::StdBaroPress;
     using DataEnvironment::StdRhoAir;
 
@@ -1905,7 +1904,7 @@ namespace HeatRecovery {
             HumRatSupOut = ExchCond(ExNum).SupInHumRat;
             EnthSupOut = PsyHFnTdbW(TempSupOut, HumRatSupOut);
             // check for saturation in supply outlet
-            TempSupOutSat = PsyTsatFnHPb(state, EnthSupOut, OutBaroPress);
+            TempSupOutSat = PsyTsatFnHPb(state, EnthSupOut, state.dataEnvrn->OutBaroPress);
             if (TempSupOutSat > TempSupOut) {
                 TempSupOut = TempSupOutSat;
                 HumRatSupOut = PsyWFnTdbH(state, TempSupOut, EnthSupOut);
@@ -1913,7 +1912,7 @@ namespace HeatRecovery {
             HumRatSecOut = ExchCond(ExNum).SecInHumRat;
             EnthSecOut = PsyHFnTdbW(TempSecOut, HumRatSecOut);
             // check for saturation in secondary outlet
-            TempSecOutSat = PsyTsatFnHPb(state, EnthSecOut, OutBaroPress);
+            TempSecOutSat = PsyTsatFnHPb(state, EnthSecOut, state.dataEnvrn->OutBaroPress);
             if (TempSecOutSat > TempSecOut) {
                 TempSecOut = TempSecOutSat;
                 HumRatSecOut = PsyWFnTdbH(state, TempSecOut, EnthSecOut);
@@ -2142,7 +2141,7 @@ namespace HeatRecovery {
             }
 
             // In the future, use actual node pressures in the following air density calls
-            RhoStd = PsyRhoAirFnPbTdbW(state, OutBaroPress, 20.0, 0.0);
+            RhoStd = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, 20.0, 0.0);
             HXSupAirVolFlowRate = ExchCond(ExNum).SupOutMassFlow / RhoStd; // volume flow using standard density
             HXSecAirVolFlowRate = ExchCond(ExNum).SecOutMassFlow / RhoStd;
             // Limit unbalanced volumetric flow ratio to 2:1
@@ -2190,8 +2189,8 @@ namespace HeatRecovery {
 
             // Determine heat exchanger effectiveness using avg air volume flow rate based on actual inlet air density
             // Linearly interpolate and extrapolate (within limits) from effectiveness input values
-            RhoSup = PsyRhoAirFnPbTdbW(state, OutBaroPress, ExchCond(ExNum).SupInTemp, ExchCond(ExNum).SupInHumRat);
-            RhoSec = PsyRhoAirFnPbTdbW(state, OutBaroPress, ExchCond(ExNum).SecInTemp, ExchCond(ExNum).SecInHumRat);
+            RhoSup = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, ExchCond(ExNum).SupInTemp, ExchCond(ExNum).SupInHumRat);
+            RhoSec = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, ExchCond(ExNum).SecInTemp, ExchCond(ExNum).SecInHumRat);
             HXSupAirVolFlowRate = ExchCond(ExNum).SupOutMassFlow / RhoSup;
             HXSecAirVolFlowRate = ExchCond(ExNum).SecOutMassFlow / RhoSec;
             HXAvgAirVolFlowRate = (HXSecAirVolFlowRate + HXSupAirVolFlowRate) / 2.0;
@@ -2278,8 +2277,8 @@ namespace HeatRecovery {
             ExchCond(ExNum).SupOutEnth = PsyHFnTdbW(ExchCond(ExNum).SupOutTemp, ExchCond(ExNum).SupOutHumRat);
 
             //   Check for saturation in supply outlet and reset temp, then humidity ratio at constant enthalpy
-            if (PsyTsatFnHPb(state, ExchCond(ExNum).SupOutEnth, OutBaroPress) > ExchCond(ExNum).SupOutTemp) {
-                ExchCond(ExNum).SupOutTemp = PsyTsatFnHPb(state, ExchCond(ExNum).SupOutEnth, OutBaroPress);
+            if (PsyTsatFnHPb(state, ExchCond(ExNum).SupOutEnth, state.dataEnvrn->OutBaroPress) > ExchCond(ExNum).SupOutTemp) {
+                ExchCond(ExNum).SupOutTemp = PsyTsatFnHPb(state, ExchCond(ExNum).SupOutEnth, state.dataEnvrn->OutBaroPress);
                 ExchCond(ExNum).SupOutHumRat = PsyWFnTdbH(state, ExchCond(ExNum).SupOutTemp, ExchCond(ExNum).SupOutEnth);
             }
             QSensTrans = CSup * (ExchCond(ExNum).SupInTemp - ExchCond(ExNum).SupOutTemp);
@@ -2450,8 +2449,8 @@ namespace HeatRecovery {
                 ExchCond(ExNum).SupOutEnth = PsyHFnTdbW(ExchCond(ExNum).SupOutTemp, ExchCond(ExNum).SupOutHumRat);
 
                 //     Check for saturation in supply outlet and reset temp, then humidity ratio at constant enthalpy
-                if (PsyTsatFnHPb(state, ExchCond(ExNum).SupOutEnth, OutBaroPress) > ExchCond(ExNum).SupOutTemp) {
-                    ExchCond(ExNum).SupOutTemp = PsyTsatFnHPb(state, ExchCond(ExNum).SupOutEnth, OutBaroPress);
+                if (PsyTsatFnHPb(state, ExchCond(ExNum).SupOutEnth, state.dataEnvrn->OutBaroPress) > ExchCond(ExNum).SupOutTemp) {
+                    ExchCond(ExNum).SupOutTemp = PsyTsatFnHPb(state, ExchCond(ExNum).SupOutEnth, state.dataEnvrn->OutBaroPress);
                     ExchCond(ExNum).SupOutHumRat = PsyWFnTdbH(state, ExchCond(ExNum).SupOutTemp, ExchCond(ExNum).SupOutEnth);
                 }
 
@@ -2489,7 +2488,7 @@ namespace HeatRecovery {
             }
 
             // check for saturation in secondary outlet
-            TempSecOutSat = PsyTsatFnHPb(state, ExchCond(ExNum).SecOutEnth, OutBaroPress);
+            TempSecOutSat = PsyTsatFnHPb(state, ExchCond(ExNum).SecOutEnth, state.dataEnvrn->OutBaroPress);
             if (TempSecOutSat > ExchCond(ExNum).SecOutTemp) {
                 ExchCond(ExNum).SecOutTemp = TempSecOutSat;
                 ExchCond(ExNum).SecOutHumRat = PsyWFnTdbH(state, ExchCond(ExNum).SecOutTemp, ExchCond(ExNum).SecOutEnth);
@@ -2793,8 +2792,8 @@ namespace HeatRecovery {
                     //     Check for saturation in the model's calculated supply outlet and reset temp, then humidity ratio at constant enthalpy
                     //     Reset delta T and delta W such that the model does not allow an outlet condition over saturation
                     TestSaturationEnthalpy = PsyHFnTdbW(FullLoadSupOutTemp, FullLoadSupOutHumRat);
-                    if (PsyTsatFnHPb(state, TestSaturationEnthalpy, OutBaroPress, ThisSubTSat) > FullLoadSupOutTemp) {
-                        FullLoadSupOutTemp = PsyTsatFnHPb(state, TestSaturationEnthalpy, OutBaroPress, ThisSubTSatFullLoadOutTemp);
+                    if (PsyTsatFnHPb(state, TestSaturationEnthalpy, state.dataEnvrn->OutBaroPress, ThisSubTSat) > FullLoadSupOutTemp) {
+                        FullLoadSupOutTemp = PsyTsatFnHPb(state, TestSaturationEnthalpy, state.dataEnvrn->OutBaroPress, ThisSubTSatFullLoadOutTemp);
                         FullLoadSupOutHumRat = PsyWFnTdbH(state, FullLoadSupOutTemp, TestSaturationEnthalpy, ThisSubTSatFullLoadOutHumRat);
                         FullLoadDeltaT = FullLoadSupOutTemp - ExchCond(ExNum).SupInTemp;
                         FullLoadDeltaW = FullLoadSupOutHumRat - ExchCond(ExNum).SupInHumRat;
@@ -2871,7 +2870,7 @@ namespace HeatRecovery {
                     // check for saturation in process (secondary) outlet
                     // The process outlet conditions should never be over the saturation curve for the balanced desiccant model
                     // although this may occur during warmup. This check is included here for consistency.
-                    TempSecOutSat = PsyTsatFnHPb(state, ExchCond(ExNum).SecOutEnth, OutBaroPress, ThisSubTestSatSec);
+                    TempSecOutSat = PsyTsatFnHPb(state, ExchCond(ExNum).SecOutEnth, state.dataEnvrn->OutBaroPress, ThisSubTestSatSec);
                     if (TempSecOutSat > ExchCond(ExNum).SecOutTemp) {
                         ExchCond(ExNum).SecOutTemp = TempSecOutSat;
                         ExchCond(ExNum).SecOutHumRat = PsyWFnTdbH(state, ExchCond(ExNum).SecOutTemp, ExchCond(ExNum).SecOutEnth, ThisSubTSatSecOutHumRat);
@@ -2983,8 +2982,8 @@ namespace HeatRecovery {
         ExchCond(ExNum).SecOutMassFlow = ExchCond(ExNum).SecInMassFlow;
         ExchCond(ExNum).SupBypassMassFlow = 0.0;
         ExchCond(ExNum).SecBypassMassFlow = 0.0;
-        RhoSup = PsyRhoAirFnPbTdbW(state, OutBaroPress, ExchCond(ExNum).SupInTemp, ExchCond(ExNum).SupInHumRat);
-        RhoSec = PsyRhoAirFnPbTdbW(state, OutBaroPress, ExchCond(ExNum).SecInTemp, ExchCond(ExNum).SecInHumRat);
+        RhoSup = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, ExchCond(ExNum).SupInTemp, ExchCond(ExNum).SupInHumRat);
+        RhoSec = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, ExchCond(ExNum).SecInTemp, ExchCond(ExNum).SecInHumRat);
         CSup = ExchCond(ExNum).SupOutMassFlow * PsyCpAirFnW(ExchCond(ExNum).SupInHumRat);
         CSec = ExchCond(ExNum).SecOutMassFlow * PsyCpAirFnW(ExchCond(ExNum).SecInHumRat);
         CMin = min(CSup, CSec);
@@ -3011,8 +3010,8 @@ namespace HeatRecovery {
             ExchCond(ExNum).SupOutEnth = PsyHFnTdbW(ExchCond(ExNum).SupOutTemp, ExchCond(ExNum).SupOutHumRat);
 
             //   Check for saturation in supply outlet and reset temp, then humidity ratio at constant enthalpy
-            if (PsyTsatFnHPb(state, ExchCond(ExNum).SupOutEnth, OutBaroPress) > ExchCond(ExNum).SupOutTemp) {
-                ExchCond(ExNum).SupOutTemp = PsyTsatFnHPb(state, ExchCond(ExNum).SupOutEnth, OutBaroPress);
+            if (PsyTsatFnHPb(state, ExchCond(ExNum).SupOutEnth, state.dataEnvrn->OutBaroPress) > ExchCond(ExNum).SupOutTemp) {
+                ExchCond(ExNum).SupOutTemp = PsyTsatFnHPb(state, ExchCond(ExNum).SupOutEnth, state.dataEnvrn->OutBaroPress);
                 ExchCond(ExNum).SupOutHumRat = PsyWFnTdbH(state, ExchCond(ExNum).SupOutTemp, ExchCond(ExNum).SupOutEnth);
             }
 
@@ -3094,8 +3093,8 @@ namespace HeatRecovery {
             ExchCond(ExNum).SupOutEnth = PsyHFnTdbW(ExchCond(ExNum).SupOutTemp, ExchCond(ExNum).SupOutHumRat);
 
             //   Check for saturation in supply outlet and reset temp, then humidity ratio at constant enthalpy
-            if (PsyTsatFnHPb(state, ExchCond(ExNum).SupOutEnth, OutBaroPress) > ExchCond(ExNum).SupOutTemp) {
-                ExchCond(ExNum).SupOutTemp = PsyTsatFnHPb(state, ExchCond(ExNum).SupOutEnth, OutBaroPress);
+            if (PsyTsatFnHPb(state, ExchCond(ExNum).SupOutEnth, state.dataEnvrn->OutBaroPress) > ExchCond(ExNum).SupOutTemp) {
+                ExchCond(ExNum).SupOutTemp = PsyTsatFnHPb(state, ExchCond(ExNum).SupOutEnth, state.dataEnvrn->OutBaroPress);
                 ExchCond(ExNum).SupOutHumRat = PsyWFnTdbH(state, ExchCond(ExNum).SupOutTemp, ExchCond(ExNum).SupOutEnth);
             }
 
@@ -3188,8 +3187,8 @@ namespace HeatRecovery {
             ExchCond(ExNum).SupOutEnth = ExchCond(ExNum).SupInEnth - QTotTrans / ExchCond(ExNum).SupOutMassFlow;
             ExchCond(ExNum).SupOutHumRat = PsyWFnTdbH(state, ExchCond(ExNum).SupOutTemp, ExchCond(ExNum).SupOutEnth);
 
-            if (PsyTsatFnHPb(state, ExchCond(ExNum).SupOutEnth, OutBaroPress) > ExchCond(ExNum).SupOutTemp) {
-                ExchCond(ExNum).SupOutTemp = PsyTsatFnHPb(state, ExchCond(ExNum).SupOutEnth, OutBaroPress);
+            if (PsyTsatFnHPb(state, ExchCond(ExNum).SupOutEnth, state.dataEnvrn->OutBaroPress) > ExchCond(ExNum).SupOutTemp) {
+                ExchCond(ExNum).SupOutTemp = PsyTsatFnHPb(state, ExchCond(ExNum).SupOutEnth, state.dataEnvrn->OutBaroPress);
                 ExchCond(ExNum).SupOutHumRat = PsyWFnTdbH(state, ExchCond(ExNum).SupOutTemp, ExchCond(ExNum).SupOutEnth);
                 QSensTrans = CSup * (ExchCond(ExNum).SupInTemp - ExchCond(ExNum).SupOutTemp);
                 // Should we be updating the sensible and latent effectiveness values also?
@@ -4833,7 +4832,7 @@ namespace HeatRecovery {
         //               *  |
         //                  |
         //                T_Temp
-        if (T_RegenInHumRat > PsyWFnTdpPb(state, T_RegenInTemp, OutBaroPress) || T_ProcInHumRat > PsyWFnTdpPb(state, T_ProcInTemp, OutBaroPress)) {
+        if (T_RegenInHumRat > PsyWFnTdpPb(state, T_RegenInTemp, state.dataEnvrn->OutBaroPress) || T_ProcInHumRat > PsyWFnTdpPb(state, T_ProcInTemp, state.dataEnvrn->OutBaroPress)) {
             //       reset RH print flags just in case
             BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintRegenInRelHumTempMess = false;
             BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintProcInRelHumTempMess = false;
@@ -4847,8 +4846,8 @@ namespace HeatRecovery {
             return;
         }
 
-        RegenInletRH = PsyRhFnTdbWPb(state, T_RegenInTemp, T_RegenInHumRat, OutBaroPress);
-        ProcInletRH = min(1.0, PsyRhFnTdbWPb(state, T_ProcInTemp, T_ProcInHumRat, OutBaroPress));
+        RegenInletRH = PsyRhFnTdbWPb(state, T_RegenInTemp, T_RegenInHumRat, state.dataEnvrn->OutBaroPress);
+        ProcInletRH = min(1.0, PsyRhFnTdbWPb(state, T_ProcInTemp, T_ProcInHumRat, state.dataEnvrn->OutBaroPress));
 
         // checking if regeneration inlet relative humidity is within model boundaries
         if (RegenInletRH < BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).T_MinRegenAirInRelHum ||
@@ -5021,7 +5020,7 @@ namespace HeatRecovery {
         //               *  |
         //                  |
         //                H_Temp
-        if (H_RegenInHumRat > PsyWFnTdpPb(state, H_RegenInTemp, OutBaroPress) || H_ProcInHumRat > PsyWFnTdpPb(state, H_ProcInTemp, OutBaroPress)) {
+        if (H_RegenInHumRat > PsyWFnTdpPb(state, H_RegenInTemp, state.dataEnvrn->OutBaroPress) || H_ProcInHumRat > PsyWFnTdpPb(state, H_ProcInTemp, state.dataEnvrn->OutBaroPress)) {
             //       reset RH print flags just in case
             BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintRegenInRelHumHumRatMess = false;
             BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).PrintProcInRelHumHumRatMess = false;
@@ -5035,8 +5034,8 @@ namespace HeatRecovery {
             return;
         }
 
-        RegenInletRH = PsyRhFnTdbWPb(state, H_RegenInTemp, H_RegenInHumRat, OutBaroPress);
-        ProcInletRH = min(1.0, PsyRhFnTdbWPb(state, H_ProcInTemp, H_ProcInHumRat, OutBaroPress));
+        RegenInletRH = PsyRhFnTdbWPb(state, H_RegenInTemp, H_RegenInHumRat, state.dataEnvrn->OutBaroPress);
+        ProcInletRH = min(1.0, PsyRhFnTdbWPb(state, H_ProcInTemp, H_ProcInHumRat, state.dataEnvrn->OutBaroPress));
 
         // checking if regeneration inlet relative humidity is within model boundaries
         if (RegenInletRH < BalDesDehumPerfData(ExchCond(ExchNum).PerfDataIndex).H_MinRegenAirInRelHum ||

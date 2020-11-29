@@ -140,7 +140,7 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_AirCooledChiller)
     Real64 MyLoad(-10000.0);
 
     DataPlant::TotNumLoops = 2;
-    DataEnvironment::OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
     DataEnvironment::StdRhoAir = 1.20;
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->TimeStep = 1;
@@ -291,7 +291,7 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_EvaporativelyCooled_Calculate)
     EXPECT_TRUE(process_idf(idf_objects, false));
 
     DataPlant::TotNumLoops = 2;
-    DataEnvironment::OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
     DataEnvironment::StdRhoAir = 1.20;
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->TimeStep = 1;
@@ -333,11 +333,11 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_EvaporativelyCooled_Calculate)
     DataPlant::PlantFirstSizesOkayToReport = true;
     DataPlant::PlantFinalSizesOkayToReport = true;
 
-    DataEnvironment::OutDryBulbTemp = 29.4;
+    state->dataEnvrn->OutDryBulbTemp = 29.4;
     DataEnvironment::OutWetBulbTemp = 23.0;
     DataEnvironment::OutHumRat =
-        Psychrometrics::PsyWFnTdbTwbPb(*state, DataEnvironment::OutDryBulbTemp, DataEnvironment::OutWetBulbTemp, DataEnvironment::OutBaroPress);
-    DataLoopNode::Node(thisEIRChiller.CondInletNodeNum).Temp = DataEnvironment::OutDryBulbTemp;
+        Psychrometrics::PsyWFnTdbTwbPb(*state, state->dataEnvrn->OutDryBulbTemp, DataEnvironment::OutWetBulbTemp, state->dataEnvrn->OutBaroPress);
+    DataLoopNode::Node(thisEIRChiller.CondInletNodeNum).Temp = state->dataEnvrn->OutDryBulbTemp;
     DataLoopNode::Node(thisEIRChiller.CondInletNodeNum).OutAirWetBulb = DataEnvironment::OutWetBulbTemp;
     DataLoopNode::Node(thisEIRChiller.CondInletNodeNum).HumRat = DataEnvironment::OutHumRat;
 

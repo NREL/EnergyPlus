@@ -1791,7 +1791,7 @@ namespace PlantHeatExchangerFluidToFluid {
                         if (SELECT_CASE_var1 == WetBulbTemperature) {
                             ControlSignalValue = DataEnvironment::OutWetBulbTemp;
                         } else if (SELECT_CASE_var1 == DryBulbTemperature) {
-                            ControlSignalValue = DataEnvironment::OutDryBulbTemp;
+                            ControlSignalValue = state.dataEnvrn->OutDryBulbTemp;
                         } else if (SELECT_CASE_var1 == LoopTemperature) {
                             ControlSignalValue = DataLoopNode::Node(this->OtherCompDemandSideLoop.inletNodeNum).TempLastTimestep;
                         } else {

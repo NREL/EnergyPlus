@@ -423,9 +423,9 @@ TEST_F(EnergyPlusFixture, HXAssistCCUnitarySystem_VStest1)
 
     // set zone temperature
     DataLoopNode::Node(ControlZoneNum).Temp = 20.0; // set zone temperature during heating season used to determine system delivered capacity
-    DataEnvironment::OutDryBulbTemp = 35.0;         // initialize weather
+    state->dataEnvrn->OutDryBulbTemp = 35.0;         // initialize weather
     DataEnvironment::OutHumRat = 0.1;
-    DataEnvironment::OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
     DataEnvironment::OutWetBulbTemp = 30.0;
 
     // initialize other incidentals that are used within the UnitarySystem module during calculations
@@ -482,9 +482,9 @@ TEST_F(EnergyPlusFixture, HXAssistCCUnitarySystem_VStest1)
 
     // set zone temperature
     DataLoopNode::Node(ControlZoneNum).Temp = 24.0; // set zone temperature during cooling season used to determine system delivered capacity
-    DataEnvironment::OutDryBulbTemp = 35.0;         // initialize weather
+    state->dataEnvrn->OutDryBulbTemp = 35.0;         // initialize weather
     DataEnvironment::OutHumRat = 0.1;
-    DataEnvironment::OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
     DataEnvironment::OutWetBulbTemp = 30.0;
 
     thisSys->simulate(*state,

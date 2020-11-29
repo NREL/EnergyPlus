@@ -1673,7 +1673,6 @@ namespace EnergyPlus::DemandManager {
         // Standard EnergyPlus methodology.
 
         // Using/Aliasing
-        using DataEnvironment::Month;
         using ScheduleManager::GetCurrentScheduleValue;
 
         // Locals
@@ -1688,7 +1687,7 @@ namespace EnergyPlus::DemandManager {
 
         // FLOW:
         if (DemandManagerList(ListNum).BillingSchedule == 0) {
-            BillingPeriod = Month;
+            BillingPeriod = state.dataEnvrn->Month;
         } else {
             BillingPeriod = GetCurrentScheduleValue(state, DemandManagerList(ListNum).BillingSchedule);
         }

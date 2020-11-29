@@ -3925,7 +3925,6 @@ namespace OutputReportTabular {
         //   timestep to the appropriate bin.
 
         // Using/Aliasing
-        using DataEnvironment::Month;
         using DataHVACGlobals::TimeStepSys;
         using ScheduleManager::GetCurrentScheduleValue;
 
@@ -4015,15 +4014,15 @@ namespace OutputReportTabular {
                         // check if the value is above the maximum or below the minimum value
                         // first before binning the value within the range.
                         if (curValue < curIntervalStart) {
-                            BinResultsBelow(repIndex).mnth(Month) += elapsedTime;
+                            BinResultsBelow(repIndex).mnth(state.dataEnvrn->Month) += elapsedTime;
                             BinResultsBelow(repIndex).hrly(state.dataGlobal->HourOfDay) += elapsedTime;
                         } else if (curValue >= topValue) {
-                            BinResultsAbove(repIndex).mnth(Month) += elapsedTime;
+                            BinResultsAbove(repIndex).mnth(state.dataEnvrn->Month) += elapsedTime;
                             BinResultsAbove(repIndex).hrly(state.dataGlobal->HourOfDay) += elapsedTime;
                         } else {
                             // determine which bin the results are in
                             binNum = int((curValue - curIntervalStart) / curIntervalSize) + 1;
-                            BinResults(binNum, repIndex).mnth(Month) += elapsedTime;
+                            BinResults(binNum, repIndex).mnth(state.dataEnvrn->Month) += elapsedTime;
                             BinResults(binNum, repIndex).hrly(state.dataGlobal->HourOfDay) += elapsedTime;
                         }
                         // add to statistics array
@@ -4055,7 +4054,6 @@ namespace OutputReportTabular {
         //   holding the data that will be reported later.
 
         // Using/Aliasing
-        using DataEnvironment::Month;
         using DataHVACGlobals::TimeStepSys;
         using General::DetermineMinuteForReporting;
         using General::EncodeMonDayHrMin;
@@ -4143,7 +4141,7 @@ namespace OutputReportTabular {
         } else {
             elapsedTime = state.dataGlobal->TimeStepZone;
         }
-        IsMonthGathered(Month) = true;
+        IsMonthGathered(state.dataEnvrn->Month) = true;
         for (iTable = 1; iTable <= MonthlyTablesCount; ++iTable) {
             activeMinMax = false;     // at the beginning of the new timestep
             activeHoursShown = false; // fix by JG addressing CR6482
@@ -4161,9 +4159,9 @@ namespace OutputReportTabular {
                     curVarNum = MonthlyColumnsVarNum(curCol);
                     curValue = GetInternalVariableValue(state, curTypeOfVar, curVarNum);
                     // Get the value from the result array
-                    oldResultValue = MonthlyColumns(curCol).reslt(Month);
-                    oldTimeStamp = MonthlyColumns(curCol).timeStamp(Month);
-                    oldDuration = MonthlyColumns(curCol).duration(Month);
+                    oldResultValue = MonthlyColumns(curCol).reslt(state.dataEnvrn->Month);
+                    oldTimeStamp = MonthlyColumns(curCol).timeStamp(state.dataEnvrn->Month);
+                    oldDuration = MonthlyColumns(curCol).duration(state.dataEnvrn->Month);
                     // Zero the revised values (as default if not set later in SELECT)
                     newResultValue = 0.0;
                     newTimeStamp = 0;
@@ -4174,7 +4172,7 @@ namespace OutputReportTabular {
                     //      minuteCalculated = (CurrentTime - INT(CurrentTime))*60
                     //      IF (t_timeStepType .EQ. OutputProcessor::TimeStepType::TimeStepSystem) minuteCalculated = minuteCalculated +
                     //      SysTimeElapsed * 60 minuteCalculated = INT((TimeStep-1) * TimeStepZone * 60) + INT((SysTimeElapsed + TimeStepSys) * 60)
-                    EncodeMonDayHrMin(timestepTimeStamp, Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, minuteCalculated);
+                    EncodeMonDayHrMin(timestepTimeStamp, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, minuteCalculated);
                     // perform the selected aggregation type
                     // use next lines since it is faster was: SELECT CASE (MonthlyColumns(curCol)%aggType)
                     {
@@ -4280,9 +4278,9 @@ namespace OutputReportTabular {
                     // new columns. This skips the aggregation types that don't even get
                     // triggered now such as valueWhenMinMax and all the agg*HoursShown
                     if (activeNewValue) {
-                        MonthlyColumns(curCol).reslt(Month) = newResultValue;
-                        MonthlyColumns(curCol).timeStamp(Month) = newTimeStamp;
-                        MonthlyColumns(curCol).duration(Month) = newDuration;
+                        MonthlyColumns(curCol).reslt(state.dataEnvrn->Month) = newResultValue;
+                        MonthlyColumns(curCol).timeStamp(state.dataEnvrn->Month) = newTimeStamp;
+                        MonthlyColumns(curCol).duration(state.dataEnvrn->Month) = newDuration;
                     }
                     // if a minimum or maximum value was set this timeStep then
                     // scan the remaining columns of the table looking for values
@@ -4310,7 +4308,7 @@ namespace OutputReportTabular {
                                             scanValue /= state.dataGlobal->TimeStepZoneSec;
                                         }
                                     }
-                                    MonthlyColumns(scanColumn).reslt(Month) = scanValue;
+                                    MonthlyColumns(scanColumn).reslt(state.dataEnvrn->Month) = scanValue;
                                 } else {
                                     // do nothing
                                 }
@@ -4325,7 +4323,7 @@ namespace OutputReportTabular {
                             scanTypeOfVar = MonthlyColumns(scanColumn).typeOfVar;
                             scanVarNum = MonthlyColumns(scanColumn).varNum;
                             scanValue = GetInternalVariableValue(state, scanTypeOfVar, scanVarNum);
-                            oldScanValue = MonthlyColumns(scanColumn).reslt(Month);
+                            oldScanValue = MonthlyColumns(scanColumn).reslt(state.dataEnvrn->Month);
                             {
                                 auto const SELECT_CASE_var(MonthlyColumns(scanColumn).aggType);
                                 if ((SELECT_CASE_var == aggTypeHoursZero) || (SELECT_CASE_var == aggTypeHoursNonZero)) {
@@ -4340,12 +4338,12 @@ namespace OutputReportTabular {
                                 } else if (SELECT_CASE_var == aggTypeSumOrAverageHoursShown) {
                                     // this case is when the value should be set
                                     if (MonthlyColumns(scanColumn).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
-                                        MonthlyColumns(scanColumn).reslt(Month) = oldScanValue + scanValue;
+                                        MonthlyColumns(scanColumn).reslt(state.dataEnvrn->Month) = oldScanValue + scanValue;
                                     } else {
                                         // for averaging - weight by elapsed time
-                                        MonthlyColumns(scanColumn).reslt(Month) = oldScanValue + scanValue * elapsedTime;
+                                        MonthlyColumns(scanColumn).reslt(state.dataEnvrn->Month) = oldScanValue + scanValue * elapsedTime;
                                     }
-                                    MonthlyColumns(scanColumn).duration(Month) += elapsedTime;
+                                    MonthlyColumns(scanColumn).duration(state.dataEnvrn->Month) += elapsedTime;
                                 } else if (SELECT_CASE_var == aggTypeMaximumDuringHoursShown) {
                                     if (MonthlyColumns(scanColumn).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
                                         if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) {
@@ -4355,8 +4353,8 @@ namespace OutputReportTabular {
                                         }
                                     }
                                     if (scanValue > oldScanValue) {
-                                        MonthlyColumns(scanColumn).reslt(Month) = scanValue;
-                                        MonthlyColumns(scanColumn).timeStamp(Month) = timestepTimeStamp;
+                                        MonthlyColumns(scanColumn).reslt(state.dataEnvrn->Month) = scanValue;
+                                        MonthlyColumns(scanColumn).timeStamp(state.dataEnvrn->Month) = timestepTimeStamp;
                                     }
                                 } else if (SELECT_CASE_var == aggTypeMinimumDuringHoursShown) {
                                     if (MonthlyColumns(scanColumn).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
@@ -4367,8 +4365,8 @@ namespace OutputReportTabular {
                                         }
                                     }
                                     if (scanValue < oldScanValue) {
-                                        MonthlyColumns(scanColumn).reslt(Month) = scanValue;
-                                        MonthlyColumns(scanColumn).timeStamp(Month) = timestepTimeStamp;
+                                        MonthlyColumns(scanColumn).reslt(state.dataEnvrn->Month) = scanValue;
+                                        MonthlyColumns(scanColumn).timeStamp(state.dataEnvrn->Month) = timestepTimeStamp;
                                     }
                                 } else {
                                     // do nothing
@@ -4715,7 +4713,6 @@ namespace OutputReportTabular {
         // na
 
         // Using/Aliasing
-        using DataEnvironment::Month;
         using DataStringGlobals::CharComma;
         using DataStringGlobals::CharSpace;
         using DataStringGlobals::CharTab;
@@ -4756,7 +4753,7 @@ namespace OutputReportTabular {
                         // save the time that the peak demand occurred
                         //        minuteCalculated = (CurrentTime - INT(CurrentTime))*60
                         minuteCalculated = DetermineMinuteForReporting(state, t_timeStepType);
-                        EncodeMonDayHrMin(timestepTimeStamp, Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, minuteCalculated);
+                        EncodeMonDayHrMin(timestepTimeStamp, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, minuteCalculated);
                         gatherDemandTimeStamp(iResource) = timestepTimeStamp;
                         // if new peak demand is set, then gather all of the end use values at this particular
                         // time to find the components of the peak demand
@@ -4890,8 +4887,8 @@ namespace OutputReportTabular {
         static int iTank(0);
         static int iRef(0);
 
-        static Real64 H2OHtOfVap_HVAC = Psychrometrics::PsyHgAirFnWTdb(DataEnvironment::OutHumRat, DataEnvironment::OutDryBulbTemp);
-        static Real64 RhoWater = Psychrometrics::RhoH2O(DataEnvironment::OutDryBulbTemp);
+        static Real64 H2OHtOfVap_HVAC = Psychrometrics::PsyHgAirFnWTdb(DataEnvironment::OutHumRat, state.dataEnvrn->OutDryBulbTemp);
+        static Real64 RhoWater = Psychrometrics::RhoH2O(state.dataEnvrn->OutDryBulbTemp);
         Real64 TimeStepSysSec = TimeStepSys * DataGlobalConstants::SecInHour();
         SysTotalHVACReliefHeatLoss = 0;
         SysTotalHVACRejectHeatLoss = 0;
@@ -5115,7 +5112,6 @@ namespace OutputReportTabular {
         // The peak reports follow a similar example.
 
         // Using/Aliasing
-        using DataEnvironment::Month;
         using DataHeatBalance::BuildingPreDefRep;
         using DataHeatBalance::ZnAirRpt;
         using DataHeatBalance::ZnRpt;
@@ -5312,7 +5308,7 @@ namespace OutputReportTabular {
                     //      ActualTimeHrS=INT(ActualTimeS)
                     //      ActualTimeMin=NINT((ActualtimeE - ActualTimeHrS)*FracToMin)
                     ActualTimeMin = DetermineMinuteForReporting(state, t_timeStepType);
-                    EncodeMonDayHrMin(timestepTimeStamp, Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, ActualTimeMin);
+                    EncodeMonDayHrMin(timestepTimeStamp, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, ActualTimeMin);
                     ZonePreDefRep(iZone).htPtTimeStamp = timestepTimeStamp;
                     // HVAC Input Sensible Air Heating
                     // HVAC Input Sensible Air Cooling
@@ -5391,7 +5387,7 @@ namespace OutputReportTabular {
                     //      ActualTimeHrS=INT(ActualTimeS)
                     //      ActualTimeMin=NINT((ActualtimeE - ActualTimeHrS)*FracToMin)
                     ActualTimeMin = DetermineMinuteForReporting(state, t_timeStepType);
-                    EncodeMonDayHrMin(timestepTimeStamp, Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, ActualTimeMin);
+                    EncodeMonDayHrMin(timestepTimeStamp, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, ActualTimeMin);
                     ZonePreDefRep(iZone).clPtTimeStamp = timestepTimeStamp;
                     // HVAC Input Sensible Air Heating
                     // HVAC Input Sensible Air Cooling
@@ -5482,7 +5478,7 @@ namespace OutputReportTabular {
             //  ActualTimeHrS=INT(ActualTimeS)
             //  ActualTimeMin=NINT((ActualtimeE - ActualTimeHrS)*FracToMin)
             ActualTimeMin = DetermineMinuteForReporting(state, t_timeStepType);
-            EncodeMonDayHrMin(timestepTimeStamp, Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, ActualTimeMin);
+            EncodeMonDayHrMin(timestepTimeStamp, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, ActualTimeMin);
             BuildingPreDefRep.htPtTimeStamp = timestepTimeStamp;
             // reset building level results to zero prior to accumulating across zones
             BuildingPreDefRep.SHGSHtHvacHt = 0.0;
@@ -5570,7 +5566,7 @@ namespace OutputReportTabular {
             //  ActualTimeHrS=INT(ActualTimeS)
             //  ActualTimeMin=NINT((ActualtimeE - ActualTimeHrS)*FracToMin)
             ActualTimeMin = DetermineMinuteForReporting(state, t_timeStepType);
-            EncodeMonDayHrMin(timestepTimeStamp, Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, ActualTimeMin);
+            EncodeMonDayHrMin(timestepTimeStamp, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, ActualTimeMin);
             BuildingPreDefRep.clPtTimeStamp = timestepTimeStamp;
             // reset building level results to zero prior to accumulating across zones
             BuildingPreDefRep.SHGSClHvacHt = 0.0;
@@ -10251,8 +10247,6 @@ namespace OutputReportTabular {
 
         // Using/Aliasing
         using DataEnvironment::EnvironmentName;
-        using DataEnvironment::Latitude;
-        using DataEnvironment::Longitude;
         using DataEnvironment::RunPeriodStartDayOfWeek;
         using DataEnvironment::TimeZoneNumber;
         using DataEnvironment::WeatherFileLocationTitle;
@@ -10475,8 +10469,8 @@ namespace OutputReportTabular {
             tableBody(1, 1) = VerString;                               // program
             tableBody(1, 2) = EnvironmentName;                         // runperiod name
             tableBody(1, 3) = WeatherFileLocationTitle;                // weather
-            tableBody(1, 4) = RealToStr(Latitude, 2);                  // latitude
-            tableBody(1, 5) = RealToStr(Longitude, 2);                 // longitude
+            tableBody(1, 4) = RealToStr(state.dataEnvrn->Latitude, 2);                  // latitude
+            tableBody(1, 5) = RealToStr(state.dataEnvrn->Longitude, 2);                 // longitude
             tableBody(1, 6) = RealToStr(state.dataEnvrn->Elevation * m_unitConv, 2);    // Elevation
             tableBody(1, 7) = RealToStr(TimeZoneNumber, 2);            // Time Zone
             tableBody(1, 8) = RealToStr(BuildingAzimuth, 2);           // north axis angle

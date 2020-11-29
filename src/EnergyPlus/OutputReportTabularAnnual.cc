@@ -355,7 +355,7 @@ namespace OutputReportTabularAnnual {
                         // the current timestamp
                         int minuteCalculated = General::DetermineMinuteForReporting(state, kindOfTimeStep);
                         General::EncodeMonDayHrMin(
-                            timestepTimeStamp, DataEnvironment::Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, minuteCalculated);
+                            timestepTimeStamp, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, minuteCalculated);
                         // perform the selected aggregation type
                         // the following types of aggregations are not gathered at this point:
                         // noAggregation, valueWhenMaxMin, sumOrAverageHoursShown, 	maximumDuringHoursShown, minimumDuringHoursShown:

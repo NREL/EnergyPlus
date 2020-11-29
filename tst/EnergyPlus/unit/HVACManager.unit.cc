@@ -96,7 +96,7 @@ TEST_F(EnergyPlusFixture, CrossMixingReportTest)
     DataHVACGlobals::TimeStepSys = 1.0;
     DataHeatBalFanSys::MCPI = 0.0;
     DataHeatBalFanSys::MCPV = 0.0;
-    DataEnvironment::OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
     DataHeatBalFanSys::MAT(1) = 22.0;
     DataHeatBalFanSys::MAT(2) = 25.0;
     DataHeatBalFanSys::ZoneAirHumRat(1) = 0.001;
@@ -164,7 +164,7 @@ TEST_F(EnergyPlusFixture, InfiltrationReportTest)
     DataHeatBalFanSys::MCPI(2) = 1.5;
     DataHeatBalFanSys::MCPV(1) = 2.0;
     DataHeatBalFanSys::MCPV(2) = 2.5;
-    DataEnvironment::OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
     DataEnvironment::OutHumRat = 0.0005;
     DataHeatBalFanSys::MAT(1) = 22.0;
     DataHeatBalFanSys::MAT(2) = 25.0;
@@ -226,7 +226,7 @@ TEST_F(EnergyPlusFixture, ExfilAndExhaustReportTest)
     DataHeatBalFanSys::MCPI(2) = 1.5;
     DataHeatBalFanSys::MCPV(1) = 2.0;
     DataHeatBalFanSys::MCPV(2) = 2.5;
-    DataEnvironment::OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
     DataEnvironment::OutHumRat = 0.0005;
     DataHeatBalFanSys::MAT(1) = 22.0;
     DataHeatBalFanSys::MAT(2) = 25.0;

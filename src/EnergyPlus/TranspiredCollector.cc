@@ -853,7 +853,6 @@ namespace TranspiredCollector {
 
         // Using/Aliasing
         using ConvectionCoefficients::InitExteriorConvectionCoeff;
-        using DataEnvironment::OutBaroPress;
         using DataEnvironment::OutHumRat;
         using DataEnvironment::SkyTemp;
         using DataHeatBalSurface::TH;
@@ -959,7 +958,7 @@ namespace TranspiredCollector {
                    surfaceArea; // Autodesk:F2C++ Functions handle array subscript usage
         }
 
-        RhoAir = PsyRhoAirFnPbTdbW(state, OutBaroPress, Tamb, OutHumRat);
+        RhoAir = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, Tamb, OutHumRat);
 
         CpAir = PsyCpAirFnW(OutHumRat);
 
@@ -1193,7 +1192,6 @@ namespace TranspiredCollector {
         // USE STATEMENTS:
 
         // Using/Aliasing
-        using DataEnvironment::OutBaroPress;
         using DataSurfaces::Surface;
         using DataSurfaces::SurfaceData;
         using Psychrometrics::PsyHFnTdbW;
@@ -1235,9 +1233,9 @@ namespace TranspiredCollector {
         // UTSC( UTSCNum ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
         Twbamb = sum_product_sub(Surface, &SurfaceData::OutWetBulbTemp, &SurfaceData::Area, state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) /
                  surfaceArea; // Autodesk:F2C++ Functions handle array subscript usage
-        OutHumRatAmb = PsyWFnTdbTwbPb(state, Tamb, Twbamb, OutBaroPress);
+        OutHumRatAmb = PsyWFnTdbTwbPb(state, Tamb, Twbamb, state.dataEnvrn->OutBaroPress);
 
-        RhoAir = PsyRhoAirFnPbTdbW(state, OutBaroPress, Tamb, OutHumRatAmb);
+        RhoAir = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, Tamb, OutHumRatAmb);
         holeArea = state.dataTranspiredCollector->UTSC(UTSCNum).ActualArea * state.dataTranspiredCollector->UTSC(UTSCNum).Porosity;
 
         AspRat = state.dataTranspiredCollector->UTSC(UTSCNum).Height / state.dataTranspiredCollector->UTSC(UTSCNum).PlenGapThick;

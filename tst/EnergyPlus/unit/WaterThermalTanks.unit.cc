@@ -1415,7 +1415,7 @@ TEST_F(EnergyPlusFixture, HPWHTestSPControl)
 
     DataLoopNode::Node(3).Temp = 30.0;
     DataLoopNode::Node(3).HumRat = 0.01;
-    DataEnvironment::OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
 
     bool FirstHVACIteration(true);
     state->dataGlobal->WarmupFlag = true;
@@ -1707,13 +1707,13 @@ TEST_F(EnergyPlusFixture, StratifiedTankSourceTemperatures)
 
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->HourOfDay = 1;
-    DataEnvironment::Month = 7;
+    state->dataEnvrn->Month = 7;
     state->dataEnvrn->DayOfMonth = 21;
     state->dataGlobal->HourOfDay = 1;
     state->dataEnvrn->DSTIndicator = 0;
     state->dataEnvrn->DayOfWeek = 2;
     state->dataEnvrn->HolidayIndex = 0;
-    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, state->dataEnvrn->DayOfMonth, 1);
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
     ScheduleManager::UpdateScheduleValues(*state);
 
     int TankNum(1);
@@ -2373,13 +2373,13 @@ TEST_F(EnergyPlusFixture, DesuperheaterTimeAdvanceCheck)
 
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->HourOfDay = 1;
-    DataEnvironment::Month = 7;
+    state->dataEnvrn->Month = 7;
     state->dataEnvrn->DayOfMonth = 21;
     state->dataGlobal->HourOfDay = 1;
     state->dataEnvrn->DSTIndicator = 0;
     state->dataEnvrn->DayOfWeek = 2;
     state->dataEnvrn->HolidayIndex = 0;
-    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, state->dataEnvrn->DayOfMonth, 1);
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
     ScheduleManager::UpdateScheduleValues(*state);
 
     int TankNum = 1;
@@ -2604,13 +2604,13 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
 
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->HourOfDay = 1;
-    DataEnvironment::Month = 7;
+    state->dataEnvrn->Month = 7;
     state->dataEnvrn->DayOfMonth = 21;
     state->dataGlobal->HourOfDay = 1;
     state->dataEnvrn->DSTIndicator = 0;
     state->dataEnvrn->DayOfWeek = 2;
     state->dataEnvrn->HolidayIndex = 0;
-    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, state->dataEnvrn->DayOfMonth, 1);
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
     ScheduleManager::UpdateScheduleValues(*state);
     DataPlant::TotNumLoops = 1;
     int TankNum(1);
@@ -2999,13 +2999,13 @@ TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
 
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->HourOfDay = 1;
-    DataEnvironment::Month = 7;
+    state->dataEnvrn->Month = 7;
     state->dataEnvrn->DayOfMonth = 21;
     state->dataGlobal->HourOfDay = 1;
     state->dataEnvrn->DSTIndicator = 0;
     state->dataEnvrn->DayOfWeek = 2;
     state->dataEnvrn->HolidayIndex = 0;
-    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, state->dataEnvrn->DayOfMonth, 1);
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
     ScheduleManager::UpdateScheduleValues(*state);
 
     int TankNum(1);
@@ -3017,9 +3017,9 @@ TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
     EXPECT_EQ(DataHeatBalance::HeatReclaimDXCoil(1).SourceType, "Coil:Cooling:DX:MultiSpeed");
 
     // Initiate conditions for multispeed coil calculation
-    DataEnvironment::OutDryBulbTemp = 32.0;
+    state->dataEnvrn->OutDryBulbTemp = 32.0;
     DataEnvironment::OutHumRat = 0.02;
-    DataEnvironment::OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
     DataEnvironment::OutWetBulbTemp = Psychrometrics::PsyTwbFnTdbWPb(*state, 32.0, 0.02, 101325.0);
 
     DXCoil(1).MSRatedAirMassFlowRate(1) = DXCoil(1).MSRatedAirVolFlowRate(1) * 1.2;
@@ -3158,13 +3158,13 @@ TEST_F(EnergyPlusFixture, MixedTankAlternateSchedule)
 
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->HourOfDay = 1;
-    DataEnvironment::Month = 7;
+    state->dataEnvrn->Month = 7;
     state->dataEnvrn->DayOfMonth = 21;
     state->dataGlobal->HourOfDay = 1;
     state->dataEnvrn->DSTIndicator = 0;
     state->dataEnvrn->DayOfWeek = 2;
     state->dataEnvrn->HolidayIndex = 0;
-    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, state->dataEnvrn->DayOfMonth, 1);
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
     ScheduleManager::UpdateScheduleValues(*state);
 
     EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(*state));
@@ -3653,13 +3653,13 @@ TEST_F(EnergyPlusFixture, MultipleDesuperheaterSingleSource)
 
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->HourOfDay = 1;
-    DataEnvironment::Month = 7;
+    state->dataEnvrn->Month = 7;
     state->dataEnvrn->DayOfMonth = 21;
     state->dataGlobal->HourOfDay = 1;
     state->dataEnvrn->DSTIndicator = 0;
     state->dataEnvrn->DayOfWeek = 2;
     state->dataEnvrn->HolidayIndex = 0;
-    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, state->dataEnvrn->DayOfMonth, 1);
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
     ScheduleManager::UpdateScheduleValues(*state);
 
     // Initiate tank conditions
@@ -4423,7 +4423,7 @@ TEST_F(EnergyPlusFixture, CrashCalcStandardRatings_HPWH_and_Standalone)
 
         DataLoopNode::Node(3).Temp = 30.0;
         DataLoopNode::Node(3).HumRat = 0.01;
-        DataEnvironment::OutBaroPress = 101325.0;
+        state->dataEnvrn->OutBaroPress = 101325.0;
 
         bool FirstHVACIteration(true);
         state->dataGlobal->WarmupFlag = true;
@@ -4447,7 +4447,7 @@ TEST_F(EnergyPlusFixture, CrashCalcStandardRatings_HPWH_and_Standalone)
 
         DataLoopNode::Node(3).Temp = 30.0;
         DataLoopNode::Node(3).HumRat = 0.01;
-        DataEnvironment::OutBaroPress = 101325.0;
+        state->dataEnvrn->OutBaroPress = 101325.0;
 
         bool FirstHVACIteration(true);
         state->dataGlobal->WarmupFlag = true;

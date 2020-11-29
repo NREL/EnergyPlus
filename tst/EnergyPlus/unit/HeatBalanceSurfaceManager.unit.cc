@@ -139,7 +139,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_CalcOutsideSurfTemp)
     DataSurfaces::Surface(SurfNum).MaterialMovInsulExt = 1;
 
     DataEnvironment::SkyTemp = 23.0;
-    DataEnvironment::OutDryBulbTemp = 23.0;
+    state->dataEnvrn->OutDryBulbTemp = 23.0;
 
     DataHeatBalSurface::QdotRadOutRep.allocate(SurfNum);
     DataHeatBalSurface::QdotRadOutRepPerArea.allocate(SurfNum);
@@ -722,7 +722,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
 
     DataSizing::ZoneEqSizing.allocate(1);
     DataHeatBalance::Zone(1).SystemZoneNodeNumber = 5;
-    DataEnvironment::OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
     DataHeatBalFanSys::MAT.allocate(1); // Zone temperature C
     DataHeatBalFanSys::MAT(1) = 24.0;
     DataHeatBalFanSys::ZoneAirHumRat.allocate(1);
@@ -1258,7 +1258,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
 
     DataSizing::ZoneEqSizing.allocate(1);
     DataHeatBalance::Zone(1).SystemZoneNodeNumber = 5;
-    DataEnvironment::OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
     DataHeatBalFanSys::MAT.allocate(1); // Zone temperature C
     DataHeatBalFanSys::MAT(1) = 24.0;
     DataHeatBalFanSys::ZoneAirHumRat.allocate(1);
@@ -1833,7 +1833,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
 
     DataSizing::ZoneEqSizing.allocate(1);
     DataHeatBalance::Zone(1).SystemZoneNodeNumber = 5;
-    DataEnvironment::OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
     DataHeatBalFanSys::MAT.allocate(1); // Zone temperature C
     DataHeatBalFanSys::MAT(1) = 24.0;
     DataHeatBalFanSys::ZoneAirHumRat.allocate(1);
@@ -2392,7 +2392,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
 
     DataSizing::ZoneEqSizing.allocate(1);
     DataHeatBalance::Zone(1).SystemZoneNodeNumber = 5;
-    DataEnvironment::OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
     DataHeatBalFanSys::MAT.allocate(1); // Zone temperature C
     DataHeatBalFanSys::MAT(1) = 24.0;
     DataHeatBalFanSys::ZoneAirHumRat.allocate(1);
@@ -2617,12 +2617,12 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     state->dataGlobal->NumOfZones = 1;
     state->dataGlobal->KindOfSim = DataGlobalConstants::KindOfSim::RunPeriodWeather;
     OutputReportTabular::displayThermalResilienceSummary = true;
-    DataEnvironment::Month = 7;
+    state->dataEnvrn->Month = 7;
     state->dataEnvrn->DayOfMonth = 1;
 
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->TimeStepZone = 1;
-    DataEnvironment::OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
 
     state->dataGlobal->NumOfZones = 1;
     DataHeatBalance::Zone.allocate(state->dataGlobal->NumOfZones);

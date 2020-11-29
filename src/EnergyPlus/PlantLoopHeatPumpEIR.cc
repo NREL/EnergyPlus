@@ -516,7 +516,7 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
                                                    this->sourceSideLocation.branchNum,
                                                    this->sourceSideLocation.compNum);
             } else if (this->airSource) {
-                rho = Psychrometrics::PsyRhoAirFnPbTdbW(state, DataEnvironment::StdBaroPress, DataEnvironment::OutDryBulbTemp, 0.0, routineName);
+                rho = Psychrometrics::PsyRhoAirFnPbTdbW(state, DataEnvironment::StdBaroPress, state.dataEnvrn->OutDryBulbTemp, 0.0, routineName);
                 this->sourceSideDesignMassFlowRate = rho * this->sourceSideDesignVolFlowRate;
             }
 

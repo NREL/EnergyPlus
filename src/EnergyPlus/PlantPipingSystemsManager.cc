@@ -4366,9 +4366,9 @@ namespace EnergyPlus {
             Real64 GroundCoverCoefficient;
 
             // retrieve information from E+ globals
-            Latitude_Degrees = DataEnvironment::Latitude;
+            Latitude_Degrees = state.dataEnvrn->Latitude;
             StMeridian_Degrees = -DataEnvironment::TimeZoneMeridian; // Standard meridian, degrees W
-            Longitude_Degrees = -DataEnvironment::Longitude;         // Longitude, degrees W
+            Longitude_Degrees = -state.dataEnvrn->Longitude;         // Longitude, degrees W
 
             // retrieve any information from input data structure
             GroundCoverCoefficient = this->Moisture.GroundCoverCoefficient;
@@ -5731,7 +5731,7 @@ namespace EnergyPlus {
             static std::string const RoutineName("PipingSystemCircuit::DoStartOfTimeStepInitializations");
 
             // Update environmental conditions
-            this->Cur.CurAirTemp = DataEnvironment::OutDryBulbTemp;
+            this->Cur.CurAirTemp = state.dataEnvrn->OutDryBulbTemp;
             this->Cur.CurWindSpeed = DataEnvironment::WindSpeed;
             this->Cur.CurRelativeHumidity = DataEnvironment::OutRelHum;
             this->Cur.CurIncidentSolar = state.dataEnvrn->BeamSolarRad;

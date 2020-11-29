@@ -738,7 +738,7 @@ namespace DataSurfaces {
         }
     }
 
-    void SurfaceData::SetOutBulbTempAt()
+    void SurfaceData::SetOutBulbTempAt(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Noel Keen (LBL)/Linda Lawrie
@@ -754,19 +754,19 @@ namespace DataSurfaces {
         using DataEnvironment::WeatherFileTempModCoeff;
 
         if (SiteTempGradient == 0.0) {
-            OutDryBulbTemp = DataEnvironment::OutDryBulbTemp;
+            state.dataEnvrn->OutDryBulbTemp = state.dataEnvrn->OutDryBulbTemp;
             OutWetBulbTemp = DataEnvironment::OutWetBulbTemp;
         } else {
             // Base temperatures at Z = 0 (C)
-            Real64 const BaseDryTemp(DataEnvironment::OutDryBulbTemp + WeatherFileTempModCoeff);
+            Real64 const BaseDryTemp(state.dataEnvrn->OutDryBulbTemp + WeatherFileTempModCoeff);
             Real64 const BaseWetTemp(DataEnvironment::OutWetBulbTemp + WeatherFileTempModCoeff);
 
             Real64 const Z(Centroid.z); // Centroid value
             if (Z <= 0.0) {
-                OutDryBulbTemp = BaseDryTemp;
+                state.dataEnvrn->OutDryBulbTemp = BaseDryTemp;
                 OutWetBulbTemp = BaseWetTemp;
             } else {
-                OutDryBulbTemp = BaseDryTemp - SiteTempGradient * DataEnvironment::EarthRadius * Z / (DataEnvironment::EarthRadius + Z);
+                state.dataEnvrn->OutDryBulbTemp = BaseDryTemp - SiteTempGradient * DataEnvironment::EarthRadius * Z / (DataEnvironment::EarthRadius + Z);
                 OutWetBulbTemp = BaseWetTemp - SiteTempGradient * DataEnvironment::EarthRadius * Z / (DataEnvironment::EarthRadius + Z);
             }
         }
@@ -910,11 +910,11 @@ namespace DataSurfaces {
                     temperature = OutWetBulbTemp;
                 } else {
                     // Dry
-                    temperature = OutDryBulbTemp;
+                    temperature = state.dataEnvrn->OutDryBulbTemp;
                 }
             } else {
                 // Window not exposed to wind
-                temperature = OutDryBulbTemp;
+                temperature = state.dataEnvrn->OutDryBulbTemp;
             }
         }
 
@@ -1427,10 +1427,10 @@ namespace DataSurfaces {
         SurfWinTDDPipeNum.clear();
     }
 
-    void SetSurfaceOutBulbTempAt()
+    void SetSurfaceOutBulbTempAt(EnergyPlusData &state)
     {
         for (auto &surface : Surface) {
-            surface.SetOutBulbTempAt();
+            surface.SetOutBulbTempAt(state);
         }
     }
 

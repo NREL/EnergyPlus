@@ -130,7 +130,6 @@ namespace DesiccantDehumidifiers {
     // Use statements for data only modules
     // Using/Aliasing
     using namespace DataLoopNode;
-    using DataEnvironment::OutBaroPress;
     using DataEnvironment::StdRhoAir;
     using DataHeatBalance::HeatReclaimDXCoil;
     using DataHVACGlobals::BlowThru;

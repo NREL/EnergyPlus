@@ -71,12 +71,12 @@ TEST_F(EnergyPlusFixture, OutAirNodeManager_OATdbTwbOverrideTest)
     DataLoopNode::Node.allocate(3);
     ScheduleManager::Schedule.allocate(2);
 
-    DataEnvironment::OutDryBulbTemp = 25.0;
+    state->dataEnvrn->OutDryBulbTemp = 25.0;
     DataEnvironment::OutWetBulbTemp = 15.0;
     DataEnvironment::WindSpeed = 2.0;
     DataEnvironment::WindDir = 0.0;
-    DataEnvironment::OutBaroPress = 101325;
-    DataEnvironment::OutHumRat = Psychrometrics::PsyWFnTdbTwbPb(*state, DataEnvironment::OutDryBulbTemp, DataEnvironment::OutWetBulbTemp, DataEnvironment::OutBaroPress);
+    state->dataEnvrn->OutBaroPress = 101325;
+    DataEnvironment::OutHumRat = Psychrometrics::PsyWFnTdbTwbPb(*state, state->dataEnvrn->OutDryBulbTemp, DataEnvironment::OutWetBulbTemp, state->dataEnvrn->OutBaroPress);
 
     ScheduleManager::Schedule(1).CurrentValue = 24.0;
     OutsideAirNodeList(1) = 1;
@@ -85,7 +85,7 @@ TEST_F(EnergyPlusFixture, OutAirNodeManager_OATdbTwbOverrideTest)
     // Scheduled value
     DataLoopNode::Node(1).IsLocalNode = true;
     DataLoopNode::Node(1).OutAirDryBulbSchedNum = 1;
-    DataLoopNode::Node(1).OutAirDryBulb = DataEnvironment::OutDryBulbTemp;
+    DataLoopNode::Node(1).OutAirDryBulb = state->dataEnvrn->OutDryBulbTemp;
     DataLoopNode::Node(1).OutAirWetBulb = DataEnvironment::OutWetBulbTemp;
     // EMS override value
     DataLoopNode::Node(2).IsLocalNode = true;
@@ -93,10 +93,10 @@ TEST_F(EnergyPlusFixture, OutAirNodeManager_OATdbTwbOverrideTest)
     DataLoopNode::Node(2).EMSOverrideOutAirWetBulb = true;
     DataLoopNode::Node(2).EMSValueForOutAirDryBulb = 26.0;
     DataLoopNode::Node(2).EMSValueForOutAirWetBulb = 16.0;
-    DataLoopNode::Node(2).OutAirDryBulb = DataEnvironment::OutDryBulbTemp;
+    DataLoopNode::Node(2).OutAirDryBulb = state->dataEnvrn->OutDryBulbTemp;
     DataLoopNode::Node(2).OutAirWetBulb = DataEnvironment::OutWetBulbTemp;
     // No changes
-    DataLoopNode::Node(3).OutAirDryBulb = DataEnvironment::OutDryBulbTemp;
+    DataLoopNode::Node(3).OutAirDryBulb = state->dataEnvrn->OutDryBulbTemp;
     DataLoopNode::Node(3).OutAirWetBulb = DataEnvironment::OutWetBulbTemp;
 
     InitOutAirNodes(*state);

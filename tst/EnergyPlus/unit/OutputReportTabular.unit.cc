@@ -51,7 +51,6 @@
 
 // Google Test Headers
 #include <gtest/gtest.h>
-#include <stdio.h>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 #include "Fixtures/SQLiteFixture.hh"
@@ -61,14 +60,11 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/CondenserLoopTowers.hh>
-#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
-#include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataOutputs.hh>
 #include <EnergyPlus/DataSizing.hh>
@@ -76,8 +72,6 @@
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
-#include <EnergyPlus/General.hh>
-#include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -89,10 +83,8 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
 #include <EnergyPlus/SQLiteProcedures.hh>
-#include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WeatherManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 
@@ -100,10 +92,8 @@ using namespace EnergyPlus;
 using namespace EnergyPlus::DataGlobalConstants;
 using namespace EnergyPlus::DataEnvironment;
 using namespace EnergyPlus::DataHeatBalance;
-using namespace EnergyPlus::DataHeatBalSurface;
 using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::DataSurfaces;
-using namespace EnergyPlus::HeatBalanceManager;
 using namespace EnergyPlus::OutputProcessor;
 using namespace EnergyPlus::OutputReportPredefined;
 using namespace EnergyPlus::OutputReportTabular;
@@ -3516,7 +3506,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_ResetMonthlyGathering)
 
     extLitUse = 1.01;
 
-    DataEnvironment::Month = 12;
+    state->dataEnvrn->Month = 12;
 
     GatherMonthlyResultsForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
     EXPECT_EQ(extLitUse * 1, MonthlyColumns(1).reslt(12));
@@ -3589,7 +3579,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering)
 
     extLitUse = 1.01;
 
-    DataEnvironment::Month = 12;
+    state->dataEnvrn->Month = 12;
 
     UpdateMeterReporting(*state);
     UpdateDataandReport(*state, OutputProcessor::TimeStepType::TimeStepZone);
@@ -3727,7 +3717,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatEmissionReport)
     state->dataGlobal->DoWeathSim = true;
     DataHVACGlobals::TimeStepSys = 10.0;
     DataEnvironment::OutHumRat = 0.005;
-    DataEnvironment::OutDryBulbTemp = 25.0;
+    state->dataEnvrn->OutDryBulbTemp = 25.0;
 
     MixedAir::NumOAControllers = 2;
     MixedAir::OAController.allocate(2);
@@ -6059,8 +6049,8 @@ TEST_F(SQLiteFixture, WriteVeriSumTableAreasTest)
     EnergyPlus::sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
     displayTabularVeriSum = true;
-    Latitude = 12.3;
-    Longitude = 45.6;
+    state->dataEnvrn->Latitude = 12.3;
+    state->dataEnvrn->Longitude = 45.6;
 
     TotSurfaces = 4;
     Surface.allocate(TotSurfaces);
@@ -6169,8 +6159,8 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal)
     EnergyPlus::sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
     displayTabularVeriSum = true;
-    Latitude = 12.3;
-    Longitude = 45.6;
+    state->dataEnvrn->Latitude = 12.3;
+    state->dataEnvrn->Longitude = 45.6;
 
     TotSurfaces = 4;
     Surface.allocate(TotSurfaces);
@@ -7639,8 +7629,8 @@ TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummary_TestPerArea) {
 
     // DetermineBuildingFloorArea
 
-    Latitude = 12.3;
-    Longitude = 45.6;
+    state->dataEnvrn->Latitude = 12.3;
+    state->dataEnvrn->Longitude = 45.6;
 
     TotSurfaces = 4;
     Surface.allocate(TotSurfaces);
@@ -7910,7 +7900,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
 
     GetInputOutputTableSummaryReports(*state);
 
-    DataEnvironment::Month = 12;
+    state->dataEnvrn->Month = 12;
 
     UpdateMeterReporting(*state);
     UpdateDataandReport(*state, OutputProcessor::TimeStepType::TimeStepZone);

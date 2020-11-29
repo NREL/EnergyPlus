@@ -619,10 +619,10 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMInletSide)
     state->dataGlobal->BeginEnvrnFlag = false;
 
     // set input variables
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::OutDryBulbTemp = 35.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->OutDryBulbTemp = 35.0;
     DataEnvironment::OutHumRat = 0.0098;
-    DataEnvironment::OutEnthalpy = Psychrometrics::PsyHFnTdbW(DataEnvironment::OutDryBulbTemp, DataEnvironment::OutHumRat);
+    DataEnvironment::OutEnthalpy = Psychrometrics::PsyHFnTdbW(state->dataEnvrn->OutDryBulbTemp, DataEnvironment::OutHumRat);
     DataEnvironment::StdRhoAir = 1.20;
     HVACInletMassFlowRate = 0.50;
     PrimaryAirMassFlowRate = 0.1;
@@ -660,7 +660,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMInletSide)
     DXCoil(1).RatedAirMassFlowRate(1) = HVACInletMassFlowRate;
 
     // primary air condition set at outdoor air condition
-    Node(PTUnit(PTUnitNum).ATMixerPriNode).Temp = DataEnvironment::OutDryBulbTemp;
+    Node(PTUnit(PTUnitNum).ATMixerPriNode).Temp = state->dataEnvrn->OutDryBulbTemp;
     Node(PTUnit(PTUnitNum).ATMixerPriNode).HumRat = DataEnvironment::OutHumRat;
     Node(PTUnit(PTUnitNum).ATMixerPriNode).Enthalpy = DataEnvironment::OutEnthalpy;
 
@@ -948,10 +948,10 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMSupplySide)
     EXPECT_EQ("ZoneHVAC:PackagedTerminalAirConditioner", PTUnit(1).UnitType); // zoneHVAC equipment type
 
     // set input variables
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::OutDryBulbTemp = 35.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->OutDryBulbTemp = 35.0;
     DataEnvironment::OutHumRat = 0.0098;
-    DataEnvironment::OutEnthalpy = Psychrometrics::PsyHFnTdbW(DataEnvironment::OutDryBulbTemp, DataEnvironment::OutHumRat);
+    DataEnvironment::OutEnthalpy = Psychrometrics::PsyHFnTdbW(state->dataEnvrn->OutDryBulbTemp, DataEnvironment::OutHumRat);
     DataEnvironment::StdRhoAir = 1.20;
     HVACInletMassFlowRate = 0.50;
     PrimaryAirMassFlowRate = 0.1;
@@ -991,7 +991,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMSupplySide)
     DXCoil(1).RatedAirMassFlowRate(1) = HVACInletMassFlowRate;
 
     // primary air condition at outside air condition
-    Node(PTUnit(PTUnitNum).ATMixerPriNode).Temp = DataEnvironment::OutDryBulbTemp;
+    Node(PTUnit(PTUnitNum).ATMixerPriNode).Temp = state->dataEnvrn->OutDryBulbTemp;
     Node(PTUnit(PTUnitNum).ATMixerPriNode).HumRat = DataEnvironment::OutHumRat;
     Node(PTUnit(PTUnitNum).ATMixerPriNode).Enthalpy = DataEnvironment::OutEnthalpy;
 
@@ -1364,10 +1364,10 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMInletSide)
     state->dataGlobal->BeginEnvrnFlag = false;
 
     // set input variables
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::OutDryBulbTemp = 35.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->OutDryBulbTemp = 35.0;
     DataEnvironment::OutHumRat = 0.0098;
-    DataEnvironment::OutEnthalpy = Psychrometrics::PsyHFnTdbW(DataEnvironment::OutDryBulbTemp, DataEnvironment::OutHumRat);
+    DataEnvironment::OutEnthalpy = Psychrometrics::PsyHFnTdbW(state->dataEnvrn->OutDryBulbTemp, DataEnvironment::OutHumRat);
     DataEnvironment::StdRhoAir = 1.20;
     HVACInletMassFlowRate = 0.50;
     PrimaryAirMassFlowRate = 0.1;
@@ -1405,7 +1405,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMInletSide)
     DXCoil(1).RatedAirMassFlowRate(1) = HVACInletMassFlowRate;
 
     // primary air condition set at outdoor air condition
-    Node(PTUnit(PTUnitNum).ATMixerPriNode).Temp = DataEnvironment::OutDryBulbTemp;
+    Node(PTUnit(PTUnitNum).ATMixerPriNode).Temp = state->dataEnvrn->OutDryBulbTemp;
     Node(PTUnit(PTUnitNum).ATMixerPriNode).HumRat = DataEnvironment::OutHumRat;
     Node(PTUnit(PTUnitNum).ATMixerPriNode).Enthalpy = DataEnvironment::OutEnthalpy;
 
@@ -1775,10 +1775,10 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMSupplySide)
     EXPECT_EQ("ZoneHVAC:PackagedTerminalHeatPump", PTUnit(1).UnitType);      // zoneHVAC equipment type
 
     // set input variables
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::OutDryBulbTemp = 35.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->OutDryBulbTemp = 35.0;
     DataEnvironment::OutHumRat = 0.0098;
-    DataEnvironment::OutEnthalpy = Psychrometrics::PsyHFnTdbW(DataEnvironment::OutDryBulbTemp, DataEnvironment::OutHumRat);
+    DataEnvironment::OutEnthalpy = Psychrometrics::PsyHFnTdbW(state->dataEnvrn->OutDryBulbTemp, DataEnvironment::OutHumRat);
     DataEnvironment::StdRhoAir = 1.20;
     HVACInletMassFlowRate = 0.50;
     PrimaryAirMassFlowRate = 0.1;
@@ -1818,7 +1818,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMSupplySide)
     DXCoil(1).RatedAirMassFlowRate(1) = HVACInletMassFlowRate;
 
     // primary air condition at outside air condition
-    Node(PTUnit(PTUnitNum).ATMixerPriNode).Temp = DataEnvironment::OutDryBulbTemp;
+    Node(PTUnit(PTUnitNum).ATMixerPriNode).Temp = state->dataEnvrn->OutDryBulbTemp;
     Node(PTUnit(PTUnitNum).ATMixerPriNode).HumRat = DataEnvironment::OutHumRat;
     Node(PTUnit(PTUnitNum).ATMixerPriNode).Enthalpy = DataEnvironment::OutEnthalpy;
 
@@ -2451,10 +2451,10 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRF_ATMInletSide)
     state->dataGlobal->BeginEnvrnFlag = false;
 
     // set input variables
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::OutDryBulbTemp = 35.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->OutDryBulbTemp = 35.0;
     DataEnvironment::OutHumRat = 0.0098;
-    DataEnvironment::OutEnthalpy = Psychrometrics::PsyHFnTdbW(DataEnvironment::OutDryBulbTemp, DataEnvironment::OutHumRat);
+    DataEnvironment::OutEnthalpy = Psychrometrics::PsyHFnTdbW(state->dataEnvrn->OutDryBulbTemp, DataEnvironment::OutHumRat);
     DataEnvironment::StdRhoAir = 1.20;
     HVACInletMassFlowRate = 0.50;
     PrimaryAirMassFlowRate = 0.1;
@@ -2499,7 +2499,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRF_ATMInletSide)
     DXCoil(1).RatedAirMassFlowRate(1) = HVACInletMassFlowRate;
 
     // primary air condition set at outdoor air condition
-    Node(VRFTU(VRFTUNum).ATMixerPriNode).Temp = DataEnvironment::OutDryBulbTemp;
+    Node(VRFTU(VRFTUNum).ATMixerPriNode).Temp = state->dataEnvrn->OutDryBulbTemp;
     Node(VRFTU(VRFTUNum).ATMixerPriNode).HumRat = DataEnvironment::OutHumRat;
     Node(VRFTU(VRFTUNum).ATMixerPriNode).Enthalpy = DataEnvironment::OutEnthalpy;
 
@@ -3129,10 +3129,10 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRF_ATMSupplySide)
     state->dataGlobal->BeginEnvrnFlag = false;
 
     // set input variables
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::OutDryBulbTemp = 35.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->OutDryBulbTemp = 35.0;
     DataEnvironment::OutHumRat = 0.0098;
-    DataEnvironment::OutEnthalpy = Psychrometrics::PsyHFnTdbW(DataEnvironment::OutDryBulbTemp, DataEnvironment::OutHumRat);
+    DataEnvironment::OutEnthalpy = Psychrometrics::PsyHFnTdbW(state->dataEnvrn->OutDryBulbTemp, DataEnvironment::OutHumRat);
     DataEnvironment::StdRhoAir = 1.20;
     HVACInletMassFlowRate = 0.50;
     PrimaryAirMassFlowRate = 0.1;
@@ -3175,7 +3175,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRF_ATMSupplySide)
     DXCoil(1).RatedAirMassFlowRate(1) = HVACInletMassFlowRate;
 
     // primary air condition set at outdoor air condition
-    Node(VRFTU(VRFTUNum).ATMixerPriNode).Temp = DataEnvironment::OutDryBulbTemp;
+    Node(VRFTU(VRFTUNum).ATMixerPriNode).Temp = state->dataEnvrn->OutDryBulbTemp;
     Node(VRFTU(VRFTUNum).ATMixerPriNode).HumRat = DataEnvironment::OutHumRat;
     Node(VRFTU(VRFTUNum).ATMixerPriNode).Enthalpy = DataEnvironment::OutEnthalpy;
 
@@ -4879,11 +4879,11 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMInletSi
     state->dataGlobal->BeginEnvrnFlag = false;
 
     // set input variables
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::OutDryBulbTemp = 35.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->OutDryBulbTemp = 35.0;
     DataEnvironment::OutHumRat = 0.0098;
-    DataEnvironment::OutEnthalpy = Psychrometrics::PsyHFnTdbW(DataEnvironment::OutDryBulbTemp, DataEnvironment::OutHumRat);
-    DataEnvironment::OutWetBulbTemp = PsyTwbFnTdbWPb(*state, DataEnvironment::OutDryBulbTemp, DataEnvironment::OutHumRat, DataEnvironment::OutBaroPress);
+    DataEnvironment::OutEnthalpy = Psychrometrics::PsyHFnTdbW(state->dataEnvrn->OutDryBulbTemp, DataEnvironment::OutHumRat);
+    DataEnvironment::OutWetBulbTemp = PsyTwbFnTdbWPb(*state, state->dataEnvrn->OutDryBulbTemp, DataEnvironment::OutHumRat, state->dataEnvrn->OutBaroPress);
     DataEnvironment::StdRhoAir = 1.20;
     HVACInletMassFlowRate = 0.50;
     PrimaryAirMassFlowRate = 0.1;
@@ -4927,7 +4927,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMInletSi
     DXCoil(1).RatedAirMassFlowRate(1) = HVACInletMassFlowRate;
 
     // primary air condition set at outdoor air condition
-    Node(VRFTU(VRFTUNum).ATMixerPriNode).Temp = DataEnvironment::OutDryBulbTemp;
+    Node(VRFTU(VRFTUNum).ATMixerPriNode).Temp = state->dataEnvrn->OutDryBulbTemp;
     Node(VRFTU(VRFTUNum).ATMixerPriNode).HumRat = DataEnvironment::OutHumRat;
     Node(VRFTU(VRFTUNum).ATMixerPriNode).Enthalpy = DataEnvironment::OutEnthalpy;
 
@@ -6633,10 +6633,10 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMSupplyS
     state->dataGlobal->BeginEnvrnFlag = false;
 
     // set input variables
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::OutDryBulbTemp = 35.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->OutDryBulbTemp = 35.0;
     DataEnvironment::OutHumRat = 0.0098;
-    DataEnvironment::OutEnthalpy = Psychrometrics::PsyHFnTdbW(DataEnvironment::OutDryBulbTemp, DataEnvironment::OutHumRat);
+    DataEnvironment::OutEnthalpy = Psychrometrics::PsyHFnTdbW(state->dataEnvrn->OutDryBulbTemp, DataEnvironment::OutHumRat);
     DataEnvironment::StdRhoAir = 1.20;
     HVACInletMassFlowRate = 0.50;
     PrimaryAirMassFlowRate = 0.1;
@@ -6679,7 +6679,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMSupplyS
     DXCoil(1).RatedAirMassFlowRate(1) = HVACInletMassFlowRate;
 
     // primary air condition set at outdoor air condition
-    Node(VRFTU(VRFTUNum).ATMixerPriNode).Temp = DataEnvironment::OutDryBulbTemp;
+    Node(VRFTU(VRFTUNum).ATMixerPriNode).Temp = state->dataEnvrn->OutDryBulbTemp;
     Node(VRFTU(VRFTUNum).ATMixerPriNode).HumRat = DataEnvironment::OutHumRat;
     Node(VRFTU(VRFTUNum).ATMixerPriNode).Enthalpy = DataEnvironment::OutEnthalpy;
 
@@ -6878,10 +6878,10 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimUnitVent_ATMInletSide)
     state->dataGlobal->BeginEnvrnFlag = false;
 
     // set input variables
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::OutDryBulbTemp = 10.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->OutDryBulbTemp = 10.0;
     DataEnvironment::OutHumRat = 0.0070;
-    DataEnvironment::OutEnthalpy = Psychrometrics::PsyHFnTdbW(DataEnvironment::OutDryBulbTemp, DataEnvironment::OutHumRat);
+    DataEnvironment::OutEnthalpy = Psychrometrics::PsyHFnTdbW(state->dataEnvrn->OutDryBulbTemp, DataEnvironment::OutHumRat);
     DataEnvironment::StdRhoAir = 1.00;
     HVACInletMassFlowRate = 0.50;
     PrimaryAirMassFlowRate = 0.1;
@@ -6916,7 +6916,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimUnitVent_ATMInletSide)
     Node(Fan(1).OutletNodeNum).MassFlowRateMax = HVACInletMassFlowRate;
 
     // primary air condition set at outdoor air condition
-    Node(state->dataUnitVentilators->UnitVent(UnitVentNum).ATMixerPriNode).Temp = DataEnvironment::OutDryBulbTemp;
+    Node(state->dataUnitVentilators->UnitVent(UnitVentNum).ATMixerPriNode).Temp = state->dataEnvrn->OutDryBulbTemp;
     Node(state->dataUnitVentilators->UnitVent(UnitVentNum).ATMixerPriNode).HumRat = DataEnvironment::OutHumRat;
     Node(state->dataUnitVentilators->UnitVent(UnitVentNum).ATMixerPriNode).Enthalpy = DataEnvironment::OutEnthalpy;
 
@@ -7113,10 +7113,10 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimUnitVent_ATMSupplySide)
     EXPECT_EQ("AIRTERMINAL:SINGLEDUCT:MIXER", state->dataDefineEquipment->AirDistUnit(1).EquipType(1));  // Air distribution unit equipment type
 
     // set input variables
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::OutDryBulbTemp = 10.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->OutDryBulbTemp = 10.0;
     DataEnvironment::OutHumRat = 0.0070;
-    DataEnvironment::OutEnthalpy = Psychrometrics::PsyHFnTdbW(DataEnvironment::OutDryBulbTemp, DataEnvironment::OutHumRat);
+    DataEnvironment::OutEnthalpy = Psychrometrics::PsyHFnTdbW(state->dataEnvrn->OutDryBulbTemp, DataEnvironment::OutHumRat);
     DataEnvironment::StdRhoAir = 1.00;
     HVACInletMassFlowRate = 0.50;
     PrimaryAirMassFlowRate = 0.1;
@@ -7153,7 +7153,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimUnitVent_ATMSupplySide)
     Node(Fan(1).OutletNodeNum).MassFlowRateMax = HVACInletMassFlowRate;
 
     // primary air condition at outside air condition
-    Node(state->dataUnitVentilators->UnitVent(UnitVentNum).ATMixerPriNode).Temp = DataEnvironment::OutDryBulbTemp;
+    Node(state->dataUnitVentilators->UnitVent(UnitVentNum).ATMixerPriNode).Temp = state->dataEnvrn->OutDryBulbTemp;
     Node(state->dataUnitVentilators->UnitVent(UnitVentNum).ATMixerPriNode).HumRat = DataEnvironment::OutHumRat;
     Node(state->dataUnitVentilators->UnitVent(UnitVentNum).ATMixerPriNode).Enthalpy = DataEnvironment::OutEnthalpy;
 
@@ -7528,8 +7528,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimFCU_ATMInletSideTest)
     int FanCoilNum(1);
 
     DataSizing::CurZoneEqNum = 1;
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, OutBaroPress, 20.0, 0.0);
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
     state->dataWaterCoils->GetWaterCoilsInputFlag = true;
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->TimeStep = 1;
@@ -7628,13 +7628,13 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimFCU_ATMInletSideTest)
     state->dataGlobal->DoingSizing = true;
     state->dataFans->LocalTurnFansOff = false;
     state->dataFans->LocalTurnFansOn = true;
-    DataEnvironment::Month = 1;
+    state->dataEnvrn->Month = 1;
     state->dataEnvrn->DayOfMonth = 21;
     state->dataGlobal->HourOfDay = 1;
     state->dataEnvrn->DSTIndicator = 0;
     state->dataEnvrn->DayOfWeek = 2;
     state->dataEnvrn->HolidayIndex = 0;
-    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(Month, state->dataEnvrn->DayOfMonth, 1);
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
     UpdateScheduleValues(*state);
 
     ZoneEqSizing.allocate(1);
@@ -7681,11 +7681,11 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimFCU_ATMInletSideTest)
     Node(zoneEquipConfig.ZoneNode).HumRat = 0.0075;
     Node(zoneEquipConfig.ZoneNode).Enthalpy = Psychrometrics::PsyHFnTdbW(Node(zoneEquipConfig.ZoneNode).Temp, Node(zoneEquipConfig.ZoneNode).HumRat);
     // primary air conditions
-    DataEnvironment::OutDryBulbTemp = 5.0;
+    state->dataEnvrn->OutDryBulbTemp = 5.0;
     DataEnvironment::OutHumRat = 0.005;
-    DataEnvironment::OutEnthalpy = Psychrometrics::PsyHFnTdbW(DataEnvironment::OutDryBulbTemp, DataEnvironment::OutHumRat);
+    DataEnvironment::OutEnthalpy = Psychrometrics::PsyHFnTdbW(state->dataEnvrn->OutDryBulbTemp, DataEnvironment::OutHumRat);
     // primary air condition set at outdoor air condition
-    Node(thisFanCoil.ATMixerPriNode).Temp = DataEnvironment::OutDryBulbTemp;
+    Node(thisFanCoil.ATMixerPriNode).Temp = state->dataEnvrn->OutDryBulbTemp;
     Node(thisFanCoil.ATMixerPriNode).HumRat = DataEnvironment::OutHumRat;
     Node(thisFanCoil.ATMixerPriNode).Enthalpy = DataEnvironment::OutEnthalpy;
     // initialize air terminal mixer primary air mass flow rate
@@ -7728,11 +7728,11 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimFCU_ATMInletSideTest)
     Node(zoneEquipConfig.ZoneNode).HumRat = 0.0085;
     Node(zoneEquipConfig.ZoneNode).Enthalpy = Psychrometrics::PsyHFnTdbW(Node(zoneEquipConfig.ZoneNode).Temp, Node(zoneEquipConfig.ZoneNode).HumRat);
     // primary air conditions
-    DataEnvironment::OutDryBulbTemp = 28.0;
+    state->dataEnvrn->OutDryBulbTemp = 28.0;
     DataEnvironment::OutHumRat = 0.0095;
-    DataEnvironment::OutEnthalpy = Psychrometrics::PsyHFnTdbW(DataEnvironment::OutDryBulbTemp, DataEnvironment::OutHumRat);
+    DataEnvironment::OutEnthalpy = Psychrometrics::PsyHFnTdbW(state->dataEnvrn->OutDryBulbTemp, DataEnvironment::OutHumRat);
     // primary air condition set at outdoor air condition
-    Node(thisFanCoil.ATMixerPriNode).Temp = DataEnvironment::OutDryBulbTemp;
+    Node(thisFanCoil.ATMixerPriNode).Temp = state->dataEnvrn->OutDryBulbTemp;
     Node(thisFanCoil.ATMixerPriNode).HumRat = DataEnvironment::OutHumRat;
     Node(thisFanCoil.ATMixerPriNode).Enthalpy = DataEnvironment::OutEnthalpy;
     // initialize air terminal mixer primary air mass flow rate
@@ -7956,8 +7956,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
     int FanCoilNum(1);
 
     DataSizing::CurZoneEqNum = 1;
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, OutBaroPress, 20.0, 0.0);
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
     state->dataWaterCoils->GetWaterCoilsInputFlag = true;
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->TimeStep = 1;
@@ -8059,13 +8059,13 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
     state->dataGlobal->DoingSizing = true;
     state->dataFans->LocalTurnFansOff = false;
     state->dataFans->LocalTurnFansOn = true;
-    DataEnvironment::Month = 1;
+    state->dataEnvrn->Month = 1;
     state->dataEnvrn->DayOfMonth = 21;
     state->dataGlobal->HourOfDay = 1;
     state->dataEnvrn->DSTIndicator = 0;
     state->dataEnvrn->DayOfWeek = 2;
     state->dataEnvrn->HolidayIndex = 0;
-    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(Month, state->dataEnvrn->DayOfMonth, 1);
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
     UpdateScheduleValues(*state);
 
     ZoneEqSizing.allocate(1);
@@ -8112,11 +8112,11 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
     Node(zoneEquipConfig.ZoneNode).HumRat = 0.0075;
     Node(zoneEquipConfig.ZoneNode).Enthalpy = Psychrometrics::PsyHFnTdbW(Node(zoneEquipConfig.ZoneNode).Temp, Node(zoneEquipConfig.ZoneNode).HumRat);
     // primary air conditions
-    DataEnvironment::OutDryBulbTemp = 5.0;
+    state->dataEnvrn->OutDryBulbTemp = 5.0;
     DataEnvironment::OutHumRat = 0.005;
-    DataEnvironment::OutEnthalpy = Psychrometrics::PsyHFnTdbW(DataEnvironment::OutDryBulbTemp, DataEnvironment::OutHumRat);
+    DataEnvironment::OutEnthalpy = Psychrometrics::PsyHFnTdbW(state->dataEnvrn->OutDryBulbTemp, DataEnvironment::OutHumRat);
     // primary air condition set at outdoor air condition
-    Node(thisFanCoil.ATMixerPriNode).Temp = DataEnvironment::OutDryBulbTemp;
+    Node(thisFanCoil.ATMixerPriNode).Temp = state->dataEnvrn->OutDryBulbTemp;
     Node(thisFanCoil.ATMixerPriNode).HumRat = DataEnvironment::OutHumRat;
     Node(thisFanCoil.ATMixerPriNode).Enthalpy = DataEnvironment::OutEnthalpy;
     // initialize air terminal mixer primary air mass flow rate

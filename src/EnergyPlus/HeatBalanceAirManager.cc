@@ -4392,7 +4392,6 @@ namespace HeatBalanceAirManager {
         // na
 
         // Using/Aliasing
-        using DataEnvironment::OutBaroPress;
         using DataHeatBalance::MRT;
         using DataZoneControls::AnyOpTempControl;
         using DataZoneControls::TempControlledZone;
@@ -4424,7 +4423,7 @@ namespace HeatBalanceAirManager {
             ZnAirRpt(ZoneLoop).MeanAirTemp = ZTAV(ZoneLoop);
             ZnAirRpt(ZoneLoop).MeanAirHumRat = ZoneAirHumRatAvg(ZoneLoop);
             ZnAirRpt(ZoneLoop).OperativeTemp = 0.5 * (ZTAV(ZoneLoop) + MRT(ZoneLoop));
-            ZnAirRpt(ZoneLoop).MeanAirDewPointTemp = PsyTdpFnWPb(state, ZnAirRpt(ZoneLoop).MeanAirHumRat, OutBaroPress);
+            ZnAirRpt(ZoneLoop).MeanAirDewPointTemp = PsyTdpFnWPb(state, ZnAirRpt(ZoneLoop).MeanAirHumRat, state.dataEnvrn->OutBaroPress);
 
             // if operative temperature control is being used, then radiative fraction/weighting
             //  might be defined by user to be something different than 0.5, even scheduled over simulation period

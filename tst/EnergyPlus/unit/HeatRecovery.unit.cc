@@ -94,7 +94,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HRTest)
     NumHeatExchangers = 1;
     ExchCond.allocate(NumHeatExchangers);
     Node.allocate(4);
-    OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
 
     int ExchNum = 1;
     int CompanionCoilNum = 0;
@@ -4081,8 +4081,8 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HeatExchangerGenericCalcTest)
     bool HighHumCtrlFlag = false;
     int FanOpMode = 2; // 2 = constant fan
 
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, DataEnvironment::OutBaroPress, 20.0, 0.0);
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
 
     thisHX.ExchTypeNum = HX_AIRTOAIR_GENERIC;
     thisHX.SupInTemp = 10.0;

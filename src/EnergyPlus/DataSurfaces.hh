@@ -956,7 +956,7 @@ namespace DataSurfaces {
             // Set Precomputed Parameters
         void set_computed_geometry();
 
-        void SetOutBulbTempAt();
+        void SetOutBulbTempAt(EnergyPlusData &state);
 
         void SetWindDirAt(Real64 const fac);
 
@@ -1452,7 +1452,7 @@ namespace DataSurfaces {
     // Needed for unit tests, should not be normally called.
     void clear_state();
 
-    void SetSurfaceOutBulbTempAt();
+    void SetSurfaceOutBulbTempAt(EnergyPlusData &state);
 
     void CheckSurfaceOutBulbTempAt(EnergyPlusData &state);
 

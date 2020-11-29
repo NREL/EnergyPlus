@@ -303,7 +303,6 @@ namespace SplitterComponent {
         // METHODOLOGY EMPLOYED:
         // Uses the status flags to trigger events.
 
-        using DataEnvironment::OutBaroPress;
         using DataEnvironment::OutHumRat;
         using Psychrometrics::PsyHFnTdbW;
 
@@ -324,7 +323,7 @@ namespace SplitterComponent {
             Node(InletNode).Temp = 20.0;
             Node(InletNode).HumRat = OutHumRat;
             Node(InletNode).Enthalpy = AirEnthalpy;
-            Node(InletNode).Press = OutBaroPress;
+            Node(InletNode).Press = state.dataEnvrn->OutBaroPress;
             if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
                 Node(InletNode).CO2 = state.dataContaminantBalance->OutdoorCO2;
             }

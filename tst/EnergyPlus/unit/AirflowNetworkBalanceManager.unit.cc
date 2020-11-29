@@ -2266,9 +2266,9 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPressureStat)
     Schedule(UtilityRoutines::FindItemInList("WINDOWVENTSCHED", Schedule({1, NumSchedules}))).CurrentValue = 1.0; // WindowVentSched
 
     AirflowNetwork::AirflowNetworkFanActivated = true;
-    DataEnvironment::OutDryBulbTemp = -17.29025;
+    state->dataEnvrn->OutDryBulbTemp = -17.29025;
     DataEnvironment::OutHumRat = 0.0008389;
-    DataEnvironment::OutBaroPress = 99063.0;
+    state->dataEnvrn->OutBaroPress = 99063.0;
     DataEnvironment::WindSpeed = 4.9;
     DataEnvironment::WindDir = 270.0;
 
@@ -4428,7 +4428,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_UserDefinedDuctViewFactor
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetHeatBalanceInput(*state);
     HeatBalanceManager::AllocateHeatBalArrays(*state);
-    DataEnvironment::OutBaroPress = 101000;
+    state->dataEnvrn->OutBaroPress = 101000;
     DataHVACGlobals::TimeStepSys = state->dataGlobal->TimeStepZone;
     SurfaceGeometry::GetGeometryParameters(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -4635,14 +4635,14 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestWindPressureTable)
     EXPECT_FALSE(has_err_output());
 
     // Set up some environmental parameters
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::OutDryBulbTemp = 25.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->OutDryBulbTemp = 25.0;
     DataEnvironment::WindDir = 105.0;
     DataEnvironment::OutHumRat = 0.0;        // Dry air only
     DataEnvironment::SiteTempGradient = 0.0; // Disconnect z from testing
 
     // Make sure we can compute the right density
-    Real64 rho = Psychrometrics::PsyRhoAirFnPbTdbW(*state, DataEnvironment::OutBaroPress, DataEnvironment::OutDryBulbTemp, DataEnvironment::OutHumRat);
+    Real64 rho = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, state->dataEnvrn->OutDryBulbTemp, DataEnvironment::OutHumRat);
     EXPECT_DOUBLE_EQ(1.1841123742118911, rho);
     // CalcWindPressure(MultizoneExternalNodeData(i).curve, 1
     //	Vref, 1
@@ -4717,8 +4717,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestWPCValue)
     EXPECT_FALSE(has_err_output());
 
     // Set up some environmental parameters
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::OutDryBulbTemp = 25.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->OutDryBulbTemp = 25.0;
     DataEnvironment::WindDir = 105.0;
     DataEnvironment::OutHumRat = 0.0;        // Dry air only
     DataEnvironment::SiteTempGradient = 0.0; // Disconnect z from testing
@@ -4730,7 +4730,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestWPCValue)
     Real64 humRat = DataEnvironment::OutHumRat;
 
     // Make sure we can compute the right density
-    Real64 rho = Psychrometrics::PsyRhoAirFnPbTdbW(*state, DataEnvironment::OutBaroPress, DataEnvironment::OutDryBulbTemp, DataEnvironment::OutHumRat);
+    Real64 rho = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, state->dataEnvrn->OutDryBulbTemp, DataEnvironment::OutHumRat);
     EXPECT_DOUBLE_EQ(1.1841123742118911, rho);
 
     // Compute wind pressure with current defaults
@@ -5730,8 +5730,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodes)
     EXPECT_EQ(2, AirflowNetwork::MultizoneExternalNodeData(2).curve);
 
     // Set up some environmental parameters
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::OutDryBulbTemp = 25.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->OutDryBulbTemp = 25.0;
     DataEnvironment::WindDir = 105.0;
     DataEnvironment::OutHumRat = 0.0;        // Dry air only
     DataEnvironment::SiteTempGradient = 0.0; // Disconnect z from testing
@@ -5739,7 +5739,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodes)
     DataEnvironment::WindSpeed = 10.0;
 
     // Make sure we can compute the right wind pressure
-    Real64 rho = Psychrometrics::PsyRhoAirFnPbTdbW(*state, DataEnvironment::OutBaroPress, DataEnvironment::OutDryBulbTemp, DataEnvironment::OutHumRat);
+    Real64 rho = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, state->dataEnvrn->OutDryBulbTemp, DataEnvironment::OutHumRat);
     EXPECT_DOUBLE_EQ(1.1841123742118911, rho);
     Real64 p = AirflowNetworkBalanceManager::CalcWindPressure(*state, AirflowNetwork::MultizoneExternalNodeData(1).curve,
                                                               false,
@@ -6434,8 +6434,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithTables)
     EXPECT_EQ(2, AirflowNetwork::MultizoneExternalNodeData(2).curve);
 
     // Set up some environmental parameters
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::OutDryBulbTemp = 25.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->OutDryBulbTemp = 25.0;
     DataEnvironment::WindDir = 105.0;
     DataEnvironment::OutHumRat = 0.0;        // Dry air only
     DataEnvironment::SiteTempGradient = 0.0; // Disconnect z from testing
@@ -6443,7 +6443,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithTables)
     DataEnvironment::WindSpeed = 10.0;
 
     // Make sure we can compute the right wind pressure
-    Real64 rho = Psychrometrics::PsyRhoAirFnPbTdbW(*state, DataEnvironment::OutBaroPress, DataEnvironment::OutDryBulbTemp, DataEnvironment::OutHumRat);
+    Real64 rho = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, state->dataEnvrn->OutDryBulbTemp, DataEnvironment::OutHumRat);
     EXPECT_DOUBLE_EQ(1.1841123742118911, rho);
     Real64 p = AirflowNetworkBalanceManager::CalcWindPressure(*state, AirflowNetwork::MultizoneExternalNodeData(1).curve,
                                                               false,
@@ -7069,8 +7069,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithNoInput)
     EXPECT_EQ(2, AirflowNetwork::MultizoneExternalNodeData(2).curve);
 
     // Set up some environmental parameters
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::OutDryBulbTemp = 25.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->OutDryBulbTemp = 25.0;
     DataEnvironment::WindDir = 105.0;
     DataEnvironment::OutHumRat = 0.0;        // Dry air only
     DataEnvironment::SiteTempGradient = 0.0; // Disconnect z from testing
@@ -7078,7 +7078,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithNoInput)
     DataEnvironment::WindSpeed = 10.0;
 
     // Make sure we can compute the right wind pressure
-    Real64 rho = Psychrometrics::PsyRhoAirFnPbTdbW(*state, DataEnvironment::OutBaroPress, DataEnvironment::OutDryBulbTemp, DataEnvironment::OutHumRat);
+    Real64 rho = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, state->dataEnvrn->OutDryBulbTemp, DataEnvironment::OutHumRat);
     EXPECT_DOUBLE_EQ(1.1841123742118911, rho);
     Real64 p = AirflowNetworkBalanceManager::CalcWindPressure(*state, AirflowNetwork::MultizoneExternalNodeData(2).curve,
                                                               false,
@@ -7746,8 +7746,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithSymmetricTable)
     EXPECT_EQ(1, AirflowNetwork::MultizoneExternalNodeData(2).curve);
 
     // Set up some environmental parameters
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::OutDryBulbTemp = 25.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->OutDryBulbTemp = 25.0;
     DataEnvironment::WindDir = 105.0;
     DataEnvironment::OutHumRat = 0.0;        // Dry air only
     DataEnvironment::SiteTempGradient = 0.0; // Disconnect z from testing
@@ -7755,7 +7755,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithSymmetricTable)
     DataEnvironment::WindSpeed = 10.0;
 
     // Make sure we can compute the right wind pressure
-    Real64 rho = Psychrometrics::PsyRhoAirFnPbTdbW(*state, DataEnvironment::OutBaroPress, DataEnvironment::OutDryBulbTemp, DataEnvironment::OutHumRat);
+    Real64 rho = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, state->dataEnvrn->OutDryBulbTemp, DataEnvironment::OutHumRat);
     EXPECT_DOUBLE_EQ(1.1841123742118911, rho);
     Real64 p = AirflowNetworkBalanceManager::CalcWindPressure(*state, AirflowNetwork::MultizoneExternalNodeData(1).curve,
                                                               false,
@@ -8389,8 +8389,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithSymmetricCurve)
     EXPECT_NEAR(-0.403903999999994, CurveManager::CurveValue(*state, 1, 5000), 1e-14); // Maximum x
 
     // Set up some environmental parameters
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::OutDryBulbTemp = 25.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->OutDryBulbTemp = 25.0;
     DataEnvironment::WindDir = 105.0;
     DataEnvironment::OutHumRat = 0.0;        // Dry air only
     DataEnvironment::SiteTempGradient = 0.0; // Disconnect z from testing
@@ -8398,7 +8398,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithSymmetricCurve)
     DataEnvironment::WindSpeed = 10.0;
 
     // Make sure we can compute the right wind pressure
-    Real64 rho = Psychrometrics::PsyRhoAirFnPbTdbW(*state, DataEnvironment::OutBaroPress, DataEnvironment::OutDryBulbTemp, DataEnvironment::OutHumRat);
+    Real64 rho = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, state->dataEnvrn->OutDryBulbTemp, DataEnvironment::OutHumRat);
     EXPECT_DOUBLE_EQ(1.1841123742118911, rho);
     Real64 p = AirflowNetworkBalanceManager::CalcWindPressure(*state, AirflowNetwork::MultizoneExternalNodeData(1).curve,
                                                               false,
@@ -9057,8 +9057,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithLocalAirNode)
     bool errors = false;
 
     // Set up some environmental parameters
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::OutDryBulbTemp = 25.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->OutDryBulbTemp = 25.0;
     DataEnvironment::WindDir = 105.0;
     DataEnvironment::OutHumRat = 0.0;        // Dry air only
     DataEnvironment::SiteTempGradient = 0.0; // Disconnect z from testing
@@ -9126,8 +9126,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithLocalAirNode)
     Node(1).OutAirWindSpeed = 1.0;
     Node(1).OutAirDryBulb = 15.0;
     Real64 rho_1 =
-        Psychrometrics::PsyRhoAirFnPbTdbW(*state, DataEnvironment::OutBaroPress, DataLoopNode::Node(1).OutAirDryBulb, DataLoopNode::Node(1).HumRat);
-    Real64 rho_2 = Psychrometrics::PsyRhoAirFnPbTdbW(*state, DataEnvironment::OutBaroPress, DataEnvironment::OutDryBulbTemp, DataEnvironment::OutHumRat);
+        Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, DataLoopNode::Node(1).OutAirDryBulb, DataLoopNode::Node(1).HumRat);
+    Real64 rho_2 = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, state->dataEnvrn->OutDryBulbTemp, DataEnvironment::OutHumRat);
     EXPECT_DOUBLE_EQ(1.2252059842834473, rho_1);
     EXPECT_DOUBLE_EQ(1.1841123742118911, rho_2);
 
@@ -13124,9 +13124,9 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
     Schedule(18).CurrentValue = 0.0;          // HVACTemplate-Always 0
 
     AirflowNetwork::AirflowNetworkFanActivated = true;
-    DataEnvironment::OutDryBulbTemp = -17.29025;
+    state->dataEnvrn->OutDryBulbTemp = -17.29025;
     DataEnvironment::OutHumRat = 0.0008389;
-    DataEnvironment::OutBaroPress = 99063.0;
+    state->dataEnvrn->OutBaroPress = 99063.0;
     DataEnvironment::WindSpeed = 4.9;
     DataEnvironment::WindDir = 270.0;
 
@@ -13190,11 +13190,11 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
     DataHeatBalFanSys::MAT = 23.0;
     DataHeatBalFanSys::ZoneAirHumRat = 0.001;
     DataHeatBalFanSys::ZoneAirHumRatAvg = DataHeatBalFanSys::ZoneAirHumRat;
-    Zone(1).OutDryBulbTemp = DataEnvironment::OutDryBulbTemp;
-    Zone(2).OutDryBulbTemp = DataEnvironment::OutDryBulbTemp;
-    Zone(3).OutDryBulbTemp = DataEnvironment::OutDryBulbTemp;
-    Zone(4).OutDryBulbTemp = DataEnvironment::OutDryBulbTemp;
-    Zone(5).OutDryBulbTemp = DataEnvironment::OutDryBulbTemp;
+    Zone(1).OutDryBulbTemp = state->dataEnvrn->OutDryBulbTemp;
+    Zone(2).OutDryBulbTemp = state->dataEnvrn->OutDryBulbTemp;
+    Zone(3).OutDryBulbTemp = state->dataEnvrn->OutDryBulbTemp;
+    Zone(4).OutDryBulbTemp = state->dataEnvrn->OutDryBulbTemp;
+    Zone(5).OutDryBulbTemp = state->dataEnvrn->OutDryBulbTemp;
     DataZoneEquipment::ZoneEquipConfig(1).IsControlled = false;
     DataZoneEquipment::ZoneEquipConfig(2).IsControlled = false;
     DataZoneEquipment::ZoneEquipConfig(3).IsControlled = false;
@@ -13663,16 +13663,16 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_BasicAdvancedSingleSidedAvoidCrashTest)
     DataHeatBalFanSys::ZoneAirHumRat.allocate(1);
     DataHeatBalFanSys::MAT(1) = 23.0;
     DataHeatBalFanSys::ZoneAirHumRat(1) = 0.001;
-    DataEnvironment::OutDryBulbTemp = -17.29025;
+    state->dataEnvrn->OutDryBulbTemp = -17.29025;
     DataEnvironment::OutHumRat = 0.0008389;
-    DataEnvironment::OutBaroPress = 99063.0;
+    state->dataEnvrn->OutBaroPress = 99063.0;
     DataEnvironment::WindSpeed = 4.9;
     DataEnvironment::WindDir = 270.0;
     bool First = false;
     int iter = 1;
     bool resimu = false;
 
-    Zone(1).OutDryBulbTemp = DataEnvironment::OutDryBulbTemp;
+    Zone(1).OutDryBulbTemp = state->dataEnvrn->OutDryBulbTemp;
     AirflowNetworkBalanceManager::GetAirflowNetworkInput(*state);
     state->dataAirflowNetworkBalanceManager->AirflowNetworkGetInputFlag = false;
     state->dataAirflowNetworkBalanceManager->exchangeData.allocate(1);
@@ -15603,9 +15603,9 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestFanModel)
     Schedule(14).CurrentValue = 1.0;
 
     AirflowNetwork::AirflowNetworkFanActivated = true;
-    DataEnvironment::OutDryBulbTemp = -17.29025;
+    state->dataEnvrn->OutDryBulbTemp = -17.29025;
     DataEnvironment::OutHumRat = 0.0008389;
-    DataEnvironment::OutBaroPress = 99063.0;
+    state->dataEnvrn->OutBaroPress = 99063.0;
     DataEnvironment::WindSpeed = 4.9;
     DataEnvironment::WindDir = 270.0;
 
@@ -17157,7 +17157,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_DuplicatedNodeNameTest)
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetHeatBalanceInput(*state);
     HeatBalanceManager::AllocateHeatBalArrays(*state);
-    DataEnvironment::OutBaroPress = 101000;
+    state->dataEnvrn->OutBaroPress = 101000;
     DataHVACGlobals::TimeStepSys = state->dataGlobal->TimeStepZone;
     SurfaceGeometry::GetGeometryParameters(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -19945,9 +19945,9 @@ std::string const idf_objects = delimited_string({
     GetAirflowNetworkInput(*state);
 
     AirflowNetwork::AirflowNetworkFanActivated = true;
-    DataEnvironment::OutDryBulbTemp = -17.29025;
+    state->dataEnvrn->OutDryBulbTemp = -17.29025;
     DataEnvironment::OutHumRat = 0.0008389;
-    DataEnvironment::OutBaroPress = 99063.0;
+    state->dataEnvrn->OutBaroPress = 99063.0;
     DataEnvironment::WindSpeed = 4.9;
     DataEnvironment::WindDir = 270.0;
 

@@ -182,7 +182,6 @@ namespace PlantCondLoopOperation {
         // na
         // Using/Aliasing
         using DataEnvironment::OutDewPointTemp;
-        using DataEnvironment::OutDryBulbTemp;
         using DataEnvironment::OutRelHum;
         using DataEnvironment::OutWetBulbTemp; // Current outdoor relative humidity [%]
 
@@ -282,7 +281,7 @@ namespace PlantCondLoopOperation {
             }
             RangeVariable = LoopDemand;
         } else if (CurSchemeType == DryBulbRBOpSchemeType) {
-            RangeVariable = OutDryBulbTemp;
+            RangeVariable = state.dataEnvrn->OutDryBulbTemp;
         } else if (CurSchemeType == WetBulbRBOpSchemeType) {
             RangeVariable = OutWetBulbTemp;
         } else if (CurSchemeType == RelHumRBOpSchemeType) {
@@ -291,7 +290,7 @@ namespace PlantCondLoopOperation {
             RangeVariable = OutDewPointTemp;
         } else if ((CurSchemeType == DryBulbTDBOpSchemeType) || (CurSchemeType == WetBulbTDBOpSchemeType) ||
                    (CurSchemeType == DewPointTDBOpSchemeType)) {
-            RangeVariable = FindRangeVariable(LoopNum, CurSchemePtr, CurSchemeType);
+            RangeVariable = FindRangeVariable(state, LoopNum, CurSchemePtr, CurSchemeType);
         } else {
             // No controls specified.  This is a fatal error
             ShowFatalError(state, "Invalid Operation Scheme Type Requested=" + PlantLoop(LoopNum).OpScheme(CurSchemePtr).TypeOf +
@@ -2745,7 +2744,6 @@ CurrentModuleObject, PlantOpSchemeName);
         // USE STATEMENTS:
         //  USE EconomizerHeatExchanger,  ONLY: GetEconHeatExchangerCurrentCapacity
         // Using/Aliasing
-        using DataEnvironment::OutDryBulbTemp;
         using DataEnvironment::OutWetBulbTemp;
         using DataLoopNode::Node;
 
@@ -2803,7 +2801,7 @@ CurrentModuleObject, PlantOpSchemeName);
                     if (SELECT_CASE_var1 == FreeCoolControlMode_WetBulb) {
                         Tsensor = OutWetBulbTemp;
                     } else if (SELECT_CASE_var1 == FreeCoolControlMode_DryBulb) {
-                        Tsensor = OutDryBulbTemp;
+                        Tsensor = state.dataEnvrn->OutDryBulbTemp;
                     } else if (SELECT_CASE_var1 == FreeCoolControlMode_Loop) {
                         ControlNodeNum = this_component.FreeCoolCntrlNodeNum;
                         if (ControlNodeNum > 0) {
@@ -2832,7 +2830,7 @@ CurrentModuleObject, PlantOpSchemeName);
                     if (SELECT_CASE_var1 == FreeCoolControlMode_WetBulb) {
                         Tsensor = OutWetBulbTemp;
                     } else if (SELECT_CASE_var1 == FreeCoolControlMode_DryBulb) {
-                        Tsensor = OutDryBulbTemp;
+                        Tsensor = state.dataEnvrn->OutDryBulbTemp;
                     } else if (SELECT_CASE_var1 == FreeCoolControlMode_Loop) {
                         ControlNodeNum = this_component.FreeCoolCntrlNodeNum;
                         if (ControlNodeNum > 0) {
@@ -3121,7 +3119,8 @@ CurrentModuleObject, PlantOpSchemeName);
 
     //********************************
 
-    Real64 FindRangeVariable(int const LoopNum,      // PlantLoop data structure loop counter
+    Real64 FindRangeVariable(EnergyPlusData &state,
+                             int const LoopNum,      // PlantLoop data structure loop counter
                              int const CurSchemePtr, // set by PL()%LoopSide()%Branch()%Comp()%OpScheme()%OpSchemePtr
                              int const CurSchemeType // identifier set in PlantData
     )
@@ -3136,7 +3135,6 @@ CurrentModuleObject, PlantOpSchemeName);
         // Using/Aliasing
         using namespace DataLoopNode;
         using DataEnvironment::OutDewPointTemp;
-        using DataEnvironment::OutDryBulbTemp;
         using DataEnvironment::OutWetBulbTemp;
 
         // Return value
@@ -3161,7 +3159,7 @@ CurrentModuleObject, PlantOpSchemeName);
         if (CurSchemeType == DryBulbTDBOpSchemeType) { // drybulb temp based controls
             ReferenceNodeNum = PlantLoop(LoopNum).OpScheme(CurSchemePtr).ReferenceNodeNumber;
             NodeTemperature = Node(ReferenceNodeNum).Temp;
-            FindRangeVariable = NodeTemperature - OutDryBulbTemp;
+            FindRangeVariable = NodeTemperature - state.dataEnvrn->OutDryBulbTemp;
         } else if (CurSchemeType == WetBulbTDBOpSchemeType) { // wetbulb temp based controls
             ReferenceNodeNum = PlantLoop(LoopNum).OpScheme(CurSchemePtr).ReferenceNodeNumber;
             NodeTemperature = Node(ReferenceNodeNum).Temp;

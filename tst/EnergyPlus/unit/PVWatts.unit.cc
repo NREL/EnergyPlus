@@ -176,7 +176,7 @@ TEST_F(EnergyPlusFixture, PVWattsGenerator_Calc)
     state->dataGlobal->NumOfTimeStepInHour = 1;
     WeatherManager::AllocateWeatherData(*state); // gets us the albedo array initialized
     DataEnvironment::Year = 1986;
-    DataEnvironment::Month = 6;
+    state->dataEnvrn->Month = 6;
     state->dataEnvrn->DayOfMonth = 15;
     state->dataGlobal->HourOfDay = 8; // 8th hour of day, 7-8am
     state->dataWeatherManager->WeatherFileLatitude = 33.45;
@@ -185,7 +185,7 @@ TEST_F(EnergyPlusFixture, PVWattsGenerator_Calc)
     state->dataEnvrn->BeamSolarRad = 728;
     state->dataEnvrn->DifSolarRad = 70;
     DataEnvironment::WindSpeed = 3.1;
-    DataEnvironment::OutDryBulbTemp = 31.7;
+    state->dataEnvrn->OutDryBulbTemp = 31.7;
 
     PVWattsGenerator pvwa(*state, "PVWattsArrayA", 4000.0, ModuleType::STANDARD, ArrayType::FIXED_ROOF_MOUNTED);
     pvwa.setCellTemperature(30.345);

@@ -1906,9 +1906,9 @@ namespace CondenserLoopTowers {
             this->AirPress = DataLoopNode::Node(this->OutdoorAirInletNodeNum).Press;
             this->AirWetBulb = DataLoopNode::Node(this->OutdoorAirInletNodeNum).OutAirWetBulb;
         } else {
-            this->AirTemp = DataEnvironment::OutDryBulbTemp;
+            this->AirTemp = state.dataEnvrn->OutDryBulbTemp;
             this->AirHumRat = DataEnvironment::OutHumRat;
-            this->AirPress = DataEnvironment::OutBaroPress;
+            this->AirPress = state.dataEnvrn->OutBaroPress;
             this->AirWetBulb = DataEnvironment::OutWetBulbTemp;
         }
 

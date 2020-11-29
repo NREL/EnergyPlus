@@ -180,7 +180,6 @@ TEST_F(EnergyPlusFixture, SkyEmissivityTest)
 
 TEST_F(EnergyPlusFixture, WaterMainsCorrelationTest)
 {
-    using DataEnvironment::Latitude;
     using DataEnvironment::WaterMainsTemp;
 
     state->dataWeatherManager->WaterMainsTempsMethod = WeatherManager::WaterMainsTempCalcMethod::Correlation;
@@ -188,11 +187,11 @@ TEST_F(EnergyPlusFixture, WaterMainsCorrelationTest)
     state->dataWeatherManager->WaterMainsTempsMaxDiffAirTemp = 28.1;
     state->dataEnvrn->DayOfYear = 50;
 
-    Latitude = 40.0;
+    state->dataEnvrn->Latitude = 40.0;
     CalcWaterMainsTemp(*state);
     EXPECT_NEAR(WaterMainsTemp, 6.6667, 0.0001);
 
-    Latitude = -40.0;
+    state->dataEnvrn->Latitude = -40.0;
     CalcWaterMainsTemp(*state);
     EXPECT_NEAR(WaterMainsTemp, 19.3799, 0.0001);
 }
@@ -366,7 +365,6 @@ TEST_F(EnergyPlusFixture, UnderwaterBoundaryConditionConvectionCoefficients)
 
 TEST_F(EnergyPlusFixture, WaterMainsCorrelationFromWeatherFileTest)
 {
-    using DataEnvironment::Latitude;
     using DataEnvironment::WaterMainsTemp;
 
     std::string const idf_objects = delimited_string({
@@ -391,7 +389,7 @@ TEST_F(EnergyPlusFixture, WaterMainsCorrelationFromWeatherFileTest)
     state->dataWeatherManager->OADryBulbAverage.AnnualAvgOADryBulbTemp = 9.99;
     state->dataWeatherManager->OADryBulbAverage.MonthlyAvgOADryBulbTempMaxDiff = 28.78;
     state->dataWeatherManager->OADryBulbAverage.OADryBulbWeatherDataProcessed = true;
-    DataEnvironment::Latitude = 42.00; // CHICAGO_IL_USA_WMO_725300
+    state->dataEnvrn->Latitude = 42.00; // CHICAGO_IL_USA_WMO_725300
 
     // January 15th water mains temperature test
     state->dataEnvrn->DayOfYear = 15; // January 15th
@@ -406,7 +404,6 @@ TEST_F(EnergyPlusFixture, WaterMainsCorrelationFromWeatherFileTest)
 
 TEST_F(EnergyPlusFixture, WaterMainsCorrelationFromStatFileTest)
 {
-    using DataEnvironment::Latitude;
     using DataEnvironment::WaterMainsTemp;
 
     int AnnualNumberOfDays(0);
@@ -451,7 +448,7 @@ TEST_F(EnergyPlusFixture, WaterMainsCorrelationFromStatFileTest)
     // test water mains temperature
     // WeatherManager::WaterMainsTempsMethod = WeatherManager::CorrelationFromWeatherFileMethod;
     state->dataWeatherManager->OADryBulbAverage.OADryBulbWeatherDataProcessed = true;
-    DataEnvironment::Latitude = 42.00; // CHICAGO_IL_USA_WMO_725300
+    state->dataEnvrn->Latitude = 42.00; // CHICAGO_IL_USA_WMO_725300
 
     // January 21st water mains temperature test
     state->dataEnvrn->DayOfYear = 21; // January 21st

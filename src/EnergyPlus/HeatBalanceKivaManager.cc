@@ -355,7 +355,7 @@ namespace HeatBalanceKivaManager {
         std::shared_ptr<Kiva::BoundaryConditions> bcs = instance.bcs;
 
 
-        bcs->outdoorTemp = DataEnvironment::OutDryBulbTemp + DataGlobalConstants::KelvinConv();
+        bcs->outdoorTemp = state.dataEnvrn->OutDryBulbTemp + DataGlobalConstants::KelvinConv();
         bcs->localWindSpeed = DataEnvironment::WindSpeedAt(instance.ground->foundation.grade.roughness);
         bcs->windDirection = DataEnvironment::WindDir * DataGlobalConstants::DegToRadians();
         bcs->solarAzimuth = std::atan2(DataEnvironment::SOLCOS(1), DataEnvironment::SOLCOS(2));
@@ -1101,7 +1101,7 @@ namespace HeatBalanceKivaManager {
             kv.setBoundaryConditions(state);
             kv.instance.calculate(timestep);
             kv.instance.calculate_surface_averages();
-            if (DataEnvironment::Month == 1 && state.dataEnvrn->DayOfMonth == 1 && state.dataGlobal->HourOfDay == 1 && state.dataGlobal->TimeStep == 1) {
+            if (state.dataEnvrn->Month == 1 && state.dataEnvrn->DayOfMonth == 1 && state.dataGlobal->HourOfDay == 1 && state.dataGlobal->TimeStep == 1) {
                 kv.plotDomain();
             }
         }
@@ -1148,7 +1148,7 @@ namespace HeatBalanceKivaManager {
             }
         }
 
-        gp.createFrame(fmt::to_string(DataEnvironment::Month) + "/" + fmt::to_string(state.dataEnvrn->DayOfMonth) + " " +
+        gp.createFrame(fmt::to_string(state.dataEnvrn->Month) + "/" + fmt::to_string(state.dataEnvrn->DayOfMonth) + " " +
                        fmt::to_string(state.dataGlobal->HourOfDay) + ":00");
 
 #ifndef NDEBUG

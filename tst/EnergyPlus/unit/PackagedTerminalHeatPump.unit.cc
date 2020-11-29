@@ -487,7 +487,7 @@ TEST_F(EnergyPlusFixture, PackagedTerminalHP_VSCoils_Sizing)
     DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).DesCoolCoilInHumRat = 0.09;
     DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).CoolDesTemp = 12.0;
     DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).CoolDesHumRat = 0.05;
-    DataEnvironment::OutBaroPress = 101325;
+    state->dataEnvrn->OutBaroPress = 101325;
     DataEnvironment::StdRhoAir = 1.0;
     OutputReportPredefined::SetPredefinedTables(*state);
     DataSizing::ZoneEqSizing.allocate(1);
@@ -814,10 +814,10 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
     state->dataGlobal->BeginEnvrnFlag = false;
 
     // set input variables
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::OutDryBulbTemp = 10.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->OutDryBulbTemp = 10.0;
     DataEnvironment::OutHumRat = 0.0075;
-    DataEnvironment::OutEnthalpy = Psychrometrics::PsyHFnTdbW(DataEnvironment::OutDryBulbTemp, DataEnvironment::OutHumRat);
+    DataEnvironment::OutEnthalpy = Psychrometrics::PsyHFnTdbW(state->dataEnvrn->OutDryBulbTemp, DataEnvironment::OutHumRat);
     DataEnvironment::StdRhoAir = 1.20;
     HVACInletMassFlowRate = 0.50;
     PrimaryAirMassFlowRate = 0.20;
@@ -862,7 +862,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
     DXCoil(1).RatedAirMassFlowRate(1) = HVACInletMassFlowRate;
 
     // primary air condition set at outdoor air condition
-    Node(PTUnit(PTUnitNum).OutsideAirNode).Temp = DataEnvironment::OutDryBulbTemp;
+    Node(PTUnit(PTUnitNum).OutsideAirNode).Temp = state->dataEnvrn->OutDryBulbTemp;
     Node(PTUnit(PTUnitNum).OutsideAirNode).HumRat = DataEnvironment::OutHumRat;
     Node(PTUnit(PTUnitNum).OutsideAirNode).Enthalpy = DataEnvironment::OutEnthalpy;
 
@@ -1160,10 +1160,10 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
     state->dataGlobal->BeginEnvrnFlag = true;
 
     // set input variables
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::OutDryBulbTemp = 10.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->OutDryBulbTemp = 10.0;
     DataEnvironment::OutHumRat = 0.0075;
-    DataEnvironment::OutEnthalpy = Psychrometrics::PsyHFnTdbW(DataEnvironment::OutDryBulbTemp, DataEnvironment::OutHumRat);
+    DataEnvironment::OutEnthalpy = Psychrometrics::PsyHFnTdbW(state->dataEnvrn->OutDryBulbTemp, DataEnvironment::OutHumRat);
     DataEnvironment::StdRhoAir = 1.20;
     HVACInletMassFlowRate = 0.50;
     //		PrimaryAirMassFlowRate = 0.20;
@@ -1208,7 +1208,7 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
     DXCoil(1).RatedAirMassFlowRate(1) = HVACInletMassFlowRate;
 
     // primary air condition set at outdoor air condition
-    Node(PTUnit(PTUnitNum).OutsideAirNode).Temp = DataEnvironment::OutDryBulbTemp;
+    Node(PTUnit(PTUnitNum).OutsideAirNode).Temp = state->dataEnvrn->OutDryBulbTemp;
     Node(PTUnit(PTUnitNum).OutsideAirNode).HumRat = DataEnvironment::OutHumRat;
     Node(PTUnit(PTUnitNum).OutsideAirNode).Enthalpy = DataEnvironment::OutEnthalpy;
 

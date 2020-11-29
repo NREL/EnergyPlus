@@ -73,7 +73,6 @@
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/FanCoilUnits.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/HVACSingleDuctInduc.hh>
 #include <EnergyPlus/HWBaseboardRadiator.hh>
@@ -1029,7 +1028,6 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
     // USE STATEMENTS:
 
     // Using/Aliasing
-    using DataEnvironment::OutBaroPress;
     using DataEnvironment::SkyTemp;
     using DataEnvironment::WindSpeedAt;
     // USE DataLoopNode    , ONLY: Node
@@ -1117,9 +1115,9 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
     LocalWetBulbTemp = sum_product_sub(Surface, &SurfaceData::Area, &SurfaceData::OutWetBulbTemp, SurfPtrARR) /
                        surfaceArea; // Autodesk:F2C++ Functions handle array subscript usage
 
-    LocalOutHumRat = PsyWFnTdbTwbPb(state, LocalOutDryBulbTemp, LocalWetBulbTemp, OutBaroPress, RoutineName);
+    LocalOutHumRat = PsyWFnTdbTwbPb(state, LocalOutDryBulbTemp, LocalWetBulbTemp, state.dataEnvrn->OutBaroPress, RoutineName);
 
-    RhoAir = PsyRhoAirFnPbTdbW(state, OutBaroPress, LocalOutDryBulbTemp, LocalOutHumRat, RoutineName);
+    RhoAir = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, LocalOutDryBulbTemp, LocalOutHumRat, RoutineName);
     CpAir = PsyCpAirFnW(LocalOutHumRat);
     if (!state.dataEnvrn->IsRain) {
         Tamb = LocalOutDryBulbTemp;
@@ -1386,7 +1384,6 @@ void CalcBasinHeaterPower(EnergyPlusData &state,
     // na
 
     // Using/Aliasing
-    using DataEnvironment::OutDryBulbTemp;
     using ScheduleManager::GetCurrentScheduleValue;
 
     // Locals
@@ -1410,12 +1407,12 @@ void CalcBasinHeaterPower(EnergyPlusData &state,
     if (SchedulePtr > 0) {
         BasinHeaterSch = GetCurrentScheduleValue(state, SchedulePtr);
         if (Capacity > 0.0 && BasinHeaterSch > 0.0) {
-            Power = max(0.0, Capacity * (SetPointTemp - OutDryBulbTemp));
+            Power = max(0.0, Capacity * (SetPointTemp - state.dataEnvrn->OutDryBulbTemp));
         }
     } else {
         // IF schedule does not exist, basin heater operates anytime outdoor dry-bulb temp is below setpoint
         if (Capacity > 0.0) {
-            Power = max(0.0, Capacity * (SetPointTemp - OutDryBulbTemp));
+            Power = max(0.0, Capacity * (SetPointTemp - state.dataEnvrn->OutDryBulbTemp));
         }
     }
 }

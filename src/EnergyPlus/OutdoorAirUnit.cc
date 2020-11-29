@@ -1113,7 +1113,6 @@ CurrentModuleObjects(CO_OAEqList), ComponentListName);
         // na
 
         // Using/Aliasing
-        using DataEnvironment::OutBaroPress;
         using DataEnvironment::OutHumRat;
         using DataEnvironment::StdRhoAir;
         using DataHeatBalFanSys::MAT;
@@ -1429,7 +1428,7 @@ CurrentModuleObjects(CO_OAEqList), ComponentListName);
             // Initialize the outside air conditions...
             Node(OutsideAirNode).Temp = Node(OutsideAirNode).OutAirDryBulb;
             Node(OutsideAirNode).HumRat = OutHumRat;
-            Node(OutsideAirNode).Press = OutBaroPress;
+            Node(OutsideAirNode).Press = state.dataEnvrn->OutBaroPress;
         }
     }
 
@@ -1710,7 +1709,6 @@ CurrentModuleObjects(CO_OAEqList), ComponentListName);
         // Using/Aliasing
         using DataEnvironment::CurMnDy;
         using DataEnvironment::EnvironmentName;
-        using DataEnvironment::OutBaroPress;
         using DataHeatBalFanSys::MAT;
         using DataHeatBalFanSys::ZoneAirHumRat;
         using DataHVACGlobals::ZoneCompTurnFansOff;
@@ -2132,7 +2130,6 @@ CurrentModuleObjects(CO_OAEqList), ComponentListName);
         // Using/Aliasing
         using DataEnvironment::CurMnDy;
         using DataEnvironment::EnvironmentName;
-        using DataEnvironment::OutBaroPress;
         using DataHeatBalance::MRT;
         using DataHeatBalFanSys::MAT;
         using DataHeatBalFanSys::ZoneAirHumRat;

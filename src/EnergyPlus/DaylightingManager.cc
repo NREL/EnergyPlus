@@ -4452,7 +4452,7 @@ namespace EnergyPlus::DaylightingManager {
 
         // RJH DElight Modification Begin - Calls to DElight preprocessing subroutines
         if (doesDayLightingUseDElight(state)) {
-            dLatitude = DataEnvironment::Latitude;
+            dLatitude = state.dataEnvrn->Latitude;
             DisplayString(state, "Calculating DElight Daylighting Factors");
             DElightInputGenerator(state);
             // Init Error Flag to 0 (no Warnings or Errors)
@@ -10013,7 +10013,7 @@ namespace EnergyPlus::DaylightingManager {
                     // We need DataGlobals::CalendarYear, and not DataEnvironment::Year because
                     // otherwise if you run a TMY file, you'll get for eg 1977, 1981, etc
                     SQYear = state.dataGlobal->CalendarYear;
-                    SQMonth = DataEnvironment::Month;
+                    SQMonth = state.dataEnvrn->Month;
                     SQDayOfMonth = state.dataEnvrn->DayOfMonth;
 
                     for (Y = 1; Y <= state.dataDaylightingData->IllumMap(MapNum).Ynum; ++Y) {

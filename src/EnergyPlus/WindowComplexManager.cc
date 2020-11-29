@@ -99,7 +99,6 @@ namespace WindowComplexManager {
     using namespace DataBSDFWindow;
     using namespace DataSurfaces; // , ONLY: TotSurfaces,TotWindows,Surface,SurfaceWindow   !update this later
     using DataEnvironment::CloudFraction;
-    using DataEnvironment::OutBaroPress;
     using DataEnvironment::OutHumRat;
     using DataEnvironment::SkyTempKelvin;
     using DataEnvironment::SunIsUp;
@@ -2767,7 +2766,7 @@ namespace WindowComplexManager {
         hrout = 0.0;
         hcout = 0.0;
 
-        Pa = OutBaroPress;
+        Pa = state.dataEnvrn->OutBaroPress;
 
         ThermalModelNum = state.dataConstruction->Construct(ConstrNum).BSDFInput.ThermalModel;
         standard = WindowThermalModel(ThermalModelNum).CalculationStandard;
@@ -3122,7 +3121,7 @@ namespace WindowComplexManager {
             // is assumed that nothing is transmitted through
             asol(nlayer) += SurfQRadThermInAbs(SurfNum);
 
-            presure = OutBaroPress;
+            presure = state.dataEnvrn->OutBaroPress;
 
             // Instead of doing temperature guess get solution from previous iteration.  That should be much better than guess
             for (k = 1; k <= 2 * nlayer; ++k) {

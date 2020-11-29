@@ -237,7 +237,7 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(EnergyPlus::EnergyPlu
             condInletNode.Temp, condInletNode.HumRat, DataEnvironment::StdPressureSeaLevel, "CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode");
     }
     // thisspeed.ambPressure = inletNode.Press;
-    thisspeed.ambPressure = DataEnvironment::OutBaroPress;
+    thisspeed.ambPressure = state.dataEnvrn->OutBaroPress;
     thisspeed.AirMassFlow = inletNode.MassFlowRate;
     if (fanOpMode == DataHVACGlobals::CycFanCycCoil && speedNum == 1) {
         if (PLR > 0.0) {

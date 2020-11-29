@@ -226,7 +226,7 @@ TEST_F(EnergyPlusFixture, DOASEffectOnZoneSizing_SizeZoneEquipment)
     CalcFinalZoneSizing(2).MinOA = 0.11;
     CalcZoneSizing(CurOverallSimDay, 1).DOASControlStrategy = 3;
     CalcZoneSizing(CurOverallSimDay, 2).DOASControlStrategy = 3;
-    OutDryBulbTemp = 28.;
+    state->dataEnvrn->OutDryBulbTemp = 28.;
     OutHumRat = 0.017;
     Node(4).Temp = 22;
     Node(4).HumRat = 0.008;

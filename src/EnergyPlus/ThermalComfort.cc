@@ -100,8 +100,6 @@ namespace ThermalComfort {
     // the people statements and perform the requested thermal comfort evaluations
 
     // Using/Aliasing
-    using DataEnvironment::OutBaroPress;
-    using DataEnvironment::OutDryBulbTemp;
     using DataHeatBalance::AngleFactor;
     using DataHeatBalance::MRT;
     using DataHeatBalance::People;
@@ -156,13 +154,13 @@ namespace ThermalComfort {
                 state.dataThermalComforts->TemporarySixAMTemperature = 1.868132;
             } else if (state.dataGlobal->HourOfDay == 7) {
                 if (state.dataGlobal->TimeStep == 1) {
-                    state.dataThermalComforts->TemporarySixAMTemperature = OutDryBulbTemp;
+                    state.dataThermalComforts->TemporarySixAMTemperature = state.dataEnvrn->OutDryBulbTemp;
                 }
             }
         } else {
             if (state.dataGlobal->HourOfDay == 7) {
                 if (state.dataGlobal->TimeStep == 1) {
-                    state.dataThermalComforts->TemporarySixAMTemperature = OutDryBulbTemp;
+                    state.dataThermalComforts->TemporarySixAMTemperature = state.dataEnvrn->OutDryBulbTemp;
                 }
             }
         }
@@ -528,9 +526,9 @@ namespace ThermalComfort {
             state.dataThermalComforts->RadTemp = CalcRadTemp(state, state.dataThermalComforts->PeopleNum);
             // Use mean air temp for calculating RH when thermal comfort control is used
             if (present(PNum)) {
-                state.dataThermalComforts->RelHum = PsyRhFnTdbWPb(state, MAT(state.dataThermalComforts->ZoneNum), ZoneAirHumRatAvgComf(state.dataThermalComforts->ZoneNum), OutBaroPress);
+                state.dataThermalComforts->RelHum = PsyRhFnTdbWPb(state, MAT(state.dataThermalComforts->ZoneNum), ZoneAirHumRatAvgComf(state.dataThermalComforts->ZoneNum), state.dataEnvrn->OutBaroPress);
             } else {
-                state.dataThermalComforts->RelHum = PsyRhFnTdbWPb(state, state.dataThermalComforts->AirTemp, ZoneAirHumRatAvgComf(state.dataThermalComforts->ZoneNum), OutBaroPress);
+                state.dataThermalComforts->RelHum = PsyRhFnTdbWPb(state, state.dataThermalComforts->AirTemp, ZoneAirHumRatAvgComf(state.dataThermalComforts->ZoneNum), state.dataEnvrn->OutBaroPress);
             }
             People(state.dataThermalComforts->PeopleNum).TemperatureInZone = state.dataThermalComforts->AirTemp;
             People(state.dataThermalComforts->PeopleNum).RelativeHumidityInZone = state.dataThermalComforts->RelHum * 100.0;
@@ -811,7 +809,7 @@ namespace ThermalComfort {
                 state.dataThermalComforts->AirTemp = ZTAVComf(state.dataThermalComforts->ZoneNum);
             }
             state.dataThermalComforts->RadTemp = CalcRadTemp(state, state.dataThermalComforts->PeopleNum);
-            state.dataThermalComforts->RelHum = PsyRhFnTdbWPb(state, state.dataThermalComforts->AirTemp, ZoneAirHumRatAvgComf(state.dataThermalComforts->ZoneNum), OutBaroPress);
+            state.dataThermalComforts->RelHum = PsyRhFnTdbWPb(state, state.dataThermalComforts->AirTemp, ZoneAirHumRatAvgComf(state.dataThermalComforts->ZoneNum), state.dataEnvrn->OutBaroPress);
             // Metabolic rate of body (W/m2)
             state.dataThermalComforts->ActLevel = GetCurrentScheduleValue(state, People(state.dataThermalComforts->PeopleNum).ActivityLevelPtr) / state.dataThermalComforts->BodySurfArea;
             // Energy consumption by external work (W/m2)
@@ -1231,7 +1229,7 @@ namespace ThermalComfort {
                 state.dataThermalComforts->AirTemp = ZTAVComf(state.dataThermalComforts->ZoneNum);
             }
             state.dataThermalComforts->RadTemp = CalcRadTemp(state, state.dataThermalComforts->PeopleNum);
-            state.dataThermalComforts->RelHum = PsyRhFnTdbWPb(state, state.dataThermalComforts->AirTemp, ZoneAirHumRatAvgComf(state.dataThermalComforts->ZoneNum), OutBaroPress);
+            state.dataThermalComforts->RelHum = PsyRhFnTdbWPb(state, state.dataThermalComforts->AirTemp, ZoneAirHumRatAvgComf(state.dataThermalComforts->ZoneNum), state.dataEnvrn->OutBaroPress);
             state.dataThermalComforts->ActLevel = GetCurrentScheduleValue(state, People(state.dataThermalComforts->PeopleNum).ActivityLevelPtr) / state.dataThermalComforts->BodySurfArea;
             state.dataThermalComforts->WorkEff = GetCurrentScheduleValue(state, People(state.dataThermalComforts->PeopleNum).WorkEffPtr) * state.dataThermalComforts->ActLevel;
             {
@@ -2381,8 +2379,6 @@ namespace ThermalComfort {
         // the relevant file once to initialize, and then operates within the loop.
 
         // Using/Aliasing
-        using DataEnvironment::Month;
-        using DataEnvironment::OutDryBulbTemp;
         using DataHVACGlobals::SysTimeElapsed;
         using OutputReportTabular::GetColumnUsingTabs;
         using OutputReportTabular::StrToReal;
@@ -2544,13 +2540,13 @@ namespace ThermalComfort {
         if (state.dataGlobal->BeginDayFlag && useStatData) {
             //  CALL InvJulianDay(DayOfYear,pMonth,pDay,0)
             //  runningAverageASH = monthlyTemp(pMonth)
-            state.dataThermalComforts->runningAverageASH = monthlyTemp(Month);
+            state.dataThermalComforts->runningAverageASH = monthlyTemp(state.dataEnvrn->Month);
         }
 
         // Update the daily average
         // IF (BeginHourFlag .and. useEpwData) THEN
         if (state.dataGlobal->BeginHourFlag) {
-            avgDryBulbASH += (OutDryBulbTemp / 24.0);
+            avgDryBulbASH += (state.dataEnvrn->OutDryBulbTemp / 24.0);
         }
 
         for (state.dataThermalComforts->PeopleNum = 1; state.dataThermalComforts->PeopleNum <= TotPeople; ++state.dataThermalComforts->PeopleNum) {
@@ -2620,8 +2616,6 @@ namespace ThermalComfort {
         // moving average of the outdoor air temperature.
 
         // Using/Aliasing
-        using DataEnvironment::Month;
-        using DataEnvironment::OutDryBulbTemp;
         using DataHVACGlobals::SysTimeElapsed;
         using OutputReportTabular::GetColumnUsingTabs;
         using OutputReportTabular::StrToReal;
@@ -2751,7 +2745,7 @@ namespace ThermalComfort {
 
         // Update the daily average
         if (state.dataGlobal->BeginHourFlag) {
-            avgDryBulbCEN += (OutDryBulbTemp / 24.0);
+            avgDryBulbCEN += (state.dataEnvrn->OutDryBulbTemp / 24.0);
         }
 
         for (state.dataThermalComforts->PeopleNum = 1; state.dataThermalComforts->PeopleNum <= TotPeople; ++state.dataThermalComforts->PeopleNum) {

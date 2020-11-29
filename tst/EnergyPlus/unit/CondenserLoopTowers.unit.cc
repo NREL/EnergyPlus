@@ -3923,11 +3923,11 @@ TEST_F(EnergyPlusFixture, VSCoolingTowers_WaterOutletTempTest)
     state->dataGlobal->BeginEnvrnFlag = true;
 
     // test case 1:
-    DataEnvironment::OutDryBulbTemp = 35.0;
+    state->dataEnvrn->OutDryBulbTemp = 35.0;
     DataEnvironment::OutWetBulbTemp = 26.0;
-    DataEnvironment::OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
     DataEnvironment::OutHumRat =
-        Psychrometrics::PsyWFnTdbTwbPb(*state, DataEnvironment::OutDryBulbTemp, DataEnvironment::OutWetBulbTemp, DataEnvironment::OutBaroPress);
+        Psychrometrics::PsyWFnTdbTwbPb(*state, state->dataEnvrn->OutDryBulbTemp, DataEnvironment::OutWetBulbTemp, state->dataEnvrn->OutBaroPress);
     DataLoopNode::Node(VSTower.WaterInletNodeNum).Temp = 35.0;
 
     VSTower.initialize(*state);
@@ -3950,14 +3950,14 @@ TEST_F(EnergyPlusFixture, VSCoolingTowers_WaterOutletTempTest)
     EXPECT_NEAR(30.0, TowerOutletWaterTemp, 0.0001);
 
     // test case 2:
-    DataEnvironment::OutDryBulbTemp = 15.0;
+    state->dataEnvrn->OutDryBulbTemp = 15.0;
     DataEnvironment::OutWetBulbTemp = 10.0;
     DataEnvironment::OutHumRat =
-        Psychrometrics::PsyWFnTdbTwbPb(*state, DataEnvironment::OutDryBulbTemp, DataEnvironment::OutWetBulbTemp, DataEnvironment::OutBaroPress);
+        Psychrometrics::PsyWFnTdbTwbPb(*state, state->dataEnvrn->OutDryBulbTemp, DataEnvironment::OutWetBulbTemp, state->dataEnvrn->OutBaroPress);
     AirWetBulbTemp = DataEnvironment::OutWetBulbTemp;
     VSTower.WaterMassFlowRate = VSTower.DesWaterMassFlowRate * WaterFlowRateRatio;
 
-    VSTower.AirTemp = DataEnvironment::OutDryBulbTemp;
+    VSTower.AirTemp = state->dataEnvrn->OutDryBulbTemp;
     VSTower.AirWetBulb = DataEnvironment::OutWetBulbTemp;
     VSTower.AirHumRat = DataEnvironment::OutHumRat;
 

@@ -126,9 +126,6 @@ namespace SizingManager {
 
         // Using/Aliasing
         using DataEnvironment::EnvironmentName;
-        using DataEnvironment::Month;
-        using DataEnvironment::OutBaroPress;
-        using DataEnvironment::OutDryBulbTemp;
         using DataEnvironment::OutHumRat;
         using SimAirServingZones::ManageAirLoops;
         using SimAirServingZones::UpdateSysSizing;
@@ -360,11 +357,11 @@ namespace SizingManager {
                                 if (!state.dataGlobal->WarmupFlag) {
                                     TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
                                     if (state.dataGlobal->HourOfDay == 1 && state.dataGlobal->TimeStep == 1) {
-                                        DesDayWeath(CurOverallSimDay).DateString = fmt::format("{}/{}", Month, state.dataEnvrn->DayOfMonth);
+                                        DesDayWeath(CurOverallSimDay).DateString = fmt::format("{}/{}", state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth);
                                     }
-                                    DesDayWeath(CurOverallSimDay).Temp(TimeStepInDay) = OutDryBulbTemp;
+                                    DesDayWeath(CurOverallSimDay).Temp(TimeStepInDay) = state.dataEnvrn->OutDryBulbTemp;
                                     DesDayWeath(CurOverallSimDay).HumRat(TimeStepInDay) = OutHumRat;
-                                    DesDayWeath(CurOverallSimDay).Press(TimeStepInDay) = OutBaroPress;
+                                    DesDayWeath(CurOverallSimDay).Press(TimeStepInDay) = state.dataEnvrn->OutBaroPress;
                                 }
 
                                 ManageHeatBalance(state);
@@ -391,7 +388,7 @@ namespace SizingManager {
 
                     } // ... End day loop.
 
-                    LastMonth = Month;
+                    LastMonth = state.dataEnvrn->Month;
                     LastDayOfMonth = state.dataEnvrn->DayOfMonth;
 
                 } // ... End environment loop
@@ -422,7 +419,7 @@ namespace SizingManager {
 
         state.dataGlobal->ZoneSizingCalc = false;
         state.dataGlobal->DoOutputReporting = false;
-        Month = LastMonth;
+        state.dataEnvrn->Month = LastMonth;
         state.dataEnvrn->DayOfMonth = LastDayOfMonth;
 
         if ((state.dataGlobal->DoSystemSizing) && (NumSysSizInput == 0) && (state.dataSizingManager->NumAirLoops > 0)) {

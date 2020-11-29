@@ -3839,7 +3839,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
         }
         this->RelTemp = this->RetTemp;
         this->RelEnth = this->RetEnth;
-        this->RelSensiLossRate = this->RelMassFlow * Psychrometrics::PsyCpAirFnW(OutHumRat) * (this->RelTemp - OutDryBulbTemp);
+        this->RelSensiLossRate = this->RelMassFlow * Psychrometrics::PsyCpAirFnW(OutHumRat) * (this->RelTemp - state.dataEnvrn->OutDryBulbTemp);
         this->RelTotalLossRate = this->RelMassFlow * (this->RelEnth - OutEnthalpy);
         this->RelLatentLossRate = this->RelTotalLossRate - this->RelSensiLossRate;
     }
@@ -4338,7 +4338,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                                     MassFlowRate = 0.0;
                                 }
                                 // total primary air to terminal units of the zone
-                                if (MassFlowRate > 0.0) ZonePA += MassFlowRate / PsyRhoAirFnPbTdbW(state, OutBaroPress, NodeTemp, NodeHumRat);
+                                if (MassFlowRate > 0.0) ZonePA += MassFlowRate / PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, NodeTemp, NodeHumRat);
 
                                 // or InletNode = ZoneEquipConfig(ZoneEquipConfigNum)%AirDistUnitCool(InNodeIndex)%OutNode
                                 InletNode = curZoneEquipConfig.InletNode(InNodeIndex);
@@ -4350,7 +4350,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                                     MassFlowRate = 0.0;
                                 }
                                 // total supply air to the zone
-                                if (MassFlowRate > 0.0) ZoneSA += MassFlowRate / PsyRhoAirFnPbTdbW(state, OutBaroPress, NodeTemp, NodeHumRat);
+                                if (MassFlowRate > 0.0) ZoneSA += MassFlowRate / PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, NodeTemp, NodeHumRat);
                             }
 
                             // calc zone primary air fraction

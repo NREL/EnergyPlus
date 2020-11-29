@@ -534,9 +534,9 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RHControl)
     EXPECT_EQ(2, HVACDXSystem::DXCoolingSystem(DXSystemNum).DXSystemControlNodeNum);
 
     // set up outdoor environment
-    DataEnvironment::OutDryBulbTemp = 35.0;
+    state->dataEnvrn->OutDryBulbTemp = 35.0;
     DataEnvironment::OutHumRat = 0.0196;
-    DataEnvironment::OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
     DataEnvironment::OutWetBulbTemp = 27.0932;
 
     // set up inputs to test coil control
@@ -691,9 +691,9 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_LatentDegradation_Test)
     HVACDXSystem::GetDXCoolingSystemInput(*state);
 
     // set up outdoor environment
-    DataEnvironment::OutDryBulbTemp = 35.0;
+    state->dataEnvrn->OutDryBulbTemp = 35.0;
     DataEnvironment::OutHumRat = 0.0196;
-    DataEnvironment::OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
     DataEnvironment::OutWetBulbTemp = 27.0932;
 
     // set up inputs to test coil control

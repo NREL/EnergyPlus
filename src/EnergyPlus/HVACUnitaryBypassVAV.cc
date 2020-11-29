@@ -2256,8 +2256,8 @@ namespace HVACUnitaryBypassVAV {
             OutdoorDryBulbTemp = DataLoopNode::Node(CBVAV(CBVAVNum).CondenserNodeNum).Temp;
             OutdoorBaroPress = DataLoopNode::Node(CBVAV(CBVAVNum).CondenserNodeNum).Press;
         } else {
-            OutdoorDryBulbTemp = DataEnvironment::OutDryBulbTemp;
-            OutdoorBaroPress = DataEnvironment::OutBaroPress;
+            OutdoorDryBulbTemp = state.dataEnvrn->OutDryBulbTemp;
+            OutdoorBaroPress = state.dataEnvrn->OutBaroPress;
         }
 
         SaveCompressorPLR = 0.0;

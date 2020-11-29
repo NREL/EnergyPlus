@@ -221,9 +221,9 @@ TEST_F(EnergyPlusFixture, DXCoils_Test1)
     // coil, 6414.3, 6414.3, 6.58, 4" } ) ) );
 
     // set up coil operating conditions (replicates first occurrence of RH > 1 warning in HVACTemplate_UnitarySytsem annual run)
-    OutDryBulbTemp = 16.1;
+    state->dataEnvrn->OutDryBulbTemp = 16.1;
     OutHumRat = 0.0114507065;
-    OutBaroPress = 98200.0;
+    state->dataEnvrn->OutBaroPress = 98200.0;
     DataEnvironment::StdRhoAir = 1.2;
     MSHPMassFlowRateLow = 0.2339 * DataEnvironment::StdRhoAir;
     MSHPMassFlowRateHigh = 0.2924 * DataEnvironment::StdRhoAir;
@@ -262,8 +262,8 @@ TEST_F(EnergyPlusFixture, DXCoils_Test1)
     CalcMultiSpeedDXCoilCooling(*state, CoilIndex, SpeedRatio, CycRatio, SpeedNum, FanOpMode, CompOp, SingleMode);
 
     Real64 TdbAtOutlet = PsyTdbFnHW(DXCoil(CoilIndex).OutletAirEnthalpy, DXCoil(CoilIndex).OutletAirHumRat);
-    Real64 tSatAtOutlet = PsyTsatFnHPb(*state, DXCoil(CoilIndex).OutletAirEnthalpy, OutBaroPress);
-    Real64 rhAtOutlet = PsyRhFnTdbWPb(*state, DXCoil(CoilIndex).OutletAirTemp, DXCoil(CoilIndex).OutletAirHumRat, OutBaroPress);
+    Real64 tSatAtOutlet = PsyTsatFnHPb(*state, DXCoil(CoilIndex).OutletAirEnthalpy, state->dataEnvrn->OutBaroPress);
+    Real64 rhAtOutlet = PsyRhFnTdbWPb(*state, DXCoil(CoilIndex).OutletAirTemp, DXCoil(CoilIndex).OutletAirHumRat, state->dataEnvrn->OutBaroPress);
 
     // air outlet condition is right next to the saturation curve
     EXPECT_DOUBLE_EQ(TdbAtOutlet, tSatAtOutlet); // Tdb higher than TSat by 1.8E-15 C
@@ -391,8 +391,6 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
 {
     // Test that the COP calculation is correct when the defrost is on. #4973
 
-    using DataEnvironment::OutBaroPress;
-    using DataEnvironment::OutDryBulbTemp;
     using DataEnvironment::OutHumRat;
     using DXCoils::CalcMultiSpeedDXCoilHeating;
     using Psychrometrics::PsyHFnTdbW;
@@ -665,7 +663,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
     MSHPMassFlowRateLow = Coil.MSRatedAirMassFlowRate(1);
     MSHPMassFlowRateHigh = Coil.MSRatedAirMassFlowRate(2);
     OutHumRat = 0.002;
-    OutBaroPress = 101325; // sea level
+    state->dataEnvrn->OutBaroPress = 101325; // sea level
     Coil.InletAirTemp = 20;
     Coil.InletAirHumRat = 0.008;
     Coil.InletAirEnthalpy = PsyHFnTdbW(Coil.InletAirTemp, Coil.InletAirHumRat);
@@ -677,16 +675,16 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
     int const FanOpMode = ContFanCycCoil;
 
     // Defroster on
-    OutDryBulbTemp = -5.0; // cold
+    state->dataEnvrn->OutDryBulbTemp = -5.0; // cold
     CalcMultiSpeedDXCoilHeating(*state, DXCoilNum, SpeedRatio, CycRatio, SpeedNum, FanOpMode, 0);
-    Real64 COPwoDefrost = Coil.MSRatedCOP(SpeedNum) / (CurveValue(*state, nEIRfT2, Coil.InletAirTemp, OutDryBulbTemp) * CurveValue(*state, nEIRfFF2, 1));
+    Real64 COPwoDefrost = Coil.MSRatedCOP(SpeedNum) / (CurveValue(*state, nEIRfT2, Coil.InletAirTemp, state->dataEnvrn->OutDryBulbTemp) * CurveValue(*state, nEIRfFF2, 1));
     Real64 COPwDefrost = Coil.TotalHeatingEnergyRate / Coil.ElecHeatingPower;
     EXPECT_LT(COPwDefrost, COPwoDefrost);
 
     // Defroster off
-    OutDryBulbTemp = 5.0; // not cold enough for defroster
+    state->dataEnvrn->OutDryBulbTemp = 5.0; // not cold enough for defroster
     CalcMultiSpeedDXCoilHeating(*state, DXCoilNum, SpeedRatio, CycRatio, SpeedNum, FanOpMode, 0);
-    COPwoDefrost = Coil.MSRatedCOP(SpeedNum) / (CurveValue(*state, nEIRfT2, Coil.InletAirTemp, OutDryBulbTemp) * CurveValue(*state, nEIRfFF2, 1));
+    COPwoDefrost = Coil.MSRatedCOP(SpeedNum) / (CurveValue(*state, nEIRfT2, Coil.InletAirTemp, state->dataEnvrn->OutDryBulbTemp) * CurveValue(*state, nEIRfFF2, 1));
     COPwDefrost = Coil.TotalHeatingEnergyRate / Coil.ElecHeatingPower;
     EXPECT_DOUBLE_EQ(COPwoDefrost, COPwDefrost);
 
@@ -694,16 +692,16 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
     SpeedNum = 1;
 
     // Defroster on
-    OutDryBulbTemp = -5.0; // cold
+    state->dataEnvrn->OutDryBulbTemp = -5.0; // cold
     CalcMultiSpeedDXCoilHeating(*state, DXCoilNum, SpeedRatio, CycRatio, SpeedNum, FanOpMode, 0);
-    COPwoDefrost = Coil.MSRatedCOP(SpeedNum) / (CurveValue(*state, nEIRfT1, Coil.InletAirTemp, OutDryBulbTemp) * CurveValue(*state, nEIRfFF1, 1));
+    COPwoDefrost = Coil.MSRatedCOP(SpeedNum) / (CurveValue(*state, nEIRfT1, Coil.InletAirTemp, state->dataEnvrn->OutDryBulbTemp) * CurveValue(*state, nEIRfFF1, 1));
     COPwDefrost = Coil.TotalHeatingEnergyRate / Coil.ElecHeatingPower;
     EXPECT_LT(COPwDefrost, COPwoDefrost);
 
     // Defroster off
-    OutDryBulbTemp = 5.0; // not cold enough for defroster
+    state->dataEnvrn->OutDryBulbTemp = 5.0; // not cold enough for defroster
     CalcMultiSpeedDXCoilHeating(*state, DXCoilNum, SpeedRatio, CycRatio, SpeedNum, FanOpMode, 0);
-    COPwoDefrost = Coil.MSRatedCOP(SpeedNum) / (CurveValue(*state, nEIRfT1, Coil.InletAirTemp, OutDryBulbTemp) * CurveValue(*state, nEIRfFF1, 1));
+    COPwoDefrost = Coil.MSRatedCOP(SpeedNum) / (CurveValue(*state, nEIRfT1, Coil.InletAirTemp, state->dataEnvrn->OutDryBulbTemp) * CurveValue(*state, nEIRfFF1, 1));
     COPwDefrost = Coil.TotalHeatingEnergyRate / Coil.ElecHeatingPower;
     EXPECT_DOUBLE_EQ(COPwoDefrost, COPwDefrost);
 
@@ -730,7 +728,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
     EXPECT_DOUBLE_EQ(DXCoilHeatingCapacity, DXCoilHeatingCapacity2);
 
     // Defroster on
-    OutDryBulbTemp = -5.0; // cold
+    state->dataEnvrn->OutDryBulbTemp = -5.0; // cold
 
     SpeedRatio = 0.0;
     CycRatio = 1.0;
@@ -765,8 +763,6 @@ TEST_F(EnergyPlusFixture, TestSingleSpeedDefrostCOP)
     // Test that the COP calculation is correct when the defrost is on. #4973
 
     using DXCoils::CalcMultiSpeedDXCoilHeating;
-    using EnergyPlus::DataEnvironment::OutBaroPress;
-    using EnergyPlus::DataEnvironment::OutDryBulbTemp;
     using EnergyPlus::DataEnvironment::OutHumRat;
     using Psychrometrics::PsyHFnTdbW;
     using Psychrometrics::PsyRhoAirFnPbTdbW;
@@ -909,7 +905,7 @@ TEST_F(EnergyPlusFixture, TestSingleSpeedDefrostCOP)
     // Set up inlet air conditions.
     Coil.InletAirMassFlowRate = Coil.RatedAirMassFlowRate(1);
     OutHumRat = 0.002;
-    OutBaroPress = 101325; // sea level
+    state->dataEnvrn->OutBaroPress = 101325; // sea level
     Coil.InletAirTemp = 20;
     Coil.InletAirHumRat = 0.008;
     Coil.InletAirEnthalpy = PsyHFnTdbW(Coil.InletAirTemp, Coil.InletAirHumRat);
@@ -918,16 +914,16 @@ TEST_F(EnergyPlusFixture, TestSingleSpeedDefrostCOP)
     Real64 const PLR = 1.0;
 
     // Defrost Off
-    OutDryBulbTemp = -5.0; // cold
+    state->dataEnvrn->OutDryBulbTemp = -5.0; // cold
     CalcDXHeatingCoil(*state, DXCoilNum, PLR, FanOpMode);
-    Real64 COPwoDefrost = Coil.RatedCOP(1) / (CurveValue(*state, nEIRfT2, Coil.InletAirTemp, OutDryBulbTemp) * CurveValue(*state, nEIRfFF2, 1));
+    Real64 COPwoDefrost = Coil.RatedCOP(1) / (CurveValue(*state, nEIRfT2, Coil.InletAirTemp, state->dataEnvrn->OutDryBulbTemp) * CurveValue(*state, nEIRfFF2, 1));
     Real64 COPwDefrost = Coil.TotalHeatingEnergyRate / Coil.ElecHeatingPower;
     EXPECT_LT(COPwDefrost, COPwoDefrost);
 
     // Defrost On
-    OutDryBulbTemp = 5.0; // not as cold
+    state->dataEnvrn->OutDryBulbTemp = 5.0; // not as cold
     CalcDXHeatingCoil(*state, DXCoilNum, PLR, FanOpMode);
-    COPwoDefrost = Coil.RatedCOP(1) / (CurveValue(*state, nEIRfT2, Coil.InletAirTemp, OutDryBulbTemp) * CurveValue(*state, nEIRfFF2, 1));
+    COPwoDefrost = Coil.RatedCOP(1) / (CurveValue(*state, nEIRfT2, Coil.InletAirTemp, state->dataEnvrn->OutDryBulbTemp) * CurveValue(*state, nEIRfFF2, 1));
     COPwDefrost = Coil.TotalHeatingEnergyRate / Coil.ElecHeatingPower;
     EXPECT_DOUBLE_EQ(COPwoDefrost, COPwDefrost);
 }
@@ -1315,10 +1311,10 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedWasteHeat)
     DXCoil(1).FuelTypeNum = DataGlobalConstants::ResourceType::Natural_Gas;
     DXCoil(1).MSHPHeatRecActive = false;
 
-    OutDryBulbTemp = 35;
+    state->dataEnvrn->OutDryBulbTemp = 35;
     OutHumRat = 0.0128;
-    OutBaroPress = 101325;
-    OutWetBulbTemp = PsyTwbFnTdbWPb(*state, OutDryBulbTemp, OutHumRat, OutBaroPress);
+    state->dataEnvrn->OutBaroPress = 101325;
+    OutWetBulbTemp = PsyTwbFnTdbWPb(*state, state->dataEnvrn->OutDryBulbTemp, OutHumRat, state->dataEnvrn->OutBaroPress);
 
     DXCoil(1).MSRatedAirMassFlowRate(1) = DXCoil(1).MSRatedAirVolFlowRate(1) * 1.2;
     DXCoil(1).MSRatedAirMassFlowRate(2) = DXCoil(1).MSRatedAirVolFlowRate(2) * 1.2;
@@ -4047,8 +4043,8 @@ TEST_F(EnergyPlusFixture, SingleSpeedDXCoolingCoilOutputTest)
     AirOutletNode.HumRat = Coil.InletAirHumRat;
     AirOutletNode.Enthalpy = Coil.InletAirEnthalpy;
     // outside air condition
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::OutDryBulbTemp = 38.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->OutDryBulbTemp = 38.0;
     DataEnvironment::OutHumRat = 0.0120;
     DataEnvironment::WindSpeed = 5.0;
     DataEnvironment::WindDir = 0.0;
@@ -4218,8 +4214,8 @@ TEST_F(EnergyPlusFixture, MultiSpeedDXCoolingCoilOutputTest)
     AirOutletNode.HumRat = Coil.InletAirHumRat;
     AirOutletNode.Enthalpy = Coil.InletAirEnthalpy;
     // outside air condition
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::OutDryBulbTemp = 30.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->OutDryBulbTemp = 30.0;
     DataEnvironment::OutHumRat = 0.0120;
     DataEnvironment::WindSpeed = 5.0;
     DataEnvironment::WindDir = 0.0;

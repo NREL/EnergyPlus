@@ -842,7 +842,6 @@ namespace PipeHeatTransfer {
         // Check flags and update data structure
 
         // Using/Aliasing
-        using DataEnvironment::OutDryBulbTemp;
         using DataHeatBalFanSys::MAT; // average (mean) zone air temperature [C]
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
@@ -964,13 +963,13 @@ namespace PipeHeatTransfer {
                 if (SELECT_CASE_var == GroundEnv) {
                     // EnvironmentTemp = GroundTemp
                 } else if (SELECT_CASE_var == OutsideAirEnv) {
-                    nsvEnvironmentTemp = OutDryBulbTemp;
+                    nsvEnvironmentTemp = state.dataEnvrn->OutDryBulbTemp;
                 } else if (SELECT_CASE_var == ZoneEnv) {
                     nsvEnvironmentTemp = MAT(this->EnvrZonePtr);
                 } else if (SELECT_CASE_var == ScheduleEnv) {
                     nsvEnvironmentTemp = GetCurrentScheduleValue(state, this->EnvrSchedPtr);
                 } else if (SELECT_CASE_var == None) { // default to outside temp
-                    nsvEnvironmentTemp = OutDryBulbTemp;
+                    nsvEnvironmentTemp = state.dataEnvrn->OutDryBulbTemp;
                 }
             }
 
@@ -1262,7 +1261,6 @@ namespace PipeHeatTransfer {
 
         // Using/Aliasing
         using ConvectionCoefficients::CalcASHRAESimpExtConvectCoeff;
-        using DataEnvironment::OutDryBulbTemp;
         using DataEnvironment::SkyTemp;
         using DataEnvironment::SOLCOS;
         using DataEnvironment::WindSpeed;
@@ -1372,7 +1370,7 @@ namespace PipeHeatTransfer {
 
                                 //-Update Equation, basically a detailed energy balance at the surface
                                 this->T(WidthIndex, DepthIndex, LengthIndex, TentativeTimeIndex) =
-                                    (QSolAbsorbed + RadCoef * SkyTemp + ConvCoef * OutDryBulbTemp + (kSoil / dS) * (NodeBelow + 2 * NodeLeft) +
+                                    (QSolAbsorbed + RadCoef * SkyTemp + ConvCoef * state.dataEnvrn->OutDryBulbTemp + (kSoil / dS) * (NodeBelow + 2 * NodeLeft) +
                                      (rho * Cp / nsvDeltaTime) * NodePast) /
                                     (RadCoef + ConvCoef + 3 * (kSoil / dS) + (rho * Cp / nsvDeltaTime));
 
@@ -1385,7 +1383,7 @@ namespace PipeHeatTransfer {
 
                                 //-Update Equation
                                 this->T(WidthIndex, DepthIndex, LengthIndex, TentativeTimeIndex) =
-                                    (QSolAbsorbed + RadCoef * SkyTemp + ConvCoef * OutDryBulbTemp +
+                                    (QSolAbsorbed + RadCoef * SkyTemp + ConvCoef * state.dataEnvrn->OutDryBulbTemp +
                                      (kSoil / dS) * (NodeBelow + NodeLeft + NodeRight) + (rho * Cp / nsvDeltaTime) * NodePast) /
                                     (RadCoef + ConvCoef + 3 * (kSoil / dS) + (rho * Cp / nsvDeltaTime));
 

@@ -1309,10 +1309,10 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
     ScheduleManager::Schedule(17).CurrentValue = 1.0;
     ScheduleManager::Schedule(9).CurrentValue = 1.0;
     DataEnvironment::StdRhoAir = 1.2;
-    DataEnvironment::OutDryBulbTemp = 35.0;
+    state->dataEnvrn->OutDryBulbTemp = 35.0;
     DataEnvironment::OutHumRat = 0.012;
     DataEnvironment::StdBaroPress = 101325.0;
-    DataEnvironment::OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
 
     // InitMSHeatPump resets the current MSHeatPumpNum only
     HVACMultiSpeedHeatPump::InitMSHeatPump(*state, MSHeatPumpNum, FirstHVACIteration, AirLoopNum, QZnReq, OnOffAirFlowRatio);
@@ -1382,7 +1382,7 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
     // Heating
     QZnReq = 10000.00;
     MSHeatPump(2).HeatCoolMode = HeatingMode;
-    DataEnvironment::OutDryBulbTemp = 5.0;
+    state->dataEnvrn->OutDryBulbTemp = 5.0;
     DataEnvironment::OutHumRat = 0.008;
     state->dataGlobal->DoCoilDirectSolutions = false;
     SimMSHP(*state, MSHeatPumpNum, FirstHVACIteration, AirLoopNum, QSensUnitOut, QZnReq, OnOffAirFlowRatio);

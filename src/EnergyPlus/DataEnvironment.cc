@@ -71,14 +71,6 @@ namespace DataEnvironment {
     // current weather variables)
 
     // MODULE VARIABLE DECLARATIONS:
-    Real64 Latitude;                          // Latitude of building location
-    Real64 Longitude;                         // Longitude of building location
-    int Month;                                // Current calendar month
-    int MonthTomorrow;                        // Tomorrow's calendar month
-    Real64 OutBaroPress;                      // Current outdoor air barometric pressure
-    Real64 OutDryBulbTemp;                    // Current outdoor air dry bulb temperature
-    bool EMSOutDryBulbOverrideOn(false);      // EMS flag for outdoor air dry bulb temperature
-    Real64 EMSOutDryBulbOverrideValue;        // EMS override value for outdoor air dry bulb temperature
     Real64 OutHumRat;                         // Current outdoor air humidity ratio
     Real64 OutRelHum;                         // Current outdoor relative humidity [%]
     Real64 OutRelHumValue;                    // Current outdoor relative humidity value [0.0-1.0]
@@ -172,14 +164,6 @@ namespace DataEnvironment {
 
     void clear_state()
     {
-        Latitude = Real64();
-        Longitude = Real64();
-        Month = int();
-        MonthTomorrow = int();
-        OutBaroPress = Real64();
-        OutDryBulbTemp = Real64();
-        EMSOutDryBulbOverrideOn = false;
-        EMSOutDryBulbOverrideValue = Real64();
         OutHumRat = Real64();
         OutRelHum = Real64();
         OutRelHumValue = Real64();
@@ -289,10 +273,10 @@ namespace DataEnvironment {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 BaseTemp; // Base temperature at Z = 0 (C)
 
-        BaseTemp = OutDryBulbTemp + WeatherFileTempModCoeff;
+        BaseTemp = state.dataEnvrn->OutDryBulbTemp + WeatherFileTempModCoeff;
 
         if (SiteTempGradient == 0.0) {
-            LocalOutDryBulbTemp = OutDryBulbTemp;
+            LocalOutDryBulbTemp = state.dataEnvrn->OutDryBulbTemp;
         } else if (Z <= 0.0) {
             LocalOutDryBulbTemp = BaseTemp;
         } else {
@@ -467,7 +451,7 @@ namespace DataEnvironment {
         if (Z <= 0.0) {
             LocalAirPressure = 0.0;
         } else if (SiteTempGradient == 0.0) {
-            LocalAirPressure = OutBaroPress;
+            LocalAirPressure = state.dataEnvrn->OutBaroPress;
         } else {
             LocalAirPressure = StdBaroPress * std::pow(BaseTemp / (BaseTemp + TempGradient * (Z - GeopotentialH)),
                                                        (StdGravity * AirMolarMass) / (GasConstant * TempGradient));

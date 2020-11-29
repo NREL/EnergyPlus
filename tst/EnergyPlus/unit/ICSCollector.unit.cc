@@ -89,7 +89,7 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     InitializePsychRoutines();
 
     state->dataGlobal->BeginEnvrnFlag = true;
-    OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
     SkyTemp = 24.0;
     state->dataEnvrn->IsRain = false;
     MatNum = 1;

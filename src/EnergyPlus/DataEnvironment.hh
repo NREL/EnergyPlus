@@ -68,14 +68,6 @@ namespace DataEnvironment {
     Real64 constexpr StdPressureSeaLevel(101325.0);   // Standard barometric pressure at sea level (Pa)
 
     // MODULE VARIABLE DECLARATIONS:
-    extern Real64 Latitude;                        // Latitude of building location
-    extern Real64 Longitude;                       // Longitude of building location
-    extern int Month;                              // Current calendar month
-    extern int MonthTomorrow;                      // Tomorrow's calendar month
-    extern Real64 OutBaroPress;                    // Current outdoor air barometric pressure
-    extern Real64 OutDryBulbTemp;                  // Current outdoor air dry bulb temperature
-    extern bool EMSOutDryBulbOverrideOn;           // EMS flag for outdoor air dry bulb temperature
-    extern Real64 EMSOutDryBulbOverrideValue;      // EMS override value for outdoor air dry bulb temperature
     extern Real64 OutHumRat;                       // Current outdoor air humidity ratio
     extern Real64 OutRelHum;                       // Current outdoor relative humidity [%]
     extern Real64 OutRelHumValue;                  // Current outdoor relative humidity value [0.0-1.0]
@@ -213,6 +205,14 @@ struct EnvironmentData : BaseGlobalStruct {
     int HolidayIndexTomorrow = 0;                       // Tomorrow's Holiday Index
     bool IsRain = false;                                // Surfaces are wet for this time interval
     bool IsSnow = false;                                // Snow on the ground for this time interval
+    Real64 Latitude = 0.0;                              // Latitude of building location
+    Real64 Longitude = 0.0;                             // Longitude of building location
+    int Month = 0;                                      // Current calendar month
+    int MonthTomorrow = 0;                              // Tomorrow's calendar month
+    Real64 OutBaroPress = 0.0;                          // Current outdoor air barometric pressure
+    Real64 OutDryBulbTemp = 0.0;                        // Current outdoor air dry bulb temperature
+    bool EMSOutDryBulbOverrideOn = false;               // EMS flag for outdoor air dry bulb temperature
+    Real64 EMSOutDryBulbOverrideValue = 0.0;            // EMS override value for outdoor air dry bulb temperature
 
     void clear_state() override
     {
@@ -244,6 +244,14 @@ struct EnvironmentData : BaseGlobalStruct {
         this->HolidayIndexTomorrow = 0;
         this->IsRain = false;
         this->IsSnow = false;
+        this->Latitude = 0.0;
+        this->Longitude = 0.0;
+        this->Month = 0;
+        this->MonthTomorrow = 0;
+        this->OutBaroPress = 0.0;
+        this->OutDryBulbTemp = 0.0;
+        this->EMSOutDryBulbOverrideOn = false;
+        this->EMSOutDryBulbOverrideValue = 0.0;
     }
 };
 

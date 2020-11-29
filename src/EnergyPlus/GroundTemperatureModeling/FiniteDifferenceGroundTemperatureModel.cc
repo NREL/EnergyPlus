@@ -301,7 +301,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
 
                 WeatherManager::ManageWeather(state);
 
-                outDryBulbTemp_num += OutDryBulbTemp;
+                outDryBulbTemp_num += state.dataEnvrn->OutDryBulbTemp;
                 airDensity_num += OutAirDensity;
                 relHum_num += OutRelHumValue;
                 windSpeed_num += WindSpeed;

@@ -9568,8 +9568,8 @@ namespace RefrigeratedCase {
                 OutDbTemp = DataLoopNode::Node(this->OutsideAirNodeNum).Temp;
                 BPress = DataLoopNode::Node(this->OutsideAirNodeNum).Press;
             } else {
-                OutDbTemp = DataEnvironment::OutDryBulbTemp;
-                BPress = DataEnvironment::OutBaroPress;
+                OutDbTemp = state.dataEnvrn->OutDryBulbTemp;
+                BPress = state.dataEnvrn->OutBaroPress;
             }
             EffectTemp = OutDbTemp;
 
@@ -9819,11 +9819,11 @@ namespace RefrigeratedCase {
         // Zone relative humidity (%)
         Real64 ZoneRHPercent = Psychrometrics::PsyRhFnTdbWPb(state, DataLoopNode::Node(this->ZoneNodeNum).Temp,
                                                              DataLoopNode::Node(this->ZoneNodeNum).HumRat,
-                                                             DataEnvironment::OutBaroPress) *
+                                                             state.dataEnvrn->OutBaroPress) *
                                100.0;
 
         // Zone dew point (C)
-        Real64 ZoneDewPoint = Psychrometrics::PsyTdpFnWPb(state, DataLoopNode::Node(this->ZoneNodeNum).HumRat, DataEnvironment::OutBaroPress);
+        Real64 ZoneDewPoint = Psychrometrics::PsyTdpFnWPb(state, DataLoopNode::Node(this->ZoneNodeNum).HumRat, state.dataEnvrn->OutBaroPress);
 
         // Display case operating temperature
         Real64 TCase = this->Temperature;
@@ -10816,10 +10816,10 @@ namespace RefrigeratedCase {
                         {
                             auto const SELECT_CASE_var(Condenser(System(SysNum).CondenserNum(1)).CondenserType); // only one condenser allowed now
                             if (SELECT_CASE_var == DataHeatBalance::RefrigCondenserTypeAir) {
-                                System(SysNum).TCondense = DataEnvironment::OutDryBulbTemp + 16.7;
+                                System(SysNum).TCondense = state.dataEnvrn->OutDryBulbTemp + 16.7;
                                 // 16.7C is delta T at rating point for air-cooled condensers, just estimate, so ok for zone-located condensers
                             } else if (SELECT_CASE_var == DataHeatBalance::RefrigCondenserTypeEvap) {
-                                System(SysNum).TCondense = DataEnvironment::OutDryBulbTemp + 15.0;
+                                System(SysNum).TCondense = state.dataEnvrn->OutDryBulbTemp + 15.0;
                                 // 15C is delta T at rating point for evap-cooled condensers
                             } else if (SELECT_CASE_var == DataHeatBalance::RefrigCondenserTypeWater) {
                                 // define starting estimate at temperature of water exiting condenser
@@ -11525,8 +11525,8 @@ namespace RefrigeratedCase {
                 BPress = DataLoopNode::Node(condenser.InletAirNodeNum).Press;
                 HumRatIn = DataLoopNode::Node(condenser.InletAirNodeNum).HumRat;
             } else {
-                OutDbTemp = DataEnvironment::OutDryBulbTemp;
-                BPress = DataEnvironment::OutBaroPress;
+                OutDbTemp = state.dataEnvrn->OutDryBulbTemp;
+                BPress = state.dataEnvrn->OutBaroPress;
                 HumRatIn = DataEnvironment::OutHumRat;
             }
             AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(state, BPress, OutDbTemp, HumRatIn);
@@ -11826,7 +11826,7 @@ namespace RefrigeratedCase {
         if (GasCooler(GasCoolerID).InletAirNodeNum != 0) {
             OutDbTemp = DataLoopNode::Node(GasCooler(GasCoolerID).InletAirNodeNum).Temp;
         } else {
-            OutDbTemp = DataEnvironment::OutDryBulbTemp;
+            OutDbTemp = state.dataEnvrn->OutDryBulbTemp;
         }
         // Determine gas cooler outlet temperature and pressure
         // Transcritical:  Gas cooler outlet temperature based on ambient temperature and approach temperature.
@@ -11835,7 +11835,7 @@ namespace RefrigeratedCase {
         //               transition temperature.
         if (OutDbTemp > GasCooler(GasCoolerID).TransitionTemperature) { // Gas cooler in transcritical operation
             GasCooler(GasCoolerID).TGasCoolerOut = OutDbTemp + GasCooler(GasCoolerID).GasCoolerApproachT;
-            GasCooler(GasCoolerID).PGasCoolerOut = 1.0e5 * (2.3083 * DataEnvironment::OutDryBulbTemp + 11.9);
+            GasCooler(GasCoolerID).PGasCoolerOut = 1.0e5 * (2.3083 * state.dataEnvrn->OutDryBulbTemp + 11.9);
             if (GasCooler(GasCoolerID).PGasCoolerOut < 7.5e6) { // Ensure gas cooler pressure is at least 7.5 MPa for transcritical operation
                 GasCooler(GasCoolerID).PGasCoolerOut = 7.5e6;
             }
@@ -13578,12 +13578,12 @@ namespace RefrigeratedCase {
         Real64 TWalkIn = this->Temperature; // WalkIn operating temperature (C)
 
         // Enthalpy of air corresponding to walk in temperature and 90% assumed RH (J/kg)
-        Real64 EnthalpyAirWalkIn = Psychrometrics::PsyHFnTdbRhPb(state, TWalkIn, 0.9, DataEnvironment::OutBaroPress); // assume 90%RH in cooler
+        Real64 EnthalpyAirWalkIn = Psychrometrics::PsyHFnTdbRhPb(state, TWalkIn, 0.9, state.dataEnvrn->OutBaroPress); // assume 90%RH in cooler
 
         // corresponds to walk in temp and 90% assumed RH(kg water/kg dry air)
         Real64 HumRatioAirWalkIn = Psychrometrics::PsyWFnTdbH(state, TWalkIn, EnthalpyAirWalkIn);
-        Real64 DensityAirWalkIn = Psychrometrics::PsyRhoAirFnPbTdbW(state, DataEnvironment::OutBaroPress, TWalkIn, HumRatioAirWalkIn);
-        Real64 Conv = DataEnvironment::Latitude * 2.0 * DataGlobalConstants::Pi() / 360.0; // Convert DataEnvironment::Latitude to radians
+        Real64 DensityAirWalkIn = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, TWalkIn, HumRatioAirWalkIn);
+        Real64 Conv = state.dataEnvrn->Latitude * 2.0 * DataGlobalConstants::Pi() / 360.0; // Convert DataEnvironment::Latitude to radians
         Real64 Gravity = 9.780373 * (1.0 + 0.0052891 * pow_2(std::sin(Conv)) - 0.0000059 * pow_2(std::sin(2.0 * Conv)));
 
         // CALCULATE ALL LOADS INFLUENCED BY ZONE TEMPERATURE AND RH
@@ -13620,11 +13620,11 @@ namespace RefrigeratedCase {
             if (StockDoorArea > 0.0 || GlassDoorArea > 0.0) {
                 // Zone relative humidity fraction (decimal)
                 Real64 ZoneRHFrac = Psychrometrics::PsyRhFnTdbWPb(state,
-                    DataLoopNode::Node(zoneNodeNum).Temp, DataLoopNode::Node(zoneNodeNum).HumRat, DataEnvironment::OutBaroPress, RoutineName);
+                    DataLoopNode::Node(zoneNodeNum).Temp, DataLoopNode::Node(zoneNodeNum).HumRat, state.dataEnvrn->OutBaroPress, RoutineName);
                 // Enthalpy of the air in a particular zone (J/kg)
-                Real64 EnthalpyZoneAir = Psychrometrics::PsyHFnTdbRhPb(state, ZoneDryBulb, ZoneRHFrac, DataEnvironment::OutBaroPress, RoutineName);
+                Real64 EnthalpyZoneAir = Psychrometrics::PsyHFnTdbRhPb(state, ZoneDryBulb, ZoneRHFrac, state.dataEnvrn->OutBaroPress, RoutineName);
                 Real64 HumRatioZoneAir = Psychrometrics::PsyWFnTdbH(state, ZoneDryBulb, EnthalpyZoneAir, RoutineName);
-                Real64 DensityZoneAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, DataEnvironment::OutBaroPress, ZoneDryBulb, HumRatioZoneAir, RoutineName);
+                Real64 DensityZoneAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, ZoneDryBulb, HumRatioZoneAir, RoutineName);
                 if (DensityZoneAir < DensityAirWalkIn) { // usual case when walk in is colder than zone
                     DensitySqRtFactor = std::sqrt(1.0 - DensityZoneAir / DensityAirWalkIn);
                     DensityFactorFm = std::pow(2.0 / (1.0 + std::pow(DensityAirWalkIn / DensityZoneAir, 0.333)), 1.5);
@@ -14584,10 +14584,10 @@ namespace RefrigeratedCase {
                 SensLoadRequestedGross = SensLoadRequested + HeaterLoad + FanPowerRated;
                 Real64 ZoneMixedAirDryBulb = DataLoopNode::Node(this->ZoneNodeNum).Temp;    // (C)
                 Real64 ZoneMixedAirHumRatio = DataLoopNode::Node(this->ZoneNodeNum).HumRat; // kg water/kg air in the zone mixed air
-                Real64 ZoneMixedAirRHFrac = Psychrometrics::PsyRhFnTdbWPb(state, ZoneMixedAirDryBulb, ZoneMixedAirHumRatio, DataEnvironment::OutBaroPress, TrackMessage);
-                Real64 ZoneMixedAirEnthalpy = Psychrometrics::PsyHFnTdbRhPb(state, ZoneMixedAirDryBulb, ZoneMixedAirRHFrac, DataEnvironment::OutBaroPress, TrackMessage);
-                Real64 ZoneMixedAirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(state, DataEnvironment::OutBaroPress, ZoneMixedAirDryBulb, ZoneMixedAirHumRatio, TrackMessage);
-                Real64 ZoneDryAirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(state, DataEnvironment::OutBaroPress, ZoneMixedAirDryBulb, 0.0, TrackMessage);
+                Real64 ZoneMixedAirRHFrac = Psychrometrics::PsyRhFnTdbWPb(state, ZoneMixedAirDryBulb, ZoneMixedAirHumRatio, state.dataEnvrn->OutBaroPress, TrackMessage);
+                Real64 ZoneMixedAirEnthalpy = Psychrometrics::PsyHFnTdbRhPb(state, ZoneMixedAirDryBulb, ZoneMixedAirRHFrac, state.dataEnvrn->OutBaroPress, TrackMessage);
+                Real64 ZoneMixedAirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, ZoneMixedAirDryBulb, ZoneMixedAirHumRatio, TrackMessage);
+                Real64 ZoneDryAirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, ZoneMixedAirDryBulb, 0.0, TrackMessage);
                 Real64 DryAirMassFlowRated = AirVolumeFlowRated * ZoneDryAirDensity;
                 // calc t inlet to coil assuming at middle/mixed point in room  bbb -
                 //    later need to do for hottest/coolest in room where Tin /= Tzonemixed
@@ -14640,7 +14640,7 @@ namespace RefrigeratedCase {
                         ShowContinueError(state, " The estimated air outlet temperature is less than the evaporating temperature.");
                     }
                     Real64 ExitEnthalpyEstimate = Psychrometrics::PsyHFnTdbRhPb(state,
-                        ExitTemperatureEstimate, 1.0, DataEnvironment::OutBaroPress, TrackMessage); // Estimated Air enthalpy leaving the coil (J/kg)
+                        ExitTemperatureEstimate, 1.0, state.dataEnvrn->OutBaroPress, TrackMessage); // Estimated Air enthalpy leaving the coil (J/kg)
                     if (ExitEnthalpyEstimate <= CoilInletEnthalpy) {
                         CoilCapTotEstimate = (CoilInletEnthalpy - ExitEnthalpyEstimate) * AirVolumeFlowMax * CoilInletDensity;
                     } else {
@@ -14704,7 +14704,7 @@ namespace RefrigeratedCase {
                 Real64 ExitEnthalpy =
                     CoilInletEnthalpy - (CoilCapTotEstimate / (AirVolumeFlowMax * CoilInletDensity)); // Air enthalpy leaving the coil (J/kg)
                 Real64 ExitTemperature = Psychrometrics::PsyTsatFnHPb(state,
-                    ExitEnthalpy, DataEnvironment::OutBaroPress, TrackMessage); // RH =1.0 at Tsat // Air temperature leaving the coil (C)
+                    ExitEnthalpy, state.dataEnvrn->OutBaroPress, TrackMessage); // RH =1.0 at Tsat // Air temperature leaving the coil (C)
                 Real64 ExitHumRatio = Psychrometrics::PsyWFnTdbH(state, ExitTemperature, ExitEnthalpy, TrackMessage); // kg water/kg air
                 if (ExitHumRatio > CoilInletHumRatio) ExitHumRatio = CoilInletHumRatio;
                 WaterRemovRate = DryAirMassFlowMax * (CoilInletHumRatio - ExitHumRatio);

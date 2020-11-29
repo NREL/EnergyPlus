@@ -1876,12 +1876,11 @@ namespace ExternalInterface {
 
         // Using/Aliasing
         using DataEnvironment::CurrentYearIsLeapYear;
-        using DataEnvironment::Month;
         // Locals
         Real64 simtime;
 
         if (!CurrentYearIsLeapYear) {
-            switch (Month) {
+            switch (state.dataEnvrn->Month) {
             case 1:
                 simtime = 0;
                 break;
@@ -1922,7 +1921,7 @@ namespace ExternalInterface {
                 simtime = 0;
             }
         } else {
-            switch (Month) {
+            switch (state.dataEnvrn->Month) {
             case 1:
                 simtime = 0;
                 break;

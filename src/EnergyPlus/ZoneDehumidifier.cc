@@ -108,7 +108,6 @@ namespace ZoneDehumidifier {
 
     // Using/Aliasing
     using namespace DataLoopNode;
-    using DataEnvironment::OutBaroPress;
     using DataEnvironment::StdBaroPress;
 
     using namespace ScheduleManager;
@@ -767,7 +766,7 @@ namespace ZoneDehumidifier {
 
         InletAirTemp = Node(AirInletNodeNum).Temp;
         InletAirHumRat = Node(AirInletNodeNum).HumRat;
-        InletAirRH = 100.0 * PsyRhFnTdbWPb(state, InletAirTemp, InletAirHumRat, OutBaroPress, RoutineName); // RH in percent (%)
+        InletAirRH = 100.0 * PsyRhFnTdbWPb(state, InletAirTemp, InletAirHumRat, state.dataEnvrn->OutBaroPress, RoutineName); // RH in percent (%)
 
         if (QZnDehumidReq < 0.0 && GetCurrentScheduleValue(state, state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).SchedPtr) > 0.0 &&
             InletAirTemp >= state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).MinInletAirTemp && InletAirTemp <= state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).MaxInletAirTemp) {

@@ -88,7 +88,6 @@ namespace ZonePlenum {
 
     // Using/Aliasing
     using namespace DataLoopNode;
-    using DataEnvironment::OutBaroPress;
     using DataEnvironment::OutHumRat;
     using Psychrometrics::PsyHFnTdbW;
     using Psychrometrics::PsyTdbFnHW;
@@ -703,7 +702,7 @@ namespace ZonePlenum {
                 Node(ZoneNodeNum).Temp = 20.0;
                 Node(ZoneNodeNum).MassFlowRate = 0.0;
                 Node(ZoneNodeNum).Quality = 1.0;
-                Node(ZoneNodeNum).Press = OutBaroPress;
+                Node(ZoneNodeNum).Press = state.dataEnvrn->OutBaroPress;
                 Node(ZoneNodeNum).HumRat = OutHumRat;
                 Node(ZoneNodeNum).Enthalpy = PsyHFnTdbW(Node(ZoneNodeNum).Temp, Node(ZoneNodeNum).HumRat);
 
@@ -799,7 +798,7 @@ namespace ZonePlenum {
                 Node(ZoneNodeNum).Temp = 20.0;
                 Node(ZoneNodeNum).MassFlowRate = 0.0;
                 Node(ZoneNodeNum).Quality = 1.0;
-                Node(ZoneNodeNum).Press = OutBaroPress;
+                Node(ZoneNodeNum).Press = state.dataEnvrn->OutBaroPress;
                 Node(ZoneNodeNum).HumRat = OutHumRat;
                 Node(ZoneNodeNum).Enthalpy = PsyHFnTdbW(Node(ZoneNodeNum).Temp, Node(ZoneNodeNum).HumRat);
 

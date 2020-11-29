@@ -608,7 +608,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
     DataHeatBalance::Zone( 1 ).SystemZoneNodeNumber = 1;
     DataHeatBalance::Zone( 1 ).Multiplier = 1.0;
     DataHeatBalance::Zone( 1 ).ListMultiplier = 1.0;
-    DataEnvironment::OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
     DataLoopNode::Node( 1 ).Temp = 20.0;
     HeatBalanceManager::AllocateHeatBalArrays(*state);
     HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays(*state);
@@ -768,7 +768,7 @@ TEST_F(ConvectionCoefficientsFixture, TestCalcZoneSystemACH)
     state->dataGlobal->BeginEnvrnFlag = false;
     DataHeatBalance::Zone(ZoneNum).Multiplier = 1.0;
     DataHeatBalance::Zone(ZoneNum).ListMultiplier = 1.0;
-    EnergyPlus::DataEnvironment::OutBaroPress = 101400.0;
+    state->dataEnvrn->OutBaroPress = 101400.0;
     Real64 ZoneNode = DataHeatBalance::Zone(ZoneNum).SystemZoneNodeNumber;
 
     // Test 1: Node not allocated, returns a zero ACH
@@ -801,7 +801,7 @@ TEST_F(ConvectionCoefficientsFixture, TestCalcFisherPedersenCeilDiffuserNatConv)
     Real64 ExpectedHconv;
     Real64 CalculatedHconv;
 
-    DataEnvironment::OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
 
     // Test 1: Non-window, all natural
     Hforced = 10.0;
@@ -883,7 +883,7 @@ TEST_F(ConvectionCoefficientsFixture, TestCalcFisherPedersenCeilDiffuserCorrelat
     Real64 ExpectedHconv;
     Real64 CalculatedHconv;
 
-    DataEnvironment::OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
 
     // Test 1: Forced Convection All Correlations (Floor, Ceiling, Wall)
     ACH = 3.3;
@@ -977,7 +977,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedAssistedWall)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataEnvironment::OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
 
     bool errorsFound(false);
     HeatBalanceManager::GetProjectControlData(*state, errorsFound); // read project control data
@@ -1034,7 +1034,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedOpposingWall)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataEnvironment::OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
 
     bool errorsFound(false);
     HeatBalanceManager::GetProjectControlData(*state, errorsFound); // read project control data
@@ -1091,7 +1091,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedStableFloor)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataEnvironment::OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
 
     bool errorsFound(false);
     HeatBalanceManager::GetProjectControlData(*state, errorsFound); // read project control data
@@ -1148,7 +1148,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedUnstableFloor)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataEnvironment::OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
 
     bool errorsFound(false);
     HeatBalanceManager::GetProjectControlData(*state, errorsFound); // read project control data
@@ -1205,7 +1205,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedStableCeiling)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataEnvironment::OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
 
     bool errorsFound(false);
     HeatBalanceManager::GetProjectControlData(*state, errorsFound); // read project control data
@@ -1262,7 +1262,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedUnstableCeiling
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataEnvironment::OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
 
     bool errorsFound(false);
     HeatBalanceManager::GetProjectControlData(*state, errorsFound); // read project control data

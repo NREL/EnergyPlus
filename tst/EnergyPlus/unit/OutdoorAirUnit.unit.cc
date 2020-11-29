@@ -292,9 +292,9 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_AutoSize)
 
     state->dataGlobal->BeginEnvrnFlag = true;
     DataSizing::CurZoneEqNum = 1;
-    DataEnvironment::OutBaroPress = 101325;          // sea level
+    state->dataEnvrn->OutBaroPress = 101325;          // sea level
     DataZoneEquipment::ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
-    DataEnvironment::StdRhoAir = PsyRhoAirFnPbTdbW(*state, DataEnvironment::OutBaroPress, 20.0, 0.0);
+    DataEnvironment::StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
     ZoneEqSizing.allocate(1);
     ZoneSizingRunDone = true;
     ZoneEqSizing(CurZoneEqNum).DesignSizeFromParent = false;
@@ -548,7 +548,7 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_WaterCoolingCoilAutoSizeTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataEnvironment::OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->MinutesPerTimeStep = 60;
@@ -618,11 +618,11 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_WaterCoolingCoilAutoSizeTest)
 
     state->dataGlobal->HourOfDay = 15;
     state->dataEnvrn->DSTIndicator = 0;
-    DataEnvironment::Month = 7;
+    state->dataEnvrn->Month = 7;
     state->dataEnvrn->DayOfMonth = 21;
     state->dataEnvrn->DayOfWeek = 2;
     state->dataEnvrn->HolidayIndex = 0;
-    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(Month, state->dataEnvrn->DayOfMonth, state->dataGlobal->HourOfDay);
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, state->dataGlobal->HourOfDay);
 
     UpdateScheduleValues(*state);
 
@@ -644,7 +644,7 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_WaterCoolingCoilAutoSizeTest)
     FinalZoneSizing(CurZoneEqNum).DesCoolCoilInTemp = 30.0;
     FinalZoneSizing(CurZoneEqNum).DesCoolCoilInHumRat = 0.01;
 
-    DataEnvironment::StdRhoAir = PsyRhoAirFnPbTdbW(*state, OutBaroPress, 30.0, 0.0);
+    DataEnvironment::StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 30.0, 0.0);
 
     FinalZoneSizing(CurZoneEqNum).CoolDesTemp = 12.8;
     FinalZoneSizing(CurZoneEqNum).CoolDesHumRat = 0.0080;
@@ -854,7 +854,7 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_SteamHeatingCoilAutoSizeTest)
     ASSERT_TRUE(process_idf(idf_objects));
 
     DataEnvironment::StdRhoAir = 1.20;
-    DataEnvironment::OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->MinutesPerTimeStep = 60;
@@ -924,11 +924,11 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_SteamHeatingCoilAutoSizeTest)
 
     state->dataGlobal->HourOfDay = 15;
     state->dataEnvrn->DSTIndicator = 0;
-    DataEnvironment::Month = 1;
+    state->dataEnvrn->Month = 1;
     state->dataEnvrn->DayOfMonth = 21;
     state->dataEnvrn->DayOfWeek = 2;
     state->dataEnvrn->HolidayIndex = 0;
-    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(Month, state->dataEnvrn->DayOfMonth, state->dataGlobal->HourOfDay);
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, state->dataGlobal->HourOfDay);
 
     UpdateScheduleValues(*state);
 
@@ -950,7 +950,7 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_SteamHeatingCoilAutoSizeTest)
     FinalZoneSizing(CurZoneEqNum).DesHeatCoilInTemp = 5.0;
     FinalZoneSizing(CurZoneEqNum).DesHeatCoilInHumRat = 0.005;
 
-    DataEnvironment::StdRhoAir = PsyRhoAirFnPbTdbW(*state, OutBaroPress, 5.0, 0.0);
+    DataEnvironment::StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 5.0, 0.0);
     OutAirUnit(OAUnitNum).OAEquip(1).MaxVolWaterFlow = DataSizing::AutoSize;
 
     FinalZoneSizing(CurZoneEqNum).HeatDesTemp = 50.0;

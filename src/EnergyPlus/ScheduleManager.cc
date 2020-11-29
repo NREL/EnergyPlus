@@ -96,11 +96,6 @@ namespace ScheduleManager {
     // REFERENCES:
     // Proposal for Schedule Manager in EnergyPlus (Rick Strand)
 
-    // OTHER NOTES:
-
-    // Using/Aliasing
-    using DataEnvironment::MonthTomorrow;
-    // Data
     // MODULE PARAMETER DEFINITIONS
     int const MaxDayTypes(12);
     static std::string const BlankString;

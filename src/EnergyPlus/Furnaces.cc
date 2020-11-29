@@ -171,7 +171,6 @@ namespace Furnaces {
     // Using/Aliasing
     using namespace DataLoopNode;
     using namespace DataHVACGlobals;
-    using DataEnvironment::OutDryBulbTemp;
     using DataEnvironment::StdRhoAir;
     using namespace DataZoneEquipment;
     using Psychrometrics::PsyCpAirFnW;
@@ -6857,11 +6856,11 @@ namespace Furnaces {
                 if (Furnace(FurnaceNum).CondenserNodeNum > 0) {
                     OutdoorDryBulbTemp = Node(Furnace(FurnaceNum).CondenserNodeNum).Temp;
                 } else {
-                    OutdoorDryBulbTemp = OutDryBulbTemp;
+                    OutdoorDryBulbTemp = state.dataEnvrn->OutDryBulbTemp;
                 }
             }
         } else {
-            OutdoorDryBulbTemp = OutDryBulbTemp;
+            OutdoorDryBulbTemp = state.dataEnvrn->OutDryBulbTemp;
         }
         if (FirstHVACIteration) {
             // Set selected values during first HVAC iteration
@@ -10659,7 +10658,7 @@ namespace Furnaces {
             if (Furnace(FurnaceNum).NumOfSpeedHeating > 0)
                 SpeedNum = Furnace(FurnaceNum).NumOfSpeedHeating; // maximum heating speed, avoid zero for cooling only mode
 
-            if (OutDryBulbTemp <= Furnace(FurnaceNum).MaxOATSuppHeat) {
+            if (state.dataEnvrn->OutDryBulbTemp <= Furnace(FurnaceNum).MaxOATSuppHeat) {
                 SupHeaterLoad = QZnReq - FullOutput;
             } else {
                 SupHeaterLoad = 0.0;
@@ -10802,7 +10801,7 @@ namespace Furnaces {
             }
 
             if ((QZnReq < (-1.0 * SmallLoad) || (QLatReq < (-1.0 * SmallLoad))) &&
-                (OutDryBulbTemp >= Furnace(FurnaceNum).MinOATCompressorCooling)) { // COOLING MODE or dehumidification mode
+                (state.dataEnvrn->OutDryBulbTemp >= Furnace(FurnaceNum).MinOATCompressorCooling)) { // COOLING MODE or dehumidification mode
 
                 if (Furnace(FurnaceNum).bIsIHP) {
                     SimIHP(state,
@@ -10970,7 +10969,7 @@ namespace Furnaces {
                     state, FurnaceNum, SuppHeatingCoilFlag, FirstHVACIteration, HeatCoilLoad, Furnace(FurnaceNum).OpMode, QCoilActual);
             }
 
-            if ((QZnReq < (-1.0 * SmallLoad) || (QLatReq < (-1.0 * SmallLoad))) && (OutDryBulbTemp >= Furnace(FurnaceNum).MinOATCompressorCooling)) {
+            if ((QZnReq < (-1.0 * SmallLoad) || (QLatReq < (-1.0 * SmallLoad))) && (state.dataEnvrn->OutDryBulbTemp >= Furnace(FurnaceNum).MinOATCompressorCooling)) {
 
                 if (Furnace(FurnaceNum).bIsIHP) {
                     SimIHP(state,
@@ -11142,7 +11141,7 @@ namespace Furnaces {
                     state, FurnaceNum, SuppHeatingCoilFlag, FirstHVACIteration, HeatCoilLoad, Furnace(FurnaceNum).OpMode, QCoilActual);
             }
 
-            if ((QZnReq < (-1.0 * SmallLoad) || (QLatReq < (-1.0 * SmallLoad))) && (OutDryBulbTemp >= Furnace(FurnaceNum).MinOATCompressorCooling)) {
+            if ((QZnReq < (-1.0 * SmallLoad) || (QLatReq < (-1.0 * SmallLoad))) && (state.dataEnvrn->OutDryBulbTemp >= Furnace(FurnaceNum).MinOATCompressorCooling)) {
 
                 if (Furnace(FurnaceNum).bIsIHP) {
                     SimIHP(state,
@@ -11219,7 +11218,7 @@ namespace Furnaces {
             }
 
             if (Furnace(FurnaceNum).FurnaceType_Num != UnitarySys_HeatCool) {
-                if (QZnReq > SmallLoad && (OutDryBulbTemp >= Furnace(FurnaceNum).MinOATCompressorCooling)) {
+                if (QZnReq > SmallLoad && (state.dataEnvrn->OutDryBulbTemp >= Furnace(FurnaceNum).MinOATCompressorCooling)) {
 
                     if (Furnace(FurnaceNum).bIsIHP) {
                         SimIHP(state,

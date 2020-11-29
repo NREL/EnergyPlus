@@ -304,7 +304,7 @@ namespace EvaporativeFluidCoolers {
                 if ((DataEnvironment::OutRelHumValue >= 0.1) && (DataEnvironment::OutRelHumValue <= 0.7)) {
                     // Use correlation by B.A. Qureshi and S.M. Zubair if within these limits
                     thisEFC.UserEvapLossFactor =
-                        (113.0 - 8.417 * DataEnvironment::OutRelHumValue + 1.6147 * DataEnvironment::OutDryBulbTemp) * 1.0e-5;
+                        (113.0 - 8.417 * DataEnvironment::OutRelHumValue + 1.6147 * state.dataEnvrn->OutDryBulbTemp) * 1.0e-5;
                 } else { // Inlet conditions are out of the limit of correlation; An approximate default value of loss factor is used
                     thisEFC.UserEvapLossFactor = 0.2;
                 }
@@ -588,7 +588,7 @@ namespace EvaporativeFluidCoolers {
                 if ((DataEnvironment::OutRelHumValue >= 0.1) && (DataEnvironment::OutRelHumValue <= 0.7)) {
                     // Use correlation by B.A. Qureshi and S.M. Zubair if within these limits
                     thisEFC.UserEvapLossFactor =
-                        (113.0 - 8.417 * DataEnvironment::OutRelHumValue + 1.6147 * DataEnvironment::OutDryBulbTemp) * 1.0e-5;
+                        (113.0 - 8.417 * DataEnvironment::OutRelHumValue + 1.6147 * state.dataEnvrn->OutDryBulbTemp) * 1.0e-5;
                 } else { // Inlet conditions are out of the limit of correlation; An approximate default value of loss factor is used
                     thisEFC.UserEvapLossFactor = 0.2;
                 }
@@ -1149,9 +1149,9 @@ namespace EvaporativeFluidCoolers {
             this->inletConds.AirPress = DataLoopNode::Node(this->OutdoorAirInletNodeNum).Press;
             this->inletConds.AirWetBulb = DataLoopNode::Node(this->OutdoorAirInletNodeNum).OutAirWetBulb;
         } else {
-            this->inletConds.AirTemp = DataEnvironment::OutDryBulbTemp;
+            this->inletConds.AirTemp = state.dataEnvrn->OutDryBulbTemp;
             this->inletConds.AirHumRat = DataEnvironment::OutHumRat;
-            this->inletConds.AirPress = DataEnvironment::OutBaroPress;
+            this->inletConds.AirPress = state.dataEnvrn->OutBaroPress;
             this->inletConds.AirWetBulb = DataEnvironment::OutWetBulbTemp;
         }
 

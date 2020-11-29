@@ -793,7 +793,7 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOccupancyTest)
     Node(10).Temp = 13.00;
     Node(10).HumRat = 0.008;
     Node(10).MassFlowRate = 1.7 * StdRhoAir;
-    OutBaroPress = 101325;
+    state->dataEnvrn->OutBaroPress = 101325;
     ZoneSysEnergyDemand.allocate(1);
 
     OAController(1).CalcOAController(*state, 1, true);
@@ -1075,7 +1075,7 @@ TEST_F(EnergyPlusFixture, MixedAir_TestHXinOASystem)
     state->dataAirLoop->AirLoopControlInfo.allocate(AirloopNum); // will be deallocated by MixedAir::clear_state(); in EnergyPlusFixture
     state->dataAirLoop->AirLoopFlow.allocate(AirloopNum);        // will be deallocated by MixedAir::clear_state(); in EnergyPlusFixture
     DataEnvironment::StdRhoAir = 1.2;
-    DataEnvironment::OutBaroPress = 101250.0;
+    state->dataEnvrn->OutBaroPress = 101250.0;
     state->dataAirLoop->AirLoopFlow(AirloopNum).DesSupply = 1.0 * DataEnvironment::StdRhoAir;
 
     // setup OA system and initialize nodes
@@ -1233,7 +1233,7 @@ TEST_F(EnergyPlusFixture, MixedAir_HumidifierOnOASystemTest)
     state->dataAirLoop->AirLoopFlow.allocate(AirloopNum);
     state->dataAirLoop->AirLoopFlow(AirloopNum).DesSupply = 1.0 * DataEnvironment::StdRhoAir;
     DataEnvironment::StdRhoAir = 1.2;
-    DataEnvironment::OutBaroPress = 101250.0;
+    state->dataEnvrn->OutBaroPress = 101250.0;
     DataSizing::SysSizingRunDone = false;
     DataSizing::CurSysNum = 1;
 
@@ -5658,7 +5658,7 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOARateTest)
     Node(10).Temp = 13.00;
     Node(10).HumRat = 0.008;
     Node(10).MassFlowRate = 1.7 * StdRhoAir;
-    OutBaroPress = 101325;
+    state->dataEnvrn->OutBaroPress = 101325;
     ZoneSysEnergyDemand.allocate(1);
     ZoneIntGain.allocate(1);
     ZoneIntGain(1).NOFOCC = 0.1;

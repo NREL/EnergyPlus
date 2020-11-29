@@ -984,7 +984,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortPierceSET)
     ZTAVComf(1) = 25.0;
     MRT(1) = 26.0;
     ZoneAirHumRatAvgComf(1) = 0.00529; // 0.002 to 0.006
-    DataEnvironment::OutBaroPress = 101217.;
+    state->dataEnvrn->OutBaroPress = 101217.;
     IsZoneDV(1) = IsZoneUI(1) = false;
     QHTRadSysToPerson(1) = 0.0;
     QCoolingPanelToPerson(1) = 0.0;
