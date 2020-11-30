@@ -132,7 +132,7 @@ namespace PluginManagement {
         return "Linked to Python Version: \"" + sVersion + "\"";
     }
 #else
-    std::string pythonStringForUsage(EnergyPlusData &state)
+    std::string pythonStringForUsage([[maybe_unused]] EnergyPlusData &state)
     {
         return "This version of EnergyPlus not linked to Python library.";
     }
@@ -1093,7 +1093,8 @@ namespace PluginManagement {
         }
     }
 #else
-    void PluginManager::addToPythonPath([[maybe_unused]] EnergyPlusData &state, const std::string &path, bool userDefinedPath)
+
+    void PluginManager::addToPythonPath([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] const std::string &path, [[maybe_unused]] bool userDefinedPath)
     {
     }
 #endif
@@ -1135,8 +1136,8 @@ namespace PluginManagement {
     }
 #else
     int PluginManager::getGlobalVariableHandle([[maybe_unused]] EnergyPlusData &state,
-                                               const std::string &name,
-                                               bool const suppress_warning)
+                                               [[maybe_unused]] const std::string &name,
+                                               [[maybe_unused]] bool const suppress_warning)
     {
         return -1;
     }
@@ -1306,7 +1307,8 @@ namespace PluginManagement {
         return 0.0;
     }
 #else
-    Real64 PluginManager::getGlobalVariableValue([[maybe_unused]] EnergyPlusData &state, int handle)
+
+    Real64 PluginManager::getGlobalVariableValue([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] int handle)
     {
         return 0.0;
     }
@@ -1328,7 +1330,8 @@ namespace PluginManagement {
         }
     }
 #else
-    void PluginManager::setGlobalVariableValue([[maybe_unused]] EnergyPlusData &state, int handle, Real64 value)
+
+    void PluginManager::setGlobalVariableValue([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] int handle, [[maybe_unused]] Real64 value)
     {
     }
 #endif

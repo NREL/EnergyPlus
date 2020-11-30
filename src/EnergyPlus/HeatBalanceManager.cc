@@ -66,6 +66,7 @@
 #include <EnergyPlus/DataComplexFenestration.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataDaylighting.hh>
+#include <EnergyPlus/DataDaylightingDevices.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -5232,6 +5233,26 @@ namespace HeatBalanceManager {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
+    void SetSolarParameterAt(EnergyPlusData &state)
+    {
+        // Pre-calculate commonly used solar arrays to avoid duplicate data reference during calculated
+        for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+            if (!DataSurfaces::Surface(SurfNum).ExtSolar &&
+                DataSurfaces::SurfWinOriginalClass(SurfNum) != DataSurfaces::SurfaceClass::TDD_Diffuser) continue;
+            int SurfNum2 = SurfNum;
+            int PipeNum = DataSurfaces::SurfWinTDDPipeNum(SurfNum);
+            if (DataSurfaces::SurfWinOriginalClass(SurfNum) == DataSurfaces::SurfaceClass::TDD_Diffuser) {
+                SurfNum2 = DataDaylightingDevices::TDDPipe(PipeNum).Dome;
+            }
+            SurfCosIncTimestep(SurfNum) = CosIncAng(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum2);
+            SurfSunlitFracTimestep(SurfNum) = SunlitFrac(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum2);
+//            ProfAngHourly(SurfNum) = 0;
+//            if (SurfWinShadingFlag(SurfNum) != ExtScreenOn && SurfWinBlindNumber(SurfNum) > 0)
+//                ProfileAngle(SurfNum, SOLCOS, Blind(SurfWinBlindNumber(SurfNum)).SlatOrientation, ProfAngHourly(SurfNum));
+        }
+
+    }
+
     void InitHeatBalance(EnergyPlusData &state)
     {
 
@@ -5371,6 +5392,9 @@ namespace HeatBalanceManager {
                 }
             }
         }
+
+        // Initialize timestep-wise solar parameters
+        SetSolarParameterAt(state);
 
         // Initialize zone outdoor environmental variables
         // Bulk Initialization for Temperatures & WindSpeed

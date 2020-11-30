@@ -2344,7 +2344,7 @@ namespace HeatBalanceSurfaceManager {
         static Array1D<Real64> AbsDiffWinGnd(CFSMAXNL); // Ground diffuse solar absorptance of glass layers //Tuned Made static
         static Array1D<Real64> AbsDiffWinSky(CFSMAXNL); // Sky diffuse solar absorptance of glass layers //Tuned Made static
 
-        Array1D<Real64> currCosInc(TotSurfaces); // Cosine of incidence angle of beam solar on glass
+//        Array1D<Real64> currCosInc(TotSurfaces); // Cosine of incidence angle of beam solar on glass
         Array1D<Real64> currBeamSolar(TotSurfaces); // Local variable for BeamSolarRad
         Array1D<Real64> currSkySolarInc(TotSurfaces); // Sky diffuse solar incident on a surface
         Array1D<Real64> currGndSolarInc(TotSurfaces); // Ground diffuse solar incident on a surface
@@ -2720,11 +2720,10 @@ namespace HeatBalanceSurfaceManager {
             if (BuildingShadingCount || FixedShadingCount || AttachedShadingCount) {
                 for (int SurfNum = ShadingSurfaceFirst; SurfNum <= ShadingSurfaceLast; SurfNum++) {
                     // Cosine of incidence angle and solar incident on outside of surface, for reporting
-                    Real64 CosInc = CosIncAng(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum);
-                    SurfCosIncidenceAngle(SurfNum) = CosInc;
+                    SurfCosIncidenceAngle(SurfNum) = SurfCosIncTimestep(SurfNum);
                     // Incident direct (unreflected) beam
                     SurfQRadSWOutIncidentBeam(SurfNum) =
-                            BeamSolarRad * SunlitFrac(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum) * CosInc;
+                            BeamSolarRad * SurfSunlitFracTimestep(SurfNum) * SurfCosIncTimestep(SurfNum);
                     // Incident (unreflected) diffuse solar from sky -- TDD_Diffuser calculated differently
                     SurfQRadSWOutIncidentSkyDiffuse(SurfNum) = DifSolarRad * AnisoSkyMult(SurfNum);
                     // Incident diffuse solar from sky diffuse reflected from ground plus beam reflected from ground
@@ -2745,16 +2744,16 @@ namespace HeatBalanceSurfaceManager {
             for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
                 for (int SurfNum : Zone(zoneNum).ZoneExtSolarSurfaceList) {
                     // Regular surface
-                    currCosInc(SurfNum) = CosIncAng(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum);
+//                    currCosInc(SurfNum) = CosIncAng(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum);
                     currBeamSolar(SurfNum) = BeamSolarRad;
                     currSkySolarInc(SurfNum) = SurfSkySolarInc(SurfNum);
                     currGndSolarInc(SurfNum) = SurfGndSolarInc(SurfNum);
                     // Cosine of incidence angle and solar incident on outside of surface, for reporting
-                    SurfCosIncidenceAngle(SurfNum) = currCosInc(SurfNum);
+                    SurfCosIncidenceAngle(SurfNum) = SurfCosIncTimestep(SurfNum);
                     // Report variables for various incident solar quantities
                     // Incident direct (unreflected) beam
                     SurfQRadSWOutIncidentBeam(SurfNum) =
-                            currBeamSolar(SurfNum) * SunlitFrac(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum) * currCosInc(SurfNum);
+                            currBeamSolar(SurfNum) * SurfSunlitFracTimestep(SurfNum) * SurfCosIncTimestep(SurfNum);
 
                     // Incident (unreflected) diffuse solar from sky -- TDD_Diffuser calculated differently
                     SurfQRadSWOutIncidentSkyDiffuse(SurfNum) = DifSolarRad * AnisoSkyMult(SurfNum);
@@ -2795,15 +2794,15 @@ namespace HeatBalanceSurfaceManager {
                 int ConstrNum = Surface(SurfNum).Construction;
                 if (SurfWinStormWinFlag(SurfNum) == 1) ConstrNum = Surface(SurfNum).StormWinConstruction;
 
-                currCosInc(SurfNum) = CosIncAng(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum2);
+//                currCosInc(SurfNum) = CosIncAng(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum2);
 
                 // Reconstruct the beam, sky, and ground radiation transmittance of just the TDD:DOME and TDD pipe
                 // by dividing out diffuse solar transmittance of TDD:DIFFUSER
-                currBeamSolar(SurfNum) = BeamSolarRad * TransTDD(state, PipeNum, currCosInc(SurfNum), SolarBeam) /
+                currBeamSolar(SurfNum) = BeamSolarRad * TransTDD(state, PipeNum, SurfCosIncTimestep(SurfNum), SolarBeam) /
                                          state.dataConstruction->Construct(ConstrNum).TransDiff;
 
                 currSkySolarInc(SurfNum) = DifSolarRad * AnisoSkyMult(SurfNum2) *
-                                           TransTDD(state, PipeNum, currCosInc(SurfNum), SolarAniso) /
+                                           TransTDD(state, PipeNum, SurfCosIncTimestep(SurfNum), SolarAniso) /
                                            state.dataConstruction->Construct(ConstrNum).TransDiff;
 
                 currGndSolarInc(SurfNum) =
@@ -2811,8 +2810,7 @@ namespace HeatBalanceSurfaceManager {
                         state.dataConstruction->Construct(ConstrNum).TransDiff;
                 // Incident direct (unreflected) beam
                 SurfQRadSWOutIncidentBeam(SurfNum) =
-                        currBeamSolar(SurfNum) * SunlitFrac(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum2) *
-                        currCosInc(SurfNum); // NOTE: SurfNum2
+                        currBeamSolar(SurfNum) * SurfSunlitFracTimestep(SurfNum) * SurfCosIncTimestep(SurfNum); // NOTE: sunlit and coninc array set to SurfNum2
 
                 // Incident (unreflected) diffuse solar from sky -- TDD_Diffuser calculated differently
                 SurfQRadSWOutIncidentSkyDiffuse(SurfNum) = currSkySolarInc(SurfNum);
@@ -2823,12 +2821,12 @@ namespace HeatBalanceSurfaceManager {
             for (int ShelfNum = 1; ShelfNum <= NumOfShelf; ++ShelfNum) {
                 int SurfNum = Shelf(ShelfNum).Window; // Daylighting shelf object number
                 int OutShelfSurf = Shelf(ShelfNum).OutSurf; // Outside daylighting shelf present if > 0
-                currCosInc(SurfNum) = CosIncAng(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum);
+//                currCosInc(SurfNum) = CosIncAng(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum);
                 currBeamSolar(SurfNum) = BeamSolarRad;
                 currSkySolarInc(SurfNum) = DifSolarRad * AnisoSkyMult(SurfNum);
                 // Shelf diffuse solar radiation
-                Real64 ShelfSolarRad = (BeamSolarRad * SunlitFrac(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, OutShelfSurf) *
-                                        CosIncAng(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, OutShelfSurf) +
+                Real64 ShelfSolarRad = (BeamSolarRad * SurfSunlitFracTimestep(OutShelfSurf) *
+                                        SurfCosIncTimestep(OutShelfSurf) +
                                         DifSolarRad * AnisoSkyMult(OutShelfSurf)) *
                                        Shelf(ShelfNum).OutReflectSol;
 
@@ -2907,7 +2905,7 @@ namespace HeatBalanceSurfaceManager {
                             int ConstrNum = Surface(SurfNum).Construction;
                             if (SurfWinStormWinFlag(SurfNum) == 1) ConstrNum = Surface(SurfNum).StormWinConstruction;
                             if (RoughIndexMovInsul <= 0) { // No movable insulation present
-                                Real64 CosInc = currCosInc(SurfNum); // Cosine of incidence angle of beam solar on glass
+                                Real64 CosInc = SurfCosIncTimestep(SurfNum); // Cosine of incidence angle of beam solar on glass
                                 Real64 BeamSolar = currBeamSolar(SurfNum); // Local variable for BeamSolarRad
                                 Real64 SkySolarInc = currSkySolarInc(SurfNum); // Sky diffuse solar incident on a surface
                                 Real64 GndSolarInc = currGndSolarInc(SurfNum); // Ground diffuse solar incident on a surface
@@ -3153,9 +3151,8 @@ namespace HeatBalanceSurfaceManager {
                                     Real64 BeamFaceInc; // Beam solar incident window plane this time step (W/m2)
                                     Real64 DifSolarFaceInc; // Diffuse solar incident on window plane this time step (W/m2)
                                     if (FrArea > 0.0 || DivArea > 0.0) {
-                                        FracSunLit = SunlitFrac(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum);
-                                        BeamFaceInc =
-                                                BeamSolarRad * SunlitFrac(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum) * CosInc;
+                                        FracSunLit = SurfSunlitFracTimestep(SurfNum);
+                                        BeamFaceInc = BeamSolarRad * SurfSunlitFracTimestep(SurfNum) * CosInc;
                                         DifSolarFaceInc = SkySolarInc + GndSolarInc;
                                     }
                                     if (FracSunLit > 0.0) {

@@ -731,6 +731,10 @@ namespace DataHeatBalance {
     Array3D<Real64> SunlitFracWithoutReveal; // For a window with reveal, the sunlit fraction
     // without shadowing by the reveal
     Array3D<Real64> CosIncAng; // TimeStep cosine of beam radiation incidence angle on surface
+
+    Array1D<Real64> SurfCosIncTimestep; // Cosine of beam radiation incidence angle on surface at the current timestep
+    Array1D<Real64> SurfSunlitFracTimestep; // Fraction of heat transfer surface that is sunlit at the current timestep
+
     Array4D_int BackSurfaces;  // For a given hour and timestep, a list of up to 20 surfaces receiving
     // beam solar radiation from a given exterior window
     Array4D<Real64> OverlapAreas; // For a given hour and timestep, the areas of the exterior window sending
@@ -1056,6 +1060,8 @@ namespace DataHeatBalance {
         SunlitFrac.deallocate();
         SunlitFracWithoutReveal.deallocate();
         CosIncAng.deallocate();
+        SurfCosIncTimestep.deallocate();
+        SurfSunlitFracTimestep.deallocate();
         BackSurfaces.deallocate();
         OverlapAreas.deallocate();
         ZonePreDefRep.deallocate();
