@@ -72,7 +72,6 @@ namespace EnergyPlus {
 #define EP_cache_PsyTsatFnPb
 #define EP_cache_PsyTsatFnHPb
 #endif
-#define EP_psych_errors
 
 namespace Psychrometrics {
     // Module containing the Psychometric simulation routines
@@ -98,7 +97,7 @@ namespace Psychrometrics {
     // more research on hfg calc
 
     // Using/Aliasing
-    #ifdef EP_psych_errors
+#ifdef EP_psych_errors
     using namespace DataEnvironment;
 #endif
 
@@ -107,31 +106,6 @@ namespace Psychrometrics {
 
 #endif
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    static std::string const BlankString;
-    // call for recurring errors
-    int const iPsyTdpFnTdbTwbPb(1);
-    int const iPsyRhFnTdbWPb(2);
-    int const iPsyTwbFnTdbWPb(3);
-    int const iPsyTwbFnTdbWPb2(14);
-    int const iPsyTwbFnTdbWPb3(15); // convergence
-    int const iPsyVFnTdbWPb(4);
-    int const iPsyWFnTdpPb(5);
-    int const iPsyWFnTdbH(6);
-    int const iPsyWFnTdbTwbPb(7);
-    int const iPsyWFnTdbTwbPb2(16);
-    int const iPsyWFnTdbRhPb(8);
-    int const iPsyPsatFnTemp(9);
-    int const iPsyTsatFnHPb(10);
-    int const iPsyTsatFnPb(11);
-    int const iPsyTsatFnPb2(17); // iterations
-    int const iPsyRhFnTdbRhov(12);
-    int const iPsyRhFnTdbRhovLBnd0C(13);
-    int const iPsyTwbFnTdbWPb_cache(18);
-    int const iPsyPsatFnTemp_cache(19);
-    int const NumPsychMonitors(19); // Parameterization of Number of psychrometric routines that
-    std::string const blank_string;
 #ifdef EP_psych_stats
     Array1D_string const PsyRoutineNames(NumPsychMonitors,
                                          {"PsyTdpFnTdbTwbPb",
@@ -184,28 +158,6 @@ namespace Psychrometrics {
                                             // PsyTwbFnTdbWPb_raw (raw calc) | PsyPsatFnTemp_cache  19 - PsyPsatFnTemp_raw (raw calc)
 #endif
 
-#ifndef EP_psych_errors
-    Real64 const KelvinConv(273.15);
-#endif
-
-#ifdef EP_cache_PsyTwbFnTdbWPb
-    int const twbcache_size(1024 * 1024);
-    int const twbprecision_bits(20);
-#endif
-#ifdef EP_cache_PsyPsatFnTemp
-    int const psatcache_size(1024 * 1024);
-    int const psatprecision_bits(24); // 28  // 24  // 32
-    Int64 const psatcache_mask(psatcache_size - 1);
-#endif
-#ifdef EP_cache_PsyTsatFnPb
-    int const tsatcache_size(1024 * 1024);
-    int const tsatprecision_bits(24);
-    Int64 const tsatcache_mask(tsatcache_size - 1);
-#endif
-#ifdef EP_cache_PsyTsatFnHPb
-    int const tsat_hbp_cache_size(1024 * 1024);
-    int const tsat_hbp_precision_bits(28);
-#endif
     // MODULE VARIABLE DECLARATIONS:
     // na
 
@@ -218,19 +170,6 @@ namespace Psychrometrics {
     Array1D_int NumIterations(NumPsychMonitors, 0);
 #endif
 
-    // Object Data
-#ifdef EP_cache_PsyTwbFnTdbWPb
-    Array1D<cached_twb_t> cached_Twb; // DIMENSION(0:twbcache_size)
-#endif
-#ifdef EP_cache_PsyPsatFnTemp
-    Array1D<cached_psat_t> cached_Psat; // DIMENSION(0:psatcache_size)
-#endif
-#ifdef EP_cache_PsyTsatFnPb
-    Array1D<cached_tsat_pb> cached_Tsat; // DIMENSION(0:tsatcache_size)
-#endif
-#ifdef EP_cache_PsyTsatFnHPb
-    Array1D<cached_tsat_h_pb> cached_Tsat_HPb; // DIMENSION(0:tsat_hbp_cache_size)
-#endif
     // Subroutine Specifications for the Module
 
     // Functions
@@ -309,9 +248,9 @@ namespace Psychrometrics {
     }
 
 #ifdef EP_psych_stats
-    void ShowPsychrometricSummary(OutputFile &auditFile)
+    void ShowPsychrometricSummary(InputOutputFile &auditFile)
 #else
-    void ShowPsychrometricSummary(InputOutputFile &)
+    void ShowPsychrometricSummary([[maybe_unused]] InputOutputFile &auditFile)
 #endif
     {
 
@@ -368,7 +307,8 @@ namespace Psychrometrics {
     }
 
 #ifdef EP_psych_errors
-    void PsyRhoAirFnPbTdbW_error(EnergyPlusData &state, Real64 const pb,              // barometric pressure (Pascals)
+    void PsyRhoAirFnPbTdbW_error(EnergyPlusData &state,
+                                 Real64 const pb,              // barometric pressure (Pascals)
                                  Real64 const tdb,             // dry bulb temperature (Celsius)
                                  Real64 const dw,              // humidity ratio (kgWater/kgDryAir)
                                  Real64 const rhoair,          // density of air
@@ -391,7 +331,8 @@ namespace Psychrometrics {
 #endif
 
 #ifdef EP_psych_errors
-    void PsyRhFnTdbRhovLBnd0C_error(EnergyPlusData &state, Real64 const Tdb,             // dry-bulb temperature {C}
+    void PsyRhFnTdbRhovLBnd0C_error(EnergyPlusData &state,
+                                    Real64 const Tdb,             // dry-bulb temperature {C}
                                     Real64 const Rhovapor,        // vapor density in air {kg/m3}
                                     Real64 const RHValue,         // relative humidity value (0.0-1.0)
                                     std::string const &CalledFrom // routine this function was called from (error messages)
@@ -445,7 +386,8 @@ namespace Psychrometrics {
 
 #ifdef EP_cache_PsyTwbFnTdbWPb
 
-    Real64 PsyTwbFnTdbWPb(EnergyPlusData &state, Real64 const Tdb,             // dry-bulb temperature {C}
+    Real64 PsyTwbFnTdbWPb(EnergyPlusData &state,
+                          Real64 const Tdb,             // dry-bulb temperature {C}
                           Real64 const W,               // humidity ratio
                           Real64 const Pb,              // barometric pressure {Pascals}
                           std::string const &CalledFrom // routine this function was called from (error messages)
@@ -527,7 +469,8 @@ namespace Psychrometrics {
         return Twb_result;
     }
 
-    Real64 PsyTwbFnTdbWPb_raw(EnergyPlusData &state, Real64 const TDB,             // dry-bulb temperature {C}
+    Real64 PsyTwbFnTdbWPb_raw(EnergyPlusData &state,
+                              Real64 const TDB,             // dry-bulb temperature {C}
                               Real64 const dW,              // humidity ratio
                               Real64 const Patm,            // barometric pressure {Pascals}
                               std::string const &CalledFrom // routine this function was called from (error messages)
@@ -535,7 +478,8 @@ namespace Psychrometrics {
 
 #else
 
-    Real64 PsyTwbFnTdbWPb(Real64 const TDB,             // dry-bulb temperature {C}
+    Real64 PsyTwbFnTdbWPb(EnergyPlusData &state,
+                          Real64 const TDB,             // dry-bulb temperature {C}
                           Real64 const dW,              // humidity ratio
                           Real64 const Patm,            // barometric pressure {Pascals}
                           std::string const &CalledFrom // routine this function was called from (error messages)
@@ -692,7 +636,7 @@ namespace Psychrometrics {
             // If converged, leave iteration loop.
             if (icvg == 1) break;
 
-            // Error Trap for the Discontinious nature of PsyPsatFnTemp function (Sat Press Curve) at ~0 Deg C.
+            // Error Trap for the Discontinuous nature of PsyPsatFnTemp function (Sat Press Curve) at ~0 Deg C.
             if ((PSatstar > 611.000) && (PSatstar < 611.25) && (std::abs(error) <= 0.0001) && (iter > 4)) break;
 
         } // End of Iteration Loop
@@ -745,7 +689,8 @@ namespace Psychrometrics {
     }
 
 #ifdef EP_psych_errors
-    void PsyVFnTdbWPb_error(EnergyPlusData &state, Real64 const TDB,             // dry-bulb temperature {C}
+    void PsyVFnTdbWPb_error(EnergyPlusData &state,
+                            Real64 const TDB,             // dry-bulb temperature {C}
                             Real64 const w,               // humidity ratio
                             Real64 const PB,              // barometric pressure {Pascals}
                             Real64 const V,               // specific volume {m3/kg}
@@ -774,7 +719,8 @@ namespace Psychrometrics {
 #endif
 
 #ifdef EP_psych_errors
-    void PsyWFnTdbH_error(EnergyPlusData &state, Real64 const TDB,             // dry-bulb temperature {C}
+    void PsyWFnTdbH_error(EnergyPlusData &state,
+                          Real64 const TDB,             // dry-bulb temperature {C}
                           Real64 const H,               // enthalpy {J/kg}
                           Real64 const W,               // humidity ratio
                           std::string const &CalledFrom // routine this function was called from (error messages)
@@ -802,9 +748,9 @@ namespace Psychrometrics {
 
 #ifdef EP_cache_PsyPsatFnTemp
 
-    Real64 PsyPsatFnTemp_raw(EnergyPlusData &state,
+    Real64 PsyPsatFnTemp_raw([[maybe_unused]] EnergyPlusData &state,
                              Real64 const T,               // dry-bulb temperature {C}
-                             std::string const &CalledFrom // routine this function was called from (error messages)
+                             [[maybe_unused]] std::string const &CalledFrom // routine this function was called from (error messages)
     )
 
 #else
@@ -930,7 +876,8 @@ namespace Psychrometrics {
     }
 
 #ifdef EP_psych_errors
-    void PsyWFnTdbTwbPb_temperature_error(EnergyPlusData &state, Real64 const TDB,             // dry-bulb temperature {C}
+    void PsyWFnTdbTwbPb_temperature_error(EnergyPlusData &state,
+                                          Real64 const TDB,             // dry-bulb temperature {C}
                                           Real64 const TWB,             // wet-bulb temperature {C}
                                           Real64 const PB,              // barometric pressure {Pascals}
                                           std::string const &CalledFrom // routine this function was called from (error messages)
@@ -958,7 +905,8 @@ namespace Psychrometrics {
 #endif
 
 #ifdef EP_psych_errors
-    void PsyWFnTdbTwbPb_humidity_error(EnergyPlusData &state, Real64 const TDB,             // dry-bulb temperature {C}
+    void PsyWFnTdbTwbPb_humidity_error(EnergyPlusData &state,
+                                       Real64 const TDB,             // dry-bulb temperature {C}
                                        Real64 const TWB,             // wet-bulb temperature {C}
                                        Real64 const PB,              // barometric pressure {Pascals}
                                        Real64 const W,               // humidity ratio
@@ -988,7 +936,8 @@ namespace Psychrometrics {
 #endif
 
 #ifdef EP_psych_errors
-    void PsyTdpFnTdbTwbPb_error(EnergyPlusData &state, Real64 const TDB,             // dry-bulb temperature {C}
+    void PsyTdpFnTdbTwbPb_error(EnergyPlusData &state,
+                                Real64 const TDB,             // dry-bulb temperature {C}
                                 Real64 const TWB,             // wet-bulb temperature {C}
                                 Real64 const PB,              // barometric pressure (N/M**2) {Pascals}
                                 Real64 const W,               // humidity ratio
@@ -1019,12 +968,14 @@ namespace Psychrometrics {
 
 
 #ifdef EP_cache_PsyTsatFnHPb
-    Real64 PsyTsatFnHPb_raw(EnergyPlusData &state, Real64 const H,               // enthalpy {J/kg}
+    Real64 PsyTsatFnHPb_raw(EnergyPlusData &state,
+                            Real64 const H,               // enthalpy {J/kg}
                             Real64 const PB,              // barometric pressure {Pascals}
-                            std::string const &CalledFrom // routine this function was called from (error messages)
+                            [[maybe_unused]] std::string const &CalledFrom // routine this function was called from (error messages)
     )
 #else
-    Real64 PsyTsatFnHPb(Real64 const H,               // enthalpy {J/kg}
+    Real64 PsyTsatFnHPb(EnergyPlusData &state,
+                        Real64 const H,               // enthalpy {J/kg}
                         Real64 const PB,              // barometric pressure {Pascals}
                         std::string const &CalledFrom // routine this function was called from (error messages)
     )
@@ -1183,7 +1134,8 @@ namespace Psychrometrics {
     }
 
 #ifdef EP_psych_errors
-    void PsyRhFnTdbRhov_error(EnergyPlusData &state, Real64 const Tdb,             // dry-bulb temperature {C}
+    void PsyRhFnTdbRhov_error(EnergyPlusData &state,
+                              Real64 const Tdb,             // dry-bulb temperature {C}
                               Real64 const Rhovapor,        // vapor density in air {kg/m3}
                               Real64 const RHValue,         // relative humidity value (0.0-1.0)
                               std::string const &CalledFrom // routine this function was called from (error messages)
@@ -1236,7 +1188,8 @@ namespace Psychrometrics {
 #endif
 
 #ifdef EP_psych_errors
-    void PsyRhFnTdbWPb_error(EnergyPlusData &state, Real64 const TDB,             // dry-bulb temperature {C}
+    void PsyRhFnTdbWPb_error(EnergyPlusData &state,
+                             Real64 const TDB,             // dry-bulb temperature {C}
                              Real64 const W,               // humidity ratio
                              Real64 const RHValue,         // relative humidity (0.0-1.0)
                              std::string const &CalledFrom // routine this function was called from (error messages)
@@ -1289,7 +1242,8 @@ namespace Psychrometrics {
 #endif
 
 #ifdef EP_psych_errors
-    void PsyWFnTdpPb_error(EnergyPlusData &state, Real64 const TDP,             // dew-point temperature {C}
+    void PsyWFnTdpPb_error(EnergyPlusData &state,
+                           Real64 const TDP,             // dew-point temperature {C}
                            Real64 const PB,              // barometric pressure {Pascals}
                            Real64 const W,               // humidity ratio
                            Real64 const DeltaT,          // Reduced temperature difference of dew point
@@ -1315,7 +1269,8 @@ namespace Psychrometrics {
 #endif
 
 #ifdef EP_psych_errors
-    void PsyWFnTdbRhPb_error(EnergyPlusData &state, Real64 const TDB,             // dry-bulb temperature {C}
+    void PsyWFnTdbRhPb_error(EnergyPlusData &state,
+                             Real64 const TDB,             // dry-bulb temperature {C}
                              Real64 const RH,              // relative humidity value (0.0-1.0)
                              Real64 const PB,              // barometric pressure {Pascals}
                              Real64 const W,               // humidity ratio
@@ -1345,12 +1300,14 @@ namespace Psychrometrics {
 
 #ifdef EP_cache_PsyTsatFnPb
 
-    Real64 PsyTsatFnPb_raw(EnergyPlusData &state, Real64 const Press,           // barometric pressure {Pascals}
+    Real64 PsyTsatFnPb_raw(EnergyPlusData &state,
+                           Real64 const Press,           // barometric pressure {Pascals}
                            std::string const &CalledFrom // routine this function was called from (error messages)
     )
 
 #else
-    Real64 PsyTsatFnPb(Real64 const Press,           // barometric pressure {Pascals}
+    Real64 PsyTsatFnPb(EnergyPlusData &state,
+                       Real64 const Press,           // barometric pressure {Pascals}
                        std::string const &CalledFrom // routine this function was called from (error messages)
     )
 #endif
