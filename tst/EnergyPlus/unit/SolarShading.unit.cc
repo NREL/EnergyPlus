@@ -2231,6 +2231,8 @@ WindowMaterial:SimpleGlazingSystem,
     state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
     state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
     state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->HourOfDay = 1;
 
     SurfaceGeometry::GetSurfaceData(*state, FoundError); // setup zone geometry and get zone data
     EXPECT_FALSE(FoundError);                    // expect no errors
@@ -2239,12 +2241,12 @@ WindowMaterial:SimpleGlazingSystem,
 
     SurfaceGeometry::SetupZoneGeometry(*state, FoundError); // this calls GetSurfaceData()
     EXPECT_FALSE(FoundError);
+    SolarShading::AllocateModuleArrays(*state);
 
     state->dataGlobal->BeginSimFlag = true;
     HeatBalanceManager::InitHeatBalance(*state);
     EXPECT_FALSE(FoundError);
 
-    SolarShading::AllocateModuleArrays(*state);
     SolarShading::DetermineShadowingCombinations(*state);
 
     std::string error_string = delimited_string({"** Severe  ** Problem in interior solar distribution calculation (CHKBKS)"});
