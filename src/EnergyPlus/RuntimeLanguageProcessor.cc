@@ -233,7 +233,6 @@ namespace RuntimeLanguageProcessor {
 
         // Using/Aliasing
         using DataEnvironment::CurEnvirNum;
-        using DataEnvironment::SunIsUp;
         using DataEnvironment::Year;
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
@@ -335,7 +334,7 @@ namespace RuntimeLanguageProcessor {
         tmpMinutes = ((tmpCurrentTime - double(state.dataGlobal->HourOfDay - 1)) * 60.0); // -1.0 // off by 1
         ErlVariable(MinuteVariableNum).Value = SetErlValueNumber(tmpMinutes);
         ErlVariable(HolidayVariableNum).Value = SetErlValueNumber(double(state.dataEnvrn->HolidayIndex));
-        if (SunIsUp) {
+        if (state.dataEnvrn->SunIsUp) {
             ErlVariable(SunIsUpVariableNum).Value = SetErlValueNumber(1.0);
         } else {
             ErlVariable(SunIsUpVariableNum).Value = SetErlValueNumber(0.0);

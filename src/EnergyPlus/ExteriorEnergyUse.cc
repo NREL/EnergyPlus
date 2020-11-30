@@ -539,8 +539,6 @@ namespace ExteriorEnergyUse {
         // na
 
         // Using/Aliasing
-        using DataEnvironment::SunIsUp;
-
         using ScheduleManager::GetCurrentScheduleValue;
 
         // Locals
@@ -566,7 +564,7 @@ namespace ExteriorEnergyUse {
                     state.dataExteriorEnergyUse->ExteriorLights(Item).CurrentUse = state.dataExteriorEnergyUse->ExteriorLights(Item).Power * state.dataGlobal->TimeStepZoneSec;
                     break;
                 case ExteriorEnergyUse::LightControlType::AstroClockOverride:
-                    if (SunIsUp) {
+                    if (state.dataEnvrn->SunIsUp) {
                         state.dataExteriorEnergyUse->ExteriorLights(Item).Power = 0.0;
                         state.dataExteriorEnergyUse->ExteriorLights(Item).CurrentUse = 0.0;
                     } else {

@@ -362,7 +362,7 @@ namespace HeatBalanceKivaManager {
         bcs->solarAltitude = DataGlobalConstants::PiOvr2() - std::acos(DataEnvironment::SOLCOS(3));
         bcs->directNormalFlux = state.dataEnvrn->BeamSolarRad;
         bcs->diffuseHorizontalFlux = state.dataEnvrn->DifSolarRad;
-        bcs->skyEmissivity = pow4(DataEnvironment::SkyTempKelvin) / pow4(bcs->outdoorTemp);
+        bcs->skyEmissivity = pow4(state.dataEnvrn->SkyTempKelvin) / pow4(bcs->outdoorTemp);
 
         bcs->slabAbsRadiation = DataHeatBalSurface::SurfOpaqQRadSWInAbs(floorSurface) + // solar
                                DataHeatBalance::SurfQRadThermInAbs(floorSurface) + // internal gains

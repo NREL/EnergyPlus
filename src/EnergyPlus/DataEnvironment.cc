@@ -71,13 +71,6 @@ namespace DataEnvironment {
     // current weather variables)
 
     // MODULE VARIABLE DECLARATIONS:
-    Real64 OutDewPointTemp;                   // Current outdoor dewpoint temperature
-    bool EMSOutDewPointTempOverrideOn(false); // EMS flag for outdoor dewpoint temperature
-    Real64 EMSOutDewPointTempOverrideValue;   // EMS override value for outdoor dewpoint temperature
-    Real64 SkyTemp;                           // Current sky temperature {C}
-    Real64 SkyTempKelvin;                     // Current sky temperature {K}
-    Real64 LiquidPrecipitation;               // Current liquid precipitation amount (rain) {m}
-    bool SunIsUp;                             // True when Sun is over horizon, False when not
     Real64 WindDir;                           // Current outdoor air wind direction
     bool EMSWindDirOverrideOn(false);         // EMS flag for outdoor air wind direction
     Real64 EMSWindDirOverrideValue;           // EMS override value for outdoor air wind direction
@@ -156,13 +149,6 @@ namespace DataEnvironment {
 
     void clear_state()
     {
-        OutDewPointTemp = Real64();
-        EMSOutDewPointTempOverrideOn = false;
-        EMSOutDewPointTempOverrideValue = Real64();
-        SkyTemp = Real64();
-        SkyTempKelvin = Real64();
-        LiquidPrecipitation = Real64();
-        SunIsUp = bool();
         WindDir = Real64();
         EMSWindDirOverrideOn = false;
         EMSWindDirOverrideValue = Real64();
@@ -344,10 +330,10 @@ namespace DataEnvironment {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 BaseTemp; // Base temperature at Z = 0 (C)
 
-        BaseTemp = OutDewPointTemp + WeatherFileTempModCoeff;
+        BaseTemp = state.dataEnvrn->OutDewPointTemp + WeatherFileTempModCoeff;
 
         if (SiteTempGradient == 0.0) {
-            LocalOutDewPointTemp = OutDewPointTemp;
+            LocalOutDewPointTemp = state.dataEnvrn->OutDewPointTemp;
         } else if (Z <= 0.0) {
             LocalOutDewPointTemp = BaseTemp;
         } else {

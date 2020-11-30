@@ -592,7 +592,7 @@ namespace PondGroundHeatExchanger {
 
         // absolute temperatures
         Real64 SurfTempAbs = PondBulkTemp + DataGlobalConstants::KelvinConv();            // absolute value of surface temp
-        Real64 SkyTempAbs = DataEnvironment::SkyTemp + DataGlobalConstants::KelvinConv(); // absolute value of sky temp
+        Real64 SkyTempAbs = state.dataEnvrn->SkyTemp + DataGlobalConstants::KelvinConv(); // absolute value of sky temp
 
         // ASHRAE simple convection coefficient model for external surfaces.
         Real64 ConvCoef = ConvectionCoefficients::CalcASHRAESimpExtConvectCoeff(DataHeatBalance::VeryRough, DataEnvironment::WindSpeedAt(PondHeight));
@@ -677,7 +677,7 @@ namespace PondGroundHeatExchanger {
         Real64 const PondExtCoef(0.3);    // extinction coefficient of water
 
         // check for sun up.
-        if (!DataEnvironment::SunIsUp) {
+        if (!state.dataEnvrn->SunIsUp) {
             CalcSolarFlux = 0.0;
             return CalcSolarFlux;
         }

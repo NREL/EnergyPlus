@@ -658,7 +658,6 @@ namespace WindowEquivalentLayer {
         // uses the solar-thermal routine developed for ASHRAE RP-1311 (ASHWAT Model).
 
         using DataBSDFWindow::noCondition;
-        using DataEnvironment::SkyTempKelvin;
         using DataLoopNode::Node;
         using DataZoneEquipment::ZoneEquipConfig;
         using General::InterpSw;
@@ -847,7 +846,7 @@ namespace WindowEquivalentLayer {
                 } else { // Window not exposed to wind
                     Tout = Surface(SurfNum).OutDryBulbTemp + DataGlobalConstants::KelvinConv();
                 }
-                tsky = SkyTempKelvin;
+                tsky = state.dataEnvrn->SkyTempKelvin;
                 Ebout = DataGlobalConstants::StefanBoltzmann() * pow_4(Tout);
                 // ASHWAT model may be slightly different
                 outir = Surface(SurfNum).ViewFactorSkyIR *

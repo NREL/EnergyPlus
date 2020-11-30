@@ -123,8 +123,6 @@ namespace HeatBalanceHAMTManager {
     using DataHeatBalSurface::SurfOpaqQRadSWOutAbs;
     using namespace DataHeatBalance;
     using namespace Psychrometrics;
-    using DataEnvironment::SkyTemp;
-    using DataEnvironment::SunIsUp;
     using DataHeatBalFanSys::MAT;
     using DataHeatBalFanSys::QCoolingPanelSurf;
     using DataHeatBalFanSys::QElecBaseboardSurf;
@@ -1195,7 +1193,7 @@ namespace HeatBalanceHAMTManager {
             cells(ExtSkycell(sid)).temp = OSCM(Surface(sid).OSCMPtr).TRad;
             cells(Extcell(sid)).Qadds = 0.0; // eliminate incident shortwave on underlying surface
         } else {
-            cells(ExtSkycell(sid)).temp = SkyTemp;
+            cells(ExtSkycell(sid)).temp = state.dataEnvrn->SkyTemp;
 
             cells(Extcell(sid)).Qadds = Surface(sid).Area * SurfOpaqQRadSWOutAbs(sid);
         }

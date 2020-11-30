@@ -358,7 +358,6 @@ namespace ConvectionCoefficients {
         // TARP Reference Manual, "Surface Outside Heat Balances", pp 71ff
 
         // Using/Aliasing
-        using DataEnvironment::SkyTempKelvin;
         using ScheduleManager::GetCurrentScheduleValue;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -382,7 +381,7 @@ namespace ConvectionCoefficients {
 
         TAir = Surface(SurfNum).OutDryBulbTemp + DataGlobalConstants::KelvinConv();
         TSurf = TempExt + DataGlobalConstants::KelvinConv();
-        TSky = SkyTempKelvin;
+        TSky = state.dataEnvrn->SkyTempKelvin;
         TGround = TAir;
 
         if (Surface(SurfNum).HasSurroundingSurfProperties) {

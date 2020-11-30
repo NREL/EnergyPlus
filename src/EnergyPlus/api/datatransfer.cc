@@ -683,8 +683,9 @@ int holidayIndex(EnergyPlusState state) {
     return thisState->dataEnvrn->HolidayIndex;
 }
 
-int sunIsUp(EnergyPlusState) { // maintain response convention from previous (EMS) implementation
-    if (EnergyPlus::DataEnvironment::SunIsUp) {
+int sunIsUp(EnergyPlusState state) { // maintain response convention from previous (EMS) implementation
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    if (thisState->dataEnvrn->SunIsUp) {
         return 1;
     } else {
         return 0;

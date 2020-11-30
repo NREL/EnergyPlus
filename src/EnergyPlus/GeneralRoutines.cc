@@ -1028,7 +1028,6 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
     // USE STATEMENTS:
 
     // Using/Aliasing
-    using DataEnvironment::SkyTemp;
     using DataEnvironment::WindSpeedAt;
     // USE DataLoopNode    , ONLY: Node
     using ConvectionCoefficients::InitExteriorConvectionCoeff;
@@ -1237,7 +1236,7 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
 
     // now calculate baffle temperature
     if (!ICSCollectorIsOn) {
-        TsBaffle = (Isc * SolAbs + HExt * Tamb + HrAtm * Tamb + HrSky * SkyTemp + HrGround * Tamb + HrPlen * Tso + HcPlen * TaGap + QdotSource) /
+        TsBaffle = (Isc * SolAbs + HExt * Tamb + HrAtm * Tamb + HrSky * state.dataEnvrn->SkyTemp + HrGround * Tamb + HrPlen * Tso + HcPlen * TaGap + QdotSource) /
                    (HExt + HrAtm + HrSky + HrGround + HrPlen + HcPlen);
     } else {
 

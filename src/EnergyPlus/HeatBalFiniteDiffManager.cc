@@ -96,7 +96,6 @@ namespace HeatBalFiniteDiffManager {
 
     // Using/Aliasing
     using namespace DataMoistureBalance;
-    using DataEnvironment::SkyTemp;
     using DataHeatBalance::Air;
     using DataHeatBalance::SurfQRadThermInAbs;
     using DataHeatBalance::RegularMaterial;
@@ -1437,7 +1436,7 @@ namespace HeatBalFiniteDiffManager {
         } else {               // Set the external conditions to local variables
             QRadSWOutFD = SurfOpaqQRadSWOutAbs(Surf);
             QRadSWOutMvInsulFD = SurfQRadSWOutMvIns(Surf);
-            Tsky = SkyTemp;
+            Tsky = state.dataEnvrn->SkyTemp;
         }
 
         if (surface_ExtBoundCond == Ground || state.dataEnvrn->IsRain) {

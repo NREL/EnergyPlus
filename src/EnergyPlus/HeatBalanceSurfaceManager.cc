@@ -493,7 +493,7 @@ namespace HeatBalanceSurfaceManager {
 
         // Calculate exterior-surface multipliers that account for anisotropy of
         // sky radiance
-        if (SunIsUp && state.dataEnvrn->DifSolarRad > 0.0) {
+        if (state.dataEnvrn->SunIsUp && state.dataEnvrn->DifSolarRad > 0.0) {
             AnisoSkyViewFactors(state);
         } else {
             AnisoSkyMult = 0.0;
@@ -548,20 +548,20 @@ namespace HeatBalanceSurfaceManager {
                 state.dataDaylightingData->ZoneDaylight(NZ).TimeExceedingDaylightIlluminanceSPAtRefPt = 0.0;
             }
 
-            if (SunIsUp && state.dataDaylightingData->ZoneDaylight(NZ).TotalDaylRefPoints != 0) {
+            if (state.dataEnvrn->SunIsUp && state.dataDaylightingData->ZoneDaylight(NZ).TotalDaylRefPoints != 0) {
                 if (InitSurfaceHeatBalancefirstTime) DisplayString(state, "Computing Interior Daylighting Illumination");
                 DayltgInteriorIllum(state, NZ);
                 if (!state.dataGlobal->DoingSizing) DayltgInteriorMapIllum(state, NZ);
             }
 
-            if (SunIsUp && state.dataDaylightingDevicesData->NumOfTDDPipes > 0 && NZ == 1) {
+            if (state.dataEnvrn->SunIsUp && state.dataDaylightingDevicesData->NumOfTDDPipes > 0 && NZ == 1) {
                 if (InitSurfaceHeatBalancefirstTime) DisplayString(state, "Computing Interior Daylighting Illumination for TDD pipes");
                 DayltgInteriorTDDIllum(state);
             }
 
             // RJH DElight Modification Begin - Call to DElight electric lighting control subroutine
             // Check if the sun is up and the current Thermal Zone hosts a Daylighting:DElight object
-            if (SunIsUp && state.dataDaylightingData->ZoneDaylight(NZ).TotalDaylRefPoints != 0 && (state.dataDaylightingData->ZoneDaylight(NZ).DaylightMethod == DataDaylighting::iDaylightingMethod::DElightDaylighting)) {
+            if (state.dataEnvrn->SunIsUp && state.dataDaylightingData->ZoneDaylight(NZ).TotalDaylRefPoints != 0 && (state.dataDaylightingData->ZoneDaylight(NZ).DaylightMethod == DataDaylighting::iDaylightingMethod::DElightDaylighting)) {
                 // Call DElight interior illuminance and electric lighting control subroutine
                 Real64 dPowerReducFac = 1.0;       // Return value Electric Lighting Power Reduction Factor for current Zone and Timestep
                 Real64 dHISKFFC = HISKF * LUX2FC;
@@ -706,7 +706,7 @@ namespace HeatBalanceSurfaceManager {
         if (InitSurfaceHeatBalancefirstTime) DisplayString(state, "Initializing Solar Heat Gains");
 
         InitSolarHeatGains(state);
-        if (SunIsUp && (state.dataEnvrn->BeamSolarRad + state.dataEnvrn->GndSolarRad + state.dataEnvrn->DifSolarRad > 0.0)) {
+        if (state.dataEnvrn->SunIsUp && (state.dataEnvrn->BeamSolarRad + state.dataEnvrn->GndSolarRad + state.dataEnvrn->DifSolarRad > 0.0)) {
             for (int NZ = 1; NZ <= state.dataGlobal->NumOfZones; ++NZ) {
                 if (state.dataDaylightingData->ZoneDaylight(NZ).TotalDaylRefPoints > 0) {
                     if (Zone(NZ).HasInterZoneWindow) {
@@ -2531,7 +2531,7 @@ namespace HeatBalanceSurfaceManager {
             }
         }
 
-        if (!SunIsUp || (state.dataEnvrn->BeamSolarRad + state.dataEnvrn->GndSolarRad + state.dataEnvrn->DifSolarRad <= 0.0)) { // Sun is down
+        if (!state.dataEnvrn->SunIsUp || (state.dataEnvrn->BeamSolarRad + state.dataEnvrn->GndSolarRad + state.dataEnvrn->DifSolarRad <= 0.0)) { // Sun is down
 
             for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
                 EnclSolQD(zoneNum) = 0.0;
@@ -3508,7 +3508,7 @@ namespace HeatBalanceSurfaceManager {
 
         // Beam and diffuse solar on inside surfaces from interior windows (for reporting)
 
-        if (SunIsUp) {
+        if (state.dataEnvrn->SunIsUp) {
             for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
                 if (!Surface(SurfNum).HeatTransSurf) continue;
                 //!!! Following may need to be removed or changed when shelves are considered in adjacent reflection calculations
@@ -8025,7 +8025,7 @@ namespace HeatBalanceSurfaceManager {
             QuickConductionSurf = false;
         }
 
-        Real64 TSky = SkyTemp;
+        Real64 TSky = state.dataEnvrn->SkyTemp;
         Real64 TGround = state.dataEnvrn->OutDryBulbTemp;
 
         if (Surface(SurfNum).HasSurroundingSurfProperties) {
@@ -8244,8 +8244,6 @@ namespace HeatBalanceSurfaceManager {
         // na
 
         // Using/Aliasing
-        using DataEnvironment::SkyTemp;
-        using DataEnvironment::SunIsUp;
         using DataSurfaces::ExtVentedCavity;
         using DataSurfaces::OSCM;
         using DataSurfaces::Surface;

@@ -617,7 +617,7 @@ namespace WindowManager {
         double IR = m_Surface.getOutsideIR(state, m_SurfNum);
         // double dirSolRad = QRadSWOutIncident( t_SurfNum ) + QS( Surface( t_SurfNum ).Zone );
         double swRadiation = m_Surface.getSWIncident(m_SurfNum);
-        double tSky = SkyTempKelvin;
+        double tSky = state.dataEnvrn->SkyTempKelvin;
         double airSpeed = 0.0;
         if (m_Surface.ExtWind) {
             airSpeed = m_Surface.WindSpeed;

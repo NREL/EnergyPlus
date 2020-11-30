@@ -2170,7 +2170,7 @@ namespace WindowManager {
             }
 
             state.dataWindowManager->Ebout = state.dataWindowManager->sigma * pow_4(state.dataWindowManager->tout);
-            state.dataWindowManager->Outir = surface.ViewFactorSkyIR * (AirSkyRadSplit(SurfNum) * state.dataWindowManager->sigma * pow_4(SkyTempKelvin) + (1.0 - AirSkyRadSplit(SurfNum)) * state.dataWindowManager->Ebout) +
+            state.dataWindowManager->Outir = surface.ViewFactorSkyIR * (AirSkyRadSplit(SurfNum) * state.dataWindowManager->sigma * pow_4(state.dataEnvrn->SkyTempKelvin) + (1.0 - AirSkyRadSplit(SurfNum)) * state.dataWindowManager->Ebout) +
                     surface.ViewFactorGroundIR * state.dataWindowManager->Ebout;
 
         } else if (SurfWinWindowModelType(SurfNum) == WindowEQLModel) {
@@ -2549,7 +2549,7 @@ namespace WindowManager {
                     state.dataWindowManager->tout = surface.OutDryBulbTemp + state.dataWindowManager->TKelvin;
                 }
                 state.dataWindowManager->Ebout = state.dataWindowManager->sigma * pow_4(state.dataWindowManager->tout);
-                state.dataWindowManager->Outir = surface.ViewFactorSkyIR * (AirSkyRadSplit(SurfNum) * state.dataWindowManager->sigma * pow_4(SkyTempKelvin) + (1.0 - AirSkyRadSplit(SurfNum)) * state.dataWindowManager->Ebout) +
+                state.dataWindowManager->Outir = surface.ViewFactorSkyIR * (AirSkyRadSplit(SurfNum) * state.dataWindowManager->sigma * pow_4(state.dataEnvrn->SkyTempKelvin) + (1.0 - AirSkyRadSplit(SurfNum)) * state.dataWindowManager->Ebout) +
                         surface.ViewFactorGroundIR * state.dataWindowManager->Ebout + OutSrdIR;
             }
 
@@ -2633,7 +2633,7 @@ namespace WindowManager {
                 if (SurfWinAirflowSource(SurfNum) == AirFlowWindow_Source_IndoorAir) {
                     if (Tleft < RoomDewPoint || Tright < RoomDewPoint) InsideGlassCondensationFlag(SurfNum) = 1;
                 } else if (SurfWinAirflowSource(SurfNum) == AirFlowWindow_Source_OutdoorAir) {
-                    if (Tleft < OutDewPointTemp || Tright < OutDewPointTemp) InsideGlassCondensationFlag(SurfNum) = 1;
+                    if (Tleft < state.dataEnvrn->OutDewPointTemp || Tright < state.dataEnvrn->OutDewPointTemp) InsideGlassCondensationFlag(SurfNum) = 1;
                 }
             }
 
@@ -2673,7 +2673,7 @@ namespace WindowManager {
 
         Real64 const rad_out_air_per_area = - emiss_sigma_product * (1.0 - AirSkyRadSplit(SurfNum)) * surface.ViewFactorSkyIR * (Tsout_4 - Tout_4);
         Real64 const rad_out_ground_per_area = - emiss_sigma_product * surface.ViewFactorGroundIR * (Tsout_4 - Tout_4);
-        Real64 const rad_out_sky_per_area = - emiss_sigma_product * AirSkyRadSplit(SurfNum) * surface.ViewFactorSkyIR * (Tsout_4 - pow_4(SkyTempKelvin));
+        Real64 const rad_out_sky_per_area = - emiss_sigma_product * AirSkyRadSplit(SurfNum) * surface.ViewFactorSkyIR * (Tsout_4 - pow_4(state.dataEnvrn->SkyTempKelvin));
         Real64 const rad_out_per_area = rad_out_air_per_area + rad_out_sky_per_area + rad_out_ground_per_area + rad_out_lw_srd_per_area;
 
         SurfQRadLWOutSrdSurfs(SurfNum) = rad_out_lw_srd_per_area;
@@ -3553,7 +3553,7 @@ namespace WindowManager {
                                                    (Surface(SurfNum).Area + SurfWinDividerArea(SurfNum));
                 SurfWinShadingAbsorbedSolarEnergy(SurfNum) = SurfWinShadingAbsorbedSolar(SurfNum) * state.dataGlobal->TimeStepZoneSec;
             }
-            if (SunIsUp) {
+            if (state.dataEnvrn->SunIsUp) {
 
                 SurfWinSysSolTransmittance(SurfNum) =
                         SurfWinTransSolar(SurfNum) / (SurfQRadSWOutIncident(SurfNum) * (Surface(SurfNum).Area + SurfWinDividerArea(SurfNum)) + 0.0001);

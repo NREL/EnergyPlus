@@ -4496,7 +4496,6 @@ namespace SystemAvailabilityManager {
         using AirflowNetworkBalanceManager::GetZoneInfilAirChangeRate;
         using AirflowNetworkBalanceManager::ManageAirflowNetworkBalance;
         using CurveManager::CurveValue;
-        using DataEnvironment::OutDewPointTemp;
         using DataHeatBalance::HybridControlTypeClose;
         using DataHeatBalance::HybridControlTypeGlobal;
         using DataHeatBalance::HybridControlTypeIndiv;
@@ -4597,8 +4596,8 @@ namespace SystemAvailabilityManager {
 
                     // Dew point control
                 } else if (SELECT_CASE_var == state.dataSystemAvailabilityManager->HybridVentMode_DewPoint) {
-                    if (OutDewPointTemp >= state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).MinOutdoorDewPoint &&
-                        OutDewPointTemp <= state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).MaxOutdoorDewPoint) {
+                    if (state.dataEnvrn->OutDewPointTemp >= state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).MinOutdoorDewPoint &&
+                        state.dataEnvrn->OutDewPointTemp <= state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).MaxOutdoorDewPoint) {
                         state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl = state.dataSystemAvailabilityManager->HybridVentCtrl_Open;
                     } else {
                         state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl = state.dataSystemAvailabilityManager->HybridVentCtrl_Close;

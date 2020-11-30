@@ -68,13 +68,6 @@ namespace DataEnvironment {
     Real64 constexpr StdPressureSeaLevel(101325.0);   // Standard barometric pressure at sea level (Pa)
 
     // MODULE VARIABLE DECLARATIONS:
-    extern Real64 OutDewPointTemp;                 // Current outdoor dewpoint temperature
-    extern bool EMSOutDewPointTempOverrideOn;      // EMS flag for outdoor dewpoint temperature
-    extern Real64 EMSOutDewPointTempOverrideValue; // EMS override value for outdoor dewpoint temperature
-    extern Real64 SkyTemp;                         // Current sky temperature {C}
-    extern Real64 SkyTempKelvin;                   // Current sky temperature {K}
-    extern Real64 LiquidPrecipitation;             // Current liquid precipitation amount (rain) {m}
-    extern bool SunIsUp;                           // True when Sun is over horizon, False when not
     extern Real64 WindDir;                         // Current outdoor air wind direction
     extern bool EMSWindDirOverrideOn;              // EMS flag for outdoor air wind direction
     extern Real64 EMSWindDirOverrideValue;         // EMS override value for outdoor air wind direction
@@ -213,6 +206,13 @@ struct EnvironmentData : BaseGlobalStruct {
     Real64 OutEnthalpy = 0.0;                           // Current outdoor enthalpy
     Real64 OutAirDensity = 0.0;                         // Current outdoor air density
     Real64 OutWetBulbTemp = 0.0;                        // Current outdoor air wet bulb temperature
+    Real64 OutDewPointTemp = 0.0;                       // Current outdoor dewpoint temperature
+    bool EMSOutDewPointTempOverrideOn = false;          // EMS flag for outdoor dewpoint temperature
+    Real64 EMSOutDewPointTempOverrideValue = 0.0;       // EMS override value for outdoor dewpoint temperature
+    Real64 SkyTemp = 0.0;                               // Current sky temperature {C}
+    Real64 SkyTempKelvin = 0.0;                         // Current sky temperature {K}
+    Real64 LiquidPrecipitation = 0.0;                   // Current liquid precipitation amount (rain) {m}
+    bool SunIsUp = false;                               // True when Sun is over horizon, False when not
 
     void clear_state() override
     {
@@ -260,6 +260,13 @@ struct EnvironmentData : BaseGlobalStruct {
         this->OutEnthalpy = 0.0;
         this->OutAirDensity = 0.0;
         this->OutWetBulbTemp = 0.0;
+        this->OutDewPointTemp = 0.0;
+        this->EMSOutDewPointTempOverrideOn = false;
+        this->EMSOutDewPointTempOverrideValue = 0.0;
+        this->SkyTemp = 0.0;
+        this->SkyTempKelvin = 0.0;
+        this->LiquidPrecipitation = 0.0;
+        this->SunIsUp = false;
     }
 };
 

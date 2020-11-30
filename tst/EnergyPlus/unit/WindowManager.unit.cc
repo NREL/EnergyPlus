@@ -261,7 +261,7 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
     state->dataEnvrn->BeamSolarRad = I_s;
 
     if (I_s > 0.0) {
-        DataEnvironment::SunIsUp = true;
+        state->dataEnvrn->SunIsUp = true;
     }
 
     HeatBalanceSurfaceManager::InitSolarHeatGains(*state);

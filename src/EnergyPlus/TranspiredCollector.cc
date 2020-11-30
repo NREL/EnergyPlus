@@ -853,7 +853,6 @@ namespace TranspiredCollector {
 
         // Using/Aliasing
         using ConvectionCoefficients::InitExteriorConvectionCoeff;
-        using DataEnvironment::SkyTemp;
         using DataHeatBalSurface::TH;
         using DataHVACGlobals::TimeStepSys;
         using DataSurfaces::Surface;
@@ -1117,7 +1116,7 @@ namespace TranspiredCollector {
 
         // now calculate collector temperature
 
-        Tscoll = (Isc * SolAbs + HrAtm * Tamb + HrSky * SkyTemp + HrGround * Tamb + HrPlen * Tso + HcWind * Tamb + (Mdot * CpAir / A) * Tamb -
+        Tscoll = (Isc * SolAbs + HrAtm * Tamb + HrSky * state.dataEnvrn->SkyTemp + HrGround * Tamb + HrPlen * Tso + HcWind * Tamb + (Mdot * CpAir / A) * Tamb -
                   (Mdot * CpAir / A) * (1.0 - HXeff) * Tamb + QdotSource) /
                  (HrAtm + HrSky + HrGround + HrPlen + HcWind + (Mdot * CpAir / A) * HXeff);
 

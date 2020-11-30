@@ -8961,13 +8961,13 @@ namespace SolarShading {
                         SchedAllowsControl = false;
                 }
 
-                Real64 GlareControlIsActive = (state.dataDaylightingData->ZoneDaylight(IZone).TotalDaylRefPoints > 0 && SunIsUp &&
+                Real64 GlareControlIsActive = (state.dataDaylightingData->ZoneDaylight(IZone).TotalDaylRefPoints > 0 && state.dataEnvrn->SunIsUp &&
                                         WindowShadingControl(IShadingCtrl).GlareControlIsActive); // True if glare control is active
 
                 Real64 SolarOnWindow = 0.0; // Direct plus diffuse solar intensity on window (W/m2)
                 Real64 BeamSolarOnWindow = 0.0; // Direct solar intensity on window (W/m2)
                 Real64 HorizSolar = 0.0; // Horizontal direct plus diffuse solar intensity
-                if (SunIsUp) {
+                if (state.dataEnvrn->SunIsUp) {
                     Real64 SkySolarOnWindow = AnisoSkyMult(ISurf) * state.dataEnvrn->DifSolarRad;  // Sky diffuse solar intensity on window (W/m2)
                     BeamSolarOnWindow = state.dataEnvrn->BeamSolarRad * CosIncAng(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, ISurf) *
                                         SunlitFrac(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, ISurf);
@@ -8992,7 +8992,7 @@ namespace SolarShading {
 
                 } else if (SELECT_CASE_var == WSCT_HiSolar) {
                     // 'ONIFHIGHSOLARONWINDOW'  ! Direct plus diffuse solar intensity on window
-                    if (SunIsUp) {
+                    if (state.dataEnvrn->SunIsUp) {
                         if (SolarOnWindow > SetPoint && SchedAllowsControl) {
                             SurfWinShadingFlag(ISurf) = ShType;
                         } else if (GlareControlIsActive) {
@@ -9002,7 +9002,7 @@ namespace SolarShading {
 
                 } else if (SELECT_CASE_var == WSCT_HiHorzSolar) {
                     // 'ONIFHIGHHORIZONTALSOLAR'  ! Direct plus diffuse exterior horizontal solar intensity
-                    if (SunIsUp) {
+                    if (state.dataEnvrn->SunIsUp) {
                         if (HorizSolar > SetPoint && SchedAllowsControl) {
                             SurfWinShadingFlag(ISurf) = ShType;
                         } else if (GlareControlIsActive) {
@@ -9027,7 +9027,7 @@ namespace SolarShading {
 
                 } else if (SELECT_CASE_var == WSCT_OnHiOutTemp_HiSolarWindow) {
                     // 'OnIfHighOutdoorAirTempAndHighSolarOnWindow'  ! Outside air temp and solar on window
-                    if (SunIsUp) {
+                    if (state.dataEnvrn->SunIsUp) {
                         if (Surface(ISurf).OutDryBulbTemp > SetPoint && SolarOnWindow > SetPoint2 &&
                             SchedAllowsControl) {
                             SurfWinShadingFlag(ISurf) = ShType;
@@ -9038,7 +9038,7 @@ namespace SolarShading {
 
                 } else if (SELECT_CASE_var == WSCT_OnHiOutTemp_HiHorzSolar) {
                     // 'OnIfHighOutdoorAirTempAndHighHorizontalSolar'  ! Outside air temp and horizontal solar
-                    if (SunIsUp) {
+                    if (state.dataEnvrn->SunIsUp) {
                         if (Surface(ISurf).OutDryBulbTemp > SetPoint && HorizSolar > SetPoint2 &&
                             SchedAllowsControl) {
                             SurfWinShadingFlag(ISurf) = ShType;
@@ -9049,7 +9049,7 @@ namespace SolarShading {
 
                 } else if (SELECT_CASE_var == WSCT_OnHiZoneTemp_HiSolarWindow) {
                     // 'ONIFHIGHZONEAIRTEMPANDHIGHSOLARONWINDOW'  ! Zone air temp and solar on window
-                    if (SunIsUp) {
+                    if (state.dataEnvrn->SunIsUp) {
                         if (MAT(IZone) > SetPoint && SolarOnWindow > SetPoint2 && SchedAllowsControl) {
                             SurfWinShadingFlag(ISurf) = ShType;
                         } else if (GlareControlIsActive) {
@@ -9059,7 +9059,7 @@ namespace SolarShading {
 
                 } else if (SELECT_CASE_var ==  WSCT_OnHiZoneTemp_HiHorzSolar) {
                     // 'ONIFHIGHZONEAIRTEMPANDHIGHHORIZONTALSOLAR'  ! Zone air temp and horizontal solar
-                    if (SunIsUp) {
+                    if (state.dataEnvrn->SunIsUp) {
                         if (MAT(IZone) > SetPoint && HorizSolar > SetPoint2 && SchedAllowsControl) {
                             SurfWinShadingFlag(ISurf) = ShType;
                         } else if (GlareControlIsActive) {
@@ -9083,22 +9083,22 @@ namespace SolarShading {
                     // 'ONIFHIGHGLARE'  ! Daylight glare index at first reference point in the zone.
                     // This type of shading control is done in DayltgInteriorIllum. Glare control is not affected
                     // by control schedule.
-                    if (SunIsUp) SurfWinShadingFlag(ISurf) = 10 * ShType;
+                    if (state.dataEnvrn->SunIsUp) SurfWinShadingFlag(ISurf) = 10 * ShType;
 
                 } else if (SELECT_CASE_var == WSCT_MeetDaylIlumSetp) {
                     // 'MEETDAYLIGHTILLUMINANCESETPOINT')  !  Daylight illuminance test is done in DayltgInteriorIllum
                     // Only switchable glazing does daylight illuminance control
-                    if (SunIsUp && SchedAllowsControl) SurfWinShadingFlag(ISurf) = GlassConditionallyLightened;
+                    if (state.dataEnvrn->SunIsUp && SchedAllowsControl) SurfWinShadingFlag(ISurf) = GlassConditionallyLightened;
 
                 } else if (SELECT_CASE_var == WSCT_OnNightLoOutTemp_OffDay) { // 'OnNightIfLowOutdoorTempAndOffDay'
-                    if (!SunIsUp && Surface(ISurf).OutDryBulbTemp < SetPoint && SchedAllowsControl) {
+                    if (!state.dataEnvrn->SunIsUp && Surface(ISurf).OutDryBulbTemp < SetPoint && SchedAllowsControl) {
                         SurfWinShadingFlag(ISurf) = ShType;
                     } else if (GlareControlIsActive) {
                         SurfWinShadingFlag(ISurf) = 10 * ShType;
                     }
 
                 } else if (SELECT_CASE_var == WSCT_OnNightLoInTemp_OffDay) { // 'OnNightIfLowInsideTempAndOffDay')
-                    if (!SunIsUp && MAT(IZone) < SetPoint && SchedAllowsControl) {
+                    if (!state.dataEnvrn->SunIsUp && MAT(IZone) < SetPoint && SchedAllowsControl) {
                         SurfWinShadingFlag(ISurf) = ShType;
                     } else if (GlareControlIsActive) {
                         SurfWinShadingFlag(ISurf) = 10 * ShType;
@@ -9106,7 +9106,7 @@ namespace SolarShading {
 
                 } else if (SELECT_CASE_var == WSCT_OnNightIfHeating_OffDay) { // 'OnNightIfHeatingAndOffDay'
                     if (!state.dataGlobal->BeginSimFlag) {
-                        if (!SunIsUp && SNLoadHeatRate(IZone) > SetPoint && SchedAllowsControl) {
+                        if (!state.dataEnvrn->SunIsUp && SNLoadHeatRate(IZone) > SetPoint && SchedAllowsControl) {
                             SurfWinShadingFlag(ISurf) = ShType;
                         } else if (GlareControlIsActive) {
                             SurfWinShadingFlag(ISurf) = 10 * ShType;
@@ -9116,7 +9116,7 @@ namespace SolarShading {
                 } else if (SELECT_CASE_var == WSCT_OnNightLoOutTemp_OnDayCooling) {
                     // 'OnNightIfLowOutdoorTempAndOnDayIfCooling'
                     if (!state.dataGlobal->BeginSimFlag) {
-                        if (!SunIsUp) { // Night
+                        if (!state.dataEnvrn->SunIsUp) { // Night
                             if (Surface(ISurf).OutDryBulbTemp < SetPoint && SchedAllowsControl)
                                 SurfWinShadingFlag(ISurf) = ShType;
                         } else { // Day
@@ -9131,7 +9131,7 @@ namespace SolarShading {
                 } else if (SELECT_CASE_var ==
                            WSCT_OnNightIfHeating_OnDayCooling) { // 'OnNightIfHeatingAndOnDayIfCooling'
                     if (!state.dataGlobal->BeginSimFlag) {
-                        if (!SunIsUp) { // Night
+                        if (!state.dataEnvrn->SunIsUp) { // Night
                             if (SNLoadHeatRate(IZone) > SetPoint && SchedAllowsControl)
                                 SurfWinShadingFlag(ISurf) = ShType;
                         } else { // Day
@@ -9146,7 +9146,7 @@ namespace SolarShading {
                 } else if (SELECT_CASE_var ==
                            WSCT_OffNight_OnDay_HiSolarWindow) { // 'OffNightAndOnDayIfCoolingAndHighSolarOnWindow'
                     if (!state.dataGlobal->BeginSimFlag) {
-                        if (SunIsUp && SNLoadCoolRate(IZone) > 0.0 && SchedAllowsControl) {
+                        if (state.dataEnvrn->SunIsUp && SNLoadCoolRate(IZone) > 0.0 && SchedAllowsControl) {
                             if (SolarOnWindow > SetPoint) SurfWinShadingFlag(ISurf) = ShType;
                         } else if (GlareControlIsActive) {
                             SurfWinShadingFlag(ISurf) = 10 * ShType;
@@ -9156,9 +9156,9 @@ namespace SolarShading {
                 } else if (SELECT_CASE_var ==
                            WSCT_OnNight_OnDay_HiSolarWindow) { // 'OnNightAndOnDayIfCoolingAndHighSolarOnWindow'
                     if (!state.dataGlobal->BeginSimFlag) {
-                        if (SunIsUp && SNLoadCoolRate(IZone) > 0.0 && SchedAllowsControl) {
+                        if (state.dataEnvrn->SunIsUp && SNLoadCoolRate(IZone) > 0.0 && SchedAllowsControl) {
                             if (SolarOnWindow > SetPoint) SurfWinShadingFlag(ISurf) = ShType;
-                        } else if (!SunIsUp && SchedAllowsControl) {
+                        } else if (!state.dataEnvrn->SunIsUp && SchedAllowsControl) {
                             SurfWinShadingFlag(ISurf) = ShType;
                         } else if (GlareControlIsActive) {
                             SurfWinShadingFlag(ISurf) = 10 * ShType;
@@ -9315,7 +9315,7 @@ namespace SolarShading {
                 } // End of check if interior or exterior blind in place
 
                 //   CALL CalcScreenTransmittance to intialized all screens prior to HB calc's
-                if (SurfWinShadingFlag(ISurf) == ExtScreenOn && SunIsUp) {
+                if (SurfWinShadingFlag(ISurf) == ExtScreenOn && state.dataEnvrn->SunIsUp) {
                     CalcScreenTransmittance(state, ISurf);
                 }
 

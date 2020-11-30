@@ -821,7 +821,6 @@ namespace EnergyPlus::DaylightingManager {
         using General::BlindBeamBeamTrans;
 
         using General::SafeDivide;
-        using DataEnvironment::SunIsUp;
         using DataSystemVariables::DetailedSolarTimestepIntegration;
 
         // Locals
@@ -1111,15 +1110,15 @@ namespace EnergyPlus::DaylightingManager {
 
                             }    // End of hourly sun position loop, IHR
                         } else { // timestep integrated
-                            if (SunIsUp && !MySunIsUpFlag) {
+                            if (state.dataEnvrn->SunIsUp && !MySunIsUpFlag) {
                                 ISunPos = 0;
                                 MySunIsUpFlag = true;
-                            } else if (SunIsUp && MySunIsUpFlag) {
+                            } else if (state.dataEnvrn->SunIsUp && MySunIsUpFlag) {
                                 ISunPos = 1;
-                            } else if (!SunIsUp && MySunIsUpFlag) {
+                            } else if (!state.dataEnvrn->SunIsUp && MySunIsUpFlag) {
                                 MySunIsUpFlag = false;
                                 ISunPos = -1;
-                            } else if (!SunIsUp && !MySunIsUpFlag) {
+                            } else if (!state.dataEnvrn->SunIsUp && !MySunIsUpFlag) {
                                 ISunPos = -1;
                             }
 
@@ -1177,15 +1176,15 @@ namespace EnergyPlus::DaylightingManager {
 
                     } // End of sun position loop, IHR
                 } else {
-                    if (SunIsUp && !MySunIsUpFlag) {
+                    if (state.dataEnvrn->SunIsUp && !MySunIsUpFlag) {
                         ISunPos = 0;
                         MySunIsUpFlag = true;
-                    } else if (SunIsUp && MySunIsUpFlag) {
+                    } else if (state.dataEnvrn->SunIsUp && MySunIsUpFlag) {
                         ISunPos = 1;
-                    } else if (!SunIsUp && MySunIsUpFlag) {
+                    } else if (!state.dataEnvrn->SunIsUp && MySunIsUpFlag) {
                         MySunIsUpFlag = false;
                         ISunPos = -1;
-                    } else if (!SunIsUp && !MySunIsUpFlag) {
+                    } else if (!state.dataEnvrn->SunIsUp && !MySunIsUpFlag) {
                         ISunPos = -1;
                     }
                     FigureRefPointDayltgFactorsToAddIllums(state, ZoneNum, ILB, state.dataGlobal->HourOfDay, ISunPos, IWin, loopwin, NWX, NWY, ICtrl);
@@ -1219,7 +1218,6 @@ namespace EnergyPlus::DaylightingManager {
         using General::BlindBeamBeamTrans;
 
         using General::SafeDivide;
-        using DataEnvironment::SunIsUp;
         using DataSystemVariables::DetailedSolarTimestepIntegration;
 
         // Locals
@@ -1523,15 +1521,15 @@ namespace EnergyPlus::DaylightingManager {
                                                                              MapWindowSolidAngAtRefPtWtd);
                                 } // End of hourly sun position loop, IHR
                             } else {
-                                if (SunIsUp && !MySunIsUpFlag) {
+                                if (state.dataEnvrn->SunIsUp && !MySunIsUpFlag) {
                                     ISunPos = 0;
                                     MySunIsUpFlag = true;
-                                } else if (SunIsUp && MySunIsUpFlag) {
+                                } else if (state.dataEnvrn->SunIsUp && MySunIsUpFlag) {
                                     ISunPos = 1;
-                                } else if (!SunIsUp && MySunIsUpFlag) {
+                                } else if (!state.dataEnvrn->SunIsUp && MySunIsUpFlag) {
                                     MySunIsUpFlag = false;
                                     ISunPos = -1;
-                                } else if (!SunIsUp && !MySunIsUpFlag) {
+                                } else if (!state.dataEnvrn->SunIsUp && !MySunIsUpFlag) {
                                     ISunPos = -1;
                                 }
                                 FigureDayltgCoeffsAtPointsForSunPosition(state,

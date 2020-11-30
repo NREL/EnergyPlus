@@ -138,7 +138,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_CalcOutsideSurfTemp)
     DataSurfaces::Surface(SurfNum).Area = 10.0;
     DataSurfaces::Surface(SurfNum).MaterialMovInsulExt = 1;
 
-    DataEnvironment::SkyTemp = 23.0;
+    state->dataEnvrn->SkyTemp = 23.0;
     state->dataEnvrn->OutDryBulbTemp = 23.0;
 
     DataHeatBalSurface::QdotRadOutRep.allocate(SurfNum);
@@ -3105,10 +3105,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBInterzoneWindow)
     // bypass internal solar distribution at night
     DataHeatBalSurface::InterZoneWindow = false;
     DataHeatBalance::ZoneBmSolFrIntWinsRep(1) = 10.0;
-    DataEnvironment::SunIsUp = false;
+    state->dataEnvrn->SunIsUp = false;
     InitIntSolarDistribution(*state);
     EXPECT_EQ(0.0, DataHeatBalance::SurfIntBmIncInsSurfIntensRep(1));
-    DataEnvironment::SunIsUp = true;
+    state->dataEnvrn->SunIsUp = true;
     InitIntSolarDistribution(*state);
     EXPECT_NEAR(1.666667, DataHeatBalance::SurfIntBmIncInsSurfIntensRep(1), 0.00001);
 }

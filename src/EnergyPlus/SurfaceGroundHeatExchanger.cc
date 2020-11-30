@@ -525,7 +525,7 @@ namespace SurfaceGroundHeatExchanger {
             state.dataSurfaceGroundHeatExchangers->PastIsSnow = state.dataEnvrn->IsSnow;
             state.dataSurfaceGroundHeatExchangers->PastOutDryBulbTemp = OutDryBulbTempAt(state, SurfaceHXHeight);
             state.dataSurfaceGroundHeatExchangers->PastOutWetBulbTemp = OutWetBulbTempAt(state, SurfaceHXHeight);
-            state.dataSurfaceGroundHeatExchangers->PastSkyTemp = SkyTemp;
+            state.dataSurfaceGroundHeatExchangers->PastSkyTemp = state.dataEnvrn->SkyTemp;
             state.dataSurfaceGroundHeatExchangers->PastWindSpeed = WindSpeedAt(SurfaceHXHeight);
             this->MyEnvrnFlag = false;
         }
@@ -716,7 +716,7 @@ namespace SurfaceGroundHeatExchanger {
             state.dataSurfaceGroundHeatExchangers->PastIsSnow = state.dataEnvrn->IsSnow;
             state.dataSurfaceGroundHeatExchangers->PastOutDryBulbTemp = OutDryBulbTempAt(state, SurfaceHXHeight);
             state.dataSurfaceGroundHeatExchangers->PastOutWetBulbTemp = OutWetBulbTempAt(state, SurfaceHXHeight);
-            state.dataSurfaceGroundHeatExchangers->PastSkyTemp = SkyTemp;
+            state.dataSurfaceGroundHeatExchangers->PastSkyTemp = state.dataEnvrn->SkyTemp;
             state.dataSurfaceGroundHeatExchangers->PastWindSpeed = WindSpeedAt(SurfaceHXHeight);
 
             TempBtm = this->TbtmHistory(1);

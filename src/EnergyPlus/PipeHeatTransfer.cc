@@ -1261,7 +1261,6 @@ namespace PipeHeatTransfer {
 
         // Using/Aliasing
         using ConvectionCoefficients::CalcASHRAESimpExtConvectCoeff;
-        using DataEnvironment::SkyTemp;
         using DataEnvironment::SOLCOS;
         using DataEnvironment::WindSpeed;
         using DataLoopNode::Node;
@@ -1333,7 +1332,7 @@ namespace PipeHeatTransfer {
                             // If on soil boundary, load up local variables and perform calculations
                             NodePast = this->T(WidthIndex, DepthIndex, LengthIndex, PreviousTimeIndex);
                             PastNodeTempAbs = NodePast + DataGlobalConstants::KelvinConv();
-                            SkyTempAbs = SkyTemp + DataGlobalConstants::KelvinConv();
+                            SkyTempAbs = state.dataEnvrn->SkyTemp + DataGlobalConstants::KelvinConv();
                             TopRoughness = this->SoilRoughness;
                             TopThermAbs = this->SoilThermAbs;
                             TopSolarAbs = this->SoilSolarAbs;
@@ -1370,7 +1369,7 @@ namespace PipeHeatTransfer {
 
                                 //-Update Equation, basically a detailed energy balance at the surface
                                 this->T(WidthIndex, DepthIndex, LengthIndex, TentativeTimeIndex) =
-                                    (QSolAbsorbed + RadCoef * SkyTemp + ConvCoef * state.dataEnvrn->OutDryBulbTemp + (kSoil / dS) * (NodeBelow + 2 * NodeLeft) +
+                                    (QSolAbsorbed + RadCoef * state.dataEnvrn->SkyTemp + ConvCoef * state.dataEnvrn->OutDryBulbTemp + (kSoil / dS) * (NodeBelow + 2 * NodeLeft) +
                                      (rho * Cp / nsvDeltaTime) * NodePast) /
                                     (RadCoef + ConvCoef + 3 * (kSoil / dS) + (rho * Cp / nsvDeltaTime));
 
@@ -1383,7 +1382,7 @@ namespace PipeHeatTransfer {
 
                                 //-Update Equation
                                 this->T(WidthIndex, DepthIndex, LengthIndex, TentativeTimeIndex) =
-                                    (QSolAbsorbed + RadCoef * SkyTemp + ConvCoef * state.dataEnvrn->OutDryBulbTemp +
+                                    (QSolAbsorbed + RadCoef * state.dataEnvrn->SkyTemp + ConvCoef * state.dataEnvrn->OutDryBulbTemp +
                                      (kSoil / dS) * (NodeBelow + NodeLeft + NodeRight) + (rho * Cp / nsvDeltaTime) * NodePast) /
                                     (RadCoef + ConvCoef + 3 * (kSoil / dS) + (rho * Cp / nsvDeltaTime));
 

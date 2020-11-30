@@ -938,7 +938,7 @@ namespace DataSurfaces {
         } else {
             Real64 tout = getOutsideAirTemperature(state, t_SurfNum) + DataGlobalConstants::KelvinConv();
             value = state.dataWindowManager->sigma * pow_4(tout);
-            value = ViewFactorSkyIR * (AirSkyRadSplit(t_SurfNum) * state.dataWindowManager->sigma * pow_4(SkyTempKelvin) + (1.0 - AirSkyRadSplit(t_SurfNum)) * value) +
+            value = ViewFactorSkyIR * (AirSkyRadSplit(t_SurfNum) * state.dataWindowManager->sigma * pow_4(state.dataEnvrn->SkyTempKelvin) + (1.0 - AirSkyRadSplit(t_SurfNum)) * value) +
                     ViewFactorGroundIR * value;
         }
         return value;

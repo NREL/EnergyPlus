@@ -181,8 +181,6 @@ namespace PlantCondLoopOperation {
         // REFERENCES:
         // na
         // Using/Aliasing
-        using DataEnvironment::OutDewPointTemp;
-
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -285,7 +283,7 @@ namespace PlantCondLoopOperation {
         } else if (CurSchemeType == RelHumRBOpSchemeType) {
             RangeVariable = state.dataEnvrn->OutRelHum;
         } else if (CurSchemeType == DewPointRBOpSchemeType) {
-            RangeVariable = OutDewPointTemp;
+            RangeVariable = state.dataEnvrn->OutDewPointTemp;
         } else if ((CurSchemeType == DryBulbTDBOpSchemeType) || (CurSchemeType == WetBulbTDBOpSchemeType) ||
                    (CurSchemeType == DewPointTDBOpSchemeType)) {
             RangeVariable = FindRangeVariable(state, LoopNum, CurSchemePtr, CurSchemeType);
@@ -3131,7 +3129,6 @@ CurrentModuleObject, PlantOpSchemeName);
 
         // Using/Aliasing
         using namespace DataLoopNode;
-        using DataEnvironment::OutDewPointTemp;
         // Return value
         Real64 FindRangeVariable(0.0);
 
@@ -3162,7 +3159,7 @@ CurrentModuleObject, PlantOpSchemeName);
         } else if (CurSchemeType == DewPointTDBOpSchemeType) { // dewpoint temp based controls
             ReferenceNodeNum = PlantLoop(LoopNum).OpScheme(CurSchemePtr).ReferenceNodeNumber;
             NodeTemperature = Node(ReferenceNodeNum).Temp;
-            FindRangeVariable = NodeTemperature - OutDewPointTemp;
+            FindRangeVariable = NodeTemperature - state.dataEnvrn->OutDewPointTemp;
         } else {
             assert(false);
         } // OperationScheme

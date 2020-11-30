@@ -985,7 +985,7 @@ namespace PhotovoltaicThermalCollectors {
                 }
 
                 Real64 Tcollector =
-                    (2.0 * mdot * CpInlet * Tinlet + this->AreaCol * (HrGround * state.dataEnvrn->OutDryBulbTemp + HrSky * DataEnvironment::SkyTemp +
+                    (2.0 * mdot * CpInlet * Tinlet + this->AreaCol * (HrGround * state.dataEnvrn->OutDryBulbTemp + HrSky * state.dataEnvrn->SkyTemp +
                                                                       HrAir * DataSurfaces::Surface(this->SurfNum).OutDryBulbTemp +
                                                                       HcExt * DataSurfaces::Surface(this->SurfNum).OutDryBulbTemp)) /
                     (2.0 * mdot * CpInlet + this->AreaCol * (HrGround + HrSky + HrAir + HcExt));

@@ -99,8 +99,6 @@ namespace WindowComplexManager {
     using namespace DataBSDFWindow;
     using namespace DataSurfaces; // , ONLY: TotSurfaces,TotWindows,Surface,SurfaceWindow   !update this later
     using DataEnvironment::CloudFraction;
-    using DataEnvironment::SkyTempKelvin;
-    using DataEnvironment::SunIsUp;
     using namespace DataHeatBalance;
     using namespace DataShadowingCombinations;
     using namespace Vectors;
@@ -2912,7 +2910,7 @@ namespace WindowComplexManager {
                     tout = Surface(SurfNum).OutDryBulbTemp + DataGlobalConstants::KelvinConv();
                 }
                 // tsky = SkyTemp + TKelvin
-                tsky = SkyTempKelvin;
+                tsky = state.dataEnvrn->SkyTempKelvin;
                 Ebout = state.dataWindowComplexManager->sigma * pow_4(tout);
                 outir = Surface(SurfNum).ViewFactorSkyIR * (AirSkyRadSplit(SurfNum) * state.dataWindowComplexManager->sigma * pow_4(tsky) + (1.0 - AirSkyRadSplit(SurfNum)) * Ebout) +
                         Surface(SurfNum).ViewFactorGroundIR * Ebout + OutSrdIR;
@@ -3459,7 +3457,7 @@ namespace WindowComplexManager {
                                                    (Surface(SurfNum).Area + SurfWinDividerArea(SurfNum));
                 SurfWinShadingAbsorbedSolarEnergy(SurfNum) = SurfWinShadingAbsorbedSolar(SurfNum) * state.dataGlobal->TimeStepZoneSec;
             }
-            if (SunIsUp) {
+            if (state.dataEnvrn->SunIsUp) {
                 SurfWinSysSolTransmittance(SurfNum) =
                         SurfWinTransSolar(SurfNum) / (SurfQRadSWOutIncident(SurfNum) * (Surface(SurfNum).Area + SurfWinDividerArea(SurfNum)) + 0.0001);
                 SurfWinSysSolAbsorptance(SurfNum) = (SurfWinQRadSWwinAbsTot(SurfNum) + SurfWinShadingAbsorbedSolar(SurfNum)) /

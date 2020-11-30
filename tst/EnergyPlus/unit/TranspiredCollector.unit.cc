@@ -242,7 +242,7 @@ TEST_F(EnergyPlusFixture, TranspiredCollectors_InitTranspiredCollectorTest)
 
     state->dataGlobal->BeginEnvrnFlag = true;
     state->dataEnvrn->OutBaroPress = 101325.0;
-    SkyTemp = 24.0;
+    state->dataEnvrn->SkyTemp = 24.0;
     state->dataEnvrn->IsRain = false;
 
     InitTranspiredCollector(*state, UTSCNum);

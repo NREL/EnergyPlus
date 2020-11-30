@@ -1755,7 +1755,7 @@ TEST_F(EnergyPlusFixture, EMS_WeatherDataActuators)
     WeatherManager::ManageWeather(*state);
 
     EXPECT_NEAR(state->dataEnvrn->OutDryBulbTemp, 50.0, 0.000001);
-    EXPECT_NEAR(DataEnvironment::OutDewPointTemp, 25.0, 0.000001);
+    EXPECT_NEAR(state->dataEnvrn->OutDewPointTemp, 25.0, 0.000001);
     EXPECT_NEAR(state->dataEnvrn->OutRelHum, 50.0, 0.000001);
     EXPECT_NEAR(state->dataEnvrn->DifSolarRad, 0.0, 0.000001);  // Sun is down
     EXPECT_NEAR(state->dataEnvrn->BeamSolarRad, 0.0, 0.000001); // Sun is down
@@ -1770,7 +1770,7 @@ TEST_F(EnergyPlusFixture, EMS_WeatherDataActuators)
     WeatherManager::ManageWeather(*state);
 
     EXPECT_NEAR(state->dataEnvrn->OutDryBulbTemp, 50.0, 0.000001);
-    EXPECT_NEAR(DataEnvironment::OutDewPointTemp, 25.0, 0.000001);
+    EXPECT_NEAR(state->dataEnvrn->OutDewPointTemp, 25.0, 0.000001);
     EXPECT_NEAR(state->dataEnvrn->OutRelHum, 50.0, 0.000001);
     EXPECT_NEAR(state->dataEnvrn->DifSolarRad, 500.0, 0.000001);   // Sun is up
     EXPECT_NEAR(state->dataEnvrn->BeamSolarRad, 1000.0, 0.000001); // Sun is up

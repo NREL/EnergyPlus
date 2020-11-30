@@ -378,7 +378,7 @@ namespace WeatherManager {
                 "Site Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, state.dataEnvrn->OutDryBulbTemp, "Zone", "Average", "Environment");
             SetupOutputVariable(state, "Site Outdoor Air Dewpoint Temperature",
                                 OutputProcessor::Unit::C,
-                                DataEnvironment::OutDewPointTemp,
+                                state.dataEnvrn->OutDewPointTemp,
                                 "Zone",
                                 "Average",
                                 "Environment");
@@ -396,7 +396,7 @@ namespace WeatherManager {
                 "Site Outdoor Air Barometric Pressure", OutputProcessor::Unit::Pa, state.dataEnvrn->OutBaroPress, "Zone", "Average", "Environment");
             SetupOutputVariable(state, "Site Wind Speed", OutputProcessor::Unit::m_s, DataEnvironment::WindSpeed, "Zone", "Average", "Environment");
             SetupOutputVariable(state, "Site Wind Direction", OutputProcessor::Unit::deg, DataEnvironment::WindDir, "Zone", "Average", "Environment");
-            SetupOutputVariable(state, "Site Sky Temperature", OutputProcessor::Unit::C, DataEnvironment::SkyTemp, "Zone", "Average", "Environment");
+            SetupOutputVariable(state, "Site Sky Temperature", OutputProcessor::Unit::C, state.dataEnvrn->SkyTemp, "Zone", "Average", "Environment");
             SetupOutputVariable(state,
                 "Site Horizontal Infrared Radiation Rate per Area", OutputProcessor::Unit::W_m2, state.dataWeatherManager->HorizIRSky, "Zone", "Average", "Environment");
             SetupOutputVariable(state, "Site Diffuse Solar Radiation Rate per Area",
@@ -412,7 +412,7 @@ namespace WeatherManager {
                                 "Average",
                                 "Environment");
             SetupOutputVariable(state,
-                "Site Precipitation Depth", OutputProcessor::Unit::m, DataEnvironment::LiquidPrecipitation, "Zone", "Sum", "Environment");
+                "Site Precipitation Depth", OutputProcessor::Unit::m, state.dataEnvrn->LiquidPrecipitation, "Zone", "Sum", "Environment");
             SetupOutputVariable(state, "Site Ground Reflected Solar Radiation Rate per Area",
                                 OutputProcessor::Unit::W_m2,
                                 state.dataEnvrn->GndSolarRad,
@@ -484,8 +484,8 @@ namespace WeatherManager {
                                  "Environment",
                                  "Outdoor Dew Point",
                                  "[C]",
-                                 DataEnvironment::EMSOutDewPointTempOverrideOn,
-                                 DataEnvironment::EMSOutDewPointTempOverrideValue);
+                                 state.dataEnvrn->EMSOutDewPointTempOverrideOn,
+                                 state.dataEnvrn->EMSOutDewPointTempOverrideValue);
                 SetupEMSActuator("Weather Data",
                                  "Environment",
                                  "Outdoor Relative Humidity",
@@ -1894,15 +1894,15 @@ namespace WeatherManager {
 
         // Determine if Sun is up or down, set Solar Cosine values for time step.
         DetermineSunUpDown(state, DataEnvironment::SOLCOS);
-        if (DataEnvironment::SunIsUp &&  state.dataWeatherManager->SolarAltitudeAngle < 0.0) {
+        if (state.dataEnvrn->SunIsUp &&  state.dataWeatherManager->SolarAltitudeAngle < 0.0) {
             ShowFatalError(state, "SetCurrentWeather: At " + DataEnvironment::CurMnDyHr + " Sun is Up but Solar Altitude Angle is < 0.0");
         }
 
         state.dataEnvrn->OutDryBulbTemp = state.dataWeatherManager->TodayOutDryBulbTemp(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay);
         if (state.dataEnvrn->EMSOutDryBulbOverrideOn) state.dataEnvrn->OutDryBulbTemp = state.dataEnvrn->EMSOutDryBulbOverrideValue;
         state.dataEnvrn->OutBaroPress = state.dataWeatherManager->TodayOutBaroPress(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay);
-        DataEnvironment::OutDewPointTemp = state.dataWeatherManager->TodayOutDewPointTemp(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay);
-        if (DataEnvironment::EMSOutDewPointTempOverrideOn) DataEnvironment::OutDewPointTemp = DataEnvironment::EMSOutDewPointTempOverrideValue;
+        state.dataEnvrn->OutDewPointTemp = state.dataWeatherManager->TodayOutDewPointTemp(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay);
+        if (state.dataEnvrn->EMSOutDewPointTempOverrideOn) state.dataEnvrn->OutDewPointTemp = state.dataEnvrn->EMSOutDewPointTempOverrideValue;
         state.dataEnvrn->OutRelHum = state.dataWeatherManager->TodayOutRelHum(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay);
         state.dataEnvrn->OutRelHumValue = state.dataEnvrn->OutRelHum / 100.0;
         if (state.dataEnvrn->EMSOutRelHumOverrideOn) {
@@ -1919,11 +1919,11 @@ namespace WeatherManager {
             state.dataEnvrn->OutWetBulbTemp = state.dataEnvrn->OutDryBulbTemp;
             Real64 TempVal =
                 Psychrometrics::PsyWFnTdbTwbPb(state, state.dataEnvrn->OutDryBulbTemp, state.dataEnvrn->OutWetBulbTemp, state.dataEnvrn->OutBaroPress);
-            DataEnvironment::OutDewPointTemp = Psychrometrics::PsyTdpFnWPb(state, TempVal, state.dataEnvrn->OutBaroPress);
+            state.dataEnvrn->OutDewPointTemp = Psychrometrics::PsyTdpFnWPb(state, TempVal, state.dataEnvrn->OutBaroPress);
         }
 
-        if (DataEnvironment::OutDewPointTemp > state.dataEnvrn->OutWetBulbTemp) {
-            DataEnvironment::OutDewPointTemp = state.dataEnvrn->OutWetBulbTemp;
+        if (state.dataEnvrn->OutDewPointTemp > state.dataEnvrn->OutWetBulbTemp) {
+            state.dataEnvrn->OutDewPointTemp = state.dataEnvrn->OutWetBulbTemp;
         }
 
         if ((state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::DesignDay) || (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeDesignDay)) {
@@ -1964,13 +1964,13 @@ namespace WeatherManager {
         DataEnvironment::WindDir = state.dataWeatherManager->TodayWindDir(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay);
         if (DataEnvironment::EMSWindDirOverrideOn) DataEnvironment::WindDir = DataEnvironment::EMSWindDirOverrideValue;
         state.dataWeatherManager->HorizIRSky = state.dataWeatherManager->TodayHorizIRSky(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay);
-        DataEnvironment::SkyTemp = state.dataWeatherManager->TodaySkyTemp(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay);
-        DataEnvironment::SkyTempKelvin = DataEnvironment::SkyTemp + DataGlobalConstants::KelvinConv();
+        state.dataEnvrn->SkyTemp = state.dataWeatherManager->TodaySkyTemp(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay);
+        state.dataEnvrn->SkyTempKelvin = state.dataEnvrn->SkyTemp + DataGlobalConstants::KelvinConv();
         state.dataEnvrn->DifSolarRad = state.dataWeatherManager->TodayDifSolarRad(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay);
         if (state.dataEnvrn->EMSDifSolarRadOverrideOn) state.dataEnvrn->DifSolarRad = state.dataEnvrn->EMSDifSolarRadOverrideValue;
         state.dataEnvrn->BeamSolarRad = state.dataWeatherManager->TodayBeamSolarRad(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay);
         if (state.dataEnvrn->EMSBeamSolarRadOverrideOn) state.dataEnvrn->BeamSolarRad = state.dataEnvrn->EMSBeamSolarRadOverrideValue;
-        DataEnvironment::LiquidPrecipitation = state.dataWeatherManager->TodayLiquidPrecip(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay) / 1000.0; // convert from mm to m
+        state.dataEnvrn->LiquidPrecipitation = state.dataWeatherManager->TodayLiquidPrecip(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay) / 1000.0; // convert from mm to m
         DataEnvironment::TotalCloudCover = state.dataWeatherManager->TodayTotalSkyCover(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay);
         DataEnvironment::OpaqueCloudCover = state.dataWeatherManager->TodayOpaqueSkyCover(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay);
 
@@ -1993,7 +1993,7 @@ namespace WeatherManager {
         state.dataEnvrn->GndSolarRad =
             max((state.dataEnvrn->BeamSolarRad * DataEnvironment::SOLCOS(3) + state.dataEnvrn->DifSolarRad) * state.dataEnvrn->GndReflectance, 0.0);
 
-        if (!DataEnvironment::SunIsUp) {
+        if (!state.dataEnvrn->SunIsUp) {
             state.dataEnvrn->DifSolarRad = 0.0;
             state.dataEnvrn->BeamSolarRad = 0.0;
             state.dataEnvrn->GndSolarRad = 0.0;
@@ -2004,7 +2004,7 @@ namespace WeatherManager {
             Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataEnvrn->OutDryBulbTemp, state.dataEnvrn->OutHumRat);
 
         if (state.dataEnvrn->OutDryBulbTemp < state.dataEnvrn->OutWetBulbTemp) state.dataEnvrn->OutWetBulbTemp = state.dataEnvrn->OutDryBulbTemp;
-        if (DataEnvironment::OutDewPointTemp > state.dataEnvrn->OutWetBulbTemp) DataEnvironment::OutDewPointTemp = state.dataEnvrn->OutWetBulbTemp;
+        if (state.dataEnvrn->OutDewPointTemp > state.dataEnvrn->OutWetBulbTemp) state.dataEnvrn->OutDewPointTemp = state.dataEnvrn->OutWetBulbTemp;
 
         DayltgCurrentExtHorizIllum(state);
 
@@ -4236,11 +4236,11 @@ namespace WeatherManager {
 
         SunDirectionCosines(3) = CosZenith;
         if (CosZenith < DataEnvironment::SunIsUpValue) {
-            DataEnvironment::SunIsUp = false;
+            state.dataEnvrn->SunIsUp = false;
             SunDirectionCosines(2) = 0.0;
             SunDirectionCosines(1) = 0.0;
         } else {
-            DataEnvironment::SunIsUp = true;
+            state.dataEnvrn->SunIsUp = true;
             SunDirectionCosines(2) = state.dataWeatherManager->TodayVariables.SinSolarDeclinAngle * DataEnvironment::CosLatitude -
                                      state.dataWeatherManager->TodayVariables.CosSolarDeclinAngle * DataEnvironment::SinLatitude * std::cos(H);
             SunDirectionCosines(1) = state.dataWeatherManager->TodayVariables.CosSolarDeclinAngle * std::sin(H);
@@ -7207,7 +7207,7 @@ namespace WeatherManager {
         // Based on DOE-2.1E subroutine DEXTIL.
 
         // SOLCOS(3), below, is the cosine of the solar zenith angle.
-        if (DataEnvironment::SunIsUp) {
+        if (state.dataEnvrn->SunIsUp) {
             // Exterior horizontal beam irradiance (W/m2)
             Real64 SDIRH = state.dataEnvrn->BeamSolarRad * DataEnvironment::SOLCOS(3);
             // Exterior horizontal sky diffuse irradiance (W/m2)
@@ -7314,7 +7314,7 @@ namespace WeatherManager {
             ISkyClearness = 8;
         }
         // Atmospheric moisture (cm of precipitable water)
-        Real64 const AtmosMoisture = std::exp(0.07 * DataEnvironment::OutDewPointTemp - 0.075);
+        Real64 const AtmosMoisture = std::exp(0.07 * state.dataEnvrn->OutDewPointTemp - 0.075);
         // Sky diffuse luminous efficacy
         if (DataEnvironment::SkyBrightness <= 0.0) {
             DiffLumEff = 0.0;
