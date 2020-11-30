@@ -67,6 +67,7 @@
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterToAirHeatPumpSimple.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -143,7 +144,7 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     Furnace(FurnaceNum).SchedPtr = -1; // denotes missing schedule name in Furnace input ( returns 1.0 )
     HeatingLoad = true;
     CoolingLoad = false;
-    SetVSHPAirFlow(state, FurnaceNum, PartLoadRatio, OnOffAirFlowRatio);
+    SetVSHPAirFlow(*state, FurnaceNum, PartLoadRatio, OnOffAirFlowRatio);
 
     EXPECT_DOUBLE_EQ(0.0, CompOffMassFlow);
     EXPECT_DOUBLE_EQ(0.5, CompOnMassFlow);
@@ -154,7 +155,7 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     Furnace(FurnaceNum).NumOfSpeedCooling = 0;
     HeatingLoad = true;
     CoolingLoad = false;
-    SetVSHPAirFlow(state, FurnaceNum, PartLoadRatio, OnOffAirFlowRatio);
+    SetVSHPAirFlow(*state, FurnaceNum, PartLoadRatio, OnOffAirFlowRatio);
     EXPECT_DOUBLE_EQ(0.25, MSHPMassFlowRateLow);
     EXPECT_DOUBLE_EQ(0.25, MSHPMassFlowRateHigh);
     EXPECT_DOUBLE_EQ(0.0, CompOffMassFlow);
@@ -166,7 +167,7 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     Furnace(FurnaceNum).NumOfSpeedCooling = 0;
     HeatingLoad = true;
     CoolingLoad = false;
-    SetVSHPAirFlow(state, FurnaceNum, PartLoadRatio, OnOffAirFlowRatio);
+    SetVSHPAirFlow(*state, FurnaceNum, PartLoadRatio, OnOffAirFlowRatio);
     EXPECT_DOUBLE_EQ(0.5, MSHPMassFlowRateLow);
     EXPECT_DOUBLE_EQ(0.5, MSHPMassFlowRateHigh);
     EXPECT_DOUBLE_EQ(0.0, CompOffMassFlow);
@@ -178,7 +179,7 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     Furnace(FurnaceNum).NumOfSpeedCooling = 0;
     HeatingLoad = true;
     CoolingLoad = false;
-    SetVSHPAirFlow(state, FurnaceNum, PartLoadRatio, OnOffAirFlowRatio);
+    SetVSHPAirFlow(*state, FurnaceNum, PartLoadRatio, OnOffAirFlowRatio);
     EXPECT_DOUBLE_EQ(1.0, MSHPMassFlowRateLow);
     EXPECT_DOUBLE_EQ(1.0, MSHPMassFlowRateHigh);
     EXPECT_DOUBLE_EQ(0.0, CompOffMassFlow);
@@ -190,7 +191,7 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     Furnace(FurnaceNum).NumOfSpeedCooling = 1;
     HeatingLoad = false;
     CoolingLoad = true;
-    SetVSHPAirFlow(state, FurnaceNum, PartLoadRatio, OnOffAirFlowRatio);
+    SetVSHPAirFlow(*state, FurnaceNum, PartLoadRatio, OnOffAirFlowRatio);
     EXPECT_DOUBLE_EQ(0.3, MSHPMassFlowRateLow);
     EXPECT_DOUBLE_EQ(0.3, MSHPMassFlowRateHigh);
     EXPECT_DOUBLE_EQ(0.0, CompOffMassFlow);
@@ -202,7 +203,7 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     Furnace(FurnaceNum).NumOfSpeedCooling = 2;
     HeatingLoad = false;
     CoolingLoad = true;
-    SetVSHPAirFlow(state, FurnaceNum, PartLoadRatio, OnOffAirFlowRatio);
+    SetVSHPAirFlow(*state, FurnaceNum, PartLoadRatio, OnOffAirFlowRatio);
     EXPECT_DOUBLE_EQ(0.6, MSHPMassFlowRateLow);
     EXPECT_DOUBLE_EQ(0.6, MSHPMassFlowRateHigh);
     EXPECT_DOUBLE_EQ(0.0, CompOffMassFlow);
@@ -214,7 +215,7 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     Furnace(FurnaceNum).NumOfSpeedCooling = 3;
     HeatingLoad = false;
     CoolingLoad = true;
-    SetVSHPAirFlow(state, FurnaceNum, PartLoadRatio, OnOffAirFlowRatio);
+    SetVSHPAirFlow(*state, FurnaceNum, PartLoadRatio, OnOffAirFlowRatio);
     EXPECT_DOUBLE_EQ(1.2, MSHPMassFlowRateLow);
     EXPECT_DOUBLE_EQ(1.2, MSHPMassFlowRateHigh);
     EXPECT_DOUBLE_EQ(0.0, CompOffMassFlow);
@@ -229,7 +230,7 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     Furnace(FurnaceNum).NumOfSpeedCooling = 0;
     HeatingLoad = true;
     CoolingLoad = false;
-    SetVSHPAirFlow(state, FurnaceNum, PartLoadRatio, OnOffAirFlowRatio);
+    SetVSHPAirFlow(*state, FurnaceNum, PartLoadRatio, OnOffAirFlowRatio);
     EXPECT_EQ(0.0, MSHPMassFlowRateLow);
     EXPECT_EQ(0.0, MSHPMassFlowRateHigh);
     EXPECT_DOUBLE_EQ(0.2, CompOffMassFlow);
@@ -254,7 +255,7 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     Furnaces::HeatingLoad = false;
     Furnaces::CoolingLoad = false;
 
-    CalcNewZoneHeatCoolFlowRates(state,
+    CalcNewZoneHeatCoolFlowRates(*state,
         FurnaceNum, firstHVACIteration, compOp, zoneLoad, moistureLoad, heatCoilLoad, reheatCoilLoad, onOffAirFlowRatio, hXUnitOn);
     EXPECT_EQ(Furnace(1).MdotFurnace, 0.5); // CompOnMassFlow rate
     EXPECT_EQ(DataLoopNode::Node(1).MassFlowRate, 0.5); // furnace inlet node mass flow rate
@@ -264,30 +265,30 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     firstHVACIteration = false; // now the coils will be called
     Furnace(FurnaceNum).CoolingCoilIndex = 1;
     Furnace(FurnaceNum).HeatingCoilIndex = 2;
-    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP.allocate(2);
-    state.dataWaterToAirHeatPumpSimple->NumWatertoAirHPs = 2;
-    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).Name = "WATERCOOLINGCOIL";
-    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).WAHPPlantTypeOfNum = DataPlant::TypeOf_CoilWAHPCoolingEquationFit;
-    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).Name = "WATERHEATINGCOIL";
-    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).WAHPPlantTypeOfNum = DataPlant::TypeOf_CoilWAHPHeatingEquationFit;
-    state.dataWaterToAirHeatPumpSimple->SimpleHPTimeStepFlag.allocate(2);
-    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).AirInletNodeNum = 1;
-    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).AirOutletNodeNum = 3;
-    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).WaterInletNodeNum = 5;
-    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).WaterOutletNodeNum = 6;
-    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).LoopNum = 1;
-    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).LoopSide = 1;
-    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).BranchNum = 1;
-    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).CompNum = 1;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP.allocate(2);
+    state->dataWaterToAirHeatPumpSimple->NumWatertoAirHPs = 2;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).Name = "WATERCOOLINGCOIL";
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).WAHPPlantTypeOfNum = DataPlant::TypeOf_CoilWAHPCoolingEquationFit;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).Name = "WATERHEATINGCOIL";
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).WAHPPlantTypeOfNum = DataPlant::TypeOf_CoilWAHPHeatingEquationFit;
+    state->dataWaterToAirHeatPumpSimple->SimpleHPTimeStepFlag.allocate(2);
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).AirInletNodeNum = 1;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).AirOutletNodeNum = 3;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).WaterInletNodeNum = 5;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).WaterOutletNodeNum = 6;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).LoopNum = 1;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).LoopSide = 1;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).BranchNum = 1;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).CompNum = 1;
 
-    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).AirInletNodeNum = 3;
-    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).AirOutletNodeNum = 2;
-    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).WaterInletNodeNum = 7;
-    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).WaterOutletNodeNum = 8;
-    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).LoopNum = 2;
-    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).LoopSide = 1;
-    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).BranchNum = 1;
-    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).CompNum = 1;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).AirInletNodeNum = 3;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).AirOutletNodeNum = 2;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).WaterInletNodeNum = 7;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).WaterOutletNodeNum = 8;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).LoopNum = 2;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).LoopSide = 1;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).BranchNum = 1;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).CompNum = 1;
 
     // set up plant loop
     DataPlant::TotNumLoops = 2;
@@ -318,8 +319,8 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
 
     DataHeatBalance::HeatReclaimSimple_WAHPCoil.allocate(2);
 
-    state.dataWaterToAirHeatPumpSimple->GetCoilsInputFlag = false; // turn off water source coil GetInput
-    CalcNewZoneHeatCoolFlowRates(state,
+    state->dataWaterToAirHeatPumpSimple->GetCoilsInputFlag = false; // turn off water source coil GetInput
+    CalcNewZoneHeatCoolFlowRates(*state,
         FurnaceNum, firstHVACIteration, compOp, zoneLoad, moistureLoad, heatCoilLoad, reheatCoilLoad, onOffAirFlowRatio, hXUnitOn);
     EXPECT_EQ(Furnace(1).MdotFurnace, 0.2); // flow rate is at idle speed flow rate
     EXPECT_EQ(DataLoopNode::Node(1).MassFlowRate, 0.2); // furnace inlet node mass flow rate is at idle speed flow rate
@@ -328,7 +329,7 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
 
     Furnace(1).HeatPartLoadRatio = 1.0;
     Furnaces::HeatingLoad = true;
-    CalcNewZoneHeatCoolFlowRates(state,
+    CalcNewZoneHeatCoolFlowRates(*state,
         FurnaceNum, firstHVACIteration, compOp, zoneLoad, moistureLoad, heatCoilLoad, reheatCoilLoad, onOffAirFlowRatio, hXUnitOn);
     EXPECT_EQ(Furnace(1).HeatPartLoadRatio, 1.0);
 
@@ -339,7 +340,7 @@ TEST_F(EnergyPlusFixture, FurnaceTest_PartLoadRatioTest)
 {
     // Test passing variables between Furnace and AirflowNetwork #5134
 
-    state.dataAirLoop->AirLoopAFNInfo.allocate(1);
+    state->dataAirLoop->AirLoopAFNInfo.allocate(1);
 
     int FurnaceNum;
 
@@ -356,12 +357,12 @@ TEST_F(EnergyPlusFixture, FurnaceTest_PartLoadRatioTest)
     Furnace(FurnaceNum).CoolPartLoadRatio = 0.0;
 
     AirflowNetwork::SimulateAirflowNetwork = AirflowNetwork::AirflowNetworkControlMultiADS;
-    ReportFurnace(state, FurnaceNum, 1);
+    ReportFurnace(*state, FurnaceNum, 1);
 
-    EXPECT_EQ(2.0, state.dataAirLoop->AirLoopAFNInfo(1).LoopSystemOnMassFlowrate);
-    EXPECT_EQ(0.0, state.dataAirLoop->AirLoopAFNInfo(1).LoopSystemOffMassFlowrate);
-    EXPECT_EQ(1.0, state.dataAirLoop->AirLoopAFNInfo(1).LoopFanOperationMode);
-    EXPECT_EQ(1.0, state.dataAirLoop->AirLoopAFNInfo(1).LoopOnOffFanPartLoadRatio);
+    EXPECT_EQ(2.0, state->dataAirLoop->AirLoopAFNInfo(1).LoopSystemOnMassFlowrate);
+    EXPECT_EQ(0.0, state->dataAirLoop->AirLoopAFNInfo(1).LoopSystemOffMassFlowrate);
+    EXPECT_EQ(1.0, state->dataAirLoop->AirLoopAFNInfo(1).LoopFanOperationMode);
+    EXPECT_EQ(1.0, state->dataAirLoop->AirLoopAFNInfo(1).LoopOnOffFanPartLoadRatio);
 
     Furnace(FurnaceNum).FurnaceType_Num = UnitarySys_HeatCool;
     Furnace(FurnaceNum).HeatPartLoadRatio = 0.0;
@@ -369,9 +370,9 @@ TEST_F(EnergyPlusFixture, FurnaceTest_PartLoadRatioTest)
     Furnace(FurnaceNum).MaxCoolAirMassFlow = 2.2;
     Furnace(FurnaceNum).MaxHeatAirMassFlow = 2.0;
 
-    ReportFurnace(state, FurnaceNum, 1);
+    ReportFurnace(*state, FurnaceNum, 1);
 
-    EXPECT_EQ(1.0, state.dataAirLoop->AirLoopAFNInfo(1).LoopOnOffFanPartLoadRatio);
+    EXPECT_EQ(1.0, state->dataAirLoop->AirLoopAFNInfo(1).LoopOnOffFanPartLoadRatio);
 
     AirflowNetwork::SimulateAirflowNetwork = 0;
     Furnace.deallocate();
@@ -1162,13 +1163,13 @@ TEST_F(EnergyPlusFixture, UnitaryHeatPumpAirToAir_MaxSuppAirTempTest)
     bool FirstHVACIteration(false);
 
     // OutputProcessor::TimeValue.allocate(2);
-    ManageSimulation(state);
+    ManageSimulation(*state);
     // check the design max air outlet temperature
     EXPECT_DOUBLE_EQ(45.0, Furnace(1).DesignMaxOutletTemp);
 
     ZoneSysEnergyDemand(1).SequencedOutputRequiredToCoolingSP(1) = 25000.0;
     ZoneSysEnergyDemand(1).SequencedOutputRequiredToHeatingSP(1) = 25000.0;
-    SimFurnace(state, Furnace(1).Name, FirstHVACIteration, AirLoopNum, CompIndex);
+    SimFurnace(*state, Furnace(1).Name, FirstHVACIteration, AirLoopNum, CompIndex);
     // check the heating mode is On
     EXPECT_TRUE(Furnaces::HeatingLoad);
     // check the cooling mode is Off

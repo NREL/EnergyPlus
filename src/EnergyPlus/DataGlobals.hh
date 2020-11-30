@@ -93,6 +93,7 @@ struct EnergyPlusData;
         std::function<void (void *)> externalHVACManager;
         bool externalHVACManagerInitialized = false;
         DataGlobalConstants::KindOfSim KindOfSim = DataGlobalConstants::KindOfSim::Unassigned;
+        bool sizingAnalysisEioHeaderDoneOnce = false;
         bool EndDayFlag = false;                          // True at the end of each day (last time step of last hour of day)
         bool EndHourFlag = false;                         // True at the end of each hour (last time step of hour)
         int PreviousHour = 0;                             // Previous Hour Index
@@ -186,6 +187,7 @@ struct EnergyPlusData;
             this->stopSimulation= false;
             this->externalHVACManager = nullptr;
             this->externalHVACManagerInitialized = false;
+            this->sizingAnalysisEioHeaderDoneOnce = false;
             this->KindOfSim = DataGlobalConstants::KindOfSim::Unassigned;
             this->EndDayFlag = false;
             this->EndHourFlag = false;

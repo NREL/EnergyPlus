@@ -51,6 +51,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 

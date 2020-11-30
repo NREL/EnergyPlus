@@ -2159,8 +2159,8 @@ namespace PlantHeatExchangerFluidToFluid {
                                 ++this->DmdSideModulatSolvNoConvergeErrorCount;
                                 ShowWarningError(state, ComponentClassName + " named " + this->Name +
                                                  " - Iteration Limit exceeded calculating demand side loop flow rate");
-                                ShowContinueError(state, "Simulation continues with calculated demand side mass flow rate = " +
-                                                  General::RoundSigDigits(DmdSideMdot, 7));
+                                ShowContinueError(state,
+                                                  format("Simulation continues with calculated demand side mass flow rate = {:.7R}", DmdSideMdot));
                             }
                             ShowRecurringWarningErrorAtEnd(state, ComponentClassName + " named " + this->Name +
                                                                " - Iteration Limit exceeded calculating demand side loop flow rate continues.",
@@ -2176,8 +2176,8 @@ namespace PlantHeatExchangerFluidToFluid {
                                 ++this->DmdSideModulatSolvFailErrorCount;
                                 ShowWarningError(state, ComponentClassName + " named " + this->Name +
                                                  " - Solver failed to calculate demand side loop flow rate");
-                                ShowContinueError(state, "Simulation continues with estimated demand side mass flow rate = " +
-                                                  General::RoundSigDigits(DmdSideMdot, 7));
+                                ShowContinueError(state,
+                                                  format("Simulation continues with estimated demand side mass flow rate = {:.7R}", DmdSideMdot));
                             }
                             ShowRecurringWarningErrorAtEnd(state, ComponentClassName + " named " + this->Name +
                                                                " - Solver failed to calculate demand side loop flow rate continues.",
@@ -2232,8 +2232,8 @@ namespace PlantHeatExchangerFluidToFluid {
                                 ++this->DmdSideModulatSolvNoConvergeErrorCount;
                                 ShowWarningError(state, ComponentClassName + " named " + this->Name +
                                                  " - Iteration Limit exceeded calculating demand side loop flow rate");
-                                ShowContinueError(state, "Simulation continues with calculated demand side mass flow rate = " +
-                                                  General::RoundSigDigits(DmdSideMdot, 7));
+                                ShowContinueError(state,
+                                                  format("Simulation continues with calculated demand side mass flow rate = {:.7R}", DmdSideMdot));
                             }
                             ShowRecurringWarningErrorAtEnd(state, ComponentClassName + " named " + this->Name +
                                                                " - Iteration Limit exceeded calculating demand side loop flow rate continues.",
@@ -2249,8 +2249,8 @@ namespace PlantHeatExchangerFluidToFluid {
                                 ++this->DmdSideModulatSolvFailErrorCount;
                                 ShowWarningError(state, ComponentClassName + " named " + this->Name +
                                                  " - Solver failed to calculate demand side loop flow rate");
-                                ShowContinueError(state, "Simulation continues with estimated demand side mass flow rate = " +
-                                                  General::RoundSigDigits(DmdSideMdot, 7));
+                                ShowContinueError(state,
+                                                  format("Simulation continues with estimated demand side mass flow rate = {:.7R}", DmdSideMdot));
                             }
                             ShowRecurringWarningErrorAtEnd(state, ComponentClassName + " named " + this->Name +
                                                                " - Solver failed to calculate demand side loop flow rate continues.",

@@ -54,6 +54,7 @@
 #include <EnergyPlus/ICEngineElectricGenerator.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus::ICEngineElectricGenerator;
 
@@ -127,7 +128,7 @@ TEST_F(EnergyPlusFixture, ICEngineElectricGenerator_Fueltype)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetICEngineGeneratorInput(state);
+    GetICEngineGeneratorInput(*state);
 
     EXPECT_EQ(ICEngineGenerator(1).FuelType, "Diesel");
 }

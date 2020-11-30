@@ -53,6 +53,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/PlantComponent.hh>
@@ -132,7 +133,7 @@ namespace BoilerSteam {
         void calculate(EnergyPlusData &state,
                        Real64 &MyLoad,   // W - hot water demand to be met by boiler
                        bool RunFlag,     // TRUE if boiler operating
-                       int EquipFlowCtrl // Flow control mode for the equipment
+                       DataBranchAirLoopPlant::ControlTypeEnum EquipFlowCtrl // Flow control mode for the equipment
         );
 
         void update(Real64 MyLoad,          // boiler operating load

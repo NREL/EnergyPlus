@@ -55,7 +55,6 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
-#include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -64,11 +63,8 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSizing.hh>
-#include <EnergyPlus/DataSurfaceLists.hh>
-#include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/DesiccantDehumidifiers.hh>
-#include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
@@ -89,7 +85,6 @@
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
-#include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/SteamCoils.hh>
 #include <EnergyPlus/UnitarySystem.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -129,7 +124,6 @@ namespace OutdoorAirUnit {
     using namespace ScheduleManager;
     using namespace Psychrometrics;
     using namespace FluidProperties;
-    using General::TrimSigDigits;
 
     // component types addressed by this module
     std::string const cMO_OutdoorAirUnit("ZoneHVAC:OutdoorAirUnit");
@@ -237,7 +231,6 @@ namespace OutdoorAirUnit {
         // Standard EnergyPlus methodology.
 
         // Using/Aliasing
-        using General::TrimSigDigits;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int OAUnitNum; // index of outdoor air unit being simulated
@@ -259,13 +252,19 @@ namespace OutdoorAirUnit {
         } else {
             OAUnitNum = CompIndex;
             if (OAUnitNum > NumOfOAUnits || OAUnitNum < 1) {
-                ShowFatalError(state, "SimOutdoorAirUnit:  Invalid CompIndex passed=" + TrimSigDigits(OAUnitNum) +
-                               ", Number of Units=" + TrimSigDigits(NumOfOAUnits) + ", Entered Unit name=" + CompName);
+                ShowFatalError(state,
+                               format("SimOutdoorAirUnit:  Invalid CompIndex passed={}, Number of Units={}, Entered Unit name={}",
+                                      OAUnitNum,
+                                      NumOfOAUnits,
+                                      CompName));
             }
             if (CheckEquipName(OAUnitNum)) {
                 if (CompName != OutAirUnit(OAUnitNum).Name) {
-                    ShowFatalError(state, "SimOutdoorAirUnit: Invalid CompIndex passed=" + TrimSigDigits(OAUnitNum) + ", Unit name=" + CompName +
-                                   ", stored Unit Name for that index=" + OutAirUnit(OAUnitNum).Name);
+                    ShowFatalError(state,
+                                   format("SimOutdoorAirUnit: Invalid CompIndex passed={}, Unit name={}, stored Unit Name for that index={}",
+                                          OAUnitNum,
+                                          CompName,
+                                          OutAirUnit(OAUnitNum).Name));
                 }
                 CheckEquipName(OAUnitNum) = false;
             }
@@ -323,7 +322,6 @@ namespace OutdoorAirUnit {
         using SteamCoils::GetSteamCoilIndex;
         using WaterCoils::CheckWaterCoilSchedule;
         using namespace DataLoopNode;
-        using namespace DataSurfaceLists;
         using OutAirNodeManager::CheckAndAddAirNodeNumber;
         using WaterCoils::GetCoilWaterInletNode;
         using WaterCoils::GetWaterCoilIndex;
@@ -551,8 +549,7 @@ namespace OutdoorAirUnit {
                 if (NumArray(2) != NumArray(1)) {
                     ShowWarningError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cNumericFields(1) + " and " + cNumericFields(2) +
                                      " are not equal. This may cause unbalanced flow.");
-                    ShowContinueError(state, cNumericFields(1) + "=" + General::RoundSigDigits(NumArray(1), 3) + " and " + cNumericFields(2) + "=" +
-                                      General::RoundSigDigits(NumArray(2), 3));
+                    ShowContinueError(state, format("{}={:.3R}= and {}{:.3R}", cNumericFields(1), NumArray(1), cNumericFields(2), NumArray(2)));
                 }
             }
             // A8
@@ -1463,7 +1460,7 @@ CurrentModuleObjects(CO_OAEqList), ComponentListName);
         using DataPlant::TypeOf_CoilWaterDetailedFlatCooling;
         using DataPlant::TypeOf_CoilWaterSimpleHeating;
         using Fans::GetFanDesignVolumeFlowRate;
-        using General::RoundSigDigits;
+
         using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
         using PlantUtilities::MyPlantSizingIndex;
         using SteamCoils::SimulateSteamCoilComponents;
@@ -1544,9 +1541,8 @@ CurrentModuleObjects(CO_OAEqList), ComponentListName);
                                                              OutAirVolFlowDes);
                                 ShowMessage(state, "SizeOutdoorAirUnit: Potential issue with equipment sizing for ZoneHVAC:OutdoorAirUnit " +
                                             OutAirUnit(OAUnitNum).Name);
-                                ShowContinueError(state, "User-Specified Outdoor Air Flow Rate of " + RoundSigDigits(OutAirVolFlowUser, 5) + " [m3/s]");
-                                ShowContinueError(state, "differs from Design Size Outdoor Air Flow Rate of " + RoundSigDigits(OutAirVolFlowDes, 5) +
-                                                  " [m3/s]");
+                                ShowContinueError(state, format("User-Specified Outdoor Air Flow Rate of {:.5R} [m3/s]", OutAirVolFlowUser));
+                                ShowContinueError(state, format("differs from Design Size Outdoor Air Flow Rate of {:.5R} [m3/s]", OutAirVolFlowDes));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }
@@ -1588,9 +1584,8 @@ CurrentModuleObjects(CO_OAEqList), ComponentListName);
                                                              ExtAirVolFlowDes);
                                 ShowMessage(state, "SizeOutdoorAirUnit: Potential issue with equipment sizing for ZoneHVAC:OutdoorAirUnit " +
                                             OutAirUnit(OAUnitNum).Name);
-                                ShowContinueError(state, "User-Specified Exhaust Air Flow Rate of " + RoundSigDigits(ExtAirVolFlowUser, 5) + " [m3/s]");
-                                ShowContinueError(state, "differs from Design Size Exhaust Air Flow Rate of " + RoundSigDigits(ExtAirVolFlowDes, 5) +
-                                                  " [m3/s]");
+                                ShowContinueError(state, format("User-Specified Exhaust Air Flow Rate of {:.5R} [m3/s]", ExtAirVolFlowUser));
+                                ShowContinueError(state, format("differs from Design Size Exhaust Air Flow Rate of {:.5R} [m3/s]", ExtAirVolFlowDes));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }
@@ -1713,7 +1708,6 @@ CurrentModuleObjects(CO_OAEqList), ComponentListName);
         // USE STATEMENTS:
 
         // Using/Aliasing
-        using namespace DataZoneEnergyDemands;
         using DataEnvironment::CurMnDy;
         using DataEnvironment::EnvironmentName;
         using DataEnvironment::OutBaroPress;
@@ -1885,8 +1879,9 @@ CurrentModuleObjects(CO_OAEqList), ComponentListName);
                     ShowContinueError(state, "Air mass balance is required by other outdoor air units: Fan:ZoneExhaust, ZoneMixing, ZoneCrossMixing, or "
                                       "other air flow control inputs.");
                     ShowContinueErrorTimeStamp(state,
-                        "The outdoor mass flow rate = " + General::RoundSigDigits(OutAirUnit(OAUnitNum).OutAirMassFlow, 3) +
-                        " and the exhaust mass flow rate = " + General::RoundSigDigits(OutAirUnit(OAUnitNum).ExtAirMassFlow, 3) + ".");
+                                               format("The outdoor mass flow rate = {:.3R} and the exhaust mass flow rate = {:.3R}.",
+                                                      OutAirUnit(OAUnitNum).OutAirMassFlow,
+                                                      OutAirUnit(OAUnitNum).ExtAirMassFlow));
                     OutAirUnit(OAUnitNum).FlowError = true;
                 }
             }
@@ -2135,7 +2130,6 @@ CurrentModuleObjects(CO_OAEqList), ComponentListName);
         // USE STATEMENTS:
 
         // Using/Aliasing
-        using namespace DataZoneEnergyDemands;
         using DataEnvironment::CurMnDy;
         using DataEnvironment::EnvironmentName;
         using DataEnvironment::OutBaroPress;
@@ -2145,7 +2139,7 @@ CurrentModuleObjects(CO_OAEqList), ComponentListName);
         using DataHVACGlobals::SmallLoad;
         using DataLoopNode::Node;
         using DesiccantDehumidifiers::SimDesiccantDehumidifier;
-        using General::TrimSigDigits;
+
         using HeatingCoils::SimulateHeatingCoilComponents;
         using HeatRecovery::SimHeatRecovery;
         using HVACDXHeatPumpSystem::SimDXHeatPumpSystem;

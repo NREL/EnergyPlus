@@ -718,9 +718,8 @@ namespace HeatBalanceHAMTManager {
         // na
 
         // Using/Aliasing
-        using General::RoundSigDigits;
+
         using General::ScanForReports;
-        using General::TrimSigDigits;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1042,7 +1041,8 @@ namespace HeatBalanceHAMTManager {
             print(state.files.eio, "\n");
 
             for (int cellid = Extcell(sid), concell = 1; cellid <= Intcell(sid); ++cellid, ++concell) {
-                SetupOutputVariable(state, "HAMT Surface Temperature Cell " + TrimSigDigits(concell) + "",
+                SetupOutputVariable(state,
+                                    format("HAMT Surface Temperature Cell {}", concell),
                                     OutputProcessor::Unit::C,
                                     cells(cellid).temp,
                                     "Zone",
@@ -1050,7 +1050,8 @@ namespace HeatBalanceHAMTManager {
                                     Surface(sid).Name);
             }
             for (int cellid = Extcell(sid), concell = 1; cellid <= Intcell(sid); ++cellid, ++concell) {
-                SetupOutputVariable(state, "HAMT Surface Water Content Cell " + TrimSigDigits(concell) + "",
+                SetupOutputVariable(state,
+                                    format("HAMT Surface Water Content Cell {}", concell),
                                     OutputProcessor::Unit::kg_kg,
                                     cells(cellid).wreport,
                                     "Zone",
@@ -1058,7 +1059,8 @@ namespace HeatBalanceHAMTManager {
                                     Surface(sid).Name);
             }
             for (int cellid = Extcell(sid), concell = 1; cellid <= Intcell(sid); ++cellid, ++concell) {
-                SetupOutputVariable(state, "HAMT Surface Relative Humidity Cell " + TrimSigDigits(concell) + "",
+                SetupOutputVariable(state,
+                                    format("HAMT Surface Relative Humidity Cell {}", concell),
                                     OutputProcessor::Unit::Perc,
                                     cells(cellid).rhp,
                                     "Zone",
@@ -1102,7 +1104,6 @@ namespace HeatBalanceHAMTManager {
         using DataHeatBalSurface::SurfQAdditionalHeatSourceInside;
         using DataSurfaces::OSCM;
         using DataSurfaces::OtherSideCondModeledExt;
-        using General::RoundSigDigits;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1379,8 +1380,8 @@ namespace HeatBalanceHAMTManager {
             if (tempmax > MaxSurfaceTempLimit) {
                 if (!state.dataGlobal->WarmupFlag) {
                     if (Surface(sid).HighTempErrCount == 0) {
-                        ShowSevereMessage(state, "HAMT: Temperature (high) out of bounds (" + RoundSigDigits(tempmax, 2) +
-                                          ") for surface=" + Surface(sid).Name);
+                        ShowSevereMessage(state,
+                                          format("HAMT: Temperature (high) out of bounds ({:.2R}) for surface={}", tempmax, Surface(sid).Name));
                         ShowContinueErrorTimeStamp(state, "");
                     }
                     ShowRecurringWarningErrorAtEnd(state, "HAMT: Temperature Temperature (high) out of bounds; Surface=" + Surface(sid).Name,
@@ -1394,8 +1395,8 @@ namespace HeatBalanceHAMTManager {
             }
             if (tempmax > MaxSurfaceTempLimitBeforeFatal) {
                 if (!state.dataGlobal->WarmupFlag) {
-                    ShowSevereError(state, "HAMT: HAMT: Temperature (high) out of bounds ( " + RoundSigDigits(tempmax, 2) +
-                                    ") for surface=" + Surface(sid).Name);
+                    ShowSevereError(state,
+                                    format("HAMT: HAMT: Temperature (high) out of bounds ( {:.2R}) for surface={}", tempmax, Surface(sid).Name));
                     ShowContinueErrorTimeStamp(state, "");
                     ShowFatalError(state, "Program terminates due to preceding condition.");
                 }
@@ -1403,8 +1404,7 @@ namespace HeatBalanceHAMTManager {
             if (tempmin < MinSurfaceTempLimit) {
                 if (!state.dataGlobal->WarmupFlag) {
                     if (Surface(sid).HighTempErrCount == 0) {
-                        ShowSevereMessage(state, "HAMT: Temperature (low) out of bounds (" + RoundSigDigits(tempmin, 2) +
-                                          ") for surface=" + Surface(sid).Name);
+                        ShowSevereMessage(state, format("HAMT: Temperature (low) out of bounds ({:.2R}) for surface={}", tempmin, Surface(sid).Name));
                         ShowContinueErrorTimeStamp(state, "");
                     }
                     ShowRecurringWarningErrorAtEnd(state, "HAMT: Temperature Temperature (high) out of bounds; Surface=" + Surface(sid).Name,
@@ -1418,8 +1418,8 @@ namespace HeatBalanceHAMTManager {
             }
             if (tempmin < MinSurfaceTempLimitBeforeFatal) {
                 if (!state.dataGlobal->WarmupFlag) {
-                    ShowSevereError(state, "HAMT: HAMT: Temperature (low) out of bounds ( " + RoundSigDigits(tempmin, 2) +
-                                    ") for surface=" + Surface(sid).Name);
+                    ShowSevereError(state,
+                                    format("HAMT: HAMT: Temperature (low) out of bounds ( {:.2R}) for surface={}", tempmin, Surface(sid).Name));
                     ShowContinueErrorTimeStamp(state, "");
                     ShowFatalError(state, "Program terminates due to preceding condition.");
                 }

@@ -71,6 +71,7 @@
 #include <EnergyPlus/SplitterComponent.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus;
 using namespace DataAirSystems;
@@ -95,7 +96,7 @@ TEST_F(EnergyPlusFixture, SimAirServingZones_ReheatCoilSizing)
     CalcSysSizing.allocate(NumPrimaryAirSys);
     FinalSysSizing.allocate(NumPrimaryAirSys);
     FinalZoneSizing.allocate(NumPrimaryAirSys);
-    state.dataAirSystemsData->PrimaryAirSystems.allocate(NumPrimaryAirSys);
+    state->dataAirSystemsData->PrimaryAirSystems.allocate(NumPrimaryAirSys);
 
     // Inputs: system configurations:
     // 	(1) Central heating coils exist
@@ -103,20 +104,20 @@ TEST_F(EnergyPlusFixture, SimAirServingZones_ReheatCoilSizing)
     // 	(3) No central heating coils, but OA heat-exchangers exist
     // 	(4) No central heating coils; No preheating coils or OA heat-exchangers
 
-    state.dataAirSystemsData->PrimaryAirSystems(1).CentralHeatCoilExists = true;
-    state.dataAirSystemsData->PrimaryAirSystems(2).CentralHeatCoilExists = false;
-    state.dataAirSystemsData->PrimaryAirSystems(3).CentralHeatCoilExists = false;
-    state.dataAirSystemsData->PrimaryAirSystems(4).CentralHeatCoilExists = false;
+    state->dataAirSystemsData->PrimaryAirSystems(1).CentralHeatCoilExists = true;
+    state->dataAirSystemsData->PrimaryAirSystems(2).CentralHeatCoilExists = false;
+    state->dataAirSystemsData->PrimaryAirSystems(3).CentralHeatCoilExists = false;
+    state->dataAirSystemsData->PrimaryAirSystems(4).CentralHeatCoilExists = false;
 
-    state.dataAirSystemsData->PrimaryAirSystems(1).NumOAHeatCoils = 0;
-    state.dataAirSystemsData->PrimaryAirSystems(2).NumOAHeatCoils = 1;
-    state.dataAirSystemsData->PrimaryAirSystems(3).NumOAHeatCoils = 0;
-    state.dataAirSystemsData->PrimaryAirSystems(4).NumOAHeatCoils = 0;
+    state->dataAirSystemsData->PrimaryAirSystems(1).NumOAHeatCoils = 0;
+    state->dataAirSystemsData->PrimaryAirSystems(2).NumOAHeatCoils = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(3).NumOAHeatCoils = 0;
+    state->dataAirSystemsData->PrimaryAirSystems(4).NumOAHeatCoils = 0;
 
-    state.dataAirSystemsData->PrimaryAirSystems(1).NumOAHXs = 0;
-    state.dataAirSystemsData->PrimaryAirSystems(2).NumOAHXs = 0;
-    state.dataAirSystemsData->PrimaryAirSystems(3).NumOAHXs = 1;
-    state.dataAirSystemsData->PrimaryAirSystems(4).NumOAHXs = 0;
+    state->dataAirSystemsData->PrimaryAirSystems(1).NumOAHXs = 0;
+    state->dataAirSystemsData->PrimaryAirSystems(2).NumOAHXs = 0;
+    state->dataAirSystemsData->PrimaryAirSystems(3).NumOAHXs = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(4).NumOAHXs = 0;
 
     // Inputs: sizing parameters
     for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
@@ -138,8 +139,8 @@ TEST_F(EnergyPlusFixture, SimAirServingZones_ReheatCoilSizing)
     for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
         CtrlZoneNum = AirLoopNum;
 
-        FinalZoneSizing(CtrlZoneNum).DesHeatCoilInTempTU = GetHeatingSATempForSizing(state, AirLoopNum);
-        FinalZoneSizing(CtrlZoneNum).DesHeatCoilInHumRatTU = GetHeatingSATempHumRatForSizing(state, AirLoopNum);
+        FinalZoneSizing(CtrlZoneNum).DesHeatCoilInTempTU = GetHeatingSATempForSizing(*state, AirLoopNum);
+        FinalZoneSizing(CtrlZoneNum).DesHeatCoilInHumRatTU = GetHeatingSATempHumRatForSizing(*state, AirLoopNum);
     }
 
     // Check
@@ -156,7 +157,7 @@ TEST_F(EnergyPlusFixture, SimAirServingZones_ReheatCoilSizing)
     CalcSysSizing.deallocate();
     FinalSysSizing.deallocate();
     FinalZoneSizing.deallocate();
-    state.dataAirSystemsData->PrimaryAirSystems.deallocate();
+    state->dataAirSystemsData->PrimaryAirSystems.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, SimAirServingZones_LimitZoneVentEff)
@@ -245,7 +246,7 @@ TEST_F(EnergyPlusFixture, SizingSystem_FlowPerCapacityMethodTest1)
     // scale cooling flow rate using user input capacity
     ScaledCoolDesignFlowRate = FinalSysSizing(AirLoopNum).ScaledCoolingCapacity * FinalSysSizing(AirLoopNum).FlowPerCoolingCapacity;
     // do scalable flow sizing
-    UpdateSysSizingForScalableInputs(state, AirLoopNum);
+    UpdateSysSizingForScalableInputs(*state, AirLoopNum);
     EXPECT_DOUBLE_EQ(0.755125, ScaledCoolDesignFlowRate);
     EXPECT_DOUBLE_EQ(0.755125, FinalSysSizing(AirLoopNum).InpDesCoolAirFlow);
 
@@ -257,7 +258,7 @@ TEST_F(EnergyPlusFixture, SizingSystem_FlowPerCapacityMethodTest1)
     // scale heating flow rate using user input capacity
     ScaledHeatDesignFlowRate = FinalSysSizing(AirLoopNum).ScaledHeatingCapacity * FinalSysSizing(AirLoopNum).FlowPerHeatingCapacity;
     // do scalable flow sizing
-    UpdateSysSizingForScalableInputs(state, AirLoopNum);
+    UpdateSysSizingForScalableInputs(*state, AirLoopNum);
     EXPECT_DOUBLE_EQ(0.869904, ScaledHeatDesignFlowRate);
     EXPECT_DOUBLE_EQ(0.869904, FinalSysSizing(AirLoopNum).InpDesHeatAirFlow);
 }
@@ -286,7 +287,7 @@ TEST_F(EnergyPlusFixture, SizingSystem_FlowPerCapacityMethodTest2)
     ScaledCoolDesignCapacity = FinalSysSizing(AirLoopNum).ScaledCoolingCapacity * FinalSysSizing(AirLoopNum).FloorAreaOnAirLoopCooled;
     ScaledCoolDesignFlowRate = FinalSysSizing(AirLoopNum).FlowPerCoolingCapacity * ScaledCoolDesignCapacity;
     // do scalable flow sizing
-    UpdateSysSizingForScalableInputs(state, AirLoopNum);
+    UpdateSysSizingForScalableInputs(*state, AirLoopNum);
     EXPECT_DOUBLE_EQ(0.038878893558427413, ScaledCoolDesignFlowRate);
     EXPECT_DOUBLE_EQ(0.038878893558427413, FinalSysSizing(AirLoopNum).InpDesCoolAirFlow);
 
@@ -300,7 +301,7 @@ TEST_F(EnergyPlusFixture, SizingSystem_FlowPerCapacityMethodTest2)
     ScaledHeatDesignCapacity = FinalSysSizing(AirLoopNum).ScaledHeatingCapacity * FinalSysSizing(AirLoopNum).FloorAreaOnAirLoopCooled;
     ScaledHeatDesignFlowRate = FinalSysSizing(AirLoopNum).FlowPerHeatingCapacity * ScaledHeatDesignCapacity;
     // do scalable flow sizing
-    UpdateSysSizingForScalableInputs(state, AirLoopNum);
+    UpdateSysSizingForScalableInputs(*state, AirLoopNum);
     EXPECT_DOUBLE_EQ(0.11880981823487276, ScaledHeatDesignFlowRate);
     EXPECT_DOUBLE_EQ(0.11880981823487276, FinalSysSizing(AirLoopNum).InpDesHeatAirFlow);
 }
@@ -464,12 +465,12 @@ TEST_F(EnergyPlusFixture, GetAirPathData_ControllerLockout1)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    SimAirServingZones::GetAirPathData(state);
+    SimAirServingZones::GetAirPathData(*state);
 
     // 2 controllers on this AHU for 2 water coils on the branch
     // CanBeLockedOutByEcono should be false for both controller in this test
-    EXPECT_FALSE(state.dataAirSystemsData->PrimaryAirSystems(1).CanBeLockedOutByEcono(1));
-    EXPECT_FALSE(state.dataAirSystemsData->PrimaryAirSystems(1).CanBeLockedOutByEcono(2));
+    EXPECT_FALSE(state->dataAirSystemsData->PrimaryAirSystems(1).CanBeLockedOutByEcono(1));
+    EXPECT_FALSE(state->dataAirSystemsData->PrimaryAirSystems(1).CanBeLockedOutByEcono(2));
 }
 
 TEST_F(EnergyPlusFixture, GetAirPathData_ControllerLockout2)
@@ -624,13 +625,13 @@ TEST_F(EnergyPlusFixture, GetAirPathData_ControllerLockout2)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    SimAirServingZones::GetAirPathData(state);
+    SimAirServingZones::GetAirPathData(*state);
 
     // 2 controllers on this AHU for 2 water coils in the OA system
     // CanBeLockedOutByEcono should be false for the heating coil controller #1 in this test
     // CanBeLockedOutByEcono should be true for the cooling coil controller #2 in this test
-    EXPECT_FALSE(state.dataAirSystemsData->PrimaryAirSystems(1).CanBeLockedOutByEcono(1));
-    EXPECT_TRUE(state.dataAirSystemsData->PrimaryAirSystems(1).CanBeLockedOutByEcono(2));
+    EXPECT_FALSE(state->dataAirSystemsData->PrimaryAirSystems(1).CanBeLockedOutByEcono(1));
+    EXPECT_TRUE(state->dataAirSystemsData->PrimaryAirSystems(1).CanBeLockedOutByEcono(2));
 }
 
 TEST_F(EnergyPlusFixture, InitAirLoops_1AirLoop2ADU)
@@ -776,24 +777,24 @@ TEST_F(EnergyPlusFixture, InitAirLoops_1AirLoop2ADU)
 
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
-    HeatBalanceManager::GetZoneData(state, ErrorsFound);
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     EXPECT_TRUE(compare_err_stream(""));
-    DataZoneEquipment::GetZoneEquipmentData1(state);
+    DataZoneEquipment::GetZoneEquipmentData1(*state);
     EXPECT_TRUE(compare_err_stream(""));
     ASSERT_FALSE(ErrorsFound);
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state);
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
     EXPECT_TRUE(compare_err_stream(""));
     ASSERT_FALSE(ErrorsFound);
-    SingleDuct::GetSysInput(state);
+    SingleDuct::GetSysInput(*state);
     EXPECT_TRUE(compare_err_stream(""));
     ASSERT_FALSE(ErrorsFound);
-    SplitterComponent::GetSplitterInput(state);
+    SplitterComponent::GetSplitterInput(*state);
     EXPECT_TRUE(compare_err_stream(""));
-    SimAirServingZones::GetAirPathData(state);
+    SimAirServingZones::GetAirPathData(*state);
     // Expect warnings about no controllers, clear err_stream
     EXPECT_TRUE(has_err_output(true));
-    SimAirServingZones::InitAirLoops(state, true);
+    SimAirServingZones::InitAirLoops(*state, true);
     EXPECT_TRUE(compare_err_stream(""));
     ASSERT_FALSE(ErrorsFound);
     // And finally, all of this gymnastics just to check if the airloopnums get set correctly
@@ -1008,24 +1009,24 @@ TEST_F(EnergyPlusFixture, InitAirLoops_2AirLoop2ADU)
 
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
-    HeatBalanceManager::GetZoneData(state, ErrorsFound);
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     EXPECT_TRUE(compare_err_stream(""));
-    DataZoneEquipment::GetZoneEquipmentData1(state);
+    DataZoneEquipment::GetZoneEquipmentData1(*state);
     EXPECT_TRUE(compare_err_stream(""));
     ASSERT_FALSE(ErrorsFound);
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state);
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
     EXPECT_TRUE(compare_err_stream(""));
     ASSERT_FALSE(ErrorsFound);
-    SingleDuct::GetSysInput(state);
+    SingleDuct::GetSysInput(*state);
     EXPECT_TRUE(compare_err_stream(""));
     ASSERT_FALSE(ErrorsFound);
-    SplitterComponent::GetSplitterInput(state);
+    SplitterComponent::GetSplitterInput(*state);
     EXPECT_TRUE(compare_err_stream(""));
-    SimAirServingZones::GetAirPathData(state);
+    SimAirServingZones::GetAirPathData(*state);
     // Expect warnings about no controllers, clear err_stream
     EXPECT_TRUE(has_err_output(true));
-    SimAirServingZones::InitAirLoops(state, true);
+    SimAirServingZones::InitAirLoops(*state, true);
     EXPECT_TRUE(compare_err_stream(""));
     ASSERT_FALSE(ErrorsFound);
     // And finally, all of this gymnastics just to check if the airloopnums get set correctly
@@ -1273,24 +1274,24 @@ TEST_F(EnergyPlusFixture, InitAirLoops_2AirLoop3ADUa)
 
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
-    HeatBalanceManager::GetZoneData(state, ErrorsFound);
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     EXPECT_TRUE(compare_err_stream(""));
-    DataZoneEquipment::GetZoneEquipmentData1(state);
+    DataZoneEquipment::GetZoneEquipmentData1(*state);
     EXPECT_TRUE(compare_err_stream(""));
     ASSERT_FALSE(ErrorsFound);
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state);
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
     EXPECT_TRUE(compare_err_stream(""));
     ASSERT_FALSE(ErrorsFound);
-    SingleDuct::GetSysInput(state);
+    SingleDuct::GetSysInput(*state);
     EXPECT_TRUE(compare_err_stream(""));
     ASSERT_FALSE(ErrorsFound);
-    SplitterComponent::GetSplitterInput(state);
+    SplitterComponent::GetSplitterInput(*state);
     EXPECT_TRUE(compare_err_stream(""));
-    SimAirServingZones::GetAirPathData(state);
+    SimAirServingZones::GetAirPathData(*state);
     // Expect warnings about no controllers, clear err_stream
     EXPECT_TRUE(has_err_output(true));
-    SimAirServingZones::InitAirLoops(state, true);
+    SimAirServingZones::InitAirLoops(*state, true);
     EXPECT_TRUE(compare_err_stream(""));
     ASSERT_FALSE(ErrorsFound);
     // And finally, all of this gymnastics just to check if the airloopnums get set correctly
@@ -1539,24 +1540,24 @@ TEST_F(EnergyPlusFixture, InitAirLoops_2AirLoop3ADUb)
 
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
-    HeatBalanceManager::GetZoneData(state, ErrorsFound);
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     EXPECT_TRUE(compare_err_stream(""));
-    DataZoneEquipment::GetZoneEquipmentData1(state);
+    DataZoneEquipment::GetZoneEquipmentData1(*state);
     EXPECT_TRUE(compare_err_stream(""));
     ASSERT_FALSE(ErrorsFound);
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state);
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
     EXPECT_TRUE(compare_err_stream(""));
     ASSERT_FALSE(ErrorsFound);
-    SingleDuct::GetSysInput(state);
+    SingleDuct::GetSysInput(*state);
     EXPECT_TRUE(compare_err_stream(""));
     ASSERT_FALSE(ErrorsFound);
-    SplitterComponent::GetSplitterInput(state);
+    SplitterComponent::GetSplitterInput(*state);
     EXPECT_TRUE(compare_err_stream(""));
-    SimAirServingZones::GetAirPathData(state);
+    SimAirServingZones::GetAirPathData(*state);
     // Expect warnings about no controllers, clear err_stream
     EXPECT_TRUE(has_err_output(true));
-    SimAirServingZones::InitAirLoops(state, true);
+    SimAirServingZones::InitAirLoops(*state, true);
     EXPECT_TRUE(compare_err_stream(""));
     ASSERT_FALSE(ErrorsFound);
     // And finally, all of this gymnastics just to check if the airloopnums get set correctly

@@ -105,8 +105,6 @@ namespace ThermalChimney {
     // Use statements for access to subroutines in other modules
     using namespace Psychrometrics;
 
-    static std::string const BlankString;
-
     void ManageThermalChimney(EnergyPlusData &state)
     {
 
@@ -151,7 +149,7 @@ namespace ThermalChimney {
         // stores it in the ThermalChimney data structure.
 
         // Using/Aliasing
-        using General::RoundSigDigits;
+
         using ScheduleManager::GetScheduleIndex;
         using namespace DataIPShortCuts;
 
@@ -226,22 +224,34 @@ namespace ThermalChimney {
 
             state.dataThermalChimneys->ThermalChimneySys(Loop).AbsorberWallWidth = rNumericArgs(1);
             if (state.dataThermalChimneys->ThermalChimneySys(Loop).AbsorberWallWidth < 0.0) {
-                ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid " + cNumericFieldNames(1) +
-                                " must be >= 0, entered value=[" + RoundSigDigits(rNumericArgs(1), 2) + "].");
+                ShowSevereError(state,
+                                format("{}=\"{} invalid {} must be >= 0, entered value=[{:.2R}].",
+                                       cCurrentModuleObject,
+                                       cAlphaArgs(1),
+                                       cNumericFieldNames(1),
+                                       rNumericArgs(1)));
                 ErrorsFound = true;
             }
 
             state.dataThermalChimneys->ThermalChimneySys(Loop).AirOutletCrossArea = rNumericArgs(2);
             if (state.dataThermalChimneys->ThermalChimneySys(Loop).AirOutletCrossArea < 0.0) {
-                ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid " + cNumericFieldNames(2) +
-                                " must be >= 0, entered value=[" + RoundSigDigits(rNumericArgs(2), 2) + "].");
+                ShowSevereError(state,
+                                format("{}=\"{} invalid {} must be >= 0, entered value=[{:.2R}].",
+                                       cCurrentModuleObject,
+                                       cAlphaArgs(1),
+                                       cNumericFieldNames(2),
+                                       rNumericArgs(2)));
                 ErrorsFound = true;
             }
 
             state.dataThermalChimneys->ThermalChimneySys(Loop).DischargeCoeff = rNumericArgs(3);
             if ((state.dataThermalChimneys->ThermalChimneySys(Loop).DischargeCoeff <= 0.0) || (state.dataThermalChimneys->ThermalChimneySys(Loop).DischargeCoeff > 1.0)) {
-                ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid " + cNumericFieldNames(3) +
-                                " must be > 0 and <=1.0, entered value=[" + RoundSigDigits(rNumericArgs(3), 2) + "].");
+                ShowSevereError(state,
+                                format("{}=\"{} invalid {} must be > 0 and <=1.0, entered value=[{:.2R}].",
+                                       cCurrentModuleObject,
+                                       cAlphaArgs(1),
+                                       cNumericFieldNames(3),
+                                       rNumericArgs(3)));
                 ErrorsFound = true;
             }
 
@@ -275,21 +285,33 @@ namespace ThermalChimney {
                 }
 
                 if (state.dataThermalChimneys->ThermalChimneySys(Loop).DistanceThermChimInlet(TCZoneNum) < 0.0) {
-                    ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid " + cNumericFieldNames(3 * TCZoneNum + 1) +
-                                    " must be >= 0, entered value=[" + RoundSigDigits(rNumericArgs(3 * TCZoneNum + 1), 2) + "].");
+                    ShowSevereError(state,
+                                    format("{}=\"{} invalid {} must be >= 0, entered value=[{:.2R}].",
+                                           cCurrentModuleObject,
+                                           cAlphaArgs(1),
+                                           cNumericFieldNames(3 * TCZoneNum + 1),
+                                           rNumericArgs(3 * TCZoneNum + 1)));
                     ErrorsFound = true;
                 }
 
                 if ((state.dataThermalChimneys->ThermalChimneySys(Loop).RatioThermChimAirFlow(TCZoneNum) <= 0.0) ||
                     (state.dataThermalChimneys->ThermalChimneySys(Loop).RatioThermChimAirFlow(TCZoneNum) > 1.0)) {
-                    ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid " + cNumericFieldNames(3 * TCZoneNum + 2) +
-                                    " must be > 0 and <=1.0, entered value=[" + RoundSigDigits(rNumericArgs(3 * TCZoneNum + 2), 2) + "].");
+                    ShowSevereError(state,
+                                    format("{}=\"{} invalid {} must be > 0 and <=1.0, entered value=[{:.2R}].",
+                                           cCurrentModuleObject,
+                                           cAlphaArgs(1),
+                                           cNumericFieldNames(3 * TCZoneNum + 2),
+                                           rNumericArgs(3 * TCZoneNum + 2)));
                     ErrorsFound = true;
                 }
 
                 if (state.dataThermalChimneys->ThermalChimneySys(Loop).EachAirInletCrossArea(TCZoneNum) < 0.0) {
-                    ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid " + cNumericFieldNames(3 * TCZoneNum + 3) +
-                                    " must be >= 0, entered value=[" + RoundSigDigits(rNumericArgs(3 * TCZoneNum + 3), 2) + "].");
+                    ShowSevereError(state,
+                                    format("{}=\"{} invalid {} must be >= 0, entered value=[{:.2R}].",
+                                           cCurrentModuleObject,
+                                           cAlphaArgs(1),
+                                           cNumericFieldNames(3 * TCZoneNum + 3),
+                                           rNumericArgs(3 * TCZoneNum + 3)));
                     ErrorsFound = true;
                 }
 
@@ -299,9 +321,11 @@ namespace ThermalChimney {
 
             // Error trap if the sum of fractions is not equal to 1.0
             if (std::abs(AllRatiosSummed - 1.0) > FlowFractionTolerance) {
-                ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
-                                " invalid sum of fractions, must be =1.0, entered value (summed from entries)=[" +
-                                RoundSigDigits(AllRatiosSummed, 4) + "].");
+                ShowSevereError(state,
+                                format("{}=\"{} invalid sum of fractions, must be =1.0, entered value (summed from entries)=[{:.4R}].",
+                                       cCurrentModuleObject,
+                                       cAlphaArgs(1),
+                                       AllRatiosSummed));
                 ErrorsFound = true;
             }
 

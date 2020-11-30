@@ -58,6 +58,7 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <ObjexxFCL/string.functions.hh>
 #include <ObjexxFCL/Array1D.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 

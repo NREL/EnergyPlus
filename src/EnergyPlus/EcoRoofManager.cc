@@ -60,14 +60,12 @@
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
-#include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataWater.hh>
 #include <EnergyPlus/EcoRoofManager.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/Material.hh>
 #include <EnergyPlus/OutputProcessor.hh>
-#include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -97,7 +95,6 @@ namespace EcoRoofManager {
     // Use statements for data only modules
     // Using/Aliasing
     using namespace DataSurfaces;
-    using namespace DataLoopNode;
     using namespace DataHeatBalance;
 
     Real64 CumRunoff(0.0); // Cumulative runoff, updated each time step (m) mult by roof area to get volume
@@ -158,7 +155,6 @@ namespace EcoRoofManager {
         using namespace DataHeatBalance;
         using namespace DataHeatBalSurface;
         using namespace DataSurfaces;
-        using namespace Psychrometrics;
         using ConvectionCoefficients::InitExteriorConvectionCoeff;
         using ConvectionCoefficients::SetExtConvectionCoeff;
         using ConvectionCoefficients::SetIntConvectionCoeff;
@@ -703,7 +699,6 @@ namespace EcoRoofManager {
         // Using/Aliasing
         using namespace DataEnvironment;
         using namespace DataSurfaces;
-        using General::RoundSigDigits;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -804,16 +799,20 @@ namespace EcoRoofManager {
                     ShowWarningError(state,
                                      "CalcEcoRoof: Too few time steps per hour for stability.");
                     if (ceil(60 * index1 / state.dataGlobal->MinutesPerTimeStep) <= 60) {
-                        ShowContinueError(state, "...Entered Timesteps per hour=[" + RoundSigDigits(state.dataGlobal->NumOfTimeStepInHour) +
-                                          "], Change to some value greater than or equal to [" + RoundSigDigits(60 * index1 / state.dataGlobal->MinutesPerTimeStep) +
-                                          "] for assured stability.");
+                        ShowContinueError(
+                            state,
+                            format("...Entered Timesteps per hour=[{}], Change to some value greater than or equal to [{}] for assured stability.",
+                                   state.dataGlobal->NumOfTimeStepInHour,
+                                   60 * index1 / state.dataGlobal->MinutesPerTimeStep));
                         ShowContinueError(state, "...Note that EnergyPlus has a maximum of 60 timesteps per hour");
                         ShowContinueError(state, "...The program will continue, but if the simulation fails due to too low/high temperatures, instability "
                                           "here could be the reason.");
                     } else {
-                        ShowContinueError(state, "...Entered Timesteps per hour=[" + RoundSigDigits(state.dataGlobal->NumOfTimeStepInHour) +
-                                          "], however the required frequency for stability [" + RoundSigDigits(60 * index1 / state.dataGlobal->MinutesPerTimeStep) +
-                                          "] is over the EnergyPlus maximum of 60.");
+                        ShowContinueError(state,
+                                          format("...Entered Timesteps per hour=[{}], however the required frequency for stability [{}] is over the "
+                                                 "EnergyPlus maximum of 60.",
+                                                 state.dataGlobal->NumOfTimeStepInHour,
+                                                 60 * index1 / state.dataGlobal->MinutesPerTimeStep));
                         ShowContinueError(state, "...Consider using the simple moisture diffusion calculation method for this application");
                         ShowContinueError(state, "...The program will continue, but if the simulation fails due to too low/high temperatures, instability "
                                           "here could be the reason.");
@@ -951,8 +950,9 @@ namespace EcoRoofManager {
             RelativeSoilSaturationTop = (Moisture - MoistureResidual) / (MoistureMax - MoistureResidual);
             if (RelativeSoilSaturationTop < 0.0001) {
                 if (ErrIndex == 0) {
-                    ShowWarningMessage(state, "EcoRoof: UpdateSoilProps: Relative Soil Saturation Top Moisture <= 0.0001, Value=[" +
-                                       RoundSigDigits(RelativeSoilSaturationTop, 5) + "].");
+                    ShowWarningMessage(state,
+                                       format("EcoRoof: UpdateSoilProps: Relative Soil Saturation Top Moisture <= 0.0001, Value=[{:.5R}].",
+                                              RelativeSoilSaturationTop));
                     ShowContinueError(state, "Value is set to 0.0001 and simulation continues.");
                     ShowContinueError(state, "You may wish to increase the number of timesteps to attempt to alleviate the problem.");
                 }

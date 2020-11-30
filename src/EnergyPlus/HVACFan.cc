@@ -62,7 +62,6 @@
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Fans.hh> // used for fault model routine CalFaultyFanAirFlowReduction
 #include <EnergyPlus/FaultsManager.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -625,7 +624,8 @@ namespace HVACFan {
             SetupOutputVariable(state, "Fan Runtime Fraction", OutputProcessor::Unit::None, m_fanRunTimeFractionAtSpeed[0], "System", "Average", name);
         } else if (speedControl == SpeedControlMethod::Discrete && m_numSpeeds > 1) {
             for (auto speedLoop = 0; speedLoop < m_numSpeeds; ++speedLoop) {
-                SetupOutputVariable(state, "Fan Runtime Fraction Speed " + General::TrimSigDigits(speedLoop + 1) + "",
+                SetupOutputVariable(state,
+                                    "Fan Runtime Fraction Speed " + fmt::to_string(speedLoop + 1),
                                     OutputProcessor::Unit::None,
                                     m_fanRunTimeFractionAtSpeed[speedLoop],
                                     "System",
@@ -1054,10 +1054,10 @@ namespace HVACFan {
         // make sure inlet has the same mass flow
         DataLoopNode::Node(inletNodeNum).MassFlowRate = m_outletAirMassFlowRate;
 
-        if (DataContaminantBalance::Contaminant.CO2Simulation) {
+        if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
             DataLoopNode::Node(outletNodeNum).CO2 = DataLoopNode::Node(inletNodeNum).CO2;
         }
-        if (DataContaminantBalance::Contaminant.GenericContamSimulation) {
+        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
             DataLoopNode::Node(outletNodeNum).GenContam = DataLoopNode::Node(inletNodeNum).GenContam;
         }
 

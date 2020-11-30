@@ -54,10 +54,12 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/ChillerAbsorption.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/SimulationManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -1773,15 +1775,15 @@ TEST_F(EnergyPlusFixture, ChillerAbsorption_Calc)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    SimulationManager::ManageSimulation(state); // run the design day
+    SimulationManager::ManageSimulation(*state); // run the design day
 
     // set conditions for test
     int AbsChillNum = 1;
-    int EquipFlowCtrl = 1;
+    DataBranchAirLoopPlant::ControlTypeEnum EquipFlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
     Real64 AbsChillEvapLoad;
     bool AbsChillRunFlag = true;
     // check chiller inputs
-    auto &thisChiller = state.dataChillerAbsorber->absorptionChillers(AbsChillNum);
+    auto &thisChiller = state->dataChillerAbsorber->absorptionChillers(AbsChillNum);
     EXPECT_EQ(thisChiller.NomCap, 100000.0);
     EXPECT_EQ(thisChiller.FlowMode, DataPlant::FlowMode::LEAVINGSETPOINTMODULATED);
     // define local var
@@ -1817,7 +1819,7 @@ TEST_F(EnergyPlusFixture, ChillerAbsorption_Calc)
     PlantLoop(GenLoopNum).LoopSide(GenLoopSideNum).FlowLock = 0;
     // run CalcBLASTAbsorberModel
     thisChiller.EquipFlowCtrl = EquipFlowCtrl;
-    thisChiller.calculate(state, AbsChillEvapLoad, AbsChillRunFlag);
+    thisChiller.calculate(*state, AbsChillEvapLoad, AbsChillRunFlag);
     // check generator hot water mass flow rate is proportional to the chilled water flow rate
     EXPECT_EQ(DataLoopNode::Node(GeneratorInletNode).MassFlowRate, GenMassFlowRateTestResult);
     EXPECT_EQ(DataLoopNode::Node(GeneratorOutletNode).MassFlowRate, GenMassFlowRateTestResult);
