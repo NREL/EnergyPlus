@@ -238,7 +238,6 @@ namespace CostEstimateManager {
         using DataPhotovoltaics::PVarray;
         using DataSurfaces::Surface;
         using DXCoils::DXCoil;
-        using namespace DataDaylighting;
         using HeatingCoils::HeatingCoil;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -385,7 +384,7 @@ namespace CostEstimateManager {
                     } else {
                         ThisZoneID = UtilityRoutines::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName, Zone);
                         if (ThisZoneID > 0) {
-                            state.dataCostEstimateManager->CostLineItem(Item).Qty = ZoneDaylight(ThisZoneID).TotalDaylRefPoints;
+                            state.dataCostEstimateManager->CostLineItem(Item).Qty = state.dataDaylightingData->ZoneDaylight(ThisZoneID).TotalDaylRefPoints;
                         } else {
                             ShowSevereError(state, "ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
                                             "\", Daylighting:Controls, need to specify a valid zone name");
@@ -500,7 +499,6 @@ namespace CostEstimateManager {
         using DataSurfaces::TotSurfaces;
         using DXCoils::DXCoil;
         using DXCoils::NumDXCoils;
-        using namespace DataDaylighting;
         using HeatingCoils::HeatingCoil;
         using HeatingCoils::NumHeatingCoils;
 
@@ -708,11 +706,11 @@ namespace CostEstimateManager {
                 } else if (SELECT_CASE_var == "DAYLIGHTING:CONTROLS") {
 
                     if (state.dataCostEstimateManager->CostLineItem(Item).ParentObjName == "*") { // wildcard, apply to all such components
-                        state.dataCostEstimateManager->CostLineItem(Item).Qty = sum(ZoneDaylight, &ZoneDaylightCalc::TotalDaylRefPoints);
+                        state.dataCostEstimateManager->CostLineItem(Item).Qty = sum(state.dataDaylightingData->ZoneDaylight, &DataDaylighting::ZoneDaylightCalc::TotalDaylRefPoints);
                     } else if (!state.dataCostEstimateManager->CostLineItem(Item).ParentObjName.empty()) {
                         ThisZoneID = UtilityRoutines::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName, Zone);
                         if (ThisZoneID > 0) {
-                            state.dataCostEstimateManager->CostLineItem(Item).Qty = ZoneDaylight(ThisZoneID).TotalDaylRefPoints;
+                            state.dataCostEstimateManager->CostLineItem(Item).Qty = state.dataDaylightingData->ZoneDaylight(ThisZoneID).TotalDaylRefPoints;
                         }
                     }
 
