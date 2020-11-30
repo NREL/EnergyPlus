@@ -15694,7 +15694,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_ScheduleInterpolationTest)
         "1,                       !- Start Day 1",
         "12,                      !- End Month 1",
         "31;                      !- End Day 1",
-        // End of problem issue
+        // End of problem schedule
 
         "Schedule:Compact,",
         "  AlwaysOne,                      !- Name",
