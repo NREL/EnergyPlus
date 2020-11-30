@@ -910,11 +910,11 @@ namespace DataSurfaces {
                     temperature = OutWetBulbTemp;
                 } else {
                     // Dry
-                    temperature = state.dataEnvrn->OutDryBulbTemp;
+                    temperature = OutDryBulbTemp;
                 }
             } else {
                 // Window not exposed to wind
-                temperature = state.dataEnvrn->OutDryBulbTemp;
+                temperature = OutDryBulbTemp;
             }
         }
 
