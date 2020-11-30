@@ -466,7 +466,6 @@ namespace HVACVariableRefrigerantFlow {
         using CurveManager::CurveValue;
         using DataEnvironment::CurMnDy;
         using DataEnvironment::EnvironmentName;
-        using DataEnvironment::OutWetBulbTemp;
         using DXCoils::DXCoilCoolInletAirWBTemp;
         using DXCoils::DXCoilHeatInletAirDBTemp;
         using DXCoils::DXCoilHeatInletAirWBTemp;
@@ -574,13 +573,13 @@ namespace HVACVariableRefrigerantFlow {
             } else {
                 OutdoorHumRat = state.dataEnvrn->OutHumRat;
                 OutdoorPressure = state.dataEnvrn->OutBaroPress;
-                OutdoorWetBulb = OutWetBulbTemp;
+                OutdoorWetBulb = state.dataEnvrn->OutWetBulbTemp;
             }
         } else {
             OutdoorDryBulb = state.dataEnvrn->OutDryBulbTemp;
             OutdoorHumRat = state.dataEnvrn->OutHumRat;
             OutdoorPressure = state.dataEnvrn->OutBaroPress;
-            OutdoorWetBulb = OutWetBulbTemp;
+            OutdoorWetBulb = state.dataEnvrn->OutWetBulbTemp;
         }
 
         if (VRF(VRFCond).CondenserType == DataHVACGlobals::AirCooled) {
@@ -10383,7 +10382,6 @@ namespace HVACVariableRefrigerantFlow {
         using CurveManager::CurveValue;
         using DataEnvironment::CurMnDy;
         using DataEnvironment::EnvironmentName;
-        using DataEnvironment::OutWetBulbTemp;
         using DXCoils::DXCoil;
         using DXCoils::DXCoilCoolInletAirWBTemp;
         using DXCoils::DXCoilHeatInletAirDBTemp;
@@ -10629,13 +10627,13 @@ namespace HVACVariableRefrigerantFlow {
             } else {
                 OutdoorHumRat = state.dataEnvrn->OutHumRat;
                 OutdoorPressure = state.dataEnvrn->OutBaroPress;
-                OutdoorWetBulb = OutWetBulbTemp;
+                OutdoorWetBulb = state.dataEnvrn->OutWetBulbTemp;
             }
         } else {
             OutdoorDryBulb = state.dataEnvrn->OutDryBulbTemp;
             OutdoorHumRat = state.dataEnvrn->OutHumRat;
             OutdoorPressure = state.dataEnvrn->OutBaroPress;
-            OutdoorWetBulb = OutWetBulbTemp;
+            OutdoorWetBulb = state.dataEnvrn->OutWetBulbTemp;
         }
         RhoAir = PsyRhoAirFnPbTdbW(state, OutdoorPressure, OutdoorDryBulb, OutdoorHumRat);
 

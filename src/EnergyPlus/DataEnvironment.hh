@@ -68,8 +68,6 @@ namespace DataEnvironment {
     Real64 constexpr StdPressureSeaLevel(101325.0);   // Standard barometric pressure at sea level (Pa)
 
     // MODULE VARIABLE DECLARATIONS:
-    extern Real64 OutAirDensity;                   // Current outdoor air density
-    extern Real64 OutWetBulbTemp;                  // Current outdoor air wet bulb temperature
     extern Real64 OutDewPointTemp;                 // Current outdoor dewpoint temperature
     extern bool EMSOutDewPointTempOverrideOn;      // EMS flag for outdoor dewpoint temperature
     extern Real64 EMSOutDewPointTempOverrideValue; // EMS override value for outdoor dewpoint temperature
@@ -213,6 +211,8 @@ struct EnvironmentData : BaseGlobalStruct {
     bool EMSOutRelHumOverrideOn = false;                // EMS flag for outdoor relative humidity value
     Real64 EMSOutRelHumOverrideValue = 0.0;             // EMS override value for outdoor relative humidity value
     Real64 OutEnthalpy = 0.0;                           // Current outdoor enthalpy
+    Real64 OutAirDensity = 0.0;                         // Current outdoor air density
+    Real64 OutWetBulbTemp = 0.0;                        // Current outdoor air wet bulb temperature
 
     void clear_state() override
     {
@@ -258,6 +258,8 @@ struct EnvironmentData : BaseGlobalStruct {
         this->EMSOutRelHumOverrideOn = false;
         this->EMSOutRelHumOverrideValue = 0.0;
         this->OutEnthalpy = 0.0;
+        this->OutAirDensity = 0.0;
+        this->OutWetBulbTemp = 0.0;
     }
 };
 

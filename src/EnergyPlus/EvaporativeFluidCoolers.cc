@@ -1152,7 +1152,7 @@ namespace EvaporativeFluidCoolers {
             this->inletConds.AirTemp = state.dataEnvrn->OutDryBulbTemp;
             this->inletConds.AirHumRat = state.dataEnvrn->OutHumRat;
             this->inletConds.AirPress = state.dataEnvrn->OutBaroPress;
-            this->inletConds.AirWetBulb = DataEnvironment::OutWetBulbTemp;
+            this->inletConds.AirWetBulb = state.dataEnvrn->OutWetBulbTemp;
         }
 
         this->WaterMassFlowRate =

@@ -231,7 +231,7 @@ TEST_F(EnergyPlusFixture, TranspiredCollectors_InitTranspiredCollectorTest)
     EXPECT_FALSE(ErrorsFound);   // expect no errors
 
     state->dataEnvrn->OutDryBulbTemp = 20.0;
-    DataEnvironment::OutWetBulbTemp = 15.0;
+    state->dataEnvrn->OutWetBulbTemp = 15.0;
 
     SetSurfaceOutBulbTempAt(*state);
 

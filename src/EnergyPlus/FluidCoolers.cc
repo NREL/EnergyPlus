@@ -769,7 +769,7 @@ namespace FluidCoolers {
             this->AirTemp = state.dataEnvrn->OutDryBulbTemp;
             this->AirHumRat = state.dataEnvrn->OutHumRat;
             this->AirPress = state.dataEnvrn->OutBaroPress;
-            this->AirWetBulb = DataEnvironment::OutWetBulbTemp;
+            this->AirWetBulb = state.dataEnvrn->OutWetBulbTemp;
         }
 
         this->WaterMassFlowRate = PlantUtilities::RegulateCondenserCompFlowReqOp(

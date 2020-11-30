@@ -115,7 +115,6 @@ namespace PackagedThermalStorageCoil {
     using namespace Psychrometrics;
     using DataEnvironment::CurMnDy;
     using DataEnvironment::EnvironmentName;
-    using DataEnvironment::OutWetBulbTemp;
     using DataEnvironment::StdBaroPress;
     using namespace CurveManager;
 
@@ -2571,7 +2570,7 @@ namespace PackagedThermalStorageCoil {
                 OutdoorDryBulb = state.dataEnvrn->OutDryBulbTemp;
                 OutdoorHumRat = state.dataEnvrn->OutHumRat;
                 CondAirSidePressure = state.dataEnvrn->OutBaroPress;
-                OutdoorWetBulb = OutWetBulbTemp;
+                OutdoorWetBulb = state.dataEnvrn->OutWetBulbTemp;
             } else {
                 OutdoorDryBulb = Node(TESCoil(TESCoilNum).CondAirInletNodeNum).Temp;
                 OutdoorHumRat = Node(TESCoil(TESCoilNum).CondAirInletNodeNum).HumRat;
@@ -2894,7 +2893,7 @@ namespace PackagedThermalStorageCoil {
                 OutdoorDryBulb = state.dataEnvrn->OutDryBulbTemp;
                 OutdoorHumRat = state.dataEnvrn->OutHumRat;
                 CondAirSidePressure = state.dataEnvrn->OutBaroPress;
-                OutdoorWetBulb = OutWetBulbTemp;
+                OutdoorWetBulb = state.dataEnvrn->OutWetBulbTemp;
             } else {
                 OutdoorDryBulb = Node(TESCoil(TESCoilNum).CondAirInletNodeNum).Temp;
                 OutdoorHumRat = Node(TESCoil(TESCoilNum).CondAirInletNodeNum).HumRat;
@@ -3329,7 +3328,7 @@ namespace PackagedThermalStorageCoil {
                 OutdoorDryBulb = state.dataEnvrn->OutDryBulbTemp;
                 OutdoorHumRat = state.dataEnvrn->OutHumRat;
                 CondAirSidePressure = state.dataEnvrn->OutBaroPress;
-                OutdoorWetBulb = OutWetBulbTemp;
+                OutdoorWetBulb = state.dataEnvrn->OutWetBulbTemp;
             } else {
                 OutdoorDryBulb = Node(TESCoil(TESCoilNum).CondAirInletNodeNum).Temp;
                 OutdoorHumRat = Node(TESCoil(TESCoilNum).CondAirInletNodeNum).HumRat;
@@ -3678,7 +3677,7 @@ namespace PackagedThermalStorageCoil {
                 OutdoorDryBulb = state.dataEnvrn->OutDryBulbTemp;
                 OutdoorHumRat = state.dataEnvrn->OutHumRat;
                 CondAirSidePressure = state.dataEnvrn->OutBaroPress;
-                OutdoorWetBulb = OutWetBulbTemp;
+                OutdoorWetBulb = state.dataEnvrn->OutWetBulbTemp;
             } else {
                 OutdoorDryBulb = Node(TESCoil(TESCoilNum).CondAirInletNodeNum).Temp;
                 OutdoorHumRat = Node(TESCoil(TESCoilNum).CondAirInletNodeNum).HumRat;

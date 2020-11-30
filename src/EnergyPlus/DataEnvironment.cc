@@ -71,8 +71,6 @@ namespace DataEnvironment {
     // current weather variables)
 
     // MODULE VARIABLE DECLARATIONS:
-    Real64 OutAirDensity;                     // Current outdoor air density
-    Real64 OutWetBulbTemp;                    // Current outdoor air wet bulb temperature
     Real64 OutDewPointTemp;                   // Current outdoor dewpoint temperature
     bool EMSOutDewPointTempOverrideOn(false); // EMS flag for outdoor dewpoint temperature
     Real64 EMSOutDewPointTempOverrideValue;   // EMS override value for outdoor dewpoint temperature
@@ -158,8 +156,6 @@ namespace DataEnvironment {
 
     void clear_state()
     {
-        OutAirDensity = Real64();
-        OutWetBulbTemp = Real64();
         OutDewPointTemp = Real64();
         EMSOutDewPointTempOverrideOn = false;
         EMSOutDewPointTempOverrideValue = Real64();
@@ -304,10 +300,10 @@ namespace DataEnvironment {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 BaseTemp; // Base temperature at Z = 0 (C)
 
-        BaseTemp = OutWetBulbTemp + WeatherFileTempModCoeff;
+        BaseTemp = state.dataEnvrn->OutWetBulbTemp + WeatherFileTempModCoeff;
 
         if (SiteTempGradient == 0.0) {
-            LocalOutWetBulbTemp = OutWetBulbTemp;
+            LocalOutWetBulbTemp = state.dataEnvrn->OutWetBulbTemp;
         } else if (Z <= 0.0) {
             LocalOutWetBulbTemp = BaseTemp;
         } else {

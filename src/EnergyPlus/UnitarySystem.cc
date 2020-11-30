@@ -12620,7 +12620,7 @@ namespace UnitarySystems {
             if (this->m_CondenserType == DataHVACGlobals::WaterCooled) {
                 OutdoorHumRat = state.dataEnvrn->OutHumRat;
                 OutdoorPressure = state.dataEnvrn->OutBaroPress;
-                OutdoorWetBulb = DataEnvironment::OutWetBulbTemp;
+                OutdoorWetBulb = state.dataEnvrn->OutWetBulbTemp;
             } else {
                 OutdoorPressure = DataLoopNode::Node(this->m_CondenserNodeNum).Press;
                 // IF node is not connected to anything, pressure = default, use weather data
@@ -12628,7 +12628,7 @@ namespace UnitarySystems {
                     OutdoorDryBulb = state.dataEnvrn->OutDryBulbTemp;
                     OutdoorHumRat = state.dataEnvrn->OutHumRat;
                     OutdoorPressure = state.dataEnvrn->OutBaroPress;
-                    OutdoorWetBulb = DataEnvironment::OutWetBulbTemp;
+                    OutdoorWetBulb = state.dataEnvrn->OutWetBulbTemp;
                 } else {
                     OutdoorHumRat = DataLoopNode::Node(this->m_CondenserNodeNum).HumRat;
                     //     this should use Node%WetBulbTemp or a PSYC function, not OAWB
@@ -12639,7 +12639,7 @@ namespace UnitarySystems {
             OutdoorDryBulb = state.dataEnvrn->OutDryBulbTemp;
             OutdoorHumRat = state.dataEnvrn->OutHumRat;
             OutdoorPressure = state.dataEnvrn->OutBaroPress;
-            OutdoorWetBulb = DataEnvironment::OutWetBulbTemp;
+            OutdoorWetBulb = state.dataEnvrn->OutWetBulbTemp;
         }
 
         // IF there is a fault of coil SAT Sensor

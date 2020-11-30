@@ -604,7 +604,7 @@ namespace OutAirNodeManager {
         if (Node(NodeNum).Height < 0.0) {
             // Note -- this setting is different than the DataEnvironment "AT" settings.
             Node(NodeNum).OutAirDryBulb = state.dataEnvrn->OutDryBulbTemp;
-            Node(NodeNum).OutAirWetBulb = OutWetBulbTemp;
+            Node(NodeNum).OutAirWetBulb = state.dataEnvrn->OutWetBulbTemp;
             if (InitCall) Node(NodeNum).OutAirWindSpeed = WindSpeed;
         } else {
             Node(NodeNum).OutAirDryBulb = OutDryBulbTempAt(state, Node(NodeNum).Height);

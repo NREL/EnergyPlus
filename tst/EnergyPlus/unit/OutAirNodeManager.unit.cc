@@ -72,11 +72,11 @@ TEST_F(EnergyPlusFixture, OutAirNodeManager_OATdbTwbOverrideTest)
     ScheduleManager::Schedule.allocate(2);
 
     state->dataEnvrn->OutDryBulbTemp = 25.0;
-    DataEnvironment::OutWetBulbTemp = 15.0;
+    state->dataEnvrn->OutWetBulbTemp = 15.0;
     DataEnvironment::WindSpeed = 2.0;
     DataEnvironment::WindDir = 0.0;
     state->dataEnvrn->OutBaroPress = 101325;
-    state->dataEnvrn->OutHumRat = Psychrometrics::PsyWFnTdbTwbPb(*state, state->dataEnvrn->OutDryBulbTemp, DataEnvironment::OutWetBulbTemp, state->dataEnvrn->OutBaroPress);
+    state->dataEnvrn->OutHumRat = Psychrometrics::PsyWFnTdbTwbPb(*state, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutWetBulbTemp, state->dataEnvrn->OutBaroPress);
 
     ScheduleManager::Schedule(1).CurrentValue = 24.0;
     OutsideAirNodeList(1) = 1;
@@ -86,7 +86,7 @@ TEST_F(EnergyPlusFixture, OutAirNodeManager_OATdbTwbOverrideTest)
     DataLoopNode::Node(1).IsLocalNode = true;
     DataLoopNode::Node(1).OutAirDryBulbSchedNum = 1;
     DataLoopNode::Node(1).OutAirDryBulb = state->dataEnvrn->OutDryBulbTemp;
-    DataLoopNode::Node(1).OutAirWetBulb = DataEnvironment::OutWetBulbTemp;
+    DataLoopNode::Node(1).OutAirWetBulb = state->dataEnvrn->OutWetBulbTemp;
     // EMS override value
     DataLoopNode::Node(2).IsLocalNode = true;
     DataLoopNode::Node(2).EMSOverrideOutAirDryBulb = true;
@@ -94,10 +94,10 @@ TEST_F(EnergyPlusFixture, OutAirNodeManager_OATdbTwbOverrideTest)
     DataLoopNode::Node(2).EMSValueForOutAirDryBulb = 26.0;
     DataLoopNode::Node(2).EMSValueForOutAirWetBulb = 16.0;
     DataLoopNode::Node(2).OutAirDryBulb = state->dataEnvrn->OutDryBulbTemp;
-    DataLoopNode::Node(2).OutAirWetBulb = DataEnvironment::OutWetBulbTemp;
+    DataLoopNode::Node(2).OutAirWetBulb = state->dataEnvrn->OutWetBulbTemp;
     // No changes
     DataLoopNode::Node(3).OutAirDryBulb = state->dataEnvrn->OutDryBulbTemp;
-    DataLoopNode::Node(3).OutAirWetBulb = DataEnvironment::OutWetBulbTemp;
+    DataLoopNode::Node(3).OutAirWetBulb = state->dataEnvrn->OutWetBulbTemp;
 
     InitOutAirNodes(*state);
 

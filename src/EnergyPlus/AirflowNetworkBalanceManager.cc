@@ -122,7 +122,6 @@ namespace AirflowNetworkBalanceManager {
     using CurveManager::GetCurveIndex;
     using DataEnvironment::CurMnDy;
     using DataEnvironment::EnvironmentName;
-    using DataEnvironment::OutAirDensity;
     using DataEnvironment::OutDryBulbTempAt;
     using DataEnvironment::StdBaroPress;
     using DataEnvironment::StdRhoAir;

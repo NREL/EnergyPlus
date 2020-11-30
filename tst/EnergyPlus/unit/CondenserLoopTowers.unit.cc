@@ -3924,10 +3924,10 @@ TEST_F(EnergyPlusFixture, VSCoolingTowers_WaterOutletTempTest)
 
     // test case 1:
     state->dataEnvrn->OutDryBulbTemp = 35.0;
-    DataEnvironment::OutWetBulbTemp = 26.0;
+    state->dataEnvrn->OutWetBulbTemp = 26.0;
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataEnvrn->OutHumRat =
-        Psychrometrics::PsyWFnTdbTwbPb(*state, state->dataEnvrn->OutDryBulbTemp, DataEnvironment::OutWetBulbTemp, state->dataEnvrn->OutBaroPress);
+        Psychrometrics::PsyWFnTdbTwbPb(*state, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutWetBulbTemp, state->dataEnvrn->OutBaroPress);
     DataLoopNode::Node(VSTower.WaterInletNodeNum).Temp = 35.0;
 
     VSTower.initialize(*state);
@@ -3937,7 +3937,7 @@ TEST_F(EnergyPlusFixture, VSCoolingTowers_WaterOutletTempTest)
 
     VSTower.InletWaterTemp = 35.0;
     Real64 WaterFlowRateRatio = 0.75;
-    Real64 AirWetBulbTemp = DataEnvironment::OutWetBulbTemp;
+    Real64 AirWetBulbTemp = state->dataEnvrn->OutWetBulbTemp;
 
     DataPlant::PlantLoop(VSTower.LoopNum).LoopSide(VSTower.LoopSideNum).FlowLock = 1;
     DataPlant::PlantLoop(VSTower.LoopNum).LoopSide(VSTower.LoopSideNum).TempSetPoint = 30.0;
@@ -3951,14 +3951,14 @@ TEST_F(EnergyPlusFixture, VSCoolingTowers_WaterOutletTempTest)
 
     // test case 2:
     state->dataEnvrn->OutDryBulbTemp = 15.0;
-    DataEnvironment::OutWetBulbTemp = 10.0;
+    state->dataEnvrn->OutWetBulbTemp = 10.0;
     state->dataEnvrn->OutHumRat =
-        Psychrometrics::PsyWFnTdbTwbPb(*state, state->dataEnvrn->OutDryBulbTemp, DataEnvironment::OutWetBulbTemp, state->dataEnvrn->OutBaroPress);
-    AirWetBulbTemp = DataEnvironment::OutWetBulbTemp;
+        Psychrometrics::PsyWFnTdbTwbPb(*state, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutWetBulbTemp, state->dataEnvrn->OutBaroPress);
+    AirWetBulbTemp = state->dataEnvrn->OutWetBulbTemp;
     VSTower.WaterMassFlowRate = VSTower.DesWaterMassFlowRate * WaterFlowRateRatio;
 
     VSTower.AirTemp = state->dataEnvrn->OutDryBulbTemp;
-    VSTower.AirWetBulb = DataEnvironment::OutWetBulbTemp;
+    VSTower.AirWetBulb = state->dataEnvrn->OutWetBulbTemp;
     VSTower.AirHumRat = state->dataEnvrn->OutHumRat;
 
     VSTower.calculateVariableSpeedTower(*state);

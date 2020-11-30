@@ -293,7 +293,7 @@ protected:
 
         state->dataEnvrn->OutDryBulbTemp = 35.0;
         state->dataEnvrn->OutHumRat = 0.0141066;
-        DataEnvironment::OutWetBulbTemp = 23.9;
+        state->dataEnvrn->OutWetBulbTemp = 23.9;
         state->dataEnvrn->OutBaroPress = 101325.0;
 
         state->dataAirLoop->AirLoopFlow.allocate(1);

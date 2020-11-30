@@ -537,7 +537,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RHControl)
     state->dataEnvrn->OutDryBulbTemp = 35.0;
     state->dataEnvrn->OutHumRat = 0.0196;
     state->dataEnvrn->OutBaroPress = 101325.0;
-    DataEnvironment::OutWetBulbTemp = 27.0932;
+    state->dataEnvrn->OutWetBulbTemp = 27.0932;
 
     // set up inputs to test coil control
     HVACDXSystem::DXCoolingSystem(DXSystemNum).DesiredOutletTemp = 18.0;
@@ -694,7 +694,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_LatentDegradation_Test)
     state->dataEnvrn->OutDryBulbTemp = 35.0;
     state->dataEnvrn->OutHumRat = 0.0196;
     state->dataEnvrn->OutBaroPress = 101325.0;
-    DataEnvironment::OutWetBulbTemp = 27.0932;
+    state->dataEnvrn->OutWetBulbTemp = 27.0932;
 
     // set up inputs to test coil control
     HVACDXSystem::DXCoolingSystem(DXSystemNum).DesiredOutletTemp = 22.0;

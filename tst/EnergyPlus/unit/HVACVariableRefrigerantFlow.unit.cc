@@ -147,7 +147,7 @@ protected:
         state->dataGlobal->BeginEnvrnFlag = true;
         state->dataEnvrn->OutDryBulbTemp = 35.0;
         state->dataEnvrn->OutHumRat = 0.012;
-        DataEnvironment::OutWetBulbTemp =
+        state->dataEnvrn->OutWetBulbTemp =
             Psychrometrics::PsyTwbFnTdbWPb(*state, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat, DataEnvironment::StdPressureSeaLevel);
         state->dataEnvrn->OutBaroPress = 101325;          // sea level
         DataZoneEquipment::ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
@@ -5648,7 +5648,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
     state->dataEnvrn->OutDryBulbTemp = 35.0;
     state->dataEnvrn->OutHumRat = 0.017767; // 50% RH
     state->dataEnvrn->OutBaroPress = 101325.0;
-    DataEnvironment::OutWetBulbTemp = 26.045;
+    state->dataEnvrn->OutWetBulbTemp = 26.045;
     SimulateVRF(*state,
                 VRFTU(VRFTUNum).Name,
                 FirstHVACIteration,
@@ -5693,7 +5693,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
     state->dataEnvrn->OutDryBulbTemp = 5.0;
     state->dataEnvrn->OutHumRat = 0.00269; // 50% RH
     state->dataEnvrn->OutBaroPress = 101325.0;
-    DataEnvironment::OutWetBulbTemp = 1.34678;
+    state->dataEnvrn->OutWetBulbTemp = 1.34678;
     SimulateVRF(*state,
                 VRFTU(VRFTUNum).Name,
                 FirstHVACIteration,
@@ -6571,7 +6571,7 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest)
     state->dataEnvrn->OutDryBulbTemp = 35.0;
     state->dataEnvrn->OutHumRat = 0.01;
     state->dataEnvrn->OutBaroPress = 101325.0;
-    DataEnvironment::OutWetBulbTemp = 21.1340575;
+    state->dataEnvrn->OutWetBulbTemp = 21.1340575;
 
     // TU's are off
     TerminalUnitList(1).TotalCoolLoad(1) = 0.0;
@@ -13116,7 +13116,7 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest_HREIRFTHeat)
     state->dataEnvrn->OutDryBulbTemp = 35.0;
     state->dataEnvrn->OutHumRat = 0.01;
     state->dataEnvrn->OutBaroPress = 101325.0;
-    DataEnvironment::OutWetBulbTemp = 21.1340575;
+    state->dataEnvrn->OutWetBulbTemp = 21.1340575;
 
     // call with zero loads to reset CurrentEndTimeLast until that's resolved
     TerminalUnitList(1).TotalCoolLoad = 0.0;

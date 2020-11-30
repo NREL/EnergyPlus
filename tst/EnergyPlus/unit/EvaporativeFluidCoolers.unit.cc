@@ -121,7 +121,7 @@ TEST_F(EvapFluidCoolersFixture, EvapFluidCoolerSpecs_getDesignCapacitiesTest)
     state->dataEnvrn->OutDryBulbTemp = 20.0;
     state->dataEnvrn->OutHumRat = 0.02;
     state->dataEnvrn->OutBaroPress = 101325.;
-    DataEnvironment::OutWetBulbTemp = 8.0;
+    state->dataEnvrn->OutWetBulbTemp = 8.0;
     DataLoopNode::Node.allocate(2);
     DataLoopNode::Node(thisEFC.WaterInletNodeNum).Temp = 20.0;
     DataLoopNode::Node(1).Temp = 23.0;

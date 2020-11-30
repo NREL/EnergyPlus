@@ -91,7 +91,7 @@ protected:
 
         state->dataEnvrn->OutDryBulbTemp = 20.0;
         state->dataEnvrn->OutHumRat = 0.0075;
-        DataEnvironment::OutWetBulbTemp =
+        state->dataEnvrn->OutWetBulbTemp =
             Psychrometrics::PsyTwbFnTdbWPb(*state, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat, state->dataEnvrn->OutBaroPress);
 
         state->dataGlobal->NumOfZones = 1;

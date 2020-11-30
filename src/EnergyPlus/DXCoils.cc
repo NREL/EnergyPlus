@@ -130,7 +130,6 @@ namespace DXCoils {
     using namespace Psychrometrics;
     using DataEnvironment::CurMnDy;
     using DataEnvironment::EnvironmentName;
-    using DataEnvironment::OutWetBulbTemp;
     using DataHeatBalance::HeatReclaimDXCoil;
 
     // Use statements for access to subroutines in other modules
@@ -6254,11 +6253,11 @@ namespace DXCoils {
                 // store environment data fill back in after rating point calc is over
                 Real64 holdOutDryBulbTemp = state.dataEnvrn->OutDryBulbTemp;
                 Real64 holdOutHumRat = state.dataEnvrn->OutHumRat;
-                Real64 holdOutWetBulb = DataEnvironment::OutWetBulbTemp;
+                Real64 holdOutWetBulb = state.dataEnvrn->OutWetBulbTemp;
                 Real64 holdOutBaroPress = state.dataEnvrn->OutBaroPress;
                 Real64 ratedOutdoorAirWetBulb = 23.9; // from I/O ref. more precise value?
                 state.dataEnvrn->OutDryBulbTemp = RatedOutdoorAirTemp;
-                DataEnvironment::OutWetBulbTemp = ratedOutdoorAirWetBulb;
+                state.dataEnvrn->OutWetBulbTemp = ratedOutdoorAirWetBulb;
                 state.dataEnvrn->OutBaroPress = DataEnvironment::StdPressureSeaLevel; // assume rating is for sea level.
                 state.dataEnvrn->OutHumRat =
                     Psychrometrics::PsyWFnTdbTwbPb(state, RatedOutdoorAirTemp, ratedOutdoorAirWetBulb, DataEnvironment::StdPressureSeaLevel, RoutineName);
@@ -6304,7 +6303,7 @@ namespace DXCoils {
                 // now replace the outdoor air conditions set above for one time rating point calc
                 state.dataEnvrn->OutDryBulbTemp = holdOutDryBulbTemp;
                 state.dataEnvrn->OutHumRat = holdOutHumRat;
-                DataEnvironment::OutWetBulbTemp = holdOutWetBulb;
+                state.dataEnvrn->OutWetBulbTemp = holdOutWetBulb;
                 state.dataEnvrn->OutBaroPress = holdOutBaroPress;
             }
 
@@ -6409,13 +6408,13 @@ namespace DXCoils {
                 // store environment data fill back in after rating point calc is over
                 Real64 holdOutDryBulbTemp = state.dataEnvrn->OutDryBulbTemp;
                 Real64 holdOutHumRat = state.dataEnvrn->OutHumRat;
-                Real64 holdOutWetBulb = DataEnvironment::OutWetBulbTemp;
+                Real64 holdOutWetBulb = state.dataEnvrn->OutWetBulbTemp;
                 Real64 holdOutBaroPress = state.dataEnvrn->OutBaroPress;
 
                 state.dataEnvrn->OutDryBulbTemp = RatedOutdoorAirTempHeat;
 
                 Real64 ratedOutdoorAirWetBulb = 6.11; // from I/O ref. more precise value?
-                DataEnvironment::OutWetBulbTemp = ratedOutdoorAirWetBulb;
+                state.dataEnvrn->OutWetBulbTemp = ratedOutdoorAirWetBulb;
                 state.dataEnvrn->OutBaroPress = DataEnvironment::StdPressureSeaLevel; // assume rating is for sea level.
                 state.dataEnvrn->OutHumRat = Psychrometrics::PsyWFnTdbTwbPb(state,
                     RatedOutdoorAirTempHeat, ratedOutdoorAirWetBulb, DataEnvironment::StdPressureSeaLevel, RoutineName);
@@ -6459,7 +6458,7 @@ namespace DXCoils {
                 // now replace the outdoor air conditions set above for one time rating point calc
                 state.dataEnvrn->OutDryBulbTemp = holdOutDryBulbTemp;
                 state.dataEnvrn->OutHumRat = holdOutHumRat;
-                DataEnvironment::OutWetBulbTemp = holdOutWetBulb;
+                state.dataEnvrn->OutWetBulbTemp = holdOutWetBulb;
                 state.dataEnvrn->OutBaroPress = holdOutBaroPress;
             }
 
@@ -8613,7 +8612,7 @@ namespace DXCoils {
                     OutdoorDryBulb = state.dataEnvrn->OutDryBulbTemp;
                     OutdoorHumRat = state.dataEnvrn->OutHumRat;
                     OutdoorPressure = state.dataEnvrn->OutBaroPress;
-                    OutdoorWetBulb = OutWetBulbTemp;
+                    OutdoorWetBulb = state.dataEnvrn->OutWetBulbTemp;
                 } else {
                     OutdoorDryBulb = Node(DXCoil(DXCoilNum).CondenserInletNodeNum(Mode)).Temp;
                     OutdoorHumRat = Node(DXCoil(DXCoilNum).CondenserInletNodeNum(Mode)).HumRat;
@@ -8624,7 +8623,7 @@ namespace DXCoils {
                 OutdoorDryBulb = state.dataEnvrn->OutDryBulbTemp;
                 OutdoorHumRat = state.dataEnvrn->OutHumRat;
                 OutdoorPressure = state.dataEnvrn->OutBaroPress;
-                OutdoorWetBulb = OutWetBulbTemp;
+                OutdoorWetBulb = state.dataEnvrn->OutWetBulbTemp;
             }
             if (DXCoil(DXCoilNum).IsSecondaryDXCoilInZone) {
                 OutdoorDryBulb = ZT(DXCoil(DXCoilNum).SecZonePtr);
@@ -9605,7 +9604,7 @@ namespace DXCoils {
             if (DXCoil(DXCoilNum).CondenserType(Mode) == WaterCooled) {
                 OutdoorHumRat = state.dataEnvrn->OutHumRat;
                 OutdoorPressure = state.dataEnvrn->OutBaroPress;
-                OutdoorWetBulb = OutWetBulbTemp;
+                OutdoorWetBulb = state.dataEnvrn->OutWetBulbTemp;
             } else {
                 OutdoorPressure = Node(DXCoil(DXCoilNum).CondenserInletNodeNum(Mode)).Press;
                 // If node is not connected to anything, pressure = default, use weather data
@@ -9613,7 +9612,7 @@ namespace DXCoils {
                     OutdoorDryBulb = state.dataEnvrn->OutDryBulbTemp;
                     OutdoorHumRat = state.dataEnvrn->OutHumRat;
                     OutdoorPressure = state.dataEnvrn->OutBaroPress;
-                    OutdoorWetBulb = OutWetBulbTemp;
+                    OutdoorWetBulb = state.dataEnvrn->OutWetBulbTemp;
                 } else {
                     OutdoorHumRat = Node(DXCoil(DXCoilNum).CondenserInletNodeNum(Mode)).HumRat;
                     // this should use Node%WetBulbTemp or a PSYC function, not OAWB
@@ -9624,7 +9623,7 @@ namespace DXCoils {
             OutdoorDryBulb = state.dataEnvrn->OutDryBulbTemp;
             OutdoorHumRat = state.dataEnvrn->OutHumRat;
             OutdoorPressure = state.dataEnvrn->OutBaroPress;
-            OutdoorWetBulb = OutWetBulbTemp;
+            OutdoorWetBulb = state.dataEnvrn->OutWetBulbTemp;
         }
 
         if (DXCoil(DXCoilNum).CondenserType(Mode) == EvapCooled) {
@@ -10237,7 +10236,7 @@ namespace DXCoils {
             if (DXCoil(DXCoilNum).CondenserType(Mode) == WaterCooled) {
                 OutdoorHumRat = state.dataEnvrn->OutHumRat;
                 OutdoorPressure = state.dataEnvrn->OutBaroPress;
-                OutdoorWetBulb = OutWetBulbTemp;
+                OutdoorWetBulb = state.dataEnvrn->OutWetBulbTemp;
                 CompAmbTemp = state.dataEnvrn->OutDryBulbTemp;
             } else {
                 OutdoorPressure = Node(DXCoil(DXCoilNum).CondenserInletNodeNum(1)).Press;
@@ -10246,7 +10245,7 @@ namespace DXCoils {
                     OutdoorDryBulb = state.dataEnvrn->OutDryBulbTemp;
                     OutdoorHumRat = state.dataEnvrn->OutHumRat;
                     OutdoorPressure = state.dataEnvrn->OutBaroPress;
-                    OutdoorWetBulb = OutWetBulbTemp;
+                    OutdoorWetBulb = state.dataEnvrn->OutWetBulbTemp;
                 } else {
                     OutdoorHumRat = Node(DXCoil(DXCoilNum).CondenserInletNodeNum(1)).HumRat;
                     // this should use Node%WetBulbTemp or a PSYC function, not OAWB
@@ -10270,7 +10269,7 @@ namespace DXCoils {
             OutdoorDryBulb = state.dataEnvrn->OutDryBulbTemp;
             OutdoorHumRat = state.dataEnvrn->OutHumRat;
             OutdoorPressure = state.dataEnvrn->OutBaroPress;
-            OutdoorWetBulb = OutWetBulbTemp;
+            OutdoorWetBulb = state.dataEnvrn->OutWetBulbTemp;
             CompAmbTemp = OutdoorDryBulb;
         }
 
@@ -10720,7 +10719,7 @@ namespace DXCoils {
                 OutdoorDryBulb = state.dataEnvrn->OutDryBulbTemp;
                 OutdoorHumRat = state.dataEnvrn->OutHumRat;
                 OutdoorPressure = state.dataEnvrn->OutBaroPress;
-                OutdoorWetBulb = OutWetBulbTemp;
+                OutdoorWetBulb = state.dataEnvrn->OutWetBulbTemp;
             } else {
                 OutdoorDryBulb = Node(DXCoil(DXCoilNum).CondenserInletNodeNum(Mode)).Temp;
                 OutdoorHumRat = Node(DXCoil(DXCoilNum).CondenserInletNodeNum(Mode)).HumRat;
@@ -10744,7 +10743,7 @@ namespace DXCoils {
             OutdoorDryBulb = state.dataEnvrn->OutDryBulbTemp;
             OutdoorHumRat = state.dataEnvrn->OutHumRat;
             OutdoorPressure = state.dataEnvrn->OutBaroPress;
-            OutdoorWetBulb = OutWetBulbTemp;
+            OutdoorWetBulb = state.dataEnvrn->OutWetBulbTemp;
             CompAmbTemp = OutdoorDryBulb;
         }
 
@@ -11949,7 +11948,7 @@ namespace DXCoils {
                 OutdoorDryBulb = state.dataEnvrn->OutDryBulbTemp;
                 OutdoorHumRat = state.dataEnvrn->OutHumRat;
                 OutdoorPressure = state.dataEnvrn->OutBaroPress;
-                OutdoorWetBulb = OutWetBulbTemp;
+                OutdoorWetBulb = state.dataEnvrn->OutWetBulbTemp;
             } else {
                 OutdoorDryBulb = Node(DXCoil(DXCoilNum).CondenserInletNodeNum(DXMode)).Temp;
                 OutdoorHumRat = Node(DXCoil(DXCoilNum).CondenserInletNodeNum(DXMode)).HumRat;
@@ -11970,7 +11969,7 @@ namespace DXCoils {
             OutdoorDryBulb = state.dataEnvrn->OutDryBulbTemp;
             OutdoorHumRat = state.dataEnvrn->OutHumRat;
             OutdoorPressure = state.dataEnvrn->OutBaroPress;
-            OutdoorWetBulb = OutWetBulbTemp;
+            OutdoorWetBulb = state.dataEnvrn->OutWetBulbTemp;
         }
 
         if (SpeedNum > 1) {
@@ -15943,7 +15942,7 @@ namespace DXCoils {
             if (DXCoil(DXCoilNum).CondenserType(Mode) == WaterCooled) {
                 OutdoorHumRat = state.dataEnvrn->OutHumRat;
                 OutdoorPressure = state.dataEnvrn->OutBaroPress;
-                OutdoorWetBulb = OutWetBulbTemp;
+                OutdoorWetBulb = state.dataEnvrn->OutWetBulbTemp;
             } else {
                 OutdoorPressure = Node(DXCoil(DXCoilNum).CondenserInletNodeNum(Mode)).Press;
                 // If node is not connected to anything, pressure = default, use weather data
@@ -15951,7 +15950,7 @@ namespace DXCoils {
                     OutdoorDryBulb = state.dataEnvrn->OutDryBulbTemp;
                     OutdoorHumRat = state.dataEnvrn->OutHumRat;
                     OutdoorPressure = state.dataEnvrn->OutBaroPress;
-                    OutdoorWetBulb = OutWetBulbTemp;
+                    OutdoorWetBulb = state.dataEnvrn->OutWetBulbTemp;
                 } else {
                     OutdoorHumRat = Node(DXCoil(DXCoilNum).CondenserInletNodeNum(Mode)).HumRat;
                     OutdoorWetBulb = Node(DXCoil(DXCoilNum).CondenserInletNodeNum(Mode)).OutAirWetBulb;
@@ -15961,7 +15960,7 @@ namespace DXCoils {
             OutdoorDryBulb = state.dataEnvrn->OutDryBulbTemp;
             OutdoorHumRat = state.dataEnvrn->OutHumRat;
             OutdoorPressure = state.dataEnvrn->OutBaroPress;
-            OutdoorWetBulb = OutWetBulbTemp;
+            OutdoorWetBulb = state.dataEnvrn->OutWetBulbTemp;
         }
 
         if (DXCoil(DXCoilNum).CondenserType(Mode) == EvapCooled) {
@@ -16375,7 +16374,7 @@ namespace DXCoils {
 
         // Air cooled condenser
         OutdoorDryBulb = state.dataEnvrn->OutDryBulbTemp;
-        OutdoorWetBulb = OutWetBulbTemp;
+        OutdoorWetBulb = state.dataEnvrn->OutWetBulbTemp;
         OutdoorHumRat = state.dataEnvrn->OutHumRat;
         OutdoorPressure = state.dataEnvrn->OutBaroPress;
 

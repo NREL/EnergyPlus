@@ -302,7 +302,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
                 WeatherManager::ManageWeather(state);
 
                 outDryBulbTemp_num += state.dataEnvrn->OutDryBulbTemp;
-                airDensity_num += OutAirDensity;
+                airDensity_num += state.dataEnvrn->OutAirDensity;
                 relHum_num += state.dataEnvrn->OutRelHumValue;
                 windSpeed_num += WindSpeed;
                 horizSolarRad_num += state.dataEnvrn->BeamSolarRad + state.dataEnvrn->DifSolarRad;
