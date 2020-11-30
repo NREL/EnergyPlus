@@ -68,11 +68,6 @@ namespace DataEnvironment {
     Real64 constexpr StdPressureSeaLevel(101325.0);   // Standard barometric pressure at sea level (Pa)
 
     // MODULE VARIABLE DECLARATIONS:
-    extern Real64 OutRelHum;                       // Current outdoor relative humidity [%]
-    extern Real64 OutRelHumValue;                  // Current outdoor relative humidity value [0.0-1.0]
-    extern bool EMSOutRelHumOverrideOn;            // EMS flag for outdoor relative humidity value
-    extern Real64 EMSOutRelHumOverrideValue;       // EMS override value for outdoor relative humidity value
-    extern Real64 OutEnthalpy;                     // Current outdoor enthalpy
     extern Real64 OutAirDensity;                   // Current outdoor air density
     extern Real64 OutWetBulbTemp;                  // Current outdoor air wet bulb temperature
     extern Real64 OutDewPointTemp;                 // Current outdoor dewpoint temperature
@@ -213,6 +208,11 @@ struct EnvironmentData : BaseGlobalStruct {
     bool EMSOutDryBulbOverrideOn = false;               // EMS flag for outdoor air dry bulb temperature
     Real64 EMSOutDryBulbOverrideValue = 0.0;            // EMS override value for outdoor air dry bulb temperature
     Real64 OutHumRat = 0.0;                             // Current outdoor air humidity ratio
+    Real64 OutRelHum = 0.0;                             // Current outdoor relative humidity [%]
+    Real64 OutRelHumValue = 0.0;                        // Current outdoor relative humidity value [0.0-1.0]
+    bool EMSOutRelHumOverrideOn = false;                // EMS flag for outdoor relative humidity value
+    Real64 EMSOutRelHumOverrideValue = 0.0;             // EMS override value for outdoor relative humidity value
+    Real64 OutEnthalpy = 0.0;                           // Current outdoor enthalpy
 
     void clear_state() override
     {
@@ -253,6 +253,11 @@ struct EnvironmentData : BaseGlobalStruct {
         this->EMSOutDryBulbOverrideOn = false;
         this->EMSOutDryBulbOverrideValue = 0.0;
         this->OutHumRat = 0.0;
+        this->OutRelHum = 0.0;
+        this->OutRelHumValue = 0.0;
+        this->EMSOutRelHumOverrideOn = false;
+        this->EMSOutRelHumOverrideValue = 0.0;
+        this->OutEnthalpy = 0.0;
     }
 };
 

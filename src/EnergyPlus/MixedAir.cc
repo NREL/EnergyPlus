@@ -3840,7 +3840,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
         this->RelTemp = this->RetTemp;
         this->RelEnth = this->RetEnth;
         this->RelSensiLossRate = this->RelMassFlow * Psychrometrics::PsyCpAirFnW(state.dataEnvrn->OutHumRat) * (this->RelTemp - state.dataEnvrn->OutDryBulbTemp);
-        this->RelTotalLossRate = this->RelMassFlow * (this->RelEnth - OutEnthalpy);
+        this->RelTotalLossRate = this->RelMassFlow * (this->RelEnth - state.dataEnvrn->OutEnthalpy);
         this->RelLatentLossRate = this->RelTotalLossRate - this->RelSensiLossRate;
     }
 

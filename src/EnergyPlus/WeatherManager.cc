@@ -391,7 +391,7 @@ namespace WeatherManager {
                                 "Average",
                                 "Environment");
             SetupOutputVariable(state,
-                "Site Outdoor Air Relative Humidity", OutputProcessor::Unit::Perc, DataEnvironment::OutRelHum, "Zone", "Average", "Environment");
+                "Site Outdoor Air Relative Humidity", OutputProcessor::Unit::Perc, state.dataEnvrn->OutRelHum, "Zone", "Average", "Environment");
             SetupOutputVariable(state,
                 "Site Outdoor Air Barometric Pressure", OutputProcessor::Unit::Pa, state.dataEnvrn->OutBaroPress, "Zone", "Average", "Environment");
             SetupOutputVariable(state, "Site Wind Speed", OutputProcessor::Unit::m_s, DataEnvironment::WindSpeed, "Zone", "Average", "Environment");
@@ -433,7 +433,7 @@ namespace WeatherManager {
             SetupOutputVariable(state, "Site Total Sky Cover", OutputProcessor::Unit::None, DataEnvironment::TotalCloudCover, "Zone", "Average", "Environment");
             SetupOutputVariable(state, "Site Opaque Sky Cover", OutputProcessor::Unit::None, DataEnvironment::OpaqueCloudCover, "Zone", "Average", "Environment");
             SetupOutputVariable(state,
-                "Site Outdoor Air Enthalpy", OutputProcessor::Unit::J_kg, DataEnvironment::OutEnthalpy, "Zone", "Average", "Environment");
+                "Site Outdoor Air Enthalpy", OutputProcessor::Unit::J_kg, state.dataEnvrn->OutEnthalpy, "Zone", "Average", "Environment");
             SetupOutputVariable(state,
                 "Site Outdoor Air Density", OutputProcessor::Unit::kg_m3, DataEnvironment::OutAirDensity, "Zone", "Average", "Environment");
             SetupOutputVariable(state, "Site Solar Azimuth Angle", OutputProcessor::Unit::deg, state.dataWeatherManager->SolarAzimuthAngle, "Zone", "Average", "Environment");
@@ -490,8 +490,8 @@ namespace WeatherManager {
                                  "Environment",
                                  "Outdoor Relative Humidity",
                                  "[%]",
-                                 DataEnvironment::EMSOutRelHumOverrideOn,
-                                 DataEnvironment::EMSOutRelHumOverrideValue);
+                                 state.dataEnvrn->EMSOutRelHumOverrideOn,
+                                 state.dataEnvrn->EMSOutRelHumOverrideValue);
                 SetupEMSActuator("Weather Data",
                                  "Environment",
                                  "Diffuse Solar",
@@ -1903,16 +1903,16 @@ namespace WeatherManager {
         state.dataEnvrn->OutBaroPress = state.dataWeatherManager->TodayOutBaroPress(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay);
         DataEnvironment::OutDewPointTemp = state.dataWeatherManager->TodayOutDewPointTemp(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay);
         if (DataEnvironment::EMSOutDewPointTempOverrideOn) DataEnvironment::OutDewPointTemp = DataEnvironment::EMSOutDewPointTempOverrideValue;
-        DataEnvironment::OutRelHum = state.dataWeatherManager->TodayOutRelHum(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay);
-        DataEnvironment::OutRelHumValue = DataEnvironment::OutRelHum / 100.0;
-        if (DataEnvironment::EMSOutRelHumOverrideOn) {
-            DataEnvironment::OutRelHumValue = DataEnvironment::EMSOutRelHumOverrideValue / 100.0;
-            DataEnvironment::OutRelHum = DataEnvironment::EMSOutRelHumOverrideValue;
+        state.dataEnvrn->OutRelHum = state.dataWeatherManager->TodayOutRelHum(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay);
+        state.dataEnvrn->OutRelHumValue = state.dataEnvrn->OutRelHum / 100.0;
+        if (state.dataEnvrn->EMSOutRelHumOverrideOn) {
+            state.dataEnvrn->OutRelHumValue = state.dataEnvrn->EMSOutRelHumOverrideValue / 100.0;
+            state.dataEnvrn->OutRelHum = state.dataEnvrn->EMSOutRelHumOverrideValue;
         }
 
         // Humidity Ratio and Wet Bulb are derived
         state.dataEnvrn->OutHumRat = Psychrometrics::PsyWFnTdbRhPb(state,
-            state.dataEnvrn->OutDryBulbTemp, DataEnvironment::OutRelHumValue, state.dataEnvrn->OutBaroPress, RoutineName);
+            state.dataEnvrn->OutDryBulbTemp, state.dataEnvrn->OutRelHumValue, state.dataEnvrn->OutBaroPress, RoutineName);
         DataEnvironment::OutWetBulbTemp =
             Psychrometrics::PsyTwbFnTdbWPb(state, state.dataEnvrn->OutDryBulbTemp, state.dataEnvrn->OutHumRat, state.dataEnvrn->OutBaroPress);
         if (state.dataEnvrn->OutDryBulbTemp < DataEnvironment::OutWetBulbTemp) {
@@ -1999,7 +1999,7 @@ namespace WeatherManager {
             state.dataEnvrn->GndSolarRad = 0.0;
         }
 
-        DataEnvironment::OutEnthalpy = Psychrometrics::PsyHFnTdbW(state.dataEnvrn->OutDryBulbTemp, state.dataEnvrn->OutHumRat);
+        state.dataEnvrn->OutEnthalpy = Psychrometrics::PsyHFnTdbW(state.dataEnvrn->OutDryBulbTemp, state.dataEnvrn->OutHumRat);
         DataEnvironment::OutAirDensity =
             Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataEnvrn->OutDryBulbTemp, state.dataEnvrn->OutHumRat);
 

@@ -128,7 +128,6 @@ namespace FanCoilUnits {
     // Using/Aliasing
     using namespace DataLoopNode;
     using namespace DataSizing;
-    using DataEnvironment::OutRelHum;
     using DataEnvironment::StdRhoAir;
     using DataHVACGlobals::ATMixer_InletSide;
     using DataHVACGlobals::ATMixer_SupplySide;

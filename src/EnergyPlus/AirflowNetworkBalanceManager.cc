@@ -124,7 +124,6 @@ namespace AirflowNetworkBalanceManager {
     using DataEnvironment::EnvironmentName;
     using DataEnvironment::OutAirDensity;
     using DataEnvironment::OutDryBulbTempAt;
-    using DataEnvironment::OutEnthalpy;
     using DataEnvironment::StdBaroPress;
     using DataEnvironment::StdRhoAir;
     using DataEnvironment::WindDir;
@@ -9357,10 +9356,10 @@ namespace AirflowNetworkBalanceManager {
             ZoneAirEnthalpy = PsyHFnTdbW(ANZT(ZoneNum), ANZW(ZoneNum));
             // Check whether this surface is an interior wall or not. If Yes, use adjacent zone conditions
             if (VentCtrlNum == VentControlType::AdjEnth && MultizoneSurfaceData(i).IndVentControl) {
-                OutEnthalpy = PsyHFnTdbW(ANZT(MultizoneZoneData(MultizoneSurfaceData(i).NodeNums[1]).ZoneNum),
+                state.dataEnvrn->OutEnthalpy = PsyHFnTdbW(ANZT(MultizoneZoneData(MultizoneSurfaceData(i).NodeNums[1]).ZoneNum),
                                          ANZW(MultizoneZoneData(MultizoneSurfaceData(i).NodeNums[1]).ZoneNum));
             }
-            if (ZoneAirEnthalpy > OutEnthalpy && ANZT(ZoneNum) > VentTemp) {
+            if (ZoneAirEnthalpy > state.dataEnvrn->OutEnthalpy && ANZT(ZoneNum) > VentTemp) {
                 OpenFactor = MultizoneSurfaceData(i).Factor;
                 // Modulation of OpenFactor
                 if (MultizoneSurfaceData(i).IndVentControl) {
@@ -9375,7 +9374,7 @@ namespace AirflowNetworkBalanceManager {
                 SurfWinVentingOpenFactorMultRep(SurfNum) = 1.0;
 
                 if (LimValVentOpenFacMult != 1.0) {
-                    DelEnthal = ZoneAirEnthalpy - OutEnthalpy;
+                    DelEnthal = ZoneAirEnthalpy - state.dataEnvrn->OutEnthalpy;
                     if (DelEnthal <= LowerValInOutEnthalDiff) {
                         OpenFactorMult = 1.0;
                     } else if (DelEnthal >= UpperValInOutEnthalDiff) {

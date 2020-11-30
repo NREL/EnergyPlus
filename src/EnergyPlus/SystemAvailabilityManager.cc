@@ -4497,7 +4497,6 @@ namespace SystemAvailabilityManager {
         using AirflowNetworkBalanceManager::ManageAirflowNetworkBalance;
         using CurveManager::CurveValue;
         using DataEnvironment::OutDewPointTemp;
-        using DataEnvironment::OutEnthalpy;
         using DataHeatBalance::HybridControlTypeClose;
         using DataHeatBalance::HybridControlTypeGlobal;
         using DataHeatBalance::HybridControlTypeIndiv;
@@ -4589,8 +4588,8 @@ namespace SystemAvailabilityManager {
                     // Enthalpy control
                 } else if (SELECT_CASE_var == state.dataSystemAvailabilityManager->HybridVentMode_Enth) {
                     ZoneAirEnthalpy = PsyHFnTdbW(MAT(ZoneNum), ZoneAirHumRat(ZoneNum));
-                    if (OutEnthalpy >= state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).MinOutdoorEnth &&
-                        OutEnthalpy <= state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).MaxOutdoorEnth) {
+                    if (state.dataEnvrn->OutEnthalpy >= state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).MinOutdoorEnth &&
+                        state.dataEnvrn->OutEnthalpy <= state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).MaxOutdoorEnth) {
                         state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl = state.dataSystemAvailabilityManager->HybridVentCtrl_Open;
                     } else {
                         state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl = state.dataSystemAvailabilityManager->HybridVentCtrl_Close;

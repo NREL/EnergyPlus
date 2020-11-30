@@ -182,7 +182,6 @@ namespace PlantCondLoopOperation {
         // na
         // Using/Aliasing
         using DataEnvironment::OutDewPointTemp;
-        using DataEnvironment::OutRelHum;
         using DataEnvironment::OutWetBulbTemp; // Current outdoor relative humidity [%]
 
         // Locals
@@ -285,7 +284,7 @@ namespace PlantCondLoopOperation {
         } else if (CurSchemeType == WetBulbRBOpSchemeType) {
             RangeVariable = OutWetBulbTemp;
         } else if (CurSchemeType == RelHumRBOpSchemeType) {
-            RangeVariable = OutRelHum;
+            RangeVariable = state.dataEnvrn->OutRelHum;
         } else if (CurSchemeType == DewPointRBOpSchemeType) {
             RangeVariable = OutDewPointTemp;
         } else if ((CurSchemeType == DryBulbTDBOpSchemeType) || (CurSchemeType == WetBulbTDBOpSchemeType) ||

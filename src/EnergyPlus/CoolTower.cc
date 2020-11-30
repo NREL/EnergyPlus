@@ -519,7 +519,6 @@ namespace CoolTower {
         //     John Wiley & Sons, Inc.
 
         // Using/Aliasing
-        using DataEnvironment::OutEnthalpy;
         using DataEnvironment::OutWetBulbTemp;
         using DataEnvironment::StdRhoAir;
         using DataEnvironment::WindSpeed;
@@ -625,7 +624,7 @@ namespace CoolTower {
                 // Determine air mass flow rate and volume flow rate
                 InletHumRat = PsyWFnTdbTwbPb(state, state.dataEnvrn->OutDryBulbTemp, OutWetBulbTemp, state.dataEnvrn->OutBaroPress);
                 // Assume no pressure drops and no changes in enthalpy between inlet and outlet air
-                IntHumRat = PsyWFnTdbH(state, OutletTemp, OutEnthalpy); // Initialized humidity ratio
+                IntHumRat = PsyWFnTdbH(state, OutletTemp, state.dataEnvrn->OutEnthalpy); // Initialized humidity ratio
                 AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, OutletTemp, IntHumRat);
                 AirMassFlowRate = AirDensity * state.dataCoolTower->CoolTowerSys(CoolTowerNum).ActualAirVolFlowRate;
                 // From the mass balance W_in*(m_air + m_water) = W_out*m_air

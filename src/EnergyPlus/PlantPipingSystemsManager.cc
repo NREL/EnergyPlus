@@ -5733,7 +5733,7 @@ namespace EnergyPlus {
             // Update environmental conditions
             this->Cur.CurAirTemp = state.dataEnvrn->OutDryBulbTemp;
             this->Cur.CurWindSpeed = DataEnvironment::WindSpeed;
-            this->Cur.CurRelativeHumidity = DataEnvironment::OutRelHum;
+            this->Cur.CurRelativeHumidity = state.dataEnvrn->OutRelHum;
             this->Cur.CurIncidentSolar = state.dataEnvrn->BeamSolarRad;
 
             //'now update cell properties

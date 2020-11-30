@@ -301,10 +301,10 @@ namespace EvaporativeFluidCoolers {
             thisEFC.UserEvapLossFactor = NumArray(13); //  N13 , \field Evaporation Loss Factor
             if ((NumNums < 13) && (thisEFC.UserEvapLossFactor == 0.0)) {
                 // assume Evaporation loss factor not entered and should be calculated
-                if ((DataEnvironment::OutRelHumValue >= 0.1) && (DataEnvironment::OutRelHumValue <= 0.7)) {
+                if ((state.dataEnvrn->OutRelHumValue >= 0.1) && (state.dataEnvrn->OutRelHumValue <= 0.7)) {
                     // Use correlation by B.A. Qureshi and S.M. Zubair if within these limits
                     thisEFC.UserEvapLossFactor =
-                        (113.0 - 8.417 * DataEnvironment::OutRelHumValue + 1.6147 * state.dataEnvrn->OutDryBulbTemp) * 1.0e-5;
+                        (113.0 - 8.417 * state.dataEnvrn->OutRelHumValue + 1.6147 * state.dataEnvrn->OutDryBulbTemp) * 1.0e-5;
                 } else { // Inlet conditions are out of the limit of correlation; An approximate default value of loss factor is used
                     thisEFC.UserEvapLossFactor = 0.2;
                 }
@@ -585,10 +585,10 @@ namespace EvaporativeFluidCoolers {
             thisEFC.UserEvapLossFactor = NumArray(23); //  N23 , \field Evaporation Loss Factor
             if ((NumNums < 23) && (thisEFC.UserEvapLossFactor == 0.0)) {
                 // assume Evaporation loss factor not entered and should be calculated
-                if ((DataEnvironment::OutRelHumValue >= 0.1) && (DataEnvironment::OutRelHumValue <= 0.7)) {
+                if ((state.dataEnvrn->OutRelHumValue >= 0.1) && (state.dataEnvrn->OutRelHumValue <= 0.7)) {
                     // Use correlation by B.A. Qureshi and S.M. Zubair if within these limits
                     thisEFC.UserEvapLossFactor =
-                        (113.0 - 8.417 * DataEnvironment::OutRelHumValue + 1.6147 * state.dataEnvrn->OutDryBulbTemp) * 1.0e-5;
+                        (113.0 - 8.417 * state.dataEnvrn->OutRelHumValue + 1.6147 * state.dataEnvrn->OutDryBulbTemp) * 1.0e-5;
                 } else { // Inlet conditions are out of the limit of correlation; An approximate default value of loss factor is used
                     thisEFC.UserEvapLossFactor = 0.2;
                 }

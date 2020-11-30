@@ -451,7 +451,7 @@ namespace EcoRoofManager {
             // Table 1 for sigmaf_max and min (0.20 to 0.9)
 
             EpsilonOne = epsilonf + epsilong - epsilong * epsilonf; // Checked (eqn. 6 in FASST Veg Models)
-            RH = OutRelHum;                                         // Get humidity in % from the DataEnvironment.cc
+            RH = state.dataEnvrn->OutRelHum;                                         // Get humidity in % from the DataEnvironment.cc
             eair = (RH / 100.0) * 611.2 * std::exp(17.67 * Ta / (Tak - 29.65));
             qa = (0.622 * eair) / (Pa - 1.000 * eair); // Mixing Ratio of air
             Rhoa = Pa / (Rair * Tak);                  // Density of air. kg/m^3

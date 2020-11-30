@@ -4559,7 +4559,6 @@ namespace ZoneEquipmentManager {
         // This subroutine calculates the air component of the heat balance.
 
         // Using/Aliasing
-        using DataEnvironment::OutEnthalpy;
         using DataEnvironment::WindSpeed;
         using namespace DataHeatBalFanSys;
         using namespace DataHeatBalance;
@@ -4750,7 +4749,7 @@ namespace ZoneEquipmentManager {
                 EnthalpyExt = Node(Zone(NZ).LinkedOutAirNode).Enthalpy;
             } else {
                 HumRatExt = state.dataEnvrn->OutHumRat;
-                EnthalpyExt = OutEnthalpy;
+                EnthalpyExt = state.dataEnvrn->OutEnthalpy;
             }
             AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, TempExt, HumRatExt);
             CpAir = PsyCpAirFnW(HumRatExt);

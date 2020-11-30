@@ -94,7 +94,6 @@ namespace VariableSpeedCoils {
     using namespace Psychrometrics;
     using DataEnvironment::CurMnDy;
     using DataEnvironment::EnvironmentName;
-    using DataEnvironment::OutEnthalpy;
     using DataEnvironment::OutWetBulbTemp;
     using DataEnvironment::StdBaroPress;
     using namespace DataSizing;
@@ -5724,7 +5723,7 @@ namespace VariableSpeedCoils {
             state.dataVariableSpeedCoils->LoadSideInletHumRat = state.dataEnvrn->OutHumRat;
             LoadPressure = state.dataEnvrn->OutBaroPress;
             state.dataVariableSpeedCoils->LoadSideInletWBTemp = OutWetBulbTemp;
-            state.dataVariableSpeedCoils->LoadSideInletEnth = OutEnthalpy;
+            state.dataVariableSpeedCoils->LoadSideInletEnth = state.dataEnvrn->OutEnthalpy;
 
             // Initialize crankcase heater, operates below OAT defined in input deck for HP DX heating coil
             if (state.dataEnvrn->OutDryBulbTemp < state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MaxOATCrankcaseHeater) {

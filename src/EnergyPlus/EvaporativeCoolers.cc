@@ -941,7 +941,6 @@ namespace EvaporativeCoolers {
 
         // Using/Aliasing
         using DataEnvironment::OutAirDensity;
-        using DataEnvironment::OutEnthalpy;
         using DataEnvironment::OutWetBulbTemp;
         using DataHVACGlobals::DoSetPointTest;
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
@@ -1057,7 +1056,7 @@ namespace EvaporativeCoolers {
             EvapCond(EvapCoolNum).SecInletMassFlowRateMinAvail = 0.0;
             EvapCond(EvapCoolNum).SecInletTemp = state.dataEnvrn->OutDryBulbTemp;
             EvapCond(EvapCoolNum).SecInletHumRat = PsyWFnTdbTwbPb(state, state.dataEnvrn->OutDryBulbTemp, OutWetBulbTemp, state.dataEnvrn->OutBaroPress);
-            EvapCond(EvapCoolNum).SecInletEnthalpy = OutEnthalpy;
+            EvapCond(EvapCoolNum).SecInletEnthalpy = state.dataEnvrn->OutEnthalpy;
             EvapCond(EvapCoolNum).SecInletPressure = state.dataEnvrn->OutBaroPress;
         }
         // Set the energy consumption to zero each time through for reporting

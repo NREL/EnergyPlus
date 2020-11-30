@@ -123,7 +123,6 @@ namespace HeatBalanceHAMTManager {
     using DataHeatBalSurface::SurfOpaqQRadSWOutAbs;
     using namespace DataHeatBalance;
     using namespace Psychrometrics;
-    using DataEnvironment::OutEnthalpy;
     using DataEnvironment::SkyTemp;
     using DataEnvironment::SunIsUp;
     using DataHeatBalFanSys::MAT;

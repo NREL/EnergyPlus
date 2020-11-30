@@ -111,7 +111,6 @@ namespace WindowAC {
 
     using namespace DataLoopNode;
     using namespace DataSizing;
-    using DataEnvironment::OutRelHum;
     using DataEnvironment::StdRhoAir;
     using DataHVACGlobals::BlowThru;
     using DataHVACGlobals::CoilDX_CoolingHXAssisted;

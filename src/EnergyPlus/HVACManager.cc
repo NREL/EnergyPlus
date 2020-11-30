@@ -2430,7 +2430,7 @@ namespace HVACManager {
                     for (int ExhNum = 1; ExhNum <= ZoneEquipConfig(ZoneLoop).NumExhaustNodes; ExhNum++) {
                         if (Fan(FanNum).InletNodeNum == ZoneEquipConfig(ZoneLoop).ExhaustNode(ExhNum)) {
                             ZnAirRpt(ZoneLoop).ExhTotalLoss +=
-                                Fan(FanNum).OutletAirMassFlowRate * (Fan(FanNum).OutletAirEnthalpy - OutEnthalpy) * ADSCorrectionFactor;
+                                Fan(FanNum).OutletAirMassFlowRate * (Fan(FanNum).OutletAirEnthalpy - state.dataEnvrn->OutEnthalpy) * ADSCorrectionFactor;
                             ZnAirRpt(ZoneLoop).ExhSensiLoss += Fan(FanNum).OutletAirMassFlowRate * CpAir *
                                                                (Fan(FanNum).OutletAirTemp - Zone(ZoneLoop).OutDryBulbTemp) * ADSCorrectionFactor;
                             break;

@@ -120,7 +120,6 @@ namespace PurchasedAirManager {
     // Use statements for data only modules
     // Using/Aliasing
     using namespace DataHVACGlobals;
-    using DataEnvironment::OutEnthalpy;
     using DataEnvironment::StdRhoAir;
     using DataHeatBalFanSys::ZoneAirHumRat;
     using DataHeatBalFanSys::ZoneThermostatSetPointHi;
