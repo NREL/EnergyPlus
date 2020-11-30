@@ -3105,26 +3105,29 @@ namespace WaterCoils {
 
         // Warning and error messages for large flow rates for the given user input geometry
         AirDensity = PsyRhoAirFnPbTdbW(state, OutBaroPress, TempAirIn, InletAirHumRat, RoutineName);
-        if (AirMassFlow > (5.0 * state.dataWaterCoils->WaterCoil(CoilNum).MinAirFlowArea / AirDensity) && state.dataWaterCoils->CoilWarningOnceFlag(CoilNum)) {
+
+        // [kg/s] == [m/s] * [m2] * [kg/m3]
+        if (AirMassFlow > (5.0 * state.dataWaterCoils->WaterCoil(CoilNum).MinAirFlowArea * AirDensity) && state.dataWaterCoils->CoilWarningOnceFlag(CoilNum)) {
             ShowWarningError(state, "Coil:Cooling:Water:DetailedGeometry in Coil =" + state.dataWaterCoils->WaterCoil(CoilNum).Name);
             ShowContinueError(state, "Air Flow Rate Velocity has greatly exceeded upper design guidelines of ~2.5 m/s");
-            ShowContinueError(state, format("Air MassFlowRate[kg/s]={:.6T}", AirMassFlow));
-            AirVelocity = AirMassFlow * AirDensity / state.dataWaterCoils->WaterCoil(CoilNum).MinAirFlowArea;
+            ShowContinueError(state, format("Air Mass Flow Rate[kg/s]={:.6T}", AirMassFlow));
+            // [m/s] = [kg/s] / ([m2] * [kg/m3])
+            AirVelocity = AirMassFlow / (state.dataWaterCoils->WaterCoil(CoilNum).MinAirFlowArea * AirDensity);
             ShowContinueError(state, format("Air Face Velocity[m/s]={:.6T}", AirVelocity));
             ShowContinueError(state,
-                              format("Approximate MassFlowRate limit for Face Area[kg/s]={:.6T}",
-                                     2.5 * state.dataWaterCoils->WaterCoil(CoilNum).MinAirFlowArea / AirDensity));
+                              format("Approximate Mass Flow Rate limit for Face Area[kg/s]={:.6T}",
+                                     2.5 * state.dataWaterCoils->WaterCoil(CoilNum).MinAirFlowArea * AirDensity));
             ShowContinueError(state, "Coil:Cooling:Water:DetailedGeometry could be resized/autosized to handle capacity");
             state.dataWaterCoils->CoilWarningOnceFlag(CoilNum) = false;
-        } else if (AirMassFlow > (44.7 * state.dataWaterCoils->WaterCoil(CoilNum).MinAirFlowArea / AirDensity)) {
+        } else if (AirMassFlow > (44.7 * state.dataWaterCoils->WaterCoil(CoilNum).MinAirFlowArea * AirDensity)) {
             ShowSevereError(state, "Coil:Cooling:Water:DetailedGeometry in Coil =" + state.dataWaterCoils->WaterCoil(CoilNum).Name);
             ShowContinueError(state, "Air Flow Rate Velocity is > 100MPH (44.7m/s) and simulation cannot continue");
             ShowContinueError(state, format("Air Mass Flow Rate[kg/s]={:.6T}", AirMassFlow));
-            AirVelocity = AirMassFlow * AirDensity / state.dataWaterCoils->WaterCoil(CoilNum).MinAirFlowArea;
+            AirVelocity = AirMassFlow / (state.dataWaterCoils->WaterCoil(CoilNum).MinAirFlowArea * AirDensity);
             ShowContinueError(state, format("Air Face Velocity[m/s]={:.6T}", AirVelocity));
             ShowContinueError(state,
-                              format("Approximate MassFlowRate limit for Face Area[kg/s]={:.6T}",
-                                     2.5 * state.dataWaterCoils->WaterCoil(CoilNum).MinAirFlowArea / AirDensity));
+                              format("Approximate Mass Flow Rate limit for Face Area[kg/s]={:.6T}",
+                                     44.7 * state.dataWaterCoils->WaterCoil(CoilNum).MinAirFlowArea * AirDensity));
             ShowFatalError(state, "Coil:Cooling:Water:DetailedGeometry needs to be resized/autosized to handle capacity");
         }
 
