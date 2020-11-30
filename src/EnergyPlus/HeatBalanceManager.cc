@@ -4735,8 +4735,6 @@ namespace HeatBalanceManager {
         // IDD Definition for Zone object
 
         // Using/Aliasing
-        using DataDaylighting::ZoneDaylight;
-
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -4768,7 +4766,7 @@ namespace HeatBalanceManager {
         Zone.allocate(state.dataGlobal->NumOfZones);
         DataViewFactorInformation::ZoneRadiantInfo.allocate(state.dataGlobal->NumOfZones);
         DataViewFactorInformation::ZoneSolarInfo.allocate(state.dataGlobal->NumOfZones);
-        ZoneDaylight.allocate(state.dataGlobal->NumOfZones);
+        state.dataDaylightingData->ZoneDaylight.allocate(state.dataGlobal->NumOfZones);
 
         ZoneLoop = 0;
 
@@ -5110,8 +5108,6 @@ namespace HeatBalanceManager {
         // IDD Definition for Zone object
 
         // Using/Aliasing
-        using DataDaylighting::ZoneDaylight;
-
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
 

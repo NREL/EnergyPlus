@@ -4138,7 +4138,6 @@ namespace EnergyPlus::SingleDuct {
 
         // Using/Aliasing
         using namespace DataZoneEnergyDemands;
-        using DataConvergParams::HVACFlowRateToler;
         using General::SolveRoot;
         using SteamCoils::GetCoilCapacity;
         using TempSolveRoot::SolveRoot;
@@ -4203,7 +4202,7 @@ namespace EnergyPlus::SingleDuct {
         MaxCoolMassFlow = this->sd_airterminalInlet.AirMassFlowRateMaxAvail;
         MaxHeatMassFlow = min(this->HeatAirMassFlowRateMax, this->sd_airterminalInlet.AirMassFlowRateMaxAvail);
         MinMassFlow = MaxCoolMassFlow * this->ZoneMinAirFrac;
-        UnitFlowToler = 0.001 * HVACFlowRateToler;
+        UnitFlowToler = 0.001 * DataConvergParams::HVACFlowRateToler;
         QDelivered = 0.0;
         HWFlow = 0.0;
         if (this->sd_airterminalInlet.AirMassFlowRateMaxAvail <= 0.0 || CurDeadBandOrSetback(ZoneNum)) {
