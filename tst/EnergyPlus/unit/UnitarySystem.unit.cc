@@ -15565,6 +15565,210 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_SetpointControlCyclingFan)
     EXPECT_TRUE(compare_err_stream(error_string, true));
 }
 
+TEST_F(ZoneUnitarySysTest, UnitarySystemModel_ScheduleInterpolationTest)
+{
+
+    std::string const idf_objects = delimited_string({
+
+        "AirLoopHVAC:UnitarySystem,",
+        "  Unitary System Model,           !- Name",
+        "  Setpoint,                       !- Control Type",
+        "  East Zone,                      !- Controlling Zone or Thermostat Location",
+        "  None,                           !- Dehumidification Control Type",
+        "  AlwaysOne,                      !- Availability Schedule Name",
+        "  Zone Exhaust Node,              !- Air Inlet Node Name",
+        "  Zone 2 Inlet Node,              !- Air Outlet Node Name",
+        "  Fan:OnOff,                      !- Supply Fan Object Type",
+        "  Supply Fan 1,                   !- Supply Fan Name",
+        "  BlowThrough,                    !- Fan Placement",
+        "  2LLOYear,                     !- Supply Air Fan Operating Mode Schedule Name",
+        "  ,                               !- Heating Coil Object Type",
+        "  ,                               !- Heating Coil Name",
+        "  ,                               !- DX Heating Coil Sizing Ratio",
+        "  Coil:Cooling:DX:SingleSpeed,       !- Cooling Coil Object Type",
+        "  DX Cooling Coil,                !- Cooling Coil Name",
+        "  No,                             !- Use DOAS DX Cooling Coil",
+        "  2.0,                            !- DOAS DX Cooling Coil Leaving Minimum Air Temperature{ C }",
+        "  SensibleOnlyLoadControl,        !- Latent Load Control",
+        "  ,                               !- Supplemental Heating Coil Object Type",
+        "  ,                               !- Supplemental Heating Coil Name",
+        "  SupplyAirFlowRate,              !- Supply Air Flow Rate Method During Cooling Operation",
+        "  autosize,                       !- Supply Air Flow Rate During Cooling Operation{ m3/s }",
+        "  ,                               !- Supply Air Flow Rate Per Floor Area During Cooling Operation{ m3/s-m2 }",
+        "  ,                               !- Fraction of Autosized Design Cooling Supply Air Flow Rate",
+        "  ,                               !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }",
+        "  SupplyAirFlowRate,              !- Supply air Flow Rate Method During Heating Operation",
+        "  autosize,                       !- Supply Air Flow Rate During Heating Operation{ m3/s }",
+        "  ,                               !- Supply Air Flow Rate Per Floor Area during Heating Operation{ m3/s-m2 }",
+        "  ,                               !- Fraction of Autosized Design Heating Supply Air Flow Rate",
+        "  ,                               !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }",
+        "  SupplyAirFlowRate,              !- Supply Air Flow Rate Method When No Cooling or Heating is Required",
+        "  autosize,                       !- Supply Air Flow Rate When No Cooling or Heating is Required{ m3/s }",
+        "  ,                               !- Supply Air Flow Rate Per Floor Area When No Cooling or Heating is Required{ m3/s-m2 }",
+        "  ,                               !- Fraction of Autosized Design Cooling Supply Air Flow Rate",
+        "  ,                               !- Fraction of Autosized Design Heating Supply Air Flow Rate",
+        "  ,                               !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }",
+        "  ,                               !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }",
+        "  80.0;                           !- Maximum Supply Air Temperature{ C }",
+
+        "Fan:OnOff,",
+        "  Supply Fan 1,                   !- Name",
+        "  2LLOYear,                      !- Availability Schedule Name",
+        "  0.7,                            !- Fan Total Efficiency",
+        "  600.0,                          !- Pressure Rise{ Pa }",
+        "  autosize,                       !- Maximum Flow Rate{ m3 / s }",
+        "  0.9,                            !- Motor Efficiency",
+        "  1.0,                            !- Motor In Airstream Fraction",
+        "  Zone Exhaust Node,              !- Air Inlet Node Name",
+        "  Cooling Coil Air Inlet Node;    !- Air Outlet Node Name",
+
+        "Coil:Cooling:DX:SingleSpeed,",
+        "  DX Cooling Coil,                !- Name",
+        "  ,                               !- Availability Schedule Name",
+        "  autosize,                       !- Gross Rated Total Cooling Capacity{ W }",
+        "  0.8,                            !- Gross Rated Sensible Heat Ratio",
+        "  3.0,                            !- Gross Rated Cooling COP{ W / W }",
+        "  autosize,                       !- Rated Air Flow Rate {m3/s}",
+        "  ,                               !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "  Cooling Coil Air Inlet Node,    !- Air Inlet Node Name",
+        "  Zone 2 Inlet Node,              !- Air Outlet Node Name",
+        "  Biquadratic,                    !- Total Cooling Capacity Function of Temperature Curve Name",
+        "  Quadratic,                      !- Total Cooling Capacity Function of Flow Fraction Curve Name",
+        "  Biquadratic,                    !- Energy Input Ratio Function of Temperature Curve Name",
+        "  Quadratic,                      !- Energy Input Ratio Function of Flow Fraction Curve Name",
+        "  Quadratic,                      !- Part Load Fraction Correlation Curve Name",
+        "  -25.0,                          !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
+        "  1000,                           !- Nominal Time for Condensate Removal to Begin {s}",
+        "  1.5,                            !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}",
+        "  3,                              !- Maximum Cycling Rate {cycles/hr}",
+        "  45,                             !- Latent Capacity Time Constant {s}",
+        "  ,                               !- Condenser Air Inlet Node Name",
+        "  EvaporativelyCooled;            !- Condenser Type",
+
+        "ScheduleTypeLimits,",
+        "  Any Number;                     !- Name",
+
+
+        // This schedule should cause issues if interpolation issue is not fixed. Got the initial schedule from the unmethours issue. 
+        "ScheduleTypeLimits, ",
+        "  Fractional,                     !-Name ",
+        "  0,                              !-Lower Limit Value",
+        "  1,                              !-Upper Limit Value",
+        "  Continuous;                     !-Numeric Type",
+
+        "Schedule:Day:Interval,",
+        "2LLO Tuesday,                           !- Name",
+        "Fractional,                             !- Schedule Type Limits Name",
+        "Linear,                                 !- Interpolate to Timestep",
+        "06:00,                                  !- Time 1 {hh:mm}",
+        "0.5,                                      !- Value Until Time 1",
+        "07:15,                                  !- Time 2 {hh:mm}",
+        "1.0,                                      !- Value Until Time 2",
+        "16:15,                                  !- Time 3 {hh:mm}",
+        "0.5,                                      !- Value Until Time 3",
+        "18:15,                                  !- Time 4 {hh:mm}",
+        "1.0,                                      !- Value Until Time 4",
+        "24:00,                                  !- Time 5 {hh:mm}",
+        "0.5;                                       !-Value Until Time 5 ",
+
+        "Schedule:Week:Daily,",
+        "Week Rule - Jan1-Dec31,  !- Name",
+        "2LLO Tuesday,  !- Sunday Schedule:Day Name",
+        "2LLO Tuesday,  !- Monday Schedule:Day Name",
+        "2LLO Tuesday,  !- Tuesday Schedule:Day Name",
+        "2LLO Tuesday,  !- Wednesday Schedule:Day Name",
+        "2LLO Tuesday,  !- Thursday Schedule:Day Name",
+        "2LLO Tuesday,  !- Friday Schedule:Day Name",
+        "2LLO Tuesday,  !- Saturday Schedule:Day Name",
+        "2LLO Tuesday,  !- Holiday Schedule:Day Name",
+        "2LLO Tuesday,  !- SummerDesignDay Schedule:Day Name",
+        "2LLO Tuesday,  !- WinterDesignDay Schedule:Day Name",
+        "2LLO Tuesday,  !- CustomDay1 Schedule:Day Name",
+        "2LLO Tuesday;  !- CustomDay2 Schedule:Day Name",
+
+        "Schedule:Year,",
+        "2LLOYear,   !- Name ",
+        "Fractional,               !-Schedule Type Limits Name",
+        "Week Rule - Jan1-Dec31,  !- Schedule:Week Name 1",
+        "1,                       !- Start Month 1 ",
+        "1,                       !- Start Day 1",
+        "12,                      !- End Month 1",
+        "31;                      !- End Day 1",
+        // End of problem issue
+
+        "Schedule:Compact,",
+        "  AlwaysOne,                      !- Name",
+        "  Any Number,                     !- Schedule Type Limits Name",
+        "  Through: 12/31,                 !- Field 1",
+        "  For: AllDays,                   !- Field 2",
+        "  Until: 24:00, 1.0;              !- Field 3",
+
+        "Schedule:Compact,",
+        "  AlwaysZero,                      !- Name",
+        "  Any Number,                     !- Schedule Type Limits Name",
+        "  Through: 12/31,                 !- Field 1",
+        "  For: AllDays,                   !- Field 2",
+        "  Until: 24:00, 0.0;              !- Field 3",
+
+        "Schedule:Compact,",
+        "  Always 20C,                     !- Name",
+        "  Any Number,                     !- Schedule Type Limits Name",
+        "  Through: 12/31,                 !- Field 1",
+        "  For: AllDays,                   !- Field 2",
+        "  Until: 24:00, 20.0;             !- Field 3",
+
+        "SetpointManager:Scheduled,",
+        "  Cooling Coil Setpoint Manager,  !- Name",
+        "  Temperature,                    !- Control Variable",
+        "  Always 20C,                     !- Schedule Name",
+        "  Zone 2 Inlet Node;              !- Setpoint Node or NodeList Name",
+
+        "Curve:Quadratic,",
+        "  Quadratic,                      !- Name",
+        "  0.8,                            !- Coefficient1 Constant",
+        "  0.2,                            !- Coefficient2 x",
+        "  0.0,                            !- Coefficient3 x**2",
+        "  0.5,                            !- Minimum Value of x",
+        "  1.5;                            !- Maximum Value of x",
+
+        "Curve:Biquadratic,",
+        "  Biquadratic,                    !- Name",
+        "  0.942587793,                    !- Coefficient1 Constant",
+        "  0.009543347,                    !- Coefficient2 x",
+        "  0.000683770,                    !- Coefficient3 x**2",
+        "  -0.011042676,                   !- Coefficient4 y",
+        "  0.000005249,                    !- Coefficient5 y**2",
+        "  -0.000009720,                   !- Coefficient6 x*y",
+        "  12.77778,                       !- Minimum Value of x",
+        "  23.88889,                       !- Maximum Value of x",
+        "  18.0,                           !- Minimum Value of y",
+        "  46.11111,                       !- Maximum Value of y",
+        "  ,                               !- Minimum Curve Output",
+        "  ,                               !- Maximum Curve Output",
+        "  Temperature,                    !- Input Unit Type for X",
+        "  Temperature,                    !- Input Unit Type for Y",
+        "  Dimensionless;                  !- Output Unit Type",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
+
+    // call the UnitarySystem factory
+    std::string compName = "UNITARY SYSTEM MODEL";
+    bool zoneEquipment = true;
+    UnitarySystems::UnitarySys::factory(*state, DataHVACGlobals::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
+    UnitarySystems::UnitarySys *thisSys = &state->dataUnitarySystems->unitarySys[0];
+
+    state->dataGlobal->NumOfTimeStepInHour = 1;
+    state->dataGlobal->MinutesPerTimeStep = 60;
+    DataZoneEquipment::ZoneEquipInputsFilled = true;                                     // indicate zone data is available
+    thisSys->getUnitarySystemInputData(*state, compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
+
+
+    EXPECT_FALSE(ErrorsFound);
+
+}
+
 TEST_F(ZoneUnitarySysTest, UnitarySystemModel_FuelHeatCoilStptNodeTest)
 {
 
