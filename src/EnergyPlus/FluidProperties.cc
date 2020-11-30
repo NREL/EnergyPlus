@@ -62,8 +62,6 @@
 #include <EnergyPlus/TempSolveRoot.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
-#define EP_cache_GlycolSpecificHeat
-
 namespace EnergyPlus {
 
 namespace FluidProperties {
