@@ -351,11 +351,11 @@ TEST_F(EnergyPlusFixture, DElightManagerF_GetInputDElightComplexFenestration_Tes
     compare_err_stream("");
     EXPECT_FALSE(foundErrors); // expect no errors
 
-    EXPECT_EQ(1, TotDElightCFS);
+    EXPECT_EQ(1, state->dataDaylightingData->TotDElightCFS);
 
-    EXPECT_EQ("TEST CFS", DElightComplexFene(1).Name);
-    EXPECT_EQ("BTDF^GEN^LIGHTSHELF^1.0^20.0", DElightComplexFene(1).ComplexFeneType);
-    EXPECT_EQ("ZN001:WALL001", DElightComplexFene(1).surfName);
-    EXPECT_EQ("ZN001:WALL001:WIN001", DElightComplexFene(1).wndwName);
-    EXPECT_EQ(0., DElightComplexFene(1).feneRota);
+    EXPECT_EQ("TEST CFS", state->dataDaylightingData->DElightComplexFene(1).Name);
+    EXPECT_EQ("BTDF^GEN^LIGHTSHELF^1.0^20.0", state->dataDaylightingData->DElightComplexFene(1).ComplexFeneType);
+    EXPECT_EQ("ZN001:WALL001", state->dataDaylightingData->DElightComplexFene(1).surfName);
+    EXPECT_EQ("ZN001:WALL001:WIN001", state->dataDaylightingData->DElightComplexFene(1).wndwName);
+    EXPECT_EQ(0., state->dataDaylightingData->DElightComplexFene(1).feneRota);
 }

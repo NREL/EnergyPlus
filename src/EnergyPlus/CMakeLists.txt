@@ -163,15 +163,11 @@ SET( SRC
   DataBranchNodeConnections.hh
   DataComplexFenestration.hh
   DataContaminantBalance.hh
-  DataConvergParams.cc
   DataConvergParams.hh
-  DataConversions.cc
   DataConversions.hh
   DataDElight.cc
   DataDElight.hh
-  DataDaylighting.cc
   DataDaylighting.hh
-  DataDaylightingDevices.cc
   DataDaylightingDevices.hh
   DataDefineEquip.cc
   DataDefineEquip.hh

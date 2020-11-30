@@ -4736,8 +4736,6 @@ namespace HeatBalanceManager {
         // IDD Definition for Zone object
 
         // Using/Aliasing
-        using DataDaylighting::ZoneDaylight;
-
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -4769,7 +4767,7 @@ namespace HeatBalanceManager {
         Zone.allocate(state.dataGlobal->NumOfZones);
         DataViewFactorInformation::ZoneRadiantInfo.allocate(state.dataGlobal->NumOfZones);
         DataViewFactorInformation::ZoneSolarInfo.allocate(state.dataGlobal->NumOfZones);
-        ZoneDaylight.allocate(state.dataGlobal->NumOfZones);
+        state.dataDaylightingData->ZoneDaylight.allocate(state.dataGlobal->NumOfZones);
 
         ZoneLoop = 0;
 
@@ -5111,8 +5109,6 @@ namespace HeatBalanceManager {
         // IDD Definition for Zone object
 
         // Using/Aliasing
-        using DataDaylighting::ZoneDaylight;
-
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -5242,7 +5238,7 @@ namespace HeatBalanceManager {
             int SurfNum2 = SurfNum;
             int PipeNum = DataSurfaces::SurfWinTDDPipeNum(SurfNum);
             if (DataSurfaces::SurfWinOriginalClass(SurfNum) == DataSurfaces::SurfaceClass::TDD_Diffuser) {
-                SurfNum2 = DataDaylightingDevices::TDDPipe(PipeNum).Dome;
+                SurfNum2 = state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome;
             }
             SurfCosIncTimestep(SurfNum) = CosIncAng(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum2);
             SurfSunlitFracTimestep(SurfNum) = SunlitFrac(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum2);
