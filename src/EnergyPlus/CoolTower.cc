@@ -520,7 +520,6 @@ namespace CoolTower {
 
         // Using/Aliasing
         using DataEnvironment::StdRhoAir;
-        using DataEnvironment::WindSpeed;
         using DataHeatBalFanSys::CTMFL;
         using DataHeatBalFanSys::MAT;
         using DataHeatBalFanSys::MCPC;
@@ -564,14 +563,14 @@ namespace CoolTower {
 
             if (GetCurrentScheduleValue(state, state.dataCoolTower->CoolTowerSys(CoolTowerNum).SchedPtr) > 0.0) {
                 // check component operation
-                if (WindSpeed < MinWindSpeed || WindSpeed > MaxWindSpeed) continue;
+                if (state.dataEnvrn->WindSpeed < MinWindSpeed || state.dataEnvrn->WindSpeed > MaxWindSpeed) continue;
                 if (MAT(ZoneNum) < state.dataCoolTower->CoolTowerSys(CoolTowerNum).MinZoneTemp) continue;
 
                 // Unit is on and simulate this component
                 // Determine the temperature and air flow rate at the cooltower outlet
                 if (state.dataCoolTower->CoolTowerSys(CoolTowerNum).FlowCtrlType == FlowCtrlEnum::WindDriven) {
                     Real64 const height_sqrt(std::sqrt(state.dataCoolTower->CoolTowerSys(CoolTowerNum).TowerHeight));
-                    state.dataCoolTower->CoolTowerSys(CoolTowerNum).OutletVelocity = 0.7 * height_sqrt + 0.47 * (WindSpeed - 1.0);
+                    state.dataCoolTower->CoolTowerSys(CoolTowerNum).OutletVelocity = 0.7 * height_sqrt + 0.47 * (state.dataEnvrn->WindSpeed - 1.0);
                     AirVolFlowRate = state.dataCoolTower->CoolTowerSys(CoolTowerNum).OutletArea * state.dataCoolTower->CoolTowerSys(CoolTowerNum).OutletVelocity;
                     AirVolFlowRate = min(AirVolFlowRate, state.dataCoolTower->CoolTowerSys(CoolTowerNum).MaxAirVolFlowRate);
                     WaterFlowRate = (AirVolFlowRate / (0.0125 * height_sqrt));

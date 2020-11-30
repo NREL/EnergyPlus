@@ -11191,8 +11191,8 @@ TEST_F(EnergyPlusFixture, VRFTU_SysCurve_ReportOutputVerificationTest)
     state->dataEnvrn->OutDryBulbTemp = 35.0;
     state->dataEnvrn->OutHumRat = 0.0100;
     state->dataEnvrn->OutBaroPress = 101325.0;
-    DataEnvironment::WindSpeed = 5.0;
-    DataEnvironment::WindDir = 0.0;
+    state->dataEnvrn->WindSpeed = 5.0;
+    state->dataEnvrn->WindDir = 0.0;
 
     FinalZoneSizing(CurZoneEqNum).ZoneRetTempAtCoolPeak = Node(thisVRFTU.VRFTUInletNodeNum).Temp;
     FinalZoneSizing(CurZoneEqNum).ZoneHumRatAtCoolPeak = Node(thisVRFTU.VRFTUInletNodeNum).HumRat;
@@ -12923,8 +12923,8 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_ReportOutputVerificationTest)
     state->dataEnvrn->OutDryBulbTemp = 35.0;
     state->dataEnvrn->OutHumRat = 0.0100;
     state->dataEnvrn->OutBaroPress = 101325.0;
-    DataEnvironment::WindSpeed = 5.0;
-    DataEnvironment::WindDir = 0.0;
+    state->dataEnvrn->WindSpeed = 5.0;
+    state->dataEnvrn->WindDir = 0.0;
 
     FinalZoneSizing(CurZoneEqNum).ZoneRetTempAtCoolPeak = Node(thisVRFTU.VRFTUInletNodeNum).Temp;
     FinalZoneSizing(CurZoneEqNum).ZoneHumRatAtCoolPeak = Node(thisVRFTU.VRFTUInletNodeNum).HumRat;

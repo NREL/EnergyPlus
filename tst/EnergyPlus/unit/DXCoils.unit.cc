@@ -4044,8 +4044,8 @@ TEST_F(EnergyPlusFixture, SingleSpeedDXCoolingCoilOutputTest)
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataEnvrn->OutDryBulbTemp = 38.0;
     state->dataEnvrn->OutHumRat = 0.0120;
-    DataEnvironment::WindSpeed = 5.0;
-    DataEnvironment::WindDir = 0.0;
+    state->dataEnvrn->WindSpeed = 5.0;
+    state->dataEnvrn->WindDir = 0.0;
     // run coil at full capacity
     Real64 PartLoadRatio(1.0);
     Real64 AirFlowRatio(1.0);
@@ -4215,8 +4215,8 @@ TEST_F(EnergyPlusFixture, MultiSpeedDXCoolingCoilOutputTest)
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataEnvrn->OutDryBulbTemp = 30.0;
     state->dataEnvrn->OutHumRat = 0.0120;
-    DataEnvironment::WindSpeed = 5.0;
-    DataEnvironment::WindDir = 0.0;
+    state->dataEnvrn->WindSpeed = 5.0;
+    state->dataEnvrn->WindDir = 0.0;
     int SpeedNum = 2;
     int FanOpMode = 1;
     int CompOp = 1;

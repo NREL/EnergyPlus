@@ -1147,7 +1147,7 @@ namespace DataHeatBalance {
         }
     }
 
-    void ZoneData::SetWindSpeedAt(Real64 const fac)
+    void ZoneData::SetWindSpeedAt(EnergyPlusData &state, Real64 const fac)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
@@ -1162,7 +1162,7 @@ namespace DataHeatBalance {
         using DataEnvironment::SiteWindExp;
 
         if (SiteWindExp == 0.0) {
-            WindSpeed = DataEnvironment::WindSpeed;
+            WindSpeed = state.dataEnvrn->WindSpeed;
         } else {
             Real64 const Z(Centroid.z); // Centroid value
             if (Z <= 0.0) {
@@ -1200,23 +1200,23 @@ namespace DataHeatBalance {
         }
     }
 
-    void SetZoneWindSpeedAt()
+    void SetZoneWindSpeedAt(EnergyPlusData &state)
     {
         // Using/Aliasing
         using DataEnvironment::SiteWindBLHeight;
         using DataEnvironment::SiteWindExp;
         using DataEnvironment::WeatherFileWindModCoeff;
 
-        Real64 const fac(DataEnvironment::WindSpeed * WeatherFileWindModCoeff * std::pow(SiteWindBLHeight, -SiteWindExp));
+        Real64 const fac(state.dataEnvrn->WindSpeed * WeatherFileWindModCoeff * std::pow(SiteWindBLHeight, -SiteWindExp));
         for (auto &zone : Zone) {
-            zone.SetWindSpeedAt(fac);
+            zone.SetWindSpeedAt(state, fac);
         }
     }
 
-    void SetZoneWindDirAt()
+    void SetZoneWindDirAt(EnergyPlusData &state)
     {
         // Using/Aliasing
-        Real64 const fac(DataEnvironment::WindDir);
+        Real64 const fac(state.dataEnvrn->WindDir);
         for (auto &zone : Zone) {
             zone.SetWindDirAt(fac);
         }

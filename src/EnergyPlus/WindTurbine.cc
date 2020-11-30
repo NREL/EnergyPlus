@@ -814,7 +814,6 @@ namespace WindTurbine {
         using DataEnvironment::OutBaroPressAt;
         using DataEnvironment::OutDryBulbTempAt;
         using DataEnvironment::OutWetBulbTempAt;
-        using DataEnvironment::WindSpeedAt;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         using Psychrometrics::PsyWFnTdbTwbPb;
         using ScheduleManager::GetCurrentScheduleValue;
@@ -871,7 +870,7 @@ namespace WindTurbine {
         LocalPress = OutBaroPressAt(state, RotorH);
         LocalHumRat = PsyWFnTdbTwbPb(state, LocalTemp, OutWetBulbTempAt(state, RotorH), LocalPress);
         LocalAirDensity = PsyRhoAirFnPbTdbW(state, LocalPress, LocalTemp, LocalHumRat);
-        LocalWindSpeed = WindSpeedAt(RotorH);
+        LocalWindSpeed = DataEnvironment::WindSpeedAt(state, RotorH);
         LocalWindSpeed /= state.dataWindTurbine->WindTurbineSys(WindTurbineNum).WSFactor;
 
         // Flow

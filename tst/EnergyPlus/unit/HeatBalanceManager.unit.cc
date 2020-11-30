@@ -1290,8 +1290,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
     DataLoopNode::Node(1).OutAirWindDirSchedNum = 0;
     state->dataEnvrn->OutDryBulbTemp = 25.0;
     state->dataEnvrn->OutWetBulbTemp = 20.0;
-    DataEnvironment::WindSpeed = 1.5;
-    DataEnvironment::WindDir = 90.0;
+    state->dataEnvrn->WindSpeed = 1.5;
+    state->dataEnvrn->WindDir = 90.0;
 
     InitHeatBalance(*state);
 

@@ -184,7 +184,7 @@ TEST_F(EnergyPlusFixture, PVWattsGenerator_Calc)
     state->dataWeatherManager->WeatherFileTimeZone = -7;
     state->dataEnvrn->BeamSolarRad = 728;
     state->dataEnvrn->DifSolarRad = 70;
-    DataEnvironment::WindSpeed = 3.1;
+    state->dataEnvrn->WindSpeed = 3.1;
     state->dataEnvrn->OutDryBulbTemp = 31.7;
 
     PVWattsGenerator pvwa(*state, "PVWattsArrayA", 4000.0, ModuleType::STANDARD, ArrayType::FIXED_ROOF_MOUNTED);

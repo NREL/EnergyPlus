@@ -4653,8 +4653,6 @@ namespace ConvectionCoefficients {
         // separated out long case statement for selecting models.
 
         // Using/Aliasing
-        using DataEnvironment::WindDir;
-        using DataEnvironment::WindSpeed;
         using DataHeatBalSurface::QdotConvOutRepPerArea;
         using DataHeatBalSurface::TH;
 
@@ -4908,19 +4906,19 @@ namespace ConvectionCoefficients {
                     }
                 }
             } else if (SELECT_CASE_var == HcExt_BlockenWindward) {
-                Hf = CalcBlockenWindward(WindSpeed, WindDir, Surface(SurfNum).Azimuth);
+                Hf = CalcBlockenWindward(state.dataEnvrn->WindSpeed, state.dataEnvrn->WindDir, Surface(SurfNum).Azimuth);
                 // Not compatible with Kiva (doesn't use weather station windspeed)
                 if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
                     ShowFatalError(state, "Blocken Windward convection model not applicable for foundation surface =" + Surface(SurfNum).Name);
                 }
             } else if (SELECT_CASE_var == HcExt_EmmelVertical) {
-                Hf = CalcEmmelVertical(state, WindSpeed, WindDir, Surface(SurfNum).Azimuth, SurfNum);
+                Hf = CalcEmmelVertical(state, state.dataEnvrn->WindSpeed, state.dataEnvrn->WindDir, Surface(SurfNum).Azimuth, SurfNum);
                 // Not compatible with Kiva (doesn't use weather station windspeed)
                 if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
                     ShowFatalError(state, "Emmel Vertical convection model not applicable for foundation surface =" + Surface(SurfNum).Name);
                 }
             } else if (SELECT_CASE_var == HcExt_EmmelRoof) {
-                Hf = CalcEmmelRoof(state, WindSpeed, WindDir, state.dataConvectionCoefficient->RoofLongAxisOutwardAzimuth, SurfNum);
+                Hf = CalcEmmelRoof(state, state.dataEnvrn->WindSpeed, state.dataEnvrn->WindDir, state.dataConvectionCoefficient->RoofLongAxisOutwardAzimuth, SurfNum);
                 // Not compatible with Kiva (doesn't use weather station windspeed)
                 if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
                     ShowFatalError(state, "Emmel Roof convection model not applicable for foundation surface =" + Surface(SurfNum).Name);
@@ -6172,8 +6170,6 @@ namespace ConvectionCoefficients {
 
         // Using/Aliasing
         using CurveManager::CurveValue;
-        using DataEnvironment::WindDir;
-        using DataEnvironment::WindSpeed;
         using DataHeatBalSurface::TH;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -6187,14 +6183,14 @@ namespace ConvectionCoefficients {
             auto const SELECT_CASE_var(UserCurve.WindSpeedType);
 
             if (SELECT_CASE_var == RefWindWeatherFile) {
-                windVel = WindSpeed;
+                windVel = state.dataEnvrn->WindSpeed;
             } else if (SELECT_CASE_var == RefWindAtZ) {
                 windVel = Surface(SurfNum).WindSpeed;
             } else if (SELECT_CASE_var == RefWindParallComp) {
                 // WindSpeed , WindDir, surface Azimuth
-                Theta = WindDir - Surface(SurfNum).Azimuth - 90.0; // TODO double check theta
+                Theta = state.dataEnvrn->WindDir - Surface(SurfNum).Azimuth - 90.0; // TODO double check theta
                 ThetaRad = Theta * DataGlobalConstants::DegToRadians();
-                windVel = std::cos(ThetaRad) * WindSpeed;
+                windVel = std::cos(ThetaRad) * state.dataEnvrn->WindSpeed;
             } else if (SELECT_CASE_var == RefWindParallCompAtZ) {
                 // Surface WindSpeed , Surface WindDir, surface Azimuth
                 Theta = Surface(SurfNum).WindDir - Surface(SurfNum).Azimuth - 90.0; // TODO double check theta

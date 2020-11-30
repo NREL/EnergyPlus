@@ -605,14 +605,14 @@ namespace OutAirNodeManager {
             // Note -- this setting is different than the DataEnvironment "AT" settings.
             Node(NodeNum).OutAirDryBulb = state.dataEnvrn->OutDryBulbTemp;
             Node(NodeNum).OutAirWetBulb = state.dataEnvrn->OutWetBulbTemp;
-            if (InitCall) Node(NodeNum).OutAirWindSpeed = WindSpeed;
+            if (InitCall) Node(NodeNum).OutAirWindSpeed = state.dataEnvrn->WindSpeed;
         } else {
             Node(NodeNum).OutAirDryBulb = OutDryBulbTempAt(state, Node(NodeNum).Height);
             Node(NodeNum).OutAirWetBulb = OutWetBulbTempAt(state, Node(NodeNum).Height);
-            if (InitCall) Node(NodeNum).OutAirWindSpeed = WindSpeedAt(Node(NodeNum).Height);
+            if (InitCall) Node(NodeNum).OutAirWindSpeed = DataEnvironment::WindSpeedAt(state, Node(NodeNum).Height);
         }
-        if (!InitCall) Node(NodeNum).OutAirWindSpeed = WindSpeed;
-        Node(NodeNum).OutAirWindDir = WindDir;
+        if (!InitCall) Node(NodeNum).OutAirWindSpeed = state.dataEnvrn->WindSpeed;
+        Node(NodeNum).OutAirWindDir = state.dataEnvrn->WindDir;
 
         if (InitCall) {
             // Set node data to local air node values if defined

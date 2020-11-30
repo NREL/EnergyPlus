@@ -73,8 +73,8 @@ TEST_F(EnergyPlusFixture, OutAirNodeManager_OATdbTwbOverrideTest)
 
     state->dataEnvrn->OutDryBulbTemp = 25.0;
     state->dataEnvrn->OutWetBulbTemp = 15.0;
-    DataEnvironment::WindSpeed = 2.0;
-    DataEnvironment::WindDir = 0.0;
+    state->dataEnvrn->WindSpeed = 2.0;
+    state->dataEnvrn->WindDir = 0.0;
     state->dataEnvrn->OutBaroPress = 101325;
     state->dataEnvrn->OutHumRat = Psychrometrics::PsyWFnTdbTwbPb(*state, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutWetBulbTemp, state->dataEnvrn->OutBaroPress);
 

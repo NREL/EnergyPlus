@@ -397,8 +397,8 @@ namespace HeatBalanceSurfaceManager {
         SetSurfaceOutBulbTempAt(state);
         CheckSurfaceOutBulbTempAt(state);
 
-        SetSurfaceWindSpeedAt();
-        SetSurfaceWindDirAt();
+        SetSurfaceWindSpeedAt(state);
+        SetSurfaceWindDirAt(state);
         //  DO SurfNum = 1, TotSurfaces
         //    IF (Surface(SurfNum)%ExtWind) Surface(SurfNum)%WindSpeed = WindSpeedAt(Surface(SurfNum)%Centroid%z)
         //  END DO

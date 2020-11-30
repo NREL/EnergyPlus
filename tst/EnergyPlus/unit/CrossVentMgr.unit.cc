@@ -119,7 +119,7 @@ TEST_F(EnergyPlusFixture, CrossVentMgr_EvolveParaUCSDCV_Test)
     EnergyPlus::AirflowNetwork::AirflowNetworkLinkSimu.allocate(1);
     EnergyPlus::AirflowNetwork::AirflowNetworkLinkSimu(1).VolFLOW2 = 27.142934345451458;
 
-    EnergyPlus::DataEnvironment::WindDir = 271.66666666666669;
+    state->dataEnvrn->WindDir = 271.66666666666669;
 
     EnergyPlus::DataRoomAirModel::AirModel.allocate(state->dataGlobal->NumOfZones);
 

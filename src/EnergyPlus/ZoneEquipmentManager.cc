@@ -4559,7 +4559,6 @@ namespace ZoneEquipmentManager {
         // This subroutine calculates the air component of the heat balance.
 
         // Using/Aliasing
-        using DataEnvironment::WindSpeed;
         using namespace DataHeatBalFanSys;
         using namespace DataHeatBalance;
         using CoolTower::ManageCoolTower;
@@ -5416,7 +5415,7 @@ namespace ZoneEquipmentManager {
                     Infiltration(j).MassFlowRate = Infiltration(j).VolumeFlowRate * AirDensity;
                 } else if (SELECT_CASE_var == InfiltrationShermanGrimsrud) {
                     // Sherman Grimsrud model as formulated in ASHRAE HoF
-                    WindSpeedExt = WindSpeed; // formulated to use wind at Meterological Station rather than local
+                    WindSpeedExt = state.dataEnvrn->WindSpeed; // formulated to use wind at Meterological Station rather than local
                     IVF = GetCurrentScheduleValue(state, Infiltration(j).SchedPtr) * Infiltration(j).LeakageArea / 1000.0 *
                           std::sqrt(Infiltration(j).BasicStackCoefficient * std::abs(TempExt - ZMAT(NZ)) +
                                     Infiltration(j).BasicWindCoefficient * pow_2(WindSpeedExt));

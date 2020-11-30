@@ -1262,7 +1262,6 @@ namespace PipeHeatTransfer {
         // Using/Aliasing
         using ConvectionCoefficients::CalcASHRAESimpExtConvectCoeff;
         using DataEnvironment::SOLCOS;
-        using DataEnvironment::WindSpeed;
         using DataLoopNode::Node;
 
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1342,7 +1341,7 @@ namespace PipeHeatTransfer {
                             Cp = this->SoilCp;
 
                             // ASHRAE simple convection coefficient model for external surfaces.
-                            this->OutdoorConvCoef = CalcASHRAESimpExtConvectCoeff(TopRoughness, WindSpeed);
+                            this->OutdoorConvCoef = CalcASHRAESimpExtConvectCoeff(TopRoughness, state.dataEnvrn->WindSpeed);
                             ConvCoef = this->OutdoorConvCoef;
 
                             // thermal radiation coefficient using surf temp from past time step
@@ -1751,7 +1750,6 @@ namespace PipeHeatTransfer {
         // p. 369-370 (Eq. 7:55b)
 
         // Using/Aliasing
-        using DataEnvironment::WindSpeed;
         using DataHeatBalFanSys::MAT; // average (mean) zone air temperature [C]
         using DataLoopNode::Node;
         using ScheduleManager::GetCurrentScheduleValue;
@@ -1830,7 +1828,7 @@ namespace PipeHeatTransfer {
                     auto const SELECT_CASE_var1(this->EnvironmentPtr);
                     if (SELECT_CASE_var1 == OutsideAirEnv) {
                         AirTemp = Node(this->EnvrAirNodeNum).Temp;
-                        AirVel = WindSpeed;
+                        AirVel = state.dataEnvrn->WindSpeed;
                     }
                 }
             }

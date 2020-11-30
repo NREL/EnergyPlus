@@ -394,8 +394,8 @@ namespace WeatherManager {
                 "Site Outdoor Air Relative Humidity", OutputProcessor::Unit::Perc, state.dataEnvrn->OutRelHum, "Zone", "Average", "Environment");
             SetupOutputVariable(state,
                 "Site Outdoor Air Barometric Pressure", OutputProcessor::Unit::Pa, state.dataEnvrn->OutBaroPress, "Zone", "Average", "Environment");
-            SetupOutputVariable(state, "Site Wind Speed", OutputProcessor::Unit::m_s, DataEnvironment::WindSpeed, "Zone", "Average", "Environment");
-            SetupOutputVariable(state, "Site Wind Direction", OutputProcessor::Unit::deg, DataEnvironment::WindDir, "Zone", "Average", "Environment");
+            SetupOutputVariable(state, "Site Wind Speed", OutputProcessor::Unit::m_s, state.dataEnvrn->WindSpeed, "Zone", "Average", "Environment");
+            SetupOutputVariable(state, "Site Wind Direction", OutputProcessor::Unit::deg, state.dataEnvrn->WindDir, "Zone", "Average", "Environment");
             SetupOutputVariable(state, "Site Sky Temperature", OutputProcessor::Unit::C, state.dataEnvrn->SkyTemp, "Zone", "Average", "Environment");
             SetupOutputVariable(state,
                 "Site Horizontal Infrared Radiation Rate per Area", OutputProcessor::Unit::W_m2, state.dataWeatherManager->HorizIRSky, "Zone", "Average", "Environment");
@@ -508,14 +508,14 @@ namespace WeatherManager {
                                  "Environment",
                                  "Wind Speed",
                                  "[m/s]",
-                                 DataEnvironment::EMSWindSpeedOverrideOn,
-                                 DataEnvironment::EMSWindSpeedOverrideValue);
+                                 state.dataEnvrn->EMSWindSpeedOverrideOn,
+                                 state.dataEnvrn->EMSWindSpeedOverrideValue);
                 SetupEMSActuator("Weather Data",
                                  "Environment",
                                  "Wind Direction",
                                  "[deg]",
-                                 DataEnvironment::EMSWindDirOverrideOn,
-                                 DataEnvironment::EMSWindDirOverrideValue);
+                                 state.dataEnvrn->EMSWindDirOverrideOn,
+                                 state.dataEnvrn->EMSWindDirOverrideValue);
             }
 
             state.dataWeatherManager->GetEnvironmentFirstCall = false;
@@ -1959,10 +1959,10 @@ namespace WeatherManager {
             state.dataWeatherManager->SPSiteSkyTemperatureScheduleValue = -999.0;    // N/A SkyTemperature Modifier Schedule Value
         }
 
-        DataEnvironment::WindSpeed = state.dataWeatherManager->TodayWindSpeed(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay);
-        if (DataEnvironment::EMSWindSpeedOverrideOn) DataEnvironment::WindSpeed = DataEnvironment::EMSWindSpeedOverrideValue;
-        DataEnvironment::WindDir = state.dataWeatherManager->TodayWindDir(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay);
-        if (DataEnvironment::EMSWindDirOverrideOn) DataEnvironment::WindDir = DataEnvironment::EMSWindDirOverrideValue;
+        state.dataEnvrn->WindSpeed = state.dataWeatherManager->TodayWindSpeed(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay);
+        if (state.dataEnvrn->EMSWindSpeedOverrideOn) state.dataEnvrn->WindSpeed = state.dataEnvrn->EMSWindSpeedOverrideValue;
+        state.dataEnvrn->WindDir = state.dataWeatherManager->TodayWindDir(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay);
+        if (state.dataEnvrn->EMSWindDirOverrideOn) state.dataEnvrn->WindDir = state.dataEnvrn->EMSWindDirOverrideValue;
         state.dataWeatherManager->HorizIRSky = state.dataWeatherManager->TodayHorizIRSky(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay);
         state.dataEnvrn->SkyTemp = state.dataWeatherManager->TodaySkyTemp(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay);
         state.dataEnvrn->SkyTempKelvin = state.dataEnvrn->SkyTemp + DataGlobalConstants::KelvinConv();

@@ -595,7 +595,7 @@ namespace PondGroundHeatExchanger {
         Real64 SkyTempAbs = state.dataEnvrn->SkyTemp + DataGlobalConstants::KelvinConv(); // absolute value of sky temp
 
         // ASHRAE simple convection coefficient model for external surfaces.
-        Real64 ConvCoef = ConvectionCoefficients::CalcASHRAESimpExtConvectCoeff(DataHeatBalance::VeryRough, DataEnvironment::WindSpeedAt(PondHeight));
+        Real64 ConvCoef = ConvectionCoefficients::CalcASHRAESimpExtConvectCoeff(DataHeatBalance::VeryRough, DataEnvironment::WindSpeedAt(state, PondHeight));
 
         // convective flux
         Real64 FluxConvect = ConvCoef * (PondBulkTemp - ExternalTemp);

@@ -4419,9 +4419,9 @@ namespace EnergyPlus {
                         Denominator += (Beta / Resistance);
                     } else if (CurDirection == Direction::PositiveY) {
                         // convection at the surface
-                        if (DataEnvironment::WindSpeed > 0.1) {
+                        if (state.dataEnvrn->WindSpeed > 0.1) {
                             Resistance = 208.0 /
-                                         (AirDensity * AirSpecificHeat * DataEnvironment::WindSpeed * ThisNormalArea);
+                                         (AirDensity * AirSpecificHeat * state.dataEnvrn->WindSpeed * ThisNormalArea);
                             Numerator += (Beta / Resistance) * this->Cur.CurAirTemp;
                             Denominator += (Beta / Resistance);
                         }
@@ -4443,9 +4443,9 @@ namespace EnergyPlus {
                         // debug error, can't get here
                     } else if (CurDirection == Direction::PositiveY) {
                         // convection at the surface
-                        if (DataEnvironment::WindSpeed > 0.1) {
+                        if (state.dataEnvrn->WindSpeed > 0.1) {
                             Resistance = 208.0 /
-                                         (AirDensity * AirSpecificHeat * DataEnvironment::WindSpeed * ThisNormalArea);
+                                         (AirDensity * AirSpecificHeat * state.dataEnvrn->WindSpeed * ThisNormalArea);
                             Numerator += (Beta / Resistance) * this->Cur.CurAirTemp;
                             Denominator += (Beta / Resistance);
                         } else {
@@ -5732,7 +5732,7 @@ namespace EnergyPlus {
 
             // Update environmental conditions
             this->Cur.CurAirTemp = state.dataEnvrn->OutDryBulbTemp;
-            this->Cur.CurWindSpeed = DataEnvironment::WindSpeed;
+            this->Cur.CurWindSpeed = state.dataEnvrn->WindSpeed;
             this->Cur.CurRelativeHumidity = state.dataEnvrn->OutRelHum;
             this->Cur.CurIncidentSolar = state.dataEnvrn->BeamSolarRad;
 

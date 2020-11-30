@@ -71,12 +71,6 @@ namespace DataEnvironment {
     // current weather variables)
 
     // MODULE VARIABLE DECLARATIONS:
-    Real64 WindDir;                           // Current outdoor air wind direction
-    bool EMSWindDirOverrideOn(false);         // EMS flag for outdoor air wind direction
-    Real64 EMSWindDirOverrideValue;           // EMS override value for outdoor air wind direction
-    Real64 WindSpeed;                         // Current outdoor air wind speed
-    bool EMSWindSpeedOverrideOn(false);       // EMS flag for outdoor air wind speed
-    Real64 EMSWindSpeedOverrideValue;         // EMS override value for outdoor air wind speed
     Real64 WaterMainsTemp;                    // Current water mains temperature
     int Year;                                 // Current calendar year of the simulation from the weather file
     int YearTomorrow;                         // Tomorrow's calendar year of the simulation
@@ -149,12 +143,6 @@ namespace DataEnvironment {
 
     void clear_state()
     {
-        WindDir = Real64();
-        EMSWindDirOverrideOn = false;
-        EMSWindDirOverrideValue = Real64();
-        WindSpeed = Real64();
-        EMSWindSpeedOverrideOn = false;
-        EMSWindSpeedOverrideValue = Real64();
         WaterMainsTemp = Real64();
         Year = int();
         YearTomorrow = int();
@@ -349,7 +337,7 @@ namespace DataEnvironment {
         return LocalOutDewPointTemp;
     }
 
-    Real64 WindSpeedAt(Real64 const Z) // Height above ground (m)
+    Real64 WindSpeedAt(EnergyPlusData &state, Real64 const Z) // Height above ground (m)
     {
 
         // FUNCTION INFORMATION:
@@ -374,12 +362,12 @@ namespace DataEnvironment {
         if (Z <= 0.0) {
             LocalWindSpeed = 0.0;
         } else if (SiteWindExp == 0.0) {
-            LocalWindSpeed = WindSpeed;
+            LocalWindSpeed = state.dataEnvrn->WindSpeed;
         } else {
             //  [Met] - at meterological Station, Height of measurement is usually 10m above ground
             //  LocalWindSpeed = Windspeed [Met] * (Wind Boundary LayerThickness [Met]/Height [Met])**Wind Exponent[Met] &
             //                     * (Height above ground / Site Wind Boundary Layer Thickness) ** Site Wind Exponent
-            LocalWindSpeed = WindSpeed * WeatherFileWindModCoeff * std::pow(Z / SiteWindBLHeight, SiteWindExp);
+            LocalWindSpeed = state.dataEnvrn->WindSpeed * WeatherFileWindModCoeff * std::pow(Z / SiteWindBLHeight, SiteWindExp);
         }
 
         return LocalWindSpeed;
@@ -444,7 +432,7 @@ namespace DataEnvironment {
     }
 
     void
-    SetWindSpeedAt(int const NumItems, const Array1D<Real64> &Heights, Array1D<Real64> &LocalWindSpeed, [[maybe_unused]] std::string const &Settings)
+    SetWindSpeedAt(EnergyPlusData &state, int const NumItems, const Array1D<Real64> &Heights, Array1D<Real64> &LocalWindSpeed, [[maybe_unused]] std::string const &Settings)
     {
 
         // SUBROUTINE INFORMATION:
@@ -457,9 +445,9 @@ namespace DataEnvironment {
         // Routine provides facility for doing bulk Set Windspeed at Height.
 
         if (SiteWindExp == 0.0) {
-            LocalWindSpeed = WindSpeed;
+            LocalWindSpeed = state.dataEnvrn->WindSpeed;
         } else {
-            Real64 const fac(WindSpeed * WeatherFileWindModCoeff * std::pow(SiteWindBLHeight, -SiteWindExp));
+            Real64 const fac(state.dataEnvrn->WindSpeed * WeatherFileWindModCoeff * std::pow(SiteWindBLHeight, -SiteWindExp));
             Real64 Z; // Centroid value
             for (int i = 1; i <= NumItems; ++i) {
                 Z = Heights(i);

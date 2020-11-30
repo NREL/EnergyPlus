@@ -1759,8 +1759,8 @@ TEST_F(EnergyPlusFixture, EMS_WeatherDataActuators)
     EXPECT_NEAR(state->dataEnvrn->OutRelHum, 50.0, 0.000001);
     EXPECT_NEAR(state->dataEnvrn->DifSolarRad, 0.0, 0.000001);  // Sun is down
     EXPECT_NEAR(state->dataEnvrn->BeamSolarRad, 0.0, 0.000001); // Sun is down
-    EXPECT_NEAR(DataEnvironment::WindSpeed, 5.5, 0.000001);
-    EXPECT_NEAR(DataEnvironment::WindDir, 32.1, 0.000001);
+    EXPECT_NEAR(state->dataEnvrn->WindSpeed, 5.5, 0.000001);
+    EXPECT_NEAR(state->dataEnvrn->WindDir, 32.1, 0.000001);
 
     state->dataGlobal->TimeStep = 3;
     state->dataGlobal->HourOfDay = 8;
@@ -1774,8 +1774,8 @@ TEST_F(EnergyPlusFixture, EMS_WeatherDataActuators)
     EXPECT_NEAR(state->dataEnvrn->OutRelHum, 50.0, 0.000001);
     EXPECT_NEAR(state->dataEnvrn->DifSolarRad, 500.0, 0.000001);   // Sun is up
     EXPECT_NEAR(state->dataEnvrn->BeamSolarRad, 1000.0, 0.000001); // Sun is up
-    EXPECT_NEAR(DataEnvironment::WindSpeed, 5.5, 0.000001);
-    EXPECT_NEAR(DataEnvironment::WindDir, 32.1, 0.000001);
+    EXPECT_NEAR(state->dataEnvrn->WindSpeed, 5.5, 0.000001);
+    EXPECT_NEAR(state->dataEnvrn->WindDir, 32.1, 0.000001);
 }
 TEST_F(EnergyPlusFixture, EMS_TodayTomorrowFunctions)
 {

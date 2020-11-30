@@ -772,7 +772,7 @@ namespace DataSurfaces {
         }
     }
 
-    void SurfaceData::SetWindSpeedAt(Real64 const fac)
+    void SurfaceData::SetWindSpeedAt(EnergyPlusData &state, Real64 const fac)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
@@ -787,7 +787,7 @@ namespace DataSurfaces {
         using DataEnvironment::SiteWindExp;
 
         if (SiteWindExp == 0.0) {
-            WindSpeed = DataEnvironment::WindSpeed;
+            WindSpeed = state.dataEnvrn->WindSpeed;
         } else {
             Real64 const Z(Centroid.z); // Centroid value
             if (Z <= 0.0) {
@@ -1446,25 +1446,24 @@ namespace DataSurfaces {
         }
     }
 
-    void SetSurfaceWindSpeedAt()
+    void SetSurfaceWindSpeedAt(EnergyPlusData &state)
     {
         // Using/Aliasing
         using DataEnvironment::SiteWindBLHeight;
         using DataEnvironment::SiteWindExp;
         using DataEnvironment::WeatherFileWindModCoeff;
 
-        Real64 const fac(DataEnvironment::WindSpeed * WeatherFileWindModCoeff * std::pow(SiteWindBLHeight, -SiteWindExp));
+        Real64 const fac(state.dataEnvrn->WindSpeed * WeatherFileWindModCoeff * std::pow(SiteWindBLHeight, -SiteWindExp));
         for (auto &surface : Surface) {
-            surface.SetWindSpeedAt(fac);
+            surface.SetWindSpeedAt(state, fac);
         }
     }
 
-    void SetSurfaceWindDirAt()
+    void SetSurfaceWindDirAt(EnergyPlusData &state)
     {
         // Using/Aliasing
-        using DataEnvironment::WindDir;
         for (auto &surface : Surface) {
-            surface.SetWindDirAt(WindDir);
+            surface.SetWindDirAt(state.dataEnvrn->WindDir);
         }
     }
 

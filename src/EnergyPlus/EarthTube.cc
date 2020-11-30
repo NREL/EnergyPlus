@@ -605,7 +605,7 @@ namespace EarthTube {
             EVF = EarthTubeSys(Loop).DesignLevel * GetCurrentScheduleValue(state, EarthTubeSys(Loop).SchedPtr);
             MCPE(NZ) = EVF * AirDensity * AirSpecHeat *
                        (EarthTubeSys(Loop).ConstantTermCoef + std::abs(state.dataEnvrn->OutDryBulbTemp - MAT(NZ)) * EarthTubeSys(Loop).TemperatureTermCoef +
-                        WindSpeed * (EarthTubeSys(Loop).VelocityTermCoef + WindSpeed * EarthTubeSys(Loop).VelocitySQTermCoef));
+                           state.dataEnvrn->WindSpeed * (EarthTubeSys(Loop).VelocityTermCoef + state.dataEnvrn->WindSpeed * EarthTubeSys(Loop).VelocitySQTermCoef));
 
             EAMFL(NZ) = MCPE(NZ) / AirSpecHeat;
             if (EarthTubeSys(Loop).FanEfficiency > 0.0) {

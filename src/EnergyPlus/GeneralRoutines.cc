@@ -1028,8 +1028,6 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
     // USE STATEMENTS:
 
     // Using/Aliasing
-    using DataEnvironment::WindSpeedAt;
-    // USE DataLoopNode    , ONLY: Node
     using ConvectionCoefficients::InitExteriorConvectionCoeff;
     using DataHeatBalance::SurfQRadSWOutIncident;
     using DataHeatBalSurface::TH;

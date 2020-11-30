@@ -125,8 +125,6 @@ namespace AirflowNetworkBalanceManager {
     using DataEnvironment::OutDryBulbTempAt;
     using DataEnvironment::StdBaroPress;
     using DataEnvironment::StdRhoAir;
-    using DataEnvironment::WindDir;
-    using DataEnvironment::WindSpeedAt;
     using DataHeatBalance::TotCrossMixing;
     using DataHeatBalance::TotInfiltration;
     using DataHeatBalance::TotMixing;
@@ -5765,7 +5763,7 @@ namespace AirflowNetworkBalanceManager {
                     AirflowNetworkNodeSimu(n).WZ = state.dataEnvrn->OutHumRat;
                     if (i <= state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfExtNode) {
                         if (MultizoneExternalNodeData(i).OutAirNodeNum == 0) {
-                            LocalWindSpeed = WindSpeedAt(MultizoneExternalNodeData(i).height);
+                            LocalWindSpeed = DataEnvironment::WindSpeedAt(state, MultizoneExternalNodeData(i).height);
                             LocalDryBulb = OutDryBulbTempAt(state, AirflowNetworkNodeData(n).NodeHeight);
                             LocalAzimuth = MultizoneExternalNodeData(i).azimuth;
                             AirflowNetworkNodeSimu(n).PZ = CalcWindPressure(state,
@@ -5774,7 +5772,7 @@ namespace AirflowNetworkBalanceManager {
                                                                             MultizoneExternalNodeData(i).useRelativeAngle,
                                                                             LocalAzimuth,
                                                                             LocalWindSpeed,
-                                                                            WindDir,
+                                                                            state.dataEnvrn->WindDir,
                                                                             LocalDryBulb,
                                                                             state.dataEnvrn->OutHumRat);
                         } else {
@@ -6596,7 +6594,6 @@ namespace AirflowNetworkBalanceManager {
         // REFERENCES:
         // ASTM C1340
 
-        using DataEnvironment::WindSpeed;
         Real64 k = airThermConductivity(state, Ts);
 
         Real64 hOut_final = 0;
@@ -6624,7 +6621,7 @@ namespace AirflowNetworkBalanceManager {
                 Real64 Vol = Zone(ZoneNum).Volume;               // Zone volume [m3]
                 V = pow(Vol, 0.333) * ACH / 3600;                // Average air speed in zone [m/s]
             } else {
-                V = WindSpeed;
+                V = state.dataEnvrn->WindSpeed;
             }
 
             Real64 Re = V * Dh / KinVisc; // Reynolds number
@@ -10824,7 +10821,7 @@ namespace AirflowNetworkBalanceManager {
                 Sprime(ZnNum) = std::sqrt(pow_2(X1 - X2) + pow_2(Y1 - Y2)) / MultizoneZoneData(ZnNum).BuildWidth;
                 // Calculate DeltaCp for each wind direction for each zone
                 for (windDirNum = 1; windDirNum <= numWindDir; ++windDirNum) {
-                    WindDir = (windDirNum - 1) * 10.0;
+                    state.dataEnvrn->WindDir = (windDirNum - 1) * 10.0;
                     Real64 WindAng = (windDirNum - 1) * 10.0;
                     state.dataAirflowNetworkBalanceManager->IncAng = std::abs(WindAng - ZoneAng(ZnNum));
                     if (std::abs(state.dataAirflowNetworkBalanceManager->IncAng) > 180.0) state.dataAirflowNetworkBalanceManager->IncAng -= 360.0;

@@ -68,12 +68,6 @@ namespace DataEnvironment {
     Real64 constexpr StdPressureSeaLevel(101325.0);   // Standard barometric pressure at sea level (Pa)
 
     // MODULE VARIABLE DECLARATIONS:
-    extern Real64 WindDir;                         // Current outdoor air wind direction
-    extern bool EMSWindDirOverrideOn;              // EMS flag for outdoor air wind direction
-    extern Real64 EMSWindDirOverrideValue;         // EMS override value for outdoor air wind direction
-    extern Real64 WindSpeed;                       // Current outdoor air wind speed
-    extern bool EMSWindSpeedOverrideOn;            // EMS flag for outdoor air wind speed
-    extern Real64 EMSWindSpeedOverrideValue;       // EMS override value for outdoor air wind speed
     extern Real64 WaterMainsTemp;                  // Current water mains temperature
     extern int Year;                               // Current calendar year of the simulation from the weather file
     extern int YearTomorrow;                       // Tomorrow's calendar year of the simulation
@@ -152,7 +146,7 @@ namespace DataEnvironment {
 
     Real64 OutDewPointTempAt(EnergyPlusData &state, Real64 Z); // Height above ground (m)
 
-    Real64 WindSpeedAt(Real64 Z); // Height above ground (m)
+    Real64 WindSpeedAt(EnergyPlusData &state, Real64 Z); // Height above ground (m)
 
     Real64 OutBaroPressAt(EnergyPlusData &state, Real64 Z); // Height above ground (m)
 
@@ -213,6 +207,12 @@ struct EnvironmentData : BaseGlobalStruct {
     Real64 SkyTempKelvin = 0.0;                         // Current sky temperature {K}
     Real64 LiquidPrecipitation = 0.0;                   // Current liquid precipitation amount (rain) {m}
     bool SunIsUp = false;                               // True when Sun is over horizon, False when not
+    Real64 WindDir = 0.0;                               // Current outdoor air wind direction
+    bool EMSWindDirOverrideOn = false;                  // EMS flag for outdoor air wind direction
+    Real64 EMSWindDirOverrideValue = 0.0;               // EMS override value for outdoor air wind direction
+    Real64 WindSpeed = 0.0;                             // Current outdoor air wind speed
+    bool EMSWindSpeedOverrideOn = false;                // EMS flag for outdoor air wind speed
+    Real64 EMSWindSpeedOverrideValue = false;           // EMS override value for outdoor air wind speed
 
     void clear_state() override
     {
@@ -267,6 +267,12 @@ struct EnvironmentData : BaseGlobalStruct {
         this->SkyTempKelvin = 0.0;
         this->LiquidPrecipitation = 0.0;
         this->SunIsUp = false;
+        this->WindDir = 0.0;
+        this->EMSWindDirOverrideOn = false;
+        this->EMSWindDirOverrideValue = 0.0;
+        this->WindSpeed = 0.0;
+        this->EMSWindSpeedOverrideOn = false;
+        this->EMSWindSpeedOverrideValue = false;
     }
 };
 

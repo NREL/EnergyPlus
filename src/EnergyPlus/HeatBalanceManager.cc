@@ -5375,8 +5375,8 @@ namespace HeatBalanceManager {
         CheckZoneOutBulbTempAt(state);
 
         // set zone level wind dir to global value
-        SetZoneWindSpeedAt();
-        SetZoneWindDirAt();
+        SetZoneWindSpeedAt(state);
+        SetZoneWindDirAt(state);
 
         // Set zone data to linked air node value if defined.
         if (state.dataGlobal->AnyLocalEnvironmentsInModel) {

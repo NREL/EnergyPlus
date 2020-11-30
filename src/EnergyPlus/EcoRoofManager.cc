@@ -293,7 +293,7 @@ namespace EcoRoofManager {
         //  INTEGER,EXTERNAL :: GetNewUnitNumber ! external function to return a new (unique) unit for ecoroof writing
         int unit(0); // not actually used in the function it is passed into
 
-        Ws = WindSpeedAt(Surface(SurfNum).Centroid.z); // use windspeed at Z of roof
+        Ws = DataEnvironment::WindSpeedAt(state, Surface(SurfNum).Centroid.z); // use windspeed at Z of roof
         if (Ws < 2.0) {                                // Later we need to adjust for building roof height...
             Ws = 2.0;                                  // Set minimum possible wind speed outside vegetation to 2.0 m/s
                                                        // consistent with FASST TR-04-25 p. x (W' = 2.0)
