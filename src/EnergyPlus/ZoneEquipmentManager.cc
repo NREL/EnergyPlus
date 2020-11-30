@@ -138,7 +138,6 @@ namespace ZoneEquipmentManager {
     using namespace DataSizing;
     using DataEnvironment::CurEnvirNum;
     using DataEnvironment::EnvironmentName;
-    using DataEnvironment::OutHumRat;
     using DataEnvironment::TotDesDays;
     using DataEnvironment::TotRunDesPersDays;
     using namespace DataZoneEquipment;
@@ -232,7 +231,6 @@ namespace ZoneEquipmentManager {
         // This subroutine initializes the zone equipment prior to simulation.
 
         // Using/Aliasing
-        using DataEnvironment::OutHumRat;
         using DataHVACGlobals::NoAction;
         using DataHVACGlobals::NumOfSizingTypes;
         using DataHVACGlobals::ZoneComp;
@@ -299,7 +297,7 @@ namespace ZoneEquipmentManager {
                 Node(ZoneNodeNum).MassFlowRate = 0.0;
                 Node(ZoneNodeNum).Quality = 1.0;
                 Node(ZoneNodeNum).Press = state.dataEnvrn->OutBaroPress;
-                Node(ZoneNodeNum).HumRat = OutHumRat;
+                Node(ZoneNodeNum).HumRat = state.dataEnvrn->OutHumRat;
                 Node(ZoneNodeNum).Enthalpy = PsyHFnTdbW(Node(ZoneNodeNum).Temp, Node(ZoneNodeNum).HumRat);
                 if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
                     Node(ZoneNodeNum).CO2 = state.dataContaminantBalance->OutdoorCO2;
@@ -315,7 +313,7 @@ namespace ZoneEquipmentManager {
                     Node(InNodeNum).MassFlowRate = 0.0;
                     Node(InNodeNum).Quality = 1.0;
                     Node(InNodeNum).Press = state.dataEnvrn->OutBaroPress;
-                    Node(InNodeNum).HumRat = OutHumRat;
+                    Node(InNodeNum).HumRat = state.dataEnvrn->OutHumRat;
                     Node(InNodeNum).Enthalpy = PsyHFnTdbW(Node(InNodeNum).Temp, Node(InNodeNum).HumRat);
                     if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
                         Node(InNodeNum).CO2 = state.dataContaminantBalance->OutdoorCO2;
@@ -332,7 +330,7 @@ namespace ZoneEquipmentManager {
                     Node(ExhNodeNum).MassFlowRate = 0.0;
                     Node(ExhNodeNum).Quality = 1.0;
                     Node(ExhNodeNum).Press = state.dataEnvrn->OutBaroPress;
-                    Node(ExhNodeNum).HumRat = OutHumRat;
+                    Node(ExhNodeNum).HumRat = state.dataEnvrn->OutHumRat;
                     Node(ExhNodeNum).Enthalpy = PsyHFnTdbW(Node(ExhNodeNum).Temp, Node(ExhNodeNum).HumRat);
                     if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
                         Node(ExhNodeNum).CO2 = state.dataContaminantBalance->OutdoorCO2;
@@ -351,7 +349,7 @@ namespace ZoneEquipmentManager {
                         Node(returnNode).MassFlowRate = 0.0;
                         Node(returnNode).Quality = 1.0;
                         Node(returnNode).Press = state.dataEnvrn->OutBaroPress;
-                        Node(returnNode).HumRat = OutHumRat;
+                        Node(returnNode).HumRat = state.dataEnvrn->OutHumRat;
                         Node(returnNode).Enthalpy = PsyHFnTdbW(Node(returnNode).Temp, Node(returnNode).HumRat);
                         if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
                             Node(returnNode).CO2 = state.dataContaminantBalance->OutdoorCO2;
@@ -505,7 +503,7 @@ namespace ZoneEquipmentManager {
                 HR90L = PsyWFnTdbRhPb(state, CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).DOASLowSetpoint, 0.9, StdBaroPress);
                 DOASMassFlowRate = CalcFinalZoneSizing(ControlledZoneNum).MinOA;
                 CalcDOASSupCondsForSizing(state, state.dataEnvrn->OutDryBulbTemp,
-                                          OutHumRat,
+                                          state.dataEnvrn->OutHumRat,
                                           CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).DOASControlStrategy,
                                           CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).DOASLowSetpoint,
                                           CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).DOASHighSetpoint,
@@ -625,9 +623,9 @@ namespace ZoneEquipmentManager {
                 CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).HeatZoneHumRat = 0.0;
             }
             CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).HeatOutTemp = state.dataEnvrn->OutDryBulbTemp;
-            CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).HeatOutHumRat = OutHumRat;
+            CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).HeatOutHumRat = state.dataEnvrn->OutHumRat;
             CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).CoolOutTemp = state.dataEnvrn->OutDryBulbTemp;
-            CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).CoolOutHumRat = OutHumRat;
+            CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).CoolOutHumRat = state.dataEnvrn->OutHumRat;
 
             if (SupplyAirNode > 0) {
                 Node(SupplyAirNode).Temp = Temp;
@@ -4562,7 +4560,6 @@ namespace ZoneEquipmentManager {
 
         // Using/Aliasing
         using DataEnvironment::OutEnthalpy;
-        using DataEnvironment::OutHumRat;
         using DataEnvironment::WindSpeed;
         using namespace DataHeatBalFanSys;
         using namespace DataHeatBalance;
@@ -4752,7 +4749,7 @@ namespace ZoneEquipmentManager {
                 HumRatExt = Node(Zone(NZ).LinkedOutAirNode).HumRat;
                 EnthalpyExt = Node(Zone(NZ).LinkedOutAirNode).Enthalpy;
             } else {
-                HumRatExt = OutHumRat;
+                HumRatExt = state.dataEnvrn->OutHumRat;
                 EnthalpyExt = OutEnthalpy;
             }
             AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, TempExt, HumRatExt);
@@ -5381,7 +5378,7 @@ namespace ZoneEquipmentManager {
             if (Zone(NZ).HasLinkedOutAirNode) {
                 HumRatExt = Node(Zone(NZ).LinkedOutAirNode).HumRat;
             } else {
-                HumRatExt = OutHumRat;
+                HumRatExt = state.dataEnvrn->OutHumRat;
             }
 
             AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, TempExt, HumRatExt, RoutineNameInfiltration);

@@ -816,8 +816,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
     // set input variables
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataEnvrn->OutDryBulbTemp = 10.0;
-    DataEnvironment::OutHumRat = 0.0075;
-    DataEnvironment::OutEnthalpy = Psychrometrics::PsyHFnTdbW(state->dataEnvrn->OutDryBulbTemp, DataEnvironment::OutHumRat);
+    state->dataEnvrn->OutHumRat = 0.0075;
+    DataEnvironment::OutEnthalpy = Psychrometrics::PsyHFnTdbW(state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat);
     DataEnvironment::StdRhoAir = 1.20;
     HVACInletMassFlowRate = 0.50;
     PrimaryAirMassFlowRate = 0.20;
@@ -863,7 +863,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
 
     // primary air condition set at outdoor air condition
     Node(PTUnit(PTUnitNum).OutsideAirNode).Temp = state->dataEnvrn->OutDryBulbTemp;
-    Node(PTUnit(PTUnitNum).OutsideAirNode).HumRat = DataEnvironment::OutHumRat;
+    Node(PTUnit(PTUnitNum).OutsideAirNode).HumRat = state->dataEnvrn->OutHumRat;
     Node(PTUnit(PTUnitNum).OutsideAirNode).Enthalpy = DataEnvironment::OutEnthalpy;
 
     // set secondary air (recirculating air) conditions to zone air node
@@ -1162,8 +1162,8 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
     // set input variables
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataEnvrn->OutDryBulbTemp = 10.0;
-    DataEnvironment::OutHumRat = 0.0075;
-    DataEnvironment::OutEnthalpy = Psychrometrics::PsyHFnTdbW(state->dataEnvrn->OutDryBulbTemp, DataEnvironment::OutHumRat);
+    state->dataEnvrn->OutHumRat = 0.0075;
+    DataEnvironment::OutEnthalpy = Psychrometrics::PsyHFnTdbW(state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat);
     DataEnvironment::StdRhoAir = 1.20;
     HVACInletMassFlowRate = 0.50;
     //		PrimaryAirMassFlowRate = 0.20;
@@ -1209,7 +1209,7 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
 
     // primary air condition set at outdoor air condition
     Node(PTUnit(PTUnitNum).OutsideAirNode).Temp = state->dataEnvrn->OutDryBulbTemp;
-    Node(PTUnit(PTUnitNum).OutsideAirNode).HumRat = DataEnvironment::OutHumRat;
+    Node(PTUnit(PTUnitNum).OutsideAirNode).HumRat = state->dataEnvrn->OutHumRat;
     Node(PTUnit(PTUnitNum).OutsideAirNode).Enthalpy = DataEnvironment::OutEnthalpy;
 
     // set secondary air (recirculating air) conditions to zone air node

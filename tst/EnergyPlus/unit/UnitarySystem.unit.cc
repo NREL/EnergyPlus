@@ -4748,7 +4748,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInput)
     // set zone temperature
     DataLoopNode::Node(ControlZoneNum).Temp = 24.0; // set zone temperature during cooling season used to determine system delivered capacity
     state->dataEnvrn->OutDryBulbTemp = 35.0;         // initialize weather
-    DataEnvironment::OutHumRat = 0.1;
+    state->dataEnvrn->OutHumRat = 0.1;
     state->dataEnvrn->OutBaroPress = 101325.0;
     DataEnvironment::OutWetBulbTemp = 30.0;
     DXCoils::DXCoil(1).RatedCBF(1) = 0.1;                            // autosizing is disabled so initialize coil bypass factor
@@ -5546,7 +5546,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_VarSpeedCoils)
     DataLoopNode::Node(ControlZoneNum).HumRat =
         DataLoopNode::Node(InletNode).HumRat; // set zone humidity ratio, used to determine system delivered capacity
     state->dataEnvrn->OutDryBulbTemp = 35.0;   // initialize weather
-    DataEnvironment::OutHumRat = 0.1;
+    state->dataEnvrn->OutHumRat = 0.1;
     state->dataEnvrn->OutBaroPress = 101325.0;
     DataEnvironment::OutWetBulbTemp = 30.0;
 
@@ -5628,7 +5628,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_VarSpeedCoils)
     // set zone temperature
     DataLoopNode::Node(ControlZoneNum).Temp = 24.0; // set zone temperature during cooling season used to determine system delivered capacity
     state->dataEnvrn->OutDryBulbTemp = 35.0;         // initialize weather
-    DataEnvironment::OutHumRat = 0.1;
+    state->dataEnvrn->OutHumRat = 0.1;
     state->dataEnvrn->OutBaroPress = 101325.0;
     DataEnvironment::OutWetBulbTemp = 30.0;
 
@@ -6006,7 +6006,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_VarSpeedCoils_CyclingFan)
     // set zone temperature
     DataLoopNode::Node(ControlZoneNum).Temp = 20.0; // set zone temperature during heating season used to determine system delivered capacity
     state->dataEnvrn->OutDryBulbTemp = 35.0;         // initialize weather
-    DataEnvironment::OutHumRat = 0.1;
+    state->dataEnvrn->OutHumRat = 0.1;
     state->dataEnvrn->OutBaroPress = 101325.0;
     DataEnvironment::OutWetBulbTemp = 30.0;
 
@@ -6094,7 +6094,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_VarSpeedCoils_CyclingFan)
     // set zone temperature
     DataLoopNode::Node(ControlZoneNum).Temp = 24.0; // set zone temperature during cooling season used to determine system delivered capacity
     state->dataEnvrn->OutDryBulbTemp = 35.0;         // initialize weather
-    DataEnvironment::OutHumRat = 0.1;
+    state->dataEnvrn->OutHumRat = 0.1;
     state->dataEnvrn->OutBaroPress = 101325.0;
     DataEnvironment::OutWetBulbTemp = 30.0;
 
@@ -7851,7 +7851,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_WaterToAirHeatPump)
     // set zone temperature
     DataLoopNode::Node(ControlZoneNum).Temp = 20.0; // set zone temperature during heating season used to determine system delivered capacity
     state->dataEnvrn->OutDryBulbTemp = 35.0;         // initialize weather
-    DataEnvironment::OutHumRat = 0.1;
+    state->dataEnvrn->OutHumRat = 0.1;
     state->dataEnvrn->OutBaroPress = 101325.0;
     DataEnvironment::OutWetBulbTemp = 30.0;
 
@@ -7933,7 +7933,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_WaterToAirHeatPump)
     // set zone temperature
     DataLoopNode::Node(ControlZoneNum).Temp = 24.0; // set zone temperature during cooling season used to determine system delivered capacity
     state->dataEnvrn->OutDryBulbTemp = 35.0;         // initialize weather
-    DataEnvironment::OutHumRat = 0.1;
+    state->dataEnvrn->OutHumRat = 0.1;
     state->dataEnvrn->OutBaroPress = 101325.0;
     DataEnvironment::OutWetBulbTemp = 30.0;
 
@@ -8187,7 +8187,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ASHRAEModel_WaterCoils)
     // set zone temperature
     DataLoopNode::Node(ControlZoneNum).Temp = 20.0; // set zone temperature during heating season used to determine system delivered capacity
     state->dataEnvrn->OutDryBulbTemp = 35.0;         // initialize weather
-    DataEnvironment::OutHumRat = 0.1;
+    state->dataEnvrn->OutHumRat = 0.1;
     state->dataEnvrn->OutBaroPress = 101325.0;
     DataEnvironment::OutWetBulbTemp = 30.0;
 
@@ -8457,7 +8457,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ASHRAEModel_WaterCoils)
     DataLoopNode::Node(InletNode).Temp = 24.0;      // system inlet node dry-bulb temp
     DataLoopNode::Node(InletNode).Enthalpy = Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(InletNode).Temp, DataLoopNode::Node(InletNode).HumRat);
     state->dataEnvrn->OutDryBulbTemp = 35.0; // initialize weather
-    DataEnvironment::OutHumRat = 0.1;
+    state->dataEnvrn->OutHumRat = 0.1;
     state->dataEnvrn->OutBaroPress = 101325.0;
     DataEnvironment::OutWetBulbTemp = 30.0;
 
@@ -9974,7 +9974,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultiSpeedCoils_SingleMode)
     DataLoopNode::Node(ControlZoneNum).Temp = 24.0;    // set zone temperature during cooling season used to determine system delivered capacity
     DataLoopNode::Node(ControlZoneNum).HumRat = 0.001; // set zone temperature during cooling season used to determine system delivered capacity
     state->dataEnvrn->OutDryBulbTemp = 35.0;            // initialize weather
-    DataEnvironment::OutHumRat = 0.1;
+    state->dataEnvrn->OutHumRat = 0.1;
     state->dataEnvrn->OutBaroPress = 101325.0;
     DataEnvironment::OutWetBulbTemp = 30.0;
 
@@ -10099,7 +10099,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultiSpeedCoils_SingleMode)
         DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToHeatingSP;
 
     state->dataEnvrn->OutDryBulbTemp = 0.0; // initialize weather
-    DataEnvironment::OutHumRat = 0.0001;
+    state->dataEnvrn->OutHumRat = 0.0001;
     state->dataEnvrn->OutBaroPress = 101325.0;
 
     thisSys->simulate(*state,

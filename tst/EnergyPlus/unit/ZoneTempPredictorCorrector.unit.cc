@@ -188,7 +188,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     EAMFL(1) = 0.0;
     EAMFLxHumRat(1) = 0.0;
     CTMFL(1) = 0.0;
-    OutHumRat = 0.008;
+    state->dataEnvrn->OutHumRat = 0.008;
     MixingMassFlowXHumRat(1) = 0.0;
     MixingMassFlowZone(1) = 0.0;
     MDotOA(1) = 0.0;
@@ -218,7 +218,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     EAMFL(1) = 0.0;
     EAMFLxHumRat(1) = 0.0;
     CTMFL(1) = 0.0;
-    OutHumRat = 0.004;
+    state->dataEnvrn->OutHumRat = 0.004;
     MixingMassFlowXHumRat(1) = 0.0;
     MixingMassFlowZone(1) = 0.0;
     MDotOA(1) = 0.0;
@@ -245,7 +245,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     EAMFL(1) = 0.0;
     EAMFLxHumRat(1) = 0.0;
     CTMFL(1) = 0.0;
-    OutHumRat = 0.004;
+    state->dataEnvrn->OutHumRat = 0.004;
     MixingMassFlowXHumRat(1) = 0.02 * 0.008;
     MixingMassFlowZone(1) = 0.02;
     MDotOA(1) = 0.0;
@@ -272,7 +272,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     EAMFL(1) = 0.0;
     EAMFLxHumRat(1) = 0.0;
     CTMFL(1) = 0.0;
-    OutHumRat = 0.004;
+    state->dataEnvrn->OutHumRat = 0.004;
     MixingMassFlowXHumRat(1) = 0.0;
     MixingMassFlowZone(1) = 0.0;
     MDotOA(1) = 0.0;

@@ -4498,7 +4498,6 @@ namespace SystemAvailabilityManager {
         using CurveManager::CurveValue;
         using DataEnvironment::OutDewPointTemp;
         using DataEnvironment::OutEnthalpy;
-        using DataEnvironment::OutHumRat;
         using DataHeatBalance::HybridControlTypeClose;
         using DataHeatBalance::HybridControlTypeGlobal;
         using DataHeatBalance::HybridControlTypeIndiv;
@@ -4775,10 +4774,10 @@ namespace SystemAvailabilityManager {
                             ZoneRHDehumidifyingSetPoint = GetCurrentScheduleValue(state, HumidityControlZone(HStatZoneNum).DehumidifyingSchedIndex);
                             if (ZoneAirRH > ZoneRHDehumidifyingSetPoint) { // Need dehumidification
                                 WSetPoint = PsyWFnTdbRhPb(state, MAT(ZoneNum), (ZoneRHDehumidifyingSetPoint / 100.0), state.dataEnvrn->OutBaroPress);
-                                if (WSetPoint < OutHumRat) state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl = state.dataSystemAvailabilityManager->HybridVentCtrl_Close;
+                                if (WSetPoint < state.dataEnvrn->OutHumRat) state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl = state.dataSystemAvailabilityManager->HybridVentCtrl_Close;
                             } else if (ZoneAirRH < ZoneRHHumidifyingSetPoint) { // Need humidification
                                 WSetPoint = PsyWFnTdbRhPb(state, MAT(ZoneNum), (ZoneRHHumidifyingSetPoint / 100.0), state.dataEnvrn->OutBaroPress);
-                                if (WSetPoint > OutHumRat) state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl = state.dataSystemAvailabilityManager->HybridVentCtrl_Close;
+                                if (WSetPoint > state.dataEnvrn->OutHumRat) state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl = state.dataSystemAvailabilityManager->HybridVentCtrl_Close;
                             } else {
                                 state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl = state.dataSystemAvailabilityManager->HybridVentCtrl_Close;
                             }

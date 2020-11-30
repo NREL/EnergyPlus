@@ -102,7 +102,6 @@ namespace Humidifiers {
 
     // Using/Aliasing
     using namespace DataLoopNode;
-    using DataEnvironment::OutHumRat;
     using DataHVACGlobals::SetPointErrorFlag;
     using DataHVACGlobals::SmallMassFlow;
     using namespace ScheduleManager;
@@ -812,7 +811,7 @@ namespace Humidifiers {
                     if (CurOASysNum > 0) {
                         // size to outdoor air volume flow rate if available
                         if (FinalSysSizing(CurSysNum).DesOutAirVolFlow > 0.0) {
-                            AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataEnvrn->OutDryBulbTemp, OutHumRat, CalledFrom);
+                            AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataEnvrn->OutDryBulbTemp, state.dataEnvrn->OutHumRat, CalledFrom);
                             MassFlowDes = FinalSysSizing(CurSysNum).DesOutAirVolFlow * AirDensity;
                             InletHumRatDes = std::min(FinalSysSizing(CurSysNum).OutHumRatAtCoolPeak, FinalSysSizing(CurSysNum).HeatOutHumRat);
                             OutletHumRatDes = std::max(FinalSysSizing(CurSysNum).CoolSupHumRat, FinalSysSizing(CurSysNum).HeatSupHumRat);

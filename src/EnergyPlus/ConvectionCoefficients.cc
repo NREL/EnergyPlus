@@ -3374,7 +3374,7 @@ namespace ConvectionCoefficients {
         if (Surface(SurfNum).Zone > 0) {
             AirHumRat = DataHeatBalFanSys::ZoneAirHumRatAvg(Surface(SurfNum).Zone);
         } else {
-            AirHumRat = DataEnvironment::OutHumRat;
+            AirHumRat = state.dataEnvrn->OutHumRat;
         }
 
         Real64 Height = Surface(SurfNum).Height;
@@ -8093,7 +8093,6 @@ namespace ConvectionCoefficients {
                          int const RoughnessIndex)
     {
         // Using/Aliasing
-        using DataEnvironment::OutHumRat;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
 
         // FUNCTION PARAMETER DEFINITIONS:
@@ -8124,7 +8123,7 @@ namespace ConvectionCoefficients {
         }
         DeltaTemp = SurfTemp - AirTemp;
         BetaFilm = 1.0 / (DataGlobalConstants::KelvinConv() + SurfTemp + 0.5 * DeltaTemp);
-        AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, AirTemp, OutHumRat);
+        AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, AirTemp, state.dataEnvrn->OutHumRat);
 
         GrLn = g * pow_2(AirDensity) * pow_3(Ln) * std::abs(DeltaTemp) * BetaFilm / pow_2(v);
         RaLn = GrLn * Pr;

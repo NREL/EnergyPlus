@@ -128,7 +128,6 @@ namespace EnergyPlus::SetPointManager {
 
     using namespace DataLoopNode;
     using namespace DataAirLoop;
-    using DataEnvironment::OutHumRat;
     using DataEnvironment::OutWetBulbTemp;
     using namespace ScheduleManager;
     using DataHVACGlobals::NumPrimaryAirSys;
@@ -4501,18 +4500,18 @@ namespace EnergyPlus::SetPointManager {
                 Node(state.dataSetPointManager->MixedAirSetPtMgr(SetPtMgrNum).RefNode).Temp = 20.0;
                 Node(state.dataSetPointManager->MixedAirSetPtMgr(SetPtMgrNum).FanInNode).Temp = 20.0;
                 Node(state.dataSetPointManager->MixedAirSetPtMgr(SetPtMgrNum).FanOutNode).Temp = 20.0;
-                Node(state.dataSetPointManager->MixedAirSetPtMgr(SetPtMgrNum).RefNode).HumRat = OutHumRat;
-                Node(state.dataSetPointManager->MixedAirSetPtMgr(SetPtMgrNum).FanInNode).HumRat = OutHumRat;
-                Node(state.dataSetPointManager->MixedAirSetPtMgr(SetPtMgrNum).FanOutNode).HumRat = OutHumRat;
+                Node(state.dataSetPointManager->MixedAirSetPtMgr(SetPtMgrNum).RefNode).HumRat = state.dataEnvrn->OutHumRat;
+                Node(state.dataSetPointManager->MixedAirSetPtMgr(SetPtMgrNum).FanInNode).HumRat = state.dataEnvrn->OutHumRat;
+                Node(state.dataSetPointManager->MixedAirSetPtMgr(SetPtMgrNum).FanOutNode).HumRat = state.dataEnvrn->OutHumRat;
                 Node(state.dataSetPointManager->MixedAirSetPtMgr(SetPtMgrNum).RefNode).Quality = 1.0;
                 Node(state.dataSetPointManager->MixedAirSetPtMgr(SetPtMgrNum).FanInNode).Quality = 1.0;
                 Node(state.dataSetPointManager->MixedAirSetPtMgr(SetPtMgrNum).FanOutNode).Quality = 1.0;
                 Node(state.dataSetPointManager->MixedAirSetPtMgr(SetPtMgrNum).RefNode).Press = state.dataEnvrn->OutBaroPress;
                 Node(state.dataSetPointManager->MixedAirSetPtMgr(SetPtMgrNum).FanInNode).Press = state.dataEnvrn->OutBaroPress;
                 Node(state.dataSetPointManager->MixedAirSetPtMgr(SetPtMgrNum).FanOutNode).Press = state.dataEnvrn->OutBaroPress;
-                Node(state.dataSetPointManager->MixedAirSetPtMgr(SetPtMgrNum).RefNode).Enthalpy = PsyHFnTdbW(DataPrecisionGlobals::constant_twenty, OutHumRat);
-                Node(state.dataSetPointManager->MixedAirSetPtMgr(SetPtMgrNum).FanInNode).Enthalpy = PsyHFnTdbW(DataPrecisionGlobals::constant_twenty, OutHumRat);
-                Node(state.dataSetPointManager->MixedAirSetPtMgr(SetPtMgrNum).FanOutNode).Enthalpy = PsyHFnTdbW(DataPrecisionGlobals::constant_twenty, OutHumRat);
+                Node(state.dataSetPointManager->MixedAirSetPtMgr(SetPtMgrNum).RefNode).Enthalpy = PsyHFnTdbW(DataPrecisionGlobals::constant_twenty, state.dataEnvrn->OutHumRat);
+                Node(state.dataSetPointManager->MixedAirSetPtMgr(SetPtMgrNum).FanInNode).Enthalpy = PsyHFnTdbW(DataPrecisionGlobals::constant_twenty, state.dataEnvrn->OutHumRat);
+                Node(state.dataSetPointManager->MixedAirSetPtMgr(SetPtMgrNum).FanOutNode).Enthalpy = PsyHFnTdbW(DataPrecisionGlobals::constant_twenty, state.dataEnvrn->OutHumRat);
                 for (CtrlNodeIndex = 1; CtrlNodeIndex <= state.dataSetPointManager->MixedAirSetPtMgr(SetPtMgrNum).NumCtrlNodes; ++CtrlNodeIndex) {
                     NodeNum = state.dataSetPointManager->MixedAirSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex); // Get the node number
                     if (state.dataSetPointManager->MixedAirSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::Temp) {
@@ -4531,10 +4530,10 @@ namespace EnergyPlus::SetPointManager {
                 Node(state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).MixedOutNode).Temp = 20.0;
                 Node(state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).OAInNode).Temp = 20.0;
                 Node(state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).ReturnInNode).Temp = 20.0;
-                Node(state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).RefNode).HumRat = OutHumRat;
-                Node(state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).MixedOutNode).HumRat = OutHumRat;
-                Node(state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).OAInNode).HumRat = OutHumRat;
-                Node(state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).ReturnInNode).HumRat = OutHumRat;
+                Node(state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).RefNode).HumRat = state.dataEnvrn->OutHumRat;
+                Node(state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).MixedOutNode).HumRat = state.dataEnvrn->OutHumRat;
+                Node(state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).OAInNode).HumRat = state.dataEnvrn->OutHumRat;
+                Node(state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).ReturnInNode).HumRat = state.dataEnvrn->OutHumRat;
                 Node(state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).RefNode).Quality = 1.0;
                 Node(state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).MixedOutNode).Quality = 1.0;
                 Node(state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).OAInNode).Quality = 1.0;
@@ -4543,23 +4542,23 @@ namespace EnergyPlus::SetPointManager {
                 Node(state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).MixedOutNode).Press = state.dataEnvrn->OutBaroPress;
                 Node(state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).OAInNode).Press = state.dataEnvrn->OutBaroPress;
                 Node(state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).ReturnInNode).Press = state.dataEnvrn->OutBaroPress;
-                Node(state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).RefNode).Enthalpy = PsyHFnTdbW(DataPrecisionGlobals::constant_twenty, OutHumRat);
-                Node(state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).MixedOutNode).Enthalpy = PsyHFnTdbW(DataPrecisionGlobals::constant_twenty, OutHumRat);
-                Node(state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).OAInNode).Enthalpy = PsyHFnTdbW(DataPrecisionGlobals::constant_twenty, OutHumRat);
-                Node(state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).ReturnInNode).Enthalpy = PsyHFnTdbW(DataPrecisionGlobals::constant_twenty, OutHumRat);
+                Node(state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).RefNode).Enthalpy = PsyHFnTdbW(DataPrecisionGlobals::constant_twenty, state.dataEnvrn->OutHumRat);
+                Node(state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).MixedOutNode).Enthalpy = PsyHFnTdbW(DataPrecisionGlobals::constant_twenty, state.dataEnvrn->OutHumRat);
+                Node(state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).OAInNode).Enthalpy = PsyHFnTdbW(DataPrecisionGlobals::constant_twenty, state.dataEnvrn->OutHumRat);
+                Node(state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).ReturnInNode).Enthalpy = PsyHFnTdbW(DataPrecisionGlobals::constant_twenty, state.dataEnvrn->OutHumRat);
                 for (CtrlNodeIndex = 1; CtrlNodeIndex <= state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).NumCtrlNodes; ++CtrlNodeIndex) {
                     NodeNum = state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex); // Get the node number
                     if (state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::Temp) {
                         Node(NodeNum).TempSetPoint = 20.0; // Set the setpoint
                     }
                     if (state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::MaxHumRat) {
-                        Node(NodeNum).HumRatMax = OutHumRat; // Set the setpoint
+                        Node(NodeNum).HumRatMax = state.dataEnvrn->OutHumRat; // Set the setpoint
                     }
                     if (state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::MinHumRat) {
-                        Node(NodeNum).HumRatMin = OutHumRat; // Set the setpoint
+                        Node(NodeNum).HumRatMin = state.dataEnvrn->OutHumRat; // Set the setpoint
                     }
                     if (state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::HumRat) {
-                        Node(NodeNum).HumRatSetPoint = OutHumRat; // Set the setpoint
+                        Node(NodeNum).HumRatSetPoint = state.dataEnvrn->OutHumRat; // Set the setpoint
                     }
                 }
             }

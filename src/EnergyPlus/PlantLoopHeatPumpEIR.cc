@@ -333,7 +333,7 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
             CpSrc = FluidProperties::GetSpecificHeatGlycol(
                 state, thisLoadPlantLoop.FluidName, DataLoopNode::Node(this->loadSideNodes.inlet).Temp, thisLoadPlantLoop.FluidIndex, "PLHPEIR::simulate()");
         } else if (this->airSource) {
-            CpSrc = Psychrometrics::PsyCpAirFnW(DataEnvironment::OutHumRat);
+            CpSrc = Psychrometrics::PsyCpAirFnW(state.dataEnvrn->OutHumRat);
         }
         Real64 const sourceMCp = this->sourceSideMassFlowRate * CpSrc;
         this->sourceSideOutletTemp = this->calcSourceOutletTemp(this->sourceSideInletTemp, this->sourceSideHeatTransfer / sourceMCp);

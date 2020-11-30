@@ -3716,7 +3716,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatEmissionReport)
     displayHeatEmissionsSummary = true;
     state->dataGlobal->DoWeathSim = true;
     DataHVACGlobals::TimeStepSys = 10.0;
-    DataEnvironment::OutHumRat = 0.005;
+    state->dataEnvrn->OutHumRat = 0.005;
     state->dataEnvrn->OutDryBulbTemp = 25.0;
 
     MixedAir::NumOAControllers = 2;

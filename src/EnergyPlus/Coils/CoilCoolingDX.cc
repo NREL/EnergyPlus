@@ -512,7 +512,7 @@ void CoilCoolingDX::simulate(EnergyPlus::EnergyPlusData &state, int useAlternate
                 DataEnvironment::OutWetBulbTemp + (state.dataEnvrn->OutDryBulbTemp - DataEnvironment::OutWetBulbTemp) *
                                                       (1.0 - this->performance.normalMode.speeds[speedNum - 1].evap_condenser_effectiveness);
             Real64 condInletHumRat = Psychrometrics::PsyWFnTdbTwbPb(state, condInletTemp, DataEnvironment::OutWetBulbTemp, state.dataEnvrn->OutBaroPress);
-            Real64 outdoorHumRat = DataEnvironment::OutHumRat;
+            Real64 outdoorHumRat = state.dataEnvrn->OutHumRat;
             Real64 condAirMassFlow = condInletNode.MassFlowRate; // TODO: How is this getting a value?
             Real64 waterDensity = Psychrometrics::RhoH2O(state.dataEnvrn->OutDryBulbTemp);
             this->evaporativeCondSupplyTankVolumeFlow = (condInletHumRat - outdoorHumRat) * condAirMassFlow / waterDensity;

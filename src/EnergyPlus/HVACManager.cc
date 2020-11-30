@@ -2330,7 +2330,6 @@ namespace HVACManager {
         // na
 
         // Using/Aliasing
-        using DataEnvironment::OutHumRat;
         using DataEnvironment::StdRhoAir;
         using DataHeatBalance::AirBalanceQuadrature;
         using DataHeatBalance::CrossMixing;
@@ -2412,8 +2411,8 @@ namespace HVACManager {
 
         // Reports zone exhaust loss by exhaust fans
         for (ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) { // Start of zone loads report variable update loop ...
-            CpAir = PsyCpAirFnW(OutHumRat);
-            H2OHtOfVap = PsyHgAirFnWTdb(OutHumRat, Zone(ZoneLoop).OutDryBulbTemp);
+            CpAir = PsyCpAirFnW(state.dataEnvrn->OutHumRat);
+            H2OHtOfVap = PsyHgAirFnWTdb(state.dataEnvrn->OutHumRat, Zone(ZoneLoop).OutDryBulbTemp);
             ADSCorrectionFactor = 1.0;
             if (AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS) {
                 if ((ZoneEquipAvail(ZoneLoop) == CycleOn || ZoneEquipAvail(ZoneLoop) == CycleOnZoneFansOnly) &&
@@ -2479,17 +2478,17 @@ namespace HVACManager {
                 ZnAirRpt(ZoneLoop).InfilHeatLoss = 0.0;
             }
             // Report infiltration latent gains and losses
-            CpAir = PsyCpAirFnW(OutHumRat);
+            CpAir = PsyCpAirFnW(state.dataEnvrn->OutHumRat);
             H2OHtOfVap = PsyHgAirFnWTdb(ZoneAirHumRat(ZoneLoop), MAT(ZoneLoop));
-            if (ZoneAirHumRat(ZoneLoop) > OutHumRat) {
+            if (ZoneAirHumRat(ZoneLoop) > state.dataEnvrn->OutHumRat) {
 
-                ZnAirRpt(ZoneLoop).InfilLatentLoss = 0.001 * MCPI(ZoneLoop) / CpAir * (ZoneAirHumRat(ZoneLoop) - OutHumRat) * H2OHtOfVap *
+                ZnAirRpt(ZoneLoop).InfilLatentLoss = 0.001 * MCPI(ZoneLoop) / CpAir * (ZoneAirHumRat(ZoneLoop) - state.dataEnvrn->OutHumRat) * H2OHtOfVap *
                                                      TimeStepSys * DataGlobalConstants::SecInHour() * 1000.0 * ADSCorrectionFactor;
                 ZnAirRpt(ZoneLoop).InfilLatentGain = 0.0;
 
-            } else if (ZoneAirHumRat(ZoneLoop) <= OutHumRat) {
+            } else if (ZoneAirHumRat(ZoneLoop) <= state.dataEnvrn->OutHumRat) {
 
-                ZnAirRpt(ZoneLoop).InfilLatentGain = 0.001 * MCPI(ZoneLoop) / CpAir * (OutHumRat - ZoneAirHumRat(ZoneLoop)) * H2OHtOfVap *
+                ZnAirRpt(ZoneLoop).InfilLatentGain = 0.001 * MCPI(ZoneLoop) / CpAir * (state.dataEnvrn->OutHumRat - ZoneAirHumRat(ZoneLoop)) * H2OHtOfVap *
                                                      TimeStepSys * DataGlobalConstants::SecInHour() * 1000.0 * ADSCorrectionFactor;
                 ZnAirRpt(ZoneLoop).InfilLatentLoss = 0.0;
             }
@@ -2505,7 +2504,7 @@ namespace HVACManager {
             }
 
             // first calculate mass flows using outside air heat capacity for consistency with input to heat balance
-            CpAir = PsyCpAirFnW(OutHumRat);
+            CpAir = PsyCpAirFnW(state.dataEnvrn->OutHumRat);
             ZnAirRpt(ZoneLoop).InfilMass = (MCPI(ZoneLoop) / CpAir) * TimeStepSys * DataGlobalConstants::SecInHour() * ADSCorrectionFactor;
             ZnAirRpt(ZoneLoop).InfilMdot = (MCPI(ZoneLoop) / CpAir) * ADSCorrectionFactor;
             ZnAirRpt(ZoneLoop).VentilMass = (MCPV(ZoneLoop) / CpAir) * TimeStepSys * DataGlobalConstants::SecInHour() * ADSCorrectionFactor;
@@ -2562,12 +2561,12 @@ namespace HVACManager {
 
                     // Report ventilation latent gains and losses
                     H2OHtOfVap = PsyHgAirFnWTdb(ZoneAirHumRat(ZoneLoop), MAT(ZoneLoop));
-                    if (ZoneAirHumRat(ZoneLoop) > OutHumRat) {
-                        ZnAirRpt(ZoneLoop).VentilLatentLoss = 0.001 * MCPV(ZoneLoop) / CpAir * (ZoneAirHumRat(ZoneLoop) - OutHumRat) * H2OHtOfVap *
+                    if (ZoneAirHumRat(ZoneLoop) > state.dataEnvrn->OutHumRat) {
+                        ZnAirRpt(ZoneLoop).VentilLatentLoss = 0.001 * MCPV(ZoneLoop) / CpAir * (ZoneAirHumRat(ZoneLoop) - state.dataEnvrn->OutHumRat) * H2OHtOfVap *
                                                               TimeStepSys * DataGlobalConstants::SecInHour() * 1000.0 * ADSCorrectionFactor;
                         ZnAirRpt(ZoneLoop).VentilLatentGain = 0.0;
-                    } else if (ZoneAirHumRat(ZoneLoop) <= OutHumRat) {
-                        ZnAirRpt(ZoneLoop).VentilLatentGain = 0.001 * MCPV(ZoneLoop) / CpAir * (OutHumRat - ZoneAirHumRat(ZoneLoop)) * H2OHtOfVap *
+                    } else if (ZoneAirHumRat(ZoneLoop) <= state.dataEnvrn->OutHumRat) {
+                        ZnAirRpt(ZoneLoop).VentilLatentGain = 0.001 * MCPV(ZoneLoop) / CpAir * (state.dataEnvrn->OutHumRat - ZoneAirHumRat(ZoneLoop)) * H2OHtOfVap *
                                                               TimeStepSys * DataGlobalConstants::SecInHour() * 1000.0 * ADSCorrectionFactor;
                         ZnAirRpt(ZoneLoop).VentilLatentLoss = 0.0;
                     }
@@ -2781,13 +2780,13 @@ namespace HVACManager {
                         ZnAirRpt(ZoneLoop).OABalanceHeatGain =
                             -MDotCPOA(ZoneLoop) * (MAT(ZoneLoop) - Zone(ZoneLoop).OutDryBulbTemp) * TimeStepSys * DataGlobalConstants::SecInHour() * ADSCorrectionFactor;
                     }
-                    H2OHtOfVap = PsyHgAirFnWTdb(OutHumRat, Zone(ZoneLoop).OutDryBulbTemp);
-                    if (ZoneAirHumRat(ZoneLoop) > OutHumRat) {
-                        ZnAirRpt(ZoneLoop).OABalanceLatentLoss = 0.001 * MDotOA(ZoneLoop) * (ZoneAirHumRat(ZoneLoop) - OutHumRat) * H2OHtOfVap *
+                    H2OHtOfVap = PsyHgAirFnWTdb(state.dataEnvrn->OutHumRat, Zone(ZoneLoop).OutDryBulbTemp);
+                    if (ZoneAirHumRat(ZoneLoop) > state.dataEnvrn->OutHumRat) {
+                        ZnAirRpt(ZoneLoop).OABalanceLatentLoss = 0.001 * MDotOA(ZoneLoop) * (ZoneAirHumRat(ZoneLoop) - state.dataEnvrn->OutHumRat) * H2OHtOfVap *
                                                                  TimeStepSys * DataGlobalConstants::SecInHour() * 1000.0 * ADSCorrectionFactor;
                         ZnAirRpt(ZoneLoop).OABalanceLatentGain = 0.0;
-                    } else if (ZoneAirHumRat(ZoneLoop) <= OutHumRat) {
-                        ZnAirRpt(ZoneLoop).OABalanceLatentGain = 0.001 * MDotOA(ZoneLoop) * (OutHumRat - ZoneAirHumRat(ZoneLoop)) * H2OHtOfVap *
+                    } else if (ZoneAirHumRat(ZoneLoop) <= state.dataEnvrn->OutHumRat) {
+                        ZnAirRpt(ZoneLoop).OABalanceLatentGain = 0.001 * MDotOA(ZoneLoop) * (state.dataEnvrn->OutHumRat - ZoneAirHumRat(ZoneLoop)) * H2OHtOfVap *
                                                                  TimeStepSys * DataGlobalConstants::SecInHour() * 1000.0 * ADSCorrectionFactor;
                         ZnAirRpt(ZoneLoop).OABalanceLatentLoss = 0.0;
                     }
@@ -2814,7 +2813,7 @@ namespace HVACManager {
                 }
             }
             // Reports exfiltration loss
-            H2OHtOfVap = PsyHgAirFnWTdb(OutHumRat, Zone(ZoneLoop).OutDryBulbTemp);
+            H2OHtOfVap = PsyHgAirFnWTdb(state.dataEnvrn->OutHumRat, Zone(ZoneLoop).OutDryBulbTemp);
             ZnAirRpt(ZoneLoop).SysInletMass = 0;
             ZnAirRpt(ZoneLoop).SysOutletMass = 0;
             if (!ZoneEquipConfig(ZoneLoop).IsControlled) {
@@ -2838,7 +2837,7 @@ namespace HVACManager {
             ZnAirRpt(ZoneLoop).ExfilSensiLoss =
                 ZnAirRpt(ZoneLoop).ExfilMass / (TimeStepSys * DataGlobalConstants::SecInHour()) * (MAT(ZoneLoop) - Zone(ZoneLoop).OutDryBulbTemp) * CpAir; // W
             ZnAirRpt(ZoneLoop).ExfilLatentLoss =
-                ZnAirRpt(ZoneLoop).ExfilMass / (TimeStepSys * DataGlobalConstants::SecInHour()) * (ZoneAirHumRat(ZoneLoop) - OutHumRat) * H2OHtOfVap;
+                ZnAirRpt(ZoneLoop).ExfilMass / (TimeStepSys * DataGlobalConstants::SecInHour()) * (ZoneAirHumRat(ZoneLoop) - state.dataEnvrn->OutHumRat) * H2OHtOfVap;
             ZnAirRpt(ZoneLoop).ExfilTotalLoss = ZnAirRpt(ZoneLoop).ExfilLatentLoss + ZnAirRpt(ZoneLoop).ExfilSensiLoss;
 
             ZoneTotalExfiltrationHeatLoss += ZnAirRpt(ZoneLoop).ExfilTotalLoss * TimeStepSys * DataGlobalConstants::SecInHour();

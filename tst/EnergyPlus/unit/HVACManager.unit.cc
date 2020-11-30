@@ -165,7 +165,7 @@ TEST_F(EnergyPlusFixture, InfiltrationReportTest)
     DataHeatBalFanSys::MCPV(1) = 2.0;
     DataHeatBalFanSys::MCPV(2) = 2.5;
     state->dataEnvrn->OutBaroPress = 101325.0;
-    DataEnvironment::OutHumRat = 0.0005;
+    state->dataEnvrn->OutHumRat = 0.0005;
     DataHeatBalFanSys::MAT(1) = 22.0;
     DataHeatBalFanSys::MAT(2) = 25.0;
     DataHeatBalFanSys::ZoneAirHumRat(1) = 0.001;
@@ -197,12 +197,12 @@ TEST_F(EnergyPlusFixture, InfiltrationReportTest)
     EXPECT_NEAR(7.4569771, DataHeatBalance::ZnAirRpt(2).VentilVolumeStdDensity, 0.0001);
 
     // #8068
-    Real64 deltah = DataHeatBalFanSys::MCPI(1) / (Psychrometrics::PsyCpAirFnW(DataEnvironment::OutHumRat)) * 3600.0 *
-                    (Psychrometrics::PsyHFnTdbW(DataHeatBalance::Zone(1).OutDryBulbTemp, DataEnvironment::OutHumRat) -
+    Real64 deltah = DataHeatBalFanSys::MCPI(1) / (Psychrometrics::PsyCpAirFnW(state->dataEnvrn->OutHumRat)) * 3600.0 *
+                    (Psychrometrics::PsyHFnTdbW(DataHeatBalance::Zone(1).OutDryBulbTemp, state->dataEnvrn->OutHumRat) -
                      Psychrometrics::PsyHFnTdbW(DataHeatBalFanSys::MAT(1), DataHeatBalFanSys::ZoneAirHumRat(1)));
     EXPECT_NEAR(-deltah, DataHeatBalance::ZnAirRpt(1).InfilTotalLoss, 0.0001);
-    deltah = DataHeatBalFanSys::MCPV(1) / (Psychrometrics::PsyCpAirFnW(DataEnvironment::OutHumRat)) * 3600.0 *
-                    (Psychrometrics::PsyHFnTdbW(DataHeatBalance::Zone(1).OutDryBulbTemp, DataEnvironment::OutHumRat) -
+    deltah = DataHeatBalFanSys::MCPV(1) / (Psychrometrics::PsyCpAirFnW(state->dataEnvrn->OutHumRat)) * 3600.0 *
+                    (Psychrometrics::PsyHFnTdbW(DataHeatBalance::Zone(1).OutDryBulbTemp, state->dataEnvrn->OutHumRat) -
                      Psychrometrics::PsyHFnTdbW(DataHeatBalFanSys::MAT(1), DataHeatBalFanSys::ZoneAirHumRat(1)));
     EXPECT_NEAR(-deltah, DataHeatBalance::ZnAirRpt(1).VentilTotalLoss, 0.0001);
 }
@@ -227,7 +227,7 @@ TEST_F(EnergyPlusFixture, ExfilAndExhaustReportTest)
     DataHeatBalFanSys::MCPV(1) = 2.0;
     DataHeatBalFanSys::MCPV(2) = 2.5;
     state->dataEnvrn->OutBaroPress = 101325.0;
-    DataEnvironment::OutHumRat = 0.0005;
+    state->dataEnvrn->OutHumRat = 0.0005;
     DataHeatBalFanSys::MAT(1) = 22.0;
     DataHeatBalFanSys::MAT(2) = 25.0;
     DataHeatBalFanSys::ZoneAirHumRat(1) = 0.001;

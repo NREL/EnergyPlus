@@ -292,7 +292,7 @@ protected:
         state->dataCurveManager->PerfCurve(1).Coeff1 = 1.0;
 
         state->dataEnvrn->OutDryBulbTemp = 35.0;
-        DataEnvironment::OutHumRat = 0.0141066;
+        state->dataEnvrn->OutHumRat = 0.0141066;
         DataEnvironment::OutWetBulbTemp = 23.9;
         state->dataEnvrn->OutBaroPress = 101325.0;
 
@@ -777,7 +777,7 @@ TEST_F(CBVAVSys, UnitaryBypassVAV_NoOASys)
     DataLoopNode::Node(cbvav.AirInNode).MassFlowRate = 0.57;
 
     DataLoopNode::Node(MixedAir::OAMixer(1).InletNode).Temp = state->dataEnvrn->OutDryBulbTemp;
-    DataLoopNode::Node(MixedAir::OAMixer(1).InletNode).HumRat = DataEnvironment::OutHumRat;
+    DataLoopNode::Node(MixedAir::OAMixer(1).InletNode).HumRat = state->dataEnvrn->OutHumRat;
     DataLoopNode::Node(MixedAir::OAMixer(1).InletNode).Enthalpy = 71299.267;
 
     DataLoopNode::Node(cbvav.CBVAVBoxOutletNode(1)).MassFlowRateMax = 0.61;
@@ -872,7 +872,7 @@ TEST_F(CBVAVSys, UnitaryBypassVAV_InternalOAMixer)
     DataLoopNode::Node(cbvav.AirInNode).MassFlowRate = 0.57;
 
     DataLoopNode::Node(MixedAir::OAMixer(1).InletNode).Temp = state->dataEnvrn->OutDryBulbTemp;
-    DataLoopNode::Node(MixedAir::OAMixer(1).InletNode).HumRat = DataEnvironment::OutHumRat;
+    DataLoopNode::Node(MixedAir::OAMixer(1).InletNode).HumRat = state->dataEnvrn->OutHumRat;
     DataLoopNode::Node(MixedAir::OAMixer(1).InletNode).Enthalpy = 71299.267;
 
     DataLoopNode::Node(cbvav.CBVAVBoxOutletNode(1)).MassFlowRateMax = 0.61;
@@ -961,7 +961,7 @@ TEST_F(CBVAVSys, UnitaryBypassVAV_Mixerconnected)
     DataLoopNode::Node(cbvav.AirInNode).MassFlowRate = 0.57;
 
     DataLoopNode::Node(MixedAir::OAMixer(1).InletNode).Temp = state->dataEnvrn->OutDryBulbTemp;
-    DataLoopNode::Node(MixedAir::OAMixer(1).InletNode).HumRat = DataEnvironment::OutHumRat;
+    DataLoopNode::Node(MixedAir::OAMixer(1).InletNode).HumRat = state->dataEnvrn->OutHumRat;
     DataLoopNode::Node(MixedAir::OAMixer(1).InletNode).Enthalpy = 71299.267;
 
     DataLoopNode::Node(cbvav.CBVAVBoxOutletNode(1)).MassFlowRateMax = 0.61;

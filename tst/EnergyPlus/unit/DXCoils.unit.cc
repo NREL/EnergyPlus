@@ -222,7 +222,7 @@ TEST_F(EnergyPlusFixture, DXCoils_Test1)
 
     // set up coil operating conditions (replicates first occurrence of RH > 1 warning in HVACTemplate_UnitarySytsem annual run)
     state->dataEnvrn->OutDryBulbTemp = 16.1;
-    OutHumRat = 0.0114507065;
+    state->dataEnvrn->OutHumRat = 0.0114507065;
     state->dataEnvrn->OutBaroPress = 98200.0;
     DataEnvironment::StdRhoAir = 1.2;
     MSHPMassFlowRateLow = 0.2339 * DataEnvironment::StdRhoAir;
@@ -391,7 +391,6 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
 {
     // Test that the COP calculation is correct when the defrost is on. #4973
 
-    using DataEnvironment::OutHumRat;
     using DXCoils::CalcMultiSpeedDXCoilHeating;
     using Psychrometrics::PsyHFnTdbW;
     using Psychrometrics::PsyRhoAirFnPbTdbW;
@@ -662,7 +661,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
     Coil.InletAirMassFlowRate = Coil.MSRatedAirMassFlowRate(1);
     MSHPMassFlowRateLow = Coil.MSRatedAirMassFlowRate(1);
     MSHPMassFlowRateHigh = Coil.MSRatedAirMassFlowRate(2);
-    OutHumRat = 0.002;
+    state->dataEnvrn->OutHumRat = 0.002;
     state->dataEnvrn->OutBaroPress = 101325; // sea level
     Coil.InletAirTemp = 20;
     Coil.InletAirHumRat = 0.008;
@@ -763,7 +762,6 @@ TEST_F(EnergyPlusFixture, TestSingleSpeedDefrostCOP)
     // Test that the COP calculation is correct when the defrost is on. #4973
 
     using DXCoils::CalcMultiSpeedDXCoilHeating;
-    using EnergyPlus::DataEnvironment::OutHumRat;
     using Psychrometrics::PsyHFnTdbW;
     using Psychrometrics::PsyRhoAirFnPbTdbW;
     int DXCoilNum;
@@ -904,7 +902,7 @@ TEST_F(EnergyPlusFixture, TestSingleSpeedDefrostCOP)
 
     // Set up inlet air conditions.
     Coil.InletAirMassFlowRate = Coil.RatedAirMassFlowRate(1);
-    OutHumRat = 0.002;
+    state->dataEnvrn->OutHumRat = 0.002;
     state->dataEnvrn->OutBaroPress = 101325; // sea level
     Coil.InletAirTemp = 20;
     Coil.InletAirHumRat = 0.008;
@@ -1312,9 +1310,9 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedWasteHeat)
     DXCoil(1).MSHPHeatRecActive = false;
 
     state->dataEnvrn->OutDryBulbTemp = 35;
-    OutHumRat = 0.0128;
+    state->dataEnvrn->OutHumRat = 0.0128;
     state->dataEnvrn->OutBaroPress = 101325;
-    OutWetBulbTemp = PsyTwbFnTdbWPb(*state, state->dataEnvrn->OutDryBulbTemp, OutHumRat, state->dataEnvrn->OutBaroPress);
+    OutWetBulbTemp = PsyTwbFnTdbWPb(*state, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat, state->dataEnvrn->OutBaroPress);
 
     DXCoil(1).MSRatedAirMassFlowRate(1) = DXCoil(1).MSRatedAirVolFlowRate(1) * 1.2;
     DXCoil(1).MSRatedAirMassFlowRate(2) = DXCoil(1).MSRatedAirVolFlowRate(2) * 1.2;
@@ -4045,7 +4043,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedDXCoolingCoilOutputTest)
     // outside air condition
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataEnvrn->OutDryBulbTemp = 38.0;
-    DataEnvironment::OutHumRat = 0.0120;
+    state->dataEnvrn->OutHumRat = 0.0120;
     DataEnvironment::WindSpeed = 5.0;
     DataEnvironment::WindDir = 0.0;
     // run coil at full capacity
@@ -4216,7 +4214,7 @@ TEST_F(EnergyPlusFixture, MultiSpeedDXCoolingCoilOutputTest)
     // outside air condition
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataEnvrn->OutDryBulbTemp = 30.0;
-    DataEnvironment::OutHumRat = 0.0120;
+    state->dataEnvrn->OutHumRat = 0.0120;
     DataEnvironment::WindSpeed = 5.0;
     DataEnvironment::WindDir = 0.0;
     int SpeedNum = 2;

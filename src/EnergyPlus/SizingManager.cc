@@ -126,7 +126,6 @@ namespace SizingManager {
 
         // Using/Aliasing
         using DataEnvironment::EnvironmentName;
-        using DataEnvironment::OutHumRat;
         using SimAirServingZones::ManageAirLoops;
         using SimAirServingZones::UpdateSysSizing;
         using ZoneEquipmentManager::ManageZoneEquipment;
@@ -360,7 +359,7 @@ namespace SizingManager {
                                         DesDayWeath(CurOverallSimDay).DateString = fmt::format("{}/{}", state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth);
                                     }
                                     DesDayWeath(CurOverallSimDay).Temp(TimeStepInDay) = state.dataEnvrn->OutDryBulbTemp;
-                                    DesDayWeath(CurOverallSimDay).HumRat(TimeStepInDay) = OutHumRat;
+                                    DesDayWeath(CurOverallSimDay).HumRat(TimeStepInDay) = state.dataEnvrn->OutHumRat;
                                     DesDayWeath(CurOverallSimDay).Press(TimeStepInDay) = state.dataEnvrn->OutBaroPress;
                                 }
 

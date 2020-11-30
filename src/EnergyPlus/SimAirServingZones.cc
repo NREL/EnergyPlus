@@ -1457,7 +1457,6 @@ namespace SimAirServingZones {
         //     initialized at the start of an environment (run period or design day).
 
         // Using/Aliasing
-        using DataEnvironment::OutHumRat;
         using DataEnvironment::StdBaroPress;
         using DataEnvironment::StdRhoAir;
         using Fans::GetFanIndex;
@@ -2196,7 +2195,7 @@ namespace SimAirServingZones {
                         // Initialize the nodes to a standard set of initial conditions that will
                         //  change after the first iteration to a system value
                         Node(NodeNum).Temp = 20.0;
-                        Node(NodeNum).HumRat = OutHumRat;
+                        Node(NodeNum).HumRat = state.dataEnvrn->OutHumRat;
                         Node(NodeNum).Enthalpy = PsyHFnTdbW(Node(NodeNum).Temp, Node(NodeNum).HumRat);
                         // set the node mass flow rates to the airloop max mass flow rate
                         Node(NodeNum).MassFlowRate = state.dataAirLoop->AirLoopFlow(AirLoopNum).DesSupply;
@@ -5265,7 +5264,6 @@ namespace SimAirServingZones {
         // na
 
         // Using/Aliasing
-        using DataEnvironment::OutHumRat;
         using DataEnvironment::StdRhoAir;
         using EMSManager::ManageEMS;
         using General::FindNumberInList;
@@ -5574,9 +5572,9 @@ namespace SimAirServingZones {
                         }
                         // now calculate the mixed air temperature
                         SysCoolMixTemp = state.dataEnvrn->OutDryBulbTemp * OutAirFrac + SysCoolRetTemp * (1.0 - OutAirFrac);
-                        SysCoolMixHumRat = OutHumRat * OutAirFrac + SysCoolRetHumRat * (1.0 - OutAirFrac);
+                        SysCoolMixHumRat = state.dataEnvrn->OutHumRat * OutAirFrac + SysCoolRetHumRat * (1.0 - OutAirFrac);
                         SysSizing(CurOverallSimDay, AirLoopNum).SysCoolOutTempSeq(TimeStepInDay) = state.dataEnvrn->OutDryBulbTemp;
-                        SysSizing(CurOverallSimDay, AirLoopNum).SysCoolOutHumRatSeq(TimeStepInDay) = OutHumRat;
+                        SysSizing(CurOverallSimDay, AirLoopNum).SysCoolOutHumRatSeq(TimeStepInDay) = state.dataEnvrn->OutHumRat;
                         // From the mixed air temp, system design supply air temp, and the mass flow rate
                         // calculate the system sensible cooling capacity
                         SysSensCoolCap = PsyCpAirFnW(DataPrecisionGlobals::constant_zero) * SysSizing(CurOverallSimDay, AirLoopNum).CoolFlowSeq(TimeStepInDay) *
@@ -5609,7 +5607,7 @@ namespace SimAirServingZones {
                             SysSizing(CurOverallSimDay, AirLoopNum).RetTempAtCoolPeak = SysCoolRetTemp;
                             SysSizing(CurOverallSimDay, AirLoopNum).RetHumRatAtCoolPeak = SysCoolRetHumRat;
                             SysSizing(CurOverallSimDay, AirLoopNum).OutTempAtCoolPeak = state.dataEnvrn->OutDryBulbTemp;
-                            SysSizing(CurOverallSimDay, AirLoopNum).OutHumRatAtCoolPeak = OutHumRat;
+                            SysSizing(CurOverallSimDay, AirLoopNum).OutHumRatAtCoolPeak = state.dataEnvrn->OutHumRat;
                             SysSizing(CurOverallSimDay, AirLoopNum).MassFlowAtCoolPeak =
                                 SysSizing(CurOverallSimDay, AirLoopNum).CoolFlowSeq(TimeStepInDay);
                         }
@@ -5626,7 +5624,7 @@ namespace SimAirServingZones {
                             SysSizing(CurOverallSimDay, AirLoopNum).RetTempAtCoolPeak = SysCoolRetTemp;
                             SysSizing(CurOverallSimDay, AirLoopNum).RetHumRatAtCoolPeak = SysCoolRetHumRat;
                             SysSizing(CurOverallSimDay, AirLoopNum).OutTempAtCoolPeak = state.dataEnvrn->OutDryBulbTemp;
-                            SysSizing(CurOverallSimDay, AirLoopNum).OutHumRatAtCoolPeak = OutHumRat;
+                            SysSizing(CurOverallSimDay, AirLoopNum).OutHumRatAtCoolPeak = state.dataEnvrn->OutHumRat;
                             SysSizing(CurOverallSimDay, AirLoopNum).MassFlowAtCoolPeak =
                                 SysSizing(CurOverallSimDay, AirLoopNum).CoolFlowSeq(TimeStepInDay);
                         }
@@ -5697,9 +5695,9 @@ namespace SimAirServingZones {
                             }
                             // calculate the mixed air temperature
                             SysHeatMixTemp = state.dataEnvrn->OutDryBulbTemp * OutAirFrac + SysHeatRetTemp * (1.0 - OutAirFrac);
-                            SysHeatMixHumRat = OutHumRat * OutAirFrac + SysHeatRetHumRat * (1.0 - OutAirFrac);
+                            SysHeatMixHumRat = state.dataEnvrn->OutHumRat * OutAirFrac + SysHeatRetHumRat * (1.0 - OutAirFrac);
                             SysSizing(CurOverallSimDay, AirLoopNum).SysHeatOutTempSeq(TimeStepInDay) = state.dataEnvrn->OutDryBulbTemp;
-                            SysSizing(CurOverallSimDay, AirLoopNum).SysHeatOutHumRatSeq(TimeStepInDay) = OutHumRat;
+                            SysSizing(CurOverallSimDay, AirLoopNum).SysHeatOutHumRatSeq(TimeStepInDay) = state.dataEnvrn->OutHumRat;
                             // From the mixed air temp, heating supply air temp, and mass flow rate calculate the system heating capacity
                             SysHeatCap = PsyCpAirFnW(DataPrecisionGlobals::constant_zero) * SysSizing(CurOverallSimDay, AirLoopNum).HeatFlowSeq(TimeStepInDay) *
                                          (SysSizing(CurOverallSimDay, AirLoopNum).HeatSupTemp - SysHeatMixTemp);
@@ -5717,7 +5715,7 @@ namespace SimAirServingZones {
                             SysSizing(CurOverallSimDay, AirLoopNum).HeatRetTemp = SysHeatRetTemp;
                             SysSizing(CurOverallSimDay, AirLoopNum).HeatRetHumRat = SysHeatRetHumRat;
                             SysSizing(CurOverallSimDay, AirLoopNum).HeatOutTemp = state.dataEnvrn->OutDryBulbTemp;
-                            SysSizing(CurOverallSimDay, AirLoopNum).HeatOutHumRat = OutHumRat;
+                            SysSizing(CurOverallSimDay, AirLoopNum).HeatOutHumRat = state.dataEnvrn->OutHumRat;
                             // save time of system coincident heating coil peak
                             SysSizing(CurOverallSimDay, AirLoopNum).SysHeatCoilTimeStepPk = TimeStepInDay;
                             SysSizing(CurOverallSimDay, AirLoopNum).SysHeatCoinSpaceSens = 0.0;
@@ -5787,9 +5785,9 @@ namespace SimAirServingZones {
                             }
                             // calculate the mixed air temperature
                             SysHeatMixTemp = state.dataEnvrn->OutDryBulbTemp * OutAirFrac + SysHeatRetTemp * (1.0 - OutAirFrac);
-                            SysHeatMixHumRat = OutHumRat * OutAirFrac + SysHeatRetHumRat * (1.0 - OutAirFrac);
+                            SysHeatMixHumRat = state.dataEnvrn->OutHumRat * OutAirFrac + SysHeatRetHumRat * (1.0 - OutAirFrac);
                             SysSizing(CurOverallSimDay, AirLoopNum).SysHeatOutTempSeq(TimeStepInDay) = state.dataEnvrn->OutDryBulbTemp;
-                            SysSizing(CurOverallSimDay, AirLoopNum).SysHeatOutHumRatSeq(TimeStepInDay) = OutHumRat;
+                            SysSizing(CurOverallSimDay, AirLoopNum).SysHeatOutHumRatSeq(TimeStepInDay) = state.dataEnvrn->OutHumRat;
                             // From the mixed air temp, heating supply air temp, and mass flow rate calculate the system heating capacity
                             SysHeatCap = PsyCpAirFnW(DataPrecisionGlobals::constant_zero) * SysSizing(CurOverallSimDay, AirLoopNum).HeatFlowSeq(TimeStepInDay) *
                                          (SysSizing(CurOverallSimDay, AirLoopNum).HeatSupTemp - SysHeatMixTemp);
@@ -5807,7 +5805,7 @@ namespace SimAirServingZones {
                             SysSizing(CurOverallSimDay, AirLoopNum).HeatRetTemp = SysHeatRetTemp;
                             SysSizing(CurOverallSimDay, AirLoopNum).HeatRetHumRat = SysHeatRetHumRat;
                             SysSizing(CurOverallSimDay, AirLoopNum).HeatOutTemp = state.dataEnvrn->OutDryBulbTemp;
-                            SysSizing(CurOverallSimDay, AirLoopNum).HeatOutHumRat = OutHumRat;
+                            SysSizing(CurOverallSimDay, AirLoopNum).HeatOutHumRat = state.dataEnvrn->OutHumRat;
                             // save time of system coincident heating coil peak
                             SysSizing(CurOverallSimDay, AirLoopNum).SysHeatCoilTimeStepPk = TimeStepInDay;
 

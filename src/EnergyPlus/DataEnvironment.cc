@@ -71,7 +71,6 @@ namespace DataEnvironment {
     // current weather variables)
 
     // MODULE VARIABLE DECLARATIONS:
-    Real64 OutHumRat;                         // Current outdoor air humidity ratio
     Real64 OutRelHum;                         // Current outdoor relative humidity [%]
     Real64 OutRelHumValue;                    // Current outdoor relative humidity value [0.0-1.0]
     bool EMSOutRelHumOverrideOn(false);       // EMS flag for outdoor relative humidity value
@@ -164,7 +163,6 @@ namespace DataEnvironment {
 
     void clear_state()
     {
-        OutHumRat = Real64();
         OutRelHum = Real64();
         OutRelHumValue = Real64();
         EMSOutRelHumOverrideOn = false;

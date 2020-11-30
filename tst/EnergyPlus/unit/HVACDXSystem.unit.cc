@@ -535,7 +535,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RHControl)
 
     // set up outdoor environment
     state->dataEnvrn->OutDryBulbTemp = 35.0;
-    DataEnvironment::OutHumRat = 0.0196;
+    state->dataEnvrn->OutHumRat = 0.0196;
     state->dataEnvrn->OutBaroPress = 101325.0;
     DataEnvironment::OutWetBulbTemp = 27.0932;
 
@@ -692,7 +692,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_LatentDegradation_Test)
 
     // set up outdoor environment
     state->dataEnvrn->OutDryBulbTemp = 35.0;
-    DataEnvironment::OutHumRat = 0.0196;
+    state->dataEnvrn->OutHumRat = 0.0196;
     state->dataEnvrn->OutBaroPress = 101325.0;
     DataEnvironment::OutWetBulbTemp = 27.0932;
 

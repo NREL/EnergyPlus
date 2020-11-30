@@ -102,7 +102,6 @@ namespace ZoneContaminantPredictorCorrector {
     using namespace DataHVACGlobals;
     using namespace DataHeatBalance;
     using namespace DataHeatBalFanSys;
-    using DataEnvironment::OutHumRat;
     using namespace Psychrometrics;
     using namespace HybridModel;
     using ScheduleManager::GetCurrentScheduleValue;
@@ -2176,8 +2175,8 @@ namespace ZoneContaminantPredictorCorrector {
 
                 zone_M_CO2 = Zone(ZoneNum).ZoneMeasuredCO2Concentration;
                 delta_CO2 = (Zone(ZoneNum).ZoneMeasuredCO2Concentration - state.dataContaminantBalance->OutdoorCO2) / 1000;
-                CpAir = PsyCpAirFnW(OutHumRat);
-                AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, Zone(ZoneNum).OutDryBulbTemp, OutHumRat, RoutineNameInfiltration);
+                CpAir = PsyCpAirFnW(state.dataEnvrn->OutHumRat);
+                AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, Zone(ZoneNum).OutDryBulbTemp, state.dataEnvrn->OutHumRat, RoutineNameInfiltration);
 
                 if (Zone(ZoneNum).ZoneMeasuredCO2Concentration == state.dataContaminantBalance->OutdoorCO2) {
                     M_inf = 0.0;

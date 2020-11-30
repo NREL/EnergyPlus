@@ -853,7 +853,6 @@ namespace TranspiredCollector {
 
         // Using/Aliasing
         using ConvectionCoefficients::InitExteriorConvectionCoeff;
-        using DataEnvironment::OutHumRat;
         using DataEnvironment::SkyTemp;
         using DataHeatBalSurface::TH;
         using DataHVACGlobals::TimeStepSys;
@@ -958,9 +957,9 @@ namespace TranspiredCollector {
                    surfaceArea; // Autodesk:F2C++ Functions handle array subscript usage
         }
 
-        RhoAir = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, Tamb, OutHumRat);
+        RhoAir = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, Tamb, state.dataEnvrn->OutHumRat);
 
-        CpAir = PsyCpAirFnW(OutHumRat);
+        CpAir = PsyCpAirFnW(state.dataEnvrn->OutHumRat);
 
         holeArea = state.dataTranspiredCollector->UTSC(UTSCNum).ActualArea * state.dataTranspiredCollector->UTSC(UTSCNum).Porosity;
 
@@ -1149,7 +1148,7 @@ namespace TranspiredCollector {
         state.dataTranspiredCollector->UTSC(UTSCNum).Vsuction = Vsuction;
         state.dataTranspiredCollector->UTSC(UTSCNum).PlenumVelocity = Vplen;
         state.dataTranspiredCollector->UTSC(UTSCNum).SupOutTemp = Taplen;
-        state.dataTranspiredCollector->UTSC(UTSCNum).SupOutHumRat = OutHumRat; // stays the same with sensible heating
+        state.dataTranspiredCollector->UTSC(UTSCNum).SupOutHumRat = state.dataEnvrn->OutHumRat; // stays the same with sensible heating
         state.dataTranspiredCollector->UTSC(UTSCNum).SupOutEnth = PsyHFnTdbW(state.dataTranspiredCollector->UTSC(UTSCNum).SupOutTemp, state.dataTranspiredCollector->UTSC(UTSCNum).SupOutHumRat);
         state.dataTranspiredCollector->UTSC(UTSCNum).SupOutMassFlow = Mdot;
         state.dataTranspiredCollector->UTSC(UTSCNum).SensHeatingRate = SensHeatingRate;

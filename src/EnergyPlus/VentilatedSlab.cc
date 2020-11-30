@@ -1290,7 +1290,6 @@ namespace VentilatedSlab {
         // na
 
         // Using/Aliasing
-        using DataEnvironment::OutHumRat;
         using DataEnvironment::StdRhoAir;
         using DataHeatBalFanSys::MAT;
         using DataHeatBalFanSys::ZoneAirHumRat;
@@ -1611,7 +1610,7 @@ namespace VentilatedSlab {
         if (state.dataGlobal->BeginTimeStepFlag && FirstHVACIteration) {
             // Initialize the outside air conditions...
             Node(OutsideAirNode).Temp = Node(OutsideAirNode).OutAirDryBulb;
-            Node(OutsideAirNode).HumRat = OutHumRat;
+            Node(OutsideAirNode).HumRat = state.dataEnvrn->OutHumRat;
             Node(OutsideAirNode).Press = state.dataEnvrn->OutBaroPress;
 
             // The first pass through in a particular time step

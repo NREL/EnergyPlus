@@ -123,7 +123,6 @@ namespace ZoneTempPredictorCorrector {
     using namespace DataHVACGlobals;
     using namespace DataHeatBalance;
     using namespace DataHeatBalFanSys;
-    using DataEnvironment::OutHumRat;
     using DataZoneEnergyDemands::CurDeadBandOrSetback;
     using DataZoneEnergyDemands::DeadBandOrSetback;
     using DataZoneEnergyDemands::Setback;
@@ -2984,15 +2983,15 @@ namespace ZoneTempPredictorCorrector {
             ZTM1 = 0.0;
             ZTM2 = 0.0;
             ZTM3 = 0.0;
-            WZoneTimeMinus1 = OutHumRat;
-            WZoneTimeMinus2 = OutHumRat;
-            WZoneTimeMinus3 = OutHumRat;
-            WZoneTimeMinus4 = OutHumRat;
-            WZoneTimeMinusP = OutHumRat;
-            DSWZoneTimeMinus1 = OutHumRat;
-            DSWZoneTimeMinus2 = OutHumRat;
-            DSWZoneTimeMinus3 = OutHumRat;
-            DSWZoneTimeMinus4 = OutHumRat;
+            WZoneTimeMinus1 = state.dataEnvrn->OutHumRat;
+            WZoneTimeMinus2 = state.dataEnvrn->OutHumRat;
+            WZoneTimeMinus3 = state.dataEnvrn->OutHumRat;
+            WZoneTimeMinus4 = state.dataEnvrn->OutHumRat;
+            WZoneTimeMinusP = state.dataEnvrn->OutHumRat;
+            DSWZoneTimeMinus1 = state.dataEnvrn->OutHumRat;
+            DSWZoneTimeMinus2 = state.dataEnvrn->OutHumRat;
+            DSWZoneTimeMinus3 = state.dataEnvrn->OutHumRat;
+            DSWZoneTimeMinus4 = state.dataEnvrn->OutHumRat;
             WZoneTimeMinus1Temp = 0.0;
             WZoneTimeMinus2Temp = 0.0;
             WZoneTimeMinus3Temp = 0.0;
@@ -3046,9 +3045,9 @@ namespace ZoneTempPredictorCorrector {
             for (auto &e : Zone)
                 e.NoHeatToReturnAir = false;
             ZoneT1 = 0.0;
-            ZoneW1 = OutHumRat;
-            ZoneWMX = OutHumRat;
-            ZoneWM2 = OutHumRat;
+            ZoneW1 = state.dataEnvrn->OutHumRat;
+            ZoneWMX = state.dataEnvrn->OutHumRat;
+            ZoneWM2 = state.dataEnvrn->OutHumRat;
             PreviousMeasuredZT1 = 0.0;     // Hybrid modeling
             PreviousMeasuredZT2 = 0.0;     // Hybrid modeling
             PreviousMeasuredZT3 = 0.0;     // Hybrid modeling
@@ -4610,8 +4609,8 @@ namespace ZoneTempPredictorCorrector {
                 A = state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMHr + state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMMHr +
                     SumHmARa(ZoneNum);
             } else {
-                B = (LatentGain / H2OHtOfVap) + ((OAMFL(ZoneNum) + VAMFL(ZoneNum) + CTMFL(ZoneNum)) * OutHumRat) + EAMFLxHumRat(ZoneNum) +
-                    SumHmARaW(ZoneNum) + MixingMassFlowXHumRat(ZoneNum) + MDotOA(ZoneNum) * OutHumRat;
+                B = (LatentGain / H2OHtOfVap) + ((OAMFL(ZoneNum) + VAMFL(ZoneNum) + CTMFL(ZoneNum)) * state.dataEnvrn->OutHumRat) + EAMFLxHumRat(ZoneNum) +
+                    SumHmARaW(ZoneNum) + MixingMassFlowXHumRat(ZoneNum) + MDotOA(ZoneNum) * state.dataEnvrn->OutHumRat;
                 A = OAMFL(ZoneNum) + VAMFL(ZoneNum) + EAMFL(ZoneNum) + CTMFL(ZoneNum) + SumHmARa(ZoneNum) + MixingMassFlowZone(ZoneNum) +
                     MDotOA(ZoneNum);
             }
@@ -5582,8 +5581,8 @@ namespace ZoneTempPredictorCorrector {
         RhoAir = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, ZT(ZoneNum), ZoneAirHumRat(ZoneNum), RoutineName);
         H2OHtOfVap = PsyHgAirFnWTdb(ZoneAirHumRat(ZoneNum), ZT(ZoneNum));
 
-        B = (LatentGain / H2OHtOfVap) + ((OAMFL(ZoneNum) + VAMFL(ZoneNum) + CTMFL(ZoneNum)) * OutHumRat) + EAMFLxHumRat(ZoneNum) +
-            (MoistureMassFlowRate) + SumHmARaW(ZoneNum) + MixingMassFlowXHumRat(ZoneNum) + MDotOA(ZoneNum) * OutHumRat;
+        B = (LatentGain / H2OHtOfVap) + ((OAMFL(ZoneNum) + VAMFL(ZoneNum) + CTMFL(ZoneNum)) * state.dataEnvrn->OutHumRat) + EAMFLxHumRat(ZoneNum) +
+            (MoistureMassFlowRate) + SumHmARaW(ZoneNum) + MixingMassFlowXHumRat(ZoneNum) + MDotOA(ZoneNum) * state.dataEnvrn->OutHumRat;
         A = ZoneMassFlowRate + OAMFL(ZoneNum) + VAMFL(ZoneNum) + EAMFL(ZoneNum) + CTMFL(ZoneNum) + SumHmARa(ZoneNum) + MixingMassFlowZone(ZoneNum) +
             MDotOA(ZoneNum);
 
@@ -5827,8 +5826,8 @@ namespace ZoneTempPredictorCorrector {
 
                 zone_M_T = Zone(ZoneNum).ZoneMeasuredTemperature;
                 delta_T = (Zone(ZoneNum).ZoneMeasuredTemperature - Zone(ZoneNum).OutDryBulbTemp);
-                CpAir = PsyCpAirFnW(OutHumRat);
-                AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, Zone(ZoneNum).OutDryBulbTemp, OutHumRat, RoutineNameInfiltration);
+                CpAir = PsyCpAirFnW(state.dataEnvrn->OutHumRat);
+                AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, Zone(ZoneNum).OutDryBulbTemp, state.dataEnvrn->OutHumRat, RoutineNameInfiltration);
                 Zone(ZoneNum).delta_T = delta_T;
 
                 // s4 - Set ACH to 0 when delta_T <= 0.5, add max and min limits to ach
@@ -6045,12 +6044,12 @@ namespace ZoneTempPredictorCorrector {
 
                     AA = SumSysM_HM + VAMFL(ZoneNum) + EAMFL(ZoneNum) + CTMFL(ZoneNum) + SumHmARa(ZoneNum) + MixingMassFlowZone(ZoneNum) +
                          MDotOA(ZoneNum);
-                    BB = SumSysMHumRat_HM + (LatentGain / H2OHtOfVap) + ((VAMFL(ZoneNum) + CTMFL(ZoneNum)) * OutHumRat) + EAMFLxHumRat(ZoneNum) +
-                         SumHmARaW(ZoneNum) + MixingMassFlowXHumRat(ZoneNum) + MDotOA(ZoneNum) * OutHumRat;
+                    BB = SumSysMHumRat_HM + (LatentGain / H2OHtOfVap) + ((VAMFL(ZoneNum) + CTMFL(ZoneNum)) * state.dataEnvrn->OutHumRat) + EAMFLxHumRat(ZoneNum) +
+                         SumHmARaW(ZoneNum) + MixingMassFlowXHumRat(ZoneNum) + MDotOA(ZoneNum) * state.dataEnvrn->OutHumRat;
                 } else {
                     AA = VAMFL(ZoneNum) + EAMFL(ZoneNum) + CTMFL(ZoneNum) + SumHmARa(ZoneNum) + MixingMassFlowZone(ZoneNum) + MDotOA(ZoneNum);
-                    BB = (LatentGain / H2OHtOfVap) + ((VAMFL(ZoneNum) + CTMFL(ZoneNum)) * OutHumRat) + EAMFLxHumRat(ZoneNum) + SumHmARaW(ZoneNum) +
-                         MixingMassFlowXHumRat(ZoneNum) + MDotOA(ZoneNum) * OutHumRat;
+                    BB = (LatentGain / H2OHtOfVap) + ((VAMFL(ZoneNum) + CTMFL(ZoneNum)) * state.dataEnvrn->OutHumRat) + EAMFLxHumRat(ZoneNum) + SumHmARaW(ZoneNum) +
+                         MixingMassFlowXHumRat(ZoneNum) + MDotOA(ZoneNum) * state.dataEnvrn->OutHumRat;
                 }
 
                 CC = RhoAir * Zone(ZoneNum).Volume * Zone(ZoneNum).ZoneVolCapMultpMoist / SysTimeStepInSeconds;
@@ -6058,12 +6057,12 @@ namespace ZoneTempPredictorCorrector {
                       (1.0 / 3.0) * PreviousMeasuredHumRat3(ZoneNum));
 
                 zone_M_HR = Zone(ZoneNum).ZoneMeasuredHumidityRatio;
-                delta_HR = (Zone(ZoneNum).ZoneMeasuredHumidityRatio - OutHumRat);
+                delta_HR = (Zone(ZoneNum).ZoneMeasuredHumidityRatio - state.dataEnvrn->OutHumRat);
 
-                CpAir = PsyCpAirFnW(OutHumRat);
-                AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, Zone(ZoneNum).OutDryBulbTemp, OutHumRat, RoutineName);
+                CpAir = PsyCpAirFnW(state.dataEnvrn->OutHumRat);
+                AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, Zone(ZoneNum).OutDryBulbTemp, state.dataEnvrn->OutHumRat, RoutineName);
 
-                if (std::abs(Zone(ZoneNum).ZoneMeasuredHumidityRatio - OutHumRat) < 0.0000001) {
+                if (std::abs(Zone(ZoneNum).ZoneMeasuredHumidityRatio - state.dataEnvrn->OutHumRat) < 0.0000001) {
                     M_inf = 0.0;
                 } else {
                     M_inf = (CC * DD + BB - ((11.0 / 6.0) * CC + AA) * Zone(ZoneNum).ZoneMeasuredHumidityRatio) / delta_HR;
@@ -6107,14 +6106,14 @@ namespace ZoneTempPredictorCorrector {
 
                     AA = SumSysM_HM + OAMFL(ZoneNum) + VAMFL(ZoneNum) + EAMFL(ZoneNum) + CTMFL(ZoneNum) + SumHmARa(ZoneNum) +
                          MixingMassFlowZone(ZoneNum) + MDotOA(ZoneNum);
-                    BB = SumSysMHumRat_HM + (LatentGainExceptPeople / H2OHtOfVap) + ((OAMFL(ZoneNum) + VAMFL(ZoneNum) + CTMFL(ZoneNum)) * OutHumRat) +
-                         EAMFLxHumRat(ZoneNum) + SumHmARaW(ZoneNum) + MixingMassFlowXHumRat(ZoneNum) + MDotOA(ZoneNum) * OutHumRat;
+                    BB = SumSysMHumRat_HM + (LatentGainExceptPeople / H2OHtOfVap) + ((OAMFL(ZoneNum) + VAMFL(ZoneNum) + CTMFL(ZoneNum)) * state.dataEnvrn->OutHumRat) +
+                         EAMFLxHumRat(ZoneNum) + SumHmARaW(ZoneNum) + MixingMassFlowXHumRat(ZoneNum) + MDotOA(ZoneNum) * state.dataEnvrn->OutHumRat;
                 } else {
                     AA = ZoneMassFlowRate + OAMFL(ZoneNum) + VAMFL(ZoneNum) + EAMFL(ZoneNum) + CTMFL(ZoneNum) + SumHmARa(ZoneNum) +
                          MixingMassFlowZone(ZoneNum) + MDotOA(ZoneNum);
-                    BB = (LatentGainExceptPeople / H2OHtOfVap) + ((OAMFL(ZoneNum) + VAMFL(ZoneNum) + CTMFL(ZoneNum)) * OutHumRat) +
+                    BB = (LatentGainExceptPeople / H2OHtOfVap) + ((OAMFL(ZoneNum) + VAMFL(ZoneNum) + CTMFL(ZoneNum)) * state.dataEnvrn->OutHumRat) +
                          EAMFLxHumRat(ZoneNum) + (MoistureMassFlowRate) + SumHmARaW(ZoneNum) + MixingMassFlowXHumRat(ZoneNum) +
-                         MDotOA(ZoneNum) * OutHumRat;
+                         MDotOA(ZoneNum) * state.dataEnvrn->OutHumRat;
                 }
 
                 CC = RhoAir * Zone(ZoneNum).Volume * Zone(ZoneNum).ZoneVolCapMultpMoist / SysTimeStepInSeconds;

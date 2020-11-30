@@ -3892,7 +3892,7 @@ namespace UnitVentilator {
             }
 
             ActualOAMassFlowRate =
-                (std::abs(state.dataUnitVentilators->QZnReq) + (MassFlowRate * std::abs(EnthDiffAcrossFan))) / (PsyCpAirFnW(DataEnvironment::OutHumRat) * (Tinlet - Toutdoor));
+                (std::abs(state.dataUnitVentilators->QZnReq) + (MassFlowRate * std::abs(EnthDiffAcrossFan))) / (PsyCpAirFnW(state.dataEnvrn->OutHumRat) * (Tinlet - Toutdoor));
 
             ActualOAMassFlowRate = max(ActualOAMassFlowRate, (MinOAFrac * MassFlowRate));
             ActualOAMassFlowRate = min(ActualOAMassFlowRate, (MaxOAFrac * MassFlowRate));

@@ -3018,7 +3018,7 @@ TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
 
     // Initiate conditions for multispeed coil calculation
     state->dataEnvrn->OutDryBulbTemp = 32.0;
-    DataEnvironment::OutHumRat = 0.02;
+    state->dataEnvrn->OutHumRat = 0.02;
     state->dataEnvrn->OutBaroPress = 101325.0;
     DataEnvironment::OutWetBulbTemp = Psychrometrics::PsyTwbFnTdbWPb(*state, 32.0, 0.02, 101325.0);
 

@@ -767,7 +767,7 @@ namespace FluidCoolers {
             this->AirWetBulb = DataLoopNode::Node(this->OutdoorAirInletNodeNum).OutAirWetBulb;
         } else {
             this->AirTemp = state.dataEnvrn->OutDryBulbTemp;
-            this->AirHumRat = DataEnvironment::OutHumRat;
+            this->AirHumRat = state.dataEnvrn->OutHumRat;
             this->AirPress = state.dataEnvrn->OutBaroPress;
             this->AirWetBulb = DataEnvironment::OutWetBulbTemp;
         }

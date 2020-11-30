@@ -1150,7 +1150,7 @@ namespace EvaporativeFluidCoolers {
             this->inletConds.AirWetBulb = DataLoopNode::Node(this->OutdoorAirInletNodeNum).OutAirWetBulb;
         } else {
             this->inletConds.AirTemp = state.dataEnvrn->OutDryBulbTemp;
-            this->inletConds.AirHumRat = DataEnvironment::OutHumRat;
+            this->inletConds.AirHumRat = state.dataEnvrn->OutHumRat;
             this->inletConds.AirPress = state.dataEnvrn->OutBaroPress;
             this->inletConds.AirWetBulb = DataEnvironment::OutWetBulbTemp;
         }

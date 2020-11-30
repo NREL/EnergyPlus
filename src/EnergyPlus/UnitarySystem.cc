@@ -12618,7 +12618,7 @@ namespace UnitarySystems {
         if (this->m_CondenserNodeNum != 0) {
             OutdoorDryBulb = DataLoopNode::Node(this->m_CondenserNodeNum).Temp;
             if (this->m_CondenserType == DataHVACGlobals::WaterCooled) {
-                OutdoorHumRat = DataEnvironment::OutHumRat;
+                OutdoorHumRat = state.dataEnvrn->OutHumRat;
                 OutdoorPressure = state.dataEnvrn->OutBaroPress;
                 OutdoorWetBulb = DataEnvironment::OutWetBulbTemp;
             } else {
@@ -12626,7 +12626,7 @@ namespace UnitarySystems {
                 // IF node is not connected to anything, pressure = default, use weather data
                 if (OutdoorPressure == DataLoopNode::DefaultNodeValues.Press) {
                     OutdoorDryBulb = state.dataEnvrn->OutDryBulbTemp;
-                    OutdoorHumRat = DataEnvironment::OutHumRat;
+                    OutdoorHumRat = state.dataEnvrn->OutHumRat;
                     OutdoorPressure = state.dataEnvrn->OutBaroPress;
                     OutdoorWetBulb = DataEnvironment::OutWetBulbTemp;
                 } else {
@@ -12637,7 +12637,7 @@ namespace UnitarySystems {
             }
         } else {
             OutdoorDryBulb = state.dataEnvrn->OutDryBulbTemp;
-            OutdoorHumRat = DataEnvironment::OutHumRat;
+            OutdoorHumRat = state.dataEnvrn->OutHumRat;
             OutdoorPressure = state.dataEnvrn->OutBaroPress;
             OutdoorWetBulb = DataEnvironment::OutWetBulbTemp;
         }

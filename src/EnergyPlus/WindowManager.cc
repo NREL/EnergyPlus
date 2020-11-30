@@ -3504,7 +3504,7 @@ namespace WindowManager {
                     if (SurfWinAirflowSource(SurfNum) == AirFlowWindow_Source_IndoorAir) {
                         InletAirHumRat = ZoneAirHumRat(ZoneNum);
                     } else { // AirflowSource = outside air
-                        InletAirHumRat = OutHumRat;
+                        InletAirHumRat = state.dataEnvrn->OutHumRat;
                     }
                     ZoneTemp = MAT(ZoneNum); // this should be Tin (account for different reference temps)
                     CpAirOutlet = PsyCpAirFnW(InletAirHumRat);

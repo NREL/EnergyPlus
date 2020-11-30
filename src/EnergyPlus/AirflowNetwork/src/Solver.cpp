@@ -93,7 +93,6 @@ namespace AirflowNetwork {
     // USE STATEMENTS:
 
     // Using/Aliasing
-    using DataEnvironment::OutHumRat;
     using DataEnvironment::StdBaroPress;
     using DataSurfaces::Surface;
 
@@ -514,9 +513,9 @@ namespace AirflowNetwork {
             properties[n].density = AIRDENSITY(state, StdBaroPress + PZ(n), properties[n].temperature, properties[n].humidityRatio);
             // RHOZ(n) = PsyRhoAirFnPbTdbW(StdBaroPress + PZ(n), TZ(n), WZ(n));
             if (AirflowNetworkNodeData(n).ExtNodeNum > 0) {
-                properties[n].density = AIRDENSITY(state, StdBaroPress + PZ(n), state.dataEnvrn->OutDryBulbTemp, OutHumRat);
+                properties[n].density = AIRDENSITY(state, StdBaroPress + PZ(n), state.dataEnvrn->OutDryBulbTemp, state.dataEnvrn->OutHumRat);
                 properties[n].temperature = state.dataEnvrn->OutDryBulbTemp;
-                properties[n].humidityRatio = OutHumRat;
+                properties[n].humidityRatio = state.dataEnvrn->OutHumRat;
             }
             properties[n].sqrtDensity = std::sqrt(properties[n].density);
             properties[n].viscosity = 1.71432e-5 + 4.828e-8 * properties[n].temperature;
@@ -2021,7 +2020,7 @@ namespace AirflowNetwork {
         Real64 CONV;
 
         // FLOW:
-        RhoREF = AIRDENSITY(state, PSea, state.dataEnvrn->OutDryBulbTemp, OutHumRat);
+        RhoREF = AIRDENSITY(state, PSea, state.dataEnvrn->OutDryBulbTemp, state.dataEnvrn->OutHumRat);
 
         CONV = state.dataEnvrn->Latitude * 2.0 * DataGlobalConstants::Pi() / 360.0;
         G = 9.780373 * (1.0 + 0.0052891 * pow_2(std::sin(CONV)) - 0.0000059 * pow_2(std::sin(2.0 * CONV)));

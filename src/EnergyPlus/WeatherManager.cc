@@ -386,7 +386,7 @@ namespace WeatherManager {
                 "Site Outdoor Air Wetbulb Temperature", OutputProcessor::Unit::C, DataEnvironment::OutWetBulbTemp, "Zone", "Average", "Environment");
             SetupOutputVariable(state, "Site Outdoor Air Humidity Ratio",
                                 OutputProcessor::Unit::kgWater_kgDryAir,
-                                DataEnvironment::OutHumRat,
+                                state.dataEnvrn->OutHumRat,
                                 "Zone",
                                 "Average",
                                 "Environment");
@@ -1911,10 +1911,10 @@ namespace WeatherManager {
         }
 
         // Humidity Ratio and Wet Bulb are derived
-        DataEnvironment::OutHumRat = Psychrometrics::PsyWFnTdbRhPb(state,
+        state.dataEnvrn->OutHumRat = Psychrometrics::PsyWFnTdbRhPb(state,
             state.dataEnvrn->OutDryBulbTemp, DataEnvironment::OutRelHumValue, state.dataEnvrn->OutBaroPress, RoutineName);
         DataEnvironment::OutWetBulbTemp =
-            Psychrometrics::PsyTwbFnTdbWPb(state, state.dataEnvrn->OutDryBulbTemp, DataEnvironment::OutHumRat, state.dataEnvrn->OutBaroPress);
+            Psychrometrics::PsyTwbFnTdbWPb(state, state.dataEnvrn->OutDryBulbTemp, state.dataEnvrn->OutHumRat, state.dataEnvrn->OutBaroPress);
         if (state.dataEnvrn->OutDryBulbTemp < DataEnvironment::OutWetBulbTemp) {
             DataEnvironment::OutWetBulbTemp = state.dataEnvrn->OutDryBulbTemp;
             Real64 TempVal =
@@ -1999,9 +1999,9 @@ namespace WeatherManager {
             state.dataEnvrn->GndSolarRad = 0.0;
         }
 
-        DataEnvironment::OutEnthalpy = Psychrometrics::PsyHFnTdbW(state.dataEnvrn->OutDryBulbTemp, DataEnvironment::OutHumRat);
+        DataEnvironment::OutEnthalpy = Psychrometrics::PsyHFnTdbW(state.dataEnvrn->OutDryBulbTemp, state.dataEnvrn->OutHumRat);
         DataEnvironment::OutAirDensity =
-            Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataEnvrn->OutDryBulbTemp, DataEnvironment::OutHumRat);
+            Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataEnvrn->OutDryBulbTemp, state.dataEnvrn->OutHumRat);
 
         if (state.dataEnvrn->OutDryBulbTemp < DataEnvironment::OutWetBulbTemp) DataEnvironment::OutWetBulbTemp = state.dataEnvrn->OutDryBulbTemp;
         if (DataEnvironment::OutDewPointTemp > DataEnvironment::OutWetBulbTemp) DataEnvironment::OutDewPointTemp = DataEnvironment::OutWetBulbTemp;

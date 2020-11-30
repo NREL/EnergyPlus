@@ -76,7 +76,7 @@ TEST_F(EnergyPlusFixture, OutAirNodeManager_OATdbTwbOverrideTest)
     DataEnvironment::WindSpeed = 2.0;
     DataEnvironment::WindDir = 0.0;
     state->dataEnvrn->OutBaroPress = 101325;
-    DataEnvironment::OutHumRat = Psychrometrics::PsyWFnTdbTwbPb(*state, state->dataEnvrn->OutDryBulbTemp, DataEnvironment::OutWetBulbTemp, state->dataEnvrn->OutBaroPress);
+    state->dataEnvrn->OutHumRat = Psychrometrics::PsyWFnTdbTwbPb(*state, state->dataEnvrn->OutDryBulbTemp, DataEnvironment::OutWetBulbTemp, state->dataEnvrn->OutBaroPress);
 
     ScheduleManager::Schedule(1).CurrentValue = 24.0;
     OutsideAirNodeList(1) = 1;

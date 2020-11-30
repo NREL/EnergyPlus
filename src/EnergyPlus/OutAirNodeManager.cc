@@ -643,8 +643,8 @@ namespace OutAirNodeManager {
                     Node(NodeNum).OutAirWetBulb = Node(NodeNum).OutAirDryBulb;
                 }
                 if (Node(NodeNum).OutAirWetBulbSchedNum == 0 && !Node(NodeNum).EMSOverrideOutAirWetBulb && (Node(NodeNum).EMSOverrideOutAirDryBulb || Node(NodeNum).OutAirDryBulbSchedNum != 0)) {
-                    Node(NodeNum).HumRat = OutHumRat;
-                    Node(NodeNum).OutAirWetBulb = PsyTwbFnTdbWPb(state, Node(NodeNum).OutAirDryBulb, OutHumRat, state.dataEnvrn->OutBaroPress);
+                    Node(NodeNum).HumRat = state.dataEnvrn->OutHumRat;
+                    Node(NodeNum).OutAirWetBulb = PsyTwbFnTdbWPb(state, Node(NodeNum).OutAirDryBulb, state.dataEnvrn->OutHumRat, state.dataEnvrn->OutBaroPress);
                 } else {
                     Node(NodeNum).HumRat = PsyWFnTdbTwbPb(state, Node(NodeNum).OutAirDryBulb, Node(NodeNum).OutAirWetBulb, state.dataEnvrn->OutBaroPress);
                 }
@@ -652,7 +652,7 @@ namespace OutAirNodeManager {
                 Node(NodeNum).HumRat = PsyWFnTdbTwbPb(state, Node(NodeNum).OutAirDryBulb, Node(NodeNum).OutAirWetBulb, state.dataEnvrn->OutBaroPress);
             }
         } else {
-            Node(NodeNum).HumRat = OutHumRat;
+            Node(NodeNum).HumRat = state.dataEnvrn->OutHumRat;
         }
         Node(NodeNum).Enthalpy = PsyHFnTdbW(Node(NodeNum).OutAirDryBulb, Node(NodeNum).HumRat);
         Node(NodeNum).Press = state.dataEnvrn->OutBaroPress;

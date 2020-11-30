@@ -1310,7 +1310,7 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
     ScheduleManager::Schedule(9).CurrentValue = 1.0;
     DataEnvironment::StdRhoAir = 1.2;
     state->dataEnvrn->OutDryBulbTemp = 35.0;
-    DataEnvironment::OutHumRat = 0.012;
+    state->dataEnvrn->OutHumRat = 0.012;
     DataEnvironment::StdBaroPress = 101325.0;
     state->dataEnvrn->OutBaroPress = 101325.0;
 
@@ -1383,7 +1383,7 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
     QZnReq = 10000.00;
     MSHeatPump(2).HeatCoolMode = HeatingMode;
     state->dataEnvrn->OutDryBulbTemp = 5.0;
-    DataEnvironment::OutHumRat = 0.008;
+    state->dataEnvrn->OutHumRat = 0.008;
     state->dataGlobal->DoCoilDirectSolutions = false;
     SimMSHP(*state, MSHeatPumpNum, FirstHVACIteration, AirLoopNum, QSensUnitOut, QZnReq, OnOffAirFlowRatio);
     EXPECT_NEAR(DataLoopNode::Node(22).Temp, 26.546664, 0.0001);

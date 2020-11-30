@@ -9590,7 +9590,7 @@ namespace RefrigeratedCase {
                 if (this->OutsideAirNodeNum != 0) {
                     HumRatIn = DataLoopNode::Node(this->OutsideAirNodeNum).HumRat;
                 } else {
-                    HumRatIn = DataEnvironment::OutHumRat;
+                    HumRatIn = state.dataEnvrn->OutHumRat;
                 } // outsideairnode
                 OutWbTemp = Psychrometrics::PsyTwbFnTdbWPb(state, OutDbTemp, HumRatIn, BPress);
                 EffectTemp = OutWbTemp + (1.0 - this->EvapEffect) * (OutDbTemp - OutWbTemp);
@@ -11527,7 +11527,7 @@ namespace RefrigeratedCase {
             } else {
                 OutDbTemp = state.dataEnvrn->OutDryBulbTemp;
                 BPress = state.dataEnvrn->OutBaroPress;
-                HumRatIn = DataEnvironment::OutHumRat;
+                HumRatIn = state.dataEnvrn->OutHumRat;
             }
             AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(state, BPress, OutDbTemp, HumRatIn);
             AirDensityDry = Psychrometrics::PsyRhoAirFnPbTdbW(state, BPress, OutDbTemp, 0.0);

@@ -146,9 +146,9 @@ protected:
         DataSizing::DesDayWeath(1).Temp(1) = 35.0;
         state->dataGlobal->BeginEnvrnFlag = true;
         state->dataEnvrn->OutDryBulbTemp = 35.0;
-        DataEnvironment::OutHumRat = 0.012;
+        state->dataEnvrn->OutHumRat = 0.012;
         DataEnvironment::OutWetBulbTemp =
-            Psychrometrics::PsyTwbFnTdbWPb(*state, state->dataEnvrn->OutDryBulbTemp, DataEnvironment::OutHumRat, DataEnvironment::StdPressureSeaLevel);
+            Psychrometrics::PsyTwbFnTdbWPb(*state, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat, DataEnvironment::StdPressureSeaLevel);
         state->dataEnvrn->OutBaroPress = 101325;          // sea level
         DataZoneEquipment::ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
 
@@ -5646,7 +5646,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
     DataLoopNode::Node(VRFTU(VRFTUNum).VRFTUInletNodeNum).HumRat = 0.0093;
     DataLoopNode::Node(VRFTU(VRFTUNum).VRFTUInletNodeNum).Enthalpy = 47794.1;
     state->dataEnvrn->OutDryBulbTemp = 35.0;
-    DataEnvironment::OutHumRat = 0.017767; // 50% RH
+    state->dataEnvrn->OutHumRat = 0.017767; // 50% RH
     state->dataEnvrn->OutBaroPress = 101325.0;
     DataEnvironment::OutWetBulbTemp = 26.045;
     SimulateVRF(*state,
@@ -5691,7 +5691,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
     DataLoopNode::Node(VRFTU(VRFTUNum).ZoneAirNode).HumRat = 0.0056;
     DataLoopNode::Node(VRFTU(VRFTUNum).ZoneAirNode).Enthalpy = 34823.5;
     state->dataEnvrn->OutDryBulbTemp = 5.0;
-    DataEnvironment::OutHumRat = 0.00269; // 50% RH
+    state->dataEnvrn->OutHumRat = 0.00269; // 50% RH
     state->dataEnvrn->OutBaroPress = 101325.0;
     DataEnvironment::OutWetBulbTemp = 1.34678;
     SimulateVRF(*state,
@@ -6569,7 +6569,7 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest)
     state->dataGlobal->TimeStepZone = 0.25;
     DataHVACGlobals::SysTimeElapsed = 0.0;
     state->dataEnvrn->OutDryBulbTemp = 35.0;
-    DataEnvironment::OutHumRat = 0.01;
+    state->dataEnvrn->OutHumRat = 0.01;
     state->dataEnvrn->OutBaroPress = 101325.0;
     DataEnvironment::OutWetBulbTemp = 21.1340575;
 
@@ -11189,7 +11189,7 @@ TEST_F(EnergyPlusFixture, VRFTU_SysCurve_ReportOutputVerificationTest)
         Psychrometrics::PsyHFnTdbW(Node(thisVRFTU.VRFTUInletNodeNum).Temp, Node(thisVRFTU.VRFTUInletNodeNum).HumRat);
 
     state->dataEnvrn->OutDryBulbTemp = 35.0;
-    DataEnvironment::OutHumRat = 0.0100;
+    state->dataEnvrn->OutHumRat = 0.0100;
     state->dataEnvrn->OutBaroPress = 101325.0;
     DataEnvironment::WindSpeed = 5.0;
     DataEnvironment::WindDir = 0.0;
@@ -12921,7 +12921,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_ReportOutputVerificationTest)
         Psychrometrics::PsyHFnTdbW(Node(thisVRFTU.VRFTUInletNodeNum).Temp, Node(thisVRFTU.VRFTUInletNodeNum).HumRat);
 
     state->dataEnvrn->OutDryBulbTemp = 35.0;
-    DataEnvironment::OutHumRat = 0.0100;
+    state->dataEnvrn->OutHumRat = 0.0100;
     state->dataEnvrn->OutBaroPress = 101325.0;
     DataEnvironment::WindSpeed = 5.0;
     DataEnvironment::WindDir = 0.0;
@@ -13114,7 +13114,7 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest_HREIRFTHeat)
     DataHVACGlobals::TimeStepSys = 0.25;
     DataHVACGlobals::SysTimeElapsed = 0.0;
     state->dataEnvrn->OutDryBulbTemp = 35.0;
-    DataEnvironment::OutHumRat = 0.01;
+    state->dataEnvrn->OutHumRat = 0.01;
     state->dataEnvrn->OutBaroPress = 101325.0;
     DataEnvironment::OutWetBulbTemp = 21.1340575;
 

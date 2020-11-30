@@ -95,7 +95,6 @@ namespace VariableSpeedCoils {
     using DataEnvironment::CurMnDy;
     using DataEnvironment::EnvironmentName;
     using DataEnvironment::OutEnthalpy;
-    using DataEnvironment::OutHumRat;
     using DataEnvironment::OutWetBulbTemp;
     using DataEnvironment::StdBaroPress;
     using namespace DataSizing;
@@ -3226,7 +3225,7 @@ namespace VariableSpeedCoils {
                                                                                                     state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirHumRat);
                 // store environment data fill back in after rating point calc is over
                 Real64 holdOutDryBulbTemp = state.dataEnvrn->OutDryBulbTemp;
-                Real64 holdOutHumRat = DataEnvironment::OutHumRat;
+                Real64 holdOutHumRat = state.dataEnvrn->OutHumRat;
                 Real64 holdOutWetBulb = DataEnvironment::OutWetBulbTemp;
                 Real64 holdOutBaroPress = state.dataEnvrn->OutBaroPress;
                 Real64 ratedOutdoorAirWetBulb = 23.9; // from I/O ref. more precise value?
@@ -3234,11 +3233,11 @@ namespace VariableSpeedCoils {
                 state.dataEnvrn->OutDryBulbTemp = state.dataVariableSpeedCoils->RatedAmbAirTemp;
                 DataEnvironment::OutWetBulbTemp = ratedOutdoorAirWetBulb;
                 state.dataEnvrn->OutBaroPress = DataEnvironment::StdPressureSeaLevel; // assume rating is for sea level.
-                DataEnvironment::OutHumRat =
+                state.dataEnvrn->OutHumRat =
                     Psychrometrics::PsyWFnTdbTwbPb(state, state.dataVariableSpeedCoils->RatedAmbAirTemp, ratedOutdoorAirWetBulb, DataEnvironment::StdPressureSeaLevel, RoutineName);
                 if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondenserInletNodeNum > 0) {
                     Node(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondenserInletNodeNum).Temp = state.dataVariableSpeedCoils->RatedAmbAirTemp;
-                    Node(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondenserInletNodeNum).HumRat = DataEnvironment::OutHumRat;
+                    Node(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondenserInletNodeNum).HumRat = state.dataEnvrn->OutHumRat;
                     Node(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondenserInletNodeNum).Press = DataEnvironment::StdPressureSeaLevel;
                     Node(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondenserInletNodeNum).OutAirWetBulb = ratedOutdoorAirWetBulb;
                 }
@@ -3287,7 +3286,7 @@ namespace VariableSpeedCoils {
 
                 // now replace the outdoor air conditions set above for one time rating point calc
                 state.dataEnvrn->OutDryBulbTemp = holdOutDryBulbTemp;
-                DataEnvironment::OutHumRat = holdOutHumRat;
+                state.dataEnvrn->OutHumRat = holdOutHumRat;
                 DataEnvironment::OutWetBulbTemp = holdOutWetBulb;
                 state.dataEnvrn->OutBaroPress = holdOutBaroPress;
             }
@@ -3331,18 +3330,18 @@ namespace VariableSpeedCoils {
                                                                                                     state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirHumRat);
                 // store environment data fill back in after rating point calc is over
                 Real64 holdOutDryBulbTemp = state.dataEnvrn->OutDryBulbTemp;
-                Real64 holdOutHumRat = DataEnvironment::OutHumRat;
+                Real64 holdOutHumRat = state.dataEnvrn->OutHumRat;
                 Real64 holdOutWetBulb = DataEnvironment::OutWetBulbTemp;
                 Real64 holdOutBaroPress = state.dataEnvrn->OutBaroPress;
 
                 state.dataEnvrn->OutDryBulbTemp = state.dataVariableSpeedCoils->RatedAmbAirTempHeat;
                 DataEnvironment::OutWetBulbTemp = state.dataVariableSpeedCoils->RatedAmbAirWBHeat;
                 state.dataEnvrn->OutBaroPress = DataEnvironment::StdPressureSeaLevel; // assume rating is for sea level.
-                DataEnvironment::OutHumRat =
+                state.dataEnvrn->OutHumRat =
                     Psychrometrics::PsyWFnTdbTwbPb(state, state.dataVariableSpeedCoils->RatedAmbAirTempHeat, state.dataVariableSpeedCoils->RatedAmbAirWBHeat, DataEnvironment::StdPressureSeaLevel, RoutineName);
                 if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondenserInletNodeNum > 0) {
                     Node(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondenserInletNodeNum).Temp = state.dataVariableSpeedCoils->RatedAmbAirTempHeat;
-                    Node(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondenserInletNodeNum).HumRat = DataEnvironment::OutHumRat;
+                    Node(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondenserInletNodeNum).HumRat = state.dataEnvrn->OutHumRat;
                     Node(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondenserInletNodeNum).Press = DataEnvironment::StdPressureSeaLevel;
                     Node(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondenserInletNodeNum).OutAirWetBulb = state.dataVariableSpeedCoils->RatedAmbAirWBHeat;
                 }
@@ -3392,7 +3391,7 @@ namespace VariableSpeedCoils {
 
                 // now replace the outdoor air conditions set above for one time rating point calc
                 state.dataEnvrn->OutDryBulbTemp = holdOutDryBulbTemp;
-                DataEnvironment::OutHumRat = holdOutHumRat;
+                state.dataEnvrn->OutHumRat = holdOutHumRat;
                 DataEnvironment::OutWetBulbTemp = holdOutWetBulb;
                 state.dataEnvrn->OutBaroPress = holdOutBaroPress;
             }
@@ -5077,7 +5076,7 @@ namespace VariableSpeedCoils {
                 OutdoorWetBulb = Node(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondenserInletNodeNum).OutAirWetBulb;
             } else {
                 OutdoorDryBulb = state.dataEnvrn->OutDryBulbTemp;
-                OutdoorHumRat = OutHumRat;
+                OutdoorHumRat = state.dataEnvrn->OutHumRat;
                 OutdoorPressure = state.dataEnvrn->OutBaroPress;
                 OutdoorWetBulb = OutWetBulbTemp;
             }
@@ -5106,7 +5105,7 @@ namespace VariableSpeedCoils {
             } else {                            // AIR COOLED CONDENSER
                 CondInletTemp = OutdoorDryBulb; // Outdoor dry-bulb temp
                 CompAmbTemp = OutdoorDryBulb;
-                CondInletHumRat = OutHumRat;
+                CondInletHumRat = state.dataEnvrn->OutHumRat;
             }
 
             state.dataVariableSpeedCoils->SourceSideMassFlowRate = CondAirMassFlow;
@@ -5722,7 +5721,7 @@ namespace VariableSpeedCoils {
             state.dataVariableSpeedCoils->LoadSideInletEnth = Node(EvapInletNode).Enthalpy;
         } else {
             state.dataVariableSpeedCoils->LoadSideInletDBTemp = state.dataEnvrn->OutDryBulbTemp;
-            state.dataVariableSpeedCoils->LoadSideInletHumRat = OutHumRat;
+            state.dataVariableSpeedCoils->LoadSideInletHumRat = state.dataEnvrn->OutHumRat;
             LoadPressure = state.dataEnvrn->OutBaroPress;
             state.dataVariableSpeedCoils->LoadSideInletWBTemp = OutWetBulbTemp;
             state.dataVariableSpeedCoils->LoadSideInletEnth = OutEnthalpy;
@@ -6250,14 +6249,14 @@ namespace VariableSpeedCoils {
                 OutdoorWetBulb = Node(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondenserInletNodeNum).OutAirWetBulb;
             } else {
                 OutdoorDryBulb = state.dataEnvrn->OutDryBulbTemp;
-                OutdoorHumRat = OutHumRat;
+                OutdoorHumRat = state.dataEnvrn->OutHumRat;
                 OutdoorPressure = state.dataEnvrn->OutBaroPress;
                 OutdoorWetBulb = OutWetBulbTemp;
             }
             state.dataVariableSpeedCoils->SourceSideMassFlowRate = 1.0; // not used and avoid divided by zero
             state.dataVariableSpeedCoils->SourceSideInletTemp = OutdoorDryBulb;
             state.dataVariableSpeedCoils->SourceSideInletEnth = PsyHFnTdbW(OutdoorDryBulb, OutdoorHumRat);
-            CpSource = PsyCpAirFnW(OutHumRat);
+            CpSource = PsyCpAirFnW(state.dataEnvrn->OutHumRat);
 
             // Initialize crankcase heater, operates below OAT defined in input deck for HP DX heating coil
             if (OutdoorDryBulb < state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MaxOATCrankcaseHeater) {

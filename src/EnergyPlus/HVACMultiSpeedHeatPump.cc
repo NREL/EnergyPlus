@@ -128,7 +128,6 @@ namespace HVACMultiSpeedHeatPump {
     using namespace DataLoopNode;
     using DataEnvironment::CurMnDy;
     using DataEnvironment::EnvironmentName;
-    using DataEnvironment::OutHumRat;
     using DataEnvironment::StdRhoAir;
     using DataHVACGlobals::BlowThru;
     using DataHVACGlobals::Coil_HeatingElectric;

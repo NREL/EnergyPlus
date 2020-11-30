@@ -4887,7 +4887,7 @@ namespace OutputReportTabular {
         static int iTank(0);
         static int iRef(0);
 
-        static Real64 H2OHtOfVap_HVAC = Psychrometrics::PsyHgAirFnWTdb(DataEnvironment::OutHumRat, state.dataEnvrn->OutDryBulbTemp);
+        static Real64 H2OHtOfVap_HVAC = Psychrometrics::PsyHgAirFnWTdb(state.dataEnvrn->OutHumRat, state.dataEnvrn->OutDryBulbTemp);
         static Real64 RhoWater = Psychrometrics::RhoH2O(state.dataEnvrn->OutDryBulbTemp);
         Real64 TimeStepSysSec = TimeStepSys * DataGlobalConstants::SecInHour();
         SysTotalHVACReliefHeatLoss = 0;

@@ -520,7 +520,6 @@ namespace CoolTower {
 
         // Using/Aliasing
         using DataEnvironment::OutEnthalpy;
-        using DataEnvironment::OutHumRat;
         using DataEnvironment::OutWetBulbTemp;
         using DataEnvironment::StdRhoAir;
         using DataEnvironment::WindSpeed;
@@ -648,7 +647,7 @@ namespace CoolTower {
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).AirVolFlowRateStd = CTMFL(ZoneNum) / StdRhoAir;
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).InletDBTemp = Zone(ZoneNum).OutDryBulbTemp;
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).InletWBTemp = Zone(ZoneNum).OutWetBulbTemp;
-                state.dataCoolTower->CoolTowerSys(CoolTowerNum).InletHumRat = OutHumRat;
+                state.dataCoolTower->CoolTowerSys(CoolTowerNum).InletHumRat = state.dataEnvrn->OutHumRat;
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTWaterConsumpRate = (std::abs(InletHumRat - OutletHumRat) * CTMFL(ZoneNum)) / RhoWater;
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTWaterStarvMakeupRate = 0.0; // initialize -- calc in update
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).PumpElecPower = state.dataCoolTower->CoolTowerSys(CoolTowerNum).RatedPumpPower * PumpPartLoadRat;
