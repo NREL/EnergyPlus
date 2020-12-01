@@ -942,13 +942,6 @@ namespace ScheduleManager {
             }
 
             SchedTypePtr = DaySchedule(Count).ScheduleTypePtr;
-            if (ScheduleType(SchedTypePtr).Limited) {
-                if (any_lt(DaySchedule(Count).TSValue, ScheduleType(SchedTypePtr).Minimum) ||
-                    any_gt(DaySchedule(Count).TSValue, ScheduleType(SchedTypePtr).Maximum)) {
-                    ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", Values are outside of range for " +
-                                     cAlphaFields(2) + '=' + Alphas(2));
-                }
-            }
             if (!ScheduleType(SchedTypePtr).IsReal) {
                 // Make sure each is integer
                 NumErrorFlag = false; // only show error message once
