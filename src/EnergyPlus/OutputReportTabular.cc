@@ -3534,8 +3534,6 @@ namespace OutputReportTabular {
         // na
 
         // Using/Aliasing
-        using DataEnvironment::EnvironmentName;
-        using DataEnvironment::WeatherFileLocationTitle;
         using DataHeatBalance::BuildingName;
         using DataStringGlobals::VerString;
 
@@ -3569,10 +3567,10 @@ namespace OutputReportTabular {
                     tbl_stream << "Tabular Output Report in Format: " << curDel << "Comma\n";
                     tbl_stream << '\n';
                     tbl_stream << "Building:" << curDel << BuildingName << '\n';
-                    if (EnvironmentName == WeatherFileLocationTitle) {
-                        tbl_stream << "Environment:" << curDel << EnvironmentName << '\n';
+                    if (state.dataEnvrn->EnvironmentName == state.dataEnvrn->WeatherFileLocationTitle) {
+                        tbl_stream << "Environment:" << curDel << state.dataEnvrn->EnvironmentName << '\n';
                     } else {
-                        tbl_stream << "Environment:" << curDel << EnvironmentName << " ** " << WeatherFileLocationTitle << '\n';
+                        tbl_stream << "Environment:" << curDel << state.dataEnvrn->EnvironmentName << " ** " << state.dataEnvrn->WeatherFileLocationTitle << '\n';
                     }
                     tbl_stream << '\n';
                 } else if (TableStyle(iStyle) == tableStyleTab) {
@@ -3582,10 +3580,10 @@ namespace OutputReportTabular {
                     tbl_stream << "Tabular Output Report in Format: " << curDel << "Tab\n";
                     tbl_stream << '\n';
                     tbl_stream << "Building:" << curDel << BuildingName << '\n';
-                    if (EnvironmentName == WeatherFileLocationTitle) {
-                        tbl_stream << "Environment:" << curDel << EnvironmentName << '\n';
+                    if (state.dataEnvrn->EnvironmentName == state.dataEnvrn->WeatherFileLocationTitle) {
+                        tbl_stream << "Environment:" << curDel << state.dataEnvrn->EnvironmentName << '\n';
                     } else {
-                        tbl_stream << "Environment:" << curDel << EnvironmentName << " ** " << WeatherFileLocationTitle << '\n';
+                        tbl_stream << "Environment:" << curDel << state.dataEnvrn->EnvironmentName << " ** " << state.dataEnvrn->WeatherFileLocationTitle << '\n';
                     }
                     tbl_stream << '\n';
                 } else if (TableStyle(iStyle) == tableStyleHTML) {
@@ -3594,10 +3592,10 @@ namespace OutputReportTabular {
                     tbl_stream << "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\"http://www.w3.org/TR/html4/loose.dtd\">\n";
                     tbl_stream << "<html>\n";
                     tbl_stream << "<head>\n";
-                    if (EnvironmentName == WeatherFileLocationTitle) {
-                        tbl_stream << "<title> " << BuildingName << ' ' << EnvironmentName << '\n';
+                    if (state.dataEnvrn->EnvironmentName == state.dataEnvrn->WeatherFileLocationTitle) {
+                        tbl_stream << "<title> " << BuildingName << ' ' << state.dataEnvrn->EnvironmentName << '\n';
                     } else {
-                        tbl_stream << "<title> " << BuildingName << ' ' << EnvironmentName << " ** " << WeatherFileLocationTitle << '\n';
+                        tbl_stream << "<title> " << BuildingName << ' ' << state.dataEnvrn->EnvironmentName << " ** " << state.dataEnvrn->WeatherFileLocationTitle << '\n';
                     }
                     tbl_stream << "  " << std::setw(4) << td(1) << '-' << std::setfill('0') << std::setw(2) << td(2) << '-' << std::setw(2) << td(3)
                                << '\n';
@@ -3612,10 +3610,10 @@ namespace OutputReportTabular {
                     tbl_stream << "<p>Program Version:<b>" << VerString << "</b></p>\n";
                     tbl_stream << "<p>Tabular Output Report in Format: <b>HTML</b></p>\n";
                     tbl_stream << "<p>Building: <b>" << BuildingName << "</b></p>\n";
-                    if (EnvironmentName == WeatherFileLocationTitle) {
-                        tbl_stream << "<p>Environment: <b>" << EnvironmentName << "</b></p>\n";
+                    if (state.dataEnvrn->EnvironmentName == state.dataEnvrn->WeatherFileLocationTitle) {
+                        tbl_stream << "<p>Environment: <b>" << state.dataEnvrn->EnvironmentName << "</b></p>\n";
                     } else {
-                        tbl_stream << "<p>Environment: <b>" << EnvironmentName << " ** " << WeatherFileLocationTitle << "</b></p>\n";
+                        tbl_stream << "<p>Environment: <b>" << state.dataEnvrn->EnvironmentName << " ** " << state.dataEnvrn->WeatherFileLocationTitle << "</b></p>\n";
                     }
                     tbl_stream << "<p>Simulation Timestamp: <b>" << std::setw(4) << td(1) << '-' << std::setfill('0') << std::setw(2) << td(2) << '-'
                                << std::setw(2) << td(3) << '\n';
@@ -3627,8 +3625,8 @@ namespace OutputReportTabular {
                     tbl_stream << "<?xml version=\"1.0\"?>\n";
                     tbl_stream << "<EnergyPlusTabularReports>\n";
                     tbl_stream << "  <BuildingName>" << BuildingName << "</BuildingName>\n";
-                    tbl_stream << "  <EnvironmentName>" << EnvironmentName << "</EnvironmentName>\n";
-                    tbl_stream << "  <WeatherFileLocationTitle>" << WeatherFileLocationTitle << "</WeatherFileLocationTitle>\n";
+                    tbl_stream << "  <EnvironmentName>" << state.dataEnvrn->EnvironmentName << "</EnvironmentName>\n";
+                    tbl_stream << "  <WeatherFileLocationTitle>" << state.dataEnvrn->WeatherFileLocationTitle << "</WeatherFileLocationTitle>\n";
                     tbl_stream << "  <ProgramVersion>" << VerString << "</ProgramVersion>\n";
                     tbl_stream << "  <SimulationTimestamp>\n";
                     tbl_stream << "    <Date>\n";
@@ -3648,10 +3646,10 @@ namespace OutputReportTabular {
                     tbl_stream << "Tabular Output Report in Format: " << curDel << "Fixed\n";
                     tbl_stream << '\n';
                     tbl_stream << "Building:        " << BuildingName << '\n';
-                    if (EnvironmentName == WeatherFileLocationTitle) {
-                        tbl_stream << "Environment:     " << EnvironmentName << '\n';
+                    if (state.dataEnvrn->EnvironmentName == state.dataEnvrn->WeatherFileLocationTitle) {
+                        tbl_stream << "Environment:     " << state.dataEnvrn->EnvironmentName << '\n';
                     } else {
-                        tbl_stream << "Environment:     " << EnvironmentName << " ** " << WeatherFileLocationTitle << '\n';
+                        tbl_stream << "Environment:     " << state.dataEnvrn->EnvironmentName << " ** " << state.dataEnvrn->WeatherFileLocationTitle << '\n';
                     }
                     tbl_stream << '\n';
                 }
@@ -4849,7 +4847,6 @@ namespace OutputReportTabular {
         // the output variables and data structures shown.
 
         // Using/Aliasing
-        using DataEnvironment::WeatherFileLocationTitle;
         using DataHeatBalance::BuildingPreDefRep;
         using DataHeatBalance::NumRefrigCondensers;
         using DataHeatBalance::NumRefrigeratedRacks;
@@ -6389,9 +6386,7 @@ namespace OutputReportTabular {
 
         // Using/Aliasing
         using DataEnvironment::CurrentYearIsLeapYear;
-        using DataEnvironment::EnvironmentName;
         using DataEnvironment::RunPeriodStartDayOfWeek;
-        using DataEnvironment::WeatherFileLocationTitle;
         using DataHeatBalance::BuildingPreDefRep;
         using DataHeatBalance::Lights;
         using DataHeatBalance::TotLights;
@@ -6755,10 +6750,10 @@ namespace OutputReportTabular {
         // LEED Report
         // 1.1A-General Information
         // CALL PreDefTableEntry(pdchLeedGenData,'Principal Heating Source','-')
-        if (EnvironmentName == WeatherFileLocationTitle) {
-            PreDefTableEntry(pdchLeedGenData, "Weather File", EnvironmentName);
+        if (state.dataEnvrn->EnvironmentName == state.dataEnvrn->WeatherFileLocationTitle) {
+            PreDefTableEntry(pdchLeedGenData, "Weather File", state.dataEnvrn->EnvironmentName);
         } else {
-            PreDefTableEntry(pdchLeedGenData, "Weather File", EnvironmentName + " ** " + WeatherFileLocationTitle);
+            PreDefTableEntry(pdchLeedGenData, "Weather File", state.dataEnvrn->EnvironmentName + " ** " + state.dataEnvrn->WeatherFileLocationTitle);
         }
 
         // CALL PreDefTableEntry(pdchLeedGenData,'Climate Zone','-')
@@ -10246,9 +10241,7 @@ namespace OutputReportTabular {
         // na
 
         // Using/Aliasing
-        using DataEnvironment::EnvironmentName;
         using DataEnvironment::RunPeriodStartDayOfWeek;
-        using DataEnvironment::WeatherFileLocationTitle;
         using DataHeatBalance::BuildingAzimuth;
         using DataHeatBalance::BuildingRotationAppendixG;
         using DataHeatBalance::Lights;
@@ -10466,8 +10459,8 @@ namespace OutputReportTabular {
             tableBody = "";
 
             tableBody(1, 1) = VerString;                               // program
-            tableBody(1, 2) = EnvironmentName;                         // runperiod name
-            tableBody(1, 3) = WeatherFileLocationTitle;                // weather
+            tableBody(1, 2) = state.dataEnvrn->EnvironmentName;                         // runperiod name
+            tableBody(1, 3) = state.dataEnvrn->WeatherFileLocationTitle;                // weather
             tableBody(1, 4) = RealToStr(state.dataEnvrn->Latitude, 2);                  // latitude
             tableBody(1, 5) = RealToStr(state.dataEnvrn->Longitude, 2);                 // longitude
             tableBody(1, 6) = RealToStr(state.dataEnvrn->Elevation * m_unitConv, 2);    // Elevation

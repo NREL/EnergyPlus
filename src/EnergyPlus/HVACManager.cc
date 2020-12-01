@@ -512,7 +512,7 @@ namespace HVACManager {
                         print(state.files.eso,
                               EnvironmentStampFormatStr,
                               "1",
-                              "Warmup {" + cWarmupDay + "} " + EnvironmentName,
+                              "Warmup {" + cWarmupDay + "} " + state.dataEnvrn->EnvironmentName,
                               state.dataEnvrn->Latitude,
                               state.dataEnvrn->Longitude,
                               state.dataEnvrn->TimeZoneNumber,
@@ -520,7 +520,7 @@ namespace HVACManager {
                         print(state.files.mtr,
                               EnvironmentStampFormatStr,
                               "1",
-                              "Warmup {" + cWarmupDay + "} " + EnvironmentName,
+                              "Warmup {" + cWarmupDay + "} " + state.dataEnvrn->EnvironmentName,
                               state.dataEnvrn->Latitude,
                               state.dataEnvrn->Longitude,
                               state.dataEnvrn->TimeZoneNumber,
@@ -550,7 +550,7 @@ namespace HVACManager {
                         print(state.files.eso,
                               EnvironmentStampFormatStr,
                               "1",
-                              "Warmup {" + cWarmupDay + "} " + EnvironmentName,
+                              "Warmup {" + cWarmupDay + "} " + state.dataEnvrn->EnvironmentName,
                               state.dataEnvrn->Latitude,
                               state.dataEnvrn->Longitude,
                               state.dataEnvrn->TimeZoneNumber,
@@ -558,7 +558,7 @@ namespace HVACManager {
                         print(state.files.mtr,
                               EnvironmentStampFormatStr,
                               "1",
-                              "Warmup {" + cWarmupDay + "} " + EnvironmentName,
+                              "Warmup {" + cWarmupDay + "} " + state.dataEnvrn->EnvironmentName,
                               state.dataEnvrn->Latitude,
                               state.dataEnvrn->Longitude,
                               state.dataEnvrn->TimeZoneNumber,
@@ -655,8 +655,6 @@ namespace HVACManager {
         // REFERENCES: none
 
         // Using/Aliasing
-        using DataEnvironment::CurMnDy;
-        using DataEnvironment::EnvironmentName;
         using DataPlant::ConvergenceHistoryARR;
         using DataPlant::DemandSide;
         using DataPlant::NumConvergenceHistoryTerms;
@@ -963,12 +961,12 @@ namespace HVACManager {
         if ((HVACManageIteration > state.dataConvergeParams->MaxIter) && (!state.dataGlobal->WarmupFlag)) {
             ++ErrCount;
             if (ErrCount < 15) {
-                ErrEnvironmentName = EnvironmentName;
+                ErrEnvironmentName = state.dataEnvrn->EnvironmentName;
                 ShowWarningError(state,
                                  format("SimHVAC: Maximum iterations ({}) exceeded for all HVAC loops, at {}, {} {}",
                                         state.dataConvergeParams->MaxIter,
-                                        EnvironmentName,
-                                        CurMnDy,
+                                        state.dataEnvrn->EnvironmentName,
+                                        state.dataEnvrn->CurMnDy,
                                         CreateSysTimeIntervalString(state)));
                 if (SimAirLoopsFlag) {
                     ShowContinueError(state, "The solution for one or more of the Air Loop HVAC systems did not appear to converge");
@@ -1688,14 +1686,14 @@ namespace HVACManager {
                     }     // loop over plant loop systems
                 }
             } else {
-                if (EnvironmentName == ErrEnvironmentName) {
+                if (state.dataEnvrn->EnvironmentName == ErrEnvironmentName) {
                     ShowRecurringWarningErrorAtEnd(state,
-                        "SimHVAC: Exceeding Maximum iterations for all HVAC loops, during " + EnvironmentName + " continues", MaxErrCount);
+                        "SimHVAC: Exceeding Maximum iterations for all HVAC loops, during " + state.dataEnvrn->EnvironmentName + " continues", MaxErrCount);
                 } else {
                     MaxErrCount = 0;
-                    ErrEnvironmentName = EnvironmentName;
+                    ErrEnvironmentName = state.dataEnvrn->EnvironmentName;
                     ShowRecurringWarningErrorAtEnd(state,
-                        "SimHVAC: Exceeding Maximum iterations for all HVAC loops, during " + EnvironmentName + " continues", MaxErrCount);
+                        "SimHVAC: Exceeding Maximum iterations for all HVAC loops, during " + state.dataEnvrn->EnvironmentName + " continues", MaxErrCount);
                 }
             }
         }

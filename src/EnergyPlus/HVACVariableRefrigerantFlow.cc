@@ -464,8 +464,6 @@ namespace HVACVariableRefrigerantFlow {
         // If terminal units require more capacity than can be delivered by condenser, a limit is set.
 
         using CurveManager::CurveValue;
-        using DataEnvironment::CurMnDy;
-        using DataEnvironment::EnvironmentName;
         using DXCoils::DXCoilCoolInletAirWBTemp;
         using DXCoils::DXCoilHeatInletAirDBTemp;
         using DXCoils::DXCoilHeatInletAirWBTemp;
@@ -10379,8 +10377,6 @@ namespace HVACVariableRefrigerantFlow {
         //       A new physics based VRF model applicable for Fluid Temperature Control.
 
         using CurveManager::CurveValue;
-        using DataEnvironment::CurMnDy;
-        using DataEnvironment::EnvironmentName;
         using DXCoils::DXCoil;
         using DXCoils::DXCoilCoolInletAirWBTemp;
         using DXCoils::DXCoilHeatInletAirDBTemp;

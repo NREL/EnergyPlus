@@ -126,8 +126,6 @@ namespace HVACMultiSpeedHeatPump {
     // Use statements for data only modules
     // Using/Aliasing
     using namespace DataLoopNode;
-    using DataEnvironment::CurMnDy;
-    using DataEnvironment::EnvironmentName;
     using DataHVACGlobals::BlowThru;
     using DataHVACGlobals::Coil_HeatingElectric;
     using DataHVACGlobals::Coil_HeatingElectric_MultiStage;

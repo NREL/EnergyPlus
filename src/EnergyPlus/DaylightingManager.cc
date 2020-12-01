@@ -448,9 +448,9 @@ namespace EnergyPlus::DaylightingManager {
         //-----------------------------------------!
         if (!DetailedSolarTimestepIntegration && !state.dataGlobal->KickOffSizing && !state.dataGlobal->KickOffSimulation) {
             if (state.dataGlobal->WarmupFlag) {
-                DisplayString(state, "Calculating Detailed Daylighting Factors, Start Date=" + DataEnvironment::CurMnDy);
+                DisplayString(state, "Calculating Detailed Daylighting Factors, Start Date=" + state.dataEnvrn->CurMnDy);
             } else {
-                DisplayString(state, "Updating Detailed Daylighting Factors, Start Date=" + DataEnvironment::CurMnDy);
+                DisplayString(state, "Updating Detailed Daylighting Factors, Start Date=" + state.dataEnvrn->CurMnDy);
             }
         }
 
@@ -602,7 +602,7 @@ namespace EnergyPlus::DaylightingManager {
                                         print(state.files.eio,
                                               " Sky Daylight Factors,{},{},{},{},{},{:.4R}\n",
                                               skyTypeString,
-                                              DataEnvironment::CurMnDy,
+                                              state.dataEnvrn->CurMnDy,
                                               Zone(ZoneNum).Name,
                                               Surface(IWin).Name,
                                               state.dataDaylightingData->DaylRefPt(state.dataDaylightingData->ZoneDaylight(ZoneNum).DaylRefPtNum(refPtNum)).Name,
@@ -675,14 +675,14 @@ namespace EnergyPlus::DaylightingManager {
                     for (ISlatAngle = 1; ISlatAngle <= ISA; ++ISlatAngle) {
                         if (ISlatAngle == 1) {
                             // base window without shades, screens, or blinds
-                            print(state.files.dfs, "{},{},{},Base Window\n", DataEnvironment::CurMnDy, Zone(ZoneNum).Name, Surface(IWin).Name);
+                            print(state.files.dfs, "{},{},{},Base Window\n", state.dataEnvrn->CurMnDy, Zone(ZoneNum).Name, Surface(IWin).Name);
                         } else if (ISlatAngle == 2 && ISA == 2) {
                             // window shade or blind with fixed slat angle
-                            print(state.files.dfs, "{},{},{},Blind or Slat Applied\n", DataEnvironment::CurMnDy, Zone(ZoneNum).Name, Surface(IWin).Name);
+                            print(state.files.dfs, "{},{},{},Blind or Slat Applied\n", state.dataEnvrn->CurMnDy, Zone(ZoneNum).Name, Surface(IWin).Name);
                         } else {
                             // blind with variable slat angle
                             SlatAngle = 180.0 / double(MaxSlatAngs - 1) * double(ISlatAngle - 2);
-                            print(state.files.dfs, "{},{},{},{:.1R}\n", DataEnvironment::CurMnDy, Zone(ZoneNum).Name, Surface(IWin).Name, SlatAngle);
+                            print(state.files.dfs, "{},{},{},{:.1R}\n", state.dataEnvrn->CurMnDy, Zone(ZoneNum).Name, Surface(IWin).Name, SlatAngle);
                         }
 
                         for (IHR = 1; IHR <= 24; ++IHR) {
@@ -9917,7 +9917,7 @@ namespace EnergyPlus::DaylightingManager {
                 //				CommaDelimited = false; //Unused Set but never used
             }
 
-            SavedMnDy(MapNum) = DataEnvironment::CurMnDyHr.substr(0, 5);
+            SavedMnDy(MapNum) = state.dataEnvrn->CurMnDyHr.substr(0, 5);
 
             state.dataDaylightingData->IllumMap(MapNum).Name = format("{} at {:.2R}m", state.dataDaylightingData->IllumMap(MapNum).Name, state.dataDaylightingData->IllumMap(MapNum).Z);
 
@@ -9928,16 +9928,16 @@ namespace EnergyPlus::DaylightingManager {
                                               state.dataDaylightingData->ZoneDaylight(state.dataDaylightingData->IllumMap(MapNum).Zone).DaylRefPtAbsCoord(3, R) );
             }
         }
-        if (SavedMnDy(MapNum) != DataEnvironment::CurMnDyHr.substr(0, 5)) {
+        if (SavedMnDy(MapNum) != state.dataEnvrn->CurMnDyHr.substr(0, 5)) {
             EnvrnPrint(MapNum) = true;
-            SavedMnDy(MapNum) = DataEnvironment::CurMnDyHr.substr(0, 5);
+            SavedMnDy(MapNum) = state.dataEnvrn->CurMnDyHr.substr(0, 5);
         }
         if (EnvrnPrint(MapNum)) {
             WriteDaylightMapTitle(state,
                                   MapNum,
                                   *state.dataDaylightingData->IllumMap(MapNum).mapFile,
                                   state.dataDaylightingData->IllumMap(MapNum).Name,
-                                  DataEnvironment::EnvironmentName,
+                                  state.dataEnvrn->EnvironmentName,
                                   state.dataDaylightingData->IllumMap(MapNum).Zone,
                                   RefPts(state.dataDaylightingData->IllumMap(MapNum).Zone, 1),
                                   RefPts(state.dataDaylightingData->IllumMap(MapNum).Zone, 2),

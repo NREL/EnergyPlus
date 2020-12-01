@@ -5774,9 +5774,9 @@ namespace HeatBalanceManager {
                             SizingWarmupConvergenceWarning = true;
                         }
                         if (RunPeriodEnvironment) {
-                            ShowContinueError(state, "...Environment(RunPeriod)=\"" + EnvironmentName + "\"");
+                            ShowContinueError(state, "...Environment(RunPeriod)=\"" + state.dataEnvrn->EnvironmentName + "\"");
                         } else {
-                            ShowContinueError(state, "...Environment(SizingPeriod)=\"" + EnvironmentName + "\"");
+                            ShowContinueError(state, "...Environment(SizingPeriod)=\"" + state.dataEnvrn->EnvironmentName + "\"");
                         }
 
                         ShowContinueError(state,
@@ -5932,7 +5932,7 @@ namespace HeatBalanceManager {
                 print(state.files.eio,
                       Format_731,
                       Zone(ZoneNum).Name,
-                      EnvHeader + ' ' + EnvironmentName,
+                      EnvHeader + ' ' + state.dataEnvrn->EnvironmentName,
                       AverageZoneTemp,
                       StdDevZoneTemp,
                       PassFail(WarmupConvergenceValues(ZoneNum).PassFlag(1)),
@@ -6025,7 +6025,7 @@ namespace HeatBalanceManager {
                     print(state.files.eso,
                           EnvironmentStampFormatStr,
                           "1",
-                          "Warmup {" + cWarmupDay + "} " + EnvironmentName,
+                          "Warmup {" + cWarmupDay + "} " + state.dataEnvrn->EnvironmentName,
                           state.dataEnvrn->Latitude,
                           state.dataEnvrn->Longitude,
                           state.dataEnvrn->TimeZoneNumber,
@@ -6034,7 +6034,7 @@ namespace HeatBalanceManager {
                     print(state.files.mtr,
                           EnvironmentStampFormatStr,
                           "1",
-                          "Warmup {" + cWarmupDay + "} " + EnvironmentName,
+                          "Warmup {" + cWarmupDay + "} " + state.dataEnvrn->EnvironmentName,
                           state.dataEnvrn->Latitude,
                           state.dataEnvrn->Longitude,
                           state.dataEnvrn->TimeZoneNumber,

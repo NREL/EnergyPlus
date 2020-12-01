@@ -6930,7 +6930,6 @@ namespace EnergyPlus::SetPointManager {
 
         // Using/Aliasing
         using CurveManager::CurveValue;
-        using DataEnvironment::CurMnDy;
         using ScheduleManager::GetCurrentScheduleValue;
         using namespace DataPlant;
         using DataLoopNode::Node;

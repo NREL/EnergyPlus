@@ -211,9 +211,7 @@ std::unique_ptr<HVACSizingSimulationManager> hvacSizingSimulationManager;
 
 void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound)
 {
-    using DataEnvironment::CurMnDy;
     using DataEnvironment::CurrentOverallSimDay;
-    using DataEnvironment::EnvironmentName;
     using DataEnvironment::TotalOverallSimDays;
     using DataErrorTracking::ExitDuringSimulations;
     using DataSystemVariables::ReportDuringHVACSizingSimulation;
@@ -269,7 +267,7 @@ void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound)
                 if (sqlite) {
                     sqlite->sqliteBegin();
                     sqlite->createSQLiteEnvironmentPeriodRecord(
-                        DataEnvironment::CurEnvirNum, DataEnvironment::EnvironmentName, state.dataGlobal->KindOfSim);
+                        DataEnvironment::CurEnvirNum, state.dataEnvrn->EnvironmentName, state.dataGlobal->KindOfSim);
                     sqlite->sqliteCommit();
                 }
             }
@@ -317,11 +315,11 @@ void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound)
                     cWarmupDay = fmt::to_string(NumOfWarmupDays);
                     DisplayString(state, "Warming up {" + cWarmupDay + '}');
                 } else if (state.dataGlobal->DayOfSim == 1) {
-                    DisplayString(state, fmt::format("Starting HVAC Sizing Simulation at {} for {}", CurMnDy, EnvironmentName));
+                    DisplayString(state, fmt::format("Starting HVAC Sizing Simulation at {} for {}", state.dataEnvrn->CurMnDy, state.dataEnvrn->EnvironmentName));
                     static constexpr auto Format_700("Environment:WarmupDays,{:3}\n");
                     print(state.files.eio, Format_700, NumOfWarmupDays);
                 } else if (DisplayPerfSimulationFlag) {
-                    DisplayString(state, "Continuing Simulation at " + CurMnDy + " for " + EnvironmentName);
+                    DisplayString(state, "Continuing Simulation at " + state.dataEnvrn->CurMnDy + " for " + state.dataEnvrn->EnvironmentName);
                     DisplayPerfSimulationFlag = false;
                 }
 

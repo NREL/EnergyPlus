@@ -71,11 +71,6 @@ namespace DataEnvironment {
     // current weather variables)
 
     // MODULE VARIABLE DECLARATIONS:
-    std::string EnvironmentName;              // Current environment name (longer for weather file names)
-    std::string WeatherFileLocationTitle;     // Location Title from Weather File
-    std::string CurMnDyHr;                    // Current Month/Day/Hour timestamp info
-    std::string CurMnDy;                      // Current Month/Day timestamp info
-    std::string CurMnDyYr;                    // Current Month/Day/Year timestamp info
     int CurEnvirNum;                          // current environment number
     int TotDesDays(0);                        // Total number of Design days to Setup
     int TotRunDesPersDays(0);                 // Total number of Run Design Periods [Days] (Weather data) to Setup
@@ -124,11 +119,6 @@ namespace DataEnvironment {
 
     void clear_state()
     {
-        EnvironmentName = std::string();
-        WeatherFileLocationTitle = std::string();
-        CurMnDyHr = std::string();
-        CurMnDy = std::string();
-        CurMnDyYr = std::string();
         CurEnvirNum = int();
         TotDesDays = 0;
         TotRunDesPersDays = 0;

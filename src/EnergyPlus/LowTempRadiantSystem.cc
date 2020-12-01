@@ -3876,8 +3876,6 @@ namespace LowTempRadiantSystem {
         //   of Wisconsin-Madison.
 
         // Using/Aliasing
-        using DataEnvironment::CurMnDy;
-        using DataEnvironment::EnvironmentName;
         using DataHeatBalance::MRT;
         using DataHeatBalance::Zone;
         using DataHeatBalance::ZoneData;

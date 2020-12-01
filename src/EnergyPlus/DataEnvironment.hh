@@ -68,11 +68,6 @@ namespace DataEnvironment {
     Real64 constexpr StdPressureSeaLevel(101325.0);   // Standard barometric pressure at sea level (Pa)
 
     // MODULE VARIABLE DECLARATIONS:
-    extern std::string EnvironmentName;            // Current environment name (longer for weather file names)
-    extern std::string WeatherFileLocationTitle;   // Location Title from Weather File
-    extern std::string CurMnDyHr;                  // Current Month/Day/Hour timestamp info
-    extern std::string CurMnDy;                    // Current Month/Day timestamp info
-    extern std::string CurMnDyYr;                  // Current Month/Day/Year timestamp info
     extern int CurEnvirNum;                        // current environment number
     extern int TotDesDays;                         // Total number of Design days to Setup
     extern int TotRunDesPersDays;                  // Total number of Run Design Periods [Days] (Weather data) to Setup
@@ -213,6 +208,11 @@ struct EnvironmentData : BaseGlobalStruct {
     Real64 rhoAirSTP = 0.0;                             // Standard density of dry air at 101325 Pa, 20.0C temperature
     Real64 TimeZoneNumber = 0.0;                        // Time Zone Number of building location
     Real64 TimeZoneMeridian = 0.0;                      // Standard Meridian of TimeZone
+    std::string EnvironmentName;                        // Current environment name (longer for weather file names)
+    std::string WeatherFileLocationTitle;               // Location Title from Weather File
+    std::string CurMnDyHr;                              // Current Month/Day/Hour timestamp info
+    std::string CurMnDy;                                // Current Month/Day timestamp info
+    std::string CurMnDyYr;                              // Current Month/Day/Year timestamp info
 
     void clear_state() override
     {
@@ -292,6 +292,11 @@ struct EnvironmentData : BaseGlobalStruct {
         this->rhoAirSTP = 0.0;
         this->TimeZoneNumber = 0.0;
         this->TimeZoneMeridian = 0.0;
+        this->EnvironmentName.clear();
+        this->WeatherFileLocationTitle.clear();
+        this->CurMnDyHr.clear();
+        this->CurMnDy.clear();
+        this->CurMnDyYr.clear();
     }
 };
 

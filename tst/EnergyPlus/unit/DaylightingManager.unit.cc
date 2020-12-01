@@ -2124,7 +2124,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
     state->dataEnvrn->DSTIndicator = 0;
     state->dataEnvrn->DayOfWeek = 2;
     state->dataEnvrn->HolidayIndex = 0;
-    DataEnvironment::CurMnDy = "01/21";
+    state->dataEnvrn->CurMnDy = "01/21";
     state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
     ScheduleManager::UpdateScheduleValues(*state);
     InternalHeatGains::GetInternalHeatGainsInput(*state);

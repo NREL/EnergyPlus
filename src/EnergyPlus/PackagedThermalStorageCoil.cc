@@ -113,8 +113,6 @@ namespace PackagedThermalStorageCoil {
     // Using/Aliasing
     using namespace DataLoopNode;
     using namespace Psychrometrics;
-    using DataEnvironment::CurMnDy;
-    using DataEnvironment::EnvironmentName;
     using namespace CurveManager;
 
     // Data

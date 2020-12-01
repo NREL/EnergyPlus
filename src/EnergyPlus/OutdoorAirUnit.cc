@@ -1704,8 +1704,6 @@ CurrentModuleObjects(CO_OAEqList), ComponentListName);
         // USE STATEMENTS:
 
         // Using/Aliasing
-        using DataEnvironment::CurMnDy;
-        using DataEnvironment::EnvironmentName;
         using DataHeatBalFanSys::MAT;
         using DataHeatBalFanSys::ZoneAirHumRat;
         using DataHVACGlobals::ZoneCompTurnFansOff;
@@ -2125,8 +2123,6 @@ CurrentModuleObjects(CO_OAEqList), ComponentListName);
         // USE STATEMENTS:
 
         // Using/Aliasing
-        using DataEnvironment::CurMnDy;
-        using DataEnvironment::EnvironmentName;
         using DataHeatBalance::MRT;
         using DataHeatBalFanSys::MAT;
         using DataHeatBalFanSys::ZoneAirHumRat;

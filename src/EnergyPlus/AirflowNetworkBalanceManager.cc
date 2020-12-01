@@ -120,8 +120,6 @@ namespace AirflowNetworkBalanceManager {
     // Using/Aliasing
     using CurveManager::CurveValue;
     using CurveManager::GetCurveIndex;
-    using DataEnvironment::CurMnDy;
-    using DataEnvironment::EnvironmentName;
     using DataEnvironment::OutDryBulbTempAt;
     using DataHeatBalance::TotCrossMixing;
     using DataHeatBalance::TotInfiltration;

@@ -8258,9 +8258,9 @@ namespace SolarShading {
 
                 if (!state.dataGlobal->WarmupFlag) {
                     if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
-                        DisplayString(state, "Updating Shadowing Calculations, Start Date=" + CurMnDyYr);
+                        DisplayString(state, "Updating Shadowing Calculations, Start Date=" + state.dataEnvrn->CurMnDyYr);
                     } else {
-                        DisplayString(state, "Updating Shadowing Calculations, Start Date=" + CurMnDy);
+                        DisplayString(state, "Updating Shadowing Calculations, Start Date=" + state.dataEnvrn->CurMnDy);
                     }
                     DisplayPerfSimulationFlag = true;
                 }

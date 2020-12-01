@@ -642,7 +642,7 @@ namespace WeatherManager {
             }
 
             if (!ErrorsFound && Available &&  state.dataWeatherManager->Envrn > 0) {
-                DataEnvironment::EnvironmentName = state.dataWeatherManager->Environment( state.dataWeatherManager->Envrn).Title;
+                state.dataEnvrn->EnvironmentName = state.dataWeatherManager->Environment( state.dataWeatherManager->Envrn).Title;
                 DataEnvironment::CurEnvirNum =  state.dataWeatherManager->Envrn;
                 DataEnvironment::RunPeriodStartDayOfWeek = 0;
                 if ((state.dataGlobal->DoDesDaySim && (state.dataGlobal->KindOfSim != DataGlobalConstants::KindOfSim::RunPeriodWeather)) ||
@@ -1514,7 +1514,7 @@ namespace WeatherManager {
             if (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn != DataGlobalConstants::KindOfSim::RunPeriodWeather) {
                 if (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum > 0) {
                     SetUpDesignDay(state, state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum);
-                    DataEnvironment::EnvironmentName = state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).Title;
+                    state.dataEnvrn->EnvironmentName = state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).Title;
                 }
             }
 
@@ -1865,15 +1865,15 @@ namespace WeatherManager {
         char time_stamp[10];
         std::sprintf(
             time_stamp, "%02d/%02d %02hu", state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, (unsigned short)(state.dataGlobal->HourOfDay - 1));
-        DataEnvironment::CurMnDyHr = time_stamp;
+        state.dataEnvrn->CurMnDyHr = time_stamp;
 
         char day_stamp[6];
         std::sprintf(day_stamp, "%02d/%02d", state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth);
-        DataEnvironment::CurMnDy = day_stamp;
+        state.dataEnvrn->CurMnDy = day_stamp;
 
         char day_year_stamp[11];
         std::sprintf(day_year_stamp, "%02d/%02d/%04d", state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->CalendarYear);
-        DataEnvironment::CurMnDyYr = day_year_stamp;
+        state.dataEnvrn->CurMnDyYr = day_year_stamp;
 
         state.dataGlobal->WeightNow = state.dataWeatherManager->Interpolation(state.dataGlobal->TimeStep);
         state.dataGlobal->WeightPreviousHour = 1.0 - state.dataGlobal->WeightNow;
@@ -1895,7 +1895,7 @@ namespace WeatherManager {
         // Determine if Sun is up or down, set Solar Cosine values for time step.
         DetermineSunUpDown(state, state.dataEnvrn->SOLCOS);
         if (state.dataEnvrn->SunIsUp &&  state.dataWeatherManager->SolarAltitudeAngle < 0.0) {
-            ShowFatalError(state, "SetCurrentWeather: At " + DataEnvironment::CurMnDyHr + " Sun is Up but Solar Altitude Angle is < 0.0");
+            ShowFatalError(state, "SetCurrentWeather: At " + state.dataEnvrn->CurMnDyHr + " Sun is Up but Solar Altitude Angle is < 0.0");
         }
 
         state.dataEnvrn->OutDryBulbTemp = state.dataWeatherManager->TodayOutDryBulbTemp(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay);
@@ -2268,7 +2268,7 @@ namespace WeatherManager {
                                                    "<= 70",
                                                    (DryBulb <= 70.0),
                                                    format("{:.2R}", DryBulb),
-                                                   DataEnvironment::WeatherFileLocationTitle);
+                                                   state.dataEnvrn->WeatherFileLocationTitle);
                     if (DewPoint < 99.9)
                         inputProcessor->rangeCheck(state,
                                                    ErrorsFound,
@@ -2280,7 +2280,7 @@ namespace WeatherManager {
                                                    "<= 70",
                                                    (DewPoint <= 70.0),
                                                    format("{:.2R}", DewPoint),
-                                                   DataEnvironment::WeatherFileLocationTitle);
+                                                   state.dataEnvrn->WeatherFileLocationTitle);
                     if (RelHum < 999.0)
                         inputProcessor->rangeCheck(state,
                                                    ErrorsFound,
@@ -2292,7 +2292,7 @@ namespace WeatherManager {
                                                    "<= 110",
                                                    (RelHum <= 110.0),
                                                    format("{:.0R}", RelHum),
-                                                   DataEnvironment::WeatherFileLocationTitle);
+                                                   state.dataEnvrn->WeatherFileLocationTitle);
                     if (AtmPress < 999999.0)
                         inputProcessor->rangeCheck(state,
                                                    ErrorsFound,
@@ -2304,7 +2304,7 @@ namespace WeatherManager {
                                                    "<=120000",
                                                    (AtmPress <= 120000.0),
                                                    format("{:.0R}", AtmPress),
-                                                   DataEnvironment::WeatherFileLocationTitle);
+                                                   state.dataEnvrn->WeatherFileLocationTitle);
                     if (DirectRad < 9999.0)
                         inputProcessor->rangeCheck(state,
                                                    ErrorsFound,
@@ -2316,7 +2316,7 @@ namespace WeatherManager {
                                                    _,
                                                    _,
                                                    _,
-                                                   DataEnvironment::WeatherFileLocationTitle);
+                                                   state.dataEnvrn->WeatherFileLocationTitle);
                     if (DiffuseRad < 9999.0)
                         inputProcessor->rangeCheck(state,
                                                    ErrorsFound,
@@ -2328,7 +2328,7 @@ namespace WeatherManager {
                                                    _,
                                                    _,
                                                    _,
-                                                   DataEnvironment::WeatherFileLocationTitle);
+                                                   state.dataEnvrn->WeatherFileLocationTitle);
                     if (WindDir < 999.0)
                         inputProcessor->rangeCheck(state,
                                                    ErrorsFound,
@@ -2340,7 +2340,7 @@ namespace WeatherManager {
                                                    "<=360",
                                                    (WindDir <= 360.0),
                                                    format("{:.0R}", WindDir),
-                                                   DataEnvironment::WeatherFileLocationTitle);
+                                                   state.dataEnvrn->WeatherFileLocationTitle);
                     if (WindSpeed < 999.0)
                         inputProcessor->rangeCheck(state,
                                                    ErrorsFound,
@@ -2352,7 +2352,7 @@ namespace WeatherManager {
                                                    "<=40",
                                                    (WindSpeed <= 40.0),
                                                    format("{:.2R}", WindSpeed),
-                                                   DataEnvironment::WeatherFileLocationTitle);
+                                                   state.dataEnvrn->WeatherFileLocationTitle);
                     if (ErrorsFound) {
                         ShowSevereError(state, "Out of Range errors found with initial day of WeatherFile");
                     }
@@ -3418,11 +3418,11 @@ namespace WeatherManager {
         state.dataWeatherManager->DesignDay(EnvrnNum).DayOfMonth = state.dataWeatherManager->DesDayInput(EnvrnNum).DayOfMonth;
         state.dataWeatherManager->DesignDay(EnvrnNum).DayOfYear = General::OrdinalDay(state.dataWeatherManager->DesignDay(EnvrnNum).Month, state.dataWeatherManager->DesignDay(EnvrnNum).DayOfMonth, 0);
         static constexpr auto MnDyFmt("{:02}/{:02}");
-        DataEnvironment::CurMnDy = format(MnDyFmt, state.dataWeatherManager->DesDayInput(EnvrnNum).Month, state.dataWeatherManager->DesDayInput(EnvrnNum).DayOfMonth);
+        state.dataEnvrn->CurMnDy = format(MnDyFmt, state.dataWeatherManager->DesDayInput(EnvrnNum).Month, state.dataWeatherManager->DesDayInput(EnvrnNum).DayOfMonth);
         // EnvironmentName = DesDayInput( EnvrnNum ).Title;
         DataEnvironment::RunPeriodEnvironment = false;
         // Following builds Environment start/end for ASHRAE 55 warnings
-        DataEnvironment::EnvironmentStartEnd = DataEnvironment::CurMnDy + " - " + DataEnvironment::CurMnDy;
+        DataEnvironment::EnvironmentStartEnd = state.dataEnvrn->CurMnDy + " - " + state.dataEnvrn->CurMnDy;
 
         // Check that barometric pressure is within range
         if (state.dataWeatherManager->DesDayInput(EnvrnNum).PressureEntered) {
@@ -3432,7 +3432,7 @@ namespace WeatherManager {
                                         "Barometric Pressure={:.0R}.",
                                         state.dataWeatherManager->DesDayInput(EnvrnNum).PressBarom,
                                         state.dataEnvrn->StdBaroPress));
-                ShowContinueError(state, "...occurs in DesignDay=" + DataEnvironment::EnvironmentName +
+                ShowContinueError(state, "...occurs in DesignDay=" + state.dataEnvrn->EnvironmentName +
                                   ", Standard Pressure (based on elevation) will be used.");
                 state.dataWeatherManager->DesDayInput(EnvrnNum).PressBarom = state.dataEnvrn->StdBaroPress;
             }
@@ -4367,7 +4367,7 @@ namespace WeatherManager {
                     std::abs(state.dataEnvrn->Elevation - state.dataWeatherManager->WeatherFileElevation) / max(state.dataEnvrn->Elevation, 1.0) > 0.10) {
                     ShowWarningError(state, "Weather file location will be used rather than entered (IDF) Location object.");
                     ShowContinueError(state, "..Location object=" + state.dataWeatherManager->LocationTitle);
-                    ShowContinueError(state, "..Weather File Location=" + DataEnvironment::WeatherFileLocationTitle);
+                    ShowContinueError(state, "..Weather File Location=" + state.dataEnvrn->WeatherFileLocationTitle);
                     ShowContinueError(
                         state,
                         format("..due to location differences, Latitude difference=[{:.2R}] degrees, Longitude difference=[{:.2R}] degrees.",
@@ -4382,7 +4382,7 @@ namespace WeatherManager {
                 }
             }
 
-            state.dataWeatherManager->LocationTitle = DataEnvironment::WeatherFileLocationTitle;
+            state.dataWeatherManager->LocationTitle = state.dataEnvrn->WeatherFileLocationTitle;
             state.dataEnvrn->Latitude = state.dataWeatherManager->WeatherFileLatitude;
             state.dataEnvrn->Longitude = state.dataWeatherManager->WeatherFileLongitude;
             state.dataEnvrn->TimeZoneNumber = state.dataWeatherManager->WeatherFileTimeZone;
@@ -7478,7 +7478,7 @@ namespace WeatherManager {
                     }
                     Line.erase(0, Pos + 1);
                 }
-                DataEnvironment::WeatherFileLocationTitle = stripped(state.dataWeatherManager->EPWHeaderTitle);
+                state.dataEnvrn->WeatherFileLocationTitle = stripped(state.dataWeatherManager->EPWHeaderTitle);
 
             } else if (HeaderStringUppercase == "TYPICAL/EXTREME PERIODS") {
                 strip(Line);
@@ -8369,7 +8369,7 @@ namespace WeatherManager {
             env.UseDST = runPer.useDST;
             env.UseHolidays = runPer.useHolidays;
             if (runPer.title.empty()) {
-                env.Title = DataEnvironment::WeatherFileLocationTitle;
+                env.Title = state.dataEnvrn->WeatherFileLocationTitle;
             } else {
                 env.Title = runPer.title;
             }

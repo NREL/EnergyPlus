@@ -128,8 +128,6 @@ namespace DXCoils {
     using namespace DataLoopNode;
     using namespace DataHVACGlobals;
     using namespace Psychrometrics;
-    using DataEnvironment::CurMnDy;
-    using DataEnvironment::EnvironmentName;
     using DataHeatBalance::HeatReclaimDXCoil;
 
     // Use statements for access to subroutines in other modules
@@ -8847,7 +8845,7 @@ namespace DXCoils {
                                    DXCoil(DXCoilNum).Name,
                                    OutdoorDryBulb);
                         DXCoil(DXCoilNum).LowAmbBuffer2 =
-                            " ... Occurrence info = " + EnvironmentName + ", " + CurMnDy + ' ' + CreateSysTimeIntervalString(state);
+                            " ... Occurrence info = " + state.dataEnvrn->EnvironmentName + ", " + state.dataEnvrn->CurMnDy + ' ' + CreateSysTimeIntervalString(state);
                     }
                 }
             } else if (DXCoil(DXCoilNum).CondenserType(Mode) == EvapCooled) {
@@ -8861,7 +8859,7 @@ namespace DXCoils {
                                    DXCoil(DXCoilNum).Name,
                                    OutdoorWetBulb);
                         DXCoil(DXCoilNum).LowAmbBuffer2 =
-                            " ... Occurrence info = " + EnvironmentName + ", " + CurMnDy + ' ' + CreateSysTimeIntervalString(state);
+                            " ... Occurrence info = " + state.dataEnvrn->EnvironmentName + ", " + state.dataEnvrn->CurMnDy + ' ' + CreateSysTimeIntervalString(state);
                     }
                 }
             }
@@ -9116,7 +9114,7 @@ namespace DXCoils {
                                                                  DXCoil(DXCoilNum).Name,
                                                                  FullLoadOutAirTemp);
                     DXCoil(DXCoilNum).LowOutTempBuffer2 =
-                        " ...Occurrence info = " + EnvironmentName + ", " + CurMnDy + ' ' + CreateSysTimeIntervalString(state);
+                        " ...Occurrence info = " + state.dataEnvrn->EnvironmentName + ", " + state.dataEnvrn->CurMnDy + ' ' + CreateSysTimeIntervalString(state);
                 }
             }
 
@@ -9809,7 +9807,7 @@ namespace DXCoils {
                                DXCoil(DXCoilNum).MinOATCompressor,
                                OutdoorDryBulb);
                     DXCoil(DXCoilNum).LowAmbBuffer2 =
-                        " ... Occurrence info = " + EnvironmentName + ", " + CurMnDy + ' ' + CreateSysTimeIntervalString(state);
+                        " ... Occurrence info = " + state.dataEnvrn->EnvironmentName + ", " + state.dataEnvrn->CurMnDy + ' ' + CreateSysTimeIntervalString(state);
                 }
             }
 
@@ -9825,7 +9823,7 @@ namespace DXCoils {
                                DXCoil(DXCoilNum).MaxOATCompressor,
                                OutdoorDryBulb);
                     DXCoil(DXCoilNum).HighAmbBuffer2 =
-                        " ... Occurrence info = " + EnvironmentName + ", " + CurMnDy + ' ' + CreateSysTimeIntervalString(state);
+                        " ... Occurrence info = " + state.dataEnvrn->EnvironmentName + ", " + state.dataEnvrn->CurMnDy + ' ' + CreateSysTimeIntervalString(state);
                 }
             }
 
@@ -10010,7 +10008,7 @@ namespace DXCoils {
                                                                  DXCoil(DXCoilNum).Name,
                                                                  FullLoadOutAirTemp);
                     DXCoil(DXCoilNum).LowOutTempBuffer2 =
-                        " ...Occurrence info = " + EnvironmentName + ", " + CurMnDy + ' ' + CreateSysTimeIntervalString(state);
+                        " ...Occurrence info = " + state.dataEnvrn->EnvironmentName + ", " + state.dataEnvrn->CurMnDy + ' ' + CreateSysTimeIntervalString(state);
                 }
             }
 
@@ -16224,7 +16222,7 @@ namespace DXCoils {
                                                                  DXCoil(DXCoilNum).Name,
                                                                  OutletAirTemp);
                     DXCoil(DXCoilNum).LowOutTempBuffer2 =
-                        " ...Occurrence info = " + EnvironmentName + ", " + CurMnDy + " " + CreateSysTimeIntervalString(state);
+                        " ...Occurrence info = " + state.dataEnvrn->EnvironmentName + ", " + state.dataEnvrn->CurMnDy + " " + CreateSysTimeIntervalString(state);
                 }
             }
 

@@ -92,8 +92,6 @@ namespace VariableSpeedCoils {
     // Using/Aliasing
     using namespace DataLoopNode;
     using namespace Psychrometrics;
-    using DataEnvironment::CurMnDy;
-    using DataEnvironment::EnvironmentName;
     using namespace DataSizing;
     using namespace DataHVACGlobals;
     using DataPlant::TypeOf_CoilVSWAHPCoolingEquationFit;

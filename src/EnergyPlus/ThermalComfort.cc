@@ -1973,7 +1973,6 @@ namespace ThermalComfort {
         //   based on operative temperature and humidity ratio
 
         // Using/Aliasing
-        using DataEnvironment::EnvironmentName;
         using DataEnvironment::EnvironmentStartEnd;
         using DataEnvironment::RunPeriodEnvironment;
 
@@ -2101,9 +2100,9 @@ namespace ThermalComfort {
                 ShowWarningError(state, format("More than 4% of time ({:.1R} hours) uncomfortable in one or more zones ", allowedHours));
                 ShowContinueError(state, "Based on ASHRAE 55-2004 graph (Section 5.2.1.1)");
                 if (RunPeriodEnvironment) {
-                    ShowContinueError(state, "During Environment [" + EnvironmentStartEnd + "]: " + EnvironmentName);
+                    ShowContinueError(state, "During Environment [" + EnvironmentStartEnd + "]: " + state.dataEnvrn->EnvironmentName);
                 } else {
-                    ShowContinueError(state, "During SizingPeriod Environment [" + EnvironmentStartEnd + "]: " + EnvironmentName);
+                    ShowContinueError(state, "During SizingPeriod Environment [" + EnvironmentStartEnd + "]: " + state.dataEnvrn->EnvironmentName);
                 }
                 for (iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
                     if (state.dataThermalComforts->ThermalComfortInASH55(iZone).Enable55Warning) {

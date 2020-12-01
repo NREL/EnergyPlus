@@ -2231,9 +2231,6 @@ namespace Fans {
         using CurveManager::CurveValue;
         using CurveManager::GetCurveIndex;
         using namespace OutputReportPredefined;
-        using DataEnvironment::CurMnDy;
-        using DataEnvironment::EnvironmentName;
-
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
 

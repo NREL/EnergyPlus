@@ -125,7 +125,6 @@ namespace SizingManager {
         // purchased hot and cold water, yielding central heating and cooling capacities.
 
         // Using/Aliasing
-        using DataEnvironment::EnvironmentName;
         using SimAirServingZones::ManageAirLoops;
         using SimAirServingZones::UpdateSysSizing;
         using ZoneEquipmentManager::ManageZoneEquipment;
@@ -315,7 +314,7 @@ namespace SizingManager {
                                 } else {
                                     DisplayString(state, "Performing Zone Sizing Simulation for Load Component Report");
                                 }
-                                DisplayString(state, fmt::format("...for Sizing Period: #{} {}", NumSizingPeriodsPerformed, EnvironmentName));
+                                DisplayString(state, fmt::format("...for Sizing Period: #{} {}", NumSizingPeriodsPerformed, state.dataEnvrn->EnvironmentName));
                             }
                             UpdateZoneSizing(state, DataGlobalConstants::CallIndicator::BeginDay);
                             UpdateFacilitySizing(state, DataGlobalConstants::CallIndicator::BeginDay);
@@ -498,7 +497,7 @@ namespace SizingManager {
                     } else { // (.NOT.WarmupFlag)
                         if (state.dataGlobal->DayOfSim == 1) {
                             DisplayString(state, "Calculating System sizing");
-                            DisplayString(state, fmt::format("...for Sizing Period: #{} {}", NumSizingPeriodsPerformed, EnvironmentName));
+                            DisplayString(state, fmt::format("...for Sizing Period: #{} {}", NumSizingPeriodsPerformed, state.dataEnvrn->EnvironmentName));
                         }
                         UpdateSysSizing(state, DataGlobalConstants::CallIndicator::BeginDay);
                     }

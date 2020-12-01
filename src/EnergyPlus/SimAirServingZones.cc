@@ -141,8 +141,6 @@ namespace SimAirServingZones {
     using namespace DataHVACGlobals;
     using namespace DataSizing;
     using DataEnvironment::CurEnvirNum;
-    using DataEnvironment::CurMnDy;
-    using DataEnvironment::EnvironmentName;
     using DataEnvironment::TotDesDays;
     using DataEnvironment::TotRunDesPersDays;
     using namespace DataZoneEquipment;
@@ -2993,19 +2991,19 @@ namespace SimAirServingZones {
                         if (!state.dataGlobal->WarmupFlag) {
                             ++ErrCount;
                             if (ErrCount < 15) {
-                                ErrEnvironmentName = EnvironmentName;
+                                ErrEnvironmentName = state.dataEnvrn->EnvironmentName;
                                 const auto CharErrOut = fmt::to_string(MaxIter);
                                 ShowWarningError(state, "SolveAirLoopControllers: Maximum iterations (" + CharErrOut + ") exceeded for " +
                                                  state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Name + ", " +
-                                                 state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).ControllerName(AirLoopControlNum) + ", at " + EnvironmentName + ", " +
-                                                 CurMnDy + ' ' + CreateSysTimeIntervalString(state));
+                                                 state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).ControllerName(AirLoopControlNum) + ", at " + state.dataEnvrn->EnvironmentName + ", " +
+                                                 state.dataEnvrn->CurMnDy + ' ' + CreateSysTimeIntervalString(state));
                             } else {
-                                if (EnvironmentName != ErrEnvironmentName) {
+                                if (state.dataEnvrn->EnvironmentName != ErrEnvironmentName) {
                                     MaxErrCount = 0;
-                                    ErrEnvironmentName = EnvironmentName;
+                                    ErrEnvironmentName = state.dataEnvrn->EnvironmentName;
                                 }
                                 ShowRecurringWarningErrorAtEnd(state, "SolveAirLoopControllers: Exceeding Maximum iterations for " +
-                                                                   state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Name + " during " + EnvironmentName + " continues",
+                                                                   state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Name + " during " + state.dataEnvrn->EnvironmentName + " continues",
                                                                MaxErrCount);
                             }
                         }
@@ -3222,18 +3220,18 @@ namespace SimAirServingZones {
                     if (!state.dataGlobal->WarmupFlag) {
                         ++ErrCount;
                         if (ErrCount < 15) {
-                            ErrEnvironmentName = EnvironmentName;
+                            ErrEnvironmentName = state.dataEnvrn->EnvironmentName;
                             const auto CharErrOut = fmt::to_string(MaxIter);
                             ShowWarningError(state, "SolveAirLoopControllers: Maximum iterations (" + CharErrOut + ") exceeded for " +
-                                             state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Name + ":" + ControllerName + ", at " + EnvironmentName + ", " + CurMnDy +
+                                             state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Name + ":" + ControllerName + ", at " + state.dataEnvrn->EnvironmentName + ", " + state.dataEnvrn->CurMnDy +
                                              ' ' + CreateSysTimeIntervalString(state));
                         } else {
-                            if (EnvironmentName != ErrEnvironmentName) {
+                            if (state.dataEnvrn->EnvironmentName != ErrEnvironmentName) {
                                 MaxErrCount = 0;
-                                ErrEnvironmentName = EnvironmentName;
+                                ErrEnvironmentName = state.dataEnvrn->EnvironmentName;
                             }
                             ShowRecurringWarningErrorAtEnd(state, "SolveAirLoopControllers: Exceeding Maximum iterations for " +
-                                                               state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Name + " during " + EnvironmentName + " continues",
+                                                               state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Name + " during " + state.dataEnvrn->EnvironmentName + " continues",
                                                            MaxErrCount);
                         }
                     }
@@ -5426,8 +5424,8 @@ namespace SimAirServingZones {
 
                     int NumZonesCooled = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled;
                     int NumZonesHeated = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesHeated;
-                    SysSizing(CurOverallSimDay, AirLoopNum).CoolDesDay = EnvironmentName;
-                    SysSizing(CurOverallSimDay, AirLoopNum).HeatDesDay = EnvironmentName;
+                    SysSizing(CurOverallSimDay, AirLoopNum).CoolDesDay = state.dataEnvrn->EnvironmentName;
+                    SysSizing(CurOverallSimDay, AirLoopNum).HeatDesDay = state.dataEnvrn->EnvironmentName;
                     SensCoolCapTemp(AirLoopNum) = 0.0;
                     TotCoolCapTemp(AirLoopNum) = 0.0;
 

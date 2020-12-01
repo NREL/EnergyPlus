@@ -137,7 +137,6 @@ namespace ZoneEquipmentManager {
     // Using/Aliasing
     using namespace DataSizing;
     using DataEnvironment::CurEnvirNum;
-    using DataEnvironment::EnvironmentName;
     using DataEnvironment::TotDesDays;
     using DataEnvironment::TotRunDesPersDays;
     using namespace DataZoneEquipment;
@@ -1446,8 +1445,8 @@ namespace ZoneEquipmentManager {
 
                     if (!ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
 
-                    CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).CoolDesDay = EnvironmentName;
-                    CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatDesDay = EnvironmentName;
+                    CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).CoolDesDay = state.dataEnvrn->EnvironmentName;
+                    CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatDesDay = state.dataEnvrn->EnvironmentName;
                     CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).DesHeatDens = state.dataEnvrn->StdRhoAir;
                     CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).DesCoolDens = state.dataEnvrn->StdRhoAir;
                     CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatDDNum = CurOverallSimDay;

@@ -13905,7 +13905,7 @@ namespace RefrigeratedCase {
             if (this->ShowUnmetWIEnergyWarning) {
                 ShowWarningError(state, "Refrigeration:WalkIn: " + this->Name);
                 ShowContinueError(state, " This walk-in cooler has insufficient capacity to meet the loads");
-                ShowContinueError(state, "... Occurrence info = " + DataEnvironment::EnvironmentName + ", " + DataEnvironment::CurMnDy + ' ' +
+                ShowContinueError(state, "... Occurrence info = " + state.dataEnvrn->EnvironmentName + ", " + state.dataEnvrn->CurMnDy + ' ' +
                                   General::CreateSysTimeIntervalString(state));
                 ShowContinueError(state, " Refer to documentation for further explanation of Total Cooling Capacity.");
                 this->ShowUnmetWIEnergyWarning = false;
@@ -13917,7 +13917,7 @@ namespace RefrigeratedCase {
                 ShowWarningError(state, "Refrigeration:WalkIn: " + this->Name);
                 ShowContinueError(state, " This walkin cooler has insufficient defrost capacity to remove the excess frost accumulation.");
                 ShowContinueError(state, " Check the defrost schedule or defrost capacity. ");
-                ShowContinueError(state, "... Occurrence info = " + DataEnvironment::EnvironmentName + ", " + DataEnvironment::CurMnDy + ' ' +
+                ShowContinueError(state, "... Occurrence info = " + state.dataEnvrn->EnvironmentName + ", " + state.dataEnvrn->CurMnDy + ' ' +
                                   General::CreateSysTimeIntervalString(state));
                 this->ShowWIFrostWarning = false;
             }
