@@ -2167,9 +2167,9 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
 
 TEST_F(EnergyPlusFixture, ZoneEquipmentManager_RezeroZoneSizingArrays) {
 
-    DataEnvironment::TotDesDays = 12;
-    DataEnvironment::TotRunDesPersDays = 3;
-    int totDesDays = DataEnvironment::TotDesDays + DataEnvironment::TotRunDesPersDays;
+    state->dataEnvrn->TotDesDays = 12;
+    state->dataEnvrn->TotRunDesPersDays = 3;
+    int totDesDays = state->dataEnvrn->TotDesDays + state->dataEnvrn->TotRunDesPersDays;
     state->dataGlobal->NumOfZones = 5;
     state->dataZoneEquipmentManager->NumOfTimeStepInDay = 4;
     DataSizing::ZoneSizing.allocate(totDesDays, state->dataGlobal->NumOfZones);
@@ -2178,7 +2178,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_RezeroZoneSizingArrays) {
     DataSizing::CalcFinalZoneSizing.allocate(state->dataGlobal->NumOfZones);
 
     for (int CtrlZoneNum = 1; CtrlZoneNum <= state->dataGlobal->NumOfZones; ++CtrlZoneNum) {
-        for (int DesDayNum = 1; DesDayNum <= DataEnvironment::TotDesDays + DataEnvironment::TotRunDesPersDays; ++DesDayNum) {
+        for (int DesDayNum = 1; DesDayNum <= state->dataEnvrn->TotDesDays + state->dataEnvrn->TotRunDesPersDays; ++DesDayNum) {
             auto &thisSizingType(DataSizing::ZoneSizing(DesDayNum, CtrlZoneNum));
             thisSizingType.ZoneName = "test";
             thisSizingType.ADUName = "test";
@@ -2578,7 +2578,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_RezeroZoneSizingArrays) {
     ZoneEquipmentManager::RezeroZoneSizingArrays(*state);
 
     for ( int CtrlZoneNum = 1; CtrlZoneNum <= state->dataGlobal->NumOfZones; ++CtrlZoneNum ) {
-        for ( int DesDayNum = 1; DesDayNum <= DataEnvironment::TotDesDays + DataEnvironment::TotRunDesPersDays; ++DesDayNum ) {
+        for ( int DesDayNum = 1; DesDayNum <= state->dataEnvrn->TotDesDays + state->dataEnvrn->TotRunDesPersDays; ++DesDayNum ) {
             auto &thisSizingType(DataSizing::ZoneSizing(DesDayNum, CtrlZoneNum));
             //EXPECT_EQ(thisSizingType.ZoneName, "");
             //EXPECT_EQ(thisSizingType.ADUName, "");

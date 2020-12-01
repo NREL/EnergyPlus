@@ -450,7 +450,7 @@ TEST_F(EnergyPlusFixture, RunPeriod_BadLeapDayFlagLogic)
 
     state->dataWeatherManager->Environment.allocate(1);
     // These may already be set, but do it anyway
-    DataEnvironment::TotDesDays = 0;
+    state->dataEnvrn->TotDesDays = 0;
     state->dataWeatherManager->TotRunPers = 1;
     state->dataWeatherManager->TotRunDesPers = 0;
 

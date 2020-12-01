@@ -1104,7 +1104,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileHi)
             ++state->dataGlobal->DayOfSim;
 
             if (!state->dataGlobal->WarmupFlag) {
-                ++DataEnvironment::CurrentOverallSimDay;
+                ++state->dataEnvrn->CurrentOverallSimDay;
             }
             state->dataGlobal->BeginDayFlag = true;
             state->dataGlobal->EndDayFlag = false;
@@ -2195,7 +2195,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo)
             ++state->dataGlobal->DayOfSim;
 
             if (!state->dataGlobal->WarmupFlag) {
-                ++DataEnvironment::CurrentOverallSimDay;
+                ++state->dataEnvrn->CurrentOverallSimDay;
             }
             state->dataGlobal->BeginDayFlag = true;
             state->dataGlobal->EndDayFlag = false;

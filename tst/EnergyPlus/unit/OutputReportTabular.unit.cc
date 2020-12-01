@@ -487,8 +487,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetColumnUsingTabs)
 
 TEST_F(EnergyPlusFixture, OutputReportTabularTest_AllocateLoadComponentArraysTest)
 {
-    TotDesDays = 2;
-    TotRunDesPersDays = 3;
+    state->dataEnvrn->TotDesDays = 2;
+    state->dataEnvrn->TotRunDesPersDays = 3;
     state->dataGlobal->NumOfZones = 4;
     TotSurfaces = 7;
     state->dataGlobal->NumOfTimeStepInHour = 4;
@@ -6786,8 +6786,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesTwice_test)
 
     int coolDesSelected = 1;
     int iZone = 1;
-    TotDesDays = 2;
-    TotRunDesPersDays = 3;
+    state->dataEnvrn->TotDesDays = 2;
+    state->dataEnvrn->TotRunDesPersDays = 3;
     state->dataGlobal->NumOfTimeStepInHour = 4;
 
     state->dataGlobal->NumOfZones = 4;
@@ -6831,7 +6831,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesTwice_test)
     feneSolarDelaySeqCool = 0.;
 
     Array3D<Real64> feneCondInstantSeq;
-    feneCondInstantSeq.allocate(TotDesDays + TotRunDesPersDays, state->dataGlobal->NumOfTimeStepInHour * 24, state->dataGlobal->NumOfZones);
+    feneCondInstantSeq.allocate(state->dataEnvrn->TotDesDays + state->dataEnvrn->TotRunDesPersDays, state->dataGlobal->NumOfTimeStepInHour * 24, state->dataGlobal->NumOfZones);
     feneCondInstantSeq = 0.0;
 
     Array2D<Real64> surfDelaySeqCool;
@@ -6934,8 +6934,8 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
 
     // Two design days
     int numDesDays = 2;
-    DataEnvironment::TotDesDays = numDesDays;
-    DataEnvironment::TotRunDesPersDays = 0;
+    state->dataEnvrn->TotDesDays = numDesDays;
+    state->dataEnvrn->TotRunDesPersDays = 0;
     state->dataWeatherManager->DesDayInput.allocate(2);
     state->dataWeatherManager->DesDayInput(1).Month = 7;
     state->dataWeatherManager->DesDayInput(1).DayOfMonth = 21;
@@ -8118,8 +8118,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesSurfaceOrder_
 
     int coolDesSelected = 1;
     int iZone = 1;
-    TotDesDays = 2;
-    TotRunDesPersDays = 3;
+    state->dataEnvrn->TotDesDays = 2;
+    state->dataEnvrn->TotRunDesPersDays = 3;
     state->dataGlobal->NumOfTimeStepInHour = 4;
 
     state->dataGlobal->NumOfZones = 1;
@@ -8162,7 +8162,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesSurfaceOrder_
     feneSolarDelaySeqCool = 0.;
 
     Array3D<Real64> feneCondInstantSeq;
-    feneCondInstantSeq.allocate(TotDesDays + TotRunDesPersDays, state->dataGlobal->NumOfTimeStepInHour * 24, state->dataGlobal->NumOfZones);
+    feneCondInstantSeq.allocate(state->dataEnvrn->TotDesDays + state->dataEnvrn->TotRunDesPersDays, state->dataGlobal->NumOfTimeStepInHour * 24, state->dataGlobal->NumOfZones);
     feneCondInstantSeq = 0.0;
 
     Array2D<Real64> surfDelaySeqCool;

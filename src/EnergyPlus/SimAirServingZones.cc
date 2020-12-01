@@ -140,9 +140,6 @@ namespace SimAirServingZones {
     using namespace DataAirLoop;
     using namespace DataHVACGlobals;
     using namespace DataSizing;
-    using DataEnvironment::CurEnvirNum;
-    using DataEnvironment::TotDesDays;
-    using DataEnvironment::TotRunDesPersDays;
     using namespace DataZoneEquipment;
     using namespace DataAirSystems;
 
@@ -4243,12 +4240,12 @@ namespace SimAirServingZones {
             ShowFatalError(state, "Errors found in Sizing:System input");
         }
 
-        SysSizing.allocate(TotDesDays + TotRunDesPersDays, NumPrimaryAirSys);
+        SysSizing.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, NumPrimaryAirSys);
         FinalSysSizing.allocate(NumPrimaryAirSys);
         CalcSysSizing.allocate(NumPrimaryAirSys);
         SysSizPeakDDNum.allocate(NumPrimaryAirSys);
 
-        for (int DesDayEnvrnNum = 1; DesDayEnvrnNum <= TotDesDays + TotRunDesPersDays; ++DesDayEnvrnNum) {
+        for (int DesDayEnvrnNum = 1; DesDayEnvrnNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DesDayEnvrnNum) {
             for (int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
 
                 SysSizing(DesDayEnvrnNum, AirLoopNum).AirPriLoopName = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Name;
@@ -4615,10 +4612,10 @@ namespace SimAirServingZones {
             CalcSysSizing(AirLoopNum).FloorAreaOnAirLoopCooled = 0.0;
             CalcSysSizing(AirLoopNum).FloorAreaOnAirLoopHeated = 0.0;
 
-            SysSizPeakDDNum(AirLoopNum).TimeStepAtSensCoolPk.allocate(TotDesDays + TotRunDesPersDays);
-            SysSizPeakDDNum(AirLoopNum).TimeStepAtTotCoolPk.allocate(TotDesDays + TotRunDesPersDays);
-            SysSizPeakDDNum(AirLoopNum).TimeStepAtCoolFlowPk.allocate(TotDesDays + TotRunDesPersDays);
-            SysSizPeakDDNum(AirLoopNum).TimeStepAtHeatPk.allocate(TotDesDays + TotRunDesPersDays);
+            SysSizPeakDDNum(AirLoopNum).TimeStepAtSensCoolPk.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays);
+            SysSizPeakDDNum(AirLoopNum).TimeStepAtTotCoolPk.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays);
+            SysSizPeakDDNum(AirLoopNum).TimeStepAtCoolFlowPk.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays);
+            SysSizPeakDDNum(AirLoopNum).TimeStepAtHeatPk.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays);
             SysSizPeakDDNum(AirLoopNum).TimeStepAtSensCoolPk = 0;
             SysSizPeakDDNum(AirLoopNum).TimeStepAtTotCoolPk = 0;
             SysSizPeakDDNum(AirLoopNum).TimeStepAtCoolFlowPk = 0;
@@ -5227,7 +5224,7 @@ namespace SimAirServingZones {
                 FinalSysSizing(AirLoopNum).DesOutAirVolFlow = MinOAFlow;
                 CalcSysSizing(AirLoopNum).DesOutAirVolFlow = MinOAFlow;
 
-                for (int DesDayEnvrnNum = 1; DesDayEnvrnNum <= TotDesDays + TotRunDesPersDays; ++DesDayEnvrnNum) {
+                for (int DesDayEnvrnNum = 1; DesDayEnvrnNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DesDayEnvrnNum) {
                     SysSizing(DesDayEnvrnNum, AirLoopNum).DesOutAirVolFlow = FinalSysSizing(AirLoopNum).DesOutAirVolFlow;
                 }
             }
@@ -6437,7 +6434,7 @@ namespace SimAirServingZones {
                     // For coincident sizing, loop over design days and pick out the largest central heating amd
                     // cooling flow rates and associated data
 
-                    for (DDNum = 1; DDNum <= TotDesDays + TotRunDesPersDays; ++DDNum) {
+                    for (DDNum = 1; DDNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DDNum) {
 
                         if (SysSizing(DDNum, AirLoopNum).SensCoolCap > SensCoolCapTemp(AirLoopNum)) {
                             SysSizPeakDDNum(AirLoopNum).SensCoolPeakDD = DDNum;
@@ -7109,7 +7106,7 @@ namespace SimAirServingZones {
                 // SizingFileColSep << CalcSysSizing( I ).AirPriLoopName << ":Des Sens Cool Cap [W]"; }
                 // }
                 for (I = 1; I <= NumPrimaryAirSys; ++I) {
-                    for (J = 1; J <= TotDesDays + TotRunDesPersDays; ++J) {
+                    for (J = 1; J <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++J) {
                         static constexpr auto SSizeFmt12("{}{}{}{:2}{}{}{}{}{:2}{}{}{}{}{:2}{}{}{}{}{:2}{}{}{}{}{:2}{}");
                         print(state.files.ssz,
                               SSizeFmt12,
@@ -7157,7 +7154,7 @@ namespace SimAirServingZones {
                         static constexpr auto SSizeFmt20("{:02}:{:02}:00");
                         print(state.files.ssz, SSizeFmt20, HourPrint, Minutes);
                         for (I = 1; I <= NumPrimaryAirSys; ++I) {
-                            for (J = 1; J <= TotDesDays + TotRunDesPersDays; ++J) {
+                            for (J = 1; J <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++J) {
                                 static constexpr auto SSizeFmt22("{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}");
 
                                 print(state.files.ssz,

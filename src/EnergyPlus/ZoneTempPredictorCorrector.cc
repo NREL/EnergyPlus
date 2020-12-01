@@ -7865,7 +7865,7 @@ namespace ZoneTempPredictorCorrector {
             monthName = "July";
         }
 
-        int jdateSelect = General::nthDayOfWeekOfMonth(dayOfWeek, 1, monthToUse);
+        int jdateSelect = General::nthDayOfWeekOfMonth(state, dayOfWeek, 1, monthToUse);
 
         // determine number of days in year
         int DaysInYear;

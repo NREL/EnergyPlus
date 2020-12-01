@@ -558,13 +558,13 @@ TEST_F(EnergyPlusFixture, ASHRAE_Tau2017ModelTest)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound(false);
-    DataEnvironment::TotDesDays = 2;
+    state->dataEnvrn->TotDesDays = 2;
     // setup environment state
-    state->dataWeatherManager->Environment.allocate(DataEnvironment::TotDesDays);
-    state->dataWeatherManager->DesignDay.allocate(DataEnvironment::TotDesDays);
+    state->dataWeatherManager->Environment.allocate(state->dataEnvrn->TotDesDays);
+    state->dataWeatherManager->DesignDay.allocate(state->dataEnvrn->TotDesDays);
     state->dataWeatherManager->Environment(1).DesignDayNum = 1;
     state->dataWeatherManager->Environment(2).DesignDayNum = 2;
-    GetDesignDayData(*state, DataEnvironment::TotDesDays, ErrorsFound);
+    GetDesignDayData(*state, state->dataEnvrn->TotDesDays, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
     // init local variables
@@ -736,10 +736,10 @@ TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
     has_eio_output(true);
 
     bool ErrorsFound(false);
-    DataEnvironment::TotDesDays = 1;
+    state->dataEnvrn->TotDesDays = 1;
     // setup environment state
-    state->dataWeatherManager->Environment.allocate(DataEnvironment::TotDesDays);
-    state->dataWeatherManager->DesignDay.allocate(DataEnvironment::TotDesDays);
+    state->dataWeatherManager->Environment.allocate(state->dataEnvrn->TotDesDays);
+    state->dataWeatherManager->DesignDay.allocate(state->dataEnvrn->TotDesDays);
 
     state->dataWeatherManager->Environment(1).DesignDayNum = 1;
     state->dataWeatherManager->Environment(1).WP_Type1 = 0;
@@ -751,7 +751,7 @@ TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
     WeatherManager::SetupInterpolationValues(*state);
     WeatherManager::AllocateWeatherData(*state);
 
-    WeatherManager::GetDesignDayData(*state, DataEnvironment::TotDesDays, ErrorsFound);
+    WeatherManager::GetDesignDayData(*state, state->dataEnvrn->TotDesDays, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
     WeatherManager::SetUpDesignDay(*state, 1);
@@ -990,14 +990,14 @@ TEST_F(EnergyPlusFixture, IRHoriz_InterpretWeatherCalculateMissingIRHoriz) {
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound(false);
-    DataEnvironment::TotDesDays = 2;
+    state->dataEnvrn->TotDesDays = 2;
 
     // setup environment state
-    state->dataWeatherManager->Environment.allocate(DataEnvironment::TotDesDays);
-    state->dataWeatherManager->DesignDay.allocate(DataEnvironment::TotDesDays);
+    state->dataWeatherManager->Environment.allocate(state->dataEnvrn->TotDesDays);
+    state->dataWeatherManager->DesignDay.allocate(state->dataEnvrn->TotDesDays);
     state->dataWeatherManager->Environment(1).DesignDayNum = 1;
     state->dataWeatherManager->Environment(2).DesignDayNum = 2;
-    GetDesignDayData(*state, DataEnvironment::TotDesDays, ErrorsFound);
+    GetDesignDayData(*state, state->dataEnvrn->TotDesDays, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
     state->dataWeatherManager->Envrn =1;

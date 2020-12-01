@@ -720,8 +720,9 @@ Real64 systemTimeStep(EnergyPlusState) {
     return EnergyPlus::DataHVACGlobals::TimeStepSys;
 }
 
-int currentEnvironmentNum(EnergyPlusState) {
-    return EnergyPlus::DataEnvironment::CurEnvirNum;
+int currentEnvironmentNum(EnergyPlusState state) {
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    return thisState->dataEnvrn->CurEnvirNum;
 }
 
 int kindOfSim(EnergyPlusState state) {

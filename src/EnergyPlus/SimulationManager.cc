@@ -195,11 +195,7 @@ namespace SimulationManager {
         // na
 
         // Using/Aliasing
-        using DataEnvironment::CurrentOverallSimDay;
         using DataEnvironment::CurrentYearIsLeapYear;
-        using DataEnvironment::TotalOverallSimDays;
-        using DataEnvironment::TotDesDays;
-        using DataEnvironment::TotRunDesPersDays;
         using DataHVACGlobals::TimeStepSys;
 
         using BranchInputManager::ManageBranchInput;
@@ -469,7 +465,7 @@ namespace SimulationManager {
 
             if (sqlite) {
                 sqlite->sqliteBegin();
-                sqlite->createSQLiteEnvironmentPeriodRecord(DataEnvironment::CurEnvirNum, state.dataEnvrn->EnvironmentName, state.dataGlobal->KindOfSim);
+                sqlite->createSQLiteEnvironmentPeriodRecord(state.dataEnvrn->CurEnvirNum, state.dataEnvrn->EnvironmentName, state.dataGlobal->KindOfSim);
                 sqlite->sqliteCommit();
             }
 
@@ -515,8 +511,8 @@ namespace SimulationManager {
                 ++state.dataGlobal->DayOfSim;
                 state.dataGlobal->DayOfSimChr = fmt::to_string(state.dataGlobal->DayOfSim);
                 if (!state.dataGlobal->WarmupFlag) {
-                    ++CurrentOverallSimDay;
-                    DisplaySimDaysProgress(state, CurrentOverallSimDay, TotalOverallSimDays);
+                    ++state.dataEnvrn->CurrentOverallSimDay;
+                    DisplaySimDaysProgress(state, state.dataEnvrn->CurrentOverallSimDay, state.dataEnvrn->TotalOverallSimDays);
                 } else {
                     state.dataGlobal->DayOfSimChr = "0";
                 }
@@ -625,7 +621,7 @@ namespace SimulationManager {
 
         state.dataGlobal->WarmupFlag = false;
         if (!SimsDone && state.dataGlobal->DoDesDaySim) {
-            if ((TotDesDays + TotRunDesPersDays) == 0) { // if sum is 0, then there was no sizing done.
+            if ((state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays) == 0) { // if sum is 0, then there was no sizing done.
                 ShowWarningError(state, "ManageSimulation: SizingPeriod:* were requested in SimulationControl but no SizingPeriod:* objects in input.");
             }
         }

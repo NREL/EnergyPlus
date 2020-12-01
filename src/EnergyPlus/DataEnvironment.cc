@@ -71,14 +71,6 @@ namespace DataEnvironment {
     // current weather variables)
 
     // MODULE VARIABLE DECLARATIONS:
-    int CurEnvirNum;                          // current environment number
-    int TotDesDays(0);                        // Total number of Design days to Setup
-    int TotRunDesPersDays(0);                 // Total number of Run Design Periods [Days] (Weather data) to Setup
-    int CurrentOverallSimDay;                 // Count of current simulation day in total of all sim days
-    int TotalOverallSimDays;                  // Count of all possible simulation days in all environments
-    int MaxNumberSimYears;                    // Maximum number of simulation years requested in all RunPeriod statements
-    int RunPeriodStartDayOfWeek;              // Day of week of the first day of the run period. (or design day - day of week)
-
     Real64 CosSolarDeclinAngle; // Cosine of the solar declination angle
     Real64 EquationOfTime;      // Value of the equation of time formula
     Real64 SinLatitude;         // Sine of Latitude
@@ -119,13 +111,6 @@ namespace DataEnvironment {
 
     void clear_state()
     {
-        CurEnvirNum = int();
-        TotDesDays = 0;
-        TotRunDesPersDays = 0;
-        CurrentOverallSimDay = int();
-        TotalOverallSimDays = int();
-        MaxNumberSimYears = int();
-        RunPeriodStartDayOfWeek = int();
         CosSolarDeclinAngle = Real64();
         EquationOfTime = Real64();
         SinLatitude = Real64();

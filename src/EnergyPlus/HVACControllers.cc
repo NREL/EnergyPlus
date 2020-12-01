@@ -2830,7 +2830,6 @@ namespace HVACControllers {
         // na
 
         // Using/Aliasing
-        using DataEnvironment::CurEnvirNum;
         using DataHVACGlobals::FirstTimeStepSysFlag;
         using General::LogicalToInteger;
 
@@ -2857,7 +2856,7 @@ namespace HVACControllers {
               "{},{},{},{},{},{},{},{},{},{},{},{},",
               LogicalToInteger(state.dataGlobal->ZoneSizingCalc),
               LogicalToInteger(state.dataGlobal->SysSizingCalc),
-              CurEnvirNum,
+              state.dataEnvrn->CurEnvirNum,
               LogicalToInteger(state.dataGlobal->WarmupFlag),
               CreateHVACTimeString(state),
               MakeHVACTimeIntervalString(state),
@@ -3001,7 +3000,6 @@ namespace HVACControllers {
         // na
 
         // Using/Aliasing
-        using DataEnvironment::CurEnvirNum;
         using General::LogicalToInteger;
 
         using RootFinder::WriteRootFinderTrace;
@@ -3050,7 +3048,7 @@ namespace HVACControllers {
         // Write iteration stamp
         print(TraceFile,
               "{},{},{},{},{},{},{},{},",
-              CurEnvirNum,
+              state.dataEnvrn->CurEnvirNum,
               LogicalToInteger(state.dataGlobal->WarmupFlag),
               CreateHVACTimeString(state),
               MakeHVACTimeIntervalString(state),

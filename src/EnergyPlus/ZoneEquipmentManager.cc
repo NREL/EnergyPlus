@@ -136,9 +136,6 @@ namespace ZoneEquipmentManager {
 
     // Using/Aliasing
     using namespace DataSizing;
-    using DataEnvironment::CurEnvirNum;
-    using DataEnvironment::TotDesDays;
-    using DataEnvironment::TotRunDesPersDays;
     using namespace DataZoneEquipment;
     // Use statements for access to subroutines in other modules
     using Psychrometrics::PsyCpAirFnW;
@@ -828,12 +825,12 @@ namespace ZoneEquipmentManager {
         // Put Auto Sizing of Sizing:Zone inputs here!
         AutoCalcDOASControlStrategy(state);
 
-        ZoneSizing.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfZones);
+        ZoneSizing.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->NumOfZones);
         FinalZoneSizing.allocate(state.dataGlobal->NumOfZones);
-        CalcZoneSizing.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfZones);
+        CalcZoneSizing.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->NumOfZones);
         CalcFinalZoneSizing.allocate(state.dataGlobal->NumOfZones);
         TermUnitFinalZoneSizing.allocate(DataSizing::NumAirTerminalUnits);
-        DesDayWeath.allocate(TotDesDays + TotRunDesPersDays);
+        DesDayWeath.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays);
         NumOfTimeStepInDay = state.dataGlobal->NumOfTimeStepInHour * 24;
         state.dataZoneEquipmentManager->AvgData.allocate(NumOfTimeStepInDay);
         CoolPeakDateHrMin.allocate(state.dataGlobal->NumOfZones);
@@ -847,7 +844,7 @@ namespace ZoneEquipmentManager {
         ZoneSizThermSetPtHi = 0.0;
         ZoneSizThermSetPtLo = 1000.0;
 
-        for (DesDayNum = 1; DesDayNum <= TotDesDays + TotRunDesPersDays; ++DesDayNum) {
+        for (DesDayNum = 1; DesDayNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DesDayNum) {
             DesDayWeath(DesDayNum).Temp.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
             DesDayWeath(DesDayNum).HumRat.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
             DesDayWeath(DesDayNum).Press.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
@@ -856,7 +853,7 @@ namespace ZoneEquipmentManager {
             DesDayWeath(DesDayNum).Press = 0.0;
         }
         // Fill zone sizing arrays from input array
-        for (DesDayNum = 1; DesDayNum <= TotDesDays + TotRunDesPersDays; ++DesDayNum) {
+        for (DesDayNum = 1; DesDayNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DesDayNum) {
             for (CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
                 if (!ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
                 ZoneSizing(DesDayNum, CtrlZoneNum).ZoneName = ZoneEquipConfig(CtrlZoneNum).ZoneName;
@@ -1328,7 +1325,7 @@ namespace ZoneEquipmentManager {
             FinalZoneSizing(CtrlZoneNum).InpDesHeatAirFlow *= Zone(ZoneIndex).Multiplier * Zone(ZoneIndex).ListMultiplier;
             CalcFinalZoneSizing(CtrlZoneNum).InpDesHeatAirFlow *= Zone(ZoneIndex).Multiplier * Zone(ZoneIndex).ListMultiplier;
 
-            for (DesDayNum = 1; DesDayNum <= TotDesDays + TotRunDesPersDays; ++DesDayNum) {
+            for (DesDayNum = 1; DesDayNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DesDayNum) {
                 ZoneSizing(DesDayNum, CtrlZoneNum).MinOA = FinalZoneSizing(CtrlZoneNum).MinOA;
                 CalcZoneSizing(DesDayNum, CtrlZoneNum).MinOA = CalcFinalZoneSizing(CtrlZoneNum).MinOA;
                 ZoneSizing(DesDayNum, CtrlZoneNum).DesCoolMinAirFlow2 = FinalZoneSizing(CtrlZoneNum).DesCoolMinAirFlow2;
@@ -1373,7 +1370,7 @@ namespace ZoneEquipmentManager {
         DisplayString(state, "Re-zeroing zone sizing arrays");
 
         for (int ctrlZoneNum = 1; ctrlZoneNum <= state.dataGlobal->NumOfZones; ++ctrlZoneNum) {
-            for (int desDayNum = 1; desDayNum <= TotDesDays + TotRunDesPersDays; ++desDayNum) {
+            for (int desDayNum = 1; desDayNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++desDayNum) {
                 ZoneSizing(desDayNum, ctrlZoneNum).zeroMemberData();
                 CalcZoneSizing(desDayNum, ctrlZoneNum).zeroMemberData();
             }
@@ -2082,7 +2079,7 @@ namespace ZoneEquipmentManager {
                     z.DesCoolCoilInHumRat = c.DesCoolCoilInHumRat;
                 }
 
-                for (DesDayNum = 1; DesDayNum <= TotDesDays + TotRunDesPersDays; ++DesDayNum) {
+                for (DesDayNum = 1; DesDayNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DesDayNum) {
                     for (CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
                         if (!ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
                         for (TimeStepIndex = 1; TimeStepIndex <= state.dataZoneEquipmentManager->NumOfTimeStepInDay; ++TimeStepIndex) {
@@ -2181,7 +2178,7 @@ namespace ZoneEquipmentManager {
                             FinalZoneSizing(CtrlZoneNum).DesCoolMassFlow =
                                 FinalZoneSizing(CtrlZoneNum).DesCoolVolFlow * FinalZoneSizing(CtrlZoneNum).DesCoolDens;
                         }
-                        for (DDNum = 1; DDNum <= TotDesDays + TotRunDesPersDays; ++DDNum) {
+                        for (DDNum = 1; DDNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DDNum) {
                             if (ZoneSizing(DDNum, CtrlZoneNum).DesCoolVolFlow > 0.0) {
                                 TimeStepAtPeak = ZoneSizing(DDNum, CtrlZoneNum).TimeStepNumAtCoolMax;
                                 ZoneSizing(DDNum, CtrlZoneNum).DesCoolVolFlow = CalcZoneSizing(DDNum, CtrlZoneNum).DesCoolVolFlow * TotCoolSizMult;
@@ -2230,7 +2227,7 @@ namespace ZoneEquipmentManager {
                                 FinalZoneSizing(CtrlZoneNum).CoolFlowSeqNoOA(TimeStepIndex) = MaxOfMinCoolMassFlowNoOA;
                             }
                         }
-                        for (DDNum = 1; DDNum <= TotDesDays + TotRunDesPersDays; ++DDNum) {
+                        for (DDNum = 1; DDNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DDNum) {
                             ZoneSizing(DDNum, CtrlZoneNum).DesCoolVolFlowNoOA = ZoneSizing(DDNum, CtrlZoneNum).DesCoolVolFlow;
                             ZoneSizing(DDNum, CtrlZoneNum).DesCoolMassFlowNoOA = ZoneSizing(DDNum, CtrlZoneNum).DesCoolMassFlow;
                             MaxOfMinCoolVolFlowNoOA =
@@ -2272,7 +2269,7 @@ namespace ZoneEquipmentManager {
                                 FinalZoneSizing(CtrlZoneNum).CoolFlowSeq(TimeStepIndex) = MaxOfMinCoolMassFlow;
                             }
                         }
-                        for (DDNum = 1; DDNum <= TotDesDays + TotRunDesPersDays; ++DDNum) {
+                        for (DDNum = 1; DDNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DDNum) {
                             MaxOfMinCoolVolFlow = max(ZoneSizing(DDNum, CtrlZoneNum).DesCoolMinAirFlow,
                                                       ZoneSizing(DDNum, CtrlZoneNum).DesCoolMinAirFlow,
                                                       ZoneSizing(DDNum, CtrlZoneNum).MinOA);
@@ -2292,7 +2289,7 @@ namespace ZoneEquipmentManager {
                     // check for flow rate having been set (by MinOA or other min) but no timestep at max
                     //        IF (FinalZoneSizing(CtrlZoneNum)%DesCoolMassFlow > 0.0d0 .AND. &
                     if ((FinalZoneSizing(CtrlZoneNum).TimeStepNumAtCoolMax == 0 || FinalZoneSizing(CtrlZoneNum).CoolDDNum == 0)) {
-                        for (DDNum = 1; DDNum <= TotDesDays + TotRunDesPersDays; ++DDNum) {
+                        for (DDNum = 1; DDNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DDNum) {
                             ZoneSizing(DDNum, CtrlZoneNum).TimeStepNumAtCoolMax = 1;
                             TimeStepAtPeak = ZoneSizing(DDNum, CtrlZoneNum).TimeStepNumAtCoolMax;
                             for (TimeStepIndex = 1; TimeStepIndex <= state.dataZoneEquipmentManager->NumOfTimeStepInDay; ++TimeStepIndex) {
@@ -2306,7 +2303,7 @@ namespace ZoneEquipmentManager {
                         FinalZoneSizing(CtrlZoneNum).CoolDDNum = 1;
                         TimeStepAtPeakF = FinalZoneSizing(CtrlZoneNum).TimeStepNumAtCoolMax;
                         DDNumF = FinalZoneSizing(CtrlZoneNum).CoolDDNum;
-                        for (DDNum = 1; DDNum <= TotDesDays + TotRunDesPersDays; ++DDNum) {
+                        for (DDNum = 1; DDNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DDNum) {
                             TimeStepAtPeak = ZoneSizing(DDNum, CtrlZoneNum).TimeStepNumAtCoolMax;
                             if (DesDayWeath(DDNum).Temp(TimeStepAtPeak) > DesDayWeath(DDNumF).Temp(TimeStepAtPeakF)) {
                                 DDNumF = DDNum;
@@ -2392,7 +2389,7 @@ namespace ZoneEquipmentManager {
                             FinalZoneSizing(CtrlZoneNum).DesHeatMassFlow =
                                 FinalZoneSizing(CtrlZoneNum).DesHeatVolFlow * FinalZoneSizing(CtrlZoneNum).DesHeatDens;
                         }
-                        for (DDNum = 1; DDNum <= TotDesDays + TotRunDesPersDays; ++DDNum) {
+                        for (DDNum = 1; DDNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DDNum) {
                             if (ZoneSizing(DDNum, CtrlZoneNum).DesHeatVolFlow > 0.0) {
                                 TimeStepAtPeak = ZoneSizing(DDNum, CtrlZoneNum).TimeStepNumAtHeatMax;
                                 ZoneSizing(DDNum, CtrlZoneNum).DesHeatVolFlow = CalcZoneSizing(DDNum, CtrlZoneNum).DesHeatVolFlow * TotHeatSizMult;
@@ -2438,7 +2435,7 @@ namespace ZoneEquipmentManager {
                             FinalZoneSizing(CtrlZoneNum).HeatFlowSeq(TimeStepIndex) = MinOAMass;
                         }
                     }
-                    for (DDNum = 1; DDNum <= TotDesDays + TotRunDesPersDays; ++DDNum) {
+                    for (DDNum = 1; DDNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DDNum) {
                         MinOAMass = ZoneSizing(DDNum, CtrlZoneNum).MinOA * ZoneSizing(DDNum, CtrlZoneNum).DesHeatDens;
                         if (ZoneSizing(DDNum, CtrlZoneNum).MinOA > ZoneSizing(DDNum, CtrlZoneNum).DesHeatVolFlow) {
                             ZoneSizing(DDNum, CtrlZoneNum).DesHeatVolFlow = ZoneSizing(DDNum, CtrlZoneNum).MinOA;
@@ -2454,7 +2451,7 @@ namespace ZoneEquipmentManager {
                     // check for flow rate having been set (by MinOA or other min) but no timestep at max
                     //        IF (FinalZoneSizing(CtrlZoneNum)%DesHeatMassFlow > 0.0d0 .AND. &
                     if ((FinalZoneSizing(CtrlZoneNum).TimeStepNumAtHeatMax == 0 || FinalZoneSizing(CtrlZoneNum).HeatDDNum == 0)) {
-                        for (DDNum = 1; DDNum <= TotDesDays + TotRunDesPersDays; ++DDNum) {
+                        for (DDNum = 1; DDNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DDNum) {
                             ZoneSizing(DDNum, CtrlZoneNum).TimeStepNumAtHeatMax = 1;
                             TimeStepAtPeak = ZoneSizing(DDNum, CtrlZoneNum).TimeStepNumAtHeatMax;
                             for (TimeStepIndex = 1; TimeStepIndex <= state.dataZoneEquipmentManager->NumOfTimeStepInDay; ++TimeStepIndex) {
@@ -2468,7 +2465,7 @@ namespace ZoneEquipmentManager {
                         FinalZoneSizing(CtrlZoneNum).HeatDDNum = 1;
                         TimeStepAtPeakF = FinalZoneSizing(CtrlZoneNum).TimeStepNumAtHeatMax;
                         DDNumF = FinalZoneSizing(CtrlZoneNum).HeatDDNum;
-                        for (DDNum = 1; DDNum <= TotDesDays + TotRunDesPersDays; ++DDNum) {
+                        for (DDNum = 1; DDNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DDNum) {
                             TimeStepAtPeak = ZoneSizing(DDNum, CtrlZoneNum).TimeStepNumAtHeatMax;
                             if (DesDayWeath(DDNum).Temp(TimeStepAtPeak) < DesDayWeath(DDNumF).Temp(TimeStepAtPeakF)) {
                                 DDNumF = DDNum;

@@ -68,14 +68,6 @@ namespace DataEnvironment {
     Real64 constexpr StdPressureSeaLevel(101325.0);   // Standard barometric pressure at sea level (Pa)
 
     // MODULE VARIABLE DECLARATIONS:
-    extern int CurEnvirNum;                        // current environment number
-    extern int TotDesDays;                         // Total number of Design days to Setup
-    extern int TotRunDesPersDays;                  // Total number of Run Design Periods [Days] (Weather data) to Setup
-    extern int CurrentOverallSimDay;               // Count of current simulation day in total of all sim days
-    extern int TotalOverallSimDays;                // Count of all possible simulation days in all environments
-    extern int MaxNumberSimYears;                  // Maximum number of simulation years requested in all RunPeriod statements
-    extern int RunPeriodStartDayOfWeek;            // Day of week of the first day of the run period. (or design day - day of week)
-
     extern Real64 CosSolarDeclinAngle; // Cosine of the solar declination angle
     extern Real64 EquationOfTime;      // Value of the equation of time formula
     extern Real64 SinLatitude;         // Sine of Latitude
@@ -213,6 +205,13 @@ struct EnvironmentData : BaseGlobalStruct {
     std::string CurMnDyHr;                              // Current Month/Day/Hour timestamp info
     std::string CurMnDy;                                // Current Month/Day timestamp info
     std::string CurMnDyYr;                              // Current Month/Day/Year timestamp info
+    int CurEnvirNum = 0;                                // current environment number
+    int TotDesDays = 0;                                 // Total number of Design days to Setup
+    int TotRunDesPersDays = 0;                          // Total number of Run Design Periods [Days] (Weather data) to Setup
+    int CurrentOverallSimDay = 0;                       // Count of current simulation day in total of all sim days
+    int TotalOverallSimDays = 0;                        // Count of all possible simulation days in all environments
+    int MaxNumberSimYears = 0;                          // Maximum number of simulation years requested in all RunPeriod statements
+    int RunPeriodStartDayOfWeek = 0;                    // Day of week of the first day of the run period. (or design day - day of week)
 
     void clear_state() override
     {
@@ -297,6 +296,13 @@ struct EnvironmentData : BaseGlobalStruct {
         this->CurMnDyHr.clear();
         this->CurMnDy.clear();
         this->CurMnDyYr.clear();
+        this->CurEnvirNum = 0;
+        this->TotDesDays = 0;
+        this->TotRunDesPersDays = 0;
+        this->CurrentOverallSimDay = 0;
+        this->TotalOverallSimDays = 0;
+        this->MaxNumberSimYears = 0;
+        this->RunPeriodStartDayOfWeek = 0;
     }
 };
 

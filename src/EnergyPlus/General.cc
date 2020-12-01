@@ -2311,14 +2311,15 @@ namespace General {
     }
 
     // returns the Julian date for the first, second, etc. day of week for a given month
-    int nthDayOfWeekOfMonth(int const &dayOfWeek,  // day of week (Sunday=1, Monday=2, ...)
+    int nthDayOfWeekOfMonth(EnergyPlusData &state,
+                            int const &dayOfWeek,  // day of week (Sunday=1, Monday=2, ...)
                             int const &nthTime,    // nth time the day of the week occurs (first monday, third tuesday, ..)
                             int const &monthNumber // January = 1
     )
     {
         // J. Glazer - August 2017
         int firstDayOfMonth = OrdinalDay(monthNumber, 1, DataEnvironment::CurrentYearIsLeapYear);
-        int dayOfWeekForFirstDay = (DataEnvironment::RunPeriodStartDayOfWeek + firstDayOfMonth - 1) % 7;
+        int dayOfWeekForFirstDay = (state.dataEnvrn->RunPeriodStartDayOfWeek + firstDayOfMonth - 1) % 7;
         int jdatForNth;
         if (dayOfWeek >= dayOfWeekForFirstDay) {
             jdatForNth = firstDayOfMonth + (dayOfWeek - dayOfWeekForFirstDay) + 7 * (nthTime - 1);

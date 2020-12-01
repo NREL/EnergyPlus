@@ -125,7 +125,7 @@ TEST_F(AutoSizingFixture, HeatingAirFlowSizingGauntlet)
     EnergyPlus::DataSizing::FinalZoneSizing(1).TimeStepNumAtHeatMax = 6;
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->MinutesPerTimeStep = 60;
-    DataEnvironment::TotDesDays = 2;
+    state->dataEnvrn->TotDesDays = 2;
     state->dataWeatherManager->DesDayInput.allocate(2);
     state->dataWeatherManager->DesDayInput(1).Month = 7;
     state->dataWeatherManager->DesDayInput(1).DayOfMonth = 7;
@@ -668,7 +668,7 @@ TEST_F(AutoSizingFixture, HeatingAirFlowSizingGauntlet)
     // Test 41 - Airloop Equipment - ems override is on
     DataSizing::SysSizingRunDone = true;
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
-    DataEnvironment::TotDesDays = 2;
+    state->dataEnvrn->TotDesDays = 2;
     DataSizing::SysSizPeakDDNum.allocate(2);
     DataSizing::SysSizPeakDDNum(1).CoolFlowPeakDD = 1;
     DataSizing::SysSizPeakDDNum(1).TimeStepAtCoolFlowPk.allocate(2);

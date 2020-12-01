@@ -1983,8 +1983,6 @@ namespace ExternalInterface {
         // This subroutine organizes the data exchange between FMU and EnergyPlus.
 
         // Using/Aliasing
-        using DataEnvironment::TotalOverallSimDays;
-        using DataEnvironment::TotDesDays;
         using DataSystemVariables::UpdateDataDuringWarmupExternalInterface;
         using EMSManager::ManageEMS;
 
@@ -2139,7 +2137,7 @@ namespace ExternalInterface {
                 UpdateDataDuringWarmupExternalInterface = false;
                 // The time is computed in seconds for FMU
                 tStart = GetCurSimStartTimeSeconds(state);
-                tStop = tStart + (TotalOverallSimDays - TotDesDays) * 24.0 * 3600.0;
+                tStop = tStart + (state.dataEnvrn->TotalOverallSimDays - state.dataEnvrn->TotDesDays) * 24.0 * 3600.0;
                 tComm = tStart;
 
                 // Terminate all FMUs

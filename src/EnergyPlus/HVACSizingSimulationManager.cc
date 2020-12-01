@@ -211,8 +211,6 @@ std::unique_ptr<HVACSizingSimulationManager> hvacSizingSimulationManager;
 
 void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound)
 {
-    using DataEnvironment::CurrentOverallSimDay;
-    using DataEnvironment::TotalOverallSimDays;
     using DataErrorTracking::ExitDuringSimulations;
     using DataSystemVariables::ReportDuringHVACSizingSimulation;
     using EMSManager::ManageEMS;
@@ -267,7 +265,7 @@ void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound)
                 if (sqlite) {
                     sqlite->sqliteBegin();
                     sqlite->createSQLiteEnvironmentPeriodRecord(
-                        DataEnvironment::CurEnvirNum, state.dataEnvrn->EnvironmentName, state.dataGlobal->KindOfSim);
+                        state.dataEnvrn->CurEnvirNum, state.dataEnvrn->EnvironmentName, state.dataGlobal->KindOfSim);
                     sqlite->sqliteCommit();
                 }
             }
@@ -302,8 +300,8 @@ void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound)
                 ++state.dataGlobal->DayOfSim;
                 state.dataGlobal->DayOfSimChr = fmt::to_string(state.dataGlobal->DayOfSim);
                 if (!state.dataGlobal->WarmupFlag) {
-                    ++CurrentOverallSimDay;
-                    DisplaySimDaysProgress(state, CurrentOverallSimDay, TotalOverallSimDays);
+                    ++state.dataEnvrn->CurrentOverallSimDay;
+                    DisplaySimDaysProgress(state, state.dataEnvrn->CurrentOverallSimDay, state.dataEnvrn->TotalOverallSimDays);
                 } else {
                     state.dataGlobal->DayOfSimChr = "0";
                 }

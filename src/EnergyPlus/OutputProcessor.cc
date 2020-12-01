@@ -4060,7 +4060,7 @@ namespace OutputProcessor {
                 sqlite->createSQLiteTimeIndexRecord(static_cast<int>(reportingInterval),
                                                     reportID,
                                                     state.dataGlobal->DayOfSim,
-                                                    DataEnvironment::CurEnvirNum,
+                                                    state.dataEnvrn->CurEnvirNum,
                                                     state.dataGlobal->CalendarYear,
                                                     Month,
                                                     DayOfMonth,
@@ -4089,7 +4089,7 @@ namespace OutputProcessor {
                 sqlite->createSQLiteTimeIndexRecord(static_cast<int>(reportingInterval),
                                                     reportID,
                                                     state.dataGlobal->DayOfSim,
-                                                    DataEnvironment::CurEnvirNum,
+                                                    state.dataEnvrn->CurEnvirNum,
                                                     state.dataGlobal->CalendarYear,
                                                     Month,
                                                     DayOfMonth,
@@ -4108,7 +4108,7 @@ namespace OutputProcessor {
                 sqlite->createSQLiteTimeIndexRecord(static_cast<int>(reportingInterval),
                                                     reportID,
                                                     state.dataGlobal->DayOfSim,
-                                                    DataEnvironment::CurEnvirNum,
+                                                    state.dataEnvrn->CurEnvirNum,
                                                     state.dataGlobal->CalendarYear,
                                                     Month,
                                                     DayOfMonth,
@@ -4125,7 +4125,7 @@ namespace OutputProcessor {
             print(outputFile, "{}\n", stamp);
             if (writeToSQL && sqlite) {
                 sqlite->createSQLiteTimeIndexRecord(
-                    static_cast<int>(reportingInterval), reportID, state.dataGlobal->DayOfSim, DataEnvironment::CurEnvirNum, state.dataGlobal->CalendarYear, Month);
+                    static_cast<int>(reportingInterval), reportID, state.dataGlobal->DayOfSim, state.dataEnvrn->CurEnvirNum, state.dataGlobal->CalendarYear, Month);
             }
             break;
         case ReportingFrequency::Simulation:
@@ -4133,7 +4133,7 @@ namespace OutputProcessor {
             print(outputFile, "{}\n", stamp);
             if (writeToSQL && sqlite) {
                 sqlite->createSQLiteTimeIndexRecord(
-                    static_cast<int>(reportingInterval), reportID, state.dataGlobal->DayOfSim, DataEnvironment::CurEnvirNum, state.dataGlobal->CalendarYear);
+                    static_cast<int>(reportingInterval), reportID, state.dataGlobal->DayOfSim, state.dataEnvrn->CurEnvirNum, state.dataGlobal->CalendarYear);
             }
             break;
         default:
@@ -4153,7 +4153,7 @@ namespace OutputProcessor {
     {
         print(outputFile, "{},{}\n", reportIDString, yearOfSimChr);
         if (writeToSQL && sqlite) {
-            sqlite->createYearlyTimeIndexRecord(state.dataGlobal->CalendarYear, DataEnvironment::CurEnvirNum);
+            sqlite->createYearlyTimeIndexRecord(state.dataGlobal->CalendarYear, state.dataEnvrn->CurEnvirNum);
         }
     }
 

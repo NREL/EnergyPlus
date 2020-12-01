@@ -232,7 +232,6 @@ namespace RuntimeLanguageProcessor {
         // One time run.  Must be run BEFORE anything gets parsed.
 
         // Using/Aliasing
-        using DataEnvironment::CurEnvirNum;
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
 
@@ -345,7 +344,7 @@ namespace RuntimeLanguageProcessor {
         }
         ErlVariable(SystemTimeStepVariableNum).Value = SetErlValueNumber(TimeStepSys);
 
-        tmpCurEnvirNum = double(CurEnvirNum);
+        tmpCurEnvirNum = double(state.dataEnvrn->CurEnvirNum);
         ErlVariable(CurrentEnvironmentPeriodNum).Value = SetErlValueNumber(tmpCurEnvirNum);
         if (state.dataGlobal->WarmupFlag) {
             ErlVariable(WarmUpFlagNum).Value = SetErlValueNumber(1.0);

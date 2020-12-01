@@ -4805,8 +4805,8 @@ namespace SizingManager {
 
         //  test if allocated here
         if (!CalcFacilitySizing.allocated()) {
-            CalcFacilitySizing.allocate(DataEnvironment::TotDesDays + DataEnvironment::TotRunDesPersDays);
-            for (int DDNum = 1; DDNum <= DataEnvironment::TotDesDays + DataEnvironment::TotRunDesPersDays; ++DDNum) {
+            CalcFacilitySizing.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays);
+            for (int DDNum = 1; DDNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DDNum) {
                 CalcFacilitySizing(DDNum).DOASHeatAddSeq.allocate(NumOfTimeStepInDay);
                 CalcFacilitySizing(DDNum).DOASLatAddSeq.allocate(NumOfTimeStepInDay);
                 CalcFacilitySizing(DDNum).CoolOutHumRatSeq.allocate(NumOfTimeStepInDay);
@@ -4912,7 +4912,7 @@ namespace SizingManager {
             }
 
         } else if (CallIndicator == DataGlobalConstants::CallIndicator::EndZoneSizingCalc) {
-            for (int DDNum = 1; DDNum <= DataEnvironment::TotDesDays + DataEnvironment::TotRunDesPersDays; ++DDNum) {
+            for (int DDNum = 1; DDNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DDNum) {
                 if (CalcFacilitySizing(DDNum).DesCoolLoad > CalcFinalFacilitySizing.DesCoolLoad) {
                     CalcFinalFacilitySizing.DesCoolLoad = CalcFacilitySizing(DDNum).DesCoolLoad;
                     CalcFinalFacilitySizing.TimeStepNumAtCoolMax = CalcFacilitySizing(DDNum).TimeStepNumAtCoolMax;

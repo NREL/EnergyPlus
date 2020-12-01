@@ -555,12 +555,12 @@ namespace WeatherManager {
                 ErrorsFound = true;
                 ShowSevereError(state, RoutineName + "No Design Days or Run Period(s) specified, program will terminate.");
             }
-            if (DataSystemVariables::DDOnly && DataEnvironment::TotDesDays == 0) {
+            if (DataSystemVariables::DDOnly && state.dataEnvrn->TotDesDays == 0) {
                 ErrorsFound = true;
                 ShowSevereError(state, RoutineName +
                                 "Requested Design Days only (DataSystemVariables::DDOnly) but no Design Days specified, program will terminate.");
             }
-            if (DataSystemVariables::ReverseDD && DataEnvironment::TotDesDays == 1) {
+            if (DataSystemVariables::ReverseDD && state.dataEnvrn->TotDesDays == 1) {
                 ErrorsFound = true;
                 ShowSevereError(state,
                     RoutineName +
@@ -573,16 +573,16 @@ namespace WeatherManager {
                 ShowFatalError(state, RoutineName + "Errors found in Weater Data Input. Program terminates.");
             }
 
-            DataEnvironment::CurrentOverallSimDay = 0;
-            DataEnvironment::TotalOverallSimDays = 0;
-            DataEnvironment::MaxNumberSimYears = 1;
+            state.dataEnvrn->CurrentOverallSimDay = 0;
+            state.dataEnvrn->TotalOverallSimDays = 0;
+            state.dataEnvrn->MaxNumberSimYears = 1;
             for (int i = 1; i <= state.dataWeatherManager->NumOfEnvrn; ++i) {
-                DataEnvironment::TotalOverallSimDays += state.dataWeatherManager->Environment(i).TotalDays;
+                state.dataEnvrn->TotalOverallSimDays += state.dataWeatherManager->Environment(i).TotalDays;
                 if (state.dataWeatherManager->Environment(i).KindOfEnvrn == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
-                    DataEnvironment::MaxNumberSimYears = max(DataEnvironment::MaxNumberSimYears, state.dataWeatherManager->Environment(i).NumSimYears);
+                    state.dataEnvrn->MaxNumberSimYears = max(state.dataEnvrn->MaxNumberSimYears, state.dataWeatherManager->Environment(i).NumSimYears);
                 }
             }
-            DisplaySimDaysProgress(state, DataEnvironment::CurrentOverallSimDay, DataEnvironment::TotalOverallSimDays);
+            DisplaySimDaysProgress(state, state.dataEnvrn->CurrentOverallSimDay, state.dataEnvrn->TotalOverallSimDays);
         }
 
         CloseWeatherFile(state); // will only close if opened.
@@ -591,7 +591,7 @@ namespace WeatherManager {
         if (state.dataWeatherManager->Envrn > state.dataWeatherManager->NumOfEnvrn) {
             Available = false;
             state.dataWeatherManager->Envrn = 0;
-            DataEnvironment::CurEnvirNum = 0;
+            state.dataEnvrn->CurEnvirNum = 0;
         } else {
             state.dataGlobal->KindOfSim = state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn;
             state.dataEnvrn->DayOfYear = state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).StartJDay;
@@ -622,7 +622,7 @@ namespace WeatherManager {
                     }
                 }
             }
-            if ( state.dataWeatherManager->Envrn > DataEnvironment::TotDesDays && state.dataWeatherManager->WeatherFileExists) {
+            if ( state.dataWeatherManager->Envrn > state.dataEnvrn->TotDesDays && state.dataWeatherManager->WeatherFileExists) {
                 OpenEPlusWeatherFile(state, ErrorsFound, false);
             }
             Available = true;
@@ -643,8 +643,8 @@ namespace WeatherManager {
 
             if (!ErrorsFound && Available &&  state.dataWeatherManager->Envrn > 0) {
                 state.dataEnvrn->EnvironmentName = state.dataWeatherManager->Environment( state.dataWeatherManager->Envrn).Title;
-                DataEnvironment::CurEnvirNum =  state.dataWeatherManager->Envrn;
-                DataEnvironment::RunPeriodStartDayOfWeek = 0;
+                state.dataEnvrn->CurEnvirNum =  state.dataWeatherManager->Envrn;
+                state.dataEnvrn->RunPeriodStartDayOfWeek = 0;
                 if ((state.dataGlobal->DoDesDaySim && (state.dataGlobal->KindOfSim != DataGlobalConstants::KindOfSim::RunPeriodWeather)) ||
                     ((state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) && state.dataGlobal->DoWeathSim)) {
                     if (state.dataWeatherManager->PrntEnvHeaders && DataReportingFlags::DoWeatherInitReporting) {
@@ -841,7 +841,7 @@ namespace WeatherManager {
                         }
 
                         // Only need to set Week days for Run Days
-                        DataEnvironment::RunPeriodStartDayOfWeek = TWeekDay;
+                        state.dataEnvrn->RunPeriodStartDayOfWeek = TWeekDay;
                         state.dataWeatherManager->WeekDayTypes = 0;
                         int JDay5Start = General::OrdinalDay(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).StartMonth, state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).StartDay, state.dataWeatherManager->LeapYearAdd);
                         int JDay5End = General::OrdinalDay(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).EndMonth, state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).EndDay, state.dataWeatherManager->LeapYearAdd);
@@ -1951,7 +1951,7 @@ namespace WeatherManager {
                 state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SkyTempModel == EmissivityCalcType::DewPointDelta) {
                 state.dataWeatherManager->SPSiteSkyTemperatureScheduleValue(envrnDayNum) = state.dataWeatherManager->DDSkyTempScheduleValues(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, envrnDayNum);
             }
-        } else if (DataEnvironment::TotDesDays > 0) {
+        } else if (state.dataEnvrn->TotDesDays > 0) {
             state.dataWeatherManager->SPSiteDryBulbRangeModScheduleValue = -999.0;   // N/A Drybulb Temperature Range Modifier Schedule Value
             state.dataWeatherManager->SPSiteHumidityConditionScheduleValue = -999.0; // N/A Humidity Condition Schedule Value
             state.dataWeatherManager->SPSiteBeamSolarScheduleValue = -999.0;         // N/A Beam Solar Schedule Value
@@ -4686,42 +4686,42 @@ namespace WeatherManager {
         // FLOW:
 
         // Get the number of design days and annual runs from user inpout
-        DataEnvironment::TotDesDays = inputProcessor->getNumObjectsFound(state, "SizingPeriod:DesignDay");
+        state.dataEnvrn->TotDesDays = inputProcessor->getNumObjectsFound(state, "SizingPeriod:DesignDay");
         int RPD1 = inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileDays");
         int RPD2 = inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileConditionType");
         state.dataWeatherManager->TotRunPers = inputProcessor->getNumObjectsFound(state, "RunPeriod");
-         state.dataWeatherManager->NumOfEnvrn = DataEnvironment::TotDesDays + state.dataWeatherManager->TotRunPers + RPD1 + RPD2;
+         state.dataWeatherManager->NumOfEnvrn = state.dataEnvrn->TotDesDays + state.dataWeatherManager->TotRunPers + RPD1 + RPD2;
         state.dataGlobal->WeathSimReq = state.dataWeatherManager->TotRunPers > 0;
 
-        state.dataWeatherManager->SPSiteScheduleNamePtr.allocate(DataEnvironment::TotDesDays * 5);
-        state.dataWeatherManager->SPSiteScheduleUnits.allocate(DataEnvironment::TotDesDays * 5);
+        state.dataWeatherManager->SPSiteScheduleNamePtr.allocate(state.dataEnvrn->TotDesDays * 5);
+        state.dataWeatherManager->SPSiteScheduleUnits.allocate(state.dataEnvrn->TotDesDays * 5);
 
         state.dataWeatherManager->SPSiteScheduleNamePtr = 0;
         state.dataWeatherManager->SPSiteScheduleUnits = "";
 
         // Allocate the Design Day and Environment array to the # of DD's or/and
         // Annual runs on input file
-        state.dataWeatherManager->DesignDay.allocate(DataEnvironment::TotDesDays);
+        state.dataWeatherManager->DesignDay.allocate(state.dataEnvrn->TotDesDays);
         state.dataWeatherManager->Environment.allocate( state.dataWeatherManager->NumOfEnvrn);
 
         // Set all Environments to DesignDay and then the weather environment will be set
         //  in the get annual run data subroutine
-        for (int Env = 1; Env <= DataEnvironment::TotDesDays; ++Env) {
+        for (int Env = 1; Env <= state.dataEnvrn->TotDesDays; ++Env) {
             state.dataWeatherManager->Environment(Env).KindOfEnvrn = DataGlobalConstants::KindOfSim::DesignDay;
         }
         for (int Env = 1; Env <= RPD1 + RPD2; ++Env) {
             if (!DataSystemVariables::DDOnly) {
-                state.dataWeatherManager->Environment(DataEnvironment::TotDesDays + Env).KindOfEnvrn = DataGlobalConstants::KindOfSim::RunPeriodDesign;
+                state.dataWeatherManager->Environment(state.dataEnvrn->TotDesDays + Env).KindOfEnvrn = DataGlobalConstants::KindOfSim::RunPeriodDesign;
             } else {
-                state.dataWeatherManager->Environment(DataEnvironment::TotDesDays + Env).KindOfEnvrn = DataGlobalConstants::KindOfSim::RunPeriodWeather;
+                state.dataWeatherManager->Environment(state.dataEnvrn->TotDesDays + Env).KindOfEnvrn = DataGlobalConstants::KindOfSim::RunPeriodWeather;
             }
         }
         for (int Env = 1; Env <= state.dataWeatherManager->TotRunPers; ++Env) {
-            state.dataWeatherManager->Environment(DataEnvironment::TotDesDays + RPD1 + RPD2 + Env).KindOfEnvrn = DataGlobalConstants::KindOfSim::RunPeriodWeather;
+            state.dataWeatherManager->Environment(state.dataEnvrn->TotDesDays + RPD1 + RPD2 + Env).KindOfEnvrn = DataGlobalConstants::KindOfSim::RunPeriodWeather;
         }
 
-        if (DataEnvironment::TotDesDays >= 1) {
-            GetDesignDayData(state, DataEnvironment::TotDesDays, ErrorsFound);
+        if (state.dataEnvrn->TotDesDays >= 1) {
+            GetDesignDayData(state, state.dataEnvrn->TotDesDays, ErrorsFound);
         }
 
         if (RPD1 >= 1 || RPD2 >= 1) {
@@ -4737,7 +4737,7 @@ namespace WeatherManager {
 
         if (DataSystemVariables::FullAnnualRun) {
             // GetRunPeriodData may have reset the value of TotRunPers
-             state.dataWeatherManager->NumOfEnvrn = DataEnvironment::TotDesDays + state.dataWeatherManager->TotRunPers + RPD1 + RPD2;
+             state.dataWeatherManager->NumOfEnvrn = state.dataEnvrn->TotDesDays + state.dataWeatherManager->TotRunPers + RPD1 + RPD2;
         }
 
         if (RPD1 >= 1 || RPD2 >= 1 || state.dataWeatherManager->TotRunPers >= 1 || DataSystemVariables::FullAnnualRun) {
@@ -8264,7 +8264,7 @@ namespace WeatherManager {
         // Weather Properties
 
         // Transfer weather file information to the Environment derived type
-        state.dataWeatherManager->Envrn = DataEnvironment::TotDesDays + 1;
+        state.dataWeatherManager->Envrn = state.dataEnvrn->TotDesDays + 1;
 
         // Sizing Periods from Weather File
         for (int i = 1; i <= state.dataWeatherManager->TotRunDesPers; ++i) {
@@ -8284,7 +8284,7 @@ namespace WeatherManager {
             } else {
                 env.TotalDays = (General::OrdinalDay(12, 31, state.dataWeatherManager->LeapYearAdd) - env.StartJDay + 1 + env.EndJDay) * env.NumSimYears;
             }
-            DataEnvironment::TotRunDesPersDays += env.TotalDays;
+            state.dataEnvrn->TotRunDesPersDays += env.TotalDays;
             env.UseDST = runPer.useDST;
             env.UseHolidays = runPer.useHolidays;
             env.Title = runPer.title;

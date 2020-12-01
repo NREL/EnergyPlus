@@ -1181,7 +1181,7 @@ void ReportCoilSelection::setCoilCoolingCapacity(
         // These next blocks does not always work with SizingPeriod:WeatherFileDays or SizingPeriod:WeatherFileConditionType, protect against hard
         // crash
         if (DataSizing::SysSizPeakDDNum(curSysNum).SensCoolPeakDD > 0 &&
-            DataSizing::SysSizPeakDDNum(curSysNum).SensCoolPeakDD <= DataEnvironment::TotDesDays) {
+            DataSizing::SysSizPeakDDNum(curSysNum).SensCoolPeakDD <= state.dataEnvrn->TotDesDays) {
             c->desDayNameAtSensPeak = state.dataWeatherManager->DesDayInput(DataSizing::SysSizPeakDDNum(curSysNum).SensCoolPeakDD).Title;
             c->coilSensePeakHrMin =
                 PeakHrMinString(state,
@@ -1189,7 +1189,7 @@ void ReportCoilSelection::setCoilCoolingCapacity(
                                 DataSizing::SysSizPeakDDNum(curSysNum).TimeStepAtSensCoolPk(DataSizing::SysSizPeakDDNum(curSysNum).SensCoolPeakDD));
         }
         if (DataSizing::SysSizPeakDDNum(curSysNum).TotCoolPeakDD > 0 &&
-            DataSizing::SysSizPeakDDNum(curSysNum).TotCoolPeakDD <= DataEnvironment::TotDesDays) {
+            DataSizing::SysSizPeakDDNum(curSysNum).TotCoolPeakDD <= state.dataEnvrn->TotDesDays) {
             c->desDayNameAtTotalPeak = state.dataWeatherManager->DesDayInput(DataSizing::SysSizPeakDDNum(curSysNum).TotCoolPeakDD).Title;
             c->coilTotalPeakHrMin =
                 PeakHrMinString(state,
@@ -1198,7 +1198,7 @@ void ReportCoilSelection::setCoilCoolingCapacity(
         }
 
         if (DataSizing::SysSizPeakDDNum(curSysNum).CoolFlowPeakDD > 0 &&
-            DataSizing::SysSizPeakDDNum(curSysNum).CoolFlowPeakDD <= DataEnvironment::TotDesDays) {
+            DataSizing::SysSizPeakDDNum(curSysNum).CoolFlowPeakDD <= state.dataEnvrn->TotDesDays) {
             c->desDayNameAtAirFlowPeak = state.dataWeatherManager->DesDayInput(DataSizing::SysSizPeakDDNum(curSysNum).CoolFlowPeakDD).Title;
             c->airPeakHrMin =
                 PeakHrMinString(state,
@@ -1344,7 +1344,7 @@ void ReportCoilSelection::setCoilCoolingCapacity(
         c->rmPeakRelHum =
             Psychrometrics::PsyRhFnTdbWPb(state, c->rmPeakTemp, c->rmPeakHumRat, state.dataEnvrn->StdBaroPress) * 100.0; // convert to percentage
         if (DataSizing::FinalZoneSizing(curZoneEqNum).CoolDDNum > 0 &&
-            DataSizing::FinalZoneSizing(curZoneEqNum).CoolDDNum <= DataEnvironment::TotDesDays) {
+            DataSizing::FinalZoneSizing(curZoneEqNum).CoolDDNum <= state.dataEnvrn->TotDesDays) {
             c->coilSensePeakHrMin = PeakHrMinString(
                 state, DataSizing::FinalZoneSizing(curZoneEqNum).CoolDDNum, DataSizing::FinalZoneSizing(curZoneEqNum).TimeStepNumAtCoolMax);
             c->airPeakHrMin = PeakHrMinString(
@@ -1513,7 +1513,7 @@ void ReportCoilSelection::setCoilHeatingCapacity(
             c->rmSensibleAtPeak = sumLoad;
         }
 
-        if (DataSizing::FinalSysSizing(curSysNum).HeatDDNum > 0 && DataSizing::FinalSysSizing(curSysNum).HeatDDNum <= DataEnvironment::TotDesDays) {
+        if (DataSizing::FinalSysSizing(curSysNum).HeatDDNum > 0 && DataSizing::FinalSysSizing(curSysNum).HeatDDNum <= state.dataEnvrn->TotDesDays) {
             c->coilSensePeakHrMin =
                 PeakHrMinString(state, DataSizing::FinalSysSizing(curSysNum).HeatDDNum, DataSizing::FinalSysSizing(curSysNum).SysHeatCoilTimeStepPk);
 
@@ -1568,7 +1568,7 @@ void ReportCoilSelection::setCoilHeatingCapacity(
         c->rmPeakRelHum =
             Psychrometrics::PsyRhFnTdbWPb(state, c->rmPeakTemp, c->rmPeakHumRat, state.dataEnvrn->StdBaroPress) * 100.0; // convert to percentage
         if (DataSizing::FinalZoneSizing(curZoneEqNum).HeatDDNum > 0 &&
-            DataSizing::FinalZoneSizing(curZoneEqNum).HeatDDNum <= DataEnvironment::TotDesDays) {
+            DataSizing::FinalZoneSizing(curZoneEqNum).HeatDDNum <= state.dataEnvrn->TotDesDays) {
             c->coilSensePeakHrMin = PeakHrMinString(
                 state, DataSizing::FinalZoneSizing(curZoneEqNum).HeatDDNum, DataSizing::FinalZoneSizing(curZoneEqNum).TimeStepNumAtHeatMax);
             c->airPeakHrMin = PeakHrMinString(

@@ -679,8 +679,8 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_CheckZoneComponentLoadSubtotals)
     EXPECT_EQ(totConvGains, expectedTotConvGains);
 
     // Check subtotals used in zone component loads
-    DataEnvironment::TotDesDays = 1;
-    DataEnvironment::TotRunDesPersDays = 0;
+    state->dataEnvrn->TotDesDays = 1;
+    state->dataEnvrn->TotRunDesPersDays = 0;
     DataSizing::CurOverallSimDay = 1;
     state->dataGlobal->HourOfDay = 1;
     state->dataGlobal->NumOfTimeStepInHour = 10;

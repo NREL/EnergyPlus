@@ -917,7 +917,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_FanPeak)
     state->dataWeatherManager->DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Month = 7;
     state->dataWeatherManager->DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).DayOfMonth = 15;
     // Also need to set this, it's used to check if DDNum <= TotDesDays
-    DataEnvironment::TotDesDays = 1;
+    state->dataEnvrn->TotDesDays = 1;
 
     DataSizing::ZoneSizingRunDone = true;
 
