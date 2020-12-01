@@ -15648,12 +15648,11 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_ScheduleInterpolationTest)
         "ScheduleTypeLimits,",
         "  Any Number;                     !- Name",
 
-
-        // This schedule should cause issues if interpolation issue is not fixed. Got the initial schedule from the unmethours issue. 
+        // This schedule should cause issues if interpolation issue is not fixed. Got the initial schedule from the unmethours issue.
         "ScheduleTypeLimits, ",
         "  Fractional,                     !-Name ",
-        "  0,                              !-Lower Limit Value",
-        "  1,                              !-Upper Limit Value",
+        "  0.1,                              !-Lower Limit Value",
+        "  0.9,                              !-Upper Limit Value",
         "  Continuous;                     !-Numeric Type",
 
         "Schedule:Day:Interval,",
@@ -15661,15 +15660,15 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_ScheduleInterpolationTest)
         "Fractional,                             !- Schedule Type Limits Name",
         "Linear,                                 !- Interpolate to Timestep",
         "06:00,                                  !- Time 1 {hh:mm}",
-        "0.5,                                      !- Value Until Time 1",
+        "0.1,                                      !- Value Until Time 1",
         "07:15,                                  !- Time 2 {hh:mm}",
-        "1.0,                                      !- Value Until Time 2",
+        "0.9,                                      !- Value Until Time 2",
         "16:15,                                  !- Time 3 {hh:mm}",
-        "0.5,                                      !- Value Until Time 3",
+        "0.1,                                      !- Value Until Time 3",
         "18:15,                                  !- Time 4 {hh:mm}",
-        "1.0,                                      !- Value Until Time 4",
+        "0.1,                                      !- Value Until Time 4",
         "24:00,                                  !- Time 5 {hh:mm}",
-        "0.5;                                       !-Value Until Time 5 ",
+        "0.9;                                       !-Value Until Time 5 ",
 
         "Schedule:Week:Daily,",
         "Week Rule - Jan1-Dec31,  !- Name",
@@ -15761,12 +15760,13 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_ScheduleInterpolationTest)
 
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->MinutesPerTimeStep = 60;
-    DataZoneEquipment::ZoneEquipInputsFilled = true;                                     // indicate zone data is available
-    thisSys->getUnitarySystemInputData(*state, compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
+    DataZoneEquipment::ZoneEquipInputsFilled = true; // indicate zone data is available
 
-
-    EXPECT_FALSE(ErrorsFound);
-
+    try {
+        thisSys->getUnitarySystemInputData(*state, compName, zoneEquipment, 0, ErrorsFound);
+    } catch (...) {
+        FAIL();
+    }
 }
 
 TEST_F(ZoneUnitarySysTest, UnitarySystemModel_FuelHeatCoilStptNodeTest)
