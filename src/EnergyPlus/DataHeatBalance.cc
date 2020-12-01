@@ -1124,25 +1124,21 @@ namespace DataHeatBalance {
         // PURPOSE OF THIS SUBROUTINE:
         // Routine provides facility for doing bulk Set Temperature at Height.
 
-        // Using/Aliasing
-        using DataEnvironment::SiteTempGradient;
-        using DataEnvironment::WeatherFileTempModCoeff;
-
-        if (SiteTempGradient == 0.0) {
+        if (state.dataEnvrn->SiteTempGradient == 0.0) {
             OutDryBulbTemp = state.dataEnvrn->OutDryBulbTemp;
             OutWetBulbTemp = state.dataEnvrn->OutWetBulbTemp;
         } else {
             // Base temperatures at Z = 0 (C)
-            Real64 const BaseDryTemp(state.dataEnvrn->OutDryBulbTemp + WeatherFileTempModCoeff);
-            Real64 const BaseWetTemp(state.dataEnvrn->OutWetBulbTemp + WeatherFileTempModCoeff);
+            Real64 const BaseDryTemp(state.dataEnvrn->OutDryBulbTemp + state.dataEnvrn->WeatherFileTempModCoeff);
+            Real64 const BaseWetTemp(state.dataEnvrn->OutWetBulbTemp + state.dataEnvrn->WeatherFileTempModCoeff);
 
             Real64 const Z(Centroid.z); // Centroid value
             if (Z <= 0.0) {
                 OutDryBulbTemp = BaseDryTemp;
                 OutWetBulbTemp = BaseWetTemp;
             } else {
-                OutDryBulbTemp = BaseDryTemp - SiteTempGradient * DataEnvironment::EarthRadius * Z / (DataEnvironment::EarthRadius + Z);
-                OutWetBulbTemp = BaseWetTemp - SiteTempGradient * DataEnvironment::EarthRadius * Z / (DataEnvironment::EarthRadius + Z);
+                OutDryBulbTemp = BaseDryTemp - state.dataEnvrn->SiteTempGradient * DataEnvironment::EarthRadius * Z / (DataEnvironment::EarthRadius + Z);
+                OutWetBulbTemp = BaseWetTemp - state.dataEnvrn->SiteTempGradient * DataEnvironment::EarthRadius * Z / (DataEnvironment::EarthRadius + Z);
             }
         }
     }
@@ -1158,10 +1154,7 @@ namespace DataHeatBalance {
         // PURPOSE OF THIS SUBROUTINE:
         // Routine provides facility for doing bulk Set Windspeed at Height.
 
-        // Using/Aliasing
-        using DataEnvironment::SiteWindExp;
-
-        if (SiteWindExp == 0.0) {
+        if (state.dataEnvrn->SiteWindExp == 0.0) {
             WindSpeed = state.dataEnvrn->WindSpeed;
         } else {
             Real64 const Z(Centroid.z); // Centroid value
@@ -1171,7 +1164,7 @@ namespace DataHeatBalance {
                 //  [Met] - at meterological Station, Height of measurement is usually 10m above ground
                 //  LocalWindSpeed = Windspeed [Met] * (Wind Boundary LayerThickness [Met]/Height [Met])**Wind Exponent[Met] &
                 //                     * (Height above ground / Site Wind Boundary Layer Thickness) ** Site Wind Exponent
-                WindSpeed = fac * std::pow(Z, SiteWindExp);
+                WindSpeed = fac * std::pow(Z, state.dataEnvrn->SiteWindExp);
             }
         }
     }
@@ -1202,12 +1195,7 @@ namespace DataHeatBalance {
 
     void SetZoneWindSpeedAt(EnergyPlusData &state)
     {
-        // Using/Aliasing
-        using DataEnvironment::SiteWindBLHeight;
-        using DataEnvironment::SiteWindExp;
-        using DataEnvironment::WeatherFileWindModCoeff;
-
-        Real64 const fac(state.dataEnvrn->WindSpeed * WeatherFileWindModCoeff * std::pow(SiteWindBLHeight, -SiteWindExp));
+        Real64 const fac(state.dataEnvrn->WindSpeed * state.dataEnvrn->WeatherFileWindModCoeff * std::pow(state.dataEnvrn->SiteWindBLHeight, -state.dataEnvrn->SiteWindExp));
         for (auto &zone : Zone) {
             zone.SetWindSpeedAt(state, fac);
         }

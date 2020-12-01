@@ -54,9 +54,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
-namespace EnergyPlus {
-
-namespace DataEnvironment {
+namespace EnergyPlus::DataEnvironment {
 
     // MODULE INFORMATION:
     //       AUTHOR         Rick Strand, Dan Fisher, Linda Lawrie
@@ -71,20 +69,6 @@ namespace DataEnvironment {
     // current weather variables)
 
     // MODULE VARIABLE DECLARATIONS:
-    Real64 CosSolarDeclinAngle; // Cosine of the solar declination angle
-    Real64 EquationOfTime;      // Value of the equation of time formula
-    Real64 SinLatitude;         // Sine of Latitude
-    Real64 CosLatitude;         // Cosine of Latitude
-    Real64 SinSolarDeclinAngle; // Sine of the solar declination angle
-    Real64 TS1TimeOffset(-0.5); // offset when TS=1 for solar calculations
-
-    Real64 WeatherFileWindModCoeff(1.5863); // =(WindBLHeight/WindSensorHeight)**WindExp for conditions at the weather station
-    Real64 WeatherFileTempModCoeff(0.0);    // =AtmosphericTempGradient*EarthRadius*SensorHeight/(EarthRadius+SensorHeight)
-
-    Real64 SiteWindExp(0.22);        // Exponent for the wind velocity profile at the site
-    Real64 SiteWindBLHeight(370.0);  // Boundary layer height for the wind velocity profile at the site (m)
-    Real64 SiteTempGradient(0.0065); // Air temperature gradient coefficient (K/m)
-
     bool GroundTempObjInput(false);         // Ground temperature object input
     bool GroundTemp_SurfaceObjInput(false); // Surface ground temperature object input
     bool GroundTemp_DeepObjInput(false);    // Deep ground temperature object input
@@ -111,17 +95,6 @@ namespace DataEnvironment {
 
     void clear_state()
     {
-        CosSolarDeclinAngle = Real64();
-        EquationOfTime = Real64();
-        SinLatitude = Real64();
-        CosLatitude = Real64();
-        SinSolarDeclinAngle = Real64();
-        TS1TimeOffset = -0.5;
-        WeatherFileWindModCoeff = 1.5863;
-        WeatherFileTempModCoeff = 0.0;
-        SiteWindExp = 0.22;
-        SiteWindBLHeight = 370.0;
-        SiteTempGradient = 0.0065;
         GroundTempObjInput = false;
         GroundTemp_SurfaceObjInput = false;
         GroundTemp_DeepObjInput = false;
@@ -169,14 +142,14 @@ namespace DataEnvironment {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 BaseTemp; // Base temperature at Z = 0 (C)
 
-        BaseTemp = state.dataEnvrn->OutDryBulbTemp + WeatherFileTempModCoeff;
+        BaseTemp = state.dataEnvrn->OutDryBulbTemp + state.dataEnvrn->WeatherFileTempModCoeff;
 
-        if (SiteTempGradient == 0.0) {
+        if (state.dataEnvrn->SiteTempGradient == 0.0) {
             LocalOutDryBulbTemp = state.dataEnvrn->OutDryBulbTemp;
         } else if (Z <= 0.0) {
             LocalOutDryBulbTemp = BaseTemp;
         } else {
-            LocalOutDryBulbTemp = BaseTemp - SiteTempGradient * DataEnvironment::EarthRadius * Z / (DataEnvironment::EarthRadius + Z);
+            LocalOutDryBulbTemp = BaseTemp - state.dataEnvrn->SiteTempGradient * DataEnvironment::EarthRadius * Z / (DataEnvironment::EarthRadius + Z);
         }
 
         if (LocalOutDryBulbTemp < -100.0) {
@@ -212,14 +185,14 @@ namespace DataEnvironment {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 BaseTemp; // Base temperature at Z = 0 (C)
 
-        BaseTemp = state.dataEnvrn->OutWetBulbTemp + WeatherFileTempModCoeff;
+        BaseTemp = state.dataEnvrn->OutWetBulbTemp + state.dataEnvrn->WeatherFileTempModCoeff;
 
-        if (SiteTempGradient == 0.0) {
+        if (state.dataEnvrn->SiteTempGradient == 0.0) {
             LocalOutWetBulbTemp = state.dataEnvrn->OutWetBulbTemp;
         } else if (Z <= 0.0) {
             LocalOutWetBulbTemp = BaseTemp;
         } else {
-            LocalOutWetBulbTemp = BaseTemp - SiteTempGradient * DataEnvironment::EarthRadius * Z / (DataEnvironment::EarthRadius + Z);
+            LocalOutWetBulbTemp = BaseTemp - state.dataEnvrn->SiteTempGradient * DataEnvironment::EarthRadius * Z / (DataEnvironment::EarthRadius + Z);
         }
 
         if (LocalOutWetBulbTemp < -100.0) {
@@ -256,14 +229,14 @@ namespace DataEnvironment {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 BaseTemp; // Base temperature at Z = 0 (C)
 
-        BaseTemp = state.dataEnvrn->OutDewPointTemp + WeatherFileTempModCoeff;
+        BaseTemp = state.dataEnvrn->OutDewPointTemp + state.dataEnvrn->WeatherFileTempModCoeff;
 
-        if (SiteTempGradient == 0.0) {
+        if (state.dataEnvrn->SiteTempGradient == 0.0) {
             LocalOutDewPointTemp = state.dataEnvrn->OutDewPointTemp;
         } else if (Z <= 0.0) {
             LocalOutDewPointTemp = BaseTemp;
         } else {
-            LocalOutDewPointTemp = BaseTemp - SiteTempGradient * DataEnvironment::EarthRadius * Z / (DataEnvironment::EarthRadius + Z);
+            LocalOutDewPointTemp = BaseTemp - state.dataEnvrn->SiteTempGradient * DataEnvironment::EarthRadius * Z / (DataEnvironment::EarthRadius + Z);
         }
 
         if (LocalOutDewPointTemp < -100.0) {
@@ -299,13 +272,13 @@ namespace DataEnvironment {
 
         if (Z <= 0.0) {
             LocalWindSpeed = 0.0;
-        } else if (SiteWindExp == 0.0) {
+        } else if (state.dataEnvrn->SiteWindExp == 0.0) {
             LocalWindSpeed = state.dataEnvrn->WindSpeed;
         } else {
             //  [Met] - at meterological Station, Height of measurement is usually 10m above ground
             //  LocalWindSpeed = Windspeed [Met] * (Wind Boundary LayerThickness [Met]/Height [Met])**Wind Exponent[Met] &
             //                     * (Height above ground / Site Wind Boundary Layer Thickness) ** Site Wind Exponent
-            LocalWindSpeed = state.dataEnvrn->WindSpeed * WeatherFileWindModCoeff * std::pow(Z / SiteWindBLHeight, SiteWindExp);
+            LocalWindSpeed = state.dataEnvrn->WindSpeed * state.dataEnvrn->WeatherFileWindModCoeff * std::pow(Z / state.dataEnvrn->SiteWindBLHeight, state.dataEnvrn->SiteWindExp);
         }
 
         return LocalWindSpeed;
@@ -346,7 +319,7 @@ namespace DataEnvironment {
 
         if (Z <= 0.0) {
             LocalAirPressure = 0.0;
-        } else if (SiteTempGradient == 0.0) {
+        } else if (state.dataEnvrn->SiteTempGradient == 0.0) {
             LocalAirPressure = state.dataEnvrn->OutBaroPress;
         } else {
             LocalAirPressure = state.dataEnvrn->StdBaroPress * std::pow(BaseTemp / (BaseTemp + TempGradient * (Z - GeopotentialH)),
@@ -382,10 +355,10 @@ namespace DataEnvironment {
         // PURPOSE OF THIS SUBROUTINE:
         // Routine provides facility for doing bulk Set Windspeed at Height.
 
-        if (SiteWindExp == 0.0) {
+        if (state.dataEnvrn->SiteWindExp == 0.0) {
             LocalWindSpeed = state.dataEnvrn->WindSpeed;
         } else {
-            Real64 const fac(state.dataEnvrn->WindSpeed * WeatherFileWindModCoeff * std::pow(SiteWindBLHeight, -SiteWindExp));
+            Real64 const fac(state.dataEnvrn->WindSpeed * state.dataEnvrn->WeatherFileWindModCoeff * std::pow(state.dataEnvrn->SiteWindBLHeight, -state.dataEnvrn->SiteWindExp));
             Real64 Z; // Centroid value
             for (int i = 1; i <= NumItems; ++i) {
                 Z = Heights(i);
@@ -395,12 +368,10 @@ namespace DataEnvironment {
                     //  [Met] - at meterological Station, Height of measurement is usually 10m above ground
                     //  LocalWindSpeed = Windspeed [Met] * (Wind Boundary LayerThickness [Met]/Height [Met])**Wind Exponent[Met] &
                     //                     * (Height above ground / Site Wind Boundary Layer Thickness) ** Site Wind Exponent
-                    LocalWindSpeed(i) = fac * std::pow(Z, SiteWindExp);
+                    LocalWindSpeed(i) = fac * std::pow(Z, state.dataEnvrn->SiteWindExp);
                 }
             }
         }
     }
-
-} // namespace DataEnvironment
 
 } // namespace EnergyPlus

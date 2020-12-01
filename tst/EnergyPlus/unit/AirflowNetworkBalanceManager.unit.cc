@@ -4639,7 +4639,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestWindPressureTable)
     state->dataEnvrn->OutDryBulbTemp = 25.0;
     state->dataEnvrn->WindDir = 105.0;
     state->dataEnvrn->OutHumRat = 0.0;        // Dry air only
-    DataEnvironment::SiteTempGradient = 0.0; // Disconnect z from testing
+    state->dataEnvrn->SiteTempGradient = 0.0; // Disconnect z from testing
 
     // Make sure we can compute the right density
     Real64 rho = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat);
@@ -4721,7 +4721,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestWPCValue)
     state->dataEnvrn->OutDryBulbTemp = 25.0;
     state->dataEnvrn->WindDir = 105.0;
     state->dataEnvrn->OutHumRat = 0.0;        // Dry air only
-    DataEnvironment::SiteTempGradient = 0.0; // Disconnect z from testing
+    state->dataEnvrn->SiteTempGradient = 0.0; // Disconnect z from testing
 
     Real64 windSpeed = 1.0;
     Real64 dryBulb = DataEnvironment::OutDryBulbTempAt(*state, 10.0);
@@ -5734,8 +5734,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodes)
     state->dataEnvrn->OutDryBulbTemp = 25.0;
     state->dataEnvrn->WindDir = 105.0;
     state->dataEnvrn->OutHumRat = 0.0;        // Dry air only
-    DataEnvironment::SiteTempGradient = 0.0; // Disconnect z from testing
-    DataEnvironment::SiteWindExp = 0.0;      // Disconnect variation by height
+    state->dataEnvrn->SiteTempGradient = 0.0; // Disconnect z from testing
+    state->dataEnvrn->SiteWindExp = 0.0;      // Disconnect variation by height
     state->dataEnvrn->WindSpeed = 10.0;
 
     // Make sure we can compute the right wind pressure
@@ -6438,8 +6438,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithTables)
     state->dataEnvrn->OutDryBulbTemp = 25.0;
     state->dataEnvrn->WindDir = 105.0;
     state->dataEnvrn->OutHumRat = 0.0;        // Dry air only
-    DataEnvironment::SiteTempGradient = 0.0; // Disconnect z from testing
-    DataEnvironment::SiteWindExp = 0.0;      // Disconnect variation by height
+    state->dataEnvrn->SiteTempGradient = 0.0; // Disconnect z from testing
+    state->dataEnvrn->SiteWindExp = 0.0;      // Disconnect variation by height
     state->dataEnvrn->WindSpeed = 10.0;
 
     // Make sure we can compute the right wind pressure
@@ -7073,8 +7073,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithNoInput)
     state->dataEnvrn->OutDryBulbTemp = 25.0;
     state->dataEnvrn->WindDir = 105.0;
     state->dataEnvrn->OutHumRat = 0.0;        // Dry air only
-    DataEnvironment::SiteTempGradient = 0.0; // Disconnect z from testing
-    DataEnvironment::SiteWindExp = 0.0;      // Disconnect variation by height
+    state->dataEnvrn->SiteTempGradient = 0.0; // Disconnect z from testing
+    state->dataEnvrn->SiteWindExp = 0.0;      // Disconnect variation by height
     state->dataEnvrn->WindSpeed = 10.0;
 
     // Make sure we can compute the right wind pressure
@@ -7750,8 +7750,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithSymmetricTable)
     state->dataEnvrn->OutDryBulbTemp = 25.0;
     state->dataEnvrn->WindDir = 105.0;
     state->dataEnvrn->OutHumRat = 0.0;        // Dry air only
-    DataEnvironment::SiteTempGradient = 0.0; // Disconnect z from testing
-    DataEnvironment::SiteWindExp = 0.0;      // Disconnect variation by height
+    state->dataEnvrn->SiteTempGradient = 0.0; // Disconnect z from testing
+    state->dataEnvrn->SiteWindExp = 0.0;      // Disconnect variation by height
     state->dataEnvrn->WindSpeed = 10.0;
 
     // Make sure we can compute the right wind pressure
@@ -8393,8 +8393,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithSymmetricCurve)
     state->dataEnvrn->OutDryBulbTemp = 25.0;
     state->dataEnvrn->WindDir = 105.0;
     state->dataEnvrn->OutHumRat = 0.0;        // Dry air only
-    DataEnvironment::SiteTempGradient = 0.0; // Disconnect z from testing
-    DataEnvironment::SiteWindExp = 0.0;      // Disconnect variation by height
+    state->dataEnvrn->SiteTempGradient = 0.0; // Disconnect z from testing
+    state->dataEnvrn->SiteWindExp = 0.0;      // Disconnect variation by height
     state->dataEnvrn->WindSpeed = 10.0;
 
     // Make sure we can compute the right wind pressure
@@ -9061,8 +9061,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithLocalAirNode)
     state->dataEnvrn->OutDryBulbTemp = 25.0;
     state->dataEnvrn->WindDir = 105.0;
     state->dataEnvrn->OutHumRat = 0.0;        // Dry air only
-    DataEnvironment::SiteTempGradient = 0.0; // Disconnect z from testing
-    DataEnvironment::SiteWindExp = 0.0;      // Disconnect variation by height
+    state->dataEnvrn->SiteTempGradient = 0.0; // Disconnect z from testing
+    state->dataEnvrn->SiteWindExp = 0.0;      // Disconnect variation by height
     state->dataEnvrn->WindSpeed = 10.0;
 
     bool ErrorsFound = false;

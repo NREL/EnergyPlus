@@ -62,11 +62,11 @@ using namespace ObjexxFCL;
 TEST_F(EnergyPlusFixture, DataEnvironment_WindSpeedAt)
 {
     state->dataEnvrn->WindSpeed = 10;
-    DataEnvironment::WeatherFileWindModCoeff = 0.3;
-    DataEnvironment::SiteWindBLHeight = 20;
+    state->dataEnvrn->WeatherFileWindModCoeff = 0.3;
+    state->dataEnvrn->SiteWindBLHeight = 20;
 
     // Start with normal mode
-    DataEnvironment::SiteWindExp = 0.1;
+    state->dataEnvrn->SiteWindExp = 0.1;
     EXPECT_NEAR(0.000, DataEnvironment::WindSpeedAt(*state, -1.0), 0.001);
     EXPECT_NEAR(0.000, DataEnvironment::WindSpeedAt(*state, 0.0), 0.001);
     EXPECT_NEAR(2.223, DataEnvironment::WindSpeedAt(*state, 1.0), 0.001);
@@ -75,7 +75,7 @@ TEST_F(EnergyPlusFixture, DataEnvironment_WindSpeedAt)
     EXPECT_NEAR(3.000, DataEnvironment::WindSpeedAt(*state, 20.0), 0.001);
 
     // If the site wind exponent is zero, the wind speed is either zero or the actual wind speed
-    DataEnvironment::SiteWindExp = 0.0;
+    state->dataEnvrn->SiteWindExp = 0.0;
     EXPECT_NEAR(0.0, DataEnvironment::WindSpeedAt(*state, -1.0), 0.001);
     EXPECT_NEAR(0.0, DataEnvironment::WindSpeedAt(*state, 0.0), 0.001);
     EXPECT_NEAR(10.0, DataEnvironment::WindSpeedAt(*state, 1.0), 0.001);

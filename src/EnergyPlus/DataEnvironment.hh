@@ -68,20 +68,6 @@ namespace DataEnvironment {
     Real64 constexpr StdPressureSeaLevel(101325.0);   // Standard barometric pressure at sea level (Pa)
 
     // MODULE VARIABLE DECLARATIONS:
-    extern Real64 CosSolarDeclinAngle; // Cosine of the solar declination angle
-    extern Real64 EquationOfTime;      // Value of the equation of time formula
-    extern Real64 SinLatitude;         // Sine of Latitude
-    extern Real64 CosLatitude;         // Cosine of Latitude
-    extern Real64 SinSolarDeclinAngle; // Sine of the solar declination angle
-    extern Real64 TS1TimeOffset;       // offset when TS=1 for solar calculations
-
-    extern Real64 WeatherFileWindModCoeff; // =(WindBLHeight/WindSensorHeight)**WindExp for conditions at the weather station
-    extern Real64 WeatherFileTempModCoeff; // =AtmosphericTempGradient*EarthRadius*SensorHeight/(EarthRadius+SensorHeight)
-
-    extern Real64 SiteWindExp;      // Exponent for the wind velocity profile at the site
-    extern Real64 SiteWindBLHeight; // Boundary layer height for the wind velocity profile at the site (m)
-    extern Real64 SiteTempGradient; // Air temperature gradient coefficient (K/m)
-
     extern bool GroundTempObjInput;         // Ground temperature object input
     extern bool GroundTemp_SurfaceObjInput; // Surface ground temperature object input
     extern bool GroundTemp_DeepObjInput;    // Deep ground temperature object input
@@ -212,6 +198,17 @@ struct EnvironmentData : BaseGlobalStruct {
     int TotalOverallSimDays = 0;                        // Count of all possible simulation days in all environments
     int MaxNumberSimYears = 0;                          // Maximum number of simulation years requested in all RunPeriod statements
     int RunPeriodStartDayOfWeek = 0;                    // Day of week of the first day of the run period. (or design day - day of week)
+    Real64 CosSolarDeclinAngle = 0.0;                   // Cosine of the solar declination angle
+    Real64 EquationOfTime = 0.0;                        // Value of the equation of time formula
+    Real64 SinLatitude = 0.0;                           // Sine of Latitude
+    Real64 CosLatitude = 0.0;                           // Cosine of Latitude
+    Real64 SinSolarDeclinAngle = 0.0;                   // Sine of the solar declination angle
+    Real64 TS1TimeOffset = -0.5;                        // offset when TS=1 for solar calculations
+    Real64 WeatherFileWindModCoeff = 1.5863;            // =(WindBLHeight/WindSensorHeight)**WindExp for conditions at the weather station
+    Real64 WeatherFileTempModCoeff = 0.0;               // =AtmosphericTempGradient*EarthRadius*SensorHeight/(EarthRadius+SensorHeight)
+    Real64 SiteWindExp = 0.22;                          // Exponent for the wind velocity profile at the site
+    Real64 SiteWindBLHeight = 370.0;                    // Boundary layer height for the wind velocity profile at the site (m)
+    Real64 SiteTempGradient = 0.0065;                   // Air temperature gradient coefficient (K/m)
 
     void clear_state() override
     {
@@ -303,6 +300,17 @@ struct EnvironmentData : BaseGlobalStruct {
         this->TotalOverallSimDays = 0;
         this->MaxNumberSimYears = 0;
         this->RunPeriodStartDayOfWeek = 0;
+        this->CosSolarDeclinAngle = 0.0;
+        this->EquationOfTime = 0.0;
+        this->SinLatitude = 0.0;
+        this->CosLatitude = 0.0;
+        this->SinSolarDeclinAngle = 0.0;
+        this->TS1TimeOffset = -0.5;
+        this->WeatherFileWindModCoeff = 1.5863;
+        this->WeatherFileTempModCoeff = 0.0;
+        this->SiteWindExp = 0.22;
+        this->SiteWindBLHeight = 370.0;
+        this->SiteTempGradient = 0.0065;
     }
 };
 

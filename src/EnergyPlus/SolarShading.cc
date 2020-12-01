@@ -4601,7 +4601,7 @@ namespace SolarShading {
         if (state.dataGlobal->NumOfTimeStepInHour != 1) {
             CurrentTime = double(iHour - 1) + double(iTimeStep) * (state.dataGlobal->TimeStepZone);
         } else {
-            CurrentTime = double(iHour) + TS1TimeOffset;
+            CurrentTime = double(iHour) + state.dataEnvrn->TS1TimeOffset;
         }
         SUN4(state, CurrentTime, EqOfTime, SinSolarDeclin, CosSolarDeclin);
 
@@ -8757,14 +8757,14 @@ namespace SolarShading {
         H = HrAngle * DataGlobalConstants::DegToRadians();
 
         // Compute the cosine of the solar zenith angle.
-        state.dataSolarShading->SUNCOS(3) = SinSolarDeclin * SinLatitude + CosSolarDeclin * CosLatitude * std::cos(H);
+        state.dataSolarShading->SUNCOS(3) = SinSolarDeclin * state.dataEnvrn->SinLatitude + CosSolarDeclin * state.dataEnvrn->CosLatitude * std::cos(H);
         state.dataSolarShading->SUNCOS(2) = 0.0;
         state.dataSolarShading->SUNCOS(1) = 0.0;
 
         if (state.dataSolarShading->SUNCOS(3) < DataEnvironment::SunIsUpValue) return; // Return if sun not above horizon.
 
         // Compute other direction cosines.
-        state.dataSolarShading->SUNCOS(2) = SinSolarDeclin * CosLatitude - CosSolarDeclin * SinLatitude * std::cos(H);
+        state.dataSolarShading->SUNCOS(2) = SinSolarDeclin * state.dataEnvrn->CosLatitude - CosSolarDeclin * state.dataEnvrn->SinLatitude * std::cos(H);
         state.dataSolarShading->SUNCOS(1) = CosSolarDeclin * std::sin(H);
     }
 

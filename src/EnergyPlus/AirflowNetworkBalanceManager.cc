@@ -10847,7 +10847,7 @@ namespace AirflowNetworkBalanceManager {
                 for (ExtOpenNum = 1; ExtOpenNum <= AFNNumOfExtOpenings; ++ExtOpenNum) {
                     if (OpenNuminZone > 2) break; // Tuned
                     if (AFNExtSurfaces(ExtOpenNum).MZDZoneNum == ZnNum) {
-                        Real64 const VelRatio_2(std::pow(10.0 / AFNExtSurfaces(ExtOpenNum).NodeHeight, 2.0 * SiteWindExp));
+                        Real64 const VelRatio_2(std::pow(10.0 / AFNExtSurfaces(ExtOpenNum).NodeHeight, 2.0 * state.dataEnvrn->SiteWindExp));
                         Real64 const AFNEExtSurface_fac(0.5 * (1.0 / pow_2(AFNExtSurfaces(ExtOpenNum).DischCoeff)));
                         if (OpenNuminZone == 1) {
                             std::vector<Real64> cpvalues(numWindDir);

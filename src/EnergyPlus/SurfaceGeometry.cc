@@ -12829,7 +12829,7 @@ namespace SurfaceGeometry {
             ShowContinueError(state, "...in any calculations, Wind Speed will be 0.0 for these surfaces.");
             ShowContinueError(state,
                               format("...in any calculations, Outside temperatures will be the outside temperature + {:.3R} for these surfaces.",
-                                     WeatherFileTempModCoeff));
+                                     state.dataEnvrn->WeatherFileTempModCoeff));
             ShowContinueError(state, "...that is, these surfaces will have conditions as though at ground level.");
         }
     }

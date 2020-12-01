@@ -691,10 +691,6 @@ namespace WindTurbine {
         // at the particular rotor height is used with no factorization.
         // It also initializes module variables at each time step.
 
-        using DataEnvironment::SiteWindBLHeight;
-        using DataEnvironment::SiteWindExp;
-        using DataEnvironment::WeatherFileWindModCoeff;
-
         static char const TabChr('\t'); // Tab character
 
         int mon;                      // loop counter
@@ -773,7 +769,7 @@ namespace WindTurbine {
         if (AnnualTMYWS > 0.0 && state.dataWindTurbine->WindTurbineSys(WindTurbineNum).WSFactor == 0.0 && state.dataWindTurbine->WindTurbineSys(WindTurbineNum).LocalAnnualAvgWS > 0) {
             // Convert the annual wind speed to the local wind speed at the height of the local station, then factor
             LocalTMYWS =
-                AnnualTMYWS * WeatherFileWindModCoeff * std::pow(state.dataWindTurbine->WindTurbineSys(WindTurbineNum).HeightForLocalWS / SiteWindBLHeight, SiteWindExp);
+                AnnualTMYWS * state.dataEnvrn->WeatherFileWindModCoeff * std::pow(state.dataWindTurbine->WindTurbineSys(WindTurbineNum).HeightForLocalWS / state.dataEnvrn->SiteWindBLHeight, state.dataEnvrn->SiteWindExp);
             state.dataWindTurbine->WindTurbineSys(WindTurbineNum).WSFactor = LocalTMYWS / state.dataWindTurbine->WindTurbineSys(WindTurbineNum).LocalAnnualAvgWS;
         }
         // Assign factor of 1.0 if no stat file or no input of local average wind speed

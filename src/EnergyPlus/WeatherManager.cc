@@ -1812,9 +1812,9 @@ namespace WeatherManager {
              state.dataWeatherManager->RptDayType = state.dataEnvrn->DayOfWeek;
         }
         state.dataEnvrn->DSTIndicator = state.dataWeatherManager->TodayVariables.DaylightSavingIndex;
-        DataEnvironment::EquationOfTime = state.dataWeatherManager->TodayVariables.EquationOfTime;
-        DataEnvironment::CosSolarDeclinAngle = state.dataWeatherManager->TodayVariables.CosSolarDeclinAngle;
-        DataEnvironment::SinSolarDeclinAngle = state.dataWeatherManager->TodayVariables.SinSolarDeclinAngle;
+        state.dataEnvrn->EquationOfTime = state.dataWeatherManager->TodayVariables.EquationOfTime;
+        state.dataEnvrn->CosSolarDeclinAngle = state.dataWeatherManager->TodayVariables.CosSolarDeclinAngle;
+        state.dataEnvrn->SinSolarDeclinAngle = state.dataWeatherManager->TodayVariables.SinSolarDeclinAngle;
     }
 
     void SetCurrentWeather(EnergyPlusData &state)
@@ -3718,7 +3718,7 @@ namespace WeatherManager {
                     if (state.dataGlobal->NumOfTimeStepInHour != 1) {
                         CurTime = double(hour - 1) + double(ts) * state.dataWeatherManager->TimeStepFraction;
                     } else {
-                        CurTime = double(hour) + DataEnvironment::TS1TimeOffset;
+                        CurTime = double(hour) + state.dataEnvrn->TS1TimeOffset;
                     }
 
                     Array1D<Real64> SUNCOS(3); // Sun direction cosines
@@ -4174,10 +4174,10 @@ namespace WeatherManager {
         // COMPUTE THE COSINE OF THE SOLAR ZENITH ANGLE.
         // This is also the Sine of the Solar Altitude Angle
 
-        SUNCOS(3) = SinSolDeclin * DataEnvironment::SinLatitude + CosSolDeclin * DataEnvironment::CosLatitude * COSH;
+        SUNCOS(3) = SinSolDeclin * state.dataEnvrn->SinLatitude + CosSolDeclin * state.dataEnvrn->CosLatitude * COSH;
 
         if (SUNCOS(3) >= DataEnvironment::SunIsUpValue) { // If Sun above horizon, compute other direction cosines
-            SUNCOS(2) = SinSolDeclin * DataEnvironment::CosLatitude - CosSolDeclin * DataEnvironment::SinLatitude * COSH;
+            SUNCOS(2) = SinSolDeclin * state.dataEnvrn->CosLatitude - CosSolDeclin * state.dataEnvrn->SinLatitude * COSH;
             SUNCOS(1) = CosSolDeclin * std::sin(H);
         } else { // Sun is down, set to 0.0
             SUNCOS(1) = 0.0;
@@ -4208,21 +4208,21 @@ namespace WeatherManager {
              state.dataWeatherManager->HrAngle = (15.0 * (12.0 - (state.dataGlobal->CurrentTime + state.dataWeatherManager->TodayVariables.EquationOfTime)) +
                        (state.dataEnvrn->TimeZoneMeridian - state.dataEnvrn->Longitude));
         } else {
-             state.dataWeatherManager->HrAngle = (15.0 * (12.0 - ((state.dataGlobal->CurrentTime + DataEnvironment::TS1TimeOffset) + state.dataWeatherManager->TodayVariables.EquationOfTime)) +
+             state.dataWeatherManager->HrAngle = (15.0 * (12.0 - ((state.dataGlobal->CurrentTime + state.dataEnvrn->TS1TimeOffset) + state.dataWeatherManager->TodayVariables.EquationOfTime)) +
                        (state.dataEnvrn->TimeZoneMeridian - state.dataEnvrn->Longitude));
         }
         Real64 H =  state.dataWeatherManager->HrAngle * DataGlobalConstants::DegToRadians();
 
         // Compute the Cosine of the Solar Zenith (Altitude) Angle.
-        Real64 CosZenith = DataEnvironment::SinLatitude * state.dataWeatherManager->TodayVariables.SinSolarDeclinAngle +
-                           DataEnvironment::CosLatitude * state.dataWeatherManager->TodayVariables.CosSolarDeclinAngle * std::cos(H);
+        Real64 CosZenith = state.dataEnvrn->SinLatitude * state.dataWeatherManager->TodayVariables.SinSolarDeclinAngle +
+                           state.dataEnvrn->CosLatitude * state.dataWeatherManager->TodayVariables.CosSolarDeclinAngle * std::cos(H);
 
         Real64 SolarZenith = std::acos(CosZenith);
-        Real64 SinAltitude = DataEnvironment::CosLatitude * state.dataWeatherManager->TodayVariables.CosSolarDeclinAngle * std::cos(H) +
-                             DataEnvironment::SinLatitude * state.dataWeatherManager->TodayVariables.SinSolarDeclinAngle;
+        Real64 SinAltitude = state.dataEnvrn->CosLatitude * state.dataWeatherManager->TodayVariables.CosSolarDeclinAngle * std::cos(H) +
+                             state.dataEnvrn->SinLatitude * state.dataWeatherManager->TodayVariables.SinSolarDeclinAngle;
         Real64 SolarAltitude = std::asin(SinAltitude);
         Real64 CosAzimuth =
-            -(DataEnvironment::SinLatitude * CosZenith - state.dataWeatherManager->TodayVariables.SinSolarDeclinAngle) / (DataEnvironment::CosLatitude * std::sin(SolarZenith));
+            -(state.dataEnvrn->SinLatitude * CosZenith - state.dataWeatherManager->TodayVariables.SinSolarDeclinAngle) / (state.dataEnvrn->CosLatitude * std::sin(SolarZenith));
         // Following because above can yield invalid cos value.  (e.g. at south pole)
         CosAzimuth = max(CosAzimuth, -1.0);
         CosAzimuth = min(1.0, CosAzimuth);
@@ -4241,8 +4241,8 @@ namespace WeatherManager {
             SunDirectionCosines(1) = 0.0;
         } else {
             state.dataEnvrn->SunIsUp = true;
-            SunDirectionCosines(2) = state.dataWeatherManager->TodayVariables.SinSolarDeclinAngle * DataEnvironment::CosLatitude -
-                                     state.dataWeatherManager->TodayVariables.CosSolarDeclinAngle * DataEnvironment::SinLatitude * std::cos(H);
+            SunDirectionCosines(2) = state.dataWeatherManager->TodayVariables.SinSolarDeclinAngle * state.dataEnvrn->CosLatitude -
+                                     state.dataWeatherManager->TodayVariables.CosSolarDeclinAngle * state.dataEnvrn->SinLatitude * std::cos(H);
             SunDirectionCosines(1) = state.dataWeatherManager->TodayVariables.CosSolarDeclinAngle * std::sin(H);
         }
     }
@@ -4493,8 +4493,8 @@ namespace WeatherManager {
         } else {
             state.dataEnvrn->TimeZoneMeridian = state.dataEnvrn->TimeZoneNumber * 15.0 - 360.0;
         }
-        DataEnvironment::SinLatitude = std::sin(DataGlobalConstants::DegToRadians() * state.dataEnvrn->Latitude);
-        DataEnvironment::CosLatitude = std::cos(DataGlobalConstants::DegToRadians() * state.dataEnvrn->Latitude);
+        state.dataEnvrn->SinLatitude = std::sin(DataGlobalConstants::DegToRadians() * state.dataEnvrn->Latitude);
+        state.dataEnvrn->CosLatitude = std::cos(DataGlobalConstants::DegToRadians() * state.dataEnvrn->Latitude);
 
         if (state.dataEnvrn->Latitude == 0.0 && state.dataEnvrn->Longitude == 0.0 && state.dataEnvrn->TimeZoneNumber == 0.0) {
             ShowWarningError(state, "Did you realize that you have Latitude=0.0, Longitude=0.0 and TimeZone=0.0?  Your building site is in the middle of "
@@ -7162,8 +7162,8 @@ namespace WeatherManager {
             ErrorsFound = true;
         }
 
-        DataEnvironment::WeatherFileWindModCoeff = std::pow(WeatherFileWindBLHeight / WeatherFileWindSensorHeight, WeatherFileWindExp);
-        DataEnvironment::WeatherFileTempModCoeff = DataEnvironment::AtmosphericTempGradient * DataEnvironment::EarthRadius *
+        state.dataEnvrn->WeatherFileWindModCoeff = std::pow(WeatherFileWindBLHeight / WeatherFileWindSensorHeight, WeatherFileWindExp);
+        state.dataEnvrn->WeatherFileTempModCoeff = DataEnvironment::AtmosphericTempGradient * DataEnvironment::EarthRadius *
                                                    WeatherFileTempSensorHeight / (DataEnvironment::EarthRadius + WeatherFileTempSensorHeight);
 
         // Write to the initialization output file
@@ -7181,8 +7181,8 @@ namespace WeatherManager {
               WeatherFileWindExp,
               WeatherFileWindBLHeight,
               WeatherFileTempSensorHeight,
-              DataEnvironment::WeatherFileWindModCoeff,
-              DataEnvironment::WeatherFileTempModCoeff);
+              state.dataEnvrn->WeatherFileWindModCoeff,
+              state.dataEnvrn->WeatherFileTempModCoeff);
     }
 
     void DayltgCurrentExtHorizIllum(EnergyPlusData &state)

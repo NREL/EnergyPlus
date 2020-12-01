@@ -737,29 +737,29 @@ namespace HeatBalanceManager {
             BuildingAzimuth = mod(BuildingNumbers(1), 360.0);
             // Terrain
             if (AlphaName(2) == "COUNTRY" || AlphaName(2) == "1") {
-                SiteWindExp = 0.14;
-                SiteWindBLHeight = 270.0;
+                state.dataEnvrn->SiteWindExp = 0.14;
+                state.dataEnvrn->SiteWindBLHeight = 270.0;
                 AlphaName(2) = "Country";
             } else if (AlphaName(2) == "SUBURBS" || AlphaName(2) == "2" || AlphaName(2) == "SUBURB") {
-                SiteWindExp = 0.22;
-                SiteWindBLHeight = 370.0;
+                state.dataEnvrn->SiteWindExp = 0.22;
+                state.dataEnvrn->SiteWindBLHeight = 370.0;
                 AlphaName(2) = "Suburbs";
             } else if (AlphaName(2) == "CITY" || AlphaName(2) == "3") {
-                SiteWindExp = 0.33;
-                SiteWindBLHeight = 460.0;
+                state.dataEnvrn->SiteWindExp = 0.33;
+                state.dataEnvrn->SiteWindBLHeight = 460.0;
                 AlphaName(2) = "City";
             } else if (AlphaName(2) == "OCEAN") {
-                SiteWindExp = 0.10;
-                SiteWindBLHeight = 210.0;
+                state.dataEnvrn->SiteWindExp = 0.10;
+                state.dataEnvrn->SiteWindBLHeight = 210.0;
                 AlphaName(2) = "Ocean";
             } else if (AlphaName(2) == "URBAN") {
-                SiteWindExp = 0.22;
-                SiteWindBLHeight = 370.0;
+                state.dataEnvrn->SiteWindExp = 0.22;
+                state.dataEnvrn->SiteWindBLHeight = 370.0;
                 AlphaName(2) = "Urban";
             } else {
                 ShowSevereError(state, RoutineName + CurrentModuleObject + ": " + cAlphaFieldNames(2) + " invalid=" + AlphaName(2));
-                SiteWindExp = 0.14;
-                SiteWindBLHeight = 270.0;
+                state.dataEnvrn->SiteWindExp = 0.14;
+                state.dataEnvrn->SiteWindBLHeight = 270.0;
                 AlphaName(2) = AlphaName(2) + "-invalid";
                 ErrorsFound = true;
             }
@@ -1453,9 +1453,9 @@ namespace HeatBalanceManager {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
 
-            if (NumNums > 0) SiteWindExp = NumArray(1);
-            if (NumNums > 1) SiteWindBLHeight = NumArray(2);
-            if (NumNums > 2) SiteTempGradient = NumArray(3);
+            if (NumNums > 0) state.dataEnvrn->SiteWindExp = NumArray(1);
+            if (NumNums > 1) state.dataEnvrn->SiteWindBLHeight = NumArray(2);
+            if (NumNums > 2) state.dataEnvrn->SiteTempGradient = NumArray(3);
 
         } else if (NumObjects > 1) {
             ShowSevereError(state, "Too many " + CurrentModuleObject + " objects, only 1 allowed.");
@@ -1466,7 +1466,7 @@ namespace HeatBalanceManager {
             // be overridden by a Site Atmospheric Variation Object.
             // SiteWindExp = 0.22
             // SiteWindBLHeight = 370.0
-            SiteTempGradient = 0.0065;
+            state.dataEnvrn->SiteTempGradient = 0.0065;
         }
 
         // Write to the initialization output file
@@ -1474,7 +1474,7 @@ namespace HeatBalanceManager {
             "! <Environment:Site Atmospheric Variation>,Wind Speed Profile Exponent {{}},Wind Speed Profile Boundary "
             "Layer Thickness {{m}},Air Temperature Gradient Coefficient {{K/m}}\n");
 
-        print(state.files.eio, Format_720, SiteWindExp, SiteWindBLHeight, SiteTempGradient);
+        print(state.files.eio, Format_720, state.dataEnvrn->SiteWindExp, state.dataEnvrn->SiteWindBLHeight, state.dataEnvrn->SiteTempGradient);
     }
 
     void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if errors found in input

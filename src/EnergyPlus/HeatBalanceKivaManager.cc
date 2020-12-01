@@ -211,8 +211,8 @@ namespace HeatBalanceKivaManager {
         bcs->outdoorTemp = kivaWeather.dryBulb[index] * weightNow + kivaWeather.dryBulb[indexPrev] * (1.0 - weightNow) + DataGlobalConstants::KelvinConv();
 
         bcs->localWindSpeed = (kivaWeather.windSpeed[index] * weightNow + kivaWeather.windSpeed[indexPrev] * (1.0 - weightNow)) *
-                             DataEnvironment::WeatherFileWindModCoeff *
-                             std::pow(instance.ground->foundation.grade.roughness / DataEnvironment::SiteWindBLHeight, DataEnvironment::SiteWindExp);
+                             state.dataEnvrn->WeatherFileWindModCoeff *
+                             std::pow(instance.ground->foundation.grade.roughness / state.dataEnvrn->SiteWindBLHeight, state.dataEnvrn->SiteWindExp);
         bcs->skyEmissivity = kivaWeather.skyEmissivity[index] * weightNow + kivaWeather.skyEmissivity[indexPrev] * (1.0 - weightNow);
         bcs->solarAzimuth = 3.14;
         bcs->solarAltitude = 0.0;
