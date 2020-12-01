@@ -5002,8 +5002,11 @@ namespace SolarShading {
                         }
                         GSS(NGSS) = GSSNR;
 
-                    } else if ((Surface(GSSNR).BaseSurf == 0) || (Surface(GSSNR).BaseSurf == GSSNR)) { // Detached shadowing surface or | any other base surface
-                                                                                             // exposed to outside environment
+                    } else if ((Surface(GSSNR).BaseSurf == 0) ||
+                               ((Surface(GSSNR).BaseSurf == GSSNR) &&
+                                ((Surface(GSSNR).ExtBoundCond == ExternalEnvironment) ||
+                                 Surface(GSSNR).ExtBoundCond == OtherSideCondModeledExt))) { // Detached shadowing surface or | any other base surface
+                        // exposed to outside environment
 
                         CHKGSS(GRSNR, GSSNR, ZMIN, CannotShade); // Check to see if this can shade the receiving surface
                         if (!CannotShade) {                      // Update the shadowing surface data if shading is possible

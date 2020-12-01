@@ -6910,10 +6910,6 @@ namespace HeatBalanceSurfaceManager {
                 Real64 &TH12(TH(2, 1, SurfNum));
                 TH12 = TempSurfInRep(SurfNum) = TempSurfIn(SurfNum);
                 SurfTempOut(SurfNum) = TH11; // For reporting
-                if (Surface(SurfNum).IsAirBoundarySurf) {
-                    double test = SurfTempOut(SurfNum);
-                    test = 0;
-                }
 
                 if (SurfWinOriginalClass(SurfNum) == SurfaceClass::TDD_Diffuser) { // Tubular daylighting device
                     // Tubular daylighting devices are treated as one big object with an effective R value.
