@@ -72,6 +72,7 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/IntegratedHeatPump.hh>
 
 namespace EnergyPlus {
 
@@ -1939,7 +1940,63 @@ namespace IceThermalStorage {
         }
     }
 
-    void UpdateIceFractions()
+    void UpdateIceFractionIHP(EnergyPlusData &state, std::string sType, const int IndexNum, const Real64 ChargeRate, const Real64 DischargRate)
+    {
+        Real64 NetRate = ChargeRate - DischargRate; 
+
+        if (UtilityRoutines::SameString(sType, "ThermalStorage:Ice:Simple")) {
+            if (IndexNum != 0) {
+                SimpleIceStorage(IndexNum).ITSChargingRate = ChargeRate; 
+                SimpleIceStorage(IndexNum).ITSCoolingRate = DischargRate; 
+                SimpleIceStorage(IndexNum).Urate = NetRate * 3600.0 / SimpleIceStorage(IndexNum).ITSNomCap; 
+                SimpleIceStorage(IndexNum).IceFracRemain += SimpleIceStorage(IndexNum).Urate * DataHVACGlobals::TimeStepSys;
+                if (SimpleIceStorage(IndexNum).IceFracRemain <= 0.001) SimpleIceStorage(IndexNum).IceFracRemain = 0.0;
+                if (SimpleIceStorage(IndexNum).IceFracRemain > 1.0) SimpleIceStorage(IndexNum).IceFracRemain = 1.0;
+                // std::cout << "********************************************** IceFracRemain =" << thisITS.IceFracRemain << endl;
+            }
+        } else if (UtilityRoutines::SameString(sType, "ThermalStorage:Ice:Detailed")) {
+            if (IndexNum != 0) {
+                DetailedIceStorage(IndexNum).ChargingRate = ChargeRate; 
+                DetailedIceStorage(IndexNum).DischargingRate = DischargRate;
+
+                DetailedIceStorage(IndexNum).IceFracChange = NetRate * DataHVACGlobals::TimeStepSys / DetailedIceStorage(IndexNum).NomCapacity;
+
+                DetailedIceStorage(IndexNum).IceFracRemaining +=
+                    DetailedIceStorage(IndexNum).IceFracChange - (DetailedIceStorage(IndexNum).TankLossCoeff * DataHVACGlobals::TimeStepSys);
+                if (DetailedIceStorage(IndexNum).IceFracRemaining < 0.001) DetailedIceStorage(IndexNum).IceFracRemaining = 0.0;
+                if (DetailedIceStorage(IndexNum).IceFracRemaining > 1.000) DetailedIceStorage(IndexNum).IceFracRemaining = 1.0;
+                // Reset the ice on the coil to zero for inside melt whenever discharging takes place.
+                // This assumes that any remaining ice floats away from the coil and resettles perfectly.
+                // While this is not exactly what happens and it is possible theoretically to have multiple
+                // freeze thaw cycles that are not complete, this is the best we can do.
+                if (DetailedIceStorage(IndexNum).ThawProcessIndex == DetIce::InsideMelt) {
+                    if (DetailedIceStorage(IndexNum).IceFracChange < 0.0) {
+                        DetailedIceStorage(IndexNum).IceFracOnCoil = 0.0;
+                    } else {
+                        // Assume loss term does not impact ice on the coil but what is remaining
+                        DetailedIceStorage(IndexNum).IceFracOnCoil += DetailedIceStorage(IndexNum).IceFracChange;
+                        // If the ice remaining has run out because of tank losses, reset ice fraction on coil so that it keeps track of losses
+                        if (DetailedIceStorage(IndexNum).IceFracOnCoil > DetailedIceStorage(IndexNum).IceFracRemaining)
+                            DetailedIceStorage(IndexNum).IceFracOnCoil = DetailedIceStorage(IndexNum).IceFracRemaining;
+                    }
+                } else { // Outside melt system so IceFracOnCoil is always the same as IceFracRemaining (needs to be done for reporting only)
+                    DetailedIceStorage(IndexNum).IceFracOnCoil = DetailedIceStorage(IndexNum).IceFracRemaining;
+                }
+            }
+        } else if (UtilityRoutines::SameString(sType, "ThermalStorage:Pcm:Simple")) {
+            if (IndexNum != 0) {
+                SimplePcmStorage(IndexNum).PcmTSChargingRate = ChargeRate;
+                SimplePcmStorage(IndexNum).PcmTSCoolingRate = DischargRate; 
+
+                SimplePcmStorage(IndexNum).Urate = NetRate * 3600.0 / SimplePcmStorage(IndexNum).PcmTSNomCap; 
+                SimplePcmStorage(IndexNum).PcmFracRemain += SimplePcmStorage(IndexNum).Urate * DataHVACGlobals::TimeStepSys;
+                if (SimplePcmStorage(IndexNum).PcmFracRemain <= 0.001) SimplePcmStorage(IndexNum).PcmFracRemain = 0.0;
+                if (SimplePcmStorage(IndexNum).PcmFracRemain > 1.0) SimplePcmStorage(IndexNum).PcmFracRemain = 1.0;
+            }
+        }
+    }
+
+    void UpdateIceFractions(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1956,6 +2013,11 @@ namespace IceThermalStorage {
         // a system time step.
 
         for (auto &thisITS : SimpleIceStorage) {
+            if (thisITS.idIHP > 0) {
+                IntegratedHeatPump::UpdateIceStorage(state, thisITS.idIHP);
+                return;
+            }
+
             thisITS.IceFracRemain += thisITS.Urate * DataHVACGlobals::TimeStepSys;
             if (thisITS.IceFracRemain <= 0.001) thisITS.IceFracRemain = 0.0;
             if (thisITS.IceFracRemain > 1.0) thisITS.IceFracRemain = 1.0;
@@ -1963,6 +2025,11 @@ namespace IceThermalStorage {
         }
 
         for (auto &thisITS : DetailedIceStorage) {
+            if (thisITS.idIHP > 0) {
+                IntegratedHeatPump::UpdateIceStorage(state, thisITS.idIHP);
+                return;
+            }
+
             thisITS.IceFracRemaining += thisITS.IceFracChange - (thisITS.TankLossCoeff * DataHVACGlobals::TimeStepSys);
             if (thisITS.IceFracRemaining < 0.001) thisITS.IceFracRemaining = 0.0;
             if (thisITS.IceFracRemaining > 1.000) thisITS.IceFracRemaining = 1.0;
@@ -1985,6 +2052,11 @@ namespace IceThermalStorage {
         }
 
         for (auto &thisPcmTS : SimplePcmStorage) {
+            if (thisPcmTS.idIHP > 0) {
+                IntegratedHeatPump::UpdateIceStorage(state, thisPcmTS.idIHP);
+                return;
+            }
+
             thisPcmTS.PcmFracRemain += thisPcmTS.Urate * DataHVACGlobals::TimeStepSys;
             if (thisPcmTS.PcmFracRemain <= 0.001) thisPcmTS.PcmFracRemain = 0.0;
             if (thisPcmTS.PcmFracRemain > 1.0) thisPcmTS.PcmFracRemain = 1.0;
@@ -2947,6 +3019,44 @@ namespace IceThermalStorage {
         }
 
         return (dFraction);
+    }
+
+    void SetIHPID(EnergyPlusData &state, std::string sType, const int IndexNum, int idIHP)
+    {
+        if (UtilityRoutines::SameString(sType, "ThermalStorage:Ice:Simple")) {
+            if (IndexNum != 0) {
+                SimpleIceStorage(IndexNum).idIHP = idIHP; 
+            }
+        } else if (UtilityRoutines::SameString(sType, "ThermalStorage:Ice:Detailed")) {
+            if (IndexNum != 0) {
+                DetailedIceStorage(IndexNum).idIHP = idIHP; 
+            }
+        } else if (UtilityRoutines::SameString(sType, "ThermalStorage:Pcm:Simple")) {
+            if (IndexNum != 0) {
+                SimplePcmStorage(IndexNum).idIHP = idIHP; 
+            }
+        }
+    }
+
+    int GetWaterInletNode(EnergyPlusData &state, std::string sType, const int IndexNum)
+    {
+        int iRet = 0; 
+
+        if (UtilityRoutines::SameString(sType, "ThermalStorage:Ice:Simple")) {
+            if (IndexNum != 0) {
+                iRet  = SimpleIceStorage(IndexNum).PltInletNodeNum;
+            }
+        } else if (UtilityRoutines::SameString(sType, "ThermalStorage:Ice:Detailed")) {
+            if (IndexNum != 0) {
+                iRet = DetailedIceStorage(IndexNum).PlantInNodeNum; 
+            }
+        } else if (UtilityRoutines::SameString(sType, "ThermalStorage:Pcm:Simple")) {
+            if (IndexNum != 0) {
+                iRet = SimplePcmStorage(IndexNum).PltInletNodeNum;
+            }
+        }
+
+        return (iRet); 
     }
 
 } // namespace IceThermalStorage

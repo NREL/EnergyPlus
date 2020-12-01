@@ -144,6 +144,7 @@ namespace IceThermalStorage {
 
         bool MyPlantScanFlag;
         bool MyEnvrnFlag2;
+        int idIHP; 
 
         // Default Constructor
         SimpleIceStorageData()
@@ -151,7 +152,7 @@ namespace IceThermalStorage {
               BranchNum(0), CompNum(0), DesignMassFlowRate(0.0), FreezeTemp(0.0), ResetXForITSFlag(false), MyEnvrnFlag(true), UAIceCh(0.0),
               UAIceDisCh(0.0), HLoss(0.0), XCurIceFrac(0.0), ITSMassFlowRate(0.0), ITSInletTemp(0.0), ITSOutletTemp(0.0), ITSOutletSetPointTemp(0.0),
               ITSCoolingRate(0.0), ITSCoolingEnergy(0.0), CheckEquipName(true), MyLoad(0.0), Urate(0.0), IceFracRemain(0.0), ITSChargingRate(0.0),
-              ITSChargingEnergy(0.0), ITSmdot(0.0), ITSCoolingRate_rep(0.0), ITSCoolingEnergy_rep(0.0), MyPlantScanFlag(true), MyEnvrnFlag2(true)
+              ITSChargingEnergy(0.0), ITSmdot(0.0), ITSCoolingRate_rep(0.0), ITSCoolingEnergy_rep(0.0), MyPlantScanFlag(true), MyEnvrnFlag2(true), idIHP(0)
         {
         }
 
@@ -240,6 +241,7 @@ namespace IceThermalStorage {
         bool CheckEquipName;
         bool MyPlantScanFlag;
         bool MyEnvrnFlag2;
+        int idIHP; 
 
         // Default Constructor
         DetailedIceStorageData()
@@ -250,7 +252,7 @@ namespace IceThermalStorage {
               ChargingEnergy(0.0), MassFlowRate(0.0), BypassMassFlowRate(0.0), TankMassFlowRate(0.0), InletTemp(0.0), OutletTemp(0.0),
               TankOutletTemp(0.0), ParasiticElecRate(0.0), ParasiticElecEnergy(0.0), DischargeIterErrors(0), DischargeErrorCount(0),
               ChargeIterErrors(0), ChargeErrorCount(0), ResetXForITSFlag(false), MyEnvrnFlag(true), CheckEquipName(true), MyPlantScanFlag(true),
-              MyEnvrnFlag2(true)
+              MyEnvrnFlag2(true), idIHP(0)
         {
         }
 
@@ -313,6 +315,7 @@ namespace IceThermalStorage {
 
         bool MyPlantScanFlag;
         bool MyEnvrnFlag2;
+        int idIHP; 
 
         Real64 OnsetTemp;
         Real64 FinishTemp; 
@@ -325,7 +328,7 @@ namespace IceThermalStorage {
               DesignMassFlowRate(0.0), FreezeTemp(0.0), ResetXForPcmTSFlag(false), MyEnvrnFlag(true), UAIceCh(0.0), UAIceDisCh(0.0), HLoss(0.0),
               XCurPcmFrac(0.0), PcmTSMassFlowRate(0.0), PcmTSInletTemp(0.0), PcmTSOutletTemp(0.0), PcmTSOutletSetPointTemp(0.0), PcmTSCoolingRate(0.0),
               PcmTSCoolingEnergy(0.0), CheckEquipName(true), MyLoad(0.0), Urate(0.0), PcmFracRemain(0.0), PcmTSChargingRate(0.0), PcmTSChargingEnergy(0.0), PcmTSmdot(0.0), PcmTSCoolingRate_rep(0.0), PcmTSCoolingEnergy_rep(0.0),
-              MyPlantScanFlag(true), MyEnvrnFlag2(true), OnsetTemp(0.0), FinishTemp(0.0), OnsetUA(10000), FinishUA(10000)
+              MyPlantScanFlag(true), MyEnvrnFlag2(true), OnsetTemp(0.0), FinishTemp(0.0), OnsetUA(10000), FinishUA(10000), idIHP(0)
         {
         }
 
@@ -387,7 +390,12 @@ namespace IceThermalStorage {
 
     Real64 TempIPtoSI(Real64 Temp);
 
-    void UpdateIceFractions();
+    void UpdateIceFractions(EnergyPlusData &state);
+
+    void UpdateIceFractionIHP(EnergyPlusData &state, std::string sType, const int IndexNum, 
+        const Real64 ChargeRate, const Real64 DischargRate); 
+
+    void SetIHPID(EnergyPlusData &state, std::string sType, const int IndexNum, int idIHP); 
 
     void SetIceStoreNormCapacity(EnergyPlusData &state, 
         std::string sType, std::string sName, const Real64 dNormCapacity); 
@@ -412,6 +420,8 @@ namespace IceThermalStorage {
     Real64 GetIceFraction(EnergyPlusData &state, std::string sType, const int IndexNum); 
      
     PlantLocation GetTankPlantLocation(EnergyPlusData &state, std::string sType, const int IndexNum); 
+
+    int GetWaterInletNode(EnergyPlusData &state, std::string sType, const int IndexNum); 
         
 
 } // namespace IceThermalStorage

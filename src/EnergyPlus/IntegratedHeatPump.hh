@@ -212,6 +212,7 @@ namespace IntegratedHeatPump {
         Real64 SupWaterCoilWaterFRatio; //water coil air flow ratio
         Real64 SupWaterCoilAirFRatio; //water coil air flow ratio
         int ChillerRunSpeed;//chiller exit target temperature
+        Real64 DischargeCapacity;//last moment discharge capacity
 
         bool bIsEnhanchedDumLastMoment; //whether the last moment dehumidification
         bool bIsDWHSeparateunit;//whether DWH is a separate unit
@@ -308,6 +309,8 @@ namespace IntegratedHeatPump {
         Real64 TankSaltMass;//salt mass in the tank
         Real64 CompressorPartLoadRatio;//compressor part load ratio
         int iWorkMode; 
+        Real64 LastTime; 
+
 
         // Default Constructor
         IntegratedHeatPumpData()
@@ -337,34 +340,21 @@ namespace IntegratedHeatPump {
               bIsEnhanchedDumLastMoment(false), // whether the last moment dehumidification
               SHCoilSize(1.0), DWHCoilSize(1.0), SCWHCoilSize(1.0), SCDWHCoolCoilSize(1.0), SCDWHWHCoilSize(0.13), SHDWHHeatCoilSize(0.9),
               SHDWHWHCoilSize(0.1), EnDehumCoilSize(0.95), GridSCCoilSize(1.0), GridSHCoilSize(1.0), ChillerSize(1.0),
-              StorageType(IHPStorageType::HOTWATER), 
-              DehumPlace(DehumPlacement::OUTDOOR),
-              LDDehumCoilIndex(0),
-              LDRegenCoilIndex(0), 
-              EvapCoolCoilIndex(0), 
-              ChillerCoilIndex(0), 
-              SupWaterCoilIndex(0),
-              bIsDWHSeparateunit(false), 
-              bIsChillerSeparateunit(false), 
-              ChillTankIndex(0),
-              TlimitSCWH(110.0), // temperature limit apply combined sc and wh mode
-              TlimitSCDWH(150.0),                                 // temperature limit apply scdwh mode
-              TlimitDWH(130.0),                                   // temperature limit apply DWH mode
-              TregenTarget(180.0),                                // target regeneration temperature
-              Concen_Set(0.45),                                  // salt concentration setting
-              Concen_band(0.05),                                 // salt concentration deadband
-              ChillerRunSpeed(1),     // chiller run speed
-              SupWaterCoilWaterFRatio(1.0), SupWaterCoilAirFRatio(1.0),
-              IceStoreMode(0), //ice storage off
-              ChargFracLow(0.9),//charing fraction
-              AirCoolOutletNodeNum(0), 
-              DehumLDMassFlowRate(0.0), SupHeatRate(0.0), SupHeatEnergy(0), WaterMiddleNodeNum(0), 
-              LDLoopChecked(false),
-              SaltConcentration(0.0), LDHeatMode(0), TankLDMass(0.0), TankSaltMass(0.0), 
-              DehumLDMassFlowSize(1.0), GridSHCoilIndex(0),
-              DehumAirMasslowRate(0.0), DehumAirMasslowSize(1.0), RegenAirMasslowRate(0.0), 
-              RegenAirMasslowSize(1.0), RegenLDMassFlowRate(0.0),
-              CompressorPartLoadRatio(0.0), SHR(1.0), iWorkMode(0)
+              StorageType(IHPStorageType::HOTWATER), DehumPlace(DehumPlacement::OUTDOOR), LDDehumCoilIndex(0), LDRegenCoilIndex(0),
+              EvapCoolCoilIndex(0), ChillerCoilIndex(0), SupWaterCoilIndex(0), bIsDWHSeparateunit(false), bIsChillerSeparateunit(false),
+              ChillTankIndex(0), TlimitSCWH(110.0),                                      // temperature limit apply combined sc and wh mode
+              TlimitSCDWH(150.0),                                                        // temperature limit apply scdwh mode
+              TlimitDWH(130.0),                                                          // temperature limit apply DWH mode
+              TregenTarget(180.0),                                                       // target regeneration temperature
+              Concen_Set(0.45),                                                          // salt concentration setting
+              Concen_band(0.05),                                                         // salt concentration deadband
+              ChillerRunSpeed(1),                                                        // chiller run speed
+              SupWaterCoilWaterFRatio(1.0), SupWaterCoilAirFRatio(1.0), IceStoreMode(0), // ice storage off
+              ChargFracLow(0.9),                                                         // charing fraction
+              AirCoolOutletNodeNum(0), DehumLDMassFlowRate(0.0), SupHeatRate(0.0), SupHeatEnergy(0), WaterMiddleNodeNum(0), LDLoopChecked(false),
+              SaltConcentration(0.0), LDHeatMode(0), TankLDMass(0.0), TankSaltMass(0.0), DehumLDMassFlowSize(1.0), GridSHCoilIndex(0),
+              DehumAirMasslowRate(0.0), DehumAirMasslowSize(1.0), RegenAirMasslowRate(0.0), RegenAirMasslowSize(1.0), RegenLDMassFlowRate(0.0),
+              CompressorPartLoadRatio(0.0), SHR(1.0), iWorkMode(0), LastTime(0.0), DischargeCapacity(0.0)
         {
         }
     };

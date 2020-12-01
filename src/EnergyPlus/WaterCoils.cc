@@ -4427,7 +4427,7 @@ namespace WaterCoils {
         if (state.dataWaterCoils->WaterCoil(CoilNum).LiqDesiccantAirSource == state.dataWaterCoils->ZoneAirSource) { // Zone air source
 
                 // If Coil is Scheduled ON then do the simulation
-            if (((GetCurrentScheduleValue(state, state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr) > 0.0) &&
+            if (((PartLoadRatio > 0.0) && (GetCurrentScheduleValue(state, state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr) > 0.0) &&
                      (state.dataWaterCoils->WaterCoil(CoilNum).InletWaterMassFlowRate > 0.0) &&
                      (state.dataWaterCoils->WaterCoil(CoilNum).InletAirMassFlowRate >= state.dataWaterCoils->MinAirMassFlow) &&
                      (state.dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate > 0.0) &&
@@ -4523,7 +4523,8 @@ namespace WaterCoils {
             else // outdoor air source "OutdoorAirSource"
             {
                 // If Coil is Scheduled ON then do the simulation
-                if (((GetCurrentScheduleValue(state, state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr) > 0.0) && (state.dataWaterCoils->WaterCoil(CoilNum).InletWaterMassFlowRate > 0.0) &&
+                if (((PartLoadRatio > 0.0) && (GetCurrentScheduleValue(state, state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr) > 0.0) &&
+                     (state.dataWaterCoils->WaterCoil(CoilNum).InletWaterMassFlowRate > 0.0) &&
                      (state.dataWaterCoils->WaterCoil(CoilNum).InletAirMassFlowRate >= state.dataWaterCoils->MinAirMassFlow) &&
                      (state.dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate > 0.0) &&
                      (state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterMassFlowRate > 0.0)) ||

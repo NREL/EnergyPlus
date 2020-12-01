@@ -460,7 +460,7 @@ namespace HVACManager {
 
             DetectOscillatingZoneTemp(state);
             UpdateZoneListAndGroupLoads(); // Must be called before UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepSystem)
-            UpdateIceFractions();          // Update fraction of ice stored in TES
+            UpdateIceFractions(state);          // Update fraction of ice stored in TES
             ManageWater(state);
             // update electricity data for net, purchased, sold etc.
             DummyLogical = false;

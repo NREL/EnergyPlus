@@ -4203,6 +4203,95 @@ namespace VariableSpeedCoils {
                                         _,
                                         "System");
                 }
+                else if(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == CoilDX_ChillerAirSourceVariableSpeed) {
+                    // chiller coil
+                    // Setup Report variables for air source chiller
+                    SetupOutputVariable(state,
+                                        "Cooling Coil Electricity Rate",
+                                        OutputProcessor::Unit::W,
+                                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Power,
+                                        "System",
+                                        "Average",
+                                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
+                    SetupOutputVariable(state,
+                                        "Cooling Coil Total Cooling Rate",
+                                        OutputProcessor::Unit::W,
+                                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).QLoadTotal,
+                                        "System",
+                                        "Average",
+                                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);                    
+                    SetupOutputVariable(state,
+                                        "Cooling Coil Source Side Heat Transfer Rate",
+                                        OutputProcessor::Unit::W,
+                                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).QSource,
+                                        "System",
+                                        "Average",
+                                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
+                    SetupOutputVariable(state,
+                                        "Cooling Coil Part Load Ratio",
+                                        OutputProcessor::Unit::None,
+                                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).PartLoadRatio,
+                                        "System",
+                                        "Average",
+                                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
+                    SetupOutputVariable(state,
+                                        "Cooling Coil Runtime Fraction",
+                                        OutputProcessor::Unit::None,
+                                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RunFrac,
+                                        "System",
+                                        "Average",
+                                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
+
+                    SetupOutputVariable(state,
+                                        "Cooling Coil Air Mass Flow Rate",
+                                        OutputProcessor::Unit::kg_s,
+                                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirMassFlowRate,
+                                        "System",
+                                        "Average",
+                                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);                   
+                    SetupOutputVariable(state,
+                                        "Cooling Coil Water Mass Flow Rate",
+                                        OutputProcessor::Unit::kg_s,
+                                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).WaterMassFlowRate,
+                                        "System",
+                                        "Average",
+                                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
+                    SetupOutputVariable(state,
+                                        "Cooling Coil Water Side Inlet Temperature",
+                                        OutputProcessor::Unit::C,
+                                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletWaterTemp,
+                                        "System",
+                                        "Average",
+                                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
+                    SetupOutputVariable(state,
+                                        "Cooling Coil Water Outlet Temperature",
+                                        OutputProcessor::Unit::C,
+                                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).OutletWaterTemp,
+                                        "System",
+                                        "Average",
+                                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
+                    SetupOutputVariable(state,
+                                        "Cooling Coil Upper Speed Level",
+                                        OutputProcessor::Unit::None,
+                                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).SpeedNumReport,
+                                        "System",
+                                        "Average",
+                                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
+                    SetupOutputVariable(state,
+                                        "Cooling Coil Neighboring Speed Levels Ratio",
+                                        OutputProcessor::Unit::None,
+                                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).SpeedRatioReport,
+                                        "System",
+                                        "Average",
+                                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
+                    SetupOutputVariable(state,
+                                        "Cooling Coil Recoverable Heat Transfer Rate",
+                                        OutputProcessor::Unit::W,
+                                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).QWasteHeat,
+                                        "System",
+                                        "Average",
+                                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
+                }
             }
         }
 
@@ -7628,8 +7717,8 @@ namespace VariableSpeedCoils {
         int MaxSpeed;         // maximum speed level
         int SpeedCal;         // calculated speed level
         Real64 RhoWater(0.0); // water density
-        Real64 COPWaterFFModFac;    // water flow fraction modification
-        Real64 COPTempModFac;       // total capacity temperature correctio fraction
+        Real64 EIRWaterFFModFac;    // water flow fraction modification
+        Real64 EIRTempModFac;       // total capacity temperature correctio fraction
         Real64 TOTCAPWaterFFModFac; // water flow fraction modification
         Real64 TOTCAPTempModFac;    // total capacity temperature correctio fractionn
         Real64 COP;                 // total capacity temperature correctio fraction
@@ -7735,13 +7824,13 @@ namespace VariableSpeedCoils {
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).HPWHCondPumpElecNomPower =
                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSWHPumpPower(SpeedCal);
 
-            COPTempModFac = CurveValue(state,
+            EIRTempModFac = CurveValue(state,
                                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRFTemp(SpeedCal), 
                                         InletWaterTemp, InletAirTemp);
 
-            COPWaterFFModFac = CurveValue(state, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRWaterFFlow(SpeedCal), WaterMassFlowRatio);
+            EIRWaterFFModFac = CurveValue(state, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRWaterFFlow(SpeedCal), WaterMassFlowRatio);
 
-            COP = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedCOP(SpeedCal) * COPTempModFac  * COPWaterFFModFac;
+            COP = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedCOP(SpeedCal)/( EIRTempModFac  * EIRWaterFFModFac);
 
             TOTCAPTempModFac = CurveValue(state,
                                           state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSCCapFTemp(SpeedCal), 
@@ -7790,11 +7879,11 @@ namespace VariableSpeedCoils {
 
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).HPWHCondPumpElecNomPower =
                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSWHPumpPower(SpeedCal);
-            COPTempModFac = CurveValue(state,
+            EIRTempModFac = CurveValue(state,
                                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRFTemp(SpeedCal), InletWaterTemp, InletAirTemp);
-            COPWaterFFModFac = CurveValue(state, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRWaterFFlow(SpeedCal), WaterMassFlowRatio);
+            EIRWaterFFModFac = CurveValue(state, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRWaterFFlow(SpeedCal), WaterMassFlowRatio);
 
-            COP = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedCOP(SpeedCal) * COPTempModFac * COPWaterFFModFac;
+            COP = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedCOP(SpeedCal) /( EIRTempModFac * EIRWaterFFModFac);
 
             TOTCAPTempModFac = CurveValue(state,
                                           state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSCCapFTemp(SpeedCal), InletWaterTemp, InletAirTemp);
@@ -7814,11 +7903,11 @@ namespace VariableSpeedCoils {
 
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).HPWHCondPumpElecNomPower =
                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSWHPumpPower(SpeedCal);
-            COPTempModFac = CurveValue(state,
+            EIRTempModFac = CurveValue(state,
                                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRFTemp(SpeedCal), InletWaterTemp, InletAirTemp);
-            COPWaterFFModFac = CurveValue(state, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRWaterFFlow(SpeedCal), WaterMassFlowRatio);
+            EIRWaterFFModFac = CurveValue(state, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRWaterFFlow(SpeedCal), WaterMassFlowRatio);
 
-            COP = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedCOP(SpeedCal) * COPTempModFac  * COPWaterFFModFac;
+            COP = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedCOP(SpeedCal) /( EIRTempModFac  * EIRWaterFFModFac );
 
             TOTCAPTempModFac = CurveValue(state,
                                           state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSCCapFTemp(SpeedCal), InletWaterTemp, InletAirTemp);

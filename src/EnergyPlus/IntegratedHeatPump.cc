@@ -189,7 +189,8 @@ namespace IntegratedHeatPump {
 
         IntegratedHeatPumps(DXCoilNum).bIsEnhanchedDumLastMoment = false; 
         airMassFlowRate = Node(IntegratedHeatPumps(DXCoilNum).AirCoolInletNodeNum).MassFlowRate;
-        waterMassFlowRate = Node(IntegratedHeatPumps(DXCoilNum).WaterInletNodeNum).MassFlowRate;
+        if (IntegratedHeatPumps(DXCoilNum).WaterInletNodeNum > 0)
+            waterMassFlowRate = Node(IntegratedHeatPumps(DXCoilNum).WaterInletNodeNum).MassFlowRate;
         IntegratedHeatPumps(DXCoilNum).AirLoopFlowRate = airMassFlowRate;
 
         switch (IntegratedHeatPumps(DXCoilNum).CurMode) {
@@ -3511,6 +3512,9 @@ namespace IntegratedHeatPump {
                     if (0 == IntegratedHeatPumps(DXCoilNum).ChillTankIndex) {
                         ShowContinueError(state, "...specified in " + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
                         ErrorsFound = true;
+                    } else {
+                        IceThermalStorage::SetIHPID(
+                            state, IntegratedHeatPumps(DXCoilNum).ChillTankType, IntegratedHeatPumps(DXCoilNum).ChillTankIndex, DXCoilNum); 
                     }
                 }
             };
@@ -5468,6 +5472,13 @@ namespace IntegratedHeatPump {
                                 "System",
                                 "Average",
                                 IntegratedHeatPumps(DXCoilNum).Name);
+            SetupOutputVariable(state,
+                                "Integrated Heat Pump Supplemental Cooling Capacity",
+                                OutputProcessor::Unit::W,
+                                IntegratedHeatPumps(DXCoilNum).DischargeCapacity,
+                                "System",
+                                "Average",
+                                IntegratedHeatPumps(DXCoilNum).Name);
         }
     }
 
@@ -5812,6 +5823,8 @@ namespace IntegratedHeatPump {
         IntegratedHeatPumps(DXCoilNum).EnergySource = 0.0;                // total source energy
         IntegratedHeatPumps(DXCoilNum).TotalCOP = 0.0;
         IntegratedHeatPumps(DXCoilNum).SupHeatRate = 0.0; 
+
+        ClearCoils(state, DXCoilNum); 
     }
 
     void UpdateIHP(EnergyPlusData &state, int const DXCoilNum)
@@ -6045,109 +6058,79 @@ namespace IntegratedHeatPump {
 
         Real64 EMP1(0.0), EMP2(0.0), EMP3(0.0); // place holder to calling clear up function
         int CycFanCycCoil(1);                   // fan cycl manner place holder
-
-        Real64 CurLoad = 0.0;
-        Real64 TankOutTemp = 0.0;
         Real64 TankFraction = 0.0;
-        Real64 TankFractionNew = 0.0;
-        PlantLocation IceTankLoc = IceThermalStorage::GetTankPlantLocation(
-            state, IntegratedHeatPumps(DXCoilNum).ChillTankType, IntegratedHeatPumps(DXCoilNum).ChillTankIndex);
-        Real64 dTankOutSet = 0.0;
-        Real64 dToutChiller = 0.0;
+        Real64 ChillCapacity = 0.0; 
         Real64 dTinChiller = -0.5; 
-        Real64 dTHigh = 20.0; 
-        Real64 dTLow = -20.0; 
-        const int MaxIterNum = 10; 
-        int IterNum = 0; 
 
-        if ((IntegratedHeatPumps(DXCoilNum).ChillTankIndex > 0) && (IntegratedHeatPumps(DXCoilNum).ChillerCoilIndex > 0) &&
-            (IceTankLoc.compNum > 0)) {
+        int iChillInNode = state.dataVariableSpeedCoils->VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).ChillerCoilIndex).WaterInletNodeNum;
+        Real64 ChillerWFlowRate = state.dataVariableSpeedCoils->VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).ChillerCoilIndex).DesignWaterMassFlowRate;
+        Real64 DischargeCapacity = state.dataWaterCoils->WaterCoil(IntegratedHeatPumps(DXCoilNum).SupWaterCoilIndex).TotWaterCoolingCoilRate;
+        IntegratedHeatPumps(DXCoilNum).DischargeCapacity = DischargeCapacity; 
+                          
+        if  (!state.dataGlobal->WarmupFlag) {
+            //initialization
+            SimVariableSpeedCoils(state, 
+                BlankString, IntegratedHeatPumps(DXCoilNum).ChillerCoilIndex, CycFanCycCoil, EMP1, EMP2, EMP3, 
+                1, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
             // charge the storage tank
-            int iChillInNode = state.dataVariableSpeedCoils->VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).ChillerCoilIndex).WaterInletNodeNum; 
-            Real64 ChillerWFlowRate =
-                state.dataVariableSpeedCoils->VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).ChillerCoilIndex).MSRatedWaterMassFlowRate(1);
-
+            
             TankFraction = IceThermalStorage::
                 GetIceFraction(state, IntegratedHeatPumps(DXCoilNum).ChillTankType, IntegratedHeatPumps(DXCoilNum).ChillTankIndex);
+            ChillCapacity = 0.0; 
+
+            int iIceMode = IntegratedHeatPumps(DXCoilNum).IceStoreMode;  
 
             if ((((TankFraction < IntegratedHeatPumps(DXCoilNum).ChargFracLow) 
-                && (0 == IntegratedHeatPumps(DXCoilNum).IceStoreMode)) || 
-                ((TankFraction < 0.99) && (1 == IntegratedHeatPumps(DXCoilNum).IceStoreMode)))   
+                && (0 == iIceMode)) || ((TankFraction < 0.99) && (1 == iIceMode)))   
                 && ((IntegratedHeatPumps(DXCoilNum).bIsChillerSeparateunit == true) || 
-                    (IntegratedHeatPumps(DXCoilNum).CurMode == IHPOperationMode::IdleMode)))
-            {
-                PlantComponent *pcTank =
-                    IceTankReference(state, IntegratedHeatPumps(DXCoilNum).ChillTankType, IntegratedHeatPumps(DXCoilNum).ChillTankName);
-
-                Real64 dDesignFlowBack = IceThermalStorage::GetDesignMassFlowRate(
-                    state, IntegratedHeatPumps(DXCoilNum).ChillTankType, IntegratedHeatPumps(DXCoilNum).ChillTankIndex);
-                dTankOutSet = IceThermalStorage::GetTankOutSetpoint(
-                    state, IntegratedHeatPumps(DXCoilNum).ChillTankType, IntegratedHeatPumps(DXCoilNum).ChillTankIndex);
-
-                Node(iChillInNode).MassFlowRate = ChillerWFlowRate; 
-
-                while (IterNum < MaxIterNum) {
-                    Node(iChillInNode).Temp = dTinChiller;
-
-                    SimVariableSpeedCoils(state,
-                                          BlankString,
-                                          IntegratedHeatPumps(DXCoilNum).ChillerCoilIndex,
-                                          CycFanCycCoil,
-                                          EMP1,
-                                          EMP2,
-                                          EMP3,
-                                          1,
-                                          1.0,
-                                          IntegratedHeatPumps(DXCoilNum).ChillerRunSpeed,
-                                          1.0,
-                                          0.0,
-                                          0.0,
-                                          1.0);
-                    dToutChiller = state.dataVariableSpeedCoils->VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).ChillerCoilIndex).OutletWaterTemp;
-
-                    IceThermalStorage::SetDesignMassFlowRate(
-                        state, IntegratedHeatPumps(DXCoilNum).ChillTankType, IntegratedHeatPumps(DXCoilNum).ChillTankIndex, ChillerWFlowRate);
-                    IceThermalStorage::SetInletTemperature(
-                        state, IntegratedHeatPumps(DXCoilNum).ChillTankType, IntegratedHeatPumps(DXCoilNum).ChillTankIndex, dToutChiller);
-
-                    //assume -0.5 C constant set point
-                    IceThermalStorage::SetTankOutSetpoint(
-                        state, IntegratedHeatPumps(DXCoilNum).ChillTankType, IntegratedHeatPumps(DXCoilNum).ChillTankIndex, -0.5);
-
-                    pcTank->simulate(state, IceTankLoc, true, CurLoad, true);
-                    TankOutTemp = IceThermalStorage::GetOutletTemperature(
-                        state, IntegratedHeatPumps(DXCoilNum).ChillTankType, IntegratedHeatPumps(DXCoilNum).ChillTankIndex);
-
-                    if ((fabs(TankOutTemp - dTinChiller) < 0.1) || (fabs(dTHigh - dTLow) < 0.1)) {
-                        IterNum = MaxIterNum + 1;
-                    } else if (TankOutTemp > dTinChiller) {
-                        dTLow = dTinChiller;
-                    } else {
-                        dTHigh = dTinChiller;
-                    }
-
-                    dTinChiller = (dTLow + dTHigh) / 2.0;
-                    IterNum++;
-                };
-                           
-                IceThermalStorage::UpdateIceFractions();
-                TankFractionNew = IceThermalStorage::GetIceFraction(
-                    state, IntegratedHeatPumps(DXCoilNum).ChillTankType, IntegratedHeatPumps(DXCoilNum).ChillTankIndex);
-
-                if (TankFractionNew > 0.99) {
-                    IntegratedHeatPumps(DXCoilNum).IceStoreMode = 0; 
-                } else {
-                    IntegratedHeatPumps(DXCoilNum).IceStoreMode = 1;
-                };
-
-                //recover the design flow rate and set point
-                IceThermalStorage::SetDesignMassFlowRate(
-                    state, IntegratedHeatPumps(DXCoilNum).ChillTankType, IntegratedHeatPumps(DXCoilNum).ChillTankIndex, dDesignFlowBack);
-                IceThermalStorage::SetTankOutSetpoint(
-                    state, IntegratedHeatPumps(DXCoilNum).ChillTankType, IntegratedHeatPumps(DXCoilNum).ChillTankIndex, dTankOutSet);
-
+                    (IntegratedHeatPumps(DXCoilNum).CurMode == IHPOperationMode::IdleMode))) {
+                iIceMode = 1; 
+            } else {
+                iIceMode = 0; 
             }
-        }
+             
+             if (iIceMode == 1)
+             {                                
+                Node(iChillInNode).MassFlowRate = ChillerWFlowRate; 
+                Node(iChillInNode).Temp = dTinChiller;
+
+                SimVariableSpeedCoils(state,
+                                        BlankString,
+                                        IntegratedHeatPumps(DXCoilNum).ChillerCoilIndex,
+                                        CycFanCycCoil,
+                                        EMP1,
+                                        EMP2,
+                                        EMP3,
+                                        1,
+                                        1.0,
+                                        IntegratedHeatPumps(DXCoilNum).ChillerRunSpeed,
+                                        1.0,
+                                        0.0,
+                                        0.0,
+                                        1.0);
+                ChillCapacity = state.dataVariableSpeedCoils->VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).ChillerCoilIndex)
+                                    .QLoadTotal;                                        
+    
+                IceThermalStorage::UpdateIceFractionIHP(state,
+                                                        IntegratedHeatPumps(DXCoilNum).ChillTankType,
+                                                        IntegratedHeatPumps(DXCoilNum).ChillTankIndex,
+                                                        ChillCapacity,
+                                                        DischargeCapacity);                
+                IntegratedHeatPumps(DXCoilNum).IceStoreMode = 1;
+            } else {
+                IceThermalStorage::UpdateIceFractionIHP(state,
+                                                        IntegratedHeatPumps(DXCoilNum).ChillTankType,
+                                                        IntegratedHeatPumps(DXCoilNum).ChillTankIndex,
+                                                        ChillCapacity,
+                                                        DischargeCapacity);
+                IntegratedHeatPumps(DXCoilNum).IceStoreMode = 0;
+            }                        
+        } 
+
+        // Real64 CurTime =
+       //(state.dataGlobal->HourOfDay - 1) + state.dataGlobal->TimeStep * state.dataGlobal->TimeStepZone
+        //+ DataHVACGlobals::SysTimeElapsed;
+        //IntegratedHeatPumps(DXCoilNum).LastTime = CurTime; 
     }
 
     void DecideWorkMode(EnergyPlusData &state,
@@ -6189,7 +6172,19 @@ namespace IntegratedHeatPump {
 
         if (IntegratedHeatPumps(DXCoilNum).IHPCoilsSized == false) SizeIHP(state, DXCoilNum);
 
-        if (IntegratedHeatPumps(DXCoilNum).ChillTankIndex > 0) UpdateIceStorage(state, DXCoilNum);
+        //no water heating elements
+        if ((IntegratedHeatPumps(DXCoilNum).DWHCoilIndex == 0) && (IntegratedHeatPumps(DXCoilNum).SCWHCoilIndex == 0)) {
+            if ((SensLoad < (-1.0 * SmallLoad)) || (LatentLoad < (-1.0 * SmallLoad))) // space cooling mode
+            {
+                IntegratedHeatPumps(DXCoilNum).CurMode = IHPOperationMode::SCMode;
+            } else if (SensLoad > SmallLoad) {
+                IntegratedHeatPumps(DXCoilNum).CurMode = IHPOperationMode::SHMode;
+            } else {
+                IntegratedHeatPumps(DXCoilNum).CurMode = IHPOperationMode::IdleMode;
+            }
+
+            return; 
+        }
 
         // decide working mode at the first moment
         // check if there is a water heating call
@@ -6404,7 +6399,7 @@ namespace IntegratedHeatPump {
         }
         
         // clear up, important
-        ClearCoils(state, DXCoilNum);
+        //ClearCoils(state, DXCoilNum);
     }
 
     void ClearCoils(EnergyPlusData &state, int const DXCoilNum)
@@ -6434,13 +6429,13 @@ namespace IntegratedHeatPump {
         // clear up
         if ((IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex != 0) && 
             (IntegratedHeatPumps(DXCoilNum).DehumPlace == DehumPlacement::UPSTRREAM)) {
-            state.dataWaterCoils->WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).InletWaterMassFlowRate = 0.0;
+            /*state.dataWaterCoils->WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).InletWaterMassFlowRate = 0.0;
             int iWNod = state.dataWaterCoils->WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).WaterInletNodeNum;
             int iANod = state.dataWaterCoils->WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).AirInletNodeNum;
             Node(iWNod).MassFlowRate = 0.0;
             Node(iWNod).MassFlowRateMax = 0.0;
             Node(iANod).MassFlowRate = 0.0;
-            Node(iANod).MassFlowRateMax = 0.0;
+            Node(iANod).MassFlowRateMax = 0.0;*/
 
             SimulateWaterCoilComponents(state,
                                         IntegratedHeatPumps(DXCoilNum).LDDehumCoilName,
@@ -6478,9 +6473,9 @@ namespace IntegratedHeatPump {
                 state, BlankString, IntegratedHeatPumps(DXCoilNum).GridSCCoilIndex, CycFanCycCoil, EMP1, EMP2, EMP3, 1, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
         
         if (IntegratedHeatPumps(DXCoilNum).LDRegenCoilIndex != 0) {
-            int iANod = state.dataWaterCoils->WaterCoil(IntegratedHeatPumps(DXCoilNum).LDRegenCoilIndex).AirInletNodeNum;
+            /*int iANod = state.dataWaterCoils->WaterCoil(IntegratedHeatPumps(DXCoilNum).LDRegenCoilIndex).AirInletNodeNum;
             Node(iANod).MassFlowRate = 0.0;
-            Node(iANod).MassFlowRateMax = 0.0; 
+            Node(iANod).MassFlowRateMax = 0.0;*/ 
 
             SimulateWaterCoilComponents(
                 state, IntegratedHeatPumps(DXCoilNum).LDRegenCoilName, false, IntegratedHeatPumps(DXCoilNum).LDRegenCoilIndex, 
@@ -6493,22 +6488,25 @@ namespace IntegratedHeatPump {
         if ((IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex != 0) 
             && (IntegratedHeatPumps(DXCoilNum).DehumPlace != DehumPlacement::UPSTRREAM))
         {
-            state.dataWaterCoils->WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).InletWaterMassFlowRate = 0.0;
+            /*state.dataWaterCoils->WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).InletWaterMassFlowRate = 0.0;
             int iWNod = state.dataWaterCoils->WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).WaterInletNodeNum;
             int iANod = state.dataWaterCoils->WaterCoil(IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex).AirInletNodeNum;
             Node(iWNod).MassFlowRate = 0.0;
             Node(iWNod).MassFlowRateMax = 0.0;
             Node(iANod).MassFlowRate = 0.0;
-            Node(iANod).MassFlowRateMax = 0.0;
+            Node(iANod).MassFlowRateMax = 0.0;*/
 
             SimulateWaterCoilComponents(
                 state, IntegratedHeatPumps(DXCoilNum).LDDehumCoilName, false, IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex,
                                         0.0, CycFanCycCoil, 0.0);
         }
 
+        Real64 MassFlowBack = 0.0; 
         if (IntegratedHeatPumps(DXCoilNum).EvapCoolCoilIndex != 0) {
+            MassFlowBack = Node(IntegratedHeatPumps(DXCoilNum).AirCoolOutletNodeNum).MassFlowRate; 
             Node(IntegratedHeatPumps(DXCoilNum).AirCoolOutletNodeNum).MassFlowRate = 0.0;
             SimEvapCooler(state, IntegratedHeatPumps(DXCoilNum).EvapCoolCoilName, IntegratedHeatPumps(DXCoilNum).EvapCoolCoilIndex, 0.0);
+            Node(IntegratedHeatPumps(DXCoilNum).AirCoolOutletNodeNum).MassFlowRate = MassFlowBack; 
         }
                            
         if (IntegratedHeatPumps(DXCoilNum).SHCoilIndex != 0)
@@ -6522,11 +6520,6 @@ namespace IntegratedHeatPump {
         if (IntegratedHeatPumps(DXCoilNum).DWHCoilIndex != 0)
         SimVariableSpeedCoils(state,
             BlankString, IntegratedHeatPumps(DXCoilNum).DWHCoilIndex, CycFanCycCoil, EMP1, EMP2, EMP3, 1, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
-
-        if (IntegratedHeatPumps(DXCoilNum).ChillerCoilIndex != 0)
-            SimVariableSpeedCoils(state, 
-                BlankString, IntegratedHeatPumps(DXCoilNum).ChillerCoilIndex, CycFanCycCoil, EMP1, EMP2, EMP3, 
-                1, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
 
         IntegratedHeatPumps(DXCoilNum).CompressorPartLoadRatio = 0.0;
 
