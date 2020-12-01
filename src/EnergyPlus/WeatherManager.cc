@@ -442,20 +442,20 @@ namespace WeatherManager {
             SetupOutputVariable(state, "Site Rain Status", OutputProcessor::Unit::None,  state.dataWeatherManager->RptIsRain, "Zone", "Average", "Environment");
             SetupOutputVariable(state, "Site Snow on Ground Status", OutputProcessor::Unit::None,  state.dataWeatherManager->RptIsSnow, "Zone", "Average", "Environment");
             SetupOutputVariable(state,
-                "Site Exterior Horizontal Sky Illuminance", OutputProcessor::Unit::lux, DataEnvironment::HISKF, "Zone", "Average", "Environment");
+                "Site Exterior Horizontal Sky Illuminance", OutputProcessor::Unit::lux, state.dataEnvrn->HISKF, "Zone", "Average", "Environment");
             SetupOutputVariable(state,
-                "Site Exterior Horizontal Beam Illuminance", OutputProcessor::Unit::lux, DataEnvironment::HISUNF, "Zone", "Average", "Environment");
+                "Site Exterior Horizontal Beam Illuminance", OutputProcessor::Unit::lux, state.dataEnvrn->HISUNF, "Zone", "Average", "Environment");
             SetupOutputVariable(state,
-                "Site Exterior Beam Normal Illuminance", OutputProcessor::Unit::lux, DataEnvironment::HISUNFnorm, "Zone", "Average", "Environment");
+                "Site Exterior Beam Normal Illuminance", OutputProcessor::Unit::lux, state.dataEnvrn->HISUNFnorm, "Zone", "Average", "Environment");
             SetupOutputVariable(state, "Site Sky Diffuse Solar Radiation Luminous Efficacy",
                                 OutputProcessor::Unit::lum_W,
-                                DataEnvironment::PDIFLW,
+                                state.dataEnvrn->PDIFLW,
                                 "Zone",
                                 "Average",
                                 "Environment");
             SetupOutputVariable(state, "Site Beam Solar Radiation Luminous Efficacy",
                                 OutputProcessor::Unit::lum_W,
-                                DataEnvironment::PDIRLW,
+                                state.dataEnvrn->PDIRLW,
                                 "Zone",
                                 "Average",
                                 "Environment");
@@ -471,7 +471,7 @@ namespace WeatherManager {
                 "Site Daylight Saving Time Status", OutputProcessor::Unit::None, state.dataEnvrn->DSTIndicator, "Zone", "State", "Environment");
             SetupOutputVariable(state, "Site Day Type Index", OutputProcessor::Unit::None,  state.dataWeatherManager->RptDayType, "Zone", "State", "Environment");
             SetupOutputVariable(state,
-                "Site Mains Water Temperature", OutputProcessor::Unit::C, DataEnvironment::WaterMainsTemp, "Zone", "Average", "Environment");
+                "Site Mains Water Temperature", OutputProcessor::Unit::C, state.dataEnvrn->WaterMainsTemp, "Zone", "Average", "Environment");
 
             if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                 SetupEMSActuator("Weather Data",
@@ -1634,7 +1634,7 @@ namespace WeatherManager {
             state.dataEnvrn->DayOfMonthTomorrow = state.dataWeatherManager->TomorrowVariables.DayOfMonth;
             state.dataEnvrn->DayOfWeekTomorrow = state.dataWeatherManager->TomorrowVariables.DayOfWeek;
             state.dataEnvrn->HolidayIndexTomorrow = state.dataWeatherManager->TomorrowVariables.HolidayIndex;
-            DataEnvironment::YearTomorrow = state.dataWeatherManager->TomorrowVariables.Year;
+            state.dataEnvrn->YearTomorrow = state.dataWeatherManager->TomorrowVariables.Year;
 
             if (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
                 if (state.dataEnvrn->Month == 1 && state.dataEnvrn->DayOfMonth == 1 && state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).ActualWeather) {
@@ -1801,7 +1801,7 @@ namespace WeatherManager {
         // Update Global Data
 
         state.dataEnvrn->DayOfYear = state.dataWeatherManager->TodayVariables.DayOfYear;
-        DataEnvironment::Year = state.dataWeatherManager->TodayVariables.Year;
+        state.dataEnvrn->Year = state.dataWeatherManager->TodayVariables.Year;
         state.dataEnvrn->Month = state.dataWeatherManager->TodayVariables.Month;
         state.dataEnvrn->DayOfMonth = state.dataWeatherManager->TodayVariables.DayOfMonth;
         state.dataEnvrn->DayOfWeek = state.dataWeatherManager->TodayVariables.DayOfWeek;
@@ -1893,7 +1893,7 @@ namespace WeatherManager {
         CalcWaterMainsTemp(state);
 
         // Determine if Sun is up or down, set Solar Cosine values for time step.
-        DetermineSunUpDown(state, DataEnvironment::SOLCOS);
+        DetermineSunUpDown(state, state.dataEnvrn->SOLCOS);
         if (state.dataEnvrn->SunIsUp &&  state.dataWeatherManager->SolarAltitudeAngle < 0.0) {
             ShowFatalError(state, "SetCurrentWeather: At " + DataEnvironment::CurMnDyHr + " Sun is Up but Solar Altitude Angle is < 0.0");
         }
@@ -1991,7 +1991,7 @@ namespace WeatherManager {
         }
 
         state.dataEnvrn->GndSolarRad =
-            max((state.dataEnvrn->BeamSolarRad * DataEnvironment::SOLCOS(3) + state.dataEnvrn->DifSolarRad) * state.dataEnvrn->GndReflectance, 0.0);
+            max((state.dataEnvrn->BeamSolarRad * state.dataEnvrn->SOLCOS(3) + state.dataEnvrn->DifSolarRad) * state.dataEnvrn->GndReflectance, 0.0);
 
         if (!state.dataEnvrn->SunIsUp) {
             state.dataEnvrn->DifSolarRad = 0.0;
@@ -7061,21 +7061,21 @@ namespace WeatherManager {
 
         switch (state.dataWeatherManager->WaterMainsTempsMethod) {
         case WaterMainsTempCalcMethod::Schedule:
-            DataEnvironment::WaterMainsTemp = ScheduleManager::GetCurrentScheduleValue(state, state.dataWeatherManager->WaterMainsTempsSchedule);
+            state.dataEnvrn->WaterMainsTemp = ScheduleManager::GetCurrentScheduleValue(state, state.dataWeatherManager->WaterMainsTempsSchedule);
             break;
         case WaterMainsTempCalcMethod::Correlation:
-            DataEnvironment::WaterMainsTemp = WaterMainsTempFromCorrelation(state, state.dataWeatherManager->WaterMainsTempsAnnualAvgAirTemp, state.dataWeatherManager->WaterMainsTempsMaxDiffAirTemp);
+            state.dataEnvrn->WaterMainsTemp = WaterMainsTempFromCorrelation(state, state.dataWeatherManager->WaterMainsTempsAnnualAvgAirTemp, state.dataWeatherManager->WaterMainsTempsMaxDiffAirTemp);
             break;
         case WaterMainsTempCalcMethod::CorrelationFromWeatherFile:
             if (state.dataWeatherManager->OADryBulbAverage.OADryBulbWeatherDataProcessed) {
-                DataEnvironment::WaterMainsTemp =
+                state.dataEnvrn->WaterMainsTemp =
                     WaterMainsTempFromCorrelation(state, state.dataWeatherManager->OADryBulbAverage.AnnualAvgOADryBulbTemp, state.dataWeatherManager->OADryBulbAverage.MonthlyAvgOADryBulbTempMaxDiff);
             } else {
-                DataEnvironment::WaterMainsTemp = 10.0; // 50 F
+                state.dataEnvrn->WaterMainsTemp = 10.0; // 50 F
             }
             break;
         default:
-            DataEnvironment::WaterMainsTemp = 10.0; // 50 F
+            state.dataEnvrn->WaterMainsTemp = 10.0; // 50 F
             break;
         }
     }
@@ -7209,26 +7209,26 @@ namespace WeatherManager {
         // SOLCOS(3), below, is the cosine of the solar zenith angle.
         if (state.dataEnvrn->SunIsUp) {
             // Exterior horizontal beam irradiance (W/m2)
-            Real64 SDIRH = state.dataEnvrn->BeamSolarRad * DataEnvironment::SOLCOS(3);
+            Real64 SDIRH = state.dataEnvrn->BeamSolarRad * state.dataEnvrn->SOLCOS(3);
             // Exterior horizontal sky diffuse irradiance (W/m2)
             Real64 SDIFH = state.dataEnvrn->DifSolarRad;
             // Fraction of sky covered by clouds
-            DataEnvironment::CloudFraction = pow_2(SDIFH / (SDIRH + SDIFH + 0.0001));
+            state.dataEnvrn->CloudFraction = pow_2(SDIFH / (SDIRH + SDIFH + 0.0001));
             // Luminous efficacy of sky diffuse solar and beam solar (lumens/W);
             // Horizontal illuminance from sky and horizontal beam illuminance (lux)
             // obtained from solar quantities on weather file and luminous efficacy.
 
-            DayltgLuminousEfficacy(state, DataEnvironment::PDIFLW, DataEnvironment::PDIRLW);
-            DataEnvironment::HISKF = SDIFH * DataEnvironment::PDIFLW;
-            DataEnvironment::HISUNF = SDIRH * DataEnvironment::PDIRLW;
-            DataEnvironment::HISUNFnorm = state.dataEnvrn->BeamSolarRad * DataEnvironment::PDIRLW;
+            DayltgLuminousEfficacy(state, state.dataEnvrn->PDIFLW, state.dataEnvrn->PDIRLW);
+            state.dataEnvrn->HISKF = SDIFH * state.dataEnvrn->PDIFLW;
+            state.dataEnvrn->HISUNF = SDIRH * state.dataEnvrn->PDIRLW;
+            state.dataEnvrn->HISUNFnorm = state.dataEnvrn->BeamSolarRad * state.dataEnvrn->PDIRLW;
         } else {
-            DataEnvironment::CloudFraction = 0.0;
-            DataEnvironment::PDIFLW = 0.0;
-            DataEnvironment::PDIRLW = 0.0;
-            DataEnvironment::HISKF = 0.0;
-            DataEnvironment::HISUNF = 0.0;
-            DataEnvironment::HISUNFnorm = 0.0;
+            state.dataEnvrn->CloudFraction = 0.0;
+            state.dataEnvrn->PDIFLW = 0.0;
+            state.dataEnvrn->PDIRLW = 0.0;
+            state.dataEnvrn->HISKF = 0.0;
+            state.dataEnvrn->HISUNF = 0.0;
+            state.dataEnvrn->HISUNFnorm = 0.0;
             DataEnvironment::SkyClearness = 0.0;
             DataEnvironment::SkyBrightness = 0.0;
         }
@@ -7280,7 +7280,7 @@ namespace WeatherManager {
                                                       128814.0,
                                                       130471.0}); // Monthly exterrestrial direct normal illuminance (lum/m2)
 
-        Real64 const SunZenith = std::acos(DataEnvironment::SOLCOS(3)); // Solar zenith angle (radians)
+        Real64 const SunZenith = std::acos(state.dataEnvrn->SOLCOS(3)); // Solar zenith angle (radians)
         Real64 const SunAltitude = DataGlobalConstants::PiOvr2() - SunZenith;     // Solar altitude angle (radians)
         Real64 const SinSunAltitude = std::sin(SunAltitude);
         // Clearness of sky. SkyClearness close to 1.0 corresponds to an overcast sky.
@@ -7320,7 +7320,7 @@ namespace WeatherManager {
             DiffLumEff = 0.0;
         } else {
             DiffLumEff = ADiffLumEff(ISkyClearness) + BDiffLumEff(ISkyClearness) * AtmosMoisture +
-                         CDiffLumEff(ISkyClearness) * DataEnvironment::SOLCOS(3) +
+                         CDiffLumEff(ISkyClearness) * state.dataEnvrn->SOLCOS(3) +
                          DDiffLumEff(ISkyClearness) * std::log(DataEnvironment::SkyBrightness);
         }
         // Direct normal luminous efficacy

@@ -1925,7 +1925,6 @@ namespace DataHeatBalance {
         // na
 
         // Using/Aliasing
-        using DataEnvironment::SOLCOS;
         using DataSurfaces::DoNotModel;
         using DataSurfaces::ModelAsDiffuse;
         using DataSurfaces::ModelAsDirectBeam;
@@ -2000,7 +1999,7 @@ namespace DataHeatBalance {
             }
             NormalAzimuth = SunAzimuthToScreenNormal;
         } else {
-            SunAzimuth = std::atan2(SOLCOS(1), SOLCOS(2));
+            SunAzimuth = std::atan2(state.dataEnvrn->SOLCOS(1), state.dataEnvrn->SOLCOS(2));
             if (SunAzimuth < 0.0) SunAzimuth += 2.0 * DataGlobalConstants::Pi();
             SurfaceAzimuth = Surface(SurfaceNum).Azimuth * DataGlobalConstants::DegToRadians();
             NormalAzimuth = SunAzimuth - SurfaceAzimuth;
@@ -2019,7 +2018,7 @@ namespace DataHeatBalance {
             }
             SunAltitude = SunAltitudeToScreenNormal;
         } else {
-            SunAltitude = (DataGlobalConstants::PiOvr2() - std::acos(SOLCOS(3)));
+            SunAltitude = (DataGlobalConstants::PiOvr2() - std::acos(state.dataEnvrn->SOLCOS(3)));
             SurfaceTilt = Surface(SurfaceNum).Tilt * DataGlobalConstants::DegToRadians();
             SunAltitudeToScreenNormal = std::abs(SunAltitude + (SurfaceTilt - DataGlobalConstants::PiOvr2()));
             if (SunAltitudeToScreenNormal > DataGlobalConstants::PiOvr2()) {

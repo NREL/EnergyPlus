@@ -622,7 +622,7 @@ namespace WindowManager {
         if (m_Surface.ExtWind) {
             airSpeed = m_Surface.WindSpeed;
         }
-        double fclr = 1 - CloudFraction;
+        double fclr = 1 - state.dataEnvrn->CloudFraction;
         AirHorizontalDirection airDirection = AirHorizontalDirection::Windward;
         std::shared_ptr<CEnvironment> Outdoor =
             std::make_shared<COutdoorEnvironment>(tout, state.dataEnvrn->OutBaroPress, airSpeed, swRadiation, airDirection, tSky, SkyModel::AllSpecified, fclr);

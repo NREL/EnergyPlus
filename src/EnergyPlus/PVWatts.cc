@@ -395,7 +395,7 @@ namespace PVWatts {
 
         // process_irradiance
         IrradianceOutput irr_st = processIrradiance(state,
-                                                    DataEnvironment::Year,
+                                                    state.dataEnvrn->Year,
                                                     state.dataEnvrn->Month,
                                                     state.dataEnvrn->DayOfMonth,
                                                     state.dataGlobal->HourOfDay - 1,

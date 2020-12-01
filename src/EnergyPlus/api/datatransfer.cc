@@ -612,8 +612,9 @@ Real64 getPluginTrendVariableDirection(EnergyPlusState state, int handle, int co
 }
 
 
-int year(EnergyPlusState) {
-    return EnergyPlus::DataEnvironment::Year;
+int year(EnergyPlusState state) {
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    return thisState->dataEnvrn->Year;
 }
 
 int month(EnergyPlusState state) {

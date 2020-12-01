@@ -1157,7 +1157,6 @@ namespace Humidifiers {
 
         // Using/Aliasing
         using CurveManager::CurveValue;
-        using DataEnvironment::WaterMainsTemp;
         using FluidProperties::FindGlycol;
         using FluidProperties::FindRefrigerant;
         using FluidProperties::GetSatEnthalpyRefrig;
@@ -1247,7 +1246,7 @@ namespace Humidifiers {
                 if (SuppliedByWaterSystem) { // use water use storage tank supply temperature
                     CurMakeupWaterTemp = state.dataWaterData->WaterStorage(WaterTankID).TwaterSupply(TankSupplyID);
                 } else { // use water main temperature
-                    CurMakeupWaterTemp = WaterMainsTemp;
+                    CurMakeupWaterTemp = state.dataEnvrn->WaterMainsTemp;
                 }
                 Tref = CurMakeupWaterTemp;
                 RefrigerantIndex = FindRefrigerant(state, fluidNameSteam);

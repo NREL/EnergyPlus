@@ -564,13 +564,13 @@ namespace HeatBalanceSurfaceManager {
             if (state.dataEnvrn->SunIsUp && state.dataDaylightingData->ZoneDaylight(NZ).TotalDaylRefPoints != 0 && (state.dataDaylightingData->ZoneDaylight(NZ).DaylightMethod == DataDaylighting::iDaylightingMethod::DElightDaylighting)) {
                 // Call DElight interior illuminance and electric lighting control subroutine
                 Real64 dPowerReducFac = 1.0;       // Return value Electric Lighting Power Reduction Factor for current Zone and Timestep
-                Real64 dHISKFFC = HISKF * LUX2FC;
-                Real64 dHISUNFFC = HISUNF * LUX2FC;
-                Real64 dSOLCOS1 = SOLCOS(1);
-                Real64 dSOLCOS2 = SOLCOS(2);
-                Real64 dSOLCOS3 = SOLCOS(3);
+                Real64 dHISKFFC = state.dataEnvrn->HISKF * LUX2FC;
+                Real64 dHISUNFFC = state.dataEnvrn->HISUNF * LUX2FC;
+                Real64 dSOLCOS1 = state.dataEnvrn->SOLCOS(1);
+                Real64 dSOLCOS2 = state.dataEnvrn->SOLCOS(2);
+                Real64 dSOLCOS3 = state.dataEnvrn->SOLCOS(3);
                 Real64 dLatitude = state.dataEnvrn->Latitude;
-                Real64 dCloudFraction = CloudFraction;
+                Real64 dCloudFraction = state.dataEnvrn->CloudFraction;
                 // Init Error Flag to 0 (no Warnings or Errors) (returned from DElight)
                 int iErrorFlag = 0;
                 bool elOpened;
@@ -2609,7 +2609,7 @@ namespace HeatBalanceSurfaceManager {
                 // For Complex Fenestrations:
                 for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
                     SurfWinSkyGndSolarInc(SurfNum) = state.dataEnvrn->DifSolarRad * state.dataEnvrn->GndReflectance * ReflFacSkySolGnd(SurfNum);
-                    SurfWinBmGndSolarInc(SurfNum) = state.dataEnvrn->BeamSolarRad * SOLCOS(3) * state.dataEnvrn->GndReflectance * SurfBmToDiffReflFacGnd(SurfNum);
+                    SurfWinBmGndSolarInc(SurfNum) = state.dataEnvrn->BeamSolarRad * state.dataEnvrn->SOLCOS(3) * state.dataEnvrn->GndReflectance * SurfBmToDiffReflFacGnd(SurfNum);
                     SurfBmToBmReflFacObs(SurfNum) = state.dataGlobal->WeightNow * ReflFacBmToBmSolObs[lSH + SurfNum] +
                                                     state.dataGlobal->WeightPreviousHour * ReflFacBmToBmSolObs[lSP + SurfNum];
                     SurfBmToDiffReflFacObs(SurfNum) = state.dataGlobal->WeightNow * ReflFacBmToDiffSolObs[lSH + SurfNum] +
@@ -2619,7 +2619,7 @@ namespace HeatBalanceSurfaceManager {
                     // TH2 CR 9056
                     SurfSkySolarInc(SurfNum) +=
                         state.dataEnvrn->BeamSolarRad * (SurfBmToBmReflFacObs(SurfNum) + SurfBmToDiffReflFacObs(SurfNum)) + state.dataEnvrn->DifSolarRad * ReflFacSkySolObs(SurfNum);
-                    SurfGndSolarInc(SurfNum) = state.dataEnvrn->BeamSolarRad * SOLCOS(3) * state.dataEnvrn->GndReflectance * SurfBmToDiffReflFacGnd(SurfNum) +
+                    SurfGndSolarInc(SurfNum) = state.dataEnvrn->BeamSolarRad * state.dataEnvrn->SOLCOS(3) * state.dataEnvrn->GndReflectance * SurfBmToDiffReflFacGnd(SurfNum) +
                                                          state.dataEnvrn->DifSolarRad * state.dataEnvrn->GndReflectance * ReflFacSkySolGnd(SurfNum);
                     SurfSkyDiffReflFacGnd(SurfNum) = ReflFacSkySolGnd(SurfNum);
                 }
@@ -2725,7 +2725,7 @@ namespace HeatBalanceSurfaceManager {
                     SurfQRadSWOutIncidentGndDiffuse(SurfNum) = SurfGndSolarInc(SurfNum);
                     // Incident diffuse solar from beam-to-diffuse reflection from ground
                     SurfQRadSWOutIncBmToDiffReflGnd(SurfNum) =
-                            state.dataEnvrn->BeamSolarRad * SOLCOS(3) * state.dataEnvrn->GndReflectance * SurfBmToDiffReflFacGnd(SurfNum);
+                            state.dataEnvrn->BeamSolarRad * state.dataEnvrn->SOLCOS(3) * state.dataEnvrn->GndReflectance * SurfBmToDiffReflFacGnd(SurfNum);
                     // Incident diffuse solar from sky diffuse reflection from ground
                     SurfQRadSWOutIncSkyDiffReflGnd(SurfNum) = state.dataEnvrn->DifSolarRad * state.dataEnvrn->GndReflectance * SurfSkyDiffReflFacGnd(SurfNum);
                     // Total incident solar. Beam and sky reflection from obstructions, if calculated, is included
@@ -2756,7 +2756,7 @@ namespace HeatBalanceSurfaceManager {
                     SurfQRadSWOutIncidentGndDiffuse(SurfNum) = currGndSolarInc(SurfNum);
                     // Incident diffuse solar from beam-to-diffuse reflection from ground
                     SurfQRadSWOutIncBmToDiffReflGnd(SurfNum) =
-                            state.dataEnvrn->BeamSolarRad * SOLCOS(3) * state.dataEnvrn->GndReflectance * SurfBmToDiffReflFacGnd(SurfNum);
+                            state.dataEnvrn->BeamSolarRad * state.dataEnvrn->SOLCOS(3) * state.dataEnvrn->GndReflectance * SurfBmToDiffReflFacGnd(SurfNum);
 
                     // Incident diffuse solar from sky diffuse reflection from ground
                     SurfQRadSWOutIncSkyDiffReflGnd(SurfNum) =
@@ -3166,8 +3166,8 @@ namespace HeatBalanceSurfaceManager {
                                             Real64 ThWin = std::atan2(Surface(SurfNum).OutNormVec(2),
                                                                       Surface(SurfNum).OutNormVec(1));
                                             Real64 PhiSun = std::asin(
-                                                    SOLCOS(3)); // Altitude and azimuth angle of sun (radians)
-                                            Real64 ThSun = std::atan2(SOLCOS(2), SOLCOS(1));
+                                                    state.dataEnvrn->SOLCOS(3)); // Altitude and azimuth angle of sun (radians)
+                                            Real64 ThSun = std::atan2(state.dataEnvrn->SOLCOS(2), state.dataEnvrn->SOLCOS(1));
                                             Real64 const cos_PhiWin(std::cos(PhiWin));
                                             Real64 const cos_PhiSun(std::cos(PhiSun));
                                             CosIncAngHorProj = std::abs(
@@ -3356,7 +3356,7 @@ namespace HeatBalanceSurfaceManager {
                                         } else if (ShadeFlag == ExtBlindOn) { // Exterior blind
                                             int BlNum = SurfWinBlindNumber(SurfNum);
                                             Real64 ProfAng; // Solar profile angle (rad)
-                                            ProfileAngle(SurfNum, SOLCOS, Blind(BlNum).SlatOrientation, ProfAng);
+                                            ProfileAngle(SurfNum, state.dataEnvrn->SOLCOS, Blind(BlNum).SlatOrientation, ProfAng);
                                             Real64 SlatAng = SurfWinSlatAngThisTS(SurfNum); // Slat angle (rad)
                                             // TBlBmBm - Blind beam-beam solar transmittance
                                             // TBlBmDif - Blind diffuse-diffuse solar transmittance

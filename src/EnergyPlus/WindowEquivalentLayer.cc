@@ -8119,7 +8119,6 @@ namespace WindowEquivalentLayer {
         // Uses the net radiation method developed for ASHWAT fenestration
         // model (ASHRAE RP-1311) by John Wright, the University of WaterLoo
 
-        using DataEnvironment::SOLCOS;
         using DaylightingManager::ProfileAngle;
 
         // Argument array dimensioning
@@ -8145,9 +8144,9 @@ namespace WindowEquivalentLayer {
             for (Lay = 1; Lay <= CFS(EQLNum).NL; ++Lay) {
                 if (IsVBLayer(CFS(EQLNum).L(Lay))) {
                     if (CFS(EQLNum).L(Lay).LTYPE == ltyVBHOR) {
-                        ProfileAngle(SurfNum, SOLCOS, Horizontal, ProfAngVer);
+                        ProfileAngle(SurfNum, state.dataEnvrn->SOLCOS, Horizontal, ProfAngVer);
                     } else if (CFS(EQLNum).L(Lay).LTYPE == ltyVBVER) {
-                        ProfileAngle(SurfNum, SOLCOS, Vertical, ProfAngHor);
+                        ProfileAngle(SurfNum, state.dataEnvrn->SOLCOS, Vertical, ProfAngHor);
                     }
                 }
             }
@@ -8161,9 +8160,9 @@ namespace WindowEquivalentLayer {
                 for (Lay = 1; Lay <= CFS(EQLNum).NL; ++Lay) {
                     if (IsVBLayer(CFS(EQLNum).L(Lay))) {
                         if (CFS(EQLNum).L(Lay).LTYPE == ltyVBHOR) {
-                            ProfileAngle(SurfNum, SOLCOS, Horizontal, ProfAngVer);
+                            ProfileAngle(SurfNum, state.dataEnvrn->SOLCOS, Horizontal, ProfAngVer);
                         } else if (CFS(EQLNum).L(Lay).LTYPE == ltyVBVER) {
-                            ProfileAngle(SurfNum, SOLCOS, Vertical, ProfAngHor);
+                            ProfileAngle(SurfNum, state.dataEnvrn->SOLCOS, Vertical, ProfAngHor);
                         }
                     }
                 }

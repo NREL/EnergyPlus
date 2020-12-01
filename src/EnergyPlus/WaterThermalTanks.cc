@@ -5802,7 +5802,7 @@ namespace WaterThermalTanks {
                 if (SchIndex > 0) {
                     this->UseInletTemp = ScheduleManager::GetCurrentScheduleValue(state, SchIndex);
                 } else {
-                    this->UseInletTemp = DataEnvironment::WaterMainsTemp;
+                    this->UseInletTemp = state.dataEnvrn->WaterMainsTemp;
                 }
 
                 SchIndex = this->FlowRateSchedule;

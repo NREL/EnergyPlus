@@ -175,7 +175,7 @@ TEST_F(EnergyPlusFixture, PVWattsGenerator_Calc)
     state->dataGlobal->MinutesPerTimeStep = 60;
     state->dataGlobal->NumOfTimeStepInHour = 1;
     WeatherManager::AllocateWeatherData(*state); // gets us the albedo array initialized
-    DataEnvironment::Year = 1986;
+    state->dataEnvrn->Year = 1986;
     state->dataEnvrn->Month = 6;
     state->dataEnvrn->DayOfMonth = 15;
     state->dataGlobal->HourOfDay = 8; // 8th hour of day, 7-8am

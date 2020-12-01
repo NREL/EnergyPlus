@@ -68,16 +68,6 @@ namespace DataEnvironment {
     Real64 constexpr StdPressureSeaLevel(101325.0);   // Standard barometric pressure at sea level (Pa)
 
     // MODULE VARIABLE DECLARATIONS:
-    extern Real64 WaterMainsTemp;                  // Current water mains temperature
-    extern int Year;                               // Current calendar year of the simulation from the weather file
-    extern int YearTomorrow;                       // Tomorrow's calendar year of the simulation
-    extern Array1D<Real64> SOLCOS;                 // Solar direction cosines at current time step
-    extern Real64 CloudFraction;                   // Fraction of sky covered by clouds
-    extern Real64 HISKF;                           // Exterior horizontal illuminance from sky (lux).
-    extern Real64 HISUNF;                          // Exterior horizontal beam illuminance (lux)
-    extern Real64 HISUNFnorm;                      // Exterior beam normal illuminance (lux)
-    extern Real64 PDIRLW;                          // Luminous efficacy (lum/W) of beam solar radiation
-    extern Real64 PDIFLW;                          // Luminous efficacy (lum/W) of sky diffuse solar radiation
     extern Real64 SkyClearness;                    // Sky clearness (see subr. DayltgLuminousEfficacy)
     extern Real64 SkyBrightness;                   // Sky brightness (see subr. DayltgLuminousEfficacy)
     extern Real64 TotalCloudCover;                 // Total Sky Cover (tenth of sky)
@@ -213,6 +203,16 @@ struct EnvironmentData : BaseGlobalStruct {
     Real64 WindSpeed = 0.0;                             // Current outdoor air wind speed
     bool EMSWindSpeedOverrideOn = false;                // EMS flag for outdoor air wind speed
     Real64 EMSWindSpeedOverrideValue = false;           // EMS override value for outdoor air wind speed
+    Real64 WaterMainsTemp = 0.0;                        // Current water mains temperature
+    int Year = 0;                                       // Current calendar year of the simulation from the weather file
+    int YearTomorrow = 0;                               // Tomorrow's calendar year of the simulation
+    Array1D<Real64> SOLCOS = Array1D<Real64>(3);        // Solar direction cosines at current time step
+    Real64 CloudFraction = 0.0;                         // Fraction of sky covered by clouds
+    Real64 HISKF = 0.0;                                 // Exterior horizontal illuminance from sky (lux).
+    Real64 HISUNF = 0.0;                                // Exterior horizontal beam illuminance (lux)
+    Real64 HISUNFnorm = 0.0;                            // Exterior beam normal illuminance (lux)
+    Real64 PDIRLW = 0.0;                                // Luminous efficacy (lum/W) of beam solar radiation
+    Real64 PDIFLW = 0.0;                                // Luminous efficacy (lum/W) of sky diffuse solar radiation
 
     void clear_state() override
     {
@@ -273,6 +273,16 @@ struct EnvironmentData : BaseGlobalStruct {
         this->WindSpeed = 0.0;
         this->EMSWindSpeedOverrideOn = false;
         this->EMSWindSpeedOverrideValue = false;
+        this->WaterMainsTemp = 0.0;
+        this->Year = 0;
+        this->YearTomorrow = 0;
+        this->SOLCOS = Array1D<Real64>(3);
+        this->CloudFraction = 0.0;
+        this->HISKF = 0.0;
+        this->HISUNF = 0.0;
+        this->HISUNFnorm = 0.0;
+        this->PDIRLW = 0.0;
+        this->PDIFLW = 0.0;
     }
 };
 

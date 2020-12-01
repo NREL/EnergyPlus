@@ -2292,7 +2292,7 @@ namespace SolarShading {
         ++NumAnisoSky_Calls;
 #endif
 
-        CosZenithAng = SOLCOS(3);
+        CosZenithAng = state.dataEnvrn->SOLCOS(3);
         ZenithAng = std::acos(CosZenithAng);
         ZenithAngDeg = ZenithAng / DataGlobalConstants::DegToRadians();
 
@@ -2320,7 +2320,7 @@ namespace SolarShading {
             if (!Surface(SurfNum).ExtSolar) continue;
 
             CosIncAngBeamOnSurface =
-                SOLCOS(1) * Surface(SurfNum).OutNormVec(1) + SOLCOS(2) * Surface(SurfNum).OutNormVec(2) + SOLCOS(3) * Surface(SurfNum).OutNormVec(3);
+                state.dataEnvrn->SOLCOS(1) * Surface(SurfNum).OutNormVec(1) + state.dataEnvrn->SOLCOS(2) * Surface(SurfNum).OutNormVec(2) + state.dataEnvrn->SOLCOS(3) * Surface(SurfNum).OutNormVec(3);
 
             // So I believe this should only be a diagnostic error...the calcs should always be within -1,+1; it's just round-off that we need to trap
             // for
@@ -6103,7 +6103,7 @@ namespace SolarShading {
                 int ScNum = SurfWinScreenNumber(SurfNum);
                 int ShadeFlag = SurfWinShadingFlag(SurfNum); // Set in subr. WindowShadingManager
                 Real64 ProfAng = 0.0; // Window solar profile angle (radians)
-                if (ShadeFlag != ExtScreenOn && BlNum > 0) ProfileAngle(SurfNum, SOLCOS, Blind(BlNum).SlatOrientation, ProfAng);
+                if (ShadeFlag != ExtScreenOn && BlNum > 0) ProfileAngle(SurfNum, state.dataEnvrn->SOLCOS, Blind(BlNum).SlatOrientation, ProfAng);
                 Real64 SlatAng = SurfWinSlatAngThisTS(SurfNum);
                 Real64 VarSlats = SurfWinMovableSlats(SurfNum);
                 int SurfNum2 = SurfNum;
@@ -6171,7 +6171,7 @@ namespace SolarShading {
                                 }
                             } else {
                                 // Blind or screen on
-                                if (ShadeFlag != ExtScreenOn) ProfileAngle(SurfNum, SOLCOS, Blind(BlNum).SlatOrientation, ProfAng);
+                                if (ShadeFlag != ExtScreenOn) ProfileAngle(SurfNum, state.dataEnvrn->SOLCOS, Blind(BlNum).SlatOrientation, ProfAng);
                                 if (ShadeFlag == IntBlindOn) {
                                     // Interior blind on
                                     Real64 TGlBm = POLYF(CosInc,state.dataConstruction->Construct(ConstrNum).TransSolBeamCoef); // Glazing system front solar beam transmittance
@@ -7113,7 +7113,7 @@ namespace SolarShading {
                                     if (ShadeFlagBack == IntBlindOn || ShadeFlagBack == ExtBlindOn || ShadeFlagBack == BGBlindOn) {
                                         int BlNumBack = SurfWinBlindNumber(BackSurfNum); // Back surface blind number
                                         Real64 ProfAngBack; // Back window solar profile angle (radians)
-                                        ProfileAngle(BackSurfNum, SOLCOS, Blind(BlNumBack).SlatOrientation, ProfAngBack);
+                                        ProfileAngle(BackSurfNum, state.dataEnvrn->SOLCOS, Blind(BlNumBack).SlatOrientation, ProfAngBack);
                                         Real64 TGlBmBack = POLYF(CosIncBack, state.dataConstruction->Construct(ConstrNumBack).TransSolBeamCoef);
                                         Real64 TBlBmBmBack = BlindBeamBeamTrans(ProfAngBack,
                                                                          DataGlobalConstants::Pi() - SlatAngBack,
@@ -8973,7 +8973,7 @@ namespace SolarShading {
                                         SunlitFrac(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, ISurf);
                     SolarOnWindow =
                             BeamSolarOnWindow + SkySolarOnWindow + state.dataEnvrn->GndSolarRad * Surface(ISurf).ViewFactorGround;
-                    HorizSolar = state.dataEnvrn->BeamSolarRad * SOLCOS(3) + state.dataEnvrn->DifSolarRad;
+                    HorizSolar = state.dataEnvrn->BeamSolarRad * state.dataEnvrn->SOLCOS(3) + state.dataEnvrn->DifSolarRad;
                 }
 
                 // Determine whether to deploy shading depending on type of control
@@ -9199,7 +9199,7 @@ namespace SolarShading {
 
 
                         if (Blind(BlNum).SlatWidth > Blind(BlNum).SlatSeparation && BeamSolarOnWindow > 0.0) {
-                            ProfileAngle(ISurf, SOLCOS, Blind(BlNum).SlatOrientation, ProfAng);
+                            ProfileAngle(ISurf, state.dataEnvrn->SOLCOS, Blind(BlNum).SlatOrientation, ProfAng);
                             Real64 ThetaBase = std::acos(
                                     std::cos(ProfAng) * Blind(BlNum).SlatSeparation / Blind(BlNum).SlatWidth);
                             // There are two solutions for the slat angle that just blocks beam radiation
@@ -9215,7 +9215,7 @@ namespace SolarShading {
                         if (Blind(BlNum).SlatWidth <= Blind(BlNum).SlatSeparation && BeamSolarOnWindow > 0.0) {
                             if (WindowShadingControl(IShadingCtrl).SlatAngleControlForBlinds == WSC_SAC_BlockBeamSolar) {
 
-                                ProfileAngle(ISurf, SOLCOS, Blind(BlNum).SlatOrientation, ProfAng);
+                                ProfileAngle(ISurf, state.dataEnvrn->SOLCOS, Blind(BlNum).SlatOrientation, ProfAng);
 
                                 if (std::abs(std::cos(ProfAng) * Blind(BlNum).SlatSeparation / Blind(BlNum).SlatWidth) <= 1.0) {
                                     // set to block 100% of beam solar, not necessarily to block maximum solar (beam + diffuse)
@@ -9668,7 +9668,7 @@ namespace SolarShading {
         Vector3<Real64> WinNorm;                 // Unit vector normal to window
         Vector3<Real64> WinNormCrossBase;        // Cross product of WinNorm and vector along window baseline
         Vector3<Real64> SunPrime;                // Projection of sun vector onto plane (perpendicular to
-        Vector3<Real64> const SolCosVec(SOLCOS); // Local Vector3 copy for speed (until SOLCOS mig to Vector3)
+        Vector3<Real64> const SolCosVec(state.dataEnvrn->SOLCOS); // Local Vector3 copy for speed (until SOLCOS mig to Vector3)
         //  window plane) determined by WinNorm and vector along
         //  baseline of window
         Real64 ThWin; // Azimuth angle of WinNorm (radians)
@@ -10112,11 +10112,11 @@ namespace SolarShading {
                 // Calculate cosine of angle of incidence of beam solar on reveal surfaces,
                 // assumed to be perpendicular to window plane
 
-                CosBetaBottom = -SOLCOS(1) * Surface(SurfNum).SinAzim * Surface(SurfNum).CosTilt -
-                                SOLCOS(2) * Surface(SurfNum).CosAzim * Surface(SurfNum).CosTilt +
-                                SOLCOS(3) * Surface(SurfNum).SinTilt;
+                CosBetaBottom = -state.dataEnvrn->SOLCOS(1) * Surface(SurfNum).SinAzim * Surface(SurfNum).CosTilt -
+                                state.dataEnvrn->SOLCOS(2) * Surface(SurfNum).CosAzim * Surface(SurfNum).CosTilt +
+                                state.dataEnvrn->SOLCOS(3) * Surface(SurfNum).SinTilt;
 
-                CosBetaLeft = -SOLCOS(1) * Surface(SurfNum).CosAzim - SOLCOS(2) * Surface(SurfNum).SinAzim;
+                CosBetaLeft = -state.dataEnvrn->SOLCOS(1) * Surface(SurfNum).CosAzim - state.dataEnvrn->SOLCOS(2) * Surface(SurfNum).SinAzim;
 
                 // Note: CosBetaTop = -CosBetaBottom, CosBetaRight = -CosBetaLeft
 

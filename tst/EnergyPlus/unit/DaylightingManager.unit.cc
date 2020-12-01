@@ -1345,8 +1345,8 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
     DaylightingManager::GetDaylightingParametersInput(*state);
     state->dataDaylightingManager->GILSK = 100.0;
     state->dataGlobal->WeightNow = 1.0;
-    DataEnvironment::HISUNF = 100.0;
-    DataEnvironment::HISKF = 100.0;
+    state->dataEnvrn->HISUNF = 100.0;
+    state->dataEnvrn->HISKF = 100.0;
     DataEnvironment::SkyClearness = 6.0;
 
     // Set all daylighting factors to zero

@@ -71,16 +71,6 @@ namespace DataEnvironment {
     // current weather variables)
 
     // MODULE VARIABLE DECLARATIONS:
-    Real64 WaterMainsTemp;                    // Current water mains temperature
-    int Year;                                 // Current calendar year of the simulation from the weather file
-    int YearTomorrow;                         // Tomorrow's calendar year of the simulation
-    Array1D<Real64> SOLCOS(3);                // Solar direction cosines at current time step
-    Real64 CloudFraction;                     // Fraction of sky covered by clouds
-    Real64 HISKF;                             // Exterior horizontal illuminance from sky (lux).
-    Real64 HISUNF;                            // Exterior horizontal beam illuminance (lux)
-    Real64 HISUNFnorm;                        // Exterior beam normal illuminance (lux)
-    Real64 PDIRLW;                            // Luminous efficacy (lum/W) of beam solar radiation
-    Real64 PDIFLW;                            // Luminous efficacy (lum/W) of sky diffuse solar radiation
     Real64 SkyClearness;                      // Sky clearness (see subr. DayltgLuminousEfficacy)
     Real64 SkyBrightness;                     // Sky brightness (see subr. DayltgLuminousEfficacy)
     Real64 TotalCloudCover(5.0);              // Total Sky Cover (tenth of sky)
@@ -143,16 +133,6 @@ namespace DataEnvironment {
 
     void clear_state()
     {
-        WaterMainsTemp = Real64();
-        Year = int();
-        YearTomorrow = int();
-        SOLCOS.dimension(3);
-        CloudFraction = Real64();
-        HISKF = Real64();
-        HISUNF = Real64();
-        HISUNFnorm = Real64();
-        PDIRLW = Real64();
-        PDIFLW = Real64();
         SkyClearness = Real64();
         SkyBrightness = Real64();
         TotalCloudCover = 0.0;

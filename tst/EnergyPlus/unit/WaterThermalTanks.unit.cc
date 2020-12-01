@@ -1409,7 +1409,7 @@ TEST_F(EnergyPlusFixture, HPWHTestSPControl)
     WaterThermalTanks::WaterThermalTankData &Tank = state->dataWaterThermalTanks->WaterThermalTank(1);
     WaterThermalTanks::HeatPumpWaterHeaterData &HeatPump = state->dataWaterThermalTanks->HPWaterHeater(1);
     DataHVACGlobals::HPWHInletDBTemp = 30.0;
-    DataEnvironment::WaterMainsTemp = 40.0;
+    state->dataEnvrn->WaterMainsTemp = 40.0;
     DataHVACGlobals::DXCoilTotalCapacity = 3500.0;
     DXCoils::HPWHHeatingCapacity = 4000.0;
 
@@ -4417,7 +4417,7 @@ TEST_F(EnergyPlusFixture, CrashCalcStandardRatings_HPWH_and_Standalone)
         EXPECT_EQ(HPWHTank.Name, "HPWHTANK");
 
         DataHVACGlobals::HPWHInletDBTemp = 30.0;
-        DataEnvironment::WaterMainsTemp = 40.0;
+        state->dataEnvrn->WaterMainsTemp = 40.0;
         DataHVACGlobals::DXCoilTotalCapacity = 3500.0;
         DXCoils::HPWHHeatingCapacity = 4000.0;
 
@@ -4441,7 +4441,7 @@ TEST_F(EnergyPlusFixture, CrashCalcStandardRatings_HPWH_and_Standalone)
         EXPECT_EQ(Tank.Name, "STANDALONE TANK");
         EXPECT_EQ(Tank.HeatPumpNum, 0);
         DataHVACGlobals::HPWHInletDBTemp = 30.0;
-        DataEnvironment::WaterMainsTemp = 40.0;
+        state->dataEnvrn->WaterMainsTemp = 40.0;
         DataHVACGlobals::DXCoilTotalCapacity = 3500.0;
         DXCoils::HPWHHeatingCapacity = 4000.0;
 

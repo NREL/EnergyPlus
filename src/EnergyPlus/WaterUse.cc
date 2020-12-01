@@ -827,7 +827,7 @@ namespace WaterUse {
             if (this->ColdTempSchedule > 0) {
                 this->ColdTemp = ScheduleManager::GetCurrentScheduleValue(state, this->ColdTempSchedule);
             } else { // If no ColdTempSchedule, use the mains temperature
-                this->ColdTemp = DataEnvironment::WaterMainsTemp;
+                this->ColdTemp = state.dataEnvrn->WaterMainsTemp;
             }
 
             if (this->HotTempSchedule > 0) {
@@ -1004,7 +1004,7 @@ namespace WaterUse {
             this->ColdSupplyTemp = ScheduleManager::GetCurrentScheduleValue(state, this->ColdTempSchedule);
 
         } else {
-            this->ColdSupplyTemp = DataEnvironment::WaterMainsTemp;
+            this->ColdSupplyTemp = state.dataEnvrn->WaterMainsTemp;
         }
 
         // Initially set ColdTemp to the ColdSupplyTemp; with heat recovery, ColdTemp will change during iteration

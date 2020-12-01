@@ -233,7 +233,6 @@ namespace RuntimeLanguageProcessor {
 
         // Using/Aliasing
         using DataEnvironment::CurEnvirNum;
-        using DataEnvironment::Year;
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
 
@@ -312,7 +311,7 @@ namespace RuntimeLanguageProcessor {
         }
 
         // Update built-in variables
-        ErlVariable(YearVariableNum).Value = SetErlValueNumber(double(Year));
+        ErlVariable(YearVariableNum).Value = SetErlValueNumber(double(state.dataEnvrn->Year));
         ErlVariable(MonthVariableNum).Value = SetErlValueNumber(double(state.dataEnvrn->Month));
         ErlVariable(DayOfMonthVariableNum).Value = SetErlValueNumber(double(state.dataEnvrn->DayOfMonth));
         ErlVariable(DayOfWeekVariableNum).Value = SetErlValueNumber(double(state.dataEnvrn->DayOfWeek));

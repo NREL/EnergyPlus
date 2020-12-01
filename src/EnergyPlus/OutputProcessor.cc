@@ -107,7 +107,6 @@ namespace OutputProcessor {
     // na
 
     // Using/Aliasing
-    using DataEnvironment::Year;
     using namespace DataGlobalConstants;
 
     // Data

@@ -567,7 +567,7 @@ namespace SwimmingPool {
             this->CurMakeupWaterTemp = ScheduleManager::GetCurrentScheduleValue(state, this->MakeupWaterSupplySchedPtr);
         } else {
             // use water main temperaure if no schedule present in input
-            this->CurMakeupWaterTemp = DataEnvironment::WaterMainsTemp;
+            this->CurMakeupWaterTemp = state.dataEnvrn->WaterMainsTemp;
         }
 
         // determine the current heat gain from people

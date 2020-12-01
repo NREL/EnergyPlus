@@ -180,7 +180,6 @@ TEST_F(EnergyPlusFixture, SkyEmissivityTest)
 
 TEST_F(EnergyPlusFixture, WaterMainsCorrelationTest)
 {
-    using DataEnvironment::WaterMainsTemp;
 
     state->dataWeatherManager->WaterMainsTempsMethod = WeatherManager::WaterMainsTempCalcMethod::Correlation;
     state->dataWeatherManager->WaterMainsTempsAnnualAvgAirTemp = 9.69;
@@ -189,11 +188,11 @@ TEST_F(EnergyPlusFixture, WaterMainsCorrelationTest)
 
     state->dataEnvrn->Latitude = 40.0;
     CalcWaterMainsTemp(*state);
-    EXPECT_NEAR(WaterMainsTemp, 6.6667, 0.0001);
+    EXPECT_NEAR(state->dataEnvrn->WaterMainsTemp, 6.6667, 0.0001);
 
     state->dataEnvrn->Latitude = -40.0;
     CalcWaterMainsTemp(*state);
-    EXPECT_NEAR(WaterMainsTemp, 19.3799, 0.0001);
+    EXPECT_NEAR(state->dataEnvrn->WaterMainsTemp, 19.3799, 0.0001);
 }
 
 TEST_F(EnergyPlusFixture, JGDate_Test)
@@ -365,7 +364,6 @@ TEST_F(EnergyPlusFixture, UnderwaterBoundaryConditionConvectionCoefficients)
 
 TEST_F(EnergyPlusFixture, WaterMainsCorrelationFromWeatherFileTest)
 {
-    using DataEnvironment::WaterMainsTemp;
 
     std::string const idf_objects = delimited_string({
         "   Site:WaterMainsTemperature,",
@@ -394,17 +392,16 @@ TEST_F(EnergyPlusFixture, WaterMainsCorrelationFromWeatherFileTest)
     // January 15th water mains temperature test
     state->dataEnvrn->DayOfYear = 15; // January 15th
     WeatherManager::CalcWaterMainsTemp(*state);
-    EXPECT_NEAR(DataEnvironment::WaterMainsTemp, 7.5145, 0.0001);
+    EXPECT_NEAR(state->dataEnvrn->WaterMainsTemp, 7.5145, 0.0001);
 
     // July 15th water mains temperature test
     state->dataEnvrn->DayOfYear = 196; // July 15th
     WeatherManager::CalcWaterMainsTemp(*state);
-    EXPECT_NEAR(DataEnvironment::WaterMainsTemp, 19.0452, 0.0001);
+    EXPECT_NEAR(state->dataEnvrn->WaterMainsTemp, 19.0452, 0.0001);
 }
 
 TEST_F(EnergyPlusFixture, WaterMainsCorrelationFromStatFileTest)
 {
-    using DataEnvironment::WaterMainsTemp;
 
     int AnnualNumberOfDays(0);
     Real64 MonthlyDailyDryBulbMin(0.0);
@@ -453,17 +450,15 @@ TEST_F(EnergyPlusFixture, WaterMainsCorrelationFromStatFileTest)
     // January 21st water mains temperature test
     state->dataEnvrn->DayOfYear = 21; // January 21st
     WeatherManager::CalcWaterMainsTemp(*state);
-    EXPECT_NEAR(DataEnvironment::WaterMainsTemp, 7.23463, 0.00001);
+    EXPECT_NEAR(state->dataEnvrn->WaterMainsTemp, 7.23463, 0.00001);
 
     // July 21st water mains temperature test
     state->dataEnvrn->DayOfYear = 202; // July 21st
     WeatherManager::CalcWaterMainsTemp(*state);
-    EXPECT_NEAR(DataEnvironment::WaterMainsTemp, 19.33812, 0.00001);
+    EXPECT_NEAR(state->dataEnvrn->WaterMainsTemp, 19.33812, 0.00001);
 }
 TEST_F(EnergyPlusFixture, WaterMainsOutputReports_CorrelationFromWeatherFileTest)
 {
-
-    using DataEnvironment::WaterMainsTemp;
 
     std::string const idf_objects = delimited_string({
         "   Site:WaterMainsTemperature,",

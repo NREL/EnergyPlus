@@ -98,7 +98,6 @@ namespace WindowComplexManager {
     using namespace DataVectorTypes;
     using namespace DataBSDFWindow;
     using namespace DataSurfaces; // , ONLY: TotSurfaces,TotWindows,Surface,SurfaceWindow   !update this later
-    using DataEnvironment::CloudFraction;
     using namespace DataHeatBalance;
     using namespace DataShadowingCombinations;
     using namespace Vectors;
@@ -2945,7 +2944,7 @@ namespace WindowComplexManager {
             // indoor wind speed
             wsi = 0.0; // assumuption (TODO, what to use for inside air velocity?)
 
-            fclr = 1.0 - CloudFraction;
+            fclr = 1.0 - state.dataEnvrn->CloudFraction;
         }
 
         TotLay = state.dataConstruction->Construct(ConstrNum).TotLayers;
