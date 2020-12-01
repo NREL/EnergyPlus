@@ -1349,8 +1349,6 @@ namespace HVACControllers {
 
         // Using/Aliasing
         using namespace DataSizing;
-        using DataConvergParams::HVACEnergyToler;
-        using DataConvergParams::HVACTemperatureToler;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1395,9 +1393,9 @@ namespace HVACControllers {
             //   with a temperature tolerance that won't exceed the loop energy error tolerance (10 W).
             // Finally we need to take into account the fact that somebody might change the energy tolerance.
             ControllerProps(ControlNum).Offset =
-                (0.001 / (2100.0 * max(ControllerProps(ControlNum).MaxVolFlowActuated, SmallWaterVolFlow))) * (HVACEnergyToler / 10.0);
+                (0.001 / (2100.0 * max(ControllerProps(ControlNum).MaxVolFlowActuated, SmallWaterVolFlow))) * (DataConvergParams::HVACEnergyToler / 10.0);
             // do not let the controller tolerance exceed 1/10 of the loop temperature tolerance.
-            ControllerProps(ControlNum).Offset = min(0.1 * HVACTemperatureToler, ControllerProps(ControlNum).Offset);
+            ControllerProps(ControlNum).Offset = min(0.1 * DataConvergParams::HVACTemperatureToler, ControllerProps(ControlNum).Offset);
             BaseSizer::reportSizerOutput(state, ControllerProps(ControlNum).ControllerType,
                                          ControllerProps(ControlNum).ControllerName,
                                          "Controller Convergence Tolerance",
