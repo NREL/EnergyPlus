@@ -6563,9 +6563,6 @@ namespace SolarShading {
                 Real64 TDifBare; // Bare diffuse transmittance of exterior window
 
                 // Beam-beam transmittance for bare exterior window
-                if (SurfNum == 97) {
-                    std::string name = Surface(SurfNum).Name;
-                }
                 if (SunLitFract > 0.0) {
                     if (SurfWinOriginalClass(SurfNum) == SurfaceClass::TDD_Diffuser) {
                         TBmDif = TransTDD(state, PipeNum, CosInc, DataDaylightingDevices::iRadType::SolarBeam);
@@ -6579,9 +6576,12 @@ namespace SolarShading {
                         }
                     } else if (SurfWinWindowModelType(SurfNum) == WindowBSDFModel) {
                         // Need to check what effect, if any, defining these here has
-                        TBmBm = SurfaceWindow(SurfNum).ComplexFen.State(SurfaceWindow(SurfNum).ComplexFen.CurrentState)
+                        TBmBm = SurfaceWindow(SurfNum)
+                                .ComplexFen.State(SurfaceWindow(SurfNum).ComplexFen.CurrentState)
                                 .WinDirSpecTrans(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep);
-                        TBmDif = SurfaceWindow(SurfNum).ComplexFen.State(SurfaceWindow(SurfNum).ComplexFen.CurrentState)
+                        TBmDif = SurfaceWindow(SurfNum)
+                                         .ComplexFen.State(SurfaceWindow(SurfNum).ComplexFen.CurrentState)
+                                         .WinDirHemiTrans(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep) -
                                          .WinDirHemiTrans(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep) - TBmBm;
                     } else if (SurfWinWindowModelType(SurfNum) == WindowEQLModel) {
                         // get ASHWAT fenestration model beam-beam and beam-diffuse properties
@@ -6589,7 +6589,6 @@ namespace SolarShading {
                         TBmDif = TBmDiffEQL;
                     }
                 }
-
 
                 // Report variables
                 SurfWinGlTsolBmBm(SurfNum) = TBmBm;
@@ -6822,6 +6821,7 @@ namespace SolarShading {
                     // Note: with previous defs of TBmBm & TBmDif, these come out right for Complex Fenestration
                     // WinTransBmSolar uses the directional-hemispherical transmittance
                     WinTransBmSolar(SurfNum) = (TBmBm + TBmDif) * SunLitFract * CosInc * Surface(SurfNum).Area * InOutProjSLFracMult;
+
                     // added TH 12/9/2009
                     WinTransBmBmSolar(SurfNum) = TBmBm * SunLitFract * CosInc * Surface(SurfNum).Area * InOutProjSLFracMult;   // m2
                     WinTransBmDifSolar(SurfNum) = TBmDif * SunLitFract * CosInc * Surface(SurfNum).Area * InOutProjSLFracMult; // m2
@@ -6858,8 +6858,6 @@ namespace SolarShading {
                     // added TH 12/9/2009
                     WinTransBmDifSolar(SurfNum) += SurfWinOutsRevealDiffOntoGlazing(SurfNum) * DiffTrans * Surface(SurfNum).Area;
                 }
-
-
 
                 // Increment factor for total exterior beam solar entering zone through window as beam or diffuse
 
