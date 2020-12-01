@@ -886,7 +886,7 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST_RampUp_Leap) {
     // # 'THROUGH" => Number of additional week schedules
     // # 'FOR' => Number of additional day schedules
     // So we use 366 Week Schedules, all with one day (LeapYear)
-    DataEnvironment::CurrentYearIsLeapYear = true;
+    state->dataEnvrn->CurrentYearIsLeapYear = true;
     state->dataWeatherManager->WFAllowsLeapYears = true;
     state->dataWeatherManager->LeapYearAdd = 1;
 
@@ -1067,7 +1067,7 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST_RampUp_NoLeap) {
     // # 'THROUGH" => Number of additional week schedules
     // # 'FOR' => Number of additional day schedules
     // So we use 366 Week Schedules, all with one day (LeapYear)
-    DataEnvironment::CurrentYearIsLeapYear = false;
+    state->dataEnvrn->CurrentYearIsLeapYear = false;
     state->dataWeatherManager->WFAllowsLeapYears = false;
     state->dataWeatherManager->LeapYearAdd = 0;
 

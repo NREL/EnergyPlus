@@ -267,22 +267,22 @@ namespace WeatherManager {
                                       DataIPShortCuts::lAlphaFieldBlanks,
                                       DataIPShortCuts::cAlphaFieldNames,
                                       DataIPShortCuts::cNumericFieldNames);
-        DataEnvironment::varyingLocationSchedIndexLat = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(1));
-        DataEnvironment::varyingLocationSchedIndexLong = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(2));
-        DataEnvironment::varyingOrientationSchedIndex = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(3));
+        state.dataEnvrn->varyingLocationSchedIndexLat = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(1));
+        state.dataEnvrn->varyingLocationSchedIndexLong = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(2));
+        state.dataEnvrn->varyingOrientationSchedIndex = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(3));
     }
 
     void UpdateLocationAndOrientation(EnergyPlusData &state)
     {
-        if (DataEnvironment::varyingLocationSchedIndexLat > 0) {
-            state.dataEnvrn->Latitude = ScheduleManager::GetCurrentScheduleValue(state, DataEnvironment::varyingLocationSchedIndexLat);
+        if (state.dataEnvrn->varyingLocationSchedIndexLat > 0) {
+            state.dataEnvrn->Latitude = ScheduleManager::GetCurrentScheduleValue(state, state.dataEnvrn->varyingLocationSchedIndexLat);
         }
-        if (DataEnvironment::varyingLocationSchedIndexLong > 0) {
-            state.dataEnvrn->Longitude = ScheduleManager::GetCurrentScheduleValue(state, DataEnvironment::varyingLocationSchedIndexLong);
+        if (state.dataEnvrn->varyingLocationSchedIndexLong > 0) {
+            state.dataEnvrn->Longitude = ScheduleManager::GetCurrentScheduleValue(state, state.dataEnvrn->varyingLocationSchedIndexLong);
         }
         CheckLocationValidity(state);
-        if (DataEnvironment::varyingOrientationSchedIndex > 0) {
-            DataHeatBalance::BuildingAzimuth = mod(ScheduleManager::GetCurrentScheduleValue(state, DataEnvironment::varyingOrientationSchedIndex), 360.0);
+        if (state.dataEnvrn->varyingOrientationSchedIndex > 0) {
+            DataHeatBalance::BuildingAzimuth = mod(ScheduleManager::GetCurrentScheduleValue(state, state.dataEnvrn->varyingOrientationSchedIndex), 360.0);
             state.dataSurfaceGeometry->CosBldgRelNorth =
                 std::cos(-(DataHeatBalance::BuildingAzimuth + DataHeatBalance::BuildingRotationAppendixG) * DataGlobalConstants::DegToRadians());
             state.dataSurfaceGeometry->SinBldgRelNorth =
@@ -661,16 +661,16 @@ namespace WeatherManager {
 
                     if ((state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) || (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodDesign)) {
                         std::string kindOfRunPeriod = state.dataWeatherManager->Environment( state.dataWeatherManager->Envrn).cKindOfEnvrn;
-                        DataEnvironment::RunPeriodEnvironment = state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather;
+                        state.dataEnvrn->RunPeriodEnvironment = state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather;
                         Array1D_int ActEndDayOfMonth(12);
                         ActEndDayOfMonth = state.dataWeatherManager->EndDayOfMonth;
-                        DataEnvironment::CurrentYearIsLeapYear = state.dataWeatherManager->Environment( state.dataWeatherManager->Envrn).IsLeapYear;
-                        if (DataEnvironment::CurrentYearIsLeapYear && state.dataWeatherManager->WFAllowsLeapYears) {
+                        state.dataEnvrn->CurrentYearIsLeapYear = state.dataWeatherManager->Environment( state.dataWeatherManager->Envrn).IsLeapYear;
+                        if (state.dataEnvrn->CurrentYearIsLeapYear && state.dataWeatherManager->WFAllowsLeapYears) {
                             state.dataWeatherManager->LeapYearAdd = 1;
                         } else {
                             state.dataWeatherManager->LeapYearAdd = 0;
                         }
-                        if (DataEnvironment::CurrentYearIsLeapYear) {
+                        if (state.dataEnvrn->CurrentYearIsLeapYear) {
                             ActEndDayOfMonth(2) = state.dataWeatherManager->EndDayOfMonth(2) + state.dataWeatherManager->LeapYearAdd;
                         }
                         state.dataWeatherManager->UseDaylightSaving = state.dataWeatherManager->Environment( state.dataWeatherManager->Envrn).UseDST;
@@ -775,7 +775,7 @@ namespace WeatherManager {
                             StDate += format("/{}", state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).StartYear);
                             EnDate += format("/{}", state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).EndYear);
                         }
-                        DataEnvironment::EnvironmentStartEnd = StDate + " - " + EnDate;
+                        state.dataEnvrn->EnvironmentStartEnd = StDate + " - " + EnDate;
 
                         int TWeekDay = (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DayOfWeek == 0) ? 1 : state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DayOfWeek;
                         auto const &MonWeekDay = state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).MonWeekDay;
@@ -939,7 +939,7 @@ namespace WeatherManager {
 
                     } else if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::DesignDay ||
                                state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeDesignDay) { // Design Day
-                        DataEnvironment::RunPeriodEnvironment = false;
+                        state.dataEnvrn->RunPeriodEnvironment = false;
                         StDate = format(
                             DateFormat, state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum).Month, state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum).DayOfMonth);
                         EnDate = StDate;
@@ -1642,8 +1642,8 @@ namespace WeatherManager {
                         if (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).TreatYearsAsConsecutive) {
                             ++state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).CurrentYear;
                             state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).IsLeapYear = isLeapYear(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).CurrentYear);
-                            DataEnvironment::CurrentYearIsLeapYear = state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).IsLeapYear;
-                            if (DataEnvironment::CurrentYearIsLeapYear) {
+                            state.dataEnvrn->CurrentYearIsLeapYear = state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).IsLeapYear;
+                            if (state.dataEnvrn->CurrentYearIsLeapYear) {
                                 if (state.dataWeatherManager->WFAllowsLeapYears) {
                                     state.dataWeatherManager->LeapYearAdd = 1;
                                 } else {
@@ -1686,12 +1686,12 @@ namespace WeatherManager {
                     if (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).TreatYearsAsConsecutive) {
                         ++state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).CurrentYear;
                         state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).IsLeapYear = isLeapYear(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).CurrentYear);
-                        DataEnvironment::CurrentYearIsLeapYear = state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).IsLeapYear;
-                        if (DataEnvironment::CurrentYearIsLeapYear && !state.dataWeatherManager->WFAllowsLeapYears) DataEnvironment::CurrentYearIsLeapYear = false;
-                        if (state.dataGlobal->DayOfSim < state.dataWeatherManager->curSimDayForEndOfRunPeriod && DataEnvironment::CurrentYearIsLeapYear)
+                        state.dataEnvrn->CurrentYearIsLeapYear = state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).IsLeapYear;
+                        if (state.dataEnvrn->CurrentYearIsLeapYear && !state.dataWeatherManager->WFAllowsLeapYears) state.dataEnvrn->CurrentYearIsLeapYear = false;
+                        if (state.dataGlobal->DayOfSim < state.dataWeatherManager->curSimDayForEndOfRunPeriod && state.dataEnvrn->CurrentYearIsLeapYear)
                             ++state.dataWeatherManager->curSimDayForEndOfRunPeriod;
                     }
-                    if (DataEnvironment::CurrentYearIsLeapYear) {
+                    if (state.dataEnvrn->CurrentYearIsLeapYear) {
                         if (state.dataWeatherManager->WFAllowsLeapYears) {
                             state.dataWeatherManager->LeapYearAdd = 1;
                         } else {
@@ -1709,7 +1709,7 @@ namespace WeatherManager {
                                              state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).EndMonth,
                                              state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).EndDay,
                                              state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).RollDayTypeOnRepeat,
-                                             state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).RollDayTypeOnRepeat || DataEnvironment::CurrentYearIsLeapYear);
+                                             state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).RollDayTypeOnRepeat || state.dataEnvrn->CurrentYearIsLeapYear);
                         if (state.dataWeatherManager->DaylightSavingIsActive) {
                             SetDSTDateRanges(state, state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).MonWeekDay, state.dataWeatherManager->DSTIndex);
                         }
@@ -2561,7 +2561,7 @@ namespace WeatherManager {
                     if (ETDirect < 0.0) ETDirect = 9999.0;
                     if (IRHoriz <= 0.0) IRHoriz = 9999.0;
                     if (GLBHoriz < 0.0) GLBHoriz = 9999.0;
-                    if (DataEnvironment::DisplayWeatherMissingDataWarnings) {
+                    if (state.dataEnvrn->DisplayWeatherMissingDataWarnings) {
                         if (DirectRad >= 9999.0) {
                             ++state.dataWeatherManager->Missed.DirectRad;
                         }
@@ -2598,7 +2598,7 @@ namespace WeatherManager {
                     if (LiquidPrecip < 0.0) LiquidPrecip = 999.0;
 
                     if (hour == 1 && CurTimeStep == 1) {
-                        if (WMonth == 2 && WDay == 29 && (!DataEnvironment::CurrentYearIsLeapYear || !state.dataWeatherManager->WFAllowsLeapYears)) {
+                        if (WMonth == 2 && WDay == 29 && (!state.dataEnvrn->CurrentYearIsLeapYear || !state.dataWeatherManager->WFAllowsLeapYears)) {
                             state.dataWeatherManager->EndDayOfMonth(2) = 28;
                             SkipThisDay = true;
                             TryAgain = true;
@@ -2613,7 +2613,7 @@ namespace WeatherManager {
                             SkipThisDay = false;
                         }
 
-                        if (state.dataWeatherManager->Environment(Environ).ActualWeather && DataEnvironment::CurrentYearIsLeapYear) {
+                        if (state.dataWeatherManager->Environment(Environ).ActualWeather && state.dataEnvrn->CurrentYearIsLeapYear) {
                             if (WMonth == 3 && WDay == 1 && state.dataEnvrn->Month == 2 && state.dataEnvrn->DayOfMonth == 28) {
                                 ShowFatalError(state, "ReadEPlusWeatherForDay: Current year is a leap year, but Feb29 data is missing.");
                             }
@@ -2752,15 +2752,15 @@ namespace WeatherManager {
                     if (DirectNrmIllum >= 999900.0) DirectNrmIllum = 0.0;
                     if (DiffuseHorizIllum >= 999900.0) DiffuseHorizIllum = 0.0;
                     if (ZenLum >= 99990.0) ZenLum = 0.0;
-                    if (DataEnvironment::IgnoreSolarRadiation) {
+                    if (state.dataEnvrn->IgnoreSolarRadiation) {
                         GLBHoriz = 0.0;
                         DirectRad = 0.0;
                         DiffuseRad = 0.0;
                     }
-                    if (DataEnvironment::IgnoreBeamRadiation) {
+                    if (state.dataEnvrn->IgnoreBeamRadiation) {
                         DirectRad = 0.0;
                     }
-                    if (DataEnvironment::IgnoreDiffuseRadiation) {
+                    if (state.dataEnvrn->IgnoreDiffuseRadiation) {
                         DiffuseRad = 0.0;
                     }
 
@@ -3420,9 +3420,9 @@ namespace WeatherManager {
         static constexpr auto MnDyFmt("{:02}/{:02}");
         state.dataEnvrn->CurMnDy = format(MnDyFmt, state.dataWeatherManager->DesDayInput(EnvrnNum).Month, state.dataWeatherManager->DesDayInput(EnvrnNum).DayOfMonth);
         // EnvironmentName = DesDayInput( EnvrnNum ).Title;
-        DataEnvironment::RunPeriodEnvironment = false;
+        state.dataEnvrn->RunPeriodEnvironment = false;
         // Following builds Environment start/end for ASHRAE 55 warnings
-        DataEnvironment::EnvironmentStartEnd = state.dataEnvrn->CurMnDy + " - " + state.dataEnvrn->CurMnDy;
+        state.dataEnvrn->EnvironmentStartEnd = state.dataEnvrn->CurMnDy + " - " + state.dataEnvrn->CurMnDy;
 
         // Check that barometric pressure is within range
         if (state.dataWeatherManager->DesDayInput(EnvrnNum).PressureEntered) {
@@ -3804,8 +3804,8 @@ namespace WeatherManager {
                 }
 
                 // override result to 0 per environment var (for testing)
-                if (DataEnvironment::IgnoreSolarRadiation || DataEnvironment::IgnoreBeamRadiation) BeamRad = 0.0;
-                if (DataEnvironment::IgnoreSolarRadiation || DataEnvironment::IgnoreDiffuseRadiation) DiffRad = 0.0;
+                if (state.dataEnvrn->IgnoreSolarRadiation || state.dataEnvrn->IgnoreBeamRadiation) BeamRad = 0.0;
+                if (state.dataEnvrn->IgnoreSolarRadiation || state.dataEnvrn->IgnoreDiffuseRadiation) DiffRad = 0.0;
 
                 state.dataWeatherManager->TomorrowBeamSolarRad(ts, hour) = BeamRad;
                 state.dataWeatherManager->TomorrowDifSolarRad(ts, hour) = DiffRad;
@@ -4458,7 +4458,7 @@ namespace WeatherManager {
         // different, notify the user.  If StdTimeMerid couldn't be calculated,
         // produce an error message.
 
-        if (DataEnvironment::varyingLocationSchedIndexLat > 0 || DataEnvironment::varyingLocationSchedIndexLong > 0) {
+        if (state.dataEnvrn->varyingLocationSchedIndexLat > 0 || state.dataEnvrn->varyingLocationSchedIndexLong > 0) {
             // don't do any warnings, the building is moving
         } else if (StdTimeMerid >= -12.0 && StdTimeMerid <= 12.0) {
             if (state.dataEnvrn->TimeZoneNumber != StdTimeMerid) {
@@ -5891,7 +5891,7 @@ namespace WeatherManager {
                 }
             }
             // for PerformancePrecisionTradeoffs
-            if (DataEnvironment::forceBeginEnvResetSuppress) {
+            if (state.dataEnvrn->forceBeginEnvResetSuppress) {
                 state.dataWeatherManager->DesDayInput(EnvrnNum).suppressBegEnvReset = true;
             }
             //   A7,  \field Rain Indicator
@@ -8132,7 +8132,7 @@ namespace WeatherManager {
         static std::string const RangeString("Out of Range Data Found on Weather Data File");
         static constexpr auto rgFmt("Out of Range {} [{},{}], Number of items={:5}");
 
-        if (!DataEnvironment::DisplayWeatherMissingDataWarnings) return;
+        if (!state.dataEnvrn->DisplayWeatherMissingDataWarnings) return;
 
         bool MissedHeader = false;
         auto missedHeaderCheck{[&](Real64 const value, std::string const &description) {

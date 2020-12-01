@@ -7869,7 +7869,7 @@ namespace ZoneTempPredictorCorrector {
 
         // determine number of days in year
         int DaysInYear;
-        if (DataEnvironment::CurrentYearIsLeapYear) {
+        if (state.dataEnvrn->CurrentYearIsLeapYear) {
             DaysInYear = 366;
         } else {
             DaysInYear = 365;

@@ -1874,12 +1874,10 @@ namespace ExternalInterface {
         //  Get the current month and day in the runperiod and convert
         //  it into seconds.
 
-        // Using/Aliasing
-        using DataEnvironment::CurrentYearIsLeapYear;
         // Locals
         Real64 simtime;
 
-        if (!CurrentYearIsLeapYear) {
+        if (!state.dataEnvrn->CurrentYearIsLeapYear) {
             switch (state.dataEnvrn->Month) {
             case 1:
                 simtime = 0;

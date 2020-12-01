@@ -4857,7 +4857,7 @@ namespace SolarShading {
         HTS = 0;
 
         // Check every surface as a possible shadow receiving surface ("RS" = receiving surface).
-        if (IgnoreSolarRadiation) {
+        if (state.dataEnvrn->IgnoreSolarRadiation) {
             return;
         }
 

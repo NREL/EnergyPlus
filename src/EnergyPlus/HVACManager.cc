@@ -496,12 +496,12 @@ namespace HVACManager {
                 }
                 EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::checkConcurrentOperation(state);
             } else if (!state.dataGlobal->KickOffSimulation && state.dataGlobal->DoOutputReporting && ReportDuringWarmup) {
-                if (state.dataGlobal->BeginDayFlag && !PrintEnvrnStampWarmupPrinted) {
-                    PrintEnvrnStampWarmup = true;
-                    PrintEnvrnStampWarmupPrinted = true;
+                if (state.dataGlobal->BeginDayFlag && !state.dataEnvrn->PrintEnvrnStampWarmupPrinted) {
+                    state.dataEnvrn->PrintEnvrnStampWarmup = true;
+                    state.dataEnvrn->PrintEnvrnStampWarmupPrinted = true;
                 }
-                if (!state.dataGlobal->BeginDayFlag) PrintEnvrnStampWarmupPrinted = false;
-                if (PrintEnvrnStampWarmup) {
+                if (!state.dataGlobal->BeginDayFlag) state.dataEnvrn->PrintEnvrnStampWarmupPrinted = false;
+                if (state.dataEnvrn->PrintEnvrnStampWarmup) {
                     if (PrintEndDataDictionary && state.dataGlobal->DoOutputReporting && !PrintedWarmup) {
                         print(state.files.eso, "{}\n", EndOfHeaderString);
                         print(state.files.mtr, "{}\n", EndOfHeaderString);
@@ -525,7 +525,7 @@ namespace HVACManager {
                               state.dataEnvrn->Longitude,
                               state.dataEnvrn->TimeZoneNumber,
                               state.dataEnvrn->Elevation);
-                        PrintEnvrnStampWarmup = false;
+                        state.dataEnvrn->PrintEnvrnStampWarmup = false;
                     }
                     PrintedWarmup = true;
                 }
@@ -535,12 +535,12 @@ namespace HVACManager {
                     if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsSystemStep(state);
                 }
             } else if (UpdateDataDuringWarmupExternalInterface) { // added for FMI
-                if (state.dataGlobal->BeginDayFlag && !PrintEnvrnStampWarmupPrinted) {
-                    PrintEnvrnStampWarmup = true;
-                    PrintEnvrnStampWarmupPrinted = true;
+                if (state.dataGlobal->BeginDayFlag && !state.dataEnvrn->PrintEnvrnStampWarmupPrinted) {
+                    state.dataEnvrn->PrintEnvrnStampWarmup = true;
+                    state.dataEnvrn->PrintEnvrnStampWarmupPrinted = true;
                 }
-                if (!state.dataGlobal->BeginDayFlag) PrintEnvrnStampWarmupPrinted = false;
-                if (PrintEnvrnStampWarmup) {
+                if (!state.dataGlobal->BeginDayFlag) state.dataEnvrn->PrintEnvrnStampWarmupPrinted = false;
+                if (state.dataEnvrn->PrintEnvrnStampWarmup) {
                     if (PrintEndDataDictionary && state.dataGlobal->DoOutputReporting && !PrintedWarmup) {
                         print(state.files.eso, "{}\n", EndOfHeaderString);
                         print(state.files.mtr, "{}\n", EndOfHeaderString);
@@ -563,7 +563,7 @@ namespace HVACManager {
                               state.dataEnvrn->Longitude,
                               state.dataEnvrn->TimeZoneNumber,
                               state.dataEnvrn->Elevation);
-                        PrintEnvrnStampWarmup = false;
+                        state.dataEnvrn->PrintEnvrnStampWarmup = false;
                     }
                     PrintedWarmup = true;
                 }

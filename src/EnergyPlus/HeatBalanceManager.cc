@@ -5773,7 +5773,7 @@ namespace HeatBalanceManager {
                             ShowContinueError(state, "Warmup Convergence failing during sizing.");
                             SizingWarmupConvergenceWarning = true;
                         }
-                        if (RunPeriodEnvironment) {
+                        if (state.dataEnvrn->RunPeriodEnvironment) {
                             ShowContinueError(state, "...Environment(RunPeriod)=\"" + state.dataEnvrn->EnvironmentName + "\"");
                         } else {
                             ShowContinueError(state, "...Environment(SizingPeriod)=\"" + state.dataEnvrn->EnvironmentName + "\"");
@@ -5903,7 +5903,7 @@ namespace HeatBalanceManager {
             TempZoneRptStdDev = 0.0;
             LoadZoneRptStdDev = 0.0;
 
-            if (RunPeriodEnvironment) {
+            if (state.dataEnvrn->RunPeriodEnvironment) {
                 EnvHeader = "RunPeriod:";
             } else {
                 EnvHeader = "SizingPeriod:";
@@ -6008,12 +6008,12 @@ namespace HeatBalanceManager {
             UpdateTabularReports(state, OutputProcessor::TimeStepType::TimeStepZone);
             UpdateUtilityBills(state);
         } else if (!state.dataGlobal->KickOffSimulation && state.dataGlobal->DoOutputReporting && ReportDuringWarmup) {
-            if (state.dataGlobal->BeginDayFlag && !PrintEnvrnStampWarmupPrinted) {
-                PrintEnvrnStampWarmup = true;
-                PrintEnvrnStampWarmupPrinted = true;
+            if (state.dataGlobal->BeginDayFlag && !state.dataEnvrn->PrintEnvrnStampWarmupPrinted) {
+                state.dataEnvrn->PrintEnvrnStampWarmup = true;
+                state.dataEnvrn->PrintEnvrnStampWarmupPrinted = true;
             }
-            if (!state.dataGlobal->BeginDayFlag) PrintEnvrnStampWarmupPrinted = false;
-            if (PrintEnvrnStampWarmup) {
+            if (!state.dataGlobal->BeginDayFlag) state.dataEnvrn->PrintEnvrnStampWarmupPrinted = false;
+            if (state.dataEnvrn->PrintEnvrnStampWarmup) {
                 if (PrintEndDataDictionary && state.dataGlobal->DoOutputReporting) {
                     static constexpr auto EndOfHeaderString("End of Data Dictionary"); // End of data dictionary marker
                     print(state.files.eso, "{}\n", EndOfHeaderString);
@@ -6039,7 +6039,7 @@ namespace HeatBalanceManager {
                           state.dataEnvrn->Longitude,
                           state.dataEnvrn->TimeZoneNumber,
                           state.dataEnvrn->Elevation);
-                    PrintEnvrnStampWarmup = false;
+                    state.dataEnvrn->PrintEnvrnStampWarmup = false;
                 }
             }
             CalcMoreNodeInfo(state);

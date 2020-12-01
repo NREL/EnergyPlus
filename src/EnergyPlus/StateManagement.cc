@@ -56,7 +56,6 @@
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBranchNodeConnections.hh>
-#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataErrorTracking.hh>
 #include <EnergyPlus/DataGenerators.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -198,7 +197,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     autosizing_clear_state();
     CoilCoolingDX::clear_state();
     AirflowNetwork::clear_state();
-    DataEnvironment::clear_state();
     DataErrorTracking::clear_state();
     DataGenerators::clear_state();
     DataHeatBalance::clear_state();

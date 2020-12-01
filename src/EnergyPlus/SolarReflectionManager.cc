@@ -219,7 +219,7 @@ namespace SolarReflectionManager {
         }
 
         // Should this be moved up front?
-        if (IgnoreSolarRadiation) {
+        if (state.dataEnvrn->IgnoreSolarRadiation) {
             state.dataSolarReflectionManager->TotSolReflRecSurf = 0;
             CalcSolRefl = false;
             return;

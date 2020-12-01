@@ -184,7 +184,6 @@ namespace SurfaceGroundHeatExchanger {
         // Using/Aliasing
         using namespace DataIPShortCuts; // Data for field names, blank numerics
         using BranchNodeConnections::TestCompSet;
-        using DataEnvironment::GroundTemp_SurfaceObjInput;
         using FluidProperties::CheckFluidPropertyName;
         using FluidProperties::FindGlycol;
 
@@ -389,7 +388,7 @@ namespace SurfaceGroundHeatExchanger {
         }
 
         if (state.dataSurfaceGroundHeatExchangers->NoSurfaceGroundTempObjWarning) {
-            if (!GroundTemp_SurfaceObjInput) {
+            if (!state.dataEnvrn->GroundTemp_SurfaceObjInput) {
                 ShowWarningError(state, "GetSurfaceGroundHeatExchanger: No \"Site:GroundTemperature:Shallow\" were input.");
                 ShowContinueError(state, format("Defaults, constant throughout the year of ({:.1R}) will be used.", state.dataEnvrn->GroundTemp_Surface));
             }

@@ -327,7 +327,7 @@ TEST_F(EnergyPlusFixture, nthDayOfWeekOfMonth_test)
     //			int const & monthNumber // January = 1
     //		)
 
-    DataEnvironment::CurrentYearIsLeapYear = false; // based on 2017
+    state->dataEnvrn->CurrentYearIsLeapYear = false; // based on 2017
     state->dataEnvrn->RunPeriodStartDayOfWeek = 1;   // sunday
 
     EXPECT_EQ(1, nthDayOfWeekOfMonth(*state, 1, 1, 1));  // first sunday of january
@@ -343,14 +343,14 @@ TEST_F(EnergyPlusFixture, nthDayOfWeekOfMonth_test)
     EXPECT_EQ(32, nthDayOfWeekOfMonth(*state, 4, 1, 2)); // first wednesday of february
     EXPECT_EQ(60, nthDayOfWeekOfMonth(*state, 4, 1, 3)); // first wednesday of march
 
-    DataEnvironment::CurrentYearIsLeapYear = true;
+    state->dataEnvrn->CurrentYearIsLeapYear = true;
     state->dataEnvrn->RunPeriodStartDayOfWeek = 1; // sunday
 
     EXPECT_EQ(32, nthDayOfWeekOfMonth(*state, 4, 1, 2)); // first wednesday of february
     EXPECT_EQ(61, nthDayOfWeekOfMonth(*state, 5, 1, 3)); // first thursday of march
     EXPECT_EQ(67, nthDayOfWeekOfMonth(*state, 4, 1, 3)); // first wednesday of march
 
-    DataEnvironment::CurrentYearIsLeapYear = true; // based on 2016
+    state->dataEnvrn->CurrentYearIsLeapYear = true; // based on 2016
     state->dataEnvrn->RunPeriodStartDayOfWeek = 6;  // friday
 
     EXPECT_EQ(3, nthDayOfWeekOfMonth(*state, 1, 1, 1));  // first sunday of january

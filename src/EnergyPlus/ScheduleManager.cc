@@ -546,7 +546,7 @@ namespace ScheduleManager {
 
             rowCnt = 0;
             firstLine = true;
-            if (DataEnvironment::CurrentYearIsLeapYear) {
+            if (state.dataEnvrn->CurrentYearIsLeapYear) {
                 rowLimitCount = 366 * 24 * state.dataGlobal->NumOfTimeStepInHour;
             } else {
                 rowLimitCount = 365 * 24 * state.dataGlobal->NumOfTimeStepInHour;
@@ -2002,7 +2002,7 @@ namespace ScheduleManager {
                         DaySchedule(AddDaySch).TSValue(TS, jHour) = curHrVal;
                     }
                 }
-                if (iDay == 59 && !DataEnvironment::CurrentYearIsLeapYear) { // 28 Feb
+                if (iDay == 59 && !state.dataEnvrn->CurrentYearIsLeapYear) { // 28 Feb
                     // Dup 28 Feb to 29 Feb (60)
                     ++iDay;
                     Schedule(SchNum).WeekSchedulePointer(iDay) = Schedule(SchNum).WeekSchedulePointer(iDay - 1);

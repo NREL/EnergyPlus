@@ -67,33 +67,6 @@ namespace DataEnvironment {
     Real64 constexpr SunIsUpValue(0.00001);           // if Cos Zenith Angle of the sun is >= this value, the sun is "up"
     Real64 constexpr StdPressureSeaLevel(101325.0);   // Standard barometric pressure at sea level (Pa)
 
-    // MODULE VARIABLE DECLARATIONS:
-    extern bool GroundTempObjInput;         // Ground temperature object input
-    extern bool GroundTemp_SurfaceObjInput; // Surface ground temperature object input
-    extern bool GroundTemp_DeepObjInput;    // Deep ground temperature object input
-    extern bool FCGroundTemps;
-    extern bool DisplayWeatherMissingDataWarnings; // Display missing/out of range weather warnings
-    extern bool IgnoreSolarRadiation;              // TRUE if all solar radiation is to be ignored
-    extern bool IgnoreBeamRadiation;               // TRUE if beam (aka direct normal) radiation is to be ignored
-    extern bool IgnoreDiffuseRadiation;            // TRUE if diffuse horizontal radiation is to be ignored
-
-    extern bool PrintEnvrnStampWarmup;
-    extern bool PrintEnvrnStampWarmupPrinted;
-
-    extern bool RunPeriodEnvironment;       // True if Run Period, False if DesignDay
-    extern std::string EnvironmentStartEnd; // Start/End dates for Environment
-    extern bool CurrentYearIsLeapYear;      // true when current year is leap year (convoluted logic dealing with
-    // whether weather file allows leap years, runperiod inputs.
-
-    extern int varyingLocationSchedIndexLat;
-    extern int varyingLocationSchedIndexLong;
-    extern int varyingOrientationSchedIndex;
-
-    // for PerformancePrecisionTradeoffs
-    extern bool forceBeginEnvResetSuppress;
-
-    void clear_state();
-
     Real64 OutDryBulbTempAt(EnergyPlusData &state, Real64 Z); // Height above ground (m)
 
     Real64 OutWetBulbTempAt(EnergyPlusData &state, Real64 Z); // Height above ground (m)
@@ -209,6 +182,23 @@ struct EnvironmentData : BaseGlobalStruct {
     Real64 SiteWindExp = 0.22;                          // Exponent for the wind velocity profile at the site
     Real64 SiteWindBLHeight = 370.0;                    // Boundary layer height for the wind velocity profile at the site (m)
     Real64 SiteTempGradient = 0.0065;                   // Air temperature gradient coefficient (K/m)
+    bool GroundTempObjInput = false;                    // Ground temperature object input
+    bool GroundTemp_SurfaceObjInput = false;            // Surface ground temperature object input
+    bool GroundTemp_DeepObjInput = false;               // Deep ground temperature object input
+    bool FCGroundTemps = false;
+    bool DisplayWeatherMissingDataWarnings = false;     // Display missing/out of range weather warnings
+    bool IgnoreSolarRadiation = false;                  // TRUE if all solar radiation is to be ignored
+    bool IgnoreBeamRadiation = false;                   // TRUE if beam (aka direct normal) radiation is to be ignored
+    bool IgnoreDiffuseRadiation = false;                // TRUE if diffuse horizontal radiation is to be ignored
+    bool PrintEnvrnStampWarmup = false;
+    bool PrintEnvrnStampWarmupPrinted = false;
+    bool RunPeriodEnvironment = false;                  // True if Run Period, False if DesignDay
+    std::string EnvironmentStartEnd;                    // Start/End dates for Environment
+    bool CurrentYearIsLeapYear = false;                 // true when current year is leap year (convoluted logic dealing with whether weather file allows leap years, runperiod inputs.
+    int varyingLocationSchedIndexLat = 0;
+    int varyingLocationSchedIndexLong = 0;
+    int varyingOrientationSchedIndex = 0;
+    bool forceBeginEnvResetSuppress = false;            // for PerformancePrecisionTradeoffs
 
     void clear_state() override
     {
@@ -311,6 +301,23 @@ struct EnvironmentData : BaseGlobalStruct {
         this->SiteWindExp = 0.22;
         this->SiteWindBLHeight = 370.0;
         this->SiteTempGradient = 0.0065;
+        this->GroundTempObjInput = false;
+        this->GroundTemp_SurfaceObjInput = false;
+        this->GroundTemp_DeepObjInput = false;
+        this->FCGroundTemps = false;
+        this->DisplayWeatherMissingDataWarnings = false;
+        this->IgnoreSolarRadiation = false;
+        this->IgnoreBeamRadiation = false;
+        this->IgnoreDiffuseRadiation = false;
+        this->PrintEnvrnStampWarmup = false;
+        this->PrintEnvrnStampWarmupPrinted = false;
+        this->RunPeriodEnvironment = false;
+        this->EnvironmentStartEnd.clear();
+        this->CurrentYearIsLeapYear = false;
+        this->varyingLocationSchedIndexLat = 0;
+        this->varyingLocationSchedIndexLong = 0;
+        this->varyingOrientationSchedIndex = 0;
+        this->forceBeginEnvResetSuppress = false;
     }
 };
 

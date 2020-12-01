@@ -1147,7 +1147,7 @@ TEST_F(EnergyPlusFixture, temperatureAndCountInSch_test)
 
     state->dataGlobal->NumOfTimeStepInHour = 4;
     state->dataGlobal->MinutesPerTimeStep = 15;
-    DataEnvironment::CurrentYearIsLeapYear = false;
+    state->dataEnvrn->CurrentYearIsLeapYear = false;
 
     Real64 valueAtTime;
     int numDays;

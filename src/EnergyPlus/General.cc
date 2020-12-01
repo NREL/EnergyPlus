@@ -2318,7 +2318,7 @@ namespace General {
     )
     {
         // J. Glazer - August 2017
-        int firstDayOfMonth = OrdinalDay(monthNumber, 1, DataEnvironment::CurrentYearIsLeapYear);
+        int firstDayOfMonth = OrdinalDay(monthNumber, 1, state.dataEnvrn->CurrentYearIsLeapYear);
         int dayOfWeekForFirstDay = (state.dataEnvrn->RunPeriodStartDayOfWeek + firstDayOfMonth - 1) % 7;
         int jdatForNth;
         if (dayOfWeek >= dayOfWeekForFirstDay) {

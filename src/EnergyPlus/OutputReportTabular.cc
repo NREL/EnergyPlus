@@ -6385,7 +6385,6 @@ namespace OutputReportTabular {
         //   any additional report entries for the predefined reports.
 
         // Using/Aliasing
-        using DataEnvironment::CurrentYearIsLeapYear;
         using DataHeatBalance::BuildingPreDefRep;
         using DataHeatBalance::Lights;
         using DataHeatBalance::TotLights;
@@ -6448,7 +6447,7 @@ namespace OutputReportTabular {
                 PreDefTableEntry(pdchInLtCond, Lights(iLight).Name, "N");
             }
             PreDefTableEntry(
-                pdchInLtAvgHrSchd, Lights(iLight).Name, ScheduleAverageHoursPerWeek(state, Lights(iLight).SchedPtr, StartOfWeek, CurrentYearIsLeapYear));
+                pdchInLtAvgHrSchd, Lights(iLight).Name, ScheduleAverageHoursPerWeek(state, Lights(iLight).SchedPtr, StartOfWeek, state.dataEnvrn->CurrentYearIsLeapYear));
             // average operating hours per week
             if (gatherElapsedTimeBEPS > 0) {
                 HrsPerWeek = 24 * 7 * Lights(iLight).SumTimeNotZeroCons / gatherElapsedTimeBEPS;
@@ -6470,7 +6469,7 @@ namespace OutputReportTabular {
             if (state.dataExteriorEnergyUse->ExteriorLights(iLight).ControlMode == ExteriorEnergyUse::LightControlType::ScheduleOnly) { // photocell/schedule
                 PreDefTableEntry(pdchExLtAvgHrSchd,
                                  state.dataExteriorEnergyUse->ExteriorLights(iLight).Name,
-                                 ScheduleAverageHoursPerWeek(state, state.dataExteriorEnergyUse->ExteriorLights(iLight).SchedPtr, StartOfWeek, CurrentYearIsLeapYear));
+                                 ScheduleAverageHoursPerWeek(state, state.dataExteriorEnergyUse->ExteriorLights(iLight).SchedPtr, StartOfWeek, state.dataEnvrn->CurrentYearIsLeapYear));
             }
             // average operating hours per week
             if (gatherElapsedTimeBEPS > 0) {
@@ -6769,9 +6768,9 @@ namespace OutputReportTabular {
             std::string curSchType = ScheduleManager::GetScheduleType(state, iSch);
             if (UtilityRoutines::SameString(curSchType, "FRACTION")) {
                 PreDefTableEntry(
-                    pdchLeedEflhEflh, curSchName, ScheduleManager::ScheduleAnnualFullLoadHours(state, iSch, StartOfWeek, CurrentYearIsLeapYear), 0);
+                    pdchLeedEflhEflh, curSchName, ScheduleManager::ScheduleAnnualFullLoadHours(state, iSch, StartOfWeek, state.dataEnvrn->CurrentYearIsLeapYear), 0);
                 PreDefTableEntry(
-                    pdchLeedEflhNonZerHrs, curSchName, ScheduleManager::ScheduleHoursGT1perc(state, iSch, StartOfWeek, CurrentYearIsLeapYear), 0);
+                    pdchLeedEflhNonZerHrs, curSchName, ScheduleManager::ScheduleHoursGT1perc(state, iSch, StartOfWeek, state.dataEnvrn->CurrentYearIsLeapYear), 0);
             }
         }
         // fill the LEED setpoint table

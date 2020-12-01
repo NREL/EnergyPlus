@@ -3172,7 +3172,7 @@ namespace SurfaceGeometry {
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond = Ground;
 
                     if (state.dataSurfaceGeometry->NoGroundTempObjWarning) {
-                        if (!GroundTempObjInput) {
+                        if (!state.dataEnvrn->GroundTempObjInput) {
                             ShowWarningError(state, "GetHTSurfaceData: Surfaces with interface to Ground found but no \"Ground Temperatures\" were input.");
                             ShowContinueError(state, "Found first in surface=" + cAlphaArgs(1));
                             ShowContinueError(state, format("Defaults, constant throughout the year of ({:.1R}) will be used.", state.dataEnvrn->GroundTemp));
@@ -3184,7 +3184,7 @@ namespace SurfaceGeometry {
                 } else if (UtilityRoutines::SameString(cAlphaArgs(ArgPointer), "GroundFCfactorMethod")) {
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond = GroundFCfactorMethod;
                     if (state.dataSurfaceGeometry->NoFCGroundTempObjWarning) {
-                        if (!FCGroundTemps) {
+                        if (!state.dataEnvrn->FCGroundTemps) {
                             ShowSevereError(state, "GetHTSurfaceData: Surfaces with interface to GroundFCfactorMethod found but no \"FC Ground "
                                             "Temperatures\" were input.");
                             ShowContinueError(state, "Found first in surface=" + cAlphaArgs(1));
@@ -3707,7 +3707,7 @@ namespace SurfaceGeometry {
                 } else if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond == Ground) {
 
                     if (state.dataSurfaceGeometry->NoGroundTempObjWarning) {
-                        if (!GroundTempObjInput) {
+                        if (!state.dataEnvrn->GroundTempObjInput) {
                             ShowWarningError(state, "GetRectSurfaces: Surfaces with interface to Ground found but no \"Ground Temperatures\" were input.");
                             ShowContinueError(state, "Found first in surface=" + cAlphaArgs(1));
                             ShowContinueError(state, format("Defaults, constant throughout the year of ({:.1R}) will be used.", state.dataEnvrn->GroundTemp));
@@ -3717,7 +3717,7 @@ namespace SurfaceGeometry {
 
                 } else if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond == GroundFCfactorMethod) {
                     if (state.dataSurfaceGeometry->NoFCGroundTempObjWarning) {
-                        if (!FCGroundTemps) {
+                        if (!state.dataEnvrn->FCGroundTemps) {
                             ShowSevereError(state, "GetRectSurfaces: Surfaces with interface to GroundFCfactorMethod found but no \"FC Ground "
                                             "Temperatures\" were input.");
                             ShowContinueError(state, "Found first in surface=" + cAlphaArgs(1));

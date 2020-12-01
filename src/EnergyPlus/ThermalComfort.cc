@@ -1973,9 +1973,6 @@ namespace ThermalComfort {
         //   based on operative temperature and humidity ratio
 
         // Using/Aliasing
-        using DataEnvironment::EnvironmentStartEnd;
-        using DataEnvironment::RunPeriodEnvironment;
-
         using OutputReportTabular::isInQuadrilateral;
         using namespace OutputReportPredefined;
 
@@ -2099,10 +2096,10 @@ namespace ThermalComfort {
             if (showWarning) {
                 ShowWarningError(state, format("More than 4% of time ({:.1R} hours) uncomfortable in one or more zones ", allowedHours));
                 ShowContinueError(state, "Based on ASHRAE 55-2004 graph (Section 5.2.1.1)");
-                if (RunPeriodEnvironment) {
-                    ShowContinueError(state, "During Environment [" + EnvironmentStartEnd + "]: " + state.dataEnvrn->EnvironmentName);
+                if (state.dataEnvrn->RunPeriodEnvironment) {
+                    ShowContinueError(state, "During Environment [" + state.dataEnvrn->EnvironmentStartEnd + "]: " + state.dataEnvrn->EnvironmentName);
                 } else {
-                    ShowContinueError(state, "During SizingPeriod Environment [" + EnvironmentStartEnd + "]: " + state.dataEnvrn->EnvironmentName);
+                    ShowContinueError(state, "During SizingPeriod Environment [" + state.dataEnvrn->EnvironmentStartEnd + "]: " + state.dataEnvrn->EnvironmentName);
                 }
                 for (iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
                     if (state.dataThermalComforts->ThermalComfortInASH55(iZone).Enable55Warning) {
@@ -2442,7 +2439,7 @@ namespace ThermalComfort {
             } else if (epwFileExists) {
                 // determine number of days in year
                 int DaysInYear;
-                if (DataEnvironment::CurrentYearIsLeapYear) {
+                if (state.dataEnvrn->CurrentYearIsLeapYear) {
                     DaysInYear = 366;
                 } else {
                     DaysInYear = 365;

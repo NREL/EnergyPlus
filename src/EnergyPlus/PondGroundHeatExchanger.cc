@@ -346,7 +346,7 @@ namespace PondGroundHeatExchanger {
             ShowFatalError(state, "Errors found in processing input for " + DataIPShortCuts::cCurrentModuleObject);
         }
 
-        if (!DataEnvironment::GroundTemp_DeepObjInput) {
+        if (!state.dataEnvrn->GroundTemp_DeepObjInput) {
             ShowWarningError(state, "GetPondGroundHeatExchanger:  No \"Site:GroundTemperature:Deep\" were input.");
             ShowContinueError(state, format("Defaults, constant throughout the year of ({:.1R}) will be used.", state.dataEnvrn->GroundTemp_Deep));
         }

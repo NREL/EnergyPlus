@@ -241,10 +241,6 @@ namespace EnergyPlus::SetPointManager {
         // Use the Get routines from the InputProcessor module.
 
         // Using/Aliasing
-        using DataEnvironment::FCGroundTemps;
-        using DataEnvironment::GroundTemp_DeepObjInput;
-        using DataEnvironment::GroundTemp_SurfaceObjInput;
-        using DataEnvironment::GroundTempObjInput;
         using DataHeatBalance::Zone;
         using DataZoneControls::StageZoneLogic;
         using DataZoneEquipment::GetSystemNodeNumberForZone;
@@ -2731,7 +2727,7 @@ namespace EnergyPlus::SetPointManager {
             if (UtilityRoutines::SameString(state.dataSetPointManager->GroundTempSetPtMgr(SetPtMgrNum).RefGroundTempObjType, "Site:GroundTemperature:BuildingSurface")) {
                 state.dataSetPointManager->GroundTempSetPtMgr(SetPtMgrNum).RefTypeMode = ReferenceGroundTempObjectType::BuildingSurface;
                 if (state.dataSetPointManager->NoSurfaceGroundTempObjWarning) {
-                    if (!GroundTempObjInput) {
+                    if (!state.dataEnvrn->GroundTempObjInput) {
                         ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
                                          "\" requires \"Site:GroundTemperature:BuildingSurface\" in the input.");
                         ShowContinueError(state, format("Defaults, constant throughout the year of ({:.1R}) will be used.", state.dataEnvrn->GroundTemp));
@@ -2741,7 +2737,7 @@ namespace EnergyPlus::SetPointManager {
             } else if (UtilityRoutines::SameString(state.dataSetPointManager->GroundTempSetPtMgr(SetPtMgrNum).RefGroundTempObjType, "Site:GroundTemperature:Shallow")) {
                 state.dataSetPointManager->GroundTempSetPtMgr(SetPtMgrNum).RefTypeMode = ReferenceGroundTempObjectType::Shallow;
                 if (state.dataSetPointManager->NoShallowGroundTempObjWarning) {
-                    if (!GroundTemp_SurfaceObjInput) {
+                    if (!state.dataEnvrn->GroundTemp_SurfaceObjInput) {
                         ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
                                          "\" requires \"Site:GroundTemperature:Shallow\" in the input.");
                         ShowContinueError(state, format("Defaults, constant throughout the year of ({:.1R}) will be used.", state.dataEnvrn->GroundTemp_Surface));
@@ -2751,7 +2747,7 @@ namespace EnergyPlus::SetPointManager {
             } else if (UtilityRoutines::SameString(state.dataSetPointManager->GroundTempSetPtMgr(SetPtMgrNum).RefGroundTempObjType, "Site:GroundTemperature:Deep")) {
                 state.dataSetPointManager->GroundTempSetPtMgr(SetPtMgrNum).RefTypeMode = ReferenceGroundTempObjectType::Deep;
                 if (state.dataSetPointManager->NoDeepGroundTempObjWarning) {
-                    if (!GroundTemp_DeepObjInput) {
+                    if (!state.dataEnvrn->GroundTemp_DeepObjInput) {
                         ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
                                          "\" requires \"Site:GroundTemperature:Deep\" in the input.");
                         ShowContinueError(state, format("Defaults, constant throughout the year of ({:.1R}) will be used.", state.dataEnvrn->GroundTemp_Deep));
@@ -2761,7 +2757,7 @@ namespace EnergyPlus::SetPointManager {
             } else if (UtilityRoutines::SameString(state.dataSetPointManager->GroundTempSetPtMgr(SetPtMgrNum).RefGroundTempObjType, "Site:GroundTemperature:FCfactorMethod")) {
                 state.dataSetPointManager->GroundTempSetPtMgr(SetPtMgrNum).RefTypeMode = ReferenceGroundTempObjectType::FCFactorMethod;
                 if (state.dataSetPointManager->NoFCGroundTempObjWarning) {
-                    if (!FCGroundTemps) {
+                    if (!state.dataEnvrn->FCGroundTemps) {
                         ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
                                          "\" requires \"Site:GroundTemperature:FCfactorMethod\" in the input.");
                         ShowContinueError(state, format("Defaults, constant throughout the year of ({:.1R}) will be used.", state.dataEnvrn->GroundTempFC));

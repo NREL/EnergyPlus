@@ -68,51 +68,6 @@ namespace EnergyPlus::DataEnvironment {
     // to the "environment" (i.e. current date data, tomorrow's date data, and
     // current weather variables)
 
-    // MODULE VARIABLE DECLARATIONS:
-    bool GroundTempObjInput(false);         // Ground temperature object input
-    bool GroundTemp_SurfaceObjInput(false); // Surface ground temperature object input
-    bool GroundTemp_DeepObjInput(false);    // Deep ground temperature object input
-    bool FCGroundTemps(false);
-    bool DisplayWeatherMissingDataWarnings(false); // Display missing/out of range weather warnings
-    bool IgnoreSolarRadiation(false);              // TRUE if all solar radiation is to be ignored
-    bool IgnoreBeamRadiation(false);               // TRUE if beam (aka direct normal) radiation is to be ignored
-    bool IgnoreDiffuseRadiation(false);            // TRUE if diffuse horizontal radiation is to be ignored
-
-    bool PrintEnvrnStampWarmup(false);
-    bool PrintEnvrnStampWarmupPrinted(false);
-
-    bool RunPeriodEnvironment(false);  // True if Run Period, False if DesignDay
-    std::string EnvironmentStartEnd;   // Start/End dates for Environment
-    bool CurrentYearIsLeapYear(false); // true when current year is leap year (convoluted logic dealing with
-    // whether weather file allows leap years, runperiod inputs.
-
-    int varyingLocationSchedIndexLat(0);
-    int varyingLocationSchedIndexLong(0);
-    int varyingOrientationSchedIndex(0);
-
-    // for PerformancePrecisionTradeoffs
-    bool forceBeginEnvResetSuppress(false);
-
-    void clear_state()
-    {
-        GroundTempObjInput = false;
-        GroundTemp_SurfaceObjInput = false;
-        GroundTemp_DeepObjInput = false;
-        FCGroundTemps = false;
-        DisplayWeatherMissingDataWarnings = false;
-        IgnoreSolarRadiation = false;
-        IgnoreBeamRadiation = false;
-        IgnoreDiffuseRadiation = false;
-        PrintEnvrnStampWarmup = false;
-        PrintEnvrnStampWarmupPrinted = false;
-        RunPeriodEnvironment = false;
-        EnvironmentStartEnd = std::string();
-        CurrentYearIsLeapYear = false;
-        varyingLocationSchedIndexLat = 0;
-        varyingLocationSchedIndexLong = 0;
-        varyingOrientationSchedIndex = 0;
-    }
-
     Real64 OutDryBulbTempAt(EnergyPlusData &state, Real64 const Z) // Height above ground (m)
     {
 
