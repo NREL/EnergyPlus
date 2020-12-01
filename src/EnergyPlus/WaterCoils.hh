@@ -221,6 +221,7 @@ namespace WaterCoils {
         bool reportCoilFinalSizes;      // one time report of sizes to coil summary report
         bool AirLoopDOASFlag;           // True when this coil is used AirLoopDOAS
         bool GetSizeNotInPlant;         //size not in plant water coils
+        bool ExtOn;                  //on/off signal set by an external unit, i.e. integrated heat pump
 
         // Default Constructor
         WaterCoilEquipConditions()
@@ -250,7 +251,7 @@ namespace WaterCoils {
               CondensateTankID(0), CondensateTankSupplyARRID(0), CondensateVdot(0.0), CondensateVol(0.0), CoilPerfInpMeth(0),
               FaultyCoilFoulingFlag(false), FaultyCoilFoulingIndex(0), FaultyCoilFoulingFactor(0.0),  HdAvVt(1.0), MatlLiqDesiccant(0), IsInPlantLoop(true),
               DesiccantRegenerationCoil(false), DesiccantDehumNum(0), DesignWaterDeltaTemp(0.0), UseDesignWaterDeltaTemp(false), ControllerName(""),
-              ControllerIndex(0), reportCoilFinalSizes(true), AirLoopDOASFlag(false), GetSizeNotInPlant(true),DesiccantWaterLoss(0.0)
+              ControllerIndex(0), reportCoilFinalSizes(true), AirLoopDOASFlag(false), GetSizeNotInPlant(true),DesiccantWaterLoss(0.0), ExtOn(true)
         {
         }
     };

@@ -3696,7 +3696,8 @@ namespace WaterCoils {
         }
 
         // If Coil is Scheduled ON then do the simulation
-        if (((GetCurrentScheduleValue(state, state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr) > 0.0) && (WaterMassFlowRate > 0.0) && (AirMassFlow >= state.dataWaterCoils->MinAirMassFlow)) ||
+        if (((state.dataWaterCoils->WaterCoil(CoilNum).ExtOn == true) &&
+            (GetCurrentScheduleValue(state, state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr) > 0.0) && (WaterMassFlowRate > 0.0) && (AirMassFlow >= state.dataWaterCoils->MinAirMassFlow)) ||
             (CalcMode == state.dataWaterCoils->DesignCalc)) {
             //        transfer inputs to simulation variables and calculate
             //        known thermodynamic functions
@@ -4229,7 +4230,8 @@ namespace WaterCoils {
         }
 
         // If Coil is Scheduled ON then do the simulation
-        if (((GetCurrentScheduleValue(state, state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr) > 0.0) && (state.dataWaterCoils->WaterCoil(CoilNum).InletWaterMassFlowRate > 0.0) &&
+        if (((state.dataWaterCoils->WaterCoil(CoilNum).ExtOn == true) &&
+            (GetCurrentScheduleValue(state, state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr) > 0.0) && (state.dataWaterCoils->WaterCoil(CoilNum).InletWaterMassFlowRate > 0.0) &&
              (AirMassFlowRate >= state.dataWaterCoils->MinAirMassFlow) && (state.dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate > 0.0) &&
              (state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterMassFlowRate > 0.0)) ||
             (CalcMode == state.dataWaterCoils->DesignCalc)) {

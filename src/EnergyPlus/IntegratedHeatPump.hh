@@ -219,6 +219,8 @@ namespace IntegratedHeatPump {
         bool bIsChillerSeparateunit;        // whether chiller is a separate unit
         int IceStoreMode; //IceStorageMode ON; OFF
         Real64 ChargFracLow; //below which charging starts
+        Real64 TchargeZeroFrac; // chiller inlet temperature when the tank ice fraction is zero
+        int CurveChargeT;// charge curve temperature index
 
 
         Real64 WaterVolSCDWH;
@@ -354,7 +356,7 @@ namespace IntegratedHeatPump {
               AirCoolOutletNodeNum(0), DehumLDMassFlowRate(0.0), SupHeatRate(0.0), SupHeatEnergy(0), WaterMiddleNodeNum(0), LDLoopChecked(false),
               SaltConcentration(0.0), LDHeatMode(0), TankLDMass(0.0), TankSaltMass(0.0), DehumLDMassFlowSize(1.0), GridSHCoilIndex(0),
               DehumAirMasslowRate(0.0), DehumAirMasslowSize(1.0), RegenAirMasslowRate(0.0), RegenAirMasslowSize(1.0), RegenLDMassFlowRate(0.0),
-              CompressorPartLoadRatio(0.0), SHR(1.0), iWorkMode(0), LastTime(0.0), DischargeCapacity(0.0)
+              CompressorPartLoadRatio(0.0), SHR(1.0), iWorkMode(0), LastTime(0.0), DischargeCapacity(0.0), CurveChargeT(0), TchargeZeroFrac(-0.5)
         {
         }
     };
@@ -383,7 +385,7 @@ namespace IntegratedHeatPump {
                 bool const bEnhancedDehum = false           // whether it requires enhanced dehumidification
     );
 
-    void SimIHPLiquidStorage(EnergyPlusData &state,
+    void SimIHPLiquidDesiccantStorage(EnergyPlusData &state,
                 int &CompIndex,                // Index for Component name
                 int const CyclingScheme,       // Continuous fan OR cycling compressor
                 Real64 &MaxONOFFCyclesperHour, // Maximum cycling rate of heat pump [cycles/hr]
@@ -399,6 +401,24 @@ namespace IntegratedHeatPump {
                 bool const FirstHVACIteration, // TRUE if First iteration of simulation
                 Optional<Real64 const> OnOffAirFlowRat = _, // ratio of comp on to comp off air flow rate
                 bool const bEnhancedDehum = false           // whether it requires enhanced dehumidification
+    );
+
+    void SimIHPWaterIceStorage(EnergyPlusData &state,
+                             int &CompIndex,                // Index for Component name
+                             int const CyclingScheme,       // Continuous fan OR cycling compressor
+                             Real64 &MaxONOFFCyclesperHour, // Maximum cycling rate of heat pump [cycles/hr]
+                             Real64 &HPTimeConstant,        // Heat pump time constant [s]
+                             Real64 &FanDelayTime,          // Fan delay time, time delay for the HP's fan to
+                             int const CompOp,              // compressor on/off. 0 = off; 1= on
+                             Real64 const PartLoadFrac,
+                             int const SpeedNum,      // compressor speed number
+                             Real64 const SpeedRatio, // compressor speed ratio
+                             Real64 const SensLoad,   // Sensible demand load [W]
+                             Real64 const LatentLoad, // Latent demand load [W]
+                             bool const IsCallbyWH,   // whether the call from the water heating loop or air loop, true = from water heating loop
+                             bool const FirstHVACIteration,              // TRUE if First iteration of simulation
+                             Optional<Real64 const> OnOffAirFlowRat = _, // ratio of comp on to comp off air flow rate
+                             bool const bEnhancedDehum = false           // whether it requires enhanced dehumidification
     );
 
     void GetIHPInput(EnergyPlusData &state);
