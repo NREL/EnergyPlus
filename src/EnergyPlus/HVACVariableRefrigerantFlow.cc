@@ -5290,7 +5290,6 @@ namespace HVACVariableRefrigerantFlow {
         // METHODOLOGY EMPLOYED:
         // Uses the status flags to trigger initializations.
 
-        using DataEnvironment::StdRhoAir;
         using DataHeatBalFanSys::TempControlType;
         using DataHeatBalFanSys::ZoneThermostatSetPointHi;
         using DataHeatBalFanSys::ZoneThermostatSetPointLo;
@@ -6141,7 +6140,7 @@ namespace HVACVariableRefrigerantFlow {
 
             // Change the Volume Flow Rates to Mass Flow Rates
 
-            RhoAir = StdRhoAir;
+            RhoAir = state.dataEnvrn->StdRhoAir;
             // set the mass flow rates from the input volume flow rates
             VRFTU(VRFTUNum).MaxCoolAirMassFlow = RhoAir * VRFTU(VRFTUNum).MaxCoolAirVolFlow;
             VRFTU(VRFTUNum).CoolOutAirMassFlow = RhoAir * VRFTU(VRFTUNum).CoolOutAirVolFlow;

@@ -488,7 +488,7 @@ TEST_F(EnergyPlusFixture, PackagedTerminalHP_VSCoils_Sizing)
     DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).CoolDesTemp = 12.0;
     DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).CoolDesHumRat = 0.05;
     state->dataEnvrn->OutBaroPress = 101325;
-    DataEnvironment::StdRhoAir = 1.0;
+    state->dataEnvrn->StdRhoAir = 1.0;
     OutputReportPredefined::SetPredefinedTables(*state);
     DataSizing::ZoneEqSizing.allocate(1);
     DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).SizingMethod.allocate(16);
@@ -818,7 +818,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
     state->dataEnvrn->OutDryBulbTemp = 10.0;
     state->dataEnvrn->OutHumRat = 0.0075;
     state->dataEnvrn->OutEnthalpy = Psychrometrics::PsyHFnTdbW(state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat);
-    DataEnvironment::StdRhoAir = 1.20;
+    state->dataEnvrn->StdRhoAir = 1.20;
     HVACInletMassFlowRate = 0.50;
     PrimaryAirMassFlowRate = 0.20;
 
@@ -853,7 +853,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
     // set fan parameters
     Fan(1).MaxAirMassFlowRate = HVACInletMassFlowRate;
     Fan(1).InletAirMassFlowRate = HVACInletMassFlowRate;
-    Fan(1).RhoAirStdInit = DataEnvironment::StdRhoAir;
+    Fan(1).RhoAirStdInit = state->dataEnvrn->StdRhoAir;
     Node(Fan(1).InletNodeNum).MassFlowRateMaxAvail = HVACInletMassFlowRate;
     Node(Fan(1).OutletNodeNum).MassFlowRateMax = HVACInletMassFlowRate;
 
@@ -1164,7 +1164,7 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
     state->dataEnvrn->OutDryBulbTemp = 10.0;
     state->dataEnvrn->OutHumRat = 0.0075;
     state->dataEnvrn->OutEnthalpy = Psychrometrics::PsyHFnTdbW(state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat);
-    DataEnvironment::StdRhoAir = 1.20;
+    state->dataEnvrn->StdRhoAir = 1.20;
     HVACInletMassFlowRate = 0.50;
     //		PrimaryAirMassFlowRate = 0.20;
 
@@ -1199,7 +1199,7 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
     // set fan parameters
     Fan(1).MaxAirMassFlowRate = HVACInletMassFlowRate;
     Fan(1).InletAirMassFlowRate = HVACInletMassFlowRate;
-    Fan(1).RhoAirStdInit = DataEnvironment::StdRhoAir;
+    Fan(1).RhoAirStdInit = state->dataEnvrn->StdRhoAir;
     Node(Fan(1).InletNodeNum).MassFlowRateMaxAvail = HVACInletMassFlowRate;
     Node(Fan(1).OutletNodeNum).MassFlowRateMax = HVACInletMassFlowRate;
 

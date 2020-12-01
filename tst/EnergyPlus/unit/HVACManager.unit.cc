@@ -102,7 +102,7 @@ TEST_F(EnergyPlusFixture, CrossMixingReportTest)
     DataHeatBalFanSys::ZoneAirHumRat(1) = 0.001;
     DataHeatBalFanSys::ZoneAirHumRat(2) = 0.0011;
     DataHeatBalFanSys::ZoneAirHumRatAvg = DataHeatBalFanSys::ZoneAirHumRat;
-    DataEnvironment::StdRhoAir = 1.20;
+    state->dataEnvrn->StdRhoAir = 1.20;
 
     DataHeatBalance::CrossMixing(1).ZonePtr = 1;
     DataHeatBalance::CrossMixing(1).FromZone = 2;
@@ -171,7 +171,7 @@ TEST_F(EnergyPlusFixture, InfiltrationReportTest)
     DataHeatBalFanSys::ZoneAirHumRat(1) = 0.001;
     DataHeatBalFanSys::ZoneAirHumRat(2) = 0.0011;
     DataHeatBalFanSys::ZoneAirHumRatAvg = DataHeatBalFanSys::ZoneAirHumRat;
-    DataEnvironment::StdRhoAir = 1.20;
+    state->dataEnvrn->StdRhoAir = 1.20;
     DataHeatBalance::Zone(1).OutDryBulbTemp = 20.0;
     DataHeatBalance::Zone(2).OutDryBulbTemp = 20.0;
     DataZoneEquipment::ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
@@ -233,7 +233,7 @@ TEST_F(EnergyPlusFixture, ExfilAndExhaustReportTest)
     DataHeatBalFanSys::ZoneAirHumRat(1) = 0.001;
     DataHeatBalFanSys::ZoneAirHumRat(2) = 0.0011;
     DataHeatBalFanSys::ZoneAirHumRatAvg = DataHeatBalFanSys::ZoneAirHumRat;
-    DataEnvironment::StdRhoAir = 1.20;
+    state->dataEnvrn->StdRhoAir = 1.20;
     DataHeatBalance::Zone(1).OutDryBulbTemp = 20.0;
     DataHeatBalance::Zone(2).OutDryBulbTemp = 20.0;
     DataZoneEquipment::ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
@@ -277,7 +277,7 @@ TEST_F(EnergyPlusFixture, AirloopFlowBalanceTest)
     DataHeatBalance::ZoneAirMassFlow.EnforceZoneMassBalance = false;
     state->dataGlobal->WarmupFlag = false;
     DataHVACGlobals::AirLoopsSimOnce = true;
-    DataEnvironment::StdRhoAir = 1.0;
+    state->dataEnvrn->StdRhoAir = 1.0;
 
     DataHVACGlobals::NumPrimaryAirSys = 2;
     state->dataAirSystemsData->PrimaryAirSystems.allocate(DataHVACGlobals::NumPrimaryAirSys);

@@ -128,7 +128,6 @@ namespace FanCoilUnits {
     // Using/Aliasing
     using namespace DataLoopNode;
     using namespace DataSizing;
-    using DataEnvironment::StdRhoAir;
     using DataHVACGlobals::ATMixer_InletSide;
     using DataHVACGlobals::ATMixer_SupplySide;
     using DataHVACGlobals::ATMixerExists;
@@ -1252,7 +1251,7 @@ namespace FanCoilUnits {
             InNode = FanCoil(FanCoilNum).AirInNode;
             OutNode = FanCoil(FanCoilNum).AirOutNode;
             OutsideAirNode = FanCoil(FanCoilNum).OutsideAirNode;
-            RhoAir = StdRhoAir;
+            RhoAir = state.dataEnvrn->StdRhoAir;
             HotConNode = FanCoil(FanCoilNum).HeatCoilFluidInletNode;
             ColdConNode = FanCoil(FanCoilNum).CoolCoilFluidInletNode;
             // set the mass flow rates from the input volume flow rates
@@ -3791,7 +3790,7 @@ namespace FanCoilUnits {
 
             // calculate fan speed ratio for Fan:OnOff or Fan:SystemModel (not used for other fan types). Only used in fan:OnOff model if performance
             // curves are present.
-            FanSpeedRatio = Node(InletNode).MassFlowRate / (FanCoil(FanCoilNum).FanAirVolFlow * StdRhoAir);
+            FanSpeedRatio = Node(InletNode).MassFlowRate / (FanCoil(FanCoilNum).FanAirVolFlow * state.dataEnvrn->StdRhoAir);
 
             // Constant fan and variable flow calculation AND variable fan
 

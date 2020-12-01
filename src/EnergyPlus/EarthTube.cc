@@ -747,7 +747,6 @@ namespace EarthTube {
         // PURPOSE OF THIS SUBROUTINE: This subroutine fills remaining report variables.
 
         // Using/Aliasing
-        using DataEnvironment::StdRhoAir;
         using DataHVACGlobals::TimeStepSys;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -767,7 +766,7 @@ namespace EarthTube {
             ZnRptET(ZoneLoop).EarthTubeVolume = (MCPE(ZoneLoop) / CpAir / AirDensity) * ReportingConstant;
             ZnRptET(ZoneLoop).EarthTubeMass = (MCPE(ZoneLoop) / CpAir) * ReportingConstant;
             ZnRptET(ZoneLoop).EarthTubeVolFlowRate = MCPE(ZoneLoop) / CpAir / AirDensity;
-            ZnRptET(ZoneLoop).EarthTubeVolFlowRateStd = MCPE(ZoneLoop) / CpAir / StdRhoAir;
+            ZnRptET(ZoneLoop).EarthTubeVolFlowRateStd = MCPE(ZoneLoop) / CpAir / state.dataEnvrn->StdRhoAir;
             ZnRptET(ZoneLoop).EarthTubeMassFlowRate = MCPE(ZoneLoop) / CpAir;
             ZnRptET(ZoneLoop).EarthTubeWaterMassFlowRate = EAMFLxHumRat(ZoneLoop);
 

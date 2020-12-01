@@ -111,9 +111,6 @@ namespace HeatRecovery {
     using namespace DataLoopNode;
     using DataEnvironment::CurMnDy;
     using DataEnvironment::EnvironmentName;
-    using DataEnvironment::StdBaroPress;
-    using DataEnvironment::StdRhoAir;
-
     // Use statements for access to subroutines in other modules
     using namespace ScheduleManager;
 
@@ -1350,7 +1347,7 @@ namespace HeatRecovery {
         // Do the Begin Environment initializations
         if (state.dataGlobal->BeginEnvrnFlag && ExchCond(ExchNum).myEnvrnFlag) {
             // I believe that all of these initializations should be taking place at the SCFM conditions
-            RhoAir = StdRhoAir;
+            RhoAir = state.dataEnvrn->StdRhoAir;
             //    RhoAir = PsyRhoAirFnPbTdbW(101325.0,20.0,0.0)  do we want standard air density at sea level for generic ERVs per ARI 1060?
             CpAir = PsyCpAirFnW(0.0);
 
@@ -2730,7 +2727,7 @@ namespace HeatRecovery {
                     T_RegenInHumRat = ExchCond(ExNum).SupInHumRat;
 
                     // Must use the same density used to convert volumetric flow rate to mass flow rate to get back to velocity
-                    RhoStd = StdRhoAir; // PsyRhoAirFnPbTdbW(StdBaroPress,20.0d0, 0.0d0)
+                    RhoStd = state.dataEnvrn->StdRhoAir; // PsyRhoAirFnPbTdbW(StdBaroPress,20.0d0, 0.0d0)
                     BalFaceVelActual = SupInMassFlow / (RhoStd * ExchCond(ExNum).FaceArea);
 
                     T_FaceVel = BalFaceVelActual;

@@ -6098,7 +6098,7 @@ namespace DXCoils {
             HPWHInletWBTemp = DXCoil(DXCoilNum).RatedInletWBTemp;
             DXCoil(DXCoilNum).RatedAirMassFlowRate(1) =
                 DXCoil(DXCoilNum).RatedAirVolFlowRate(1) *
-                PsyRhoAirFnPbTdbW(state, StdBaroPress, DXCoil(DXCoilNum).RatedInletDBTemp, HPInletAirHumRat, RoutineName);
+                PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, DXCoil(DXCoilNum).RatedInletDBTemp, HPInletAirHumRat, RoutineName);
             //   get rated coil bypass factor excluding fan heat
 
             //   call CalcHPWHDXCoil to determine DXCoil%RatedTotCap(1) for rated CBF calculation below
@@ -6227,7 +6227,7 @@ namespace DXCoils {
                 }
 
                 DXCoil(DXCoilNum).RatedAirMassFlowRate(Mode) = DXCoil(DXCoilNum).RatedAirVolFlowRate(Mode) *
-                                                               PsyRhoAirFnPbTdbW(state, StdBaroPress, RatedInletAirTemp, RatedInletAirHumRat, RoutineName);
+                                                               PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, RatedInletAirTemp, RatedInletAirHumRat, RoutineName);
                 // get high speed rated coil bypass factor
                 DXCoil(DXCoilNum).RatedCBF(Mode) = CalcCBF(state,
                                                            DXCoil(DXCoilNum).DXCoilType,
@@ -6343,7 +6343,7 @@ namespace DXCoils {
                         }
                         DXCoil(DXCoilNum).RatedAirMassFlowRate(Mode) =
                             DXCoil(DXCoilNum).RatedAirVolFlowRate(Mode) *
-                            PsyRhoAirFnPbTdbW(state, StdBaroPress, RatedInletAirTemp, RatedInletAirHumRat, RoutineName);
+                            PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, RatedInletAirTemp, RatedInletAirHumRat, RoutineName);
                         // get rated coil bypass factor
                         DXCoil(DXCoilNum).RatedCBF(Mode) = CalcCBF(state,
                                                                    DXCoil(DXCoilNum).CoilPerformanceType(Mode),
@@ -6376,7 +6376,7 @@ namespace DXCoils {
                 RatedHeatPumpIndoorHumRat = 0.00881; // Humidity ratio corresponding to 70F dry bulb/60F wet bulb
                 DXCoil(DXCoilNum).RatedAirMassFlowRate(Mode) =
                     DXCoil(DXCoilNum).RatedAirVolFlowRate(Mode) *
-                    PsyRhoAirFnPbTdbW(state, StdBaroPress, RatedHeatPumpIndoorAirTemp, RatedHeatPumpIndoorHumRat, RoutineName);
+                    PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, RatedHeatPumpIndoorAirTemp, RatedHeatPumpIndoorHumRat, RoutineName);
 
                 // Check for valid range of (Rated Air Volume Flow Rate / Rated Total Capacity)
                 if (DXCoil(DXCoilNum).DXCoilType_Num !=
@@ -6478,7 +6478,7 @@ namespace DXCoils {
                 }
 
                 DXCoil(DXCoilNum).RatedAirMassFlowRate2 =
-                    DXCoil(DXCoilNum).RatedAirVolFlowRate2 * PsyRhoAirFnPbTdbW(state, StdBaroPress, RatedInletAirTemp, RatedInletAirHumRat, RoutineName);
+                    DXCoil(DXCoilNum).RatedAirVolFlowRate2 * PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, RatedInletAirTemp, RatedInletAirHumRat, RoutineName);
                 // get low speed rated coil bypass factor
                 DXCoil(DXCoilNum).RatedCBF2 = CalcCBF(state,
                                                       DXCoil(DXCoilNum).DXCoilType,
@@ -6538,7 +6538,7 @@ namespace DXCoils {
                     }
                     DXCoil(DXCoilNum).MSRatedAirMassFlowRate(Mode) =
                         DXCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode) *
-                        PsyRhoAirFnPbTdbW(state, StdBaroPress, RatedInletAirTemp, RatedInletAirHumRat, RoutineName);
+                        PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, RatedInletAirTemp, RatedInletAirHumRat, RoutineName);
                     // get high speed rated coil bypass factor
                     DXCoil(DXCoilNum).MSRatedCBF(Mode) = CalcCBF(state,
                                                                  DXCoil(DXCoilNum).DXCoilType,
@@ -6559,7 +6559,7 @@ namespace DXCoils {
 
                     DXCoil(DXCoilNum).MSRatedAirMassFlowRate(Mode) =
                         DXCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode) *
-                        PsyRhoAirFnPbTdbW(state, StdBaroPress, RatedHeatPumpIndoorAirTemp, RatedHeatPumpIndoorHumRat, RoutineName);
+                        PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, RatedHeatPumpIndoorAirTemp, RatedHeatPumpIndoorHumRat, RoutineName);
                     // Check for valid range of (Rated Air Volume Flow Rate / Rated Total Capacity)
                     RatedVolFlowPerRatedTotCap = DXCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode) / DXCoil(DXCoilNum).MSRatedTotCap(Mode);
                     if (((MinRatedVolFlowPerRatedTotCap(DXCT) - RatedVolFlowPerRatedTotCap) > SmallDifferenceTest) ||
@@ -6632,7 +6632,7 @@ namespace DXCoils {
             //   The DX Coil used in HPWH's does not know if it is using a scheduled inlet temperature so check the node pressure
             if (DXCoil(DXCoilNum).CondenserInletNodeNum(1) > 0) {
                 if (Node(DXCoil(DXCoilNum).CondenserInletNodeNum(1)).Press == 0.0) {
-                    Node(DXCoil(DXCoilNum).CondenserInletNodeNum(1)).Press = StdBaroPress;
+                    Node(DXCoil(DXCoilNum).CondenserInletNodeNum(1)).Press = state.dataEnvrn->StdBaroPress;
                 }
             }
         }

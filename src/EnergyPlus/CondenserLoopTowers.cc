@@ -2421,7 +2421,7 @@ namespace CondenserLoopTowers {
 
         if (this->HighSpeedAirFlowRateWasAutoSized) {
             // Plant Sizing Object is not required to AUTOSIZE this field since its simply a multiple of another field.
-            tmpHighSpeedAirFlowRate = tmpHighSpeedFanPower * 0.5 * (101325.0 / DataEnvironment::StdBaroPress) / 190.0;
+            tmpHighSpeedAirFlowRate = tmpHighSpeedFanPower * 0.5 * (101325.0 / state.dataEnvrn->StdBaroPress) / 190.0;
             if (DataPlant::PlantFirstSizesOkayToFinalize) this->HighSpeedAirFlowRate = tmpHighSpeedAirFlowRate;
 
             if (this->TowerType_Num == DataPlant::TypeOf_CoolingTower_SingleSpd || this->TowerType_Num == DataPlant::TypeOf_CoolingTower_VarSpd) {
@@ -2490,7 +2490,7 @@ namespace CondenserLoopTowers {
                     this->WaterTemp = DesTowerInletWaterTemp;
                     this->AirTemp = this->DesInletAirDBTemp;    // 35.0;
                     this->AirWetBulb = this->DesInletAirWBTemp; // 25.6;
-                    this->AirPress = DataEnvironment::StdBaroPress;
+                    this->AirPress = state.dataEnvrn->StdBaroPress;
                     this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(state, this->AirTemp, this->AirWetBulb, this->AirPress);
                     auto f = std::bind(&CoolingTower::residualUA, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
                     TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, UA, f, UA0, UA1, Par);
@@ -2594,7 +2594,7 @@ namespace CondenserLoopTowers {
                     this->WaterTemp = DesTowerInletWaterTemp;
                     this->AirTemp = this->DesInletAirDBTemp;    // 35.0;
                     this->AirWetBulb = this->DesInletAirWBTemp; // 25.6;
-                    this->AirPress = DataEnvironment::StdBaroPress;
+                    this->AirPress = state.dataEnvrn->StdBaroPress;
                     this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(state, this->AirTemp, this->AirWetBulb, this->AirPress);
                     auto f = std::bind(&CoolingTower::residualUA, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
                     TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, UA, f, UA0, UA1, Par);
@@ -2663,7 +2663,7 @@ namespace CondenserLoopTowers {
                 this->WaterTemp = this->DesInletWaterTemp;  // 35.0; // 95F design inlet water temperature
                 this->AirTemp = this->DesInletAirDBTemp;    // 95F design inlet air dry-bulb temp
                 this->AirWetBulb = this->DesInletAirWBTemp; // 78F design inlet air wet-bulb temp
-                this->AirPress = DataEnvironment::StdBaroPress;
+                this->AirPress = state.dataEnvrn->StdBaroPress;
                 this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(state, this->AirTemp, this->AirWetBulb, this->AirPress);
                 auto f = std::bind(&CoolingTower::residualUA, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
                 TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, UA, f, UA0, UA1, Par);
@@ -2801,7 +2801,7 @@ namespace CondenserLoopTowers {
                 this->WaterTemp = this->DesInletWaterTemp;  // 35.0; // 95F design inlet water temperature
                 this->AirTemp = this->DesInletAirDBTemp;    // 35.0; // 95F design inlet air dry-bulb temp
                 this->AirWetBulb = this->DesInletAirWBTemp; // 25.6; // 78F design inlet air wet-bulb temp
-                this->AirPress = DataEnvironment::StdBaroPress;
+                this->AirPress = state.dataEnvrn->StdBaroPress;
                 this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(state, this->AirTemp, this->AirWetBulb, this->AirPress);
                 auto f = std::bind(&CoolingTower::residualUA, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
                 TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, UA, f, UA0, UA1, Par);
@@ -2882,7 +2882,7 @@ namespace CondenserLoopTowers {
                 this->WaterTemp = this->DesInletWaterTemp;  // 35.0; // 95F design inlet water temperature
                 this->AirTemp = this->DesInletAirDBTemp;    // 35.0; // 95F design inlet air dry-bulb temp
                 this->AirWetBulb = this->DesInletAirWBTemp; // 25.6; // 78F design inlet air wet-bulb temp
-                this->AirPress = DataEnvironment::StdBaroPress;
+                this->AirPress = state.dataEnvrn->StdBaroPress;
                 this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(state, this->AirTemp, this->AirWetBulb, this->AirPress);
                 auto f = std::bind(&CoolingTower::residualUA, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
                 TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, UA, f, UA0, UA1, Par);
@@ -3344,7 +3344,7 @@ namespace CondenserLoopTowers {
             PlantUtilities::RegisterPlantCompDesignFlow(this->WaterInletNodeNum, tmpDesignWaterFlowRate);
 
             if (this->DefaultedDesignAirFlowScalingFactor) {
-                tmpDesignAirFlowRate = tmpNomTowerCap * this->DesignAirFlowPerUnitNomCap * (101325.0 / DataEnvironment::StdBaroPress);
+                tmpDesignAirFlowRate = tmpNomTowerCap * this->DesignAirFlowPerUnitNomCap * (101325.0 / state.dataEnvrn->StdBaroPress);
             } else {
                 tmpDesignAirFlowRate = tmpNomTowerCap * this->DesignAirFlowPerUnitNomCap;
             }
@@ -3459,7 +3459,7 @@ namespace CondenserLoopTowers {
 
                 this->AirTemp = this->DesInletAirDBTemp;    // 35.0;
                 this->AirWetBulb = this->DesInletAirWBTemp; // 25.6;
-                this->AirPress = DataEnvironment::StdBaroPress;
+                this->AirPress = state.dataEnvrn->StdBaroPress;
                 this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(state, this->AirTemp, this->AirWetBulb, this->AirPress);
                 auto f = std::bind(&CoolingTower::residualUA, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
                 TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, UA, f, UA0, UA1, Par);
@@ -3491,7 +3491,7 @@ namespace CondenserLoopTowers {
 
                 this->AirTemp = this->DesInletAirDBTemp;    // 35.0;
                 this->AirWetBulb = this->DesInletAirWBTemp; // 25.6;
-                this->AirPress = DataEnvironment::StdBaroPress;
+                this->AirPress = state.dataEnvrn->StdBaroPress;
                 this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(state, this->AirTemp, this->AirWetBulb, this->AirPress);
                 auto f2 = std::bind(&CoolingTower::residualUA, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
                 TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, UA, f2, UA0, UA1, Par);
@@ -3668,7 +3668,7 @@ namespace CondenserLoopTowers {
                 }
                 if (this->HighSpeedAirFlowRateWasAutoSized) {
                     if (this->DefaultedDesignAirFlowScalingFactor) {
-                        tmpDesignAirFlowRate = tmpNomTowerCap * this->DesignAirFlowPerUnitNomCap * (101325.0 / DataEnvironment::StdBaroPress);
+                        tmpDesignAirFlowRate = tmpNomTowerCap * this->DesignAirFlowPerUnitNomCap * (101325.0 / state.dataEnvrn->StdBaroPress);
                     } else {
                         tmpDesignAirFlowRate = tmpNomTowerCap * this->DesignAirFlowPerUnitNomCap;
                     }
@@ -3721,7 +3721,7 @@ namespace CondenserLoopTowers {
                     this->WaterTemp = DesTowerInletWaterTemp;
                     this->AirTemp = this->DesInletAirDBTemp;    // 35.0;
                     this->AirWetBulb = this->DesInletAirWBTemp; // 25.6;
-                    this->AirPress = DataEnvironment::StdBaroPress;
+                    this->AirPress = state.dataEnvrn->StdBaroPress;
                     this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(state, this->AirTemp, this->AirWetBulb, this->AirPress);
                     auto f = std::bind(&CoolingTower::residualUA, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
                     TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, UA, f, UA0, UA1, Par);
@@ -3754,7 +3754,7 @@ namespace CondenserLoopTowers {
                     this->WaterTemp = DesTowerInletWaterTemp;
                     this->AirTemp = DesTowerInletAirDBTemp;    // 35.0;
                     this->AirWetBulb = DesTowerInletAirWBTemp; // 25.6;
-                    this->AirPress = DataEnvironment::StdBaroPress;
+                    this->AirPress = state.dataEnvrn->StdBaroPress;
                     this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(state, this->AirTemp, this->AirWetBulb, this->AirPress);
                     auto f3 = std::bind(&CoolingTower::residualUA, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
                     TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, UA, f3, UA0, UA1, Par);
@@ -3850,7 +3850,7 @@ namespace CondenserLoopTowers {
                     }
 
                     if (this->DefaultedDesignAirFlowScalingFactor) {
-                        tmpDesignAirFlowRate = tmpNomTowerCap * this->DesignAirFlowPerUnitNomCap * (101325.0 / DataEnvironment::StdBaroPress);
+                        tmpDesignAirFlowRate = tmpNomTowerCap * this->DesignAirFlowPerUnitNomCap * (101325.0 / state.dataEnvrn->StdBaroPress);
                     } else {
                         tmpDesignAirFlowRate = tmpNomTowerCap * this->DesignAirFlowPerUnitNomCap;
                     }
@@ -3882,7 +3882,7 @@ namespace CondenserLoopTowers {
                     this->WaterTemp = DesTowerInletWaterTemp;
                     this->AirTemp = DesTowerInletAirDBTemp;    // 35.0;
                     this->AirWetBulb = DesTowerInletAirWBTemp; // 25.6;
-                    this->AirPress = DataEnvironment::StdBaroPress;
+                    this->AirPress = state.dataEnvrn->StdBaroPress;
                     this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(state, this->AirTemp, this->AirWetBulb, this->AirPress);
                     OutWaterTemp =
                         this->calculateSimpleTowerOutletTemp(state, rho * tmpDesignWaterFlowRate, this->HighSpeedAirFlowRate, this->HighSpeedTowerUA);

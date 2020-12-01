@@ -940,7 +940,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedSizing)
     EXPECT_TRUE(state->dataCondenserLoopTowers->towers(1).HighSpeedAirFlowRateWasAutoSized);
     EXPECT_GT(state->dataCondenserLoopTowers->towers(1).HighSpeedAirFlowRate, 10000000.0);
     EXPECT_DOUBLE_EQ(state->dataCondenserLoopTowers->towers(1).HighSpeedAirFlowRate,
-                     state->dataCondenserLoopTowers->towers(1).HighSpeedFanPower * 0.5 * (101325.0 / DataEnvironment::StdBaroPress) / 190.0);
+                     state->dataCondenserLoopTowers->towers(1).HighSpeedFanPower * 0.5 * (101325.0 / state->dataEnvrn->StdBaroPress) / 190.0);
 
     // autosized input
     EXPECT_TRUE(state->dataCondenserLoopTowers->towers(1).HighSpeedFanPowerWasAutoSized);
@@ -1349,7 +1349,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUserInputTowerSizing)
     EXPECT_TRUE(state->dataCondenserLoopTowers->towers(1).HighSpeedAirFlowRateWasAutoSized);
     EXPECT_NEAR(state->dataCondenserLoopTowers->towers(1).HighSpeedAirFlowRate, 2.8262, 0.0001);
     EXPECT_DOUBLE_EQ(state->dataCondenserLoopTowers->towers(1).HighSpeedAirFlowRate,
-                     state->dataCondenserLoopTowers->towers(1).HighSpeedFanPower * 0.5 * (101325.0 / DataEnvironment::StdBaroPress) / 190.0);
+                     state->dataCondenserLoopTowers->towers(1).HighSpeedFanPower * 0.5 * (101325.0 / state->dataEnvrn->StdBaroPress) / 190.0);
 
     // autosized input
     EXPECT_TRUE(state->dataCondenserLoopTowers->towers(1).HighSpeedFanPowerWasAutoSized);
@@ -1764,7 +1764,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_TwoSpeedUserInputTowerSizing)
     EXPECT_TRUE(state->dataCondenserLoopTowers->towers(1).HighSpeedAirFlowRateWasAutoSized);
     EXPECT_NEAR(state->dataCondenserLoopTowers->towers(1).HighSpeedAirFlowRate, 2.8262, 0.0001);
     EXPECT_DOUBLE_EQ(state->dataCondenserLoopTowers->towers(1).HighSpeedAirFlowRate,
-                     state->dataCondenserLoopTowers->towers(1).HighSpeedFanPower * 0.5 * (101325.0 / DataEnvironment::StdBaroPress) / 190.0);
+                     state->dataCondenserLoopTowers->towers(1).HighSpeedFanPower * 0.5 * (101325.0 / state->dataEnvrn->StdBaroPress) / 190.0);
 
     // autosized input
     EXPECT_TRUE(state->dataCondenserLoopTowers->towers(1).HighSpeedFanPowerWasAutoSized);

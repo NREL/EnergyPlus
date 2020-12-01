@@ -3773,7 +3773,6 @@ namespace PackagedTerminalHeatPump {
 
         // Using/Aliasing
         using namespace DataZoneEnergyDemands;
-        using DataEnvironment::StdRhoAir;
         using DataZoneEquipment::CheckZoneEquipmentList;
         using DataZoneEquipment::ZoneEquipInputsFilled;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
@@ -4042,7 +4041,7 @@ namespace PackagedTerminalHeatPump {
             SizePTUnit(state, PTUnitNum);
             MySizeFlag(PTUnitNum) = false;
 
-            RhoAir = StdRhoAir;
+            RhoAir = state.dataEnvrn->StdRhoAir;
             PTUnit(PTUnitNum).MaxCoolAirMassFlow = RhoAir * PTUnit(PTUnitNum).MaxCoolAirVolFlow;
             PTUnit(PTUnitNum).MaxHeatAirMassFlow = RhoAir * PTUnit(PTUnitNum).MaxHeatAirVolFlow;
 
@@ -4301,7 +4300,7 @@ namespace PackagedTerminalHeatPump {
             InNode = PTUnit(PTUnitNum).AirInNode;
             OutNode = PTUnit(PTUnitNum).AirOutNode;
             OutsideAirNode = PTUnit(PTUnitNum).OutsideAirNode;
-            RhoAir = StdRhoAir;
+            RhoAir = state.dataEnvrn->StdRhoAir;
             // set the mass flow rates from the input volume flow rates
             PTUnit(PTUnitNum).MaxCoolAirMassFlow = RhoAir * PTUnit(PTUnitNum).MaxCoolAirVolFlow;
             PTUnit(PTUnitNum).CoolOutAirMassFlow = RhoAir * PTUnit(PTUnitNum).CoolOutAirVolFlow;

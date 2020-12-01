@@ -110,7 +110,6 @@ namespace PoweredInductionUnits {
 
     // Using/Aliasing
     using namespace DataLoopNode;
-    using DataEnvironment::StdRhoAir;
     using DataHVACGlobals::PlenumInducedMassFlow;
     using DataHVACGlobals::SingleCoolingSetPoint;
     using DataHVACGlobals::SingleHeatingSetPoint;
@@ -876,7 +875,7 @@ namespace PoweredInductionUnits {
 
         // Do the Begin Environment initializations
         if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(PIUNum)) {
-            RhoAir = StdRhoAir;
+            RhoAir = state.dataEnvrn->StdRhoAir;
             PriNode = PIU(PIUNum).PriAirInNode;
             SecNode = PIU(PIUNum).SecAirInNode;
             OutletNode = PIU(PIUNum).OutAirNode;
@@ -1323,7 +1322,7 @@ namespace PoweredInductionUnits {
                                              TermUnitFinalZoneSizing(CurTermUnitSizingNum).ZoneTempAtHeatPeak * (1.0 - PIU(PIUNum).MinPriAirFlowFrac);
                                 CoilOutTemp = TermUnitFinalZoneSizing(CurTermUnitSizingNum).HeatDesTemp;
                                 CoilOutHumRat = TermUnitFinalZoneSizing(CurTermUnitSizingNum).HeatDesHumRat;
-                                DesMassFlow = StdRhoAir * TermUnitSizing(CurTermUnitSizingNum).AirVolFlow;
+                                DesMassFlow = state.dataEnvrn->StdRhoAir * TermUnitSizing(CurTermUnitSizingNum).AirVolFlow;
                                 DesCoilLoad = PsyCpAirFnW(CoilOutHumRat) * DesMassFlow * (CoilOutTemp - CoilInTemp);
 
                                 rho = GetDensityGlycol(state,
@@ -1416,7 +1415,7 @@ namespace PoweredInductionUnits {
                                              TermUnitFinalZoneSizing(CurTermUnitSizingNum).ZoneTempAtHeatPeak * (1.0 - PIU(PIUNum).MinPriAirFlowFrac);
                                 CoilOutTemp = TermUnitFinalZoneSizing(CurTermUnitSizingNum).HeatDesTemp;
                                 CoilOutHumRat = TermUnitFinalZoneSizing(CurTermUnitSizingNum).HeatDesHumRat;
-                                DesMassFlow = StdRhoAir * TermUnitSizing(CurTermUnitSizingNum).AirVolFlow;
+                                DesMassFlow = state.dataEnvrn->StdRhoAir * TermUnitSizing(CurTermUnitSizingNum).AirVolFlow;
                                 DesCoilLoad = PsyCpAirFnW(CoilOutHumRat) * DesMassFlow * (CoilOutTemp - CoilInTemp);
                                 TempSteamIn = 100.00;
                                 EnthSteamInDry = GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 1.0, PIU(PIUNum).HCoil_FluidIndex, RoutineName);
@@ -2184,7 +2183,7 @@ namespace PoweredInductionUnits {
     {
         // calculates zone outdoor air volume flow rate using the supply air flow rate and OA fraction
         if (this->AirLoopNum > 0) {
-            this->OutdoorAirFlowRate = (DataLoopNode::Node(this->PriAirInNode).MassFlowRate / DataEnvironment::StdRhoAir) * state.dataAirLoop->AirLoopFlow(this->AirLoopNum).OAFrac;
+            this->OutdoorAirFlowRate = (DataLoopNode::Node(this->PriAirInNode).MassFlowRate / state.dataEnvrn->StdRhoAir) * state.dataAirLoop->AirLoopFlow(this->AirLoopNum).OAFrac;
         } else {
             this->OutdoorAirFlowRate = 0.0;
         }

@@ -4054,7 +4054,6 @@ namespace EvaporativeCoolers {
         // na
 
         // Using/Aliasing
-        using DataEnvironment::StdRhoAir;
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::ZoneComp;
         using DataSizing::AutoSize;
@@ -4168,7 +4167,7 @@ namespace EvaporativeCoolers {
         // Do the Begin Environment initializations
         if (state.dataGlobal->BeginEnvrnFlag && ZoneEvapUnit(UnitNum).MyEnvrn) {
 
-            ZoneEvapUnit(UnitNum).DesignAirMassFlowRate = StdRhoAir * ZoneEvapUnit(UnitNum).DesignAirVolumeFlowRate;
+            ZoneEvapUnit(UnitNum).DesignAirMassFlowRate = state.dataEnvrn->StdRhoAir * ZoneEvapUnit(UnitNum).DesignAirVolumeFlowRate;
             Node(ZoneEvapUnit(UnitNum).OAInletNodeNum).MassFlowRateMax = ZoneEvapUnit(UnitNum).DesignAirMassFlowRate;
             Node(ZoneEvapUnit(UnitNum).OAInletNodeNum).MassFlowRateMin = 0.0;
             Node(ZoneEvapUnit(UnitNum).OAInletNodeNum).MassFlowRateMinAvail = 0.0;

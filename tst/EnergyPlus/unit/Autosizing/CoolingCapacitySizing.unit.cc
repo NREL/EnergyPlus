@@ -81,7 +81,7 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    DataEnvironment::StdRhoAir = 1.2;
+    state->dataEnvrn->StdRhoAir = 1.2;
     // call simulate to trigger sizing call
     HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(*state, "MyFan"));
     DataLoopNode::Node(1).Press = 101325.0;
@@ -174,7 +174,7 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(4981.71, sizedValue, 0.01);
-    EXPECT_NEAR(1.2, DataEnvironment::StdRhoAir, 0.01);
+    EXPECT_NEAR(1.2, state->dataEnvrn->StdRhoAir, 0.01);
     sizer.autoSizedValue = 0.0; // reset for next test
 
     // Test 3 - Zone Equipment, Zone Eq Fan Coil
@@ -194,7 +194,7 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
 
     // Test 4 - Zone Equipment, Zone Eq Fan Coil, HX assisted water coil
     DataSizing::ZoneEqSizing(1).DesCoolingLoad = 0.0;
-    DataSizing::DataFlowUsedForSizing = DataSizing::FinalZoneSizing(1).DesCoolMassFlow / DataEnvironment::StdRhoAir;
+    DataSizing::DataFlowUsedForSizing = DataSizing::FinalZoneSizing(1).DesCoolMassFlow / state->dataEnvrn->StdRhoAir;
     // start with an auto-sized value as the user input
     inputValue = DataSizing::AutoSize;
     // do sizing

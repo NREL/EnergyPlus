@@ -164,7 +164,7 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    DataEnvironment::StdRhoAir = 1.0;
+    state->dataEnvrn->StdRhoAir = 1.0;
 
     CurZoneEqNum = 0;
     CurSysNum = 0;
@@ -291,7 +291,7 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
     state->dataGlobal->BeginEnvrnFlag = true;
     // set fan inlet max avail so fan doesn't shut down flow
     DataLoopNode::Node(1).MassFlowRateMaxAvail = 0.2;
-    DataEnvironment::StdRhoAir = 1.2; // fan used this to convert volume to mass flow rate
+    state->dataEnvrn->StdRhoAir = 1.2; // fan used this to convert volume to mass flow rate
     state->dataEnvrn->OutBaroPress = 101325.0;
     // second pass through will run model
 
@@ -425,7 +425,7 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     Real64 PLR(0.0);
 
     state->dataEnvrn->OutBaroPress = 101325.0;
-    DataEnvironment::StdRhoAir = 1.20;
+    state->dataEnvrn->StdRhoAir = 1.20;
     state->dataWaterCoils->GetWaterCoilsInputFlag = true;
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->TimeStep = 1;
@@ -549,10 +549,10 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
         });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    DataEnvironment::StdRhoAir = 1.0;
+    state->dataEnvrn->StdRhoAir = 1.0;
 
     state->dataEnvrn->OutBaroPress = 101325.0;
-    DataEnvironment::StdRhoAir = 1.20;
+    state->dataEnvrn->StdRhoAir = 1.20;
     state->dataWaterCoils->GetWaterCoilsInputFlag = true;
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->TimeStep = 1;

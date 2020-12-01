@@ -241,9 +241,9 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_SimConstVolNoReheat)
     GetZoneEquipmentData1(*state);
     GetZoneAirLoopEquipment(*state);
     GetSysInput(*state);
-    DataEnvironment::StdRhoAir = 1.0;
+    state->dataEnvrn->StdRhoAir = 1.0;
     int const SysNum(1);
-    Real64 MassFlowRateMaxAvail = state->dataSingleDuct->sd_airterminal(SysNum).MaxAirVolFlowRate * DataEnvironment::StdRhoAir;
+    Real64 MassFlowRateMaxAvail = state->dataSingleDuct->sd_airterminal(SysNum).MaxAirVolFlowRate * state->dataEnvrn->StdRhoAir;
     state->dataSingleDuct->sd_airterminal(SysNum).sd_airterminalInlet.AirMassFlowRate = MassFlowRateMaxAvail;
     Schedule(state->dataSingleDuct->sd_airterminal(SysNum).SchedPtr).CurrentValue = 1.0; // unit is always available
     // run SimConstVolNoReheat() function
@@ -327,7 +327,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_Sim)
 
     state->dataGlobal->SysSizingCalc = true;
     state->dataGlobal->BeginEnvrnFlag = true;
-    DataEnvironment::StdRhoAir = 1.0;
+    state->dataEnvrn->StdRhoAir = 1.0;
     state->dataEnvrn->OutBaroPress = 101325.0;
 
     int const SysNum(1);
@@ -337,7 +337,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_Sim)
     Schedule(state->dataSingleDuct->sd_airterminal(SysNum).SchedPtr).CurrentValue = 1.0; // unit is always available
 
     // design maximum air mass flow rate
-    Real64 MassFlowRateMaxAvail = state->dataSingleDuct->sd_airterminal(SysNum).MaxAirVolFlowRate * DataEnvironment::StdRhoAir;
+    Real64 MassFlowRateMaxAvail = state->dataSingleDuct->sd_airterminal(SysNum).MaxAirVolFlowRate * state->dataEnvrn->StdRhoAir;
     EXPECT_EQ(1.0, state->dataSingleDuct->sd_airterminal(SysNum).MaxAirVolFlowRate);
     EXPECT_EQ(1.0, MassFlowRateMaxAvail);
 
@@ -503,7 +503,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OASpecification)
 
     state->dataGlobal->SysSizingCalc = true;
     state->dataGlobal->BeginEnvrnFlag = true;
-    DataEnvironment::StdRhoAir = 1.0;
+    state->dataEnvrn->StdRhoAir = 1.0;
     state->dataEnvrn->OutBaroPress = 101325.0;
 
     int const SysNum(1);
@@ -512,7 +512,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OASpecification)
     int const ZoneAirNodeNum = ZoneEquipConfig(ZonePtr).ZoneNode;
 
     // design maximum air mass flow rate
-    Real64 MassFlowRateMaxAvail = state->dataSingleDuct->sd_airterminal(SysNum).MaxAirVolFlowRate * DataEnvironment::StdRhoAir;
+    Real64 MassFlowRateMaxAvail = state->dataSingleDuct->sd_airterminal(SysNum).MaxAirVolFlowRate * state->dataEnvrn->StdRhoAir;
     EXPECT_EQ(3.0, state->dataSingleDuct->sd_airterminal(SysNum).MaxAirVolFlowRate);
     EXPECT_EQ(3.0, MassFlowRateMaxAvail);
 
@@ -664,7 +664,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_EMSOverrideAirFlow)
 
     state->dataGlobal->SysSizingCalc = true;
     state->dataGlobal->BeginEnvrnFlag = true;
-    DataEnvironment::StdRhoAir = 1.0;
+    state->dataEnvrn->StdRhoAir = 1.0;
     state->dataEnvrn->OutBaroPress = 101325.0;
 
     int const SysNum(1);
@@ -673,7 +673,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_EMSOverrideAirFlow)
     int const ZoneAirNodeNum = ZoneEquipConfig(ZonePtr).ZoneNode;
     Schedule(state->dataSingleDuct->sd_airterminal(SysNum).SchedPtr).CurrentValue = 1.0; // unit is always available
     // design maximum air mass flow rate
-    Real64 MassFlowRateMaxAvail = state->dataSingleDuct->sd_airterminal(SysNum).MaxAirVolFlowRate * DataEnvironment::StdRhoAir;
+    Real64 MassFlowRateMaxAvail = state->dataSingleDuct->sd_airterminal(SysNum).MaxAirVolFlowRate * state->dataEnvrn->StdRhoAir;
     EXPECT_EQ(1.0, state->dataSingleDuct->sd_airterminal(SysNum).MaxAirVolFlowRate);
     EXPECT_EQ(1.0, MassFlowRateMaxAvail);
 
@@ -838,7 +838,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OAVolumeFlowRateReport
 
     state->dataGlobal->SysSizingCalc = true;
     state->dataGlobal->BeginEnvrnFlag = true;
-    DataEnvironment::StdRhoAir = 1.0;
+    state->dataEnvrn->StdRhoAir = 1.0;
     state->dataEnvrn->OutBaroPress = 101325.0;
 
     state->dataAirLoop->AirLoopFlow.allocate(1);
@@ -856,7 +856,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OAVolumeFlowRateReport
     thisAirTerminal.AirLoopNum = ZoneEquipConfig(ZonePtr).InletNodeAirLoopNum(1);
 
     // design maximum air mass flow rate
-    Real64 MassFlowRateMaxAvail = thisAirTerminal.MaxAirVolFlowRate * DataEnvironment::StdRhoAir;
+    Real64 MassFlowRateMaxAvail = thisAirTerminal.MaxAirVolFlowRate * state->dataEnvrn->StdRhoAir;
     EXPECT_EQ(3.0, thisAirTerminal.MaxAirVolFlowRate);
     EXPECT_EQ(3.0, MassFlowRateMaxAvail);
 
@@ -905,7 +905,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OAVolumeFlowRateReport
 
     // run SimulateSingleDuct(*state, ) function
     SimulateSingleDuct(*state, thisAirDisUnit.EquipName(1), FirstHVACIteration, ZonePtr, ZoneAirNodeNum, thisAirDisUnit.EquipIndex(1));
-    Real64 expected_OAVolFlowRate = thisAirTerminalOutlet.AirMassFlowRate * thisAirLoop.OAFrac / DataEnvironment::StdRhoAir;
+    Real64 expected_OAVolFlowRate = thisAirTerminalOutlet.AirMassFlowRate * thisAirLoop.OAFrac / state->dataEnvrn->StdRhoAir;
     // check AT air mass flow rates
     EXPECT_EQ(expectedMassFlow, thisAirTerminalInlet.AirMassFlowRate);
     EXPECT_EQ(expectedMassFlow, thisAirTerminalOutlet.AirMassFlowRate);
@@ -918,7 +918,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OAVolumeFlowRateReport
     DataHeatBalance::ZoneIntGain(1).NOFOCC = 1.5;
     expectedMassFlow = 1.0 * ((1.5 * 0.1) + 0.5);
     SimulateSingleDuct(*state, thisAirDisUnit.EquipName(1), FirstHVACIteration, ZonePtr, ZoneAirNodeNum, thisAirDisUnit.EquipIndex(1));
-    expected_OAVolFlowRate = thisAirTerminalOutlet.AirMassFlowRate * thisAirLoop.OAFrac / DataEnvironment::StdRhoAir;
+    expected_OAVolFlowRate = thisAirTerminalOutlet.AirMassFlowRate * thisAirLoop.OAFrac / state->dataEnvrn->StdRhoAir;
     // check AT air mass flow rates
     EXPECT_EQ(expectedMassFlow, thisAirTerminalInlet.AirMassFlowRate);
     EXPECT_EQ(expectedMassFlow, thisAirTerminalOutlet.AirMassFlowRate);
@@ -931,7 +931,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OAVolumeFlowRateReport
     DataHeatBalance::ZoneIntGain(1).NOFOCC = 1.5;
     expectedMassFlow = 0.0 * ((1.5 * 0.1) + 0.5);
     SimulateSingleDuct(*state, thisAirDisUnit.EquipName(1), FirstHVACIteration, ZonePtr, ZoneAirNodeNum, thisAirDisUnit.EquipIndex(1));
-    expected_OAVolFlowRate = thisAirTerminalOutlet.AirMassFlowRate * thisAirLoop.OAFrac / DataEnvironment::StdRhoAir;
+    expected_OAVolFlowRate = thisAirTerminalOutlet.AirMassFlowRate * thisAirLoop.OAFrac / state->dataEnvrn->StdRhoAir;
     // check AT air mass flow rates
     EXPECT_EQ(expectedMassFlow, thisAirTerminalInlet.AirMassFlowRate);
     EXPECT_EQ(expectedMassFlow, thisAirTerminalOutlet.AirMassFlowRate);
@@ -1013,7 +1013,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_SimSensibleOutPutTest)
 
     state->dataGlobal->SysSizingCalc = true;
     state->dataGlobal->BeginEnvrnFlag = true;
-    DataEnvironment::StdRhoAir = 1.0;
+    state->dataEnvrn->StdRhoAir = 1.0;
     state->dataEnvrn->OutBaroPress = 101325.0;
 
     int const AirDistUnitNum(1);
@@ -1029,7 +1029,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_SimSensibleOutPutTest)
     Schedule(thisAirTerminal.SchedPtr).CurrentValue = 1.0; // unit is always available
     ;
     // design maximum air mass flow rate
-    Real64 MassFlowRateMaxAvail = thisAirTerminal.MaxAirVolFlowRate * DataEnvironment::StdRhoAir;
+    Real64 MassFlowRateMaxAvail = thisAirTerminal.MaxAirVolFlowRate * state->dataEnvrn->StdRhoAir;
     EXPECT_EQ(1.0, thisAirTerminal.MaxAirVolFlowRate);
     EXPECT_EQ(1.0, MassFlowRateMaxAvail);
 

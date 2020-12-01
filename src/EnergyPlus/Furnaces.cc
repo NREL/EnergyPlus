@@ -171,7 +171,6 @@ namespace Furnaces {
     // Using/Aliasing
     using namespace DataLoopNode;
     using namespace DataHVACGlobals;
-    using DataEnvironment::StdRhoAir;
     using namespace DataZoneEquipment;
     using Psychrometrics::PsyCpAirFnW;
     using Psychrometrics::PsyHfgAirFnWTdb;
@@ -5134,10 +5133,10 @@ namespace Furnaces {
         // Do the Begin Environment initializations
         if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(FurnaceNum)) {
             // Change the Volume Flow Rates to Mass Flow Rates
-            Furnace(FurnaceNum).DesignMassFlowRate = Furnace(FurnaceNum).DesignFanVolFlowRate * StdRhoAir;
-            Furnace(FurnaceNum).MaxCoolAirMassFlow = Furnace(FurnaceNum).MaxCoolAirVolFlow * StdRhoAir;
-            Furnace(FurnaceNum).MaxHeatAirMassFlow = Furnace(FurnaceNum).MaxHeatAirVolFlow * StdRhoAir;
-            Furnace(FurnaceNum).MaxNoCoolHeatAirMassFlow = Furnace(FurnaceNum).MaxNoCoolHeatAirVolFlow * StdRhoAir;
+            Furnace(FurnaceNum).DesignMassFlowRate = Furnace(FurnaceNum).DesignFanVolFlowRate * state.dataEnvrn->StdRhoAir;
+            Furnace(FurnaceNum).MaxCoolAirMassFlow = Furnace(FurnaceNum).MaxCoolAirVolFlow * state.dataEnvrn->StdRhoAir;
+            Furnace(FurnaceNum).MaxHeatAirMassFlow = Furnace(FurnaceNum).MaxHeatAirVolFlow * state.dataEnvrn->StdRhoAir;
+            Furnace(FurnaceNum).MaxNoCoolHeatAirMassFlow = Furnace(FurnaceNum).MaxNoCoolHeatAirVolFlow * state.dataEnvrn->StdRhoAir;
             Furnace(FurnaceNum).WSHPRuntimeFrac = 0.0;
             Furnace(FurnaceNum).CompPartLoadRatio = 0.0;
             Furnace(FurnaceNum).CoolingCoilSensDemand = 0.0;
@@ -5562,7 +5561,7 @@ namespace Furnaces {
                         if (Furnace(FurnaceNum).bIsIHP) // set max fan flow rate to the IHP collection
                         {
                             IntegratedHeatPumps(Furnace(FurnaceNum).CoolingCoilIndex).MaxCoolAirVolFlow = Furnace(FurnaceNum).FanVolFlow;
-                            IntegratedHeatPumps(Furnace(FurnaceNum).CoolingCoilIndex).MaxCoolAirMassFlow = Furnace(FurnaceNum).FanVolFlow * StdRhoAir;
+                            IntegratedHeatPumps(Furnace(FurnaceNum).CoolingCoilIndex).MaxCoolAirMassFlow = Furnace(FurnaceNum).FanVolFlow * state.dataEnvrn->StdRhoAir;
                         };
 
                         // Check flow rates in other speeds and ensure flow rates are not above the max flow rate
@@ -5594,7 +5593,7 @@ namespace Furnaces {
                             {
                                 IntegratedHeatPumps(Furnace(FurnaceNum).CoolingCoilIndex).MaxHeatAirVolFlow = Furnace(FurnaceNum).FanVolFlow;
                                 IntegratedHeatPumps(Furnace(FurnaceNum).CoolingCoilIndex).MaxHeatAirMassFlow =
-                                    Furnace(FurnaceNum).FanVolFlow * StdRhoAir;
+                                    Furnace(FurnaceNum).FanVolFlow * state.dataEnvrn->StdRhoAir;
                             };
 
                             for (int i = NumOfSpeedHeating - 1; i >= 1; --i) {
@@ -5621,7 +5620,7 @@ namespace Furnaces {
                         ShowContinueError(state, " Occurs in " + CurrentModuleObject + " = " + Furnace(FurnaceNum).Name);
                         Furnace(FurnaceNum).IdleVolumeAirRate = Furnace(FurnaceNum).FanVolFlow;
                     }
-                    RhoAir = StdRhoAir;
+                    RhoAir = state.dataEnvrn->StdRhoAir;
                     // set the mass flow rates from the reset volume flow rates
                     for (int i = 1; i <= NumOfSpeedCooling; ++i) {
                         Furnace(FurnaceNum).CoolMassFlowRate(i) = RhoAir * Furnace(FurnaceNum).CoolVolumeFlowRate(i);

@@ -167,7 +167,7 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     ScheduleManager::UpdateScheduleValues(*state);
     // Initialize zone areas and volumes - too many other things need to be set up to do these in the normal routines
     DataHeatBalance::Zone(1).FloorArea = 232.26;
-    DataEnvironment::StdRhoAir = 1.225;
+    state->dataEnvrn->StdRhoAir = 1.225;
     state->dataEnvrn->OutBaroPress = 101325;
     DataHeatBalance::ZoneIntGain.allocate(1);
 

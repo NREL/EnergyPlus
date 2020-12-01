@@ -1102,8 +1102,6 @@ namespace NodeInputManager {
         // stored in MoreNodeInfo.
 
         // Using/Aliasing
-        using DataEnvironment::StdBaroPress;
-        using DataEnvironment::StdRhoAir;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetGlycolNameByIndex;
         using FluidProperties::GetSatDensityRefrig;
@@ -1154,7 +1152,7 @@ namespace NodeInputManager {
         Real64 rhoStd;
 
         if (CalcMoreNodeInfoMyOneTimeFlag) {
-            RhoAirStdInit = StdRhoAir;
+            RhoAirStdInit = state.dataEnvrn->StdRhoAir;
             RhoWaterStdInit = RhoH2O(DataGlobalConstants::InitConvTemp());
             NodeWetBulbRepReq.allocate(NumOfNodes);
             NodeWetBulbSchedPtr.allocate(NumOfNodes);
@@ -1320,7 +1318,7 @@ namespace NodeInputManager {
                 if (Node(iNode).HumRat > 0.0) {
                     MoreNodeInfo(iNode).ReportEnthalpy = PsyHFnTdbW(Node(iNode).Temp, Node(iNode).HumRat);
                     if (ReportWetBulb) {
-                        MoreNodeInfo(iNode).WetBulbTemp = PsyTwbFnTdbWPb(state, Node(iNode).Temp, Node(iNode).HumRat, StdBaroPress);
+                        MoreNodeInfo(iNode).WetBulbTemp = PsyTwbFnTdbWPb(state, Node(iNode).Temp, Node(iNode).HumRat, state.dataEnvrn->StdBaroPress);
                     } else {
                         MoreNodeInfo(iNode).WetBulbTemp = 0.0;
                     }

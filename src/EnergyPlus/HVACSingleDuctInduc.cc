@@ -106,7 +106,6 @@ namespace HVACSingleDuctInduc {
 
     // Using/Aliasing
     using namespace DataLoopNode;
-    using DataEnvironment::StdRhoAir;
     // Use statements for access to subroutines in other modules
     using namespace ScheduleManager;
     using DataHVACGlobals::SmallAirVolFlow;
@@ -632,7 +631,7 @@ namespace HVACSingleDuctInduc {
 
         // Do the Begin Environment initializations
         if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(IUNum)) {
-            RhoAir = StdRhoAir;
+            RhoAir = state.dataEnvrn->StdRhoAir;
             PriNode = IndUnit(IUNum).PriAirInNode;
             SecNode = IndUnit(IUNum).SecAirInNode;
             OutletNode = IndUnit(IUNum).OutAirNode;
@@ -794,7 +793,7 @@ namespace HVACSingleDuctInduc {
         PltSizCoolNum = 0;
         DesPriVolFlow = 0.0;
         CpAir = 0.0;
-        RhoAir = StdRhoAir;
+        RhoAir = state.dataEnvrn->StdRhoAir;
         ErrorsFound = false;
         IsAutoSize = false;
         MaxTotAirVolFlowDes = 0.0;
@@ -1612,7 +1611,7 @@ namespace HVACSingleDuctInduc {
     {
         // calculates zone outdoor air volume flow rate using the supply air flow rate and OA fraction
         if (this->AirLoopNum > 0) {
-            this->OutdoorAirFlowRate = (DataLoopNode::Node(this->PriAirInNode).MassFlowRate / DataEnvironment::StdRhoAir) * state.dataAirLoop->AirLoopFlow(this->AirLoopNum).OAFrac;
+            this->OutdoorAirFlowRate = (DataLoopNode::Node(this->PriAirInNode).MassFlowRate / state.dataEnvrn->StdRhoAir) * state.dataAirLoop->AirLoopFlow(this->AirLoopNum).OAFrac;
         } else {
             this->OutdoorAirFlowRate = 0.0;
         }

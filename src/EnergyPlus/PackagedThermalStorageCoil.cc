@@ -115,7 +115,6 @@ namespace PackagedThermalStorageCoil {
     using namespace Psychrometrics;
     using DataEnvironment::CurMnDy;
     using DataEnvironment::EnvironmentName;
-    using DataEnvironment::StdBaroPress;
     using namespace CurveManager;
 
     // Data
@@ -2106,7 +2105,6 @@ namespace PackagedThermalStorageCoil {
 
         // Using/Aliasing
         using namespace DataSizing;
-        using DataEnvironment::StdRhoAir;
         using namespace OutputReportPredefined;
         using CurveManager::CurveValue;
         using FluidProperties::GetDensityGlycol;
@@ -2161,7 +2159,7 @@ namespace PackagedThermalStorageCoil {
                                          TESCoil(TESCoilNum).RatedEvapAirVolFlowRate);
         }
 
-        TESCoil(TESCoilNum).RatedEvapAirMassFlowRate = StdRhoAir * TESCoil(TESCoilNum).RatedEvapAirVolFlowRate;
+        TESCoil(TESCoilNum).RatedEvapAirMassFlowRate = state.dataEnvrn->StdRhoAir * TESCoil(TESCoilNum).RatedEvapAirVolFlowRate;
 
         if (TESCoil(TESCoilNum).CondenserAirVolumeFlow == DataGlobalConstants::AutoCalculate()) {
             TESCoil(TESCoilNum).CondenserAirVolumeFlow =
@@ -2172,7 +2170,7 @@ namespace PackagedThermalStorageCoil {
                                          TESCoil(TESCoilNum).CondenserAirVolumeFlow);
         }
 
-        TESCoil(TESCoilNum).CondenserAirMassFlow = StdRhoAir * TESCoil(TESCoilNum).CondenserAirVolumeFlow;
+        TESCoil(TESCoilNum).CondenserAirMassFlow = state.dataEnvrn->StdRhoAir * TESCoil(TESCoilNum).CondenserAirVolumeFlow;
 
         if (TESCoil(TESCoilNum).CoolingOnlyRatedTotCap == AutoSize) {
             if (CurSysNum > 0) {
@@ -2206,9 +2204,9 @@ namespace PackagedThermalStorageCoil {
                         }
                     }
                     OutTemp = FinalSysSizing(CurSysNum).OutTempAtCoolPeak;
-                    rhoair = PsyRhoAirFnPbTdbW(state, StdBaroPress, MixTemp, MixHumRat, RoutineName);
+                    rhoair = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, MixTemp, MixHumRat, RoutineName);
                     MixEnth = PsyHFnTdbW(MixTemp, MixHumRat);
-                    MixWetBulb = PsyTwbFnTdbWPb(state, MixTemp, MixHumRat, StdBaroPress, RoutineName);
+                    MixWetBulb = PsyTwbFnTdbWPb(state, MixTemp, MixHumRat, state.dataEnvrn->StdBaroPress, RoutineName);
                     SupEnth = PsyHFnTdbW(SupTemp, SupHumRat);
                     TotCapTempModFac = CurveValue(state, TESCoil(TESCoilNum).CoolingOnlyCapFTempCurve, MixWetBulb, OutTemp);
                     CoolCapAtPeak = max(0.0, (rhoair * VolFlowRate * (MixEnth - SupEnth)));
@@ -2246,9 +2244,9 @@ namespace PackagedThermalStorageCoil {
                     } else {
                         OutTemp = 0.0;
                     }
-                    rhoair = PsyRhoAirFnPbTdbW(state, StdBaroPress, MixTemp, MixHumRat, RoutineName);
+                    rhoair = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, MixTemp, MixHumRat, RoutineName);
                     MixEnth = PsyHFnTdbW(MixTemp, MixHumRat);
-                    MixWetBulb = PsyTwbFnTdbWPb(state, MixTemp, MixHumRat, StdBaroPress, RoutineName);
+                    MixWetBulb = PsyTwbFnTdbWPb(state, MixTemp, MixHumRat, state.dataEnvrn->StdBaroPress, RoutineName);
                     SupEnth = PsyHFnTdbW(SupTemp, SupHumRat);
                     TotCapTempModFac = CurveValue(state, TESCoil(TESCoilNum).CoolingOnlyCapFTempCurve, MixWetBulb, OutTemp);
                     CoolCapAtPeak = max(0.0, (rhoair * VolFlowRate * (MixEnth - SupEnth)));

@@ -6268,16 +6268,16 @@ namespace EnergyPlus::DaylightingManager {
             state.dataDaylightingData->ZoneDaylight(ZoneNum).BacLum(IL) = 0.0;
         }
 
-        if (DataEnvironment::SkyClearness > 3.0) { // Sky is average of clear and clear turbid
-            SkyWeight = min(1.0, (DataEnvironment::SkyClearness - 3.0) / 3.0);
+        if (state.dataEnvrn->SkyClearness > 3.0) { // Sky is average of clear and clear turbid
+            SkyWeight = min(1.0, (state.dataEnvrn->SkyClearness - 3.0) / 3.0);
             ISky1 = 1;
             ISky2 = 2;
-        } else if (DataEnvironment::SkyClearness > 1.2) { // Sky is average of clear turbid and intermediate
-            SkyWeight = (DataEnvironment::SkyClearness - 1.2) / 1.8;
+        } else if (state.dataEnvrn->SkyClearness > 1.2) { // Sky is average of clear turbid and intermediate
+            SkyWeight = (state.dataEnvrn->SkyClearness - 1.2) / 1.8;
             ISky1 = 2;
             ISky2 = 3;
         } else { // Sky is average of intermediate and overcast
-            SkyWeight = min(1.0, max(0.0, (DataEnvironment::SkyClearness - 1.0) / 0.2, (DataEnvironment::SkyBrightness - 0.05) / 0.4));
+            SkyWeight = min(1.0, max(0.0, (state.dataEnvrn->SkyClearness - 1.0) / 0.2, (state.dataEnvrn->SkyBrightness - 0.05) / 0.4));
             ISky1 = 3;
             ISky2 = 4;
         }
@@ -7153,16 +7153,16 @@ namespace EnergyPlus::DaylightingManager {
         int ISky2;
         Real64 SkyWeight; // Weighting factor used to average two different sky types
 
-        if (DataEnvironment::SkyClearness > 3.0) { // Sky is average of clear and clear turbid
-            SkyWeight = min(1.0, (DataEnvironment::SkyClearness - 3.0) / 3.0);
+        if (state.dataEnvrn->SkyClearness > 3.0) { // Sky is average of clear and clear turbid
+            SkyWeight = min(1.0, (state.dataEnvrn->SkyClearness - 3.0) / 3.0);
             ISky1 = 1;
             ISky2 = 2;
-        } else if (DataEnvironment::SkyClearness > 1.2) { // Sky is average of clear turbid and intermediate
-            SkyWeight = (DataEnvironment::SkyClearness - 1.2) / 1.8;
+        } else if (state.dataEnvrn->SkyClearness > 1.2) { // Sky is average of clear turbid and intermediate
+            SkyWeight = (state.dataEnvrn->SkyClearness - 1.2) / 1.8;
             ISky1 = 2;
             ISky2 = 3;
         } else { // Sky is average of intermediate and overcast
-            SkyWeight = min(1.0, max(0.0, (DataEnvironment::SkyClearness - 1.0) / 0.2, (DataEnvironment::SkyBrightness - 0.05) / 0.4));
+            SkyWeight = min(1.0, max(0.0, (state.dataEnvrn->SkyClearness - 1.0) / 0.2, (state.dataEnvrn->SkyBrightness - 0.05) / 0.4));
             ISky1 = 3;
             ISky2 = 4;
         }
@@ -9462,16 +9462,16 @@ namespace EnergyPlus::DaylightingManager {
             BACLUM = 0.0;
             GLRNDX = 0.0;
 
-            if (DataEnvironment::SkyClearness > 3.0) { // Sky is average of clear and clear turbid
-                SkyWeight = min(1.0, (DataEnvironment::SkyClearness - 3.0) / 3.0);
+            if (state.dataEnvrn->SkyClearness > 3.0) { // Sky is average of clear and clear turbid
+                SkyWeight = min(1.0, (state.dataEnvrn->SkyClearness - 3.0) / 3.0);
                 ISky1 = 1;
                 ISky2 = 2;
-            } else if (DataEnvironment::SkyClearness > 1.2) { // Sky is average of clear turbid and intermediate
-                SkyWeight = (DataEnvironment::SkyClearness - 1.2) / 1.8;
+            } else if (state.dataEnvrn->SkyClearness > 1.2) { // Sky is average of clear turbid and intermediate
+                SkyWeight = (state.dataEnvrn->SkyClearness - 1.2) / 1.8;
                 ISky1 = 2;
                 ISky2 = 3;
             } else { // Sky is average of intermediate and overcast
-                SkyWeight = min(1.0, max(0.0, (DataEnvironment::SkyClearness - 1.0) / 0.2, (DataEnvironment::SkyBrightness - 0.05) / 0.4));
+                SkyWeight = min(1.0, max(0.0, (state.dataEnvrn->SkyClearness - 1.0) / 0.2, (state.dataEnvrn->SkyBrightness - 0.05) / 0.4));
                 ISky1 = 3;
                 ISky2 = 4;
             }

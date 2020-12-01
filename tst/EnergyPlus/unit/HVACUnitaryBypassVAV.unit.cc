@@ -98,7 +98,7 @@ protected:
         state->dataGlobal->DayOfSim = 1;
         state->dataGlobal->HourOfDay = 1;
 
-        DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, 101325.0, 20.0, 0.0); // initialize StdRhoAir
+        state->dataEnvrn->StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, 101325.0, 20.0, 0.0); // initialize StdRhoAir
         state->dataEnvrn->OutBaroPress = 101325.0;
         state->dataGlobal->NumOfZones = 1;
         DataHeatBalance::Zone.allocate(state->dataGlobal->NumOfZones);

@@ -77,7 +77,7 @@ void BaseSizer::initializeWithinEP(EnergyPlusData &state,
     this->isEpJSON = state.dataGlobal->isEpJSON;
     this->printWarningFlag = _printWarningFlag;
     this->callingRoutine = _callingRoutine;
-    this->stdRhoAir = DataEnvironment::StdRhoAir;
+    this->stdRhoAir = state.dataEnvrn->StdRhoAir;
     this->sysSizingRunDone = DataSizing::SysSizingRunDone;
     this->zoneSizingRunDone = DataSizing::ZoneSizingRunDone;
     this->curSysNum = DataSizing::CurSysNum;
@@ -620,16 +620,16 @@ void BaseSizer::overrideSizingString(std::string &string)
     this->overrideSizeString = false;
 }
 
-Real64 BaseSizer::setOAFracForZoneEqSizing(Real64 const &desMassFlow, DataSizing::ZoneEqSizingData const &zoneEqSizing)
+Real64 BaseSizer::setOAFracForZoneEqSizing(EnergyPlusData &state, Real64 const &desMassFlow, DataSizing::ZoneEqSizingData const &zoneEqSizing)
 {
     Real64 outAirFrac = 0.0;
     if (desMassFlow <= 0.0) return outAirFrac;
 
     if (zoneEqSizing.ATMixerVolFlow > 0.0) {
         // set central DOAS AT mixer OA fraction
-        outAirFrac = min(DataEnvironment::StdRhoAir * zoneEqSizing.ATMixerVolFlow / desMassFlow, 1.0);
+        outAirFrac = min(state.dataEnvrn->StdRhoAir * zoneEqSizing.ATMixerVolFlow / desMassFlow, 1.0);
     } else if (zoneEqSizing.OAVolFlow > 0.0) { // set zone equipment OA fraction
-        outAirFrac = min(DataEnvironment::StdRhoAir * zoneEqSizing.OAVolFlow / desMassFlow, 1.0);
+        outAirFrac = min(state.dataEnvrn->StdRhoAir * zoneEqSizing.OAVolFlow / desMassFlow, 1.0);
     }
     return outAirFrac;
 }

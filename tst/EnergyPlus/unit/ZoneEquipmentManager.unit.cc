@@ -138,7 +138,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest)
     ZoneEquipConfig(ZoneNum).ReturnNodeAirLoopNum(1) = 0;
     ZoneEquipConfig(ZoneNum).ReturnNodeInletNum(1) = 1;
     // Avoid zero values in volume flow balance check
-    DataEnvironment::StdRhoAir = 1.2;
+    state->dataEnvrn->StdRhoAir = 1.2;
     state->dataEnvrn->OutBaroPress = 100000.0;
     Node(ZoneEquipConfig(ZoneNum).ZoneNode).Temp = 20.0;
     Node(ZoneEquipConfig(ZoneNum).ZoneNode).HumRat = 0.004;
@@ -537,7 +537,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest2)
     int returnNode3 = ZoneEquipConfig(ZoneNum).ReturnNode(3);
 
     // Avoid zero values in volume flow balance check
-    DataEnvironment::StdRhoAir = 1.2;
+    state->dataEnvrn->StdRhoAir = 1.2;
     state->dataEnvrn->OutBaroPress = 100000.0;
     Node(ZoneEquipConfig(ZoneNum).ZoneNode).Temp = 20.0;
     Node(ZoneEquipConfig(ZoneNum).ZoneNode).HumRat = 0.004;
@@ -669,7 +669,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest3)
     Node(ZoneEquipConfig(ZoneNum).ExhaustNode(1)).MassFlowRate = 0.0;
 
     // Avoid zero values in volume flow balance check
-    DataEnvironment::StdRhoAir = 1.2;
+    state->dataEnvrn->StdRhoAir = 1.2;
     state->dataEnvrn->OutBaroPress = 100000.0;
     Node(ZoneEquipConfig(ZoneNum).ZoneNode).Temp = 20.0;
     Node(ZoneEquipConfig(ZoneNum).ZoneNode).HumRat = 0.004;
@@ -771,7 +771,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest4)
     int returnNode3 = ZoneEquipConfig(ZoneNum).ReturnNode(3);
 
     // Avoid zero values in volume flow balance check
-    DataEnvironment::StdRhoAir = 1.2;
+    state->dataEnvrn->StdRhoAir = 1.2;
     state->dataEnvrn->OutBaroPress = 100000.0;
     Node(ZoneEquipConfig(ZoneNum).ZoneNode).Temp = 20.0;
     Node(ZoneEquipConfig(ZoneNum).ZoneNode).HumRat = 0.004;

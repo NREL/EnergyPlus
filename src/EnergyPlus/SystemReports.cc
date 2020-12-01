@@ -4403,7 +4403,6 @@ namespace SystemReports {
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         using namespace DataZoneEnergyDemands;
         using namespace DataGlobalConstants;
-        using DataEnvironment::StdRhoAir;
         using DataHeatBalance::ZnAirRpt;
         using DataHeatBalance::Zone;
         using DataHeatBalance::ZonePreDefRep;
@@ -4828,7 +4827,7 @@ namespace SystemReports {
             ZoneOAMass(CtrlZoneNum) = ZoneOAMassFlow(CtrlZoneNum) * TimeStepSys * DataGlobalConstants::SecInHour();
 
             // determine volumetric values from mass flow using standard density (adjusted for elevation)
-            ZoneOAVolFlowStdRho(CtrlZoneNum) = ZoneOAMassFlow(CtrlZoneNum) / StdRhoAir;
+            ZoneOAVolFlowStdRho(CtrlZoneNum) = ZoneOAMassFlow(CtrlZoneNum) / state.dataEnvrn->StdRhoAir;
             ZoneOAVolStdRho(CtrlZoneNum) = ZoneOAVolFlowStdRho(CtrlZoneNum) * TimeStepSys * DataGlobalConstants::SecInHour();
 
             // determine volumetric values from mass flow using current air density for zone (adjusted for elevation)

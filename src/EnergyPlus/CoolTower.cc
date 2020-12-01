@@ -519,7 +519,6 @@ namespace CoolTower {
         //     John Wiley & Sons, Inc.
 
         // Using/Aliasing
-        using DataEnvironment::StdRhoAir;
         using DataHeatBalFanSys::CTMFL;
         using DataHeatBalFanSys::MAT;
         using DataHeatBalFanSys::MCPC;
@@ -641,7 +640,7 @@ namespace CoolTower {
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).OutletHumRat = OutletHumRat;
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).AirVolFlowRate = CVF_ZoneNum;
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).AirMassFlowRate = CTMFL(ZoneNum);
-                state.dataCoolTower->CoolTowerSys(CoolTowerNum).AirVolFlowRateStd = CTMFL(ZoneNum) / StdRhoAir;
+                state.dataCoolTower->CoolTowerSys(CoolTowerNum).AirVolFlowRateStd = CTMFL(ZoneNum) / state.dataEnvrn->StdRhoAir;
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).InletDBTemp = Zone(ZoneNum).OutDryBulbTemp;
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).InletWBTemp = Zone(ZoneNum).OutWetBulbTemp;
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).InletHumRat = state.dataEnvrn->OutHumRat;

@@ -298,11 +298,11 @@ namespace MixedAir {
 
     // Functions
 
-    Real64 OAGetFlowRate(int OAPtr)
+    Real64 OAGetFlowRate(EnergyPlusData &state, int OAPtr)
     {
         Real64 FlowRate(0);
-        if ((OAPtr > 0) && (OAPtr <= NumOAControllers) && (StdRhoAir != 0)) {
-            FlowRate = OAController(OAPtr).OAMassFlow / StdRhoAir;
+        if ((OAPtr > 0) && (OAPtr <= NumOAControllers) && (state.dataEnvrn->StdRhoAir != 0)) {
+            FlowRate = OAController(OAPtr).OAMassFlow / state.dataEnvrn->StdRhoAir;
         }
         return FlowRate;
     }
@@ -320,10 +320,10 @@ namespace MixedAir {
             OAController(OAPtr).ManageDemand = aState;
         }
     }
-    void OASetDemandManagerVentilationFlow(int OAPtr, Real64 aFlow)
+    void OASetDemandManagerVentilationFlow(EnergyPlusData &state, int OAPtr, Real64 aFlow)
     {
         if ((OAPtr > 0) && (OAPtr <= NumOAControllers)) {
-            OAController(OAPtr).DemandLimitFlowRate = aFlow * StdRhoAir;
+            OAController(OAPtr).DemandLimitFlowRate = aFlow * state.dataEnvrn->StdRhoAir;
         }
     }
     int GetOAController(std::string const &OAName)
@@ -2840,7 +2840,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
             }
 
             if (AirLoopNum > 0) {
-                Real64 DesSupplyVolFlowRate = state.dataAirLoop->AirLoopFlow(AirLoopNum).DesSupply / StdRhoAir;
+                Real64 DesSupplyVolFlowRate = state.dataAirLoop->AirLoopFlow(AirLoopNum).DesSupply / state.dataEnvrn->StdRhoAir;
                 if ((thisOAController.MinOA - DesSupplyVolFlowRate) > 0.0001) {
                     ShowWarningError(state, "InitOAController: Minimum Outdoor Air Flow Rate for Controller:OutdoorAir=" + thisOAController.Name +
                                      " is greater than Design Supply Air Flow Rate for AirLoopHVAC=" + state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Name + ".");
@@ -2872,7 +2872,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
 
         if (state.dataGlobal->BeginEnvrnFlag && OAControllerMyEnvrnFlag(OAControllerNum)) {
             OANode = thisOAController.OANode;
-            RhoAirStdInit = StdRhoAir;
+            RhoAirStdInit = state.dataEnvrn->StdRhoAir;
             thisOAController.MinOAMassFlowRate = thisOAController.MinOA * RhoAirStdInit;
             thisOAController.MaxOAMassFlowRate = thisOAController.MaxOA * RhoAirStdInit;
             OAControllerMyEnvrnFlag(OAControllerNum) = false;
@@ -4012,11 +4012,11 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                     this->SystemOAMethod == SOAM_ProportionalControlDesOcc || this->SystemOAMethod == SOAM_ProportionalControlDesOARate) {
 
                     // System supply air flow rate is always greater than or equal the system outdoor air flow rate
-                    if ((SysSA > 0.0) && (SysSA < (SysOAuc * StdRhoAir))) SysSA = SysOAuc * StdRhoAir;
+                    if ((SysSA > 0.0) && (SysSA < (SysOAuc * state.dataEnvrn->StdRhoAir))) SysSA = SysOAuc * state.dataEnvrn->StdRhoAir;
 
                     // calc Xs - average outdoor air fraction
                     if (SysSA > 0.0) {
-                        Xs = (SysOAuc * StdRhoAir) / SysSA;
+                        Xs = (SysOAuc * state.dataEnvrn->StdRhoAir) / SysSA;
                     } else {
                         Xs = 0.0;
                     }
@@ -4422,7 +4422,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                 }
 
                 // Finally calc the system supply OA mass flow rate
-                MechVentOAMassFlow = SysOA * StdRhoAir;
+                MechVentOAMassFlow = SysOA * state.dataEnvrn->StdRhoAir;
             }
 
         } else {

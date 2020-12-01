@@ -107,7 +107,6 @@ namespace HVACCooledBeam {
 
     // Using/Aliasing
     using namespace DataLoopNode;
-    using DataEnvironment::StdRhoAir;
     using namespace ScheduleManager;
     using DataHVACGlobals::SmallAirVolFlow;
     using DataHVACGlobals::SmallLoad;
@@ -600,7 +599,7 @@ namespace HVACCooledBeam {
 
         // Do the Begin Environment initializations
         if (state.dataGlobal->BeginEnvrnFlag && CoolBeam(CBNum).MyEnvrnFlag) {
-            RhoAir = StdRhoAir;
+            RhoAir = state.dataEnvrn->StdRhoAir;
             InAirNode = CoolBeam(CBNum).AirInNode;
             OutAirNode = CoolBeam(CBNum).AirOutNode;
             // set the mass flow rates from the input volume flow rates
@@ -720,7 +719,7 @@ namespace HVACCooledBeam {
         PltSizCoolNum = 0;
         DesAirVolFlow = 0.0;
         CpAir = 0.0;
-        RhoAir = StdRhoAir;
+        RhoAir = state.dataEnvrn->StdRhoAir;
         ErrorsFound = false;
         // find the appropriate Plant Sizing object
         if (CoolBeam(CBNum).MaxAirVolFlow == AutoSize || CoolBeam(CBNum).BeamLength == AutoSize) {
@@ -997,7 +996,7 @@ namespace HVACCooledBeam {
         // Set the unit's air inlet nodes mass flow rates
         Node(InAirNode).MassFlowRate = AirMassFlow;
         // set the air volumetric flow rate per beam
-        CoolBeam(CBNum).BeamFlow = Node(InAirNode).MassFlowRate / (StdRhoAir * CoolBeam(CBNum).NumBeams);
+        CoolBeam(CBNum).BeamFlow = Node(InAirNode).MassFlowRate / (state.dataEnvrn->StdRhoAir * CoolBeam(CBNum).NumBeams);
         // fire the unit at min water flow
         CalcCoolBeam(state, CBNum, ZoneNodeNum, MinColdWaterFlow, QMin, TWOut);
         // cooling by supply air
@@ -1153,7 +1152,7 @@ namespace HVACCooledBeam {
             DT = max(ZTemp - 0.5 * (TWIn + TWOut), 0.0);
             IndFlow =
                 CoolBeam(CBNum).K1 * std::pow(DT, CoolBeam(CBNum).n) + CoolBeam(CBNum).Kin * CoolBeam(CBNum).BeamFlow / CoolBeam(CBNum).BeamLength;
-            CoilFlow = (IndFlow / CoolBeam(CBNum).a0) * StdRhoAir;
+            CoilFlow = (IndFlow / CoolBeam(CBNum).a0) * state.dataEnvrn->StdRhoAir;
             WaterVel = CWFlowPerBeam / (rho * DataGlobalConstants::Pi() * pow_2(CoolBeam(CBNum).InDiam) / 4.0);
             if (WaterVel > MinWaterVel) {
                 K = CoolBeam(CBNum).a * std::pow(DT, CoolBeam(CBNum).n1) * std::pow(CoilFlow, CoolBeam(CBNum).n2) *
@@ -1364,7 +1363,7 @@ namespace HVACCooledBeam {
     {
         // calculates zone outdoor air volume flow rate using the supply air flow rate and OA fraction
         if (this->AirLoopNum > 0) {
-            this->OutdoorAirFlowRate = (DataLoopNode::Node(this->AirOutNode).MassFlowRate / DataEnvironment::StdRhoAir) * state.dataAirLoop->AirLoopFlow(this->AirLoopNum).OAFrac;
+            this->OutdoorAirFlowRate = (DataLoopNode::Node(this->AirOutNode).MassFlowRate / state.dataEnvrn->StdRhoAir) * state.dataAirLoop->AirLoopFlow(this->AirLoopNum).OAFrac;
         } else {
             this->OutdoorAirFlowRate = 0.0;
         }

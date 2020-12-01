@@ -120,7 +120,6 @@ namespace PurchasedAirManager {
     // Use statements for data only modules
     // Using/Aliasing
     using namespace DataHVACGlobals;
-    using DataEnvironment::StdRhoAir;
     using DataHeatBalFanSys::ZoneAirHumRat;
     using DataHeatBalFanSys::ZoneThermostatSetPointHi;
     using DataHeatBalFanSys::ZoneThermostatSetPointLo;
@@ -1257,12 +1256,12 @@ namespace PurchasedAirManager {
         if (state.dataGlobal->BeginEnvrnFlag && InitPurchasedAirMyEnvrnFlag(PurchAirNum)) {
 
             if ((PurchAir(PurchAirNum).HeatingLimit == LimitFlowRate) || (PurchAir(PurchAirNum).HeatingLimit == LimitFlowRateAndCapacity)) {
-                PurchAir(PurchAirNum).MaxHeatMassFlowRate = StdRhoAir * PurchAir(PurchAirNum).MaxHeatVolFlowRate;
+                PurchAir(PurchAirNum).MaxHeatMassFlowRate = state.dataEnvrn->StdRhoAir * PurchAir(PurchAirNum).MaxHeatVolFlowRate;
             } else {
                 PurchAir(PurchAirNum).MaxHeatMassFlowRate = 0.0;
             }
             if ((PurchAir(PurchAirNum).CoolingLimit == LimitFlowRate) || (PurchAir(PurchAirNum).CoolingLimit == LimitFlowRateAndCapacity)) {
-                PurchAir(PurchAirNum).MaxCoolMassFlowRate = StdRhoAir * PurchAir(PurchAirNum).MaxCoolVolFlowRate;
+                PurchAir(PurchAirNum).MaxCoolMassFlowRate = state.dataEnvrn->StdRhoAir * PurchAir(PurchAirNum).MaxCoolVolFlowRate;
             } else {
                 PurchAir(PurchAirNum).MaxCoolMassFlowRate = 0.0;
             }
@@ -2158,7 +2157,7 @@ namespace PurchasedAirManager {
                 // Check if OA flow rate greater than max cooling airflow limit
                 if (((PurchAir(PurchAirNum).CoolingLimit == LimitFlowRate) || (PurchAir(PurchAirNum).CoolingLimit == LimitFlowRateAndCapacity)) &&
                     (OAMassFlowRate > PurchAir(PurchAirNum).MaxCoolMassFlowRate)) {
-                    OAVolFlowRate = OAMassFlowRate / StdRhoAir;
+                    OAVolFlowRate = OAMassFlowRate / state.dataEnvrn->StdRhoAir;
                     if (PurchAir(PurchAirNum).OAFlowMaxCoolOutputError < 1) {
                         ++PurchAir(PurchAirNum).OAFlowMaxCoolOutputError;
                         ShowWarningError(state,
@@ -2436,7 +2435,7 @@ namespace PurchasedAirManager {
                 // Check if OA flow rate greater than max heating airflow limit
                 if (((PurchAir(PurchAirNum).HeatingLimit == LimitFlowRate) || (PurchAir(PurchAirNum).HeatingLimit == LimitFlowRateAndCapacity)) &&
                     (OAMassFlowRate > PurchAir(PurchAirNum).MaxHeatMassFlowRate)) {
-                    OAVolFlowRate = OAMassFlowRate / StdRhoAir;
+                    OAVolFlowRate = OAMassFlowRate / state.dataEnvrn->StdRhoAir;
                     if (PurchAir(PurchAirNum).OAFlowMaxHeatOutputError < 1) {
                         ++PurchAir(PurchAirNum).OAFlowMaxHeatOutputError;
                         ShowWarningError(state,
@@ -2792,9 +2791,9 @@ namespace PurchasedAirManager {
         }
 
         PurchAir(PurchAirNum).OutdoorAirMassFlowRate = OAMassFlowRate;
-        PurchAir(PurchAirNum).OutdoorAirVolFlowRateStdRho = OAMassFlowRate / StdRhoAir;
+        PurchAir(PurchAirNum).OutdoorAirVolFlowRateStdRho = OAMassFlowRate / state.dataEnvrn->StdRhoAir;
         PurchAir(PurchAirNum).SupplyAirMassFlowRate = SupplyMassFlowRate;
-        PurchAir(PurchAirNum).SupplyAirVolFlowRateStdRho = SupplyMassFlowRate / StdRhoAir;
+        PurchAir(PurchAirNum).SupplyAirVolFlowRateStdRho = SupplyMassFlowRate / state.dataEnvrn->StdRhoAir;
 
         if (PurchAir(PurchAirNum).PlenumExhaustAirNodeNum > 0) {
             Node(PurchAir(PurchAirNum).PlenumExhaustAirNodeNum).MassFlowRate = SupplyMassFlowRate;
@@ -2825,7 +2824,6 @@ namespace PurchasedAirManager {
         // REFERENCES:
 
         // Using/Aliasing
-        using DataEnvironment::StdRhoAir;
         using DataHeatBalance::Zone;
         using DataZoneEquipment::CalcDesignSpecificationOutdoorAir;
 
@@ -2854,7 +2852,7 @@ namespace PurchasedAirManager {
             }
             OAVolumeFlowRate =
                 CalcDesignSpecificationOutdoorAir(state, PurchAir(PurchAirNum).OARequirementsPtr, ActualZoneNum, UseOccSchFlag, UseMinOASchFlag);
-            OAMassFlowRate = OAVolumeFlowRate * StdRhoAir;
+            OAMassFlowRate = OAVolumeFlowRate * state.dataEnvrn->StdRhoAir;
 
             // If DCV with CO2SetPoint then check required OA flow to meet CO2 setpoint
             if (PurchAir(PurchAirNum).DCVType == CO2SetPoint) {

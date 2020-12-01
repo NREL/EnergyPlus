@@ -128,7 +128,6 @@ namespace HVACMultiSpeedHeatPump {
     using namespace DataLoopNode;
     using DataEnvironment::CurMnDy;
     using DataEnvironment::EnvironmentName;
-    using DataEnvironment::StdRhoAir;
     using DataHVACGlobals::BlowThru;
     using DataHVACGlobals::Coil_HeatingElectric;
     using DataHVACGlobals::Coil_HeatingElectric_MultiStage;
@@ -2112,7 +2111,7 @@ namespace HVACMultiSpeedHeatPump {
 
         // Do the Begin Environment initializations
         if (state.dataGlobal->BeginEnvrnFlag && MSHeatPump(MSHeatPumpNum).MyEnvrnFlag) {
-            RhoAir = StdRhoAir;
+            RhoAir = state.dataEnvrn->StdRhoAir;
             // set the mass flow rates from the input volume flow rates
             for (i = 1; i <= NumOfSpeedCooling; ++i) {
                 MSHeatPump(MSHeatPumpNum).CoolMassFlowRate(i) = RhoAir * MSHeatPump(MSHeatPumpNum).CoolVolumeFlowRate(i);
@@ -2324,7 +2323,7 @@ namespace HVACMultiSpeedHeatPump {
                     ShowContinueError(state, " Occurs in " + CurrentModuleObject + " = " + MSHeatPump(MSHeatPumpNum).Name);
                     MSHeatPump(MSHeatPumpNum).IdleVolumeAirRate = MSHeatPump(MSHeatPumpNum).FanVolFlow;
                 }
-                RhoAir = StdRhoAir;
+                RhoAir = state.dataEnvrn->StdRhoAir;
                 // set the mass flow rates from the reset volume flow rates
                 for (i = 1; i <= NumOfSpeedCooling; ++i) {
                     MSHeatPump(MSHeatPumpNum).CoolMassFlowRate(i) = RhoAir * MSHeatPump(MSHeatPumpNum).CoolVolumeFlowRate(i);

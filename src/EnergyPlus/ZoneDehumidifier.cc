@@ -108,8 +108,6 @@ namespace ZoneDehumidifier {
 
     // Using/Aliasing
     using namespace DataLoopNode;
-    using DataEnvironment::StdBaroPress;
-
     using namespace ScheduleManager;
 
     void SimZoneDehumidifier(EnergyPlusData &state,
@@ -609,9 +607,9 @@ namespace ZoneDehumidifier {
             // Might default back to STP later after discussion with M. Witte, use StdRhoAir instead of calc'd RhoAir at rated conditions
             RatedAirDBTemp = 26.6667; // 26.6667 C, 80F
             RatedAirRH = 0.6;         // 60% RH
-            RatedAirHumrat = PsyWFnTdbRhPb(state, RatedAirDBTemp, RatedAirRH, StdBaroPress, RoutineName);
+            RatedAirHumrat = PsyWFnTdbRhPb(state, RatedAirDBTemp, RatedAirRH, state.dataEnvrn->StdBaroPress, RoutineName);
             state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).RatedAirMassFlow =
-                PsyRhoAirFnPbTdbW(state, StdBaroPress, RatedAirDBTemp, RatedAirHumrat, RoutineName) * state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).RatedAirVolFlow;
+                PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, RatedAirDBTemp, RatedAirHumrat, RoutineName) * state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).RatedAirVolFlow;
 
             // Set the node max and min mass flow rates on inlet node... outlet node gets updated in UPDATE subroutine
             Node(AirInletNode).MassFlowRateMax = state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).RatedAirMassFlow;

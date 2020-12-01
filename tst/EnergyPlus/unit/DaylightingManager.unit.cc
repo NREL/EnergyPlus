@@ -1347,7 +1347,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
     state->dataGlobal->WeightNow = 1.0;
     state->dataEnvrn->HISUNF = 100.0;
     state->dataEnvrn->HISKF = 100.0;
-    DataEnvironment::SkyClearness = 6.0;
+    state->dataEnvrn->SkyClearness = 6.0;
 
     // Set all daylighting factors to zero
     state->dataDaylightingData->ZoneDaylight(ZoneNum).DaylIllFacSky = 0.0;

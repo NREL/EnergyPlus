@@ -123,8 +123,6 @@ namespace AirflowNetworkBalanceManager {
     using DataEnvironment::CurMnDy;
     using DataEnvironment::EnvironmentName;
     using DataEnvironment::OutDryBulbTempAt;
-    using DataEnvironment::StdBaroPress;
-    using DataEnvironment::StdRhoAir;
     using DataHeatBalance::TotCrossMixing;
     using DataHeatBalance::TotInfiltration;
     using DataHeatBalance::TotMixing;
@@ -305,7 +303,7 @@ namespace AirflowNetworkBalanceManager {
         if (AirflowNetworkFanActivated && SimulateAirflowNetwork > AirflowNetworkControlMultizone) {
             if (state.dataAirflowNetworkBalanceManager->ValidateDistributionSystemFlag) {
                 ValidateDistributionSystem(state);
-                ValidateFanFlowRate();
+                ValidateFanFlowRate(state);
                 state.dataAirflowNetworkBalanceManager->ValidateDistributionSystemFlag = false;
             }
         }
@@ -363,13 +361,13 @@ namespace AirflowNetworkBalanceManager {
                 Real64 pressure(101325.0);
                 if (fields.find("reference_barometric_pressure") != fields.end()) { // not required field, has default value
                     pressure = fields.at("reference_barometric_pressure");
-                    if (std::abs((pressure - StdBaroPress) / StdBaroPress) > 0.1) { // 10% off
+                    if (std::abs((pressure - state.dataEnvrn->StdBaroPress) / state.dataEnvrn->StdBaroPress) > 0.1) { // 10% off
                         ShowWarningError(state,
                                          format("{}: {}: Pressure = {:.0R} differs by more than 10% from Standard Barometric Pressure = {:.0R}.",
                                                 RoutineName,
                                                 CurrentModuleObject,
                                                 pressure,
-                                                StdBaroPress));
+                                                state.dataEnvrn->StdBaroPress));
                         ShowContinueError(state, "...occurs in " + CurrentModuleObject + " = " + thisObjectName);
                     }
                     if (pressure <= 31000.0) {
@@ -480,7 +478,7 @@ namespace AirflowNetworkBalanceManager {
                 Real64 flowRate;
 
                 GetFanVolFlow(fanIndex, flowRate);
-                flowRate *= StdRhoAir;
+                flowRate *= state.dataEnvrn->StdRhoAir;
                 bool nodeErrorsFound{false};
                 int inletNode = GetFanInletNode(state, "Fan:ZoneExhaust", thisObjectName, nodeErrorsFound);
                 int outletNode = GetFanOutletNode(state, "Fan:ZoneExhaust", thisObjectName, nodeErrorsFound);
@@ -1141,7 +1139,7 @@ namespace AirflowNetworkBalanceManager {
 
                 DisSysCompELRData(i).name = thisObjectName;          // Name of duct effective leakage ratio component
                 DisSysCompELRData(i).ELR = elr;                      // Value of effective leakage ratio
-                DisSysCompELRData(i).FlowRate = maxflow * StdRhoAir; // Maximum airflow rate
+                DisSysCompELRData(i).FlowRate = maxflow * state.dataEnvrn->StdRhoAir; // Maximum airflow rate
                 DisSysCompELRData(i).RefPres = dp;                   // Reference pressure difference
                 DisSysCompELRData(i).FlowExpo = expnt;               // Air Mass Flow exponent
 
@@ -1273,7 +1271,7 @@ namespace AirflowNetworkBalanceManager {
                         success = false;
                     } else {
                         flowRate = HVACFan::fanObjs[fanIndex]->designAirVolFlowRate;
-                        flowRate *= StdRhoAir;
+                        flowRate *= state.dataEnvrn->StdRhoAir;
                         DisSysCompCVFData(i).FanModelFlag = true;
                         inletNode = HVACFan::fanObjs[fanIndex]->inletNodeNum;
                         outletNode = HVACFan::fanObjs[fanIndex]->outletNodeNum;
@@ -1296,7 +1294,7 @@ namespace AirflowNetworkBalanceManager {
                     }
 
                     GetFanVolFlow(fanIndex, flowRate);
-                    flowRate *= StdRhoAir;
+                    flowRate *= state.dataEnvrn->StdRhoAir;
 
                     GetFanType(state, fan_name, fanType_Num, FanErrorFound);
                     state.dataAirflowNetworkBalanceManager->SupplyFanType = fanType_Num;
@@ -10284,7 +10282,7 @@ namespace AirflowNetworkBalanceManager {
         }
     }
 
-    void ValidateFanFlowRate()
+    void ValidateFanFlowRate(EnergyPlusData &state)
     {
 
         // Catch a fan flow rate from EPlus input file and add a flag for VAV terminal damper
@@ -10296,11 +10294,11 @@ namespace AirflowNetworkBalanceManager {
                     if (DisSysCompCVFData(typeNum).FanTypeNum == FanType_SimpleVAV) {
                         if (DisSysCompCVFData(typeNum).FanModelFlag) {
                             DisSysCompCVFData(typeNum).MaxAirMassFlowRate =
-                                HVACFan::fanObjs[DisSysCompCVFData(typeNum).FanIndex]->designAirVolFlowRate * StdRhoAir;
+                                HVACFan::fanObjs[DisSysCompCVFData(typeNum).FanIndex]->designAirVolFlowRate * state.dataEnvrn->StdRhoAir;
                         } else {
                             Real64 FanFlow; // Return type
                             GetFanVolFlow(DisSysCompCVFData(typeNum).FanIndex, FanFlow);
-                            DisSysCompCVFData(typeNum).MaxAirMassFlowRate = FanFlow * StdRhoAir;
+                            DisSysCompCVFData(typeNum).MaxAirMassFlowRate = FanFlow * state.dataEnvrn->StdRhoAir;
                         }
                     }
                 } else if (SELECT_CASE_var == CompTypeNum_FAN) { //'FAN'

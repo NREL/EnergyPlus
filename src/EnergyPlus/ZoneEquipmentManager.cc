@@ -425,7 +425,6 @@ namespace ZoneEquipmentManager {
         // and saves the results in the zone sizing data arrays.
 
         // Using/Aliasing
-        using DataEnvironment::StdBaroPress;
         using DataHeatBalFanSys::NonAirSystemResponse;
         using DataHeatBalFanSys::SysDepZoneLoads;
         using DataHeatBalFanSys::TempZoneThermostatSetPoint;
@@ -499,8 +498,8 @@ namespace ZoneEquipmentManager {
                     ShowFatalError(state, "Previous severe error causes abort ");
                 }
                 // set the DOAS mass flow rate and supply temperature and humidity ratio
-                HR90H = PsyWFnTdbRhPb(state, CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).DOASHighSetpoint, 0.9, StdBaroPress);
-                HR90L = PsyWFnTdbRhPb(state, CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).DOASLowSetpoint, 0.9, StdBaroPress);
+                HR90H = PsyWFnTdbRhPb(state, CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).DOASHighSetpoint, 0.9, state.dataEnvrn->StdBaroPress);
+                HR90L = PsyWFnTdbRhPb(state, CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).DOASLowSetpoint, 0.9, state.dataEnvrn->StdBaroPress);
                 DOASMassFlowRate = CalcFinalZoneSizing(ControlledZoneNum).MinOA;
                 CalcDOASSupCondsForSizing(state, state.dataEnvrn->OutDryBulbTemp,
                                           state.dataEnvrn->OutHumRat,
@@ -1403,8 +1402,6 @@ namespace ZoneEquipmentManager {
         // CallIndicator = 4 (EndZoneSizingCalc) write out results
 
         // Using/Aliasing
-        using DataEnvironment::StdBaroPress;
-        using DataEnvironment::StdRhoAir;
         using DataHeatBalFanSys::TempZoneThermostatSetPoint;
         using DataHeatBalFanSys::ZoneThermostatSetPointHi;
         using DataHeatBalFanSys::ZoneThermostatSetPointLo;
@@ -1451,8 +1448,8 @@ namespace ZoneEquipmentManager {
 
                     CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).CoolDesDay = EnvironmentName;
                     CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatDesDay = EnvironmentName;
-                    CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).DesHeatDens = StdRhoAir;
-                    CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).DesCoolDens = StdRhoAir;
+                    CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).DesHeatDens = state.dataEnvrn->StdRhoAir;
+                    CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).DesCoolDens = state.dataEnvrn->StdRhoAir;
                     CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatDDNum = CurOverallSimDay;
                     CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).CoolDDNum = CurOverallSimDay;
                 }
@@ -1671,7 +1668,7 @@ namespace ZoneEquipmentManager {
                         CalcFinalZoneSizing(CtrlZoneNum).DesHeatCoilInTemp = CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).DesHeatCoilInTemp;
                         CalcFinalZoneSizing(CtrlZoneNum).DesHeatCoilInHumRat = CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).DesHeatCoilInHumRat;
                     } else {
-                        CalcFinalZoneSizing(CtrlZoneNum).DesHeatDens = StdRhoAir;
+                        CalcFinalZoneSizing(CtrlZoneNum).DesHeatDens = state.dataEnvrn->StdRhoAir;
                         // save design heating load when the there is design heating load and the design heating volume flow rate is zero, i.e., when
                         // design heating volume flow rate is set to zero due to heating supply air temp less than zone thermostat temperature
                         if (CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).DesHeatLoad > CalcFinalZoneSizing(CtrlZoneNum).DesHeatLoad) {
@@ -1724,7 +1721,7 @@ namespace ZoneEquipmentManager {
                         CalcFinalZoneSizing(CtrlZoneNum).DesCoolCoilInTemp = CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).DesCoolCoilInTemp;
                         CalcFinalZoneSizing(CtrlZoneNum).DesCoolCoilInHumRat = CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).DesCoolCoilInHumRat;
                     } else {
-                        CalcFinalZoneSizing(CtrlZoneNum).DesCoolDens = StdRhoAir;
+                        CalcFinalZoneSizing(CtrlZoneNum).DesCoolDens = state.dataEnvrn->StdRhoAir;
                         // save design cooling load when the there is design cooling load and the design cooling volume flow rate is zero, i.e., when
                         // design cooling volume flow rate is set to zero due to cooling supply air temp greater than zone thermostat temperature
                         if (CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).DesCoolLoad > CalcFinalZoneSizing(CtrlZoneNum).DesCoolLoad) {
@@ -2336,7 +2333,7 @@ namespace ZoneEquipmentManager {
                             if (FinalZoneSizing(CtrlZoneNum).ZoneHumRatAtCoolPeak > 0.0) {
                                 FinalZoneSizing(CtrlZoneNum).ZoneHumRatAtCoolPeak =
                                     min(FinalZoneSizing(CtrlZoneNum).ZoneHumRatAtCoolPeak,
-                                        PsyWFnTdpPb(state, FinalZoneSizing(CtrlZoneNum).ZoneTempAtCoolPeak, StdBaroPress, RoutineName));
+                                        PsyWFnTdpPb(state, FinalZoneSizing(CtrlZoneNum).ZoneTempAtCoolPeak, state.dataEnvrn->StdBaroPress, RoutineName));
 
                             } else {
                                 FinalZoneSizing(CtrlZoneNum).ZoneHumRatAtCoolPeak = ZoneSizing(DDNumF, CtrlZoneNum).CoolDesHumRat;
@@ -2501,7 +2498,7 @@ namespace ZoneEquipmentManager {
                             if (FinalZoneSizing(CtrlZoneNum).ZoneHumRatAtHeatPeak > 0.0) {
                                 FinalZoneSizing(CtrlZoneNum).ZoneHumRatAtHeatPeak =
                                     min(FinalZoneSizing(CtrlZoneNum).ZoneHumRatAtHeatPeak,
-                                        PsyWFnTdpPb(state, FinalZoneSizing(CtrlZoneNum).ZoneTempAtHeatPeak, StdBaroPress, RoutineName));
+                                        PsyWFnTdpPb(state, FinalZoneSizing(CtrlZoneNum).ZoneTempAtHeatPeak, state.dataEnvrn->StdBaroPress, RoutineName));
                             } else {
                                 FinalZoneSizing(CtrlZoneNum).ZoneHumRatAtHeatPeak = ZoneSizing(DDNumF, CtrlZoneNum).HeatDesHumRat;
                             }
@@ -4137,7 +4134,7 @@ namespace ZoneEquipmentManager {
                                 Real64 zoneHumRat = Node(thisZoneEquip.ZoneNode).HumRat;
                                 Real64 rhoZone = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, zoneTemp, zoneHumRat, "CalcZoneMassBalance");
                                 Real64 incomingVolFlow = incomingFlow / rhoZone;
-                                Real64 sysUnbalancedVolFlow = sysUnbalancedFlow / DataEnvironment::StdRhoAir;
+                                Real64 sysUnbalancedVolFlow = sysUnbalancedFlow / state.dataEnvrn->StdRhoAir;
                                 Real64 unbalancedVolFlow = max(0.0, sysUnbalancedVolFlow - incomingVolFlow);
                                 if (unbalancedVolFlow > DataHVACGlobals::SmallAirVolFlow) {
                                     ShowWarningError(state, "In zone " + thisZoneEquip.ZoneName +
@@ -4145,9 +4142,9 @@ namespace ZoneEquipmentManager {
                                     ShowContinueErrorTimeStamp(state, "");
                                     ShowContinueError(state,
                                                       format("  Flows [m3/s]: Inlets: {:.6R}  Unbalanced exhausts: {:.6R}  Returns: {:.6R}",
-                                                             thisZoneEquip.TotInletAirMassFlowRate / DataEnvironment::StdRhoAir,
-                                                             sysUnbalExhaust / DataEnvironment::StdRhoAir,
-                                                             totalZoneReturnMassFlow / DataEnvironment::StdRhoAir));
+                                                             thisZoneEquip.TotInletAirMassFlowRate / state.dataEnvrn->StdRhoAir,
+                                                             sysUnbalExhaust / state.dataEnvrn->StdRhoAir,
+                                                             totalZoneReturnMassFlow / state.dataEnvrn->StdRhoAir));
                                     ShowContinueError(state,
                                                       format("  Infiltration: {:.6R}  Zone Ventilation: {:.6R}  Mixing (incoming): {:.6R}",
                                                              DataHeatBalFanSys::OAMFL(actualZone) / rhoZone,
@@ -4158,7 +4155,7 @@ namespace ZoneEquipmentManager {
                                         format(
                                             "  Imbalance (excess outflow): {:.6R}  Total system OA flow (for all airloops serving this zone): {:.6R}",
                                             unbalancedVolFlow,
-                                            thisZoneEquip.TotAvailAirLoopOA / DataEnvironment::StdRhoAir));
+                                            thisZoneEquip.TotAvailAirLoopOA / state.dataEnvrn->StdRhoAir));
                                     ShowContinueError(state, "  This error will only be reported once per zone.");
                                     thisZoneEquip.FlowError = true;
                                 }

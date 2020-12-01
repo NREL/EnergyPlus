@@ -10248,7 +10248,6 @@ namespace OutputReportTabular {
         // Using/Aliasing
         using DataEnvironment::EnvironmentName;
         using DataEnvironment::RunPeriodStartDayOfWeek;
-        using DataEnvironment::TimeZoneNumber;
         using DataEnvironment::WeatherFileLocationTitle;
         using DataHeatBalance::BuildingAzimuth;
         using DataHeatBalance::BuildingRotationAppendixG;
@@ -10472,7 +10471,7 @@ namespace OutputReportTabular {
             tableBody(1, 4) = RealToStr(state.dataEnvrn->Latitude, 2);                  // latitude
             tableBody(1, 5) = RealToStr(state.dataEnvrn->Longitude, 2);                 // longitude
             tableBody(1, 6) = RealToStr(state.dataEnvrn->Elevation * m_unitConv, 2);    // Elevation
-            tableBody(1, 7) = RealToStr(TimeZoneNumber, 2);            // Time Zone
+            tableBody(1, 7) = RealToStr(state.dataEnvrn->TimeZoneNumber, 2);            // Time Zone
             tableBody(1, 8) = RealToStr(BuildingAzimuth, 2);           // north axis angle
             tableBody(1, 9) = RealToStr(BuildingRotationAppendixG, 2); // Rotation for Appendix G
             tableBody(1, 10) = RealToStr(gatherElapsedTimeBEPS, 2);    // hours simulated

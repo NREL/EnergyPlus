@@ -68,15 +68,6 @@ namespace DataEnvironment {
     Real64 constexpr StdPressureSeaLevel(101325.0);   // Standard barometric pressure at sea level (Pa)
 
     // MODULE VARIABLE DECLARATIONS:
-    extern Real64 SkyClearness;                    // Sky clearness (see subr. DayltgLuminousEfficacy)
-    extern Real64 SkyBrightness;                   // Sky brightness (see subr. DayltgLuminousEfficacy)
-    extern Real64 TotalCloudCover;                 // Total Sky Cover (tenth of sky)
-    extern Real64 OpaqueCloudCover;                // Opaque Sky Cover (tehnth of sky)
-    extern Real64 StdBaroPress;                    // Standard "atmospheric pressure" based on elevation (ASHRAE HOF p6.1)
-    extern Real64 StdRhoAir;                       // Standard "rho air" set in WeatherManager - based on StdBaroPress at elevation
-    extern Real64 rhoAirSTP;                       // Standard density of dry air at 101325 Pa, 20.0C temperaure
-    extern Real64 TimeZoneNumber;                  // Time Zone Number of building location
-    extern Real64 TimeZoneMeridian;                // Standard Meridian of TimeZone
     extern std::string EnvironmentName;            // Current environment name (longer for weather file names)
     extern std::string WeatherFileLocationTitle;   // Location Title from Weather File
     extern std::string CurMnDyHr;                  // Current Month/Day/Hour timestamp info
@@ -213,6 +204,15 @@ struct EnvironmentData : BaseGlobalStruct {
     Real64 HISUNFnorm = 0.0;                            // Exterior beam normal illuminance (lux)
     Real64 PDIRLW = 0.0;                                // Luminous efficacy (lum/W) of beam solar radiation
     Real64 PDIFLW = 0.0;                                // Luminous efficacy (lum/W) of sky diffuse solar radiation
+    Real64 SkyClearness = 0.0;                          // Sky clearness (see subr. DayltgLuminousEfficacy)
+    Real64 SkyBrightness = 0.0;                         // Sky brightness (see subr. DayltgLuminousEfficacy)
+    Real64 TotalCloudCover = 5.0;                       // Total Sky Cover (tenth of sky)
+    Real64 OpaqueCloudCover = 5.0;                      // Opaque Sky Cover (tenth of sky)
+    Real64 StdBaroPress = DataEnvironment::StdPressureSeaLevel; // Standard "atmospheric pressure" based on elevation (ASHRAE HOF p6.1)
+    Real64 StdRhoAir = 0.0;                             // Standard "rho air" set in WeatherManager - based on StdBaroPress
+    Real64 rhoAirSTP = 0.0;                             // Standard density of dry air at 101325 Pa, 20.0C temperature
+    Real64 TimeZoneNumber = 0.0;                        // Time Zone Number of building location
+    Real64 TimeZoneMeridian = 0.0;                      // Standard Meridian of TimeZone
 
     void clear_state() override
     {
@@ -283,6 +283,15 @@ struct EnvironmentData : BaseGlobalStruct {
         this->HISUNFnorm = 0.0;
         this->PDIRLW = 0.0;
         this->PDIFLW = 0.0;
+        this->SkyClearness = 0.0;
+        this->SkyBrightness = 0.0;
+        this->TotalCloudCover = 5.0;
+        this->OpaqueCloudCover = 5.0;
+        this->StdBaroPress = DataEnvironment::StdPressureSeaLevel;
+        this->StdRhoAir = 0.0;
+        this->rhoAirSTP = 0.0;
+        this->TimeZoneNumber = 0.0;
+        this->TimeZoneMeridian = 0.0;
     }
 };
 

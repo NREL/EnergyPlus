@@ -4082,7 +4082,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HeatExchangerGenericCalcTest)
     int FanOpMode = 2; // 2 = constant fan
 
     state->dataEnvrn->OutBaroPress = 101325.0;
-    DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
+    state->dataEnvrn->StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
 
     thisHX.ExchTypeNum = HX_AIRTOAIR_GENERIC;
     thisHX.SupInTemp = 10.0;
@@ -4099,9 +4099,9 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HeatExchangerGenericCalcTest)
     Node(thisHX.SecInletNode).Enthalpy = thisHX.SecInEnth;
 
     // test 1: primary and secondary flow rate equal
-    Node(thisHX.SupInletNode).MassFlowRate = thisHX.NomSupAirVolFlow * DataEnvironment::StdRhoAir;
+    Node(thisHX.SupInletNode).MassFlowRate = thisHX.NomSupAirVolFlow * state->dataEnvrn->StdRhoAir;
     thisHX.NomSecAirVolFlow = thisHX.NomSupAirVolFlow;
-    Node(thisHX.SecInletNode).MassFlowRate = thisHX.NomSecAirVolFlow * DataEnvironment::StdRhoAir;
+    Node(thisHX.SecInletNode).MassFlowRate = thisHX.NomSecAirVolFlow * state->dataEnvrn->StdRhoAir;
     Node(thisHX.SupOutletNode).TempSetPoint = 19.0;
     InitHeatRecovery(*state, ExchNum, CompanionCoilNum, 0);
     CalcAirToAirGenericHeatExch(*state, ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag);
@@ -4115,9 +4115,9 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HeatExchangerGenericCalcTest)
     EXPECT_EQ(0, thisHX.LowFlowErrCount ); // flow ratio within range, < 1.3
 
     // test 2: secondary flow is 10 times primary
-    Node(thisHX.SupInletNode).MassFlowRate = thisHX.NomSupAirVolFlow * DataEnvironment::StdRhoAir;
+    Node(thisHX.SupInletNode).MassFlowRate = thisHX.NomSupAirVolFlow * state->dataEnvrn->StdRhoAir;
     thisHX.NomSecAirVolFlow = 10.0 * thisHX.NomSupAirVolFlow;
-    Node(thisHX.SecInletNode).MassFlowRate = thisHX.NomSecAirVolFlow * DataEnvironment::StdRhoAir;
+    Node(thisHX.SecInletNode).MassFlowRate = thisHX.NomSecAirVolFlow * state->dataEnvrn->StdRhoAir;
     Node(thisHX.SupOutletNode).TempSetPoint = 19.0;
     InitHeatRecovery(*state, ExchNum, CompanionCoilNum, 0);
     CalcAirToAirGenericHeatExch(*state, ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag);

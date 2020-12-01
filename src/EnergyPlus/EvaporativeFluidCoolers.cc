@@ -1384,7 +1384,7 @@ namespace EvaporativeFluidCoolers {
         if (this->HighSpeedAirFlowRateWasAutoSized) {
             // Plant Sizing Object is not required to AUTOSIZE this field since its simply a multiple of another field.
 
-            tmpHighSpeedAirFlowRate = tmpHighSpeedFanPower * 0.5 * (101325.0 / DataEnvironment::StdBaroPress) / 190.0;
+            tmpHighSpeedAirFlowRate = tmpHighSpeedFanPower * 0.5 * (101325.0 / state.dataEnvrn->StdBaroPress) / 190.0;
             if (DataPlant::PlantFirstSizesOkayToFinalize) {
                 this->HighSpeedAirFlowRate = tmpHighSpeedAirFlowRate;
 
@@ -1455,7 +1455,7 @@ namespace EvaporativeFluidCoolers {
                     this->inletConds.WaterTemp = DataSizing::PlantSizData(PltSizCondNum).ExitTemp + DataSizing::PlantSizData(PltSizCondNum).DeltaT;
                     this->inletConds.AirTemp = 35.0;
                     this->inletConds.AirWetBulb = 25.6;
-                    this->inletConds.AirPress = DataEnvironment::StdBaroPress;
+                    this->inletConds.AirPress = state.dataEnvrn->StdBaroPress;
                     this->inletConds.AirHumRat =
                         Psychrometrics::PsyWFnTdbTwbPb(state, this->inletConds.AirTemp, this->inletConds.AirWetBulb, this->inletConds.AirPress);
                     TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, UA, boundUAResidualFunc, UA0, UA1, Par);
@@ -1566,7 +1566,7 @@ namespace EvaporativeFluidCoolers {
                 this->inletConds.WaterTemp = 35.0;            // 95F design inlet water temperature
                 this->inletConds.AirTemp = 35.0;              // 95F design inlet air dry-bulb temp
                 this->inletConds.AirWetBulb = 25.6;           // 78F design inlet air wet-bulb temp
-                this->inletConds.AirPress = DataEnvironment::StdBaroPress;
+                this->inletConds.AirPress = state.dataEnvrn->StdBaroPress;
                 this->inletConds.AirHumRat =
                     Psychrometrics::PsyWFnTdbTwbPb(state, this->inletConds.AirTemp, this->inletConds.AirWetBulb, this->inletConds.AirPress);
                 TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, UA, boundUAResidualFunc, UA0, UA1, Par);
@@ -1637,7 +1637,7 @@ namespace EvaporativeFluidCoolers {
                 this->inletConds.WaterTemp = this->DesignEnteringWaterTemp;
                 this->inletConds.AirTemp = this->DesignEnteringAirTemp;
                 this->inletConds.AirWetBulb = this->DesignEnteringAirWetBulbTemp;
-                this->inletConds.AirPress = DataEnvironment::StdBaroPress;
+                this->inletConds.AirPress = state.dataEnvrn->StdBaroPress;
                 this->inletConds.AirHumRat =
                     Psychrometrics::PsyWFnTdbTwbPb(state, this->inletConds.AirTemp, this->inletConds.AirWetBulb, this->inletConds.AirPress);
                 TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, UA, boundUAResidualFunc, UA0, UA1, Par);
@@ -1780,7 +1780,7 @@ namespace EvaporativeFluidCoolers {
                 this->inletConds.WaterTemp = 35.0;            // 95F design inlet water temperature
                 this->inletConds.AirTemp = 35.0;              // 95F design inlet air dry-bulb temp
                 this->inletConds.AirWetBulb = 25.6;           // 78F design inlet air wet-bulb temp
-                this->inletConds.AirPress = DataEnvironment::StdBaroPress;
+                this->inletConds.AirPress = state.dataEnvrn->StdBaroPress;
                 this->inletConds.AirHumRat =
                     Psychrometrics::PsyWFnTdbTwbPb(state, this->inletConds.AirTemp, this->inletConds.AirWetBulb, this->inletConds.AirPress);
                 TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, UA, boundUAResidualFunc, UA0, UA1, Par);
@@ -1833,7 +1833,7 @@ namespace EvaporativeFluidCoolers {
                 this->inletConds.WaterTemp = this->DesignEnteringWaterTemp;
                 this->inletConds.AirTemp = this->DesignEnteringAirTemp;
                 this->inletConds.AirWetBulb = this->DesignEnteringAirWetBulbTemp;
-                this->inletConds.AirPress = DataEnvironment::StdBaroPress;
+                this->inletConds.AirPress = state.dataEnvrn->StdBaroPress;
                 this->inletConds.AirHumRat =
                     Psychrometrics::PsyWFnTdbTwbPb(state, this->inletConds.AirTemp, this->inletConds.AirWetBulb, this->inletConds.AirPress);
                 TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, UA, boundUAResidualFunc, UA0, UA1, Par);

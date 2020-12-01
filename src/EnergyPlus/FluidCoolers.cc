@@ -1081,7 +1081,7 @@ namespace FluidCoolers {
                     this->WaterTemp = DataSizing::PlantSizData(PltSizCondNum).ExitTemp + DataSizing::PlantSizData(PltSizCondNum).DeltaT;
                     this->AirTemp = this->DesignEnteringAirTemp;
                     this->AirWetBulb = this->DesignEnteringAirWetBulbTemp;
-                    this->AirPress = DataEnvironment::StdBaroPress;
+                    this->AirPress = state.dataEnvrn->StdBaroPress;
                     this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(state, this->AirTemp, this->AirWetBulb, this->AirPress, CalledFrom);
                     TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, UA, SimpleFluidCoolerUAResidual, UA0, UA1, Par);
                     if (SolFla == -1) {
@@ -1189,7 +1189,7 @@ namespace FluidCoolers {
                 this->WaterTemp = this->DesignEnteringWaterTemp;       // design inlet water temperature
                 this->AirTemp = this->DesignEnteringAirTemp;           // design inlet air dry-bulb temp
                 this->AirWetBulb = this->DesignEnteringAirWetBulbTemp; // design inlet air wet-bulb temp
-                this->AirPress = DataEnvironment::StdBaroPress;
+                this->AirPress = state.dataEnvrn->StdBaroPress;
                 this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(state, this->AirTemp, this->AirWetBulb, this->AirPress);
                 TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, UA, SimpleFluidCoolerUAResidual, UA0, UA1, Par);
                 if (SolFla == -1) {
@@ -1341,7 +1341,7 @@ namespace FluidCoolers {
                 this->WaterTemp = this->DesignEnteringWaterTemp;       // design inlet water temperature
                 this->AirTemp = this->DesignEnteringAirTemp;           // design inlet air dry-bulb temp
                 this->AirWetBulb = this->DesignEnteringAirWetBulbTemp; // design inlet air wet-bulb temp
-                this->AirPress = DataEnvironment::StdBaroPress;
+                this->AirPress = state.dataEnvrn->StdBaroPress;
                 this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(state, this->AirTemp, this->AirWetBulb, this->AirPress, CalledFrom);
                 TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, UA, SimpleFluidCoolerUAResidual, UA0, UA1, Par);
                 if (SolFla == -1) {

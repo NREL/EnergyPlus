@@ -224,9 +224,9 @@ TEST_F(EnergyPlusFixture, DXCoils_Test1)
     state->dataEnvrn->OutDryBulbTemp = 16.1;
     state->dataEnvrn->OutHumRat = 0.0114507065;
     state->dataEnvrn->OutBaroPress = 98200.0;
-    DataEnvironment::StdRhoAir = 1.2;
-    MSHPMassFlowRateLow = 0.2339 * DataEnvironment::StdRhoAir;
-    MSHPMassFlowRateHigh = 0.2924 * DataEnvironment::StdRhoAir;
+    state->dataEnvrn->StdRhoAir = 1.2;
+    MSHPMassFlowRateLow = 0.2339 * state->dataEnvrn->StdRhoAir;
+    MSHPMassFlowRateHigh = 0.2924 * state->dataEnvrn->StdRhoAir;
 
     int CoilIndex = 1;
     DataHeatBalance::HeatReclaimDXCoil.allocate(2);
@@ -468,7 +468,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
 
     for (int mode = 1; mode <= Coil.NumOfSpeeds; ++mode) {
         Coil.MSRatedAirMassFlowRate(mode) =
-            Coil.MSRatedAirVolFlowRate(mode) * PsyRhoAirFnPbTdbW(*state, EnergyPlus::DataEnvironment::StdBaroPress, 21.11, 0.00881, "InitDXCoil");
+            Coil.MSRatedAirVolFlowRate(mode) * PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->StdBaroPress, 21.11, 0.00881, "InitDXCoil");
     }
 
     state->dataCurveManager->NumCurves = 11;
@@ -794,7 +794,7 @@ TEST_F(EnergyPlusFixture, TestSingleSpeedDefrostCOP)
     Coil.RatedEIR(1) = 1 / Coil.RatedCOP(1);
     Coil.RatedAirVolFlowRate(1) = 0.43873066751851;
     Coil.RatedAirMassFlowRate(1) =
-        Coil.RatedAirVolFlowRate(1) * PsyRhoAirFnPbTdbW(*state, EnergyPlus::DataEnvironment::StdBaroPress, 21.11, 0.00881, "InitDXCoil");
+        Coil.RatedAirVolFlowRate(1) * PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->StdBaroPress, 21.11, 0.00881, "InitDXCoil");
     Coil.FanPowerPerEvapAirFlowRate(1) = 773.3;
     Coil.MinOATCompressor = -73.27777777777779;
     Coil.CrankcaseHeaterCapacity = 0.0;
@@ -1463,7 +1463,7 @@ TEST_F(EnergyPlusFixture, DXCoil_ValidateADPFunction)
     ZoneSizingInput(1).ZoneNum = 1;
     DataSizing::NumZoneSizingInput = 1;
     ZoneSizingRunDone = true;
-    StdBaroPress = 101325.0;
+    state->dataEnvrn->StdBaroPress = 101325.0;
 
     SizeDXCoil(*state, 1); // normal sizing
 
@@ -2199,7 +2199,7 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_TwoSpeed)
     DataSizing::SysSizInput(1).AirLoopNum = CurSysNum;
     DataSizing::NumSysSizInput = 1;
 
-    DataEnvironment::StdBaroPress = 101325.0;
+    state->dataEnvrn->StdBaroPress = 101325.0;
     Psychrometrics::InitializePsychRoutines();
 
     // Need this to prevent crash in Sizers
@@ -2425,7 +2425,7 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_SingleSpeed)
     DataSizing::SysSizInput(1).AirLoopNum = CurSysNum;
     DataSizing::NumSysSizInput = 1;
 
-    DataEnvironment::StdBaroPress = 101325.0;
+    state->dataEnvrn->StdBaroPress = 101325.0;
     Psychrometrics::InitializePsychRoutines();
 
     // Need this to prevent crash in Sizers
@@ -3509,8 +3509,8 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoilsAutoSizingOutput)
     EXPECT_EQ("ASHP CLG COIL", DXCoil(1).Name);
     EXPECT_EQ("Coil:Cooling:DX:MultiSpeed", DXCoil(1).DXCoilType);
 
-    DataEnvironment::StdBaroPress = 101325.0;
-    DataEnvironment::StdRhoAir = 1.2;
+    state->dataEnvrn->StdBaroPress = 101325.0;
+    state->dataEnvrn->StdRhoAir = 1.2;
     Psychrometrics::InitializePsychRoutines();
 
     // set system sizing parameters
@@ -3761,8 +3761,8 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoolingCoilPartialAutoSizeOutput)
     EXPECT_EQ("ASHP CLG COIL", DXCoil(1).Name);
     EXPECT_EQ("Coil:Cooling:DX:MultiSpeed", DXCoil(1).DXCoilType);
 
-    DataEnvironment::StdBaroPress = 101325.0;
-    DataEnvironment::StdRhoAir = 1.2;
+    state->dataEnvrn->StdBaroPress = 101325.0;
+    state->dataEnvrn->StdRhoAir = 1.2;
     Psychrometrics::InitializePsychRoutines();
 
     // set system sizing parameters

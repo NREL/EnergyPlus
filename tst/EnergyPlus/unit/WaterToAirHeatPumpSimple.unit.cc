@@ -127,7 +127,7 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_SizeHVACWaterToAir)
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).SensCoolCap6 = 0.0;
 
     DesDayWeath(1).Temp(15) = 32.0;
-    StdBaroPress = 101325.0;
+    state->dataEnvrn->StdBaroPress = 101325.0;
     ZoneEqDXCoil = true;
 
     WaterToAirHeatPumpSimple::SizeHVACWaterToAir(*state, HPNum);

@@ -613,7 +613,7 @@ Real64 CoolingAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, b
                         this->autoSizedValue = this->oaSysEqSizing(this->curOASysNum).CoolingAirVolFlow;
                     } else if (outsideAirSys(this->curOASysNum).AirLoopDOASNum > -1) {
                         this->autoSizedValue = this->airloopDOAS[outsideAirSys(this->curOASysNum).AirLoopDOASNum].SizingMassFlow /
-                                               DataEnvironment::StdRhoAir;
+                                               state.dataEnvrn->StdRhoAir;
                     } else {
                         this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesOutAirVolFlow;
                     }

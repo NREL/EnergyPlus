@@ -93,7 +93,6 @@ namespace AirflowNetwork {
     // USE STATEMENTS:
 
     // Using/Aliasing
-    using DataEnvironment::StdBaroPress;
     using DataSurfaces::Surface;
 
     //std::vector<AirProperties> properties;
@@ -510,10 +509,10 @@ namespace AirflowNetwork {
         }
         // Compute zone air properties.
         for (n = 1; n <= NetworkNumOfNodes; ++n) {
-            properties[n].density = AIRDENSITY(state, StdBaroPress + PZ(n), properties[n].temperature, properties[n].humidityRatio);
+            properties[n].density = AIRDENSITY(state, state.dataEnvrn->StdBaroPress + PZ(n), properties[n].temperature, properties[n].humidityRatio);
             // RHOZ(n) = PsyRhoAirFnPbTdbW(StdBaroPress + PZ(n), TZ(n), WZ(n));
             if (AirflowNetworkNodeData(n).ExtNodeNum > 0) {
-                properties[n].density = AIRDENSITY(state, StdBaroPress + PZ(n), state.dataEnvrn->OutDryBulbTemp, state.dataEnvrn->OutHumRat);
+                properties[n].density = AIRDENSITY(state, state.dataEnvrn->StdBaroPress + PZ(n), state.dataEnvrn->OutDryBulbTemp, state.dataEnvrn->OutHumRat);
                 properties[n].temperature = state.dataEnvrn->OutDryBulbTemp;
                 properties[n].humidityRatio = state.dataEnvrn->OutHumRat;
             }

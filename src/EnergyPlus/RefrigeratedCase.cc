@@ -895,8 +895,8 @@ namespace RefrigeratedCase {
                 }
                 RefrigCase(CaseNum).RatedAmbientDewPoint = Psychrometrics::PsyTdpFnWPb(state,
                     Psychrometrics::PsyWFnTdbRhPb(state,
-                        RefrigCase(CaseNum).RatedAmbientTemp, (RefrigCase(CaseNum).RatedAmbientRH / 100.0), DataEnvironment::StdBaroPress),
-                    DataEnvironment::StdBaroPress);
+                        RefrigCase(CaseNum).RatedAmbientTemp, (RefrigCase(CaseNum).RatedAmbientRH / 100.0), state.dataEnvrn->StdBaroPress),
+                    state.dataEnvrn->StdBaroPress);
 
                 RefrigCase(CaseNum).RateTotCapPerLength = Numbers(3);
                 if (Numbers(3) <= 0.0) {

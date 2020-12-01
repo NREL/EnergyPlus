@@ -442,7 +442,7 @@ namespace EcoRoofManager {
 
             Qsoilpart2 = state.dataConstruction->Construct(ConstrNum).CTFOutside(0) - F1temp * state.dataConstruction->Construct(ConstrNum).CTFCross(0);
 
-            Pa = StdBaroPress; // standard atmospheric pressure (apparently in Pascals)
+            Pa = state.dataEnvrn->StdBaroPress; // standard atmospheric pressure (apparently in Pascals)
             Tgk = Tg + DataGlobalConstants::KelvinConv();
             Tak = Ta + DataGlobalConstants::KelvinConv();
 

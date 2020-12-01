@@ -130,7 +130,6 @@ namespace DesiccantDehumidifiers {
     // Use statements for data only modules
     // Using/Aliasing
     using namespace DataLoopNode;
-    using DataEnvironment::StdRhoAir;
     using DataHeatBalance::HeatReclaimDXCoil;
     using DataHVACGlobals::BlowThru;
     using DataHVACGlobals::Coil_HeatingElectric;
@@ -1902,7 +1901,7 @@ namespace DesiccantDehumidifiers {
                 //      Do the Begin Environment initializations
                 if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(DesicDehumNum)) {
                     // Change the Volume Flow Rates to Mass Flow Rates
-                    DesicDehum(DesicDehumNum).ExhaustFanMaxMassFlowRate = DesicDehum(DesicDehumNum).ExhaustFanMaxVolFlowRate * StdRhoAir;
+                    DesicDehum(DesicDehumNum).ExhaustFanMaxMassFlowRate = DesicDehum(DesicDehumNum).ExhaustFanMaxVolFlowRate * state.dataEnvrn->StdRhoAir;
 
                     //   set fluid-side hardware limits
                     if (DesicDehum(DesicDehumNum).CoilControlNode > 0) {
@@ -2510,13 +2509,13 @@ namespace DesiccantDehumidifiers {
         if (Node(DesicDehum(DesicDehumNum).RegenAirInNode).MassFlowRate != RegenAirMassFlowRate) {
             // Initialize standard air density
             if (CalcSolidDesiccantDehumidifierMyOneTimeFlag) {
-                RhoAirStdInit = StdRhoAir; // Uhh, this static flag is never set to false...
+                RhoAirStdInit = state.dataEnvrn->StdRhoAir;
             }
             ShowRecurringSevereErrorAtEnd(state, "Improper flow delivered by desiccant regen fan - RESULTS INVALID! Check regen fan capacity and schedule.",
                                           DesicDehum(DesicDehumNum).RegenFanErrorIndex1);
             ShowRecurringContinueErrorAtEnd(state, DesicDehum(DesicDehumNum).DehumType + '=' + DesicDehum(DesicDehumNum).Name,
                                             DesicDehum(DesicDehumNum).RegenFanErrorIndex2);
-            RhoAirStdInit = StdRhoAir;
+            RhoAirStdInit = state.dataEnvrn->StdRhoAir;
             ShowRecurringContinueErrorAtEnd(state, "Flow requested [m3/s] from " + DesicDehum(DesicDehumNum).RegenFanType + '=' +
                                                 DesicDehum(DesicDehumNum).RegenFanName,
                                             DesicDehum(DesicDehumNum).RegenFanErrorIndex3,
@@ -2650,7 +2649,7 @@ namespace DesiccantDehumidifiers {
         }
 
         if (CalcGenericDesiccantDehumidifierMyOneTimeFlag) {
-            RhoAirStdInit = StdRhoAir;
+            RhoAirStdInit = state.dataEnvrn->StdRhoAir;
             CalcGenericDesiccantDehumidifierMyOneTimeFlag = false;
         }
 

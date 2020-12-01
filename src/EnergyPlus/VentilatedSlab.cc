@@ -1290,7 +1290,6 @@ namespace VentilatedSlab {
         // na
 
         // Using/Aliasing
-        using DataEnvironment::StdRhoAir;
         using DataHeatBalFanSys::MAT;
         using DataHeatBalFanSys::ZoneAirHumRat;
         using DataHVACGlobals::ZoneComp;
@@ -1465,7 +1464,7 @@ namespace VentilatedSlab {
             HotConNode = state.dataVentilatedSlab->VentSlab(Item).HotControlNode;
             ColdConNode = state.dataVentilatedSlab->VentSlab(Item).ColdControlNode;
             OutsideAirNode = state.dataVentilatedSlab->VentSlab(Item).OutsideAirNode;
-            RhoAir = StdRhoAir;
+            RhoAir = state.dataEnvrn->StdRhoAir;
 
             // Radiation Panel Part
             state.dataVentilatedSlab->ZeroSourceSumHATsurf = 0.0;

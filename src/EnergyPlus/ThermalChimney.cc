@@ -587,7 +587,6 @@ namespace ThermalChimney {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine simulates the components making up the ThermalChimney.
 
-        using DataEnvironment::StdRhoAir;
         using ScheduleManager::GetCurrentScheduleValue;
 
         int const NTC(15); // Number of subregions in thermal chimney air channel for FINITE DIFFERENCE
@@ -832,7 +831,7 @@ namespace ThermalChimney {
 
             state.dataThermalChimneys->ThermalChimneyReport(Loop).OverallTCVolumeFlow = TCVolumeAirFlowRate;
             state.dataThermalChimneys->ThermalChimneyReport(Loop).OverallTCMassFlow = TCMassAirFlowRate;
-            state.dataThermalChimneys->ThermalChimneyReport(Loop).OverallTCVolumeFlowStd = TCMassAirFlowRate / StdRhoAir;
+            state.dataThermalChimneys->ThermalChimneyReport(Loop).OverallTCVolumeFlowStd = TCMassAirFlowRate / state.dataEnvrn->StdRhoAir;
             if (state.dataThermalChimneys->ThermalChimneyReport(Loop).OverallTCMassFlow != (TCVolumeAirFlowRate * AirDensityThermalChim)) {
                 state.dataThermalChimneys->ThermalChimneyReport(Loop).OverallTCMassFlow = state.dataThermalChimneys->ThermalChimneyReport(Loop).OverallTCVolumeFlow * AirDensityThermalChim;
             }

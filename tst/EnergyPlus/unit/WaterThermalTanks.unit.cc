@@ -722,7 +722,7 @@ TEST_F(EnergyPlusFixture, HPWHEnergyBalance)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    DataEnvironment::StdRhoAir = 1.0;
+    state->dataEnvrn->StdRhoAir = 1.0;
 
     ASSERT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(*state));
 
@@ -1028,7 +1028,7 @@ TEST_F(EnergyPlusFixture, HPWHSizing)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    DataEnvironment::StdRhoAir = 1.0;
+    state->dataEnvrn->StdRhoAir = 1.0;
 
     bool ErrorsFound = false;
     int CompIndex = 1;
@@ -1392,7 +1392,7 @@ TEST_F(EnergyPlusFixture, HPWHTestSPControl)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    DataEnvironment::StdRhoAir = 1.0;
+    state->dataEnvrn->StdRhoAir = 1.0;
 
     DataHVACGlobals::TimeStepSys = 1;
     state->dataGlobal->NumOfTimeStepInHour = 1;
@@ -4396,7 +4396,7 @@ TEST_F(EnergyPlusFixture, CrashCalcStandardRatings_HPWH_and_Standalone)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    DataEnvironment::StdRhoAir = 1.0;
+    state->dataEnvrn->StdRhoAir = 1.0;
 
     DataHVACGlobals::TimeStepSys = 1;
     state->dataGlobal->NumOfTimeStepInHour = 1;

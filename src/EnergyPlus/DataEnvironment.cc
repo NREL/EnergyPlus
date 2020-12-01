@@ -71,15 +71,6 @@ namespace DataEnvironment {
     // current weather variables)
 
     // MODULE VARIABLE DECLARATIONS:
-    Real64 SkyClearness;                      // Sky clearness (see subr. DayltgLuminousEfficacy)
-    Real64 SkyBrightness;                     // Sky brightness (see subr. DayltgLuminousEfficacy)
-    Real64 TotalCloudCover(5.0);              // Total Sky Cover (tenth of sky)
-    Real64 OpaqueCloudCover(5.0);             // Opaque Sky Cover (tenth of sky)
-    Real64 StdBaroPress(DataEnvironment::StdPressureSeaLevel); // Standard "atmospheric pressure" based on elevation (ASHRAE HOF p6.1)
-    Real64 StdRhoAir;                         // Standard "rho air" set in WeatherManager - based on StdBaroPress
-    Real64 rhoAirSTP;                         // Standard density of dry air at 101325 Pa, 20.0C temperaure
-    Real64 TimeZoneNumber;                    // Time Zone Number of building location
-    Real64 TimeZoneMeridian;                  // Standard Meridian of TimeZone
     std::string EnvironmentName;              // Current environment name (longer for weather file names)
     std::string WeatherFileLocationTitle;     // Location Title from Weather File
     std::string CurMnDyHr;                    // Current Month/Day/Hour timestamp info
@@ -133,14 +124,6 @@ namespace DataEnvironment {
 
     void clear_state()
     {
-        SkyClearness = Real64();
-        SkyBrightness = Real64();
-        TotalCloudCover = 0.0;
-        OpaqueCloudCover = 0.0;
-        StdBaroPress = 101325.0;
-        StdRhoAir = Real64();
-        TimeZoneNumber = Real64();
-        TimeZoneMeridian = Real64();
         EnvironmentName = std::string();
         WeatherFileLocationTitle = std::string();
         CurMnDyHr = std::string();
@@ -391,7 +374,7 @@ namespace DataEnvironment {
         } else if (SiteTempGradient == 0.0) {
             LocalAirPressure = state.dataEnvrn->OutBaroPress;
         } else {
-            LocalAirPressure = StdBaroPress * std::pow(BaseTemp / (BaseTemp + TempGradient * (Z - GeopotentialH)),
+            LocalAirPressure = state.dataEnvrn->StdBaroPress * std::pow(BaseTemp / (BaseTemp + TempGradient * (Z - GeopotentialH)),
                                                        (StdGravity * AirMolarMass) / (GasConstant * TempGradient));
         }
 

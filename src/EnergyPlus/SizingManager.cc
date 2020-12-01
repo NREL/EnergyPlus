@@ -1082,21 +1082,21 @@ namespace SizingManager {
                             int termUnitSizingIndex = state.dataDefineEquipment->AirDistUnit(HVACSingleDuctInduc::IndUnit(indUnitNum).ADUNum).TermUnitSizingNum;
 
                             airLoopHeatingMaximumFlowRateSum +=
-                                HVACSingleDuctInduc::IndUnit(indUnitNum).MaxPriAirMassFlow / DataEnvironment::StdRhoAir;
+                                HVACSingleDuctInduc::IndUnit(indUnitNum).MaxPriAirMassFlow / state.dataEnvrn->StdRhoAir;
                             airLoopHeatingMinimumFlowRateSum +=
-                                HVACSingleDuctInduc::IndUnit(indUnitNum).MaxPriAirMassFlow / DataEnvironment::StdRhoAir;
-                            airLoopMaxFlowRateSum += HVACSingleDuctInduc::IndUnit(indUnitNum).MaxPriAirMassFlow / DataEnvironment::StdRhoAir;
+                                HVACSingleDuctInduc::IndUnit(indUnitNum).MaxPriAirMassFlow / state.dataEnvrn->StdRhoAir;
+                            airLoopMaxFlowRateSum += HVACSingleDuctInduc::IndUnit(indUnitNum).MaxPriAirMassFlow / state.dataEnvrn->StdRhoAir;
                             // store Std 62.1 values, CV system
                             DataSizing::VpzClgByZone(termUnitSizingIndex) =
-                                HVACSingleDuctInduc::IndUnit(indUnitNum).MaxPriAirMassFlow / DataEnvironment::StdRhoAir;
+                                HVACSingleDuctInduc::IndUnit(indUnitNum).MaxPriAirMassFlow / state.dataEnvrn->StdRhoAir;
                             DataSizing::VpzMinClgByZone(termUnitSizingIndex) =
-                                HVACSingleDuctInduc::IndUnit(indUnitNum).MaxPriAirMassFlow / DataEnvironment::StdRhoAir;
+                                HVACSingleDuctInduc::IndUnit(indUnitNum).MaxPriAirMassFlow / state.dataEnvrn->StdRhoAir;
                             DataSizing::VdzClgByZone(termUnitSizingIndex) = HVACSingleDuctInduc::IndUnit(indUnitNum).MaxTotAirVolFlow;
                             DataSizing::VdzMinClgByZone(termUnitSizingIndex) = HVACSingleDuctInduc::IndUnit(indUnitNum).MaxTotAirVolFlow;
                             DataSizing::VpzHtgByZone(termUnitSizingIndex) =
-                                HVACSingleDuctInduc::IndUnit(indUnitNum).MaxPriAirMassFlow / DataEnvironment::StdRhoAir;
+                                HVACSingleDuctInduc::IndUnit(indUnitNum).MaxPriAirMassFlow / state.dataEnvrn->StdRhoAir;
                             DataSizing::VpzMinHtgByZone(termUnitSizingIndex) =
-                                HVACSingleDuctInduc::IndUnit(indUnitNum).MaxPriAirMassFlow / DataEnvironment::StdRhoAir;
+                                HVACSingleDuctInduc::IndUnit(indUnitNum).MaxPriAirMassFlow / state.dataEnvrn->StdRhoAir;
                             DataSizing::VdzHtgByZone(termUnitSizingIndex) = HVACSingleDuctInduc::IndUnit(indUnitNum).MaxTotAirVolFlow;
                             DataSizing::VdzMinHtgByZone(termUnitSizingIndex) = HVACSingleDuctInduc::IndUnit(indUnitNum).MaxTotAirVolFlow;
                         }
@@ -1196,11 +1196,11 @@ namespace SizingManager {
                         FinalSysSizing(AirLoopNum).DesMainVolFlow = max(airLoopMaxFlowRateSum, FinalSysSizing(AirLoopNum).DesMainVolFlow);
                         if (FinalSysSizing(AirLoopNum).sysSizeCoolingDominant) {
                             FinalSysSizing(AirLoopNum).DesCoolVolFlow = FinalSysSizing(AirLoopNum).DesMainVolFlow;
-                            FinalSysSizing(AirLoopNum).MassFlowAtCoolPeak = FinalSysSizing(AirLoopNum).DesCoolVolFlow * DataEnvironment::StdRhoAir;
+                            FinalSysSizing(AirLoopNum).MassFlowAtCoolPeak = FinalSysSizing(AirLoopNum).DesCoolVolFlow * state.dataEnvrn->StdRhoAir;
                         } else if (FinalSysSizing(AirLoopNum).sysSizeHeatingDominant) { // make sure cooling is at least at minimum.
                             FinalSysSizing(AirLoopNum).DesCoolVolFlow =
                                 max(airLoopHeatingMinimumFlowRateSum, FinalSysSizing(AirLoopNum).DesCoolVolFlow);
-                            FinalSysSizing(AirLoopNum).MassFlowAtCoolPeak = FinalSysSizing(AirLoopNum).DesCoolVolFlow * DataEnvironment::StdRhoAir;
+                            FinalSysSizing(AirLoopNum).MassFlowAtCoolPeak = FinalSysSizing(AirLoopNum).DesCoolVolFlow * state.dataEnvrn->StdRhoAir;
                         }
                     } else if (FinalSysSizing(AirLoopNum).SizingOption == Coincident) {
 
@@ -1212,7 +1212,7 @@ namespace SizingManager {
                             FinalSysSizing(AirLoopNum).DesMainVolFlow =
                                 max(airLoopHeatingMinimumFlowRateSum, FinalSysSizing(AirLoopNum).DesMainVolFlow);
                             FinalSysSizing(AirLoopNum).DesCoolVolFlow = FinalSysSizing(AirLoopNum).DesMainVolFlow;
-                            FinalSysSizing(AirLoopNum).MassFlowAtCoolPeak = FinalSysSizing(AirLoopNum).DesCoolVolFlow * DataEnvironment::StdRhoAir;
+                            FinalSysSizing(AirLoopNum).MassFlowAtCoolPeak = FinalSysSizing(AirLoopNum).DesCoolVolFlow * state.dataEnvrn->StdRhoAir;
                         } else if (FinalSysSizing(AirLoopNum).sysSizeHeatingDominant) { // use maximum heating flow sum from air terminals
                             FinalSysSizing(AirLoopNum).DesHeatVolFlow =
                                 max(airLoopHeatingMaximumFlowRateSum, FinalSysSizing(AirLoopNum).DesHeatVolFlow);
@@ -1221,7 +1221,7 @@ namespace SizingManager {
                             // make sure cooling is at least at minimum.
                             FinalSysSizing(AirLoopNum).DesCoolVolFlow =
                                 max(airLoopHeatingMinimumFlowRateSum, FinalSysSizing(AirLoopNum).DesCoolVolFlow);
-                            FinalSysSizing(AirLoopNum).MassFlowAtCoolPeak = FinalSysSizing(AirLoopNum).DesCoolVolFlow * DataEnvironment::StdRhoAir;
+                            FinalSysSizing(AirLoopNum).MassFlowAtCoolPeak = FinalSysSizing(AirLoopNum).DesCoolVolFlow * state.dataEnvrn->StdRhoAir;
                         }
                     }
                     // report out adjusted design flow rates

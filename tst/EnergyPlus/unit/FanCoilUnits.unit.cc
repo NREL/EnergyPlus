@@ -127,7 +127,7 @@ namespace EnergyPlus {
         Real64 MaxAirMassFlow(0.0);
 
         state->dataEnvrn->OutBaroPress = 101325.0;
-        DataEnvironment::StdRhoAir = 1.20;
+        state->dataEnvrn->StdRhoAir = 1.20;
         state->dataWaterCoils->GetWaterCoilsInputFlag = true;
         NumCoils = 0;
         state->dataGlobal->NumOfTimeStepInHour = 1;
@@ -438,7 +438,7 @@ namespace EnergyPlus {
         Real64 MaxAirMassFlow(0.0);
 
         state->dataEnvrn->OutBaroPress = 101325.0;
-        DataEnvironment::StdRhoAir = 1.20;
+        state->dataEnvrn->StdRhoAir = 1.20;
         state->dataWaterCoils->GetWaterCoilsInputFlag = true;
         NumCoils = 0;
         state->dataGlobal->NumOfTimeStepInHour = 1;
@@ -751,7 +751,7 @@ namespace EnergyPlus {
         Real64 LatOutputProvided(0.0);
 
         state->dataEnvrn->OutBaroPress = 101325.0;
-        DataEnvironment::StdRhoAir = 1.20;
+        state->dataEnvrn->StdRhoAir = 1.20;
         state->dataWaterCoils->GetWaterCoilsInputFlag = true;
         NumCoils = 0;
         state->dataGlobal->NumOfTimeStepInHour = 1;
@@ -1138,7 +1138,7 @@ namespace EnergyPlus {
         Real64 LatOutputProvided(0.0);
 
         state->dataEnvrn->OutBaroPress = 101325.0;
-        DataEnvironment::StdRhoAir = 1.20;
+        state->dataEnvrn->StdRhoAir = 1.20;
         state->dataWaterCoils->GetWaterCoilsInputFlag = true;
         NumCoils = 0;
         state->dataGlobal->NumOfTimeStepInHour = 1;
@@ -1446,7 +1446,7 @@ namespace EnergyPlus {
         Real64 LatOutputProvided(0.0);
 
         state->dataEnvrn->OutBaroPress = 101325.0;
-        DataEnvironment::StdRhoAir = 1.20;
+        state->dataEnvrn->StdRhoAir = 1.20;
         state->dataWaterCoils->GetWaterCoilsInputFlag = true;
         NumCoils = 0;
         state->dataGlobal->NumOfTimeStepInHour = 1;
@@ -1798,7 +1798,7 @@ namespace EnergyPlus {
         Real64 MaxAirMassFlow(0.0);
 
         state->dataEnvrn->OutBaroPress = 101325.0;
-        DataEnvironment::StdRhoAir = 1.20;
+        state->dataEnvrn->StdRhoAir = 1.20;
         state->dataWaterCoils->GetWaterCoilsInputFlag = true;
         NumCoils = 0;
         state->dataGlobal->NumOfTimeStepInHour = 1;
@@ -2102,7 +2102,7 @@ namespace EnergyPlus {
         FinalZoneSizing(CurZoneEqNum).DesHeatCoilInHumRat = 0.005;
         FinalZoneSizing(CurZoneEqNum).DesCoolLoad = 4000.0;
         FinalZoneSizing(CurZoneEqNum).DesHeatLoad = 4000.0;
-        StdRhoAir = 1.2;
+        state->dataEnvrn->StdRhoAir = 1.2;
 
         state->dataGlobal->BeginEnvrnFlag = true;
         InitFanCoilUnits(*state, FanCoilNum, ZoneNum, ZoneNum);
@@ -2216,7 +2216,7 @@ namespace EnergyPlus {
         Real64 QZnReq(-1000.0);
         DataPlant::TotNumLoops = 2;
         state->dataEnvrn->OutBaroPress = 101325.0;
-        DataEnvironment::StdRhoAir = 1.20;
+        state->dataEnvrn->StdRhoAir = 1.20;
         state->dataWaterCoils->GetWaterCoilsInputFlag = true;
         NumCoils = 0;
         state->dataGlobal->NumOfTimeStepInHour = 1;
@@ -2501,7 +2501,7 @@ namespace EnergyPlus {
         Real64 MaxAirMassFlow(0.0);
 
         state->dataEnvrn->OutBaroPress = 101325.0;
-        DataEnvironment::StdRhoAir = 1.20;
+        state->dataEnvrn->StdRhoAir = 1.20;
         state->dataWaterCoils->GetWaterCoilsInputFlag = true;
         NumCoils = 0;
         state->dataGlobal->NumOfTimeStepInHour = 1;
@@ -2812,7 +2812,7 @@ namespace EnergyPlus {
         FinalZoneSizing(CurZoneEqNum).DesHeatCoilInHumRat = 0.005;
         FinalZoneSizing(CurZoneEqNum).DesCoolLoad = 4000.0;
         FinalZoneSizing(CurZoneEqNum).DesHeatLoad = 4000.0;
-        StdRhoAir = 1.2;
+        state->dataEnvrn->StdRhoAir = 1.2;
 
         state->dataGlobal->BeginEnvrnFlag = true;
         InitFanCoilUnits(*state, FanCoilNum, ZoneNum, ZoneNum);
@@ -2906,7 +2906,7 @@ namespace EnergyPlus {
         Real64 MaxAirMassFlow(0.0);
 
         state->dataEnvrn->OutBaroPress = 101325.0;
-        DataEnvironment::StdRhoAir = 1.20;
+        state->dataEnvrn->StdRhoAir = 1.20;
         state->dataWaterCoils->GetWaterCoilsInputFlag = true;
         NumCoils = 0;
         state->dataGlobal->NumOfTimeStepInHour = 1;
@@ -3225,7 +3225,7 @@ namespace EnergyPlus {
         FinalZoneSizing(CurZoneEqNum).DesHeatCoilInHumRat = 0.005;
         FinalZoneSizing(CurZoneEqNum).DesCoolLoad = 4000.0;
         FinalZoneSizing(CurZoneEqNum).DesHeatLoad = 4000.0;
-        StdRhoAir = 1.2;
+        state->dataEnvrn->StdRhoAir = 1.2;
 
         state->dataGlobal->BeginEnvrnFlag = true;
         InitFanCoilUnits(*state, FanCoilNum, ZoneNum, ZoneNum);
@@ -3310,7 +3310,7 @@ namespace EnergyPlus {
         Real64 MaxAirMassFlow(0.0);
 
         state->dataEnvrn->OutBaroPress = 101325.0;
-        DataEnvironment::StdRhoAir = 1.20;
+        state->dataEnvrn->StdRhoAir = 1.20;
         state->dataWaterCoils->GetWaterCoilsInputFlag = true;
         NumCoils = 0;
         state->dataGlobal->NumOfTimeStepInHour = 1;
@@ -3561,7 +3561,7 @@ namespace EnergyPlus {
         ZoneSysEnergyDemand.allocate(1);
         auto &zSysEDemand(ZoneSysEnergyDemand(1));
 
-        StdRhoAir = 1.2;
+        state->dataEnvrn->StdRhoAir = 1.2;
         state->dataEnvrn->Month = 1;
         state->dataEnvrn->DayOfMonth = 21;
         state->dataGlobal->HourOfDay = 1;
@@ -3677,7 +3677,7 @@ namespace EnergyPlus {
         Real64 MaxAirMassFlow(0.0);
 
         state->dataEnvrn->OutBaroPress = 101325.0;
-        DataEnvironment::StdRhoAir = 1.20;
+        state->dataEnvrn->StdRhoAir = 1.20;
         state->dataWaterCoils->GetWaterCoilsInputFlag = true;
         NumCoils = 0;
         state->dataGlobal->NumOfTimeStepInHour = 1;
@@ -3928,7 +3928,7 @@ namespace EnergyPlus {
         ZoneSysEnergyDemand.allocate(1);
         auto &zSysEDemand(ZoneSysEnergyDemand(1));
 
-        StdRhoAir = 1.2;
+        state->dataEnvrn->StdRhoAir = 1.2;
         state->dataEnvrn->Month = 1;
         state->dataEnvrn->DayOfMonth = 21;
         state->dataGlobal->HourOfDay = 1;
@@ -4044,7 +4044,7 @@ namespace EnergyPlus {
         Real64 MaxAirMassFlow(0.0);
 
         state->dataEnvrn->OutBaroPress = 101325.0;
-        DataEnvironment::StdRhoAir = 1.20;
+        state->dataEnvrn->StdRhoAir = 1.20;
         state->dataWaterCoils->GetWaterCoilsInputFlag = true;
         NumCoils = 0;
         state->dataGlobal->NumOfTimeStepInHour = 1;
@@ -4295,7 +4295,7 @@ namespace EnergyPlus {
         ZoneSysEnergyDemand.allocate(1);
         auto &zSysEDemand(ZoneSysEnergyDemand(1));
 
-        StdRhoAir = 1.2;
+        state->dataEnvrn->StdRhoAir = 1.2;
         state->dataEnvrn->Month = 1;
         state->dataEnvrn->DayOfMonth = 21;
         state->dataGlobal->HourOfDay = 1;
@@ -4513,7 +4513,7 @@ namespace EnergyPlus {
         ASSERT_TRUE(process_idf(idf_objects));
 
         state->dataEnvrn->OutBaroPress = 101325.0;
-        DataEnvironment::StdRhoAir = 1.20;
+        state->dataEnvrn->StdRhoAir = 1.20;
         state->dataWaterCoils->GetWaterCoilsInputFlag = true;
         //NumCoils = 0;
         state->dataGlobal->NumOfTimeStepInHour = 1;

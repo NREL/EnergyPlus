@@ -542,7 +542,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     Node.allocate(8);
 
     // Avoid zero values in volume flow balance check
-    DataEnvironment::StdRhoAir = 1.2;
+    state->dataEnvrn->StdRhoAir = 1.2;
     state->dataEnvrn->OutBaroPress = 100000.0;
     Node(ZoneEquipConfig(1).ZoneNode).Temp = 20.0;
     Node(ZoneEquipConfig(1).ZoneNode).HumRat = 0.004;

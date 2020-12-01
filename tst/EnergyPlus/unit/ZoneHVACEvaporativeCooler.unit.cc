@@ -87,7 +87,7 @@ protected:
 
         DataSizing::ZoneEqSizing.allocate(1);
         state->dataEnvrn->OutBaroPress = 101325.0;
-        DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
+        state->dataEnvrn->StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
 
         state->dataEnvrn->OutDryBulbTemp = 20.0;
         state->dataEnvrn->OutHumRat = 0.0075;

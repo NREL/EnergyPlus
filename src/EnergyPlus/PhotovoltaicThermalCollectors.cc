@@ -392,7 +392,7 @@ namespace PhotovoltaicThermalCollectors {
                 if (PVT(Item).WorkingFluidType == WorkingFluidEnum::LIQUID) {
                     PlantUtilities::RegisterPlantCompDesignFlow(PVT(Item).PlantInletNodeNum, PVT(Item).DesignVolFlowRate);
                 } else if (PVT(Item).WorkingFluidType == WorkingFluidEnum::AIR) {
-                    PVT(Item).MaxMassFlowRate = PVT(Item).DesignVolFlowRate * DataEnvironment::StdRhoAir;
+                    PVT(Item).MaxMassFlowRate = PVT(Item).DesignVolFlowRate * state.dataEnvrn->StdRhoAir;
                 }
                 PVT(Item).SizingInit = false;
             }
@@ -757,7 +757,7 @@ namespace PhotovoltaicThermalCollectors {
                             }
                         }
                     }
-                    Real64 DesMassFlow = DataEnvironment::StdRhoAir * DesignVolFlowRateDes;
+                    Real64 DesMassFlow = state.dataEnvrn->StdRhoAir * DesignVolFlowRateDes;
                     this->MaxMassFlowRate = DesMassFlow;
                 }
                 if (!HardSizeNoDesRun) {

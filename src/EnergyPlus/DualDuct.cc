@@ -99,7 +99,6 @@ namespace DualDuct {
 
     // Using/Aliasing
     using namespace DataLoopNode;
-    using DataEnvironment::StdRhoAir;
     using DataHVACGlobals::SmallAirVolFlow;
     using DataHVACGlobals::SmallMassFlow;
     using namespace DataSizing;
@@ -677,7 +676,7 @@ namespace DualDuct {
                 }
 
                 dd_airterminal(DDNum).MaxAirVolFlowRate = NumArray(1);
-                dd_airterminal(DDNum).MaxAirMassFlowRate = dd_airterminal(DDNum).MaxAirVolFlowRate * StdRhoAir;
+                dd_airterminal(DDNum).MaxAirMassFlowRate = dd_airterminal(DDNum).MaxAirVolFlowRate * state.dataEnvrn->StdRhoAir;
 
                 // Register component set data - one for OA and one for RA
                 TestCompSet(state, CurrentModuleObject + ":OutdoorAir", dd_airterminal(DDNum).Name, AlphArray(4), AlphArray(3), "Air Nodes");
@@ -919,7 +918,7 @@ namespace DualDuct {
                 OutNode = this->OutletNodeNum;
                 HotInNode = this->HotAirInletNodeNum;
                 ColdInNode = this->ColdAirInletNodeNum;
-                Node(OutNode).MassFlowRateMax = this->MaxAirVolFlowRate * StdRhoAir;
+                Node(OutNode).MassFlowRateMax = this->MaxAirVolFlowRate * state.dataEnvrn->StdRhoAir;
                 if (this->DamperType == DualDuct_ConstantVolume) {
                     Node(OutNode).MassFlowRateMin = 0.0;
                 } else if (this->DamperType == DualDuct_VariableVolume) {
@@ -948,7 +947,7 @@ namespace DualDuct {
                 if (this->RecircIsUsed) RAInNode = this->RecircAirInletNodeNum;
                 Node(OutNode).MassFlowRateMax = this->MaxAirMassFlowRate;
                 Node(OutNode).MassFlowRateMin = 0.0;
-                this->dd_airterminalOAInlet.AirMassFlowRateMax = this->DesignOAFlowRate * StdRhoAir;
+                this->dd_airterminalOAInlet.AirMassFlowRateMax = this->DesignOAFlowRate * state.dataEnvrn->StdRhoAir;
                 if (this->RecircIsUsed) {
                     this->dd_airterminalRecircAirInlet.AirMassFlowRateMax = this->MaxAirMassFlowRate - this->dd_airterminalOAInlet.AirMassFlowRateMax;
                     Node(RAInNode).MassFlowRateMax = this->dd_airterminalRecircAirInlet.AirMassFlowRateMax;
@@ -1172,7 +1171,7 @@ namespace DualDuct {
                         this->MaxAirVolFlowRate = this->DesignOAFlowRate;
                         this->DesignRecircFlowRate = 0.0;
                     }
-                    this->MaxAirMassFlowRate = this->MaxAirVolFlowRate * StdRhoAir;
+                    this->MaxAirMassFlowRate = this->MaxAirVolFlowRate * state.dataEnvrn->StdRhoAir;
                 }
 
                 if (this->MaxAirVolFlowRate < SmallAirVolFlow) {
@@ -1863,7 +1862,7 @@ namespace DualDuct {
                                                                      this->ActualZoneNum,
                                                                      state.dataAirLoop->AirLoopControlInfo(AirLoopNum).AirLoopDCVFlag,
                                                                      UseMinOASchFlag);
-                OAMassFlow = OAVolumeFlowRate * StdRhoAir;
+                OAMassFlow = OAVolumeFlowRate * state.dataEnvrn->StdRhoAir;
 
                 // convert OA mass flow rate to supply air flow rate based on air loop OA fraction
                 SAMassFlow = OAMassFlow / AirLoopOAFrac;
@@ -1939,7 +1938,7 @@ namespace DualDuct {
         OAVolumeFlowRate =
             CalcDesignSpecificationOutdoorAir(state, this->OARequirementsPtr, this->ActualZoneNum, UseOccSchFlag, UseMinOASchFlag, PerPersonNotSet);
 
-        OAMassFlow = OAVolumeFlowRate * StdRhoAir;
+        OAMassFlow = OAVolumeFlowRate * state.dataEnvrn->StdRhoAir;
 
         if (present(MaxOAVolFlow)) {
             OAVolumeFlowRate =
@@ -2334,7 +2333,7 @@ namespace DualDuct {
     {
         // calculates zone outdoor air volume flow rate using the supply air flow rate and OA fraction
         if (this->AirLoopNum > 0) {
-            this->OutdoorAirFlowRate = (this->dd_airterminalOutlet.AirMassFlowRate / StdRhoAir) * state.dataAirLoop->AirLoopFlow(this->AirLoopNum).OAFrac;
+            this->OutdoorAirFlowRate = (this->dd_airterminalOutlet.AirMassFlowRate / state.dataEnvrn->StdRhoAir) * state.dataAirLoop->AirLoopFlow(this->AirLoopNum).OAFrac;
         } else {
             // do nothing for now
         }

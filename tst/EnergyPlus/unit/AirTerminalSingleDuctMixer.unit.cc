@@ -623,7 +623,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMInletSide)
     state->dataEnvrn->OutDryBulbTemp = 35.0;
     state->dataEnvrn->OutHumRat = 0.0098;
     state->dataEnvrn->OutEnthalpy = Psychrometrics::PsyHFnTdbW(state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat);
-    DataEnvironment::StdRhoAir = 1.20;
+    state->dataEnvrn->StdRhoAir = 1.20;
     HVACInletMassFlowRate = 0.50;
     PrimaryAirMassFlowRate = 0.1;
 
@@ -651,7 +651,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMInletSide)
     // set fan parameters
     Fan(1).MaxAirMassFlowRate = HVACInletMassFlowRate;
     Fan(1).InletAirMassFlowRate = HVACInletMassFlowRate;
-    Fan(1).RhoAirStdInit = DataEnvironment::StdRhoAir;
+    Fan(1).RhoAirStdInit = state->dataEnvrn->StdRhoAir;
     Node(Fan(1).InletNodeNum).MassFlowRateMaxAvail = HVACInletMassFlowRate;
     Node(Fan(1).OutletNodeNum).MassFlowRateMax = HVACInletMassFlowRate;
 
@@ -952,7 +952,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMSupplySide)
     state->dataEnvrn->OutDryBulbTemp = 35.0;
     state->dataEnvrn->OutHumRat = 0.0098;
     state->dataEnvrn->OutEnthalpy = Psychrometrics::PsyHFnTdbW(state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat);
-    DataEnvironment::StdRhoAir = 1.20;
+    state->dataEnvrn->StdRhoAir = 1.20;
     HVACInletMassFlowRate = 0.50;
     PrimaryAirMassFlowRate = 0.1;
 
@@ -982,7 +982,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMSupplySide)
     // set fan parameters
     Fan(1).MaxAirMassFlowRate = HVACInletMassFlowRate;
     Fan(1).InletAirMassFlowRate = HVACInletMassFlowRate;
-    Fan(1).RhoAirStdInit = DataEnvironment::StdRhoAir;
+    Fan(1).RhoAirStdInit = state->dataEnvrn->StdRhoAir;
     Node(Fan(1).InletNodeNum).MassFlowRateMaxAvail = HVACInletMassFlowRate;
     Node(Fan(1).OutletNodeNum).MassFlowRateMax = HVACInletMassFlowRate;
 
@@ -1368,7 +1368,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMInletSide)
     state->dataEnvrn->OutDryBulbTemp = 35.0;
     state->dataEnvrn->OutHumRat = 0.0098;
     state->dataEnvrn->OutEnthalpy = Psychrometrics::PsyHFnTdbW(state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat);
-    DataEnvironment::StdRhoAir = 1.20;
+    state->dataEnvrn->StdRhoAir = 1.20;
     HVACInletMassFlowRate = 0.50;
     PrimaryAirMassFlowRate = 0.1;
 
@@ -1396,7 +1396,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMInletSide)
     // set fan parameters
     Fan(1).MaxAirMassFlowRate = HVACInletMassFlowRate;
     Fan(1).InletAirMassFlowRate = HVACInletMassFlowRate;
-    Fan(1).RhoAirStdInit = DataEnvironment::StdRhoAir;
+    Fan(1).RhoAirStdInit = state->dataEnvrn->StdRhoAir;
     Node(Fan(1).InletNodeNum).MassFlowRateMaxAvail = HVACInletMassFlowRate;
     Node(Fan(1).OutletNodeNum).MassFlowRateMax = HVACInletMassFlowRate;
 
@@ -1779,7 +1779,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMSupplySide)
     state->dataEnvrn->OutDryBulbTemp = 35.0;
     state->dataEnvrn->OutHumRat = 0.0098;
     state->dataEnvrn->OutEnthalpy = Psychrometrics::PsyHFnTdbW(state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat);
-    DataEnvironment::StdRhoAir = 1.20;
+    state->dataEnvrn->StdRhoAir = 1.20;
     HVACInletMassFlowRate = 0.50;
     PrimaryAirMassFlowRate = 0.1;
 
@@ -1809,7 +1809,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMSupplySide)
     // set fan parameters
     Fan(1).MaxAirMassFlowRate = HVACInletMassFlowRate;
     Fan(1).InletAirMassFlowRate = HVACInletMassFlowRate;
-    Fan(1).RhoAirStdInit = DataEnvironment::StdRhoAir;
+    Fan(1).RhoAirStdInit = state->dataEnvrn->StdRhoAir;
     Node(Fan(1).InletNodeNum).MassFlowRateMaxAvail = HVACInletMassFlowRate;
     Node(Fan(1).OutletNodeNum).MassFlowRateMax = HVACInletMassFlowRate;
 
@@ -2455,7 +2455,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRF_ATMInletSide)
     state->dataEnvrn->OutDryBulbTemp = 35.0;
     state->dataEnvrn->OutHumRat = 0.0098;
     state->dataEnvrn->OutEnthalpy = Psychrometrics::PsyHFnTdbW(state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat);
-    DataEnvironment::StdRhoAir = 1.20;
+    state->dataEnvrn->StdRhoAir = 1.20;
     HVACInletMassFlowRate = 0.50;
     PrimaryAirMassFlowRate = 0.1;
     SecondaryAirMassFlowRate = HVACInletMassFlowRate - PrimaryAirMassFlowRate; // seconday air flow is VRFTU flow less primary air flow
@@ -2490,7 +2490,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRF_ATMInletSide)
     // set fan parameters
     Fan(1).MaxAirMassFlowRate = HVACInletMassFlowRate;
     Fan(1).InletAirMassFlowRate = HVACInletMassFlowRate;
-    Fan(1).RhoAirStdInit = DataEnvironment::StdRhoAir;
+    Fan(1).RhoAirStdInit = state->dataEnvrn->StdRhoAir;
     Node(Fan(1).InletNodeNum).MassFlowRateMaxAvail = HVACInletMassFlowRate;
     Node(Fan(1).OutletNodeNum).MassFlowRateMax = HVACInletMassFlowRate;
 
@@ -3133,7 +3133,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRF_ATMSupplySide)
     state->dataEnvrn->OutDryBulbTemp = 35.0;
     state->dataEnvrn->OutHumRat = 0.0098;
     state->dataEnvrn->OutEnthalpy = Psychrometrics::PsyHFnTdbW(state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat);
-    DataEnvironment::StdRhoAir = 1.20;
+    state->dataEnvrn->StdRhoAir = 1.20;
     HVACInletMassFlowRate = 0.50;
     PrimaryAirMassFlowRate = 0.1;
     SecondaryAirMassFlowRate = HVACInletMassFlowRate; // seconday air mass flow rate is the same as that of the VRF terminal unit
@@ -3166,7 +3166,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRF_ATMSupplySide)
     // set fan parameters
     Fan(1).MaxAirMassFlowRate = HVACInletMassFlowRate;
     Fan(1).InletAirMassFlowRate = HVACInletMassFlowRate;
-    Fan(1).RhoAirStdInit = DataEnvironment::StdRhoAir;
+    Fan(1).RhoAirStdInit = state->dataEnvrn->StdRhoAir;
     Node(Fan(1).InletNodeNum).MassFlowRateMaxAvail = HVACInletMassFlowRate;
     Node(Fan(1).OutletNodeNum).MassFlowRateMax = HVACInletMassFlowRate;
 
@@ -4884,7 +4884,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMInletSi
     state->dataEnvrn->OutHumRat = 0.0098;
     state->dataEnvrn->OutEnthalpy = Psychrometrics::PsyHFnTdbW(state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat);
     state->dataEnvrn->OutWetBulbTemp = PsyTwbFnTdbWPb(*state, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat, state->dataEnvrn->OutBaroPress);
-    DataEnvironment::StdRhoAir = 1.20;
+    state->dataEnvrn->StdRhoAir = 1.20;
     HVACInletMassFlowRate = 0.50;
     PrimaryAirMassFlowRate = 0.1;
     SecondaryAirMassFlowRate = HVACInletMassFlowRate - PrimaryAirMassFlowRate; // seconday air flow is VRFTU flow less primary air flow
@@ -4918,7 +4918,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMInletSi
     // set fan parameters
     Fan(1).MaxAirMassFlowRate = HVACInletMassFlowRate;
     Fan(1).InletAirMassFlowRate = HVACInletMassFlowRate;
-    Fan(1).RhoAirStdInit = DataEnvironment::StdRhoAir;
+    Fan(1).RhoAirStdInit = state->dataEnvrn->StdRhoAir;
     Node(Fan(1).InletNodeNum).MassFlowRateMaxAvail = HVACInletMassFlowRate;
     Node(Fan(1).OutletNodeNum).MassFlowRateMax = HVACInletMassFlowRate;
 
@@ -6637,7 +6637,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMSupplyS
     state->dataEnvrn->OutDryBulbTemp = 35.0;
     state->dataEnvrn->OutHumRat = 0.0098;
     state->dataEnvrn->OutEnthalpy = Psychrometrics::PsyHFnTdbW(state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat);
-    DataEnvironment::StdRhoAir = 1.20;
+    state->dataEnvrn->StdRhoAir = 1.20;
     HVACInletMassFlowRate = 0.50;
     PrimaryAirMassFlowRate = 0.1;
 
@@ -6670,7 +6670,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMSupplyS
     // set fan parameters
     Fan(1).MaxAirMassFlowRate = HVACInletMassFlowRate;
     Fan(1).InletAirMassFlowRate = HVACInletMassFlowRate;
-    Fan(1).RhoAirStdInit = DataEnvironment::StdRhoAir;
+    Fan(1).RhoAirStdInit = state->dataEnvrn->StdRhoAir;
     Node(Fan(1).InletNodeNum).MassFlowRateMaxAvail = HVACInletMassFlowRate;
     Node(Fan(1).OutletNodeNum).MassFlowRateMax = HVACInletMassFlowRate;
 
@@ -6882,7 +6882,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimUnitVent_ATMInletSide)
     state->dataEnvrn->OutDryBulbTemp = 10.0;
     state->dataEnvrn->OutHumRat = 0.0070;
     state->dataEnvrn->OutEnthalpy = Psychrometrics::PsyHFnTdbW(state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat);
-    DataEnvironment::StdRhoAir = 1.00;
+    state->dataEnvrn->StdRhoAir = 1.00;
     HVACInletMassFlowRate = 0.50;
     PrimaryAirMassFlowRate = 0.1;
 
@@ -6897,9 +6897,9 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimUnitVent_ATMInletSide)
 
     UnitVentNum = 1;
     // set the mass flow rates from the input volume flow rates
-    state->dataUnitVentilators->UnitVent(UnitVentNum).MaxAirMassFlow = DataEnvironment::StdRhoAir * state->dataUnitVentilators->UnitVent(UnitVentNum).MaxAirVolFlow;
-    state->dataUnitVentilators->UnitVent(UnitVentNum).OutAirMassFlow = DataEnvironment::StdRhoAir * state->dataUnitVentilators->UnitVent(UnitVentNum).OutAirVolFlow;
-    state->dataUnitVentilators->UnitVent(UnitVentNum).MinOutAirMassFlow = DataEnvironment::StdRhoAir * state->dataUnitVentilators->UnitVent(UnitVentNum).MinOutAirVolFlow;
+    state->dataUnitVentilators->UnitVent(UnitVentNum).MaxAirMassFlow = state->dataEnvrn->StdRhoAir * state->dataUnitVentilators->UnitVent(UnitVentNum).MaxAirVolFlow;
+    state->dataUnitVentilators->UnitVent(UnitVentNum).OutAirMassFlow = state->dataEnvrn->StdRhoAir * state->dataUnitVentilators->UnitVent(UnitVentNum).OutAirVolFlow;
+    state->dataUnitVentilators->UnitVent(UnitVentNum).MinOutAirMassFlow = state->dataEnvrn->StdRhoAir * state->dataUnitVentilators->UnitVent(UnitVentNum).MinOutAirVolFlow;
 
     state->dataUnitVentilators->UnitVent(UnitVentNum).OpMode = CycFanCycCoil;
     // initialize mass flow rates
@@ -6911,7 +6911,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimUnitVent_ATMInletSide)
     // set fan parameters
     Fan(1).MaxAirMassFlowRate = HVACInletMassFlowRate;
     Fan(1).InletAirMassFlowRate = HVACInletMassFlowRate;
-    Fan(1).RhoAirStdInit = DataEnvironment::StdRhoAir;
+    Fan(1).RhoAirStdInit = state->dataEnvrn->StdRhoAir;
     Node(Fan(1).InletNodeNum).MassFlowRateMaxAvail = HVACInletMassFlowRate;
     Node(Fan(1).OutletNodeNum).MassFlowRateMax = HVACInletMassFlowRate;
 
@@ -7117,7 +7117,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimUnitVent_ATMSupplySide)
     state->dataEnvrn->OutDryBulbTemp = 10.0;
     state->dataEnvrn->OutHumRat = 0.0070;
     state->dataEnvrn->OutEnthalpy = Psychrometrics::PsyHFnTdbW(state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat);
-    DataEnvironment::StdRhoAir = 1.00;
+    state->dataEnvrn->StdRhoAir = 1.00;
     HVACInletMassFlowRate = 0.50;
     PrimaryAirMassFlowRate = 0.1;
 
@@ -7134,9 +7134,9 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimUnitVent_ATMSupplySide)
 
     UnitVentNum = 1;
     // set the mass flow rates from the input volume flow rates
-    state->dataUnitVentilators->UnitVent(UnitVentNum).MaxAirMassFlow = DataEnvironment::StdRhoAir * state->dataUnitVentilators->UnitVent(UnitVentNum).MaxAirVolFlow;
-    state->dataUnitVentilators->UnitVent(UnitVentNum).OutAirMassFlow = DataEnvironment::StdRhoAir * state->dataUnitVentilators->UnitVent(UnitVentNum).OutAirVolFlow;
-    state->dataUnitVentilators->UnitVent(UnitVentNum).MinOutAirMassFlow = DataEnvironment::StdRhoAir * state->dataUnitVentilators->UnitVent(UnitVentNum).MinOutAirVolFlow;
+    state->dataUnitVentilators->UnitVent(UnitVentNum).MaxAirMassFlow = state->dataEnvrn->StdRhoAir * state->dataUnitVentilators->UnitVent(UnitVentNum).MaxAirVolFlow;
+    state->dataUnitVentilators->UnitVent(UnitVentNum).OutAirMassFlow = state->dataEnvrn->StdRhoAir * state->dataUnitVentilators->UnitVent(UnitVentNum).OutAirVolFlow;
+    state->dataUnitVentilators->UnitVent(UnitVentNum).MinOutAirMassFlow = state->dataEnvrn->StdRhoAir * state->dataUnitVentilators->UnitVent(UnitVentNum).MinOutAirVolFlow;
 
     state->dataUnitVentilators->UnitVent(UnitVentNum).OpMode = CycFanCycCoil;
     // initialize mass flow rates
@@ -7148,7 +7148,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimUnitVent_ATMSupplySide)
     // set fan parameters
     Fan(1).MaxAirMassFlowRate = HVACInletMassFlowRate;
     Fan(1).InletAirMassFlowRate = HVACInletMassFlowRate;
-    Fan(1).RhoAirStdInit = DataEnvironment::StdRhoAir;
+    Fan(1).RhoAirStdInit = state->dataEnvrn->StdRhoAir;
     Node(Fan(1).InletNodeNum).MassFlowRateMaxAvail = HVACInletMassFlowRate;
     Node(Fan(1).OutletNodeNum).MassFlowRateMax = HVACInletMassFlowRate;
 
@@ -7529,7 +7529,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimFCU_ATMInletSideTest)
 
     DataSizing::CurZoneEqNum = 1;
     state->dataEnvrn->OutBaroPress = 101325.0;
-    DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
+    state->dataEnvrn->StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
     state->dataWaterCoils->GetWaterCoilsInputFlag = true;
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->TimeStep = 1;
@@ -7649,9 +7649,9 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimFCU_ATMInletSideTest)
     FinalZoneSizing.allocate(1);
     auto &finalZoneSizing(FinalZoneSizing(1));
     finalZoneSizing.DesCoolVolFlow = DesignHeatAirVolFlow;
-    finalZoneSizing.DesCoolMassFlow = finalZoneSizing.DesCoolVolFlow * DataEnvironment::StdRhoAir;
+    finalZoneSizing.DesCoolMassFlow = finalZoneSizing.DesCoolVolFlow * state->dataEnvrn->StdRhoAir;
     finalZoneSizing.DesHeatVolFlow = DesignCoolAirVolFlow;
-    finalZoneSizing.DesHeatMassFlow = finalZoneSizing.DesHeatVolFlow * DataEnvironment::StdRhoAir;
+    finalZoneSizing.DesHeatMassFlow = finalZoneSizing.DesHeatVolFlow * state->dataEnvrn->StdRhoAir;
     finalZoneSizing.ZoneTempAtHeatPeak = 20.0;
     finalZoneSizing.ZoneRetTempAtHeatPeak = finalZoneSizing.ZoneTempAtHeatPeak;
     zoneEqSizing.ATMixerHeatPriDryBulb = 4.0;
@@ -7957,7 +7957,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
 
     DataSizing::CurZoneEqNum = 1;
     state->dataEnvrn->OutBaroPress = 101325.0;
-    DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
+    state->dataEnvrn->StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
     state->dataWaterCoils->GetWaterCoilsInputFlag = true;
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->TimeStep = 1;
@@ -8080,9 +8080,9 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
     FinalZoneSizing.allocate(1);
     auto &finalZoneSizing(FinalZoneSizing(1));
     finalZoneSizing.DesCoolVolFlow = DesignHeatAirVolFlow;
-    finalZoneSizing.DesCoolMassFlow = finalZoneSizing.DesCoolVolFlow * DataEnvironment::StdRhoAir;
+    finalZoneSizing.DesCoolMassFlow = finalZoneSizing.DesCoolVolFlow * state->dataEnvrn->StdRhoAir;
     finalZoneSizing.DesHeatVolFlow = DesignCoolAirVolFlow;
-    finalZoneSizing.DesHeatMassFlow = finalZoneSizing.DesHeatVolFlow * DataEnvironment::StdRhoAir;
+    finalZoneSizing.DesHeatMassFlow = finalZoneSizing.DesHeatVolFlow * state->dataEnvrn->StdRhoAir;
     finalZoneSizing.ZoneTempAtHeatPeak = 20.0;
     finalZoneSizing.ZoneRetTempAtHeatPeak = finalZoneSizing.ZoneTempAtHeatPeak;
     zoneEqSizing.ATMixerHeatPriDryBulb = 4.0;

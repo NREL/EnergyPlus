@@ -110,7 +110,6 @@ namespace EnergyPlus::SingleDuct {
     using namespace DataLoopNode;
     using BranchNodeConnections::SetUpCompSets;
     using BranchNodeConnections::TestCompSet;
-    using DataEnvironment::StdRhoAir;
     using DataHeatBalFanSys::TempControlType;
     using DataHVACGlobals::ATMixer_InletSide;
     using DataHVACGlobals::ATMixer_SupplySide;
@@ -2132,10 +2131,10 @@ namespace EnergyPlus::SingleDuct {
             // Set the outlet node max mass flow rate to the Max Air Flow specified for the Sys
             OutletNode = this->OutletNodeNum;
             InletNode = this->InletNodeNum;
-            Node(OutletNode).MassFlowRateMax = this->MaxAirVolFlowRate * StdRhoAir;
-            this->AirMassFlowRateMax = this->MaxAirVolFlowRate * StdRhoAir;
-            this->HeatAirMassFlowRateMax = this->MaxHeatAirVolFlowRate * StdRhoAir;
-            Node(InletNode).MassFlowRateMax = this->MaxAirVolFlowRate * StdRhoAir;
+            Node(OutletNode).MassFlowRateMax = this->MaxAirVolFlowRate * state.dataEnvrn->StdRhoAir;
+            this->AirMassFlowRateMax = this->MaxAirVolFlowRate * state.dataEnvrn->StdRhoAir;
+            this->HeatAirMassFlowRateMax = this->MaxHeatAirVolFlowRate * state.dataEnvrn->StdRhoAir;
+            Node(InletNode).MassFlowRateMax = this->MaxAirVolFlowRate * state.dataEnvrn->StdRhoAir;
             this->MassFlowDiff = 1.0e-10 * this->AirMassFlowRateMax;
 
             if (this->HWLoopNum > 0 && this->ReheatComp_Num != HeatingCoilType::SteamAirHeating) { // protect early calls before plant is setup
@@ -2148,7 +2147,7 @@ namespace EnergyPlus::SingleDuct {
             this->MaxReheatWaterFlow = rho * this->MaxReheatWaterVolFlow;
             this->MinReheatWaterFlow = rho * this->MinReheatWaterVolFlow;
 
-            this->AirMassFlowDuringReheatMax = this->MaxAirVolFlowRateDuringReheat * StdRhoAir;
+            this->AirMassFlowDuringReheatMax = this->MaxAirVolFlowRateDuringReheat * state.dataEnvrn->StdRhoAir;
 
             // set the upstream leakage flowrate - remove from here - done in ZoneAirLoopEquipmentManager::SimZoneAirLoopEquipment
 
@@ -2230,7 +2229,7 @@ namespace EnergyPlus::SingleDuct {
                     if (airLoopOAFrac > 0.0) {
                         Real64 vDotOAReq =
                             DataZoneEquipment::CalcDesignSpecificationOutdoorAir(state, this->OARequirementsPtr, this->CtrlZoneNum, UseOccSchFlag, true);
-                        mDotFromOARequirement = vDotOAReq * DataEnvironment::StdRhoAir / airLoopOAFrac;
+                        mDotFromOARequirement = vDotOAReq * state.dataEnvrn->StdRhoAir / airLoopOAFrac;
                         mDotFromOARequirement = min(mDotFromOARequirement, this->AirMassFlowRateMax);
                     } else {
                         mDotFromOARequirement = this->AirMassFlowRateMax;
@@ -2971,7 +2970,7 @@ namespace EnergyPlus::SingleDuct {
                         }
                         if (PltSizHeatNum > 0) {
                             CoilInTemp = TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatCoilInTempTU;
-                            DesMassFlow = StdRhoAir * TermUnitSizing(CurTermUnitSizingNum).AirVolFlow;
+                            DesMassFlow = state.dataEnvrn->StdRhoAir * TermUnitSizing(CurTermUnitSizingNum).AirVolFlow;
                             DesZoneHeatLoad = TermUnitFinalZoneSizing(CurTermUnitSizingNum).NonAirSysDesHeatLoad;
                             ZoneDesTemp = TermUnitFinalZoneSizing(CurTermUnitSizingNum).ZoneTempAtHeatPeak;
                             ZoneDesHumRat = TermUnitFinalZoneSizing(CurTermUnitSizingNum).ZoneHumRatAtHeatPeak;
@@ -3071,7 +3070,7 @@ namespace EnergyPlus::SingleDuct {
                         }
                         if (PltSizHeatNum > 0) {
                             CoilInTemp = TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatCoilInTempTU;
-                            DesMassFlow = StdRhoAir * TermUnitSizing(CurTermUnitSizingNum).AirVolFlow;
+                            DesMassFlow = state.dataEnvrn->StdRhoAir * TermUnitSizing(CurTermUnitSizingNum).AirVolFlow;
                             DesZoneHeatLoad = TermUnitFinalZoneSizing(CurTermUnitSizingNum).NonAirSysDesHeatLoad;
                             ZoneDesTemp = TermUnitFinalZoneSizing(CurTermUnitSizingNum).ZoneTempAtHeatPeak;
                             ZoneDesHumRat = TermUnitFinalZoneSizing(CurTermUnitSizingNum).ZoneHumRatAtHeatPeak;
@@ -3270,7 +3269,7 @@ namespace EnergyPlus::SingleDuct {
         MinFlowFrac = this->ZoneMinAirFrac;
         MassFlowBasedOnOA = 0.0;
         ZoneTemp = Node(ZoneNodeNum).Temp;
-        MinMassAirFlow = MinFlowFrac * StdRhoAir * this->MaxAirVolFlowRate;
+        MinMassAirFlow = MinFlowFrac * state.dataEnvrn->StdRhoAir * this->MaxAirVolFlowRate;
 
         // Then depending on if the Load is for heating or cooling it is handled differently.  First
         // the massflow rate for cooling is determined to meet the entire load.  Then
@@ -3730,7 +3729,7 @@ namespace EnergyPlus::SingleDuct {
             if (AirLoopOAFrac > 0.0) {
                 OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir(state,
                     this->OARequirementsPtr, this->ActualZoneNum, state.dataAirLoop->AirLoopControlInfo(AirLoopNum).AirLoopDCVFlag, UseMinOASchFlag);
-                OAMassFlow = OAVolumeFlowRate * StdRhoAir;
+                OAMassFlow = OAVolumeFlowRate * state.dataEnvrn->StdRhoAir;
 
                 // convert OA mass flow rate to supply air flow rate based on air loop OA fraction
                 SAMassFlow = OAMassFlow / AirLoopOAFrac;
@@ -3818,7 +3817,7 @@ namespace EnergyPlus::SingleDuct {
         SysInletNode = this->InletNodeNum;
         CpAirZn = PsyCpAirFnW(Node(ZoneNodeNum).HumRat);
         MinFlowFrac = this->ZoneMinAirFrac;
-        MinMassAirFlow = MinFlowFrac * StdRhoAir * this->MaxAirVolFlowRate;
+        MinMassAirFlow = MinFlowFrac * state.dataEnvrn->StdRhoAir * this->MaxAirVolFlowRate;
         ZoneTemp = Node(ZoneNodeNum).Temp;
 
         // Then depending on if the Load is for heating or cooling it is handled differently.  First
@@ -5633,7 +5632,7 @@ namespace EnergyPlus::SingleDuct {
                     state.dataSingleDuct->SysATMixer(ATMixerNum).DesignPrimaryAirVolRate = 0.0;
                 }
             }
-            state.dataSingleDuct->SysATMixer(ATMixerNum).MassFlowRateMaxAvail = state.dataSingleDuct->SysATMixer(ATMixerNum).DesignPrimaryAirVolRate * DataEnvironment::StdRhoAir;
+            state.dataSingleDuct->SysATMixer(ATMixerNum).MassFlowRateMaxAvail = state.dataSingleDuct->SysATMixer(ATMixerNum).DesignPrimaryAirVolRate * state.dataEnvrn->StdRhoAir;
         }
 
         if (ErrorsFound) {
@@ -5701,7 +5700,7 @@ namespace EnergyPlus::SingleDuct {
                 airLoopOAFrac = state.dataAirLoop->AirLoopFlow(this->AirLoopNum).OAFrac;
                 if (airLoopOAFrac > 0.0) {
                     vDotOAReq = DataZoneEquipment::CalcDesignSpecificationOutdoorAir(state, this->OARequirementsPtr, this->ZoneNum, UseOccSchFlag, true);
-                    mDotFromOARequirement = vDotOAReq * DataEnvironment::StdRhoAir / airLoopOAFrac;
+                    mDotFromOARequirement = vDotOAReq * state.dataEnvrn->StdRhoAir / airLoopOAFrac;
                 } else {
                     mDotFromOARequirement = Node(this->PriInNode).MassFlowRate;
                 }
@@ -5740,7 +5739,6 @@ namespace EnergyPlus::SingleDuct {
         // REFERENCES:
 
         // Using/Aliasing
-        using DataEnvironment::StdRhoAir;
         using Psychrometrics::PsyTdbFnHW;
 
         // Locals
@@ -6152,7 +6150,7 @@ namespace EnergyPlus::SingleDuct {
     {
         // calculates zone outdoor air volume flow rate using the supply air flow rate and OA fraction
         if (this->AirLoopNum > 0) {
-            this->OutdoorAirFlowRate = (this->sd_airterminalOutlet.AirMassFlowRate / StdRhoAir) * state.dataAirLoop->AirLoopFlow(this->AirLoopNum).OAFrac;
+            this->OutdoorAirFlowRate = (this->sd_airterminalOutlet.AirMassFlowRate / state.dataEnvrn->StdRhoAir) * state.dataAirLoop->AirLoopFlow(this->AirLoopNum).OAFrac;
         } else {
             this->OutdoorAirFlowRate = 0.0;
         }

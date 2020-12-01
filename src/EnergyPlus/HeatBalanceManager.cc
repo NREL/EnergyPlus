@@ -6028,7 +6028,7 @@ namespace HeatBalanceManager {
                           "Warmup {" + cWarmupDay + "} " + EnvironmentName,
                           state.dataEnvrn->Latitude,
                           state.dataEnvrn->Longitude,
-                          TimeZoneNumber,
+                          state.dataEnvrn->TimeZoneNumber,
                           state.dataEnvrn->Elevation);
 
                     print(state.files.mtr,
@@ -6037,7 +6037,7 @@ namespace HeatBalanceManager {
                           "Warmup {" + cWarmupDay + "} " + EnvironmentName,
                           state.dataEnvrn->Latitude,
                           state.dataEnvrn->Longitude,
-                          TimeZoneNumber,
+                          state.dataEnvrn->TimeZoneNumber,
                           state.dataEnvrn->Elevation);
                     PrintEnvrnStampWarmup = false;
                 }

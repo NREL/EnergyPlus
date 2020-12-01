@@ -1087,7 +1087,7 @@ namespace ChillerElectricEIR {
                 DataLoopNode::Node(this->CondInletNodeNum).Temp = this->TempRefCondIn;
             } else { // air or evap air condenser
                 // Initialize maximum available condenser flow rate
-                rho = Psychrometrics::PsyRhoAirFnPbTdbW(state, DataEnvironment::StdBaroPress, this->TempRefCondIn, 0.0, RoutineName);
+                rho = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, this->TempRefCondIn, 0.0, RoutineName);
                 this->CondMassFlowRateMax = rho * this->CondVolFlowRate;
 
                 DataLoopNode::Node(this->CondInletNodeNum).MassFlowRate = this->CondMassFlowRateMax;

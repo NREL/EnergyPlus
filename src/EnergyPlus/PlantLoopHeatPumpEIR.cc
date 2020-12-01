@@ -516,7 +516,7 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
                                                    this->sourceSideLocation.branchNum,
                                                    this->sourceSideLocation.compNum);
             } else if (this->airSource) {
-                rho = Psychrometrics::PsyRhoAirFnPbTdbW(state, DataEnvironment::StdBaroPress, state.dataEnvrn->OutDryBulbTemp, 0.0, routineName);
+                rho = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, state.dataEnvrn->OutDryBulbTemp, 0.0, routineName);
                 this->sourceSideDesignMassFlowRate = rho * this->sourceSideDesignVolFlowRate;
             }
 
@@ -857,7 +857,7 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
             sourceSideInitTemp = 20;
         }
 
-        Real64 const rhoSrc = Psychrometrics::PsyRhoAirFnPbTdbW(state, DataEnvironment::StdBaroPress, sourceSideInitTemp, sourceSideHumRat);
+        Real64 const rhoSrc = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, sourceSideInitTemp, sourceSideHumRat);
         Real64 const CpSrc = Psychrometrics::PsyCpAirFnW(sourceSideHumRat);
 
         // set the source-side flow rate

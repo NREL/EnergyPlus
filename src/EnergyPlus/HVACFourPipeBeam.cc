@@ -724,7 +724,6 @@ namespace FourPipeBeam {
     {
 
         // Using
-        using DataEnvironment::StdRhoAir;
         using namespace DataSizing;
         using DataPlant::PlantLoop;
         using FluidProperties::GetDensityGlycol;
@@ -752,7 +751,7 @@ namespace FourPipeBeam {
         Real64 originalTermUnitSizeHeatVDot = 0.0;
 
         // convert rated primary flow rate to mass flow rate using standard pressure and dry air at 20.0
-        this->mDotNormRatedPrimAir = this->vDotNormRatedPrimAir * DataEnvironment::rhoAirSTP;
+        this->mDotNormRatedPrimAir = this->vDotNormRatedPrimAir * state.dataEnvrn->rhoAirSTP;
 
         noHardSizeAnchorAvailable = false;
 
@@ -820,8 +819,8 @@ namespace FourPipeBeam {
             // minimum flow rate is from air flow rate on the terminal unit final zone size ( typically ventilation minimum and may be too low)
             Real64 minFlow(0.0);
             Real64 maxFlowCool(0.0);
-            minFlow = std::min(DataEnvironment::StdRhoAir * originalTermUnitSizeMaxVDot,
-                               TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesOAFlow * DataEnvironment::StdRhoAir);
+            minFlow = std::min(state.dataEnvrn->StdRhoAir * originalTermUnitSizeMaxVDot,
+                               TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesOAFlow * state.dataEnvrn->StdRhoAir);
             minFlow = std::max(0.0, minFlow);
             // max flow is as if the air supply was sufficient to provide all the conditioning
 
@@ -914,8 +913,8 @@ namespace FourPipeBeam {
             this->mDotDesignPrimAir = std::max(mDotAirSolutionHeating, mDotAirSolutionCooling);
             // make sure this is higher than the zone OA requirement
             this->mDotDesignPrimAir =
-                std::max(this->mDotDesignPrimAir, TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesOAFlow * DataEnvironment::StdRhoAir);
-            this->vDotDesignPrimAir = this->mDotDesignPrimAir / DataEnvironment::StdRhoAir;
+                std::max(this->mDotDesignPrimAir, TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesOAFlow * state.dataEnvrn->StdRhoAir);
+            this->vDotDesignPrimAir = this->mDotDesignPrimAir / state.dataEnvrn->StdRhoAir;
             this->totBeamLength = this->vDotDesignPrimAir / this->vDotNormRatedPrimAir;
             if (this->vDotDesignCWWasAutosized) {
                 this->vDotDesignCW = this->vDotNormRatedCW * this->totBeamLength;
@@ -925,7 +924,7 @@ namespace FourPipeBeam {
             }
         }
         // fill in mass flow rate versions of working variables (regardless of autosizing )
-        this->mDotDesignPrimAir = this->vDotDesignPrimAir * DataEnvironment::StdRhoAir;
+        this->mDotDesignPrimAir = this->vDotDesignPrimAir * state.dataEnvrn->StdRhoAir;
 
         if ((originalTermUnitSizeMaxVDot > 0.0) && (originalTermUnitSizeMaxVDot != this->vDotDesignPrimAir) && (CurZoneEqNum > 0)) {
             if ((DataSizing::SysSizingRunDone) && (this->airLoopNum > 0)) {
@@ -936,7 +935,7 @@ namespace FourPipeBeam {
                 DataSizing::FinalSysSizing(this->airLoopNum).DesCoolVolFlow += (this->vDotDesignPrimAir - originalTermUnitSizeCoolVDot);
                 DataSizing::FinalSysSizing(this->airLoopNum).DesHeatVolFlow += (this->vDotDesignPrimAir - originalTermUnitSizeHeatVDot);
                 DataSizing::FinalSysSizing(this->airLoopNum).MassFlowAtCoolPeak +=
-                    (this->vDotDesignPrimAir - originalTermUnitSizeCoolVDot) * DataEnvironment::StdRhoAir;
+                    (this->vDotDesignPrimAir - originalTermUnitSizeCoolVDot) * state.dataEnvrn->StdRhoAir;
 
                 BaseSizer::reportSizerOutput(state, this->unitType,
                                              this->name,
@@ -1019,7 +1018,7 @@ namespace FourPipeBeam {
         Real64 Residuum; // residual to be minimized to zero
 
         this->mDotSystemAir = airFlow;
-        this->vDotDesignPrimAir = this->mDotSystemAir / DataEnvironment::StdRhoAir;
+        this->vDotDesignPrimAir = this->mDotSystemAir / state.dataEnvrn->StdRhoAir;
 
         this->totBeamLength = this->vDotDesignPrimAir / this->vDotNormRatedPrimAir;
         if (this->vDotDesignCWWasAutosized) {
@@ -1495,7 +1494,7 @@ namespace FourPipeBeam {
         this->supAirCoolingEnergy = this->supAirCoolingRate * ReportingConstant;
         this->supAirHeatingEnergy = this->supAirHeatingRate * ReportingConstant;
 
-        this->primAirFlow = this->mDotSystemAir / DataEnvironment::StdRhoAir;
+        this->primAirFlow = this->mDotSystemAir / state.dataEnvrn->StdRhoAir;
 
         this->CalcOutdoorAirVolumeFlowRate(state);
     }
@@ -1504,7 +1503,7 @@ namespace FourPipeBeam {
     {
         // calculates zone outdoor air volume flow rate using the supply air flow rate and OA fraction
         if (this->airLoopNum > 0) {
-            this->OutdoorAirFlowRate = (DataLoopNode::Node(this->airOutNodeNum).MassFlowRate / DataEnvironment::StdRhoAir) * state.dataAirLoop->AirLoopFlow(this->airLoopNum).OAFrac;
+            this->OutdoorAirFlowRate = (DataLoopNode::Node(this->airOutNodeNum).MassFlowRate / state.dataEnvrn->StdRhoAir) * state.dataAirLoop->AirLoopFlow(this->airLoopNum).OAFrac;
         } else {
             this->OutdoorAirFlowRate = 0.0;
         }

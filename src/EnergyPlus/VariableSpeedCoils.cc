@@ -94,7 +94,6 @@ namespace VariableSpeedCoils {
     using namespace Psychrometrics;
     using DataEnvironment::CurMnDy;
     using DataEnvironment::EnvironmentName;
-    using DataEnvironment::StdBaroPress;
     using namespace DataSizing;
     using namespace DataHVACGlobals;
     using DataPlant::TypeOf_CoilVSWAHPCoolingEquationFit;
@@ -4277,7 +4276,7 @@ namespace VariableSpeedCoils {
 
         if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CoolHeatType == "WATERHEATING") {
             HPInletAirHumRat =
-                PsyWFnTdbTwbPb(state, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).WHRatedInletDBTemp, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).WHRatedInletWBTemp, StdBaroPress, RoutineName);
+                PsyWFnTdbTwbPb(state, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).WHRatedInletDBTemp, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).WHRatedInletWBTemp, state.dataEnvrn->StdBaroPress, RoutineName);
             rhoA = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).WHRatedInletDBTemp, HPInletAirHumRat, RoutineName);
 
             for (Mode = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).NumOfSpeeds; Mode >= 1; --Mode) {
@@ -4623,7 +4622,7 @@ namespace VariableSpeedCoils {
             HPWHInletDBTemp = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).WHRatedInletDBTemp;
             HPWHInletWBTemp = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).WHRatedInletWBTemp;
 
-            rhoA = PsyRhoAirFnPbTdbW(state, StdBaroPress, HPWHInletDBTemp, HPInletAirHumRat, RoutineName);
+            rhoA = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, HPWHInletDBTemp, HPInletAirHumRat, RoutineName);
             for (Mode = 1; Mode <= state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).NumOfSpeeds; ++Mode) {
                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedAirMassFlowRate(Mode) = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode) * rhoA;
                 // Check for valid range of (Rated Air Volume Flow Rate / Rated Total Capacity)
@@ -4676,7 +4675,7 @@ namespace VariableSpeedCoils {
 
         if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate >= SmallAirVolFlow && state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CoolHeatType == "COOLING") {
             RatedAirMassFlowRate =
-                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate * PsyRhoAirFnPbTdbW(state, StdBaroPress, state.dataVariableSpeedCoils->RatedInletAirTemp, state.dataVariableSpeedCoils->RatedInletAirHumRat, RoutineName);
+                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate * PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, state.dataVariableSpeedCoils->RatedInletAirTemp, state.dataVariableSpeedCoils->RatedInletAirHumRat, RoutineName);
             RatedInletEnth = PsyHFnTdbW(state.dataVariableSpeedCoils->RatedInletAirTemp, state.dataVariableSpeedCoils->RatedInletAirHumRat);
             CBFRated = AdjustCBF(
                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedCBF(NormSpeed), state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedAirMassFlowRate(NormSpeed), RatedAirMassFlowRate);
@@ -4712,7 +4711,7 @@ namespace VariableSpeedCoils {
                                  QLoadTotal,
                                  SHR,
                                  RatedSourceTempCool,
-                                 StdBaroPress,
+                                 state.dataEnvrn->StdBaroPress,
                                  0.0,
                                  1,
                                  state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).capModFacTotal);

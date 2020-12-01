@@ -4367,7 +4367,7 @@ namespace EnergyPlus {
 
             // retrieve information from E+ globals
             Latitude_Degrees = state.dataEnvrn->Latitude;
-            StMeridian_Degrees = -DataEnvironment::TimeZoneMeridian; // Standard meridian, degrees W
+            StMeridian_Degrees = -state.dataEnvrn->TimeZoneMeridian; // Standard meridian, degrees W
             Longitude_Degrees = -state.dataEnvrn->Longitude;         // Longitude, degrees W
 
             // retrieve any information from input data structure

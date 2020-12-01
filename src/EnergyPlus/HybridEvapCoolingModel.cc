@@ -977,7 +977,7 @@ namespace HybridEvapCoolingModel {
 
             oStandBy.ScaledSupply_Air_Mass_Flow_Rate = MsaRatio * ScaledSystemMaximumSupplyAirMassFlowRate;
             oStandBy.Unscaled_Supply_Air_Mass_Flow_Rate = oStandBy.ScaledSupply_Air_Mass_Flow_Rate / ScalingFactor;
-            oStandBy.ScaledSupply_Air_Ventilation_Volume = MsaRatio * ScaledSystemMaximumSupplyAirMassFlowRate / StdRhoAir;
+            oStandBy.ScaledSupply_Air_Ventilation_Volume = MsaRatio * ScaledSystemMaximumSupplyAirMassFlowRate / state.dataEnvrn->StdRhoAir;
             oStandBy.Supply_Air_Mass_Flow_Rate_Ratio = MsaRatio;
             oStandBy.ElectricalPower = Mode0.CalculateCurveVal(state, Tosa, Wosa, Tra, Wra, oStandBy.Unscaled_Supply_Air_Mass_Flow_Rate, OSAF, POWER_CURVE);
             oStandBy.Outdoor_Air_Fraction = OSAF;
@@ -1326,8 +1326,8 @@ namespace HybridEvapCoolingModel {
                         // Calculate the ventilation mass flow rate
                         Real64 Mvent = ScaledMsa * OSAF;
 
-                        if (StdRhoAir > 1) {
-                            Supply_Air_Ventilation_Volume = Mvent / StdRhoAir;
+                        if (state.dataEnvrn->StdRhoAir > 1) {
+                            Supply_Air_Ventilation_Volume = Mvent / state.dataEnvrn->StdRhoAir;
                         } else {
                             Supply_Air_Ventilation_Volume = Mvent / 1.225; // stored as volumetric flow for reporting
                         }
@@ -1400,7 +1400,7 @@ namespace HybridEvapCoolingModel {
                                     Tsa = StepIns.Tosa + FanHeatTemp;
                                 }
 
-                                CandidateSetting.ScaledSupply_Air_Ventilation_Volume = CandidateSetting.ScaledSupply_Air_Mass_Flow_Rate / StdRhoAir;
+                                CandidateSetting.ScaledSupply_Air_Ventilation_Volume = CandidateSetting.ScaledSupply_Air_Mass_Flow_Rate / state.dataEnvrn->StdRhoAir;
                                 CandidateSetting.oMode = Mode;
                                 CandidateSetting.SupplyAirTemperature = Tsa;
                                 CandidateSetting.SupplyAirW = CheckVal_W(state, Wsa, Tsa, OutletPressure);
@@ -1521,7 +1521,7 @@ namespace HybridEvapCoolingModel {
             // Calculate partload fraction required to meet all requirements
             Real64 PartRuntimeFraction = 0;
             PartRuntimeFraction = CalculatePartRuntimeFraction(MinOA_Msa,
-                                                               thisSetting.Supply_Air_Ventilation_Volume * StdRhoAir,
+                                                               thisSetting.Supply_Air_Ventilation_Volume * state.dataEnvrn->StdRhoAir,
                                                                StepIns.RequestedCoolingLoad,
                                                                StepIns.RequestedHeatingLoad,
                                                                SensibleRoomORZone,
@@ -1880,8 +1880,8 @@ namespace HybridEvapCoolingModel {
         // All powers are calculated in Watts amd energies in Joules
 
         SupplyVentilationVolume = CalculateTimeStepAverage(SYSTEMOUTPUTS::VENTILATION_AIR_V);
-        if (StdRhoAir > 1) {
-            SupplyVentilationAir = SupplyVentilationVolume * StdRhoAir;
+        if (state.dataEnvrn->StdRhoAir > 1) {
+            SupplyVentilationAir = SupplyVentilationVolume * state.dataEnvrn->StdRhoAir;
         } else {
             SupplyVentilationAir = SupplyVentilationVolume * 1.225;
         }
@@ -1896,8 +1896,8 @@ namespace HybridEvapCoolingModel {
         OutletEnthalpy = PsyHFnTdbRhPb(state, OutletTemp, OutletRH, InletPressure);
         OutletMassFlowRate = CalculateTimeStepAverage(SYSTEMOUTPUTS::SUPPLY_MASS_FLOW);
 
-        if (StdRhoAir > 1) {
-            OutletVolumetricFlowRate = OutletMassFlowRate / StdRhoAir;
+        if (state.dataEnvrn->StdRhoAir > 1) {
+            OutletVolumetricFlowRate = OutletMassFlowRate / state.dataEnvrn->StdRhoAir;
         } else {
             OutletVolumetricFlowRate = OutletMassFlowRate / 1.225;
         }

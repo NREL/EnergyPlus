@@ -5938,7 +5938,7 @@ namespace WaterThermalTanks {
                                                  state.dataWaterThermalTanks->HPWaterHeater(HPNum).OperatingAirFlowRate);
                 }
                 DataSizing::DataNonZoneNonAirloopValue = state.dataWaterThermalTanks->HPWaterHeater(HPNum).OperatingAirFlowRate;
-                state.dataWaterThermalTanks->HPWaterHeater(HPNum).OperatingAirMassFlowRate = state.dataWaterThermalTanks->HPWaterHeater(HPNum).OperatingAirFlowRate * DataEnvironment::StdRhoAir;
+                state.dataWaterThermalTanks->HPWaterHeater(HPNum).OperatingAirMassFlowRate = state.dataWaterThermalTanks->HPWaterHeater(HPNum).OperatingAirFlowRate * state.dataEnvrn->StdRhoAir;
                 if (DataSizing::CurZoneEqNum > 0) {
                     DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).CoolingAirFlow = true;
                     DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).CoolingAirVolFlow = DataSizing::DataNonZoneNonAirloopValue;
