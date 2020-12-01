@@ -165,7 +165,6 @@ SET( SRC
   DataContaminantBalance.hh
   DataConvergParams.hh
   DataConversions.hh
-  DataDElight.cc
   DataDElight.hh
   DataDaylighting.hh
   DataDaylightingDevices.hh

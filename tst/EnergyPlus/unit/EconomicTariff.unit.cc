@@ -587,7 +587,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GatherForEconomics)
     state->dataGlobal->NumOfTimeStepInHour = 4;    // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 15;    // must initialize this to get schedules initialized
     state->dataGlobal->TimeStepZone = 0.25;
-    state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour();
+    state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour;
 
     ScheduleManager::ProcessScheduleInput(*state); // read schedules
     ExteriorEnergyUse::ManageExteriorEnergyUse(*state);

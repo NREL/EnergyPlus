@@ -572,7 +572,7 @@ namespace ExternalInterface {
             StopExternalInterfaceIfError(state);
 
             // make a single length here for all strings to be passed to getepvariables
-            size_t lenXmlStr(maxVar * DataGlobalConstants::MaxNameLength()); // Length of strings being passed to getepvariables
+            size_t lenXmlStr(maxVar * DataGlobalConstants::MaxNameLength); // Length of strings being passed to getepvariables
 
             // initialize all the strings to this length with blanks
             xmlStrOut = std::string(lenXmlStr, ' ');

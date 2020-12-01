@@ -65,6 +65,8 @@
 namespace EnergyPlus {
 
 // forward declare all structs
+struct ErrorTrackingData;
+struct GeneratorsData;
 struct AirflowNetworkBalanceManagerData;
 struct AirLoopHVACDOASData;
 struct AirSystemsData;
@@ -158,6 +160,8 @@ struct EnergyPlusData : BaseGlobalStruct {
     IOFiles files;
 
     // module globals
+    std::unique_ptr<ErrorTrackingData> dataErrTracking;
+    std::unique_ptr<GeneratorsData> dataGenerator;
     std::unique_ptr<AirflowNetworkBalanceManagerData> dataAirflowNetworkBalanceManager;
     std::unique_ptr<AirLoopHVACDOASData> dataAirLoopHVACDOAS;
     std::unique_ptr<AirSystemsData> dataAirSystemsData;

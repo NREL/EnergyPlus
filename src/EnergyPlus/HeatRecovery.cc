@@ -418,7 +418,7 @@ namespace HeatRecovery {
             ExchCond(ExchNum).Name = cAlphaArgs(1);
             ExchCond(ExchNum).ExchTypeNum = HX_AIRTOAIR_FLATPLATE;
             if (lAlphaFieldBlanks(2)) {
-                ExchCond(ExchNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                ExchCond(ExchNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 ExchCond(ExchNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (ExchCond(ExchNum).SchedPtr == 0) {
@@ -501,7 +501,7 @@ namespace HeatRecovery {
             ExchCond(ExchNum).Name = cAlphaArgs(1);
             ExchCond(ExchNum).ExchTypeNum = HX_AIRTOAIR_GENERIC;
             if (lAlphaFieldBlanks(2)) {
-                ExchCond(ExchNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                ExchCond(ExchNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 ExchCond(ExchNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (ExchCond(ExchNum).SchedPtr == 0) {
@@ -634,7 +634,7 @@ namespace HeatRecovery {
             ExchCond(ExchNum).Name = cAlphaArgs(1);
             ExchCond(ExchNum).ExchTypeNum = HX_DESICCANT_BALANCED;
             if (lAlphaFieldBlanks(2)) {
-                ExchCond(ExchNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                ExchCond(ExchNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 ExchCond(ExchNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (ExchCond(ExchNum).SchedPtr == 0) {
@@ -3291,7 +3291,7 @@ namespace HeatRecovery {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 ReportingConstant;
 
-        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour();
+        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour;
         ExchCond(ExNum).ElecUseEnergy = ExchCond(ExNum).ElecUseRate * ReportingConstant;
         ExchCond(ExNum).SensHeatingEnergy = ExchCond(ExNum).SensHeatingRate * ReportingConstant;
         ExchCond(ExNum).LatHeatingEnergy = ExchCond(ExNum).LatHeatingRate * ReportingConstant;

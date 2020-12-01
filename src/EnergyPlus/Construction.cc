@@ -1237,8 +1237,8 @@ namespace Construction {
                         // Make sure the next term won't cause an underflow.  If it will end up being
                         // so small as to go below TinyLimit, then ignore it since it won't add anything
                         // to AMatN anyway.
-                        if (std::abs(AMat1(ic, ict)) > DataGlobalConstants::rTinyValue()) {
-                            if (std::abs(AMato(ict, ir)) > std::abs(double(i) * DataGlobalConstants::rTinyValue() / AMat1(ic, ict)))
+                        if (std::abs(AMat1(ic, ict)) > DataGlobalConstants::rTinyValue) {
+                            if (std::abs(AMato(ict, ir)) > std::abs(double(i) * DataGlobalConstants::rTinyValue / AMat1(ic, ict)))
                                 AMatN(ic, ir) += AMato(ict, ir) * AMat1(ic, ict) / double(i);
                         }
                     }
@@ -1254,7 +1254,7 @@ namespace Construction {
             for (ir = 1; ir <= this->rcmax; ++ir) {
                 for (ic = 1; ic <= this->rcmax; ++ic) {
                     // Test of limit criteria:
-                    if (std::abs(this->AExp(ic, ir)) > DataGlobalConstants::rTinyValue()) { // Next line divides by AExp entry so it
+                    if (std::abs(this->AExp(ic, ir)) > DataGlobalConstants::rTinyValue) { // Next line divides by AExp entry so it
                         // must be checked to avoid dividing by zero.
                         // If the ratio between any current element in the power
                         // of AMat and its corresponding element in AExp is
@@ -1302,7 +1302,7 @@ namespace Construction {
             for (ir = 1; ir <= this->rcmax; ++ir) {
                 for (ic = 1; ic <= this->rcmax; ++ic) {
                     for (idm = 1; idm <= this->rcmax; ++idm) {
-                        if (std::abs(AMato(idm, ir) * AMato(ic, idm)) > DataGlobalConstants::rTinyValue()) {
+                        if (std::abs(AMato(idm, ir) * AMato(ic, idm)) > DataGlobalConstants::rTinyValue) {
                             this->AExp(ic, ir) += AMato(idm, ir) * AMato(ic, idm);
                             Backup = false;
                         }
@@ -1726,8 +1726,8 @@ namespace Construction {
                         // Make sure the next term won't cause an underflow.  If it will end up being
                         // so small as to go below TinyLimit, then ignore it since it won't add anything
                         // to PhiR0 anyway.
-                        if (std::abs(Rnew(ic, is)) > DataGlobalConstants::rTinyValue()) {
-                            if (std::abs(this->AExp(is, ir)) > std::abs(DataGlobalConstants::rTinyValue() / Rnew(ic, is))) PhiR0(ic, ir) += this->AExp(is, ir) * Rnew(ic, is);
+                        if (std::abs(Rnew(ic, is)) > DataGlobalConstants::rTinyValue) {
+                            if (std::abs(this->AExp(is, ir)) > std::abs(DataGlobalConstants::rTinyValue / Rnew(ic, is))) PhiR0(ic, ir) += this->AExp(is, ir) * Rnew(ic, is);
                         }
                     }
                 }

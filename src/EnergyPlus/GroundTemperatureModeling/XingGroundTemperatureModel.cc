@@ -159,12 +159,12 @@ Real64 XingGroundTempsModel::getGroundTemp(EnergyPlusData &state)
     PL_2 = phaseShift_2;
 
     n = 1;
-    term1 = -depth * std::sqrt((n * DataGlobalConstants::Pi()) / (groundThermalDiffisivity * tp));
-    term2 = (2 * DataGlobalConstants::Pi() * n) / tp * (simTimeInDays - PL_1) - depth * std::sqrt((n * DataGlobalConstants::Pi()) / (groundThermalDiffisivity * tp));
+    term1 = -depth * std::sqrt((n * DataGlobalConstants::Pi) / (groundThermalDiffisivity * tp));
+    term2 = (2 * DataGlobalConstants::Pi * n) / tp * (simTimeInDays - PL_1) - depth * std::sqrt((n * DataGlobalConstants::Pi) / (groundThermalDiffisivity * tp));
 
     n = 2;
-    term3 = -depth * std::sqrt((n * DataGlobalConstants::Pi()) / (groundThermalDiffisivity * tp));
-    term4 = (2 * DataGlobalConstants::Pi() * n) / tp * (simTimeInDays - PL_2) - depth * std::sqrt((n * DataGlobalConstants::Pi()) / (groundThermalDiffisivity * tp));
+    term3 = -depth * std::sqrt((n * DataGlobalConstants::Pi) / (groundThermalDiffisivity * tp));
+    term4 = (2 * DataGlobalConstants::Pi * n) / tp * (simTimeInDays - PL_2) - depth * std::sqrt((n * DataGlobalConstants::Pi) / (groundThermalDiffisivity * tp));
 
     summation = std::exp(term1) * Ts_1 * std::cos(term2) + std::exp(term3) * Ts_2 * std::cos(term4);
 
@@ -223,7 +223,7 @@ Real64 XingGroundTempsModel::getGroundTempAtTimeInSeconds(EnergyPlusData &state,
 
     depth = _depth;
 
-    simTimeInDays = seconds / DataGlobalConstants::SecsInDay();
+    simTimeInDays = seconds / DataGlobalConstants::SecsInDay;
 
     if (simTimeInDays > state.dataWeatherManager->NumDaysInYear) {
         simTimeInDays = remainder(simTimeInDays, state.dataWeatherManager->NumDaysInYear);

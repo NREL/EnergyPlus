@@ -56,6 +56,8 @@ namespace EnergyPlus {
         // todo, try to eliminate the need for the singleton
         IOFiles::setSingleton(&files);
 
+        this->dataErrTracking = std::make_unique<ErrorTrackingData>();
+        this->dataGenerator = std::make_unique<GeneratorsData>();
         this->dataAirflowNetworkBalanceManager = std::make_unique<AirflowNetworkBalanceManagerData>();
         this->dataAirLoop = std::make_unique<DataAirLoopData>();
         this->dataAirLoopHVACDOAS = std::make_unique<AirLoopHVACDOASData>();
@@ -146,6 +148,8 @@ namespace EnergyPlus {
     }
 
     void EnergyPlusData::clear_state() {
+        this->dataErrTracking->clear_state();
+        this->dataGenerator->clear_state();
         this->dataAirflowNetworkBalanceManager->clear_state();
         this->dataAirLoop->clear_state();
         this->dataAirLoopHVACDOAS->clear_state();

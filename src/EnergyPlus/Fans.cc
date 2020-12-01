@@ -403,7 +403,7 @@ namespace Fans {
             Fan(FanNum).FanType = cCurrentModuleObject;
             Fan(FanNum).AvailSchedName = cAlphaArgs(2);
             if (lAlphaFieldBlanks(2)) {
-                Fan(FanNum).AvailSchedPtrNum = DataGlobalConstants::ScheduleAlwaysOn();
+                Fan(FanNum).AvailSchedPtrNum = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 Fan(FanNum).AvailSchedPtrNum = GetScheduleIndex(state, cAlphaArgs(2));
                 if (Fan(FanNum).AvailSchedPtrNum == 0) {
@@ -466,7 +466,7 @@ namespace Fans {
             Fan(FanNum).FanType = cCurrentModuleObject;
             Fan(FanNum).AvailSchedName = cAlphaArgs(2);
             if (lAlphaFieldBlanks(2)) {
-                Fan(FanNum).AvailSchedPtrNum = DataGlobalConstants::ScheduleAlwaysOn();
+                Fan(FanNum).AvailSchedPtrNum = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 Fan(FanNum).AvailSchedPtrNum = GetScheduleIndex(state, cAlphaArgs(2));
                 if (Fan(FanNum).AvailSchedPtrNum == 0) {
@@ -549,7 +549,7 @@ namespace Fans {
             Fan(FanNum).FanType = cCurrentModuleObject;
             Fan(FanNum).AvailSchedName = cAlphaArgs(2);
             if (lAlphaFieldBlanks(2)) {
-                Fan(FanNum).AvailSchedPtrNum = DataGlobalConstants::ScheduleAlwaysOn();
+                Fan(FanNum).AvailSchedPtrNum = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 Fan(FanNum).AvailSchedPtrNum = GetScheduleIndex(state, cAlphaArgs(2));
                 if (Fan(FanNum).AvailSchedPtrNum == 0) {
@@ -607,7 +607,7 @@ namespace Fans {
                     }
                 }
             } else {
-                Fan(FanNum).FlowFractSchedNum = DataGlobalConstants::ScheduleAlwaysOn();
+                Fan(FanNum).FlowFractSchedNum = DataGlobalConstants::ScheduleAlwaysOn;
             }
 
             if (NumAlphas > 6 && !lAlphaFieldBlanks(7)) {
@@ -687,7 +687,7 @@ namespace Fans {
             Fan(FanNum).FanType = cCurrentModuleObject;
             Fan(FanNum).AvailSchedName = cAlphaArgs(2);
             if (lAlphaFieldBlanks(2)) {
-                Fan(FanNum).AvailSchedPtrNum = DataGlobalConstants::ScheduleAlwaysOn();
+                Fan(FanNum).AvailSchedPtrNum = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 Fan(FanNum).AvailSchedPtrNum = GetScheduleIndex(state, cAlphaArgs(2));
                 if (Fan(FanNum).AvailSchedPtrNum == 0) {
@@ -2586,7 +2586,7 @@ namespace Fans {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // na
 
-        Fan(FanNum).FanEnergy = Fan(FanNum).FanPower * TimeStepSys * DataGlobalConstants::SecInHour();
+        Fan(FanNum).FanEnergy = Fan(FanNum).FanPower * TimeStepSys * DataGlobalConstants::SecInHour;
         Fan(FanNum).DeltaTemp = Fan(FanNum).OutletAirTemp - Fan(FanNum).InletAirTemp;
 
         if (Fan(FanNum).FanType_Num == FanType_SimpleOnOff) {

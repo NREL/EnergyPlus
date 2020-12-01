@@ -3626,7 +3626,7 @@ namespace SystemReports {
                     if (InletNodeNum <= 0 || OutletNodeNum <= 0) continue;
                     CompLoad = Node(OutletNodeNum).MassFlowRate * (PsyHFnTdbW(Node(InletNodeNum).Temp, Node(InletNodeNum).HumRat) -
                                                                    PsyHFnTdbW(Node(OutletNodeNum).Temp, Node(OutletNodeNum).HumRat));
-                    CompLoad *= TimeStepSys * DataGlobalConstants::SecInHour();
+                    CompLoad *= TimeStepSys * DataGlobalConstants::SecInHour;
                     CompEnergyUse = 0.0;
                     EnergyType = DataGlobalConstants::ResourceType::None;
                     CompLoadFlag = true;
@@ -3647,7 +3647,7 @@ namespace SystemReports {
                         if (InletNodeNum <= 0 || OutletNodeNum <= 0) continue;
                         CompLoad = Node(OutletNodeNum).MassFlowRate * (PsyHFnTdbW(Node(InletNodeNum).Temp, Node(InletNodeNum).HumRat) -
                                                                        PsyHFnTdbW(Node(OutletNodeNum).Temp, Node(OutletNodeNum).HumRat));
-                        CompLoad *= TimeStepSys * DataGlobalConstants::SecInHour();
+                        CompLoad *= TimeStepSys * DataGlobalConstants::SecInHour;
                         CompEnergyUse = 0.0;
                         EnergyType = DataGlobalConstants::ResourceType::None;
                         CompLoadFlag = true;
@@ -3668,7 +3668,7 @@ namespace SystemReports {
                             if (InletNodeNum <= 0 || OutletNodeNum <= 0) continue;
                             CompLoad = Node(OutletNodeNum).MassFlowRate * (PsyHFnTdbW(Node(InletNodeNum).Temp, Node(InletNodeNum).HumRat) -
                                                                            PsyHFnTdbW(Node(OutletNodeNum).Temp, Node(OutletNodeNum).HumRat));
-                            CompLoad *= TimeStepSys * DataGlobalConstants::SecInHour();
+                            CompLoad *= TimeStepSys * DataGlobalConstants::SecInHour;
                             CompEnergyUse = 0.0;
                             EnergyType = DataGlobalConstants::ResourceType::None;
                             CompLoadFlag = true;
@@ -3755,7 +3755,7 @@ namespace SystemReports {
                             CompLoad -= (PsyHFnTdbW(Node(OutletNodeNum).Temp, Node(OutletNodeNum).HumRat) * Node(OutletNodeNum).MassFlowRate);
                         }
                     }
-                    CompLoad *= TimeStepSys * DataGlobalConstants::SecInHour();
+                    CompLoad *= TimeStepSys * DataGlobalConstants::SecInHour;
                     CompEnergyUse = 0.0;
                     EnergyType = DataGlobalConstants::ResourceType::None;
                     CompLoadFlag = true;
@@ -3774,7 +3774,7 @@ namespace SystemReports {
                         if (InletNodeNum <= 0 || OutletNodeNum <= 0) continue;
                         CompLoad = Node(InletNodeNum).MassFlowRate * (PsyHFnTdbW(Node(InletNodeNum).Temp, Node(InletNodeNum).HumRat) -
                                                                       PsyHFnTdbW(Node(OutletNodeNum).Temp, Node(OutletNodeNum).HumRat));
-                        CompLoad *= TimeStepSys * DataGlobalConstants::SecInHour();
+                        CompLoad *= TimeStepSys * DataGlobalConstants::SecInHour;
                         CompEnergyUse = 0.0;
                         EnergyType = DataGlobalConstants::ResourceType::None;
                         CompLoadFlag = true;
@@ -3793,7 +3793,7 @@ namespace SystemReports {
                             if (InletNodeNum <= 0 || OutletNodeNum <= 0) continue;
                             CompLoad = Node(InletNodeNum).MassFlowRate * (PsyHFnTdbW(Node(InletNodeNum).Temp, Node(InletNodeNum).HumRat) -
                                                                           PsyHFnTdbW(Node(OutletNodeNum).Temp, Node(OutletNodeNum).HumRat));
-                            CompLoad *= TimeStepSys * DataGlobalConstants::SecInHour();
+                            CompLoad *= TimeStepSys * DataGlobalConstants::SecInHour;
                             CompEnergyUse = 0.0;
                             EnergyType = DataGlobalConstants::ResourceType::None;
                             CompLoadFlag = true;
@@ -4544,7 +4544,7 @@ namespace SystemReports {
                             ZFAUEnthMixedAir = PsyHFnTdbW(Node(MixedAirNode).Temp, Node(MixedAirNode).HumRat);
                             ZFAUEnthReturnAir = PsyHFnTdbW(Node(ReturnAirNode).Temp, Node(ReturnAirNode).HumRat);
                             // Calculate the zone ventilation load for this supply air path (i.e. zone inlet)
-                            ZFAUZoneVentLoad += (ZFAUFlowRate) * (ZFAUEnthMixedAir - ZFAUEnthReturnAir) * TimeStepSys * DataGlobalConstants::SecInHour(); //*KJperJ
+                            ZFAUZoneVentLoad += (ZFAUFlowRate) * (ZFAUEnthMixedAir - ZFAUEnthReturnAir) * TimeStepSys * DataGlobalConstants::SecInHour; //*KJperJ
                         } else {
                             ZFAUZoneVentLoad += 0.0;
                         }
@@ -4562,7 +4562,7 @@ namespace SystemReports {
                             ZFAUEnthMixedAir = PsyHFnTdbW(Node(MixedAirNode).Temp, Node(MixedAirNode).HumRat);
                             ZFAUEnthReturnAir = PsyHFnTdbW(Node(ReturnAirNode).Temp, Node(ReturnAirNode).HumRat);
                             // Calculate the zone ventilation load for this supply air path (i.e. zone inlet)
-                            ZFAUZoneVentLoad += (ZFAUFlowRate) * (ZFAUEnthMixedAir - ZFAUEnthReturnAir) * TimeStepSys * DataGlobalConstants::SecInHour(); //*KJperJ
+                            ZFAUZoneVentLoad += (ZFAUFlowRate) * (ZFAUEnthMixedAir - ZFAUEnthReturnAir) * TimeStepSys * DataGlobalConstants::SecInHour; //*KJperJ
                         } else {
                             ZFAUZoneVentLoad += 0.0;
                         }
@@ -4587,7 +4587,7 @@ namespace SystemReports {
                             ZFAUEnthMixedAir = PsyHFnTdbW(Node(MixedAirNode).Temp, Node(MixedAirNode).HumRat);
                             ZFAUEnthReturnAir = PsyHFnTdbW(Node(ReturnAirNode).Temp, Node(ReturnAirNode).HumRat);
                             // Calculate the zone ventilation load for this supply air path (i.e. zone inlet)
-                            ZFAUZoneVentLoad += (ZFAUFlowRate) * (ZFAUEnthMixedAir - ZFAUEnthReturnAir) * TimeStepSys * DataGlobalConstants::SecInHour(); //*KJperJ
+                            ZFAUZoneVentLoad += (ZFAUFlowRate) * (ZFAUEnthMixedAir - ZFAUEnthReturnAir) * TimeStepSys * DataGlobalConstants::SecInHour; //*KJperJ
                         } else {
                             ZFAUZoneVentLoad += 0.0;
                         }
@@ -4607,7 +4607,7 @@ namespace SystemReports {
                             ZFAUEnthMixedAir = PsyHFnTdbW(Node(MixedAirNode).Temp, Node(MixedAirNode).HumRat);
                             ZFAUEnthReturnAir = PsyHFnTdbW(Node(ReturnAirNode).Temp, Node(ReturnAirNode).HumRat);
                             // Calculate the zone ventilation load for this supply air path (i.e. zone inlet)
-                            ZFAUZoneVentLoad += (ZFAUFlowRate) * (ZFAUEnthMixedAir - ZFAUEnthReturnAir) * TimeStepSys * DataGlobalConstants::SecInHour(); //*KJperJ
+                            ZFAUZoneVentLoad += (ZFAUFlowRate) * (ZFAUEnthMixedAir - ZFAUEnthReturnAir) * TimeStepSys * DataGlobalConstants::SecInHour; //*KJperJ
                         } else {
                             ZFAUZoneVentLoad += 0.0;
                         }
@@ -4628,7 +4628,7 @@ namespace SystemReports {
                             ZFAUEnthMixedAir = PsyHFnTdbW(Node(MixedAirNode).Temp, Node(MixedAirNode).HumRat);
                             ZFAUEnthReturnAir = PsyHFnTdbW(Node(ReturnAirNode).Temp, Node(ReturnAirNode).HumRat);
                             // Calculate the zone ventilation load for this supply air path (i.e. zone inlet)
-                            ZFAUZoneVentLoad += (ZFAUFlowRate) * (ZFAUEnthMixedAir - ZFAUEnthReturnAir) * TimeStepSys * DataGlobalConstants::SecInHour(); //*KJperJ
+                            ZFAUZoneVentLoad += (ZFAUFlowRate) * (ZFAUEnthMixedAir - ZFAUEnthReturnAir) * TimeStepSys * DataGlobalConstants::SecInHour; //*KJperJ
                         } else {
                             ZFAUZoneVentLoad += 0.0;
                         }
@@ -4649,7 +4649,7 @@ namespace SystemReports {
                             ZFAUEnthMixedAir = PsyHFnTdbW(ZFAUTempMixedAir, ZFAUHumRatMixedAir);
                             ZFAUEnthReturnAir = PsyHFnTdbW(Node(ReturnAirNode).Temp, Node(ReturnAirNode).HumRat);
                             // Calculate the zone ventilation load for this supply air path (i.e. zone inlet)
-                            ZFAUZoneVentLoad += (ZFAUFlowRate) * (ZFAUEnthMixedAir - ZFAUEnthReturnAir) * TimeStepSys * DataGlobalConstants::SecInHour(); //*KJperJ
+                            ZFAUZoneVentLoad += (ZFAUFlowRate) * (ZFAUEnthMixedAir - ZFAUEnthReturnAir) * TimeStepSys * DataGlobalConstants::SecInHour; //*KJperJ
                         } else {
                             ZFAUZoneVentLoad += 0.0;
                         }
@@ -4669,7 +4669,7 @@ namespace SystemReports {
                             ZFAUEnthMixedAir = PsyHFnTdbW(Node(MixedAirNode).Temp, Node(MixedAirNode).HumRat);
                             ZFAUEnthReturnAir = PsyHFnTdbW(Node(ReturnAirNode).Temp, Node(ReturnAirNode).HumRat);
                             // Calculate the zone ventilation load for this supply air path (i.e. zone inlet)
-                            ZFAUZoneVentLoad += (ZFAUFlowRate) * (ZFAUEnthMixedAir - ZFAUEnthReturnAir) * TimeStepSys * DataGlobalConstants::SecInHour(); //*KJperJ
+                            ZFAUZoneVentLoad += (ZFAUFlowRate) * (ZFAUEnthMixedAir - ZFAUEnthReturnAir) * TimeStepSys * DataGlobalConstants::SecInHour; //*KJperJ
                         } else {
                             ZFAUZoneVentLoad += 0.0;
                         }
@@ -4694,7 +4694,7 @@ namespace SystemReports {
                             ZFAUEnthReturnAir = PsyHFnTdbW(Node(ReturnAirNode).Temp, Node(ReturnAirNode).HumRat);
                             ZFAUEnthOutdoorAir = PsyHFnTdbW(Node(OutAirNode).Temp, Node(OutAirNode).HumRat);
                             // Calculate the zone ventilation load for this supply air path (i.e. zone inlet)
-                            ZFAUZoneVentLoad += (ZFAUFlowRate) * (ZFAUEnthOutdoorAir - ZFAUEnthReturnAir) * TimeStepSys * DataGlobalConstants::SecInHour(); //*KJperJ
+                            ZFAUZoneVentLoad += (ZFAUFlowRate) * (ZFAUEnthOutdoorAir - ZFAUEnthReturnAir) * TimeStepSys * DataGlobalConstants::SecInHour; //*KJperJ
                         } else {
                             ZFAUZoneVentLoad += 0.0;
                         }
@@ -4718,7 +4718,7 @@ namespace SystemReports {
                             ZFAUEnthOutdoorAir = PsyHFnTdbW(Node(OutAirNode).Temp, Node(OutAirNode).HumRat);
                             // Calculate the zone ventilation load for this supply air path (i.e. zone inlet)
 
-                            ZFAUZoneVentLoad += (ZFAUFlowRate) * (ZFAUEnthOutdoorAir - ZFAUEnthReturnAir) * TimeStepSys * DataGlobalConstants::SecInHour(); //*KJperJ
+                            ZFAUZoneVentLoad += (ZFAUFlowRate) * (ZFAUEnthOutdoorAir - ZFAUEnthReturnAir) * TimeStepSys * DataGlobalConstants::SecInHour; //*KJperJ
                         } else {
                             ZFAUZoneVentLoad += 0.0;
                         }
@@ -4814,7 +4814,7 @@ namespace SystemReports {
                     }
                     // Calculate the zone ventilation load for this supply air path (i.e. zone inlet)
                     AirSysZoneVentLoad =
-                        (ADUCoolFlowrate + ADUHeatFlowrate) * (AirSysEnthMixedAir - AirSysEnthReturnAir) * TimeStepSys * DataGlobalConstants::SecInHour(); //*KJperJ
+                        (ADUCoolFlowrate + ADUHeatFlowrate) * (AirSysEnthMixedAir - AirSysEnthReturnAir) * TimeStepSys * DataGlobalConstants::SecInHour; //*KJperJ
                 }
                 ZAirSysZoneVentLoad += AirSysZoneVentLoad;
                 ZAirSysOutAirFlow += AirSysOutAirFlow;
@@ -4824,16 +4824,16 @@ namespace SystemReports {
             OutAirFlow = ZAirSysOutAirFlow + ZFAUOutAirFlow;
             // assign report variables
             ZoneOAMassFlow(CtrlZoneNum) = OutAirFlow;
-            ZoneOAMass(CtrlZoneNum) = ZoneOAMassFlow(CtrlZoneNum) * TimeStepSys * DataGlobalConstants::SecInHour();
+            ZoneOAMass(CtrlZoneNum) = ZoneOAMassFlow(CtrlZoneNum) * TimeStepSys * DataGlobalConstants::SecInHour;
 
             // determine volumetric values from mass flow using standard density (adjusted for elevation)
             ZoneOAVolFlowStdRho(CtrlZoneNum) = ZoneOAMassFlow(CtrlZoneNum) / state.dataEnvrn->StdRhoAir;
-            ZoneOAVolStdRho(CtrlZoneNum) = ZoneOAVolFlowStdRho(CtrlZoneNum) * TimeStepSys * DataGlobalConstants::SecInHour();
+            ZoneOAVolStdRho(CtrlZoneNum) = ZoneOAVolFlowStdRho(CtrlZoneNum) * TimeStepSys * DataGlobalConstants::SecInHour;
 
             // determine volumetric values from mass flow using current air density for zone (adjusted for elevation)
             currentZoneAirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, MAT(ActualZoneNum), ZoneAirHumRatAvg(ActualZoneNum));
             if (currentZoneAirDensity > 0.0) ZoneOAVolFlowCrntRho(CtrlZoneNum) = ZoneOAMassFlow(CtrlZoneNum) / currentZoneAirDensity;
-            ZoneOAVolCrntRho(CtrlZoneNum) = ZoneOAVolFlowCrntRho(CtrlZoneNum) * TimeStepSys * DataGlobalConstants::SecInHour();
+            ZoneOAVolCrntRho(CtrlZoneNum) = ZoneOAVolFlowCrntRho(CtrlZoneNum) * TimeStepSys * DataGlobalConstants::SecInHour;
             if (ZoneVolume > 0.0) ZoneMechACH(CtrlZoneNum) = (ZoneOAVolCrntRho(CtrlZoneNum) / TimeStepSys) / ZoneVolume;
 
             // store data for predefined tabular report on outside air

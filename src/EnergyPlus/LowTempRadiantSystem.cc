@@ -515,7 +515,7 @@ namespace LowTempRadiantSystem {
 
             thisRadSys.SchedName = Alphas(2);
             if (lAlphaBlanks(2)) {
-                thisRadSys.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                thisRadSys.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 thisRadSys.SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (thisRadSys.SchedPtr == 0) {
@@ -836,7 +836,7 @@ namespace LowTempRadiantSystem {
 
             thisCFloSys.SchedName = Alphas(2);
             if (lAlphaBlanks(2)) {
-                thisCFloSys.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                thisCFloSys.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 thisCFloSys.SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (thisCFloSys.SchedPtr == 0) {
@@ -1080,7 +1080,7 @@ namespace LowTempRadiantSystem {
 
             thisElecSys.SchedName = Alphas(2);
             if (lAlphaBlanks(2)) {
-                thisElecSys.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                thisElecSys.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 thisElecSys.SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (thisElecSys.SchedPtr == 0) {
@@ -1964,7 +1964,7 @@ namespace LowTempRadiantSystem {
                 if (HydrRadSys(RadSysNum).HotWaterInNode > 0) {
                     rho = GetDensityGlycol(state,
                                            PlantLoop(HydrRadSys(RadSysNum).HWLoopNum).FluidName,
-                                           DataGlobalConstants::HWInitConvTemp(),
+                                           DataGlobalConstants::HWInitConvTemp,
                                            PlantLoop(HydrRadSys(RadSysNum).HWLoopNum).FluidIndex,
                                            RoutineName);
                     HydrRadSys(RadSysNum).WaterFlowMaxHeat = rho * HydrRadSys(RadSysNum).WaterVolFlowMaxHeat;
@@ -1980,7 +1980,7 @@ namespace LowTempRadiantSystem {
                 if (HydrRadSys(RadSysNum).ColdWaterInNode > 0) {
                     rho = GetDensityGlycol(state,
                                            PlantLoop(HydrRadSys(RadSysNum).CWLoopNum).FluidName,
-                                           DataGlobalConstants::CWInitConvTemp(),
+                                           DataGlobalConstants::CWInitConvTemp,
                                            PlantLoop(HydrRadSys(RadSysNum).CWLoopNum).FluidIndex,
                                            RoutineName);
                     HydrRadSys(RadSysNum).WaterFlowMaxCool = rho * HydrRadSys(RadSysNum).WaterVolFlowMaxCool;
@@ -2005,7 +2005,7 @@ namespace LowTempRadiantSystem {
                 if (CFloRadSys(RadSysNum).HotWaterInNode > 0) {
                     rho = GetDensityGlycol(state,
                                            PlantLoop(CFloRadSys(RadSysNum).HWLoopNum).FluidName,
-                                           DataGlobalConstants::HWInitConvTemp(),
+                                           DataGlobalConstants::HWInitConvTemp,
                                            PlantLoop(CFloRadSys(RadSysNum).HWLoopNum).FluidIndex,
                                            RoutineName);
                     CFloRadSys(RadSysNum).HotDesignWaterMassFlowRate = rho * CFloRadSys(RadSysNum).WaterVolFlowMax;
@@ -2021,7 +2021,7 @@ namespace LowTempRadiantSystem {
                 if (CFloRadSys(RadSysNum).ColdWaterInNode > 0) {
                     rho = GetDensityGlycol(state,
                                            PlantLoop(CFloRadSys(RadSysNum).CWLoopNum).FluidName,
-                                           DataGlobalConstants::CWInitConvTemp(),
+                                           DataGlobalConstants::CWInitConvTemp,
                                            PlantLoop(CFloRadSys(RadSysNum).CWLoopNum).FluidIndex,
                                            RoutineName);
                     CFloRadSys(RadSysNum).ColdDesignWaterMassFlowRate = rho * CFloRadSys(RadSysNum).WaterVolFlowMax;
@@ -2347,7 +2347,7 @@ namespace LowTempRadiantSystem {
             // So, the day should be the previous day, the hour should bethe last hour of the
             // day, and the time step should be the last time step.
             this->lastDayOfSim = state.dataGlobal->DayOfSim - 1;
-            this->lastHourOfDay = int(DataGlobalConstants::HoursInDay());
+            this->lastHourOfDay = int(DataGlobalConstants::HoursInDay);
             this->lastTimeStep = state.dataGlobal->NumOfTimeStepInHour;
         } else if (state.dataGlobal->BeginHourFlag) {
             // It's not the beginning of the day but it is the beginning of an hour other than
@@ -2683,12 +2683,12 @@ namespace LowTempRadiantSystem {
                             if (DesCoilLoad >= SmallLoad) {
                                 rho = GetDensityGlycol(state,
                                                        PlantLoop(HydrRadSys(RadSysNum).HWLoopNum).FluidName,
-                                                       DataGlobalConstants::HWInitConvTemp(),
+                                                       DataGlobalConstants::HWInitConvTemp,
                                                        PlantLoop(HydrRadSys(RadSysNum).HWLoopNum).FluidIndex,
                                                        RoutineName);
                                 Cp = GetSpecificHeatGlycol(state,
                                                            PlantLoop(HydrRadSys(RadSysNum).HWLoopNum).FluidName,
-                                                           DataGlobalConstants::HWInitConvTemp(),
+                                                           DataGlobalConstants::HWInitConvTemp,
                                                            PlantLoop(HydrRadSys(RadSysNum).HWLoopNum).FluidIndex,
                                                            RoutineName);
                                 WaterVolFlowMaxHeatDes = DesCoilLoad / (PlantSizData(PltSizHeatNum).DeltaT * Cp * rho);
@@ -2843,12 +2843,12 @@ namespace LowTempRadiantSystem {
                             if (DesCoilLoad >= SmallLoad) {
                                 rho = GetDensityGlycol(state,
                                                        PlantLoop(HydrRadSys(RadSysNum).CWLoopNum).FluidName,
-                                                       DataGlobalConstants::CWInitConvTemp(),
+                                                       DataGlobalConstants::CWInitConvTemp,
                                                        PlantLoop(HydrRadSys(RadSysNum).CWLoopNum).FluidIndex,
                                                        RoutineName);
                                 Cp = GetSpecificHeatGlycol(state,
                                                            PlantLoop(HydrRadSys(RadSysNum).CWLoopNum).FluidName,
-                                                           DataGlobalConstants::CWInitConvTemp(),
+                                                           DataGlobalConstants::CWInitConvTemp,
                                                            PlantLoop(HydrRadSys(RadSysNum).CWLoopNum).FluidIndex,
                                                            RoutineName);
                                 WaterVolFlowMaxCoolDes = DesCoilLoad / (PlantSizData(PltSizCoolNum).DeltaT * Cp * rho);
@@ -2992,12 +2992,12 @@ namespace LowTempRadiantSystem {
                         if (FinalZoneSizing(CurZoneEqNum).NonAirSysDesHeatLoad >= SmallLoad) {
                             rho = GetDensityGlycol(state,
                                                    PlantLoop(CFloRadSys(RadSysNum).HWLoopNum).FluidName,
-                                                   DataGlobalConstants::HWInitConvTemp(),
+                                                   DataGlobalConstants::HWInitConvTemp,
                                                    PlantLoop(CFloRadSys(RadSysNum).HWLoopNum).FluidIndex,
                                                    "SizeLowTempRadiantSystem");
                             Cp = GetSpecificHeatGlycol(state,
                                                        PlantLoop(CFloRadSys(RadSysNum).HWLoopNum).FluidName,
-                                                       DataGlobalConstants::HWInitConvTemp(),
+                                                       DataGlobalConstants::HWInitConvTemp,
                                                        PlantLoop(CFloRadSys(RadSysNum).HWLoopNum).FluidIndex,
                                                        "SizeLowTempRadiantSystem");
                             WaterVolFlowMaxHeatDes =
@@ -3025,12 +3025,12 @@ namespace LowTempRadiantSystem {
                         if (FinalZoneSizing(CurZoneEqNum).NonAirSysDesCoolLoad >= SmallLoad) {
                             rho = GetDensityGlycol(state,
                                                    PlantLoop(CFloRadSys(RadSysNum).CWLoopNum).FluidName,
-                                                   DataGlobalConstants::CWInitConvTemp(),
+                                                   DataGlobalConstants::CWInitConvTemp,
                                                    PlantLoop(CFloRadSys(RadSysNum).CWLoopNum).FluidIndex,
                                                    "SizeLowTempRadiantSystem");
                             Cp = GetSpecificHeatGlycol(state,
                                                        PlantLoop(CFloRadSys(RadSysNum).CWLoopNum).FluidName,
-                                                       DataGlobalConstants::CWInitConvTemp(),
+                                                       DataGlobalConstants::CWInitConvTemp,
                                                        PlantLoop(CFloRadSys(RadSysNum).CWLoopNum).FluidIndex,
                                                        "SizeLowTempRadiantSystem");
                             WaterVolFlowMaxCoolDes =
@@ -4891,12 +4891,12 @@ namespace LowTempRadiantSystem {
     Real64 ConstantFlowRadiantSystemData::calculateCurrentDailyAverageODB(EnergyPlusData& state)
     {
         Real64 sum = 0.0;
-        for (int hourNumber = 1; hourNumber <= DataGlobalConstants::HoursInDay(); ++hourNumber) {
+        for (int hourNumber = 1; hourNumber <= DataGlobalConstants::HoursInDay; ++hourNumber) {
             for (int timeStepNumber = 1; timeStepNumber <= state.dataGlobal->NumOfTimeStepInHour; ++timeStepNumber) {
                 sum += state.dataWeatherManager->TodayOutDryBulbTemp(timeStepNumber, hourNumber);
             }
         }
-        return sum / double(DataGlobalConstants::HoursInDay() * state.dataGlobal->NumOfTimeStepInHour);
+        return sum / double(DataGlobalConstants::HoursInDay * state.dataGlobal->NumOfTimeStepInHour);
     }
 
     void ElectricRadiantSystemData::calculateLowTemperatureRadiantSystem(EnergyPlusData &state,
@@ -5435,11 +5435,11 @@ namespace LowTempRadiantSystem {
             // NTU = UA/[(Mdot*Cp)min]
             // where: U = h (convection coefficient) and h = (k)(Nu)/D
             //        A = DataGlobalConstants::Pi()*D*TubeLength
-            NTU = U * DataGlobalConstants::Pi() * this->TubeDiameterOuter * this->TubeLength / (WaterMassFlow * CpWater); // FlowFraction cancels out here
+            NTU = U * DataGlobalConstants::Pi * this->TubeDiameterOuter * this->TubeLength / (WaterMassFlow * CpWater); // FlowFraction cancels out here
         } else {    // (this->FluidToSlabHeatTransfer == FluidToSlabHeatTransferTypes::ConvectionOnly)
 
             // Calculate the Reynold's number from RE=(4*Mdot)/(Pi*Mu*Diameter)
-            ReD = 4.0 * WaterMassFlow * FlowFraction / (DataGlobalConstants::Pi() * MUactual * this->TubeDiameterInner * NumCircs);
+            ReD = 4.0 * WaterMassFlow * FlowFraction / (DataGlobalConstants::Pi * MUactual * this->TubeDiameterInner * NumCircs);
 
             // Calculate the Nusselt number based on what flow regime one is in
             if (ReD >= MaxLaminarRe) { // Turbulent flow --> use Colburn equation
@@ -5455,7 +5455,7 @@ namespace LowTempRadiantSystem {
             // NTU = UA/[(Mdot*Cp)min]
             // where: U = h (convection coefficient) and h = (k)(Nu)/D
             //        A = Pi*D*TubeLength
-            NTU = DataGlobalConstants::Pi() * Kactual * NuD * this->TubeLength / (WaterMassFlow * CpWater); // FlowFraction cancels out here
+            NTU = DataGlobalConstants::Pi * Kactual * NuD * this->TubeLength / (WaterMassFlow * CpWater); // FlowFraction cancels out here
         }
 
         // Calculate Epsilon*MassFlowRate*Cp
@@ -5488,10 +5488,10 @@ namespace LowTempRadiantSystem {
         // Fluid resistance to heat transfer, assumes turbulent flow (Equation B5, p. 38 of ISO Standard 11855-2)
         Real64 distanceBetweenPipes = 2.0 * state.dataConstruction->Construct(constructionNumber).ThicknessPerpend;
         Real64 ratioDiameterToMassFlowLength = this->TubeDiameterInner / WaterMassFlow / this->TubeLength;
-        Real64 rFluid = 0.125 / DataGlobalConstants::Pi() * std::pow(distanceBetweenPipes, 0.13) * std::pow(ratioDiameterToMassFlowLength,0.87);
+        Real64 rFluid = 0.125 / DataGlobalConstants::Pi * std::pow(distanceBetweenPipes, 0.13) * std::pow(ratioDiameterToMassFlowLength,0.87);
 
         // Resistance to heat transfer (conduction through the piping material, Equation B6, p. 38 of ISO Standard 11855-2)
-        Real64 rTube = 0.5 * distanceBetweenPipes * std::log(this->TubeDiameterOuter/this->TubeDiameterInner) / DataGlobalConstants::Pi() / this->TubeConductivity;
+        Real64 rTube = 0.5 * distanceBetweenPipes * std::log(this->TubeDiameterOuter/this->TubeDiameterInner) / DataGlobalConstants::Pi / this->TubeConductivity;
 
         calculateUFromISOStandard = 1.0 / (rFluid + rTube);
 
@@ -5641,11 +5641,11 @@ namespace LowTempRadiantSystem {
             this->WaterOutletTemp = this->WaterInletTemp;
         }
 
-        this->HeatEnergy = this->HeatPower * TimeStepSys * DataGlobalConstants::SecInHour();
-        this->CoolEnergy = this->CoolPower * TimeStepSys * DataGlobalConstants::SecInHour();
+        this->HeatEnergy = this->HeatPower * TimeStepSys * DataGlobalConstants::SecInHour;
+        this->CoolEnergy = this->CoolPower * TimeStepSys * DataGlobalConstants::SecInHour;
 
         if (this->CondCausedShutDown) {
-            this->CondCausedTimeOff = TimeStepSys * DataGlobalConstants::SecInHour();
+            this->CondCausedTimeOff = TimeStepSys * DataGlobalConstants::SecInHour;
         } else {
             this->CondCausedTimeOff = 0.0;
         }
@@ -5713,13 +5713,13 @@ namespace LowTempRadiantSystem {
             this->PumpHeattoFluid = 0.0;
         }
 
-        this->HeatEnergy = this->HeatPower * TimeStepSys * DataGlobalConstants::SecInHour();
-        this->CoolEnergy = this->CoolPower * TimeStepSys * DataGlobalConstants::SecInHour();
-        this->PumpEnergy = this->PumpPower * TimeStepSys * DataGlobalConstants::SecInHour();
-        this->PumpHeattoFluidEnergy = this->PumpHeattoFluid * TimeStepSys * DataGlobalConstants::SecInHour();
+        this->HeatEnergy = this->HeatPower * TimeStepSys * DataGlobalConstants::SecInHour;
+        this->CoolEnergy = this->CoolPower * TimeStepSys * DataGlobalConstants::SecInHour;
+        this->PumpEnergy = this->PumpPower * TimeStepSys * DataGlobalConstants::SecInHour;
+        this->PumpHeattoFluidEnergy = this->PumpHeattoFluid * TimeStepSys * DataGlobalConstants::SecInHour;
 
         if (this->CondCausedShutDown) {
-            this->CondCausedTimeOff = TimeStepSys * DataGlobalConstants::SecInHour();
+            this->CondCausedTimeOff = TimeStepSys * DataGlobalConstants::SecInHour;
         } else {
             this->CondCausedTimeOff = 0.0;
         }
@@ -5741,7 +5741,7 @@ namespace LowTempRadiantSystem {
         totalRadSysPower *= double(Zone(this->ZonePtr).Multiplier * Zone(this->ZonePtr).ListMultiplier);
 
         this->ElecPower = totalRadSysPower;
-        this->ElecEnergy = this->ElecPower * TimeStepSys * DataGlobalConstants::SecInHour();
+        this->ElecEnergy = this->ElecPower * TimeStepSys * DataGlobalConstants::SecInHour;
         this->HeatPower = this->ElecPower;
         this->HeatEnergy = this->ElecEnergy;
     }

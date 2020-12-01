@@ -315,8 +315,8 @@ namespace UFADManager {
                 ZoneUCSDUI(UINum).CalcTransHeight = false;
             }
             if (ZoneUCSDUI(UINum).DiffuserType == Swirl) {
-                if (ZoneUCSDUI(UINum).A_Kc != DataGlobalConstants::AutoCalculate() || ZoneUCSDUI(UINum).B_Kc != DataGlobalConstants::AutoCalculate() || ZoneUCSDUI(UINum).C_Kc != DataGlobalConstants::AutoCalculate() ||
-                    ZoneUCSDUI(UINum).D_Kc != DataGlobalConstants::AutoCalculate() || ZoneUCSDUI(UINum).E_Kc != DataGlobalConstants::AutoCalculate()) {
+                if (ZoneUCSDUI(UINum).A_Kc != DataGlobalConstants::AutoCalculate || ZoneUCSDUI(UINum).B_Kc != DataGlobalConstants::AutoCalculate || ZoneUCSDUI(UINum).C_Kc != DataGlobalConstants::AutoCalculate ||
+                    ZoneUCSDUI(UINum).D_Kc != DataGlobalConstants::AutoCalculate || ZoneUCSDUI(UINum).E_Kc != DataGlobalConstants::AutoCalculate) {
                     ShowWarningError(state, "For RoomAirSettings:UnderFloorAirDistributionInterior for Zone " + ZoneUCSDUI(UINum).ZoneName +
                                      ", input for Coefficients A - E will be ignored when Floor Diffuser Type = Swirl.");
                     ShowContinueError(state, "  To input these Coefficients, use Floor Diffuser Type = Custom.");
@@ -327,8 +327,8 @@ namespace UFADManager {
                 ZoneUCSDUI(UINum).D_Kc = 0.0069;
                 ZoneUCSDUI(UINum).E_Kc = -0.00004;
             } else if (ZoneUCSDUI(UINum).DiffuserType == VarArea) {
-                if (ZoneUCSDUI(UINum).A_Kc != DataGlobalConstants::AutoCalculate() || ZoneUCSDUI(UINum).B_Kc != DataGlobalConstants::AutoCalculate() || ZoneUCSDUI(UINum).C_Kc != DataGlobalConstants::AutoCalculate() ||
-                    ZoneUCSDUI(UINum).D_Kc != DataGlobalConstants::AutoCalculate() || ZoneUCSDUI(UINum).E_Kc != DataGlobalConstants::AutoCalculate()) {
+                if (ZoneUCSDUI(UINum).A_Kc != DataGlobalConstants::AutoCalculate || ZoneUCSDUI(UINum).B_Kc != DataGlobalConstants::AutoCalculate || ZoneUCSDUI(UINum).C_Kc != DataGlobalConstants::AutoCalculate ||
+                    ZoneUCSDUI(UINum).D_Kc != DataGlobalConstants::AutoCalculate || ZoneUCSDUI(UINum).E_Kc != DataGlobalConstants::AutoCalculate) {
                     ShowWarningError(state, "For RoomAirSettings:UnderFloorAirDistributionInterior for Zone " + ZoneUCSDUI(UINum).ZoneName +
                                      ", input for Coefficients A - E will be ignored when Floor Diffuser Type = VariableArea.");
                     ShowContinueError(state, "  To input these Coefficients, use Floor Diffuser Type = Custom.");
@@ -339,8 +339,8 @@ namespace UFADManager {
                 ZoneUCSDUI(UINum).D_Kc = 0.0;
                 ZoneUCSDUI(UINum).E_Kc = 0.0;
             } else if (ZoneUCSDUI(UINum).DiffuserType == DisplVent) {
-                if (ZoneUCSDUI(UINum).A_Kc != DataGlobalConstants::AutoCalculate() || ZoneUCSDUI(UINum).B_Kc != DataGlobalConstants::AutoCalculate() || ZoneUCSDUI(UINum).C_Kc != DataGlobalConstants::AutoCalculate() ||
-                    ZoneUCSDUI(UINum).D_Kc != DataGlobalConstants::AutoCalculate() || ZoneUCSDUI(UINum).E_Kc != DataGlobalConstants::AutoCalculate()) {
+                if (ZoneUCSDUI(UINum).A_Kc != DataGlobalConstants::AutoCalculate || ZoneUCSDUI(UINum).B_Kc != DataGlobalConstants::AutoCalculate || ZoneUCSDUI(UINum).C_Kc != DataGlobalConstants::AutoCalculate ||
+                    ZoneUCSDUI(UINum).D_Kc != DataGlobalConstants::AutoCalculate || ZoneUCSDUI(UINum).E_Kc != DataGlobalConstants::AutoCalculate) {
                     ShowWarningError(state, "For RoomAirSettings:UnderFloorAirDistributionInterior for Zone " + ZoneUCSDUI(UINum).ZoneName +
                                      ", input for Coefficients A - E will be ignored when Floor Diffuser Type = HorizontalDisplacement.");
                     ShowContinueError(state, "  To input these Coefficients, use Floor Diffuser Type = Custom.");
@@ -351,8 +351,8 @@ namespace UFADManager {
                 ZoneUCSDUI(UINum).D_Kc = 0.0;
                 ZoneUCSDUI(UINum).E_Kc = 0.0;
             } else if (ZoneUCSDUI(UINum).DiffuserType == LinBarGrille) {
-                if (ZoneUCSDUI(UINum).A_Kc != DataGlobalConstants::AutoCalculate() || ZoneUCSDUI(UINum).B_Kc != DataGlobalConstants::AutoCalculate() || ZoneUCSDUI(UINum).C_Kc != DataGlobalConstants::AutoCalculate() ||
-                    ZoneUCSDUI(UINum).D_Kc != DataGlobalConstants::AutoCalculate() || ZoneUCSDUI(UINum).E_Kc != DataGlobalConstants::AutoCalculate()) {
+                if (ZoneUCSDUI(UINum).A_Kc != DataGlobalConstants::AutoCalculate || ZoneUCSDUI(UINum).B_Kc != DataGlobalConstants::AutoCalculate || ZoneUCSDUI(UINum).C_Kc != DataGlobalConstants::AutoCalculate ||
+                    ZoneUCSDUI(UINum).D_Kc != DataGlobalConstants::AutoCalculate || ZoneUCSDUI(UINum).E_Kc != DataGlobalConstants::AutoCalculate) {
                     ShowWarningError(state, "For RoomAirSettings:UnderFloorAirDistributionInterior for Zone " + ZoneUCSDUI(UINum).ZoneName +
                                      ", input for Coefficients A - E will be ignored when Floor Diffuser Type = LinearBarGrille.");
                     ShowContinueError(state, "  To input these Coefficients, use Floor Diffuser Type = Custom.");
@@ -363,13 +363,13 @@ namespace UFADManager {
                 ZoneUCSDUI(UINum).D_Kc = 0.0;
                 ZoneUCSDUI(UINum).E_Kc = 0.0;
             } else {
-                if (ZoneUCSDUI(UINum).A_Kc == DataGlobalConstants::AutoCalculate() || ZoneUCSDUI(UINum).B_Kc == DataGlobalConstants::AutoCalculate() || ZoneUCSDUI(UINum).C_Kc == DataGlobalConstants::AutoCalculate() ||
-                    ZoneUCSDUI(UINum).D_Kc == DataGlobalConstants::AutoCalculate() || ZoneUCSDUI(UINum).E_Kc == DataGlobalConstants::AutoCalculate()) {
+                if (ZoneUCSDUI(UINum).A_Kc == DataGlobalConstants::AutoCalculate || ZoneUCSDUI(UINum).B_Kc == DataGlobalConstants::AutoCalculate || ZoneUCSDUI(UINum).C_Kc == DataGlobalConstants::AutoCalculate ||
+                    ZoneUCSDUI(UINum).D_Kc == DataGlobalConstants::AutoCalculate || ZoneUCSDUI(UINum).E_Kc == DataGlobalConstants::AutoCalculate) {
                     ShowFatalError(state, "For RoomAirSettings:UnderFloorAirDistributionInterior for Zone " + ZoneUCSDUI(UINum).ZoneName +
                                    ", input for Coefficients A - E must be specified when Floor Diffuser Type = Custom.");
                 }
             }
-            if (ZoneUCSDUI(UINum).PowerPerPlume == DataGlobalConstants::AutoCalculate()) {
+            if (ZoneUCSDUI(UINum).PowerPerPlume == DataGlobalConstants::AutoCalculate) {
                 NumberOfPlumes = 0.0;
                 if (NumberOfOccupants > 0.0) {
                     NumberOfPlumes = NumberOfOccupants;
@@ -491,8 +491,8 @@ namespace UFADManager {
                 ZoneUCSDUE(UINum).CalcTransHeight = false;
             }
             if (ZoneUCSDUE(UINum).DiffuserType == Swirl) {
-                if (ZoneUCSDUE(UINum).A_Kc != DataGlobalConstants::AutoCalculate() || ZoneUCSDUE(UINum).B_Kc != DataGlobalConstants::AutoCalculate() || ZoneUCSDUE(UINum).C_Kc != DataGlobalConstants::AutoCalculate() ||
-                    ZoneUCSDUE(UINum).D_Kc != DataGlobalConstants::AutoCalculate() || ZoneUCSDUE(UINum).E_Kc != DataGlobalConstants::AutoCalculate()) {
+                if (ZoneUCSDUE(UINum).A_Kc != DataGlobalConstants::AutoCalculate || ZoneUCSDUE(UINum).B_Kc != DataGlobalConstants::AutoCalculate || ZoneUCSDUE(UINum).C_Kc != DataGlobalConstants::AutoCalculate ||
+                    ZoneUCSDUE(UINum).D_Kc != DataGlobalConstants::AutoCalculate || ZoneUCSDUE(UINum).E_Kc != DataGlobalConstants::AutoCalculate) {
                     ShowWarningError(state, "For RoomAirSettings:UnderFloorAirDistributionExterior for Zone " + ZoneUCSDUE(UINum).ZoneName +
                                      ", input for Coefficients A - E will be ignored when Floor Diffuser Type = Swirl.");
                     ShowContinueError(state, "  To input these Coefficients, use Floor Diffuser Type = Custom.");
@@ -503,8 +503,8 @@ namespace UFADManager {
                 ZoneUCSDUE(UINum).D_Kc = 0.0069;
                 ZoneUCSDUE(UINum).E_Kc = -0.00004;
             } else if (ZoneUCSDUE(UINum).DiffuserType == VarArea) {
-                if (ZoneUCSDUE(UINum).A_Kc != DataGlobalConstants::AutoCalculate() || ZoneUCSDUE(UINum).B_Kc != DataGlobalConstants::AutoCalculate() || ZoneUCSDUE(UINum).C_Kc != DataGlobalConstants::AutoCalculate() ||
-                    ZoneUCSDUE(UINum).D_Kc != DataGlobalConstants::AutoCalculate() || ZoneUCSDUE(UINum).E_Kc != DataGlobalConstants::AutoCalculate()) {
+                if (ZoneUCSDUE(UINum).A_Kc != DataGlobalConstants::AutoCalculate || ZoneUCSDUE(UINum).B_Kc != DataGlobalConstants::AutoCalculate || ZoneUCSDUE(UINum).C_Kc != DataGlobalConstants::AutoCalculate ||
+                    ZoneUCSDUE(UINum).D_Kc != DataGlobalConstants::AutoCalculate || ZoneUCSDUE(UINum).E_Kc != DataGlobalConstants::AutoCalculate) {
                     ShowWarningError(state, "For RoomAirSettings:UnderFloorAirDistributionExterior for Zone " + ZoneUCSDUE(UINum).ZoneName +
                                      ", input for Coefficients A - E will be ignored when Floor Diffuser Type = VariableArea.");
                     ShowContinueError(state, "  To input these Coefficients, use Floor Diffuser Type = Custom.");
@@ -515,8 +515,8 @@ namespace UFADManager {
                 ZoneUCSDUE(UINum).D_Kc = 0.0;
                 ZoneUCSDUE(UINum).E_Kc = 0.0;
             } else if (ZoneUCSDUE(UINum).DiffuserType == DisplVent) {
-                if (ZoneUCSDUE(UINum).A_Kc != DataGlobalConstants::AutoCalculate() || ZoneUCSDUE(UINum).B_Kc != DataGlobalConstants::AutoCalculate() || ZoneUCSDUE(UINum).C_Kc != DataGlobalConstants::AutoCalculate() ||
-                    ZoneUCSDUE(UINum).D_Kc != DataGlobalConstants::AutoCalculate() || ZoneUCSDUE(UINum).E_Kc != DataGlobalConstants::AutoCalculate()) {
+                if (ZoneUCSDUE(UINum).A_Kc != DataGlobalConstants::AutoCalculate || ZoneUCSDUE(UINum).B_Kc != DataGlobalConstants::AutoCalculate || ZoneUCSDUE(UINum).C_Kc != DataGlobalConstants::AutoCalculate ||
+                    ZoneUCSDUE(UINum).D_Kc != DataGlobalConstants::AutoCalculate || ZoneUCSDUE(UINum).E_Kc != DataGlobalConstants::AutoCalculate) {
                     ShowWarningError(state, "For RoomAirSettings:UnderFloorAirDistributionExterior for Zone " + ZoneUCSDUE(UINum).ZoneName +
                                      ", input for Coefficients A - E will be ignored when Floor Diffuser Type = HorizontalDisplacement.");
                     ShowContinueError(state, "  To input these Coefficients, use Floor Diffuser Type = Custom.");
@@ -527,8 +527,8 @@ namespace UFADManager {
                 ZoneUCSDUE(UINum).D_Kc = 0.0;
                 ZoneUCSDUE(UINum).E_Kc = 0.0;
             } else if (ZoneUCSDUE(UINum).DiffuserType == LinBarGrille) {
-                if (ZoneUCSDUE(UINum).A_Kc != DataGlobalConstants::AutoCalculate() || ZoneUCSDUE(UINum).B_Kc != DataGlobalConstants::AutoCalculate() || ZoneUCSDUE(UINum).C_Kc != DataGlobalConstants::AutoCalculate() ||
-                    ZoneUCSDUE(UINum).D_Kc != DataGlobalConstants::AutoCalculate() || ZoneUCSDUE(UINum).E_Kc != DataGlobalConstants::AutoCalculate()) {
+                if (ZoneUCSDUE(UINum).A_Kc != DataGlobalConstants::AutoCalculate || ZoneUCSDUE(UINum).B_Kc != DataGlobalConstants::AutoCalculate || ZoneUCSDUE(UINum).C_Kc != DataGlobalConstants::AutoCalculate ||
+                    ZoneUCSDUE(UINum).D_Kc != DataGlobalConstants::AutoCalculate || ZoneUCSDUE(UINum).E_Kc != DataGlobalConstants::AutoCalculate) {
                     ShowWarningError(state, "For RoomAirSettings:UnderFloorAirDistributionExterior for Zone " + ZoneUCSDUE(UINum).ZoneName +
                                      ", input for Coefficients A - E will be ignored when Floor Diffuser Type = LinearBarGrille.");
                     ShowContinueError(state, "  To input these Coefficients, use Floor Diffuser Type = Custom.");
@@ -539,13 +539,13 @@ namespace UFADManager {
                 ZoneUCSDUE(UINum).D_Kc = -0.0263;
                 ZoneUCSDUE(UINum).E_Kc = 0.0014;
             } else {
-                if (ZoneUCSDUE(UINum).A_Kc == DataGlobalConstants::AutoCalculate() || ZoneUCSDUE(UINum).B_Kc == DataGlobalConstants::AutoCalculate() || ZoneUCSDUE(UINum).C_Kc == DataGlobalConstants::AutoCalculate() ||
-                    ZoneUCSDUE(UINum).D_Kc == DataGlobalConstants::AutoCalculate() || ZoneUCSDUE(UINum).E_Kc == DataGlobalConstants::AutoCalculate()) {
+                if (ZoneUCSDUE(UINum).A_Kc == DataGlobalConstants::AutoCalculate || ZoneUCSDUE(UINum).B_Kc == DataGlobalConstants::AutoCalculate || ZoneUCSDUE(UINum).C_Kc == DataGlobalConstants::AutoCalculate ||
+                    ZoneUCSDUE(UINum).D_Kc == DataGlobalConstants::AutoCalculate || ZoneUCSDUE(UINum).E_Kc == DataGlobalConstants::AutoCalculate) {
                     ShowFatalError(state, "For RoomAirSettings:UnderFloorAirDistributionExterior for Zone " + ZoneUCSDUE(UINum).ZoneName +
                                    ", input for Coefficients A - E must be specified when Floor Diffuser Type = Custom.");
                 }
             }
-            if (ZoneUCSDUE(UINum).PowerPerPlume == DataGlobalConstants::AutoCalculate()) {
+            if (ZoneUCSDUE(UINum).PowerPerPlume == DataGlobalConstants::AutoCalculate) {
                 if (NumberOfOccupants > 0) {
                     NumberOfPlumes = NumberOfOccupants;
                 } else {
@@ -1046,7 +1046,7 @@ namespace UFADManager {
         HeightComfort = ZoneUCSDUI(UINum).ComfortHeight;
         TempDiffCritRep = ZoneUCSDUI(UINum).TempTrigger;
         DiffArea = ZoneUCSDUI(UINum).DiffArea;
-        ThrowAngle = DataGlobalConstants::DegToRadians() * ZoneUCSDUI(UINum).DiffAngle;
+        ThrowAngle = DataGlobalConstants::DegToRadians * ZoneUCSDUI(UINum).DiffAngle;
         SourceHeight = 0.0;
         NumDiffusers = ZoneUCSDUI(UINum).DiffusersPerZone;
         PowerPerPlume = ZoneUCSDUI(UINum).PowerPerPlume;
@@ -1086,7 +1086,7 @@ namespace UFADManager {
                 SumSysM += MassFlowRate;
             }
             if (TotSysFlow > 0.0) {
-                TSupK = TSupK / SumSysM + DataGlobalConstants::KelvinConv();
+                TSupK = TSupK / SumSysM + DataGlobalConstants::KelvinConv;
             } else {
                 TSupK = 0.0;
             }
@@ -1115,7 +1115,7 @@ namespace UFADManager {
             NumberOfPlumes = 1.0;
             NumDiffusersPerPlume = 1.0;
         }
-        if ((PowerInPlumes <= 0.0) || (TotSysFlow == 0.0) || (TSupK - DataGlobalConstants::KelvinConv()) > MAT(ZoneNum)) {
+        if ((PowerInPlumes <= 0.0) || (TotSysFlow == 0.0) || (TSupK - DataGlobalConstants::KelvinConv) > MAT(ZoneNum)) {
             // The system will mix
             HeightFrac = 0.0;
         } else {
@@ -1152,10 +1152,10 @@ namespace UFADManager {
                 GainsFrac = max(0.6, min(GainsFrac, 1.0));
                 AIRRATOC(ZoneNum) = Zone(ZoneNum).Volume * (HeightTransition(ZoneNum) - min(HeightTransition(ZoneNum), 0.2)) / CeilingHeight *
                                     Zone(ZoneNum).ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, MATOC(ZoneNum), ZoneAirHumRat(ZoneNum)) *
-                                    PsyCpAirFnW(ZoneAirHumRat(ZoneNum)) / (TimeStepSys * DataGlobalConstants::SecInHour());
+                                    PsyCpAirFnW(ZoneAirHumRat(ZoneNum)) / (TimeStepSys * DataGlobalConstants::SecInHour);
                 AIRRATMX(ZoneNum) = Zone(ZoneNum).Volume * (CeilingHeight - HeightTransition(ZoneNum)) / CeilingHeight *
                                     Zone(ZoneNum).ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, MATMX(ZoneNum), ZoneAirHumRat(ZoneNum)) *
-                                    PsyCpAirFnW(ZoneAirHumRat(ZoneNum)) / (TimeStepSys * DataGlobalConstants::SecInHour());
+                                    PsyCpAirFnW(ZoneAirHumRat(ZoneNum)) / (TimeStepSys * DataGlobalConstants::SecInHour);
 
                 if (UseZoneTimeStepHistory) {
                     ZTM3OC(ZoneNum) = XM3TOC(ZoneNum);
@@ -1352,7 +1352,7 @@ namespace UFADManager {
         if (MIXFLAG) {
             Phi(ZoneNum) = 1.0;
         } else {
-            Phi(ZoneNum) = (ZTOC(ZoneNum) - (TSupK - DataGlobalConstants::KelvinConv())) / (ZTMX(ZoneNum) - (TSupK - DataGlobalConstants::KelvinConv()));
+            Phi(ZoneNum) = (ZTOC(ZoneNum) - (TSupK - DataGlobalConstants::KelvinConv)) / (ZTMX(ZoneNum) - (TSupK - DataGlobalConstants::KelvinConv));
         }
 
         // Mixed for reporting purposes
@@ -1524,7 +1524,7 @@ namespace UFADManager {
         HeightComfort = ZoneUCSDUE(UINum).ComfortHeight;
         TempDiffCritRep = ZoneUCSDUE(UINum).TempTrigger;
         DiffArea = ZoneUCSDUE(UINum).DiffArea;
-        ThrowAngle = DataGlobalConstants::DegToRadians() * ZoneUCSDUE(UINum).DiffAngle;
+        ThrowAngle = DataGlobalConstants::DegToRadians * ZoneUCSDUE(UINum).DiffAngle;
         SourceHeight = ZoneUCSDUE(UINum).HeatSrcHeight;
         NumDiffusers = ZoneUCSDUE(UINum).DiffusersPerZone;
         PowerPerPlume = ZoneUCSDUE(UINum).PowerPerPlume;
@@ -1563,7 +1563,7 @@ namespace UFADManager {
                 SumSysM += MassFlowRate;
             }
             if (TotSysFlow > 0.0) {
-                TSupK = TSupK / SumSysM + DataGlobalConstants::KelvinConv();
+                TSupK = TSupK / SumSysM + DataGlobalConstants::KelvinConv;
             } else {
                 TSupK = 0.0;
             }
@@ -1595,7 +1595,7 @@ namespace UFADManager {
             NumberOfPlumes = 1.0;
             NumDiffusersPerPlume = 1.0;
         }
-        if ((PowerInPlumes <= 0.0) || (TotSysFlow == 0.0) || (TSupK - DataGlobalConstants::KelvinConv()) > MAT(ZoneNum)) {
+        if ((PowerInPlumes <= 0.0) || (TotSysFlow == 0.0) || (TSupK - DataGlobalConstants::KelvinConv) > MAT(ZoneNum)) {
             // The system will mix
             HeightFrac = 0.0;
         } else {
@@ -1664,10 +1664,10 @@ namespace UFADManager {
                 }
                 AIRRATOC(ZoneNum) = Zone(ZoneNum).Volume * (HeightTransition(ZoneNum) - min(HeightTransition(ZoneNum), 0.2)) / CeilingHeight *
                                     Zone(ZoneNum).ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, MATOC(ZoneNum), ZoneAirHumRat(ZoneNum)) *
-                                    PsyCpAirFnW(ZoneAirHumRat(ZoneNum)) / (TimeStepSys * DataGlobalConstants::SecInHour());
+                                    PsyCpAirFnW(ZoneAirHumRat(ZoneNum)) / (TimeStepSys * DataGlobalConstants::SecInHour);
                 AIRRATMX(ZoneNum) = Zone(ZoneNum).Volume * (CeilingHeight - HeightTransition(ZoneNum)) / CeilingHeight *
                                     Zone(ZoneNum).ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, MATMX(ZoneNum), ZoneAirHumRat(ZoneNum)) *
-                                    PsyCpAirFnW(ZoneAirHumRat(ZoneNum)) / (TimeStepSys * DataGlobalConstants::SecInHour());
+                                    PsyCpAirFnW(ZoneAirHumRat(ZoneNum)) / (TimeStepSys * DataGlobalConstants::SecInHour);
 
                 if (UseZoneTimeStepHistory) {
                     ZTM3OC(ZoneNum) = XM3TOC(ZoneNum);
@@ -1866,7 +1866,7 @@ namespace UFADManager {
         if (MIXFLAG) {
             Phi(ZoneNum) = 1.0;
         } else {
-            Phi(ZoneNum) = (ZTOC(ZoneNum) - (TSupK - DataGlobalConstants::KelvinConv())) / (ZTMX(ZoneNum) - (TSupK - DataGlobalConstants::KelvinConv()));
+            Phi(ZoneNum) = (ZTOC(ZoneNum) - (TSupK - DataGlobalConstants::KelvinConv)) / (ZTMX(ZoneNum) - (TSupK - DataGlobalConstants::KelvinConv));
         }
 
         // Mixed for reporting purposes

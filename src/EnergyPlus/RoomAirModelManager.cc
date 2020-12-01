@@ -399,7 +399,7 @@ namespace RoomAirModelManager {
 
             AirPatternZoneInfo(ZoneNum).AvailSched = cAlphaArgs(3);
             if (lAlphaFieldBlanks(3)) {
-                AirPatternZoneInfo(ZoneNum).AvailSchedID = DataGlobalConstants::ScheduleAlwaysOn();
+                AirPatternZoneInfo(ZoneNum).AvailSchedID = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 AirPatternZoneInfo(ZoneNum).AvailSchedID = GetScheduleIndex(state, cAlphaArgs(3));
                 if (AirPatternZoneInfo(ZoneNum).AvailSchedID == 0) {

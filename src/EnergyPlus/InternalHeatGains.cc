@@ -615,7 +615,7 @@ namespace InternalHeatGains {
                     if (NumNumber >= 5 && !lNumericFieldBlanks(5)) {
                         People(Loop).UserSpecSensFrac = IHGNumbers(5);
                     } else {
-                        People(Loop).UserSpecSensFrac = DataGlobalConstants::AutoCalculate();
+                        People(Loop).UserSpecSensFrac = DataGlobalConstants::AutoCalculate;
                     }
 
                     if (NumNumber == 6 && !lNumericFieldBlanks(6)) {
@@ -3788,7 +3788,7 @@ namespace InternalHeatGains {
                 }
 
                 if (lAlphaFieldBlanks(5)) {
-                    ZoneITEq(Loop).OperSchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                    ZoneITEq(Loop).OperSchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
                 } else {
                     ZoneITEq(Loop).OperSchedPtr = GetScheduleIndex(state, AlphaName(5));
                 }
@@ -3818,7 +3818,7 @@ namespace InternalHeatGains {
                 }
 
                 if (lAlphaFieldBlanks(6)) {
-                    ZoneITEq(Loop).CPULoadSchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                    ZoneITEq(Loop).CPULoadSchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
                 } else {
                     ZoneITEq(Loop).CPULoadSchedPtr = GetScheduleIndex(state, AlphaName(6));
                 }
@@ -4866,7 +4866,7 @@ namespace InternalHeatGains {
 
             print(state.files.eio, "{:.3R},", People(Loop).FractionRadiant);
             print(state.files.eio, "{:.3R},", People(Loop).FractionConvected);
-            if (People(Loop).UserSpecSensFrac == DataGlobalConstants::AutoCalculate()) {
+            if (People(Loop).UserSpecSensFrac == DataGlobalConstants::AutoCalculate) {
                 print(state.files.eio, "AutoCalculate,");
             } else {
                 print(state.files.eio, "{:.3R},", People(Loop).UserSpecSensFrac);
@@ -5388,7 +5388,7 @@ namespace InternalHeatGains {
                 ActivityLevel_WperPerson = GetCurrentScheduleValue(state, People(Loop).ActivityLevelPtr);
                 TotalPeopleGain = NumberOccupants * ActivityLevel_WperPerson;
                 // if the user did not specify a sensible fraction, calculate the sensible heat gain
-                if (People(Loop).UserSpecSensFrac == DataGlobalConstants::AutoCalculate()) {
+                if (People(Loop).UserSpecSensFrac == DataGlobalConstants::AutoCalculate) {
                     if (!(IsZoneDV(NZ) || IsZoneUI(NZ))) {
                         SensiblePeopleGain =
                             NumberOccupants * (C(1) + ActivityLevel_WperPerson * (C(2) + ActivityLevel_WperPerson * C(3)) +

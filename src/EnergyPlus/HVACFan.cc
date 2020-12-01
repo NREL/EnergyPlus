@@ -428,7 +428,7 @@ namespace HVACFan {
         m_fanType = locCurrentModuleObject;
         m_fanType_Num = DataHVACGlobals::FanType_SystemModelObject;
         if (isAlphaFieldBlank(2)) {
-            availSchedIndex = DataGlobalConstants::ScheduleAlwaysOn();
+            availSchedIndex = DataGlobalConstants::ScheduleAlwaysOn;
         } else {
             availSchedIndex = ScheduleManager::GetScheduleIndex(state, alphaArgs(2));
             if (availSchedIndex == 0) {
@@ -1082,7 +1082,7 @@ namespace HVACFan {
 
     void FanSystem::report()
     {
-        m_fanEnergy = m_fanPower * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+        m_fanEnergy = m_fanPower * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
         m_deltaTemp = m_outletAirTemp - m_inletAirTemp;
     }
 

@@ -347,7 +347,7 @@ namespace HighTempRadiantSystem {
 
             HighTempRadSys(Item).SchedName = cAlphaArgs(2);
             if (lAlphaFieldBlanks(2)) {
-                HighTempRadSys(Item).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                HighTempRadSys(Item).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 HighTempRadSys(Item).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (HighTempRadSys(Item).SchedPtr == 0) {
@@ -1452,19 +1452,19 @@ namespace HighTempRadiantSystem {
         // FLOW:
         if (HighTempRadSys(RadSysNum).HeaterType == Gas) {
             HighTempRadSys(RadSysNum).GasPower = QHTRadSource(RadSysNum) / HighTempRadSys(RadSysNum).CombustionEffic;
-            HighTempRadSys(RadSysNum).GasEnergy = HighTempRadSys(RadSysNum).GasPower * TimeStepSys * DataGlobalConstants::SecInHour();
+            HighTempRadSys(RadSysNum).GasEnergy = HighTempRadSys(RadSysNum).GasPower * TimeStepSys * DataGlobalConstants::SecInHour;
             HighTempRadSys(RadSysNum).ElecPower = 0.0;
             HighTempRadSys(RadSysNum).ElecEnergy = 0.0;
         } else if (HighTempRadSys(RadSysNum).HeaterType == Electric) {
             HighTempRadSys(RadSysNum).GasPower = 0.0;
             HighTempRadSys(RadSysNum).GasEnergy = 0.0;
             HighTempRadSys(RadSysNum).ElecPower = QHTRadSource(RadSysNum);
-            HighTempRadSys(RadSysNum).ElecEnergy = HighTempRadSys(RadSysNum).ElecPower * TimeStepSys * DataGlobalConstants::SecInHour();
+            HighTempRadSys(RadSysNum).ElecEnergy = HighTempRadSys(RadSysNum).ElecPower * TimeStepSys * DataGlobalConstants::SecInHour;
         } else {
             ShowWarningError(state, "Someone forgot to add a high temperature radiant heater type to the reporting subroutine");
         }
         HighTempRadSys(RadSysNum).HeatPower = QHTRadSource(RadSysNum);
-        HighTempRadSys(RadSysNum).HeatEnergy = HighTempRadSys(RadSysNum).HeatPower * TimeStepSys * DataGlobalConstants::SecInHour();
+        HighTempRadSys(RadSysNum).HeatEnergy = HighTempRadSys(RadSysNum).HeatPower * TimeStepSys * DataGlobalConstants::SecInHour;
     }
 
     Real64 SumHATsurf(int const ZoneNum) // Zone number

@@ -1804,7 +1804,7 @@ namespace DataHeatBalance {
             // Minimum and maximum slat angles allowed by slat geometry
             if (Blind(TotBlinds).SlatWidth > Blind(TotBlinds).SlatSeparation) {
                 MinSlatAngGeom =
-                    std::asin(Blind(TotBlinds).SlatThickness / (Blind(TotBlinds).SlatThickness + Blind(TotBlinds).SlatSeparation)) / DataGlobalConstants::DegToRadians();
+                    std::asin(Blind(TotBlinds).SlatThickness / (Blind(TotBlinds).SlatThickness + Blind(TotBlinds).SlatSeparation)) / DataGlobalConstants::DegToRadians;
             } else {
                 MinSlatAngGeom = 0.0;
             }
@@ -1978,22 +1978,22 @@ namespace DataHeatBalance {
 
         if (present(Theta)) {
             SunAzimuthToScreenNormal = std::abs(Theta);
-            if (SunAzimuthToScreenNormal > DataGlobalConstants::Pi()) {
+            if (SunAzimuthToScreenNormal > DataGlobalConstants::Pi) {
                 SunAzimuthToScreenNormal = 0.0;
             } else {
-                if (SunAzimuthToScreenNormal > DataGlobalConstants::PiOvr2()) {
-                    SunAzimuthToScreenNormal = DataGlobalConstants::Pi() - SunAzimuthToScreenNormal;
+                if (SunAzimuthToScreenNormal > DataGlobalConstants::PiOvr2) {
+                    SunAzimuthToScreenNormal = DataGlobalConstants::Pi - SunAzimuthToScreenNormal;
                 }
             }
             NormalAzimuth = SunAzimuthToScreenNormal;
         } else {
             SunAzimuth = std::atan2(state.dataEnvrn->SOLCOS(1), state.dataEnvrn->SOLCOS(2));
-            if (SunAzimuth < 0.0) SunAzimuth += 2.0 * DataGlobalConstants::Pi();
-            SurfaceAzimuth = Surface(SurfaceNum).Azimuth * DataGlobalConstants::DegToRadians();
+            if (SunAzimuth < 0.0) SunAzimuth += 2.0 * DataGlobalConstants::Pi;
+            SurfaceAzimuth = Surface(SurfaceNum).Azimuth * DataGlobalConstants::DegToRadians;
             NormalAzimuth = SunAzimuth - SurfaceAzimuth;
             //   Calculate the transmittance whether sun is in front of or behind screen, place result in BmBmTrans or BmBmTransBack
-            if (std::abs(SunAzimuth - SurfaceAzimuth) > DataGlobalConstants::PiOvr2()) {
-                SunAzimuthToScreenNormal = std::abs(SunAzimuth - SurfaceAzimuth) - DataGlobalConstants::PiOvr2();
+            if (std::abs(SunAzimuth - SurfaceAzimuth) > DataGlobalConstants::PiOvr2) {
+                SunAzimuthToScreenNormal = std::abs(SunAzimuth - SurfaceAzimuth) - DataGlobalConstants::PiOvr2;
             } else {
                 SunAzimuthToScreenNormal = std::abs(SunAzimuth - SurfaceAzimuth);
             }
@@ -2001,23 +2001,23 @@ namespace DataHeatBalance {
 
         if (present(Phi)) {
             SunAltitudeToScreenNormal = std::abs(Phi);
-            if (SunAltitudeToScreenNormal > DataGlobalConstants::PiOvr2()) {
-                SunAltitudeToScreenNormal = DataGlobalConstants::Pi() - SunAltitudeToScreenNormal;
+            if (SunAltitudeToScreenNormal > DataGlobalConstants::PiOvr2) {
+                SunAltitudeToScreenNormal = DataGlobalConstants::Pi - SunAltitudeToScreenNormal;
             }
             SunAltitude = SunAltitudeToScreenNormal;
         } else {
-            SunAltitude = (DataGlobalConstants::PiOvr2() - std::acos(state.dataEnvrn->SOLCOS(3)));
-            SurfaceTilt = Surface(SurfaceNum).Tilt * DataGlobalConstants::DegToRadians();
-            SunAltitudeToScreenNormal = std::abs(SunAltitude + (SurfaceTilt - DataGlobalConstants::PiOvr2()));
-            if (SunAltitudeToScreenNormal > DataGlobalConstants::PiOvr2()) {
-                SunAltitudeToScreenNormal -= DataGlobalConstants::PiOvr2();
+            SunAltitude = (DataGlobalConstants::PiOvr2 - std::acos(state.dataEnvrn->SOLCOS(3)));
+            SurfaceTilt = Surface(SurfaceNum).Tilt * DataGlobalConstants::DegToRadians;
+            SunAltitudeToScreenNormal = std::abs(SunAltitude + (SurfaceTilt - DataGlobalConstants::PiOvr2));
+            if (SunAltitudeToScreenNormal > DataGlobalConstants::PiOvr2) {
+                SunAltitudeToScreenNormal -= DataGlobalConstants::PiOvr2;
             }
         }
 
         if (SurfaceNum == 0 || !present(ScreenNumber)) {
             NormalAltitude = SunAltitude;
         } else {
-            NormalAltitude = SunAltitude + (SurfaceTilt - DataGlobalConstants::PiOvr2());
+            NormalAltitude = SunAltitude + (SurfaceTilt - DataGlobalConstants::PiOvr2);
         }
 
         if (NormalAltitude != 0.0 && NormalAzimuth != 0.0) {
@@ -2038,11 +2038,11 @@ namespace DataHeatBalance {
         // ************************************************************************************************
 
         // calculate compliment of relative solar azimuth
-        Beta = DataGlobalConstants::PiOvr2() - SunAzimuthToScreenNormal;
+        Beta = DataGlobalConstants::PiOvr2 - SunAzimuthToScreenNormal;
 
         // Catch all divide by zero instances
         if (Beta > Small) {
-            if (std::abs(SunAltitudeToScreenNormal - DataGlobalConstants::PiOvr2()) > Small) {
+            if (std::abs(SunAltitudeToScreenNormal - DataGlobalConstants::PiOvr2) > Small) {
                 AlphaDblPrime = std::atan(std::tan(SunAltitudeToScreenNormal) / std::cos(SunAzimuthToScreenNormal));
                 TransYDir = 1.0 - Gamma * (std::cos(AlphaDblPrime) + std::sin(AlphaDblPrime) * std::tan(SunAltitudeToScreenNormal) *
                                                                          std::sqrt(1.0 + pow_2(1.0 / std::tan(Beta))));
@@ -2058,7 +2058,7 @@ namespace DataHeatBalance {
                           pow_2(std::sin(SunAltitudeToScreenNormal)));
         if (COSMu > Small) {
             Epsilon = std::acos(std::cos(SunAltitudeToScreenNormal) * std::cos(SunAzimuthToScreenNormal) / COSMu);
-            Eta = DataGlobalConstants::PiOvr2() - Epsilon;
+            Eta = DataGlobalConstants::PiOvr2 - Epsilon;
             if (std::cos(Epsilon) != 0.0) {
                 MuPrime = std::atan(std::tan(std::acos(COSMu)) / std::cos(Epsilon));
                 if (Eta != 0.0) {
@@ -2083,13 +2083,13 @@ namespace DataHeatBalance {
         ReflectCyl = SurfaceScreens(ScNum).ReflectCylinder;
         ReflectCylVis = SurfaceScreens(ScNum).ReflectCylinderVis;
 
-        if (std::abs(SunAzimuthToScreenNormal - DataGlobalConstants::PiOvr2()) < Small || std::abs(SunAltitudeToScreenNormal - DataGlobalConstants::PiOvr2()) < Small) {
+        if (std::abs(SunAzimuthToScreenNormal - DataGlobalConstants::PiOvr2) < Small || std::abs(SunAltitudeToScreenNormal - DataGlobalConstants::PiOvr2) < Small) {
             Tscattered = 0.0;
             TscatteredVis = 0.0;
         } else {
             //   DeltaMax and Delta are in degrees
             DeltaMax = 89.7 - (10.0 * Gamma / 0.16);
-            Delta = std::sqrt(pow_2(SunAzimuthToScreenNormal / DataGlobalConstants::DegToRadians()) + pow_2(SunAltitudeToScreenNormal / DataGlobalConstants::DegToRadians()));
+            Delta = std::sqrt(pow_2(SunAzimuthToScreenNormal / DataGlobalConstants::DegToRadians) + pow_2(SunAltitudeToScreenNormal / DataGlobalConstants::DegToRadians));
 
             //   Use empirical model to determine maximum (peak) scattering
             Tscattermax = 0.0229 * Gamma + 0.2971 * ReflectCyl - 0.03624 * pow_2(Gamma) + 0.04763 * pow_2(ReflectCyl) - 0.44416 * Gamma * ReflectCyl;
@@ -2123,7 +2123,7 @@ namespace DataHeatBalance {
         TscatteredVis = max(0.0, TscatteredVis);
 
         if (SurfaceScreens(ScNum).ScreenBeamReflectanceAccounting == DoNotModel) {
-            if (std::abs(IncidentAngle) <= DataGlobalConstants::PiOvr2()) {
+            if (std::abs(IncidentAngle) <= DataGlobalConstants::PiOvr2) {
                 SurfaceScreens(ScNum).BmBmTrans = Tdirect;
                 SurfaceScreens(ScNum).BmBmTransVis = Tdirect;
                 SurfaceScreens(ScNum).BmBmTransBack = 0.0;
@@ -2135,7 +2135,7 @@ namespace DataHeatBalance {
             Tscattered = 0.0;
             TscatteredVis = 0.0;
         } else if (SurfaceScreens(ScNum).ScreenBeamReflectanceAccounting == ModelAsDirectBeam) {
-            if (std::abs(IncidentAngle) <= DataGlobalConstants::PiOvr2()) {
+            if (std::abs(IncidentAngle) <= DataGlobalConstants::PiOvr2) {
                 SurfaceScreens(ScNum).BmBmTrans = Tdirect + Tscattered;
                 SurfaceScreens(ScNum).BmBmTransVis = Tdirect + TscatteredVis;
                 SurfaceScreens(ScNum).BmBmTransBack = 0.0;
@@ -2147,7 +2147,7 @@ namespace DataHeatBalance {
             Tscattered = 0.0;
             TscatteredVis = 0.0;
         } else if (SurfaceScreens(ScNum).ScreenBeamReflectanceAccounting == ModelAsDiffuse) {
-            if (std::abs(IncidentAngle) <= DataGlobalConstants::PiOvr2()) {
+            if (std::abs(IncidentAngle) <= DataGlobalConstants::PiOvr2) {
                 SurfaceScreens(ScNum).BmBmTrans = Tdirect;
                 SurfaceScreens(ScNum).BmBmTransVis = Tdirect;
                 SurfaceScreens(ScNum).BmBmTransBack = 0.0;
@@ -2158,7 +2158,7 @@ namespace DataHeatBalance {
             }
         }
 
-        if (std::abs(IncidentAngle) <= DataGlobalConstants::PiOvr2()) {
+        if (std::abs(IncidentAngle) <= DataGlobalConstants::PiOvr2) {
             SurfaceScreens(ScNum).BmDifTrans = Tscattered;
             SurfaceScreens(ScNum).BmDifTransVis = TscatteredVis;
             SurfaceScreens(ScNum).BmDifTransBack = 0.0;

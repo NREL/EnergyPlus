@@ -1771,13 +1771,13 @@ namespace ThermalComfort {
         auto &thisAngFacList(state.dataThermalComforts->AngleFactorList(AngleFacNum));
 
         for (SurfNum = 1; SurfNum <= thisAngFacList.TotAngleFacSurfaces; ++SurfNum) {
-            SurfaceTemp = TH(2, 1, thisAngFacList.SurfacePtr(SurfNum)) + DataGlobalConstants::KelvinConv();
+            SurfaceTemp = TH(2, 1, thisAngFacList.SurfacePtr(SurfNum)) + DataGlobalConstants::KelvinConv;
             SurfEAF = state.dataConstruction->Construct(Surface(thisAngFacList.SurfacePtr(SurfNum)).Construction).InsideAbsorpThermal * thisAngFacList.AngleFactor(SurfNum);
             SurfTempEmissAngleFacSummed += SurfEAF * pow_4(SurfaceTemp);
             SumSurfaceEmissAngleFactor += SurfEAF;
         }
 
-        CalcAngleFactorMRT = root_4(SurfTempEmissAngleFacSummed / SumSurfaceEmissAngleFactor) - DataGlobalConstants::KelvinConv();
+        CalcAngleFactorMRT = root_4(SurfTempEmissAngleFacSummed / SumSurfaceEmissAngleFactor) - DataGlobalConstants::KelvinConv;
 
         return CalcAngleFactorMRT;
     }
@@ -1950,11 +1950,11 @@ namespace ThermalComfort {
         // If high temperature radiant heater present and on, then must account for this in MRT calculation
         if (QHTRadSysToPerson(state.dataThermalComforts->ZoneNum) > 0.0 || QCoolingPanelToPerson(state.dataThermalComforts->ZoneNum) > 0.0 || QHWBaseboardToPerson(state.dataThermalComforts->ZoneNum) > 0.0 ||
             QSteamBaseboardToPerson(state.dataThermalComforts->ZoneNum) > 0.0 || QElecBaseboardToPerson(state.dataThermalComforts->ZoneNum) > 0.0) {
-            state.dataThermalComforts->RadTemp += DataGlobalConstants::KelvinConv(); // Convert to Kelvin
+            state.dataThermalComforts->RadTemp += DataGlobalConstants::KelvinConv; // Convert to Kelvin
             state.dataThermalComforts->RadTemp = root_4(pow_4(state.dataThermalComforts->RadTemp) + ((QHTRadSysToPerson(state.dataThermalComforts->ZoneNum) + QCoolingPanelToPerson(state.dataThermalComforts->ZoneNum) + QHWBaseboardToPerson(state.dataThermalComforts->ZoneNum) +
                                                 QSteamBaseboardToPerson(state.dataThermalComforts->ZoneNum) + QElecBaseboardToPerson(state.dataThermalComforts->ZoneNum)) /
                                                AreaEff / StefanBoltzmannConst));
-            state.dataThermalComforts->RadTemp -= DataGlobalConstants::KelvinConv(); // Convert back to Celsius
+            state.dataThermalComforts->RadTemp -= DataGlobalConstants::KelvinConv; // Convert back to Celsius
         }
 
         CalcRadTemp = state.dataThermalComforts->RadTemp;

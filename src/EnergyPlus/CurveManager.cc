@@ -2873,7 +2873,7 @@ namespace CurveManager {
         ConstantF = state.dataBranchAirLoopPlant->PressureCurve(PressureCurveIndex).ConstantF;
 
         // Intermediate calculations
-        CrossSectArea = (DataGlobalConstants::Pi() / 4.0) * pow_2(Diameter);
+        CrossSectArea = (DataGlobalConstants::Pi / 4.0) * pow_2(Diameter);
         Velocity = MassFlow / (Density * CrossSectArea);
         ReynoldsNumber = Density * Diameter * Velocity / Viscosity; // assuming mu here
         RoughnessRatio = Roughness / Diameter;

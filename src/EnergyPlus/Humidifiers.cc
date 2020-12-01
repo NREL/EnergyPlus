@@ -326,7 +326,7 @@ namespace Humidifiers {
             Humidifier(HumNum).HumType_Code = Humidifier_Steam_Electric;
             Humidifier(HumNum).Sched = Alphas(2);
             if (lAlphaBlanks(2)) {
-                Humidifier(HumNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                Humidifier(HumNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 Humidifier(HumNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (Humidifier(HumNum).SchedPtr == 0) {
@@ -376,7 +376,7 @@ namespace Humidifiers {
             Humidifier(HumNum).HumType_Code = Humidifier_Steam_Gas;
             Humidifier(HumNum).Sched = Alphas(2);
             if (lAlphaBlanks(2)) {
-                Humidifier(HumNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                Humidifier(HumNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 Humidifier(HumNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (Humidifier(HumNum).SchedPtr == 0) {
@@ -857,7 +857,7 @@ namespace Humidifiers {
             }
 
             if (!HardSizeNoDesRun) {
-                NomCapVolDes = MassFlowDes * (OutletHumRatDes - InletHumRatDes) / RhoH2O(DataGlobalConstants::InitConvTemp());
+                NomCapVolDes = MassFlowDes * (OutletHumRatDes - InletHumRatDes) / RhoH2O(DataGlobalConstants::InitConvTemp);
                 if (NomCapVolDes < 0.0) NomCapVolDes = 0.0; // No humidity demand
 
                 if (IsAutoSize) {
@@ -886,7 +886,7 @@ namespace Humidifiers {
                 }
             }
 
-            NomCap = RhoH2O(DataGlobalConstants::InitConvTemp()) * NomCapVol;
+            NomCap = RhoH2O(DataGlobalConstants::InitConvTemp) * NomCapVol;
             RefrigerantIndex = FindRefrigerant(state, fluidNameSteam);
             WaterIndex = FindGlycol(state, fluidNameWater);
             SteamSatEnthalpy = GetSatEnthalpyRefrig(state, fluidNameSteam, TSteam, 1.0, RefrigerantIndex, CalledFrom);
@@ -1080,7 +1080,7 @@ namespace Humidifiers {
         HumRatSatOut = 0.0;
         HumRatSatApp = 0.0;
         WaterInEnthalpy = 2676125.0; // At 100 C
-        WaterDens = RhoH2O(DataGlobalConstants::InitConvTemp());
+        WaterDens = RhoH2O(DataGlobalConstants::InitConvTemp);
         WaterAddNeededMax = min(WaterAddNeeded, NomCap);
         if (WaterAddNeededMax > 0.0) {
             //   ma*W1 + mw = ma*W2
@@ -1193,7 +1193,7 @@ namespace Humidifiers {
         HumRatSatOut = 0.0;
         HumRatSatApp = 0.0;
         WaterInEnthalpy = 2676125.0; // At 100 C
-        WaterDens = RhoH2O(DataGlobalConstants::InitConvTemp());
+        WaterDens = RhoH2O(DataGlobalConstants::InitConvTemp);
         WaterAddNeededMax = min(WaterAddNeeded, NomCap);
         if (WaterAddNeededMax > 0.0) {
             //   ma*W1 + mw = ma*W2
@@ -1329,9 +1329,9 @@ namespace Humidifiers {
                 TankSupplyVdot = AvailTankVdot;
             }
 
-            TankSupplyVol = TankSupplyVdot * (TimeStepSys * DataGlobalConstants::SecInHour());
+            TankSupplyVol = TankSupplyVdot * (TimeStepSys * DataGlobalConstants::SecInHour);
             StarvedSupplyVdot = StarvedVdot;
-            StarvedSupplyVol = StarvedVdot * (TimeStepSys * DataGlobalConstants::SecInHour());
+            StarvedSupplyVol = StarvedVdot * (TimeStepSys * DataGlobalConstants::SecInHour);
         }
     }
 
@@ -1405,10 +1405,10 @@ namespace Humidifiers {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // na
 
-        ElecUseEnergy = ElecUseRate * TimeStepSys * DataGlobalConstants::SecInHour();
-        WaterCons = WaterConsRate * TimeStepSys * DataGlobalConstants::SecInHour();
-        GasUseEnergy = GasUseRate * TimeStepSys * DataGlobalConstants::SecInHour();
-        AuxElecUseEnergy = AuxElecUseRate * TimeStepSys * DataGlobalConstants::SecInHour();
+        ElecUseEnergy = ElecUseRate * TimeStepSys * DataGlobalConstants::SecInHour;
+        WaterCons = WaterConsRate * TimeStepSys * DataGlobalConstants::SecInHour;
+        GasUseEnergy = GasUseRate * TimeStepSys * DataGlobalConstants::SecInHour;
+        AuxElecUseEnergy = AuxElecUseRate * TimeStepSys * DataGlobalConstants::SecInHour;
     }
 
     int GetAirInletNodeNum(EnergyPlusData &state,

@@ -5098,7 +5098,7 @@ namespace HeatBalanceSurfaceManager {
             for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 Real64 ZoneW = ZoneAirHumRatAvg(ZoneNum);
                 Real64 ZoneT = ZTAV(ZoneNum);
-                Real64 TDewPointK = Psychrometrics::PsyTdpFnWPb(state, ZoneW, state.dataEnvrn->OutBaroPress) + DataGlobalConstants::KelvinConv();
+                Real64 TDewPointK = Psychrometrics::PsyTdpFnWPb(state, ZoneW, state.dataEnvrn->OutBaroPress) + DataGlobalConstants::KelvinConv;
                 Real64 e = 6.11 * std::exp(5417.7530 * ((1 / 273.16) - (1 / TDewPointK)));
                 Real64 h = 5.0 / 9.0 * (e - 10.0);
                 Real64 Humidex = ZoneT + h;
@@ -5766,7 +5766,7 @@ namespace HeatBalanceSurfaceManager {
                         //  Allow for modification of TemperatureCoefficient with unitary sine wave.
                         Real64 ConstantTempCoef; // Temperature Coefficient as input or modified using sine wave COP mod
                         if (OSC(OPtr).SinusoidalConstTempCoef) { // Sine wave C4
-                            ConstantTempCoef = std::sin(2 * DataGlobalConstants::Pi() * state.dataGlobal->CurrentTime / OSC(OPtr).SinusoidPeriod);
+                            ConstantTempCoef = std::sin(2 * DataGlobalConstants::Pi * state.dataGlobal->CurrentTime / OSC(OPtr).SinusoidPeriod);
                         } else {
                             ConstantTempCoef = OSC(OPtr).ConstTempCoef;
                         }
@@ -6079,13 +6079,13 @@ namespace HeatBalanceSurfaceManager {
                         if (Surface(SurfNum).HasSurroundingSurfProperties) {
                             int SrdSurfsNum = Surface(SurfNum).SurroundingSurfacesNum;
                             // Absolute temperature of the outside surface of an exterior surface
-                            Real64 TSurf = TH(1, 1, SurfNum) + DataGlobalConstants::KelvinConv();
+                            Real64 TSurf = TH(1, 1, SurfNum) + DataGlobalConstants::KelvinConv;
                             for (int SrdSurfNum = 1; SrdSurfNum <= SurroundingSurfsProperty(SrdSurfsNum).TotSurroundingSurface; SrdSurfNum++) {
                                 // View factor of a surrounding surface
                                 Real64 SrdSurfViewFac = SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).ViewFactor;
                                 // Absolute temperature of a surrounding surface
-                                Real64 SrdSurfTempAbs = GetCurrentScheduleValue(state, SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).TempSchNum) + DataGlobalConstants::KelvinConv();
-                                SurfQRadLWOutSrdSurfs(SurfNum) += DataGlobalConstants::StefanBoltzmann() * AbsThermSurf * SrdSurfViewFac * (pow_4(SrdSurfTempAbs) - pow_4(TSurf));
+                                Real64 SrdSurfTempAbs = GetCurrentScheduleValue(state, SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).TempSchNum) + DataGlobalConstants::KelvinConv;
+                                SurfQRadLWOutSrdSurfs(SurfNum) += DataGlobalConstants::StefanBoltzmann * AbsThermSurf * SrdSurfViewFac * (pow_4(SrdSurfTempAbs) - pow_4(TSurf));
                             }
                         }
 
@@ -6439,7 +6439,7 @@ namespace HeatBalanceSurfaceManager {
 
             if (DataHeatBalance::AnyKiva) {
                 for (auto &kivaSurf : state.dataSurfaceGeometry->kivaManager.surfaceMap) {
-                    TempSurfIn(kivaSurf.first) = kivaSurf.second.results.Tavg - DataGlobalConstants::KelvinConv(); // TODO: Use average radiant temp? Trad?
+                    TempSurfIn(kivaSurf.first) = kivaSurf.second.results.Tavg - DataGlobalConstants::KelvinConv; // TODO: Use average radiant temp? Trad?
                 }
             }
 
@@ -6730,7 +6730,7 @@ namespace HeatBalanceSurfaceManager {
 
                         } else if (surface.HeatTransferAlgorithm == HeatTransferModel_Kiva) {
                             // Read Kiva results for each surface
-                            TempSurfInTmp(SurfNum) = state.dataSurfaceGeometry->kivaManager.surfaceMap[SurfNum].results.Tconv - DataGlobalConstants::KelvinConv();
+                            TempSurfInTmp(SurfNum) = state.dataSurfaceGeometry->kivaManager.surfaceMap[SurfNum].results.Tconv - DataGlobalConstants::KelvinConv;
                             SurfOpaqInsFaceConductionFlux(SurfNum) = state.dataSurfaceGeometry->kivaManager.surfaceMap[SurfNum].results.qtot;
                             SurfOpaqInsFaceConduction(SurfNum) = SurfOpaqInsFaceConductionFlux(SurfNum) * DataSurfaces::Surface(SurfNum).Area;
 
@@ -6798,7 +6798,7 @@ namespace HeatBalanceSurfaceManager {
                                                                // conduction from the outside surface | Coefficient for conduction (current
                                                                // time) | Convection and damping term
 
-                    Real64 const Sigma_Temp_4(DataGlobalConstants::StefanBoltzmann() * pow_4(TempSurfIn(SurfNum)));
+                    Real64 const Sigma_Temp_4(DataGlobalConstants::StefanBoltzmann * pow_4(TempSurfIn(SurfNum)));
 
                     // Calculate window heat gain for TDD:DIFFUSER since this calculation is usually done in WindowManager
                     SurfWinHeatGain(SurfNum) =
@@ -7507,7 +7507,7 @@ namespace HeatBalanceSurfaceManager {
                                                                    // conduction from the outside surface | Coefficient for conduction (current
                                                                    // time) | Convection and damping term
 
-                        Real64 const Sigma_Temp_4(DataGlobalConstants::StefanBoltzmann() * pow_4(TempSurfIn(surfNum)));
+                        Real64 const Sigma_Temp_4(DataGlobalConstants::StefanBoltzmann * pow_4(TempSurfIn(surfNum)));
 
                         // Calculate window heat gain for TDD:DIFFUSER since this calculation is usually done in WindowManager
                         SurfWinHeatGain(surfNum) =
@@ -8182,9 +8182,9 @@ namespace HeatBalanceSurfaceManager {
             int SrdSurfsNum = Surface(SurfNum).SurroundingSurfacesNum;
             for (int SrdSurfNum = 1; SrdSurfNum <= SurroundingSurfsProperty(SrdSurfsNum).TotSurroundingSurface; SrdSurfNum++) {
                 Real64 SrdSurfViewFac = SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).ViewFactor;
-                Real64 SrdSurfTempAbs = GetCurrentScheduleValue(state, SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).TempSchNum) + DataGlobalConstants::KelvinConv();
-                QRadLWOutSrdSurfsRep += DataGlobalConstants::StefanBoltzmann() * dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).AbsorpThermal *
-                                        SrdSurfViewFac * (pow_4(SrdSurfTempAbs) - pow_4(TH11 + DataGlobalConstants::KelvinConv()));
+                Real64 SrdSurfTempAbs = GetCurrentScheduleValue(state, SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).TempSchNum) + DataGlobalConstants::KelvinConv;
+                QRadLWOutSrdSurfsRep += DataGlobalConstants::StefanBoltzmann * dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).AbsorpThermal *
+                                        SrdSurfViewFac * (pow_4(SrdSurfTempAbs) - pow_4(TH11 + DataGlobalConstants::KelvinConv));
             }
         }
         QdotRadOutRep(SurfNum) = Surface(SurfNum).Area * HExtSurf_fac + Surface(SurfNum).Area * QRadLWOutSrdSurfsRep;
@@ -8330,7 +8330,7 @@ namespace HeatBalanceSurfaceManager {
         ExtVentedCavity(CavNum).HrPlen = HrPlen;
         ExtVentedCavity(CavNum).HcPlen = HcPlen;
         ExtVentedCavity(CavNum).PassiveACH =
-            (MdotVent / RhoAir) * (1.0 / (ExtVentedCavity(CavNum).ProjArea * ExtVentedCavity(CavNum).PlenGapThick)) * DataGlobalConstants::SecInHour();
+            (MdotVent / RhoAir) * (1.0 / (ExtVentedCavity(CavNum).ProjArea * ExtVentedCavity(CavNum).PlenGapThick)) * DataGlobalConstants::SecInHour;
         ExtVentedCavity(CavNum).PassiveMdotVent = MdotVent;
         ExtVentedCavity(CavNum).PassiveMdotWind = VdotWind * RhoAir;
         ExtVentedCavity(CavNum).PassiveMdotTherm = VdotThermal * RhoAir;

@@ -375,7 +375,7 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc_Slope)
     // Calculate RH for use in material property calculations.
     Real64 RV_Deep_Old = DataMoistureBalanceEMPD::RVdeepOld( surfNum );
     Real64 RVaver = DataMoistureBalanceEMPD::RVSurfLayerOld(surfNum);
-    Real64 RHaver = RVaver * 461.52 * (Taver + DataGlobalConstants::KelvinConv()) * std::exp(-23.7093 + 4111.0 / (Taver + 237.7));
+    Real64 RHaver = RVaver * 461.52 * (Taver + DataGlobalConstants::KelvinConv) * std::exp(-23.7093 + 4111.0 / (Taver + 237.7));
     Real64 dU_dRH = material.MoistACoeff * material.MoistBCoeff * pow(RHaver, material.MoistBCoeff - 1) +
                     material.MoistCCoeff * material.MoistDCoeff * pow(RHaver, material.MoistDCoeff - 1);
 

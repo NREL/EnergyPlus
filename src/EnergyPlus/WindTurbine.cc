@@ -254,7 +254,7 @@ namespace WindTurbine {
 
             state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Schedule = cAlphaArgs(2); // Get schedule
             if (lAlphaBlanks(2)) {
-                state.dataWindTurbine->WindTurbineSys(WindTurbineNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                state.dataWindTurbine->WindTurbineSys(WindTurbineNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 state.dataWindTurbine->WindTurbineSys(WindTurbineNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (state.dataWindTurbine->WindTurbineSys(WindTurbineNum).SchedPtr == 0) {
@@ -875,9 +875,9 @@ namespace WindTurbine {
             LocalWindSpeed < state.dataWindTurbine->WindTurbineSys(WindTurbineNum).CutOutSpeed) {
 
             // System is on
-            Period = 2.0 * DataGlobalConstants::Pi();
+            Period = 2.0 * DataGlobalConstants::Pi;
             Omega = (RotorSpeed * Period) / SecInMin;
-            SweptArea = (DataGlobalConstants::Pi() * pow_2(RotorD)) / 4;
+            SweptArea = (DataGlobalConstants::Pi * pow_2(RotorD)) / 4;
             TipSpeedRatio = (Omega * (RotorD / 2.0)) / LocalWindSpeed;
 
             // Limit maximum tip speed ratio
@@ -945,8 +945,8 @@ namespace WindTurbine {
 
                     InducedVel = LocalWindSpeed * 2.0 / 3.0;
                     // Velocity components
-                    Real64 const sin_AzimuthAng(std::sin(AzimuthAng * DataGlobalConstants::DegToRadians()));
-                    Real64 const cos_AzimuthAng(std::cos(AzimuthAng * DataGlobalConstants::DegToRadians()));
+                    Real64 const sin_AzimuthAng(std::sin(AzimuthAng * DataGlobalConstants::DegToRadians));
+                    Real64 const cos_AzimuthAng(std::cos(AzimuthAng * DataGlobalConstants::DegToRadians));
                     ChordalVel = RotorVel + InducedVel * cos_AzimuthAng;
                     NormalVel = InducedVel * sin_AzimuthAng;
                     RelFlowVel = std::sqrt(pow_2(ChordalVel) + pow_2(NormalVel));
@@ -955,8 +955,8 @@ namespace WindTurbine {
                     AngOfAttack = std::atan((sin_AzimuthAng / ((RotorVel / LocalWindSpeed) / (InducedVel / LocalWindSpeed) + cos_AzimuthAng)));
 
                     // Force coefficients
-                    Real64 const sin_AngOfAttack(std::sin(AngOfAttack * DataGlobalConstants::DegToRadians()));
-                    Real64 const cos_AngOfAttack(std::cos(AngOfAttack * DataGlobalConstants::DegToRadians()));
+                    Real64 const sin_AngOfAttack(std::sin(AngOfAttack * DataGlobalConstants::DegToRadians));
+                    Real64 const cos_AngOfAttack(std::cos(AngOfAttack * DataGlobalConstants::DegToRadians));
                     TanForceCoeff = std::abs(state.dataWindTurbine->WindTurbineSys(WindTurbineNum).LiftCoeff * sin_AngOfAttack -
                                              state.dataWindTurbine->WindTurbineSys(WindTurbineNum).DragCoeff * cos_AngOfAttack);
                     NorForceCoeff =
@@ -1039,7 +1039,7 @@ namespace WindTurbine {
 
         using DataHVACGlobals::TimeStepSys;
 
-        state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Energy = state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Power * TimeStepSys * DataGlobalConstants::SecInHour();
+        state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Energy = state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Power * TimeStepSys * DataGlobalConstants::SecInHour;
     }
 
     //*****************************************************************************************

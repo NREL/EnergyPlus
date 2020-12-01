@@ -2750,7 +2750,7 @@ namespace EconomicTariff {
                 tariff(iTariff).collectEnergy += curInstantValue;
                 tariff(iTariff).collectTime += state.dataGlobal->TimeStepZoneSec;
                 // added *SecInHour when adding RTP support August 2008
-                if (tariff(iTariff).collectTime >= tariff(iTariff).demWinTime * DataGlobalConstants::SecInHour()) {
+                if (tariff(iTariff).collectTime >= tariff(iTariff).demWinTime * DataGlobalConstants::SecInHour) {
                     // get current value that has been converted into desired units
                     curDemand = tariff(iTariff).demandConv * tariff(iTariff).collectEnergy / tariff(iTariff).collectTime;
                     curEnergy = tariff(iTariff).energyConv * tariff(iTariff).collectEnergy;

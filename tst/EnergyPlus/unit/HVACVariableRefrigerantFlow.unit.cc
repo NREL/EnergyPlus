@@ -248,7 +248,7 @@ protected:
         thisZoneEqConfig.ExhaustNode.allocate(NumZoneExhaustNodes);
         thisZoneEqConfig.ExhaustNode(1) = zoneExhNode1;
         thisZoneEqConfig.EquipListIndex = zoneNum;
-        thisZoneEqConfig.ReturnFlowSchedPtrNum = DataGlobalConstants::ScheduleAlwaysOn();
+        thisZoneEqConfig.ReturnFlowSchedPtrNum = DataGlobalConstants::ScheduleAlwaysOn;
 
         auto &thisZone(DataHeatBalance::Zone(zoneNum));
         thisZone.Name = "ZONE1";
@@ -5673,7 +5673,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
     EXPECT_DOUBLE_EQ(CondVolFlowRate, VRF(VRFCond).WaterCondVolFlowRate);
 
     rho = GetDensityGlycol(*state,
-        PlantLoop(VRF(VRFCond).SourceLoopNum).FluidName, DataGlobalConstants::InitConvTemp(), PlantLoop(VRF(VRFCond).SourceLoopNum).FluidIndex, RoutineName);
+        PlantLoop(VRF(VRFCond).SourceLoopNum).FluidName, DataGlobalConstants::InitConvTemp, PlantLoop(VRF(VRFCond).SourceLoopNum).FluidIndex, RoutineName);
     EXPECT_DOUBLE_EQ(VRF(VRFCond).WaterCondenserDesignMassFlow, (VRF(VRFCond).WaterCondVolFlowRate * rho));
 
     // set zone load to heating
@@ -7924,7 +7924,7 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilElectric)
     HeatingCoils::HeatingCoil(CoilNum).HCoilType_Num = thisVRFTU.SuppHeatCoilType_Num;
     HeatingCoils::HeatingCoil(CoilNum).AirInletNodeNum = thisVRFTU.SuppHeatCoilAirInletNode;
     HeatingCoils::HeatingCoil(CoilNum).AirOutletNodeNum = thisVRFTU.SuppHeatCoilAirOutletNode;
-    HeatingCoils::HeatingCoil(CoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn(); // fan is always on
+    HeatingCoils::HeatingCoil(CoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn; // fan is always on
     HeatingCoils::HeatingCoil(CoilNum).NominalCapacity = 10000.0;
     HeatingCoils::HeatingCoil(CoilNum).Efficiency = 1.0;
     HeatingCoils::CheckEquipName.dimension(HeatingCoils::NumHeatingCoils, true);
@@ -7988,7 +7988,7 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilFuel)
     HeatingCoils::HeatingCoil(CoilNum).HCoilType_Num = thisVRFTU.SuppHeatCoilType_Num;
     HeatingCoils::HeatingCoil(CoilNum).AirInletNodeNum = thisVRFTU.SuppHeatCoilAirInletNode;
     HeatingCoils::HeatingCoil(CoilNum).AirOutletNodeNum = thisVRFTU.SuppHeatCoilAirOutletNode;
-    HeatingCoils::HeatingCoil(CoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn(); // fan is always on
+    HeatingCoils::HeatingCoil(CoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn; // fan is always on
     HeatingCoils::HeatingCoil(CoilNum).NominalCapacity = 10000.0;
     HeatingCoils::HeatingCoil(CoilNum).Efficiency = 1.0;
     HeatingCoils::CheckEquipName.dimension(HeatingCoils::NumHeatingCoils, true);
@@ -8052,7 +8052,7 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilWater)
     state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel = state->dataWaterCoils->CoilType_Heating;
     state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType = state->dataWaterCoils->CoilType_Heating;
     state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilTypeA = "Heating";
-    state->dataWaterCoils->WaterCoil(CoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+    state->dataWaterCoils->WaterCoil(CoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
     state->dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum = 1;
 
     // state->dataWaterCoils->WaterCoil(CoilNum).FuelType_Num = DataGlobalConstants::ResourceType::Natural_Gas;
@@ -8169,7 +8169,7 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilSteam)
     state->dataSteamCoils->SteamCoil(CoilNum).SteamCoilType_Num = state->dataSteamCoils->SteamCoil_AirHeating;
     state->dataSteamCoils->SteamCoil(CoilNum).LoopNum = 1;
     state->dataSteamCoils->SteamCoil(CoilNum).SteamCoilTypeA = "Heating";
-    state->dataSteamCoils->SteamCoil(CoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+    state->dataSteamCoils->SteamCoil(CoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
     state->dataSteamCoils->SteamCoil(CoilNum).InletSteamTemp = 100.0;
     state->dataSteamCoils->SteamCoil(CoilNum).InletSteamPress = 101325.0;
     state->dataSteamCoils->SteamCoil(CoilNum).DegOfSubcooling = 0.0;

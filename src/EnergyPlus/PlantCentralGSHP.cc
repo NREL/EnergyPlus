@@ -350,12 +350,12 @@ namespace PlantCentralGSHP {
                 if (PltSizNum > 0) {
                     if (DataSizing::PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow && tmpEvapVolFlowRate > 0.0) {
                         Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state, DataPlant::PlantLoop(this->CWLoopNum).FluidName,
-                                                                           DataGlobalConstants::CWInitConvTemp(),
+                                                                           DataGlobalConstants::CWInitConvTemp,
                                                                            DataPlant::PlantLoop(this->CWLoopNum).FluidIndex,
                                                                            RoutineName);
 
                         Real64 rho = FluidProperties::GetDensityGlycol(state, DataPlant::PlantLoop(this->CWLoopNum).FluidName,
-                                                                       DataGlobalConstants::CWInitConvTemp(),
+                                                                       DataGlobalConstants::CWInitConvTemp,
                                                                        DataPlant::PlantLoop(this->CWLoopNum).FluidIndex,
                                                                        RoutineName);
                         tmpNomCap = Cp * rho * DataSizing::PlantSizData(PltSizNum).DeltaT * tmpEvapVolFlowRate;
@@ -443,7 +443,7 @@ namespace PlantCentralGSHP {
                 if (PltSizCondNum > 0) {
                     if (DataSizing::PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
                         Real64 rho = FluidProperties::GetDensityGlycol(state, DataPlant::PlantLoop(this->GLHELoopNum).FluidName,
-                                                                       DataGlobalConstants::CWInitConvTemp(),
+                                                                       DataGlobalConstants::CWInitConvTemp,
                                                                        DataPlant::PlantLoop(this->GLHELoopNum).FluidIndex,
                                                                        RoutineName);
                         // TODO: JM 2018-12-06 I wonder why Cp isn't calculated at the same temp as rho...
@@ -708,7 +708,7 @@ namespace PlantCentralGSHP {
                     Wrapper(WrapperNum).WrapperComp(Comp).WrapperPerformanceObjectType = DataIPShortCuts::cAlphaArgs(loop);
                     Wrapper(WrapperNum).WrapperComp(Comp).WrapperComponentName = DataIPShortCuts::cAlphaArgs(loop + 1);
                     if (DataIPShortCuts::lAlphaFieldBlanks(loop + 2)) {
-                        Wrapper(WrapperNum).WrapperComp(Comp).CHSchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                        Wrapper(WrapperNum).WrapperComp(Comp).CHSchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
                     } else {
                         Wrapper(WrapperNum).WrapperComp(Comp).CHSchedPtr = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(loop + 2));
                     }
@@ -1591,7 +1591,7 @@ namespace PlantCentralGSHP {
 
                 Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                                DataPlant::PlantLoop(this->CWLoopNum).FluidName,
-                                                               DataGlobalConstants::CWInitConvTemp(),
+                                                               DataGlobalConstants::CWInitConvTemp,
                                                                DataPlant::PlantLoop(this->CWLoopNum).FluidIndex,
                                                                RoutineName);
 
@@ -1835,7 +1835,7 @@ namespace PlantCentralGSHP {
                 // Hot water temperature is known, but evaporator mass flow rates will be adjusted in the following "Do" loop
                 Real64 InitDensity = FluidProperties::GetDensityGlycol(state,
                                                                        DataPlant::PlantLoop(this->CWLoopNum).FluidName,
-                                                                       DataGlobalConstants::CWInitConvTemp(),
+                                                                       DataGlobalConstants::CWInitConvTemp,
                                                                        DataPlant::PlantLoop(this->CWLoopNum).FluidIndex,
                                                                        RoutineName);
                 Real64 EvapDensity = FluidProperties::GetDensityGlycol(
@@ -2263,7 +2263,7 @@ namespace PlantCentralGSHP {
                 // Hot water temperature is known, but condenser mass flow rates will be adjusted in the following "Do" loop
                 Real64 InitDensity = FluidProperties::GetDensityGlycol(state,
                                                                        DataPlant::PlantLoop(this->CWLoopNum).FluidName,
-                                                                       DataGlobalConstants::CWInitConvTemp(),
+                                                                       DataGlobalConstants::CWInitConvTemp,
                                                                        DataPlant::PlantLoop(this->CWLoopNum).FluidIndex,
                                                                        RoutineName);
                 Real64 EvapDensity = FluidProperties::GetDensityGlycol(
@@ -3370,7 +3370,7 @@ namespace PlantCentralGSHP {
         Real64 SecInTimeStep; // Number of seconds per HVAC system time step, to convert from W (J/s) to J
         int ChillerHeaterNum; // Chiller heater number
 
-        SecInTimeStep = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+        SecInTimeStep = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
 
         for (ChillerHeaterNum = 1; ChillerHeaterNum <= this->ChillerHeaterNums; ++ChillerHeaterNum) {
             this->ChillerHeater(ChillerHeaterNum).Report.ChillerFalseLoad =
@@ -3396,7 +3396,7 @@ namespace PlantCentralGSHP {
         //       DATE WRITTEN:    Feb 2013
 
         // Number of seconds per HVAC system time step, to convert from W (J/s) to J
-        Real64 SecInTimeStep = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+        Real64 SecInTimeStep = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
 
         for (int ChillerHeaterNum = 1; ChillerHeaterNum <= this->ChillerHeaterNums; ++ChillerHeaterNum) {
             this->ChillerHeater(ChillerHeaterNum).Report.ChillerFalseLoad =

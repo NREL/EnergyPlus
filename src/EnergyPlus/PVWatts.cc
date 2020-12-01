@@ -378,7 +378,7 @@ namespace PVWatts {
 
         // We only run this once for each zone time step.
         if (!state.dataGlobal->BeginTimeStepFlag) {
-            m_outputDCEnergy = m_outputDCPower * TimeStepSys * DataGlobalConstants::SecInHour();
+            m_outputDCEnergy = m_outputDCPower * TimeStepSys * DataGlobalConstants::SecInHour;
             return;
         }
 
@@ -420,7 +420,7 @@ namespace PVWatts {
         m_cellTemperature = pwr_st.pvt;
         m_planeOfArrayIrradiance = pwr_st.poa;
         m_outputDCPower = pwr_st.dc;
-        m_outputDCEnergy = m_outputDCPower * TimeStepSys * DataGlobalConstants::SecInHour();
+        m_outputDCEnergy = m_outputDCPower * TimeStepSys * DataGlobalConstants::SecInHour;
     }
 
     void PVWattsGenerator::getResults(Real64 &GeneratorPower, Real64 &GeneratorEnergy, Real64 &ThermalPower, Real64 &ThermalEnergy)
@@ -476,8 +476,8 @@ namespace PVWatts {
                     Real64 Fgnddiff = 1.0;
 
                     // worst-case mask angle using calculated surface tilt
-                    Real64 phi0 = DataGlobalConstants::RadToDeg() * std::atan2(std::sin(irr_st.stilt * DataGlobalConstants::DegToRadians()),
-                                                        1.0 / m_groundCoverageRatio - std::cos(irr_st.stilt * DataGlobalConstants::DegToRadians()));
+                    Real64 phi0 = DataGlobalConstants::RadToDeg * std::atan2(std::sin(irr_st.stilt * DataGlobalConstants::DegToRadians),
+                                                        1.0 / m_groundCoverageRatio - std::cos(irr_st.stilt * DataGlobalConstants::DegToRadians));
 
                     // calculate sky and gnd diffuse derate factors
                     // based on view factor reductions from self-shading

@@ -267,7 +267,7 @@ namespace RuntimeLanguageProcessor {
             TrueVariableNum = NewEMSVariable("TRUE", 0, True);
             OffVariableNum = NewEMSVariable("OFF", 0, False);
             OnVariableNum = NewEMSVariable("ON", 0, True);
-            PiVariableNum = NewEMSVariable("PI", 0, SetErlValueNumber(DataGlobalConstants::Pi()));
+            PiVariableNum = NewEMSVariable("PI", 0, SetErlValueNumber(DataGlobalConstants::Pi));
             TimeStepsPerHourVariableNum = NewEMSVariable("TIMESTEPSPERHOUR", 0, SetErlValueNumber(double(state.dataGlobal->NumOfTimeStepInHour)));
 
             // Create dynamic built-in variables
@@ -2018,9 +2018,9 @@ namespace RuntimeLanguageProcessor {
                     } else if (SELECT_CASE_var == FuncArcCos) {
                         ReturnValue = SetErlValueNumber(std::acos(Operand(1).Number));
                     } else if (SELECT_CASE_var == FuncDegToRad) {
-                        ReturnValue = SetErlValueNumber(Operand(1).Number * DataGlobalConstants::DegToRadians());
+                        ReturnValue = SetErlValueNumber(Operand(1).Number * DataGlobalConstants::DegToRadians);
                     } else if (SELECT_CASE_var == FuncRadToDeg) {
-                        ReturnValue = SetErlValueNumber(Operand(1).Number / DataGlobalConstants::DegToRadians());
+                        ReturnValue = SetErlValueNumber(Operand(1).Number / DataGlobalConstants::DegToRadians);
                     } else if (SELECT_CASE_var == FuncExp) {
                         if ((Operand(1).Number < 700.0) && (Operand(1).Number > -20.0)) {
                             ReturnValue = SetErlValueNumber(std::exp(Operand(1).Number));

@@ -823,10 +823,10 @@ namespace HeatBalanceHAMTManager {
                     dataMaterial.Material(matid).divs = dataMaterial.Material(matid).divmax;
                 }
                 // Check length of cell - reduce number of divisions if necessary
-                Real64 const sin_negPIOvr2 = std::sin(-DataGlobalConstants::Pi() / 2.0);
+                Real64 const sin_negPIOvr2 = std::sin(-DataGlobalConstants::Pi / 2.0);
                 while (true) {
                     testlen =
-                        dataMaterial.Material(matid).Thickness * ((std::sin(DataGlobalConstants::Pi() * (-1.0 / double(dataMaterial.Material(matid).divs)) - DataGlobalConstants::Pi() / 2.0) / 2.0) - (sin_negPIOvr2 / 2.0));
+                        dataMaterial.Material(matid).Thickness * ((std::sin(DataGlobalConstants::Pi * (-1.0 / double(dataMaterial.Material(matid).divs)) - DataGlobalConstants::Pi / 2.0) / 2.0) - (sin_negPIOvr2 / 2.0));
                     if (testlen > adjdist) break;
                     --dataMaterial.Material(matid).divs;
                     if (dataMaterial.Material(matid).divs < 1) {
@@ -928,8 +928,8 @@ namespace HeatBalanceHAMTManager {
 
                     // Make cells smaller near the surface
                     cells(cid).length(1) =
-                        dataMaterial.Material(matid).Thickness * ((std::sin(DataGlobalConstants::Pi() * (-double(did) / double(dataMaterial.Material(matid).divs)) - DataGlobalConstants::Pi() / 2.0) / 2.0) -
-                                                     (std::sin(DataGlobalConstants::Pi() * (-double(did - 1) / double(dataMaterial.Material(matid).divs)) - DataGlobalConstants::Pi() / 2.0) / 2.0));
+                        dataMaterial.Material(matid).Thickness * ((std::sin(DataGlobalConstants::Pi * (-double(did) / double(dataMaterial.Material(matid).divs)) - DataGlobalConstants::Pi / 2.0) / 2.0) -
+                                                     (std::sin(DataGlobalConstants::Pi * (-double(did - 1) / double(dataMaterial.Material(matid).divs)) - DataGlobalConstants::Pi / 2.0) / 2.0));
 
                     cells(cid).origin(1) = runor + cells(cid).length(1) / 2.0;
                     runor += cells(cid).length(1);
@@ -1517,7 +1517,7 @@ namespace HeatBalanceHAMTManager {
 
         TempSurfInP = cells(Intcell(sid)).rhp1 * PsyPsatFnTemp(state, cells(Intcell(sid)).tempp1);
 
-        RhoVaporSurfIn(sid) = TempSurfInP / (461.52 * (MAT(Surface(sid).Zone) + DataGlobalConstants::KelvinConv()));
+        RhoVaporSurfIn(sid) = TempSurfInP / (461.52 * (MAT(Surface(sid).Zone) + DataGlobalConstants::KelvinConv));
     }
 
     void UpdateHeatBalHAMT(EnergyPlusData &state, int const sid)
@@ -1747,7 +1747,7 @@ namespace HeatBalanceHAMTManager {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         // na
 
-        WVDC = (2.e-7 * std::pow(Temperature + DataGlobalConstants::KelvinConv(), 0.81)) / ambp;
+        WVDC = (2.e-7 * std::pow(Temperature + DataGlobalConstants::KelvinConv, 0.81)) / ambp;
 
         return WVDC;
     }

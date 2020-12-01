@@ -328,7 +328,7 @@ namespace DualDuct {
                 dd_airterminal(DDNum).DamperType = DualDuct_ConstantVolume;
                 dd_airterminal(DDNum).Schedule = AlphArray(2);
                 if (lAlphaBlanks(2)) {
-                    dd_airterminal(DDNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                    dd_airterminal(DDNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
                 } else {
                     dd_airterminal(DDNum).SchedPtr = GetScheduleIndex(state, AlphArray(2));
                     if (dd_airterminal(DDNum).SchedPtr == 0) {
@@ -469,7 +469,7 @@ namespace DualDuct {
                 dd_airterminal(DDNum).DamperType = DualDuct_VariableVolume;
                 dd_airterminal(DDNum).Schedule = AlphArray(2);
                 if (lAlphaBlanks(2)) {
-                    dd_airterminal(DDNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                    dd_airterminal(DDNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
                 } else {
                     dd_airterminal(DDNum).SchedPtr = GetScheduleIndex(state, AlphArray(2));
                     if (dd_airterminal(DDNum).SchedPtr == 0) {
@@ -632,7 +632,7 @@ namespace DualDuct {
                 dd_airterminal(DDNum).DamperType = DualDuct_OutdoorAir;
                 dd_airterminal(DDNum).Schedule = AlphArray(2);
                 if (lAlphaBlanks(2)) {
-                    dd_airterminal(DDNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                    dd_airterminal(DDNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
                 } else {
                     dd_airterminal(DDNum).SchedPtr = GetScheduleIndex(state, AlphArray(2));
                     if (dd_airterminal(DDNum).SchedPtr == 0) {

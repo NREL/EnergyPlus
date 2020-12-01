@@ -1044,7 +1044,7 @@ namespace DXCoils {
             DXCoil(DXCoilNum).DXCoilType_Num = CoilDX_CoolingSingleSpeed;
             DXCoil(DXCoilNum).Schedule = Alphas(2);
             if (lAlphaBlanks(2)) {
-                DXCoil(DXCoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                DXCoil(DXCoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 DXCoil(DXCoilNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (DXCoil(DXCoilNum).SchedPtr == 0) {
@@ -1489,7 +1489,7 @@ namespace DXCoils {
             DXCoil(DXCoilNum).DXCoilType_Num = CoilDX_CoolingTwoStageWHumControl;
             DXCoil(DXCoilNum).Schedule = Alphas(2);
             if (lAlphaBlanks(2)) {
-                DXCoil(DXCoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                DXCoil(DXCoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 DXCoil(DXCoilNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (DXCoil(DXCoilNum).SchedPtr == 0) {
@@ -2010,7 +2010,7 @@ namespace DXCoils {
             DXCoil(DXCoilNum).DXCoilType_Num = CoilDX_HeatingEmpirical;
             DXCoil(DXCoilNum).Schedule = Alphas(2);
             if (lAlphaBlanks(2)) {
-                DXCoil(DXCoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                DXCoil(DXCoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 DXCoil(DXCoilNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (DXCoil(DXCoilNum).SchedPtr == 0) {
@@ -2435,7 +2435,7 @@ namespace DXCoils {
             DXCoil(DXCoilNum).DXCoilType_Num = CoilDX_CoolingTwoSpeed;
             DXCoil(DXCoilNum).Schedule = Alphas(2);
             if (lAlphaBlanks(2)) {
-                DXCoil(DXCoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                DXCoil(DXCoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 DXCoil(DXCoilNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (DXCoil(DXCoilNum).SchedPtr == 0) {
@@ -3014,7 +3014,7 @@ namespace DXCoils {
             }
 
             DXCoil(DXCoilNum).RatedAirVolFlowRate(1) = Numbers(7);
-            if (DXCoil(DXCoilNum).RatedAirVolFlowRate(1) != DataGlobalConstants::AutoCalculate()) {
+            if (DXCoil(DXCoilNum).RatedAirVolFlowRate(1) != DataGlobalConstants::AutoCalculate) {
                 if (DXCoil(DXCoilNum).RatedAirVolFlowRate(1) <= 0.0) {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
                     ShowContinueError(state, format("...{} must be > 0.0.  entered value=[{:.3T}].", cNumericFields(7), Numbers(7)));
@@ -3024,7 +3024,7 @@ namespace DXCoils {
 
             DXCoil(DXCoilNum).RatedHPWHCondWaterFlow = Numbers(8);
             // move to init
-            if (DXCoil(DXCoilNum).RatedHPWHCondWaterFlow != DataGlobalConstants::AutoCalculate()) {
+            if (DXCoil(DXCoilNum).RatedHPWHCondWaterFlow != DataGlobalConstants::AutoCalculate) {
                 if (DXCoil(DXCoilNum).RatedHPWHCondWaterFlow <= 0.0) {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
                     ShowContinueError(state, format("...{} must be > 0.0  entered value=[{:.3T}].", cNumericFields(8), Numbers(8)));
@@ -3461,7 +3461,7 @@ namespace DXCoils {
             }
 
             DXCoil(DXCoilNum).RatedAirVolFlowRate(1) = Numbers(7);
-            if (DXCoil(DXCoilNum).RatedAirVolFlowRate(1) != DataGlobalConstants::AutoCalculate()) {
+            if (DXCoil(DXCoilNum).RatedAirVolFlowRate(1) != DataGlobalConstants::AutoCalculate) {
                 if (DXCoil(DXCoilNum).RatedAirVolFlowRate(1) <= 0.0) {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
                     ShowContinueError(state, format("...{} must be > 0.0.  entered value=[{:.3T}].", cNumericFields(7), Numbers(7)));
@@ -3765,7 +3765,7 @@ namespace DXCoils {
             DXCoil(DXCoilNum).DXCoilType_Num = CoilDX_MultiSpeedCooling;
             DXCoil(DXCoilNum).Schedule = Alphas(2);
             if (lAlphaBlanks(2)) {
-                DXCoil(DXCoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                DXCoil(DXCoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 DXCoil(DXCoilNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (DXCoil(DXCoilNum).SchedPtr == 0) {
@@ -4289,7 +4289,7 @@ namespace DXCoils {
             DXCoil(DXCoilNum).DXCoilType_Num = CoilDX_MultiSpeedHeating;
             DXCoil(DXCoilNum).Schedule = Alphas(2);
             if (lAlphaBlanks(2)) {
-                DXCoil(DXCoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                DXCoil(DXCoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 DXCoil(DXCoilNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (DXCoil(DXCoilNum).SchedPtr == 0) {
@@ -4741,7 +4741,7 @@ namespace DXCoils {
             DXCoil(DXCoilNum).DXCoilType_Num = CoilVRF_Cooling;
             DXCoil(DXCoilNum).Schedule = Alphas(2);
             if (lAlphaBlanks(2)) {
-                DXCoil(DXCoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                DXCoil(DXCoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 DXCoil(DXCoilNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (DXCoil(DXCoilNum).SchedPtr == 0) {
@@ -4865,7 +4865,7 @@ namespace DXCoils {
             DXCoil(DXCoilNum).DXCoilType_Num = CoilVRF_Heating;
             DXCoil(DXCoilNum).Schedule = Alphas(2);
             if (lAlphaBlanks(2)) {
-                DXCoil(DXCoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                DXCoil(DXCoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 DXCoil(DXCoilNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (DXCoil(DXCoilNum).SchedPtr == 0) {
@@ -4980,7 +4980,7 @@ namespace DXCoils {
             DXCoil(DXCoilNum).DXCoilType_Num = CoilVRF_FluidTCtrl_Cooling;
             DXCoil(DXCoilNum).Schedule = Alphas(2);
             if (lAlphaBlanks(2)) {
-                DXCoil(DXCoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                DXCoil(DXCoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 DXCoil(DXCoilNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (DXCoil(DXCoilNum).SchedPtr == 0) {
@@ -5080,7 +5080,7 @@ namespace DXCoils {
             DXCoil(DXCoilNum).DXCoilType_Num = CoilVRF_FluidTCtrl_Heating;
             DXCoil(DXCoilNum).Schedule = Alphas(2);
             if (lAlphaBlanks(2)) {
-                DXCoil(DXCoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                DXCoil(DXCoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 DXCoil(DXCoilNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (DXCoil(DXCoilNum).SchedPtr == 0) {
@@ -6814,7 +6814,7 @@ namespace DXCoils {
                 Mode = DehumidModeNum * 2 + CapacityStageNum;
                 if (DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_HeatPumpWaterHeaterPumped ||
                     DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_HeatPumpWaterHeaterWrapped) {
-                    if (DXCoil(DXCoilNum).RatedAirVolFlowRate(1) == DataGlobalConstants::AutoCalculate()) {
+                    if (DXCoil(DXCoilNum).RatedAirVolFlowRate(1) == DataGlobalConstants::AutoCalculate) {
                         // report autocalculated sizing
                         PrintFlag = true;
                         CompName = DXCoil(DXCoilNum).Name;
@@ -6832,7 +6832,7 @@ namespace DXCoils {
                         PrintFlag = false;
                     }
 
-                    if (DXCoil(DXCoilNum).RatedHPWHCondWaterFlow == DataGlobalConstants::AutoCalculate()) {
+                    if (DXCoil(DXCoilNum).RatedHPWHCondWaterFlow == DataGlobalConstants::AutoCalculate) {
                         // report autocalculated sizing
                         PrintFlag = true;
                         CompName = DXCoil(DXCoilNum).Name;
@@ -13493,7 +13493,7 @@ namespace DXCoils {
             }
         }
 
-        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour();
+        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour;
 
         {
             auto const SELECT_CASE_var(DXCoil(DXCoilNum).DXCoilType_Num);
