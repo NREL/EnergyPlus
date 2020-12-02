@@ -67,25 +67,24 @@ namespace Pumps {
     // Data
     // MODULE PARAMETER DEFINITIONS:
 
-    enum class PumpControlType
-    {
+    enum class PumpControlType {
         Unassigned,
         Continuous,   // Pump control type (pump always running)
         Intermittent, // Pump control type (pump runs only when there is a demand)
     };
 
-    
-    enum class VFDControlType
-    {
+    enum class VFDControlType {
         Unassigned,
         VFDManual,    // VFD control type (Scheduled RPM)
         VFDAutomatic, // VFD control type (Variable RPM according to flow request)
     };
 
-
-    extern int const OptimalScheme;    // Control sequencing for pump bank
-    extern int const SequentialScheme; // Control sequencing for pump bank
-    extern int const UserDefined;      // Control sequencing for pump bank
+    enum class PumpBankControlSeq {
+        Unassigned,
+        OptimalScheme,    // Control sequencing for pump bank
+        SequentialScheme, // Control sequencing for pump bank
+        UserDefined,      // Control sequencing for pump bank
+    };
 
     extern std::string const cPump_VarSpeed;
     extern int const Pump_VarSpeed;
@@ -170,7 +169,7 @@ namespace Pumps {
         int PumpScheduleIndex;                       // Schedule Pointer
         int InletNodeNum;                            // Node number on the inlet side of the plant
         int OutletNodeNum;                           // Node number on the outlet side of the plant
-        int SequencingScheme;                        // Optimal, Sequential, User-Defined
+        PumpBankControlSeq SequencingScheme;         // Optimal, Sequential, User-Defined
         int FluidIndex;                              // Index for Fluid Properties
         int NumPumpsInBank;                          // Node number on the inlet side of the plant
         int PowerErrIndex1;                          // for recurring errors
@@ -222,8 +221,8 @@ namespace Pumps {
 
         // Default Constructor
         PumpSpecs()
-            : PumpType(0), TypeOf_Num(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), PumpControl(PumpControlType::Unassigned), PumpScheduleIndex(0), InletNodeNum(0),
-              OutletNodeNum(0), SequencingScheme(0), FluidIndex(0), NumPumpsInBank(0), PowerErrIndex1(0), PowerErrIndex2(0), MinVolFlowRateFrac(0.0),
+            : PumpType(0), TypeOf_Num(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), PumpControl(PumpControlType::Unassigned), PumpScheduleIndex(0), InletNodeNum(0), OutletNodeNum(0), SequencingScheme(PumpBankControlSeq::Unassigned), FluidIndex(0), NumPumpsInBank(0),
+              PowerErrIndex1(0), PowerErrIndex2(0), MinVolFlowRateFrac(0.0),
               NomVolFlowRate(0.0), NomVolFlowRateWasAutoSized(false), MassFlowRateMax(0.0), EMSMassFlowOverrideOn(false), EMSMassFlowValue(0.0),
               NomSteamVolFlowRate(0.0), NomSteamVolFlowRateWasAutoSized(false), MinVolFlowRate(0.0), minVolFlowRateWasAutosized(false),
               MassFlowRateMin(0.0), NomPumpHead(0.0), EMSPressureOverrideOn(false), EMSPressureOverrideValue(0.0), NomPowerUse(0.0),
