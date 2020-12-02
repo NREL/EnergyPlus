@@ -53,9 +53,10 @@
 #include <ObjexxFCL/Optional.fwd.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
-#include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/PlantComponent.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>

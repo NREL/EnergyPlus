@@ -53,8 +53,9 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
+#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
 
@@ -546,6 +547,14 @@ namespace PackagedTerminalHeatPump {
     );
 
 } // namespace PackagedTerminalHeatPump
+
+struct PackagedTerminalHeatPumpData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

@@ -56,7 +56,6 @@
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataConversions.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>

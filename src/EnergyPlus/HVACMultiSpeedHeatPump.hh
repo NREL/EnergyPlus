@@ -414,6 +414,14 @@ namespace HVACMultiSpeedHeatPump {
 
 } // namespace HVACMultiSpeedHeatPump
 
+struct HVACMultiSpeedHeatPumpData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
+
 } // namespace EnergyPlus
 
 #endif

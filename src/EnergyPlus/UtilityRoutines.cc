@@ -58,21 +58,17 @@ extern "C" {
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/char.functions.hh>
-// #include <ObjexxFCL/Array1.hh>
 #include <ObjexxFCL/Array1S.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include "IOFiles.hh"
-#include "StringUtilities.hh"
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataErrorTracking.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataReportingFlags.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
@@ -83,6 +79,7 @@ extern "C" {
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputReports.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
@@ -90,8 +87,8 @@ extern "C" {
 #include <EnergyPlus/SQLiteProcedures.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SolarShading.hh>
+#include <EnergyPlus/StringUtilities.hh>
 #include <EnergyPlus/SystemReports.hh>
-#include <EnergyPlus/Timer.h>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {

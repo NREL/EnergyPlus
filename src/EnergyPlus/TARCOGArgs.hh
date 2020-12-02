@@ -52,8 +52,8 @@
 #include <ObjexxFCL/Array2A.hh>
 
 // EnergyPlus Headers
-#include "TARCOGOutput.hh"
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/TARCOGOutput.hh>
 
 namespace EnergyPlus {
 

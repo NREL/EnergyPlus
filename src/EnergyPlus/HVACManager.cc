@@ -54,17 +54,13 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/AirflowNetworkBalanceManager.hh>
-#include <EnergyPlus/HVACManager.hh>
 #include <AirflowNetwork/Elements.hpp>
+#include <EnergyPlus/AirflowNetworkBalanceManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
-#include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataConvergParams.hh>
-#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataErrorTracking.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -75,10 +71,11 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/DemandManager.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
-#include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/HVACManager.hh>
 #include <EnergyPlus/HVACSizingSimulationManager.hh>
 #include <EnergyPlus/IceThermalStorage.hh>
 #include <EnergyPlus/InternalHeatGains.hh>

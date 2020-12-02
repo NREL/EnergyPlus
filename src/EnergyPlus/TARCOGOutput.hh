@@ -52,8 +52,8 @@
 #include <ObjexxFCL/Array2A.hh>
 
 // EnergyPlus Headers
-#include "IOFiles.hh"
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/IOFiles.hh>
 
 namespace EnergyPlus {
 

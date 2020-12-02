@@ -448,6 +448,14 @@ void createCoilSelectionReportObj();
 
 void clearCoilSelectionReportObj();
 
+struct ReportCoilSelectionData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
+
 } // namespace EnergyPlus
 
 #endif

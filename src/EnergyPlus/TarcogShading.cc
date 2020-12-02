@@ -57,8 +57,6 @@
 #include <EnergyPlus/TARCOGParams.hh>
 #include <EnergyPlus/TarcogShading.hh>
 
-#include <EnergyPlus/DataGlobals.hh>
-
 namespace EnergyPlus {
 
 namespace TarcogShading {
