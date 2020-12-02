@@ -49,6 +49,7 @@
 #define GeneratorFuelSupply_hh_INCLUDED
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -83,6 +84,14 @@ namespace GeneratorFuelSupply {
     void SetupFuelConstituentData(EnergyPlusData &state, int const FuelSupplyNum, bool &ErrorsFound);
 
 } // namespace GeneratorFuelSupply
+
+struct GeneratorFuelSupplyData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

@@ -57,6 +57,7 @@
 #include <ObjexxFCL/Array2S.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -757,6 +758,14 @@ namespace FluidProperties {
 
 } // namespace FluidProperties
 
-} // namespace EnergyPlus
+struct FluidPropertiesData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
+
+}; // namespace EnergyPlus
 
 #endif

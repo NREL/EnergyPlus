@@ -53,8 +53,9 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
+#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
 
@@ -74,7 +75,7 @@ namespace Furnaces {
     // Last mode of operation
     extern int const CoolingMode; // last compressor operating mode was in cooling
     extern int const HeatingMode; // last compressor operating mode was in heating
-    // Airflow control for contant fan mode
+    // Airflow control for constant fan mode
     extern int const UseCompressorOnFlow;  // set compressor OFF air flow rate equal to compressor ON air flow rate
     extern int const UseCompressorOffFlow; // set compressor OFF air flow rate equal to user defined value
     // Compressor operation
@@ -541,6 +542,14 @@ namespace Furnaces {
     );
 
 } // namespace Furnaces
+
+struct FurnacesData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

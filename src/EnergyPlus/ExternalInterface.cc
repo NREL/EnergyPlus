@@ -69,7 +69,6 @@ extern "C" {
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/ExternalInterface.hh>
 #include <EnergyPlus/FileSystem.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputProcessor.hh>

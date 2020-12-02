@@ -52,8 +52,9 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
@@ -208,6 +209,14 @@ void SetupEMSActuator(std::string const &cComponentTypeName,
 void SetupEMSInternalVariable(EnergyPlusData &state, std::string const &cDataTypeName, std::string const &cUniqueIDName, std::string const &cUnits, Real64 &rValue);
 
 void SetupEMSInternalVariable(EnergyPlusData &state, std::string const &cDataTypeName, std::string const &cUniqueIDName, std::string const &cUnits, int &iValue);
+
+struct EMSManagerData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

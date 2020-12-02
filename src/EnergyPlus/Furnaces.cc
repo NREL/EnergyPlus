@@ -59,9 +59,7 @@
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
-#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -74,7 +72,6 @@
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/Furnaces.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/HVACControllers.hh>
@@ -6777,7 +6774,6 @@ namespace Furnaces {
         using DataHeatBalFanSys::ZT;
         using DXCoils::DXCoil;
         using DXCoils::DXCoilPartLoadRatio;
-        using General::SolveRoot;
 
         using TempSolveRoot::SolveRoot;
 
@@ -8104,7 +8100,6 @@ namespace Furnaces {
 
         // Using/Aliasing
         using DataHeatBalFanSys::MAT;
-        using General::SolveRoot;
 
         using HeatingCoils::SimulateHeatingCoilComponents;
         using TempSolveRoot::SolveRoot;
@@ -9726,7 +9721,6 @@ namespace Furnaces {
         // Using/Aliasing
         using DataHVACGlobals::SmallLoad;
 
-        using General::SolveRoot;
         using HeatingCoils::SimulateHeatingCoilComponents;
         using PlantUtilities::SetComponentFlowRate;
         using SteamCoils::SimulateSteamCoilComponents;
@@ -10316,8 +10310,6 @@ namespace Furnaces {
         // Use RegulaFalsi technique to iterate on part-load ratio until convergence is achieved.
 
         // Using/Aliasing
-        using General::SolveRoot;
-
         using HeatingCoils::SimulateHeatingCoilComponents;
         using IntegratedHeatPump::GetCurWorkMode;
         using IntegratedHeatPump::GetMaxSpeedNumIHP;

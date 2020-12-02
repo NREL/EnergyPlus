@@ -1000,6 +1000,14 @@ namespace DXCoils {
 
 } // namespace DXCoils
 
+struct DXCoilsData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
+
 } // namespace EnergyPlus
 
 #endif

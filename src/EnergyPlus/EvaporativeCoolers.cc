@@ -59,7 +59,6 @@
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
@@ -75,7 +74,6 @@
 #include <EnergyPlus/EvaporativeCoolers.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/FaultsManager.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/HVACFan.hh>
@@ -2454,7 +2452,6 @@ namespace EvaporativeCoolers {
         using CurveManager::CurveValue;
         using DataHVACGlobals::SmallLoad;
 
-        using General::SolveRoot;
         using Psychrometrics::PsyHfgAirFnWTdb;
 
         // Locals
@@ -4714,7 +4711,6 @@ namespace EvaporativeCoolers {
         using DataHVACGlobals::ZoneCompTurnFansOff;
         using DataHVACGlobals::ZoneCompTurnFansOn;
 
-        using General::SolveRoot;
         using TempSolveRoot::SolveRoot;
 
         // Locals

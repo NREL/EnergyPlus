@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
@@ -618,6 +619,14 @@ namespace FuelCellElectricGenerator {
     extern Array1D<FCDataStruct> FuelCell;
 
 } // namespace FuelCellElectricGenerator
+
+struct FuelCellElectricGeneratorData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 
