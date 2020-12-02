@@ -66,8 +66,6 @@ namespace Pumps {
 
     // Data
     // MODULE PARAMETER DEFINITIONS:
-    //extern int const Continuous;   // Pump control type (pump always running)
-    //extern int const Intermittent; // Pump control type (pump runs only when there is a demand)
 
     enum class PumpControlType
     {
@@ -76,8 +74,14 @@ namespace Pumps {
         Intermittent, // Pump control type (pump runs only when there is a demand)
     };
 
-    extern int const VFDManual;    // VFD control type (Scheduled RPM)
-    extern int const VFDAutomatic; // VFD control type (Variable RPM according to flow request)
+    
+    enum class VFDControlType
+    {
+        Unassigned,
+        VFDManual,    // VFD control type (Scheduled RPM)
+        VFDAutomatic, // VFD control type (Variable RPM according to flow request)
+    };
+
 
     extern int const OptimalScheme;    // Control sequencing for pump bank
     extern int const SequentialScheme; // Control sequencing for pump bank
@@ -136,14 +140,14 @@ namespace Pumps {
         int MinRPMSchedIndex;
         std::string MaxRPMSchedName;
         int MaxRPMSchedIndex;
-        int VFDControlType;   // Integer equivalent of VFDControlType
+        VFDControlType VFDControlType;   // Integer equivalent of VFDControlType
         Real64 MaxRPM;        // Maximum RPM range value - schedule limit
         Real64 MinRPM;        // Minimum RPM range value - schedule limit
         Real64 PumpActualRPM; // RPM recalculated from final flow through the loop
 
         // Default Constructor
         PumpVFDControlData()
-            : ManualRPMSchedIndex(0), LowerPsetSchedIndex(0), UpperPsetSchedIndex(0), MinRPMSchedIndex(0), MaxRPMSchedIndex(0), VFDControlType(0),
+            : ManualRPMSchedIndex(0), LowerPsetSchedIndex(0), UpperPsetSchedIndex(0), MinRPMSchedIndex(0), MaxRPMSchedIndex(0), VFDControlType(VFDControlType::Unassigned),
               MaxRPM(0.0), MinRPM(0.0), PumpActualRPM(0.0)
         {
         }

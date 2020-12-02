@@ -118,13 +118,7 @@ namespace Pumps {
 
     // Data
     // MODULE PARAMETER DEFINITIONS:
-    //int const Continuous(1);   // Pump control type (pump always running)
-    //int const Intermittent(2); // Pump control type (pump runs only when there is a demand)
 
-
-
-    int const VFDManual(1);    // VFD control type (Scheduled RPM)
-    int const VFDAutomatic(2); // VFD control type (Variable RPM according to flow request)
 
     int const OptimalScheme(1);    // Control sequencing for pump bank
     int const SequentialScheme(2); // Control sequencing for pump bank
@@ -490,7 +484,7 @@ namespace Pumps {
             } else {
                 PumpEquip(PumpNum).HasVFD = true;
                 if (cAlphaArgs(7) == "MANUALCONTROL") {
-                    PumpEquip(PumpNum).VFD.VFDControlType = VFDManual;
+                    PumpEquip(PumpNum).VFD.VFDControlType = VFDControlType::VFDManual;
                     PumpEquip(PumpNum).VFD.ManualRPMSchedName = cAlphaArgs(8);
                     PumpEquip(PumpNum).VFD.ManualRPMSchedIndex = GetScheduleIndex(state, cAlphaArgs(8));
                     if (PumpEquip(PumpNum).VFD.ManualRPMSchedIndex <= 0) {
@@ -505,7 +499,7 @@ namespace Pumps {
                         ErrorsFound = true;
                     }
                 } else if (cAlphaArgs(7) == "PRESSURESETPOINTCONTROL") {
-                    PumpEquip(PumpNum).VFD.VFDControlType = VFDAutomatic;
+                    PumpEquip(PumpNum).VFD.VFDControlType = VFDControlType::VFDAutomatic;
                     PumpEquip(PumpNum).VFD.LowerPsetSchedName = cAlphaArgs(9);
                     PumpEquip(PumpNum).VFD.LowerPsetSchedIndex = GetScheduleIndex(state, cAlphaArgs(9));
                     PumpEquip(PumpNum).VFD.UpperPsetSchedName = cAlphaArgs(10);
@@ -1646,8 +1640,8 @@ namespace Pumps {
 
                 if (PumpEquip(PumpNum).HasVFD) {
                     {
-                        auto const SELECT_CASE_var1(PumpEquip(PumpNum).VFD.VFDControlType);
-                        if (SELECT_CASE_var1 == VFDManual) {
+                        VFDControlType SELECT_CASE_var1(PumpEquip(PumpNum).VFD.VFDControlType);
+                        if (SELECT_CASE_var1 == VFDControlType::VFDManual) {
 
                             // Evaluate the schedule if it exists and put the fraction into a local variable
                             PumpSchedRPM = GetCurrentScheduleValue(state, PumpEquip(PumpNum).VFD.ManualRPMSchedIndex);
@@ -1671,7 +1665,7 @@ namespace Pumps {
                                 PumpMassFlowRateMin = PumpMassFlowRate;
                             }
 
-                        } else if (SELECT_CASE_var1 == VFDAutomatic) {
+                        } else if (SELECT_CASE_var1 == VFDControlType::VFDAutomatic) {
 
                             if (PlantLoop(PumpEquip(PumpNum).LoopNum).UsePressureForPumpCalcs &&
                                 PlantLoop(PumpEquip(PumpNum).LoopNum).PressureSimType == Press_FlowCorrection &&
