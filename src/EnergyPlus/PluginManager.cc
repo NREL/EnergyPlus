@@ -47,9 +47,7 @@
 
 #include <map>
 
-#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -59,8 +57,7 @@
 
 #include <nlohmann/json.hpp>
 
-namespace EnergyPlus {
-namespace PluginManagement {
+namespace EnergyPlus::PluginManagement {
 
     PluginTrendVariable::PluginTrendVariable(EnergyPlusData &state, std::string _name, int _numValues, int _indexOfPluginVariable) :
     name(std::move(_name)), numValues(_numValues), indexOfPluginVariable(_indexOfPluginVariable)
@@ -1361,8 +1358,5 @@ namespace PluginManagement {
         return false;
     }
 #endif
-
-} // namespace PluginManagement
-
 
 } // namespace EnergyPlus

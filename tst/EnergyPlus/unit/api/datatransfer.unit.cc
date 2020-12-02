@@ -68,8 +68,6 @@ using namespace EnergyPlus;
 
 class DataExchangeAPIUnitTestFixture : public EnergyPlusFixture
 {
-    // create a plugin manager instance
-    EnergyPlus::PluginManagement::PluginManager pluginManager = EnergyPlus::PluginManagement::PluginManager(*state);
 
     struct DummyRealVariable
     {
@@ -152,6 +150,7 @@ class DataExchangeAPIUnitTestFixture : public EnergyPlusFixture
         OutputProcessor::SetupTimePointers(*state, "HVAC", timeStep);
         *OutputProcessor::TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep = 60;
         *OutputProcessor::TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep = 60;
+        state->dataPluginManager->pluginManager = std::make_unique<EnergyPlus::PluginManagement::PluginManager>(*state);
     }
 
     void TearDown() override
@@ -238,12 +237,12 @@ public:
 
     void addPluginGlobal(EnergyPlus::EnergyPlusData &state, std::string const &varName)
     {
-        this->pluginManager.addGlobalVariable(state, varName);
+        state.dataPluginManager->pluginManager->addGlobalVariable(state, varName);
     }
 
     void addTrendWithNewGlobal(std::string const &newGlobalVarName, std::string const &trendName, int numTrendValues)
     {
-        this->pluginManager.addGlobalVariable(*state, newGlobalVarName);
+        state->dataPluginManager->pluginManager->addGlobalVariable(*state, newGlobalVarName);
         int i = EnergyPlus::PluginManagement::PluginManager::getGlobalVariableHandle(*state, newGlobalVarName, true);
         state->dataPluginManager->trends.emplace_back(*state, trendName, numTrendValues, i);
     }
