@@ -2091,9 +2091,6 @@ namespace EnergyPlus {
             using DataHVACGlobals::NumPlantLoops;
             using DataPlant::PlantFirstSizesOkayToReport;
             using EMSManager::CheckIfNodeSetPointManagedByEMS;
-            using EMSManager::iTemperatureMaxSetPoint;
-            using EMSManager::iTemperatureMinSetPoint;
-            using EMSManager::iTemperatureSetPoint;
             ;
             using PlantUtilities::SetAllFlowLocks;
 
@@ -2157,7 +2154,7 @@ namespace EnergyPlus {
                                 SetPointErrorFlag = true;
                             } else {
                                 // need call to EMS to check node
-                                CheckIfNodeSetPointManagedByEMS(state, SensedNode, iTemperatureSetPoint, SetPointErrorFlag);
+                                CheckIfNodeSetPointManagedByEMS(state, SensedNode, EMSManager::SPControlType::iTemperatureSetPoint, SetPointErrorFlag);
                                 if (SetPointErrorFlag) {
                                     ShowSevereError(state,
                                             "PlantManager: No Setpoint Manager Defined for Node=" + NodeID(SensedNode) +
@@ -2336,7 +2333,7 @@ namespace EnergyPlus {
                                     SetPointErrorFlag = true;
                                 } else {
                                     CheckIfNodeSetPointManagedByEMS(state, PlantLoop(LoopNum).TempSetPointNodeNum,
-                                                                    iTemperatureMaxSetPoint, SetPointErrorFlag);
+                                                                    EMSManager::SPControlType::iTemperatureMaxSetPoint, SetPointErrorFlag);
                                     if (SetPointErrorFlag) {
                                         ShowSevereError(state,
                                                 "Plant Loop: missing high temperature setpoint for dual setpoint deadband demand scheme");
@@ -2360,7 +2357,7 @@ namespace EnergyPlus {
                                     SetPointErrorFlag = true;
                                 } else {
                                     CheckIfNodeSetPointManagedByEMS(state, PlantLoop(LoopNum).TempSetPointNodeNum,
-                                                                    iTemperatureMinSetPoint, SetPointErrorFlag);
+                                                                    EMSManager::SPControlType::iTemperatureMinSetPoint, SetPointErrorFlag);
                                     if (SetPointErrorFlag) {
                                         ShowSevereError(state,
                                                 "Plant Loop: missing low temperature setpoint for dual setpoint deadband demand scheme");

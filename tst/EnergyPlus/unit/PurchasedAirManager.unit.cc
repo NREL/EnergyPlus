@@ -649,7 +649,7 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_EMSOverrideTest)
 
     EMSManager::CheckIfAnyEMS(*state); // get EMS input
     EMSManager::GetEMSInput(*state);
-    EMSManager::FinishProcessingUserInput = true;
+    state->dataEMSMgr->FinishProcessingUserInput = true;
 
     bool FirstHVACIteration(true);
 

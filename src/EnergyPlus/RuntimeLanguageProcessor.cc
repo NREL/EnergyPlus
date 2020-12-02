@@ -1865,7 +1865,7 @@ namespace RuntimeLanguageProcessor {
                         ReturnValue.Type = ValueError;
                         ReturnValue.Error = "EvaluateExpression: Variable = '" + ErlVariable(Operand(OperandNum).Variable).Name +
                                             "' used in expression has not been initialized!";
-                        if (!state.dataGlobal->DoingSizing && !state.dataGlobal->KickOffSimulation && !EMSManager::FinishProcessingUserInput) {
+                        if (!state.dataGlobal->DoingSizing && !state.dataGlobal->KickOffSimulation && !state.dataEMSMgr->FinishProcessingUserInput) {
 
                             // check if this is an arg in CurveValue,
                             if (ErlExpression(ExpressionNum).Operator !=
@@ -1893,7 +1893,7 @@ namespace RuntimeLanguageProcessor {
                             if (Operand(2).Number == 0.0) {
                                 ReturnValue.Type = ValueError;
                                 ReturnValue.Error = "EvaluateExpression: Divide By Zero in EMS Program!";
-                                if (!state.dataGlobal->DoingSizing && !state.dataGlobal->KickOffSimulation && !EMSManager::FinishProcessingUserInput) {
+                                if (!state.dataGlobal->DoingSizing && !state.dataGlobal->KickOffSimulation && !state.dataEMSMgr->FinishProcessingUserInput) {
                                     seriousErrorFound = true;
                                 }
                             } else {
@@ -1982,7 +1982,7 @@ namespace RuntimeLanguageProcessor {
                                     format("EvaluateExpression: Attempted to raise to power with incompatible numbers: {:.6T} raised to {:.6T}",
                                            Operand(1).Number,
                                            Operand(2).Number);
-                                if (!state.dataGlobal->DoingSizing && !state.dataGlobal->KickOffSimulation && !EMSManager::FinishProcessingUserInput) {
+                                if (!state.dataGlobal->DoingSizing && !state.dataGlobal->KickOffSimulation && !state.dataEMSMgr->FinishProcessingUserInput) {
                                     seriousErrorFound = true;
                                 }
                             } else {
@@ -2031,7 +2031,7 @@ namespace RuntimeLanguageProcessor {
                             ReturnValue.Error = format("EvaluateExpression: Attempted to calculate exponential value of too large a number: {:.4T}",
                                                        Operand(1).Number);
                             ReturnValue.Type = ValueError;
-                            if (!state.dataGlobal->DoingSizing && !state.dataGlobal->KickOffSimulation && !EMSManager::FinishProcessingUserInput) {
+                            if (!state.dataGlobal->DoingSizing && !state.dataGlobal->KickOffSimulation && !state.dataEMSMgr->FinishProcessingUserInput) {
                                 seriousErrorFound = true;
                             }
                         }
@@ -2042,7 +2042,7 @@ namespace RuntimeLanguageProcessor {
                             // throw error,
                             ReturnValue.Type = ValueError;
                             ReturnValue.Error = format("EvaluateExpression: Natural Log of zero or less! ln of value = {:.4T}", Operand(1).Number);
-                            if (!state.dataGlobal->DoingSizing && !state.dataGlobal->KickOffSimulation && !EMSManager::FinishProcessingUserInput) {
+                            if (!state.dataGlobal->DoingSizing && !state.dataGlobal->KickOffSimulation && !state.dataEMSMgr->FinishProcessingUserInput) {
                                 seriousErrorFound = true;
                             }
                         }

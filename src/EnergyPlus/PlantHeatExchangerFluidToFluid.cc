@@ -411,7 +411,7 @@ namespace PlantHeatExchangerFluidToFluid {
                                 // need call to EMS to check node
                                 bool NodeEMSSetPointMissing = false;
                                 EMSManager::CheckIfNodeSetPointManagedByEMS(state,
-                                    FluidHX(CompLoop).SetPointNodeNum, EMSManager::iTemperatureSetPoint, NodeEMSSetPointMissing);
+                                    FluidHX(CompLoop).SetPointNodeNum, EMSManager::SPControlType::iTemperatureSetPoint, NodeEMSSetPointMissing);
                                 if (NodeEMSSetPointMissing) {
                                     ShowSevereError(state, RoutineName + " Missing temperature setpoint for node = " + cAlphaArgs(9));
                                     ShowContinueError(state, "Occurs for " + cCurrentModuleObject + "=\"" + cAlphaArgs(1));
@@ -433,9 +433,9 @@ namespace PlantHeatExchangerFluidToFluid {
                                 // need call to EMS to check node
                                 bool NodeEMSSetPointMissing = false;
                                 EMSManager::CheckIfNodeSetPointManagedByEMS(state,
-                                    FluidHX(CompLoop).SetPointNodeNum, EMSManager::iTemperatureMinSetPoint, NodeEMSSetPointMissing);
+                                    FluidHX(CompLoop).SetPointNodeNum, EMSManager::SPControlType::iTemperatureMinSetPoint, NodeEMSSetPointMissing);
                                 EMSManager::CheckIfNodeSetPointManagedByEMS(state,
-                                    FluidHX(CompLoop).SetPointNodeNum, EMSManager::iTemperatureMaxSetPoint, NodeEMSSetPointMissing);
+                                    FluidHX(CompLoop).SetPointNodeNum, EMSManager::SPControlType::iTemperatureMaxSetPoint, NodeEMSSetPointMissing);
                                 if (NodeEMSSetPointMissing) {
                                     ShowSevereError(state, RoutineName + " Missing temperature setpoint for node = " + cAlphaArgs(9));
                                     ShowContinueError(state, "Occurs for " + cCurrentModuleObject + "=\"" + cAlphaArgs(1));

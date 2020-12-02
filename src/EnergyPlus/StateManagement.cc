@@ -84,7 +84,6 @@
 #include <EnergyPlus/DesiccantDehumidifiers.hh>
 #include <EnergyPlus/DisplacementVentMgr.hh>
 #include <EnergyPlus/DualDuct.hh>
-#include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/EarthTube.hh>
 #include <EnergyPlus/EconomicLifeCycleCost.hh>
 #include <EnergyPlus/EconomicTariff.hh>
@@ -230,7 +229,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     EconomicLifeCycleCost::clear_state();
     EconomicTariff::clear_state();
     ElectricBaseboardRadiator::clear_state();
-    EMSManager::clear_state();
     EvaporativeCoolers::clear_state();
     EvaporativeFluidCoolers::clear_state();
     ExternalInterface::clear_state();

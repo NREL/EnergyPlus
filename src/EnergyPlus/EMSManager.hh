@@ -65,27 +65,18 @@ struct EnergyPlusData;
 
 namespace EMSManager {
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-    extern int const iTemperatureSetPoint;      // integer for node setpoint control type
-    extern int const iTemperatureMinSetPoint;   // integer for node setpoint control type
-    extern int const iTemperatureMaxSetPoint;   // integer for node setpoint control type
-    extern int const iHumidityRatioSetPoint;    // integer for node setpoint control type
-    extern int const iHumidityRatioMinSetPoint; // integer for node setpoint control type
-    extern int const iHumidityRatioMaxSetPoint; // integer for node setpoint control type
-    extern int const iMassFlowRateSetPoint;     // integer for node setpoint control type
-    extern int const iMassFlowRateMinSetPoint;  // integer for node setpoint control type
-    extern int const iMassFlowRateMaxSetPoint;  // integer for node setpoint control type
-
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE TYPE DECLARATIONS:
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern bool GetEMSUserInput; // Flag to prevent input from being read multiple times
-    extern bool ZoneThermostatActuatorsHaveBeenSetup;
-    extern bool FinishProcessingUserInput; // Flag to indicate still need to process input
-
+    enum class SPControlType {
+        iTemperatureSetPoint,      // integer for node setpoint control type
+        iTemperatureMinSetPoint,   // integer for node setpoint control type
+        iTemperatureMaxSetPoint,   // integer for node setpoint control type
+        iHumidityRatioSetPoint,    // integer for node setpoint control type
+        iHumidityRatioMinSetPoint, // integer for node setpoint control type
+        iHumidityRatioMaxSetPoint, // integer for node setpoint control type
+        iMassFlowRateSetPoint,     // integer for node setpoint control type
+        iMassFlowRateMinSetPoint,  // integer for node setpoint control type
+        iMassFlowRateMaxSetPoint   // integer for node setpoint control type
+    };
+    
     // Parameters for EMS Calling Points
     enum class EMSCallFrom {
         Unassigned,
@@ -111,14 +102,7 @@ namespace EMSManager {
         BeginZoneTimestepBeforeSetCurrentWeather
     };
 
-    // SUBROUTINE SPECIFICATIONS:
-
-    // Functions
-    void clear_state();
-
     void CheckIfAnyEMS(EnergyPlusData &state);
-
-    // MODULE SUBROUTINES:
 
     void ManageEMS(EnergyPlusData &state,
                    EMSCallFrom iCalledFrom,  // indicates where subroutine was called from, parameters in DataGlobals.
@@ -132,7 +116,7 @@ namespace EMSManager {
 
     void GetEMSInput(EnergyPlusData &state);
 
-    void ProcessEMSInput(EnergyPlusData &state, bool const reportErrors); // .  If true, then report out errors ,otherwise setup what we can
+    void ProcessEMSInput(EnergyPlusData &state, bool reportErrors); // .  If true, then report out errors ,otherwise setup what we can
 
     void GetVariableTypeAndIndex(EnergyPlusData &state, std::string const &VarName, std::string const &VarKeyName, int &VarType, int &VarIndex);
 
@@ -144,20 +128,20 @@ namespace EMSManager {
 
     void UpdateEMSTrendVariables(EnergyPlusData &state);
 
-    std::string controlTypeName(int const SetPointType); // Maps int to the std::string equivalent
+    std::string controlTypeName(SPControlType SetPointType); // Maps int to the std::string equivalent
                                                          // (eg iTemperatureSetPoint => "Temperature Setpoint")
 
     bool CheckIfNodeSetPointManaged(EnergyPlusData &state,
-                                    int const NodeNum, // index of node being checked.
-                                    int const SetPointType,
+                                    int NodeNum, // index of node being checked.
+                                    SPControlType SetPointType,
                                     bool byHandle = false);
 
     bool CheckIfNodeSetPointManagedByEMS(EnergyPlusData &state,
-                                         int const NodeNum, // index of node being checked.
-                                         int const SetPointType,
+                                         int NodeNum, // index of node being checked.
+                                         SPControlType SetPointType,
                                          bool &ErrorFlag);
 
-    bool CheckIfNodeMoreInfoSensedByEMS(int const nodeNum, // index of node being checked.
+    bool CheckIfNodeMoreInfoSensedByEMS(int nodeNum, // index of node being checked.
                                         std::string const &varName);
 
     void SetupPrimaryAirSystemAvailMgrAsActuators(EnergyPlusData &state);
@@ -212,9 +196,15 @@ void SetupEMSInternalVariable(EnergyPlusData &state, std::string const &cDataTyp
 
 struct EMSManagerData : BaseGlobalStruct {
 
+    bool GetEMSUserInput = true; // Flag to prevent input from being read multiple times
+    bool ZoneThermostatActuatorsHaveBeenSetup = false;
+    bool FinishProcessingUserInput = true; // Flag to indicate still need to process input
+
     void clear_state() override
     {
-
+        GetEMSUserInput = true;
+        ZoneThermostatActuatorsHaveBeenSetup = false;
+        FinishProcessingUserInput = true;
     }
 };
 

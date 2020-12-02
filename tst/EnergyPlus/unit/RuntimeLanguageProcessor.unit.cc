@@ -65,7 +65,7 @@ TEST_F(EnergyPlusFixture, ERLExpression_TestExponentials)
     // set the program state so that errors can be thrown
     state->dataGlobal->DoingSizing = false;
     state->dataGlobal->KickOffSimulation = false;
-    EMSManager::FinishProcessingUserInput = false;
+    state->dataEMSMgr->FinishProcessingUserInput = false;
 
     bool errorsFound = false;
 
