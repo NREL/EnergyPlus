@@ -421,12 +421,12 @@ namespace DataRuntimeLanguage {
         // Members
         // nested structure inside ErlStack that holds program instructions
         int LineNum;   // Erl program line number reference
-        int Keyword;   // type of instruction for this line, e.g. KeywordSet, KeywordIf, etc
+        RuntimeLanguageProcessor::ErlKeywordParam Keyword; // type of instruction for this line, e.g. KeywordSet, KeywordIf, etc
         int Argument1; // Index to a variable, function, expression, or stack
         int Argument2; // Index to a variable, function, expression, or stack
 
         // Default Constructor
-        InstructionType() : LineNum(0), Keyword(0), Argument1(0), Argument2(0)
+        InstructionType() : LineNum(0), Keyword(RuntimeLanguageProcessor::ErlKeywordParam::KeywordNone), Argument1(0), Argument2(0)
         {
         }
     };
