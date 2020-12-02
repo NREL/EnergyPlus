@@ -705,7 +705,7 @@ namespace PluginManagement {
 
             for (unsigned long itemNum = 0; itemNum < numVals; itemNum++) {
                 PyObject *item = PyList_GetItem(pyth_val, itemNum);
-                if PyUnicode_Check(item) { // NOLINT(hicpp-signed-bitwise) -- something inside Python code causes warning
+                if (PyUnicode_Check(item)) { // NOLINT(hicpp-signed-bitwise) -- something inside Python code causes warning
                     std::string traceback_line = PyUnicode_AsUTF8(item);
                     if (!traceback_line.empty() && traceback_line[traceback_line.length()-1] == '\n') {
                         traceback_line.erase(traceback_line.length()-1);
