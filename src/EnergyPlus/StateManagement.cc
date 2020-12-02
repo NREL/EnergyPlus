@@ -56,7 +56,6 @@
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBranchNodeConnections.hh>
-#include <EnergyPlus/DataErrorTracking.hh>
 #include <EnergyPlus/DataGenerators.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
@@ -169,7 +168,6 @@
 #include <EnergyPlus/PlantPipingSystemsManager.hh>
 #include <EnergyPlus/PlantPressureSystem.hh>
 #include <EnergyPlus/PlantUtilities.hh>
-#include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/PollutionModule.hh>
 #include <EnergyPlus/PondGroundHeatExchanger.hh>
 #include <EnergyPlus/PoweredInductionUnits.hh>
@@ -197,7 +195,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     autosizing_clear_state();
     CoilCoolingDX::clear_state();
     AirflowNetwork::clear_state();
-    DataErrorTracking::clear_state();
     DataGenerators::clear_state();
     DataHeatBalance::clear_state();
     DataHeatBalFanSys::clear_state();
@@ -313,7 +310,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     PlantPressureSystem::clear_state();
     PlantUtilities::clear_state();
     PlantPipingSystemsManager::clear_state();
-    PluginManagement::clear_state();
     PollutionModule::clear_state();
     PondGroundHeatExchanger::clear_state();
     PoweredInductionUnits::clear_state();

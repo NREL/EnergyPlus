@@ -2349,9 +2349,6 @@ namespace BranchInputManager {
         // This routine will point out any "dangling branches" that are not included on a BranchList.
         // Warnings are produced as the user might clutter up the input file with unused branches.
 
-        // Using/Aliasing
-        using DataErrorTracking::TotalSevereErrors;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumDanglingCount;        // when mustprint not true, count and report
         int BlNum;                   // Branch List Counter
@@ -2389,7 +2386,7 @@ namespace BranchInputManager {
                     }
                 } else {
                     ShowSevereMessage(state, "AuditBranches: Branch=\"" + state.dataBranchInputManager->Branch(BrN).Name + "\" not found on any BranchLists.");
-                    ++TotalSevereErrors;
+                    ++state.dataErrTracking->TotalSevereErrors;
                 }
             }
         }
@@ -2399,7 +2396,7 @@ namespace BranchInputManager {
         }
         if (!mustprint && NumDanglingCount > 0) {
             ShowSevereMessage(state, fmt::format("AuditBranches: There are {} branch(es) that do not appear on any BranchList.", NumDanglingCount));
-            TotalSevereErrors += NumDanglingCount;
+            state.dataErrTracking->TotalSevereErrors += NumDanglingCount;
             ShowContinueError(state, "Use Output:Diagnostics,DisplayExtraWarnings; for detail of each branch not on a branch list.");
         }
     }

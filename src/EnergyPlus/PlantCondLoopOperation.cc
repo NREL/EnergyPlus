@@ -1776,7 +1776,7 @@ CurrentModuleObject, PlantOpSchemeName);
                     PlantLoop(LoopNum).OpScheme(SchemeNum).ErlSimProgramMngr = StackMngrNum;
                 } else {
                     PlantLoop(LoopNum).OpScheme(SchemeNum).simPluginLocation =
-                        EnergyPlus::PluginManagement::pluginManager->getLocationOfUserDefinedPlugin(cAlphaArgs(2));
+                        state.dataPluginManager->pluginManager->getLocationOfUserDefinedPlugin(state, cAlphaArgs(2));
                     if (PlantLoop(LoopNum).OpScheme(SchemeNum).simPluginLocation == -1) {
                         ShowSevereError(state, "Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
                         ShowContinueError(state, "Entered in " + CurrentModuleObject + '=' + cAlphaArgs(1));
@@ -1790,7 +1790,7 @@ CurrentModuleObject, PlantOpSchemeName);
                         PlantLoop(LoopNum).OpScheme(SchemeNum).ErlInitProgramMngr = StackMngrNum;
                     } else {
                         PlantLoop(LoopNum).OpScheme(SchemeNum).initPluginLocation =
-                            EnergyPlus::PluginManagement::pluginManager->getLocationOfUserDefinedPlugin(cAlphaArgs(3));
+                            state.dataPluginManager->pluginManager->getLocationOfUserDefinedPlugin(state, cAlphaArgs(3));
                         if (PlantLoop(LoopNum).OpScheme(SchemeNum).initPluginLocation == -1) {
                             ShowSevereError(state, "Invalid " + cAlphaFieldNames(3) + '=' + cAlphaArgs(3));
                             ShowContinueError(state, "Entered in " + CurrentModuleObject + '=' + cAlphaArgs(1));
@@ -2084,7 +2084,7 @@ CurrentModuleObject, PlantOpSchemeName);
                                 bool anyEMSRan;
                                 ManageEMS(state, EMSManager::EMSCallFrom::UserDefinedComponentModel, anyEMSRan, this_op_scheme.ErlInitProgramMngr);
                             } else if (this_op_scheme.initPluginLocation > -1) {
-                                EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(state, this_op_scheme.initPluginLocation);
+                                state.dataPluginManager->pluginManager->runSingleUserDefinedPlugin(state, this_op_scheme.initPluginLocation);
                             }
                             this_op_scheme.MyEnvrnFlag = false;
                         }
@@ -3092,8 +3092,7 @@ CurrentModuleObject, PlantOpSchemeName);
             bool anyEMSRan;
             ManageEMS(state, EMSManager::EMSCallFrom::UserDefinedComponentModel, anyEMSRan, PlantLoop(LoopNum).OpScheme(CurSchemePtr).ErlSimProgramMngr);
         } else if (PlantLoop(LoopNum).OpScheme(CurSchemePtr).simPluginLocation > -1) {
-            EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(state,
-                                                                                    PlantLoop(LoopNum).OpScheme(CurSchemePtr).simPluginLocation);
+            state.dataPluginManager->pluginManager->runSingleUserDefinedPlugin(state, PlantLoop(LoopNum).OpScheme(CurSchemePtr).simPluginLocation);
         }
 
         // move actuated value to MyLoad

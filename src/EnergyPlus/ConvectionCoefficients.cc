@@ -802,7 +802,6 @@ namespace ConvectionCoefficients {
         // Using/Aliasing
         using namespace DataIPShortCuts;
         using CurveManager::GetCurveIndex;
-        using DataErrorTracking::TotalSevereErrors;
         using ScheduleManager::CheckScheduleValueMinMax;
         using ScheduleManager::GetScheduleIndex;
 
@@ -1715,7 +1714,7 @@ namespace ConvectionCoefficients {
                     "the Zone Outside Convection Algorithm specifies \"SimpleCombined\". SimpleCombined will be used for these surfaces.");
                 if (!state.dataGlobal->DisplayExtraWarnings) {
                     ShowContinueError(state, "Use OutputDiagnostics,DisplayExtraWarnings; to see specific instances.");
-                    TotalSevereErrors += Count;
+                    state.dataErrTracking->TotalSevereErrors += Count;
                 }
             }
         }

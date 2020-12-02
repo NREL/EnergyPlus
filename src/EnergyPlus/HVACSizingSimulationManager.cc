@@ -209,7 +209,6 @@ std::unique_ptr<HVACSizingSimulationManager> hvacSizingSimulationManager;
 
 void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound)
 {
-    using DataErrorTracking::ExitDuringSimulations;
     using DataSystemVariables::ReportDuringHVACSizingSimulation;
     using EMSManager::ManageEMS;
     using ExteriorEnergyUse::ManageExteriorEnergyUse;
@@ -267,7 +266,7 @@ void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound)
                     sqlite->sqliteCommit();
                 }
             }
-            ExitDuringSimulations = true;
+            state.dataErrTracking->ExitDuringSimulations = true;
 
             DisplayString(state, "Initializing New Environment Parameters, HVAC Sizing Simulation");
 

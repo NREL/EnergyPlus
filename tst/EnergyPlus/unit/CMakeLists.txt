@@ -251,6 +251,7 @@ set( test_dependencies
 )
 
 if(LINK_WITH_PYTHON)
+  add_definitions("-DLINK_WITH_PYTHON")
   if (CMAKE_HOST_UNIX)
     find_package(PythonLibs 3 REQUIRED)
     include_directories(${PYTHON_INCLUDE_DIRS})

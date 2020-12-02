@@ -766,6 +766,6 @@ struct FluidPropertiesData : BaseGlobalStruct {
     }
 };
 
-}; // namespace EnergyPlus
+} // namespace EnergyPlus
 
 #endif

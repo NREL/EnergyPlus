@@ -129,7 +129,7 @@ namespace UserDefinedComponents {
                 EMSManager::ManageEMS(
                     state, EMSManager::EMSCallFrom::UserDefinedComponentModel, anyEMSRan, this->Loop(thisLoop).ErlInitProgramMngr);
             } else if (this->Loop(thisLoop).initPluginLocation > -1) {
-                EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(state, this->Loop(thisLoop).initPluginLocation);
+                state.dataPluginManager->pluginManager->runSingleUserDefinedPlugin(state, this->Loop(thisLoop).initPluginLocation);
             }
 
             PlantUtilities::InitComponentNodes(this->Loop(thisLoop).MassFlowRateMin,
@@ -203,14 +203,14 @@ namespace UserDefinedComponents {
                 EMSManager::ManageEMS(
                     state, EMSManager::EMSCallFrom::UserDefinedComponentModel, anyEMSRan, this->Loop(thisLoop).ErlSimProgramMngr);
             } else if (this->Loop(thisLoop).simPluginLocation > -1) {
-                EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(state, this->Loop(thisLoop).simPluginLocation);
+                state.dataPluginManager->pluginManager->runSingleUserDefinedPlugin(state, this->Loop(thisLoop).simPluginLocation);
             }
         }
 
         if (this->ErlSimProgramMngr > 0) {
             EMSManager::ManageEMS(state, EMSManager::EMSCallFrom::UserDefinedComponentModel, anyEMSRan, this->ErlSimProgramMngr);
         } else if (this->simPluginLocation > -1) {
-            EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(state, this->simPluginLocation);
+            state.dataPluginManager->pluginManager->runSingleUserDefinedPlugin(state, this->simPluginLocation);
         }
 
         this->report(state, thisLoop);
@@ -271,7 +271,7 @@ namespace UserDefinedComponents {
                 EMSManager::ManageEMS(
                     state, EMSManager::EMSCallFrom::UserDefinedComponentModel, anyEMSRan, state.dataUserDefinedComponents->UserCoil(CompNum).ErlInitProgramMngr);
             } else if (state.dataUserDefinedComponents->UserCoil(CompNum).initPluginLocation > -1) {
-                EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(state, state.dataUserDefinedComponents->UserCoil(CompNum).initPluginLocation);
+                state.dataPluginManager->pluginManager->runSingleUserDefinedPlugin(state, state.dataUserDefinedComponents->UserCoil(CompNum).initPluginLocation);
             }
 
             if (state.dataUserDefinedComponents->UserCoil(CompNum).PlantIsConnected) {
@@ -294,7 +294,7 @@ namespace UserDefinedComponents {
         if (state.dataUserDefinedComponents->UserCoil(CompNum).ErlSimProgramMngr > 0) {
             EMSManager::ManageEMS(state, EMSManager::EMSCallFrom::UserDefinedComponentModel, anyEMSRan, state.dataUserDefinedComponents->UserCoil(CompNum).ErlSimProgramMngr);
         } else if (state.dataUserDefinedComponents->UserCoil(CompNum).simPluginLocation > -1) {
-            EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(state, state.dataUserDefinedComponents->UserCoil(CompNum).simPluginLocation);
+            state.dataPluginManager->pluginManager->runSingleUserDefinedPlugin(state, state.dataUserDefinedComponents->UserCoil(CompNum).simPluginLocation);
         }
 
         state.dataUserDefinedComponents->UserCoil(CompNum).report(state);
@@ -370,7 +370,7 @@ namespace UserDefinedComponents {
                 EMSManager::ManageEMS(
                     state, EMSManager::EMSCallFrom::UserDefinedComponentModel, anyEMSRan, state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).ErlInitProgramMngr);
             } else if (state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).initPluginLocation > -1) {
-                EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(state, state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).initPluginLocation);
+                state.dataPluginManager->pluginManager->runSingleUserDefinedPlugin(state, state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).initPluginLocation);
             }
             if (state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).NumPlantConnections > 0) {
                 for (int Loop = 1; Loop <= state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).NumPlantConnections; ++Loop) {
@@ -397,7 +397,7 @@ namespace UserDefinedComponents {
             EMSManager::ManageEMS(
                 state, EMSManager::EMSCallFrom::UserDefinedComponentModel, anyEMSRan, state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).ErlSimProgramMngr);
         } else if (state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).simPluginLocation > -1) {
-            EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(state, state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).simPluginLocation);
+            state.dataPluginManager->pluginManager->runSingleUserDefinedPlugin(state, state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).simPluginLocation);
         }
 
         state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).report(state);
@@ -477,7 +477,7 @@ namespace UserDefinedComponents {
                 EMSManager::ManageEMS(
                     state, EMSManager::EMSCallFrom::UserDefinedComponentModel, anyEMSRan, state.dataUserDefinedComponents->UserAirTerminal(CompNum).ErlInitProgramMngr);
             } else if (state.dataUserDefinedComponents->UserAirTerminal(CompNum).initPluginLocation > -1) {
-                EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(state, state.dataUserDefinedComponents->UserAirTerminal(CompNum).initPluginLocation);
+                state.dataPluginManager->pluginManager->runSingleUserDefinedPlugin(state, state.dataUserDefinedComponents->UserAirTerminal(CompNum).initPluginLocation);
             }
             if (state.dataUserDefinedComponents->UserAirTerminal(CompNum).NumPlantConnections > 0) {
                 for (int Loop = 1; Loop <= state.dataUserDefinedComponents->UserAirTerminal(CompNum).NumPlantConnections; ++Loop) {
@@ -504,7 +504,7 @@ namespace UserDefinedComponents {
             EMSManager::ManageEMS(
                 state, EMSManager::EMSCallFrom::UserDefinedComponentModel, anyEMSRan, state.dataUserDefinedComponents->UserAirTerminal(CompNum).ErlSimProgramMngr);
         } else if (state.dataUserDefinedComponents->UserAirTerminal(CompNum).simPluginLocation > -1) {
-            EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(state, state.dataUserDefinedComponents->UserAirTerminal(CompNum).simPluginLocation);
+            state.dataPluginManager->pluginManager->runSingleUserDefinedPlugin(state, state.dataUserDefinedComponents->UserAirTerminal(CompNum).simPluginLocation);
         }
 
         state.dataUserDefinedComponents->UserAirTerminal(CompNum).report(state);
@@ -552,7 +552,7 @@ namespace UserDefinedComponents {
                         state.dataUserDefinedComponents->UserPlantComp(CompLoop).ErlSimProgramMngr = StackMngrNum;
                     } else {
                         // check Python Plugins
-                        state.dataUserDefinedComponents->UserPlantComp(CompLoop).simPluginLocation = EnergyPlus::PluginManagement::pluginManager->getLocationOfUserDefinedPlugin(cAlphaArgs(2));
+                        state.dataUserDefinedComponents->UserPlantComp(CompLoop).simPluginLocation = state.dataPluginManager->pluginManager->getLocationOfUserDefinedPlugin(state, cAlphaArgs(2));
                         if (state.dataUserDefinedComponents->UserPlantComp(CompLoop).simPluginLocation == -1) {
                             ShowSevereError(state, "Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
                             ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
@@ -638,7 +638,7 @@ namespace UserDefinedComponents {
                             if (StackMngrNum > 0) { // found it
                                 state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).ErlInitProgramMngr = StackMngrNum;
                             } else {
-                                state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).initPluginLocation = EnergyPlus::PluginManagement::pluginManager->getLocationOfUserDefinedPlugin(cAlphaArgs(aArgCount + 4));
+                                state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).initPluginLocation = state.dataPluginManager->pluginManager->getLocationOfUserDefinedPlugin(state, cAlphaArgs(aArgCount + 4));
                                 if (state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).initPluginLocation == -1) {
                                     ShowSevereError(state, "Invalid " + cAlphaFieldNames(aArgCount + 4) + '=' + cAlphaArgs(aArgCount + 4));
                                     ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
@@ -654,7 +654,7 @@ namespace UserDefinedComponents {
                             if (StackMngrNum > 0) { // found it
                                 state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).ErlSimProgramMngr = StackMngrNum;
                             } else {
-                                state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).simPluginLocation = EnergyPlus::PluginManagement::pluginManager->getLocationOfUserDefinedPlugin(cAlphaArgs(aArgCount + 5));
+                                state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).simPluginLocation = state.dataPluginManager->pluginManager->getLocationOfUserDefinedPlugin(state, cAlphaArgs(aArgCount + 5));
                                 if (state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).simPluginLocation == -1) {
                                     ShowSevereError(state, "Invalid " + cAlphaFieldNames(aArgCount + 4) + '=' + cAlphaArgs(aArgCount + 4));
                                     ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
@@ -941,7 +941,7 @@ namespace UserDefinedComponents {
                     if (StackMngrNum > 0) { // found it
                         state.dataUserDefinedComponents->UserCoil(CompLoop).ErlSimProgramMngr = StackMngrNum;
                     } else {
-                        state.dataUserDefinedComponents->UserCoil(CompLoop).simPluginLocation = EnergyPlus::PluginManagement::pluginManager->getLocationOfUserDefinedPlugin(cAlphaArgs(2));
+                        state.dataUserDefinedComponents->UserCoil(CompLoop).simPluginLocation = state.dataPluginManager->pluginManager->getLocationOfUserDefinedPlugin(state, cAlphaArgs(2));
                         if (state.dataUserDefinedComponents->UserCoil(CompLoop).simPluginLocation == -1) {
                             ShowSevereError(state, "Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
                             ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
@@ -957,7 +957,7 @@ namespace UserDefinedComponents {
                     if (StackMngrNum > 0) { // found it
                         state.dataUserDefinedComponents->UserCoil(CompLoop).ErlInitProgramMngr = StackMngrNum;
                     } else {
-                        state.dataUserDefinedComponents->UserCoil(CompLoop).initPluginLocation = EnergyPlus::PluginManagement::pluginManager->getLocationOfUserDefinedPlugin(cAlphaArgs(3));
+                        state.dataUserDefinedComponents->UserCoil(CompLoop).initPluginLocation = state.dataPluginManager->pluginManager->getLocationOfUserDefinedPlugin(state, cAlphaArgs(3));
                         if (state.dataUserDefinedComponents->UserCoil(CompLoop).initPluginLocation == -1) {
                             ShowSevereError(state, "Invalid " + cAlphaFieldNames(3) + '=' + cAlphaArgs(3));
                             ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
@@ -1278,7 +1278,7 @@ namespace UserDefinedComponents {
                     if (StackMngrNum > 0) { // found it
                         state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).ErlSimProgramMngr = StackMngrNum;
                     } else {
-                        state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).simPluginLocation = EnergyPlus::PluginManagement::pluginManager->getLocationOfUserDefinedPlugin(cAlphaArgs(2));
+                        state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).simPluginLocation = state.dataPluginManager->pluginManager->getLocationOfUserDefinedPlugin(state, cAlphaArgs(2));
                         if (state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).simPluginLocation == -1) {
                             ShowSevereError(state, "Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
                             ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
@@ -1294,7 +1294,7 @@ namespace UserDefinedComponents {
                     if (StackMngrNum > 0) { // found it
                         state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).ErlInitProgramMngr = StackMngrNum;
                     } else {
-                        state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).initPluginLocation = EnergyPlus::PluginManagement::pluginManager->getLocationOfUserDefinedPlugin(cAlphaArgs(3));
+                        state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).initPluginLocation = state.dataPluginManager->pluginManager->getLocationOfUserDefinedPlugin(state, cAlphaArgs(3));
                         if (state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).initPluginLocation == -1) {
                             ShowSevereError(state, "Invalid " + cAlphaFieldNames(3) + '=' + cAlphaArgs(3));
                             ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
@@ -1659,7 +1659,7 @@ namespace UserDefinedComponents {
                     if (StackMngrNum > 0) { // found it
                         state.dataUserDefinedComponents->UserAirTerminal(CompLoop).ErlSimProgramMngr = StackMngrNum;
                     } else {
-                        state.dataUserDefinedComponents->UserAirTerminal(CompLoop).simPluginLocation = EnergyPlus::PluginManagement::pluginManager->getLocationOfUserDefinedPlugin(cAlphaArgs(2));
+                        state.dataUserDefinedComponents->UserAirTerminal(CompLoop).simPluginLocation = state.dataPluginManager->pluginManager->getLocationOfUserDefinedPlugin(state, cAlphaArgs(2));
                         if (state.dataUserDefinedComponents->UserAirTerminal(CompLoop).simPluginLocation == -1) {
                             ShowSevereError(state, "Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
                             ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
@@ -1675,7 +1675,7 @@ namespace UserDefinedComponents {
                     if (StackMngrNum > 0) { // found it
                         state.dataUserDefinedComponents->UserAirTerminal(CompLoop).ErlInitProgramMngr = StackMngrNum;
                     } else {
-                        state.dataUserDefinedComponents->UserAirTerminal(CompLoop).initPluginLocation = EnergyPlus::PluginManagement::pluginManager->getLocationOfUserDefinedPlugin(cAlphaArgs(3));
+                        state.dataUserDefinedComponents->UserAirTerminal(CompLoop).initPluginLocation = state.dataPluginManager->pluginManager->getLocationOfUserDefinedPlugin(state, cAlphaArgs(3));
                         if (state.dataUserDefinedComponents->UserAirTerminal(CompLoop).initPluginLocation == -1) {
                             ShowSevereError(state, "Invalid " + cAlphaFieldNames(3) + '=' + cAlphaArgs(3));
                             ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));

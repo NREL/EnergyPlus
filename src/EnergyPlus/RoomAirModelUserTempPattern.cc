@@ -820,14 +820,7 @@ namespace RoomAirModelUserTempPattern {
         // use ceiling height from Zone structure
         // non dimensionalize surface's centroid's Z value
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
         // Using/Aliasing
-        using DataErrorTracking::TotalRoomAirPatternTooHigh;
-        using DataErrorTracking::TotalRoomAirPatternTooLow;
         using DataHeatBalance::Zone;
         using DataSurfaces::Surface;
         using DataVectorTypes::Vector;
@@ -835,17 +828,8 @@ namespace RoomAirModelUserTempPattern {
         // Return value
         Real64 FigureNDheightInZone;
 
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
         // FUNCTION PARAMETER DEFINITIONS:
         Real64 const TolValue(0.0001);
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int thisZone;
@@ -914,7 +898,7 @@ namespace RoomAirModelUserTempPattern {
                 ShowContinueError(state, format("**** Average floor height of zone is: {:.3R}", ZoneZorig));
                 ShowContinueError(state, format("**** Surface minimum height is: {:.3R}", SurfMinZ));
             } else {
-                ++TotalRoomAirPatternTooLow;
+                ++state.dataErrTracking->TotalRoomAirPatternTooLow;
             }
         }
 
@@ -925,7 +909,7 @@ namespace RoomAirModelUserTempPattern {
                 ShowContinueError(state, format("**** Average Ceiling height of zone is: {:.3R}", (ZoneZorig + ZoneCeilHeight)));
                 ShowContinueError(state, format("**** Surface Maximum height is: {:.3R}", SurfMaxZ));
             } else {
-                ++TotalRoomAirPatternTooHigh;
+                ++state.dataErrTracking->TotalRoomAirPatternTooHigh;
             }
         }
 

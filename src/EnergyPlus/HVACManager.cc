@@ -1748,12 +1748,8 @@ namespace HVACManager {
         // METHODOLOGY EMPLOYED:
         // Each flag is checked and the appropriate manager is then called.
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using AirflowNetworkBalanceManager::ManageAirflowNetworkBalance;
-        using DataErrorTracking::AskForPlantCheckOnAbort;
         using DataPlant::FlowLocked;
         using DataPlant::FlowUnlocked;
         using NonZoneEquipmentManager::ManageNonZoneEquipment;
@@ -1771,16 +1767,8 @@ namespace HVACManager {
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const MaxAir(5); // Iteration Max for Air Simulation Iterations
 
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int IterAir; // counts iterations to enforce maximum iteration limit
-
-        // FLOW:
 
         IterAir = 0;
 
@@ -1826,7 +1814,7 @@ namespace HVACManager {
 
             ManagePlantLoops(state, FirstHVACIteration, SimAirLoops, SimZoneEquipment, SimNonZoneEquipment, SimPlantLoops, SimElecCircuits);
 
-            AskForPlantCheckOnAbort = true; // need to make a first pass through plant calcs before this check make sense
+            state.dataErrTracking->AskForPlantCheckOnAbort = true; // need to make a first pass through plant calcs before this check make sense
             facilityElectricServiceObj->manageElectricPowerService(state, FirstHVACIteration, SimElecCircuitsFlag, false);
         } else {
             FlowResolutionNeeded = false;

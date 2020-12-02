@@ -1090,7 +1090,7 @@ namespace SurfaceGeometry {
 
         int NumSurfs = 0;
         AddedSubSurfaces = 0;
-        AskForSurfacesReport = true;
+        state.dataErrTracking->AskForSurfacesReport = true;
 
         GetDetShdSurfaceData(state, ErrorsFound, NumSurfs, TotDetachedFixed, TotDetachedBldg);
 
@@ -2198,31 +2198,31 @@ namespace SurfaceGeometry {
             ShowContinueError(state, "For explicit details on each window, use Output:Diagnostics,DisplayExtraWarnings;");
         }
 
-        if (TotalMultipliedWindows > 0) {
+        if (state.dataErrTracking->TotalMultipliedWindows > 0) {
             ShowWarningMessage(state,
                                format("{}There are {} window/glass door(s) that may cause inaccurate shadowing due to Solar Distribution.",
                                       RoutineName,
-                                      TotalMultipliedWindows));
+                                      state.dataErrTracking->TotalMultipliedWindows));
             ShowContinueError(state, "For explicit details on each window, use Output:Diagnostics,DisplayExtraWarnings;");
-            TotalWarningErrors += TotalMultipliedWindows;
+            state.dataErrTracking->TotalWarningErrors += state.dataErrTracking->TotalMultipliedWindows;
         }
-        if (TotalCoincidentVertices > 0) {
+        if (state.dataErrTracking->TotalCoincidentVertices > 0) {
             ShowWarningMessage(state,
                                format("{}There are {} coincident/collinear vertices; These have been deleted unless the deletion would bring the "
                                       "number of surface sides < 3.",
                                       RoutineName,
-                                      TotalCoincidentVertices));
+                                      state.dataErrTracking->TotalCoincidentVertices));
             ShowContinueError(state, "For explicit details on each problem surface, use Output:Diagnostics,DisplayExtraWarnings;");
-            TotalWarningErrors += TotalCoincidentVertices;
+            state.dataErrTracking->TotalWarningErrors += state.dataErrTracking->TotalCoincidentVertices;
         }
-        if (TotalDegenerateSurfaces > 0) {
+        if (state.dataErrTracking->TotalDegenerateSurfaces > 0) {
             ShowSevereMessage(state,
                               format("{}There are {} degenerate surfaces; Degenerate surfaces are those with number of sides < 3.",
                                      RoutineName,
-                                     TotalDegenerateSurfaces));
+                                     state.dataErrTracking->TotalDegenerateSurfaces));
             ShowContinueError(state, "These surfaces should be deleted.");
             ShowContinueError(state, "For explicit details on each problem surface, use Output:Diagnostics,DisplayExtraWarnings;");
-            TotalSevereErrors += TotalDegenerateSurfaces;
+            state.dataErrTracking->TotalSevereErrors += state.dataErrTracking->TotalDegenerateSurfaces;
         }
 
         GetHTSurfExtVentedCavityData(state, ErrorsFound);
@@ -5012,7 +5012,7 @@ namespace SurfaceGeometry {
                 ShowContinueError(state, "can cause inaccurate shadowing on the window and/or");
                 ShowContinueError(state, "inaccurate interior solar distribution from the window.");
             }
-            ++TotalMultipliedWindows;
+            ++state.dataErrTracking->TotalMultipliedWindows;
         }
 
         //  Require that a construction referenced by a surface that is a window
@@ -7716,7 +7716,7 @@ namespace SurfaceGeometry {
                                                  state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(1).z) +
                                           ')');
                 }
-                ++TotalCoincidentVertices;
+                ++state.dataErrTracking->TotalCoincidentVertices;
                 if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides > 3) {
                     if (state.dataGlobal->DisplayExtraWarnings) {
                         ShowContinueError(state, format("Dropping Vertex [{}].", state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides));
@@ -7730,7 +7730,7 @@ namespace SurfaceGeometry {
                             format("Cannot Drop Vertex [{}]; Number of Surface Sides at minimum. This surface is now a degenerate surface.",
                                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides));
                     }
-                    ++TotalDegenerateSurfaces;
+                    ++state.dataErrTracking->TotalDegenerateSurfaces;
                     // mark degenerate surface?
                 }
                 DistanceCheck = 0.0;
@@ -7757,7 +7757,7 @@ namespace SurfaceGeometry {
                                                      state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(Vrt - 1).y,
                                                      state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(Vrt - 1).z));
                     }
-                    ++TotalCoincidentVertices;
+                    ++state.dataErrTracking->TotalCoincidentVertices;
                     if (Vrt == state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides) {
                         if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides > 3) {
                             if (state.dataGlobal->DisplayExtraWarnings) {
@@ -7772,7 +7772,7 @@ namespace SurfaceGeometry {
                                     format("Cannot Drop Vertex [{}]; Number of Surface Sides at minimum. This surface is now a degenerate surface.",
                                            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides));
                             }
-                            ++TotalDegenerateSurfaces;
+                            ++state.dataErrTracking->TotalDegenerateSurfaces;
                             // mark degenerate surface?
                         }
                         DistanceCheck = 0.0;
@@ -7795,7 +7795,7 @@ namespace SurfaceGeometry {
                                     format("Cannot Drop Vertex [{}]; Number of Surface Sides at minimum. This surface is now a degenerate surface.",
                                            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides));
                             }
-                            ++TotalDegenerateSurfaces;
+                            ++state.dataErrTracking->TotalDegenerateSurfaces;
                             // mark degenerate surface?
                         }
                         DistanceCheck = 0.0;
@@ -13376,7 +13376,7 @@ namespace SurfaceGeometry {
                         }
                         SurfCollinearWarning = true;
                     }
-                    ++TotalCoincidentVertices;
+                    ++state.dataErrTracking->TotalCoincidentVertices;
                     ++M;
                     SurfCollinearVerts(M) = n + 1;
                     continue;
@@ -13424,7 +13424,7 @@ namespace SurfaceGeometry {
                         format("CheckConvexity: Surface=\"{}\" has [{}] collinear points.", state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name, M));
                     ShowContinueError(state, "...too many to remove all.  Will leave the surface with 3 sides. But this is now a degenerate surface");
                 }
-                ++TotalDegenerateSurfaces;
+                ++state.dataErrTracking->TotalDegenerateSurfaces;
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides = max(NSides - M, 3);
                 M = NSides - state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides;
             }

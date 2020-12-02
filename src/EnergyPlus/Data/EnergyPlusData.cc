@@ -198,6 +198,7 @@ namespace EnergyPlus {
         this->dataPlantChillers = std::make_unique<PlantChillersData>();
         this->dataPlantHXFluidToFluid = std::make_unique<PlantHeatExchangerFluidToFluidData>();
         this->dataPlantValves = std::make_unique<PlantValvesData>();
+        this->dataPluginManager = std::make_unique<PluginManagerData>();
         this->dataPollutionModule = std::make_unique<PollutionModuleData>();
         this->dataPowerInductionUnits = std::make_unique<PoweredInductionUnitsData>();
         this->dataPumps = std::make_unique<PumpsData>();
@@ -408,6 +409,7 @@ namespace EnergyPlus {
         this->dataPlantChillers->clear_state();
         this->dataPlantHXFluidToFluid->clear_state();
         this->dataPlantValves->clear_state();
+        this->dataPluginManager->clear_state();
         this->dataPollutionModule->clear_state();
         this->dataPowerInductionUnits->clear_state();
         this->dataPumps->clear_state();

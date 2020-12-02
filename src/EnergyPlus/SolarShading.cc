@@ -5158,7 +5158,7 @@ namespace SolarShading {
                                         "\" is a receiving surface and is non-convex.");
                                     ShowContinueError(state, "...Shadowing values may be inaccurate. Check .shd report file for more surface shading details");
                                 } else {
-                                    ++TotalReceivingNonConvexSurfaces;
+                                    ++state.dataErrTracking->TotalReceivingNonConvexSurfaces;
                                 }
                             }
                         }
@@ -5187,27 +5187,27 @@ namespace SolarShading {
                         ShowSevereError(state, "DetermineShadowingCombinations: Surface=\"" + Surface(HTS).Name + "\" is a casting surface and is non-convex.");
                         ShowContinueError(state, "...Shadowing values may be inaccurate. Check .shd report file for more surface shading details");
                     } else {
-                        ++TotalCastingNonConvexSurfaces;
+                        ++state.dataErrTracking->TotalCastingNonConvexSurfaces;
                     }
                 }
             }
 
-            if (TotalReceivingNonConvexSurfaces > 0) {
+            if (state.dataErrTracking->TotalReceivingNonConvexSurfaces > 0) {
                 ShowWarningMessage(state,
                                    format("DetermineShadowingCombinations: There are {} surfaces which are receiving surfaces and are non-convex.",
-                                          TotalReceivingNonConvexSurfaces));
+                                          state.dataErrTracking->TotalReceivingNonConvexSurfaces));
                 ShowContinueError(state, "...Shadowing values may be inaccurate. Check .shd report file for more surface shading details");
                 ShowContinueError(state, "...Add Output:Diagnostics,DisplayExtraWarnings; to see individual warnings for each surface.");
-                TotalWarningErrors += TotalReceivingNonConvexSurfaces;
+                state.dataErrTracking->TotalWarningErrors += state.dataErrTracking->TotalReceivingNonConvexSurfaces;
             }
 
-            if (TotalCastingNonConvexSurfaces > 0) {
+            if (state.dataErrTracking->TotalCastingNonConvexSurfaces > 0) {
                 ShowSevereMessage(state,
                                   format("DetermineShadowingCombinations: There are {} surfaces which are casting surfaces and are non-convex.",
-                                         TotalCastingNonConvexSurfaces));
+                                         state.dataErrTracking->TotalCastingNonConvexSurfaces));
                 ShowContinueError(state, "...Shadowing values may be inaccurate. Check .shd report file for more surface shading details");
                 ShowContinueError(state, "...Add Output:Diagnostics,DisplayExtraWarnings; to see individual severes for each surface.");
-                TotalSevereErrors += TotalCastingNonConvexSurfaces;
+                state.dataErrTracking->TotalSevereErrors += state.dataErrTracking->TotalCastingNonConvexSurfaces;
             }
         }
 
@@ -10561,7 +10561,7 @@ namespace SolarShading {
                     }
                 }
                 TotCount += Count;
-                TotalWarningErrors += Count - 1;
+                state.dataErrTracking->TotalWarningErrors += Count - 1;
                 ShowWarningError(state, "Base surface does not surround subsurface (CHKSBS), Overlap Status=" +
                                  state.dataSolarShading->cOverLapStatus(state.dataSolarShading->TrackBaseSubSurround(Loop1).MiscIndex));
                 ShowContinueError(state, format("  The base surround errors occurred {} times.", Count));
@@ -10599,7 +10599,7 @@ namespace SolarShading {
                     }
                 }
                 TotCount += Count;
-                TotalWarningErrors += Count - 1;
+                state.dataErrTracking->TotalWarningErrors += Count - 1;
                 ShowMessage(state, "");
                 ShowWarningError(state, format("Too many vertices [>={}] in a shadow overlap", state.dataSolarShading->MaxHCV));
                 ShowContinueError(state, "Overlapping figure=" + Surface(state.dataSolarShading->TrackTooManyVertices(Loop1).SurfIndex1).Name + ", Surface Class=[" +
@@ -10638,7 +10638,7 @@ namespace SolarShading {
                     }
                 }
                 TotCount += Count;
-                TotalWarningErrors += Count - 1;
+                state.dataErrTracking->TotalWarningErrors += Count - 1;
                 ShowMessage(state, "");
                 ShowWarningError(state, format("Too many figures [>={}] in a shadow overlap", state.dataSolarShading->MaxHCS));
                 ShowContinueError(state, "Overlapping figure=" + Surface(state.dataSolarShading->TrackTooManyFigures(Loop1).SurfIndex1).Name + ", Surface Class=[" +
