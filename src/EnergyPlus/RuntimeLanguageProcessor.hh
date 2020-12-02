@@ -85,20 +85,7 @@ namespace RuntimeLanguageProcessor {
     //extern int const KeywordWhile;    // While statement, begins a While block
     //extern int const KeywordEndWhile; // EndWhile statement, terminates a While block
 
-    enum class ErlKeywordParam
-    {
-        KeywordNone,     // statement type not set
-        KeywordReturn,   // Return statement, as in leave program
-        KeywordGoto,     // Goto statement, used in parsing to manage IF-ElseIf-Else-EndIf and nesting
-        KeywordSet,      // Set statement, as in assign RHS to LHS
-        KeywordRun,      // Run statement, used to call a subroutine from a main program
-        KeywordIf,       // If statement, begins an IF-ElseIf-Else-EndIf logic block
-        KeywordElseIf,   // ElseIf statement, begins an ElseIf block
-        KeywordElse,     // Else statement, begins an Else block
-        KeywordEndIf,    // EndIf statement, terminates an IF-ElseIf-Else-EndIf logic block
-        KeywordWhile,    // While statement, begins a While block
-        KeywordEndWhile, // EndWhile statement, terminates a While block
-    };
+
 
     // token type parameters for Erl code parsing
     extern int const TokenNumber;     // matches the ValueNumber
@@ -203,7 +190,7 @@ namespace RuntimeLanguageProcessor {
 
     int AddInstruction(int const StackNum,
                        int const LineNum,
-                       RuntimeLanguageProcessor::ErlKeywordParam Keyword,
+                       DataRuntimeLanguage::ErlKeywordParam Keyword,
                        Optional_int_const Argument1 = _, // Erl variable index
                        Optional_int_const Argument2 = _);
 
