@@ -72,21 +72,6 @@ namespace RuntimeLanguageProcessor {
     // MODULE PARAMETER DEFINITIONS:
     extern int const MaxErrors;
 
-    //// keyword parameters for types of Erl statements
-    //extern int const KeywordNone;     // statement type not set
-    //extern int const KeywordReturn;   // Return statement, as in leave program
-    //extern int const KeywordGoto;     // Goto statement, used in parsing to manage IF-ElseIf-Else-EndIf and nesting
-    //extern int const KeywordSet;      // Set statement, as in assign RHS to LHS
-    //extern int const KeywordRun;      // Run statement, used to call a subroutine from a main program
-    //extern int const KeywordIf;       // If statement, begins an IF-ElseIf-Else-EndIf logic block
-    //extern int const KeywordElseIf;   // ElseIf statement, begins an ElseIf block
-    //extern int const KeywordElse;     // Else statement, begins an Else block
-    //extern int const KeywordEndIf;    // EndIf statement, terminates an IF-ElseIf-Else-EndIf logic block
-    //extern int const KeywordWhile;    // While statement, begins a While block
-    //extern int const KeywordEndWhile; // EndWhile statement, terminates a While block
-
-
-
     // token type parameters for Erl code parsing
     extern int const TokenNumber;     // matches the ValueNumber
     extern int const TokenVariable;   // matches the ValueVariable

@@ -1845,7 +1845,7 @@ namespace RuntimeLanguageProcessor {
         // Object Data
         Array1D<ErlValueType> Operand;
 
-        static std::string const EMSBuiltInFunction("EMS Built-In Function");
+        auto constexpr EMSBuiltInFunction("EMS Built-In Function");
 
         // FLOW:
 
@@ -2621,7 +2621,7 @@ namespace RuntimeLanguageProcessor {
 
         // Locals
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetRuntimeLanguageUserInput: ");
+        auto constexpr RoutineName("GetRuntimeLanguageUserInput: ");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int GlobalNum;
