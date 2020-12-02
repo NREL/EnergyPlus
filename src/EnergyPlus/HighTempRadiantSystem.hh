@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -204,6 +205,14 @@ namespace HighTempRadiantSystem {
     Real64 SumHATsurf(int const ZoneNum); // Zone number
 
 } // namespace HighTempRadiantSystem
+
+struct HighTempRadiantSystemData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

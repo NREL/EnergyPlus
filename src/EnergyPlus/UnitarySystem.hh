@@ -48,8 +48,12 @@
 #ifndef ENERGYPLUS_UNITARYSYSTEM_HH
 #define ENERGYPLUS_UNITARYSYSTEM_HH
 
+// C++ headers
 #include <string>
 #include <vector>
+
+// EnergyPlus headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataHVACSystems.hh>
 
 namespace EnergyPlus {

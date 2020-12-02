@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
@@ -266,6 +267,14 @@ namespace MicroCHPElectricGenerator {
     extern Array1D<MicroCHPParamsNonNormalized> MicroCHPParamInput;
 
 } // namespace MicroCHPElectricGenerator
+
+struct MicroCHPElectricGeneratorData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

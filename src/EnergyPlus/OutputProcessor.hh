@@ -59,6 +59,7 @@
 #include <ObjexxFCL/Reference.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
@@ -1061,6 +1062,14 @@ void AddToOutputVariableList(std::string const &VarName, // Variable Name
 );
 
 int initErrorFile(EnergyPlusData &state);
+
+struct OutputProcessorData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

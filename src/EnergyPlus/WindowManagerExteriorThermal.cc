@@ -58,7 +58,8 @@
 // Windows library headers
 #include <WCETarcog.hpp>
 
-#include "WindowManagerExteriorThermal.hh"
+// EnergyPlus headers
+#include <EnergyPlus/WindowManagerExteriorThermal.hh>
 
 namespace EnergyPlus {
 
