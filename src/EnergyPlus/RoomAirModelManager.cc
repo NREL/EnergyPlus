@@ -314,9 +314,6 @@ namespace RoomAirModelManager {
 
         // Using/Aliasing
         using namespace DataIPShortCuts;
-        using DataErrorTracking::TotalRoomAirPatternTooHigh;
-        using DataErrorTracking::TotalRoomAirPatternTooLow;
-        using DataErrorTracking::TotalWarningErrors;
         using DataHeatBalance::Zone;
         using DataSurfaces::Surface;
         using DataZoneEquipment::EquipConfiguration;
@@ -610,21 +607,21 @@ namespace RoomAirModelManager {
             RoomAirPattern(thisPattern).MapPatrn.NumSurfs = NumPairs;
         }
 
-        if (TotalRoomAirPatternTooLow > 0) {
+        if (state.dataErrTracking->TotalRoomAirPatternTooLow > 0) {
             ShowWarningError(state,
                              format("GetUserDefinedPatternData: RoomAirModelUserTempPattern: {} problem(s) in non-dimensional height calculations, "
                                     "too low surface height(s) in relation to floor height of zone(s).",
-                                    TotalRoomAirPatternTooLow));
+                                    state.dataErrTracking->TotalRoomAirPatternTooLow));
             ShowContinueError(state, "...Use OutputDiagnostics,DisplayExtraWarnings; to see details.");
-            TotalWarningErrors += TotalRoomAirPatternTooLow;
+            state.dataErrTracking->TotalWarningErrors += state.dataErrTracking->TotalRoomAirPatternTooLow;
         }
-        if (TotalRoomAirPatternTooHigh > 0) {
+        if (state.dataErrTracking->TotalRoomAirPatternTooHigh > 0) {
             ShowWarningError(state,
                              format("GetUserDefinedPatternData: RoomAirModelUserTempPattern: {} problem(s) in non-dimensional height calculations, "
                                     "too high surface height(s) in relation to ceiling height of zone(s).",
-                                    TotalRoomAirPatternTooHigh));
+                                    state.dataErrTracking->TotalRoomAirPatternTooHigh));
             ShowContinueError(state, "...Use OutputDiagnostics,DisplayExtraWarnings; to see details.");
-            TotalWarningErrors += TotalRoomAirPatternTooHigh;
+            state.dataErrTracking->TotalWarningErrors += state.dataErrTracking->TotalRoomAirPatternTooHigh;
         }
 
         // now do one time setups from and checks on user data

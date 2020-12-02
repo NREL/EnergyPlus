@@ -10054,7 +10054,6 @@ namespace EnergyPlus::DaylightingManager {
         // na
 
         // Using/Aliasing
-        using DataErrorTracking::AbortProcessing;
         using DataStringGlobals::CharComma;
         using DataStringGlobals::CharSpace;
         using DataStringGlobals::CharTab;
@@ -10098,7 +10097,7 @@ namespace EnergyPlus::DaylightingManager {
                 state.dataDaylightingData->IllumMap(MapNum).mapFile->del();
             }
 
-            if (!state.dataDaylightingData->mapResultsReported && !AbortProcessing) {
+            if (!state.dataDaylightingData->mapResultsReported && !state.dataErrTracking->AbortProcessing) {
                 const auto message =
                     "CloseReportIllumMaps: Illuminance maps requested but no data ever reported. Likely cause is no solar.";
                 ShowSevereError(state, message);

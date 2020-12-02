@@ -2782,9 +2782,6 @@ namespace EnergyPlus {
             //       then another branch in the s/m needs to be active
             //  other checks could/should be added!
 
-            // Using/Aliasing
-            using DataErrorTracking::AskForPlantCheckOnAbort;
-
             // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
             int LoopNum;           // DO loop counter for loops
             bool ActiveCntrlfound; // used to search for active control branches in parallel with bypass branches
@@ -2797,7 +2794,7 @@ namespace EnergyPlus {
             int CompNum;   // do loop for multiple components on a branch
             bool ShouldBeACTIVE;
 
-            if (!(AskForPlantCheckOnAbort)) {
+            if (!(state.dataErrTracking->AskForPlantCheckOnAbort)) {
                 return;
             }
 

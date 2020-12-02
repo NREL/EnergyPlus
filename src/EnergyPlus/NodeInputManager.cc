@@ -285,32 +285,8 @@ namespace NodeInputManager {
         // Nodes have been found (TOTAL NODE NUMBER) or when HVAC warmup is
         // complete, whichever condition is reached first.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using DataErrorTracking::AbortProcessing; // used here to determine if this routine called during fatal error processing
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
         if (!NodeVarsSetup) {
-            if (!AbortProcessing) {
+            if (!state.dataErrTracking->AbortProcessing) {
                 MoreNodeInfo.allocate(NumOfUniqueNodeNames);
                 for (int NumNode = 1; NumNode <= NumOfUniqueNodeNames; ++NumNode) {
                     // Setup Report variables for the Nodes for HVAC Reporting, CurrentModuleObject='Node Name'

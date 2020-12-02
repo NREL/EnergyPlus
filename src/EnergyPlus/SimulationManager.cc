@@ -203,8 +203,6 @@ namespace SimulationManager {
         using BranchNodeConnections::TestCompSetInletOutletNodes;
         using CostEstimateManager::SimCostEstimate;
         using CurveManager::InitCurveReporting;
-        using DataErrorTracking::AskForConnectionsReport;
-        using DataErrorTracking::ExitDuringSimulations;
         using DemandManager::InitDemandManagers;
         using EconomicLifeCycleCost::ComputeLifeCycleCostAndReport;
         using EconomicLifeCycleCost::GetInputForLifeCycleCost;
@@ -289,7 +287,7 @@ namespace SimulationManager {
         DoWeatherInitReporting = false;
         state.dataSimulationManager->RunPeriodsInInput =
             (inputProcessor->getNumObjectsFound(state, "RunPeriod") > 0 || inputProcessor->getNumObjectsFound(state, "RunPeriod:CustomRange") > 0 || FullAnnualRun);
-        AskForConnectionsReport = false; // set to false until sizing is finished
+        state.dataErrTracking->AskForConnectionsReport = false; // set to false until sizing is finished
 
         OpenOutputFiles(state);
         GetProjectData(state);
@@ -361,7 +359,7 @@ namespace SimulationManager {
 
         InitCurveReporting(state);
 
-        AskForConnectionsReport = true; // set to true now that input processing and sizing is done.
+        state.dataErrTracking->AskForConnectionsReport = true; // set to true now that input processing and sizing is done.
         state.dataGlobal->KickOffSimulation = false;
         state.dataGlobal->WarmupFlag = false;
         DoWeatherInitReporting = true;
@@ -468,7 +466,7 @@ namespace SimulationManager {
                 sqlite->sqliteCommit();
             }
 
-            ExitDuringSimulations = true;
+            state.dataErrTracking->ExitDuringSimulations = true;
             SimsDone = true;
             DisplayString(state, "Initializing New Environment Parameters");
 
@@ -2279,8 +2277,6 @@ namespace SimulationManager {
         using namespace DataHVACGlobals;
         using namespace DataPlant;
         using namespace DataZoneEquipment;
-        using DataErrorTracking::AbortProcessing; // used here to turn off Node Connection Error reporting
-        using DataErrorTracking::AskForConnectionsReport;
         using DualDuct::ReportDualDuctConnections;
         using OutAirNodeManager::NumOutsideAirNodes;
         using OutAirNodeManager::OutsideAirNodeList;
@@ -2328,7 +2324,7 @@ namespace SimulationManager {
 
             if (state.dataBranchNodeConnections->CompSets(Count).ParentCType == "UNDEFINED" || state.dataBranchNodeConnections->CompSets(Count).InletNodeName == "UNDEFINED" ||
                 state.dataBranchNodeConnections->CompSets(Count).OutletNodeName == "UNDEFINED") {
-                if (AbortProcessing && state.dataSimulationManager->WarningOut) {
+                if (state.dataErrTracking->AbortProcessing && state.dataSimulationManager->WarningOut) {
                     ShowWarningError(state, "Node Connection errors shown during \"fatal error\" processing may be false because not all inputs may have "
                                      "been retrieved.");
                     state.dataSimulationManager->WarningOut = false;
@@ -2343,7 +2339,7 @@ namespace SimulationManager {
                 }
             }
             if (state.dataBranchNodeConnections->CompSets(Count).Description == "UNDEFINED") {
-                if (AbortProcessing && state.dataSimulationManager->WarningOut) {
+                if (state.dataErrTracking->AbortProcessing && state.dataSimulationManager->WarningOut) {
                     ShowWarningError(state, "Node Connection errors shown during \"fatal error\" processing may be false because not all inputs may have "
                                      "been retrieved.");
                     state.dataSimulationManager->WarningOut = false;
@@ -2362,7 +2358,7 @@ namespace SimulationManager {
                 if (state.dataBranchNodeConnections->CompSets(Count).CName != state.dataBranchNodeConnections->CompSets(Count1).CName) continue;
                 if (state.dataBranchNodeConnections->CompSets(Count).InletNodeName != state.dataBranchNodeConnections->CompSets(Count1).InletNodeName) continue;
                 if (state.dataBranchNodeConnections->CompSets(Count).OutletNodeName != state.dataBranchNodeConnections->CompSets(Count1).OutletNodeName) continue;
-                if (AbortProcessing && state.dataSimulationManager->WarningOut) {
+                if (state.dataErrTracking->AbortProcessing && state.dataSimulationManager->WarningOut) {
                     ShowWarningError(state, "Node Connection errors shown during \"fatal error\" processing may be false because not all inputs may have "
                                      "been retrieved.");
                     state.dataSimulationManager->WarningOut = false;
@@ -2776,7 +2772,7 @@ namespace SimulationManager {
             }
         }
 
-        AskForConnectionsReport = false;
+        state.dataErrTracking->AskForConnectionsReport = false;
     }
 
     void ReportParentChildren(EnergyPlusData &state)
