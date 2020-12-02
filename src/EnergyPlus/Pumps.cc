@@ -479,7 +479,7 @@ namespace Pumps {
             } else {
                 PumpEquip(PumpNum).HasVFD = true;
                 if (cAlphaArgs(7) == "MANUALCONTROL") {
-                    PumpEquip(PumpNum).VFD.VFDControlType = VFDControlType::VFDManual;
+                    PumpEquip(PumpNum).VFD.VFDControlType = ControlTypeVFD::VFDManual;
                     PumpEquip(PumpNum).VFD.ManualRPMSchedName = cAlphaArgs(8);
                     PumpEquip(PumpNum).VFD.ManualRPMSchedIndex = GetScheduleIndex(state, cAlphaArgs(8));
                     if (PumpEquip(PumpNum).VFD.ManualRPMSchedIndex <= 0) {
@@ -494,7 +494,7 @@ namespace Pumps {
                         ErrorsFound = true;
                     }
                 } else if (cAlphaArgs(7) == "PRESSURESETPOINTCONTROL") {
-                    PumpEquip(PumpNum).VFD.VFDControlType = VFDControlType::VFDAutomatic;
+                    PumpEquip(PumpNum).VFD.VFDControlType = ControlTypeVFD::VFDAutomatic;
                     PumpEquip(PumpNum).VFD.LowerPsetSchedName = cAlphaArgs(9);
                     PumpEquip(PumpNum).VFD.LowerPsetSchedIndex = GetScheduleIndex(state, cAlphaArgs(9));
                     PumpEquip(PumpNum).VFD.UpperPsetSchedName = cAlphaArgs(10);
@@ -1635,8 +1635,8 @@ namespace Pumps {
 
                 if (PumpEquip(PumpNum).HasVFD) {
                     {
-                        VFDControlType SELECT_CASE_var1(PumpEquip(PumpNum).VFD.VFDControlType);
-                        if (SELECT_CASE_var1 == VFDControlType::VFDManual) {
+                        ControlTypeVFD SELECT_CASE_var1(PumpEquip(PumpNum).VFD.VFDControlType);
+                        if (SELECT_CASE_var1 == ControlTypeVFD::VFDManual) {
 
                             // Evaluate the schedule if it exists and put the fraction into a local variable
                             PumpSchedRPM = GetCurrentScheduleValue(state, PumpEquip(PumpNum).VFD.ManualRPMSchedIndex);
@@ -1660,7 +1660,7 @@ namespace Pumps {
                                 PumpMassFlowRateMin = PumpMassFlowRate;
                             }
 
-                        } else if (SELECT_CASE_var1 == VFDControlType::VFDAutomatic) {
+                        } else if (SELECT_CASE_var1 == ControlTypeVFD::VFDAutomatic) {
 
                             if (PlantLoop(PumpEquip(PumpNum).LoopNum).UsePressureForPumpCalcs &&
                                 PlantLoop(PumpEquip(PumpNum).LoopNum).PressureSimType == Press_FlowCorrection &&
