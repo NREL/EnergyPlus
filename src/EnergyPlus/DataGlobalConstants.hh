@@ -52,6 +52,7 @@
 #include <map>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -177,6 +178,14 @@ namespace DataGlobalConstants {
     extern std::map<EndUse, int> iEndUse;
 
 } // namespace DataGlobalConstants
+
+struct DataGlobalConstantsData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

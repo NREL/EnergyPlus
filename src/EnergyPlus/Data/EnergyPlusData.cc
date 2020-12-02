@@ -60,7 +60,10 @@ namespace EnergyPlus {
         this->dataAirLoopHVACDOAS = std::make_unique<AirLoopHVACDOASData>();
         this->dataAirSystemsData = std::make_unique<AirSystemsData>();
         this->dataAirflowNetworkBalanceManager = std::make_unique<AirflowNetworkBalanceManagerData>();
+        this->dataAutoSizingBase = std::make_unique<AutoSizingBaseData>();
         this->dataBSDFWindow = std::make_unique<BSDFWindowData>();
+        this->dataBaseSizerFanHeatInputs = std::make_unique<BaseSizerWithFanHeatInputsData>();
+        this->dataBaseSizerScalableInputs = std::make_unique<BaseSizerWithScalableInputsData>();
         this->dataBaseboardElectric = std::make_unique<BaseboardElectricData>();
         this->dataBaseboardRadiator = std::make_unique<BaseboardRadiatorData>();
         this->dataBoilerSteam = std::make_unique<BoilerSteamData>();
@@ -77,6 +80,7 @@ namespace EnergyPlus {
         this->dataChillerGasAbsorption = std::make_unique<ChillerGasAbsorptionData>();
         this->dataChillerIndirectAbsorption = std::make_unique<ChillerIndirectAbsoprtionData>();
         this->dataChillerReformulatedEIR = std::make_unique<ChillerReformulatedEIRData>();
+        this->dataCoilCooingDX = std::make_unique<CoilCoolingDXData>();
         this->dataCondenserLoopTowers = std::make_unique<CondenserLoopTowersData>();
         this->dataConstruction = std::make_unique<ConstructionData>();
         this->dataContaminantBalance = std::make_unique<ContaminantBalanceData>();
@@ -124,7 +128,9 @@ namespace EnergyPlus {
         this->dataGenerator = std::make_unique<GeneratorsData>();
         this->dataGeneratorFuelSupply = std::make_unique<GeneratorFuelSupplyData>();
         this->dataGlobal = std::make_unique<DataGlobal>();
+        this->dataGlobalConst = std::make_unique<DataGlobalConstantsData>();
         this->dataGlobalNames = std::make_unique<GlobalNamesData>();
+        this->dataGrndTempModelMgr = std::make_unique<GroundTemperatureManagerData>();
         this->dataGroundHeatExchanger = std::make_unique<GroundHeatExchangerData>();
         this->dataHPWaterToWaterClg = std::make_unique<HeatPumpWaterToWaterCOOLINGData>();
         this->dataHPWaterToWaterHtg = std::make_unique<HeatPumpWaterToWaterHEATINGData>();
@@ -198,6 +204,7 @@ namespace EnergyPlus {
         this->dataPlantChillers = std::make_unique<PlantChillersData>();
         this->dataPlantHXFluidToFluid = std::make_unique<PlantHeatExchangerFluidToFluidData>();
         this->dataPlantValves = std::make_unique<PlantValvesData>();
+        this->dataPlnt = std::make_unique<DataPlantData>();
         this->dataPluginManager = std::make_unique<PluginManagerData>();
         this->dataPollutionModule = std::make_unique<PollutionModuleData>();
         this->dataPowerInductionUnits = std::make_unique<PoweredInductionUnitsData>();
@@ -223,6 +230,7 @@ namespace EnergyPlus {
         this->dataSplitterComponent = std::make_unique<SplitterComponentData>();
         this->dataSteamBaseboardRadiator = std::make_unique<SteamBaseboardRadiatorData>();
         this->dataSteamCoils = std::make_unique<SteamCoilsData>();
+        this->dataStrGlobals = std::make_unique<DataStringGlobalsData>();
         this->dataSurfColor = std::make_unique<SurfaceColorData>();
         this->dataSurfLists = std::make_unique<SurfaceListsData>();
         this->dataSurface = std::make_unique<SurfacesData>();
@@ -261,7 +269,10 @@ namespace EnergyPlus {
         this->dataWindowManager = std::make_unique<WindowManagerData>();
         this->dataZoneAirLoopEquipmentManager = std::make_unique<ZoneAirLoopEquipmentManagerData>();
         this->dataZoneContaminantPredictorCorrector = std::make_unique<ZoneContaminantPredictorCorrectorData>();
+        this->dataZoneCtrls = std::make_unique<DataZoneControlsData>();
         this->dataZoneDehumidifier = std::make_unique<ZoneDehumidifierData>();
+        this->dataZoneEnergyDemand = std::make_unique<DataZoneEnergyDemandsData>();
+        this->dataZoneEquip = std::make_unique<DataZoneEquipmentData>();
         this->dataZoneEquipmentManager = std::make_unique<ZoneEquipmentManagerData>();
         this->dataZonePlenum = std::make_unique<ZonePlenumData>();
         this->dataZoneTempPredictorCorrector = std::make_unique<ZoneTempPredictorCorrectorData>();
@@ -272,7 +283,10 @@ namespace EnergyPlus {
         this->dataAirLoopHVACDOAS->clear_state();
         this->dataAirSystemsData->clear_state();
         this->dataAirflowNetworkBalanceManager->clear_state();
+        this->dataAutoSizingBase->clear_state();
         this->dataBSDFWindow->clear_state();
+        this->dataBaseSizerFanHeatInputs->clear_state();
+        this->dataBaseSizerScalableInputs->clear_state();
         this->dataBaseboardElectric->clear_state();
         this->dataBaseboardRadiator->clear_state();
         this->dataBoilerSteam->clear_state();
@@ -289,6 +303,7 @@ namespace EnergyPlus {
         this->dataChillerGasAbsorption->clear_state();
         this->dataChillerIndirectAbsorption->clear_state();
         this->dataChillerReformulatedEIR->clear_state();
+        this->dataCoilCooingDX->clear_state();
         this->dataCondenserLoopTowers->clear_state();
         this->dataConstruction->clear_state();
         this->dataContaminantBalance->clear_state();
@@ -336,7 +351,9 @@ namespace EnergyPlus {
         this->dataGenerator->clear_state();
         this->dataGeneratorFuelSupply->clear_state();
         this->dataGlobal->clear_state();
+        this->dataGlobalConst->clear_state();
         this->dataGlobalNames->clear_state();
+        this->dataGrndTempModelMgr->clear_state();
         this->dataGroundHeatExchanger->clear_state();
         this->dataHPWaterToWaterClg->clear_state();
         this->dataHPWaterToWaterHtg->clear_state();
@@ -409,6 +426,7 @@ namespace EnergyPlus {
         this->dataPlantChillers->clear_state();
         this->dataPlantHXFluidToFluid->clear_state();
         this->dataPlantValves->clear_state();
+        this->dataPlnt->clear_state();
         this->dataPluginManager->clear_state();
         this->dataPollutionModule->clear_state();
         this->dataPowerInductionUnits->clear_state();
@@ -434,6 +452,7 @@ namespace EnergyPlus {
         this->dataSplitterComponent->clear_state();
         this->dataSteamBaseboardRadiator->clear_state();
         this->dataSteamCoils->clear_state();
+        this->dataStrGlobals->clear_state();
         this->dataSurfColor->clear_state();
         this->dataSurfLists->clear_state();
         this->dataSurface->clear_state();
@@ -472,19 +491,22 @@ namespace EnergyPlus {
         this->dataWindowManager->clear_state();
         this->dataZoneAirLoopEquipmentManager->clear_state();
         this->dataZoneContaminantPredictorCorrector->clear_state();
+        this->dataZoneCtrls->clear_state();
         this->dataZoneDehumidifier->clear_state();
+        this->dataZoneEnergyDemand->clear_state();
+        this->dataZoneEquip->clear_state();
         this->dataZoneEquipmentManager->clear_state();
         this->dataZonePlenum->clear_state();
         this->dataZoneTempPredictorCorrector->clear_state();
 
-        this->files.eso.close();
-        this->files.err_stream.reset();
         this->files.debug.close();
-        this->files.zsz.close();
-        this->files.ssz.close();
+        this->files.err_stream.reset();
+        this->files.err_stream.reset();
+        this->files.eso.close();
+        this->files.mtr.close();
         this->files.mtr.close();
         this->files.shade.close();
-        this->files.mtr.close();
-        this->files.err_stream.reset();
+        this->files.ssz.close();
+        this->files.zsz.close();
     }
 }
