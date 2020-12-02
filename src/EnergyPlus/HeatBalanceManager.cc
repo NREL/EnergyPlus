@@ -5233,8 +5233,6 @@ namespace HeatBalanceManager {
     {
         // Pre-calculate commonly used solar arrays to avoid duplicate data reference during calculated
         for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-            if (!DataSurfaces::Surface(SurfNum).ExtSolar &&
-                DataSurfaces::SurfWinOriginalClass(SurfNum) != DataSurfaces::SurfaceClass::TDD_Diffuser) continue;
             int SurfNum2 = SurfNum;
             int PipeNum = DataSurfaces::SurfWinTDDPipeNum(SurfNum);
             if (DataSurfaces::SurfWinOriginalClass(SurfNum) == DataSurfaces::SurfaceClass::TDD_Diffuser) {
