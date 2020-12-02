@@ -118,8 +118,10 @@ namespace Pumps {
 
     // Data
     // MODULE PARAMETER DEFINITIONS:
-    int const Continuous(1);   // Pump control type (pump always running)
-    int const Intermittent(2); // Pump control type (pump runs only when there is a demand)
+    //int const Continuous(1);   // Pump control type (pump always running)
+    //int const Intermittent(2); // Pump control type (pump runs only when there is a demand)
+
+
 
     int const VFDManual(1);    // VFD control type (Scheduled RPM)
     int const VFDAutomatic(2); // VFD control type (Variable RPM according to flow request)
@@ -403,13 +405,13 @@ namespace Pumps {
 
             //    PumpEquip(PumpNum)%PumpControlType = cAlphaArgs(4)
             if (UtilityRoutines::SameString(cAlphaArgs(4), "Continuous")) {
-                PumpEquip(PumpNum).PumpControl = Continuous;
+                PumpEquip(PumpNum).PumpControl = PumpControlType::Continuous;
             } else if (UtilityRoutines::SameString(cAlphaArgs(4), "Intermittent")) {
-                PumpEquip(PumpNum).PumpControl = Intermittent;
+                PumpEquip(PumpNum).PumpControl = PumpControlType::Intermittent;
             } else {
                 ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + PumpEquip(PumpNum).Name + "\", Invalid " + cAlphaFieldNames(4));
                 ShowContinueError(state, "Entered Value=[" + cAlphaArgs(4) + "]. " + cAlphaFieldNames(4) + " has been set to Continuous for this pump.");
-                PumpEquip(PumpNum).PumpControl = Continuous;
+                PumpEquip(PumpNum).PumpControl = PumpControlType::Continuous;
             }
 
             // Input the optional schedule for the pump
@@ -635,13 +637,13 @@ namespace Pumps {
 
             //    PumpEquip(PumpNum)%PumpControlType = cAlphaArgs(4)
             if (UtilityRoutines::SameString(cAlphaArgs(4), "Continuous")) {
-                PumpEquip(PumpNum).PumpControl = Continuous;
+                PumpEquip(PumpNum).PumpControl = PumpControlType::Continuous;
             } else if (UtilityRoutines::SameString(cAlphaArgs(4), "Intermittent")) {
-                PumpEquip(PumpNum).PumpControl = Intermittent;
+                PumpEquip(PumpNum).PumpControl = PumpControlType::Intermittent;
             } else {
                 ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + PumpEquip(PumpNum).Name + "\", Invalid " + cAlphaFieldNames(4));
                 ShowContinueError(state, "Entered Value=[" + cAlphaArgs(4) + "]. " + cAlphaFieldNames(4) + " has been set to Continuous for this pump.");
-                PumpEquip(PumpNum).PumpControl = Continuous;
+                PumpEquip(PumpNum).PumpControl = PumpControlType::Continuous;
             }
 
             // Input the optional schedule for the pump
@@ -751,7 +753,7 @@ namespace Pumps {
             TestCompSet(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(2), cAlphaArgs(3), "Water Nodes");
 
             // PumpEquip(PumpNum)%PumpControlType == 'Intermittent'
-            PumpEquip(PumpNum).PumpControl = Intermittent;
+            PumpEquip(PumpNum).PumpControl = PumpControlType::Intermittent;
 
             // Input the optional schedule for the pump
             PumpEquip(PumpNum).PumpSchedule = cAlphaArgs(4);
@@ -876,13 +878,13 @@ namespace Pumps {
 
             //    PumpEquip(PumpNum)%PumpControlType = cAlphaArgs(5)
             if (UtilityRoutines::SameString(cAlphaArgs(5), "Continuous")) {
-                PumpEquip(PumpNum).PumpControl = Continuous;
+                PumpEquip(PumpNum).PumpControl = PumpControlType::Continuous;
             } else if (UtilityRoutines::SameString(cAlphaArgs(5), "Intermittent")) {
-                PumpEquip(PumpNum).PumpControl = Intermittent;
+                PumpEquip(PumpNum).PumpControl = PumpControlType::Intermittent;
             } else {
                 ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + PumpEquip(PumpNum).Name + "\", Invalid " + cAlphaFieldNames(5));
                 ShowContinueError(state, "Entered Value=[" + cAlphaArgs(5) + "]. " + cAlphaFieldNames(5) + " has been set to Continuous for this pump.");
-                PumpEquip(PumpNum).PumpControl = Continuous;
+                PumpEquip(PumpNum).PumpControl = PumpControlType::Continuous;
             }
 
             // Input the optional schedule for the pump
@@ -998,13 +1000,13 @@ namespace Pumps {
 
             //    PumpEquip(PumpNum)%PumpControlType = cAlphaArgs(5)
             if (UtilityRoutines::SameString(cAlphaArgs(5), "Continuous")) {
-                PumpEquip(PumpNum).PumpControl = Continuous;
+                PumpEquip(PumpNum).PumpControl = PumpControlType::Continuous;
             } else if (UtilityRoutines::SameString(cAlphaArgs(5), "Intermittent")) {
-                PumpEquip(PumpNum).PumpControl = Intermittent;
+                PumpEquip(PumpNum).PumpControl = PumpControlType::Intermittent;
             } else {
                 ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + PumpEquip(PumpNum).Name + "\", Invalid " + cAlphaFieldNames(5));
                 ShowContinueError(state, "Entered Value=[" + cAlphaArgs(5) + "]. " + cAlphaFieldNames(5) + " has been set to Continuous for this pump.");
-                PumpEquip(PumpNum).PumpControl = Continuous;
+                PumpEquip(PumpNum).PumpControl = PumpControlType::Continuous;
             }
 
             // Input the optional schedule for the pump
@@ -1440,7 +1442,7 @@ namespace Pumps {
                 ShowWarningError(state, "Check input. Pump nominal flow rate is set or calculated = 0, for pump=" + PumpEquip(PumpNum).Name);
             }
 
-            if (PumpEquip(PumpNum).PumpControl == Continuous) {
+            if (PumpEquip(PumpNum).PumpControl == PumpControlType::Continuous) {
                 // reset flow priority appropriately (default was for Intermittent)
                 PlantLoop(PumpEquip(PumpNum).LoopNum)
                     .LoopSide(PumpEquip(PumpNum).LoopSideNum)
@@ -1687,13 +1689,13 @@ namespace Pumps {
                     } // VFDControlType
                 }
 
-                if (PumpEquip(PumpNum).PumpControl == Continuous) {
+                if (PumpEquip(PumpNum).PumpControl == PumpControlType::Continuous) {
                     Node(InletNode).MassFlowRateRequest = PumpMassFlowRateMin;
                 }
 
             } else if (SELECT_CASE_var == Pump_ConSpeed) {
 
-                if (PumpEquip(PumpNum).PumpControl == Continuous) {
+                if (PumpEquip(PumpNum).PumpControl == PumpControlType::Continuous) {
                     PumpMassFlowRateMin = PumpMassFlowRateMax;
                     Node(InletNode).MassFlowRateRequest = PumpMassFlowRateMin;
                 }
@@ -2356,9 +2358,9 @@ namespace Pumps {
 
         equipName = PumpEquip(NumPump).Name;
         PreDefTableEntry(pdchPumpType, equipName, cPumpTypes(PumpEquip(NumPump).PumpType));
-        if (PumpEquip(NumPump).PumpControl == Continuous) {
+        if (PumpEquip(NumPump).PumpControl == PumpControlType::Continuous) {
             PreDefTableEntry(pdchPumpControl, equipName, "Continuous");
-        } else if (PumpEquip(NumPump).PumpControl == Intermittent) {
+        } else if (PumpEquip(NumPump).PumpControl == PumpControlType::Intermittent) {
             PreDefTableEntry(pdchPumpControl, equipName, "Intermittent");
         } else {
             PreDefTableEntry(pdchPumpControl, equipName, "Unknown");
