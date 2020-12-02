@@ -122,7 +122,7 @@ struct ErrorTrackingData : BaseGlobalStruct {
     void clear_state() override
     {
         RecurringErrors.clear();
-        MatchCounts.clear();
+        MatchCounts = Array1D_int(DataErrorTracking::SearchCounts, 0);
         AbortProcessing = false;            // Flag used to if currently in "abort processing"
         NumRecurringErrors = 0;              // Number of stored recurring error messages
         TotalSevereErrors = 0;               // Counter
