@@ -107,6 +107,7 @@ struct FansData;
 struct PipesData;
 struct PlantChillersData;
 struct PlantValvesData;
+struct PluginManagerData;
 struct SetPointManagerData;
 struct SimulationManagerData;
 struct SingleDuctData;
@@ -197,6 +198,7 @@ struct EnergyPlusData : BaseGlobalStruct {
     std::unique_ptr<PipesData> dataPipes;
     std::unique_ptr<PlantChillersData> dataPlantChillers;
     std::unique_ptr<PlantValvesData> dataPlantValves;
+    std::unique_ptr<PluginManagerData> dataPluginManager;
     std::unique_ptr<SetPointManagerData> dataSetPointManager;
     std::unique_ptr<SimulationManagerData> dataSimulationManager;
     std::unique_ptr<SingleDuctData> dataSingleDuct;

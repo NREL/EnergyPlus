@@ -204,7 +204,7 @@ namespace EMSManager {
 
         // Python plugin instances also count since actuators need to be set up for them
         int numPythonPlugins = inputProcessor->getNumObjectsFound(state, "PythonPlugin:Instance");
-        int numActiveCallbacks = PluginManagement::PluginManager::numActiveCallbacks();
+        int numActiveCallbacks = PluginManagement::PluginManager::numActiveCallbacks(state);
 
         // added for FMU
         if ((NumSensors + numActuatorsUsed + NumProgramCallManagers + NumErlPrograms + NumErlSubroutines + NumUserGlobalVariables +
@@ -283,7 +283,7 @@ namespace EMSManager {
 
         if (iCalledFrom == EMSCallFrom::BeginNewEnvironment) {
             BeginEnvrnInitializeRuntimeLanguage();
-            PluginManagement::onBeginEnvironment();
+            PluginManagement::onBeginEnvironment(state);
         }
 
         InitEMS(state, iCalledFrom);
@@ -1737,7 +1737,7 @@ namespace EMSManager {
 
         if ((!ErrorFlag) && (!FoundControl)) {
             int numPythonPlugins = inputProcessor->getNumObjectsFound(state, "PythonPlugin:Instance");
-            int numActiveCallbacks = PluginManagement::PluginManager::numActiveCallbacks(); // errorCallback;
+            int numActiveCallbacks = PluginManagement::PluginManager::numActiveCallbacks(state); // errorCallback;
             if ((numPythonPlugins + numActiveCallbacks) == 0) {
                 ErrorFlag = true;
             } else {
