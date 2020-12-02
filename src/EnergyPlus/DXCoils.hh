@@ -53,6 +53,7 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>

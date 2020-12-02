@@ -66,7 +66,6 @@
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/FluidProperties.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -652,7 +651,6 @@ namespace BaseboardRadiator {
         using DataHVACGlobals::HeatingCapacitySizing;
         using DataLoopNode::Node;
 
-        using General::SolveRoot;
         using PlantUtilities::RegisterPlantCompDesignFlow;
 
         // SUBROUTINE PARAMETER DEFINITIONS:

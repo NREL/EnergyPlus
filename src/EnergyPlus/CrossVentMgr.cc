@@ -53,8 +53,10 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/AirflowNetworkBalanceManager.hh>
 #include <EnergyPlus/ConvectionCoefficients.hh>
 #include <EnergyPlus/CrossVentMgr.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
@@ -63,12 +65,10 @@
 #include <EnergyPlus/DataRoomAirModel.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataUCSDSharedData.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-#include <EnergyPlus/AirflowNetworkBalanceManager.hh>
 
 namespace EnergyPlus {
 

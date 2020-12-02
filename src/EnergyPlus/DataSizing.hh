@@ -1254,6 +1254,14 @@ namespace DataSizing {
 
 } // namespace DataSizing
 
+struct SizingData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
+
 } // namespace EnergyPlus
 
 #endif

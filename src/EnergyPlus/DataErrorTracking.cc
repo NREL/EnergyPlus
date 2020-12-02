@@ -47,6 +47,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataErrorTracking.hh>
+
 namespace EnergyPlus {
 
 namespace DataErrorTracking {

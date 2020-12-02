@@ -51,7 +51,6 @@
 #include <EnergyPlus/DataConversions.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/Material.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 

@@ -49,8 +49,8 @@
 #define CostEstimateManager_hh_INCLUDED
 
 // EnergyPlus Headers
-#include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 

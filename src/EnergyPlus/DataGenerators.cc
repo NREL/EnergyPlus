@@ -47,6 +47,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataGenerators.hh>
+
 namespace EnergyPlus {
 
 namespace DataGenerators {

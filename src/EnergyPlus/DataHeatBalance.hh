@@ -57,6 +57,7 @@
 #include <ObjexxFCL/Reference.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataComplexFenestration.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataSurfaces.hh>
@@ -2242,6 +2243,14 @@ namespace DataHeatBalance {
     void SetFlagForWindowConstructionWithShadeOrBlindLayer(EnergyPlusData &state);
 
 } // namespace DataHeatBalance
+
+struct HeatBalanceData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

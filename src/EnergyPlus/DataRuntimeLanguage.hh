@@ -59,6 +59,7 @@
 #include <ObjexxFCL/Reference.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -550,6 +551,14 @@ namespace DataRuntimeLanguage {
     );
 
 } // namespace DataRuntimeLanguage
+
+struct RuntimeLanguageData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

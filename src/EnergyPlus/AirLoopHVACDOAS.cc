@@ -45,20 +45,22 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+// C++ Headers
+#include <string>
+
+// EnergyPlus Headers
 #include <EnergyPlus/AirLoopHVACDOAS.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DesiccantDehumidifiers.hh>
 #include <EnergyPlus/EvaporativeCoolers.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/FluidProperties.hh>
-#include <EnergyPlus/General.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACDXHeatPumpSystem.hh>
 #include <EnergyPlus/HVACDXSystem.hh>
 #include <EnergyPlus/HVACFan.hh>
@@ -80,7 +82,6 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterCoils.hh>
 #include <EnergyPlus/WeatherManager.hh>
-#include <string>
 
 namespace EnergyPlus {
 

@@ -58,7 +58,6 @@
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>

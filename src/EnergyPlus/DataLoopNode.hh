@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -328,6 +329,14 @@ namespace DataLoopNode {
     void clear_state();
 
 } // namespace DataLoopNode
+
+struct LoopNodeData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

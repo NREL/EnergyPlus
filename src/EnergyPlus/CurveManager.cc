@@ -46,10 +46,10 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // C++ Headers
-#include <cmath>
-#include <string>
 #include <algorithm>
+#include <cmath>
 #include <limits>
+#include <string>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
@@ -59,12 +59,12 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/EMSManager.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputProcessor.hh>

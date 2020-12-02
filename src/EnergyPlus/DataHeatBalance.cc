@@ -58,7 +58,6 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/Material.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 

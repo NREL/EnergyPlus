@@ -67,7 +67,6 @@
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/FaultsManager.hh>
 #include <EnergyPlus/FluidProperties.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
