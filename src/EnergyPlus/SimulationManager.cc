@@ -316,7 +316,7 @@ namespace SimulationManager {
         // If we are already within a Python interpreter context, and we try to start up a new Python interpreter environment, it segfaults
         // Note that some setup is deferred until later such as setting up output variables
         if (!state.dataGlobal->eplusRunningViaAPI) {
-            EnergyPlus::PluginManagement::pluginManager = std::make_unique<EnergyPlus::PluginManagement::PluginManager>(state);
+            state.dataPluginManager->pluginManager = std::make_unique<EnergyPlus::PluginManagement::PluginManager>(state);
         } else {
             // if we ARE running via API, we should warn if any plugin objects are found and fail rather than running silently without them
             bool invalidPluginObjects = EnergyPlus::PluginManagement::PluginManager::anyUnexpectedPluginObjects(state);
@@ -377,7 +377,7 @@ namespace SimulationManager {
             state.dataGlobal->MetersHaveBeenInitialized = true;
             SetupPollutionMeterReporting(state);
             SystemReports::AllocateAndSetUpVentReports(state);
-            if (EnergyPlus::PluginManagement::pluginManager) {
+            if (state.dataPluginManager->pluginManager) {
                 EnergyPlus::PluginManagement::PluginManager::setupOutputVariables(state);
             }
             UpdateMeterReporting(state);
@@ -421,7 +421,7 @@ namespace SimulationManager {
         }
 
         // up until this point, output vars, meters, actuators, etc., may not have been registered; they are now
-        PluginManagement::fullyReady = true;
+        state.dataPluginManager->fullyReady = true;
 
         if (sqlite) {
             sqlite->sqliteBegin();

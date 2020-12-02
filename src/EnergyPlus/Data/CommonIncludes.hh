@@ -160,6 +160,7 @@
 #include <EnergyPlus/PlantChillers.hh>
 #include <EnergyPlus/PlantLoopHeatPumpEIR.hh>
 #include <EnergyPlus/PlantValves.hh>
+#include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/SetPointManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SingleDuct.hh>

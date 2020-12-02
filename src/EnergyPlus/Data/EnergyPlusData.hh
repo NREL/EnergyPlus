@@ -155,6 +155,7 @@ struct PhotovoltaicsData;
 struct PipesData;
 struct PlantChillersData;
 struct PlantValvesData;
+struct PluginManagerData;
 struct ReportFlagData;
 struct RoomAirModelData;
 struct RuntimeLanguageData;
@@ -310,6 +311,7 @@ struct EnergyPlusData : BaseGlobalStruct {
     std::unique_ptr<PipesData> dataPipes;
     std::unique_ptr<PlantChillersData> dataPlantChillers;
     std::unique_ptr<PlantValvesData> dataPlantValves;
+    std::unique_ptr<PluginManagerData> dataPluginManager;
     std::unique_ptr<ReportFlagData> dataReportFlag;
     std::unique_ptr<RoomAirModelData> dataRoomAirMod;
     std::unique_ptr<RuntimeLanguageData> dataRuntimeLang;

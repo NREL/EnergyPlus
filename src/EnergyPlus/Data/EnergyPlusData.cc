@@ -148,6 +148,7 @@ namespace EnergyPlus {
         this->dataPipes = std::make_unique<PipesData>();
         this->dataPlantChillers = std::make_unique<PlantChillersData>();
         this->dataPlantValves = std::make_unique<PlantValvesData>();
+        this->dataPluginManager = std::make_unique<PluginManagerData>();
         this->dataReportFlag = std::make_unique<ReportFlagData>();
         this->dataRoomAirMod = std::make_unique<RoomAirModelData>();
         this->dataRuntimeLang = std::make_unique<RuntimeLanguageData>();
@@ -300,6 +301,7 @@ namespace EnergyPlus {
         this->dataPipes->clear_state();
         this->dataPlantChillers->clear_state();
         this->dataPlantValves->clear_state();
+        this->dataPluginManager->clear_state();
         this->dataReportFlag->clear_state();
         this->dataRoomAirMod->clear_state();
         this->dataRuntimeLang->clear_state();

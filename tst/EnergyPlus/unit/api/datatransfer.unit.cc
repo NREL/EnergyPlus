@@ -68,8 +68,6 @@ using namespace EnergyPlus;
 
 class DataExchangeAPIUnitTestFixture : public EnergyPlusFixture
 {
-    // create a plugin manager instance
-    EnergyPlus::PluginManagement::PluginManager pluginManager = EnergyPlus::PluginManagement::PluginManager(*state);
 
     struct DummyRealVariable
     {
@@ -152,6 +150,7 @@ class DataExchangeAPIUnitTestFixture : public EnergyPlusFixture
         OutputProcessor::SetupTimePointers(*state, "HVAC", timeStep);
         *OutputProcessor::TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep = 60;
         *OutputProcessor::TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep = 60;
+        state->dataPluginManager->pluginManager = std::make_unique<EnergyPlus::PluginManagement::PluginManager>(*state);
     }
 
     void TearDown() override
@@ -236,16 +235,16 @@ public:
         }
     }
 
-    void addPluginGlobal(std::string const &varName)
+    void addPluginGlobal(EnergyPlus::EnergyPlusData &state, std::string const &varName)
     {
-        this->pluginManager.addGlobalVariable(varName);
+        state.dataPluginManager->pluginManager->addGlobalVariable(state, varName);
     }
 
     void addTrendWithNewGlobal(std::string const &newGlobalVarName, std::string const &trendName, int numTrendValues)
     {
-        this->pluginManager.addGlobalVariable(newGlobalVarName);
+        state->dataPluginManager->pluginManager->addGlobalVariable(*state, newGlobalVarName);
         int i = EnergyPlus::PluginManagement::PluginManager::getGlobalVariableHandle(*state, newGlobalVarName, true);
-        EnergyPlus::PluginManagement::trends.emplace_back(*state, trendName, numTrendValues, i);
+        state->dataPluginManager->trends.emplace_back(*state, trendName, numTrendValues, i);
     }
 
     void simulateTimeStepAndReport()
@@ -274,7 +273,7 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestListAllDataInCSV)
     this->setupActuatorsOnceAllAreRequested();
     this->preRequestInternalVariable("Floor Area", "Zone 1", 6.02e23);
     this->setupInternalVariablesOnceAllAreRequested();
-    this->addPluginGlobal("Plugin_Global_Var_Name");
+    this->addPluginGlobal(*state, "Plugin_Global_Var_Name");
     this->addTrendWithNewGlobal("NewGlobalVarHere", "Trend 1", 3);
     char * charCsvDataFull = listAllAPIDataCSV((void*)this->state);
     std::string csvData = std::string(charCsvDataFull);
