@@ -52,6 +52,7 @@
 #include <string>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACSystems.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -191,6 +192,14 @@ namespace SimAirServingZones {
     bool CheckWaterCoilSystemOnAirLoopOrOASystem(EnergyPlusData &state, int CoilTypeNum, std::string CompName);
 
 } // namespace SimAirServingZones
+
+struct SimAirServingZonesData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

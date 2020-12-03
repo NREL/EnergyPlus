@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -218,6 +219,14 @@ namespace PlantUtilities {
     bool verifyTwoNodeNumsOnSamePlantLoop(int const nodeIndexA, int const nodeIndexB);
 
 } // namespace PlantUtilities
+
+struct PlantUtilitiesData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

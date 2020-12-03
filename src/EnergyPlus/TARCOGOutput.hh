@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array2A.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/IOFiles.hh>
 
@@ -309,6 +310,14 @@ namespace TARCOGOutput {
         Files &files, std::string const &Debug_dir, std::string const &Debug_file, int const Debug_mode, int const win_ID, int const igu_ID);
 
 } // namespace TARCOGOutput
+
+struct TARCOGOutputData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 
