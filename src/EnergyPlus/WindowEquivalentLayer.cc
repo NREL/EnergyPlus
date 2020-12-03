@@ -204,117 +204,117 @@ namespace WindowEquivalentLayer {
 
             MaterNum = state.dataConstruction->Construct(ConstrNum).LayerPoint(Layer);
 
-            if (dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group != GlassEquivalentLayer &&
-                dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group != ShadeEquivalentLayer &&
-                dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group != DrapeEquivalentLayer &&
-                dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group != ScreenEquivalentLayer &&
-                dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group != BlindEquivalentLayer &&
-                dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group != GapEquivalentLayer)
+            if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group != GlassEquivalentLayer &&
+                state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group != ShadeEquivalentLayer &&
+                state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group != DrapeEquivalentLayer &&
+                state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group != ScreenEquivalentLayer &&
+                state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group != BlindEquivalentLayer &&
+                state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group != GapEquivalentLayer)
                 continue;
 
-            if (dataMaterial.Material(MaterNum).Group == GapEquivalentLayer) {
+            if (state.dataMaterial->Material(MaterNum).Group == GapEquivalentLayer) {
                 // Gap or Gas Layer
                 ++gLayer;
             } else {
                 // Solid (Glazing or Shade) Layer
                 ++sLayer;
-                CFS(EQLNum).L(sLayer).Name = dataMaterial.Material(MaterNum).Name;
+                CFS(EQLNum).L(sLayer).Name = state.dataMaterial->Material(MaterNum).Name;
                 // longwave property input
-                CFS(EQLNum).L(sLayer).LWP_MAT.EPSLF = dataMaterial.Material(MaterNum).EmissThermalFront;
-                CFS(EQLNum).L(sLayer).LWP_MAT.EPSLB = dataMaterial.Material(MaterNum).EmissThermalBack;
-                CFS(EQLNum).L(sLayer).LWP_MAT.TAUL = dataMaterial.Material(MaterNum).TausThermal;
+                CFS(EQLNum).L(sLayer).LWP_MAT.EPSLF = state.dataMaterial->Material(MaterNum).EmissThermalFront;
+                CFS(EQLNum).L(sLayer).LWP_MAT.EPSLB = state.dataMaterial->Material(MaterNum).EmissThermalBack;
+                CFS(EQLNum).L(sLayer).LWP_MAT.TAUL = state.dataMaterial->Material(MaterNum).TausThermal;
             }
 
-            if (dataMaterial.Material(MaterNum).Group == BlindEquivalentLayer) {
+            if (state.dataMaterial->Material(MaterNum).Group == BlindEquivalentLayer) {
                 CFS(EQLNum).VBLayerPtr = sLayer;
-                if (dataMaterial.Material(MaterNum).SlatOrientation == Horizontal) {
+                if (state.dataMaterial->Material(MaterNum).SlatOrientation == Horizontal) {
                     CFS(EQLNum).L(sLayer).LTYPE = ltyVBHOR;
-                } else if (dataMaterial.Material(MaterNum).SlatOrientation == Vertical) {
+                } else if (state.dataMaterial->Material(MaterNum).SlatOrientation == Vertical) {
                     CFS(EQLNum).L(sLayer).LTYPE = ltyVBVER;
                 }
-                CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFBD = dataMaterial.Material(MaterNum).ReflFrontBeamDiff;
-                CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBBD = dataMaterial.Material(MaterNum).ReflBackBeamDiff;
-                CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBD = dataMaterial.Material(MaterNum).TausFrontBeamDiff;
-                CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBD = dataMaterial.Material(MaterNum).TausBackBeamDiff;
+                CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFBD = state.dataMaterial->Material(MaterNum).ReflFrontBeamDiff;
+                CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBBD = state.dataMaterial->Material(MaterNum).ReflBackBeamDiff;
+                CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBD = state.dataMaterial->Material(MaterNum).TausFrontBeamDiff;
+                CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBD = state.dataMaterial->Material(MaterNum).TausBackBeamDiff;
 
-                CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFDD = dataMaterial.Material(MaterNum).ReflFrontDiffDiff;
-                CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBDD = dataMaterial.Material(MaterNum).ReflBackDiffDiff;
-                CFS(EQLNum).L(sLayer).SWP_MAT.TAUS_DD = dataMaterial.Material(MaterNum).TausDiffDiff;
-                CFS(EQLNum).L(sLayer).PHI_DEG = dataMaterial.Material(MaterNum).SlatAngle;
-                CFS(EQLNum).L(sLayer).CNTRL = dataMaterial.Material(MaterNum).SlatAngleType;
-                CFS(EQLNum).L(sLayer).S = dataMaterial.Material(MaterNum).SlatSeparation;
-                CFS(EQLNum).L(sLayer).W = dataMaterial.Material(MaterNum).SlatWidth;
-                CFS(EQLNum).L(sLayer).C = dataMaterial.Material(MaterNum).SlatCrown;
-            } else if (dataMaterial.Material(MaterNum).Group == GlassEquivalentLayer) {
+                CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFDD = state.dataMaterial->Material(MaterNum).ReflFrontDiffDiff;
+                CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBDD = state.dataMaterial->Material(MaterNum).ReflBackDiffDiff;
+                CFS(EQLNum).L(sLayer).SWP_MAT.TAUS_DD = state.dataMaterial->Material(MaterNum).TausDiffDiff;
+                CFS(EQLNum).L(sLayer).PHI_DEG = state.dataMaterial->Material(MaterNum).SlatAngle;
+                CFS(EQLNum).L(sLayer).CNTRL = state.dataMaterial->Material(MaterNum).SlatAngleType;
+                CFS(EQLNum).L(sLayer).S = state.dataMaterial->Material(MaterNum).SlatSeparation;
+                CFS(EQLNum).L(sLayer).W = state.dataMaterial->Material(MaterNum).SlatWidth;
+                CFS(EQLNum).L(sLayer).C = state.dataMaterial->Material(MaterNum).SlatCrown;
+            } else if (state.dataMaterial->Material(MaterNum).Group == GlassEquivalentLayer) {
                 // glazing
                 CFS(EQLNum).L(sLayer).LTYPE = ltyGLAZE;
-                CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFBB = dataMaterial.Material(MaterNum).ReflFrontBeamBeam;
-                CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBBB = dataMaterial.Material(MaterNum).ReflBackBeamBeam;
-                CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBB = dataMaterial.Material(MaterNum).TausFrontBeamBeam;
+                CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFBB = state.dataMaterial->Material(MaterNum).ReflFrontBeamBeam;
+                CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBBB = state.dataMaterial->Material(MaterNum).ReflBackBeamBeam;
+                CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBB = state.dataMaterial->Material(MaterNum).TausFrontBeamBeam;
 
-                CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFBD = dataMaterial.Material(MaterNum).ReflFrontBeamDiff;
-                CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBBD = dataMaterial.Material(MaterNum).ReflBackBeamDiff;
-                CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBD = dataMaterial.Material(MaterNum).TausFrontBeamDiff;
-                CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBD = dataMaterial.Material(MaterNum).TausBackBeamDiff;
+                CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFBD = state.dataMaterial->Material(MaterNum).ReflFrontBeamDiff;
+                CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBBD = state.dataMaterial->Material(MaterNum).ReflBackBeamDiff;
+                CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBD = state.dataMaterial->Material(MaterNum).TausFrontBeamDiff;
+                CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBD = state.dataMaterial->Material(MaterNum).TausBackBeamDiff;
 
-                CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFDD = dataMaterial.Material(MaterNum).ReflFrontDiffDiff;
-                CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBDD = dataMaterial.Material(MaterNum).ReflBackDiffDiff;
-                CFS(EQLNum).L(sLayer).SWP_MAT.TAUS_DD = dataMaterial.Material(MaterNum).TausDiffDiff;
-            } else if (dataMaterial.Material(MaterNum).Group == ShadeEquivalentLayer) {
+                CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFDD = state.dataMaterial->Material(MaterNum).ReflFrontDiffDiff;
+                CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBDD = state.dataMaterial->Material(MaterNum).ReflBackDiffDiff;
+                CFS(EQLNum).L(sLayer).SWP_MAT.TAUS_DD = state.dataMaterial->Material(MaterNum).TausDiffDiff;
+            } else if (state.dataMaterial->Material(MaterNum).Group == ShadeEquivalentLayer) {
                 // roller blind
                 CFS(EQLNum).L(sLayer).LTYPE = ltyROLLB;
-                CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBB = dataMaterial.Material(MaterNum).TausFrontBeamBeam;
-                CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBB = dataMaterial.Material(MaterNum).TausBackBeamBeam;
-                CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFBD = dataMaterial.Material(MaterNum).ReflFrontBeamDiff;
-                CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBBD = dataMaterial.Material(MaterNum).ReflBackBeamDiff;
-                CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBD = dataMaterial.Material(MaterNum).TausFrontBeamDiff;
-                CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBD = dataMaterial.Material(MaterNum).TausBackBeamDiff;
+                CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBB = state.dataMaterial->Material(MaterNum).TausFrontBeamBeam;
+                CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBB = state.dataMaterial->Material(MaterNum).TausBackBeamBeam;
+                CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFBD = state.dataMaterial->Material(MaterNum).ReflFrontBeamDiff;
+                CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBBD = state.dataMaterial->Material(MaterNum).ReflBackBeamDiff;
+                CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBD = state.dataMaterial->Material(MaterNum).TausFrontBeamDiff;
+                CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBD = state.dataMaterial->Material(MaterNum).TausBackBeamDiff;
 
-            } else if (dataMaterial.Material(MaterNum).Group == DrapeEquivalentLayer) {
+            } else if (state.dataMaterial->Material(MaterNum).Group == DrapeEquivalentLayer) {
                 // drapery fabric
                 CFS(EQLNum).L(sLayer).LTYPE = ltyDRAPE;
-                CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBB = dataMaterial.Material(MaterNum).TausFrontBeamBeam;
-                CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBB = dataMaterial.Material(MaterNum).TausBackBeamBeam;
-                CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFBD = dataMaterial.Material(MaterNum).ReflFrontBeamDiff;
-                CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBBD = dataMaterial.Material(MaterNum).ReflBackBeamDiff;
-                CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBD = dataMaterial.Material(MaterNum).TausFrontBeamDiff;
-                CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBD = dataMaterial.Material(MaterNum).TausBackBeamDiff;
+                CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBB = state.dataMaterial->Material(MaterNum).TausFrontBeamBeam;
+                CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBB = state.dataMaterial->Material(MaterNum).TausBackBeamBeam;
+                CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFBD = state.dataMaterial->Material(MaterNum).ReflFrontBeamDiff;
+                CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBBD = state.dataMaterial->Material(MaterNum).ReflBackBeamDiff;
+                CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBD = state.dataMaterial->Material(MaterNum).TausFrontBeamDiff;
+                CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBD = state.dataMaterial->Material(MaterNum).TausBackBeamDiff;
 
-                CFS(EQLNum).L(sLayer).S = dataMaterial.Material(MaterNum).PleatedDrapeLength;
-                CFS(EQLNum).L(sLayer).W = dataMaterial.Material(MaterNum).PleatedDrapeWidth;
+                CFS(EQLNum).L(sLayer).S = state.dataMaterial->Material(MaterNum).PleatedDrapeLength;
+                CFS(EQLNum).L(sLayer).W = state.dataMaterial->Material(MaterNum).PleatedDrapeWidth;
                 // init diffuse SWP to force default derivation
                 CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFDD = -1.0;
                 CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBDD = -1.0;
                 CFS(EQLNum).L(sLayer).SWP_MAT.TAUS_DD = -1.0;
-            } else if (dataMaterial.Material(MaterNum).Group == ScreenEquivalentLayer) {
+            } else if (state.dataMaterial->Material(MaterNum).Group == ScreenEquivalentLayer) {
                 // insect screen
                 CFS(EQLNum).L(sLayer).LTYPE = ltyINSCRN;
-                CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBB = dataMaterial.Material(MaterNum).TausFrontBeamBeam;
-                CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBB = dataMaterial.Material(MaterNum).TausBackBeamBeam;
-                CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFBD = dataMaterial.Material(MaterNum).ReflFrontBeamDiff;
-                CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBBD = dataMaterial.Material(MaterNum).ReflBackBeamDiff;
+                CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBB = state.dataMaterial->Material(MaterNum).TausFrontBeamBeam;
+                CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBB = state.dataMaterial->Material(MaterNum).TausBackBeamBeam;
+                CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFBD = state.dataMaterial->Material(MaterNum).ReflFrontBeamDiff;
+                CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBBD = state.dataMaterial->Material(MaterNum).ReflBackBeamDiff;
 
-                CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBD = dataMaterial.Material(MaterNum).TausFrontBeamDiff;
-                CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBD = dataMaterial.Material(MaterNum).TausBackBeamDiff;
+                CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBD = state.dataMaterial->Material(MaterNum).TausFrontBeamDiff;
+                CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBD = state.dataMaterial->Material(MaterNum).TausBackBeamDiff;
                 // wire geometry
-                CFS(EQLNum).L(sLayer).S = dataMaterial.Material(MaterNum).ScreenWireSpacing;
-                CFS(EQLNum).L(sLayer).W = dataMaterial.Material(MaterNum).ScreenWireDiameter;
-            } else if (dataMaterial.Material(MaterNum).Group == GapEquivalentLayer) {
+                CFS(EQLNum).L(sLayer).S = state.dataMaterial->Material(MaterNum).ScreenWireSpacing;
+                CFS(EQLNum).L(sLayer).W = state.dataMaterial->Material(MaterNum).ScreenWireDiameter;
+            } else if (state.dataMaterial->Material(MaterNum).Group == GapEquivalentLayer) {
                 // This layer is a gap.  Fill in the parameters
-                CFS(EQLNum).G(gLayer).Name = dataMaterial.Material(MaterNum).Name;
-                CFS(EQLNum).G(gLayer).GTYPE = dataMaterial.Material(MaterNum).GapVentType;
-                CFS(EQLNum).G(gLayer).TAS = dataMaterial.Material(MaterNum).Thickness;
-                CFS(EQLNum).G(gLayer).FG.Name = dataMaterial.Material(MaterNum).GasName;
-                CFS(EQLNum).G(gLayer).FG.AK = dataMaterial.Material(MaterNum).GasCon(1, 1);
-                CFS(EQLNum).G(gLayer).FG.BK = dataMaterial.Material(MaterNum).GasCon(2, 1);
-                CFS(EQLNum).G(gLayer).FG.CK = dataMaterial.Material(MaterNum).GasCon(3, 1);
-                CFS(EQLNum).G(gLayer).FG.ACP = dataMaterial.Material(MaterNum).GasCp(1, 1);
-                CFS(EQLNum).G(gLayer).FG.BCP = dataMaterial.Material(MaterNum).GasCp(2, 1);
-                CFS(EQLNum).G(gLayer).FG.CCP = dataMaterial.Material(MaterNum).GasCp(3, 1);
-                CFS(EQLNum).G(gLayer).FG.AVISC = dataMaterial.Material(MaterNum).GasVis(1, 1);
-                CFS(EQLNum).G(gLayer).FG.BVISC = dataMaterial.Material(MaterNum).GasVis(2, 1);
-                CFS(EQLNum).G(gLayer).FG.CVISC = dataMaterial.Material(MaterNum).GasVis(3, 1);
-                CFS(EQLNum).G(gLayer).FG.MHAT = dataMaterial.Material(MaterNum).GasWght(1);
+                CFS(EQLNum).G(gLayer).Name = state.dataMaterial->Material(MaterNum).Name;
+                CFS(EQLNum).G(gLayer).GTYPE = state.dataMaterial->Material(MaterNum).GapVentType;
+                CFS(EQLNum).G(gLayer).TAS = state.dataMaterial->Material(MaterNum).Thickness;
+                CFS(EQLNum).G(gLayer).FG.Name = state.dataMaterial->Material(MaterNum).GasName;
+                CFS(EQLNum).G(gLayer).FG.AK = state.dataMaterial->Material(MaterNum).GasCon(1, 1);
+                CFS(EQLNum).G(gLayer).FG.BK = state.dataMaterial->Material(MaterNum).GasCon(2, 1);
+                CFS(EQLNum).G(gLayer).FG.CK = state.dataMaterial->Material(MaterNum).GasCon(3, 1);
+                CFS(EQLNum).G(gLayer).FG.ACP = state.dataMaterial->Material(MaterNum).GasCp(1, 1);
+                CFS(EQLNum).G(gLayer).FG.BCP = state.dataMaterial->Material(MaterNum).GasCp(2, 1);
+                CFS(EQLNum).G(gLayer).FG.CCP = state.dataMaterial->Material(MaterNum).GasCp(3, 1);
+                CFS(EQLNum).G(gLayer).FG.AVISC = state.dataMaterial->Material(MaterNum).GasVis(1, 1);
+                CFS(EQLNum).G(gLayer).FG.BVISC = state.dataMaterial->Material(MaterNum).GasVis(2, 1);
+                CFS(EQLNum).G(gLayer).FG.CVISC = state.dataMaterial->Material(MaterNum).GasVis(3, 1);
+                CFS(EQLNum).G(gLayer).FG.MHAT = state.dataMaterial->Material(MaterNum).GasWght(1);
                 // fills gas density and effective gap thickness
                 BuildGap(state, CFS(EQLNum).G(gLayer), CFS(EQLNum).G(gLayer).GTYPE, CFS(EQLNum).G(gLayer).TAS);
             } else {

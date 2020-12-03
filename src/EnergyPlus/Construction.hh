@@ -323,7 +323,7 @@ namespace Construction {
 
         void reportTransferFunction(EnergyPlusData &state, int const cCounter);
 
-        bool isGlazingConstruction() const;
+        bool isGlazingConstruction(EnergyPlusData &state) const;
 
         Real64 setUserTemperatureLocationPerpendicular(EnergyPlusData &state, Real64 userValue);
 

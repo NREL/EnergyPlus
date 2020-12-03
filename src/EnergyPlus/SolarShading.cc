@@ -7001,8 +7001,8 @@ namespace SolarShading {
                                         if (MovInsulSchedVal <= 0.0) { // Movable insulation not present at current time
                                             HMovInsul = 0.0;
                                         } else { // Movable insulation present
-                                            HMovInsul = 1.0 / (MovInsulSchedVal * dataMaterial.Material(Surface(BackSurfNum).MaterialMovInsulInt).Resistance);
-                                            AbsInt = dataMaterial.Material(Surface(BackSurfNum).MaterialMovInsulInt).AbsorpSolar;
+                                            HMovInsul = 1.0 / (MovInsulSchedVal * state.dataMaterial->Material(Surface(BackSurfNum).MaterialMovInsulInt).Resistance);
+                                            AbsInt = state.dataMaterial->Material(Surface(BackSurfNum).MaterialMovInsulInt).AbsorpSolar;
                                         }
                                     }
                                     if (HMovInsul > 0.0) AbsIntSurf = AbsInt; // Movable inside insulation present
@@ -7072,8 +7072,8 @@ namespace SolarShading {
 
                                     if (ShadeFlagBack == ExtShadeOn) {
                                         Real64 RGlFront = state.dataConstruction->Construct(ConstrNumBack).ReflectSolDiffFront;
-                                        Real64 AbsSh = dataMaterial.Material(state.dataConstruction->Construct(ConstrNumBackSh).LayerPoint(1)).AbsorpSolar;
-                                        Real64 RhoSh = 1.0 - AbsSh - dataMaterial.Material(state.dataConstruction->Construct(ConstrNumBackSh).LayerPoint(1)).Trans;
+                                        Real64 AbsSh = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNumBackSh).LayerPoint(1)).AbsorpSolar;
+                                        Real64 RhoSh = 1.0 - AbsSh - state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNumBackSh).LayerPoint(1)).Trans;
                                         Real64 AShBack = POLYF(CosIncBack, state.dataConstruction->Construct(ConstrNumBack).TransSolBeamCoef) * AbsSh / (1.0 - RGlFront * RhoSh);
                                         BABSZone += BOverlap * AShBack;
                                         IntBeamAbsByShadFac(BackSurfNum) =
@@ -7088,8 +7088,8 @@ namespace SolarShading {
                                         Real64 AShBack; // System shade absorptance for interior beam solar
                                         if (NBackGlass == 2) {
                                             Real64 t2k = POLYF(CosIncBack, state.dataConstruction->Construct(ConstrNumBack).tBareSolCoef({1, 6}, 2));
-                                            Real64 TrSh = dataMaterial.Material(state.dataConstruction->Construct(ConstrNumBackSh).LayerPoint(3)).Trans; // Shade material solar transmittance
-                                            Real64 RhoSh = dataMaterial.Material(state.dataConstruction->Construct(ConstrNumBackSh).LayerPoint(3)).ReflectShade; // Shade material solar absorptance
+                                            Real64 TrSh = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNumBackSh).LayerPoint(3)).Trans; // Shade material solar transmittance
+                                            Real64 RhoSh = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNumBackSh).LayerPoint(3)).ReflectShade; // Shade material solar absorptance
                                             Real64 AbsSh = min(1.0, max(0.0, 1 - TrSh - RhoSh)); // Shade material solar absorptance
                                             AShBack = t2k * (1 + RhoSh * rfd2k + TrSh * rbd1k) * AbsSh;
                                         } else { // NBackGlass = 3
@@ -7097,8 +7097,8 @@ namespace SolarShading {
                                             Real64 td2k = state.dataConstruction->Construct(ConstrNumBack).tBareSolDiff(2);
                                             Real64 rbd2k = state.dataConstruction->Construct(ConstrNumBack).rbBareSolDiff(2);
                                             Real64 rfd3k = state.dataConstruction->Construct(ConstrNumBack).rfBareSolDiff(3);
-                                            Real64 TrSh = dataMaterial.Material(state.dataConstruction->Construct(ConstrNumBackSh).LayerPoint(5)).Trans;
-                                            Real64 RhoSh = dataMaterial.Material(state.dataConstruction->Construct(ConstrNumBackSh).LayerPoint(5)).ReflectShade;
+                                            Real64 TrSh = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNumBackSh).LayerPoint(5)).Trans;
+                                            Real64 RhoSh = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNumBackSh).LayerPoint(5)).ReflectShade;
                                             Real64 AbsSh = min(1.0, max(0.0, 1 - TrSh - RhoSh));
                                             AShBack = t3k * (1 + RhoSh * rfd3k + TrSh * (rbd2k + td2k * rbd1k * td2k)) * AbsSh;
                                         }
@@ -7526,8 +7526,8 @@ namespace SolarShading {
                                         if (MovInsulSchedVal <= 0.0) { // Movable insulation not present at current time
                                             HMovInsul = 0.0;
                                         } else { // Movable insulation present
-                                            HMovInsul = 1.0 / (MovInsulSchedVal * dataMaterial.Material(Surface(BackSurfNum).MaterialMovInsulInt).Resistance);
-                                            AbsInt = dataMaterial.Material(Surface(BackSurfNum).MaterialMovInsulInt).AbsorpSolar;
+                                            HMovInsul = 1.0 / (MovInsulSchedVal * state.dataMaterial->Material(Surface(BackSurfNum).MaterialMovInsulInt).Resistance);
+                                            AbsInt = state.dataMaterial->Material(Surface(BackSurfNum).MaterialMovInsulInt).AbsorpSolar;
                                         }
                                     }
                                     if (HMovInsul > 0.0) AbsIntSurf = AbsInt; // Movable inside insulation present
@@ -8089,8 +8089,8 @@ namespace SolarShading {
                                 if (MovInsulSchedVal <= 0.0) { // Movable insulation not present at current time
                                     HMovInsul = 0.0;
                                 } else { // Movable insulation present
-                                    HMovInsul = 1.0 / (MovInsulSchedVal * dataMaterial.Material(Surface(BackSurfNum).MaterialMovInsulInt).Resistance);
-                                    AbsInt = dataMaterial.Material(Surface(BackSurfNum).MaterialMovInsulInt).AbsorpSolar;
+                                    HMovInsul = 1.0 / (MovInsulSchedVal * state.dataMaterial->Material(Surface(BackSurfNum).MaterialMovInsulInt).Resistance);
+                                    AbsInt = state.dataMaterial->Material(Surface(BackSurfNum).MaterialMovInsulInt).AbsorpSolar;
                                 }
                             }
                             if (HMovInsul > 0.0) AbsIntSurf = AbsInt; // Movable inside insulation present
@@ -8866,7 +8866,7 @@ namespace SolarShading {
                     int TotLayers = construction.TotLayers;
                     for (auto Lay = 1; Lay <= TotLayers; ++Lay) {
                         const int LayPtr = construction.LayerPoint(Lay);
-                        auto &material(dataMaterial.Material(LayPtr));
+                        auto &material(state.dataMaterial->Material(LayPtr));
                         const bool isShading = material.Group == ComplexWindowShade;
                         if (isShading && Lay == 1) SurfWinShadingFlag(ISurf) = ExtShadeOn;
                         if (isShading && Lay == TotLayers) SurfWinShadingFlag(ISurf) = IntShadeOn;
@@ -8875,14 +8875,14 @@ namespace SolarShading {
                         auto &construction(state.dataConstruction->Construct(Surface(ISurf).Construction));
                         const int TotLay = construction.TotLayers;
                         int ShadingLayerPtr = construction.LayerPoint(TotLay);
-                        ShadingLayerPtr = dataMaterial.Material(ShadingLayerPtr).ComplexShadePtr;
+                        ShadingLayerPtr = state.dataMaterial->Material(ShadingLayerPtr).ComplexShadePtr;
                         auto &complexShade = ComplexShade(ShadingLayerPtr);
                         auto TauShadeIR = complexShade.IRTransmittance;
                         auto EpsShadeIR = complexShade.BackEmissivity;
                         auto RhoShadeIR = max(0.0, 1.0 - TauShadeIR - EpsShadeIR);
                         // Get properties of glass next to inside shading layer
                         int GlassLayPtr = construction.LayerPoint(TotLay - 2);
-                        auto EpsGlassIR = dataMaterial.Material(GlassLayPtr).AbsorpThermalBack;
+                        auto EpsGlassIR = state.dataMaterial->Material(GlassLayPtr).AbsorpThermalBack;
                         auto RhoGlassIR = 1 - EpsGlassIR;
 
                         auto EffShBlEmiss =
@@ -10716,9 +10716,9 @@ namespace SolarShading {
                                 MatNumSh = state.dataConstruction->Construct(ConstrNumSh).LayerPoint(5);
                             }
                         }
-                        AbsorpEff = dataMaterial.Material(MatNumSh).AbsorpSolar /
-                                    (dataMaterial.Material(MatNumSh).AbsorpSolar +
-                                     dataMaterial.Material(MatNumSh).Trans + 0.0001);
+                        AbsorpEff = state.dataMaterial->Material(MatNumSh).AbsorpSolar /
+                                    (state.dataMaterial->Material(MatNumSh).AbsorpSolar +
+                                     state.dataMaterial->Material(MatNumSh).Trans + 0.0001);
                         AbsorpEff = min(max(AbsorpEff, 0.0001),
                                         0.999); // Constrain to avoid problems with following log eval
                         SurfWinShadeAbsFacFace1(SurfNum) = (1.0 - std::exp(0.5 * std::log(1.0 - AbsorpEff))) / AbsorpEff;
@@ -10901,8 +10901,8 @@ namespace SolarShading {
                             if (MovInsulSchedVal <= 0.0) { // Movable insulation not present at current time
                                 HMovInsul = 0.0;
                             } else { // Movable insulation present
-                                HMovInsul = 1.0 / (MovInsulSchedVal * dataMaterial.Material(Surface(HeatTransSurfNum).MaterialMovInsulInt).Resistance);
-                                AbsInt = dataMaterial.Material(Surface(HeatTransSurfNum).MaterialMovInsulInt).AbsorpSolar;
+                                HMovInsul = 1.0 / (MovInsulSchedVal * state.dataMaterial->Material(Surface(HeatTransSurfNum).MaterialMovInsulInt).Resistance);
+                                AbsInt = state.dataMaterial->Material(Surface(HeatTransSurfNum).MaterialMovInsulInt).AbsorpSolar;
                             }
                         }
                         if (HMovInsul > 0.0) InsideDifAbsorptance = AbsInt; // Movable inside insulation present
@@ -11442,8 +11442,8 @@ namespace SolarShading {
                     if (MovInsulSchedVal <= 0.0) { // Movable insulation not present at current time
                         HMovInsul = 0.0;
                     } else { // Movable insulation present
-                        HMovInsul = 1.0 / (MovInsulSchedVal * dataMaterial.Material(Surface(HeatTransSurfNum).MaterialMovInsulInt).Resistance);
-                        AbsInt = dataMaterial.Material(Surface(HeatTransSurfNum).MaterialMovInsulInt).AbsorpSolar;
+                        HMovInsul = 1.0 / (MovInsulSchedVal * state.dataMaterial->Material(Surface(HeatTransSurfNum).MaterialMovInsulInt).Resistance);
+                        AbsInt = state.dataMaterial->Material(Surface(HeatTransSurfNum).MaterialMovInsulInt).AbsorpSolar;
                     }
                 }
                 if (HMovInsul > 0.0) InsideDifAbsorptance = AbsInt; // Movable inside insulation present
@@ -11903,7 +11903,7 @@ namespace SolarShading {
                 if (SurfWinWindowModelType(BackSurfaceNumber) == WindowBSDFModel) {
                     VisibleReflectance = state.dataConstruction->Construct(IConst).ReflectVisDiffBack;
                 } else {
-                    VisibleReflectance = (1.0 - dataMaterial.Material(InsideConLay).AbsorpVisible);
+                    VisibleReflectance = (1.0 - state.dataMaterial->Material(InsideConLay).AbsorpVisible);
                 }
                 Geom.ARhoVisOverlap(KBkSurf, IRay) = Geom.AOverlap(KBkSurf, IRay) * VisibleReflectance;
                 TotAOverlap += Geom.AOverlap(KBkSurf, IRay);

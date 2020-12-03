@@ -312,7 +312,7 @@ namespace WindowManager {
 
         auto &construction(state.dataConstruction->Construct(ConstrNum));
         auto LayPtr = construction.LayerPoint(t_Index);
-        return &dataMaterial.Material(LayPtr);
+        return &state.dataMaterial->Material(LayPtr);
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
@@ -331,7 +331,7 @@ namespace WindowManager {
         } else if (matGroup == WindowGas || matGroup == WindowGasMixture) {
             aLayer = getGapLayer(*material);
         } else if (matGroup == ComplexWindowGap) {
-            aLayer = getComplexGapLayer(*material);
+            aLayer = getComplexGapLayer(state, *material);
         }
 
         return aLayer;
@@ -511,7 +511,7 @@ namespace WindowManager {
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
-    std::shared_ptr<CBaseIGULayer> CWCEHeatTransferFactory::getComplexGapLayer(Material::MaterialProperties const &material) const
+    std::shared_ptr<CBaseIGULayer> CWCEHeatTransferFactory::getComplexGapLayer(EnergyPlusData &state, Material::MaterialProperties const &material) const
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -524,7 +524,7 @@ namespace WindowManager {
         auto const pres = 1e5; // Old code uses this constant pressure
         auto thickness = material.Thickness;
         auto gasPointer = material.GasPointer;
-        auto &gasMaterial(dataMaterial.Material(gasPointer));
+        auto &gasMaterial(state.dataMaterial->Material(gasPointer));
         auto aGas = getGas(gasMaterial);
         std::shared_ptr<CBaseIGULayer> aLayer = std::make_shared<CIGUGapLayer>(thickness, pres, aGas);
         return aLayer;

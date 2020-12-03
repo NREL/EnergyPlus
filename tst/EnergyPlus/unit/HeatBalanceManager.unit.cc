@@ -337,15 +337,15 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetWindowConstructData)
     bool ErrorsFound(false); // If errors detected in input
 
     TotMaterials = 3;
-    dataMaterial.Material.allocate(TotMaterials);
-    dataMaterial.Material(1).Name = "GLASS";
-    dataMaterial.Material(2).Name = "AIRGAP";
-    dataMaterial.Material(3).Name = "GLASS";
+    state->dataMaterial->Material.allocate(TotMaterials);
+    state->dataMaterial->Material(1).Name = "GLASS";
+    state->dataMaterial->Material(2).Name = "AIRGAP";
+    state->dataMaterial->Material(3).Name = "GLASS";
 
     // Material layer group index
-    dataMaterial.Material(1).Group = 3; // WindowGlass
-    dataMaterial.Material(2).Group = 4; // WindowGas
-    dataMaterial.Material(3).Group = 3; // WindowGlass
+    state->dataMaterial->Material(1).Group = 3; // WindowGlass
+    state->dataMaterial->Material(2).Group = 4; // WindowGas
+    state->dataMaterial->Material(3).Group = 3; // WindowGlass
 
     NominalRforNominalUCalculation.allocate(1);
     NominalRforNominalUCalculation(1) = 0.0;
@@ -716,11 +716,11 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetMaterialRoofVegetation)
     EXPECT_FALSE(ErrorsFound);
 
     // check the "Material:RoofVegetation" names
-    EXPECT_EQ(dataMaterial.Material(1).Name, "THICKSOIL");
+    EXPECT_EQ(state->dataMaterial->Material(1).Name, "THICKSOIL");
     // check maximum (saturated) moisture content
-    EXPECT_EQ(0.4, dataMaterial.Material(1).Porosity);
+    EXPECT_EQ(0.4, state->dataMaterial->Material(1).Porosity);
     // check initial moisture Content was reset
-    EXPECT_EQ(0.4, dataMaterial.Material(1).InitMoisture); // reset from 0.45 to 0.4 during get input
+    EXPECT_EQ(0.4, state->dataMaterial->Material(1).InitMoisture); // reset from 0.45 to 0.4 during get input
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceManager_WarmUpConvergenceSmallLoadTest)
@@ -1769,7 +1769,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GlazingEquivalentLayer_RValue)
     HeatBalanceManager::GetMaterialData(*state, errorsfound);
 
     EXPECT_FALSE(errorsfound);
-    EXPECT_NEAR(dataMaterial.Material(1).Resistance,0.158,0.0001);
+    EXPECT_NEAR(state->dataMaterial->Material(1).Resistance,0.158,0.0001);
 
 }
 
@@ -1815,17 +1815,17 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData)
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(DataHeatBalance::TotMaterials, 1);
     int MaterNum = 1;
-    EXPECT_EQ(dataMaterial.Material(MaterNum).Group, DataHeatBalance::IRTMaterial);
-    EXPECT_EQ(dataMaterial.Material(MaterNum).Name, "~AirBoundary-IRTMaterial");
-    EXPECT_EQ(dataMaterial.Material(MaterNum).ROnly, true);
-    EXPECT_EQ(dataMaterial.Material(MaterNum).Resistance, 0.01);
-    EXPECT_EQ(dataMaterial.Material(MaterNum).AbsorpThermal, 0.9999);
-    EXPECT_EQ(dataMaterial.Material(MaterNum).AbsorpThermalInput, 0.9999);
-    EXPECT_EQ(dataMaterial.Material(MaterNum).AbsorpSolar, 0.0);
-    EXPECT_EQ(dataMaterial.Material(MaterNum).AbsorpSolarInput, 0.0);
-    EXPECT_EQ(dataMaterial.Material(MaterNum).AbsorpVisible, 0.0);
-    EXPECT_EQ(dataMaterial.Material(MaterNum).AbsorpVisibleInput, 0.0);
-    EXPECT_EQ(DataHeatBalance::NominalR(MaterNum), dataMaterial.Material(MaterNum).Resistance);
+    EXPECT_EQ(state->dataMaterial->Material(MaterNum).Group, DataHeatBalance::IRTMaterial);
+    EXPECT_EQ(state->dataMaterial->Material(MaterNum).Name, "~AirBoundary-IRTMaterial");
+    EXPECT_EQ(state->dataMaterial->Material(MaterNum).ROnly, true);
+    EXPECT_EQ(state->dataMaterial->Material(MaterNum).Resistance, 0.01);
+    EXPECT_EQ(state->dataMaterial->Material(MaterNum).AbsorpThermal, 0.9999);
+    EXPECT_EQ(state->dataMaterial->Material(MaterNum).AbsorpThermalInput, 0.9999);
+    EXPECT_EQ(state->dataMaterial->Material(MaterNum).AbsorpSolar, 0.0);
+    EXPECT_EQ(state->dataMaterial->Material(MaterNum).AbsorpSolarInput, 0.0);
+    EXPECT_EQ(state->dataMaterial->Material(MaterNum).AbsorpVisible, 0.0);
+    EXPECT_EQ(state->dataMaterial->Material(MaterNum).AbsorpVisibleInput, 0.0);
+    EXPECT_EQ(DataHeatBalance::NominalR(MaterNum), state->dataMaterial->Material(MaterNum).Resistance);
 
     // get constructions
     ErrorsFound = false;
@@ -1844,7 +1844,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData)
     EXPECT_TRUE(state->dataConstruction->Construct(constrNum).TypeIsAirBoundaryIRTSurface);
     EXPECT_TRUE(state->dataConstruction->Construct(constrNum).TypeIsAirBoundaryMixing);
     EXPECT_EQ(state->dataConstruction->Construct(constrNum).TotLayers, 1);
-    EXPECT_TRUE(UtilityRoutines::SameString(dataMaterial.Material(state->dataConstruction->Construct(constrNum).LayerPoint(1)).Name, "~AirBoundary-IRTMaterial"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataMaterial->Material(state->dataConstruction->Construct(constrNum).LayerPoint(1)).Name, "~AirBoundary-IRTMaterial"));
     EXPECT_EQ(state->dataConstruction->Construct(constrNum).AirBoundaryACH, 0.5); // Default value from IDD
     EXPECT_EQ(state->dataConstruction->Construct(constrNum).AirBoundaryMixingSched, -1);
     EXPECT_EQ(DataHeatBalance::NominalRforNominalUCalculation(constrNum), 0.01);
@@ -1873,7 +1873,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData)
     EXPECT_TRUE(state->dataConstruction->Construct(constrNum).TypeIsAirBoundaryIRTSurface);
     EXPECT_TRUE(state->dataConstruction->Construct(constrNum).TypeIsAirBoundaryMixing);
     EXPECT_EQ(state->dataConstruction->Construct(constrNum).TotLayers, 1);
-    EXPECT_TRUE(UtilityRoutines::SameString(dataMaterial.Material(state->dataConstruction->Construct(constrNum).LayerPoint(1)).Name, "~AirBoundary-IRTMaterial"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataMaterial->Material(state->dataConstruction->Construct(constrNum).LayerPoint(1)).Name, "~AirBoundary-IRTMaterial"));
     EXPECT_EQ(state->dataConstruction->Construct(constrNum).AirBoundaryACH, 0.4);
     EXPECT_EQ(state->dataConstruction->Construct(constrNum).AirBoundaryMixingSched, 1);
     EXPECT_EQ(DataHeatBalance::NominalRforNominalUCalculation(constrNum), 0.01);
@@ -1954,14 +1954,14 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetMaterialData_IRTSurfaces)
 
     int MaterNum = 1;
 
-    EXPECT_EQ(dataMaterial.Material(MaterNum).ROnly, true);
-    EXPECT_NEAR(dataMaterial.Material(MaterNum).Resistance, 0.01, 0.00001);
-    EXPECT_NEAR(dataMaterial.Material(MaterNum).AbsorpThermal, 0.9999, 0.00001);
-    EXPECT_NEAR(dataMaterial.Material(MaterNum).AbsorpThermalInput, 0.9999, 0.00001);
-    EXPECT_NEAR(dataMaterial.Material(MaterNum).AbsorpSolar, 1.0, 0.00001);
-    EXPECT_NEAR(dataMaterial.Material(MaterNum).AbsorpSolarInput, 1.0, 0.00001);
-    EXPECT_NEAR(dataMaterial.Material(MaterNum).AbsorpVisible, 1.0, 0.00001);
-    EXPECT_NEAR(dataMaterial.Material(MaterNum).AbsorpVisibleInput, 1.0, 0.00001);
+    EXPECT_EQ(state->dataMaterial->Material(MaterNum).ROnly, true);
+    EXPECT_NEAR(state->dataMaterial->Material(MaterNum).Resistance, 0.01, 0.00001);
+    EXPECT_NEAR(state->dataMaterial->Material(MaterNum).AbsorpThermal, 0.9999, 0.00001);
+    EXPECT_NEAR(state->dataMaterial->Material(MaterNum).AbsorpThermalInput, 0.9999, 0.00001);
+    EXPECT_NEAR(state->dataMaterial->Material(MaterNum).AbsorpSolar, 1.0, 0.00001);
+    EXPECT_NEAR(state->dataMaterial->Material(MaterNum).AbsorpSolarInput, 1.0, 0.00001);
+    EXPECT_NEAR(state->dataMaterial->Material(MaterNum).AbsorpVisible, 1.0, 0.00001);
+    EXPECT_NEAR(state->dataMaterial->Material(MaterNum).AbsorpVisibleInput, 1.0, 0.00001);
 
 }
 

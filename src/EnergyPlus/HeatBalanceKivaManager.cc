@@ -641,7 +641,7 @@ namespace HeatBalanceKivaManager {
 
         auto &Surfaces = DataSurfaces::Surface;
         auto &Constructs = state.dataConstruction->Construct;
-        auto &Materials = dataMaterial.Material;
+        auto &Materials = state.dataMaterial->Material;
 
         int inst = 0;
         int surfNum = 1;

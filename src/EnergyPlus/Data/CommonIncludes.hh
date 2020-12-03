@@ -195,6 +195,7 @@
 #include <EnergyPlus/IntegratedHeatPump.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/LowTempRadiantSystem.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/MatrixDataManager.hh>
 #include <EnergyPlus/MicroCHPElectricGenerator.hh>
 #include <EnergyPlus/MicroturbineElectricGenerator.hh>

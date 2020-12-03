@@ -902,7 +902,7 @@ namespace EnergyPlus {
                 // Get slab material properties
                 if (thisDomain.SlabInGradeFlag) {
                     thisDomain.SlabMaterialNum = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(6),
-                                                                                 dataMaterial.Material,
+                                                                                 state.dataMaterial->Material,
                                                                                  DataHeatBalance::TotMaterials);
                     if (thisDomain.SlabMaterialNum == 0) {
                         ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(6) + "=" +
@@ -910,12 +910,12 @@ namespace EnergyPlus {
                         ShowContinueError(state, "Found in: " + thisDomain.Name);
                         ErrorsFound = true;
                     } else {
-                        thisDomain.SlabThickness = dataMaterial.Material(thisDomain.SlabMaterialNum).Thickness;
-                        thisDomain.SlabProperties.Density = dataMaterial.Material(
+                        thisDomain.SlabThickness = state.dataMaterial->Material(thisDomain.SlabMaterialNum).Thickness;
+                        thisDomain.SlabProperties.Density = state.dataMaterial->Material(
                                 thisDomain.SlabMaterialNum).Density;
-                        thisDomain.SlabProperties.SpecificHeat = dataMaterial.Material(
+                        thisDomain.SlabProperties.SpecificHeat = state.dataMaterial->Material(
                                 thisDomain.SlabMaterialNum).SpecHeat;
-                        thisDomain.SlabProperties.Conductivity = dataMaterial.Material(
+                        thisDomain.SlabProperties.Conductivity = state.dataMaterial->Material(
                                 thisDomain.SlabMaterialNum).Conductivity;
                     }
                 }
@@ -937,7 +937,7 @@ namespace EnergyPlus {
                 // Get horizontal insulation material properties
                 if (thisDomain.HorizInsPresentFlag) {
                     thisDomain.HorizInsMaterialNum = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(8),
-                                                                                     dataMaterial.Material,
+                                                                                     state.dataMaterial->Material,
                                                                                      DataHeatBalance::TotMaterials);
                     if (thisDomain.HorizInsMaterialNum == 0) {
                         ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(8) + "=" +
@@ -945,13 +945,13 @@ namespace EnergyPlus {
                         ShowContinueError(state, "Found in: " + thisDomain.Name);
                         ErrorsFound = true;
                     } else {
-                        thisDomain.HorizInsThickness = dataMaterial.Material(
+                        thisDomain.HorizInsThickness = state.dataMaterial->Material(
                                 thisDomain.HorizInsMaterialNum).Thickness;
-                        thisDomain.HorizInsProperties.Density = dataMaterial.Material(
+                        thisDomain.HorizInsProperties.Density = state.dataMaterial->Material(
                                 thisDomain.HorizInsMaterialNum).Density;
-                        thisDomain.HorizInsProperties.SpecificHeat = dataMaterial.Material(
+                        thisDomain.HorizInsProperties.SpecificHeat = state.dataMaterial->Material(
                                 thisDomain.HorizInsMaterialNum).SpecHeat;
-                        thisDomain.HorizInsProperties.Conductivity = dataMaterial.Material(
+                        thisDomain.HorizInsProperties.Conductivity = state.dataMaterial->Material(
                                 thisDomain.HorizInsMaterialNum).Conductivity;
                         if (SiteGroundDomainUsingNoMassMat(state, thisDomain.HorizInsThickness, thisDomain.HorizInsMaterialNum)) {
                             ErrorsFound = true;
@@ -994,7 +994,7 @@ namespace EnergyPlus {
                 // Get vertical insulation material properties
                 if (thisDomain.VertInsPresentFlag) {
                     thisDomain.VertInsMaterialNum = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(11),
-                                                                                    dataMaterial.Material,
+                                                                                    state.dataMaterial->Material,
                                                                                     DataHeatBalance::TotMaterials);
                     if (thisDomain.VertInsMaterialNum == 0) {
                         ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(11) + "=" +
@@ -1002,13 +1002,13 @@ namespace EnergyPlus {
                         ShowContinueError(state, "Found in: " + thisDomain.Name);
                         ErrorsFound = true;
                     } else {
-                        thisDomain.VertInsThickness = dataMaterial.Material(
+                        thisDomain.VertInsThickness = state.dataMaterial->Material(
                                 thisDomain.VertInsMaterialNum).Thickness;
-                        thisDomain.VertInsProperties.Density = dataMaterial.Material(
+                        thisDomain.VertInsProperties.Density = state.dataMaterial->Material(
                                 thisDomain.VertInsMaterialNum).Density;
-                        thisDomain.VertInsProperties.SpecificHeat = dataMaterial.Material(
+                        thisDomain.VertInsProperties.SpecificHeat = state.dataMaterial->Material(
                                 thisDomain.VertInsMaterialNum).SpecHeat;
-                        thisDomain.VertInsProperties.Conductivity = dataMaterial.Material(
+                        thisDomain.VertInsProperties.Conductivity = state.dataMaterial->Material(
                                 thisDomain.VertInsMaterialNum).Conductivity;
                         if (SiteGroundDomainUsingNoMassMat(state, thisDomain.VertInsThickness, thisDomain.VertInsMaterialNum)) {
                             ErrorsFound = true;
@@ -1334,7 +1334,7 @@ namespace EnergyPlus {
                 // Get horizontal insulation material properties
                 if (thisDomain.HorizInsPresentFlag) {
                     thisDomain.HorizInsMaterialNum = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(6),
-                                                                                     dataMaterial.Material,
+                                                                                     state.dataMaterial->Material,
                                                                                      DataHeatBalance::TotMaterials);
                     if (thisDomain.HorizInsMaterialNum == 0) {
                         ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(6) + "=" +
@@ -1342,13 +1342,13 @@ namespace EnergyPlus {
                         ShowContinueError(state, "Found in: " + thisDomain.Name);
                         ErrorsFound = true;
                     } else {
-                        thisDomain.HorizInsThickness = dataMaterial.Material(
+                        thisDomain.HorizInsThickness = state.dataMaterial->Material(
                                 thisDomain.HorizInsMaterialNum).Thickness;
-                        thisDomain.HorizInsProperties.Density = dataMaterial.Material(
+                        thisDomain.HorizInsProperties.Density = state.dataMaterial->Material(
                                 thisDomain.HorizInsMaterialNum).Density;
-                        thisDomain.HorizInsProperties.SpecificHeat = dataMaterial.Material(
+                        thisDomain.HorizInsProperties.SpecificHeat = state.dataMaterial->Material(
                                 thisDomain.HorizInsMaterialNum).SpecHeat;
-                        thisDomain.HorizInsProperties.Conductivity = dataMaterial.Material(
+                        thisDomain.HorizInsProperties.Conductivity = state.dataMaterial->Material(
                                 thisDomain.HorizInsMaterialNum).Conductivity;
                         if (SiteGroundDomainUsingNoMassMat(state, thisDomain.HorizInsThickness, thisDomain.HorizInsMaterialNum)) {
                             ErrorsFound = true;
@@ -1396,7 +1396,7 @@ namespace EnergyPlus {
                         ErrorsFound = true;
                     }
                     thisDomain.VertInsMaterialNum = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(10),
-                                                                                    dataMaterial.Material,
+                                                                                    state.dataMaterial->Material,
                                                                                     DataHeatBalance::TotMaterials);
                     if (thisDomain.VertInsMaterialNum == 0) {
                         ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(10) + "=" +
@@ -1404,13 +1404,13 @@ namespace EnergyPlus {
                         ShowContinueError(state, "Found in: " + thisDomain.Name);
                         ErrorsFound = true;
                     } else {
-                        thisDomain.VertInsThickness = dataMaterial.Material(
+                        thisDomain.VertInsThickness = state.dataMaterial->Material(
                                 thisDomain.VertInsMaterialNum).Thickness;
-                        thisDomain.VertInsProperties.Density = dataMaterial.Material(
+                        thisDomain.VertInsProperties.Density = state.dataMaterial->Material(
                                 thisDomain.VertInsMaterialNum).Density;
-                        thisDomain.VertInsProperties.SpecificHeat = dataMaterial.Material(
+                        thisDomain.VertInsProperties.SpecificHeat = state.dataMaterial->Material(
                                 thisDomain.VertInsMaterialNum).SpecHeat;
-                        thisDomain.VertInsProperties.Conductivity = dataMaterial.Material(
+                        thisDomain.VertInsProperties.Conductivity = state.dataMaterial->Material(
                                 thisDomain.VertInsMaterialNum).Conductivity;
                         if (SiteGroundDomainUsingNoMassMat(state, thisDomain.VertInsThickness, thisDomain.VertInsMaterialNum)) {
                             ErrorsFound = true;
@@ -1484,7 +1484,7 @@ namespace EnergyPlus {
         bool SiteGroundDomainUsingNoMassMat([[maybe_unused]] EnergyPlusData &state, Real64 const MaterialThickness, int const MaterialNum)
         {
 
-            if ( (MaterialThickness <= 0.0) || (dataMaterial.Material(MaterialNum).ROnly) ) {
+            if ( (MaterialThickness <= 0.0) || (state.dataMaterial->Material(MaterialNum).ROnly) ) {
                 return true;
             } else {
                 return false;

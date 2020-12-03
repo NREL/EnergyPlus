@@ -839,9 +839,9 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
     EXPECT_EQ(state->dataConstruction->Construct(4).TotGlassLayers, 2);          // outer glass, inner glass
     EXPECT_EQ(state->dataConstruction->Construct(4).TotSolidLayers, 2);          // outer glass, inner glass
 
-    EXPECT_EQ(dataMaterial.Material(4).Name, "SINGLEPANE"); // single pane glass
-    EXPECT_EQ(dataMaterial.Material(5).Name, "WINGAS");     // air gap
-    EXPECT_EQ(dataMaterial.Material(6).Name, "BLIND");      // window blind
+    EXPECT_EQ(state->dataMaterial->Material(4).Name, "SINGLEPANE"); // single pane glass
+    EXPECT_EQ(state->dataMaterial->Material(5).Name, "WINGAS");     // air gap
+    EXPECT_EQ(state->dataMaterial->Material(6).Name, "BLIND");      // window blind
 
     // construction layer material pointers. this construction has no blind
     EXPECT_EQ(state->dataConstruction->Construct(4).LayerPoint(1), 4); // glass, outer layer

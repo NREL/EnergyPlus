@@ -2976,20 +2976,20 @@ namespace WindowComplexManager {
         for (Lay = 1; Lay <= TotLay; ++Lay) {
             LayPtr = state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay);
 
-            if ((dataMaterial.Material(LayPtr).Group == WindowGlass) || (dataMaterial.Material(LayPtr).Group == WindowSimpleGlazing)) {
+            if ((state.dataMaterial->Material(LayPtr).Group == WindowGlass) || (state.dataMaterial->Material(LayPtr).Group == WindowSimpleGlazing)) {
                 ++IGlass;
                 LayerType(IGlass) = 0; // this marks specular layer type
-                thick(IGlass) = dataMaterial.Material(LayPtr).Thickness;
-                scon(IGlass) = dataMaterial.Material(LayPtr).Conductivity;
-                emis(2 * IGlass - 1) = dataMaterial.Material(LayPtr).AbsorpThermalFront;
-                emis(2 * IGlass) = dataMaterial.Material(LayPtr).AbsorpThermalBack;
-                tir(2 * IGlass - 1) = dataMaterial.Material(LayPtr).TransThermal;
-                tir(2 * IGlass) = dataMaterial.Material(LayPtr).TransThermal;
-                YoungsMod(IGlass) = dataMaterial.Material(LayPtr).YoungModulus;
-                PoissonsRat(IGlass) = dataMaterial.Material(LayPtr).PoissonsRatio;
-            } else if (dataMaterial.Material(LayPtr).Group == ComplexWindowShade) {
+                thick(IGlass) = state.dataMaterial->Material(LayPtr).Thickness;
+                scon(IGlass) = state.dataMaterial->Material(LayPtr).Conductivity;
+                emis(2 * IGlass - 1) = state.dataMaterial->Material(LayPtr).AbsorpThermalFront;
+                emis(2 * IGlass) = state.dataMaterial->Material(LayPtr).AbsorpThermalBack;
+                tir(2 * IGlass - 1) = state.dataMaterial->Material(LayPtr).TransThermal;
+                tir(2 * IGlass) = state.dataMaterial->Material(LayPtr).TransThermal;
+                YoungsMod(IGlass) = state.dataMaterial->Material(LayPtr).YoungModulus;
+                PoissonsRat(IGlass) = state.dataMaterial->Material(LayPtr).PoissonsRatio;
+            } else if (state.dataMaterial->Material(LayPtr).Group == ComplexWindowShade) {
                 ++IGlass;
-                TempInt = dataMaterial.Material(LayPtr).ComplexShadePtr;
+                TempInt = state.dataMaterial->Material(LayPtr).ComplexShadePtr;
                 LayerType(IGlass) = ComplexShade(TempInt).LayerType;
 
                 thick(IGlass) = ComplexShade(TempInt).Thickness;
@@ -3012,19 +3012,19 @@ namespace WindowComplexManager {
                 SlatCond(IGlass) = ComplexShade(TempInt).SlatConductivity;
                 SlatSpacing(IGlass) = ComplexShade(TempInt).SlatSpacing;
                 SlatCurve(IGlass) = ComplexShade(TempInt).SlatCurve;
-            } else if (dataMaterial.Material(LayPtr).Group == ComplexWindowGap) {
+            } else if (state.dataMaterial->Material(LayPtr).Group == ComplexWindowGap) {
                 ++IGap;
-                gap(IGap) = dataMaterial.Material(LayPtr).Thickness;
-                presure(IGap) = dataMaterial.Material(LayPtr).Pressure;
+                gap(IGap) = state.dataMaterial->Material(LayPtr).Thickness;
+                presure(IGap) = state.dataMaterial->Material(LayPtr).Pressure;
 
-                DeflectionPtr = dataMaterial.Material(LayPtr).DeflectionStatePtr;
+                DeflectionPtr = state.dataMaterial->Material(LayPtr).DeflectionStatePtr;
                 if (DeflectionPtr != 0) {
                     GapDefMax(IGap) = DeflectionState(DeflectionPtr).DeflectedThickness;
                 } else {
                     GapDefMax(IGap) = gap(IGap);
                 }
 
-                PillarPtr = dataMaterial.Material(LayPtr).SupportPillarPtr;
+                PillarPtr = state.dataMaterial->Material(LayPtr).SupportPillarPtr;
 
                 if (PillarPtr != 0) {
                     SupportPlr(IGap) = 1;
@@ -3032,27 +3032,27 @@ namespace WindowComplexManager {
                     PillarRadius(IGap) = SupportPillar(PillarPtr).Radius;
                 }
 
-                GasPointer = dataMaterial.Material(LayPtr).GasPointer;
+                GasPointer = state.dataMaterial->Material(LayPtr).GasPointer;
 
-                nmix(IGap + 1) = dataMaterial.Material(GasPointer).NumberOfGasesInMixture;
+                nmix(IGap + 1) = state.dataMaterial->Material(GasPointer).NumberOfGasesInMixture;
                 for (IMix = 1; IMix <= nmix(IGap + 1); ++IMix) {
                     // iprop(IGap+1, IMix) = dataMaterial.Material(LayPtr)%GasType(IMix)
                     // iprop(IGap+1, IMix) = GetGasIndex(dataMaterial.Material(LayPtr)%GasWght(IMix))
-                    frct(IMix, IGap + 1) = dataMaterial.Material(GasPointer).GasFract(IMix);
+                    frct(IMix, IGap + 1) = state.dataMaterial->Material(GasPointer).GasFract(IMix);
 
                     // Now has to build-up gas coefficients arrays. All used gasses should be stored into these arrays and
                     // to be correctly referenced by gap arrays
 
                     // First check if gas coefficients are already part of array.  Duplicates are not necessary
                     bool feedData(false);
-                    CheckGasCoefs(dataMaterial.Material(GasPointer).GasWght(IMix), iprop(IMix, IGap + 1), wght, feedData);
+                    CheckGasCoefs(state.dataMaterial->Material(GasPointer).GasWght(IMix), iprop(IMix, IGap + 1), wght, feedData);
                     if (feedData) {
-                        wght(iprop(IMix, IGap + 1)) = dataMaterial.Material(GasPointer).GasWght(IMix);
-                        gama(iprop(IMix, IGap + 1)) = dataMaterial.Material(GasPointer).GasSpecHeatRatio(IMix);
+                        wght(iprop(IMix, IGap + 1)) = state.dataMaterial->Material(GasPointer).GasWght(IMix);
+                        gama(iprop(IMix, IGap + 1)) = state.dataMaterial->Material(GasPointer).GasSpecHeatRatio(IMix);
                         for (i = 1; i <= 3; ++i) {
-                            gcon(i, iprop(IMix, IGap + 1)) = dataMaterial.Material(GasPointer).GasCon(i, IMix);
-                            gvis(i, iprop(IMix, IGap + 1)) = dataMaterial.Material(GasPointer).GasVis(i, IMix);
-                            gcp(i, iprop(IMix, IGap + 1)) = dataMaterial.Material(GasPointer).GasCp(i, IMix);
+                            gcon(i, iprop(IMix, IGap + 1)) = state.dataMaterial->Material(GasPointer).GasCon(i, IMix);
+                            gvis(i, iprop(IMix, IGap + 1)) = state.dataMaterial->Material(GasPointer).GasVis(i, IMix);
+                            gcp(i, iprop(IMix, IGap + 1)) = state.dataMaterial->Material(GasPointer).GasCp(i, IMix);
                         }
                     } // IF feedData THEN
                 }

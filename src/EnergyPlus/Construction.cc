@@ -214,46 +214,46 @@ namespace Construction {
 
             // Obtain thermal properties from the Material derived type
 
-            dl(Layer) = dataMaterial.Material(CurrentLayer).Thickness;
-            rk(Layer) = dataMaterial.Material(CurrentLayer).Conductivity;
-            rho(Layer) = dataMaterial.Material(CurrentLayer).Density;
-            cp(Layer) = dataMaterial.Material(CurrentLayer).SpecHeat; // Must convert
+            dl(Layer) = state.dataMaterial->Material(CurrentLayer).Thickness;
+            rk(Layer) = state.dataMaterial->Material(CurrentLayer).Conductivity;
+            rho(Layer) = state.dataMaterial->Material(CurrentLayer).Density;
+            cp(Layer) = state.dataMaterial->Material(CurrentLayer).SpecHeat; // Must convert
             // from kJ/kg-K to J/kg-k due to rk units
 
-            if (this->SourceSinkPresent && !dataMaterial.Material(CurrentLayer).WarnedForHighDiffusivity) {
+            if (this->SourceSinkPresent && !state.dataMaterial->Material(CurrentLayer).WarnedForHighDiffusivity) {
                 // check for materials that are too conductive or thin
                 if ((rho(Layer) * cp(Layer)) > 0.0) {
                     Real64 Alpha = rk(Layer) / (rho(Layer) * cp(Layer));
                     if (Alpha > DataHeatBalance::HighDiffusivityThreshold) {
                         DeltaTimestep = state.dataGlobal->TimeStepZoneSec;
                         Real64 const ThicknessThreshold = std::sqrt(Alpha * DeltaTimestep * 3.0);
-                        if (dataMaterial.Material(CurrentLayer).Thickness < ThicknessThreshold) {
+                        if (state.dataMaterial->Material(CurrentLayer).Thickness < ThicknessThreshold) {
                             ShowSevereError(state, "InitConductionTransferFunctions: Found Material that is too thin and/or too highly conductive, "
                                             "material name = " +
-                                            dataMaterial.Material(CurrentLayer).Name);
+                                            state.dataMaterial->Material(CurrentLayer).Name);
                             ShowContinueError(state,
                                               format("High conductivity Material layers are not well supported for internal source constructions, "
                                                      "material conductivity = {:.3R} [W/m-K]",
-                                                     dataMaterial.Material(CurrentLayer).Conductivity));
+                                                     state.dataMaterial->Material(CurrentLayer).Conductivity));
                             ShowContinueError(state, format("Material thermal diffusivity = {:.3R} [m2/s]", Alpha));
                             ShowContinueError(
                                 state, format("Material with this thermal diffusivity should have thickness > {:.5R} [m]", ThicknessThreshold));
-                            if (dataMaterial.Material(CurrentLayer).Thickness < DataHeatBalance::ThinMaterialLayerThreshold) {
+                            if (state.dataMaterial->Material(CurrentLayer).Thickness < DataHeatBalance::ThinMaterialLayerThreshold) {
                                 ShowContinueError(state,
                                                   format("Material may be too thin to be modeled well, thickness = {:.5R} [m]",
-                                                         dataMaterial.Material(CurrentLayer).Thickness));
+                                                         state.dataMaterial->Material(CurrentLayer).Thickness));
                                 ShowContinueError(state,
                                                   format("Material with this thermal diffusivity should have thickness > {:.5R} [m]",
                                                          DataHeatBalance::ThinMaterialLayerThreshold));
                             }
-                            dataMaterial.Material(CurrentLayer).WarnedForHighDiffusivity = true;
+                            state.dataMaterial->Material(CurrentLayer).WarnedForHighDiffusivity = true;
                         }
                     }
                 }
             }
-            if (dataMaterial.Material(CurrentLayer).Thickness > 3.0) {
+            if (state.dataMaterial->Material(CurrentLayer).Thickness > 3.0) {
                 ShowSevereError(state, "InitConductionTransferFunctions: Material too thick for CTF calculation");
-                ShowContinueError(state, "material name = " + dataMaterial.Material(CurrentLayer).Name);
+                ShowContinueError(state, "material name = " + state.dataMaterial->Material(CurrentLayer).Name);
                 ErrorsFound = true;
             }
 
@@ -270,12 +270,12 @@ namespace Construction {
 
             if (ResLayer(Layer)) {                             // Resistive layer-check for R-value, etc.
                 ++NumResLayers;                                // Increment number of resistive layers
-                lr(Layer) = dataMaterial.Material(CurrentLayer).Resistance; // User defined thermal resistivity
+                lr(Layer) = state.dataMaterial->Material(CurrentLayer).Resistance; // User defined thermal resistivity
                 if (lr(Layer) < RValueLowLimit) {              // User didn't define enough
                     // parameters to calculate CTFs for a building element
                     // containing this layer.
 
-                    ShowSevereError(state, "InitConductionTransferFunctions: Material=" + dataMaterial.Material(CurrentLayer).Name +
+                    ShowSevereError(state, "InitConductionTransferFunctions: Material=" + state.dataMaterial->Material(CurrentLayer).Name +
                                     "R Value below lowest allowed value");
                     ShowContinueError(state, format("Lowest allowed value=[{:.3R}], Material R Value=[{:.3R}].", RValueLowLimit, lr(Layer)));
                     ErrorsFound = true;
@@ -290,7 +290,7 @@ namespace Construction {
                     // then use the "exact" approach to model a massless layer
                     // based on the node equations for the state space method.
 
-                    if ((Layer == 1) || (Layer == this->TotLayers) || (!dataMaterial.Material(this->LayerPoint(Layer)).ROnly)) {
+                    if ((Layer == 1) || (Layer == this->TotLayers) || (!state.dataMaterial->Material(this->LayerPoint(Layer)).ROnly)) {
                         cp(Layer) = 1.007;
                         rho(Layer) = 1.1614;
                         rk(Layer) = 0.0263;
@@ -932,12 +932,12 @@ namespace Construction {
                     if (this->CTFTimeStep >= MaxAllowedTimeStep) {
                         ShowSevereError(state, "CTF calculation convergence problem for Construction=\"" + this->Name + "\".");
                         ShowContinueError(state, "...with Materials (outside layer to inside)");
-                        ShowContinueError(state, "(outside)=\"" + dataMaterial.Material(this->LayerPoint(1)).Name + "\"");
+                        ShowContinueError(state, "(outside)=\"" + state.dataMaterial->Material(this->LayerPoint(1)).Name + "\"");
                         for (int Layer = 2; Layer <= this->TotLayers; ++Layer) {
                             if (Layer != this->TotLayers) {
-                                ShowContinueError(state, "(next)=\"" + dataMaterial.Material(this->LayerPoint(Layer)).Name + "\"");
+                                ShowContinueError(state, "(next)=\"" + state.dataMaterial->Material(this->LayerPoint(Layer)).Name + "\"");
                             } else {
-                                ShowContinueError(state, "(inside)=\"" + dataMaterial.Material(this->LayerPoint(Layer)).Name + "\"");
+                                ShowContinueError(state, "(inside)=\"" + state.dataMaterial->Material(this->LayerPoint(Layer)).Name + "\"");
                             }
                         }
                         ShowContinueError(state,
@@ -1916,20 +1916,20 @@ namespace Construction {
         for (int I = 1; I <= this->TotLayers; ++I) {
             int Layer = this->LayerPoint(I);
             {
-                auto const SELECT_CASE_var(dataMaterial.Material(Layer).Group);
+                auto const SELECT_CASE_var(state.dataMaterial->Material(Layer).Group);
                 if (SELECT_CASE_var == DataHeatBalance::Air) {
                     static constexpr auto Format_702(" Material:Air,{},{:12.4N}\n");
-                    print(state.files.eio, Format_702, dataMaterial.Material(Layer).Name, dataMaterial.Material(Layer).Resistance);
+                    print(state.files.eio, Format_702, state.dataMaterial->Material(Layer).Name, state.dataMaterial->Material(Layer).Resistance);
                 } else {
                     static constexpr auto Format_701(" Material CTF Summary,{},{:8.4F},{:14.3F},{:11.3F},{:13.3F},{:12.4N}\n");
                     print(state.files.eio,
                           Format_701,
-                          dataMaterial.Material(Layer).Name,
-                          dataMaterial.Material(Layer).Thickness,
-                          dataMaterial.Material(Layer).Conductivity,
-                          dataMaterial.Material(Layer).Density,
-                          dataMaterial.Material(Layer).SpecHeat,
-                          dataMaterial.Material(Layer).Resistance);
+                          state.dataMaterial->Material(Layer).Name,
+                          state.dataMaterial->Material(Layer).Thickness,
+                          state.dataMaterial->Material(Layer).Conductivity,
+                          state.dataMaterial->Material(Layer).Density,
+                          state.dataMaterial->Material(Layer).SpecHeat,
+                          state.dataMaterial->Material(Layer).Resistance);
                 }
             }
         }
@@ -1986,7 +1986,7 @@ namespace Construction {
         }
     }
 
-    bool ConstructionProps::isGlazingConstruction() const
+    bool ConstructionProps::isGlazingConstruction(EnergyPlusData &state) const
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -1997,7 +1997,7 @@ namespace Construction {
         // PURPOSE OF THIS SUBROUTINE:
         // Commonly used routine in several places in EnergyPlus which examines if current
         // construction is glazing construction
-        auto const MaterialGroup = dataMaterial.Material(LayerPoint(1)).Group;
+        auto const MaterialGroup = state.dataMaterial->Material(LayerPoint(1)).Group;
         return MaterialGroup == DataHeatBalance::WindowGlass ||
                MaterialGroup == DataHeatBalance::Shade ||
                MaterialGroup == DataHeatBalance::Screen ||

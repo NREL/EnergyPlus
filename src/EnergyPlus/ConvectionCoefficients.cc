@@ -4741,7 +4741,7 @@ namespace ConvectionCoefficients {
                 SurfWindSpeed = Surface(SurfNum).WindSpeed;
             }
 
-            int Roughness = dataMaterial.Material(state.dataConstruction->Construct(Surface(SurfNum).Construction).LayerPoint(1)).Roughness;
+            int Roughness = state.dataMaterial->Material(state.dataConstruction->Construct(Surface(SurfNum).Construction).LayerPoint(1)).Roughness;
 
             auto const SELECT_CASE_var(ForcedConvModelEqNum);
 
@@ -8147,7 +8147,7 @@ namespace ConvectionCoefficients {
 
         Real64 x; // distance to roof edge toward wind direction
 
-        int const RoughnessIndex = dataMaterial.Material(state.dataConstruction->Construct(Surface(SurfNum).Construction).LayerPoint(1)).Roughness;
+        int const RoughnessIndex = state.dataMaterial->Material(state.dataConstruction->Construct(Surface(SurfNum).Construction).LayerPoint(1)).Roughness;
         // find x, don't know x. avoid time consuming geometry algorithm
         x = std::sqrt(RoofArea) / 2.0; // quick simplification, geometry routines to develop
 

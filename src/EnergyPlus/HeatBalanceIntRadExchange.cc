@@ -299,7 +299,7 @@ namespace HeatBalanceIntRadExchange {
                         }
                         if (Surface(SurfNum).MovInsulIntPresent) {
                             HeatBalanceMovableInsulation::EvalInsideMovableInsulation(state, SurfNum, HMovInsul, AbsInt);
-                            zone_info.Emissivity(ZoneSurfNum) = dataMaterial.Material(Surface(SurfNum).MaterialMovInsulInt).AbsorpThermal;
+                            zone_info.Emissivity(ZoneSurfNum) = state.dataMaterial->Material(Surface(SurfNum).MaterialMovInsulInt).AbsorpThermal;
                         }
                         if (SurfWinWindowModelType(SurfNum) == WindowEQLModel &&
                             DataWindowEquivalentLayer::CFS(state.dataConstruction->Construct(ConstrNum).EQLConsPtr).ISControlled) {
@@ -481,7 +481,7 @@ namespace HeatBalanceIntRadExchange {
         }
         if ((Surface(SurfNum).MovInsulIntPresent != Surface(SurfNum).MovInsulIntPresentPrevTS)) {
             auto const &thissurf(Surface(SurfNum));
-            Real64 AbsorpDiff = std::abs(state.dataConstruction->Construct(thissurf.Construction).InsideAbsorpThermal - dataMaterial.Material(thissurf.MaterialMovInsulInt).AbsorpThermal);
+            Real64 AbsorpDiff = std::abs(state.dataConstruction->Construct(thissurf.Construction).InsideAbsorpThermal - state.dataMaterial->Material(thissurf.MaterialMovInsulInt).AbsorpThermal);
             if (AbsorpDiff > 0.01) {
                 MovableInsulationChange = true;
             }

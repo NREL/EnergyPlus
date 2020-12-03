@@ -107,8 +107,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_CalcOutsideSurfTemp)
     state->dataConstruction->Construct(ConstrNum).CTFCross(0) = 0.0;
     state->dataConstruction->Construct(ConstrNum).CTFOutside(0) = 1.0;
     state->dataConstruction->Construct(ConstrNum).SourceSinkPresent = true;
-    dataMaterial.Material.allocate(1);
-    dataMaterial.Material(1).Name = "TestMaterial";
+    state->dataMaterial->Material.allocate(1);
+    state->dataMaterial->Material(1).Name = "TestMaterial";
 
     DataHeatBalSurface::HcExtSurf.allocate(SurfNum);
     DataHeatBalSurface::HcExtSurf(SurfNum) = 1.0;
@@ -276,7 +276,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_ComputeIntThermalAbsorpFacto
     DataSurfaces::SurfaceWindow.allocate(DataSurfaces::TotSurfaces);
     SurfaceGeometry::AllocateSurfaceWindows(DataSurfaces::TotSurfaces);
     state->dataConstruction->Construct.allocate(DataHeatBalance::TotConstructs);
-    dataMaterial.Material.allocate(DataHeatBalance::TotMaterials);
+    state->dataMaterial->Material.allocate(DataHeatBalance::TotMaterials);
 
     DataSurfaces::Surface(1).HeatTransSurf = true;
     DataSurfaces::Surface(1).Construction = 1;
@@ -284,11 +284,11 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_ComputeIntThermalAbsorpFacto
     state->dataConstruction->Construct(1).InsideAbsorpThermal = 0.9;
     state->dataConstruction->Construct(1).TransDiff = 0.0;
     DataSurfaces::Surface(1).MaterialMovInsulInt = 1;
-    dataMaterial.Material(1).AbsorpThermal = 0.2;
-    dataMaterial.Material(1).AbsorpSolar = 0.5;
+    state->dataMaterial->Material(1).AbsorpThermal = 0.2;
+    state->dataMaterial->Material(1).AbsorpSolar = 0.5;
 
     DataSurfaces::Surface(1).SchedMovInsulInt = -1; // According to schedule manager protocol, an index of -1 returns a 1.0 value for the schedule
-    dataMaterial.Material(1).Resistance = 1.25;
+    state->dataMaterial->Material(1).Resistance = 1.25;
 
     ComputeIntThermalAbsorpFactors(*state);
 

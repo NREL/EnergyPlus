@@ -150,7 +150,7 @@ void CreateSQLiteZoneExtendedOutput(EnergyPlusData &state)
             sqlite->addSurfaceData(surfaceNumber, surface, DataSurfaces::cSurfaceClass(surface.Class));
         }
         for (int materialNum = 1; materialNum <= DataHeatBalance::TotMaterials; ++materialNum) {
-            sqlite->addMaterialData(materialNum, dataMaterial.Material(materialNum));
+            sqlite->addMaterialData(materialNum, state.dataMaterial->Material(materialNum));
         }
         for (int constructNum = 1; constructNum <= DataHeatBalance::TotConstructs; ++constructNum) {
             auto const &construction = state.dataConstruction->Construct(constructNum);
