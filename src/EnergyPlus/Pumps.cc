@@ -1765,7 +1765,7 @@ namespace Pumps {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        auto constexpr RoutineName("PlantPumps:CalcPumps: ");
+        static std::string const RoutineName("PlantPumps:CalcPumps: ");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
