@@ -317,8 +317,8 @@ namespace Pumps {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const StartTemp(100.0); // Standard Temperature across code to calculated Steam density
-        auto constexpr RoutineName("GetPumpInput: ");
-        auto constexpr RoutineNameNoColon("GetPumpInput");
+        static std::string const RoutineName("GetPumpInput: ");
+        static std::string const RoutineNameNoColon("GetPumpInput");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PumpNum;
@@ -1299,7 +1299,7 @@ namespace Pumps {
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const StartTemp(100.0); // Standard Temperature across code to calculated Steam density
         Real64 const ZeroPowerTol(0.0000001);
-        auto constexpr RoutineName("PlantPumps::InitializePumps ");
+        static std::string const RoutineName("PlantPumps::InitializePumps ");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int InletNode;  // pump inlet node number
@@ -1572,7 +1572,7 @@ namespace Pumps {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        auto constexpr RoutineName("PlantPumps:SetupPumpMinMaxFlows: ");
+        static std::string const RoutineName("PlantPumps:SetupPumpMinMaxFlows: ");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int InletNode;  // pump inlet node number
@@ -1933,23 +1933,19 @@ namespace Pumps {
         //****************************!
         if (Power < 0.0) {
             if (PumpEquip(PumpNum).PowerErrIndex1 == 0) {
-                ShowWarningMessage(
-                    state, 
-                    format("{} Calculated Pump Power < 0, Type={}, Name=\"{}\".", RoutineName, cPumpTypes(PumpType), PumpEquip(PumpNum).Name));
+                ShowWarningMessage(state, RoutineName + " Calculated Pump Power < 0, Type=" + cPumpTypes(PumpType) + ", Name=\"" + PumpEquip(PumpNum).Name +
+                                   "\".");
                 ShowContinueErrorTimeStamp(state, "");
                 ShowContinueError(state, format("...PartLoadRatio=[{:.4R}], Fraction Full Load Power={:.4R}]", PartLoadRatio, FracFullLoadPower));
                 ShowContinueError(state, "...Power is set to 0 for continuing the simulation.");
                 ShowContinueError(state, "...Pump coefficients should be checked for producing this negative value.");
             }
             Power = 0.0;
-            ShowRecurringWarningErrorAtEnd(state,
-                                           format("{} Calculated Pump Power < 0, {}, Name=\"{}\", PLR=",
-                                                  RoutineName,
-                                                  cPumpTypes(PumpType),
-                                                  PumpEquip(PumpNum).Name),
-                                                  PumpEquip(PumpNum).PowerErrIndex1,
-                                                  PartLoadRatio,
-                                                  PartLoadRatio);
+            ShowRecurringWarningErrorAtEnd(state, RoutineName + " Calculated Pump Power < 0, " + cPumpTypes(PumpType) + ", Name=\"" +
+                                               PumpEquip(PumpNum).Name + "\", PLR=",
+                                           PumpEquip(PumpNum).PowerErrIndex1,
+                                           PartLoadRatio,
+                                           PartLoadRatio);
             ShowRecurringContinueErrorAtEnd(state, "...Fraction Full Load Power=", PumpEquip(PumpNum).PowerErrIndex2, FracFullLoadPower, FracFullLoadPower);
         }
 
@@ -1964,9 +1960,7 @@ namespace Pumps {
                 TotalEffic = PumpEquip(PumpNum).PumpEffic * PumpEquip(PumpNum).MotorEffic;
                 // Efficiency errors are caught previously, but it doesn't hurt to add another catch before dividing by zero!!!
                 if (TotalEffic == 0.0) {
-                    ShowSevereError(state,
-                                    format("{} Plant pressure simulation encountered a pump with zero efficiency: {}",
-                                           RoutineName, PumpEquip(PumpNum).Name));
+                    ShowSevereError(state, RoutineName + " Plant pressure simulation encountered a pump with zero efficiency: " + PumpEquip(PumpNum).Name);
                     ShowContinueError(state, "Check efficiency inputs for this pump component.");
                     ShowFatalError(state, "Errors in plant calculation would result in divide-by-zero cause program termination.");
                 }
@@ -1979,9 +1973,7 @@ namespace Pumps {
             TotalEffic = PumpEquip(PumpNum).PumpEffic * PumpEquip(PumpNum).MotorEffic;
             // Efficiency errors are caught previously, but it doesn't hurt to add another catch before dividing by zero!!!
             if (TotalEffic == 0.0) {
-                /*ShowSevereError(state, RoutineName + " Plant pump simulation encountered a pump with zero efficiency: " + PumpEquip(PumpNum).Name);*/
-                ShowSevereError(state, 
-                    format("{} Plant pump simulation encountered a pump with zero efficiency: {}", RoutineName, PumpEquip(PumpNum).Name));
+                ShowSevereError(state, RoutineName + " Plant pump simulation encountered a pump with zero efficiency: " + PumpEquip(PumpNum).Name);
                 ShowContinueError(state, "Check efficiency inputs for this pump component.");
                 ShowFatalError(state, "Errors in plant calculation would result in divide-by-zero cause program termination.");
             }
@@ -2044,8 +2036,8 @@ namespace Pumps {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const StartTemp(100.0); // Standard Temperature across code to calculated Steam density
-        auto constexpr RoutineName("PlantPumps::InitSimVars ");
-        auto constexpr RoutineNameSizePumps("SizePumps");
+        static std::string const RoutineName("PlantPumps::InitSimVars ");
+        static std::string const RoutineNameSizePumps("SizePumps");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
