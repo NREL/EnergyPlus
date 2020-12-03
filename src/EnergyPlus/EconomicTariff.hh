@@ -63,31 +63,19 @@ struct EnergyPlusData;
 
 namespace EconomicTariff {
 
-    //extern int const kindUnknown;
-    //extern int const kindTariff;
-    //extern int const kindQualify;
-    //extern int const kindChargeSimple;
-    //extern int const kindChargeBlock;
-    //extern int const kindRatchet;
-    //extern int const kindVariable;
-    //extern int const kindComputation;
-    //extern int const kindCategory;
-    //extern int const kindNative;
-    //extern int const kindAssignCompute;
-
     enum class kind
     {
-        kindUnknown,
-        kindTariff,
-        kindQualify,
-        kindChargeSimple,
-        kindChargeBlock,
-        kindRatchet,
-        kindVariable,
-        kindComputation,
-        kindCategory,
-        kindNative,
-        kindAssignCompute,
+        Unknown,
+        Tariff,
+        Qualify,
+        ChargeSimple,
+        ChargeBlock,
+        Ratchet,
+        Variable,
+        Computation,
+        Category,
+        Native,
+        AssignCompute,
     
     };
 
@@ -312,7 +300,7 @@ namespace EconomicTariff {
 
         // Default Constructor
         EconVarType()
-            : tariffIndx(0), kindOfObj(kind::kindUnknown), index(0), values(MaxNumMonths, 0.0), isArgument(false), isAssigned(false), specific(0), cntMeDependOn(0),
+            : tariffIndx(0), kindOfObj(kind::Unknown), index(0), values(MaxNumMonths, 0.0), isArgument(false), isAssigned(false), specific(0), cntMeDependOn(0),
               Operator(0), firstOperand(0), lastOperand(0), activeNow(false), isEvaluated(false), isReported(false), varUnitType(0)
         {
         }
