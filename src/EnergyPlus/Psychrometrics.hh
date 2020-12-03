@@ -1383,6 +1383,6 @@ struct PsychrometricsData : BaseGlobalStruct
     }
 };
 
-}; // namespace EnergyPlus
+} // namespace EnergyPlus
 
 #endif
