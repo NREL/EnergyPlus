@@ -3638,19 +3638,19 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckWindowShadingControlSimilarForWin
 TEST_F(EnergyPlusFixture, SurfaceGeometry_createAirMaterialFromDistance_Test)
 {
     TotMaterials = 0;
-    createAirMaterialFromDistance(0.008, "test_air_");
+    createAirMaterialFromDistance(*state, 0.008, "test_air_");
     EXPECT_EQ(TotMaterials, 1);
     EXPECT_EQ(state->dataMaterial->Material(TotMaterials).Name, "test_air_8MM");
     EXPECT_EQ(state->dataMaterial->Material(TotMaterials).Thickness, 0.008);
     EXPECT_EQ(state->dataMaterial->Material(TotMaterials).GasCon(1, 1), 2.873e-3);
     EXPECT_EQ(state->dataMaterial->Material(TotMaterials).GasCon(2, 1), 7.760e-5);
 
-    createAirMaterialFromDistance(0.012, "test_air_");
+    createAirMaterialFromDistance(*state, 0.012, "test_air_");
     EXPECT_EQ(TotMaterials, 2);
     EXPECT_EQ(state->dataMaterial->Material(TotMaterials).Name, "test_air_12MM");
     EXPECT_EQ(state->dataMaterial->Material(TotMaterials).Thickness, 0.012);
 
-    createAirMaterialFromDistance(0.008, "test_air_");
+    createAirMaterialFromDistance(*state, 0.008, "test_air_");
     EXPECT_EQ(TotMaterials, 2);
 }
 

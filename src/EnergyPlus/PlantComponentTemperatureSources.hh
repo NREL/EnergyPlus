@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
@@ -144,6 +145,14 @@ namespace PlantComponentTemperatureSources {
     void clear_state();
 
 } // namespace PlantComponentTemperatureSources
+
+struct PlantCompTempSrcData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

@@ -243,12 +243,6 @@ namespace OutputReportPredefined {
     extern int pdstIntFen;
     extern int pdchIntFenCons;
     extern int pdchIntFenAreaOf1;
-    // Include these if interzone windows ever get frame and dividers
-    // INTEGER :: pdchIntFenGlassAreaOf1
-    // INTEGER :: pdchIntFenFrameAreaOf1
-    // INTEGER :: pdchIntFenDividerAreaOf1
-    // INTEGER :: pdchIntFenFrameConductance
-    // INTEGER :: pdchIntFenDividerConductance
     extern int pdchIntFenArea;
     extern int pdchIntFenUfact;
     extern int pdchIntFenSHGC;
@@ -1097,6 +1091,14 @@ namespace OutputReportPredefined {
     int newPreDefColumn(int const subTableIndex, std::string const &columnHeading);
 
 } // namespace OutputReportPredefined
+
+struct OutputReportPredefinedData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

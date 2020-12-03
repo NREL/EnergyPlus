@@ -170,6 +170,7 @@ namespace EnergyPlus {
         this->dataHumidifiers = std::make_unique<HumidifiersData>();
         this->dataHybridModel = std::make_unique<HybridModelData>();
         this->dataHybridUnitaryAC = std::make_unique<HybridUnitaryAirConditionersData>();
+        this->dataHysteresisPhaseChange = std::make_unique<HysteresisPhaseChangeData>();
         this->dataICEngElectGen = std::make_unique<ICEngineElectricGeneratorData>();
         this->dataIPShortCut = std::make_unique<IPShortCutsData>();
         this->dataIceThermalStorage = std::make_unique<IceThermalStorageData>();
@@ -188,6 +189,7 @@ namespace EnergyPlus {
         this->dataMundtSimMgr = std::make_unique<MundtSimMgrData>();
         this->dataNodeInputMgr = std::make_unique<NodeInputManagerData>();
         this->dataOutAirNodeMgr = std::make_unique<OutAirNodeManagerData>();
+        this->dataOutRptPredefined = std::make_unique<OutputReportPredefinedData>();
         this->dataOutdoorAirUnit = std::make_unique<OutdoorAirUnitData>();
         this->dataOutput = std::make_unique<OutputsData>();
         this->dataOutputProcessor = std::make_unique<OutputProcessorData>();
@@ -200,9 +202,11 @@ namespace EnergyPlus {
         this->dataPhotovoltaic = std::make_unique<PhotovoltaicsData>();
         this->dataPhotovoltaicState = std::make_unique<PhotovoltaicStateData>();
         this->dataPhotovoltaicThermalCollector = std::make_unique<PhotovoltaicThermalCollectorsData>();
+        this->dataPipeHT = std::make_unique<PipeHeatTransferData>();
         this->dataPipes = std::make_unique<PipesData>();
         this->dataPlantCentralGSHP = std::make_unique<PlantCentralGSHPData>();
         this->dataPlantChillers = std::make_unique<PlantChillersData>();
+        this->dataPlantCompTempSrc = std::make_unique<PlantCompTempSrcData>();
         this->dataPlantHXFluidToFluid = std::make_unique<PlantHeatExchangerFluidToFluidData>();
         this->dataPlantValves = std::make_unique<PlantValvesData>();
         this->dataPlnt = std::make_unique<DataPlantData>();
@@ -393,6 +397,7 @@ namespace EnergyPlus {
         this->dataHumidifiers->clear_state();
         this->dataHybridModel->clear_state();
         this->dataHybridUnitaryAC->clear_state();
+        this->dataHysteresisPhaseChange->clear_state();
         this->dataICEngElectGen->clear_state();
         this->dataIPShortCut->clear_state();
         this->dataIceThermalStorage->clear_state();
@@ -411,6 +416,7 @@ namespace EnergyPlus {
         this->dataMundtSimMgr->clear_state();
         this->dataNodeInputMgr->clear_state();
         this->dataOutAirNodeMgr->clear_state();
+        this->dataOutRptPredefined->clear_state();
         this->dataOutdoorAirUnit->clear_state();
         this->dataOutput->clear_state();
         this->dataOutputProcessor->clear_state();
@@ -423,9 +429,11 @@ namespace EnergyPlus {
         this->dataPhotovoltaic->clear_state();
         this->dataPhotovoltaicState->clear_state();
         this->dataPhotovoltaicThermalCollector->clear_state();
+        this->dataPipeHT->clear_state();
         this->dataPipes->clear_state();
         this->dataPlantCentralGSHP->clear_state();
         this->dataPlantChillers->clear_state();
+        this->dataPlantCompTempSrc->clear_state();
         this->dataPlantHXFluidToFluid->clear_state();
         this->dataPlantValves->clear_state();
         this->dataPlnt->clear_state();

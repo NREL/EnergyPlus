@@ -92,8 +92,6 @@ namespace EMSManager {
     // Using/Aliasing
     using namespace DataRuntimeLanguage;
 
-    auto constexpr BlankString("");
-
     void CheckIfAnyEMS(EnergyPlusData &state)
     {
 
