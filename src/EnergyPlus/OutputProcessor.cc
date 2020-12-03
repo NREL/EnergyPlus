@@ -103,15 +103,6 @@ namespace OutputProcessor {
     // REFERENCES:
     // EnergyPlus OutputProcessor specifications.
 
-    // OTHER NOTES:
-    // na
-
-    // Using/Aliasing
-    using namespace DataGlobalConstants;
-
-    // Data
-    // in this file should obey a USE OutputProcessor, ONLY: rule.
-
     // MODULE PARAMETER DEFINITIONS:
     int const ReportVDD_No(0);  // Don't report the variable dictionaries in any form
     int const ReportVDD_Yes(1); // Report the variable dictionaries in "report format"
@@ -161,9 +152,6 @@ namespace OutputProcessor {
                                                           "WATERSYSTEMS",
                                                           "REFRIGERATION",
                                                           "COGENERATION"};
-
-    static std::string const BlankString;
-    int const UnitsStringLength(16);
 
     int const RVarAllocInc(1000);
     int const LVarAllocInc(1000);
@@ -929,7 +917,7 @@ namespace OutputProcessor {
 
             ReqRepVars(Loop).Key = cAlphaArgs(1);
             if (ReqRepVars(Loop).Key == "*") {
-                ReqRepVars(Loop).Key = BlankString;
+                ReqRepVars(Loop).Key = std::string();
             }
 
             std::string::size_type const lbpos = index(cAlphaArgs(2), '['); // Remove Units designation if user put it in
@@ -1024,7 +1012,7 @@ namespace OutputProcessor {
             StrOut = format(EnvrnFormat, strip(String), Mon, Day, Hour, Minute);
             break;
         default: // Each, TimeStep, Hourly dont have this
-            StrOut = BlankString;
+            StrOut = std::string();
             break;
         }
 
@@ -1111,7 +1099,7 @@ namespace OutputProcessor {
             break;
 
         default: // Each, TimeStep, Hourly dont have this
-            StrOut = BlankString;
+            StrOut = std::string();
             break;
         }
 
@@ -1564,7 +1552,7 @@ namespace OutputProcessor {
                 }
                 if (!MeterCreated) {
                     MeterUnits = UnitsVar; // meter units are same as first variable on custom meter
-                    AddMeter(state, cAlphaArgs(1), UnitsVar, BlankString, BlankString, BlankString, BlankString);
+                    AddMeter(state, cAlphaArgs(1), UnitsVar, std::string(), std::string(), std::string(), std::string());
                     EnergyMeters(NumEnergyMeters).TypeOfMeter = MeterType_Custom;
                     // Can't use resource type in AddMeter cause it will confuse it with other meters.  So, now:
                     GetStandardMeterResourceType(state, EnergyMeters(NumEnergyMeters).ResourceType, UtilityRoutines::MakeUPPERCase(cAlphaArgs(2)), errFlag);
@@ -1768,7 +1756,7 @@ namespace OutputProcessor {
                 }
                 if (!MeterCreated) {
                     MeterUnits = UnitsVar;
-                    AddMeter(state, cAlphaArgs(1), UnitsVar, BlankString, BlankString, BlankString, BlankString);
+                    AddMeter(state, cAlphaArgs(1), UnitsVar, std::string(), std::string(), std::string(), std::string());
                     EnergyMeters(NumEnergyMeters).TypeOfMeter = MeterType_CustomDec;
                     EnergyMeters(NumEnergyMeters).SourceMeter = WhichMeter;
 

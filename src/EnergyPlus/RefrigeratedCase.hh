@@ -65,7 +65,12 @@ struct EneryPlusData;
 
 namespace RefrigeratedCase {
 
-    extern int const WaterSupplyFromMains;
+    // Condenser evap cooling water supply
+    enum class WaterSupply
+    {
+        FromMains,
+        FromTank,
+    };
 
     void clear_state();
 
@@ -278,7 +283,7 @@ namespace RefrigeratedCase {
         int NumCases;                     // Total number of refrigerated cases attached to each rack
         int NumCoils;                     // Total number of air chillers attached to each rack
         int NumWalkIns;                   // Total number of walk-ins attached to each rack
-        int EvapWaterSupplyMode;          // Source of water for evap condenser cooling
+        WaterSupply EvapWaterSupplyMode;          // Source of water for evap condenser cooling
         int EvapWaterSupTankID;           // TankID when evap condenser uses water from storage tank
         int EvapWaterTankDemandARRID;     // Demand index when evap condenser uses water from storage tank
         int OutsideAirNodeNum;            // Outside air node number
@@ -334,7 +339,7 @@ namespace RefrigeratedCase {
               LaggedUsedHVACCoil(0.0), EvapEffect(0.9), CondenserAirFlowRate(0.0), EvapPumpPower(0.0), ActualEvapPumpPower(0.0),
               EvapPumpConsumption(0.0), EvapWaterConsumpRate(0.0), EvapWaterConsumption(0.0), EvapSchedPtr(0), BasinHeaterPowerFTempDiff(0.0),
               BasinHeaterSetPointTemp(2.0), BasinHeaterPower(0.0), BasinHeaterConsumption(0.0), RatedCOP(0.0), COPFTempPtr(0), NumCases(0),
-              NumCoils(0), NumWalkIns(0), EvapWaterSupplyMode(WaterSupplyFromMains), EvapWaterSupTankID(0), EvapWaterTankDemandARRID(0),
+              NumCoils(0), NumWalkIns(0), EvapWaterSupplyMode(WaterSupply::FromMains), EvapWaterSupTankID(0), EvapWaterTankDemandARRID(0),
               OutsideAirNodeNum(0), HeatRejectionZoneNum(0), HeatRejectionZoneNodeNum(0), TotalRackLoad(0.0), RackCompressorCOP(0.0),
               RackCompressorPower(0.0), RackElecConsumption(0.0), RackCapacity(0.0), RackCoolingEnergy(0.0), CondenserFanPower(0.0),
               TotCondFTempPtr(0), ActualCondenserFanPower(0.0), CondenserFanConsumption(0.0), SensZoneCreditHeatRate(0.0), SensZoneCreditHeat(0.0),
@@ -745,7 +750,7 @@ namespace RefrigeratedCase {
         int HighInletWarnIndex;       // Water inlet high temp warning index
         int InletNode;                // Water-cooled condenser inlet node number
         int EvapSchedPtr;             // Index to the correct evap condenser availability schedule
-        int EvapWaterSupplyMode;      // Source of water for evap condenser cooling
+        WaterSupply EvapWaterSupplyMode;      // Source of water for evap condenser cooling
         int EvapWaterSupTankID;       // TankID when evap condenser uses water from storage tank
         int EvapWaterTankDemandARRID; // Demand index when evap condenser uses water from storage tank
         int OutletNode;               // Water-cooled condenser outlet node number
@@ -826,7 +831,7 @@ namespace RefrigeratedCase {
               EvapFreezeWarnIndex(0), FlowType(1), CondCreditWarnIndex1(0), CondCreditWarnIndex2(0), CondCreditWarnIndex3(0), CondCreditWarnIndex4(0),
               CondCreditWarnIndex5(0), CondCreditWarnIndex6(0), CondCreditWarnIndex7(0), NoFlowWarnIndex(0), HighTempWarnIndex(0),
               LowTempWarnIndex(0), HighFlowWarnIndex(0), HighInletWarnIndex(0), InletNode(0), EvapSchedPtr(0),
-              EvapWaterSupplyMode(WaterSupplyFromMains), EvapWaterSupTankID(0), EvapWaterTankDemandARRID(0), OutletNode(0), PlantTypeOfNum(0),
+              EvapWaterSupplyMode(WaterSupply::FromMains), EvapWaterSupTankID(0), EvapWaterTankDemandARRID(0), OutletNode(0), PlantTypeOfNum(0),
               PlantLoopNum(0), PlantLoopSideNum(0), PlantBranchNum(0), PlantCompNum(0), OutletTempSchedPtr(0), InletAirNodeNum(0), InletAirZoneNum(0),
               FanSpeedControlType(0), CapCurvePtr(0), CascadeSysID(0), CascadeTempControl(0), CascadeSinkSystemID(0), CascadeRatedEvapTemp(0.0),
               MinCondLoad(0.0), TempSlope(0.0), EvapEffect(0.9), RatedAirFlowRate(0.0), EvapPumpPower(0.0), ActualEvapPumpPower(0.0),
@@ -1572,9 +1577,57 @@ namespace RefrigeratedCase {
 
 struct RefrigeratedCaseData : BaseGlobalStruct {
 
+    int NumSimulationCondAir = 0;                   // Number of air-cooled condensers in simulation
+    int NumSimulationCondEvap = 0;                  // Number of evaporative condensers in simulation
+    int NumSimulationCondWater = 0;                 // Number of water-cooled condensers in simulation
+    int NumSimulationCascadeCondensers = 0;         // Total number of Cascade condensers in IDF
+    int NumSimulationGasCooler = 0;                 // Number of gas coolers in simulation
+    int NumSimulationSharedGasCoolers = 0;          // Total number of gas coolers that serve more than one system
+    int NumTransRefrigSystems = 0;                  // Total number of transcritical CO2 refrigeration systems
+    int NumSimulationSharedCondensers = 0;          // Total number of condensers that serve more than one system
+    int NumSimulationCases = 0;                     // Number of refrigerated cases in simulation
+    int NumSimulationCaseAndWalkInLists = 0;        // Total number of CaseAndWalkIn Lists in IDF
+    int NumSimulationWalkIns = 0;                   // Number of walk in coolers in simulation
+    int NumSimulationCompressors = 0;               // Number of refrigeration compressors in simulation
+    int NumSimulationSubcoolers = 0;                // Number of refrigeration subcoolers in simulation
+    int NumSimulationMechSubcoolers = 0;            // Number of mechanical subcoolers in simulation
+    int NumSimulationRefrigAirChillers = 0;         // Number of individual Air Chillers/coils in simulation
+    int NumSimulationSecondarySystems = 0;          // Number of Secondary loops in simulation
+    int NumSimulationTransferLoadLists = 0;         // Number of Secondary Lists in simulation
+    int NumUnusedRefrigCases = 0;                   // Number of refrigerated cases not connected to a rack or system
+    int NumUnusedCoils = 0;                         // Number of refrigeration air coils not connected to a rack or system
+    int NumUnusedCondensers = 0;                    // Number of refrigeration condensers not connected to a system
+    int NumUnusedGasCoolers = 0;                    // Number of refrigeration gas coolers not connected to a system
+    int NumUnusedCompressors = 0;                   // Number of refrigeration compressors not connected to a system
+    int NumUnusedSecondarys = 0;                    // Number of refrigeration secondarys not connected to a system
+    bool MyReferPlantScanFlag = true;
+
     void clear_state() override
     {
-
+        this->NumSimulationCondAir = 0;
+        this->NumSimulationCondEvap = 0;
+        this->NumSimulationCondWater = 0;
+        this->NumSimulationCascadeCondensers = 0;
+        this->NumSimulationGasCooler = 0;
+        this->NumSimulationSharedGasCoolers = 0;
+        this->NumTransRefrigSystems = 0;
+        this->NumSimulationSharedCondensers = 0;
+        this->NumSimulationCases = 0;
+        this->NumSimulationCaseAndWalkInLists = 0;
+        this->NumSimulationWalkIns = 0;
+        this->NumSimulationCompressors = 0;
+        this->NumSimulationSubcoolers = 0;
+        this->NumSimulationMechSubcoolers = 0;
+        this->NumSimulationRefrigAirChillers = 0;
+        this->NumSimulationSecondarySystems = 0;
+        this->NumSimulationTransferLoadLists = 0;
+        this->NumUnusedRefrigCases = 0;
+        this->NumUnusedCoils = 0;
+        this->NumUnusedCondensers = 0;
+        this->NumUnusedGasCoolers = 0;
+        this->NumUnusedCompressors = 0;
+        this->NumUnusedSecondarys = 0;
+        this->MyReferPlantScanFlag = true;
     }
 };
 
