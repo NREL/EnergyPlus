@@ -129,12 +129,6 @@ namespace RoomAirModelManager {
         // PURPOSE OF THIS SUBROUTINE:
         //     manage room air models.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using CrossVentMgr::ManageUCSDCVModel;
         using DisplacementVentMgr::ManageUCSDDVModel;
@@ -1089,17 +1083,17 @@ namespace RoomAirModelManager {
 
             // Third Alpha is a string: JET or RECIRCULATION
             if (UtilityRoutines::SameString(cAlphaArgs(3), "Jet")) {
-                ZoneUCSDCV(Loop).VforComfort = VComfort_Jet;
+                ZoneUCSDCV(Loop).VforComfort = Comfort::VComfort_Jet;
             } else if (UtilityRoutines::SameString(cAlphaArgs(3), "Recirculation")) {
-                ZoneUCSDCV(Loop).VforComfort = VComfort_Recirculation;
+                ZoneUCSDCV(Loop).VforComfort = Comfort::VComfort_Recirculation;
             } else {
-                ZoneUCSDCV(Loop).VforComfort = VComfort_Invalid;
+                ZoneUCSDCV(Loop).VforComfort = Comfort::VComfort_Invalid;
             }
 
             for (Loop2 = 1; Loop2 <= TotPeople; ++Loop2) {
                 if (People(Loop2).ZonePtr != ZoneUCSDCV(Loop).ZonePtr) continue;
                 if (People(Loop2).Fanger) {
-                    if (ZoneUCSDCV(Loop).VforComfort == VComfort_Invalid) {
+                    if (ZoneUCSDCV(Loop).VforComfort == Comfort::VComfort_Invalid) {
                         if (lAlphaFieldBlanks(3)) {
                             ShowSevereError(state, "Invalid " + cAlphaFieldNames(3) + " = " + cAlphaArgs(3));
                             ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs(1));
@@ -1227,15 +1221,15 @@ namespace RoomAirModelManager {
             }
             // 2nd alpha is diffuser type
             if (UtilityRoutines::SameString(cAlphaArgs(2), "Swirl")) {
-                ZoneUCSDUI(Loop).DiffuserType = Swirl;
+                ZoneUCSDUI(Loop).DiffuserType = Diffuser::Swirl;
             } else if (UtilityRoutines::SameString(cAlphaArgs(2), "VariableArea")) {
-                ZoneUCSDUI(Loop).DiffuserType = VarArea;
+                ZoneUCSDUI(Loop).DiffuserType = Diffuser::VarArea;
             } else if (UtilityRoutines::SameString(cAlphaArgs(2), "HorizontalSwirl")) {
-                ZoneUCSDUI(Loop).DiffuserType = DisplVent;
+                ZoneUCSDUI(Loop).DiffuserType = Diffuser::DisplVent;
             } else if (UtilityRoutines::SameString(cAlphaArgs(2), "Custom")) {
-                ZoneUCSDUI(Loop).DiffuserType = Custom;
+                ZoneUCSDUI(Loop).DiffuserType = Diffuser::Custom;
             } else if (UtilityRoutines::SameString(cAlphaArgs(2), "LinearBarGrille")) {
-                ZoneUCSDUI(Loop).DiffuserType = LinBarGrille;
+                ZoneUCSDUI(Loop).DiffuserType = Diffuser::LinBarGrille;
             } else {
                 ShowSevereError(state, "Invalid " + cAlphaFieldNames(2) + " = " + cAlphaArgs(2));
                 ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs(1));
@@ -1297,15 +1291,15 @@ namespace RoomAirModelManager {
             }
             // 2nd alpha is diffuser type
             if (UtilityRoutines::SameString(cAlphaArgs(2), "Swirl")) {
-                ZoneUCSDUE(Loop).DiffuserType = Swirl;
+                ZoneUCSDUE(Loop).DiffuserType = Diffuser::Swirl;
             } else if (UtilityRoutines::SameString(cAlphaArgs(2), "VariableArea")) {
-                ZoneUCSDUE(Loop).DiffuserType = VarArea;
+                ZoneUCSDUE(Loop).DiffuserType = Diffuser::VarArea;
             } else if (UtilityRoutines::SameString(cAlphaArgs(2), "HorizontalSwirl")) {
-                ZoneUCSDUE(Loop).DiffuserType = DisplVent;
+                ZoneUCSDUE(Loop).DiffuserType = Diffuser::DisplVent;
             } else if (UtilityRoutines::SameString(cAlphaArgs(2), "Custom")) {
-                ZoneUCSDUE(Loop).DiffuserType = Custom;
+                ZoneUCSDUE(Loop).DiffuserType = Diffuser::Custom;
             } else if (UtilityRoutines::SameString(cAlphaArgs(2), "LinearBarGrille")) {
-                ZoneUCSDUE(Loop).DiffuserType = LinBarGrille;
+                ZoneUCSDUE(Loop).DiffuserType = Diffuser::LinBarGrille;
             } else {
                 ShowSevereError(state, "Invalid " + cAlphaFieldNames(2) + " = " + cAlphaArgs(2));
                 ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs(1));

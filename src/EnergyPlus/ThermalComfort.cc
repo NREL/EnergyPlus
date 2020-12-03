@@ -121,8 +121,6 @@ namespace ThermalComfort {
     using DataRoomAirModel::TCMF;
     using DataRoomAirModel::Ujet;
     using DataRoomAirModel::Urec;
-    using DataRoomAirModel::VComfort_Jet;
-    using DataRoomAirModel::VComfort_Recirculation;
     using DataRoomAirModel::ZoneUCSDCV;
     using DataRoomAirModel::ZTJET;
     using DataRoomAirModel::ZTREC;
@@ -504,9 +502,9 @@ namespace ThermalComfort {
                 state.dataThermalComforts->AirTemp = TCMF(state.dataThermalComforts->ZoneNum); // PH 3/7/04
                 // UCSD-CV
             } else if (IsZoneCV(state.dataThermalComforts->ZoneNum)) {
-                if (ZoneUCSDCV(state.dataThermalComforts->ZoneNum).VforComfort == VComfort_Jet) {
+                if (ZoneUCSDCV(state.dataThermalComforts->ZoneNum).VforComfort == DataRoomAirModel::Comfort::VComfort_Jet) {
                     state.dataThermalComforts->AirTemp = ZTJET(state.dataThermalComforts->ZoneNum);
-                } else if (ZoneUCSDCV(state.dataThermalComforts->ZoneNum).VforComfort == VComfort_Recirculation) {
+                } else if (ZoneUCSDCV(state.dataThermalComforts->ZoneNum).VforComfort == DataRoomAirModel::Comfort::VComfort_Recirculation) {
                     state.dataThermalComforts->AirTemp = ZTJET(state.dataThermalComforts->ZoneNum);
                 } else {
                     // Thermal comfort control uses Tset to determine PMV setpoint value, otherwise use zone temp
@@ -568,9 +566,9 @@ namespace ThermalComfort {
             }
 
             if (IsZoneCV(state.dataThermalComforts->ZoneNum)) {
-                if (ZoneUCSDCV(state.dataThermalComforts->ZoneNum).VforComfort == VComfort_Jet) {
+                if (ZoneUCSDCV(state.dataThermalComforts->ZoneNum).VforComfort == DataRoomAirModel::Comfort::VComfort_Jet) {
                     state.dataThermalComforts->AirVel = Ujet(state.dataThermalComforts->ZoneNum);
-                } else if (ZoneUCSDCV(state.dataThermalComforts->ZoneNum).VforComfort == VComfort_Recirculation) {
+                } else if (ZoneUCSDCV(state.dataThermalComforts->ZoneNum).VforComfort == DataRoomAirModel::Comfort::VComfort_Recirculation) {
                     state.dataThermalComforts->AirVel = Urec(state.dataThermalComforts->ZoneNum);
                 } else {
                     state.dataThermalComforts->AirVel = 0.2;

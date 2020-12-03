@@ -122,16 +122,20 @@ namespace DataRoomAirModel {
     };
 
     // parameters to indicate diffuser type
-    extern int const Swirl;
-    extern int const VarArea;
-    extern int const DisplVent;
-    extern int const LinBarGrille;
-    extern int const Custom;
+    enum class Diffuser {
+        Unassigned,
+        Swirl,
+        VarArea,
+        DisplVent,
+        LinBarGrille,
+        Custom
+    };
 
-    // parameters for comfort calculations
-    extern int const VComfort_Invalid;
-    extern int const VComfort_Jet;
-    extern int const VComfort_Recirculation;
+    enum class Comfort {
+        VComfort_Invalid,
+        VComfort_Jet,
+        VComfort_Recirculation
+    };
 
     // MODULE VARIABLE DECLARATIONS:
     extern int TotNumOfAirNodes;
@@ -330,11 +334,11 @@ namespace DataRoomAirModel {
         int ZonePtr;                // Pointer to the zone number for this statement
         int SchedGainsPtr;          // Schedule for internal gain fraction to occupied zone
         std::string SchedGainsName; // Gains Schedule name
-        int VforComfort;            // Use Recirculation or Jet velocity and temperatures
+        Comfort VforComfort;            // Use Recirculation or Jet velocity and temperatures
         // for comfort models
 
         // Default Constructor
-        CVData() : ZonePtr(-1), SchedGainsPtr(-1), VforComfort(VComfort_Invalid)
+        CVData() : ZonePtr(-1), SchedGainsPtr(-1), VforComfort(Comfort::VComfort_Invalid)
         {
         }
     };
@@ -393,7 +397,7 @@ namespace DataRoomAirModel {
         // comfort purposes [m]
         Real64 TempTrigger; // Minimum temperature difference between TOC TMX
         // for stratification [deltaC]
-        int DiffuserType;     // 1=Swirl, 2=variable area, 3=displacement, 4=linear bar grille, 5=custom
+        Diffuser DiffuserType;     // 1=Swirl, 2=variable area, 3=displacement, 4=linear bar grille, 5=custom
         Real64 TransHeight;   // user specified transition height [m]
         bool CalcTransHeight; // flag to calc trans height or use user specified input
         Real64 A_Kc;          // Coefficient A in Formula Kc = A*Gamma**B + C + D*Gamma + E*Gamma**2
@@ -405,7 +409,7 @@ namespace DataRoomAirModel {
         // Default Constructor
         UFIData()
             : ZonePtr(0), ZoneEquipPtr(0), DiffusersPerZone(0.0), PowerPerPlume(0.0), DiffArea(0.0), DiffAngle(0.0), HeatSrcHeight(0.0),
-              ThermostatHeight(0.0), ComfortHeight(0.0), TempTrigger(0.0), DiffuserType(0), TransHeight(0.0), CalcTransHeight(false), A_Kc(0.0),
+              ThermostatHeight(0.0), ComfortHeight(0.0), TempTrigger(0.0), DiffuserType(Diffuser::Unassigned), TransHeight(0.0), CalcTransHeight(false), A_Kc(0.0),
               B_Kc(0.0), C_Kc(0.0), D_Kc(0.0), E_Kc(0.0)
         {
         }
@@ -427,7 +431,7 @@ namespace DataRoomAirModel {
         // comfort purposes [m]
         Real64 TempTrigger; // Minimum temperature difference between TOC TMX
         // for stratification [deltaC]
-        int DiffuserType;     // 1=Swirl, 2=variable area, 3=displacement, 4=linear bar grille, 5=custom
+        Diffuser DiffuserType;     // 1=Swirl, 2=variable area, 3=displacement, 4=linear bar grille, 5=custom
         Real64 TransHeight;   // user specified transition height [m]
         bool CalcTransHeight; // flag to calc trans height or use user specified input
         Real64 A_Kc;          // Coefficient A in Formula Kc = A*Gamma**B + C + D*Gamma + E*Gamma**2
@@ -442,7 +446,7 @@ namespace DataRoomAirModel {
         // Default Constructor
         UFEData()
             : ZonePtr(0), ZoneEquipPtr(0), DiffusersPerZone(0.0), PowerPerPlume(0.0), DiffArea(0.0), DiffAngle(0.0), HeatSrcHeight(0.0),
-              ThermostatHeight(0.0), ComfortHeight(0.0), TempTrigger(0.0), DiffuserType(0), TransHeight(0.0), CalcTransHeight(false), A_Kc(0.0),
+              ThermostatHeight(0.0), ComfortHeight(0.0), TempTrigger(0.0), DiffuserType(Diffuser::Unassigned), TransHeight(0.0), CalcTransHeight(false), A_Kc(0.0),
               B_Kc(0.0), C_Kc(0.0), D_Kc(0.0), E_Kc(0.0), WinWidth(0.0), NumExtWin(0.0), ShadeDown(true)
         {
         }

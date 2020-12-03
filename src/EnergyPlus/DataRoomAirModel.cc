@@ -88,18 +88,6 @@ namespace DataRoomAirModel {
     int const RoomAirNode3(8);               // air node for vertical walls (for Rees&Haves Model)
     int const RoomAirNode4(9);               // air node for vertical walls (for Rees&Haves Model)
 
-    // parameters to indicate diffuser type
-    int const Swirl(1);
-    int const VarArea(2);
-    int const DisplVent(3);
-    int const LinBarGrille(4);
-    int const Custom(5);
-
-    // parameters for comfort calculations
-    int const VComfort_Invalid(-1);
-    int const VComfort_Jet(1);
-    int const VComfort_Recirculation(2);
-
     // MODULE VARIABLE DECLARATIONS:
     int TotNumOfAirNodes(0);
     int TotNumOfRoomAFNNodes(0);

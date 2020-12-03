@@ -273,13 +273,13 @@ namespace UFADManager {
                 }
             }
             if (ZoneUCSDUI(UINum).DiffArea == AutoSize) {
-                if (ZoneUCSDUI(UINum).DiffuserType == Swirl) {
+                if (ZoneUCSDUI(UINum).DiffuserType == Diffuser::Swirl) {
                     ZoneUCSDUI(UINum).DiffArea = 0.0075;
-                } else if (ZoneUCSDUI(UINum).DiffuserType == VarArea) {
+                } else if (ZoneUCSDUI(UINum).DiffuserType == Diffuser::VarArea) {
                     ZoneUCSDUI(UINum).DiffArea = 0.035;
-                } else if (ZoneUCSDUI(UINum).DiffuserType == DisplVent) {
+                } else if (ZoneUCSDUI(UINum).DiffuserType == Diffuser::DisplVent) {
                     ZoneUCSDUI(UINum).DiffArea = 0.0060;
-                } else if (ZoneUCSDUI(UINum).DiffuserType == LinBarGrille) {
+                } else if (ZoneUCSDUI(UINum).DiffuserType == Diffuser::LinBarGrille) {
                     // 4 ft x 4 inches; 75 cfm per linear foot; area is .025 m2/m
                     ZoneUCSDUI(UINum).DiffArea = 0.03;
                 } else {
@@ -291,13 +291,13 @@ namespace UFADManager {
                                              ZoneUCSDUI(UINum).DiffArea);
             }
             if (ZoneUCSDUI(UINum).DiffAngle == AutoSize) {
-                if (ZoneUCSDUI(UINum).DiffuserType == Swirl) {
+                if (ZoneUCSDUI(UINum).DiffuserType == Diffuser::Swirl) {
                     ZoneUCSDUI(UINum).DiffAngle = 28.0;
-                } else if (ZoneUCSDUI(UINum).DiffuserType == VarArea) {
+                } else if (ZoneUCSDUI(UINum).DiffuserType == Diffuser::VarArea) {
                     ZoneUCSDUI(UINum).DiffAngle = 45.0;
-                } else if (ZoneUCSDUI(UINum).DiffuserType == DisplVent) {
+                } else if (ZoneUCSDUI(UINum).DiffuserType == Diffuser::DisplVent) {
                     ZoneUCSDUI(UINum).DiffAngle = 73.0;
-                } else if (ZoneUCSDUI(UINum).DiffuserType == LinBarGrille) {
+                } else if (ZoneUCSDUI(UINum).DiffuserType == Diffuser::LinBarGrille) {
                     ZoneUCSDUI(UINum).DiffAngle = 15.0;
                 } else {
                     ZoneUCSDUI(UINum).DiffAngle = 28.0;
@@ -313,7 +313,7 @@ namespace UFADManager {
             } else {
                 ZoneUCSDUI(UINum).CalcTransHeight = false;
             }
-            if (ZoneUCSDUI(UINum).DiffuserType == Swirl) {
+            if (ZoneUCSDUI(UINum).DiffuserType == Diffuser::Swirl) {
                 if (ZoneUCSDUI(UINum).A_Kc != DataGlobalConstants::AutoCalculate || ZoneUCSDUI(UINum).B_Kc != DataGlobalConstants::AutoCalculate || ZoneUCSDUI(UINum).C_Kc != DataGlobalConstants::AutoCalculate ||
                     ZoneUCSDUI(UINum).D_Kc != DataGlobalConstants::AutoCalculate || ZoneUCSDUI(UINum).E_Kc != DataGlobalConstants::AutoCalculate) {
                     ShowWarningError(state, "For RoomAirSettings:UnderFloorAirDistributionInterior for Zone " + ZoneUCSDUI(UINum).ZoneName +
@@ -325,7 +325,7 @@ namespace UFADManager {
                 ZoneUCSDUI(UINum).C_Kc = 0.6531;
                 ZoneUCSDUI(UINum).D_Kc = 0.0069;
                 ZoneUCSDUI(UINum).E_Kc = -0.00004;
-            } else if (ZoneUCSDUI(UINum).DiffuserType == VarArea) {
+            } else if (ZoneUCSDUI(UINum).DiffuserType == Diffuser::VarArea) {
                 if (ZoneUCSDUI(UINum).A_Kc != DataGlobalConstants::AutoCalculate || ZoneUCSDUI(UINum).B_Kc != DataGlobalConstants::AutoCalculate || ZoneUCSDUI(UINum).C_Kc != DataGlobalConstants::AutoCalculate ||
                     ZoneUCSDUI(UINum).D_Kc != DataGlobalConstants::AutoCalculate || ZoneUCSDUI(UINum).E_Kc != DataGlobalConstants::AutoCalculate) {
                     ShowWarningError(state, "For RoomAirSettings:UnderFloorAirDistributionInterior for Zone " + ZoneUCSDUI(UINum).ZoneName +
@@ -337,7 +337,7 @@ namespace UFADManager {
                 ZoneUCSDUI(UINum).C_Kc = 0.88;
                 ZoneUCSDUI(UINum).D_Kc = 0.0;
                 ZoneUCSDUI(UINum).E_Kc = 0.0;
-            } else if (ZoneUCSDUI(UINum).DiffuserType == DisplVent) {
+            } else if (ZoneUCSDUI(UINum).DiffuserType == Diffuser::DisplVent) {
                 if (ZoneUCSDUI(UINum).A_Kc != DataGlobalConstants::AutoCalculate || ZoneUCSDUI(UINum).B_Kc != DataGlobalConstants::AutoCalculate || ZoneUCSDUI(UINum).C_Kc != DataGlobalConstants::AutoCalculate ||
                     ZoneUCSDUI(UINum).D_Kc != DataGlobalConstants::AutoCalculate || ZoneUCSDUI(UINum).E_Kc != DataGlobalConstants::AutoCalculate) {
                     ShowWarningError(state, "For RoomAirSettings:UnderFloorAirDistributionInterior for Zone " + ZoneUCSDUI(UINum).ZoneName +
@@ -349,7 +349,7 @@ namespace UFADManager {
                 ZoneUCSDUI(UINum).C_Kc = 0.67;
                 ZoneUCSDUI(UINum).D_Kc = 0.0;
                 ZoneUCSDUI(UINum).E_Kc = 0.0;
-            } else if (ZoneUCSDUI(UINum).DiffuserType == LinBarGrille) {
+            } else if (ZoneUCSDUI(UINum).DiffuserType == Diffuser::LinBarGrille) {
                 if (ZoneUCSDUI(UINum).A_Kc != DataGlobalConstants::AutoCalculate || ZoneUCSDUI(UINum).B_Kc != DataGlobalConstants::AutoCalculate || ZoneUCSDUI(UINum).C_Kc != DataGlobalConstants::AutoCalculate ||
                     ZoneUCSDUI(UINum).D_Kc != DataGlobalConstants::AutoCalculate || ZoneUCSDUI(UINum).E_Kc != DataGlobalConstants::AutoCalculate) {
                     ShowWarningError(state, "For RoomAirSettings:UnderFloorAirDistributionInterior for Zone " + ZoneUCSDUI(UINum).ZoneName +
@@ -449,13 +449,13 @@ namespace UFADManager {
                 }
             }
             if (ZoneUCSDUE(UINum).DiffArea == AutoSize) {
-                if (ZoneUCSDUE(UINum).DiffuserType == Swirl) {
+                if (ZoneUCSDUE(UINum).DiffuserType == Diffuser::Swirl) {
                     ZoneUCSDUE(UINum).DiffArea = 0.0075;
-                } else if (ZoneUCSDUE(UINum).DiffuserType == VarArea) {
+                } else if (ZoneUCSDUE(UINum).DiffuserType == Diffuser::VarArea) {
                     ZoneUCSDUE(UINum).DiffArea = 0.035;
-                } else if (ZoneUCSDUE(UINum).DiffuserType == DisplVent) {
+                } else if (ZoneUCSDUE(UINum).DiffuserType == Diffuser::DisplVent) {
                     ZoneUCSDUE(UINum).DiffArea = 0.0060;
-                } else if (ZoneUCSDUE(UINum).DiffuserType == LinBarGrille) {
+                } else if (ZoneUCSDUE(UINum).DiffuserType == Diffuser::LinBarGrille) {
                     // 4 ft x 4 inches; eff area is 50% of total area; 75 cfm per linear foot.
                     ZoneUCSDUE(UINum).DiffArea = 0.03;
                 } else {
@@ -467,13 +467,13 @@ namespace UFADManager {
                                              ZoneUCSDUE(UINum).DiffArea);
             }
             if (ZoneUCSDUE(UINum).DiffAngle == AutoSize) {
-                if (ZoneUCSDUE(UINum).DiffuserType == Swirl) {
+                if (ZoneUCSDUE(UINum).DiffuserType == Diffuser::Swirl) {
                     ZoneUCSDUE(UINum).DiffAngle = 28.0;
-                } else if (ZoneUCSDUE(UINum).DiffuserType == VarArea) {
+                } else if (ZoneUCSDUE(UINum).DiffuserType == Diffuser::VarArea) {
                     ZoneUCSDUE(UINum).DiffAngle = 45.0;
-                } else if (ZoneUCSDUE(UINum).DiffuserType == DisplVent) {
+                } else if (ZoneUCSDUE(UINum).DiffuserType == Diffuser::DisplVent) {
                     ZoneUCSDUE(UINum).DiffAngle = 73.0;
-                } else if (ZoneUCSDUE(UINum).DiffuserType == LinBarGrille) {
+                } else if (ZoneUCSDUE(UINum).DiffuserType == Diffuser::LinBarGrille) {
                     ZoneUCSDUE(UINum).DiffAngle = 15.0;
                 } else {
                     ZoneUCSDUE(UINum).DiffAngle = 28.0;
@@ -489,7 +489,7 @@ namespace UFADManager {
             } else {
                 ZoneUCSDUE(UINum).CalcTransHeight = false;
             }
-            if (ZoneUCSDUE(UINum).DiffuserType == Swirl) {
+            if (ZoneUCSDUE(UINum).DiffuserType == Diffuser::Swirl) {
                 if (ZoneUCSDUE(UINum).A_Kc != DataGlobalConstants::AutoCalculate || ZoneUCSDUE(UINum).B_Kc != DataGlobalConstants::AutoCalculate || ZoneUCSDUE(UINum).C_Kc != DataGlobalConstants::AutoCalculate ||
                     ZoneUCSDUE(UINum).D_Kc != DataGlobalConstants::AutoCalculate || ZoneUCSDUE(UINum).E_Kc != DataGlobalConstants::AutoCalculate) {
                     ShowWarningError(state, "For RoomAirSettings:UnderFloorAirDistributionExterior for Zone " + ZoneUCSDUE(UINum).ZoneName +
@@ -501,7 +501,7 @@ namespace UFADManager {
                 ZoneUCSDUE(UINum).C_Kc = 0.6531;
                 ZoneUCSDUE(UINum).D_Kc = 0.0069;
                 ZoneUCSDUE(UINum).E_Kc = -0.00004;
-            } else if (ZoneUCSDUE(UINum).DiffuserType == VarArea) {
+            } else if (ZoneUCSDUE(UINum).DiffuserType == Diffuser::VarArea) {
                 if (ZoneUCSDUE(UINum).A_Kc != DataGlobalConstants::AutoCalculate || ZoneUCSDUE(UINum).B_Kc != DataGlobalConstants::AutoCalculate || ZoneUCSDUE(UINum).C_Kc != DataGlobalConstants::AutoCalculate ||
                     ZoneUCSDUE(UINum).D_Kc != DataGlobalConstants::AutoCalculate || ZoneUCSDUE(UINum).E_Kc != DataGlobalConstants::AutoCalculate) {
                     ShowWarningError(state, "For RoomAirSettings:UnderFloorAirDistributionExterior for Zone " + ZoneUCSDUE(UINum).ZoneName +
@@ -513,7 +513,7 @@ namespace UFADManager {
                 ZoneUCSDUE(UINum).C_Kc = 0.83;
                 ZoneUCSDUE(UINum).D_Kc = 0.0;
                 ZoneUCSDUE(UINum).E_Kc = 0.0;
-            } else if (ZoneUCSDUE(UINum).DiffuserType == DisplVent) {
+            } else if (ZoneUCSDUE(UINum).DiffuserType == Diffuser::DisplVent) {
                 if (ZoneUCSDUE(UINum).A_Kc != DataGlobalConstants::AutoCalculate || ZoneUCSDUE(UINum).B_Kc != DataGlobalConstants::AutoCalculate || ZoneUCSDUE(UINum).C_Kc != DataGlobalConstants::AutoCalculate ||
                     ZoneUCSDUE(UINum).D_Kc != DataGlobalConstants::AutoCalculate || ZoneUCSDUE(UINum).E_Kc != DataGlobalConstants::AutoCalculate) {
                     ShowWarningError(state, "For RoomAirSettings:UnderFloorAirDistributionExterior for Zone " + ZoneUCSDUE(UINum).ZoneName +
@@ -525,7 +525,7 @@ namespace UFADManager {
                 ZoneUCSDUE(UINum).C_Kc = 0.67;
                 ZoneUCSDUE(UINum).D_Kc = 0.0;
                 ZoneUCSDUE(UINum).E_Kc = 0.0;
-            } else if (ZoneUCSDUE(UINum).DiffuserType == LinBarGrille) {
+            } else if (ZoneUCSDUE(UINum).DiffuserType == Diffuser::LinBarGrille) {
                 if (ZoneUCSDUE(UINum).A_Kc != DataGlobalConstants::AutoCalculate || ZoneUCSDUE(UINum).B_Kc != DataGlobalConstants::AutoCalculate || ZoneUCSDUE(UINum).C_Kc != DataGlobalConstants::AutoCalculate ||
                     ZoneUCSDUE(UINum).D_Kc != DataGlobalConstants::AutoCalculate || ZoneUCSDUE(UINum).E_Kc != DataGlobalConstants::AutoCalculate) {
                     ShowWarningError(state, "For RoomAirSettings:UnderFloorAirDistributionExterior for Zone " + ZoneUCSDUE(UINum).ZoneName +
@@ -1099,7 +1099,7 @@ namespace UFADManager {
         // at the diffuser, and a design flow rate of 150 cfm (.0708 m3/s). Then the design area for each diffuser is
         // 150 ft3/min / 400 ft/min = .375 ft2 = .035 m2. This is adjusted each time step by
         //               (TotSysFlow/(NumDiffusers*.0708))*.035
-        if (ZoneUCSDUI(UINum).DiffuserType == VarArea) {
+        if (ZoneUCSDUI(UINum).DiffuserType == Diffuser::VarArea) {
             DiffArea = 0.035 * TotSysFlow / (0.0708 * NumDiffusers);
         }
         // initial estimate of convective transfer from surfaces; assume HeightFrac is 0.5.
@@ -1576,7 +1576,7 @@ namespace UFADManager {
         // at the diffuser, and a design flow rate of 150 cfm (.0708 m3/s). Then the design area for each diffuser is
         // 150 ft3/min / 400 ft/min = .375 ft2 = .035 m2. This is adjusted each time step by
         //               (TotSysFlow/(NumDiffusers*.0708))*.035
-        if (ZoneUCSDUE(UINum).DiffuserType == VarArea) {
+        if (ZoneUCSDUE(UINum).DiffuserType == Diffuser::VarArea) {
             DiffArea = 0.035 * TotSysFlow / (0.0708 * NumDiffusers);
         }
         // initial estimate of convective transfer from surfaces; assume HeightFrac is 0.5.
