@@ -90,7 +90,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetTest1)
     state->dataThermalComforts->ThermalComfortSetPoint.allocate(state->dataGlobal->NumOfZones);
     TempControlType.allocate(1);
     AirModel.allocate(state->dataGlobal->NumOfZones);
-    AirModel(1).AirModelType = RoomAirModel_Mixing;
+    AirModel(1).AirModelType = DataRoomAirModel::RoomAirModel::Mixing;
     ZTAV.allocate(state->dataGlobal->NumOfZones);
     ZoneThermostatSetPointLo.allocate(state->dataGlobal->NumOfZones);
     ZoneThermostatSetPointHi.allocate(state->dataGlobal->NumOfZones);
@@ -891,7 +891,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetWithCutoutTest)
     state->dataThermalComforts->ThermalComfortSetPoint.allocate(state->dataGlobal->NumOfZones);
     TempControlType.allocate(1);
     AirModel.allocate(state->dataGlobal->NumOfZones);
-    AirModel(1).AirModelType = RoomAirModel_Mixing;
+    AirModel(1).AirModelType = DataRoomAirModel::RoomAirModel::Mixing;
     ZTAV.allocate(state->dataGlobal->NumOfZones);
     ZoneThermostatSetPointLo.allocate(state->dataGlobal->NumOfZones);
     ZoneThermostatSetPointHi.allocate(state->dataGlobal->NumOfZones);

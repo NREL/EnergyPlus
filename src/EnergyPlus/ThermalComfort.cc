@@ -2193,8 +2193,6 @@ namespace ThermalComfort {
         using DataHVACGlobals::SingleHeatCoolSetPoint;
         using DataHVACGlobals::SingleHeatingSetPoint;
         using DataRoomAirModel::AirModel;
-        using DataRoomAirModel::RoomAirModel_Mixing;
-        //using ZoneTempPredictorCorrector::NumOnOffCtrZone;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 SensibleLoadPredictedNoAdj;
@@ -2236,7 +2234,7 @@ namespace ThermalComfort {
                 }
             }
             if (testHeating && (SensibleLoadPredictedNoAdj > 0)) { // heating
-                if (AirModel(iZone).AirModelType != RoomAirModel_Mixing) {
+                if (AirModel(iZone).AirModelType != DataRoomAirModel::RoomAirModel::Mixing) {
                     deltaT = TempTstatAir(iZone) - ZoneThermostatSetPointLo(iZone);
                 } else {
                     if (state.dataZoneTempPredictorCorrector->NumOnOffCtrZone > 0) {
@@ -2257,7 +2255,7 @@ namespace ThermalComfort {
                     }
                 }
             } else if (testCooling && (SensibleLoadPredictedNoAdj < 0)) { // cooling
-                if (AirModel(iZone).AirModelType != RoomAirModel_Mixing) {
+                if (AirModel(iZone).AirModelType != DataRoomAirModel::RoomAirModel::Mixing) {
                     deltaT = TempTstatAir(iZone) - ZoneThermostatSetPointHi(iZone);
                 } else {
                     if (state.dataZoneTempPredictorCorrector->NumOnOffCtrZone > 0) {

@@ -3244,7 +3244,6 @@ namespace ZoneTempPredictorCorrector {
         using DataRoomAirModel::MATFloor;
         using DataRoomAirModel::MATMX;
         using DataRoomAirModel::MATOC;
-        using DataRoomAirModel::RoomAirModel_Mixing;
         using DataRoomAirModel::XM2TFloor;
         using DataRoomAirModel::XM2TMX;
         using DataRoomAirModel::XM2TOC;
@@ -3577,7 +3576,7 @@ namespace ZoneTempPredictorCorrector {
                                                       DSXM3TMX(ZoneNum),
                                                       DSXM4TMX(ZoneNum));
                     }
-                    if (AirModel(ZoneNum).AirModelType == RoomAirModel_AirflowNetwork) {
+                    if (AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
                         for (LoopNode = 1; LoopNode <= RoomAirflowNetworkZoneInfo(ZoneNum).NumOfAirNodes; ++LoopNode) {
                             auto &ThisRAFNNode(RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode));
                             DownInterpolate4HistoryValues(PriorTimeStep,
@@ -3648,7 +3647,7 @@ namespace ZoneTempPredictorCorrector {
 
             TempDepCoef = SumHA + SumMCp;
             TempIndCoef = SumIntGain + SumHATsurf - SumHATref + SumMCpT + SysDepZoneLoadsLagged(ZoneNum);
-            if (AirModel(ZoneNum).AirModelType == RoomAirModel_Mixing) {
+            if (AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::Mixing) {
                 TempHistoryTerm = AirCap * (3.0 * ZTM1(ZoneNum) - (3.0 / 2.0) * ZTM2(ZoneNum) + (1.0 / 3.0) * ZTM3(ZoneNum));
                 state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) = (11.0 / 6.0) * AirCap + TempDepCoef;
                 state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum) = TempHistoryTerm + TempIndCoef;
@@ -3662,7 +3661,7 @@ namespace ZoneTempPredictorCorrector {
                 TempHistoryTerm = AirCap * (3.0 * ZTM1(ZoneNum) - (3.0 / 2.0) * ZTM2(ZoneNum) + (1.0 / 3.0) * ZTM3(ZoneNum));
                 state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) = (11.0 / 6.0) * AirCap + TempDepCoef;
                 state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum) = TempHistoryTerm + TempIndCoef;
-            } else if (AirModel(ZoneNum).AirModelType == RoomAirModel_AirflowNetwork) {
+            } else if (AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
                 // RoomAirflowNetworkModel - make dynamic term independent of TimeStepSys
                 if (RoomAirflowNetworkZoneInfo(ZoneNum).IsUsed) {
                     RoomAirNode = RoomAirflowNetworkZoneInfo(ZoneNum).ControlAirNodeID;
@@ -3697,7 +3696,7 @@ namespace ZoneTempPredictorCorrector {
                     if (PreviousTimeStep < state.dataGlobal->TimeStepZone) {
                         ZoneT1(ZoneNum) = ZoneTM2(ZoneNum);
                         ZoneW1(ZoneNum) = ZoneWM2(ZoneNum);
-                        if (AirModel(ZoneNum).AirModelType == RoomAirModel_AirflowNetwork) {
+                        if (AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
                             for (LoopNode = 1; LoopNode <= RoomAirflowNetworkZoneInfo(ZoneNum).NumOfAirNodes; ++LoopNode) {
                                 RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode).AirTempT1 =
                                     RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode).AirTempTM2;
@@ -3708,7 +3707,7 @@ namespace ZoneTempPredictorCorrector {
                     } else {
                         ZoneT1(ZoneNum) = ZoneTMX(ZoneNum);
                         ZoneW1(ZoneNum) = ZoneWMX(ZoneNum);
-                        if (AirModel(ZoneNum).AirModelType == RoomAirModel_AirflowNetwork) {
+                        if (AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
                             for (LoopNode = 1; LoopNode <= RoomAirflowNetworkZoneInfo(ZoneNum).NumOfAirNodes; ++LoopNode) {
                                 RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode).AirTempT1 =
                                     RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode).AirTempTMX;
@@ -3721,7 +3720,7 @@ namespace ZoneTempPredictorCorrector {
                 } else {
                     ZoneT1(ZoneNum) = ZT(ZoneNum);
                     ZoneW1(ZoneNum) = ZoneAirHumRat(ZoneNum);
-                    if (AirModel(ZoneNum).AirModelType == RoomAirModel_AirflowNetwork) {
+                    if (AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
                         for (LoopNode = 1; LoopNode <= RoomAirflowNetworkZoneInfo(ZoneNum).NumOfAirNodes; ++LoopNode) {
                             RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode).AirTempT1 = RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode).AirTemp;
                             RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode).HumRatW1 = RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode).HumRat;
@@ -4616,7 +4615,7 @@ namespace ZoneTempPredictorCorrector {
             }
             C = RhoAir * Zone(ZoneNum).Volume * Zone(ZoneNum).ZoneVolCapMultpMoist / SysTimeStepInSeconds;
 
-            if (AirModel(ZoneNum).AirModelType == RoomAirModel_AirflowNetwork) {
+            if (AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
                 RoomAirNode = RoomAirflowNetworkZoneInfo(ZoneNum).ControlAirNodeID;
                 H2OHtOfVap = PsyHgAirFnWTdb(RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).HumRat,
                                             RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).AirTemp);
@@ -4763,9 +4762,6 @@ namespace ZoneTempPredictorCorrector {
         using DataRoomAirModel::MATFloor;
         using DataRoomAirModel::MATMX;
         using DataRoomAirModel::MATOC;
-        using DataRoomAirModel::RoomAirModel_Mixing;
-        using DataRoomAirModel::RoomAirModel_Mundt;
-        using DataRoomAirModel::RoomAirModel_UserDefined;
         using DataRoomAirModel::XM2TFloor;
         using DataRoomAirModel::XM2TMX;
         using DataRoomAirModel::XM2TOC;
@@ -4893,7 +4889,7 @@ namespace ZoneTempPredictorCorrector {
                                                       DSXM3TMX(ZoneNum),
                                                       DSXM4TMX(ZoneNum));
                     }
-                    if (AirModel(ZoneNum).AirModelType == RoomAirModel_AirflowNetwork) {
+                    if (AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
                         for (LoopNode = 1; LoopNode <= RoomAirflowNetworkZoneInfo(ZoneNum).NumOfAirNodes; ++LoopNode) {
                             auto &ThisRAFNNode(RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode));
                             DownInterpolate4HistoryValues(PriorTimeStep,
@@ -5000,7 +4996,7 @@ namespace ZoneTempPredictorCorrector {
                 }
                 // Update zone node temperature and thermostat temperature unless already updated in Room Air Model,
                 // calculate load correction factor
-                if ((AirModel(ZoneNum).AirModelType == RoomAirModel_Mixing) || (!AirModel(ZoneNum).SimAirModel)) {
+                if ((AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::Mixing) || (!AirModel(ZoneNum).SimAirModel)) {
                     // Fully mixed
                     Node(ZoneNodeNum).Temp = ZT(ZoneNum);
                     TempTstatAir(ZoneNum) = ZT(ZoneNum);
@@ -5023,7 +5019,7 @@ namespace ZoneTempPredictorCorrector {
                         LoadCorrectionFactor(ZoneNum) = 1.0;
                     }
                 } else if (AirModel(ZoneNum).SimAirModel &&
-                           ((AirModel(ZoneNum).AirModelType == RoomAirModel_UserDefined) || (AirModel(ZoneNum).AirModelType == RoomAirModel_Mundt))) {
+                           ((AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::UserDefined) || (AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::Mundt))) {
                     if (SumSysMCp > SmallMassFlow) {
                         TempSupplyAir = SumSysMCpT / SumSysMCp; // Non-negligible flow, calculate supply air temperature
                         if (std::abs(TempSupplyAir - ZT(ZoneNum)) > TempConvergTol) {
@@ -5039,7 +5035,7 @@ namespace ZoneTempPredictorCorrector {
                         // Negligible flow, assume mixed - reasonable lagged starting value for first step time with significant flow
                         LoadCorrectionFactor(ZoneNum) = 1.0;
                     }
-                } else if (AirModel(ZoneNum).AirModelType == RoomAirModel_AirflowNetwork) {
+                } else if (AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
                     // Zone node used in the RoomAirflowNetwork model
                     ZT(ZoneNum) = RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirflowNetworkZoneInfo(ZoneNum).ControlAirNodeID).AirTemp;
                     Node(ZoneNodeNum).Temp = ZT(ZoneNum);
@@ -5092,7 +5088,7 @@ namespace ZoneTempPredictorCorrector {
                     }
                 }
 
-                if (AirModel(ZoneNum).AirModelType == RoomAirModel_AirflowNetwork) {
+                if (AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
                     ZT(ZoneNum) = RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirflowNetworkZoneInfo(ZoneNum).ControlAirNodeID).AirTemp;
                 }
 
@@ -5219,8 +5215,8 @@ namespace ZoneTempPredictorCorrector {
             WZoneTimeMinusP(ZoneNum) = ZoneAirHumRatTemp(ZoneNum);
             state.dataZoneTempPredictorCorrector->ZoneAirRelHum(ZoneNum) = 100.0 * PsyRhFnTdbWPb(state, ZT(ZoneNum), ZoneAirHumRat(ZoneNum), state.dataEnvrn->OutBaroPress, CorrectZoneAirTemp);
 
-            if (AirModel(ZoneNum).AirModelType == RoomAirModel_UCSDDV || AirModel(ZoneNum).AirModelType == RoomAirModel_UCSDUFI ||
-                AirModel(ZoneNum).AirModelType == RoomAirModel_UCSDUFE) {
+            if (AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::UCSDDV || AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::UCSDUFI ||
+                AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::UCSDUFE) {
                 XM4TFloor(ZoneNum) = XM3TFloor(ZoneNum);
                 XM3TFloor(ZoneNum) = XM2TFloor(ZoneNum);
                 XM2TFloor(ZoneNum) = XMATFloor(ZoneNum);
@@ -5241,7 +5237,7 @@ namespace ZoneTempPredictorCorrector {
             }
 
             // for RoomAirflowNetwork model
-            if (AirModel(ZoneNum).AirModelType == RoomAirModel_AirflowNetwork) {
+            if (AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
                 for (LoopNode = 1; LoopNode <= RoomAirflowNetworkZoneInfo(ZoneNum).NumOfAirNodes; ++LoopNode) {
                     RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode).AirTempX4 = RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode).AirTempX3;
                     RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode).AirTempX3 = RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode).AirTempX2;
@@ -5260,8 +5256,8 @@ namespace ZoneTempPredictorCorrector {
                 ZoneTMX(ZoneNum) = ZTAV(ZoneNum); // using average for whole zone time step.
                 ZoneWM2(ZoneNum) = ZoneWMX(ZoneNum);
                 ZoneWMX(ZoneNum) = ZoneAirHumRatAvg(ZoneNum); // using average for whole zone time step.
-                if (AirModel(ZoneNum).AirModelType == RoomAirModel_UCSDDV || AirModel(ZoneNum).AirModelType == RoomAirModel_UCSDUFI ||
-                    AirModel(ZoneNum).AirModelType == RoomAirModel_UCSDUFE) {
+                if (AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::UCSDDV || AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::UCSDUFI ||
+                    AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::UCSDUFE) {
                     ZoneM2Floor(ZoneNum) = ZoneMXFloor(ZoneNum);
                     ZoneMXFloor(ZoneNum) = ZTFloor(ZoneNum); // using average for whole zone time step.
                     ZoneM2OC(ZoneNum) = ZoneMXOC(ZoneNum);
@@ -5270,7 +5266,7 @@ namespace ZoneTempPredictorCorrector {
                     ZoneMXMX(ZoneNum) = ZTMX(ZoneNum); // using average for whole zone time step.
                 }
 
-                if (AirModel(ZoneNum).AirModelType == RoomAirModel_AirflowNetwork) {
+                if (AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
                     for (LoopNode = 1; LoopNode <= RoomAirflowNetworkZoneInfo(ZoneNum).NumOfAirNodes; ++LoopNode) {
                         RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode).AirTempTM2 = RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode).AirTempTMX;
                         RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode).AirTempTMX = RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode).AirTemp;
@@ -5331,7 +5327,7 @@ namespace ZoneTempPredictorCorrector {
                 DSXM2TMX(ZoneNum) = DSXMATMX(ZoneNum);
                 DSXMATMX(ZoneNum) = MATMX(ZoneNum);
             }
-            if (AirModel(ZoneNum).AirModelType == RoomAirModel_AirflowNetwork) {
+            if (AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
                 for (LoopNode = 1; LoopNode <= RoomAirflowNetworkZoneInfo(ZoneNum).NumOfAirNodes; ++LoopNode) {
                     RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode).AirTempDSX4 = RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode).AirTempDSX3;
                     RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode).AirTempDSX3 = RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode).AirTempDSX2;
@@ -5353,8 +5349,8 @@ namespace ZoneTempPredictorCorrector {
                 ZoneWM2(ZoneNum) = ZoneWMX(ZoneNum);
                 ZoneWMX(ZoneNum) = ZoneAirHumRatTemp(ZoneNum); // using average for whole zone time step.
 
-                if (AirModel(ZoneNum).AirModelType == RoomAirModel_UCSDDV || AirModel(ZoneNum).AirModelType == RoomAirModel_UCSDUFI ||
-                    AirModel(ZoneNum).AirModelType == RoomAirModel_UCSDUFE) {
+                if (AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::UCSDDV || AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::UCSDUFI ||
+                    AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::UCSDUFE) {
                     ZoneM2Floor(ZoneNum) = ZoneMXFloor(ZoneNum);
                     ZoneMXFloor(ZoneNum) = ZTFloor(ZoneNum); // using average for whole zone time step.
                     ZoneM2OC(ZoneNum) = ZoneMXOC(ZoneNum);
@@ -5362,7 +5358,7 @@ namespace ZoneTempPredictorCorrector {
                     ZoneM2MX(ZoneNum) = ZoneMXMX(ZoneNum);
                     ZoneMXMX(ZoneNum) = ZTMX(ZoneNum); // using average for whole zone time step.
                 }
-                if (AirModel(ZoneNum).AirModelType == RoomAirModel_AirflowNetwork) {
+                if (AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
                     for (LoopNode = 1; LoopNode <= RoomAirflowNetworkZoneInfo(ZoneNum).NumOfAirNodes; ++LoopNode) {
                         RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode).AirTempTM2 = RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode).AirTempTMX;
                         RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode).AirTempTMX = RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode).AirTemp;
@@ -5406,8 +5402,8 @@ namespace ZoneTempPredictorCorrector {
             WZoneTimeMinus2(ZoneNum) = WZoneTimeMinus3(ZoneNum);
             WZoneTimeMinus3(ZoneNum) = WZoneTimeMinus4(ZoneNum);
 
-            if (AirModel(ZoneNum).AirModelType == RoomAirModel_UCSDDV || AirModel(ZoneNum).AirModelType == RoomAirModel_UCSDUFI ||
-                AirModel(ZoneNum).AirModelType == RoomAirModel_UCSDUFE) {
+            if (AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::UCSDDV || AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::UCSDUFI ||
+                AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::UCSDUFE) {
 
                 //      MATFloor(ZoneNum)= XMATFloor(ZoneNum)
                 XMATFloor(ZoneNum) = XM2TFloor(ZoneNum);
@@ -5424,7 +5420,7 @@ namespace ZoneTempPredictorCorrector {
                 XM3TMX(ZoneNum) = XM4TMX(ZoneNum);
             }
 
-            if (AirModel(ZoneNum).AirModelType == RoomAirModel_AirflowNetwork) {
+            if (AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
                 for (LoopNode = 1; LoopNode <= RoomAirflowNetworkZoneInfo(ZoneNum).NumOfAirNodes; ++LoopNode) {
                     RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode).AirTempX1 = RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode).AirTempX2;
                     RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode).AirTempX2 = RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode).AirTempX3;
@@ -5632,7 +5628,7 @@ namespace ZoneTempPredictorCorrector {
 
         if (ZoneAirHumRatTemp(ZoneNum) > WZSat) ZoneAirHumRatTemp(ZoneNum) = WZSat;
 
-        if (AirModel(ZoneNum).AirModelType == RoomAirModel_AirflowNetwork) {
+        if (AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
             ZoneAirHumRatTemp(ZoneNum) = RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirflowNetworkZoneInfo(ZoneNum).ControlAirNodeID).HumRat;
         }
 

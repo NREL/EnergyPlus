@@ -146,7 +146,6 @@ namespace AirflowNetworkBalanceManager {
     using DataRoomAirModel::AirModel;
     using DataRoomAirModel::AirNode;
     using DataRoomAirModel::RoomAirflowNetworkZoneInfo;
-    using DataRoomAirModel::RoomAirModel_AirflowNetwork;
     using DataRoomAirModel::TotNumOfAirNodes;
     using DataSurfaces::cExtBoundCondition;
     using DataSurfaces::ExternalEnvironment;

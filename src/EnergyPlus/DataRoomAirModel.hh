@@ -61,33 +61,29 @@ namespace EnergyPlus {
 
 namespace DataRoomAirModel {
 
-    // Using/Aliasing
-
-    // Data
-    // module should be available to other modules and routines.  Thus,
-    // all variables in this module must be PUBLIC.
-
-    // MODULE PARAMETER DEFINITIONS
-    extern std::string const cUserDefinedControlObject;
-    extern std::string const cTempPatternConstGradientObject;
-    extern std::string const cTempPatternTwoGradientObject;
-    extern std::string const cTempPatternNDHeightObject;
-    extern std::string const cTempPatternSurfMapObject;
+    auto constexpr cUserDefinedControlObject("RoomAir:TemperaturePattern:UserDefined");
+    auto constexpr cTempPatternConstGradientObject("RoomAir:TemperaturePattern:ConstantGradient");
+    auto constexpr cTempPatternTwoGradientObject("RoomAir:TemperaturePattern:TwoGradient");
+    auto constexpr cTempPatternNDHeightObject("RoomAir:TemperaturePattern:NondimensionalHeight");
+    auto constexpr cTempPatternSurfMapObject("RoomAir:TemperaturePattern:SurfaceMapping");
 
     // Parameters to indicate room air model selected
-    extern int const RoomAirModel_UserDefined;    // user defined patterns
-    extern int const RoomAirModel_Mixing;         // mixing air model
-    extern int const RoomAirModel_Mundt;          // Mundt nodal model
-    extern int const RoomAirModel_UCSDDV;         // UCSD Displacement Ventilation model
-    extern int const RoomAirModel_UCSDCV;         // UCSD-CV
-    extern int const RoomAirModel_UCSDUFI;        // UCSD UFAD interior zone model
-    extern int const RoomAirModel_UCSDUFE;        // UCSD UFAD exterior zone model
-    extern int const RoomAirModel_AirflowNetwork; // RoomAirModel_AirflowNetwork interior zone model
-    extern Array1D_string const ChAirModel;
+    enum class RoomAirModel : int {
+        UserDefined = 1,    // user defined patterns
+        Mixing = 2,         // mixing air model
+        Mundt = 3,          // Mundt nodal model
+        UCSDDV = 4,         // UCSD Displacement Ventilation model
+        UCSDCV = 5,         // UCSD-CV
+        UCSDUFI = 6,        // UCSD UFAD interior zone model
+        UCSDUFE = 7,        // UCSD UFAD exterior zone model
+        AirflowNetwork = 8  // RoomAirModel_AirflowNetwork interior zone model
+    };
+    constexpr const char * ChAirModel[] = {"*Invalid*", "UserDefined", "Mixing", "Mundt", "UCSD_DV", "UCSD_CV", "UCSD_UFI", "UCSD_UFE", "AirflowNetwork"};
 
     // Parameters to indicate air temperature coupling scheme
-    extern int const DirectCoupling;   // direct coupling scheme
-    extern int const IndirectCoupling; // indirect coupling scheme
+    enum class CouplingScheme : int {
+        Direct = 1, Indirect = 2
+    };
 
     // Parameters to indicate type of air node, which is dependent on air models
     extern int const InletAirNode;              // air node at inlet (for Mundt and Rees&Haves Models)
@@ -119,11 +115,6 @@ namespace DataRoomAirModel {
     extern int const NonDimenHeightPattern; // non-dimensionalized height
     extern int const SurfMapTempPattern;    // arbitrary surface mappings
 
-    // Parameters to indicate type of control for the UCSD UFAD interior zone model
-    // INTEGER, PARAMETER :: ConsFlow          = 1     ! constant supply air flow
-    // INTEGER, PARAMETER :: VarFlowConsPress  = 2     ! variable supply air flow, constant supply plenum pressure
-    // INTEGER, PARAMETER :: VarFlowVarPress   = 3     ! variable supply air flow, variable supply plenum pressure
-
     // parameters to indicate diffuser type
     extern int const Swirl;
     extern int const VarArea;
@@ -136,27 +127,13 @@ namespace DataRoomAirModel {
     extern int const VComfort_Jet;
     extern int const VComfort_Recirculation;
 
-    // DERIVED TYPE DEFINITIONS
-
-    // Air Node Data
-
-    // UCSD
-
-    // END UCSD
-
-    // begin NREL RoomAir DERIVED TYPES ******************************************
-
-    // end NREL room air derived types*********************************
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
     // MODULE VARIABLE DECLARATIONS:
     extern int TotNumOfAirNodes;
     extern int TotNumOfRoomAFNNodes;
     extern Array1D_int TotNumOfZoneAirNodes;
     extern Array1D<Real64> ConvectiveFloorSplit;
     extern Array1D<Real64> InfiltratFloorSplit;
+
     // UCSD
     extern Array1D<Real64> DVHcIn;
     extern int TotUCSDDV;                // Total number of UCSDDV zones
@@ -290,16 +267,16 @@ namespace DataRoomAirModel {
         std::string AirModelName;
         std::string ZoneName;
         int ZonePtr;      // Pointer to the zone number for this statement
-        int AirModelType; // 1 = Mixing, 2 = Mundt, 3 = Rees and Haves,
+        RoomAirModel AirModelType; // 1 = Mixing, 2 = Mundt, 3 = Rees and Haves,
         // 4 = UCSDDV, 5 = UCSDCV, -1 = user defined
         // 6 = UCSDUFI, 7 = UCSDUFE, 8 = AirflowNetwork
-        int TempCoupleScheme; // 1 = absolute (direct),
+        CouplingScheme TempCoupleScheme; // 1 = absolute (direct),
         // 2 = relative air model temperature passing scheme (indirect)
         bool SimAirModel; // FALSE if Mixing air model is currently used and
         // TRUE if other air models are currently used
 
         // Default Constructor
-        AirModelData() : ZonePtr(0), AirModelType(RoomAirModel_Mixing), TempCoupleScheme(DirectCoupling), SimAirModel(false)
+        AirModelData() : ZonePtr(0), AirModelType(RoomAirModel::Mixing), TempCoupleScheme(CouplingScheme::Direct), SimAirModel(false)
         {
         }
     };

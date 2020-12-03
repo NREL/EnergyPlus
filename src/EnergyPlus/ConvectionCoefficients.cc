@@ -2556,10 +2556,6 @@ namespace ConvectionCoefficients {
         // Using/Aliasing
         using DataHeatBalFanSys::MAT;
         using DataRoomAirModel::AirModel;
-        using DataRoomAirModel::RoomAirModel_UCSDCV;
-        using DataRoomAirModel::RoomAirModel_UCSDDV;
-        using DataRoomAirModel::RoomAirModel_UCSDUFE;
-        using DataRoomAirModel::RoomAirModel_UCSDUFI;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 TAirConv;
@@ -2578,9 +2574,9 @@ namespace ConvectionCoefficients {
                 }
             }
 
-            if (AirModel(Surface(SurfNum).Zone).AirModelType == RoomAirModel_UCSDDV ||
-                AirModel(Surface(SurfNum).Zone).AirModelType == RoomAirModel_UCSDUFI ||
-                AirModel(Surface(SurfNum).Zone).AirModelType == RoomAirModel_UCSDUFE) {
+            if (AirModel(Surface(SurfNum).Zone).AirModelType == DataRoomAirModel::RoomAirModel::UCSDDV ||
+                AirModel(Surface(SurfNum).Zone).AirModelType == DataRoomAirModel::RoomAirModel::UCSDUFI ||
+                AirModel(Surface(SurfNum).Zone).AirModelType == DataRoomAirModel::RoomAirModel::UCSDUFE) {
 
                 // Set HConvIn using the proper correlation based on DeltaTemp and CosTiltSurf
                 if (Surface(SurfNum).IntConvCoeff != 0) {
@@ -2593,7 +2589,7 @@ namespace ConvectionCoefficients {
                                                           -Surface(SurfNum).CosTilt); // negative CosTilt because CosTilt is relative to exterior
                 }
 
-            } else if (AirModel(Surface(SurfNum).Zone).AirModelType == RoomAirModel_UCSDCV) {
+            } else if (AirModel(Surface(SurfNum).Zone).AirModelType == DataRoomAirModel::RoomAirModel::UCSDCV) {
 
                 Hf = 4.3 * Vhc()(Surface(SurfNum).Zone);
 

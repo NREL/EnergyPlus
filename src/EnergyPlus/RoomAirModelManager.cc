@@ -100,33 +100,14 @@ namespace RoomAirModelManager {
     // PURPOSE OF THIS MODULE:
     // Contains subroutines for managing the room air models
 
-    // METHODOLOGY EMPLOYED:
-    // na
-
-    // REFERENCES:
-    // na
-
     // Using/Aliasing
     using namespace DataRoomAirModel;
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS
     static std::string const BlankString;
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
 
     bool GetUCSDDVDataFlag(true); // UCSD
     bool GetAirModelData(true);   // Used to "get" all air model data
     bool MyOneTimeFlag(true);
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE
-
-    // MODULE SUBROUTINES:
-
-    // Functions
 
     void clear_state()
     {
@@ -190,34 +171,34 @@ namespace RoomAirModelManager {
         {
             auto const SELECT_CASE_var(AirModel(ZoneNum).AirModelType);
 
-            if (SELECT_CASE_var == RoomAirModel_UserDefined) {
+            if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::UserDefined) {
 
                 ManageUserDefinedPatterns(state, ZoneNum);
 
-            } else if (SELECT_CASE_var == RoomAirModel_Mixing) { // Mixing air model
+            } else if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::Mixing) { // Mixing air model
                                                                  // do nothing
 
-            } else if (SELECT_CASE_var == RoomAirModel_Mundt) { // Mundt air model
+            } else if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::Mundt) { // Mundt air model
                 // simulate room airflow using Mundt model
                 ManageMundtModel(state, ZoneNum);
 
-            } else if (SELECT_CASE_var == RoomAirModel_UCSDDV) { // UCDV Displacement Ventilation model
+            } else if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::UCSDDV) { // UCDV Displacement Ventilation model
                 // simulate room airflow using UCSDDV model
                 ManageUCSDDVModel(state, ZoneNum);
 
-            } else if (SELECT_CASE_var == RoomAirModel_UCSDCV) { // UCSD Cross Ventilation model
+            } else if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::UCSDCV) { // UCSD Cross Ventilation model
                 // simulate room airflow using UCSDDV model
                 ManageUCSDCVModel(state, ZoneNum);
 
-            } else if (SELECT_CASE_var == RoomAirModel_UCSDUFI) { // UCSD UFAD interior zone model
+            } else if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::UCSDUFI) { // UCSD UFAD interior zone model
                 // simulate room airflow using the UCSDUFI model
-                ManageUCSDUFModels(state, ZoneNum, RoomAirModel_UCSDUFI);
+                ManageUCSDUFModels(state, ZoneNum, DataRoomAirModel::RoomAirModel::UCSDUFI);
 
-            } else if (SELECT_CASE_var == RoomAirModel_UCSDUFE) { // UCSD UFAD exterior zone model
+            } else if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::UCSDUFE) { // UCSD UFAD exterior zone model
                 // simulate room airflow using the UCSDUFE model
-                ManageUCSDUFModels(state, ZoneNum, RoomAirModel_UCSDUFE);
+                ManageUCSDUFModels(state, ZoneNum, DataRoomAirModel::RoomAirModel::UCSDUFE);
 
-            } else if (SELECT_CASE_var == RoomAirModel_AirflowNetwork) { // RoomAirflowNetwork zone model
+            } else if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::AirflowNetwork) { // RoomAirflowNetwork zone model
                 // simulate room airflow using the AirflowNetwork - based model
                 SimRoomAirModelAirflowNetwork(state, ZoneNum);
 
@@ -439,7 +420,7 @@ namespace RoomAirModelManager {
 
         // Check against AirModel.  Make sure there is a match here.
         for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-            if (AirModel(ZoneNum).AirModelType != RoomAirModel_UserDefined) continue;
+            if (AirModel(ZoneNum).AirModelType != DataRoomAirModel::RoomAirModel::UserDefined) continue;
             if (AirPatternZoneInfo(ZoneNum).IsUsed) continue; // There is a Room Air Temperatures object for this zone
             ShowSevereError(state, RoutineName + "AirModel for Zone=[" + Zone(ZoneNum).Name + "] is indicated as \"User Defined\".");
             ShowContinueError(state, "...but missing a " + cCurrentModuleObject + " object for control.");
@@ -505,7 +486,7 @@ namespace RoomAirModelManager {
 
             // now test the input some
             if (RoomAirPattern(thisPattern).TwoGradPatrn.HiGradient == RoomAirPattern(thisPattern).TwoGradPatrn.LowGradient) {
-                ShowWarningError(state, "Upper and lower gradients equal, use " + cTempPatternConstGradientObject + " instead ");
+                ShowWarningError(state, format("Upper and lower gradients equal, use {} instead ", cTempPatternConstGradientObject));
                 ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs(1));
             }
             if ((RoomAirPattern(thisPattern).TwoGradPatrn.UpperBoundTempScale == RoomAirPattern(thisPattern).TwoGradPatrn.LowerBoundTempScale) &&
@@ -855,7 +836,7 @@ namespace RoomAirModelManager {
         for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
 
             // this zone uses other air model so skip the rest
-            if (AirModel(ZoneNum).AirModelType != RoomAirModel_Mundt) continue;
+            if (AirModel(ZoneNum).AirModelType != DataRoomAirModel::RoomAirModel::Mundt) continue;
 
             // this zone uses a nodal air model so get number of air nodes in each zone
             for (AirNodeNum = 1; AirNodeNum <= TotNumOfAirNodes; ++AirNodeNum) {
@@ -942,9 +923,9 @@ namespace RoomAirModelManager {
                 ErrorsFound = true;
                 continue;
             }
-            if (AirModel(ZoneNum).AirModelType != RoomAirModel_Mundt) {
+            if (AirModel(ZoneNum).AirModelType != DataRoomAirModel::RoomAirModel::Mundt) {
                 ShowSevereError(state, "Zone specified=\"" + cAlphaArgs(1) + "\", Air Model type is not OneNodeDisplacementVentilation.");
-                ShowContinueError(state, "Air Model Type for zone=" + ChAirModel(AirModel(ZoneNum).AirModelType));
+                ShowContinueError(state, format("Air Model Type for zone={}", ChAirModel[static_cast<int>(AirModel(ZoneNum).AirModelType)]));
                 ErrorsFound = true;
                 continue;
             }
@@ -1177,7 +1158,7 @@ namespace RoomAirModelManager {
                     TypeNum = AirflowNetwork::AirflowNetworkCompData(CompNum).TypeNum;
                     if (AirflowNetwork::AirflowNetworkCompData(CompNum).CompTypeNum == AirflowNetwork::CompTypeNum_SCR) {
                         if (AirflowNetwork::MultizoneSurfaceCrackData(TypeNum).FlowExpo != 0.50) {
-                            AirModel(ThisZone).AirModelType = RoomAirModel_Mixing;
+                            AirModel(ThisZone).AirModelType = DataRoomAirModel::RoomAirModel::Mixing;
                             ShowWarningError(state, "Problem with " + cCurrentModuleObject + " = " + cAlphaArgs(1));
                             ShowWarningError(state, "Roomair model will not be applied for Zone=" + cAlphaArgs(1) + '.');
                             ShowContinueError(
@@ -1467,9 +1448,9 @@ namespace RoomAirModelManager {
                 ErrorsFound = true;
                 continue;
             }
-            if (AirModel(ZoneNum).AirModelType != RoomAirModel_AirflowNetwork) {
+            if (AirModel(ZoneNum).AirModelType != DataRoomAirModel::RoomAirModel::AirflowNetwork) {
                 ShowSevereError(state, "GetRoomAirflowNetworkData: Zone specified='" + cAlphaArgs(1) + "', Air Model type is not AirflowNetwork.");
-                ShowContinueError(state, "Air Model Type for zone =" + ChAirModel(AirModel(ZoneNum).AirModelType));
+                ShowContinueError(state, format("Air Model Type for zone ={}", ChAirModel[static_cast<int>(AirModel(ZoneNum).AirModelType)]));
                 ErrorsFound = true;
                 continue;
             }
@@ -2359,7 +2340,7 @@ namespace RoomAirModelManager {
                 ZoneDVMixedFlag = 0;
                 // Output variables and DV zone flag
                 for (Loop = 1; Loop <= state.dataGlobal->NumOfZones; ++Loop) {
-                    if (AirModel(Loop).AirModelType != RoomAirModel_UCSDDV) continue; // don't set these up if they don't make sense
+                    if (AirModel(Loop).AirModelType != DataRoomAirModel::RoomAirModel::UCSDDV) continue; // don't set these up if they don't make sense
                     // CurrentModuleObject='RoomAirSettings:ThreeNodeDisplacementVentilation'
                     SetupOutputVariable(state,
                         "Room Air Zone Mixed Subzone Temperature", OutputProcessor::Unit::C, ZTMX(Loop), "HVAC", "State", Zone(Loop).Name);
@@ -2415,7 +2396,7 @@ namespace RoomAirModelManager {
                 ZoneUFPowInPlumesfromWindows = 0.0;
                 // Output variables and UF zone flag
                 for (Loop = 1; Loop <= state.dataGlobal->NumOfZones; ++Loop) {
-                    if (AirModel(Loop).AirModelType != RoomAirModel_UCSDUFI) continue; // don't set these up if they don't make sense
+                    if (AirModel(Loop).AirModelType != DataRoomAirModel::RoomAirModel::UCSDUFI) continue; // don't set these up if they don't make sense
                     // CurrentModuleObject='RoomAirSettings:UnderFloorAirDistributionInterior'
                     SetupOutputVariable(state,
                         "Room Air Zone Mixed Subzone Temperature", OutputProcessor::Unit::C, ZTMX(Loop), "HVAC", "State", Zone(Loop).Name);
@@ -2463,7 +2444,7 @@ namespace RoomAirModelManager {
                     } // ZoneEquipConfigNum
                 }
                 for (Loop = 1; Loop <= state.dataGlobal->NumOfZones; ++Loop) {
-                    if (AirModel(Loop).AirModelType != RoomAirModel_UCSDUFE) continue; // don't set these up if they don't make sense
+                    if (AirModel(Loop).AirModelType != DataRoomAirModel::RoomAirModel::UCSDUFE) continue; // don't set these up if they don't make sense
                     // CurrentModuleObject='RoomAirSettings:UnderFloorAirDistributionExterior'
                     SetupOutputVariable(state,
                         "Room Air Zone Mixed Subzone Temperature", OutputProcessor::Unit::C, ZTMX(Loop), "HVAC", "State", Zone(Loop).Name);
@@ -2562,7 +2543,7 @@ namespace RoomAirModelManager {
                 HDoor = 0.0;
 
                 for (Loop = 1; Loop <= state.dataGlobal->NumOfZones; ++Loop) {
-                    if (AirModel(Loop).AirModelType != RoomAirModel_UCSDCV) continue; // don't set these up if they don't make sense
+                    if (AirModel(Loop).AirModelType != DataRoomAirModel::RoomAirModel::UCSDCV) continue; // don't set these up if they don't make sense
                     ZoneEquipConfigNum = ZoneNum;
                     // check whether this zone is a controlled zone or not
                     if (ZoneEquipConfig(ZoneEquipConfigNum).IsControlled) {
