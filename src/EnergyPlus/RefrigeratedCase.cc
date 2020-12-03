@@ -264,18 +264,6 @@ namespace EnergyPlus::RefrigeratedCase {
     int const DefrostNone(3);
     int const DefrostOffCycle(4);
 
-    int const RatedCapacityTotal(1);
-    int const EuropeanSC1Std(2);
-    int const EuropeanSC1Nom(3);
-    int const EuropeanSC2Std(4);
-    int const EuropeanSC2Nom(5);
-    int const EuropeanSC3Std(6);
-    int const EuropeanSC3Nom(7);
-    int const EuropeanSC4Std(8);
-    int const EuropeanSC4Nom(9);
-    int const EuropeanSC5Std(10);
-    int const EuropeanSC5Nom(11);
-    int const UnitLoadFactorSens(12);
     int const SHR60(1);
     int const QuadraticSHR(2);
     int const European(3);
@@ -1787,29 +1775,29 @@ namespace EnergyPlus::RefrigeratedCase {
                                     " is required and not found.");
                     ErrorsFound = true;
                 } else if (UtilityRoutines::SameString(Alphas(AlphaNum), "UnitLoadFactorSensibleOnly")) {
-                    WarehouseCoil(CoilID).RatingType = UnitLoadFactorSens;
+                    WarehouseCoil(CoilID).RatingType = iRatingType::UnitLoadFactorSens;
                 } else if (UtilityRoutines::SameString(Alphas(AlphaNum), "CapacityTotalSpecificConditions")) {
-                    WarehouseCoil(CoilID).RatingType = RatedCapacityTotal;
+                    WarehouseCoil(CoilID).RatingType = iRatingType::RatedCapacityTotal;
                 } else if (UtilityRoutines::SameString(Alphas(AlphaNum), "EuropeanSC1Standard")) {
-                    WarehouseCoil(CoilID).RatingType = EuropeanSC1Std;
+                    WarehouseCoil(CoilID).RatingType = iRatingType::EuropeanSC1Std;
                 } else if (UtilityRoutines::SameString(Alphas(AlphaNum), "EuropeanSC1NominalWet")) {
-                    WarehouseCoil(CoilID).RatingType = EuropeanSC1Nom;
+                    WarehouseCoil(CoilID).RatingType = iRatingType::EuropeanSC1Nom;
                 } else if (UtilityRoutines::SameString(Alphas(AlphaNum), "EuropeanSC2Standard")) {
-                    WarehouseCoil(CoilID).RatingType = EuropeanSC2Std;
+                    WarehouseCoil(CoilID).RatingType = iRatingType::EuropeanSC2Std;
                 } else if (UtilityRoutines::SameString(Alphas(AlphaNum), "EuropeanSC2NominalWet")) {
-                    WarehouseCoil(CoilID).RatingType = EuropeanSC2Nom;
+                    WarehouseCoil(CoilID).RatingType = iRatingType::EuropeanSC2Nom;
                 } else if (UtilityRoutines::SameString(Alphas(AlphaNum), "EuropeanSC3Standard")) {
-                    WarehouseCoil(CoilID).RatingType = EuropeanSC3Std;
+                    WarehouseCoil(CoilID).RatingType = iRatingType::EuropeanSC3Std;
                 } else if (UtilityRoutines::SameString(Alphas(AlphaNum), "EuropeanSC3NominalWet")) {
-                    WarehouseCoil(CoilID).RatingType = EuropeanSC3Nom;
+                    WarehouseCoil(CoilID).RatingType = iRatingType::EuropeanSC3Nom;
                 } else if (UtilityRoutines::SameString(Alphas(AlphaNum), "EuropeanSC4Standard")) {
-                    WarehouseCoil(CoilID).RatingType = EuropeanSC4Std;
+                    WarehouseCoil(CoilID).RatingType = iRatingType::EuropeanSC4Std;
                 } else if (UtilityRoutines::SameString(Alphas(AlphaNum), "EuropeanSC4NominalWet")) {
-                    WarehouseCoil(CoilID).RatingType = EuropeanSC4Nom;
+                    WarehouseCoil(CoilID).RatingType = iRatingType::EuropeanSC4Nom;
                 } else if (UtilityRoutines::SameString(Alphas(AlphaNum), "EuropeanSC5Standard")) {
-                    WarehouseCoil(CoilID).RatingType = EuropeanSC5Std;
+                    WarehouseCoil(CoilID).RatingType = iRatingType::EuropeanSC5Std;
                 } else if (UtilityRoutines::SameString(Alphas(AlphaNum), "EuropeanSC5NominalWet")) {
-                    WarehouseCoil(CoilID).RatingType = EuropeanSC5Nom;
+                    WarehouseCoil(CoilID).RatingType = iRatingType::EuropeanSC5Nom;
                 } else {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", invalid  " +
                                     cAlphaFieldNames(AlphaNum) + "=\"" + Alphas(AlphaNum) + "\".");
@@ -1819,154 +1807,154 @@ namespace EnergyPlus::RefrigeratedCase {
                 // Here have to do select case with one numeric field with units of W and the second with units of W/deltaC,
                 //  (RatedRH field only used for RatedCapacityTotal type)
                 {
-                    auto const SELECT_CASE_var(WarehouseCoil(CoilID).RatingType);
-                    if (SELECT_CASE_var == UnitLoadFactorSens) {
-                        // N1
-                        NumNum = 1;
-                        if (!lNumericBlanks(NumNum) && Numbers(NumNum) > 0.0) {
-                            WarehouseCoil(CoilID).UnitLoadFactorSens = Numbers(NumNum);
-                        } else {
-                            ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", " +
-                                            cNumericFieldNames(NumNum) + " must be input and be greater than 0 W/C");
-                            ErrorsFound = true;
-                        }
-                    } else if (SELECT_CASE_var == RatedCapacityTotal) {
-                        // N2
-                        NumNum = 2; // advance past rating in W/C to N2 with rating in W
-                        if (!lNumericBlanks(NumNum) && Numbers(NumNum) > 0.0) {
-                            WarehouseCoil(CoilID).RatedCapTotal = Numbers(NumNum);
-                            // N3
-                            NumNum = 3; // read rated RH only for this type of rating at N3
-                            if (lNumericBlanks(NumNum)) {
-                                WarehouseCoil(CoilID).RatedRH = 0.85;
+                    switch (WarehouseCoil(CoilID).RatingType) {
+                        case iRatingType::UnitLoadFactorSens :
+                            // N1
+                            NumNum = 1;
+                            if (!lNumericBlanks(NumNum) && Numbers(NumNum) > 0.0) {
+                                WarehouseCoil(CoilID).UnitLoadFactorSens = Numbers(NumNum);
                             } else {
-                                if (Numbers(NumNum) <= 0.0 || Numbers(NumNum) >= 100.0) {
-                                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", " +
-                                                    cNumericFieldNames(NumNum) + " must be greater than 0% and less than 100%");
-                                    ErrorsFound = true;
-                                }
-                                WarehouseCoil(CoilID).RatedRH = Numbers(NumNum) / 100.0;
+                                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", " +
+                                                       cNumericFieldNames(NumNum) + " must be input and be greater than 0 W/C");
+                                ErrorsFound = true;
                             }
-                        } else {
-                            ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", " +
-                                            cNumericFieldNames(NumNum) + " must be input and be greater than 0 W");
-                            ErrorsFound = true;
-                        }
-                    } else if (SELECT_CASE_var == EuropeanSC1Std) {
-                        // N2
-                        NumNum = 2; // advance past rating in W/C to rating in W at N2
-                        if (!lNumericBlanks(NumNum) && Numbers(NumNum) > 0.0) {
-                            WarehouseCoil(CoilID).RatedSensibleCap = Numbers(NumNum);
-                            WarehouseCoil(CoilID).SCIndex = 1;
-                        } else {
-                            ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", " +
-                                            cNumericFieldNames(NumNum) + " must be input and be greater than 0 W");
-                            ErrorsFound = true;
-                        }
-                    } else if (SELECT_CASE_var == EuropeanSC1Nom) {
-                        // N2
-                        NumNum = 2; // advance past rating in W/C to rating in W at N2
-                        if (!lNumericBlanks(NumNum) && Numbers(NumNum) > 0.0) {
-                            WarehouseCoil(CoilID).RatedCapTotal = Numbers(NumNum);
-                            WarehouseCoil(CoilID).RatedSensibleCap = Numbers(NumNum) / EuropeanWetCoilFactor(1);
-                            WarehouseCoil(CoilID).SCIndex = 1;
-                        } else {
-                            ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", " +
-                                            cNumericFieldNames(NumNum) + " must be input and be greater than 0 W");
-                            ErrorsFound = true;
-                        }
-                    } else if (SELECT_CASE_var == EuropeanSC2Std) {
-                        // N2
-                        NumNum = 2; // advance past rating in W/C to rating in W at N2
-                        if (!lNumericBlanks(NumNum) && Numbers(NumNum) > 0.0) {
-                            WarehouseCoil(CoilID).RatedSensibleCap = Numbers(NumNum);
-                            WarehouseCoil(CoilID).SCIndex = 2;
-                        } else {
-                            ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", " +
-                                            cNumericFieldNames(NumNum) + " must be input and be greater than 0 W");
-                            ErrorsFound = true;
-                        }
-                    } else if (SELECT_CASE_var == EuropeanSC2Nom) {
-                        // N2
-                        NumNum = 2; // advance past rating in W/C to rating in W at N2
-                        if (!lNumericBlanks(NumNum) && Numbers(NumNum) > 0.0) {
-                            WarehouseCoil(CoilID).RatedCapTotal = Numbers(NumNum);
-                            WarehouseCoil(CoilID).RatedSensibleCap = Numbers(NumNum) / EuropeanWetCoilFactor(2);
-                            WarehouseCoil(CoilID).SCIndex = 2;
-                        } else {
-                            ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", " +
-                                            cNumericFieldNames(NumNum) + " must be input and be greater than 0 W");
-                            ErrorsFound = true;
-                        }
-                    } else if (SELECT_CASE_var == EuropeanSC3Std) {
-                        // N2
-                        NumNum = 2; // advance past rating in W/C to rating in W at N2
-                        if (!lNumericBlanks(NumNum) && Numbers(NumNum) > 0.0) {
-                            WarehouseCoil(CoilID).RatedSensibleCap = Numbers(NumNum);
-                            WarehouseCoil(CoilID).SCIndex = 3;
-                        } else {
-                            ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", " +
-                                            cNumericFieldNames(NumNum) + " must be input and be greater than 0 W");
-                            ErrorsFound = true;
-                        }
-                    } else if (SELECT_CASE_var == EuropeanSC3Nom) {
-                        // N2
-                        NumNum = 2; // advance past rating in W/C to rating in W at N2
-                        if (!lNumericBlanks(NumNum) && Numbers(NumNum) > 0.0) {
-                            WarehouseCoil(CoilID).RatedCapTotal = Numbers(NumNum);
-                            WarehouseCoil(CoilID).RatedSensibleCap = Numbers(NumNum) / EuropeanWetCoilFactor(3);
-                            WarehouseCoil(CoilID).SCIndex = 3;
-                        } else {
-                            ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", " +
-                                            cNumericFieldNames(NumNum) + " must be input and be greater than 0 W");
-                            ErrorsFound = true;
-                        }
-                    } else if (SELECT_CASE_var == EuropeanSC4Std) {
-                        // N2
-                        NumNum = 2; // advance past rating in W/C to rating in W at N2
-                        if (!lNumericBlanks(NumNum) && Numbers(NumNum) > 0.0) {
-                            WarehouseCoil(CoilID).RatedSensibleCap = Numbers(NumNum);
-                            WarehouseCoil(CoilID).SCIndex = 4;
-                        } else {
-                            ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", " +
-                                            cNumericFieldNames(NumNum) + " must be input and be greater than 0 W");
-                            ErrorsFound = true;
-                        }
-                    } else if (SELECT_CASE_var == EuropeanSC4Nom) {
-                        // N2
-                        NumNum = 2; // advance past rating in W/C to rating in W at N2
-                        if (!lNumericBlanks(NumNum) && Numbers(NumNum) > 0.0) {
-                            WarehouseCoil(CoilID).RatedCapTotal = Numbers(NumNum);
-                            WarehouseCoil(CoilID).RatedSensibleCap = Numbers(NumNum) / EuropeanWetCoilFactor(4);
-                            WarehouseCoil(CoilID).SCIndex = 4;
-                        } else {
-                            ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", " +
-                                            cNumericFieldNames(NumNum) + " must be input and be greater than 0 W");
-                            ErrorsFound = true;
-                        }
-                    } else if (SELECT_CASE_var == EuropeanSC5Std) {
-                        // N2
-                        NumNum = 2; // advance past rating in W/C to rating in W at N2
-                        if (!lNumericBlanks(NumNum) && Numbers(NumNum) > 0.0) {
-                            WarehouseCoil(CoilID).RatedSensibleCap = Numbers(NumNum);
-                            WarehouseCoil(CoilID).SCIndex = 5;
-                        } else {
-                            ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", " +
-                                            cNumericFieldNames(NumNum) + " must be input and be greater than 0 W");
-                            ErrorsFound = true;
-                        }
-                    } else if (SELECT_CASE_var == EuropeanSC5Nom) {
-                        // N2
-                        NumNum = 2; // advance past rating in W/C to rating in W at N2
-                        if (!lNumericBlanks(NumNum) && Numbers(NumNum) > 0.0) {
-                            WarehouseCoil(CoilID).RatedCapTotal = Numbers(NumNum);
-                            WarehouseCoil(CoilID).RatedSensibleCap = Numbers(NumNum) / EuropeanWetCoilFactor(5);
-                            WarehouseCoil(CoilID).SCIndex = 5;
-                        } else {
-                            ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", " +
-                                            cNumericFieldNames(NumNum) + " must be input and be greater than 0 W");
-                            ErrorsFound = true;
-                        }
+                        case iRatingType::RatedCapacityTotal :
+                            // N2
+                            NumNum = 2; // advance past rating in W/C to N2 with rating in W
+                            if (!lNumericBlanks(NumNum) && Numbers(NumNum) > 0.0) {
+                                WarehouseCoil(CoilID).RatedCapTotal = Numbers(NumNum);
+                                // N3
+                                NumNum = 3; // read rated RH only for this type of rating at N3
+                                if (lNumericBlanks(NumNum)) {
+                                    WarehouseCoil(CoilID).RatedRH = 0.85;
+                                } else {
+                                    if (Numbers(NumNum) <= 0.0 || Numbers(NumNum) >= 100.0) {
+                                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", " +
+                                                               cNumericFieldNames(NumNum) + " must be greater than 0% and less than 100%");
+                                        ErrorsFound = true;
+                                    }
+                                    WarehouseCoil(CoilID).RatedRH = Numbers(NumNum) / 100.0;
+                                }
+                            } else {
+                                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", " +
+                                                       cNumericFieldNames(NumNum) + " must be input and be greater than 0 W");
+                                ErrorsFound = true;
+                            }
+                        case iRatingType::EuropeanSC1Std :
+                            // N2
+                            NumNum = 2; // advance past rating in W/C to rating in W at N2
+                            if (!lNumericBlanks(NumNum) && Numbers(NumNum) > 0.0) {
+                                WarehouseCoil(CoilID).RatedSensibleCap = Numbers(NumNum);
+                                WarehouseCoil(CoilID).SCIndex = 1;
+                            } else {
+                                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", " +
+                                                       cNumericFieldNames(NumNum) + " must be input and be greater than 0 W");
+                                ErrorsFound = true;
+                            }
+                        case iRatingType::EuropeanSC1Nom :
+                            // N2
+                            NumNum = 2; // advance past rating in W/C to rating in W at N2
+                            if (!lNumericBlanks(NumNum) && Numbers(NumNum) > 0.0) {
+                                WarehouseCoil(CoilID).RatedCapTotal = Numbers(NumNum);
+                                WarehouseCoil(CoilID).RatedSensibleCap = Numbers(NumNum) / EuropeanWetCoilFactor(1);
+                                WarehouseCoil(CoilID).SCIndex = 1;
+                            } else {
+                                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", " +
+                                                       cNumericFieldNames(NumNum) + " must be input and be greater than 0 W");
+                                ErrorsFound = true;
+                            }
+                        case iRatingType::EuropeanSC2Std :
+                            // N2
+                            NumNum = 2; // advance past rating in W/C to rating in W at N2
+                            if (!lNumericBlanks(NumNum) && Numbers(NumNum) > 0.0) {
+                                WarehouseCoil(CoilID).RatedSensibleCap = Numbers(NumNum);
+                                WarehouseCoil(CoilID).SCIndex = 2;
+                            } else {
+                                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", " +
+                                                       cNumericFieldNames(NumNum) + " must be input and be greater than 0 W");
+                                ErrorsFound = true;
+                            }
+                        case iRatingType::EuropeanSC2Nom :
+                            // N2
+                            NumNum = 2; // advance past rating in W/C to rating in W at N2
+                            if (!lNumericBlanks(NumNum) && Numbers(NumNum) > 0.0) {
+                                WarehouseCoil(CoilID).RatedCapTotal = Numbers(NumNum);
+                                WarehouseCoil(CoilID).RatedSensibleCap = Numbers(NumNum) / EuropeanWetCoilFactor(2);
+                                WarehouseCoil(CoilID).SCIndex = 2;
+                            } else {
+                                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", " +
+                                                       cNumericFieldNames(NumNum) + " must be input and be greater than 0 W");
+                                ErrorsFound = true;
+                            }
+                        case iRatingType::EuropeanSC3Std :
+                            // N2
+                            NumNum = 2; // advance past rating in W/C to rating in W at N2
+                            if (!lNumericBlanks(NumNum) && Numbers(NumNum) > 0.0) {
+                                WarehouseCoil(CoilID).RatedSensibleCap = Numbers(NumNum);
+                                WarehouseCoil(CoilID).SCIndex = 3;
+                            } else {
+                                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", " +
+                                                       cNumericFieldNames(NumNum) + " must be input and be greater than 0 W");
+                                ErrorsFound = true;
+                            }
+                        case iRatingType::EuropeanSC3Nom :
+                            // N2
+                            NumNum = 2; // advance past rating in W/C to rating in W at N2
+                            if (!lNumericBlanks(NumNum) && Numbers(NumNum) > 0.0) {
+                                WarehouseCoil(CoilID).RatedCapTotal = Numbers(NumNum);
+                                WarehouseCoil(CoilID).RatedSensibleCap = Numbers(NumNum) / EuropeanWetCoilFactor(3);
+                                WarehouseCoil(CoilID).SCIndex = 3;
+                            } else {
+                                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", " +
+                                                       cNumericFieldNames(NumNum) + " must be input and be greater than 0 W");
+                                ErrorsFound = true;
+                            }
+                        case iRatingType::EuropeanSC4Std :
+                            // N2
+                            NumNum = 2; // advance past rating in W/C to rating in W at N2
+                            if (!lNumericBlanks(NumNum) && Numbers(NumNum) > 0.0) {
+                                WarehouseCoil(CoilID).RatedSensibleCap = Numbers(NumNum);
+                                WarehouseCoil(CoilID).SCIndex = 4;
+                            } else {
+                                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", " +
+                                                       cNumericFieldNames(NumNum) + " must be input and be greater than 0 W");
+                                ErrorsFound = true;
+                            }
+                        case iRatingType::EuropeanSC4Nom :
+                            // N2
+                            NumNum = 2; // advance past rating in W/C to rating in W at N2
+                            if (!lNumericBlanks(NumNum) && Numbers(NumNum) > 0.0) {
+                                WarehouseCoil(CoilID).RatedCapTotal = Numbers(NumNum);
+                                WarehouseCoil(CoilID).RatedSensibleCap = Numbers(NumNum) / EuropeanWetCoilFactor(4);
+                                WarehouseCoil(CoilID).SCIndex = 4;
+                            } else {
+                                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", " +
+                                                       cNumericFieldNames(NumNum) + " must be input and be greater than 0 W");
+                                ErrorsFound = true;
+                            }
+                        case iRatingType::EuropeanSC5Std :
+                            // N2
+                            NumNum = 2; // advance past rating in W/C to rating in W at N2
+                            if (!lNumericBlanks(NumNum) && Numbers(NumNum) > 0.0) {
+                                WarehouseCoil(CoilID).RatedSensibleCap = Numbers(NumNum);
+                                WarehouseCoil(CoilID).SCIndex = 5;
+                            } else {
+                                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", " +
+                                                       cNumericFieldNames(NumNum) + " must be input and be greater than 0 W");
+                                ErrorsFound = true;
+                            }
+                        case iRatingType::EuropeanSC5Nom :
+                            // N2
+                            NumNum = 2; // advance past rating in W/C to rating in W at N2
+                            if (!lNumericBlanks(NumNum) && Numbers(NumNum) > 0.0) {
+                                WarehouseCoil(CoilID).RatedCapTotal = Numbers(NumNum);
+                                WarehouseCoil(CoilID).RatedSensibleCap = Numbers(NumNum) / EuropeanWetCoilFactor(5);
+                                WarehouseCoil(CoilID).SCIndex = 5;
+                            } else {
+                                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", " +
+                                                       cNumericFieldNames(NumNum) + " must be input and be greater than 0 W");
+                                ErrorsFound = true;
+                            }
                     }
                 } // WarehouseCoil(CoilID)%RatingType
 
@@ -2013,21 +2001,21 @@ namespace EnergyPlus::RefrigeratedCase {
                 // ONLY used if the Capacity Rating Type is CapacityTotalSpecificConditions
 
                 // Convert all European sensible capacities to sensible load factors
-                if ((WarehouseCoil(CoilID).RatingType != UnitLoadFactorSens) && (WarehouseCoil(CoilID).RatingType != RatedCapacityTotal))
+                if ((WarehouseCoil(CoilID).RatingType != iRatingType::UnitLoadFactorSens) && (WarehouseCoil(CoilID).RatingType != iRatingType::RatedCapacityTotal))
                     WarehouseCoil(CoilID).UnitLoadFactorSens = WarehouseCoil(CoilID).RatedSensibleCap / WarehouseCoil(CoilID).RatedTemperatureDif;
                 // Now have UnitLoadFactorSens for all except RatingType == RatedCapacityTotal
 
                 // Apply material and refrigerant correction factors to sensible load factors
-                if ((WarehouseCoil(CoilID).RatingType != RatedCapacityTotal))
+                if ((WarehouseCoil(CoilID).RatingType != iRatingType::RatedCapacityTotal))
                     WarehouseCoil(CoilID).UnitLoadFactorSens *= WarehouseCoil(CoilID).CorrMaterial * WarehouseCoil(CoilID).CorrRefrigerant;
                 // First calc of ratedsensiblecap for type type unitloadfactorsens
                 WarehouseCoil(CoilID).RatedSensibleCap = WarehouseCoil(CoilID).UnitLoadFactorSens * WarehouseCoil(CoilID).RatedTemperatureDif;
                 // A4    Enter capacity correction curve type
                 AlphaNum = 4;
-                if ((lAlphaBlanks(AlphaNum)) && (WarehouseCoil(CoilID).RatingType != RatedCapacityTotal)) {
+                if ((lAlphaBlanks(AlphaNum)) && (WarehouseCoil(CoilID).RatingType != iRatingType::RatedCapacityTotal)) {
                     // For all except RatedCapacityTotal - default to linear capacity factor approximating Nelson August 2010 ASHRAE journal
                     WarehouseCoil(CoilID).SHRCorrectionType = SHR60;
-                } else if (WarehouseCoil(CoilID).RatingType == RatedCapacityTotal) {
+                } else if (WarehouseCoil(CoilID).RatingType == iRatingType::RatedCapacityTotal) {
                     // For RatedCapacityTotal, the manufacturer's coil performance map is required
                     // Specify the performance map with TabularRHxDT1xTRoom
                     WarehouseCoil(CoilID).SHRCorrectionType = TabularRH_DT1_TRoom;
@@ -14779,7 +14767,7 @@ namespace EnergyPlus::RefrigeratedCase {
             Real64 TemperatureDif =
                 min(this->MaxTemperatureDif, (CoilInletTemp - TEvap)); // difference between inlet air and evaporating temperature (deltaC)
 
-            if (this->RatingType == RatedCapacityTotal) {
+            if (this->RatingType == iRatingType::RatedCapacityTotal) {
                 // RatingType = CapacityTotalSpecificConditions, will be doing a table lookup
                 //    based upon RHInlet, DT1, CoilInletTemperature - see excel files from B. Nelson, CoilCom
                 //    In the table, X1== inlet air dry bulb temperature

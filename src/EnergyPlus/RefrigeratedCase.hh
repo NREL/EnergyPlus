@@ -72,6 +72,23 @@ namespace RefrigeratedCase {
         FromTank,
     };
 
+    enum class iRatingType
+    {
+        Unassigned,
+        RatedCapacityTotal,
+        EuropeanSC1Std,
+        EuropeanSC1Nom,
+        EuropeanSC2Std,
+        EuropeanSC2Nom,
+        EuropeanSC3Std,
+        EuropeanSC3Nom,
+        EuropeanSC4Std,
+        EuropeanSC4Nom,
+        EuropeanSC5Std,
+        EuropeanSC5Nom,
+        UnitLoadFactorSens,
+    };
+
     struct RefrigCaseData
     {
         // Members
@@ -1312,7 +1329,7 @@ namespace RefrigeratedCase {
         int FanType;                 // Index to coil fan type (fixed, two-speed, etc.)
         int HeaterSchedPtr;          // Index to the correct availability schedule
         int NumSysAttach;            // Number of refrigerating systems cooling this coil (error check purpose)
-        int RatingType;              // Indicates which type of manufacturer's rating is used
+        iRatingType RatingType;      // Indicates which type of manufacturer's rating is used
         int SchedPtr;                // Index to the correct availability schedule
         int SCIndex;                 // IDs which of European standard conditions is used for rating
         int SecServeID;              // Index to the refrigeration system serving this coil
@@ -1382,7 +1399,7 @@ namespace RefrigeratedCase {
         WarehouseCoilData()
             : SecStatusFirst(false), SecStatusLast(false), SysStatusFirst(false), SysStatusLast(false), CoilFanSchedPtr(0),
               DefrostDripDownSchedPtr(0), DefrostSchedPtr(0), DefrostControlType(0), DefrostType(0), FanType(0), HeaterSchedPtr(0), NumSysAttach(0),
-              RatingType(0), SchedPtr(0), SCIndex(0), SecServeID(0), SHRCorrectionType(0), SHRCorrectionCurvePtr(0), SysServeID(0),
+              RatingType(iRatingType::Unassigned), SchedPtr(0), SCIndex(0), SecServeID(0), SHRCorrectionType(0), SHRCorrectionCurvePtr(0), SysServeID(0),
               VerticalLocation(0), ZoneNodeNum(0), ZoneNum(0), CorrMaterial(0.0), CorrRefrigerant(0.0), DefrostCapacity(0.0), DefrostPower(0.0),
               DeltaFreezeKgFrost(0.0), DefEnergyFraction(0.0), DesignRefrigInventory(0.0), FanMinAirFlowRatio(0.0), HeaterPower(0.0),
               HotDefrostCondCredit(0.0), IceTemp(0.0), IceTempSaved(0.0), KgFrost(0.0), KgFrostSaved(0.0), MaxTemperatureDif(0.0),
