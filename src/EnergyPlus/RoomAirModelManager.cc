@@ -143,21 +143,6 @@ namespace RoomAirModelManager {
         using RoomAirModelUserTempPattern::ManageUserDefinedPatterns;
         using UFADManager::ManageUCSDUFModels;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        //		static bool GetAirModelData( true ); // Used to "get" all air model data
-
         // FLOW:
         if (GetAirModelData) {
             GetAirModelDatas(state);
@@ -463,15 +448,15 @@ namespace RoomAirModelManager {
             RoomAirPattern(thisPattern).TwoGradPatrn.HiGradient = rNumericArgs(6);
 
             if (UtilityRoutines::SameString(cAlphaArgs(2), "OutdoorDryBulbTemperature")) {
-                RoomAirPattern(thisPattern).TwoGradPatrn.InterpolationMode = OutdoorDryBulbMode;
+                RoomAirPattern(thisPattern).TwoGradPatrn.InterpolationMode = DataRoomAirModel::UserDefinedPatternMode::OutdoorDryBulbMode;
             } else if (UtilityRoutines::SameString(cAlphaArgs(2), "ZoneDryBulbTemperature")) {
-                RoomAirPattern(thisPattern).TwoGradPatrn.InterpolationMode = ZoneAirTempMode;
+                RoomAirPattern(thisPattern).TwoGradPatrn.InterpolationMode = DataRoomAirModel::UserDefinedPatternMode::ZoneAirTempMode;
             } else if (UtilityRoutines::SameString(cAlphaArgs(2), "ZoneAndOutdoorTemperatureDifference")) {
-                RoomAirPattern(thisPattern).TwoGradPatrn.InterpolationMode = DeltaOutdoorZone;
+                RoomAirPattern(thisPattern).TwoGradPatrn.InterpolationMode = DataRoomAirModel::UserDefinedPatternMode::DeltaOutdoorZone;
             } else if (UtilityRoutines::SameString(cAlphaArgs(2), "SensibleCoolingLoad")) {
-                RoomAirPattern(thisPattern).TwoGradPatrn.InterpolationMode = SensibleCoolingMode;
+                RoomAirPattern(thisPattern).TwoGradPatrn.InterpolationMode = DataRoomAirModel::UserDefinedPatternMode::SensibleCoolingMode;
             } else if (UtilityRoutines::SameString(cAlphaArgs(2), "SensibleHeatingLoad")) {
-                RoomAirPattern(thisPattern).TwoGradPatrn.InterpolationMode = SensibleHeatingMode;
+                RoomAirPattern(thisPattern).TwoGradPatrn.InterpolationMode = DataRoomAirModel::UserDefinedPatternMode::SensibleHeatingMode;
             } else {
                 ShowSevereError(state, "Invalid " + cAlphaFieldNames(2) + " = " + cAlphaArgs(2));
                 ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs(1));
@@ -490,16 +475,16 @@ namespace RoomAirModelManager {
                 ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs(1));
             }
             if ((RoomAirPattern(thisPattern).TwoGradPatrn.UpperBoundTempScale == RoomAirPattern(thisPattern).TwoGradPatrn.LowerBoundTempScale) &&
-                ((RoomAirPattern(thisPattern).TwoGradPatrn.InterpolationMode == OutdoorDryBulbMode) ||
-                 (RoomAirPattern(thisPattern).TwoGradPatrn.InterpolationMode == ZoneAirTempMode) ||
-                 (RoomAirPattern(thisPattern).TwoGradPatrn.InterpolationMode == DeltaOutdoorZone))) {
+                ((RoomAirPattern(thisPattern).TwoGradPatrn.InterpolationMode == DataRoomAirModel::UserDefinedPatternMode::OutdoorDryBulbMode) ||
+                 (RoomAirPattern(thisPattern).TwoGradPatrn.InterpolationMode == DataRoomAirModel::UserDefinedPatternMode::ZoneAirTempMode) ||
+                 (RoomAirPattern(thisPattern).TwoGradPatrn.InterpolationMode == DataRoomAirModel::UserDefinedPatternMode::DeltaOutdoorZone))) {
                 // throw error, will cause divide by zero when used for scaling
                 ShowSevereError(state, "Error in temperature scale in " + cCurrentModuleObject + ": " + cAlphaArgs(1));
                 ErrorsFound = true;
             }
             if ((RoomAirPattern(thisPattern).TwoGradPatrn.HiGradient == RoomAirPattern(thisPattern).TwoGradPatrn.LowGradient) &&
-                ((RoomAirPattern(thisPattern).TwoGradPatrn.InterpolationMode == SensibleCoolingMode) ||
-                 (RoomAirPattern(thisPattern).TwoGradPatrn.InterpolationMode == SensibleHeatingMode))) {
+                ((RoomAirPattern(thisPattern).TwoGradPatrn.InterpolationMode == DataRoomAirModel::UserDefinedPatternMode::SensibleCoolingMode) ||
+                 (RoomAirPattern(thisPattern).TwoGradPatrn.InterpolationMode == DataRoomAirModel::UserDefinedPatternMode::SensibleHeatingMode))) {
                 // throw error, will cause divide by zero when used for scaling
                 ShowSevereError(state, "Error in load scale in " + cCurrentModuleObject + ": " + cAlphaArgs(1));
                 ErrorsFound = true;

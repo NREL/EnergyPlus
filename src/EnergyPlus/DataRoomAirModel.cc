@@ -88,23 +88,11 @@ namespace DataRoomAirModel {
     int const RoomAirNode3(8);               // air node for vertical walls (for Rees&Haves Model)
     int const RoomAirNode4(9);               // air node for vertical walls (for Rees&Haves Model)
 
-    // user-defined pattern two gradient interplotation modes
-    int const OutdoorDryBulbMode(21);  // by outdoor air bulb.
-    int const SensibleCoolingMode(22); // by sensible cooling load
-    int const SensibleHeatingMode(23); // by sensible heating load
-    int const ZoneAirTempMode(24);     // by zone air temperature
-    int const DeltaOutdoorZone(25);    // by difference between zone and outdoor
-
     // user defined temperature pattern types
     int const ConstGradTempPattern(31);  // constant gradient in vertical direction
     int const TwoGradInterpPattern(32);  // two gradient interpolation
     int const NonDimenHeightPattern(33); // non-dimensionalized height
     int const SurfMapTempPattern(34);    // arbitrary surface mappings
-
-    // Parameters to indicate type of control for the UCSD UFAD interior zone model
-    // INTEGER, PARAMETER :: ConsFlow          = 1     ! constant supply air flow
-    // INTEGER, PARAMETER :: VarFlowConsPress  = 2     ! variable supply air flow, constant supply plenum pressure
-    // INTEGER, PARAMETER :: VarFlowVarPress   = 3     ! variable supply air flow, variable supply plenum pressure
 
     // parameters to indicate diffuser type
     int const Swirl(1);
@@ -117,21 +105,6 @@ namespace DataRoomAirModel {
     int const VComfort_Invalid(-1);
     int const VComfort_Jet(1);
     int const VComfort_Recirculation(2);
-
-    // DERIVED TYPE DEFINITIONS
-
-    // Air Node Data
-
-    // UCSD
-
-    // END UCSD
-
-    // begin NREL RoomAir DERIVED TYPES ******************************************
-
-    // end NREL room air derived types*********************************
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
 
     // MODULE VARIABLE DECLARATIONS:
     int TotNumOfAirNodes(0);

@@ -102,12 +102,15 @@ namespace DataRoomAirModel {
     extern int const RoomAirNode3;              // air node for vertical walls (for Rees&Haves Model)
     extern int const RoomAirNode4;              // air node for vertical walls (for Rees&Haves Model)
 
-    // user-defined pattern two gradient interplotation modes
-    extern int const OutdoorDryBulbMode;  // by outdoor air bulb.
-    extern int const SensibleCoolingMode; // by sensible cooling load
-    extern int const SensibleHeatingMode; // by sensible heating load
-    extern int const ZoneAirTempMode;     // by zone air temperature
-    extern int const DeltaOutdoorZone;    // by difference between zone and outdoor
+    // user-defined pattern two gradient interpolation modes
+    enum class UserDefinedPatternMode {
+        Unassigned,
+        OutdoorDryBulbMode,  // by outdoor air bulb.
+        SensibleCoolingMode, // by sensible cooling load
+        SensibleHeatingMode, // by sensible heating load
+        ZoneAirTempMode,     // by zone air temperature
+        DeltaOutdoorZone     // by difference between zone and outdoor
+    };
 
     // user defined temperature pattern types
     extern int const ConstGradTempPattern;  // constant gradient in vertical direction
@@ -481,7 +484,7 @@ namespace DataRoomAirModel {
         Real64 TexhaustHeight;          // height of exhaust air node where leaving zone
         Real64 LowGradient;             // lower value of vertical gradient [C/m]
         Real64 HiGradient;              // upper value of vertical gradient [C/m]
-        int InterpolationMode;          // control for interpolation mode
+        DataRoomAirModel::UserDefinedPatternMode InterpolationMode;          // control for interpolation mode
         Real64 UpperBoundTempScale;     // temperature value for HiGradient
         Real64 LowerBoundTempScale;     // temperature value for LowGradient
         Real64 UpperBoundHeatRateScale; // load value for HiGradient
@@ -489,7 +492,7 @@ namespace DataRoomAirModel {
 
         // Default Constructor
         TwoVertGradInterpolPattern()
-            : TstatHeight(0.0), TleavingHeight(0.0), TexhaustHeight(0.0), LowGradient(0.0), HiGradient(0.0), InterpolationMode(0),
+            : TstatHeight(0.0), TleavingHeight(0.0), TexhaustHeight(0.0), LowGradient(0.0), HiGradient(0.0), InterpolationMode(DataRoomAirModel::UserDefinedPatternMode::Unassigned),
               UpperBoundTempScale(0.0), LowerBoundTempScale(0.0), UpperBoundHeatRateScale(0.0), LowerBoundHeatRateScale(0.0)
         {
         }

@@ -592,7 +592,7 @@ namespace RoomAirModelUserTempPattern {
         {
             auto const SELECT_CASE_var(RoomAirPattern(PattrnID).TwoGradPatrn.InterpolationMode);
 
-            if (SELECT_CASE_var == OutdoorDryBulbMode) {
+            if (SELECT_CASE_var == DataRoomAirModel::UserDefinedPatternMode::OutdoorDryBulbMode) {
 
                 Grad = OutdoorDryBulbGrad(Zone(ZoneNum).OutDryBulbTemp,
                                           RoomAirPattern(PattrnID).TwoGradPatrn.UpperBoundTempScale,
@@ -600,7 +600,7 @@ namespace RoomAirModelUserTempPattern {
                                           RoomAirPattern(PattrnID).TwoGradPatrn.LowerBoundTempScale,
                                           RoomAirPattern(PattrnID).TwoGradPatrn.LowGradient);
 
-            } else if (SELECT_CASE_var == ZoneAirTempMode) {
+            } else if (SELECT_CASE_var == DataRoomAirModel::UserDefinedPatternMode::ZoneAirTempMode) {
 
                 if (Tmean >= RoomAirPattern(PattrnID).TwoGradPatrn.UpperBoundTempScale) {
                     Grad = RoomAirPattern(PattrnID).TwoGradPatrn.HiGradient;
@@ -623,7 +623,7 @@ namespace RoomAirModelUserTempPattern {
                     }
                 }
 
-            } else if (SELECT_CASE_var == DeltaOutdoorZone) {
+            } else if (SELECT_CASE_var == DataRoomAirModel::UserDefinedPatternMode::DeltaOutdoorZone) {
                 DeltaT = Zone(ZoneNum).OutDryBulbTemp - Tmean;
                 if (DeltaT >= RoomAirPattern(PattrnID).TwoGradPatrn.UpperBoundTempScale) {
                     Grad = RoomAirPattern(PattrnID).TwoGradPatrn.HiGradient;
@@ -646,7 +646,7 @@ namespace RoomAirModelUserTempPattern {
                     }
                 }
 
-            } else if (SELECT_CASE_var == SensibleCoolingMode) {
+            } else if (SELECT_CASE_var == DataRoomAirModel::UserDefinedPatternMode::SensibleCoolingMode) {
 
                 CoolLoad = SNLoadCoolRate(ZoneNum);
                 if (CoolLoad >= RoomAirPattern(PattrnID).TwoGradPatrn.UpperBoundHeatRateScale) {
@@ -669,7 +669,7 @@ namespace RoomAirModelUserTempPattern {
                     }
                 }
 
-            } else if (SELECT_CASE_var == SensibleHeatingMode) {
+            } else if (SELECT_CASE_var == DataRoomAirModel::UserDefinedPatternMode::SensibleHeatingMode) {
 
                 HeatLoad = SNLoadHeatRate(ZoneNum);
                 if (HeatLoad >= RoomAirPattern(PattrnID).TwoGradPatrn.UpperBoundHeatRateScale) {
