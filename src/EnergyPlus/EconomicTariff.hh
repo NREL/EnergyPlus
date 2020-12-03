@@ -63,33 +63,17 @@ struct EnergyPlusData;
 
 namespace EconomicTariff {
 
-    //extern int const kindUnknown;
-    //extern int const kindTariff;
-    //extern int const kindQualify;
-    //extern int const kindChargeSimple;
-    //extern int const kindChargeBlock;
-    //extern int const kindRatchet;
-    //extern int const kindVariable;
-    //extern int const kindComputation;
-    //extern int const kindCategory;
-    //extern int const kindNative;
-    //extern int const kindAssignCompute;
-
-    enum class kind
-    {
-        kindUnknown,
-        kindTariff,
-        kindQualify,
-        kindChargeSimple,
-        kindChargeBlock,
-        kindRatchet,
-        kindVariable,
-        kindComputation,
-        kindCategory,
-        kindNative,
-        kindAssignCompute,
-    
-    };
+    extern int const kindUnknown;
+    extern int const kindTariff;
+    extern int const kindQualify;
+    extern int const kindChargeSimple;
+    extern int const kindChargeBlock;
+    extern int const kindRatchet;
+    extern int const kindVariable;
+    extern int const kindComputation;
+    extern int const kindCategory;
+    extern int const kindNative;
+    extern int const kindAssignCompute;
 
     extern int const conversionUSERDEF;
     extern int const conversionKWH;
@@ -291,7 +275,7 @@ namespace EconomicTariff {
         // Members
         std::string name;       // name of the economics object or variable
         int tariffIndx;         // index of the tariff name in the tariff array
-        kind kindOfObj;          // enumerated list for the kind of economics object
+        int kindOfObj;          // enumerated list for the kind of economics object
         int index;              // pointer to item in specific array
         Array1D<Real64> values; // values
         // the following items are not part of the object description
@@ -312,7 +296,7 @@ namespace EconomicTariff {
 
         // Default Constructor
         EconVarType()
-            : tariffIndx(0), kindOfObj(kind::kindUnknown), index(0), values(MaxNumMonths, 0.0), isArgument(false), isAssigned(false), specific(0), cntMeDependOn(0),
+            : tariffIndx(0), kindOfObj(0), index(0), values(MaxNumMonths, 0.0), isArgument(false), isAssigned(false), specific(0), cntMeDependOn(0),
               Operator(0), firstOperand(0), lastOperand(0), activeNow(false), isEvaluated(false), isReported(false), varUnitType(0)
         {
         }
@@ -617,7 +601,7 @@ namespace EconomicTariff {
                          bool const flagIfNotNumeric,
                          int const useOfVar,
                          int const varSpecific,
-                         kind econObjKind,
+                         int const econObjKind,
                          int const objIndex,
                          int const tariffPt);
 

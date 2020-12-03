@@ -86,17 +86,17 @@ namespace EconomicTariff {
 
     // ECONOMCIS:TARIFF enumerated lists
 
-    //int const kindUnknown(0);
-    //int const kindTariff(1);
-    //int const kindQualify(2);
-    //int const kindChargeSimple(3);
-    //int const kindChargeBlock(4);
-    //int const kindRatchet(5);
-    //int const kindVariable(6);
-    //int const kindComputation(7);
-    //int const kindCategory(8);
-    //int const kindNative(9);
-    //int const kindAssignCompute(10);
+    int const kindUnknown(0);
+    int const kindTariff(1);
+    int const kindQualify(2);
+    int const kindChargeSimple(3);
+    int const kindChargeBlock(4);
+    int const kindRatchet(5);
+    int const kindVariable(6);
+    int const kindComputation(7);
+    int const kindCategory(8);
+    int const kindNative(9);
+    int const kindAssignCompute(10);
 
     int const conversionUSERDEF(0);
     int const conversionKWH(1);
@@ -775,14 +775,14 @@ namespace EconomicTariff {
             }
             // monthly charge
             tariff(iInObj).monthChgVal = UtilityRoutines::ProcessNumber(cAlphaArgs(8), isNotNumeric);
-            tariff(iInObj).monthChgPt = AssignVariablePt(state, cAlphaArgs(8), isNotNumeric, varIsArgument, varNotYetDefined, kind::kindUnknown, 0, iInObj);
+            tariff(iInObj).monthChgPt = AssignVariablePt(state, cAlphaArgs(8), isNotNumeric, varIsArgument, varNotYetDefined, kindUnknown, 0, iInObj);
             // minimum monthly charge
             if (len(cAlphaArgs(9)) > 0) {
                 tariff(iInObj).minMonthChgVal = UtilityRoutines::ProcessNumber(cAlphaArgs(9), isNotNumeric);
             } else {
                 tariff(iInObj).minMonthChgVal = -HUGE_(-1.0); // set to a very negative value
             }
-            tariff(iInObj).minMonthChgPt = AssignVariablePt(state, cAlphaArgs(9), isNotNumeric, varIsArgument, varNotYetDefined, kind::kindUnknown, 0, iInObj);
+            tariff(iInObj).minMonthChgPt = AssignVariablePt(state, cAlphaArgs(9), isNotNumeric, varIsArgument, varNotYetDefined, kindUnknown, 0, iInObj);
             // real time pricing
             tariff(iInObj).chargeSchedule = cAlphaArgs(10);
             tariff(iInObj).chargeSchIndex = GetScheduleIndex(state, cAlphaArgs(10));
@@ -890,10 +890,10 @@ namespace EconomicTariff {
             qualify(iInObj).tariffIndx = FindTariffIndex(state, cAlphaArgs(2), cAlphaArgs(1), ErrorsFound, CurrentModuleObject);
             warnIfNativeVarname(state, cAlphaArgs(1), qualify(iInObj).tariffIndx, ErrorsFound, CurrentModuleObject);
             qualify(iInObj).namePt =
-                AssignVariablePt(state, cAlphaArgs(1), true, varIsAssigned, varNotYetDefined, kind::kindQualify, iInObj, qualify(iInObj).tariffIndx);
+                AssignVariablePt(state, cAlphaArgs(1), true, varIsAssigned, varNotYetDefined, kindQualify, iInObj, qualify(iInObj).tariffIndx);
             // index of the variable in the variable array
             qualify(iInObj).sourcePt =
-                AssignVariablePt(state, cAlphaArgs(3), true, varIsArgument, varNotYetDefined, kind::kindUnknown, 0, qualify(iInObj).tariffIndx);
+                AssignVariablePt(state, cAlphaArgs(3), true, varIsArgument, varNotYetDefined, kindUnknown, 0, qualify(iInObj).tariffIndx);
             // indicator if maximum test otherwise minimum
             if (UtilityRoutines::SameString(cAlphaArgs(4), "Minimum")) {
                 qualify(iInObj).isMaximum = false;
@@ -908,7 +908,7 @@ namespace EconomicTariff {
             // value of the threshold
             qualify(iInObj).thresholdVal = UtilityRoutines::ProcessNumber(cAlphaArgs(5), isNotNumeric);
             qualify(iInObj).thresholdPt =
-                AssignVariablePt(state, cAlphaArgs(5), isNotNumeric, varIsArgument, varNotYetDefined, kind::kindUnknown, 0, qualify(iInObj).tariffIndx);
+                AssignVariablePt(state, cAlphaArgs(5), isNotNumeric, varIsArgument, varNotYetDefined, kindUnknown, 0, qualify(iInObj).tariffIndx);
             // enumerated list of the kind of season
             qualify(iInObj).season = LookUpSeason(state, cAlphaArgs(6), cAlphaArgs(1));
             // indicator if consecutive months otherwise count
@@ -972,10 +972,10 @@ namespace EconomicTariff {
             chargeSimple(iInObj).tariffIndx = FindTariffIndex(state, cAlphaArgs(2), cAlphaArgs(1), ErrorsFound, CurrentModuleObject);
             warnIfNativeVarname(state, cAlphaArgs(1), chargeSimple(iInObj).tariffIndx, ErrorsFound, CurrentModuleObject);
             chargeSimple(iInObj).namePt =
-                AssignVariablePt(state, cAlphaArgs(1), true, varIsAssigned, varNotYetDefined, kind::kindChargeSimple, iInObj, chargeSimple(iInObj).tariffIndx);
+                AssignVariablePt(state, cAlphaArgs(1), true, varIsAssigned, varNotYetDefined, kindChargeSimple, iInObj, chargeSimple(iInObj).tariffIndx);
             // index of the variable in the variable array
             chargeSimple(iInObj).sourcePt =
-                AssignVariablePt(state, cAlphaArgs(3), true, varIsArgument, varNotYetDefined, kind::kindUnknown, 0, chargeSimple(iInObj).tariffIndx);
+                AssignVariablePt(state, cAlphaArgs(3), true, varIsArgument, varNotYetDefined, kindUnknown, 0, chargeSimple(iInObj).tariffIndx);
             // enumerated list of the kind of season
             chargeSimple(iInObj).season = LookUpSeason(state, cAlphaArgs(4), cAlphaArgs(1));
             // check to make sure a seasonal schedule is specified if the season is not annual
@@ -990,11 +990,11 @@ namespace EconomicTariff {
             }
             // index of the category in the variable array
             chargeSimple(iInObj).categoryPt =
-                AssignVariablePt(state, cAlphaArgs(5), true, varIsAssigned, varNotYetDefined, kind::kindCategory, iInObj, chargeSimple(iInObj).tariffIndx);
+                AssignVariablePt(state, cAlphaArgs(5), true, varIsAssigned, varNotYetDefined, kindCategory, iInObj, chargeSimple(iInObj).tariffIndx);
             // cost per unit value or variable
             chargeSimple(iInObj).costPerVal = UtilityRoutines::ProcessNumber(cAlphaArgs(6), isNotNumeric);
             chargeSimple(iInObj).costPerPt =
-                AssignVariablePt(state, cAlphaArgs(6), isNotNumeric, varIsArgument, varNotYetDefined, kind::kindUnknown, 0, chargeSimple(iInObj).tariffIndx);
+                AssignVariablePt(state, cAlphaArgs(6), isNotNumeric, varIsArgument, varNotYetDefined, kindUnknown, 0, chargeSimple(iInObj).tariffIndx);
         }
     }
 
@@ -1047,10 +1047,10 @@ namespace EconomicTariff {
             chargeBlock(iInObj).tariffIndx = FindTariffIndex(state, cAlphaArgs(2), cAlphaArgs(1), ErrorsFound, CurrentModuleObject);
             warnIfNativeVarname(state, cAlphaArgs(1), chargeBlock(iInObj).tariffIndx, ErrorsFound, CurrentModuleObject);
             chargeBlock(iInObj).namePt =
-                AssignVariablePt(state, cAlphaArgs(1), true, varIsAssigned, varNotYetDefined, kind::kindChargeBlock, iInObj, chargeBlock(iInObj).tariffIndx);
+                AssignVariablePt(state, cAlphaArgs(1), true, varIsAssigned, varNotYetDefined, kindChargeBlock, iInObj, chargeBlock(iInObj).tariffIndx);
             // index of the variable in the variable array
             chargeBlock(iInObj).sourcePt =
-                AssignVariablePt(state, cAlphaArgs(3), true, varIsArgument, varNotYetDefined, kind::kindUnknown, 0, chargeBlock(iInObj).tariffIndx);
+                AssignVariablePt(state, cAlphaArgs(3), true, varIsArgument, varNotYetDefined, kindUnknown, 0, chargeBlock(iInObj).tariffIndx);
             // enumerated list of the kind of season
             chargeBlock(iInObj).season = LookUpSeason(state, cAlphaArgs(4), cAlphaArgs(1));
             // check to make sure a seasonal schedule is specified if the season is not annual
@@ -1065,10 +1065,10 @@ namespace EconomicTariff {
             }
             // index of the category in the variable array
             chargeBlock(iInObj).categoryPt =
-                AssignVariablePt(state, cAlphaArgs(5), true, varIsAssigned, varNotYetDefined, kind::kindCategory, iInObj, chargeBlock(iInObj).tariffIndx);
+                AssignVariablePt(state, cAlphaArgs(5), true, varIsAssigned, varNotYetDefined, kindCategory, iInObj, chargeBlock(iInObj).tariffIndx);
             // index of the remaining into variable in the variable array
             chargeBlock(iInObj).remainingPt =
-                AssignVariablePt(state, cAlphaArgs(6), true, varIsAssigned, varNotYetDefined, kind::kindCategory, iInObj, chargeBlock(iInObj).tariffIndx);
+                AssignVariablePt(state, cAlphaArgs(6), true, varIsAssigned, varNotYetDefined, kindCategory, iInObj, chargeBlock(iInObj).tariffIndx);
             // block size multiplier
             if (len(cAlphaArgs(7)) == 0) {              // if blank
                 chargeBlock(iInObj).blkSzMultVal = 1.0; // default is 1 if left blank
@@ -1076,7 +1076,7 @@ namespace EconomicTariff {
             } else {
                 chargeBlock(iInObj).blkSzMultVal = UtilityRoutines::ProcessNumber(cAlphaArgs(7), isNotNumeric);
                 chargeBlock(iInObj).blkSzMultPt =
-                    AssignVariablePt(state, cAlphaArgs(7), isNotNumeric, varIsArgument, varNotYetDefined, kind::kindUnknown, 0, chargeBlock(iInObj).tariffIndx);
+                    AssignVariablePt(state, cAlphaArgs(7), isNotNumeric, varIsArgument, varNotYetDefined, kindUnknown, 0, chargeBlock(iInObj).tariffIndx);
             }
             // number of blocks used
             chargeBlock(iInObj).numBlk = (NumAlphas - 7) / 2;
@@ -1091,12 +1091,12 @@ namespace EconomicTariff {
                     chargeBlock(iInObj).blkSzVal(jBlk) = UtilityRoutines::ProcessNumber(cAlphaArgs(alphaOffset + 1), isNotNumeric);
 
                     chargeBlock(iInObj).blkSzPt(jBlk) = AssignVariablePt(state,
-                        cAlphaArgs(alphaOffset + 1), isNotNumeric, varIsArgument, varNotYetDefined, kind::kindUnknown, 0, chargeBlock(iInObj).tariffIndx);
+                        cAlphaArgs(alphaOffset + 1), isNotNumeric, varIsArgument, varNotYetDefined, kindUnknown, 0, chargeBlock(iInObj).tariffIndx);
                 }
                 // array of block cost
                 chargeBlock(iInObj).blkCostVal(jBlk) = UtilityRoutines::ProcessNumber(cAlphaArgs(alphaOffset + 2), isNotNumeric);
                 chargeBlock(iInObj).blkCostPt(jBlk) = AssignVariablePt(state,
-                    cAlphaArgs(alphaOffset + 2), isNotNumeric, varIsArgument, varNotYetDefined, kind::kindUnknown, 0, chargeBlock(iInObj).tariffIndx);
+                    cAlphaArgs(alphaOffset + 2), isNotNumeric, varIsArgument, varNotYetDefined, kindUnknown, 0, chargeBlock(iInObj).tariffIndx);
             }
         }
     }
@@ -1146,24 +1146,24 @@ namespace EconomicTariff {
             ratchet(iInObj).tariffIndx = FindTariffIndex(state, cAlphaArgs(2), cAlphaArgs(1), ErrorsFound, CurrentModuleObject);
             warnIfNativeVarname(state, cAlphaArgs(1), ratchet(iInObj).tariffIndx, ErrorsFound, CurrentModuleObject);
             ratchet(iInObj).namePt =
-                AssignVariablePt(state, cAlphaArgs(1), true, varIsAssigned, varNotYetDefined, kind::kindRatchet, iInObj, ratchet(iInObj).tariffIndx);
+                AssignVariablePt(state, cAlphaArgs(1), true, varIsAssigned, varNotYetDefined, kindRatchet, iInObj, ratchet(iInObj).tariffIndx);
             // index of the variable in the variable array
             ratchet(iInObj).baselinePt =
-                AssignVariablePt(state, cAlphaArgs(3), true, varIsArgument, varNotYetDefined, kind::kindRatchet, iInObj, ratchet(iInObj).tariffIndx);
+                AssignVariablePt(state, cAlphaArgs(3), true, varIsArgument, varNotYetDefined, kindRatchet, iInObj, ratchet(iInObj).tariffIndx);
             // index of the variable in the variable array
             ratchet(iInObj).adjustmentPt =
-                AssignVariablePt(state, cAlphaArgs(4), true, varIsArgument, varNotYetDefined, kind::kindRatchet, iInObj, ratchet(iInObj).tariffIndx);
+                AssignVariablePt(state, cAlphaArgs(4), true, varIsArgument, varNotYetDefined, kindRatchet, iInObj, ratchet(iInObj).tariffIndx);
             // seasons to and from
             ratchet(iInObj).seasonFrom = LookUpSeason(state, cAlphaArgs(5), cAlphaArgs(1));
             ratchet(iInObj).seasonTo = LookUpSeason(state, cAlphaArgs(6), cAlphaArgs(1));
             // ratchet multiplier
             ratchet(iInObj).multiplierVal = UtilityRoutines::ProcessNumber(cAlphaArgs(7), isNotNumeric);
             ratchet(iInObj).multiplierPt =
-                AssignVariablePt(state, cAlphaArgs(7), isNotNumeric, varIsArgument, varNotYetDefined, kind::kindUnknown, 0, ratchet(iInObj).tariffIndx);
+                AssignVariablePt(state, cAlphaArgs(7), isNotNumeric, varIsArgument, varNotYetDefined, kindUnknown, 0, ratchet(iInObj).tariffIndx);
             // ratchet offset
             ratchet(iInObj).offsetVal = UtilityRoutines::ProcessNumber(cAlphaArgs(8), isNotNumeric);
             ratchet(iInObj).offsetPt =
-                AssignVariablePt(state, cAlphaArgs(8), isNotNumeric, varIsArgument, varNotYetDefined, kind::kindUnknown, 0, ratchet(iInObj).tariffIndx);
+                AssignVariablePt(state, cAlphaArgs(8), isNotNumeric, varIsArgument, varNotYetDefined, kindUnknown, 0, ratchet(iInObj).tariffIndx);
         }
     }
 
@@ -1212,7 +1212,7 @@ namespace EconomicTariff {
                 }
             }
             tariffPt = FindTariffIndex(state, cAlphaArgs(2), cAlphaArgs(1), ErrorsFound, CurrentModuleObject);
-            variablePt = AssignVariablePt(state, cAlphaArgs(1), true, varIsArgument, varUserDefined, kind::kindVariable, iInObj, tariffPt);
+            variablePt = AssignVariablePt(state, cAlphaArgs(1), true, varIsArgument, varUserDefined, kindVariable, iInObj, tariffPt);
             warnIfNativeVarname(state, cAlphaArgs(1), tariffPt, ErrorsFound, CurrentModuleObject);
             // validate the kind of variable - not used internally except for validation
             if (UtilityRoutines::SameString(cAlphaArgs(3), "ENERGY")) {
@@ -1404,9 +1404,9 @@ namespace EconomicTariff {
             if (token == 0) {
                 // see if argument or assignment (assignment will be first string on line)
                 if (endOfWord != std::string::npos) {
-                    token = AssignVariablePt(state, word, true, varIsArgument, varNotYetDefined, kind::kindUnknown, 0, fromTariff);
+                    token = AssignVariablePt(state, word, true, varIsArgument, varNotYetDefined, kindUnknown, 0, fromTariff);
                 } else {
-                    token = AssignVariablePt(state, word, true, varIsAssigned, varNotYetDefined, kind::kindAssignCompute, 0, fromTariff);
+                    token = AssignVariablePt(state, word, true, varIsAssigned, varNotYetDefined, kindAssignCompute, 0, fromTariff);
                 }
             }
             // if a token is found then put it into step array
@@ -1977,7 +1977,7 @@ namespace EconomicTariff {
                          bool const flagIfNotNumeric,
                          int const useOfVar,
                          int const varSpecific,
-                         kind econObjKind,
+                         int const econObjKind,
                          int const objIndex,
                          int const tariffPt)
     {
@@ -2010,7 +2010,7 @@ namespace EconomicTariff {
             }
             if (found > 0) {
                 AssignVariablePt = found;
-                if (econVar(found).kindOfObj == kind::kindUnknown) {
+                if (econVar(found).kindOfObj == 0) {
                     econVar(found).kindOfObj = econObjKind;
                     if (econVar(found).index == 0) econVar(found).index = objIndex;
                 }
@@ -2063,7 +2063,7 @@ namespace EconomicTariff {
         // initialize new record) //Autodesk Most of these match default initialization so not needed
         econVar(numEconVar).name = "";
         econVar(numEconVar).tariffIndx = 0;
-        econVar(numEconVar).kindOfObj = kind::kindUnknown;
+        econVar(numEconVar).kindOfObj = 0;
         econVar(numEconVar).index = 0;
         econVar(numEconVar).values = 0.0;
         econVar(numEconVar).isArgument = false;
@@ -2140,79 +2140,79 @@ namespace EconomicTariff {
 
         for (iTariff = 1; iTariff <= numTariff; ++iTariff) {
             // category variables first
-            tariff(iTariff).ptEnergyCharges = AssignVariablePt(state, "EnergyCharges", true, varIsAssigned, catEnergyCharges, kind::kindCategory, 0, iTariff);
+            tariff(iTariff).ptEnergyCharges = AssignVariablePt(state, "EnergyCharges", true, varIsAssigned, catEnergyCharges, kindCategory, 0, iTariff);
             tariff(iTariff).firstCategory = numEconVar;
-            tariff(iTariff).ptDemandCharges = AssignVariablePt(state, "DemandCharges", true, varIsAssigned, catDemandCharges, kind::kindCategory, 0, iTariff);
-            tariff(iTariff).ptServiceCharges = AssignVariablePt(state, "ServiceCharges", true, varIsAssigned, catServiceCharges, kind::kindCategory, 0, iTariff);
-            tariff(iTariff).ptBasis = AssignVariablePt(state, "Basis", true, varIsAssigned, catBasis, kind::kindCategory, 0, iTariff);
-            tariff(iTariff).ptAdjustment = AssignVariablePt(state, "Adjustment", true, varIsAssigned, catAdjustment, kind::kindCategory, 0, iTariff);
-            tariff(iTariff).ptSurcharge = AssignVariablePt(state, "Surcharge", true, varIsAssigned, catSurcharge, kind::kindCategory, 0, iTariff);
-            tariff(iTariff).ptSubtotal = AssignVariablePt(state, "Subtotal", true, varIsAssigned, catSubtotal, kind::kindCategory, 0, iTariff);
-            tariff(iTariff).ptTaxes = AssignVariablePt(state, "Taxes", true, varIsAssigned, catTaxes, kind::kindCategory, 0, iTariff);
-            tariff(iTariff).ptTotal = AssignVariablePt(state, "Total", true, varIsAssigned, catTotal, kind::kindCategory, 0, iTariff);
-            tariff(iTariff).ptNotIncluded = AssignVariablePt(state, "NotIncluded", true, varIsAssigned, catNotIncluded, kind::kindCategory, 0, iTariff);
+            tariff(iTariff).ptDemandCharges = AssignVariablePt(state, "DemandCharges", true, varIsAssigned, catDemandCharges, kindCategory, 0, iTariff);
+            tariff(iTariff).ptServiceCharges = AssignVariablePt(state, "ServiceCharges", true, varIsAssigned, catServiceCharges, kindCategory, 0, iTariff);
+            tariff(iTariff).ptBasis = AssignVariablePt(state, "Basis", true, varIsAssigned, catBasis, kindCategory, 0, iTariff);
+            tariff(iTariff).ptAdjustment = AssignVariablePt(state, "Adjustment", true, varIsAssigned, catAdjustment, kindCategory, 0, iTariff);
+            tariff(iTariff).ptSurcharge = AssignVariablePt(state, "Surcharge", true, varIsAssigned, catSurcharge, kindCategory, 0, iTariff);
+            tariff(iTariff).ptSubtotal = AssignVariablePt(state, "Subtotal", true, varIsAssigned, catSubtotal, kindCategory, 0, iTariff);
+            tariff(iTariff).ptTaxes = AssignVariablePt(state, "Taxes", true, varIsAssigned, catTaxes, kindCategory, 0, iTariff);
+            tariff(iTariff).ptTotal = AssignVariablePt(state, "Total", true, varIsAssigned, catTotal, kindCategory, 0, iTariff);
+            tariff(iTariff).ptNotIncluded = AssignVariablePt(state, "NotIncluded", true, varIsAssigned, catNotIncluded, kindCategory, 0, iTariff);
             tariff(iTariff).lastCategory = numEconVar;
             // category variables first
-            tariff(iTariff).nativeTotalEnergy = AssignVariablePt(state, "TotalEnergy", true, varIsArgument, nativeTotalEnergy, kind::kindNative, 0, iTariff);
+            tariff(iTariff).nativeTotalEnergy = AssignVariablePt(state, "TotalEnergy", true, varIsArgument, nativeTotalEnergy, kindNative, 0, iTariff);
             tariff(iTariff).firstNative = numEconVar;
-            tariff(iTariff).nativeTotalDemand = AssignVariablePt(state, "TotalDemand", true, varIsArgument, nativeTotalDemand, kind::kindNative, 0, iTariff);
-            tariff(iTariff).nativePeakEnergy = AssignVariablePt(state, "PeakEnergy", true, varIsArgument, nativePeakEnergy, kind::kindNative, 0, iTariff);
-            tariff(iTariff).nativePeakDemand = AssignVariablePt(state, "PeakDemand", true, varIsArgument, nativePeakDemand, kind::kindNative, 0, iTariff);
+            tariff(iTariff).nativeTotalDemand = AssignVariablePt(state, "TotalDemand", true, varIsArgument, nativeTotalDemand, kindNative, 0, iTariff);
+            tariff(iTariff).nativePeakEnergy = AssignVariablePt(state, "PeakEnergy", true, varIsArgument, nativePeakEnergy, kindNative, 0, iTariff);
+            tariff(iTariff).nativePeakDemand = AssignVariablePt(state, "PeakDemand", true, varIsArgument, nativePeakDemand, kindNative, 0, iTariff);
             tariff(iTariff).nativeShoulderEnergy =
-                AssignVariablePt(state, "ShoulderEnergy", true, varIsArgument, nativeShoulderEnergy, kind::kindNative, 0, iTariff);
+                AssignVariablePt(state, "ShoulderEnergy", true, varIsArgument, nativeShoulderEnergy, kindNative, 0, iTariff);
             tariff(iTariff).nativeShoulderDemand =
-                AssignVariablePt(state, "ShoulderDemand", true, varIsArgument, nativeShoulderDemand, kind::kindNative, 0, iTariff);
-            tariff(iTariff).nativeOffPeakEnergy = AssignVariablePt(state, "OffPeakEnergy", true, varIsArgument, nativeOffPeakEnergy, kind::kindNative, 0, iTariff);
-            tariff(iTariff).nativeOffPeakDemand = AssignVariablePt(state, "OffPeakDemand", true, varIsArgument, nativeOffPeakDemand, kind::kindNative, 0, iTariff);
-            tariff(iTariff).nativeMidPeakEnergy = AssignVariablePt(state, "MidPeakEnergy", true, varIsArgument, nativeMidPeakEnergy, kind::kindNative, 0, iTariff);
-            tariff(iTariff).nativeMidPeakDemand = AssignVariablePt(state, "MidPeakDemand", true, varIsArgument, nativeMidPeakDemand, kind::kindNative, 0, iTariff);
+                AssignVariablePt(state, "ShoulderDemand", true, varIsArgument, nativeShoulderDemand, kindNative, 0, iTariff);
+            tariff(iTariff).nativeOffPeakEnergy = AssignVariablePt(state, "OffPeakEnergy", true, varIsArgument, nativeOffPeakEnergy, kindNative, 0, iTariff);
+            tariff(iTariff).nativeOffPeakDemand = AssignVariablePt(state, "OffPeakDemand", true, varIsArgument, nativeOffPeakDemand, kindNative, 0, iTariff);
+            tariff(iTariff).nativeMidPeakEnergy = AssignVariablePt(state, "MidPeakEnergy", true, varIsArgument, nativeMidPeakEnergy, kindNative, 0, iTariff);
+            tariff(iTariff).nativeMidPeakDemand = AssignVariablePt(state, "MidPeakDemand", true, varIsArgument, nativeMidPeakDemand, kindNative, 0, iTariff);
             tariff(iTariff).nativePeakExceedsOffPeak =
-                AssignVariablePt(state, "PeakExceedsOffPeak", true, varIsArgument, nativePeakExceedsOffPeak, kind::kindNative, 0, iTariff);
+                AssignVariablePt(state, "PeakExceedsOffPeak", true, varIsArgument, nativePeakExceedsOffPeak, kindNative, 0, iTariff);
             tariff(iTariff).nativeOffPeakExceedsPeak =
-                AssignVariablePt(state, "OffPeakExceedsPeak", true, varIsArgument, nativeOffPeakExceedsPeak, kind::kindNative, 0, iTariff);
+                AssignVariablePt(state, "OffPeakExceedsPeak", true, varIsArgument, nativeOffPeakExceedsPeak, kindNative, 0, iTariff);
             tariff(iTariff).nativePeakExceedsMidPeak =
-                AssignVariablePt(state, "PeakExceedsMidPeak", true, varIsArgument, nativePeakExceedsMidPeak, kind::kindNative, 0, iTariff);
+                AssignVariablePt(state, "PeakExceedsMidPeak", true, varIsArgument, nativePeakExceedsMidPeak, kindNative, 0, iTariff);
             tariff(iTariff).nativeMidPeakExceedsPeak =
-                AssignVariablePt(state, "MidPeakExceedsPeak", true, varIsArgument, nativeMidPeakExceedsPeak, kind::kindNative, 0, iTariff);
+                AssignVariablePt(state, "MidPeakExceedsPeak", true, varIsArgument, nativeMidPeakExceedsPeak, kindNative, 0, iTariff);
             tariff(iTariff).nativePeakExceedsShoulder =
-                AssignVariablePt(state, "PeakExceedsShoulder", true, varIsArgument, nativePeakExceedsShoulder, kind::kindNative, 0, iTariff);
+                AssignVariablePt(state, "PeakExceedsShoulder", true, varIsArgument, nativePeakExceedsShoulder, kindNative, 0, iTariff);
             tariff(iTariff).nativeShoulderExceedsPeak =
-                AssignVariablePt(state, "ShoulderExceedsPeak", true, varIsArgument, nativeShoulderExceedsPeak, kind::kindNative, 0, iTariff);
-            tariff(iTariff).nativeIsWinter = AssignVariablePt(state, "IsWinter", true, varIsArgument, nativeIsWinter, kind::kindNative, 0, iTariff);
-            tariff(iTariff).nativeIsNotWinter = AssignVariablePt(state, "IsNotWinter", true, varIsArgument, nativeIsNotWinter, kind::kindNative, 0, iTariff);
-            tariff(iTariff).nativeIsSpring = AssignVariablePt(state, "IsSpring", true, varIsArgument, nativeIsSpring, kind::kindNative, 0, iTariff);
-            tariff(iTariff).nativeIsNotSpring = AssignVariablePt(state, "IsNotSpring", true, varIsArgument, nativeIsNotSpring, kind::kindNative, 0, iTariff);
-            tariff(iTariff).nativeIsSummer = AssignVariablePt(state, "IsSummer", true, varIsArgument, nativeIsSummer, kind::kindNative, 0, iTariff);
-            tariff(iTariff).nativeIsNotSummer = AssignVariablePt(state, "IsNotSummer", true, varIsArgument, nativeIsNotSummer, kind::kindNative, 0, iTariff);
-            tariff(iTariff).nativeIsAutumn = AssignVariablePt(state, "IsAutumn", true, varIsArgument, nativeIsAutumn, kind::kindNative, 0, iTariff);
-            tariff(iTariff).nativeIsNotAutumn = AssignVariablePt(state, "IsNotAutumn", true, varIsArgument, nativeIsNotAutumn, kind::kindNative, 0, iTariff);
+                AssignVariablePt(state, "ShoulderExceedsPeak", true, varIsArgument, nativeShoulderExceedsPeak, kindNative, 0, iTariff);
+            tariff(iTariff).nativeIsWinter = AssignVariablePt(state, "IsWinter", true, varIsArgument, nativeIsWinter, kindNative, 0, iTariff);
+            tariff(iTariff).nativeIsNotWinter = AssignVariablePt(state, "IsNotWinter", true, varIsArgument, nativeIsNotWinter, kindNative, 0, iTariff);
+            tariff(iTariff).nativeIsSpring = AssignVariablePt(state, "IsSpring", true, varIsArgument, nativeIsSpring, kindNative, 0, iTariff);
+            tariff(iTariff).nativeIsNotSpring = AssignVariablePt(state, "IsNotSpring", true, varIsArgument, nativeIsNotSpring, kindNative, 0, iTariff);
+            tariff(iTariff).nativeIsSummer = AssignVariablePt(state, "IsSummer", true, varIsArgument, nativeIsSummer, kindNative, 0, iTariff);
+            tariff(iTariff).nativeIsNotSummer = AssignVariablePt(state, "IsNotSummer", true, varIsArgument, nativeIsNotSummer, kindNative, 0, iTariff);
+            tariff(iTariff).nativeIsAutumn = AssignVariablePt(state, "IsAutumn", true, varIsArgument, nativeIsAutumn, kindNative, 0, iTariff);
+            tariff(iTariff).nativeIsNotAutumn = AssignVariablePt(state, "IsNotAutumn", true, varIsArgument, nativeIsNotAutumn, kindNative, 0, iTariff);
 
             tariff(iTariff).nativePeakAndShoulderEnergy =
-                AssignVariablePt(state, "PeakAndShoulderEnergy", true, varIsArgument, nativePeakAndShoulderEnergy, kind::kindNative, 0, iTariff);
+                AssignVariablePt(state, "PeakAndShoulderEnergy", true, varIsArgument, nativePeakAndShoulderEnergy, kindNative, 0, iTariff);
             tariff(iTariff).nativePeakAndShoulderDemand =
-                AssignVariablePt(state, "PeakAndShoulderDemand", true, varIsArgument, nativePeakAndShoulderDemand, kind::kindNative, 0, iTariff);
+                AssignVariablePt(state, "PeakAndShoulderDemand", true, varIsArgument, nativePeakAndShoulderDemand, kindNative, 0, iTariff);
             tariff(iTariff).nativePeakAndMidPeakEnergy =
-                AssignVariablePt(state, "PeakAndMidPeakEnergy", true, varIsArgument, nativePeakAndMidPeakEnergy, kind::kindNative, 0, iTariff);
+                AssignVariablePt(state, "PeakAndMidPeakEnergy", true, varIsArgument, nativePeakAndMidPeakEnergy, kindNative, 0, iTariff);
             tariff(iTariff).nativePeakAndMidPeakDemand =
-                AssignVariablePt(state, "PeakAndMidPeakDemand", true, varIsArgument, nativePeakAndMidPeakDemand, kind::kindNative, 0, iTariff);
+                AssignVariablePt(state, "PeakAndMidPeakDemand", true, varIsArgument, nativePeakAndMidPeakDemand, kindNative, 0, iTariff);
             tariff(iTariff).nativeShoulderAndOffPeakEnergy =
-                AssignVariablePt(state, "ShoulderAndOffPeakEnergy", true, varIsArgument, nativeShoulderAndOffPeakEnergy, kind::kindNative, 0, iTariff);
+                AssignVariablePt(state, "ShoulderAndOffPeakEnergy", true, varIsArgument, nativeShoulderAndOffPeakEnergy, kindNative, 0, iTariff);
             tariff(iTariff).nativeShoulderAndOffPeakDemand =
-                AssignVariablePt(state, "ShoulderAndOffPeakDemand", true, varIsArgument, nativeShoulderAndOffPeakDemand, kind::kindNative, 0, iTariff);
+                AssignVariablePt(state, "ShoulderAndOffPeakDemand", true, varIsArgument, nativeShoulderAndOffPeakDemand, kindNative, 0, iTariff);
             tariff(iTariff).nativePeakAndOffPeakEnergy =
-                AssignVariablePt(state, "PeakAndOffPeakEnergy", true, varIsArgument, nativePeakAndOffPeakEnergy, kind::kindNative, 0, iTariff);
+                AssignVariablePt(state, "PeakAndOffPeakEnergy", true, varIsArgument, nativePeakAndOffPeakEnergy, kindNative, 0, iTariff);
             tariff(iTariff).nativePeakAndOffPeakDemand =
-                AssignVariablePt(state, "PeakAndOffPeakDemand", true, varIsArgument, nativePeakAndOffPeakDemand, kind::kindNative, 0, iTariff);
+                AssignVariablePt(state, "PeakAndOffPeakDemand", true, varIsArgument, nativePeakAndOffPeakDemand, kindNative, 0, iTariff);
             tariff(iTariff).nativeRealTimePriceCosts =
-                AssignVariablePt(state, "RealTimePriceCosts", true, varIsArgument, nativeRealTimePriceCosts, kind::kindNative, 0, iTariff);
+                AssignVariablePt(state, "RealTimePriceCosts", true, varIsArgument, nativeRealTimePriceCosts, kindNative, 0, iTariff);
             tariff(iTariff).nativeAboveCustomerBaseCosts =
-                AssignVariablePt(state, "AboveCustomerBaseCosts", true, varIsArgument, nativeAboveCustomerBaseCosts, kind::kindNative, 0, iTariff);
+                AssignVariablePt(state, "AboveCustomerBaseCosts", true, varIsArgument, nativeAboveCustomerBaseCosts, kindNative, 0, iTariff);
             tariff(iTariff).nativeBelowCustomerBaseCosts =
-                AssignVariablePt(state, "BelowCustomerBaseCosts", true, varIsArgument, nativeBelowCustomerBaseCosts, kind::kindNative, 0, iTariff);
+                AssignVariablePt(state, "BelowCustomerBaseCosts", true, varIsArgument, nativeBelowCustomerBaseCosts, kindNative, 0, iTariff);
             tariff(iTariff).nativeAboveCustomerBaseEnergy =
-                AssignVariablePt(state, "AboveCustomerBaseEnergy", true, varIsArgument, nativeAboveCustomerBaseEnergy, kind::kindNative, 0, iTariff);
+                AssignVariablePt(state, "AboveCustomerBaseEnergy", true, varIsArgument, nativeAboveCustomerBaseEnergy, kindNative, 0, iTariff);
             tariff(iTariff).nativeBelowCustomerBaseEnergy =
-                AssignVariablePt(state, "BelowCustomerBaseEnergy", true, varIsArgument, nativeBelowCustomerBaseEnergy, kind::kindNative, 0, iTariff);
+                AssignVariablePt(state, "BelowCustomerBaseEnergy", true, varIsArgument, nativeBelowCustomerBaseEnergy, kindNative, 0, iTariff);
             tariff(iTariff).lastNative = numEconVar;
         }
     }
@@ -2518,7 +2518,7 @@ namespace EconomicTariff {
                 // make all of the user defined variables as active
                 for (iVar = 1; iVar <= numEconVar; ++iVar) {
                     if (econVar(iVar).tariffIndx == iTariff) {
-                        if (econVar(iVar).kindOfObj == kind::kindVariable) {
+                        if (econVar(iVar).kindOfObj == kindVariable) {
                             econVar(iVar).activeNow = true;
                         }
                     }
@@ -2559,7 +2559,7 @@ namespace EconomicTariff {
                             if (econVar(iVar).cntMeDependOn == 0) {
                                 // If the variable is a native variable then
                                 // IF (econVar(iVar)%kindOfObj .NE. kindNative) THEN
-                                if ((econVar(iVar).kindOfObj != kind::kindNative) && (econVar(iVar).kindOfObj != kind::kindVariable)) {
+                                if ((econVar(iVar).kindOfObj != kindNative) && (econVar(iVar).kindOfObj != kindVariable)) {
                                     if (econVar(iVar).lastOperand >= econVar(iVar).firstOperand) {
                                         // transfer variables and operator to the computation and list of steps
                                         // go through the operands backwards (end of line is evaluated first)
@@ -3279,21 +3279,21 @@ namespace EconomicTariff {
             if (!econVar(variablePointer).isEvaluated) {
                 {
                     auto const SELECT_CASE_var(econVar(variablePointer).kindOfObj);
-                    if (SELECT_CASE_var == kind::kindChargeSimple) {
+                    if (SELECT_CASE_var == kindChargeSimple) {
                         evaluateChargeSimple(state, variablePointer);
-                    } else if (SELECT_CASE_var == kind::kindChargeBlock) {
+                    } else if (SELECT_CASE_var == kindChargeBlock) {
                         evaluateChargeBlock(state, variablePointer);
-                    } else if (SELECT_CASE_var == kind::kindRatchet) {
+                    } else if (SELECT_CASE_var == kindRatchet) {
                         evaluateRatchet(state, variablePointer);
-                    } else if (SELECT_CASE_var == kind::kindQualify) {
+                    } else if (SELECT_CASE_var == kindQualify) {
                         evaluateQualify(state, variablePointer);
-                    } else if (SELECT_CASE_var == kind::kindUnknown) {
+                    } else if (SELECT_CASE_var == kindUnknown) {
                         ShowWarningError(state, "UtilityCost variable not defined: " + econVar(variablePointer).name);
                         ShowContinueError(state, "   In tariff: " + tariff(econVar(variablePointer).tariffIndx).tariffName);
                         ShowContinueError(state, "   This may be the result of a mispelled variable name in the UtilityCost:Computation object.");
                         ShowContinueError(state, "   All zero values will be assumed for this variable.");
-                    } else if ((SELECT_CASE_var == kind::kindVariable) || (SELECT_CASE_var == kind::kindCategory) || (SELECT_CASE_var == kind::kindNative) ||
-                               (SELECT_CASE_var == kind::kindAssignCompute) || (SELECT_CASE_var == kind::kindTariff) || (SELECT_CASE_var == kind::kindComputation)) {
+                    } else if ((SELECT_CASE_var == kindVariable) || (SELECT_CASE_var == kindCategory) || (SELECT_CASE_var == kindNative) ||
+                               (SELECT_CASE_var == kindAssignCompute) || (SELECT_CASE_var == kindTariff) || (SELECT_CASE_var == kindComputation)) {
                         // do nothing
                     } else {
                         ShowWarningError(state,
@@ -4460,7 +4460,7 @@ namespace EconomicTariff {
                         e.activeNow = false;
                     for (kVar = 1; kVar <= numEconVar; ++kVar) {
                         if (econVar(kVar).tariffIndx == iTariff) {
-                            if ((econVar(kVar).kindOfObj == kind::kindChargeSimple) || (econVar(kVar).kindOfObj == kind::kindChargeBlock)) {
+                            if ((econVar(kVar).kindOfObj == kindChargeSimple) || (econVar(kVar).kindOfObj == kindChargeBlock)) {
                                 econVar(kVar).activeNow = true;
                             }
                         }
@@ -4472,11 +4472,11 @@ namespace EconomicTariff {
                     for (kVar = 1; kVar <= numEconVar; ++kVar) {
                         if (econVar(kVar).tariffIndx == iTariff) {
                             indexInChg = econVar(kVar).index;
-                            if (econVar(kVar).kindOfObj == kind::kindChargeSimple) {
+                            if (econVar(kVar).kindOfObj == kindChargeSimple) {
                                 if (chargeSimple(indexInChg).sourcePt > 0) {
                                     econVar(chargeSimple(indexInChg).sourcePt).activeNow = true;
                                 }
-                            } else if (econVar(kVar).kindOfObj == kind::kindChargeBlock) {
+                            } else if (econVar(kVar).kindOfObj == kindChargeBlock) {
                                 if (chargeBlock(indexInChg).sourcePt > 0) {
                                     econVar(chargeBlock(indexInChg).sourcePt).activeNow = true;
                                 }
@@ -4489,7 +4489,7 @@ namespace EconomicTariff {
                         e.activeNow = false;
                     for (kVar = 1; kVar <= numEconVar; ++kVar) {
                         if (econVar(kVar).tariffIndx == iTariff) {
-                            if (econVar(kVar).kindOfObj == kind::kindRatchet) {
+                            if (econVar(kVar).kindOfObj == kindRatchet) {
                                 econVar(kVar).activeNow = true;
                             }
                         }
@@ -4500,7 +4500,7 @@ namespace EconomicTariff {
                         e.activeNow = false;
                     for (kVar = 1; kVar <= numEconVar; ++kVar) {
                         if (econVar(kVar).tariffIndx == iTariff) {
-                            if (econVar(kVar).kindOfObj == kind::kindQualify) {
+                            if (econVar(kVar).kindOfObj == kindQualify) {
                                 econVar(kVar).activeNow = true;
                             }
                         }
@@ -4766,11 +4766,11 @@ namespace EconomicTariff {
                     curIndex = econVar(iVar).index;
                     {
                         auto const SELECT_CASE_var(econVar(iVar).kindOfObj);
-                        if (SELECT_CASE_var == kind::kindChargeSimple) {
+                        if (SELECT_CASE_var == kindChargeSimple) {
                             if ((curIndex >= 1) && (curIndex <= numChargeSimple)) {
                                 curCatPt = chargeSimple(curIndex).categoryPt;
                             }
-                        } else if (SELECT_CASE_var == kind::kindChargeBlock) {
+                        } else if (SELECT_CASE_var == kindChargeBlock) {
                             if ((curIndex >= 1) && (curIndex <= numChargeBlock)) {
                                 curCatPt = chargeBlock(curIndex).categoryPt;
                             }
