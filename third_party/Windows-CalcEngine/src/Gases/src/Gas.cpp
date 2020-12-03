@@ -22,7 +22,7 @@ namespace Gases {
 		m_Properties( t_Gas.m_Properties ), m_DefaultGas( t_Gas.m_DefaultGas ),
 		m_Pressure( t_Gas.m_Pressure ) {
 		m_GasItem.clear();
-		for ( auto item : t_Gas.m_GasItem ) {
+		for ( auto const &item : t_Gas.m_GasItem ) {
 			m_GasItem.push_back( item );
 		}
 	}
@@ -39,7 +39,7 @@ namespace Gases {
 	double CGas::totalPercent() {
 		auto totalPercent = 0.0;
 
-		for ( auto& it : m_GasItem ) {
+		for ( auto const &it : m_GasItem ) {
 			totalPercent += it.getFraction();
 		}
 
