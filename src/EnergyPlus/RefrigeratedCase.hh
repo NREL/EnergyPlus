@@ -1620,6 +1620,33 @@ struct RefrigeratedCaseData : BaseGlobalStruct {
     Real64 TotalBasinHeatPower = 0.0;               // Total condenser basin water heater power (W)
     Real64 TotalEvapWaterUseRate = 0.0;             // Total condenser water use rate (m3/s)
 
+    // Refrigeration system variables
+    Array1D_bool ShowUnmetEnergyWarning;            // Used for one-time warning message for possible compressor input error regarding total system compressor capacity
+    Array1D_bool ShowHiStageUnmetEnergyWarning;     // Used for one-time warning message for possible high-stage compressor input error regarding high-stage compressor capacity
+
+    // Transcritical refrigeration system variables
+    Array1D_bool ShowUnmetEnergyWarningTrans;       // Used for one-time warning message for possible compressor input error regarding total system compressor capacity
+
+    // Refrigeration Secondary Loop variables
+    Array1D_bool ShowUnmetSecondEnergyWarning;      // Used for one-time warning message for possible compressor input error regarding secondary loop heat exchanger capacity
+
+    // Refrigeration Plant connections checks
+    Array1D_bool CheckEquipNameRackWaterCondenser;
+    Array1D_bool CheckEquipNameWaterCondenser;
+
+    // Control variables
+    Array1D_bool RefrigPresentInZone;               // Used when translating rate to energy for reporting total refrigeration impact on a zone
+    Array1D_bool CheckChillerSetName;               // used when sim chiller set called form zone equip manager
+
+    bool GetRefrigerationInputFlag = true;           // Flag to show case input should be read
+    bool HaveRefrigRacks = true;                     // Is initialized as TRUE and remains true when refrigerated racks exist in the input deck
+    bool HaveDetailedRefrig = true;                  // Is initialized as TRUE and remains true when detailed refrigeration systems exist in the input deck
+    bool HaveDetailedTransRefrig = true;             // Is initialized as TRUE and remains true when detailed transcritical CO2 refrigeration systems exist in the input deck
+    bool ManageRefrigeration = true;                 // Is initialized as TRUE and remains true when refrigerated racks or detailed systems exist in the input deck
+    bool UseSysTimeStep = false;                     // Flag is true IF working on a system that includes a coil cooling a controlled zone on the system time step, All other refrigeration calculations for case and walkin systems done on the load time step
+    bool HaveCasesOrWalkins = true;                  // Is initialized as TRUE and remains true when  refrigerated cases or walkins exist in the input deck
+    bool HaveChillers = true;                        // Is initialized as TRUE and remains true when chillers exist in the input deck
+
     void clear_state() override
     {
         this->NumSimulationCondAir = 0;
@@ -1658,6 +1685,22 @@ struct RefrigeratedCaseData : BaseGlobalStruct {
         this->TotalCondenserHeat = 0.0;
         this->TotalBasinHeatPower = 0.0;
         this->TotalEvapWaterUseRate = 0.0;
+        this->ShowUnmetEnergyWarning.deallocate();
+        this->ShowHiStageUnmetEnergyWarning.deallocate();
+        this->ShowUnmetEnergyWarningTrans.deallocate();
+        this->ShowUnmetSecondEnergyWarning.deallocate();
+        this->CheckEquipNameRackWaterCondenser.deallocate();
+        this->CheckEquipNameWaterCondenser.deallocate();
+        this->RefrigPresentInZone.deallocate();
+        this->CheckChillerSetName.deallocate();
+        this->GetRefrigerationInputFlag = true;
+        this->HaveRefrigRacks = true;
+        this->HaveDetailedRefrig = true;
+        this->HaveDetailedTransRefrig = true;
+        this->ManageRefrigeration = true;
+        this->UseSysTimeStep = false;
+        this->HaveCasesOrWalkins = true;
+        this->HaveChillers = true;
     }
 };
 
