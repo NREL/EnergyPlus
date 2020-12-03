@@ -89,6 +89,30 @@ namespace RefrigeratedCase {
         UnitLoadFactorSens,
     };
 
+    enum class iSHRCorrectionType
+    {
+        Unassigned,
+        SHR60,
+        QuadraticSHR,
+        European,
+        TabularRH_DT1_TRoom,
+    };
+
+    enum class iVerticalLoc
+    {
+        Unassigned,
+        Ceiling,
+        Middle,
+        Floor,
+    };
+
+    enum class iSourceType
+    {
+        Unassigned,
+        DetailedSystem,
+        SecondarySystem,
+    };
+
     struct RefrigCaseData
     {
         // Members
@@ -1333,10 +1357,10 @@ namespace RefrigeratedCase {
         int SchedPtr;                // Index to the correct availability schedule
         int SCIndex;                 // IDs which of European standard conditions is used for rating
         int SecServeID;              // Index to the refrigeration system serving this coil
-        int SHRCorrectionType;       // Index to type of correction for sensible heat ratio
+        iSHRCorrectionType SHRCorrectionType;       // Index to type of correction for sensible heat ratio
         int SHRCorrectionCurvePtr;   // Index to Sensible heat ratio correction curve
         int SysServeID;              // Index to the secondary system serving this coil
-        int VerticalLocation;        // Index to coil location, floor, ceiling, or middle
+        iVerticalLoc VerticalLocation;        // Index to coil location, floor, ceiling, or middle
         int ZoneNodeNum;             // Index to the zone node for the zone served by this coil
         int ZoneNum;                 // Index to the zone served by this coil
         Real64 CorrMaterial;         // Correction factor from manufacturer's rating for coil material, default 1.0
@@ -1399,8 +1423,8 @@ namespace RefrigeratedCase {
         WarehouseCoilData()
             : SecStatusFirst(false), SecStatusLast(false), SysStatusFirst(false), SysStatusLast(false), CoilFanSchedPtr(0),
               DefrostDripDownSchedPtr(0), DefrostSchedPtr(0), DefrostControlType(0), DefrostType(0), FanType(0), HeaterSchedPtr(0), NumSysAttach(0),
-              RatingType(iRatingType::Unassigned), SchedPtr(0), SCIndex(0), SecServeID(0), SHRCorrectionType(0), SHRCorrectionCurvePtr(0), SysServeID(0),
-              VerticalLocation(0), ZoneNodeNum(0), ZoneNum(0), CorrMaterial(0.0), CorrRefrigerant(0.0), DefrostCapacity(0.0), DefrostPower(0.0),
+              RatingType(iRatingType::Unassigned), SchedPtr(0), SCIndex(0), SecServeID(0), SHRCorrectionType(iSHRCorrectionType::Unassigned), SHRCorrectionCurvePtr(0), SysServeID(0),
+              VerticalLocation(iVerticalLoc::Unassigned), ZoneNodeNum(0), ZoneNum(0), CorrMaterial(0.0), CorrRefrigerant(0.0), DefrostCapacity(0.0), DefrostPower(0.0),
               DeltaFreezeKgFrost(0.0), DefEnergyFraction(0.0), DesignRefrigInventory(0.0), FanMinAirFlowRatio(0.0), HeaterPower(0.0),
               HotDefrostCondCredit(0.0), IceTemp(0.0), IceTempSaved(0.0), KgFrost(0.0), KgFrostSaved(0.0), MaxTemperatureDif(0.0),
               RatedAirVolumeFlow(0.0), RatedCapTotal(0.0), RatedFanPower(0.0), RatedRH(0.0), RatedSensibleCap(0.0), RatedTemperatureDif(0.0),
@@ -1558,7 +1582,7 @@ namespace RefrigeratedCase {
 
     void FinalRateCoils(EnergyPlusData &state,
                         bool DeRate,              // True if compressor rack or secondary ht exchanger unable to provide capacity
-                        int SystemSourceType,     // SecondarySystem or DetailedSystem
+                        iSourceType SystemSourceType,     // SecondarySystem or DetailedSystem
                         int SystemID,             // ID for Secondary loop or detailed system calling for derate
                         Real64 InitialTotalLoad,  // Load on system or secondary loop as initially calculated [W]
                         Real64 AvailableTotalLoad // Load that system or secondary loop is able to serve [W]

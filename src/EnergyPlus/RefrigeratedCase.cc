@@ -264,16 +264,6 @@ namespace EnergyPlus::RefrigeratedCase {
     int const DefrostNone(3);
     int const DefrostOffCycle(4);
 
-    int const SHR60(1);
-    int const QuadraticSHR(2);
-    int const European(3);
-    int const TabularRH_DT1_TRoom(4);
-    int const Ceiling(1);
-    int const Middle(2);
-    int const Floor(3);
-    int const DetailedSystem(1);
-    int const SecondarySystem(2);
-
     // Following constant approp for R22, future may make f(refrigerant)
     Real64 constexpr CaseSuperheat(4.0);                // case superheat used to control thermal expansion valve, ASHRAE 2006 p 44.6 (C)
     Real64 constexpr TransCaseSuperheat(10.0);          // case superheat for transcritical CO2 systems (C)
@@ -1818,6 +1808,7 @@ namespace EnergyPlus::RefrigeratedCase {
                                                        cNumericFieldNames(NumNum) + " must be input and be greater than 0 W/C");
                                 ErrorsFound = true;
                             }
+                            break;
                         case iRatingType::RatedCapacityTotal :
                             // N2
                             NumNum = 2; // advance past rating in W/C to N2 with rating in W
@@ -1840,6 +1831,7 @@ namespace EnergyPlus::RefrigeratedCase {
                                                        cNumericFieldNames(NumNum) + " must be input and be greater than 0 W");
                                 ErrorsFound = true;
                             }
+                            break;
                         case iRatingType::EuropeanSC1Std :
                             // N2
                             NumNum = 2; // advance past rating in W/C to rating in W at N2
@@ -1851,6 +1843,7 @@ namespace EnergyPlus::RefrigeratedCase {
                                                        cNumericFieldNames(NumNum) + " must be input and be greater than 0 W");
                                 ErrorsFound = true;
                             }
+                            break;
                         case iRatingType::EuropeanSC1Nom :
                             // N2
                             NumNum = 2; // advance past rating in W/C to rating in W at N2
@@ -1863,6 +1856,7 @@ namespace EnergyPlus::RefrigeratedCase {
                                                        cNumericFieldNames(NumNum) + " must be input and be greater than 0 W");
                                 ErrorsFound = true;
                             }
+                            break;
                         case iRatingType::EuropeanSC2Std :
                             // N2
                             NumNum = 2; // advance past rating in W/C to rating in W at N2
@@ -1874,6 +1868,7 @@ namespace EnergyPlus::RefrigeratedCase {
                                                        cNumericFieldNames(NumNum) + " must be input and be greater than 0 W");
                                 ErrorsFound = true;
                             }
+                            break;
                         case iRatingType::EuropeanSC2Nom :
                             // N2
                             NumNum = 2; // advance past rating in W/C to rating in W at N2
@@ -1886,6 +1881,7 @@ namespace EnergyPlus::RefrigeratedCase {
                                                        cNumericFieldNames(NumNum) + " must be input and be greater than 0 W");
                                 ErrorsFound = true;
                             }
+                            break;
                         case iRatingType::EuropeanSC3Std :
                             // N2
                             NumNum = 2; // advance past rating in W/C to rating in W at N2
@@ -1897,6 +1893,7 @@ namespace EnergyPlus::RefrigeratedCase {
                                                        cNumericFieldNames(NumNum) + " must be input and be greater than 0 W");
                                 ErrorsFound = true;
                             }
+                            break;
                         case iRatingType::EuropeanSC3Nom :
                             // N2
                             NumNum = 2; // advance past rating in W/C to rating in W at N2
@@ -1909,6 +1906,7 @@ namespace EnergyPlus::RefrigeratedCase {
                                                        cNumericFieldNames(NumNum) + " must be input and be greater than 0 W");
                                 ErrorsFound = true;
                             }
+                            break;
                         case iRatingType::EuropeanSC4Std :
                             // N2
                             NumNum = 2; // advance past rating in W/C to rating in W at N2
@@ -1920,6 +1918,7 @@ namespace EnergyPlus::RefrigeratedCase {
                                                        cNumericFieldNames(NumNum) + " must be input and be greater than 0 W");
                                 ErrorsFound = true;
                             }
+                            break;
                         case iRatingType::EuropeanSC4Nom :
                             // N2
                             NumNum = 2; // advance past rating in W/C to rating in W at N2
@@ -1932,6 +1931,7 @@ namespace EnergyPlus::RefrigeratedCase {
                                                        cNumericFieldNames(NumNum) + " must be input and be greater than 0 W");
                                 ErrorsFound = true;
                             }
+                            break;
                         case iRatingType::EuropeanSC5Std :
                             // N2
                             NumNum = 2; // advance past rating in W/C to rating in W at N2
@@ -1943,6 +1943,7 @@ namespace EnergyPlus::RefrigeratedCase {
                                                        cNumericFieldNames(NumNum) + " must be input and be greater than 0 W");
                                 ErrorsFound = true;
                             }
+                            break;
                         case iRatingType::EuropeanSC5Nom :
                             // N2
                             NumNum = 2; // advance past rating in W/C to rating in W at N2
@@ -1955,6 +1956,8 @@ namespace EnergyPlus::RefrigeratedCase {
                                                        cNumericFieldNames(NumNum) + " must be input and be greater than 0 W");
                                 ErrorsFound = true;
                             }
+                        default:
+                            break;
                     }
                 } // WarehouseCoil(CoilID)%RatingType
 
@@ -2014,11 +2017,11 @@ namespace EnergyPlus::RefrigeratedCase {
                 AlphaNum = 4;
                 if ((lAlphaBlanks(AlphaNum)) && (WarehouseCoil(CoilID).RatingType != iRatingType::RatedCapacityTotal)) {
                     // For all except RatedCapacityTotal - default to linear capacity factor approximating Nelson August 2010 ASHRAE journal
-                    WarehouseCoil(CoilID).SHRCorrectionType = SHR60;
+                    WarehouseCoil(CoilID).SHRCorrectionType = iSHRCorrectionType::SHR60;
                 } else if (WarehouseCoil(CoilID).RatingType == iRatingType::RatedCapacityTotal) {
                     // For RatedCapacityTotal, the manufacturer's coil performance map is required
                     // Specify the performance map with TabularRHxDT1xTRoom
-                    WarehouseCoil(CoilID).SHRCorrectionType = TabularRH_DT1_TRoom;
+                    WarehouseCoil(CoilID).SHRCorrectionType = iSHRCorrectionType::TabularRH_DT1_TRoom;
                     if (!(UtilityRoutines::SameString(Alphas(AlphaNum), "TabularRHxDT1xTRoom"))) {
                         ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", invalid " +
                                          cAlphaFieldNames(AlphaNum) + "=\"" + Alphas(AlphaNum) + "\".");
@@ -2029,13 +2032,13 @@ namespace EnergyPlus::RefrigeratedCase {
                             cAlphaFieldNames(AlphaNum + 1) + "\".");
                     }
                 } else if (UtilityRoutines::SameString(Alphas(AlphaNum), "LinearSHR60")) {
-                    WarehouseCoil(CoilID).SHRCorrectionType = SHR60;
+                    WarehouseCoil(CoilID).SHRCorrectionType = iSHRCorrectionType::SHR60;
                 } else if (UtilityRoutines::SameString(Alphas(AlphaNum), "QuadraticSHR")) {
-                    WarehouseCoil(CoilID).SHRCorrectionType = QuadraticSHR;
+                    WarehouseCoil(CoilID).SHRCorrectionType = iSHRCorrectionType::QuadraticSHR;
                 } else if (UtilityRoutines::SameString(Alphas(AlphaNum), "European")) {
-                    WarehouseCoil(CoilID).SHRCorrectionType = European;
+                    WarehouseCoil(CoilID).SHRCorrectionType = iSHRCorrectionType::European;
                 } else if (UtilityRoutines::SameString(Alphas(AlphaNum), "TabularRHxDT1xTRoom")) {
-                    WarehouseCoil(CoilID).SHRCorrectionType = TabularRH_DT1_TRoom;
+                    WarehouseCoil(CoilID).SHRCorrectionType = iSHRCorrectionType::TabularRH_DT1_TRoom;
                 } else {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", invalid  " +
                                     cAlphaFieldNames(AlphaNum) + "=\"" + Alphas(AlphaNum) + "\".");
@@ -2046,7 +2049,7 @@ namespace EnergyPlus::RefrigeratedCase {
                 ++NumNum;   // N9
                 {
                     auto const SELECT_CASE_var(WarehouseCoil(CoilID).SHRCorrectionType);
-                    if (SELECT_CASE_var == SHR60) {
+                    if (SELECT_CASE_var == iSHRCorrectionType::SHR60) {
                         WarehouseCoil(CoilID).SHRCorrection60 = 1.48; // reference Nelson, ASHRAE journal August 2010 Fig 2
                         if (!lNumericBlanks(NumNum)) WarehouseCoil(CoilID).SHRCorrection60 = Numbers(NumNum);
                         //(1.66667 would be a perfect effectiveness, 1.0 would be artificial coil that does only sensible)
@@ -2060,10 +2063,10 @@ namespace EnergyPlus::RefrigeratedCase {
                             ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", " +
                                              cNumericFieldNames(NumNum) + " must be between 1 and 1.67, 1.00 will be used.");
                         }
-                    } else if (SELECT_CASE_var == European) {
+                    } else if (SELECT_CASE_var == iSHRCorrectionType::European) {
                         // WarehouseCoil(CoilID)%SHRCorrectionCurvePtr = CurveManager::GetCurveIndex(state, 'ChillerEuropeanWetCoilFactor')
                         // This is a place holder, currently use embedded constants for European ratings, future may want a curve
-                    } else if (SELECT_CASE_var == QuadraticSHR) {
+                    } else if (SELECT_CASE_var == iSHRCorrectionType::QuadraticSHR) {
                         WarehouseCoil(CoilID).SHRCorrectionCurvePtr = CurveManager::GetCurveIndex(state, Alphas(AlphaNum)); // convert curve name to number
                         if (lAlphaBlanks(AlphaNum)) {
                             ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", invalid  " +
@@ -2081,7 +2084,7 @@ namespace EnergyPlus::RefrigeratedCase {
                             CurrentModuleObject,            // Object Type
                             WarehouseCoil(CoilID).Name,     // Object Name
                             cAlphaFieldNames(AlphaNum));    // Field Name
-                    } else if (SELECT_CASE_var == TabularRH_DT1_TRoom) {
+                    } else if (SELECT_CASE_var == iSHRCorrectionType::TabularRH_DT1_TRoom) {
                         WarehouseCoil(CoilID).SHRCorrectionCurvePtr = CurveManager::GetCurveIndex(state, Alphas(AlphaNum)); // convert curve name to number
                         if (lAlphaBlanks(AlphaNum)) {
                             ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", invalid  " +
@@ -2267,11 +2270,11 @@ namespace EnergyPlus::RefrigeratedCase {
 
                 ++AlphaNum; // A12
                 if (lAlphaBlanks(AlphaNum) || UtilityRoutines::SameString(Alphas(AlphaNum), "Middle")) {
-                    WarehouseCoil(CoilID).VerticalLocation = Middle; // default position
+                    WarehouseCoil(CoilID).VerticalLocation = iVerticalLoc::Middle; // default position
                 } else if (UtilityRoutines::SameString(Alphas(AlphaNum), "Ceiling")) {
-                    WarehouseCoil(CoilID).VerticalLocation = Ceiling;
+                    WarehouseCoil(CoilID).VerticalLocation = iVerticalLoc::Ceiling;
                 } else if (UtilityRoutines::SameString(Alphas(AlphaNum), "Floor")) {
-                    WarehouseCoil(CoilID).VerticalLocation = Floor;
+                    WarehouseCoil(CoilID).VerticalLocation = iVerticalLoc::Floor;
                 } else {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", invalid  " +
                                     cAlphaFieldNames(AlphaNum) + " not found: " + Alphas(AlphaNum));
@@ -10778,7 +10781,7 @@ namespace EnergyPlus::RefrigeratedCase {
                             System(SysNum).TotalSystemLoad + System(SysNum).LSHXTrans; // because compressor capacity rated from txv to comp inlet
                         if ((System(SysNum).CoilFlag) && (CurrentLoads > (System(SysNum).TotCompCapacity * 1.001))) {
                             DeRate = true;
-                            FinalRateCoils(state, DeRate, DetailedSystem, SysNum, CurrentLoads, System(SysNum).TotCompCapacity);
+                            FinalRateCoils(state, DeRate, iSourceType::DetailedSystem, SysNum, CurrentLoads, System(SysNum).TotCompCapacity);
                             System(SysNum).TotalCoolingLoad = 0.0;
                             System(SysNum).TotalCondDefrostCredit = 0.0;
                             for (int CoilIndex = 1; CoilIndex <= System(SysNum).NumCoils; ++CoilIndex) {
@@ -14157,7 +14160,7 @@ namespace EnergyPlus::RefrigeratedCase {
                 //  here will find out if secondary can serve total load, if not will derate coil outout/case credits
                 RefrigerationLoad += WarehouseCoil(CoilID).TotalCoolingLoad;
                 TotalHotDefrostCondCredit += WarehouseCoil(CoilID).HotDefrostCondCredit;
-            } // NumCoils on seocndary system
+            } // NumCoils on secondary system
         }     // Secondary(SecondaryNum)%NumCoils > 0
 
         TotalLoad = RefrigerationLoad + distPipeHeatGain + receiverHeatGain;
@@ -14273,7 +14276,7 @@ namespace EnergyPlus::RefrigeratedCase {
         } else { // air coils on secondary loop, no "unmet" energy accounting, just reduce amount of cooling provided to zone by coils
             DeRate = false;
             if (TotalLoad > this->MaxLoad) DeRate = true;
-            FinalRateCoils(state, DeRate, SecondarySystem, SecondaryNum, TotalLoad, this->MaxLoad); // assign case credits for coils on this loop
+            FinalRateCoils(state, DeRate, iSourceType::SecondarySystem, SecondaryNum, TotalLoad, this->MaxLoad); // assign case credits for coils on this loop
             // Bug TotalCoolingLoad not set but used below
         } // no air coils on secondary loop
         this->PumpPowerTotal = TotalPumpPower;
@@ -14564,7 +14567,7 @@ namespace EnergyPlus::RefrigeratedCase {
 
     void FinalRateCoils(EnergyPlusData &state,
                         bool const DeRate,              // True if compressor rack or secondary ht exchanger unable to provide capacity
-                        int const SystemSourceType,     // Secondarysystem or DetailedSystem
+                        iSourceType const SystemSourceType,     // Secondarysystem or DetailedSystem
                         int const SystemID,             // ID for Secondary loop or detailed system calling for derate
                         Real64 const InitialTotalLoad,  // Load on system or secondary loop as initially calculated [W]
                         Real64 const AvailableTotalLoad // Load that system or secondary loop is able to serve [W]
@@ -14592,11 +14595,15 @@ namespace EnergyPlus::RefrigeratedCase {
         Real64 FrostReduction(0.0);      // Change in frost on coils based on derated latent load [kg]
 
         {
-            auto const SELECT_CASE_var(SystemSourceType);
-            if (SELECT_CASE_var == DetailedSystem) {
+            switch (SystemSourceType) {
+            case iSourceType::DetailedSystem:
                 NumCoils = System(SystemID).NumCoils;
-            } else if (SELECT_CASE_var == SecondarySystem) {
+                break;
+            case iSourceType::SecondarySystem:
                 NumCoils = state.dataRefrigCase->Secondary(SystemID).NumCoils;
+                break;
+            default:
+                assert(false);
             }
         } // DeRateCoils
 
@@ -14743,11 +14750,11 @@ namespace EnergyPlus::RefrigeratedCase {
                 // calc RH inlet to coil assuming at middle/mixed point in room
                 // calc coilcap, sens and latent, available as f(inlet T,RH)
                 switch (this->VerticalLocation) {
-                case Floor:
+                case iVerticalLoc::Floor:
                     // purposely fall through
-                case Ceiling:
+                case iVerticalLoc::Ceiling:
                     // purposely fall through
-                case Middle:
+                case iVerticalLoc::Middle:
                     CoilInletTemp = ZoneMixedAirDryBulb;
                     CoilInletEnthalpy = ZoneMixedAirEnthalpy;
                     CoilInletRHFrac = ZoneMixedAirRHFrac;
@@ -14755,6 +14762,8 @@ namespace EnergyPlus::RefrigeratedCase {
                     CoilInletHumRatio = ZoneMixedAirHumRatio;
                     CoilInletDryAirCp = Psychrometrics::PsyCpAirFnW(0.0);
                     break;
+                default:
+                    assert(false);
                 }
                 AirVolumeFlowMax = AirVolumeFlowRated * (1.0 - DefrostDripDownSchedule) * CoilSchedule;
                 DryAirMassFlowMax = DryAirMassFlowRated * (1.0 - DefrostDripDownSchedule) * CoilSchedule;
@@ -14807,14 +14816,14 @@ namespace EnergyPlus::RefrigeratedCase {
 
                     {
                         auto const SELECT_CASE_var(this->SHRCorrectionType);
-                        if (SELECT_CASE_var == SHR60) {
+                        if (SELECT_CASE_var == iSHRCorrectionType::SHR60) {
                             // line from y = SHRCorrection60 value to 1. as x(SHR) goes from .6 to 1, from B. Nelson, ASHRAE August 2010
                             Real64 Slope = (this->SHRCorrection60 - 1.0) / (0.6 - 1.0); // Part of linear SHR60 correction factor, dimensionless
                             Real64 Yint = this->SHRCorrection60 - (Slope * 0.6);        // Part of linear SHR60 correction factor, dimensionless
                             SHRCorrection = Slope * SHR + Yint;
-                        } else if (SELECT_CASE_var == QuadraticSHR) {
+                        } else if (SELECT_CASE_var == iSHRCorrectionType::QuadraticSHR) {
                             SHRCorrection = CurveManager::CurveValue(state, this->SHRCorrectionCurvePtr, SHR);
-                        } else if (SELECT_CASE_var == European) {
+                        } else if (SELECT_CASE_var == iSHRCorrectionType::European) {
                             // With European ratings, either start with rated total sensible capacity or rated total capacity
                             //    If rated total capacity is used, 'get input'
                             //    translated it to rated total sensible capacity using
