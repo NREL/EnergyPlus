@@ -341,7 +341,7 @@ namespace IntegratedHeatPump {
 
 } // namespace IntegratedHeatPump
 
-struct IntegratedHeatPumpData : BaseGlobalStruct {
+struct IntegratedHeatPumpGlobalData : BaseGlobalStruct {
 
     void clear_state() override
     {

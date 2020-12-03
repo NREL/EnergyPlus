@@ -167,7 +167,7 @@ namespace EnergyPlus {
         this->dataICEngElectGen = std::make_unique<ICEngineElectricGeneratorData>();
         this->dataIPShortCut = std::make_unique<IPShortCutsData>();
         this->dataIceThermalStorage = std::make_unique<IceThermalStorageData>();
-        this->dataIntegratedHP = std::make_unique<IntegratedHeatPumpData>();
+        this->dataIntegratedHP = std::make_unique<IntegratedHeatPumpGlobalData>();
         this->dataInternalHeatGains = std::make_unique<InternalHeatGainsData>();
         this->dataLoopNodes = std::make_unique<LoopNodeData>();
         this->dataLowTempRadSys = std::make_unique<LowTempRadiantSystemData>();
