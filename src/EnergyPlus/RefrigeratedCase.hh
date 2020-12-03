@@ -1602,6 +1602,24 @@ struct RefrigeratedCaseData : BaseGlobalStruct {
     int NumUnusedSecondarys = 0;                    // Number of refrigeration secondarys not connected to a system
     bool MyReferPlantScanFlag = true;
 
+    // Refrigerated case variables
+    Real64 CaseRAFactor = 0.0;                      // Factor determining case credit allocation (e.g. % to zone or HVAC)
+    Array1D_bool ShowStockingWarning;               // Used for one-time warning message for possible case input error regarding stocking
+
+    // Refrigeration compressor rack variables
+    Real64 TotalRackDeliveredCapacity = 0.0;        // Total capacity of all refrigerated cases attached to rack (W)
+    Real64 TotalCompressorPower = 0.0;              // Total compressor electric power (W)
+    Real64 CompressorCOPactual = 0.0;               // Compressor coefficient of performance at specific operating conditions (W/W)
+    Real64 RackSenCreditToZone = 0.0;               // Amount of condenser heat applied to zone load (W)
+    Real64 RackSenCreditToHVAC = 0.0;               // Amount of condenser heat applied to HVAC RA duct (W)
+
+    // Refrigeration condenser variables (used for both racks and detailed systems)
+    Real64 TotalCondenserFanPower = 0.0;            // Total condenser fan electric power (W)
+    Real64 TotalCondenserPumpPower = 0.0;           // Total condenser pump electric power (W)
+    Real64 TotalCondenserHeat = 0.0;                // Total condenser heat from compressor rack (W)
+    Real64 TotalBasinHeatPower = 0.0;               // Total condenser basin water heater power (W)
+    Real64 TotalEvapWaterUseRate = 0.0;             // Total condenser water use rate (m3/s)
+
     void clear_state() override
     {
         this->NumSimulationCondAir = 0;
@@ -1628,6 +1646,18 @@ struct RefrigeratedCaseData : BaseGlobalStruct {
         this->NumUnusedCompressors = 0;
         this->NumUnusedSecondarys = 0;
         this->MyReferPlantScanFlag = true;
+        this->CaseRAFactor = 0.0;
+        this->ShowStockingWarning.deallocate();
+        this->TotalRackDeliveredCapacity = 0.0;
+        this->TotalCompressorPower = 0.0;
+        this->CompressorCOPactual = 0.0;
+        this->RackSenCreditToZone = 0.0;
+        this->RackSenCreditToHVAC = 0.0;
+        this->TotalCondenserFanPower = 0.0;
+        this->TotalCondenserPumpPower = 0.0;
+        this->TotalCondenserHeat = 0.0;
+        this->TotalBasinHeatPower = 0.0;
+        this->TotalEvapWaterUseRate = 0.0;
     }
 };
 

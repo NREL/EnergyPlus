@@ -287,51 +287,30 @@ namespace EnergyPlus::RefrigeratedCase {
     int const SecondarySystem(2);
 
     // Following constant approp for R22, future may make f(refrigerant)
-    Real64 const CaseSuperheat(4.0);       // case superheat used to control thermal expansion valve, ASHRAE 2006 p 44.6 (C)
-    Real64 const TransCaseSuperheat(10.0); // case superheat for transcritical CO2 systems (C)
-    // Next two constants used to autosize evap condenser
-    Real64 const CondPumpRatePower(0.004266);  // evap condenser pump rated, Wpump/Wcapacity (15 W/ton)
-    Real64 const AirVolRateEvapCond(0.000144); // evap cond air flow rate for autosize, equiv 850 cfm/ton (m3/W-s)
-    Real64 const EvapCutOutTdb(4.0);           // shut off evap water flow if outdoor drybulb < evapcutOutTdb (C)
-    // Miscellaneous constants
-    Real64 const MyLargeNumber(1.0e9);
-    Real64 const MySmallNumber(1.0e-9);
-    Real64 const Rair(0.3169);                  // Air resistance used with Heat Balance anti-sweat (AS) heater
-    Real64 const IceMeltEnthalpy(335000.0);     // heat of fusion of water J/kg
-    Real64 const TempTooHotToFrost(5.0);        // C, used to check for frosting conditions on evaporator coils
-    Real64 const IcetoVaporEnthalpy(2833000.0); // J/kg to freeze water vapor to ice
-    Real64 const SpecificHeatIce(2000.0);       // in the likely range (2040 at 0C and 1950 at -20C) (J/kg-C)
-    Real64 const CondAirVolExponentDry(1.58);   // exponent for forced air over a cylinder, = 1/.633
-    // per ASHRAE 2005 (page 3.15)
-    Real64 const CondAirVolExponentEvap(1.32); // exponent for evap condenser air vol flow, = 1/.76
-    // per Manske, 1999
-    Real64 const EvaporatorAirVolExponent(1.54); // exponent for evapaporator air vol flow, = 1/.65
-    // per Manske, 1999, page 35
+    Real64 constexpr CaseSuperheat(4.0);                // case superheat used to control thermal expansion valve, ASHRAE 2006 p 44.6 (C)
+    Real64 constexpr TransCaseSuperheat(10.0);          // case superheat for transcritical CO2 systems (C)
 
-    Real64 const FanHalfSpeedRatio(0.1768); // = 1/(2**2.5) for power step for two speed fan
-    Real64 const CapFac60Percent(0.60);     // = 60%, load served by half power 2-speed fan
+    // Next two constants used to autosize evap condenser
+    Real64 constexpr CondPumpRatePower(0.004266);       // evap condenser pump rated, Wpump/Wcapacity (15 W/ton)
+    Real64 constexpr AirVolRateEvapCond(0.000144);      // evap cond air flow rate for autosize, equiv 850 cfm/ton (m3/W-s)
+    Real64 constexpr EvapCutOutTdb(4.0);                // shut off evap water flow if outdoor drybulb < evapcutOutTdb (C)
+
+    // Miscellaneous constants
+    Real64 constexpr MyLargeNumber(1.0e9);
+    Real64 constexpr MySmallNumber(1.0e-9);
+    Real64 constexpr Rair(0.3169);                      // Air resistance used with Heat Balance anti-sweat (AS) heater
+    Real64 constexpr IceMeltEnthalpy(335000.0);         // heat of fusion of water J/kg
+    Real64 constexpr TempTooHotToFrost(5.0);            // C, used to check for frosting conditions on evaporator coils
+    Real64 constexpr IcetoVaporEnthalpy(2833000.0);     // J/kg to freeze water vapor to ice
+    Real64 constexpr SpecificHeatIce(2000.0);           // in the likely range (2040 at 0C and 1950 at -20C) (J/kg-C)
+    Real64 constexpr CondAirVolExponentDry(1.58);       // exponent for forced air over a cylinder, = 1/.633 per ASHRAE 2005 (page 3.15)
+    Real64 constexpr CondAirVolExponentEvap(1.32);      // exponent for evap condenser air vol flow, = 1/.76 per Manske, 1999
+    Real64 constexpr EvaporatorAirVolExponent(1.54);    // exponent for evapaporator air vol flow, = 1/.65 per Manske, 1999, page 35
+    Real64 constexpr FanHalfSpeedRatio(0.1768);         // = 1/(2**2.5) for power step for two speed fan
+    Real64 constexpr CapFac60Percent(0.60);             // = 60%, load served by half power 2-speed fan
 
     Array1D<Real64> const EuropeanWetCoilFactor(5, {1.35, 1.15, 1.05, 1.01, 1.0});
     Array1D<Real64> const EuropeanAirInletTemp(5, {10.0, 0.0, -18.0, -25.0, -34.0});
-
-    // Refrigerated case variables
-    Real64 CaseRAFactor(0.0);         // Factor determining case credit allocation (e.g. % to zone or HVAC)
-    Array1D_bool ShowStockingWarning; // Used for one-time warning message for possible case
-    // input error regarding stocking
-
-    // Refrigeration compressor rack variables
-    Real64 TotalRackDeliveredCapacity(0.0); // Total capacity of all refrigerated cases attached to rack (W)
-    Real64 TotalCompressorPower(0.0);       // Total compressor electric power (W)
-    Real64 CompressorCOPactual(0.0);        // Compressor coefficient of performance at specific operating conditions (W/W)
-    Real64 RackSenCreditToZone(0.0);        // Amount of condenser heat applied to zone load (W)
-    Real64 RackSenCreditToHVAC(0.0);        // Amount of condenser heat applied to HVAC RA duct (W)
-
-    // Refrigeration condenser variables (used for both racks and detailed systems)
-    Real64 TotalCondenserFanPower(0.0);  // Total condenser fan electric power (W)
-    Real64 TotalCondenserPumpPower(0.0); // Total condenser pump electric power (W)
-    Real64 TotalCondenserHeat(0.0);      // Total condenser heat from compressor rack (W)
-    Real64 TotalBasinHeatPower(0.0);     // Total condenser basin water heater power (W)
-    Real64 TotalEvapWaterUseRate(0.0);   // Total condenser water use rate (m3/s)
 
     // Refrigeration system variables
     Array1D_bool ShowUnmetEnergyWarning; // Used for one-time warning message for possible
@@ -400,22 +379,6 @@ namespace EnergyPlus::RefrigeratedCase {
 
     void clear_state()
     {
-        CaseRAFactor = 0.0;
-
-        ShowStockingWarning.deallocate();
-
-        TotalRackDeliveredCapacity = 0.0;
-        TotalCompressorPower = 0.0;
-        CompressorCOPactual = 0.0;
-        RackSenCreditToZone = 0.0;
-        RackSenCreditToHVAC = 0.0;
-
-        TotalCondenserFanPower = 0.0;
-        TotalCondenserPumpPower = 0.0;
-        TotalCondenserHeat = 0.0;
-        TotalBasinHeatPower = 0.0;
-        TotalEvapWaterUseRate = 0.0;
-
         ShowUnmetEnergyWarning.deallocate();
         ShowHiStageUnmetEnergyWarning.deallocate();
         ShowUnmetEnergyWarningTrans.deallocate();
@@ -683,7 +646,7 @@ namespace EnergyPlus::RefrigeratedCase {
         if (state.dataRefrigCase->NumSimulationCases > 0) {
             CaseRAFraction.allocate(state.dataGlobal->NumOfZones);
             RefrigCase.allocate(state.dataRefrigCase->NumSimulationCases);
-            ShowStockingWarning.dimension(state.dataRefrigCase->NumSimulationCases, true);
+            state.dataRefrigCase->ShowStockingWarning.dimension(state.dataRefrigCase->NumSimulationCases, true);
         }
         if (state.dataRefrigCase->NumSimulationWalkIns > 0) {
             WalkIn.allocate(state.dataRefrigCase->NumSimulationWalkIns);
@@ -9421,17 +9384,17 @@ namespace EnergyPlus::RefrigeratedCase {
         Real64 BPress;                    // Barometric pressure at condenser air inlet node [Pa]
         bool EvapAvail;                   // Control for evap condenser availability
 
-        TotalRackDeliveredCapacity = 0.0;
-        CompressorCOPactual = 0.0;
-        TotalCompressorPower = 0.0;
-        TotalCondenserFanPower = 0.0;
-        TotalCondenserPumpPower = 0.0;
-        TotalBasinHeatPower = 0.0;
-        TotalCondenserHeat = 0.0;
+        state.dataRefrigCase->TotalRackDeliveredCapacity = 0.0;
+        state.dataRefrigCase->CompressorCOPactual = 0.0;
+        state.dataRefrigCase->TotalCompressorPower = 0.0;
+        state.dataRefrigCase->TotalCondenserFanPower = 0.0;
+        state.dataRefrigCase->TotalCondenserPumpPower = 0.0;
+        state.dataRefrigCase->TotalBasinHeatPower = 0.0;
+        state.dataRefrigCase->TotalCondenserHeat = 0.0;
         TotalHeatRejectedToZone = 0.0;
-        TotalEvapWaterUseRate = 0.0;
-        RackSenCreditToZone = 0.0;
-        RackSenCreditToHVAC = 0.0;
+        state.dataRefrigCase->TotalEvapWaterUseRate = 0.0;
+        state.dataRefrigCase->RackSenCreditToZone = 0.0;
+        state.dataRefrigCase->RackSenCreditToHVAC = 0.0;
         CondenserFrac = 0.0;
         EvapAvail = true;
         HeatRejectZoneNum = 0;
@@ -9458,7 +9421,7 @@ namespace EnergyPlus::RefrigeratedCase {
                 int CoilID = this->CoilNum(CoilIndex);
                 // already CALLed CalculateCoil(CoilID) in CoilSet specified order
                 // increment TotalCoolingLoad for Compressors/condenser on each system
-                TotalRackDeliveredCapacity += WarehouseCoil(CoilID).TotalCoolingLoad;
+                state.dataRefrigCase->TotalRackDeliveredCapacity += WarehouseCoil(CoilID).TotalCoolingLoad;
                 //      System(SysNum)%TotalCondDefrostCredit=System(SysNum)%TotalCondDefrostCredit + WarehouseCoil(CoilID)%HotDefrostCondCredit
             } // NumCoils systems
         }     // System(SysNum)%NumCoils > 0
@@ -9469,7 +9432,7 @@ namespace EnergyPlus::RefrigeratedCase {
                 RefrigCase(CaseID).CalculateCase(state);
 
                 //   add evaporator load for all cases connected to rack
-                TotalRackDeliveredCapacity += RefrigCase(CaseID).TotalCoolingLoad;
+                state.dataRefrigCase->TotalRackDeliveredCapacity += RefrigCase(CaseID).TotalCoolingLoad;
 
                 //   sensible and latent case credits already calculated in "CalculateCase"
                 //   Now need to calculate amount of condenser heat rejection that should be applied to zone
@@ -9478,7 +9441,7 @@ namespace EnergyPlus::RefrigeratedCase {
                 //   rejection goes to that zone - that is, no heat rejection goes to the HVAC return air
                 if (this->HeatRejectionLocation == LocationZone) {
                     if (this->NumWalkIns == 0) {
-                        TotalHeatRejectedToZone += RefrigCase(CaseID).TotalCoolingLoad * (1.0 - CaseRAFactor);
+                        TotalHeatRejectedToZone += RefrigCase(CaseID).TotalCoolingLoad * (1.0 - state.dataRefrigCase->CaseRAFactor);
                         //  CaseRAFactor is a module variable calculated in CalculateCase
                         //   find zone number of first case on rack (all cases are in the same zone
                         //  if HeatRejectionLocation = LocationZone and no walk-ins)
@@ -9495,7 +9458,7 @@ namespace EnergyPlus::RefrigeratedCase {
             for (int WalkInIndex = 1; WalkInIndex <= this->NumWalkIns; ++WalkInIndex) {
                 int WalkInID = this->WalkInNum(WalkInIndex);
                 WalkIn(WalkInID).CalculateWalkIn(state);
-                TotalRackDeliveredCapacity += WalkIn(WalkInID).TotalCoolingLoad;
+                state.dataRefrigCase->TotalRackDeliveredCapacity += WalkIn(WalkInID).TotalCoolingLoad;
                 if (this->HeatRejectionLocation == LocationZone) {
                     TotalHeatRejectedToZone += WalkIn(WalkInID).TotalCoolingLoad;
                     HeatRejectZoneNum = this->HeatRejectionZoneNum;
@@ -9560,11 +9523,11 @@ namespace EnergyPlus::RefrigeratedCase {
             COPFTempOutput = CurveManager::CurveValue(state, this->COPFTempPtr, EffectTemp);
         } // Location Zone
 
-        CompressorCOPactual = this->RatedCOP * COPFTempOutput;
+        state.dataRefrigCase->CompressorCOPactual = this->RatedCOP * COPFTempOutput;
 
-        if (CompressorCOPactual > 0.0) {
-            TotalCompressorPower = TotalRackDeliveredCapacity / CompressorCOPactual;
-            TotalCondenserHeat = TotalCompressorPower + TotalRackDeliveredCapacity;
+        if (state.dataRefrigCase->CompressorCOPactual > 0.0) {
+            state.dataRefrigCase->TotalCompressorPower = state.dataRefrigCase->TotalRackDeliveredCapacity / state.dataRefrigCase->CompressorCOPactual;
+            state.dataRefrigCase->TotalCondenserHeat = state.dataRefrigCase->TotalCompressorPower + state.dataRefrigCase->TotalRackDeliveredCapacity;
         } else {
             if (this->ShowCOPWarning) {
                 ShowWarningError(state, "Refrigeration:CompressorRack: " + this->Name);
@@ -9576,37 +9539,37 @@ namespace EnergyPlus::RefrigeratedCase {
 
         // calculate condenser fan usage here if not water-cooled; if water-cooled, fan is in separate tower object
         // fan loads > 0 only if the connected cases are operating
-        if (TotalRackDeliveredCapacity > 0.0 && this->CondenserType != DataHeatBalance::RefrigCondenserTypeWater) {
+        if (state.dataRefrigCase->TotalRackDeliveredCapacity > 0.0 && this->CondenserType != DataHeatBalance::RefrigCondenserTypeWater) {
             if (this->TotCondFTempPtr != 0) {
                 if (this->HeatRejectionLocation == LocationZone) {
                     CondenserFrac =
                         max(0.0, min(1.0, CurveManager::CurveValue(state, this->TotCondFTempPtr, DataLoopNode::Node(HeatRejectZoneNodeNum).Temp)));
-                    TotalCondenserFanPower = this->CondenserFanPower * CondenserFrac;
+                    state.dataRefrigCase->TotalCondenserFanPower = this->CondenserFanPower * CondenserFrac;
                     DataHeatBalance::RefrigCaseCredit(HeatRejectZoneNum).SenCaseCreditToZone += this->CondenserFanPower * CondenserFrac;
                 } else {
                     CondenserFrac = max(0.0, min(1.0, CurveManager::CurveValue(state, this->TotCondFTempPtr, EffectTemp)));
-                    TotalCondenserFanPower = this->CondenserFanPower * CondenserFrac;
+                    state.dataRefrigCase->TotalCondenserFanPower = this->CondenserFanPower * CondenserFrac;
                 } // location zone
             } else {
                 CondenserFrac = 1.0;
-                TotalCondenserFanPower = this->CondenserFanPower * CondenserFrac;
+                state.dataRefrigCase->TotalCondenserFanPower = this->CondenserFanPower * CondenserFrac;
             } // TotCondFTempPtr
         }     // Cooling Water type
 
         // calculate evap water use and water pump power, if applicable
         // assumes pump runs whenever evap cooling is available to minimize scaling
         if (this->CondenserType == DataHeatBalance::RefrigCondenserTypeEvap && EvapAvail) {
-            TotalCondenserPumpPower = this->EvapPumpPower;
+            state.dataRefrigCase->TotalCondenserPumpPower = this->EvapPumpPower;
             HumRatOut = Psychrometrics::PsyWFnTdbTwbPb(state, EffectTemp, OutWbTemp, BPress);
-            TotalEvapWaterUseRate = this->CondenserAirFlowRate * CondenserFrac * Psychrometrics::PsyRhoAirFnPbTdbW(state, BPress, OutDbTemp, HumRatIn) *
+            state.dataRefrigCase->TotalEvapWaterUseRate = this->CondenserAirFlowRate * CondenserFrac * Psychrometrics::PsyRhoAirFnPbTdbW(state, BPress, OutDbTemp, HumRatIn) *
                                     (HumRatOut - HumRatIn) / Psychrometrics::RhoH2O(EffectTemp);
         } // evapAvail
         // calculate basin water heater load
         if (this->CondenserType == DataHeatBalance::RefrigCondenserTypeEvap) {
-            if ((TotalRackDeliveredCapacity == 0.0) && (EvapAvail) && (OutDbTemp < this->BasinHeaterSetPointTemp)) {
-                TotalBasinHeatPower = max(0.0, this->BasinHeaterPowerFTempDiff * (this->BasinHeaterSetPointTemp - OutDbTemp));
+            if ((state.dataRefrigCase->TotalRackDeliveredCapacity == 0.0) && (EvapAvail) && (OutDbTemp < this->BasinHeaterSetPointTemp)) {
+                state.dataRefrigCase->TotalBasinHeatPower = max(0.0, this->BasinHeaterPowerFTempDiff * (this->BasinHeaterSetPointTemp - OutDbTemp));
                 // provide warning if no heater power exists
-                if (TotalBasinHeatPower == 0.0) {
+                if (state.dataRefrigCase->TotalBasinHeatPower == 0.0) {
                     if (this->EvapFreezeWarnIndex == 0) {
                         ShowWarningMessage(state, "Refrigeration Compressor Rack " + this->Name +
                                            " - Evap cooling of condenser underway with no basin heater power");
@@ -9617,7 +9580,7 @@ namespace EnergyPlus::RefrigeratedCase {
                                                        " - Evap cooling of condenser underway with no basin heater power ... continues",
                                                    this->EvapFreezeWarnIndex);
                     // END IF
-                } // TotalBasinHeatPower == 0 when at outdoor freezing conditions
+                } // state.dataRefrigCase->TotalBasinHeatPower == 0 when at outdoor freezing conditions
             }     // cap
         }         // evap condenser type
 
@@ -9625,21 +9588,21 @@ namespace EnergyPlus::RefrigeratedCase {
         //   if walk-ins are served by rack, user must specify heat rejection zone and 100% of heat
         //   rejection goes to that zone - that is, no condenser heat rejection goes to the HVAC return air
         if (this->HeatRejectionLocation == LocationZone) {
-            TotalCondenserHeat = TotalRackDeliveredCapacity + TotalCompressorPower + TotalCondenserFanPower;
-            if (HeatRejectZoneNum > 0 && TotalRackDeliveredCapacity > 0.0) {
+            state.dataRefrigCase->TotalCondenserHeat = state.dataRefrigCase->TotalRackDeliveredCapacity + state.dataRefrigCase->TotalCompressorPower + state.dataRefrigCase->TotalCondenserFanPower;
+            if (HeatRejectZoneNum > 0 && state.dataRefrigCase->TotalRackDeliveredCapacity > 0.0) {
                 if (this->NumWalkIns == 0) {
                     //       rack report variables for condenser heat to Zone and/or HVAC
-                    //       The difference between TotalHeatRejectedToZone and TotalRackDeliveredCapacity is the heat sent to return air
-                    RackSenCreditToZone = TotalCondenserHeat * (TotalHeatRejectedToZone / TotalRackDeliveredCapacity);
-                    RackSenCreditToHVAC = TotalCondenserHeat - RackSenCreditToZone;
+                    //       The difference between TotalHeatRejectedToZone and state.dataRefrigCase->TotalRackDeliveredCapacity is the heat sent to return air
+                    state.dataRefrigCase->RackSenCreditToZone = state.dataRefrigCase->TotalCondenserHeat * (TotalHeatRejectedToZone / state.dataRefrigCase->TotalRackDeliveredCapacity);
+                    state.dataRefrigCase->RackSenCreditToHVAC = state.dataRefrigCase->TotalCondenserHeat - state.dataRefrigCase->RackSenCreditToZone;
                 } else { // walkins present and no rack heat rejection goes to return air
-                    RackSenCreditToZone = TotalCondenserHeat;
-                    RackSenCreditToHVAC = 0.0;
+                    state.dataRefrigCase->RackSenCreditToZone = state.dataRefrigCase->TotalCondenserHeat;
+                    state.dataRefrigCase->RackSenCreditToHVAC = 0.0;
                 } // walkins present
                 //     Update globals for use in Air Heat Balance and Zone Equipment Manager
-                DataHeatBalance::RefrigCaseCredit(HeatRejectZoneNum).SenCaseCreditToZone += RackSenCreditToZone;
+                DataHeatBalance::RefrigCaseCredit(HeatRejectZoneNum).SenCaseCreditToZone += state.dataRefrigCase->RackSenCreditToZone;
 
-                DataHeatBalance::RefrigCaseCredit(HeatRejectZoneNum).SenCaseCreditToHVAC += RackSenCreditToHVAC;
+                DataHeatBalance::RefrigCaseCredit(HeatRejectZoneNum).SenCaseCreditToHVAC += state.dataRefrigCase->RackSenCreditToHVAC;
             } // zone # > 0 and tot del cap > 0
         }     // rack heat rejection to zone
     }
@@ -9659,30 +9622,30 @@ namespace EnergyPlus::RefrigeratedCase {
         Real64 LocalTimeStep = state.dataGlobal->TimeStepZone;
         if (UseSysTimeStep) LocalTimeStep = DataHVACGlobals::TimeStepSys;
 
-        this->RackCompressorPower = TotalCompressorPower;
-        this->RackElecConsumption = TotalCompressorPower * LocalTimeStep * DataGlobalConstants::SecInHour;
-        this->ActualCondenserFanPower = TotalCondenserFanPower;
-        this->CondenserFanConsumption = TotalCondenserFanPower * LocalTimeStep * DataGlobalConstants::SecInHour;
-        this->RackCapacity = TotalRackDeliveredCapacity;
-        this->RackCoolingEnergy = TotalRackDeliveredCapacity * LocalTimeStep * DataGlobalConstants::SecInHour;
-        this->RackCompressorCOP = CompressorCOPactual;
-        this->SensHVACCreditHeatRate = RackSenCreditToHVAC;
-        this->SensHVACCreditHeat = RackSenCreditToHVAC * LocalTimeStep * DataGlobalConstants::SecInHour;
-        this->SensZoneCreditHeatRate = RackSenCreditToZone;
-        this->SensZoneCreditHeat = RackSenCreditToZone * LocalTimeStep * DataGlobalConstants::SecInHour;
-        this->EvapWaterConsumpRate = TotalEvapWaterUseRate;
-        this->EvapWaterConsumption = TotalEvapWaterUseRate * LocalTimeStep * DataGlobalConstants::SecInHour;
-        this->ActualEvapPumpPower = TotalCondenserPumpPower;
-        this->EvapPumpConsumption = TotalCondenserPumpPower * LocalTimeStep * DataGlobalConstants::SecInHour;
-        this->BasinHeaterPower = TotalBasinHeatPower;
-        this->BasinHeaterConsumption = TotalBasinHeatPower * LocalTimeStep * DataGlobalConstants::SecInHour;
-        this->CondLoad = TotalCondenserHeat;
-        this->CondEnergy = TotalCondenserHeat * LocalTimeStep * DataGlobalConstants::SecInHour;
+        this->RackCompressorPower = state.dataRefrigCase->TotalCompressorPower;
+        this->RackElecConsumption = state.dataRefrigCase->TotalCompressorPower * LocalTimeStep * DataGlobalConstants::SecInHour;
+        this->ActualCondenserFanPower = state.dataRefrigCase->TotalCondenserFanPower;
+        this->CondenserFanConsumption = state.dataRefrigCase->TotalCondenserFanPower * LocalTimeStep * DataGlobalConstants::SecInHour;
+        this->RackCapacity = state.dataRefrigCase->TotalRackDeliveredCapacity;
+        this->RackCoolingEnergy = state.dataRefrigCase->TotalRackDeliveredCapacity * LocalTimeStep * DataGlobalConstants::SecInHour;
+        this->RackCompressorCOP = state.dataRefrigCase->CompressorCOPactual;
+        this->SensHVACCreditHeatRate = state.dataRefrigCase->RackSenCreditToHVAC;
+        this->SensHVACCreditHeat = state.dataRefrigCase->RackSenCreditToHVAC * LocalTimeStep * DataGlobalConstants::SecInHour;
+        this->SensZoneCreditHeatRate = state.dataRefrigCase->RackSenCreditToZone;
+        this->SensZoneCreditHeat = state.dataRefrigCase->RackSenCreditToZone * LocalTimeStep * DataGlobalConstants::SecInHour;
+        this->EvapWaterConsumpRate = state.dataRefrigCase->TotalEvapWaterUseRate;
+        this->EvapWaterConsumption = state.dataRefrigCase->TotalEvapWaterUseRate * LocalTimeStep * DataGlobalConstants::SecInHour;
+        this->ActualEvapPumpPower = state.dataRefrigCase->TotalCondenserPumpPower;
+        this->EvapPumpConsumption = state.dataRefrigCase->TotalCondenserPumpPower * LocalTimeStep * DataGlobalConstants::SecInHour;
+        this->BasinHeaterPower = state.dataRefrigCase->TotalBasinHeatPower;
+        this->BasinHeaterConsumption = state.dataRefrigCase->TotalBasinHeatPower * LocalTimeStep * DataGlobalConstants::SecInHour;
+        this->CondLoad = state.dataRefrigCase->TotalCondenserHeat;
+        this->CondEnergy = state.dataRefrigCase->TotalCondenserHeat * LocalTimeStep * DataGlobalConstants::SecInHour;
         // Set total rack heat rejection used for heat reclaim. Do not allow heat reclaim on stand alone (indoor) display cases.
         if (this->HeatRejectionLocation == LocationZone) {
             DataHeatBalance::HeatReclaimRefrigeratedRack(RackNum).AvailCapacity = 0.0;
         } else {
-            DataHeatBalance::HeatReclaimRefrigeratedRack(RackNum).AvailCapacity = TotalRackDeliveredCapacity * (1.0 + 1.0 / CompressorCOPactual);
+            DataHeatBalance::HeatReclaimRefrigeratedRack(RackNum).AvailCapacity = state.dataRefrigCase->TotalRackDeliveredCapacity * (1.0 + 1.0 / state.dataRefrigCase->CompressorCOPactual);
         }
 
         // set water system demand request (if needed)
@@ -9758,7 +9721,7 @@ namespace EnergyPlus::RefrigeratedCase {
         // DefElectricOnDemand = 6 (not available)
         // DefElectricTerm     = 7
 
-        CaseRAFactor = 0.0;
+        state.dataRefrigCase->CaseRAFactor = 0.0;
 
         // Zone relative humidity (%)
         Real64 ZoneRHPercent = Psychrometrics::PsyRhFnTdbWPb(state, DataLoopNode::Node(this->ZoneNodeNum).Temp,
@@ -10008,7 +9971,7 @@ namespace EnergyPlus::RefrigeratedCase {
             DefrostCap_Actual = 0.0;
 
         Real64 caseRAFraction = min(0.8, this->RAFrac);
-        CaseRAFactor = (1.0 - ((0.8 - caseRAFraction) / 0.8)) * 0.5;
+        state.dataRefrigCase->CaseRAFactor = (1.0 - ((0.8 - caseRAFraction) / 0.8)) * 0.5;
 
         // Update globals for use in ZoneTemperaturePredictorCorrector (Air Heat Balance) and
         //   Zone Equipment Manager. Sum case credits to zone and case credits to HVAC
@@ -10017,16 +9980,16 @@ namespace EnergyPlus::RefrigeratedCase {
         //** allocate moisture to the zone when the HVAC system is off.
 
         // Amount of sensible case credit applied to zone load (W)
-        Real64 CaseSenCreditToZone = SensibleCaseCredit * (1.0 - CaseRAFactor);
+        Real64 CaseSenCreditToZone = SensibleCaseCredit * (1.0 - state.dataRefrigCase->CaseRAFactor);
 
         // Amount of latent case credit applied to zone load (W)
-        Real64 CaseLatCreditToZone = LatentCaseCredit * (1.0 - CaseRAFactor);
+        Real64 CaseLatCreditToZone = LatentCaseCredit * (1.0 - state.dataRefrigCase->CaseRAFactor);
 
         // Amount of sensible case credit applied to HVAC RA duct (W)
-        Real64 CaseSenCreditToHVAC = SensibleCaseCredit * CaseRAFactor;
+        Real64 CaseSenCreditToHVAC = SensibleCaseCredit * state.dataRefrigCase->CaseRAFactor;
 
         // Amount of latent case credit applied to HVAC RA duct (W)
-        Real64 CaseLatCreditToHVAC = LatentCaseCredit * CaseRAFactor;
+        Real64 CaseLatCreditToHVAC = LatentCaseCredit * state.dataRefrigCase->CaseRAFactor;
 
         DataHeatBalance::RefrigCaseCredit(this->ActualZoneNum).SenCaseCreditToZone += CaseSenCreditToZone;
         DataHeatBalance::RefrigCaseCredit(this->ActualZoneNum).LatCaseCreditToZone += CaseLatCreditToZone;
@@ -10219,7 +10182,7 @@ namespace EnergyPlus::RefrigeratedCase {
         PlantBranchIndex = this->PlantBranchNum;
         PlantCompIndex = this->PlantCompNum;
 
-        TotalCondenserHeat = this->CondLoad;
+        state.dataRefrigCase->TotalCondenserHeat = this->CondLoad;
         TypeName = "Refrigeration:Condenser:WaterCooled";
         ErrIntro = "Condenser for refrigeration system ";
 
@@ -10232,7 +10195,7 @@ namespace EnergyPlus::RefrigeratedCase {
         Real64 Cp = FluidProperties::GetSpecificHeatGlycol(
             state, DataPlant::PlantLoop(PlantLoopIndex).FluidName, this->InletTemp, DataPlant::PlantLoop(PlantLoopIndex).FluidIndex, RoutineName);
 
-        if (this->FlowType == VariableFlow && TotalCondenserHeat > 0.0) {
+        if (this->FlowType == VariableFlow && state.dataRefrigCase->TotalCondenserHeat > 0.0) {
 
             this->OutletTemp = ScheduleManager::GetCurrentScheduleValue(state, this->OutletTempSchedPtr);
 
@@ -10250,7 +10213,7 @@ namespace EnergyPlus::RefrigeratedCase {
                 this->MassFlowRate = this->VolFlowRate * rho;
                 } else {
                 Real64 DeltaT = this->OutletTemp - this->InletTemp;
-                this->MassFlowRate = TotalCondenserHeat / Cp / DeltaT;
+                this->MassFlowRate = state.dataRefrigCase->TotalCondenserHeat / Cp / DeltaT;
                 // Check for maximum flow in the component
                 if (this->MassFlowRate > this->MassFlowRateMax) {
                     if (this->HighFlowWarnIndex == 0) {
@@ -10265,12 +10228,12 @@ namespace EnergyPlus::RefrigeratedCase {
             }
             } // compare outlet T to inlet T
 
-        } else if (this->FlowType == ConstantFlow && TotalCondenserHeat > 0.0) {
+        } else if (this->FlowType == ConstantFlow && state.dataRefrigCase->TotalCondenserHeat > 0.0) {
             // this part for constant flow condition
             this->VolFlowRate = this->DesVolFlowRate;
             this->MassFlowRate = this->VolFlowRate * rho;
 
-        } else if (TotalCondenserHeat == 0.0) {
+        } else if (state.dataRefrigCase->TotalCondenserHeat == 0.0) {
             this->MassFlowRate = 0.0;
 
         } // on flow type
@@ -10281,10 +10244,10 @@ namespace EnergyPlus::RefrigeratedCase {
         this->VolFlowRate = this->MassFlowRate / rho;
 
         if (this->MassFlowRate > 0) {
-            this->OutletTemp = TotalCondenserHeat / (this->MassFlowRate * Cp) + DataLoopNode::Node(PlantInletNode).Temp;
+            this->OutletTemp = state.dataRefrigCase->TotalCondenserHeat / (this->MassFlowRate * Cp) + DataLoopNode::Node(PlantInletNode).Temp;
         } else {
             this->OutletTemp = this->InletTemp;
-            if ((TotalCondenserHeat > 0.0) && (!FirstHVACIteration)) {
+            if ((state.dataRefrigCase->TotalCondenserHeat > 0.0) && (!FirstHVACIteration)) {
 
                 ShowRecurringWarningErrorAtEnd(state,
                     TypeName + this->Name +
@@ -10377,7 +10340,7 @@ namespace EnergyPlus::RefrigeratedCase {
             PlantBranchIndex = this->PlantBranchNum;
             PlantCompIndex = this->PlantCompNum;
 
-            TotalCondenserHeat =
+            state.dataRefrigCase->TotalCondenserHeat =
                 DataHeatBalance::HeatReclaimRefrigeratedRack(this->MyIdx).AvailCapacity - this->LaggedUsedWaterHeater - this->LaggedUsedHVACCoil;
             TypeName = "Refrigeration:CompressorRack:";
             ErrIntro = "Condenser for refrigeration rack ";
@@ -10391,7 +10354,7 @@ namespace EnergyPlus::RefrigeratedCase {
             Real64 Cp = FluidProperties::GetSpecificHeatGlycol(
                 state, DataPlant::PlantLoop(PlantLoopIndex).FluidName, this->InletTemp, DataPlant::PlantLoop(PlantLoopIndex).FluidIndex, RoutineName);
 
-            if (this->FlowType == VariableFlow && TotalCondenserHeat > 0.0) {
+            if (this->FlowType == VariableFlow && state.dataRefrigCase->TotalCondenserHeat > 0.0) {
                 this->OutletTemp = ScheduleManager::GetCurrentScheduleValue(state, this->OutletTempSchedPtr);
 
                 if (this->OutletTemp == this->InletTemp) {
@@ -10409,7 +10372,7 @@ namespace EnergyPlus::RefrigeratedCase {
                     this->MassFlowRate = this->VolFlowRate * rho;
                 } else {
                     Real64 DeltaT = this->OutletTemp - this->InletTemp;
-                    this->MassFlowRate = TotalCondenserHeat / Cp / DeltaT;
+                    this->MassFlowRate = state.dataRefrigCase->TotalCondenserHeat / Cp / DeltaT;
                     // Check for maximum flow in the component
                     if (this->MassFlowRate > this->MassFlowRateMax) {
                         if (this->HighFlowWarnIndex == 0) {
@@ -10424,12 +10387,12 @@ namespace EnergyPlus::RefrigeratedCase {
                     }
                 } // compare outlet T to inlet T
 
-            } else if (this->FlowType == ConstantFlow && TotalCondenserHeat > 0.0) {
+            } else if (this->FlowType == ConstantFlow && state.dataRefrigCase->TotalCondenserHeat > 0.0) {
                 // this part for constant flow condition
                 this->VolFlowRate = this->DesVolFlowRate;
                 this->MassFlowRate = this->VolFlowRate * rho;
 
-            } else if (TotalCondenserHeat == 0.0) {
+            } else if (state.dataRefrigCase->TotalCondenserHeat == 0.0) {
                 this->MassFlowRate = 0.0;
 
             } // on flow type
@@ -10440,10 +10403,10 @@ namespace EnergyPlus::RefrigeratedCase {
             this->VolFlowRate = this->MassFlowRate / rho;
 
             if (this->MassFlowRate > 0) {
-                this->OutletTemp = TotalCondenserHeat / (this->MassFlowRate * Cp) + DataLoopNode::Node(PlantInletNode).Temp;
+                this->OutletTemp = state.dataRefrigCase->TotalCondenserHeat / (this->MassFlowRate * Cp) + DataLoopNode::Node(PlantInletNode).Temp;
             } else {
                 this->OutletTemp = this->InletTemp;
-                if ((TotalCondenserHeat > 0.0) && (!FirstHVACIteration)) {
+                if ((state.dataRefrigCase->TotalCondenserHeat > 0.0) && (!FirstHVACIteration)) {
 
                     ShowRecurringWarningErrorAtEnd(state,
                         TypeName + this->Name +
@@ -11359,10 +11322,10 @@ namespace EnergyPlus::RefrigeratedCase {
         if (UseSysTimeStep) LocalTimeStep = DataHVACGlobals::TimeStepSys;
 
         // Initialize this condenser for this time step
-        TotalCondenserPumpPower = 0.0;
-        TotalBasinHeatPower = 0.0;
-        TotalCondenserHeat = 0.0;
-        TotalEvapWaterUseRate = 0.0;
+        state.dataRefrigCase->TotalCondenserPumpPower = 0.0;
+        state.dataRefrigCase->TotalBasinHeatPower = 0.0;
+        state.dataRefrigCase->TotalCondenserHeat = 0.0;
+        state.dataRefrigCase->TotalEvapWaterUseRate = 0.0;
         ActualFanPower = 0.0;
         TotalCondDefrostCreditLocal = 0.0;
         TotalLoadFromSystems = 0.0;
@@ -11406,10 +11369,10 @@ namespace EnergyPlus::RefrigeratedCase {
         condenser.InternalHeatRecoveredLoad = TotalCondDefrostCreditLocal;
         condenser.TotalHeatRecoveredLoad = condenser.ExternalHeatRecoveredLoad + TotalCondDefrostCreditLocal;
 
-        TotalCondenserHeat = TotalLoadFromSystems - TotalCondDefrostCreditLocal - condenser.ExternalHeatRecoveredLoad;
-        if (TotalCondenserHeat < 0.0) {
+        state.dataRefrigCase->TotalCondenserHeat = TotalLoadFromSystems - TotalCondDefrostCreditLocal - condenser.ExternalHeatRecoveredLoad;
+        if (state.dataRefrigCase->TotalCondenserHeat < 0.0) {
 
-            TotalCondenserHeat = 0.0;
+            state.dataRefrigCase->TotalCondenserHeat = 0.0;
             if (!state.dataGlobal->WarmupFlag) {
                 ShowRecurringWarningErrorAtEnd(state, "Refrigeration:System: " + this->Name +
                                                    ":heat reclaimed(defrost,other purposes) >current condenser load. ",
@@ -11459,7 +11422,7 @@ namespace EnergyPlus::RefrigeratedCase {
             // Condensing Temp, fan and other aux loads for air-cooled or evap-cooled
 
             // The rated capacity of air-cooled condenser was adjusted for elevation in get input step
-            CapFac = TotalCondenserHeat / condenser.RatedCapacity;
+            CapFac = state.dataRefrigCase->TotalCondenserHeat / condenser.RatedCapacity;
             // See whether condenser is at ground level or if other air conditions(ie node) have been specified.
             //    Note that air-cooled condensers can draw air from, and reject heat to, a conditioned zone
             //    But evaporative condensers cannot.
@@ -11516,7 +11479,7 @@ namespace EnergyPlus::RefrigeratedCase {
                     condenser.EvapCoeff1 + condenser.EvapCoeff2 * HRCF + condenser.EvapCoeff3 / HRCF + (1.0 + condenser.EvapCoeff4) * SinkTemp;
             } else { // air-cooled condenser
                 // MinCondLoad and TempSlope came from condenser capacity curve, using curve backwards
-                TCondCalc = OutDbTemp + (TotalCondenserHeat - condenser.MinCondLoad) * condenser.TempSlope;
+                TCondCalc = OutDbTemp + (state.dataRefrigCase->TotalCondenserHeat - condenser.MinCondLoad) * condenser.TempSlope;
                 SinkTemp = OutDbTemp;
             } // if evap-cooled condenser
 
@@ -11534,7 +11497,7 @@ namespace EnergyPlus::RefrigeratedCase {
                 if (condenser.CondenserType == DataHeatBalance::RefrigCondenserTypeAir) {
                     // current maximum condenser capacity at delta T present for minimum condensing temperature [W]
                     Real64 CurMaxCapacity = CurveManager::CurveValue(state, condenser.CapCurvePtr, (this->TCondenseMin - OutDbTemp));
-                    CapFac = TotalCondenserHeat / CurMaxCapacity;
+                    CapFac = state.dataRefrigCase->TotalCondenserHeat / CurMaxCapacity;
                     AirVolRatio = max(FanMinAirFlowRatio, std::pow(CapFac, CondAirVolExponentDry)); // Fans limited by minimum air flow ratio
                     AirVolRatio = min(AirVolRatio, 1.0);
                 } else { // condenser.CondenserType == DataHeatBalance::RefrigCondenserTypeEvap
@@ -11588,26 +11551,26 @@ namespace EnergyPlus::RefrigeratedCase {
                 //  Also, based on experience, running the evap water when outdoor T near freezing
                 //  leads to 'spectacular' ice, so schedule evap off when Tdb <=4 C.
                 // Calculate bleed/purge rate of water loss as a function of capacity, 3 gpm/100 tons refrigeration
-                PurgeRate = TotalCondenserHeat * BleedRateConstant;
+                PurgeRate = state.dataRefrigCase->TotalCondenserHeat * BleedRateConstant;
                 EnthalpyAirIn = Psychrometrics::PsyHFnTdbW(OutDbTemp, HumRatIn);
                 // calculate effectiveness at rated conditions, so use Tcondcalc)
                 EnthalpyAtTcond = Psychrometrics::PsyHFnTdbRhPb(state, TCondCalc, 1.0, BPress);
-                Effectiveness = TotalCondenserHeat / (RatedAirFlowRate * AirDensity * (EnthalpyAtTcond - EnthalpyAirIn));
+                Effectiveness = state.dataRefrigCase->TotalCondenserHeat / (RatedAirFlowRate * AirDensity * (EnthalpyAtTcond - EnthalpyAirIn));
                 // need to limit max effectiveness for errors due to working beyond limits of HRCF in manuf data
                 Effectiveness = min(Effectiveness, 0.9);
                 EnthalpyAirOut = EnthalpyAirIn + Effectiveness * (EnthalpyAtTcond - EnthalpyAirIn);
                 // Air leaving the evaporative condenser is saturated
                 Real64 TAirOut = Psychrometrics::PsyTsatFnHPb(state, EnthalpyAirOut, BPress);
                 HumRatOut = Psychrometrics::PsyWFnTdpPb(state, TAirOut, BPress);
-                TotalEvapWaterUseRate =
+                state.dataRefrigCase->TotalEvapWaterUseRate =
                     PurgeRate + RatedAirFlowRate * AirVolRatio * AirDensityDry * (HumRatOut - HumRatIn) / Psychrometrics::RhoH2O(OutWbTemp);
                 // assumes evap water pump runs whenever evap cooling is available to minimize scaling
-                TotalCondenserPumpPower = condenser.EvapPumpPower;
+                state.dataRefrigCase->TotalCondenserPumpPower = condenser.EvapPumpPower;
                 // calculate basin water heater load
-                if (TotalCondenserHeat == 0.0 && OutDbTemp < condenser.BasinHeaterSetPointTemp) {
-                    TotalBasinHeatPower = max(0.0, condenser.BasinHeaterPowerFTempDiff * (condenser.BasinHeaterSetPointTemp - OutDbTemp));
+                if (state.dataRefrigCase->TotalCondenserHeat == 0.0 && OutDbTemp < condenser.BasinHeaterSetPointTemp) {
+                    state.dataRefrigCase->TotalBasinHeatPower = max(0.0, condenser.BasinHeaterPowerFTempDiff * (condenser.BasinHeaterSetPointTemp - OutDbTemp));
                     // provide warning if no heater power exists
-                    if (TotalBasinHeatPower == 0.0) {
+                    if (state.dataRefrigCase->TotalBasinHeatPower == 0.0) {
                         // condenser.EvapFreezeWarn = condenser.EvapFreezeWarn + 1;
                         if (condenser.EvapFreezeWarnIndex == 0) {
                             ShowWarningMessage(state, "Refrigeration Condenser " + condenser.Name +
@@ -11646,14 +11609,14 @@ namespace EnergyPlus::RefrigeratedCase {
 
         condenser.ActualFanPower = ActualFanPower;
         condenser.FanElecEnergy = ActualFanPower * LocalTimeStep * DataGlobalConstants::SecInHour;
-        condenser.EvapWaterConsumpRate = TotalEvapWaterUseRate;
-        condenser.EvapWaterConsumption = TotalEvapWaterUseRate * LocalTimeStep * DataGlobalConstants::SecInHour;
-        condenser.ActualEvapPumpPower = TotalCondenserPumpPower;
-        condenser.EvapPumpConsumption = TotalCondenserPumpPower * LocalTimeStep * DataGlobalConstants::SecInHour;
-        condenser.BasinHeaterPower = TotalBasinHeatPower;
-        condenser.BasinHeaterConsumption = TotalBasinHeatPower * LocalTimeStep * DataGlobalConstants::SecInHour;
-        condenser.CondLoad = TotalCondenserHeat;
-        condenser.CondEnergy = TotalCondenserHeat * LocalTimeStep * DataGlobalConstants::SecInHour;
+        condenser.EvapWaterConsumpRate = state.dataRefrigCase->TotalEvapWaterUseRate;
+        condenser.EvapWaterConsumption = state.dataRefrigCase->TotalEvapWaterUseRate * LocalTimeStep * DataGlobalConstants::SecInHour;
+        condenser.ActualEvapPumpPower = state.dataRefrigCase->TotalCondenserPumpPower;
+        condenser.EvapPumpConsumption = state.dataRefrigCase->TotalCondenserPumpPower * LocalTimeStep * DataGlobalConstants::SecInHour;
+        condenser.BasinHeaterPower = state.dataRefrigCase->TotalBasinHeatPower;
+        condenser.BasinHeaterConsumption = state.dataRefrigCase->TotalBasinHeatPower * LocalTimeStep * DataGlobalConstants::SecInHour;
+        condenser.CondLoad = state.dataRefrigCase->TotalCondenserHeat;
+        condenser.CondEnergy = state.dataRefrigCase->TotalCondenserHeat * LocalTimeStep * DataGlobalConstants::SecInHour;
         condenser.CondCreditWarnIndex1 = CondCreditWarnIndex1;
         condenser.CondCreditWarnIndex2 = CondCreditWarnIndex2;
         condenser.CondCreditWarnIndex3 = CondCreditWarnIndex3;
@@ -11664,7 +11627,7 @@ namespace EnergyPlus::RefrigeratedCase {
         condenser.ExternalEnergyRecovered = condenser.ExternalHeatRecoveredLoad * LocalTimeStep * DataGlobalConstants::SecInHour;
         condenser.InternalEnergyRecovered = condenser.InternalHeatRecoveredLoad * LocalTimeStep * DataGlobalConstants::SecInHour;
         condenser.TotalHeatRecoveredEnergy = condenser.TotalHeatRecoveredLoad * LocalTimeStep * DataGlobalConstants::SecInHour;
-        this->NetHeatRejectLoad = TotalCondenserHeat * TotalLoadFromThisSystem / TotalLoadFromSystems;
+        this->NetHeatRejectLoad = state.dataRefrigCase->TotalCondenserHeat * TotalLoadFromThisSystem / TotalLoadFromSystems;
         this->NetHeatRejectEnergy = this->NetHeatRejectLoad * LocalTimeStep * DataGlobalConstants::SecInHour;
 
         // set water system demand request (if needed)
