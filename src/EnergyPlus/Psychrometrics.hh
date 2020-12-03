@@ -58,6 +58,7 @@
 #include <ObjexxFCL/bit.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -1374,6 +1375,14 @@ namespace Psychrometrics {
 
 } // namespace Psychrometrics
 
-} // namespace EnergyPlus
+struct PsychrometricsData : BaseGlobalStruct
+{
+
+    void clear_state() override
+    {
+    }
+};
+
+}; // namespace EnergyPlus
 
 #endif

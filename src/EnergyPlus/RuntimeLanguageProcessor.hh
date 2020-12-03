@@ -261,6 +261,13 @@ namespace RuntimeLanguageProcessor {
 
 } // namespace RuntimeLanguageProcessor
 
+struct RuntimeLanguageProcessorData : BaseGlobalStruct {
+
+    void clear_state() override {
+
+    }
+};
+
 } // namespace EnergyPlus
 
 #endif
