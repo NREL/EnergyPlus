@@ -354,19 +354,19 @@ namespace RoomAirModelUserTempPattern {
             {
                 auto const SELECT_CASE_var(RoomAirPattern(CurPatrnID).PatternMode);
 
-                if (SELECT_CASE_var == ConstGradTempPattern) {
+                if (SELECT_CASE_var == DataRoomAirModel::UserDefinedPatternType::ConstGradTempPattern) {
 
                     FigureConstGradPattern(CurPatrnID, ZoneNum);
 
-                } else if (SELECT_CASE_var == TwoGradInterpPattern) {
+                } else if (SELECT_CASE_var == DataRoomAirModel::UserDefinedPatternType::TwoGradInterpPattern) {
 
                     FigureTwoGradInterpPattern(state, CurPatrnID, ZoneNum);
 
-                } else if (SELECT_CASE_var == NonDimenHeightPattern) {
+                } else if (SELECT_CASE_var == DataRoomAirModel::UserDefinedPatternType::NonDimenHeightPattern) {
 
                     FigureHeightPattern(CurPatrnID, ZoneNum);
 
-                } else if (SELECT_CASE_var == SurfMapTempPattern) {
+                } else if (SELECT_CASE_var == DataRoomAirModel::UserDefinedPatternType::SurfMapTempPattern) {
 
                     FigureSurfMapPattern(CurPatrnID, ZoneNum);
 

@@ -113,10 +113,13 @@ namespace DataRoomAirModel {
     };
 
     // user defined temperature pattern types
-    extern int const ConstGradTempPattern;  // constant gradient in vertical direction
-    extern int const TwoGradInterpPattern;  // two gradient interpolation
-    extern int const NonDimenHeightPattern; // non-dimensionalized height
-    extern int const SurfMapTempPattern;    // arbitrary surface mappings
+    enum class UserDefinedPatternType {
+        Unassigned,
+        ConstGradTempPattern,  // constant gradient in vertical direction
+        TwoGradInterpPattern,  // two gradient interpolation
+        NonDimenHeightPattern, // non-dimensionalized height
+        SurfMapTempPattern    // arbitrary surface mappings
+    };
 
     // parameters to indicate diffuser type
     extern int const Swirl;
@@ -515,7 +518,7 @@ namespace DataRoomAirModel {
         // Members
         std::string Name;                        // unique identifier
         int PatrnID;                             // control ID for referencing in Schedules
-        int PatternMode;                         // Control for what type of calcs in this pattern
+        UserDefinedPatternType PatternMode;                         // Control for what type of calcs in this pattern
         ConstGradPattern GradPatrn;              // Constant gradient pattern
         TwoVertGradInterpolPattern TwoGradPatrn; // Two gradient interpolation pattern
         TempVsHeightPattern VertPatrn;           // Vertical gradient profile pattern
@@ -525,7 +528,7 @@ namespace DataRoomAirModel {
         Real64 DeltaTexhaust;                    // (Texhaust - MAT) deg C
 
         // Default Constructor
-        TemperaturePatternStruct() : PatrnID(0), PatternMode(0), DeltaTstat(0.0), DeltaTleaving(0.0), DeltaTexhaust(0.0)
+        TemperaturePatternStruct() : PatrnID(0), PatternMode(UserDefinedPatternType::Unassigned), DeltaTstat(0.0), DeltaTleaving(0.0), DeltaTexhaust(0.0)
         {
         }
     };

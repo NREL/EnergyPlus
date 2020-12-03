@@ -426,7 +426,7 @@ namespace RoomAirModelManager {
 
             RoomAirPattern(thisPattern).Name = cAlphaArgs(1);
             RoomAirPattern(thisPattern).PatrnID = rNumericArgs(1);
-            RoomAirPattern(thisPattern).PatternMode = ConstGradTempPattern;
+            RoomAirPattern(thisPattern).PatternMode = DataRoomAirModel::UserDefinedPatternType::ConstGradTempPattern;
             RoomAirPattern(thisPattern).DeltaTstat = rNumericArgs(2);
             RoomAirPattern(thisPattern).DeltaTleaving = rNumericArgs(3);
             RoomAirPattern(thisPattern).DeltaTexhaust = rNumericArgs(4);
@@ -438,7 +438,7 @@ namespace RoomAirModelManager {
             thisPattern = NumConstantGradient + ObjNum;
             inputProcessor->getObjectItem(
                 state, cCurrentModuleObject, ObjNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status, _, _, cAlphaFieldNames, cNumericFieldNames);
-            RoomAirPattern(thisPattern).PatternMode = TwoGradInterpPattern;
+            RoomAirPattern(thisPattern).PatternMode = DataRoomAirModel::UserDefinedPatternType::TwoGradInterpPattern;
             RoomAirPattern(thisPattern).Name = cAlphaArgs(1);
             RoomAirPattern(thisPattern).PatrnID = rNumericArgs(1);
             RoomAirPattern(thisPattern).TwoGradPatrn.TstatHeight = rNumericArgs(2);
@@ -494,7 +494,7 @@ namespace RoomAirModelManager {
         cCurrentModuleObject = cTempPatternNDHeightObject;
         for (ObjNum = 1; ObjNum <= NumNonDimensionalHeight; ++ObjNum) {
             thisPattern = NumConstantGradient + NumTwoGradientInterp + ObjNum;
-            RoomAirPattern(thisPattern).PatternMode = NonDimenHeightPattern;
+            RoomAirPattern(thisPattern).PatternMode = DataRoomAirModel::UserDefinedPatternType::NonDimenHeightPattern;
 
             inputProcessor->getObjectItem(
                 state, cCurrentModuleObject, ObjNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status, _, _, cAlphaFieldNames, cNumericFieldNames);
@@ -533,7 +533,7 @@ namespace RoomAirModelManager {
         cCurrentModuleObject = cTempPatternSurfMapObject;
         for (ObjNum = 1; ObjNum <= NumSurfaceMapping; ++ObjNum) {
             thisPattern = NumConstantGradient + NumTwoGradientInterp + NumNonDimensionalHeight + ObjNum;
-            RoomAirPattern(thisPattern).PatternMode = SurfMapTempPattern;
+            RoomAirPattern(thisPattern).PatternMode = DataRoomAirModel::UserDefinedPatternType::SurfMapTempPattern;
 
             inputProcessor->getObjectItem(
                 state, cCurrentModuleObject, ObjNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status, _, _, cAlphaFieldNames, cNumericFieldNames);

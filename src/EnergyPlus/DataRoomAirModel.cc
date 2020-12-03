@@ -88,12 +88,6 @@ namespace DataRoomAirModel {
     int const RoomAirNode3(8);               // air node for vertical walls (for Rees&Haves Model)
     int const RoomAirNode4(9);               // air node for vertical walls (for Rees&Haves Model)
 
-    // user defined temperature pattern types
-    int const ConstGradTempPattern(31);  // constant gradient in vertical direction
-    int const TwoGradInterpPattern(32);  // two gradient interpolation
-    int const NonDimenHeightPattern(33); // non-dimensionalized height
-    int const SurfMapTempPattern(34);    // arbitrary surface mappings
-
     // parameters to indicate diffuser type
     int const Swirl(1);
     int const VarArea(2);
