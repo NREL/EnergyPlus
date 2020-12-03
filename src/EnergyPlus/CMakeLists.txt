@@ -34,6 +34,8 @@ if(USE_PSYCH_ERRORS)
 endif()
 
 SET( SRC
+  StateManagement.cc
+  StateManagement.hh
   "${PROJECT_SOURCE_DIR}/third_party/milo/dtoa.h"
   "${PROJECT_SOURCE_DIR}/third_party/milo/itoa.h"
   "${PROJECT_SOURCE_DIR}/third_party/milo/diyfp.h"
@@ -173,7 +175,6 @@ SET( SRC
   DataEnvironment.hh
   DataErrorTracking.cc
   DataErrorTracking.hh
-  DataGenerators.cc
   DataGenerators.hh
   DataGlobalConstants.cc
   DataGlobalConstants.hh
@@ -585,8 +586,6 @@ SET( SRC
   SplitterComponent.hh
   StandardRatings.cc
   StandardRatings.hh
-  StateManagement.cc
-  StateManagement.hh
   SteamBaseboardRadiator.cc
   SteamBaseboardRadiator.hh
   SteamCoils.cc
