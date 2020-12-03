@@ -92,32 +92,7 @@ namespace EMSManager {
     // Using/Aliasing
     using namespace DataRuntimeLanguage;
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-    int const iTemperatureSetPoint(101);      // integer for node setpoint control type
-    int const iTemperatureMinSetPoint(102);   // integer for node setpoint control type
-    int const iTemperatureMaxSetPoint(103);   // integer for node setpoint control type
-    int const iHumidityRatioSetPoint(104);    // integer for node setpoint control type
-    int const iHumidityRatioMinSetPoint(105); // integer for node setpoint control type
-    int const iHumidityRatioMaxSetPoint(106); // integer for node setpoint control type
-    int const iMassFlowRateSetPoint(107);     // integer for node setpoint control type
-    int const iMassFlowRateMinSetPoint(108);  // integer for node setpoint control type
-    int const iMassFlowRateMaxSetPoint(109);  // integer for node setpoint control type
-
-    static std::string const BlankString;
-
-    // MODULE VARIABLE DECLARATIONS:
-    bool GetEMSUserInput(true); // Flag to prevent input from being read multiple times
-    bool ZoneThermostatActuatorsHaveBeenSetup(false);
-    bool FinishProcessingUserInput(true); // Flag to indicate still need to process input
-
-    // Functions
-    void clear_state()
-    {
-        GetEMSUserInput = true;
-        ZoneThermostatActuatorsHaveBeenSetup = false;
-        FinishProcessingUserInput = true;
-    }
+    auto constexpr BlankString("");
 
     void CheckIfAnyEMS(EnergyPlusData &state)
     {
@@ -383,31 +358,11 @@ namespace EMSManager {
         // PURPOSE OF THIS SUBROUTINE:
         // collect routines needed to initialize EMS
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataZoneControls::GetZoneAirStatsInputFlag;
         using RuntimeLanguageProcessor::InitializeRuntimeLanguage;
         using RuntimeLanguageProcessor::SetErlValueNumber;
         using ScheduleManager::GetCurrentScheduleValue;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         int InternalVarUsedNum; // local index and loop
         int InternVarAvailNum;  // local index
@@ -415,7 +370,7 @@ namespace EMSManager {
         int ErlVariableNum;     // local index
         Real64 tmpReal;         // temporary local integer
 
-        if (GetEMSUserInput) {
+        if (state.dataEMSMgr->GetEMSUserInput) {
             SetupZoneInfoAsInternalDataAvail(state);
             SetupWindowShadingControlActuators(state);
             SetupSurfaceConvectionActuators();
@@ -423,22 +378,22 @@ namespace EMSManager {
             SetupSurfaceOutdoorBoundaryConditionActuators();
             SetupZoneOutdoorBoundaryConditionActuators(state);
             GetEMSInput(state);
-            GetEMSUserInput = false;
+            state.dataEMSMgr->GetEMSUserInput = false;
         }
 
-        if (!GetZoneAirStatsInputFlag && !ZoneThermostatActuatorsHaveBeenSetup) {
+        if (!GetZoneAirStatsInputFlag && !state.dataEMSMgr->ZoneThermostatActuatorsHaveBeenSetup) {
             SetupThermostatActuators();
-            ZoneThermostatActuatorsHaveBeenSetup = true;
+            state.dataEMSMgr->ZoneThermostatActuatorsHaveBeenSetup = true;
         }
 
         // need to delay setup of HVAC actuator until after the systems input has been processed (if present)
-        if (FinishProcessingUserInput && !state.dataGlobal->DoingSizing && !state.dataGlobal->KickOffSimulation) {
+        if (state.dataEMSMgr->FinishProcessingUserInput && !state.dataGlobal->DoingSizing && !state.dataGlobal->KickOffSimulation) {
             SetupNodeSetPointsAsActuators();
             SetupPrimaryAirSystemAvailMgrAsActuators(state);
             //    CALL SetupWindowShadingControlActuators !this is too late for including in sizing, moved to GetEMSUserInput
             //    CALL SetupThermostatActuators !this is too late for including in sizing, moved to GetEMSUserInput
             //    CALL SetupSurfaceConvectionActuators !this is too late for including in sizing, moved to GetEMSUserInput
-            FinishProcessingUserInput = false;
+            state.dataEMSMgr->FinishProcessingUserInput = false;
         }
 
         InitializeRuntimeLanguage(state);
@@ -447,7 +402,7 @@ namespace EMSManager {
             (iCalledFrom == EMSCallFrom::UserDefinedComponentModel)) {
 
             // another pass at trying to setup input data.
-            if (FinishProcessingUserInput) {
+            if (state.dataEMSMgr->FinishProcessingUserInput) {
                 ProcessEMSInput(state, false);
             }
 
@@ -455,8 +410,8 @@ namespace EMSManager {
             for (InternalVarUsedNum = 1; InternalVarUsedNum <= NumInternalVariablesUsed; ++InternalVarUsedNum) {
                 ErlVariableNum = EMSInternalVarsUsed(InternalVarUsedNum).ErlVariableNum;
                 InternVarAvailNum = EMSInternalVarsUsed(InternalVarUsedNum).InternVarNum;
-                if (!(InternVarAvailNum > 0)) continue; // sometimes executes before completely finished setting up.
-                if (!(ErlVariableNum > 0)) continue;
+                if (InternVarAvailNum <= 0) continue; // sometimes executes before completely finished setting up.
+                if (ErlVariableNum <= 0) continue;
 
                 {
                     auto const SELECT_CASE_var(EMSInternalVarsAvailable(InternVarAvailNum).PntrVarTypeUsed);
@@ -506,16 +461,7 @@ namespace EMSManager {
         // METHODOLOGY EMPLOYED:
         // Standard EnergyPlus methodology.
 
-        // Using/Aliasing
-        using RuntimeLanguageProcessor::ReportRuntimeLanguage;
-
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // INTEGER, INTENT(IN) :: ListNum
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-        // FLOW:
-        ReportRuntimeLanguage();
+        RuntimeLanguageProcessor::ReportRuntimeLanguage();
     }
 
     void GetEMSInput(EnergyPlusData &state)
@@ -1630,28 +1576,28 @@ namespace EMSManager {
         }
     }
 
-    std::string controlTypeName(int const SetPointType) {
+    std::string controlTypeName(SPControlType const SetPointType) {
         std::string cControlTypeName;
 
         auto const SELECT_CASE_var(SetPointType);
 
-        if (SELECT_CASE_var == iTemperatureSetPoint) {
+        if (SELECT_CASE_var == SPControlType::iTemperatureSetPoint) {
             cControlTypeName = "Temperature Setpoint";
-        } else if (SELECT_CASE_var == iTemperatureMinSetPoint) {
+        } else if (SELECT_CASE_var == SPControlType::iTemperatureMinSetPoint) {
             cControlTypeName = "Temperature Minimum Setpoint";
-        } else if (SELECT_CASE_var == iTemperatureMaxSetPoint) {
+        } else if (SELECT_CASE_var == SPControlType::iTemperatureMaxSetPoint) {
             cControlTypeName = "Temperature Maximum Setpoint";
-        } else if (SELECT_CASE_var == iHumidityRatioSetPoint) {
+        } else if (SELECT_CASE_var == SPControlType::iHumidityRatioSetPoint) {
             cControlTypeName = "Humidity Ratio Setpoint";
-        } else if (SELECT_CASE_var == iHumidityRatioMinSetPoint) {
+        } else if (SELECT_CASE_var == SPControlType::iHumidityRatioMinSetPoint) {
             cControlTypeName = "Humidity Ratio Minimum Setpoint";
-        } else if (SELECT_CASE_var == iHumidityRatioMaxSetPoint) {
+        } else if (SELECT_CASE_var == SPControlType::iHumidityRatioMaxSetPoint) {
             cControlTypeName = "Humidity Ratio Maximum Setpoint";
-        } else if (SELECT_CASE_var == iMassFlowRateSetPoint) {
+        } else if (SELECT_CASE_var == SPControlType::iMassFlowRateSetPoint) {
             cControlTypeName = "Mass Flow Rate Setpoint";
-        } else if (SELECT_CASE_var == iMassFlowRateMinSetPoint) {
+        } else if (SELECT_CASE_var == SPControlType::iMassFlowRateMinSetPoint) {
             cControlTypeName = "Mass Flow Rate Minimum Available Setpoint";
-        } else if (SELECT_CASE_var == iMassFlowRateMaxSetPoint) {
+        } else if (SELECT_CASE_var == SPControlType::iMassFlowRateMaxSetPoint) {
             cControlTypeName = "Mass Flow Rate Maximum Available Setpoint";
         }
 
@@ -1659,7 +1605,7 @@ namespace EMSManager {
 
     }
 
-    bool CheckIfNodeSetPointManaged(EnergyPlusData &state, int const NodeNum, int const SetPointType, bool byHandle) {
+    bool CheckIfNodeSetPointManaged(EnergyPlusData &state, int const NodeNum, SPControlType const SetPointType, bool byHandle) {
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
@@ -1711,7 +1657,7 @@ namespace EMSManager {
 
     bool CheckIfNodeSetPointManagedByEMS(EnergyPlusData &state,
                                          int const NodeNum, // index of node being checked.
-                                         int const SetPointType,
+                                         SPControlType const SetPointType,
                                          bool &ErrorFlag)
     {
 
@@ -1744,23 +1690,23 @@ namespace EMSManager {
                 nodeSetpointCheck.needsSetpointChecking = true;
 
                 auto const SELECT_CASE_var(SetPointType);
-                if (SELECT_CASE_var == iTemperatureSetPoint) {
+                if (SELECT_CASE_var == SPControlType::iTemperatureSetPoint) {
                     nodeSetpointCheck.checkTemperatureSetPoint = true;
-                } else if (SELECT_CASE_var == iTemperatureMinSetPoint) {
+                } else if (SELECT_CASE_var == SPControlType::iTemperatureMinSetPoint) {
                     nodeSetpointCheck.checkTemperatureMinSetPoint = true;
-                } else if (SELECT_CASE_var == iTemperatureMaxSetPoint) {
+                } else if (SELECT_CASE_var == SPControlType::iTemperatureMaxSetPoint) {
                     nodeSetpointCheck.checkTemperatureMaxSetPoint = true;
-                } else if (SELECT_CASE_var == iHumidityRatioSetPoint) {
+                } else if (SELECT_CASE_var == SPControlType::iHumidityRatioSetPoint) {
                     nodeSetpointCheck.checkHumidityRatioSetPoint = true;
-                } else if (SELECT_CASE_var == iHumidityRatioMinSetPoint) {
+                } else if (SELECT_CASE_var == SPControlType::iHumidityRatioMinSetPoint) {
                     nodeSetpointCheck.checkHumidityRatioMinSetPoint = true;
-                } else if (SELECT_CASE_var == iHumidityRatioMaxSetPoint) {
+                } else if (SELECT_CASE_var == SPControlType::iHumidityRatioMaxSetPoint) {
                     nodeSetpointCheck.checkHumidityRatioMaxSetPoint = true;
-                } else if (SELECT_CASE_var == iMassFlowRateSetPoint) {
+                } else if (SELECT_CASE_var == SPControlType::iMassFlowRateSetPoint) {
                     nodeSetpointCheck.checkMassFlowRateSetPoint = true;
-                } else if (SELECT_CASE_var == iMassFlowRateMinSetPoint) {
+                } else if (SELECT_CASE_var == SPControlType::iMassFlowRateMinSetPoint) {
                     nodeSetpointCheck.checkMassFlowRateMinSetPoint = true;
-                } else if (SELECT_CASE_var == iMassFlowRateMaxSetPoint) {
+                } else if (SELECT_CASE_var == SPControlType::iMassFlowRateMaxSetPoint) {
                     nodeSetpointCheck.checkMassFlowRateMaxSetPoint = true;
                 }
 
@@ -1793,31 +1739,31 @@ namespace EMSManager {
                 nodeSetpointCheck.needsSetpointChecking = false;
 
                 if (nodeSetpointCheck.checkTemperatureSetPoint) {
-                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(state, NodeNum, iTemperatureSetPoint, true);
+                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(state, NodeNum, SPControlType::iTemperatureSetPoint, true);
                 }
                 if (nodeSetpointCheck.checkTemperatureMinSetPoint) {
-                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(state, NodeNum, iTemperatureMinSetPoint, true);
+                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(state, NodeNum, SPControlType::iTemperatureMinSetPoint, true);
                 }
                 if (nodeSetpointCheck.checkTemperatureMaxSetPoint) {
-                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(state, NodeNum, iTemperatureMaxSetPoint, true);
+                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(state, NodeNum, SPControlType::iTemperatureMaxSetPoint, true);
                 }
                 if (nodeSetpointCheck.checkHumidityRatioSetPoint) {
-                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(state, NodeNum, iHumidityRatioSetPoint, true);
+                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(state, NodeNum, SPControlType::iHumidityRatioSetPoint, true);
                 }
                 if (nodeSetpointCheck.checkHumidityRatioMinSetPoint) {
-                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(state, NodeNum, iHumidityRatioMinSetPoint, true);
+                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(state, NodeNum, SPControlType::iHumidityRatioMinSetPoint, true);
                 }
                 if (nodeSetpointCheck.checkHumidityRatioMaxSetPoint) {
-                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(state, NodeNum, iHumidityRatioMaxSetPoint, true);
+                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(state, NodeNum, SPControlType::iHumidityRatioMaxSetPoint, true);
                 }
                 if (nodeSetpointCheck.checkMassFlowRateSetPoint) {
-                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(state, NodeNum, iMassFlowRateSetPoint, true);
+                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(state, NodeNum, SPControlType::iMassFlowRateSetPoint, true);
                 }
                 if (nodeSetpointCheck.checkMassFlowRateMinSetPoint) {
-                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(state, NodeNum, iMassFlowRateMinSetPoint, true);
+                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(state, NodeNum, SPControlType::iMassFlowRateMinSetPoint, true);
                 }
                 if (nodeSetpointCheck.checkMassFlowRateMaxSetPoint) {
-                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(state, NodeNum, iMassFlowRateMaxSetPoint, true);
+                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(state, NodeNum, SPControlType::iMassFlowRateMaxSetPoint, true);
                 }
 
                 if (nodeSetpointCheck.needsSetpointChecking) {
@@ -2220,7 +2166,7 @@ namespace EMSManager {
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
 
             if (!Surface(SurfNum).HeatTransSurf) continue;
-            if (!(Surface(SurfNum).ExtBoundCond == ExternalEnvironment)) continue;
+            if (Surface(SurfNum).ExtBoundCond != ExternalEnvironment) continue;
 
             SetupEMSActuator("Surface",
                              Surface(SurfNum).Name,

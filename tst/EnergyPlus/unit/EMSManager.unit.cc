@@ -163,7 +163,7 @@ TEST_F(EnergyPlusFixture, Dual_NodeTempSetpoints)
 
     EMSManager::CheckIfAnyEMS(*state);
 
-    EMSManager::FinishProcessingUserInput = true;
+    state->dataEMSMgr->FinishProcessingUserInput = true;
 
     bool anyRan;
     EMSManager::ManageEMS(*state, EMSManager::EMSCallFrom::SetupSimulation, anyRan, ObjexxFCL::Optional_int_const());
@@ -237,7 +237,7 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetActuatedBranchFlo
     EMSManager::CheckIfAnyEMS(*state);
 
     // allows NodeSetpoint and AvailabilityManagers actuators to be setup
-    EMSManager::FinishProcessingUserInput = true;
+    state->dataEMSMgr->FinishProcessingUserInput = true;
 
     // set up plant loop
     DataPlant::TotNumLoops = 1;
@@ -401,7 +401,7 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetComponentFlowRate
     EMSManager::CheckIfAnyEMS(*state);
 
     // allows NodeSetpoint and AvailabilityManagers actuators to be setup
-    EMSManager::FinishProcessingUserInput = true;
+    state->dataEMSMgr->FinishProcessingUserInput = true;
 
     // set up plant loop
     DataPlant::TotNumLoops = 1;
@@ -706,7 +706,7 @@ TEST_F(EnergyPlusFixture, Test_EMSLogic)
     OutAirNodeManager::SetOutAirNodes(*state);
 
     EMSManager::CheckIfAnyEMS(*state);
-    EMSManager::FinishProcessingUserInput = true;
+    state->dataEMSMgr->FinishProcessingUserInput = true;
     bool anyRan;
     EMSManager::ManageEMS(*state, EMSManager::EMSCallFrom::SetupSimulation, anyRan, ObjexxFCL::Optional_int_const());
     EMSManager::ManageEMS(*state, EMSManager::EMSCallFrom::BeginNewEnvironment, anyRan, ObjexxFCL::Optional_int_const());
@@ -774,7 +774,7 @@ TEST_F(EnergyPlusFixture, Debug_EMSLogic)
     OutAirNodeManager::SetOutAirNodes(*state);
 
     EMSManager::CheckIfAnyEMS(*state);
-    EMSManager::FinishProcessingUserInput = true;
+    state->dataEMSMgr->FinishProcessingUserInput = true;
     bool anyRan;
     EMSManager::ManageEMS(*state, EMSManager::EMSCallFrom::SetupSimulation, anyRan, ObjexxFCL::Optional_int_const());
     EMSManager::ManageEMS(*state, EMSManager::EMSCallFrom::BeginNewEnvironment, anyRan, ObjexxFCL::Optional_int_const());
@@ -813,7 +813,7 @@ TEST_F(EnergyPlusFixture, TestAnyRanArgument)
     NodeInputManager::SetupNodeVarsForReporting(*state);
     EMSManager::CheckIfAnyEMS(*state);
 
-    EMSManager::FinishProcessingUserInput = true;
+    state->dataEMSMgr->FinishProcessingUserInput = true;
 
     bool anyRan;
     EMSManager::ManageEMS(*state, EMSManager::EMSCallFrom::SetupSimulation, anyRan, ObjexxFCL::Optional_int_const());
@@ -849,7 +849,7 @@ TEST_F(EnergyPlusFixture, TestUnInitializedEMSVariable1)
     ASSERT_TRUE(process_idf(idf_objects));
 
     EMSManager::CheckIfAnyEMS(*state);
-    EMSManager::FinishProcessingUserInput = true;
+    state->dataEMSMgr->FinishProcessingUserInput = true;
     bool anyRan;
     EMSManager::ManageEMS(*state, EMSManager::EMSCallFrom::SetupSimulation, anyRan, ObjexxFCL::Optional_int_const());
     // Find the variable in the list
@@ -907,14 +907,14 @@ TEST_F(EnergyPlusFixture, TestUnInitializedEMSVariable2)
     OutAirNodeManager::SetOutAirNodes(*state);
 
     EMSManager::CheckIfAnyEMS(*state);
-    EMSManager::FinishProcessingUserInput = true;
+    state->dataEMSMgr->FinishProcessingUserInput = true;
     bool anyRan;
     EMSManager::ManageEMS(*state, EMSManager::EMSCallFrom::SetupSimulation, anyRan, ObjexxFCL::Optional_int_const());
     // Expect the variable to not yet be initialized, call EvaluateExpresssion and check argument
 
     ErlValueType ReturnValue;
     bool seriousErrorFound = false;
-    EMSManager::FinishProcessingUserInput = false;
+    state->dataEMSMgr->FinishProcessingUserInput = false;
     ReturnValue = RuntimeLanguageProcessor::EvaluateExpression(*state,
         ErlStack(UtilityRoutines::FindItemInList("SETNODESETPOINTTEST", ErlStack)).Instruction(1).Argument2,
         seriousErrorFound); // we just check the logic and don't throw the fatal errors.
@@ -1084,7 +1084,7 @@ TEST_F(EnergyPlusFixture, EMSManager_TestFuntionCall)
     state->dataGlobal->TimeStepZone = 0.25;
 
     EMSManager::CheckIfAnyEMS(*state); // get EMS input
-    EMSManager::FinishProcessingUserInput = true;
+    state->dataEMSMgr->FinishProcessingUserInput = true;
     bool ErrorsFound(false);
     CurveManager::GetCurveInputData(*state, ErrorsFound); // process curve for use with EMS
     EXPECT_FALSE(ErrorsFound);
@@ -1744,7 +1744,7 @@ TEST_F(EnergyPlusFixture, EMS_WeatherDataActuators)
     WeatherManager::GetNextEnvironment(*state, available, errorsFound);
     ASSERT_FALSE(errorsFound);
 
-    EMSManager::FinishProcessingUserInput = true;
+    state->dataEMSMgr->FinishProcessingUserInput = true;
 
     // Initialize all sorts of weather stuff
     state->dataGlobal->TimeStep = 1;
@@ -1872,7 +1872,7 @@ TEST_F(EnergyPlusFixture, EMS_TodayTomorrowFunctions)
     WeatherManager::GetNextEnvironment(*state, available, errorsFound);
     ASSERT_FALSE(errorsFound);
 
-    EMSManager::FinishProcessingUserInput = true;
+    state->dataEMSMgr->FinishProcessingUserInput = true;
 
     // Initialize all sorts of weather stuff
     state->dataGlobal->TimeStep = 1;

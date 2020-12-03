@@ -1320,9 +1320,6 @@ CurrentModuleObject, PlantOpSchemeName);
         using namespace DataSizing;
         using namespace DataIPShortCuts;
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
-        using EMSManager::iTemperatureMaxSetPoint;
-        using EMSManager::iTemperatureMinSetPoint;
-        using EMSManager::iTemperatureSetPoint;
         using ScheduleManager::GetScheduleIndex;
         using SetPointManager::SetUpNewScheduledTESSetPtMgr;
 
@@ -1521,7 +1518,7 @@ CurrentModuleObject, PlantOpSchemeName);
                                         NodeEMSSetPointMissing = false;
                                         CheckIfNodeSetPointManagedByEMS(state,
                                             PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum,
-                                            iTemperatureSetPoint,
+                                                                        EMSManager::SPControlType::iTemperatureSetPoint,
                                             NodeEMSSetPointMissing);
                                         if (NodeEMSSetPointMissing) {
                                             ShowSevereError(state, "Missing temperature setpoint for " + CurrentModuleObject + " named " + cAlphaArgs(1));
@@ -1559,7 +1556,7 @@ CurrentModuleObject, PlantOpSchemeName);
                                             NodeEMSSetPointMissing = false;
                                             CheckIfNodeSetPointManagedByEMS(state,
                                                 PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum,
-                                                iTemperatureMaxSetPoint,
+                                                                            EMSManager::SPControlType::iTemperatureMaxSetPoint,
                                                 NodeEMSSetPointMissing);
                                             if (NodeEMSSetPointMissing) {
                                                 ShowSevereError(state, "Missing high temperature setpoint for " + CurrentModuleObject + " named " +
@@ -1597,11 +1594,11 @@ CurrentModuleObject, PlantOpSchemeName);
                                             NodeEMSSetPointMissing = false;
                                             CheckIfNodeSetPointManagedByEMS(state,
                                                 PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum,
-                                                iTemperatureMinSetPoint,
+                                                                            EMSManager::SPControlType::iTemperatureMinSetPoint,
                                                 NodeEMSSetPointMissing);
                                             CheckIfNodeSetPointManagedByEMS(state,
                                                 PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum,
-                                                iTemperatureMaxSetPoint,
+                                                                            EMSManager::SPControlType::iTemperatureMaxSetPoint,
                                                 NodeEMSSetPointMissing);
                                             if (NodeEMSSetPointMissing) {
                                                 ShowSevereError(state, "Missing low temperature setpoint for " + CurrentModuleObject + " named " +
@@ -1641,7 +1638,7 @@ CurrentModuleObject, PlantOpSchemeName);
                                             NodeEMSSetPointMissing = false;
                                             CheckIfNodeSetPointManagedByEMS(state,
                                                 PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum,
-                                                iTemperatureMinSetPoint,
+                                                                            EMSManager::SPControlType::iTemperatureMinSetPoint,
                                                 NodeEMSSetPointMissing);
                                             if (NodeEMSSetPointMissing) {
                                                 ShowSevereError(state, "Missing dual temperature setpoint for " + CurrentModuleObject + " named " +

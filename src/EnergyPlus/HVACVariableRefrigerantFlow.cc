@@ -5832,13 +5832,13 @@ namespace HVACVariableRefrigerantFlow {
                             } else if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                                 bool SPNotFound = false;
                                 EMSManager::CheckIfNodeSetPointManagedByEMS(state,
-                                    VRFTU(TUIndex).VRFTUOutletNodeNum, EMSManager::iTemperatureSetPoint, SetPointErrorFlag);
+                                    VRFTU(TUIndex).VRFTUOutletNodeNum, EMSManager::SPControlType::iTemperatureSetPoint, SetPointErrorFlag);
                                 SPNotFound = SPNotFound || SetPointErrorFlag;
                                 EMSManager::CheckIfNodeSetPointManagedByEMS(state,
-                                    VRFTU(TUIndex).coolCoilAirOutNode, EMSManager::iTemperatureSetPoint, SetPointErrorFlag);
+                                    VRFTU(TUIndex).coolCoilAirOutNode, EMSManager::SPControlType::iTemperatureSetPoint, SetPointErrorFlag);
                                 SPNotFound = SPNotFound || SetPointErrorFlag;
                                 EMSManager::CheckIfNodeSetPointManagedByEMS(state,
-                                    VRFTU(TUIndex).heatCoilAirOutNode, EMSManager::iTemperatureSetPoint, SetPointErrorFlag);
+                                    VRFTU(TUIndex).heatCoilAirOutNode, EMSManager::SPControlType::iTemperatureSetPoint, SetPointErrorFlag);
                                 SPNotFound = SPNotFound || SetPointErrorFlag;
 
                                 // We disable the check at end (if API), because one of the nodes is enough, so there's an almost certainty

@@ -184,7 +184,7 @@ struct HybridUnitaryAirConditionersData;
 struct ICEngineElectricGeneratorData;
 struct IPShortCutsData;
 struct IceThermalStorageData;
-struct IntegratedHeatPumpData;
+struct IntegratedHeatPumpGlobalData;
 struct InternalHeatGainsData;
 struct LoopNodeData;
 struct LowTempRadiantSystemData;
@@ -411,7 +411,7 @@ struct EnergyPlusData : BaseGlobalStruct {
     std::unique_ptr<ICEngineElectricGeneratorData> dataICEngElectGen;
     std::unique_ptr<IPShortCutsData> dataIPShortCut;
     std::unique_ptr<IceThermalStorageData> dataIceThermalStorage;
-    std::unique_ptr<IntegratedHeatPumpData> dataIntegratedHP;
+    std::unique_ptr<IntegratedHeatPumpGlobalData> dataIntegratedHP;
     std::unique_ptr<InternalHeatGainsData> dataInternalHeatGains;
     std::unique_ptr<LoopNodeData> dataLoopNodes;
     std::unique_ptr<LowTempRadiantSystemData> dataLowTempRadSys;

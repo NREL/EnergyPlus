@@ -732,7 +732,6 @@ namespace TranspiredCollector {
         using DataSurfaces::Surface;
         using DataSurfaces::SurfaceData;
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
-        using EMSManager::iTemperatureSetPoint;
 
         int UTSCUnitNum;
         static Array1D_bool MyEnvrnFlag;
@@ -784,7 +783,7 @@ namespace TranspiredCollector {
                                 SetPointErrorFlag = true;
                             } else {
                                 // need call to EMS to check node
-                                CheckIfNodeSetPointManagedByEMS(state, ControlNode, iTemperatureSetPoint, SetPointErrorFlag);
+                                CheckIfNodeSetPointManagedByEMS(state, ControlNode, EMSManager::SPControlType::iTemperatureSetPoint, SetPointErrorFlag);
                                 if (SetPointErrorFlag) {
                                     ShowSevereError(state, "Missing temperature setpoint for UTSC " + state.dataTranspiredCollector->UTSC(UTSCUnitNum).Name);
                                     ShowContinueError(state, " use a Setpoint Manager to establish a setpoint at the unit control node.");

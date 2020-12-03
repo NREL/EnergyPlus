@@ -2663,7 +2663,6 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
 
         using namespace OutputReportPredefined;
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
-        using EMSManager::iTemperatureSetPoint;
 
         static Array1D_bool OAControllerMyOneTimeFlag; // One-time initialization flag
         static Array1D_bool OAControllerMyEnvrnFlag;   // One-time initialization flag
@@ -2793,7 +2792,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                             SetPointErrorFlag = true;
                         } else {
                             // add call to check node in EMS
-                            CheckIfNodeSetPointManagedByEMS(state, MixedAirNode, iTemperatureSetPoint, SetPointErrorFlag);
+                            CheckIfNodeSetPointManagedByEMS(state, MixedAirNode, EMSManager::SPControlType::iTemperatureSetPoint, SetPointErrorFlag);
                             if (SetPointErrorFlag) {
                                 ShowSevereError(state, "MixedAir: Missing temperature setpoint for economizer controller " + thisOAController.Name);
                                 ShowSevereError(state, "Node Referenced (by Controller)=" + NodeID(MixedAirNode));

@@ -1253,7 +1253,6 @@ namespace HeatingCoils {
 
         // Using/Aliasing
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
-        using EMSManager::iTemperatureSetPoint;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int AirInletNode;                         // coil air inlet node number
@@ -1339,7 +1338,7 @@ namespace HeatingCoils {
                             ShowContinueError(state, "... use a Setpoint Manager to establish a setpoint at the coil temperature setpoint node.");
                             HeatingCoilFatalError = true;
                         } else {
-                            CheckIfNodeSetPointManagedByEMS(state, ControlNode, iTemperatureSetPoint, HeatingCoilFatalError);
+                            CheckIfNodeSetPointManagedByEMS(state, ControlNode, EMSManager::SPControlType::iTemperatureSetPoint, HeatingCoilFatalError);
                             if (HeatingCoilFatalError) {
                                 ShowSevereError(state, cAllCoilTypes(HeatingCoil(CoilNum).HCoilType_Num) + " \"" + HeatingCoil(CoilNum).Name + "\"");
                                 ShowContinueError(state, "... Missing temperature setpoint for heating coil.");
