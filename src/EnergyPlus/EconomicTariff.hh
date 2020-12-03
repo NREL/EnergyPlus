@@ -152,63 +152,90 @@ namespace EconomicTariff {
     extern int const opADD;
     extern int const opNOOP; // no operation - just list the operand variables - shown as FROM
 
-    // not predefined variable (user defined name - many variables and all objects)
-    // used in econvar%specific
-    extern int const varUserDefined;
-    extern int const varNotYetDefined;
+    //// not predefined variable (user defined name - many variables and all objects)
+    //// used in econvar%specific
+    //extern int const varUserDefined;
+    //extern int const varNotYetDefined;
 
-    // category variables (used in econvar%specific)
-    extern int const catEnergyCharges;
-    extern int const catDemandCharges;
-    extern int const catServiceCharges;
-    extern int const catBasis;
-    extern int const catAdjustment;
-    extern int const catSurcharge;
-    extern int const catSubtotal;
-    extern int const catTaxes;
-    extern int const catTotal;
-    extern int const catNotIncluded;
+    //// category variables (used in econvar%specific)
+    //extern int const catEnergyCharges;
+    //extern int const catDemandCharges;
+    //extern int const catServiceCharges;
+    //extern int const catBasis;
+    //extern int const catAdjustment;
+    //extern int const catSurcharge;
+    //extern int const catSubtotal;
+    //extern int const catTaxes;
+    //extern int const catTotal;
+    //extern int const catNotIncluded;
 
-    // native variables (based on energy and demands from the simulation) used in econvar%specific
-    extern int const nativeTotalEnergy;
-    extern int const nativeTotalDemand;
-    extern int const nativePeakEnergy;
-    extern int const nativePeakDemand;
-    extern int const nativeShoulderEnergy;
-    extern int const nativeShoulderDemand;
-    extern int const nativeOffPeakEnergy;
-    extern int const nativeOffPeakDemand;
-    extern int const nativeMidPeakEnergy;
-    extern int const nativeMidPeakDemand;
-    extern int const nativePeakExceedsOffPeak;
-    extern int const nativeOffPeakExceedsPeak;
-    extern int const nativePeakExceedsMidPeak;
-    extern int const nativeMidPeakExceedsPeak;
-    extern int const nativePeakExceedsShoulder;
-    extern int const nativeShoulderExceedsPeak;
-    extern int const nativeIsWinter;
-    extern int const nativeIsNotWinter;
-    extern int const nativeIsSpring;
-    extern int const nativeIsNotSpring;
-    extern int const nativeIsSummer;
-    extern int const nativeIsNotSummer;
-    extern int const nativeIsAutumn;
-    extern int const nativeIsNotAutumn;
+    
+    enum class varSpecific
+    {
+        Unassigned, 
 
-    extern int const nativePeakAndShoulderEnergy;
-    extern int const nativePeakAndShoulderDemand;
-    extern int const nativePeakAndMidPeakEnergy;
-    extern int const nativePeakAndMidPeakDemand;
-    extern int const nativeShoulderAndOffPeakEnergy;
-    extern int const nativeShoulderAndOffPeakDemand;
-    extern int const nativePeakAndOffPeakEnergy;
-    extern int const nativePeakAndOffPeakDemand;
+        // not predefined variable (user defined name - many variables and all objects)
+        // used in econvar%specific
+        varUserDefined,
+        varNotYetDefined,
 
-    extern int const nativeRealTimePriceCosts;
-    extern int const nativeAboveCustomerBaseCosts;
-    extern int const nativeBelowCustomerBaseCosts;
-    extern int const nativeAboveCustomerBaseEnergy;
-    extern int const nativeBelowCustomerBaseEnergy;
+
+        // category variables (used in econvar%specific)
+        catEnergyCharges,
+        catDemandCharges,
+        catServiceCharges,
+        catBasis,
+        catAdjustment,
+        catSurcharge,
+        catSubtotal,
+        catTaxes,
+        catTotal,
+        catNotIncluded,
+        
+        
+        // native variables (based on energy and demands from the simulation) used in econvar%specific
+        TotalEnergy,
+        TotalDemand,
+        PeakEnergy,
+        PeakDemand,
+        ShoulderEnergy,
+        ShoulderDemand,
+        OffPeakEnergy,
+        OffPeakDemand,
+        MidPeakEnergy,
+        MidPeakDemand,
+        PeakExceedsOffPeak,
+        OffPeakExceedsPeak,
+        PeakExceedsMidPeak,
+        MidPeakExceedsPeak,
+        PeakExceedsShoulder,
+        ShoulderExceedsPeak,
+        IsWinter,
+        IsNotWinter,
+        IsSpring,
+        IsNotSpring,
+        IsSummer,
+        IsNotSummer,
+        IsAutumn,
+        IsNotAutumn,
+
+        PeakAndShoulderEnergy,
+        PeakAndShoulderDemand,
+        PeakAndMidPeakEnergy,
+        PeakAndMidPeakDemand,
+        ShoulderAndOffPeakEnergy,
+        ShoulderAndOffPeakDemand,
+        PeakAndOffPeakEnergy,
+        PeakAndOffPeakDemand,
+
+        RealTimePriceCosts,
+        AboveCustomerBaseCosts,
+        BelowCustomerBaseCosts,
+        AboveCustomerBaseEnergy,
+        BelowCustomerBaseEnergy,
+
+
+    };
 
     extern int const countPeriod;
     extern int const MaxNumMonths;
@@ -285,7 +312,7 @@ namespace EconomicTariff {
         // the following items are not part of the object description
         bool isArgument; // flag if the variable is ever used as an argument (value needed)
         bool isAssigned; // flag if the variable is ever assigned to
-        int specific;    // the specific type of variable - see enumerated lists
+        varSpecific specific; // the specific type of variable - see enumerated lists
         // the following items are used in determinging the dependency relationship of variables
         // and consist of an operator and a list of variables.
         int cntMeDependOn; // count of items in depend this line depends upon
@@ -300,7 +327,8 @@ namespace EconomicTariff {
 
         // Default Constructor
         EconVarType()
-            : tariffIndx(0), kindOfObj(kind::Unknown), index(0), values(MaxNumMonths, 0.0), isArgument(false), isAssigned(false), specific(0), cntMeDependOn(0),
+            : tariffIndx(0), kindOfObj(kind::Unknown), index(0), values(MaxNumMonths, 0.0), isArgument(false), isAssigned(false),
+              specific(varSpecific::Unassigned), cntMeDependOn(0),
               Operator(0), firstOperand(0), lastOperand(0), activeNow(false), isEvaluated(false), isReported(false), varUnitType(0)
         {
         }
@@ -604,7 +632,7 @@ namespace EconomicTariff {
                          std::string const &stringIn,
                          bool const flagIfNotNumeric,
                          int const useOfVar,
-                         int const varSpecific,
+                         varSpecific varSpecific,
                          kind econObjKind,
                          int const objIndex,
                          int const tariffPt);
