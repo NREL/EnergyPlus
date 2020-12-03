@@ -315,25 +315,7 @@ namespace EnergyPlus::RefrigeratedCase {
         // Inter-system heat transfer via subcoolers and cascade condensers can be accommodated.
         // Secondary refrigeration cycles are also available.
 
-        auto RefrigCase(state.dataRefrigCase->RefrigCase);
-        auto RefrigRack(state.dataRefrigCase->RefrigRack);
-        auto CaseRAFraction(state.dataRefrigCase->CaseRAFraction);
-        auto System(state.dataRefrigCase->System);
-        auto TransSystem(state.dataRefrigCase->TransSystem);
-        auto Condenser(state.dataRefrigCase->Condenser);
-        auto UniqueCondenserNames(state.dataRefrigCase->UniqueCondenserNames);
-        auto Compressor(state.dataRefrigCase->Compressor);
-        auto GasCooler(state.dataRefrigCase->GasCooler);
-        auto Subcooler(state.dataRefrigCase->Subcooler);
-        auto CaseAndWalkInList(state.dataRefrigCase->CaseAndWalkInList);
-        auto CompressorLists(state.dataRefrigCase->CompressorLists);
-        auto Secondary(state.dataRefrigCase->Secondary);
-        auto TransferLoadList(state.dataRefrigCase->TransferLoadList);
-        auto WalkIn(state.dataRefrigCase->WalkIn);
-        auto WarehouseCoil(state.dataRefrigCase->WarehouseCoil);
-        auto AirChillerSet(state.dataRefrigCase->AirChillerSet);
-        auto CoilSysCredit(state.dataRefrigCase->CoilSysCredit);
-        auto CaseWIZoneReport(state.dataRefrigCase->CaseWIZoneReport);
+        auto &RefrigRack(state.dataRefrigCase->RefrigRack);
 
         if (!state.dataRefrigCase->ManageRefrigeration) return;
 
@@ -479,25 +461,24 @@ namespace EnergyPlus::RefrigeratedCase {
         Array1D<Real64> Numbers;                  // Numeric items for object
         Array2D<Real64> DayValues;                // Array of schedule values
 
-        auto RefrigCase(state.dataRefrigCase->RefrigCase);
-        auto RefrigRack(state.dataRefrigCase->RefrigRack);
-        auto CaseRAFraction(state.dataRefrigCase->CaseRAFraction);
-        auto System(state.dataRefrigCase->System);
-        auto TransSystem(state.dataRefrigCase->TransSystem);
-        auto Condenser(state.dataRefrigCase->Condenser);
-        auto UniqueCondenserNames(state.dataRefrigCase->UniqueCondenserNames);
-        auto Compressor(state.dataRefrigCase->Compressor);
-        auto GasCooler(state.dataRefrigCase->GasCooler);
-        auto Subcooler(state.dataRefrigCase->Subcooler);
-        auto CaseAndWalkInList(state.dataRefrigCase->CaseAndWalkInList);
-        auto CompressorLists(state.dataRefrigCase->CompressorLists);
-        auto Secondary(state.dataRefrigCase->Secondary);
-        auto TransferLoadList(state.dataRefrigCase->TransferLoadList);
-        auto WalkIn(state.dataRefrigCase->WalkIn);
-        auto WarehouseCoil(state.dataRefrigCase->WarehouseCoil);
-        auto AirChillerSet(state.dataRefrigCase->AirChillerSet);
-        auto CoilSysCredit(state.dataRefrigCase->CoilSysCredit);
-        auto CaseWIZoneReport(state.dataRefrigCase->CaseWIZoneReport);
+        auto &RefrigCase(state.dataRefrigCase->RefrigCase);
+        auto &RefrigRack(state.dataRefrigCase->RefrigRack);
+        auto &CaseRAFraction(state.dataRefrigCase->CaseRAFraction);
+        auto &System(state.dataRefrigCase->System);
+        auto &TransSystem(state.dataRefrigCase->TransSystem);
+        auto &Condenser(state.dataRefrigCase->Condenser);
+        auto &Compressor(state.dataRefrigCase->Compressor);
+        auto &GasCooler(state.dataRefrigCase->GasCooler);
+        auto &Subcooler(state.dataRefrigCase->Subcooler);
+        auto &CaseAndWalkInList(state.dataRefrigCase->CaseAndWalkInList);
+        auto &CompressorLists(state.dataRefrigCase->CompressorLists);
+        auto &Secondary(state.dataRefrigCase->Secondary);
+        auto &TransferLoadList(state.dataRefrigCase->TransferLoadList);
+        auto &WalkIn(state.dataRefrigCase->WalkIn);
+        auto &WarehouseCoil(state.dataRefrigCase->WarehouseCoil);
+        auto &AirChillerSet(state.dataRefrigCase->AirChillerSet);
+        auto &CoilSysCredit(state.dataRefrigCase->CoilSysCredit);
+        auto &CaseWIZoneReport(state.dataRefrigCase->CaseWIZoneReport);
 
         state.dataRefrigCase->NumSimulationCascadeCondensers = inputProcessor->getNumObjectsFound(state, "Refrigeration:Condenser:Cascade");
         state.dataRefrigCase->NumSimulationCases = inputProcessor->getNumObjectsFound(state, "Refrigeration:Case");
@@ -6269,25 +6250,19 @@ namespace EnergyPlus::RefrigeratedCase {
         // PURPOSE OF THIS SUBROUTINE:
         // Set up the report variables.
 
-        auto RefrigCase(state.dataRefrigCase->RefrigCase);
-        auto RefrigRack(state.dataRefrigCase->RefrigRack);
-        auto CaseRAFraction(state.dataRefrigCase->CaseRAFraction);
-        auto System(state.dataRefrigCase->System);
-        auto TransSystem(state.dataRefrigCase->TransSystem);
-        auto Condenser(state.dataRefrigCase->Condenser);
-        auto UniqueCondenserNames(state.dataRefrigCase->UniqueCondenserNames);
-        auto Compressor(state.dataRefrigCase->Compressor);
-        auto GasCooler(state.dataRefrigCase->GasCooler);
-        auto Subcooler(state.dataRefrigCase->Subcooler);
-        auto CaseAndWalkInList(state.dataRefrigCase->CaseAndWalkInList);
-        auto CompressorLists(state.dataRefrigCase->CompressorLists);
-        auto Secondary(state.dataRefrigCase->Secondary);
-        auto TransferLoadList(state.dataRefrigCase->TransferLoadList);
-        auto WalkIn(state.dataRefrigCase->WalkIn);
-        auto WarehouseCoil(state.dataRefrigCase->WarehouseCoil);
-        auto AirChillerSet(state.dataRefrigCase->AirChillerSet);
-        auto CoilSysCredit(state.dataRefrigCase->CoilSysCredit);
-        auto CaseWIZoneReport(state.dataRefrigCase->CaseWIZoneReport);
+        auto &RefrigCase(state.dataRefrigCase->RefrigCase);
+        auto &RefrigRack(state.dataRefrigCase->RefrigRack);
+        auto &System(state.dataRefrigCase->System);
+        auto &TransSystem(state.dataRefrigCase->TransSystem);
+        auto &Condenser(state.dataRefrigCase->Condenser);
+        auto &Compressor(state.dataRefrigCase->Compressor);
+        auto &GasCooler(state.dataRefrigCase->GasCooler);
+        auto &Subcooler(state.dataRefrigCase->Subcooler);
+        auto &Secondary(state.dataRefrigCase->Secondary);
+        auto &WalkIn(state.dataRefrigCase->WalkIn);
+        auto &WarehouseCoil(state.dataRefrigCase->WarehouseCoil);
+        auto &CoilSysCredit(state.dataRefrigCase->CoilSysCredit);
+        auto &CaseWIZoneReport(state.dataRefrigCase->CaseWIZoneReport);
 
         static std::string Walkin_and_zone_name; // concat name for walk-in/zone credit reporting
 
@@ -8821,25 +8796,18 @@ namespace EnergyPlus::RefrigeratedCase {
         static Real64 MyStepStartTimeSaved(0.0); // Used to determine whether the system time step is a repetition
         static Real64 TimeStepFraction(0.0);     // Used to calculate my current time
 
-        auto RefrigCase(state.dataRefrigCase->RefrigCase);
-        auto RefrigRack(state.dataRefrigCase->RefrigRack);
-        auto CaseRAFraction(state.dataRefrigCase->CaseRAFraction);
-        auto System(state.dataRefrigCase->System);
-        auto TransSystem(state.dataRefrigCase->TransSystem);
-        auto Condenser(state.dataRefrigCase->Condenser);
-        auto UniqueCondenserNames(state.dataRefrigCase->UniqueCondenserNames);
-        auto Compressor(state.dataRefrigCase->Compressor);
-        auto GasCooler(state.dataRefrigCase->GasCooler);
-        auto Subcooler(state.dataRefrigCase->Subcooler);
-        auto CaseAndWalkInList(state.dataRefrigCase->CaseAndWalkInList);
-        auto CompressorLists(state.dataRefrigCase->CompressorLists);
-        auto Secondary(state.dataRefrigCase->Secondary);
-        auto TransferLoadList(state.dataRefrigCase->TransferLoadList);
-        auto WalkIn(state.dataRefrigCase->WalkIn);
-        auto WarehouseCoil(state.dataRefrigCase->WarehouseCoil);
-        auto AirChillerSet(state.dataRefrigCase->AirChillerSet);
-        auto CoilSysCredit(state.dataRefrigCase->CoilSysCredit);
-        auto CaseWIZoneReport(state.dataRefrigCase->CaseWIZoneReport);
+        auto &RefrigCase(state.dataRefrigCase->RefrigCase);
+        auto &RefrigRack(state.dataRefrigCase->RefrigRack);
+        auto &System(state.dataRefrigCase->System);
+        auto &TransSystem(state.dataRefrigCase->TransSystem);
+        auto &Condenser(state.dataRefrigCase->Condenser);
+        auto &Compressor(state.dataRefrigCase->Compressor);
+        auto &GasCooler(state.dataRefrigCase->GasCooler);
+        auto &Secondary(state.dataRefrigCase->Secondary);
+        auto &WalkIn(state.dataRefrigCase->WalkIn);
+        auto &WarehouseCoil(state.dataRefrigCase->WarehouseCoil);
+        auto &CoilSysCredit(state.dataRefrigCase->CoilSysCredit);
+        auto &CaseWIZoneReport(state.dataRefrigCase->CaseWIZoneReport);
 
         // Zero display case, air-coil, and walk-in cooler credits (summed by zone)
         // to 0 each zone or sys time step
@@ -9177,25 +9145,8 @@ namespace EnergyPlus::RefrigeratedCase {
 
         static std::string const RoutineName("InitRefrigerationPlantConnections");
 
-        auto RefrigCase(state.dataRefrigCase->RefrigCase);
-        auto RefrigRack(state.dataRefrigCase->RefrigRack);
-        auto CaseRAFraction(state.dataRefrigCase->CaseRAFraction);
-        auto System(state.dataRefrigCase->System);
-        auto TransSystem(state.dataRefrigCase->TransSystem);
-        auto Condenser(state.dataRefrigCase->Condenser);
-        auto UniqueCondenserNames(state.dataRefrigCase->UniqueCondenserNames);
-        auto Compressor(state.dataRefrigCase->Compressor);
-        auto GasCooler(state.dataRefrigCase->GasCooler);
-        auto Subcooler(state.dataRefrigCase->Subcooler);
-        auto CaseAndWalkInList(state.dataRefrigCase->CaseAndWalkInList);
-        auto CompressorLists(state.dataRefrigCase->CompressorLists);
-        auto Secondary(state.dataRefrigCase->Secondary);
-        auto TransferLoadList(state.dataRefrigCase->TransferLoadList);
-        auto WalkIn(state.dataRefrigCase->WalkIn);
-        auto WarehouseCoil(state.dataRefrigCase->WarehouseCoil);
-        auto AirChillerSet(state.dataRefrigCase->AirChillerSet);
-        auto CoilSysCredit(state.dataRefrigCase->CoilSysCredit);
-        auto CaseWIZoneReport(state.dataRefrigCase->CaseWIZoneReport);
+        auto &RefrigRack(state.dataRefrigCase->RefrigRack);
+        auto &Condenser(state.dataRefrigCase->Condenser);
 
         // initialize plant topology information, if applicable
         if (state.dataRefrigCase->MyReferPlantScanFlag && allocated(DataPlant::PlantLoop)) {
@@ -9364,25 +9315,10 @@ namespace EnergyPlus::RefrigeratedCase {
         Real64 BPress;                    // Barometric pressure at condenser air inlet node [Pa]
         bool EvapAvail;                   // Control for evap condenser availability
 
-        auto RefrigCase(state.dataRefrigCase->RefrigCase);
-        auto RefrigRack(state.dataRefrigCase->RefrigRack);
-        auto CaseRAFraction(state.dataRefrigCase->CaseRAFraction);
-        auto System(state.dataRefrigCase->System);
-        auto TransSystem(state.dataRefrigCase->TransSystem);
-        auto Condenser(state.dataRefrigCase->Condenser);
-        auto UniqueCondenserNames(state.dataRefrigCase->UniqueCondenserNames);
-        auto Compressor(state.dataRefrigCase->Compressor);
-        auto GasCooler(state.dataRefrigCase->GasCooler);
-        auto Subcooler(state.dataRefrigCase->Subcooler);
-        auto CaseAndWalkInList(state.dataRefrigCase->CaseAndWalkInList);
-        auto CompressorLists(state.dataRefrigCase->CompressorLists);
-        auto Secondary(state.dataRefrigCase->Secondary);
-        auto TransferLoadList(state.dataRefrigCase->TransferLoadList);
-        auto WalkIn(state.dataRefrigCase->WalkIn);
-        auto WarehouseCoil(state.dataRefrigCase->WarehouseCoil);
-        auto AirChillerSet(state.dataRefrigCase->AirChillerSet);
-        auto CoilSysCredit(state.dataRefrigCase->CoilSysCredit);
-        auto CaseWIZoneReport(state.dataRefrigCase->CaseWIZoneReport);
+        auto &RefrigCase(state.dataRefrigCase->RefrigCase);
+        auto &WalkIn(state.dataRefrigCase->WalkIn);
+        auto &WarehouseCoil(state.dataRefrigCase->WarehouseCoil);
+        auto &AirChillerSet(state.dataRefrigCase->AirChillerSet);
 
         state.dataRefrigCase->TotalRackDeliveredCapacity = 0.0;
         state.dataRefrigCase->CompressorCOPactual = 0.0;
@@ -10490,25 +10426,15 @@ namespace EnergyPlus::RefrigeratedCase {
         static std::string const RoutineName("SimulateDetailedRefrigerationSystems");
         Real64 const MaxDelTFloatFrac(0.5); // max fraction allowed for difference between case and evaporator temperature
 
-        auto RefrigCase(state.dataRefrigCase->RefrigCase);
-        auto RefrigRack(state.dataRefrigCase->RefrigRack);
-        auto CaseRAFraction(state.dataRefrigCase->CaseRAFraction);
-        auto System(state.dataRefrigCase->System);
-        auto TransSystem(state.dataRefrigCase->TransSystem);
-        auto Condenser(state.dataRefrigCase->Condenser);
-        auto UniqueCondenserNames(state.dataRefrigCase->UniqueCondenserNames);
-        auto Compressor(state.dataRefrigCase->Compressor);
-        auto GasCooler(state.dataRefrigCase->GasCooler);
-        auto Subcooler(state.dataRefrigCase->Subcooler);
-        auto CaseAndWalkInList(state.dataRefrigCase->CaseAndWalkInList);
-        auto CompressorLists(state.dataRefrigCase->CompressorLists);
-        auto Secondary(state.dataRefrigCase->Secondary);
-        auto TransferLoadList(state.dataRefrigCase->TransferLoadList);
-        auto WalkIn(state.dataRefrigCase->WalkIn);
-        auto WarehouseCoil(state.dataRefrigCase->WarehouseCoil);
-        auto AirChillerSet(state.dataRefrigCase->AirChillerSet);
-        auto CoilSysCredit(state.dataRefrigCase->CoilSysCredit);
-        auto CaseWIZoneReport(state.dataRefrigCase->CaseWIZoneReport);
+        auto &RefrigCase(state.dataRefrigCase->RefrigCase);
+        auto &System(state.dataRefrigCase->System);
+        auto &Condenser(state.dataRefrigCase->Condenser);
+        auto &Subcooler(state.dataRefrigCase->Subcooler);
+        auto &Secondary(state.dataRefrigCase->Secondary);
+        auto &WalkIn(state.dataRefrigCase->WalkIn);
+        auto &WarehouseCoil(state.dataRefrigCase->WarehouseCoil);
+        auto &AirChillerSet(state.dataRefrigCase->AirChillerSet);
+        auto &CoilSysCredit(state.dataRefrigCase->CoilSysCredit);
 
         Real64 LocalTimeStep = state.dataGlobal->TimeStepZone;
         if (state.dataRefrigCase->UseSysTimeStep) LocalTimeStep = DataHVACGlobals::TimeStepSys;
@@ -10928,25 +10854,10 @@ namespace EnergyPlus::RefrigeratedCase {
 
         static std::string const RoutineName("SimulateDetailedTransRefrigSystems");
 
-        auto RefrigCase(state.dataRefrigCase->RefrigCase);
-        auto RefrigRack(state.dataRefrigCase->RefrigRack);
-        auto CaseRAFraction(state.dataRefrigCase->CaseRAFraction);
-        auto System(state.dataRefrigCase->System);
-        auto TransSystem(state.dataRefrigCase->TransSystem);
-        auto Condenser(state.dataRefrigCase->Condenser);
-        auto UniqueCondenserNames(state.dataRefrigCase->UniqueCondenserNames);
-        auto Compressor(state.dataRefrigCase->Compressor);
-        auto GasCooler(state.dataRefrigCase->GasCooler);
-        auto Subcooler(state.dataRefrigCase->Subcooler);
-        auto CaseAndWalkInList(state.dataRefrigCase->CaseAndWalkInList);
-        auto CompressorLists(state.dataRefrigCase->CompressorLists);
-        auto Secondary(state.dataRefrigCase->Secondary);
-        auto TransferLoadList(state.dataRefrigCase->TransferLoadList);
-        auto WalkIn(state.dataRefrigCase->WalkIn);
-        auto WarehouseCoil(state.dataRefrigCase->WarehouseCoil);
-        auto AirChillerSet(state.dataRefrigCase->AirChillerSet);
-        auto CoilSysCredit(state.dataRefrigCase->CoilSysCredit);
-        auto CaseWIZoneReport(state.dataRefrigCase->CaseWIZoneReport);
+        auto &RefrigCase(state.dataRefrigCase->RefrigCase);
+        auto &TransSystem(state.dataRefrigCase->TransSystem);
+        auto &GasCooler(state.dataRefrigCase->GasCooler);
+        auto &WalkIn(state.dataRefrigCase->WalkIn);
 
         int LocalTimeStep = state.dataGlobal->TimeStepZone;
         if (state.dataRefrigCase->UseSysTimeStep) LocalTimeStep = DataHVACGlobals::TimeStepSys;
@@ -11317,25 +11228,8 @@ namespace EnergyPlus::RefrigeratedCase {
         Real64 const BleedRateConstant(5.0E-10); // water purge rate for evaporative
         //  condensers (m3/W-s) equal to 3 GPM per 100 tons (BAC Engineering Reference)
 
-        auto RefrigCase(state.dataRefrigCase->RefrigCase);
-        auto RefrigRack(state.dataRefrigCase->RefrigRack);
-        auto CaseRAFraction(state.dataRefrigCase->CaseRAFraction);
-        auto System(state.dataRefrigCase->System);
-        auto TransSystem(state.dataRefrigCase->TransSystem);
-        auto Condenser(state.dataRefrigCase->Condenser);
-        auto UniqueCondenserNames(state.dataRefrigCase->UniqueCondenserNames);
-        auto Compressor(state.dataRefrigCase->Compressor);
-        auto GasCooler(state.dataRefrigCase->GasCooler);
-        auto Subcooler(state.dataRefrigCase->Subcooler);
-        auto CaseAndWalkInList(state.dataRefrigCase->CaseAndWalkInList);
-        auto CompressorLists(state.dataRefrigCase->CompressorLists);
-        auto Secondary(state.dataRefrigCase->Secondary);
-        auto TransferLoadList(state.dataRefrigCase->TransferLoadList);
-        auto WalkIn(state.dataRefrigCase->WalkIn);
-        auto WarehouseCoil(state.dataRefrigCase->WarehouseCoil);
-        auto AirChillerSet(state.dataRefrigCase->AirChillerSet);
-        auto CoilSysCredit(state.dataRefrigCase->CoilSysCredit);
-        auto CaseWIZoneReport(state.dataRefrigCase->CaseWIZoneReport);
+        auto &System(state.dataRefrigCase->System);
+        auto &Condenser(state.dataRefrigCase->Condenser);
 
         int CondID;               // Condenser Number
         int CondCreditWarnIndex1; // Used to sum up warning count
@@ -11733,25 +11627,8 @@ namespace EnergyPlus::RefrigeratedCase {
 
         static std::string const RoutineName("RefrigeratedCase:CalcGasCooler");
 
-        auto RefrigCase(state.dataRefrigCase->RefrigCase);
-        auto RefrigRack(state.dataRefrigCase->RefrigRack);
-        auto CaseRAFraction(state.dataRefrigCase->CaseRAFraction);
-        auto System(state.dataRefrigCase->System);
-        auto TransSystem(state.dataRefrigCase->TransSystem);
-        auto Condenser(state.dataRefrigCase->Condenser);
-        auto UniqueCondenserNames(state.dataRefrigCase->UniqueCondenserNames);
-        auto Compressor(state.dataRefrigCase->Compressor);
-        auto GasCooler(state.dataRefrigCase->GasCooler);
-        auto Subcooler(state.dataRefrigCase->Subcooler);
-        auto CaseAndWalkInList(state.dataRefrigCase->CaseAndWalkInList);
-        auto CompressorLists(state.dataRefrigCase->CompressorLists);
-        auto Secondary(state.dataRefrigCase->Secondary);
-        auto TransferLoadList(state.dataRefrigCase->TransferLoadList);
-        auto WalkIn(state.dataRefrigCase->WalkIn);
-        auto WarehouseCoil(state.dataRefrigCase->WarehouseCoil);
-        auto AirChillerSet(state.dataRefrigCase->AirChillerSet);
-        auto CoilSysCredit(state.dataRefrigCase->CoilSysCredit);
-        auto CaseWIZoneReport(state.dataRefrigCase->CaseWIZoneReport);
+        auto &TransSystem(state.dataRefrigCase->TransSystem);
+        auto &GasCooler(state.dataRefrigCase->GasCooler);
 
         int GasCoolerCreditWarnIndex;     // Warning counter
         Real64 ActualFanPower;            // Fan power after adjustments for partially loaded gas cooler [W]
@@ -11945,25 +11822,8 @@ namespace EnergyPlus::RefrigeratedCase {
         Real64 HHiStageCompIn;            // Enthalpy at inlet of high-stage compressor (J/kg)
         Real64 HCaseInRated_base(0.0), HCompInRated_base(0.0); // Autodesk:Tuned Intermediate values for performance tuning
 
-        auto RefrigCase(state.dataRefrigCase->RefrigCase);
-        auto RefrigRack(state.dataRefrigCase->RefrigRack);
-        auto CaseRAFraction(state.dataRefrigCase->CaseRAFraction);
-        auto System(state.dataRefrigCase->System);
-        auto TransSystem(state.dataRefrigCase->TransSystem);
-        auto Condenser(state.dataRefrigCase->Condenser);
-        auto UniqueCondenserNames(state.dataRefrigCase->UniqueCondenserNames);
-        auto Compressor(state.dataRefrigCase->Compressor);
-        auto GasCooler(state.dataRefrigCase->GasCooler);
-        auto Subcooler(state.dataRefrigCase->Subcooler);
-        auto CaseAndWalkInList(state.dataRefrigCase->CaseAndWalkInList);
-        auto CompressorLists(state.dataRefrigCase->CompressorLists);
-        auto Secondary(state.dataRefrigCase->Secondary);
-        auto TransferLoadList(state.dataRefrigCase->TransferLoadList);
-        auto WalkIn(state.dataRefrigCase->WalkIn);
-        auto WarehouseCoil(state.dataRefrigCase->WarehouseCoil);
-        auto AirChillerSet(state.dataRefrigCase->AirChillerSet);
-        auto CoilSysCredit(state.dataRefrigCase->CoilSysCredit);
-        auto CaseWIZoneReport(state.dataRefrigCase->CaseWIZoneReport);
+        auto &Condenser(state.dataRefrigCase->Condenser);
+        auto &Compressor(state.dataRefrigCase->Compressor);
 
         Real64 LocalTimeStep = state.dataGlobal->TimeStepZone;
         if (state.dataRefrigCase->UseSysTimeStep) LocalTimeStep = DataHVACGlobals::TimeStepSys;
@@ -12342,25 +12202,8 @@ namespace EnergyPlus::RefrigeratedCase {
         Real64 Xl;                          // Initial lower guess for iterative search
         Real64 Xnew(0.0);                   // New guess for iterative search
 
-        auto RefrigCase(state.dataRefrigCase->RefrigCase);
-        auto RefrigRack(state.dataRefrigCase->RefrigRack);
-        auto CaseRAFraction(state.dataRefrigCase->CaseRAFraction);
-        auto System(state.dataRefrigCase->System);
-        auto TransSystem(state.dataRefrigCase->TransSystem);
-        auto Condenser(state.dataRefrigCase->Condenser);
-        auto UniqueCondenserNames(state.dataRefrigCase->UniqueCondenserNames);
-        auto Compressor(state.dataRefrigCase->Compressor);
-        auto GasCooler(state.dataRefrigCase->GasCooler);
-        auto Subcooler(state.dataRefrigCase->Subcooler);
-        auto CaseAndWalkInList(state.dataRefrigCase->CaseAndWalkInList);
-        auto CompressorLists(state.dataRefrigCase->CompressorLists);
-        auto Secondary(state.dataRefrigCase->Secondary);
-        auto TransferLoadList(state.dataRefrigCase->TransferLoadList);
-        auto WalkIn(state.dataRefrigCase->WalkIn);
-        auto WarehouseCoil(state.dataRefrigCase->WarehouseCoil);
-        auto AirChillerSet(state.dataRefrigCase->AirChillerSet);
-        auto CoilSysCredit(state.dataRefrigCase->CoilSysCredit);
-        auto CaseWIZoneReport(state.dataRefrigCase->CaseWIZoneReport);
+        auto &Compressor(state.dataRefrigCase->Compressor);
+        auto &GasCooler(state.dataRefrigCase->GasCooler);
 
         Real64 LocalTimeStep = state.dataGlobal->TimeStepZone;
         if (state.dataRefrigCase->UseSysTimeStep) LocalTimeStep = DataHVACGlobals::TimeStepSys;
@@ -12705,25 +12548,9 @@ namespace EnergyPlus::RefrigeratedCase {
         static std::string const RoutineName("CalculateSubcoolers");
         Real64 TLiqInActualLocal(0.0); // Liquid T in, after condenser, before any mechanical subcooler
 
-        auto RefrigCase(state.dataRefrigCase->RefrigCase);
-        auto RefrigRack(state.dataRefrigCase->RefrigRack);
-        auto CaseRAFraction(state.dataRefrigCase->CaseRAFraction);
-        auto System(state.dataRefrigCase->System);
-        auto TransSystem(state.dataRefrigCase->TransSystem);
-        auto Condenser(state.dataRefrigCase->Condenser);
-        auto UniqueCondenserNames(state.dataRefrigCase->UniqueCondenserNames);
-        auto Compressor(state.dataRefrigCase->Compressor);
-        auto GasCooler(state.dataRefrigCase->GasCooler);
-        auto Subcooler(state.dataRefrigCase->Subcooler);
-        auto CaseAndWalkInList(state.dataRefrigCase->CaseAndWalkInList);
-        auto CompressorLists(state.dataRefrigCase->CompressorLists);
-        auto Secondary(state.dataRefrigCase->Secondary);
-        auto TransferLoadList(state.dataRefrigCase->TransferLoadList);
-        auto WalkIn(state.dataRefrigCase->WalkIn);
-        auto WarehouseCoil(state.dataRefrigCase->WarehouseCoil);
-        auto AirChillerSet(state.dataRefrigCase->AirChillerSet);
-        auto CoilSysCredit(state.dataRefrigCase->CoilSysCredit);
-        auto CaseWIZoneReport(state.dataRefrigCase->CaseWIZoneReport);
+        auto &System(state.dataRefrigCase->System);
+        auto &Condenser(state.dataRefrigCase->Condenser);
+        auto &Subcooler(state.dataRefrigCase->Subcooler);
 
         Real64 LocalTimeStep = state.dataGlobal->TimeStepZone;
         if (state.dataRefrigCase->UseSysTimeStep) LocalTimeStep = DataHVACGlobals::TimeStepSys;
@@ -12827,25 +12654,8 @@ namespace EnergyPlus::RefrigeratedCase {
         // This subroutine sets an index for a given refrigerated rack or refrigeration condenser
         //  -- issues error message if the rack or condenser is not found.
 
-        auto RefrigCase(state.dataRefrigCase->RefrigCase);
-        auto RefrigRack(state.dataRefrigCase->RefrigRack);
-        auto CaseRAFraction(state.dataRefrigCase->CaseRAFraction);
-        auto System(state.dataRefrigCase->System);
-        auto TransSystem(state.dataRefrigCase->TransSystem);
-        auto Condenser(state.dataRefrigCase->Condenser);
-        auto UniqueCondenserNames(state.dataRefrigCase->UniqueCondenserNames);
-        auto Compressor(state.dataRefrigCase->Compressor);
-        auto GasCooler(state.dataRefrigCase->GasCooler);
-        auto Subcooler(state.dataRefrigCase->Subcooler);
-        auto CaseAndWalkInList(state.dataRefrigCase->CaseAndWalkInList);
-        auto CompressorLists(state.dataRefrigCase->CompressorLists);
-        auto Secondary(state.dataRefrigCase->Secondary);
-        auto TransferLoadList(state.dataRefrigCase->TransferLoadList);
-        auto WalkIn(state.dataRefrigCase->WalkIn);
-        auto WarehouseCoil(state.dataRefrigCase->WarehouseCoil);
-        auto AirChillerSet(state.dataRefrigCase->AirChillerSet);
-        auto CoilSysCredit(state.dataRefrigCase->CoilSysCredit);
-        auto CaseWIZoneReport(state.dataRefrigCase->CaseWIZoneReport);
+        auto &RefrigRack(state.dataRefrigCase->RefrigRack);
+        auto &Condenser(state.dataRefrigCase->Condenser);
 
         CheckRefrigerationInput(state);
 
@@ -12900,25 +12710,18 @@ namespace EnergyPlus::RefrigeratedCase {
         std::string ChrOut;
         std::string ChrOut2;
 
-        auto RefrigCase(state.dataRefrigCase->RefrigCase);
-        auto RefrigRack(state.dataRefrigCase->RefrigRack);
-        auto CaseRAFraction(state.dataRefrigCase->CaseRAFraction);
-        auto System(state.dataRefrigCase->System);
-        auto TransSystem(state.dataRefrigCase->TransSystem);
-        auto Condenser(state.dataRefrigCase->Condenser);
-        auto UniqueCondenserNames(state.dataRefrigCase->UniqueCondenserNames);
-        auto Compressor(state.dataRefrigCase->Compressor);
-        auto GasCooler(state.dataRefrigCase->GasCooler);
-        auto Subcooler(state.dataRefrigCase->Subcooler);
-        auto CaseAndWalkInList(state.dataRefrigCase->CaseAndWalkInList);
-        auto CompressorLists(state.dataRefrigCase->CompressorLists);
-        auto Secondary(state.dataRefrigCase->Secondary);
-        auto TransferLoadList(state.dataRefrigCase->TransferLoadList);
-        auto WalkIn(state.dataRefrigCase->WalkIn);
-        auto WarehouseCoil(state.dataRefrigCase->WarehouseCoil);
-        auto AirChillerSet(state.dataRefrigCase->AirChillerSet);
-        auto CoilSysCredit(state.dataRefrigCase->CoilSysCredit);
-        auto CaseWIZoneReport(state.dataRefrigCase->CaseWIZoneReport);
+        auto &RefrigCase(state.dataRefrigCase->RefrigCase);
+        auto &RefrigRack(state.dataRefrigCase->RefrigRack);
+        auto &System(state.dataRefrigCase->System);
+        auto &TransSystem(state.dataRefrigCase->TransSystem);
+        auto &Condenser(state.dataRefrigCase->Condenser);
+        auto &Compressor(state.dataRefrigCase->Compressor);
+        auto &GasCooler(state.dataRefrigCase->GasCooler);
+        auto &Subcooler(state.dataRefrigCase->Subcooler);
+        auto &Secondary(state.dataRefrigCase->Secondary);
+        auto &WalkIn(state.dataRefrigCase->WalkIn);
+        auto &WarehouseCoil(state.dataRefrigCase->WarehouseCoil);
+        auto &AirChillerSet(state.dataRefrigCase->AirChillerSet);
 
         static constexpr auto Format_104("! <Refrigeration Compressor Rack>,Compressor Rack Name, # Refrigerated Cases Connected,# WalkIn Coolers "
                                          "Connected, Heat Rejection Location, Condenser Type, COP");
@@ -14063,25 +13866,9 @@ namespace EnergyPlus::RefrigeratedCase {
         Real64 VarFrac;                   // Pump power fraction for variable speed pump, dimensionless
         Real64 VolFlowRate;               // Used in dispatching pumps to meet load (m3/s)
 
-        auto RefrigCase(state.dataRefrigCase->RefrigCase);
-        auto RefrigRack(state.dataRefrigCase->RefrigRack);
-        auto CaseRAFraction(state.dataRefrigCase->CaseRAFraction);
-        auto System(state.dataRefrigCase->System);
-        auto TransSystem(state.dataRefrigCase->TransSystem);
-        auto Condenser(state.dataRefrigCase->Condenser);
-        auto UniqueCondenserNames(state.dataRefrigCase->UniqueCondenserNames);
-        auto Compressor(state.dataRefrigCase->Compressor);
-        auto GasCooler(state.dataRefrigCase->GasCooler);
-        auto Subcooler(state.dataRefrigCase->Subcooler);
-        auto CaseAndWalkInList(state.dataRefrigCase->CaseAndWalkInList);
-        auto CompressorLists(state.dataRefrigCase->CompressorLists);
-        auto Secondary(state.dataRefrigCase->Secondary);
-        auto TransferLoadList(state.dataRefrigCase->TransferLoadList);
-        auto WalkIn(state.dataRefrigCase->WalkIn);
-        auto WarehouseCoil(state.dataRefrigCase->WarehouseCoil);
-        auto AirChillerSet(state.dataRefrigCase->AirChillerSet);
-        auto CoilSysCredit(state.dataRefrigCase->CoilSysCredit);
-        auto CaseWIZoneReport(state.dataRefrigCase->CaseWIZoneReport);
+        auto &RefrigCase(state.dataRefrigCase->RefrigCase);
+        auto &WalkIn(state.dataRefrigCase->WalkIn);
+        auto &WarehouseCoil(state.dataRefrigCase->WarehouseCoil);
 
         Real64 LocalTimeStep = state.dataGlobal->TimeStepZone;
         if (state.dataRefrigCase->UseSysTimeStep) LocalTimeStep = DataHVACGlobals::TimeStepSys;
@@ -14310,25 +14097,8 @@ namespace EnergyPlus::RefrigeratedCase {
         //   heat absorbed by suction piping, secondary loop distribution piping, and
         //   secondary receiver shells
 
-        auto RefrigCase(state.dataRefrigCase->RefrigCase);
-        auto RefrigRack(state.dataRefrigCase->RefrigRack);
-        auto CaseRAFraction(state.dataRefrigCase->CaseRAFraction);
-        auto System(state.dataRefrigCase->System);
-        auto TransSystem(state.dataRefrigCase->TransSystem);
-        auto Condenser(state.dataRefrigCase->Condenser);
-        auto UniqueCondenserNames(state.dataRefrigCase->UniqueCondenserNames);
-        auto Compressor(state.dataRefrigCase->Compressor);
-        auto GasCooler(state.dataRefrigCase->GasCooler);
-        auto Subcooler(state.dataRefrigCase->Subcooler);
-        auto CaseAndWalkInList(state.dataRefrigCase->CaseAndWalkInList);
-        auto CompressorLists(state.dataRefrigCase->CompressorLists);
-        auto Secondary(state.dataRefrigCase->Secondary);
-        auto TransferLoadList(state.dataRefrigCase->TransferLoadList);
-        auto WalkIn(state.dataRefrigCase->WalkIn);
-        auto WarehouseCoil(state.dataRefrigCase->WarehouseCoil);
-        auto AirChillerSet(state.dataRefrigCase->AirChillerSet);
-        auto CoilSysCredit(state.dataRefrigCase->CoilSysCredit);
-        auto CaseWIZoneReport(state.dataRefrigCase->CaseWIZoneReport);
+        auto &CoilSysCredit(state.dataRefrigCase->CoilSysCredit);
+        auto &CaseWIZoneReport(state.dataRefrigCase->CaseWIZoneReport);
 
         if (state.dataRefrigCase->UseSysTimeStep) { // air chillers
             for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
@@ -14440,25 +14210,8 @@ namespace EnergyPlus::RefrigeratedCase {
         // METHODOLOGY EMPLOYED:
         // Called from Zone Equipment Manager.
 
-        auto RefrigCase(state.dataRefrigCase->RefrigCase);
-        auto RefrigRack(state.dataRefrigCase->RefrigRack);
-        auto CaseRAFraction(state.dataRefrigCase->CaseRAFraction);
-        auto System(state.dataRefrigCase->System);
-        auto TransSystem(state.dataRefrigCase->TransSystem);
-        auto Condenser(state.dataRefrigCase->Condenser);
-        auto UniqueCondenserNames(state.dataRefrigCase->UniqueCondenserNames);
-        auto Compressor(state.dataRefrigCase->Compressor);
-        auto GasCooler(state.dataRefrigCase->GasCooler);
-        auto Subcooler(state.dataRefrigCase->Subcooler);
-        auto CaseAndWalkInList(state.dataRefrigCase->CaseAndWalkInList);
-        auto CompressorLists(state.dataRefrigCase->CompressorLists);
-        auto Secondary(state.dataRefrigCase->Secondary);
-        auto TransferLoadList(state.dataRefrigCase->TransferLoadList);
-        auto WalkIn(state.dataRefrigCase->WalkIn);
-        auto WarehouseCoil(state.dataRefrigCase->WarehouseCoil);
-        auto AirChillerSet(state.dataRefrigCase->AirChillerSet);
-        auto CoilSysCredit(state.dataRefrigCase->CoilSysCredit);
-        auto CaseWIZoneReport(state.dataRefrigCase->CaseWIZoneReport);
+        auto &AirChillerSet(state.dataRefrigCase->AirChillerSet);
+        auto &CoilSysCredit(state.dataRefrigCase->CoilSysCredit);
 
         int ChillerSetID;
         Real64 RemainingOutputToCoolingSP; // Remaining requested load in zone
@@ -14542,7 +14295,7 @@ namespace EnergyPlus::RefrigeratedCase {
         Real64 QZNReqSens(0.0);            // Amount of sensible heat needed by the zone, NEGATIVE when cooling needed [W]
         Real64 RemainQZNReqSens(0.0);      // Remaining amount of sensible heat needed by the zone [W]
 
-        auto WarehouseCoil(state.dataRefrigCase->WarehouseCoil);
+        auto &WarehouseCoil(state.dataRefrigCase->WarehouseCoil);
 
         // Note, all coils in a coil set are in the same zone
         // the coils may be served by different detailed systems
@@ -14586,8 +14339,8 @@ namespace EnergyPlus::RefrigeratedCase {
         //   Note that the coil fan, heater, and defrost would be unaffected because they
         //   would still be running at level calculated previously
 
-        auto System(state.dataRefrigCase->System);
-        auto WarehouseCoil(state.dataRefrigCase->WarehouseCoil);
+        auto &System(state.dataRefrigCase->System);
+        auto &WarehouseCoil(state.dataRefrigCase->WarehouseCoil);
 
         int NumCoils(0);
         Real64 DeRateFactor(0.0);        // Ratio of energy available from system or secondary loop
@@ -15089,12 +14842,12 @@ namespace EnergyPlus::RefrigeratedCase {
         // PURPOSE OF THIS SUBROUTINE:
         // initialize zone gain terms at begin environment
 
-        auto System(state.dataRefrigCase->System);
-        auto TransSystem(state.dataRefrigCase->TransSystem);
-        auto RefrigRack(state.dataRefrigCase->RefrigRack);
-        auto Secondary(state.dataRefrigCase->Secondary);
-        auto WalkIn(state.dataRefrigCase->WalkIn);
-        auto RefrigCase(state.dataRefrigCase->RefrigCase);
+        auto &System(state.dataRefrigCase->System);
+        auto &TransSystem(state.dataRefrigCase->TransSystem);
+        auto &RefrigRack(state.dataRefrigCase->RefrigRack);
+        auto &Secondary(state.dataRefrigCase->Secondary);
+        auto &WalkIn(state.dataRefrigCase->WalkIn);
+        auto &RefrigCase(state.dataRefrigCase->RefrigCase);
 
         CheckRefrigerationInput(state);
 
@@ -15162,8 +14915,8 @@ namespace EnergyPlus::RefrigeratedCase {
         // to zero when called on zone timestep. Otherwise, values may be held over when
         // no HVAC load calls module during that zone time step.
 
-        auto RefrigRack(state.dataRefrigCase->RefrigRack);
-        auto Condenser(state.dataRefrigCase->Condenser);
+        auto &RefrigRack(state.dataRefrigCase->RefrigRack);
+        auto &Condenser(state.dataRefrigCase->Condenser);
 
         int DemandARRID(0); // Index to water tank Demand used for evap condenser
 
