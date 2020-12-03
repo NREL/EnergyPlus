@@ -72,8 +72,6 @@ namespace RefrigeratedCase {
         FromTank,
     };
 
-    void clear_state();
-
     struct RefrigCaseData
     {
         // Members
@@ -1503,26 +1501,6 @@ namespace RefrigeratedCase {
         }
     };
 
-    // Object Data
-    extern Array1D<RefrigCaseData> RefrigCase;
-    extern Array1D<RefrigRackData> RefrigRack;
-    extern Array1D<CaseRAFractionData> CaseRAFraction;
-    extern Array1D<RefrigSystemData> System;
-    extern Array1D<TransRefrigSystemData> TransSystem;
-    extern Array1D<RefrigCondenserData> Condenser;
-    extern Array1D<RefrigCompressorData> Compressor;
-    extern Array1D<RefrigGasCoolerData> GasCooler;
-    extern Array1D<SubcoolerData> Subcooler;
-    extern Array1D<CaseAndWalkInListDef> CaseAndWalkInList;
-    extern Array1D<CompressorListDef> CompressorLists;
-    extern Array1D<SecondaryLoopData> Secondary;
-    extern Array1D<TransferLoadListDef> TransferLoadList;
-    extern Array1D<WalkInData> WalkIn;
-    extern Array1D<WarehouseCoilData> WarehouseCoil;
-    extern Array1D<AirChillerSetData> AirChillerSet;
-    extern Array1D<CoilCreditData> CoilSysCredit;
-    extern Array1D<CaseWIZoneReportData> CaseWIZoneReport;
-
     // Functions
 
     void ManageRefrigeratedCaseRacks(EnergyPlusData &state);
@@ -1647,6 +1625,32 @@ struct RefrigeratedCaseData : BaseGlobalStruct {
     bool HaveCasesOrWalkins = true;                  // Is initialized as TRUE and remains true when  refrigerated cases or walkins exist in the input deck
     bool HaveChillers = true;                        // Is initialized as TRUE and remains true when chillers exist in the input deck
 
+    // Object Data
+    Array1D<RefrigeratedCase::RefrigCaseData> RefrigCase;
+    Array1D<RefrigeratedCase::RefrigRackData> RefrigRack;
+    Array1D<RefrigeratedCase::CaseRAFractionData> CaseRAFraction;
+    Array1D<RefrigeratedCase::RefrigSystemData> System;
+    Array1D<RefrigeratedCase::TransRefrigSystemData> TransSystem;
+    Array1D<RefrigeratedCase::RefrigCondenserData> Condenser;
+    std::unordered_map<std::string, std::string> UniqueCondenserNames;
+    Array1D<RefrigeratedCase::RefrigCompressorData> Compressor;
+    Array1D<RefrigeratedCase::RefrigGasCoolerData> GasCooler;
+    Array1D<RefrigeratedCase::SubcoolerData> Subcooler;
+    Array1D<RefrigeratedCase::CaseAndWalkInListDef> CaseAndWalkInList;
+    Array1D<RefrigeratedCase::CompressorListDef> CompressorLists;
+    Array1D<RefrigeratedCase::SecondaryLoopData> Secondary;
+    Array1D<RefrigeratedCase::TransferLoadListDef> TransferLoadList;
+    Array1D<RefrigeratedCase::WalkInData> WalkIn;
+    Array1D<RefrigeratedCase::WarehouseCoilData> WarehouseCoil;
+    Array1D<RefrigeratedCase::AirChillerSetData> AirChillerSet;
+    Array1D<RefrigeratedCase::CoilCreditData> CoilSysCredit;
+    Array1D<RefrigeratedCase::CaseWIZoneReportData> CaseWIZoneReport;
+
+    bool MyOneTimeFlag= true;                       // flag to skip first pass on next begin environment flag
+    bool InitRefrigerationMyBeginEnvrnFlag= true;
+    bool InitRefrigerationPlantConnectionsMyBeginEnvrnFlag= true;
+    bool FigureRefrigerationZoneGainsMyEnvrnFlag= true;
+
     void clear_state() override
     {
         this->NumSimulationCondAir = 0;
@@ -1701,6 +1705,29 @@ struct RefrigeratedCaseData : BaseGlobalStruct {
         this->UseSysTimeStep = false;
         this->HaveCasesOrWalkins = true;
         this->HaveChillers = true;
+        this->RefrigCase.deallocate();
+        this->RefrigRack.deallocate();
+        this->CaseRAFraction.deallocate();
+        this->System.deallocate();
+        this->TransSystem.deallocate();
+        this->Condenser.deallocate();
+        this->UniqueCondenserNames.clear();
+        this->Compressor.deallocate();
+        this->GasCooler.deallocate();
+        this->Subcooler.deallocate();
+        this->CaseAndWalkInList.deallocate();
+        this->CompressorLists.deallocate();
+        this->Secondary.deallocate();
+        this->TransferLoadList.deallocate();
+        this->WalkIn.deallocate();
+        this->WarehouseCoil.deallocate();
+        this->AirChillerSet.deallocate();
+        this->CoilSysCredit.deallocate();
+        this->CaseWIZoneReport.deallocate();
+        this->MyOneTimeFlag= true;
+        this->InitRefrigerationMyBeginEnvrnFlag= true;
+        this->InitRefrigerationPlantConnectionsMyBeginEnvrnFlag= true;
+        this->FigureRefrigerationZoneGainsMyEnvrnFlag= true;
     }
 };
 
