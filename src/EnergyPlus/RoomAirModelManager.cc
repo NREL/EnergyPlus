@@ -100,33 +100,14 @@ namespace RoomAirModelManager {
     // PURPOSE OF THIS MODULE:
     // Contains subroutines for managing the room air models
 
-    // METHODOLOGY EMPLOYED:
-    // na
-
-    // REFERENCES:
-    // na
-
     // Using/Aliasing
     using namespace DataRoomAirModel;
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS
     static std::string const BlankString;
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
 
     bool GetUCSDDVDataFlag(true); // UCSD
     bool GetAirModelData(true);   // Used to "get" all air model data
     bool MyOneTimeFlag(true);
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE
-
-    // MODULE SUBROUTINES:
-
-    // Functions
 
     void clear_state()
     {
@@ -162,21 +143,6 @@ namespace RoomAirModelManager {
         using RoomAirModelUserTempPattern::ManageUserDefinedPatterns;
         using UFADManager::ManageUCSDUFModels;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        //		static bool GetAirModelData( true ); // Used to "get" all air model data
-
         // FLOW:
         if (GetAirModelData) {
             GetAirModelDatas(state);
@@ -190,34 +156,34 @@ namespace RoomAirModelManager {
         {
             auto const SELECT_CASE_var(AirModel(ZoneNum).AirModelType);
 
-            if (SELECT_CASE_var == RoomAirModel_UserDefined) {
+            if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::UserDefined) {
 
                 ManageUserDefinedPatterns(state, ZoneNum);
 
-            } else if (SELECT_CASE_var == RoomAirModel_Mixing) { // Mixing air model
+            } else if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::Mixing) { // Mixing air model
                                                                  // do nothing
 
-            } else if (SELECT_CASE_var == RoomAirModel_Mundt) { // Mundt air model
+            } else if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::Mundt) { // Mundt air model
                 // simulate room airflow using Mundt model
                 ManageMundtModel(state, ZoneNum);
 
-            } else if (SELECT_CASE_var == RoomAirModel_UCSDDV) { // UCDV Displacement Ventilation model
+            } else if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::UCSDDV) { // UCDV Displacement Ventilation model
                 // simulate room airflow using UCSDDV model
                 ManageUCSDDVModel(state, ZoneNum);
 
-            } else if (SELECT_CASE_var == RoomAirModel_UCSDCV) { // UCSD Cross Ventilation model
+            } else if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::UCSDCV) { // UCSD Cross Ventilation model
                 // simulate room airflow using UCSDDV model
                 ManageUCSDCVModel(state, ZoneNum);
 
-            } else if (SELECT_CASE_var == RoomAirModel_UCSDUFI) { // UCSD UFAD interior zone model
+            } else if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::UCSDUFI) { // UCSD UFAD interior zone model
                 // simulate room airflow using the UCSDUFI model
-                ManageUCSDUFModels(state, ZoneNum, RoomAirModel_UCSDUFI);
+                ManageUCSDUFModels(state, ZoneNum, DataRoomAirModel::RoomAirModel::UCSDUFI);
 
-            } else if (SELECT_CASE_var == RoomAirModel_UCSDUFE) { // UCSD UFAD exterior zone model
+            } else if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::UCSDUFE) { // UCSD UFAD exterior zone model
                 // simulate room airflow using the UCSDUFE model
-                ManageUCSDUFModels(state, ZoneNum, RoomAirModel_UCSDUFE);
+                ManageUCSDUFModels(state, ZoneNum, DataRoomAirModel::RoomAirModel::UCSDUFE);
 
-            } else if (SELECT_CASE_var == RoomAirModel_AirflowNetwork) { // RoomAirflowNetwork zone model
+            } else if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::AirflowNetwork) { // RoomAirflowNetwork zone model
                 // simulate room airflow using the AirflowNetwork - based model
                 SimRoomAirModelAirflowNetwork(state, ZoneNum);
 
@@ -439,7 +405,7 @@ namespace RoomAirModelManager {
 
         // Check against AirModel.  Make sure there is a match here.
         for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-            if (AirModel(ZoneNum).AirModelType != RoomAirModel_UserDefined) continue;
+            if (AirModel(ZoneNum).AirModelType != DataRoomAirModel::RoomAirModel::UserDefined) continue;
             if (AirPatternZoneInfo(ZoneNum).IsUsed) continue; // There is a Room Air Temperatures object for this zone
             ShowSevereError(state, RoutineName + "AirModel for Zone=[" + Zone(ZoneNum).Name + "] is indicated as \"User Defined\".");
             ShowContinueError(state, "...but missing a " + cCurrentModuleObject + " object for control.");
@@ -460,7 +426,7 @@ namespace RoomAirModelManager {
 
             RoomAirPattern(thisPattern).Name = cAlphaArgs(1);
             RoomAirPattern(thisPattern).PatrnID = rNumericArgs(1);
-            RoomAirPattern(thisPattern).PatternMode = ConstGradTempPattern;
+            RoomAirPattern(thisPattern).PatternMode = DataRoomAirModel::UserDefinedPatternType::ConstGradTempPattern;
             RoomAirPattern(thisPattern).DeltaTstat = rNumericArgs(2);
             RoomAirPattern(thisPattern).DeltaTleaving = rNumericArgs(3);
             RoomAirPattern(thisPattern).DeltaTexhaust = rNumericArgs(4);
@@ -472,7 +438,7 @@ namespace RoomAirModelManager {
             thisPattern = NumConstantGradient + ObjNum;
             inputProcessor->getObjectItem(
                 state, cCurrentModuleObject, ObjNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status, _, _, cAlphaFieldNames, cNumericFieldNames);
-            RoomAirPattern(thisPattern).PatternMode = TwoGradInterpPattern;
+            RoomAirPattern(thisPattern).PatternMode = DataRoomAirModel::UserDefinedPatternType::TwoGradInterpPattern;
             RoomAirPattern(thisPattern).Name = cAlphaArgs(1);
             RoomAirPattern(thisPattern).PatrnID = rNumericArgs(1);
             RoomAirPattern(thisPattern).TwoGradPatrn.TstatHeight = rNumericArgs(2);
@@ -482,15 +448,15 @@ namespace RoomAirModelManager {
             RoomAirPattern(thisPattern).TwoGradPatrn.HiGradient = rNumericArgs(6);
 
             if (UtilityRoutines::SameString(cAlphaArgs(2), "OutdoorDryBulbTemperature")) {
-                RoomAirPattern(thisPattern).TwoGradPatrn.InterpolationMode = OutdoorDryBulbMode;
+                RoomAirPattern(thisPattern).TwoGradPatrn.InterpolationMode = DataRoomAirModel::UserDefinedPatternMode::OutdoorDryBulbMode;
             } else if (UtilityRoutines::SameString(cAlphaArgs(2), "ZoneDryBulbTemperature")) {
-                RoomAirPattern(thisPattern).TwoGradPatrn.InterpolationMode = ZoneAirTempMode;
+                RoomAirPattern(thisPattern).TwoGradPatrn.InterpolationMode = DataRoomAirModel::UserDefinedPatternMode::ZoneAirTempMode;
             } else if (UtilityRoutines::SameString(cAlphaArgs(2), "ZoneAndOutdoorTemperatureDifference")) {
-                RoomAirPattern(thisPattern).TwoGradPatrn.InterpolationMode = DeltaOutdoorZone;
+                RoomAirPattern(thisPattern).TwoGradPatrn.InterpolationMode = DataRoomAirModel::UserDefinedPatternMode::DeltaOutdoorZone;
             } else if (UtilityRoutines::SameString(cAlphaArgs(2), "SensibleCoolingLoad")) {
-                RoomAirPattern(thisPattern).TwoGradPatrn.InterpolationMode = SensibleCoolingMode;
+                RoomAirPattern(thisPattern).TwoGradPatrn.InterpolationMode = DataRoomAirModel::UserDefinedPatternMode::SensibleCoolingMode;
             } else if (UtilityRoutines::SameString(cAlphaArgs(2), "SensibleHeatingLoad")) {
-                RoomAirPattern(thisPattern).TwoGradPatrn.InterpolationMode = SensibleHeatingMode;
+                RoomAirPattern(thisPattern).TwoGradPatrn.InterpolationMode = DataRoomAirModel::UserDefinedPatternMode::SensibleHeatingMode;
             } else {
                 ShowSevereError(state, "Invalid " + cAlphaFieldNames(2) + " = " + cAlphaArgs(2));
                 ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs(1));
@@ -505,20 +471,20 @@ namespace RoomAirModelManager {
 
             // now test the input some
             if (RoomAirPattern(thisPattern).TwoGradPatrn.HiGradient == RoomAirPattern(thisPattern).TwoGradPatrn.LowGradient) {
-                ShowWarningError(state, "Upper and lower gradients equal, use " + cTempPatternConstGradientObject + " instead ");
+                ShowWarningError(state, format("Upper and lower gradients equal, use {} instead ", cTempPatternConstGradientObject));
                 ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs(1));
             }
             if ((RoomAirPattern(thisPattern).TwoGradPatrn.UpperBoundTempScale == RoomAirPattern(thisPattern).TwoGradPatrn.LowerBoundTempScale) &&
-                ((RoomAirPattern(thisPattern).TwoGradPatrn.InterpolationMode == OutdoorDryBulbMode) ||
-                 (RoomAirPattern(thisPattern).TwoGradPatrn.InterpolationMode == ZoneAirTempMode) ||
-                 (RoomAirPattern(thisPattern).TwoGradPatrn.InterpolationMode == DeltaOutdoorZone))) {
+                ((RoomAirPattern(thisPattern).TwoGradPatrn.InterpolationMode == DataRoomAirModel::UserDefinedPatternMode::OutdoorDryBulbMode) ||
+                 (RoomAirPattern(thisPattern).TwoGradPatrn.InterpolationMode == DataRoomAirModel::UserDefinedPatternMode::ZoneAirTempMode) ||
+                 (RoomAirPattern(thisPattern).TwoGradPatrn.InterpolationMode == DataRoomAirModel::UserDefinedPatternMode::DeltaOutdoorZone))) {
                 // throw error, will cause divide by zero when used for scaling
                 ShowSevereError(state, "Error in temperature scale in " + cCurrentModuleObject + ": " + cAlphaArgs(1));
                 ErrorsFound = true;
             }
             if ((RoomAirPattern(thisPattern).TwoGradPatrn.HiGradient == RoomAirPattern(thisPattern).TwoGradPatrn.LowGradient) &&
-                ((RoomAirPattern(thisPattern).TwoGradPatrn.InterpolationMode == SensibleCoolingMode) ||
-                 (RoomAirPattern(thisPattern).TwoGradPatrn.InterpolationMode == SensibleHeatingMode))) {
+                ((RoomAirPattern(thisPattern).TwoGradPatrn.InterpolationMode == DataRoomAirModel::UserDefinedPatternMode::SensibleCoolingMode) ||
+                 (RoomAirPattern(thisPattern).TwoGradPatrn.InterpolationMode == DataRoomAirModel::UserDefinedPatternMode::SensibleHeatingMode))) {
                 // throw error, will cause divide by zero when used for scaling
                 ShowSevereError(state, "Error in load scale in " + cCurrentModuleObject + ": " + cAlphaArgs(1));
                 ErrorsFound = true;
@@ -528,7 +494,7 @@ namespace RoomAirModelManager {
         cCurrentModuleObject = cTempPatternNDHeightObject;
         for (ObjNum = 1; ObjNum <= NumNonDimensionalHeight; ++ObjNum) {
             thisPattern = NumConstantGradient + NumTwoGradientInterp + ObjNum;
-            RoomAirPattern(thisPattern).PatternMode = NonDimenHeightPattern;
+            RoomAirPattern(thisPattern).PatternMode = DataRoomAirModel::UserDefinedPatternType::NonDimenHeightPattern;
 
             inputProcessor->getObjectItem(
                 state, cCurrentModuleObject, ObjNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status, _, _, cAlphaFieldNames, cNumericFieldNames);
@@ -567,7 +533,7 @@ namespace RoomAirModelManager {
         cCurrentModuleObject = cTempPatternSurfMapObject;
         for (ObjNum = 1; ObjNum <= NumSurfaceMapping; ++ObjNum) {
             thisPattern = NumConstantGradient + NumTwoGradientInterp + NumNonDimensionalHeight + ObjNum;
-            RoomAirPattern(thisPattern).PatternMode = SurfMapTempPattern;
+            RoomAirPattern(thisPattern).PatternMode = DataRoomAirModel::UserDefinedPatternType::SurfMapTempPattern;
 
             inputProcessor->getObjectItem(
                 state, cCurrentModuleObject, ObjNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status, _, _, cAlphaFieldNames, cNumericFieldNames);
@@ -855,7 +821,7 @@ namespace RoomAirModelManager {
         for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
 
             // this zone uses other air model so skip the rest
-            if (AirModel(ZoneNum).AirModelType != RoomAirModel_Mundt) continue;
+            if (AirModel(ZoneNum).AirModelType != DataRoomAirModel::RoomAirModel::Mundt) continue;
 
             // this zone uses a nodal air model so get number of air nodes in each zone
             for (AirNodeNum = 1; AirNodeNum <= TotNumOfAirNodes; ++AirNodeNum) {
@@ -942,9 +908,9 @@ namespace RoomAirModelManager {
                 ErrorsFound = true;
                 continue;
             }
-            if (AirModel(ZoneNum).AirModelType != RoomAirModel_Mundt) {
+            if (AirModel(ZoneNum).AirModelType != DataRoomAirModel::RoomAirModel::Mundt) {
                 ShowSevereError(state, "Zone specified=\"" + cAlphaArgs(1) + "\", Air Model type is not OneNodeDisplacementVentilation.");
-                ShowContinueError(state, "Air Model Type for zone=" + ChAirModel(AirModel(ZoneNum).AirModelType));
+                ShowContinueError(state, format("Air Model Type for zone={}", ChAirModel[static_cast<int>(AirModel(ZoneNum).AirModelType)]));
                 ErrorsFound = true;
                 continue;
             }
@@ -1177,7 +1143,7 @@ namespace RoomAirModelManager {
                     TypeNum = AirflowNetwork::AirflowNetworkCompData(CompNum).TypeNum;
                     if (AirflowNetwork::AirflowNetworkCompData(CompNum).CompTypeNum == AirflowNetwork::CompTypeNum_SCR) {
                         if (AirflowNetwork::MultizoneSurfaceCrackData(TypeNum).FlowExpo != 0.50) {
-                            AirModel(ThisZone).AirModelType = RoomAirModel_Mixing;
+                            AirModel(ThisZone).AirModelType = DataRoomAirModel::RoomAirModel::Mixing;
                             ShowWarningError(state, "Problem with " + cCurrentModuleObject + " = " + cAlphaArgs(1));
                             ShowWarningError(state, "Roomair model will not be applied for Zone=" + cAlphaArgs(1) + '.');
                             ShowContinueError(
@@ -1467,9 +1433,9 @@ namespace RoomAirModelManager {
                 ErrorsFound = true;
                 continue;
             }
-            if (AirModel(ZoneNum).AirModelType != RoomAirModel_AirflowNetwork) {
+            if (AirModel(ZoneNum).AirModelType != DataRoomAirModel::RoomAirModel::AirflowNetwork) {
                 ShowSevereError(state, "GetRoomAirflowNetworkData: Zone specified='" + cAlphaArgs(1) + "', Air Model type is not AirflowNetwork.");
-                ShowContinueError(state, "Air Model Type for zone =" + ChAirModel(AirModel(ZoneNum).AirModelType));
+                ShowContinueError(state, format("Air Model Type for zone ={}", ChAirModel[static_cast<int>(AirModel(ZoneNum).AirModelType)]));
                 ErrorsFound = true;
                 continue;
             }
@@ -2359,7 +2325,7 @@ namespace RoomAirModelManager {
                 ZoneDVMixedFlag = 0;
                 // Output variables and DV zone flag
                 for (Loop = 1; Loop <= state.dataGlobal->NumOfZones; ++Loop) {
-                    if (AirModel(Loop).AirModelType != RoomAirModel_UCSDDV) continue; // don't set these up if they don't make sense
+                    if (AirModel(Loop).AirModelType != DataRoomAirModel::RoomAirModel::UCSDDV) continue; // don't set these up if they don't make sense
                     // CurrentModuleObject='RoomAirSettings:ThreeNodeDisplacementVentilation'
                     SetupOutputVariable(state,
                         "Room Air Zone Mixed Subzone Temperature", OutputProcessor::Unit::C, ZTMX(Loop), "HVAC", "State", Zone(Loop).Name);
@@ -2415,7 +2381,7 @@ namespace RoomAirModelManager {
                 ZoneUFPowInPlumesfromWindows = 0.0;
                 // Output variables and UF zone flag
                 for (Loop = 1; Loop <= state.dataGlobal->NumOfZones; ++Loop) {
-                    if (AirModel(Loop).AirModelType != RoomAirModel_UCSDUFI) continue; // don't set these up if they don't make sense
+                    if (AirModel(Loop).AirModelType != DataRoomAirModel::RoomAirModel::UCSDUFI) continue; // don't set these up if they don't make sense
                     // CurrentModuleObject='RoomAirSettings:UnderFloorAirDistributionInterior'
                     SetupOutputVariable(state,
                         "Room Air Zone Mixed Subzone Temperature", OutputProcessor::Unit::C, ZTMX(Loop), "HVAC", "State", Zone(Loop).Name);
@@ -2463,7 +2429,7 @@ namespace RoomAirModelManager {
                     } // ZoneEquipConfigNum
                 }
                 for (Loop = 1; Loop <= state.dataGlobal->NumOfZones; ++Loop) {
-                    if (AirModel(Loop).AirModelType != RoomAirModel_UCSDUFE) continue; // don't set these up if they don't make sense
+                    if (AirModel(Loop).AirModelType != DataRoomAirModel::RoomAirModel::UCSDUFE) continue; // don't set these up if they don't make sense
                     // CurrentModuleObject='RoomAirSettings:UnderFloorAirDistributionExterior'
                     SetupOutputVariable(state,
                         "Room Air Zone Mixed Subzone Temperature", OutputProcessor::Unit::C, ZTMX(Loop), "HVAC", "State", Zone(Loop).Name);
@@ -2562,7 +2528,7 @@ namespace RoomAirModelManager {
                 HDoor = 0.0;
 
                 for (Loop = 1; Loop <= state.dataGlobal->NumOfZones; ++Loop) {
-                    if (AirModel(Loop).AirModelType != RoomAirModel_UCSDCV) continue; // don't set these up if they don't make sense
+                    if (AirModel(Loop).AirModelType != DataRoomAirModel::RoomAirModel::UCSDCV) continue; // don't set these up if they don't make sense
                     ZoneEquipConfigNum = ZoneNum;
                     // check whether this zone is a controlled zone or not
                     if (ZoneEquipConfig(ZoneEquipConfigNum).IsControlled) {

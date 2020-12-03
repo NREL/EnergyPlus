@@ -59,35 +59,18 @@ struct EnergyPlusData;
 
 namespace RoomAirModelManager {
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-
     extern bool GetUCSDDVDataFlag; // UCSD
     extern bool GetAirModelData;   // Used to "get" all air model data
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE
-
-    // Functions
 
     void clear_state();
 
     void ManageAirModel(EnergyPlusData &state, int &ZoneNum);
-
-    //*****************************************************************************************
 
     void GetAirModelDatas(EnergyPlusData &state);
 
     void GetUserDefinedPatternData(EnergyPlusData &state, bool &ErrorsFound); // True if errors found during this get input routine
 
     void GetAirNodeData(EnergyPlusData &state, bool &ErrorsFound); // True if errors found during this get input routine
-
-    //*****************************************************************************************
 
     void GetMundtData(EnergyPlusData &state, bool &ErrorsFound); // True if errors found during this get input routine
 
@@ -112,8 +95,6 @@ namespace RoomAirModelManager {
                         std::string &ReturnNodeName,  // Return node name
                         int TotNumEquip,              // how many of this equipment type
                         int TypeNum);                 // equipment type number
-
-    //*****************************************************************************************
 
 } // namespace RoomAirModelManager
 

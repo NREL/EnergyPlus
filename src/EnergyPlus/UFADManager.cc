@@ -121,7 +121,7 @@ namespace UFADManager {
 
     void ManageUCSDUFModels(EnergyPlusData &state,
                             int const ZoneNum,      // index number for the specified zone
-                            int const ZoneModelType // type of zone model; UCSDUFI = 6
+                            DataRoomAirModel::RoomAirModel const ZoneModelType // type of zone model; UCSDUFI = 6
     )
     {
 
@@ -156,11 +156,11 @@ namespace UFADManager {
         {
             auto const SELECT_CASE_var(ZoneModelType);
 
-            if (SELECT_CASE_var == RoomAirModel_UCSDUFI) { // UCSD UFAD interior zone model
+            if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::UCSDUFI) { // UCSD UFAD interior zone model
                 // simulate room airflow using the UCSDUFI model
                 CalcUCSDUI(state, ZoneNum);
 
-            } else if (SELECT_CASE_var == RoomAirModel_UCSDUFE) { // UCSD UFAD interior zone model
+            } else if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::UCSDUFE) { // UCSD UFAD interior zone model
                 // simulate room airflow using the UCSDUFI model
                 CalcUCSDUE(state, ZoneNum);
             }
@@ -168,7 +168,7 @@ namespace UFADManager {
     }
 
     void InitUCSDUF(EnergyPlusData &state, int const ZoneNum,
-                    int const ZoneModelType // type of zone model; UCSDUFI = 6
+                    DataRoomAirModel::RoomAirModel const ZoneModelType // type of zone model; UCSDUFI = 6
     )
     {
 
@@ -220,7 +220,7 @@ namespace UFADManager {
                 }
             }
         }
-        if (ZoneModelType == RoomAirModel_UCSDUFE) {
+        if (ZoneModelType == DataRoomAirModel::RoomAirModel::UCSDUFE) {
             UINum = ZoneUFPtr(ZoneNum);
             if (ZoneUCSDUE(UINum).NumExtWin > 1.0) {
                 if (NumShadesDown / ZoneUCSDUE(UINum).NumExtWin >= 0.5) {
@@ -235,7 +235,7 @@ namespace UFADManager {
     }
 
     void SizeUCSDUF(EnergyPlusData &state, int const ZoneNum,
-                    int const ZoneModelType // type of zone model; UCSDUFI = 6
+                    DataRoomAirModel::RoomAirModel const ZoneModelType // type of zone model; UCSDUFI = 6
     )
     {
 
@@ -264,7 +264,7 @@ namespace UFADManager {
         static Real64 ZoneHWEqConv(0.0);      // zone hot water equip design convective gain [W]
         static Real64 ZoneSteamEqConv(0.0);   // zone steam equip design convective gain [W]
 
-        if (ZoneModelType == RoomAirModel_UCSDUFI) {
+        if (ZoneModelType == DataRoomAirModel::RoomAirModel::UCSDUFI) {
             UINum = ZoneUFPtr(ZoneNum);
             NumberOfOccupants = 0.0;
             for (Ctd = 1; Ctd <= TotPeople; ++Ctd) {
@@ -425,7 +425,7 @@ namespace UFADManager {
             }
         }
 
-        if (ZoneModelType == RoomAirModel_UCSDUFE) {
+        if (ZoneModelType == DataRoomAirModel::RoomAirModel::UCSDUFE) {
             UINum = ZoneUFPtr(ZoneNum);
             // calculate total window width in zone
             for (Ctd = PosZ_Window((ZoneNum - 1) * 2 + 1); Ctd <= PosZ_Window((ZoneNum - 1) * 2 + 2); ++Ctd) {

@@ -162,7 +162,7 @@ TEST_F(EnergyPlusFixture, DisplacementVentMgr_HcUCSDDV_Door_Test)
     Surface(3).Vertex(4).z = 8.5343999852;
 
     EnergyPlus::DataRoomAirModel::AirModel.allocate(state->dataGlobal->NumOfZones);
-    AirModel(1).AirModelType = RoomAirModel_UCSDDV;
+    AirModel(1).AirModelType = DataRoomAirModel::RoomAirModel::UCSDDV;
 
     APos_Wall.allocate(TotSurfaces);
     APos_Floor.allocate(TotSurfaces);

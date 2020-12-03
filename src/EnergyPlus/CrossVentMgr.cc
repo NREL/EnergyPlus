@@ -678,7 +678,7 @@ namespace CrossVentMgr {
                 if (Surface(AirflowNetwork::MultizoneSurfaceData(MaxSurf).SurfNum).Zone == ZoneNum) {
                     if (AirflowNetwork::AirflowNetworkNodeData(NodeNum1).EPlusZoneNum <= 0) {
                         Tin(ZoneNum) = Surface(AirflowNetwork::MultizoneSurfaceData(MaxSurf).SurfNum).OutDryBulbTemp;
-                    } else if (AirModel(AirflowNetwork::AirflowNetworkNodeData(NodeNum1).EPlusZoneNum).AirModelType == RoomAirModel_UCSDCV) {
+                    } else if (AirModel(AirflowNetwork::AirflowNetworkNodeData(NodeNum1).EPlusZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::UCSDCV) {
                         Tin(ZoneNum) = RoomOutflowTemp(AirflowNetwork::AirflowNetworkNodeData(NodeNum1).EPlusZoneNum);
                     } else {
                         Tin(ZoneNum) = MAT(AirflowNetwork::AirflowNetworkNodeData(NodeNum1).EPlusZoneNum);
@@ -688,7 +688,7 @@ namespace CrossVentMgr {
 
                     if (AirflowNetwork::AirflowNetworkNodeData(NodeNum2).EPlusZoneNum <= 0) {
                         Tin(ZoneNum) = Surface(AirflowNetwork::MultizoneSurfaceData(MaxSurf).SurfNum).OutDryBulbTemp;
-                    } else if (AirModel(AirflowNetwork::AirflowNetworkNodeData(NodeNum2).EPlusZoneNum).AirModelType == RoomAirModel_UCSDCV) {
+                    } else if (AirModel(AirflowNetwork::AirflowNetworkNodeData(NodeNum2).EPlusZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::UCSDCV) {
                         Tin(ZoneNum) = RoomOutflowTemp(AirflowNetwork::AirflowNetworkNodeData(NodeNum2).EPlusZoneNum);
                     } else {
                         Tin(ZoneNum) = MAT(AirflowNetwork::AirflowNetworkNodeData(NodeNum2).EPlusZoneNum);
@@ -696,10 +696,10 @@ namespace CrossVentMgr {
                 }
             } else if ((Surface(AirflowNetwork::MultizoneSurfaceData(MaxSurf).SurfNum).Zone == ZoneNum) &&
                        (AirModel(Surface(Surface(AirflowNetwork::MultizoneSurfaceData(MaxSurf).SurfNum).ExtBoundCond).Zone).AirModelType ==
-                        RoomAirModel_UCSDCV)) {
+                               DataRoomAirModel::RoomAirModel::UCSDCV)) {
                 Tin(ZoneNum) = RoomOutflowTemp(Surface(Surface(AirflowNetwork::MultizoneSurfaceData(MaxSurf).SurfNum).ExtBoundCond).Zone);
             } else if ((Surface(AirflowNetwork::MultizoneSurfaceData(MaxSurf).SurfNum).Zone != ZoneNum) &&
-                       (AirModel(Surface(AirflowNetwork::MultizoneSurfaceData(MaxSurf).SurfNum).Zone).AirModelType == RoomAirModel_UCSDCV)) {
+                       (AirModel(Surface(AirflowNetwork::MultizoneSurfaceData(MaxSurf).SurfNum).Zone).AirModelType == DataRoomAirModel::RoomAirModel::UCSDCV)) {
                 Tin(ZoneNum) = RoomOutflowTemp(AirflowNetwork::MultizoneSurfaceData(MaxSurf).SurfNum);
             } else {
                 if (Surface(AirflowNetwork::MultizoneSurfaceData(MaxSurf).SurfNum).Zone == ZoneNum) {

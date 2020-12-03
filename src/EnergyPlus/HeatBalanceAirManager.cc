@@ -3954,20 +3954,9 @@ namespace HeatBalanceAirManager {
         using DataHeatBalance::Zone;
         using DataRoomAirModel::AirModel;
         using DataRoomAirModel::ChAirModel;
-        using DataRoomAirModel::DirectCoupling;
-        using DataRoomAirModel::IndirectCoupling;
         using DataRoomAirModel::MundtModelUsed;
-        using DataRoomAirModel::RoomAirModel_AirflowNetwork;
-        using DataRoomAirModel::RoomAirModel_Mixing;
-        using DataRoomAirModel::RoomAirModel_Mundt;
-        using DataRoomAirModel::RoomAirModel_UCSDCV;
-        using DataRoomAirModel::RoomAirModel_UCSDDV;
-        using DataRoomAirModel::RoomAirModel_UCSDUFE;
-        using DataRoomAirModel::RoomAirModel_UCSDUFI;
-        using DataRoomAirModel::RoomAirModel_UserDefined;
         using DataRoomAirModel::UCSDModelUsed;
         using DataRoomAirModel::UserDefinedUsed;
-
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumAlphas; // States which alpha value to read from a
@@ -4015,7 +4004,7 @@ namespace HeatBalanceAirManager {
                     ShowContinueError(state, "Duplicate zone name, only one type of roomair model is allowed per zone");
                     ShowContinueError(state, "Zone " + cAlphaArgs(2) + " was already assigned a roomair model by " + cCurrentModuleObject + " = " +
                                       AirModel(ZoneNum).AirModelName);
-                    ShowContinueError(state, "Air Model Type for zone already set to " + ChAirModel(AirModel(ZoneNum).AirModelType));
+                    ShowContinueError(state, format("Air Model Type for zone already set to {}", ChAirModel[static_cast<int>(AirModel(ZoneNum).AirModelType)]));
                     ShowContinueError(state, "Trying to overwrite with model type = " + cAlphaArgs(3));
                     ErrorsFound = true;
                 }
@@ -4025,9 +4014,9 @@ namespace HeatBalanceAirManager {
                 {
                     auto const SELECT_CASE_var(cAlphaArgs(3));
                     if (SELECT_CASE_var == "MIXING") {
-                        AirModel(ZoneNum).AirModelType = RoomAirModel_Mixing;
+                        AirModel(ZoneNum).AirModelType = DataRoomAirModel::RoomAirModel::Mixing;
                     } else if (SELECT_CASE_var == "ONENODEDISPLACEMENTVENTILATION") {
-                        AirModel(ZoneNum).AirModelType = RoomAirModel_Mundt;
+                        AirModel(ZoneNum).AirModelType = DataRoomAirModel::RoomAirModel::Mundt;
                         AirModel(ZoneNum).SimAirModel = true;
                         MundtModelUsed = true;
                         IsNotOK = false;
@@ -4038,7 +4027,7 @@ namespace HeatBalanceAirManager {
                             ErrorsFound = true;
                         }
                     } else if (SELECT_CASE_var == "THREENODEDISPLACEMENTVENTILATION") {
-                        AirModel(ZoneNum).AirModelType = RoomAirModel_UCSDDV;
+                        AirModel(ZoneNum).AirModelType = DataRoomAirModel::RoomAirModel::UCSDDV;
                         AirModel(ZoneNum).SimAirModel = true;
                         UCSDModelUsed = true;
                         IsNotOK = false;
@@ -4049,7 +4038,7 @@ namespace HeatBalanceAirManager {
                             ErrorsFound = true;
                         }
                     } else if (SELECT_CASE_var == "CROSSVENTILATION") {
-                        AirModel(ZoneNum).AirModelType = RoomAirModel_UCSDCV;
+                        AirModel(ZoneNum).AirModelType = DataRoomAirModel::RoomAirModel::UCSDCV;
                         AirModel(ZoneNum).SimAirModel = true;
                         UCSDModelUsed = true;
                         IsNotOK = false;
@@ -4059,7 +4048,7 @@ namespace HeatBalanceAirManager {
                             ErrorsFound = true;
                         }
                     } else if (SELECT_CASE_var == "UNDERFLOORAIRDISTRIBUTIONINTERIOR") {
-                        AirModel(ZoneNum).AirModelType = RoomAirModel_UCSDUFI;
+                        AirModel(ZoneNum).AirModelType = DataRoomAirModel::RoomAirModel::UCSDUFI;
                         AirModel(ZoneNum).SimAirModel = true;
                         UCSDModelUsed = true;
                         ValidateComponent(state,
@@ -4069,7 +4058,7 @@ namespace HeatBalanceAirManager {
                             ErrorsFound = true;
                         }
                     } else if (SELECT_CASE_var == "UNDERFLOORAIRDISTRIBUTIONEXTERIOR") {
-                        AirModel(ZoneNum).AirModelType = RoomAirModel_UCSDUFE;
+                        AirModel(ZoneNum).AirModelType = DataRoomAirModel::RoomAirModel::UCSDUFE;
                         AirModel(ZoneNum).SimAirModel = true;
                         UCSDModelUsed = true;
                         ValidateComponent(state,
@@ -4079,11 +4068,11 @@ namespace HeatBalanceAirManager {
                             ErrorsFound = true;
                         }
                     } else if (SELECT_CASE_var == "USERDEFINED") {
-                        AirModel(ZoneNum).AirModelType = RoomAirModel_UserDefined;
+                        AirModel(ZoneNum).AirModelType = DataRoomAirModel::RoomAirModel::UserDefined;
                         AirModel(ZoneNum).SimAirModel = true;
                         UserDefinedUsed = true;
                     } else if (SELECT_CASE_var == "AIRFLOWNETWORK") {
-                        AirModel(ZoneNum).AirModelType = RoomAirModel_AirflowNetwork;
+                        AirModel(ZoneNum).AirModelType = DataRoomAirModel::RoomAirModel::AirflowNetwork;
                         AirModel(ZoneNum).SimAirModel = true;
                         if (inputProcessor->getNumObjectsFound(state, "AirflowNetwork:SimulationControl") == 0) {
                             ShowSevereError(state, "In " + cCurrentModuleObject + " = " + cAlphaArgs(1) + ": " + cAlphaFieldNames(3) + " = AIRFLOWNETWORK.");
@@ -4096,21 +4085,21 @@ namespace HeatBalanceAirManager {
                         ShowWarningError(state, "Invalid " + cAlphaFieldNames(3) + " = " + cAlphaArgs(3));
                         ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs(1));
                         ShowContinueError(state, "The mixing air model will be used for Zone =" + cAlphaArgs(2));
-                        AirModel(ZoneNum).AirModelType = RoomAirModel_Mixing;
+                        AirModel(ZoneNum).AirModelType = DataRoomAirModel::RoomAirModel::Mixing;
                     }
                 }
 
                 {
                     auto const SELECT_CASE_var(cAlphaArgs(4));
                     if (SELECT_CASE_var == "DIRECT") {
-                        AirModel(ZoneNum).TempCoupleScheme = DirectCoupling;
+                        AirModel(ZoneNum).TempCoupleScheme = DataRoomAirModel::CouplingScheme::Direct;
                     } else if (SELECT_CASE_var == "INDIRECT") {
-                        AirModel(ZoneNum).TempCoupleScheme = IndirectCoupling;
+                        AirModel(ZoneNum).TempCoupleScheme = DataRoomAirModel::CouplingScheme::Indirect;
                     } else {
                         ShowWarningError(state, "Invalid " + cAlphaFieldNames(4) + " = " + cAlphaArgs(4));
                         ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs(1));
                         ShowContinueError(state, "The direct coupling scheme will be used for Zone =" + cAlphaArgs(2));
-                        AirModel(ZoneNum).TempCoupleScheme = DirectCoupling;
+                        AirModel(ZoneNum).TempCoupleScheme = DataRoomAirModel::CouplingScheme::Direct;
                     }
                 }
             } else { // Zone Not Found
@@ -4139,21 +4128,21 @@ namespace HeatBalanceAirManager {
                 static constexpr auto RoomAirZoneFmt("RoomAir Model,{},{}\n");
 
                 auto const SELECT_CASE_var(AirModel(ZoneNum).AirModelType);
-                if (SELECT_CASE_var == RoomAirModel_Mixing) {
+                if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::Mixing) {
                     print(state.files.eio, RoomAirZoneFmt, Zone(ZoneNum).Name, "Mixing/Well-Stirred");
-                } else if (SELECT_CASE_var == RoomAirModel_Mundt) {
+                } else if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::Mundt) {
                     print(state.files.eio, RoomAirZoneFmt, Zone(ZoneNum).Name, "OneNodeDisplacementVentilation");
-                } else if (SELECT_CASE_var == RoomAirModel_UCSDDV) {
+                } else if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::UCSDDV) {
                     print(state.files.eio, RoomAirZoneFmt, Zone(ZoneNum).Name, "ThreeNodeDisplacementVentilation");
-                } else if (SELECT_CASE_var == RoomAirModel_UCSDCV) {
+                } else if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::UCSDCV) {
                     print(state.files.eio, RoomAirZoneFmt, Zone(ZoneNum).Name, "CrossVentilation");
-                } else if (SELECT_CASE_var == RoomAirModel_UCSDUFI) {
+                } else if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::UCSDUFI) {
                     print(state.files.eio, RoomAirZoneFmt, Zone(ZoneNum).Name, "UnderFloorAirDistributionInterior");
-                } else if (SELECT_CASE_var == RoomAirModel_UCSDUFE) {
+                } else if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::UCSDUFE) {
                     print(state.files.eio, RoomAirZoneFmt, Zone(ZoneNum).Name, "UnderFloorAirDistributionExterior");
-                } else if (SELECT_CASE_var == RoomAirModel_UserDefined) {
+                } else if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::UserDefined) {
                     print(state.files.eio, RoomAirZoneFmt, Zone(ZoneNum).Name, "UserDefined");
-                } else if (SELECT_CASE_var == RoomAirModel_AirflowNetwork) {
+                } else if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
                     print(state.files.eio, RoomAirZoneFmt, Zone(ZoneNum).Name, "AirflowNetwork");
                 }
             }
