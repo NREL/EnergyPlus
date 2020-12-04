@@ -272,7 +272,7 @@ namespace PlantComponentTemperatureSources {
         SetupOutputVariable(state,
             "Plant Temperature Source Component Heat Transfer Energy", OutputProcessor::Unit::J, this->HeatEnergy, "System", "Sum", this->Name);
         if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-            SetupEMSActuator("PlantComponent:TemperatureSource",
+            SetupEMSActuator(state, "PlantComponent:TemperatureSource",
                              this->Name,
                              "Maximum Mass Flow Rate",
                              "[kg/s]",

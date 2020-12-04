@@ -4839,7 +4839,7 @@ namespace HVACVariableRefrigerantFlow {
                                 "Average",
                                 VRFTU(VRFNum).Name);
             if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                SetupEMSActuator("Variable Refrigerant Flow Terminal Unit",
+                SetupEMSActuator(state, "Variable Refrigerant Flow Terminal Unit",
                                  VRFTU(VRFNum).Name,
                                  "Part Load Ratio",
                                  "[fraction]",
@@ -5262,7 +5262,7 @@ namespace HVACVariableRefrigerantFlow {
             }
 
             if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                SetupEMSActuator("Variable Refrigerant Flow Heat Pump",
+                SetupEMSActuator(state, "Variable Refrigerant Flow Heat Pump",
                                  VRF(NumCond).Name,
                                  "Operating Mode",
                                  "[integer]",

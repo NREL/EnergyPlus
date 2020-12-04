@@ -603,7 +603,7 @@ namespace UserDefinedComponents {
                             } else if (SELECT_CASE_var == "MEETSLOADWITHNOMINALCAPACITYLOWOUTLIMIT") {
                                 state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).HowLoadServed = DataPlant::HowMet_ByNominalCapLowOutLimit;
                                 // actuator for low out limit
-                                SetupEMSActuator("Plant Connection " + LoopStr,
+                                SetupEMSActuator(state, "Plant Connection " + LoopStr,
                                                  state.dataUserDefinedComponents->UserPlantComp(CompLoop).Name,
                                                  "Low Outlet Temperature Limit",
                                                  "[C]",
@@ -612,7 +612,7 @@ namespace UserDefinedComponents {
                             } else if (SELECT_CASE_var == "MEETSLOADWITHNOMINALCAPACITYHIOUTLIMIT") {
                                 state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).HowLoadServed = DataPlant::HowMet_ByNominalCapHiOutLimit;
                                 // actuator for hi out limit
-                                SetupEMSActuator("Plant Connection " + LoopStr,
+                                SetupEMSActuator(state, "Plant Connection " + LoopStr,
                                                  state.dataUserDefinedComponents->UserPlantComp(CompLoop).Name,
                                                  "High Outlet Temperature Limit",
                                                  "[C]",
@@ -688,50 +688,50 @@ namespace UserDefinedComponents {
                                                  "[J/kg-C]",
                                                  state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).InletCp);
                         // model results related actuators
-                        SetupEMSActuator("Plant Connection " + LoopStr,
+                        SetupEMSActuator(state, "Plant Connection " + LoopStr,
                                          state.dataUserDefinedComponents->UserPlantComp(CompLoop).Name,
                                          "Outlet Temperature",
                                          "[C]",
                                          lDummy,
                                          state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).OutletTemp);
-                        SetupEMSActuator("Plant Connection " + LoopStr,
+                        SetupEMSActuator(state, "Plant Connection " + LoopStr,
                                          state.dataUserDefinedComponents->UserPlantComp(CompLoop).Name,
                                          "Mass Flow Rate",
                                          "[kg/s]",
                                          lDummy,
                                          state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).MassFlowRateRequest);
                         // model initialization and sizing related actuators
-                        SetupEMSActuator("Plant Connection " + LoopStr,
+                        SetupEMSActuator(state, "Plant Connection " + LoopStr,
                                          state.dataUserDefinedComponents->UserPlantComp(CompLoop).Name,
                                          "Minimum Mass Flow Rate",
                                          "[kg/s]",
                                          lDummy,
                                          state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).MassFlowRateMin);
-                        SetupEMSActuator("Plant Connection " + LoopStr,
+                        SetupEMSActuator(state, "Plant Connection " + LoopStr,
                                          state.dataUserDefinedComponents->UserPlantComp(CompLoop).Name,
                                          "Maximum Mass Flow Rate",
                                          "[kg/s]",
                                          lDummy,
                                          state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).MassFlowRateMax);
-                        SetupEMSActuator("Plant Connection " + LoopStr,
+                        SetupEMSActuator(state, "Plant Connection " + LoopStr,
                                          state.dataUserDefinedComponents->UserPlantComp(CompLoop).Name,
                                          "Design Volume Flow Rate",
                                          "[m3/s]",
                                          lDummy,
                                          state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).DesignVolumeFlowRate);
-                        SetupEMSActuator("Plant Connection " + LoopStr,
+                        SetupEMSActuator(state, "Plant Connection " + LoopStr,
                                          state.dataUserDefinedComponents->UserPlantComp(CompLoop).Name,
                                          "Minimum Loading Capacity",
                                          "[W]",
                                          lDummy,
                                          state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).MinLoad);
-                        SetupEMSActuator("Plant Connection " + LoopStr,
+                        SetupEMSActuator(state, "Plant Connection " + LoopStr,
                                          state.dataUserDefinedComponents->UserPlantComp(CompLoop).Name,
                                          "Maximum Loading Capacity",
                                          "[W]",
                                          lDummy,
                                          state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).MaxLoad);
-                        SetupEMSActuator("Plant Connection " + LoopStr,
+                        SetupEMSActuator(state, "Plant Connection " + LoopStr,
                                          state.dataUserDefinedComponents->UserPlantComp(CompLoop).Name,
                                          "Optimal Loading Capacity",
                                          "[W]",
@@ -777,15 +777,15 @@ namespace UserDefinedComponents {
                                                                                                     1,
                                                                                                     DataLoopNode::ObjectIsNotParent);
                     // outlet air node results
-                    SetupEMSActuator(
+                    SetupEMSActuator(state,
                         "Air Connection", state.dataUserDefinedComponents->UserPlantComp(CompLoop).Name, "Outlet Temperature", "[C]", lDummy, state.dataUserDefinedComponents->UserPlantComp(CompLoop).Air.OutletTemp);
-                    SetupEMSActuator("Air Connection",
+                    SetupEMSActuator(state, "Air Connection",
                                      state.dataUserDefinedComponents->UserPlantComp(CompLoop).Name,
                                      "Outlet Humidity Ratio",
                                      "[kgWater/kgDryAir]",
                                      lDummy,
                                      state.dataUserDefinedComponents->UserPlantComp(CompLoop).Air.OutletHumRat);
-                    SetupEMSActuator("Air Connection",
+                    SetupEMSActuator(state, "Air Connection",
                                      state.dataUserDefinedComponents->UserPlantComp(CompLoop).Name,
                                      "Mass Flow Rate",
                                      "[kg/s]",
@@ -802,7 +802,7 @@ namespace UserDefinedComponents {
                                                            state.dataUserDefinedComponents->UserPlantComp(CompLoop).Water.SupplyTankDemandARRID);
 
                     state.dataUserDefinedComponents->UserPlantComp(CompLoop).Water.SuppliedByWaterSystem = true;
-                    SetupEMSActuator("Water System",
+                    SetupEMSActuator(state, "Water System",
                                      state.dataUserDefinedComponents->UserPlantComp(CompLoop).Name,
                                      "Supplied Volume Flow Rate",
                                      "[m3/s]",
@@ -818,7 +818,7 @@ namespace UserDefinedComponents {
                                                            state.dataUserDefinedComponents->UserPlantComp(CompLoop).Water.CollectionTankID,
                                                            state.dataUserDefinedComponents->UserPlantComp(CompLoop).Water.CollectionTankSupplyARRID);
                     state.dataUserDefinedComponents->UserPlantComp(CompLoop).Water.CollectsToWaterSystem = true;
-                    SetupEMSActuator("Water System",
+                    SetupEMSActuator(state, "Water System",
                                      state.dataUserDefinedComponents->UserPlantComp(CompLoop).Name,
                                      "Collected Volume Flow Rate",
                                      "[m3/s]",
@@ -846,43 +846,43 @@ namespace UserDefinedComponents {
                                               &state.dataUserDefinedComponents->UserPlantComp(CompLoop).Zone.CarbonDioxideGainRate,
                                               &state.dataUserDefinedComponents->UserPlantComp(CompLoop).Zone.GenericContamGainRate);
 
-                        SetupEMSActuator("Component Zone Internal Gain",
+                        SetupEMSActuator(state, "Component Zone Internal Gain",
                                          state.dataUserDefinedComponents->UserPlantComp(CompLoop).Name,
                                          "Sensible Heat Gain Rate",
                                          "[W]",
                                          lDummy,
                                          state.dataUserDefinedComponents->UserPlantComp(CompLoop).Zone.ConvectionGainRate);
-                        SetupEMSActuator("Component Zone Internal Gain",
+                        SetupEMSActuator(state, "Component Zone Internal Gain",
                                          state.dataUserDefinedComponents->UserPlantComp(CompLoop).Name,
                                          "Return Air Heat Sensible Gain Rate",
                                          "[W]",
                                          lDummy,
                                          state.dataUserDefinedComponents->UserPlantComp(CompLoop).Zone.ReturnAirConvectionGainRate);
-                        SetupEMSActuator("Component Zone Internal Gain",
+                        SetupEMSActuator(state, "Component Zone Internal Gain",
                                          state.dataUserDefinedComponents->UserPlantComp(CompLoop).Name,
                                          "Thermal Radiation Heat Gain Rate",
                                          "[W]",
                                          lDummy,
                                          state.dataUserDefinedComponents->UserPlantComp(CompLoop).Zone.ThermalRadiationGainRate);
-                        SetupEMSActuator("Component Zone Internal Gain",
+                        SetupEMSActuator(state, "Component Zone Internal Gain",
                                          state.dataUserDefinedComponents->UserPlantComp(CompLoop).Name,
                                          "Latent Heat Gain Rate",
                                          "[W]",
                                          lDummy,
                                          state.dataUserDefinedComponents->UserPlantComp(CompLoop).Zone.LatentGainRate);
-                        SetupEMSActuator("Component Zone Internal Gain",
+                        SetupEMSActuator(state, "Component Zone Internal Gain",
                                          state.dataUserDefinedComponents->UserPlantComp(CompLoop).Name,
                                          "Return Air Latent Heat Gain Rate",
                                          "[W]",
                                          lDummy,
                                          state.dataUserDefinedComponents->UserPlantComp(CompLoop).Zone.ReturnAirLatentGainRate);
-                        SetupEMSActuator("Component Zone Internal Gain",
+                        SetupEMSActuator(state, "Component Zone Internal Gain",
                                          state.dataUserDefinedComponents->UserPlantComp(CompLoop).Name,
                                          "Carbon Dioxide Gain Rate",
                                          "[W]",
                                          lDummy,
                                          state.dataUserDefinedComponents->UserPlantComp(CompLoop).Zone.CarbonDioxideGainRate);
-                        SetupEMSActuator("Component Zone Internal Gain",
+                        SetupEMSActuator(state, "Component Zone Internal Gain",
                                          state.dataUserDefinedComponents->UserPlantComp(CompLoop).Name,
                                          "Gaseous Contaminant Gain Rate",
                                          "[W]",
@@ -1015,19 +1015,19 @@ namespace UserDefinedComponents {
                                                                 DataLoopNode::NodeConnectionType_Outlet,
                                                                 1,
                                                                 DataLoopNode::ObjectIsNotParent);
-                        SetupEMSActuator("Air Connection " + LoopStr,
+                        SetupEMSActuator(state, "Air Connection " + LoopStr,
                                          state.dataUserDefinedComponents->UserCoil(CompLoop).Name,
                                          "Outlet Temperature",
                                          "[C]",
                                          lDummy,
                                          state.dataUserDefinedComponents->UserCoil(CompLoop).Air(ConnectionLoop).OutletTemp);
-                        SetupEMSActuator("Air Connection " + LoopStr,
+                        SetupEMSActuator(state, "Air Connection " + LoopStr,
                                          state.dataUserDefinedComponents->UserCoil(CompLoop).Name,
                                          "Outlet Humidity Ratio",
                                          "[kgWater/kgDryAir]",
                                          lDummy,
                                          state.dataUserDefinedComponents->UserCoil(CompLoop).Air(ConnectionLoop).OutletHumRat);
-                        SetupEMSActuator("Air Connection " + LoopStr,
+                        SetupEMSActuator(state, "Air Connection " + LoopStr,
                                          state.dataUserDefinedComponents->UserCoil(CompLoop).Name,
                                          "Mass Flow Rate",
                                          "[kg/s]",
@@ -1091,29 +1091,29 @@ namespace UserDefinedComponents {
                         SetupEMSInternalVariable(state,
                             "Inlet Specific Heat for Plant Connection", state.dataUserDefinedComponents->UserCoil(CompLoop).Name, "[J/kg-C]", state.dataUserDefinedComponents->UserCoil(CompLoop).Loop.InletCp);
                         // model results related actuators
-                        SetupEMSActuator(
+                        SetupEMSActuator(state,
                             "Plant Connection", state.dataUserDefinedComponents->UserCoil(CompLoop).Name, "Outlet Temperature", "[C]", lDummy, state.dataUserDefinedComponents->UserCoil(CompLoop).Loop.OutletTemp);
-                        SetupEMSActuator("Plant Connection",
+                        SetupEMSActuator(state, "Plant Connection",
                                          state.dataUserDefinedComponents->UserCoil(CompLoop).Name,
                                          "Mass Flow Rate",
                                          "[kg/s]",
                                          lDummy,
                                          state.dataUserDefinedComponents->UserCoil(CompLoop).Loop.MassFlowRateRequest);
                         // model initialization and sizing related actuators
-                        SetupEMSActuator("Plant Connection",
+                        SetupEMSActuator(state, "Plant Connection",
                                          state.dataUserDefinedComponents->UserCoil(CompLoop).Name,
                                          "Design Volume Flow Rate",
                                          "[m3/s]",
                                          lDummy,
                                          state.dataUserDefinedComponents->UserCoil(CompLoop).Loop.DesignVolumeFlowRate);
 
-                        SetupEMSActuator("Plant Connection",
+                        SetupEMSActuator(state, "Plant Connection",
                                          state.dataUserDefinedComponents->UserCoil(CompLoop).Name,
                                          "Minimum Mass Flow Rate",
                                          "[kg/s]",
                                          lDummy,
                                          state.dataUserDefinedComponents->UserCoil(CompLoop).Loop.MassFlowRateMin);
-                        SetupEMSActuator("Plant Connection",
+                        SetupEMSActuator(state, "Plant Connection",
                                          state.dataUserDefinedComponents->UserCoil(CompLoop).Name,
                                          "Maximum Mass Flow Rate",
                                          "[kg/s]",
@@ -1130,7 +1130,7 @@ namespace UserDefinedComponents {
                                                                state.dataUserDefinedComponents->UserCoil(CompLoop).Water.SupplyTankDemandARRID);
 
                         state.dataUserDefinedComponents->UserCoil(CompLoop).Water.SuppliedByWaterSystem = true;
-                        SetupEMSActuator("Water System",
+                        SetupEMSActuator(state, "Water System",
                                          state.dataUserDefinedComponents->UserCoil(CompLoop).Name,
                                          "Supplied Volume Flow Rate",
                                          "[m3/s]",
@@ -1146,7 +1146,7 @@ namespace UserDefinedComponents {
                                                                state.dataUserDefinedComponents->UserCoil(CompLoop).Water.CollectionTankID,
                                                                state.dataUserDefinedComponents->UserCoil(CompLoop).Water.CollectionTankSupplyARRID);
                         state.dataUserDefinedComponents->UserCoil(CompLoop).Water.CollectsToWaterSystem = true;
-                        SetupEMSActuator("Water System",
+                        SetupEMSActuator(state, "Water System",
                                          state.dataUserDefinedComponents->UserCoil(CompLoop).Name,
                                          "Collected Volume Flow Rate",
                                          "[m3/s]",
@@ -1174,43 +1174,43 @@ namespace UserDefinedComponents {
                                                   &state.dataUserDefinedComponents->UserCoil(CompLoop).Zone.CarbonDioxideGainRate,
                                                   &state.dataUserDefinedComponents->UserCoil(CompLoop).Zone.GenericContamGainRate);
 
-                            SetupEMSActuator("Component Zone Internal Gain",
+                            SetupEMSActuator(state, "Component Zone Internal Gain",
                                              state.dataUserDefinedComponents->UserCoil(CompLoop).Name,
                                              "Sensible Heat Gain Rate",
                                              "[W]",
                                              lDummy,
                                              state.dataUserDefinedComponents->UserCoil(CompLoop).Zone.ConvectionGainRate);
-                            SetupEMSActuator("Component Zone Internal Gain",
+                            SetupEMSActuator(state, "Component Zone Internal Gain",
                                              state.dataUserDefinedComponents->UserCoil(CompLoop).Name,
                                              "Return Air Heat Sensible Gain Rate",
                                              "[W]",
                                              lDummy,
                                              state.dataUserDefinedComponents->UserCoil(CompLoop).Zone.ReturnAirConvectionGainRate);
-                            SetupEMSActuator("Component Zone Internal Gain",
+                            SetupEMSActuator(state, "Component Zone Internal Gain",
                                              state.dataUserDefinedComponents->UserCoil(CompLoop).Name,
                                              "Thermal Radiation Heat Gain Rate",
                                              "[W]",
                                              lDummy,
                                              state.dataUserDefinedComponents->UserCoil(CompLoop).Zone.ThermalRadiationGainRate);
-                            SetupEMSActuator("Component Zone Internal Gain",
+                            SetupEMSActuator(state, "Component Zone Internal Gain",
                                              state.dataUserDefinedComponents->UserCoil(CompLoop).Name,
                                              "Latent Heat Gain Rate",
                                              "[W]",
                                              lDummy,
                                              state.dataUserDefinedComponents->UserCoil(CompLoop).Zone.LatentGainRate);
-                            SetupEMSActuator("Component Zone Internal Gain",
+                            SetupEMSActuator(state, "Component Zone Internal Gain",
                                              state.dataUserDefinedComponents->UserCoil(CompLoop).Name,
                                              "Return Air Latent Heat Gain Rate",
                                              "[W]",
                                              lDummy,
                                              state.dataUserDefinedComponents->UserCoil(CompLoop).Zone.ReturnAirLatentGainRate);
-                            SetupEMSActuator("Component Zone Internal Gain",
+                            SetupEMSActuator(state, "Component Zone Internal Gain",
                                              state.dataUserDefinedComponents->UserCoil(CompLoop).Name,
                                              "Carbon Dioxide Gain Rate",
                                              "[W]",
                                              lDummy,
                                              state.dataUserDefinedComponents->UserCoil(CompLoop).Zone.CarbonDioxideGainRate);
-                            SetupEMSActuator("Component Zone Internal Gain",
+                            SetupEMSActuator(state, "Component Zone Internal Gain",
                                              state.dataUserDefinedComponents->UserCoil(CompLoop).Name,
                                              "Gaseous Contaminant Gain Rate",
                                              "[W]",
@@ -1347,7 +1347,7 @@ namespace UserDefinedComponents {
                                          "[kg/s]",
                                          state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).RemainingOutputReqToDehumidSP);
 
-                SetupEMSActuator("Primary Air Connection",
+                SetupEMSActuator(state, "Primary Air Connection",
                                  state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Name,
                                  "Inlet Mass Flow Rate",
                                  "[kg/s]",
@@ -1361,19 +1361,19 @@ namespace UserDefinedComponents {
                                                                                                       DataLoopNode::NodeConnectionType_Outlet,
                                                                                                       1,
                                                                                                       DataLoopNode::ObjectIsNotParent);
-                SetupEMSActuator("Primary Air Connection",
+                SetupEMSActuator(state, "Primary Air Connection",
                                  state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Name,
                                  "Outlet Temperature",
                                  "[C]",
                                  lDummy,
                                  state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).ZoneAir.OutletTemp);
-                SetupEMSActuator("Primary Air Connection",
+                SetupEMSActuator(state, "Primary Air Connection",
                                  state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Name,
                                  "Outlet Humidity Ratio",
                                  "[kgWater/kgDryAir]",
                                  lDummy,
                                  state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).ZoneAir.OutletHumRat);
-                SetupEMSActuator("Primary Air Connection",
+                SetupEMSActuator(state, "Primary Air Connection",
                                  state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Name,
                                  "Outlet Mass Flow Rate",
                                  "[kg/s]",
@@ -1407,7 +1407,7 @@ namespace UserDefinedComponents {
                                              state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Name,
                                              "[J/kg-C]",
                                              state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).SourceAir.InletCp);
-                    SetupEMSActuator("Secondary Air Connection",
+                    SetupEMSActuator(state, "Secondary Air Connection",
                                      state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Name,
                                      "Inlet Mass Flow Rate",
                                      "[kg/s]",
@@ -1424,19 +1424,19 @@ namespace UserDefinedComponents {
                                                                                                             DataLoopNode::NodeConnectionType_Outlet,
                                                                                                             2,
                                                                                                             DataLoopNode::ObjectIsNotParent);
-                    SetupEMSActuator("Secondary Air Connection",
+                    SetupEMSActuator(state, "Secondary Air Connection",
                                      state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Name,
                                      "Outlet Temperature",
                                      "[C]",
                                      lDummy,
                                      state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).SourceAir.OutletTemp);
-                    SetupEMSActuator("Secondary Air Connection",
+                    SetupEMSActuator(state, "Secondary Air Connection",
                                      state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Name,
                                      "Outlet Humidity Ratio",
                                      "[kgWater/kgDryAir]",
                                      lDummy,
                                      state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).SourceAir.OutletHumRat);
-                    SetupEMSActuator("Secondary Air Connection",
+                    SetupEMSActuator(state, "Secondary Air Connection",
                                      state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Name,
                                      "Mass Flow Rate",
                                      "[kg/s]",
@@ -1496,32 +1496,32 @@ namespace UserDefinedComponents {
                                                  "[J/kg-C]",
                                                  state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Loop(ConnectionLoop).InletCp);
                         // model results related actuators
-                        SetupEMSActuator("Plant Connection " + LoopStr,
+                        SetupEMSActuator(state, "Plant Connection " + LoopStr,
                                          state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Name,
                                          "Outlet Temperature",
                                          "[C]",
                                          lDummy,
                                          state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Loop(ConnectionLoop).OutletTemp);
-                        SetupEMSActuator("Plant Connection " + LoopStr,
+                        SetupEMSActuator(state, "Plant Connection " + LoopStr,
                                          state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Name,
                                          "Mass Flow Rate",
                                          "[kg/s]",
                                          lDummy,
                                          state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Loop(ConnectionLoop).MassFlowRateRequest);
                         // model initialization and sizing related actuators
-                        SetupEMSActuator("Plant Connection " + LoopStr,
+                        SetupEMSActuator(state, "Plant Connection " + LoopStr,
                                          state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Name,
                                          "Minimum Mass Flow Rate",
                                          "[kg/s]",
                                          lDummy,
                                          state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Loop(ConnectionLoop).MassFlowRateMin);
-                        SetupEMSActuator("Plant Connection " + LoopStr,
+                        SetupEMSActuator(state, "Plant Connection " + LoopStr,
                                          state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Name,
                                          "Maximum Mass Flow Rate",
                                          "[kg/s]",
                                          lDummy,
                                          state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Loop(ConnectionLoop).MassFlowRateMax);
-                        SetupEMSActuator("Plant Connection " + LoopStr,
+                        SetupEMSActuator(state, "Plant Connection " + LoopStr,
                                          state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Name,
                                          "Design Volume Flow Rate",
                                          "[m3/s]",
@@ -1539,7 +1539,7 @@ namespace UserDefinedComponents {
                                                            state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Water.SupplyTankDemandARRID);
 
                     state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Water.SuppliedByWaterSystem = true;
-                    SetupEMSActuator("Water System",
+                    SetupEMSActuator(state, "Water System",
                                      state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Name,
                                      "Supplied Volume Flow Rate",
                                      "[m3/s]",
@@ -1555,7 +1555,7 @@ namespace UserDefinedComponents {
                                                            state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Water.CollectionTankID,
                                                            state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Water.CollectionTankSupplyARRID);
                     state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Water.CollectsToWaterSystem = true;
-                    SetupEMSActuator("Water System",
+                    SetupEMSActuator(state, "Water System",
                                      state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Name,
                                      "Collected Volume Flow Rate",
                                      "[m3/s]",
@@ -1583,43 +1583,43 @@ namespace UserDefinedComponents {
                                               &state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Zone.CarbonDioxideGainRate,
                                               &state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Zone.GenericContamGainRate);
 
-                        SetupEMSActuator("Component Zone Internal Gain",
+                        SetupEMSActuator(state, "Component Zone Internal Gain",
                                          state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Name,
                                          "Sensible Heat Gain Rate",
                                          "[W]",
                                          lDummy,
                                          state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Zone.ConvectionGainRate);
-                        SetupEMSActuator("Component Zone Internal Gain",
+                        SetupEMSActuator(state, "Component Zone Internal Gain",
                                          state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Name,
                                          "Return Air Heat Sensible Gain Rate",
                                          "[W]",
                                          lDummy,
                                          state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Zone.ReturnAirConvectionGainRate);
-                        SetupEMSActuator("Component Zone Internal Gain",
+                        SetupEMSActuator(state, "Component Zone Internal Gain",
                                          state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Name,
                                          "Thermal Radiation Heat Gain Rate",
                                          "[W]",
                                          lDummy,
                                          state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Zone.ThermalRadiationGainRate);
-                        SetupEMSActuator("Component Zone Internal Gain",
+                        SetupEMSActuator(state, "Component Zone Internal Gain",
                                          state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Name,
                                          "Latent Heat Gain Rate",
                                          "[W]",
                                          lDummy,
                                          state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Zone.LatentGainRate);
-                        SetupEMSActuator("Component Zone Internal Gain",
+                        SetupEMSActuator(state, "Component Zone Internal Gain",
                                          state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Name,
                                          "Return Air Latent Heat Gain Rate",
                                          "[W]",
                                          lDummy,
                                          state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Zone.ReturnAirLatentGainRate);
-                        SetupEMSActuator("Component Zone Internal Gain",
+                        SetupEMSActuator(state, "Component Zone Internal Gain",
                                          state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Name,
                                          "Carbon Dioxide Gain Rate",
                                          "[m3/s]",
                                          lDummy,
                                          state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Zone.CarbonDioxideGainRate);
-                        SetupEMSActuator("Component Zone Internal Gain",
+                        SetupEMSActuator(state, "Component Zone Internal Gain",
                                          state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Name,
                                          "Gaseous Contaminant Gain Rate",
                                          "[m3/s]",
@@ -1729,7 +1729,7 @@ namespace UserDefinedComponents {
                                          "[kg/s]",
                                          state.dataUserDefinedComponents->UserAirTerminal(CompLoop).RemainingOutputReqToDehumidSP);
 
-                SetupEMSActuator("Primary Air Connection",
+                SetupEMSActuator(state, "Primary Air Connection",
                                  state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Name,
                                  "Inlet Mass Flow Rate",
                                  "[kg/s]",
@@ -1744,19 +1744,19 @@ namespace UserDefinedComponents {
                                                                                                       1,
                                                                                                       DataLoopNode::ObjectIsNotParent,
                                                                                                       cAlphaFieldNames(5));
-                SetupEMSActuator("Primary Air Connection",
+                SetupEMSActuator(state, "Primary Air Connection",
                                  state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Name,
                                  "Outlet Temperature",
                                  "[C]",
                                  lDummy,
                                  state.dataUserDefinedComponents->UserAirTerminal(CompLoop).AirLoop.OutletTemp);
-                SetupEMSActuator("Primary Air Connection",
+                SetupEMSActuator(state, "Primary Air Connection",
                                  state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Name,
                                  "Outlet Humidity Ratio",
                                  "[kgWater/kgDryAir]",
                                  lDummy,
                                  state.dataUserDefinedComponents->UserAirTerminal(CompLoop).AirLoop.OutletHumRat);
-                SetupEMSActuator("Primary Air Connection",
+                SetupEMSActuator(state, "Primary Air Connection",
                                  state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Name,
                                  "Outlet Mass Flow Rate",
                                  "[kg/s]",
@@ -1831,7 +1831,7 @@ namespace UserDefinedComponents {
                                              state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Name,
                                              "[J/kg-C]",
                                              state.dataUserDefinedComponents->UserAirTerminal(CompLoop).SourceAir.InletCp);
-                    SetupEMSActuator("Secondary Air Connection",
+                    SetupEMSActuator(state, "Secondary Air Connection",
                                      state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Name,
                                      "Inlet Mass Flow Rate",
                                      "[kg/s]",
@@ -1849,19 +1849,19 @@ namespace UserDefinedComponents {
                                                                                                             2,
                                                                                                             DataLoopNode::ObjectIsNotParent,
                                                                                                             cAlphaFieldNames(7));
-                    SetupEMSActuator("Secondary Air Connection",
+                    SetupEMSActuator(state, "Secondary Air Connection",
                                      state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Name,
                                      "Outlet Temperature",
                                      "[C]",
                                      lDummy,
                                      state.dataUserDefinedComponents->UserAirTerminal(CompLoop).SourceAir.OutletTemp);
-                    SetupEMSActuator("Secondary Air Connection",
+                    SetupEMSActuator(state, "Secondary Air Connection",
                                      state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Name,
                                      "Outlet Humidity Ratio",
                                      "[kgWater/kgDryAir]",
                                      lDummy,
                                      state.dataUserDefinedComponents->UserAirTerminal(CompLoop).SourceAir.OutletHumRat);
-                    SetupEMSActuator("Secondary Air Connection",
+                    SetupEMSActuator(state, "Secondary Air Connection",
                                      state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Name,
                                      "Mass Flow Rate",
                                      "[kg/s]",
@@ -1923,32 +1923,32 @@ namespace UserDefinedComponents {
                                                  "[J/kg-C]",
                                                  state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Loop(ConnectionLoop).InletCp);
                         // model results related actuators
-                        SetupEMSActuator("Plant Connection " + LoopStr,
+                        SetupEMSActuator(state, "Plant Connection " + LoopStr,
                                          state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Name,
                                          "Outlet Temperature",
                                          "[C]",
                                          lDummy,
                                          state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Loop(ConnectionLoop).OutletTemp);
-                        SetupEMSActuator("Plant Connection " + LoopStr,
+                        SetupEMSActuator(state, "Plant Connection " + LoopStr,
                                          state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Name,
                                          "Mass Flow Rate",
                                          "[kg/s]",
                                          lDummy,
                                          state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Loop(ConnectionLoop).MassFlowRateRequest);
                         // model initialization and sizing related actuators
-                        SetupEMSActuator("Plant Connection " + LoopStr,
+                        SetupEMSActuator(state, "Plant Connection " + LoopStr,
                                          state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Name,
                                          "Minimum Mass Flow Rate",
                                          "[kg/s]",
                                          lDummy,
                                          state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Loop(ConnectionLoop).MassFlowRateMin);
-                        SetupEMSActuator("Plant Connection " + LoopStr,
+                        SetupEMSActuator(state, "Plant Connection " + LoopStr,
                                          state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Name,
                                          "Maximum Mass Flow Rate",
                                          "[kg/s]",
                                          lDummy,
                                          state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Loop(ConnectionLoop).MassFlowRateMax);
-                        SetupEMSActuator("Plant Connection " + LoopStr,
+                        SetupEMSActuator(state, "Plant Connection " + LoopStr,
                                          state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Name,
                                          "Design Volume Flow Rate",
                                          "[m3/s]",
@@ -1966,7 +1966,7 @@ namespace UserDefinedComponents {
                                                            state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Water.SupplyTankDemandARRID);
 
                     state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Water.SuppliedByWaterSystem = true;
-                    SetupEMSActuator("Water System",
+                    SetupEMSActuator(state, "Water System",
                                      state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Name,
                                      "Supplied Volume Flow Rate",
                                      "[m3/s]",
@@ -1982,7 +1982,7 @@ namespace UserDefinedComponents {
                                                            state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Water.CollectionTankID,
                                                            state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Water.CollectionTankSupplyARRID);
                     state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Water.CollectsToWaterSystem = true;
-                    SetupEMSActuator("Water System",
+                    SetupEMSActuator(state, "Water System",
                                      state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Name,
                                      "Collected Volume Flow Rate",
                                      "[m3/s]",
@@ -2010,43 +2010,43 @@ namespace UserDefinedComponents {
                                               &state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Zone.CarbonDioxideGainRate,
                                               &state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Zone.GenericContamGainRate);
 
-                        SetupEMSActuator("Component Zone Internal Gain",
+                        SetupEMSActuator(state, "Component Zone Internal Gain",
                                          state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Name,
                                          "Sensible Heat Gain Rate",
                                          "[W]",
                                          lDummy,
                                          state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Zone.ConvectionGainRate);
-                        SetupEMSActuator("Component Zone Internal Gain",
+                        SetupEMSActuator(state, "Component Zone Internal Gain",
                                          state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Name,
                                          "Return Air Heat Sensible Gain Rate",
                                          "[W]",
                                          lDummy,
                                          state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Zone.ReturnAirConvectionGainRate);
-                        SetupEMSActuator("Component Zone Internal Gain",
+                        SetupEMSActuator(state, "Component Zone Internal Gain",
                                          state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Name,
                                          "Thermal Radiation Heat Gain Rate",
                                          "[W]",
                                          lDummy,
                                          state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Zone.ThermalRadiationGainRate);
-                        SetupEMSActuator("Component Zone Internal Gain",
+                        SetupEMSActuator(state, "Component Zone Internal Gain",
                                          state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Name,
                                          "Latent Heat Gain Rate",
                                          "[W]",
                                          lDummy,
                                          state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Zone.LatentGainRate);
-                        SetupEMSActuator("Component Zone Internal Gain",
+                        SetupEMSActuator(state, "Component Zone Internal Gain",
                                          state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Name,
                                          "Return Air Latent Heat Gain Rate",
                                          "[W]",
                                          lDummy,
                                          state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Zone.ReturnAirLatentGainRate);
-                        SetupEMSActuator("Component Zone Internal Gain",
+                        SetupEMSActuator(state, "Component Zone Internal Gain",
                                          state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Name,
                                          "Carbon Dioxide Gain Rate",
                                          "[W]",
                                          lDummy,
                                          state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Zone.CarbonDioxideGainRate);
-                        SetupEMSActuator("Component Zone Internal Gain",
+                        SetupEMSActuator(state, "Component Zone Internal Gain",
                                          state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Name,
                                          "Gaseous Contaminant Gain Rate",
                                          "[W]",

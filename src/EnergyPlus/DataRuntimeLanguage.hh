@@ -87,7 +87,7 @@ namespace DataRuntimeLanguage {
     extern int const PntrInteger; // data type for overloaded pointer management, integer
     extern int const PntrLogical; // data type for overloaded pointer management, logical
 
-    extern int const MaxWhileLoopIterations; // protect from infinite loop in WHILE loops
+    int constexpr MaxWhileLoopIterations(1000000); // protect from infinite loop in WHILE loops
 
     // Parameters for identifying operator types in Erl
     // The number of these parameters indicates the order of precedence
@@ -206,18 +206,6 @@ namespace DataRuntimeLanguage {
     extern int const FuncTomorrowLiquidPrecip;    // Access TomorrowLiquidPrecip(hour, timestep)
 
     extern int const NumPossibleOperators; // total number of operators and built-in functions
-
-    extern Array1D_int EMSProgram;
-
-    extern int NumProgramCallManagers;      // count of Erl program managers with calling points
-    extern int NumSensors;                  // count of EMS sensors used in model (data from output variables)
-    extern int numActuatorsUsed;            // count of EMS actuators used in model
-    extern int numEMSActuatorsAvailable;    // count of EMS actuators available for use in such a model
-    extern int maxEMSActuatorsAvailable;    // count of EMS current maximum actuators available for use in such a model
-    extern int NumInternalVariablesUsed;    // count of EMS internal variables used in model
-    extern int numEMSInternalVarsAvailable; // count of EMS internal variables available for use in such a model
-    extern int maxEMSInternalVarsAvailable; // count of EMS current maximum internal variables available for use in such a model
-    extern int varsAvailableAllocInc;       // allocation increment for variable arrays
 
     extern int NumErlPrograms;               // count of Erl programs in model
     extern int NumErlSubroutines;            // count of Erl subroutines in model
@@ -554,9 +542,27 @@ namespace DataRuntimeLanguage {
 
 struct RuntimeLanguageData : BaseGlobalStruct {
 
+    int NumProgramCallManagers = 0;                 // count of Erl program managers with calling points
+    int NumSensors = 0;                             // count of EMS sensors used in model (data from output variables)
+    int numActuatorsUsed = 0;                       // count of EMS actuators used in model
+    int numEMSActuatorsAvailable = 0;               // count of EMS actuators available for use in such a model
+    int maxEMSActuatorsAvailable = 0;               // count of EMS current maximum actuators available for use in such a model
+    int NumInternalVariablesUsed = 0;               // count of EMS internal variables used in model
+    int numEMSInternalVarsAvailable = 0;            // count of EMS internal variables available for use in such a model
+    int maxEMSInternalVarsAvailable = 0;            // count of EMS current maximum internal variables available for use in such a model
+    int varsAvailableAllocInc = 1000;               // allocation increment for variable arrays
+
     void clear_state() override
     {
-
+        this->NumProgramCallManagers = 0;
+        this->NumSensors = 0;
+        this->numActuatorsUsed = 0;
+        this->numEMSActuatorsAvailable = 0;
+        this->maxEMSActuatorsAvailable = 0;
+        this->NumInternalVariablesUsed = 0;
+        this->numEMSInternalVarsAvailable = 0;
+        this->maxEMSInternalVarsAvailable = 0;
+        this->varsAvailableAllocInc = 1000;
     }
 };
 

@@ -478,13 +478,13 @@ namespace PlantLoadProfile {
                                     "Plant");
 
                 if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                    SetupEMSActuator("Plant Load Profile",
+                    SetupEMSActuator(state, "Plant Load Profile",
                                      PlantProfile(ProfileNum).Name,
                                      "Mass Flow Rate",
                                      "[kg/s]",
                                      PlantProfile(ProfileNum).EMSOverrideMassFlow,
                                      PlantProfile(ProfileNum).EMSMassFlowValue);
-                    SetupEMSActuator("Plant Load Profile",
+                    SetupEMSActuator(state, "Plant Load Profile",
                                      PlantProfile(ProfileNum).Name,
                                      "Power",
                                      "[W]",

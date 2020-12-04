@@ -98,30 +98,30 @@ TEST_F(EnergyPlusFixture, EMSManager_TestForUniqueEMSActuators)
     bool testBoolean3(true);
 
     // calling three times but twice with same names should still result in only two item in the resulting list
-    SetupEMSActuator(componentTypeName1, uniqueIDName1, controlTypeName1, units1, EMSActuated1, testBoolean1);
-    SetupEMSActuator(componentTypeName1, uniqueIDName1, controlTypeName1, units1, EMSActuated1, testBoolean2);
-    SetupEMSActuator(componentTypeName2, uniqueIDName1, controlTypeName1, units1, EMSActuated1, testBoolean3);
-    EXPECT_EQ(2, numEMSActuatorsAvailable);
+    SetupEMSActuator(*state, componentTypeName1, uniqueIDName1, controlTypeName1, units1, EMSActuated1, testBoolean1);
+    SetupEMSActuator(*state, componentTypeName1, uniqueIDName1, controlTypeName1, units1, EMSActuated1, testBoolean2);
+    SetupEMSActuator(*state, componentTypeName2, uniqueIDName1, controlTypeName1, units1, EMSActuated1, testBoolean3);
+    EXPECT_EQ(2, state->dataRuntimeLang->numEMSActuatorsAvailable);
 
     // repeat with integers
     std::string controlTypeName2("ModeOfSomething");
     int testInt1(7);
     int testInt2(9);
     int testInt3(11);
-    SetupEMSActuator(componentTypeName1, uniqueIDName1, controlTypeName2, units1, EMSActuated1, testInt1);
-    SetupEMSActuator(componentTypeName1, uniqueIDName1, controlTypeName2, units1, EMSActuated1, testInt2);
-    SetupEMSActuator(componentTypeName2, uniqueIDName1, controlTypeName2, units1, EMSActuated1, testInt3);
-    EXPECT_EQ(4, numEMSActuatorsAvailable);
+    SetupEMSActuator(*state, componentTypeName1, uniqueIDName1, controlTypeName2, units1, EMSActuated1, testInt1);
+    SetupEMSActuator(*state, componentTypeName1, uniqueIDName1, controlTypeName2, units1, EMSActuated1, testInt2);
+    SetupEMSActuator(*state, componentTypeName2, uniqueIDName1, controlTypeName2, units1, EMSActuated1, testInt3);
+    EXPECT_EQ(4, state->dataRuntimeLang->numEMSActuatorsAvailable);
 
     // repeat with reals
     std::string controlTypeName3("ValueOfResults");
     Real64 testReal1(0.123);
     Real64 testReal2(0.456);
     Real64 testReal3(0.789);
-    SetupEMSActuator(componentTypeName1, uniqueIDName1, controlTypeName3, units1, EMSActuated1, testReal1);
-    SetupEMSActuator(componentTypeName1, uniqueIDName1, controlTypeName3, units1, EMSActuated1, testReal2);
-    SetupEMSActuator(componentTypeName2, uniqueIDName1, controlTypeName3, units1, EMSActuated1, testReal3);
-    EXPECT_EQ(6, numEMSActuatorsAvailable);
+    SetupEMSActuator(*state, componentTypeName1, uniqueIDName1, controlTypeName3, units1, EMSActuated1, testReal1);
+    SetupEMSActuator(*state, componentTypeName1, uniqueIDName1, controlTypeName3, units1, EMSActuated1, testReal2);
+    SetupEMSActuator(*state, componentTypeName2, uniqueIDName1, controlTypeName3, units1, EMSActuated1, testReal3);
+    EXPECT_EQ(6, state->dataRuntimeLang->numEMSActuatorsAvailable);
 
     EMSActuatorAvailable.deallocate();
 }
@@ -264,7 +264,7 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetActuatedBranchFlo
     PlantLoop(1).LoopSide(1).Branch(1).Comp(2).Name = "Pipe";
     PlantLoop(1).LoopSide(1).Branch(1).Comp(2).NodeNumIn = 2;
     PlantLoop(1).LoopSide(1).Branch(1).Comp(2).NodeNumOut = 3;
-    PlantCondLoopOperation::SetupPlantEMSActuators();
+    PlantCondLoopOperation::SetupPlantEMSActuators(*state);
 
     // set flow, max and maxavail on the nodes
     Node.allocate(3);
@@ -428,7 +428,7 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetComponentFlowRate
     PlantLoop(1).LoopSide(1).Branch(1).Comp(2).Name = "Pipe";
     PlantLoop(1).LoopSide(1).Branch(1).Comp(2).NodeNumIn = 2;
     PlantLoop(1).LoopSide(1).Branch(1).Comp(2).NodeNumOut = 3;
-    PlantCondLoopOperation::SetupPlantEMSActuators();
+    PlantCondLoopOperation::SetupPlantEMSActuators(*state);
 
     // set flow, max and maxavail on the nodes
     Node.allocate(3);
@@ -1547,7 +1547,7 @@ TEST_F(EnergyPlusFixture, EMSManager_TestOANodeAsActuators)
 {
     //    EMSActuatorAvailable.allocate(100);
     NumOfNodes = 3;
-    numActuatorsUsed = 3;
+    state->dataRuntimeLang->numActuatorsUsed = 3;
     Node.allocate(3);
     NodeID.allocate(3);
     EMSActuatorUsed.allocate(3);
@@ -1576,7 +1576,7 @@ TEST_F(EnergyPlusFixture, EMSManager_TestOANodeAsActuators)
     EMSActuatorUsed(2).UniqueIDName = NodeID(2);
     EMSActuatorUsed(3).UniqueIDName = NodeID(3);
 
-    SetupNodeSetPointsAsActuators();
+    SetupNodeSetPointsAsActuators(*state);
 
     EXPECT_TRUE(Node(1).IsLocalNode);
     EXPECT_FALSE(Node(2).IsLocalNode);

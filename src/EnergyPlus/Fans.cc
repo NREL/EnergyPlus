@@ -964,20 +964,20 @@ namespace Fans {
             if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
 
                 SetupEMSInternalVariable(state, "Fan Maximum Mass Flow Rate", Fan(FanNum).FanName, "[kg/s]", Fan(FanNum).MaxAirMassFlowRate);
-                SetupEMSActuator("Fan",
+                SetupEMSActuator(state, "Fan",
                                  Fan(FanNum).FanName,
                                  "Fan Air Mass Flow Rate",
                                  "[kg/s]",
                                  Fan(FanNum).EMSMaxMassFlowOverrideOn,
                                  Fan(FanNum).EMSAirMassFlowValue);
                 SetupEMSInternalVariable(state, "Fan Nominal Pressure Rise", Fan(FanNum).FanName, "[Pa]", Fan(FanNum).DeltaPress);
-                SetupEMSActuator(
+                SetupEMSActuator(state,
                     "Fan", Fan(FanNum).FanName, "Fan Pressure Rise", "[Pa]", Fan(FanNum).EMSFanPressureOverrideOn, Fan(FanNum).EMSFanPressureValue);
                 SetupEMSInternalVariable(state, "Fan Nominal Total Efficiency", Fan(FanNum).FanName, "[fraction]", Fan(FanNum).FanEff);
-                SetupEMSActuator(
+                SetupEMSActuator(state,
                     "Fan", Fan(FanNum).FanName, "Fan Total Efficiency", "[fraction]", Fan(FanNum).EMSFanEffOverrideOn, Fan(FanNum).EMSFanEffValue);
 
-                SetupEMSActuator("Fan",
+                SetupEMSActuator(state, "Fan",
                                  Fan(FanNum).FanName,
                                  "Fan Autosized Air Flow Rate",
                                  "[m3/s]",

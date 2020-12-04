@@ -260,7 +260,8 @@ int getActuatorHandle(EnergyPlusState state, const char* componentType, const ch
     std::string const typeUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(componentType);
     std::string const keyUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(uniqueKey);
     std::string const controlUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(controlType);
-    for (int ActuatorLoop = 1; ActuatorLoop <= EnergyPlus::DataRuntimeLanguage::numEMSActuatorsAvailable; ++ActuatorLoop) {
+    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    for (int ActuatorLoop = 1; ActuatorLoop <= thisState->dataRuntimeLang->numEMSActuatorsAvailable; ++ActuatorLoop) {
         auto & availActuator = EnergyPlus::DataRuntimeLanguage::EMSActuatorAvailable(ActuatorLoop);
         handle++;
         std::string const actuatorTypeUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(availActuator.ComponentTypeName);
@@ -272,7 +273,7 @@ int getActuatorHandle(EnergyPlusState state, const char* componentType, const ch
                 // If the handle is already used by an IDF EnergyManagementSystem:Actuator, we should warn the user
                 bool foundActuator = false;
                 auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-                for (int ActuatorLoopUsed = 1; ActuatorLoopUsed <= EnergyPlus::DataRuntimeLanguage::numActuatorsUsed; ++ActuatorLoopUsed) {
+                for (int ActuatorLoopUsed = 1; ActuatorLoopUsed <= thisState->dataRuntimeLang->numActuatorsUsed; ++ActuatorLoopUsed) {
                     auto const & usedActuator = EnergyPlus::DataRuntimeLanguage::EMSActuatorUsed(ActuatorLoopUsed);
                     if (usedActuator.ActuatorVariableNum == handle) {
                         EnergyPlus::ShowWarningError(*thisState,
@@ -308,7 +309,8 @@ int getActuatorHandle(EnergyPlusState state, const char* componentType, const ch
 
 void resetActuator(EnergyPlusState state, int handle) {
     // resets the actuator so that E+ will use the internally calculated value again
-    if (handle >= 1 && handle <= EnergyPlus::DataRuntimeLanguage::numEMSActuatorsAvailable) {
+    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    if (handle >= 1 && handle <= thisState->dataRuntimeLang->numEMSActuatorsAvailable) {
         auto & theActuator(EnergyPlus::DataRuntimeLanguage::EMSActuatorAvailable(handle));
         *theActuator.Actuated = false;
     } else {
@@ -326,7 +328,8 @@ void resetActuator(EnergyPlusState state, int handle) {
 }
 
 void setActuatorValue(EnergyPlusState state, const int handle, const Real64 value) {
-    if (handle >= 1 && handle <= EnergyPlus::DataRuntimeLanguage::numEMSActuatorsAvailable) {
+    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    if (handle >= 1 && handle <= thisState->dataRuntimeLang->numEMSActuatorsAvailable) {
         auto & theActuator(EnergyPlus::DataRuntimeLanguage::EMSActuatorAvailable(handle));
         if (theActuator.RealValue) {
             *theActuator.RealValue = value;
@@ -352,7 +355,8 @@ void setActuatorValue(EnergyPlusState state, const int handle, const Real64 valu
 }
 
 Real64 getActuatorValue(EnergyPlusState state, const int handle) {
-    if (handle >= 1 && handle <= EnergyPlus::DataRuntimeLanguage::numEMSActuatorsAvailable) {
+    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    if (handle >= 1 && handle <= thisState->dataRuntimeLang->numEMSActuatorsAvailable) {
         auto &theActuator(EnergyPlus::DataRuntimeLanguage::EMSActuatorAvailable(handle));
         if (theActuator.RealValue) {
             return *theActuator.RealValue;
@@ -399,7 +403,7 @@ int getInternalVariableHandle(EnergyPlusState, const char* type, const char* key
 
 Real64 getInternalVariableValue(EnergyPlusState state, int handle) {
     auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-    if (handle >= 1 && handle <= (int)EnergyPlus::DataRuntimeLanguage::numEMSInternalVarsAvailable) {
+    if (handle >= 1 && handle <= (int)thisState->dataRuntimeLang->numEMSInternalVarsAvailable) {
         auto thisVar = EnergyPlus::DataRuntimeLanguage::EMSInternalVarsAvailable(handle);
         if (thisVar.PntrVarTypeUsed == EnergyPlus::DataRuntimeLanguage::PntrReal) {
             return *thisVar.RealValue;

@@ -709,7 +709,7 @@ namespace WindowAC {
                                 "Average",
                                 state.dataWindowAC->WindAC(WindACNum).Name);
             if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                SetupEMSActuator("Window Air Conditioner",
+                SetupEMSActuator(state, "Window Air Conditioner",
                                  state.dataWindowAC->WindAC(WindACNum).Name,
                                  "Part Load Ratio",
                                  "[fraction]",

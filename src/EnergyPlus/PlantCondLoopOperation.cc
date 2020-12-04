@@ -55,7 +55,6 @@
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/Autosizing/Base.hh>
@@ -1753,7 +1752,7 @@ CurrentModuleObject, PlantOpSchemeName);
                         PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).Name = cAlphaArgs(CompNum * 2 + 3);
 
                         // Setup EMS actuators for machines' MyLoad.
-                        SetupEMSActuator("Plant Equipment Operation",
+                        SetupEMSActuator(state, "Plant Equipment Operation",
                                          PlantLoop(LoopNum).OpScheme(SchemeNum).Name + ':' +
                                              PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).Name,
                                          "Distributed Load Rate",
@@ -3303,7 +3302,7 @@ CurrentModuleObject, PlantOpSchemeName);
     // Begin Plant EMS Control Routines
     //******************************************************************************
 
-    void SetupPlantEMSActuators()
+    void SetupPlantEMSActuators(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3333,12 +3332,12 @@ CurrentModuleObject, PlantOpSchemeName);
             ActuatorName = "Plant Loop Overall";
             UniqueIDName = PlantLoop(LoopNum).Name;
             ActuatorType = "On/Off Supervisory";
-            SetupEMSActuator(ActuatorName, UniqueIDName, ActuatorType, Units, PlantLoop(LoopNum).EMSCtrl, PlantLoop(LoopNum).EMSValue);
+            SetupEMSActuator(state, ActuatorName, UniqueIDName, ActuatorType, Units, PlantLoop(LoopNum).EMSCtrl, PlantLoop(LoopNum).EMSValue);
 
             ActuatorName = "Supply Side Half Loop";
             UniqueIDName = PlantLoop(LoopNum).Name;
             ActuatorType = "On/Off Supervisory";
-            SetupEMSActuator(ActuatorName,
+            SetupEMSActuator(state, ActuatorName,
                              UniqueIDName,
                              ActuatorType,
                              Units,
@@ -3348,7 +3347,7 @@ CurrentModuleObject, PlantOpSchemeName);
             ActuatorName = "Demand Side Half Loop";
             UniqueIDName = PlantLoop(LoopNum).Name;
             ActuatorType = "On/Off Supervisory";
-            SetupEMSActuator(ActuatorName,
+            SetupEMSActuator(state, ActuatorName,
                              UniqueIDName,
                              ActuatorType,
                              Units,
@@ -3361,7 +3360,7 @@ CurrentModuleObject, PlantOpSchemeName);
                         ActuatorName = "Supply Side Branch";
                         UniqueIDName = PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Name;
                         ActuatorType = "On/Off Supervisory";
-                        SetupEMSActuator(ActuatorName,
+                        SetupEMSActuator(state, ActuatorName,
                                          UniqueIDName,
                                          ActuatorType,
                                          Units,
@@ -3371,7 +3370,7 @@ CurrentModuleObject, PlantOpSchemeName);
                         ActuatorName = "Demand Side Branch";
                         UniqueIDName = PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Name;
                         ActuatorType = "On/Off Supervisory";
-                        SetupEMSActuator(ActuatorName,
+                        SetupEMSActuator(state, ActuatorName,
                                          UniqueIDName,
                                          ActuatorType,
                                          Units,
@@ -3383,7 +3382,7 @@ CurrentModuleObject, PlantOpSchemeName);
                                        ccSimPlantEquipTypes(PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).TypeOf_Num);
                         UniqueIDName = PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).Name;
                         ActuatorType = "On/Off Supervisory";
-                        SetupEMSActuator(ActuatorName,
+                        SetupEMSActuator(state, ActuatorName,
                                          UniqueIDName,
                                          ActuatorType,
                                          "[fraction]",

@@ -76,7 +76,7 @@ namespace EMSManager {
         iMassFlowRateMinSetPoint,  // integer for node setpoint control type
         iMassFlowRateMaxSetPoint   // integer for node setpoint control type
     };
-    
+
     // Parameters for EMS Calling Points
     enum class EMSCallFrom {
         Unassigned,
@@ -124,7 +124,7 @@ namespace EMSManager {
 
     void EchoOutInternalVariableChoices(EnergyPlusData &state);
 
-    void SetupNodeSetPointsAsActuators();
+    void SetupNodeSetPointsAsActuators(EnergyPlusData &state);
 
     void UpdateEMSTrendVariables(EnergyPlusData &state);
 
@@ -141,20 +141,21 @@ namespace EMSManager {
                                          SPControlType SetPointType,
                                          bool &ErrorFlag);
 
-    bool CheckIfNodeMoreInfoSensedByEMS(int nodeNum, // index of node being checked.
+    bool CheckIfNodeMoreInfoSensedByEMS(EnergyPlusData &state,
+                                        int nodeNum, // index of node being checked.
                                         std::string const &varName);
 
     void SetupPrimaryAirSystemAvailMgrAsActuators(EnergyPlusData &state);
 
     void SetupWindowShadingControlActuators(EnergyPlusData &state);
 
-    void SetupThermostatActuators();
+    void SetupThermostatActuators(EnergyPlusData &state);
 
-    void SetupSurfaceConvectionActuators();
+    void SetupSurfaceConvectionActuators(EnergyPlusData &state);
 
-    void SetupSurfaceConstructionActuators();
+    void SetupSurfaceConstructionActuators(EnergyPlusData &state);
 
-    void SetupSurfaceOutdoorBoundaryConditionActuators();
+    void SetupSurfaceOutdoorBoundaryConditionActuators(EnergyPlusData &state);
 
     void SetupZoneOutdoorBoundaryConditionActuators(EnergyPlusData &state);
 
@@ -169,21 +170,24 @@ namespace EMSManager {
 // Moved these setup EMS actuator routines out of module to solve circular use problems between
 //  ScheduleManager and OutputProcessor. Followed pattern used for SetupOutputVariable
 
-void SetupEMSActuator(std::string const &cComponentTypeName,
+void SetupEMSActuator(EnergyPlusData &state,
+                      std::string const &cComponentTypeName,
                       std::string const &cUniqueIDName,
                       std::string const &cControlTypeName,
                       std::string const &cUnits,
                       bool &lEMSActuated,
                       Real64 &rValue);
 
-void SetupEMSActuator(std::string const &cComponentTypeName,
+void SetupEMSActuator(EnergyPlusData &state,
+                      std::string const &cComponentTypeName,
                       std::string const &cUniqueIDName,
                       std::string const &cControlTypeName,
                       std::string const &cUnits,
                       bool &lEMSActuated,
                       int &iValue);
 
-void SetupEMSActuator(std::string const &cComponentTypeName,
+void SetupEMSActuator(EnergyPlusData &state,
+                      std::string const &cComponentTypeName,
                       std::string const &cUniqueIDName,
                       std::string const &cControlTypeName,
                       std::string const &cUnits,

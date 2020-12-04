@@ -213,13 +213,13 @@ public:
     void setupActuatorsOnceAllAreRequested()
     {
         for (auto &act : this->realActuatorPlaceholders) {
-            SetupEMSActuator(act.objType, act.key, act.controlType, "kg/s", act.flag, act.val);
+            SetupEMSActuator(*state, act.objType, act.key, act.controlType, "kg/s", act.flag, act.val);
         }
         for (auto &act : this->intActuatorPlaceholders) {
-            SetupEMSActuator(act.objType, act.key, act.controlType, "kg/s", act.flag, act.val);
+            SetupEMSActuator(*state, act.objType, act.key, act.controlType, "kg/s", act.flag, act.val);
         }
         for (auto &act : this->boolActuatorPlaceholders) {
-            SetupEMSActuator(act.objType, act.key, act.controlType, "kg/s", act.flag, act.val);
+            SetupEMSActuator(*state, act.objType, act.key, act.controlType, "kg/s", act.flag, act.val);
         }
     }
 
@@ -662,8 +662,8 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_Python_EMS_Override)
     bool anyRan;
     // Calls SetupNodeSetpointsAsActuator (via InitEMS, which calls GetEMSInput too)
     EMSManager::ManageEMS(*state, EMSManager::EMSCallFrom::SetupSimulation, anyRan);
-    EXPECT_GT(EnergyPlus::DataRuntimeLanguage::numEMSActuatorsAvailable, 0);
-    EXPECT_EQ(1, DataRuntimeLanguage::numActuatorsUsed);
+    EXPECT_GT(state->dataRuntimeLang->numEMSActuatorsAvailable, 0);
+    EXPECT_EQ(1, state->dataRuntimeLang->numActuatorsUsed);
 
     // no error message until now
     EXPECT_TRUE(compare_err_stream("", true));
@@ -706,8 +706,8 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_Python_Python_Override)
     bool anyRan;
     // Calls SetupNodeSetpointsAsActuator (via InitEMS, which calls GetEMSInput too)
     EMSManager::ManageEMS(*state, EMSManager::EMSCallFrom::SetupSimulation, anyRan);
-    EXPECT_GT(EnergyPlus::DataRuntimeLanguage::numEMSActuatorsAvailable, 0);
-    EXPECT_EQ(0, DataRuntimeLanguage::numActuatorsUsed);
+    EXPECT_GT(state->dataRuntimeLang->numEMSActuatorsAvailable, 0);
+    EXPECT_EQ(0, state->dataRuntimeLang->numActuatorsUsed);
 
     // no error message until now
     EXPECT_TRUE(compare_err_stream("", true));

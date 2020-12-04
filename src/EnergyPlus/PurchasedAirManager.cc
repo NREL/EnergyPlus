@@ -1056,25 +1056,25 @@ namespace PurchasedAirManager {
                                 PurchAir(PurchAirNum).Name);
 
             if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                SetupEMSActuator("Ideal Loads Air System",
+                SetupEMSActuator(state, "Ideal Loads Air System",
                                  PurchAir(PurchAirNum).Name,
                                  "Air Mass Flow Rate",
                                  "[kg/s]",
                                  PurchAir(PurchAirNum).EMSOverrideMdotOn,
                                  PurchAir(PurchAirNum).EMSValueMassFlowRate);
-                SetupEMSActuator("Ideal Loads Air System",
+                SetupEMSActuator(state, "Ideal Loads Air System",
                                  PurchAir(PurchAirNum).Name,
                                  "Outdoor Air Mass Flow Rate",
                                  "[kg/s]",
                                  PurchAir(PurchAirNum).EMSOverrideOAMdotOn,
                                  PurchAir(PurchAirNum).EMSValueOAMassFlowRate);
-                SetupEMSActuator("Ideal Loads Air System",
+                SetupEMSActuator(state, "Ideal Loads Air System",
                                  PurchAir(PurchAirNum).Name,
                                  "Air Temperature",
                                  "[C]",
                                  PurchAir(PurchAirNum).EMSOverrideSupplyTempOn,
                                  PurchAir(PurchAirNum).EMSValueSupplyTemp);
-                SetupEMSActuator("Ideal Loads Air System",
+                SetupEMSActuator(state, "Ideal Loads Air System",
                                  PurchAir(PurchAirNum).Name,
                                  "Air Humidity Ratio",
                                  "[kgWater/kgDryAir]",

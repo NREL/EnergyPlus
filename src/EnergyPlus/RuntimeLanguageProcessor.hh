@@ -182,7 +182,7 @@ namespace RuntimeLanguageProcessor {
 
     void InitializeRuntimeLanguage(EnergyPlusData &state);
 
-    void BeginEnvrnInitializeRuntimeLanguage();
+    void BeginEnvrnInitializeRuntimeLanguage(EnergyPlusData &state);
 
     void ParseStack(EnergyPlusData &state, int const StackNum);
 

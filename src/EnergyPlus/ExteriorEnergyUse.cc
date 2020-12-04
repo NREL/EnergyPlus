@@ -207,7 +207,7 @@ namespace ExteriorEnergyUse {
 
             state.dataExteriorEnergyUse->ExteriorLights(Item).DesignLevel = rNumericArgs(1);
             if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                SetupEMSActuator("ExteriorLights",
+                SetupEMSActuator(state, "ExteriorLights",
                                  state.dataExteriorEnergyUse->ExteriorLights(Item).Name,
                                  "Electricity Rate",
                                  "W",

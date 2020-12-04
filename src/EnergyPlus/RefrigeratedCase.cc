@@ -4906,7 +4906,7 @@ namespace EnergyPlus::RefrigeratedCase {
                     System(RefrigSysNum).TCondenseMin = Numbers(1);
                     System(RefrigSysNum).TCondenseMinInput = System(RefrigSysNum).TCondenseMin;
                     if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                        SetupEMSActuator("Refrigeration:System",
+                        SetupEMSActuator(state, "Refrigeration:System",
                                          System(RefrigSysNum).Name,
                                          "Minimum Condensing Temperature",
                                          "[C]",

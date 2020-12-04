@@ -86,8 +86,6 @@ namespace DataRuntimeLanguage {
     int const PntrInteger(302); // data type for overloaded pointer management, integer
     int const PntrLogical(303); // data type for overloaded pointer management, logical
 
-    int const MaxWhileLoopIterations(1000000); // protect from infinite loop in WHILE loops
-
     // Parameters for identifying operator types in Erl
     // The number of these parameters indicates the order of precedence
     int const OperatorLiteral(1);         // Just stores a literal value
@@ -206,18 +204,6 @@ namespace DataRuntimeLanguage {
 
     int const NumPossibleOperators(96); // total number of operators and built-in functions
 
-    Array1D_int EMSProgram;
-
-    int NumProgramCallManagers(0);      // count of Erl program managers with calling points
-    int NumSensors(0);                  // count of EMS sensors used in model (data from output variables)
-    int numActuatorsUsed(0);            // count of EMS actuators used in model
-    int numEMSActuatorsAvailable(0);    // count of EMS actuators available for use in such a model
-    int maxEMSActuatorsAvailable(0);    // count of EMS current maximum actuators available for use in such a model
-    int NumInternalVariablesUsed(0);    // count of EMS internal variables used in model
-    int numEMSInternalVarsAvailable(0); // count of EMS internal variables available for use in such a model
-    int maxEMSInternalVarsAvailable(0); // count of EMS current maximum internal variables available for use in such a model
-    int varsAvailableAllocInc(1000);    // allocation increment for variable arrays
-
     int NumErlPrograms(0);               // count of Erl programs in model
     int NumErlSubroutines(0);            // count of Erl subroutines in model
     int NumUserGlobalVariables(0);       // count of global EMS variables defined by user
@@ -259,7 +245,7 @@ namespace DataRuntimeLanguage {
     Array1D<ErlStackType> ErlStack;                              // holds Erl programs in separate "stacks"
     Array1D<ErlExpressionType> ErlExpression;                    // holds Erl expressions in structure array
     Array1D<OperatorType> PossibleOperators;                     // hard library of available operators and functions
-    Array1D<TrendVariableType> TrendVariable;                    // holds Erl trend varialbes in a structure array
+    Array1D<TrendVariableType> TrendVariable;                    // holds Erl trend variables in a structure array
     Array1D<OutputVarSensorType> Sensor;                         // EMS:SENSOR objects used (from output variables)
     Array1D<EMSActuatorAvailableType> EMSActuatorAvailable;      // actuators that could be used
     Array1D<ActuatorUsedType> EMSActuatorUsed;                   // actuators that are used
@@ -276,16 +262,6 @@ namespace DataRuntimeLanguage {
     // Functions
     void clear_state()
     {
-        EMSProgram.deallocate();
-        NumProgramCallManagers = 0;
-        NumSensors = 0;
-        numActuatorsUsed = 0;
-        numEMSActuatorsAvailable = 0;
-        maxEMSActuatorsAvailable = 0;
-        NumInternalVariablesUsed = 0;
-        numEMSInternalVarsAvailable = 0;
-        maxEMSInternalVarsAvailable = 0;
-        varsAvailableAllocInc = 1000;
         NumErlPrograms = 0;
         NumErlSubroutines = 0;
         NumUserGlobalVariables = 0;

@@ -858,7 +858,7 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
     GetEMSInput(*state);
     // check if EMS actuator is not setup because there is no blind/shade layer
     SetupWindowShadingControlActuators(*state);
-    EXPECT_EQ(numEMSActuatorsAvailable, 0); // no EMS actuator because there is shade/blind layer
+    EXPECT_EQ(state->dataRuntimeLang->numEMSActuatorsAvailable, 0); // no EMS actuator because there is shade/blind layer
 
     // add a blind layer in between glass
     state->dataConstruction->Construct(4).TotLayers = 5;
@@ -887,7 +887,7 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
     SurfWinMovableSlats(windowSurfNum) = true;
     // check if EMS actuator is available when blind layer is added
     SetupWindowShadingControlActuators(*state);
-    EXPECT_EQ(numEMSActuatorsAvailable, 2);
+    EXPECT_EQ(state->dataRuntimeLang->numEMSActuatorsAvailable, 2);
     EXPECT_EQ(EMSActuatorAvailable(1).ComponentTypeName, "Window Shading Control");
     EXPECT_EQ(EMSActuatorAvailable(1).ControlTypeName, "Control Status");
     EXPECT_EQ(EMSActuatorAvailable(1).Units, "[ShadeStatus]");

@@ -1397,7 +1397,7 @@ namespace LowTempRadiantSystem {
                                          thisHydrSys.Name,
                                          "[m3/s]",
                                          thisHydrSys.WaterVolFlowMaxCool);
-                SetupEMSActuator("Hydronic Low Temp Radiant",
+                SetupEMSActuator(state, "Hydronic Low Temp Radiant",
                                  thisHydrSys.Name,
                                  "Water Mass Flow Rate",
                                  "[kg/s]",
@@ -1550,7 +1550,7 @@ namespace LowTempRadiantSystem {
             if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                 SetupEMSInternalVariable(state,
                     "Constant Flow Low Temp Radiant Design Water Mass Flow Rate", thisCFloSys.Name, "[m3/s]", thisCFloSys.WaterVolFlowMax);
-                SetupEMSActuator("Constant Flow Low Temp Radiant",
+                SetupEMSActuator(state, "Constant Flow Low Temp Radiant",
                                  thisCFloSys.Name,
                                  "Water Mass Flow Rate",
                                  "[kg/s]",

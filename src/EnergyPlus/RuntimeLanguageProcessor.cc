@@ -353,7 +353,7 @@ namespace RuntimeLanguageProcessor {
         }
     }
 
-    void BeginEnvrnInitializeRuntimeLanguage()
+    void BeginEnvrnInitializeRuntimeLanguage(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -427,7 +427,7 @@ namespace RuntimeLanguageProcessor {
             }
         }
         // reinitialize state of actuators
-        for (ActuatorUsedLoop = 1; ActuatorUsedLoop <= numActuatorsUsed + NumExternalInterfaceActuatorsUsed; ++ActuatorUsedLoop) {
+        for (ActuatorUsedLoop = 1; ActuatorUsedLoop <= state.dataRuntimeLang->numActuatorsUsed + NumExternalInterfaceActuatorsUsed; ++ActuatorUsedLoop) {
             EMSActuatorVariableNum = EMSActuatorUsed(ActuatorUsedLoop).ActuatorVariableNum;
             ErlVariableNum = EMSActuatorUsed(ActuatorUsedLoop).ErlVariableNum;
             ErlVariable(ErlVariableNum).Value.Type = ValueNull;
@@ -451,7 +451,7 @@ namespace RuntimeLanguageProcessor {
         }
 
         // reinitilize sensors
-        for (SensorNum = 1; SensorNum <= NumSensors; ++SensorNum) {
+        for (SensorNum = 1; SensorNum <= state.dataRuntimeLang->NumSensors; ++SensorNum) {
             SetInternalVariableValue(Sensor(SensorNum).Type, Sensor(SensorNum).Index, 0.0, 0);
         }
     }
