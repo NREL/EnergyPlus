@@ -6000,43 +6000,12 @@ namespace SolarShading {
             EnclSolDB(zoneNum) = 0.0;
             EnclSolDBSSG(zoneNum) = 0.0;
             EnclSolDBIntWin(zoneNum) = 0.0;
-
-//            ZoneTransSolar(zoneNum) = 0.0;
-//            ZoneBmSolFrExtWinsRep(zoneNum) = 0.0;
-//            ZoneBmSolFrIntWinsRep(zoneNum) = 0.0;
-//            ZoneDifSolFrExtWinsRep(zoneNum) = 0.0;
-//            ZoneDifSolFrIntWinsRep(zoneNum) = 0.0;
-//
-//            ZoneTransSolarEnergy(zoneNum) = 0.0;
-//            ZoneBmSolFrExtWinsRepEnergy(zoneNum) = 0.0;
-//            ZoneBmSolFrIntWinsRepEnergy(zoneNum) = 0.0;
-//            ZoneDifSolFrExtWinsRepEnergy(zoneNum) = 0.0;
-//            ZoneDifSolFrIntWinsRepEnergy(zoneNum) = 0.0;
             int const firstSurfWin = Zone(zoneNum).WindowSurfaceFirst;
             int const lastSurfWin = Zone(zoneNum).WindowSurfaceLast;
-
             for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
                 for (int lay = 1; lay <= CFSMAXNL + 1; ++lay) {
                     SurfWinA(lay, SurfNum) = 0.0;
                 }
-//                SurfWinBmBmSolar(SurfNum) = 0.0;
-//                SurfWinBmDifSolar(SurfNum) = 0.0;
-//
-//                SurfWinBmBmSolarEnergy(SurfNum) = 0.0;
-//                SurfWinBmDifSolarEnergy(SurfNum) = 0.0;
-//
-//                SurfWinDifSolarEnergy(SurfNum) = 0.0;
-//                SurfWinDifSolar(SurfNum) = 0.0;
-//
-//                SurfWinBmSolTransThruIntWinRep(SurfNum) = 0.0;
-//                SurfWinBmSolTransThruIntWinRepEnergy(SurfNum) = 0.0;
-
-                WinTransBmSolar(SurfNum) = 0.0;
-                WinTransDifSolar(SurfNum) = 0.0;
-                WinTransDifSolarGnd(SurfNum) = 0.0;
-                WinTransDifSolarSky(SurfNum) = 0.0;
-                IntBeamAbsByShadFac(SurfNum) = 0.0;
-                ExtBeamAbsByShadFac(SurfNum) = 0.0;
             }
             int const firstSurfOpaque = Zone(zoneNum).NonWindowSurfaceFirst;
             int const lastSurfOpaque = Zone(zoneNum).NonWindowSurfaceLast;
@@ -6069,8 +6038,6 @@ namespace SolarShading {
             // EXTERIOR BEAM SOLAR RADIATION ABSORBED ON THE OUTSIDE OF OPAQUE SURFACES
             //-------------------------------------------------------------------------
             // TODO: use opaq and window loop after airboundary is sorted
-//            int const firstSurfOpaq = Zone(enclosureNum).NonWindowSurfaceFirst;
-//            int const lastSurfOpaq = Zone(enclosureNum).NonWindowSurfaceLast;
             for (int const SurfNum : thisEnclosure.SurfacePtr) {
                 if (Surface(SurfNum).Class != SurfaceClass::Window && Surface(SurfNum).Class != SurfaceClass::TDD_Dome) {
                     if (!Surface(SurfNum).HeatTransSurf) continue;
@@ -6704,8 +6671,13 @@ namespace SolarShading {
 
                 // The following WinTransBmSolar and WinTransDifSolar will be combined later to give
                 // WinTransSolar for reporting
+                WinTransBmSolar(SurfNum) = 0.0;
+                WinTransDifSolar(SurfNum) = 0.0;
+                WinTransDifSolarGnd(SurfNum) = 0.0;
+                WinTransDifSolarSky(SurfNum) = 0.0;
                 WinTransBmBmSolar(SurfNum) = 0.0; // Factor for exterior beam to beam solar transmitted through window, or window plus shade, into zone at current time (m2)
                 WinTransBmDifSolar(SurfNum) = 0.0; // Factor for exterior beam to diffuse solar transmitted through window, or window plus shade, into zone at current time (m2)
+
                 Real64 InOutProjSLFracMult = SurfaceWindow(SurfNum).InOutProjSLFracMult(state.dataGlobal->HourOfDay);
                 if (SurfWinWindowModelType(SurfNum) != WindowEQLModel) {
                     WinTransDifSolar(SurfNum) = DiffTrans * Surface(SurfNum).Area;
@@ -6797,21 +6769,18 @@ namespace SolarShading {
                     SurfOpaqAI(BaseSurfNum) += SurfWinBmSolAbsdInsReveal(SurfNum) / Surface(BaseSurfNum).Area;
                     SurfOpaqAO(BaseSurfNum) += SurfWinBmSolAbsdOutsReveal(SurfNum) / Surface(BaseSurfNum).Area;
                 }
-            }
 
-            //-----------------------------------------------------------------
-            // BLOCK 7 - TODO
-            //-----------------------------------------------------------------
-            for (int const SurfNum : thisEnclosure.SurfacePtr) {
-                //---------------------------------------------------------------------------------
-                // INTERIOR BEAM FROM EXTERIOR WINDOW THAT IS ABSORBED/TRANSMITTED BY BACK SURFACES
-                //---------------------------------------------------------------------------------
+                //-----------------------------------------------------------------
+                // BLOCK 7 - INTERIOR BEAM FROM EXTERIOR WINDOW THAT IS ABSORBED/TRANSMITTED BY BACK SURFACES
+                //-----------------------------------------------------------------
+
                 // If shade is in place or there is a diffusing glass layer there is no interior beam
                 // from this exterior window since the beam-beam transmittance of shades and diffusing glass
                 // is assumed to be zero. The beam-beam transmittance of tubular daylighting devices is also
                 // assumed to be zero.
-                int ShadeFlag = SurfWinShadingFlag(SurfNum);
-                Real64 SunLitFract = SurfSunlitFracTimestep(SurfNum);
+                IntBeamAbsByShadFac(SurfNum) = 0.0;
+                ExtBeamAbsByShadFac(SurfNum) = 0.0;
+
                 if (SurfWinWindowModelType(SurfNum) != WindowBSDFModel)
                     if (ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == BGShadeOn || SurfWinSolarDiffusing(SurfNum) ||
                         SurfWinOriginalClass(SurfNum) == SurfaceClass::TDD_Diffuser || Surface(SurfNum).Class == SurfaceClass::TDD_Dome)
@@ -7724,19 +7693,9 @@ namespace SolarShading {
                 // TH added 3/24/2010 while debugging CR 7872
                 if (!Surface(SurfNum).ExtSolar && SurfWinOriginalClass(SurfNum) != SurfaceClass::TDD_Diffuser) continue;
                 int ConstrNum = Surface(SurfNum).Construction;
-//                int ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
                 if (SurfWinStormWinFlag(SurfNum) == 1) {
                     ConstrNum = Surface(SurfNum).StormWinConstruction;
-//                    ConstrNumSh = Surface(SurfNum).activeStormWinShadedConstruction;
                 }
-
-//                int SurfNum2 = 0;
-//                if (SurfWinOriginalClass(SurfNum) == SurfaceClass::TDD_Diffuser) {
-//                    int PipeNum = SurfWinTDDPipeNum(SurfNum);
-//                    SurfNum2 = TDDPipe(PipeNum).Dome;
-//                } else {
-//                    SurfNum2 = SurfNum;
-//                }
 
                 Real64 CosInc = SurfCosIncTimestep(SurfNum);
                 Real64 SunLitFract = SurfSunlitFracTimestep(SurfNum);

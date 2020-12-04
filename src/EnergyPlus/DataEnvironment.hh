@@ -130,6 +130,7 @@ namespace DataEnvironment {
     extern Real64 SkyTempKelvin;                   // Current sky temperature {K}
     extern Real64 LiquidPrecipitation;             // Current liquid precipitation amount (rain) {m}
     extern bool SunIsUp;                           // True when Sun is over horizon, False when not
+    extern bool PreviousSunIsUp;                   // True when Sun is over horizon at the previous timestep, and BeamSolarRad + GndSolarRad + DifSolarRad > 0.0
     extern Real64 WindDir;                         // Current outdoor air wind direction
     extern bool EMSWindDirOverrideOn;              // EMS flag for outdoor air wind direction
     extern Real64 EMSWindDirOverrideValue;         // EMS override value for outdoor air wind direction

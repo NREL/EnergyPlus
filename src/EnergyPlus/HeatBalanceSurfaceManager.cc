@@ -2333,6 +2333,7 @@ namespace HeatBalanceSurfaceManager {
         using namespace DataWindowEquivalentLayer;
         using SolarShading::SurfaceScheduledSolarInc;
         using SolarShading::WindowScheduledSolarAbs;
+        using namespace std::chrono;
 
         static Array1D<Real64> AbsDiffWin(CFSMAXNL);    // Diffuse solar absorptance of glass layers //Tuned Made static
         static Array1D<Real64> AbsDiffWinGnd(CFSMAXNL); // Ground diffuse solar absorptance of glass layers //Tuned Made static
@@ -2341,43 +2342,40 @@ namespace HeatBalanceSurfaceManager {
         Array1D<Real64> currBeamSolar(TotSurfaces); // Local variable for BeamSolarRad
         Array1D<Real64> currSkySolarInc(TotSurfaces); // Sky diffuse solar incident on a surface
         Array1D<Real64> currGndSolarInc(TotSurfaces); // Ground diffuse solar incident on a surface
+
+        high_resolution_clock::time_point t1 = high_resolution_clock::now();
+
         // Always initialize the shortwave quantities
         for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
 
             SurfInitialDifSolInAbsReport(SurfNum) = 0.0;
             SurfSWInAbsTotalReport(SurfNum) = 0.0;
-
-            SurfBmIncInsSurfIntensRep(SurfNum) = 0.0;
-            SurfBmIncInsSurfAmountRep(SurfNum) = 0.0;
-            SurfIntBmIncInsSurfIntensRep(SurfNum) = 0.0;
-            SurfIntBmIncInsSurfAmountRep(SurfNum) = 0.0;
-
-            SurfQRadSWOutIncident(SurfNum) = 0.0;
-            SurfQRadSWOutIncidentBeam(SurfNum) = 0.0;
-            SurfQRadSWOutIncidentSkyDiffuse(SurfNum) = 0.0;
-            SurfQRadSWOutIncidentGndDiffuse(SurfNum) = 0.0;
-
-            SurfQRadSWOutIncBmToDiffReflGnd(SurfNum) = 0.0;
-            SurfQRadSWOutIncSkyDiffReflGnd(SurfNum) = 0.0;
-            SurfQRadSWOutIncBmToBmReflObs(SurfNum) = 0.0;
-            SurfQRadSWOutIncBmToDiffReflObs(SurfNum) = 0.0;
-            SurfQRadSWOutIncSkyDiffReflObs(SurfNum) = 0.0;
             SurfCosIncidenceAngle(SurfNum) = 0.0;
 
-            SurfBmIncInsSurfIntensRep(SurfNum) = 0.0;
-            SurfBmIncInsSurfAmountRep(SurfNum) = 0.0;
-            SurfIntBmIncInsSurfIntensRep(SurfNum) = 0.0;
-            SurfIntBmIncInsSurfAmountRep(SurfNum) = 0.0;
-            SurfBmIncInsSurfAmountRepEnergy(SurfNum) = 0.0;
-            SurfIntBmIncInsSurfAmountRepEnergy(SurfNum) = 0.0;
+            SurfBmIncInsSurfIntensRep(SurfNum) = 0.0;  // Sun is up
+            SurfBmIncInsSurfAmountRep(SurfNum) = 0.0; // Sun is up
+            SurfIntBmIncInsSurfIntensRep(SurfNum) = 0.0; // Sun is up
+            SurfIntBmIncInsSurfAmountRep(SurfNum) = 0.0; // Sun is up
+            SurfIntBmIncInsSurfAmountRepEnergy(SurfNum) = 0.0; // Sun is up
 
-            SurfSkySolarInc(SurfNum) = 0.0;
-            SurfGndSolarInc(SurfNum) = 0.0;
+            SurfQRadSWOutIncident(SurfNum) = 0.0; // Sun is up
+            SurfQRadSWOutIncidentBeam(SurfNum) = 0.0; // Sun is up
+            SurfQRadSWOutIncidentSkyDiffuse(SurfNum) = 0.0; // Sun is up
+            SurfQRadSWOutIncidentGndDiffuse(SurfNum) = 0.0; // Sun is up
+
+            SurfQRadSWOutIncBmToDiffReflGnd(SurfNum) = 0.0; // Sun is up
+            SurfQRadSWOutIncSkyDiffReflGnd(SurfNum) = 0.0; // Sun is up
+            SurfQRadSWOutIncBmToBmReflObs(SurfNum) = 0.0; // Sun is up
+            SurfQRadSWOutIncBmToDiffReflObs(SurfNum) = 0.0; // Sun is up
+            SurfQRadSWOutIncSkyDiffReflObs(SurfNum) = 0.0; // Sun is up
+
+            SurfSkySolarInc(SurfNum) = 0.0; // Sun is up
+            SurfGndSolarInc(SurfNum) = 0.0; // Sun is up
 
         }
 
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-            InitialZoneDifSolReflW(zoneNum) = 0.0;
+            InitialZoneDifSolReflW(zoneNum) = 0.0; // Sun is up
             ZoneWinHeatGainRepEnergy(zoneNum) = 0.0;
             ZoneWinHeatLossRepEnergy(zoneNum) = 0.0;
             ZnOpqSurfInsFaceCondGnRepEnrg(zoneNum) = 0.0;
@@ -2396,31 +2394,35 @@ namespace HeatBalanceSurfaceManager {
             ZoneOpaqSurfExtFaceCondLossRep(zoneNum) = 0.0;
 
             // combine InitSolar and CalcSolarDist initialization
-            ZoneTransSolar(zoneNum) = 0.0;
-            ZoneBmSolFrExtWinsRep(zoneNum) = 0.0;
-            ZoneBmSolFrIntWinsRep(zoneNum) = 0.0;
-            ZoneDifSolFrExtWinsRep(zoneNum) = 0.0;
-            ZoneDifSolFrIntWinsRep(zoneNum) = 0.0;
-            ZoneTransSolarEnergy(zoneNum) = 0.0;
-            ZoneBmSolFrExtWinsRepEnergy(zoneNum) = 0.0;
-            ZoneBmSolFrIntWinsRepEnergy(zoneNum) = 0.0;
-            ZoneDifSolFrExtWinsRepEnergy(zoneNum) = 0.0;
-            ZoneDifSolFrIntWinsRepEnergy(zoneNum) = 0.0;
+            ZoneTransSolar(zoneNum) = 0.0; // Sun is up
+            ZoneBmSolFrExtWinsRep(zoneNum) = 0.0; // Sun is up
+            ZoneBmSolFrIntWinsRep(zoneNum) = 0.0; // Sun is up
+            ZoneDifSolFrExtWinsRep(zoneNum) = 0.0; // Sun is up
+            ZoneDifSolFrIntWinsRep(zoneNum) = 0.0; // Sun is up
+            ZoneTransSolarEnergy(zoneNum) = 0.0; // Sun is up
+            ZoneBmSolFrExtWinsRepEnergy(zoneNum) = 0.0; // Sun is up
+            ZoneBmSolFrIntWinsRepEnergy(zoneNum) = 0.0; // Sun is up
+            ZoneDifSolFrExtWinsRepEnergy(zoneNum) = 0.0; // Sun is up
+            ZoneDifSolFrIntWinsRepEnergy(zoneNum) = 0.0; // Sun is up
         }
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
             int const firstSurfOpaq = Zone(zoneNum).NonWindowSurfaceFirst;
             int const lastSurfOpaq = Zone(zoneNum).NonWindowSurfaceLast;
             for (int SurfNum = firstSurfOpaq; SurfNum <= lastSurfOpaq; ++SurfNum) {
-                SurfOpaqInsFaceBeamSolAbsorbed(SurfNum) = 0.0;
+
                 SurfOpaqInsFaceCondGainRep(SurfNum) = 0.0;
                 SurfOpaqInsFaceCondLossRep(SurfNum) = 0.0;
-                SurfOpaqQRadSWOutAbs(SurfNum) = 0.0;
+
                 SurfOpaqQRadSWInAbs(SurfNum) = 0.0;
                 SurfOpaqQRadSWLightsInAbs(SurfNum) = 0.0;
-                SurfOpaqInitialDifSolInAbs(SurfNum) = 0.0;
-                SurfOpaqSWOutAbsTotalReport(SurfNum) = 0.0;
-                SurfOpaqSWOutAbsEnergyReport(SurfNum) = 0.0;
-            } // end of ZoneSurf
+
+                SurfOpaqQRadSWOutAbs(SurfNum) = 0.0; // Sun is up
+                SurfOpaqInitialDifSolInAbs(SurfNum) = 0.0; // Sun is up
+
+                SurfOpaqInsFaceBeamSolAbsorbed(SurfNum) = 0.0; // Sun is up
+                SurfOpaqSWOutAbsTotalReport(SurfNum) = 0.0; // Sun is up
+                SurfOpaqSWOutAbsEnergyReport(SurfNum) = 0.0; // Sun is up
+            }
 
             int const firstSurfWin = Zone(zoneNum).WindowSurfaceFirst;
             int const lastSurfWin = Zone(zoneNum).WindowSurfaceLast;
@@ -2430,14 +2432,19 @@ namespace HeatBalanceSurfaceManager {
                 SurfWinFrameQRadInAbs(SurfNum) = 0.0;
                 SurfWinDividerQRadOutAbs(SurfNum) = 0.0;
                 SurfWinDividerQRadInAbs(SurfNum) = 0.0;
-                SurfWinExtBeamAbsByShade(SurfNum) = 0.0;
-                SurfWinExtDiffAbsByShade(SurfNum) = 0.0;
-                SurfWinIntBeamAbsByShade(SurfNum) = 0.0;
+
                 SurfWinIntSWAbsByShade(SurfNum) = 0.0;
-                SurfWinInitialDifSolAbsByShade(SurfNum) = 0.0;
                 SurfWinIntLWAbsByShade(SurfNum) = 0.0;
+
                 SurfWinConvHeatFlowNatural(SurfNum) = 0.0;
                 SurfWinConvHeatGainToZoneAir(SurfNum) = 0.0;
+
+                SurfWinExtBeamAbsByShade(SurfNum) = 0.0; // Sun is up
+                SurfWinExtDiffAbsByShade(SurfNum) = 0.0; // Sun is up
+                SurfWinIntBeamAbsByShade(SurfNum) = 0.0; // Sun is up
+                SurfWinInitialDifSolAbsByShade(SurfNum) = 0.0; // Sun is up
+
+
             }
             for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
                 SurfWinRetHeatGainToZoneAir(SurfNum) = 0.0;
@@ -2554,7 +2561,13 @@ namespace HeatBalanceSurfaceManager {
             }
         }
 
-        if (!SunIsUp || (BeamSolarRad + GndSolarRad + DifSolarRad <= 0.0)) { // Sun is down
+
+        bool currSunIsUp = SunIsUp && (BeamSolarRad + GndSolarRad + DifSolarRad > 0.0);
+        bool sunset = (!currSunIsUp) && PreviousSunIsUp;
+        PreviousSunIsUp = currSunIsUp;
+//        std::cout << "currSunIsUp, " << currSunIsUp << ", sunset, " << sunset << "\n";
+
+        if (sunset) { // Sun is down at the current time, reset arrays.
             for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
                 EnclSolQD(zoneNum) = 0.0;
                 EnclSolQDforDaylight(zoneNum) = 0.0;
@@ -2583,9 +2596,9 @@ namespace HeatBalanceSurfaceManager {
                     SurfBmToDiffReflFacGnd(SurfNum) = 0.0;
                 }
             }
+        }
 
-        } else { // Sun is up, calculate solar quantities
-
+        if (currSunIsUp) { // Sun is up, calculate solar quantities
             assert(equal_dimensions(ReflFacBmToBmSolObs, ReflFacBmToDiffSolObs)); // For linear indexing
             assert(equal_dimensions(ReflFacBmToBmSolObs, ReflFacBmToDiffSolGnd)); // For linear indexing
             for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
@@ -3405,6 +3418,11 @@ namespace HeatBalanceSurfaceManager {
                 SurfWinQRadSWwinAbsTotEnergy(SurfNum) = SurfWinQRadSWwinAbsTot(SurfNum) * state.dataGlobal->TimeStepZoneSec;
             }
         } // End of sun-up check
+
+        high_resolution_clock::time_point t2 = high_resolution_clock::now();
+
+        duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
+        timer += time_span.count();
     }
 
     void InitIntSolarDistribution(EnergyPlusData &state)

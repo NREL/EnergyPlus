@@ -333,6 +333,8 @@ namespace DataSurfaces {
 
     // MODULE VARIABLE DECLARATIONS:
 
+    double timer(0);
+
     int TotSurfaces(0);          // Total number of surfaces (walls, floors, roofs, windows, shading surfaces, etc.--everything)
     int TotWindows(0);           // Total number of windows
     int TotComplexWin(0);        // Total number of windows with complex optical properties
@@ -1165,6 +1167,7 @@ namespace DataSurfaces {
     // Needed for unit tests, should not be normally called.
     void clear_state()
     {
+        timer = 0;
         TotSurfaces = 0;
         TotWindows = 0;
         TotComplexWin = 0;
