@@ -5974,6 +5974,8 @@ namespace SolarShading {
         static Array2D<Real64> AbsSolDiffEQL(2, CFSMAXNL + 1);     // absorbed exterior diffuse radiation by layers fraction
         static Array2D<Real64> AbsSolBeamBackEQL(2, CFSMAXNL + 1); // absorbed interior beam radiation by layers fraction from back
         // Array2D< Real64 > AbsSolDiffBackEQL( CFSMAXNL+1, 2 ); // absorbed exterior diffuse radiation by layers fraction from back //Unused
+        static Array1D<Real64> WinTransBmBmSolar; // Factor for exterior beam to beam solar transmitted through window, or window plus shade, into zone at current time (m2)
+        static Array1D<Real64> WinTransBmDifSolar; // Factor for exterior beam to diffuse solar transmitted through window, or window plus shade, into zone at current time (m2)
 
         Array1D<Real64> CFBoverlap;    // Sum of boverlap for each back surface
         Array2D<Real64> CFDirBoverlap; // Directional boverlap (Direction, IBack)
@@ -5986,6 +5988,8 @@ namespace SolarShading {
             WinTransDifSolar.allocate(TotSurfaces);
             WinTransDifSolarGnd.allocate(TotSurfaces);
             WinTransDifSolarSky.allocate(TotSurfaces);
+            WinTransBmBmSolar.allocate(TotSurfaces);
+            WinTransBmDifSolar.allocate(TotSurfaces);
             state.dataSolarShading->MustAllocSolarShading = false;
         }
 
@@ -5993,35 +5997,6 @@ namespace SolarShading {
         ++NumIntSolarDist_Calls;
 #endif
 
-        Array1D<Real64> WinTransBmBmSolar(TotSurfaces); // Factor for exterior beam to beam solar transmitted through window, or window plus shade, into zone at current time (m2)
-        Array1D<Real64> WinTransBmDifSolar(TotSurfaces); // Factor for exterior beam to diffuse solar transmitted through window, or window plus shade, into zone at current time (m2)
-//        Array1D<Real64> CosIncHourly(TotSurfaces);
-//        Array1D<Real64> SunLitFractHourly(TotSurfaces);
-        Array1D<Real64> ProfAngHourly(TotSurfaces); // Window solar profile angle (radians)
-
-        for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-            WinTransBmSolar(SurfNum) = 0.0;
-            WinTransDifSolar(SurfNum) = 0.0;
-            WinTransDifSolarGnd(SurfNum) = 0.0;
-            WinTransDifSolarSky(SurfNum) = 0.0;
-            IntBeamAbsByShadFac(SurfNum) = 0.0;
-            ExtBeamAbsByShadFac(SurfNum) = 0.0;
-        }
-
-        // this should be determined once calculated, no need to check at every solar functions
-        for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-            if (!Surface(SurfNum).ExtSolar && SurfWinOriginalClass(SurfNum) != SurfaceClass::TDD_Diffuser) continue;
-//            int SurfNum2 = SurfNum;
-//            int PipeNum = SurfWinTDDPipeNum(SurfNum);
-//            if (SurfWinOriginalClass(SurfNum) == SurfaceClass::TDD_Diffuser) {
-//                SurfNum2 = TDDPipe(PipeNum).Dome;
-//            }
-//            CosIncHourly(SurfNum) = CosIncAng(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum2);
-//            SunLitFractHourly(SurfNum) = SunlitFrac(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum2);
-            ProfAngHourly(SurfNum) = 0;
-            if (SurfWinShadingFlag(SurfNum) != ExtScreenOn && SurfWinBlindNumber(SurfNum) > 0)
-                ProfileAngle(SurfNum, SOLCOS, Blind(SurfWinBlindNumber(SurfNum)).SlatOrientation, ProfAngHourly(SurfNum));
-        }
 
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
             EnclSolDB(zoneNum) = 0.0;
@@ -6055,6 +6030,13 @@ namespace SolarShading {
                 SurfWinDifSolar(SurfNum) = 0.0;
                 SurfWinBmSolTransThruIntWinRep(SurfNum) = 0.0;
                 SurfWinBmSolTransThruIntWinRepEnergy(SurfNum) = 0.0;
+
+                WinTransBmSolar(SurfNum) = 0.0;
+                WinTransDifSolar(SurfNum) = 0.0;
+                WinTransDifSolarGnd(SurfNum) = 0.0;
+                WinTransDifSolarSky(SurfNum) = 0.0;
+                IntBeamAbsByShadFac(SurfNum) = 0.0;
+                ExtBeamAbsByShadFac(SurfNum) = 0.0;
             }
             int const firstSurfOpaque = Zone(zoneNum).NonWindowSurfaceFirst;
             int const lastSurfOpaque = Zone(zoneNum).NonWindowSurfaceLast;
@@ -6116,7 +6098,10 @@ namespace SolarShading {
                 int BlNum = SurfWinBlindNumber(SurfNum);
                 int ScNum = SurfWinScreenNumber(SurfNum);
                 int ShadeFlag = SurfWinShadingFlag(SurfNum); // Set in subr. WindowShadingManager
-                Real64 ProfAng = ProfAngHourly(SurfNum); // Window solar profile angle (radians)
+
+                Real64 ProfAng = 0.0; // Window solar profile angle (radians)
+//                if (ShadeFlag != ExtScreenOn && BlNum > 0) ProfileAngle(SurfNum, SOLCOS, Blind(BlNum).SlatOrientation, ProfAng);
+
                 Real64 SlatAng = SurfWinSlatAngThisTS(SurfNum);
                 Real64 VarSlats = SurfWinMovableSlats(SurfNum);
                 int PipeNum = SurfWinTDDPipeNum(SurfNum);
