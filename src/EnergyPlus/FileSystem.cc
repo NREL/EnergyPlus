@@ -51,7 +51,6 @@
 #include <fstream>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 
@@ -82,13 +81,13 @@ namespace FileSystem {
 
     void makeNativePath(std::string &path)
     {
+        // fs::path(path).make_preferred().string();
         std::replace(path.begin(), path.end(), DataStringGlobals::altpathChar, DataStringGlobals::pathChar);
     }
 
     std::string getFileName(std::string const &filePath)
     {
-        int pathCharPosition = filePath.find_last_of(DataStringGlobals::pathChar);
-        return filePath.substr(pathCharPosition + 1, filePath.size() - 1);
+        return fs::path(filePath).filename().string();
     }
 
     std::string getParentDirectoryPath(std::string const &path)
@@ -96,13 +95,24 @@ namespace FileSystem {
         std::string tempPath = path;
         if (path.at(path.size() - 1) == DataStringGlobals::pathChar) tempPath = path.substr(0, path.size() - 1);
 
-        int pathCharPosition = tempPath.find_last_of(DataStringGlobals::pathChar);
-        tempPath = tempPath.substr(0, pathCharPosition + 1);
+        fs::path p(tempPath);
+        tempPath = p.parent_path().string();
 
-        // If empty, then current dir, but with trailing separator too: eg `./`
-        if (tempPath == "") tempPath = {'.',DataStringGlobals:: pathChar};
 
+        // Is that below really needed? Perhaps the best way would be just to use actual fs::path (instead of std::string) and the operator/ ...
+        if (tempPath.empty()) {
+            tempPath = ".";
+        }
+        tempPath += '/';
         return tempPath;
+
+        //int pathCharPosition = tempPath.find_last_of(DataStringGlobals::pathChar);
+        //tempPath = tempPath.substr(0, pathCharPosition + 1);
+
+        //// If empty, then current dir, but with trailing separator too: eg `./`
+        //if (tempPath == "") tempPath = {'.',DataStringGlobals:: pathChar};
+
+        //return tempPath;
     }
 
     std::string getAbsolutePath(std::string const &path)
@@ -115,42 +125,38 @@ namespace FileSystem {
          * of the link.
          */
 
-#ifdef _WIN32
-        char absolutePath[1024];
-        GetFullPathName(path.c_str(), sizeof(absolutePath), absolutePath, NULL);
-        return std::string(absolutePath);
-#else
-        // If the path doesn't exist, find which of it's parents' paths does exist
-        std::string parentPath = path;
-        while (!pathExists(parentPath)) {
-            parentPath = getParentDirectoryPath(parentPath);
+        fs::path p(path);
+        while (fs::is_symlink(p)) {
+            p = fs::read_symlink(p);
         }
 
-        std::string pathTail;
-        std::string currentDir = ".";
-        std::string currentDirWithSep = currentDir + DataStringGlobals::pathChar;
-        if ((parentPath == currentDir || parentPath == currentDirWithSep) && path.find(currentDirWithSep) == std::string::npos)
-            // If parent path is the current directory and the original path does not already contain
-            // the current directory in the string, then leave the path tail as-is.
-            pathTail = path;
-        else
-            // otherwise strip off any preceding content from the path tail
-            pathTail = path.substr(parentPath.size(), path.size() - parentPath.size());
+        // Not available in experimental/filesystem
+        // return fs::weakly_canonical(fs::absolute(p)).string();
 
-        char *absolutePathTemp = realpath(parentPath.c_str(), NULL);
-        if (absolutePathTemp != NULL) {
-            std::string absoluteParentPath(absolutePathTemp);
-            free(absolutePathTemp);
-            if (pathTail.size() == 0)
-                return absoluteParentPath;
-            else
-                return absoluteParentPath + DataStringGlobals::pathChar + pathTail;
+        p = fs::absolute(p);
 
-        } else {
-            std::cout << "ERROR: Could not resolve path for " + path + "." << std::endl;
-            std::exit(EXIT_FAILURE);
+        fs::path result;
+        // `p` now is absolute, but it isn't necessarilly canonical.
+        // If you have <filesystem>, you can use `fs::weakly_canonical`
+        // This block resolves a canonical path, even if it doesn't exist (yet?) on disk.
+        for (fs::path::iterator it = p.begin(); it != p.end(); ++it) {
+            if (*it == fs::path("..")) {
+                if (fs::is_symlink(result) || (result.filename() == fs::path(".."))) {
+                    result /= *it;
+                } else {
+                    result = result.parent_path();
+                }
+            } else if (*it != fs::path(".")) {
+                result /= *it;
+            }
         }
-#endif
+
+        // Workaround to maintain std::string & backward compat
+        std::string s = result.string();
+        if (fs::is_directory(s)) {
+            s += '/';
+        }
+        return s;
     }
 
     std::string getProgramPath()
@@ -180,16 +186,19 @@ namespace FileSystem {
         return std::string(executableRelativePath);
     }
 
-    std::string getFileExtension(std::string const &fileName)
-    {
-        int extensionPosition = fileName.find_last_of(".");
-        return fileName.substr(extensionPosition + 1, fileName.size() - 1);
+    std::string getFileExtension(std::string const &fileName) {
+        std::string pext = fs::path(fileName).extension().string();
+        if (!pext.empty()) {
+            // remove '.'
+            pext = std::string(++pext.begin(), pext.end());
+        }
+        return pext;
     }
 
     std::string removeFileExtension(std::string const &fileName)
     {
-        int extensionPosition = fileName.find_last_of(".");
-        return fileName.substr(0, extensionPosition);
+        // return fs::path(fileName).stem().string();
+        return fs::path(fileName).replace_extension().string();
     }
 
     void makeDirectory(std::string const &directoryPath)
@@ -197,93 +206,44 @@ namespace FileSystem {
         // Create a directory if doesn't already exist
         if (pathExists(directoryPath)) { // path already exists
             if (!directoryExists(directoryPath)) {
-                std::cout << "ERROR: " + getAbsolutePath(directoryPath) + " is not a directory." << std::endl;
+                std::cout << "ERROR: " + getAbsolutePath(directoryPath) + " already exists and is not a directory." << std::endl;
                 std::exit(EXIT_FAILURE);
             }
         } else { // directory does not already exist
-            std::string parentDirectoryPath = getParentDirectoryPath(directoryPath);
-            if (!pathExists(parentDirectoryPath)) {
-                std::cout << "ERROR: " + getAbsolutePath(parentDirectoryPath) + " is not a directory." << std::endl;
-                std::exit(EXIT_FAILURE);
-            }
-#ifdef _WIN32
-            CreateDirectory(directoryPath.c_str(), NULL);
-#else
-            mkdir(directoryPath.c_str(), 0755);
-#endif
+            // Create_directories is recursive, create_directory isn't. I don't see why we wouldn't want recursive
+            fs::create_directories(fs::path(directoryPath));
         }
     }
 
     bool pathExists(std::string const &path)
     {
-#ifdef _WIN32
-        return PathFileExists(path.c_str());
-#else
-        struct stat info;
-        return (stat(path.c_str(), &info) == 0);
-#endif
+        return fs::exists(fs::path(path));
     }
 
     bool directoryExists(std::string const &directoryPath)
     {
-#ifdef _WIN32
-        if (PathFileExists(directoryPath.c_str()))
-            return PathIsDirectory(directoryPath.c_str());
-        else
-            return false;
-#else
-        struct stat info;
-        if (stat(directoryPath.c_str(), &info) == 0) {
-            return (info.st_mode & S_IFDIR);
-        } else
-            return false;
-#endif
+        fs::path p(directoryPath);
+        return fs::exists(p) && fs::is_directory(p);
     }
 
     bool fileExists(std::string const &filePath)
     {
-#ifdef _WIN32
-        if (PathFileExists(filePath.c_str()))
-            return !PathIsDirectory(filePath.c_str());
-        else
-            return false;
-#else
-        struct stat info;
-        if (stat(filePath.c_str(), &info) == 0) {
-            return !(info.st_mode & S_IFDIR);
-        } else
-            return false;
-#endif
+        fs::path p(filePath);
+        return fs::exists(p) && !fs::is_directory(p);
     }
 
     void moveFile(std::string const &filePath, std::string const &destination)
     {
-        if (!fileExists(filePath)) {
+        if (!fs::exists(filePath)) {
             return;
         }
-#ifdef _WIN32
-        //Note: on Windows, rename function doesn't always replace the existing file so MoveFileExA is used
-        MoveFileExA(filePath.c_str(), destination.c_str(), MOVEFILE_COPY_ALLOWED | MOVEFILE_REPLACE_EXISTING);
-#else
-        // Start by removing the destination file. rename fails silently, so you don't want to silently use a potentially outdated file...
-        removeFile(destination);
-        int result = rename(filePath.c_str(), destination.c_str());
-        if ((result != 0) || !fileExists(destination)) {
-            // rename won't work for cross-device (eg: copying from one disk to another)
 
-            // Do a copy of the content
-            {
-                std::ifstream src(filePath, std::ios::binary);
-                std::ofstream dst(destination, std::ios::binary);
-                dst << src.rdbuf();
-            }
-
-            //  Then remove original
-            if (fileExists(destination)) {
-                removeFile(filePath);
-            }
+        try {
+            fs::rename(fs::path(filePath), destination);
+        } catch (fs::filesystem_error&) {
+            fs::copy(filePath, destination, fs::copy_options::update_existing);
+            fs::remove(filePath);
         }
-#endif
     }
 
     int systemCall(std::string const &command)
@@ -302,17 +262,20 @@ namespace FileSystem {
 
     void removeFile(std::string const &fileName)
     {
-        remove(fileName.c_str());
+        fs::path p(fileName);
+        if (!fs::exists(p)) {
+            return;
+        }
+
+        fs::remove(p);
     }
 
     void linkFile(std::string const &fileName, std::string const &link)
     {
 #ifdef _WIN32
-        CopyFile(fileName.c_str(), link.c_str(), false);
+        fs::copy(filePath, destination, fs::copy_options::update_existing);
 #else
-        int returnValue = symlink(fileName.c_str(), link.c_str()); // ignore the return value
-        // we want to ignore the return value without muting all warnings, so...
-        (void)(returnValue + 1); // outsmart the compiler :-/
+        return fs::create_symlink(fileName, link);
 #endif
     }
 

@@ -58,18 +58,6 @@
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/FileSystem.hh>
 
-// We don't have a remove_all function since we do not use std::filesystem (or boost::filesystem), so make a very sketchy and crude one for testing
-// only
-namespace fs {
-    void remove_all(const std::string& p) {
-#ifdef _wIN
-        EnergyPlus::FileSystem::systemCall("rmdir /Q /S \"" + p + "\"");
-#else
-        EnergyPlus::FileSystem::systemCall("rm -Rf \"" + p + "\"");
-#endif
-    }
-}
-
 TEST(FileSystem, movefile_test)
 {
     // test moveFile function, specifically on Windows

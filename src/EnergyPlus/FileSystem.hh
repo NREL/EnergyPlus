@@ -49,6 +49,17 @@
 #define FileSystem_hh_INCLUDED
 
 #include <algorithm>
+#include <string>
+
+#if __has_include(<filesystem>)
+    #include <filesystem>
+    namespace fs = std::filesystem;
+#elif __has_include(<experimental/filesystem>)
+    #include <experimental/filesystem>
+    namespace fs = std::experimental::filesystem;
+#else
+    #error "no filesystem support"
+#endif
 
 namespace EnergyPlus {
 
@@ -87,6 +98,7 @@ namespace FileSystem {
 
     void removeFile(std::string const &fileName);
 
+    // On Windows, this just copies the file. On Unix, it creates a symlink
     void linkFile(std::string const &fileName, std::string const &link);
 
 } // namespace FileSystem
