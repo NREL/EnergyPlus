@@ -204,7 +204,7 @@ namespace EnergyPlus::SingleDuct {
                 thisATU.SimConstVol(state, FirstHVACIteration, ZoneNum, ZoneNodeNum);
                 break;
             case SysType::SingleDuctConstVolNoReheat: // AirTerminal:SingleDuct:ConstantVolume:NoReheat
-                thisATU.SimConstVolNoReheat();
+                thisATU.SimConstVolNoReheat(state);
                 break;
             case SysType::SingleDuctVAVReheat: // SINGLE DUCT:VAV:REHEAT
             case SysType::SingleDuctVAVNoReheat: // SINGLE DUCT:VAV:NOREHEAT
@@ -3401,7 +3401,7 @@ namespace EnergyPlus::SingleDuct {
         }
 
         // Need to make sure that the damper outlets are passed to the coil inlet
-        this->UpdateSys();
+        this->UpdateSys(state);
 
         // At the current air mass flow rate, calculate heating coil load
         QActualHeating = QToHeatSetPt - MassFlow * CpAirAvg * (this->sd_airterminalInlet.AirTemp - ZoneTemp); // reheat needed
@@ -3467,7 +3467,7 @@ namespace EnergyPlus::SingleDuct {
 
             this->sd_airterminalOutlet.AirMassFlowRate = MassFlow;
 
-            this->UpdateSys();
+            this->UpdateSys(state);
 
             // Now do the heating coil calculation for each heating coil type
             {
@@ -3560,7 +3560,7 @@ namespace EnergyPlus::SingleDuct {
                                 (std::abs(MassFlow - this->MassFlow1) >= this->MassFlowDiff)) {
                                 if (MassFlow > 0.0) MassFlow = this->MassFlow1;
                                 this->sd_airterminalOutlet.AirMassFlowRate = MassFlow;
-                                this->UpdateSys();
+                                this->UpdateSys(state);
 
                                 // Although this equation looks strange (using temp instead of deltaT), it is corrected later in ControlCompOutput
                                 // and is working as-is, temperature setpoints are maintained as expected.
@@ -3589,7 +3589,7 @@ namespace EnergyPlus::SingleDuct {
 
                             this->sd_airterminalOutlet.AirMassFlowRate = MassFlow;
                             // reset OA report variable
-                            this->UpdateSys();
+                            this->UpdateSys(state);
                         } // IF (Node(state.dataSingleDuct->sd_airterminal(SysNum)%ReheatControlNode)%MassFlowRate .EQ. MaxFlowWater) THEN
                     }     // IF (state.dataSingleDuct->sd_airterminal(SysNum)%DamperHeatingAction .EQ. ReverseAction) THEN
 
@@ -3872,7 +3872,7 @@ namespace EnergyPlus::SingleDuct {
         }
 
         // Need to make sure that the damper outlets are passed to the coil inlet
-        this->UpdateSys();
+        this->UpdateSys(state);
 
         QActualHeating = QToHeatSetPt - MassFlow * CpAirZn * (this->sd_airterminalInlet.AirTemp - ZoneTemp);
 
@@ -3928,7 +3928,7 @@ namespace EnergyPlus::SingleDuct {
 
             this->sd_airterminalOutlet.AirMassFlowRate = MassFlow;
 
-            this->UpdateSys();
+            this->UpdateSys(state);
 
             {
                 auto const SELECT_CASE_var(this->ReheatComp_Num);
@@ -4003,7 +4003,7 @@ namespace EnergyPlus::SingleDuct {
                             // reset terminal unit inlet air mass flow to new value.
                             MassFlow = Node(SysOutletNode).MassFlowRate;
                             this->sd_airterminalOutlet.AirMassFlowRate = MassFlow;
-                            this->UpdateSys();
+                            this->UpdateSys(state);
                         }
                         // look for bang-bang condition: flow rate oscillating between 2 values during the air loop / zone
                         // equipment iteration. If detected, set flow rate to previous value and recalc HW flow.
@@ -4012,7 +4012,7 @@ namespace EnergyPlus::SingleDuct {
                             (std::abs(MassFlow - this->MassFlow1) >= this->MassFlowDiff)) {
                             MassFlow = this->MassFlow1;
                             this->sd_airterminalOutlet.AirMassFlowRate = MassFlow;
-                            this->UpdateSys();
+                            this->UpdateSys(state);
                             ControlCompOutput(state,
                                               this->ReheatName,
                                               this->ReheatComp,
@@ -4138,7 +4138,6 @@ namespace EnergyPlus::SingleDuct {
 
         // Using/Aliasing
         using namespace DataZoneEnergyDemands;
-        using DataConvergParams::HVACFlowRateToler;
         using General::SolveRoot;
         using SteamCoils::GetCoilCapacity;
         using TempSolveRoot::SolveRoot;
@@ -4203,7 +4202,7 @@ namespace EnergyPlus::SingleDuct {
         MaxCoolMassFlow = this->sd_airterminalInlet.AirMassFlowRateMaxAvail;
         MaxHeatMassFlow = min(this->HeatAirMassFlowRateMax, this->sd_airterminalInlet.AirMassFlowRateMaxAvail);
         MinMassFlow = MaxCoolMassFlow * this->ZoneMinAirFrac;
-        UnitFlowToler = 0.001 * HVACFlowRateToler;
+        UnitFlowToler = 0.001 * DataConvergParams::HVACFlowRateToler;
         QDelivered = 0.0;
         HWFlow = 0.0;
         if (this->sd_airterminalInlet.AirMassFlowRateMaxAvail <= 0.0 || CurDeadBandOrSetback(ZoneNum)) {
@@ -4540,7 +4539,7 @@ namespace EnergyPlus::SingleDuct {
             this->DamperPosition = MassFlow / this->AirMassFlowRateMax;
         }
         // update the air terminal outlet node data
-        this->UpdateSys();
+        this->UpdateSys(state);
     }
 
     void SingleDuctAirTerminal::SimConstVol(EnergyPlusData &state, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum)
@@ -4623,7 +4622,7 @@ namespace EnergyPlus::SingleDuct {
         this->sd_airterminalOutlet.AirMassFlowRate = MassFlow;
         this->sd_airterminalOutlet.AirMassFlowRateMaxAvail = this->sd_airterminalInlet.AirMassFlowRateMaxAvail;
         this->sd_airterminalOutlet.AirMassFlowRateMinAvail = this->sd_airterminalInlet.AirMassFlowRateMinAvail;
-        this->UpdateSys();
+        this->UpdateSys(state);
 
         QActualHeating = QToHeatSetPt - MassFlow * CpAir * (this->sd_airterminalInlet.AirTemp - ZoneTemp); // reheat needed
         // Now the massflow for reheating has been determined. If it is zero, or in SetBack, or the
@@ -4735,7 +4734,7 @@ namespace EnergyPlus::SingleDuct {
         }
     }
 
-    void SingleDuctAirTerminal::SimConstVolNoReheat()
+    void SingleDuctAirTerminal::SimConstVolNoReheat(EnergyPlusData &state)
     {
 
         // PURPOSE OF THIS SUBROUTINE:
@@ -4744,7 +4743,7 @@ namespace EnergyPlus::SingleDuct {
         this->sd_airterminalOutlet = this->sd_airterminalInlet;
 
         // update the air terminal outlet node data
-        this->UpdateSys();
+        this->UpdateSys(state);
     }
 
     void SingleDuctAirTerminal::CalcVAVVS(EnergyPlusData &state,
@@ -5191,7 +5190,7 @@ namespace EnergyPlus::SingleDuct {
     // Beginning of Update subroutines for the Sys Module
     // *****************************************************************************
 
-    void SingleDuctAirTerminal::UpdateSys() const
+    void SingleDuctAirTerminal::UpdateSys(EnergyPlusData &state) const
     {
 
         // SUBROUTINE INFORMATION:
@@ -5202,27 +5201,6 @@ namespace EnergyPlus::SingleDuct {
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine updates the Syss.
-
-        // METHODOLOGY EMPLOYED:
-        // There is method to this madness.
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using DataContaminantBalance::Contaminant;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int OutletNode;
@@ -5249,11 +5227,11 @@ namespace EnergyPlus::SingleDuct {
         Node(OutletNode).MassFlowRateMaxAvail = min(this->sd_airterminalOutlet.AirMassFlowRateMaxAvail, Node(OutletNode).MassFlowRateMax);
         Node(OutletNode).MassFlowRateMinAvail = this->sd_airterminalOutlet.AirMassFlowRateMinAvail;
 
-        if (Contaminant.CO2Simulation) {
+        if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
             Node(OutletNode).CO2 = Node(InletNode).CO2;
         }
 
-        if (Contaminant.GenericContamSimulation) {
+        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
             Node(OutletNode).GenContam = Node(InletNode).GenContam;
         }
     }
@@ -5859,18 +5837,6 @@ namespace EnergyPlus::SingleDuct {
 
         // Using/Aliasing
         using namespace DataLoopNode;
-        using DataContaminantBalance::Contaminant;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PriInNode = state.dataSingleDuct->SysATMixer(SysNum).PriInNode;
@@ -5884,7 +5850,7 @@ namespace EnergyPlus::SingleDuct {
         Node(MixedAirOutNode).Press = state.dataSingleDuct->SysATMixer(SysNum).MixedAirPressure;
         Node(MixedAirOutNode).MassFlowRate = state.dataSingleDuct->SysATMixer(SysNum).MixedAirMassFlowRate;
 
-        if (Contaminant.CO2Simulation) {
+        if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
             if (state.dataSingleDuct->SysATMixer(SysNum).MixedAirMassFlowRate <= DataHVACGlobals::VerySmallMassFlow) {
                 Node(MixedAirOutNode).CO2 = Node(PriInNode).CO2;
             } else {
@@ -5894,7 +5860,7 @@ namespace EnergyPlus::SingleDuct {
             }
         }
 
-        if (Contaminant.GenericContamSimulation) {
+        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
             if (state.dataSingleDuct->SysATMixer(SysNum).MixedAirMassFlowRate <= DataHVACGlobals::VerySmallMassFlow) {
                 Node(MixedAirOutNode).GenContam = Node(PriInNode).GenContam;
             } else {

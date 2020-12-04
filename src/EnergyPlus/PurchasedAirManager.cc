@@ -296,7 +296,6 @@ namespace PurchasedAirManager {
         using OutAirNodeManager::CheckAndAddAirNodeNumber;
         using namespace DataLoopNode;
         using namespace DataIPShortCuts;
-        using DataContaminantBalance::Contaminant;
         using DataSizing::OARequirements; // to find DesignSpecification:OutdoorAir pointer
         using DataSizing::ZoneHVACSizing;
         using DataZoneEquipment::ZoneEquipConfig;
@@ -579,7 +578,7 @@ namespace PurchasedAirManager {
                     } else if (UtilityRoutines::SameString(cAlphaArgs(14), "OccupancySchedule")) {
                         PurchAir(PurchAirNum).DCVType = OccupancySchedule;
                     } else if (UtilityRoutines::SameString(cAlphaArgs(14), "CO2Setpoint")) {
-                        if (Contaminant.CO2Simulation) {
+                        if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
                             PurchAir(PurchAirNum).DCVType = CO2SetPoint;
                         } else {
                             PurchAir(PurchAirNum).DCVType = NoDCV;
@@ -2003,7 +2002,6 @@ namespace PurchasedAirManager {
         // na
 
         // Using/Aliasing
-        using DataContaminantBalance::Contaminant;
         using DataHeatBalance::Zone;
         using DataHeatBalFanSys::TempControlType;
         using DataHVACGlobals::ForceOff;
@@ -2720,7 +2718,7 @@ namespace PurchasedAirManager {
                     PurchAir(PurchAirNum).OASenOutput = 0.0;
                     PurchAir(PurchAirNum).OALatOutput = 0.0;
                 }
-                if (Contaminant.CO2Simulation) {
+                if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
                     if (PurchAir(PurchAirNum).OutdoorAir) {
                         Node(InNodeNum).CO2 =
                             ((SupplyMassFlowRate - OAMassFlowRate) * Node(RecircNodeNum).CO2 + OAMassFlowRate * Node(OANodeNum).CO2) /
@@ -2729,7 +2727,7 @@ namespace PurchasedAirManager {
                         Node(InNodeNum).CO2 = Node(RecircNodeNum).CO2;
                     }
                 }
-                if (Contaminant.GenericContamSimulation) {
+                if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
                     if (PurchAir(PurchAirNum).OutdoorAir) {
                         Node(InNodeNum).GenContam =
                             ((SupplyMassFlowRate - OAMassFlowRate) * Node(RecircNodeNum).GenContam + OAMassFlowRate * Node(OANodeNum).GenContam) /
@@ -2750,10 +2748,10 @@ namespace PurchasedAirManager {
                 PurchAir(PurchAirNum).OALatOutput = 0.0;
                 PurchAir(PurchAirNum).FinalMixedAirTemp = Node(RecircNodeNum).Temp;
                 PurchAir(PurchAirNum).FinalMixedAirHumRat = Node(RecircNodeNum).HumRat;
-                if (Contaminant.CO2Simulation) {
+                if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
                     Node(InNodeNum).CO2 = Node(ZoneNodeNum).CO2;
                 }
-                if (Contaminant.GenericContamSimulation) {
+                if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
                     Node(InNodeNum).GenContam = Node(ZoneNodeNum).GenContam;
                 }
             }
@@ -2773,10 +2771,10 @@ namespace PurchasedAirManager {
             Node(InNodeNum).Temp = Node(ZoneNodeNum).Temp;
             Node(InNodeNum).HumRat = Node(ZoneNodeNum).HumRat;
             Node(InNodeNum).Enthalpy = Node(ZoneNodeNum).Enthalpy;
-            if (Contaminant.CO2Simulation) {
+            if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
                 Node(InNodeNum).CO2 = Node(ZoneNodeNum).CO2;
             }
-            if (Contaminant.GenericContamSimulation) {
+            if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
                 Node(InNodeNum).GenContam = Node(ZoneNodeNum).GenContam;
             }
 
@@ -2830,7 +2828,6 @@ namespace PurchasedAirManager {
         // REFERENCES:
 
         // Using/Aliasing
-        using DataContaminantBalance::ZoneSysContDemand;
         using DataEnvironment::StdRhoAir;
         using DataHeatBalance::Zone;
         using DataZoneEquipment::CalcDesignSpecificationOutdoorAir;
@@ -2864,7 +2861,7 @@ namespace PurchasedAirManager {
 
             // If DCV with CO2SetPoint then check required OA flow to meet CO2 setpoint
             if (PurchAir(PurchAirNum).DCVType == CO2SetPoint) {
-                OAMassFlowRate = max(OAMassFlowRate, ZoneSysContDemand(ActualZoneNum).OutputRequiredToCO2SP);
+                OAMassFlowRate = max(OAMassFlowRate, state.dataContaminantBalance->ZoneSysContDemand(ActualZoneNum).OutputRequiredToCO2SP);
             }
 
             if (OAMassFlowRate <= VerySmallMassFlow) OAMassFlowRate = 0.0;

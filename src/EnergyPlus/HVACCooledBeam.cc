@@ -212,7 +212,7 @@ namespace HVACCooledBeam {
         ControlCoolBeam(state, CBNum, ZoneNum, ZoneNodeNum, FirstHVACIteration, NonAirSysOutput);
 
         // Update the current unit's outlet nodes. No update needed
-        UpdateCoolBeam(CBNum);
+        UpdateCoolBeam(state, CBNum);
 
         // Fill the report variables. There are no report variables
         ReportCoolBeam(state, CBNum);
@@ -1244,7 +1244,7 @@ namespace HVACCooledBeam {
         return Residuum;
     }
 
-    void UpdateCoolBeam(int const CBNum)
+    void UpdateCoolBeam(EnergyPlusData &state, int const CBNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1259,24 +1259,8 @@ namespace HVACCooledBeam {
         // METHODOLOGY EMPLOYED:
         // Data is moved from the cooled beam unit data structure to the unit outlet nodes.
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
-        using DataContaminantBalance::Contaminant;
         using PlantUtilities::SafeCopyPlantNode;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int AirInletNode;
@@ -1324,11 +1308,11 @@ namespace HVACCooledBeam {
         //    Node(WaterOutletNode)%MassFlowRateMinAvail= 0.0
         //  END IF
 
-        if (Contaminant.CO2Simulation) {
+        if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
             Node(AirOutletNode).CO2 = Node(AirInletNode).CO2;
         }
 
-        if (Contaminant.GenericContamSimulation) {
+        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
             Node(AirOutletNode).GenContam = Node(AirInletNode).GenContam;
         }
     }

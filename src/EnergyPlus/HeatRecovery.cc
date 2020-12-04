@@ -343,7 +343,7 @@ namespace HeatRecovery {
             }
         }
 
-        UpdateHeatRecovery(HeatExchNum);
+        UpdateHeatRecovery(state, HeatExchNum);
 
         ReportHeatRecovery(HeatExchNum);
     }
@@ -3203,7 +3203,7 @@ namespace HeatRecovery {
         ExchCond(ExNum).DefrostFraction = DFFraction;
     }
 
-    void UpdateHeatRecovery(int const ExNum) // number of the current heat exchanger being simulated
+    void UpdateHeatRecovery(EnergyPlusData &state, int const ExNum) // number of the current heat exchanger being simulated
     {
 
         // SUBROUTINE INFORMATION:
@@ -3214,27 +3214,6 @@ namespace HeatRecovery {
 
         // PURPOSE OF THIS SUBROUTINE:
         // Moves heat exchanger output to the outlet nodes.
-
-        // METHODOLOGY EMPLOYED:
-        // NA
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using DataContaminantBalance::Contaminant;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int SupInNode;  // supply inlet node number
@@ -3271,11 +3250,11 @@ namespace HeatRecovery {
         Node(SecOutNode).MassFlowRateMinAvail = Node(SecInNode).MassFlowRateMinAvail;
         Node(SecOutNode).MassFlowRateMaxAvail = Node(SecInNode).MassFlowRateMaxAvail;
 
-        if (Contaminant.CO2Simulation) {
+        if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
             Node(SupOutNode).CO2 = Node(SupInNode).CO2;
             Node(SecOutNode).CO2 = Node(SecInNode).CO2;
         }
-        if (Contaminant.GenericContamSimulation) {
+        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
             Node(SupOutNode).GenContam = Node(SupInNode).GenContam;
             Node(SecOutNode).GenContam = Node(SecInNode).GenContam;
         }

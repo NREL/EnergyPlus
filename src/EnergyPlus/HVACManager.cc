@@ -138,7 +138,6 @@ namespace HVACManager {
     using namespace DataHVACGlobals;
     using namespace DataLoopNode;
     using namespace DataAirLoop;
-    using namespace DataConvergParams;
     using namespace DataReportingFlags;
 
     // Data
@@ -213,23 +212,10 @@ namespace HVACManager {
         // REFERENCES:
 
         // Using/Aliasing
-        using DataConvergParams::MaxZoneTempDiff;
-        using DataConvergParams::MinTimeStepSys; // =0.0166667     != 1 minute | 0.3 C = (1% OF 300 C) =max allowable diff between ZoneAirTemp at
-                                                 // Time=T & T-1
-
         using ZoneTempPredictorCorrector::DetectOscillatingZoneTemp;
         using ZoneTempPredictorCorrector::ManageZoneAirUpdates;
 
         using AirflowNetworkBalanceManager::ManageAirflowNetworkBalance;
-        using DataContaminantBalance::Contaminant;
-        using DataContaminantBalance::OutdoorCO2;
-        using DataContaminantBalance::OutdoorGC;
-        using DataContaminantBalance::ZoneAirCO2;
-        using DataContaminantBalance::ZoneAirCO2Avg;
-        using DataContaminantBalance::ZoneAirCO2Temp;
-        using DataContaminantBalance::ZoneAirGC;
-        using DataContaminantBalance::ZoneAirGCAvg;
-        using DataContaminantBalance::ZoneAirGCTemp;
         using DataHeatBalFanSys::QRadSurfAFNDuct;
         using DataHeatBalFanSys::SysDepZoneLoads;
         using DataHeatBalFanSys::SysDepZoneLoadsLagged;
@@ -310,13 +296,13 @@ namespace HVACManager {
         ZoneThermostatSetPointLoAver = 0.0;
         ZoneAirHumRatAvg = 0.0;
         PrintedWarmup = false;
-        if (Contaminant.CO2Simulation) {
-            OutdoorCO2 = GetCurrentScheduleValue(state, Contaminant.CO2OutdoorSchedPtr);
-            ZoneAirCO2Avg = 0.0;
+        if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
+            state.dataContaminantBalance->OutdoorCO2 = GetCurrentScheduleValue(state, state.dataContaminantBalance->Contaminant.CO2OutdoorSchedPtr);
+            state.dataContaminantBalance->ZoneAirCO2Avg = 0.0;
         }
-        if (Contaminant.GenericContamSimulation) {
-            OutdoorGC = GetCurrentScheduleValue(state, Contaminant.GenericContamOutdoorSchedPtr);
-            if (allocated(ZoneAirGCAvg)) ZoneAirGCAvg = 0.0;
+        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
+            state.dataContaminantBalance->OutdoorGC = GetCurrentScheduleValue(state, state.dataContaminantBalance->Contaminant.GenericContamOutdoorSchedPtr);
+            if (allocated(state.dataContaminantBalance->ZoneAirGCAvg)) state.dataContaminantBalance->ZoneAirGCAvg = 0.0;
         }
 
         if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag) {
@@ -348,7 +334,7 @@ namespace HVACManager {
 
         // ZONE INITIALIZATION  'Get Zone Setpoints'
         ManageZoneAirUpdates(state, iGetZoneSetPoints, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
-        if (Contaminant.SimulateContaminants)
+        if (state.dataContaminantBalance->Contaminant.SimulateContaminants)
             ManageZoneContaminanUpdates(state, iGetZoneSetPoints, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
 
         ManageHybridVentilation(state);
@@ -367,7 +353,7 @@ namespace HVACManager {
 
         ManageZoneAirUpdates(state, iPredictStep, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
 
-        if (Contaminant.SimulateContaminants) ManageZoneContaminanUpdates(state, iPredictStep, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+        if (state.dataContaminantBalance->Contaminant.SimulateContaminants) ManageZoneContaminanUpdates(state, iPredictStep, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
 
         SimHVAC(state);
 
@@ -388,16 +374,16 @@ namespace HVACManager {
         state.dataGlobal->BeginTimeStepFlag = false; // At this point, we have been through the first pass through SimHVAC so this needs to be set
 
         ManageZoneAirUpdates(state, iCorrectStep, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
-        if (Contaminant.SimulateContaminants) ManageZoneContaminanUpdates(state, iCorrectStep, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+        if (state.dataContaminantBalance->Contaminant.SimulateContaminants) ManageZoneContaminanUpdates(state, iCorrectStep, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
 
-        if (ZoneTempChange > MaxZoneTempDiff && !state.dataGlobal->KickOffSimulation) {
+        if (ZoneTempChange > state.dataConvergeParams->MaxZoneTempDiff && !state.dataGlobal->KickOffSimulation) {
             // determine value of adaptive system time step
             // model how many system timesteps we want in zone timestep
-            ZTempTrendsNumSysSteps = int(ZoneTempChange / MaxZoneTempDiff + 1.0); // add 1 for truncation
+            ZTempTrendsNumSysSteps = int(ZoneTempChange / state.dataConvergeParams->MaxZoneTempDiff + 1.0); // add 1 for truncation
             NumOfSysTimeSteps = min(ZTempTrendsNumSysSteps, LimitNumSysSteps);
             // then determine timestep length for even distribution, protect div by zero
             if (NumOfSysTimeSteps > 0) TimeStepSys = state.dataGlobal->TimeStepZone / NumOfSysTimeSteps;
-            TimeStepSys = max(TimeStepSys, MinTimeStepSys);
+            TimeStepSys = max(TimeStepSys, state.dataConvergeParams->MinTimeStepSys);
             UseZoneTimeStepHistory = false;
             ShortenTimeStepSys = true;
         } else {
@@ -423,7 +409,7 @@ namespace HVACManager {
                 ManageZoneAirUpdates(state, iPredictStep, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory,
                                      PriorTimeStep);
 
-                if (Contaminant.SimulateContaminants)
+                if (state.dataContaminantBalance->Contaminant.SimulateContaminants)
                     ManageZoneContaminanUpdates(state, iPredictStep, ShortenTimeStepSys, UseZoneTimeStepHistory,
                                                 PriorTimeStep);
                 SimHVAC(state);
@@ -442,13 +428,13 @@ namespace HVACManager {
 
                 ManageZoneAirUpdates(state, iCorrectStep, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory,
                                      PriorTimeStep);
-                if (Contaminant.SimulateContaminants)
+                if (state.dataContaminantBalance->Contaminant.SimulateContaminants)
                     ManageZoneContaminanUpdates(state, iCorrectStep, ShortenTimeStepSys, UseZoneTimeStepHistory,
                                                 PriorTimeStep);
 
                 ManageZoneAirUpdates(state, iPushSystemTimestepHistories, ZoneTempChange, ShortenTimeStepSys,
                                      UseZoneTimeStepHistory, PriorTimeStep);
-                if (Contaminant.SimulateContaminants)
+                if (state.dataContaminantBalance->Contaminant.SimulateContaminants)
                     ManageZoneContaminanUpdates(state, iPushSystemTimestepHistories, ShortenTimeStepSys,
                                                 UseZoneTimeStepHistory, PriorTimeStep);
                 PreviousTimeStep = TimeStepSys;
@@ -459,8 +445,8 @@ namespace HVACManager {
             for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 ZTAV(ZoneNum) += ZT(ZoneNum) * FracTimeStepZone;
                 ZoneAirHumRatAvg(ZoneNum) += ZoneAirHumRat(ZoneNum) * FracTimeStepZone;
-                if (Contaminant.CO2Simulation) ZoneAirCO2Avg(ZoneNum) += ZoneAirCO2(ZoneNum) * FracTimeStepZone;
-                if (Contaminant.GenericContamSimulation) ZoneAirGCAvg(ZoneNum) += ZoneAirGC(ZoneNum) * FracTimeStepZone;
+                if (state.dataContaminantBalance->Contaminant.CO2Simulation) state.dataContaminantBalance->ZoneAirCO2Avg(ZoneNum) += state.dataContaminantBalance->ZoneAirCO2(ZoneNum) * FracTimeStepZone;
+                if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) state.dataContaminantBalance->ZoneAirGCAvg(ZoneNum) += state.dataContaminantBalance->ZoneAirGC(ZoneNum) * FracTimeStepZone;
                 if (state.dataZoneTempPredictorCorrector->NumOnOffCtrZone > 0) {
                     ZoneThermostatSetPointHiAver(ZoneNum) += ZoneThermostatSetPointHi(ZoneNum) * FracTimeStepZone;
                     ZoneThermostatSetPointLoAver(ZoneNum) += ZoneThermostatSetPointLo(ZoneNum) * FracTimeStepZone;
@@ -591,7 +577,7 @@ namespace HVACManager {
         } // system time step  loop (loops once if no downstepping)
 
         ManageZoneAirUpdates(state, iPushZoneTimestepHistories, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
-        if (Contaminant.SimulateContaminants)
+        if (state.dataContaminantBalance->Contaminant.SimulateContaminants)
             ManageZoneContaminanUpdates(state, iPushZoneTimestepHistories, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
 
         NumOfSysTimeStepsLastZoneTimeStep = NumOfSysTimeSteps;
@@ -669,7 +655,6 @@ namespace HVACManager {
         // REFERENCES: none
 
         // Using/Aliasing
-        using namespace DataConvergParams;
         using DataEnvironment::CurMnDy;
         using DataEnvironment::EnvironmentName;
         using DataPlant::ConvergenceHistoryARR;
@@ -738,6 +723,11 @@ namespace HVACManager {
         int NodeIndex;
         bool MonotonicIncreaseFound;
         bool MonotonicDecreaseFound;
+
+        Array1D<Real64> const ConvergLogStackARR(DataConvergParams::ConvergLogStackDepth, {0.0, -1.0, -2.0, -3.0, -4.0, -5.0, -6.0, -7.0, -8.0, -9.0});
+        Real64 const sum_ConvergLogStackARR(sum(ConvergLogStackARR));
+        Real64 const square_sum_ConvergLogStackARR(pow_2(sum_ConvergLogStackARR));
+        Real64 const sum_square_ConvergLogStackARR(sum(pow(ConvergLogStackARR, 2)));
 
         // Initialize all of the simulation flags to true for the first iteration
         SimZoneEquipmentFlag = true;
@@ -870,7 +860,7 @@ namespace HVACManager {
         // Main iteration loop for HVAC.  If any of the simulation flags are
         // true, then specific components must be resimulated.
         while ((SimAirLoopsFlag || SimZoneEquipmentFlag || SimNonZoneEquipmentFlag || SimPlantLoopsFlag || SimElecCircuitsFlag) &&
-               (HVACManageIteration <= MaxIter)) {
+               (HVACManageIteration <= state.dataConvergeParams->MaxIter)) {
 
             if (state.dataGlobal->stopSimulation) break;
 
@@ -970,13 +960,13 @@ namespace HVACManager {
             }
         }
 
-        if ((HVACManageIteration > MaxIter) && (!state.dataGlobal->WarmupFlag)) {
+        if ((HVACManageIteration > state.dataConvergeParams->MaxIter) && (!state.dataGlobal->WarmupFlag)) {
             ++ErrCount;
             if (ErrCount < 15) {
                 ErrEnvironmentName = EnvironmentName;
                 ShowWarningError(state,
                                  format("SimHVAC: Maximum iterations ({}) exceeded for all HVAC loops, at {}, {} {}",
-                                        MaxIter,
+                                        state.dataConvergeParams->MaxIter,
                                         EnvironmentName,
                                         CurMnDy,
                                         CreateSysTimeIntervalString(state)));
@@ -1002,105 +992,105 @@ namespace HVACManager {
 
                     for (AirSysNum = 1; AirSysNum <= NumPrimaryAirSys; ++AirSysNum) {
 
-                        if (any(AirLoopConvergence(AirSysNum).HVACMassFlowNotConverged)) {
+                        if (any(state.dataConvergeParams->AirLoopConvergence(AirSysNum).HVACMassFlowNotConverged)) {
 
                             ShowContinueError(state, "Air System Named = " + state.dataAirLoop->AirToZoneNodeInfo(AirSysNum).AirLoopName +
                                               " did not converge for mass flow rate");
                             ShowContinueError(state, "Check values should be zero. Most Recent values listed first.");
                             HistoryTrace = "";
-                            for (StackDepth = 1; StackDepth <= ConvergLogStackDepth; ++StackDepth) {
-                                HistoryTrace += format("{:.6R},", AirLoopConvergence(AirSysNum).HVACFlowDemandToSupplyTolValue(StackDepth));
+                            for (StackDepth = 1; StackDepth <= DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
+                                HistoryTrace += format("{:.6R},", state.dataConvergeParams->AirLoopConvergence(AirSysNum).HVACFlowDemandToSupplyTolValue(StackDepth));
                             }
 
                             ShowContinueError(state, "Demand-to-Supply interface mass flow rate check value iteration history trace: " + HistoryTrace);
                             HistoryTrace = "";
-                            for (StackDepth = 1; StackDepth <= ConvergLogStackDepth; ++StackDepth) {
-                                HistoryTrace += format("{:.6R},", AirLoopConvergence(AirSysNum).HVACFlowSupplyDeck1ToDemandTolValue(StackDepth));
+                            for (StackDepth = 1; StackDepth <= DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
+                                HistoryTrace += format("{:.6R},", state.dataConvergeParams->AirLoopConvergence(AirSysNum).HVACFlowSupplyDeck1ToDemandTolValue(StackDepth));
                             }
                             ShowContinueError(state, "Supply-to-demand interface deck 1 mass flow rate check value iteration history trace: " +
                                               HistoryTrace);
 
                             if (state.dataAirLoop->AirToZoneNodeInfo(AirSysNum).NumSupplyNodes >= 2) {
                                 HistoryTrace = "";
-                                for (StackDepth = 1; StackDepth <= ConvergLogStackDepth; ++StackDepth) {
-                                    HistoryTrace += format("{:.6R},", AirLoopConvergence(AirSysNum).HVACFlowSupplyDeck2ToDemandTolValue(StackDepth));
+                                for (StackDepth = 1; StackDepth <= DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
+                                    HistoryTrace += format("{:.6R},", state.dataConvergeParams->AirLoopConvergence(AirSysNum).HVACFlowSupplyDeck2ToDemandTolValue(StackDepth));
                                 }
                                 ShowContinueError(state, "Supply-to-demand interface deck 2 mass flow rate check value iteration history trace: " +
                                                   HistoryTrace);
                             }
                         } // mass flow rate not converged
 
-                        if (any(AirLoopConvergence(AirSysNum).HVACHumRatNotConverged)) {
+                        if (any(state.dataConvergeParams->AirLoopConvergence(AirSysNum).HVACHumRatNotConverged)) {
 
                             ShowContinueError(state, "Air System Named = " + state.dataAirLoop->AirToZoneNodeInfo(AirSysNum).AirLoopName +
                                               " did not converge for humidity ratio");
                             ShowContinueError(state, "Check values should be zero. Most Recent values listed first.");
                             HistoryTrace = "";
-                            for (StackDepth = 1; StackDepth <= ConvergLogStackDepth; ++StackDepth) {
-                                HistoryTrace += format("{:.6R},", AirLoopConvergence(AirSysNum).HVACHumDemandToSupplyTolValue(StackDepth));
+                            for (StackDepth = 1; StackDepth <= DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
+                                HistoryTrace += format("{:.6R},", state.dataConvergeParams->AirLoopConvergence(AirSysNum).HVACHumDemandToSupplyTolValue(StackDepth));
                             }
                             ShowContinueError(state, "Demand-to-Supply interface humidity ratio check value iteration history trace: " + HistoryTrace);
                             HistoryTrace = "";
-                            for (StackDepth = 1; StackDepth <= ConvergLogStackDepth; ++StackDepth) {
-                                HistoryTrace += format("{:.6R},", AirLoopConvergence(AirSysNum).HVACHumSupplyDeck1ToDemandTolValue(StackDepth));
+                            for (StackDepth = 1; StackDepth <= DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
+                                HistoryTrace += format("{:.6R},", state.dataConvergeParams->AirLoopConvergence(AirSysNum).HVACHumSupplyDeck1ToDemandTolValue(StackDepth));
                             }
                             ShowContinueError(state, "Supply-to-demand interface deck 1 humidity ratio check value iteration history trace: " +
                                               HistoryTrace);
 
                             if (state.dataAirLoop->AirToZoneNodeInfo(AirSysNum).NumSupplyNodes >= 2) {
                                 HistoryTrace = "";
-                                for (StackDepth = 1; StackDepth <= ConvergLogStackDepth; ++StackDepth) {
-                                    HistoryTrace += format("{:.6R},", AirLoopConvergence(AirSysNum).HVACHumSupplyDeck2ToDemandTolValue(StackDepth));
+                                for (StackDepth = 1; StackDepth <= DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
+                                    HistoryTrace += format("{:.6R},", state.dataConvergeParams->AirLoopConvergence(AirSysNum).HVACHumSupplyDeck2ToDemandTolValue(StackDepth));
                                 }
                                 ShowContinueError(state, "Supply-to-demand interface deck 2 humidity ratio check value iteration history trace: " +
                                                   HistoryTrace);
                             }
                         } // humidity ratio not converged
 
-                        if (any(AirLoopConvergence(AirSysNum).HVACTempNotConverged)) {
+                        if (any(state.dataConvergeParams->AirLoopConvergence(AirSysNum).HVACTempNotConverged)) {
 
                             ShowContinueError(state, "Air System Named = " + state.dataAirLoop->AirToZoneNodeInfo(AirSysNum).AirLoopName + " did not converge for temperature");
                             ShowContinueError(state, "Check values should be zero. Most Recent values listed first.");
                             HistoryTrace = "";
-                            for (StackDepth = 1; StackDepth <= ConvergLogStackDepth; ++StackDepth) {
-                                HistoryTrace += format("{:.6R},", AirLoopConvergence(AirSysNum).HVACTempDemandToSupplyTolValue(StackDepth));
+                            for (StackDepth = 1; StackDepth <= DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
+                                HistoryTrace += format("{:.6R},", state.dataConvergeParams->AirLoopConvergence(AirSysNum).HVACTempDemandToSupplyTolValue(StackDepth));
                             }
                             ShowContinueError(state, "Demand-to-Supply interface temperature check value iteration history trace: " + HistoryTrace);
                             HistoryTrace = "";
-                            for (StackDepth = 1; StackDepth <= ConvergLogStackDepth; ++StackDepth) {
-                                HistoryTrace += format("{:.6R},", AirLoopConvergence(AirSysNum).HVACTempSupplyDeck1ToDemandTolValue(StackDepth));
+                            for (StackDepth = 1; StackDepth <= DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
+                                HistoryTrace += format("{:.6R},", state.dataConvergeParams->AirLoopConvergence(AirSysNum).HVACTempSupplyDeck1ToDemandTolValue(StackDepth));
                             }
                             ShowContinueError(state, "Supply-to-demand interface deck 1 temperature check value iteration history trace: " + HistoryTrace);
 
                             if (state.dataAirLoop->AirToZoneNodeInfo(AirSysNum).NumSupplyNodes >= 2) {
                                 HistoryTrace = "";
-                                for (StackDepth = 1; StackDepth <= ConvergLogStackDepth; ++StackDepth) {
-                                    HistoryTrace += format("{:.6R},", AirLoopConvergence(AirSysNum).HVACTempSupplyDeck1ToDemandTolValue(StackDepth));
+                                for (StackDepth = 1; StackDepth <= DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
+                                    HistoryTrace += format("{:.6R},", state.dataConvergeParams->AirLoopConvergence(AirSysNum).HVACTempSupplyDeck1ToDemandTolValue(StackDepth));
                                 }
                                 ShowContinueError(state, "Supply-to-demand interface deck 2 temperature check value iteration history trace: " +
                                                   HistoryTrace);
                             }
                         } // Temps not converged
-                        if (any(AirLoopConvergence(AirSysNum).HVACEnergyNotConverged)) {
+                        if (any(state.dataConvergeParams->AirLoopConvergence(AirSysNum).HVACEnergyNotConverged)) {
 
                             ShowContinueError(state, "Air System Named = " + state.dataAirLoop->AirToZoneNodeInfo(AirSysNum).AirLoopName + " did not converge for energy");
                             ShowContinueError(state, "Check values should be zero. Most Recent values listed first.");
                             HistoryTrace = "";
-                            for (StackDepth = 1; StackDepth <= ConvergLogStackDepth; ++StackDepth) {
-                                HistoryTrace += format("{:.6R},", AirLoopConvergence(AirSysNum).HVACEnergyDemandToSupplyTolValue(StackDepth));
+                            for (StackDepth = 1; StackDepth <= DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
+                                HistoryTrace += format("{:.6R},", state.dataConvergeParams->AirLoopConvergence(AirSysNum).HVACEnergyDemandToSupplyTolValue(StackDepth));
                             }
                             ShowContinueError(state, "Demand-to-Supply interface energy check value iteration history trace: " + HistoryTrace);
                             HistoryTrace = "";
-                            for (StackDepth = 1; StackDepth <= ConvergLogStackDepth; ++StackDepth) {
-                                HistoryTrace += format("{:.6R},", AirLoopConvergence(AirSysNum).HVACEnergySupplyDeck1ToDemandTolValue(StackDepth));
+                            for (StackDepth = 1; StackDepth <= DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
+                                HistoryTrace += format("{:.6R},", state.dataConvergeParams->AirLoopConvergence(AirSysNum).HVACEnergySupplyDeck1ToDemandTolValue(StackDepth));
                             }
                             ShowContinueError(state, "Supply-to-demand interface deck 1 energy check value iteration history trace: " + HistoryTrace);
 
                             if (state.dataAirLoop->AirToZoneNodeInfo(AirSysNum).NumSupplyNodes >= 2) {
                                 HistoryTrace = "";
-                                for (StackDepth = 1; StackDepth <= ConvergLogStackDepth; ++StackDepth) {
+                                for (StackDepth = 1; StackDepth <= DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
                                     HistoryTrace +=
-                                        format("{:.6R},", AirLoopConvergence(AirSysNum).HVACEnergySupplyDeck2ToDemandTolValue(StackDepth));
+                                        format("{:.6R},", state.dataConvergeParams->AirLoopConvergence(AirSysNum).HVACEnergySupplyDeck2ToDemandTolValue(StackDepth));
                                 }
                                 ShowContinueError(state, "Supply-to-demand interface deck 2 energy check value iteration history trace: " + HistoryTrace);
                             }
@@ -1111,42 +1101,42 @@ namespace HVACManager {
                     // loop over zones and check for issues with zone inlet nodes
                     for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
 
-                        for (NodeIndex = 1; NodeIndex <= ZoneInletConvergence(ZoneNum).NumInletNodes; ++NodeIndex) {
+                        for (NodeIndex = 1; NodeIndex <= state.dataConvergeParams->ZoneInletConvergence(ZoneNum).NumInletNodes; ++NodeIndex) {
 
                             // Check humidity ratio
                             FoundOscillationByDuplicate = false;
                             MonotonicDecreaseFound = false;
                             MonotonicIncreaseFound = false;
-                            // check for evidence of oscillation by indentify duplicates when latest value not equal to average
-                            AvgValue = sum(ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).HumidityRatio) / double(ConvergLogStackDepth);
-                            if (std::abs(ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).HumidityRatio(1) - AvgValue) >
-                                HVACHumRatOscillationToler) { // last iterate differs from average
+                            // check for evidence of oscillation by identifying duplicates when latest value not equal to average
+                            AvgValue = sum(state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).HumidityRatio) / double(DataConvergParams::ConvergLogStackDepth);
+                            if (std::abs(state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).HumidityRatio(1) - AvgValue) >
+                                DataConvergParams::HVACHumRatOscillationToler) { // last iterate differs from average
                                 FoundOscillationByDuplicate = false;
-                                for (StackDepth = 2; StackDepth <= ConvergLogStackDepth; ++StackDepth) {
-                                    if (std::abs(ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).HumidityRatio(1) -
-                                                 ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).HumidityRatio(StackDepth)) <
-                                        HVACHumRatOscillationToler) {
+                                for (StackDepth = 2; StackDepth <= DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
+                                    if (std::abs(state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).HumidityRatio(1) -
+                                                 state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).HumidityRatio(StackDepth)) <
+                                        DataConvergParams::HVACHumRatOscillationToler) {
                                         FoundOscillationByDuplicate = true;
                                         ShowContinueError(
                                             state,
                                             format("Node named {} shows oscillating humidity ratio across iterations with a repeated value of {:.6R}",
-                                                   NodeID(ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum),
-                                                   ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).HumidityRatio(1)));
+                                                   NodeID(state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum),
+                                                   state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).HumidityRatio(1)));
                                         break;
                                     }
                                 }
                                 if (!FoundOscillationByDuplicate) {
-                                    SlopeHumRat = (sum_ConvergLogStackARR * sum(ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).HumidityRatio) -
-                                                   double(ConvergLogStackDepth) *
-                                                       sum((ConvergLogStackARR * ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).HumidityRatio))) /
-                                                  (square_sum_ConvergLogStackARR - double(ConvergLogStackDepth) * sum_square_ConvergLogStackARR);
-                                    if (std::abs(SlopeHumRat) > HVACHumRatSlopeToler) {
+                                    SlopeHumRat = (sum_ConvergLogStackARR * sum(state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).HumidityRatio) -
+                                                   double(DataConvergParams::ConvergLogStackDepth) *
+                                                       sum((ConvergLogStackARR * state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).HumidityRatio))) /
+                                                  (square_sum_ConvergLogStackARR - double(DataConvergParams::ConvergLogStackDepth) * sum_square_ConvergLogStackARR);
+                                    if (std::abs(SlopeHumRat) > DataConvergParams::HVACHumRatSlopeToler) {
 
                                         if (SlopeHumRat < 0.0) { // check for monotic decrease
                                             MonotonicDecreaseFound = true;
-                                            for (StackDepth = 2; StackDepth <= ConvergLogStackDepth; ++StackDepth) {
-                                                if (ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).HumidityRatio(StackDepth - 1) >
-                                                    ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).HumidityRatio(StackDepth)) {
+                                            for (StackDepth = 2; StackDepth <= DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
+                                                if (state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).HumidityRatio(StackDepth - 1) >
+                                                    state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).HumidityRatio(StackDepth)) {
                                                     MonotonicDecreaseFound = false;
                                                     break;
                                                 }
@@ -1155,14 +1145,14 @@ namespace HVACManager {
                                                 ShowContinueError(state,
                                                                   format("Node named {} shows monotonically decreasing humidity ratio with a trend "
                                                                          "rate across iterations of {:.6R} [ kg-water/kg-dryair/iteration]",
-                                                                         NodeID(ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum),
+                                                                         NodeID(state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum),
                                                                          SlopeHumRat));
                                             }
                                         } else { // check for monotic incrase
                                             MonotonicIncreaseFound = true;
-                                            for (StackDepth = 2; StackDepth <= ConvergLogStackDepth; ++StackDepth) {
-                                                if (ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).HumidityRatio(StackDepth - 1) <
-                                                    ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).HumidityRatio(StackDepth)) {
+                                            for (StackDepth = 2; StackDepth <= DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
+                                                if (state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).HumidityRatio(StackDepth - 1) <
+                                                    state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).HumidityRatio(StackDepth)) {
                                                     MonotonicIncreaseFound = false;
                                                     break;
                                                 }
@@ -1171,7 +1161,7 @@ namespace HVACManager {
                                                 ShowContinueError(state,
                                                                   format("Node named {} shows monotonically increasing humidity ratio with a trend "
                                                                          "rate across iterations of {:.6R} [ kg-water/kg-dryair/iteration]",
-                                                                         NodeID(ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum),
+                                                                         NodeID(state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum),
                                                                          SlopeHumRat));
                                             }
                                         }
@@ -1181,11 +1171,11 @@ namespace HVACManager {
 
                             if (MonotonicDecreaseFound || MonotonicIncreaseFound || FoundOscillationByDuplicate) {
                                 HistoryTrace = "";
-                                for (StackDepth = 1; StackDepth <= ConvergLogStackDepth; ++StackDepth) {
-                                    HistoryTrace += format("{:.6R},", ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).HumidityRatio(StackDepth));
+                                for (StackDepth = 1; StackDepth <= DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
+                                    HistoryTrace += format("{:.6R},", state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).HumidityRatio(StackDepth));
                                 }
                                 ShowContinueError(state,
-                                    "Node named " + NodeID(ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum) +
+                                    "Node named " + NodeID(state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum) +
                                     " humidity ratio [kg-water/kg-dryair] iteration history trace (most recent first): " + HistoryTrace);
                             } // need to report trace
                             // end humidity ratio
@@ -1195,34 +1185,34 @@ namespace HVACManager {
                             MonotonicDecreaseFound = false;
                             MonotonicIncreaseFound = false;
                             // check for evidence of oscillation by indentify duplicates when latest value not equal to average
-                            AvgValue = sum(ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).MassFlowRate) / double(ConvergLogStackDepth);
-                            if (std::abs(ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).MassFlowRate(1) - AvgValue) >
-                                HVACFlowRateOscillationToler) { // last iterate differs from average
+                            AvgValue = sum(state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).MassFlowRate) / double(DataConvergParams::ConvergLogStackDepth);
+                            if (std::abs(state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).MassFlowRate(1) - AvgValue) >
+                                DataConvergParams::HVACFlowRateOscillationToler) { // last iterate differs from average
                                 FoundOscillationByDuplicate = false;
-                                for (StackDepth = 2; StackDepth <= ConvergLogStackDepth; ++StackDepth) {
-                                    if (std::abs(ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).MassFlowRate(1) -
-                                                 ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).MassFlowRate(StackDepth)) <
-                                        HVACFlowRateOscillationToler) {
+                                for (StackDepth = 2; StackDepth <= DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
+                                    if (std::abs(state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).MassFlowRate(1) -
+                                                 state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).MassFlowRate(StackDepth)) <
+                                        DataConvergParams::HVACFlowRateOscillationToler) {
                                         FoundOscillationByDuplicate = true;
                                         ShowContinueError(
                                             state,
                                             format("Node named {} shows oscillating mass flow rate across iterations with a repeated value of {:.6R}",
-                                                   NodeID(ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum),
-                                                   ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).MassFlowRate(1)));
+                                                   NodeID(state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum),
+                                                   state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).MassFlowRate(1)));
                                         break;
                                     }
                                 }
                                 if (!FoundOscillationByDuplicate) {
-                                    SlopeMdot = (sum_ConvergLogStackARR * sum(ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).MassFlowRate) -
-                                                 double(ConvergLogStackDepth) *
-                                                     sum((ConvergLogStackARR * ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).MassFlowRate))) /
-                                                (square_sum_ConvergLogStackARR - double(ConvergLogStackDepth) * sum_square_ConvergLogStackARR);
-                                    if (std::abs(SlopeMdot) > HVACFlowRateSlopeToler) {
+                                    SlopeMdot = (sum_ConvergLogStackARR * sum(state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).MassFlowRate) -
+                                                 double(DataConvergParams::ConvergLogStackDepth) *
+                                                     sum((ConvergLogStackARR * state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).MassFlowRate))) /
+                                                (square_sum_ConvergLogStackARR - double(DataConvergParams::ConvergLogStackDepth) * sum_square_ConvergLogStackARR);
+                                    if (std::abs(SlopeMdot) > DataConvergParams::HVACFlowRateSlopeToler) {
                                         if (SlopeMdot < 0.0) { // check for monotic decrease
                                             MonotonicDecreaseFound = true;
-                                            for (StackDepth = 2; StackDepth <= ConvergLogStackDepth; ++StackDepth) {
-                                                if (ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).MassFlowRate(StackDepth - 1) >
-                                                    ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).MassFlowRate(StackDepth)) {
+                                            for (StackDepth = 2; StackDepth <= DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
+                                                if (state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).MassFlowRate(StackDepth - 1) >
+                                                    state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).MassFlowRate(StackDepth)) {
                                                     MonotonicDecreaseFound = false;
                                                     break;
                                                 }
@@ -1231,14 +1221,14 @@ namespace HVACManager {
                                                 ShowContinueError(state,
                                                                   format("Node named {} shows monotonically decreasing mass flow rate with a trend "
                                                                          "rate across iterations of {:.6R} [kg/s/iteration]",
-                                                                         NodeID(ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum),
+                                                                         NodeID(state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum),
                                                                          SlopeMdot));
                                             }
                                         } else { // check for monotic incrase
                                             MonotonicIncreaseFound = true;
-                                            for (StackDepth = 2; StackDepth <= ConvergLogStackDepth; ++StackDepth) {
-                                                if (ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).MassFlowRate(StackDepth - 1) <
-                                                    ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).MassFlowRate(StackDepth)) {
+                                            for (StackDepth = 2; StackDepth <= DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
+                                                if (state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).MassFlowRate(StackDepth - 1) <
+                                                    state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).MassFlowRate(StackDepth)) {
                                                     MonotonicIncreaseFound = false;
                                                     break;
                                                 }
@@ -1247,7 +1237,7 @@ namespace HVACManager {
                                                 ShowContinueError(state,
                                                                   format("Node named {} shows monotonically increasing mass flow rate with a trend "
                                                                          "rate across iterations of {:.6R} [kg/s/iteration]",
-                                                                         NodeID(ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum),
+                                                                         NodeID(state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum),
                                                                          SlopeMdot));
                                             }
                                         }
@@ -1257,10 +1247,10 @@ namespace HVACManager {
 
                             if (MonotonicDecreaseFound || MonotonicIncreaseFound || FoundOscillationByDuplicate) {
                                 HistoryTrace = "";
-                                for (StackDepth = 1; StackDepth <= ConvergLogStackDepth; ++StackDepth) {
-                                    HistoryTrace += format("{:.6R},", ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).MassFlowRate(StackDepth));
+                                for (StackDepth = 1; StackDepth <= DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
+                                    HistoryTrace += format("{:.6R},", state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).MassFlowRate(StackDepth));
                                 }
-                                ShowContinueError(state, "Node named " + NodeID(ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum) +
+                                ShowContinueError(state, "Node named " + NodeID(state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum) +
                                                   " mass flow rate [kg/s] iteration history trace (most recent first): " + HistoryTrace);
                             } // need to report trace
                             // end mass flow rate
@@ -1270,34 +1260,34 @@ namespace HVACManager {
                             MonotonicDecreaseFound = false;
                             MonotonicIncreaseFound = false;
                             // check for evidence of oscillation by indentify duplicates when latest value not equal to average
-                            AvgValue = sum(ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).Temperature) / double(ConvergLogStackDepth);
-                            if (std::abs(ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).Temperature(1) - AvgValue) >
-                                HVACTemperatureOscillationToler) { // last iterate differs from average
+                            AvgValue = sum(state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).Temperature) / double(DataConvergParams::ConvergLogStackDepth);
+                            if (std::abs(state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).Temperature(1) - AvgValue) >
+                                DataConvergParams::HVACTemperatureOscillationToler) { // last iterate differs from average
                                 FoundOscillationByDuplicate = false;
-                                for (StackDepth = 2; StackDepth <= ConvergLogStackDepth; ++StackDepth) {
-                                    if (std::abs(ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).Temperature(1) -
-                                                 ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).Temperature(StackDepth)) <
-                                        HVACTemperatureOscillationToler) {
+                                for (StackDepth = 2; StackDepth <= DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
+                                    if (std::abs(state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).Temperature(1) -
+                                                 state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).Temperature(StackDepth)) <
+                                        DataConvergParams::HVACTemperatureOscillationToler) {
                                         FoundOscillationByDuplicate = true;
                                         ShowContinueError(
                                             state,
                                             format("Node named {} shows oscillating temperatures across iterations with a repeated value of {:.6R}",
-                                                   NodeID(ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum),
-                                                   ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).Temperature(1)));
+                                                   NodeID(state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum),
+                                                   state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).Temperature(1)));
                                         break;
                                     }
                                 }
                                 if (!FoundOscillationByDuplicate) {
-                                    SlopeTemps = (sum_ConvergLogStackARR * sum(ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).Temperature) -
-                                                  double(ConvergLogStackDepth) *
-                                                      sum((ConvergLogStackARR * ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).Temperature))) /
-                                                 (square_sum_ConvergLogStackARR - double(ConvergLogStackDepth) * sum_square_ConvergLogStackARR);
-                                    if (std::abs(SlopeTemps) > HVACTemperatureSlopeToler) {
-                                        if (SlopeTemps < 0.0) { // check for monotic decrease
+                                    SlopeTemps = (sum_ConvergLogStackARR * sum(state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).Temperature) -
+                                                  double(DataConvergParams::ConvergLogStackDepth) *
+                                                      sum((ConvergLogStackARR * state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).Temperature))) /
+                                                 (square_sum_ConvergLogStackARR - double(DataConvergParams::ConvergLogStackDepth) * sum_square_ConvergLogStackARR);
+                                    if (std::abs(SlopeTemps) > DataConvergParams::HVACTemperatureSlopeToler) {
+                                        if (SlopeTemps < 0.0) { // check for monotonic decrease
                                             MonotonicDecreaseFound = true;
-                                            for (StackDepth = 2; StackDepth <= ConvergLogStackDepth; ++StackDepth) {
-                                                if (ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).Temperature(StackDepth - 1) >
-                                                    ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).Temperature(StackDepth)) {
+                                            for (StackDepth = 2; StackDepth <= DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
+                                                if (state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).Temperature(StackDepth - 1) >
+                                                    state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).Temperature(StackDepth)) {
                                                     MonotonicDecreaseFound = false;
                                                     break;
                                                 }
@@ -1306,14 +1296,14 @@ namespace HVACManager {
                                                 ShowContinueError(state,
                                                                   format("Node named {} shows monotonically decreasing temperature with a trend rate "
                                                                          "across iterations of {:.4R} [C/iteration]",
-                                                                         NodeID(ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum),
+                                                                         NodeID(state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum),
                                                                          SlopeTemps));
                                             }
                                         } else { // check for monotic incrase
                                             MonotonicIncreaseFound = true;
-                                            for (StackDepth = 2; StackDepth <= ConvergLogStackDepth; ++StackDepth) {
-                                                if (ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).Temperature(StackDepth - 1) <
-                                                    ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).Temperature(StackDepth)) {
+                                            for (StackDepth = 2; StackDepth <= DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
+                                                if (state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).Temperature(StackDepth - 1) <
+                                                    state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).Temperature(StackDepth)) {
                                                     MonotonicIncreaseFound = false;
                                                     break;
                                                 }
@@ -1322,7 +1312,7 @@ namespace HVACManager {
                                                 ShowContinueError(state,
                                                                   format("Node named {} shows monotonically increasing temperatures with a trend "
                                                                          "rate across iterations of {:.4R} [C/iteration]",
-                                                                         NodeID(ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum),
+                                                                         NodeID(state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum),
                                                                          SlopeTemps));
                                             }
                                         }
@@ -1332,10 +1322,10 @@ namespace HVACManager {
 
                             if (MonotonicDecreaseFound || MonotonicIncreaseFound || FoundOscillationByDuplicate) {
                                 HistoryTrace = "";
-                                for (StackDepth = 1; StackDepth <= ConvergLogStackDepth; ++StackDepth) {
-                                    HistoryTrace += format("{:.6R},", ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).Temperature(StackDepth));
+                                for (StackDepth = 1; StackDepth <= DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
+                                    HistoryTrace += format("{:.6R},", state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).Temperature(StackDepth));
                                 }
-                                ShowContinueError(state, "Node named " + NodeID(ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum) +
+                                ShowContinueError(state, "Node named " + NodeID(state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum) +
                                                   " temperature [C] iteration history trace (most recent first): " + HistoryTrace);
                             } // need to report trace
                               // end Temperature checks
@@ -1345,17 +1335,17 @@ namespace HVACManager {
 
                     for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
 
-                        if (PlantConvergence(LoopNum).PlantMassFlowNotConverged) {
+                        if (state.dataConvergeParams->PlantConvergence(LoopNum).PlantMassFlowNotConverged) {
                             ShowContinueError(state, "Plant System Named = " + PlantLoop(LoopNum).Name + " did not converge for mass flow rate");
                             ShowContinueError(state, "Check values should be zero. Most Recent values listed first.");
                             HistoryTrace = "";
-                            for (StackDepth = 1; StackDepth <= ConvergLogStackDepth; ++StackDepth) {
-                                HistoryTrace += format("{:.6R},", PlantConvergence(LoopNum).PlantFlowDemandToSupplyTolValue(StackDepth));
+                            for (StackDepth = 1; StackDepth <= DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
+                                HistoryTrace += format("{:.6R},", state.dataConvergeParams->PlantConvergence(LoopNum).PlantFlowDemandToSupplyTolValue(StackDepth));
                             }
                             ShowContinueError(state, "Demand-to-Supply interface mass flow rate check value iteration history trace: " + HistoryTrace);
                             HistoryTrace = "";
-                            for (StackDepth = 1; StackDepth <= ConvergLogStackDepth; ++StackDepth) {
-                                HistoryTrace += format("{:.6R},", PlantConvergence(LoopNum).PlantFlowSupplyToDemandTolValue(StackDepth));
+                            for (StackDepth = 1; StackDepth <= DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
+                                HistoryTrace += format("{:.6R},", state.dataConvergeParams->PlantConvergence(LoopNum).PlantFlowSupplyToDemandTolValue(StackDepth));
                             }
                             ShowContinueError(state, "Supply-to-Demand interface mass flow rate check value iteration history trace: " + HistoryTrace);
 
@@ -1368,12 +1358,12 @@ namespace HVACManager {
                                 AvgValue =
                                     sum(PlantLoop(LoopNum).LoopSide(ThisLoopSide).InletNode.MassFlowRateHistory) / double(NumConvergenceHistoryTerms);
                                 if (std::abs(PlantLoop(LoopNum).LoopSide(ThisLoopSide).InletNode.MassFlowRateHistory(1) - AvgValue) >
-                                    PlantFlowRateOscillationToler) {
+                                    DataConvergParams::PlantFlowRateOscillationToler) {
                                     FoundOscillationByDuplicate = false;
                                     for (StackDepth = 2; StackDepth <= NumConvergenceHistoryTerms; ++StackDepth) {
                                         if (std::abs(PlantLoop(LoopNum).LoopSide(ThisLoopSide).InletNode.MassFlowRateHistory(1) -
                                                      PlantLoop(LoopNum).LoopSide(ThisLoopSide).InletNode.MassFlowRateHistory(StackDepth)) <
-                                            PlantFlowRateOscillationToler) {
+                                            DataConvergParams::PlantFlowRateOscillationToler) {
                                             FoundOscillationByDuplicate = true;
                                             ShowContinueError(
                                                 state,
@@ -1390,7 +1380,7 @@ namespace HVACManager {
                                          double(NumConvergenceHistoryTerms) *
                                              sum((ConvergenceHistoryARR * PlantLoop(LoopNum).LoopSide(ThisLoopSide).InletNode.MassFlowRateHistory))) /
                                         (square_sum_ConvergenceHistoryARR - double(NumConvergenceHistoryTerms) * sum_square_ConvergenceHistoryARR);
-                                    if (std::abs(SlopeMdot) > PlantFlowRateSlopeToler) {
+                                    if (std::abs(SlopeMdot) > DataConvergParams::PlantFlowRateSlopeToler) {
                                         if (SlopeMdot < 0.0) { // check for monotonic decrease
                                             MonotonicDecreaseFound = true;
                                             for (StackDepth = 2; StackDepth <= NumConvergenceHistoryTerms; ++StackDepth) {
@@ -1445,12 +1435,12 @@ namespace HVACManager {
                                 AvgValue = sum(PlantLoop(LoopNum).LoopSide(ThisLoopSide).OutletNode.MassFlowRateHistory) /
                                            double(NumConvergenceHistoryTerms);
                                 if (std::abs(PlantLoop(LoopNum).LoopSide(ThisLoopSide).OutletNode.MassFlowRateHistory(1) - AvgValue) >
-                                    PlantFlowRateOscillationToler) {
+                                    DataConvergParams::PlantFlowRateOscillationToler) {
                                     FoundOscillationByDuplicate = false;
                                     for (StackDepth = 2; StackDepth <= NumConvergenceHistoryTerms; ++StackDepth) {
                                         if (std::abs(PlantLoop(LoopNum).LoopSide(ThisLoopSide).OutletNode.MassFlowRateHistory(1) -
                                                      PlantLoop(LoopNum).LoopSide(ThisLoopSide).OutletNode.MassFlowRateHistory(StackDepth)) <
-                                            PlantFlowRateOscillationToler) {
+                                            DataConvergParams::PlantFlowRateOscillationToler) {
                                             FoundOscillationByDuplicate = true;
                                             ShowContinueError(
                                                 state,
@@ -1468,7 +1458,7 @@ namespace HVACManager {
                                              sum((ConvergenceHistoryARR *
                                                   PlantLoop(LoopNum).LoopSide(ThisLoopSide).OutletNode.MassFlowRateHistory))) /
                                         (square_sum_ConvergenceHistoryARR - double(NumConvergenceHistoryTerms) * sum_square_ConvergenceHistoryARR);
-                                    if (std::abs(SlopeMdot) > PlantFlowRateSlopeToler) {
+                                    if (std::abs(SlopeMdot) > DataConvergParams::PlantFlowRateSlopeToler) {
                                         if (SlopeMdot < 0.0) { // check for monotonic decrease
                                             MonotonicDecreaseFound = true;
                                             for (StackDepth = 2; StackDepth <= NumConvergenceHistoryTerms; ++StackDepth) {
@@ -1520,17 +1510,17 @@ namespace HVACManager {
 
                         } // mass flow not converged
 
-                        if (PlantConvergence(LoopNum).PlantTempNotConverged) {
+                        if (state.dataConvergeParams->PlantConvergence(LoopNum).PlantTempNotConverged) {
                             ShowContinueError(state, "Plant System Named = " + PlantLoop(LoopNum).Name + " did not converge for temperature");
                             ShowContinueError(state, "Check values should be zero. Most Recent values listed first.");
                             HistoryTrace = "";
-                            for (StackDepth = 1; StackDepth <= ConvergLogStackDepth; ++StackDepth) {
-                                HistoryTrace += format("{:.6R},", PlantConvergence(LoopNum).PlantTempDemandToSupplyTolValue(StackDepth));
+                            for (StackDepth = 1; StackDepth <= DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
+                                HistoryTrace += format("{:.6R},", state.dataConvergeParams->PlantConvergence(LoopNum).PlantTempDemandToSupplyTolValue(StackDepth));
                             }
                             ShowContinueError(state, "Demand-to-Supply interface temperature check value iteration history trace: " + HistoryTrace);
                             HistoryTrace = "";
-                            for (StackDepth = 1; StackDepth <= ConvergLogStackDepth; ++StackDepth) {
-                                HistoryTrace += format("{:.6R},", PlantConvergence(LoopNum).PlantTempSupplyToDemandTolValue(StackDepth));
+                            for (StackDepth = 1; StackDepth <= DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
+                                HistoryTrace += format("{:.6R},", state.dataConvergeParams->PlantConvergence(LoopNum).PlantTempSupplyToDemandTolValue(StackDepth));
                             }
                             ShowContinueError(state, "Supply-to-Demand interface temperature check value iteration history trace: " + HistoryTrace);
 
@@ -1543,12 +1533,12 @@ namespace HVACManager {
                                 AvgValue =
                                     sum(PlantLoop(LoopNum).LoopSide(ThisLoopSide).InletNode.TemperatureHistory) / double(NumConvergenceHistoryTerms);
                                 if (std::abs(PlantLoop(LoopNum).LoopSide(ThisLoopSide).InletNode.TemperatureHistory(1) - AvgValue) >
-                                    PlantTemperatureOscillationToler) {
+                                    DataConvergParams::PlantTemperatureOscillationToler) {
                                     FoundOscillationByDuplicate = false;
                                     for (StackDepth = 2; StackDepth <= NumConvergenceHistoryTerms; ++StackDepth) {
                                         if (std::abs(PlantLoop(LoopNum).LoopSide(ThisLoopSide).InletNode.TemperatureHistory(1) -
                                                      PlantLoop(LoopNum).LoopSide(ThisLoopSide).InletNode.TemperatureHistory(StackDepth)) <
-                                            PlantTemperatureOscillationToler) {
+                                            DataConvergParams::PlantTemperatureOscillationToler) {
                                             FoundOscillationByDuplicate = true;
                                             ShowContinueError(
                                                 state,
@@ -1566,7 +1556,7 @@ namespace HVACManager {
                                          double(NumConvergenceHistoryTerms) *
                                              sum((ConvergenceHistoryARR * PlantLoop(LoopNum).LoopSide(ThisLoopSide).InletNode.TemperatureHistory))) /
                                         (square_sum_ConvergenceHistoryARR - double(NumConvergenceHistoryTerms) * sum_square_ConvergenceHistoryARR);
-                                    if (std::abs(SlopeTemps) > PlantTemperatureSlopeToler) {
+                                    if (std::abs(SlopeTemps) > DataConvergParams::PlantTemperatureSlopeToler) {
                                         if (SlopeTemps < 0.0) { // check for monotic decrease
                                             MonotonicDecreaseFound = true;
                                             for (StackDepth = 2; StackDepth <= NumConvergenceHistoryTerms; ++StackDepth) {
@@ -1621,12 +1611,12 @@ namespace HVACManager {
                                 AvgValue =
                                     sum(PlantLoop(LoopNum).LoopSide(ThisLoopSide).OutletNode.TemperatureHistory) / double(NumConvergenceHistoryTerms);
                                 if (std::abs(PlantLoop(LoopNum).LoopSide(ThisLoopSide).OutletNode.TemperatureHistory(1) - AvgValue) >
-                                    PlantTemperatureOscillationToler) {
+                                    DataConvergParams::PlantTemperatureOscillationToler) {
                                     FoundOscillationByDuplicate = false;
                                     for (StackDepth = 2; StackDepth <= NumConvergenceHistoryTerms; ++StackDepth) {
                                         if (std::abs(PlantLoop(LoopNum).LoopSide(ThisLoopSide).OutletNode.TemperatureHistory(1) -
                                                      PlantLoop(LoopNum).LoopSide(ThisLoopSide).OutletNode.TemperatureHistory(StackDepth)) <
-                                            PlantTemperatureOscillationToler) {
+                                            DataConvergParams::PlantTemperatureOscillationToler) {
                                             FoundOscillationByDuplicate = true;
                                             ShowContinueError(
                                                 state,
@@ -1644,7 +1634,7 @@ namespace HVACManager {
                                          double(NumConvergenceHistoryTerms) *
                                              sum((ConvergenceHistoryARR * PlantLoop(LoopNum).LoopSide(ThisLoopSide).OutletNode.TemperatureHistory))) /
                                         (square_sum_ConvergenceHistoryARR - double(NumConvergenceHistoryTerms) * sum_square_ConvergenceHistoryARR);
-                                    if (std::abs(SlopeTemps) > PlantFlowRateSlopeToler) {
+                                    if (std::abs(SlopeTemps) > DataConvergParams::PlantFlowRateSlopeToler) {
                                         if (SlopeTemps < 0.0) { // check for monotic decrease
                                             MonotonicDecreaseFound = true;
                                             for (StackDepth = 2; StackDepth <= NumConvergenceHistoryTerms; ++StackDepth) {
@@ -1885,9 +1875,9 @@ namespace HVACManager {
 
             RepIterAir += IterAir;
             if (IterAir > MaxAir) {
-                AirLoopConvergFail = 1;
+                state.dataConvergeParams->AirLoopConvergFail = 1;
             } else {
-                AirLoopConvergFail = 0;
+                state.dataConvergeParams->AirLoopConvergFail = 0;
             }
             // Check to see if any components have been locked out. If so, SimAirLoops will be reset to TRUE.
             ResolveLockoutFlags(state, SimAirLoops);
@@ -1994,24 +1984,6 @@ namespace HVACManager {
         // Sets the MassFlowRateMaxAvail on the terminal unit inlet nodes to match the
         // maximum available from the primary air loop.
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using DataConvergParams::HVACFlowRateToler;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int AirLoopIndex;
         int ZonesCooledIndex;
@@ -2031,7 +2003,7 @@ namespace HVACManager {
                     if (Node(SupplyNode).MassFlowRate > 0.0) {
                         // must include bypass flow for ChangeoverBypass system so that terminal units are not restricted (e.g., MaxAvail is lowered)
                         if ((Node(SupplyNode).MassFlowRateSetPoint - Node(SupplyNode).MassFlowRate - state.dataAirLoop->AirLoopFlow(AirLoopIndex).BypassMassFlow) >
-                            HVACFlowRateToler * 0.01) {
+                            DataConvergParams::HVACFlowRateToler * 0.01) {
                             FlowRatio = Node(SupplyNode).MassFlowRate / Node(SupplyNode).MassFlowRateSetPoint;
                             for (ZonesCooledIndex = 1; ZonesCooledIndex <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopIndex).NumZonesCooled; ++ZonesCooledIndex) {
                                 TermInletNode = state.dataAirLoop->AirToZoneNodeInfo(AirLoopIndex).TermUnitCoolInletNodes(ZonesCooledIndex);
@@ -2041,7 +2013,7 @@ namespace HVACManager {
                             }
                         }
                         if ((Node(SupplyNode).MassFlowRateSetPoint - Node(SupplyNode).MassFlowRate - state.dataAirLoop->AirLoopFlow(AirLoopIndex).BypassMassFlow) <
-                            -HVACFlowRateToler * 0.01) {
+                            -DataConvergParams::HVACFlowRateToler * 0.01) {
                             if (Node(SupplyNode).MassFlowRateSetPoint == 0.0) {
                                 //               CALL ShowFatalError('ResolveAirLoopFlowLimits: Node MassFlowRateSetPoint = 0.0, Node='//  &
                                 //                                   TRIM(NodeID(SupplyNode))//  &
@@ -2074,7 +2046,7 @@ namespace HVACManager {
                     if (Node(SupplyNode).MassFlowRate > 0.0) {
                         // must include bypass flow for ChangeoverBypass system so that terminal units are not restricted (e.g., MaxAvail is lowered)
                         if ((Node(SupplyNode).MassFlowRateSetPoint - Node(SupplyNode).MassFlowRate - state.dataAirLoop->AirLoopFlow(AirLoopIndex).BypassMassFlow) >
-                            HVACFlowRateToler * 0.01) {
+                            DataConvergParams::HVACFlowRateToler * 0.01) {
                             FlowRatio = Node(SupplyNode).MassFlowRate / Node(SupplyNode).MassFlowRateSetPoint;
                             for (ZonesHeatedIndex = 1; ZonesHeatedIndex <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopIndex).NumZonesHeated; ++ZonesHeatedIndex) {
                                 TermInletNode = state.dataAirLoop->AirToZoneNodeInfo(AirLoopIndex).TermUnitHeatInletNodes(ZonesHeatedIndex);
@@ -2084,7 +2056,7 @@ namespace HVACManager {
                             }
                         }
                         if ((Node(SupplyNode).MassFlowRateSetPoint - Node(SupplyNode).MassFlowRate - state.dataAirLoop->AirLoopFlow(AirLoopIndex).BypassMassFlow) <
-                            -HVACFlowRateToler * 0.01) {
+                            -DataConvergParams::HVACFlowRateToler * 0.01) {
                             if (Node(SupplyNode).MassFlowRateSetPoint == 0.0) {
                                 // CALL ShowFatalError('ResolveAirLoopFlowLimits: Node MassFlowRateSetPoint = 0.0, Node='//  &
                                 // TRIM(NodeID(SupplyNode))//  &
@@ -3052,8 +3024,6 @@ namespace HVACManager {
         // na
 
         // Using/Aliasing
-        using DataConvergParams::ConvergLogStackDepth;
-        using DataConvergParams::ZoneInletConvergence;
         using DataLoopNode::Node;
 
         // Locals
@@ -3073,26 +3043,26 @@ namespace HVACManager {
         int ZoneNum;
         int NodeIndex;
         int NodeNum;
-        Array1D<Real64> tmpRealARR(ConvergLogStackDepth);
+        Array1D<Real64> tmpRealARR(DataConvergParams::ConvergLogStackDepth);
 
         for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
 
-            for (NodeIndex = 1; NodeIndex <= ZoneInletConvergence(ZoneNum).NumInletNodes; ++NodeIndex) {
-                NodeNum = ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum;
+            for (NodeIndex = 1; NodeIndex <= state.dataConvergeParams->ZoneInletConvergence(ZoneNum).NumInletNodes; ++NodeIndex) {
+                NodeNum = state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum;
 
-                tmpRealARR = ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).HumidityRatio;
-                ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).HumidityRatio(1) = Node(NodeNum).HumRat;
-                ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).HumidityRatio({2, ConvergLogStackDepth}) =
-                    tmpRealARR({1, ConvergLogStackDepth - 1});
+                tmpRealARR = state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).HumidityRatio;
+                state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).HumidityRatio(1) = Node(NodeNum).HumRat;
+                state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).HumidityRatio({2, DataConvergParams::ConvergLogStackDepth}) =
+                    tmpRealARR({1, DataConvergParams::ConvergLogStackDepth - 1});
 
-                tmpRealARR = ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).MassFlowRate;
-                ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).MassFlowRate(1) = Node(NodeNum).MassFlowRate;
-                ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).MassFlowRate({2, ConvergLogStackDepth}) =
-                    tmpRealARR({1, ConvergLogStackDepth - 1});
+                tmpRealARR = state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).MassFlowRate;
+                state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).MassFlowRate(1) = Node(NodeNum).MassFlowRate;
+                state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).MassFlowRate({2, DataConvergParams::ConvergLogStackDepth}) =
+                    tmpRealARR({1, DataConvergParams::ConvergLogStackDepth - 1});
 
-                tmpRealARR = ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).Temperature;
-                ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).Temperature(1) = Node(NodeNum).Temp;
-                ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).Temperature({2, ConvergLogStackDepth}) = tmpRealARR({1, ConvergLogStackDepth - 1});
+                tmpRealARR = state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).Temperature;
+                state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).Temperature(1) = Node(NodeNum).Temp;
+                state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).Temperature({2, DataConvergParams::ConvergLogStackDepth}) = tmpRealARR({1, DataConvergParams::ConvergLogStackDepth - 1});
             }
         }
     }

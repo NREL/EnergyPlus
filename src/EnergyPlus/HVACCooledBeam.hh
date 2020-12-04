@@ -202,7 +202,7 @@ namespace HVACCooledBeam {
                             Real64 CWFlow, // cold water flow rate in kg/s
                             Array1D<Real64> const &Par);
 
-    void UpdateCoolBeam(int CBNum);
+    void UpdateCoolBeam(EnergyPlusData &state, int CBNum);
 
     void ReportCoolBeam(EnergyPlusData &state, int CBNum);
 

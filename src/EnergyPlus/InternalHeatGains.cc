@@ -5260,7 +5260,6 @@ namespace InternalHeatGains {
         using DataHeatBalFanSys::SumConvHTRadSys;
         using DataHeatBalFanSys::ZoneLatentGain;
         using DataHeatBalFanSys::ZoneLatentGainExceptPeople;
-        using namespace DataDaylighting;
         using DataRoomAirModel::IsZoneDV;
         using DataRoomAirModel::IsZoneUI;
         using DataRoomAirModel::TCMF;
@@ -5436,10 +5435,10 @@ namespace InternalHeatGains {
             int NZ = Lights(Loop).ZonePtr;
             Q = Lights(Loop).DesignLevel * GetCurrentScheduleValue(state, Lights(Loop).SchedPtr);
 
-            if (ZoneDaylight(NZ).DaylightMethod == SplitFluxDaylighting || ZoneDaylight(NZ).DaylightMethod == DElightDaylighting) {
+            if (state.dataDaylightingData->ZoneDaylight(NZ).DaylightMethod == DataDaylighting::iDaylightingMethod::SplitFluxDaylighting || state.dataDaylightingData->ZoneDaylight(NZ).DaylightMethod == DataDaylighting::iDaylightingMethod::DElightDaylighting) {
 
                 if (Lights(Loop).FractionReplaceable > 0.0) { // FractionReplaceable can only be 0 or 1 for these models
-                    Q *= ZoneDaylight(NZ).ZonePowerReductionFactor;
+                    Q *= state.dataDaylightingData->ZoneDaylight(NZ).ZonePowerReductionFactor;
                 }
             }
 
@@ -6445,8 +6444,6 @@ namespace InternalHeatGains {
         // level for a zone.
 
         // Using/Aliasing
-        using namespace DataDaylighting;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Loop;
         Real64 LightsRepMin; // Minimum Lighting replacement fraction for any lights statement for this zone
@@ -6466,8 +6463,8 @@ namespace InternalHeatGains {
             LightsRepMin = min(LightsRepMin, Lights(Loop).FractionReplaceable);
             LightsRepMax = max(LightsRepMax, Lights(Loop).FractionReplaceable);
             ++NumLights;
-            if ((ZoneDaylight(Lights(Loop).ZonePtr).DaylightMethod == SplitFluxDaylighting ||
-                 ZoneDaylight(Lights(Loop).ZonePtr).DaylightMethod == DElightDaylighting) &&
+            if ((state.dataDaylightingData->ZoneDaylight(Lights(Loop).ZonePtr).DaylightMethod == DataDaylighting::iDaylightingMethod::SplitFluxDaylighting ||
+                 state.dataDaylightingData->ZoneDaylight(Lights(Loop).ZonePtr).DaylightMethod == DataDaylighting::iDaylightingMethod::DElightDaylighting) &&
                 (Lights(Loop).FractionReplaceable > 0.0 && Lights(Loop).FractionReplaceable < 1.0)) {
                 ShowWarningError(state, "CheckLightsReplaceableMinMaxForZone: Fraction Replaceable must be 0.0 or 1.0 if used with daylighting.");
                 ShowContinueError(state, "..Lights=\"" + Lights(Loop).Name + "\", Fraction Replaceable will be reset to 1.0 to allow dimming controls");
@@ -6476,7 +6473,7 @@ namespace InternalHeatGains {
             }
         }
 
-        if (ZoneDaylight(WhichZone).DaylightMethod == SplitFluxDaylighting) {
+        if (state.dataDaylightingData->ZoneDaylight(WhichZone).DaylightMethod == DataDaylighting::iDaylightingMethod::SplitFluxDaylighting) {
             if (LightsRepMax == 0.0) {
                 ShowWarningError(state, "CheckLightsReplaceable: Zone \"" + Zone(WhichZone).Name + "\" has Daylighting:Controls.");
                 ShowContinueError(state, "but all of the LIGHTS object in that zone have zero Fraction Replaceable.");
@@ -6487,7 +6484,7 @@ namespace InternalHeatGains {
                 ShowContinueError(state, "but there are no LIGHTS objects in that zone.");
                 ShowContinueError(state, "The daylighting controls will have no effect.");
             }
-        } else if (ZoneDaylight(WhichZone).DaylightMethod == DElightDaylighting) {
+        } else if (state.dataDaylightingData->ZoneDaylight(WhichZone).DaylightMethod == DataDaylighting::iDaylightingMethod::DElightDaylighting) {
             if (LightsRepMax == 0.0) {
                 ShowWarningError(state, "CheckLightsReplaceable: Zone \"" + Zone(WhichZone).Name + "\" has Daylighting:Controls.");
                 ShowContinueError(state, "but all of the LIGHTS object in that zone have zero Fraction Replaceable.");
@@ -6511,8 +6508,6 @@ namespace InternalHeatGains {
         //       RE-ENGINEERED  na
 
         // Using/Aliasing
-        using DataContaminantBalance::Contaminant;
-        using DataContaminantBalance::ZoneGCGain;
         using DataHeatBalFanSys::ZoneLatentGain;
         using DataHeatBalFanSys::ZoneLatentGainExceptPeople; // Added for hybrid model
 
@@ -6553,10 +6548,10 @@ namespace InternalHeatGains {
             }
         }
 
-        if (Contaminant.GenericContamSimulation && allocated(ZoneGCGain)) {
+        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation && allocated(state.dataContaminantBalance->ZoneGCGain)) {
             for (NZ = 1; NZ <= state.dataGlobal->NumOfZones; ++NZ) {
-                SumAllInternalGenericContamGains(NZ, ZoneGCGain(NZ));
-                ZnRpt(NZ).GCRate = ZoneGCGain(NZ);
+                SumAllInternalGenericContamGains(NZ, state.dataContaminantBalance->ZoneGCGain(NZ));
+                ZnRpt(NZ).GCRate = state.dataContaminantBalance->ZoneGCGain(NZ);
             }
         }
     }
