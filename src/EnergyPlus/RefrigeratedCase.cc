@@ -195,75 +195,6 @@ namespace EnergyPlus::RefrigeratedCase {
     // includes DataGlobals::CurrentTime, in fractional hours, from start of day. Uses Loads time step.
     // includes DataGlobals::NumOfZones
 
-    // Anti-sweat heater control type
-    int const ASNone(0);
-    int const ASConstant(1);
-    int const ASLinear(2);
-    int const ASDewPoint(3);
-    int const ASHeatBalance(4);
-    // Refrigerated display case defrost type
-    int const DefNone(0);
-    int const DefOffCycle(1);
-    int const DefHotFluid(2);
-    int const DefHotFluidTerm(4);
-    int const DefElectric(5);
-    int const DefElectricOnDemand(6);
-    int const DefElectricTerm(7);
-
-    // Refrigerated display case rack heat rejection location
-    int const LocationOutdoors(1);
-    int const LocationZone(2);
-    // Air- and evap-cooled condenser fan speed control types
-    int const FanVariableSpeed(1);
-    int const FanConstantSpeedLinear(2);
-    int const FanTwoSpeed(3);
-    int const FanConstantSpeed(4);
-    // Water-cooled condenser loop flow type
-    int const VariableFlow(1);
-    int const ConstantFlow(2);
-
-    // Cascade condenser temperature control types
-    int const CascadeTempSet(1);
-    int const CascadeTempFloat(2);
-    // Refrigerated display case energy equation form
-    int const None(0);
-    int const CaseTemperatureMethod(1);
-    int const RHCubic(2);
-    int const DPCubic(3);
-    // Secondary loop parameters
-    int const SecFluidTypeAlwaysLiquid(1);
-    int const SecFluidTypePhaseChange(2);
-    int const SecPumpControlConstant(1);
-    int const SecPumpControlVariable(2);
-    // Walk In Cooler Defrost type
-    int const WalkInDefrostFluid(1);
-    int const WalkInDefrostElec(2);
-    int const WalkInDefrostNone(3);
-    int const WalkInDefrostOffCycle(4);
-    // Walk In Cooler Defrost Control type
-    int const DefrostControlSched(1);
-    int const DefrostContTempTerm(2);
-    // Walk In Cooler Stock Door Protection types
-    int const WIStockDoorNone(1);
-    int const WIStockDoorAirCurtain(2);
-    int const WIStockDoorStripCurtain(3);
-    // Subcooler type
-    int const LiquidSuction(1);
-    int const Mechanical(2);
-    // Compressor suction pressure control
-    int const FloatSuctionTemperature(1);
-    int const ConstantSuctionTemperature(2);
-    // Compressor rating types
-    int const RatedSuperheat(1);
-    int const RatedReturnGasTemperature(2);
-    int const RatedSubcooling(1);
-    int const RatedLiquidTemperature(2);
-    // Warehouse coil Defrost type
-    int const DefrostFluid(1);
-    int const DefrostElec(2);
-    int const DefrostNone(3);
-    int const DefrostOffCycle(4);
-
     // Following constant approp for R22, future may make f(refrigerant)
     Real64 constexpr CaseSuperheat(4.0);                // case superheat used to control thermal expansion valve, ASHRAE 2006 p 44.6 (C)
     Real64 constexpr TransCaseSuperheat(10.0);          // case superheat for transcritical CO2 systems (C)
@@ -729,11 +660,11 @@ namespace EnergyPlus::RefrigeratedCase {
                 }
 
                 if (UtilityRoutines::SameString(Alphas(4), "CaseTemperatureMethod")) {
-                    RefrigCase(CaseNum).LatentEnergyCurveType = CaseTemperatureMethod;
+                    RefrigCase(CaseNum).LatentEnergyCurveType = iEnergyEqnForm::CaseTemperatureMethod;
                 } else if (UtilityRoutines::SameString(Alphas(4), "RelativeHumidityMethod")) {
-                    RefrigCase(CaseNum).LatentEnergyCurveType = RHCubic;
+                    RefrigCase(CaseNum).LatentEnergyCurveType = iEnergyEqnForm::RHCubic;
                 } else if (UtilityRoutines::SameString(Alphas(4), "DewpointMethod")) {
-                    RefrigCase(CaseNum).LatentEnergyCurveType = DPCubic;
+                    RefrigCase(CaseNum).LatentEnergyCurveType = iEnergyEqnForm::DPCubic;
                 } else {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\", invalid  " + cAlphaFieldNames(4) +
                                     "=\"" + Alphas(4) + "\".");
@@ -853,16 +784,16 @@ namespace EnergyPlus::RefrigeratedCase {
                 }
 
                 if (UtilityRoutines::SameString(Alphas(7), "None")) {
-                    RefrigCase(CaseNum).AntiSweatControlType = ASNone;
+                    RefrigCase(CaseNum).AntiSweatControlType = iASHtrCtrlType::None;
                     RefrigCase(CaseNum).AntiSweatPower = 0.0;
                 } else if (UtilityRoutines::SameString(Alphas(7), "Constant")) {
-                    RefrigCase(CaseNum).AntiSweatControlType = ASConstant;
+                    RefrigCase(CaseNum).AntiSweatControlType = iASHtrCtrlType::Constant;
                 } else if (UtilityRoutines::SameString(Alphas(7), "Linear")) {
-                    RefrigCase(CaseNum).AntiSweatControlType = ASLinear;
+                    RefrigCase(CaseNum).AntiSweatControlType = iASHtrCtrlType::Linear;
                 } else if (UtilityRoutines::SameString(Alphas(7), "DewpointMethod")) {
-                    RefrigCase(CaseNum).AntiSweatControlType = ASDewPoint;
+                    RefrigCase(CaseNum).AntiSweatControlType = iASHtrCtrlType::DewPoint;
                 } else if (UtilityRoutines::SameString(Alphas(7), "HeatBalanceMethod")) {
-                    RefrigCase(CaseNum).AntiSweatControlType = ASHeatBalance;
+                    RefrigCase(CaseNum).AntiSweatControlType = iASHtrCtrlType::HeatBalance;
                 } else {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\", invalid  " + cAlphaFieldNames(7) +
                                     "=\"" + Alphas(7) + "\".");
@@ -871,7 +802,7 @@ namespace EnergyPlus::RefrigeratedCase {
 
                 //   Assure that case temperature is below the rated dew point when anti-sweat heater control type is dew point method
                 if (RefrigCase(CaseNum).Temperature >= RefrigCase(CaseNum).RatedAmbientDewPoint &&
-                    RefrigCase(CaseNum).AntiSweatControlType == ASDewPoint) {
+                    RefrigCase(CaseNum).AntiSweatControlType == iASHtrCtrlType::DewPoint) {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\", " + cNumericFieldNames(7) +
                                     " must be below the Rated Ambient Dew Point when " + cAlphaFieldNames(7) + " is Dew Point Method");
                     ErrorsFound = true;
@@ -882,7 +813,7 @@ namespace EnergyPlus::RefrigeratedCase {
                 RefrigCase(CaseNum).HumAtZeroAS = Numbers(NumNum);
 
                 //   check minimum humidity when linear AS control type is used
-                if (RefrigCase(CaseNum).HumAtZeroAS >= RefrigCase(CaseNum).RatedAmbientRH && RefrigCase(CaseNum).AntiSweatControlType == ASLinear) {
+                if (RefrigCase(CaseNum).HumAtZeroAS >= RefrigCase(CaseNum).RatedAmbientRH && RefrigCase(CaseNum).AntiSweatControlType == iASHtrCtrlType::Linear) {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\", " + cNumericFieldNames(NumNum) +
                                     " must be less than " + cNumericFieldNames(2));
                     ShowContinueError(state, " for Linear " + cAlphaFieldNames(7) + '.');
@@ -897,7 +828,7 @@ namespace EnergyPlus::RefrigeratedCase {
                     ErrorsFound = true;
                 }
 
-                if (RefrigCase(CaseNum).Height <= 0.0 && RefrigCase(CaseNum).AntiSweatControlType == ASHeatBalance) {
+                if (RefrigCase(CaseNum).Height <= 0.0 && RefrigCase(CaseNum).AntiSweatControlType == iASHtrCtrlType::HeatBalance) {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\", " + cNumericFieldNames(NumNum) +
                                     " must be greater than 0 when " + cAlphaFieldNames(7) + " is Heat Balance Method.");
                     ShowContinueError(state, format("..given {} was: {:.3R}", cNumericFieldNames(NumNum), RefrigCase(CaseNum).Height));
@@ -905,7 +836,7 @@ namespace EnergyPlus::RefrigeratedCase {
                 }
 
                 //   initialize case resistance for anti-sweat heater control type = Heat Balance Method
-                if (RefrigCase(CaseNum).AntiSweatControlType == ASHeatBalance) {
+                if (RefrigCase(CaseNum).AntiSweatControlType == iASHtrCtrlType::HeatBalance) {
                     Real64 Rcase(0.0);      // Case thermal resistance used with anti-sweat heater control
                     Real64 RcaseDenom(0.0); // Denominator of case thermal resistance calculation for anti-sweat
 
@@ -935,30 +866,30 @@ namespace EnergyPlus::RefrigeratedCase {
                 }
 
                 if (UtilityRoutines::SameString(Alphas(8), "None")) {
-                    RefrigCase(CaseNum).DefrostType = DefNone;
+                    RefrigCase(CaseNum).DefrostType = iRefCaseDefrostType::None;
                 } else if (UtilityRoutines::SameString(Alphas(8), "OffCycle")) {
-                    RefrigCase(CaseNum).DefrostType = DefOffCycle;
+                    RefrigCase(CaseNum).DefrostType = iRefCaseDefrostType::OffCycle;
                 } else if ((UtilityRoutines::SameString(Alphas(8), "HotFluid")) || (UtilityRoutines::SameString(Alphas(8), "HotGas"))) {
-                    RefrigCase(CaseNum).DefrostType = DefHotFluid;
+                    RefrigCase(CaseNum).DefrostType = iRefCaseDefrostType::HotFluid;
                 } else if ((UtilityRoutines::SameString(Alphas(8), "HotFluidWithTemperatureTermination")) ||
                            (UtilityRoutines::SameString(Alphas(8), "HotGasWithTemperatureTermination"))) {
-                    RefrigCase(CaseNum).DefrostType = DefHotFluidTerm;
+                    RefrigCase(CaseNum).DefrostType = iRefCaseDefrostType::HotFluidTerm;
                     //   ELSEIF (UtilityRoutines::SameString(Alphas(8),'Hot-Fluid On Demand')) THEN
                     //     RefrigCase(CaseNum)%DefrostType = DefHotFluidOnDemand
                 } else if (UtilityRoutines::SameString(Alphas(8), "Electric")) {
-                    RefrigCase(CaseNum).DefrostType = DefElectric;
+                    RefrigCase(CaseNum).DefrostType = iRefCaseDefrostType::Electric;
                 } else if (UtilityRoutines::SameString(Alphas(8), "ElectricWithTemperatureTermination")) {
-                    RefrigCase(CaseNum).DefrostType = DefElectricTerm;
+                    RefrigCase(CaseNum).DefrostType = iRefCaseDefrostType::ElectricTerm;
                     //   ELSEIF (UtilityRoutines::SameString(Alphas(8),'Electric On Demand')) THEN
                     //     RefrigCase(CaseNum)%DefrostType = DefElectricOnDemand
                 } else {
                     ShowWarningError(state, CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\", invalid  " + cAlphaFieldNames(8) + "=\"" +
                                      Alphas(8) + "\".");
                     ShowContinueError(state, "Simulation will default to " + cAlphaFieldNames(8) + "=\"None\" and continue.");
-                    RefrigCase(CaseNum).DefrostType = DefNone;
+                    RefrigCase(CaseNum).DefrostType = iRefCaseDefrostType::None;
                 }
 
-                int DefType = RefrigCase(CaseNum).DefrostType;
+                auto DefType = RefrigCase(CaseNum).DefrostType;
                 NumNum = 18;
                 if (!lNumericBlanks(NumNum)) {
                     RefrigCase(CaseNum).DefrostPower = Numbers(NumNum);
@@ -968,7 +899,7 @@ namespace EnergyPlus::RefrigeratedCase {
                         ErrorsFound = true;
                     }
                     //   disregard defrost power for Off-Cycle or None defrost types
-                    if ((DefType == DefOffCycle || DefType == DefNone) && (RefrigCase(CaseNum).DefrostPower > 0.0)) {
+                    if ((DefType == iRefCaseDefrostType::OffCycle || DefType == iRefCaseDefrostType::None) && (RefrigCase(CaseNum).DefrostPower > 0.0)) {
                         RefrigCase(CaseNum).DefrostPower = 0.0;
                         ShowWarningError(state, CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\", " + cNumericFieldNames(NumNum) + " for " +
                                          cAlphaFieldNames(8) + " None or Off-Cycle will be set to 0 and simulation continues.");
@@ -978,7 +909,7 @@ namespace EnergyPlus::RefrigeratedCase {
                 }
 
                 // defrost power needed to calculate heat gain to case even if not needed for electric consumption
-                if ((DefType == DefHotFluid || DefType == DefHotFluidTerm || DefType == DefElectric || DefType == DefElectricTerm) &&
+                if ((DefType == iRefCaseDefrostType::HotFluid || DefType == iRefCaseDefrostType::HotFluidTerm || DefType == iRefCaseDefrostType::Electric || DefType == iRefCaseDefrostType::ElectricTerm) &&
                     RefrigCase(CaseNum).DefrostPower <= 0.0) {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\", " + cNumericFieldNames(NumNum) +
                                     " must be greater than 0 W/m for " + cAlphaFieldNames(8) + ' ' + Alphas(8));
@@ -986,7 +917,7 @@ namespace EnergyPlus::RefrigeratedCase {
                 }
 
                 RefrigCase(CaseNum).DefrostSchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(9)); // convert schedule name to pointer
-                if (RefrigCase(CaseNum).DefrostSchedPtr == 0 && RefrigCase(CaseNum).DefrostType != DefNone) {
+                if (RefrigCase(CaseNum).DefrostSchedPtr == 0 && RefrigCase(CaseNum).DefrostType != iRefCaseDefrostType::None) {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\", invalid  " + cAlphaFieldNames(9) +
                                     " not found: " + Alphas(9));
                     ShowContinueError(state, "required when " + cAlphaFieldNames(8) + "=\"" + Alphas(8) + "\".");
@@ -1055,13 +986,13 @@ namespace EnergyPlus::RefrigeratedCase {
                 }
 
                 if (UtilityRoutines::SameString(Alphas(11), "CaseTemperatureMethod")) {
-                    RefrigCase(CaseNum).DefrostEnergyCurveType = CaseTemperatureMethod;
+                    RefrigCase(CaseNum).DefrostEnergyCurveType = iEnergyEqnForm::CaseTemperatureMethod;
                 } else if (UtilityRoutines::SameString(Alphas(11), "RelativeHumidityMethod")) {
-                    RefrigCase(CaseNum).DefrostEnergyCurveType = RHCubic;
+                    RefrigCase(CaseNum).DefrostEnergyCurveType = iEnergyEqnForm::RHCubic;
                 } else if (UtilityRoutines::SameString(Alphas(11), "DewpointMethod")) {
-                    RefrigCase(CaseNum).DefrostEnergyCurveType = DPCubic;
+                    RefrigCase(CaseNum).DefrostEnergyCurveType = iEnergyEqnForm::DPCubic;
                 } else if (UtilityRoutines::SameString(Alphas(11), "None")) {
-                    RefrigCase(CaseNum).DefrostEnergyCurveType = None;
+                    RefrigCase(CaseNum).DefrostEnergyCurveType = iEnergyEqnForm::None;
                 } else {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\", invalid  " + cAlphaFieldNames(11) +
                                     "=\"" + Alphas(11) + "\".");
@@ -1069,7 +1000,7 @@ namespace EnergyPlus::RefrigeratedCase {
                 }
 
                 RefrigCase(CaseNum).DefCapCurvePtr = CurveManager::GetCurveIndex(state, Alphas(12)); // convert curve name to number
-                if ((RefrigCase(CaseNum).DefrostType == DefElectricTerm || RefrigCase(CaseNum).DefrostType == DefHotFluidTerm) &&
+                if ((RefrigCase(CaseNum).DefrostType == iRefCaseDefrostType::ElectricTerm || RefrigCase(CaseNum).DefrostType == iRefCaseDefrostType::HotFluidTerm) &&
                     (RefrigCase(CaseNum).DefCapCurvePtr == 0)) {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\", invalid  " + cAlphaFieldNames(12) +
                                     " not found:" + Alphas(12));
@@ -1087,7 +1018,7 @@ namespace EnergyPlus::RefrigeratedCase {
 
                 //  warn user if defrost energy curve is entered that it is only used for temperature termination types
                 if (RefrigCase(CaseNum).DefCapCurvePtr > 0) {
-                    if (RefrigCase(CaseNum).DefrostType != DefElectricTerm && RefrigCase(CaseNum).DefrostType != DefHotFluidTerm) {
+                    if (RefrigCase(CaseNum).DefrostType != iRefCaseDefrostType::ElectricTerm && RefrigCase(CaseNum).DefrostType != iRefCaseDefrostType::HotFluidTerm) {
                         ShowWarningError(state, CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\", invalid  " + cAlphaFieldNames(12) +
                                          " is only applicable to Defrost Temperature Termination types.");
                         ShowContinueError(state, cAlphaFieldNames(12) + " will be disregarded and simulation continues.");
@@ -1386,13 +1317,13 @@ namespace EnergyPlus::RefrigeratedCase {
                 // Input walk-in cooler defrost information
                 AlphaNum = 5;
                 if (lAlphaBlanks(AlphaNum) || UtilityRoutines::SameString(Alphas(AlphaNum), "Electric")) {
-                    WalkIn(WalkInID).DefrostType = WalkInDefrostElec;
+                    WalkIn(WalkInID).DefrostType = WalkinClrDefrostType::Elec;
                 } else if (UtilityRoutines::SameString(Alphas(AlphaNum), "HotFluid")) {
-                    WalkIn(WalkInID).DefrostType = WalkInDefrostFluid;
+                    WalkIn(WalkInID).DefrostType = WalkinClrDefrostType::Fluid;
                 } else if (UtilityRoutines::SameString(Alphas(AlphaNum), "None")) {
-                    WalkIn(WalkInID).DefrostType = WalkInDefrostNone;
+                    WalkIn(WalkInID).DefrostType = WalkinClrDefrostType::None;
                 } else if (UtilityRoutines::SameString(Alphas(AlphaNum), "OffCycle")) {
-                    WalkIn(WalkInID).DefrostType = WalkInDefrostOffCycle;
+                    WalkIn(WalkInID).DefrostType = WalkinClrDefrostType::OffCycle;
                 } else {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + WalkIn(WalkInID).Name + "\", invalid  " + cAlphaFieldNames(AlphaNum) +
                                     "=\"" + Alphas(AlphaNum) + "\".");
@@ -1401,9 +1332,9 @@ namespace EnergyPlus::RefrigeratedCase {
 
                 AlphaNum = 6;
                 if (lAlphaBlanks(AlphaNum) || UtilityRoutines::SameString(Alphas(AlphaNum), "TimeSchedule")) {
-                    WalkIn(WalkInID).DefrostControlType = DefrostControlSched;
+                    WalkIn(WalkInID).DefrostControlType = iDefrostCtrlType::Sched;
                 } else if (UtilityRoutines::SameString(Alphas(AlphaNum), "TemperatureTermination")) {
-                    WalkIn(WalkInID).DefrostControlType = DefrostContTempTerm;
+                    WalkIn(WalkInID).DefrostControlType = iDefrostCtrlType::TempTerm;
                 } else {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + WalkIn(WalkInID).Name + "\", invalid  " + cAlphaFieldNames(AlphaNum) +
                                     " not found: " + Alphas(AlphaNum));
@@ -1451,7 +1382,7 @@ namespace EnergyPlus::RefrigeratedCase {
                     WalkIn(WalkInID).DefrostDripDownSchedPtr = WalkIn(WalkInID).DefrostSchedPtr;
                 }
 
-                if (WalkIn(WalkInID).DefrostType == WalkInDefrostOffCycle || WalkIn(WalkInID).DefrostType == WalkInDefrostNone) {
+                if (WalkIn(WalkInID).DefrostType == WalkinClrDefrostType::OffCycle || WalkIn(WalkInID).DefrostType == WalkinClrDefrostType::None) {
                     WalkIn(WalkInID).DefrostCapacity = 0.0;
                     // Don't even need to read N8 or N9 for those two defrost types.
                 } else { // have electric or hot gas/brine defrost
@@ -1465,8 +1396,8 @@ namespace EnergyPlus::RefrigeratedCase {
 
                     // defaults for defrost energy fraction are 0.7 for elec defrost and 0.3 for warm fluid
                     // note this value is only used for temperature terminated defrost control type
-                    if (WalkIn(WalkInID).DefrostType == WalkInDefrostElec) WalkIn(WalkInID).DefEnergyFraction = 0.7;
-                    if (WalkIn(WalkInID).DefrostType == WalkInDefrostFluid) WalkIn(WalkInID).DefEnergyFraction = 0.3;
+                    if (WalkIn(WalkInID).DefrostType == WalkinClrDefrostType::Elec) WalkIn(WalkInID).DefEnergyFraction = 0.7;
+                    if (WalkIn(WalkInID).DefrostType == WalkinClrDefrostType::Fluid) WalkIn(WalkInID).DefEnergyFraction = 0.3;
                     if (!lNumericBlanks(9)) {
                         if ((Numbers(9) > 1.0) || (Numbers(9) < 0.0)) {
                             ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + WalkIn(WalkInID).Name + "\", " + cNumericFieldNames(9) +
@@ -1537,7 +1468,7 @@ namespace EnergyPlus::RefrigeratedCase {
                 if (!allocated(WalkIn(WalkInID).HeightGlassDr)) WalkIn(WalkInID).HeightGlassDr.allocate(NumZones) = 0.0;
                 if (!allocated(WalkIn(WalkInID).UValueStockDr)) WalkIn(WalkInID).UValueStockDr.allocate(NumZones) = 0.0;
                 if (!allocated(WalkIn(WalkInID).StockDoorOpenSchedPtr)) WalkIn(WalkInID).StockDoorOpenSchedPtr.allocate(NumZones) = 0;
-                if (!allocated(WalkIn(WalkInID).StockDoorProtectType)) WalkIn(WalkInID).StockDoorProtectType.allocate(NumZones) = 0;
+                if (!allocated(WalkIn(WalkInID).StockDoorProtectType)) WalkIn(WalkInID).StockDoorProtectType.allocate(NumZones) = WIStockDoor::Unassigned;
                 if (!allocated(WalkIn(WalkInID).AreaStockDr)) WalkIn(WalkInID).AreaStockDr.allocate(NumZones) = 0.0;
                 if (!allocated(WalkIn(WalkInID).HeightStockDr)) WalkIn(WalkInID).HeightStockDr.allocate(NumZones) = 0.0;
                 if (!allocated(WalkIn(WalkInID).SensZoneCreditRate)) WalkIn(WalkInID).SensZoneCreditRate.allocate(NumZones) = 0.0;
@@ -1667,11 +1598,11 @@ namespace EnergyPlus::RefrigeratedCase {
 
                         if (lAlphaBlanks(AStart + 3) || UtilityRoutines::SameString(Alphas(AStart + 3), "AirCurtain")) {
                             // default air curtain
-                            WalkIn(WalkInID).StockDoorProtectType(ZoneID) = WIStockDoorAirCurtain;
+                            WalkIn(WalkInID).StockDoorProtectType(ZoneID) = WIStockDoor::AirCurtain;
                         } else if (UtilityRoutines::SameString(Alphas(AStart + 3), "None")) {
-                            WalkIn(WalkInID).StockDoorProtectType(ZoneID) = WIStockDoorNone;
+                            WalkIn(WalkInID).StockDoorProtectType(ZoneID) = WIStockDoor::None;
                         } else if (UtilityRoutines::SameString(Alphas(AStart + 3), "StripCurtain")) {
-                            WalkIn(WalkInID).StockDoorProtectType(ZoneID) = WIStockDoorStripCurtain;
+                            WalkIn(WalkInID).StockDoorProtectType(ZoneID) = WIStockDoor::StripCurtain;
                         } else {
                             ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + WalkIn(WalkInID).Name + "\", invalid  " +
                                             cAlphaFieldNames(AStart + 3) + "=\"" + Alphas(AStart + 3) + "\".");
@@ -2122,13 +2053,13 @@ namespace EnergyPlus::RefrigeratedCase {
                 // Input fan control type
                 ++AlphaNum; // A7
                 if (lAlphaBlanks(AlphaNum) || UtilityRoutines::SameString(Alphas(AlphaNum), "Fixed")) {
-                    WarehouseCoil(CoilID).FanType = FanConstantSpeed;
+                    WarehouseCoil(CoilID).FanType = iFanSpeedCtrlType::ConstantSpeed;
                 } else if (UtilityRoutines::SameString(Alphas(AlphaNum), "FixedLinear")) {
-                    WarehouseCoil(CoilID).FanType = FanConstantSpeedLinear;
+                    WarehouseCoil(CoilID).FanType = iFanSpeedCtrlType::ConstantSpeedLinear;
                 } else if (UtilityRoutines::SameString(Alphas(AlphaNum), "VariableSpeed")) {
-                    WarehouseCoil(CoilID).FanType = FanVariableSpeed;
+                    WarehouseCoil(CoilID).FanType = iFanSpeedCtrlType::VariableSpeed;
                 } else if (UtilityRoutines::SameString(Alphas(AlphaNum), "TwoSpeed")) {
-                    WarehouseCoil(CoilID).FanType = FanTwoSpeed;
+                    WarehouseCoil(CoilID).FanType = iFanSpeedCtrlType::TwoSpeed;
                 } else {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", invalid  " +
                                     cAlphaFieldNames(AlphaNum) + "=\"" + Alphas(AlphaNum) + "\".");
@@ -2159,13 +2090,13 @@ namespace EnergyPlus::RefrigeratedCase {
                 // Input defrost type
                 ++AlphaNum; // A8
                 if (lAlphaBlanks(AlphaNum) || UtilityRoutines::SameString(Alphas(AlphaNum), "Electric")) {
-                    WarehouseCoil(CoilID).DefrostType = DefrostElec;
+                    WarehouseCoil(CoilID).DefrostType = iDefrostType::Elec;
                 } else if (UtilityRoutines::SameString(Alphas(AlphaNum), "HotFluid")) {
-                    WarehouseCoil(CoilID).DefrostType = DefrostFluid;
+                    WarehouseCoil(CoilID).DefrostType = iDefrostType::Fluid;
                 } else if (UtilityRoutines::SameString(Alphas(AlphaNum), "None")) {
-                    WarehouseCoil(CoilID).DefrostType = DefrostNone;
+                    WarehouseCoil(CoilID).DefrostType = iDefrostType::None;
                 } else if (UtilityRoutines::SameString(Alphas(AlphaNum), "OffCycle")) {
-                    WarehouseCoil(CoilID).DefrostType = DefrostOffCycle;
+                    WarehouseCoil(CoilID).DefrostType = iDefrostType::OffCycle;
                 } else {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", invalid  " +
                                     cAlphaFieldNames(AlphaNum) + "=\"" + Alphas(AlphaNum) + "\".");
@@ -2174,9 +2105,9 @@ namespace EnergyPlus::RefrigeratedCase {
 
                 ++AlphaNum; // A9
                 if (lAlphaBlanks(AlphaNum) || UtilityRoutines::SameString(Alphas(AlphaNum), "TimeSchedule")) {
-                    WarehouseCoil(CoilID).DefrostControlType = DefrostControlSched;
+                    WarehouseCoil(CoilID).DefrostControlType = iDefrostCtrlType::Sched;
                 } else if (UtilityRoutines::SameString(Alphas(AlphaNum), "TemperatureTermination")) {
-                    WarehouseCoil(CoilID).DefrostControlType = DefrostContTempTerm;
+                    WarehouseCoil(CoilID).DefrostControlType = iDefrostCtrlType::TempTerm;
                 } else {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", invalid  " +
                                     cAlphaFieldNames(AlphaNum) + " not found: " + Alphas(AlphaNum));
@@ -2221,7 +2152,7 @@ namespace EnergyPlus::RefrigeratedCase {
                 } // .not. lAlphaBlanks
 
                 ++NumNum; // N14
-                if (WarehouseCoil(CoilID).DefrostType == DefrostOffCycle || WarehouseCoil(CoilID).DefrostType == DefrostNone) {
+                if (WarehouseCoil(CoilID).DefrostType == iDefrostType::OffCycle || WarehouseCoil(CoilID).DefrostType == iDefrostType::None) {
                     WarehouseCoil(CoilID).DefrostCapacity = 0.0;
                     // Don't even need to read Defrost capacity for those two defrost types.
                 } else { // have electric or hot gas/brine defrost
@@ -2235,8 +2166,8 @@ namespace EnergyPlus::RefrigeratedCase {
 
                     // defaults for defrost energy fraction are 0.7 for elec defrost and 0.3 for warm fluid
                     // note this value is only used for temperature terminated defrost control type
-                    if (WarehouseCoil(CoilID).DefrostType == DefrostElec) WarehouseCoil(CoilID).DefEnergyFraction = 0.7;
-                    if (WarehouseCoil(CoilID).DefrostType == DefrostFluid) WarehouseCoil(CoilID).DefEnergyFraction = 0.3;
+                    if (WarehouseCoil(CoilID).DefrostType == iDefrostType::Elec) WarehouseCoil(CoilID).DefEnergyFraction = 0.7;
+                    if (WarehouseCoil(CoilID).DefrostType == iDefrostType::Fluid) WarehouseCoil(CoilID).DefEnergyFraction = 0.3;
 
                     ++NumNum; // N15
                     if (!lNumericBlanks(NumNum)) {
@@ -2480,13 +2411,13 @@ namespace EnergyPlus::RefrigeratedCase {
                 DataHeatBalance::HeatReclaimRefrigeratedRack(RackNum).Name = Alphas(1);
                 DataHeatBalance::HeatReclaimRefrigeratedRack(RackNum).SourceType = CurrentModuleObject;
                 if (UtilityRoutines::SameString(Alphas(2), "Outdoors")) {
-                    RefrigRack(RackNum).HeatRejectionLocation = LocationOutdoors;
+                    RefrigRack(RackNum).HeatRejectionLocation = iLocation::Outdoors;
                 } else if (UtilityRoutines::SameString(Alphas(2), "Zone")) {
-                    RefrigRack(RackNum).HeatRejectionLocation = LocationZone;
+                    RefrigRack(RackNum).HeatRejectionLocation = iLocation::Zone;
                     // don't need to set RefrigPresentInZone to .TRUE. here because only allowed to reject heat to zone
                     // holding all served cases,  so already set when case read in
                 } else {
-                    RefrigRack(RackNum).HeatRejectionLocation = LocationOutdoors;
+                    RefrigRack(RackNum).HeatRejectionLocation = iLocation::Outdoors;
                     ShowWarningError(state, CurrentModuleObject + ", " + cAlphaFieldNames(1) + " = \"" + RefrigRack(RackNum).Name +
                                      "\": " + cAlphaFieldNames(2) + " defined as " + Alphas(2) + " not found. Will assume " + cAlphaFieldNames(2) +
                                      " is OUTDOORS and simulation continues.");
@@ -2539,7 +2470,7 @@ namespace EnergyPlus::RefrigeratedCase {
 
                 if (UtilityRoutines::SameString(Alphas(5), "EvaporativelyCooled")) {
                     RefrigRack(RackNum).CondenserType = DataHeatBalance::RefrigCondenserTypeEvap;
-                    if (RefrigRack(RackNum).HeatRejectionLocation == LocationZone) {
+                    if (RefrigRack(RackNum).HeatRejectionLocation == iLocation::Zone) {
                         ShowWarningError(state, CurrentModuleObject + "=\"" + RefrigRack(RackNum).Name + "\" Evap cooled " + cAlphaFieldNames(5) +
                                          " not available with " + cAlphaFieldNames(2) + " = Zone.");
                         ShowContinueError(state, cAlphaFieldNames(5) + " reset to Air Cooled and simulation continues.");
@@ -2547,7 +2478,7 @@ namespace EnergyPlus::RefrigeratedCase {
                     }
                 } else if (UtilityRoutines::SameString(Alphas(5), "WaterCooled")) {
                     RefrigRack(RackNum).CondenserType = DataHeatBalance::RefrigCondenserTypeWater;
-                    if (RefrigRack(RackNum).HeatRejectionLocation == LocationZone) {
+                    if (RefrigRack(RackNum).HeatRejectionLocation == iLocation::Zone) {
                         ShowWarningError(state, CurrentModuleObject + "=\"" + RefrigRack(RackNum).Name + "\" Water cooled " + cAlphaFieldNames(5) +
                                          " not available with " + cAlphaFieldNames(2) + " = Zone.");
                         ShowContinueError(state, cAlphaFieldNames(5) + " reset to Air Cooled and simulation continues.");
@@ -2578,9 +2509,9 @@ namespace EnergyPlus::RefrigeratedCase {
                     BranchNodeConnections::TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(6), Alphas(7), "RefrigRack Nodes");
                     // Get loop flow type
                     if (UtilityRoutines::SameString(Alphas(8), "VariableFlow")) {
-                        RefrigRack(RackNum).FlowType = VariableFlow;
+                        RefrigRack(RackNum).FlowType = iCndsrFlowType::VariableFlow;
                     } else if (UtilityRoutines::SameString(Alphas(8), "ConstantFlow")) {
-                        RefrigRack(RackNum).FlowType = ConstantFlow;
+                        RefrigRack(RackNum).FlowType = iCndsrFlowType::ConstantFlow;
                     } else {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + RefrigRack(RackNum).Name + "\", invalid  " + cAlphaFieldNames(8) +
                                         " not recognized: " + Alphas(8));
@@ -2588,7 +2519,7 @@ namespace EnergyPlus::RefrigeratedCase {
                         ErrorsFound = true;
                     }
                     // Get outlet temperature schedule for variable flow case
-                    if (RefrigRack(RackNum).FlowType == VariableFlow) {
+                    if (RefrigRack(RackNum).FlowType == iCndsrFlowType::VariableFlow) {
                         if (lAlphaBlanks(9)) {
                             RefrigRack(RackNum).OutletTempSchedPtr = 0;
                         } else {
@@ -2602,7 +2533,7 @@ namespace EnergyPlus::RefrigeratedCase {
                         }
                     }
                     // Get volumetric flow rate if applicable
-                    if (RefrigRack(RackNum).FlowType == ConstantFlow) {
+                    if (RefrigRack(RackNum).FlowType == iCndsrFlowType::ConstantFlow) {
                         RefrigRack(RackNum).DesVolFlowRate = Numbers(3);
                         RefrigRack(RackNum).VolFlowRate = Numbers(3);
                     }
@@ -2610,7 +2541,7 @@ namespace EnergyPlus::RefrigeratedCase {
                     RefrigRack(RackNum).VolFlowRateMax = Numbers(4);
 
                     // Check constant flow for max violation, if applicable
-                    if (RefrigRack(RackNum).FlowType == ConstantFlow && RefrigRack(RackNum).VolFlowRate > Numbers(4)) {
+                    if (RefrigRack(RackNum).FlowType == iCndsrFlowType::ConstantFlow && RefrigRack(RackNum).VolFlowRate > Numbers(4)) {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + RefrigRack(RackNum).Name + "\" " + cNumericFieldNames(3) + " > " +
                                         cNumericFieldNames(4) + '.');
                         ShowContinueError(state, "Revise flow rates.");
@@ -2802,7 +2733,7 @@ namespace EnergyPlus::RefrigeratedCase {
                     } // CaseIndex=1,NumCases
                     //     check that all refrigerated cases attached to a rack are to the same zone if heat rejection location is "Zone"
                     //     however, won't matter if walk-in specified
-                    if (RefrigRack(RackNum).HeatRejectionLocation == LocationZone && RefrigRack(RackNum).NumCases > 1 &&
+                    if (RefrigRack(RackNum).HeatRejectionLocation == iLocation::Zone && RefrigRack(RackNum).NumCases > 1 &&
                         RefrigCase(RefrigRack(RackNum).CaseNum(1)).ActualZoneNum != 0 && NumWalkIns < 1 && NumCoils < 1) {
                         int ZoneNum = RefrigCase(RefrigRack(RackNum).CaseNum(1)).ActualZoneNum;
                         for (int caseIndex = 2; caseIndex <= RefrigRack(RackNum).NumCases; ++caseIndex) {
@@ -2839,7 +2770,7 @@ namespace EnergyPlus::RefrigeratedCase {
 
                 if (NumWalkIns > 0 || NumCoils > 0) {
                     // Get the heat rejection Zone node number from the zone name entered by the user (if heatrej location = zone)
-                    if (RefrigRack(RackNum).HeatRejectionLocation == LocationZone) {
+                    if (RefrigRack(RackNum).HeatRejectionLocation == iLocation::Zone) {
                         if (lAlphaBlanks(15)) {
                             ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + RefrigRack(RackNum).Name + cAlphaFieldNames(15) +
                                             " must be input if walkins or AirChillers connected to rack and heat rejection location = zone.");
@@ -2957,13 +2888,13 @@ namespace EnergyPlus::RefrigeratedCase {
 
                     // Get fan control type
                     if (UtilityRoutines::SameString(Alphas(3), "FixedLinear")) {
-                        Condenser(CondNum).FanSpeedControlType = FanConstantSpeedLinear;
+                        Condenser(CondNum).FanSpeedControlType = iFanSpeedCtrlType::ConstantSpeedLinear;
                     } else if (UtilityRoutines::SameString(Alphas(3), "VariableSpeed")) {
-                        Condenser(CondNum).FanSpeedControlType = FanVariableSpeed;
+                        Condenser(CondNum).FanSpeedControlType = iFanSpeedCtrlType::VariableSpeed;
                     } else if (UtilityRoutines::SameString(Alphas(3), "TwoSpeed")) {
-                        Condenser(CondNum).FanSpeedControlType = FanTwoSpeed;
+                        Condenser(CondNum).FanSpeedControlType = iFanSpeedCtrlType::TwoSpeed;
                     } else {
-                        Condenser(CondNum).FanSpeedControlType = FanConstantSpeed; // default
+                        Condenser(CondNum).FanSpeedControlType = iFanSpeedCtrlType::ConstantSpeed; // default
                     }                                                              // Set fan control type
 
                     if (!lNumericBlanks(2)) Condenser(CondNum).RatedFanPower = Numbers(2);
@@ -3069,13 +3000,13 @@ namespace EnergyPlus::RefrigeratedCase {
 
                     // Get fan control type
                     if (UtilityRoutines::SameString(Alphas(3), "FixedLinear")) {
-                        Condenser(CondNum).FanSpeedControlType = FanConstantSpeedLinear;
+                        Condenser(CondNum).FanSpeedControlType = iFanSpeedCtrlType::ConstantSpeedLinear;
                     } else if (UtilityRoutines::SameString(Alphas(2), "VariableSpeed")) {
-                        Condenser(CondNum).FanSpeedControlType = FanVariableSpeed;
+                        Condenser(CondNum).FanSpeedControlType = iFanSpeedCtrlType::VariableSpeed;
                     } else if (UtilityRoutines::SameString(Alphas(2), "TwoSpeed")) {
-                        Condenser(CondNum).FanSpeedControlType = FanTwoSpeed;
+                        Condenser(CondNum).FanSpeedControlType = iFanSpeedCtrlType::TwoSpeed;
                     } else {
-                        Condenser(CondNum).FanSpeedControlType = FanConstantSpeed; // default
+                        Condenser(CondNum).FanSpeedControlType = iFanSpeedCtrlType::ConstantSpeed; // default
                     }                                                              // Set fan control type
 
                     Condenser(CondNum).RatedFanPower = Numbers(3);
@@ -3334,9 +3265,9 @@ namespace EnergyPlus::RefrigeratedCase {
                     BranchNodeConnections::TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(2), Alphas(3), "Water Cooled Condenser Nodes");
                     // Get loop flow type
                     if (UtilityRoutines::SameString(Alphas(4), "VariableFlow")) { // set FlowType
-                        Condenser(CondNum).FlowType = VariableFlow;
+                        Condenser(CondNum).FlowType = iCndsrFlowType::VariableFlow;
                     } else if (UtilityRoutines::SameString(Alphas(4), "ConstantFlow")) {
-                        Condenser(CondNum).FlowType = ConstantFlow;
+                        Condenser(CondNum).FlowType = iCndsrFlowType::ConstantFlow;
                     } else {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Condenser(CondNum).Name + "\", invalid  " + cAlphaFieldNames(4) +
                                         " not recognized: " + Alphas(4));
@@ -3345,7 +3276,7 @@ namespace EnergyPlus::RefrigeratedCase {
                     } // Set FlowType
 
                     // Get outlet temperature schedule for variable flow case
-                    if (Condenser(CondNum).FlowType == VariableFlow) {
+                    if (Condenser(CondNum).FlowType == iCndsrFlowType::VariableFlow) {
                         if (lAlphaBlanks(5)) {
                             Condenser(CondNum).OutletTempSchedPtr = 0;
                         } else {
@@ -3360,7 +3291,7 @@ namespace EnergyPlus::RefrigeratedCase {
                     } // Outlet temperature schedule
 
                     // Get volumetric flow rate if applicable
-                    if (Condenser(CondNum).FlowType == ConstantFlow) {
+                    if (Condenser(CondNum).FlowType == iCndsrFlowType::ConstantFlow) {
                         if ((!lNumericBlanks(5)) && (Numbers(5) > 0.0)) {
                             Condenser(CondNum).DesVolFlowRate = Numbers(5);
                             Condenser(CondNum).VolFlowRate = Numbers(5);
@@ -3377,7 +3308,7 @@ namespace EnergyPlus::RefrigeratedCase {
                     if (Numbers(6) > 0.0) {
                         Condenser(CondNum).VolFlowRateMax = Numbers(6);
                         // Check constant flow for max violation, if applicable
-                        if (Condenser(CondNum).FlowType == ConstantFlow && Condenser(CondNum).VolFlowRate > Numbers(6)) {
+                        if (Condenser(CondNum).FlowType == iCndsrFlowType::ConstantFlow && Condenser(CondNum).VolFlowRate > Numbers(6)) {
                             ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Condenser(CondNum).Name + "\" " + cNumericFieldNames(5) +
                                             " > " + cNumericFieldNames(6) + " .");
                             ShowContinueError(state, "Revise flow rates.");
@@ -3468,9 +3399,9 @@ namespace EnergyPlus::RefrigeratedCase {
                     // Get condensing temperature type, either fixed by design or allowed to float to match other loads on supply system
                     if (!lAlphaBlanks(2)) {
                         if (UtilityRoutines::SameString(Alphas(2), "Fixed")) { // set Condenser Temperature Control Type
-                            Condenser(CondNum).CascadeTempControl = CascadeTempSet;
+                            Condenser(CondNum).CascadeTempControl = iCascadeCndsrTempCtrlType::TempSet;
                         } else if (UtilityRoutines::SameString(Alphas(2), "Float")) {
-                            Condenser(CondNum).CascadeTempControl = CascadeTempFloat;
+                            Condenser(CondNum).CascadeTempControl = iCascadeCndsrTempCtrlType::TempFloat;
                         } else {
                             ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Condenser(CondNum).Name + "\", invalid  " +
                                             cAlphaFieldNames(2) + " not recognized: " + Alphas(2));
@@ -3478,7 +3409,7 @@ namespace EnergyPlus::RefrigeratedCase {
                             ErrorsFound = true;
                         }    // string comparison to key choices
                     } else { // default is fixed/cascadetempset
-                        Condenser(CondNum).CascadeTempControl = CascadeTempSet;
+                        Condenser(CondNum).CascadeTempControl = iCascadeCndsrTempCtrlType::TempSet;
                     } // not blank
 
                     Condenser(CondNum).CascadeRatedEvapTemp = Condenser(CondNum).RatedTCondense - Condenser(CondNum).RatedApproachT;
@@ -3549,13 +3480,13 @@ namespace EnergyPlus::RefrigeratedCase {
 
                     // Get fan control type
                     if (UtilityRoutines::SameString(Alphas(3), "FixedLinear")) {
-                        GasCooler(GCNum).FanSpeedControlType = FanConstantSpeedLinear;
+                        GasCooler(GCNum).FanSpeedControlType = iFanSpeedCtrlType::ConstantSpeedLinear;
                     } else if (UtilityRoutines::SameString(Alphas(3), "VariableSpeed")) {
-                        GasCooler(GCNum).FanSpeedControlType = FanVariableSpeed;
+                        GasCooler(GCNum).FanSpeedControlType = iFanSpeedCtrlType::VariableSpeed;
                     } else if (UtilityRoutines::SameString(Alphas(3), "TwoSpeed")) {
-                        GasCooler(GCNum).FanSpeedControlType = FanTwoSpeed;
+                        GasCooler(GCNum).FanSpeedControlType = iFanSpeedCtrlType::TwoSpeed;
                     } else {
-                        GasCooler(GCNum).FanSpeedControlType = FanConstantSpeed; // default
+                        GasCooler(GCNum).FanSpeedControlType = iFanSpeedCtrlType::ConstantSpeed; // default
                     }                                                            // Set fan control type
 
                     // Gas cooler fan power
@@ -3816,9 +3747,9 @@ namespace EnergyPlus::RefrigeratedCase {
                     AlphaNum = 3;
                     if (!lAlphaBlanks(AlphaNum)) {
                         if (UtilityRoutines::SameString(Alphas(AlphaNum), "FluidAlwaysLiquid")) {
-                            Secondary(SecondaryNum).FluidType = SecFluidTypeAlwaysLiquid;
+                            Secondary(SecondaryNum).FluidType = iSecFluidType::AlwaysLiquid;
                         } else if (UtilityRoutines::SameString(Alphas(AlphaNum), "FluidPhaseChange")) {
-                            Secondary(SecondaryNum).FluidType = SecFluidTypePhaseChange;
+                            Secondary(SecondaryNum).FluidType = iSecFluidType::PhaseChange;
                         } else {
                             ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Secondary(SecondaryNum).Name + "\"  " +
                                             cAlphaFieldNames(AlphaNum) + " not recognized = " + Alphas(AlphaNum));
@@ -3867,7 +3798,7 @@ namespace EnergyPlus::RefrigeratedCase {
                     Real64 TBrineOutRated(0.0);        // Rated temperature of circ fluid LEAVING heat exchanger,C
                     Real64 TBrineInRated(0.0);         // Rated temperature of circ fluid going INTO heat exchanger, C
 
-                    if (Secondary(SecondaryNum).FluidType == SecFluidTypeAlwaysLiquid) {
+                    if (Secondary(SecondaryNum).FluidType == iSecFluidType::AlwaysLiquid) {
                         if (!lNumericBlanks(5)) {
                             Secondary(SecondaryNum).TRangeDifRated = Numbers(5);
                         } else {
@@ -4039,12 +3970,12 @@ namespace EnergyPlus::RefrigeratedCase {
 
                     // Get pump drive type
                     AlphaNum = 5;
-                    Secondary(SecondaryNum).PumpControlType = SecPumpControlConstant; // default
+                    Secondary(SecondaryNum).PumpControlType = iSecPumpCtrl::Constant; // default
                     if (!lAlphaBlanks(AlphaNum)) {
                         if (UtilityRoutines::SameString(Alphas(AlphaNum), "Constant")) {
-                            Secondary(SecondaryNum).PumpControlType = SecPumpControlConstant;
+                            Secondary(SecondaryNum).PumpControlType = iSecPumpCtrl::Constant;
                         } else if (UtilityRoutines::SameString(Alphas(AlphaNum), "Variable")) {
-                            Secondary(SecondaryNum).PumpControlType = SecPumpControlVariable;
+                            Secondary(SecondaryNum).PumpControlType = iSecPumpCtrl::Variable;
                         } else {
                             ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Secondary(SecondaryNum).Name + "\"  " +
                                             cAlphaFieldNames(AlphaNum) + " not recognized = " + Alphas(AlphaNum));
@@ -4054,7 +3985,7 @@ namespace EnergyPlus::RefrigeratedCase {
                     }     // blank on pump drive control type
 
                     //  Print warning if Pump Control = Constant and Variable Speed Curve is specified.
-                    if ((Secondary(SecondaryNum).PumpControlType == SecPumpControlConstant) && (!lAlphaBlanks(AlphaNum + 1))) {
+                    if ((Secondary(SecondaryNum).PumpControlType == iSecPumpCtrl::Constant) && (!lAlphaBlanks(AlphaNum + 1))) {
                         ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Secondary(SecondaryNum).Name + "\", A " +
                                          cAlphaFieldNames(AlphaNum + 1) + " is specified even though " + cAlphaFieldNames(AlphaNum) +
                                          " is \"CONSTANT\".");
@@ -4062,7 +3993,7 @@ namespace EnergyPlus::RefrigeratedCase {
                                           " will be ignored.");
                     }
 
-                    if (Secondary(SecondaryNum).PumpControlType == SecPumpControlConstant) {
+                    if (Secondary(SecondaryNum).PumpControlType == iSecPumpCtrl::Constant) {
                         // Set incremental flow and power amounts for pump dispatch
                         Secondary(SecondaryNum).PumpIncrementFlowVol = PumpTotRatedFlowVol / NumPumps;
                         Secondary(SecondaryNum).PumpIncrementPower = Secondary(SecondaryNum).PumpTotRatedPower / NumPumps;
@@ -4201,7 +4132,7 @@ namespace EnergyPlus::RefrigeratedCase {
                     Secondary(SecondaryNum).MaxVolFlow = min(SecondaryFlowVolRated, PumpTotRatedFlowVol);
                     Real64 NominalSecondaryRefLoad = NominalTotalCaseCap + NominalTotalWalkInCap + Secondary(SecondaryNum).PumpTotRatedPower;
 
-                    if (Secondary(SecondaryNum).FluidType == SecFluidTypeAlwaysLiquid) {
+                    if (Secondary(SecondaryNum).FluidType == iSecFluidType::AlwaysLiquid) {
                         if (TBrineOutRated > (Secondary(SecondaryNum).TMinNeeded + 0.5)) {
                             ShowWarningError(state,
                                              format("{}=\"{} The design brine temperature to the refrigeration loads: {:.1R} ;",
@@ -4240,7 +4171,7 @@ namespace EnergyPlus::RefrigeratedCase {
                                     PumpTotRatedFlowVol * PumpTotRatedHead / (PumpImpellerEfficiency * PumpMotorEfficiency);
                                 // need to recalc nominal load with new pump power value
                                 NominalSecondaryRefLoad = NominalTotalCaseCap + NominalTotalWalkInCap + Secondary(SecondaryNum).PumpTotRatedPower;
-                                if (Secondary(SecondaryNum).PumpControlType == SecPumpControlConstant) {
+                                if (Secondary(SecondaryNum).PumpControlType == iSecPumpCtrl::Constant) {
                                     // Set incremental flow and power amounts for pump dispatch
                                     Secondary(SecondaryNum).PumpIncrementFlowVol = PumpTotRatedFlowVol / NumPumps;
                                     Secondary(SecondaryNum).PumpIncrementPower = Secondary(SecondaryNum).PumpTotRatedPower / NumPumps;
@@ -4320,10 +4251,10 @@ namespace EnergyPlus::RefrigeratedCase {
                     ShowContinueError(state, "Must Be Entered. Check input value choices.");
                     ErrorsFound = true;
                 } else if (!lNumericBlanks(1)) {
-                    Compressor(CompNum).SuperheatRatingType = RatedSuperheat;
+                    Compressor(CompNum).SuperheatRatingType = iCompRatingType::Superheat;
                     Compressor(CompNum).RatedSuperheat = Numbers(1);
                 } else if (!lNumericBlanks(2)) {
-                    Compressor(CompNum).SuperheatRatingType = RatedReturnGasTemperature;
+                    Compressor(CompNum).SuperheatRatingType = iCompRatingType::ReturnGasTemperature;
                     Compressor(CompNum).RatedSuperheat = Numbers(2);
                 } // Set SuperheatRatingType
 
@@ -4334,10 +4265,10 @@ namespace EnergyPlus::RefrigeratedCase {
                     ShowContinueError(state, "Must Be Entered. Check input value choices.");
                     ErrorsFound = true;
                 } else if (!lNumericBlanks(3)) {
-                    Compressor(CompNum).SubcoolRatingType = RatedLiquidTemperature;
+                    Compressor(CompNum).SubcoolRatingType = iCompRatingType::LiquidTemperature;
                     Compressor(CompNum).RatedSubcool = Numbers(3);
                 } else if (!lNumericBlanks(4)) {
-                    Compressor(CompNum).SubcoolRatingType = RatedSubcooling;
+                    Compressor(CompNum).SubcoolRatingType = iCompRatingType::Subcooling;
                     Compressor(CompNum).RatedSubcool = Numbers(4);
                 } // Set SubcoolRatingType
 
@@ -4399,12 +4330,12 @@ namespace EnergyPlus::RefrigeratedCase {
                     Subcooler(SubcoolerNum).Name = Alphas(1);
 
                     // Get subcooler type
-                    Subcooler(SubcoolerNum).SubcoolerType = LiquidSuction;      // default subcooler type
+                    Subcooler(SubcoolerNum).SubcoolerType = iSubcoolerType::LiquidSuction;      // default subcooler type
                     if (UtilityRoutines::SameString(Alphas(2), "Mechanical")) { // set subcooler type
-                        Subcooler(SubcoolerNum).SubcoolerType = Mechanical;
+                        Subcooler(SubcoolerNum).SubcoolerType = iSubcoolerType::Mechanical;
                         ++state.dataRefrigCase->NumSimulationMechSubcoolers;
                     } else if (UtilityRoutines::SameString(Alphas(2), "LiquidSuction")) {
-                        Subcooler(SubcoolerNum).SubcoolerType = LiquidSuction;
+                        Subcooler(SubcoolerNum).SubcoolerType = iSubcoolerType::LiquidSuction;
                     } else {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Subcooler(SubcoolerNum).Name + "\", " + cAlphaFieldNames(2) +
                                         " not recognized = " + Alphas(2));
@@ -4415,7 +4346,7 @@ namespace EnergyPlus::RefrigeratedCase {
                     {
                         auto const SELECT_CASE_var(Subcooler(SubcoolerNum).SubcoolerType);
 
-                        if (SELECT_CASE_var == LiquidSuction) {
+                        if (SELECT_CASE_var == iSubcoolerType::LiquidSuction) {
                             Subcooler(SubcoolerNum).LiqSuctDesignDelT = 10.0; // default value
                             if (!lNumericBlanks(1)) Subcooler(SubcoolerNum).LiqSuctDesignDelT = Numbers(1);
                             if (Subcooler(SubcoolerNum).LiqSuctDesignDelT < 0.0) {
@@ -4445,7 +4376,7 @@ namespace EnergyPlus::RefrigeratedCase {
                                 ErrorsFound = true;
                             } // error check
 
-                        } else if (SELECT_CASE_var == Mechanical) {
+                        } else if (SELECT_CASE_var == iSubcoolerType::Mechanical) {
                             Subcooler(SubcoolerNum).MechSourceSys = Alphas(3);
                             // Error check on system name comes later after systems have been read
 
@@ -4853,7 +4784,7 @@ namespace EnergyPlus::RefrigeratedCase {
                                     System(RefrigSysNum).TEvapDesign = min(Condenser(CondID).CascadeRatedEvapTemp, System(RefrigSysNum).TEvapDesign);
                                 }    // CascadeLoadIndex == 1
                             } else { // (NumNonCascadeLoads > 0 so initial TEvapDesign set above with those other loads)
-                                if (Condenser(CondID).CascadeTempControl == CascadeTempSet)
+                                if (Condenser(CondID).CascadeTempControl == iCascadeCndsrTempCtrlType::TempSet)
                                     System(RefrigSysNum).TEvapDesign =
                                         min(Condenser(CondID).CascadeRatedEvapTemp,
                                             System(RefrigSysNum).TEvapDesign); // other wise TEvapDesign set by other loads
@@ -5000,9 +4931,9 @@ namespace EnergyPlus::RefrigeratedCase {
                 AlphaNum = 7;
                 if (!lAlphaBlanks(AlphaNum)) {
                     if (UtilityRoutines::SameString(Alphas(AlphaNum), "ConstantSuctionTemperature")) {
-                        System(RefrigSysNum).CompSuctControl = ConstantSuctionTemperature;
+                        System(RefrigSysNum).CompSuctControl = iCompSuctionPressureCtrl::ConstantSuctionTemperature;
                     } else if (UtilityRoutines::SameString(Alphas(AlphaNum), "FloatSuctionTemperature")) {
-                        System(RefrigSysNum).CompSuctControl = FloatSuctionTemperature;
+                        System(RefrigSysNum).CompSuctControl = iCompSuctionPressureCtrl::FloatSuctionTemperature;
                         if (System(RefrigSysNum).CoilFlag) {
                             ShowWarningError(state, CurrentModuleObject + "=\"" + System(RefrigSysNum).Name +
                                              "\", The system specified a FloatSuctionTemperature, but that is not available with air chiller loads "
@@ -5014,7 +4945,7 @@ namespace EnergyPlus::RefrigeratedCase {
                         ErrorsFound = true;
                     }
                 } else {
-                    System(RefrigSysNum).CompSuctControl = ConstantSuctionTemperature; // Default for blank
+                    System(RefrigSysNum).CompSuctControl = iCompSuctionPressureCtrl::ConstantSuctionTemperature; // Default for blank
                 }
 
                 // Count subcoolers on system and allocate
@@ -5352,7 +5283,7 @@ namespace EnergyPlus::RefrigeratedCase {
         // System%NumMechSCServed=0
         if (state.dataRefrigCase->NumSimulationSubcoolers > 0) {
             for (int SubcoolerNum = 1; SubcoolerNum <= state.dataRefrigCase->NumSimulationSubcoolers; ++SubcoolerNum) {
-                if (Subcooler(SubcoolerNum).SubcoolerType == LiquidSuction) continue;
+                if (Subcooler(SubcoolerNum).SubcoolerType == iSubcoolerType::LiquidSuction) continue;
                 Subcooler(SubcoolerNum).MechSourceSysID =
                     inputProcessor->getObjectItemNum(state, "Refrigeration:System", Subcooler(SubcoolerNum).MechSourceSys);
                 if (Subcooler(SubcoolerNum).MechSourceSysID == 0) {
@@ -5373,7 +5304,7 @@ namespace EnergyPlus::RefrigeratedCase {
 
             for (RefrigSysNum = 1; RefrigSysNum <= DataHeatBalance::NumRefrigSystems; ++RefrigSysNum) {
                 for (int SubcoolerNum = 1; SubcoolerNum <= state.dataRefrigCase->NumSimulationSubcoolers; ++SubcoolerNum) {
-                    if (Subcooler(SubcoolerNum).SubcoolerType == LiquidSuction) continue;
+                    if (Subcooler(SubcoolerNum).SubcoolerType == iSubcoolerType::LiquidSuction) continue;
                     if (Subcooler(SubcoolerNum).MechSourceSysID == RefrigSysNum) {
                         ++System(RefrigSysNum).NumMechSCServed;
                     }
@@ -6428,7 +6359,7 @@ namespace EnergyPlus::RefrigeratedCase {
                                         RefrigCase(caseNum).ZoneName);
 
                     // Report defrost energy curve value only for cases having electric or hot-gas defrost with temperature termination
-                    if (RefrigCase(caseNum).DefrostType == DefElectricTerm || RefrigCase(caseNum).DefrostType == DefHotFluidTerm) {
+                    if (RefrigCase(caseNum).DefrostType == iRefCaseDefrostType::ElectricTerm || RefrigCase(caseNum).DefrostType == iRefCaseDefrostType::HotFluidTerm) {
                         SetupOutputVariable(state, "Refrigeration Case Defrost Energy Correction Curve Value",
                                             OutputProcessor::Unit::None,
                                             RefrigCase(caseNum).DefEnergyCurveValue,
@@ -6445,7 +6376,7 @@ namespace EnergyPlus::RefrigeratedCase {
                                         RefrigCase(caseNum).Name);
 
                     // Report only for cases having anti-sweat heaters
-                    if (RefrigCase(caseNum).AntiSweatControlType > ASNone) {
+                    if (RefrigCase(caseNum).AntiSweatControlType > iASHtrCtrlType::None) {
                         SetupOutputVariable(state, "Refrigeration Case Anti Sweat Electricity Rate",
                                             OutputProcessor::Unit::W,
                                             RefrigCase(caseNum).ElecAntiSweatPower,
@@ -6468,8 +6399,8 @@ namespace EnergyPlus::RefrigeratedCase {
 
                     // Report only for cases using electric defrost
 
-                    if (RefrigCase(caseNum).DefrostType == DefElectric || RefrigCase(caseNum).DefrostType == DefElectricOnDemand ||
-                        RefrigCase(caseNum).DefrostType == DefElectricTerm) {
+                    if (RefrigCase(caseNum).DefrostType == iRefCaseDefrostType::Electric || RefrigCase(caseNum).DefrostType == iRefCaseDefrostType::ElectricOnDemand ||
+                        RefrigCase(caseNum).DefrostType == iRefCaseDefrostType::ElectricTerm) {
                         SetupOutputVariable(state, "Refrigeration Case Defrost Electricity Rate",
                                             OutputProcessor::Unit::W,
                                             RefrigCase(caseNum).ElecDefrostPower,
@@ -6615,7 +6546,7 @@ namespace EnergyPlus::RefrigeratedCase {
                                         "Building");
 
                     // Report only for WalkIns using electric defrost
-                    if (WalkIn(walkInNum).DefrostType == WalkInDefrostElec) {
+                    if (WalkIn(walkInNum).DefrostType == WalkinClrDefrostType::Elec) {
                         SetupOutputVariable(state, "Refrigeration Walk In Defrost Electricity Rate",
                                             OutputProcessor::Unit::W,
                                             WalkIn(walkInNum).ElecDefrostPower,
@@ -6838,7 +6769,7 @@ namespace EnergyPlus::RefrigeratedCase {
                                         WarehouseCoil(coilNum).Name);
 
                     // Report only for Warehouse coils using electric defrost
-                    if (WarehouseCoil(coilNum).DefrostType == DefrostElec) {
+                    if (WarehouseCoil(coilNum).DefrostType == iDefrostType::Elec) {
                         SetupOutputVariable(state, "Refrigeration Zone Air Chiller Defrost Electricity Rate",
                                             OutputProcessor::Unit::W,
                                             WarehouseCoil(coilNum).ElecDefrostPower,
@@ -7311,7 +7242,7 @@ namespace EnergyPlus::RefrigeratedCase {
                                             "Plant");
                     } // Evap condenser
 
-                    if (RefrigRack(rackNum).HeatRejectionLocation == LocationZone) {
+                    if (RefrigRack(rackNum).HeatRejectionLocation == iLocation::Zone) {
                         SetupOutputVariable(state, "Refrigeration Air Chiller Compressor Rack Zone Sensible Heating Rate",
                                             OutputProcessor::Unit::W,
                                             RefrigRack(rackNum).SensZoneCreditHeatRate,
@@ -7461,7 +7392,7 @@ namespace EnergyPlus::RefrigeratedCase {
                                             "Plant");
                     } // condenser evap
 
-                    if (RefrigRack(rackNum).HeatRejectionLocation == LocationZone) {
+                    if (RefrigRack(rackNum).HeatRejectionLocation == iLocation::Zone) {
                         SetupOutputVariable(state, "Refrigeration Compressor Rack Zone Sensible Heating Rate",
                                             OutputProcessor::Unit::W,
                                             RefrigRack(rackNum).SensZoneCreditHeatRate,
@@ -8380,7 +8311,7 @@ namespace EnergyPlus::RefrigeratedCase {
                 for (int subcoolNum = 1; subcoolNum <= state.dataRefrigCase->NumSimulationSubcoolers; ++subcoolNum) {
                     // CurrentModuleObject='Refrigeration:Subcooler'
                     if (Subcooler(subcoolNum).CoilFlag) { // Subcooler serving system with chillers on HVAC time step
-                        if (Subcooler(subcoolNum).SubcoolerType == Mechanical) {
+                        if (Subcooler(subcoolNum).SubcoolerType == iSubcoolerType::Mechanical) {
                             SetupOutputVariable(state, "Refrigeration Air Chiller System Mechanical Subcooler Heat Transfer Rate",
                                                 OutputProcessor::Unit::W,
                                                 Subcooler(subcoolNum).MechSCTransLoad,
@@ -8395,7 +8326,7 @@ namespace EnergyPlus::RefrigeratedCase {
                                                 Subcooler(subcoolNum).Name);
                         }
                     } else { // Subcooler on system serving cases and/or walkins
-                        if (Subcooler(subcoolNum).SubcoolerType == Mechanical) {
+                        if (Subcooler(subcoolNum).SubcoolerType == iSubcoolerType::Mechanical) {
                             SetupOutputVariable(state, "Refrigeration System Mechanical Subcooler Heat Transfer Rate",
                                                 OutputProcessor::Unit::W,
                                                 Subcooler(subcoolNum).MechSCTransLoad,
@@ -9177,9 +9108,9 @@ namespace EnergyPlus::RefrigeratedCase {
                                                                DataPlant::PlantLoop(Condenser(RefCondLoop).PlantLoopNum).FluidIndex,
                                                                RoutineName);
 
-                if (Condenser(RefCondLoop).FlowType == ConstantFlow) {
+                if (Condenser(RefCondLoop).FlowType == iCndsrFlowType::ConstantFlow) {
                     Condenser(RefCondLoop).MassFlowRateMax = Condenser(RefCondLoop).DesVolFlowRate * rho;
-                } else if (Condenser(RefCondLoop).FlowType == VariableFlow) {
+                } else if (Condenser(RefCondLoop).FlowType == iCndsrFlowType::VariableFlow) {
                     Condenser(RefCondLoop).MassFlowRateMax = Condenser(RefCondLoop).VolFlowRateMax * rho;
                 }
             }
@@ -9211,9 +9142,9 @@ namespace EnergyPlus::RefrigeratedCase {
                                                                DataPlant::PlantLoop(RefrigRack(RefCompRackLoop).PlantLoopNum).FluidIndex,
                                                                RoutineName);
 
-                if (RefrigRack(RefCompRackLoop).FlowType == ConstantFlow) {
+                if (RefrigRack(RefCompRackLoop).FlowType == iCndsrFlowType::ConstantFlow) {
                     RefrigRack(RefCompRackLoop).MassFlowRateMax = RefrigRack(RefCompRackLoop).DesVolFlowRate * rho;
-                } else if (RefrigRack(RefCompRackLoop).FlowType == VariableFlow) {
+                } else if (RefrigRack(RefCompRackLoop).FlowType == iCndsrFlowType::VariableFlow) {
                     RefrigRack(RefCompRackLoop).MassFlowRateMax = RefrigRack(RefCompRackLoop).VolFlowRateMax * rho;
                 }
             }
@@ -9236,9 +9167,9 @@ namespace EnergyPlus::RefrigeratedCase {
                                                                    DataPlant::PlantLoop(Condenser(RefCondLoop).PlantLoopNum).FluidIndex,
                                                                    RoutineName);
 
-                    if (Condenser(RefCondLoop).FlowType == ConstantFlow) {
+                    if (Condenser(RefCondLoop).FlowType == iCndsrFlowType::ConstantFlow) {
                         Condenser(RefCondLoop).MassFlowRateMax = Condenser(RefCondLoop).DesVolFlowRate * rho;
-                    } else if (Condenser(RefCondLoop).FlowType == VariableFlow) {
+                    } else if (Condenser(RefCondLoop).FlowType == iCndsrFlowType::VariableFlow) {
                         Condenser(RefCondLoop).MassFlowRateMax = Condenser(RefCondLoop).VolFlowRateMax * rho;
                     }
 
@@ -9260,9 +9191,9 @@ namespace EnergyPlus::RefrigeratedCase {
                                                                    DataPlant::PlantLoop(RefrigRack(RefCompRackLoop).PlantLoopNum).FluidIndex,
                                                                    RoutineName);
 
-                    if (RefrigRack(RefCompRackLoop).FlowType == ConstantFlow) {
+                    if (RefrigRack(RefCompRackLoop).FlowType == iCndsrFlowType::ConstantFlow) {
                         RefrigRack(RefCompRackLoop).MassFlowRateMax = RefrigRack(RefCompRackLoop).DesVolFlowRate * rho;
-                    } else if (RefrigRack(RefCompRackLoop).FlowType == VariableFlow) {
+                    } else if (RefrigRack(RefCompRackLoop).FlowType == iCndsrFlowType::VariableFlow) {
                         RefrigRack(RefCompRackLoop).MassFlowRateMax = RefrigRack(RefCompRackLoop).VolFlowRateMax * rho;
                     }
 
@@ -9375,7 +9306,7 @@ namespace EnergyPlus::RefrigeratedCase {
                 //                                     (used when HeatRejectionLocation = LocationZone)
                 //   if walk-ins are served by rack, user must specify heat rejection zone and 100% of heat
                 //   rejection goes to that zone - that is, no heat rejection goes to the HVAC return air
-                if (this->HeatRejectionLocation == LocationZone) {
+                if (this->HeatRejectionLocation == iLocation::Zone) {
                     if (this->NumWalkIns == 0) {
                         TotalHeatRejectedToZone += RefrigCase(CaseID).TotalCoolingLoad * (1.0 - state.dataRefrigCase->CaseRAFactor);
                         //  CaseRAFactor is a module variable calculated in CalculateCase
@@ -9395,7 +9326,7 @@ namespace EnergyPlus::RefrigeratedCase {
                 int WalkInID = this->WalkInNum(WalkInIndex);
                 WalkIn(WalkInID).CalculateWalkIn(state);
                 state.dataRefrigCase->TotalRackDeliveredCapacity += WalkIn(WalkInID).TotalCoolingLoad;
-                if (this->HeatRejectionLocation == LocationZone) {
+                if (this->HeatRejectionLocation == iLocation::Zone) {
                     TotalHeatRejectedToZone += WalkIn(WalkInID).TotalCoolingLoad;
                     HeatRejectZoneNum = this->HeatRejectionZoneNum;
                     HeatRejectZoneNodeNum = this->HeatRejectionZoneNodeNum;
@@ -9403,7 +9334,7 @@ namespace EnergyPlus::RefrigeratedCase {
             }     // WalkInIndex
         }         // NumWalkIns>0
 
-        if (this->HeatRejectionLocation == LocationZone) {
+        if (this->HeatRejectionLocation == iLocation::Zone) {
             COPFTempOutput = CurveManager::CurveValue(state, this->COPFTempPtr, DataLoopNode::Node(HeatRejectZoneNodeNum).Temp);
             EvapAvail = false;
         } else {
@@ -9477,7 +9408,7 @@ namespace EnergyPlus::RefrigeratedCase {
         // fan loads > 0 only if the connected cases are operating
         if (state.dataRefrigCase->TotalRackDeliveredCapacity > 0.0 && this->CondenserType != DataHeatBalance::RefrigCondenserTypeWater) {
             if (this->TotCondFTempPtr != 0) {
-                if (this->HeatRejectionLocation == LocationZone) {
+                if (this->HeatRejectionLocation == iLocation::Zone) {
                     CondenserFrac =
                         max(0.0, min(1.0, CurveManager::CurveValue(state, this->TotCondFTempPtr, DataLoopNode::Node(HeatRejectZoneNodeNum).Temp)));
                     state.dataRefrigCase->TotalCondenserFanPower = this->CondenserFanPower * CondenserFrac;
@@ -9523,7 +9454,7 @@ namespace EnergyPlus::RefrigeratedCase {
         // add in compressor and condenser fan power to rack heat rejection variables if the heat rejection location is to the zone
         //   if walk-ins are served by rack, user must specify heat rejection zone and 100% of heat
         //   rejection goes to that zone - that is, no condenser heat rejection goes to the HVAC return air
-        if (this->HeatRejectionLocation == LocationZone) {
+        if (this->HeatRejectionLocation == iLocation::Zone) {
             state.dataRefrigCase->TotalCondenserHeat = state.dataRefrigCase->TotalRackDeliveredCapacity + state.dataRefrigCase->TotalCompressorPower + state.dataRefrigCase->TotalCondenserFanPower;
             if (HeatRejectZoneNum > 0 && state.dataRefrigCase->TotalRackDeliveredCapacity > 0.0) {
                 if (this->NumWalkIns == 0) {
@@ -9578,7 +9509,7 @@ namespace EnergyPlus::RefrigeratedCase {
         this->CondLoad = state.dataRefrigCase->TotalCondenserHeat;
         this->CondEnergy = state.dataRefrigCase->TotalCondenserHeat * LocalTimeStep * DataGlobalConstants::SecInHour;
         // Set total rack heat rejection used for heat reclaim. Do not allow heat reclaim on stand alone (indoor) display cases.
-        if (this->HeatRejectionLocation == LocationZone) {
+        if (this->HeatRejectionLocation == iLocation::Zone) {
             DataHeatBalance::HeatReclaimRefrigeratedRack(RackNum).AvailCapacity = 0.0;
         } else {
             DataHeatBalance::HeatReclaimRefrigeratedRack(RackNum).AvailCapacity = state.dataRefrigCase->TotalRackDeliveredCapacity * (1.0 + 1.0 / state.dataRefrigCase->CompressorCOPactual);
@@ -9678,7 +9609,7 @@ namespace EnergyPlus::RefrigeratedCase {
         Real64 CaseSchedule = ScheduleManager::GetCurrentScheduleValue(state, this->SchedPtr);
         if (CaseSchedule <= 0) return;
         // get defrost schedule
-        if (this->DefrostType > DefNone) {
+        if (this->DefrostType > iRefCaseDefrostType::None) {
             DefrostSchedule = ScheduleManager::GetCurrentScheduleValue(state, this->DefrostSchedPtr);
             DefrostDripDownSchedule = ScheduleManager::GetCurrentScheduleValue(state, this->DefrostDripDownSchedPtr);
             // next statement In case user doesn't understand concept of drip down schedule
@@ -9717,7 +9648,7 @@ namespace EnergyPlus::RefrigeratedCase {
         Real64 TotalLightToZone = TotalLightingLoad - TotalLightToCase;
         // cycle fan according to defrost schedule
         // turn fan on for none or off-cycle defrost types
-        if (this->DefrostType == DefNone || this->DefrostType == DefOffCycle) {
+        if (this->DefrostType == iRefCaseDefrostType::None || this->DefrostType == iRefCaseDefrostType::OffCycle) {
             TotalFan = this->DesignFanPower;
         } else {
             TotalFan = this->DesignFanPower * (1.0 - DefrostDripDownSchedule);
@@ -9736,18 +9667,18 @@ namespace EnergyPlus::RefrigeratedCase {
         // Anti-sweat heater capacity
         {
             auto const SELECT_CASE_var(this->AntiSweatControlType);
-            if (SELECT_CASE_var == ASNone) {
+            if (SELECT_CASE_var == iASHtrCtrlType::None) {
                 TotalAntiSweat = 0.0;
-            } else if (SELECT_CASE_var == ASConstant) {
+            } else if (SELECT_CASE_var == iASHtrCtrlType::Constant) {
                 TotalAntiSweat = this->AntiSweatPower;
-            } else if (SELECT_CASE_var == ASLinear) {
+            } else if (SELECT_CASE_var == iASHtrCtrlType::Linear) {
                 TotalAntiSweat = this->AntiSweatPower *
                                  min(1.0, max(0.0, 1.0 - (this->RatedAmbientRH - ZoneRHPercent) / (this->RatedAmbientRH - this->HumAtZeroAS)));
                 TotalAntiSweat = max(this->MinimumASPower, TotalAntiSweat);
-            } else if (SELECT_CASE_var == ASDewPoint) {
+            } else if (SELECT_CASE_var == iASHtrCtrlType::DewPoint) {
                 TotalAntiSweat = this->AntiSweatPower * min(1.0, max(0.0, (ZoneDewPoint - TCase) / (this->RatedAmbientDewPoint - TCase)));
                 TotalAntiSweat = max(this->MinimumASPower, TotalAntiSweat);
-            } else if (SELECT_CASE_var == ASHeatBalance) {
+            } else if (SELECT_CASE_var == iASHtrCtrlType::HeatBalance) {
                 if (this->Rcase > 0.0) {
                     TotalAntiSweat = (((ZoneDewPoint - DataLoopNode::Node(this->ZoneNodeNum).Temp) * this->Height / Rair) +
                                       ((ZoneDewPoint - TCase) * this->Height / this->Rcase));
@@ -9771,12 +9702,12 @@ namespace EnergyPlus::RefrigeratedCase {
         // latent capacity correction term at off-design conditions
         {
             auto const SELECT_CASE_var(this->LatentEnergyCurveType);
-            if (SELECT_CASE_var == CaseTemperatureMethod) {
+            if (SELECT_CASE_var == iEnergyEqnForm::CaseTemperatureMethod) {
                 Real64 LatCapModFrac = CurveManager::CurveValue(state, this->LatCapCurvePtr, TCase);
                 LatentRatio = max(0.0, (1.0 - (this->RatedAmbientRH - ZoneRHPercent) * LatCapModFrac));
-            } else if (SELECT_CASE_var == RHCubic) {
+            } else if (SELECT_CASE_var == iEnergyEqnForm::RHCubic) {
                 LatentRatio = max(0.0, CurveManager::CurveValue(state, this->LatCapCurvePtr, ZoneRHPercent));
-            } else if (SELECT_CASE_var == DPCubic) {
+            } else if (SELECT_CASE_var == iEnergyEqnForm::DPCubic) {
                 LatentRatio = max(0.0, CurveManager::CurveValue(state, this->LatCapCurvePtr, ZoneDewPoint));
             }
         }
@@ -9821,20 +9752,20 @@ namespace EnergyPlus::RefrigeratedCase {
 
         // DEFROST CALCULATIONS
         if (DefrostSchedule > 0.0) {
-            if (this->DefrostType != DefNone && this->DefrostType != DefOffCycle) {
+            if (this->DefrostType != iRefCaseDefrostType::None && this->DefrostType != iRefCaseDefrostType::OffCycle) {
                 DefrostCap_Actual = this->DesignDefrostCap * DefrostSchedule;
-                if (this->DefrostType == DefElectricTerm || this->DefrostType == DefHotFluidTerm) {
+                if (this->DefrostType == iRefCaseDefrostType::ElectricTerm || this->DefrostType == iRefCaseDefrostType::HotFluidTerm) {
                     // calculate correction term for temperature termination defrost control
                     {
                         auto const SELECT_CASE_var(this->DefrostEnergyCurveType);
-                        if (SELECT_CASE_var == CaseTemperatureMethod) {
+                        if (SELECT_CASE_var == iEnergyEqnForm::CaseTemperatureMethod) {
                             Real64 DefCapModFrac = CurveManager::CurveValue(state, this->DefCapCurvePtr, TCase);
                             DefrostRatio = max(0.0, (1.0 - (this->RatedAmbientRH - ZoneRHPercent) * DefCapModFrac));
-                        } else if (SELECT_CASE_var == RHCubic) {
+                        } else if (SELECT_CASE_var == iEnergyEqnForm::RHCubic) {
                             DefrostRatio = max(0.0, CurveManager::CurveValue(state, this->DefCapCurvePtr, ZoneRHPercent));
-                        } else if (SELECT_CASE_var == DPCubic) {
+                        } else if (SELECT_CASE_var == iEnergyEqnForm::DPCubic) {
                             DefrostRatio = max(0.0, CurveManager::CurveValue(state, this->DefCapCurvePtr, ZoneDewPoint));
-                        } else if (SELECT_CASE_var == None) {
+                        } else if (SELECT_CASE_var == iEnergyEqnForm::None) {
                             DefrostRatio = 1.0;
                         }
                     }
@@ -9864,7 +9795,7 @@ namespace EnergyPlus::RefrigeratedCase {
                 }
                 // If hot brine or hot gas is used for defrost, need to reduce condenser load
                 // Note this condenser credit is not applied in compressor-rack systems.
-                if (this->DefrostType != DefElectric && this->DefrostType != DefElectricOnDemand && this->DefrostType != DefElectricTerm)
+                if (this->DefrostType != iRefCaseDefrostType::Electric && this->DefrostType != iRefCaseDefrostType::ElectricOnDemand && this->DefrostType != iRefCaseDefrostType::ElectricTerm)
                     this->HotDefrostCondCredit = DefrostCap_Actual * DefrostSchedule;
             } else { // no defrost or off-cycle defrost
                 DefrostCap_Actual = 0.0;
@@ -9903,7 +9834,7 @@ namespace EnergyPlus::RefrigeratedCase {
         } // CapAvail vs Load requested
 
         // Reset DefrostLoad_Actual to zero for non-electric defrost types, for reporting purposes
-        if (this->DefrostType != DefElectric && this->DefrostType != DefElectricOnDemand && this->DefrostType != DefElectricTerm)
+        if (this->DefrostType != iRefCaseDefrostType::Electric && this->DefrostType != iRefCaseDefrostType::ElectricOnDemand && this->DefrostType != iRefCaseDefrostType::ElectricTerm)
             DefrostCap_Actual = 0.0;
 
         Real64 caseRAFraction = min(0.8, this->RAFrac);
@@ -10131,7 +10062,7 @@ namespace EnergyPlus::RefrigeratedCase {
         Real64 Cp = FluidProperties::GetSpecificHeatGlycol(
             state, DataPlant::PlantLoop(PlantLoopIndex).FluidName, this->InletTemp, DataPlant::PlantLoop(PlantLoopIndex).FluidIndex, RoutineName);
 
-        if (this->FlowType == VariableFlow && state.dataRefrigCase->TotalCondenserHeat > 0.0) {
+        if (this->FlowType == iCndsrFlowType::VariableFlow && state.dataRefrigCase->TotalCondenserHeat > 0.0) {
 
             this->OutletTemp = ScheduleManager::GetCurrentScheduleValue(state, this->OutletTempSchedPtr);
 
@@ -10164,7 +10095,7 @@ namespace EnergyPlus::RefrigeratedCase {
             }
             } // compare outlet T to inlet T
 
-        } else if (this->FlowType == ConstantFlow && state.dataRefrigCase->TotalCondenserHeat > 0.0) {
+        } else if (this->FlowType == iCndsrFlowType::ConstantFlow && state.dataRefrigCase->TotalCondenserHeat > 0.0) {
             // this part for constant flow condition
             this->VolFlowRate = this->DesVolFlowRate;
             this->MassFlowRate = this->VolFlowRate * rho;
@@ -10188,7 +10119,7 @@ namespace EnergyPlus::RefrigeratedCase {
                 ShowRecurringWarningErrorAtEnd(state,
                     TypeName + this->Name +
                         "Water-cooled condenser has no cooling water flow. Heat is not being rejected from compressor rack condenser.",
-                    this->FlowType);
+                    reinterpret_cast<int &>(this->FlowType));
             }
                     }
         // Check outlet water temp for max value
@@ -10290,7 +10221,7 @@ namespace EnergyPlus::RefrigeratedCase {
             Real64 Cp = FluidProperties::GetSpecificHeatGlycol(
                 state, DataPlant::PlantLoop(PlantLoopIndex).FluidName, this->InletTemp, DataPlant::PlantLoop(PlantLoopIndex).FluidIndex, RoutineName);
 
-            if (this->FlowType == VariableFlow && state.dataRefrigCase->TotalCondenserHeat > 0.0) {
+            if (this->FlowType == iCndsrFlowType::VariableFlow && state.dataRefrigCase->TotalCondenserHeat > 0.0) {
                 this->OutletTemp = ScheduleManager::GetCurrentScheduleValue(state, this->OutletTempSchedPtr);
 
                 if (this->OutletTemp == this->InletTemp) {
@@ -10323,7 +10254,7 @@ namespace EnergyPlus::RefrigeratedCase {
                     }
                 } // compare outlet T to inlet T
 
-            } else if (this->FlowType == ConstantFlow && state.dataRefrigCase->TotalCondenserHeat > 0.0) {
+            } else if (this->FlowType == iCndsrFlowType::ConstantFlow && state.dataRefrigCase->TotalCondenserHeat > 0.0) {
                 // this part for constant flow condition
                 this->VolFlowRate = this->DesVolFlowRate;
                 this->MassFlowRate = this->VolFlowRate * rho;
@@ -10471,7 +10402,7 @@ namespace EnergyPlus::RefrigeratedCase {
                         //  Tevap needed is either fixed at this design value,
                         //  or allowed to float to meet lowest T needed among all loads served by the system
                         //  (Floating Tevap = Design Tevap unless load <= Design cap)
-                        if (System(SysNum).CompSuctControl == ConstantSuctionTemperature) {
+                        if (System(SysNum).CompSuctControl == iCompSuctionPressureCtrl::ConstantSuctionTemperature) {
                             System(SysNum).TEvapNeeded = System(SysNum).TEvapDesign;
                         } else { // calculate floating T evap
                             Real64 LoadFrac = min(1.0, (RefrigCase(CaseID).TotalCoolingLoad / RefrigCase(CaseID).DesignRatedCap));
@@ -10495,7 +10426,7 @@ namespace EnergyPlus::RefrigeratedCase {
                     for (int WalkInIndex = 1; WalkInIndex <= System(SysNum).NumWalkIns; ++WalkInIndex) {
                         int WalkInID = System(SysNum).WalkInNum(WalkInIndex);
                         WalkIn(WalkInID).CalculateWalkIn(state);
-                        if (System(SysNum).CompSuctControl == ConstantSuctionTemperature) {
+                        if (System(SysNum).CompSuctControl == iCompSuctionPressureCtrl::ConstantSuctionTemperature) {
                             System(SysNum).TEvapNeeded = System(SysNum).TEvapDesign;
                         } else { // calculate floating T evap
                             Real64 LoadFrac = min(1.0, (WalkIn(WalkInID).TotalCoolingLoad / WalkIn(WalkInID).DesignRatedCap));
@@ -10519,7 +10450,7 @@ namespace EnergyPlus::RefrigeratedCase {
                     for (int CoilIndex = 1; CoilIndex <= System(SysNum).NumCoils; ++CoilIndex) {
                         int CoilID = System(SysNum).CoilNum(CoilIndex);
                         // already CALLed CalculateCoil(CoilID) in CoilSet specified order
-                        if (System(SysNum).CompSuctControl == ConstantSuctionTemperature) {
+                        if (System(SysNum).CompSuctControl == iCompSuctionPressureCtrl::ConstantSuctionTemperature) {
                             System(SysNum).TEvapNeeded = System(SysNum).TEvapDesign;
                         } else { // calculate floating T evap
                             // for now, override floating Tevap if coils on system, warning was printed in input to let user know
@@ -10535,7 +10466,7 @@ namespace EnergyPlus::RefrigeratedCase {
                     for (int SecondIndex = 1; SecondIndex <= System(SysNum).NumSecondarys; ++SecondIndex) {
                         int SecondID = System(SysNum).SecondaryNum(SecondIndex);
                         Secondary(SecondID).CalculateSecondary(state, SecondID);
-                        if (System(SysNum).CompSuctControl == ConstantSuctionTemperature) {
+                        if (System(SysNum).CompSuctControl == iCompSuctionPressureCtrl::ConstantSuctionTemperature) {
                             System(SysNum).TEvapNeeded = System(SysNum).TEvapDesign;
                         } else { // check for lowest T evap design among the secondary systems and
                             //  Compare Tevap for this second to max allowed for cases, walk ins, and
@@ -10604,7 +10535,7 @@ namespace EnergyPlus::RefrigeratedCase {
                     if ((state.dataRefrigCase->NumSimulationMechSubcoolers > 0) && (!FirstSCLoop)) {
                         // This loop places load on system providing mechanical subcooling
                         for (int SubcoolID = 1; SubcoolID <= state.dataRefrigCase->NumSimulationSubcoolers; ++SubcoolID) {
-                            if (Subcooler(SubcoolID).SubcoolerType == LiquidSuction) continue;
+                            if (Subcooler(SubcoolID).SubcoolerType == iSubcoolerType::LiquidSuction) continue;
                             if (Subcooler(SubcoolID).MechSourceSysID != SysNum) continue;
                             // don't have summechscload until second subcooler pass, set to zero on first pass
                             System(SysNum).SumMechSCLoad += System(SysNum).MechSCLoad(SubcoolID);
@@ -10620,7 +10551,7 @@ namespace EnergyPlus::RefrigeratedCase {
                         if (System(SysNum).NumSubcoolers > 0) {
                             for (int SubcoolerIndex = 1; SubcoolerIndex <= System(SysNum).NumSubcoolers; ++SubcoolerIndex) {
                                 int SubcoolID = System(SysNum).SubcoolerNum(SubcoolerIndex);
-                                if (Subcooler(SubcoolID).SubcoolerType == LiquidSuction) continue;
+                                if (Subcooler(SubcoolID).SubcoolerType == iSubcoolerType::LiquidSuction) continue;
                                 System(SysNum).SumMechSCBenefit = Subcooler(SubcoolID).MechSCTransLoad;
                             } // subcoolerindex
                         }     // System(sysid)%numsubcoolers > 0
@@ -10631,13 +10562,13 @@ namespace EnergyPlus::RefrigeratedCase {
                     if ((System(SysNum).NumCascadeLoads > 0) && (!FirstSCLoop)) {
                         for (int CascadeLoadIndex = 1; CascadeLoadIndex <= System(SysNum).NumCascadeLoads; ++CascadeLoadIndex) {
                             int CascadeLoadID = System(SysNum).CascadeLoadNum(CascadeLoadIndex);
-                            if (System(SysNum).CompSuctControl == ConstantSuctionTemperature) {
+                            if (System(SysNum).CompSuctControl == iCompSuctionPressureCtrl::ConstantSuctionTemperature) {
                                 System(SysNum).TEvapNeeded = System(SysNum).TEvapDesign;
                             } else { // check for lowest T evap design among the CascadeLoad systems and
                                 //  Compare Tevap for this Cascade to max allowed for cases, walk ins, and
                                 //  for all previous CascadeLoad loops on this suction group and set
                                 //  at the MINIMUM
-                                if (Condenser(CascadeLoadID).CascadeTempControl == CascadeTempSet) {
+                                if (Condenser(CascadeLoadID).CascadeTempControl == iCascadeCndsrTempCtrlType::TempSet) {
                                     // if float then set tevap based upon other loads
                                     if (CascadeLoadIndex == 1 && System(SysNum).NumNonCascadeLoads == 0) {
                                         System(SysNum).TEvapNeeded = Condenser(CascadeLoadID).CascadeRatedEvapTemp;
@@ -10713,7 +10644,7 @@ namespace EnergyPlus::RefrigeratedCase {
                             for (int CoilIndex = 1; CoilIndex <= System(SysNum).NumCoils; ++CoilIndex) {
                                 int CoilID = System(SysNum).CoilNum(CoilIndex);
                                 // already CALLed CalculateCoil(CoilID) in CoilSet specified order
-                                if (System(SysNum).CompSuctControl == ConstantSuctionTemperature) {
+                                if (System(SysNum).CompSuctControl == iCompSuctionPressureCtrl::ConstantSuctionTemperature) {
                                     System(SysNum).TEvapNeeded = System(SysNum).TEvapDesign;
                                 } else { // calculate floating T evap
                                     System(SysNum).TEvapNeeded = System(SysNum).TEvapDesign;
@@ -11480,14 +11411,14 @@ namespace EnergyPlus::RefrigeratedCase {
 
                 {
                     auto const SELECT_CASE_var(condenser.FanSpeedControlType);
-                    if (SELECT_CASE_var == FanVariableSpeed) { // fan power law, adjusted for reality, applies
+                    if (SELECT_CASE_var == iFanSpeedCtrlType::VariableSpeed) { // fan power law, adjusted for reality, applies
                         FanPowerRatio = std::pow(AirVolRatio, 2.5);
                         ActualFanPower = FanPowerRatio * RatedFanPower;
-                    } else if (SELECT_CASE_var == FanConstantSpeed) {
+                    } else if (SELECT_CASE_var == iFanSpeedCtrlType::ConstantSpeed) {
                         ActualFanPower = AirVolRatio * std::exp(1.0 - AirVolRatio) * RatedFanPower;
-                    } else if (SELECT_CASE_var == FanConstantSpeedLinear) {
+                    } else if (SELECT_CASE_var == iFanSpeedCtrlType::ConstantSpeedLinear) {
                         ActualFanPower = AirVolRatio * RatedFanPower;
-                    } else if (SELECT_CASE_var == FanTwoSpeed) {
+                    } else if (SELECT_CASE_var == iFanSpeedCtrlType::TwoSpeed) {
                         // low speed setting of 1/2 fan speed can give up to 60% of capacity.
                         // 1/2 speed corresonds to ~1/8 power consumption (FanHalfSpeedRatio = 1/(2**2.5) = 0.1768)
                         // dampers are used to control flow within those two ranges as in FanConstantSpeed
@@ -11548,7 +11479,7 @@ namespace EnergyPlus::RefrigeratedCase {
 
             this->TCondense = condenser.RatedTCondense;
 
-            if ((this->NumNonCascadeLoads > 0) && (condenser.CascadeTempControl == CascadeTempFloat)) {
+            if ((this->NumNonCascadeLoads > 0) && (condenser.CascadeTempControl == iCascadeCndsrTempCtrlType::TempFloat)) {
                 this->TCondense = System(condenser.CascadeSinkSystemID).TEvapNeeded + condenser.RatedApproachT;
                 if (this->TCondense < this->TCondenseMin) {
                     this->TCondense = this->TCondenseMin;
@@ -11738,14 +11669,14 @@ namespace EnergyPlus::RefrigeratedCase {
 
         {
             auto const SELECT_CASE_var(GasCooler(GasCoolerID).FanSpeedControlType);
-            if (SELECT_CASE_var == FanVariableSpeed) { // fan power law, adjusted for reality, applies
+            if (SELECT_CASE_var == iFanSpeedCtrlType::VariableSpeed) { // fan power law, adjusted for reality, applies
                 FanPowerRatio = std::pow(AirVolRatio, 2.5);
                 ActualFanPower = FanPowerRatio * RatedFanPower;
-            } else if (SELECT_CASE_var == FanConstantSpeed) {
+            } else if (SELECT_CASE_var == iFanSpeedCtrlType::ConstantSpeed) {
                 ActualFanPower = AirVolRatio * std::exp(1.0 - AirVolRatio) * RatedFanPower;
-            } else if (SELECT_CASE_var == FanConstantSpeedLinear) {
+            } else if (SELECT_CASE_var == iFanSpeedCtrlType::ConstantSpeedLinear) {
                 ActualFanPower = AirVolRatio * RatedFanPower;
-            } else if (SELECT_CASE_var == FanTwoSpeed) {
+            } else if (SELECT_CASE_var == iFanSpeedCtrlType::TwoSpeed) {
                 // low speed setting of 1/2 fan speed can give up to 60% of capacity.
                 // 1/2 speed corresonds to ~1/8 power consumption (FanHalfSpeedRatio = 1/(2**2.5) = 0.1768)
                 // dampers are used to control flow within those two ranges as in FanConstantSpeed
@@ -11982,7 +11913,7 @@ namespace EnergyPlus::RefrigeratedCase {
                 // need to use indiv compressor's rated subcool and superheat to adjust capacity to actual conditions
                 {
                     auto const SELECT_CASE_var(Compressor_CompID.SubcoolRatingType);
-                    if (SELECT_CASE_var == RatedSubcooling) {
+                    if (SELECT_CASE_var == iCompRatingType::Subcooling) {
                         if (this->NumStages == 1) { // Single-stage system
                             HCaseInRated = this->HSatLiqCond - this->CpSatLiqCond * Compressor_CompID.RatedSubcool;
                         } else if (this->NumStages == 2 && StageIndex == 1) { // Two-stage system, low-stage side
@@ -11990,7 +11921,7 @@ namespace EnergyPlus::RefrigeratedCase {
                         } else if (this->NumStages == 2 && StageIndex == 2) { // Two-stage system, high-stage side
                             HCaseInRated = this->HSatLiqCond - this->CpSatLiqCond * Compressor_CompID.RatedSubcool;
                         }                                                   // NumStages
-                    } else if (SELECT_CASE_var == RatedLiquidTemperature) { // have rated liquid temperature stored in "RatedSubcool"
+                    } else if (SELECT_CASE_var == iCompRatingType::LiquidTemperature) { // have rated liquid temperature stored in "RatedSubcool"
                         if (this->NumStages == 1) {                         // Single-stage system
                             HCaseInRated = this->HSatLiqCond - this->CpSatLiqCond * (this->TCondense - Compressor_CompID.RatedSubcool);
                         } else if (this->NumStages == 2 && StageIndex == 1) { // Two-stage system, low-stage side
@@ -12002,7 +11933,7 @@ namespace EnergyPlus::RefrigeratedCase {
                 } // Compressor SubcoolRatingType
                 {
                     auto const SELECT_CASE_var(Compressor_CompID.SuperheatRatingType);
-                    if (SELECT_CASE_var == RatedSuperheat) {
+                    if (SELECT_CASE_var == iCompRatingType::Superheat) {
                         if (this->NumStages == 1) { // Single-stage system
                             HCompInRated = HsatVaporforTevapneeded + this->CpSatVapEvap * Compressor_CompID.RatedSuperheat;
                             TempInRated = this->TEvapNeeded + Compressor_CompID.RatedSuperheat;
@@ -12013,7 +11944,7 @@ namespace EnergyPlus::RefrigeratedCase {
                             HCompInRated = HCompInRated_base + this->CpSatVapEvap * Compressor_CompID.RatedSuperheat;
                             TempInRated = this->TIntercooler + Compressor_CompID.RatedSuperheat;
                         }                                                      // NumStages
-                    } else if (SELECT_CASE_var == RatedReturnGasTemperature) { // have rated compressor inlet temperature stored in "RatedSuperheat"
+                    } else if (SELECT_CASE_var == iCompRatingType::ReturnGasTemperature) { // have rated compressor inlet temperature stored in "RatedSuperheat"
                         if (this->NumStages == 1) {                            // Single-stage system
                             TempInRated = Compressor_CompID.RatedSuperheat;
                             HCompInRated = HsatVaporforTevapneeded + this->CpSatVapEvap * (TempInRated - this->TEvapNeeded);
@@ -12266,19 +12197,19 @@ namespace EnergyPlus::RefrigeratedCase {
                 // need to use indiv compressor's rated subcool and superheat to adjust capacity to actual conditions
                 {
                     auto const SELECT_CASE_var(Compressor(CompID).SubcoolRatingType);
-                    if (SELECT_CASE_var == RatedSubcooling) {
+                    if (SELECT_CASE_var == iCompRatingType::Subcooling) {
                         HCaseInRatedLT = HsatLiqforTevapNeededMT - this->CpSatLiqReceiver * Compressor(CompID).RatedSubcool;
-                    } else if (SELECT_CASE_var == RatedLiquidTemperature) { // have rated liquid temperature stored in "RatedSubcool"
+                    } else if (SELECT_CASE_var == iCompRatingType::LiquidTemperature) { // have rated liquid temperature stored in "RatedSubcool"
                         HCaseInRatedLT = FluidProperties::GetSatEnthalpyRefrig(state,
                             this->RefrigerantName, Compressor(CompID).RatedSubcool, 0.0, this->RefIndex, RoutineName);
                     }
                 }
                 {
                     auto const SELECT_CASE_var(Compressor(CompID).SuperheatRatingType);
-                    if (SELECT_CASE_var == RatedSuperheat) {
+                    if (SELECT_CASE_var == iCompRatingType::Superheat) {
                         HCompInRatedLP = HsatVaporforTevapneededLT + this->CpSatVapEvapLT * Compressor(CompID).RatedSuperheat;
                         TempInRatedLP = this->TEvapNeededLT + Compressor(CompID).RatedSuperheat;
-                    } else if (SELECT_CASE_var == RatedReturnGasTemperature) { // have rated compressor inlet temperature stored in "RatedSuperheat"
+                    } else if (SELECT_CASE_var == iCompRatingType::ReturnGasTemperature) { // have rated compressor inlet temperature stored in "iCompRatingType::Superheat"
                         TempInRatedLP = Compressor(CompID).RatedSuperheat;
                         HCompInRatedLP = FluidProperties::GetSupHeatEnthalpyRefrig(
                             state, this->RefrigerantName, Compressor(CompID).RatedSuperheat, PSuctionLT, this->RefIndex, RoutineName);
@@ -12445,14 +12376,14 @@ namespace EnergyPlus::RefrigeratedCase {
             // Subcritical operation requires rated subcool and rated superheat
             {
                 auto const SELECT_CASE_var(Compressor(CompID).SubcoolRatingType);
-                if (SELECT_CASE_var == RatedSubcooling) {
+                if (SELECT_CASE_var == iCompRatingType::Subcooling) {
                     if (!GasCooler(this->GasCoolerNum(1)).TransOpFlag) { // Subcritical operation
                         HCaseInRatedMT = GasCooler(this->GasCoolerNum(1)).HGasCoolerOut -
                                          GasCooler(this->GasCoolerNum(1)).CpGasCoolerOut * Compressor(CompID).RatedSubcool;
                     } else { // Transcritical operation
                         HCaseInRatedMT = GasCooler(this->GasCoolerNum(1)).HGasCoolerOut;
                     }                                                                  // (.NOT.GasCooler(SysNum)%TransOpFlag)
-                } else if (SELECT_CASE_var == RatedLiquidTemperature) {                // have rated liquid temperature stored in "RatedSubcool"
+                } else if (SELECT_CASE_var == iCompRatingType::LiquidTemperature) {                // have rated liquid temperature stored in "RatedSubcool"
                     if (!GasCooler(this->GasCoolerNum(1)).TransOpFlag) { // Subcritical operation
                         HCaseInRatedMT = FluidProperties::GetSatEnthalpyRefrig(state,
                             this->RefrigerantName, Compressor(CompID).RatedSubcool, 0.0, this->RefIndex, RoutineName);
@@ -12463,10 +12394,10 @@ namespace EnergyPlus::RefrigeratedCase {
             }
             {
                 auto const SELECT_CASE_var(Compressor(CompID).SuperheatRatingType);
-                if (SELECT_CASE_var == RatedSuperheat) {
+                if (SELECT_CASE_var == iCompRatingType::Superheat) {
                     HCompInRatedHP = HsatVaporforTevapneededMT + this->CpSatVapEvapMT * Compressor(CompID).RatedSuperheat;
                     TempInRatedHP = this->TEvapNeededMT + Compressor(CompID).RatedSuperheat;
-                } else if (SELECT_CASE_var == RatedReturnGasTemperature) { // have rated compressor inlet temperature stored in "RatedSuperheat"
+                } else if (SELECT_CASE_var == iCompRatingType::ReturnGasTemperature) { // have rated compressor inlet temperature stored in "RatedSuperheat"
                     TempInRatedHP = Compressor(CompID).RatedSuperheat;
                     HCompInRatedHP = FluidProperties::GetSupHeatEnthalpyRefrig(
                         state, this->RefrigerantName, Compressor(CompID).RatedSuperheat, PSuctionMT, this->RefIndex, RoutineName);
@@ -12606,7 +12537,7 @@ namespace EnergyPlus::RefrigeratedCase {
                 // Mechanical subcoolers required to come first in order to take advantage of delT
                 //  from lshx. taken care of because subcooler ID assigned in that order in input.
 
-                if (SELECT_CASE_var == Mechanical) {
+                if (SELECT_CASE_var == iSubcoolerType::Mechanical) {
                     Real64 mechSCLoad = this->RefMassFlowtoLoads * CpLiquid * (TLiqInActualLocal - ControlTLiqOut);
                     this->HCaseIn -= CpLiquid * (TLiqInActualLocal - ControlTLiqOut);
                     // refrigeration benefit to System(sysnum)
@@ -12619,7 +12550,7 @@ namespace EnergyPlus::RefrigeratedCase {
                     TLiqInActualLocal = ControlTLiqOut;
                     this->TCompIn = this->TEvapNeeded + CaseSuperheat;
 
-                } else if (SELECT_CASE_var == LiquidSuction) {
+                } else if (SELECT_CASE_var == iSubcoolerType::LiquidSuction) {
                     Real64 LSHXeffectiveness = DelTLiqDes / (TLiqInDes - TVapInDes);
                     Real64 TVapInActual = this->TEvapNeeded + CaseSuperheat;
                     Real64 DelTempActual = LSHXeffectiveness * (TLiqInActualLocal - TVapInActual);
@@ -12796,11 +12727,11 @@ namespace EnergyPlus::RefrigeratedCase {
             int CountSecPhase = 0;
             int CountSecBrine = 0;
             for (int SecondaryID = 1; SecondaryID <= state.dataRefrigCase->NumSimulationSecondarySystems; ++SecondaryID) {
-                if ((Secondary(SecondaryID).FluidType == SecFluidTypeAlwaysLiquid) && (CountSecBrine == 0)) {
+                if ((Secondary(SecondaryID).FluidType == iSecFluidType::AlwaysLiquid) && (CountSecBrine == 0)) {
                     print(state.files.eio, "{}\n", Format_133); // Secondary system header for brine type systems
                     ++CountSecBrine;
                 }
-                if ((Secondary(SecondaryID).FluidType == SecFluidTypePhaseChange) && (CountSecPhase == 0)) {
+                if ((Secondary(SecondaryID).FluidType == iSecFluidType::PhaseChange) && (CountSecPhase == 0)) {
                     print(state.files.eio, "{}\n", Format_146); // Secondary system header for liquid overfeed/phase change systems
                     ++CountSecPhase;
                 }
@@ -12860,7 +12791,7 @@ namespace EnergyPlus::RefrigeratedCase {
         if (DataHeatBalance::NumRefrigeratedRacks > 0) {
             print(state.files.eio, "#Refrigeration Compressor Racks, {}\n", DataHeatBalance::NumRefrigeratedRacks);
             for (int RackNum = 1; RackNum <= DataHeatBalance::NumRefrigeratedRacks; ++RackNum) {
-                if (RefrigRack(RackNum).HeatRejectionLocation == LocationOutdoors) {
+                if (RefrigRack(RackNum).HeatRejectionLocation == iLocation::Outdoors) {
                     ChrOut = "Outdoors";
                 } else {
                     ChrOut = "Zone";
@@ -13093,9 +13024,9 @@ namespace EnergyPlus::RefrigeratedCase {
 
                         {
                             auto const SELECT_CASE_var1(Condenser(CondID).CascadeTempControl);
-                            if (SELECT_CASE_var1 == CascadeTempSet) {
+                            if (SELECT_CASE_var1 == iCascadeCndsrTempCtrlType::TempSet) {
                                 ChrOut = "Fixed";
-                            } else if (SELECT_CASE_var1 == CascadeTempFloat) {
+                            } else if (SELECT_CASE_var1 == iCascadeCndsrTempCtrlType::TempFloat) {
                                 ChrOut = "Floating";
                             }
                         } // cascade temperature control
@@ -13114,7 +13045,7 @@ namespace EnergyPlus::RefrigeratedCase {
                     int SubcoolerID = System(SystemNum).SubcoolerNum(SubcoolerNum);
                     {
                         auto const SELECT_CASE_var(Subcooler(SubcoolerID).SubcoolerType);
-                        if (SELECT_CASE_var == LiquidSuction) {
+                        if (SELECT_CASE_var == iSubcoolerType::LiquidSuction) {
                             print(state.files.eio,
                                   "   Refrigeration Liquid Suction Subcooler,{},{},{:.1R},{:.1R},{:.1R}\n",
                                   SubcoolerID,
@@ -13122,7 +13053,7 @@ namespace EnergyPlus::RefrigeratedCase {
                                   Subcooler(SubcoolerID).LiqSuctDesignDelT,
                                   Subcooler(SubcoolerID).LiqSuctDesignTliqIn,
                                   Subcooler(SubcoolerID).LiqSuctDesignTvapIn);
-                        } else if (SELECT_CASE_var == Mechanical) {
+                        } else if (SELECT_CASE_var == iSubcoolerType::Mechanical) {
                             print(state.files.eio,
                                   "   Refrigeration Mechanical Subcooler,{},{},{},{:.1R}\n",
                                   SubcoolerID,
@@ -13286,7 +13217,7 @@ namespace EnergyPlus::RefrigeratedCase {
             for (int SecondaryID = 1; SecondaryID <= state.dataRefrigCase->NumSimulationSecondarySystems; ++SecondaryID) {
                 {
                     auto const SELECT_CASE_var(Secondary(SecondaryID).FluidType);
-                    if (SELECT_CASE_var == SecFluidTypeAlwaysLiquid) {
+                    if (SELECT_CASE_var == iSecFluidType::AlwaysLiquid) {
                         print(state.files.eio,
                               "Secondary Refrigeration System: Fluid Always Liquid,{},{},{},{},{},{:.1R},{:.2R},{:.2R},{:.3R},{:.3R}\n",
                               SecondaryID,
@@ -13299,7 +13230,7 @@ namespace EnergyPlus::RefrigeratedCase {
                               Secondary(SecondaryID).TApproachDifRated,
                               Secondary(SecondaryID).TRangeDifRated,
                               Secondary(SecondaryID).PumpTotRatedPower);
-                    } else if (SELECT_CASE_var == SecFluidTypePhaseChange) {
+                    } else if (SELECT_CASE_var == iSecFluidType::PhaseChange) {
                         print(state.files.eio,
                               "Secondary Refrigeration System: Liquid Overfeed,{},{},{},{},{},{:.1R},{:.2R},{:.2R},{:.3R},{:.3R}\n",
                               SecondaryID,
@@ -13537,11 +13468,11 @@ namespace EnergyPlus::RefrigeratedCase {
                     {
                         auto const SELECT_CASE_var(this->StockDoorProtectType(ZoneID));
                         // Values from ASHRAE Ref p 13.6
-                        if (SELECT_CASE_var == WIStockDoorNone) {
+                        if (SELECT_CASE_var == WIStockDoor::None) {
                             DoorProtectEff = 0.0;
-                        } else if (SELECT_CASE_var == WIStockDoorAirCurtain) {
+                        } else if (SELECT_CASE_var == WIStockDoor::AirCurtain) {
                             DoorProtectEff = 0.5;
-                        } else if (SELECT_CASE_var == WIStockDoorStripCurtain) {
+                        } else if (SELECT_CASE_var == WIStockDoor::StripCurtain) {
                             DoorProtectEff = 0.9;
                         }
                     }
@@ -13655,11 +13586,11 @@ namespace EnergyPlus::RefrigeratedCase {
         Real64 DefrostLoad;
 
         // DEFROST CALCULATIONS
-        if ((DefrostSchedule > 0.0) && (this->DefrostType != WalkInDefrostNone) && (this->DefrostType != WalkInDefrostOffCycle)) {
+        if ((DefrostSchedule > 0.0) && (this->DefrostType != WalkinClrDefrostType::None) && (this->DefrostType != WalkinClrDefrostType::OffCycle)) {
             DefrostLoad = this->DefrostCapacity * DefrostSchedule;             // W
             Real64 StartFrostKg = this->KgFrost;                               // frost load at start of time step (kg of ice)
             Real64 DefrostEnergy = DefrostLoad * state.dataGlobal->TimeStepZoneSec; // Joules
-            if (this->DefrostControlType == DefrostContTempTerm) {
+            if (this->DefrostControlType == iDefrostCtrlType::TempTerm) {
                 //  Need to turn defrost system off early if controlled by temperature and all ice melted
                 //  For temperature termination, need to recognize not all defrost heat goes to melt ice
                 //  Some goes to misc losses (for fluid defrost, some coil areas bare earlier than
@@ -13717,7 +13648,7 @@ namespace EnergyPlus::RefrigeratedCase {
             DefrostLoad = 0.0;
         } // Defrost calculations
 
-        if (this->DefrostType == WalkInDefrostElec) {
+        if (this->DefrostType == WalkinClrDefrostType::Elec) {
             this->ElecDefrostConsumption = this->DefrostCapacity * DefrostSchedule * state.dataGlobal->TimeStepZoneSec;
             this->ElecDefrostPower = this->DefrostCapacity * DefrostSchedule;
         } else {
@@ -13726,7 +13657,7 @@ namespace EnergyPlus::RefrigeratedCase {
         }
 
         // If hot brine or hot gas is used for defrost, need to reduce condenser load by heat reclaimed for defrost
-        if (this->DefrostType == WalkInDefrostFluid) this->HotDefrostCondCredit = this->DefrostCapacity * DefrostSchedule;
+        if (this->DefrostType == WalkinClrDefrostType::Fluid) this->HotDefrostCondCredit = this->DefrostCapacity * DefrostSchedule;
 
         // loads reflects that walk ins continue to accumulate loads, even during defrost
         // but cap is used to report portion met by active system while operating
@@ -13875,12 +13806,12 @@ namespace EnergyPlus::RefrigeratedCase {
 
         {
             auto const SELECT_CASE_var(this->FluidType);
-            if (SELECT_CASE_var == SecFluidTypeAlwaysLiquid) {
+            if (SELECT_CASE_var == iSecFluidType::AlwaysLiquid) {
                 CpBrine = this->CpBrineRated;
                 DensityBrine = this->DensityBrineRated;
                 TBrineIn = this->TBrineInRated;
                 TPipesReceiver = this->TBrineAverage;
-            } else if (SELECT_CASE_var == SecFluidTypePhaseChange) {
+            } else if (SELECT_CASE_var == iSecFluidType::PhaseChange) {
                 TPipesReceiver = this->TCondense;
             }
         } // Fluid type
@@ -13953,7 +13884,7 @@ namespace EnergyPlus::RefrigeratedCase {
         TotalLoad = RefrigerationLoad + distPipeHeatGain + receiverHeatGain;
         AtPartLoad = true;
         // Check to see if load is already >+ maxload without pump heat
-        if (this->FluidType == SecFluidTypeAlwaysLiquid) { //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+        if (this->FluidType == iSecFluidType::AlwaysLiquid) { //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
             FlowVolNeeded = TotalLoad / this->HeatExchangeEta / (CpBrine * DensityBrine * (TBrineIn - this->TEvapDesign));
             // For brine/glycol systems, find flow volume needed to meet load
             // Per ashrae 2006, p4.1, eval mass flow rate to pump at brine return (to chiller) temp
@@ -13989,17 +13920,17 @@ namespace EnergyPlus::RefrigeratedCase {
                     break;
                 }
                 PrevTotalLoad = TotalLoad;
-                if (this->FluidType == SecFluidTypeAlwaysLiquid) {
+                if (this->FluidType == iSecFluidType::AlwaysLiquid) {
                     FlowVolNeeded = TotalLoad / this->HeatExchangeEta / (CpBrine * DensityBrine * (TBrineIn - this->TEvapDesign));
                     PartLdFrac = FlowVolNeeded / this->MaxVolFlow;
                 } else {
                     PartLdFrac = TotalLoad / this->MaxLoad;
                 }
-                if (this->PumpControlType == SecPumpControlConstant) {
+                if (this->PumpControlType == iSecPumpCtrl::Constant) {
                     VolFlowRate = 0.0;
                     TotalPumpPower = 0.0;
                     for (int PumpID = 1; PumpID <= this->NumPumps; ++PumpID) { // dispatch pumps to meet needed flow rate
-                        if (this->FluidType == SecFluidTypeAlwaysLiquid) {     //>>>>>>>>>>>>>>>>>>>>>
+                        if (this->FluidType == iSecFluidType::AlwaysLiquid) {     //>>>>>>>>>>>>>>>>>>>>>
                             VolFlowRate += this->PumpIncrementFlowVol;
                             TotalPumpPower += this->PumpIncrementPower;
                             if (VolFlowRate >= FlowVolNeeded) break;
@@ -14453,7 +14384,7 @@ namespace EnergyPlus::RefrigeratedCase {
         if (this->HeaterSchedPtr > 0) HeaterSchedule = ScheduleManager::GetCurrentScheduleValue(state, this->HeaterSchedPtr);
 
         // Set local subroutine variables for convenience
-        int FanSpeedControlType = this->FanType;
+        auto FanSpeedControlType = this->FanType;
         Real64 AirVolumeFlowRated = this->RatedAirVolumeFlow;   // Coil rated air flow (m3/s)
         Real64 FanPowerRated = this->RatedFanPower;             // (W)
         Real64 HeaterLoad = this->HeaterPower * HeaterSchedule; // Total heater (except defrost) energy rate (W)
@@ -14645,14 +14576,14 @@ namespace EnergyPlus::RefrigeratedCase {
 
                 {
                     auto const SELECT_CASE_var(FanSpeedControlType);
-                    if (SELECT_CASE_var == FanVariableSpeed) { // fan power law, adjusted for reality, applies
+                    if (SELECT_CASE_var == iFanSpeedCtrlType::VariableSpeed) { // fan power law, adjusted for reality, applies
                         Real64 FanPowerRatio = std::pow(AirVolRatio, 2.5); // Used for variable speed fans, dimensionless
                         FanPowerActual = FanPowerRatio * FanPowerMax;
-                    } else if (SELECT_CASE_var == FanConstantSpeed) {
+                    } else if (SELECT_CASE_var == iFanSpeedCtrlType::ConstantSpeed) {
                         FanPowerActual = AirVolRatio * std::exp(1.0 - AirVolRatio) * FanPowerMax;
-                    } else if (SELECT_CASE_var == FanConstantSpeedLinear) { // e.g., on-off control
+                    } else if (SELECT_CASE_var == iFanSpeedCtrlType::ConstantSpeedLinear) { // e.g., on-off control
                         FanPowerActual = AirVolRatio * FanPowerMax;
-                    } else if (SELECT_CASE_var == FanTwoSpeed) {
+                    } else if (SELECT_CASE_var == iFanSpeedCtrlType::TwoSpeed) {
                         // low speed setting of 1/2 fan speed can give up to 60% of capacity.
                         // 1/2 speed corresonds to ~1/8 power consumption (FanHalfSpeedRatio = 1/(2**2.5) = 0.1768)
                         // dampers are used to control flow within those two ranges as in FanConstantSpeed
@@ -14700,12 +14631,12 @@ namespace EnergyPlus::RefrigeratedCase {
         //                     in starting IF are there to mimic temperature override
         //                     on the coils that stops defrost if the coils get above
         //                     a certain temperature (such as when there's no load and no ice)
-        if ((DefrostSchedule > 0.0) && (this->DefrostType != DefrostNone) && (this->DefrostType != DefrostOffCycle)) {
+        if ((DefrostSchedule > 0.0) && (this->DefrostType != iDefrostType::None) && (this->DefrostType != iDefrostType::OffCycle)) {
             DefrostLoad = DefrostCap * DefrostSchedule; // Part of the defrost that is a heat load on the zone (W)
             Real64 DefrostEnergy = DefrostLoad * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour; // Joules
             Real64 StartFrostKg = this->KgFrost; // frost load at start of time step (kg of ice)
 
-            if (this->DefrostControlType == DefrostContTempTerm) {
+            if (this->DefrostControlType == iDefrostCtrlType::TempTerm) {
                 //  Need to turn defrost system off early if controlled by temperature and all ice melted
                 //  For temperature termination, need to recognize not all defrost heat goes to melt ice
                 //  Some goes to misc losses (for fluid defrost, some coil areas bare earlier than
@@ -14772,7 +14703,7 @@ namespace EnergyPlus::RefrigeratedCase {
 
         // ReportWarehouseCoil(CoilID)
         this->ThermalDefrostPower = DefrostLoad;
-        if (this->DefrostType == DefrostElec) {
+        if (this->DefrostType == iDefrostType::Elec) {
             this->ElecDefrostConsumption = DefrostCap * DefrostSchedule * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
             this->ElecDefrostPower = DefrostCap * DefrostSchedule;
         } else {
@@ -14781,7 +14712,7 @@ namespace EnergyPlus::RefrigeratedCase {
         }
 
         // If hot brine or hot gas is used for defrost, need to reduce condenser load by heat reclaimed for defrost
-        if (this->DefrostType == DefrostFluid) this->HotDefrostCondCredit = DefrostCap * DefrostSchedule;
+        if (this->DefrostType == iDefrostType::Fluid) this->HotDefrostCondCredit = DefrostCap * DefrostSchedule;
         // LatentLoadServed is positive for latent heat removed from zone
         // SensLoadFromZone positive for heat REMOVED from zone, switch when do credit to zone
         this->SensCreditRate = SensLoadFromZone;
