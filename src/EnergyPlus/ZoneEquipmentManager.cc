@@ -4332,7 +4332,6 @@ namespace ZoneEquipmentManager {
         using DataHVACGlobals::RetTempMax;
         using DataHVACGlobals::RetTempMin;
         using DataLoopNode::Node;
-        using DataRoomAirModel::AirPatternZoneInfo;
         using DataSurfaces::AirFlowWindow_Destination_ReturnAir;
         using DataSurfaces::Surface;
         using DataZoneEnergyDemands::CurDeadBandOrSetback;
@@ -4385,9 +4384,9 @@ namespace ZoneEquipmentManager {
                 MassFlowRA = Node(ReturnNode).MassFlowRate / ZoneMult;
 
                 // user defined room air model may feed temp that differs from zone node
-                if (allocated(AirPatternZoneInfo)) {
-                    if ((AirPatternZoneInfo(ActualZoneNum).IsUsed) && (!state.dataGlobal->BeginEnvrnFlag)) {
-                        TempZoneAir = AirPatternZoneInfo(ActualZoneNum).Tleaving;
+                if (allocated(state.dataRoomAirMod->AirPatternZoneInfo)) {
+                    if ((state.dataRoomAirMod->AirPatternZoneInfo(ActualZoneNum).IsUsed) && (!state.dataGlobal->BeginEnvrnFlag)) {
+                        TempZoneAir = state.dataRoomAirMod->AirPatternZoneInfo(ActualZoneNum).Tleaving;
                         TempRetAir = TempZoneAir;
                     } else {
                         TempZoneAir = Node(ZoneNode).Temp;
@@ -4559,7 +4558,6 @@ namespace ZoneEquipmentManager {
         using DataHVACGlobals::CycleOn;
         using DataHVACGlobals::CycleOnZoneFansOnly;
         using DataHVACGlobals::TimeStepSys;
-        using DataRoomAirModel::ZTJET;
         using DataZoneEquipment::ZHumRat;
         using DataZoneEquipment::ZMAT;
         using DataZoneEquipment::ZoneEquipAvail;

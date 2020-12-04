@@ -115,17 +115,6 @@ namespace ThermalComfort {
     using DataHeatBalFanSys::ZoneComfortControlsFanger;
     using DataHeatBalFanSys::ZTAV;
     using DataHeatBalFanSys::ZTAVComf;
-    using DataRoomAirModel::IsZoneCV;
-    using DataRoomAirModel::IsZoneDV;
-    using DataRoomAirModel::IsZoneUI;
-    using DataRoomAirModel::TCMF;
-    using DataRoomAirModel::Ujet;
-    using DataRoomAirModel::Urec;
-    using DataRoomAirModel::VComfort_Jet;
-    using DataRoomAirModel::VComfort_Recirculation;
-    using DataRoomAirModel::ZoneUCSDCV;
-    using DataRoomAirModel::ZTJET;
-    using DataRoomAirModel::ZTREC;
     using Psychrometrics::PsyRhFnTdbWPb;
     using ScheduleManager::GetCurrentScheduleValue;
 
@@ -500,14 +489,14 @@ namespace ThermalComfort {
             if ((!People(state.dataThermalComforts->PeopleNum).Fanger) && (!present(PNum))) continue;
 
             state.dataThermalComforts->ZoneNum = People(state.dataThermalComforts->PeopleNum).ZonePtr;
-            if (IsZoneDV(state.dataThermalComforts->ZoneNum) || IsZoneUI(state.dataThermalComforts->ZoneNum)) {
-                state.dataThermalComforts->AirTemp = TCMF(state.dataThermalComforts->ZoneNum); // PH 3/7/04
+            if (state.dataRoomAirMod->IsZoneDV(state.dataThermalComforts->ZoneNum) || state.dataRoomAirMod->IsZoneUI(state.dataThermalComforts->ZoneNum)) {
+                state.dataThermalComforts->AirTemp = state.dataRoomAirMod->TCMF(state.dataThermalComforts->ZoneNum); // PH 3/7/04
                 // UCSD-CV
-            } else if (IsZoneCV(state.dataThermalComforts->ZoneNum)) {
-                if (ZoneUCSDCV(state.dataThermalComforts->ZoneNum).VforComfort == VComfort_Jet) {
-                    state.dataThermalComforts->AirTemp = ZTJET(state.dataThermalComforts->ZoneNum);
-                } else if (ZoneUCSDCV(state.dataThermalComforts->ZoneNum).VforComfort == VComfort_Recirculation) {
-                    state.dataThermalComforts->AirTemp = ZTJET(state.dataThermalComforts->ZoneNum);
+            } else if (state.dataRoomAirMod->IsZoneCV(state.dataThermalComforts->ZoneNum)) {
+                if (state.dataRoomAirMod->ZoneUCSDCV(state.dataThermalComforts->ZoneNum).VforComfort == DataRoomAirModel::Comfort::VComfort_Jet) {
+                    state.dataThermalComforts->AirTemp = state.dataRoomAirMod->ZTJET(state.dataThermalComforts->ZoneNum);
+                } else if (state.dataRoomAirMod->ZoneUCSDCV(state.dataThermalComforts->ZoneNum).VforComfort == DataRoomAirModel::Comfort::VComfort_Recirculation) {
+                    state.dataThermalComforts->AirTemp = state.dataRoomAirMod->ZTJET(state.dataThermalComforts->ZoneNum);
                 } else {
                     // Thermal comfort control uses Tset to determine PMV setpoint value, otherwise use zone temp
                     if (present(PNum)) {
@@ -567,11 +556,11 @@ namespace ThermalComfort {
                 }
             }
 
-            if (IsZoneCV(state.dataThermalComforts->ZoneNum)) {
-                if (ZoneUCSDCV(state.dataThermalComforts->ZoneNum).VforComfort == VComfort_Jet) {
-                    state.dataThermalComforts->AirVel = Ujet(state.dataThermalComforts->ZoneNum);
-                } else if (ZoneUCSDCV(state.dataThermalComforts->ZoneNum).VforComfort == VComfort_Recirculation) {
-                    state.dataThermalComforts->AirVel = Urec(state.dataThermalComforts->ZoneNum);
+            if (state.dataRoomAirMod->IsZoneCV(state.dataThermalComforts->ZoneNum)) {
+                if (state.dataRoomAirMod->ZoneUCSDCV(state.dataThermalComforts->ZoneNum).VforComfort == DataRoomAirModel::Comfort::VComfort_Jet) {
+                    state.dataThermalComforts->AirVel = state.dataRoomAirMod->Ujet(state.dataThermalComforts->ZoneNum);
+                } else if (state.dataRoomAirMod->ZoneUCSDCV(state.dataThermalComforts->ZoneNum).VforComfort == DataRoomAirModel::Comfort::VComfort_Recirculation) {
+                    state.dataThermalComforts->AirVel = state.dataRoomAirMod->Urec(state.dataThermalComforts->ZoneNum);
                 } else {
                     state.dataThermalComforts->AirVel = 0.2;
                 }
@@ -803,8 +792,8 @@ namespace ThermalComfort {
             if (!People(state.dataThermalComforts->PeopleNum).Pierce) continue;
 
             state.dataThermalComforts->ZoneNum = People(state.dataThermalComforts->PeopleNum).ZonePtr;
-            if (IsZoneDV(state.dataThermalComforts->ZoneNum) || IsZoneUI(state.dataThermalComforts->ZoneNum)) {
-                state.dataThermalComforts->AirTemp = TCMF(state.dataThermalComforts->ZoneNum); // PH 3/7/04
+            if (state.dataRoomAirMod->IsZoneDV(state.dataThermalComforts->ZoneNum) || state.dataRoomAirMod->IsZoneUI(state.dataThermalComforts->ZoneNum)) {
+                state.dataThermalComforts->AirTemp = state.dataRoomAirMod->TCMF(state.dataThermalComforts->ZoneNum); // PH 3/7/04
             } else {
                 state.dataThermalComforts->AirTemp = ZTAVComf(state.dataThermalComforts->ZoneNum);
             }
@@ -1223,8 +1212,8 @@ namespace ThermalComfort {
             if (!People(state.dataThermalComforts->PeopleNum).KSU) continue;
 
             state.dataThermalComforts->ZoneNum = People(state.dataThermalComforts->PeopleNum).ZonePtr;
-            if (IsZoneDV(state.dataThermalComforts->ZoneNum) || IsZoneUI(state.dataThermalComforts->ZoneNum)) {
-                state.dataThermalComforts->AirTemp = TCMF(state.dataThermalComforts->ZoneNum); // PH 3/7/04
+            if (state.dataRoomAirMod->IsZoneDV(state.dataThermalComforts->ZoneNum) || state.dataRoomAirMod->IsZoneUI(state.dataThermalComforts->ZoneNum)) {
+                state.dataThermalComforts->AirTemp = state.dataRoomAirMod->TCMF(state.dataThermalComforts->ZoneNum); // PH 3/7/04
             } else {
                 state.dataThermalComforts->AirTemp = ZTAVComf(state.dataThermalComforts->ZoneNum);
             }
@@ -2009,8 +1998,8 @@ namespace ThermalComfort {
             if (state.dataThermalComforts->ThermalComfortInASH55(iZone).ZoneIsOccupied) {
                 // keep track of occupied hours
                 state.dataThermalComforts->ZoneOccHrs(iZone) += state.dataGlobal->TimeStepZone;
-                if (IsZoneDV(iZone) || IsZoneUI(iZone)) {
-                    CurAirTemp = TCMF(iZone);
+                if (state.dataRoomAirMod->IsZoneDV(iZone) || state.dataRoomAirMod->IsZoneUI(iZone)) {
+                    CurAirTemp = state.dataRoomAirMod->TCMF(iZone);
                 } else {
                     CurAirTemp = ZTAVComf(iZone);
                 }
@@ -2192,9 +2181,6 @@ namespace ThermalComfort {
         using DataHVACGlobals::SingleCoolingSetPoint;
         using DataHVACGlobals::SingleHeatCoolSetPoint;
         using DataHVACGlobals::SingleHeatingSetPoint;
-        using DataRoomAirModel::AirModel;
-        using DataRoomAirModel::RoomAirModel_Mixing;
-        //using ZoneTempPredictorCorrector::NumOnOffCtrZone;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 SensibleLoadPredictedNoAdj;
@@ -2236,7 +2222,7 @@ namespace ThermalComfort {
                 }
             }
             if (testHeating && (SensibleLoadPredictedNoAdj > 0)) { // heating
-                if (AirModel(iZone).AirModelType != RoomAirModel_Mixing) {
+                if (state.dataRoomAirMod->AirModel(iZone).AirModelType != DataRoomAirModel::RoomAirModel::Mixing) {
                     deltaT = TempTstatAir(iZone) - ZoneThermostatSetPointLo(iZone);
                 } else {
                     if (state.dataZoneTempPredictorCorrector->NumOnOffCtrZone > 0) {
@@ -2257,7 +2243,7 @@ namespace ThermalComfort {
                     }
                 }
             } else if (testCooling && (SensibleLoadPredictedNoAdj < 0)) { // cooling
-                if (AirModel(iZone).AirModelType != RoomAirModel_Mixing) {
+                if (state.dataRoomAirMod->AirModel(iZone).AirModelType != DataRoomAirModel::RoomAirModel::Mixing) {
                     deltaT = TempTstatAir(iZone) - ZoneThermostatSetPointHi(iZone);
                 } else {
                     if (state.dataZoneTempPredictorCorrector->NumOnOffCtrZone > 0) {
@@ -2548,8 +2534,8 @@ namespace ThermalComfort {
         for (state.dataThermalComforts->PeopleNum = 1; state.dataThermalComforts->PeopleNum <= TotPeople; ++state.dataThermalComforts->PeopleNum) {
             if (!People(state.dataThermalComforts->PeopleNum).AdaptiveASH55) continue;
             state.dataThermalComforts->ZoneNum = People(state.dataThermalComforts->PeopleNum).ZonePtr;
-            if (IsZoneDV(state.dataThermalComforts->ZoneNum) || IsZoneUI(state.dataThermalComforts->ZoneNum)) {
-                state.dataThermalComforts->AirTemp = TCMF(state.dataThermalComforts->ZoneNum);
+            if (state.dataRoomAirMod->IsZoneDV(state.dataThermalComforts->ZoneNum) || state.dataRoomAirMod->IsZoneUI(state.dataThermalComforts->ZoneNum)) {
+                state.dataThermalComforts->AirTemp = state.dataRoomAirMod->TCMF(state.dataThermalComforts->ZoneNum);
             } else {
                 state.dataThermalComforts->AirTemp = ZTAVComf(state.dataThermalComforts->ZoneNum);
             }
@@ -2747,8 +2733,8 @@ namespace ThermalComfort {
         for (state.dataThermalComforts->PeopleNum = 1; state.dataThermalComforts->PeopleNum <= TotPeople; ++state.dataThermalComforts->PeopleNum) {
             if (!People(state.dataThermalComforts->PeopleNum).AdaptiveCEN15251) continue;
             state.dataThermalComforts->ZoneNum = People(state.dataThermalComforts->PeopleNum).ZonePtr;
-            if (IsZoneDV(state.dataThermalComforts->ZoneNum) || IsZoneUI(state.dataThermalComforts->ZoneNum)) {
-                state.dataThermalComforts->AirTemp = TCMF(state.dataThermalComforts->ZoneNum);
+            if (state.dataRoomAirMod->IsZoneDV(state.dataThermalComforts->ZoneNum) || state.dataRoomAirMod->IsZoneUI(state.dataThermalComforts->ZoneNum)) {
+                state.dataThermalComforts->AirTemp = state.dataRoomAirMod->TCMF(state.dataThermalComforts->ZoneNum);
             } else {
                 state.dataThermalComforts->AirTemp = ZTAVComf(state.dataThermalComforts->ZoneNum);
             }
