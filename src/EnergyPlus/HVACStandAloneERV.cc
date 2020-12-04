@@ -908,52 +908,52 @@ namespace HVACStandAloneERV {
 
             // Changed by AMIT for new implementation of the controller:outside air
             if (Alphas(3) == "EXHAUSTAIRTEMPERATURELIMIT" && Alphas(4) == "EXHAUSTAIRENTHALPYLIMIT") {
-                thisOAController.Econo = MixedAir::EconomizerControl::DifferentialDryBulbAndEnthalpy;
+                thisOAController.Econo = MixedAir::DifferentialDryBulbAndEnthalpy;
             } else if (Alphas(3) == "EXHAUSTAIRTEMPERATURELIMIT" && Alphas(4) == "NOEXHAUSTAIRENTHALPYLIMIT") {
-                thisOAController.Econo = MixedAir::EconomizerControl::DifferentialDryBulb;
+                thisOAController.Econo = MixedAir::DifferentialDryBulb;
             } else if (Alphas(3) == "NOEXHAUSTAIRTEMPERATURELIMIT" && Alphas(4) == "EXHAUSTAIRENTHALPYLIMIT") {
-                thisOAController.Econo = MixedAir::EconomizerControl::DifferentialEnthalpy;
+                thisOAController.Econo = MixedAir::DifferentialEnthalpy;
             } else if (Alphas(3) == "NOEXHAUSTAIRTEMPERATURELIMIT" && Alphas(4) == "NOEXHAUSTAIRENTHALPYLIMIT") {
                 if ((!lNumericBlanks(1)) || (!lNumericBlanks(3)) || (!lNumericBlanks(4)) || (!lAlphaBlanks(2))) {
                     // This means that any of the FIXED DRY BULB, FIXED ENTHALPY, FIXED DEW POINT AND DRY BULB OR
                     // ELECTRONIC ENTHALPY ECONOMIZER STRATEGY is present
-                    thisOAController.Econo = MixedAir::EconomizerControl::FixedDryBulb;
+                    thisOAController.Econo = MixedAir::FixedDryBulb;
                 }
             } else if ((!lAlphaBlanks(3)) && (!lAlphaBlanks(4))) {
                 if ((lNumericBlanks(1)) && (lNumericBlanks(3)) && (lNumericBlanks(4)) && lAlphaBlanks(2)) {
                     ShowWarningError(state, CurrentModuleObject + " \"" + Alphas(1) + "\"");
                     ShowContinueError(state, "... Invalid " + cAlphaFields(3) + cAlphaFields(4) + " = " + Alphas(3) + Alphas(4));
                     ShowContinueError(state, "... Assumed NO EXHAUST AIR TEMP LIMIT and NO EXHAUST AIR ENTHALPY LIMIT.");
-                    thisOAController.Econo = MixedAir::EconomizerControl::NoEconomizer;
+                    thisOAController.Econo = MixedAir::NoEconomizer;
                 } else {
                     // This means that any of the FIXED DRY BULB, FIXED ENTHALPY, FIXED DEW POINT AND DRY BULB OR
                     // ELECTRONIC ENTHALPY ECONOMIZER STRATEGY is present
-                    thisOAController.Econo = MixedAir::EconomizerControl::FixedDryBulb;
+                    thisOAController.Econo = MixedAir::FixedDryBulb;
                 }
             } else if ((lAlphaBlanks(3)) && (!lAlphaBlanks(4))) {
                 if ((lNumericBlanks(1)) && (lNumericBlanks(3)) && (lNumericBlanks(4)) && lAlphaBlanks(2)) {
                     ShowWarningError(state, CurrentModuleObject + " \"" + Alphas(1) + "\"");
                     ShowContinueError(state, "... Invalid " + cAlphaFields(4) + " = " + Alphas(4));
                     ShowContinueError(state, "... Assumed  NO EXHAUST AIR ENTHALPY LIMIT.");
-                    thisOAController.Econo = MixedAir::EconomizerControl::NoEconomizer;
+                    thisOAController.Econo = MixedAir::NoEconomizer;
                 } else {
                     // This means that any of the FIXED DRY BULB, FIXED ENTHALPY, FIXED DEW POINT AND DRY BULB OR
                     // ELECTRONIC ENTHALPY ECONOMIZER STRATEGY is present
-                    thisOAController.Econo = MixedAir::EconomizerControl::FixedDryBulb;
+                    thisOAController.Econo = MixedAir::FixedDryBulb;
                 }
             } else if ((!lAlphaBlanks(3)) && (lAlphaBlanks(4))) {
                 if ((lNumericBlanks(1)) && (lNumericBlanks(3)) && (lNumericBlanks(4)) && lAlphaBlanks(2)) {
                     ShowWarningError(state, CurrentModuleObject + " \"" + Alphas(1) + "\"");
                     ShowContinueError(state, "... Invalid " + cAlphaFields(3) + " = " + Alphas(3));
                     ShowContinueError(state, "... Assumed NO EXHAUST AIR TEMP LIMIT ");
-                    thisOAController.Econo = MixedAir::EconomizerControl::NoEconomizer;
+                    thisOAController.Econo = MixedAir::NoEconomizer;
                 } else {
                     // This means that any of the FIXED DRY BULB, FIXED ENTHALPY, FIXED DEW POINT AND DRY BULB OR
                     // ELECTRONIC ENTHALPY ECONOMIZER STRATEGY is present
-                    thisOAController.Econo = MixedAir::EconomizerControl::FixedDryBulb;
+                    thisOAController.Econo = MixedAir::FixedDryBulb;
                 }
             } else { // NO Economizer
-                thisOAController.Econo = MixedAir::EconomizerControl::NoEconomizer;
+                thisOAController.Econo = MixedAir::NoEconomizer;
             }
 
             thisOAController.FixedMin = false;

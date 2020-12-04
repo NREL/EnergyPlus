@@ -155,6 +155,15 @@ namespace MixedAir {
     int const LockoutWithHeatingPossible(1);
     int const LockoutWithCompressorPossible(2);
 
+    int const NoEconomizer(0);
+    // Changed by Amit as a part on New Feature Proposal
+    int const FixedDryBulb(1);
+    int const FixedEnthalpy(2);
+    int const DifferentialDryBulb(3);
+    int const DifferentialEnthalpy(4);
+    int const FixedDewPointAndDryBulb(5);
+    int const ElectronicEnthalpy(6);
+    int const DifferentialDryBulbAndEnthalpy(7);
     // coil operation
     int const On(1);  // normal coil operation
     int const Off(0); // signal coil shouldn't run
@@ -2285,21 +2294,21 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
             ShowContinueError(state, "Confirm that this is the intended source for the outdoor air stream.");
         }
         if (UtilityRoutines::SameString(AlphArray(6), "NoEconomizer")) {
-            OAController(OutAirNum).Econo = EconomizerControl::NoEconomizer;
+            OAController(OutAirNum).Econo = NoEconomizer;
         } else if (UtilityRoutines::SameString(AlphArray(6), "FixedDryBulb")) {
-            OAController(OutAirNum).Econo = EconomizerControl::FixedDryBulb;
+            OAController(OutAirNum).Econo = FixedDryBulb;
         } else if (UtilityRoutines::SameString(AlphArray(6), "FixedEnthalpy")) {
-            OAController(OutAirNum).Econo = EconomizerControl::FixedEnthalpy;
+            OAController(OutAirNum).Econo = FixedEnthalpy;
         } else if (UtilityRoutines::SameString(AlphArray(6), "FixedDewPointAndDryBulb")) {
-            OAController(OutAirNum).Econo = EconomizerControl::FixedDewPointAndDryBulb;
+            OAController(OutAirNum).Econo = FixedDewPointAndDryBulb;
         } else if (UtilityRoutines::SameString(AlphArray(6), "DifferentialDryBulb")) {
-            OAController(OutAirNum).Econo = EconomizerControl::DifferentialDryBulb;
+            OAController(OutAirNum).Econo = DifferentialDryBulb;
         } else if (UtilityRoutines::SameString(AlphArray(6), "DifferentialEnthalpy")) {
-            OAController(OutAirNum).Econo = EconomizerControl::DifferentialEnthalpy;
+            OAController(OutAirNum).Econo = DifferentialEnthalpy;
         } else if (UtilityRoutines::SameString(AlphArray(6), "DifferentialDryBulbAndEnthalpy")) {
-            OAController(OutAirNum).Econo = EconomizerControl::DifferentialDryBulbAndEnthalpy;
+            OAController(OutAirNum).Econo = DifferentialDryBulbAndEnthalpy;
         } else if (UtilityRoutines::SameString(AlphArray(6), "ElectronicEnthalpy")) {
-            OAController(OutAirNum).Econo = EconomizerControl::ElectronicEnthalpy;
+            OAController(OutAirNum).Econo = ElectronicEnthalpy;
         } else {
             ShowSevereError(state, CurrentModuleObject + "=\"" + AlphArray(1) + "\" invalid " + cAlphaFields(6) + "=\"" + AlphArray(6) + "\" value.");
             ErrorsFound = true;
@@ -2520,7 +2529,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                     ErrorsFound = true;
                 }
             } else {
-                if (OAController(OutAirNum).Econo == EconomizerControl::NoEconomizer) {
+                if (OAController(OutAirNum).Econo == NoEconomizer) {
                     OAController(OutAirNum).ModifyDuringHighOAMoisture = true;
                 } else {
                     OAController(OutAirNum).ModifyDuringHighOAMoisture = false;
@@ -2564,7 +2573,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
             }
         }
 
-        if (UtilityRoutines::SameString(AlphArray(16), "Yes") && OAController(OutAirNum).Econo == EconomizerControl::NoEconomizer) {
+        if (UtilityRoutines::SameString(AlphArray(16), "Yes") && OAController(OutAirNum).Econo == NoEconomizer) {
             ShowWarningError(state, OAController(OutAirNum).ControllerType + " \"" + OAController(OutAirNum).Name + "\"");
             ShowContinueError(state, "...Economizer operation must be enabled when " + cAlphaFields(16) + " is set to YES.");
             ShowContinueError(state, "...The high humidity control option will be disabled and the simulation continues.");
@@ -2694,7 +2703,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
         Real64 rSchVal;
         Real64 rOffset;
         int i;
-        EconomizerControl iEco;
+        int iEco;
 
         ErrorsFound = false;
         OANode = 0;
@@ -2774,7 +2783,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
             MixedAirNode = thisOAController.MixNode;
             if (MixedAirNode > 0) {
                 //      IF (OAController(OAControllerNum)%Econo == 1 .AND. .NOT. state.dataAirLoop->AirLoopControlInfo(AirLoopNum)%CyclingFan) THEN
-                if (thisOAController.Econo > EconomizerControl::NoEconomizer && state.dataAirLoop->AirLoopControlInfo(AirLoopNum).AnyContFan) {
+                if (thisOAController.Econo > NoEconomizer && state.dataAirLoop->AirLoopControlInfo(AirLoopNum).AnyContFan) {
                     if (Node(MixedAirNode).TempSetPoint == SensedNodeFlagValue) {
                         if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                             ShowSevereError(state, "MixedAir: Missing temperature setpoint for economizer controller " + thisOAController.Name);
@@ -2870,17 +2879,17 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
             Node(OANode).MassFlowRateMax = thisOAController.MaxOAMassFlowRate;
 
             // predefined reporting
-            if (thisOAController.Econo > EconomizerControl::NoEconomizer) {
+            if (thisOAController.Econo > NoEconomizer) {
                 equipName = thisOAController.Name;
                 // 90.1 descriptor for economizer controls
                 // Changed by Amit for New Feature implementation
-                if (thisOAController.Econo == EconomizerControl::DifferentialEnthalpy) {
+                if (thisOAController.Econo == DifferentialEnthalpy) {
                     PreDefTableEntry(pdchEcoKind, equipName, "DifferentialEnthalpy");
-                } else if (thisOAController.Econo == EconomizerControl::DifferentialDryBulb) {
+                } else if (thisOAController.Econo == DifferentialDryBulb) {
                     PreDefTableEntry(pdchEcoKind, equipName, "DifferentialDryBulb");
-                } else if (thisOAController.Econo == EconomizerControl::FixedEnthalpy) {
+                } else if (thisOAController.Econo == FixedEnthalpy) {
                     PreDefTableEntry(pdchEcoKind, equipName, "FixedEnthalpy");
-                } else if (thisOAController.Econo == EconomizerControl::FixedDryBulb) {
+                } else if (thisOAController.Econo == FixedDryBulb) {
                     PreDefTableEntry(pdchEcoKind, equipName, "FixedDryBulb");
                 } else {
                     PreDefTableEntry(pdchEcoKind, equipName, "Other");
@@ -2890,22 +2899,22 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                 PreDefTableEntry(pdchEcoMaxOA, equipName, thisOAController.MaxOA);
                 // EnergyPlus input echos for economizer controls
                 // Chnged by Amit for new feature implementation
-                if (thisOAController.Econo == EconomizerControl::DifferentialDryBulb) {
+                if (thisOAController.Econo == DifferentialDryBulb) {
                     PreDefTableEntry(pdchEcoRetTemp, equipName, "Yes");
                 } else {
                     PreDefTableEntry(pdchEcoRetTemp, equipName, "No");
                 }
-                if (thisOAController.Econo == EconomizerControl::DifferentialEnthalpy) {
+                if (thisOAController.Econo == DifferentialEnthalpy) {
                     PreDefTableEntry(pdchEcoRetTemp, equipName, "Yes");
                 } else {
                     PreDefTableEntry(pdchEcoRetTemp, equipName, "No");
                 }
-                if (thisOAController.Econo == EconomizerControl::FixedDryBulb) {
+                if (thisOAController.Econo == FixedDryBulb) {
                     PreDefTableEntry(pdchEcoRetTemp, equipName, thisOAController.TempLim);
                 } else {
                     PreDefTableEntry(pdchEcoRetTemp, equipName, "-");
                 }
-                if (thisOAController.Econo == EconomizerControl::FixedEnthalpy) {
+                if (thisOAController.Econo == FixedEnthalpy) {
                     PreDefTableEntry(pdchEcoRetTemp, equipName, thisOAController.EnthLim);
                 } else {
                     PreDefTableEntry(pdchEcoRetTemp, equipName, "-");
@@ -3349,7 +3358,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
 
         // Check sensors faults for the air economizer
         iEco = thisOAController.Econo;
-        if (AnyFaultsInModel && (iEco > EconomizerControl::NoEconomizer)) {
+        if (AnyFaultsInModel && (iEco > NoEconomizer)) {
             int j; // index to economizer faults
             for (i = 1; i <= thisOAController.NumFaultyEconomizer; ++i) {
                 j = thisOAController.EconmizerFaultNum(i);
@@ -3370,9 +3379,9 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                 // ECONOMIZER - outdoor air dry-bulb temperature sensor offset
                 {
                     auto const SELECT_CASE_var(iEco);
-                    if ((SELECT_CASE_var == EconomizerControl::FixedDryBulb) || (SELECT_CASE_var == EconomizerControl::DifferentialDryBulb) ||
-                        (SELECT_CASE_var == EconomizerControl::FixedDewPointAndDryBulb) || (SELECT_CASE_var == EconomizerControl::ElectronicEnthalpy) ||
-                        (SELECT_CASE_var == EconomizerControl::DifferentialDryBulbAndEnthalpy)) {
+                    if ((SELECT_CASE_var == FixedDryBulb) || (SELECT_CASE_var == DifferentialDryBulb) ||
+                        (SELECT_CASE_var == FixedDewPointAndDryBulb) || (SELECT_CASE_var == ElectronicEnthalpy) ||
+                        (SELECT_CASE_var == DifferentialDryBulbAndEnthalpy)) {
                         if (FaultsEconomizer(j).FaultTypeEnum == iFault_TemperatureSensorOffset_OutdoorAir) {
                             // FaultModel:TemperatureSensorOffset:OutdoorAir
                             thisOAController.OATemp += rOffset;
@@ -3385,7 +3394,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                 // ECONOMIZER - outdoor air humidity ratio sensor offset. really needed ???
                 {
                     auto const SELECT_CASE_var(iEco);
-                    if ((SELECT_CASE_var == EconomizerControl::FixedDewPointAndDryBulb) || (SELECT_CASE_var == EconomizerControl::ElectronicEnthalpy)) {
+                    if ((SELECT_CASE_var == FixedDewPointAndDryBulb) || (SELECT_CASE_var == ElectronicEnthalpy)) {
                         if (FaultsEconomizer(j).FaultTypeEnum == iFault_HumiditySensorOffset_OutdoorAir) {
                             // FaultModel:HumiditySensorOffset:OutdoorAir
                             thisOAController.OAHumRat += rOffset;
@@ -3398,8 +3407,8 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                 // ECONOMIZER - outdoor air enthalpy sensor offset
                 {
                     auto const SELECT_CASE_var(iEco);
-                    if ((SELECT_CASE_var == EconomizerControl::FixedEnthalpy) || (SELECT_CASE_var == EconomizerControl::ElectronicEnthalpy) ||
-                        (SELECT_CASE_var == EconomizerControl::DifferentialDryBulbAndEnthalpy)) {
+                    if ((SELECT_CASE_var == FixedEnthalpy) || (SELECT_CASE_var == ElectronicEnthalpy) ||
+                        (SELECT_CASE_var == DifferentialDryBulbAndEnthalpy)) {
                         if (FaultsEconomizer(j).FaultTypeEnum == iFault_EnthalpySensorOffset_OutdoorAir) {
                             // FaultModel:EnthalpySensorOffset:OutdoorAir
                             thisOAController.OAEnth += rOffset;
@@ -3412,7 +3421,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                 // ECONOMIZER - return air dry-bulb temperature sensor offset
                 {
                     auto const SELECT_CASE_var(iEco);
-                    if ((SELECT_CASE_var == EconomizerControl::DifferentialDryBulb) || (SELECT_CASE_var == EconomizerControl::DifferentialDryBulbAndEnthalpy)) {
+                    if ((SELECT_CASE_var == DifferentialDryBulb) || (SELECT_CASE_var == DifferentialDryBulbAndEnthalpy)) {
                         if (FaultsEconomizer(j).FaultTypeEnum == iFault_TemperatureSensorOffset_ReturnAir) {
                             // FaultModel:TemperatureSensorOffset:ReturnAir
                             thisOAController.RetTemp += rOffset;
@@ -3424,7 +3433,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                 // ECONOMIZER - return air enthalpy sensor offset
                 {
                     auto const SELECT_CASE_var(iEco);
-                    if ((SELECT_CASE_var == EconomizerControl::ElectronicEnthalpy) || (SELECT_CASE_var == EconomizerControl::DifferentialDryBulbAndEnthalpy)) {
+                    if ((SELECT_CASE_var == ElectronicEnthalpy) || (SELECT_CASE_var == DifferentialDryBulbAndEnthalpy)) {
                         if (FaultsEconomizer(j).FaultTypeEnum == iFault_EnthalpySensorOffset_ReturnAir) {
                             // FaultModel:EnthalpySensorOffset:ReturnAir
                             thisOAController.RetEnth += rOffset;
@@ -4515,7 +4524,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
         OutAirSignal = min(max(OutAirSignal, OutAirMinFrac), 1.0);
 
         // If no economizer, set to minimum and disable economizer and high humidity control
-        if (this->Econo == EconomizerControl::NoEconomizer) {
+        if (this->Econo == NoEconomizer) {
             OutAirSignal = OutAirMinFrac;
             EconomizerOperationFlag = false;
             EconomizerAirFlowScheduleValue = 0.0;
@@ -4539,7 +4548,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                 OutAirSignal = 1.0;
             }
             // Return air temp limit
-            if (this->Econo == EconomizerControl::DifferentialDryBulb) {
+            if (this->Econo == DifferentialDryBulb) {
                 if (this->InletTemp > this->RetTemp) {
                     OutAirSignal = OutAirMinFrac;
                     EconomizerOperationFlag = false;
@@ -4547,7 +4556,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                 this->Checksetpoints(state, OutAirMinFrac, OutAirSignal, EconomizerOperationFlag);
             }
             // Return air enthalpy limit
-            if (this->Econo == EconomizerControl::DifferentialEnthalpy) {
+            if (this->Econo == DifferentialEnthalpy) {
                 if (this->InletEnth > this->RetEnth) {
                     OutAirSignal = OutAirMinFrac;
                     EconomizerOperationFlag = false;
@@ -4555,23 +4564,23 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                 this->Checksetpoints(state, OutAirMinFrac, OutAirSignal, EconomizerOperationFlag);
             }
             // Outside air temperature limit
-            if (this->Econo == EconomizerControl::FixedDryBulb) {
+            if (this->Econo == FixedDryBulb) {
                 this->Checksetpoints(state, OutAirMinFrac, OutAirSignal, EconomizerOperationFlag);
             }
             // Fixed Enthalpy limit
-            if (this->Econo == EconomizerControl::FixedEnthalpy) {
+            if (this->Econo == FixedEnthalpy) {
                 this->Checksetpoints(state, OutAirMinFrac, OutAirSignal, EconomizerOperationFlag);
             }
             // FIXED DEW POINT AND DRY BULB TEMPERATURE STRATEGY
-            if (this->Econo == EconomizerControl::FixedDewPointAndDryBulb) {
+            if (this->Econo == FixedDewPointAndDryBulb) {
                 this->Checksetpoints(state, OutAirMinFrac, OutAirSignal, EconomizerOperationFlag);
             }
             // ELECRONIC ENTHALPY, HUMIDITY RATIO CURVE
-            if (this->Econo == EconomizerControl::ElectronicEnthalpy) {
+            if (this->Econo == ElectronicEnthalpy) {
                 this->Checksetpoints(state, OutAirMinFrac, OutAirSignal, EconomizerOperationFlag);
             }
             // Differential dry bulb and enthalpy strategy
-            if (this->Econo == EconomizerControl::DifferentialDryBulbAndEnthalpy) {
+            if (this->Econo == DifferentialDryBulbAndEnthalpy) {
                 if (this->InletTemp > this->RetTemp) {
                     OutAirSignal = OutAirMinFrac;
                     EconomizerOperationFlag = false;
@@ -4759,7 +4768,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
         if (AirLoopNightVent) OASignal = 1.0;
 
         // Set economizer report variable and status flag
-        if (this->Econo == EconomizerControl::NoEconomizer) {
+        if (this->Econo == NoEconomizer) {
             // No economizer
             this->EconomizerStatus = 0;
             this->EconoActive = false;

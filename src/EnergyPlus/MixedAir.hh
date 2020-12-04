@@ -73,17 +73,15 @@ namespace MixedAir {
     extern int const LockoutWithHeatingPossible;
     extern int const LockoutWithCompressorPossible;
 
-    enum class EconomizerControl{
-        NoEconomizer,
-        FixedDryBulb,
-        FixedEnthalpy,
-        DifferentialDryBulb,
-        DifferentialEnthalpy,
-        FixedDewPointAndDryBulb,
-        ElectronicEnthalpy,
-        DifferentialDryBulbAndEnthalpy,
-    };
-
+    extern int const NoEconomizer;
+    // Changed by Amit as a part on New Feature Proposal
+    extern int const FixedDryBulb;
+    extern int const FixedEnthalpy;
+    extern int const DifferentialDryBulb;
+    extern int const DifferentialEnthalpy;
+    extern int const FixedDewPointAndDryBulb;
+    extern int const ElectronicEnthalpy;
+    extern int const DifferentialDryBulbAndEnthalpy;
     // coil operation
     extern int const On;  // normal coil operation
     extern int const Off; // signal coil shouldn't run
@@ -216,7 +214,7 @@ namespace MixedAir {
         int EnthalpyCurvePtr; // Electronic Enthalpy Curve Index (max HumRat = f[OAT])
         Real64 MinOA;         // Minimum outside air flow (m3/sec)
         Real64 MaxOA;         // Maximum outside air flow (m3/sec)
-        EconomizerControl Econo;            // 0 = NoEconomizer, 1 = FixedDryBulb, 2 = FixedEnthalpy, 3=DifferentialDryBulb,
+        int Econo;            // 0 = NoEconomizer, 1 = FixedDryBulb, 2 = FixedEnthalpy, 3=DifferentialDryBulb,
         // 4=DifferentialEnthalpy, 5=FixedDewPointAndDryBulb, 6 = ElectronicEnthalpy,
         // 7 =DifferentialDryBulbAndEnthalpy
         bool EconBypass;      // ModulateFlow =FALSE , MinimumFlowWithBypass =TRUE
@@ -295,7 +293,7 @@ namespace MixedAir {
         // Default Constructor
         OAControllerProps()
             : ControllerType_Num(0), OACtrlIndex(0), Lockout(0), FixedMin(true), TempLim(0.0), TempLowLim(0.0), EnthLim(0.0), DPTempLim(0.0),
-              EnthalpyCurvePtr(0), MinOA(0.0), MaxOA(0.0), Econo(EconomizerControl::NoEconomizer), EconBypass(false), MixNode(0), OANode(0), InletNode(0), RelNode(0), RetNode(0),
+              EnthalpyCurvePtr(0), MinOA(0.0), MaxOA(0.0), Econo(0), EconBypass(false), MixNode(0), OANode(0), InletNode(0), RelNode(0), RetNode(0),
               MinOASchPtr(0), RelMassFlow(0.0), OAMassFlow(0.0), ExhMassFlow(0.0), MixMassFlow(0.0), InletTemp(0.0), InletEnth(0.0), InletPress(0.0),
               InletHumRat(0.0), OATemp(0.0), OAEnth(0.0), OAPress(0.0), OAHumRat(0.0), RetTemp(0.0), RetEnth(0.0), MixSetTemp(0.0),
               MinOAMassFlowRate(0.0), MaxOAMassFlowRate(0.0), RelTemp(0.0), RelEnth(0.0), RelSensiLossRate(0.0), RelLatentLossRate(0.0),
