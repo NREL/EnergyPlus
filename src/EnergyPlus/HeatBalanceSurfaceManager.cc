@@ -2338,7 +2338,6 @@ namespace HeatBalanceSurfaceManager {
         static Array1D<Real64> AbsDiffWinGnd(CFSMAXNL); // Ground diffuse solar absorptance of glass layers //Tuned Made static
         static Array1D<Real64> AbsDiffWinSky(CFSMAXNL); // Sky diffuse solar absorptance of glass layers //Tuned Made static
 
-//        Array1D<Real64> currCosInc(TotSurfaces); // Cosine of incidence angle of beam solar on glass
         Array1D<Real64> currBeamSolar(TotSurfaces); // Local variable for BeamSolarRad
         Array1D<Real64> currSkySolarInc(TotSurfaces); // Sky diffuse solar incident on a surface
         Array1D<Real64> currGndSolarInc(TotSurfaces); // Ground diffuse solar incident on a surface
@@ -2395,11 +2394,22 @@ namespace HeatBalanceSurfaceManager {
             ZoneOpaqSurfExtFaceCond(zoneNum) = 0.0;
             ZoneOpaqSurfExtFaceCondGainRep(zoneNum) = 0.0;
             ZoneOpaqSurfExtFaceCondLossRep(zoneNum) = 0.0;
+
+            // combine InitSolar and CalcSolarDist initialization
+            ZoneTransSolar(zoneNum) = 0.0;
+            ZoneBmSolFrExtWinsRep(zoneNum) = 0.0;
+            ZoneBmSolFrIntWinsRep(zoneNum) = 0.0;
+            ZoneDifSolFrExtWinsRep(zoneNum) = 0.0;
+            ZoneDifSolFrIntWinsRep(zoneNum) = 0.0;
+            ZoneTransSolarEnergy(zoneNum) = 0.0;
+            ZoneBmSolFrExtWinsRepEnergy(zoneNum) = 0.0;
+            ZoneBmSolFrIntWinsRepEnergy(zoneNum) = 0.0;
+            ZoneDifSolFrExtWinsRepEnergy(zoneNum) = 0.0;
+            ZoneDifSolFrIntWinsRepEnergy(zoneNum) = 0.0;
         }
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
             int const firstSurfOpaq = Zone(zoneNum).NonWindowSurfaceFirst;
             int const lastSurfOpaq = Zone(zoneNum).NonWindowSurfaceLast;
-            if (firstSurfOpaq == -1) continue;
             for (int SurfNum = firstSurfOpaq; SurfNum <= lastSurfOpaq; ++SurfNum) {
                 SurfOpaqInsFaceBeamSolAbsorbed(SurfNum) = 0.0;
                 SurfOpaqInsFaceCondGainRep(SurfNum) = 0.0;
@@ -2414,7 +2424,6 @@ namespace HeatBalanceSurfaceManager {
 
             int const firstSurfWin = Zone(zoneNum).WindowSurfaceFirst;
             int const lastSurfWin = Zone(zoneNum).WindowSurfaceLast;
-            if (firstSurfWin == -1) continue;
             for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
                 // Faster "inline" than calling SurfaceWindow( SurfNum ).InitSolarHeatGains()
                 SurfWinFrameQRadOutAbs(SurfNum) = 0.0;
@@ -2496,14 +2505,28 @@ namespace HeatBalanceSurfaceManager {
                 SurfWinHeatTransferRepEnergy(SurfNum) = 0.0;
                 SurfWinShadingAbsorbedSolarEnergy(SurfNum) = 0.0;
                 SurfWinOtherConvGainInsideFaceToZoneRep(SurfNum) = 0.0;
-                SurfWinBSDFBeamDirectionRep(SurfNum) = 0;
-                SurfWinBSDFBeamThetaRep(SurfNum) = 0.0;
-                SurfWinBSDFBeamPhiRep(SurfNum) = 0.0;
                 SurfWinQRadSWwinAbsTot(SurfNum) = 0.0;
                 SurfWinQRadSWwinAbsTotEnergy(SurfNum) = 0.0;
                 SurfWinSWwinAbsTotalReport(SurfNum) = 0.0;
                 SurfWinInitialDifSolInTrans(SurfNum) = 0.0;
                 SurfWinInitialDifSolInTransReport(SurfNum) = 0.0;
+            }
+
+            for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
+                SurfWinTransSolar(SurfNum) = 0.0;
+                SurfWinBmSolar(SurfNum) = 0.0;
+                SurfWinBmBmSolar(SurfNum) = 0.0;
+                SurfWinBmDifSolar(SurfNum) = 0.0;
+                SurfWinDifSolar(SurfNum) = 0.0;
+                SurfWinTransSolarEnergy(SurfNum) = 0.0;
+                SurfWinBmSolarEnergy(SurfNum) = 0.0;
+                SurfWinBmBmSolarEnergy(SurfNum) = 0.0;
+                SurfWinBmDifSolarEnergy(SurfNum) = 0.0;
+                SurfWinDifSolarEnergy(SurfNum) = 0.0;
+
+                SurfWinBSDFBeamDirectionRep(SurfNum) = 0;
+                SurfWinBSDFBeamThetaRep(SurfNum) = 0.0;
+                SurfWinBSDFBeamPhiRep(SurfNum) = 0.0;
 
             }
 
@@ -2532,41 +2555,10 @@ namespace HeatBalanceSurfaceManager {
         }
 
         if (!SunIsUp || (BeamSolarRad + GndSolarRad + DifSolarRad <= 0.0)) { // Sun is down
-
             for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
                 EnclSolQD(zoneNum) = 0.0;
                 EnclSolQDforDaylight(zoneNum) = 0.0;
-                ZoneTransSolar(zoneNum) = 0.0;
-                ZoneBmSolFrExtWinsRep(zoneNum) = 0.0;
-                ZoneBmSolFrIntWinsRep(zoneNum) = 0.0;
-                ZoneDifSolFrExtWinsRep(zoneNum) = 0.0;
-                ZoneDifSolFrIntWinsRep(zoneNum) = 0.0;
-                // energy
-                ZoneTransSolarEnergy(zoneNum) = 0.0;
-                ZoneBmSolFrExtWinsRepEnergy(zoneNum) = 0.0;
-                ZoneBmSolFrIntWinsRepEnergy(zoneNum) = 0.0;
-                ZoneDifSolFrExtWinsRepEnergy(zoneNum) = 0.0;
-                ZoneDifSolFrIntWinsRepEnergy(zoneNum) = 0.0;
             }
-            for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-                int const firstSurfWin = Zone(zoneNum).WindowSurfaceFirst;
-                int const lastSurfWin = Zone(zoneNum).WindowSurfaceLast;
-                if (firstSurfWin == -1) continue;
-                for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
-                    SurfWinTransSolar(SurfNum) = 0.0;
-                    SurfWinBmSolar(SurfNum) = 0.0;
-                    SurfWinBmBmSolar(SurfNum) = 0.0;
-                    SurfWinBmDifSolar(SurfNum) = 0.0;
-                    SurfWinDifSolar(SurfNum) = 0.0;
-                    // energy
-                    SurfWinTransSolarEnergy(SurfNum) = 0.0;
-                    SurfWinBmSolarEnergy(SurfNum) = 0.0;
-                    SurfWinBmBmSolarEnergy(SurfNum) = 0.0;
-                    SurfWinBmDifSolarEnergy(SurfNum) = 0.0;
-                    SurfWinDifSolarEnergy(SurfNum) = 0.0;
-                }
-            }
-
             if (state.dataDaylightingDevicesData->NumOfTDDPipes > 0) {
                 for (auto &e : state.dataDaylightingDevicesData->TDDPipe) {
                     e.TransSolBeam = 0.0;
@@ -2738,7 +2730,6 @@ namespace HeatBalanceSurfaceManager {
             for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
                 for (int SurfNum : Zone(zoneNum).ZoneExtSolarSurfaceList) {
                     // Regular surface
-//                    currCosInc(SurfNum) = CosIncAng(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum);
                     currBeamSolar(SurfNum) = BeamSolarRad;
                     currSkySolarInc(SurfNum) = SurfSkySolarInc(SurfNum);
                     currGndSolarInc(SurfNum) = SurfGndSolarInc(SurfNum);
@@ -2788,8 +2779,6 @@ namespace HeatBalanceSurfaceManager {
                 int ConstrNum = Surface(SurfNum).Construction;
                 if (SurfWinStormWinFlag(SurfNum) == 1) ConstrNum = Surface(SurfNum).StormWinConstruction;
 
-//                currCosInc(SurfNum) = CosIncAng(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum2);
-
                 // Reconstruct the beam, sky, and ground radiation transmittance of just the TDD:DOME and TDD pipe
                 // by dividing out diffuse solar transmittance of TDD:DIFFUSER
 
@@ -2817,7 +2806,6 @@ namespace HeatBalanceSurfaceManager {
             for (int ShelfNum = 1; ShelfNum <= state.dataDaylightingDevicesData->NumOfShelf; ++ShelfNum) {
                 int SurfNum = state.dataDaylightingDevicesData->Shelf(ShelfNum).Window; // Daylighting shelf object number
                 int OutShelfSurf = state.dataDaylightingDevicesData->Shelf(ShelfNum).OutSurf; // Outside daylighting shelf present if > 0
-                // currCosInc(SurfNum) = CosIncAng(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum);
                 currBeamSolar(SurfNum) = BeamSolarRad;
                 currSkySolarInc(SurfNum) = DifSolarRad * AnisoSkyMult(SurfNum);
                 // Shelf diffuse solar radiation

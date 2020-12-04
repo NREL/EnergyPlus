@@ -5996,40 +5996,40 @@ namespace SolarShading {
 #ifdef EP_Count_Calls
         ++NumIntSolarDist_Calls;
 #endif
-
-
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
             EnclSolDB(zoneNum) = 0.0;
             EnclSolDBSSG(zoneNum) = 0.0;
             EnclSolDBIntWin(zoneNum) = 0.0;
-            ZoneTransSolar(zoneNum) = 0.0;
-            ZoneBmSolFrExtWinsRep(zoneNum) = 0.0;
-            ZoneBmSolFrIntWinsRep(zoneNum) = 0.0;
-            ZoneDifSolFrExtWinsRep(zoneNum) = 0.0;
-            ZoneDifSolFrIntWinsRep(zoneNum) = 0.0;
-            ZoneTransSolarEnergy(zoneNum) = 0.0;
-            ZoneBmSolFrExtWinsRepEnergy(zoneNum) = 0.0;
-            ZoneBmSolFrIntWinsRepEnergy(zoneNum) = 0.0;
-            ZoneDifSolFrExtWinsRepEnergy(zoneNum) = 0.0;
-            ZoneDifSolFrIntWinsRepEnergy(zoneNum) = 0.0;
+
+//            ZoneTransSolar(zoneNum) = 0.0;
+//            ZoneBmSolFrExtWinsRep(zoneNum) = 0.0;
+//            ZoneBmSolFrIntWinsRep(zoneNum) = 0.0;
+//            ZoneDifSolFrExtWinsRep(zoneNum) = 0.0;
+//            ZoneDifSolFrIntWinsRep(zoneNum) = 0.0;
+//
+//            ZoneTransSolarEnergy(zoneNum) = 0.0;
+//            ZoneBmSolFrExtWinsRepEnergy(zoneNum) = 0.0;
+//            ZoneBmSolFrIntWinsRepEnergy(zoneNum) = 0.0;
+//            ZoneDifSolFrExtWinsRepEnergy(zoneNum) = 0.0;
+//            ZoneDifSolFrIntWinsRepEnergy(zoneNum) = 0.0;
             int const firstSurfWin = Zone(zoneNum).WindowSurfaceFirst;
             int const lastSurfWin = Zone(zoneNum).WindowSurfaceLast;
+
             for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
                 for (int lay = 1; lay <= CFSMAXNL + 1; ++lay) {
                     SurfWinA(lay, SurfNum) = 0.0;
                 }
-                SurfWinBmSolar(SurfNum) = 0.0;
-                SurfWinBmBmSolar(SurfNum) = 0.0;
-                SurfWinBmDifSolar(SurfNum) = 0.0;
-                // energy
-                SurfWinBmSolarEnergy(SurfNum) = 0.0;
-                SurfWinBmBmSolarEnergy(SurfNum) = 0.0;
-                SurfWinBmDifSolarEnergy(SurfNum) = 0.0;
-
-                SurfWinDifSolarEnergy(SurfNum) = 0.0;
-                SurfWinDifSolar(SurfNum) = 0.0;
-                SurfWinBmSolTransThruIntWinRep(SurfNum) = 0.0;
-                SurfWinBmSolTransThruIntWinRepEnergy(SurfNum) = 0.0;
+//                SurfWinBmBmSolar(SurfNum) = 0.0;
+//                SurfWinBmDifSolar(SurfNum) = 0.0;
+//
+//                SurfWinBmBmSolarEnergy(SurfNum) = 0.0;
+//                SurfWinBmDifSolarEnergy(SurfNum) = 0.0;
+//
+//                SurfWinDifSolarEnergy(SurfNum) = 0.0;
+//                SurfWinDifSolar(SurfNum) = 0.0;
+//
+//                SurfWinBmSolTransThruIntWinRep(SurfNum) = 0.0;
+//                SurfWinBmSolTransThruIntWinRepEnergy(SurfNum) = 0.0;
 
                 WinTransBmSolar(SurfNum) = 0.0;
                 WinTransDifSolar(SurfNum) = 0.0;
