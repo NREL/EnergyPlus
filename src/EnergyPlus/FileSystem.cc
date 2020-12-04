@@ -265,20 +265,10 @@ namespace FileSystem {
         //Note: on Windows, rename function doesn't always replace the existing file so MoveFileExA is used
         MoveFileExA(filePath.c_str(), destination.c_str(), MOVEFILE_COPY_ALLOWED | MOVEFILE_REPLACE_EXISTING);
 #else
-        bool tryCopy = false;
-        try {
-            // Start by removing the destination file. rename fails silently, so you don't want to silently use a potentially outdated file...
-            removeFile(destination);
-            rename(filePath.c_str(), destination.c_str());
-        } catch (...) {
-            tryCopy = true;
-        }
-
-        if (!fileExists(destination)) {
-            tryCopy = true;
-        }
-
-        if (tryCopy) {
+        // Start by removing the destination file. rename fails silently, so you don't want to silently use a potentially outdated file...
+        removeFile(destination);
+        int result = rename(filePath.c_str(), destination.c_str());
+        if ((result != 0) || !fileExists(destination)) {
             // rename won't work for cross-device (eg: copying from one disk to another)
 
             // Do a copy of the content
