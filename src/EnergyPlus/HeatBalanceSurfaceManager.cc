@@ -2333,7 +2333,7 @@ namespace HeatBalanceSurfaceManager {
         using namespace DataWindowEquivalentLayer;
         using SolarShading::SurfaceScheduledSolarInc;
         using SolarShading::WindowScheduledSolarAbs;
-        using namespace std::chrono;
+//        using namespace std::chrono;
 
         static Array1D<Real64> AbsDiffWin(CFSMAXNL);    // Diffuse solar absorptance of glass layers //Tuned Made static
         static Array1D<Real64> AbsDiffWinGnd(CFSMAXNL); // Ground diffuse solar absorptance of glass layers //Tuned Made static
@@ -2343,7 +2343,7 @@ namespace HeatBalanceSurfaceManager {
         Array1D<Real64> currSkySolarInc(TotSurfaces); // Sky diffuse solar incident on a surface
         Array1D<Real64> currGndSolarInc(TotSurfaces); // Ground diffuse solar incident on a surface
 
-        high_resolution_clock::time_point t1 = high_resolution_clock::now();
+//        high_resolution_clock::time_point t1 = high_resolution_clock::now();
 
         // Always initialize the shortwave quantities
         for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
@@ -3419,10 +3419,10 @@ namespace HeatBalanceSurfaceManager {
             }
         } // End of sun-up check
 
-        high_resolution_clock::time_point t2 = high_resolution_clock::now();
-
-        duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
-        timer += time_span.count();
+//        high_resolution_clock::time_point t2 = high_resolution_clock::now();
+//
+//        duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
+//        timer += time_span.count();
     }
 
     void InitIntSolarDistribution(EnergyPlusData &state)
