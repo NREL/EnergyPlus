@@ -4873,8 +4873,6 @@ namespace OutputReportTabular {
         using MixedAir::OAController;
         using PackagedThermalStorageCoil::NumTESCoils;
         using PackagedThermalStorageCoil::TESCoil;
-        using RefrigeratedCase::Condenser;
-        using RefrigeratedCase::RefrigRack;
 
         static int iOACtrl(0);
         static int iCoil(0);
@@ -5024,6 +5022,7 @@ namespace OutputReportTabular {
         }
 
         // Refrigerated Rack
+        auto &RefrigRack(state.dataRefrigCase->RefrigRack);
         for (iRef = 1; iRef <= NumRefrigeratedRacks; ++iRef) {
             if (RefrigRack(iRef).CondenserType == AirCooled) {
                 SysTotalHVACRejectHeatLoss += RefrigRack(iRef).RackElecConsumption + RefrigRack(iRef).RackCoolingEnergy;
@@ -5037,7 +5036,7 @@ namespace OutputReportTabular {
 
         // Refrigerated Case - Condenser
         for (iRef = 1; iRef <= NumRefrigCondensers; ++iRef) {
-            SysTotalHVACRejectHeatLoss += Condenser(iRef).CondEnergy;
+            SysTotalHVACRejectHeatLoss += state.dataRefrigCase->Condenser(iRef).CondEnergy;
         }
 
         // Evaporative coolers
