@@ -67,8 +67,10 @@ namespace FileSystem {
 
     std::string getProgramPath();
 
+    // For `a/b/c.txt.idf` it returns `idf` (anything after last dot, not including the dot)
     std::string getFileExtension(std::string const &fileName);
 
+    // Turns a/b/c.txt.idf into a/b/c.txt
     std::string removeFileExtension(std::string const &fileName);
 
     void makeDirectory(std::string const &directoryPath);
