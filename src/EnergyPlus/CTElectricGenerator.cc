@@ -118,10 +118,11 @@ namespace CTElectricGenerator {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void CTGeneratorData::simulate(EnergyPlusData &EP_UNUSED(state), const EnergyPlus::PlantLocation &EP_UNUSED(calledFromLocation),
-                                   bool EP_UNUSED(FirstHVACIteration),
-                                   Real64 &EP_UNUSED(CurLoad),
-                                   bool EP_UNUSED(RunFlag))
+    void CTGeneratorData::simulate([[maybe_unused]] EnergyPlusData &state,
+                                   [[maybe_unused]] const EnergyPlus::PlantLocation &calledFromLocation,
+                                   [[maybe_unused]] bool FirstHVACIteration,
+                                   [[maybe_unused]] Real64 &CurLoad,
+                                   [[maybe_unused]] bool RunFlag)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
@@ -186,7 +187,7 @@ namespace CTElectricGenerator {
 
             state.dataCTElectricGenerator->CTGenerator(genNum).RatedPowerOutput = NumArray(1);
             if (NumArray(1) == 0.0) {
-                ShowSevereError(state, "Invalid " + DataIPShortCuts::cNumericFieldNames(1) + '=' + General::RoundSigDigits(NumArray(1), 2));
+                ShowSevereError(state, format("Invalid {}={:.2R}", DataIPShortCuts::cNumericFieldNames(1), NumArray(1)));
                 ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
             }

@@ -144,7 +144,7 @@ namespace EnergyPlus {
             //       MODIFIED       na
             //       RE-ENGINEERED  na
             int numSlabsCheck(inputProcessor->getNumObjectsFound(state, ObjName_ZoneCoupled_Slab));
-            DataGlobals::AnySlabsInModel = (numSlabsCheck > 0);
+            state.dataGlobal->AnySlabsInModel = (numSlabsCheck > 0);
         }
 
         void CheckIfAnyBasements(EnergyPlusData &state) {
@@ -154,10 +154,11 @@ namespace EnergyPlus {
             //       MODIFIED       na
             //       RE-ENGINEERED  na
             int const numBasementsCheck(inputProcessor->getNumObjectsFound(state, ObjName_ZoneCoupled_Basement));
-            DataGlobals::AnyBasementsInModel = (numBasementsCheck > 0);
+            state.dataGlobal->AnyBasementsInModel = (numBasementsCheck > 0);
         }
 
-        PlantComponent *Circuit::factory(EnergyPlusData &state, int EP_UNUSED(objectType), std::string objectName) {
+        PlantComponent *Circuit::factory(EnergyPlusData &state, [[maybe_unused]] int objectType, std::string objectName)
+        {
             // Process the input data for circuits if it hasn't been done already
             if (GetInputFlag) {
                 GetPipingSystemsAndGroundDomainsInput(state);
@@ -176,10 +177,12 @@ namespace EnergyPlus {
             return nullptr; // LCOV_EXCL_LINE
         }
 
-        void Circuit::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
-                               bool const EP_UNUSED(FirstHVACIteration),
-                               Real64 &EP_UNUSED(CurLoad),
-                               bool const EP_UNUSED(RunFlag)) {
+        void Circuit::simulate(EnergyPlusData &state,
+                               [[maybe_unused]] const PlantLocation &calledFromLocation,
+                               [[maybe_unused]] bool const FirstHVACIteration,
+                               [[maybe_unused]] Real64 &CurLoad,
+                               [[maybe_unused]] bool const RunFlag)
+        {
             // Retrieve the parent domain index for this pipe circuit
             auto &thisDomain(domains[this->ParentDomainIndex]);
 
@@ -225,9 +228,9 @@ namespace EnergyPlus {
                 // The time init should be done here before we DoOneTimeInits because the DoOneTimeInits
                 // includes a ground temperature initialization, which is based on the Cur%CurSimTimeSeconds variable
                 // which would be carried over from the previous environment
-                thisDomain.Cur.CurSimTimeStepSize = DataGlobals::TimeStepZone * DataGlobalConstants::SecInHour();
-                thisDomain.Cur.CurSimTimeSeconds = ((state.dataGlobal->DayOfSim - 1) * 24 + (DataGlobals::HourOfDay - 1) +
-                                                    (DataGlobals::TimeStep - 1) * DataGlobals::TimeStepZone +
+                thisDomain.Cur.CurSimTimeStepSize = state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour();
+                thisDomain.Cur.CurSimTimeSeconds = ((state.dataGlobal->DayOfSim - 1) * 24 + (state.dataGlobal->HourOfDay - 1) +
+                                                    (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone +
                                                     DataHVACGlobals::SysTimeElapsed) * DataGlobalConstants::SecInHour();
 
                 // There are also some inits that are "close to one time" inits...( one-time in standalone, each envrn in E+ )
@@ -488,9 +491,10 @@ namespace EnergyPlus {
                             ShowSevereError(state, "PipingSystems::" + RoutineName +
                                             ": A pipe was outside of the domain extents after performing corrections for basement or burial depth.");
                             ShowContinueError(state, "Pipe segment name:" + thisSegment->Name);
-                            ShowContinueError(state, "Corrected pipe location: ( x,y )=( " +
-                                              General::TrimSigDigits(thisSegment->PipeLocation.X, 2) + ',' +
-                                              General::TrimSigDigits(thisSegment->PipeLocation.Y, 2) + " )");
+                            ShowContinueError(state,
+                                              format("Corrected pipe location: ( x,y )=( {:.2T},{:.2T} )",
+                                                     thisSegment->PipeLocation.X,
+                                                     thisSegment->PipeLocation.Y));
                         }
                     } // segment loop
                 } // circuit loop
@@ -1478,15 +1482,14 @@ namespace EnergyPlus {
             }
         }
 
-        bool SiteGroundDomainUsingNoMassMat(EnergyPlusData &EP_UNUSED(state), Real64 const MaterialThickness,
-                                            int const MaterialNum) {
+        bool SiteGroundDomainUsingNoMassMat([[maybe_unused]] EnergyPlusData &state, Real64 const MaterialThickness, int const MaterialNum)
+        {
 
             if ( (MaterialThickness <= 0.0) || (dataMaterial.Material(MaterialNum).ROnly) ) {
                 return true;
             } else {
                 return false;
             }
-
         }
 
         void SiteGroundDomainNoMassMatError(EnergyPlusData &state, std::string const &FieldName,
@@ -1671,8 +1674,10 @@ namespace EnergyPlus {
                 // Issue a severe if Inner >= Outer diameter
                 if (thisCircuit.PipeSize.InnerDia >= thisCircuit.PipeSize.OuterDia) {
                     ShowSevereError(state, RoutineName + ": " + ObjName_HorizTrench + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\" has invalid pipe diameters.");
-                    ShowContinueError(state, "Outer diameter [" + General::TrimSigDigits(thisCircuit.PipeSize.OuterDia, 3)
-                            + "] must be greater than inner diameter [" + General::TrimSigDigits(thisCircuit.PipeSize.InnerDia, 3) + "].");
+                    ShowContinueError(state,
+                                      format("Outer diameter [{:.3T}] must be greater than inner diameter [{:.3T}].",
+                                             thisCircuit.PipeSize.OuterDia,
+                                             thisCircuit.PipeSize.InnerDia));
                     ErrorsFound = true;
                 }
 
@@ -1941,8 +1946,7 @@ namespace EnergyPlus {
                 for (int ThisCircuitPipeSegmentCounter = 1;
                      ThisCircuitPipeSegmentCounter <= NumPipeSegments; ++ThisCircuitPipeSegmentCounter) {
                     Segment segment;
-                    segment.Name = "HorizontalTrenchCircuit" + std::to_string(HorizontalGHXCtr) + "Segment" +
-                                   std::to_string(ThisCircuitPipeSegmentCounter);
+                    segment.Name = format("HorizontalTrenchCircuit{}Segment{}", HorizontalGHXCtr, ThisCircuitPipeSegmentCounter);
                     segment.IsActuallyPartOfAHorizontalTrench = true;
                     segment.PipeLocation = PointF(ThisCircuitPipeSegmentCounter * thisInterPipeSpacing,
                                                   thisBurialDepth);
@@ -2187,8 +2191,8 @@ namespace EnergyPlus {
             // includes a ground temperature initialization, which is based on the Cur%CurSimTimeSeconds variable
             // which would be carried over from the previous environment
             this->Cur.CurSimTimeStepSize = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
-            this->Cur.CurSimTimeSeconds = (state.dataGlobal->DayOfSim - 1) * 24 + (DataGlobals::HourOfDay - 1) +
-                                          (DataGlobals::TimeStep - 1) * DataGlobals::TimeStepZone +
+            this->Cur.CurSimTimeSeconds = (state.dataGlobal->DayOfSim - 1) * 24 + (state.dataGlobal->HourOfDay - 1) +
+                                          (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone +
                                           DataHVACGlobals::SysTimeElapsed;
 
             // There are also some inits that are "close to one time" inits...(one-time in standalone, each envrn in E+)
@@ -2279,8 +2283,10 @@ namespace EnergyPlus {
             //       MODIFIED       na
             //       RE-ENGINEERED  na
 
-            ShowSevereError(state, RoutineName + ':' + ObjectName + "=\"" + InstanceName + "\", invalid " + FieldName + "=\"" +
-                            General::TrimSigDigits(FieldEntry, 3) + "\", Condition: " + Condition);
+            ShowSevereError(
+                state,
+                format(
+                    "{}:{}=\"{}\", invalid {}=\"{:.3T}\", Condition: {}", RoutineName, ObjectName, InstanceName, FieldName, FieldEntry, Condition));
             ErrorsFound = true;
         }
 
@@ -2764,7 +2770,8 @@ namespace EnergyPlus {
             this->setupPipeCircuitInOutCells();
         }
 
-        void Domain::createPartitionCenterList(EnergyPlusData &EP_UNUSED(state)) {
+        void Domain::createPartitionCenterList([[maybe_unused]] EnergyPlusData &state)
+        {
 
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Edwin Lee

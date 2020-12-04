@@ -138,9 +138,6 @@ namespace PackagedTerminalHeatPump {
     // Using/Aliasing
     using namespace DataLoopNode;
     using namespace DataSizing;
-    using DataGlobals::DisplayExtraWarnings;
-    using DataGlobals::NumOfZones;
-    using DataGlobals::SysSizingCalc;
     using namespace DataHVACGlobals;
     using DXCoils::DXCoilPartLoadRatio;
 
@@ -263,7 +260,7 @@ namespace PackagedTerminalHeatPump {
         // Manages the simulation of a packaged terminal heat pump. Called from SimZoneEquipment.
 
         // Using/Aliasing
-        using General::TrimSigDigits;
+
         using namespace DataZoneEnergyDemands;
         using DataHeatBalFanSys::TempControlType;
         using DataZoneEquipment::PkgTermACAirToAir_Num;
@@ -307,13 +304,19 @@ namespace PackagedTerminalHeatPump {
                 }
             }
             if (PTUnitNum > NumPTUs || PTUnitNum < 1) {
-                ShowFatalError(state, "SimPackagedTerminalUnit:  Invalid CompIndex passed=" + TrimSigDigits(PTUnitNum) +
-                               ", Number of Units=" + TrimSigDigits(NumPTUs) + ", Entered Unit name=" + CompName);
+                ShowFatalError(state,
+                               format("SimPackagedTerminalUnit:  Invalid CompIndex passed={}, Number of Units={}, Entered Unit name={}",
+                                      PTUnitNum,
+                                      NumPTUs,
+                                      CompName));
             }
             if (CheckEquipName(PTUnitNum)) {
                 if (CompName != PTUnit(PTUnitNum).Name) {
-                    ShowFatalError(state, "SimPackagedTerminalUnit: Invalid CompIndex passed=" + TrimSigDigits(PTUnitNum) + ", Unit name=" + CompName +
-                                   ", stored Unit Name for that index=" + PTUnit(PTUnitNum).Name);
+                    ShowFatalError(state,
+                                   format("SimPackagedTerminalUnit: Invalid CompIndex passed={}, Unit name={}, stored Unit Name for that index={}",
+                                          PTUnitNum,
+                                          CompName,
+                                          PTUnit(PTUnitNum).Name));
                 }
                 CheckEquipName(PTUnitNum) = false;
             }
@@ -340,7 +343,7 @@ namespace PackagedTerminalHeatPump {
         SimPTUnit(state, PTUnitNum, ZoneNum, FirstHVACIteration, QUnitOut, OnOffAirFlowRatio, QZnReq, LatOutputProvided);
 
         // Report the result of the simulation
-        ReportPTUnit(PTUnitNum);
+        ReportPTUnit(state, PTUnitNum);
 
         ZoneEqDXCoil = false;
     }
@@ -565,8 +568,7 @@ namespace PackagedTerminalHeatPump {
         using Fans::GetFanOutletNode;
         using Fans::GetFanType;
         using Fans::GetFanVolFlow;
-        using General::RoundSigDigits;
-        using General::TrimSigDigits;
+
         using MixedAir::GetOAMixerNodeNumbers;
         auto &GetDXCoilInletNode(DXCoils::GetCoilInletNode);
         auto &GetDXCoilOutletNode(DXCoils::GetCoilOutletNode);
@@ -792,28 +794,28 @@ namespace PackagedTerminalHeatPump {
             }
             PTUnit(PTUnitNum).MaxCoolAirVolFlow = Numbers(1);
             if (PTUnit(PTUnitNum).MaxCoolAirVolFlow <= 0 && PTUnit(PTUnitNum).MaxCoolAirVolFlow != AutoSize) {
-                ShowSevereError(state, CurrentModuleObject + " illegal " + cNumericFields(1) + " = " + TrimSigDigits(Numbers(1), 7));
+                ShowSevereError(state, format("{} illegal {} = {:.7T}", CurrentModuleObject, cNumericFields(1), Numbers(1)));
                 ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + PTUnit(PTUnitNum).Name);
                 ErrorsFound = true;
             }
 
             PTUnit(PTUnitNum).MaxHeatAirVolFlow = Numbers(2);
             if (PTUnit(PTUnitNum).MaxHeatAirVolFlow <= 0 && PTUnit(PTUnitNum).MaxHeatAirVolFlow != AutoSize) {
-                ShowSevereError(state, CurrentModuleObject + " illegal " + cNumericFields(2) + " = " + TrimSigDigits(Numbers(2), 7));
+                ShowSevereError(state, format("{} illegal {} = {:.7T}", CurrentModuleObject, cNumericFields(2), Numbers(2)));
                 ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + PTUnit(PTUnitNum).Name);
                 ErrorsFound = true;
             }
 
             PTUnit(PTUnitNum).MaxNoCoolHeatAirVolFlow = Numbers(3);
             if (PTUnit(PTUnitNum).MaxNoCoolHeatAirVolFlow < 0 && PTUnit(PTUnitNum).MaxNoCoolHeatAirVolFlow != AutoSize) {
-                ShowSevereError(state, CurrentModuleObject + " illegal " + cNumericFields(3) + " = " + TrimSigDigits(Numbers(3), 7));
+                ShowSevereError(state, format("{} illegal {} = {:.7T}", CurrentModuleObject, cNumericFields(3), Numbers(3)));
                 ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + PTUnit(PTUnitNum).Name);
                 ErrorsFound = true;
             }
 
             PTUnit(PTUnitNum).CoolOutAirVolFlow = Numbers(4);
             if (PTUnit(PTUnitNum).CoolOutAirVolFlow < 0 && PTUnit(PTUnitNum).CoolOutAirVolFlow != AutoSize) {
-                ShowSevereError(state, CurrentModuleObject + " illegal " + cNumericFields(4) + " = " + TrimSigDigits(Numbers(4), 7));
+                ShowSevereError(state, format("{} illegal {} = {:.7T}", CurrentModuleObject, cNumericFields(4), Numbers(4)));
                 ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + PTUnit(PTUnitNum).Name);
                 ErrorsFound = true;
             }
@@ -828,7 +830,7 @@ namespace PackagedTerminalHeatPump {
 
             PTUnit(PTUnitNum).HeatOutAirVolFlow = Numbers(5);
             if (PTUnit(PTUnitNum).HeatOutAirVolFlow < 0 && PTUnit(PTUnitNum).HeatOutAirVolFlow != AutoSize) {
-                ShowSevereError(state, CurrentModuleObject + " illegal " + cNumericFields(5) + " = " + TrimSigDigits(Numbers(5), 7));
+                ShowSevereError(state, format("{} illegal {} = {:.7T}", CurrentModuleObject, cNumericFields(5), Numbers(5)));
                 ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + PTUnit(PTUnitNum).Name);
                 ErrorsFound = true;
             }
@@ -843,7 +845,7 @@ namespace PackagedTerminalHeatPump {
 
             PTUnit(PTUnitNum).NoCoolHeatOutAirVolFlow = Numbers(6);
             if (PTUnit(PTUnitNum).NoCoolHeatOutAirVolFlow < 0 && PTUnit(PTUnitNum).NoCoolHeatOutAirVolFlow != AutoSize) {
-                ShowSevereError(state, CurrentModuleObject + " illegal " + cNumericFields(6) + " = " + TrimSigDigits(Numbers(6), 7));
+                ShowSevereError(state, format("{} illegal {} = {:.7T}", CurrentModuleObject, cNumericFields(6), Numbers(6)));
                 ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + PTUnit(PTUnitNum).Name);
                 ErrorsFound = true;
             }
@@ -886,8 +888,10 @@ namespace PackagedTerminalHeatPump {
                 if (FanVolFlow <
                     max(PTUnit(PTUnitNum).MaxCoolAirVolFlow, PTUnit(PTUnitNum).MaxHeatAirVolFlow, PTUnit(PTUnitNum).MaxNoCoolHeatAirVolFlow)) {
                     ShowSevereError(state, CurrentModuleObject + "=\"" + PTUnit(PTUnitNum).Name + "\", invalid air flow rate");
-                    ShowContinueError(state, "air flow rate = " + TrimSigDigits(FanVolFlow, 7) + " in fan object " + PTUnit(PTUnitNum).FanName +
-                                      " is less than the maximum PTHP supply air flow rate.");
+                    ShowContinueError(state,
+                                      format("air flow rate = {:.7T} in fan object {} is less than the maximum PTHP supply air flow rate.",
+                                             FanVolFlow,
+                                             PTUnit(PTUnitNum).FanName));
                     ShowContinueError(state, " The fan flow rate must be greater than the PTHP maximum supply air flow rate.");
                     ErrorsFound = true;
                 }
@@ -1116,7 +1120,7 @@ namespace PackagedTerminalHeatPump {
             PTUnit(PTUnitNum).MaxOATSupHeat = Numbers(10);
             if (PTUnit(PTUnitNum).MaxOATSupHeat > 21.0) {
                 ShowWarningError(state, CurrentModuleObject + " = " + PTUnit(PTUnitNum).Name + ": " + cNumericFields(10) + " should be <= to 21.");
-                ShowContinueError(state, "..." + cNumericFields(10) + " = " + TrimSigDigits(Numbers(10), 1));
+                ShowContinueError(state, format("...{} = {:.1T}", cNumericFields(10), Numbers(10)));
             }
 
             if (UtilityRoutines::SameString(Alphas(15), "BlowThrough")) PTUnit(PTUnitNum).FanPlace = BlowThru;
@@ -1149,7 +1153,7 @@ namespace PackagedTerminalHeatPump {
             // check that PTUnit inlet node is a zone exhaust node.
             if (!PTUnit(PTUnitNum).ATMixerExists || PTUnit(PTUnitNum).ATMixerType == ATMixer_SupplySide) {
                 ZoneNodeNotFound = true;
-                for (CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone) {
+                for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                     if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
                     for (NodeNum = 1; NodeNum <= ZoneEquipConfig(CtrlZone).NumExhaustNodes; ++NodeNum) {
                         if (PTUnit(PTUnitNum).AirInNode == ZoneEquipConfig(CtrlZone).ExhaustNode(NodeNum)) {
@@ -1169,7 +1173,7 @@ namespace PackagedTerminalHeatPump {
             // check that PTUnit outlet node is a zone inlet node.
             if (!PTUnit(PTUnitNum).ATMixerExists || PTUnit(PTUnitNum).ATMixerType == ATMixer_InletSide) {
                 ZoneNodeNotFound = true;
-                for (CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone) {
+                for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                     if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
                     for (NodeNum = 1; NodeNum <= ZoneEquipConfig(CtrlZone).NumInletNodes; ++NodeNum) {
                         if (PTUnit(PTUnitNum).AirOutNode == ZoneEquipConfig(CtrlZone).InletNode(NodeNum)) {
@@ -1398,10 +1402,11 @@ namespace PackagedTerminalHeatPump {
             }
 
             //			if ( PTUnit( PTUnitNum ).MaxOATSupHeat > 21.0 ) {
-            //				ShowWarningError(state,  CurrentModuleObject + " = " + PTUnit( PTUnitNum ).Name + ": " + cNumericFields( 11 ) + "
+            //				ShowWarningError(state,  CurrentModuleObject + " = " + PTUnit( PTUnitNum ).Name + ": " + cNumericFields( 11 ) +
+            //"
             // should  be
             //<=  to 21."
-            //); 				ShowContinueError(state,  "..." + cNumericFields( 11 ) + " = " + TrimSigDigits( Numbers( 11 ), 1 ) );
+            //); 				ShowContinueError(state,  format("...{} = {:.1T}", cNumericFields( 11 ),  Numbers( 11 )) );
             //			}
 
             //   set air flow control mode, UseCompressorOnFlow = operate at last cooling or heating air flow requested when compressor is off
@@ -1495,7 +1500,7 @@ namespace PackagedTerminalHeatPump {
 
                 // MaxNoCoolHeatAirVolFlow should be greater than 0
                 if (PTUnit(PTUnitNum).MaxNoCoolHeatAirVolFlow == 0) {
-                    ShowWarningError(state, CurrentModuleObject + " illegal " + cNumericFields(3) + " = " + TrimSigDigits(Numbers(3), 3));
+                    ShowWarningError(state, format("{} illegal {} = {:.3T}", CurrentModuleObject, cNumericFields(3), Numbers(3)));
                     ShowContinueError(state, "... when " + cAlphaFields(19) + " = " + Alphas(19) +
                                       " the minimum operating air flow rate should be autosized or > 0.");
                     ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + PTUnit(PTUnitNum).Name);
@@ -1504,7 +1509,7 @@ namespace PackagedTerminalHeatPump {
 
                 // only allowed for DX cooling coils at this time
                 if (PTUnit(PTUnitNum).DXCoolCoilType_Num != CoilDX_CoolingSingleSpeed) {
-                    if (DisplayExtraWarnings) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
                         ShowWarningError(state, CurrentModuleObject + ": " + PTUnit(PTUnitNum).Name);
                         ShowContinueError(state, "Single Zone VAV control method requires specific cooling coil types.");
                         ShowContinueError(state, "Valid cooling coil type is Coil:Cooling:DX:SingleSpeed.");
@@ -1516,7 +1521,7 @@ namespace PackagedTerminalHeatPump {
                 }
                 // only allow for DX heating coils at this time
                 if (PTUnit(PTUnitNum).DXHeatCoilType_Num != CoilDX_HeatingEmpirical) {
-                    if (DisplayExtraWarnings) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
                         ShowWarningError(state, CurrentModuleObject + ": " + PTUnit(PTUnitNum).Name);
                         ShowContinueError(state, "Single Zone VAV control method requires specific heating coil types.");
                         ShowContinueError(state, "Valid heating coil type is Coil:Heating:DX:SingleSpeed.");
@@ -1685,28 +1690,28 @@ namespace PackagedTerminalHeatPump {
             }
             PTUnit(PTUnitNum).MaxCoolAirVolFlow = Numbers(1);
             if (PTUnit(PTUnitNum).MaxCoolAirVolFlow <= 0 && PTUnit(PTUnitNum).MaxCoolAirVolFlow != AutoSize) {
-                ShowSevereError(state, CurrentModuleObject + " illegal " + cNumericFields(1) + " = " + TrimSigDigits(Numbers(1), 7));
+                ShowSevereError(state, format("{} illegal {} = {:.7T}", CurrentModuleObject, cNumericFields(1), Numbers(1)));
                 ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + PTUnit(PTUnitNum).Name);
                 ErrorsFound = true;
             }
 
             PTUnit(PTUnitNum).MaxHeatAirVolFlow = Numbers(2);
             if (PTUnit(PTUnitNum).MaxHeatAirVolFlow <= 0 && PTUnit(PTUnitNum).MaxHeatAirVolFlow != AutoSize) {
-                ShowSevereError(state, CurrentModuleObject + " illegal " + cNumericFields(2) + " = " + TrimSigDigits(Numbers(2), 7));
+                ShowSevereError(state, format("{} illegal {} = {:.7T}", CurrentModuleObject, cNumericFields(2), Numbers(2)));
                 ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + PTUnit(PTUnitNum).Name);
                 ErrorsFound = true;
             }
 
             PTUnit(PTUnitNum).MaxNoCoolHeatAirVolFlow = Numbers(3);
             if (PTUnit(PTUnitNum).MaxNoCoolHeatAirVolFlow < 0 && PTUnit(PTUnitNum).MaxNoCoolHeatAirVolFlow != AutoSize) {
-                ShowSevereError(state, CurrentModuleObject + " illegal " + cNumericFields(3) + " = " + TrimSigDigits(Numbers(3), 7));
+                ShowSevereError(state, format("{} illegal {} = {:.7T}", CurrentModuleObject, cNumericFields(3), Numbers(3)));
                 ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + PTUnit(PTUnitNum).Name);
                 ErrorsFound = true;
             }
 
             PTUnit(PTUnitNum).CoolOutAirVolFlow = Numbers(4);
             if (PTUnit(PTUnitNum).CoolOutAirVolFlow < 0 && PTUnit(PTUnitNum).CoolOutAirVolFlow != AutoSize) {
-                ShowSevereError(state, CurrentModuleObject + " illegal " + cNumericFields(4) + " = " + TrimSigDigits(Numbers(4), 7));
+                ShowSevereError(state, format("{} illegal {} = {:.7T}", CurrentModuleObject, cNumericFields(4), Numbers(4)));
                 ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + PTUnit(PTUnitNum).Name);
                 ErrorsFound = true;
             }
@@ -1721,7 +1726,7 @@ namespace PackagedTerminalHeatPump {
 
             PTUnit(PTUnitNum).HeatOutAirVolFlow = Numbers(5);
             if (PTUnit(PTUnitNum).HeatOutAirVolFlow < 0 && PTUnit(PTUnitNum).HeatOutAirVolFlow != AutoSize) {
-                ShowSevereError(state, CurrentModuleObject + " illegal " + cNumericFields(5) + " = " + TrimSigDigits(Numbers(5), 7));
+                ShowSevereError(state, format("{} illegal {} = {:.7T}", CurrentModuleObject, cNumericFields(5), Numbers(5)));
                 ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + PTUnit(PTUnitNum).Name);
                 ErrorsFound = true;
             }
@@ -1736,7 +1741,7 @@ namespace PackagedTerminalHeatPump {
 
             PTUnit(PTUnitNum).NoCoolHeatOutAirVolFlow = Numbers(6);
             if (PTUnit(PTUnitNum).NoCoolHeatOutAirVolFlow < 0 && PTUnit(PTUnitNum).NoCoolHeatOutAirVolFlow != AutoSize) {
-                ShowSevereError(state, CurrentModuleObject + " illegal " + cNumericFields(6) + " = " + TrimSigDigits(Numbers(6), 7));
+                ShowSevereError(state, format("{} illegal {} = {:.7T}", CurrentModuleObject, cNumericFields(6), Numbers(6)));
                 ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + PTUnit(PTUnitNum).Name);
                 ErrorsFound = true;
             }
@@ -1786,8 +1791,11 @@ namespace PackagedTerminalHeatPump {
             if (FanVolFlow != AutoSize) {
                 if (FanVolFlow <
                     max(PTUnit(PTUnitNum).MaxCoolAirVolFlow, PTUnit(PTUnitNum).MaxHeatAirVolFlow, PTUnit(PTUnitNum).MaxNoCoolHeatAirVolFlow)) {
-                    ShowWarningError(state, CurrentModuleObject + " - air flow rate = " + TrimSigDigits(FanVolFlow, 7) + " in fan object " +
-                                     PTUnit(PTUnitNum).FanName + " is less than the maximum PTHP supply air flow rate.");
+                    ShowWarningError(state,
+                                     format("{} - air flow rate = {:.7T} in fan object {} is less than the maximum PTHP supply air flow rate.",
+                                            CurrentModuleObject,
+                                            FanVolFlow,
+                                            PTUnit(PTUnitNum).FanName));
                     ShowContinueError(state, " The fan flow rate must be greater than the PTHP maximum supply air flow rate.");
                     ShowContinueError(state, " Occurs in " + CurrentModuleObject + " = " + PTUnit(PTUnitNum).Name);
                     ErrorsFound = true;
@@ -1979,7 +1987,7 @@ namespace PackagedTerminalHeatPump {
             // check that Air-conditioners inlet node is a zone exhaust node or the OA Mixer return node.
             if (!PTUnit(PTUnitNum).ATMixerExists || PTUnit(PTUnitNum).ATMixerType == ATMixer_SupplySide) {
                 ZoneNodeNotFound = true;
-                for (CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone) {
+                for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                     if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
                     for (NodeNum = 1; NodeNum <= ZoneEquipConfig(CtrlZone).NumExhaustNodes; ++NodeNum) {
                         if (PTUnit(PTUnitNum).AirInNode == ZoneEquipConfig(CtrlZone).ExhaustNode(NodeNum)) {
@@ -1999,7 +2007,7 @@ namespace PackagedTerminalHeatPump {
             // check that Air-conditioners outlet node is a zone inlet node.
             if (!PTUnit(PTUnitNum).ATMixerExists || PTUnit(PTUnitNum).ATMixerType == ATMixer_InletSide) {
                 ZoneNodeNotFound = true;
-                for (CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone) {
+                for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                     if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
                     for (NodeNum = 1; NodeNum <= ZoneEquipConfig(CtrlZone).NumInletNodes; ++NodeNum) {
                         if (PTUnit(PTUnitNum).AirOutNode == ZoneEquipConfig(CtrlZone).InletNode(NodeNum)) {
@@ -2301,7 +2309,7 @@ namespace PackagedTerminalHeatPump {
 
                 // MaxNoCoolHeatAirVolFlow should be greater than 0
                 if (PTUnit(PTUnitNum).MaxNoCoolHeatAirVolFlow == 0) {
-                    ShowWarningError(state, CurrentModuleObject + " illegal " + cNumericFields(3) + " = " + TrimSigDigits(Numbers(3), 3));
+                    ShowWarningError(state, format("{} illegal {} = {:.3T}", CurrentModuleObject, cNumericFields(3), Numbers(3)));
                     ShowContinueError(state, "... when " + cAlphaFields(17) + " = " + Alphas(17) +
                                       " the minimum operating air flow rate should be autosized or > 0.");
                     ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + PTUnit(PTUnitNum).Name);
@@ -2310,7 +2318,7 @@ namespace PackagedTerminalHeatPump {
 
                 // only allowed for DX cooling coils at this time
                 if (PTUnit(PTUnitNum).DXCoolCoilType_Num != CoilDX_CoolingSingleSpeed) {
-                    if (DisplayExtraWarnings) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
                         ShowWarningError(state, CurrentModuleObject + ": " + PTUnit(PTUnitNum).Name);
                         ShowContinueError(state, "ASHRAE90.1 control method requires specific cooling coil types.");
                         ShowContinueError(state, "Valid cooling coil type is Coil:Cooling:DX:SingleSpeed.");
@@ -2323,7 +2331,7 @@ namespace PackagedTerminalHeatPump {
                 // only allow for water, fuel, or electric at this time
                 if (PTUnit(PTUnitNum).ACHeatCoilType_Num != Coil_HeatingWater && PTUnit(PTUnitNum).ACHeatCoilType_Num != Coil_HeatingGasOrOtherFuel &&
                     PTUnit(PTUnitNum).ACHeatCoilType_Num != Coil_HeatingElectric) {
-                    if (DisplayExtraWarnings) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
                         ShowWarningError(state, CurrentModuleObject + ": " + PTUnit(PTUnitNum).Name);
                         ShowContinueError(state, "ASHRAE90.1 control method requires specific heating coil types.");
                         ShowContinueError(state, "Valid heating coil type is Coil:Heating:DX:SingleSpeed.");
@@ -2871,7 +2879,7 @@ namespace PackagedTerminalHeatPump {
             // check that PTUnit inlet node is a zone exhaust node.
             if (!PTUnit(PTUnitNum).ATMixerExists || PTUnit(PTUnitNum).ATMixerType == ATMixer_SupplySide) {
                 ZoneNodeNotFound = true;
-                for (CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone) {
+                for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                     if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
                     for (NodeNum = 1; NodeNum <= ZoneEquipConfig(CtrlZone).NumExhaustNodes; ++NodeNum) {
                         if (PTUnit(PTUnitNum).AirInNode == ZoneEquipConfig(CtrlZone).ExhaustNode(NodeNum)) {
@@ -2891,7 +2899,7 @@ namespace PackagedTerminalHeatPump {
             // check that PTUnit outlet node is a zone inlet node.
             if (!PTUnit(PTUnitNum).ATMixerExists || PTUnit(PTUnitNum).ATMixerType == ATMixer_InletSide) {
                 ZoneNodeNotFound = true;
-                for (CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone) {
+                for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                     if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
                     for (NodeNum = 1; NodeNum <= ZoneEquipConfig(CtrlZone).NumInletNodes; ++NodeNum) {
                         if (PTUnit(PTUnitNum).AirOutNode == ZoneEquipConfig(CtrlZone).InletNode(NodeNum)) {
@@ -3146,13 +3154,17 @@ namespace PackagedTerminalHeatPump {
                 if (PTUnit(PTUnitNum).ActualFanVolFlowRate > FanVolFlow) {
                     ShowContinueError(state, "...occurs in " + CurrentModuleObject + " = " + Alphas(1));
                     ShowContinueError(state, "... has a Design Fan Flow Rate > Max Fan Volume Flow Rate, should be <=.");
-                    ShowContinueError(state, "... Entered value=" + RoundSigDigits(PTUnit(PTUnitNum).ActualFanVolFlowRate, 2) + "... Fan [" +
-                                      PTUnit(PTUnitNum).FanType + ':' + PTUnit(PTUnitNum).FanName + "] Max Value=" + RoundSigDigits(FanVolFlow, 2));
+                    ShowContinueError(state,
+                                      format("... Entered value={:.2R}... Fan [{}:{}] Max Value={:.2R}",
+                                             PTUnit(PTUnitNum).ActualFanVolFlowRate,
+                                             PTUnit(PTUnitNum).FanType,
+                                             PTUnit(PTUnitNum).FanName,
+                                             FanVolFlow));
                 }
                 if (PTUnit(PTUnitNum).ActualFanVolFlowRate <= 0.0) {
                     ShowContinueError(state, "...occurs in " + CurrentModuleObject + " = " + Alphas(1));
                     ShowContinueError(state, "... has a Design Fan Flow Rate <= 0.0, it must be >0.0");
-                    ShowContinueError(state, "... Entered value=" + RoundSigDigits(PTUnit(PTUnitNum).ActualFanVolFlowRate, 2));
+                    ShowContinueError(state, format("... Entered value={:.2R}", PTUnit(PTUnitNum).ActualFanVolFlowRate));
                     ErrorsFound = true;
                 }
             }
@@ -3160,21 +3172,21 @@ namespace PackagedTerminalHeatPump {
             PTUnit(PTUnitNum).MaxCoolAirVolFlow = Numbers(1);
             if (PTUnit(PTUnitNum).MaxCoolAirVolFlow <= 0 && PTUnit(PTUnitNum).MaxCoolAirVolFlow != AutoSize) {
                 ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + PTUnit(PTUnitNum).Name + "\"");
-                ShowContinueError(state, " illegal value " + cNumericFields(1) + " = " + TrimSigDigits(Numbers(1), 7));
+                ShowContinueError(state, format(" illegal value {} = {:.7T}", cNumericFields(1), Numbers(1)));
                 ErrorsFound = true;
             }
 
             PTUnit(PTUnitNum).MaxHeatAirVolFlow = Numbers(2);
             if (PTUnit(PTUnitNum).MaxHeatAirVolFlow <= 0 && PTUnit(PTUnitNum).MaxHeatAirVolFlow != AutoSize) {
                 ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + PTUnit(PTUnitNum).Name + "\"");
-                ShowContinueError(state, " illegal " + cNumericFields(2) + " = " + TrimSigDigits(Numbers(2), 7));
+                ShowContinueError(state, format(" illegal {} = {:.7T}", cNumericFields(2), Numbers(2)));
                 ErrorsFound = true;
             }
 
             PTUnit(PTUnitNum).MaxNoCoolHeatAirVolFlow = Numbers(3);
             if (PTUnit(PTUnitNum).MaxNoCoolHeatAirVolFlow < 0 && PTUnit(PTUnitNum).MaxNoCoolHeatAirVolFlow != AutoSize) {
                 ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + PTUnit(PTUnitNum).Name + "\"");
-                ShowContinueError(state, " illegal " + cNumericFields(3) + " = " + TrimSigDigits(Numbers(3), 7));
+                ShowContinueError(state, format(" illegal {} = {:.7T}", cNumericFields(3), Numbers(3)));
                 ErrorsFound = true;
             }
 
@@ -3189,7 +3201,7 @@ namespace PackagedTerminalHeatPump {
                 PTUnit(PTUnitNum).CoolOutAirVolFlow = Numbers(4);
                 if (PTUnit(PTUnitNum).CoolOutAirVolFlow < 0 && PTUnit(PTUnitNum).CoolOutAirVolFlow != AutoSize) {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + PTUnit(PTUnitNum).Name + "\"");
-                    ShowContinueError(state, " illegal " + cNumericFields(4) + " = " + TrimSigDigits(Numbers(4), 7));
+                    ShowContinueError(state, format(" illegal {} = {:.7T}", cNumericFields(4), Numbers(4)));
                     ErrorsFound = true;
                 }
 
@@ -3198,15 +3210,15 @@ namespace PackagedTerminalHeatPump {
                     PTUnit(PTUnitNum).MaxCoolAirVolFlow != AutoSize) {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + PTUnit(PTUnitNum).Name + "\"");
                     ShowContinueError(state, ".." + cNumericFields(4) + " cannot be greater than " + cNumericFields(1));
-                    ShowContinueError(state, ".." + cNumericFields(1) + " = " + TrimSigDigits(Numbers(1), 7));
-                    ShowContinueError(state, ".." + cNumericFields(4) + " = " + TrimSigDigits(Numbers(4), 7));
+                    ShowContinueError(state, format("..{} = {:.7T}", cNumericFields(1), Numbers(1)));
+                    ShowContinueError(state, format("..{} = {:.7T}", cNumericFields(4), Numbers(4)));
                     ErrorsFound = true;
                 }
 
                 PTUnit(PTUnitNum).HeatOutAirVolFlow = Numbers(5);
                 if (PTUnit(PTUnitNum).HeatOutAirVolFlow < 0 && PTUnit(PTUnitNum).HeatOutAirVolFlow != AutoSize) {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + PTUnit(PTUnitNum).Name + "\"");
-                    ShowContinueError(state, " illegal " + cNumericFields(5) + " = " + TrimSigDigits(Numbers(5), 7));
+                    ShowContinueError(state, format(" illegal {} = {:.7T}", cNumericFields(5), Numbers(5)));
                     ErrorsFound = true;
                 }
 
@@ -3215,15 +3227,15 @@ namespace PackagedTerminalHeatPump {
                     PTUnit(PTUnitNum).MaxHeatAirVolFlow != AutoSize) {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + PTUnit(PTUnitNum).Name + "\"");
                     ShowContinueError(state, ".." + cNumericFields(5) + " cannot be greater than " + cNumericFields(2));
-                    ShowContinueError(state, ".." + cNumericFields(2) + " = " + TrimSigDigits(Numbers(2), 7));
-                    ShowContinueError(state, ".." + cNumericFields(5) + " = " + TrimSigDigits(Numbers(5), 7));
+                    ShowContinueError(state, format("..{} = {:.7T}", cNumericFields(2), Numbers(2)));
+                    ShowContinueError(state, format("..{} = {:.7T}", cNumericFields(5), Numbers(5)));
                     ErrorsFound = true;
                 }
 
                 PTUnit(PTUnitNum).NoCoolHeatOutAirVolFlow = Numbers(6);
                 if (PTUnit(PTUnitNum).NoCoolHeatOutAirVolFlow < 0 && PTUnit(PTUnitNum).NoCoolHeatOutAirVolFlow != AutoSize) {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + PTUnit(PTUnitNum).Name + "\"");
-                    ShowContinueError(state, " illegal " + cNumericFields(6) + " = " + TrimSigDigits(Numbers(6), 7));
+                    ShowContinueError(state, format(" illegal {} = {:.7T}", cNumericFields(6), Numbers(6)));
                     ErrorsFound = true;
                 }
             } else {
@@ -3762,7 +3774,6 @@ namespace PackagedTerminalHeatPump {
         // Using/Aliasing
         using namespace DataZoneEnergyDemands;
         using DataEnvironment::StdRhoAir;
-        using DataGlobals::AnyPlantInModel;
         using DataZoneEquipment::CheckZoneEquipmentList;
         using DataZoneEquipment::ZoneEquipInputsFilled;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
@@ -3778,7 +3789,7 @@ namespace PackagedTerminalHeatPump {
         using Fans::GetFanVolFlow;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSatDensityRefrig;
-        using General::TrimSigDigits;
+
         using PlantUtilities::InitComponentNodes;
         using PlantUtilities::ScanPlantLoopsForObject;
         using PlantUtilities::SetComponentFlowRate;
@@ -4000,7 +4011,7 @@ namespace PackagedTerminalHeatPump {
             } else { // pthp not connected to plant
                 MyPlantScanFlag(PTUnitNum) = false;
             }
-        } else if (MyPlantScanFlag(PTUnitNum) && !AnyPlantInModel) {
+        } else if (MyPlantScanFlag(PTUnitNum) && !state.dataGlobal->AnyPlantInModel) {
             MyPlantScanFlag(PTUnitNum) = false;
         }
 
@@ -4008,10 +4019,10 @@ namespace PackagedTerminalHeatPump {
             if (ZoneEquipInputsFilled) {
                 ZoneEquipmentListNotChecked = false;
                 for (Loop = 1; Loop <= NumPTUs; ++Loop) {
-                    if (CheckZoneEquipmentList(PTUnit(Loop).UnitType, PTUnit(Loop).Name, CtrlZoneNum)) {
+                    if (CheckZoneEquipmentList(state, PTUnit(Loop).UnitType, PTUnit(Loop).Name, CtrlZoneNum)) {
                         // save the ZoneEquipConfig index for this unit
                         PTUnit(Loop).ControlZoneNum = CtrlZoneNum;
-                        for (int ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum) {
+                        for (int ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
                             for (int ZoneExhNum = 1; ZoneExhNum <= ZoneEquipConfig(ControlledZoneNum).NumExhaustNodes; ++ZoneExhNum) {
                                 if (ZoneEquipConfig(ControlledZoneNum).ExhaustNode(ZoneExhNum) != PTUnit(Loop).AirInNode) continue;
                                 // Find the controlled zone number for the specified thermostat location
@@ -4027,7 +4038,7 @@ namespace PackagedTerminalHeatPump {
             }
         }
 
-        if (!SysSizingCalc && MySizeFlag(PTUnitNum)) {
+        if (!state.dataGlobal->SysSizingCalc && MySizeFlag(PTUnitNum)) {
             SizePTUnit(state, PTUnitNum);
             MySizeFlag(PTUnitNum) = false;
 
@@ -4181,9 +4192,12 @@ namespace PackagedTerminalHeatPump {
                 if (PTUnit(PTUnitNum).FanVolFlow != AutoSize) {
                     //     Check fan versus system supply air flow rates
                     if (PTUnit(PTUnitNum).FanVolFlow + 1e-10 < PTUnit(PTUnitNum).CoolVolumeFlowRate(NumOfSpeedCooling)) {
-                        ShowWarningError(state, CurrentModuleObject + " - air flow rate = " + TrimSigDigits(PTUnit(PTUnitNum).FanVolFlow, 7) +
-                                         " in fan object is less than the MSHP system air flow rate when cooling is required (" +
-                                         TrimSigDigits(PTUnit(PTUnitNum).CoolVolumeFlowRate(NumOfSpeedCooling), 7) + ").");
+                        ShowWarningError(state,
+                                         format("{} - air flow rate = {:.7T} in fan object is less than the MSHP system air flow rate when cooling "
+                                                "is required ({:.7T}).",
+                                                CurrentModuleObject,
+                                                PTUnit(PTUnitNum).FanVolFlow,
+                                                PTUnit(PTUnitNum).CoolVolumeFlowRate(NumOfSpeedCooling)));
                         ShowContinueError(state,
                             " The MSHP system flow rate when cooling is required is reset to the fan flow rate and the simulation continues.");
                         ShowContinueError(state, " Occurs in " + CurrentModuleObject + " = " + PTUnit(PTUnitNum).Name);
@@ -4191,9 +4205,10 @@ namespace PackagedTerminalHeatPump {
                         // Check flow rates in other speeds and ensure flow rates are not above the max flow rate
                         for (i = NumOfSpeedCooling - 1; i >= 1; --i) {
                             if (PTUnit(PTUnitNum).CoolVolumeFlowRate(i) > PTUnit(PTUnitNum).CoolVolumeFlowRate(i + 1)) {
-                                ShowContinueError(state, " The MSHP system flow rate when cooling is required is reset to the flow rate at higher speed and "
-                                                  "the simulation continues at Speed" +
-                                                  TrimSigDigits(i) + '.');
+                                ShowContinueError(state,
+                                                  format(" The MSHP system flow rate when cooling is required is reset to the flow rate at higher "
+                                                         "speed and the simulation continues at Speed{}.",
+                                                         i));
                                 ShowContinueError(state, " Occurs in " + CurrentModuleObject + " = " + PTUnit(PTUnitNum).Name);
                                 PTUnit(PTUnitNum).CoolVolumeFlowRate(i) = PTUnit(PTUnitNum).CoolVolumeFlowRate(i + 1);
                             }
@@ -4202,18 +4217,22 @@ namespace PackagedTerminalHeatPump {
 
                     if (PTUnit(PTUnitNum).NumOfSpeedHeating > 0) {
                         if (PTUnit(PTUnitNum).FanVolFlow + 1e-10 < PTUnit(PTUnitNum).HeatVolumeFlowRate(NumOfSpeedHeating)) {
-                            ShowWarningError(state, CurrentModuleObject + " - air flow rate = " + TrimSigDigits(PTUnit(PTUnitNum).FanVolFlow, 7) +
-                                             " in fan object is less than the MSHP system air flow rate when heating is required (" +
-                                             TrimSigDigits(PTUnit(PTUnitNum).HeatVolumeFlowRate(NumOfSpeedHeating), 7) + ").");
+                            ShowWarningError(state,
+                                             format("{} - air flow rate = {:.7T} in fan object is less than the MSHP system air flow rate when "
+                                                    "heating is required ({:.7T}).",
+                                                    CurrentModuleObject,
+                                                    PTUnit(PTUnitNum).FanVolFlow,
+                                                    PTUnit(PTUnitNum).HeatVolumeFlowRate(NumOfSpeedHeating)));
                             ShowContinueError(state,
                                 " The MSHP system flow rate when heating is required is reset to the fan flow rate and the simulation continues.");
                             ShowContinueError(state, " Occurs in " + CurrentModuleObject + " = " + PTUnit(PTUnitNum).Name);
                             PTUnit(PTUnitNum).HeatVolumeFlowRate(NumOfSpeedHeating) = PTUnit(PTUnitNum).FanVolFlow;
                             for (i = NumOfSpeedHeating - 1; i >= 1; --i) {
                                 if (PTUnit(PTUnitNum).HeatVolumeFlowRate(i) > PTUnit(PTUnitNum).HeatVolumeFlowRate(i + 1)) {
-                                    ShowContinueError(state, " The MSHP system flow rate when heating is required is reset to the flow rate at higher speed "
-                                                      "and the simulation continues at Speed" +
-                                                      TrimSigDigits(i) + '.');
+                                    ShowContinueError(state,
+                                                      format(" The MSHP system flow rate when heating is required is reset to the flow rate at "
+                                                             "higher speed and the simulation continues at Speed{}.",
+                                                             i));
                                     ShowContinueError(state, " Occurs in " + CurrentModuleObject + " system = " + PTUnit(PTUnitNum).Name);
                                     PTUnit(PTUnitNum).HeatVolumeFlowRate(i) = PTUnit(PTUnitNum).HeatVolumeFlowRate(i + 1);
                                 }
@@ -4222,9 +4241,12 @@ namespace PackagedTerminalHeatPump {
                     }
 
                     if (PTUnit(PTUnitNum).FanVolFlow < PTUnit(PTUnitNum).IdleVolumeAirRate && PTUnit(PTUnitNum).IdleVolumeAirRate != 0.0) {
-                        ShowWarningError(state, CurrentModuleObject + " - air flow rate = " + TrimSigDigits(PTUnit(PTUnitNum).FanVolFlow, 7) +
-                                         " in fan object is less than the MSHP system air flow rate when no heating or cooling is needed (" +
-                                         TrimSigDigits(PTUnit(PTUnitNum).IdleVolumeAirRate, 7) + ").");
+                        ShowWarningError(state,
+                                         format("{} - air flow rate = {:.7T} in fan object is less than the MSHP system air flow rate when no "
+                                                "heating or cooling is needed ({:.7T}).",
+                                                CurrentModuleObject,
+                                                PTUnit(PTUnitNum).FanVolFlow,
+                                                PTUnit(PTUnitNum).IdleVolumeAirRate));
                         ShowContinueError(state, " The MSHP system flow rate when no heating or cooling is needed is reset to the fan flow rate and the "
                                           "simulation continues.");
                         ShowContinueError(state, " Occurs in " + CurrentModuleObject + " = " + PTUnit(PTUnitNum).Name);
@@ -4813,7 +4835,7 @@ namespace PackagedTerminalHeatPump {
         using DataZoneEquipment::PkgTermACAirToAir_Num;
         using DataZoneEquipment::PkgTermHPAirToAir_Num;
         using DataZoneEquipment::PkgTermHPWaterToAir_Num;
-        using General::RoundSigDigits;
+
         using VariableSpeedCoils::GetCoilAirFlowRateVariableSpeed;
         using VariableSpeedCoils::SimVariableSpeedCoils;
         using WaterCoils::SetCoilDesFlow;
@@ -5280,14 +5302,16 @@ namespace PackagedTerminalHeatPump {
                                                      CoolOutAirVolFlowDes,
                                                      "User-Specified Outdoor Air Flow Rate During Cooling Operation [m3/s]",
                                                      CoolOutAirVolFlowUser);
-                        if (DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(CoolOutAirVolFlowDes - CoolOutAirVolFlowUser) / CoolOutAirVolFlowUser) > AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizePTUnit: Potential issue with equipment sizing for " + PTUnit(PTUnitNum).UnitType + ' ' +
                                             PTUnit(PTUnitNum).Name);
-                                ShowContinueError(state, "User-Specified Outdoor Air Flow Rate During Cooling Operation of " +
-                                                  RoundSigDigits(CoolOutAirVolFlowUser, 5) + " [m3/s]");
-                                ShowContinueError(state, "differs from Design Size Outdoor Air Flow Rate During Cooling Operation of " +
-                                                  RoundSigDigits(CoolOutAirVolFlowDes, 5) + " [m3/s]");
+                                ShowContinueError(
+                                    state,
+                                    format("User-Specified Outdoor Air Flow Rate During Cooling Operation of {:.5R} [m3/s]", CoolOutAirVolFlowUser));
+                                ShowContinueError(state,
+                                                  format("differs from Design Size Outdoor Air Flow Rate During Cooling Operation of {:.5R} [m3/s]",
+                                                         CoolOutAirVolFlowDes));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }
@@ -5331,14 +5355,16 @@ namespace PackagedTerminalHeatPump {
                                                      HeatOutAirVolFlowDes,
                                                      "User-Specified Outdoor Air Flow Rate During Heating Operation [m3/s]",
                                                      HeatOutAirVolFlowUser);
-                        if (DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(HeatOutAirVolFlowDes - HeatOutAirVolFlowUser) / HeatOutAirVolFlowUser) > AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizePTUnit: Potential issue with equipment sizing for " + PTUnit(PTUnitNum).UnitType + ' ' +
                                             PTUnit(PTUnitNum).Name);
-                                ShowContinueError(state, "User-Specified Outdoor Air Flow Rate During Heating Operation of " +
-                                                  RoundSigDigits(HeatOutAirVolFlowUser, 5) + " [m3/s]");
-                                ShowContinueError(state, "differs from Design Size Outdoor Air Flow Rate During Heating Operation of " +
-                                                  RoundSigDigits(HeatOutAirVolFlowDes, 5) + " [m3/s]");
+                                ShowContinueError(
+                                    state,
+                                    format("User-Specified Outdoor Air Flow Rate During Heating Operation of {:.5R} [m3/s]", HeatOutAirVolFlowUser));
+                                ShowContinueError(state,
+                                                  format("differs from Design Size Outdoor Air Flow Rate During Heating Operation of {:.5R} [m3/s]",
+                                                         HeatOutAirVolFlowDes));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }
@@ -5382,15 +5408,18 @@ namespace PackagedTerminalHeatPump {
                                                      NoCoolHeatOutAirVolFlowDes,
                                                      "User-Specified Outdoor Air Flow Rate When No Cooling or Heating is Needed [m3/s]",
                                                      NoCoolHeatOutAirVolFlowUser);
-                        if (DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(NoCoolHeatOutAirVolFlowDes - NoCoolHeatOutAirVolFlowUser) / NoCoolHeatOutAirVolFlowUser) >
                                 AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizePTUnit: Potential issue with equipment sizing for " + PTUnit(PTUnitNum).UnitType + ' ' +
                                             PTUnit(PTUnitNum).Name);
-                                ShowContinueError(state, "User-Specified Outdoor Air Flow Rate When No Cooling or Heating is Needed of " +
-                                                  RoundSigDigits(NoCoolHeatOutAirVolFlowUser, 5) + " [m3/s]");
-                                ShowContinueError(state, "differs from Design Size Outdoor Air Flow Rate When No Cooling or Heating is Needed of " +
-                                                  RoundSigDigits(NoCoolHeatOutAirVolFlowDes, 5) + " [m3/s]");
+                                ShowContinueError(state,
+                                                  format("User-Specified Outdoor Air Flow Rate When No Cooling or Heating is Needed of {:.5R} [m3/s]",
+                                                         NoCoolHeatOutAirVolFlowUser));
+                                ShowContinueError(
+                                    state,
+                                    format("differs from Design Size Outdoor Air Flow Rate When No Cooling or Heating is Needed of {:.5R} [m3/s]",
+                                           NoCoolHeatOutAirVolFlowDes));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }
@@ -5431,14 +5460,17 @@ namespace PackagedTerminalHeatPump {
                                                      MaxSATSupHeatDes,
                                                      "User-Specified Maximum Supply Air Temperature from Supplemental Heater [C]",
                                                      MaxSATSupHeatUser);
-                        if (DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             if (std::abs(MaxSATSupHeatDes - MaxSATSupHeatUser) > (4.0 * AutoVsHardSizingDeltaTempThreshold)) {
                                 ShowMessage(state, "SizePTUnit: Potential issue with equipment sizing for " + PTUnit(PTUnitNum).UnitType + ' ' +
                                             PTUnit(PTUnitNum).Name);
-                                ShowContinueError(state, "User-Specified Maximum Supply Air Temperature from Supplemental Heater of " +
-                                                  RoundSigDigits(MaxSATSupHeatUser, 2) + " [C]");
-                                ShowContinueError(state, "differs from Design Size Maximum Supply Air Temperature from Supplemental Heater of " +
-                                                  RoundSigDigits(MaxSATSupHeatDes, 2) + " [C]");
+                                ShowContinueError(state,
+                                                  format("User-Specified Maximum Supply Air Temperature from Supplemental Heater of {:.2R} [C]",
+                                                         MaxSATSupHeatUser));
+                                ShowContinueError(
+                                    state,
+                                    format("differs from Design Size Maximum Supply Air Temperature from Supplemental Heater of {:.2R} [C]",
+                                           MaxSATSupHeatDes));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }
@@ -5505,8 +5537,9 @@ namespace PackagedTerminalHeatPump {
                 ShowContinueError(state, " For SingleZoneVAV control the No Load Supply Air Flow Rate must be less than both the cooling and heating supply "
                                   "air flow rates.");
                 PTUnit(PTUnitNum).MaxNoCoolHeatAirVolFlow = min(PTUnit(PTUnitNum).MaxCoolAirVolFlow, PTUnit(PTUnitNum).MaxHeatAirVolFlow) - 0.01;
-                ShowContinueError(state, " The SingleZoneVAV control No Load Supply Air Flow Rate is reset to " +
-                                  RoundSigDigits(PTUnit(PTUnitNum).MaxNoCoolHeatAirVolFlow, 5) + " and the simulation continues.");
+                ShowContinueError(state,
+                                  format(" The SingleZoneVAV control No Load Supply Air Flow Rate is reset to {:.5R} and the simulation continues.",
+                                         PTUnit(PTUnitNum).MaxNoCoolHeatAirVolFlow));
             }
         }
 
@@ -5547,10 +5580,8 @@ namespace PackagedTerminalHeatPump {
 
         // Using/Aliasing
         using DataEnvironment::OutDryBulbTemp;
-        using DataGlobals::WarmupFlag;
-        using General::RoundSigDigits;
         using General::SolveRoot;
-        using General::TrimSigDigits;
+
         using HeatingCoils::SimulateHeatingCoilComponents;
         using PlantUtilities::SetComponentFlowRate;
         using Psychrometrics::PsyCpAirFnW;
@@ -5714,7 +5745,7 @@ namespace PackagedTerminalHeatPump {
                     }
                     SolveRoot(state, ErrorToler, MaxIte, SolFla, PartLoadFrac, PLRResidual, TempMinPLR, TempMaxPLR, Par);
                     if (SolFla == -1) {
-                        if (!FirstHVACIteration && !WarmupFlag) {
+                        if (!FirstHVACIteration && !state.dataGlobal->WarmupFlag) {
                             CalcPTUnit(
                                 state, PTUnitNum, FirstHVACIteration, PartLoadFrac, TempOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn);
                             if (PTUnit(PTUnitNum).IterErrIndex == 0) {
@@ -5724,7 +5755,7 @@ namespace PackagedTerminalHeatPump {
                                 ShowContinueErrorTimeStamp(state, format(" Part-load ratio returned = {:.3R}", PartLoadFrac));
                                 ShowContinueError(state, format(" Load requested = {:.5T}, Load delivered = {:.5T}", QZnReq, TempOutput));
                             }
-                            ShowRecurringWarningErrorAtEnd(PTUnit(PTUnitNum).UnitType + " \"" + PTUnit(PTUnitNum).Name +
+                            ShowRecurringWarningErrorAtEnd(state, PTUnit(PTUnitNum).UnitType + " \"" + PTUnit(PTUnitNum).Name +
                                                                "\" - Iteration limit exceeded error continues...",
                                                            PTUnit(PTUnitNum).IterErrIndex,
                                                            TempOutput,
@@ -5739,7 +5770,7 @@ namespace PackagedTerminalHeatPump {
                             ShowContinueError(state, "Packaged terminal unit part-load ratio calculation failed: PLR limits of 0 to 1 exceeded");
                             ShowContinueError(state, "Please fill out a bug report and forward to the EnergyPlus support group.");
                             ShowContinueErrorTimeStamp(state, "");
-                            if (WarmupFlag) ShowContinueError(state, "Error occurred during warmup days.");
+                            if (state.dataGlobal->WarmupFlag) ShowContinueError(state, "Error occurred during warmup days.");
                         }
                         PartLoadFrac = max(MinPLF, std::abs(QZnReq - NoCompOutput) / std::abs(FullOutput - NoCompOutput));
                     }
@@ -5749,7 +5780,7 @@ namespace PackagedTerminalHeatPump {
                         ShowContinueError(state, "Packaged terminal unit part-load ratio calculation failed: PLR limits of 0 to 1 exceeded");
                         ShowContinueError(state, "Please fill out a bug report and forward to the EnergyPlus support group.");
                         ShowContinueErrorTimeStamp(state, "");
-                        if (WarmupFlag) ShowContinueError(state, "Error occurred during warmup days.");
+                        if (state.dataGlobal->WarmupFlag) ShowContinueError(state, "Error occurred during warmup days.");
                     }
                     PartLoadFrac = max(MinPLF, std::abs(QZnReq - NoCompOutput) / std::abs(FullOutput - NoCompOutput));
                 }
@@ -5854,7 +5885,7 @@ namespace PackagedTerminalHeatPump {
         using DataEnvironment::OutDryBulbTemp;
         using DataZoneEquipment::ZoneEquipConfig;
         using DXCoils::SimDXCoil;
-        using General::RoundSigDigits;
+
         using General::SolveRoot;
         using HeatingCoils::SimulateHeatingCoilComponents;
         using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
@@ -6311,12 +6342,13 @@ namespace PackagedTerminalHeatPump {
                                     ShowWarningMessage(state, "CalcPTUnit: Hot water coil control failed for " + PTUnit(PTUnitNum).UnitType + "=\"" +
                                                        PTUnit(PTUnitNum).Name + "\"");
                                     ShowContinueErrorTimeStamp(state, "");
-                                    ShowContinueError(state, "  Iteration limit [" + RoundSigDigits(SolveMaxIter) +
-                                                      "] exceeded in calculating hot water mass flow rate");
+                                    ShowContinueError(
+                                        state, format("  Iteration limit [{}] exceeded in calculating hot water mass flow rate", SolveMaxIter));
                                 }
-                                ShowRecurringWarningErrorAtEnd("CalcPTUnit: Hot water coil control failed (iteration limit [" +
-                                                                   RoundSigDigits(SolveMaxIter) + "]) for " + PTUnit(PTUnitNum).UnitType + "=\"" +
-                                                                   PTUnit(PTUnitNum).Name,
+                                ShowRecurringWarningErrorAtEnd(state, format("CalcPTUnit: Hot water coil control failed (iteration limit [{}]) for {}=\"{}",
+                                                                      SolveMaxIter,
+                                                                      PTUnit(PTUnitNum).UnitType,
+                                                                      PTUnit(PTUnitNum).Name),
                                                                PTUnit(PTUnitNum).HotWaterCoilMaxIterIndex);
                             } else if (SolFlag == -2) {
                                 if (PTUnit(PTUnitNum).HotWaterCoilMaxIterIndex2 == 0) {
@@ -6324,10 +6356,10 @@ namespace PackagedTerminalHeatPump {
                                                        PTUnit(PTUnitNum).UnitType + "=\"" + PTUnit(PTUnitNum).Name + "\"");
                                     ShowContinueErrorTimeStamp(state, "");
                                     ShowContinueError(state, "...Bad hot water maximum flow rate limits");
-                                    ShowContinueError(state, "...Given minimum water flow rate=" + RoundSigDigits(MinWaterFlow, 3) + " kg/s");
-                                    ShowContinueError(state, "...Given maximum water flow rate=" + RoundSigDigits(MaxHotWaterFlow, 3) + " kg/s");
+                                    ShowContinueError(state, format("...Given minimum water flow rate={:.3R} kg/s", MinWaterFlow));
+                                    ShowContinueError(state, format("...Given maximum water flow rate={:.3R} kg/s", MaxHotWaterFlow));
                                 }
-                                ShowRecurringWarningErrorAtEnd("CalcPTUnit: Hot water coil control failed (flow limits) for " +
+                                ShowRecurringWarningErrorAtEnd(state, "CalcPTUnit: Hot water coil control failed (flow limits) for " +
                                                                    PTUnit(PTUnitNum).UnitType + "=\"" + PTUnit(PTUnitNum).Name + "\"",
                                                                PTUnit(PTUnitNum).HotWaterCoilMaxIterIndex2,
                                                                MaxHotWaterFlow,
@@ -6816,7 +6848,7 @@ namespace PackagedTerminalHeatPump {
         }
     }
 
-    void ReportPTUnit(int const PTUnitNum) // number of the current AC unit being simulated
+    void ReportPTUnit(EnergyPlusData &state, int const PTUnitNum) // number of the current AC unit being simulated
     {
 
         // SUBROUTINE INFORMATION:
@@ -6870,7 +6902,7 @@ namespace PackagedTerminalHeatPump {
         }
 
         if (PTUnit(PTUnitNum).FirstPass) { // reset sizing flags so other zone equipment can size normally
-            if (!DataGlobals::SysSizingCalc) {
+            if (!state.dataGlobal->SysSizingCalc) {
                 DataSizing::resetHVACSizingGlobals(DataSizing::CurZoneEqNum, 0, PTUnit(PTUnitNum).FirstPass);
             }
         }
@@ -7412,11 +7444,10 @@ namespace PackagedTerminalHeatPump {
 
         // Using/Aliasing
         using DataEnvironment::OutDryBulbTemp;
-        using DataGlobals::WarmupFlag;
         using DataZoneEnergyDemands::CurDeadBandOrSetback;
-        using General::RoundSigDigits;
+
         using General::SolveRoot;
-        using General::TrimSigDigits;
+
         using HeatingCoils::SimulateHeatingCoilComponents;
         using PlantUtilities::SetComponentFlowRate;
         using Psychrometrics::PsyCpAirFnW;
@@ -7619,14 +7650,14 @@ namespace PackagedTerminalHeatPump {
 
                 SolveRoot(state, ErrorToler, MaxIte, SolFla, PartLoadFrac, VSHPCyclingResidual, 0.0, 1.0, Par);
                 if (SolFla == -1) {
-                    if (!WarmupFlag) {
+                    if (!state.dataGlobal->WarmupFlag) {
                         if (ErrCountCyc == 0) {
                             ++ErrCountCyc;
                             ShowWarningError(state, "Iteration limit exceeded calculating VS WSHP unit cycling ratio, for unit=" + PTUnit(PTUnitNum).Name);
-                            ShowContinueErrorTimeStamp(state, "Cycling ratio returned=" + RoundSigDigits(PartLoadFrac, 2));
+                            ShowContinueErrorTimeStamp(state, format("Cycling ratio returned={:.2R}", PartLoadFrac));
                         } else {
                             ++ErrCountCyc;
-                            ShowRecurringWarningErrorAtEnd(
+                            ShowRecurringWarningErrorAtEnd(state,
                                 PTUnit(PTUnitNum).Name + "\": Iteration limit warning exceeding calculating DX unit cycling ratio  continues...",
                                 PTUnit(PTUnitNum).ErrIndexCyc,
                                 PartLoadFrac,
@@ -7701,15 +7732,14 @@ namespace PackagedTerminalHeatPump {
 
                 SolveRoot(state, ErrorToler, MaxIte, SolFla, SpeedRatio, VSHPSpeedResidual, 1.0e-10, 1.0, Par);
                 if (SolFla == -1) {
-                    if (!WarmupFlag) {
+                    if (!state.dataGlobal->WarmupFlag) {
                         if (ErrCountVar == 0) {
                             ++ErrCountVar;
                             ShowWarningError(state, "Iteration limit exceeded calculating VS WSHP unit speed ratio, for unit=" + PTUnit(PTUnitNum).Name);
-                            ShowContinueErrorTimeStamp(state, "Speed ratio returned=[" + RoundSigDigits(SpeedRatio, 2) +
-                                                       "], Speed number =" + RoundSigDigits(SpeedNum));
+                            ShowContinueErrorTimeStamp(state, format("Speed ratio returned=[{:.2R}], Speed number ={}", SpeedRatio, SpeedNum));
                         } else {
                             ++ErrCountVar;
-                            ShowRecurringWarningErrorAtEnd(PTUnit(PTUnitNum).Name +
+                            ShowRecurringWarningErrorAtEnd(state, PTUnit(PTUnitNum).Name +
                                                                "\": Iteration limit warning exceeding calculating DX unit speed ratio continues...",
                                                            PTUnit(PTUnitNum).ErrIndexVar,
                                                            SpeedRatio,
@@ -8078,7 +8108,7 @@ namespace PackagedTerminalHeatPump {
                               Real64 const QLatReq,          // Zone latent load []
                               Real64 &OnOffAirFlowRatio,     // ratio of compressor ON airflow to AVERAGE airflow over timestep
                               Real64 &SupHeaterLoad,         // supplemental heater load (W)
-                              bool const EP_UNUSED(HXUnitOn) // flag to enable heat exchanger
+                              [[maybe_unused]] bool const HXUnitOn // flag to enable heat exchanger
     )
     {
         // SUBROUTINE INFORMATION:
@@ -8094,7 +8124,7 @@ namespace PackagedTerminalHeatPump {
         using DataEnvironment::OutDryBulbTemp;
         using DataZoneEquipment::ZoneEquipConfig;
         using DXCoils::SimDXCoil;
-        using General::RoundSigDigits;
+
         using General::SolveRoot;
         using HeatingCoils::SimulateHeatingCoilComponents;
         using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
@@ -8456,12 +8486,14 @@ namespace PackagedTerminalHeatPump {
                                     ShowWarningMessage(state, "RoutineName//Hot water coil control failed for " + PTUnit(PTUnitNum).UnitType + "=\"" +
                                                        PTUnit(PTUnitNum).Name + "\""); // Autodesk:Bug? Meant RoutineName + "Hot water...
                                     ShowContinueErrorTimeStamp(state, "");
-                                    ShowContinueError(state, "  Iteration limit [" + RoundSigDigits(SolveMaxIter) +
-                                                      "] exceeded in calculating hot water mass flow rate");
+                                    ShowContinueError(
+                                        state, format("  Iteration limit [{}] exceeded in calculating hot water mass flow rate", SolveMaxIter));
                                 }
-                                ShowRecurringWarningErrorAtEnd(
-                                    "RoutineName//Hot water coil control failed (iteration limit [" + RoundSigDigits(SolveMaxIter) + "]) for " +
-                                        PTUnit(PTUnitNum).UnitType + "=\"" + PTUnit(PTUnitNum).Name,
+                                ShowRecurringWarningErrorAtEnd(state,
+                                    format("RoutineName//Hot water coil control failed (iteration limit [{}]) for {}=\"{}",
+                                           SolveMaxIter,
+                                           PTUnit(PTUnitNum).UnitType,
+                                           PTUnit(PTUnitNum).Name),
                                     PTUnit(PTUnitNum).HotWaterCoilMaxIterIndex); // Autodesk:Bug? Meant RoutineName + "Hot water...
                             } else if (SolFlag == -2) {
                                 if (PTUnit(PTUnitNum).HotWaterCoilMaxIterIndex2 == 0) {
@@ -8470,10 +8502,10 @@ namespace PackagedTerminalHeatPump {
                                                        "\""); // Autodesk:Bug? Meant RoutineName + "Hot water...
                                     ShowContinueErrorTimeStamp(state, "");
                                     ShowContinueError(state, "...Bad hot water maximum flow rate limits");
-                                    ShowContinueError(state, "...Given minimum water flow rate=" + RoundSigDigits(MinWaterFlow, 3) + " kg/s");
-                                    ShowContinueError(state, "...Given maximum water flow rate=" + RoundSigDigits(MaxHotWaterFlow, 3) + " kg/s");
+                                    ShowContinueError(state, format("...Given minimum water flow rate={:.3R} kg/s", MinWaterFlow));
+                                    ShowContinueError(state, format("...Given maximum water flow rate={:.3R} kg/s", MaxHotWaterFlow));
                                 }
-                                ShowRecurringWarningErrorAtEnd("RoutineName//Hot water coil control failed (flow limits) for " +
+                                ShowRecurringWarningErrorAtEnd(state, "RoutineName//Hot water coil control failed (flow limits) for " +
                                                                    PTUnit(PTUnitNum).UnitType + "=\"" + PTUnit(PTUnitNum).Name + "\"",
                                                                PTUnit(PTUnitNum).HotWaterCoilMaxIterIndex2,
                                                                MaxHotWaterFlow,
@@ -8541,12 +8573,12 @@ namespace PackagedTerminalHeatPump {
     }
 
     void SetVSHPAirFlow(EnergyPlusData &state,
-                        int const PTUnitNum,              // Unit index
-                        int const EP_UNUSED(ZoneNum),     // Zone index
-                        Real64 const PartLoadRatio,       // unit part load ratio
-                        Real64 &OnOffAirFlowRatio,        // ratio of compressor ON airflow to average airflow over timestep
-                        Optional_int_const SpeedNum,      // Speed number
-                        Optional<Real64 const> SpeedRatio // Speed ratio
+                        int const PTUnitNum,                // Unit index
+                        [[maybe_unused]] int const ZoneNum, // Zone index
+                        Real64 const PartLoadRatio,         // unit part load ratio
+                        Real64 &OnOffAirFlowRatio,          // ratio of compressor ON airflow to average airflow over timestep
+                        Optional_int_const SpeedNum,        // Speed number
+                        Optional<Real64 const> SpeedRatio   // Speed ratio
     )
     {
 
@@ -8715,15 +8747,15 @@ namespace PackagedTerminalHeatPump {
     }
 
     void SetOnOffMassFlowRateVSCoil(EnergyPlusData &state,
-                                    int const PTUnitNum,                  // index to furnace
-                                    int const ZoneNum,                    // index to zone
-                                    bool const FirstHVACIteration,        // Flag for 1st HVAC iteration
-                                    int const EP_UNUSED(AirLoopNum),      // index to air loop !unused1208
-                                    Real64 &OnOffAirFlowRatio,            // ratio of coil on to coil off air flow rate
-                                    int const EP_UNUSED(OpMode),          // fan operating mode
-                                    Real64 const EP_UNUSED(QZnReq),       // sensible load to be met (W) !unused1208
-                                    Real64 const EP_UNUSED(MoistureLoad), // moisture load to be met (W)
-                                    Real64 &PartLoadRatio                 // coil part-load ratio
+                                    int const PTUnitNum,                        // index to furnace
+                                    int const ZoneNum,                          // index to zone
+                                    bool const FirstHVACIteration,              // Flag for 1st HVAC iteration
+                                    [[maybe_unused]] int const AirLoopNum,      // index to air loop !unused1208
+                                    Real64 &OnOffAirFlowRatio,                  // ratio of coil on to coil off air flow rate
+                                    [[maybe_unused]] int const OpMode,          // fan operating mode
+                                    [[maybe_unused]] Real64 const QZnReq,       // sensible load to be met (W) !unused1208
+                                    [[maybe_unused]] Real64 const MoistureLoad, // moisture load to be met (W)
+                                    Real64 &PartLoadRatio                       // coil part-load ratio
     )
     {
 
@@ -8747,7 +8779,6 @@ namespace PackagedTerminalHeatPump {
 
         // Using/Aliasing
         using DataZoneEnergyDemands::CurDeadBandOrSetback;
-        using General::RoundSigDigits;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:

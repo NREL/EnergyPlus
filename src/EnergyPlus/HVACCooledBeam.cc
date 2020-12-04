@@ -65,7 +65,6 @@
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/FluidProperties.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/HVACCooledBeam.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -109,8 +108,6 @@ namespace HVACCooledBeam {
     // Using/Aliasing
     using namespace DataLoopNode;
     using DataEnvironment::StdRhoAir;
-    using DataGlobals::NumOfZones;
-    using DataGlobals::SysSizingCalc;
     using namespace ScheduleManager;
     using DataHVACGlobals::SmallAirVolFlow;
     using DataHVACGlobals::SmallLoad;
@@ -170,9 +167,6 @@ namespace HVACCooledBeam {
         // Manages the simulation of a cooled beam unit.
         // Called from SimZoneAirLoopEquipment in module ZoneAirLoopEquipmentManager.
 
-        // Using/Aliasing
-        using General::TrimSigDigits;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int CBNum; // index of cooled beam unit being simulated
 
@@ -192,13 +186,17 @@ namespace HVACCooledBeam {
         } else {
             CBNum = CompIndex;
             if (CBNum > NumCB || CBNum < 1) {
-                ShowFatalError(state, "SimCoolBeam: Invalid CompIndex passed=" + TrimSigDigits(CompIndex) +
-                               ", Number of Cool Beam Units=" + TrimSigDigits(NumCB) + ", System name=" + CompName);
+                ShowFatalError(
+                    state,
+                    format("SimCoolBeam: Invalid CompIndex passed={}, Number of Cool Beam Units={}, System name={}", CompIndex, NumCB, CompName));
             }
             if (CheckEquipName(CBNum)) {
                 if (CompName != CoolBeam(CBNum).Name) {
-                    ShowFatalError(state, "SimCoolBeam: Invalid CompIndex passed=" + TrimSigDigits(CompIndex) + ", Cool Beam Unit name=" + CompName +
-                                   ", stored Cool Beam Unit for that index=" + CoolBeam(CBNum).Name);
+                    ShowFatalError(state,
+                                   format("SimCoolBeam: Invalid CompIndex passed={}, Cool Beam Unit name={}, stored Cool Beam Unit for that index={}",
+                                          CompIndex,
+                                          CompName,
+                                          CoolBeam(CBNum).Name));
                 }
                 CheckEquipName(CBNum) = false;
             }
@@ -214,7 +212,7 @@ namespace HVACCooledBeam {
         ControlCoolBeam(state, CBNum, ZoneNum, ZoneNodeNum, FirstHVACIteration, NonAirSysOutput);
 
         // Update the current unit's outlet nodes. No update needed
-        UpdateCoolBeam(CBNum);
+        UpdateCoolBeam(state, CBNum);
 
         // Fill the report variables. There are no report variables
         ReportCoolBeam(state, CBNum);
@@ -467,7 +465,7 @@ namespace HVACCooledBeam {
 
                 // Fill the Zone Equipment data with the supply air inlet node number of this unit.
                 AirNodeFound = false;
-                for (CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone) {
+                for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                     if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
                     for (SupAirIn = 1; SupAirIn <= ZoneEquipConfig(CtrlZone).NumInletNodes; ++SupAirIn) {
                         if (CoolBeam(CBNum).AirOutNode == ZoneEquipConfig(CtrlZone).InletNode(SupAirIn)) {
@@ -574,14 +572,14 @@ namespace HVACCooledBeam {
             // Check to see if there is a Air Distribution Unit on the Zone Equipment List
             for (Loop = 1; Loop <= NumCB; ++Loop) {
                 if (CoolBeam(Loop).ADUNum == 0) continue;
-                if (CheckZoneEquipmentList("ZONEHVAC:AIRDISTRIBUTIONUNIT", AirDistUnit(CoolBeam(Loop).ADUNum).Name)) continue;
+                if (CheckZoneEquipmentList(state, "ZONEHVAC:AIRDISTRIBUTIONUNIT", AirDistUnit(CoolBeam(Loop).ADUNum).Name)) continue;
                 ShowSevereError(state, "InitCoolBeam: ADU=[Air Distribution Unit," + AirDistUnit(CoolBeam(Loop).ADUNum).Name +
                                 "] is not on any ZoneHVAC:EquipmentList.");
                 ShowContinueError(state, "...Unit=[" + CurrentModuleObject + ',' + CoolBeam(Loop).Name + "] will not be simulated.");
             }
         }
 
-        if (!SysSizingCalc && CoolBeam(CBNum).MySizeFlag && !CoolBeam(CBNum).PlantLoopScanFlag) {
+        if (!state.dataGlobal->SysSizingCalc && CoolBeam(CBNum).MySizeFlag && !CoolBeam(CBNum).PlantLoopScanFlag) {
 
             SizeCoolBeam(state, CBNum);
 
@@ -907,11 +905,11 @@ namespace HVACCooledBeam {
     }
 
     void ControlCoolBeam(EnergyPlusData &state,
-                         int const CBNum,                          // number of the current unit being simulated
-                         int const ZoneNum,                        // number of zone being served
-                         int const ZoneNodeNum,                    // zone node number
-                         bool const EP_UNUSED(FirstHVACIteration), // TRUE if 1st HVAC simulation of system timestep
-                         Real64 &NonAirSysOutput                   // convective cooling by the beam system [W]
+                         int const CBNum,                                // number of the current unit being simulated
+                         int const ZoneNum,                              // number of zone being served
+                         int const ZoneNodeNum,                          // zone node number
+                         [[maybe_unused]] bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
+                         Real64 &NonAirSysOutput                         // convective cooling by the beam system [W]
     )
     {
 
@@ -933,7 +931,6 @@ namespace HVACCooledBeam {
 
         // Using/Aliasing
         using namespace DataZoneEnergyDemands;
-        using General::SolveRoot;
         using PlantUtilities::SetComponentFlowRate;
 
         // Locals
@@ -1247,7 +1244,7 @@ namespace HVACCooledBeam {
         return Residuum;
     }
 
-    void UpdateCoolBeam(int const CBNum)
+    void UpdateCoolBeam(EnergyPlusData &state, int const CBNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1262,24 +1259,8 @@ namespace HVACCooledBeam {
         // METHODOLOGY EMPLOYED:
         // Data is moved from the cooled beam unit data structure to the unit outlet nodes.
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
-        using DataContaminantBalance::Contaminant;
         using PlantUtilities::SafeCopyPlantNode;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int AirInletNode;
@@ -1327,11 +1308,11 @@ namespace HVACCooledBeam {
         //    Node(WaterOutletNode)%MassFlowRateMinAvail= 0.0
         //  END IF
 
-        if (Contaminant.CO2Simulation) {
+        if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
             Node(AirOutletNode).CO2 = Node(AirInletNode).CO2;
         }
 
-        if (Contaminant.GenericContamSimulation) {
+        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
             Node(AirOutletNode).GenContam = Node(AirInletNode).GenContam;
         }
     }

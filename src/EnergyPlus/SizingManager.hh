@@ -63,22 +63,6 @@ struct EnergyPlusData;
 
 namespace SizingManager {
 
-    // Using/Aliasing
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS: none
-
-    // DERIVED TYPE DEFINITIONS: none
-
-    // INTERFACE BLOCK SPECIFICATIONS: none
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern int NumAirLoops;
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE SimulationManager
-
-    // Types
-
     struct ZoneListData
     {
         // Members
@@ -92,17 +76,14 @@ namespace SizingManager {
         }
     };
 
-    // Functions
-    void clear_state();
-
     void ManageSizing(EnergyPlusData &state);
 
     bool CalcdoLoadComponentPulseNow(EnergyPlusData &state,
-                                     bool const isPulseZoneSizing,
-                                     bool const WarmupFlag,
-                                     int const HourOfDay,
-                                     int const TimeStep,
-                                     DataGlobalConstants::KindOfSim const KindOfSim);
+                                     bool isPulseZoneSizing,
+                                     bool WarmupFlag,
+                                     int HourOfDay,
+                                     int TimeStep,
+                                     DataGlobalConstants::KindOfSim KindOfSim);
 
     void ManageSystemSizingAdjustments(EnergyPlusData &state);
 
@@ -114,7 +95,7 @@ namespace SizingManager {
 
     void ProcessInputOARequirements(EnergyPlusData &state,
                                     std::string const &cCurrentModuleObject,
-                                    int const OAIndex,
+                                    int OAIndex,
                                     Array1D_string const &cAlphaArgs,
                                     int &NumAlphas,
                                     Array1D<Real64> const &rNumericArgs,
@@ -148,18 +129,18 @@ namespace SizingManager {
     void ReportZoneSizing(EnergyPlusData &state,
                           std::string const &ZoneName,   // the name of the zone
                           std::string const &LoadType,   // the description of the input variable
-                          Real64 const CalcDesLoad,      // the value from the sizing calculation [W]
-                          Real64 const UserDesLoad,      // the value from the sizing calculation modified by user input [W]
-                          Real64 const CalcDesFlow,      // calculated design air flow rate [m3/s]
-                          Real64 const UserDesFlow,      // user input or modified design air flow rate [m3/s]
+                          Real64 CalcDesLoad,      // the value from the sizing calculation [W]
+                          Real64 UserDesLoad,      // the value from the sizing calculation modified by user input [W]
+                          Real64 CalcDesFlow,      // calculated design air flow rate [m3/s]
+                          Real64 UserDesFlow,      // user input or modified design air flow rate [m3/s]
                           std::string const &DesDayName, // the name of the design day that produced the peak
                           std::string const &PeakHrMin,  // time stamp of the peak
-                          Real64 const PeakTemp,         // temperature at peak [C]
-                          Real64 const PeakHumRat,       // humidity ratio at peak [kg water/kg dry air]
-                          Real64 const FloorArea,        // zone floor area [m2]
-                          Real64 const TotOccs,          // design number of occupants for the zone
-                          Real64 const MinOAVolFlow,     // zone design minimum outside air flow rate [m3/s]
-                          Real64 const DOASHeatAddRate   // zone design heat addition rate from the DOAS [W]
+                          Real64 PeakTemp,         // temperature at peak [C]
+                          Real64 PeakHumRat,       // humidity ratio at peak [kg water/kg dry air]
+                          Real64 FloorArea,        // zone floor area [m2]
+                          Real64 TotOccs,          // design number of occupants for the zone
+                          Real64 MinOAVolFlow,     // zone design minimum outside air flow rate [m3/s]
+                          Real64 DOASHeatAddRate   // zone design heat addition rate from the DOAS [W]
     );
 
     void ReportSysSizing(EnergyPlusData &state,
@@ -174,13 +155,30 @@ namespace SizingManager {
                          int const &TimeStepIndex         // time step of the peak
     );
 
-    std::string TimeIndexToHrMinString(int timeIndex);
+    std::string TimeIndexToHrMinString(EnergyPlusData &state, int timeIndex);
 
-    void UpdateFacilitySizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator const CallIndicator);
+    void UpdateFacilitySizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator CallIndicator);
 
-    void UpdateTermUnitFinalZoneSizing();
+    void UpdateTermUnitFinalZoneSizing(EnergyPlusData &state);
 
 } // namespace SizingManager
+
+struct SizingManagerData : BaseGlobalStruct {
+
+    // MODULE VARIABLE DECLARATIONS:
+    int NumAirLoops = 0;
+    bool ReportZoneSizingMyOneTimeFlag = true;
+    bool ReportSysSizingMyOneTimeFlag = true;
+    bool runZeroingOnce = true;
+
+    void clear_state() override {
+        NumAirLoops = 0;
+        ReportZoneSizingMyOneTimeFlag = true;
+        ReportSysSizingMyOneTimeFlag = true;
+        runZeroingOnce = true;
+    }
+
+};
 
 } // namespace EnergyPlus
 

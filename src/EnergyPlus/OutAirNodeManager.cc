@@ -91,11 +91,7 @@ namespace OutAirNodeManager {
     // Use statements for data only modules
     // Using/Aliasing
     using namespace DataLoopNode;
-    using namespace DataGlobals;
     using namespace DataEnvironment;
-    using DataContaminantBalance::Contaminant;
-    using DataContaminantBalance::OutdoorCO2;
-    using DataContaminantBalance::OutdoorGC;
     // USE DataHVACGlobals, ONLY: FirstTimeStepSysFlag
 
     // Data
@@ -365,7 +361,7 @@ namespace OutAirNodeManager {
                 if (NumNums > 0) Node(NodeNums(1)).Height = Numbers(1);
 
                 if (NumAlphas > 1) {
-                    AnyLocalEnvironmentsInModel = true;
+                    state.dataGlobal->AnyLocalEnvironmentsInModel = true;
                 }
 
                 if (NumAlphas > 1 && !lAlphaBlanks(2)) {
@@ -662,8 +658,8 @@ namespace OutAirNodeManager {
         Node(NodeNum).Press = OutBaroPress;
         Node(NodeNum).Quality = 0.0;
         // Add contaminants
-        if (Contaminant.CO2Simulation) Node(NodeNum).CO2 = OutdoorCO2;
-        if (Contaminant.GenericContamSimulation) Node(NodeNum).GenContam = OutdoorGC;
+        if (state.dataContaminantBalance->Contaminant.CO2Simulation) Node(NodeNum).CO2 = state.dataContaminantBalance->OutdoorCO2;
+        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) Node(NodeNum).GenContam = state.dataContaminantBalance->OutdoorGC;
 
     }
 

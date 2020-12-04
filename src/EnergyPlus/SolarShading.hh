@@ -264,7 +264,8 @@ namespace SolarShading {
               Real64 &EquationOfTime          // Equation of Time (Degrees)
     );
 
-    void SUN4(EnergyPlusData &state, Real64 const CurrentTime,    // Time to use in shadowing calculations
+    void SUN4(EnergyPlusData &state,
+              Real64 const CurrentTime,    // Time to use in shadowing calculations
               Real64 const EqOfTime,       // Equation of time for current day
               Real64 const SinSolarDeclin, // Sine of the Solar declination (current day)
               Real64 const CosSolarDeclin  // Cosine of the Solar declination (current day)
@@ -278,7 +279,7 @@ namespace SolarShading {
 
     void SkyDifSolarShading(EnergyPlusData &state);
 
-    void CalcWindowProfileAngles();
+    void CalcWindowProfileAngles(EnergyPlusData &state);
 
     void CalcFrameDividerShadow(EnergyPlusData &state, int const SurfNum,  // Surface number
                                 int const FrDivNum, // Frame/divider number
@@ -287,7 +288,7 @@ namespace SolarShading {
 
     void CalcBeamSolarOnWinRevealSurface(EnergyPlusData &state);
 
-    void ReportSurfaceShading();
+    void ReportSurfaceShading(EnergyPlusData &state);
 
     void ReportSurfaceErrors(EnergyPlusData &state);
 
@@ -488,7 +489,7 @@ struct SolarShadingData : BaseGlobalStruct {
         TrackTooManyFigures.deallocate();
         TrackTooManyVertices.deallocate();
         TrackBaseSubSurround.deallocate();
-        DataSurfaces::DBZoneIntWin.deallocate();
+        DataSurfaces::EnclSolDBIntWin.deallocate();
         ISABSF.deallocate();
         InitComplexOnce = true;
         ShadowOneTimeFlag = true;

@@ -85,24 +85,15 @@ namespace PlantValves {
     // Collect "valve" type models for Plant loops
 
     using namespace DataLoopNode;
-    using General::TrimSigDigits;
-
-    // MODULE VARIABLE DECLARATIONS:
-    int NumTemperingValves;
-    bool GetTemperingValves(true);
-    bool OneTimeInitFlag(true);
-
-    // Object Data
-    Array1D<TemperValveData> TemperValve; // dimension to No. of TemperingValve objects
 
     PlantComponent *TemperValveData::factory(EnergyPlusData &state, std::string objectName) {
         // Process the input data for valves if it hasn't been done already
-        if (GetTemperingValves) {
+        if (state.dataPlantValves->GetTemperingValves) {
             GetPlantValvesInput(state);
-            GetTemperingValves = false;
+            state.dataPlantValves->GetTemperingValves = false;
         }
         // Now look for this particular pipe in the list
-        for (auto &valve : TemperValve) {
+        for (auto &valve : state.dataPlantValves->TemperValve) {
             if (valve.Name == objectName) {
                 return &valve;
             }
@@ -114,17 +105,14 @@ namespace PlantValves {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void clear_state() {
-        GetTemperingValves = true;
-        OneTimeInitFlag = true;
-        NumTemperingValves = 0;
-        TemperValve.deallocate();
-    }
-
-    void TemperValveData::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation), bool EP_UNUSED(FirstHVACIteration), Real64 &EP_UNUSED(CurLoad),
-                                   bool EP_UNUSED(RunFlag)) {
+    void TemperValveData::simulate(EnergyPlusData &state,
+                                   [[maybe_unused]] const PlantLocation &calledFromLocation,
+                                   [[maybe_unused]] bool FirstHVACIteration,
+                                   [[maybe_unused]] Real64 &CurLoad,
+                                   [[maybe_unused]] bool RunFlag)
+    {
         this->initialize(state);
-        this->calculate();
+        this->calculate(state);
         PlantUtilities::SafeCopyPlantNode(this->PltInletNodeNum, this->PltOutletNodeNum);
         Real64 mdot = this->MixedMassFlowRate * this->FlowDivFract;
         if (this->LoopNum > 0) {
@@ -140,8 +128,8 @@ namespace PlantValves {
         }
     }
 
-    void TemperValveData::getDesignCapacities(EnergyPlusData &EP_UNUSED(state),
-                                              const PlantLocation &EP_UNUSED(calledFromLocation),
+    void TemperValveData::getDesignCapacities([[maybe_unused]] EnergyPlusData &state,
+                                              [[maybe_unused]] const PlantLocation &calledFromLocation,
                                               Real64 &MaxLoad,
                                               Real64 &MinLoad,
                                               Real64 &OptLoad)
@@ -182,31 +170,31 @@ namespace PlantValves {
         std::string CurrentModuleObject; // for ease in renaming.
 
         CurrentModuleObject = "TemperingValve";
-        NumTemperingValves = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataPlantValves->NumTemperingValves = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
-        TemperValve.allocate(NumTemperingValves);
+        state.dataPlantValves->TemperValve.allocate(state.dataPlantValves->NumTemperingValves);
 
-        for (Item = 1; Item <= NumTemperingValves; ++Item) {
+        for (Item = 1; Item <= state.dataPlantValves->NumTemperingValves; ++Item) {
 
             inputProcessor->getObjectItem(state, CurrentModuleObject, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus);
             //  <process, noting errors>
-            TemperValve(Item).Name = Alphas(1);
+            state.dataPlantValves->TemperValve(Item).Name = Alphas(1);
             // Get Plant Inlet Node
-            TemperValve(Item).PltInletNodeNum = GetOnlySingleNode(
+            state.dataPlantValves->TemperValve(Item).PltInletNodeNum = GetOnlySingleNode(
                 state, Alphas(2), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
             // Get Plant Outlet Node
-            TemperValve(Item).PltOutletNodeNum = GetOnlySingleNode(
+            state.dataPlantValves->TemperValve(Item).PltOutletNodeNum = GetOnlySingleNode(
                 state, Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
 
             // Get Stream 2 Source Node
-            TemperValve(Item).PltStream2NodeNum = GetOnlySingleNode(
+            state.dataPlantValves->TemperValve(Item).PltStream2NodeNum = GetOnlySingleNode(
                 state, Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
             // Get Mixed water Setpoint
-            TemperValve(Item).PltSetPointNodeNum = GetOnlySingleNode(
+            state.dataPlantValves->TemperValve(Item).PltSetPointNodeNum = GetOnlySingleNode(
                 state, Alphas(5), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_SetPoint, 1, ObjectIsNotParent);
 
             // Get Pump outlet
-            TemperValve(Item).PltPumpOutletNodeNum = GetOnlySingleNode(
+            state.dataPlantValves->TemperValve(Item).PltPumpOutletNodeNum = GetOnlySingleNode(
                 state, Alphas(6), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
 
             // Note most checks on user input are made in second pass thru init routine
@@ -214,14 +202,14 @@ namespace PlantValves {
             TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(2), Alphas(3), "Supply Side Water Nodes");
         }
 
-        for (Item = 1; Item <= NumTemperingValves; ++Item) {
+        for (Item = 1; Item <= state.dataPlantValves->NumTemperingValves; ++Item) {
 
             SetupOutputVariable(state, "Tempering Valve Flow Fraction",
                                 OutputProcessor::Unit::None,
-                                TemperValve(Item).FlowDivFract,
+                                state.dataPlantValves->TemperValve(Item).FlowDivFract,
                                 "System",
                                 "Average",
-                                TemperValve(Item).Name);
+                                state.dataPlantValves->TemperValve(Item).Name);
         }
 
         if (ErrorsFound) {
@@ -258,8 +246,8 @@ namespace PlantValves {
 
         bool errFlag;
 
-        if (OneTimeInitFlag) {
-            OneTimeInitFlag = false;
+        if (state.dataPlantValves->OneTimeInitFlag) {
+            state.dataPlantValves->OneTimeInitFlag = false;
         } else {
             // delay checks one pass so more of plant data structure gets filled in
             if (this->compDelayedInitFlag) {
@@ -305,7 +293,7 @@ namespace PlantValves {
                                     (thisComp.Name == this->Name)) { // we found it.
 
                                     // is branch control type 'Active'
-                                    if (thisBranch.ControlType == DataBranchAirLoopPlant::ControlType_Active) IsBranchActive = true;
+                                    if (thisBranch.ControlType == DataBranchAirLoopPlant::ControlTypeEnum::Active) IsBranchActive = true;
 
                                     // is Valve inlet node an outlet node of a splitter
                                     if (thisLoopSide.Splitter.Exists) {
@@ -437,7 +425,7 @@ namespace PlantValves {
 
     }
 
-    void TemperValveData::calculate()
+    void TemperValveData::calculate(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -459,7 +447,7 @@ namespace PlantValves {
         Real64 Tset; // local working variable for Setpoint Temperature (C)
         Real64 Ts2;  // local Working Variable for Stream 2 outlet Temperature (C)
 
-        if (DataGlobals::KickOffSimulation) return;
+        if (state.dataGlobal->KickOffSimulation) return;
 
         if (DataPlant::PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock == 0) {
             Tin = this->InletTemp;

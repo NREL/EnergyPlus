@@ -60,7 +60,6 @@
 #include <EnergyPlus/DataErrorTracking.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/FluidProperties.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -82,14 +81,6 @@ namespace NodeInputManager {
     // To provide utilities for reading and assigning indices for the
     // nodes in the HVAC loops.
 
-    // METHODOLOGY EMPLOYED:
-
-    // REFERENCES:
-
-    // OTHER NOTES:
-
-    using DataGlobals::DisplayAdvancedReportVariables;
-    using General::TrimSigDigits;
     using namespace DataLoopNode;
     using namespace BranchNodeConnections;
 
@@ -219,7 +210,7 @@ namespace NodeInputManager {
         if (NodeFluidType != NodeType_Air && NodeFluidType != NodeType_Water && NodeFluidType != NodeType_Electric &&
             NodeFluidType != NodeType_Steam && NodeFluidType != NodeType_Unknown) {
             ShowSevereError(state, RoutineName + NodeObjectType + "=\"" + NodeObjectName + "\", invalid fluid type.");
-            ShowContinueError(state, "..Invalid FluidType=" + std::to_string(NodeFluidType));
+            ShowContinueError(state, format("..Invalid FluidType={}", NodeFluidType));
             ErrorsFound = true;
             ShowFatalError(state, "Preceding issue causes termination.");
         }
@@ -261,7 +252,7 @@ namespace NodeInputManager {
             if (NodeConnectionType >= 1 && NodeConnectionType <= NumValidConnectionTypes) {
                 ConnectionType = ValidConnectionTypes(NodeConnectionType);
             } else {
-                ConnectionType = TrimSigDigits(NodeConnectionType) + "-unknown";
+                ConnectionType = format("{}-unknown", NodeConnectionType);
             }
             // If requested, assign NodeFluidStream to the first node and increment the fluid stream number
             // for each remaining node in the list
@@ -301,7 +292,6 @@ namespace NodeInputManager {
         // na
 
         // Using/Aliasing
-        using DataContaminantBalance::Contaminant;
         using DataErrorTracking::AbortProcessing; // used here to determine if this routine called during fatal error processing
 
         // Locals
@@ -430,7 +420,7 @@ namespace NodeInputManager {
                     SetupOutputVariable(state,
                         "System Node Quality", OutputProcessor::Unit::None, Node(NumNode).Quality, "System", "Average", NodeID(NumNode));
                     SetupOutputVariable(state, "System Node Height", OutputProcessor::Unit::m, Node(NumNode).Height, "System", "Average", NodeID(NumNode));
-                    if (DisplayAdvancedReportVariables) {
+                    if (state.dataGlobal->DisplayAdvancedReportVariables) {
                         SetupOutputVariable(state,
                             "System Node Minimum Temperature", OutputProcessor::Unit::C, Node(NumNode).TempMin, "System", "Average", NodeID(NumNode));
                         SetupOutputVariable(state,
@@ -484,11 +474,11 @@ namespace NodeInputManager {
                                             "Average",
                                             NodeID(NumNode));
                     }
-                    if (Contaminant.CO2Simulation) {
+                    if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
                         SetupOutputVariable(state,
                             "System Node CO2 Concentration", OutputProcessor::Unit::ppm, Node(NumNode).CO2, "System", "Average", NodeID(NumNode));
                     }
-                    if (Contaminant.GenericContamSimulation) {
+                    if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
                         SetupOutputVariable(state, "System Node Generic Air Contaminant Concentration",
                                             OutputProcessor::Unit::ppm,
                                             Node(NumNode).GenContam,
@@ -633,7 +623,7 @@ namespace NodeInputManager {
                 NodeLists(NCount).NodeNumbers(Loop1) = AssignNodeNumber(state, NodeLists(NCount).NodeNames(Loop1), NodeType_Unknown, localErrorsFound);
                 if (UtilityRoutines::SameString(NodeLists(NCount).NodeNames(Loop1), NodeLists(NCount).Name)) {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + cAlphas(1) + "\", invalid node name in list.");
-                    ShowContinueError(state, "... Node " + TrimSigDigits(Loop1) + " Name=\"" + cAlphas(Loop1 + 1) + "\", duplicates NodeList Name.");
+                    ShowContinueError(state, format("... Node {} Name=\"{}\", duplicates NodeList Name.", Loop1, cAlphas(Loop1 + 1)));
                     localErrorsFound = true;
                 }
             }
@@ -646,9 +636,12 @@ namespace NodeInputManager {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + cAlphas(1) + "\" has duplicate nodes:");
                         flagError = false;
                     }
-                    ShowContinueError(state, "...list item=" + TrimSigDigits(Loop1) + ", \"" + NodeID(NodeLists(NCount).NodeNumbers(Loop1)) +
-                                      "\", duplicate list item=" + TrimSigDigits(Loop2) + ", \"" + NodeID(NodeLists(NCount).NodeNumbers(Loop2)) +
-                                      "\".");
+                    ShowContinueError(state,
+                                      format("...list item={}, \"{}\", duplicate list item={}, \"{}\".",
+                                             Loop1,
+                                             NodeID(NodeLists(NCount).NodeNumbers(Loop1)),
+                                             Loop2,
+                                             NodeID(NodeLists(NCount).NodeNumbers(Loop2))));
                     localErrorsFound = true;
                 }
             }
@@ -660,8 +653,7 @@ namespace NodeInputManager {
                     if (Loop == Loop1) continue; // within a nodelist have already checked to see if node name duplicates nodelist name
                     if (!UtilityRoutines::SameString(NodeLists(Loop).NodeNames(Loop2), NodeLists(Loop1).Name)) continue;
                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + NodeLists(Loop1).Name + "\", invalid node name in list.");
-                    ShowContinueError(state, "... Node " + TrimSigDigits(Loop2) + " Name=\"" + NodeLists(Loop).NodeNames(Loop2) +
-                                      "\", duplicates NodeList Name.");
+                    ShowContinueError(state, format("... Node {} Name=\"{}\", duplicates NodeList Name.", Loop2, NodeLists(Loop).NodeNames(Loop2)));
                     ShowContinueError(state, "... NodeList=\"" + NodeLists(Loop1).Name + "\", is duplicated.");
                     ShowContinueError(state, "... Items in NodeLists must not be the name of another NodeList.");
                     localErrorsFound = true;
@@ -720,7 +712,7 @@ namespace NodeInputManager {
 
         if (NodeFluidType != NodeType_Air && NodeFluidType != NodeType_Water && NodeFluidType != NodeType_Electric &&
             NodeFluidType != NodeType_Steam && NodeFluidType != NodeType_Unknown) {
-            ShowSevereError(state, "AssignNodeNumber: Invalid FluidType=" + std::to_string(NodeFluidType));
+            ShowSevereError(state, format("AssignNodeNumber: Invalid FluidType={}", NodeFluidType));
             ErrorsFound = true;
             ShowFatalError(state, "AssignNodeNumber: Preceding issue causes termination.");
         }
@@ -870,7 +862,7 @@ namespace NodeInputManager {
             if (NodeConnectionType >= 1 && NodeConnectionType <= NumValidConnectionTypes) {
                 ConnectionType = ValidConnectionTypes(NodeConnectionType);
             } else {
-                ConnectionType = TrimSigDigits(NodeConnectionType) + "-unknown";
+                ConnectionType = format("{}-unknown", NodeConnectionType);
             }
             //    CALL RegisterNodeConnection(NodeNums(1),NodeID(NodeNums(1)),NodeObjectType,NodeObjectName,  &
             //                                  ConnectionType,NodeFluidStream,ObjectIsParent,errFlag)
@@ -1119,7 +1111,6 @@ namespace NodeInputManager {
         using FluidProperties::GetSatEnthalpyRefrig;
         using FluidProperties::GetSpecificHeatGlycol;
         using FluidProperties::NumOfGlycols;
-        using General::RoundSigDigits;
         using OutputProcessor::NumOfReqVariables;
         using OutputProcessor::ReqReportVariables;
         using OutputProcessor::ReqRepVars;

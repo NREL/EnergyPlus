@@ -122,8 +122,6 @@ namespace UnitVentilator {
 
     // Using/Aliasing
     using namespace DataLoopNode;
-    using DataGlobals::DisplayExtraWarnings;
-    using DataGlobals::SysSizingCalc;
     using DataHVACGlobals::ATMixer_InletSide;
     using DataHVACGlobals::ATMixer_SupplySide;
     using DataHVACGlobals::ContFanCycCoil;
@@ -162,7 +160,6 @@ namespace UnitVentilator {
 
         // Using/Aliasing
         using DataSizing::ZoneEqUnitVent;
-        using General::TrimSigDigits;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int UnitVentNum; // index of unit ventilator being simulated
@@ -183,13 +180,19 @@ namespace UnitVentilator {
         } else {
             UnitVentNum = CompIndex;
             if (UnitVentNum > state.dataUnitVentilators->NumOfUnitVents || UnitVentNum < 1) {
-                ShowFatalError(state, "SimUnitVentilator:  Invalid CompIndex passed=" + TrimSigDigits(UnitVentNum) +
-                               ", Number of Units=" + TrimSigDigits(state.dataUnitVentilators->NumOfUnitVents) + ", Entered Unit name=" + CompName);
+                ShowFatalError(state,
+                               format("SimUnitVentilator:  Invalid CompIndex passed={}, Number of Units={}, Entered Unit name={}",
+                                      UnitVentNum,
+                                      state.dataUnitVentilators->NumOfUnitVents,
+                                      CompName));
             }
             if (state.dataUnitVentilators->CheckEquipName(UnitVentNum)) {
                 if (CompName != state.dataUnitVentilators->UnitVent(UnitVentNum).Name) {
-                    ShowFatalError(state, "SimUnitVentilator: Invalid CompIndex passed=" + TrimSigDigits(UnitVentNum) + ", Unit name=" + CompName +
-                                   ", stored Unit Name for that index=" + state.dataUnitVentilators->UnitVent(UnitVentNum).Name);
+                    ShowFatalError(state,
+                                   format("SimUnitVentilator: Invalid CompIndex passed={}, Unit name={}, stored Unit Name for that index={}",
+                                          UnitVentNum,
+                                          CompName,
+                                          state.dataUnitVentilators->UnitVent(UnitVentNum).Name));
                 }
                 state.dataUnitVentilators->CheckEquipName(UnitVentNum) = false;
             }
@@ -250,7 +253,6 @@ namespace UnitVentilator {
         using Fans::GetFanVolFlow;
         using HVACHXAssistedCoolingCoil::GetHXCoilTypeAndName;
 
-        using DataGlobals::NumOfZones;
         using DataPlant::TypeOf_CoilSteamAirHeating;
         using DataPlant::TypeOf_CoilWaterCooling;
         using DataPlant::TypeOf_CoilWaterDetailedFlatCooling;
@@ -258,7 +260,7 @@ namespace UnitVentilator {
         using DataSizing::AutoSize;
         using DataSizing::ZoneHVACSizing;
         using DataZoneEquipment::ZoneEquipConfig;
-        using General::TrimSigDigits;
+
         using SingleDuct::GetATMixer;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -480,10 +482,12 @@ namespace UnitVentilator {
                                 if (FanVolFlow != AutoSize && state.dataUnitVentilators->UnitVent(UnitVentNum).MaxAirVolFlow != AutoSize &&
                                     FanVolFlow < state.dataUnitVentilators->UnitVent(UnitVentNum).MaxAirVolFlow) {
                                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataUnitVentilators->UnitVent(UnitVentNum).Name + "\"");
-                                    ShowContinueError(state, "...air flow rate [" + TrimSigDigits(FanVolFlow, 7) + "] in fan object " +
-                                                      state.dataUnitVentilators->UnitVent(UnitVentNum).FanName +
-                                                      " is less than the unit ventilator maximum supply air flow rate [" +
-                                                      TrimSigDigits(state.dataUnitVentilators->UnitVent(UnitVentNum).MaxAirVolFlow, 7) + "].");
+                                    ShowContinueError(state,
+                                                      format("...air flow rate [{:.7T}] in fan object {} is less than the unit ventilator maximum "
+                                                             "supply air flow rate [{:.7T}].",
+                                                             FanVolFlow,
+                                                             state.dataUnitVentilators->UnitVent(UnitVentNum).FanName,
+                                                             state.dataUnitVentilators->UnitVent(UnitVentNum).MaxAirVolFlow));
                                     ShowContinueError(state,
                                         "...the fan flow rate must be greater than or equal to the unit ventilator maximum supply air flow rate.");
                                     ErrorsFound = true;
@@ -520,9 +524,13 @@ namespace UnitVentilator {
                     if (FanVolFlow != AutoSize && state.dataUnitVentilators->UnitVent(UnitVentNum).MaxAirVolFlow != AutoSize &&
                         FanVolFlow < state.dataUnitVentilators->UnitVent(UnitVentNum).MaxAirVolFlow) {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataUnitVentilators->UnitVent(UnitVentNum).Name + "\"");
-                        ShowContinueError(state, "...air flow rate [" + TrimSigDigits(FanVolFlow, 7) + "] in fan object " + state.dataUnitVentilators->UnitVent(UnitVentNum).FanName +
-                                          " is less than the unit ventilator maximum supply air flow rate [" +
-                                          TrimSigDigits(state.dataUnitVentilators->UnitVent(UnitVentNum).MaxAirVolFlow, 7) + "].");
+                        ShowContinueError(
+                            state,
+                            format(
+                                "...air flow rate [{:.7T}] in fan object {} is less than the unit ventilator maximum supply air flow rate [{:.7T}].",
+                                FanVolFlow,
+                                state.dataUnitVentilators->UnitVent(UnitVentNum).FanName,
+                                state.dataUnitVentilators->UnitVent(UnitVentNum).MaxAirVolFlow));
                         ShowContinueError(state, "...the fan flow rate must be greater than or equal to the unit ventilator maximum supply air flow rate.");
                         ErrorsFound = true;
                     } else if (FanVolFlow == AutoSize && state.dataUnitVentilators->UnitVent(UnitVentNum).MaxAirVolFlow != AutoSize) {
@@ -900,7 +908,7 @@ namespace UnitVentilator {
             if (!state.dataUnitVentilators->UnitVent(UnitVentNum).ATMixerExists) {
                 // check that unit ventilator air inlet node is the same as a zone exhaust node
                 ZoneNodeNotFound = true;
-                for (CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone) {
+                for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                     if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
                     for (NodeNum = 1; NodeNum <= ZoneEquipConfig(CtrlZone).NumExhaustNodes; ++NodeNum) {
                         if (state.dataUnitVentilators->UnitVent(UnitVentNum).AirInNode == ZoneEquipConfig(CtrlZone).ExhaustNode(NodeNum)) {
@@ -918,7 +926,7 @@ namespace UnitVentilator {
                 }
                 // check that unit ventilator air outlet node is the same as a zone inlet node.
                 ZoneNodeNotFound = true;
-                for (CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone) {
+                for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                     if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
                     for (NodeNum = 1; NodeNum <= ZoneEquipConfig(CtrlZone).NumInletNodes; ++NodeNum) {
                         if (state.dataUnitVentilators->UnitVent(UnitVentNum).AirOutNode == ZoneEquipConfig(CtrlZone).InletNode(NodeNum)) {
@@ -939,7 +947,7 @@ namespace UnitVentilator {
                 if (state.dataUnitVentilators->UnitVent(UnitVentNum).ATMixerType == ATMixer_InletSide) {
                     // check that unit ventilator air outlet node is the same as a zone inlet node.
                     ZoneNodeNotFound = true;
-                    for (CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone) {
+                    for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                         if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
                         for (NodeNum = 1; NodeNum <= ZoneEquipConfig(CtrlZone).NumInletNodes; ++NodeNum) {
                             if (state.dataUnitVentilators->UnitVent(UnitVentNum).AirOutNode == ZoneEquipConfig(CtrlZone).InletNode(NodeNum)) {
@@ -978,7 +986,7 @@ namespace UnitVentilator {
 
                     // check that air teminal mixer outlet node is the same as a zone inlet node.
                     ZoneNodeNotFound = true;
-                    for (CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone) {
+                    for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                         if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
                         for (NodeNum = 1; NodeNum <= ZoneEquipConfig(CtrlZone).NumInletNodes; ++NodeNum) {
                             if (state.dataUnitVentilators->UnitVent(UnitVentNum).ATMixerOutNode == ZoneEquipConfig(CtrlZone).InletNode(NodeNum)) {
@@ -1215,7 +1223,6 @@ namespace UnitVentilator {
         // Uses the status flags to trigger initializations.
 
         using DataEnvironment::StdRhoAir;
-        using DataGlobals::AnyPlantInModel;
         using DataHVACGlobals::FanType_SimpleOnOff;
         using DataHVACGlobals::ZoneComp;
         using DataHVACGlobals::ZoneCompTurnFansOff;
@@ -1337,20 +1344,20 @@ namespace UnitVentilator {
                     ShowFatalError(state, "InitUnitVentilator: Unit=" + state.dataUnitVentilators->UnitVent(UnitVentNum).Name + ", invalid cooling coil type. Program terminated.");
             }
             MyPlantScanFlag(UnitVentNum) = false;
-        } else if (MyPlantScanFlag(UnitVentNum) && !AnyPlantInModel) {
+        } else if (MyPlantScanFlag(UnitVentNum) && !state.dataGlobal->AnyPlantInModel) {
             MyPlantScanFlag(UnitVentNum) = false;
         }
 
         if (!state.dataUnitVentilators->ZoneEquipmentListChecked && ZoneEquipInputsFilled) {
             state.dataUnitVentilators->ZoneEquipmentListChecked = true;
             for (Loop = 1; Loop <= state.dataUnitVentilators->NumOfUnitVents; ++Loop) {
-                if (CheckZoneEquipmentList("ZoneHVAC:UnitVentilator", state.dataUnitVentilators->UnitVent(Loop).Name)) continue;
+                if (CheckZoneEquipmentList(state, "ZoneHVAC:UnitVentilator", state.dataUnitVentilators->UnitVent(Loop).Name)) continue;
                 ShowSevereError(state, "InitUnitVentilator: Unit=[UNIT VENTILATOR," + state.dataUnitVentilators->UnitVent(Loop).Name +
                                 "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated.");
             }
         }
 
-        if (!SysSizingCalc && state.dataUnitVentilators->MySizeFlag(UnitVentNum) && !MyPlantScanFlag(UnitVentNum)) {
+        if (!state.dataGlobal->SysSizingCalc && state.dataUnitVentilators->MySizeFlag(UnitVentNum) && !MyPlantScanFlag(UnitVentNum)) {
 
             SizeUnitVentilator(state, UnitVentNum);
 
@@ -1559,8 +1566,7 @@ namespace UnitVentilator {
         using DataPlant::PlantLoop;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
-        using General::RoundSigDigits;
-        using General::TrimSigDigits;
+
         using HVACHXAssistedCoolingCoil::GetHXCoilType;
         using HVACHXAssistedCoolingCoil::GetHXDXCoilName;
         using PlantUtilities::MyPlantSizingIndex;
@@ -1988,14 +1994,13 @@ namespace UnitVentilator {
                                                      OutAirVolFlowDes,
                                                      "User-Specified Maximum Outdoor Air Flow Rate [m3/s]",
                                                      OutAirVolFlowUser);
-                        if (DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(OutAirVolFlowDes - OutAirVolFlowUser) / OutAirVolFlowUser) > AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeUnitVentilator: Potential issue with equipment sizing for " + state.dataUnitVentilators->cMO_UnitVentilator + ' ' +
                                             state.dataUnitVentilators->UnitVent(UnitVentNum).Name);
-                                ShowContinueError(state, "User-Specified Maximum Outdoor Air Flow Rate of " + RoundSigDigits(OutAirVolFlowUser, 5) +
-                                                  " [m3/s]");
-                                ShowContinueError(state, "differs from Design Size Maximum Outdoor Air Flow Rate of " + RoundSigDigits(OutAirVolFlowDes, 5) +
-                                                  " [m3/s]");
+                                ShowContinueError(state, format("User-Specified Maximum Outdoor Air Flow Rate of {:.5R} [m3/s]", OutAirVolFlowUser));
+                                ShowContinueError(
+                                    state, format("differs from Design Size Maximum Outdoor Air Flow Rate of {:.5R} [m3/s]", OutAirVolFlowDes));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }
@@ -2042,14 +2047,14 @@ namespace UnitVentilator {
                                                      MinOutAirVolFlowDes,
                                                      "User-Specified Minimum Outdoor Air Flow Rate [m3/s]",
                                                      MinOutAirVolFlowUser);
-                        if (DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(MinOutAirVolFlowDes - MinOutAirVolFlowUser) / MinOutAirVolFlowUser) > AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeUnitVentilator: Potential issue with equipment sizing for " + state.dataUnitVentilators->cMO_UnitVentilator + ' ' +
                                             state.dataUnitVentilators->UnitVent(UnitVentNum).Name);
-                                ShowContinueError(state, "User-Specified Minimum Outdoor Air Flow Rate of " + RoundSigDigits(MinOutAirVolFlowUser, 5) +
-                                                  " [m3/s]");
-                                ShowContinueError(state, "differs from Design Size Minimum Outdoor Air Flow Rate of " +
-                                                  RoundSigDigits(MinOutAirVolFlowDes, 5) + " [m3/s]");
+                                ShowContinueError(state,
+                                                  format("User-Specified Minimum Outdoor Air Flow Rate of {:.5R} [m3/s]", MinOutAirVolFlowUser));
+                                ShowContinueError(
+                                    state, format("differs from Design Size Minimum Outdoor Air Flow Rate of {:.5R} [m3/s]", MinOutAirVolFlowDes));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }
@@ -2174,14 +2179,14 @@ namespace UnitVentilator {
                                                          MaxVolHotWaterFlowDes,
                                                          "User-Specified Maximum Hot Water Flow [m3/s]",
                                                          MaxVolHotWaterFlowUser);
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(MaxVolHotWaterFlowDes - MaxVolHotWaterFlowUser) / MaxVolHotWaterFlowUser) > AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeUnitVentilator: Potential issue with equipment sizing for " + state.dataUnitVentilators->cMO_UnitVentilator + ' ' +
                                                 state.dataUnitVentilators->UnitVent(UnitVentNum).Name);
-                                    ShowContinueError(state, "User-Specified Maximum Hot Water Flow of " + RoundSigDigits(MaxVolHotWaterFlowUser, 5) +
-                                                      " [m3/s]");
-                                    ShowContinueError(state, "differs from Design Size Maximum Hot Water Flow of " +
-                                                      RoundSigDigits(MaxVolHotWaterFlowDes, 5) + " [m3/s]");
+                                    ShowContinueError(state,
+                                                      format("User-Specified Maximum Hot Water Flow of {:.5R} [m3/s]", MaxVolHotWaterFlowUser));
+                                    ShowContinueError(
+                                        state, format("differs from Design Size Maximum Hot Water Flow of {:.5R} [m3/s]", MaxVolHotWaterFlowDes));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -2292,14 +2297,13 @@ namespace UnitVentilator {
                                                          MaxVolHotSteamFlowDes,
                                                          "User-Specified Maximum Steam Flow [m3/s]",
                                                          MaxVolHotSteamFlowUser);
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(MaxVolHotSteamFlowDes - MaxVolHotSteamFlowUser) / MaxVolHotSteamFlowUser) > AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeUnitVentilator: Potential issue with equipment sizing for " + state.dataUnitVentilators->cMO_UnitVentilator + ' ' +
                                                 state.dataUnitVentilators->UnitVent(UnitVentNum).Name);
-                                    ShowContinueError(state, "User-Specified Maximum Steam Flow of " + RoundSigDigits(MaxVolHotSteamFlowUser, 5) +
-                                                      " [m3/s]");
-                                    ShowContinueError(state, "differs from Design Size Maximum Steam Flow of " + RoundSigDigits(MaxVolHotSteamFlowDes, 5) +
-                                                      " [m3/s]");
+                                    ShowContinueError(state, format("User-Specified Maximum Steam Flow of {:.5R} [m3/s]", MaxVolHotSteamFlowUser));
+                                    ShowContinueError(state,
+                                                      format("differs from Design Size Maximum Steam Flow of {:.5R} [m3/s]", MaxVolHotSteamFlowDes));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -2417,8 +2421,8 @@ namespace UnitVentilator {
                                     ShowWarningError(state, "Autosizing of water flow resulted in negative value.");
                                     ShowContinueError(state, "Occurs in " + state.dataUnitVentilators->cMO_UnitVentilator + " Object=" + state.dataUnitVentilators->UnitVent(UnitVentNum).Name);
                                     ShowContinueError(state, "...Sizing information found during sizing simulation:");
-                                    ShowContinueError(state, "...Calculated coil design load = " + TrimSigDigits(DesCoolingLoad, 3) + " W");
-                                    ShowContinueError(state, "...Calculated water flow rate  = " + TrimSigDigits(MaxVolColdWaterFlowDes, 3) + " m3/s");
+                                    ShowContinueError(state, format("...Calculated coil design load = {:.3T} W", DesCoolingLoad));
+                                    ShowContinueError(state, format("...Calculated water flow rate  = {:.3T} m3/s", MaxVolColdWaterFlowDes));
                                     ShowContinueError(state, "...Water flow rate will be set to 0. Check sizing inputs for zone and plant, inputs for water "
                                                       "cooling coil object, and design day specifications.");
                                     ShowContinueError(state, "...Consider autosizing all inputs if not already doing so.");
@@ -2442,15 +2446,15 @@ namespace UnitVentilator {
                                                          MaxVolColdWaterFlowDes,
                                                          "User-Specified Maximum Cold Water Flow [m3/s]",
                                                          MaxVolColdWaterFlowUser);
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(MaxVolColdWaterFlowDes - MaxVolColdWaterFlowUser) / MaxVolColdWaterFlowUser) >
                                     AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeUnitVentilator: Potential issue with equipment sizing for " + state.dataUnitVentilators->cMO_UnitVentilator + ' ' +
                                                 state.dataUnitVentilators->UnitVent(UnitVentNum).Name);
-                                    ShowContinueError(state, "User-Specified Maximum Cold Water Flow of " + RoundSigDigits(MaxVolColdWaterFlowUser, 5) +
-                                                      " [m3/s]");
-                                    ShowContinueError(state, "differs from Design Size Maximum Cold Water Flow of " +
-                                                      RoundSigDigits(MaxVolColdWaterFlowDes, 5) + " [m3/s]");
+                                    ShowContinueError(state,
+                                                      format("User-Specified Maximum Cold Water Flow of {:.5R} [m3/s]", MaxVolColdWaterFlowUser));
+                                    ShowContinueError(
+                                        state, format("differs from Design Size Maximum Cold Water Flow of {:.5R} [m3/s]", MaxVolColdWaterFlowDes));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -3597,8 +3601,6 @@ namespace UnitVentilator {
         // rates and perform an energy balance on the mixing of the return and
         // outdoor air streams.
 
-        using DataContaminantBalance::Contaminant;
-
         int AirRelNode;            // relief air node number in unit ventilator loop
         int InletNode;             // inlet node number for unit ventilator loop
         Real64 OAFraction;         // Outside air fraction of inlet air
@@ -3652,11 +3654,11 @@ namespace UnitVentilator {
         Node(OAMixOutNode).Temp = PsyTdbFnHW(Node(OAMixOutNode).Enthalpy, Node(OAMixOutNode).HumRat);
         Node(OAMixOutNode).Press = Node(InletNode).Press;
 
-        if (Contaminant.CO2Simulation) {
+        if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
             Node(AirRelNode).CO2 = Node(InletNode).CO2;
             Node(OAMixOutNode).CO2 = OAFraction * Node(OutsideAirNode).CO2 + (1.0 - OAFraction) * Node(InletNode).CO2;
         }
-        if (Contaminant.GenericContamSimulation) {
+        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
             Node(AirRelNode).GenContam = Node(InletNode).GenContam;
             Node(OAMixOutNode).GenContam = OAFraction * Node(OutsideAirNode).GenContam + (1.0 - OAFraction) * Node(InletNode).GenContam;
         }
@@ -3696,7 +3698,7 @@ namespace UnitVentilator {
         state.dataUnitVentilators->UnitVent(UnitVentNum).ElecEnergy = state.dataUnitVentilators->UnitVent(UnitVentNum).ElecPower * TimeStepSys * DataGlobalConstants::SecInHour();
 
         if (state.dataUnitVentilators->UnitVent(UnitVentNum).FirstPass) { // reset sizing flags so other zone equipment can size normally
-            if (!DataGlobals::SysSizingCalc) {
+            if (!state.dataGlobal->SysSizingCalc) {
                 DataSizing::resetHVACSizingGlobals(DataSizing::CurZoneEqNum, 0, state.dataUnitVentilators->UnitVent(UnitVentNum).FirstPass);
             }
         }

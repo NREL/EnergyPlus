@@ -121,9 +121,6 @@ namespace VentilatedSlab {
 
     // Using/Aliasing
     using namespace DataLoopNode;
-    using DataGlobals::DisplayExtraWarnings;
-    using DataGlobals::SysSizingCalc;
-    using DataGlobals::WarmupFlag;
     using DataHeatBalFanSys::QRadSysSource;
     using DataHVACGlobals::ContFanCycCoil;
     using DataHVACGlobals::SmallAirVolFlow;
@@ -164,7 +161,6 @@ namespace VentilatedSlab {
 
         // Using/Aliasing
         using DataSizing::ZoneEqVentedSlab;
-        using General::TrimSigDigits;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Item; // index of ventilated slab being simulated
@@ -185,13 +181,19 @@ namespace VentilatedSlab {
         } else {
             Item = CompIndex;
             if (Item > state.dataVentilatedSlab->NumOfVentSlabs || Item < 1) {
-                ShowFatalError(state, "SimVentilatedSlab:  Invalid CompIndex passed=" + TrimSigDigits(Item) +
-                               ", Number of Systems=" + TrimSigDigits(state.dataVentilatedSlab->NumOfVentSlabs) + ", Entered System name=" + CompName);
+                ShowFatalError(state,
+                               format("SimVentilatedSlab:  Invalid CompIndex passed={}, Number of Systems={}, Entered System name={}",
+                                      Item,
+                                      state.dataVentilatedSlab->NumOfVentSlabs,
+                                      CompName));
             }
             if (state.dataVentilatedSlab->CheckEquipName(Item)) {
                 if (CompName != state.dataVentilatedSlab->VentSlab(Item).Name ) {
-                    ShowFatalError(state, "SimVentilatedSlab: Invalid CompIndex passed=" + TrimSigDigits(Item) + ", System name=" + CompName +
-                                   ", stored System Name for that index=" + state.dataVentilatedSlab->VentSlab(Item).Name);
+                    ShowFatalError(state,
+                                   format("SimVentilatedSlab: Invalid CompIndex passed={}, System name={}, stored System Name for that index={}",
+                                          Item,
+                                          CompName,
+                                          state.dataVentilatedSlab->VentSlab(Item).Name));
                 }
                 state.dataVentilatedSlab->CheckEquipName(Item) = false;
             }
@@ -1291,8 +1293,6 @@ namespace VentilatedSlab {
         using DataEnvironment::OutBaroPress;
         using DataEnvironment::OutHumRat;
         using DataEnvironment::StdRhoAir;
-        using DataGlobals::AnyPlantInModel;
-        using DataGlobals::NumOfZones;
         using DataHeatBalFanSys::MAT;
         using DataHeatBalFanSys::ZoneAirHumRat;
         using DataHVACGlobals::ZoneComp;
@@ -1355,7 +1355,7 @@ namespace VentilatedSlab {
             state.dataVentilatedSlab->MySizeFlag.allocate(state.dataVentilatedSlab->NumOfVentSlabs);
             MyPlantScanFlag.allocate(state.dataVentilatedSlab->NumOfVentSlabs);
             MyZoneEqFlag.allocate(state.dataVentilatedSlab->NumOfVentSlabs);
-            state.dataVentilatedSlab->ZeroSourceSumHATsurf.dimension(NumOfZones, 0.0);
+            state.dataVentilatedSlab->ZeroSourceSumHATsurf.dimension(state.dataGlobal->NumOfZones, 0.0);
             state.dataVentilatedSlab->QRadSysSrcAvg.dimension(TotSurfaces, 0.0);
             state.dataVentilatedSlab->LastQRadSysSrc.dimension(TotSurfaces, 0.0);
             state.dataVentilatedSlab->LastSysTimeElapsed.dimension(TotSurfaces, 0.0);
@@ -1437,7 +1437,7 @@ namespace VentilatedSlab {
                     ShowFatalError(state, "InitVentilatedSlab: Unit=" + state.dataVentilatedSlab->VentSlab(Item).Name + ", invalid cooling coil type. Program terminated.");
             }
             MyPlantScanFlag(Item) = false;
-        } else if (MyPlantScanFlag(Item) && !AnyPlantInModel) {
+        } else if (MyPlantScanFlag(Item) && !state.dataGlobal->AnyPlantInModel) {
             MyPlantScanFlag(Item) = false;
         }
 
@@ -1445,13 +1445,13 @@ namespace VentilatedSlab {
         if (!ZoneEquipmentListChecked && ZoneEquipInputsFilled) {
             ZoneEquipmentListChecked = true;
             for (RadNum = 1; RadNum <= state.dataVentilatedSlab->NumOfVentSlabs; ++RadNum) {
-                if (CheckZoneEquipmentList(state.dataVentilatedSlab->cMO_VentilatedSlab, state.dataVentilatedSlab->VentSlab(RadNum).Name)) continue;
+                if (CheckZoneEquipmentList(state, state.dataVentilatedSlab->cMO_VentilatedSlab, state.dataVentilatedSlab->VentSlab(RadNum).Name)) continue;
                 ShowSevereError(state, "InitVentilatedSlab: Ventilated Slab Unit=[" + state.dataVentilatedSlab->cMO_VentilatedSlab + ',' + state.dataVentilatedSlab->VentSlab(RadNum).Name +
                                 "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated.");
             }
         }
 
-        if (!SysSizingCalc && state.dataVentilatedSlab->MySizeFlag(Item) && !MyPlantScanFlag(Item)) {
+        if (!state.dataGlobal->SysSizingCalc && state.dataVentilatedSlab->MySizeFlag(Item) && !MyPlantScanFlag(Item)) {
 
             SizeVentilatedSlab(state, Item);
 
@@ -1654,7 +1654,7 @@ namespace VentilatedSlab {
         using DataPlant::PlantLoop;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
-        using General::RoundSigDigits;
+
         using HVACHXAssistedCoolingCoil::GetHXCoilType;
         using HVACHXAssistedCoolingCoil::GetHXDXCoilName;
         using PlantUtilities::MyPlantSizingIndex;
@@ -1903,14 +1903,13 @@ namespace VentilatedSlab {
                                                      OutAirVolFlowDes,
                                                      "User-Specified Maximum Outdoor Air Flow Rate [m3/s]",
                                                      OutAirVolFlowUser);
-                        if (DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(OutAirVolFlowDes - OutAirVolFlowUser) / OutAirVolFlowUser) > AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeVentilatedSlab: Potential issue with equipment sizing for ZoneHVAC:VentilatedSlab = \"" +
                                             state.dataVentilatedSlab->VentSlab(Item).Name + "\".");
-                                ShowContinueError(state, "User-Specified Maximum Outdoor Air Flow Rate of " + RoundSigDigits(OutAirVolFlowUser, 5) +
-                                                  " [m3/s]");
-                                ShowContinueError(state, "differs from Design Size Maximum Outdoor Air Flow Rate of " + RoundSigDigits(OutAirVolFlowDes, 5) +
-                                                  " [m3/s]");
+                                ShowContinueError(state, format("User-Specified Maximum Outdoor Air Flow Rate of {:.5R} [m3/s]", OutAirVolFlowUser));
+                                ShowContinueError(
+                                    state, format("differs from Design Size Maximum Outdoor Air Flow Rate of {:.5R} [m3/s]", OutAirVolFlowDes));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }
@@ -1951,14 +1950,14 @@ namespace VentilatedSlab {
                                                      MinOutAirVolFlowDes,
                                                      "User-Specified Minimum Outdoor Air Flow Rate [m3/s]",
                                                      MinOutAirVolFlowUser);
-                        if (DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(MinOutAirVolFlowDes - MinOutAirVolFlowUser) / MinOutAirVolFlowUser) > AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeVentilatedSlab: Potential issue with equipment sizing for ZoneHVAC:VentilatedSlab = \"" +
                                             state.dataVentilatedSlab->VentSlab(Item).Name + "\".");
-                                ShowContinueError(state, "User-Specified Minimum Outdoor Air Flow Rate of " + RoundSigDigits(MinOutAirVolFlowUser, 5) +
-                                                  " [m3/s]");
-                                ShowContinueError(state, "differs from Design Size Minimum Outdoor Air Flow Rate of " +
-                                                  RoundSigDigits(MinOutAirVolFlowDes, 5) + " [m3/s]");
+                                ShowContinueError(state,
+                                                  format("User-Specified Minimum Outdoor Air Flow Rate of {:.5R} [m3/s]", MinOutAirVolFlowUser));
+                                ShowContinueError(
+                                    state, format("differs from Design Size Minimum Outdoor Air Flow Rate of {:.5R} [m3/s]", MinOutAirVolFlowDes));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }
@@ -2079,14 +2078,14 @@ namespace VentilatedSlab {
                                                          MaxVolHotWaterFlowDes,
                                                          "User-Specified Maximum Hot Water Flow [m3/s]",
                                                          MaxVolHotWaterFlowUser);
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(MaxVolHotWaterFlowDes - MaxVolHotWaterFlowUser) / MaxVolHotWaterFlowUser) > AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeVentilatedSlab: Potential issue with equipment sizing for ZoneHVAC:VentilatedSlab = \"" +
                                                 state.dataVentilatedSlab->VentSlab(Item).Name + "\".");
-                                    ShowContinueError(state, "User-Specified Maximum Hot Water Flow of " + RoundSigDigits(MaxVolHotWaterFlowUser, 5) +
-                                                      " [m3/s]");
-                                    ShowContinueError(state, "differs from Design Size Maximum Hot Water Flow of " +
-                                                      RoundSigDigits(MaxVolHotWaterFlowDes, 5) + " [m3/s]");
+                                    ShowContinueError(state,
+                                                      format("User-Specified Maximum Hot Water Flow of {:.5R} [m3/s]", MaxVolHotWaterFlowUser));
+                                    ShowContinueError(
+                                        state, format("differs from Design Size Maximum Hot Water Flow of {:.5R} [m3/s]", MaxVolHotWaterFlowDes));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -2196,14 +2195,13 @@ namespace VentilatedSlab {
                                                          MaxVolHotSteamFlowDes,
                                                          "User-Specified Maximum Steam Flow [m3/s]",
                                                          MaxVolHotSteamFlowUser);
-                            if (DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(MaxVolHotSteamFlowDes - MaxVolHotSteamFlowUser) / MaxVolHotSteamFlowUser) > AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeVentilatedSlab: Potential issue with equipment sizing for ZoneHVAC:VentilatedSlab = \"" +
                                                 state.dataVentilatedSlab->VentSlab(Item).Name + "\".");
-                                    ShowContinueError(state, "User-Specified Maximum Steam Flow of " + RoundSigDigits(MaxVolHotSteamFlowUser, 5) +
-                                                      " [m3/s]");
-                                    ShowContinueError(state, "differs from Design Size Maximum Steam Flow of " + RoundSigDigits(MaxVolHotSteamFlowDes, 5) +
-                                                      " [m3/s]");
+                                    ShowContinueError(state, format("User-Specified Maximum Steam Flow of {:.5R} [m3/s]", MaxVolHotSteamFlowUser));
+                                    ShowContinueError(state,
+                                                      format("differs from Design Size Maximum Steam Flow of {:.5R} [m3/s]", MaxVolHotSteamFlowDes));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -2324,14 +2322,13 @@ namespace VentilatedSlab {
                                                      MaxVolColdWaterFlowDes,
                                                      "User-Specified Maximum Cold Water Flow [m3/s]",
                                                      MaxVolColdWaterFlowUser);
-                        if (DisplayExtraWarnings) {
+                        if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(MaxVolColdWaterFlowDes - MaxVolColdWaterFlowUser) / MaxVolColdWaterFlowUser) > AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeVentilatedSlab: Potential issue with equipment sizing for ZoneHVAC:VentilatedSlab = \"" +
                                             state.dataVentilatedSlab->VentSlab(Item).Name + "\".");
-                                ShowContinueError(state, "User-Specified Maximum Cold Water Flow of " + RoundSigDigits(MaxVolColdWaterFlowUser, 5) +
-                                                  " [m3/s]");
-                                ShowContinueError(state, "differs from Design Size Maximum Cold Water Flow of " + RoundSigDigits(MaxVolColdWaterFlowDes, 5) +
-                                                  " [m3/s]");
+                                ShowContinueError(state, format("User-Specified Maximum Cold Water Flow of {:.5R} [m3/s]", MaxVolColdWaterFlowUser));
+                                ShowContinueError(
+                                    state, format("differs from Design Size Maximum Cold Water Flow of {:.5R} [m3/s]", MaxVolColdWaterFlowDes));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }
@@ -2428,7 +2425,7 @@ namespace VentilatedSlab {
         using DataHVACGlobals::ZoneCompTurnFansOff;
         using DataHVACGlobals::ZoneCompTurnFansOn;
         using DataLoopNode::Node;
-        using General::TrimSigDigits;
+
         using HeatingCoils::CheckHeatingCoilSchedule;
         using HVACHXAssistedCoolingCoil::CheckHXAssistedCoolingCoilSchedule;
         using NodeInputManager::GetOnlySingleNode;
@@ -3385,8 +3382,8 @@ namespace VentilatedSlab {
     }
 
     void CalcVentilatedSlabRadComps(EnergyPlusData &state,
-                                    int const Item,                          // System index in ventilated slab array
-                                    bool const EP_UNUSED(FirstHVACIteration) // flag for 1st HVAV iteration in the time step !unused1208
+                                    int const Item,                                // System index in ventilated slab array
+                                    [[maybe_unused]] bool const FirstHVACIteration // flag for 1st HVAV iteration in the time step !unused1208
     )
     {
 
@@ -3410,7 +3407,6 @@ namespace VentilatedSlab {
 
         // Using/Aliasing
         using DataEnvironment::OutBaroPress;
-        using General::RoundSigDigits;
 
         using DataHeatBalance::Zone;
         using DataHeatBalFanSys::CTFTsrcConstPart;
@@ -3639,7 +3635,7 @@ namespace VentilatedSlab {
                         //                            RoundSigDigits(TH(VentSlab(Item)%SurfacePtr(RadSurfNum),1,2),2))
                         //     CALL ShowContinueErrorTimeStamp(state, ' ')
                         //   ELSE
-                        //     CALL ShowRecurringWarningErrorAtEnd('Ventilated Slab ['//TRIM(VentSlab(Item)%Name)//  &
+                        //     CALL ShowRecurringWarningErrorAtEnd(state, 'Ventilated Slab ['//TRIM(VentSlab(Item)%Name)//  &
                         //                  '] Temperature Comparison Error shut-off occurrence continues.',  &
                         //                  state.dataVentilatedSlab->VentSlab(Item)%CondErrCount)
                         //   END IF
@@ -3698,7 +3694,7 @@ namespace VentilatedSlab {
                                         QRadSysSource(Surface(SurfNum2).ExtBoundCond) = 0.0; // Also zero the other side of an interzone
                                 }
                                 // Produce a warning message so that user knows the system was shut-off due to potential for condensation
-                                if (!WarmupFlag) {
+                                if (!state.dataGlobal->WarmupFlag) {
                                     ++CondensationErrorCount;
 
                                     if (state.dataVentilatedSlab->VentSlab(Item).CondErrIndex == 0) {
@@ -3706,18 +3702,19 @@ namespace VentilatedSlab {
                                         ShowContinueError(state, "Surface [" + Surface(state.dataVentilatedSlab->VentSlab(Item).SurfacePtr(RadSurfNum2)).Name +
                                                           "] temperature below dew-point temperature--potential for condensation exists");
                                         ShowContinueError(state, "Flow to the ventilated slab system will be shut-off to avoid condensation");
-                                        ShowContinueError(state, "Predicted radiant system surface temperature = " +
-                                                          RoundSigDigits(TH(2, 1, state.dataVentilatedSlab->VentSlab(Item).SurfacePtr(RadSurfNum2)), 2));
-                                        ShowContinueError(state, "Zone dew-point temperature + safety factor delta= " +
-                                                          RoundSigDigits(DewPointTemp + CondDeltaTemp, 2));
+                                        ShowContinueError(state,
+                                                          format("Predicted radiant system surface temperature = {:.2R}",
+                                                                 TH(2, 1, state.dataVentilatedSlab->VentSlab(Item).SurfacePtr(RadSurfNum2))));
+                                        ShowContinueError(
+                                            state, format("Zone dew-point temperature + safety factor delta= {:.2R}", DewPointTemp + CondDeltaTemp));
                                         ShowContinueErrorTimeStamp(state, "");
                                     }
                                     if (CondensationErrorCount == 1) {
-                                        ShowContinueError(state, "Note that there is a " + RoundSigDigits(CondDeltaTemp, 4) +
-                                                          " C safety built-in to the shut-off criteria");
+                                        ShowContinueError(
+                                            state, format("Note that there is a {:.4R} C safety built-in to the shut-off criteria", CondDeltaTemp));
                                         ShowContinueError(state, "Note also that this affects all surfaces that are part of this system");
                                     }
-                                    ShowRecurringWarningErrorAtEnd(state.dataVentilatedSlab->cMO_VentilatedSlab + " [" + state.dataVentilatedSlab->VentSlab(Item).Name +
+                                    ShowRecurringWarningErrorAtEnd(state, state.dataVentilatedSlab->cMO_VentilatedSlab + " [" + state.dataVentilatedSlab->VentSlab(Item).Name +
                                                                        "] condensation shut-off occurrence continues.",
                                                                    state.dataVentilatedSlab->VentSlab(Item).CondErrIndex,
                                                                    DewPointTemp,
@@ -3750,7 +3747,7 @@ namespace VentilatedSlab {
                         if ((std::abs(Node(ReturnAirNode).Temp - AirOutletTempCheck) > TempCheckLimit) &&
                             (std::abs(TotalVentSlabRadPower) > ZeroSystemResp)) {
 
-                            if (!WarmupFlag) {
+                            if (!state.dataGlobal->WarmupFlag) {
                                 ++EnergyImbalanceErrorCount;
                                 if (state.dataVentilatedSlab->VentSlab(Item).EnrgyImbalErrIndex == 0) {
                                     ShowWarningMessage(state, state.dataVentilatedSlab->cMO_VentilatedSlab + " [" + state.dataVentilatedSlab->VentSlab(Item).Name + ']');
@@ -3759,15 +3756,17 @@ namespace VentilatedSlab {
                                     ShowContinueError(state, "However, it could also result from improper input for the ventilated slab or");
                                     ShowContinueError(state, "illogical control temperatures.  Check your input for this ventilated slab and");
                                     ShowContinueError(state, "also look at the internal data shown below.");
-                                    ShowContinueError(state, "Predicted return air temperature [C] from the overall energy balance = " +
-                                                      RoundSigDigits(Node(ReturnAirNode).Temp, 4));
-                                    ShowContinueError(state, "Predicted return air temperature [C] from the slab section energy balances = " +
-                                                      RoundSigDigits(AirOutletTempCheck, 4));
-                                    ShowContinueError(state, "Total energy rate (power) [W] added to the slab = " +
-                                                      RoundSigDigits(TotalVentSlabRadPower, 4));
+                                    ShowContinueError(state,
+                                                      format("Predicted return air temperature [C] from the overall energy balance = {:.4R}",
+                                                             Node(ReturnAirNode).Temp));
+                                    ShowContinueError(state,
+                                                      format("Predicted return air temperature [C] from the slab section energy balances = {:.4R}",
+                                                             AirOutletTempCheck));
+                                    ShowContinueError(state,
+                                                      format("Total energy rate (power) [W] added to the slab = {:.4R}", TotalVentSlabRadPower));
                                     ShowContinueErrorTimeStamp(state, "");
                                 }
-                                ShowRecurringWarningErrorAtEnd(state.dataVentilatedSlab->cMO_VentilatedSlab + " [" + state.dataVentilatedSlab->VentSlab(Item).Name +
+                                ShowRecurringWarningErrorAtEnd(state, state.dataVentilatedSlab->cMO_VentilatedSlab + " [" + state.dataVentilatedSlab->VentSlab(Item).Name +
                                                                    "] temperature calculation mismatch occurrence continues.",
                                                                state.dataVentilatedSlab->VentSlab(Item).EnrgyImbalErrIndex);
                             }
@@ -3783,7 +3782,7 @@ namespace VentilatedSlab {
                         if ((std::abs(Node(ZoneAirInNode).Temp - AirOutletTempCheck) > TempCheckLimit) &&
                             (std::abs(TotalVentSlabRadPower) > ZeroSystemResp)) {
 
-                            if (!WarmupFlag) {
+                            if (!state.dataGlobal->WarmupFlag) {
                                 ++EnergyImbalanceErrorCount;
                                 if (state.dataVentilatedSlab->VentSlab(Item).EnrgyImbalErrIndex == 0) {
                                     ShowWarningMessage(state, state.dataVentilatedSlab->cMO_VentilatedSlab + " [" + state.dataVentilatedSlab->VentSlab(Item).Name + ']');
@@ -3792,15 +3791,17 @@ namespace VentilatedSlab {
                                     ShowContinueError(state, "However, it could also result from improper input for the ventilated slab or");
                                     ShowContinueError(state, "illogical control temperatures.  Check your input for this ventilated slab and");
                                     ShowContinueError(state, "also look at the internal data shown below.");
-                                    ShowContinueError(state, "Predicted return air temperature [C] from the overall energy balance = " +
-                                                      RoundSigDigits(Node(ReturnAirNode).Temp, 4));
-                                    ShowContinueError(state, "Predicted return air temperature [C] from the slab section energy balances = " +
-                                                      RoundSigDigits(AirOutletTempCheck, 4));
-                                    ShowContinueError(state, "Total energy rate (power) [W] added to the slab = " +
-                                                      RoundSigDigits(TotalVentSlabRadPower, 4));
+                                    ShowContinueError(state,
+                                                      format("Predicted return air temperature [C] from the overall energy balance = {:.4R}",
+                                                             Node(ReturnAirNode).Temp));
+                                    ShowContinueError(state,
+                                                      format("Predicted return air temperature [C] from the slab section energy balances = {:.4R}",
+                                                             AirOutletTempCheck));
+                                    ShowContinueError(state,
+                                                      format("Total energy rate (power) [W] added to the slab = {:.4R}", TotalVentSlabRadPower));
                                     ShowContinueErrorTimeStamp(state, "");
                                 }
-                                ShowRecurringWarningErrorAtEnd(state.dataVentilatedSlab->cMO_VentilatedSlab + " [" + state.dataVentilatedSlab->VentSlab(Item).Name +
+                                ShowRecurringWarningErrorAtEnd(state, state.dataVentilatedSlab->cMO_VentilatedSlab + " [" + state.dataVentilatedSlab->VentSlab(Item).Name +
                                                                    "] temperature calculation mismatch occurrence continues.",
                                                                state.dataVentilatedSlab->VentSlab(Item).EnrgyImbalErrIndex);
                             }
@@ -3896,7 +3897,7 @@ namespace VentilatedSlab {
                             //                           RoundSigDigits(TH(VentSlab(Item)%SurfacePtr(1),1,2),2))
                             //    CALL ShowContinueErrorTimeStamp(state, ' ')
                             //  ELSE
-                            //    CALL ShowRecurringWarningErrorAtEnd('Ventilated Slab ['//TRIM(VentSlab(Item)%Name)//  &
+                            //    CALL ShowRecurringWarningErrorAtEnd(state, 'Ventilated Slab ['//TRIM(VentSlab(Item)%Name)//  &
                             //                 ']  shut-off occurrence continues due to temperature comparison error.',  &
                             //                 state.dataVentilatedSlab->VentSlab(Item)%CondErrCount)
                             //  END IF
@@ -3948,25 +3949,26 @@ namespace VentilatedSlab {
                                         QRadSysSource(Surface(SurfNum2).ExtBoundCond) = 0.0; // Also zero the other side of an interzone
                                 }
                                 // Produce a warning message so that user knows the system was shut-off due to potential for condensation
-                                if (!WarmupFlag) {
+                                if (!state.dataGlobal->WarmupFlag) {
                                     ++CondensationErrorCount;
                                     if (state.dataVentilatedSlab->VentSlab(Item).CondErrIndex == 0) {
                                         ShowWarningMessage(state, state.dataVentilatedSlab->cMO_VentilatedSlab + " [" + state.dataVentilatedSlab->VentSlab(Item).Name + ']');
                                         ShowContinueError(state, "Surface [" + Surface(state.dataVentilatedSlab->VentSlab(Item).SurfacePtr(RadSurfNum2)).Name +
                                                           "] temperature below dew-point temperature--potential for condensation exists");
                                         ShowContinueError(state, "Flow to the ventilated slab system will be shut-off to avoid condensation");
-                                        ShowContinueError(state, "Predicted radiant system surface temperature = " +
-                                                          RoundSigDigits(TH(2, 1, state.dataVentilatedSlab->VentSlab(Item).SurfacePtr(RadSurfNum2)), 2));
-                                        ShowContinueError(state, "Zone dew-point temperature + safety factor delta= " +
-                                                          RoundSigDigits(DewPointTemp + CondDeltaTemp, 2));
+                                        ShowContinueError(state,
+                                                          format("Predicted radiant system surface temperature = {:.2R}",
+                                                                 TH(2, 1, state.dataVentilatedSlab->VentSlab(Item).SurfacePtr(RadSurfNum2))));
+                                        ShowContinueError(
+                                            state, format("Zone dew-point temperature + safety factor delta= {:.2R}", DewPointTemp + CondDeltaTemp));
                                         ShowContinueErrorTimeStamp(state, "");
                                     }
                                     if (CondensationErrorCount == 1) {
-                                        ShowContinueError(state, "Note that there is a " + RoundSigDigits(CondDeltaTemp, 4) +
-                                                          " C safety built-in to the shut-off criteria");
+                                        ShowContinueError(
+                                            state, format("Note that there is a {:.4R} C safety built-in to the shut-off criteria", CondDeltaTemp));
                                         ShowContinueError(state, "Note also that this affects all surfaces that are part of this system");
                                     }
-                                    ShowRecurringWarningErrorAtEnd(state.dataVentilatedSlab->cMO_VentilatedSlab + " [" + state.dataVentilatedSlab->VentSlab(Item).Name +
+                                    ShowRecurringWarningErrorAtEnd(state, state.dataVentilatedSlab->cMO_VentilatedSlab + " [" + state.dataVentilatedSlab->VentSlab(Item).Name +
                                                                        "] condensation shut-off occurrence continues.",
                                                                    state.dataVentilatedSlab->VentSlab(Item).CondErrIndex,
                                                                    DewPointTemp,
@@ -4029,7 +4031,7 @@ namespace VentilatedSlab {
                     if ((std::abs(Node(ReturnAirNode).Temp - AirOutletTempCheck) > TempCheckLimit) &&
                         (std::abs(TotalVentSlabRadPower) > ZeroSystemResp)) { // Return air temperature check did not match calculated temp
 
-                        if (!WarmupFlag) {
+                        if (!state.dataGlobal->WarmupFlag) {
                             ++EnergyImbalanceErrorCount;
                             if (state.dataVentilatedSlab->VentSlab(Item).EnrgyImbalErrIndex == 0) {
                                 ShowWarningMessage(state, state.dataVentilatedSlab->cMO_VentilatedSlab + " [" + state.dataVentilatedSlab->VentSlab(Item).Name + ']');
@@ -4038,14 +4040,16 @@ namespace VentilatedSlab {
                                 ShowContinueError(state, "However, it could also result from improper input for the ventilated slab or");
                                 ShowContinueError(state, "illogical control temperatures.  Check your input for this ventilated slab and");
                                 ShowContinueError(state, "also look at the internal data shown below.");
-                                ShowContinueError(state, "Predicted return air temperature [C] from the overall energy balance = " +
-                                                  RoundSigDigits(Node(ReturnAirNode).Temp, 4));
-                                ShowContinueError(state, "Predicted return air temperature [C] from the slab section energy balances = " +
-                                                  RoundSigDigits(AirOutletTempCheck, 4));
-                                ShowContinueError(state, "Total energy rate (power) [W] added to the slab = " + RoundSigDigits(TotalVentSlabRadPower, 4));
+                                ShowContinueError(state,
+                                                  format("Predicted return air temperature [C] from the overall energy balance = {:.4R}",
+                                                         Node(ReturnAirNode).Temp));
+                                ShowContinueError(state,
+                                                  format("Predicted return air temperature [C] from the slab section energy balances = {:.4R}",
+                                                         AirOutletTempCheck));
+                                ShowContinueError(state, format("Total energy rate (power) [W] added to the slab = {:.4R}", TotalVentSlabRadPower));
                                 ShowContinueErrorTimeStamp(state, "");
                             }
-                            ShowRecurringWarningErrorAtEnd(state.dataVentilatedSlab->cMO_VentilatedSlab + " [" + state.dataVentilatedSlab->VentSlab(Item).Name +
+                            ShowRecurringWarningErrorAtEnd(state, state.dataVentilatedSlab->cMO_VentilatedSlab + " [" + state.dataVentilatedSlab->VentSlab(Item).Name +
                                                                "] temperature calculation mismatch occurrence continues.",
                                                            state.dataVentilatedSlab->VentSlab(Item).EnrgyImbalErrIndex);
                         }
@@ -4147,8 +4151,9 @@ namespace VentilatedSlab {
         Node(OAMixOutNode).Press = Node(InletNode).Press;
     }
 
-    void UpdateVentilatedSlab(EnergyPlusData &state, int const Item,                          // Index for the ventilated slab under consideration within the derived types
-                              bool const EP_UNUSED(FirstHVACIteration) // TRUE if 1st HVAC simulation of system timestep !unused1208
+    void UpdateVentilatedSlab(EnergyPlusData &state,
+                              int const Item, // Index for the ventilated slab under consideration within the derived types
+                              [[maybe_unused]] bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep !unused1208
     )
     {
 
@@ -4175,7 +4180,6 @@ namespace VentilatedSlab {
         // values to the running average.
 
         // Using/Aliasing
-        using DataGlobals::TimeStepZone;
         using DataHeatBalance::Zone;
         using DataHeatBalFanSys::MAT;
         using DataHVACGlobals::SysTimeElapsed;
@@ -4218,11 +4222,11 @@ namespace VentilatedSlab {
             if (state.dataVentilatedSlab->LastSysTimeElapsed(SurfNum) == SysTimeElapsed) {
                 // Still iterating or reducing system time step, so subtract old values which were
                 // not valid
-                state.dataVentilatedSlab->QRadSysSrcAvg(SurfNum) -= state.dataVentilatedSlab->LastQRadSysSrc(SurfNum) * state.dataVentilatedSlab->LastTimeStepSys(SurfNum) / TimeStepZone;
+                state.dataVentilatedSlab->QRadSysSrcAvg(SurfNum) -= state.dataVentilatedSlab->LastQRadSysSrc(SurfNum) * state.dataVentilatedSlab->LastTimeStepSys(SurfNum) / state.dataGlobal->TimeStepZone;
             }
 
             // Update the running average and the "last" values with the current values of the appropriate variables
-            state.dataVentilatedSlab->QRadSysSrcAvg(SurfNum) += QRadSysSource(SurfNum) * TimeStepSys / TimeStepZone;
+            state.dataVentilatedSlab->QRadSysSrcAvg(SurfNum) += QRadSysSource(SurfNum) * TimeStepSys / state.dataGlobal->TimeStepZone;
 
             state.dataVentilatedSlab->LastQRadSysSrc(SurfNum) = QRadSysSource(SurfNum);
             state.dataVentilatedSlab->LastSysTimeElapsed(SurfNum) = SysTimeElapsed;
@@ -4469,7 +4473,7 @@ namespace VentilatedSlab {
 
             Area = Surface(SurfNum).Area;
 
-            if (Surface(SurfNum).Class == SurfaceClass_Window) {
+            if (Surface(SurfNum).Class == SurfaceClass::Window) {
                 if (SurfWinShadingFlag(SurfNum) == IntShadeOn || SurfWinShadingFlag(SurfNum) == IntBlindOn) {
                     // The area is the shade or blind are = sum of the glazing area and the divider area (which is zero if no divider)
                     Area += SurfWinDividerArea(SurfNum);
@@ -4567,7 +4571,7 @@ namespace VentilatedSlab {
         state.dataVentilatedSlab->VentSlab(Item).FanOutletTemp = Node(state.dataVentilatedSlab->VentSlab(Item).FanOutletNode).Temp;
 
         if (state.dataVentilatedSlab->VentSlab(Item).FirstPass) { // reset sizing flags so other zone equipment can size normally
-            if (!DataGlobals::SysSizingCalc) {
+            if (!state.dataGlobal->SysSizingCalc) {
                 DataSizing::resetHVACSizingGlobals(DataSizing::CurZoneEqNum, 0, state.dataVentilatedSlab->VentSlab(Item).FirstPass);
             }
         }

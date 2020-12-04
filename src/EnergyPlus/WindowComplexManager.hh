@@ -113,7 +113,8 @@ namespace WindowComplexManager {
 
     void InitBSDFWindows(EnergyPlusData &state);
 
-    void AllocateCFSStateHourlyData(int const iSurf, // Surface number
+    void AllocateCFSStateHourlyData(EnergyPlusData &state,
+                                    int const iSurf, // Surface number
                                     int const iState // Complex fenestration state number
     );
 
@@ -151,7 +152,7 @@ namespace WindowComplexManager {
                               int &NBasis                         // Calculated Basis length
     );
 
-    void DetermineMaxBackSurfaces();
+    void DetermineMaxBackSurfaces(EnergyPlusData &state);
 
     void ConstructBasis(EnergyPlusData &state,
                         int const IConst, // Index for accessing Construct array

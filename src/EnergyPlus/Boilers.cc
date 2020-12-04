@@ -78,9 +78,7 @@
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
-namespace EnergyPlus {
-
-namespace Boilers {
+namespace EnergyPlus::Boilers {
 
     // Module containing the routines dealing with the Boilers
 
@@ -116,8 +114,8 @@ namespace Boilers {
     }
 
     void BoilerSpecs::simulate(EnergyPlusData &state,
-                               const PlantLocation &EP_UNUSED(calledFromLocation),
-                               bool const EP_UNUSED(FirstHVACIteration),
+                               [[maybe_unused]] const PlantLocation &calledFromLocation,
+                               [[maybe_unused]] bool const FirstHVACIteration,
                                Real64 &CurLoad,
                                bool const RunFlag)
     {
@@ -127,7 +125,11 @@ namespace Boilers {
         this->UpdateBoilerRecords(CurLoad, RunFlag);
     }
 
-    void BoilerSpecs::getDesignCapacities(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
+    void BoilerSpecs::getDesignCapacities([[maybe_unused]] EnergyPlusData &state,
+                                          [[maybe_unused]] const PlantLocation &calledFromLocation,
+                                          Real64 &MaxLoad,
+                                          Real64 &MinLoad,
+                                          Real64 &OptLoad)
     {
         MinLoad = this->NomCap * this->MinPartLoadRat;
         MaxLoad = this->NomCap * this->MaxPartLoadRat;
@@ -139,7 +141,7 @@ namespace Boilers {
         SizFactor = this->SizFac;
     }
 
-    void BoilerSpecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation))
+    void BoilerSpecs::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation)
     {
         this->InitBoiler(state);
         this->SizeBoiler(state);
@@ -160,7 +162,7 @@ namespace Boilers {
         // standard EnergyPlus input retrieval using input Processor
 
         // Locals
-        static std::string const RoutineName("GetBoilerInput: ");
+        constexpr auto RoutineName("GetBoilerInput: ");
 
         // LOCAL VARIABLES
         bool ErrorsFound(false); // Flag to show errors were found during GetInput
@@ -222,8 +224,7 @@ namespace Boilers {
             thisBoiler.NomCap = DataIPShortCuts::rNumericArgs(1);
             if (DataIPShortCuts::rNumericArgs(1) == 0.0) {
                 ShowSevereError(state, RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\",");
-                ShowContinueError(state, "Invalid " + DataIPShortCuts::cNumericFieldNames(1) + '=' +
-                                  General::RoundSigDigits(DataIPShortCuts::rNumericArgs(1), 2));
+                ShowContinueError(state, format("Invalid {}={:.2R}", DataIPShortCuts::cNumericFieldNames(1), DataIPShortCuts::rNumericArgs(1)));
                 ShowContinueError(state, "..." + DataIPShortCuts::cNumericFieldNames(1) + " must be greater than 0.0");
                 ErrorsFound = true;
             }
@@ -234,8 +235,7 @@ namespace Boilers {
             thisBoiler.NomEffic = DataIPShortCuts::rNumericArgs(2);
             if (DataIPShortCuts::rNumericArgs(2) == 0.0) {
                 ShowSevereError(state, RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\",");
-                ShowContinueError(state, "Invalid " + DataIPShortCuts::cNumericFieldNames(2) + '=' +
-                                  General::RoundSigDigits(DataIPShortCuts::rNumericArgs(2), 3));
+                ShowContinueError(state, format("Invalid {}={:.3R}", DataIPShortCuts::cNumericFieldNames(2), DataIPShortCuts::rNumericArgs(2)));
                 ShowSevereError(state, "..." + DataIPShortCuts::cNumericFieldNames(2) + " must be greater than 0.0");
                 ErrorsFound = true;
             }
@@ -351,7 +351,7 @@ namespace Boilers {
         }
 
         if (ErrorsFound) {
-            ShowFatalError(state, RoutineName + "Errors found in processing " + DataIPShortCuts::cCurrentModuleObject + " input.");
+            ShowFatalError(state, format("{}{}", RoutineName, "Errors found in processing " + DataIPShortCuts::cCurrentModuleObject + " input."));
         }
     }
 
@@ -399,7 +399,7 @@ namespace Boilers {
                             "Plant");
         SetupOutputVariable(state, "Boiler Part Load Ratio", OutputProcessor::Unit::None, this->BoilerPLR, "System", "Average", this->Name);
         SetupOutputVariable(state, "Boiler Efficiency", OutputProcessor::Unit::None, this->BoilerEff, "System", "Average", this->Name);
-        if (DataGlobals::AnyEnergyManagementSystemInModel) {
+        if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
             SetupEMSInternalVariable(state, "Boiler Nominal Capacity", this->Name, "[W]", this->NomCap);
         }
     }
@@ -420,7 +420,7 @@ namespace Boilers {
         // Uses the status flags to trigger initializations.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("InitBoiler");
+        constexpr auto RoutineName("InitBoiler");
 
         // Init more variables
         if (this->MyFlag) {
@@ -477,7 +477,7 @@ namespace Boilers {
             if (this->FlowMode == DataPlant::FlowMode::LEAVINGSETPOINTMODULATED) { // check if setpoint on outlet node
                 if ((DataLoopNode::Node(this->BoilerOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&
                     (DataLoopNode::Node(this->BoilerOutletNodeNum).TempSetPointLo == DataLoopNode::SensedNodeFlagValue)) {
-                    if (!DataGlobals::AnyEnergyManagementSystemInModel) {
+                    if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                         if (!this->ModulatedFlowErrDone) {
                             ShowWarningError(state, "Missing temperature setpoint for LeavingSetpointModulated mode Boiler named " + this->Name);
                             ShowContinueError(state,
@@ -545,7 +545,7 @@ namespace Boilers {
         // the hot water flow rate and the hot water loop design delta T.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SizeBoiler");
+        constexpr auto RoutineName("SizeBoiler");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool ErrorsFound(false); // If errors detected in input
@@ -592,12 +592,11 @@ namespace Boilers {
                                                          tmpNomCap,
                                                          "User-Specified Nominal Capacity [W]",
                                                          NomCapUser);
-                            if (DataGlobals::DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpNomCap - NomCapUser) / NomCapUser) > DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeBoilerHotWater: Potential issue with equipment sizing for " + this->Name);
-                                    ShowContinueError(state, "User-Specified Nominal Capacity of " + General::RoundSigDigits(NomCapUser, 2) + " [W]");
-                                    ShowContinueError(state, "differs from Design Size Nominal Capacity of " + General::RoundSigDigits(tmpNomCap, 2) +
-                                                      " [W]");
+                                    ShowContinueError(state, format("User-Specified Nominal Capacity of {:.2R} [W]", NomCapUser));
+                                    ShowContinueError(state, format("differs from Design Size Nominal Capacity of {:.2R} [W]", tmpNomCap));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -644,13 +643,12 @@ namespace Boilers {
                                                          tmpBoilerVolFlowRate,
                                                          "User-Specified Design Water Flow Rate [m3/s]",
                                                          VolFlowRateUser);
-                            if (DataGlobals::DisplayExtraWarnings) {
+                            if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpBoilerVolFlowRate - VolFlowRateUser) / VolFlowRateUser) > DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeBoilerHotWater: Potential issue with equipment sizing for " + this->Name);
-                                    ShowContinueError(state, "User-Specified Design Water Flow Rate of " + General::RoundSigDigits(VolFlowRateUser, 2) +
-                                                      " [m3/s]");
-                                    ShowContinueError(state, "differs from Design Size Design Water Flow Rate of " +
-                                                      General::RoundSigDigits(tmpBoilerVolFlowRate, 2) + " [m3/s]");
+                                    ShowContinueError(state, format("User-Specified Design Water Flow Rate of {:.2R} [m3/s]", VolFlowRateUser));
+                                    ShowContinueError(
+                                        state, format("differs from Design Size Design Water Flow Rate of {:.2R} [m3/s]", tmpBoilerVolFlowRate));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -690,7 +688,7 @@ namespace Boilers {
     void BoilerSpecs::CalcBoilerModel(EnergyPlusData &state,
                                       Real64 const MyLoad,    // W - hot water demand to be met by boiler
                                       bool const RunFlag,     // TRUE if boiler operating
-                                      int const EquipFlowCtrl // Flow control mode for the equipment
+                                      DataBranchAirLoopPlant::ControlTypeEnum const EquipFlowCtrl // Flow control mode for the equipment
     )
     {
         // SUBROUTINE INFORMATION:
@@ -712,7 +710,7 @@ namespace Boilers {
         // load performance
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("CalcBoilerModel");
+        constexpr auto RoutineName("CalcBoilerModel");
 
         // clean up some operating conditions, may not be necessary
         this->BoilerLoad = 0.0;
@@ -738,13 +736,13 @@ namespace Boilers {
         // if the component control is SERIESACTIVE we set the component flow to inlet flow so that flow resolver
         // will not shut down the branch
         if (MyLoad <= 0.0 || !RunFlag) {
-            if (EquipFlowCtrl == DataBranchAirLoopPlant::ControlType_SeriesActive)
+            if (EquipFlowCtrl == DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive)
                 this->BoilerMassFlowRate = DataLoopNode::Node(BoilerInletNode).MassFlowRate;
             return;
         }
 
-        // If there is a fault of boiler fouling (zrp_Nov2016)
-        if (this->FaultyBoilerFoulingFlag && (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation)) {
+        // If there is a fault of boiler fouling
+        if (this->FaultyBoilerFoulingFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
             int FaultIndex = this->FaultyBoilerFoulingIndex;
             Real64 NomCap_ff = BoilerNomCap;
             Real64 BoilerNomEff_ff = BoilerNomEff;
@@ -844,27 +842,28 @@ namespace Boilers {
         BoilerEff = EffCurveOutput * BoilerNomEff;
 
         // warn if efficiency curve produces zero or negative results
-        if (!DataGlobals::WarmupFlag && EffCurveOutput <= 0.0) {
+        if (!state.dataGlobal->WarmupFlag && EffCurveOutput <= 0.0) {
             if (this->BoilerLoad > 0.0) {
                 if (this->EffCurveOutputError < 1) {
                     ++this->EffCurveOutputError;
                     ShowWarningError(state, "Boiler:HotWater \"" + this->Name + "\"");
                     ShowContinueError(state, "...Normalized Boiler Efficiency Curve output is less than or equal to 0.");
-                    ShowContinueError(state, "...Curve input x value (PLR)     = " + General::TrimSigDigits(this->BoilerPLR, 5));
+                    ShowContinueError(state, format("...Curve input x value (PLR)     = {:.5T}", this->BoilerPLR));
                     if (state.dataCurveManager->PerfCurve(this->EfficiencyCurvePtr).NumDims == 2) {
                         if (this->CurveTempMode == TempMode::ENTERINGBOILERTEMP) {
-                            ShowContinueError(state, "...Curve input y value (Tinlet) = " +
-                                              General::TrimSigDigits(DataLoopNode::Node(BoilerInletNode).Temp, 2));
+                            ShowContinueError(state, format("...Curve input y value (Tinlet) = {:.2T}", DataLoopNode::Node(BoilerInletNode).Temp));
                         } else if (this->CurveTempMode == TempMode::LEAVINGBOILERTEMP) {
-                            ShowContinueError(state, "...Curve input y value (Toutlet) = " + General::TrimSigDigits(this->BoilerOutletTemp, 2));
+                            ShowContinueError(state, format("...Curve input y value (Toutlet) = {:.2T}", this->BoilerOutletTemp));
                         }
                     }
-                    ShowContinueError(state, "...Curve output (normalized eff) = " + General::TrimSigDigits(EffCurveOutput, 5));
-                    ShowContinueError(state, "...Calculated Boiler efficiency  = " + General::TrimSigDigits(BoilerEff, 5) +
-                                      " (Boiler efficiency = Nominal Thermal Efficiency * Normalized Boiler Efficiency Curve output)");
+                    ShowContinueError(state, format("...Curve output (normalized eff) = {:.5T}", EffCurveOutput));
+                    ShowContinueError(state,
+                                      format("...Calculated Boiler efficiency  = {:.5T} (Boiler efficiency = Nominal Thermal Efficiency * Normalized "
+                                             "Boiler Efficiency Curve output)",
+                                             BoilerEff));
                     ShowContinueErrorTimeStamp(state, "...Curve output reset to 0.01 and simulation continues.");
                 } else {
-                    ShowRecurringWarningErrorAtEnd("Boiler:HotWater \"" + this->Name +
+                    ShowRecurringWarningErrorAtEnd(state, "Boiler:HotWater \"" + this->Name +
                                                        "\": Boiler Efficiency Curve output is less than or equal to 0 warning continues...",
                                                    this->EffCurveOutputIndex,
                                                    EffCurveOutput,
@@ -875,28 +874,29 @@ namespace Boilers {
         }
 
         // warn if overall efficiency greater than 1.1
-        if (!DataGlobals::WarmupFlag && BoilerEff > 1.1) {
+        if (!state.dataGlobal->WarmupFlag && BoilerEff > 1.1) {
             if (this->BoilerLoad > 0.0 && this->EfficiencyCurvePtr > 0) {
                 if (this->CalculatedEffError < 1) {
                     ++this->CalculatedEffError;
                     ShowWarningError(state, "Boiler:HotWater \"" + this->Name + "\"");
                     ShowContinueError(state, "...Calculated Boiler Efficiency is greater than 1.1.");
                     ShowContinueError(state, "...Boiler Efficiency calculations shown below.");
-                    ShowContinueError(state, "...Curve input x value (PLR)     = " + General::TrimSigDigits(this->BoilerPLR, 5));
+                    ShowContinueError(state, format("...Curve input x value (PLR)     = {:.5T}", this->BoilerPLR));
                     if (state.dataCurveManager->PerfCurve(this->EfficiencyCurvePtr).NumDims == 2) {
                         if (this->CurveTempMode == TempMode::ENTERINGBOILERTEMP) {
-                            ShowContinueError(state, "...Curve input y value (Tinlet) = " +
-                                              General::TrimSigDigits(DataLoopNode::Node(BoilerInletNode).Temp, 2));
+                            ShowContinueError(state, format("...Curve input y value (Tinlet) = {:.2T}", DataLoopNode::Node(BoilerInletNode).Temp));
                         } else if (this->CurveTempMode == TempMode::LEAVINGBOILERTEMP) {
-                            ShowContinueError(state, "...Curve input y value (Toutlet) = " + General::TrimSigDigits(this->BoilerOutletTemp, 2));
+                            ShowContinueError(state, format("...Curve input y value (Toutlet) = {:.2T}", this->BoilerOutletTemp));
                         }
                     }
-                    ShowContinueError(state, "...Curve output (normalized eff) = " + General::TrimSigDigits(EffCurveOutput, 5));
-                    ShowContinueError(state, "...Calculated Boiler efficiency  = " + General::TrimSigDigits(BoilerEff, 5) +
-                                      " (Boiler efficiency = Nominal Thermal Efficiency * Normalized Boiler Efficiency Curve output)");
+                    ShowContinueError(state, format("...Curve output (normalized eff) = {:.5T}", EffCurveOutput));
+                    ShowContinueError(state,
+                                      format("...Calculated Boiler efficiency  = {:.5T} (Boiler efficiency = Nominal Thermal Efficiency * Normalized "
+                                             "Boiler Efficiency Curve output)",
+                                             BoilerEff));
                     ShowContinueErrorTimeStamp(state, "...Curve output reset to 1.1 and simulation continues.");
                 } else {
-                    ShowRecurringWarningErrorAtEnd("Boiler:HotWater \"" + this->Name +
+                    ShowRecurringWarningErrorAtEnd(state, "Boiler:HotWater \"" + this->Name +
                                                        "\": Calculated Boiler Efficiency is greater than 1.1 warning continues...",
                                                    this->CalculatedEffIndex,
                                                    BoilerEff,
@@ -946,7 +946,5 @@ namespace Boilers {
         this->FuelConsumed = this->FuelUsed * ReportingConstant;
         this->ParasiticElecConsumption = this->ParasiticElecPower * ReportingConstant;
     }
-
-} // namespace Boilers
 
 } // namespace EnergyPlus

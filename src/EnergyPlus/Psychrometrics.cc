@@ -47,14 +47,13 @@
 
 // C++ Headers
 #include <cstdlib>
-#include <iostream>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/CommandLineInterface.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -73,7 +72,6 @@ namespace EnergyPlus {
 #define EP_cache_PsyTsatFnPb
 #define EP_cache_PsyTsatFnHPb
 #endif
-#define EP_psych_errors
 
 namespace Psychrometrics {
     // Module containing the Psychometric simulation routines
@@ -99,41 +97,15 @@ namespace Psychrometrics {
     // more research on hfg calc
 
     // Using/Aliasing
-    #ifdef EP_psych_errors
-    using namespace DataGlobals;
+#ifdef EP_psych_errors
     using namespace DataEnvironment;
 #endif
 
     // Use Statements for other routines
 #ifdef EP_psych_errors
-    using General::TrimSigDigits;
+
 #endif
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    static std::string const BlankString;
-    // call for recurring errors
-    int const iPsyTdpFnTdbTwbPb(1);
-    int const iPsyRhFnTdbWPb(2);
-    int const iPsyTwbFnTdbWPb(3);
-    int const iPsyTwbFnTdbWPb2(14);
-    int const iPsyTwbFnTdbWPb3(15); // convergence
-    int const iPsyVFnTdbWPb(4);
-    int const iPsyWFnTdpPb(5);
-    int const iPsyWFnTdbH(6);
-    int const iPsyWFnTdbTwbPb(7);
-    int const iPsyWFnTdbTwbPb2(16);
-    int const iPsyWFnTdbRhPb(8);
-    int const iPsyPsatFnTemp(9);
-    int const iPsyTsatFnHPb(10);
-    int const iPsyTsatFnPb(11);
-    int const iPsyTsatFnPb2(17); // iterations
-    int const iPsyRhFnTdbRhov(12);
-    int const iPsyRhFnTdbRhovLBnd0C(13);
-    int const iPsyTwbFnTdbWPb_cache(18);
-    int const iPsyPsatFnTemp_cache(19);
-    int const NumPsychMonitors(19); // Parameterization of Number of psychrometric routines that
-    std::string const blank_string;
 #ifdef EP_psych_stats
     Array1D_string const PsyRoutineNames(NumPsychMonitors,
                                          {"PsyTdpFnTdbTwbPb",
@@ -186,28 +158,6 @@ namespace Psychrometrics {
                                             // PsyTwbFnTdbWPb_raw (raw calc) | PsyPsatFnTemp_cache  19 - PsyPsatFnTemp_raw (raw calc)
 #endif
 
-#ifndef EP_psych_errors
-    Real64 const KelvinConv(273.15);
-#endif
-
-#ifdef EP_cache_PsyTwbFnTdbWPb
-    int const twbcache_size(1024 * 1024);
-    int const twbprecision_bits(20);
-#endif
-#ifdef EP_cache_PsyPsatFnTemp
-    int const psatcache_size(1024 * 1024);
-    int const psatprecision_bits(24); // 28  // 24  // 32
-    Int64 const psatcache_mask(psatcache_size - 1);
-#endif
-#ifdef EP_cache_PsyTsatFnPb
-    int const tsatcache_size(1024 * 1024);
-    int const tsatprecision_bits(24);
-    Int64 const tsatcache_mask(tsatcache_size - 1);
-#endif
-#ifdef EP_cache_PsyTsatFnHPb
-    int const tsat_hbp_cache_size(1024 * 1024);
-    int const tsat_hbp_precision_bits(28);
-#endif
     // MODULE VARIABLE DECLARATIONS:
     // na
 
@@ -220,19 +170,6 @@ namespace Psychrometrics {
     Array1D_int NumIterations(NumPsychMonitors, 0);
 #endif
 
-    // Object Data
-#ifdef EP_cache_PsyTwbFnTdbWPb
-    Array1D<cached_twb_t> cached_Twb; // DIMENSION(0:twbcache_size)
-#endif
-#ifdef EP_cache_PsyPsatFnTemp
-    Array1D<cached_psat_t> cached_Psat; // DIMENSION(0:psatcache_size)
-#endif
-#ifdef EP_cache_PsyTsatFnPb
-    Array1D<cached_tsat_pb> cached_Tsat; // DIMENSION(0:tsatcache_size)
-#endif
-#ifdef EP_cache_PsyTsatFnHPb
-    Array1D<cached_tsat_h_pb> cached_Tsat_HPb; // DIMENSION(0:tsat_hbp_cache_size)
-#endif
     // Subroutine Specifications for the Module
 
     // Functions
@@ -311,9 +248,9 @@ namespace Psychrometrics {
     }
 
 #ifdef EP_psych_stats
-    void ShowPsychrometricSummary(OutputFile &auditFile)
+    void ShowPsychrometricSummary(InputOutputFile &auditFile)
 #else
-    void ShowPsychrometricSummary(InputOutputFile &)
+    void ShowPsychrometricSummary([[maybe_unused]] InputOutputFile &auditFile)
 #endif
     {
 
@@ -334,7 +271,6 @@ namespace Psychrometrics {
         // na
 
         // Using/Aliasing
-        using General::RoundSigDigits;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -371,7 +307,8 @@ namespace Psychrometrics {
     }
 
 #ifdef EP_psych_errors
-    void PsyRhoAirFnPbTdbW_error(EnergyPlusData &state, Real64 const pb,              // barometric pressure (Pascals)
+    void PsyRhoAirFnPbTdbW_error(EnergyPlusData &state,
+                                 Real64 const pb,              // barometric pressure (Pascals)
                                  Real64 const tdb,             // dry bulb temperature (Celsius)
                                  Real64 const dw,              // humidity ratio (kgWater/kgDryAir)
                                  Real64 const rhoair,          // density of air
@@ -379,11 +316,10 @@ namespace Psychrometrics {
     )
     {
         // Using/Aliasing
-        using General::RoundSigDigits;
 
         if (rhoair < 0.0) {
-            ShowSevereError(state, "PsyRhoAirFnPbTdbW: RhoAir (Density of Air) is calculated <= 0 [" + RoundSigDigits(rhoair, 5) + "].");
-            ShowContinueError(state, "pb =[" + RoundSigDigits(pb, 2) + "], tdb=[" + RoundSigDigits(tdb, 2) + "], w=[" + RoundSigDigits(dw, 7) + "].");
+            ShowSevereError(state, format("PsyRhoAirFnPbTdbW: RhoAir (Density of Air) is calculated <= 0 [{:.5R}].", rhoair));
+            ShowContinueError(state, format("pb =[{:.2R}], tdb=[{:.2R}], w=[{:.7R}].", pb, tdb, dw));
             if (!CalledFrom.empty()) {
                 ShowContinueErrorTimeStamp(state, " Routine=" + CalledFrom + ',');
             } else {
@@ -395,17 +331,17 @@ namespace Psychrometrics {
 #endif
 
 #ifdef EP_psych_errors
-    void PsyRhFnTdbRhovLBnd0C_error(EnergyPlusData &state, Real64 const Tdb,             // dry-bulb temperature {C}
+    void PsyRhFnTdbRhovLBnd0C_error(EnergyPlusData &state,
+                                    Real64 const Tdb,             // dry-bulb temperature {C}
                                     Real64 const Rhovapor,        // vapor density in air {kg/m3}
                                     Real64 const RHValue,         // relative humidity value (0.0-1.0)
                                     std::string const &CalledFrom // routine this function was called from (error messages)
     )
     {
         if (RHValue > 1.01) {
-            if (!WarmupFlag) {
+            if (!state.dataGlobal->WarmupFlag) {
                 if (iPsyErrIndex(iPsyRhFnTdbRhovLBnd0C) == 0) {
-                    String = " Dry-Bulb= " + TrimSigDigits(Tdb, 2) + " Rhovapor= " + TrimSigDigits(Rhovapor, 3) +
-                             " Calculated Relative Humidity [%]= " + TrimSigDigits(RHValue * 100.0, 2);
+                    String = format(" Dry-Bulb= {:.2T} Rhovapor= {:.3T} Calculated Relative Humidity [%]= {:.2T}", Tdb, Rhovapor, RHValue * 100.0);
                     ShowWarningMessage(state, "Calculated Relative Humidity out of range (PsyRhFnTdbRhovLBnd0C) ");
                     if (!CalledFrom.empty()) {
                         ShowContinueErrorTimeStamp(state, " Routine=" + CalledFrom + ',');
@@ -415,7 +351,7 @@ namespace Psychrometrics {
                     ShowContinueError(state, String);
                     ShowContinueError(state, "Relative Humidity being reset to 100.0%");
                 }
-                ShowRecurringWarningErrorAtEnd("Calculated Relative Humidity out of range (PsyRhFnTdbRhovLBnd0C)",
+                ShowRecurringWarningErrorAtEnd(state, "Calculated Relative Humidity out of range (PsyRhFnTdbRhovLBnd0C)",
                                                iPsyErrIndex(iPsyRhFnTdbRhovLBnd0C),
                                                RHValue * 100.0,
                                                RHValue * 100.0,
@@ -424,10 +360,9 @@ namespace Psychrometrics {
                                                "%");
             }
         } else if (RHValue < -0.05) {
-            if (!WarmupFlag) {
+            if (!state.dataGlobal->WarmupFlag) {
                 if (iPsyErrIndex(iPsyRhFnTdbRhovLBnd0C) == 0) {
-                    String = " Dry-Bulb= " + TrimSigDigits(Tdb, 2) + " Rhovapor= " + TrimSigDigits(Rhovapor, 3) +
-                             " Calculated Relative Humidity [%]= " + TrimSigDigits(RHValue * 100.0, 2);
+                    String = format(" Dry-Bulb= {:.2T} Rhovapor= {:.3T} Calculated Relative Humidity [%]= {:.2T}", Tdb, Rhovapor, RHValue * 100.0);
                     ShowWarningMessage(state, "Calculated Relative Humidity out of range (PsyRhFnTdbRhovLBnd0C) ");
                     if (!CalledFrom.empty()) {
                         ShowContinueErrorTimeStamp(state, " Routine=" + CalledFrom + ',');
@@ -437,7 +372,7 @@ namespace Psychrometrics {
                     ShowContinueError(state, String);
                     ShowContinueError(state, "Relative Humidity being reset to 1%");
                 }
-                ShowRecurringWarningErrorAtEnd("Calculated Relative Humidity out of range (PsyRhFnTdbRhovLBnd0C)",
+                ShowRecurringWarningErrorAtEnd(state, "Calculated Relative Humidity out of range (PsyRhFnTdbRhovLBnd0C)",
                                                iPsyErrIndex(iPsyRhFnTdbRhovLBnd0C),
                                                RHValue * 100.0,
                                                RHValue * 100.0,
@@ -451,7 +386,8 @@ namespace Psychrometrics {
 
 #ifdef EP_cache_PsyTwbFnTdbWPb
 
-    Real64 PsyTwbFnTdbWPb(EnergyPlusData &state, Real64 const Tdb,             // dry-bulb temperature {C}
+    Real64 PsyTwbFnTdbWPb(EnergyPlusData &state,
+                          Real64 const Tdb,             // dry-bulb temperature {C}
                           Real64 const W,               // humidity ratio
                           Real64 const Pb,              // barometric pressure {Pascals}
                           std::string const &CalledFrom // routine this function was called from (error messages)
@@ -533,7 +469,8 @@ namespace Psychrometrics {
         return Twb_result;
     }
 
-    Real64 PsyTwbFnTdbWPb_raw(EnergyPlusData &state, Real64 const TDB,             // dry-bulb temperature {C}
+    Real64 PsyTwbFnTdbWPb_raw(EnergyPlusData &state,
+                              Real64 const TDB,             // dry-bulb temperature {C}
                               Real64 const dW,              // humidity ratio
                               Real64 const Patm,            // barometric pressure {Pascals}
                               std::string const &CalledFrom // routine this function was called from (error messages)
@@ -541,7 +478,8 @@ namespace Psychrometrics {
 
 #else
 
-    Real64 PsyTwbFnTdbWPb(Real64 const TDB,             // dry-bulb temperature {C}
+    Real64 PsyTwbFnTdbWPb(EnergyPlusData &state,
+                          Real64 const TDB,             // dry-bulb temperature {C}
                           Real64 const dW,              // humidity ratio
                           Real64 const Patm,            // barometric pressure {Pascals}
                           std::string const &CalledFrom // routine this function was called from (error messages)
@@ -611,7 +549,7 @@ namespace Psychrometrics {
         FlagError = false;
 #ifdef EP_psych_errors
         if (TDB <= -100.0 || TDB >= 200.0) {
-            if (!WarmupFlag) {
+            if (!state.dataGlobal->WarmupFlag) {
                 if (iPsyErrIndex(iPsyTwbFnTdbWPb) == 0) {
                     ShowWarningMessage(state, "Temperature out of range [-100. to 200.] (PsyTwbFnTdbWPb)");
                     if (!CalledFrom.empty()) {
@@ -619,10 +557,10 @@ namespace Psychrometrics {
                     } else {
                         ShowContinueErrorTimeStamp(state, " Routine=Unknown,");
                     }
-                    ShowContinueError(state, " Input Temperature=" + TrimSigDigits(TDB, 2));
+                    ShowContinueError(state, format(" Input Temperature={:.2T}", TDB));
                     FlagError = true;
                 }
-                ShowRecurringWarningErrorAtEnd(
+                ShowRecurringWarningErrorAtEnd(state,
                     "Temperature out of range [-100. to 200.] (PsyTwbFnTdbWPb)", iPsyErrIndex(iPsyTwbFnTdbWPb), TDB, TDB, _, "C", "C");
             }
         }
@@ -632,10 +570,9 @@ namespace Psychrometrics {
         if (W < 0.0) {
 #ifdef EP_psych_errors
             if (W <= -0.0001) {
-                if (!WarmupFlag) {
+                if (!state.dataGlobal->WarmupFlag) {
                     if (iPsyErrIndex(iPsyTwbFnTdbWPb2) == 0) {
-                        String = " Dry-Bulb= " + TrimSigDigits(TDB, 2) + " Humidity Ratio= " + TrimSigDigits(W, 3) +
-                                 " Pressure= " + TrimSigDigits(Patm, 2);
+                        String = format(" Dry-Bulb= {:.2T} Humidity Ratio= {:.3T} Pressure= {:.2T}", TDB, W, Patm);
                         ShowWarningMessage(state, "Entered Humidity Ratio invalid (PsyTwbFnTdbWPb)");
                         if (!CalledFrom.empty()) {
                             ShowContinueErrorTimeStamp(state, " Routine=" + CalledFrom + ',');
@@ -643,10 +580,10 @@ namespace Psychrometrics {
                             ShowContinueErrorTimeStamp(state, " Routine=Unknown,");
                         }
                         ShowContinueError(state, String);
-                        String = "Humidity Ratio= " + TrimSigDigits(W, 4);
+                        String = format("Humidity Ratio= {:.4T}", W);
                         ShowContinueError(state, String + " ... Humidity Ratio set to .00001");
                     }
-                    ShowRecurringWarningErrorAtEnd(
+                    ShowRecurringWarningErrorAtEnd(state,
                         "Entered Humidity Ratio invalid (PsyTwbFnTdbWPb)", iPsyErrIndex(iPsyTwbFnTdbWPb2), W, W, _, "[]", "[]");
                 }
             }
@@ -699,7 +636,7 @@ namespace Psychrometrics {
             // If converged, leave iteration loop.
             if (icvg == 1) break;
 
-            // Error Trap for the Discontinious nature of PsyPsatFnTemp function (Sat Press Curve) at ~0 Deg C.
+            // Error Trap for the Discontinuous nature of PsyPsatFnTemp function (Sat Press Curve) at ~0 Deg C.
             if ((PSatstar > 611.000) && (PSatstar < 611.25) && (std::abs(error) <= 0.0001) && (iter > 4)) break;
 
         } // End of Iteration Loop
@@ -712,20 +649,20 @@ namespace Psychrometrics {
         // iterations. Print error message, set return error flag, and RETURN
 #ifdef EP_psych_errors
         if (iter > itmax) {
-            if (!WarmupFlag) {
+            if (!state.dataGlobal->WarmupFlag) {
                 if (iPsyErrIndex(iPsyTwbFnTdbWPb3) == 0) {
-                    ShowWarningMessage(state, "WetBulb not converged after " + TrimSigDigits(iter) + " iterations(PsyTwbFnTdbWPb)");
+                    ShowWarningMessage(state, format("WetBulb not converged after {} iterations(PsyTwbFnTdbWPb)", iter));
                     if (!CalledFrom.empty()) {
                         ShowContinueErrorTimeStamp(state, " Routine=" + CalledFrom + ',');
                     } else {
                         ShowContinueErrorTimeStamp(state, " Routine=Unknown,");
                     }
-                    ShowContinueError(state, " Input Temperature = " + TrimSigDigits(TDB, 2));
-                    ShowContinueError(state, " Input Humidity Ratio= " + TrimSigDigits(W, 6));
-                    ShowContinueError(state, " Input Pressure = " + TrimSigDigits(Patm, 2));
+                    ShowContinueError(state, format(" Input Temperature = {:.2T}", TDB));
+                    ShowContinueError(state, format(" Input Humidity Ratio= {:.6T}", W));
+                    ShowContinueError(state, format(" Input Pressure = {:.2T}", Patm));
                     FlagError = true;
                 }
-                ShowRecurringWarningErrorAtEnd("WetBulb not converged after max iterations(PsyTwbFnTdbWPb)", iPsyErrIndex(iPsyTwbFnTdbWPb3));
+                ShowRecurringWarningErrorAtEnd(state, "WetBulb not converged after max iterations(PsyTwbFnTdbWPb)", iPsyErrIndex(iPsyTwbFnTdbWPb3));
             }
         }
 #endif
@@ -735,7 +672,7 @@ namespace Psychrometrics {
 
 #ifdef EP_psych_errors
         if (FlagError) {
-            ShowContinueError(state, " Resultant Temperature= " + TrimSigDigits(WBT, 2));
+            ShowContinueError(state, format(" Resultant Temperature= {:.2T}", WBT));
         }
 #endif
 
@@ -752,7 +689,8 @@ namespace Psychrometrics {
     }
 
 #ifdef EP_psych_errors
-    void PsyVFnTdbWPb_error(EnergyPlusData &state, Real64 const TDB,             // dry-bulb temperature {C}
+    void PsyVFnTdbWPb_error(EnergyPlusData &state,
+                            Real64 const TDB,             // dry-bulb temperature {C}
                             Real64 const w,               // humidity ratio
                             Real64 const PB,              // barometric pressure {Pascals}
                             Real64 const V,               // specific volume {m3/kg}
@@ -760,9 +698,9 @@ namespace Psychrometrics {
     )
     {
         if (V <= -0.01) {
-            if (!WarmupFlag) {
+            if (!state.dataGlobal->WarmupFlag) {
                 if (iPsyErrIndex(iPsyVFnTdbWPb) == 0) {
-                    String = " Dry-Bulb= " + TrimSigDigits(TDB, 2) + " Humidity Ratio= " + TrimSigDigits(w, 3) + " Pressure= " + TrimSigDigits(PB, 2);
+                    String = format(" Dry-Bulb= {:.2T} Humidity Ratio= {:.3T} Pressure= {:.2T}", TDB, w, PB);
                     ShowWarningMessage(state, "Calculated Specific Volume out of range (PsyVFnTdbWPb)");
                     if (!CalledFrom.empty()) {
                         ShowContinueErrorTimeStamp(state, " Routine=" + CalledFrom + ',');
@@ -770,10 +708,10 @@ namespace Psychrometrics {
                         ShowContinueErrorTimeStamp(state, " Routine=Unknown,");
                     }
                     ShowContinueError(state, String);
-                    String = "Calculated Volume= " + TrimSigDigits(V, 3);
+                    String = format("Calculated Volume= {:.3T}", V);
                     ShowContinueError(state, String + " ... Since Calculated Volume < 0.0, it is set to .83");
                 }
-                ShowRecurringWarningErrorAtEnd(
+                ShowRecurringWarningErrorAtEnd(state,
                     "Calculated Specific Volume out of range (PsyVFnTdbWPb)", iPsyErrIndex(iPsyVFnTdbWPb), V, V, _, "m3/kg", "m3/kg");
             }
         }
@@ -781,16 +719,17 @@ namespace Psychrometrics {
 #endif
 
 #ifdef EP_psych_errors
-    void PsyWFnTdbH_error(EnergyPlusData &state, Real64 const TDB,             // dry-bulb temperature {C}
+    void PsyWFnTdbH_error(EnergyPlusData &state,
+                          Real64 const TDB,             // dry-bulb temperature {C}
                           Real64 const H,               // enthalpy {J/kg}
                           Real64 const W,               // humidity ratio
                           std::string const &CalledFrom // routine this function was called from (error messages)
     )
     {
         if (W < -0.0001) {
-            if (!WarmupFlag) {
+            if (!state.dataGlobal->WarmupFlag) {
                 if (iPsyErrIndex(iPsyWFnTdbH) == 0) {
-                    String = " Dry-Bulb= " + TrimSigDigits(TDB, 2) + " Enthalpy= " + TrimSigDigits(H, 3);
+                    String = format(" Dry-Bulb= {:.2T} Enthalpy= {:.3T}", TDB, H);
                     ShowWarningMessage(state, "Calculated Humidity Ratio invalid (PsyWFnTdbH)");
                     if (!CalledFrom.empty()) {
                         ShowContinueErrorTimeStamp(state, " Routine=" + CalledFrom + ',');
@@ -798,10 +737,10 @@ namespace Psychrometrics {
                         ShowContinueErrorTimeStamp(state, " Routine=Unknown,");
                     }
                     ShowContinueError(state, String);
-                    String = "Calculated Humidity Ratio= " + TrimSigDigits(W, 4);
+                    String = format("Calculated Humidity Ratio= {:.4T}", W);
                     ShowContinueError(state, String + " ... Humidity Ratio set to .00001");
                 }
-                ShowRecurringWarningErrorAtEnd("Calculated Humidity Ratio invalid (PsyWFnTdbH)", iPsyErrIndex(iPsyWFnTdbH), W, W, _, "[]", "[]");
+                ShowRecurringWarningErrorAtEnd(state, "Calculated Humidity Ratio invalid (PsyWFnTdbH)", iPsyErrIndex(iPsyWFnTdbH), W, W, _, "[]", "[]");
             }
         }
     }
@@ -809,9 +748,9 @@ namespace Psychrometrics {
 
 #ifdef EP_cache_PsyPsatFnTemp
 
-    Real64 PsyPsatFnTemp_raw(EnergyPlusData &state,
+    Real64 PsyPsatFnTemp_raw([[maybe_unused]] EnergyPlusData &state,
                              Real64 const T,               // dry-bulb temperature {C}
-                             std::string const &CalledFrom // routine this function was called from (error messages)
+                             [[maybe_unused]] std::string const &CalledFrom // routine this function was called from (error messages)
     )
 
 #else
@@ -863,7 +802,7 @@ namespace Psychrometrics {
 
         // CHECK T IN RANGE.
 #ifdef EP_psych_errors
-        if (!WarmupFlag) {
+        if (!state.dataGlobal->WarmupFlag) {
             if (T <= -100.0 || T >= 200.0) {
                 if (iPsyErrIndex(iPsyPsatFnTemp) == 0) {
                     ShowWarningMessage(state, "Temperature out of range [-100. to 200.] (PsyPsatFnTemp)");
@@ -872,9 +811,9 @@ namespace Psychrometrics {
                     } else {
                         ShowContinueErrorTimeStamp(state, " Routine=Unknown,");
                     }
-                    ShowContinueError(state, " Input Temperature=" + TrimSigDigits(T, 2));
+                    ShowContinueError(state, format(" Input Temperature={:.2T}", T));
                 }
-                ShowRecurringWarningErrorAtEnd(
+                ShowRecurringWarningErrorAtEnd(state,
                     "Temperature out of range [-100. to 200.] (PsyPsatFnTemp)", iPsyErrIndex(iPsyPsatFnTemp), T, T, _, "C", "C");
             }
         }
@@ -937,16 +876,17 @@ namespace Psychrometrics {
     }
 
 #ifdef EP_psych_errors
-    void PsyWFnTdbTwbPb_temperature_error(EnergyPlusData &state, Real64 const TDB,             // dry-bulb temperature {C}
+    void PsyWFnTdbTwbPb_temperature_error(EnergyPlusData &state,
+                                          Real64 const TDB,             // dry-bulb temperature {C}
                                           Real64 const TWB,             // wet-bulb temperature {C}
                                           Real64 const PB,              // barometric pressure {Pascals}
                                           std::string const &CalledFrom // routine this function was called from (error messages)
     )
     {
         if (TWB > (TDB + 0.01)) {
-            if (ReportErrors && !WarmupFlag) {
+            if (ReportErrors && !state.dataGlobal->WarmupFlag) {
                 if (iPsyErrIndex(iPsyWFnTdbTwbPb) == 0) {
-                    String = " Dry-Bulb= " + TrimSigDigits(TDB, 2) + " Pressure= " + TrimSigDigits(PB, 2);
+                    String = format(" Dry-Bulb= {:.2T} Pressure= {:.2T}", TDB, PB);
                     ShowWarningMessage(state, "Given Wet Bulb Temperature invalid (PsyWFnTdbTwbPb)");
                     if (!CalledFrom.empty()) {
                         ShowContinueErrorTimeStamp(state, " Routine=" + CalledFrom + ',');
@@ -954,10 +894,10 @@ namespace Psychrometrics {
                         ShowContinueErrorTimeStamp(state, " Routine=Unknown,");
                     }
                     ShowContinueError(state, String);
-                    String = "Calculated Wet-Bulb= " + TrimSigDigits(TWB, 2);
+                    String = format("Calculated Wet-Bulb= {:.2T}", TWB);
                     ShowContinueError(state, String + " ... Since Dry Bulb < Wet Bulb, Wet Bulb set = to Dry Bulb");
                 }
-                ShowRecurringWarningErrorAtEnd(
+                ShowRecurringWarningErrorAtEnd(state,
                     "Given Wet Bulb Temperature invalid (PsyWFnTdbTwbPb)", iPsyErrIndex(iPsyWFnTdbTwbPb), TWB, TWB, _, "C", "C");
             }
         }
@@ -965,7 +905,8 @@ namespace Psychrometrics {
 #endif
 
 #ifdef EP_psych_errors
-    void PsyWFnTdbTwbPb_humidity_error(EnergyPlusData &state, Real64 const TDB,             // dry-bulb temperature {C}
+    void PsyWFnTdbTwbPb_humidity_error(EnergyPlusData &state,
+                                       Real64 const TDB,             // dry-bulb temperature {C}
                                        Real64 const TWB,             // wet-bulb temperature {C}
                                        Real64 const PB,              // barometric pressure {Pascals}
                                        Real64 const W,               // humidity ratio
@@ -974,9 +915,9 @@ namespace Psychrometrics {
     {
 
         if (W < 0.0) {
-            if (ReportErrors && !WarmupFlag) {
+            if (ReportErrors && !state.dataGlobal->WarmupFlag) {
                 if (iPsyErrIndex(iPsyWFnTdbTwbPb2) == 0) {
-                    String = " Dry-Bulb= " + TrimSigDigits(TDB, 2) + " Wet-Bulb= " + TrimSigDigits(TWB, 2) + " Pressure= " + TrimSigDigits(PB, 2);
+                    String = format(" Dry-Bulb= {:.2T} Wet-Bulb= {:.2T} Pressure= {:.2T}", TDB, TWB, PB);
                     ShowWarningMessage(state, "Calculated Humidity Ratio Invalid (PsyWFnTdbTwbPb)");
                     if (!CalledFrom.empty()) {
                         ShowContinueErrorTimeStamp(state, " Routine=" + CalledFrom + ',');
@@ -984,10 +925,10 @@ namespace Psychrometrics {
                         ShowContinueErrorTimeStamp(state, " Routine=Unknown,");
                     }
                     ShowContinueError(state, String);
-                    String = "Calculated Humidity Ratio= " + TrimSigDigits(W, 4) + ", will recalculate Humidity Ratio";
+                    String = format("Calculated Humidity Ratio= {:.4T}, will recalculate Humidity Ratio", W);
                     ShowContinueError(state, String + " using Relative Humidity .01% (and Dry-Bulb and Pressure as shown)");
                 }
-                ShowRecurringWarningErrorAtEnd(
+                ShowRecurringWarningErrorAtEnd(state,
                     "Calculated Humidity Ratio Invalid (PsyWFnTdbTwbPb)", iPsyErrIndex(iPsyWFnTdbTwbPb2), W, W, _, "[]", "[]");
             }
         }
@@ -995,7 +936,8 @@ namespace Psychrometrics {
 #endif
 
 #ifdef EP_psych_errors
-    void PsyTdpFnTdbTwbPb_error(EnergyPlusData &state, Real64 const TDB,             // dry-bulb temperature {C}
+    void PsyTdpFnTdbTwbPb_error(EnergyPlusData &state,
+                                Real64 const TDB,             // dry-bulb temperature {C}
                                 Real64 const TWB,             // wet-bulb temperature {C}
                                 Real64 const PB,              // barometric pressure (N/M**2) {Pascals}
                                 Real64 const W,               // humidity ratio
@@ -1004,7 +946,7 @@ namespace Psychrometrics {
     )
     {
         if (TDP > TWB + 0.1) {
-            if (!WarmupFlag) { // Display error message
+            if (!state.dataGlobal->WarmupFlag) { // Display error message
                 if (iPsyErrIndex(iPsyTdpFnTdbTwbPb) == 0) {
                     ShowWarningMessage(state, "Calculated Dew Point Temperature being reset (PsyTdpFnTdbTwbPb)");
                     if (!CalledFrom.empty()) {
@@ -1012,13 +954,12 @@ namespace Psychrometrics {
                     } else {
                         ShowContinueErrorTimeStamp(state, " Routine=Unknown,");
                     }
-                    String = " Dry-bulb=" + TrimSigDigits(TDB, 2) + " Wet-Bulb (WB)= " + TrimSigDigits(TWB, 2) +
-                             " Pressure= " + TrimSigDigits(PB, 2) + " Humidity Ratio=" + TrimSigDigits(W, 3);
+                    String = format(" Dry-bulb={:.2T} Wet-Bulb (WB)= {:.2T} Pressure= {:.2T} Humidity Ratio={:.3T}", TDB, TWB, PB, W);
                     ShowContinueError(state, String);
-                    String = " Calculated Dew Point Temperature (DPT)= " + TrimSigDigits(TDP, 2) + "; Since DPT > WB, DPT will be set to WB";
+                    String = format(" Calculated Dew Point Temperature (DPT)= {:.2T}; Since DPT > WB, DPT will be set to WB", TDP);
                     ShowContinueError(state, String);
                 }
-                ShowRecurringWarningErrorAtEnd(
+                ShowRecurringWarningErrorAtEnd(state,
                     "Calculated Dew Point Temperature being reset (PsyTdpFnTdbTwbPb)", iPsyErrIndex(iPsyTdpFnTdbTwbPb), TDP, TDP, _, "C", "C");
             }
         }
@@ -1027,12 +968,14 @@ namespace Psychrometrics {
 
 
 #ifdef EP_cache_PsyTsatFnHPb
-    Real64 PsyTsatFnHPb_raw(EnergyPlusData &state, Real64 const H,               // enthalpy {J/kg}
+    Real64 PsyTsatFnHPb_raw(EnergyPlusData &state,
+                            Real64 const H,               // enthalpy {J/kg}
                             Real64 const PB,              // barometric pressure {Pascals}
-                            std::string const &CalledFrom // routine this function was called from (error messages)
+                            [[maybe_unused]] std::string const &CalledFrom // routine this function was called from (error messages)
     )
 #else
-    Real64 PsyTsatFnHPb(Real64 const H,               // enthalpy {J/kg}
+    Real64 PsyTsatFnHPb(EnergyPlusData &state,
+                        Real64 const H,               // enthalpy {J/kg}
                         Real64 const PB,              // barometric pressure {Pascals}
                         std::string const &CalledFrom // routine this function was called from (error messages)
     )
@@ -1084,7 +1027,7 @@ namespace Psychrometrics {
         FlagError = false;
 #ifdef EP_psych_errors
         if (HH <= -4.24E4 || HH >= 4.5866E7) {
-            if (!WarmupFlag) {
+            if (!state.dataGlobal->WarmupFlag) {
                 if (iPsyErrIndex(iPsyTsatFnHPb) == 0) {
                     ShowWarningMessage(state, "Enthalpy out of range (PsyTsatFnHPb)");
                     if (!CalledFrom.empty()) {
@@ -1092,11 +1035,11 @@ namespace Psychrometrics {
                     } else {
                         ShowContinueErrorTimeStamp(state, " Routine=Unknown,");
                     }
-                    String = " Enthalpy=" + TrimSigDigits(HH, 5) + " Pressure= " + TrimSigDigits(PB, 2);
+                    String = format(" Enthalpy={:.5T} Pressure= {:.2T}", HH, PB);
                     ShowContinueError(state, String);
                     FlagError = true;
                 }
-                ShowRecurringWarningErrorAtEnd("Enthalpy out of range (PsyTsatFnHPb)", iPsyErrIndex(iPsyTsatFnHPb), HH, HH, _, "J/kg", "J/kg");
+                ShowRecurringWarningErrorAtEnd(state, "Enthalpy out of range (PsyTsatFnHPb)", iPsyErrIndex(iPsyTsatFnHPb), HH, HH, _, "J/kg", "J/kg");
             }
         }
 #endif
@@ -1145,7 +1088,7 @@ namespace Psychrometrics {
 
 #ifdef EP_psych_errors
         if (FlagError) {
-            ShowContinueError(state, " Initial Resultant Temperature= " + TrimSigDigits(T, 2));
+            ShowContinueError(state, format(" Initial Resultant Temperature= {:.2T}", T));
         }
 #endif
         if (std::abs(PB - 1.0133e5) / 1.0133e5 > 0.01) {
@@ -1179,8 +1122,8 @@ namespace Psychrometrics {
                     } else {
                         ShowContinueErrorTimeStamp(state, " Routine=Unknown,");
                     }
-                    String = " Enthalpy=" + TrimSigDigits(HH, 5) + " Pressure= " + TrimSigDigits(PB, 2);
-                    ShowContinueError(state, String + " Last T=" + TrimSigDigits(T, 2));
+                    String = format(" Enthalpy={:.5T} Pressure= {:.2T}", HH, PB);
+                    ShowContinueError(state, format("{} Last T={:.2T}", String, T));
                 }
 #endif
             }
@@ -1191,17 +1134,17 @@ namespace Psychrometrics {
     }
 
 #ifdef EP_psych_errors
-    void PsyRhFnTdbRhov_error(EnergyPlusData &state, Real64 const Tdb,             // dry-bulb temperature {C}
+    void PsyRhFnTdbRhov_error(EnergyPlusData &state,
+                              Real64 const Tdb,             // dry-bulb temperature {C}
                               Real64 const Rhovapor,        // vapor density in air {kg/m3}
                               Real64 const RHValue,         // relative humidity value (0.0-1.0)
                               std::string const &CalledFrom // routine this function was called from (error messages)
     )
     {
         if (RHValue > 1.01) {
-            if (!WarmupFlag) {
+            if (!state.dataGlobal->WarmupFlag) {
                 if (iPsyErrIndex(iPsyRhFnTdbRhov) == 0) {
-                    String = " Dry-Bulb= " + TrimSigDigits(Tdb, 2) + " Rhovapor= " + TrimSigDigits(Rhovapor, 3) +
-                             " Calculated Relative Humidity [%]= " + TrimSigDigits(RHValue * 100.0, 2);
+                    String = format(" Dry-Bulb= {:.2T} Rhovapor= {:.3T} Calculated Relative Humidity [%]= {:.2T}", Tdb, Rhovapor, RHValue * 100.0);
                     ShowWarningMessage(state, "Calculated Relative Humidity out of range (PsyRhFnTdbRhov) ");
                     if (!CalledFrom.empty()) {
                         ShowContinueErrorTimeStamp(state, " Routine=" + CalledFrom + ',');
@@ -1211,7 +1154,7 @@ namespace Psychrometrics {
                     ShowContinueError(state, String);
                     ShowContinueError(state, "Relative Humidity being reset to 100.0 %");
                 }
-                ShowRecurringWarningErrorAtEnd("Calculated Relative Humidity out of range (PsyRhFnTdbRhov)",
+                ShowRecurringWarningErrorAtEnd(state, "Calculated Relative Humidity out of range (PsyRhFnTdbRhov)",
                                                iPsyErrIndex(iPsyRhFnTdbRhov),
                                                RHValue * 100.0,
                                                RHValue * 100.0,
@@ -1220,10 +1163,9 @@ namespace Psychrometrics {
                                                "%");
             }
         } else if (RHValue < -0.05) {
-            if (!WarmupFlag) {
+            if (!state.dataGlobal->WarmupFlag) {
                 if (iPsyErrIndex(iPsyRhFnTdbRhov) == 0) {
-                    String = " Dry-Bulb= " + TrimSigDigits(Tdb, 2) + " Rhovapor= " + TrimSigDigits(Rhovapor, 3) +
-                             " Calculated Relative Humidity [%]= " + TrimSigDigits(RHValue * 100.0, 2);
+                    String = format(" Dry-Bulb= {:.2T} Rhovapor= {:.3T} Calculated Relative Humidity [%]= {:.2T}", Tdb, Rhovapor, RHValue * 100.0);
                     ShowWarningMessage(state, "Calculated Relative Humidity out of range (PsyRhFnTdbRhov) ");
                     if (!CalledFrom.empty()) {
                         ShowContinueErrorTimeStamp(state, " Routine=" + CalledFrom + ',');
@@ -1233,7 +1175,7 @@ namespace Psychrometrics {
                     ShowContinueError(state, String);
                     ShowContinueError(state, "Relative Humidity being reset to 1%");
                 }
-                ShowRecurringWarningErrorAtEnd("Calculated Relative Humidity out of range (PsyRhFnTdbRhov)",
+                ShowRecurringWarningErrorAtEnd(state, "Calculated Relative Humidity out of range (PsyRhFnTdbRhov)",
                                                iPsyErrIndex(iPsyRhFnTdbRhov),
                                                RHValue * 100.0,
                                                RHValue * 100.0,
@@ -1246,17 +1188,17 @@ namespace Psychrometrics {
 #endif
 
 #ifdef EP_psych_errors
-    void PsyRhFnTdbWPb_error(EnergyPlusData &state, Real64 const TDB,             // dry-bulb temperature {C}
+    void PsyRhFnTdbWPb_error(EnergyPlusData &state,
+                             Real64 const TDB,             // dry-bulb temperature {C}
                              Real64 const W,               // humidity ratio
                              Real64 const RHValue,         // relative humidity (0.0-1.0)
                              std::string const &CalledFrom // routine this function was called from (error messages)
     )
     {
         if (RHValue > 1.01) {
-            if (!WarmupFlag) {
+            if (!state.dataGlobal->WarmupFlag) {
                 if (iPsyErrIndex(iPsyRhFnTdbWPb) == 0) {
-                    String = " Dry-Bulb= " + TrimSigDigits(TDB, 2) + " Humidity Ratio= " + TrimSigDigits(W, 3) +
-                             " Calculated Relative Humidity [%]= " + TrimSigDigits(RHValue * 100.0, 2);
+                    String = format(" Dry-Bulb= {:.2T} Humidity Ratio= {:.3T} Calculated Relative Humidity [%]= {:.2T}", TDB, W, RHValue * 100.0);
                     ShowWarningMessage(state, "Calculated Relative Humidity out of range (PsyRhFnTdbWPb) ");
                     if (!CalledFrom.empty()) {
                         ShowContinueErrorTimeStamp(state, " Routine=" + CalledFrom + ',');
@@ -1266,7 +1208,7 @@ namespace Psychrometrics {
                     ShowContinueError(state, String);
                     ShowContinueError(state, "Relative Humidity being reset to 100.0%");
                 }
-                ShowRecurringWarningErrorAtEnd("Calculated Relative Humidity out of range (PsyRhFnTdbWPb)",
+                ShowRecurringWarningErrorAtEnd(state, "Calculated Relative Humidity out of range (PsyRhFnTdbWPb)",
                                                iPsyErrIndex(iPsyRhFnTdbWPb),
                                                RHValue * 100.0,
                                                RHValue * 100.0,
@@ -1275,10 +1217,9 @@ namespace Psychrometrics {
                                                "%");
             }
         } else if (RHValue < -0.05) {
-            if (!WarmupFlag) {
+            if (!state.dataGlobal->WarmupFlag) {
                 if (iPsyErrIndex(iPsyRhFnTdbWPb) == 0) {
-                    String = " Dry-Bulb= " + TrimSigDigits(TDB, 2) + " Humidity Ratio= " + TrimSigDigits(W, 3) +
-                             " Calculated Relative Humidity [%]= " + TrimSigDigits(RHValue * 100.0, 2);
+                    String = format(" Dry-Bulb= {:.2T} Humidity Ratio= {:.3T} Calculated Relative Humidity [%]= {:.2T}", TDB, W, RHValue * 100.0);
                     ShowWarningMessage(state, "Calculated Relative Humidity out of range (PsyRhFnTdbWPb) ");
                     if (!CalledFrom.empty()) {
                         ShowContinueErrorTimeStamp(state, " Routine=" + CalledFrom + ',');
@@ -1288,7 +1229,7 @@ namespace Psychrometrics {
                     ShowContinueError(state, String);
                     ShowContinueError(state, "Relative Humidity being reset to 1%");
                 }
-                ShowRecurringWarningErrorAtEnd("Calculated Relative Humidity out of range (PsyRhFnTdbWPb)",
+                ShowRecurringWarningErrorAtEnd(state, "Calculated Relative Humidity out of range (PsyRhFnTdbWPb)",
                                                iPsyErrIndex(iPsyRhFnTdbWPb),
                                                RHValue * 100.0,
                                                RHValue * 100.0,
@@ -1301,16 +1242,17 @@ namespace Psychrometrics {
 #endif
 
 #ifdef EP_psych_errors
-    void PsyWFnTdpPb_error(EnergyPlusData &state, Real64 const TDP,             // dew-point temperature {C}
+    void PsyWFnTdpPb_error(EnergyPlusData &state,
+                           Real64 const TDP,             // dew-point temperature {C}
                            Real64 const PB,              // barometric pressure {Pascals}
                            Real64 const W,               // humidity ratio
                            Real64 const DeltaT,          // Reduced temperature difference of dew point
                            std::string const &CalledFrom // routine this function was called from (error messages)
     )
     {
-        if (!WarmupFlag) {
+        if (!state.dataGlobal->WarmupFlag) {
             if (iPsyErrIndex(iPsyWFnTdpPb) == 0) {
-                String = " Dew-Point= " + TrimSigDigits(TDP, 2) + " Barometric Pressure= " + TrimSigDigits(PB, 2);
+                String = format(" Dew-Point= {:.2T} Barometric Pressure= {:.2T}", TDP, PB);
                 ShowWarningMessage(state, "Calculated partial vapor pressure is greater than the barometric pressure, so that calculated humidity ratio is invalid (PsyWFnTdpPb).");
                 if (!CalledFrom.empty()) {
                     ShowContinueErrorTimeStamp(state, " Routine=" + CalledFrom + ',');
@@ -1318,17 +1260,17 @@ namespace Psychrometrics {
                     ShowContinueErrorTimeStamp(state, " Routine=Unknown,");
                 }
                 ShowContinueError(state, String);
-                String = "Instead, calculated Humidity Ratio at " + TrimSigDigits(TDP - DeltaT, 1) + " (" + TrimSigDigits(DeltaT) +
-                         " degree less) = " + TrimSigDigits(W, 4);
+                String = format("Instead, calculated Humidity Ratio at {:.1T} ({} degree less) = {:.4T}", TDP - DeltaT, static_cast<int>(DeltaT), W);
                 ShowContinueError(state, String + " will be used. Simulation continues.");
             }
-            ShowRecurringWarningErrorAtEnd("Entered Humidity Ratio invalid (PsyWFnTdpPb)", iPsyErrIndex(iPsyWFnTdpPb), W, W, _, "[]", "[]");
+            ShowRecurringWarningErrorAtEnd(state, "Entered Humidity Ratio invalid (PsyWFnTdpPb)", iPsyErrIndex(iPsyWFnTdpPb), W, W, _, "[]", "[]");
         }
     }
 #endif
 
 #ifdef EP_psych_errors
-    void PsyWFnTdbRhPb_error(EnergyPlusData &state, Real64 const TDB,             // dry-bulb temperature {C}
+    void PsyWFnTdbRhPb_error(EnergyPlusData &state,
+                             Real64 const TDB,             // dry-bulb temperature {C}
                              Real64 const RH,              // relative humidity value (0.0-1.0)
                              Real64 const PB,              // barometric pressure {Pascals}
                              Real64 const W,               // humidity ratio
@@ -1336,10 +1278,9 @@ namespace Psychrometrics {
     )
     {
         if (W <= -0.0001) {
-            if (!WarmupFlag) {
+            if (!state.dataGlobal->WarmupFlag) {
                 if (iPsyErrIndex(iPsyWFnTdbRhPb) == 0) {
-                    String = " Dry-Bulb= " + TrimSigDigits(TDB, 2) + " Relative Humidity [%]= " + TrimSigDigits(RH * 100.0, 2) +
-                             " Pressure= " + TrimSigDigits(PB, 2);
+                    String = format(" Dry-Bulb= {:.2T} Relative Humidity [%]= {:.2T} Pressure= {:.2T}", TDB, RH * 100.0, PB);
                     ShowWarningMessage(state, "Calculated Humidity Ratio is invalid (PsyWFnTdbRhPb)");
                     if (!CalledFrom.empty()) {
                         ShowContinueErrorTimeStamp(state, " Routine=" + CalledFrom + ',');
@@ -1347,10 +1288,10 @@ namespace Psychrometrics {
                         ShowContinueErrorTimeStamp(state, " Routine=Unknown,");
                     }
                     ShowContinueError(state, String);
-                    String = "Calculated Humidity Ratio= " + TrimSigDigits(W, 4);
+                    String = format("Calculated Humidity Ratio= {:.4T}", W);
                     ShowContinueError(state, String + " ... Humidity Ratio set to .00001");
                 }
-                ShowRecurringWarningErrorAtEnd(
+                ShowRecurringWarningErrorAtEnd(state,
                     "Calculated Humidity Ratio Invalid (PsyWFnTdbTwbPb)", iPsyErrIndex(iPsyWFnTdbRhPb), W, W, _, "[]", "[]");
             }
         }
@@ -1359,12 +1300,14 @@ namespace Psychrometrics {
 
 #ifdef EP_cache_PsyTsatFnPb
 
-    Real64 PsyTsatFnPb_raw(EnergyPlusData &state, Real64 const Press,           // barometric pressure {Pascals}
+    Real64 PsyTsatFnPb_raw(EnergyPlusData &state,
+                           Real64 const Press,           // barometric pressure {Pascals}
                            std::string const &CalledFrom // routine this function was called from (error messages)
     )
 
 #else
-    Real64 PsyTsatFnPb(Real64 const Press,           // barometric pressure {Pascals}
+    Real64 PsyTsatFnPb(EnergyPlusData &state,
+                       Real64 const Press,           // barometric pressure {Pascals}
                        std::string const &CalledFrom // routine this function was called from (error messages)
     )
 #endif
@@ -1419,7 +1362,7 @@ namespace Psychrometrics {
         // Check press in range.
         FlagError = false;
 #ifdef EP_psych_errors
-        if (!WarmupFlag) {
+        if (!state.dataGlobal->WarmupFlag) {
             if (Press <= 0.0017 || Press >= 1555000.0) {
                 if (iPsyErrIndex(iPsyTsatFnPb) == 0) {
                     ShowWarningMessage(state, "Pressure out of range (PsyTsatFnPb)");
@@ -1428,10 +1371,10 @@ namespace Psychrometrics {
                     } else {
                         ShowContinueErrorTimeStamp(state, " Routine=Unknown,");
                     }
-                    ShowContinueError(state, " Input Pressure= " + TrimSigDigits(Press, 2));
+                    ShowContinueError(state, format(" Input Pressure= {:.2T}", Press));
                     FlagError = true;
                 }
-                ShowRecurringWarningErrorAtEnd("Pressure out of range (PsyTsatFnPb)", iPsyErrIndex(iPsyTsatFnPb), Press, Press, _, "Pa", "Pa");
+                ShowRecurringWarningErrorAtEnd(state, "Pressure out of range (PsyTsatFnPb)", iPsyErrIndex(iPsyTsatFnPb), Press, Press, _, "Pa", "Pa");
             }
         }
 #endif
@@ -1498,18 +1441,18 @@ namespace Psychrometrics {
 
 #ifdef EP_psych_errors
         if (iter > itmax) {
-            if (!WarmupFlag) {
+            if (!state.dataGlobal->WarmupFlag) {
                 if (iPsyErrIndex(iPsyTsatFnPb2) == 0) {
-                    ShowWarningMessage(state, "Saturation Temperature not converged after " + TrimSigDigits(iter) + " iterations (PsyTsatFnPb)");
+                    ShowWarningMessage(state, format("Saturation Temperature not converged after {} iterations (PsyTsatFnPb)", iter));
                     if (!CalledFrom.empty()) {
                         ShowContinueErrorTimeStamp(state, " Routine=" + CalledFrom + ',');
                     } else {
                         ShowContinueErrorTimeStamp(state, " Routine=Unknown,");
                     }
-                    ShowContinueError(state, " Input Pressure= " + TrimSigDigits(Press, 2));
+                    ShowContinueError(state, format(" Input Pressure= {:.2T}", Press));
                     FlagError = true;
                 }
-                ShowRecurringWarningErrorAtEnd(
+                ShowRecurringWarningErrorAtEnd(state,
                     "Saturation Temperature not converged after max iterations (PsyTsatFnPb)", iPsyErrIndex(iPsyTsatFnPb2), tSat, tSat, _, "C", "C");
             }
         }
@@ -1520,7 +1463,7 @@ namespace Psychrometrics {
 
 #ifdef EP_psych_errors
         if (FlagError) {
-            ShowContinueError(state, " Resultant Temperature= " + TrimSigDigits(Temp, 2));
+            ShowContinueError(state, format(" Resultant Temperature= {:.2T}", Temp));
         }
 #endif
 

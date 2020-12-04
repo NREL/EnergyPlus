@@ -45,57 +45,27 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+// Google Test Headers
+#include <gtest/gtest.h>
+
 // EnergyPlus Headers
-#include <EnergyPlus/DataComplexFenestration.hh>
-namespace EnergyPlus {
+#include <EnergyPlus/DataSystemVariables.hh>
+#include <EnergyPlus/FileSystem.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
-namespace DataComplexFenestration {
-    // MODULE INFORMATION:
-    //       AUTHOR         Simon Vidanovic
-    //       DATE WRITTEN   January 2012
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
+#include "Fixtures/EnergyPlusFixture.hh"
 
-    // PURPOSE OF THIS MODULE:
-    // This module contains data necessary for complex fenestration calculations
+using namespace EnergyPlus;
 
-    // Using/Aliasing
-    // Data
-    // Parameters for complex shade
-    int const csVenetianHorizontal(1);
-    int const csWoven(2);
-    int const csPerforated(3);
-    int const csOtherShadingType(4);
-    int const csBSDF(5);
-    int const csVenetianVertical(6);
-
-    // Parameters for gas definitions
-    int const GasCoeffsCustom(0);
-    int const GasCoeffsAir(1);
-    int const GasCoeffsArgon(2);
-    int const GasCoeffsKrypton(3);
-    int const GasCoeffsXenon(4);
-
-    // Parameters for Thermal Algorithm
-    // INTEGER, PARAMETER :: taTarcog = 0
-    // INTEGER, PARAMETER :: taWinkelmann = 1
-
-    // Parameters for calculation standard
-    int const csISO15099(1);
-    int const csEN673Declared(2);
-    int const csEN673Design(3);
-
-    // Parameters for thermal model
-    int const tmISO15099(0);
-    int const tmScaledCavityWidth(1);
-    int const tmConvectiveScalarModel_NoSDThickness(2);
-    int const tmConvectiveScalarModel_WithSDThickness(3);
-
-    // Parameters for deflection model
-    int const dmNoDeflection(0);
-    int const dmTemperatureAndPressureInput(1);
-    int const dmMeasuredDeflection(2);
-
-} // namespace DataComplexFenestration
-
-} // namespace EnergyPlus
+TEST_F(EnergyPlusFixture, File_Not_Found_ERR_Output)
+{
+    std::string filePath = "./NonExistentFile.txt";
+    FileSystem::makeNativePath(filePath);
+    std::string expectedError = FileSystem::getParentDirectoryPath(FileSystem::getAbsolutePath(filePath));
+    bool fileFound = false;
+    std::string fullPath;
+    std::string contextString = "Test File_Not_Found_ERR_Output";
+    DataSystemVariables::CheckForActualFileName(*this->state, filePath, fileFound, fullPath, contextString);
+    EXPECT_FALSE(fileFound);
+    EXPECT_TRUE(match_err_stream(expectedError));
+}

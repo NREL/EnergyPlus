@@ -1248,7 +1248,7 @@ namespace HybridEvapCoolingModel {
         // na
 
         // Using/Aliasing
-        using General::RoundSigDigits;
+
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
         // The CStepInputs are defined in the CStepInputs class definition.
@@ -1411,7 +1411,7 @@ namespace HybridEvapCoolingModel {
                     }
                 }
             }
-            if (!WarmupFlag) {
+            if (!state.dataGlobal->WarmupFlag) {
                 // Keep an account of the number of times the supply air temperature and humidity constraints were not met for a given mode but only
                 // do this when its not warmup.
                 if (!SAT_OC_MetinMode) {
@@ -1626,29 +1626,42 @@ namespace HybridEvapCoolingModel {
             }
         }
 
-        Real64 TimeElapsed = DataGlobals::HourOfDay + DataGlobals::TimeStep * DataGlobals::TimeStepZone + SysTimeElapsed;
+        Real64 TimeElapsed = state.dataGlobal->HourOfDay + state.dataGlobal->TimeStep * state.dataGlobal->TimeStepZone + SysTimeElapsed;
 
         // Use the elapsed time to only give a summary of warnings related to the number of Timesteps environmental conditions, or supply air
         // temperature constraints were not met for a given day. ideally there would be a clear flag that indicates "this is the last timestep of the
         // day, so report", but that doesn't seem to exist.
-        if ((TimeElapsed > 24) && WarnOnceFlag && !WarmupFlag) {
+        if ((TimeElapsed > 24) && WarnOnceFlag && !state.dataGlobal->WarmupFlag) {
             if (count_EnvironmentConditionsNotMet > 0)
-                ShowWarningError(state, "In day " + RoundSigDigits((Real64)state.dataGlobal->DayOfSim, 1) + " of simulation, " + Name.c_str() + " was unable to operate for " +
-                                 RoundSigDigits((Real64)count_EnvironmentConditionsNotMet, 1) +
-                                 " timesteps because environment conditions were beyond the allowable operating range for any mode.");
+                ShowWarningError(state,
+                                 format("In day {:.1R} was unable to operate for  of simulation, {}{:.1R} timesteps because environment conditions "
+                                        "were beyond the allowable operating range for any mode.",
+                                        (Real64)state.dataGlobal->DayOfSim,
+                                        Name,
+                                        (Real64)count_EnvironmentConditionsNotMet));
             if (count_SAHR_OC_MetOnce > 0)
-                ShowWarningError(state, "In day " + RoundSigDigits((Real64)state.dataGlobal->DayOfSim, 1) + " of simulation, " + Name.c_str() +
-                                 " failed to meet supply air humidity ratio for " + RoundSigDigits(Real64(count_SAHR_OC_MetOnce), 1) +
-                                 " time steps. For these time steps For these time steps" + Name.c_str() + " was set to mode 0");
+                ShowWarningError(state,
+                                 format("In day {:.1R} of simulation, {} failed to meet supply air humidity ratio for {:.1R} time steps. For these "
+                                        "time steps For these time steps was set to mode 0{}",
+                                        (Real64)state.dataGlobal->DayOfSim,
+                                        Name,
+                                        Real64(count_SAHR_OC_MetOnce),
+                                        Name));
             if (count_SAT_OC_MetOnce > 0)
-                ShowWarningError(state, "In day " + RoundSigDigits((Real64)state.dataGlobal->DayOfSim, 1) + " of simulation, " + Name.c_str() +
-                                 " failed to meet supply air temperature constraints for " + RoundSigDigits(Real64(count_SAT_OC_MetOnce), 1) +
-                                 " time steps. For these time steps For these time steps" + Name.c_str() + " was set to mode 0");
+                ShowWarningError(state,
+                                 format("In day {:.1R} of simulation, {} failed to meet supply air temperature constraints for {:.1R} time steps. "
+                                        "For these time steps For these time steps{} was set to mode 0",
+                                        (Real64)state.dataGlobal->DayOfSim,
+                                        Name,
+                                        Real64(count_SAT_OC_MetOnce),
+                                        Name));
 
-            ShowWarningError(state, "In day " + RoundSigDigits((Real64)state.dataGlobal->DayOfSim, 1) + " of simulation, " + Name.c_str() +
-                             " failed to  satisfy sensible load for " + RoundSigDigits((Real64)count_DidWeNotMeetLoad, 1) +
-                             " time steps. For these time steps settings were selected to provide as much sensible cooling or heating as possible, "
-                             "given other constraints.");
+            ShowWarningError(state,
+                             format("In day {:.1R} of simulation, {} failed to  satisfy sensible load for {:.1R} time steps. For these time steps "
+                                    "settings were selected to provide as much sensible cooling or heating as possible, given other constraints.",
+                                    (Real64)state.dataGlobal->DayOfSim,
+                                    Name,
+                                    (Real64)count_DidWeNotMeetLoad));
 
             count_SAT_OC_MetOnce = 0;
             count_DidWeNotMeetLoad = 0;
@@ -1657,7 +1670,7 @@ namespace HybridEvapCoolingModel {
             count_EnvironmentConditionsNotMet = 0;
             WarnOnceFlag = false;
         }
-        if (DataGlobals::HourOfDay == 1 && !WarnOnceFlag && !WarmupFlag) {
+        if (state.dataGlobal->HourOfDay == 1 && !WarnOnceFlag && !state.dataGlobal->WarmupFlag) {
             WarnOnceFlag = true;
         }
         return ErrorCode;

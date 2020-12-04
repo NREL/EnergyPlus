@@ -1,3 +1,11 @@
+if(USE_GLYCOL_CACHING)
+  add_definitions("-DEP_cache_GlycolSpecificHeat")
+endif()
+
+if(USE_PSYCH_ERRORS)
+  add_definitions("-DEP_psych_errors")
+endif()
+
 set( test_src
   TestHelpers/IdfParser.cc
   TestHelpers/IdfParser.hh
@@ -72,6 +80,7 @@ set( test_src
   Datasets.unit.cc
   DataSizing.unit.cc
   DataSurfaces.unit.cc
+  DataSystemVariables.unit.cc
   DataZoneEquipment.unit.cc
   DaylightingManager.unit.cc
   DElightManager.unit.cc

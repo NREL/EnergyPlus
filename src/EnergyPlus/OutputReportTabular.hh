@@ -777,7 +777,7 @@ namespace OutputReportTabular {
 
     void GatherSourceEnergyEndUseResultsForTimestep(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
 
-    void GatherPeakDemandForTimestep(OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
+    void GatherPeakDemandForTimestep(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
 
     void GatherHeatGainReport(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
 
@@ -827,15 +827,17 @@ namespace OutputReportTabular {
 
     void WriteThermalResilienceTables(EnergyPlusData &state);
 
-    void WriteCO2ResilienceTables();
+    void WriteCO2ResilienceTables(EnergyPlusData &state);
 
     void WriteVisualResilienceTables(EnergyPlusData &state);
 
-    void WriteResilienceBinsTable(int const columnNum,
+    void WriteResilienceBinsTable(EnergyPlusData &state,
+                                  int const columnNum,
                                   std::vector<int> const &columnHead,
                                   Array1D<std::vector<Real64>> const &ZoneBins);
 
-    void WriteSETHoursTable(int const columnNum,
+    void WriteSETHoursTable(EnergyPlusData &state,
+                            int const columnNum,
                             std::vector<std::string> const &columnHead,
                             Array1D<std::vector<Real64>> const &ZoneBins);
 
@@ -853,21 +855,22 @@ namespace OutputReportTabular {
 
     std::vector<std::string> splitCommaString(std::string const &inputString);
 
-    void AddTOCLoadComponentTableSummaries();
+    void AddTOCLoadComponentTableSummaries(EnergyPlusData &state);
 
-    void AllocateLoadComponentArrays();
+    void AllocateLoadComponentArrays(EnergyPlusData &state);
 
     void DeallocateLoadComponentArrays();
 
     void ComputeLoadComponentDecayCurve(EnergyPlusData &state);
 
-    void GatherComponentLoadsSurface();
+    void GatherComponentLoadsSurface(EnergyPlusData &state);
 
-    void GatherComponentLoadsHVAC();
+    void GatherComponentLoadsHVAC(EnergyPlusData &state);
 
     void WriteLoadComponentSummaryTables(EnergyPlusData &state);
 
-    void GetDelaySequences(int const &desDaySelected,
+    void GetDelaySequences(EnergyPlusData &state,
+                           int const &desDaySelected,
                            bool const &isCooling,
                            int const &zoneIndex,
                            Array1D<Real64> &peopleDelaySeq,
@@ -881,7 +884,8 @@ namespace OutputReportTabular {
 
     Real64 MovingAvgAtMaxTime(Array1S<Real64> const &dataSeq, int const &numTimeSteps, int const &maxTimeStep);
 
-    void ComputeTableBodyUsingMovingAvg(Array2D<Real64> &resultCells,
+    void ComputeTableBodyUsingMovingAvg(EnergyPlusData &state,
+                                        Array2D<Real64> &resultCells,
                                         Array2D_bool &resultCellsUsed,
                                         int const &desDaySelected,
                                         int const &timeOfMax,
@@ -900,7 +904,7 @@ namespace OutputReportTabular {
 
     void ComputeEngineeringChecks(CompLoadTablesType &compLoad);
 
-    void GetZoneComponentAreas(Array1D<ZompComponentAreasType> &areas);
+    void GetZoneComponentAreas(EnergyPlusData &state, Array1D<ZompComponentAreasType> &areas);
 
     void AddAreaColumnForZone(int const &zoneNum, Array1D<ZompComponentAreasType> const &compAreas, CompLoadTablesType &compLoadTotal);
 
@@ -912,7 +916,7 @@ namespace OutputReportTabular {
 
     void LoadSummaryUnitConversion(EnergyPlusData &state, CompLoadTablesType &compLoadTotal);
 
-    void CreateListOfZonesForAirLoop(CompLoadTablesType &compLoad, Array1D_int const &zoneToAirLoop, int const &curAirLoop);
+    void CreateListOfZonesForAirLoop(EnergyPlusData &state, CompLoadTablesType &compLoad, Array1D_int const &zoneToAirLoop, int const &curAirLoop);
 
     void OutputCompLoadSummary(EnergyPlusData &state,
                                int const &kind, // zone=1, airloop=2, facility=3
@@ -947,7 +951,7 @@ namespace OutputReportTabular {
 
     std::string ConvertToEscaped(std::string const &inString); // Input String
 
-    void DetermineBuildingFloorArea();
+    void DetermineBuildingFloorArea(EnergyPlusData &state);
 
     /* Tables with Subcategories in particular have a blank for rowHead for display in the HTML output.
      * This routine will fill up the blanks for output to Sql in particular */
@@ -973,9 +977,9 @@ namespace OutputReportTabular {
 
     void ResetPeakDemandGathering();
 
-    void ResetHeatGainGathering();
+    void ResetHeatGainGathering(EnergyPlusData &state);
 
-    void ResetRemainingPredefinedEntries();
+    void ResetRemainingPredefinedEntries(EnergyPlusData &state);
 
     void ResetAdaptiveComfort();
 

@@ -274,8 +274,8 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(EnergyPlus::EnergyPlu
                                                            Real64 &speedRatio,
                                                            int  const fanOpMode,
                                                            DataLoopNode::NodeData &condInletNode,
-                                                           DataLoopNode::NodeData &EP_UNUSED(condOutletNode),
-                                                           bool const singleMode)
+                                                           [[maybe_unused]] DataLoopNode::NodeData &condOutletNode,
+                                                           [[maybe_unused]] bool const singleMode)
 {
 
     std::string RoutineName = "CoilCoolingDXCurveFitOperatingMode::calcOperatingMode";

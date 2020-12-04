@@ -51,6 +51,8 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -71,7 +73,7 @@ namespace EnergyPlus {
 TEST_F(EnergyPlusFixture, SeparateGasOutputVariables)
 {
     DataHVACGlobals::NumPrimaryAirSys = 1;
-    PrimaryAirSystem.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
     DataLoopNode::Node.allocate(2);
 
     bool CompLoadFlag(false);
@@ -81,31 +83,31 @@ TEST_F(EnergyPlusFixture, SeparateGasOutputVariables)
     Real64 CompLoad(150.0);
     Real64 CompEnergyUse(100.0);
 
-    PrimaryAirSystem(1).NumBranches = 1;
-    PrimaryAirSystem(1).Branch.allocate(1);
-    PrimaryAirSystem(1).Branch(1).TotalComponents = 2;
-    PrimaryAirSystem(1).Branch(1).NodeNumOut = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).NumBranches = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).TotalComponents = 2;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).NodeNumOut = 1;
 
-    PrimaryAirSystem(1).Branch(1).Comp.allocate(2);
-    PrimaryAirSystem(1).Branch(1).Comp(1).Name = "Main Gas Humidifier";
-    PrimaryAirSystem(1).Branch(1).Comp(1).TypeOf = "HUMIDIFIER:STEAM:GAS";
-    PrimaryAirSystem(1).Branch(1).Comp(1).NodeNumIn = 1;
-    PrimaryAirSystem(1).Branch(1).Comp(1).NodeNumOut = 1;
-    PrimaryAirSystem(1).Branch(1).Comp(1).NumMeteredVars = 1;
-    PrimaryAirSystem(1).Branch(1).Comp(1).MeteredVar.allocate(1);
-    PrimaryAirSystem(1).Branch(1).Comp(1).MeteredVar(1).EndUse_CompMode = 1;
-    PrimaryAirSystem(1).Branch(1).Comp(1).MeteredVar(1).CurMeterReading = 100.0;
-    PrimaryAirSystem(1).Branch(1).Comp(1).MeteredVar(1).ResourceType = AssignResourceTypeNum("NaturalGas");
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp.allocate(2);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).Name = "Main Gas Humidifier";
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).TypeOf = "HUMIDIFIER:STEAM:GAS";
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).NodeNumIn = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).NodeNumOut = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).NumMeteredVars = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).MeteredVar.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).MeteredVar(1).EndUse_CompMode = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).MeteredVar(1).CurMeterReading = 100.0;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).MeteredVar(1).ResourceType = AssignResourceTypeNum("NaturalGas");
 
-    PrimaryAirSystem(1).Branch(1).Comp(2).Name = "Main Gas Heating Coil";
-    PrimaryAirSystem(1).Branch(1).Comp(2).TypeOf = "COIL:HEATING:DESUPERHEATER";
-    PrimaryAirSystem(1).Branch(1).Comp(2).NodeNumIn = 2;
-    PrimaryAirSystem(1).Branch(1).Comp(2).NodeNumOut = 2;
-    PrimaryAirSystem(1).Branch(1).Comp(2).NumMeteredVars = 1;
-    PrimaryAirSystem(1).Branch(1).Comp(2).MeteredVar.allocate(1);
-    PrimaryAirSystem(1).Branch(1).Comp(2).MeteredVar(1).EndUse_CompMode = 1;
-    PrimaryAirSystem(1).Branch(1).Comp(2).MeteredVar(1).CurMeterReading = 100.0;
-    PrimaryAirSystem(1).Branch(1).Comp(2).MeteredVar(1).ResourceType = AssignResourceTypeNum("NaturalGas");
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).Name = "Main Gas Heating Coil";
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).TypeOf = "COIL:HEATING:DESUPERHEATER";
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).NodeNumIn = 2;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).NodeNumOut = 2;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).NumMeteredVars = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).MeteredVar.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).MeteredVar(1).EndUse_CompMode = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).MeteredVar(1).CurMeterReading = 100.0;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).MeteredVar(1).ResourceType = AssignResourceTypeNum("NaturalGas");
 
     DataLoopNode::Node(1).MassFlowRate = 1.0;
     DataLoopNode::Node(2).MassFlowRate = 1.0;
@@ -123,19 +125,21 @@ TEST_F(EnergyPlusFixture, SeparateGasOutputVariables)
 
     //Calculate SysHumidNaturalGas ("Air System Humidifier NaturalGas Energy" Output Variable)
     CalcSystemEnergyUse(
+        *state,
         CompLoadFlag,
         AirLoopNum,
-        PrimaryAirSystem(1).Branch(1).Comp(1).TypeOf,
-        PrimaryAirSystem(1).Branch(1).Comp(1).MeteredVar(1).ResourceType,
+        state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).TypeOf,
+        state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).MeteredVar(1).ResourceType,
         CompLoad,
         CompEnergyUse);
 
     // Calculate SysHCCompNaturalGas ("Air System Heating Coil NaturalGas Energy" Output Variable)
     CalcSystemEnergyUse(
+        *state,
         CompLoadFlag,
         AirLoopNum,
-        PrimaryAirSystem(1).Branch(1).Comp(2).TypeOf,
-        PrimaryAirSystem(1).Branch(1).Comp(2).MeteredVar(1).ResourceType,
+        state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).TypeOf,
+        state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).MeteredVar(1).ResourceType,
         CompLoad,
         CompEnergyUse);
 
@@ -173,7 +177,7 @@ TEST_F(EnergyPlusFixture, SeparateGasOutputVariables)
     SysHCCompH2OHOT.allocate(1);
 
     // Calculate SysTotNaturalGas ("Air System NaturalGas Energy")
-    ReportSystemEnergyUse();
+    ReportSystemEnergyUse(*state);
     EXPECT_EQ(SysTotNaturalGas(1), 200);
 
     // Initialization for propane cases
@@ -181,22 +185,24 @@ TEST_F(EnergyPlusFixture, SeparateGasOutputVariables)
     SysHCCompNaturalGas(1) = 0;
     SysTotNaturalGas(1) = 0;
 
-    PrimaryAirSystem(1).Branch(1).Comp(1).MeteredVar(1).ResourceType = AssignResourceTypeNum("Propane");
-    PrimaryAirSystem(1).Branch(1).Comp(2).MeteredVar(1).ResourceType = AssignResourceTypeNum("Propane");
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).MeteredVar(1).ResourceType = AssignResourceTypeNum("Propane");
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).MeteredVar(1).ResourceType = AssignResourceTypeNum("Propane");
 
     // Calculate SysHumidPropane ("Air System Humidifier Propane Energy" Output Variable)
-    CalcSystemEnergyUse(CompLoadFlag,
+    CalcSystemEnergyUse(*state,
+                        CompLoadFlag,
                         AirLoopNum,
-                        PrimaryAirSystem(1).Branch(1).Comp(1).TypeOf,
-                        PrimaryAirSystem(1).Branch(1).Comp(1).MeteredVar(1).ResourceType,
+                        state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).TypeOf,
+                        state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).MeteredVar(1).ResourceType,
                         CompLoad,
                         CompEnergyUse);
 
     // Calculate SysHCCompPropane ("Air System Heating Coil Propane Energy" Output Variable)
-    CalcSystemEnergyUse(CompLoadFlag,
+    CalcSystemEnergyUse(*state,
+                        CompLoadFlag,
                         AirLoopNum,
-                        PrimaryAirSystem(1).Branch(1).Comp(2).TypeOf,
-                        PrimaryAirSystem(1).Branch(1).Comp(2).MeteredVar(1).ResourceType,
+                        state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).TypeOf,
+                        state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).MeteredVar(1).ResourceType,
                         CompLoad,
                         CompEnergyUse);
 
@@ -204,7 +210,7 @@ TEST_F(EnergyPlusFixture, SeparateGasOutputVariables)
     EXPECT_EQ(SysHCCompPropane(1), 100);
 
     // Calculate SysTotPropane ("Air System Propane Energy")
-    ReportSystemEnergyUse();
+    ReportSystemEnergyUse(*state);
     EXPECT_EQ(SysTotPropane(1), 200);
 }
 } // namespace EnergyPlus

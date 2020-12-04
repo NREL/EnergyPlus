@@ -352,7 +352,6 @@ namespace AirLoopHVACDOAS {
     void AirLoopDOAS::getAirLoopDOASInput(EnergyPlusData &state)
     {
 
-        using DataAirSystems::PrimaryAirSystem;
         using ScheduleManager::GetScheduleIndex;
 
         bool errorsFound(false);
@@ -442,7 +441,7 @@ namespace AirLoopHVACDOAS {
                         if (!(CompNum == 1 || CompNum == state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).NumComponents)) {
                             ShowSevereError(state, "The fan placement is either first as blow through or last as draw through in" + CurrentModuleObject +
                                             " = " + state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum));
-                            ShowContinueError(state, "The current position is number " + General::RoundSigDigits(CompNum));
+                            ShowContinueError(state, format("The current position is number {}", CompNum));
                             errorsFound = true;
                         }
                     } else if (SELECT_CASE_var == "FAN:COMPONENTMODEL") {
@@ -461,7 +460,7 @@ namespace AirLoopHVACDOAS {
                         if (!(CompNum == 1 || CompNum == state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).NumComponents)) {
                             ShowSevereError(state, "The fan placement is either first as blow through or last as draw through in" + CurrentModuleObject +
                                             " = " + state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum));
-                            ShowContinueError(state, "The current position is number " + General::RoundSigDigits(CompNum));
+                            ShowContinueError(state, format("The current position is number {}", CompNum));
                             errorsFound = true;
                         }
                     } else if (SELECT_CASE_var == "COIL:COOLING:WATER") {
@@ -743,8 +742,8 @@ namespace AirLoopHVACDOAS {
                 thisDOAS.NumOfAirLoops = fields.at("number_of_airloophvac"); //
                 if (thisDOAS.NumOfAirLoops < 1) {
                     cFieldName = "Number of AirLoopHVAC";
-                    ShowSevereError(state, cCurrentModuleObject + ", \"" + thisDOAS.Name + "\" " + cFieldName + " = " +
-                                    General::TrimSigDigits(thisDOAS.NumOfAirLoops));
+                    ShowSevereError(state,
+                                    fmt::format("{}, \"{}\" {} = {}", cCurrentModuleObject, thisDOAS.Name, cFieldName, thisDOAS.NumOfAirLoops));
                     ShowContinueError(state, " The minimum value should be 1.");
                     errorsFound = true;
                 }
@@ -755,7 +754,7 @@ namespace AirLoopHVACDOAS {
                     int num = 0;
                     for (auto AirLoopHAVCName : AirLoopArray) {
                         std::string name = AirLoopHAVCName.at("airloophvac_name");
-                        int LoopNum = UtilityRoutines::FindItemInList(name, PrimaryAirSystem);
+                        int LoopNum = UtilityRoutines::FindItemInList(name, state.dataAirSystemsData->PrimaryAirSystems);
                         num += 1;
                         if (LoopNum > 0 && num <= thisDOAS.NumOfAirLoops) {
                             thisDOAS.AirLoopName.push_back(name);
@@ -1022,11 +1021,11 @@ namespace AirLoopHVACDOAS {
                 if (loop.ConveCount == 0) {
                     ++loop.ConveCount;
                     ShowWarningError(state, "Convergence limit is above 1.0e-6 for unit=" + loop.Name);
-                    ShowContinueErrorTimeStamp(state, "The max difference of node temperatures between AirLoopDOAS outlet and OA mixer inlet =" +
-                                               General::RoundSigDigits(maxDiff, 6));
+                    ShowContinueErrorTimeStamp(
+                        state, format("The max difference of node temperatures between AirLoopDOAS outlet and OA mixer inlet ={:.6R}", maxDiff));
                 } else {
                     ++loop.ConveCount;
-                    ShowRecurringWarningErrorAtEnd(loop.Name +
+                    ShowRecurringWarningErrorAtEnd(state, loop.Name +
                                                        "\": The max difference of node temperatures exceeding 1.0e-6  continues...",
                                                    loop.ConveIndex,
                                                    maxDiff,

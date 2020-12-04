@@ -314,7 +314,7 @@ namespace MixedAir {
 
         void SizeOAController(EnergyPlusData &state);
 
-        void UpdateOAController();
+        void UpdateOAController(EnergyPlusData &state);
 
         void Checksetpoints(EnergyPlusData &state,
                             Real64 const OutAirMinFrac,   // Local variable used to calculate min OA fraction
@@ -517,7 +517,7 @@ namespace MixedAir {
     // Beginning Update/Reporting Section of the Module
     //******************************************************************************
 
-    void UpdateOAMixer(int const OAMixerNum);
+    void UpdateOAMixer(EnergyPlusData &state, int const OAMixerNum);
 
     void ReportOAMixer(int const OAMixerNum); // unused1208
 

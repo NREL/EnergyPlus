@@ -60,6 +60,7 @@
 #include <EnergyPlus/DataUCSDSharedData.hh>
 #include <EnergyPlus/DisplacementVentMgr.hh>
 #include <EnergyPlus/HeatBalanceAirManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::DataSurfaces;
@@ -73,21 +74,21 @@ TEST_F(EnergyPlusFixture, DisplacementVentMgr_HcUCSDDV_Door_Test)
 
     // set up all conditions entering the HcUCSDDV for Issue #5533 to cause NAN when a floor door is entered
     // 3 door types are tested: wall, floor and ceiling
-    int NumOfZones = 1;
+    state->dataGlobal->NumOfZones = 1;
     int TotSurfaces = 3;
 
-    IsZoneDV.allocate(NumOfZones);
+    IsZoneDV.allocate(state->dataGlobal->NumOfZones);
     IsZoneDV(1) = true;
     Surface.allocate(TotSurfaces);
     TempEffBulkAir.allocate(TotSurfaces);
     EnergyPlus::DataHeatBalSurface::TempSurfIn.allocate(TotSurfaces);
     DVHcIn.allocate(TotSurfaces);
-    ZTMX.allocate(NumOfZones);
-    ZTOC.allocate(NumOfZones);
+    ZTMX.allocate(state->dataGlobal->NumOfZones);
+    ZTOC.allocate(state->dataGlobal->NumOfZones);
 
     // Surface 1 Vertical wall
     Surface(1).Name = "Class1_Wall_6_0_0_0_0_0_Subsurface";
-    Surface(1).Class = SurfaceClass_Door;
+    Surface(1).Class = SurfaceClass::Door;
     Surface(1).Zone = 1;
     Surface(1).HeatTransSurf = true;
     Surface(1).Construction = 1;
@@ -112,7 +113,7 @@ TEST_F(EnergyPlusFixture, DisplacementVentMgr_HcUCSDDV_Door_Test)
 
     // Surface 2 Door floor
     Surface(2).Name = "Class1_Floor_9_0_8_0_8_0_Subsurface";
-    Surface(2).Class = SurfaceClass_Door;
+    Surface(2).Class = SurfaceClass::Door;
     Surface(2).Zone = 1;
     Surface(2).HeatTransSurf = true;
     Surface(2).Construction = 1;
@@ -139,7 +140,7 @@ TEST_F(EnergyPlusFixture, DisplacementVentMgr_HcUCSDDV_Door_Test)
     Surface(3).Name = "Class1_Ceiling_0_0_9_0_9_0_Subsurface";
     Surface(3).HeatTransSurf = true;
     Surface(3).Zone = 1;
-    Surface(3).Class = SurfaceClass_Door;
+    Surface(3).Class = SurfaceClass::Door;
     Surface(3).Construction = 1;
     Surface(3).BaseSurf = 1;
     Surface(3).Sides = 4;
@@ -160,21 +161,21 @@ TEST_F(EnergyPlusFixture, DisplacementVentMgr_HcUCSDDV_Door_Test)
     Surface(3).Vertex(4).y = -1.48693002;
     Surface(3).Vertex(4).z = 8.5343999852;
 
-    EnergyPlus::DataRoomAirModel::AirModel.allocate(NumOfZones);
+    EnergyPlus::DataRoomAirModel::AirModel.allocate(state->dataGlobal->NumOfZones);
     AirModel(1).AirModelType = RoomAirModel_UCSDDV;
 
     APos_Wall.allocate(TotSurfaces);
     APos_Floor.allocate(TotSurfaces);
     APos_Ceiling.allocate(TotSurfaces);
-    PosZ_Wall.allocate(NumOfZones * 2);
-    PosZ_Floor.allocate(NumOfZones * 2);
-    PosZ_Ceiling.allocate(NumOfZones * 2);
+    PosZ_Wall.allocate(state->dataGlobal->NumOfZones * 2);
+    PosZ_Floor.allocate(state->dataGlobal->NumOfZones * 2);
+    PosZ_Ceiling.allocate(state->dataGlobal->NumOfZones * 2);
     APos_Window.allocate(TotSurfaces);
     APos_Door.allocate(TotSurfaces);
     APos_Internal.allocate(TotSurfaces);
-    PosZ_Window.allocate(NumOfZones * 2);
-    PosZ_Door.allocate(NumOfZones * 2);
-    PosZ_Internal.allocate(NumOfZones * 2);
+    PosZ_Window.allocate(state->dataGlobal->NumOfZones * 2);
+    PosZ_Door.allocate(state->dataGlobal->NumOfZones * 2);
+    PosZ_Internal.allocate(state->dataGlobal->NumOfZones * 2);
     HCeiling.allocate(TotSurfaces);
     HWall.allocate(TotSurfaces);
     HFloor.allocate(TotSurfaces);
@@ -182,7 +183,7 @@ TEST_F(EnergyPlusFixture, DisplacementVentMgr_HcUCSDDV_Door_Test)
     HWindow.allocate(TotSurfaces);
     HDoor.allocate(TotSurfaces);
 
-    ZoneCeilingHeight.allocate(NumOfZones * 2);
+    ZoneCeilingHeight.allocate(state->dataGlobal->NumOfZones * 2);
     ZoneCeilingHeight(1) = 4.9784;
     ZoneCeilingHeight(2) = 4.9784;
 
@@ -212,7 +213,7 @@ TEST_F(EnergyPlusFixture, DisplacementVentMgr_HcUCSDDV_Door_Test)
     HWindow = 0.0;
     HDoor = 0.0;
 
-    EnergyPlus::DataRoomAirModel::ZoneUCSDCV.allocate(NumOfZones);
+    EnergyPlus::DataRoomAirModel::ZoneUCSDCV.allocate(state->dataGlobal->NumOfZones);
     EnergyPlus::DataRoomAirModel::ZoneUCSDCV(1).ZonePtr = 1;
     PosZ_Door(1) = 1;
     PosZ_Door(2) = 3;
@@ -226,7 +227,7 @@ TEST_F(EnergyPlusFixture, DisplacementVentMgr_HcUCSDDV_Door_Test)
     EnergyPlus::DataHeatBalSurface::TempSurfIn(2) = 23.0;
     EnergyPlus::DataHeatBalSurface::TempSurfIn(3) = 23.0;
 
-    HcUCSDDV(state, 1, 0.5);
+    HcUCSDDV(*state, 1, 0.5);
 
     EXPECT_NEAR(1.889346, DVHcIn(1), 0.0001);
     EXPECT_NEAR(1.650496, DVHcIn(2), 0.0001);

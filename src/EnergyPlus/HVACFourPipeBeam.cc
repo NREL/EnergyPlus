@@ -442,7 +442,7 @@ namespace FourPipeBeam {
         } else {
 
             // Fill the Zone Equipment data with the supply air inlet node number of this unit.
-            for (ctrlZone = 1; ctrlZone <= DataGlobals::NumOfZones; ++ctrlZone) {
+            for (ctrlZone = 1; ctrlZone <= state.dataGlobal->NumOfZones; ++ctrlZone) {
                 if (!ZoneEquipConfig(ctrlZone).IsControlled) continue;
                 for (supAirIn = 1; supAirIn <= ZoneEquipConfig(ctrlZone).NumInletNodes; ++supAirIn) {
                     if (thisBeam->airOutNodeNum == ZoneEquipConfig(ctrlZone).InletNode(supAirIn)) {
@@ -513,7 +513,7 @@ namespace FourPipeBeam {
             this->control(state, FirstHVACIteration, NonAirSysOutput);
 
             // Update the current unit's outlet nodes.
-            this->update();
+            this->update(state);
 
             // Fill the report variables.
             this->report(state);
@@ -527,7 +527,6 @@ namespace FourPipeBeam {
 
         // Using
         using DataDefineEquip::AirDistUnit;
-        using DataGlobals::SysSizingCalc;
         using DataLoopNode::Node;
         using DataPlant::PlantLoop;
         using DataPlant::TypeOf_FourPipeBeamAirTerminal;
@@ -586,7 +585,7 @@ namespace FourPipeBeam {
         if (!this->zoneEquipmentListChecked && ZoneEquipInputsFilled) {
             // Check to see if there is a Air Distribution Unit on the Zone Equipment List
             if (this->aDUNum != 0) {
-                if (!CheckZoneEquipmentList("ZONEHVAC:AIRDISTRIBUTIONUNIT", AirDistUnit(this->aDUNum).Name)) {
+                if (!CheckZoneEquipmentList(state, "ZONEHVAC:AIRDISTRIBUTIONUNIT", AirDistUnit(this->aDUNum).Name)) {
                     ShowSevereError(state, routineName + ": ADU=[Air Distribution Unit," + AirDistUnit(this->aDUNum).Name +
                                     "] is not on any ZoneHVAC:EquipmentList.");
                     ShowContinueError(state, "...Unit=[" + this->unitType + ',' + this->name + "] will not be simulated.");
@@ -595,8 +594,8 @@ namespace FourPipeBeam {
             }
         }
 
-        if (!SysSizingCalc && this->mySizeFlag && !this->plantLoopScanFlag) {
-            //	if ( DataGlobals::SysSizingCalc && this->mySizeFlag && ! this->plantLoopScanFlag ) {
+        if (!state.dataGlobal->SysSizingCalc && this->mySizeFlag && !this->plantLoopScanFlag) {
+            //	if ( state.dataGlobal->SysSizingCalc && this->mySizeFlag && ! this->plantLoopScanFlag ) {
             this->airLoopNum = DataZoneEquipment::ZoneEquipConfig(this->zoneIndex).InletNodeAirLoopNum(this->ctrlZoneInNodeIndex);
             AirDistUnit(this->aDUNum).AirLoopNum = this->airLoopNum;
             this->set_size(state);               // calculate autosize values (in any) and convert volume flow rates to mass flow rates
@@ -1076,8 +1075,8 @@ namespace FourPipeBeam {
     }
 
     void HVACFourPipeBeam::control(EnergyPlusData &state,
-                                   bool const EP_UNUSED(FirstHVACIteration), // TRUE if 1st HVAC simulation of system timestep
-                                   Real64 &NonAirSysOutput                   // convective cooling by the beam system [W]
+                                   [[maybe_unused]] bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
+                                   Real64 &NonAirSysOutput                         // convective cooling by the beam system [W]
     )
     {
 
@@ -1330,7 +1329,7 @@ namespace FourPipeBeam {
             // check if non physical temperature rise, can't be warmer than air
             if (this->cWTempOut > (std::max(this->tDBSystemAir, this->tDBZoneAirTemp) - 1.0)) {
                 // throw recurring warning as this indicates a problem in beam model input
-                ShowRecurringWarningErrorAtEnd(routineName + " four pipe beam name " + this->name +
+                ShowRecurringWarningErrorAtEnd(state, routineName + " four pipe beam name " + this->name +
                                                    ", chilled water outlet temperature is too warm. Capacity was limited. check beam capacity input ",
                                                this->cWTempOutErrorCount,
                                                this->cWTempOut,
@@ -1379,7 +1378,7 @@ namespace FourPipeBeam {
             // check if non physical temperature drop, can't be cooler than air
             if (this->hWTempOut < (std::min(this->tDBSystemAir, this->tDBZoneAirTemp) + 1.0)) {
                 // throw recurring warning as this indicates a problem in beam model input
-                ShowRecurringWarningErrorAtEnd(routineName + " four pipe beam name " + this->name +
+                ShowRecurringWarningErrorAtEnd(state, routineName + " four pipe beam name " + this->name +
                                                    ", hot water outlet temperature is too cool. Capacity was limited. check beam capacity input ",
                                                this->hWTempOutErrorCount,
                                                this->hWTempOut,
@@ -1437,10 +1436,9 @@ namespace FourPipeBeam {
 
         return Residuum;
     }
-    void HVACFourPipeBeam::update() const // update node date elsewhere in EnergyPlus, does not change state of this
+    void HVACFourPipeBeam::update(EnergyPlusData &state) const // update node date elsewhere in EnergyPlus, does not change state of this
     {
 
-        using DataContaminantBalance::Contaminant;
         using PlantUtilities::SafeCopyPlantNode;
 
         // Set the outlet air nodes of the unit; note that all quantities are unchanged from inlet to outlet
@@ -1455,11 +1453,11 @@ namespace FourPipeBeam {
         DataLoopNode::Node(this->airOutNodeNum).MassFlowRateMinAvail = DataLoopNode::Node(this->airInNodeNum).MassFlowRateMinAvail;
         DataLoopNode::Node(this->airOutNodeNum).MassFlowRateMaxAvail = DataLoopNode::Node(this->airInNodeNum).MassFlowRateMaxAvail;
 
-        if (Contaminant.CO2Simulation) {
+        if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
             DataLoopNode::Node(this->airOutNodeNum).CO2 = DataLoopNode::Node(this->airInNodeNum).CO2;
         }
 
-        if (Contaminant.GenericContamSimulation) {
+        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
             DataLoopNode::Node(this->airOutNodeNum).GenContam = DataLoopNode::Node(this->airInNodeNum).GenContam;
         }
 

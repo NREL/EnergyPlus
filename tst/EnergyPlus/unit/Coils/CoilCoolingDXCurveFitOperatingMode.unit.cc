@@ -62,7 +62,7 @@ TEST_F( CoilCoolingDXTest, CoilCoolingDXCurveFitModeInput )
 {
     std::string idf_objects = this->getModeObjectString("mode1", 2);
     EXPECT_TRUE(process_idf( idf_objects, false ));
-    CoilCoolingDXCurveFitOperatingMode thisMode(state, "mode1");
+    CoilCoolingDXCurveFitOperatingMode thisMode(*state, "mode1");
     EXPECT_EQ("MODE1", thisMode.name);
     EXPECT_EQ("MODE1SPEED1", thisMode.speeds[0].name);
 }
@@ -114,7 +114,7 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDXCurveFitOperatingMode_Sizing) {
     });
     idf_objects += this->getSpeedObjectString("Coil Cooling DX Curve Fit Speed 1");
     EXPECT_TRUE(process_idf( idf_objects, false ));
-    CoilCoolingDXCurveFitOperatingMode thisMode(state, "Coil Cooling DX Curve Fit Operating Mode 1");
+    CoilCoolingDXCurveFitOperatingMode thisMode(*state, "Coil Cooling DX Curve Fit Operating Mode 1");
     EXPECT_EQ(CoilCoolingDXCurveFitOperatingMode::CondenserType::EVAPCOOLED, thisMode.condenserType);
     EXPECT_EQ(DataSizing::AutoSize, thisMode.ratedEvapAirFlowRate);
     EXPECT_EQ(DataSizing::AutoSize, thisMode.ratedGrossTotalCap);
@@ -146,7 +146,7 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDXCurveFitOperatingMode_Sizing) {
     DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).CoolDesTemp = 15.0;
     DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).CoolDesHumRat = 0.0006;
 
-    thisMode.size(state);
+    thisMode.size(*state);
 
     // We need to commit, so that the ComponentSizes is actually written
     EnergyPlus::sqlite->sqliteCommit();

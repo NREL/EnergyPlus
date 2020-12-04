@@ -50,6 +50,7 @@
 #include <EnergyPlus/StringUtilities.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus;
 
