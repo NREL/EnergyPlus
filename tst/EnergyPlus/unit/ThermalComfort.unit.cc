@@ -89,8 +89,8 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetTest1)
     ZoneSysEnergyDemand.allocate(state->dataGlobal->NumOfZones);
     state->dataThermalComforts->ThermalComfortSetPoint.allocate(state->dataGlobal->NumOfZones);
     TempControlType.allocate(1);
-    AirModel.allocate(state->dataGlobal->NumOfZones);
-    AirModel(1).AirModelType = DataRoomAirModel::RoomAirModel::Mixing;
+    state->dataRoomAirMod->AirModel.allocate(state->dataGlobal->NumOfZones);
+    state->dataRoomAirMod->AirModel(1).AirModelType = DataRoomAirModel::RoomAirModel::Mixing;
     ZTAV.allocate(state->dataGlobal->NumOfZones);
     ZoneThermostatSetPointLo.allocate(state->dataGlobal->NumOfZones);
     ZoneThermostatSetPointHi.allocate(state->dataGlobal->NumOfZones);
@@ -890,8 +890,8 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetWithCutoutTest)
     ZoneSysEnergyDemand.allocate(state->dataGlobal->NumOfZones);
     state->dataThermalComforts->ThermalComfortSetPoint.allocate(state->dataGlobal->NumOfZones);
     TempControlType.allocate(1);
-    AirModel.allocate(state->dataGlobal->NumOfZones);
-    AirModel(1).AirModelType = DataRoomAirModel::RoomAirModel::Mixing;
+    state->dataRoomAirMod->AirModel.allocate(state->dataGlobal->NumOfZones);
+    state->dataRoomAirMod->AirModel(1).AirModelType = DataRoomAirModel::RoomAirModel::Mixing;
     ZTAV.allocate(state->dataGlobal->NumOfZones);
     ZoneThermostatSetPointLo.allocate(state->dataGlobal->NumOfZones);
     ZoneThermostatSetPointHi.allocate(state->dataGlobal->NumOfZones);
@@ -954,8 +954,8 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortPierceSET)
     ZTAVComf.allocate(state->dataGlobal->NumOfZones);
     MRT.allocate(state->dataGlobal->NumOfZones);
     ZoneAirHumRatAvgComf.allocate(state->dataGlobal->NumOfZones);
-    IsZoneDV.allocate(state->dataGlobal->NumOfZones);
-    IsZoneUI.allocate(state->dataGlobal->NumOfZones);
+    state->dataRoomAirMod->IsZoneDV.allocate(state->dataGlobal->NumOfZones);
+    state->dataRoomAirMod->IsZoneUI.allocate(state->dataGlobal->NumOfZones);
     QHTRadSysToPerson.allocate(state->dataGlobal->NumOfZones);
     QCoolingPanelToPerson.allocate(state->dataGlobal->NumOfZones);
     QHWBaseboardToPerson.allocate(state->dataGlobal->NumOfZones);
@@ -985,7 +985,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortPierceSET)
     MRT(1) = 26.0;
     ZoneAirHumRatAvgComf(1) = 0.00529; // 0.002 to 0.006
     state->dataEnvrn->OutBaroPress = 101217.;
-    IsZoneDV(1) = IsZoneUI(1) = false;
+    state->dataRoomAirMod->IsZoneDV(1) = state->dataRoomAirMod->IsZoneUI(1) = false;
     QHTRadSysToPerson(1) = 0.0;
     QCoolingPanelToPerson(1) = 0.0;
     QHWBaseboardToPerson(1) = 0.0;
