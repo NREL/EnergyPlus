@@ -1096,6 +1096,13 @@ namespace WaterCoils {
                     "System",
                     "Average",
                    state.dataWaterCoils->WaterCoil(CoilNum).Name);
+            SetupOutputVariable(state,
+                                "Liquid Desiccant Coil Water Loss Rate",
+                                OutputProcessor::Unit::kgWater_s,
+                                state.dataWaterCoils->WaterCoil(CoilNum).DesiccantWaterLoss,
+                                "System",
+                                "Average",
+                                state.dataWaterCoils->WaterCoil(CoilNum).Name);
             //    SetupOutputVariable("Cooling Coil Wetted Area Fraction",
             //       OutputProcessor::Unit::None,
             //        state.dataWaterCoils->WaterCoil(CoilNum).SurfAreaWetFraction,
@@ -2603,6 +2610,8 @@ namespace WaterCoils {
         Real64 DesCoilExitTemp = 0.0;
         Real64 CpAirStd = PsyCpAirFnW(0.0);
         std::string CompName = state.dataWaterCoils->WaterCoil(CoilNum).Name;
+
+        if(state.dataWaterCoils->WaterCoil(CoilNum).IsInPlantLoop == false) return; 
 
         // cooling coils
         if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType == state.dataWaterCoils->CoilType_Cooling && state.dataWaterCoils->WaterCoil(CoilNum).RequestingAutoSize) {
@@ -4429,7 +4438,8 @@ namespace WaterCoils {
         if (state.dataWaterCoils->WaterCoil(CoilNum).LiqDesiccantAirSource == state.dataWaterCoils->ZoneAirSource) { // Zone air source
 
                 // If Coil is Scheduled ON then do the simulation
-            if (((PartLoadRatio > 0.0) && (GetCurrentScheduleValue(state, state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr) > 0.0) &&
+            if (((state.dataWaterCoils->WaterCoil(CoilNum).ExtOn == true) && (PartLoadRatio > 0.0) &&
+                 (GetCurrentScheduleValue(state, state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr) > 0.0) &&
                      (state.dataWaterCoils->WaterCoil(CoilNum).InletWaterMassFlowRate > 0.0) &&
                      (state.dataWaterCoils->WaterCoil(CoilNum).InletAirMassFlowRate >= state.dataWaterCoils->MinAirMassFlow) &&
                      (state.dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate > 0.0) &&
@@ -4487,8 +4497,8 @@ namespace WaterCoils {
                         state.dataWaterCoils->WaterCoil(CoilNum).OutletWaterTemp = OutletSolnTemp;
                         // Report output results if the coil was operating
 
-                        state.dataWaterCoils->WaterCoil(CoilNum).TotWaterCoolingCoilRate = TotWaterCoilLoad;
-                        state.dataWaterCoils->WaterCoil(CoilNum).SenWaterCoolingCoilRate = SenWaterCoilLoad;
+                        state.dataWaterCoils->WaterCoil(CoilNum).TotWaterCoolingCoilRate = -1.0 * TotWaterCoilLoad;
+                        state.dataWaterCoils->WaterCoil(CoilNum).SenWaterCoolingCoilRate = -1.0 * SenWaterCoilLoad;
                         // state.dataWaterCoils->WaterCoil(CoilNum).SurfAreaWetFraction = SurfAreaWetFraction;
                         // state.dataWaterCoils->WaterCoil(CoilNum).OutletWaterEnthalpy = state.dataWaterCoils->WaterCoil(CoilNum)%InletWaterEnthalpy+ &
                         //                                state.dataWaterCoils->WaterCoil(CoilNum)%TotWaterCoolingCoilRate/state.dataWaterCoils->WaterCoil(CoilNum)%InletWaterMassFlowRate
@@ -4503,6 +4513,9 @@ namespace WaterCoils {
                         state.dataWaterCoils->WaterCoil(CoilNum).OutletWaterEnthalpy = state.dataWaterCoils->WaterCoil(CoilNum).InletWaterEnthalpy;
                         state.dataWaterCoils->WaterCoil(CoilNum).TotWaterCoolingCoilEnergy = 0.0;
                         state.dataWaterCoils->WaterCoil(CoilNum).SenWaterCoolingCoilEnergy = 0.0;
+                        state.dataWaterCoils->WaterCoil(CoilNum).TotWaterCoolingCoilRate = 0.0;
+                        state.dataWaterCoils->WaterCoil(CoilNum).SenWaterCoolingCoilRate = 0.0;
+                        state.dataWaterCoils->WaterCoil(CoilNum).DesiccantWaterLoss = 0.0; 
 
                     } // end  if (((state.dataWaterCoils->WaterCoil(CoilNum).LiqDesiccantOptMode == DehumidificationMode)...
 
@@ -4514,6 +4527,9 @@ namespace WaterCoils {
                     state.dataWaterCoils->WaterCoil(CoilNum).OutletWaterEnthalpy = state.dataWaterCoils->WaterCoil(CoilNum).InletWaterEnthalpy;
                     state.dataWaterCoils->WaterCoil(CoilNum).TotWaterCoolingCoilEnergy = 0.0;
                     state.dataWaterCoils->WaterCoil(CoilNum).SenWaterCoolingCoilEnergy = 0.0;
+                    state.dataWaterCoils->WaterCoil(CoilNum).DesiccantWaterLoss = 0.0;
+                    state.dataWaterCoils->WaterCoil(CoilNum).TotWaterCoolingCoilRate = 0.0;
+                    state.dataWaterCoils->WaterCoil(CoilNum).SenWaterCoolingCoilRate = 0.0;
                     // state.dataWaterCoils->WaterCoil(CoilNum).SurfAreaWetFraction = 0.0;
 
                 }                                                                    // End of the Flow or No flow If block
@@ -4525,7 +4541,8 @@ namespace WaterCoils {
             else // outdoor air source "OutdoorAirSource"
             {
                 // If Coil is Scheduled ON then do the simulation
-                if (((PartLoadRatio > 0.0) && (GetCurrentScheduleValue(state, state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr) > 0.0) &&
+                if (((state.dataWaterCoils->WaterCoil(CoilNum).ExtOn == true) && (PartLoadRatio > 0.0) &&
+                     (GetCurrentScheduleValue(state, state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr) > 0.0) &&
                      (state.dataWaterCoils->WaterCoil(CoilNum).InletWaterMassFlowRate > 0.0) &&
                      (state.dataWaterCoils->WaterCoil(CoilNum).InletAirMassFlowRate >= state.dataWaterCoils->MinAirMassFlow) &&
                      (state.dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate > 0.0) &&
@@ -4583,8 +4600,8 @@ namespace WaterCoils {
                         state.dataWaterCoils->WaterCoil(CoilNum).OutletWaterTemp = OutletSolnTemp;
                         // Report output results if the coil was operating
 
-                        state.dataWaterCoils->WaterCoil(CoilNum).TotWaterCoolingCoilRate = TotWaterCoilLoad;
-                        state.dataWaterCoils->WaterCoil(CoilNum).SenWaterCoolingCoilRate = SenWaterCoilLoad;
+                        state.dataWaterCoils->WaterCoil(CoilNum).TotWaterCoolingCoilRate = -1.0 * TotWaterCoilLoad;
+                        state.dataWaterCoils->WaterCoil(CoilNum).SenWaterCoolingCoilRate = -1.0 * SenWaterCoilLoad;
                         // state.dataWaterCoils->WaterCoil(CoilNum).SurfAreaWetFraction = SurfAreaWetFraction;
                         // state.dataWaterCoils->WaterCoil(CoilNum).OutletWaterEnthalpy = state.dataWaterCoils->WaterCoil(CoilNum)%InletWaterEnthalpy+ &
                         //                                state.dataWaterCoils->WaterCoil(CoilNum)%TotWaterCoolingCoilRate/state.dataWaterCoils->WaterCoil(CoilNum)%InletWaterMassFlowRate
@@ -4599,6 +4616,9 @@ namespace WaterCoils {
                         state.dataWaterCoils->WaterCoil(CoilNum).OutletWaterEnthalpy = state.dataWaterCoils->WaterCoil(CoilNum).InletWaterEnthalpy;
                         state.dataWaterCoils->WaterCoil(CoilNum).TotWaterCoolingCoilEnergy = 0.0;
                         state.dataWaterCoils->WaterCoil(CoilNum).SenWaterCoolingCoilEnergy = 0.0;
+                        state.dataWaterCoils->WaterCoil(CoilNum).TotWaterCoolingCoilRate = 0.0;
+                        state.dataWaterCoils->WaterCoil(CoilNum).SenWaterCoolingCoilRate = 0.0;
+                        state.dataWaterCoils->WaterCoil(CoilNum).DesiccantWaterLoss = 0.0;
 
                     } // end  if (((state.dataWaterCoils->WaterCoil(CoilNum).LiqDesiccantOptMode == DehumidificationMode)...
 
@@ -4610,6 +4630,9 @@ namespace WaterCoils {
                     state.dataWaterCoils->WaterCoil(CoilNum).OutletWaterEnthalpy = state.dataWaterCoils->WaterCoil(CoilNum).InletWaterEnthalpy;
                     state.dataWaterCoils->WaterCoil(CoilNum).TotWaterCoolingCoilEnergy = 0.0;
                     state.dataWaterCoils->WaterCoil(CoilNum).SenWaterCoolingCoilEnergy = 0.0;
+                    state.dataWaterCoils->WaterCoil(CoilNum).DesiccantWaterLoss = 0.0;
+                    state.dataWaterCoils->WaterCoil(CoilNum).TotWaterCoolingCoilRate = 0.0;
+                    state.dataWaterCoils->WaterCoil(CoilNum).SenWaterCoolingCoilRate = 0.0;
                     // state.dataWaterCoils->WaterCoil(CoilNum).SurfAreaWetFraction = 0.0;
 
                 }                                                                    // End of the Flow or No flow If block
