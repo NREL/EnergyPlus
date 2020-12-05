@@ -204,30 +204,6 @@ namespace DataRuntimeLanguage {
 
     int const NumPossibleOperators(96); // total number of operators and built-in functions
 
-    //######################################################################################################################################
-    // code for ExternalInterface
-    int NumExternalInterfaceGlobalVariables(0);                           // count of ExternalInterface runtime variable
-    int NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables(0); // count of ExternalInterface runtime variable for FMUImport
-    // will be updated with values from ExternalInterface
-    int NumExternalInterfaceFunctionalMockupUnitExportGlobalVariables(0); // count of ExternalInterface runtime variable for FMUExport
-    // will be updated with values from ExternalInterface
-    int NumExternalInterfaceActuatorsUsed(0);                           // count of ExternalInterface Actuators
-    int NumExternalInterfaceFunctionalMockupUnitImportActuatorsUsed(0); // count of ExternalInterface Actuators for FMUImport
-    int NumExternalInterfaceFunctionalMockupUnitExportActuatorsUsed(0); // count of ExternalInterface Actuators for FMUExport
-
-    //######################################################################################################################################
-
-    bool OutputEDDFile(false);               // set to true if user requests EDD output file be written
-    bool OutputFullEMSTrace(false);          // how much to write out to trace, if true do verbose for each line
-    bool OutputEMSErrors(false);             // how much to write out to trace, if true include Erl error messages
-    bool OutputEMSActuatorAvailFull(false);  // how much to write out to EDD file, if true dump full combinatorial actuator list
-    bool OutputEMSActuatorAvailSmall(false); // how much to write out to EDD file, if true dump actuator list without key names
-    bool OutputEMSInternalVarsFull(false);   // how much to write out to EDD file, if true dump full combinatorial internal list
-    bool OutputEMSInternalVarsSmall(false);  // how much to write out to EDD file, if true dump internal list without key names
-
-    Array2D_bool EMSConstructActuatorChecked;
-    Array2D_bool EMSConstructActuatorIsOkay;
-
     // Object Data
     Array1D<ErlVariableType> ErlVariable;                        // holds Erl variables in a structure array
     Array1D<ErlStackType> ErlStack;                              // holds Erl programs in separate "stacks"
@@ -250,21 +226,6 @@ namespace DataRuntimeLanguage {
     // Functions
     void clear_state()
     {
-        NumExternalInterfaceGlobalVariables = 0;
-        NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables = 0;
-        NumExternalInterfaceFunctionalMockupUnitExportGlobalVariables = 0;
-        NumExternalInterfaceActuatorsUsed = 0;
-        NumExternalInterfaceFunctionalMockupUnitImportActuatorsUsed = 0;
-        NumExternalInterfaceFunctionalMockupUnitExportActuatorsUsed = 0;
-        OutputEDDFile = false;
-        OutputFullEMSTrace = false;
-        OutputEMSErrors = false;
-        OutputEMSActuatorAvailFull = false;
-        OutputEMSActuatorAvailSmall = false;
-        OutputEMSInternalVarsFull = false;
-        OutputEMSInternalVarsSmall = false;
-        EMSConstructActuatorChecked.deallocate();
-        EMSConstructActuatorIsOkay.deallocate();
         ErlVariable.deallocate();              // holds Erl variables in a structure array
         ErlStack.deallocate();                 // holds Erl programs in separate "stacks"
         ErlExpression.deallocate();            // holds Erl expressions in structure array

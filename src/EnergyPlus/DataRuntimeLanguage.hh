@@ -207,30 +207,6 @@ namespace DataRuntimeLanguage {
 
     extern int const NumPossibleOperators; // total number of operators and built-in functions
 
-    //######################################################################################################################################
-    // code for ExternalInterface
-    extern int NumExternalInterfaceGlobalVariables;                           // count of ExternalInterface runtime variable
-    extern int NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables; // count of ExternalInterface runtime variable for FMUImport
-    // will be updated with values from ExternalInterface
-    extern int NumExternalInterfaceFunctionalMockupUnitExportGlobalVariables; // count of ExternalInterface runtime variable for FMUExport
-    // will be updated with values from ExternalInterface
-    extern int NumExternalInterfaceActuatorsUsed;                           // count of ExternalInterface Actuators
-    extern int NumExternalInterfaceFunctionalMockupUnitImportActuatorsUsed; // count of ExternalInterface Actuators for FMUImport
-    extern int NumExternalInterfaceFunctionalMockupUnitExportActuatorsUsed; // count of ExternalInterface Actuators for FMUExport
-
-    //######################################################################################################################################
-
-    extern bool OutputEDDFile;               // set to true if user requests EDD output file be written
-    extern bool OutputFullEMSTrace;          // how much to write out to trace, if true do verbose for each line
-    extern bool OutputEMSErrors;             // how much to write out to trace, if true include Erl error messages
-    extern bool OutputEMSActuatorAvailFull;  // how much to write out to EDD file, if true dump full combinatorial actuator list
-    extern bool OutputEMSActuatorAvailSmall; // how much to write out to EDD file, if true dump actuator list without key names
-    extern bool OutputEMSInternalVarsFull;   // how much to write out to EDD file, if true dump full combinatorial internal list
-    extern bool OutputEMSInternalVarsSmall;  // how much to write out to EDD file, if true dump internal list without key names
-
-    extern Array2D_bool EMSConstructActuatorChecked;
-    extern Array2D_bool EMSConstructActuatorIsOkay;
-
     // Types
 
     struct OutputVarSensorType
@@ -551,6 +527,30 @@ struct RuntimeLanguageData : BaseGlobalStruct {
     int NumEMSCurveIndices = 0;                     // count of EMS curve index variables in model
     int NumEMSConstructionIndices = 0;              // count of EMS construction index variables in model
 
+    //######################################################################################################################################
+    // code for ExternalInterface
+    int NumExternalInterfaceGlobalVariables = 0;                           // count of ExternalInterface runtime variable
+    int NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables = 0; // count of ExternalInterface runtime variable for FMUImport
+    // will be updated with values from ExternalInterface
+    int NumExternalInterfaceFunctionalMockupUnitExportGlobalVariables = 0; // count of ExternalInterface runtime variable for FMUExport
+    // will be updated with values from ExternalInterface
+    int NumExternalInterfaceActuatorsUsed = 0;                           // count of ExternalInterface Actuators
+    int NumExternalInterfaceFunctionalMockupUnitImportActuatorsUsed = 0; // count of ExternalInterface Actuators for FMUImport
+    int NumExternalInterfaceFunctionalMockupUnitExportActuatorsUsed = 0; // count of ExternalInterface Actuators for FMUExport
+
+    //######################################################################################################################################
+
+    bool OutputEDDFile = false;                     // set to true if user requests EDD output file be written
+    bool OutputFullEMSTrace = false;                // how much to write out to trace, if true do verbose for each line
+    bool OutputEMSErrors = false;                   // how much to write out to trace, if true include Erl error messages
+    bool OutputEMSActuatorAvailFull = false;        // how much to write out to EDD file, if true dump full combinatorial actuator list
+    bool OutputEMSActuatorAvailSmall = false;       // how much to write out to EDD file, if true dump actuator list without key names
+    bool OutputEMSInternalVarsFull = false;         // how much to write out to EDD file, if true dump full combinatorial internal list
+    bool OutputEMSInternalVarsSmall = false;        // how much to write out to EDD file, if true dump internal list without key names
+
+    Array2D_bool EMSConstructActuatorChecked;
+    Array2D_bool EMSConstructActuatorIsOkay;
+
     void clear_state() override
     {
         this->NumProgramCallManagers = 0;
@@ -573,6 +573,21 @@ struct RuntimeLanguageData : BaseGlobalStruct {
         this->NumErlTrendVariables = 0;
         this->NumEMSCurveIndices = 0;
         this->NumEMSConstructionIndices = 0;
+        this->NumExternalInterfaceGlobalVariables = 0;
+        this->NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables = 0;
+        this->NumExternalInterfaceFunctionalMockupUnitExportGlobalVariables = 0;
+        this->NumExternalInterfaceActuatorsUsed = 0;
+        this->NumExternalInterfaceFunctionalMockupUnitImportActuatorsUsed = 0;
+        this->NumExternalInterfaceFunctionalMockupUnitExportActuatorsUsed = 0;
+        this->OutputEDDFile = false;
+        this->OutputFullEMSTrace = false;
+        this->OutputEMSErrors = false;
+        this->OutputEMSActuatorAvailFull = false;
+        this->OutputEMSActuatorAvailSmall = false;
+        this->OutputEMSInternalVarsFull = false;
+        this->OutputEMSInternalVarsSmall = false;
+        this->EMSConstructActuatorChecked.deallocate();
+        this->EMSConstructActuatorIsOkay.deallocate();
     }
 };
 

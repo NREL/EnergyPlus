@@ -425,7 +425,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
             }
         }
         // reinitialize state of actuators
-        for (ActuatorUsedLoop = 1; ActuatorUsedLoop <= state.dataRuntimeLang->numActuatorsUsed + NumExternalInterfaceActuatorsUsed; ++ActuatorUsedLoop) {
+        for (ActuatorUsedLoop = 1; ActuatorUsedLoop <= state.dataRuntimeLang->numActuatorsUsed + state.dataRuntimeLang->NumExternalInterfaceActuatorsUsed; ++ActuatorUsedLoop) {
             EMSActuatorVariableNum = EMSActuatorUsed(ActuatorUsedLoop).ActuatorVariableNum;
             ErlVariableNum = EMSActuatorUsed(ActuatorUsedLoop).ErlVariableNum;
             ErlVariable(ErlVariableNum).Value.Type = ValueNull;
@@ -1048,9 +1048,9 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
         std::string DuringWarmup;
 
         // FLOW:
-        if ((!OutputFullEMSTrace) && (!OutputEMSErrors) && (!seriousErrorFound)) return;
+        if ((!state.dataRuntimeLang->OutputFullEMSTrace) && (!state.dataRuntimeLang->OutputEMSErrors) && (!seriousErrorFound)) return;
 
-        if ((OutputEMSErrors) && (!OutputFullEMSTrace) && (!seriousErrorFound)) {
+        if ((state.dataRuntimeLang->OutputEMSErrors) && (!state.dataRuntimeLang->OutputFullEMSTrace) && (!seriousErrorFound)) {
             // see if error needs to be reported.
             if (ReturnValue.Type != ValueError) return;
         }
@@ -1084,7 +1084,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
         }
         TimeString = DuringWarmup + state.dataEnvrn->EnvironmentName + ", " + state.dataEnvrn->CurMnDy + ' ' + CreateSysTimeIntervalString(state);
 
-        if (OutputFullEMSTrace || (OutputEMSErrors && (ReturnValue.Type == ValueError))) {
+        if (state.dataRuntimeLang->OutputFullEMSTrace || (state.dataRuntimeLang->OutputEMSErrors && (ReturnValue.Type == ValueError))) {
             print(state.files.edd, "{},Line {},{},{},{}\n", NameString, LineNumString, LineString, cValueString, TimeString);
         }
 
@@ -2736,12 +2736,12 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
 
             cCurrentModuleObject = "EnergyManagementSystem:GlobalVariable";
 
-            if (state.dataRuntimeLang->NumUserGlobalVariables + NumExternalInterfaceGlobalVariables + NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables +
-                    NumExternalInterfaceFunctionalMockupUnitExportGlobalVariables >
+            if (state.dataRuntimeLang->NumUserGlobalVariables + state.dataRuntimeLang->NumExternalInterfaceGlobalVariables + state.dataRuntimeLang->NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables +
+                    state.dataRuntimeLang->NumExternalInterfaceFunctionalMockupUnitExportGlobalVariables >
                 0) {
-                for (GlobalNum = 1; GlobalNum <= state.dataRuntimeLang->NumUserGlobalVariables + NumExternalInterfaceGlobalVariables +
-                                                     NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables +
-                                                     NumExternalInterfaceFunctionalMockupUnitExportGlobalVariables;
+                for (GlobalNum = 1; GlobalNum <= state.dataRuntimeLang->NumUserGlobalVariables + state.dataRuntimeLang->NumExternalInterfaceGlobalVariables +
+                                                     state.dataRuntimeLang->NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables +
+                                                     state.dataRuntimeLang->NumExternalInterfaceFunctionalMockupUnitExportGlobalVariables;
                      ++GlobalNum) {
                     // If we process the ExternalInterface actuators, all we need to do is to change the
                     // name of the module object, and add an offset for the variable number
@@ -2759,7 +2759,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                                                       lAlphaFieldBlanks,
                                                       cAlphaFieldNames,
                                                       cNumericFieldNames);
-                    } else if (GlobalNum > state.dataRuntimeLang->NumUserGlobalVariables && GlobalNum <= state.dataRuntimeLang->NumUserGlobalVariables + NumExternalInterfaceGlobalVariables) {
+                    } else if (GlobalNum > state.dataRuntimeLang->NumUserGlobalVariables && GlobalNum <= state.dataRuntimeLang->NumUserGlobalVariables + state.dataRuntimeLang->NumExternalInterfaceGlobalVariables) {
                         cCurrentModuleObject = "ExternalInterface:Variable";
                         inputProcessor->getObjectItem(state,
                                                       cCurrentModuleObject,
@@ -2773,13 +2773,13 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                                                       lAlphaFieldBlanks,
                                                       cAlphaFieldNames,
                                                       cNumericFieldNames);
-                    } else if (GlobalNum > state.dataRuntimeLang->NumUserGlobalVariables + NumExternalInterfaceGlobalVariables &&
-                               GlobalNum <= state.dataRuntimeLang->NumUserGlobalVariables + NumExternalInterfaceGlobalVariables +
-                                                NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables) {
+                    } else if (GlobalNum > state.dataRuntimeLang->NumUserGlobalVariables + state.dataRuntimeLang->NumExternalInterfaceGlobalVariables &&
+                               GlobalNum <= state.dataRuntimeLang->NumUserGlobalVariables + state.dataRuntimeLang->NumExternalInterfaceGlobalVariables +
+                                                state.dataRuntimeLang->NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables) {
                         cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Variable";
                         inputProcessor->getObjectItem(state,
                                                       cCurrentModuleObject,
-                                                      GlobalNum - state.dataRuntimeLang->NumUserGlobalVariables - NumExternalInterfaceGlobalVariables,
+                                                      GlobalNum - state.dataRuntimeLang->NumUserGlobalVariables - state.dataRuntimeLang->NumExternalInterfaceGlobalVariables,
                                                       cAlphaArgs,
                                                       NumAlphas,
                                                       rNumericArgs,
@@ -2790,16 +2790,16 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                                                       cAlphaFieldNames,
                                                       cNumericFieldNames);
 
-                    } else if (GlobalNum > state.dataRuntimeLang->NumUserGlobalVariables + NumExternalInterfaceGlobalVariables +
-                                               NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables &&
-                               GlobalNum <= state.dataRuntimeLang->NumUserGlobalVariables + NumExternalInterfaceGlobalVariables +
-                                                NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables +
-                                                NumExternalInterfaceFunctionalMockupUnitExportGlobalVariables) {
+                    } else if (GlobalNum > state.dataRuntimeLang->NumUserGlobalVariables + state.dataRuntimeLang->NumExternalInterfaceGlobalVariables +
+                                               state.dataRuntimeLang->NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables &&
+                               GlobalNum <= state.dataRuntimeLang->NumUserGlobalVariables + state.dataRuntimeLang->NumExternalInterfaceGlobalVariables +
+                                                state.dataRuntimeLang->NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables +
+                                                state.dataRuntimeLang->NumExternalInterfaceFunctionalMockupUnitExportGlobalVariables) {
                         cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitExport:To:Variable";
                         inputProcessor->getObjectItem(state,
                                                       cCurrentModuleObject,
-                                                      GlobalNum - state.dataRuntimeLang->NumUserGlobalVariables - NumExternalInterfaceGlobalVariables -
-                                                          NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables,
+                                                      GlobalNum - state.dataRuntimeLang->NumUserGlobalVariables - state.dataRuntimeLang->NumExternalInterfaceGlobalVariables -
+                                                          state.dataRuntimeLang->NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables,
                                                       cAlphaArgs,
                                                       NumAlphas,
                                                       rNumericArgs,
