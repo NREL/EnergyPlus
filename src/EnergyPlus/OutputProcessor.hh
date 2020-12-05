@@ -99,7 +99,6 @@ namespace OutputProcessor {
     extern int const MeterType_CustomDiff; // Type value for custom meters that difference another meter
 
     extern Array1D_string const DayTypes;
-    extern int const UnitsStringLength;
 
     extern int const RVarAllocInc;
     extern int const LVarAllocInc;

@@ -90,21 +90,21 @@ namespace RoomAirModelUserTempPattern {
 
     void InitTempDistModel(EnergyPlusData &state, int const ZoneNum); // index number for the specified zone
 
-    void GetSurfHBDataForTempDistModel(int const ZoneNum); // index number for the specified zone
+    void GetSurfHBDataForTempDistModel(EnergyPlusData &state, int const ZoneNum); // index number for the specified zone
 
     //*****************************************************************************************
 
     void CalcTempDistModel(EnergyPlusData &state, int const ZoneNum); // index number for the specified zone
 
-    void FigureSurfMapPattern(int const PattrnID, int const ZoneNum);
+    void FigureSurfMapPattern(EnergyPlusData &state, int const PattrnID, int const ZoneNum);
 
-    void FigureHeightPattern(int const PattrnID, int const ZoneNum);
+    void FigureHeightPattern(EnergyPlusData &state, int const PattrnID, int const ZoneNum);
 
     void FigureTwoGradInterpPattern(EnergyPlusData &state, int const PattrnID, int const ZoneNum);
 
     Real64 OutdoorDryBulbGrad(Real64 DryBulbTemp, Real64 UpperBound, Real64 HiGradient, Real64 LowerBound, Real64 LowGradient);
 
-    void FigureConstGradPattern(int const PattrnID, int const ZoneNum);
+    void FigureConstGradPattern(EnergyPlusData &state, int const PattrnID, int const ZoneNum);
 
     //*****************************************************************************************
 

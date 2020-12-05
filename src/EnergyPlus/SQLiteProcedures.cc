@@ -191,7 +191,7 @@ void CreateSQLiteZoneExtendedOutput(EnergyPlusData &state)
             sqlite->addVentilationData(ventNum, DataHeatBalance::Ventilation(ventNum));
         }
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-            sqlite->addRoomAirModelData(zoneNum, DataRoomAirModel::AirModel(zoneNum));
+            sqlite->addRoomAirModelData(zoneNum, state.dataRoomAirMod->AirModel(zoneNum));
         }
 
         sqlite->createZoneExtendedOutput();

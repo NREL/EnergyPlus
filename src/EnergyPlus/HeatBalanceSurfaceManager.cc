@@ -346,34 +346,15 @@ namespace HeatBalanceSurfaceManager {
         // METHODOLOGY EMPLOYED:
         // Uses the status flags to trigger record keeping events.
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataDElight::LUX2FC;
         using namespace SolarShading;
         using ConvectionCoefficients::InitInteriorConvectionCoeffs;
         using DataLoopNode::Node;
-        using DataRoomAirModel::IsZoneCV;
-        using DataRoomAirModel::IsZoneDV;
-        using DataRoomAirModel::IsZoneUI;
         using HeatBalanceIntRadExchange::CalcInteriorRadExchange;
         using HeatBalFiniteDiffManager::InitHeatBalFiniteDiff;
         using InternalHeatGains::ManageInternalHeatGains;
-        // RJH DElight Modification Begin
         using namespace DElightManagerF;
-        // RJH DElight Modification End
-
-        // Locals
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FLOW:
 
         assert(equal_dimensions(TH, QH));
 
@@ -469,9 +450,9 @@ namespace HeatBalanceSurfaceManager {
         if (state.dataGlobal->BeginSimFlag) {
             AllocateSurfaceHeatBalArrays(state); // Allocate the Module Arrays before any inits take place
             InterZoneWindow = std::any_of(Zone.begin(), Zone.end(), [](DataHeatBalance::ZoneData const &e) { return e.HasInterZoneWindow; });
-            IsZoneDV.dimension(state.dataGlobal->NumOfZones, false);
-            IsZoneCV.dimension(state.dataGlobal->NumOfZones, false);
-            IsZoneUI.dimension(state.dataGlobal->NumOfZones, false);
+            state.dataRoomAirMod->IsZoneDV.dimension(state.dataGlobal->NumOfZones, false);
+            state.dataRoomAirMod->IsZoneCV.dimension(state.dataGlobal->NumOfZones, false);
+            state.dataRoomAirMod->IsZoneUI.dimension(state.dataGlobal->NumOfZones, false);
         }
 
         // Do the Begin Environment initializations
@@ -632,7 +613,7 @@ namespace HeatBalanceSurfaceManager {
                     if (elOpened) {
                         iDElightErrorFile.close();
                         FileSystem::removeFile(iDElightErrorFile.fileName);
-                    };
+                    }
                     // If any DElight Error occurred then ShowFatalError to terminate
                     if (iErrorFlag > 0) {
                         ShowFatalError(state, "End of DElight Error Messages");

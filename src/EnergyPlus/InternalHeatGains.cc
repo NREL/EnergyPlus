@@ -5259,9 +5259,6 @@ namespace InternalHeatGains {
         using DataHeatBalFanSys::SumConvHTRadSys;
         using DataHeatBalFanSys::ZoneLatentGain;
         using DataHeatBalFanSys::ZoneLatentGainExceptPeople;
-        using DataRoomAirModel::IsZoneDV;
-        using DataRoomAirModel::IsZoneUI;
-        using DataRoomAirModel::TCMF;
         using DataSizing::CurOverallSimDay;
         using DataZoneEquipment::ZoneEquipConfig;
         using DaylightingDevices::FigureTDDZoneGains;
@@ -5388,7 +5385,7 @@ namespace InternalHeatGains {
                 TotalPeopleGain = NumberOccupants * ActivityLevel_WperPerson;
                 // if the user did not specify a sensible fraction, calculate the sensible heat gain
                 if (People(Loop).UserSpecSensFrac == DataGlobalConstants::AutoCalculate) {
-                    if (!(IsZoneDV(NZ) || IsZoneUI(NZ))) {
+                    if (!(state.dataRoomAirMod->IsZoneDV(NZ) || state.dataRoomAirMod->IsZoneUI(NZ))) {
                         SensiblePeopleGain =
                             NumberOccupants * (C(1) + ActivityLevel_WperPerson * (C(2) + ActivityLevel_WperPerson * C(3)) +
                                                MAT(NZ) * ((C(4) + ActivityLevel_WperPerson * (C(5) + ActivityLevel_WperPerson * C(6))) +
@@ -5396,8 +5393,8 @@ namespace InternalHeatGains {
                     } else { // UCSD - DV or UI
                         SensiblePeopleGain =
                             NumberOccupants * (C(1) + ActivityLevel_WperPerson * (C(2) + ActivityLevel_WperPerson * C(3)) +
-                                               TCMF(NZ) * ((C(4) + ActivityLevel_WperPerson * (C(5) + ActivityLevel_WperPerson * C(6))) +
-                                                           TCMF(NZ) * (C(7) + ActivityLevel_WperPerson * (C(8) + ActivityLevel_WperPerson * C(9)))));
+                                    state.dataRoomAirMod->TCMF(NZ) * ((C(4) + ActivityLevel_WperPerson * (C(5) + ActivityLevel_WperPerson * C(6))) +
+                                            state.dataRoomAirMod->TCMF(NZ) * (C(7) + ActivityLevel_WperPerson * (C(8) + ActivityLevel_WperPerson * C(9)))));
                     }
                 } else { // if the user did specify a sensible fraction, use it
                     SensiblePeopleGain = TotalPeopleGain * People(Loop).UserSpecSensFrac;
@@ -5747,9 +5744,6 @@ namespace InternalHeatGains {
         using DataHVACGlobals::SmallAirVolFlow;
         using DataHVACGlobals::SmallTempDiff;
         using DataLoopNode::Node;
-        using DataRoomAirModel::IsZoneDV;
-        using DataRoomAirModel::IsZoneUI;
-        using DataRoomAirModel::TCMF;
 
         // Operating Limits for environmental class: None, A1, A2, A3, A4, B, C
         // From ASHRAE 2011 Thermal Guidelines environmental classes for Air-Cooled ITE
