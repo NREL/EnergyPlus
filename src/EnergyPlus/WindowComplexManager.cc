@@ -98,13 +98,6 @@ namespace WindowComplexManager {
     using namespace DataVectorTypes;
     using namespace DataBSDFWindow;
     using namespace DataSurfaces; // , ONLY: TotSurfaces,TotWindows,Surface,SurfaceWindow   !update this later
-    using DataEnvironment::CloudFraction;
-    using DataEnvironment::IsRain;
-    using DataEnvironment::OutBaroPress;
-    using DataEnvironment::OutHumRat;
-    using DataEnvironment::SkyTempKelvin;
-    using DataEnvironment::SunIsUp;
-    using DataEnvironment::SunIsUpValue;
     using namespace DataHeatBalance;
     using namespace DataShadowingCombinations;
     using namespace Vectors;
@@ -611,7 +604,7 @@ namespace WindowComplexManager {
                     SunDir = state.dataBSDFWindow->SUNCOSTS(TS, Hour, {1, 3});
                     Theta = 0.0;
                     Phi = 0.0;
-                    if (state.dataBSDFWindow->SUNCOSTS(TS, Hour, 3) > SunIsUpValue) {
+                    if (state.dataBSDFWindow->SUNCOSTS(TS, Hour, 3) > DataEnvironment::SunIsUpValue) {
                         IncRay = FindInBasis(state, SunDir, state.dataWindowComplexManager->Front_Incident, iSurf, iState, complexWindowGeom.Inc, Theta, Phi);
                         complexWindowGeom.ThetaBm[lHT] = Theta;
                         complexWindowGeom.PhiBm[lHT] = Phi;
@@ -659,7 +652,7 @@ namespace WindowComplexManager {
             SunDir = state.dataBSDFWindow->SUNCOSTS(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, {1, 3});
             Theta = 0.0;
             Phi = 0.0;
-            if (state.dataBSDFWindow->SUNCOSTS(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, 3) > SunIsUpValue) {
+            if (state.dataBSDFWindow->SUNCOSTS(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, 3) > DataEnvironment::SunIsUpValue) {
                 IncRay = FindInBasis(state, SunDir, state.dataWindowComplexManager->Front_Incident, iSurf, iState, complexWindowGeom.Inc, Theta, Phi);
                 complexWindowGeom.ThetaBm[lHT] = Theta;
                 complexWindowGeom.PhiBm[lHT] = Phi;
@@ -2769,7 +2762,7 @@ namespace WindowComplexManager {
         hrout = 0.0;
         hcout = 0.0;
 
-        Pa = OutBaroPress;
+        Pa = state.dataEnvrn->OutBaroPress;
 
         ThermalModelNum = state.dataConstruction->Construct(ConstrNum).BSDFInput.ThermalModel;
         standard = WindowThermalModel(ThermalModelNum).CalculationStandard;
@@ -2907,7 +2900,7 @@ namespace WindowComplexManager {
                     }
                 }
                 if (Surface(SurfNum).ExtWind) { // Window is exposed to wind (and possibly rain)
-                    if (IsRain) {               // Raining: since wind exposed, outside window surface gets wet
+                    if (state.dataEnvrn->IsRain) {               // Raining: since wind exposed, outside window surface gets wet
                         tout = Surface(SurfNum).OutWetBulbTemp + DataGlobalConstants::KelvinConv();
                     } else { // Dry
                         tout = Surface(SurfNum).OutDryBulbTemp + DataGlobalConstants::KelvinConv();
@@ -2916,7 +2909,7 @@ namespace WindowComplexManager {
                     tout = Surface(SurfNum).OutDryBulbTemp + DataGlobalConstants::KelvinConv();
                 }
                 // tsky = SkyTemp + TKelvin
-                tsky = SkyTempKelvin;
+                tsky = state.dataEnvrn->SkyTempKelvin;
                 Ebout = state.dataWindowComplexManager->sigma * pow_4(tout);
                 outir = Surface(SurfNum).ViewFactorSkyIR * (AirSkyRadSplit(SurfNum) * state.dataWindowComplexManager->sigma * pow_4(tsky) + (1.0 - AirSkyRadSplit(SurfNum)) * Ebout) +
                         Surface(SurfNum).ViewFactorGroundIR * Ebout + OutSrdIR;
@@ -2951,7 +2944,7 @@ namespace WindowComplexManager {
             // indoor wind speed
             wsi = 0.0; // assumuption (TODO, what to use for inside air velocity?)
 
-            fclr = 1.0 - CloudFraction;
+            fclr = 1.0 - state.dataEnvrn->CloudFraction;
         }
 
         TotLay = state.dataConstruction->Construct(ConstrNum).TotLayers;
@@ -3124,7 +3117,7 @@ namespace WindowComplexManager {
             // is assumed that nothing is transmitted through
             asol(nlayer) += SurfQRadThermInAbs(SurfNum);
 
-            presure = OutBaroPress;
+            presure = state.dataEnvrn->OutBaroPress;
 
             // Instead of doing temperature guess get solution from previous iteration.  That should be much better than guess
             for (k = 1; k <= 2 * nlayer; ++k) {
@@ -3415,7 +3408,7 @@ namespace WindowComplexManager {
                     if (SurfWinAirflowSource(SurfNum) == AirFlowWindow_Source_IndoorAir) {
                         InletAirHumRat = ZoneAirHumRat(ZoneNum);
                     } else { // AirflowSource = outside air
-                        InletAirHumRat = OutHumRat;
+                        InletAirHumRat = state.dataEnvrn->OutHumRat;
                     }
                     ZoneTemp = MAT(ZoneNum); // this should be Tin (account for different reference temps)
                     CpAirOutlet = PsyCpAirFnW(InletAirHumRat);
@@ -3463,7 +3456,7 @@ namespace WindowComplexManager {
                                                    (Surface(SurfNum).Area + SurfWinDividerArea(SurfNum));
                 SurfWinShadingAbsorbedSolarEnergy(SurfNum) = SurfWinShadingAbsorbedSolar(SurfNum) * state.dataGlobal->TimeStepZoneSec;
             }
-            if (SunIsUp) {
+            if (state.dataEnvrn->SunIsUp) {
                 SurfWinSysSolTransmittance(SurfNum) =
                         SurfWinTransSolar(SurfNum) / (SurfQRadSWOutIncident(SurfNum) * (Surface(SurfNum).Area + SurfWinDividerArea(SurfNum)) + 0.0001);
                 SurfWinSysSolAbsorptance(SurfNum) = (SurfWinQRadSWwinAbsTot(SurfNum) + SurfWinShadingAbsorbedSolar(SurfNum)) /

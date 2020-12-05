@@ -126,8 +126,8 @@ namespace EnergyPlus {
         Real64 AirMassFlow(0.0);
         Real64 MaxAirMassFlow(0.0);
 
-        DataEnvironment::OutBaroPress = 101325.0;
-        DataEnvironment::StdRhoAir = 1.20;
+        state->dataEnvrn->OutBaroPress = 101325.0;
+        state->dataEnvrn->StdRhoAir = 1.20;
         state->dataWaterCoils->GetWaterCoilsInputFlag = true;
         NumCoils = 0;
         state->dataGlobal->NumOfTimeStepInHour = 1;
@@ -395,13 +395,13 @@ namespace EnergyPlus {
         state->dataFans->LocalTurnFansOff = false;
         state->dataFans->LocalTurnFansOn = true;
 
-        DataEnvironment::Month = 1;
-        DataEnvironment::DayOfMonth = 21;
+        state->dataEnvrn->Month = 1;
+        state->dataEnvrn->DayOfMonth = 21;
         state->dataGlobal->HourOfDay = 1;
-        DataEnvironment::DSTIndicator = 0;
-        DataEnvironment::DayOfWeek = 2;
-        DataEnvironment::HolidayIndex = 0;
-        DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, 1);
+        state->dataEnvrn->DSTIndicator = 0;
+        state->dataEnvrn->DayOfWeek = 2;
+        state->dataEnvrn->HolidayIndex = 0;
+        state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
         UpdateScheduleValues(*state);
 
         CalcMultiStage4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QZnReq, SpeedRatio, PartLoadRatio, QUnitOut);
@@ -437,8 +437,8 @@ namespace EnergyPlus {
         Real64 AirMassFlow(0.0);
         Real64 MaxAirMassFlow(0.0);
 
-        DataEnvironment::OutBaroPress = 101325.0;
-        DataEnvironment::StdRhoAir = 1.20;
+        state->dataEnvrn->OutBaroPress = 101325.0;
+        state->dataEnvrn->StdRhoAir = 1.20;
         state->dataWaterCoils->GetWaterCoilsInputFlag = true;
         NumCoils = 0;
         state->dataGlobal->NumOfTimeStepInHour = 1;
@@ -709,13 +709,13 @@ namespace EnergyPlus {
         state->dataFans->LocalTurnFansOff = false;
         state->dataFans->LocalTurnFansOn = true;
 
-        DataEnvironment::Month = 1;
-        DataEnvironment::DayOfMonth = 21;
+        state->dataEnvrn->Month = 1;
+        state->dataEnvrn->DayOfMonth = 21;
         state->dataGlobal->HourOfDay = 1;
-        DataEnvironment::DSTIndicator = 0;
-        DataEnvironment::DayOfWeek = 2;
-        DataEnvironment::HolidayIndex = 0;
-        DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, 1);
+        state->dataEnvrn->DSTIndicator = 0;
+        state->dataEnvrn->DayOfWeek = 2;
+        state->dataEnvrn->HolidayIndex = 0;
+        state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
         UpdateScheduleValues(*state);
 
         CalcMultiStage4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QZnReq, SpeedRatio, PartLoadRatio, QUnitOut);
@@ -750,8 +750,8 @@ namespace EnergyPlus {
         Real64 MaxAirMassFlow(0.0);
         Real64 LatOutputProvided(0.0);
 
-        DataEnvironment::OutBaroPress = 101325.0;
-        DataEnvironment::StdRhoAir = 1.20;
+        state->dataEnvrn->OutBaroPress = 101325.0;
+        state->dataEnvrn->StdRhoAir = 1.20;
         state->dataWaterCoils->GetWaterCoilsInputFlag = true;
         NumCoils = 0;
         state->dataGlobal->NumOfTimeStepInHour = 1;
@@ -1044,13 +1044,13 @@ namespace EnergyPlus {
         state->dataFans->LocalTurnFansOff = false;
         state->dataFans->LocalTurnFansOn = true;
 
-        DataEnvironment::Month = 1;
-        DataEnvironment::DayOfMonth = 21;
+        state->dataEnvrn->Month = 1;
+        state->dataEnvrn->DayOfMonth = 21;
         state->dataGlobal->HourOfDay = 1;
-        DataEnvironment::DSTIndicator = 0;
-        DataEnvironment::DayOfWeek = 2;
-        DataEnvironment::HolidayIndex = 0;
-        DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, 1);
+        state->dataEnvrn->DSTIndicator = 0;
+        state->dataEnvrn->DayOfWeek = 2;
+        state->dataEnvrn->HolidayIndex = 0;
+        state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
         UpdateScheduleValues(*state);
 
         // Normal heating simulation for fan coil with constant fan, variable water flow
@@ -1137,8 +1137,8 @@ namespace EnergyPlus {
         Real64 MaxAirMassFlow(0.0);
         Real64 LatOutputProvided(0.0);
 
-        DataEnvironment::OutBaroPress = 101325.0;
-        DataEnvironment::StdRhoAir = 1.20;
+        state->dataEnvrn->OutBaroPress = 101325.0;
+        state->dataEnvrn->StdRhoAir = 1.20;
         state->dataWaterCoils->GetWaterCoilsInputFlag = true;
         NumCoils = 0;
         state->dataGlobal->NumOfTimeStepInHour = 1;
@@ -1397,13 +1397,13 @@ namespace EnergyPlus {
         state->dataFans->LocalTurnFansOff = false;
         state->dataFans->LocalTurnFansOn = true;
 
-        DataEnvironment::Month = 1;
-        DataEnvironment::DayOfMonth = 21;
+        state->dataEnvrn->Month = 1;
+        state->dataEnvrn->DayOfMonth = 21;
         state->dataGlobal->HourOfDay = 1;
-        DataEnvironment::DSTIndicator = 0;
-        DataEnvironment::DayOfWeek = 2;
-        DataEnvironment::HolidayIndex = 0;
-        DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, 1);
+        state->dataEnvrn->DSTIndicator = 0;
+        state->dataEnvrn->DayOfWeek = 2;
+        state->dataEnvrn->HolidayIndex = 0;
+        state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
         UpdateScheduleValues(*state);
 
         // Normal heating simulation for fan coil with constant fan, electric heating
@@ -1445,8 +1445,8 @@ namespace EnergyPlus {
         Real64 MaxAirMassFlow(0.0);
         Real64 LatOutputProvided(0.0);
 
-        DataEnvironment::OutBaroPress = 101325.0;
-        DataEnvironment::StdRhoAir = 1.20;
+        state->dataEnvrn->OutBaroPress = 101325.0;
+        state->dataEnvrn->StdRhoAir = 1.20;
         state->dataWaterCoils->GetWaterCoilsInputFlag = true;
         NumCoils = 0;
         state->dataGlobal->NumOfTimeStepInHour = 1;
@@ -1742,13 +1742,13 @@ namespace EnergyPlus {
         state->dataFans->LocalTurnFansOff = false;
         state->dataFans->LocalTurnFansOn = true;
 
-        DataEnvironment::Month = 1;
-        DataEnvironment::DayOfMonth = 21;
+        state->dataEnvrn->Month = 1;
+        state->dataEnvrn->DayOfMonth = 21;
         state->dataGlobal->HourOfDay = 1;
-        DataEnvironment::DSTIndicator = 0;
-        DataEnvironment::DayOfWeek = 2;
-        DataEnvironment::HolidayIndex = 0;
-        DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, 1);
+        state->dataEnvrn->DSTIndicator = 0;
+        state->dataEnvrn->DayOfWeek = 2;
+        state->dataEnvrn->HolidayIndex = 0;
+        state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
         UpdateScheduleValues(*state);
         // normal cooling simulation for constant fan variable flow fan coil
         Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
@@ -1797,8 +1797,8 @@ namespace EnergyPlus {
         Real64 AirMassFlow(0.0);
         Real64 MaxAirMassFlow(0.0);
 
-        DataEnvironment::OutBaroPress = 101325.0;
-        DataEnvironment::StdRhoAir = 1.20;
+        state->dataEnvrn->OutBaroPress = 101325.0;
+        state->dataEnvrn->StdRhoAir = 1.20;
         state->dataWaterCoils->GetWaterCoilsInputFlag = true;
         NumCoils = 0;
         state->dataGlobal->NumOfTimeStepInHour = 1;
@@ -2076,13 +2076,13 @@ namespace EnergyPlus {
         state->dataFans->LocalTurnFansOff = false;
         state->dataFans->LocalTurnFansOn = true;
 
-        DataEnvironment::Month = 1;
-        DataEnvironment::DayOfMonth = 21;
+        state->dataEnvrn->Month = 1;
+        state->dataEnvrn->DayOfMonth = 21;
         state->dataGlobal->HourOfDay = 1;
-        DataEnvironment::DSTIndicator = 0;
-        DataEnvironment::DayOfWeek = 2;
-        DataEnvironment::HolidayIndex = 0;
-        DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, 1);
+        state->dataEnvrn->DSTIndicator = 0;
+        state->dataEnvrn->DayOfWeek = 2;
+        state->dataEnvrn->HolidayIndex = 0;
+        state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
         UpdateScheduleValues(*state);
 
         ZoneEqSizing.allocate(1);
@@ -2102,7 +2102,7 @@ namespace EnergyPlus {
         FinalZoneSizing(CurZoneEqNum).DesHeatCoilInHumRat = 0.005;
         FinalZoneSizing(CurZoneEqNum).DesCoolLoad = 4000.0;
         FinalZoneSizing(CurZoneEqNum).DesHeatLoad = 4000.0;
-        StdRhoAir = 1.2;
+        state->dataEnvrn->StdRhoAir = 1.2;
 
         state->dataGlobal->BeginEnvrnFlag = true;
         InitFanCoilUnits(*state, FanCoilNum, ZoneNum, ZoneNum);
@@ -2215,8 +2215,8 @@ namespace EnergyPlus {
         bool ErrorsFound(false);
         Real64 QZnReq(-1000.0);
         DataPlant::TotNumLoops = 2;
-        DataEnvironment::OutBaroPress = 101325.0;
-        DataEnvironment::StdRhoAir = 1.20;
+        state->dataEnvrn->OutBaroPress = 101325.0;
+        state->dataEnvrn->StdRhoAir = 1.20;
         state->dataWaterCoils->GetWaterCoilsInputFlag = true;
         NumCoils = 0;
         state->dataGlobal->NumOfTimeStepInHour = 1;
@@ -2335,8 +2335,8 @@ namespace EnergyPlus {
         Node(5).MassFlowRateMaxAvail = 0.72;
         FanCoil(FanCoilNum).CCoilName_Index = 2;
         state->dataGlobal->BeginEnvrnFlag = true;
-        DataEnvironment::DayOfYear_Schedule = 1;
-        DataEnvironment::DayOfWeek = 2;
+        state->dataEnvrn->DayOfYear_Schedule = 1;
+        state->dataEnvrn->DayOfWeek = 2;
         state->dataGlobal->HourOfDay = 1;
         ProcessScheduleInput(*state);
         UpdateScheduleValues(*state);
@@ -2500,8 +2500,8 @@ namespace EnergyPlus {
         Real64 AirMassFlow(0.0);
         Real64 MaxAirMassFlow(0.0);
 
-        DataEnvironment::OutBaroPress = 101325.0;
-        DataEnvironment::StdRhoAir = 1.20;
+        state->dataEnvrn->OutBaroPress = 101325.0;
+        state->dataEnvrn->StdRhoAir = 1.20;
         state->dataWaterCoils->GetWaterCoilsInputFlag = true;
         NumCoils = 0;
         state->dataGlobal->NumOfTimeStepInHour = 1;
@@ -2786,13 +2786,13 @@ namespace EnergyPlus {
         state->dataFans->LocalTurnFansOff = false;
         state->dataFans->LocalTurnFansOn = true;
 
-        DataEnvironment::Month = 1;
-        DataEnvironment::DayOfMonth = 21;
+        state->dataEnvrn->Month = 1;
+        state->dataEnvrn->DayOfMonth = 21;
         state->dataGlobal->HourOfDay = 1;
-        DataEnvironment::DSTIndicator = 0;
-        DataEnvironment::DayOfWeek = 2;
-        DataEnvironment::HolidayIndex = 0;
-        DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, 1);
+        state->dataEnvrn->DSTIndicator = 0;
+        state->dataEnvrn->DayOfWeek = 2;
+        state->dataEnvrn->HolidayIndex = 0;
+        state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
         UpdateScheduleValues(*state);
 
         ZoneEqSizing.allocate(1);
@@ -2812,7 +2812,7 @@ namespace EnergyPlus {
         FinalZoneSizing(CurZoneEqNum).DesHeatCoilInHumRat = 0.005;
         FinalZoneSizing(CurZoneEqNum).DesCoolLoad = 4000.0;
         FinalZoneSizing(CurZoneEqNum).DesHeatLoad = 4000.0;
-        StdRhoAir = 1.2;
+        state->dataEnvrn->StdRhoAir = 1.2;
 
         state->dataGlobal->BeginEnvrnFlag = true;
         InitFanCoilUnits(*state, FanCoilNum, ZoneNum, ZoneNum);
@@ -2905,8 +2905,8 @@ namespace EnergyPlus {
         Real64 AirMassFlow(0.0);
         Real64 MaxAirMassFlow(0.0);
 
-        DataEnvironment::OutBaroPress = 101325.0;
-        DataEnvironment::StdRhoAir = 1.20;
+        state->dataEnvrn->OutBaroPress = 101325.0;
+        state->dataEnvrn->StdRhoAir = 1.20;
         state->dataWaterCoils->GetWaterCoilsInputFlag = true;
         NumCoils = 0;
         state->dataGlobal->NumOfTimeStepInHour = 1;
@@ -3199,13 +3199,13 @@ namespace EnergyPlus {
         state->dataFans->LocalTurnFansOff = false;
         state->dataFans->LocalTurnFansOn = true;
 
-        DataEnvironment::Month = 1;
-        DataEnvironment::DayOfMonth = 21;
+        state->dataEnvrn->Month = 1;
+        state->dataEnvrn->DayOfMonth = 21;
         state->dataGlobal->HourOfDay = 1;
-        DataEnvironment::DSTIndicator = 0;
-        DataEnvironment::DayOfWeek = 2;
-        DataEnvironment::HolidayIndex = 0;
-        DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, 1);
+        state->dataEnvrn->DSTIndicator = 0;
+        state->dataEnvrn->DayOfWeek = 2;
+        state->dataEnvrn->HolidayIndex = 0;
+        state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
         UpdateScheduleValues(*state);
 
         ZoneEqSizing.allocate(1);
@@ -3225,7 +3225,7 @@ namespace EnergyPlus {
         FinalZoneSizing(CurZoneEqNum).DesHeatCoilInHumRat = 0.005;
         FinalZoneSizing(CurZoneEqNum).DesCoolLoad = 4000.0;
         FinalZoneSizing(CurZoneEqNum).DesHeatLoad = 4000.0;
-        StdRhoAir = 1.2;
+        state->dataEnvrn->StdRhoAir = 1.2;
 
         state->dataGlobal->BeginEnvrnFlag = true;
         InitFanCoilUnits(*state, FanCoilNum, ZoneNum, ZoneNum);
@@ -3309,8 +3309,8 @@ namespace EnergyPlus {
         Real64 AirMassFlow(0.0);
         Real64 MaxAirMassFlow(0.0);
 
-        DataEnvironment::OutBaroPress = 101325.0;
-        DataEnvironment::StdRhoAir = 1.20;
+        state->dataEnvrn->OutBaroPress = 101325.0;
+        state->dataEnvrn->StdRhoAir = 1.20;
         state->dataWaterCoils->GetWaterCoilsInputFlag = true;
         NumCoils = 0;
         state->dataGlobal->NumOfTimeStepInHour = 1;
@@ -3561,14 +3561,14 @@ namespace EnergyPlus {
         ZoneSysEnergyDemand.allocate(1);
         auto &zSysEDemand(ZoneSysEnergyDemand(1));
 
-        StdRhoAir = 1.2;
-        DataEnvironment::Month = 1;
-        DataEnvironment::DayOfMonth = 21;
+        state->dataEnvrn->StdRhoAir = 1.2;
+        state->dataEnvrn->Month = 1;
+        state->dataEnvrn->DayOfMonth = 21;
         state->dataGlobal->HourOfDay = 1;
-        DataEnvironment::DSTIndicator = 0;
-        DataEnvironment::DayOfWeek = 2;
-        DataEnvironment::HolidayIndex = 0;
-        DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, 1);
+        state->dataEnvrn->DSTIndicator = 0;
+        state->dataEnvrn->DayOfWeek = 2;
+        state->dataEnvrn->HolidayIndex = 0;
+        state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
         UpdateScheduleValues(*state);
         ZoneEqSizing.allocate(1);
         ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
@@ -3676,8 +3676,8 @@ namespace EnergyPlus {
         Real64 AirMassFlow(0.0);
         Real64 MaxAirMassFlow(0.0);
 
-        DataEnvironment::OutBaroPress = 101325.0;
-        DataEnvironment::StdRhoAir = 1.20;
+        state->dataEnvrn->OutBaroPress = 101325.0;
+        state->dataEnvrn->StdRhoAir = 1.20;
         state->dataWaterCoils->GetWaterCoilsInputFlag = true;
         NumCoils = 0;
         state->dataGlobal->NumOfTimeStepInHour = 1;
@@ -3928,14 +3928,14 @@ namespace EnergyPlus {
         ZoneSysEnergyDemand.allocate(1);
         auto &zSysEDemand(ZoneSysEnergyDemand(1));
 
-        StdRhoAir = 1.2;
-        DataEnvironment::Month = 1;
-        DataEnvironment::DayOfMonth = 21;
+        state->dataEnvrn->StdRhoAir = 1.2;
+        state->dataEnvrn->Month = 1;
+        state->dataEnvrn->DayOfMonth = 21;
         state->dataGlobal->HourOfDay = 1;
-        DataEnvironment::DSTIndicator = 0;
-        DataEnvironment::DayOfWeek = 2;
-        DataEnvironment::HolidayIndex = 0;
-        DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, 1);
+        state->dataEnvrn->DSTIndicator = 0;
+        state->dataEnvrn->DayOfWeek = 2;
+        state->dataEnvrn->HolidayIndex = 0;
+        state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
         UpdateScheduleValues(*state);
         ZoneEqSizing.allocate(1);
         ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
@@ -4043,8 +4043,8 @@ namespace EnergyPlus {
         Real64 AirMassFlow(0.0);
         Real64 MaxAirMassFlow(0.0);
 
-        DataEnvironment::OutBaroPress = 101325.0;
-        DataEnvironment::StdRhoAir = 1.20;
+        state->dataEnvrn->OutBaroPress = 101325.0;
+        state->dataEnvrn->StdRhoAir = 1.20;
         state->dataWaterCoils->GetWaterCoilsInputFlag = true;
         NumCoils = 0;
         state->dataGlobal->NumOfTimeStepInHour = 1;
@@ -4295,14 +4295,14 @@ namespace EnergyPlus {
         ZoneSysEnergyDemand.allocate(1);
         auto &zSysEDemand(ZoneSysEnergyDemand(1));
 
-        StdRhoAir = 1.2;
-        DataEnvironment::Month = 1;
-        DataEnvironment::DayOfMonth = 21;
+        state->dataEnvrn->StdRhoAir = 1.2;
+        state->dataEnvrn->Month = 1;
+        state->dataEnvrn->DayOfMonth = 21;
         state->dataGlobal->HourOfDay = 1;
-        DataEnvironment::DSTIndicator = 0;
-        DataEnvironment::DayOfWeek = 2;
-        DataEnvironment::HolidayIndex = 0;
-        DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, 1);
+        state->dataEnvrn->DSTIndicator = 0;
+        state->dataEnvrn->DayOfWeek = 2;
+        state->dataEnvrn->HolidayIndex = 0;
+        state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
         UpdateScheduleValues(*state);
         ZoneEqSizing.allocate(1);
         ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
@@ -4512,8 +4512,8 @@ namespace EnergyPlus {
 
         ASSERT_TRUE(process_idf(idf_objects));
 
-        DataEnvironment::OutBaroPress = 101325.0;
-        DataEnvironment::StdRhoAir = 1.20;
+        state->dataEnvrn->OutBaroPress = 101325.0;
+        state->dataEnvrn->StdRhoAir = 1.20;
         state->dataWaterCoils->GetWaterCoilsInputFlag = true;
         //NumCoils = 0;
         state->dataGlobal->NumOfTimeStepInHour = 1;
@@ -4607,13 +4607,13 @@ namespace EnergyPlus {
         ZoneSysEnergyDemand.allocate(1);
         auto &zSysEDemand(ZoneSysEnergyDemand(1));
 
-        DataEnvironment::Month = 1;
-        DataEnvironment::DayOfMonth = 21;
+        state->dataEnvrn->Month = 1;
+        state->dataEnvrn->DayOfMonth = 21;
         state->dataGlobal->HourOfDay = 1;
-        DataEnvironment::DSTIndicator = 0;
-        DataEnvironment::DayOfWeek = 2;
-        DataEnvironment::HolidayIndex = 0;
-        DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, 1);
+        state->dataEnvrn->DSTIndicator = 0;
+        state->dataEnvrn->DayOfWeek = 2;
+        state->dataEnvrn->HolidayIndex = 0;
+        state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
         UpdateScheduleValues(*state);
         ZoneEqSizing.allocate(1);
         CurDeadBandOrSetback.allocate(1);

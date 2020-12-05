@@ -76,7 +76,6 @@ std::shared_ptr<SiteDeepGroundTemps> SiteDeepGroundTemps::DeepGTMFactory(EnergyP
     // Reads input and creates instance of Site:GroundTemperature:Deep object
 
     // USE STATEMENTS:
-    using DataEnvironment::GroundTemp_DeepObjInput;
     using namespace DataIPShortCuts;
     using namespace GroundTemperatureManager;
 
@@ -110,7 +109,7 @@ std::shared_ptr<SiteDeepGroundTemps> SiteDeepGroundTemps::DeepGTMFactory(EnergyP
             thisModel->deepGroundTemps(i) = rNumericArgs(i);
         }
 
-        GroundTemp_DeepObjInput = true;
+        state.dataEnvrn->GroundTemp_DeepObjInput = true;
 
     } else if (numCurrObjects > 1) {
         ShowSevereError(state, cCurrentModuleObject + ": Too many objects entered. Only one allowed.");

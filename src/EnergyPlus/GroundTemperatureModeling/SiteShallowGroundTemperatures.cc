@@ -76,7 +76,6 @@ std::shared_ptr<SiteShallowGroundTemps> SiteShallowGroundTemps::ShallowGTMFactor
     // Reads input and creates instance of Site:GroundDomain:Shallow object
 
     // USE STATEMENTS:
-    using DataEnvironment::GroundTemp_SurfaceObjInput;
     using namespace DataIPShortCuts;
     using namespace GroundTemperatureManager;
 
@@ -110,7 +109,7 @@ std::shared_ptr<SiteShallowGroundTemps> SiteShallowGroundTemps::ShallowGTMFactor
             thisModel->surfaceGroundTemps(i) = rNumericArgs(i);
         }
 
-        GroundTemp_SurfaceObjInput = true;
+        state.dataEnvrn->GroundTemp_SurfaceObjInput = true;
 
     } else if (numCurrObjects > 1) {
         ShowSevereError(state, cCurrentModuleObject + ": Too many objects entered. Only one allowed.");

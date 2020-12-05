@@ -133,7 +133,7 @@ namespace HeatBalanceKivaManager {
         bool setupKivaInstances(EnergyPlusData &state);
         void initKivaInstances(EnergyPlusData &state);
         void calcKivaInstances(EnergyPlusData &state);
-        void defineDefaultFoundation();
+        void defineDefaultFoundation(EnergyPlusData &state);
         void addDefaultFoundation();
         int findFoundation(std::string const &name);
         void calcKivaSurfaceResults(EnergyPlusData &state);

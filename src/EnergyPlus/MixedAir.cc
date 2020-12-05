@@ -298,11 +298,11 @@ namespace MixedAir {
 
     // Functions
 
-    Real64 OAGetFlowRate(int OAPtr)
+    Real64 OAGetFlowRate(EnergyPlusData &state, int OAPtr)
     {
         Real64 FlowRate(0);
-        if ((OAPtr > 0) && (OAPtr <= NumOAControllers) && (StdRhoAir != 0)) {
-            FlowRate = OAController(OAPtr).OAMassFlow / StdRhoAir;
+        if ((OAPtr > 0) && (OAPtr <= NumOAControllers) && (state.dataEnvrn->StdRhoAir != 0)) {
+            FlowRate = OAController(OAPtr).OAMassFlow / state.dataEnvrn->StdRhoAir;
         }
         return FlowRate;
     }
@@ -320,10 +320,10 @@ namespace MixedAir {
             OAController(OAPtr).ManageDemand = aState;
         }
     }
-    void OASetDemandManagerVentilationFlow(int OAPtr, Real64 aFlow)
+    void OASetDemandManagerVentilationFlow(EnergyPlusData &state, int OAPtr, Real64 aFlow)
     {
         if ((OAPtr > 0) && (OAPtr <= NumOAControllers)) {
-            OAController(OAPtr).DemandLimitFlowRate = aFlow * StdRhoAir;
+            OAController(OAPtr).DemandLimitFlowRate = aFlow * state.dataEnvrn->StdRhoAir;
         }
     }
     int GetOAController(std::string const &OAName)
@@ -1922,24 +1922,24 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                                         for (EquipNum = 1; EquipNum <= ZoneEquipList(EquipListNum).NumOfEquipTypes; ++EquipNum) {
                                             if (UtilityRoutines::SameString(ZoneEquipList(EquipListNum).EquipType(EquipNum),
                                                                             "ZONEHVAC:AIRDISTRIBUTIONUNIT")) {
-                                                for (ADUNum = 1; ADUNum <= NumAirDistUnits; ++ADUNum) {
+                                                for (ADUNum = 1; ADUNum <= state.dataDefineEquipment->NumAirDistUnits; ++ADUNum) {
                                                     if (UtilityRoutines::SameString(ZoneEquipList(EquipListNum).EquipName(EquipNum),
-                                                                                    AirDistUnit(ADUNum).Name)) {
-                                                        if ((AirDistUnit(ADUNum).EquipType_Num(EquipNum) == SingleDuctVAVReheat) ||
-                                                            (AirDistUnit(ADUNum).EquipType_Num(EquipNum) == SingleDuctConstVolNoReheat) ||
-                                                            (AirDistUnit(ADUNum).EquipType_Num(EquipNum) == SingleDuctConstVolReheat) ||
-                                                            (AirDistUnit(ADUNum).EquipType_Num(EquipNum) == SingleDuctVAVNoReheat) ||
-                                                            (AirDistUnit(ADUNum).EquipType_Num(EquipNum) == SingleDuctVAVReheatVSFan) ||
-                                                            (AirDistUnit(ADUNum).EquipType_Num(EquipNum) == SingleDuctCBVAVReheat) ||
-                                                            (AirDistUnit(ADUNum).EquipType_Num(EquipNum) == SingleDuctCBVAVNoReheat) ||
-                                                            (AirDistUnit(ADUNum).EquipType_Num(EquipNum) == SingleDuctConstVolCooledBeam) ||
-                                                            (AirDistUnit(ADUNum).EquipType_Num(EquipNum) == SingleDuctConstVolFourPipeBeam) ||
-                                                            (AirDistUnit(ADUNum).EquipType_Num(EquipNum) == DualDuctVAVOutdoorAir)) {
+                                                                                    state.dataDefineEquipment->AirDistUnit(ADUNum).Name)) {
+                                                        if ((state.dataDefineEquipment->AirDistUnit(ADUNum).EquipType_Num(EquipNum) == DataDefineEquip::iZnAirLoopEquipType::SingleDuctVAVReheat) ||
+                                                            (state.dataDefineEquipment->AirDistUnit(ADUNum).EquipType_Num(EquipNum) == DataDefineEquip::iZnAirLoopEquipType::SingleDuctConstVolNoReheat) ||
+                                                            (state.dataDefineEquipment->AirDistUnit(ADUNum).EquipType_Num(EquipNum) == DataDefineEquip::iZnAirLoopEquipType::SingleDuctConstVolReheat) ||
+                                                            (state.dataDefineEquipment->AirDistUnit(ADUNum).EquipType_Num(EquipNum) == DataDefineEquip::iZnAirLoopEquipType::SingleDuctVAVNoReheat) ||
+                                                            (state.dataDefineEquipment->AirDistUnit(ADUNum).EquipType_Num(EquipNum) == DataDefineEquip::iZnAirLoopEquipType::SingleDuctVAVReheatVSFan) ||
+                                                            (state.dataDefineEquipment->AirDistUnit(ADUNum).EquipType_Num(EquipNum) == DataDefineEquip::iZnAirLoopEquipType::SingleDuctCBVAVReheat) ||
+                                                            (state.dataDefineEquipment->AirDistUnit(ADUNum).EquipType_Num(EquipNum) == DataDefineEquip::iZnAirLoopEquipType::SingleDuctCBVAVNoReheat) ||
+                                                            (state.dataDefineEquipment->AirDistUnit(ADUNum).EquipType_Num(EquipNum) == DataDefineEquip::iZnAirLoopEquipType::SingleDuctConstVolCooledBeam) ||
+                                                            (state.dataDefineEquipment->AirDistUnit(ADUNum).EquipType_Num(EquipNum) == DataDefineEquip::iZnAirLoopEquipType::SingleDuctConstVolFourPipeBeam) ||
+                                                            (state.dataDefineEquipment->AirDistUnit(ADUNum).EquipType_Num(EquipNum) == DataDefineEquip::iZnAirLoopEquipType::DualDuctVAVOutdoorAir)) {
                                                             ShowWarningError(state, CurrentModuleObject + "=\"" + thisVentilationMechanical.Name +
                                                                              "\", inappropriate use of Zone secondary recirculation");
                                                             ShowContinueError(state,
                                                                 "A zone secondary recirculation fraction is specified for zone served by ");
-                                                            ShowContinueError(state, "...terminal unit \"" + AirDistUnit(ADUNum).Name +
+                                                            ShowContinueError(state, "...terminal unit \"" + state.dataDefineEquipment->AirDistUnit(ADUNum).Name +
                                                                               "\" , that indicates a single path system");
                                                             ShowContinueError(state, "For Zone=\"" + thisVentilationMechanical.VentMechZoneName(jZone) +
                                                                               "\".");
@@ -2840,7 +2840,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
             }
 
             if (AirLoopNum > 0) {
-                Real64 DesSupplyVolFlowRate = state.dataAirLoop->AirLoopFlow(AirLoopNum).DesSupply / StdRhoAir;
+                Real64 DesSupplyVolFlowRate = state.dataAirLoop->AirLoopFlow(AirLoopNum).DesSupply / state.dataEnvrn->StdRhoAir;
                 if ((thisOAController.MinOA - DesSupplyVolFlowRate) > 0.0001) {
                     ShowWarningError(state, "InitOAController: Minimum Outdoor Air Flow Rate for Controller:OutdoorAir=" + thisOAController.Name +
                                      " is greater than Design Supply Air Flow Rate for AirLoopHVAC=" + state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Name + ".");
@@ -2872,7 +2872,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
 
         if (state.dataGlobal->BeginEnvrnFlag && OAControllerMyEnvrnFlag(OAControllerNum)) {
             OANode = thisOAController.OANode;
-            RhoAirStdInit = StdRhoAir;
+            RhoAirStdInit = state.dataEnvrn->StdRhoAir;
             thisOAController.MinOAMassFlowRate = thisOAController.MinOA * RhoAirStdInit;
             thisOAController.MaxOAMassFlowRate = thisOAController.MaxOA * RhoAirStdInit;
             OAControllerMyEnvrnFlag(OAControllerNum) = false;
@@ -3839,8 +3839,8 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
         }
         this->RelTemp = this->RetTemp;
         this->RelEnth = this->RetEnth;
-        this->RelSensiLossRate = this->RelMassFlow * Psychrometrics::PsyCpAirFnW(OutHumRat) * (this->RelTemp - OutDryBulbTemp);
-        this->RelTotalLossRate = this->RelMassFlow * (this->RelEnth - OutEnthalpy);
+        this->RelSensiLossRate = this->RelMassFlow * Psychrometrics::PsyCpAirFnW(state.dataEnvrn->OutHumRat) * (this->RelTemp - state.dataEnvrn->OutDryBulbTemp);
+        this->RelTotalLossRate = this->RelMassFlow * (this->RelEnth - state.dataEnvrn->OutEnthalpy);
         this->RelLatentLossRate = this->RelTotalLossRate - this->RelSensiLossRate;
     }
 
@@ -4012,11 +4012,11 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                     this->SystemOAMethod == SOAM_ProportionalControlDesOcc || this->SystemOAMethod == SOAM_ProportionalControlDesOARate) {
 
                     // System supply air flow rate is always greater than or equal the system outdoor air flow rate
-                    if ((SysSA > 0.0) && (SysSA < (SysOAuc * StdRhoAir))) SysSA = SysOAuc * StdRhoAir;
+                    if ((SysSA > 0.0) && (SysSA < (SysOAuc * state.dataEnvrn->StdRhoAir))) SysSA = SysOAuc * state.dataEnvrn->StdRhoAir;
 
                     // calc Xs - average outdoor air fraction
                     if (SysSA > 0.0) {
-                        Xs = (SysOAuc * StdRhoAir) / SysSA;
+                        Xs = (SysOAuc * state.dataEnvrn->StdRhoAir) / SysSA;
                     } else {
                         Xs = 0.0;
                     }
@@ -4338,7 +4338,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                                     MassFlowRate = 0.0;
                                 }
                                 // total primary air to terminal units of the zone
-                                if (MassFlowRate > 0.0) ZonePA += MassFlowRate / PsyRhoAirFnPbTdbW(state, OutBaroPress, NodeTemp, NodeHumRat);
+                                if (MassFlowRate > 0.0) ZonePA += MassFlowRate / PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, NodeTemp, NodeHumRat);
 
                                 // or InletNode = ZoneEquipConfig(ZoneEquipConfigNum)%AirDistUnitCool(InNodeIndex)%OutNode
                                 InletNode = curZoneEquipConfig.InletNode(InNodeIndex);
@@ -4350,7 +4350,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                                     MassFlowRate = 0.0;
                                 }
                                 // total supply air to the zone
-                                if (MassFlowRate > 0.0) ZoneSA += MassFlowRate / PsyRhoAirFnPbTdbW(state, OutBaroPress, NodeTemp, NodeHumRat);
+                                if (MassFlowRate > 0.0) ZoneSA += MassFlowRate / PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, NodeTemp, NodeHumRat);
                             }
 
                             // calc zone primary air fraction
@@ -4422,7 +4422,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                 }
 
                 // Finally calc the system supply OA mass flow rate
-                MechVentOAMassFlow = SysOA * StdRhoAir;
+                MechVentOAMassFlow = SysOA * state.dataEnvrn->StdRhoAir;
             }
 
         } else {

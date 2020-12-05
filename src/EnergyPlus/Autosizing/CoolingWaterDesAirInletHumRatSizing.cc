@@ -65,7 +65,9 @@ Real64 CoolingWaterDesAirInletHumRatSizer::size(EnergyPlusData &state, Real64 _o
             } else if (this->zoneEqFanCoil) {
                 Real64 desMassFlow = this->finalZoneSizing(this->curZoneEqNum).DesCoolMassFlow;
                 this->autoSizedValue =
-                    this->setCoolCoilInletHumRatForZoneEqSizing(this->setOAFracForZoneEqSizing(desMassFlow, this->zoneEqSizing(this->curZoneEqNum)),
+                    this->setCoolCoilInletHumRatForZoneEqSizing(this->setOAFracForZoneEqSizing(state,
+                                                                                                        desMassFlow,
+                                                                                               this->zoneEqSizing(this->curZoneEqNum)),
                                                                 this->zoneEqSizing(this->curZoneEqNum),
                                                                 this->finalZoneSizing(this->curZoneEqNum));
             } else {

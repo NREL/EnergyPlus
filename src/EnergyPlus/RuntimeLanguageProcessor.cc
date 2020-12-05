@@ -222,16 +222,6 @@ namespace RuntimeLanguageProcessor {
         // One time run.  Must be run BEFORE anything gets parsed.
 
         // Using/Aliasing
-        using DataEnvironment::CurEnvirNum;
-        using DataEnvironment::DayOfMonth;
-        using DataEnvironment::DayOfWeek;
-        using DataEnvironment::DayOfYear;
-        using DataEnvironment::DSTIndicator;
-        using DataEnvironment::HolidayIndex;
-        using DataEnvironment::IsRain;
-        using DataEnvironment::Month;
-        using DataEnvironment::SunIsUp;
-        using DataEnvironment::Year;
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
 
@@ -310,14 +300,14 @@ namespace RuntimeLanguageProcessor {
         }
 
         // Update built-in variables
-        ErlVariable(YearVariableNum).Value = SetErlValueNumber(double(Year));
-        ErlVariable(MonthVariableNum).Value = SetErlValueNumber(double(Month));
-        ErlVariable(DayOfMonthVariableNum).Value = SetErlValueNumber(double(DayOfMonth));
-        ErlVariable(DayOfWeekVariableNum).Value = SetErlValueNumber(double(DayOfWeek));
-        ErlVariable(DayOfYearVariableNum).Value = SetErlValueNumber(double(DayOfYear));
+        ErlVariable(YearVariableNum).Value = SetErlValueNumber(double(state.dataEnvrn->Year));
+        ErlVariable(MonthVariableNum).Value = SetErlValueNumber(double(state.dataEnvrn->Month));
+        ErlVariable(DayOfMonthVariableNum).Value = SetErlValueNumber(double(state.dataEnvrn->DayOfMonth));
+        ErlVariable(DayOfWeekVariableNum).Value = SetErlValueNumber(double(state.dataEnvrn->DayOfWeek));
+        ErlVariable(DayOfYearVariableNum).Value = SetErlValueNumber(double(state.dataEnvrn->DayOfYear));
         ErlVariable(TimeStepNumVariableNum).Value = SetErlValueNumber(double(state.dataGlobal->TimeStep));
 
-        ErlVariable(DSTVariableNum).Value = SetErlValueNumber(double(DSTIndicator));
+        ErlVariable(DSTVariableNum).Value = SetErlValueNumber(double(state.dataEnvrn->DSTIndicator));
         // DSTadjust = REAL(DSTIndicator, r64)
         tmpHours = double(state.dataGlobal->HourOfDay - 1); // no, just stay on 0..23+ DSTadjust ! offset by 1 and daylight savings time
         ErlVariable(HourVariableNum).Value = SetErlValueNumber(tmpHours);
@@ -331,20 +321,20 @@ namespace RuntimeLanguageProcessor {
         ErlVariable(CurrentTimeVariableNum).Value = SetErlValueNumber(tmpCurrentTime);
         tmpMinutes = ((tmpCurrentTime - double(state.dataGlobal->HourOfDay - 1)) * 60.0); // -1.0 // off by 1
         ErlVariable(MinuteVariableNum).Value = SetErlValueNumber(tmpMinutes);
-        ErlVariable(HolidayVariableNum).Value = SetErlValueNumber(double(HolidayIndex));
-        if (SunIsUp) {
+        ErlVariable(HolidayVariableNum).Value = SetErlValueNumber(double(state.dataEnvrn->HolidayIndex));
+        if (state.dataEnvrn->SunIsUp) {
             ErlVariable(SunIsUpVariableNum).Value = SetErlValueNumber(1.0);
         } else {
             ErlVariable(SunIsUpVariableNum).Value = SetErlValueNumber(0.0);
         }
-        if (IsRain) {
+        if (state.dataEnvrn->IsRain) {
             ErlVariable(IsRainingVariableNum).Value = SetErlValueNumber(1.0);
         } else {
             ErlVariable(IsRainingVariableNum).Value = SetErlValueNumber(0.0);
         }
         ErlVariable(SystemTimeStepVariableNum).Value = SetErlValueNumber(TimeStepSys);
 
-        tmpCurEnvirNum = double(CurEnvirNum);
+        tmpCurEnvirNum = double(state.dataEnvrn->CurEnvirNum);
         ErlVariable(CurrentEnvironmentPeriodNum).Value = SetErlValueNumber(tmpCurEnvirNum);
         if (state.dataGlobal->WarmupFlag) {
             ErlVariable(WarmUpFlagNum).Value = SetErlValueNumber(1.0);
@@ -1041,8 +1031,6 @@ namespace RuntimeLanguageProcessor {
         // METHODOLOGY EMPLOYED:
 
         // Using/Aliasing
-        using DataEnvironment::CurMnDy;
-        using DataEnvironment::EnvironmentName;
         using General::CreateSysTimeIntervalString;
 
         // Locals
@@ -1092,7 +1080,7 @@ namespace RuntimeLanguageProcessor {
                 DuringWarmup = " During Sizing, Occurrence info=";
             }
         }
-        TimeString = DuringWarmup + EnvironmentName + ", " + CurMnDy + ' ' + CreateSysTimeIntervalString(state);
+        TimeString = DuringWarmup + state.dataEnvrn->EnvironmentName + ", " + state.dataEnvrn->CurMnDy + ' ' + CreateSysTimeIntervalString(state);
 
         if (OutputFullEMSTrace || (OutputEMSErrors && (ReturnValue.Type == ValueError))) {
             print(state.files.edd, "{},Line {},{},{},{}\n", NameString, LineNumString, LineString, cValueString, TimeString);
