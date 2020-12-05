@@ -332,7 +332,6 @@ namespace SimAirServingZones {
         using BranchInputManager::GetNumSplitterMixerInConntrList;
         using BranchInputManager::NumBranchesInBranchList;
         using BranchInputManager::NumCompsInBranch;
-        using DataConvergParams::AirLoopConvergence;
 
         using HVACControllers::CheckCoilWaterInletNode;
         using HVACControllers::GetControllerActuatorNodeNum;
@@ -484,7 +483,7 @@ namespace SimAirServingZones {
         PackagedUnit.allocate(NumPrimaryAirSys);
         state.dataAirLoop->AirLoopControlInfo.allocate(NumPrimaryAirSys);
         state.dataAirLoop->AirLoopFlow.allocate(NumPrimaryAirSys);
-        AirLoopConvergence.allocate(NumPrimaryAirSys);
+        state.dataConvergeParams->AirLoopConvergence.allocate(NumPrimaryAirSys);
         UnitarySysEqSizing.allocate(NumPrimaryAirSys);
         if (AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultiADS ||
             AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS) {
@@ -1463,9 +1462,6 @@ namespace SimAirServingZones {
         //     initialized at the start of an environment (run period or design day).
 
         // Using/Aliasing
-        using DataConvergParams::AirLoopConvergence;
-        using DataConvergParams::HVACFlowRateToler;
-        using DataConvergParams::ZoneInletConvergence;
         using DataEnvironment::OutHumRat;
         using DataEnvironment::StdBaroPress;
         using DataEnvironment::StdRhoAir;
@@ -1560,7 +1556,7 @@ namespace SimAirServingZones {
             TermUnitSizingNumsCool.allocate(state.dataGlobal->NumOfZones);
             TermUnitSizingNumsHeat.allocate(state.dataGlobal->NumOfZones);
 
-            MassFlowSetToler = HVACFlowRateToler * 0.00001;
+            MassFlowSetToler = DataConvergParams::HVACFlowRateToler * 0.00001;
 
             for (SupAirPath = 1; SupAirPath <= NumSupplyAirPaths; ++SupAirPath) {
 
@@ -1978,13 +1974,13 @@ namespace SimAirServingZones {
             }
 
             // now register zone inlet nodes as critical demand nodes in the convergence tracking
-            ZoneInletConvergence.allocate(state.dataGlobal->NumOfZones);
+            state.dataConvergeParams->ZoneInletConvergence.allocate(state.dataGlobal->NumOfZones);
             for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 if (ZoneEquipConfig(ZoneNum).NumInletNodes > 0) {
-                    ZoneInletConvergence(ZoneNum).NumInletNodes = ZoneEquipConfig(ZoneNum).NumInletNodes;
-                    ZoneInletConvergence(ZoneNum).InletNode.allocate(ZoneEquipConfig(ZoneNum).NumInletNodes);
+                    state.dataConvergeParams->ZoneInletConvergence(ZoneNum).NumInletNodes = ZoneEquipConfig(ZoneNum).NumInletNodes;
+                    state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode.allocate(ZoneEquipConfig(ZoneNum).NumInletNodes);
                     for (nodeLoop = 1; nodeLoop <= ZoneEquipConfig(ZoneNum).NumInletNodes; ++nodeLoop) {
-                        ZoneInletConvergence(ZoneNum).InletNode(nodeLoop).NodeNum = ZoneEquipConfig(ZoneNum).InletNode(nodeLoop);
+                        state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(nodeLoop).NodeNum = ZoneEquipConfig(ZoneNum).InletNode(nodeLoop);
                     }
                 }
             }
@@ -2474,8 +2470,6 @@ namespace SimAirServingZones {
         // REFERENCES: None
 
         // Using/Aliasing
-        using DataConvergParams::CalledFromAirSystemSupplySideDeck1;
-        using DataConvergParams::CalledFromAirSystemSupplySideDeck2;
         using General::GetPreviousHVACTime;
         using HVACInterfaceManager::UpdateHVACInterface;
 
@@ -2515,7 +2509,7 @@ namespace SimAirServingZones {
         int AirLoopPass;
         // Flag set by ResolveSysFlow; if TRUE, mass balance failed and there must be a second pass
         bool SysReSim;
-        int CalledFrom;
+        DataConvergParams::iCalledFrom CalledFrom;
 
         // FLOW:
 
@@ -2529,7 +2523,7 @@ namespace SimAirServingZones {
 
         // BUG: IterMax should not be aggregated as a Sum output variable
         //      We need a new aggregation scheme to track the max value across HVAC steps
-        //      instead of suming it up.
+        //      instead of summing it up.
         IterMax = 0;
 
         // Reset counters to capture statistics for the current zone time step
@@ -2597,8 +2591,8 @@ namespace SimAirServingZones {
             // the zone equipment side, looping through all supply air paths for this
             // air loop.
             for (AirSysOutNum = 1; AirSysOutNum <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumSupplyNodes; ++AirSysOutNum) {
-                if (AirSysOutNum == 1) CalledFrom = CalledFromAirSystemSupplySideDeck1;
-                if (AirSysOutNum == 2) CalledFrom = CalledFromAirSystemSupplySideDeck2;
+                if (AirSysOutNum == 1) CalledFrom = DataConvergParams::iCalledFrom::AirSystemSupplySideDeck1;
+                if (AirSysOutNum == 2) CalledFrom = DataConvergParams::iCalledFrom::AirSystemSupplySideDeck2;
                 UpdateHVACInterface(state,
                                     AirLoopNum,
                                     CalledFrom,
@@ -2671,8 +2665,8 @@ namespace SimAirServingZones {
                     // the zone equipment side, looping through all supply air paths for this
                     // air loop.
                     for (AirSysOutNum = 1; AirSysOutNum <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumSupplyNodes; ++AirSysOutNum) {
-                        if (AirSysOutNum == 1) CalledFrom = CalledFromAirSystemSupplySideDeck1;
-                        if (AirSysOutNum == 2) CalledFrom = CalledFromAirSystemSupplySideDeck2;
+                        if (AirSysOutNum == 1) CalledFrom = DataConvergParams::iCalledFrom::AirSystemSupplySideDeck1;
+                        if (AirSysOutNum == 2) CalledFrom = DataConvergParams::iCalledFrom::AirSystemSupplySideDeck2;
                         UpdateHVACInterface(state,
                                             AirLoopNum,
                                             CalledFrom,

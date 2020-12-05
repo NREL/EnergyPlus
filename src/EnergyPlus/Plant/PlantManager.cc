@@ -192,8 +192,6 @@ namespace EnergyPlus {
             // Reset the flags as necessary
 
             // Using/Aliasing
-            using DataConvergParams::MaxPlantSubIterations;
-            using DataConvergParams::MinPlantSubIterations;
             using PlantUtilities::LogPlantConvergencePoints;
 
             // SUBROUTINE VARIABLE DEFINITIONS
@@ -210,9 +208,9 @@ namespace EnergyPlus {
                 return (e.CommonPipeType == DataPlant::CommonPipe_Single) ||
                        (e.CommonPipeType == DataPlant::CommonPipe_TwoWay);
             })) {
-                CurntMinPlantSubIterations = max(7, MinPlantSubIterations);
+                CurntMinPlantSubIterations = max(7, state.dataConvergeParams->MinPlantSubIterations);
             } else {
-                CurntMinPlantSubIterations = MinPlantSubIterations;
+                CurntMinPlantSubIterations = state.dataConvergeParams->MinPlantSubIterations;
             }
 
             if (TotNumLoops <= 0) { // quick return if no plant in model
@@ -223,7 +221,7 @@ namespace EnergyPlus {
             IterPlant = 0;
             InitializeLoops(state, FirstHVACIteration);
 
-            while ((SimPlantLoops) && (IterPlant <= MaxPlantSubIterations)) {
+            while ((SimPlantLoops) && (IterPlant <= state.dataConvergeParams->MaxPlantSubIterations)) {
                 // go through half loops in predetermined calling order
                 for (HalfLoopNum = 1; HalfLoopNum <= TotNumHalfLoops; ++HalfLoopNum) {
 
@@ -314,7 +312,6 @@ namespace EnergyPlus {
             auto localTempSetPt = SetPointManager::iCtrlVarType::Temp;
             using NodeInputManager::GetOnlySingleNode;
             using namespace BranchInputManager;
-            using DataConvergParams::PlantConvergence;
             using DataSizing::AutoSize;
             using FluidProperties::CheckFluidPropertyName;
             using FluidProperties::FindGlycol;
@@ -352,7 +349,7 @@ namespace EnergyPlus {
 
             if (TotNumLoops > 0) {
                 PlantLoop.allocate(TotNumLoops);
-                PlantConvergence.allocate(TotNumLoops);
+                state.dataConvergeParams->PlantConvergence.allocate(TotNumLoops);
                 if (!allocated(PlantAvailMgr)) {
                     PlantAvailMgr.allocate(TotNumLoops);
                 }

@@ -105,7 +105,6 @@ namespace ZoneContaminantPredictorCorrector {
     using DataEnvironment::OutBaroPress;
     using DataEnvironment::OutHumRat;
     using namespace Psychrometrics;
-    using namespace DataContaminantBalance;
     using namespace HybridModel;
     using ScheduleManager::GetCurrentScheduleValue;
     using ZoneTempPredictorCorrector::DownInterpolate4HistoryValues;
