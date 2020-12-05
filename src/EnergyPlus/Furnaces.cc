@@ -189,10 +189,6 @@ namespace Furnaces {
     // MODULE PARAMETER DEFINITIONS
     static std::string const BlankString;
 
-    // Last mode of operation
-    int const CoolingMode(1); // last compressor operating mode was in cooling
-    int const HeatingMode(2); // last compressor operating mode was in heating
-    int const NoCoolHeat(3);  // last operating mode was coil off
     // Airflow control for contant fan mode
     int const UseCompressorOnFlow(1);  // set compressor OFF air flow rate equal to compressor ON air flow rate
     int const UseCompressorOffFlow(2); // set compressor OFF air flow rate equal to user defined value
@@ -4914,9 +4910,9 @@ namespace Furnaces {
         int OutNode;                           // Outlet node number in MSHP loop
         Real64 RhoAir;                         // Air density at InNode
         int IHPIndex(0);                       // coil id of IHP coil
-        int OperatingMode;                     // track cooling, heating, and no cooling or heating modes
-        int OperatingModeMinusOne;
-        int OperatingModeMinusTwo;
+        Furnaces::ModeOfOperation OperatingMode;                     // track cooling, heating, and no cooling or heating modes
+        Furnaces::ModeOfOperation OperatingModeMinusOne;
+        Furnaces::ModeOfOperation OperatingModeMinusTwo;
         bool Oscillate; // detection of oscillating operating modes
 
         InNode = Furnace(FurnaceNum).FurnaceInletNodeNum;
@@ -5857,7 +5853,7 @@ namespace Furnaces {
 
         if (FirstHVACIteration) {
             Furnace(FurnaceNum).iterationCounter = 0;
-            Furnace(FurnaceNum).iterationMode = 0;
+            Furnace(FurnaceNum).iterationMode = Furnaces::ModeOfOperation::NoCoolHeat;
         }
         Furnace(FurnaceNum).iterationCounter += 1;
 
@@ -5865,11 +5861,11 @@ namespace Furnaces {
         Furnace(FurnaceNum).iterationMode(3) = Furnace(FurnaceNum).iterationMode(2);
         Furnace(FurnaceNum).iterationMode(2) = Furnace(FurnaceNum).iterationMode(1);
         if (CoolingLoad) {
-            Furnace(FurnaceNum).iterationMode(1) = CoolingMode;
+            Furnace(FurnaceNum).iterationMode(1) = Furnaces::ModeOfOperation::CoolingMode;
         } else if (HeatingLoad) {
-            Furnace(FurnaceNum).iterationMode(1) = HeatingMode;
+            Furnace(FurnaceNum).iterationMode(1) = Furnaces::ModeOfOperation::HeatingMode;
         } else {
-            Furnace(FurnaceNum).iterationMode(1) = NoCoolHeat;
+            Furnace(FurnaceNum).iterationMode(1) = Furnaces::ModeOfOperation::NoCoolHeat;
         }
 
         // IF small loads to meet or not converging, just shut down unit
@@ -5991,12 +5987,12 @@ namespace Furnaces {
                         CompOnMassFlow = Furnace(FurnaceNum).MaxHeatAirMassFlow;
                         CompOnFlowRatio = Furnace(FurnaceNum).HeatingSpeedRatio;
                     }
-                    Furnace(FurnaceNum).LastMode = HeatingMode;
+                    Furnace(FurnaceNum).LastMode = Furnaces::ModeOfOperation::HeatingMode;
                     //     IF a cooling load exists, operate at the cooling mass flow rate
                 } else if (CoolingLoad) {
                     CompOnMassFlow = Furnace(FurnaceNum).MaxCoolAirMassFlow;
                     CompOnFlowRatio = Furnace(FurnaceNum).CoolingSpeedRatio;
-                    Furnace(FurnaceNum).LastMode = CoolingMode;
+                    Furnace(FurnaceNum).LastMode = Furnaces::ModeOfOperation::CoolingMode;
                     //     If no load exists, set the compressor on mass flow rate.
                     //     Set equal the mass flow rate when no heating or cooling is needed if no moisture load exists.
                     //     If the user has set the off mass flow rate to 0, set according to the last operating mode.
@@ -6010,7 +6006,7 @@ namespace Furnaces {
                         CompOnFlowRatio = Furnace(FurnaceNum).HeatingSpeedRatio;
                         //         User may have entered a 0 for MaxNoCoolHeatAirMassFlow
                         if (CompOnMassFlow == 0.0) {
-                            if (Furnace(FurnaceNum).LastMode == HeatingMode) {
+                            if (Furnace(FurnaceNum).LastMode == Furnaces::ModeOfOperation::HeatingMode) {
                                 CompOnMassFlow = Furnace(FurnaceNum).MaxHeatAirMassFlow;
                                 CompOnFlowRatio = Furnace(FurnaceNum).HeatingSpeedRatio;
                             } else {
@@ -6024,7 +6020,7 @@ namespace Furnaces {
                 //     Set the compressor or coil OFF mass flow rate based on LOGICAL flag
                 //     UseCompressorOnFlow is used when the user does not enter a value for no cooling or heating flow rate
                 if (Furnace(FurnaceNum).AirFlowControl == UseCompressorOnFlow) {
-                    if (Furnace(FurnaceNum).LastMode == HeatingMode) {
+                    if (Furnace(FurnaceNum).LastMode == Furnaces::ModeOfOperation::HeatingMode) {
                         if (MoistureLoad < 0.0 && Furnace(FurnaceNum).Humidistat &&
                             Furnace(FurnaceNum).DehumidControlType_Num == DehumidControl_CoolReheat) {
                             CompOffMassFlow = Furnace(FurnaceNum).MaxCoolAirMassFlow;
@@ -6051,11 +6047,11 @@ namespace Furnaces {
                         Furnace(FurnaceNum).DehumidControlType_Num == DehumidControl_CoolReheat) {
                         CompOnMassFlow = Furnace(FurnaceNum).MaxCoolAirMassFlow;
                         CompOnFlowRatio = Furnace(FurnaceNum).CoolingSpeedRatio;
-                        Furnace(FurnaceNum).LastMode = CoolingMode;
+                        Furnace(FurnaceNum).LastMode = Furnaces::ModeOfOperation::CoolingMode;
                     } else {
                         CompOnMassFlow = Furnace(FurnaceNum).MaxHeatAirMassFlow;
                         CompOnFlowRatio = Furnace(FurnaceNum).HeatingSpeedRatio;
-                        Furnace(FurnaceNum).LastMode = HeatingMode;
+                        Furnace(FurnaceNum).LastMode = Furnaces::ModeOfOperation::HeatingMode;
                     }
                 } else if (CoolingLoad) {
                     CompOnMassFlow = Furnace(FurnaceNum).MaxCoolAirMassFlow;
@@ -10054,12 +10050,12 @@ namespace Furnaces {
 
         // Set latent load for heating
         if (HeatingLoad) {
-            Furnace(FurnaceNum).HeatCoolMode = HeatingMode;
+            Furnace(FurnaceNum).HeatCoolMode = Furnaces::ModeOfOperation::HeatingMode;
             // Set latent load for cooling and no sensible load condition
         } else if (CoolingLoad) {
-            Furnace(FurnaceNum).HeatCoolMode = CoolingMode;
+            Furnace(FurnaceNum).HeatCoolMode = Furnaces::ModeOfOperation::CoolingMode;
         } else {
-            Furnace(FurnaceNum).HeatCoolMode = 0;
+            Furnace(FurnaceNum).HeatCoolMode = Furnaces::ModeOfOperation::NoCoolHeat;
         }
 
         // set the on/off flags
@@ -10450,9 +10446,9 @@ namespace Furnaces {
         // Get full load result
         PartLoadFrac = 1.0;
         SpeedRatio = 1.0;
-        if (Furnace(FurnaceNum).HeatCoolMode == HeatingMode) {
+        if (Furnace(FurnaceNum).HeatCoolMode == Furnaces::ModeOfOperation::HeatingMode) {
             SpeedNum = Furnace(FurnaceNum).NumOfSpeedHeating;
-        } else if (Furnace(FurnaceNum).HeatCoolMode == CoolingMode) {
+        } else if (Furnace(FurnaceNum).HeatCoolMode == Furnaces::ModeOfOperation::CoolingMode) {
             SpeedNum = Furnace(FurnaceNum).NumOfSpeedCooling;
         } else if (QLatReq < -SmallLoad) {
             SpeedNum = Furnace(FurnaceNum).NumOfSpeedCooling;
@@ -11897,7 +11893,7 @@ namespace Furnaces {
             };
         } else {
             if (!CurDeadBandOrSetback(Furnace(FurnaceNum).ControlZoneNum) && present(SpeedNum)) {
-                if (Furnace(FurnaceNum).HeatCoolMode == HeatingMode) {
+                if (Furnace(FurnaceNum).HeatCoolMode == Furnaces::ModeOfOperation::HeatingMode) {
                     if (SpeedNum == 1) {
                         CompOnMassFlow = Furnace(FurnaceNum).HeatMassFlowRate(SpeedNum);
                         CompOnFlowRatio = Furnace(FurnaceNum).MSHeatingSpeedRatio(SpeedNum);
@@ -11911,7 +11907,7 @@ namespace Furnaces {
                         MSHPMassFlowRateLow = Furnace(FurnaceNum).HeatMassFlowRate(SpeedNum - 1);
                         MSHPMassFlowRateHigh = Furnace(FurnaceNum).HeatMassFlowRate(SpeedNum);
                     }
-                } else if (Furnace(FurnaceNum).HeatCoolMode == CoolingMode) {
+                } else if (Furnace(FurnaceNum).HeatCoolMode == Furnaces::ModeOfOperation::CoolingMode) {
                     if (SpeedNum == 1) {
                         CompOnMassFlow = Furnace(FurnaceNum).CoolMassFlowRate(SpeedNum);
                         CompOnFlowRatio = Furnace(FurnaceNum).MSCoolingSpeedRatio(SpeedNum);
@@ -11934,7 +11930,7 @@ namespace Furnaces {
                     if (SpeedNum == 1) { // LOWEST SPEED USE IDLE FLOW
                         CompOffMassFlow = Furnace(FurnaceNum).IdleMassFlowRate;
                         CompOffFlowRatio = Furnace(FurnaceNum).IdleSpeedRatio;
-                    } else if (Furnace(FurnaceNum).LastMode == HeatingMode) {
+                    } else if (Furnace(FurnaceNum).LastMode == Furnaces::ModeOfOperation::HeatingMode) {
                         CompOffMassFlow = Furnace(FurnaceNum).HeatMassFlowRate(SpeedNum);
                         CompOffFlowRatio = Furnace(FurnaceNum).MSHeatingSpeedRatio(SpeedNum);
                     } else {
@@ -12045,24 +12041,24 @@ namespace Furnaces {
         // FLOW:
 
         if (CoolingLoad) {
-            Furnace(FurnaceNum).HeatCoolMode = CoolingMode;
+            Furnace(FurnaceNum).HeatCoolMode = Furnaces::ModeOfOperation::CoolingMode;
         } else if (HeatingLoad) {
-            Furnace(FurnaceNum).HeatCoolMode = HeatingMode;
+            Furnace(FurnaceNum).HeatCoolMode = Furnaces::ModeOfOperation::HeatingMode;
         } else {
-            Furnace(FurnaceNum).HeatCoolMode = 0;
+            Furnace(FurnaceNum).HeatCoolMode = Furnaces::ModeOfOperation::NoCoolHeat;
         }
 
         // Set the inlet node mass flow rate
         if (Furnace(FurnaceNum).OpMode == ContFanCycCoil) {
             // constant fan mode
-            if ((Furnace(FurnaceNum).HeatCoolMode == HeatingMode) && !CurDeadBandOrSetback(ZoneNum)) {
+            if ((Furnace(FurnaceNum).HeatCoolMode == Furnaces::ModeOfOperation::HeatingMode) && !CurDeadBandOrSetback(ZoneNum)) {
                 CompOnMassFlow = Furnace(FurnaceNum).HeatMassFlowRate(1);
                 CompOnFlowRatio = Furnace(FurnaceNum).MSHeatingSpeedRatio(1);
-                Furnace(FurnaceNum).LastMode = HeatingMode;
-            } else if ((Furnace(FurnaceNum).HeatCoolMode == CoolingMode) && !CurDeadBandOrSetback(ZoneNum)) {
+                Furnace(FurnaceNum).LastMode = Furnaces::ModeOfOperation::HeatingMode;
+            } else if ((Furnace(FurnaceNum).HeatCoolMode == Furnaces::ModeOfOperation::CoolingMode) && !CurDeadBandOrSetback(ZoneNum)) {
                 CompOnMassFlow = Furnace(FurnaceNum).CoolMassFlowRate(1);
                 CompOnFlowRatio = Furnace(FurnaceNum).MSCoolingSpeedRatio(1);
-                Furnace(FurnaceNum).LastMode = CoolingMode;
+                Furnace(FurnaceNum).LastMode = Furnaces::ModeOfOperation::CoolingMode;
             } else {
                 CompOnMassFlow = Furnace(FurnaceNum).IdleMassFlowRate;
                 CompOnFlowRatio = Furnace(FurnaceNum).IdleSpeedRatio;
@@ -12071,10 +12067,10 @@ namespace Furnaces {
             CompOffFlowRatio = Furnace(FurnaceNum).IdleSpeedRatio;
         } else {
             // cycling fan mode
-            if ((Furnace(FurnaceNum).HeatCoolMode == HeatingMode) && !CurDeadBandOrSetback(ZoneNum)) {
+            if ((Furnace(FurnaceNum).HeatCoolMode == Furnaces::ModeOfOperation::HeatingMode) && !CurDeadBandOrSetback(ZoneNum)) {
                 CompOnMassFlow = Furnace(FurnaceNum).HeatMassFlowRate(1);
                 CompOnFlowRatio = Furnace(FurnaceNum).MSHeatingSpeedRatio(1);
-            } else if ((Furnace(FurnaceNum).HeatCoolMode == CoolingMode) && !CurDeadBandOrSetback(ZoneNum)) {
+            } else if ((Furnace(FurnaceNum).HeatCoolMode == Furnaces::ModeOfOperation::CoolingMode) && !CurDeadBandOrSetback(ZoneNum)) {
                 CompOnMassFlow = Furnace(FurnaceNum).CoolMassFlowRate(1);
                 CompOnFlowRatio = Furnace(FurnaceNum).MSCoolingSpeedRatio(1);
             } else {
@@ -12092,7 +12088,7 @@ namespace Furnaces {
                 Node(InNode).MassFlowRate = CompOnMassFlow;
                 PartLoadRatio = 0.0;
             } else {
-                if (Furnace(FurnaceNum).HeatCoolMode != 0) {
+                if (Furnace(FurnaceNum).HeatCoolMode != Furnaces::ModeOfOperation::NoCoolHeat) {
                     PartLoadRatio = 1.0;
                 } else {
                     PartLoadRatio = 0.0;

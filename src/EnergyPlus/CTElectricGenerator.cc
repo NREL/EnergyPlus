@@ -663,7 +663,7 @@ namespace CTElectricGenerator {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine is for initializations of the CT generators.
 
-        static std::string const RoutineName("InitICEngineGenerators");
+        auto constexpr RoutineName("InitICEngineGenerators");
 
         bool errFlag;
 
