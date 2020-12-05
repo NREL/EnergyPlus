@@ -1986,7 +1986,7 @@ namespace IceThermalStorage {
         } else if (UtilityRoutines::SameString(sType, "ThermalStorage:Pcm:Simple")) {
             if (IndexNum != 0) {
                 SimplePcmStorage(IndexNum).PcmTSChargingRate = ChargeRate;
-                SimplePcmStorage(IndexNum).PcmTSCoolingRate = DischargRate; 
+                SimplePcmStorage(IndexNum).PcmTSCoolingRate_rep = DischargRate; 
 
                 SimplePcmStorage(IndexNum).Urate = NetRate * 3600.0 / SimplePcmStorage(IndexNum).PcmTSNomCap; 
                 SimplePcmStorage(IndexNum).PcmFracRemain += SimplePcmStorage(IndexNum).Urate * DataHVACGlobals::TimeStepSys;
@@ -2718,8 +2718,9 @@ namespace IceThermalStorage {
             }
         }
 
-        // Chiller outlet temp must be below freeze temp, or else no charge
-        if (PcmTSOutletTemp_loc >= Tfr) {
+        //we are doing discharge
+        // Chiller outlet temp must be above freeze temp, or else no charge
+        if (PcmTSOutletTemp_loc <= Tfr) {
             QpcmMin = 0.0;
         } else {
             // Effectiveness-Ntu method
@@ -2729,7 +2730,7 @@ namespace IceThermalStorage {
  //           std::cout << "PcmTSMassFlowRate = " << this->PcmTSMassFlowRate << endl;
             Real64 Ntu = UAfr / Cmin;
             Real64 Effectiveness = 1 - exp(-Ntu);
-            QpcmMin = Effectiveness * Cmin * (Tfr - PcmTSOutletTemp_loc);
+            QpcmMin = Effectiveness * Cmin * (PcmTSOutletTemp_loc - Tfr);
         }
 
     }
