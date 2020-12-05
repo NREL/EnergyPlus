@@ -73,139 +73,137 @@ namespace DataRuntimeLanguage {
     // Data module should be available to other modules and routines.
     // Thus, all variables in this module must be PUBLIC.
 
-    // MODULE PARAMETER DEFINITIONS:
-    extern int const ValueNull;       // Erl entity type, "Null" value
-    extern int const ValueNumber;     // Erl entity type,  hard numeric value
-    extern int const ValueString;     // Erl entity type,  character data
-    extern int const ValueArray;      // Erl entity type,  not used yet, for future array type
-    extern int const ValueVariable;   // Erl entity type,  Erl variable
-    extern int const ValueExpression; // Erl entity type,  Erl expression
-    extern int const ValueTrend;      // Erl entity type,  Erl trend variable
-    extern int const ValueError;      // Erl entity type, processing of an expression failed, returned error
+    int constexpr ValueNull(0);       // Erl entity type, "Null" value
+    int constexpr ValueNumber(1);     // Erl entity type,  hard numeric value
+    int constexpr ValueString(2);     // Erl entity type,  character data
+    int constexpr ValueArray(3);      // Erl entity type,  not used yet, for future array type
+    int constexpr ValueVariable(4);   // Erl entity type,  Erl variable
+    int constexpr ValueExpression(5); // Erl entity type,  Erl expression
+    int constexpr ValueTrend(6);      // Erl entity type,  Erl trend variable
+    int constexpr ValueError(7);      // Erl entity type, processing of an expression failed, returned error
 
-    extern int const PntrReal;    // data type for overloaded pointer management, double real
-    extern int const PntrInteger; // data type for overloaded pointer management, integer
-    extern int const PntrLogical; // data type for overloaded pointer management, logical
-
-    int constexpr MaxWhileLoopIterations(1000000); // protect from infinite loop in WHILE loops
+    int constexpr PntrReal(301);    // data type for overloaded pointer management, double real
+    int constexpr PntrInteger(302); // data type for overloaded pointer management, integer
+    int constexpr PntrLogical(303); // data type for overloaded pointer management, logical
 
     // Parameters for identifying operator types in Erl
     // The number of these parameters indicates the order of precedence
-    extern int const OperatorLiteral;        // Just stores a literal value
-    extern int const OperatorNegative;       // -  (unary) No LHS?
-    extern int const OperatorDivide;         // /
-    extern int const OperatorMultiply;       // *
-    extern int const OperatorSubtract;       // -  (binary)
-    extern int const OperatorAdd;            // +  (binary)
-    extern int const OperatorEqual;          // ==
-    extern int const OperatorNotEqual;       // <>
-    extern int const OperatorLessOrEqual;    // <=
-    extern int const OperatorGreaterOrEqual; // >=
-    extern int const OperatorLessThan;       // <
-    extern int const OperatorGreaterThan;    // >
-    extern int const OperatorRaiseToPower;   // ^
-    extern int const OperatorLogicalAND;     // &&
-    extern int const OperatorLogicalOR;     // ||
+    int constexpr OperatorLiteral(1);         // Just stores a literal value
+    int constexpr OperatorNegative(2);        // -  (unary) No LHS?
+    int constexpr OperatorDivide(3);          // /
+    int constexpr OperatorMultiply(4);        // *
+    int constexpr OperatorSubtract(5);        // -  (binary)
+    int constexpr OperatorAdd(6);             // +  (binary)
+    int constexpr OperatorEqual(7);           // ==
+    int constexpr OperatorNotEqual(8);        // <>
+    int constexpr OperatorLessOrEqual(9);     // <=
+    int constexpr OperatorGreaterOrEqual(10); // >=
+    int constexpr OperatorLessThan(11);       // <
+    int constexpr OperatorGreaterThan(12);    // >
+    int constexpr OperatorRaiseToPower(13);   // ^
+    int constexpr OperatorLogicalAND(14);     // &&
+    int constexpr OperatorLogicalOR(15);     // ||
     // note there is an important check "> 15" to distinguish operators from functions
     //  so be careful if renumber these parameters.  Binary operator additions should get inserted here rather than appended
 
     // parameters for built-in Erl functions, these are processed like operators and numbering
     // must be sequential with the operators.
     // math functions
-    extern int const FuncRound;    // accessor for Fortran's DNINT()
-    extern int const FuncMod;      // accessor for Fortran's MOD()
-    extern int const FuncSin;      // accessor for Fortran's SIN()
-    extern int const FuncCos;      // accessor for Fortran's COS()
-    extern int const FuncArcSin;   // accessor for Fortran's ASIN()
-    extern int const FuncArcCos;   // accessor for Fortran's ACOS()
-    extern int const FuncDegToRad; // Multiplies degrees by DegToRad
-    extern int const FuncRadToDeg; // Divides radians by DegToRad
-    extern int const FuncExp;      // accessor for Fortran's EXP()
-    extern int const FuncLn;       // accessor for Fortran's LOG()
-    extern int const FuncMax;      // accessor for Fortran's MAX()
-    extern int const FuncMin;      // accessor for Fortran's MIN()
-    extern int const FuncABS;      // accessor for Fortran's ABS()
-    extern int const FuncRandU;    // accessor for Fortran's Random_Number() intrinsic, uniform distribution
-    extern int const FuncRandG;    // accessor for Gaussian/normal distribution random number
-    extern int const FuncRandSeed; // accessor for Fortran's Random_Seed() intrinsic
+    int constexpr FuncRound(16);    // accessor for Fortran's DNINT()
+    int constexpr FuncMod(17);      // accessor for Fortran's MOD()
+    int constexpr FuncSin(18);      // accessor for Fortran's SIN()
+    int constexpr FuncCos(19);      // accessor for Fortran's COS()
+    int constexpr FuncArcSin(20);   // accessor for Fortran's ASIN()
+    int constexpr FuncArcCos(21);   // accessor for Fortran's ACOS()
+    int constexpr FuncDegToRad(22); // Multiplies degrees by DegToRad
+    int constexpr FuncRadToDeg(23); // Divides radians by DegToRad
+    int constexpr FuncExp(24);      // accessor for Fortran's EXP()
+    int constexpr FuncLn(25);       // accessor for Fortran's LOG()
+    int constexpr FuncMax(26);      // accessor for Fortran's MAX()
+    int constexpr FuncMin(27);      // accessor for Fortran's MIN()
+    int constexpr FuncABS(28);      // accessor for Fortran's ABS()
+    int constexpr FuncRandU(29);    // accessor for Fortran's Random_Number() intrinsic, uniform distribution
+    int constexpr FuncRandG(30);    // accessor for Gaussian/normal distribution random number
+    int constexpr FuncRandSeed(31); // accessor for Fortran's Random_Seed() intrinsic
 
     // begin psychrometric routines
-    extern int const FuncRhoAirFnPbTdbW;    // accessor for E+ psych routine
-    extern int const FuncCpAirFnW;       // accessor for E+ psych routine
-    extern int const FuncHfgAirFnWTdb;      // accessor for E+ psych routine
-    extern int const FuncHgAirFnWTdb;       // accessor for E+ psych routine
-    extern int const FuncTdpFnTdbTwbPb;     // accessor for E+ psych routine
-    extern int const FuncTdpFnWPb;          // accessor for E+ psych routine
-    extern int const FuncHFnTdbW;           // accessor for E+ psych routine
-    extern int const FuncHFnTdbRhPb;        // accessor for E+ psych routine
-    extern int const FuncTdbFnHW;           // accessor for E+ psych routine
-    extern int const FuncRhovFnTdbRh;       // accessor for E+ psych routine
-    extern int const FuncRhovFnTdbRhLBnd0C; // accessor for E+ psych routine
-    extern int const FuncRhovFnTdbWPb;      // accessor for E+ psych routine
-    extern int const FuncRhFnTdbRhov;       // accessor for E+ psych routine
-    extern int const FuncRhFnTdbRhovLBnd0C; // accessor for E+ psych routine
-    extern int const FuncRhFnTdbWPb;        // accessor for E+ psych routine
-    extern int const FuncTwbFnTdbWPb;       // accessor for E+ psych routine
-    extern int const FuncVFnTdbWPb;         // accessor for E+ psych routine
-    extern int const FuncWFnTdpPb;          // accessor for E+ psych routine
-    extern int const FuncWFnTdbH;           // accessor for E+ psych routine
-    extern int const FuncWFnTdbTwbPb;       // accessor for E+ psych routine
-    extern int const FuncWFnTdbRhPb;        // accessor for E+ psych routine
-    extern int const FuncPsatFnTemp;        // accessor for E+ psych routine
-    extern int const FuncTsatFnHPb;         // accessor for E+ psych routine
-    extern int const FuncTsatFnPb;          // not public in PsychRoutines.cc so not really available in EMS.
-    extern int const FuncCpCW;              // accessor for E+ psych routine
-    extern int const FuncCpHW;              // accessor for E+ psych routine
-    extern int const FuncRhoH2O;            // accessor for E+ psych routine
+    int constexpr FuncRhoAirFnPbTdbW(32);    // accessor for E+ psych routine
+    int constexpr FuncCpAirFnW(33);       // accessor for E+ psych routine
+    int constexpr FuncHfgAirFnWTdb(34);      // accessor for E+ psych routine
+    int constexpr FuncHgAirFnWTdb(35);       // accessor for E+ psych routine
+    int constexpr FuncTdpFnTdbTwbPb(36);     // accessor for E+ psych routine
+    int constexpr FuncTdpFnWPb(37);          // accessor for E+ psych routine
+    int constexpr FuncHFnTdbW(38);           // accessor for E+ psych routine
+    int constexpr FuncHFnTdbRhPb(39);        // accessor for E+ psych routine
+    int constexpr FuncTdbFnHW(40);           // accessor for E+ psych routine
+    int constexpr FuncRhovFnTdbRh(41);       // accessor for E+ psych routine
+    int constexpr FuncRhovFnTdbRhLBnd0C(42); // accessor for E+ psych routine
+    int constexpr FuncRhovFnTdbWPb(43);      // accessor for E+ psych routine
+    int constexpr FuncRhFnTdbRhov(44);       // accessor for E+ psych routine
+    int constexpr FuncRhFnTdbRhovLBnd0C(45); // accessor for E+ psych routine
+    int constexpr FuncRhFnTdbWPb(46);        // accessor for E+ psych routine
+    int constexpr FuncTwbFnTdbWPb(47);       // accessor for E+ psych routine
+    int constexpr FuncVFnTdbWPb(48);         // accessor for E+ psych routine
+    int constexpr FuncWFnTdpPb(49);          // accessor for E+ psych routine
+    int constexpr FuncWFnTdbH(50);           // accessor for E+ psych routine
+    int constexpr FuncWFnTdbTwbPb(51);       // accessor for E+ psych routine
+    int constexpr FuncWFnTdbRhPb(52);        // accessor for E+ psych routine
+    int constexpr FuncPsatFnTemp(53);        // accessor for E+ psych routine
+    int constexpr FuncTsatFnHPb(54);         // accessor for E+ psych routine
+    int constexpr FuncTsatFnPb(55);          // not public in PsychRoutines.cc so not really available in EMS.
+    int constexpr FuncCpCW(56);              // accessor for E+ psych routine
+    int constexpr FuncCpHW(57);              // accessor for E+ psych routine
+    int constexpr FuncRhoH2O(58);            // accessor for E+ psych routine
 
     // Simulation Management Functions
-    extern int const FuncFatalHaltEp;  // accessor for E+ error management, "Fatal" level
-    extern int const FuncSevereWarnEp; // accessor for E+ error management, "Severe" level
-    extern int const FuncWarnEp;       // accessor for E+ error management, "Warning" level
+    int constexpr FuncFatalHaltEp(59);  // accessor for E+ error management, "Fatal" level
+    int constexpr FuncSevereWarnEp(60); // accessor for E+ error management, "Severe" level
+    int constexpr FuncWarnEp(61);       // accessor for E+ error management, "Warning" level
 
     // Trend variable handling Functions
-    extern int const FuncTrendValue;     // accessor for Erl Trend variables, instance value
-    extern int const FuncTrendAverage;   // accessor for Erl Trend variables, average value
-    extern int const FuncTrendMax;       // accessor for Erl Trend variables, max value
-    extern int const FuncTrendMin;       // accessor for Erl Trend variables, min value
-    extern int const FuncTrendDirection; // accessor for Erl Trend variables, slope value
-    extern int const FuncTrendSum;       // accessor for Erl Trend variables, sum value
+    int constexpr FuncTrendValue(62);     // accessor for Erl Trend variables, instance value
+    int constexpr FuncTrendAverage(63);   // accessor for Erl Trend variables, average value
+    int constexpr FuncTrendMax(64);       // accessor for Erl Trend variables, max value
+    int constexpr FuncTrendMin(65);       // accessor for Erl Trend variables, min value
+    int constexpr FuncTrendDirection(66); // accessor for Erl Trend variables, slope value
+    int constexpr FuncTrendSum(67);       // accessor for Erl Trend variables, sum value
 
     // Curve and Table access function
-    extern int const FuncCurveValue;
+    int constexpr FuncCurveValue(68);
 
     // Weather data query functions
-    extern int const FuncTodayIsRain;          // Access TodayIsRain(hour, timestep)
-    extern int const FuncTodayIsSnow;          // Access TodayIsSnow(hour, timestep)
-    extern int const FuncTodayOutDryBulbTemp;  // Access TodayOutDryBulbTemp(hour, timestep)
-    extern int const FuncTodayOutDewPointTemp; // Access TodayOutDewPointTemp(hour, timestep)
-    extern int const FuncTodayOutBaroPress;    // Access TodayOutBaroPress(hour, timestep)
-    extern int const FuncTodayOutRelHum;       // Access TodayOutRelHum(hour, timestep)
-    extern int const FuncTodayWindSpeed;       // Access TodayWindSpeed(hour, timestep)
-    extern int const FuncTodayWindDir;         // Access TodayWindDir(hour, timestep)
-    extern int const FuncTodaySkyTemp;         // Access TodaySkyTemp(hour, timestep)
-    extern int const FuncTodayHorizIRSky;      // Access TodayHorizIRSky(hour, timestep)
-    extern int const FuncTodayBeamSolarRad;    // Access TodayBeamSolarRad(hour, timestep)
-    extern int const FuncTodayDifSolarRad;     // Access TodayDifSolarRad(hour, timestep)
-    extern int const FuncTodayAlbedo;          // Access TodayAlbedo(hour, timestep)
-    extern int const FuncTodayLiquidPrecip;    // Access TodayLiquidPrecip(hour, timestep)
+    int constexpr FuncTodayIsRain(69);          // Access TodayIsRain(hour, timestep)
+    int constexpr FuncTodayIsSnow(70);          // Access TodayIsSnow(hour, timestep)
+    int constexpr FuncTodayOutDryBulbTemp(71);  // Access TodayOutDryBulbTemp(hour, timestep)
+    int constexpr FuncTodayOutDewPointTemp(72); // Access TodayOutDewPointTemp(hour, timestep)
+    int constexpr FuncTodayOutBaroPress(73);    // Access TodayOutBaroPress(hour, timestep)
+    int constexpr FuncTodayOutRelHum(74);       // Access TodayOutRelHum(hour, timestep)
+    int constexpr FuncTodayWindSpeed(75);       // Access TodayWindSpeed(hour, timestep)
+    int constexpr FuncTodayWindDir(76);         // Access TodayWindDir(hour, timestep)
+    int constexpr FuncTodaySkyTemp(77);         // Access TodaySkyTemp(hour, timestep)
+    int constexpr FuncTodayHorizIRSky(78);      // Access TodayHorizIRSky(hour, timestep)
+    int constexpr FuncTodayBeamSolarRad(79);    // Access TodayBeamSolarRad(hour, timestep)
+    int constexpr FuncTodayDifSolarRad(80);     // Access TodayDifSolarRad(hour, timestep)
+    int constexpr FuncTodayAlbedo(81);          // Access TodayAlbedo(hour, timestep)
+    int constexpr FuncTodayLiquidPrecip(82);    // Access TodayLiquidPrecip(hour, timestep)
+    int constexpr FuncTomorrowIsRain(83);          // Access TomorrowIsRain(hour, timestep)
+    int constexpr FuncTomorrowIsSnow(84);          // Access TomorrowIsSnow(hour, timestep)
+    int constexpr FuncTomorrowOutDryBulbTemp(85);  // Access TomorrowOutDryBulbTemp(hour, timestep)
+    int constexpr FuncTomorrowOutDewPointTemp(86); // Access TomorrowOutDewPointTemp(hour, timestep)
+    int constexpr FuncTomorrowOutBaroPress(87);    // Access TomorrowOutBaroPress(hour, timestep)
+    int constexpr FuncTomorrowOutRelHum(88);       // Access TomorrowOutRelHum(hour, timestep)
+    int constexpr FuncTomorrowWindSpeed(89);       // Access TomorrowWindSpeed(hour, timestep)
+    int constexpr FuncTomorrowWindDir(90);         // Access TomorrowWindDir(hour, timestep)
+    int constexpr FuncTomorrowSkyTemp(91);         // Access TomorrowSkyTemp(hour, timestep)
+    int constexpr FuncTomorrowHorizIRSky(92);      // Access TomorrowHorizIRSky(hour, timestep)
+    int constexpr FuncTomorrowBeamSolarRad(93);    // Access TomorrowBeamSolarRad(hour, timestep)
+    int constexpr FuncTomorrowDifSolarRad(94);     // Access TomorrowDifSolarRad(hour, timestep)
+    int constexpr FuncTomorrowAlbedo(95);          // Access TomorrowAlbedo(hour, timestep)
+    int constexpr FuncTomorrowLiquidPrecip(96);    // Access TomorrowLiquidPrecip(hour, timestep)
 
-    extern int const FuncTomorrowIsRain;          // Access TomorrowIsRain(hour, timestep)
-    extern int const FuncTomorrowIsSnow;          // Access TomorrowIsSnow(hour, timestep)
-    extern int const FuncTomorrowOutDryBulbTemp;  // Access TomorrowOutDryBulbTemp(hour, timestep)
-    extern int const FuncTomorrowOutDewPointTemp; // Access TomorrowOutDewPointTemp(hour, timestep)
-    extern int const FuncTomorrowOutBaroPress;    // Access TomorrowOutBaroPress(hour, timestep)
-    extern int const FuncTomorrowOutRelHum;       // Access TomorrowOutRelHum(hour, timestep)
-    extern int const FuncTomorrowWindSpeed;       // Access TomorrowWindSpeed(hour, timestep)
-    extern int const FuncTomorrowWindDir;         // Access TomorrowWindDir(hour, timestep)
-    extern int const FuncTomorrowSkyTemp;         // Access TomorrowSkyTemp(hour, timestep)
-    extern int const FuncTomorrowHorizIRSky;      // Access TomorrowHorizIRSky(hour, timestep)
-    extern int const FuncTomorrowBeamSolarRad;    // Access TomorrowBeamSolarRad(hour, timestep)
-    extern int const FuncTomorrowDifSolarRad;     // Access TomorrowDifSolarRad(hour, timestep)
-    extern int const FuncTomorrowAlbedo;          // Access TodayAlbedo(hour, timestep)
-    extern int const FuncTomorrowLiquidPrecip;    // Access TomorrowLiquidPrecip(hour, timestep)
+    int constexpr NumPossibleOperators(96); // total number of operators and built-in functions
 
-    extern int const NumPossibleOperators; // total number of operators and built-in functions
+    int constexpr MaxWhileLoopIterations(1000000); // protect from infinite loop in WHILE loops
 
     // Types
 
