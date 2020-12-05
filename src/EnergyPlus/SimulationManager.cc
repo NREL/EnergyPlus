@@ -3086,9 +3086,6 @@ void Resimulate(EnergyPlusData &state,
     // Using/Aliasing
     using DataHeatBalFanSys::iGetZoneSetPoints;
     using DataHeatBalFanSys::iPredictStep;
-    using DemandManager::DemandManagerExtIterations;
-    using DemandManager::DemandManagerHBIterations;
-    using DemandManager::DemandManagerHVACIterations;
     using ExteriorEnergyUse::ManageExteriorEnergyUse;
     using HeatBalanceAirManager::InitAirHeatBalance;
     using HeatBalanceSurfaceManager::InitSurfaceHeatBalance;
@@ -3107,7 +3104,7 @@ void Resimulate(EnergyPlusData &state,
     if (ResimExt) {
         ManageExteriorEnergyUse(state);
 
-        ++DemandManagerExtIterations;
+        ++state.dataDemandManager->DemandManagerExtIterations;
     }
 
     if (ResimHB) {
@@ -3120,7 +3117,7 @@ void Resimulate(EnergyPlusData &state,
         InitAirHeatBalance(state);
         ManageRefrigeratedCaseRacks(state);
 
-        ++DemandManagerHBIterations;
+        ++state.dataDemandManager->DemandManagerHBIterations;
         ResimHVAC = true; // Make sure HVAC is resimulated too
     }
 
@@ -3133,7 +3130,7 @@ void Resimulate(EnergyPlusData &state,
         if (state.dataContaminantBalance->Contaminant.SimulateContaminants) ManageZoneContaminanUpdates(state, iPredictStep, false, UseZoneTimeStepHistory, 0.0);
         SimHVAC(state);
 
-        ++DemandManagerHVACIterations;
+        ++state.dataDemandManager->DemandManagerHVACIterations;
     }
 }
 
