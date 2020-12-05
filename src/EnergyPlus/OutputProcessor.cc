@@ -117,8 +117,6 @@ namespace OutputProcessor {
     int const ReportVDD_Yes(1); // Report the variable dictionaries in "report format"
     int const ReportVDD_IDF(2); // Report the variable dictionaries in "IDF format"
 
-    Real64 const MinSetValue(99999999999999.0);
-    Real64 const MaxSetValue(-99999999999999.0);
     int const IMinSetValue(999999);
     int const IMaxSetValue(-999999);
 

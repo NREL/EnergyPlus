@@ -113,7 +113,7 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     Furnace(FurnaceNum).MSHeatingSpeedRatio.allocate(3);
     Furnace(FurnaceNum).MSCoolingSpeedRatio.allocate(3);
 
-    Furnace(FurnaceNum).LastMode = HeatingMode;
+    Furnace(FurnaceNum).LastMode = Furnaces::ModeOfOperation::HeatingMode;
     Furnace(FurnaceNum).IdleMassFlowRate = 0.2;
     Furnace(FurnaceNum).IdleSpeedRatio = 0.2;
     Furnace(FurnaceNum).FanAvailSchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
