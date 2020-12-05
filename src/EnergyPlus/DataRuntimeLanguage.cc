@@ -204,42 +204,6 @@ namespace DataRuntimeLanguage {
 
     int const NumPossibleOperators(96); // total number of operators and built-in functions
 
-    // Object Data
-    Array1D<ErlVariableType> ErlVariable;                        // holds Erl variables in a structure array
-    Array1D<ErlStackType> ErlStack;                              // holds Erl programs in separate "stacks"
-    Array1D<ErlExpressionType> ErlExpression;                    // holds Erl expressions in structure array
-    Array1D<OperatorType> PossibleOperators;                     // hard library of available operators and functions
-    Array1D<TrendVariableType> TrendVariable;                    // holds Erl trend variables in a structure array
-    Array1D<OutputVarSensorType> Sensor;                         // EMS:SENSOR objects used (from output variables)
-    Array1D<EMSActuatorAvailableType> EMSActuatorAvailable;      // actuators that could be used
-    Array1D<ActuatorUsedType> EMSActuatorUsed;                   // actuators that are used
-    Array1D<InternalVarsAvailableType> EMSInternalVarsAvailable; // internal data that could be used
-    Array1D<InternalVarsUsedType> EMSInternalVarsUsed;           // internal data that are used
-    Array1D<EMSProgramCallManagementType> EMSProgramCallManager; // program calling managers
-    ErlValueType Null(0, 0.0, "", 0, 0, false, 0, "", true);     // special "null" Erl variable value instance
-    ErlValueType False(0, 0.0, "", 0, 0, false, 0, "", true);    // special "false" Erl variable value instance
-    ErlValueType True(0, 0.0, "", 0, 0, false, 0, "", true);     // special "True" Erl variable value instance, gets reset
-
-    // EMS Actuator fast duplicate check lookup support
-    std::unordered_set<std::tuple<std::string, std::string, std::string>, EMSActuatorKey_hash> EMSActuator_lookup; // Fast duplicate lookup structure
-
-    // Functions
-    void clear_state()
-    {
-        ErlVariable.deallocate();              // holds Erl variables in a structure array
-        ErlStack.deallocate();                 // holds Erl programs in separate "stacks"
-        ErlExpression.deallocate();            // holds Erl expressions in structure array
-        PossibleOperators.deallocate();        // hard library of available operators and functions
-        TrendVariable.deallocate();            // holds Erl trend varialbes in a structure array
-        Sensor.deallocate();                   // EMS:SENSOR objects used (from output variables)
-        EMSActuatorAvailable.deallocate();     // actuators that could be used
-        EMSActuatorUsed.deallocate();          // actuators that are used
-        EMSInternalVarsAvailable.deallocate(); // internal data that could be used
-        EMSInternalVarsUsed.deallocate();      // internal data that are used
-        EMSProgramCallManager.deallocate();    // program calling managers
-        EMSActuator_lookup.clear();            // Fast duplicate lookup structure
-    }
-
     void ValidateEMSVariableName(EnergyPlusData &state,
                                  std::string const &cModuleObject, // the current object name
                                  std::string const &cFieldValue,   // the field value

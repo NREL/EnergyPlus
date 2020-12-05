@@ -547,7 +547,7 @@ namespace UserDefinedComponents {
 
                 // now get program manager for model simulations
                 if (!lAlphaFieldBlanks(2)) {
-                    int StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), DataRuntimeLanguage::EMSProgramCallManager);
+                    int StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataRuntimeLang->EMSProgramCallManager);
                     if (StackMngrNum > 0) { // found it
                         state.dataUserDefinedComponents->UserPlantComp(CompLoop).ErlSimProgramMngr = StackMngrNum;
                     } else {
@@ -634,7 +634,7 @@ namespace UserDefinedComponents {
 
                         // find program manager for initial setup, begin environment and sizing of this plant connection
                         if (!lAlphaFieldBlanks(aArgCount + 4)) {
-                            int StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(aArgCount + 4), DataRuntimeLanguage::EMSProgramCallManager);
+                            int StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(aArgCount + 4), state.dataRuntimeLang->EMSProgramCallManager);
                             if (StackMngrNum > 0) { // found it
                                 state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).ErlInitProgramMngr = StackMngrNum;
                             } else {
@@ -650,7 +650,7 @@ namespace UserDefinedComponents {
 
                         // find program to call for model simulations for just this plant connection
                         if (!lAlphaFieldBlanks(aArgCount + 5)) {
-                            int StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(aArgCount + 5), DataRuntimeLanguage::EMSProgramCallManager);
+                            int StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(aArgCount + 5), state.dataRuntimeLang->EMSProgramCallManager);
                             if (StackMngrNum > 0) { // found it
                                 state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).ErlSimProgramMngr = StackMngrNum;
                             } else {
@@ -937,7 +937,7 @@ namespace UserDefinedComponents {
 
                 // now get program manager for model simulations
                 if (!lAlphaFieldBlanks(2)) {
-                    int StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), DataRuntimeLanguage::EMSProgramCallManager);
+                    int StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataRuntimeLang->EMSProgramCallManager);
                     if (StackMngrNum > 0) { // found it
                         state.dataUserDefinedComponents->UserCoil(CompLoop).ErlSimProgramMngr = StackMngrNum;
                     } else {
@@ -953,7 +953,7 @@ namespace UserDefinedComponents {
 
                 // now get program manager for model initializations
                 if (!lAlphaFieldBlanks(3)) {
-                    int StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(3), DataRuntimeLanguage::EMSProgramCallManager);
+                    int StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(3), state.dataRuntimeLang->EMSProgramCallManager);
                     if (StackMngrNum > 0) { // found it
                         state.dataUserDefinedComponents->UserCoil(CompLoop).ErlInitProgramMngr = StackMngrNum;
                     } else {
@@ -1274,7 +1274,7 @@ namespace UserDefinedComponents {
 
                 // now get program manager for model simulations
                 if (!lAlphaFieldBlanks(2)) {
-                    int StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), DataRuntimeLanguage::EMSProgramCallManager);
+                    int StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataRuntimeLang->EMSProgramCallManager);
                     if (StackMngrNum > 0) { // found it
                         state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).ErlSimProgramMngr = StackMngrNum;
                     } else {
@@ -1290,7 +1290,7 @@ namespace UserDefinedComponents {
 
                 // now get program manager for model initializations
                 if (!lAlphaFieldBlanks(3)) {
-                    int StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(3), DataRuntimeLanguage::EMSProgramCallManager);
+                    int StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(3), state.dataRuntimeLang->EMSProgramCallManager);
                     if (StackMngrNum > 0) { // found it
                         state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).ErlInitProgramMngr = StackMngrNum;
                     } else {
@@ -1655,7 +1655,7 @@ namespace UserDefinedComponents {
 
                 // now get program manager for model simulations
                 if (!lAlphaFieldBlanks(2)) {
-                    int StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), DataRuntimeLanguage::EMSProgramCallManager);
+                    int StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataRuntimeLang->EMSProgramCallManager);
                     if (StackMngrNum > 0) { // found it
                         state.dataUserDefinedComponents->UserAirTerminal(CompLoop).ErlSimProgramMngr = StackMngrNum;
                     } else {
@@ -1671,7 +1671,7 @@ namespace UserDefinedComponents {
 
                 // now get program manager for model initializations
                 if (!lAlphaFieldBlanks(3)) {
-                    int StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(3), DataRuntimeLanguage::EMSProgramCallManager);
+                    int StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(3), state.dataRuntimeLang->EMSProgramCallManager);
                     if (StackMngrNum > 0) { // found it
                         state.dataUserDefinedComponents->UserAirTerminal(CompLoop).ErlInitProgramMngr = StackMngrNum;
                     } else {

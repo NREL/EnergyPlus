@@ -696,7 +696,7 @@ namespace ExternalInterface {
             for (i = 1; i <= nInpVar; ++i) {
                 if (inpVarTypes(i) == indexVariable) { // ems-globalvariable
                     useEMS = true;
-                    if (!isExternalInterfaceErlVariable(varInd(i))) {
+                    if (!isExternalInterfaceErlVariable(state, varInd(i))) {
                         ShowSevereError(state, "ExternalInterface: Error, xml file \"" + simCfgFilNam + "\" declares variable \"" + inpVarNames(i) + "\",");
                         ShowContinueError(state, "But this variable is an ordinary Erl variable, not an ExternalInterface variable.");
                         ShowContinueError(state, "You must specify a variable of type \"ExternalInterface:Variable\".");
@@ -704,7 +704,7 @@ namespace ExternalInterface {
                     }
                 } else if (inpVarTypes(i) == indexActuator) { // ems-actuator
                     useEMS = true;
-                    if (!isExternalInterfaceErlVariable(varInd(i))) {
+                    if (!isExternalInterfaceErlVariable(state, varInd(i))) {
                         ShowSevereError(state, "ExternalInterface: Error, xml file \"" + simCfgFilNam + "\" declares variable \"" + inpVarNames(i) + "\",");
                         ShowContinueError(state, "But this variable is an ordinary Erl actuator, not an ExternalInterface actuator.");
                         ShowContinueError(state, "You must specify a variable of type \"ExternalInterface:Actuator\".");
@@ -867,13 +867,13 @@ namespace ExternalInterface {
 
                 // Set in EnergyPlus the values of the variables
                 for (k = 1; k <= FMU(i).Instance(j).NumOutputVariablesVariable; ++k) {
-                    ExternalInterfaceSetErlVariable(FMU(i).Instance(j).eplusInputVariableVariable(k).VarIndex,
+                    ExternalInterfaceSetErlVariable(state, FMU(i).Instance(j).eplusInputVariableVariable(k).VarIndex,
                                                     FMU(i).Instance(j).fmuOutputVariableVariable(k).RealVarValue);
                 }
 
                 // Set in EnergyPlus the values of the actuators
                 for (k = 1; k <= FMU(i).Instance(j).NumOutputVariablesActuator; ++k) {
-                    ExternalInterfaceSetErlVariable(FMU(i).Instance(j).eplusInputVariableActuator(k).VarIndex,
+                    ExternalInterfaceSetErlVariable(state, FMU(i).Instance(j).eplusInputVariableActuator(k).VarIndex,
                                                     FMU(i).Instance(j).fmuOutputVariableActuator(k).RealVarValue);
                 }
 
@@ -2387,7 +2387,7 @@ namespace ExternalInterface {
                     if (inpVarTypes(i) == indexSchedule) {
                         ExternalInterfaceSetSchedule(state, varInd(i), dblValRea(i));
                     } else if ((inpVarTypes(i) == indexVariable) || (inpVarTypes(i) == indexActuator)) {
-                        ExternalInterfaceSetErlVariable(varInd(i), dblValRea(i));
+                        ExternalInterfaceSetErlVariable(state, varInd(i), dblValRea(i));
                     } else {
                         ShowContinueError(state, "ExternalInterface: Error in finding the type of the input variable for EnergyPlus");
                         ShowContinueError(state, format("variable index: {}. Variable will not be updated.", i));

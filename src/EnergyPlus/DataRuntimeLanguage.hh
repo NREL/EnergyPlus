@@ -107,7 +107,7 @@ namespace DataRuntimeLanguage {
     extern int const OperatorLogicalAND;     // &&
     extern int const OperatorLogicalOR;     // ||
     // note there is an important check "> 15" to distinguish operators from functions
-    //  so becareful if renumber these parameters.  Binary operator additions should get inserted here rather than appended
+    //  so be careful if renumber these parameters.  Binary operator additions should get inserted here rather than appended
 
     // parameters for built-in Erl functions, these are processed like operators and numbering
     // must be sequential with the operators.
@@ -444,22 +444,6 @@ namespace DataRuntimeLanguage {
         }
     };
 
-    // Object Data
-    extern Array1D<ErlVariableType> ErlVariable;                        // holds Erl variables in a structure array
-    extern Array1D<ErlStackType> ErlStack;                              // holds Erl programs in separate "stacks"
-    extern Array1D<ErlExpressionType> ErlExpression;                    // holds Erl expressions in structure array
-    extern Array1D<OperatorType> PossibleOperators;                     // hard library of available operators and functions
-    extern Array1D<TrendVariableType> TrendVariable;                    // holds Erl trend varialbes in a structure array
-    extern Array1D<OutputVarSensorType> Sensor;                         // EMS:SENSOR objects used (from output variables)
-    extern Array1D<EMSActuatorAvailableType> EMSActuatorAvailable;      // actuators that could be used
-    extern Array1D<ActuatorUsedType> EMSActuatorUsed;                   // actuators that are used
-    extern Array1D<InternalVarsAvailableType> EMSInternalVarsAvailable; // internal data that could be used
-    extern Array1D<InternalVarsUsedType> EMSInternalVarsUsed;           // internal data that are used
-    extern Array1D<EMSProgramCallManagementType> EMSProgramCallManager; // program calling managers
-    extern ErlValueType Null;                                           // special "null" Erl variable value instance
-    extern ErlValueType False;                                          // special "false" Erl variable value instance
-    extern ErlValueType True;                                           // special "True" Erl variable value instance, gets reset
-
     // EMS Actuator fast duplicate check lookup support
     typedef std::tuple<std::string, std::string, std::string> EMSActuatorKey;
     struct EMSActuatorKey_hash
@@ -479,11 +463,6 @@ namespace DataRuntimeLanguage {
             return seed;
         }
     };
-    extern std::unordered_set<std::tuple<std::string, std::string, std::string>, EMSActuatorKey_hash>
-        EMSActuator_lookup; // Fast duplicate lookup structure
-
-    // Functions
-    void clear_state();
 
     void ValidateEMSVariableName(EnergyPlusData &state,
                                  std::string const &cModuleObject, // the current object name
@@ -551,6 +530,25 @@ struct RuntimeLanguageData : BaseGlobalStruct {
     Array2D_bool EMSConstructActuatorChecked;
     Array2D_bool EMSConstructActuatorIsOkay;
 
+    // Object Data
+    Array1D<DataRuntimeLanguage::ErlVariableType> ErlVariable;                        // holds Erl variables in a structure array
+    Array1D<DataRuntimeLanguage::ErlStackType> ErlStack;                              // holds Erl programs in separate "stacks"
+    Array1D<DataRuntimeLanguage::ErlExpressionType> ErlExpression;                    // holds Erl expressions in structure array
+    Array1D<DataRuntimeLanguage::OperatorType> PossibleOperators;                     // hard library of available operators and functions
+    Array1D<DataRuntimeLanguage::TrendVariableType> TrendVariable;                    // holds Erl trend variables in a structure array
+    Array1D<DataRuntimeLanguage::OutputVarSensorType> Sensor;                         // EMS:SENSOR objects used (from output variables)
+    Array1D<DataRuntimeLanguage::EMSActuatorAvailableType> EMSActuatorAvailable;      // actuators that could be used
+    Array1D<DataRuntimeLanguage::ActuatorUsedType> EMSActuatorUsed;                   // actuators that are used
+    Array1D<DataRuntimeLanguage::InternalVarsAvailableType> EMSInternalVarsAvailable; // internal data that could be used
+    Array1D<DataRuntimeLanguage::InternalVarsUsedType> EMSInternalVarsUsed;           // internal data that are used
+    Array1D<DataRuntimeLanguage::EMSProgramCallManagementType> EMSProgramCallManager; // program calling managers
+    DataRuntimeLanguage::ErlValueType Null = DataRuntimeLanguage::ErlValueType(0, 0.0, "", 0, 0, false, 0, "", true);     // special "null" Erl variable value instance
+    DataRuntimeLanguage::ErlValueType False = DataRuntimeLanguage::ErlValueType(0, 0.0, "", 0, 0, false, 0, "", true);    // special "false" Erl variable value instance
+    DataRuntimeLanguage::ErlValueType True = DataRuntimeLanguage::ErlValueType(0, 0.0, "", 0, 0, false, 0, "", true);     // special "True" Erl variable value instance, gets reset
+
+    // EMS Actuator fast duplicate check lookup support
+    std::unordered_set<std::tuple<std::string, std::string, std::string>, DataRuntimeLanguage::EMSActuatorKey_hash> EMSActuator_lookup; // Fast duplicate lookup structure
+
     void clear_state() override
     {
         this->NumProgramCallManagers = 0;
@@ -588,6 +586,21 @@ struct RuntimeLanguageData : BaseGlobalStruct {
         this->OutputEMSInternalVarsSmall = false;
         this->EMSConstructActuatorChecked.deallocate();
         this->EMSConstructActuatorIsOkay.deallocate();
+        this->ErlVariable.deallocate();
+        this->ErlStack.deallocate();
+        this->ErlExpression.deallocate();
+        this->PossibleOperators.deallocate();
+        this->TrendVariable.deallocate();
+        this->Sensor.deallocate();
+        this->EMSActuatorAvailable.deallocate();
+        this->EMSActuatorUsed.deallocate();
+        this->EMSInternalVarsAvailable.deallocate();
+        this->EMSInternalVarsUsed.deallocate();
+        this->EMSProgramCallManager.deallocate();
+        this->EMSActuator_lookup.clear();
+        this->Null = DataRuntimeLanguage::ErlValueType(0, 0.0, "", 0, 0, false, 0, "", true);
+        this->False = DataRuntimeLanguage::ErlValueType(0, 0.0, "", 0, 0, false, 0, "", true);
+        this->True = DataRuntimeLanguage::ErlValueType(0, 0.0, "", 0, 0, false, 0, "", true);
     }
 };
 

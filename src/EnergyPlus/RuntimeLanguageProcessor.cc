@@ -255,16 +255,16 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
         // FLOW:
         if (InitializeOnce) {
 
-            False = SetErlValueNumber(0.0);
-            True = SetErlValueNumber(1.0);
+            state.dataRuntimeLang->False = SetErlValueNumber(0.0);
+            state.dataRuntimeLang->True = SetErlValueNumber(1.0);
 
             // Create constant built-in variables
             NullVariableNum = NewEMSVariable(state, "NULL", 0, SetErlValueNumber(0.0));
-            ErlVariable(NullVariableNum).Value.Type = ValueNull;
-            FalseVariableNum = NewEMSVariable(state, "FALSE", 0, False);
-            TrueVariableNum = NewEMSVariable(state, "TRUE", 0, True);
-            OffVariableNum = NewEMSVariable(state, "OFF", 0, False);
-            OnVariableNum = NewEMSVariable(state, "ON", 0, True);
+            state.dataRuntimeLang->ErlVariable(NullVariableNum).Value.Type = ValueNull;
+            FalseVariableNum = NewEMSVariable(state, "FALSE", 0, state.dataRuntimeLang->False);
+            TrueVariableNum = NewEMSVariable(state, "TRUE", 0, state.dataRuntimeLang->True);
+            OffVariableNum = NewEMSVariable(state, "OFF", 0, state.dataRuntimeLang->False);
+            OnVariableNum = NewEMSVariable(state, "ON", 0, state.dataRuntimeLang->True);
             PiVariableNum = NewEMSVariable(state, "PI", 0, SetErlValueNumber(DataGlobalConstants::Pi));
             TimeStepsPerHourVariableNum = NewEMSVariable(state, "TIMESTEPSPERHOUR", 0, SetErlValueNumber(double(state.dataGlobal->NumOfTimeStepInHour)));
 
@@ -284,7 +284,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
             IsRainingVariableNum = NewEMSVariable(state, "ISRAINING", 0);
             SystemTimeStepVariableNum = NewEMSVariable(state, "SYSTEMTIMESTEP", 0);
             ZoneTimeStepVariableNum = NewEMSVariable(state, "ZONETIMESTEP", 0);
-            ErlVariable(ZoneTimeStepVariableNum).Value = SetErlValueNumber(state.dataGlobal->TimeStepZone);
+            state.dataRuntimeLang->ErlVariable(ZoneTimeStepVariableNum).Value = SetErlValueNumber(state.dataGlobal->TimeStepZone);
             CurrentEnvironmentPeriodNum = NewEMSVariable(state, "CURRENTENVIRONMENT", 0);
             ActualDateAndTimeNum = NewEMSVariable(state, "ACTUALDATEANDTIME", 0);
             ActualTimeNum = NewEMSVariable(state, "ACTUALTIME", 0);
@@ -294,10 +294,10 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
 
             date_and_time(datestring, _, _, datevalues);
             if (datestring != "") {
-                ErlVariable(ActualDateAndTimeNum).Value = SetErlValueNumber(double(sum(datevalues)));
+                state.dataRuntimeLang->ErlVariable(ActualDateAndTimeNum).Value = SetErlValueNumber(double(sum(datevalues)));
                 // datevalues(1)+datevalues(2)+datevalues(3)+  &
                 // datevalues(5)+datevalues(6)+datevalues(7)+datevalues(8)
-                ErlVariable(ActualTimeNum).Value = SetErlValueNumber(double(sum(datevalues({5, 8}))));
+                state.dataRuntimeLang->ErlVariable(ActualTimeNum).Value = SetErlValueNumber(double(sum(datevalues({5, 8}))));
                 // datevalues(5)+datevalues(6)+datevalues(7)+datevalues(8)
                 //    ELSE
                 //      ErlVariable(ActualDateAndTimeNum)%Value  = SetErlValueNumber(REAL(RANDOM_NUMBER(X=509),r64))
@@ -308,17 +308,17 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
         }
 
         // Update built-in variables
-        ErlVariable(YearVariableNum).Value = SetErlValueNumber(double(state.dataEnvrn->Year));
-        ErlVariable(MonthVariableNum).Value = SetErlValueNumber(double(state.dataEnvrn->Month));
-        ErlVariable(DayOfMonthVariableNum).Value = SetErlValueNumber(double(state.dataEnvrn->DayOfMonth));
-        ErlVariable(DayOfWeekVariableNum).Value = SetErlValueNumber(double(state.dataEnvrn->DayOfWeek));
-        ErlVariable(DayOfYearVariableNum).Value = SetErlValueNumber(double(state.dataEnvrn->DayOfYear));
-        ErlVariable(TimeStepNumVariableNum).Value = SetErlValueNumber(double(state.dataGlobal->TimeStep));
+        state.dataRuntimeLang->ErlVariable(YearVariableNum).Value = SetErlValueNumber(double(state.dataEnvrn->Year));
+        state.dataRuntimeLang->ErlVariable(MonthVariableNum).Value = SetErlValueNumber(double(state.dataEnvrn->Month));
+        state.dataRuntimeLang->ErlVariable(DayOfMonthVariableNum).Value = SetErlValueNumber(double(state.dataEnvrn->DayOfMonth));
+        state.dataRuntimeLang->ErlVariable(DayOfWeekVariableNum).Value = SetErlValueNumber(double(state.dataEnvrn->DayOfWeek));
+        state.dataRuntimeLang->ErlVariable(DayOfYearVariableNum).Value = SetErlValueNumber(double(state.dataEnvrn->DayOfYear));
+        state.dataRuntimeLang->ErlVariable(TimeStepNumVariableNum).Value = SetErlValueNumber(double(state.dataGlobal->TimeStep));
 
-        ErlVariable(DSTVariableNum).Value = SetErlValueNumber(double(state.dataEnvrn->DSTIndicator));
+        state.dataRuntimeLang->ErlVariable(DSTVariableNum).Value = SetErlValueNumber(double(state.dataEnvrn->DSTIndicator));
         // DSTadjust = REAL(DSTIndicator, r64)
         tmpHours = double(state.dataGlobal->HourOfDay - 1); // no, just stay on 0..23+ DSTadjust ! offset by 1 and daylight savings time
-        ErlVariable(HourVariableNum).Value = SetErlValueNumber(tmpHours);
+        state.dataRuntimeLang->ErlVariable(HourVariableNum).Value = SetErlValueNumber(tmpHours);
 
         if (TimeStepSys < state.dataGlobal->TimeStepZone) {
             // CurrentTime is for end of zone timestep, need to account for system timestep
@@ -326,28 +326,28 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
         } else {
             tmpCurrentTime = state.dataGlobal->CurrentTime;
         }
-        ErlVariable(CurrentTimeVariableNum).Value = SetErlValueNumber(tmpCurrentTime);
+        state.dataRuntimeLang->ErlVariable(CurrentTimeVariableNum).Value = SetErlValueNumber(tmpCurrentTime);
         tmpMinutes = ((tmpCurrentTime - double(state.dataGlobal->HourOfDay - 1)) * 60.0); // -1.0 // off by 1
-        ErlVariable(MinuteVariableNum).Value = SetErlValueNumber(tmpMinutes);
-        ErlVariable(HolidayVariableNum).Value = SetErlValueNumber(double(state.dataEnvrn->HolidayIndex));
+        state.dataRuntimeLang->ErlVariable(MinuteVariableNum).Value = SetErlValueNumber(tmpMinutes);
+        state.dataRuntimeLang->ErlVariable(HolidayVariableNum).Value = SetErlValueNumber(double(state.dataEnvrn->HolidayIndex));
         if (state.dataEnvrn->SunIsUp) {
-            ErlVariable(SunIsUpVariableNum).Value = SetErlValueNumber(1.0);
+            state.dataRuntimeLang->ErlVariable(SunIsUpVariableNum).Value = SetErlValueNumber(1.0);
         } else {
-            ErlVariable(SunIsUpVariableNum).Value = SetErlValueNumber(0.0);
+            state.dataRuntimeLang->ErlVariable(SunIsUpVariableNum).Value = SetErlValueNumber(0.0);
         }
         if (state.dataEnvrn->IsRain) {
-            ErlVariable(IsRainingVariableNum).Value = SetErlValueNumber(1.0);
+            state.dataRuntimeLang->ErlVariable(IsRainingVariableNum).Value = SetErlValueNumber(1.0);
         } else {
-            ErlVariable(IsRainingVariableNum).Value = SetErlValueNumber(0.0);
+            state.dataRuntimeLang->ErlVariable(IsRainingVariableNum).Value = SetErlValueNumber(0.0);
         }
-        ErlVariable(SystemTimeStepVariableNum).Value = SetErlValueNumber(TimeStepSys);
+        state.dataRuntimeLang->ErlVariable(SystemTimeStepVariableNum).Value = SetErlValueNumber(TimeStepSys);
 
         tmpCurEnvirNum = double(state.dataEnvrn->CurEnvirNum);
-        ErlVariable(CurrentEnvironmentPeriodNum).Value = SetErlValueNumber(tmpCurEnvirNum);
+        state.dataRuntimeLang->ErlVariable(CurrentEnvironmentPeriodNum).Value = SetErlValueNumber(tmpCurEnvirNum);
         if (state.dataGlobal->WarmupFlag) {
-            ErlVariable(WarmUpFlagNum).Value = SetErlValueNumber(1.0);
+            state.dataRuntimeLang->ErlVariable(WarmUpFlagNum).Value = SetErlValueNumber(1.0);
         } else {
-            ErlVariable(WarmUpFlagNum).Value = SetErlValueNumber(0.0);
+            state.dataRuntimeLang->ErlVariable(WarmUpFlagNum).Value = SetErlValueNumber(0.0);
         }
     }
 
@@ -420,37 +420,37 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
             }
             if (CycleThisVariable) continue;
 
-            if (ErlVariable(ErlVariableNum).Value.initialized) {
-                ErlVariable(ErlVariableNum).Value = SetErlValueNumber(0.0, ErlVariable(ErlVariableNum).Value);
+            if (state.dataRuntimeLang->ErlVariable(ErlVariableNum).Value.initialized) {
+                state.dataRuntimeLang->ErlVariable(ErlVariableNum).Value = SetErlValueNumber(0.0, state.dataRuntimeLang->ErlVariable(ErlVariableNum).Value);
             }
         }
         // reinitialize state of actuators
         for (ActuatorUsedLoop = 1; ActuatorUsedLoop <= state.dataRuntimeLang->numActuatorsUsed + state.dataRuntimeLang->NumExternalInterfaceActuatorsUsed; ++ActuatorUsedLoop) {
-            EMSActuatorVariableNum = EMSActuatorUsed(ActuatorUsedLoop).ActuatorVariableNum;
-            ErlVariableNum = EMSActuatorUsed(ActuatorUsedLoop).ErlVariableNum;
-            ErlVariable(ErlVariableNum).Value.Type = ValueNull;
-            *EMSActuatorAvailable(EMSActuatorVariableNum).Actuated = false;
+            EMSActuatorVariableNum = state.dataRuntimeLang->EMSActuatorUsed(ActuatorUsedLoop).ActuatorVariableNum;
+            ErlVariableNum = state.dataRuntimeLang->EMSActuatorUsed(ActuatorUsedLoop).ErlVariableNum;
+            state.dataRuntimeLang->ErlVariable(ErlVariableNum).Value.Type = ValueNull;
+            *state.dataRuntimeLang->EMSActuatorAvailable(EMSActuatorVariableNum).Actuated = false;
             {
-                auto const SELECT_CASE_var(EMSActuatorAvailable(EMSActuatorVariableNum).PntrVarTypeUsed);
+                auto const SELECT_CASE_var(state.dataRuntimeLang->EMSActuatorAvailable(EMSActuatorVariableNum).PntrVarTypeUsed);
                 if (SELECT_CASE_var == PntrReal) {
-                    *EMSActuatorAvailable(EMSActuatorVariableNum).RealValue = 0.0;
+                    *state.dataRuntimeLang->EMSActuatorAvailable(EMSActuatorVariableNum).RealValue = 0.0;
                 } else if (SELECT_CASE_var == PntrInteger) {
-                    *EMSActuatorAvailable(EMSActuatorVariableNum).IntValue = 0;
+                    *state.dataRuntimeLang->EMSActuatorAvailable(EMSActuatorVariableNum).IntValue = 0;
                 } else if (SELECT_CASE_var == PntrLogical) {
-                    *EMSActuatorAvailable(EMSActuatorVariableNum).LogValue = false;
+                    *state.dataRuntimeLang->EMSActuatorAvailable(EMSActuatorVariableNum).LogValue = false;
                 }
             }
         }
 
         // reinitialize trend variables so old data are purged
         for (TrendVarNum = 1; TrendVarNum <= state.dataRuntimeLang->NumErlTrendVariables; ++TrendVarNum) {
-            TrendDepth = TrendVariable(TrendVarNum).LogDepth;
-            TrendVariable(TrendVarNum).TrendValARR({1, TrendDepth}) = 0.0;
+            TrendDepth = state.dataRuntimeLang->TrendVariable(TrendVarNum).LogDepth;
+            state.dataRuntimeLang->TrendVariable(TrendVarNum).TrendValARR({1, TrendDepth}) = 0.0;
         }
 
         // reinitilize sensors
         for (SensorNum = 1; SensorNum <= state.dataRuntimeLang->NumSensors; ++SensorNum) {
-            SetInternalVariableValue(Sensor(SensorNum).Type, Sensor(SensorNum).Index, 0.0, 0);
+            SetInternalVariableValue(state.dataRuntimeLang->Sensor(SensorNum).Type, state.dataRuntimeLang->Sensor(SensorNum).Index, 0.0, 0);
         }
     }
 
@@ -520,9 +520,9 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
         SavedWhileExpressionNum = 0;
         NumWhileGotos = 0;
 
-        while (LineNum <= ErlStack(StackNum).NumLines) {
+        while (LineNum <= state.dataRuntimeLang->ErlStack(StackNum).NumLines) {
 
-            Line = stripped(ErlStack(StackNum).Line(LineNum));
+            Line = stripped(state.dataRuntimeLang->ErlStack(StackNum).Line(LineNum));
             if (len(Line) == 0) {
                 ++LineNum;
                 continue; // Blank lines can be skipped
@@ -544,19 +544,19 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                 if (SELECT_CASE_var == "RETURN") {
                     if (DeveloperFlag) print(state.files.debug, "RETURN \"{}\"\n", Line);
                     if (Remainder.empty()) {
-                        InstructionNum = AddInstruction(StackNum, LineNum, KeywordReturn);
+                        InstructionNum = AddInstruction(state, StackNum, LineNum, KeywordReturn);
                     } else {
                         ParseExpression(state, Remainder, StackNum, ExpressionNum, Line);
-                        InstructionNum = AddInstruction(StackNum, LineNum, KeywordReturn, ExpressionNum);
+                        InstructionNum = AddInstruction(state, StackNum, LineNum, KeywordReturn, ExpressionNum);
                     }
 
                 } else if (SELECT_CASE_var == "SET") {
                     if (DeveloperFlag) print(state.files.debug, "SET \"{}\"\n", Line);
                     Pos = scan(Remainder, '=');
                     if (Pos == std::string::npos) {
-                        AddError(StackNum, LineNum, "Equal sign missing for the SET instruction.");
+                        AddError(state, StackNum, LineNum, "Equal sign missing for the SET instruction.");
                     } else if (Pos == 0) {
-                        AddError(StackNum, LineNum, "Variable name missing for the SET instruction.");
+                        AddError(state, StackNum, LineNum, "Variable name missing for the SET instruction.");
                     } else {
                         Variable = stripped(Remainder.substr(0, Pos)); // VariableName would be more expressive
                         VariableNum = NewEMSVariable(state, Variable, StackNum);
@@ -568,27 +568,27 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                             Expression.clear();
                         }
                         if (Expression.empty()) {
-                            AddError(StackNum, LineNum, "Expression missing for the SET instruction.");
+                            AddError(state, StackNum, LineNum, "Expression missing for the SET instruction.");
                         } else {
                             ParseExpression(state, Expression, StackNum, ExpressionNum, Line);
-                            InstructionNum = AddInstruction(StackNum, LineNum, KeywordSet, VariableNum, ExpressionNum);
+                            InstructionNum = AddInstruction(state, StackNum, LineNum, KeywordSet, VariableNum, ExpressionNum);
                         }
                     }
 
                 } else if (SELECT_CASE_var == "RUN") {
                     if (DeveloperFlag) print(state.files.debug, "RUN \"{}\"\n", Line);
                     if (Remainder.empty()) {
-                        AddError(StackNum, LineNum, "Program or Subroutine name missing for the RUN instruction.");
+                        AddError(state, StackNum, LineNum, "Program or Subroutine name missing for the RUN instruction.");
                     } else {
                         Pos = scan(Remainder, ' ');
                         if (Pos == std::string::npos) Pos = Remainder.length();
                         Variable = UtilityRoutines::MakeUPPERCase(
                             stripped(Remainder.substr(0, Pos))); // really the subroutine, or reference to instruction set
-                        StackNum2 = UtilityRoutines::FindItemInList(Variable, ErlStack);
+                        StackNum2 = UtilityRoutines::FindItemInList(Variable, state.dataRuntimeLang->ErlStack);
                         if (StackNum2 == 0) {
-                            AddError(StackNum, LineNum, "Program or Subroutine name [" + Variable + "] not found for the RUN instruction.");
+                            AddError(state, StackNum, LineNum, "Program or Subroutine name [" + Variable + "] not found for the RUN instruction.");
                         } else {
-                            InstructionNum = AddInstruction(StackNum, LineNum, KeywordRun, StackNum2);
+                            InstructionNum = AddInstruction(state, StackNum, LineNum, KeywordRun, StackNum2);
                         }
                     }
 
@@ -598,7 +598,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                         print(state.files.debug, "NestedIf={}\n", NestedIfDepth);
                     }
                     if (Remainder.empty()) {
-                        AddError(StackNum, LineNum, "Expression missing for the IF instruction.");
+                        AddError(state, StackNum, LineNum, "Expression missing for the IF instruction.");
                         ExpressionNum = 0;
                     } else {
                         Expression = stripped(Remainder);
@@ -609,10 +609,10 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                     ReadyForElse(NestedIfDepth) = true;
                     ReadyForEndif(NestedIfDepth) = true;
                     if (NestedIfDepth > IfDepthAllowed) {
-                        AddError(StackNum, LineNum, "Detected IF nested deeper than is allowed; need to terminate an earlier IF instruction.");
+                        AddError(state, StackNum, LineNum, "Detected IF nested deeper than is allowed; need to terminate an earlier IF instruction.");
                         break;
                     } else {
-                        InstructionNum = AddInstruction(StackNum, LineNum, KeywordIf, ExpressionNum); // Arg2 added at next ELSEIF, ELSE, ENDIF
+                        InstructionNum = AddInstruction(state, StackNum, LineNum, KeywordIf, ExpressionNum); // Arg2 added at next ELSEIF, ELSE, ENDIF
                         SavedIfInstructionNum(NestedIfDepth) = InstructionNum;
                     }
 
@@ -622,30 +622,30 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                         print(state.files.debug, "NestedIf={}\n", NestedIfDepth);
                     }
                     if (NestedIfDepth == 0) {
-                        AddError(StackNum, LineNum, "Starting IF instruction missing for the ELSEIF instruction.");
+                        AddError(state, StackNum, LineNum, "Starting IF instruction missing for the ELSEIF instruction.");
                         break; // Getting strange error on DEALLOCATE for the next instruction that I try to add, so doing EXIT here
                     }
 
                     // Complete the preceding block with a GOTO instruction
-                    InstructionNum = AddInstruction(StackNum, 0, KeywordGoto); // Arg2 is added at the ENDIF
+                    InstructionNum = AddInstruction(state, StackNum, 0, KeywordGoto); // Arg2 is added at the ENDIF
                     ++NumGotos(NestedIfDepth);
                     if (NumGotos(NestedIfDepth) > ELSEIFLengthAllowed) {
-                        AddError(StackNum, LineNum, "Detected ELSEIF series that is longer than allowed; terminate earlier IF instruction.");
+                        AddError(state, StackNum, LineNum, "Detected ELSEIF series that is longer than allowed; terminate earlier IF instruction.");
                         break;
                     } else {
                         SavedGotoInstructionNum(NumGotos(NestedIfDepth), NestedIfDepth) = InstructionNum;
                     }
 
                     if (Remainder.empty()) {
-                        AddError(StackNum, LineNum, "Expression missing for the ELSEIF instruction.");
+                        AddError(state, StackNum, LineNum, "Expression missing for the ELSEIF instruction.");
                         ExpressionNum = 0;
                     } else {
                         Expression = stripped(Remainder);
                         ParseExpression(state, Expression, StackNum, ExpressionNum, Line);
                     }
 
-                    InstructionNum = AddInstruction(StackNum, LineNum, KeywordIf, ExpressionNum); // Arg2 added at next ELSEIF, ELSE, ENDIF
-                    ErlStack(StackNum).Instruction(SavedIfInstructionNum(NestedIfDepth)).Argument2 = InstructionNum;
+                    InstructionNum = AddInstruction(state, StackNum, LineNum, KeywordIf, ExpressionNum); // Arg2 added at next ELSEIF, ELSE, ENDIF
+                    state.dataRuntimeLang->ErlStack(StackNum).Instruction(SavedIfInstructionNum(NestedIfDepth)).Argument2 = InstructionNum;
                     SavedIfInstructionNum(NestedIfDepth) = InstructionNum;
 
                 } else if (SELECT_CASE_var == "ELSE") {
@@ -654,30 +654,30 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                         print(state.files.debug, "NestedIf={}\n", NestedIfDepth);
                     }
                     if (NestedIfDepth == 0) {
-                        AddError(StackNum, LineNum, "Starting IF instruction missing for the ELSE instruction.");
+                        AddError(state, StackNum, LineNum, "Starting IF instruction missing for the ELSE instruction.");
                         break; // Getting strange error on DEALLOCATE for the next instruction that I try to add, so doing EXIT here
                     }
                     if (!ReadyForElse(NestedIfDepth)) {
-                        AddError(StackNum, LineNum, "ELSE statement without corresponding IF statement.");
+                        AddError(state, StackNum, LineNum, "ELSE statement without corresponding IF statement.");
                     }
                     ReadyForElse(NestedIfDepth) = false;
 
                     // Complete the preceding block with a GOTO instruction
-                    InstructionNum = AddInstruction(StackNum, 0, KeywordGoto); // Arg2 is added at the ENDIF
+                    InstructionNum = AddInstruction(state, StackNum, 0, KeywordGoto); // Arg2 is added at the ENDIF
                     ++NumGotos(NestedIfDepth);
                     if (NumGotos(NestedIfDepth) > ELSEIFLengthAllowed) {
-                        AddError(StackNum, LineNum, "Detected ELSEIF-ELSE series that is longer than allowed.");
+                        AddError(state, StackNum, LineNum, "Detected ELSEIF-ELSE series that is longer than allowed.");
                         break;
                     } else {
                         SavedGotoInstructionNum(NumGotos(NestedIfDepth), NestedIfDepth) = InstructionNum;
                     }
 
                     if (!Remainder.empty()) {
-                        AddError(StackNum, LineNum, "Nothing is allowed to follow the ELSE instruction.");
+                        AddError(state, StackNum, LineNum, "Nothing is allowed to follow the ELSE instruction.");
                     }
 
-                    InstructionNum = AddInstruction(StackNum, LineNum, KeywordElse); // can make this into a KeywordIf?
-                    ErlStack(StackNum).Instruction(SavedIfInstructionNum(NestedIfDepth)).Argument2 = InstructionNum;
+                    InstructionNum = AddInstruction(state, StackNum, LineNum, KeywordElse); // can make this into a KeywordIf?
+                    state.dataRuntimeLang->ErlStack(StackNum).Instruction(SavedIfInstructionNum(NestedIfDepth)).Argument2 = InstructionNum;
                     SavedIfInstructionNum(NestedIfDepth) = InstructionNum;
 
                 } else if (SELECT_CASE_var == "ENDIF") {
@@ -686,27 +686,27 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                         print(state.files.debug, "NestedIf={}\n", NestedIfDepth);
                     }
                     if (NestedIfDepth == 0) {
-                        AddError(StackNum, LineNum, "Starting IF instruction missing for the ENDIF instruction.");
+                        AddError(state, StackNum, LineNum, "Starting IF instruction missing for the ENDIF instruction.");
                         break; // PE Getting strange error on DEALLOCATE for the next instruction that I try to add, so doing EXIT here
                     }
 
                     if (!ReadyForEndif(NestedIfDepth)) {
-                        AddError(StackNum, LineNum, "ENDIF statement without corresponding IF stetement.");
+                        AddError(state, StackNum, LineNum, "ENDIF statement without corresponding IF stetement.");
                     }
                     ReadyForEndif(NestedIfDepth) = false;
                     ReadyForElse(NestedIfDepth) = false;
 
                     if (!Remainder.empty()) {
-                        AddError(StackNum, LineNum, "Nothing is allowed to follow the ENDIF instruction.");
+                        AddError(state, StackNum, LineNum, "Nothing is allowed to follow the ENDIF instruction.");
                     }
 
-                    InstructionNum = AddInstruction(StackNum, LineNum, KeywordEndIf);
-                    ErlStack(StackNum).Instruction(SavedIfInstructionNum(NestedIfDepth)).Argument2 = InstructionNum;
+                    InstructionNum = AddInstruction(state, StackNum, LineNum, KeywordEndIf);
+                    state.dataRuntimeLang->ErlStack(StackNum).Instruction(SavedIfInstructionNum(NestedIfDepth)).Argument2 = InstructionNum;
 
                     // Go back and complete all of the GOTOs that terminate each IF and ELSEIF block
                     for (GotoNum = 1; GotoNum <= NumGotos(NestedIfDepth); ++GotoNum) {
                         InstructionNum2 = SavedGotoInstructionNum(GotoNum, NestedIfDepth);
-                        ErlStack(StackNum).Instruction(InstructionNum2).Argument1 = InstructionNum;
+                        state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum2).Argument1 = InstructionNum;
                         SavedGotoInstructionNum(GotoNum, NestedIfDepth) = 0;
                     }
 
@@ -717,7 +717,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                 } else if (SELECT_CASE_var == "WHILE") {
                     if (DeveloperFlag) print(state.files.debug, "WHILE \"{}\"\n", Line);
                     if (Remainder.empty()) {
-                        AddError(StackNum, LineNum, "Expression missing for the WHILE instruction.");
+                        AddError(state, StackNum, LineNum, "Expression missing for the WHILE instruction.");
                         ExpressionNum = 0;
                     } else {
                         Expression = stripped(Remainder);
@@ -726,10 +726,10 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
 
                     ++NestedWhileDepth;
                     if (NestedWhileDepth > WhileDepthAllowed) {
-                        AddError(StackNum, LineNum, "Detected WHILE nested deeper than is allowed; need to terminate an earlier WHILE instruction.");
+                        AddError(state, StackNum, LineNum, "Detected WHILE nested deeper than is allowed; need to terminate an earlier WHILE instruction.");
                         break;
                     } else {
-                        InstructionNum = AddInstruction(StackNum, LineNum, KeywordWhile, ExpressionNum);
+                        InstructionNum = AddInstruction(state, StackNum, LineNum, KeywordWhile, ExpressionNum);
                         SavedWhileInstructionNum = InstructionNum;
                         SavedWhileExpressionNum = ExpressionNum;
                     }
@@ -737,17 +737,17 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                 } else if (SELECT_CASE_var == "ENDWHILE") {
                     if (DeveloperFlag) print(state.files.debug, "ENDWHILE \"{}\"\n", Line);
                     if (NestedWhileDepth == 0) {
-                        AddError(StackNum, LineNum, "Starting WHILE instruction missing for the ENDWHILE instruction.");
+                        AddError(state, StackNum, LineNum, "Starting WHILE instruction missing for the ENDWHILE instruction.");
                         break;
                     }
                     if (!Remainder.empty()) {
-                        AddError(StackNum, LineNum, "Nothing is allowed to follow the ENDWHILE instruction.");
+                        AddError(state, StackNum, LineNum, "Nothing is allowed to follow the ENDWHILE instruction.");
                     }
 
-                    InstructionNum = AddInstruction(StackNum, LineNum, KeywordEndWhile);
-                    ErlStack(StackNum).Instruction(SavedWhileInstructionNum).Argument2 = InstructionNum;
-                    ErlStack(StackNum).Instruction(InstructionNum).Argument1 = SavedWhileExpressionNum;
-                    ErlStack(StackNum).Instruction(InstructionNum).Argument2 = SavedWhileInstructionNum;
+                    InstructionNum = AddInstruction(state, StackNum, LineNum, KeywordEndWhile);
+                    state.dataRuntimeLang->ErlStack(StackNum).Instruction(SavedWhileInstructionNum).Argument2 = InstructionNum;
+                    state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1 = SavedWhileExpressionNum;
+                    state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument2 = SavedWhileInstructionNum;
 
                     NestedWhileDepth = 0;
                     SavedWhileInstructionNum = 0;
@@ -755,7 +755,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
 
                 } else {
                     if (DeveloperFlag) print(state.files.debug, "ERROR \"{}\"\n", Line);
-                    AddError(StackNum, LineNum, "Unknown keyword [" + Keyword + "].");
+                    AddError(state, StackNum, LineNum, "Unknown keyword [" + Keyword + "].");
                 }
             }
 
@@ -763,16 +763,17 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
         } // LineNum
 
         if (NestedIfDepth == 1) {
-            AddError(StackNum, 0, "Missing an ENDIF instruction needed to terminate an earlier IF instruction.");
+            AddError(state, StackNum, 0, "Missing an ENDIF instruction needed to terminate an earlier IF instruction.");
         } else if (NestedIfDepth > 1) {
-            AddError(StackNum, 0, format("Missing {} ENDIF instructions needed to terminate earlier IF instructions.", NestedIfDepth));
+            AddError(state, StackNum, 0, format("Missing {} ENDIF instructions needed to terminate earlier IF instructions.", NestedIfDepth));
         }
 
         //  ALLOCATE(DummyError(ErlStack(StackNum)%NumErrors))
         //  DummyError = ErlStack(StackNum)%Error
     }
 
-    int AddInstruction(int const StackNum,
+    int AddInstruction(EnergyPlusData &state,
+                       int const StackNum,
                        int const LineNum,
                        int const Keyword,
                        Optional_int_const Argument1, // Erl variable index
@@ -802,28 +803,29 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
         ErlStackType TempStack;
 
         // FLOW:
-        if (ErlStack(StackNum).NumInstructions == 0) {
-            ErlStack(StackNum).Instruction.allocate(1);
-            ErlStack(StackNum).NumInstructions = 1;
+        if (state.dataRuntimeLang->ErlStack(StackNum).NumInstructions == 0) {
+            state.dataRuntimeLang->ErlStack(StackNum).Instruction.allocate(1);
+            state.dataRuntimeLang->ErlStack(StackNum).NumInstructions = 1;
         } else {
-            TempStack = ErlStack(StackNum);
-            ErlStack(StackNum).Instruction.deallocate();
-            ErlStack(StackNum).Instruction.allocate(ErlStack(StackNum).NumInstructions + 1);
-            ErlStack(StackNum).Instruction({1, ErlStack(StackNum).NumInstructions}) = TempStack.Instruction({1, ErlStack(StackNum).NumInstructions});
-            ++ErlStack(StackNum).NumInstructions;
+            TempStack = state.dataRuntimeLang->ErlStack(StackNum);
+            state.dataRuntimeLang->ErlStack(StackNum).Instruction.deallocate();
+            state.dataRuntimeLang->ErlStack(StackNum).Instruction.allocate(state.dataRuntimeLang->ErlStack(StackNum).NumInstructions + 1);
+            state.dataRuntimeLang->ErlStack(StackNum).Instruction({1, state.dataRuntimeLang->ErlStack(StackNum).NumInstructions}) = TempStack.Instruction({1, state.dataRuntimeLang->ErlStack(StackNum).NumInstructions});
+            ++state.dataRuntimeLang->ErlStack(StackNum).NumInstructions;
         }
 
-        InstructionNum = ErlStack(StackNum).NumInstructions;
-        ErlStack(StackNum).Instruction(InstructionNum).LineNum = LineNum;
-        ErlStack(StackNum).Instruction(InstructionNum).Keyword = Keyword;
+        InstructionNum = state.dataRuntimeLang->ErlStack(StackNum).NumInstructions;
+        state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).LineNum = LineNum;
+        state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Keyword = Keyword;
 
-        if (present(Argument1)) ErlStack(StackNum).Instruction(InstructionNum).Argument1 = Argument1;
-        if (present(Argument2)) ErlStack(StackNum).Instruction(InstructionNum).Argument2 = Argument2;
+        if (present(Argument1)) state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1 = Argument1;
+        if (present(Argument2)) state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument2 = Argument2;
 
         return InstructionNum;
     }
 
-    void AddError(int const StackNum,      // index pointer to location in ErlStack structure
+    void AddError(EnergyPlusData &state,
+                  int const StackNum,      // index pointer to location in ErlStack structure
                   int const LineNum,       // Erl program line number
                   std::string const &Error // error message to be added to ErlStack
     )
@@ -850,22 +852,22 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
         ErlStackType TempStack; // temporary copy of single ErlStack
 
         // FLOW:
-        if (ErlStack(StackNum).NumErrors == 0) {
-            ErlStack(StackNum).Error.allocate(1);
-            ErlStack(StackNum).NumErrors = 1;
+        if (state.dataRuntimeLang->ErlStack(StackNum).NumErrors == 0) {
+            state.dataRuntimeLang->ErlStack(StackNum).Error.allocate(1);
+            state.dataRuntimeLang->ErlStack(StackNum).NumErrors = 1;
         } else {
-            TempStack = ErlStack(StackNum);
-            ErlStack(StackNum).Error.deallocate();
-            ErlStack(StackNum).Error.allocate(ErlStack(StackNum).NumErrors + 1);
-            ErlStack(StackNum).Error({1, ErlStack(StackNum).NumErrors}) = TempStack.Error({1, ErlStack(StackNum).NumErrors});
-            ++ErlStack(StackNum).NumErrors;
+            TempStack = state.dataRuntimeLang->ErlStack(StackNum);
+            state.dataRuntimeLang->ErlStack(StackNum).Error.deallocate();
+            state.dataRuntimeLang->ErlStack(StackNum).Error.allocate(state.dataRuntimeLang->ErlStack(StackNum).NumErrors + 1);
+            state.dataRuntimeLang->ErlStack(StackNum).Error({1, state.dataRuntimeLang->ErlStack(StackNum).NumErrors}) = TempStack.Error({1, state.dataRuntimeLang->ErlStack(StackNum).NumErrors});
+            ++state.dataRuntimeLang->ErlStack(StackNum).NumErrors;
         }
 
-        ErrorNum = ErlStack(StackNum).NumErrors;
+        ErrorNum = state.dataRuntimeLang->ErlStack(StackNum).NumErrors;
         if (LineNum > 0) {
-            ErlStack(StackNum).Error(ErrorNum) = format("Line {}:  {} \"{}\"", LineNum, Error, ErlStack(StackNum).Line(LineNum));
+            state.dataRuntimeLang->ErlStack(StackNum).Error(ErrorNum) = format("Line {}:  {} \"{}\"", LineNum, Error, state.dataRuntimeLang->ErlStack(StackNum).Line(LineNum));
         } else {
-            ErlStack(StackNum).Error(ErrorNum) = Error;
+            state.dataRuntimeLang->ErlStack(StackNum).Error(ErrorNum) = Error;
         }
     }
 
@@ -901,30 +903,30 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
         ReturnValue.Number = 0.0;
 
         InstructionNum = 1;
-        while (InstructionNum <= ErlStack(StackNum).NumInstructions) {
+        while (InstructionNum <= state.dataRuntimeLang->ErlStack(StackNum).NumInstructions) {
 
             {
-                auto const SELECT_CASE_var(ErlStack(StackNum).Instruction(InstructionNum).Keyword);
+                auto const SELECT_CASE_var(state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Keyword);
 
                 if (SELECT_CASE_var == KeywordNone) {
                     // There probably shouldn't be any of these
 
                 } else if (SELECT_CASE_var == KeywordReturn) {
-                    if (ErlStack(StackNum).Instruction(InstructionNum).Argument1 > 0)
-                        ReturnValue = EvaluateExpression(state, ErlStack(StackNum).Instruction(InstructionNum).Argument1, seriousErrorFound);
+                    if (state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1 > 0)
+                        ReturnValue = EvaluateExpression(state, state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1, seriousErrorFound);
 
                     WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
                     break; // RETURN always terminates an instruction stack
 
                 } else if (SELECT_CASE_var == KeywordSet) {
 
-                    ReturnValue = EvaluateExpression(state, ErlStack(StackNum).Instruction(InstructionNum).Argument2, seriousErrorFound);
-                    VariableNum = ErlStack(StackNum).Instruction(InstructionNum).Argument1;
-                    if ((!ErlVariable(VariableNum).ReadOnly) && (!ErlVariable(VariableNum).Value.TrendVariable)) {
-                        ErlVariable(VariableNum).Value = ReturnValue;
-                    } else if (ErlVariable(VariableNum).Value.TrendVariable) {
-                        ErlVariable(VariableNum).Value.Number = ReturnValue.Number;
-                        ErlVariable(VariableNum).Value.Error = ReturnValue.Error;
+                    ReturnValue = EvaluateExpression(state, state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument2, seriousErrorFound);
+                    VariableNum = state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1;
+                    if ((!state.dataRuntimeLang->ErlVariable(VariableNum).ReadOnly) && (!state.dataRuntimeLang->ErlVariable(VariableNum).Value.TrendVariable)) {
+                        state.dataRuntimeLang->ErlVariable(VariableNum).Value = ReturnValue;
+                    } else if (state.dataRuntimeLang->ErlVariable(VariableNum).Value.TrendVariable) {
+                        state.dataRuntimeLang->ErlVariable(VariableNum).Value.Number = ReturnValue.Number;
+                        state.dataRuntimeLang->ErlVariable(VariableNum).Value.Error = ReturnValue.Error;
                     }
 
                     WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
@@ -933,11 +935,11 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                     ReturnValue.Type = ValueString;
                     ReturnValue.String = "";
                     WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
-                    ReturnValue = EvaluateStack(state, ErlStack(StackNum).Instruction(InstructionNum).Argument1);
+                    ReturnValue = EvaluateStack(state, state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1);
 
                 } else if ((SELECT_CASE_var == KeywordIf) || (SELECT_CASE_var == KeywordElse)) { // same???
-                    ExpressionNum = ErlStack(StackNum).Instruction(InstructionNum).Argument1;
-                    InstructionNum2 = ErlStack(StackNum).Instruction(InstructionNum).Argument2;
+                    ExpressionNum = state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1;
+                    InstructionNum2 = state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument2;
 
                     if (ExpressionNum > 0) { // could be 0 if this was an ELSE
                         ReturnValue = EvaluateExpression(state, ExpressionNum, seriousErrorFound);
@@ -955,7 +957,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                     }
 
                 } else if (SELECT_CASE_var == KeywordGoto) {
-                    InstructionNum = ErlStack(StackNum).Instruction(InstructionNum).Argument1;
+                    InstructionNum = state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1;
 
                     // For debug purposes only...
                     ReturnValue.Type = ValueString;
@@ -971,8 +973,8 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
 
                 } else if (SELECT_CASE_var == KeywordWhile) {
                     // evaluate expression at while, skip to past endwhile if not true
-                    ExpressionNum = ErlStack(StackNum).Instruction(InstructionNum).Argument1;
-                    InstructionNum2 = ErlStack(StackNum).Instruction(InstructionNum).Argument2;
+                    ExpressionNum = state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1;
+                    InstructionNum2 = state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument2;
                     ReturnValue = EvaluateExpression(state, ExpressionNum, seriousErrorFound);
                     WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
                     if (ReturnValue.Number == 0.0) { //  This is the FALSE case
@@ -983,8 +985,8 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                 } else if (SELECT_CASE_var == KeywordEndWhile) {
 
                     // reevaluate expression at While and goto there if true, otherwise continue
-                    ExpressionNum = ErlStack(StackNum).Instruction(InstructionNum).Argument1;
-                    InstructionNum2 = ErlStack(StackNum).Instruction(InstructionNum).Argument2;
+                    ExpressionNum = state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1;
+                    InstructionNum2 = state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument2;
                     ReturnValue = EvaluateExpression(state, ExpressionNum, seriousErrorFound);
                     if ((ReturnValue.Number != 0.0) && (WhileLoopExitCounter <= MaxWhileLoopIterations)) { //  This is the True case
                         // Eventually should handle strings and arrays too
@@ -1062,10 +1064,10 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
         }
         // if have not return'd yet then write out full trace
 
-        NameString = ErlStack(StackNum).Name;
-        LineNum = ErlStack(StackNum).Instruction(InstructionNum).LineNum;
+        NameString = state.dataRuntimeLang->ErlStack(StackNum).Name;
+        LineNum = state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).LineNum;
         LineNumString = fmt::to_string(LineNum);
-        LineString = ErlStack(StackNum).Line(LineNum);
+        LineString = state.dataRuntimeLang->ErlStack(StackNum).Line(LineNum);
         cValueString = ValueToString(ReturnValue);
 
         // put together timestamp info
@@ -1181,7 +1183,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
         while (Pos < LastPos) {
             ++CountDoLooping;
             if (CountDoLooping > MaxDoLoopCounts) {
-                ShowSevereError(state, "EMS ParseExpression: Entity=" + ErlStack(StackNum).Name);
+                ShowSevereError(state, "EMS ParseExpression: Entity=" + state.dataRuntimeLang->ErlStack(StackNum).Name);
                 ShowContinueError(state, "...Line=" + Line);
                 ShowContinueError(state, "...Failed to process String=\"" + String + "\".");
                 ShowFatalError(state, "...program terminates due to preceding condition.");
@@ -1218,7 +1220,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                         if (NextChar == '.') {
                             if (PeriodFound) {
                                 // ERROR:  two periods appearing in a number literal!
-                                ShowSevereError(state, "EMS Parse Expression, for \"" + ErlStack(StackNum).Name + "\".");
+                                ShowSevereError(state, "EMS Parse Expression, for \"" + state.dataRuntimeLang->ErlStack(StackNum).Name + "\".");
                                 ShowContinueError(state, "...Line=\"" + Line + "\".");
                                 ShowContinueError(state, "...Bad String=\"" + String + "\".");
                                 ShowContinueError(state, "...Two decimal points detected in String.");
@@ -1232,7 +1234,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                         if (is_any_of(NextChar, "eEdD")) {
                             StringToken += NextChar;
                             if (LastED) {
-                                ShowSevereError(state, "EMS Parse Expression, for \"" + ErlStack(StackNum).Name + "\".");
+                                ShowSevereError(state, "EMS Parse Expression, for \"" + state.dataRuntimeLang->ErlStack(StackNum).Name + "\".");
                                 ShowContinueError(state, "...Line=\"" + Line + "\".");
                                 ShowContinueError(state, "...Bad String=\"" + String + "\".");
                                 ShowContinueError(state, "...Two D/E in numeric String.");
@@ -1277,7 +1279,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                     }
                     if (ErrorFlag) {
                         // Error: something wrong with this number!
-                        ShowSevereError(state, "EMS Parse Expression, for \"" + ErlStack(StackNum).Name + "\".");
+                        ShowSevereError(state, "EMS Parse Expression, for \"" + state.dataRuntimeLang->ErlStack(StackNum).Name + "\".");
                         ShowContinueError(state, "...Line=\"" + Line + "\".");
                         ShowContinueError(state, "...Bad String=\"" + String + "\".");
                         ShowContinueError(state, "Invalid numeric=\"" + StringToken + "\".");
@@ -1317,14 +1319,14 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                 if (NextChar == '-') {
                     StringToken = "-";
                     if (MultFound) {
-                        ShowSevereError(state, "EMS Parse Expression, for \"" + ErlStack(StackNum).Name + "\".");
+                        ShowSevereError(state, "EMS Parse Expression, for \"" + state.dataRuntimeLang->ErlStack(StackNum).Name + "\".");
                         ShowContinueError(state, "...Line = \"" + Line + "\".");
                         ShowContinueError(state, "...Minus sign used on the right side of multiplication sign.");
                         ShowContinueError(state, "...Use parenthesis to wrap appropriate variables. For example, X * ( -Y ).");
                         ++NumErrors;
                         MultFound = false;
                     } else if (DivFound) {
-                        ShowSevereError(state, "EMS Parse Expression, for \"" + ErlStack(StackNum).Name + "\".");
+                        ShowSevereError(state, "EMS Parse Expression, for \"" + state.dataRuntimeLang->ErlStack(StackNum).Name + "\".");
                         ShowContinueError(state, "...Line = \"" + Line + "\".");
                         ShowContinueError(state, "...Minus sign used on the right side of division sign.");
                         ShowContinueError(state, "...Use parenthesis to wrap appropriate variables. For example, X / ( -Y ).");
@@ -1608,7 +1610,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
             ShowFatalError(state, "Program terminates due to preceding error.");
         }
 
-        SetupPossibleOperators(); // includes built-in functions
+        SetupPossibleOperators(state); // includes built-in functions
 
         // Process operators and builtin functions
         // Loop thru all operators and group expressions in the order of precedence
@@ -1628,86 +1630,86 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                     // if first token is for a built-in function starting with "@" then okay, otherwise the operator needs a LHS
                     if (Token(TokenNum).Operator > OperatorLogicalOR) { // we have a function expression to set up
                         ExpressionNum = NewExpression(state);
-                        ErlExpression(ExpressionNum).Operator = OperatorNum;
-                        NumOperands = PossibleOperators(OperatorNum).NumOperands;
-                        ErlExpression(ExpressionNum).NumOperands = NumOperands;
-                        ErlExpression(ExpressionNum).Operand.allocate(NumOperands);
+                        state.dataRuntimeLang->ErlExpression(ExpressionNum).Operator = OperatorNum;
+                        NumOperands = state.dataRuntimeLang->PossibleOperators(OperatorNum).NumOperands;
+                        state.dataRuntimeLang->ErlExpression(ExpressionNum).NumOperands = NumOperands;
+                        state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand.allocate(NumOperands);
 
-                        ErlExpression(ExpressionNum).Operand(1).Type = Token(Pos + 1).Type;
-                        ErlExpression(ExpressionNum).Operand(1).Number = Token(Pos + 1).Number;
-                        ErlExpression(ExpressionNum).Operand(1).Expression = Token(Pos + 1).Expression;
-                        ErlExpression(ExpressionNum).Operand(1).Variable = Token(Pos + 1).Variable;
+                        state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(1).Type = Token(Pos + 1).Type;
+                        state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(1).Number = Token(Pos + 1).Number;
+                        state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(1).Expression = Token(Pos + 1).Expression;
+                        state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(1).Variable = Token(Pos + 1).Variable;
                         if (Token(Pos + 1).Variable > 0) {
-                            ErlExpression(ExpressionNum).Operand(1).TrendVariable = ErlVariable(Token(Pos + 1).Variable).Value.TrendVariable;
-                            ErlExpression(ExpressionNum).Operand(1).TrendVarPointer = ErlVariable(Token(Pos + 1).Variable).Value.TrendVarPointer;
+                            state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(1).TrendVariable = state.dataRuntimeLang->ErlVariable(Token(Pos + 1).Variable).Value.TrendVariable;
+                            state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(1).TrendVarPointer = state.dataRuntimeLang->ErlVariable(Token(Pos + 1).Variable).Value.TrendVarPointer;
                         }
                         if ((NumOperands >= 2) && (NumTokens >= 3)) {
-                            ErlExpression(ExpressionNum).Operand(2).Type = Token(Pos + 2).Type;
-                            ErlExpression(ExpressionNum).Operand(2).Number = Token(Pos + 2).Number;
-                            ErlExpression(ExpressionNum).Operand(2).Expression = Token(Pos + 2).Expression;
-                            ErlExpression(ExpressionNum).Operand(2).Variable = Token(Pos + 2).Variable;
+                            state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(2).Type = Token(Pos + 2).Type;
+                            state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(2).Number = Token(Pos + 2).Number;
+                            state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(2).Expression = Token(Pos + 2).Expression;
+                            state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(2).Variable = Token(Pos + 2).Variable;
                         }
 
                         if ((NumOperands >= 3) && (NumTokens >= 4)) {
-                            ErlExpression(ExpressionNum).Operand(3).Type = Token(Pos + 3).Type;
-                            ErlExpression(ExpressionNum).Operand(3).Number = Token(Pos + 3).Number;
-                            ErlExpression(ExpressionNum).Operand(3).Expression = Token(Pos + 3).Expression;
-                            ErlExpression(ExpressionNum).Operand(3).Variable = Token(Pos + 3).Variable;
+                            state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(3).Type = Token(Pos + 3).Type;
+                            state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(3).Number = Token(Pos + 3).Number;
+                            state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(3).Expression = Token(Pos + 3).Expression;
+                            state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(3).Variable = Token(Pos + 3).Variable;
                             if ((NumOperands == 3) && (NumTokens - 4 > 0)) { // too many tokens for this non-binary operator
                                 ShowFatalError(state, "EMS error parsing tokens, too many for built-in function");
                             }
                         }
 
                         if ((NumOperands >= 4) && (NumTokens >= 5)) {
-                            ErlExpression(ExpressionNum).Operand(4).Type = Token(Pos + 4).Type;
-                            ErlExpression(ExpressionNum).Operand(4).Number = Token(Pos + 4).Number;
-                            ErlExpression(ExpressionNum).Operand(4).Expression = Token(Pos + 4).Expression;
-                            ErlExpression(ExpressionNum).Operand(4).Variable = Token(Pos + 4).Variable;
+                            state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(4).Type = Token(Pos + 4).Type;
+                            state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(4).Number = Token(Pos + 4).Number;
+                            state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(4).Expression = Token(Pos + 4).Expression;
+                            state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(4).Variable = Token(Pos + 4).Variable;
                             if ((NumOperands == 4) && (NumTokens - 5 > 0)) { // too many tokens for this non-binary operator
                                 ShowFatalError(state, "EMS error parsing tokens, too many for built-in function");
                             }
                         }
 
                         if ((NumOperands == 5) && (NumTokens >= 6)) {
-                            ErlExpression(ExpressionNum).Operand(5).Type = Token(Pos + 5).Type;
-                            ErlExpression(ExpressionNum).Operand(5).Number = Token(Pos + 5).Number;
-                            ErlExpression(ExpressionNum).Operand(5).Expression = Token(Pos + 5).Expression;
-                            ErlExpression(ExpressionNum).Operand(5).Variable = Token(Pos + 5).Variable;
+                            state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(5).Type = Token(Pos + 5).Type;
+                            state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(5).Number = Token(Pos + 5).Number;
+                            state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(5).Expression = Token(Pos + 5).Expression;
+                            state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(5).Variable = Token(Pos + 5).Variable;
                             if ((NumOperands == 5) && (NumTokens - 6 > 0)) { // too many tokens for this non-binary operator
                                 ShowFatalError(state, "EMS error parsing tokens, too many for  built-in function");
                             }
                         }
                         break;
                     } else {
-                        ShowSevereError(state, "The operator \"" + PossibleOperators(OperatorNum).Symbol + "\" is missing the left-hand operand!");
+                        ShowSevereError(state, "The operator \"" + state.dataRuntimeLang->PossibleOperators(OperatorNum).Symbol + "\" is missing the left-hand operand!");
                         ShowContinueError(state, "String being parsed=\"" + ParsingString + "\".");
                         break;
                     }
                 } else if (Pos == NumTokens) {
-                    ShowSevereError(state, "The operator \"" + PossibleOperators(OperatorNum).Symbol + "\" is missing the right-hand operand!");
+                    ShowSevereError(state, "The operator \"" + state.dataRuntimeLang->PossibleOperators(OperatorNum).Symbol + "\" is missing the right-hand operand!");
                     ShowContinueError(state, "String being parsed=\"" + ParsingString + "\".");
                     break;
                 } else {
 
                     ExpressionNum = NewExpression(state);
-                    ErlExpression(ExpressionNum).Operator = OperatorNum;
-                    NumOperands = PossibleOperators(OperatorNum).NumOperands;
-                    ErlExpression(ExpressionNum).NumOperands = NumOperands;
-                    ErlExpression(ExpressionNum).Operand.allocate(NumOperands);
+                    state.dataRuntimeLang->ErlExpression(ExpressionNum).Operator = OperatorNum;
+                    NumOperands = state.dataRuntimeLang->PossibleOperators(OperatorNum).NumOperands;
+                    state.dataRuntimeLang->ErlExpression(ExpressionNum).NumOperands = NumOperands;
+                    state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand.allocate(NumOperands);
 
                     // PE commment: Need a right-hand and left-hand check for these, not just number of operators
                     // Unification of TYPEs would turn these into one-liners
 
-                    ErlExpression(ExpressionNum).Operand(1).Type = Token(Pos - 1).Type;
-                    ErlExpression(ExpressionNum).Operand(1).Number = Token(Pos - 1).Number;
-                    ErlExpression(ExpressionNum).Operand(1).Expression = Token(Pos - 1).Expression;
-                    ErlExpression(ExpressionNum).Operand(1).Variable = Token(Pos - 1).Variable;
+                    state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(1).Type = Token(Pos - 1).Type;
+                    state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(1).Number = Token(Pos - 1).Number;
+                    state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(1).Expression = Token(Pos - 1).Expression;
+                    state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(1).Variable = Token(Pos - 1).Variable;
 
                     if (NumOperands >= 2) {
-                        ErlExpression(ExpressionNum).Operand(2).Type = Token(Pos + 1).Type;
-                        ErlExpression(ExpressionNum).Operand(2).Number = Token(Pos + 1).Number;
-                        ErlExpression(ExpressionNum).Operand(2).Expression = Token(Pos + 1).Expression;
-                        ErlExpression(ExpressionNum).Operand(2).Variable = Token(Pos + 1).Variable;
+                        state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(2).Type = Token(Pos + 1).Type;
+                        state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(2).Number = Token(Pos + 1).Number;
+                        state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(2).Expression = Token(Pos + 1).Expression;
+                        state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(2).Variable = Token(Pos + 1).Variable;
                     }
 
                     // Replace the three tokens with one expression token
@@ -1737,18 +1739,18 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
         // Should be down to just one token now
         if (Token(1).Type == TokenNumber) {
             ExpressionNum = NewExpression(state);
-            ErlExpression(ExpressionNum).Operator = OperatorLiteral;
-            ErlExpression(ExpressionNum).NumOperands = 1;
-            ErlExpression(ExpressionNum).Operand.allocate(1);
-            ErlExpression(ExpressionNum).Operand(1).Type = Token(1).Type;
-            ErlExpression(ExpressionNum).Operand(1).Number = Token(1).Number;
+            state.dataRuntimeLang->ErlExpression(ExpressionNum).Operator = OperatorLiteral;
+            state.dataRuntimeLang->ErlExpression(ExpressionNum).NumOperands = 1;
+            state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand.allocate(1);
+            state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(1).Type = Token(1).Type;
+            state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(1).Number = Token(1).Number;
         } else if (Token(1).Type == TokenVariable) {
             ExpressionNum = NewExpression(state);
-            ErlExpression(ExpressionNum).Operator = OperatorLiteral;
-            ErlExpression(ExpressionNum).NumOperands = 1;
-            ErlExpression(ExpressionNum).Operand.allocate(1);
-            ErlExpression(ExpressionNum).Operand(1).Type = Token(1).Type;
-            ErlExpression(ExpressionNum).Operand(1).Variable = Token(1).Variable;
+            state.dataRuntimeLang->ErlExpression(ExpressionNum).Operator = OperatorLiteral;
+            state.dataRuntimeLang->ErlExpression(ExpressionNum).NumOperands = 1;
+            state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand.allocate(1);
+            state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(1).Type = Token(1).Type;
+            state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(1).Variable = Token(1).Variable;
         }
 
         Token.deallocate();
@@ -1781,10 +1783,10 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
 
         // FLOW:
         if (state.dataRuntimeLang->NumExpressions == 0) {
-            ErlExpression.allocate(1);
+            state.dataRuntimeLang->ErlExpression.allocate(1);
             state.dataRuntimeLang->NumExpressions = 1;
         } else {
-            ErlExpression.redimension(++state.dataRuntimeLang->NumExpressions);
+            state.dataRuntimeLang->ErlExpression.redimension(++state.dataRuntimeLang->NumExpressions);
         }
 
         return state.dataRuntimeLang->NumExpressions;
@@ -1844,10 +1846,10 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
 
         if (ExpressionNum > 0) {
             // is there a way to keep these and not allocate and deallocate all the time?
-            Operand.allocate(ErlExpression(ExpressionNum).NumOperands);
+            Operand.allocate(state.dataRuntimeLang->ErlExpression(ExpressionNum).NumOperands);
             // Reduce operands down to literals
-            for (OperandNum = 1; OperandNum <= ErlExpression(ExpressionNum).NumOperands; ++OperandNum) {
-                Operand(OperandNum) = ErlExpression(ExpressionNum).Operand(OperandNum);
+            for (OperandNum = 1; OperandNum <= state.dataRuntimeLang->ErlExpression(ExpressionNum).NumOperands; ++OperandNum) {
+                Operand(OperandNum) = state.dataRuntimeLang->ErlExpression(ExpressionNum).Operand(OperandNum);
                 if (Operand(OperandNum).Type == ValueExpression) {
                     Operand(OperandNum) = EvaluateExpression(state, Operand(OperandNum).Expression, seriousErrorFound); // recursive call
                     // check if recursive call found an error in nested expression, want to preserve error message from that
@@ -1857,16 +1859,16 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                     }
 
                 } else if (Operand(OperandNum).Type == ValueVariable) {
-                    if (ErlVariable(Operand(OperandNum).Variable).Value.initialized) { // check that value has been initialized
-                        Operand(OperandNum) = ErlVariable(Operand(OperandNum).Variable).Value;
+                    if (state.dataRuntimeLang->ErlVariable(Operand(OperandNum).Variable).Value.initialized) { // check that value has been initialized
+                        Operand(OperandNum) = state.dataRuntimeLang->ErlVariable(Operand(OperandNum).Variable).Value;
                     } else { // value has never been set
                         ReturnValue.Type = ValueError;
-                        ReturnValue.Error = "EvaluateExpression: Variable = '" + ErlVariable(Operand(OperandNum).Variable).Name +
+                        ReturnValue.Error = "EvaluateExpression: Variable = '" + state.dataRuntimeLang->ErlVariable(Operand(OperandNum).Variable).Name +
                                             "' used in expression has not been initialized!";
                         if (!state.dataGlobal->DoingSizing && !state.dataGlobal->KickOffSimulation && !state.dataEMSMgr->FinishProcessingUserInput) {
 
                             // check if this is an arg in CurveValue,
-                            if (ErlExpression(ExpressionNum).Operator !=
+                            if (state.dataRuntimeLang->ErlExpression(ExpressionNum).Operator !=
                                 FuncCurveValue) { // padding the argument list for CurveValue is too common to fatal on.  only reported to EDD
                                 seriousErrorFound = true;
                             }
@@ -1879,7 +1881,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
 
                 // Perform the operation
                 {
-                    auto const SELECT_CASE_var(ErlExpression(ExpressionNum).Operator);
+                    auto const SELECT_CASE_var(state.dataRuntimeLang->ErlExpression(ExpressionNum).Operator);
 
                     if (SELECT_CASE_var == OperatorLiteral) {
                         ReturnValue = Operand(1);
@@ -1917,56 +1919,56 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                     } else if (SELECT_CASE_var == OperatorEqual) {
                         if (Operand(1).Type == Operand(2).Type) {
                             if (Operand(1).Type == ValueNull) {
-                                ReturnValue = True;
+                                ReturnValue = state.dataRuntimeLang->True;
                             } else if ((Operand(1).Type == ValueNumber) && (Operand(1).Number == Operand(2).Number)) {
-                                ReturnValue = True;
+                                ReturnValue = state.dataRuntimeLang->True;
                             } else {
-                                ReturnValue = False;
+                                ReturnValue = state.dataRuntimeLang->False;
                             }
                         } else {
-                            ReturnValue = False;
+                            ReturnValue = state.dataRuntimeLang->False;
                         }
 
                     } else if (SELECT_CASE_var == OperatorNotEqual) {
                         if ((Operand(1).Type == ValueNumber) && (Operand(2).Type == ValueNumber)) {
                             if (Operand(1).Number != Operand(2).Number) {
-                                ReturnValue = True;
+                                ReturnValue = state.dataRuntimeLang->True;
                             } else {
-                                ReturnValue = False;
+                                ReturnValue = state.dataRuntimeLang->False;
                             }
                         }
 
                     } else if (SELECT_CASE_var == OperatorLessOrEqual) {
                         if ((Operand(1).Type == ValueNumber) && (Operand(2).Type == ValueNumber)) {
                             if (Operand(1).Number <= Operand(2).Number) {
-                                ReturnValue = True;
+                                ReturnValue = state.dataRuntimeLang->True;
                             } else {
-                                ReturnValue = False;
+                                ReturnValue = state.dataRuntimeLang->False;
                             }
                         }
 
                     } else if (SELECT_CASE_var == OperatorGreaterOrEqual) {
                         if ((Operand(1).Type == ValueNumber) && (Operand(2).Type == ValueNumber)) {
                             if (Operand(1).Number >= Operand(2).Number) {
-                                ReturnValue = True;
+                                ReturnValue = state.dataRuntimeLang->True;
                             } else {
-                                ReturnValue = False;
+                                ReturnValue = state.dataRuntimeLang->False;
                             }
                         }
                     } else if (SELECT_CASE_var == OperatorLessThan) {
                         if ((Operand(1).Type == ValueNumber) && (Operand(2).Type == ValueNumber)) {
                             if (Operand(1).Number < Operand(2).Number) {
-                                ReturnValue = True;
+                                ReturnValue = state.dataRuntimeLang->True;
                             } else {
-                                ReturnValue = False;
+                                ReturnValue = state.dataRuntimeLang->False;
                             }
                         }
                     } else if (SELECT_CASE_var == OperatorGreaterThan) {
                         if ((Operand(1).Type == ValueNumber) && (Operand(2).Type == ValueNumber)) {
                             if (Operand(1).Number > Operand(2).Number) {
-                                ReturnValue = True;
+                                ReturnValue = state.dataRuntimeLang->True;
                             } else {
-                                ReturnValue = False;
+                                ReturnValue = state.dataRuntimeLang->False;
                             }
                         }
 
@@ -1989,18 +1991,18 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                         }
                     } else if (SELECT_CASE_var == OperatorLogicalAND) {
                         if ((Operand(1).Type == ValueNumber) && (Operand(2).Type == ValueNumber)) {
-                            if ((Operand(1).Number == True.Number) && (Operand(2).Number == True.Number)) {
-                                ReturnValue = True;
+                            if ((Operand(1).Number == state.dataRuntimeLang->True.Number) && (Operand(2).Number == state.dataRuntimeLang->True.Number)) {
+                                ReturnValue = state.dataRuntimeLang->True;
                             } else {
-                                ReturnValue = False;
+                                ReturnValue = state.dataRuntimeLang->False;
                             }
                         }
                     } else if (SELECT_CASE_var == OperatorLogicalOR) {
                         if ((Operand(1).Type == ValueNumber) && (Operand(2).Type == ValueNumber)) {
-                            if ((Operand(1).Number == True.Number) || (Operand(2).Number == True.Number)) {
-                                ReturnValue = True;
+                            if ((Operand(1).Number == state.dataRuntimeLang->True.Number) || (Operand(2).Number == state.dataRuntimeLang->True.Number)) {
+                                ReturnValue = state.dataRuntimeLang->True;
                             } else {
-                                ReturnValue = False;
+                                ReturnValue = state.dataRuntimeLang->False;
                             }
                         }
                     } else if (SELECT_CASE_var == FuncRound) {
@@ -2242,8 +2244,8 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                             // second operand is number for index
                             thisIndex = std::floor(Operand(2).Number);
                             if (thisIndex >= 1) {
-                                if (thisIndex <= TrendVariable(thisTrend).LogDepth) {
-                                    ReturnValue = SetErlValueNumber(TrendVariable(thisTrend).TrendValARR(thisIndex), Operand(1));
+                                if (thisIndex <= state.dataRuntimeLang->TrendVariable(thisTrend).LogDepth) {
+                                    ReturnValue = SetErlValueNumber(state.dataRuntimeLang->TrendVariable(thisTrend).TrendValARR(thisIndex), Operand(1));
                                 } else {
                                     ReturnValue.Type = ValueError;
                                     ReturnValue.Error = "Built-in trend function called with index larger than what is being logged";
@@ -2263,9 +2265,9 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                             thisTrend = Operand(1).TrendVarPointer;
                             thisIndex = std::floor(Operand(2).Number);
                             if (thisIndex >= 1) {
-                                if (thisIndex <= TrendVariable(thisTrend).LogDepth) {
+                                if (thisIndex <= state.dataRuntimeLang->TrendVariable(thisTrend).LogDepth) {
                                     // calculate average
-                                    thisAverage = sum(TrendVariable(thisTrend).TrendValARR({1, thisIndex})) / double(thisIndex);
+                                    thisAverage = sum(state.dataRuntimeLang->TrendVariable(thisTrend).TrendValARR({1, thisIndex})) / double(thisIndex);
                                     ReturnValue = SetErlValueNumber(thisAverage, Operand(1));
                                 } else {
                                     ReturnValue.Type = ValueError;
@@ -2284,16 +2286,16 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                             thisTrend = Operand(1).TrendVarPointer;
                             thisIndex = std::floor(Operand(2).Number);
                             if (thisIndex >= 1) {
-                                if (thisIndex <= TrendVariable(thisTrend).LogDepth) {
+                                if (thisIndex <= state.dataRuntimeLang->TrendVariable(thisTrend).LogDepth) {
                                     thisMax = 0.0;
                                     if (thisIndex == 1) {
-                                        thisMax = TrendVariable(thisTrend).TrendValARR(1);
+                                        thisMax = state.dataRuntimeLang->TrendVariable(thisTrend).TrendValARR(1);
                                     } else {
                                         for (loop = 2; loop <= thisIndex; ++loop) {
                                             if (loop == 2) {
-                                                thisMax = max(TrendVariable(thisTrend).TrendValARR(1), TrendVariable(thisTrend).TrendValARR(2));
+                                                thisMax = max(state.dataRuntimeLang->TrendVariable(thisTrend).TrendValARR(1), state.dataRuntimeLang->TrendVariable(thisTrend).TrendValARR(2));
                                             } else {
-                                                thisMax = max(thisMax, TrendVariable(thisTrend).TrendValARR(loop));
+                                                thisMax = max(thisMax, state.dataRuntimeLang->TrendVariable(thisTrend).TrendValARR(loop));
                                             }
                                         }
                                     }
@@ -2315,16 +2317,16 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                             thisTrend = Operand(1).TrendVarPointer;
                             thisIndex = std::floor(Operand(2).Number);
                             if (thisIndex >= 1) {
-                                if (thisIndex <= TrendVariable(thisTrend).LogDepth) {
+                                if (thisIndex <= state.dataRuntimeLang->TrendVariable(thisTrend).LogDepth) {
                                     thisMin = 0.0;
                                     if (thisIndex == 1) {
-                                        thisMin = TrendVariable(thisTrend).TrendValARR(1);
+                                        thisMin = state.dataRuntimeLang->TrendVariable(thisTrend).TrendValARR(1);
                                     } else {
                                         for (loop = 2; loop <= thisIndex; ++loop) {
                                             if (loop == 2) {
-                                                thisMin = min(TrendVariable(thisTrend).TrendValARR(1), TrendVariable(thisTrend).TrendValARR(2));
+                                                thisMin = min(state.dataRuntimeLang->TrendVariable(thisTrend).TrendValARR(1), state.dataRuntimeLang->TrendVariable(thisTrend).TrendValARR(2));
                                             } else {
-                                                thisMin = min(thisMin, TrendVariable(thisTrend).TrendValARR(loop));
+                                                thisMin = min(thisMin, state.dataRuntimeLang->TrendVariable(thisTrend).TrendValARR(loop));
                                             }
                                         }
                                     }
@@ -2350,14 +2352,14 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                             thisIndex = std::floor(Operand(2).Number);
                             if (thisIndex >= 1) {
 
-                                if (thisIndex <= TrendVariable(thisTrend).LogDepth) {
+                                if (thisIndex <= state.dataRuntimeLang->TrendVariable(thisTrend).LogDepth) {
                                     // closed form solution for slope of linear least squares fit
-                                    thisSlope = (sum(TrendVariable(thisTrend).TimeARR({1, thisIndex})) *
-                                                     sum(TrendVariable(thisTrend).TrendValARR({1, thisIndex})) -
-                                                 thisIndex * sum((TrendVariable(thisTrend).TimeARR({1, thisIndex}) *
-                                                                  TrendVariable(thisTrend).TrendValARR({1, thisIndex})))) /
-                                                (pow_2(sum(TrendVariable(thisTrend).TimeARR({1, thisIndex}))) -
-                                                 thisIndex * sum(pow(TrendVariable(thisTrend).TimeARR({1, thisIndex}), 2)));
+                                    thisSlope = (sum(state.dataRuntimeLang->TrendVariable(thisTrend).TimeARR({1, thisIndex})) *
+                                                     sum(state.dataRuntimeLang->TrendVariable(thisTrend).TrendValARR({1, thisIndex})) -
+                                                 thisIndex * sum((state.dataRuntimeLang->TrendVariable(thisTrend).TimeARR({1, thisIndex}) *
+                                                                  state.dataRuntimeLang->TrendVariable(thisTrend).TrendValARR({1, thisIndex})))) /
+                                                (pow_2(sum(state.dataRuntimeLang->TrendVariable(thisTrend).TimeARR({1, thisIndex}))) -
+                                                 thisIndex * sum(pow(state.dataRuntimeLang->TrendVariable(thisTrend).TimeARR({1, thisIndex}), 2)));
                                     ReturnValue = SetErlValueNumber(thisSlope, Operand(1)); // rate of change per hour
                                 } else {
                                     ReturnValue.Type = ValueError;
@@ -2378,8 +2380,8 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                             thisTrend = Operand(1).TrendVarPointer;
                             thisIndex = std::floor(Operand(2).Number);
                             if (thisIndex >= 1) {
-                                if (thisIndex <= TrendVariable(thisTrend).LogDepth) {
-                                    ReturnValue = SetErlValueNumber(sum(TrendVariable(thisTrend).TrendValARR({1, thisIndex})), Operand(1));
+                                if (thisIndex <= state.dataRuntimeLang->TrendVariable(thisTrend).LogDepth) {
+                                    ReturnValue = SetErlValueNumber(sum(state.dataRuntimeLang->TrendVariable(thisTrend).TrendValARR({1, thisIndex})), Operand(1));
                                 } else {
                                     ReturnValue.Type = ValueError;
                                     ReturnValue.Error = "Built-in trend function called with index larger than what is being logged";
@@ -2537,7 +2539,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
         } else {
             ReturnVal.Type = DataRuntimeLanguage::ValueError;
             ReturnVal.Error = format("{} function called with invalid arguments: Hour={:.1R}, Timestep={:.1R}",
-                                     DataRuntimeLanguage::PossibleOperators(FunctionCode).Symbol,
+                                     state.dataRuntimeLang->PossibleOperators(FunctionCode).Symbol,
                                      Operand1,
                                      Operand2);
         }
@@ -2558,7 +2560,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
         } else {
             ReturnVal.Type = DataRuntimeLanguage::ValueError;
             ReturnVal.Error = format("{} function called with invalid arguments: Hour={:.1R}, Timestep={:.1R}",
-                                     DataRuntimeLanguage::PossibleOperators(FunctionCode).Symbol,
+                                     state.dataRuntimeLang->PossibleOperators(FunctionCode).Symbol,
                                      Operand1,
                                      Operand2);
         }
@@ -2841,7 +2843,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                                 if (GlobalNum > state.dataRuntimeLang->NumUserGlobalVariables) {
                                     // Initialize variables for the ExternalInterface variables.
                                     // This object requires an initial value.
-                                    ExternalInterfaceInitializeErlVariable(VariableNum, SetErlValueNumber(rNumericArgs(1)), false);
+                                    ExternalInterfaceInitializeErlVariable(state, VariableNum, SetErlValueNumber(rNumericArgs(1)), false);
                                 }
                             }
                         }
@@ -2903,7 +2905,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                         ErrorsFound = true;
                     } else {
                         // fill Erl variable with curve index
-                        ErlVariable(VariableNum).Value = SetErlValueNumber(double(CurveIndexNum));
+                        state.dataRuntimeLang->ErlVariable(VariableNum).Value = SetErlValueNumber(double(CurveIndexNum));
                     }
                 }
 
@@ -2966,14 +2968,14 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                         ErrorsFound = true;
                     } else {
                         // fill Erl variable with curve index
-                        ErlVariable(VariableNum).Value = SetErlValueNumber(double(ConstructNum));
+                        state.dataRuntimeLang->ErlVariable(VariableNum).Value = SetErlValueNumber(double(ConstructNum));
                     }
                 }
 
             } // NumEMSConstructionIndices > 0
 
             state.dataRuntimeLang->NumErlStacks = state.dataRuntimeLang->NumErlPrograms + state.dataRuntimeLang->NumErlSubroutines;
-            ErlStack.allocate(state.dataRuntimeLang->NumErlStacks);
+            state.dataRuntimeLang->ErlStack.allocate(state.dataRuntimeLang->NumErlStacks);
             ErlStackUniqueNames.reserve(static_cast<unsigned>(state.dataRuntimeLang->NumErlStacks));
 
             if (state.dataRuntimeLang->NumErlPrograms > 0) {
@@ -2996,13 +2998,13 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
 
                     ValidateEMSProgramName(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(1), "Programs", errFlag, ErrorsFound);
                     if (!errFlag) {
-                        ErlStack(StackNum).Name = cAlphaArgs(1);
+                        state.dataRuntimeLang->ErlStack(StackNum).Name = cAlphaArgs(1);
                     }
 
                     if (NumAlphas > 1) {
-                        ErlStack(StackNum).Line.allocate(NumAlphas - 1);
-                        ErlStack(StackNum).NumLines = NumAlphas - 1;
-                        ErlStack(StackNum).Line({1, NumAlphas - 1}) = cAlphaArgs({2, NumAlphas}); // note array assignment
+                        state.dataRuntimeLang->ErlStack(StackNum).Line.allocate(NumAlphas - 1);
+                        state.dataRuntimeLang->ErlStack(StackNum).NumLines = NumAlphas - 1;
+                        state.dataRuntimeLang->ErlStack(StackNum).Line({1, NumAlphas - 1}) = cAlphaArgs({2, NumAlphas}); // note array assignment
                     }
 
                 } // ProgramNum
@@ -3028,13 +3030,13 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
 
                     ValidateEMSProgramName(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(1), "Subroutines", errFlag, ErrorsFound);
                     if (!errFlag) {
-                        ErlStack(StackNum).Name = cAlphaArgs(1);
+                        state.dataRuntimeLang->ErlStack(StackNum).Name = cAlphaArgs(1);
                     }
 
                     if (NumAlphas > 1) {
-                        ErlStack(StackNum).Line.allocate(NumAlphas - 1);
-                        ErlStack(StackNum).NumLines = NumAlphas - 1;
-                        ErlStack(StackNum).Line({1, NumAlphas - 1}) = cAlphaArgs({2, NumAlphas}); // note array assignment
+                        state.dataRuntimeLang->ErlStack(StackNum).Line.allocate(NumAlphas - 1);
+                        state.dataRuntimeLang->ErlStack(StackNum).NumLines = NumAlphas - 1;
+                        state.dataRuntimeLang->ErlStack(StackNum).Line({1, NumAlphas - 1}) = cAlphaArgs({2, NumAlphas}); // note array assignment
                     }
                 }
             }
@@ -3042,7 +3044,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
             cCurrentModuleObject = "EnergyManagementSystem:TrendVariable";
             state.dataRuntimeLang->NumErlTrendVariables = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
             if (state.dataRuntimeLang->NumErlTrendVariables > 0) {
-                TrendVariable.allocate(state.dataRuntimeLang->NumErlTrendVariables);
+                state.dataRuntimeLang->TrendVariable.allocate(state.dataRuntimeLang->NumErlTrendVariables);
                 for (TrendNum = 1; TrendNum <= state.dataRuntimeLang->NumErlTrendVariables; ++TrendNum) {
                     inputProcessor->getObjectItem(state,
                                                   cCurrentModuleObject,
@@ -3060,7 +3062,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
 
                     ValidateEMSVariableName(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(1), errFlag, ErrorsFound);
                     if (!errFlag) {
-                        TrendVariable(TrendNum).Name = cAlphaArgs(1);
+                        state.dataRuntimeLang->TrendVariable(TrendNum).Name = cAlphaArgs(1);
                     }
 
                     VariableNum = FindEMSVariable(state, cAlphaArgs(2), 0);
@@ -3071,32 +3073,32 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                         ShowContinueError(state, "Did not find a match with an EMS variable name");
                         ErrorsFound = true;
                     } else { // found it.
-                        TrendVariable(TrendNum).ErlVariablePointer = VariableNum;
+                        state.dataRuntimeLang->TrendVariable(TrendNum).ErlVariablePointer = VariableNum;
                         // register the trend pointer in ErlVariable.
-                        ErlVariable(VariableNum).Value.TrendVariable = true;
-                        ErlVariable(VariableNum).Value.TrendVarPointer = TrendNum;
-                        ErlVariable(VariableNum).Value.initialized = true; // Cannot figure out how to get around needing this,
+                        state.dataRuntimeLang->ErlVariable(VariableNum).Value.TrendVariable = true;
+                        state.dataRuntimeLang->ErlVariable(VariableNum).Value.TrendVarPointer = TrendNum;
+                        state.dataRuntimeLang->ErlVariable(VariableNum).Value.initialized = true; // Cannot figure out how to get around needing this,
                     }
 
                     NumTrendSteps = std::floor(rNumericArgs(1));
                     if (NumTrendSteps > 0) {
-                        TrendVariable(TrendNum).LogDepth = NumTrendSteps;
+                        state.dataRuntimeLang->TrendVariable(TrendNum).LogDepth = NumTrendSteps;
                         // setup data arrays using NumTrendSteps
-                        TrendVariable(TrendNum).TrendValARR.allocate(NumTrendSteps);
-                        TrendVariable(TrendNum).TrendValARR = 0.0; // array init
-                        TrendVariable(TrendNum).tempTrendARR.allocate(NumTrendSteps);
-                        TrendVariable(TrendNum).tempTrendARR = 0.0; // array init
-                        TrendVariable(TrendNum).TimeARR.allocate(NumTrendSteps);
+                        state.dataRuntimeLang->TrendVariable(TrendNum).TrendValARR.allocate(NumTrendSteps);
+                        state.dataRuntimeLang->TrendVariable(TrendNum).TrendValARR = 0.0; // array init
+                        state.dataRuntimeLang->TrendVariable(TrendNum).tempTrendARR.allocate(NumTrendSteps);
+                        state.dataRuntimeLang->TrendVariable(TrendNum).tempTrendARR = 0.0; // array init
+                        state.dataRuntimeLang->TrendVariable(TrendNum).TimeARR.allocate(NumTrendSteps);
                         // construct time data array for use with other calculations later
                         // current time is zero, each value in trend log array is one zone timestep further back in time
                         // units are hours.  all terms negative, getting increasingly negative the further back in time
                         //  further back in time is higher index in array
                         for (loop = 1; loop <= NumTrendSteps; ++loop) {
                             if (loop == 1) {
-                                TrendVariable(TrendNum).TimeARR(loop) = -state.dataGlobal->TimeStepZone;
+                                state.dataRuntimeLang->TrendVariable(TrendNum).TimeARR(loop) = -state.dataGlobal->TimeStepZone;
                                 continue;
                             } else {
-                                TrendVariable(TrendNum).TimeARR(loop) = TrendVariable(TrendNum).TimeARR(loop - 1) - state.dataGlobal->TimeStepZone; // fractional hours
+                                state.dataRuntimeLang->TrendVariable(TrendNum).TimeARR(loop) = state.dataRuntimeLang->TrendVariable(TrendNum).TimeARR(loop - 1) - state.dataGlobal->TimeStepZone; // fractional hours
                             }
                         }
                     } else {
@@ -3117,10 +3119,10 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
             for (StackNum = 1; StackNum <= state.dataRuntimeLang->NumErlStacks; ++StackNum) {
                 ParseStack(state, StackNum);
 
-                if (ErlStack(StackNum).NumErrors > 0) {
-                    ShowSevereError(state, "Errors found parsing EMS Runtime Language program or subroutine = " + ErlStack(StackNum).Name);
-                    for (ErrorNum = 1; ErrorNum <= ErlStack(StackNum).NumErrors; ++ErrorNum) {
-                        ShowContinueError(state, ErlStack(StackNum).Error(ErrorNum));
+                if (state.dataRuntimeLang->ErlStack(StackNum).NumErrors > 0) {
+                    ShowSevereError(state, "Errors found parsing EMS Runtime Language program or subroutine = " + state.dataRuntimeLang->ErlStack(StackNum).Name);
+                    for (ErrorNum = 1; ErrorNum <= state.dataRuntimeLang->ErlStack(StackNum).NumErrors; ++ErrorNum) {
+                        ShowContinueError(state, state.dataRuntimeLang->ErlStack(StackNum).Error(ErrorNum));
                     }
                     ErrorsFound = true;
                 }
@@ -3208,7 +3210,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                         // Lookup the Runtime Language Context, i.e., PROGRAM, FUNCTION, or global
                         Found = false;
                         for (StackNum = 1; StackNum <= state.dataRuntimeLang->NumErlStacks; ++StackNum) {
-                            if (ErlStack(StackNum).Name == cAlphaArgs(5)) {
+                            if (state.dataRuntimeLang->ErlStack(StackNum).Name == cAlphaArgs(5)) {
                                 Found = true;
                                 break;
                             }
@@ -3377,7 +3379,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                         // Lookup the Runtime Language Context, i.e., PROGRAM, FUNCTION, or global
                         Found = false;
                         for (StackNum = 1; StackNum <= state.dataRuntimeLang->NumErlStacks; ++StackNum) {
-                            if (ErlStack(StackNum).Name == cAlphaArgs(4)) {
+                            if (state.dataRuntimeLang->ErlStack(StackNum).Name == cAlphaArgs(4)) {
                                 Found = true;
                                 break;
                             }
@@ -3639,8 +3641,8 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
         // FLOW:
         for (RuntimeReportVarNum = 1; RuntimeReportVarNum <= state.dataRuntimeLang->NumEMSOutputVariables + state.dataRuntimeLang->NumEMSMeteredOutputVariables; ++RuntimeReportVarNum) {
             VariableNum = RuntimeReportVar(RuntimeReportVarNum).VariableNum;
-            if (ErlVariable(VariableNum).Value.Type == ValueNumber) {
-                RuntimeReportVar(RuntimeReportVarNum).Value = ErlVariable(VariableNum).Value.Number;
+            if (state.dataRuntimeLang->ErlVariable(VariableNum).Value.Type == ValueNumber) {
+                RuntimeReportVar(RuntimeReportVarNum).Value = state.dataRuntimeLang->ErlVariable(VariableNum).Value.Number;
             } else {
                 RuntimeReportVar(RuntimeReportVarNum).Value = 0.0;
             }
@@ -3822,8 +3824,8 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
 
         // check in ErlVariables
         for (VariableNum = 1; VariableNum <= state.dataRuntimeLang->NumErlVariables; ++VariableNum) {
-            if (ErlVariable(VariableNum).Name == UppercaseName) {
-                if ((ErlVariable(VariableNum).StackNum == StackNum) || (ErlVariable(VariableNum).StackNum == 0)) {
+            if (state.dataRuntimeLang->ErlVariable(VariableNum).Name == UppercaseName) {
+                if ((state.dataRuntimeLang->ErlVariable(VariableNum).StackNum == StackNum) || (state.dataRuntimeLang->ErlVariable(VariableNum).StackNum == 0)) {
                     Found = true;
                     break;
                 }
@@ -3832,9 +3834,9 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
 
         // check in Trend variables
         for (TrendVarNum = 1; TrendVarNum <= state.dataRuntimeLang->NumErlTrendVariables; ++TrendVarNum) {
-            if (TrendVariable(TrendVarNum).Name == UppercaseName) {
-                VariableNum = TrendVariable(TrendVarNum).ErlVariablePointer;
-                if ((ErlVariable(VariableNum).StackNum == StackNum) || (ErlVariable(VariableNum).StackNum == 0)) {
+            if (state.dataRuntimeLang->TrendVariable(TrendVarNum).Name == UppercaseName) {
+                VariableNum = state.dataRuntimeLang->TrendVariable(TrendVarNum).ErlVariablePointer;
+                if ((state.dataRuntimeLang->ErlVariable(VariableNum).StackNum == StackNum) || (state.dataRuntimeLang->ErlVariable(VariableNum).StackNum == 0)) {
                     Found = true;
                     break;
                 }
@@ -3863,25 +3865,25 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
 
         if (VariableNum == 0) { // Variable does not exist anywhere yet
             if (state.dataRuntimeLang->NumErlVariables == 0) {
-                ErlVariable.allocate(1);
+                state.dataRuntimeLang->ErlVariable.allocate(1);
                 state.dataRuntimeLang->NumErlVariables = 1;
             } else { // Extend the variable array
-                ErlVariable.redimension(++state.dataRuntimeLang->NumErlVariables);
+                state.dataRuntimeLang->ErlVariable.redimension(++state.dataRuntimeLang->NumErlVariables);
             }
 
             // Add the new variable
             VariableNum = state.dataRuntimeLang->NumErlVariables;
-            ErlVariable(VariableNum).Name = UtilityRoutines::MakeUPPERCase(VariableName);
-            ErlVariable(VariableNum).StackNum = StackNum;
-            ErlVariable(VariableNum).Value.Type = ValueNumber; // ErlVariable values are numbers
+            state.dataRuntimeLang->ErlVariable(VariableNum).Name = UtilityRoutines::MakeUPPERCase(VariableName);
+            state.dataRuntimeLang->ErlVariable(VariableNum).StackNum = StackNum;
+            state.dataRuntimeLang->ErlVariable(VariableNum).Value.Type = ValueNumber; // ErlVariable values are numbers
         }
 
-        if (present(Value)) ErlVariable(VariableNum).Value = Value;
+        if (present(Value)) state.dataRuntimeLang->ErlVariable(VariableNum).Value = Value;
 
         return VariableNum;
     }
 
-    void SetupPossibleOperators()
+    void SetupPossibleOperators(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3920,399 +3922,400 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
 
         if (AlreadyDidOnce) return;
 
-        PossibleOperators.allocate(NumPossibleOperators);
+        state.dataRuntimeLang->PossibleOperators.allocate(NumPossibleOperators);
 
         // Build operator table
         // Order in this table is the order of precedence
 
-        PossibleOperators(OperatorLiteral).NumOperands = 1;
-        PossibleOperators(OperatorLiteral).Code = OperatorLiteral;
+        state.dataRuntimeLang->PossibleOperators(OperatorLiteral).NumOperands = 1;
+        state.dataRuntimeLang->PossibleOperators(OperatorLiteral).Code = OperatorLiteral;
 
         // not sure how to distinguish from subtract in parsing of tokens, not yet available
         //  PossibleOperators(OperatorNegative)%NumOperands = 1
         //  PossibleOperators(OperatorNegative)%Code        = OperatorNegative
         //  PossibleOperators(OperatorNegative)%Symbol      = '-'
 
-        PossibleOperators(OperatorDivide).Symbol = "/";
-        PossibleOperators(OperatorDivide).NumOperands = 2;
-        PossibleOperators(OperatorDivide).Code = OperatorDivide;
-
-        PossibleOperators(OperatorMultiply).Symbol = "*";
-        PossibleOperators(OperatorMultiply).NumOperands = 2;
-        PossibleOperators(OperatorMultiply).Code = OperatorMultiply;
-
-        PossibleOperators(OperatorSubtract).Symbol = "-";
-        PossibleOperators(OperatorSubtract).NumOperands = 2;
-        PossibleOperators(OperatorSubtract).Code = OperatorSubtract;
-
-        PossibleOperators(OperatorAdd).Symbol = "+";
-        PossibleOperators(OperatorAdd).NumOperands = 2;
-        PossibleOperators(OperatorAdd).Code = OperatorAdd;
-
-        PossibleOperators(OperatorEqual).Symbol = "==";
-        PossibleOperators(OperatorEqual).NumOperands = 2;
-        PossibleOperators(OperatorEqual).Code = OperatorEqual;
-
-        PossibleOperators(OperatorNotEqual).Symbol = "<>";
-        PossibleOperators(OperatorNotEqual).NumOperands = 2;
-        PossibleOperators(OperatorNotEqual).Code = OperatorNotEqual;
-
-        PossibleOperators(OperatorLessOrEqual).Symbol = "<=";
-        PossibleOperators(OperatorLessOrEqual).NumOperands = 2;
-        PossibleOperators(OperatorLessOrEqual).Code = OperatorLessOrEqual;
-
-        PossibleOperators(OperatorGreaterOrEqual).Symbol = ">=";
-        PossibleOperators(OperatorGreaterOrEqual).NumOperands = 2;
-        PossibleOperators(OperatorGreaterOrEqual).Code = OperatorGreaterOrEqual;
-
-        PossibleOperators(OperatorLessThan).Symbol = "<";
-        PossibleOperators(OperatorLessThan).NumOperands = 2;
-        PossibleOperators(OperatorLessThan).Code = OperatorLessThan;
-
-        PossibleOperators(OperatorGreaterThan).Symbol = ">";
-        PossibleOperators(OperatorGreaterThan).NumOperands = 2;
-        PossibleOperators(OperatorGreaterThan).Code = OperatorGreaterThan;
-
-        PossibleOperators(OperatorRaiseToPower).Symbol = "^";
-        PossibleOperators(OperatorRaiseToPower).NumOperands = 2;
-        PossibleOperators(OperatorRaiseToPower).Code = OperatorRaiseToPower;
-
-        PossibleOperators(OperatorLogicalAND).Symbol = "&&";
-        PossibleOperators(OperatorLogicalAND).NumOperands = 2;
-        PossibleOperators(OperatorLogicalAND).Code = OperatorLogicalAND;
-
-        PossibleOperators(OperatorLogicalOR).Symbol = "||";
-        PossibleOperators(OperatorLogicalOR).NumOperands = 2;
-        PossibleOperators(OperatorLogicalOR).Code = OperatorLogicalOR;
-
-        PossibleOperators(FuncRound).Symbol = "@ROUND";
-        PossibleOperators(FuncRound).NumOperands = 1;
-        PossibleOperators(FuncRound).Code = FuncRound;
-
-        PossibleOperators(FuncMod).Symbol = "@MOD";
-        PossibleOperators(FuncMod).NumOperands = 2;
-        PossibleOperators(FuncMod).Code = FuncMod;
-
-        PossibleOperators(FuncSin).Symbol = "@SIN";
-        PossibleOperators(FuncSin).NumOperands = 1;
-        PossibleOperators(FuncSin).Code = FuncSin;
-
-        PossibleOperators(FuncCos).Symbol = "@COS";
-        PossibleOperators(FuncCos).NumOperands = 1;
-        PossibleOperators(FuncCos).Code = FuncCos;
-
-        PossibleOperators(FuncArcSin).Symbol = "@ARCSIN";
-        PossibleOperators(FuncArcSin).NumOperands = 1;
-        PossibleOperators(FuncArcSin).Code = FuncArcSin;
-
-        PossibleOperators(FuncArcCos).Symbol = "@ARCCOS";
-        PossibleOperators(FuncArcCos).NumOperands = 1;
-        PossibleOperators(FuncArcCos).Code = FuncArcCos;
-
-        PossibleOperators(FuncDegToRad).Symbol = "@DEGTORAD";
-        PossibleOperators(FuncDegToRad).NumOperands = 1;
-        PossibleOperators(FuncDegToRad).Code = FuncDegToRad;
-
-        PossibleOperators(FuncRadToDeg).Symbol = "@RADTODEG";
-        PossibleOperators(FuncRadToDeg).NumOperands = 1;
-        PossibleOperators(FuncRadToDeg).Code = FuncRadToDeg;
-
-        PossibleOperators(FuncExp).Symbol = "@EXP";
-        PossibleOperators(FuncExp).NumOperands = 1;
-        PossibleOperators(FuncExp).Code = FuncExp;
-
-        PossibleOperators(FuncLn).Symbol = "@LN";
-        PossibleOperators(FuncLn).NumOperands = 1;
-        PossibleOperators(FuncLn).Code = FuncLn;
-
-        PossibleOperators(FuncMax).Symbol = "@MAX";
-        PossibleOperators(FuncMax).NumOperands = 2;
-        PossibleOperators(FuncMax).Code = FuncMax;
-
-        PossibleOperators(FuncMin).Symbol = "@MIN";
-        PossibleOperators(FuncMin).NumOperands = 2;
-        PossibleOperators(FuncMin).Code = FuncMin;
-
-        PossibleOperators(FuncABS).Symbol = "@ABS";
-        PossibleOperators(FuncABS).NumOperands = 1;
-        PossibleOperators(FuncABS).Code = FuncABS;
-
-        PossibleOperators(FuncRandU).Symbol = "@RANDOMUNIFORM";
-        PossibleOperators(FuncRandU).NumOperands = 2;
-        PossibleOperators(FuncRandU).Code = FuncRandU;
-
-        PossibleOperators(FuncRandG).Symbol = "@RANDOMNORMAL";
-        PossibleOperators(FuncRandG).NumOperands = 4;
-        PossibleOperators(FuncRandG).Code = FuncRandG;
-
-        PossibleOperators(FuncRandSeed).Symbol = "@SEEDRANDOM";
-        PossibleOperators(FuncRandSeed).NumOperands = 1;
-        PossibleOperators(FuncRandSeed).Code = FuncRandSeed;
-
-        PossibleOperators(FuncRhoAirFnPbTdbW).Symbol = "@RHOAIRFNPBTDBW";
-        PossibleOperators(FuncRhoAirFnPbTdbW).NumOperands = 3;
-        PossibleOperators(FuncRhoAirFnPbTdbW).Code = FuncRhoAirFnPbTdbW;
-
-        PossibleOperators(FuncCpAirFnW).Symbol = "@CPAIRFNW";
-        PossibleOperators(FuncCpAirFnW).NumOperands = 1;
-        PossibleOperators(FuncCpAirFnW).Code = FuncCpAirFnW;
-
-        PossibleOperators(FuncHfgAirFnWTdb).Symbol = "@HFGAIRFNWTDB";
-        PossibleOperators(FuncHfgAirFnWTdb).NumOperands = 2;
-        PossibleOperators(FuncHfgAirFnWTdb).Code = FuncHfgAirFnWTdb;
-
-        PossibleOperators(FuncHgAirFnWTdb).Symbol = "@HGAIRFNWTDB";
-        PossibleOperators(FuncHgAirFnWTdb).NumOperands = 2;
-        PossibleOperators(FuncHgAirFnWTdb).Code = FuncHgAirFnWTdb;
-
-        PossibleOperators(FuncTdpFnTdbTwbPb).Symbol = "@TDPFNTDBTWBPB";
-        PossibleOperators(FuncTdpFnTdbTwbPb).NumOperands = 3;
-        PossibleOperators(FuncTdpFnTdbTwbPb).Code = FuncTdpFnTdbTwbPb;
-
-        PossibleOperators(FuncTdpFnWPb).Symbol = "@TDPFNWPB";
-        PossibleOperators(FuncTdpFnWPb).NumOperands = 2;
-        PossibleOperators(FuncTdpFnWPb).Code = FuncTdpFnWPb;
-
-        PossibleOperators(FuncHFnTdbW).Symbol = "@HFNTDBW";
-        PossibleOperators(FuncHFnTdbW).NumOperands = 2;
-        PossibleOperators(FuncHFnTdbW).Code = FuncHFnTdbW;
-
-        PossibleOperators(FuncHFnTdbRhPb).Symbol = "@HFNTDBRHPB";
-        PossibleOperators(FuncHFnTdbRhPb).NumOperands = 3;
-        PossibleOperators(FuncHFnTdbRhPb).Code = FuncHFnTdbRhPb;
-
-        PossibleOperators(FuncTdbFnHW).Symbol = "@TDBFNHW";
-        PossibleOperators(FuncTdbFnHW).NumOperands = 2;
-        PossibleOperators(FuncTdbFnHW).Code = FuncTdbFnHW;
-
-        PossibleOperators(FuncRhovFnTdbRh).Symbol = "@RHOVFNTDBR";
-        PossibleOperators(FuncRhovFnTdbRh).NumOperands = 2;
-        PossibleOperators(FuncRhovFnTdbRh).Code = FuncRhovFnTdbRh;
-
-        PossibleOperators(FuncRhovFnTdbRhLBnd0C).Symbol = "@RhovFnTdbRhLBnd0C";
-        PossibleOperators(FuncRhovFnTdbRhLBnd0C).NumOperands = 2;
-        PossibleOperators(FuncRhovFnTdbRhLBnd0C).Code = FuncRhovFnTdbRhLBnd0C;
-
-        PossibleOperators(FuncRhovFnTdbWPb).Symbol = "@RHOVFNTDBWPB";
-        PossibleOperators(FuncRhovFnTdbWPb).NumOperands = 3;
-        PossibleOperators(FuncRhovFnTdbWPb).Code = FuncRhovFnTdbWPb;
-
-        PossibleOperators(FuncRhFnTdbRhov).Symbol = "@RHFNTDBRHOV";
-        PossibleOperators(FuncRhFnTdbRhov).NumOperands = 2;
-        PossibleOperators(FuncRhFnTdbRhov).Code = FuncRhFnTdbRhov;
-
-        PossibleOperators(FuncRhFnTdbRhovLBnd0C).Symbol = "@RHFNTDBRHOVLBND0C";
-        PossibleOperators(FuncRhFnTdbRhovLBnd0C).NumOperands = 2;
-        PossibleOperators(FuncRhFnTdbRhovLBnd0C).Code = FuncRhFnTdbRhovLBnd0C;
-
-        PossibleOperators(FuncRhFnTdbWPb).Symbol = "@RHFNTDBWPB";
-        PossibleOperators(FuncRhFnTdbWPb).NumOperands = 3;
-        PossibleOperators(FuncRhFnTdbWPb).Code = FuncRhFnTdbWPb;
-
-        PossibleOperators(FuncTwbFnTdbWPb).Symbol = "@TWBFNTDBWPB";
-        PossibleOperators(FuncTwbFnTdbWPb).NumOperands = 3;
-        PossibleOperators(FuncTwbFnTdbWPb).Code = FuncTwbFnTdbWPb;
-
-        PossibleOperators(FuncVFnTdbWPb).Symbol = "@VFNTDBWPB";
-        PossibleOperators(FuncVFnTdbWPb).NumOperands = 3;
-        PossibleOperators(FuncVFnTdbWPb).Code = FuncVFnTdbWPb;
-
-        PossibleOperators(FuncWFnTdpPb).Symbol = "@WFNTDPPB";
-        PossibleOperators(FuncWFnTdpPb).NumOperands = 2;
-        PossibleOperators(FuncWFnTdpPb).Code = FuncWFnTdpPb;
-
-        PossibleOperators(FuncWFnTdbH).Symbol = "@WFNTDBH";
-        PossibleOperators(FuncWFnTdbH).NumOperands = 2;
-        PossibleOperators(FuncWFnTdbH).Code = FuncWFnTdbH;
-
-        PossibleOperators(FuncWFnTdbTwbPb).Symbol = "@WFNTDBTWBPB";
-        PossibleOperators(FuncWFnTdbTwbPb).NumOperands = 3;
-        PossibleOperators(FuncWFnTdbTwbPb).Code = FuncWFnTdbTwbPb;
-
-        PossibleOperators(FuncWFnTdbRhPb).Symbol = "@WFNTDBRHPB";
-        PossibleOperators(FuncWFnTdbRhPb).NumOperands = 4;
-        PossibleOperators(FuncWFnTdbRhPb).Code = FuncWFnTdbRhPb;
-
-        PossibleOperators(FuncPsatFnTemp).Symbol = "@PSATFNTEMP";
-        PossibleOperators(FuncPsatFnTemp).NumOperands = 1;
-        PossibleOperators(FuncPsatFnTemp).Code = FuncPsatFnTemp;
-
-        PossibleOperators(FuncTsatFnHPb).Symbol = "@TSATFNHPB";
-        PossibleOperators(FuncTsatFnHPb).NumOperands = 2;
-        PossibleOperators(FuncTsatFnHPb).Code = FuncTsatFnHPb;
-
-        PossibleOperators(FuncTsatFnPb).Symbol = "@TSATFNPB";
-        PossibleOperators(FuncTsatFnPb).NumOperands = 1;
-        PossibleOperators(FuncTsatFnPb).Code = FuncTsatFnPb;
-
-        PossibleOperators(FuncCpCW).Symbol = "@CPCW";
-        PossibleOperators(FuncCpCW).NumOperands = 1;
-        PossibleOperators(FuncCpCW).Code = FuncCpCW;
-
-        PossibleOperators(FuncCpHW).Symbol = "@CPHW";
-        PossibleOperators(FuncCpHW).NumOperands = 1;
-        PossibleOperators(FuncCpHW).Code = FuncCpHW;
-
-        PossibleOperators(FuncRhoH2O).Symbol = "@RHOH2O";
-        PossibleOperators(FuncRhoH2O).NumOperands = 1;
-        PossibleOperators(FuncRhoH2O).Code = FuncRhoH2O;
-
-        PossibleOperators(FuncFatalHaltEp).Symbol = "@FATALHALTEP";
-        PossibleOperators(FuncFatalHaltEp).NumOperands = 1;
-        PossibleOperators(FuncFatalHaltEp).Code = FuncFatalHaltEp;
-
-        PossibleOperators(FuncSevereWarnEp).Symbol = "@SEVEREWARNEP";
-        PossibleOperators(FuncSevereWarnEp).NumOperands = 1;
-        PossibleOperators(FuncSevereWarnEp).Code = FuncSevereWarnEp;
-
-        PossibleOperators(FuncWarnEp).Symbol = "@WARNEP";
-        PossibleOperators(FuncWarnEp).NumOperands = 1;
-        PossibleOperators(FuncWarnEp).Code = FuncWarnEp;
-
-        PossibleOperators(FuncTrendValue).Symbol = "@TRENDVALUE";
-        PossibleOperators(FuncTrendValue).NumOperands = 2;
-        PossibleOperators(FuncTrendValue).Code = FuncTrendValue;
-
-        PossibleOperators(FuncTrendAverage).Symbol = "@TRENDAVERAGE";
-        PossibleOperators(FuncTrendAverage).NumOperands = 2;
-        PossibleOperators(FuncTrendAverage).Code = FuncTrendAverage;
-
-        PossibleOperators(FuncTrendMax).Symbol = "@TRENDMAX";
-        PossibleOperators(FuncTrendMax).NumOperands = 2;
-        PossibleOperators(FuncTrendMax).Code = FuncTrendMax;
-
-        PossibleOperators(FuncTrendMin).Symbol = "@TRENDMIN";
-        PossibleOperators(FuncTrendMin).NumOperands = 2;
-        PossibleOperators(FuncTrendMin).Code = FuncTrendMin;
-
-        PossibleOperators(FuncTrendDirection).Symbol = "@TRENDDIRECTION";
-        PossibleOperators(FuncTrendDirection).NumOperands = 2;
-        PossibleOperators(FuncTrendDirection).Code = FuncTrendDirection;
-
-        PossibleOperators(FuncTrendSum).Symbol = "@TRENDSUM";
-        PossibleOperators(FuncTrendSum).NumOperands = 2;
-        PossibleOperators(FuncTrendSum).Code = FuncTrendSum;
-
-        PossibleOperators(FuncCurveValue).Symbol = "@CURVEVALUE";
-        PossibleOperators(FuncCurveValue).NumOperands = 6;
-        PossibleOperators(FuncCurveValue).Code = FuncCurveValue;
-
-        PossibleOperators(FuncTodayIsRain).Symbol = "@TODAYISRAIN";
-        PossibleOperators(FuncTodayIsRain).NumOperands = 2;
-        PossibleOperators(FuncTodayIsRain).Code = FuncTodayIsRain;
-
-        PossibleOperators(FuncTodayIsSnow).Symbol = "@TODAYISSNOW";
-        PossibleOperators(FuncTodayIsSnow).NumOperands = 2;
-        PossibleOperators(FuncTodayIsSnow).Code = FuncTodayIsSnow;
-
-        PossibleOperators(FuncTodayOutDryBulbTemp).Symbol = "@TODAYOUTDRYBULBTEMP";
-        PossibleOperators(FuncTodayOutDryBulbTemp).NumOperands = 2;
-        PossibleOperators(FuncTodayOutDryBulbTemp).Code = FuncTodayOutDryBulbTemp;
-
-        PossibleOperators(FuncTodayOutDewPointTemp).Symbol = "@TODAYOUTDEWPOINTTEMP";
-        PossibleOperators(FuncTodayOutDewPointTemp).NumOperands = 2;
-        PossibleOperators(FuncTodayOutDewPointTemp).Code = FuncTodayOutDewPointTemp;
-
-        PossibleOperators(FuncTodayOutBaroPress).Symbol = "@TODAYOUTBAROPRESS";
-        PossibleOperators(FuncTodayOutBaroPress).NumOperands = 2;
-        PossibleOperators(FuncTodayOutBaroPress).Code = FuncTodayOutBaroPress;
-
-        PossibleOperators(FuncTodayOutRelHum).Symbol = "@TODAYOUTRELHUM";
-        PossibleOperators(FuncTodayOutRelHum).NumOperands = 2;
-        PossibleOperators(FuncTodayOutRelHum).Code = FuncTodayOutRelHum;
-
-        PossibleOperators(FuncTodayWindSpeed).Symbol = "@TODAYWINDSPEED";
-        PossibleOperators(FuncTodayWindSpeed).NumOperands = 2;
-        PossibleOperators(FuncTodayWindSpeed).Code = FuncTodayWindSpeed;
-
-        PossibleOperators(FuncTodayWindDir).Symbol = "@TODAYWINDDIR";
-        PossibleOperators(FuncTodayWindDir).NumOperands = 2;
-        PossibleOperators(FuncTodayWindDir).Code = FuncTodayWindDir;
-
-        PossibleOperators(FuncTodaySkyTemp).Symbol = "@TODAYSKYTEMP";
-        PossibleOperators(FuncTodaySkyTemp).NumOperands = 2;
-        PossibleOperators(FuncTodaySkyTemp).Code = FuncTodaySkyTemp;
-
-        PossibleOperators(FuncTodayHorizIRSky).Symbol = "@TODAYHORIZIRSKY";
-        PossibleOperators(FuncTodayHorizIRSky).NumOperands = 2;
-        PossibleOperators(FuncTodayHorizIRSky).Code = FuncTodayHorizIRSky;
-
-        PossibleOperators(FuncTodayBeamSolarRad).Symbol = "@TODAYBEAMSOLARRAD";
-        PossibleOperators(FuncTodayBeamSolarRad).NumOperands = 2;
-        PossibleOperators(FuncTodayBeamSolarRad).Code = FuncTodayBeamSolarRad;
-
-        PossibleOperators(FuncTodayDifSolarRad).Symbol = "@TODAYDIFSOLARRAD";
-        PossibleOperators(FuncTodayDifSolarRad).NumOperands = 2;
-        PossibleOperators(FuncTodayDifSolarRad).Code = FuncTodayDifSolarRad;
-
-        PossibleOperators(FuncTodayAlbedo).Symbol = "@TODAYALBEDO";
-        PossibleOperators(FuncTodayAlbedo).NumOperands = 2;
-        PossibleOperators(FuncTodayAlbedo).Code = FuncTodayAlbedo;
-
-        PossibleOperators(FuncTodayLiquidPrecip).Symbol = "@TODAYLIQUIDPRECIP";
-        PossibleOperators(FuncTodayLiquidPrecip).NumOperands = 2;
-        PossibleOperators(FuncTodayLiquidPrecip).Code = FuncTodayLiquidPrecip;
-
-        PossibleOperators(FuncTomorrowIsRain).Symbol = "@TOMORROWISRAIN";
-        PossibleOperators(FuncTomorrowIsRain).NumOperands = 2;
-        PossibleOperators(FuncTomorrowIsRain).Code = FuncTomorrowIsRain;
-
-        PossibleOperators(FuncTomorrowIsSnow).Symbol = "@TOMORROWISSNOW";
-        PossibleOperators(FuncTomorrowIsSnow).NumOperands = 2;
-        PossibleOperators(FuncTomorrowIsSnow).Code = FuncTomorrowIsSnow;
-
-        PossibleOperators(FuncTomorrowOutDryBulbTemp).Symbol = "@TOMORROWOUTDRYBULBTEMP";
-        PossibleOperators(FuncTomorrowOutDryBulbTemp).NumOperands = 2;
-        PossibleOperators(FuncTomorrowOutDryBulbTemp).Code = FuncTomorrowOutDryBulbTemp;
-
-        PossibleOperators(FuncTomorrowOutDewPointTemp).Symbol = "@TOMORROWOUTDEWPOINTTEMP";
-        PossibleOperators(FuncTomorrowOutDewPointTemp).NumOperands = 2;
-        PossibleOperators(FuncTomorrowOutDewPointTemp).Code = FuncTomorrowOutDewPointTemp;
-
-        PossibleOperators(FuncTomorrowOutBaroPress).Symbol = "@TOMORROWOUTBAROPRESS";
-        PossibleOperators(FuncTomorrowOutBaroPress).NumOperands = 2;
-        PossibleOperators(FuncTomorrowOutBaroPress).Code = FuncTomorrowOutBaroPress;
-
-        PossibleOperators(FuncTomorrowOutRelHum).Symbol = "@TOMORROWOUTRELHUM";
-        PossibleOperators(FuncTomorrowOutRelHum).NumOperands = 2;
-        PossibleOperators(FuncTomorrowOutRelHum).Code = FuncTomorrowOutRelHum;
-
-        PossibleOperators(FuncTomorrowWindSpeed).Symbol = "@TOMORROWWINDSPEED";
-        PossibleOperators(FuncTomorrowWindSpeed).NumOperands = 2;
-        PossibleOperators(FuncTomorrowWindSpeed).Code = FuncTomorrowWindSpeed;
-
-        PossibleOperators(FuncTomorrowWindDir).Symbol = "@TOMORROWWINDDIR";
-        PossibleOperators(FuncTomorrowWindDir).NumOperands = 2;
-        PossibleOperators(FuncTomorrowWindDir).Code = FuncTomorrowWindDir;
-
-        PossibleOperators(FuncTomorrowSkyTemp).Symbol = "@TOMORROWSKYTEMP";
-        PossibleOperators(FuncTomorrowSkyTemp).NumOperands = 2;
-        PossibleOperators(FuncTomorrowSkyTemp).Code = FuncTomorrowSkyTemp;
-
-        PossibleOperators(FuncTomorrowHorizIRSky).Symbol = "@TOMORROWHORIZIRSKY";
-        PossibleOperators(FuncTomorrowHorizIRSky).NumOperands = 2;
-        PossibleOperators(FuncTomorrowHorizIRSky).Code = FuncTomorrowHorizIRSky;
-
-        PossibleOperators(FuncTomorrowBeamSolarRad).Symbol = "@TOMORROWBEAMSOLARRAD";
-        PossibleOperators(FuncTomorrowBeamSolarRad).NumOperands = 2;
-        PossibleOperators(FuncTomorrowBeamSolarRad).Code = FuncTomorrowBeamSolarRad;
-
-        PossibleOperators(FuncTomorrowDifSolarRad).Symbol = "@TOMORROWDIFSOLARRAD";
-        PossibleOperators(FuncTomorrowDifSolarRad).NumOperands = 2;
-        PossibleOperators(FuncTomorrowDifSolarRad).Code = FuncTomorrowDifSolarRad;
-
-        PossibleOperators(FuncTomorrowAlbedo).Symbol = "@TOMORROWALBEDO";
-        PossibleOperators(FuncTomorrowAlbedo).NumOperands = 2;
-        PossibleOperators(FuncTomorrowAlbedo).Code = FuncTomorrowAlbedo;
-
-        PossibleOperators(FuncTomorrowLiquidPrecip).Symbol = "@TOMORROWLIQUIDPRECIP";
-        PossibleOperators(FuncTomorrowLiquidPrecip).NumOperands = 2;
-        PossibleOperators(FuncTomorrowLiquidPrecip).Code = FuncTomorrowLiquidPrecip;
+        state.dataRuntimeLang->PossibleOperators(OperatorDivide).Symbol = "/";
+        state.dataRuntimeLang->PossibleOperators(OperatorDivide).NumOperands = 2;
+        state.dataRuntimeLang->PossibleOperators(OperatorDivide).Code = OperatorDivide;
+
+        state.dataRuntimeLang->PossibleOperators(OperatorMultiply).Symbol = "*";
+        state.dataRuntimeLang->PossibleOperators(OperatorMultiply).NumOperands = 2;
+        state.dataRuntimeLang->PossibleOperators(OperatorMultiply).Code = OperatorMultiply;
+
+        state.dataRuntimeLang->PossibleOperators(OperatorSubtract).Symbol = "-";
+        state.dataRuntimeLang->PossibleOperators(OperatorSubtract).NumOperands = 2;
+        state.dataRuntimeLang->PossibleOperators(OperatorSubtract).Code = OperatorSubtract;
+
+        state.dataRuntimeLang->PossibleOperators(OperatorAdd).Symbol = "+";
+        state.dataRuntimeLang->PossibleOperators(OperatorAdd).NumOperands = 2;
+        state.dataRuntimeLang->PossibleOperators(OperatorAdd).Code = OperatorAdd;
+
+        state.dataRuntimeLang->PossibleOperators(OperatorEqual).Symbol = "==";
+        state.dataRuntimeLang->PossibleOperators(OperatorEqual).NumOperands = 2;
+        state.dataRuntimeLang->PossibleOperators(OperatorEqual).Code = OperatorEqual;
+
+        state.dataRuntimeLang->PossibleOperators(OperatorNotEqual).Symbol = "<>";
+        state.dataRuntimeLang->PossibleOperators(OperatorNotEqual).NumOperands = 2;
+        state.dataRuntimeLang->PossibleOperators(OperatorNotEqual).Code = OperatorNotEqual;
+
+        state.dataRuntimeLang->PossibleOperators(OperatorLessOrEqual).Symbol = "<=";
+        state.dataRuntimeLang->PossibleOperators(OperatorLessOrEqual).NumOperands = 2;
+        state.dataRuntimeLang->PossibleOperators(OperatorLessOrEqual).Code = OperatorLessOrEqual;
+
+        state.dataRuntimeLang->PossibleOperators(OperatorGreaterOrEqual).Symbol = ">=";
+        state.dataRuntimeLang->PossibleOperators(OperatorGreaterOrEqual).NumOperands = 2;
+        state.dataRuntimeLang->PossibleOperators(OperatorGreaterOrEqual).Code = OperatorGreaterOrEqual;
+
+        state.dataRuntimeLang->PossibleOperators(OperatorLessThan).Symbol = "<";
+        state.dataRuntimeLang->PossibleOperators(OperatorLessThan).NumOperands = 2;
+        state.dataRuntimeLang->PossibleOperators(OperatorLessThan).Code = OperatorLessThan;
+
+        state.dataRuntimeLang->PossibleOperators(OperatorGreaterThan).Symbol = ">";
+        state.dataRuntimeLang->PossibleOperators(OperatorGreaterThan).NumOperands = 2;
+        state.dataRuntimeLang->PossibleOperators(OperatorGreaterThan).Code = OperatorGreaterThan;
+
+        state.dataRuntimeLang->PossibleOperators(OperatorRaiseToPower).Symbol = "^";
+        state.dataRuntimeLang->PossibleOperators(OperatorRaiseToPower).NumOperands = 2;
+        state.dataRuntimeLang->PossibleOperators(OperatorRaiseToPower).Code = OperatorRaiseToPower;
+
+        state.dataRuntimeLang->PossibleOperators(OperatorLogicalAND).Symbol = "&&";
+        state.dataRuntimeLang->PossibleOperators(OperatorLogicalAND).NumOperands = 2;
+        state.dataRuntimeLang->PossibleOperators(OperatorLogicalAND).Code = OperatorLogicalAND;
+
+        state.dataRuntimeLang->PossibleOperators(OperatorLogicalOR).Symbol = "||";
+        state.dataRuntimeLang->PossibleOperators(OperatorLogicalOR).NumOperands = 2;
+        state.dataRuntimeLang->PossibleOperators(OperatorLogicalOR).Code = OperatorLogicalOR;
+
+        state.dataRuntimeLang->PossibleOperators(FuncRound).Symbol = "@ROUND";
+        state.dataRuntimeLang->PossibleOperators(FuncRound).NumOperands = 1;
+        state.dataRuntimeLang->PossibleOperators(FuncRound).Code = FuncRound;
+
+        state.dataRuntimeLang->PossibleOperators(FuncMod).Symbol = "@MOD";
+        state.dataRuntimeLang->PossibleOperators(FuncMod).NumOperands = 2;
+        state.dataRuntimeLang->PossibleOperators(FuncMod).Code = FuncMod;
+
+        state.dataRuntimeLang->PossibleOperators(FuncSin).Symbol = "@SIN";
+        state.dataRuntimeLang->PossibleOperators(FuncSin).NumOperands = 1;
+        state.dataRuntimeLang->PossibleOperators(FuncSin).Code = FuncSin;
+
+        state.dataRuntimeLang->PossibleOperators(FuncCos).Symbol = "@COS";
+        state.dataRuntimeLang->PossibleOperators(FuncCos).NumOperands = 1;
+        state.dataRuntimeLang->PossibleOperators(FuncCos).Code = FuncCos;
+
+        state.dataRuntimeLang->PossibleOperators(FuncArcSin).Symbol = "@ARCSIN";
+        state.dataRuntimeLang->PossibleOperators(FuncArcSin).NumOperands = 1;
+        state.dataRuntimeLang->PossibleOperators(FuncArcSin).Code = FuncArcSin;
+
+        state.dataRuntimeLang->PossibleOperators(FuncArcCos).Symbol = "@ARCCOS";
+        state.dataRuntimeLang->PossibleOperators(FuncArcCos).NumOperands = 1;
+        state.dataRuntimeLang->PossibleOperators(FuncArcCos).Code = FuncArcCos;
+
+        state.dataRuntimeLang->PossibleOperators(FuncDegToRad).Symbol = "@DEGTORAD";
+        state.dataRuntimeLang->PossibleOperators(FuncDegToRad).NumOperands = 1;
+        state.dataRuntimeLang->PossibleOperators(FuncDegToRad).Code = FuncDegToRad;
+
+        state.dataRuntimeLang->PossibleOperators(FuncRadToDeg).Symbol = "@RADTODEG";
+        state.dataRuntimeLang->PossibleOperators(FuncRadToDeg).NumOperands = 1;
+        state.dataRuntimeLang->PossibleOperators(FuncRadToDeg).Code = FuncRadToDeg;
+
+        state.dataRuntimeLang->PossibleOperators(FuncExp).Symbol = "@EXP";
+        state.dataRuntimeLang->PossibleOperators(FuncExp).NumOperands = 1;
+        state.dataRuntimeLang->PossibleOperators(FuncExp).Code = FuncExp;
+
+        state.dataRuntimeLang->PossibleOperators(FuncLn).Symbol = "@LN";
+        state.dataRuntimeLang->PossibleOperators(FuncLn).NumOperands = 1;
+        state.dataRuntimeLang->PossibleOperators(FuncLn).Code = FuncLn;
+
+        state.dataRuntimeLang->PossibleOperators(FuncMax).Symbol = "@MAX";
+        state.dataRuntimeLang->PossibleOperators(FuncMax).NumOperands = 2;
+        state.dataRuntimeLang->PossibleOperators(FuncMax).Code = FuncMax;
+
+        state.dataRuntimeLang->PossibleOperators(FuncMin).Symbol = "@MIN";
+        state.dataRuntimeLang->PossibleOperators(FuncMin).NumOperands = 2;
+        state.dataRuntimeLang->PossibleOperators(FuncMin).Code = FuncMin;
+
+        state.dataRuntimeLang->PossibleOperators(FuncABS).Symbol = "@ABS";
+        state.dataRuntimeLang->PossibleOperators(FuncABS).NumOperands = 1;
+        state.dataRuntimeLang->PossibleOperators(FuncABS).Code = FuncABS;
+
+        state.dataRuntimeLang->PossibleOperators(FuncRandU).Symbol = "@RANDOMUNIFORM";
+        state.dataRuntimeLang->PossibleOperators(FuncRandU).NumOperands = 2;
+        state.dataRuntimeLang->PossibleOperators(FuncRandU).Code = FuncRandU;
+
+        state.dataRuntimeLang->PossibleOperators(FuncRandG).Symbol = "@RANDOMNORMAL";
+        state.dataRuntimeLang->PossibleOperators(FuncRandG).NumOperands = 4;
+        state.dataRuntimeLang->PossibleOperators(FuncRandG).Code = FuncRandG;
+
+        state.dataRuntimeLang->PossibleOperators(FuncRandSeed).Symbol = "@SEEDRANDOM";
+        state.dataRuntimeLang->PossibleOperators(FuncRandSeed).NumOperands = 1;
+        state.dataRuntimeLang->PossibleOperators(FuncRandSeed).Code = FuncRandSeed;
+
+        state.dataRuntimeLang->PossibleOperators(FuncRhoAirFnPbTdbW).Symbol = "@RHOAIRFNPBTDBW";
+        state.dataRuntimeLang->PossibleOperators(FuncRhoAirFnPbTdbW).NumOperands = 3;
+        state.dataRuntimeLang->PossibleOperators(FuncRhoAirFnPbTdbW).Code = FuncRhoAirFnPbTdbW;
+
+        state.dataRuntimeLang->PossibleOperators(FuncCpAirFnW).Symbol = "@CPAIRFNW";
+        state.dataRuntimeLang->PossibleOperators(FuncCpAirFnW).NumOperands = 1;
+        state.dataRuntimeLang->PossibleOperators(FuncCpAirFnW).Code = FuncCpAirFnW;
+
+        state.dataRuntimeLang->PossibleOperators(FuncHfgAirFnWTdb).Symbol = "@HFGAIRFNWTDB";
+        state.dataRuntimeLang->PossibleOperators(FuncHfgAirFnWTdb).NumOperands = 2;
+        state.dataRuntimeLang->PossibleOperators(FuncHfgAirFnWTdb).Code = FuncHfgAirFnWTdb;
+
+        state.dataRuntimeLang->PossibleOperators(FuncHgAirFnWTdb).Symbol = "@HGAIRFNWTDB";
+        state.dataRuntimeLang->PossibleOperators(FuncHgAirFnWTdb).NumOperands = 2;
+        state.dataRuntimeLang->PossibleOperators(FuncHgAirFnWTdb).Code = FuncHgAirFnWTdb;
+
+        state.dataRuntimeLang->PossibleOperators(FuncTdpFnTdbTwbPb).Symbol = "@TDPFNTDBTWBPB";
+        state.dataRuntimeLang->PossibleOperators(FuncTdpFnTdbTwbPb).NumOperands = 3;
+        state.dataRuntimeLang->PossibleOperators(FuncTdpFnTdbTwbPb).Code = FuncTdpFnTdbTwbPb;
+
+        state.dataRuntimeLang->PossibleOperators(FuncTdpFnWPb).Symbol = "@TDPFNWPB";
+        state.dataRuntimeLang->PossibleOperators(FuncTdpFnWPb).NumOperands = 2;
+        state.dataRuntimeLang->PossibleOperators(FuncTdpFnWPb).Code = FuncTdpFnWPb;
+
+        state.dataRuntimeLang->PossibleOperators(FuncHFnTdbW).Symbol = "@HFNTDBW";
+        state.dataRuntimeLang->PossibleOperators(FuncHFnTdbW).NumOperands = 2;
+        state.dataRuntimeLang->PossibleOperators(FuncHFnTdbW).Code = FuncHFnTdbW;
+
+        state.dataRuntimeLang->PossibleOperators(FuncHFnTdbRhPb).Symbol = "@HFNTDBRHPB";
+        state.dataRuntimeLang->PossibleOperators(FuncHFnTdbRhPb).NumOperands = 3;
+        state.dataRuntimeLang->PossibleOperators(FuncHFnTdbRhPb).Code = FuncHFnTdbRhPb;
+
+        state.dataRuntimeLang->PossibleOperators(FuncTdbFnHW).Symbol = "@TDBFNHW";
+        state.dataRuntimeLang->PossibleOperators(FuncTdbFnHW).NumOperands = 2;
+        state.dataRuntimeLang->PossibleOperators(FuncTdbFnHW).Code = FuncTdbFnHW;
+
+        state.dataRuntimeLang->PossibleOperators(FuncRhovFnTdbRh).Symbol = "@RHOVFNTDBR";
+        state.dataRuntimeLang->PossibleOperators(FuncRhovFnTdbRh).NumOperands = 2;
+        state.dataRuntimeLang->PossibleOperators(FuncRhovFnTdbRh).Code = FuncRhovFnTdbRh;
+
+        state.dataRuntimeLang->PossibleOperators(FuncRhovFnTdbRhLBnd0C).Symbol = "@RhovFnTdbRhLBnd0C";
+        state.dataRuntimeLang->PossibleOperators(FuncRhovFnTdbRhLBnd0C).NumOperands = 2;
+        state.dataRuntimeLang->PossibleOperators(FuncRhovFnTdbRhLBnd0C).Code = FuncRhovFnTdbRhLBnd0C;
+
+        state.dataRuntimeLang->PossibleOperators(FuncRhovFnTdbWPb).Symbol = "@RHOVFNTDBWPB";
+        state.dataRuntimeLang->PossibleOperators(FuncRhovFnTdbWPb).NumOperands = 3;
+        state.dataRuntimeLang->PossibleOperators(FuncRhovFnTdbWPb).Code = FuncRhovFnTdbWPb;
+
+        state.dataRuntimeLang->PossibleOperators(FuncRhFnTdbRhov).Symbol = "@RHFNTDBRHOV";
+        state.dataRuntimeLang->PossibleOperators(FuncRhFnTdbRhov).NumOperands = 2;
+        state.dataRuntimeLang->PossibleOperators(FuncRhFnTdbRhov).Code = FuncRhFnTdbRhov;
+
+        state.dataRuntimeLang->PossibleOperators(FuncRhFnTdbRhovLBnd0C).Symbol = "@RHFNTDBRHOVLBND0C";
+        state.dataRuntimeLang->PossibleOperators(FuncRhFnTdbRhovLBnd0C).NumOperands = 2;
+        state.dataRuntimeLang->PossibleOperators(FuncRhFnTdbRhovLBnd0C).Code = FuncRhFnTdbRhovLBnd0C;
+
+        state.dataRuntimeLang->PossibleOperators(FuncRhFnTdbWPb).Symbol = "@RHFNTDBWPB";
+        state.dataRuntimeLang->PossibleOperators(FuncRhFnTdbWPb).NumOperands = 3;
+        state.dataRuntimeLang->PossibleOperators(FuncRhFnTdbWPb).Code = FuncRhFnTdbWPb;
+
+        state.dataRuntimeLang->PossibleOperators(FuncTwbFnTdbWPb).Symbol = "@TWBFNTDBWPB";
+        state.dataRuntimeLang->PossibleOperators(FuncTwbFnTdbWPb).NumOperands = 3;
+        state.dataRuntimeLang->PossibleOperators(FuncTwbFnTdbWPb).Code = FuncTwbFnTdbWPb;
+
+        state.dataRuntimeLang->PossibleOperators(FuncVFnTdbWPb).Symbol = "@VFNTDBWPB";
+        state.dataRuntimeLang->PossibleOperators(FuncVFnTdbWPb).NumOperands = 3;
+        state.dataRuntimeLang->PossibleOperators(FuncVFnTdbWPb).Code = FuncVFnTdbWPb;
+
+        state.dataRuntimeLang->PossibleOperators(FuncWFnTdpPb).Symbol = "@WFNTDPPB";
+        state.dataRuntimeLang->PossibleOperators(FuncWFnTdpPb).NumOperands = 2;
+        state.dataRuntimeLang->PossibleOperators(FuncWFnTdpPb).Code = FuncWFnTdpPb;
+
+        state.dataRuntimeLang->PossibleOperators(FuncWFnTdbH).Symbol = "@WFNTDBH";
+        state.dataRuntimeLang->PossibleOperators(FuncWFnTdbH).NumOperands = 2;
+        state.dataRuntimeLang->PossibleOperators(FuncWFnTdbH).Code = FuncWFnTdbH;
+
+        state.dataRuntimeLang->PossibleOperators(FuncWFnTdbTwbPb).Symbol = "@WFNTDBTWBPB";
+        state.dataRuntimeLang->PossibleOperators(FuncWFnTdbTwbPb).NumOperands = 3;
+        state.dataRuntimeLang->PossibleOperators(FuncWFnTdbTwbPb).Code = FuncWFnTdbTwbPb;
+
+        state.dataRuntimeLang->PossibleOperators(FuncWFnTdbRhPb).Symbol = "@WFNTDBRHPB";
+        state.dataRuntimeLang->PossibleOperators(FuncWFnTdbRhPb).NumOperands = 4;
+        state.dataRuntimeLang->PossibleOperators(FuncWFnTdbRhPb).Code = FuncWFnTdbRhPb;
+
+        state.dataRuntimeLang->PossibleOperators(FuncPsatFnTemp).Symbol = "@PSATFNTEMP";
+        state.dataRuntimeLang->PossibleOperators(FuncPsatFnTemp).NumOperands = 1;
+        state.dataRuntimeLang->PossibleOperators(FuncPsatFnTemp).Code = FuncPsatFnTemp;
+
+        state.dataRuntimeLang->PossibleOperators(FuncTsatFnHPb).Symbol = "@TSATFNHPB";
+        state.dataRuntimeLang->PossibleOperators(FuncTsatFnHPb).NumOperands = 2;
+        state.dataRuntimeLang->PossibleOperators(FuncTsatFnHPb).Code = FuncTsatFnHPb;
+
+        state.dataRuntimeLang->PossibleOperators(FuncTsatFnPb).Symbol = "@TSATFNPB";
+        state.dataRuntimeLang->PossibleOperators(FuncTsatFnPb).NumOperands = 1;
+        state.dataRuntimeLang->PossibleOperators(FuncTsatFnPb).Code = FuncTsatFnPb;
+
+        state.dataRuntimeLang->PossibleOperators(FuncCpCW).Symbol = "@CPCW";
+        state.dataRuntimeLang->PossibleOperators(FuncCpCW).NumOperands = 1;
+        state.dataRuntimeLang->PossibleOperators(FuncCpCW).Code = FuncCpCW;
+
+        state.dataRuntimeLang->PossibleOperators(FuncCpHW).Symbol = "@CPHW";
+        state.dataRuntimeLang->PossibleOperators(FuncCpHW).NumOperands = 1;
+        state.dataRuntimeLang->PossibleOperators(FuncCpHW).Code = FuncCpHW;
+
+        state.dataRuntimeLang->PossibleOperators(FuncRhoH2O).Symbol = "@RHOH2O";
+        state.dataRuntimeLang->PossibleOperators(FuncRhoH2O).NumOperands = 1;
+        state.dataRuntimeLang->PossibleOperators(FuncRhoH2O).Code = FuncRhoH2O;
+
+        state.dataRuntimeLang->PossibleOperators(FuncFatalHaltEp).Symbol = "@FATALHALTEP";
+        state.dataRuntimeLang->PossibleOperators(FuncFatalHaltEp).NumOperands = 1;
+        state.dataRuntimeLang->PossibleOperators(FuncFatalHaltEp).Code = FuncFatalHaltEp;
+
+        state.dataRuntimeLang->PossibleOperators(FuncSevereWarnEp).Symbol = "@SEVEREWARNEP";
+        state.dataRuntimeLang->PossibleOperators(FuncSevereWarnEp).NumOperands = 1;
+        state.dataRuntimeLang->PossibleOperators(FuncSevereWarnEp).Code = FuncSevereWarnEp;
+
+        state.dataRuntimeLang->PossibleOperators(FuncWarnEp).Symbol = "@WARNEP";
+        state.dataRuntimeLang->PossibleOperators(FuncWarnEp).NumOperands = 1;
+        state.dataRuntimeLang->PossibleOperators(FuncWarnEp).Code = FuncWarnEp;
+
+        state.dataRuntimeLang->PossibleOperators(FuncTrendValue).Symbol = "@TRENDVALUE";
+        state.dataRuntimeLang->PossibleOperators(FuncTrendValue).NumOperands = 2;
+        state.dataRuntimeLang->PossibleOperators(FuncTrendValue).Code = FuncTrendValue;
+
+        state.dataRuntimeLang->PossibleOperators(FuncTrendAverage).Symbol = "@TRENDAVERAGE";
+        state.dataRuntimeLang->PossibleOperators(FuncTrendAverage).NumOperands = 2;
+        state.dataRuntimeLang->PossibleOperators(FuncTrendAverage).Code = FuncTrendAverage;
+
+        state.dataRuntimeLang->PossibleOperators(FuncTrendMax).Symbol = "@TRENDMAX";
+        state.dataRuntimeLang->PossibleOperators(FuncTrendMax).NumOperands = 2;
+        state.dataRuntimeLang->PossibleOperators(FuncTrendMax).Code = FuncTrendMax;
+
+        state.dataRuntimeLang->PossibleOperators(FuncTrendMin).Symbol = "@TRENDMIN";
+        state.dataRuntimeLang->PossibleOperators(FuncTrendMin).NumOperands = 2;
+        state.dataRuntimeLang->PossibleOperators(FuncTrendMin).Code = FuncTrendMin;
+
+        state.dataRuntimeLang->PossibleOperators(FuncTrendDirection).Symbol = "@TRENDDIRECTION";
+        state.dataRuntimeLang->PossibleOperators(FuncTrendDirection).NumOperands = 2;
+        state.dataRuntimeLang->PossibleOperators(FuncTrendDirection).Code = FuncTrendDirection;
+
+        state.dataRuntimeLang->PossibleOperators(FuncTrendSum).Symbol = "@TRENDSUM";
+        state.dataRuntimeLang->PossibleOperators(FuncTrendSum).NumOperands = 2;
+        state.dataRuntimeLang->PossibleOperators(FuncTrendSum).Code = FuncTrendSum;
+
+        state.dataRuntimeLang->PossibleOperators(FuncCurveValue).Symbol = "@CURVEVALUE";
+        state.dataRuntimeLang->PossibleOperators(FuncCurveValue).NumOperands = 6;
+        state.dataRuntimeLang->PossibleOperators(FuncCurveValue).Code = FuncCurveValue;
+
+        state.dataRuntimeLang->PossibleOperators(FuncTodayIsRain).Symbol = "@TODAYISRAIN";
+        state.dataRuntimeLang->PossibleOperators(FuncTodayIsRain).NumOperands = 2;
+        state.dataRuntimeLang->PossibleOperators(FuncTodayIsRain).Code = FuncTodayIsRain;
+
+        state.dataRuntimeLang->PossibleOperators(FuncTodayIsSnow).Symbol = "@TODAYISSNOW";
+        state.dataRuntimeLang->PossibleOperators(FuncTodayIsSnow).NumOperands = 2;
+        state.dataRuntimeLang->PossibleOperators(FuncTodayIsSnow).Code = FuncTodayIsSnow;
+
+        state.dataRuntimeLang->PossibleOperators(FuncTodayOutDryBulbTemp).Symbol = "@TODAYOUTDRYBULBTEMP";
+        state.dataRuntimeLang->PossibleOperators(FuncTodayOutDryBulbTemp).NumOperands = 2;
+        state.dataRuntimeLang->PossibleOperators(FuncTodayOutDryBulbTemp).Code = FuncTodayOutDryBulbTemp;
+
+        state.dataRuntimeLang->PossibleOperators(FuncTodayOutDewPointTemp).Symbol = "@TODAYOUTDEWPOINTTEMP";
+        state.dataRuntimeLang->PossibleOperators(FuncTodayOutDewPointTemp).NumOperands = 2;
+        state.dataRuntimeLang->PossibleOperators(FuncTodayOutDewPointTemp).Code = FuncTodayOutDewPointTemp;
+
+        state.dataRuntimeLang->PossibleOperators(FuncTodayOutBaroPress).Symbol = "@TODAYOUTBAROPRESS";
+        state.dataRuntimeLang->PossibleOperators(FuncTodayOutBaroPress).NumOperands = 2;
+        state.dataRuntimeLang->PossibleOperators(FuncTodayOutBaroPress).Code = FuncTodayOutBaroPress;
+
+        state.dataRuntimeLang->PossibleOperators(FuncTodayOutRelHum).Symbol = "@TODAYOUTRELHUM";
+        state.dataRuntimeLang->PossibleOperators(FuncTodayOutRelHum).NumOperands = 2;
+        state.dataRuntimeLang->PossibleOperators(FuncTodayOutRelHum).Code = FuncTodayOutRelHum;
+
+        state.dataRuntimeLang->PossibleOperators(FuncTodayWindSpeed).Symbol = "@TODAYWINDSPEED";
+        state.dataRuntimeLang->PossibleOperators(FuncTodayWindSpeed).NumOperands = 2;
+        state.dataRuntimeLang->PossibleOperators(FuncTodayWindSpeed).Code = FuncTodayWindSpeed;
+
+        state.dataRuntimeLang->PossibleOperators(FuncTodayWindDir).Symbol = "@TODAYWINDDIR";
+        state.dataRuntimeLang->PossibleOperators(FuncTodayWindDir).NumOperands = 2;
+        state.dataRuntimeLang->PossibleOperators(FuncTodayWindDir).Code = FuncTodayWindDir;
+
+        state.dataRuntimeLang->PossibleOperators(FuncTodaySkyTemp).Symbol = "@TODAYSKYTEMP";
+        state.dataRuntimeLang->PossibleOperators(FuncTodaySkyTemp).NumOperands = 2;
+        state.dataRuntimeLang->PossibleOperators(FuncTodaySkyTemp).Code = FuncTodaySkyTemp;
+
+        state.dataRuntimeLang->PossibleOperators(FuncTodayHorizIRSky).Symbol = "@TODAYHORIZIRSKY";
+        state.dataRuntimeLang->PossibleOperators(FuncTodayHorizIRSky).NumOperands = 2;
+        state.dataRuntimeLang->PossibleOperators(FuncTodayHorizIRSky).Code = FuncTodayHorizIRSky;
+
+        state.dataRuntimeLang->PossibleOperators(FuncTodayBeamSolarRad).Symbol = "@TODAYBEAMSOLARRAD";
+        state.dataRuntimeLang->PossibleOperators(FuncTodayBeamSolarRad).NumOperands = 2;
+        state.dataRuntimeLang->PossibleOperators(FuncTodayBeamSolarRad).Code = FuncTodayBeamSolarRad;
+
+        state.dataRuntimeLang->PossibleOperators(FuncTodayDifSolarRad).Symbol = "@TODAYDIFSOLARRAD";
+        state.dataRuntimeLang->PossibleOperators(FuncTodayDifSolarRad).NumOperands = 2;
+        state.dataRuntimeLang->PossibleOperators(FuncTodayDifSolarRad).Code = FuncTodayDifSolarRad;
+
+        state.dataRuntimeLang->PossibleOperators(FuncTodayAlbedo).Symbol = "@TODAYALBEDO";
+        state.dataRuntimeLang->PossibleOperators(FuncTodayAlbedo).NumOperands = 2;
+        state.dataRuntimeLang->PossibleOperators(FuncTodayAlbedo).Code = FuncTodayAlbedo;
+
+        state.dataRuntimeLang->PossibleOperators(FuncTodayLiquidPrecip).Symbol = "@TODAYLIQUIDPRECIP";
+        state.dataRuntimeLang->PossibleOperators(FuncTodayLiquidPrecip).NumOperands = 2;
+        state.dataRuntimeLang->PossibleOperators(FuncTodayLiquidPrecip).Code = FuncTodayLiquidPrecip;
+
+        state.dataRuntimeLang->PossibleOperators(FuncTomorrowIsRain).Symbol = "@TOMORROWISRAIN";
+        state.dataRuntimeLang->PossibleOperators(FuncTomorrowIsRain).NumOperands = 2;
+        state.dataRuntimeLang->PossibleOperators(FuncTomorrowIsRain).Code = FuncTomorrowIsRain;
+
+        state.dataRuntimeLang->PossibleOperators(FuncTomorrowIsSnow).Symbol = "@TOMORROWISSNOW";
+        state.dataRuntimeLang->PossibleOperators(FuncTomorrowIsSnow).NumOperands = 2;
+        state.dataRuntimeLang->PossibleOperators(FuncTomorrowIsSnow).Code = FuncTomorrowIsSnow;
+
+        state.dataRuntimeLang->PossibleOperators(FuncTomorrowOutDryBulbTemp).Symbol = "@TOMORROWOUTDRYBULBTEMP";
+        state.dataRuntimeLang->PossibleOperators(FuncTomorrowOutDryBulbTemp).NumOperands = 2;
+        state.dataRuntimeLang->PossibleOperators(FuncTomorrowOutDryBulbTemp).Code = FuncTomorrowOutDryBulbTemp;
+
+        state.dataRuntimeLang->PossibleOperators(FuncTomorrowOutDewPointTemp).Symbol = "@TOMORROWOUTDEWPOINTTEMP";
+        state.dataRuntimeLang->PossibleOperators(FuncTomorrowOutDewPointTemp).NumOperands = 2;
+        state.dataRuntimeLang->PossibleOperators(FuncTomorrowOutDewPointTemp).Code = FuncTomorrowOutDewPointTemp;
+
+        state.dataRuntimeLang->PossibleOperators(FuncTomorrowOutBaroPress).Symbol = "@TOMORROWOUTBAROPRESS";
+        state.dataRuntimeLang->PossibleOperators(FuncTomorrowOutBaroPress).NumOperands = 2;
+        state.dataRuntimeLang->PossibleOperators(FuncTomorrowOutBaroPress).Code = FuncTomorrowOutBaroPress;
+
+        state.dataRuntimeLang->PossibleOperators(FuncTomorrowOutRelHum).Symbol = "@TOMORROWOUTRELHUM";
+        state.dataRuntimeLang->PossibleOperators(FuncTomorrowOutRelHum).NumOperands = 2;
+        state.dataRuntimeLang->PossibleOperators(FuncTomorrowOutRelHum).Code = FuncTomorrowOutRelHum;
+
+        state.dataRuntimeLang->PossibleOperators(FuncTomorrowWindSpeed).Symbol = "@TOMORROWWINDSPEED";
+        state.dataRuntimeLang->PossibleOperators(FuncTomorrowWindSpeed).NumOperands = 2;
+        state.dataRuntimeLang->PossibleOperators(FuncTomorrowWindSpeed).Code = FuncTomorrowWindSpeed;
+
+        state.dataRuntimeLang->PossibleOperators(FuncTomorrowWindDir).Symbol = "@TOMORROWWINDDIR";
+        state.dataRuntimeLang->PossibleOperators(FuncTomorrowWindDir).NumOperands = 2;
+        state.dataRuntimeLang->PossibleOperators(FuncTomorrowWindDir).Code = FuncTomorrowWindDir;
+
+        state.dataRuntimeLang->PossibleOperators(FuncTomorrowSkyTemp).Symbol = "@TOMORROWSKYTEMP";
+        state.dataRuntimeLang->PossibleOperators(FuncTomorrowSkyTemp).NumOperands = 2;
+        state.dataRuntimeLang->PossibleOperators(FuncTomorrowSkyTemp).Code = FuncTomorrowSkyTemp;
+
+        state.dataRuntimeLang->PossibleOperators(FuncTomorrowHorizIRSky).Symbol = "@TOMORROWHORIZIRSKY";
+        state.dataRuntimeLang->PossibleOperators(FuncTomorrowHorizIRSky).NumOperands = 2;
+        state.dataRuntimeLang->PossibleOperators(FuncTomorrowHorizIRSky).Code = FuncTomorrowHorizIRSky;
+
+        state.dataRuntimeLang->PossibleOperators(FuncTomorrowBeamSolarRad).Symbol = "@TOMORROWBEAMSOLARRAD";
+        state.dataRuntimeLang->PossibleOperators(FuncTomorrowBeamSolarRad).NumOperands = 2;
+        state.dataRuntimeLang->PossibleOperators(FuncTomorrowBeamSolarRad).Code = FuncTomorrowBeamSolarRad;
+
+        state.dataRuntimeLang->PossibleOperators(FuncTomorrowDifSolarRad).Symbol = "@TOMORROWDIFSOLARRAD";
+        state.dataRuntimeLang->PossibleOperators(FuncTomorrowDifSolarRad).NumOperands = 2;
+        state.dataRuntimeLang->PossibleOperators(FuncTomorrowDifSolarRad).Code = FuncTomorrowDifSolarRad;
+
+        state.dataRuntimeLang->PossibleOperators(FuncTomorrowAlbedo).Symbol = "@TOMORROWALBEDO";
+        state.dataRuntimeLang->PossibleOperators(FuncTomorrowAlbedo).NumOperands = 2;
+        state.dataRuntimeLang->PossibleOperators(FuncTomorrowAlbedo).Code = FuncTomorrowAlbedo;
+
+        state.dataRuntimeLang->PossibleOperators(FuncTomorrowLiquidPrecip).Symbol = "@TOMORROWLIQUIDPRECIP";
+        state.dataRuntimeLang->PossibleOperators(FuncTomorrowLiquidPrecip).NumOperands = 2;
+        state.dataRuntimeLang->PossibleOperators(FuncTomorrowLiquidPrecip).Code = FuncTomorrowLiquidPrecip;
 
         AlreadyDidOnce = true;
     }
 
-    void ExternalInterfaceSetErlVariable(int const varNum,  // The variable index to be written during run time
+    void ExternalInterfaceSetErlVariable(EnergyPlusData &state,
+                                         int const varNum,  // The variable index to be written during run time
                                          Real64 const value // The real time value of the vairable to be set
     )
     {
@@ -4334,10 +4337,11 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        ErlVariable(varNum).Value = SetErlValueNumber(value);
+        state.dataRuntimeLang->ErlVariable(varNum).Value = SetErlValueNumber(value);
     }
 
-    void ExternalInterfaceInitializeErlVariable(int const varNum,                 // The variable index to be written during run time
+    void ExternalInterfaceInitializeErlVariable(EnergyPlusData &state,
+                                                int const varNum,                 // The variable index to be written during run time
                                                 ErlValueType const &initialValue, // The initial value
                                                 bool const setToNull              // Flag, if true, value will be initialized to Null
     )
@@ -4361,19 +4365,19 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // Set initial value
         if (setToNull) {
-            ErlVariable(varNum).Value.Type = ValueNull;
+            state.dataRuntimeLang->ErlVariable(varNum).Value.Type = ValueNull;
         } else {
-            ErlVariable(varNum).Value = initialValue;
+            state.dataRuntimeLang->ErlVariable(varNum).Value = initialValue;
         }
 
         // Set variables to read-only as we don't want that other programs write to them
-        ErlVariable(varNum).ReadOnly = true;
+        state.dataRuntimeLang->ErlVariable(varNum).ReadOnly = true;
         // Set flag that it is used by the ExternalInterface. This is needed to make sure that the ExternalInterface
         // interface writes only to ExternalInterface variables, and not to other ErlVariable
-        ErlVariable(varNum).SetByExternalInterface = true;
+        state.dataRuntimeLang->ErlVariable(varNum).SetByExternalInterface = true;
     }
 
-    bool isExternalInterfaceErlVariable(int const varNum) // The variable index to be written during run time
+    bool isExternalInterfaceErlVariable(EnergyPlusData &state, int const varNum) // The variable index to be written during run time
     {
 
         // SUBROUTINE INFORMATION:
@@ -4395,7 +4399,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
-        isExternalInterfaceVar = ErlVariable(varNum).SetByExternalInterface;
+        isExternalInterfaceVar = state.dataRuntimeLang->ErlVariable(varNum).SetByExternalInterface;
 
         return isExternalInterfaceVar;
     }

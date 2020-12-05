@@ -1692,7 +1692,6 @@ CurrentModuleObject, PlantOpSchemeName);
         // Using/Aliasing
         using namespace DataIPShortCuts;
         using namespace DataPlant;
-        using DataRuntimeLanguage::EMSProgramCallManager;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const Plant(1);     // Used to identify whether the current loop is Plant
@@ -1767,7 +1766,7 @@ CurrentModuleObject, PlantOpSchemeName);
                                                  PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).EMSIntVarRemainingLoadValue);
                     }
                 }
-                StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), EMSProgramCallManager);
+                StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataRuntimeLang->EMSProgramCallManager);
                 if (StackMngrNum > 0) { // found it
                     PlantLoop(LoopNum).OpScheme(SchemeNum).ErlSimProgramMngr = StackMngrNum;
                 } else {
@@ -1781,7 +1780,7 @@ CurrentModuleObject, PlantOpSchemeName);
                     }
                 }
                 if (!lAlphaFieldBlanks(3)) {
-                    StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(3), EMSProgramCallManager);
+                    StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(3), state.dataRuntimeLang->EMSProgramCallManager);
                     if (StackMngrNum > 0) { // found it
                         PlantLoop(LoopNum).OpScheme(SchemeNum).ErlInitProgramMngr = StackMngrNum;
                     } else {

@@ -69,8 +69,8 @@ TEST_F(EnergyPlusFixture, ERLExpression_TestExponentials)
 
     bool errorsFound = false;
 
-    DataRuntimeLanguage::ErlExpression.allocate(1);
-    auto &erlExpression = DataRuntimeLanguage::ErlExpression(1);
+    state->dataRuntimeLang->ErlExpression.allocate(1);
+    auto &erlExpression = state->dataRuntimeLang->ErlExpression(1);
     erlExpression.Operator = DataRuntimeLanguage::FuncExp;
     erlExpression.NumOperands = 1;
     erlExpression.Operand.allocate(1);

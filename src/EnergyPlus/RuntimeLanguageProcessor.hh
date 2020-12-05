@@ -186,13 +186,15 @@ namespace RuntimeLanguageProcessor {
 
     void ParseStack(EnergyPlusData &state, int const StackNum);
 
-    int AddInstruction(int const StackNum,
+    int AddInstruction(EnergyPlusData &state,
+                       int const StackNum,
                        int const LineNum,
                        int const Keyword,
                        Optional_int_const Argument1 = _, // Erl variable index
                        Optional_int_const Argument2 = _);
 
-    void AddError(int const StackNum,      // index pointer to location in ErlStack structure
+    void AddError(EnergyPlusData &state,
+                  int const StackNum,      // index pointer to location in ErlStack structure
                   int const LineNum,       // Erl program line number
                   std::string const &Error // error message to be added to ErlStack
     );
@@ -247,18 +249,20 @@ namespace RuntimeLanguageProcessor {
 
     int NewEMSVariable(EnergyPlusData &state, std::string const &VariableName, int const StackNum, Optional<ErlValueType const> Value = _);
 
-    void SetupPossibleOperators();
+    void SetupPossibleOperators(EnergyPlusData &state);
 
-    void ExternalInterfaceSetErlVariable(int const varNum,  // The variable index to be written during run time
+    void ExternalInterfaceSetErlVariable(EnergyPlusData &state,
+                                         int const varNum,  // The variable index to be written during run time
                                          Real64 const value // The real time value of the vairable to be set
     );
 
-    void ExternalInterfaceInitializeErlVariable(int const varNum,                 // The variable index to be written during run time
+    void ExternalInterfaceInitializeErlVariable(EnergyPlusData &state,
+                                                int const varNum,                 // The variable index to be written during run time
                                                 ErlValueType const &initialValue, // The initial value
                                                 bool const setToNull              // Flag, if true, value will be initialized to Null
     );
 
-    bool isExternalInterfaceErlVariable(int const varNum); // The variable index to be written during run time
+    bool isExternalInterfaceErlVariable(EnergyPlusData &state, int const varNum); // The variable index to be written during run time
 
 } // namespace RuntimeLanguageProcessor
 

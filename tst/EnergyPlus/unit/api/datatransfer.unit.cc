@@ -673,7 +673,7 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_Python_EMS_Override)
     EXPECT_GT(hActuator, -1);
 
     // Both the EMS one and the Plugin one point to the same handle, which is the index into the DataRuntimeLanguage::EMSActuatorAvailable array
-    EXPECT_EQ(DataRuntimeLanguage::EMSActuatorUsed(1).ActuatorVariableNum, hActuator);
+    EXPECT_EQ(state->dataRuntimeLang->EMSActuatorUsed(1).ActuatorVariableNum, hActuator);
 
     std::string const expectedError = delimited_string({
         "   ** Warning ** Data Exchange API: An EnergyManagementSystem:Actuator seems to be already defined in the EnergyPlus File and named 'TEMPSETPOINTLO'.",
