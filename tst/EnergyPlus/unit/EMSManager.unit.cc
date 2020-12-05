@@ -853,7 +853,7 @@ TEST_F(EnergyPlusFixture, TestUnInitializedEMSVariable1)
     bool anyRan;
     EMSManager::ManageEMS(*state, EMSManager::EMSCallFrom::SetupSimulation, anyRan, ObjexxFCL::Optional_int_const());
     // Find the variable in the list
-    int internalVarNum = RuntimeLanguageProcessor::FindEMSVariable("TempSetpoint1", 0);
+    int internalVarNum = RuntimeLanguageProcessor::FindEMSVariable(*state, "TempSetpoint1", 0);
     ASSERT_GT(internalVarNum, 0);
     // Expect the variable to not yet be initialized
     EXPECT_FALSE(ErlVariable(internalVarNum).Value.initialized);
@@ -1887,120 +1887,120 @@ TEST_F(EnergyPlusFixture, EMS_TodayTomorrowFunctions)
     // But the arrays are stored as TodayXyz(timestep, hour) where hour is 1:24
 
     // TodayIsRain and TodayIsSnow are logicals, but the ems functions returns 0 or 1
-    int internalVarNum = RuntimeLanguageProcessor::FindEMSVariable("TodayRain", 1);
+    int internalVarNum = RuntimeLanguageProcessor::FindEMSVariable(*state, "TodayRain", 1);
     ASSERT_GT(internalVarNum, 0);
     bool rainTrueFalse = (ErlVariable(internalVarNum).Value.Number > 0.0);
     EXPECT_EQ(state->dataWeatherManager->TodayIsRain(3,5+1), rainTrueFalse);
 
-    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable("TodaySnow", 1);
+    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable(*state, "TodaySnow", 1);
     ASSERT_GT(internalVarNum, 0);
     bool snowTrueFalse = (ErlVariable(internalVarNum).Value.Number > 0.0);
     EXPECT_EQ(state->dataWeatherManager->TodayIsRain(3, 5 + 1), snowTrueFalse);
 
-    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable("TodayDryBulb", 1);
+    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable(*state, "TodayDryBulb", 1);
     ASSERT_GT(internalVarNum, 0);
     EXPECT_NEAR(state->dataWeatherManager->TodayOutDryBulbTemp(3, 5 + 1), ErlVariable(internalVarNum).Value.Number, 0.000001);
 
-    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable("TodayDewPoint", 1);
+    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable(*state, "TodayDewPoint", 1);
     ASSERT_GT(internalVarNum, 0);
     EXPECT_NEAR(state->dataWeatherManager->TodayOutDewPointTemp(3, 5 + 1), ErlVariable(internalVarNum).Value.Number, 0.000001);
 
-    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable("TodayBaroPress", 1);
+    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable(*state, "TodayBaroPress", 1);
     ASSERT_GT(internalVarNum, 0);
     EXPECT_NEAR(state->dataWeatherManager->TodayOutBaroPress(3, 5 + 1), ErlVariable(internalVarNum).Value.Number, 0.000001);
 
-    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable("TodayRelHum", 1);
+    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable(*state, "TodayRelHum", 1);
     ASSERT_GT(internalVarNum, 0);
     EXPECT_NEAR(state->dataWeatherManager->TodayOutRelHum(3, 5 + 1), ErlVariable(internalVarNum).Value.Number, 0.000001);
 
-    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable("TodayWindSpd", 1);
+    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable(*state, "TodayWindSpd", 1);
     ASSERT_GT(internalVarNum, 0);
     EXPECT_NEAR(state->dataWeatherManager->TodayWindSpeed(3, 5 + 1), ErlVariable(internalVarNum).Value.Number, 0.000001);
 
-    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable("TodayWindDirect", 1);
+    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable(*state, "TodayWindDirect", 1);
     ASSERT_GT(internalVarNum, 0);
     EXPECT_NEAR(state->dataWeatherManager->TodayWindDir(3, 5 + 1), ErlVariable(internalVarNum).Value.Number, 0.000001);
 
-    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable("TodaySkyT", 1);
+    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable(*state, "TodaySkyT", 1);
     ASSERT_GT(internalVarNum, 0);
     EXPECT_NEAR(state->dataWeatherManager->TodaySkyTemp(3, 5 + 1), ErlVariable(internalVarNum).Value.Number, 0.000001);
 
-    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable("TodayHorIR", 1);
+    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable(*state, "TodayHorIR", 1);
     ASSERT_GT(internalVarNum, 0);
     EXPECT_NEAR(state->dataWeatherManager->TodayHorizIRSky(3, 5 + 1), ErlVariable(internalVarNum).Value.Number, 0.000001);
 
-    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable("TodayBeamSol", 1);
+    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable(*state, "TodayBeamSol", 1);
     ASSERT_GT(internalVarNum, 0);
     EXPECT_NEAR(state->dataWeatherManager->TodayBeamSolarRad(3, 5 + 1), ErlVariable(internalVarNum).Value.Number, 0.000001);
 
-    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable("TodayDifSol", 1);
+    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable(*state, "TodayDifSol", 1);
     ASSERT_GT(internalVarNum, 0);
     EXPECT_NEAR(state->dataWeatherManager->TodayDifSolarRad(3, 5 + 1), ErlVariable(internalVarNum).Value.Number, 0.000001);
 
-    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable("TodayAlb", 1);
+    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable(*state, "TodayAlb", 1);
     ASSERT_GT(internalVarNum, 0);
     EXPECT_NEAR(state->dataWeatherManager->TodayAlbedo(3, 5 + 1), ErlVariable(internalVarNum).Value.Number, 0.000001);
 
-    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable("TodayPrecip", 1);
+    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable(*state, "TodayPrecip", 1);
     ASSERT_GT(internalVarNum, 0);
     EXPECT_NEAR(state->dataWeatherManager->TodayLiquidPrecip(3, 5 + 1), ErlVariable(internalVarNum).Value.Number, 0.000001);
 
     // TodayIsRain and TodayIsSnow are logicals, but the ems functions returns 0 or 1
-    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable("TomorrowRain", 1);
+    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable(*state, "TomorrowRain", 1);
     ASSERT_GT(internalVarNum, 0);
     rainTrueFalse = (ErlVariable(internalVarNum).Value.Number > 0.0);
     EXPECT_EQ(state->dataWeatherManager->TomorrowIsRain(3, 5 + 1), rainTrueFalse);
 
-    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable("TomorrowSnow", 1);
+    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable(*state, "TomorrowSnow", 1);
     ASSERT_GT(internalVarNum, 0);
     snowTrueFalse = (ErlVariable(internalVarNum).Value.Number > 0.0);
     EXPECT_EQ(state->dataWeatherManager->TomorrowIsRain(3, 5 + 1), snowTrueFalse);
 
-    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable("TomorrowDryBulb", 1);
+    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable(*state, "TomorrowDryBulb", 1);
     ASSERT_GT(internalVarNum, 0);
     EXPECT_NEAR(state->dataWeatherManager->TomorrowOutDryBulbTemp(3, 5 + 1), ErlVariable(internalVarNum).Value.Number, 0.000001);
 
-    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable("TomorrowDewPoint", 1);
+    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable(*state, "TomorrowDewPoint", 1);
     ASSERT_GT(internalVarNum, 0);
     EXPECT_NEAR(state->dataWeatherManager->TomorrowOutDewPointTemp(3, 5 + 1), ErlVariable(internalVarNum).Value.Number, 0.000001);
 
-    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable("TomorrowBaroPress", 1);
+    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable(*state, "TomorrowBaroPress", 1);
     ASSERT_GT(internalVarNum, 0);
     EXPECT_NEAR(state->dataWeatherManager->TomorrowOutBaroPress(3, 5 + 1), ErlVariable(internalVarNum).Value.Number, 0.000001);
 
-    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable("TomorrowRelHum", 1);
+    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable(*state, "TomorrowRelHum", 1);
     ASSERT_GT(internalVarNum, 0);
     EXPECT_NEAR(state->dataWeatherManager->TomorrowOutRelHum(3, 5 + 1), ErlVariable(internalVarNum).Value.Number, 0.000001);
 
-    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable("TomorrowWindSpd", 1);
+    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable(*state, "TomorrowWindSpd", 1);
     ASSERT_GT(internalVarNum, 0);
     EXPECT_NEAR(state->dataWeatherManager->TomorrowWindSpeed(3, 5 + 1), ErlVariable(internalVarNum).Value.Number, 0.000001);
 
-    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable("TomorrowWindDirect", 1);
+    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable(*state, "TomorrowWindDirect", 1);
     ASSERT_GT(internalVarNum, 0);
     EXPECT_NEAR(state->dataWeatherManager->TomorrowWindDir(3, 5 + 1), ErlVariable(internalVarNum).Value.Number, 0.000001);
 
-    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable("TomorrowSkyT", 1);
+    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable(*state, "TomorrowSkyT", 1);
     ASSERT_GT(internalVarNum, 0);
     EXPECT_NEAR(state->dataWeatherManager->TomorrowSkyTemp(3, 5 + 1), ErlVariable(internalVarNum).Value.Number, 0.000001);
 
-    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable("TomorrowHorIR", 1);
+    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable(*state, "TomorrowHorIR", 1);
     ASSERT_GT(internalVarNum, 0);
     EXPECT_NEAR(state->dataWeatherManager->TomorrowHorizIRSky(3, 5 + 1), ErlVariable(internalVarNum).Value.Number, 0.000001);
 
-    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable("TomorrowBeamSol", 1);
+    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable(*state, "TomorrowBeamSol", 1);
     ASSERT_GT(internalVarNum, 0);
     EXPECT_NEAR(state->dataWeatherManager->TomorrowBeamSolarRad(3, 5 + 1), ErlVariable(internalVarNum).Value.Number, 0.000001);
 
-    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable("TomorrowDifSol", 1);
+    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable(*state, "TomorrowDifSol", 1);
     ASSERT_GT(internalVarNum, 0);
     EXPECT_NEAR(state->dataWeatherManager->TomorrowDifSolarRad(3, 5 + 1), ErlVariable(internalVarNum).Value.Number, 0.000001);
 
-    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable("TomorrowAlb", 1);
+    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable(*state, "TomorrowAlb", 1);
     ASSERT_GT(internalVarNum, 0);
     EXPECT_NEAR(state->dataWeatherManager->TomorrowAlbedo(3, 5 + 1), ErlVariable(internalVarNum).Value.Number, 0.000001);
 
-    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable("TomorrowPrecip", 1);
+    internalVarNum = RuntimeLanguageProcessor::FindEMSVariable(*state, "TomorrowPrecip", 1);
     ASSERT_GT(internalVarNum, 0);
     EXPECT_NEAR(state->dataWeatherManager->TomorrowLiquidPrecip(3, 5 + 1), ErlVariable(internalVarNum).Value.Number, 0.000001);
 }

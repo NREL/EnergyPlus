@@ -112,7 +112,7 @@ namespace EMSManager {
 
     void InitEMS(EnergyPlusData &state, EMSCallFrom iCalledFrom); // indicates where subroutine was called from, parameters in DataGlobals.
 
-    void ReportEMS();
+    void ReportEMS(EnergyPlusData &state);
 
     void GetEMSInput(EnergyPlusData &state);
 

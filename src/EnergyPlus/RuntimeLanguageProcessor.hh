@@ -217,7 +217,7 @@ namespace RuntimeLanguageProcessor {
 
     int ProcessTokens(EnergyPlusData &state, const Array1D<TokenType> &TokenIN, int const NumTokensIN, int const StackNum, std::string const &ParsingString);
 
-    int NewExpression();
+    int NewExpression(EnergyPlusData &state);
 
     ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, bool &seriousErrorFound);
 
@@ -233,7 +233,7 @@ namespace RuntimeLanguageProcessor {
 
     void GetRuntimeLanguageUserInput(EnergyPlusData &state);
 
-    void ReportRuntimeLanguage();
+    void ReportRuntimeLanguage(EnergyPlusData &state);
 
     ErlValueType SetErlValueNumber(Real64 const Number, Optional<ErlValueType const> OrigValue = _);
 
@@ -241,10 +241,11 @@ namespace RuntimeLanguageProcessor {
 
     std::string ValueToString(ErlValueType const &Value);
 
-    int FindEMSVariable(std::string const &VariableName, // variable name in Erl
+    int FindEMSVariable(EnergyPlusData &state,
+                        std::string const &VariableName, // variable name in Erl
                         int const StackNum);
 
-    int NewEMSVariable(std::string const &VariableName, int const StackNum, Optional<ErlValueType const> Value = _);
+    int NewEMSVariable(EnergyPlusData &state, std::string const &VariableName, int const StackNum, Optional<ErlValueType const> Value = _);
 
     void SetupPossibleOperators();
 

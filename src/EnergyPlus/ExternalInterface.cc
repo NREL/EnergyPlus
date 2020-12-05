@@ -681,9 +681,9 @@ namespace ExternalInterface {
                 if (inpVarTypes(i) == indexSchedule) {
                     varInd(i) = GetDayScheduleIndex(state, inpVarNames(i));
                 } else if (inpVarTypes(i) == indexVariable) {
-                    varInd(i) = FindEMSVariable(inpVarNames(i), 0);
+                    varInd(i) = FindEMSVariable(state, inpVarNames(i), 0);
                 } else if (inpVarTypes(i) == indexActuator) {
-                    varInd(i) = FindEMSVariable(inpVarNames(i), 0);
+                    varInd(i) = FindEMSVariable(state, inpVarNames(i), 0);
                 }
                 if (varInd(i) <= 0) {
                     ShowSevereError(state, "ExternalInterface: Error, xml file \"" + simCfgFilNam + "\" declares variable \"" + inpVarNames(i) + "\",");
@@ -1694,7 +1694,7 @@ namespace ExternalInterface {
                             }
 
                             FMU(i).Instance(j).eplusInputVariableVariable(k).VarIndex =
-                                FindEMSVariable(FMU(i).Instance(j).eplusInputVariableVariable(k).Name, 0);
+                                FindEMSVariable(state, FMU(i).Instance(j).eplusInputVariableVariable(k).Name, 0);
                             FMU(i).Instance(j).NumOutputVariablesVariable = k;
                             if (FMU(i).Instance(j).eplusInputVariableVariable(k).VarIndex <= 0) {
                                 ShowSevereError(state, "ExternalInterface/InitExternalInterfaceFMUImport:declares variable \"" +
@@ -1793,7 +1793,7 @@ namespace ExternalInterface {
                             }
 
                             FMU(i).Instance(j).eplusInputVariableActuator(k).VarIndex =
-                                FindEMSVariable(FMU(i).Instance(j).eplusInputVariableActuator(k).Name, 0);
+                                FindEMSVariable(state, FMU(i).Instance(j).eplusInputVariableActuator(k).Name, 0);
                             FMU(i).Instance(j).NumOutputVariablesActuator = k;
                             if (FMU(i).Instance(j).eplusInputVariableActuator(k).VarIndex <= 0) {
                                 ShowSevereError(state, "ExternalInterface/InitExternalInterfaceFMUImport:declares variable \"" +

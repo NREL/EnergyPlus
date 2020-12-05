@@ -204,18 +204,6 @@ namespace DataRuntimeLanguage {
 
     int const NumPossibleOperators(96); // total number of operators and built-in functions
 
-    int NumErlPrograms(0);               // count of Erl programs in model
-    int NumErlSubroutines(0);            // count of Erl subroutines in model
-    int NumUserGlobalVariables(0);       // count of global EMS variables defined by user
-    int NumErlVariables(0);              // count of Erl variables
-    int NumErlStacks(0);                 // count of Erl program stacks in model. sum of programs and subroutines
-    int NumExpressions(0);               // count of Erl expressions
-    int NumEMSOutputVariables(0);        // count of EMS output variables, custom output variables from Erl
-    int NumEMSMeteredOutputVariables(0); // count of EMS metered output variables, custom meters from Erl
-    int NumErlTrendVariables(0);         // count of EMS trend variables in model
-    int NumEMSCurveIndices(0);           // count of EMS curve index variables in model
-    int NumEMSConstructionIndices(0);    // count of EMS construction index variables in model
-
     //######################################################################################################################################
     // code for ExternalInterface
     int NumExternalInterfaceGlobalVariables(0);                           // count of ExternalInterface runtime variable
@@ -262,17 +250,6 @@ namespace DataRuntimeLanguage {
     // Functions
     void clear_state()
     {
-        NumErlPrograms = 0;
-        NumErlSubroutines = 0;
-        NumUserGlobalVariables = 0;
-        NumErlVariables = 0;
-        NumErlStacks = 0;
-        NumExpressions = 0;
-        NumEMSOutputVariables = 0;
-        NumEMSMeteredOutputVariables = 0;
-        NumErlTrendVariables = 0;
-        NumEMSCurveIndices = 0;
-        NumEMSConstructionIndices = 0;
         NumExternalInterfaceGlobalVariables = 0;
         NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables = 0;
         NumExternalInterfaceFunctionalMockupUnitExportGlobalVariables = 0;

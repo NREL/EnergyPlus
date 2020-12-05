@@ -128,22 +128,22 @@ namespace EMSManager {
         state.dataRuntimeLang->NumProgramCallManagers = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         cCurrentModuleObject = "EnergyManagementSystem:Program";
-        NumErlPrograms = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataRuntimeLang->NumErlPrograms = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         cCurrentModuleObject = "EnergyManagementSystem:Subroutine";
-        NumErlSubroutines = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataRuntimeLang->NumErlSubroutines = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         cCurrentModuleObject = "EnergyManagementSystem:GlobalVariable";
-        NumUserGlobalVariables = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataRuntimeLang->NumUserGlobalVariables = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         cCurrentModuleObject = "EnergyManagementSystem:OutputVariable";
-        NumEMSOutputVariables = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataRuntimeLang->NumEMSOutputVariables = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         cCurrentModuleObject = "EnergyManagementSystem:MeteredOutputVariable";
-        NumEMSMeteredOutputVariables = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataRuntimeLang->NumEMSMeteredOutputVariables = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         cCurrentModuleObject = "EnergyManagementSystem:CurveOrTableIndexVariable";
-        NumEMSCurveIndices = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataRuntimeLang->NumEMSCurveIndices = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         cCurrentModuleObject = "ExternalInterface:Variable";
         NumExternalInterfaceGlobalVariables = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
@@ -168,7 +168,7 @@ namespace EMSManager {
         NumExternalInterfaceFunctionalMockupUnitExportActuatorsUsed = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         cCurrentModuleObject = "EnergyManagementSystem:ConstructionIndexVariable";
-        NumEMSConstructionIndices = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataRuntimeLang->NumEMSConstructionIndices = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         cCurrentModuleObject = "Output:EnergyManagementSystem";
         int NumOutputEMSs = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
@@ -178,9 +178,9 @@ namespace EMSManager {
         int numActiveCallbacks = PluginManagement::PluginManager::numActiveCallbacks(state);
 
         // added for FMU
-        if ((state.dataRuntimeLang->NumSensors + state.dataRuntimeLang->numActuatorsUsed + state.dataRuntimeLang->NumProgramCallManagers + NumErlPrograms + NumErlSubroutines + NumUserGlobalVariables +
-             NumEMSOutputVariables + NumEMSCurveIndices + NumExternalInterfaceGlobalVariables + NumExternalInterfaceActuatorsUsed +
-             NumEMSConstructionIndices + NumEMSMeteredOutputVariables + NumExternalInterfaceFunctionalMockupUnitImportActuatorsUsed +
+        if ((state.dataRuntimeLang->NumSensors + state.dataRuntimeLang->numActuatorsUsed + state.dataRuntimeLang->NumProgramCallManagers + state.dataRuntimeLang->NumErlPrograms + state.dataRuntimeLang->NumErlSubroutines + state.dataRuntimeLang->NumUserGlobalVariables +
+             state.dataRuntimeLang->NumEMSOutputVariables + state.dataRuntimeLang->NumEMSCurveIndices + NumExternalInterfaceGlobalVariables + NumExternalInterfaceActuatorsUsed +
+             state.dataRuntimeLang->NumEMSConstructionIndices + state.dataRuntimeLang->NumEMSMeteredOutputVariables + NumExternalInterfaceFunctionalMockupUnitImportActuatorsUsed +
              NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables + NumExternalInterfaceFunctionalMockupUnitExportActuatorsUsed +
              NumExternalInterfaceFunctionalMockupUnitExportGlobalVariables + NumOutputEMSs + numPythonPlugins + numActiveCallbacks) > 0) {
             state.dataGlobal->AnyEnergyManagementSystemInModel = true;
@@ -341,7 +341,7 @@ namespace EMSManager {
             }
         }
 
-        ReportEMS();
+        ReportEMS(state);
     }
 
     void InitEMS(EnergyPlusData &state, EMSCallFrom const iCalledFrom) // indicates where subroutine was called from, parameters in DataGlobals.
@@ -444,7 +444,7 @@ namespace EMSManager {
         }
     }
 
-    void ReportEMS()
+    void ReportEMS(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -452,14 +452,13 @@ namespace EMSManager {
         //       DATE WRITTEN   June 2006
         //       MODIFIED       na
         //       RE-ENGINEERED  na
-
         // PURPOSE OF THIS SUBROUTINE:
         // Calculates report variables.
 
         // METHODOLOGY EMPLOYED:
         // Standard EnergyPlus methodology.
 
-        RuntimeLanguageProcessor::ReportRuntimeLanguage();
+        RuntimeLanguageProcessor::ReportRuntimeLanguage(state);
     }
 
     void GetEMSInput(EnergyPlusData &state)
@@ -607,7 +606,7 @@ namespace EMSManager {
                     Sensor(SensorNum).Name = cAlphaArgs(1);
 
                     // really needs to check for conflicts with program and function names too...done later
-                    VariableNum = FindEMSVariable(cAlphaArgs(1), 0);
+                    VariableNum = FindEMSVariable(state, cAlphaArgs(1), 0);
 
                     if (VariableNum > 0) {
                         ShowSevereError(state, "Invalid " + cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
@@ -615,7 +614,7 @@ namespace EMSManager {
                         ShowContinueError(state, "Object name conflicts with a global variable name in EMS");
                         ErrorsFound = true;
                     } else {
-                        VariableNum = NewEMSVariable(cAlphaArgs(1), 0);
+                        VariableNum = NewEMSVariable(state, cAlphaArgs(1), 0);
                         Sensor(SensorNum).VariableNum = VariableNum;
                         ErlVariable(VariableNum).Value.initialized = true;
                     }
@@ -734,7 +733,7 @@ namespace EMSManager {
                     EMSActuatorUsed(ActuatorNum).Name = cAlphaArgs(1);
 
                     // really needs to check for conflicts with program and function names too...
-                    VariableNum = FindEMSVariable(cAlphaArgs(1), 0);
+                    VariableNum = FindEMSVariable(state, cAlphaArgs(1), 0);
 
                     if (VariableNum > 0) {
                         ShowSevereError(state, "Invalid " + cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
@@ -742,7 +741,7 @@ namespace EMSManager {
                         ShowContinueError(state, "Object name conflicts with a global variable name in EMS");
                         ErrorsFound = true;
                     } else {
-                        VariableNum = NewEMSVariable(cAlphaArgs(1), 0);
+                        VariableNum = NewEMSVariable(state, cAlphaArgs(1), 0);
                         EMSActuatorUsed(ActuatorNum).ErlVariableNum = VariableNum;
                         // initialize Erl variable for actuator to null
                         ErlVariable(VariableNum).Value = Null;
@@ -816,14 +815,14 @@ namespace EMSManager {
                 ValidateEMSVariableName(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(1), errFlag, ErrorsFound);
                 if (!errFlag) {
                     EMSInternalVarsUsed(InternVarNum).Name = cAlphaArgs(1);
-                    VariableNum = FindEMSVariable(cAlphaArgs(1), 0);
+                    VariableNum = FindEMSVariable(state, cAlphaArgs(1), 0);
                     if (VariableNum > 0) {
                         ShowSevereError(state, "Invalid " + cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
                         ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                         ShowContinueError(state, "Object name conflicts with a global variable name in EMS");
                         ErrorsFound = true;
                     } else {
-                        VariableNum = NewEMSVariable(cAlphaArgs(1), 0);
+                        VariableNum = NewEMSVariable(state, cAlphaArgs(1), 0);
                         EMSInternalVarsUsed(InternVarNum).ErlVariableNum = VariableNum;
                     }
 
@@ -959,7 +958,7 @@ namespace EMSManager {
             }
 
         } else { // no program calling manager in input
-            if (NumErlPrograms > 0) {
+            if (state.dataRuntimeLang->NumErlPrograms > 0) {
                 cCurrentModuleObject = "EnergyManagementSystem:ProgramCallingManager";
                 ShowWarningError(state, "Energy Management System is missing input object " + cCurrentModuleObject);
                 ShowContinueError(state, "EnergyPlus Runtime Language programs need a calling manager to control when they get executed");
@@ -1557,9 +1556,9 @@ namespace EMSManager {
 
         // checks with quick return if no updates needed.
         if (!state.dataGlobal->AnyEnergyManagementSystemInModel) return;
-        if (NumErlTrendVariables == 0) return;
+        if (state.dataRuntimeLang->NumErlTrendVariables == 0) return;
 
-        for (TrendNum = 1; TrendNum <= NumErlTrendVariables; ++TrendNum) {
+        for (TrendNum = 1; TrendNum <= state.dataRuntimeLang->NumErlTrendVariables; ++TrendNum) {
             ErlVarNum = TrendVariable(TrendNum).ErlVariablePointer;
             TrendDepth = TrendVariable(TrendNum).LogDepth;
             if ((ErlVarNum > 0) && (TrendDepth > 0)) {

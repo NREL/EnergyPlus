@@ -76,9 +76,7 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WeatherManager.hh>
 
-namespace EnergyPlus {
-
-namespace RuntimeLanguageProcessor {
+namespace EnergyPlus::RuntimeLanguageProcessor {
 
     // MODULE INFORMATION:
     //       AUTHOR         Peter Graham Ellis
@@ -261,36 +259,36 @@ namespace RuntimeLanguageProcessor {
             True = SetErlValueNumber(1.0);
 
             // Create constant built-in variables
-            NullVariableNum = NewEMSVariable("NULL", 0, SetErlValueNumber(0.0));
+            NullVariableNum = NewEMSVariable(state, "NULL", 0, SetErlValueNumber(0.0));
             ErlVariable(NullVariableNum).Value.Type = ValueNull;
-            FalseVariableNum = NewEMSVariable("FALSE", 0, False);
-            TrueVariableNum = NewEMSVariable("TRUE", 0, True);
-            OffVariableNum = NewEMSVariable("OFF", 0, False);
-            OnVariableNum = NewEMSVariable("ON", 0, True);
-            PiVariableNum = NewEMSVariable("PI", 0, SetErlValueNumber(DataGlobalConstants::Pi));
-            TimeStepsPerHourVariableNum = NewEMSVariable("TIMESTEPSPERHOUR", 0, SetErlValueNumber(double(state.dataGlobal->NumOfTimeStepInHour)));
+            FalseVariableNum = NewEMSVariable(state, "FALSE", 0, False);
+            TrueVariableNum = NewEMSVariable(state, "TRUE", 0, True);
+            OffVariableNum = NewEMSVariable(state, "OFF", 0, False);
+            OnVariableNum = NewEMSVariable(state, "ON", 0, True);
+            PiVariableNum = NewEMSVariable(state, "PI", 0, SetErlValueNumber(DataGlobalConstants::Pi));
+            TimeStepsPerHourVariableNum = NewEMSVariable(state, "TIMESTEPSPERHOUR", 0, SetErlValueNumber(double(state.dataGlobal->NumOfTimeStepInHour)));
 
             // Create dynamic built-in variables
-            YearVariableNum = NewEMSVariable("YEAR", 0);
-            MonthVariableNum = NewEMSVariable("MONTH", 0);
-            DayOfMonthVariableNum = NewEMSVariable("DAYOFMONTH", 0); // 'DAYOFMONTH'?
-            DayOfWeekVariableNum = NewEMSVariable("DAYOFWEEK", 0);
-            DayOfYearVariableNum = NewEMSVariable("DAYOFYEAR", 0);
-            HourVariableNum = NewEMSVariable("HOUR", 0);
-            TimeStepNumVariableNum = NewEMSVariable("TIMESTEPNUM", 0);
-            MinuteVariableNum = NewEMSVariable("MINUTE", 0);
-            HolidayVariableNum = NewEMSVariable("HOLIDAY", 0);
-            DSTVariableNum = NewEMSVariable("DAYLIGHTSAVINGS", 0);
-            CurrentTimeVariableNum = NewEMSVariable("CURRENTTIME", 0);
-            SunIsUpVariableNum = NewEMSVariable("SUNISUP", 0);
-            IsRainingVariableNum = NewEMSVariable("ISRAINING", 0);
-            SystemTimeStepVariableNum = NewEMSVariable("SYSTEMTIMESTEP", 0);
-            ZoneTimeStepVariableNum = NewEMSVariable("ZONETIMESTEP", 0);
+            YearVariableNum = NewEMSVariable(state, "YEAR", 0);
+            MonthVariableNum = NewEMSVariable(state, "MONTH", 0);
+            DayOfMonthVariableNum = NewEMSVariable(state, "DAYOFMONTH", 0); // 'DAYOFMONTH'?
+            DayOfWeekVariableNum = NewEMSVariable(state, "DAYOFWEEK", 0);
+            DayOfYearVariableNum = NewEMSVariable(state, "DAYOFYEAR", 0);
+            HourVariableNum = NewEMSVariable(state, "HOUR", 0);
+            TimeStepNumVariableNum = NewEMSVariable(state, "TIMESTEPNUM", 0);
+            MinuteVariableNum = NewEMSVariable(state, "MINUTE", 0);
+            HolidayVariableNum = NewEMSVariable(state, "HOLIDAY", 0);
+            DSTVariableNum = NewEMSVariable(state, "DAYLIGHTSAVINGS", 0);
+            CurrentTimeVariableNum = NewEMSVariable(state, "CURRENTTIME", 0);
+            SunIsUpVariableNum = NewEMSVariable(state, "SUNISUP", 0);
+            IsRainingVariableNum = NewEMSVariable(state, "ISRAINING", 0);
+            SystemTimeStepVariableNum = NewEMSVariable(state, "SYSTEMTIMESTEP", 0);
+            ZoneTimeStepVariableNum = NewEMSVariable(state, "ZONETIMESTEP", 0);
             ErlVariable(ZoneTimeStepVariableNum).Value = SetErlValueNumber(state.dataGlobal->TimeStepZone);
-            CurrentEnvironmentPeriodNum = NewEMSVariable("CURRENTENVIRONMENT", 0);
-            ActualDateAndTimeNum = NewEMSVariable("ACTUALDATEANDTIME", 0);
-            ActualTimeNum = NewEMSVariable("ACTUALTIME", 0);
-            WarmUpFlagNum = NewEMSVariable("WARMUPFLAG", 0);
+            CurrentEnvironmentPeriodNum = NewEMSVariable(state, "CURRENTENVIRONMENT", 0);
+            ActualDateAndTimeNum = NewEMSVariable(state, "ACTUALDATEANDTIME", 0);
+            ActualTimeNum = NewEMSVariable(state, "ACTUALTIME", 0);
+            WarmUpFlagNum = NewEMSVariable(state, "WARMUPFLAG", 0);
 
             GetRuntimeLanguageUserInput(state); // Load and parse all runtime language objects
 
@@ -398,7 +396,7 @@ namespace RuntimeLanguageProcessor {
         bool CycleThisVariable;
 
         // reinitialize state of Erl variable values to zero, this gets sensors and internal variables used
-        for (ErlVariableNum = 1; ErlVariableNum <= NumErlVariables; ++ErlVariableNum) {
+        for (ErlVariableNum = 1; ErlVariableNum <= state.dataRuntimeLang->NumErlVariables; ++ErlVariableNum) {
             // but skip constant built-in variables so don't overwrite them
             if (ErlVariableNum == NullVariableNum) continue;
             if (ErlVariableNum == FalseVariableNum) continue;
@@ -412,12 +410,12 @@ namespace RuntimeLanguageProcessor {
 
             // need to preserve curve index variables
             CycleThisVariable = false;
-            for (loop = 1; loop <= NumEMSCurveIndices; ++loop) {
+            for (loop = 1; loop <= state.dataRuntimeLang->NumEMSCurveIndices; ++loop) {
                 if (ErlVariableNum == CurveIndexVariableNums(loop)) CycleThisVariable = true;
             }
             if (CycleThisVariable) continue;
             CycleThisVariable = false;
-            for (loop = 1; loop <= NumEMSConstructionIndices; ++loop) {
+            for (loop = 1; loop <= state.dataRuntimeLang->NumEMSConstructionIndices; ++loop) {
                 if (ErlVariableNum == ConstructionIndexVariableNums(loop)) CycleThisVariable = true;
             }
             if (CycleThisVariable) continue;
@@ -445,7 +443,7 @@ namespace RuntimeLanguageProcessor {
         }
 
         // reinitialize trend variables so old data are purged
-        for (TrendVarNum = 1; TrendVarNum <= NumErlTrendVariables; ++TrendVarNum) {
+        for (TrendVarNum = 1; TrendVarNum <= state.dataRuntimeLang->NumErlTrendVariables; ++TrendVarNum) {
             TrendDepth = TrendVariable(TrendVarNum).LogDepth;
             TrendVariable(TrendVarNum).TrendValARR({1, TrendDepth}) = 0.0;
         }
@@ -561,7 +559,7 @@ namespace RuntimeLanguageProcessor {
                         AddError(StackNum, LineNum, "Variable name missing for the SET instruction.");
                     } else {
                         Variable = stripped(Remainder.substr(0, Pos)); // VariableName would be more expressive
-                        VariableNum = NewEMSVariable(Variable, StackNum);
+                        VariableNum = NewEMSVariable(state, Variable, StackNum);
                         // Check for invalid variable name
 
                         if (Pos + 1 < Remainder.length()) {
@@ -1312,7 +1310,7 @@ namespace RuntimeLanguageProcessor {
                 Token(NumTokens).Type = TokenVariable;
                 Token(NumTokens).String = StringToken;
                 if (DeveloperFlag) print(state.files.debug, "Variable=\"{}\"\n", StringToken);
-                Token(NumTokens).Variable = NewEMSVariable(StringToken, StackNum);
+                Token(NumTokens).Variable = NewEMSVariable(state, StringToken, StackNum);
 
             } else if (is_any_of(NextChar, "+-*/^=<>@|&")) {
                 // Parse an operator token
@@ -1629,7 +1627,7 @@ namespace RuntimeLanguageProcessor {
                 if (Pos == 1) {
                     // if first token is for a built-in function starting with "@" then okay, otherwise the operator needs a LHS
                     if (Token(TokenNum).Operator > OperatorLogicalOR) { // we have a function expression to set up
-                        ExpressionNum = NewExpression();
+                        ExpressionNum = NewExpression(state);
                         ErlExpression(ExpressionNum).Operator = OperatorNum;
                         NumOperands = PossibleOperators(OperatorNum).NumOperands;
                         ErlExpression(ExpressionNum).NumOperands = NumOperands;
@@ -1691,7 +1689,7 @@ namespace RuntimeLanguageProcessor {
                     break;
                 } else {
 
-                    ExpressionNum = NewExpression();
+                    ExpressionNum = NewExpression(state);
                     ErlExpression(ExpressionNum).Operator = OperatorNum;
                     NumOperands = PossibleOperators(OperatorNum).NumOperands;
                     ErlExpression(ExpressionNum).NumOperands = NumOperands;
@@ -1738,14 +1736,14 @@ namespace RuntimeLanguageProcessor {
 
         // Should be down to just one token now
         if (Token(1).Type == TokenNumber) {
-            ExpressionNum = NewExpression();
+            ExpressionNum = NewExpression(state);
             ErlExpression(ExpressionNum).Operator = OperatorLiteral;
             ErlExpression(ExpressionNum).NumOperands = 1;
             ErlExpression(ExpressionNum).Operand.allocate(1);
             ErlExpression(ExpressionNum).Operand(1).Type = Token(1).Type;
             ErlExpression(ExpressionNum).Operand(1).Number = Token(1).Number;
         } else if (Token(1).Type == TokenVariable) {
-            ExpressionNum = NewExpression();
+            ExpressionNum = NewExpression(state);
             ErlExpression(ExpressionNum).Operator = OperatorLiteral;
             ErlExpression(ExpressionNum).NumOperands = 1;
             ErlExpression(ExpressionNum).Operand.allocate(1);
@@ -1758,7 +1756,7 @@ namespace RuntimeLanguageProcessor {
         return ExpressionNum;
     }
 
-    int NewExpression()
+    int NewExpression(EnergyPlusData &state)
     {
 
         // FUNCTION INFORMATION:
@@ -1782,14 +1780,14 @@ namespace RuntimeLanguageProcessor {
         // Object Data
 
         // FLOW:
-        if (NumExpressions == 0) {
+        if (state.dataRuntimeLang->NumExpressions == 0) {
             ErlExpression.allocate(1);
-            NumExpressions = 1;
+            state.dataRuntimeLang->NumExpressions = 1;
         } else {
-            ErlExpression.redimension(++NumExpressions);
+            ErlExpression.redimension(++state.dataRuntimeLang->NumExpressions);
         }
 
-        return NumExpressions;
+        return state.dataRuntimeLang->NumExpressions;
     }
 
     ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, bool &seriousErrorFound)
@@ -2738,17 +2736,17 @@ namespace RuntimeLanguageProcessor {
 
             cCurrentModuleObject = "EnergyManagementSystem:GlobalVariable";
 
-            if (NumUserGlobalVariables + NumExternalInterfaceGlobalVariables + NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables +
+            if (state.dataRuntimeLang->NumUserGlobalVariables + NumExternalInterfaceGlobalVariables + NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables +
                     NumExternalInterfaceFunctionalMockupUnitExportGlobalVariables >
                 0) {
-                for (GlobalNum = 1; GlobalNum <= NumUserGlobalVariables + NumExternalInterfaceGlobalVariables +
+                for (GlobalNum = 1; GlobalNum <= state.dataRuntimeLang->NumUserGlobalVariables + NumExternalInterfaceGlobalVariables +
                                                      NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables +
                                                      NumExternalInterfaceFunctionalMockupUnitExportGlobalVariables;
                      ++GlobalNum) {
                     // If we process the ExternalInterface actuators, all we need to do is to change the
                     // name of the module object, and add an offset for the variable number
                     // This is done in the following IF/THEN section.
-                    if (GlobalNum <= NumUserGlobalVariables) {
+                    if (GlobalNum <= state.dataRuntimeLang->NumUserGlobalVariables) {
                         inputProcessor->getObjectItem(state,
                                                       cCurrentModuleObject,
                                                       GlobalNum,
@@ -2761,11 +2759,11 @@ namespace RuntimeLanguageProcessor {
                                                       lAlphaFieldBlanks,
                                                       cAlphaFieldNames,
                                                       cNumericFieldNames);
-                    } else if (GlobalNum > NumUserGlobalVariables && GlobalNum <= NumUserGlobalVariables + NumExternalInterfaceGlobalVariables) {
+                    } else if (GlobalNum > state.dataRuntimeLang->NumUserGlobalVariables && GlobalNum <= state.dataRuntimeLang->NumUserGlobalVariables + NumExternalInterfaceGlobalVariables) {
                         cCurrentModuleObject = "ExternalInterface:Variable";
                         inputProcessor->getObjectItem(state,
                                                       cCurrentModuleObject,
-                                                      GlobalNum - NumUserGlobalVariables,
+                                                      GlobalNum - state.dataRuntimeLang->NumUserGlobalVariables,
                                                       cAlphaArgs,
                                                       NumAlphas,
                                                       rNumericArgs,
@@ -2775,13 +2773,13 @@ namespace RuntimeLanguageProcessor {
                                                       lAlphaFieldBlanks,
                                                       cAlphaFieldNames,
                                                       cNumericFieldNames);
-                    } else if (GlobalNum > NumUserGlobalVariables + NumExternalInterfaceGlobalVariables &&
-                               GlobalNum <= NumUserGlobalVariables + NumExternalInterfaceGlobalVariables +
+                    } else if (GlobalNum > state.dataRuntimeLang->NumUserGlobalVariables + NumExternalInterfaceGlobalVariables &&
+                               GlobalNum <= state.dataRuntimeLang->NumUserGlobalVariables + NumExternalInterfaceGlobalVariables +
                                                 NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables) {
                         cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Variable";
                         inputProcessor->getObjectItem(state,
                                                       cCurrentModuleObject,
-                                                      GlobalNum - NumUserGlobalVariables - NumExternalInterfaceGlobalVariables,
+                                                      GlobalNum - state.dataRuntimeLang->NumUserGlobalVariables - NumExternalInterfaceGlobalVariables,
                                                       cAlphaArgs,
                                                       NumAlphas,
                                                       rNumericArgs,
@@ -2792,15 +2790,15 @@ namespace RuntimeLanguageProcessor {
                                                       cAlphaFieldNames,
                                                       cNumericFieldNames);
 
-                    } else if (GlobalNum > NumUserGlobalVariables + NumExternalInterfaceGlobalVariables +
+                    } else if (GlobalNum > state.dataRuntimeLang->NumUserGlobalVariables + NumExternalInterfaceGlobalVariables +
                                                NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables &&
-                               GlobalNum <= NumUserGlobalVariables + NumExternalInterfaceGlobalVariables +
+                               GlobalNum <= state.dataRuntimeLang->NumUserGlobalVariables + NumExternalInterfaceGlobalVariables +
                                                 NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables +
                                                 NumExternalInterfaceFunctionalMockupUnitExportGlobalVariables) {
                         cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitExport:To:Variable";
                         inputProcessor->getObjectItem(state,
                                                       cCurrentModuleObject,
-                                                      GlobalNum - NumUserGlobalVariables - NumExternalInterfaceGlobalVariables -
+                                                      GlobalNum - state.dataRuntimeLang->NumUserGlobalVariables - NumExternalInterfaceGlobalVariables -
                                                           NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables,
                                                       cAlphaArgs,
                                                       NumAlphas,
@@ -2830,7 +2828,7 @@ namespace RuntimeLanguageProcessor {
                             ShowContinueError(state, "Blank " + cAlphaFieldNames(1));
                             ShowContinueError(state, "Blank entry will be skipped, and the simulation continues");
                         } else if (!errFlag) {
-                            VariableNum = FindEMSVariable(cAlphaArgs(ErlVarLoop), 0);
+                            VariableNum = FindEMSVariable(state, cAlphaArgs(ErlVarLoop), 0);
                             // Still need to check for conflicts with program and function names too
 
                             if (VariableNum > 0) {
@@ -2839,8 +2837,8 @@ namespace RuntimeLanguageProcessor {
                                 ShowContinueError(state, "Name conflicts with an existing global variable name");
                                 ErrorsFound = true;
                             } else {
-                                VariableNum = NewEMSVariable(cAlphaArgs(ErlVarLoop), 0);
-                                if (GlobalNum > NumUserGlobalVariables) {
+                                VariableNum = NewEMSVariable(state, cAlphaArgs(ErlVarLoop), 0);
+                                if (GlobalNum > state.dataRuntimeLang->NumUserGlobalVariables) {
                                     // Initialize variables for the ExternalInterface variables.
                                     // This object requires an initial value.
                                     ExternalInterfaceInitializeErlVariable(VariableNum, SetErlValueNumber(rNumericArgs(1)), false);
@@ -2852,10 +2850,10 @@ namespace RuntimeLanguageProcessor {
             }
 
             cCurrentModuleObject = "EnergyManagementSystem:CurveOrTableIndexVariable";
-            NumEMSCurveIndices = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
-            if (NumEMSCurveIndices > 0) {
-                CurveIndexVariableNums.dimension(NumEMSCurveIndices, 0);
-                for (loop = 1; loop <= NumEMSCurveIndices; ++loop) {
+            state.dataRuntimeLang->NumEMSCurveIndices = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+            if (state.dataRuntimeLang->NumEMSCurveIndices > 0) {
+                CurveIndexVariableNums.dimension(state.dataRuntimeLang->NumEMSCurveIndices, 0);
+                for (loop = 1; loop <= state.dataRuntimeLang->NumEMSCurveIndices; ++loop) {
                     inputProcessor->getObjectItem(state,
                                                   cCurrentModuleObject,
                                                   loop,
@@ -2877,7 +2875,7 @@ namespace RuntimeLanguageProcessor {
                         ShowContinueError(state, "Blank entry for Erl variable name is not allowed");
                         ErrorsFound = true;
                     } else if (!errFlag) {
-                        VariableNum = FindEMSVariable(cAlphaArgs(1), 0);
+                        VariableNum = FindEMSVariable(state, cAlphaArgs(1), 0);
                         if (VariableNum > 0) {
                             ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
                             ShowContinueError(state, "Invalid " + cAlphaFieldNames(1));
@@ -2885,7 +2883,7 @@ namespace RuntimeLanguageProcessor {
                             ErrorsFound = true;
                         } else {
                             // create new EMS variable
-                            VariableNum = NewEMSVariable(cAlphaArgs(1), 0);
+                            VariableNum = NewEMSVariable(state, cAlphaArgs(1), 0);
                             // store variable num
                             CurveIndexVariableNums(loop) = VariableNum;
                         }
@@ -2912,10 +2910,10 @@ namespace RuntimeLanguageProcessor {
             } // NumEMSCurveIndices > 0
 
             cCurrentModuleObject = "EnergyManagementSystem:ConstructionIndexVariable";
-            NumEMSConstructionIndices = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
-            if (NumEMSConstructionIndices > 0) {
-                ConstructionIndexVariableNums.dimension(NumEMSConstructionIndices, 0);
-                for (loop = 1; loop <= NumEMSConstructionIndices; ++loop) {
+            state.dataRuntimeLang->NumEMSConstructionIndices = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+            if (state.dataRuntimeLang->NumEMSConstructionIndices > 0) {
+                ConstructionIndexVariableNums.dimension(state.dataRuntimeLang->NumEMSConstructionIndices, 0);
+                for (loop = 1; loop <= state.dataRuntimeLang->NumEMSConstructionIndices; ++loop) {
                     inputProcessor->getObjectItem(state,
                                                   cCurrentModuleObject,
                                                   loop,
@@ -2937,7 +2935,7 @@ namespace RuntimeLanguageProcessor {
                         ShowContinueError(state, "Blank entry for Erl variable name is not allowed");
                         ErrorsFound = true;
                     } else if (!errFlag) {
-                        VariableNum = FindEMSVariable(cAlphaArgs(1), 0);
+                        VariableNum = FindEMSVariable(state, cAlphaArgs(1), 0);
                         if (VariableNum > 0) {
                             ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
                             ShowContinueError(state, "Invalid " + cAlphaFieldNames(1));
@@ -2945,7 +2943,7 @@ namespace RuntimeLanguageProcessor {
                             ErrorsFound = true;
                         } else {
                             // create new EMS variable
-                            VariableNum = NewEMSVariable(cAlphaArgs(1), 0);
+                            VariableNum = NewEMSVariable(state, cAlphaArgs(1), 0);
                             // store variable num
                             ConstructionIndexVariableNums(loop) = VariableNum;
                         }
@@ -2974,13 +2972,13 @@ namespace RuntimeLanguageProcessor {
 
             } // NumEMSConstructionIndices > 0
 
-            NumErlStacks = NumErlPrograms + NumErlSubroutines;
-            ErlStack.allocate(NumErlStacks);
-            ErlStackUniqueNames.reserve(static_cast<unsigned>(NumErlStacks));
+            state.dataRuntimeLang->NumErlStacks = state.dataRuntimeLang->NumErlPrograms + state.dataRuntimeLang->NumErlSubroutines;
+            ErlStack.allocate(state.dataRuntimeLang->NumErlStacks);
+            ErlStackUniqueNames.reserve(static_cast<unsigned>(state.dataRuntimeLang->NumErlStacks));
 
-            if (NumErlPrograms > 0) {
+            if (state.dataRuntimeLang->NumErlPrograms > 0) {
                 cCurrentModuleObject = "EnergyManagementSystem:Program";
-                for (StackNum = 1; StackNum <= NumErlPrograms; ++StackNum) {
+                for (StackNum = 1; StackNum <= state.dataRuntimeLang->NumErlPrograms; ++StackNum) {
                     inputProcessor->getObjectItem(state,
                                                   cCurrentModuleObject,
                                                   StackNum,
@@ -3010,12 +3008,12 @@ namespace RuntimeLanguageProcessor {
                 } // ProgramNum
             }
 
-            if (NumErlSubroutines > 0) {
+            if (state.dataRuntimeLang->NumErlSubroutines > 0) {
                 cCurrentModuleObject = "EnergyManagementSystem:Subroutine";
-                for (StackNum = NumErlPrograms + 1; StackNum <= NumErlStacks; ++StackNum) {
+                for (StackNum = state.dataRuntimeLang->NumErlPrograms + 1; StackNum <= state.dataRuntimeLang->NumErlStacks; ++StackNum) {
                     inputProcessor->getObjectItem(state,
                                                   cCurrentModuleObject,
-                                                  StackNum - NumErlPrograms,
+                                                  StackNum - state.dataRuntimeLang->NumErlPrograms,
                                                   cAlphaArgs,
                                                   NumAlphas,
                                                   rNumericArgs,
@@ -3042,10 +3040,10 @@ namespace RuntimeLanguageProcessor {
             }
 
             cCurrentModuleObject = "EnergyManagementSystem:TrendVariable";
-            NumErlTrendVariables = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
-            if (NumErlTrendVariables > 0) {
-                TrendVariable.allocate(NumErlTrendVariables);
-                for (TrendNum = 1; TrendNum <= NumErlTrendVariables; ++TrendNum) {
+            state.dataRuntimeLang->NumErlTrendVariables = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+            if (state.dataRuntimeLang->NumErlTrendVariables > 0) {
+                TrendVariable.allocate(state.dataRuntimeLang->NumErlTrendVariables);
+                for (TrendNum = 1; TrendNum <= state.dataRuntimeLang->NumErlTrendVariables; ++TrendNum) {
                     inputProcessor->getObjectItem(state,
                                                   cCurrentModuleObject,
                                                   TrendNum,
@@ -3065,7 +3063,7 @@ namespace RuntimeLanguageProcessor {
                         TrendVariable(TrendNum).Name = cAlphaArgs(1);
                     }
 
-                    VariableNum = FindEMSVariable(cAlphaArgs(2), 0);
+                    VariableNum = FindEMSVariable(state, cAlphaArgs(2), 0);
                     // Still need to check for conflicts with program and function names too
                     if (VariableNum == 0) { // did not find it
                         ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
@@ -3116,7 +3114,7 @@ namespace RuntimeLanguageProcessor {
             }
 
             // Parse the runtime language code
-            for (StackNum = 1; StackNum <= NumErlStacks; ++StackNum) {
+            for (StackNum = 1; StackNum <= state.dataRuntimeLang->NumErlStacks; ++StackNum) {
                 ParseStack(state, StackNum);
 
                 if (ErlStack(StackNum).NumErrors > 0) {
@@ -3132,13 +3130,13 @@ namespace RuntimeLanguageProcessor {
                 ShowFatalError(state, "Errors found in parsing EMS Runtime Language input. Preceding condition causes termination.");
             }
 
-            if ((NumEMSOutputVariables > 0) || (NumEMSMeteredOutputVariables > 0)) {
-                RuntimeReportVar.allocate(NumEMSOutputVariables + NumEMSMeteredOutputVariables);
+            if ((state.dataRuntimeLang->NumEMSOutputVariables > 0) || (state.dataRuntimeLang->NumEMSMeteredOutputVariables > 0)) {
+                RuntimeReportVar.allocate(state.dataRuntimeLang->NumEMSOutputVariables + state.dataRuntimeLang->NumEMSMeteredOutputVariables);
             }
 
-            if (NumEMSOutputVariables > 0) {
+            if (state.dataRuntimeLang->NumEMSOutputVariables > 0) {
                 cCurrentModuleObject = "EnergyManagementSystem:OutputVariable";
-                for (RuntimeReportVarNum = 1; RuntimeReportVarNum <= NumEMSOutputVariables; ++RuntimeReportVarNum) {
+                for (RuntimeReportVarNum = 1; RuntimeReportVarNum <= state.dataRuntimeLang->NumEMSOutputVariables; ++RuntimeReportVarNum) {
                     inputProcessor->getObjectItem(state,
                                                   cCurrentModuleObject,
                                                   RuntimeReportVarNum,
@@ -3209,7 +3207,7 @@ namespace RuntimeLanguageProcessor {
                     if (!lAlphaFieldBlanks(5)) {
                         // Lookup the Runtime Language Context, i.e., PROGRAM, FUNCTION, or global
                         Found = false;
-                        for (StackNum = 1; StackNum <= NumErlStacks; ++StackNum) {
+                        for (StackNum = 1; StackNum <= state.dataRuntimeLang->NumErlStacks; ++StackNum) {
                             if (ErlStack(StackNum).Name == cAlphaArgs(5)) {
                                 Found = true;
                                 break;
@@ -3226,7 +3224,7 @@ namespace RuntimeLanguageProcessor {
                         StackNum = 0;
                     }
 
-                    VariableNum = FindEMSVariable(cAlphaArgs(2), StackNum);
+                    VariableNum = FindEMSVariable(state, cAlphaArgs(2), StackNum);
 
                     if (VariableNum == 0) {
                         if (lAlphaFieldBlanks(5)) {
@@ -3303,10 +3301,10 @@ namespace RuntimeLanguageProcessor {
                 } // RuntimeReportVarNum
             }     // NumEMSOutputVariables > 0
 
-            if (NumEMSMeteredOutputVariables > 0) {
+            if (state.dataRuntimeLang->NumEMSMeteredOutputVariables > 0) {
                 cCurrentModuleObject = "EnergyManagementSystem:MeteredOutputVariable";
-                for (loop = 1; loop <= NumEMSMeteredOutputVariables; ++loop) {
-                    RuntimeReportVarNum = NumEMSOutputVariables + loop;
+                for (loop = 1; loop <= state.dataRuntimeLang->NumEMSMeteredOutputVariables; ++loop) {
+                    RuntimeReportVarNum = state.dataRuntimeLang->NumEMSOutputVariables + loop;
                     inputProcessor->getObjectItem(state,
                                                   cCurrentModuleObject,
                                                   loop,
@@ -3378,7 +3376,7 @@ namespace RuntimeLanguageProcessor {
                     if (!lAlphaFieldBlanks(4)) {
                         // Lookup the Runtime Language Context, i.e., PROGRAM, FUNCTION, or global
                         Found = false;
-                        for (StackNum = 1; StackNum <= NumErlStacks; ++StackNum) {
+                        for (StackNum = 1; StackNum <= state.dataRuntimeLang->NumErlStacks; ++StackNum) {
                             if (ErlStack(StackNum).Name == cAlphaArgs(4)) {
                                 Found = true;
                                 break;
@@ -3395,7 +3393,7 @@ namespace RuntimeLanguageProcessor {
                         StackNum = 0;
                     }
 
-                    VariableNum = FindEMSVariable(cAlphaArgs(2), StackNum);
+                    VariableNum = FindEMSVariable(state, cAlphaArgs(2), StackNum);
                     if (VariableNum == 0) {
                         if (lAlphaFieldBlanks(4)) {
                             ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
@@ -3618,7 +3616,7 @@ namespace RuntimeLanguageProcessor {
         } // GetInput
     }
 
-    void ReportRuntimeLanguage()
+    void ReportRuntimeLanguage(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3639,7 +3637,7 @@ namespace RuntimeLanguageProcessor {
         int VariableNum;
 
         // FLOW:
-        for (RuntimeReportVarNum = 1; RuntimeReportVarNum <= NumEMSOutputVariables + NumEMSMeteredOutputVariables; ++RuntimeReportVarNum) {
+        for (RuntimeReportVarNum = 1; RuntimeReportVarNum <= state.dataRuntimeLang->NumEMSOutputVariables + state.dataRuntimeLang->NumEMSMeteredOutputVariables; ++RuntimeReportVarNum) {
             VariableNum = RuntimeReportVar(RuntimeReportVarNum).VariableNum;
             if (ErlVariable(VariableNum).Value.Type == ValueNumber) {
                 RuntimeReportVar(RuntimeReportVarNum).Value = ErlVariable(VariableNum).Value.Number;
@@ -3798,7 +3796,8 @@ namespace RuntimeLanguageProcessor {
         return String;
     }
 
-    int FindEMSVariable(std::string const &VariableName, // variable name in Erl
+    int FindEMSVariable(EnergyPlusData &state,
+                        std::string const &VariableName, // variable name in Erl
                         int const StackNum)
     {
 
@@ -3822,7 +3821,7 @@ namespace RuntimeLanguageProcessor {
         std::string const UppercaseName = UtilityRoutines::MakeUPPERCase(VariableName);
 
         // check in ErlVariables
-        for (VariableNum = 1; VariableNum <= NumErlVariables; ++VariableNum) {
+        for (VariableNum = 1; VariableNum <= state.dataRuntimeLang->NumErlVariables; ++VariableNum) {
             if (ErlVariable(VariableNum).Name == UppercaseName) {
                 if ((ErlVariable(VariableNum).StackNum == StackNum) || (ErlVariable(VariableNum).StackNum == 0)) {
                     Found = true;
@@ -3832,7 +3831,7 @@ namespace RuntimeLanguageProcessor {
         }
 
         // check in Trend variables
-        for (TrendVarNum = 1; TrendVarNum <= NumErlTrendVariables; ++TrendVarNum) {
+        for (TrendVarNum = 1; TrendVarNum <= state.dataRuntimeLang->NumErlTrendVariables; ++TrendVarNum) {
             if (TrendVariable(TrendVarNum).Name == UppercaseName) {
                 VariableNum = TrendVariable(TrendVarNum).ErlVariablePointer;
                 if ((ErlVariable(VariableNum).StackNum == StackNum) || (ErlVariable(VariableNum).StackNum == 0)) {
@@ -3847,7 +3846,7 @@ namespace RuntimeLanguageProcessor {
         return VariableNum;
     }
 
-    int NewEMSVariable(std::string const &VariableName, int const StackNum, Optional<ErlValueType const> Value)
+    int NewEMSVariable(EnergyPlusData &state, std::string const &VariableName, int const StackNum, Optional<ErlValueType const> Value)
     {
 
         // FUNCTION INFORMATION:
@@ -3860,18 +3859,18 @@ namespace RuntimeLanguageProcessor {
         // Creates new variable if it doesn't exist.  If exists, returns existing variable number.
 
         // FLOW:
-        int VariableNum = FindEMSVariable(VariableName, StackNum);
+        int VariableNum = FindEMSVariable(state, VariableName, StackNum);
 
         if (VariableNum == 0) { // Variable does not exist anywhere yet
-            if (NumErlVariables == 0) {
+            if (state.dataRuntimeLang->NumErlVariables == 0) {
                 ErlVariable.allocate(1);
-                NumErlVariables = 1;
+                state.dataRuntimeLang->NumErlVariables = 1;
             } else { // Extend the variable array
-                ErlVariable.redimension(++NumErlVariables);
+                ErlVariable.redimension(++state.dataRuntimeLang->NumErlVariables);
             }
 
             // Add the new variable
-            VariableNum = NumErlVariables;
+            VariableNum = state.dataRuntimeLang->NumErlVariables;
             ErlVariable(VariableNum).Name = UtilityRoutines::MakeUPPERCase(VariableName);
             ErlVariable(VariableNum).StackNum = StackNum;
             ErlVariable(VariableNum).Value.Type = ValueNumber; // ErlVariable values are numbers
@@ -4400,7 +4399,5 @@ namespace RuntimeLanguageProcessor {
 
         return isExternalInterfaceVar;
     }
-
-} // namespace RuntimeLanguageProcessor
 
 } // namespace EnergyPlus

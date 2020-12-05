@@ -207,18 +207,6 @@ namespace DataRuntimeLanguage {
 
     extern int const NumPossibleOperators; // total number of operators and built-in functions
 
-    extern int NumErlPrograms;               // count of Erl programs in model
-    extern int NumErlSubroutines;            // count of Erl subroutines in model
-    extern int NumUserGlobalVariables;       // count of global EMS variables defined by user
-    extern int NumErlVariables;              // count of Erl variables
-    extern int NumErlStacks;                 // count of Erl program stacks in model. sum of programs and subroutines
-    extern int NumExpressions;               // count of Erl expressions
-    extern int NumEMSOutputVariables;        // count of EMS output variables, custom output variables from Erl
-    extern int NumEMSMeteredOutputVariables; // count of EMS metered output variables, custom meters from Erl
-    extern int NumErlTrendVariables;         // count of EMS trend variables in model
-    extern int NumEMSCurveIndices;           // count of EMS curve index variables in model
-    extern int NumEMSConstructionIndices;    // count of EMS construction index variables in model
-
     //######################################################################################################################################
     // code for ExternalInterface
     extern int NumExternalInterfaceGlobalVariables;                           // count of ExternalInterface runtime variable
@@ -551,6 +539,17 @@ struct RuntimeLanguageData : BaseGlobalStruct {
     int numEMSInternalVarsAvailable = 0;            // count of EMS internal variables available for use in such a model
     int maxEMSInternalVarsAvailable = 0;            // count of EMS current maximum internal variables available for use in such a model
     int varsAvailableAllocInc = 1000;               // allocation increment for variable arrays
+    int NumErlPrograms = 0;                         // count of Erl programs in model
+    int NumErlSubroutines = 0;                      // count of Erl subroutines in model
+    int NumUserGlobalVariables = 0;                 // count of global EMS variables defined by user
+    int NumErlVariables = 0;                        // count of Erl variables
+    int NumErlStacks = 0;                           // count of Erl program stacks in model. sum of programs and subroutines
+    int NumExpressions = 0;                         // count of Erl expressions
+    int NumEMSOutputVariables = 0;                  // count of EMS output variables, custom output variables from Erl
+    int NumEMSMeteredOutputVariables = 0;           // count of EMS metered output variables, custom meters from Erl
+    int NumErlTrendVariables = 0;                   // count of EMS trend variables in model
+    int NumEMSCurveIndices = 0;                     // count of EMS curve index variables in model
+    int NumEMSConstructionIndices = 0;              // count of EMS construction index variables in model
 
     void clear_state() override
     {
@@ -563,6 +562,17 @@ struct RuntimeLanguageData : BaseGlobalStruct {
         this->numEMSInternalVarsAvailable = 0;
         this->maxEMSInternalVarsAvailable = 0;
         this->varsAvailableAllocInc = 1000;
+        this->NumErlPrograms = 0;
+        this->NumErlSubroutines = 0;
+        this->NumUserGlobalVariables = 0;
+        this->NumErlVariables = 0;
+        this->NumErlStacks = 0;
+        this->NumExpressions = 0;
+        this->NumEMSOutputVariables = 0;
+        this->NumEMSMeteredOutputVariables = 0;
+        this->NumErlTrendVariables = 0;
+        this->NumEMSCurveIndices = 0;
+        this->NumEMSConstructionIndices = 0;
     }
 };
 
