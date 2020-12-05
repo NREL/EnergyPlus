@@ -67,6 +67,7 @@
 #include <EnergyPlus/TempSolveRoot.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
+#include <EnergyPlus/IntegratedHeatPump.hh>
 
 namespace EnergyPlus {
 
@@ -179,6 +180,7 @@ namespace HVACDXHeatPumpSystem {
         static Real64 HPTimeConstant(0.0);        // Heat pump time constant [s]
         static Real64 FanDelayTime(0.0);          // Fan delay time, time delay for the HP's fan to
         static Real64 OnOffAirFlowRatio(1.0);     // ratio of compressor on flow to average flow over time step
+        bool bVSHPOn = true;                 //whether run variable speed heat pump
 
         // Obtains and Allocates DX Cooling System related parameters from input file
         if (GetInputFlag) { // First time subroutine has been entered
@@ -221,8 +223,17 @@ namespace HVACDXHeatPumpSystem {
             InitDXHeatPumpSystem(state, DXSystemNum, AirLoopNum);
         }
 
+
+        if (DXHeatPumpSystem(DXSystemNum).IHPIndex != 0) {
+            if (IntegratedHeatPump::IntegratedHeatPumps(DXHeatPumpSystem(DXSystemNum).IHPIndex).CurMode ==
+                IntegratedHeatPump::IHPOperationMode::SCMode)
+                bVSHPOn = false;  
+        }
+            
+
         // Call the series of components that simulate a DX Heating System
         // Control the DX Heating System
+        if (bVSHPOn == true)
         ControlDXHeatingSystem(state, DXSystemNum, FirstHVACIteration);
 
         // simulate DX Heating System
@@ -241,6 +252,25 @@ namespace HVACDXHeatPumpSystem {
                           DXHeatPumpSystem(DXSystemNum).PartLoadFrac);
 
             } else if (SELECT_CASE_var == Coil_HeatingAirToAirVariableSpeed) { // Coil:Heating:DX:VariableSpeed
+
+                if ((DXHeatPumpSystem(DXSystemNum).IHPIndex != 0) && (bVSHPOn == true))
+                    IntegratedHeatPump::SimIHP(state,
+                                                "",
+                                                DXHeatPumpSystem(DXSystemNum).IHPIndex,
+                                                DXHeatPumpSystem(DXSystemNum).FanOpMode,
+                                                MaxONOFFCyclesperHour,
+                                                HPTimeConstant,
+                                                FanDelayTime,
+                                                On,
+                                                DXHeatPumpSystem(DXSystemNum).PartLoadFrac,
+                                                DXHeatPumpSystem(DXSystemNum).SpeedNum,
+                                                DXHeatPumpSystem(DXSystemNum).SpeedRatio,
+                                                QZnReq,
+                                                QLatReq,
+                                                false,
+                                                false,
+                                                OnOffAirFlowRatio);
+                else if (bVSHPOn == true)
                 SimVariableSpeedCoils(state, CompName,
                                       DXHeatPumpSystem(DXSystemNum).HeatPumpCoilIndex,
                                       DXHeatPumpSystem(DXSystemNum).FanOpMode,
@@ -385,6 +415,23 @@ namespace HVACDXHeatPumpSystem {
 
                 DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilName = Alphas(4);
 
+                DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilIndex =
+                    VariableSpeedCoils::GetCoilIndexVariableSpeed(state, Alphas(3), DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilName, ErrorsFound);
+
+            } else if (UtilityRoutines::SameString(Alphas(3), "CoilSystem:IntegratedHeatPump:AirSource")) {
+
+                DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilType = Alphas(3);
+                DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilType_Num = Coil_HeatingAirToAirVariableSpeed;
+
+                DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilName = Alphas(4);
+
+                 DXHeatPumpSystem(DXHeatSysNum).IHPIndex = IntegratedHeatPump::GetCoilIndexIHP(
+                    state, "CoilSystem:IntegratedHeatPump:AirSource", DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilName, ErrorsFound);
+
+                if (DXHeatPumpSystem(DXHeatSysNum).IHPIndex != 0)
+                     DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilIndex =
+                        IntegratedHeatPump::IntegratedHeatPumps(DXHeatPumpSystem(DXHeatSysNum).IHPIndex).SHCoilIndex;
+
             } else {
                 ShowSevereError(state, "Invalid entry for " + cAlphaFields(3) + " :" + Alphas(3));
                 ShowContinueError(state, "In " + CurrentModuleObject + "=\"" + DXHeatPumpSystem(DXHeatSysNum).Name + "\".");
@@ -392,10 +439,22 @@ namespace HVACDXHeatPumpSystem {
             }
 
             if (DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilType_Num == Coil_HeatingAirToAirVariableSpeed) {
-                DXHeatPumpSystem(DXHeatSysNum).DXHeatPumpCoilInletNodeNum = GetCoilInletNodeVariableSpeed(state,
-                    DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilType, DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilName, ErrorsFound);
-                DXHeatPumpSystem(DXHeatSysNum).DXHeatPumpCoilOutletNodeNum = GetCoilOutletNodeVariableSpeed(state,
-                    DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilType, DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilName, ErrorsFound);
+                if (DXHeatPumpSystem(DXHeatSysNum).IHPIndex != 0) {
+                    DXHeatPumpSystem(DXHeatSysNum).DXHeatPumpCoilInletNodeNum = GetCoilInletNodeVariableSpeed(
+                        state, "Coil:Heating:DX:VariableSpeed", 
+                        IntegratedHeatPump::IntegratedHeatPumps(DXHeatPumpSystem(DXHeatSysNum).IHPIndex).SHCoilName,
+                        ErrorsFound);
+                    DXHeatPumpSystem(DXHeatSysNum).DXHeatPumpCoilOutletNodeNum = GetCoilOutletNodeVariableSpeed(
+                        state, "Coil:Heating:DX:VariableSpeed", 
+                        IntegratedHeatPump::IntegratedHeatPumps(DXHeatPumpSystem(DXHeatSysNum).IHPIndex).SHCoilName, 
+                        ErrorsFound);
+                }
+                else{
+                    DXHeatPumpSystem(DXHeatSysNum).DXHeatPumpCoilInletNodeNum = GetCoilInletNodeVariableSpeed(
+                        state, DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilType, DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilName, ErrorsFound);
+                    DXHeatPumpSystem(DXHeatSysNum).DXHeatPumpCoilOutletNodeNum = GetCoilOutletNodeVariableSpeed(
+                        state, DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilType, DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilName, ErrorsFound);
+                }
             } else {
                 DXHeatPumpSystem(DXHeatSysNum).DXHeatPumpCoilInletNodeNum =
                     GetCoilInletNode(state, DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilType, DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilName, ErrorsFound);
@@ -601,6 +660,7 @@ namespace HVACDXHeatPumpSystem {
         using Psychrometrics::PsyHFnTdbW;
         using Psychrometrics::PsyTdpFnWPb;
         using VariableSpeedCoils::SimVariableSpeedCoils;
+        using IntegratedHeatPump::SimIHP; 
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const MaxIte(500);   // Maximum number of iterations for solver
@@ -620,7 +680,7 @@ namespace HVACDXHeatPumpSystem {
         Real64 OutletTempDXCoil; // Actual outlet temperature of the DX cooling coil
 
         int SolFla;             // Flag of solver
-        Array1D<Real64> Par(5); // Parameter array passed to solver
+        Array1D<Real64> Par(6); // Parameter array passed to solver
         bool SensibleLoad;      // True if there is a sensible cooling load on this system
         int FanOpMode;          // Supply air fan operating mode
         // added variables to call variable speed DX coils
@@ -664,6 +724,12 @@ namespace HVACDXHeatPumpSystem {
         VSCoilIndex = 0;
         I = 1;
         SpeedRatio = 0.0;
+
+        if (DXHeatPumpSystem(DXSystemNum).IHPIndex != 0) {
+            Par(6) = Real64(DXHeatPumpSystem(DXSystemNum).IHPIndex);
+        } else {
+            Par(6) = 0.0;
+        }
 
         // If there is a fault of coil SAT Sensor
         if (DXHeatPumpSystem(DXSystemNum).FaultyCoilSATFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
@@ -800,6 +866,29 @@ namespace HVACDXHeatPumpSystem {
                         OnOffAirFlowRatio = 1.0;
                         SpeedRatio = 0.0;
 
+                        if (DXHeatPumpSystem(DXSystemNum).IHPIndex != 0) {
+                            IntegratedHeatPump::IntegratedHeatPumps(DXHeatPumpSystem(DXSystemNum).IHPIndex).CurMode =
+                                IntegratedHeatPump::IHPOperationMode::SHMode;
+                        }
+
+                        if (DXHeatPumpSystem(DXSystemNum).IHPIndex != 0)
+                            SimIHP(state,
+                                    "",
+                                    DXHeatPumpSystem(DXSystemNum).IHPIndex,
+                                    DXHeatPumpSystem(DXSystemNum).FanOpMode,
+                                    MaxONOFFCyclesperHour,
+                                    HPTimeConstant,
+                                    FanDelayTime,
+                                    On,
+                                    PartLoadFrac,
+                                    SpeedNum,
+                                    SpeedRatio,
+                                    QZnReq,
+                                    QLatReq,
+                                    false,
+                                    false,
+                                    OnOffAirFlowRatio);
+                        else 
                         SimVariableSpeedCoils(state, CompName,
                                               DXHeatPumpSystem(DXSystemNum).HeatPumpCoilIndex,
                                               FanOpMode,
@@ -826,6 +915,25 @@ namespace HVACDXHeatPumpSystem {
                         SpeedNum = NumOfSpeeds;
                         SpeedRatio = 1.0;
                         QZnReq = 0.001; // to indicate the coil is running
+
+                        if (DXHeatPumpSystem(DXSystemNum).IHPIndex != 0)
+                            SimIHP(state,
+                                    "",
+                                    DXHeatPumpSystem(DXSystemNum).IHPIndex,
+                                    DXHeatPumpSystem(DXSystemNum).FanOpMode,
+                                    MaxONOFFCyclesperHour,
+                                    HPTimeConstant,
+                                    FanDelayTime,
+                                    On,
+                                    PartLoadFrac,
+                                    SpeedNum,
+                                    SpeedRatio,
+                                    QZnReq,
+                                    QLatReq,
+                                    false,
+                                    false,
+                                    OnOffAirFlowRatio);
+                        else 
                         SimVariableSpeedCoils(state, CompName,
                                               VSCoilIndex,
                                               FanOpMode,
@@ -871,6 +979,25 @@ namespace HVACDXHeatPumpSystem {
                                 SpeedNum = 1;
                                 SpeedRatio = 1.0;
                                 QZnReq = 0.001; // to indicate the coil is running
+
+                                if (DXHeatPumpSystem(DXSystemNum).IHPIndex != 0)
+                                    SimIHP(state,
+                                            "",
+                                            DXHeatPumpSystem(DXSystemNum).IHPIndex,
+                                            DXHeatPumpSystem(DXSystemNum).FanOpMode,
+                                            MaxONOFFCyclesperHour,
+                                            HPTimeConstant,
+                                            FanDelayTime,
+                                            On,
+                                            PartLoadFrac,
+                                            SpeedNum,
+                                            SpeedRatio,
+                                            QZnReq,
+                                            QLatReq,
+                                            false,
+                                            false,
+                                            OnOffAirFlowRatio);
+                                else 
                                 SimVariableSpeedCoils(state, CompName,
                                                       VSCoilIndex,
                                                       FanOpMode,
@@ -894,6 +1021,25 @@ namespace HVACDXHeatPumpSystem {
                                     TempOut1 = TempSpeedOut;
                                     for (I = 2; I <= NumOfSpeeds; ++I) {
                                         SpeedNum = I;
+
+                                        if (DXHeatPumpSystem(DXSystemNum).IHPIndex != 0)
+                                            SimIHP(state,
+                                                    "",
+                                                    DXHeatPumpSystem(DXSystemNum).IHPIndex,
+                                                    DXHeatPumpSystem(DXSystemNum).FanOpMode,
+                                                    MaxONOFFCyclesperHour,
+                                                    HPTimeConstant,
+                                                    FanDelayTime,
+                                                    On,
+                                                    PartLoadFrac,
+                                                    SpeedNum,
+                                                    SpeedRatio,
+                                                    QZnReq,
+                                                    QLatReq,
+                                                    false,
+                                                    false,
+                                                    OnOffAirFlowRatio);
+                                        else 
                                         SimVariableSpeedCoils(state, CompName,
                                                               VSCoilIndex,
                                                               FanOpMode,
@@ -918,6 +1064,25 @@ namespace HVACDXHeatPumpSystem {
                                     }
                                     if (state.dataGlobal->DoCoilDirectSolutions) {
                                         SpeedRatio = (DesOutTemp - TempOut1) / (TempSpeedOut - TempOut1);
+
+                                        if (DXHeatPumpSystem(DXSystemNum).IHPIndex != 0)
+                                            SimIHP(state,
+                                                    "",
+                                                    DXHeatPumpSystem(DXSystemNum).IHPIndex,
+                                                    DXHeatPumpSystem(DXSystemNum).FanOpMode,
+                                                    MaxONOFFCyclesperHour,
+                                                    HPTimeConstant,
+                                                    FanDelayTime,
+                                                    On,
+                                                    PartLoadFrac,
+                                                    SpeedNum,
+                                                    SpeedRatio,
+                                                    QZnReq,
+                                                    QLatReq,
+                                                    false,
+                                                    false,
+                                                    OnOffAirFlowRatio);
+                                        else 
                                         SimVariableSpeedCoils(state, CompName,
                                                               VSCoilIndex,
                                                               FanOpMode,
@@ -987,6 +1152,25 @@ namespace HVACDXHeatPumpSystem {
                                 } else {
                                     if (state.dataGlobal->DoCoilDirectSolutions) {
                                         PartLoadFrac = (DesOutTemp - Node(InletNode).Temp) / (TempSpeedOut - Node(InletNode).Temp);
+
+                                        if (DXHeatPumpSystem(DXSystemNum).IHPIndex != 0)
+                                            SimIHP(state,
+                                                    "",
+                                                    DXHeatPumpSystem(DXSystemNum).IHPIndex,
+                                                    DXHeatPumpSystem(DXSystemNum).FanOpMode,
+                                                    MaxONOFFCyclesperHour,
+                                                    HPTimeConstant,
+                                                    FanDelayTime,
+                                                    On,
+                                                    PartLoadFrac,
+                                                    SpeedNum,
+                                                    SpeedRatio,
+                                                    QZnReq,
+                                                    QLatReq,
+                                                    false,
+                                                    false,
+                                                    OnOffAirFlowRatio);
+                                        else 
                                         SimVariableSpeedCoils(state, CompName,
                                                               VSCoilIndex,
                                                               FanOpMode,
@@ -1156,6 +1340,7 @@ namespace HVACDXHeatPumpSystem {
         // na
         // Using/Aliasing
         using VariableSpeedCoils::SimVariableSpeedCoils;
+        using IntegratedHeatPump::SimIHP; 
 
         // Return value
         Real64 Residuum; // residual to be minimized to zero
@@ -1188,10 +1373,30 @@ namespace HVACDXHeatPumpSystem {
         static Real64 FanDelayTime(0.0);          // Fan delay time, time delay for the HP's fan to
         static Real64 OnOffAirFlowRatio(1.0);     // ratio of compressor on flow to average flow over time step
         static Real64 SpeedRatio(0.0);            // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)
+        int IHPIndex;                             // index of integrated heat pump
 
         CoilIndex = int(Par(1));
         FanOpMode = int(Par(5));
+        IHPIndex = int(Par(6));
 
+        if (IHPIndex != 0)
+            SimIHP(state,
+                   "",
+                   IHPIndex,
+                   FanOpMode,
+                   MaxONOFFCyclesperHour,
+                   HPTimeConstant,
+                   FanDelayTime,
+                   On,
+                   PartLoadRatio,
+                   SpeedNum,
+                   SpeedRatio,
+                   QZnReq,
+                   QLatReq,
+                   false,
+                   false,
+                   OnOffAirFlowRatio);
+        else 
         SimVariableSpeedCoils(state, "",
                               CoilIndex,
                               FanOpMode,
@@ -1234,6 +1439,7 @@ namespace HVACDXHeatPumpSystem {
         // na
         // Using/Aliasing
         using VariableSpeedCoils::SimVariableSpeedCoils;
+        using IntegratedHeatPump::SimIHP; 
 
         // Return value
         Real64 Residuum; // residual to be minimized to zero
@@ -1266,11 +1472,31 @@ namespace HVACDXHeatPumpSystem {
         static Real64 FanDelayTime(0.0);          // Fan delay time, time delay for the HP's fan to
         static Real64 OnOffAirFlowRatio(1.0);     // ratio of compressor on flow to average flow over time step
         static Real64 PartLoadRatio(1.0);         // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)
+        int IHPIndex;                             // index of integrated heat pump
 
         CoilIndex = int(Par(1));
         FanOpMode = int(Par(5));
         SpeedNum = int(Par(3));
+        IHPIndex = int(Par(6));
 
+        if (IHPIndex != 0)
+            SimIHP(state,
+                   "",
+                   IHPIndex,
+                   FanOpMode,
+                   MaxONOFFCyclesperHour,
+                   HPTimeConstant,
+                   FanDelayTime,
+                   On,
+                   PartLoadRatio,
+                   SpeedNum,
+                   SpeedRatio,
+                   QZnReq,
+                   QLatReq,
+                   false,
+                   false,
+                   OnOffAirFlowRatio);
+        else 
         SimVariableSpeedCoils(state, "",
                               CoilIndex,
                               FanOpMode,

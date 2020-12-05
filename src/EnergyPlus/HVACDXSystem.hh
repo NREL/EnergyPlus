@@ -191,6 +191,8 @@ namespace HVACDXSystem {
         bool FaultyCoilSATFlag;     // True if the coil has SAT sensor fault
         int FaultyCoilSATIndex;     // Index of the fault object corresponding to the coil
         Real64 FaultyCoilSATOffset; // Coil SAT sensor offset
+        int IHPIndex; // index of integrated heat pump
+        bool bEnhancedDehum;//whether it requires enhanced dehumidification
 
         bool VSCoilFanInfoSet; // flag to indicate if Coil System has set fan info in VS DX coil model
 
@@ -208,7 +210,8 @@ namespace HVACDXSystem {
               MSpdCycSensPLRIterIndex(0), MSpdLatPLRIter(0), MSpdLatPLRIterIndex(0), MSpdCycLatPLRIter(0), MSpdCycLatPLRIterIndex(0),
               MModeSensPLRIter(0), MModeSensPLRIterIndex(0), MModeLatPLRIter(0), MModeLatPLRIterIndex(0), MModeLatPLRIter2(0),
               MModeLatPLRIterIndex2(0), OAUnitSetTemp(0.0), ISHundredPercentDOASDXCoil(false), DesignMinOutletTemp(0.0), FrostControlStatus(0),
-              SpeedNum(0), TESOpMode(0), FaultyCoilSATFlag(false), FaultyCoilSATIndex(0), FaultyCoilSATOffset(0.0), VSCoilFanInfoSet(false)
+              SpeedNum(0), TESOpMode(0), FaultyCoilSATFlag(false), FaultyCoilSATIndex(0), FaultyCoilSATOffset(0.0), VSCoilFanInfoSet(false), 
+              IHPIndex(0), bEnhancedDehum(false)
 
         {
         }

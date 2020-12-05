@@ -80,6 +80,7 @@
 #include <EnergyPlus/TempSolveRoot.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
+#include <EnergyPlus/IntegratedHeatPump.hh>
 
 namespace EnergyPlus {
 
@@ -264,6 +265,12 @@ namespace HVACDXSystem {
         // Call the series of components that simulate a DX Cooling System
         // Control the DX Cooling System
         HXUnitOn = false;
+
+        if (DXCoolingSystem(DXSystemNum).IHPIndex != 0)
+            IntegratedHeatPump::IntegratedHeatPumps(DXCoolingSystem(DXSystemNum).IHPIndex).CurMode =
+                IntegratedHeatPump::IHPOperationMode::IdleMode; 
+
+        DXCoolingSystem(DXSystemNum).bEnhancedDehum = false;
         ControlDXSystem(state, DXSystemNum, FirstHVACIteration, HXUnitOn);
 
         // simulate DX Cooling System
@@ -312,7 +319,25 @@ namespace HVACDXSystem {
                                    DXCoolingSystem(DXSystemNum).CoolingCoilIndex,
                                    DXCoolingSystem(DXSystemNum).FanOpMode);
             } else if (SELECT_CASE_var == Coil_CoolingAirToAirVariableSpeed) { // Coil:Cooling:DX:VariableSpeed
-
+                if (DXCoolingSystem(DXSystemNum).IHPIndex != 0)
+                    IntegratedHeatPump::SimIHP(state,
+                           "",
+                           DXCoolingSystem(DXSystemNum).IHPIndex,
+                           DXCoolingSystem(DXSystemNum).FanOpMode,
+                           MaxONOFFCyclesperHour,
+                           HPTimeConstant,
+                           FanDelayTime,
+                           On,
+                           DXCoolingSystem(DXSystemNum).PartLoadFrac,
+                           DXCoolingSystem(DXSystemNum).SpeedNum,
+                           DXCoolingSystem(DXSystemNum).SpeedRatio,
+                           QZnReq,
+                           QLatReq,
+                           false,
+                           false,
+                           OnOffAirFlowRatio,
+                           DXCoolingSystem(DXSystemNum).bEnhancedDehum);
+                else 
                 SimVariableSpeedCoils(state, CompName,
                                       DXCoolingSystem(DXSystemNum).CoolingCoilIndex,
                                       DXCoolingSystem(DXSystemNum).FanOpMode,
@@ -482,6 +507,7 @@ namespace HVACDXSystem {
             // Get Cooling System Information if available
             if (UtilityRoutines::SameString(Alphas(6), "Coil:Cooling:DX:SingleSpeed") ||
                 UtilityRoutines::SameString(Alphas(6), "Coil:Cooling:DX:VariableSpeed") ||
+                UtilityRoutines::SameString(Alphas(6), "CoilSystem:IntegratedHeatPump:AirSource") ||
                 UtilityRoutines::SameString(Alphas(6), "Coil:Cooling:DX:TwoSpeed") ||
                 UtilityRoutines::SameString(Alphas(6), "Coil:Cooling:DX:TwoStageWithHumidityControlMode") ||
                 UtilityRoutines::SameString(Alphas(6), "CoilSystem:Cooling:DX:HeatExchangerAssisted") ||
@@ -505,8 +531,24 @@ namespace HVACDXSystem {
                     }
                 } else if (UtilityRoutines::SameString(Alphas(6), "Coil:Cooling:DX:VariableSpeed")) {
                     DXCoolingSystem(DXCoolSysNum).CoolingCoilType_Num = Coil_CoolingAirToAirVariableSpeed;
-                    DXCoolingSystem(DXCoolSysNum).CoolingCoilIndex =
-                        GetCoilIndexVariableSpeed(state, "Coil:Cooling:DX:VariableSpeed", DXCoolingSystem(DXCoolSysNum).CoolingCoilName, ErrFound);
+
+                    DXCoolingSystem(DXCoolSysNum).CoolingCoilIndex = 
+                        GetCoilIndexVariableSpeed(state, Alphas(6), DXCoolingSystem(DXCoolSysNum).CoolingCoilName, ErrFound);
+
+                    if (ErrFound) {
+                        ShowContinueError(state, "...occurs in " + CurrentModuleObject + " = " + DXCoolingSystem(DXCoolSysNum).Name);
+                        ErrorsFound = true;
+                    }
+                } else if (UtilityRoutines::SameString(Alphas(6), "CoilSystem:IntegratedHeatPump:AirSource")) {
+                    DXCoolingSystem(DXCoolSysNum).CoolingCoilType_Num = Coil_CoolingAirToAirVariableSpeed;
+                                        
+                    DXCoolingSystem(DXCoolSysNum).IHPIndex = IntegratedHeatPump::GetCoilIndexIHP(
+                        state, "CoilSystem:IntegratedHeatPump:AirSource", DXCoolingSystem(DXCoolSysNum).CoolingCoilName, ErrorsFound);
+
+                    if (DXCoolingSystem(DXCoolSysNum).IHPIndex != 0)
+                        DXCoolingSystem(DXCoolSysNum).CoolingCoilIndex =
+                            IntegratedHeatPump::IntegratedHeatPumps(DXCoolingSystem(DXCoolSysNum).IHPIndex).SCCoilIndex;
+
                     if (ErrFound) {
                         ShowContinueError(state, "...occurs in " + CurrentModuleObject + " = " + DXCoolingSystem(DXCoolSysNum).Name);
                         ErrorsFound = true;
@@ -1040,6 +1082,7 @@ namespace HVACDXSystem {
         using Psychrometrics::PsyHFnTdbW;
         using Psychrometrics::PsyTdpFnWPb;
         using VariableSpeedCoils::SimVariableSpeedCoils;
+        using IntegratedHeatPump::SimIHP; 
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const MaxIte(500);         // Maximum number of iterations for solver
@@ -1068,7 +1111,7 @@ namespace HVACDXSystem {
         Real64 OutletHumRatHS;         // Actual outlet humrat of the variable speed DX cooling coil at high speed
         Real64 OutletHumRatDXCoil;     // Actual outlet humidity ratio of the DX cooling coil
         int SolFla;                    // Flag of solver
-        Array1D<Real64> Par(5);        // Parameter array passed to solver
+        Array1D<Real64> Par(6);        // Parameter array passed to solver
         bool SensibleLoad;             // True if there is a sensible cooling load on this system
         bool LatentLoad;               // True if there is a latent   cooling load on this system
         int DehumidMode;               // Dehumidification mode (0=normal, 1=enhanced)
@@ -1120,6 +1163,12 @@ namespace HVACDXSystem {
         NumOfSpeeds = 0;
         VSCoilIndex = 0;
         I = 1;
+
+        if (DXCoolingSystem(DXSystemNum).IHPIndex != 0) {
+            Par(6) = Real64(DXCoolingSystem(DXSystemNum).IHPIndex);
+        } else {
+            Par(6) = 0.0; 
+        }
 
         // If there is a fault of coil SAT Sensor
         if (DXCoolingSystem(DXSystemNum).FaultyCoilSATFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
@@ -2217,7 +2266,26 @@ namespace HVACDXSystem {
                         FanDelayTime = 0.0;
                         OnOffAirFlowRatio = 1.0;
                         SpeedRatio = 0.0;
-
+                                                                            
+                        if (DXCoolingSystem(DXSystemNum).IHPIndex != 0)
+                            SimIHP(state,
+                                    "",
+                                    DXCoolingSystem(DXSystemNum).IHPIndex,
+                                    FanOpMode,
+                                    MaxONOFFCyclesperHour,
+                                    HPTimeConstant,
+                                    FanDelayTime,
+                                    On,
+                                    PartLoadFrac,
+                                    SpeedNum,
+                                    SpeedRatio,
+                                    QZnReq,
+                                    QLatReq,
+                                    false,
+                                    false,
+                                    OnOffAirFlowRatio,
+                                    DXCoolingSystem(DXSystemNum).bEnhancedDehum);
+                        else
                         SimVariableSpeedCoils(state, CompName,
                                               DXCoolingSystem(DXSystemNum).CoolingCoilIndex,
                                               FanOpMode,
@@ -2247,6 +2315,11 @@ namespace HVACDXSystem {
                             SpeedNum = 0;
                             SpeedRatio = 0.0;
                         } else {
+                            if (DXCoolingSystem(DXSystemNum).IHPIndex != 0) {
+                                IntegratedHeatPump::IntegratedHeatPumps(DXCoolingSystem(DXSystemNum).IHPIndex).CurMode =
+                                    IntegratedHeatPump::IHPOperationMode::SCMode;
+                            }
+
                             Real64 TempOut1;
                             Real64 TempOut2;
                             // Get full load result
@@ -2255,6 +2328,26 @@ namespace HVACDXSystem {
                             SpeedRatio = 1.0;
                             CycRatio = 1.0;
                             QZnReq = 0.001; // to indicate the coil is running
+
+                            if (DXCoolingSystem(DXSystemNum).IHPIndex != 0)
+                                SimIHP(state,
+                                       "",
+                                       DXCoolingSystem(DXSystemNum).IHPIndex,
+                                       FanOpMode,
+                                       MaxONOFFCyclesperHour,
+                                       HPTimeConstant,
+                                       FanDelayTime,
+                                       On,
+                                       PartLoadFrac,
+                                       SpeedNum,
+                                       SpeedRatio,
+                                       QZnReq,
+                                       QLatReq,
+                                       false,
+                                       false,
+                                       OnOffAirFlowRatio,
+                                       DXCoolingSystem(DXSystemNum).bEnhancedDehum);
+                            else 
                             SimVariableSpeedCoils(state, CompName,
                                                   VSCoilIndex,
                                                   FanOpMode,
@@ -2278,6 +2371,25 @@ namespace HVACDXSystem {
                             if ((TempSpeedReqst - TempSpeedOut) > Acc) {
                                 if (state.dataGlobal->DoCoilDirectSolutions) {
                                     PartLoadFrac = (DesOutTemp - Node(InletNode).Temp) / (TempOut1 - Node(InletNode).Temp);
+                                    if (DXCoolingSystem(DXSystemNum).IHPIndex != 0)
+                                        SimIHP(state,
+                                               "",
+                                               DXCoolingSystem(DXSystemNum).IHPIndex,
+                                               FanOpMode,
+                                               MaxONOFFCyclesperHour,
+                                               HPTimeConstant,
+                                               FanDelayTime,
+                                               On,
+                                               PartLoadFrac,
+                                               SpeedNum,
+                                               SpeedRatio,
+                                               QZnReq,
+                                               QLatReq,
+                                               false,
+                                               false,
+                                               OnOffAirFlowRatio,
+                                               DXCoolingSystem(DXSystemNum).bEnhancedDehum);
+                                    else
                                     SimVariableSpeedCoils(state, CompName,
                                                           VSCoilIndex,
                                                           FanOpMode,
@@ -2349,6 +2461,25 @@ namespace HVACDXSystem {
                                 SpeedRatio = 1.0;
                                 for (I = 2; I <= NumOfSpeeds; ++I) {
                                     SpeedNum = I;
+                                    if (DXCoolingSystem(DXSystemNum).IHPIndex != 0)
+                                        SimIHP(state,
+                                               "",
+                                               DXCoolingSystem(DXSystemNum).IHPIndex,
+                                               FanOpMode,
+                                               MaxONOFFCyclesperHour,
+                                               HPTimeConstant,
+                                               FanDelayTime,
+                                               On,
+                                               PartLoadFrac,
+                                               SpeedNum,
+                                               SpeedRatio,
+                                               QZnReq,
+                                               QLatReq,
+                                               false,
+                                               false,
+                                               OnOffAirFlowRatio,
+                                               DXCoolingSystem(DXSystemNum).bEnhancedDehum);
+                                    else
                                     SimVariableSpeedCoils(state, CompName,
                                                           VSCoilIndex,
                                                           FanOpMode,
@@ -2380,6 +2511,26 @@ namespace HVACDXSystem {
                                 if ((TempSpeedReqst - TempSpeedOut) > Acc) {
                                     if (state.dataGlobal->DoCoilDirectSolutions) {
                                         SpeedRatio = (DesOutTemp - TempOut1) / (TempOut2 - TempOut1);
+
+                                        if (DXCoolingSystem(DXSystemNum).IHPIndex != 0)
+                                            SimIHP(state,
+                                                   "",
+                                                   DXCoolingSystem(DXSystemNum).IHPIndex,
+                                                   FanOpMode,
+                                                   MaxONOFFCyclesperHour,
+                                                   HPTimeConstant,
+                                                   FanDelayTime,
+                                                   On,
+                                                   PartLoadFrac,
+                                                   SpeedNum,
+                                                   SpeedRatio,
+                                                   QZnReq,
+                                                   QLatReq,
+                                                   false,
+                                                   false,
+                                                   OnOffAirFlowRatio,
+                                                   DXCoolingSystem(DXSystemNum).bEnhancedDehum);
+                                        else
                                         SimVariableSpeedCoils(state, CompName,
                                                               VSCoilIndex,
                                                               FanOpMode,
@@ -2474,6 +2625,26 @@ namespace HVACDXSystem {
                                 SpeedRatio = 1.0;
                                 CycRatio = 1.0;
                                 QZnReq = 0.001; // to indicate the coil is running
+
+                                if (DXCoolingSystem(DXSystemNum).IHPIndex != 0)
+                                    SimIHP(state,
+                                           "",
+                                           DXCoolingSystem(DXSystemNum).IHPIndex,
+                                           FanOpMode,
+                                           MaxONOFFCyclesperHour,
+                                           HPTimeConstant,
+                                           FanDelayTime,
+                                           On,
+                                           PartLoadFrac,
+                                           SpeedNum,
+                                           SpeedRatio,
+                                           QZnReq,
+                                           QLatReq,
+                                           false,
+                                           false,
+                                           OnOffAirFlowRatio,
+                                           DXCoolingSystem(DXSystemNum).bEnhancedDehum);
+                                else
                                 SimVariableSpeedCoils(state, CompName,
                                                       VSCoilIndex,
                                                       FanOpMode,
@@ -2496,6 +2667,26 @@ namespace HVACDXSystem {
                                     int SaveSpeedNum = min(SpeedNum + 1, NumOfSpeeds);
                                     for (I = SaveSpeedNum; I <= NumOfSpeeds; ++I) {
                                         SpeedNum = I;
+
+                                        if (DXCoolingSystem(DXSystemNum).IHPIndex != 0)
+                                            SimIHP(state,
+                                                   "",
+                                                   DXCoolingSystem(DXSystemNum).IHPIndex,
+                                                   FanOpMode,
+                                                   MaxONOFFCyclesperHour,
+                                                   HPTimeConstant,
+                                                   FanDelayTime,
+                                                   On,
+                                                   PartLoadFrac,
+                                                   SpeedNum,
+                                                   SpeedRatio,
+                                                   QZnReq,
+                                                   QLatReq,
+                                                   false,
+                                                   false,
+                                                   OnOffAirFlowRatio,
+                                                   DXCoolingSystem(DXSystemNum).bEnhancedDehum);
+                                        else
                                         SimVariableSpeedCoils(state, CompName,
                                                               VSCoilIndex,
                                                               FanOpMode,
@@ -2521,13 +2712,15 @@ namespace HVACDXSystem {
                                         Par(1) = double(VSCoilIndex);
                                         Par(2) = DesOutHumRat;
                                         Par(5) = double(FanOpMode);
+                                        DXCoolingSystem(DXSystemNum).bEnhancedDehum = true;
+
                                         if (SpeedNum > 1) {
                                             Par(3) = double(SpeedNum);
-                                            SolveRoot(state, HumRatAcc, MaxIte, SolFla, SpeedRatio, VSCoilSpeedHumResidual, 1.0e-10, 1.0, Par);
+                                            SolveRoot(state, HumRatAcc, MaxIte, SolFla, SpeedRatio, VSCoilSpeedHumResidual, 1.0e-10, 1.0, Par);                                            
                                         } else {
                                             SpeedRatio = 0.0;
                                             SolveRoot(state, HumRatAcc, MaxIte, SolFla, PartLoadFrac, VSCoilCyclingHumResidual, 1.0e-10, 1.0, Par);
-                                            CycRatio = PartLoadFrac;
+                                            CycRatio = PartLoadFrac;                                            
                                         }
 
                                         if (SolFla == -1) {
@@ -2578,9 +2771,11 @@ namespace HVACDXSystem {
                                     Par(1) = double(VSCoilIndex);
                                     Par(2) = DesOutHumRat;
                                     Par(5) = double(FanOpMode);
+                                    DXCoolingSystem(DXSystemNum).bEnhancedDehum = true;
+
                                     if (SpeedNum > 1) {
                                         Par(3) = double(SpeedNum);
-                                        SolveRoot(state, HumRatAcc, MaxIte, SolFla, SpeedRatio, VSCoilSpeedHumResidual, 1.0e-10, 1.0, Par);
+                                        SolveRoot(state, HumRatAcc, MaxIte, SolFla, SpeedRatio, VSCoilSpeedHumResidual, 1.0e-10, 1.0, Par);                                        
                                     } else {
                                         SpeedRatio = 0.0;
                                         SolveRoot(state, HumRatAcc, MaxIte, SolFla, PartLoadFrac, VSCoilCyclingHumResidual, 1.0e-10, 1.0, Par);
@@ -3572,6 +3767,7 @@ namespace HVACDXSystem {
         // na
         // Using/Aliasing
         using VariableSpeedCoils::SimVariableSpeedCoils;
+        using IntegratedHeatPump::SimIHP; 
 
         // Return value
         Real64 Residuum; // residual to be minimized to zero
@@ -3595,10 +3791,32 @@ namespace HVACDXSystem {
         static Real64 FanDelayTime(0.0);          // Fan delay time, time delay for the HP's fan to
         static Real64 OnOffAirFlowRatio(1.0);     // ratio of compressor on flow to average flow over time step
         static Real64 SpeedRatio(0.0);            // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)
-
+        int IHPIndex;                             //index of integrated heat pump
+  
         CoilIndex = int(Par(1));
         FanOpMode = int(Par(5));
+        IHPIndex = int(Par(6)); 
 
+        if (IHPIndex != 0 )
+            if (IHPIndex != 0)
+                SimIHP(state,
+                       "",
+                       IHPIndex,
+                       FanOpMode,
+                       MaxONOFFCyclesperHour,
+                       HPTimeConstant,
+                       FanDelayTime,
+                       On,
+                       PartLoadRatio,
+                       SpeedNum,
+                       SpeedRatio,
+                       QZnReq,
+                       QLatReq,
+                       false,
+                       false,
+                       OnOffAirFlowRatio,
+                       false);
+        else
         SimVariableSpeedCoils(state, "",
                               CoilIndex,
                               FanOpMode,
@@ -3640,6 +3858,7 @@ namespace HVACDXSystem {
         // na
         // Using/Aliasing
         using VariableSpeedCoils::SimVariableSpeedCoils;
+        using IntegratedHeatPump::SimIHP; 
 
         // Return value
         Real64 Residuum; // residual to be minimized to zero
@@ -3672,11 +3891,33 @@ namespace HVACDXSystem {
         static Real64 FanDelayTime(0.0);          // Fan delay time, time delay for the HP's fan to
         static Real64 OnOffAirFlowRatio(1.0);     // ratio of compressor on flow to average flow over time step
         static Real64 PartLoadRatio(1.0);         // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)
+        int IHPIndex;                             // index of integrated heat pump
 
         CoilIndex = int(Par(1));
         FanOpMode = int(Par(5));
         SpeedNum = int(Par(3));
+        IHPIndex = int(Par(6));
 
+        if (IHPIndex != 0)
+            if (IHPIndex != 0)
+                SimIHP(state,
+                        "",
+                        IHPIndex,
+                        FanOpMode,
+                        MaxONOFFCyclesperHour,
+                        HPTimeConstant,
+                        FanDelayTime,
+                        On,
+                        PartLoadRatio,
+                        SpeedNum,
+                        SpeedRatio,
+                        QZnReq,
+                        QLatReq,
+                        false,
+                        false,
+                        OnOffAirFlowRatio,
+                        false);
+        else
         SimVariableSpeedCoils(state, "",
                               CoilIndex,
                               FanOpMode,
@@ -3716,6 +3957,7 @@ namespace HVACDXSystem {
         // na
         // Using/Aliasing
         using VariableSpeedCoils::SimVariableSpeedCoils;
+        using IntegratedHeatPump::SimIHP; 
 
         // Return value
         Real64 Residuum; // residual to be minimized to zero
@@ -3748,10 +3990,32 @@ namespace HVACDXSystem {
         static Real64 FanDelayTime(0.0);          // Fan delay time, time delay for the HP's fan to
         static Real64 OnOffAirFlowRatio(1.0);     // ratio of compressor on flow to average flow over time step
         static Real64 SpeedRatio(0.0);            // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)
+        int IHPIndex;                             // index of integrated heat pump
 
         CoilIndex = int(Par(1));
         FanOpMode = int(Par(5));
+        IHPIndex = int(Par(6));
 
+        if (IHPIndex != 0)
+            if (IHPIndex != 0)
+                SimIHP(state,
+                       "",
+                       IHPIndex,
+                       FanOpMode,
+                       MaxONOFFCyclesperHour,
+                       HPTimeConstant,
+                       FanDelayTime,
+                       On,
+                       PartLoadRatio,
+                       SpeedNum,
+                       SpeedRatio,
+                       QZnReq,
+                       QLatReq,
+                       false,
+                       false,
+                       OnOffAirFlowRatio,
+                       true);
+        else
         SimVariableSpeedCoils(state, "",
                               CoilIndex,
                               FanOpMode,
@@ -3794,6 +4058,7 @@ namespace HVACDXSystem {
         // na
         // Using/Aliasing
         using VariableSpeedCoils::SimVariableSpeedCoils;
+        using IntegratedHeatPump::SimIHP; 
 
         // Return value
         Real64 Residuum; // residual to be minimized to zero
@@ -3826,11 +4091,33 @@ namespace HVACDXSystem {
         static Real64 FanDelayTime(0.0);          // Fan delay time, time delay for the HP's fan to
         static Real64 OnOffAirFlowRatio(1.0);     // ratio of compressor on flow to average flow over time step
         static Real64 PartLoadRatio(1.0);         // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)
+        int IHPIndex;                             // index of integrated heat pump
 
         CoilIndex = int(Par(1));
         FanOpMode = int(Par(5));
         SpeedNum = int(Par(3));
+        IHPIndex = int(Par(6));
 
+        if (IHPIndex != 0)
+            if (IHPIndex != 0)
+                SimIHP(state,
+                       "",
+                       IHPIndex,
+                       FanOpMode,
+                       MaxONOFFCyclesperHour,
+                       HPTimeConstant,
+                       FanDelayTime,
+                       On,
+                       PartLoadRatio,
+                       SpeedNum,
+                       SpeedRatio,
+                       QZnReq,
+                       QLatReq,
+                       false,
+                       false,
+                       OnOffAirFlowRatio,
+                       true);
+        else
         SimVariableSpeedCoils(state, "",
                               CoilIndex,
                               FanOpMode,
