@@ -1916,12 +1916,12 @@ namespace SimulationManager {
         print(state.files.audit, variable_fmt, "NumConsideredOutputVariables", NumConsideredOutputVariables);
         print(state.files.audit, variable_fmt, "MaxConsideredOutputVariables", MaxConsideredOutputVariables);
 
-        print(state.files.audit, variable_fmt, "numActuatorsUsed", numActuatorsUsed);
-        print(state.files.audit, variable_fmt, "numEMSActuatorsAvailable", numEMSActuatorsAvailable);
-        print(state.files.audit, variable_fmt, "maxEMSActuatorsAvailable", maxEMSActuatorsAvailable);
-        print(state.files.audit, variable_fmt, "numInternalVariablesUsed", NumInternalVariablesUsed);
-        print(state.files.audit, variable_fmt, "numEMSInternalVarsAvailable", numEMSInternalVarsAvailable);
-        print(state.files.audit, variable_fmt, "maxEMSInternalVarsAvailable", maxEMSInternalVarsAvailable);
+        print(state.files.audit, variable_fmt, "numActuatorsUsed", state.dataRuntimeLang->numActuatorsUsed);
+        print(state.files.audit, variable_fmt, "numEMSActuatorsAvailable", state.dataRuntimeLang->numEMSActuatorsAvailable);
+        print(state.files.audit, variable_fmt, "maxEMSActuatorsAvailable", state.dataRuntimeLang->maxEMSActuatorsAvailable);
+        print(state.files.audit, variable_fmt, "numInternalVariablesUsed", state.dataRuntimeLang->NumInternalVariablesUsed);
+        print(state.files.audit, variable_fmt, "numEMSInternalVarsAvailable", state.dataRuntimeLang->numEMSInternalVarsAvailable);
+        print(state.files.audit, variable_fmt, "maxEMSInternalVarsAvailable", state.dataRuntimeLang->maxEMSInternalVarsAvailable);
 
         print(state.files.audit, variable_fmt, "NumOfNodeConnections", state.dataBranchNodeConnections->NumOfNodeConnections);
         print(state.files.audit, variable_fmt, "MaxNumOfNodeConnections", state.dataBranchNodeConnections->MaxNumOfNodeConnections);

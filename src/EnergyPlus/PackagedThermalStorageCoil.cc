@@ -1806,7 +1806,7 @@ namespace PackagedThermalStorageCoil {
         if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
             for (item = 1; item <= NumTESCoils; ++item) {
                 // setup EMS actuator for control mode
-                SetupEMSActuator("Coil:Cooling:DX:SingleSpeed:ThermalStorage",
+                SetupEMSActuator(state, "Coil:Cooling:DX:SingleSpeed:ThermalStorage",
                                  TESCoil(item).Name,
                                  "Operating Mode",
                                  "[ ]",

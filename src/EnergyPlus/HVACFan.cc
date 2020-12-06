@@ -635,12 +635,12 @@ namespace HVACFan {
 
         if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
             SetupEMSInternalVariable(state, "Fan Maximum Mass Flow Rate", name, "[kg/s]", m_maxAirMassFlowRate);
-            SetupEMSActuator("Fan", name, "Fan Air Mass Flow Rate", "[kg/s]", m_eMSMaxMassFlowOverrideOn, m_eMSAirMassFlowValue);
+            SetupEMSActuator(state, "Fan", name, "Fan Air Mass Flow Rate", "[kg/s]", m_eMSMaxMassFlowOverrideOn, m_eMSAirMassFlowValue);
             SetupEMSInternalVariable(state, "Fan Nominal Pressure Rise", name, "[Pa]", deltaPress);
-            SetupEMSActuator("Fan", name, "Fan Pressure Rise", "[Pa]", m_eMSFanPressureOverrideOn, m_eMSFanPressureValue);
+            SetupEMSActuator(state, "Fan", name, "Fan Pressure Rise", "[Pa]", m_eMSFanPressureOverrideOn, m_eMSFanPressureValue);
             SetupEMSInternalVariable(state, "Fan Nominal Total Efficiency", name, "[fraction]", m_fanTotalEff);
-            SetupEMSActuator("Fan", name, "Fan Total Efficiency", "[fraction]", m_eMSFanEffOverrideOn, m_eMSFanEffValue);
-            SetupEMSActuator("Fan", name, "Fan Autosized Air Flow Rate", "[m3/s]", m_maxAirFlowRateEMSOverrideOn, m_maxAirFlowRateEMSOverrideValue);
+            SetupEMSActuator(state, "Fan", name, "Fan Total Efficiency", "[fraction]", m_eMSFanEffOverrideOn, m_eMSFanEffValue);
+            SetupEMSActuator(state, "Fan", name, "Fan Autosized Air Flow Rate", "[m3/s]", m_maxAirFlowRateEMSOverrideOn, m_maxAirFlowRateEMSOverrideValue);
         }
 
         if (m_heatLossesDestination == ThermalLossDestination::zoneGains) {

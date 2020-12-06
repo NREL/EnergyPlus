@@ -3945,19 +3945,19 @@ namespace HeatBalanceManager {
 
             for (MaterNum = 1; MaterNum <= TotMaterials; ++MaterNum) {
                 if (state.dataMaterial->Material(MaterNum).Group != RegularMaterial) continue;
-                SetupEMSActuator("Material",
+                SetupEMSActuator(state, "Material",
                                  state.dataMaterial->Material(MaterNum).Name,
                                  "Surface Property Solar Absorptance",
                                  "[ ]",
                                  state.dataMaterial->Material(MaterNum).AbsorpSolarEMSOverrideOn,
                                  state.dataMaterial->Material(MaterNum).AbsorpSolarEMSOverride);
-                SetupEMSActuator("Material",
+                SetupEMSActuator(state, "Material",
                                  state.dataMaterial->Material(MaterNum).Name,
                                  "Surface Property Thermal Absorptance",
                                  "[ ]",
                                  state.dataMaterial->Material(MaterNum).AbsorpThermalEMSOverrideOn,
                                  state.dataMaterial->Material(MaterNum).AbsorpThermalEMSOverride);
-                SetupEMSActuator("Material",
+                SetupEMSActuator(state, "Material",
                                  state.dataMaterial->Material(MaterNum).Name,
                                  "Surface Property Visible Absorptance",
                                  "[ ]",

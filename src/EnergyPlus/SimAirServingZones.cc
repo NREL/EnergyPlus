@@ -4627,7 +4627,7 @@ namespace SimAirServingZones {
                                          FinalSysSizing(AirLoopNum).AirPriLoopName,
                                          "[m3/s]",
                                          FinalSysSizing(AirLoopNum).DesMainVolFlow);
-                SetupEMSActuator("Sizing:System",
+                SetupEMSActuator(state, "Sizing:System",
                                  FinalSysSizing(AirLoopNum).AirPriLoopName,
                                  "Main Supply Volume Flow Rate",
                                  "[m3/s]",
@@ -4638,7 +4638,7 @@ namespace SimAirServingZones {
                                          FinalSysSizing(AirLoopNum).AirPriLoopName,
                                          "[kg/s]",
                                          FinalSysSizing(AirLoopNum).CoinCoolMassFlow);
-                SetupEMSActuator("Sizing:System",
+                SetupEMSActuator(state, "Sizing:System",
                                  FinalSysSizing(AirLoopNum).AirPriLoopName,
                                  "Main Supply Coincident Peak Cooling Mass Flow Rate",
                                  "[kg/s]",
@@ -4649,7 +4649,7 @@ namespace SimAirServingZones {
                                          FinalSysSizing(AirLoopNum).AirPriLoopName,
                                          "[kg/s]",
                                          FinalSysSizing(AirLoopNum).CoinHeatMassFlow);
-                SetupEMSActuator("Sizing:System",
+                SetupEMSActuator(state, "Sizing:System",
                                  FinalSysSizing(AirLoopNum).AirPriLoopName,
                                  "Main Supply Coincident Peak Heating Mass Flow Rate",
                                  "[kg/s]",
@@ -4660,7 +4660,7 @@ namespace SimAirServingZones {
                                          FinalSysSizing(AirLoopNum).AirPriLoopName,
                                          "[kg/s]",
                                          FinalSysSizing(AirLoopNum).NonCoinCoolMassFlow);
-                SetupEMSActuator("Sizing:System",
+                SetupEMSActuator(state, "Sizing:System",
                                  FinalSysSizing(AirLoopNum).AirPriLoopName,
                                  "Main Supply Noncoincident Peak Cooling Mass Flow Rate",
                                  "[kg/s]",
@@ -4670,7 +4670,7 @@ namespace SimAirServingZones {
                                          FinalSysSizing(AirLoopNum).AirPriLoopName,
                                          "[kg/s]",
                                          FinalSysSizing(AirLoopNum).NonCoinHeatMassFlow);
-                SetupEMSActuator("Sizing:System",
+                SetupEMSActuator(state, "Sizing:System",
                                  FinalSysSizing(AirLoopNum).AirPriLoopName,
                                  "Main Supply Noncoincident Peak Heating Mass Flow Rate",
                                  "[kg/s]",
@@ -4681,7 +4681,7 @@ namespace SimAirServingZones {
                                          FinalSysSizing(AirLoopNum).AirPriLoopName,
                                          "[m3/s]",
                                          FinalSysSizing(AirLoopNum).DesHeatVolFlow);
-                SetupEMSActuator("Sizing:System",
+                SetupEMSActuator(state, "Sizing:System",
                                  FinalSysSizing(AirLoopNum).AirPriLoopName,
                                  "Main Heating Volume Flow Rate",
                                  "[m3/s]",
@@ -4692,7 +4692,7 @@ namespace SimAirServingZones {
                                          FinalSysSizing(AirLoopNum).AirPriLoopName,
                                          "[m3/s]",
                                          FinalSysSizing(AirLoopNum).DesCoolVolFlow);
-                SetupEMSActuator("Sizing:System",
+                SetupEMSActuator(state, "Sizing:System",
                                  FinalSysSizing(AirLoopNum).AirPriLoopName,
                                  "Main Cooling Volume Flow Rate",
                                  "[m3/s]",

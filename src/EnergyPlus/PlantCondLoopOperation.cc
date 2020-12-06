@@ -55,7 +55,6 @@
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/Autosizing/Base.hh>
@@ -1693,7 +1692,6 @@ CurrentModuleObject, PlantOpSchemeName);
         // Using/Aliasing
         using namespace DataIPShortCuts;
         using namespace DataPlant;
-        using DataRuntimeLanguage::EMSProgramCallManager;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const Plant(1);     // Used to identify whether the current loop is Plant
@@ -1753,7 +1751,7 @@ CurrentModuleObject, PlantOpSchemeName);
                         PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).Name = cAlphaArgs(CompNum * 2 + 3);
 
                         // Setup EMS actuators for machines' MyLoad.
-                        SetupEMSActuator("Plant Equipment Operation",
+                        SetupEMSActuator(state, "Plant Equipment Operation",
                                          PlantLoop(LoopNum).OpScheme(SchemeNum).Name + ':' +
                                              PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).Name,
                                          "Distributed Load Rate",
@@ -1768,7 +1766,7 @@ CurrentModuleObject, PlantOpSchemeName);
                                                  PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).EMSIntVarRemainingLoadValue);
                     }
                 }
-                StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), EMSProgramCallManager);
+                StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataRuntimeLang->EMSProgramCallManager);
                 if (StackMngrNum > 0) { // found it
                     PlantLoop(LoopNum).OpScheme(SchemeNum).ErlSimProgramMngr = StackMngrNum;
                 } else {
@@ -1782,7 +1780,7 @@ CurrentModuleObject, PlantOpSchemeName);
                     }
                 }
                 if (!lAlphaFieldBlanks(3)) {
-                    StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(3), EMSProgramCallManager);
+                    StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(3), state.dataRuntimeLang->EMSProgramCallManager);
                     if (StackMngrNum > 0) { // found it
                         PlantLoop(LoopNum).OpScheme(SchemeNum).ErlInitProgramMngr = StackMngrNum;
                     } else {
@@ -3303,7 +3301,7 @@ CurrentModuleObject, PlantOpSchemeName);
     // Begin Plant EMS Control Routines
     //******************************************************************************
 
-    void SetupPlantEMSActuators()
+    void SetupPlantEMSActuators(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3333,12 +3331,12 @@ CurrentModuleObject, PlantOpSchemeName);
             ActuatorName = "Plant Loop Overall";
             UniqueIDName = PlantLoop(LoopNum).Name;
             ActuatorType = "On/Off Supervisory";
-            SetupEMSActuator(ActuatorName, UniqueIDName, ActuatorType, Units, PlantLoop(LoopNum).EMSCtrl, PlantLoop(LoopNum).EMSValue);
+            SetupEMSActuator(state, ActuatorName, UniqueIDName, ActuatorType, Units, PlantLoop(LoopNum).EMSCtrl, PlantLoop(LoopNum).EMSValue);
 
             ActuatorName = "Supply Side Half Loop";
             UniqueIDName = PlantLoop(LoopNum).Name;
             ActuatorType = "On/Off Supervisory";
-            SetupEMSActuator(ActuatorName,
+            SetupEMSActuator(state, ActuatorName,
                              UniqueIDName,
                              ActuatorType,
                              Units,
@@ -3348,7 +3346,7 @@ CurrentModuleObject, PlantOpSchemeName);
             ActuatorName = "Demand Side Half Loop";
             UniqueIDName = PlantLoop(LoopNum).Name;
             ActuatorType = "On/Off Supervisory";
-            SetupEMSActuator(ActuatorName,
+            SetupEMSActuator(state, ActuatorName,
                              UniqueIDName,
                              ActuatorType,
                              Units,
@@ -3361,7 +3359,7 @@ CurrentModuleObject, PlantOpSchemeName);
                         ActuatorName = "Supply Side Branch";
                         UniqueIDName = PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Name;
                         ActuatorType = "On/Off Supervisory";
-                        SetupEMSActuator(ActuatorName,
+                        SetupEMSActuator(state, ActuatorName,
                                          UniqueIDName,
                                          ActuatorType,
                                          Units,
@@ -3371,7 +3369,7 @@ CurrentModuleObject, PlantOpSchemeName);
                         ActuatorName = "Demand Side Branch";
                         UniqueIDName = PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Name;
                         ActuatorType = "On/Off Supervisory";
-                        SetupEMSActuator(ActuatorName,
+                        SetupEMSActuator(state, ActuatorName,
                                          UniqueIDName,
                                          ActuatorType,
                                          Units,
@@ -3383,7 +3381,7 @@ CurrentModuleObject, PlantOpSchemeName);
                                        ccSimPlantEquipTypes(PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).TypeOf_Num);
                         UniqueIDName = PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).Name;
                         ActuatorType = "On/Off Supervisory";
-                        SetupEMSActuator(ActuatorName,
+                        SetupEMSActuator(state, ActuatorName,
                                          UniqueIDName,
                                          ActuatorType,
                                          "[fraction]",

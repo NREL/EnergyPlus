@@ -1274,7 +1274,7 @@ namespace ScheduleManager {
             }
 
             if (state.dataGlobal->AnyEnergyManagementSystemInModel) { // setup constant schedules as actuators
-                SetupEMSActuator("Schedule:Year",
+                SetupEMSActuator(state, "Schedule:Year",
                                  Schedule(LoopIndex).Name,
                                  "Schedule Value",
                                  "[ ]",
@@ -1567,7 +1567,7 @@ namespace ScheduleManager {
             }
 
             if (state.dataGlobal->AnyEnergyManagementSystemInModel) { // setup constant schedules as actuators
-                SetupEMSActuator(
+                SetupEMSActuator(state,
                     "Schedule:Compact", Schedule(SchNum).Name, "Schedule Value", "[ ]", Schedule(SchNum).EMSActuatedOn, Schedule(SchNum).EMSValue);
             }
         }
@@ -1951,7 +1951,7 @@ namespace ScheduleManager {
             }
 
             if (state.dataGlobal->AnyEnergyManagementSystemInModel) { // setup constant schedules as actuators
-                SetupEMSActuator(
+                SetupEMSActuator(state,
                     "Schedule:File", Schedule(SchNum).Name, "Schedule Value", "[ ]", Schedule(SchNum).EMSActuatedOn, Schedule(SchNum).EMSValue);
             }
         }
@@ -2063,7 +2063,7 @@ namespace ScheduleManager {
             DaySchedule(AddDaySch).TSValue = Numbers(1);
 
             if (state.dataGlobal->AnyEnergyManagementSystemInModel) { // setup constant schedules as actuators
-                SetupEMSActuator(
+                SetupEMSActuator(state,
                     "Schedule:Constant", Schedule(SchNum).Name, "Schedule Value", "[ ]", Schedule(SchNum).EMSActuatedOn, Schedule(SchNum).EMSValue);
             }
         }

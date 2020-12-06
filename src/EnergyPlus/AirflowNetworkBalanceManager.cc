@@ -5182,7 +5182,7 @@ namespace AirflowNetworkBalanceManager {
                                     "Average",
                                     MultizoneSurfaceData(i).SurfName);
                 if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                    SetupEMSActuator("AirFlow Network Window/Door Opening",
+                    SetupEMSActuator(state, "AirFlow Network Window/Door Opening",
                                      MultizoneSurfaceData(i).SurfName,
                                      "Venting Opening Factor",
                                      "[Fraction]",

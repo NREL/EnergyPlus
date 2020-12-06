@@ -1170,13 +1170,13 @@ namespace Pumps {
 
             if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                 SetupEMSInternalVariable(state, "Pump Maximum Mass Flow Rate", PumpEquip(PumpNum).Name, "[kg/s]", PumpEquip(PumpNum).MassFlowRateMax);
-                SetupEMSActuator("Pump",
+                SetupEMSActuator(state, "Pump",
                                  PumpEquip(PumpNum).Name,
                                  "Pump Mass Flow Rate",
                                  "[kg/s]",
                                  PumpEquip(PumpNum).EMSMassFlowOverrideOn,
                                  PumpEquip(PumpNum).EMSMassFlowValue);
-                SetupEMSActuator("Pump",
+                SetupEMSActuator(state, "Pump",
                                  PumpEquip(PumpNum).Name,
                                  "Pump Pressure Rise",
                                  "[Pa]",

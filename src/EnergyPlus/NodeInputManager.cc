@@ -1169,19 +1169,19 @@ namespace NodeInputManager {
                         }
                     }
                 }
-                if (EMSManager::CheckIfNodeMoreInfoSensedByEMS(iNode, "System Node Wetbulb Temperature")) {
+                if (EMSManager::CheckIfNodeMoreInfoSensedByEMS(state, iNode, "System Node Wetbulb Temperature")) {
                     NodeWetBulbRepReq(iNode) = true;
                     NodeWetBulbSchedPtr(iNode) = 0;
                 }
-                if (EMSManager::CheckIfNodeMoreInfoSensedByEMS(iNode, "System Node Relative Humidity")) {
+                if (EMSManager::CheckIfNodeMoreInfoSensedByEMS(state, iNode, "System Node Relative Humidity")) {
                     NodeRelHumidityRepReq(iNode) = true;
                     NodeRelHumiditySchedPtr(iNode) = 0;
                 }
-                if (EMSManager::CheckIfNodeMoreInfoSensedByEMS(iNode, "System Node Dewpoint Temperature")) {
+                if (EMSManager::CheckIfNodeMoreInfoSensedByEMS(state, iNode, "System Node Dewpoint Temperature")) {
                     NodeDewPointRepReq(iNode) = true;
                     NodeDewPointSchedPtr(iNode) = 0;
                 }
-                if (EMSManager::CheckIfNodeMoreInfoSensedByEMS(iNode, "System Node Specific Heat")) {
+                if (EMSManager::CheckIfNodeMoreInfoSensedByEMS(state, iNode, "System Node Specific Heat")) {
                     NodeSpecificHeatRepReq(iNode) = true;
                     NodeSpecificHeatSchedPtr(iNode) = 0;
                 }

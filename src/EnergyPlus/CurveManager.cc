@@ -2224,7 +2224,7 @@ namespace CurveManager {
 
         if (state.dataGlobal->AnyEnergyManagementSystemInModel) { // provide hook for possible EMS control
             for (CurveIndex = 1; CurveIndex <= state.dataCurveManager->NumCurves; ++CurveIndex) {
-                SetupEMSActuator("Curve",
+                SetupEMSActuator(state, "Curve",
                                  state.dataCurveManager->PerfCurve(CurveIndex).Name,
                                  "Curve Result",
                                  "[unknown]",
@@ -2234,7 +2234,7 @@ namespace CurveManager {
         }
         if (state.dataGlobal->AnyEnergyManagementSystemInModel) { // provide hook for possible EMS control
             for (CurveIndex = 1; CurveIndex <= state.dataBranchAirLoopPlant->NumPressureCurves; ++CurveIndex) {
-                SetupEMSActuator("Curve",
+                SetupEMSActuator(state, "Curve",
                                  state.dataBranchAirLoopPlant->PressureCurve(CurveIndex).Name,
                                  "Curve Result",
                                  "[unknown]",

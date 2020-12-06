@@ -1001,8 +1001,8 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
     SetupOutputVariable(state, "Electric Load Center Requested Electricity Rate", OutputProcessor::Unit::W, totalPowerRequest_, "System", "Average", name_);
 
     if (state.dataGlobal->AnyEnergyManagementSystemInModel && storagePresent_) {
-        SetupEMSActuator("Electrical Storage", name_, "Power Draw Rate", "[W]", eMSOverridePelFromStorage_, eMSValuePelFromStorage_);
-        SetupEMSActuator("Electrical Storage", name_, "Power Charge Rate", "[W]", eMSOverridePelIntoStorage_, eMSValuePelIntoStorage_);
+        SetupEMSActuator(state, "Electrical Storage", name_, "Power Draw Rate", "[W]", eMSOverridePelFromStorage_, eMSValuePelFromStorage_);
+        SetupEMSActuator(state, "Electrical Storage", name_, "Power Charge Rate", "[W]", eMSOverridePelIntoStorage_, eMSValuePelIntoStorage_);
     }
 
     if (errorsFound) {
@@ -2078,7 +2078,7 @@ GeneratorController::GeneratorController(EnergyPlusData &state,
     if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
         SetupEMSInternalVariable(state, "Generator Nominal Maximum Power", objectName, "[W]", maxPowerOut);
         SetupEMSInternalVariable(state, "Generator Nominal Thermal To Electric Ratio", objectName, "[ratio]", nominalThermElectRatio);
-        SetupEMSActuator("On-Site Generator Control", objectName, "Requested Power", "[W]", eMSRequestOn, eMSPowerRequest);
+        SetupEMSActuator(state, "On-Site Generator Control", objectName, "Requested Power", "[W]", eMSRequestOn, eMSPowerRequest);
     }
 }
 

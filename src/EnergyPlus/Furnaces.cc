@@ -4536,7 +4536,7 @@ namespace Furnaces {
                                 "Average",
                                 Furnace(FurnaceNum).Name);
             if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                SetupEMSActuator("AirLoopHVAC:Unitary:Furnace:HeatOnly",
+                SetupEMSActuator(state, "AirLoopHVAC:Unitary:Furnace:HeatOnly",
                                  Furnace(FurnaceNum).Name,
                                  "Autosized Supply Air Flow Rate",
                                  "[m3/s]",
@@ -4555,7 +4555,7 @@ namespace Furnaces {
                                 "Average",
                                 Furnace(FurnaceNum).Name);
             if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                SetupEMSActuator("AirLoopHVAC:UnitaryHeatOnly",
+                SetupEMSActuator(state, "AirLoopHVAC:UnitaryHeatOnly",
                                  Furnace(FurnaceNum).Name,
                                  "Autosized Supply Air Flow Rate",
                                  "[m3/s]",
@@ -4581,25 +4581,25 @@ namespace Furnaces {
                                 Furnace(FurnaceNum).Name);
 
             if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                SetupEMSActuator("AirLoopHVAC:Unitary:Furnace:HeatCool",
+                SetupEMSActuator(state, "AirLoopHVAC:Unitary:Furnace:HeatCool",
                                  Furnace(FurnaceNum).Name,
                                  "Autosized Supply Air Flow Rate",
                                  "[m3/s]",
                                  Furnace(FurnaceNum).DesignFanVolFlowRateEMSOverrideOn,
                                  Furnace(FurnaceNum).DesignFanVolFlowRateEMSOverrideValue);
-                SetupEMSActuator("AirLoopHVAC:Unitary:Furnace:HeatCool",
+                SetupEMSActuator(state, "AirLoopHVAC:Unitary:Furnace:HeatCool",
                                  Furnace(FurnaceNum).Name,
                                  "Autosized Supply Air Flow Rate During Cooling Operation",
                                  "[m3/s]",
                                  Furnace(FurnaceNum).MaxCoolAirVolFlowEMSOverrideOn,
                                  Furnace(FurnaceNum).MaxCoolAirVolFlowEMSOverrideValue);
-                SetupEMSActuator("AirLoopHVAC:Unitary:Furnace:HeatCool",
+                SetupEMSActuator(state, "AirLoopHVAC:Unitary:Furnace:HeatCool",
                                  Furnace(FurnaceNum).Name,
                                  "Autosized Supply Air Flow Rate During Heating Operation",
                                  "[m3/s]",
                                  Furnace(FurnaceNum).MaxHeatAirVolFlowEMSOverrideOn,
                                  Furnace(FurnaceNum).MaxHeatAirVolFlowEMSOverrideValue);
-                SetupEMSActuator("AirLoopHVAC:Unitary:Furnace:HeatCool",
+                SetupEMSActuator(state, "AirLoopHVAC:Unitary:Furnace:HeatCool",
                                  Furnace(FurnaceNum).Name,
                                  "Autosized Supply Air Flow Rate During No Heating or Cooling Operation",
                                  "[m3/s]",
@@ -4626,25 +4626,25 @@ namespace Furnaces {
                                 "Average",
                                 Furnace(FurnaceNum).Name);
             if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                SetupEMSActuator("AirLoopHVAC:UnitaryHeatCool",
+                SetupEMSActuator(state, "AirLoopHVAC:UnitaryHeatCool",
                                  Furnace(FurnaceNum).Name,
                                  "Autosized Supply Air Flow Rate",
                                  "[m3/s]",
                                  Furnace(FurnaceNum).DesignFanVolFlowRateEMSOverrideOn,
                                  Furnace(FurnaceNum).DesignFanVolFlowRateEMSOverrideValue);
-                SetupEMSActuator("AirLoopHVAC:UnitaryHeatCool",
+                SetupEMSActuator(state, "AirLoopHVAC:UnitaryHeatCool",
                                  Furnace(FurnaceNum).Name,
                                  "Autosized Supply Air Flow Rate During Cooling Operation",
                                  "[m3/s]",
                                  Furnace(FurnaceNum).MaxCoolAirVolFlowEMSOverrideOn,
                                  Furnace(FurnaceNum).MaxCoolAirVolFlowEMSOverrideValue);
-                SetupEMSActuator("AirLoopHVAC:UnitaryHeatCool",
+                SetupEMSActuator(state, "AirLoopHVAC:UnitaryHeatCool",
                                  Furnace(FurnaceNum).Name,
                                  "Autosized Supply Air Flow Rate During Heating Operation",
                                  "[m3/s]",
                                  Furnace(FurnaceNum).MaxHeatAirVolFlowEMSOverrideOn,
                                  Furnace(FurnaceNum).MaxHeatAirVolFlowEMSOverrideValue);
-                SetupEMSActuator("AirLoopHVAC:UnitaryHeatCool",
+                SetupEMSActuator(state, "AirLoopHVAC:UnitaryHeatCool",
                                  Furnace(FurnaceNum).Name,
                                  "Autosized Supply Air Flow Rate During No Heating or Cooling Operation",
                                  "[m3/s]",
@@ -4678,7 +4678,7 @@ namespace Furnaces {
                                 Furnace(FurnaceNum).Name);
 
             if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                SetupEMSActuator("AirLoopHVAC:UnitaryHeatPump:AirToAir",
+                SetupEMSActuator(state, "AirLoopHVAC:UnitaryHeatPump:AirToAir",
                                  Furnace(FurnaceNum).Name,
                                  "Autosized Supply Air Flow Rate",
                                  "[m3/s]",
@@ -4729,7 +4729,7 @@ namespace Furnaces {
                                 Furnace(FurnaceNum).Name);
 
             if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                SetupEMSActuator("AirLoopHVAC:UnitaryHeatPump:WaterToAir",
+                SetupEMSActuator(state, "AirLoopHVAC:UnitaryHeatPump:WaterToAir",
                                  Furnace(FurnaceNum).Name,
                                  "Autosized Supply Air Flow Rate",
                                  "[m3/s]",
@@ -4744,13 +4744,13 @@ namespace Furnaces {
                     "Unitary HVAC Design Heating Capacity", Furnace(FurnaceNum).Name, "[W]", Furnace(FurnaceNum).DesignHeatingCapacity);
                 SetupEMSInternalVariable(state,
                     "Unitary HVAC Design Cooling Capacity", Furnace(FurnaceNum).Name, "[W]", Furnace(FurnaceNum).DesignCoolingCapacity);
-                SetupEMSActuator("Unitary HVAC",
+                SetupEMSActuator(state, "Unitary HVAC",
                                  Furnace(FurnaceNum).Name,
                                  "Sensible Load Request",
                                  "[W]",
                                  Furnace(FurnaceNum).EMSOverrideSensZoneLoadRequest,
                                  Furnace(FurnaceNum).EMSSensibleZoneLoadValue);
-                SetupEMSActuator("Unitary HVAC",
+                SetupEMSActuator(state, "Unitary HVAC",
                                  Furnace(FurnaceNum).Name,
                                  "Moisture Load Request",
                                  "[W]",

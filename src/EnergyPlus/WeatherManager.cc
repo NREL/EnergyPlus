@@ -474,43 +474,43 @@ namespace WeatherManager {
                 "Site Mains Water Temperature", OutputProcessor::Unit::C, state.dataEnvrn->WaterMainsTemp, "Zone", "Average", "Environment");
 
             if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                SetupEMSActuator("Weather Data",
+                SetupEMSActuator(state, "Weather Data",
                                  "Environment",
                                  "Outdoor Dry Bulb",
                                  "[C]",
                                  state.dataEnvrn->EMSOutDryBulbOverrideOn,
                                  state.dataEnvrn->EMSOutDryBulbOverrideValue);
-                SetupEMSActuator("Weather Data",
+                SetupEMSActuator(state, "Weather Data",
                                  "Environment",
                                  "Outdoor Dew Point",
                                  "[C]",
                                  state.dataEnvrn->EMSOutDewPointTempOverrideOn,
                                  state.dataEnvrn->EMSOutDewPointTempOverrideValue);
-                SetupEMSActuator("Weather Data",
+                SetupEMSActuator(state, "Weather Data",
                                  "Environment",
                                  "Outdoor Relative Humidity",
                                  "[%]",
                                  state.dataEnvrn->EMSOutRelHumOverrideOn,
                                  state.dataEnvrn->EMSOutRelHumOverrideValue);
-                SetupEMSActuator("Weather Data",
+                SetupEMSActuator(state, "Weather Data",
                                  "Environment",
                                  "Diffuse Solar",
                                  "[W/m2]",
                                  state.dataEnvrn->EMSDifSolarRadOverrideOn,
                                  state.dataEnvrn->EMSDifSolarRadOverrideValue);
-                SetupEMSActuator("Weather Data",
+                SetupEMSActuator(state, "Weather Data",
                                  "Environment",
                                  "Direct Solar",
                                  "[W/m2]",
                                  state.dataEnvrn->EMSBeamSolarRadOverrideOn,
                                  state.dataEnvrn->EMSBeamSolarRadOverrideValue);
-                SetupEMSActuator("Weather Data",
+                SetupEMSActuator(state, "Weather Data",
                                  "Environment",
                                  "Wind Speed",
                                  "[m/s]",
                                  state.dataEnvrn->EMSWindSpeedOverrideOn,
                                  state.dataEnvrn->EMSWindSpeedOverrideValue);
-                SetupEMSActuator("Weather Data",
+                SetupEMSActuator(state, "Weather Data",
                                  "Environment",
                                  "Wind Direction",
                                  "[deg]",

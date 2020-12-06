@@ -222,7 +222,7 @@ namespace PlantCondLoopOperation {
     // Begin Plant EMS Control Routines
     //******************************************************************************
 
-    void SetupPlantEMSActuators();
+    void SetupPlantEMSActuators(EnergyPlusData &state);
 
     void ActivateEMSControls(EnergyPlusData &state, int const LoopNum, int const LoopSideNum, int const BranchNum, int const CompNum, bool &LoopShutDownFlag);
 

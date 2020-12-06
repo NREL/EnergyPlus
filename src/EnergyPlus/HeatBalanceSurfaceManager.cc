@@ -4391,8 +4391,6 @@ namespace HeatBalanceSurfaceManager {
         // na
 
         // Using/Aliasing
-        using DataRuntimeLanguage::EMSConstructActuatorChecked;
-        using DataRuntimeLanguage::EMSConstructActuatorIsOkay;
         using HeatBalFiniteDiffManager::ConstructFD;
 
         // Locals
@@ -4421,26 +4419,26 @@ namespace HeatBalanceSurfaceManager {
             if (Surface(SurfNum).EMSConstructionOverrideON && (Surface(SurfNum).EMSConstructionOverrideValue > 0)) {
 
                 if (state.dataConstruction->Construct(Surface(SurfNum).EMSConstructionOverrideValue).TypeIsWindow) { // okay, allways allow windows
-                    EMSConstructActuatorChecked(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum) = true;
-                    EMSConstructActuatorIsOkay(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum) = true;
+                    state.dataRuntimeLang->EMSConstructActuatorChecked(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum) = true;
+                    state.dataRuntimeLang->EMSConstructActuatorIsOkay(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum) = true;
                 }
 
-                if ((EMSConstructActuatorChecked(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum)) &&
-                    (EMSConstructActuatorIsOkay(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum))) {
+                if ((state.dataRuntimeLang->EMSConstructActuatorChecked(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum)) &&
+                    (state.dataRuntimeLang->EMSConstructActuatorIsOkay(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum))) {
 
                     Surface(SurfNum).Construction = Surface(SurfNum).EMSConstructionOverrideValue;
                     state.dataConstruction->Construct(Surface(SurfNum).Construction).IsUsed = true;
 
                 } else { // have not checked yet or is not okay, so see if we need to warn about incompatible
-                    if (!EMSConstructActuatorChecked(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum)) {
+                    if (!state.dataRuntimeLang->EMSConstructActuatorChecked(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum)) {
                         // check if constructions appear compatible
 
                         if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CTF ||
                             Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_EMPD) {
                             // compare old construction to new construction and see if terms match
                             // set as okay and turn false if find a big problem
-                            EMSConstructActuatorIsOkay(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum) = true;
-                            EMSConstructActuatorChecked(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum) = true;
+                            state.dataRuntimeLang->EMSConstructActuatorIsOkay(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum) = true;
+                            state.dataRuntimeLang->EMSConstructActuatorChecked(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum) = true;
                             if (state.dataConstruction->Construct(Surface(SurfNum).Construction).NumHistories !=
                                 state.dataConstruction->Construct(Surface(SurfNum).EMSConstructionOverrideValue).NumHistories) {
                                 // thow warning, but allow
@@ -4489,17 +4487,17 @@ namespace HeatBalanceSurfaceManager {
                                     ShowContinueError(state, "This actuator is not allowed for surface name = " + Surface(SurfNum).Name +
                                                       ", and the simulation continues without the override");
 
-                                    EMSConstructActuatorIsOkay(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum) = false;
+                                    state.dataRuntimeLang->EMSConstructActuatorIsOkay(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum) = false;
                                 }
                             }
 
-                            if (EMSConstructActuatorIsOkay(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum)) {
+                            if (state.dataRuntimeLang->EMSConstructActuatorIsOkay(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum)) {
                                 Surface(SurfNum).Construction = Surface(SurfNum).EMSConstructionOverrideValue;
                             }
 
                         } else if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CondFD) {
-                            EMSConstructActuatorIsOkay(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum) = true;
-                            EMSConstructActuatorChecked(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum) = true;
+                            state.dataRuntimeLang->EMSConstructActuatorIsOkay(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum) = true;
+                            state.dataRuntimeLang->EMSConstructActuatorChecked(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum) = true;
                             if (ConstructFD(Surface(SurfNum).Construction).TotNodes !=
                                 ConstructFD(Surface(SurfNum).EMSConstructionOverrideValue).TotNodes) {
                                 // thow warning, and do not allow
@@ -4515,7 +4513,7 @@ namespace HeatBalanceSurfaceManager {
                                 ShowContinueError(state, "This actuator is not allowed for surface name = " + Surface(SurfNum).Name +
                                                   ", and the simulation continues without the override");
 
-                                EMSConstructActuatorIsOkay(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum) = false;
+                                state.dataRuntimeLang->EMSConstructActuatorIsOkay(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum) = false;
                             }
 
                             if (state.dataConstruction->Construct(Surface(SurfNum).Construction).SourceSinkPresent) {
@@ -4530,11 +4528,11 @@ namespace HeatBalanceSurfaceManager {
                                     ShowContinueError(state, "This actuator is not allowed for surface name = " + Surface(SurfNum).Name +
                                                       ", and the simulation continues without the override");
 
-                                    EMSConstructActuatorIsOkay(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum) = false;
+                                    state.dataRuntimeLang->EMSConstructActuatorIsOkay(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum) = false;
                                 }
                             }
 
-                            if (EMSConstructActuatorIsOkay(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum)) {
+                            if (state.dataRuntimeLang->EMSConstructActuatorIsOkay(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum)) {
                                 Surface(SurfNum).Construction = Surface(SurfNum).EMSConstructionOverrideValue;
                             }
 
@@ -4543,16 +4541,16 @@ namespace HeatBalanceSurfaceManager {
                                             "algorithm CombinedHeatAndMoistureFiniteElement.");
                             ShowContinueError(state, "This actuator is not allowed for surface name = " + Surface(SurfNum).Name +
                                               ", and the simulation continues without the override");
-                            EMSConstructActuatorChecked(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum) = true;
-                            EMSConstructActuatorIsOkay(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum) = false;
+                            state.dataRuntimeLang->EMSConstructActuatorChecked(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum) = true;
+                            state.dataRuntimeLang->EMSConstructActuatorIsOkay(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum) = false;
 
                         } else if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_Kiva) { // don't allow
                             ShowSevereError(state, "InitEMSControlledConstructions: EMS Construction State Actuator not available for Surfaces with "
                                             "Foundation Outside Boundary Condition.");
                             ShowContinueError(state, "This actuator is not allowed for surface name = " + Surface(SurfNum).Name +
                                               ", and the simulation continues without the override");
-                            EMSConstructActuatorChecked(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum) = true;
-                            EMSConstructActuatorIsOkay(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum) = false;
+                            state.dataRuntimeLang->EMSConstructActuatorChecked(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum) = true;
+                            state.dataRuntimeLang->EMSConstructActuatorIsOkay(Surface(SurfNum).EMSConstructionOverrideValue, SurfNum) = false;
                         }
 
                     } else {
