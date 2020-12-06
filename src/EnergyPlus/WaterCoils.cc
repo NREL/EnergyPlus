@@ -154,10 +154,6 @@ namespace WaterCoils {
     using Psychrometrics::PsyWFnTdpPb;
     using Psychrometrics::PsyRhFnTdbWPb;
     using namespace ScheduleManager;
-    using DataEnvironment::OutDryBulbTemp;
-    using DataEnvironment::OutEnthalpy;
-    using DataEnvironment::OutHumRat;
-    using DataEnvironment::OutWetBulbTemp;
     
     // Data
     // PRIVATE ! Everything private unless explicitly made public
@@ -2306,7 +2302,7 @@ namespace WaterCoils {
             state.dataWaterCoils->WaterCoil(CoilNum).InletAirEnthalpy =
                 PsyHFnTdbW(state.dataWaterCoils->WaterCoil(CoilNum).InletAirTemp, state.dataWaterCoils->WaterCoil(CoilNum).InletAirHumRat);
             state.dataWaterCoils->WaterCoil(CoilNum).InletWaterMassFlowRate = state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterMassFlowRate;
-            state.dataWaterCoils->WaterCoil(CoilNum).InletAirMassFlowRate = StdRhoAir * state.dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate;
+            state.dataWaterCoils->WaterCoil(CoilNum).InletAirMassFlowRate = state.dataEnvrn->StdRhoAir * state.dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate;
             CapacitanceAir =
                 state.dataWaterCoils->WaterCoil(CoilNum).InletAirMassFlowRate * PsyCpAirFnW(state.dataWaterCoils->WaterCoil(CoilNum).InletAirHumRat);
 
@@ -4550,8 +4546,8 @@ namespace WaterCoils {
                     SolnTempIn = state.dataWaterCoils->WaterCoil(CoilNum).InletWaterTemp;                 //(65.395-32)*5/9.0;
                     SolnConcIn = state.dataWaterCoils->WaterCoil(CoilNum).DesInletSolnConcentration;      // 0.2768;
                     AirMassFlowRateIn = state.dataWaterCoils->WaterCoil(CoilNum).InletAirMassFlowRate;    // 0.000125997881 * 2251.74;
-                    AirTempIn = OutDryBulbTemp;  // state.dataWaterCoils->WaterCoil(CoilNum).InletAirTemp;      //(57.0-32)*5.0/9.0;
-                    AirHumRat = OutHumRat;       // state.dataWaterCoils->WaterCoil(CoilNum).InletAirHumRat;        // 0.007889;
+                    AirTempIn = state.dataEnvrn->OutDryBulbTemp; // state.dataWaterCoils->WaterCoil(CoilNum).InletAirTemp;      //(57.0-32)*5.0/9.0;
+                    AirHumRat = state.dataEnvrn->OutHumRat;      // state.dataWaterCoils->WaterCoil(CoilNum).InletAirHumRat;        // 0.007889;
                     Coeff_HdAvVt = state.dataWaterCoils->WaterCoil(CoilNum).HdAvVt;                       // 1.5 * AirMassFlowRateIn;
                     LewisNum = 1.0;
                     /*
@@ -4683,7 +4679,7 @@ namespace WaterCoils {
 
         // new varibales
         int MatlOfLiqDesiccant = state.dataWaterCoils->WaterCoil(CoilNum).MatlLiqDesiccant;
-        Real64 Patm =  OutBaroPress;
+        Real64 Patm = state.dataEnvrn->OutBaroPress;
        
         Real64 HdAvVt = Coeff_HdAvVt;
 
@@ -5665,7 +5661,7 @@ namespace WaterCoils {
     {
         int MatlOfLiqDesiccant = 1; 
         // new varibales
-        Real64 Patm = OutBaroPress;
+        Real64 Patm = state.dataEnvrn->OutBaroPress;
         // Output Varibles
         Real64 mso, Xso, Tso;
 

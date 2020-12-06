@@ -1713,7 +1713,6 @@ namespace IntegratedHeatPump {
         using EvaporativeCoolers::SimEvapCooler; 
         using WaterCoils::SimulateWaterCoilComponents;
         using Psychrometrics::PsyTwbFnTdbWPb;
-        using DataEnvironment::OutDryBulbTemp;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int DXCoilNum(0); // The IHP No that you are currently dealing with
@@ -6356,7 +6355,6 @@ namespace IntegratedHeatPump {
         // it should be called by an air loop parent object, when FirstHVACIteration == true
 
         // Using/Aliasing
-        using DataEnvironment::OutDryBulbTemp;
         using DataHVACGlobals::SmallLoad;
         using DataHVACGlobals::TimeStepSys;
         using VariableSpeedCoils::IsGridResponsiveMode;
@@ -6534,7 +6532,8 @@ namespace IntegratedHeatPump {
                 IntegratedHeatPumps(DXCoilNum).CurMode = IHPOperationMode::SCMode;
             } else if (SensLoad > SmallLoad) {
                 if ((IntegratedHeatPumps(DXCoilNum).ControlledZoneTemp > IntegratedHeatPumps(DXCoilNum).TindoorOverCoolAllow) &&
-                    (OutDryBulbTemp > IntegratedHeatPumps(DXCoilNum).TambientOverCoolAllow)) // used for cooling season, avoid heating after SCWH mode
+                    (state.dataEnvrn->OutDryBulbTemp >
+                     IntegratedHeatPumps(DXCoilNum).TambientOverCoolAllow)) // used for cooling season, avoid heating after SCWH mode
                     IntegratedHeatPumps(DXCoilNum).CurMode = IHPOperationMode::IdleMode;
                 else
                     IntegratedHeatPumps(DXCoilNum).CurMode = IHPOperationMode::SHMode;
@@ -6584,12 +6583,13 @@ namespace IntegratedHeatPump {
                     };
 
                 } else if ((IntegratedHeatPumps(DXCoilNum).ControlledZoneTemp > IntegratedHeatPumps(DXCoilNum).TindoorOverCoolAllow) &&
-                           (OutDryBulbTemp > IntegratedHeatPumps(DXCoilNum).TambientOverCoolAllow)) // over-cooling allowed, water heating priority
+                           (state.dataEnvrn->OutDryBulbTemp >
+                            IntegratedHeatPumps(DXCoilNum).TambientOverCoolAllow)) // over-cooling allowed, water heating priority
                 {
                     IntegratedHeatPumps(DXCoilNum).CurMode = IHPOperationMode::SCWHMatchWHMode;
                     if (IntegratedHeatPumps(DXCoilNum).SCWHCoilIndex == 0) IntegratedHeatPumps(DXCoilNum).CurMode = IHPOperationMode::DWHMode;
                 } else if ((IntegratedHeatPumps(DXCoilNum).ControlledZoneTemp > IntegratedHeatPumps(DXCoilNum).TindoorWHHighPriority) &&
-                           (OutDryBulbTemp > IntegratedHeatPumps(DXCoilNum).TambientWHHighPriority)) // ignore space heating request
+                           (state.dataEnvrn->OutDryBulbTemp > IntegratedHeatPumps(DXCoilNum).TambientWHHighPriority)) // ignore space heating request
                 {
                     IntegratedHeatPumps(DXCoilNum).CurMode = IHPOperationMode::DWHMode;
                 } else if ((SensLoad > SmallLoad) && (IntegratedHeatPumps(DXCoilNum).SHDWHHeatCoilIndex != 0)) {
