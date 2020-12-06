@@ -1111,7 +1111,14 @@ namespace VariableSpeedCoils {
             if (lAlphaBlanks(10)) {
                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).GridScheduleIndex = 0;
             } else {
-                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).GridScheduleIndex = GetScheduleIndex(state, AlphArray(10));
+                if (UtilityRoutines::SameString(AlphArray(10), "ODTEMP") )
+                    state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).GridScheduleIndex = -1; 
+                else if (UtilityRoutines::SameString(AlphArray(10), "ODRH"))
+                    state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).GridScheduleIndex = -2; 
+                else if (UtilityRoutines::SameString(AlphArray(10), "ODHUM"))
+                    state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).GridScheduleIndex = -3; 
+                else 
+                    state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).GridScheduleIndex = GetScheduleIndex(state, AlphArray(10));
                 if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).GridScheduleIndex == 0) {
                     ShowSevereError(state,
                                     RoutineName + CurrentModuleObject + "=\"" + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name +
@@ -2029,7 +2036,15 @@ namespace VariableSpeedCoils {
             if (lAlphaBlanks(8)) {
                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).GridScheduleIndex = 0;
             } else {
-                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).GridScheduleIndex = GetScheduleIndex(state, AlphArray(8));
+
+                if (UtilityRoutines::SameString(AlphArray(8), "ODTEMP"))
+                    state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).GridScheduleIndex = -1;
+                else if (UtilityRoutines::SameString(AlphArray(8), "ODRH"))
+                    state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).GridScheduleIndex = -2;
+                else if (UtilityRoutines::SameString(AlphArray(8), "ODHUM"))
+                    state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).GridScheduleIndex = -3;
+                else 
+                    state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).GridScheduleIndex = GetScheduleIndex(state, AlphArray(8));
                 if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).GridScheduleIndex == 0) {
                     ShowSevereError(state,
                                     RoutineName + CurrentModuleObject + "=\"" + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name +
@@ -2519,7 +2534,14 @@ namespace VariableSpeedCoils {
             if (lAlphaBlanks(11)) {
                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).GridScheduleIndex = 0;
             } else {
-                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).GridScheduleIndex = GetScheduleIndex(state, AlphArray(11));
+                if (UtilityRoutines::SameString(AlphArray(11), "ODTEMP"))
+                    state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).GridScheduleIndex = -1;
+                else if (UtilityRoutines::SameString(AlphArray(11), "ODRH"))
+                    state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).GridScheduleIndex = -2;
+                else if (UtilityRoutines::SameString(AlphArray(11), "ODHUM"))
+                    state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).GridScheduleIndex = -3;
+                else 
+                    state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).GridScheduleIndex = GetScheduleIndex(state, AlphArray(11));
                 if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).GridScheduleIndex == 0) {
                     ShowSevereError(state,
                                     RoutineName + CurrentModuleObject + "=\"" + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name +
@@ -3058,7 +3080,14 @@ namespace VariableSpeedCoils {
             if (lAlphaBlanks(7)) {
                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).GridScheduleIndex = 0;
             } else {
-                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).GridScheduleIndex = GetScheduleIndex(state, AlphArray(7));
+                if (UtilityRoutines::SameString(AlphArray(7), "ODTEMP"))
+                    state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).GridScheduleIndex = -1;
+                else if (UtilityRoutines::SameString(AlphArray(7), "ODRH"))
+                    state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).GridScheduleIndex = -2;
+                else if (UtilityRoutines::SameString(AlphArray(7), "ODHUM"))
+                    state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).GridScheduleIndex = -3;
+                else 
+                    state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).GridScheduleIndex = GetScheduleIndex(state, AlphArray(7));
                 if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).GridScheduleIndex == 0) {
                     ShowSevereError(state,
                                     RoutineName + CurrentModuleObject + "=\"" + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name +
@@ -8983,10 +9012,19 @@ namespace VariableSpeedCoils {
         //      check the maximum allow speed to drive air flow rate in the air loop
 
         int MinSpeed = SpeedInput;
+        double dGridSignal = 0.0; 
 
         if (CompIndex > 0) {
-            if (state.dataVariableSpeedCoils->VarSpeedCoil(CompIndex).GridScheduleIndex > 0) {
-                const double dGridSignal = GetCurrentScheduleValue(state, state.dataVariableSpeedCoils->VarSpeedCoil(CompIndex).GridScheduleIndex);
+            if ((state.dataVariableSpeedCoils->VarSpeedCoil(CompIndex).GridScheduleIndex >= -3) &&
+                (state.dataVariableSpeedCoils->VarSpeedCoil(CompIndex).GridScheduleIndex != 0)) {
+                if (state.dataVariableSpeedCoils->VarSpeedCoil(CompIndex).GridScheduleIndex == -1)
+                    dGridSignal = DataEnvironment::OutDryBulbTemp; 
+                else if (state.dataVariableSpeedCoils->VarSpeedCoil(CompIndex).GridScheduleIndex == -2)
+                    dGridSignal = DataEnvironment::OutRelHum; 
+                else if (state.dataVariableSpeedCoils->VarSpeedCoil(CompIndex).GridScheduleIndex == -3)
+                    dGridSignal = DataEnvironment::OutHumRat; 
+                else
+                 dGridSignal = GetCurrentScheduleValue(state, state.dataVariableSpeedCoils->VarSpeedCoil(CompIndex).GridScheduleIndex);
 
                 if ((dGridSignal >= state.dataVariableSpeedCoils->VarSpeedCoil(CompIndex).GridLowBound) &&
                     (dGridSignal <= state.dataVariableSpeedCoils->VarSpeedCoil(CompIndex).GridHighBound)) {
@@ -9011,9 +9049,19 @@ namespace VariableSpeedCoils {
         //      check the maximum allow speed to drive air flow rate in the air loop
 
         int iMode = state.dataVariableSpeedCoils->GRID_SENLAT;
+        double dGridSignal = 0.0; 
+
         if (CompIndex > 0) {
-            if (state.dataVariableSpeedCoils->VarSpeedCoil(CompIndex).GridScheduleIndex > 0) {
-                const double dGridSignal = GetCurrentScheduleValue(state, state.dataVariableSpeedCoils->VarSpeedCoil(CompIndex).GridScheduleIndex);
+            if ((state.dataVariableSpeedCoils->VarSpeedCoil(CompIndex).GridScheduleIndex >= -3) &&
+                (state.dataVariableSpeedCoils->VarSpeedCoil(CompIndex).GridScheduleIndex != 0)) {
+                if (state.dataVariableSpeedCoils->VarSpeedCoil(CompIndex).GridScheduleIndex == -1)
+                    dGridSignal = DataEnvironment::OutDryBulbTemp;
+                else if (state.dataVariableSpeedCoils->VarSpeedCoil(CompIndex).GridScheduleIndex == -2)
+                    dGridSignal = DataEnvironment::OutRelHum;
+                else if (state.dataVariableSpeedCoils->VarSpeedCoil(CompIndex).GridScheduleIndex == -3)
+                    dGridSignal = DataEnvironment::OutHumRat;
+                else
+                    dGridSignal = GetCurrentScheduleValue(state, state.dataVariableSpeedCoils->VarSpeedCoil(CompIndex).GridScheduleIndex);
 
                 if ((dGridSignal >= state.dataVariableSpeedCoils->VarSpeedCoil(CompIndex).GridLowBound) &&
                     (dGridSignal <= state.dataVariableSpeedCoils->VarSpeedCoil(CompIndex).GridHighBound)) {
@@ -9524,10 +9572,19 @@ namespace VariableSpeedCoils {
     bool IsGridResponsiveMode(EnergyPlusData &state, int const DXCoilNum)
     {
         bool bIsGridResponse = false; 
+        double dGridSignal = 0.0; 
 
         if (DXCoilNum > 0) {
-            if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).GridScheduleIndex > 0) {
-                const double dGridSignal = GetCurrentScheduleValue(state, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).GridScheduleIndex);
+            if ((state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).GridScheduleIndex >= -3) &&
+                (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).GridScheduleIndex != 0)) {
+                if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).GridScheduleIndex == -1)
+                    dGridSignal = DataEnvironment::OutDryBulbTemp;
+                else if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).GridScheduleIndex == -2)
+                    dGridSignal = DataEnvironment::OutRelHum;
+                else if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).GridScheduleIndex == -3)
+                    dGridSignal = DataEnvironment::OutHumRat;
+                else
+                    dGridSignal = GetCurrentScheduleValue(state, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).GridScheduleIndex);
 
                 if ((dGridSignal >= state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).GridLowBound) &&
                     (dGridSignal <= state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).GridHighBound)) {

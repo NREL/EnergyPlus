@@ -479,6 +479,15 @@ namespace HVACDXHeatPumpSystem {
                 ErrorsFound = true;
             }
 
+            if (DXHeatPumpSystem(DXHeatSysNum).IHPIndex != 0)
+                SetUpCompSets(state,
+                              DXHeatPumpSystem(DXHeatSysNum).DXHeatPumpSystemType,
+                              DXHeatPumpSystem(DXHeatSysNum).Name,
+                              DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilType,
+                              DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilName + " Heating Coil",
+                              NodeID(DXHeatPumpSystem(DXHeatSysNum).DXHeatPumpCoilInletNodeNum),
+                              NodeID(DXHeatPumpSystem(DXHeatSysNum).DXHeatPumpCoilOutletNodeNum));
+            else 
             SetUpCompSets(state, DXHeatPumpSystem(DXHeatSysNum).DXHeatPumpSystemType,
                           DXHeatPumpSystem(DXHeatSysNum).Name,
                           DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilType,

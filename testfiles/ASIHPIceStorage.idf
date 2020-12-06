@@ -165,9 +165,9 @@
     Temperature,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: Weekdays SummerDesignDay, !- Field 2
-    Until: 09:00,7.2,       !- Field 3
+    Until: 09:00,7.22,       !- Field 3, 7.22
     Until: 22:00,7.22,       !- Field 5
-    Until: 24:00,7.2,       !- Field 7
+    Until: 24:00,7.22,       !- Field 7
     For: AllOtherDays,       !- Field 9
     Until: 24:00,7.22;       !- Field 10
 	
@@ -196,7 +196,7 @@
     CW Supply Outlet Node;    !- Component 2 Outlet Node Name
 	
   Pump:ConstantSpeed,
-    CW Circ Pump,            !- Name
+    CW Circ Pump,            !- Name, Pump:ConstantSpeed
     CW Supply Inlet Node,    !- Inlet Node Name
     Ice Tank Inlet Node,     !- Outlet Node Name
     autosize,                !- Design Flow Rate {m3/s}
@@ -204,7 +204,7 @@
     autosize,                !- Design Power Consumption {W}
     0.9,                     !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
-    Intermittent;              !- Pump Control Type, CONTINUOUS
+    Intermittent;              !- Pump Control Type, CONTINUOUS, Intermittent
 	
   ThermalStorage:Ice:Detailed,
     Ice Tank,                !- Name
@@ -3137,6 +3137,8 @@
 
   Output:Variable,*,Integrated Heat Pump COP,timestep;
   
+  Output:Variable,*,Integrated Heat Pump Supplemental Cooling Capacity,timestep;
+  
   Output:Variable,*,Ice Thermal Storage Cooling Rate,timestep; !- HVAC Average [W]
   
   Output:Variable,*,Ice Thermal Storage End Fraction,timestep; !- HVAC Average []
@@ -3148,6 +3150,13 @@
  Output:Variable,*,Ice Thermal Storage Fluid Inlet Temperature,timestep; !- HVAC Average [C]
  Output:Variable,*,Ice Thermal Storage Blended Outlet Temperature,timestep; !- HVAC Average [C]
  Output:Variable,*,Ice Thermal Storage Tank Outlet Temperature,timestep; !- HVAC Average [C]
+ 
+ Output:Variable,*,Ice Thermal Storage Cooling Discharge Rate,timestep; !- HVAC Average [C]
+  
+ Output:Variable,*,Ice Thermal Storage Tank Mass Flow Rate,timestep; !- HVAC Average [kg/s]
+ 
+ 
+ Output:Variable,*,Cooling Coil Total Cooling Energy,timestep;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,monthly;
 

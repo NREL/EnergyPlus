@@ -617,6 +617,15 @@ namespace HVACDXSystem {
                 ErrorsFound = true;
             }
 
+            if (DXCoolingSystem(DXCoolSysNum).IHPIndex != 0)
+                SetUpCompSets(state,
+                              DXCoolingSystem(DXCoolSysNum).DXCoolingSystemType,
+                              DXCoolingSystem(DXCoolSysNum).Name,
+                              Alphas(6),
+                              Alphas(7) + " Cooling Coil",
+                              Alphas(3),
+                              Alphas(4));
+            else 
             SetUpCompSets(
                 state, DXCoolingSystem(DXCoolSysNum).DXCoolingSystemType, DXCoolingSystem(DXCoolSysNum).Name, Alphas(6), Alphas(7), Alphas(3), Alphas(4));
 

@@ -166,7 +166,7 @@ namespace DataHVACGlobals {
                                         "AirLoopHVAC:UnitarySystem"});
 
     // parameters describing coil types
-    int const NumAllCoilTypes(39);
+    int const NumAllCoilTypes(40);
 
     int const CoilDX_CoolingSingleSpeed(1);
     int const CoilDX_HeatingEmpirical(2);
@@ -258,7 +258,8 @@ namespace DataHVACGlobals {
                                         "Coil:Cooling:DX:SubcoolReheat",
                                         "Coil:Cooling:DX:CurveFit:Speed",
                                         "COIL:LIQUIDDESICCANT:SIMPLE",
-                                        "Coil:Chiller:AirSource:VariableSpeed"});
+                                        "Coil:Chiller:AirSource:VariableSpeed",
+                                        "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE"});
 
     Array1D_string const cCoolingCoilTypes(NumAllCoilTypes,
                                            {"Coil:Cooling:DX:SingleSpeed",
@@ -299,7 +300,8 @@ namespace DataHVACGlobals {
                                             "Coil:Cooling:DX:SubcoolReheat",
                                             "Coil:Cooling:DX:CurveFit:Speed",
                                             "COIL:LIQUIDDESICCANT:SIMPLE",
-                                            "Coil:Chiller:AirSource:VariableSpeed"});
+                                            "Coil:Chiller:AirSource:VariableSpeed",
+                                            "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE"});
 
     Array1D_string const cHeatingCoilTypes(NumAllCoilTypes,
                                            {"",
@@ -340,7 +342,8 @@ namespace DataHVACGlobals {
                                             "",
                                             "",
                                             "",
-                                            ""});
+                                            "",
+                                            "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE"});
 
     // Water to air HP coil types
     int const WatertoAir_Simple(1);
