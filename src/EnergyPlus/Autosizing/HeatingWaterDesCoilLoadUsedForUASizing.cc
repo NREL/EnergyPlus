@@ -46,6 +46,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <EnergyPlus/Autosizing/HeatingWaterDesCoilLoadUsedForUASizing.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -109,14 +110,14 @@ Real64 HeatingWaterDesCoilLoadUsedForUASizer::size(EnergyPlusData &state, Real64
                 coilSelectionReportObj->setCoilReheatMultiplier(state, this->compName, this->compType, 1.0);
             } else {
                 if (this->zoneEqSizing(this->curZoneEqNum).SystemAirFlow) {
-                    DesMassFlow = this->zoneEqSizing(this->curZoneEqNum).AirVolFlow * DataEnvironment::StdRhoAir;
+                    DesMassFlow = this->zoneEqSizing(this->curZoneEqNum).AirVolFlow * state.dataEnvrn->StdRhoAir;
                 } else if (this->zoneEqSizing(this->curZoneEqNum).HeatingAirFlow) {
-                    DesMassFlow = this->zoneEqSizing(this->curZoneEqNum).HeatingAirVolFlow * DataEnvironment::StdRhoAir;
+                    DesMassFlow = this->zoneEqSizing(this->curZoneEqNum).HeatingAirVolFlow * state.dataEnvrn->StdRhoAir;
                 } else {
                     DesMassFlow = this->finalZoneSizing(this->curZoneEqNum).DesHeatMassFlow;
                 }
                 Real64 CoilInTemp =
-                    this->setHeatCoilInletTempForZoneEqSizing(setOAFracForZoneEqSizing(DesMassFlow, this->zoneEqSizing(this->curZoneEqNum)),
+                    this->setHeatCoilInletTempForZoneEqSizing(setOAFracForZoneEqSizing(state, DesMassFlow, this->zoneEqSizing(this->curZoneEqNum)),
                                                               this->zoneEqSizing(this->curZoneEqNum),
                                                               this->finalZoneSizing(this->curZoneEqNum));
                 // Real64 CoilInHumRat =
@@ -159,21 +160,21 @@ Real64 HeatingWaterDesCoilLoadUsedForUASizer::size(EnergyPlusData &state, Real64
             Real64 CpAirStd = Psychrometrics::PsyCpAirFnW(0.0);
             if (this->curOASysNum > 0) {
                 if (this->dataDesicRegCoil) {
-                    this->autoSizedValue = CpAirStd * DataEnvironment::StdRhoAir * this->dataAirFlowUsedForSizing *
+                    this->autoSizedValue = CpAirStd * state.dataEnvrn->StdRhoAir * this->dataAirFlowUsedForSizing *
                                            (this->dataDesOutletAirTemp - this->dataDesInletAirTemp);
                 } else if (this->outsideAirSys(this->curOASysNum).AirLoopDOASNum > -1) {
-                    this->autoSizedValue = CpAirStd * DataEnvironment::StdRhoAir * this->dataAirFlowUsedForSizing *
+                    this->autoSizedValue = CpAirStd * state.dataEnvrn->StdRhoAir * this->dataAirFlowUsedForSizing *
                                            (this->airloopDOAS[this->outsideAirSys(this->curOASysNum).AirLoopDOASNum].PreheatTemp - CoilInTemp);
                 } else {
-                    this->autoSizedValue = CpAirStd * DataEnvironment::StdRhoAir * this->dataAirFlowUsedForSizing *
+                    this->autoSizedValue = CpAirStd * state.dataEnvrn->StdRhoAir * this->dataAirFlowUsedForSizing *
                                            (this->finalSysSizing(this->curSysNum).PreheatTemp - CoilInTemp);
                 }
             } else {
                 if (this->dataDesicRegCoil) {
-                    this->autoSizedValue = CpAirStd * DataEnvironment::StdRhoAir * this->dataAirFlowUsedForSizing *
+                    this->autoSizedValue = CpAirStd * state.dataEnvrn->StdRhoAir * this->dataAirFlowUsedForSizing *
                                            (this->dataDesOutletAirTemp - this->dataDesInletAirTemp);
                 } else {
-                    this->autoSizedValue = CpAirStd * DataEnvironment::StdRhoAir * this->dataAirFlowUsedForSizing *
+                    this->autoSizedValue = CpAirStd * state.dataEnvrn->StdRhoAir * this->dataAirFlowUsedForSizing *
                                            (this->finalSysSizing(this->curSysNum).HeatSupTemp - CoilInTemp);
                 }
             }

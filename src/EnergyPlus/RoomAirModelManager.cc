@@ -2176,7 +2176,7 @@ namespace RoomAirModelManager {
                                        AirflowNetwork::CompTypeNum_SCR) { // surface type = CRACK
                                 SurfParametersCVDV(Loop2).Width = Surface(AirflowNetwork::MultizoneSurfaceData(Loop2).SurfNum).Width / 2;
                                 AinCV = AirflowNetwork::MultizoneSurfaceCrackData(TypeNum).FlowCoef /
-                                        (BaseDischargeCoef * std::sqrt(2.0 / PsyRhoAirFnPbTdbW(state, OutBaroPress, MAT(Loop), ZoneAirHumRat(Loop))));
+                                        (BaseDischargeCoef * std::sqrt(2.0 / PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, MAT(Loop), ZoneAirHumRat(Loop))));
                                 SurfParametersCVDV(Loop2).Height = AinCV / SurfParametersCVDV(Loop2).Width;
                             }
                             // calculate the surface Zmin and Zmax

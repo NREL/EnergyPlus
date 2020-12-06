@@ -567,7 +567,7 @@ namespace SwimmingPool {
             this->CurMakeupWaterTemp = ScheduleManager::GetCurrentScheduleValue(state, this->MakeupWaterSupplySchedPtr);
         } else {
             // use water main temperaure if no schedule present in input
-            this->CurMakeupWaterTemp = DataEnvironment::WaterMainsTemp;
+            this->CurMakeupWaterTemp = state.dataEnvrn->WaterMainsTemp;
         }
 
         // determine the current heat gain from people
@@ -887,7 +887,7 @@ namespace SwimmingPool {
         // Evaporation Rate per Area = Evaporation Rate * Heat of Vaporization / Area of Surface
 
         Real64 PSatPool = Psychrometrics::PsyPsatFnTemp(state, this->PoolWaterTemp, RoutineName);
-        Real64 PParAir = Psychrometrics::PsyPsatFnTemp(state, MAT, RoutineName) * Psychrometrics::PsyRhFnTdbWPb(state, MAT, HumRat, DataEnvironment::OutBaroPress);
+        Real64 PParAir = Psychrometrics::PsyPsatFnTemp(state, MAT, RoutineName) * Psychrometrics::PsyRhFnTdbWPb(state, MAT, HumRat, state.dataEnvrn->OutBaroPress);
         if (PSatPool < PParAir) PSatPool = PParAir;
         this->SatPressPoolWaterTemp = PSatPool;
         this->PartPressZoneAirTemp = PParAir;

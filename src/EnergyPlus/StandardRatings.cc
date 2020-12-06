@@ -1693,7 +1693,6 @@ namespace StandardRatings {
 
         // Using/Aliasing
         using CurveManager::CurveValue;
-        using DataEnvironment::StdBaroPress;
         using Psychrometrics::PsyTwbFnTdbWPb;
         using Psychrometrics::PsyWFnTdpPb;
 
@@ -1733,7 +1732,7 @@ namespace StandardRatings {
         if (RatedTotalCapacity > 0.0) {
 
             for (ClassNum = 1; ClassNum <= 4; ++ClassNum) {
-                TWBIndoor = PsyTwbFnTdbWPb(state, IndoorDBTempClassI2IV(ClassNum), PsyWFnTdpPb(state, IndoorTDPA2D, StdBaroPress), StdBaroPress);
+                TWBIndoor = PsyTwbFnTdbWPb(state, IndoorDBTempClassI2IV(ClassNum), PsyWFnTdpPb(state, IndoorTDPA2D, state.dataEnvrn->StdBaroPress), state.dataEnvrn->StdBaroPress);
                 for (TestNum = 1; TestNum <= 4; ++TestNum) {
                     TDBOutdoor = OutdoorDBTempAllClassA2D(TestNum);
                     Num = (ClassNum - 1) * 4 + TestNum;

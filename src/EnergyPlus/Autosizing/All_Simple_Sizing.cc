@@ -46,6 +46,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <EnergyPlus/Autosizing/All_Simple_Sizing.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DesiccantDehumidifiers.hh>
 #include <EnergyPlus/General.hh>
@@ -160,7 +161,7 @@ Real64 ASHRAEMinSATCoolingSizer::size(EnergyPlusData &state, Real64 _originalVal
             if (this->dataCapacityUsedForSizing > 0.0 && this->dataFlowUsedForSizing > 0.0) {
                 this->autoSizedValue =
                     this->finalZoneSizing(this->curZoneEqNum).ZoneTempAtCoolPeak -
-                    (this->dataCapacityUsedForSizing / (this->dataFlowUsedForSizing * DataEnvironment::StdRhoAir *
+                    (this->dataCapacityUsedForSizing / (this->dataFlowUsedForSizing * state.dataEnvrn->StdRhoAir *
                                                         Psychrometrics::PsyCpAirFnW(this->finalZoneSizing(this->curZoneEqNum).ZoneHumRatAtCoolPeak)));
             } else {
                 this->errorType = AutoSizingResultType::ErrorType1;
@@ -183,7 +184,7 @@ Real64 ASHRAEMinSATCoolingSizer::size(EnergyPlusData &state, Real64 _originalVal
             if (this->dataCapacityUsedForSizing > 0.0 && this->dataFlowUsedForSizing > 0.0 && this->dataZoneUsedForSizing > 0) {
                 this->autoSizedValue = this->finalZoneSizing(this->dataZoneUsedForSizing).ZoneTempAtCoolPeak -
                                        (this->dataCapacityUsedForSizing /
-                                        (this->dataFlowUsedForSizing * DataEnvironment::StdRhoAir *
+                                        (this->dataFlowUsedForSizing * state.dataEnvrn->StdRhoAir *
                                          Psychrometrics::PsyCpAirFnW(this->finalZoneSizing(this->dataZoneUsedForSizing).ZoneHumRatAtCoolPeak)));
             } else {
                 this->errorType = AutoSizingResultType::ErrorType1;
@@ -219,7 +220,7 @@ Real64 ASHRAEMaxSATHeatingSizer::size(EnergyPlusData &state, Real64 _originalVal
             if (this->dataCapacityUsedForSizing > 0.0 && this->dataFlowUsedForSizing > 0.0) {
                 this->autoSizedValue =
                     this->finalZoneSizing(this->curZoneEqNum).ZoneTempAtHeatPeak +
-                    (this->dataCapacityUsedForSizing / (this->dataFlowUsedForSizing * DataEnvironment::StdRhoAir *
+                    (this->dataCapacityUsedForSizing / (this->dataFlowUsedForSizing * state.dataEnvrn->StdRhoAir *
                                                         Psychrometrics::PsyCpAirFnW(this->finalZoneSizing(this->curZoneEqNum).ZoneHumRatAtHeatPeak)));
             } else {
                 this->errorType = AutoSizingResultType::ErrorType1;
@@ -242,7 +243,7 @@ Real64 ASHRAEMaxSATHeatingSizer::size(EnergyPlusData &state, Real64 _originalVal
             if (this->dataCapacityUsedForSizing > 0.0 && this->dataFlowUsedForSizing > 0.0 && this->dataZoneUsedForSizing > 0) {
                 this->autoSizedValue = this->finalZoneSizing(this->dataZoneUsedForSizing).ZoneTempAtHeatPeak +
                                        (this->dataCapacityUsedForSizing /
-                                        (this->dataFlowUsedForSizing * DataEnvironment::StdRhoAir *
+                                        (this->dataFlowUsedForSizing * state.dataEnvrn->StdRhoAir *
                                          Psychrometrics::PsyCpAirFnW(this->finalZoneSizing(this->dataZoneUsedForSizing).ZoneHumRatAtHeatPeak)));
             } else {
                 this->errorType = AutoSizingResultType::ErrorType1;

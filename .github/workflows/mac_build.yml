@@ -75,7 +75,7 @@ jobs:
         shell: bash
         run: cmake --build . --target energyplus -j 2
 
-  no_glcol_cache:
+  no_glycol_cache:
     runs-on: macos-10.15
 
     steps:

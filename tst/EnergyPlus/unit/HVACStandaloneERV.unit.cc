@@ -108,7 +108,7 @@ TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test1)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    DataEnvironment::StdRhoAir = 1.0;
+    state->dataEnvrn->StdRhoAir = 1.0;
     ZoneEquipConfig.allocate(1);
     ZoneEquipConfig(1).ZoneName = "Zone 1";
     ZoneEquipConfig(1).ActualZoneNum = 1;
@@ -209,7 +209,7 @@ TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test2)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    DataEnvironment::StdRhoAir = 1.0;
+    state->dataEnvrn->StdRhoAir = 1.0;
 
     state->dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized

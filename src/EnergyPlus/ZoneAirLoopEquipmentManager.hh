@@ -75,7 +75,7 @@ namespace ZoneAirLoopEquipmentManager {
 
     void InitZoneAirLoopEquipment(EnergyPlusData &state, int const AirDistUnitNum, int const ControlledZoneNum, int const ActualZoneNum);
 
-    void InitZoneAirLoopEquipmentTimeStep(int const AirDistUnitNum);
+    void InitZoneAirLoopEquipmentTimeStep(EnergyPlusData &state, int const AirDistUnitNum);
 
     void SimZoneAirLoopEquipment(EnergyPlusData &state, int const AirDistUnitNum,
                                  Real64 &SysOutputProvided,

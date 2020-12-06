@@ -73,7 +73,6 @@
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/FanCoilUnits.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/HVACSingleDuctInduc.hh>
 #include <EnergyPlus/HWBaseboardRadiator.hh>
@@ -1029,11 +1028,6 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
     // USE STATEMENTS:
 
     // Using/Aliasing
-    using DataEnvironment::IsRain;
-    using DataEnvironment::OutBaroPress;
-    using DataEnvironment::SkyTemp;
-    using DataEnvironment::WindSpeedAt;
-    // USE DataLoopNode    , ONLY: Node
     using ConvectionCoefficients::InitExteriorConvectionCoeff;
     using DataHeatBalance::SurfQRadSWOutIncident;
     using DataHeatBalSurface::TH;
@@ -1118,11 +1112,11 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
     LocalWetBulbTemp = sum_product_sub(Surface, &SurfaceData::Area, &SurfaceData::OutWetBulbTemp, SurfPtrARR) /
                        surfaceArea; // Autodesk:F2C++ Functions handle array subscript usage
 
-    LocalOutHumRat = PsyWFnTdbTwbPb(state, LocalOutDryBulbTemp, LocalWetBulbTemp, OutBaroPress, RoutineName);
+    LocalOutHumRat = PsyWFnTdbTwbPb(state, LocalOutDryBulbTemp, LocalWetBulbTemp, state.dataEnvrn->OutBaroPress, RoutineName);
 
-    RhoAir = PsyRhoAirFnPbTdbW(state, OutBaroPress, LocalOutDryBulbTemp, LocalOutHumRat, RoutineName);
+    RhoAir = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, LocalOutDryBulbTemp, LocalOutHumRat, RoutineName);
     CpAir = PsyCpAirFnW(LocalOutHumRat);
-    if (!IsRain) {
+    if (!state.dataEnvrn->IsRain) {
         Tamb = LocalOutDryBulbTemp;
     } else { // when raining we use wetbulb not drybulb
         Tamb = LocalWetBulbTemp;
@@ -1205,7 +1199,7 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
     HExt = sum(HExtARR * Area) / A;
     HExtARR.deallocate();
 
-    if (IsRain) HExt = 1000.0;
+    if (state.dataEnvrn->IsRain) HExt = 1000.0;
 
     //	Tso = sum( TH( 1, 1, SurfPtrARR ) * Surface( SurfPtrARR ).Area ) / A; //Autodesk:F2C++ Array subscript usage: Replaced by below
     Tso = sum_product_sub(TH(1, 1, _), Surface, &SurfaceData::Area, SurfPtrARR) / A; // Autodesk:F2C++ Functions handle array subscript usage
@@ -1240,7 +1234,7 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
 
     // now calculate baffle temperature
     if (!ICSCollectorIsOn) {
-        TsBaffle = (Isc * SolAbs + HExt * Tamb + HrAtm * Tamb + HrSky * SkyTemp + HrGround * Tamb + HrPlen * Tso + HcPlen * TaGap + QdotSource) /
+        TsBaffle = (Isc * SolAbs + HExt * Tamb + HrAtm * Tamb + HrSky * state.dataEnvrn->SkyTemp + HrGround * Tamb + HrPlen * Tso + HcPlen * TaGap + QdotSource) /
                    (HExt + HrAtm + HrSky + HrGround + HrPlen + HcPlen);
     } else {
 
@@ -1387,7 +1381,6 @@ void CalcBasinHeaterPower(EnergyPlusData &state,
     // na
 
     // Using/Aliasing
-    using DataEnvironment::OutDryBulbTemp;
     using ScheduleManager::GetCurrentScheduleValue;
 
     // Locals
@@ -1411,12 +1404,12 @@ void CalcBasinHeaterPower(EnergyPlusData &state,
     if (SchedulePtr > 0) {
         BasinHeaterSch = GetCurrentScheduleValue(state, SchedulePtr);
         if (Capacity > 0.0 && BasinHeaterSch > 0.0) {
-            Power = max(0.0, Capacity * (SetPointTemp - OutDryBulbTemp));
+            Power = max(0.0, Capacity * (SetPointTemp - state.dataEnvrn->OutDryBulbTemp));
         }
     } else {
         // IF schedule does not exist, basin heater operates anytime outdoor dry-bulb temp is below setpoint
         if (Capacity > 0.0) {
-            Power = max(0.0, Capacity * (SetPointTemp - OutDryBulbTemp));
+            Power = max(0.0, Capacity * (SetPointTemp - state.dataEnvrn->OutDryBulbTemp));
         }
     }
 }
