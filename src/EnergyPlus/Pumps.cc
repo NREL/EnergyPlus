@@ -2346,24 +2346,24 @@ namespace Pumps {
         std::string equipName;
 
         equipName = PumpEquip(NumPump).Name;
-        PreDefTableEntry(state.dataOutRptPredefined->pdchPumpType, equipName, cPumpTypes(PumpEquip(NumPump).PumpType));
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchPumpType, equipName, cPumpTypes(PumpEquip(NumPump).PumpType));
         if (PumpEquip(NumPump).PumpControl == PumpControlType::Continuous) {
-            PreDefTableEntry(state.dataOutRptPredefined->pdchPumpControl, equipName, "Continuous");
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchPumpControl, equipName, "Continuous");
         } else if (PumpEquip(NumPump).PumpControl == PumpControlType::Intermittent) {
-            PreDefTableEntry(state.dataOutRptPredefined->pdchPumpControl, equipName, "Intermittent");
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchPumpControl, equipName, "Intermittent");
         } else {
-            PreDefTableEntry(state.dataOutRptPredefined->pdchPumpControl, equipName, "Unknown");
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchPumpControl, equipName, "Unknown");
         }
-        PreDefTableEntry(state.dataOutRptPredefined->pdchPumpHead, equipName, PumpEquip(NumPump).NomPumpHead);
-        PreDefTableEntry(state.dataOutRptPredefined->pdchPumpFlow, equipName, PumpEquip(NumPump).NomVolFlowRate, 6);
-        PreDefTableEntry(state.dataOutRptPredefined->pdchPumpPower, equipName, PumpEquip(NumPump).NomPowerUse);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchPumpHead, equipName, PumpEquip(NumPump).NomPumpHead);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchPumpFlow, equipName, PumpEquip(NumPump).NomVolFlowRate, 6);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchPumpPower, equipName, PumpEquip(NumPump).NomPowerUse);
         if (PumpEquip(NumPump).NomVolFlowRate != 0) {
-            PreDefTableEntry(state.dataOutRptPredefined->pdchPumpPwrPerFlow, equipName, PumpEquip(NumPump).NomPowerUse / PumpEquip(NumPump).NomVolFlowRate);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchPumpPwrPerFlow, equipName, PumpEquip(NumPump).NomPowerUse / PumpEquip(NumPump).NomVolFlowRate);
         } else {
-            PreDefTableEntry(state.dataOutRptPredefined->pdchPumpPwrPerFlow, equipName, "-");
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchPumpPwrPerFlow, equipName, "-");
         }
-        PreDefTableEntry(state.dataOutRptPredefined->pdchPumpEndUse, equipName, PumpEquip(NumPump).EndUseSubcategoryName);
-        PreDefTableEntry(state.dataOutRptPredefined->pdchMotEff, equipName, PumpEquip(NumPump).MotorEffic);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchPumpEndUse, equipName, PumpEquip(NumPump).EndUseSubcategoryName);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchMotEff, equipName, PumpEquip(NumPump).MotorEffic);
     }
 
     //*************************************************************************!

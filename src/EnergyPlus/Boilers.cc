@@ -674,9 +674,9 @@ namespace EnergyPlus::Boilers {
         if (DataPlant::PlantFinalSizesOkayToReport) {
             // create predefined report
             std::string const equipName = this->Name;
-            OutputReportPredefined::PreDefTableEntry(state.dataOutRptPredefined->pdchMechType, equipName, "Boiler:HotWater");
-            OutputReportPredefined::PreDefTableEntry(state.dataOutRptPredefined->pdchMechNomEff, equipName, this->NomEffic);
-            OutputReportPredefined::PreDefTableEntry(state.dataOutRptPredefined->pdchMechNomCap, equipName, this->NomCap);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechType, equipName, "Boiler:HotWater");
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechNomEff, equipName, this->NomEffic);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechNomCap, equipName, this->NomCap);
         }
 
         if (ErrorsFound) {

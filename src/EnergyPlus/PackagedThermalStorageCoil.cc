@@ -2362,17 +2362,17 @@ namespace PackagedThermalStorageCoil {
                                          TESCoil(TESCoilNum).EvapCondPumpElecNomPower);
         }
 
-        PreDefTableEntry(state.dataOutRptPredefined->pdchCoolCoilType, TESCoil(TESCoilNum).Name, "Coil:Cooling:DX:SingleSpeed:ThermalStorage");
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilType, TESCoil(TESCoilNum).Name, "Coil:Cooling:DX:SingleSpeed:ThermalStorage");
 
-        PreDefTableEntry(state.dataOutRptPredefined->pdchCoolCoilTotCap, TESCoil(TESCoilNum).Name, TESCoil(TESCoilNum).CoolingOnlyRatedTotCap);
-        PreDefTableEntry(
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilTotCap, TESCoil(TESCoilNum).Name, TESCoil(TESCoilNum).CoolingOnlyRatedTotCap);
+        PreDefTableEntry(state,
             state.dataOutRptPredefined->pdchCoolCoilSensCap, TESCoil(TESCoilNum).Name, TESCoil(TESCoilNum).CoolingOnlyRatedTotCap * TESCoil(TESCoilNum).CoolingOnlyRatedSHR);
-        PreDefTableEntry(state.dataOutRptPredefined->pdchCoolCoilLatCap,
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilLatCap,
                          TESCoil(TESCoilNum).Name,
                          TESCoil(TESCoilNum).CoolingOnlyRatedTotCap -
                              TESCoil(TESCoilNum).CoolingOnlyRatedTotCap * TESCoil(TESCoilNum).CoolingOnlyRatedSHR);
-        PreDefTableEntry(state.dataOutRptPredefined->pdchCoolCoilSHR, TESCoil(TESCoilNum).Name, TESCoil(TESCoilNum).CoolingOnlyRatedSHR);
-        PreDefTableEntry(state.dataOutRptPredefined->pdchCoolCoilNomEff, TESCoil(TESCoilNum).Name, TESCoil(TESCoilNum).CoolingOnlyRatedCOP);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilSHR, TESCoil(TESCoilNum).Name, TESCoil(TESCoilNum).CoolingOnlyRatedSHR);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilNomEff, TESCoil(TESCoilNum).Name, TESCoil(TESCoilNum).CoolingOnlyRatedCOP);
     }
 
     void CalcTESCoilOffMode(EnergyPlusData &state, int const TESCoilNum)

@@ -7795,13 +7795,13 @@ namespace SimAirServingZones {
             }
 
             // Update VRP table entries:
-            PreDefTableEntry(state.dataOutRptPredefined->pdchS62zcdVpz, TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneName, VpzClgByZone, 4); // Vpz
-            PreDefTableEntry(state.dataOutRptPredefined->pdchS62zcdVdz, TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneName, VdzClgByZone, 4); // Vdz
-            PreDefTableEntry(state.dataOutRptPredefined->pdchS62zcdVpzmin,
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchS62zcdVpz, TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneName, VpzClgByZone, 4); // Vpz
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchS62zcdVdz, TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneName, VdzClgByZone, 4); // Vdz
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchS62zcdVpzmin,
                              TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneName,
                              TermUnitFinalZoneSizing(TermUnitSizingIndex).DesCoolVolFlowMin,
                              4); // Vpz-min
-            PreDefTableEntry(state.dataOutRptPredefined->pdchS62zcdZpz,
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchS62zcdZpz,
                              TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneName,
                              TermUnitFinalZoneSizing(TermUnitSizingIndex).ZpzClgByZone,
                              3); // Zpz = Voz/Vpz		}

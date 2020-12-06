@@ -1235,9 +1235,9 @@ namespace ChillerGasAbsorption {
         if (DataPlant::PlantFinalSizesOkayToReport) {
             // create predefined report
             equipName = this->Name;
-            OutputReportPredefined::PreDefTableEntry(state.dataOutRptPredefined->pdchMechType, equipName, "ChillerHeater:Absorption:DirectFired");
-            OutputReportPredefined::PreDefTableEntry(state.dataOutRptPredefined->pdchMechNomEff, equipName, this->FuelCoolRatio);
-            OutputReportPredefined::PreDefTableEntry(state.dataOutRptPredefined->pdchMechNomCap, equipName, this->NomCoolingCap);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechType, equipName, "ChillerHeater:Absorption:DirectFired");
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechNomEff, equipName, this->FuelCoolRatio);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechNomCap, equipName, this->NomCoolingCap);
         }
     }
 

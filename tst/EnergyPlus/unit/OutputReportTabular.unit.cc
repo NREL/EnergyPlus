@@ -4913,11 +4913,11 @@ TEST_F(EnergyPlusFixture, OutputTableTimeBins_GetInput)
 // ManageSimulation();
 ////	compare_err_stream( "" );
 
-// EXPECT_EQ( "3", RetrievePreDefTableEntry( pdchSurfCntTot, "Overhang" ) );
-// EXPECT_EQ( "3", RetrievePreDefTableEntry( pdchSurfCntExt, "Overhang" ) );
+// EXPECT_EQ( "3", RetrievePreDefTableEntry(*state,  pdchSurfCntTot, "Overhang" ) );
+// EXPECT_EQ( "3", RetrievePreDefTableEntry(*state,  pdchSurfCntExt, "Overhang" ) );
 
-// EXPECT_EQ( "1", RetrievePreDefTableEntry( pdchSurfCntTot, "Fin" ) );
-// EXPECT_EQ( "1", RetrievePreDefTableEntry( pdchSurfCntExt, "Fin" ) );
+// EXPECT_EQ( "1", RetrievePreDefTableEntry(*state,  pdchSurfCntTot, "Fin" ) );
+// EXPECT_EQ( "1", RetrievePreDefTableEntry(*state,  pdchSurfCntExt, "Fin" ) );
 
 //}
 
@@ -6009,8 +6009,8 @@ TEST_F(EnergyPlusFixture, OutputTableTimeBins_GetInput)
 // ManageSimulation();
 ////compare_err_stream( "" );
 
-// EXPECT_EQ( "2", RetrievePreDefTableEntry( pdchSurfCntTot, "Tubular Daylighting Device Diffuser" ) );
-// EXPECT_EQ( "2", RetrievePreDefTableEntry( pdchSurfCntExt, "Tubular Daylighting Device Diffuser" ) );
+// EXPECT_EQ( "2", RetrievePreDefTableEntry(*state,  pdchSurfCntTot, "Tubular Daylighting Device Diffuser" ) );
+// EXPECT_EQ( "2", RetrievePreDefTableEntry(*state,  pdchSurfCntExt, "Tubular Daylighting Device Diffuser" ) );
 
 //}
 
@@ -6019,13 +6019,13 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_PredefinedTableRowMatchingTest
 
     SetPredefinedTables(*state);
 
-    PreDefTableEntry(state->dataOutRptPredefined->pdchLeedPerfElEneUse, "Exterior Lighting", 1000., 2);
-    EXPECT_EQ("1000.00", RetrievePreDefTableEntry(state->dataOutRptPredefined->pdchLeedPerfElEneUse, "Exterior Lighting"));
-    EXPECT_EQ("NOT FOUND", RetrievePreDefTableEntry(state->dataOutRptPredefined->pdchLeedPerfElEneUse, "EXTERIOR LIGHTING"));
+    PreDefTableEntry(*state, state->dataOutRptPredefined->pdchLeedPerfElEneUse, "Exterior Lighting", 1000., 2);
+    EXPECT_EQ("1000.00", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchLeedPerfElEneUse, "Exterior Lighting"));
+    EXPECT_EQ("NOT FOUND", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchLeedPerfElEneUse, "EXTERIOR LIGHTING"));
 
-    PreDefTableEntry(state->dataOutRptPredefined->pdchLeedPerfElEneUse, "EXTERIOR LIGHTING", 2000., 2);
-    EXPECT_EQ("1000.00", RetrievePreDefTableEntry(state->dataOutRptPredefined->pdchLeedPerfElEneUse, "Exterior Lighting"));
-    EXPECT_EQ("2000.00", RetrievePreDefTableEntry(state->dataOutRptPredefined->pdchLeedPerfElEneUse, "EXTERIOR LIGHTING"));
+    PreDefTableEntry(*state, state->dataOutRptPredefined->pdchLeedPerfElEneUse, "EXTERIOR LIGHTING", 2000., 2);
+    EXPECT_EQ("1000.00", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchLeedPerfElEneUse, "Exterior Lighting"));
+    EXPECT_EQ("2000.00", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchLeedPerfElEneUse, "EXTERIOR LIGHTING"));
 }
 
 TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetUnitSubstring_Test)
@@ -7250,17 +7250,17 @@ TEST_F(SQLiteFixture, OutputReportTabularTest_PredefinedTableDXConversion)
     SetPredefinedTables(*state);
     std::string CompName = "My DX Coil with 10000W cooling";
 
-    PreDefTableEntry(state->dataOutRptPredefined->pdchDXCoolCoilType, CompName, "Coil:Cooling:DX:SingleSpeed");
-    PreDefTableEntry(state->dataOutRptPredefined->pdchDXCoolCoilNetCapSIA, CompName, 10000., 1);
-    PreDefTableEntry(state->dataOutRptPredefined->pdchDXCoolCoilNetCapSIB, CompName, 12000., 1);
-    PreDefTableEntry(state->dataOutRptPredefined->pdchDXCoolCoilNetCapSIC, CompName, 14000., 1);
-    PreDefTableEntry(state->dataOutRptPredefined->pdchDXCoolCoilNetCapSID, CompName, 16000., 1);
-    PreDefTableEntry(state->dataOutRptPredefined->pdchDXCoolCoilElecPowerA, CompName, 3300., 1);
-    PreDefTableEntry(state->dataOutRptPredefined->pdchDXCoolCoilElecPowerB, CompName, 4300., 1);
-    PreDefTableEntry(state->dataOutRptPredefined->pdchDXCoolCoilElecPowerC, CompName, 5300., 1);
-    PreDefTableEntry(state->dataOutRptPredefined->pdchDXCoolCoilElecPowerD, CompName, 6300., 1);
+    PreDefTableEntry(*state, state->dataOutRptPredefined->pdchDXCoolCoilType, CompName, "Coil:Cooling:DX:SingleSpeed");
+    PreDefTableEntry(*state, state->dataOutRptPredefined->pdchDXCoolCoilNetCapSIA, CompName, 10000., 1);
+    PreDefTableEntry(*state, state->dataOutRptPredefined->pdchDXCoolCoilNetCapSIB, CompName, 12000., 1);
+    PreDefTableEntry(*state, state->dataOutRptPredefined->pdchDXCoolCoilNetCapSIC, CompName, 14000., 1);
+    PreDefTableEntry(*state, state->dataOutRptPredefined->pdchDXCoolCoilNetCapSID, CompName, 16000., 1);
+    PreDefTableEntry(*state, state->dataOutRptPredefined->pdchDXCoolCoilElecPowerA, CompName, 3300., 1);
+    PreDefTableEntry(*state, state->dataOutRptPredefined->pdchDXCoolCoilElecPowerB, CompName, 4300., 1);
+    PreDefTableEntry(*state, state->dataOutRptPredefined->pdchDXCoolCoilElecPowerC, CompName, 5300., 1);
+    PreDefTableEntry(*state, state->dataOutRptPredefined->pdchDXCoolCoilElecPowerD, CompName, 6300., 1);
 
-    EXPECT_EQ("10000.0", RetrievePreDefTableEntry(state->dataOutRptPredefined->pdchDXCoolCoilNetCapSIA, CompName));
+    EXPECT_EQ("10000.0", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchDXCoolCoilNetCapSIA, CompName));
 
     // We enable the report we care about, making sure it's the right one
     EXPECT_EQ("EquipmentSummary", OutputReportPredefined::reportName(5).name);
@@ -7308,10 +7308,10 @@ TEST_F(SQLiteFixture, OutputReportTabularTest_PredefinedTableCoilHumRat)
     SetPredefinedTables(*state);
     std::string CompName = "My DX Coil";
 
-    PreDefTableEntry(state->dataOutRptPredefined->pdchDXCoolCoilType, CompName, "Coil:Cooling:DX:SingleSpeed");
-    PreDefTableEntry(state->dataOutRptPredefined->pdch2CoilLvgHumRatIdealPeak, CompName,  0.006, 8);
+    PreDefTableEntry(*state, state->dataOutRptPredefined->pdchDXCoolCoilType, CompName, "Coil:Cooling:DX:SingleSpeed");
+    PreDefTableEntry(*state, state->dataOutRptPredefined->pdch2CoilLvgHumRatIdealPeak, CompName,  0.006, 8);
     // CoilSizingDetails
-    PreDefTableEntry(state->dataOutRptPredefined->pdchCoilLvgHumRatIdealPeak, CompName,  0.006, 8);
+    PreDefTableEntry(*state, state->dataOutRptPredefined->pdchCoilLvgHumRatIdealPeak, CompName,  0.006, 8);
 
     // We enable the reports we care about, making sure we have the right ones
     EXPECT_EQ("HVACSizingSummary", OutputReportPredefined::reportName(6).name);
@@ -7459,11 +7459,11 @@ TEST_F(EnergyPlusFixture, AzimuthToCardinal)
         EXPECT_EQ(oriAzimuth, DataSurfaces::Surface(i).Azimuth) << "Surface Name = " << DataSurfaces::Surface(i).Name;
 
         // Check that the azimuth entry is the rounded version indeed
-        EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(state->dataOutRptPredefined->pdchOpAzimuth, DataSurfaces::Surface(i).Name),
+        EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchOpAzimuth, DataSurfaces::Surface(i).Name),
                   format("{:.2R}", expectedAzimuthToCard.first))
             << "Surface Name = " << DataSurfaces::Surface(i).Name;
         // Check that we do get the expected cardinal direction
-        EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(state->dataOutRptPredefined->pdchOpDir,
+        EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchOpDir,
                                                                    DataSurfaces::Surface(i).Name),
                   cardinalDir)
             << "Azimuth was " << expectedAzimuthToCard.first  << "for Surface '" << DataSurfaces::Surface(i).Name << "'.";
@@ -7476,11 +7476,11 @@ TEST_F(EnergyPlusFixture, AzimuthToCardinal)
         EXPECT_EQ(oriAzimuth, DataSurfaces::Surface(i+1).Azimuth) << "Surface Name = " << DataSurfaces::Surface(i+1).Name;
 
         // Check that the azimuth entry is the rounded version indeed
-        EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(state->dataOutRptPredefined->pdchFenAzimuth, DataSurfaces::Surface(i + 1).Name),
+        EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchFenAzimuth, DataSurfaces::Surface(i + 1).Name),
                   format("{:.2R}", expectedAzimuthToCard.first))
             << "Surface Name = " << DataSurfaces::Surface(i + 1).Name;
         // Check that we do get the expected cardinal direction
-        EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(state->dataOutRptPredefined->pdchFenDir,
+        EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchFenDir,
                                                                    DataSurfaces::Surface(i+1).Name),
                   cardinalDir)
             << "Azimuth was " << expectedAzimuthToCard.first  << "for Surface '" << DataSurfaces::Surface(i+1).Name << "'.";
@@ -7561,35 +7561,35 @@ TEST_F(EnergyPlusFixture, InteriorSurfaceEnvelopeSummaryReport)
             *****************************************************************************/
 
             // Check the wall gross area
-            EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(state->dataOutRptPredefined->pdchIntOpGrArea,
+            EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchIntOpGrArea,
                                                                        DataSurfaces::Surface(i).Name),
                                                                        "200.00");
             // Check the wall net area
-            EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(state->dataOutRptPredefined->pdchIntOpNetArea,
+            EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchIntOpNetArea,
                                                                        DataSurfaces::Surface(i).Name),
                                                                        "150.00");
             // Check the wall u value
-            EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(state->dataOutRptPredefined->pdchIntOpUfactNoFilm,
+            EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchIntOpUfactNoFilm,
                                                                        DataSurfaces::Surface(i).Name),
                                                                        "0.200");
             // Check the wall construction
-            EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(state->dataOutRptPredefined->pdchIntOpCons,
+            EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchIntOpCons,
                                                                        DataSurfaces::Surface(i).Name),
                                                                        "A Construction");
             // Check the wall reflectance
-            EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(state->dataOutRptPredefined->pdchIntOpRefl,
+            EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchIntOpRefl,
                                                                        DataSurfaces::Surface(i).Name),
                                                                        "0.60");
             // Check the tilt
-            EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(state->dataOutRptPredefined->pdchIntOpTilt,
+            EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchIntOpTilt,
                                                                        DataSurfaces::Surface(i).Name),
                                                                        "90.00");
             // Check the azimuth
-            EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(state->dataOutRptPredefined->pdchIntOpAzimuth,
+            EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchIntOpAzimuth,
                                                                        DataSurfaces::Surface(i).Name),
                                                                        "180.00");
             // Check cardinal direction
-            EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(state->dataOutRptPredefined->pdchIntOpDir,
+            EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchIntOpDir,
                                                                        DataSurfaces::Surface(i).Name),
                                                                        "S");
         }else{
@@ -7599,19 +7599,19 @@ TEST_F(EnergyPlusFixture, InteriorSurfaceEnvelopeSummaryReport)
             *****************************************************************************/
 
             // Check the door gross area
-            EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(state->dataOutRptPredefined->pdchIntDrGrArea,
+            EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchIntDrGrArea,
                                                                        DataSurfaces::Surface(i).Name),
                                                                        "50.00");
             // Check the wall u value
-            EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(state->dataOutRptPredefined->pdchIntDrUfactNoFilm,
+            EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchIntDrUfactNoFilm,
                                                                        DataSurfaces::Surface(i).Name),
                                                                        "0.200");
             // Check the door construction
-            EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(state->dataOutRptPredefined->pdchIntDrCons,
+            EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchIntDrCons,
                                                                        DataSurfaces::Surface(i).Name),
                                                                        "A Construction");
             // Check the door parant surface name
-            EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(state->dataOutRptPredefined->pdchIntDrParent,
+            EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchIntDrParent,
                                                                        DataSurfaces::Surface(i).Name),
                                                                        DataSurfaces::Surface(i-1).Name);
         }

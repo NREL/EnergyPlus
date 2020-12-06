@@ -10506,7 +10506,7 @@ namespace SolarShading {
         if (RepCol != 0) {
             for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
                 if (Surface(SurfNum).Class == SurfaceClass::Window) {
-                    PreDefTableEntry(RepCol, Surface(SurfNum).Name, SurfSunlitFrac(SurfNum));
+                    PreDefTableEntry(state, RepCol, Surface(SurfNum).Name, SurfSunlitFrac(SurfNum));
                 }
             }
         }

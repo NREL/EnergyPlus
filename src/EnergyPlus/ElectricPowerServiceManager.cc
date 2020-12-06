@@ -477,8 +477,8 @@ void ElectricPowerServiceManager::reportPVandWindCapacity(EnergyPlusData &state)
         }
     }
     // put in total capacity for PV and Wind for LEED report
-    OutputReportPredefined::PreDefTableEntry(state.dataOutRptPredefined->pdchLeedRenRatCap, "Photovoltaic", pvTotalCapacity_ / 1000, 2);
-    OutputReportPredefined::PreDefTableEntry(state.dataOutRptPredefined->pdchLeedRenRatCap, "Wind", windTotalCapacity_ / 1000, 2);
+    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedRenRatCap, "Photovoltaic", pvTotalCapacity_ / 1000, 2);
+    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedRenRatCap, "Wind", windTotalCapacity_ / 1000, 2);
 
     // future work: this legacy approach is relying on the correct power output to have been placed in the Generator list.  There could be a
     // difference between this control input and the actual size of the systems as defined in the generator objects themselves.  This method should be

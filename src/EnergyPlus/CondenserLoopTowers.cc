@@ -3039,8 +3039,8 @@ namespace CondenserLoopTowers {
         }
         if (DataPlant::PlantFinalSizesOkayToReport) {
             // create predefined report
-            OutputReportPredefined::PreDefTableEntry(state.dataOutRptPredefined->pdchMechType, this->Name, this->TowerType);
-            OutputReportPredefined::PreDefTableEntry(state.dataOutRptPredefined->pdchMechNomCap, this->Name, this->TowerNominalCapacity);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechType, this->Name, this->TowerType);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechNomCap, this->Name, this->TowerNominalCapacity);
         }
 
         // input error checking

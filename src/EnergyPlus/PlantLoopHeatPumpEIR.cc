@@ -825,9 +825,9 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
 
         if (DataPlant::PlantFinalSizesOkayToReport) {
             // create predefined report
-            OutputReportPredefined::PreDefTableEntry(state.dataOutRptPredefined->pdchMechType, this->name, typeName);
-            OutputReportPredefined::PreDefTableEntry(state.dataOutRptPredefined->pdchMechNomEff, this->name, this->referenceCOP);
-            OutputReportPredefined::PreDefTableEntry(state.dataOutRptPredefined->pdchMechNomCap, this->name, this->referenceCapacity);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechType, this->name, typeName);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechNomEff, this->name, this->referenceCOP);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechNomCap, this->name, this->referenceCapacity);
         }
 
         if (errorsFound) {

@@ -1612,11 +1612,11 @@ namespace WaterCoils {
                                   "! <Water Heating Coil Capacity Information>,Component Type,Name,Nominal Total Capacity {W}\n");
                             RptCoilHeaderFlag(1) = false;
                         }
-                        PreDefTableEntry(state.dataOutRptPredefined->pdchHeatCoilType, state.dataWaterCoils->WaterCoil(CoilNum).Name, "Coil:Heating:Water");
-                        PreDefTableEntry(state.dataOutRptPredefined->pdchHeatCoilDesCap, state.dataWaterCoils->WaterCoil(CoilNum).Name, state.dataWaterCoils->WaterCoil(CoilNum).DesWaterHeatingCoilRate);
-                        PreDefTableEntry(state.dataOutRptPredefined->pdchHeatCoilNomCap, state.dataWaterCoils->WaterCoil(CoilNum).Name, state.dataWaterCoils->WaterCoil(CoilNum).TotWaterHeatingCoilRate);
-                        PreDefTableEntry(state.dataOutRptPredefined->pdchHeatCoilNomEff, state.dataWaterCoils->WaterCoil(CoilNum).Name, "-");
-                        addFootNoteSubTable(
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilType, state.dataWaterCoils->WaterCoil(CoilNum).Name, "Coil:Heating:Water");
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilDesCap, state.dataWaterCoils->WaterCoil(CoilNum).Name, state.dataWaterCoils->WaterCoil(CoilNum).DesWaterHeatingCoilRate);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilNomCap, state.dataWaterCoils->WaterCoil(CoilNum).Name, state.dataWaterCoils->WaterCoil(CoilNum).TotWaterHeatingCoilRate);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilNomEff, state.dataWaterCoils->WaterCoil(CoilNum).Name, "-");
+                        addFootNoteSubTable(state,
                             state.dataOutRptPredefined->pdstHeatCoil,
                             "Nominal values are gross at rated conditions, i.e., the supply air fan heat and electric power NOT accounted for.");
                         print(state.files.eio,
@@ -1646,14 +1646,14 @@ namespace WaterCoils {
                         }
                         RatedLatentCapacity = state.dataWaterCoils->WaterCoil(CoilNum).TotWaterCoolingCoilRate - state.dataWaterCoils->WaterCoil(CoilNum).SenWaterCoolingCoilRate;
                         RatedSHR = SafeDivide(state.dataWaterCoils->WaterCoil(CoilNum).SenWaterCoolingCoilRate, state.dataWaterCoils->WaterCoil(CoilNum).TotWaterCoolingCoilRate);
-                        PreDefTableEntry(state.dataOutRptPredefined->pdchCoolCoilType, state.dataWaterCoils->WaterCoil(CoilNum).Name, "Coil:Cooling:Water:DetailedGeometry");
-                        PreDefTableEntry(state.dataOutRptPredefined->pdchCoolCoilDesCap, state.dataWaterCoils->WaterCoil(CoilNum).Name, state.dataWaterCoils->WaterCoil(CoilNum).DesWaterCoolingCoilRate);
-                        PreDefTableEntry(state.dataOutRptPredefined->pdchCoolCoilTotCap, state.dataWaterCoils->WaterCoil(CoilNum).Name, state.dataWaterCoils->WaterCoil(CoilNum).TotWaterCoolingCoilRate);
-                        PreDefTableEntry(state.dataOutRptPredefined->pdchCoolCoilSensCap, state.dataWaterCoils->WaterCoil(CoilNum).Name, state.dataWaterCoils->WaterCoil(CoilNum).SenWaterCoolingCoilRate);
-                        PreDefTableEntry(state.dataOutRptPredefined->pdchCoolCoilLatCap, state.dataWaterCoils->WaterCoil(CoilNum).Name, RatedLatentCapacity);
-                        PreDefTableEntry(state.dataOutRptPredefined->pdchCoolCoilSHR, state.dataWaterCoils->WaterCoil(CoilNum).Name, RatedSHR);
-                        PreDefTableEntry(state.dataOutRptPredefined->pdchCoolCoilNomEff, state.dataWaterCoils->WaterCoil(CoilNum).Name, "-");
-                        addFootNoteSubTable(
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilType, state.dataWaterCoils->WaterCoil(CoilNum).Name, "Coil:Cooling:Water:DetailedGeometry");
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilDesCap, state.dataWaterCoils->WaterCoil(CoilNum).Name, state.dataWaterCoils->WaterCoil(CoilNum).DesWaterCoolingCoilRate);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilTotCap, state.dataWaterCoils->WaterCoil(CoilNum).Name, state.dataWaterCoils->WaterCoil(CoilNum).TotWaterCoolingCoilRate);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilSensCap, state.dataWaterCoils->WaterCoil(CoilNum).Name, state.dataWaterCoils->WaterCoil(CoilNum).SenWaterCoolingCoilRate);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilLatCap, state.dataWaterCoils->WaterCoil(CoilNum).Name, RatedLatentCapacity);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilSHR, state.dataWaterCoils->WaterCoil(CoilNum).Name, RatedSHR);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilNomEff, state.dataWaterCoils->WaterCoil(CoilNum).Name, "-");
+                        addFootNoteSubTable(state,
                             state.dataOutRptPredefined->pdstCoolCoil,
                             "Nominal values are gross at rated conditions, i.e., the supply air fan heat and electric power NOT accounted for.");
                         print(state.files.eio,
@@ -1686,16 +1686,16 @@ namespace WaterCoils {
                         }
                         RatedLatentCapacity = state.dataWaterCoils->WaterCoil(CoilNum).TotWaterCoolingCoilRate - state.dataWaterCoils->WaterCoil(CoilNum).SenWaterCoolingCoilRate;
                         RatedSHR = SafeDivide(state.dataWaterCoils->WaterCoil(CoilNum).SenWaterCoolingCoilRate, state.dataWaterCoils->WaterCoil(CoilNum).TotWaterCoolingCoilRate);
-                        PreDefTableEntry(state.dataOutRptPredefined->pdchCoolCoilType, state.dataWaterCoils->WaterCoil(CoilNum).Name, "Coil:Cooling:Water");
-                        PreDefTableEntry(state.dataOutRptPredefined->pdchCoolCoilDesCap, state.dataWaterCoils->WaterCoil(CoilNum).Name, state.dataWaterCoils->WaterCoil(CoilNum).DesWaterCoolingCoilRate);
-                        PreDefTableEntry(state.dataOutRptPredefined->pdchCoolCoilTotCap, state.dataWaterCoils->WaterCoil(CoilNum).Name, state.dataWaterCoils->WaterCoil(CoilNum).TotWaterCoolingCoilRate);
-                        PreDefTableEntry(state.dataOutRptPredefined->pdchCoolCoilSensCap, state.dataWaterCoils->WaterCoil(CoilNum).Name, state.dataWaterCoils->WaterCoil(CoilNum).SenWaterCoolingCoilRate);
-                        PreDefTableEntry(state.dataOutRptPredefined->pdchCoolCoilLatCap, state.dataWaterCoils->WaterCoil(CoilNum).Name, RatedLatentCapacity);
-                        PreDefTableEntry(state.dataOutRptPredefined->pdchCoolCoilSHR, state.dataWaterCoils->WaterCoil(CoilNum).Name, RatedSHR);
-                        PreDefTableEntry(state.dataOutRptPredefined->pdchCoolCoilNomEff, state.dataWaterCoils->WaterCoil(CoilNum).Name, "-");
-                        PreDefTableEntry(state.dataOutRptPredefined->pdchCoolCoilUATotal, state.dataWaterCoils->WaterCoil(CoilNum).Name, state.dataWaterCoils->WaterCoil(CoilNum).UACoilTotal);
-                        PreDefTableEntry(state.dataOutRptPredefined->pdchCoolCoilArea, state.dataWaterCoils->WaterCoil(CoilNum).Name, state.dataWaterCoils->WaterCoil(CoilNum).TotCoilOutsideSurfArea);
-                        addFootNoteSubTable(
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilType, state.dataWaterCoils->WaterCoil(CoilNum).Name, "Coil:Cooling:Water");
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilDesCap, state.dataWaterCoils->WaterCoil(CoilNum).Name, state.dataWaterCoils->WaterCoil(CoilNum).DesWaterCoolingCoilRate);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilTotCap, state.dataWaterCoils->WaterCoil(CoilNum).Name, state.dataWaterCoils->WaterCoil(CoilNum).TotWaterCoolingCoilRate);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilSensCap, state.dataWaterCoils->WaterCoil(CoilNum).Name, state.dataWaterCoils->WaterCoil(CoilNum).SenWaterCoolingCoilRate);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilLatCap, state.dataWaterCoils->WaterCoil(CoilNum).Name, RatedLatentCapacity);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilSHR, state.dataWaterCoils->WaterCoil(CoilNum).Name, RatedSHR);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilNomEff, state.dataWaterCoils->WaterCoil(CoilNum).Name, "-");
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilUATotal, state.dataWaterCoils->WaterCoil(CoilNum).Name, state.dataWaterCoils->WaterCoil(CoilNum).UACoilTotal);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilArea, state.dataWaterCoils->WaterCoil(CoilNum).Name, state.dataWaterCoils->WaterCoil(CoilNum).TotCoilOutsideSurfArea);
+                        addFootNoteSubTable(state,
                             state.dataOutRptPredefined->pdstCoolCoil,
                             "Nominal values are gross at rated conditions, i.e., the supply air fan heat and electric power NOT accounted for.");
                         print(state.files.eio,

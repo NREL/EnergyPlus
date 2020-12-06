@@ -937,8 +937,8 @@ TEST_F(EnergyPlusFixture, BaseSizer_FanPeak)
     SizingResult = sizerSystemAirFlow.size(*state, SizingResult, errorsFound);
 
     // Check that the Design Day/Time is filled
-    EXPECT_EQ(DDTitle, OutputReportPredefined::RetrievePreDefTableEntry(state->dataOutRptPredefined->pdchFanDesDay, CompName));
-    EXPECT_EQ("7/15 18:00:00", OutputReportPredefined::RetrievePreDefTableEntry(state->dataOutRptPredefined->pdchFanPkTime, CompName));
+    EXPECT_EQ(DDTitle, OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchFanDesDay, CompName));
+    EXPECT_EQ("7/15 18:00:00", OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchFanPkTime, CompName));
 
     // Bonus test for #6949
     EXPECT_EQ("End Use Subcategory", OutputReportPredefined::columnTag(state->dataOutRptPredefined->pdchFanEndUse).heading);

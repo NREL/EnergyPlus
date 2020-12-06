@@ -5267,24 +5267,24 @@ namespace EnergyPlus::DaylightingManager {
                         }
                     }
                     refName = curRefPt.Name;
-                    PreDefTableEntry(state.dataOutRptPredefined->pdchDyLtZone, refName, daylCntrl.ZoneName);
-                    PreDefTableEntry(state.dataOutRptPredefined->pdchDyLtCtrlName, refName, daylCntrl.Name);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDyLtZone, refName, daylCntrl.ZoneName);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDyLtCtrlName, refName, daylCntrl.Name);
                     if (daylCntrl.DaylightMethod == DataDaylighting::iDaylightingMethod::SplitFluxDaylighting) {
-                        PreDefTableEntry(state.dataOutRptPredefined->pdchDyLtKind, refName, "SplitFlux");
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchDyLtKind, refName, "SplitFlux");
                     } else {
-                        PreDefTableEntry(state.dataOutRptPredefined->pdchDyLtKind, refName, "DElight");
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchDyLtKind, refName, "DElight");
                     }
                     // ( 1=continuous, 2=stepped, 3=continuous/off )
                     if (daylCntrl.LightControlType == DataDaylighting::iLtgCtrlType::Continuous) {
-                        PreDefTableEntry(state.dataOutRptPredefined->pdchDyLtCtrlType, refName, "Continuous");
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchDyLtCtrlType, refName, "Continuous");
                     } else if (daylCntrl.LightControlType == DataDaylighting::iLtgCtrlType::Stepped) {
-                        PreDefTableEntry(state.dataOutRptPredefined->pdchDyLtCtrlType, refName, "Stepped");
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchDyLtCtrlType, refName, "Stepped");
                     } else if (daylCntrl.LightControlType == DataDaylighting::iLtgCtrlType::ContinuousOff) {
-                        PreDefTableEntry(state.dataOutRptPredefined->pdchDyLtCtrlType, refName, "Continuous/Off");
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchDyLtCtrlType, refName, "Continuous/Off");
                     }
-                    PreDefTableEntry(state.dataOutRptPredefined->pdchDyLtFrac, refName, daylCntrl.FracZoneDaylit(refPtNum));
-                    PreDefTableEntry(state.dataOutRptPredefined->pdchDyLtWInst, refName, rLightLevel);
-                    PreDefTableEntry(state.dataOutRptPredefined->pdchDyLtWCtrl, refName, rLightLevel * daylCntrl.FracZoneDaylit(refPtNum));
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDyLtFrac, refName, daylCntrl.FracZoneDaylit(refPtNum));
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDyLtWInst, refName, rLightLevel);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDyLtWCtrl, refName, rLightLevel * daylCntrl.FracZoneDaylit(refPtNum));
 
                     if (daylCntrl.DaylRefPtAbsCoord(1, refPtNum) < zone.MinimumX || daylCntrl.DaylRefPtAbsCoord(1, refPtNum) > zone.MaximumX) {
                         daylCntrl.DaylRefPtInBounds(refPtNum) = false;

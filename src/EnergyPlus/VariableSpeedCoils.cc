@@ -720,12 +720,12 @@ namespace VariableSpeedCoils {
 
             // BAN Sept 30 2103, CR9322, commented out, now it is redundant, it is reported from sizing routine
             // create predefined report entries
-            // PreDefTableEntry( state.dataOutRptPredefined->pdchCoolCoilType, state.dataVariableSpeedCoils->VarSpeedCoil( DXCoilNum ).Name, CurrentModuleObject );
-            // PreDefTableEntry( state.dataOutRptPredefined->pdchCoolCoilTotCap, state.dataVariableSpeedCoils->VarSpeedCoil( DXCoilNum ).Name, state.dataVariableSpeedCoils->VarSpeedCoil( DXCoilNum ).RatedCapCoolTotal );
-            // PreDefTableEntry( state.dataOutRptPredefined->pdchCoolCoilSensCap, state.dataVariableSpeedCoils->VarSpeedCoil( DXCoilNum ).Name, state.dataVariableSpeedCoils->VarSpeedCoil( DXCoilNum ).RatedCapCoolSens );
-            // PreDefTableEntry( state.dataOutRptPredefined->pdchCoolCoilLatCap, state.dataVariableSpeedCoils->VarSpeedCoil( DXCoilNum ).Name, state.dataVariableSpeedCoils->VarSpeedCoil( DXCoilNum ).RatedCapCoolTotal - state.dataVariableSpeedCoils->VarSpeedCoil(
-            // DXCoilNum ).RatedCapCoolSens );  PreDefTableEntry( state.dataOutRptPredefined->pdchCoolCoilSHR, state.dataVariableSpeedCoils->VarSpeedCoil( DXCoilNum ).Name, state.dataVariableSpeedCoils->VarSpeedCoil( DXCoilNum
-            // ).RatedCapCoolSens / state.dataVariableSpeedCoils->VarSpeedCoil( DXCoilNum ).RatedCapCoolTotal );  PreDefTableEntry( state.dataOutRptPredefined->pdchCoolCoilNomEff, state.dataVariableSpeedCoils->VarSpeedCoil( DXCoilNum
+            // PreDefTableEntry(state,  state.dataOutRptPredefined->pdchCoolCoilType, state.dataVariableSpeedCoils->VarSpeedCoil( DXCoilNum ).Name, CurrentModuleObject );
+            // PreDefTableEntry(state,  state.dataOutRptPredefined->pdchCoolCoilTotCap, state.dataVariableSpeedCoils->VarSpeedCoil( DXCoilNum ).Name, state.dataVariableSpeedCoils->VarSpeedCoil( DXCoilNum ).RatedCapCoolTotal );
+            // PreDefTableEntry(state,  state.dataOutRptPredefined->pdchCoolCoilSensCap, state.dataVariableSpeedCoils->VarSpeedCoil( DXCoilNum ).Name, state.dataVariableSpeedCoils->VarSpeedCoil( DXCoilNum ).RatedCapCoolSens );
+            // PreDefTableEntry(state,  state.dataOutRptPredefined->pdchCoolCoilLatCap, state.dataVariableSpeedCoils->VarSpeedCoil( DXCoilNum ).Name, state.dataVariableSpeedCoils->VarSpeedCoil( DXCoilNum ).RatedCapCoolTotal - state.dataVariableSpeedCoils->VarSpeedCoil(
+            // DXCoilNum ).RatedCapCoolSens );  PreDefTableEntry(state,  state.dataOutRptPredefined->pdchCoolCoilSHR, state.dataVariableSpeedCoils->VarSpeedCoil( DXCoilNum ).Name, state.dataVariableSpeedCoils->VarSpeedCoil( DXCoilNum
+            // ).RatedCapCoolSens / state.dataVariableSpeedCoils->VarSpeedCoil( DXCoilNum ).RatedCapCoolTotal );  PreDefTableEntry(state,  state.dataOutRptPredefined->pdchCoolCoilNomEff, state.dataVariableSpeedCoils->VarSpeedCoil( DXCoilNum
             // ).Name, state.dataVariableSpeedCoils->VarSpeedCoil( DXCoilNum ).MSRatedCOP( state.dataVariableSpeedCoils->VarSpeedCoil( DXCoilNum ).NormSpedLevel ) );
         }
 
@@ -1123,12 +1123,12 @@ namespace VariableSpeedCoils {
 
             // BAN Sept 30 2103, CR9322, commented out, now it is redundant, it is reported from sizing routine
             // create predefined report entries
-            // PreDefTableEntry( state.dataOutRptPredefined->pdchCoolCoilType, state.dataVariableSpeedCoils->VarSpeedCoil( DXCoilNum ).Name, CurrentModuleObject );
-            // PreDefTableEntry( state.dataOutRptPredefined->pdchCoolCoilTotCap, state.dataVariableSpeedCoils->VarSpeedCoil( DXCoilNum ).Name, state.dataVariableSpeedCoils->VarSpeedCoil( DXCoilNum ).RatedCapCoolTotal );
-            // PreDefTableEntry( state.dataOutRptPredefined->pdchCoolCoilSensCap, state.dataVariableSpeedCoils->VarSpeedCoil( DXCoilNum ).Name, state.dataVariableSpeedCoils->VarSpeedCoil( DXCoilNum ).RatedCapCoolSens );
-            // PreDefTableEntry( state.dataOutRptPredefined->pdchCoolCoilLatCap, state.dataVariableSpeedCoils->VarSpeedCoil( DXCoilNum ).Name, state.dataVariableSpeedCoils->VarSpeedCoil( DXCoilNum ).RatedCapCoolTotal - state.dataVariableSpeedCoils->VarSpeedCoil(
-            // DXCoilNum ).RatedCapCoolSens );  PreDefTableEntry( state.dataOutRptPredefined->pdchCoolCoilSHR, state.dataVariableSpeedCoils->VarSpeedCoil( DXCoilNum ).Name, state.dataVariableSpeedCoils->VarSpeedCoil( DXCoilNum
-            // ).RatedCapCoolSens / state.dataVariableSpeedCoils->VarSpeedCoil( DXCoilNum ).RatedCapCoolTotal );  PreDefTableEntry( state.dataOutRptPredefined->pdchCoolCoilNomEff, state.dataVariableSpeedCoils->VarSpeedCoil( DXCoilNum
+            // PreDefTableEntry(state,  state.dataOutRptPredefined->pdchCoolCoilType, state.dataVariableSpeedCoils->VarSpeedCoil( DXCoilNum ).Name, CurrentModuleObject );
+            // PreDefTableEntry(state,  state.dataOutRptPredefined->pdchCoolCoilTotCap, state.dataVariableSpeedCoils->VarSpeedCoil( DXCoilNum ).Name, state.dataVariableSpeedCoils->VarSpeedCoil( DXCoilNum ).RatedCapCoolTotal );
+            // PreDefTableEntry(state,  state.dataOutRptPredefined->pdchCoolCoilSensCap, state.dataVariableSpeedCoils->VarSpeedCoil( DXCoilNum ).Name, state.dataVariableSpeedCoils->VarSpeedCoil( DXCoilNum ).RatedCapCoolSens );
+            // PreDefTableEntry(state,  state.dataOutRptPredefined->pdchCoolCoilLatCap, state.dataVariableSpeedCoils->VarSpeedCoil( DXCoilNum ).Name, state.dataVariableSpeedCoils->VarSpeedCoil( DXCoilNum ).RatedCapCoolTotal - state.dataVariableSpeedCoils->VarSpeedCoil(
+            // DXCoilNum ).RatedCapCoolSens );  PreDefTableEntry(state,  state.dataOutRptPredefined->pdchCoolCoilSHR, state.dataVariableSpeedCoils->VarSpeedCoil( DXCoilNum ).Name, state.dataVariableSpeedCoils->VarSpeedCoil( DXCoilNum
+            // ).RatedCapCoolSens / state.dataVariableSpeedCoils->VarSpeedCoil( DXCoilNum ).RatedCapCoolTotal );  PreDefTableEntry(state,  state.dataOutRptPredefined->pdchCoolCoilNomEff, state.dataVariableSpeedCoils->VarSpeedCoil( DXCoilNum
             // ).Name, state.dataVariableSpeedCoils->VarSpeedCoil( DXCoilNum ).MSRatedCOP( state.dataVariableSpeedCoils->VarSpeedCoil( DXCoilNum ).NormSpedLevel ) );
         }
 
@@ -1484,9 +1484,9 @@ namespace VariableSpeedCoils {
                                 "System");
 
             // create predefined report entries
-            PreDefTableEntry(state.dataOutRptPredefined->pdchHeatCoilType, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name, CurrentModuleObject);
-            PreDefTableEntry(state.dataOutRptPredefined->pdchHeatCoilNomCap, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapHeat);
-            PreDefTableEntry(
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilType, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name, CurrentModuleObject);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilNomCap, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapHeat);
+            PreDefTableEntry(state,
                 state.dataOutRptPredefined->pdchHeatCoilNomEff, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedCOP(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).NormSpedLevel));
         }
 
@@ -1823,9 +1823,9 @@ namespace VariableSpeedCoils {
                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
 
             // create predefined report entries
-            PreDefTableEntry(state.dataOutRptPredefined->pdchHeatCoilType, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name, CurrentModuleObject);
-            PreDefTableEntry(state.dataOutRptPredefined->pdchHeatCoilNomCap, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapHeat);
-            PreDefTableEntry(
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilType, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name, CurrentModuleObject);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilNomCap, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapHeat);
+            PreDefTableEntry(state,
                 state.dataOutRptPredefined->pdchHeatCoilNomEff, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedCOP(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).NormSpedLevel));
         }
 
@@ -4052,20 +4052,20 @@ namespace VariableSpeedCoils {
                                              state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
                                              "Design Size Rated Total Cooling Capacity [W]",
                                              state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapCoolTotal);
-                PreDefTableEntry(state.dataOutRptPredefined->pdchCoolCoilTotCap, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapCoolTotal);
-                PreDefTableEntry(state.dataOutRptPredefined->pdchCoolCoilLatCap,
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilTotCap, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapCoolTotal);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilLatCap,
                                  state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
                                  state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapCoolTotal - state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapCoolSens);
                 if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapCoolTotal != 0.0) {
-                    PreDefTableEntry(state.dataOutRptPredefined->pdchCoolCoilSHR,
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilSHR,
                                      state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
                                      state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapCoolSens / state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapCoolTotal);
-                    PreDefTableEntry(state.dataOutRptPredefined->pdchCoolCoilNomEff, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedCOP(NormSpeed));
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilNomEff, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedCOP(NormSpeed));
                 } else {
-                    PreDefTableEntry(state.dataOutRptPredefined->pdchCoolCoilSHR, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name, 0.0);
-                    PreDefTableEntry(state.dataOutRptPredefined->pdchCoolCoilNomEff, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name, 0.0);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilSHR, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name, 0.0);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilNomEff, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name, 0.0);
                 }
-                addFootNoteSubTable(
+                addFootNoteSubTable(state,
                     state.dataOutRptPredefined->pdstCoolCoil,
                     "Nominal values are gross at rated conditions, i.e., the supply air fan heat and electric power NOT accounted for.");
             } else {
@@ -4161,13 +4161,13 @@ namespace VariableSpeedCoils {
                                          state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
                                          "Design Size Nominal Heating Capacity [W]",
                                          RatedCapHeatDes);
-            PreDefTableEntry(state.dataOutRptPredefined->pdchHeatCoilNomCap, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapHeat);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilNomCap, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapHeat);
             if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapHeat != 0.0) {
-                PreDefTableEntry(state.dataOutRptPredefined->pdchHeatCoilNomEff, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedCOP(NormSpeed));
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilNomEff, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedCOP(NormSpeed));
             } else {
-                PreDefTableEntry(state.dataOutRptPredefined->pdchHeatCoilNomEff, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name, 0.0);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilNomEff, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name, 0.0);
             }
-            addFootNoteSubTable(state.dataOutRptPredefined->pdstHeatCoil,
+            addFootNoteSubTable(state, state.dataOutRptPredefined->pdstHeatCoil,
                                 "Nominal values are gross at rated conditions, i.e., the supply air fan heat and electric power NOT accounted for.");
         } else {
             if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapHeat > 0.0 && RatedCapHeatDes > 0.0) {
@@ -4744,21 +4744,21 @@ namespace VariableSpeedCoils {
                                                  RatedCapCoolSensDes); //, &
                 }
             }
-            PreDefTableEntry(state.dataOutRptPredefined->pdchCoolCoilTotCap, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapCoolTotal);
-            PreDefTableEntry(state.dataOutRptPredefined->pdchCoolCoilSensCap, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapCoolSens);
-            PreDefTableEntry(state.dataOutRptPredefined->pdchCoolCoilLatCap,
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilTotCap, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapCoolTotal);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilSensCap, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapCoolSens);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilLatCap,
                              state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
                              state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapCoolTotal - state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapCoolSens);
             if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapCoolTotal != 0.0) {
-                PreDefTableEntry(state.dataOutRptPredefined->pdchCoolCoilSHR,
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilSHR,
                                  state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
                                  state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapCoolSens / state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapCoolTotal);
             } else {
-                PreDefTableEntry(state.dataOutRptPredefined->pdchCoolCoilSHR, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name, 0.0);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilSHR, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name, 0.0);
             }
-            PreDefTableEntry(
+            PreDefTableEntry(state,
                 state.dataOutRptPredefined->pdchCoolCoilNomEff, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedCOP(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).NormSpedLevel));
-            addFootNoteSubTable(state.dataOutRptPredefined->pdstCoolCoil,
+            addFootNoteSubTable(state, state.dataOutRptPredefined->pdstCoolCoil,
                                 "Nominal values are gross at rated conditions, i.e., the supply air fan heat and electric power NOT accounted for.");
         }
 

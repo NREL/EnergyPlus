@@ -11743,24 +11743,24 @@ namespace WaterThermalTanks {
         std::string equipName;
         if (this->HeatPumpNum == 0) {
             equipName = this->Name;
-            OutputReportPredefined::PreDefTableEntry(state.dataOutRptPredefined->pdchSWHType, equipName, this->Type);
-            OutputReportPredefined::PreDefTableEntry(state.dataOutRptPredefined->pdchSWHVol, equipName, this->Volume);
-            OutputReportPredefined::PreDefTableEntry(state.dataOutRptPredefined->pdchSWHHeatIn, equipName, this->MaxCapacity);
-            OutputReportPredefined::PreDefTableEntry(state.dataOutRptPredefined->pdchSWHThEff, equipName, this->Efficiency);
-            OutputReportPredefined::PreDefTableEntry(state.dataOutRptPredefined->pdchSWHRecEff, equipName, RecoveryEfficiency);
-            OutputReportPredefined::PreDefTableEntry(state.dataOutRptPredefined->pdchSWHEnFac, equipName, EnergyFactor);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchSWHType, equipName, this->Type);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchSWHVol, equipName, this->Volume);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchSWHHeatIn, equipName, this->MaxCapacity);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchSWHThEff, equipName, this->Efficiency);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchSWHRecEff, equipName, RecoveryEfficiency);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchSWHEnFac, equipName, EnergyFactor);
         } else {
             equipName = state.dataWaterThermalTanks->HPWaterHeater(this->HeatPumpNum).Name;
-            OutputReportPredefined::PreDefTableEntry(state.dataOutRptPredefined->pdchSWHType, equipName, state.dataWaterThermalTanks->HPWaterHeater(this->HeatPumpNum).Type);
-            OutputReportPredefined::PreDefTableEntry(state.dataOutRptPredefined->pdchSWHVol, equipName, this->Volume);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchSWHType, equipName, state.dataWaterThermalTanks->HPWaterHeater(this->HeatPumpNum).Type);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchSWHVol, equipName, this->Volume);
             if (bIsVSCoil) {
-                OutputReportPredefined::PreDefTableEntry(state.dataOutRptPredefined->pdchSWHHeatIn, equipName, state.dataVariableSpeedCoils->VSHPWHHeatingCapacity);
+                OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchSWHHeatIn, equipName, state.dataVariableSpeedCoils->VSHPWHHeatingCapacity);
             } else {
-                OutputReportPredefined::PreDefTableEntry(state.dataOutRptPredefined->pdchSWHHeatIn, equipName, DXCoils::HPWHHeatingCapacity);
+                OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchSWHHeatIn, equipName, DXCoils::HPWHHeatingCapacity);
             }
-            OutputReportPredefined::PreDefTableEntry(state.dataOutRptPredefined->pdchSWHThEff, equipName, this->Efficiency);
-            OutputReportPredefined::PreDefTableEntry(state.dataOutRptPredefined->pdchSWHRecEff, equipName, RecoveryEfficiency);
-            OutputReportPredefined::PreDefTableEntry(state.dataOutRptPredefined->pdchSWHEnFac, equipName, EnergyFactor);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchSWHThEff, equipName, this->Efficiency);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchSWHRecEff, equipName, RecoveryEfficiency);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchSWHEnFac, equipName, EnergyFactor);
         }
 
         // Write test results

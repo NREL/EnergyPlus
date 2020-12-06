@@ -1345,9 +1345,9 @@ namespace ChillerAbsorption {
         if (DataPlant::PlantFinalSizesOkayToReport) {
             // create predefined report
             std::string equipName = this->Name;
-            OutputReportPredefined::PreDefTableEntry(state.dataOutRptPredefined->pdchMechType, equipName, moduleObjectType);
-            OutputReportPredefined::PreDefTableEntry(state.dataOutRptPredefined->pdchMechNomEff, equipName, "n/a");
-            OutputReportPredefined::PreDefTableEntry(state.dataOutRptPredefined->pdchMechNomCap, equipName, this->NomCap);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechType, equipName, moduleObjectType);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechNomEff, equipName, "n/a");
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechNomCap, equipName, this->NomCap);
         }
     }
 

@@ -1886,8 +1886,8 @@ namespace EvaporativeFluidCoolers {
         if (DataPlant::PlantFinalSizesOkayToReport) {
             // create predefined report
             std::string equipName = this->Name;
-            OutputReportPredefined::PreDefTableEntry(state.dataOutRptPredefined->pdchMechType, equipName, this->EvapFluidCoolerType);
-            OutputReportPredefined::PreDefTableEntry(state.dataOutRptPredefined->pdchMechNomCap, equipName, this->HighSpeedStandardDesignCapacity);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechType, equipName, this->EvapFluidCoolerType);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechNomCap, equipName, this->HighSpeedStandardDesignCapacity);
         }
     }
 

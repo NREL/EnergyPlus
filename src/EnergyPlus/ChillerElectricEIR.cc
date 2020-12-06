@@ -1537,9 +1537,9 @@ namespace ChillerElectricEIR {
                 this->IPLVFlag = false;
             }
             // create predefined report
-            OutputReportPredefined::PreDefTableEntry(state.dataOutRptPredefined->pdchMechType, this->Name, "Chiller:Electric:EIR");
-            OutputReportPredefined::PreDefTableEntry(state.dataOutRptPredefined->pdchMechNomEff, this->Name, this->RefCOP);
-            OutputReportPredefined::PreDefTableEntry(state.dataOutRptPredefined->pdchMechNomCap, this->Name, this->RefCap);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechType, this->Name, "Chiller:Electric:EIR");
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechNomEff, this->Name, this->RefCOP);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechNomCap, this->Name, this->RefCap);
         }
 
         if (ErrorsFound) {

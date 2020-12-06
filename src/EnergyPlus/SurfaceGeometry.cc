@@ -643,15 +643,15 @@ namespace SurfaceGeometry {
             if ((Surface(SurfNum).ExtBoundCond == ExternalEnvironment) || (Surface(SurfNum).ExtBoundCond == Ground) ||
                 (Surface(SurfNum).ExtBoundCond == KivaFoundation) || (Surface(SurfNum).ExtBoundCond == GroundFCfactorMethod)) {
                 if ((SurfaceClass == SurfaceClass::Wall) || (SurfaceClass == SurfaceClass::Floor) || (SurfaceClass == SurfaceClass::Roof)) {
-                    PreDefTableEntry(state.dataOutRptPredefined->pdchOpUfactFilm, Surface(SurfNum).Name, NominalUwithConvCoeffs, 3);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchOpUfactFilm, Surface(SurfNum).Name, NominalUwithConvCoeffs, 3);
                 } else if (SurfaceClass == SurfaceClass::Door) {
-                    PreDefTableEntry(state.dataOutRptPredefined->pdchDrUfactFilm, Surface(SurfNum).Name, NominalUwithConvCoeffs, 3);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDrUfactFilm, Surface(SurfNum).Name, NominalUwithConvCoeffs, 3);
                 }
             }else{
                 if ((SurfaceClass == SurfaceClass::Wall) || (SurfaceClass == SurfaceClass::Floor) || (SurfaceClass == SurfaceClass::Roof)) {
-                    PreDefTableEntry(state.dataOutRptPredefined->pdchIntOpUfactFilm, Surface(SurfNum).Name, NominalUwithConvCoeffs, 3);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchIntOpUfactFilm, Surface(SurfNum).Name, NominalUwithConvCoeffs, 3);
                 } else if (SurfaceClass == SurfaceClass::Door) {
-                    PreDefTableEntry(state.dataOutRptPredefined->pdchIntDrUfactFilm, Surface(SurfNum).Name, NominalUwithConvCoeffs, 3);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchIntDrUfactFilm, Surface(SurfNum).Name, NominalUwithConvCoeffs, 3);
                 }
             }
         } // surfaces

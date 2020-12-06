@@ -70,33 +70,9 @@ namespace OutputReportPredefined {
     // The variables get their value in AssignPredefined
 
     // Internal data structures to store information provided by calls
-
-    extern int const sizeIncrement;
-
-    extern int sizeReportName;
-    extern int numReportName;
-
-    extern int sizeSubTable;
-    extern int numSubTable;
-
-    extern int sizeColumnTag;
-    extern int numColumnTag;
-
-    extern int sizeTableEntry;
-    extern int numTableEntry;
-
-    extern int sizeCompSizeTableEntry;
-    extern int numCompSizeTableEntry;
-
-    extern int sizeShadowRelate;
-    extern int numShadowRelate;
-    extern int const recKindSurface;
-    extern int const recKindSubsurface;
-
-    extern Real64 TotalNotMetHeatingOccupiedForABUPS;
-    extern Real64 TotalNotMetCoolingOccupiedForABUPS;
-    extern Real64 TotalNotMetOccupiedForABUPS;
-    extern Real64 TotalTimeNotSimpleASH55EitherForABUPS;
+    int constexpr sizeIncrement(100);
+    int constexpr recKindSurface(1);
+    int constexpr recKindSubsurface(2);
 
     // Types
 
@@ -203,28 +179,28 @@ namespace OutputReportPredefined {
     // Creates an entry for predefined tables when the entry
     // is a real variable. numSigDigits defaults to 2, and if supplied must be in [0-9]
     // Internally it uses a Fortran-Style write statement, meaning numbers are rounded rather than trimmed
-    void PreDefTableEntry(int const columnIndex, std::string const &objName, Real64 const tableEntryReal, Optional_int_const numSigDigits = _);
+    void PreDefTableEntry(EnergyPlusData &state, int const columnIndex, std::string const &objName, Real64 const tableEntryReal, Optional_int_const numSigDigits = _);
 
-    void PreDefTableEntry(int const columnIndex, std::string const &objName, std::string const &tableEntryChar);
+    void PreDefTableEntry(EnergyPlusData &state, int const columnIndex, std::string const &objName, std::string const &tableEntryChar);
 
-    void PreDefTableEntry(int const columnIndex, std::string const &objName, int const tableEntryInt);
+    void PreDefTableEntry(EnergyPlusData &state, int const columnIndex, std::string const &objName, int const tableEntryInt);
 
-    std::string RetrievePreDefTableEntry(int const columnIndex, std::string const &objName);
+    std::string RetrievePreDefTableEntry(EnergyPlusData &state, int const columnIndex, std::string const &objName);
 
-    void incrementTableEntry();
+    void incrementTableEntry(EnergyPlusData &state);
 
     void
-    AddCompSizeTableEntry(std::string const &FieldType, std::string const &FieldName, std::string const &FieldDescription, Real64 const FieldValue);
+    AddCompSizeTableEntry(EnergyPlusData &state, std::string const &FieldType, std::string const &FieldName, std::string const &FieldDescription, Real64 const FieldValue);
 
-    void AddShadowRelateTableEntry(int const castingField, int const receivingField, int const receivingKind);
+    void AddShadowRelateTableEntry(EnergyPlusData &state, int const castingField, int const receivingField, int const receivingKind);
 
-    int newPreDefReport(std::string const &inReportName, std::string const &inReportAbrev, std::string const &inReportNamewithSpaces);
+    int newPreDefReport(EnergyPlusData &state, std::string const &inReportName, std::string const &inReportAbrev, std::string const &inReportNamewithSpaces);
 
-    int newPreDefSubTable(int const reportIndex, std::string const &subTableName);
+    int newPreDefSubTable(EnergyPlusData &state, int const reportIndex, std::string const &subTableName);
 
-    void addFootNoteSubTable(int const subTableIndex, std::string const &footnoteText);
+    void addFootNoteSubTable(EnergyPlusData &state, int const subTableIndex, std::string const &footnoteText);
 
-    int newPreDefColumn(int const subTableIndex, std::string const &columnHeading);
+    int newPreDefColumn(EnergyPlusData &state, int const subTableIndex, std::string const &columnHeading);
 
 } // namespace OutputReportPredefined
 
@@ -1098,6 +1074,29 @@ struct OutputReportPredefinedData : BaseGlobalStruct {
     int pdchIllumOccuHourAdequate = 0;
     int pdchIllumOccuHourBright = 0;
 
+    int sizeReportName = 0;
+    int numReportName = 0;
+
+    int sizeSubTable = 0;
+    int numSubTable = 0;
+
+    int sizeColumnTag = 0;
+    int numColumnTag = 0;
+
+    int sizeTableEntry = 0;
+    int numTableEntry = 0;
+
+    int sizeCompSizeTableEntry = 0;
+    int numCompSizeTableEntry = 0;
+
+    int sizeShadowRelate = 0;
+    int numShadowRelate = 0;
+
+    Real64 TotalNotMetHeatingOccupiedForABUPS = 0.0;
+    Real64 TotalNotMetCoolingOccupiedForABUPS = 0.0;
+    Real64 TotalNotMetOccupiedForABUPS = 0.0;
+    Real64 TotalTimeNotSimpleASH55EitherForABUPS = 0.0;
+
     void clear_state() override
     {
         this->pdrClim = 0;
@@ -1869,7 +1868,22 @@ struct OutputReportPredefinedData : BaseGlobalStruct {
         this->pdchIllumOccuHourDim = 0;
         this->pdchIllumOccuHourAdequate = 0;
         this->pdchIllumOccuHourBright = 0;
-
+        this->sizeReportName = 0;
+        this->numReportName = 0;
+        this->sizeSubTable = 0;
+        this->numSubTable = 0;
+        this->sizeColumnTag = 0;
+        this->numColumnTag = 0;
+        this->sizeTableEntry = 0;
+        this->numTableEntry = 0;
+        this->sizeCompSizeTableEntry = 0;
+        this->numCompSizeTableEntry = 0;
+        this->sizeShadowRelate = 0;
+        this->numShadowRelate = 0;
+        this->TotalNotMetHeatingOccupiedForABUPS = 0.0;
+        this->TotalNotMetCoolingOccupiedForABUPS = 0.0;
+        this->TotalNotMetOccupiedForABUPS = 0.0;
+        this->TotalTimeNotSimpleASH55EitherForABUPS = 0.0;
     }
 };
 

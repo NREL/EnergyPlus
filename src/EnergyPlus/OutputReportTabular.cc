@@ -1948,7 +1948,6 @@ namespace OutputReportTabular {
 
         using OutputProcessor::EndUseCategory;
         using OutputProcessor::MaxNumSubcategories;
-        using OutputReportPredefined::numReportName;
         using OutputReportPredefined::reportName;
 
         // Locals
@@ -2112,7 +2111,7 @@ namespace OutputReportTabular {
                     displayCO2ResilienceSummary = true;
                     displayVisualResilienceSummary = true;
                     nameFound = true;
-                    for (jReport = 1; jReport <= numReportName; ++jReport) {
+                    for (jReport = 1; jReport <= state.dataOutRptPredefined->numReportName; ++jReport) {
                         reportName(jReport).show = true;
                     }
                 } else if (UtilityRoutines::SameString(AlphArray(iReport), "AllSummaryAndSizingPeriod")) {
@@ -2135,7 +2134,7 @@ namespace OutputReportTabular {
                     displayCO2ResilienceSummary = true;
                     displayVisualResilienceSummary = true;
                     nameFound = true;
-                    for (jReport = 1; jReport <= numReportName; ++jReport) {
+                    for (jReport = 1; jReport <= state.dataOutRptPredefined->numReportName; ++jReport) {
                         reportName(jReport).show = true;
                     }
                     // the sizing period reports
@@ -2168,7 +2167,7 @@ namespace OutputReportTabular {
                     displayCO2ResilienceSummary = true;
                     displayVisualResilienceSummary = true;
                     nameFound = true;
-                    for (jReport = 1; jReport <= numReportName; ++jReport) {
+                    for (jReport = 1; jReport <= state.dataOutRptPredefined->numReportName; ++jReport) {
                         reportName(jReport).show = true;
                     }
                     for (jReport = 1; jReport <= numNamedMonthly; ++jReport) {
@@ -2194,7 +2193,7 @@ namespace OutputReportTabular {
                     displayCO2ResilienceSummary = true;
                     displayVisualResilienceSummary = true;
                     nameFound = true;
-                    for (jReport = 1; jReport <= numReportName; ++jReport) {
+                    for (jReport = 1; jReport <= state.dataOutRptPredefined->numReportName; ++jReport) {
                         reportName(jReport).show = true;
                     }
                     for (jReport = 1; jReport <= numNamedMonthly; ++jReport) {
@@ -2206,7 +2205,7 @@ namespace OutputReportTabular {
                     displayFacilityComponentLoadSummary = true;
                 }
                 // check the reports that are predefined and are created by OutputReportPredefined
-                for (jReport = 1; jReport <= numReportName; ++jReport) {
+                for (jReport = 1; jReport <= state.dataOutRptPredefined->numReportName; ++jReport) {
                     if (UtilityRoutines::SameString(AlphArray(iReport), reportName(jReport).name)) {
                         WriteTabularFiles = true;
                         reportName(jReport).show = true;
@@ -3730,7 +3729,6 @@ namespace OutputReportTabular {
 
         // Using/Aliasing
         using EconomicLifeCycleCost::LCCparamPresent;
-        using OutputReportPredefined::numReportName;
         using OutputReportPredefined::reportName;
 
         // Locals
@@ -3835,7 +3833,7 @@ namespace OutputReportTabular {
 //                    tbl_stream << "<br><a href=\"#" << MakeAnchorName(Annual_Visual_Resilience_Summary, Entire_Facility)
 //                               << "\">Annual Visual Resilience Summary</a>\n";
 //                }
-                for (kReport = 1; kReport <= numReportName; ++kReport) {
+                for (kReport = 1; kReport <= state.dataOutRptPredefined->numReportName; ++kReport) {
                     if (reportName(kReport).show) {
                         tbl_stream << "<br><a href=\"#" << MakeAnchorName(reportName(kReport).namewithspaces, Entire_Facility) << "\">"
                                    << reportName(kReport).namewithspaces << "</a>\n";
@@ -5704,16 +5702,16 @@ namespace OutputReportTabular {
         print(state.files.audit, variable_fmt, "sizeMonthlyFieldSetInput", sizeMonthlyFieldSetInput);
         print(state.files.audit, variable_fmt, "MonthlyTablesCount", MonthlyTablesCount);
         print(state.files.audit, variable_fmt, "MonthlyColumnsCount", MonthlyColumnsCount);
-        print(state.files.audit, variable_fmt, "sizeReportName", sizeReportName);
-        print(state.files.audit, variable_fmt, "numReportName", numReportName);
-        print(state.files.audit, variable_fmt, "sizeSubTable", sizeSubTable);
-        print(state.files.audit, variable_fmt, "numSubTable", numSubTable);
-        print(state.files.audit, variable_fmt, "sizeColumnTag", sizeColumnTag);
-        print(state.files.audit, variable_fmt, "numColumnTag", numColumnTag);
-        print(state.files.audit, variable_fmt, "sizeTableEntry", sizeTableEntry);
-        print(state.files.audit, variable_fmt, "numTableEntry", numTableEntry);
-        print(state.files.audit, variable_fmt, "sizeCompSizeTableEntry", sizeCompSizeTableEntry);
-        print(state.files.audit, variable_fmt, "numCompSizeTableEntry", numCompSizeTableEntry);
+        print(state.files.audit, variable_fmt, "state.dataOutRptPredefined->sizeReportName", state.dataOutRptPredefined->sizeReportName);
+        print(state.files.audit, variable_fmt, "state.dataOutRptPredefined->numReportName", state.dataOutRptPredefined->numReportName);
+        print(state.files.audit, variable_fmt, "state.dataOutRptPredefined->sizeSubTable", state.dataOutRptPredefined->sizeSubTable);
+        print(state.files.audit, variable_fmt, "state.dataOutRptPredefined->numSubTable", state.dataOutRptPredefined->numSubTable);
+        print(state.files.audit, variable_fmt, "state.dataOutRptPredefined->sizeColumnTag", state.dataOutRptPredefined->sizeColumnTag);
+        print(state.files.audit, variable_fmt, "state.dataOutRptPredefined->numColumnTag", state.dataOutRptPredefined->numColumnTag);
+        print(state.files.audit, variable_fmt, "state.dataOutRptPredefined->sizeTableEntry", state.dataOutRptPredefined->sizeTableEntry);
+        print(state.files.audit, variable_fmt, "state.dataOutRptPredefined->numTableEntry", state.dataOutRptPredefined->numTableEntry);
+        print(state.files.audit, variable_fmt, "state.dataOutRptPredefined->sizeCompSizeTableEntry", state.dataOutRptPredefined->sizeCompSizeTableEntry);
+        print(state.files.audit, variable_fmt, "state.dataOutRptPredefined->numCompSizeTableEntry", state.dataOutRptPredefined->numCompSizeTableEntry);
     }
 
     void parseStatLine(const std::string &lineIn,
@@ -5851,40 +5849,40 @@ namespace OutputReportTabular {
                 {
                     auto const SELECT_CASE_var(lineType);
                     if (SELECT_CASE_var == StatLineType::StatisticsLine) { // Statistics for USA_CA_San.Francisco_TMY2
-                        PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "Reference", lineIn.substr(15));
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Reference", lineIn.substr(15));
                     } else if (SELECT_CASE_var == StatLineType::LocationLine) { // Location -- SAN_FRANCISCO CA USA
-                        PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "Site:Location", lineIn.substr(11));
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Site:Location", lineIn.substr(11));
                     } else if (SELECT_CASE_var == StatLineType::LatLongLine) { //      {N 37° 37'} {W 122° 22'} {GMT -8.0 Hours}
                         // find the {}
                         sposlt = index(lineIn, '{');
                         eposlt = index(lineIn, '}');
                         if (sposlt != std::string::npos && eposlt != std::string::npos) {
-                            PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "Latitude", lineIn.substr(sposlt, eposlt - sposlt + 1));
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Latitude", lineIn.substr(sposlt, eposlt - sposlt + 1));
                             // redefine so next scan can go with {}
                             lineIn[sposlt] = '[';
                             lineIn[eposlt] = ']';
                         } else {
-                            PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "Latitude", "not found");
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Latitude", "not found");
                         }
                         sposlg = index(lineIn, '{');
                         eposlg = index(lineIn, '}');
                         if (sposlg != std::string::npos && eposlg != std::string::npos) {
-                            PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "Longitude", lineIn.substr(sposlg, eposlg - sposlg + 1));
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Longitude", lineIn.substr(sposlg, eposlg - sposlg + 1));
                             // redefine so next scan can go with {}
                             lineIn[sposlg] = '[';
                             lineIn[eposlg] = ']';
                         } else {
-                            PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "Longitude", "not found");
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Longitude", "not found");
                         }
                         spostz = index(lineIn, '{');
                         epostz = index(lineIn, '}');
                         if (spostz != std::string::npos && epostz != std::string::npos) {
-                            PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "Time Zone", lineIn.substr(spostz, epostz - spostz + 1));
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Time Zone", lineIn.substr(spostz, epostz - spostz + 1));
                             // redefine so next scan can go with {}
                             lineIn[spostz] = '[';
                             lineIn[epostz] = ']';
                         } else {
-                            PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "Time Zone", "not found");
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Time Zone", "not found");
                         }
                     } else if (SELECT_CASE_var == StatLineType::ElevationLine) { // Elevation --     5m above sea level
                         lnPtr = index(lineIn.substr(12), 'm');
@@ -5892,20 +5890,20 @@ namespace OutputReportTabular {
                             curNameWithSIUnits = "Elevation (m) " + lineIn.substr(12 + lnPtr + 2);
                             if (unitsStyle == unitsStyleInchPound) {
                                 LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
-                                PreDefTableEntry(
+                                PreDefTableEntry(state,
                                     state.dataOutRptPredefined->pdchWthrVal, curNameAndUnits, RealToStr(ConvertIP(indexUnitConv, StrToReal(lineIn.substr(12, lnPtr))), 1));
                             } else {
-                                PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, curNameWithSIUnits, lineIn.substr(12, lnPtr));
+                                PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, curNameWithSIUnits, lineIn.substr(12, lnPtr));
                             }
                         } else {
-                            PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "Elevation", "not found");
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Elevation", "not found");
                         }
                     } else if (SELECT_CASE_var == StatLineType::StdPressureLine) { // Standard Pressure at Elevation -- 101265Pa
-                        PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "Standard Pressure at Elevation", lineIn.substr(34));
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Standard Pressure at Elevation", lineIn.substr(34));
                     } else if (SELECT_CASE_var == StatLineType::DataSourceLine) { // Data Source -- TMY2-23234
-                        PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "Data Source", lineIn.substr(15));
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Data Source", lineIn.substr(15));
                     } else if (SELECT_CASE_var == StatLineType::WMOStationLine) { // WMO Station 724940
-                        PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "WMO Station", lineIn.substr(12));
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "WMO Station", lineIn.substr(12));
                     } else if (SELECT_CASE_var ==
                                StatLineType::DesignConditionsLine) { //  - Using Design Conditions from "Climate Design Data 2005 ASHRAE Handbook"
                         ashPtr = index(lineIn, "ASHRAE");
@@ -5917,14 +5915,14 @@ namespace OutputReportTabular {
                             } else {
                                 ashDesYear = "";
                             }
-                            PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "Weather File Design Conditions", "Climate Design Data " + ashDesYear + "ASHRAE Handbook");
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Weather File Design Conditions", "Climate Design Data " + ashDesYear + "ASHRAE Handbook");
                         } else if (has(lineIn, "not calculated") || lineIn == "") {
                             iscalc = false;
-                            PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "Weather File Design Conditions", "not calculated, Number of days < 1 year");
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Weather File Design Conditions", "not calculated, Number of days < 1 year");
                         } else {
                             isASHRAE = false;
                             iscalc = true;
-                            PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "Weather File Design Conditions", "Calculated from the weather file");
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Weather File Design Conditions", "Calculated from the weather file");
                         }
                     } else if (SELECT_CASE_var == StatLineType::heatingConditionsLine) { //  winter/heating design conditions
                         if (iscalc) {
@@ -5933,31 +5931,31 @@ namespace OutputReportTabular {
                                     if (unitsStyle == unitsStyleInchPound) {
                                         curNameWithSIUnits = "Heating Design Temperature 99.6% (C)";
                                         LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
-                                        PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal,
+                                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal,
                                                          curNameAndUnits,
                                                          RealToStr(ConvertIP(indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, 2))), 1) + degChar);
-                                        PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal,
+                                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal,
                                                          "Heating Design Temperature 99% (F)",
                                                          RealToStr(ConvertIP(indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, 3))), 1) + degChar);
                                     } else {
-                                        PreDefTableEntry(
+                                        PreDefTableEntry(state,
                                             state.dataOutRptPredefined->pdchWthrVal, "Heating Design Temperature 99.6% (C)", GetColumnUsingTabs(lineIn, 2) + degChar);
-                                        PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "Heating Design Temperature 99% (C)", GetColumnUsingTabs(lineIn, 3) + degChar);
+                                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Heating Design Temperature 99% (C)", GetColumnUsingTabs(lineIn, 3) + degChar);
                                     }
                                 } else { // 2005 and 2009 are the same
                                     if (unitsStyle == unitsStyleInchPound) {
                                         curNameWithSIUnits = "Heating Design Temperature 99.6% (C)";
                                         LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
-                                        PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal,
+                                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal,
                                                          curNameAndUnits,
                                                          RealToStr(ConvertIP(indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, 4))), 1) + degChar);
-                                        PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal,
+                                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal,
                                                          "Heating Design Temperature 99% (F)",
                                                          RealToStr(ConvertIP(indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, 5))), 1) + degChar);
                                     } else {
-                                        PreDefTableEntry(
+                                        PreDefTableEntry(state,
                                             state.dataOutRptPredefined->pdchWthrVal, "Heating Design Temperature 99.6% (C)", GetColumnUsingTabs(lineIn, 4) + degChar);
-                                        PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "Heating Design Temperature 99% (C)", GetColumnUsingTabs(lineIn, 5) + degChar);
+                                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Heating Design Temperature 99% (C)", GetColumnUsingTabs(lineIn, 5) + degChar);
                                     }
                                 }
                             } else { // from weather file
@@ -5971,15 +5969,15 @@ namespace OutputReportTabular {
                                 if (unitsStyle == unitsStyleInchPound) {
                                     curNameWithSIUnits = "Heating Design Temperature 99.6% (C)";
                                     LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
-                                    PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal,
+                                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal,
                                                      curNameAndUnits,
                                                      RealToStr(ConvertIP(indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, col1))), 1) + degChar);
-                                    PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal,
+                                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal,
                                                      "Heating Design Temperature 99% (F)",
                                                      RealToStr(ConvertIP(indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, col2))), 1) + degChar);
                                 } else {
-                                    PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "Heating Design Temperature 99.6% (C)", GetColumnUsingTabs(lineIn, col1) + degChar);
-                                    PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "Heating Design Temperature 99% (C)", GetColumnUsingTabs(lineIn, col2) + degChar);
+                                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Heating Design Temperature 99.6% (C)", GetColumnUsingTabs(lineIn, col1) + degChar);
+                                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Heating Design Temperature 99% (C)", GetColumnUsingTabs(lineIn, col2) + degChar);
                                 }
                             }
                         }
@@ -5990,37 +5988,37 @@ namespace OutputReportTabular {
                                     if (unitsStyle == unitsStyleInchPound) {
                                         curNameWithSIUnits = "Cooling Design Temperature 0.4% (C)";
                                         LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
-                                        PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal,
+                                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal,
                                                          curNameAndUnits,
                                                          RealToStr(ConvertIP(indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, 2))), 1) + degChar);
-                                        PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal,
+                                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal,
                                                          "Cooling Design Temperature 1% (F)",
                                                          RealToStr(ConvertIP(indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, 4))), 1) + degChar);
-                                        PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal,
+                                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal,
                                                          "Cooling Design Temperature 2% (F)",
                                                          RealToStr(ConvertIP(indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, 6))), 1) + degChar);
                                     } else {
-                                        PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "Cooling Design Temperature 0.4% (C)", GetColumnUsingTabs(lineIn, 2) + degChar);
-                                        PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "Cooling Design Temperature 1% (C)", GetColumnUsingTabs(lineIn, 4) + degChar);
-                                        PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "Cooling Design Temperature 2% (C)", GetColumnUsingTabs(lineIn, 6) + degChar);
+                                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Cooling Design Temperature 0.4% (C)", GetColumnUsingTabs(lineIn, 2) + degChar);
+                                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Cooling Design Temperature 1% (C)", GetColumnUsingTabs(lineIn, 4) + degChar);
+                                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Cooling Design Temperature 2% (C)", GetColumnUsingTabs(lineIn, 6) + degChar);
                                     }
                                 } else { // 2005 and 2009 are the same
                                     if (unitsStyle == unitsStyleInchPound) {
                                         curNameWithSIUnits = "Cooling Design Temperature 0.4% (C)";
                                         LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
-                                        PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal,
+                                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal,
                                                          curNameAndUnits,
                                                          RealToStr(ConvertIP(indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, 5))), 1) + degChar);
-                                        PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal,
+                                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal,
                                                          "Cooling Design Temperature 1% (F)",
                                                          RealToStr(ConvertIP(indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, 7))), 1) + degChar);
-                                        PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal,
+                                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal,
                                                          "Cooling Design Temperature 2% (F)",
                                                          RealToStr(ConvertIP(indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, 9))), 1) + degChar);
                                     } else {
-                                        PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "Cooling Design Temperature 0.4% (C)", GetColumnUsingTabs(lineIn, 5) + degChar);
-                                        PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "Cooling Design Temperature 1% (C)", GetColumnUsingTabs(lineIn, 7) + degChar);
-                                        PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "Cooling Design Temperature 2% (C)", GetColumnUsingTabs(lineIn, 9) + degChar);
+                                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Cooling Design Temperature 0.4% (C)", GetColumnUsingTabs(lineIn, 5) + degChar);
+                                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Cooling Design Temperature 1% (C)", GetColumnUsingTabs(lineIn, 7) + degChar);
+                                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Cooling Design Temperature 2% (C)", GetColumnUsingTabs(lineIn, 9) + degChar);
                                     }
                                 }
                             } else { // from weather file
@@ -6036,19 +6034,19 @@ namespace OutputReportTabular {
                                 if (unitsStyle == unitsStyleInchPound) {
                                     curNameWithSIUnits = "Cooling Design Temperature 0.4% (C)";
                                     LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
-                                    PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal,
+                                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal,
                                                      curNameAndUnits,
                                                      RealToStr(ConvertIP(indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, col1))), 1) + degChar);
-                                    PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal,
+                                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal,
                                                      "Cooling Design Temperature 1% (F)",
                                                      RealToStr(ConvertIP(indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, col2))), 1) + degChar);
-                                    PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal,
+                                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal,
                                                      "Cooling Design Temperature 2% (F)",
                                                      RealToStr(ConvertIP(indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, col3))), 1) + degChar);
                                 } else {
-                                    PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "Cooling Design Temperature 0.4% (C)", GetColumnUsingTabs(lineIn, col1) + degChar);
-                                    PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "Cooling Design Temperature 1% (C)", GetColumnUsingTabs(lineIn, col2) + degChar);
-                                    PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "Cooling Design Temperature 2% (C)", GetColumnUsingTabs(lineIn, col3) + degChar);
+                                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Cooling Design Temperature 0.4% (C)", GetColumnUsingTabs(lineIn, col1) + degChar);
+                                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Cooling Design Temperature 1% (C)", GetColumnUsingTabs(lineIn, col2) + degChar);
+                                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Cooling Design Temperature 2% (C)", GetColumnUsingTabs(lineIn, col3) + degChar);
                                 }
                             }
                         }
@@ -6070,23 +6068,23 @@ namespace OutputReportTabular {
                             if (unitsStyle == unitsStyleInchPound) {
                                 curNameWithSIUnits = "Maximum Dry Bulb Temperature (C)";
                                 LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
-                                PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal,
+                                PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal,
                                                  curNameAndUnits,
                                                  RealToStr(ConvertIP(indexUnitConv, StrToReal(lineIn.substr(sposlt, eposlt - sposlt + 1))), 1) +
                                                      degChar);
                             } else {
-                                PreDefTableEntry(
+                                PreDefTableEntry(state,
                                     state.dataOutRptPredefined->pdchWthrVal, "Maximum Dry Bulb Temperature (C)", lineIn.substr(sposlt, eposlt - sposlt + 1) + degChar);
                             }
                         } else {
-                            PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "Maximum Dry Bulb Temperature", "not found");
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Maximum Dry Bulb Temperature", "not found");
                         }
                         sposlt = index(lineIn, "on");
                         sposlt += 2;
                         if (sposlt != std::string::npos) {
-                            PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "Maximum Dry Bulb Occurs on", lineIn.substr(sposlt));
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Maximum Dry Bulb Occurs on", lineIn.substr(sposlt));
                         } else {
-                            PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "Maximum Dry Bulb Occurs on", "not found");
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Maximum Dry Bulb Occurs on", "not found");
                         }
                     } else if (SELECT_CASE_var == StatLineType::minDryBulbLine) { //   - Minimum Dry Bulb temperature of -22.8°C on Jan  7
                         sposlt = index(lineIn, "of");
@@ -6102,23 +6100,23 @@ namespace OutputReportTabular {
                             if (unitsStyle == unitsStyleInchPound) {
                                 curNameWithSIUnits = "Minimum Dry Bulb Temperature (C)";
                                 LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
-                                PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal,
+                                PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal,
                                                  curNameAndUnits,
                                                  RealToStr(ConvertIP(indexUnitConv, StrToReal(lineIn.substr(sposlt, eposlt - sposlt + 1))), 1) +
                                                      degChar);
                             } else {
-                                PreDefTableEntry(
+                                PreDefTableEntry(state,
                                     state.dataOutRptPredefined->pdchWthrVal, "Minimum Dry Bulb Temperature (C)", lineIn.substr(sposlt, eposlt - sposlt + 1) + degChar);
                             }
                         } else {
-                            PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "Minimum Dry Bulb Temperature", "not found");
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Minimum Dry Bulb Temperature", "not found");
                         }
                         sposlt = index(lineIn, "on");
                         sposlt += 2;
                         if (sposlt != std::string::npos) {
-                            PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "Minimum Dry Bulb Occurs on", lineIn.substr(sposlt));
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Minimum Dry Bulb Occurs on", lineIn.substr(sposlt));
                         } else {
-                            PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "Minimum Dry Bulb Occurs on", "not found");
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Minimum Dry Bulb Occurs on", "not found");
                         }
                     } else if (SELECT_CASE_var == StatLineType::maxDewPointLine) { //   - Maximum Dew Point temperature of  25.6°C on Aug  4
                         sposlt = index(lineIn, "of");
@@ -6134,23 +6132,23 @@ namespace OutputReportTabular {
                             if (unitsStyle == unitsStyleInchPound) {
                                 curNameWithSIUnits = "Maximum Dew Point Temperature (C)";
                                 LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
-                                PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal,
+                                PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal,
                                                  curNameAndUnits,
                                                  RealToStr(ConvertIP(indexUnitConv, StrToReal(lineIn.substr(sposlt, eposlt - sposlt + 1))), 1) +
                                                      degChar);
                             } else {
-                                PreDefTableEntry(
+                                PreDefTableEntry(state,
                                     state.dataOutRptPredefined->pdchWthrVal, "Maximum Dew Point Temperature (C)", lineIn.substr(sposlt, eposlt - sposlt + 1) + degChar);
                             }
                         } else {
-                            PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "Maximum Dew Point Temperature", "not found");
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Maximum Dew Point Temperature", "not found");
                         }
                         sposlt = index(lineIn, "on");
                         sposlt += 2;
                         if (sposlt != std::string::npos) {
-                            PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "Maximum Dew Point Occurs on", lineIn.substr(sposlt));
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Maximum Dew Point Occurs on", lineIn.substr(sposlt));
                         } else {
-                            PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "Maximum Dew Point Occurs on", "not found");
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Maximum Dew Point Occurs on", "not found");
                         }
                     } else if (SELECT_CASE_var == StatLineType::minDewPointLine) { //   - Minimum Dew Point temperature of -28.9°C on Dec 31
                         sposlt = index(lineIn, "of");
@@ -6166,109 +6164,109 @@ namespace OutputReportTabular {
                             if (unitsStyle == unitsStyleInchPound) {
                                 curNameWithSIUnits = "Minimum Dew Point Temperature (C)";
                                 LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
-                                PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal,
+                                PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal,
                                                  curNameAndUnits,
                                                  RealToStr(ConvertIP(indexUnitConv, StrToReal(lineIn.substr(sposlt, eposlt - sposlt + 1))), 1) +
                                                      degChar);
                             } else {
-                                PreDefTableEntry(
+                                PreDefTableEntry(state,
                                     state.dataOutRptPredefined->pdchWthrVal, "Minimum Dew Point Temperature (C)", lineIn.substr(sposlt, eposlt - sposlt + 1) + degChar);
                             }
                         } else {
-                            PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "Minimum Dew Point Temperature", "not found");
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Minimum Dew Point Temperature", "not found");
                         }
                         sposlt = index(lineIn, "on");
                         sposlt += 2;
                         if (sposlt != std::string::npos) {
-                            PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "Minimum Dew Point Occurs on", lineIn.substr(sposlt));
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Minimum Dew Point Occurs on", lineIn.substr(sposlt));
                         } else {
-                            PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "Minimum Dew Point Occurs on", "not found");
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Minimum Dew Point Occurs on", "not found");
                         }
                     } else if (SELECT_CASE_var == StatLineType::wthHDDLine) { //  - 1745 (wthr file) annual heating degree-days (10°C baseline)
                         if (storeASHRAEHDD != "") {
                             if (unitsStyle == unitsStyleInchPound) {
                                 curNameWithSIUnits = "ASHRAE Handbook 2009 Heating Degree-Days - base 65°(C)";
                                 LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
-                                PreDefTableEntry(
+                                PreDefTableEntry(state,
                                     state.dataOutRptPredefined->pdchWthrVal, curNameAndUnits, RealToStr(ConvertIPdelta(indexUnitConv, StrToReal(storeASHRAEHDD)), 1));
                             } else {
-                                PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Handbook 2009 Heating Degree-Days (base 18.3°C)", storeASHRAEHDD);
+                                PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Handbook 2009 Heating Degree-Days (base 18.3°C)", storeASHRAEHDD);
                             }
                         } else {
                             if (unitsStyle == unitsStyleInchPound) {
-                                PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Handbook 2009 Heating Degree-Days (base 65°F)", "not found");
+                                PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Handbook 2009 Heating Degree-Days (base 65°F)", "not found");
                             } else {
-                                PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Handbook 2009 Heating Degree-Days (base 18.3°C)", "not found");
+                                PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Handbook 2009 Heating Degree-Days (base 18.3°C)", "not found");
                             }
                         }
                         if (unitsStyle == unitsStyleInchPound) {
                             curNameWithSIUnits = "Weather File Heating Degree-Days - base 65°(C)";
                             LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
-                            PreDefTableEntry(
+                            PreDefTableEntry(state,
                                 state.dataOutRptPredefined->pdchWthrVal, curNameAndUnits, RealToStr(ConvertIPdelta(indexUnitConv, StrToReal(lineIn.substr(2, 4))), 1));
-                            PreDefTableEntry(
+                            PreDefTableEntry(state,
                                 state.dataOutRptPredefined->pdchLeedGenData, "Heating Degree Days", RealToStr(ConvertIPdelta(indexUnitConv, StrToReal(lineIn.substr(2, 4))), 1));
                         } else {
-                            PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "Weather File Heating Degree-Days (base 18°C)", lineIn.substr(2, 4));
-                            PreDefTableEntry(state.dataOutRptPredefined->pdchLeedGenData, "Heating Degree Days", lineIn.substr(2, 4));
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Weather File Heating Degree-Days (base 18°C)", lineIn.substr(2, 4));
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Heating Degree Days", lineIn.substr(2, 4));
                         }
-                        PreDefTableEntry(state.dataOutRptPredefined->pdchLeedGenData, "HDD and CDD data source", "Weather File Stat");
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "HDD and CDD data source", "Weather File Stat");
                     } else if (SELECT_CASE_var == StatLineType::wthCDDLine) { //  -  464 (wthr file) annual cooling degree-days (18°C baseline)
                         if (storeASHRAECDD != "") {
                             if (unitsStyle == unitsStyleInchPound) {
                                 curNameWithSIUnits = "ASHRAE Handbook 2009  Cooling Degree-Days - base 50°(C)";
                                 LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
-                                PreDefTableEntry(
+                                PreDefTableEntry(state,
                                     state.dataOutRptPredefined->pdchWthrVal, curNameAndUnits, RealToStr(ConvertIPdelta(indexUnitConv, StrToReal(storeASHRAECDD)), 1));
                             } else {
-                                PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Handbook 2009  Cooling Degree-Days (base 10°C)", storeASHRAECDD);
+                                PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Handbook 2009  Cooling Degree-Days (base 10°C)", storeASHRAECDD);
                             }
                         } else {
                             if (unitsStyle == unitsStyleInchPound) {
-                                PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Handbook 2009  Cooling Degree-Days (base 50°F)", "not found");
+                                PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Handbook 2009  Cooling Degree-Days (base 50°F)", "not found");
                             } else {
-                                PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Handbook 2009  Cooling Degree-Days (base 10°C)", "not found");
+                                PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Handbook 2009  Cooling Degree-Days (base 10°C)", "not found");
                             }
                         }
                         if (unitsStyle == unitsStyleInchPound) {
                             curNameWithSIUnits = "Weather File Cooling Degree-Days - base 50°(C)";
                             LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
-                            PreDefTableEntry(
+                            PreDefTableEntry(state,
                                 state.dataOutRptPredefined->pdchWthrVal, curNameAndUnits, RealToStr(ConvertIPdelta(indexUnitConv, StrToReal(lineIn.substr(2, 4))), 1));
-                            PreDefTableEntry(
+                            PreDefTableEntry(state,
                                 state.dataOutRptPredefined->pdchLeedGenData, "Cooling Degree Days", RealToStr(ConvertIPdelta(indexUnitConv, StrToReal(lineIn.substr(2, 4))), 1));
                         } else {
-                            PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "Weather File Cooling Degree-Days (base 10°C)", lineIn.substr(2, 4));
-                            PreDefTableEntry(state.dataOutRptPredefined->pdchLeedGenData, "Cooling Degree Days", lineIn.substr(2, 4));
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Weather File Cooling Degree-Days (base 10°C)", lineIn.substr(2, 4));
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Cooling Degree Days", lineIn.substr(2, 4));
                         }
                     } else if (SELECT_CASE_var == StatLineType::KoppenLine) { // - Climate type "BSk" (Köppen classification)
                         if (!has(lineIn, "not shown")) {
                             isKoppen = true;
                             if (lineIn[18] == '"') { // two character classification
-                                PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "Köppen Classification", lineIn.substr(16, 2));
+                                PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Köppen Classification", lineIn.substr(16, 2));
                             } else {
-                                PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "Köppen Classification", lineIn.substr(16, 3));
+                                PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Köppen Classification", lineIn.substr(16, 3));
                             }
                         } else {
                             isKoppen = false;
-                            PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "Köppen Recommendation", lineIn.substr(2));
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Köppen Recommendation", lineIn.substr(2));
                         }
                     } else if (SELECT_CASE_var ==
                                StatLineType::KoppenDes1Line) { // - Tropical monsoonal or tradewind-coastal (short dry season, lat. 5-25°)
                         if (isKoppen) {
-                            PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "Köppen Description", lineIn.substr(2));
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Köppen Description", lineIn.substr(2));
                         }
                     } else if (SELECT_CASE_var ==
                                StatLineType::KoppenDes2Line) { // - Unbearably humid periods in summer, but passive cooling is possible
                         if (isKoppen) {
                             if (len(lineIn) > 3) {                 // avoid blank lines
                                 if (lineIn.substr(2, 2) != "**") { // avoid line with warning
-                                    PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "Köppen Recommendation", lineIn.substr(2));
+                                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Köppen Recommendation", lineIn.substr(2));
                                 } else {
-                                    PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "Köppen Recommendation", "");
+                                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Köppen Recommendation", "");
                                 }
                             } else {
-                                PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "Köppen Recommendation", "");
+                                PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Köppen Recommendation", "");
                             }
                         }
                     } else if ((SELECT_CASE_var == StatLineType::AshStdLine) || (SELECT_CASE_var == StatLineType::AshStdDes1Line) ||
@@ -6277,42 +6275,42 @@ namespace OutputReportTabular {
                         if (has(lineIn, "Standard")) {
                             ashZone = lineIn.substr(16, 2);
                             if (ashZone[1] == '"') ashZone[1] = ' ';
-                            PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Climate Zone", ashZone);
-                            PreDefTableEntry(state.dataOutRptPredefined->pdchLeedGenData, "Climate Zone", ashZone);
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Climate Zone", ashZone);
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Climate Zone", ashZone);
                             if (ashZone == "1A") {
-                                PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Description", "Very Hot-Humid");
+                                PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Description", "Very Hot-Humid");
                             } else if (ashZone == "1B") {
-                                PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Description", "Very Hot-Dry");
+                                PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Description", "Very Hot-Dry");
                             } else if (ashZone == "2A") {
-                                PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Description", "Hot-Humid");
+                                PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Description", "Hot-Humid");
                             } else if (ashZone == "2B") {
-                                PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Description", "Hot-Dry");
+                                PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Description", "Hot-Dry");
                             } else if (ashZone == "3A") {
-                                PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Description", "Warm-Humid");
+                                PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Description", "Warm-Humid");
                             } else if (ashZone == "3B") {
-                                PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Description", "Warm-Dry");
+                                PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Description", "Warm-Dry");
                             } else if (ashZone == "3C") {
-                                PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Description", "Warm-Marine");
+                                PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Description", "Warm-Marine");
                             } else if (ashZone == "4A") {
-                                PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Description", "Mixed-Humid");
+                                PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Description", "Mixed-Humid");
                             } else if (ashZone == "4B") {
-                                PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Description", "Mixed-Dry");
+                                PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Description", "Mixed-Dry");
                             } else if (ashZone == "4C") {
-                                PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Description", "Mixed-Marine");
+                                PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Description", "Mixed-Marine");
                             } else if (ashZone == "5A") {
-                                PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Description", "Cool-Humid");
+                                PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Description", "Cool-Humid");
                             } else if (ashZone == "5B") {
-                                PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Description", "Cool-Dry");
+                                PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Description", "Cool-Dry");
                             } else if (ashZone == "5C") {
-                                PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Description", "Cool-Marine");
+                                PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Description", "Cool-Marine");
                             } else if (ashZone == "6A") {
-                                PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Description", "Cold-Humid");
+                                PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Description", "Cold-Humid");
                             } else if (ashZone == "6B") {
-                                PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Description", "Cold-Dry");
+                                PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Description", "Cold-Dry");
                             } else if (ashZone == "7 ") {
-                                PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Description", "Very Cold");
+                                PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Description", "Very Cold");
                             } else if (ashZone == "8 ") {
-                                PreDefTableEntry(state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Description", "Subarctic");
+                                PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Description", "Subarctic");
                             }
                         }
                     }
@@ -6440,50 +6438,50 @@ namespace OutputReportTabular {
             zonePt = Lights(iLight).ZonePtr;
             mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier;
             if (Zone(zonePt).SystemZoneNodeNumber > 0) { // conditioned y/n
-                PreDefTableEntry(state.dataOutRptPredefined->pdchInLtCond, Lights(iLight).Name, "Y");
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtCond, Lights(iLight).Name, "Y");
             } else {
-                PreDefTableEntry(state.dataOutRptPredefined->pdchInLtCond, Lights(iLight).Name, "N");
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtCond, Lights(iLight).Name, "N");
             }
-            PreDefTableEntry(
+            PreDefTableEntry(state,
                 state.dataOutRptPredefined->pdchInLtAvgHrSchd, Lights(iLight).Name, ScheduleAverageHoursPerWeek(state, Lights(iLight).SchedPtr, StartOfWeek, state.dataEnvrn->CurrentYearIsLeapYear));
             // average operating hours per week
             if (gatherElapsedTimeBEPS > 0) {
                 HrsPerWeek = 24 * 7 * Lights(iLight).SumTimeNotZeroCons / gatherElapsedTimeBEPS;
-                PreDefTableEntry(state.dataOutRptPredefined->pdchInLtAvgHrOper, Lights(iLight).Name, HrsPerWeek);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtAvgHrOper, Lights(iLight).Name, HrsPerWeek);
             }
             // full load hours per week
             if ((Lights(iLight).DesignLevel * gatherElapsedTimeBEPS) > 0) {
                 HrsPerWeek = 24 * 7 * Lights(iLight).SumConsumption / (Lights(iLight).DesignLevel * gatherElapsedTimeBEPS * DataGlobalConstants::SecInHour);
-                PreDefTableEntry(state.dataOutRptPredefined->pdchInLtFullLoadHrs, Lights(iLight).Name, HrsPerWeek);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtFullLoadHrs, Lights(iLight).Name, HrsPerWeek);
             }
-            PreDefTableEntry(state.dataOutRptPredefined->pdchInLtConsump, Lights(iLight).Name, Lights(iLight).SumConsumption * mult / 1000000000.0);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtConsump, Lights(iLight).Name, Lights(iLight).SumConsumption * mult / 1000000000.0);
             consumptionTotal += Lights(iLight).SumConsumption / 1000000000.0;
         }
-        PreDefTableEntry(state.dataOutRptPredefined->pdchInLtConsump, "Interior Lighting Total", consumptionTotal);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtConsump, "Interior Lighting Total", consumptionTotal);
 
         // Exterior Lighting
         consumptionTotal = 0.0;
         for (iLight = 1; iLight <= state.dataExteriorEnergyUse->NumExteriorLights; ++iLight) {
             if (state.dataExteriorEnergyUse->ExteriorLights(iLight).ControlMode == ExteriorEnergyUse::LightControlType::ScheduleOnly) { // photocell/schedule
-                PreDefTableEntry(state.dataOutRptPredefined->pdchExLtAvgHrSchd,
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchExLtAvgHrSchd,
                                  state.dataExteriorEnergyUse->ExteriorLights(iLight).Name,
                                  ScheduleAverageHoursPerWeek(state, state.dataExteriorEnergyUse->ExteriorLights(iLight).SchedPtr, StartOfWeek, state.dataEnvrn->CurrentYearIsLeapYear));
             }
             // average operating hours per week
             if (gatherElapsedTimeBEPS > 0) {
                 HrsPerWeek = 24 * 7 * state.dataExteriorEnergyUse->ExteriorLights(iLight).SumTimeNotZeroCons / gatherElapsedTimeBEPS;
-                PreDefTableEntry(state.dataOutRptPredefined->pdchExLtAvgHrOper, state.dataExteriorEnergyUse->ExteriorLights(iLight).Name, HrsPerWeek);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchExLtAvgHrOper, state.dataExteriorEnergyUse->ExteriorLights(iLight).Name, HrsPerWeek);
             }
             // full load hours per week
             if ((state.dataExteriorEnergyUse->ExteriorLights(iLight).DesignLevel * gatherElapsedTimeBEPS) > 0) {
                 HrsPerWeek =
                     24 * 7 * state.dataExteriorEnergyUse->ExteriorLights(iLight).SumConsumption / (state.dataExteriorEnergyUse->ExteriorLights(iLight).DesignLevel * gatherElapsedTimeBEPS * DataGlobalConstants::SecInHour);
-                PreDefTableEntry(state.dataOutRptPredefined->pdchExLtFullLoadHrs, state.dataExteriorEnergyUse->ExteriorLights(iLight).Name, HrsPerWeek);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchExLtFullLoadHrs, state.dataExteriorEnergyUse->ExteriorLights(iLight).Name, HrsPerWeek);
             }
-            PreDefTableEntry(state.dataOutRptPredefined->pdchExLtConsump, state.dataExteriorEnergyUse->ExteriorLights(iLight).Name, state.dataExteriorEnergyUse->ExteriorLights(iLight).SumConsumption / 1000000000.0);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchExLtConsump, state.dataExteriorEnergyUse->ExteriorLights(iLight).Name, state.dataExteriorEnergyUse->ExteriorLights(iLight).SumConsumption / 1000000000.0);
             consumptionTotal += state.dataExteriorEnergyUse->ExteriorLights(iLight).SumConsumption / 1000000000.0;
         }
-        PreDefTableEntry(state.dataOutRptPredefined->pdchExLtConsump, "Exterior Lighting Total", consumptionTotal);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchExLtConsump, "Exterior Lighting Total", consumptionTotal);
 
         // outside air ventilation
         for (iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
@@ -6491,21 +6489,21 @@ namespace OutputReportTabular {
                 if (Zone(iZone).isNominalOccupied) {
                     // occupants
                     if (ZonePreDefRep(iZone).NumOccAccumTime > 0) {
-                        PreDefTableEntry(
+                        PreDefTableEntry(state,
                             state.dataOutRptPredefined->pdchOaoAvgNumOcc1, Zone(iZone).Name, ZonePreDefRep(iZone).NumOccAccum / ZonePreDefRep(iZone).NumOccAccumTime);
-                        PreDefTableEntry(
+                        PreDefTableEntry(state,
                             state.dataOutRptPredefined->pdchOaoAvgNumOcc2, Zone(iZone).Name, ZonePreDefRep(iZone).NumOccAccum / ZonePreDefRep(iZone).NumOccAccumTime);
                     }
                     // Mechanical ventilation
                     if (Zone(iZone).Volume > 0 && ZonePreDefRep(iZone).TotTimeOcc > 0) {
-                        PreDefTableEntry(state.dataOutRptPredefined->pdchOaoAvgMechVent,
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaoAvgMechVent,
                                          Zone(iZone).Name,
                                          ZonePreDefRep(iZone).MechVentVolTotal / (ZonePreDefRep(iZone).TotTimeOcc * Zone(iZone).Volume *
                                                                                   Zone(iZone).Multiplier * Zone(iZone).ListMultiplier),
                                          3);
                     }
                     if ((Zone(iZone).Volume > 0) && (ZonePreDefRep(iZone).TotTimeOcc > 0)) {
-                        PreDefTableEntry(state.dataOutRptPredefined->pdchOaoMinMechVent,
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaoMinMechVent,
                                          Zone(iZone).Name,
                                          ZonePreDefRep(iZone).MechVentVolMin /
                                              (Zone(iZone).Volume * Zone(iZone).Multiplier * Zone(iZone).ListMultiplier),
@@ -6513,13 +6511,13 @@ namespace OutputReportTabular {
                     }
                     // infiltration
                     if (Zone(iZone).Volume > 0 && ZonePreDefRep(iZone).TotTimeOcc > 0) {
-                        PreDefTableEntry(state.dataOutRptPredefined->pdchOaoAvgInfil,
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaoAvgInfil,
                                          Zone(iZone).Name,
                                          ZonePreDefRep(iZone).InfilVolTotal / (ZonePreDefRep(iZone).TotTimeOcc * Zone(iZone).Volume),
                                          3);
                     }
                     if ((Zone(iZone).Volume > 0) && (ZonePreDefRep(iZone).TotTimeOcc > 0)) {
-                        PreDefTableEntry(state.dataOutRptPredefined->pdchOaoMinInfil, Zone(iZone).Name, ZonePreDefRep(iZone).InfilVolMin / (Zone(iZone).Volume), 3);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaoMinInfil, Zone(iZone).Name, ZonePreDefRep(iZone).InfilVolMin / (Zone(iZone).Volume), 3);
                     }
                     // AFN infiltration -- check that afn sim is being done.
                     if (AirflowNetwork::SimulateAirflowNetwork < AirflowNetwork::AirflowNetworkControlMultizone) {
@@ -6532,35 +6530,35 @@ namespace OutputReportTabular {
                         }
                     }
                     if (Zone(iZone).Volume > 0 && ZonePreDefRep(iZone).TotTimeOcc > 0) {
-                        PreDefTableEntry(state.dataOutRptPredefined->pdchOaoAvgAFNInfil,
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaoAvgAFNInfil,
                                          Zone(iZone).Name,
                                          ZonePreDefRep(iZone).AFNInfilVolTotal / (ZonePreDefRep(iZone).TotTimeOcc * Zone(iZone).Volume),
                                          3);
                     }
                     if ((Zone(iZone).Volume > 0) && (ZonePreDefRep(iZone).TotTimeOcc > 0)) {
-                        PreDefTableEntry(state.dataOutRptPredefined->pdchOaoMinAFNInfil, Zone(iZone).Name, ZonePreDefRep(iZone).AFNInfilVolMin / (Zone(iZone).Volume), 3);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaoMinAFNInfil, Zone(iZone).Name, ZonePreDefRep(iZone).AFNInfilVolMin / (Zone(iZone).Volume), 3);
                     }
                     // simple 'ZoneVentilation'
                     if (Zone(iZone).Volume > 0 && ZonePreDefRep(iZone).TotTimeOcc > 0) {
-                        PreDefTableEntry(state.dataOutRptPredefined->pdchOaoAvgSimpVent,
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaoAvgSimpVent,
                                          Zone(iZone).Name,
                                          ZonePreDefRep(iZone).SimpVentVolTotal / (ZonePreDefRep(iZone).TotTimeOcc * Zone(iZone).Volume),
                                          3);
                     }
                     if ((Zone(iZone).Volume > 0) && (ZonePreDefRep(iZone).TotTimeOcc > 0)) {
-                        PreDefTableEntry(state.dataOutRptPredefined->pdchOaoMinSimpVent, Zone(iZone).Name, ZonePreDefRep(iZone).SimpVentVolMin / (Zone(iZone).Volume), 3);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaoMinSimpVent, Zone(iZone).Name, ZonePreDefRep(iZone).SimpVentVolMin / (Zone(iZone).Volume), 3);
                     }
 
                     // Zone volume
-                    PreDefTableEntry(state.dataOutRptPredefined->pdchOaoZoneVol1, Zone(iZone).Name, Zone(iZone).Volume);
-                    PreDefTableEntry(state.dataOutRptPredefined->pdchOaoZoneVol2, Zone(iZone).Name, Zone(iZone).Volume);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaoZoneVol1, Zone(iZone).Name, Zone(iZone).Volume);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaoZoneVol2, Zone(iZone).Name, Zone(iZone).Volume);
                     totalVolume += Zone(iZone).Volume;
                 }
             }
         }
 
         // Add the number of central air distributions system to the count report
-        PreDefTableEntry(state.dataOutRptPredefined->pdchHVACcntVal, "HVAC Air Loops", NumPrimaryAirSys);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchHVACcntVal, "HVAC Air Loops", NumPrimaryAirSys);
         // Add the number of conditioned and unconditioned zones to the count report
         for (iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
             if (Zone(iZone).SystemZoneNodeNumber > 0) { // conditioned zones only
@@ -6569,93 +6567,93 @@ namespace OutputReportTabular {
                 ++numUncondZones;
             }
         }
-        PreDefTableEntry(state.dataOutRptPredefined->pdchHVACcntVal, "Conditioned Zones", numCondZones);
-        PreDefTableEntry(state.dataOutRptPredefined->pdchHVACcntVal, "Unconditioned Zones", numUncondZones);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchHVACcntVal, "Conditioned Zones", numCondZones);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchHVACcntVal, "Unconditioned Zones", numUncondZones);
         // add the number of plenums to the count report
-        PreDefTableEntry(state.dataOutRptPredefined->pdchHVACcntVal, "Supply Plenums", state.dataZonePlenum->NumZoneSupplyPlenums);
-        PreDefTableEntry(state.dataOutRptPredefined->pdchHVACcntVal, "Return Plenums", state.dataZonePlenum->NumZoneReturnPlenums);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchHVACcntVal, "Supply Plenums", state.dataZonePlenum->NumZoneSupplyPlenums);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchHVACcntVal, "Return Plenums", state.dataZonePlenum->NumZoneReturnPlenums);
 
         // Started to create a total row but did not fully implement
-        // CALL PreDefTableEntry(pdchOaoZoneVol1,'Total OA Avg', totalVolume)
-        // CALL PreDefTableEntry(pdchOaoZoneVol2,'Total OA Min', totalVolume)
+        // CALL PreDefTableEntry(state, pdchOaoZoneVol1,'Total OA Avg', totalVolume)
+        // CALL PreDefTableEntry(state, pdchOaoZoneVol2,'Total OA Min', totalVolume)
 
         // Add footnote saying if it is a design day or other kind of environment
 
         // Field counts
-        PreDefTableEntry(state.dataOutRptPredefined->pdchFieldCntVal, "IDF Objects", iNumberOfRecords);
-        PreDefTableEntry(state.dataOutRptPredefined->pdchFieldCntVal, "Defaulted Fields", iNumberOfDefaultedFields);
-        PreDefTableEntry(state.dataOutRptPredefined->pdchFieldCntVal, "Fields with Defaults", iTotalFieldsWithDefaults);
-        PreDefTableEntry(state.dataOutRptPredefined->pdchFieldCntVal, "Autosized Fields", iNumberOfAutoSizedFields);
-        PreDefTableEntry(state.dataOutRptPredefined->pdchFieldCntVal, "Autosizable Fields", iTotalAutoSizableFields);
-        PreDefTableEntry(state.dataOutRptPredefined->pdchFieldCntVal, "Autocalculated Fields", iNumberOfAutoCalcedFields);
-        PreDefTableEntry(state.dataOutRptPredefined->pdchFieldCntVal, "Autocalculatable Fields", iTotalAutoCalculatableFields);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFieldCntVal, "IDF Objects", iNumberOfRecords);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFieldCntVal, "Defaulted Fields", iNumberOfDefaultedFields);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFieldCntVal, "Fields with Defaults", iTotalFieldsWithDefaults);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFieldCntVal, "Autosized Fields", iNumberOfAutoSizedFields);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFieldCntVal, "Autosizable Fields", iTotalAutoSizableFields);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFieldCntVal, "Autocalculated Fields", iNumberOfAutoCalcedFields);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFieldCntVal, "Autocalculatable Fields", iTotalAutoCalculatableFields);
 
         for (iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
             // annual
-            // PreDefTableEntry( pdchSHGSAnHvacHt, Zone( iZone ).Name, ZonePreDefRep( iZone ).SHGSAnHvacHt * convertJtoGJ, 3 );
-            // PreDefTableEntry( pdchSHGSAnHvacCl, Zone( iZone ).Name, ZonePreDefRep( iZone ).SHGSAnHvacCl * convertJtoGJ, 3 );
-            PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSAnZoneEqHt, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnZoneEqHt * DataGlobalConstants::convertJtoGJ, 3);
-            PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSAnZoneEqCl, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnZoneEqCl * DataGlobalConstants::convertJtoGJ, 3);
-            PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSAnHvacATUHt, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnHvacATUHt * DataGlobalConstants::convertJtoGJ, 3);
-            PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSAnHvacATUCl, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnHvacATUCl * DataGlobalConstants::convertJtoGJ, 3);
-            PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSAnSurfHt, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnSurfHt * DataGlobalConstants::convertJtoGJ, 3);
-            PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSAnSurfCl, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnSurfCl * DataGlobalConstants::convertJtoGJ, 3);
-            PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSAnPeoplAdd, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnPeoplAdd * DataGlobalConstants::convertJtoGJ, 3);
-            PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSAnLiteAdd, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnLiteAdd * DataGlobalConstants::convertJtoGJ, 3);
-            PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSAnEquipAdd, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnEquipAdd * DataGlobalConstants::convertJtoGJ, 3);
-            PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSAnWindAdd, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnWindAdd * DataGlobalConstants::convertJtoGJ, 3);
-            PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSAnIzaAdd, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnIzaAdd * DataGlobalConstants::convertJtoGJ, 3);
-            PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSAnInfilAdd, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnInfilAdd * DataGlobalConstants::convertJtoGJ, 3);
-            PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSAnOtherAdd, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnOtherAdd * DataGlobalConstants::convertJtoGJ, 3);
-            PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSAnEquipRem, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnEquipRem * DataGlobalConstants::convertJtoGJ, 3);
-            PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSAnWindRem, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnWindRem * DataGlobalConstants::convertJtoGJ, 3);
-            PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSAnIzaRem, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnIzaRem * DataGlobalConstants::convertJtoGJ, 3);
-            PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSAnInfilRem, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnInfilRem * DataGlobalConstants::convertJtoGJ, 3);
-            PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSAnOtherRem, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnOtherRem * DataGlobalConstants::convertJtoGJ, 3);
+            // PreDefTableEntry(state,  pdchSHGSAnHvacHt, Zone( iZone ).Name, ZonePreDefRep( iZone ).SHGSAnHvacHt * convertJtoGJ, 3 );
+            // PreDefTableEntry(state,  pdchSHGSAnHvacCl, Zone( iZone ).Name, ZonePreDefRep( iZone ).SHGSAnHvacCl * convertJtoGJ, 3 );
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnZoneEqHt, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnZoneEqHt * DataGlobalConstants::convertJtoGJ, 3);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnZoneEqCl, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnZoneEqCl * DataGlobalConstants::convertJtoGJ, 3);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnHvacATUHt, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnHvacATUHt * DataGlobalConstants::convertJtoGJ, 3);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnHvacATUCl, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnHvacATUCl * DataGlobalConstants::convertJtoGJ, 3);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnSurfHt, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnSurfHt * DataGlobalConstants::convertJtoGJ, 3);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnSurfCl, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnSurfCl * DataGlobalConstants::convertJtoGJ, 3);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnPeoplAdd, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnPeoplAdd * DataGlobalConstants::convertJtoGJ, 3);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnLiteAdd, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnLiteAdd * DataGlobalConstants::convertJtoGJ, 3);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnEquipAdd, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnEquipAdd * DataGlobalConstants::convertJtoGJ, 3);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnWindAdd, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnWindAdd * DataGlobalConstants::convertJtoGJ, 3);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnIzaAdd, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnIzaAdd * DataGlobalConstants::convertJtoGJ, 3);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnInfilAdd, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnInfilAdd * DataGlobalConstants::convertJtoGJ, 3);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnOtherAdd, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnOtherAdd * DataGlobalConstants::convertJtoGJ, 3);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnEquipRem, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnEquipRem * DataGlobalConstants::convertJtoGJ, 3);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnWindRem, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnWindRem * DataGlobalConstants::convertJtoGJ, 3);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnIzaRem, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnIzaRem * DataGlobalConstants::convertJtoGJ, 3);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnInfilRem, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnInfilRem * DataGlobalConstants::convertJtoGJ, 3);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnOtherRem, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnOtherRem * DataGlobalConstants::convertJtoGJ, 3);
             // peak cooling
-            PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSClTimePeak, Zone(iZone).Name, DateToString(ZonePreDefRep(iZone).clPtTimeStamp));
-            // PreDefTableEntry( pdchSHGSClHvacHt, Zone( iZone ).Name, ZonePreDefRep( iZone ).SHGSClHvacHt );
-            // PreDefTableEntry( pdchSHGSClHvacCl, Zone( iZone ).Name, ZonePreDefRep( iZone ).SHGSClHvacCl );
-            PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSClHvacHt, Zone(iZone).Name, (ZonePreDefRep(iZone).SHGSClHvacHt - ZonePreDefRep(iZone).SHGSClHvacATUHt));
-            PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSClHvacCl, Zone(iZone).Name, (ZonePreDefRep(iZone).SHGSClHvacCl - ZonePreDefRep(iZone).SHGSClHvacATUCl));
-            PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSClHvacATUHt, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSClHvacATUHt);
-            PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSClHvacATUCl, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSClHvacATUCl);
-            PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSClSurfHt, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSClSurfHt);
-            PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSClSurfCl, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSClSurfCl);
-            PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSClPeoplAdd, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSClPeoplAdd);
-            PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSClLiteAdd, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSClLiteAdd);
-            PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSClEquipAdd, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSClEquipAdd);
-            PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSClWindAdd, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSClWindAdd);
-            PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSClIzaAdd, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSClIzaAdd);
-            PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSClInfilAdd, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSClInfilAdd);
-            PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSClOtherAdd, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSClOtherAdd);
-            PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSClEquipRem, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSClEquipRem);
-            PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSClWindRem, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSClWindRem);
-            PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSClIzaRem, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSClIzaRem);
-            PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSClInfilRem, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSClInfilRem);
-            PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSClOtherRem, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSClOtherRem);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClTimePeak, Zone(iZone).Name, DateToString(ZonePreDefRep(iZone).clPtTimeStamp));
+            // PreDefTableEntry(state,  pdchSHGSClHvacHt, Zone( iZone ).Name, ZonePreDefRep( iZone ).SHGSClHvacHt );
+            // PreDefTableEntry(state,  pdchSHGSClHvacCl, Zone( iZone ).Name, ZonePreDefRep( iZone ).SHGSClHvacCl );
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClHvacHt, Zone(iZone).Name, (ZonePreDefRep(iZone).SHGSClHvacHt - ZonePreDefRep(iZone).SHGSClHvacATUHt));
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClHvacCl, Zone(iZone).Name, (ZonePreDefRep(iZone).SHGSClHvacCl - ZonePreDefRep(iZone).SHGSClHvacATUCl));
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClHvacATUHt, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSClHvacATUHt);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClHvacATUCl, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSClHvacATUCl);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClSurfHt, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSClSurfHt);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClSurfCl, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSClSurfCl);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClPeoplAdd, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSClPeoplAdd);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClLiteAdd, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSClLiteAdd);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClEquipAdd, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSClEquipAdd);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClWindAdd, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSClWindAdd);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClIzaAdd, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSClIzaAdd);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClInfilAdd, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSClInfilAdd);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClOtherAdd, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSClOtherAdd);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClEquipRem, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSClEquipRem);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClWindRem, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSClWindRem);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClIzaRem, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSClIzaRem);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClInfilRem, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSClInfilRem);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClOtherRem, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSClOtherRem);
             // peak heating
-            PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSHtTimePeak, Zone(iZone).Name, DateToString(ZonePreDefRep(iZone).htPtTimeStamp));
-            // PreDefTableEntry( pdchSHGSHtHvacHt, Zone( iZone ).Name, ZonePreDefRep( iZone ).SHGSHtHvacHt );
-            // PreDefTableEntry( pdchSHGSHtHvacCl, Zone( iZone ).Name, ZonePreDefRep( iZone ).SHGSHtHvacCl );
-            PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSHtHvacHt, Zone(iZone).Name, (ZonePreDefRep(iZone).SHGSHtHvacHt - ZonePreDefRep(iZone).SHGSHtHvacATUHt));
-            PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSHtHvacCl, Zone(iZone).Name, (ZonePreDefRep(iZone).SHGSHtHvacCl - ZonePreDefRep(iZone).SHGSHtHvacATUCl));
-            PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSHtHvacATUHt, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSHtHvacATUHt);
-            PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSHtHvacATUCl, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSHtHvacATUCl);
-            PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSHtSurfHt, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSHtSurfHt);
-            PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSHtSurfCl, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSHtSurfCl);
-            PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSHtPeoplAdd, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSHtPeoplAdd);
-            PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSHtLiteAdd, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSHtLiteAdd);
-            PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSHtEquipAdd, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSHtEquipAdd);
-            PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSHtWindAdd, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSHtWindAdd);
-            PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSHtIzaAdd, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSHtIzaAdd);
-            PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSHtInfilAdd, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSHtInfilAdd);
-            PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSHtOtherAdd, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSHtOtherAdd);
-            PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSHtEquipRem, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSHtEquipRem);
-            PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSHtWindRem, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSHtWindRem);
-            PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSHtIzaRem, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSHtIzaRem);
-            PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSHtInfilRem, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSHtInfilRem);
-            PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSHtOtherRem, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSHtOtherRem);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtTimePeak, Zone(iZone).Name, DateToString(ZonePreDefRep(iZone).htPtTimeStamp));
+            // PreDefTableEntry(state,  pdchSHGSHtHvacHt, Zone( iZone ).Name, ZonePreDefRep( iZone ).SHGSHtHvacHt );
+            // PreDefTableEntry(state,  pdchSHGSHtHvacCl, Zone( iZone ).Name, ZonePreDefRep( iZone ).SHGSHtHvacCl );
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtHvacHt, Zone(iZone).Name, (ZonePreDefRep(iZone).SHGSHtHvacHt - ZonePreDefRep(iZone).SHGSHtHvacATUHt));
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtHvacCl, Zone(iZone).Name, (ZonePreDefRep(iZone).SHGSHtHvacCl - ZonePreDefRep(iZone).SHGSHtHvacATUCl));
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtHvacATUHt, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSHtHvacATUHt);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtHvacATUCl, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSHtHvacATUCl);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtSurfHt, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSHtSurfHt);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtSurfCl, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSHtSurfCl);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtPeoplAdd, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSHtPeoplAdd);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtLiteAdd, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSHtLiteAdd);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtEquipAdd, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSHtEquipAdd);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtWindAdd, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSHtWindAdd);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtIzaAdd, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSHtIzaAdd);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtInfilAdd, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSHtInfilAdd);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtOtherAdd, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSHtOtherAdd);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtEquipRem, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSHtEquipRem);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtWindRem, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSHtWindRem);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtIzaRem, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSHtIzaRem);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtInfilRem, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSHtInfilRem);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtOtherRem, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSHtOtherRem);
         }
         // totals for annual report
         for (iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
@@ -6678,96 +6676,96 @@ namespace OutputReportTabular {
             totalInfilRem += ZonePreDefRep(iZone).SHGSAnInfilRem;
             totalOtherRem += ZonePreDefRep(iZone).SHGSAnOtherRem;
         }
-        // PreDefTableEntry( pdchSHGSAnHvacHt, "Total Facility", totalHvacHt * convertJtoGJ, 3 );
-        // PreDefTableEntry( pdchSHGSAnHvacCl, "Total Facility", totalHvacCl * convertJtoGJ, 3 );
-        PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSAnZoneEqHt, "Total Facility", totalZoneEqHt * DataGlobalConstants::convertJtoGJ, 3);
-        PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSAnZoneEqCl, "Total Facility", totalZoneEqCl * DataGlobalConstants::convertJtoGJ, 3);
-        PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSAnHvacATUHt, "Total Facility", totalHvacATUHt * DataGlobalConstants::convertJtoGJ, 3);
-        PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSAnHvacATUCl, "Total Facility", totalHvacATUCl * DataGlobalConstants::convertJtoGJ, 3);
-        PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSAnSurfHt, "Total Facility", totalSurfHt * DataGlobalConstants::convertJtoGJ, 3);
-        PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSAnSurfCl, "Total Facility", totalSurfCl * DataGlobalConstants::convertJtoGJ, 3);
-        PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSAnPeoplAdd, "Total Facility", totalPeoplAdd * DataGlobalConstants::convertJtoGJ, 3);
-        PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSAnLiteAdd, "Total Facility", totalLiteAdd * DataGlobalConstants::convertJtoGJ, 3);
-        PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSAnEquipAdd, "Total Facility", totalEquipAdd * DataGlobalConstants::convertJtoGJ, 3);
-        PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSAnWindAdd, "Total Facility", totalWindAdd * DataGlobalConstants::convertJtoGJ, 3);
-        PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSAnIzaAdd, "Total Facility", totalIzaAdd * DataGlobalConstants::convertJtoGJ, 3);
-        PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSAnInfilAdd, "Total Facility", totalInfilAdd * DataGlobalConstants::convertJtoGJ, 3);
-        PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSAnOtherAdd, "Total Facility", totalOtherAdd * DataGlobalConstants::convertJtoGJ, 3);
-        PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSAnEquipRem, "Total Facility", totalEquipRem * DataGlobalConstants::convertJtoGJ, 3);
-        PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSAnWindRem, "Total Facility", totalWindRem * DataGlobalConstants::convertJtoGJ, 3);
-        PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSAnIzaRem, "Total Facility", totalIzaRem * DataGlobalConstants::convertJtoGJ, 3);
-        PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSAnInfilRem, "Total Facility", totalInfilRem * DataGlobalConstants::convertJtoGJ, 3);
-        PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSAnOtherRem, "Total Facility", totalOtherRem * DataGlobalConstants::convertJtoGJ, 3);
+        // PreDefTableEntry(state,  pdchSHGSAnHvacHt, "Total Facility", totalHvacHt * convertJtoGJ, 3 );
+        // PreDefTableEntry(state,  pdchSHGSAnHvacCl, "Total Facility", totalHvacCl * convertJtoGJ, 3 );
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnZoneEqHt, "Total Facility", totalZoneEqHt * DataGlobalConstants::convertJtoGJ, 3);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnZoneEqCl, "Total Facility", totalZoneEqCl * DataGlobalConstants::convertJtoGJ, 3);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnHvacATUHt, "Total Facility", totalHvacATUHt * DataGlobalConstants::convertJtoGJ, 3);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnHvacATUCl, "Total Facility", totalHvacATUCl * DataGlobalConstants::convertJtoGJ, 3);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnSurfHt, "Total Facility", totalSurfHt * DataGlobalConstants::convertJtoGJ, 3);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnSurfCl, "Total Facility", totalSurfCl * DataGlobalConstants::convertJtoGJ, 3);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnPeoplAdd, "Total Facility", totalPeoplAdd * DataGlobalConstants::convertJtoGJ, 3);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnLiteAdd, "Total Facility", totalLiteAdd * DataGlobalConstants::convertJtoGJ, 3);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnEquipAdd, "Total Facility", totalEquipAdd * DataGlobalConstants::convertJtoGJ, 3);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnWindAdd, "Total Facility", totalWindAdd * DataGlobalConstants::convertJtoGJ, 3);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnIzaAdd, "Total Facility", totalIzaAdd * DataGlobalConstants::convertJtoGJ, 3);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnInfilAdd, "Total Facility", totalInfilAdd * DataGlobalConstants::convertJtoGJ, 3);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnOtherAdd, "Total Facility", totalOtherAdd * DataGlobalConstants::convertJtoGJ, 3);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnEquipRem, "Total Facility", totalEquipRem * DataGlobalConstants::convertJtoGJ, 3);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnWindRem, "Total Facility", totalWindRem * DataGlobalConstants::convertJtoGJ, 3);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnIzaRem, "Total Facility", totalIzaRem * DataGlobalConstants::convertJtoGJ, 3);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnInfilRem, "Total Facility", totalInfilRem * DataGlobalConstants::convertJtoGJ, 3);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSAnOtherRem, "Total Facility", totalOtherRem * DataGlobalConstants::convertJtoGJ, 3);
         // building level results for peak cooling
-        PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSClTimePeak, "Total Facility", DateToString(BuildingPreDefRep.clPtTimeStamp));
-        // PreDefTableEntry( pdchSHGSClHvacHt, "Total Facility", BuildingPreDefRep.SHGSClHvacHt );
-        // PreDefTableEntry( pdchSHGSClHvacCl, "Total Facility", BuildingPreDefRep.SHGSClHvacCl );
-        PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSClHvacHt, "Total Facility", (BuildingPreDefRep.SHGSClHvacHt - BuildingPreDefRep.SHGSClHvacATUHt));
-        PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSClHvacCl, "Total Facility", (BuildingPreDefRep.SHGSClHvacCl - BuildingPreDefRep.SHGSClHvacATUCl));
-        PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSClHvacATUHt, "Total Facility", BuildingPreDefRep.SHGSClHvacATUHt);
-        PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSClHvacATUCl, "Total Facility", BuildingPreDefRep.SHGSClHvacATUCl);
-        PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSClSurfHt, "Total Facility", BuildingPreDefRep.SHGSClSurfHt);
-        PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSClSurfCl, "Total Facility", BuildingPreDefRep.SHGSClSurfCl);
-        PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSClPeoplAdd, "Total Facility", BuildingPreDefRep.SHGSClPeoplAdd);
-        PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSClLiteAdd, "Total Facility", BuildingPreDefRep.SHGSClLiteAdd);
-        PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSClEquipAdd, "Total Facility", BuildingPreDefRep.SHGSClEquipAdd);
-        PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSClWindAdd, "Total Facility", BuildingPreDefRep.SHGSClWindAdd);
-        PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSClIzaAdd, "Total Facility", BuildingPreDefRep.SHGSClIzaAdd);
-        PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSClInfilAdd, "Total Facility", BuildingPreDefRep.SHGSClInfilAdd);
-        PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSClOtherAdd, "Total Facility", BuildingPreDefRep.SHGSClOtherAdd);
-        PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSClEquipRem, "Total Facility", BuildingPreDefRep.SHGSClEquipRem);
-        PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSClWindRem, "Total Facility", BuildingPreDefRep.SHGSClWindRem);
-        PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSClIzaRem, "Total Facility", BuildingPreDefRep.SHGSClIzaRem);
-        PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSClInfilRem, "Total Facility", BuildingPreDefRep.SHGSClInfilRem);
-        PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSClOtherRem, "Total Facility", BuildingPreDefRep.SHGSClOtherRem);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClTimePeak, "Total Facility", DateToString(BuildingPreDefRep.clPtTimeStamp));
+        // PreDefTableEntry(state,  pdchSHGSClHvacHt, "Total Facility", BuildingPreDefRep.SHGSClHvacHt );
+        // PreDefTableEntry(state,  pdchSHGSClHvacCl, "Total Facility", BuildingPreDefRep.SHGSClHvacCl );
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClHvacHt, "Total Facility", (BuildingPreDefRep.SHGSClHvacHt - BuildingPreDefRep.SHGSClHvacATUHt));
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClHvacCl, "Total Facility", (BuildingPreDefRep.SHGSClHvacCl - BuildingPreDefRep.SHGSClHvacATUCl));
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClHvacATUHt, "Total Facility", BuildingPreDefRep.SHGSClHvacATUHt);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClHvacATUCl, "Total Facility", BuildingPreDefRep.SHGSClHvacATUCl);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClSurfHt, "Total Facility", BuildingPreDefRep.SHGSClSurfHt);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClSurfCl, "Total Facility", BuildingPreDefRep.SHGSClSurfCl);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClPeoplAdd, "Total Facility", BuildingPreDefRep.SHGSClPeoplAdd);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClLiteAdd, "Total Facility", BuildingPreDefRep.SHGSClLiteAdd);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClEquipAdd, "Total Facility", BuildingPreDefRep.SHGSClEquipAdd);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClWindAdd, "Total Facility", BuildingPreDefRep.SHGSClWindAdd);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClIzaAdd, "Total Facility", BuildingPreDefRep.SHGSClIzaAdd);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClInfilAdd, "Total Facility", BuildingPreDefRep.SHGSClInfilAdd);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClOtherAdd, "Total Facility", BuildingPreDefRep.SHGSClOtherAdd);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClEquipRem, "Total Facility", BuildingPreDefRep.SHGSClEquipRem);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClWindRem, "Total Facility", BuildingPreDefRep.SHGSClWindRem);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClIzaRem, "Total Facility", BuildingPreDefRep.SHGSClIzaRem);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClInfilRem, "Total Facility", BuildingPreDefRep.SHGSClInfilRem);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClOtherRem, "Total Facility", BuildingPreDefRep.SHGSClOtherRem);
         // building level results for peak heating
-        PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSHtTimePeak, "Total Facility", DateToString(BuildingPreDefRep.htPtTimeStamp));
-        // PreDefTableEntry( pdchSHGSHtHvacHt, "Total Facility", BuildingPreDefRep.SHGSHtHvacHt );
-        // PreDefTableEntry( pdchSHGSHtHvacCl, "Total Facility", BuildingPreDefRep.SHGSHtHvacCl );
-        PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSHtHvacHt, "Total Facility", (BuildingPreDefRep.SHGSHtHvacHt - BuildingPreDefRep.SHGSHtHvacATUHt));
-        PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSHtHvacCl, "Total Facility", (BuildingPreDefRep.SHGSHtHvacCl - BuildingPreDefRep.SHGSHtHvacATUCl));
-        PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSHtHvacATUHt, "Total Facility", BuildingPreDefRep.SHGSHtHvacATUHt);
-        PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSHtHvacATUCl, "Total Facility", BuildingPreDefRep.SHGSHtHvacATUCl);
-        PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSHtSurfHt, "Total Facility", BuildingPreDefRep.SHGSHtSurfHt);
-        PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSHtSurfCl, "Total Facility", BuildingPreDefRep.SHGSHtSurfCl);
-        PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSHtPeoplAdd, "Total Facility", BuildingPreDefRep.SHGSHtPeoplAdd);
-        PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSHtLiteAdd, "Total Facility", BuildingPreDefRep.SHGSHtLiteAdd);
-        PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSHtEquipAdd, "Total Facility", BuildingPreDefRep.SHGSHtEquipAdd);
-        PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSHtWindAdd, "Total Facility", BuildingPreDefRep.SHGSHtWindAdd);
-        PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSHtIzaAdd, "Total Facility", BuildingPreDefRep.SHGSHtIzaAdd);
-        PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSHtInfilAdd, "Total Facility", BuildingPreDefRep.SHGSHtInfilAdd);
-        PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSHtOtherAdd, "Total Facility", BuildingPreDefRep.SHGSHtOtherAdd);
-        PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSHtEquipRem, "Total Facility", BuildingPreDefRep.SHGSHtEquipRem);
-        PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSHtWindRem, "Total Facility", BuildingPreDefRep.SHGSHtWindRem);
-        PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSHtIzaRem, "Total Facility", BuildingPreDefRep.SHGSHtIzaRem);
-        PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSHtInfilRem, "Total Facility", BuildingPreDefRep.SHGSHtInfilRem);
-        PreDefTableEntry(state.dataOutRptPredefined->pdchSHGSHtOtherRem, "Total Facility", BuildingPreDefRep.SHGSHtOtherRem);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtTimePeak, "Total Facility", DateToString(BuildingPreDefRep.htPtTimeStamp));
+        // PreDefTableEntry(state,  pdchSHGSHtHvacHt, "Total Facility", BuildingPreDefRep.SHGSHtHvacHt );
+        // PreDefTableEntry(state,  pdchSHGSHtHvacCl, "Total Facility", BuildingPreDefRep.SHGSHtHvacCl );
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtHvacHt, "Total Facility", (BuildingPreDefRep.SHGSHtHvacHt - BuildingPreDefRep.SHGSHtHvacATUHt));
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtHvacCl, "Total Facility", (BuildingPreDefRep.SHGSHtHvacCl - BuildingPreDefRep.SHGSHtHvacATUCl));
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtHvacATUHt, "Total Facility", BuildingPreDefRep.SHGSHtHvacATUHt);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtHvacATUCl, "Total Facility", BuildingPreDefRep.SHGSHtHvacATUCl);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtSurfHt, "Total Facility", BuildingPreDefRep.SHGSHtSurfHt);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtSurfCl, "Total Facility", BuildingPreDefRep.SHGSHtSurfCl);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtPeoplAdd, "Total Facility", BuildingPreDefRep.SHGSHtPeoplAdd);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtLiteAdd, "Total Facility", BuildingPreDefRep.SHGSHtLiteAdd);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtEquipAdd, "Total Facility", BuildingPreDefRep.SHGSHtEquipAdd);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtWindAdd, "Total Facility", BuildingPreDefRep.SHGSHtWindAdd);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtIzaAdd, "Total Facility", BuildingPreDefRep.SHGSHtIzaAdd);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtInfilAdd, "Total Facility", BuildingPreDefRep.SHGSHtInfilAdd);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtOtherAdd, "Total Facility", BuildingPreDefRep.SHGSHtOtherAdd);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtEquipRem, "Total Facility", BuildingPreDefRep.SHGSHtEquipRem);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtWindRem, "Total Facility", BuildingPreDefRep.SHGSHtWindRem);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtIzaRem, "Total Facility", BuildingPreDefRep.SHGSHtIzaRem);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtInfilRem, "Total Facility", BuildingPreDefRep.SHGSHtInfilRem);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSHtOtherRem, "Total Facility", BuildingPreDefRep.SHGSHtOtherRem);
 
         // LEED Report
         // 1.1A-General Information
-        // CALL PreDefTableEntry(pdchLeedGenData,'Principal Heating Source','-')
+        // CALL PreDefTableEntry(state, pdchLeedGenData,'Principal Heating Source','-')
         if (state.dataEnvrn->EnvironmentName == state.dataEnvrn->WeatherFileLocationTitle) {
-            PreDefTableEntry(state.dataOutRptPredefined->pdchLeedGenData, "Weather File", state.dataEnvrn->EnvironmentName);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Weather File", state.dataEnvrn->EnvironmentName);
         } else {
-            PreDefTableEntry(state.dataOutRptPredefined->pdchLeedGenData, "Weather File", state.dataEnvrn->EnvironmentName + " ** " + state.dataEnvrn->WeatherFileLocationTitle);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Weather File", state.dataEnvrn->EnvironmentName + " ** " + state.dataEnvrn->WeatherFileLocationTitle);
         }
 
-        // CALL PreDefTableEntry(pdchLeedGenData,'Climate Zone','-')
-        // CALL PreDefTableEntry(pdchLeedGenData,'Heating Degree Days','-')
-        // CALL PreDefTableEntry(pdchLeedGenData,'Cooling Degree Days','-')
+        // CALL PreDefTableEntry(state, pdchLeedGenData,'Climate Zone','-')
+        // CALL PreDefTableEntry(state, pdchLeedGenData,'Heating Degree Days','-')
+        // CALL PreDefTableEntry(state, pdchLeedGenData,'Cooling Degree Days','-')
         if (unitsStyle == unitsStyleInchPound) {
-            PreDefTableEntry(state.dataOutRptPredefined->pdchLeedGenData, "Total gross floor area [ft2]", "-");
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Total gross floor area [ft2]", "-");
         } else {
-            PreDefTableEntry(state.dataOutRptPredefined->pdchLeedGenData, "Total gross floor area [m2]", "-");
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Total gross floor area [m2]", "-");
         }
         // LEED schedule sub table
         for (long iSch = 1; iSch <= ScheduleManager::NumSchedules; ++iSch) {
             std::string curSchName = ScheduleManager::Schedule(iSch).Name;
             std::string curSchType = ScheduleManager::GetScheduleType(state, iSch);
             if (UtilityRoutines::SameString(curSchType, "FRACTION")) {
-                PreDefTableEntry(
+                PreDefTableEntry(state,
                     state.dataOutRptPredefined->pdchLeedEflhEflh, curSchName, ScheduleManager::ScheduleAnnualFullLoadHours(state, iSch, StartOfWeek, state.dataEnvrn->CurrentYearIsLeapYear), 0);
-                PreDefTableEntry(
+                PreDefTableEntry(state,
                     state.dataOutRptPredefined->pdchLeedEflhNonZerHrs, curSchName, ScheduleManager::ScheduleHoursGT1perc(state, iSch, StartOfWeek, state.dataEnvrn->CurrentYearIsLeapYear), 0);
             }
         }
@@ -8095,9 +8093,9 @@ namespace OutputReportTabular {
             tableBody = "";
             tableBody(1, 1) = RealToStr(convBldgGrossFloorArea, 2);
             if (unitsStyle == unitsStyleInchPound) {
-                PreDefTableEntry(state.dataOutRptPredefined->pdchLeedGenData, "Total gross floor area [ft2]", RealToStr(convBldgGrossFloorArea, 2));
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Total gross floor area [ft2]", RealToStr(convBldgGrossFloorArea, 2));
             } else {
-                PreDefTableEntry(state.dataOutRptPredefined->pdchLeedGenData, "Total gross floor area [m2]", RealToStr(convBldgGrossFloorArea, 2));
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Total gross floor area [m2]", RealToStr(convBldgGrossFloorArea, 2));
             }
             tableBody(1, 2) = RealToStr(convBldgCondFloorArea, 2);
             tableBody(1, 3) = RealToStr(convBldgGrossFloorArea - convBldgCondFloorArea, 2);
@@ -8227,44 +8225,44 @@ namespace OutputReportTabular {
             unconvert = largeConversionFactor / 1000000000.0; // to avoid double converting, the values for the LEED report should be in GJ
             //  Energy Use Intensities - Electricity
             if (buildingGrossFloorArea > 0) {
-                PreDefTableEntry(
+                PreDefTableEntry(state,
                     state.dataOutRptPredefined->pdchLeedEuiElec, "Interior Lighting (All)", unconvert * 1000 * useVal(colElectricity, 3) / buildingGrossFloorArea, 2);
-                PreDefTableEntry(state.dataOutRptPredefined->pdchLeedEuiElec, "Space Heating", unconvert * 1000 * useVal(colElectricity, 1) / buildingGrossFloorArea, 2);
-                PreDefTableEntry(state.dataOutRptPredefined->pdchLeedEuiElec, "Space Cooling", unconvert * 1000 * useVal(colElectricity, 2) / buildingGrossFloorArea, 2);
-                PreDefTableEntry(state.dataOutRptPredefined->pdchLeedEuiElec, "Fans (All)", unconvert * 1000 * useVal(colElectricity, 7) / buildingGrossFloorArea, 2);
-                PreDefTableEntry(state.dataOutRptPredefined->pdchLeedEuiElec, "Service Water Heating", unconvert * 1000 * useVal(colElectricity, 12) / buildingGrossFloorArea, 2);
-                PreDefTableEntry(state.dataOutRptPredefined->pdchLeedEuiElec, "Receptacle Equipment", unconvert * 1000 * useVal(colElectricity, 5) / buildingGrossFloorArea, 2);
-                PreDefTableEntry(state.dataOutRptPredefined->pdchLeedEuiElec, "Miscellaneous (All)", unconvert * 1000 * (useVal(colElectricity, 15)) / buildingGrossFloorArea, 2);
-                PreDefTableEntry(state.dataOutRptPredefined->pdchLeedEuiElec, "Subtotal", unconvert * 1000 * useVal(colElectricity, 15) / buildingGrossFloorArea, 2);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEuiElec, "Space Heating", unconvert * 1000 * useVal(colElectricity, 1) / buildingGrossFloorArea, 2);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEuiElec, "Space Cooling", unconvert * 1000 * useVal(colElectricity, 2) / buildingGrossFloorArea, 2);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEuiElec, "Fans (All)", unconvert * 1000 * useVal(colElectricity, 7) / buildingGrossFloorArea, 2);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEuiElec, "Service Water Heating", unconvert * 1000 * useVal(colElectricity, 12) / buildingGrossFloorArea, 2);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEuiElec, "Receptacle Equipment", unconvert * 1000 * useVal(colElectricity, 5) / buildingGrossFloorArea, 2);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEuiElec, "Miscellaneous (All)", unconvert * 1000 * (useVal(colElectricity, 15)) / buildingGrossFloorArea, 2);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEuiElec, "Subtotal", unconvert * 1000 * useVal(colElectricity, 15) / buildingGrossFloorArea, 2);
             }
 
-            PreDefTableEntry(state.dataOutRptPredefined->pdchLeedEusTotal, "Electricity", unconvert * useVal(colElectricity, 15), 2);
-            PreDefTableEntry(state.dataOutRptPredefined->pdchLeedEusProc, "Electricity", unconvert * (useVal(colElectricity, 5) + useVal(colElectricity, 13)), 2);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEusTotal, "Electricity", unconvert * useVal(colElectricity, 15), 2);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEusProc, "Electricity", unconvert * (useVal(colElectricity, 5) + useVal(colElectricity, 13)), 2);
             if (useVal(colElectricity, 15) != 0) {
                 processFraction = (useVal(colElectricity, 5) + useVal(colElectricity, 13)) / useVal(colElectricity, 15);
                 processElecCost = state.dataOutRptPredefined->LEEDelecCostTotal * processFraction;
             } else {
                 processElecCost = 0.0;
             }
-            PreDefTableEntry(state.dataOutRptPredefined->pdchLeedEcsProc, "Electricity", processElecCost, 2);
-            addFootNoteSubTable(state.dataOutRptPredefined->pdstLeedEneCostSum, "Process energy cost based on ratio of process to total energy.");
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEcsProc, "Electricity", processElecCost, 2);
+            addFootNoteSubTable(state, state.dataOutRptPredefined->pdstLeedEneCostSum, "Process energy cost based on ratio of process to total energy.");
 
             //  Energy Use Intensities- Natural Gas
             if (buildingGrossFloorArea > 0) {
-                PreDefTableEntry(state.dataOutRptPredefined->pdchLeedEuiNatG, "Space Heating", unconvert * 1000 * useVal(colGas, 1) / buildingGrossFloorArea, 2);
-                PreDefTableEntry(state.dataOutRptPredefined->pdchLeedEuiNatG, "Service Water Heating", unconvert * 1000 * useVal(colGas, 12) / buildingGrossFloorArea, 2);
-                PreDefTableEntry(state.dataOutRptPredefined->pdchLeedEuiNatG, "Miscellaneous (All)", unconvert * 1000 * useVal(colGas, 15) / buildingGrossFloorArea, 2);
-                PreDefTableEntry(state.dataOutRptPredefined->pdchLeedEuiNatG, "Subtotal", unconvert * 1000 * useVal(colGas, 15) / buildingGrossFloorArea, 2);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEuiNatG, "Space Heating", unconvert * 1000 * useVal(colGas, 1) / buildingGrossFloorArea, 2);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEuiNatG, "Service Water Heating", unconvert * 1000 * useVal(colGas, 12) / buildingGrossFloorArea, 2);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEuiNatG, "Miscellaneous (All)", unconvert * 1000 * useVal(colGas, 15) / buildingGrossFloorArea, 2);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEuiNatG, "Subtotal", unconvert * 1000 * useVal(colGas, 15) / buildingGrossFloorArea, 2);
             }
-            PreDefTableEntry(state.dataOutRptPredefined->pdchLeedEusTotal, "Natural Gas", unconvert * useVal(colGas, 15), 2);
-            PreDefTableEntry(state.dataOutRptPredefined->pdchLeedEusProc, "Natural Gas", unconvert * (useVal(colGas, 5) + useVal(colGas, 13)), 2);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEusTotal, "Natural Gas", unconvert * useVal(colGas, 15), 2);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEusProc, "Natural Gas", unconvert * (useVal(colGas, 5) + useVal(colGas, 13)), 2);
             if (useVal(colGas, 15) != 0) {
                 processFraction = (useVal(colGas, 5) + useVal(colGas, 13)) / useVal(colGas, 15);
                 processGasCost = state.dataOutRptPredefined->LEEDgasCostTotal * processFraction;
             } else {
                 processGasCost = 0.0;
             }
-            PreDefTableEntry(state.dataOutRptPredefined->pdchLeedEcsProc, "Natural Gas", processGasCost, 2);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEcsProc, "Natural Gas", processGasCost, 2);
 
             //  Energy Use Intensities  - Additional Fuel
             useValColAddFuel15 =
@@ -8274,12 +8272,12 @@ namespace OutputReportTabular {
             useValColAddFuel13 =
                 useVal(3, 13) + useVal(4, 13) + useVal(5, 13) + useVal(6, 13) + useVal(7, 13) + useVal(8, 13) + useVal(9, 13) + useVal(10, 13);
             if (buildingGrossFloorArea > 0) {
-                PreDefTableEntry(state.dataOutRptPredefined->pdchLeedEuiOthr, "Miscellaneous", unconvert * 1000 * useValColAddFuel15 / buildingGrossFloorArea, 2);
-                PreDefTableEntry(state.dataOutRptPredefined->pdchLeedEuiOthr, "Subtotal", unconvert * 1000 * useValColAddFuel15 / buildingGrossFloorArea, 2);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEuiOthr, "Miscellaneous", unconvert * 1000 * useValColAddFuel15 / buildingGrossFloorArea, 2);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEuiOthr, "Subtotal", unconvert * 1000 * useValColAddFuel15 / buildingGrossFloorArea, 2);
             }
-            PreDefTableEntry(
+            PreDefTableEntry(state,
                 state.dataOutRptPredefined->pdchLeedEusTotal, "Additional", unconvert * (useValColAddFuel15 + useVal(colPurchCool, 15) + useVal(colPurchHeat, 15)), 2);
-            PreDefTableEntry(state.dataOutRptPredefined->pdchLeedEusProc,
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEusProc,
                              "Additional",
                              unconvert * (useValColAddFuel5 + useValColAddFuel13 + useVal(colPurchCool, 5) +
                                           useVal(colPurchCool, 13) + useVal(colPurchHeat, 5) + useVal(colPurchHeat, 13)),
@@ -8292,8 +8290,8 @@ namespace OutputReportTabular {
                 processFraction = 0.0;
             }
             processOthrCost = state.dataOutRptPredefined->LEEDothrCostTotal * processFraction;
-            PreDefTableEntry(state.dataOutRptPredefined->pdchLeedEcsProc, "Additional", processOthrCost, 2);
-            PreDefTableEntry(state.dataOutRptPredefined->pdchLeedEcsProc, "Total", processElecCost + processGasCost + processOthrCost, 2);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEcsProc, "Additional", processOthrCost, 2);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEcsProc, "Total", processElecCost + processGasCost + processOthrCost, 2);
             // accumulate for percentage table
             leedSiteIntLite = 0.0;
             leedSiteSpHeat = 0.0;
@@ -8312,13 +8310,13 @@ namespace OutputReportTabular {
                 leedSiteTotal += useVal(iResource, 15);
             }
             if (leedSiteTotal != 0) {
-                PreDefTableEntry(state.dataOutRptPredefined->pdchLeedEupPerc, "Interior Lighting (All)", 100 * leedSiteIntLite / leedSiteTotal, 2);
-                PreDefTableEntry(state.dataOutRptPredefined->pdchLeedEupPerc, "Space Heating", 100 * leedSiteSpHeat / leedSiteTotal, 2);
-                PreDefTableEntry(state.dataOutRptPredefined->pdchLeedEupPerc, "Space Cooling", 100 * leedSiteSpCool / leedSiteTotal, 2);
-                PreDefTableEntry(state.dataOutRptPredefined->pdchLeedEupPerc, "Fans (All)", 100 * leedSiteFanInt / leedSiteTotal, 2);
-                PreDefTableEntry(state.dataOutRptPredefined->pdchLeedEupPerc, "Service Water Heating", 100 * leedSiteSrvWatr / leedSiteTotal, 2);
-                PreDefTableEntry(state.dataOutRptPredefined->pdchLeedEupPerc, "Receptacle Equipment", 100 * leedSiteRecept / leedSiteTotal, 2);
-                PreDefTableEntry(
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEupPerc, "Interior Lighting (All)", 100 * leedSiteIntLite / leedSiteTotal, 2);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEupPerc, "Space Heating", 100 * leedSiteSpHeat / leedSiteTotal, 2);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEupPerc, "Space Cooling", 100 * leedSiteSpCool / leedSiteTotal, 2);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEupPerc, "Fans (All)", 100 * leedSiteFanInt / leedSiteTotal, 2);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEupPerc, "Service Water Heating", 100 * leedSiteSrvWatr / leedSiteTotal, 2);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEupPerc, "Receptacle Equipment", 100 * leedSiteRecept / leedSiteTotal, 2);
+                PreDefTableEntry(state,
                     state.dataOutRptPredefined->pdchLeedEupPerc,
                     "Miscellaneous",
                     100 * (leedSiteTotal - (leedSiteIntLite + leedSiteSpHeat + leedSiteSpCool + leedSiteFanInt + leedSiteSrvWatr + leedSiteRecept)) /
@@ -8326,12 +8324,12 @@ namespace OutputReportTabular {
                     2);
             }
             // totals across energy source
-            PreDefTableEntry(state.dataOutRptPredefined->pdchLeedEusTotal,
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEusTotal,
                              "Total",
                              unconvert * (useValColAddFuel15 + useVal(colPurchCool, 15) + useVal(colPurchHeat, 15) +
                                           useVal(colElectricity, 15) + useVal(colGas, 15)),
                              2);
-            PreDefTableEntry(state.dataOutRptPredefined->pdchLeedEusProc,
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEusProc,
                              "Total",
                              unconvert * (useValColAddFuel5 + useValColAddFuel13 + useVal(colPurchCool, 5) +
                                           useVal(colPurchCool, 13) + useVal(colPurchHeat, 5) + useVal(colPurchHeat, 13) + useVal(colElectricity, 5) +
@@ -8343,19 +8341,19 @@ namespace OutputReportTabular {
                 auto const SELECT_CASE_var(resourcePrimaryHeating);
                 if (SELECT_CASE_var == colElectricity) {
                     footnote = "Note: Electricity appears to be the principal heating source based on energy usage.";
-                    PreDefTableEntry(state.dataOutRptPredefined->pdchLeedGenData, "Principal Heating Source", "Electricity");
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Principal Heating Source", "Electricity");
                 } else if (SELECT_CASE_var == colGas) {
                     footnote = "Note: Natural gas appears to be the principal heating source based on energy usage.";
-                    PreDefTableEntry(state.dataOutRptPredefined->pdchLeedGenData, "Principal Heating Source", "Natural Gas");
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Principal Heating Source", "Natural Gas");
                 } else if (SELECT_CASE_var == 3 || SELECT_CASE_var == 4 || SELECT_CASE_var == 5 || SELECT_CASE_var == 6 || SELECT_CASE_var == 7 ||
                            SELECT_CASE_var == 8 || SELECT_CASE_var == 9 || SELECT_CASE_var == 10) {
                     footnote = "Note: Additional fuel appears to be the principal heating source based on energy usage.";
-                    PreDefTableEntry(state.dataOutRptPredefined->pdchLeedGenData, "Principal Heating Source", "Additional Fuel");
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Principal Heating Source", "Additional Fuel");
                     // additional fuel  <- gasoline (3) | <- diesel (4) | <- coal (5) | <- Fuel Oil No1 (6) | <- Fuel Oil No2 (7)
                     // <- propane (8) | <- otherfuel1 (9) | <- otherfuel2 (10)
                 } else if (SELECT_CASE_var == colPurchHeat) {
                     footnote = "Note: District heat appears to be the principal heating source based on energy usage.";
-                    PreDefTableEntry(state.dataOutRptPredefined->pdchLeedGenData, "Principal Heating Source", "District Heat");
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Principal Heating Source", "District Heat");
                 }
             }
             // heading for the entire sub-table
@@ -8573,20 +8571,20 @@ namespace OutputReportTabular {
                 for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
                     if (EndUseCategory(jEndUse).NumSubcategories > 0) {
                         for (kEndUseSub = 1; kEndUseSub <= EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
-                            PreDefTableEntry(resource_entry_map(iResource),
+                            PreDefTableEntry(state, resource_entry_map(iResource),
                                              EndUseCategory(jEndUse).DisplayName + " -- " + EndUseCategory(jEndUse).SubcategoryName(kEndUseSub),
                                              unconvert * collapsedEndUseSub(kEndUseSub, jEndUse, iResource));
                             ++i;
                         }
                         // put other
                         if (needOtherRowLEED45(jEndUse)) {
-                            PreDefTableEntry(resource_entry_map(iResource),
+                            PreDefTableEntry(state, resource_entry_map(iResource),
                                              EndUseCategory(jEndUse).DisplayName + " -- Other",
                                              unconvert * endUseSubOther(iResource, jEndUse));
                             ++i;
                         }
                     } else {
-                        PreDefTableEntry(resource_entry_map(iResource),
+                        PreDefTableEntry(state, resource_entry_map(iResource),
                                          EndUseCategory(jEndUse).DisplayName + " -- Not Subdivided",
                                          unconvert * collapsedEndUse(iResource, jEndUse));
                         ++i;
@@ -8784,9 +8782,9 @@ namespace OutputReportTabular {
             tableBody(1, 1) = RealToStr(gatherPowerFuelFireGen, 3);
             tableBody(1, 2) = RealToStr(gatherPowerHTGeothermal, 3);
             tableBody(1, 3) = RealToStr(gatherPowerPV, 3);
-            PreDefTableEntry(state.dataOutRptPredefined->pdchLeedRenAnGen, "Photovoltaic", unconvert * gatherPowerPV, 2);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedRenAnGen, "Photovoltaic", unconvert * gatherPowerPV, 2);
             tableBody(1, 4) = RealToStr(gatherPowerWind, 3);
-            PreDefTableEntry(state.dataOutRptPredefined->pdchLeedRenAnGen, "Wind", unconvert * gatherPowerWind, 2);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedRenAnGen, "Wind", unconvert * gatherPowerWind, 2);
             tableBody(1, 5) = RealToStr(gatherPowerConversion, 3);
             tableBody(1, 6) = RealToStr(OverallNetEnergyFromStorage, 3);
             tableBody(1, 7) = RealToStr(gatherElecProduced, 3);
@@ -9056,12 +9054,12 @@ namespace OutputReportTabular {
             rowHead(2) = "Time Setpoint Not Met During Occupied Cooling";
             rowHead(3) = "Time Not Comfortable Based on Simple ASHRAE 55-2004";
 
-            tableBody(1, 1) = RealToStr(TotalNotMetHeatingOccupiedForABUPS, 2);
-            tableBody(1, 2) = RealToStr(TotalNotMetCoolingOccupiedForABUPS, 2);
-            PreDefTableEntry(state.dataOutRptPredefined->pdchLeedAmData, "Number of hours heating loads not met", RealToStr(TotalNotMetHeatingOccupiedForABUPS, 2));
-            PreDefTableEntry(state.dataOutRptPredefined->pdchLeedAmData, "Number of hours cooling loads not met", RealToStr(TotalNotMetCoolingOccupiedForABUPS, 2));
-            PreDefTableEntry(state.dataOutRptPredefined->pdchLeedAmData, "Number of hours not met", RealToStr(TotalNotMetOccupiedForABUPS, 2));
-            tableBody(1, 3) = RealToStr(TotalTimeNotSimpleASH55EitherForABUPS, 2);
+            tableBody(1, 1) = RealToStr(state.dataOutRptPredefined->TotalNotMetHeatingOccupiedForABUPS, 2);
+            tableBody(1, 2) = RealToStr(state.dataOutRptPredefined->TotalNotMetCoolingOccupiedForABUPS, 2);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedAmData, "Number of hours heating loads not met", RealToStr(state.dataOutRptPredefined->TotalNotMetHeatingOccupiedForABUPS, 2));
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedAmData, "Number of hours cooling loads not met", RealToStr(state.dataOutRptPredefined->TotalNotMetCoolingOccupiedForABUPS, 2));
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedAmData, "Number of hours not met", RealToStr(state.dataOutRptPredefined->TotalNotMetOccupiedForABUPS, 2));
+            tableBody(1, 3) = RealToStr(state.dataOutRptPredefined->TotalTimeNotSimpleASH55EitherForABUPS, 2);
 
             if (displayTabularBEPS) {
                 WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
@@ -9950,19 +9948,19 @@ namespace OutputReportTabular {
                 for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
                     if (EndUseCategory(jEndUse).NumSubcategories > 0) {
                         for (kEndUseSub = 1; kEndUseSub <= EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
-                            PreDefTableEntry(resource_entry_map(iResource),
+                            PreDefTableEntry(state, resource_entry_map(iResource),
                                              EndUseCategory(jEndUse).DisplayName + " -- " + EndUseCategory(jEndUse).SubcategoryName(kEndUseSub),
                                              collapsedIndEndUseSub(kEndUseSub, jEndUse, iResource));
                             ++i;
                         }
                         // put other
                         if (needOtherRowLEED45(jEndUse)) {
-                            PreDefTableEntry(
+                            PreDefTableEntry(state,
                                 resource_entry_map(iResource), EndUseCategory(jEndUse).DisplayName + " -- Other", endUseSubOther(iResource, jEndUse));
                             ++i;
                         }
                     } else {
-                        PreDefTableEntry(resource_entry_map(iResource),
+                        PreDefTableEntry(state, resource_entry_map(iResource),
                                          EndUseCategory(jEndUse).DisplayName + " -- Not Subdivided",
                                          collapsedIndEndUse(iResource, jEndUse));
                         ++i;
@@ -10463,7 +10461,7 @@ namespace OutputReportTabular {
             tableBody(1, 8) = RealToStr(BuildingAzimuth, 2);           // north axis angle
             tableBody(1, 9) = RealToStr(BuildingRotationAppendixG, 2); // Rotation for Appendix G
             tableBody(1, 10) = RealToStr(gatherElapsedTimeBEPS, 2);    // hours simulated
-            //  tableBody(9,1) = TRIM(fmt::to_string(numTableEntry)) !number of table entries for predefined tables
+            //  tableBody(9,1) = TRIM(fmt::to_string(state.dataOutRptPredefined->numTableEntry)) !number of table entries for predefined tables
 
             WriteSubtitle("General");
             WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
@@ -10916,13 +10914,13 @@ namespace OutputReportTabular {
                 tableBody(1, iZone) = RealToStr(Zone(iZone).FloorArea * m2_unitConv, 2);
                 tableBody(4, iZone) = RealToStr(Zone(iZone).Volume * m3_unitConv, 2);
                 // no unit conversion necessary since done automatically
-                PreDefTableEntry(state.dataOutRptPredefined->pdchLeedSutSpArea, Zone(iZone).Name, Zone(iZone).FloorArea, 2);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSutSpArea, Zone(iZone).Name, Zone(iZone).FloorArea, 2);
                 if (zoneIsCond) {
-                    PreDefTableEntry(state.dataOutRptPredefined->pdchLeedSutOcArea, Zone(iZone).Name, Zone(iZone).FloorArea, 2);
-                    PreDefTableEntry(state.dataOutRptPredefined->pdchLeedSutUnArea, Zone(iZone).Name, "0.00");
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSutOcArea, Zone(iZone).Name, Zone(iZone).FloorArea, 2);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSutUnArea, Zone(iZone).Name, "0.00");
                 } else {
-                    PreDefTableEntry(state.dataOutRptPredefined->pdchLeedSutOcArea, Zone(iZone).Name, "0.00");
-                    PreDefTableEntry(state.dataOutRptPredefined->pdchLeedSutUnArea, Zone(iZone).Name, Zone(iZone).FloorArea, 2);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSutOcArea, Zone(iZone).Name, "0.00");
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSutUnArea, Zone(iZone).Name, Zone(iZone).FloorArea, 2);
                 }
                 tableBody(5, iZone) = RealToStr(mult, 2);
                 tableBody(6, iZone) = RealToStr(Zone(iZone).ExtGrossWallArea * m2_unitConv, 2);
@@ -11040,9 +11038,9 @@ namespace OutputReportTabular {
                     tableBody(11, state.dataGlobal->NumOfZones + iTotal) = RealToStr(zstArea(iTotal) * m2_unitConv / zstPeople(iTotal), 2);
                 }
             }
-            PreDefTableEntry(state.dataOutRptPredefined->pdchLeedSutSpArea, "Totals", zstArea(grandTotal), 2);
-            PreDefTableEntry(state.dataOutRptPredefined->pdchLeedSutOcArea, "Totals", zstArea(condTotal), 2);
-            PreDefTableEntry(state.dataOutRptPredefined->pdchLeedSutUnArea, "Totals", zstArea(uncondTotal), 2);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSutSpArea, "Totals", zstArea(grandTotal), 2);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSutOcArea, "Totals", zstArea(condTotal), 2);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSutUnArea, "Totals", zstArea(uncondTotal), 2);
 
             WriteSubtitle("Zone Summary");
             WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
@@ -11170,14 +11168,14 @@ namespace OutputReportTabular {
                 if (curValue > columnMax[j]) columnMax[j] = curValue;
                 if (curValue < columnMin[j]) columnMin[j] = curValue;
                 columnSum[j] += curValue;
-                PreDefTableEntry(columnHead[j], ZoneName, RealToStr(curValue, 2));
+                PreDefTableEntry(state, columnHead[j], ZoneName, RealToStr(curValue, 2));
             }
         }
         for (int j = 0; j < columnNum; j++) {
-            PreDefTableEntry(columnHead[j], "Min", RealToStr(columnMin[j], 2));
-            PreDefTableEntry(columnHead[j], "Max", RealToStr(columnMax[j], 2));
-            PreDefTableEntry(columnHead[j], "Average", RealToStr(columnSum[j] / state.dataGlobal->NumOfZones, 2));
-            PreDefTableEntry(columnHead[j], "Sum", RealToStr(columnSum[j], 2));
+            PreDefTableEntry(state, columnHead[j], "Min", RealToStr(columnMin[j], 2));
+            PreDefTableEntry(state, columnHead[j], "Max", RealToStr(columnMax[j], 2));
+            PreDefTableEntry(state, columnHead[j], "Average", RealToStr(columnSum[j] / state.dataGlobal->NumOfZones, 2));
+            PreDefTableEntry(state, columnHead[j], "Sum", RealToStr(columnSum[j], 2));
         }
 
     }
@@ -11199,19 +11197,19 @@ namespace OutputReportTabular {
                 if (curValue > columnMax[j]) columnMax[j] = curValue;
                 if (curValue < columnMin[j]) columnMin[j] = curValue;
                 columnSum[j] += curValue;
-                PreDefTableEntry(columnHead[j], Zone(i).Name, RealToStr(curValue, 2));
+                PreDefTableEntry(state, columnHead[j], Zone(i).Name, RealToStr(curValue, 2));
             }
             std::string startDateTime = DateToString(int(ZoneBins(i)[columnNum - 1]));
-            PreDefTableEntry(columnHead[columnNum - 1], Zone(i).Name, startDateTime);
+            PreDefTableEntry(state, columnHead[columnNum - 1], Zone(i).Name, startDateTime);
         }
         for (int j = 0; j < columnNum - 1; j++) {
-            PreDefTableEntry(columnHead[j], "Min", RealToStr(columnMin[j], 2));
-            PreDefTableEntry(columnHead[j], "Max", RealToStr(columnMax[j], 2));
-            PreDefTableEntry(columnHead[j], "Average", RealToStr(columnSum[j] / state.dataGlobal->NumOfZones, 2));
+            PreDefTableEntry(state, columnHead[j], "Min", RealToStr(columnMin[j], 2));
+            PreDefTableEntry(state, columnHead[j], "Max", RealToStr(columnMax[j], 2));
+            PreDefTableEntry(state, columnHead[j], "Average", RealToStr(columnSum[j] / state.dataGlobal->NumOfZones, 2));
         }
-        PreDefTableEntry(columnHead[columnNum - 1], "Min", "-");
-        PreDefTableEntry(columnHead[columnNum - 1], "Max", "-");
-        PreDefTableEntry(columnHead[columnNum - 1], "Average", "-");
+        PreDefTableEntry(state, columnHead[columnNum - 1], "Min", "-");
+        PreDefTableEntry(state, columnHead[columnNum - 1], "Max", "-");
+        PreDefTableEntry(state, columnHead[columnNum - 1], "Average", "-");
     }
 
     void WriteThermalResilienceTables(EnergyPlusData &state)
@@ -11450,13 +11448,13 @@ namespace OutputReportTabular {
         // list of unique object names
         // Much of this code is to allow for integer compares instead of string
         // compares that are nested three levels in a loop.
-        uniqueObjectName.allocate(numTableEntry);
-        useUniqueObjectName.allocate(numTableEntry);
+        uniqueObjectName.allocate(state.dataOutRptPredefined->numTableEntry);
+        useUniqueObjectName.allocate(state.dataOutRptPredefined->numTableEntry);
         numUnqObjName = 0;
-        for (lTableEntry = 1; lTableEntry <= numTableEntry; ++lTableEntry) {
+        for (lTableEntry = 1; lTableEntry <= state.dataOutRptPredefined->numTableEntry; ++lTableEntry) {
             // associate the subtable with each column
             curColumn = tableEntry(lTableEntry).indexColumn;
-            if ((curColumn >= 1) && (curColumn <= numColumnTag)) {
+            if ((curColumn >= 1) && (curColumn <= state.dataOutRptPredefined->numColumnTag)) {
                 tableEntry(lTableEntry).subTableIndex = columnTag(curColumn).indexSubTable;
             }
             // make a list of unique object names
@@ -11478,15 +11476,15 @@ namespace OutputReportTabular {
             }
         }
         // loop through all reports and include those that have been flagged as 'show'
-        for (iReportName = 1; iReportName <= numReportName; ++iReportName) {
+        for (iReportName = 1; iReportName <= state.dataOutRptPredefined->numReportName; ++iReportName) {
             if (reportName(iReportName).show) {
                 WriteReportHeaders(reportName(iReportName).namewithspaces, "Entire Facility", OutputProcessor::StoreType::Averaged);
                 // loop through the subtables and include those that are associated with this report
-                for (int jSubTable = 1, jSubTable_end = numSubTable; jSubTable <= jSubTable_end; ++jSubTable) {
+                for (int jSubTable = 1, jSubTable_end = state.dataOutRptPredefined->numSubTable; jSubTable <= jSubTable_end; ++jSubTable) {
                     if (subTable(jSubTable).indexReportName == iReportName) {
                         // determine how many columns
                         curNumColumns = 0;
-                        for (kColumnTag = 1; kColumnTag <= numColumnTag; ++kColumnTag) {
+                        for (kColumnTag = 1; kColumnTag <= state.dataOutRptPredefined->numColumnTag; ++kColumnTag) {
                             if (columnTag(kColumnTag).indexSubTable == jSubTable) {
                                 ++curNumColumns;
                             }
@@ -11494,7 +11492,7 @@ namespace OutputReportTabular {
                         // determine how many rows by going through table entries and setting
                         // flag in useUniqueObjectName to true, then count number of true's.
                         useUniqueObjectName = false; // array assignment
-                        for (lTableEntry = 1; lTableEntry <= numTableEntry; ++lTableEntry) {
+                        for (lTableEntry = 1; lTableEntry <= state.dataOutRptPredefined->numTableEntry; ++lTableEntry) {
                             if (tableEntry(lTableEntry).subTableIndex == jSubTable) {
                                 useUniqueObjectName(tableEntry(lTableEntry).uniqueObjName) = true;
                             }
@@ -11531,7 +11529,7 @@ namespace OutputReportTabular {
                         }
                         // set column headings
                         countColumn = 0;
-                        for (kColumnTag = 1; kColumnTag <= numColumnTag; ++kColumnTag) {
+                        for (kColumnTag = 1; kColumnTag <= state.dataOutRptPredefined->numColumnTag; ++kColumnTag) {
                             if (columnTag(kColumnTag).indexSubTable == jSubTable) {
                                 ++countColumn;
                                 // do the unit conversions
@@ -11552,7 +11550,7 @@ namespace OutputReportTabular {
                         }
                         // fill the body of the table from the entries
                         // find the entries associated with the current subtable
-                        for (lTableEntry = 1; lTableEntry <= numTableEntry; ++lTableEntry) {
+                        for (lTableEntry = 1; lTableEntry <= state.dataOutRptPredefined->numTableEntry; ++lTableEntry) {
                             if (tableEntry(lTableEntry).subTableIndex == jSubTable) {
                                 // determine what column the current entry is in
                                 curColTagIndex = tableEntry(lTableEntry).indexColumn;
@@ -11661,8 +11659,8 @@ namespace OutputReportTabular {
             // running program since the size of the number of entries is
             // not previouslly known. Use the size of all entries since that
             // is the maximum possible.
-            uniqueDesc.allocate(numCompSizeTableEntry);
-            uniqueObj.allocate(numCompSizeTableEntry);
+            uniqueDesc.allocate(state.dataOutRptPredefined->numCompSizeTableEntry);
+            uniqueObj.allocate(state.dataOutRptPredefined->numCompSizeTableEntry);
             // initially clear the written flags for entire array
             // The following line is not really necessary and it is possible that the array has
             // not been allocated when this is first called.
@@ -11673,7 +11671,7 @@ namespace OutputReportTabular {
             while (loopLimit <= 100) { // put a maximum count since complex loop that could run indefinitely if error
                 foundEntry = 0;
                 ++loopLimit;
-                for (iTableEntry = 1; iTableEntry <= numCompSizeTableEntry; ++iTableEntry) {
+                for (iTableEntry = 1; iTableEntry <= state.dataOutRptPredefined->numCompSizeTableEntry; ++iTableEntry) {
                     if (!CompSizeTableEntry(iTableEntry).written) {
                         foundEntry = iTableEntry;
                         break;
@@ -11685,7 +11683,7 @@ namespace OutputReportTabular {
                     e.active = false;
                 // make an unwritten item that is of the same type active - these will be the
                 // entries for the particular subtable.
-                for (iTableEntry = 1; iTableEntry <= numCompSizeTableEntry; ++iTableEntry) {
+                for (iTableEntry = 1; iTableEntry <= state.dataOutRptPredefined->numCompSizeTableEntry; ++iTableEntry) {
                     if (!CompSizeTableEntry(iTableEntry).written) {
                         if (UtilityRoutines::SameString(CompSizeTableEntry(iTableEntry).typeField, CompSizeTableEntry(foundEntry).typeField)) {
                             CompSizeTableEntry(iTableEntry).active = true;
@@ -11697,7 +11695,7 @@ namespace OutputReportTabular {
                 // reset the counters for the arrays looking for unique rows and columns
                 numUniqueDesc = 0;
                 numUniqueObj = 0;
-                for (iTableEntry = 1; iTableEntry <= numCompSizeTableEntry; ++iTableEntry) {
+                for (iTableEntry = 1; iTableEntry <= state.dataOutRptPredefined->numCompSizeTableEntry; ++iTableEntry) {
                     // search for descriptions
                     foundDesc = 0;
                     if (CompSizeTableEntry(iTableEntry).active) {
@@ -11759,7 +11757,7 @@ namespace OutputReportTabular {
                     rowHead(jUnique) = uniqueObj(jUnique);
                 }
                 // fill the table
-                for (iTableEntry = 1; iTableEntry <= numCompSizeTableEntry; ++iTableEntry) {
+                for (iTableEntry = 1; iTableEntry <= state.dataOutRptPredefined->numCompSizeTableEntry; ++iTableEntry) {
                     // find the row and column for the specific entry
                     if (CompSizeTableEntry(iTableEntry).active) {
                         curDesc = CompSizeTableEntry(iTableEntry).description;
@@ -11898,32 +11896,32 @@ namespace OutputReportTabular {
             }
 
             ShadowRelate.allocate(numreceivingfields);
-            numShadowRelate = 0;
+            state.dataOutRptPredefined->numShadowRelate = 0;
             for (HTS = 1; HTS <= TotSurfaces; ++HTS) {
                 for (NGSS = 1; NGSS <= ShadowComb(HTS).NumGenSurf; ++NGSS) {
-                    ++numShadowRelate;
-                    ShadowRelate(numShadowRelate).castSurf = ShadowComb(HTS).GenSurf(NGSS);
-                    ShadowRelate(numShadowRelate).recSurf = HTS;
-                    ShadowRelate(numShadowRelate).recKind = recKindSurface;
+                    ++state.dataOutRptPredefined->numShadowRelate;
+                    ShadowRelate(state.dataOutRptPredefined->numShadowRelate).castSurf = ShadowComb(HTS).GenSurf(NGSS);
+                    ShadowRelate(state.dataOutRptPredefined->numShadowRelate).recSurf = HTS;
+                    ShadowRelate(state.dataOutRptPredefined->numShadowRelate).recKind = recKindSurface;
                 }
                 for (NGSS = 1; NGSS <= ShadowComb(HTS).NumSubSurf; ++NGSS) {
-                    ++numShadowRelate;
-                    ShadowRelate(numShadowRelate).castSurf = ShadowComb(HTS).SubSurf(NGSS);
-                    ShadowRelate(numShadowRelate).recSurf = HTS;
-                    ShadowRelate(numShadowRelate).recKind = recKindSubsurface;
+                    ++state.dataOutRptPredefined->numShadowRelate;
+                    ShadowRelate(state.dataOutRptPredefined->numShadowRelate).castSurf = ShadowComb(HTS).SubSurf(NGSS);
+                    ShadowRelate(state.dataOutRptPredefined->numShadowRelate).recSurf = HTS;
+                    ShadowRelate(state.dataOutRptPredefined->numShadowRelate).recKind = recKindSubsurface;
                 }
             }
-            assert(numreceivingfields == numShadowRelate);
+            assert(numreceivingfields == state.dataOutRptPredefined->numShadowRelate);
 
             WriteReportHeaders("Surface Shadowing Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
-            unique.allocate(numShadowRelate);
+            unique.allocate(state.dataOutRptPredefined->numShadowRelate);
             // do entire process twice, once with surfaces receiving, once with subsurfaces receiving
             for (iKindRec = recKindSurface; iKindRec <= recKindSubsurface; ++iKindRec) {
 
                 // Build map from receiving surface to container of names
                 typedef std::map<int, std::pair<int, std::vector<std::string const *>>> ShadowMap;
                 ShadowMap shadow_map;
-                for (iShadRel = 1; iShadRel <= numShadowRelate; ++iShadRel) {
+                for (iShadRel = 1; iShadRel <= state.dataOutRptPredefined->numShadowRelate; ++iShadRel) {
                     if (ShadowRelate(iShadRel).recKind == iKindRec) {
                         curRecSurf = ShadowRelate(iShadRel).recSurf;
                         std::string const &name(Surface(ShadowRelate(iShadRel).castSurf).Name);

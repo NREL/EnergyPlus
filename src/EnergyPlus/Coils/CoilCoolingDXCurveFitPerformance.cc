@@ -680,39 +680,39 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(EnergyPlus::EnergyPlu
         print(state.files.eio, Format_890); // TODO: Verify this works
         this->oneTimeEIOHeaderWrite = false;
         state.dataOutRptPredefined->pdstVAVDXCoolCoil =
-            OutputReportPredefined::newPreDefSubTable(state.dataOutRptPredefined->pdrEquip, "VAV DX Cooling Standard Rating Details");
+            OutputReportPredefined::newPreDefSubTable(state, state.dataOutRptPredefined->pdrEquip, "VAV DX Cooling Standard Rating Details");
         state.dataOutRptPredefined->pdchVAVDXCoolCoilType =
-            OutputReportPredefined::newPreDefColumn(state.dataOutRptPredefined->pdstVAVDXCoolCoil, "DX Cooling Coil Type");
+            OutputReportPredefined::newPreDefColumn(state, state.dataOutRptPredefined->pdstVAVDXCoolCoil, "DX Cooling Coil Type");
         state.dataOutRptPredefined->pdchVAVDXFanName =
-            OutputReportPredefined::newPreDefColumn(state.dataOutRptPredefined->pdstVAVDXCoolCoil, "Assocated Fan");
+            OutputReportPredefined::newPreDefColumn(state, state.dataOutRptPredefined->pdstVAVDXCoolCoil, "Assocated Fan");
         state.dataOutRptPredefined->pdchVAVDXCoolCoilNetCapSI =
-            OutputReportPredefined::newPreDefColumn(state.dataOutRptPredefined->pdstVAVDXCoolCoil, "Net Cooling Capacity [W]");
+            OutputReportPredefined::newPreDefColumn(state, state.dataOutRptPredefined->pdstVAVDXCoolCoil, "Net Cooling Capacity [W]");
         state.dataOutRptPredefined->pdchVAVDXCoolCoilCOP =
-            OutputReportPredefined::newPreDefColumn(state.dataOutRptPredefined->pdstVAVDXCoolCoil, "COP [W/W]");
+            OutputReportPredefined::newPreDefColumn(state, state.dataOutRptPredefined->pdstVAVDXCoolCoil, "COP [W/W]");
         state.dataOutRptPredefined->pdchVAVDXCoolCoilEERIP =
-            OutputReportPredefined::newPreDefColumn(state.dataOutRptPredefined->pdstVAVDXCoolCoil, "EER [Btu/W-h]");
+            OutputReportPredefined::newPreDefColumn(state, state.dataOutRptPredefined->pdstVAVDXCoolCoil, "EER [Btu/W-h]");
         state.dataOutRptPredefined->pdchVAVDXCoolCoilIEERIP =
-            OutputReportPredefined::newPreDefColumn(state.dataOutRptPredefined->pdstVAVDXCoolCoil, "IEER [Btu/W-h]");
+            OutputReportPredefined::newPreDefColumn(state, state.dataOutRptPredefined->pdstVAVDXCoolCoil, "IEER [Btu/W-h]");
         state.dataOutRptPredefined->pdchVAVDXCoolCoilMdotA =
-            OutputReportPredefined::newPreDefColumn(state.dataOutRptPredefined->pdstVAVDXCoolCoil, "Supply Air Flow 100% [kg/s]");
+            OutputReportPredefined::newPreDefColumn(state, state.dataOutRptPredefined->pdstVAVDXCoolCoil, "Supply Air Flow 100% [kg/s]");
         state.dataOutRptPredefined->pdchVAVDXCoolCoilCOP_B =
-            OutputReportPredefined::newPreDefColumn(state.dataOutRptPredefined->pdstVAVDXCoolCoil, "COP 75% Capacity [W/W]");
+            OutputReportPredefined::newPreDefColumn(state, state.dataOutRptPredefined->pdstVAVDXCoolCoil, "COP 75% Capacity [W/W]");
         state.dataOutRptPredefined->pdchVAVDXCoolCoilEER_B_IP =
-            OutputReportPredefined::newPreDefColumn(state.dataOutRptPredefined->pdstVAVDXCoolCoil, "EER 75% Capacity [Btu/W-h]");
+            OutputReportPredefined::newPreDefColumn(state, state.dataOutRptPredefined->pdstVAVDXCoolCoil, "EER 75% Capacity [Btu/W-h]");
         state.dataOutRptPredefined->pdchVAVDXCoolCoilMdotB =
-            OutputReportPredefined::newPreDefColumn(state.dataOutRptPredefined->pdstVAVDXCoolCoil, "Supply Air Flow 75% [kg/s]");
+            OutputReportPredefined::newPreDefColumn(state, state.dataOutRptPredefined->pdstVAVDXCoolCoil, "Supply Air Flow 75% [kg/s]");
         state.dataOutRptPredefined->pdchVAVDXCoolCoilCOP_C =
-            OutputReportPredefined::newPreDefColumn(state.dataOutRptPredefined->pdstVAVDXCoolCoil, "COP 50% Capacity [W/W]");
+            OutputReportPredefined::newPreDefColumn(state, state.dataOutRptPredefined->pdstVAVDXCoolCoil, "COP 50% Capacity [W/W]");
         state.dataOutRptPredefined->pdchVAVDXCoolCoilEER_C_IP =
-            OutputReportPredefined::newPreDefColumn(state.dataOutRptPredefined->pdstVAVDXCoolCoil, "EER 50% Capacity [Btu/W-h]");
+            OutputReportPredefined::newPreDefColumn(state, state.dataOutRptPredefined->pdstVAVDXCoolCoil, "EER 50% Capacity [Btu/W-h]");
         state.dataOutRptPredefined->pdchVAVDXCoolCoilMdotC =
-            OutputReportPredefined::newPreDefColumn(state.dataOutRptPredefined->pdstVAVDXCoolCoil, "Supply Air Flow 50% [kg/s]");
+            OutputReportPredefined::newPreDefColumn(state, state.dataOutRptPredefined->pdstVAVDXCoolCoil, "Supply Air Flow 50% [kg/s]");
         state.dataOutRptPredefined->pdchVAVDXCoolCoilCOP_D =
-            OutputReportPredefined::newPreDefColumn(state.dataOutRptPredefined->pdstVAVDXCoolCoil, "COP 25% Capacity [W/W]");
+            OutputReportPredefined::newPreDefColumn(state, state.dataOutRptPredefined->pdstVAVDXCoolCoil, "COP 25% Capacity [W/W]");
         state.dataOutRptPredefined->pdchVAVDXCoolCoilEER_D_IP =
-            OutputReportPredefined::newPreDefColumn(state.dataOutRptPredefined->pdstVAVDXCoolCoil, "EER 25% Capacity [Btu/W-h]");
+            OutputReportPredefined::newPreDefColumn(state, state.dataOutRptPredefined->pdstVAVDXCoolCoil, "EER 25% Capacity [Btu/W-h]");
         state.dataOutRptPredefined->pdchVAVDXCoolCoilMdotD =
-            OutputReportPredefined::newPreDefColumn(state.dataOutRptPredefined->pdstVAVDXCoolCoil, "Supply Air Flow 25% [kg/s]");
+            OutputReportPredefined::newPreDefColumn(state, state.dataOutRptPredefined->pdstVAVDXCoolCoil, "Supply Air Flow 25% [kg/s]");
 
         // determine footnote content
         // TODO: This may be slightly incorrect if all the parent objects haven't created coils yet
@@ -752,36 +752,36 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(EnergyPlus::EnergyPlu
               EER_TestPoint_IP[3],SupAirMdot_TestPoint[0],SupAirMdot_TestPoint[1],SupAirMdot_TestPoint[2],SupAirMdot_TestPoint[3]);
     }
 
-    OutputReportPredefined::PreDefTableEntry(state.dataOutRptPredefined->pdchDXCoolCoilType, this->name, "Coil:Cooling:DX");
+    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilType, this->name, "Coil:Cooling:DX");
     // W to tons
-    OutputReportPredefined::PreDefTableEntry(state.dataOutRptPredefined->pdchDXCoolCoilNetCapSI, this->name, NetCoolingCapRated, 1);
+    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilNetCapSI, this->name, NetCoolingCapRated, 1);
     // These will convert with a factor of 1 which is ok
-    OutputReportPredefined::PreDefTableEntry(state.dataOutRptPredefined->pdchDXCoolCoilCOP, this->name, EER_TestPoint_SI[0], 2);
-    OutputReportPredefined::PreDefTableEntry(state.dataOutRptPredefined->pdchDXCoolCoilEERIP, this->name, EER_TestPoint_IP[0], 2);
-    OutputReportPredefined::PreDefTableEntry(state.dataOutRptPredefined->pdchDXCoolCoilIEERIP, this->name, IEER, 2);
-    OutputReportPredefined::PreDefTableEntry(state.dataOutRptPredefined->pdchDXCoolCoilSEERUserIP, this->name, "N/A");
-    OutputReportPredefined::PreDefTableEntry(state.dataOutRptPredefined->pdchDXCoolCoilSEERStandardIP, this->name, "N/A");
-    OutputReportPredefined::addFootNoteSubTable(state.dataOutRptPredefined->pdstDXCoolCoil, "ANSI/AHRI ratings include supply fan");
+    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilCOP, this->name, EER_TestPoint_SI[0], 2);
+    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilEERIP, this->name, EER_TestPoint_IP[0], 2);
+    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilIEERIP, this->name, IEER, 2);
+    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilSEERUserIP, this->name, "N/A");
+    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilSEERStandardIP, this->name, "N/A");
+    OutputReportPredefined::addFootNoteSubTable(state, state.dataOutRptPredefined->pdstDXCoolCoil, "ANSI/AHRI ratings include supply fan");
 
-    OutputReportPredefined::PreDefTableEntry(state.dataOutRptPredefined->pdchVAVDXCoolCoilType, this->name, "Coil:Cooling:DX");
+    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchVAVDXCoolCoilType, this->name, "Coil:Cooling:DX");
     if (this->unitStatic > 0) {
-        OutputReportPredefined::PreDefTableEntry(state.dataOutRptPredefined->pdchVAVDXFanName, this->name, supplyFanName);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchVAVDXFanName, this->name, supplyFanName);
     } else {
-        OutputReportPredefined::PreDefTableEntry(state.dataOutRptPredefined->pdchVAVDXFanName, this->name, "None");
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchVAVDXFanName, this->name, "None");
     }
-    OutputReportPredefined::PreDefTableEntry(state.dataOutRptPredefined->pdchVAVDXCoolCoilNetCapSI, this->name, NetCoolingCapRated, 2);
-    OutputReportPredefined::PreDefTableEntry(state.dataOutRptPredefined->pdchVAVDXCoolCoilIEERIP, this->name, IEER, 2);
-    OutputReportPredefined::PreDefTableEntry(state.dataOutRptPredefined->pdchVAVDXCoolCoilEERIP, this->name, EER_TestPoint_IP[0], 2);
-    OutputReportPredefined::PreDefTableEntry(state.dataOutRptPredefined->pdchVAVDXCoolCoilMdotA, this->name, SupAirMdot_TestPoint[0], 4);
-    OutputReportPredefined::PreDefTableEntry(state.dataOutRptPredefined->pdchVAVDXCoolCoilCOP_B, this->name, EER_TestPoint_SI[1], 2);
-    OutputReportPredefined::PreDefTableEntry(state.dataOutRptPredefined->pdchVAVDXCoolCoilEER_B_IP, this->name, EER_TestPoint_IP[1], 2);
-    OutputReportPredefined::PreDefTableEntry(state.dataOutRptPredefined->pdchVAVDXCoolCoilMdotB, this->name, SupAirMdot_TestPoint[1], 4);
-    OutputReportPredefined::PreDefTableEntry(state.dataOutRptPredefined->pdchVAVDXCoolCoilCOP_C, this->name, EER_TestPoint_SI[2], 2);
-    OutputReportPredefined::PreDefTableEntry(state.dataOutRptPredefined->pdchVAVDXCoolCoilEER_C_IP, this->name, EER_TestPoint_IP[2], 2);
-    OutputReportPredefined::PreDefTableEntry(state.dataOutRptPredefined->pdchVAVDXCoolCoilMdotC, this->name, SupAirMdot_TestPoint[2], 4);
-    OutputReportPredefined::PreDefTableEntry(state.dataOutRptPredefined->pdchVAVDXCoolCoilCOP_D, this->name, EER_TestPoint_SI[3], 2);
-    OutputReportPredefined::PreDefTableEntry(state.dataOutRptPredefined->pdchVAVDXCoolCoilEER_D_IP, this->name, EER_TestPoint_IP[3], 2);
-    OutputReportPredefined::PreDefTableEntry(state.dataOutRptPredefined->pdchVAVDXCoolCoilMdotD, this->name, SupAirMdot_TestPoint[3], 4);
+    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchVAVDXCoolCoilNetCapSI, this->name, NetCoolingCapRated, 2);
+    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchVAVDXCoolCoilIEERIP, this->name, IEER, 2);
+    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchVAVDXCoolCoilEERIP, this->name, EER_TestPoint_IP[0], 2);
+    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchVAVDXCoolCoilMdotA, this->name, SupAirMdot_TestPoint[0], 4);
+    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchVAVDXCoolCoilCOP_B, this->name, EER_TestPoint_SI[1], 2);
+    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchVAVDXCoolCoilEER_B_IP, this->name, EER_TestPoint_IP[1], 2);
+    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchVAVDXCoolCoilMdotB, this->name, SupAirMdot_TestPoint[1], 4);
+    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchVAVDXCoolCoilCOP_C, this->name, EER_TestPoint_SI[2], 2);
+    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchVAVDXCoolCoilEER_C_IP, this->name, EER_TestPoint_IP[2], 2);
+    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchVAVDXCoolCoilMdotC, this->name, SupAirMdot_TestPoint[2], 4);
+    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchVAVDXCoolCoilCOP_D, this->name, EER_TestPoint_SI[3], 2);
+    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchVAVDXCoolCoilEER_D_IP, this->name, EER_TestPoint_IP[3], 2);
+    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchVAVDXCoolCoilMdotD, this->name, SupAirMdot_TestPoint[3], 4);
 }
 
 Real64

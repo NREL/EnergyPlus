@@ -2883,40 +2883,40 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                 // 90.1 descriptor for economizer controls
                 // Changed by Amit for New Feature implementation
                 if (thisOAController.Econo == DifferentialEnthalpy) {
-                    PreDefTableEntry(state.dataOutRptPredefined->pdchEcoKind, equipName, "DifferentialEnthalpy");
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchEcoKind, equipName, "DifferentialEnthalpy");
                 } else if (thisOAController.Econo == DifferentialDryBulb) {
-                    PreDefTableEntry(state.dataOutRptPredefined->pdchEcoKind, equipName, "DifferentialDryBulb");
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchEcoKind, equipName, "DifferentialDryBulb");
                 } else if (thisOAController.Econo == FixedEnthalpy) {
-                    PreDefTableEntry(state.dataOutRptPredefined->pdchEcoKind, equipName, "FixedEnthalpy");
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchEcoKind, equipName, "FixedEnthalpy");
                 } else if (thisOAController.Econo == FixedDryBulb) {
-                    PreDefTableEntry(state.dataOutRptPredefined->pdchEcoKind, equipName, "FixedDryBulb");
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchEcoKind, equipName, "FixedDryBulb");
                 } else {
-                    PreDefTableEntry(state.dataOutRptPredefined->pdchEcoKind, equipName, "Other");
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchEcoKind, equipName, "Other");
                 }
 
-                PreDefTableEntry(state.dataOutRptPredefined->pdchEcoMinOA, equipName, thisOAController.MinOA);
-                PreDefTableEntry(state.dataOutRptPredefined->pdchEcoMaxOA, equipName, thisOAController.MaxOA);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchEcoMinOA, equipName, thisOAController.MinOA);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchEcoMaxOA, equipName, thisOAController.MaxOA);
                 // EnergyPlus input echos for economizer controls
                 // Chnged by Amit for new feature implementation
                 if (thisOAController.Econo == DifferentialDryBulb) {
-                    PreDefTableEntry(state.dataOutRptPredefined->pdchEcoRetTemp, equipName, "Yes");
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchEcoRetTemp, equipName, "Yes");
                 } else {
-                    PreDefTableEntry(state.dataOutRptPredefined->pdchEcoRetTemp, equipName, "No");
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchEcoRetTemp, equipName, "No");
                 }
                 if (thisOAController.Econo == DifferentialEnthalpy) {
-                    PreDefTableEntry(state.dataOutRptPredefined->pdchEcoRetTemp, equipName, "Yes");
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchEcoRetTemp, equipName, "Yes");
                 } else {
-                    PreDefTableEntry(state.dataOutRptPredefined->pdchEcoRetTemp, equipName, "No");
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchEcoRetTemp, equipName, "No");
                 }
                 if (thisOAController.Econo == FixedDryBulb) {
-                    PreDefTableEntry(state.dataOutRptPredefined->pdchEcoRetTemp, equipName, thisOAController.TempLim);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchEcoRetTemp, equipName, thisOAController.TempLim);
                 } else {
-                    PreDefTableEntry(state.dataOutRptPredefined->pdchEcoRetTemp, equipName, "-");
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchEcoRetTemp, equipName, "-");
                 }
                 if (thisOAController.Econo == FixedEnthalpy) {
-                    PreDefTableEntry(state.dataOutRptPredefined->pdchEcoRetTemp, equipName, thisOAController.EnthLim);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchEcoRetTemp, equipName, thisOAController.EnthLim);
                 } else {
-                    PreDefTableEntry(state.dataOutRptPredefined->pdchEcoRetTemp, equipName, "-");
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchEcoRetTemp, equipName, "-");
                 }
             }
         }
@@ -3002,27 +3002,27 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                 // predefined report
                 for (jZone = 1; jZone <= vent_mech.NumofVentMechZones; ++jZone) {
                     zoneName = Zone(vent_mech.VentMechZone(jZone)).Name;
-                    PreDefTableEntry(state.dataOutRptPredefined->pdchDCVventMechName, zoneName, vent_mech.Name);
-                    PreDefTableEntry(state.dataOutRptPredefined->pdchDCVperPerson, zoneName, vent_mech.ZoneOAPeopleRate(jZone), 6);
-                    PreDefTableEntry(state.dataOutRptPredefined->pdchDCVperArea, zoneName, vent_mech.ZoneOAAreaRate(jZone), 6);
-                    PreDefTableEntry(state.dataOutRptPredefined->pdchDCVperZone, zoneName, vent_mech.ZoneOAFlowRate(jZone), 6);
-                    PreDefTableEntry(state.dataOutRptPredefined->pdchDCVperACH, zoneName, vent_mech.ZoneOAACHRate(jZone), 6);
-                    PreDefTableEntry(state.dataOutRptPredefined->pdchDCVMethod, zoneName, cOAFlowMethodTypes(vent_mech.ZoneOAFlowMethod(jZone)));
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDCVventMechName, zoneName, vent_mech.Name);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDCVperPerson, zoneName, vent_mech.ZoneOAPeopleRate(jZone), 6);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDCVperArea, zoneName, vent_mech.ZoneOAAreaRate(jZone), 6);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDCVperZone, zoneName, vent_mech.ZoneOAFlowRate(jZone), 6);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDCVperACH, zoneName, vent_mech.ZoneOAACHRate(jZone), 6);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDCVMethod, zoneName, cOAFlowMethodTypes(vent_mech.ZoneOAFlowMethod(jZone)));
                     if (vent_mech.ZoneOASchPtr(jZone) > 0) {
-                        PreDefTableEntry(state.dataOutRptPredefined->pdchDCVOASchName, zoneName, GetScheduleName(state, vent_mech.ZoneOASchPtr(jZone)));
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchDCVOASchName, zoneName, GetScheduleName(state, vent_mech.ZoneOASchPtr(jZone)));
                     } else {
-                        PreDefTableEntry(state.dataOutRptPredefined->pdchDCVOASchName, zoneName, "");
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchDCVOASchName, zoneName, "");
                     }
 
                     // added for new DCV inputs
                     if (vent_mech.ZoneADEffSchPtr(jZone) > 0) {
-                        PreDefTableEntry(state.dataOutRptPredefined->pdchDCVZoneADEffCooling, zoneName, "");
-                        PreDefTableEntry(state.dataOutRptPredefined->pdchDCVZoneADEffHeating, zoneName, "");
-                        PreDefTableEntry(state.dataOutRptPredefined->pdchDCVZoneADEffSchName, zoneName, GetScheduleName(state, vent_mech.ZoneADEffSchPtr(jZone)));
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchDCVZoneADEffCooling, zoneName, "");
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchDCVZoneADEffHeating, zoneName, "");
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchDCVZoneADEffSchName, zoneName, GetScheduleName(state, vent_mech.ZoneADEffSchPtr(jZone)));
                     } else {
-                        PreDefTableEntry(state.dataOutRptPredefined->pdchDCVZoneADEffCooling, zoneName, vent_mech.ZoneADEffCooling(jZone), 2);
-                        PreDefTableEntry(state.dataOutRptPredefined->pdchDCVZoneADEffHeating, zoneName, vent_mech.ZoneADEffHeating(jZone), 2);
-                        PreDefTableEntry(state.dataOutRptPredefined->pdchDCVZoneADEffSchName, zoneName, "");
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchDCVZoneADEffCooling, zoneName, vent_mech.ZoneADEffCooling(jZone), 2);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchDCVZoneADEffHeating, zoneName, vent_mech.ZoneADEffHeating(jZone), 2);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchDCVZoneADEffSchName, zoneName, "");
                     }
                 }
 
