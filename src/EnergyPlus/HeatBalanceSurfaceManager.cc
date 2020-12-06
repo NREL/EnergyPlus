@@ -2561,7 +2561,7 @@ namespace HeatBalanceSurfaceManager {
             }
         }
 
-        bool currSolRadPositive = state.dataEnvrn->SunIsUp && (BeamSolarRad + GndSolarRad + DifSolarRad > 0.0);
+        bool currSolRadPositive = state.dataEnvrn->SunIsUp && (state.dataEnvrn->BeamSolarRad + state.dataEnvrn->GndSolarRad + state.dataEnvrn->DifSolarRad > 0.0);
         bool sunset = (!currSolRadPositive) && state.dataEnvrn->PreviousSolRadPositive;
         bool sunIsUpNoRad = state.dataEnvrn->SunIsUp && (!currSolRadPositive);
 
