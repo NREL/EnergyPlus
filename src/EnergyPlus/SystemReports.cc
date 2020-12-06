@@ -4422,9 +4422,6 @@ namespace SystemReports {
         using HybridUnitaryAirConditioners::GetHybridUnitaryACOutAirNode;
         using HybridUnitaryAirConditioners::GetHybridUnitaryACReturnAirNode;
         using HybridUnitaryAirConditioners::GetHybridUnitaryACZoneInletNode;
-        using OutdoorAirUnit::GetOutdoorAirUnitOutAirNode;
-        using OutdoorAirUnit::GetOutdoorAirUnitReturnAirNode;
-        using OutdoorAirUnit::GetOutdoorAirUnitZoneInletNode;
         using PackagedTerminalHeatPump::GetPTUnitMixedAirNode;
         using PackagedTerminalHeatPump::GetPTUnitOutAirNode;
         using PackagedTerminalHeatPump::GetPTUnitReturnAirNode;
@@ -4679,14 +4676,14 @@ namespace SystemReports {
 
                     } else if (SELECT_CASE_var == OutdoorAirUnit_Num) {
                         OutAirNode =
-                            GetOutdoorAirUnitOutAirNode(state, ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
+                            OutdoorAirUnit::GetOutdoorAirUnitOutAirNode(state, ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
                         if (OutAirNode > 0) ZFAUOutAirFlow += Node(OutAirNode).MassFlowRate;
 
                         ZoneInletAirNode =
-                            GetOutdoorAirUnitZoneInletNode(state, ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
+                                OutdoorAirUnit::GetOutdoorAirUnitZoneInletNode(state, ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
                         if (ZoneInletAirNode > 0) ZFAUFlowRate = max(Node(ZoneInletAirNode).MassFlowRate, 0.0);
                         ReturnAirNode =
-                            GetOutdoorAirUnitReturnAirNode(state, ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
+                                OutdoorAirUnit::GetOutdoorAirUnitReturnAirNode(state, ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
                         if ((OutAirNode > 0) && (ReturnAirNode > 0)) {
                             //						ZFAUEnthMixedAir = PsyHFnTdbW( Node( MixedAirNode ).Temp, Node( MixedAirNode
                             //).HumRat

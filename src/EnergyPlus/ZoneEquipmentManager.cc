@@ -2583,7 +2583,6 @@ namespace ZoneEquipmentManager {
         using HWBaseboardRadiator::SimHWBaseboard;
         using HybridUnitaryAirConditioners::SimZoneHybridUnitaryAirConditioners;
         using LowTempRadiantSystem::SimLowTempRadiantSystem;
-        using OutdoorAirUnit::SimOutdoorAirUnit;
         using PackagedTerminalHeatPump::SimPackagedTerminalUnit;
         using PurchasedAirManager::SimPurchasedAir;
         using RefrigeratedCase::SimAirChillerSet;
@@ -3026,7 +3025,7 @@ namespace ZoneEquipmentManager {
                                           LatOutputProvided,
                                           ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr));
                     } else if (SELECT_CASE_var == OutdoorAirUnit_Num) { // 'ZoneHVAC:OutdoorAirUnit'
-                        SimOutdoorAirUnit(state, state.dataZoneEquipmentManager->PrioritySimOrder(EquipTypeNum).EquipName,
+                        OutdoorAirUnit::SimOutdoorAirUnit(state, state.dataZoneEquipmentManager->PrioritySimOrder(EquipTypeNum).EquipName,
                                           ActualZoneNum,
                                           FirstHVACIteration,
                                           SysOutputProvided,
