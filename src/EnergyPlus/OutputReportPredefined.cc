@@ -74,25 +74,6 @@ namespace OutputReportPredefined {
 
     // Internal data structures to store information provided by calls
 
-    // Object Data
-    Array1D<reportNameType> reportName;
-    Array1D<SubTableType> subTable;
-    Array1D<ColumnTagType> columnTag;
-    Array1D<TableEntryType> tableEntry;
-    Array1D<CompSizeTableEntryType> CompSizeTableEntry;
-    Array1D<ShadowRelateType> ShadowRelate;
-
-    // Functions
-    void clear_state()
-    {
-        reportName.deallocate();
-        subTable.deallocate();
-        columnTag.deallocate();
-        tableEntry.deallocate();
-        CompSizeTableEntry.deallocate();
-        ShadowRelate.deallocate();
-    }
-
     void SetPredefinedTables(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
@@ -1231,21 +1212,21 @@ namespace OutputReportPredefined {
         }
 
         if (tableEntryReal < 1e8) { // change from 1e10 for more robust entry writing
-            tableEntry(state.dataOutRptPredefined->numTableEntry).charEntry = format("{:#12.{}F}", tableEntryReal, sigDigitCount);
+            state.dataOutRptPredefined->tableEntry(state.dataOutRptPredefined->numTableEntry).charEntry = format("{:#12.{}F}", tableEntryReal, sigDigitCount);
         } else {
-            tableEntry(state.dataOutRptPredefined->numTableEntry).charEntry = format("{:12.{}Z}", tableEntryReal, sigDigitCount);
+            state.dataOutRptPredefined->tableEntry(state.dataOutRptPredefined->numTableEntry).charEntry = format("{:12.{}Z}", tableEntryReal, sigDigitCount);
         }
 
 
-        if (tableEntry(state.dataOutRptPredefined->numTableEntry).charEntry.size() > 12) {
-            tableEntry(state.dataOutRptPredefined->numTableEntry).charEntry = "  Too Big";
+        if (state.dataOutRptPredefined->tableEntry(state.dataOutRptPredefined->numTableEntry).charEntry.size() > 12) {
+            state.dataOutRptPredefined->tableEntry(state.dataOutRptPredefined->numTableEntry).charEntry = "  Too Big";
         }
 
-        tableEntry(state.dataOutRptPredefined->numTableEntry).objectName = objName;
-        tableEntry(state.dataOutRptPredefined->numTableEntry).indexColumn = columnIndex;
-        tableEntry(state.dataOutRptPredefined->numTableEntry).origRealEntry = tableEntryReal;
-        tableEntry(state.dataOutRptPredefined->numTableEntry).significantDigits = sigDigitCount;
-        tableEntry(state.dataOutRptPredefined->numTableEntry).origEntryIsReal = true;
+        state.dataOutRptPredefined->tableEntry(state.dataOutRptPredefined->numTableEntry).objectName = objName;
+        state.dataOutRptPredefined->tableEntry(state.dataOutRptPredefined->numTableEntry).indexColumn = columnIndex;
+        state.dataOutRptPredefined->tableEntry(state.dataOutRptPredefined->numTableEntry).origRealEntry = tableEntryReal;
+        state.dataOutRptPredefined->tableEntry(state.dataOutRptPredefined->numTableEntry).significantDigits = sigDigitCount;
+        state.dataOutRptPredefined->tableEntry(state.dataOutRptPredefined->numTableEntry).origEntryIsReal = true;
     }
 
     void PreDefTableEntry(EnergyPlusData &state, int const columnIndex, std::string const &objName, std::string const &tableEntryChar)
@@ -1283,9 +1264,9 @@ namespace OutputReportPredefined {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         incrementTableEntry(state);
-        tableEntry(state.dataOutRptPredefined->numTableEntry).charEntry = tableEntryChar;
-        tableEntry(state.dataOutRptPredefined->numTableEntry).objectName = objName;
-        tableEntry(state.dataOutRptPredefined->numTableEntry).indexColumn = columnIndex;
+        state.dataOutRptPredefined->tableEntry(state.dataOutRptPredefined->numTableEntry).charEntry = tableEntryChar;
+        state.dataOutRptPredefined->tableEntry(state.dataOutRptPredefined->numTableEntry).objectName = objName;
+        state.dataOutRptPredefined->tableEntry(state.dataOutRptPredefined->numTableEntry).indexColumn = columnIndex;
     }
 
     void PreDefTableEntry(EnergyPlusData &state, int const columnIndex, std::string const &objName, int const tableEntryInt)
@@ -1323,16 +1304,16 @@ namespace OutputReportPredefined {
 
         incrementTableEntry(state);
         // convert the integer to a string
-        tableEntry(state.dataOutRptPredefined->numTableEntry).charEntry = format("{:12}", tableEntryInt);
-        tableEntry(state.dataOutRptPredefined->numTableEntry).objectName = objName;
-        tableEntry(state.dataOutRptPredefined->numTableEntry).indexColumn = columnIndex;
+        state.dataOutRptPredefined->tableEntry(state.dataOutRptPredefined->numTableEntry).charEntry = format("{:12}", tableEntryInt);
+        state.dataOutRptPredefined->tableEntry(state.dataOutRptPredefined->numTableEntry).objectName = objName;
+        state.dataOutRptPredefined->tableEntry(state.dataOutRptPredefined->numTableEntry).indexColumn = columnIndex;
     }
 
     std::string RetrievePreDefTableEntry(EnergyPlusData &state, int const columnIndex, std::string const &objName)
     {
         for (int iTableEntry = 1; iTableEntry <= state.dataOutRptPredefined->numTableEntry; ++iTableEntry) {
-            if (tableEntry(iTableEntry).indexColumn == columnIndex && tableEntry(iTableEntry).objectName == objName) {
-                return trimmed(ljustified(tableEntry(iTableEntry).charEntry));
+            if (state.dataOutRptPredefined->tableEntry(iTableEntry).indexColumn == columnIndex && state.dataOutRptPredefined->tableEntry(iTableEntry).objectName == objName) {
+                return trimmed(ljustified(state.dataOutRptPredefined->tableEntry(iTableEntry).charEntry));
             }
         }
         return "NOT FOUND";
@@ -1370,15 +1351,15 @@ namespace OutputReportPredefined {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        if (!allocated(tableEntry)) {
-            tableEntry.allocate(sizeIncrement);
+        if (!allocated(state.dataOutRptPredefined->tableEntry)) {
+            state.dataOutRptPredefined->tableEntry.allocate(sizeIncrement);
             state.dataOutRptPredefined->sizeTableEntry = sizeIncrement;
             state.dataOutRptPredefined->numTableEntry = 1;
         } else {
             ++state.dataOutRptPredefined->numTableEntry;
             // if larger than current size grow the array
             if (state.dataOutRptPredefined->numTableEntry > state.dataOutRptPredefined->sizeTableEntry) {
-                tableEntry.redimension(state.dataOutRptPredefined->sizeTableEntry *=
+                state.dataOutRptPredefined->tableEntry.redimension(state.dataOutRptPredefined->sizeTableEntry *=
                                        2); // Tuned Changed += sizeIncrement to *= 2 for reduced heap allocations (at some space cost)
             }
         }
@@ -1418,22 +1399,22 @@ namespace OutputReportPredefined {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        if (!allocated(CompSizeTableEntry)) {
-            CompSizeTableEntry.allocate(sizeIncrement);
+        if (!allocated(state.dataOutRptPredefined->CompSizeTableEntry)) {
+            state.dataOutRptPredefined->CompSizeTableEntry.allocate(sizeIncrement);
             state.dataOutRptPredefined->sizeCompSizeTableEntry = sizeIncrement;
             state.dataOutRptPredefined->numCompSizeTableEntry = 1;
         } else {
             ++state.dataOutRptPredefined->numCompSizeTableEntry;
             // if larger than current size grow the array
             if (state.dataOutRptPredefined->numCompSizeTableEntry > state.dataOutRptPredefined->sizeCompSizeTableEntry) {
-                CompSizeTableEntry.redimension(state.dataOutRptPredefined->sizeCompSizeTableEntry *=
+                state.dataOutRptPredefined->CompSizeTableEntry.redimension(state.dataOutRptPredefined->sizeCompSizeTableEntry *=
                                                2); // Tuned Changed += sizeIncrement to *= 2 for reduced heap allocations (at some space cost)
             }
         }
-        CompSizeTableEntry(state.dataOutRptPredefined->numCompSizeTableEntry).typeField = FieldType;
-        CompSizeTableEntry(state.dataOutRptPredefined->numCompSizeTableEntry).nameField = FieldName;
-        CompSizeTableEntry(state.dataOutRptPredefined->numCompSizeTableEntry).description = FieldDescription;
-        CompSizeTableEntry(state.dataOutRptPredefined->numCompSizeTableEntry).valField = FieldValue;
+        state.dataOutRptPredefined->CompSizeTableEntry(state.dataOutRptPredefined->numCompSizeTableEntry).typeField = FieldType;
+        state.dataOutRptPredefined->CompSizeTableEntry(state.dataOutRptPredefined->numCompSizeTableEntry).nameField = FieldName;
+        state.dataOutRptPredefined->CompSizeTableEntry(state.dataOutRptPredefined->numCompSizeTableEntry).description = FieldDescription;
+        state.dataOutRptPredefined->CompSizeTableEntry(state.dataOutRptPredefined->numCompSizeTableEntry).valField = FieldValue;
     }
 
     void AddShadowRelateTableEntry(EnergyPlusData &state, int const castingField, int const receivingField, int const receivingKind)
@@ -1472,21 +1453,21 @@ namespace OutputReportPredefined {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        if (!allocated(ShadowRelate)) {
-            ShadowRelate.allocate(sizeIncrement);
+        if (!allocated(state.dataOutRptPredefined->ShadowRelate)) {
+            state.dataOutRptPredefined->ShadowRelate.allocate(sizeIncrement);
             state.dataOutRptPredefined->sizeShadowRelate = sizeIncrement;
             state.dataOutRptPredefined->numShadowRelate = 1;
         } else {
             ++state.dataOutRptPredefined->numShadowRelate;
             // if larger than current size grow the array
             if (state.dataOutRptPredefined->numShadowRelate > state.dataOutRptPredefined->sizeShadowRelate) {
-                ShadowRelate.redimension(state.dataOutRptPredefined->sizeShadowRelate *=
+                state.dataOutRptPredefined->ShadowRelate.redimension(state.dataOutRptPredefined->sizeShadowRelate *=
                                          2); // Tuned Changed += sizeIncrement to *= 2 for reduced heap allocations (at some space cost)
             }
         }
-        ShadowRelate(state.dataOutRptPredefined->numShadowRelate).castSurf = castingField;
-        ShadowRelate(state.dataOutRptPredefined->numShadowRelate).recSurf = receivingField;
-        ShadowRelate(state.dataOutRptPredefined->numShadowRelate).recKind = receivingKind;
+        state.dataOutRptPredefined->ShadowRelate(state.dataOutRptPredefined->numShadowRelate).castSurf = castingField;
+        state.dataOutRptPredefined->ShadowRelate(state.dataOutRptPredefined->numShadowRelate).recSurf = receivingField;
+        state.dataOutRptPredefined->ShadowRelate(state.dataOutRptPredefined->numShadowRelate).recKind = receivingKind;
     }
 
     int newPreDefReport(EnergyPlusData &state, std::string const &inReportName, std::string const &inReportAbrev, std::string const &inReportNamewithSpaces)
@@ -1524,23 +1505,23 @@ namespace OutputReportPredefined {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        if (!allocated(reportName)) {
-            reportName.allocate(sizeIncrement);
+        if (!allocated(state.dataOutRptPredefined->reportName)) {
+            state.dataOutRptPredefined->reportName.allocate(sizeIncrement);
             state.dataOutRptPredefined->sizeReportName = sizeIncrement;
             state.dataOutRptPredefined->numReportName = 1;
         } else {
             ++state.dataOutRptPredefined->numReportName;
             // if larger than current size grow the array
             if (state.dataOutRptPredefined->numReportName > state.dataOutRptPredefined->sizeReportName) {
-                reportName.redimension(state.dataOutRptPredefined->sizeReportName *=
+                state.dataOutRptPredefined->reportName.redimension(state.dataOutRptPredefined->sizeReportName *=
                                        2); // Tuned Changed += sizeIncrement to *= 2 for reduced heap allocations (at some space cost)
             }
         }
         // initialize new record
-        reportName(state.dataOutRptPredefined->numReportName).name = inReportName;
-        reportName(state.dataOutRptPredefined->numReportName).abrev = inReportAbrev;
-        reportName(state.dataOutRptPredefined->numReportName).namewithspaces = inReportNamewithSpaces;
-        reportName(state.dataOutRptPredefined->numReportName).show = false;
+        state.dataOutRptPredefined->reportName(state.dataOutRptPredefined->numReportName).name = inReportName;
+        state.dataOutRptPredefined->reportName(state.dataOutRptPredefined->numReportName).abrev = inReportAbrev;
+        state.dataOutRptPredefined->reportName(state.dataOutRptPredefined->numReportName).namewithspaces = inReportNamewithSpaces;
+        state.dataOutRptPredefined->reportName(state.dataOutRptPredefined->numReportName).show = false;
         newPreDefReport = state.dataOutRptPredefined->numReportName;
         return newPreDefReport;
     }
@@ -1579,20 +1560,20 @@ namespace OutputReportPredefined {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        if (!allocated(subTable)) {
-            subTable.allocate(sizeIncrement);
+        if (!allocated(state.dataOutRptPredefined->subTable)) {
+            state.dataOutRptPredefined->subTable.allocate(sizeIncrement);
             state.dataOutRptPredefined->sizeSubTable = sizeIncrement;
             state.dataOutRptPredefined->numSubTable = 1;
         } else {
             ++state.dataOutRptPredefined->numSubTable;
             // if larger than current size then grow the array
             if (state.dataOutRptPredefined->numSubTable > state.dataOutRptPredefined->sizeSubTable) {
-                subTable.redimension(state.dataOutRptPredefined->sizeSubTable *= 2); // Tuned Changed += sizeIncrement to *= 2 for reduced heap allocations (at some space cost)
+                state.dataOutRptPredefined->subTable.redimension(state.dataOutRptPredefined->sizeSubTable *= 2); // Tuned Changed += sizeIncrement to *= 2 for reduced heap allocations (at some space cost)
             }
         }
         // initialize new record)
-        subTable(state.dataOutRptPredefined->numSubTable).name = subTableName;
-        subTable(state.dataOutRptPredefined->numSubTable).indexReportName = reportIndex;
+        state.dataOutRptPredefined->subTable(state.dataOutRptPredefined->numSubTable).name = subTableName;
+        state.dataOutRptPredefined->subTable(state.dataOutRptPredefined->numSubTable).indexReportName = reportIndex;
         return state.dataOutRptPredefined->numSubTable;
     }
 
@@ -1629,7 +1610,7 @@ namespace OutputReportPredefined {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         if ((subTableIndex >= 0) && (subTableIndex <= state.dataOutRptPredefined->numSubTable)) {
-            subTable(subTableIndex).footnote = footnoteText;
+            state.dataOutRptPredefined->subTable(subTableIndex).footnote = footnoteText;
         }
     }
 
@@ -1668,20 +1649,20 @@ namespace OutputReportPredefined {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        if (!allocated(columnTag)) {
-            columnTag.allocate(sizeIncrement);
+        if (!allocated(state.dataOutRptPredefined->columnTag)) {
+            state.dataOutRptPredefined->columnTag.allocate(sizeIncrement);
             state.dataOutRptPredefined->sizeColumnTag = sizeIncrement;
             state.dataOutRptPredefined->numColumnTag = 1;
         } else {
             ++state.dataOutRptPredefined->numColumnTag;
             // if larger than current size grow the array
             if (state.dataOutRptPredefined->numColumnTag > state.dataOutRptPredefined->sizeColumnTag) {
-                columnTag.redimension(state.dataOutRptPredefined->sizeColumnTag *= 2); // Tuned Changed += sizeIncrement to *= 2 for reduced heap allocations (at some space cost)
+                state.dataOutRptPredefined->columnTag.redimension(state.dataOutRptPredefined->sizeColumnTag *= 2); // Tuned Changed += sizeIncrement to *= 2 for reduced heap allocations (at some space cost)
             }
         }
         // initialize new record)
-        columnTag(state.dataOutRptPredefined->numColumnTag).heading = columnHeading;
-        columnTag(state.dataOutRptPredefined->numColumnTag).indexSubTable = subTableIndex;
+        state.dataOutRptPredefined->columnTag(state.dataOutRptPredefined->numColumnTag).heading = columnHeading;
+        state.dataOutRptPredefined->columnTag(state.dataOutRptPredefined->numColumnTag).indexSubTable = subTableIndex;
         newPreDefColumn = state.dataOutRptPredefined->numColumnTag;
         return newPreDefColumn;
     }

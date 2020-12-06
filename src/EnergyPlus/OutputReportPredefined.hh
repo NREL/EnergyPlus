@@ -162,19 +162,7 @@ namespace OutputReportPredefined {
         }
     };
 
-    // Object Data
-    extern Array1D<reportNameType> reportName;
-    extern Array1D<SubTableType> subTable;
-    extern Array1D<ColumnTagType> columnTag;
-    extern Array1D<TableEntryType> tableEntry;
-    extern Array1D<CompSizeTableEntryType> CompSizeTableEntry;
-    extern Array1D<ShadowRelateType> ShadowRelate;
-
-    // Functions
-    void clear_state();
-
     void SetPredefinedTables(EnergyPlusData &state);
-
 
     // Creates an entry for predefined tables when the entry
     // is a real variable. numSigDigits defaults to 2, and if supplied must be in [0-9]
@@ -1097,6 +1085,13 @@ struct OutputReportPredefinedData : BaseGlobalStruct {
     Real64 TotalNotMetOccupiedForABUPS = 0.0;
     Real64 TotalTimeNotSimpleASH55EitherForABUPS = 0.0;
 
+    Array1D<OutputReportPredefined::reportNameType> reportName;
+    Array1D<OutputReportPredefined::SubTableType> subTable;
+    Array1D<OutputReportPredefined::ColumnTagType> columnTag;
+    Array1D<OutputReportPredefined::TableEntryType> tableEntry;
+    Array1D<OutputReportPredefined::CompSizeTableEntryType> CompSizeTableEntry;
+    Array1D<OutputReportPredefined::ShadowRelateType> ShadowRelate;
+
     void clear_state() override
     {
         this->pdrClim = 0;
@@ -1884,6 +1879,12 @@ struct OutputReportPredefinedData : BaseGlobalStruct {
         this->TotalNotMetCoolingOccupiedForABUPS = 0.0;
         this->TotalNotMetOccupiedForABUPS = 0.0;
         this->TotalTimeNotSimpleASH55EitherForABUPS = 0.0;
+        this->reportName.deallocate();
+        this->subTable.deallocate();
+        this->columnTag.deallocate();
+        this->tableEntry.deallocate();
+        this->CompSizeTableEntry.deallocate();
+        this->ShadowRelate.deallocate();
     }
 };
 

@@ -142,7 +142,6 @@
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutdoorAirUnit.hh>
 #include <EnergyPlus/OutputProcessor.hh>
-#include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/OutputReportTabularAnnual.hh>
 #include <EnergyPlus/OutsideEnergySources.hh>
@@ -280,7 +279,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     OutAirNodeManager::clear_state();
     OutdoorAirUnit::clear_state();
     OutputProcessor::clear_state();
-    OutputReportPredefined::clear_state();
     OutputReportTabular::clear_state(state);
     OutputReportTabularAnnual::clear_state();
     OutsideEnergySources::clear_state();

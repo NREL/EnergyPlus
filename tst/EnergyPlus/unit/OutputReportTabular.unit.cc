@@ -7263,8 +7263,8 @@ TEST_F(SQLiteFixture, OutputReportTabularTest_PredefinedTableDXConversion)
     EXPECT_EQ("10000.0", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchDXCoolCoilNetCapSIA, CompName));
 
     // We enable the report we care about, making sure it's the right one
-    EXPECT_EQ("EquipmentSummary", OutputReportPredefined::reportName(5).name);
-    OutputReportPredefined::reportName(5).show = true;
+    EXPECT_EQ("EquipmentSummary", state->dataOutRptPredefined->reportName(5).name);
+    state->dataOutRptPredefined->reportName(5).show = true;
 
     WritePredefinedTables(*state);
     EnergyPlus::sqlite->sqliteCommit();
@@ -7314,10 +7314,10 @@ TEST_F(SQLiteFixture, OutputReportTabularTest_PredefinedTableCoilHumRat)
     PreDefTableEntry(*state, state->dataOutRptPredefined->pdchCoilLvgHumRatIdealPeak, CompName,  0.006, 8);
 
     // We enable the reports we care about, making sure we have the right ones
-    EXPECT_EQ("HVACSizingSummary", OutputReportPredefined::reportName(6).name);
-    OutputReportPredefined::reportName(6).show = true;
-    EXPECT_EQ("CoilSizingDetails", OutputReportPredefined::reportName(7).name);
-    OutputReportPredefined::reportName(7).show = true;
+    EXPECT_EQ("HVACSizingSummary", state->dataOutRptPredefined->reportName(6).name);
+    state->dataOutRptPredefined->reportName(6).show = true;
+    EXPECT_EQ("CoilSizingDetails", state->dataOutRptPredefined->reportName(7).name);
+    state->dataOutRptPredefined->reportName(7).show = true;
 
     WritePredefinedTables(*state);
     EnergyPlus::sqlite->sqliteCommit();
@@ -8297,8 +8297,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatGainReport)
     state->dataGlobal->DoWeathSim = true;
 
     state->dataOutRptPredefined->pdrSensibleGain = 1;
-    EnergyPlus::OutputReportPredefined::reportName.allocate(1);
-    EnergyPlus::OutputReportPredefined::reportName(state->dataOutRptPredefined->pdrSensibleGain).show = true;
+    state->dataOutRptPredefined->reportName.allocate(1);
+    state->dataOutRptPredefined->reportName(state->dataOutRptPredefined->pdrSensibleGain).show = true;
 
     EnergyPlus::DataHVACGlobals::TimeStepSys = 10.0;
     state->dataGlobal->TimeStepZone = 20.0;

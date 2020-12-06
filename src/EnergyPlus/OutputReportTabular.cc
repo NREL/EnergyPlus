@@ -1948,7 +1948,6 @@ namespace OutputReportTabular {
 
         using OutputProcessor::EndUseCategory;
         using OutputProcessor::MaxNumSubcategories;
-        using OutputReportPredefined::reportName;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2112,7 +2111,7 @@ namespace OutputReportTabular {
                     displayVisualResilienceSummary = true;
                     nameFound = true;
                     for (jReport = 1; jReport <= state.dataOutRptPredefined->numReportName; ++jReport) {
-                        reportName(jReport).show = true;
+                        state.dataOutRptPredefined->reportName(jReport).show = true;
                     }
                 } else if (UtilityRoutines::SameString(AlphArray(iReport), "AllSummaryAndSizingPeriod")) {
                     WriteTabularFiles = true;
@@ -2135,7 +2134,7 @@ namespace OutputReportTabular {
                     displayVisualResilienceSummary = true;
                     nameFound = true;
                     for (jReport = 1; jReport <= state.dataOutRptPredefined->numReportName; ++jReport) {
-                        reportName(jReport).show = true;
+                        state.dataOutRptPredefined->reportName(jReport).show = true;
                     }
                     // the sizing period reports
                     displayZoneComponentLoadSummary = true;
@@ -2168,7 +2167,7 @@ namespace OutputReportTabular {
                     displayVisualResilienceSummary = true;
                     nameFound = true;
                     for (jReport = 1; jReport <= state.dataOutRptPredefined->numReportName; ++jReport) {
-                        reportName(jReport).show = true;
+                        state.dataOutRptPredefined->reportName(jReport).show = true;
                     }
                     for (jReport = 1; jReport <= numNamedMonthly; ++jReport) {
                         namedMonthly(jReport).show = true;
@@ -2194,7 +2193,7 @@ namespace OutputReportTabular {
                     displayVisualResilienceSummary = true;
                     nameFound = true;
                     for (jReport = 1; jReport <= state.dataOutRptPredefined->numReportName; ++jReport) {
-                        reportName(jReport).show = true;
+                        state.dataOutRptPredefined->reportName(jReport).show = true;
                     }
                     for (jReport = 1; jReport <= numNamedMonthly; ++jReport) {
                         namedMonthly(jReport).show = true;
@@ -2206,14 +2205,14 @@ namespace OutputReportTabular {
                 }
                 // check the reports that are predefined and are created by OutputReportPredefined
                 for (jReport = 1; jReport <= state.dataOutRptPredefined->numReportName; ++jReport) {
-                    if (UtilityRoutines::SameString(AlphArray(iReport), reportName(jReport).name)) {
+                    if (UtilityRoutines::SameString(AlphArray(iReport), state.dataOutRptPredefined->reportName(jReport).name)) {
                         WriteTabularFiles = true;
-                        reportName(jReport).show = true;
+                        state.dataOutRptPredefined->reportName(jReport).show = true;
                         nameFound = true;
                     }
-                    if (UtilityRoutines::SameString(AlphArray(iReport), reportName(jReport).abrev)) {
+                    if (UtilityRoutines::SameString(AlphArray(iReport), state.dataOutRptPredefined->reportName(jReport).abrev)) {
                         WriteTabularFiles = true;
-                        reportName(jReport).show = true;
+                        state.dataOutRptPredefined->reportName(jReport).show = true;
                         nameFound = true;
                     }
                 }
@@ -3729,7 +3728,6 @@ namespace OutputReportTabular {
 
         // Using/Aliasing
         using EconomicLifeCycleCost::LCCparamPresent;
-        using OutputReportPredefined::reportName;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3834,9 +3832,9 @@ namespace OutputReportTabular {
 //                               << "\">Annual Visual Resilience Summary</a>\n";
 //                }
                 for (kReport = 1; kReport <= state.dataOutRptPredefined->numReportName; ++kReport) {
-                    if (reportName(kReport).show) {
-                        tbl_stream << "<br><a href=\"#" << MakeAnchorName(reportName(kReport).namewithspaces, Entire_Facility) << "\">"
-                                   << reportName(kReport).namewithspaces << "</a>\n";
+                    if (state.dataOutRptPredefined->reportName(kReport).show) {
+                        tbl_stream << "<br><a href=\"#" << MakeAnchorName(state.dataOutRptPredefined->reportName(kReport).namewithspaces, Entire_Facility) << "\">"
+                                   << state.dataOutRptPredefined->reportName(kReport).namewithspaces << "</a>\n";
                     }
                 }
                 if (state.dataGlobal->DoWeathSim) {
@@ -5124,7 +5122,6 @@ namespace OutputReportTabular {
         using LowTempRadiantSystem::NumOfCFloLowTempRadSys;
         using LowTempRadiantSystem::NumOfElecLowTempRadSys;
         using LowTempRadiantSystem::NumOfHydrLowTempRadSys;
-        using OutputReportPredefined::reportName;
 
         static int iZone(0);
         static int iRadiant(0);
@@ -5148,7 +5145,7 @@ namespace OutputReportTabular {
 
         if (!state.dataGlobal->DoWeathSim) return;
 
-        if (!reportName(state.dataOutRptPredefined->pdrSensibleGain).show) return; // don't gather data if report isn't requested
+        if (!state.dataOutRptPredefined->reportName(state.dataOutRptPredefined->pdrSensibleGain).show) return; // don't gather data if report isn't requested
 
         if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepZone) return; // only add values over the HVAC timestep basis
 
@@ -11453,12 +11450,12 @@ namespace OutputReportTabular {
         numUnqObjName = 0;
         for (lTableEntry = 1; lTableEntry <= state.dataOutRptPredefined->numTableEntry; ++lTableEntry) {
             // associate the subtable with each column
-            curColumn = tableEntry(lTableEntry).indexColumn;
+            curColumn = state.dataOutRptPredefined->tableEntry(lTableEntry).indexColumn;
             if ((curColumn >= 1) && (curColumn <= state.dataOutRptPredefined->numColumnTag)) {
-                tableEntry(lTableEntry).subTableIndex = columnTag(curColumn).indexSubTable;
+                state.dataOutRptPredefined->tableEntry(lTableEntry).subTableIndex = state.dataOutRptPredefined->columnTag(curColumn).indexSubTable;
             }
             // make a list of unique object names
-            curObjectName = tableEntry(lTableEntry).objectName;
+            curObjectName = state.dataOutRptPredefined->tableEntry(lTableEntry).objectName;
             found = 0;
             for (mUnqObjNames = 1; mUnqObjNames <= numUnqObjName; ++mUnqObjNames) {
                 if (curObjectName == uniqueObjectName(mUnqObjNames)) {
@@ -11467,25 +11464,25 @@ namespace OutputReportTabular {
             }
             // if found then point to the unique object
             if (found > 0) {
-                tableEntry(lTableEntry).uniqueObjName = found;
+                state.dataOutRptPredefined->tableEntry(lTableEntry).uniqueObjName = found;
                 // if not found add to the unique object list
             } else {
                 ++numUnqObjName;
                 uniqueObjectName(numUnqObjName) = curObjectName;
-                tableEntry(lTableEntry).uniqueObjName = numUnqObjName;
+                state.dataOutRptPredefined->tableEntry(lTableEntry).uniqueObjName = numUnqObjName;
             }
         }
         // loop through all reports and include those that have been flagged as 'show'
         for (iReportName = 1; iReportName <= state.dataOutRptPredefined->numReportName; ++iReportName) {
-            if (reportName(iReportName).show) {
-                WriteReportHeaders(reportName(iReportName).namewithspaces, "Entire Facility", OutputProcessor::StoreType::Averaged);
+            if (state.dataOutRptPredefined->reportName(iReportName).show) {
+                WriteReportHeaders(state.dataOutRptPredefined->reportName(iReportName).namewithspaces, "Entire Facility", OutputProcessor::StoreType::Averaged);
                 // loop through the subtables and include those that are associated with this report
                 for (int jSubTable = 1, jSubTable_end = state.dataOutRptPredefined->numSubTable; jSubTable <= jSubTable_end; ++jSubTable) {
-                    if (subTable(jSubTable).indexReportName == iReportName) {
+                    if (state.dataOutRptPredefined->subTable(jSubTable).indexReportName == iReportName) {
                         // determine how many columns
                         curNumColumns = 0;
                         for (kColumnTag = 1; kColumnTag <= state.dataOutRptPredefined->numColumnTag; ++kColumnTag) {
-                            if (columnTag(kColumnTag).indexSubTable == jSubTable) {
+                            if (state.dataOutRptPredefined->columnTag(kColumnTag).indexSubTable == jSubTable) {
                                 ++curNumColumns;
                             }
                         }
@@ -11493,8 +11490,8 @@ namespace OutputReportTabular {
                         // flag in useUniqueObjectName to true, then count number of true's.
                         useUniqueObjectName = false; // array assignment
                         for (lTableEntry = 1; lTableEntry <= state.dataOutRptPredefined->numTableEntry; ++lTableEntry) {
-                            if (tableEntry(lTableEntry).subTableIndex == jSubTable) {
-                                useUniqueObjectName(tableEntry(lTableEntry).uniqueObjName) = true;
+                            if (state.dataOutRptPredefined->tableEntry(lTableEntry).subTableIndex == jSubTable) {
+                                useUniqueObjectName(state.dataOutRptPredefined->tableEntry(lTableEntry).uniqueObjName) = true;
                             }
                         }
                         curNumRows = 0;
@@ -11530,10 +11527,10 @@ namespace OutputReportTabular {
                         // set column headings
                         countColumn = 0;
                         for (kColumnTag = 1; kColumnTag <= state.dataOutRptPredefined->numColumnTag; ++kColumnTag) {
-                            if (columnTag(kColumnTag).indexSubTable == jSubTable) {
+                            if (state.dataOutRptPredefined->columnTag(kColumnTag).indexSubTable == jSubTable) {
                                 ++countColumn;
                                 // do the unit conversions
-                                colTagWithSI = columnTag(kColumnTag).heading;
+                                colTagWithSI = state.dataOutRptPredefined->columnTag(kColumnTag).heading;
                                 if (unitsStyle == unitsStyleInchPound) {
                                     LookupSItoIP(state, colTagWithSI, indexUnitConv, curColTag);
                                     colUnitConv(countColumn) = indexUnitConv;
@@ -11551,9 +11548,9 @@ namespace OutputReportTabular {
                         // fill the body of the table from the entries
                         // find the entries associated with the current subtable
                         for (lTableEntry = 1; lTableEntry <= state.dataOutRptPredefined->numTableEntry; ++lTableEntry) {
-                            if (tableEntry(lTableEntry).subTableIndex == jSubTable) {
+                            if (state.dataOutRptPredefined->tableEntry(lTableEntry).subTableIndex == jSubTable) {
                                 // determine what column the current entry is in
-                                curColTagIndex = tableEntry(lTableEntry).indexColumn;
+                                curColTagIndex = state.dataOutRptPredefined->tableEntry(lTableEntry).indexColumn;
                                 for (nColHead = 1; nColHead <= curNumColumns; ++nColHead) {
                                     if (curColTagIndex == colHeadToColTag(nColHead)) {
                                         colCurrent = nColHead;
@@ -11561,7 +11558,7 @@ namespace OutputReportTabular {
                                     }
                                 }
                                 // determine what row the current entry is in
-                                curRowUnqObjIndex = tableEntry(lTableEntry).uniqueObjName;
+                                curRowUnqObjIndex = state.dataOutRptPredefined->tableEntry(lTableEntry).uniqueObjName;
                                 for (oRowHead = 1; oRowHead <= curNumRows; ++oRowHead) {
                                     if (curRowUnqObjIndex == rowToUnqObjName(oRowHead)) {
                                         rowCurrent = oRowHead;
@@ -11571,34 +11568,34 @@ namespace OutputReportTabular {
                                 // finally assign the entry to the place in the table body
                                 if (unitsStyle == unitsStyleInchPound || unitsStyle == unitsStyleJtoKWH) {
                                     columnUnitConv = colUnitConv(colCurrent);
-                                    if (UtilityRoutines::SameString(subTable(jSubTable).name, "SizingPeriod:DesignDay") &&
+                                    if (UtilityRoutines::SameString(state.dataOutRptPredefined->subTable(jSubTable).name, "SizingPeriod:DesignDay") &&
                                         unitsStyle == unitsStyleInchPound) {
                                         if (UtilityRoutines::SameString(columnHead(colCurrent), "Humidity Value")) {
-                                            LookupSItoIP(state, tableEntry(lTableEntry + 1).charEntry, columnUnitConv, repTableTag);
-                                            tableEntry(lTableEntry + 1).charEntry = repTableTag;
+                                            LookupSItoIP(state, state.dataOutRptPredefined->tableEntry(lTableEntry + 1).charEntry, columnUnitConv, repTableTag);
+                                            state.dataOutRptPredefined->tableEntry(lTableEntry + 1).charEntry = repTableTag;
                                         }
                                     }
-                                    if (tableEntry(lTableEntry).origEntryIsReal && (columnUnitConv != 0)) {
-                                        IPvalue = ConvertIP(columnUnitConv, tableEntry(lTableEntry).origRealEntry);
-                                        tableBody(colCurrent, rowCurrent) = RealToStr(IPvalue, tableEntry(lTableEntry).significantDigits);
+                                    if (state.dataOutRptPredefined->tableEntry(lTableEntry).origEntryIsReal && (columnUnitConv != 0)) {
+                                        IPvalue = ConvertIP(columnUnitConv, state.dataOutRptPredefined->tableEntry(lTableEntry).origRealEntry);
+                                        tableBody(colCurrent, rowCurrent) = RealToStr(IPvalue, state.dataOutRptPredefined->tableEntry(lTableEntry).significantDigits);
                                     } else {
-                                        tableBody(colCurrent, rowCurrent) = tableEntry(lTableEntry).charEntry;
+                                        tableBody(colCurrent, rowCurrent) = state.dataOutRptPredefined->tableEntry(lTableEntry).charEntry;
                                     }
                                 } else {
-                                    tableBody(colCurrent, rowCurrent) = tableEntry(lTableEntry).charEntry;
+                                    tableBody(colCurrent, rowCurrent) = state.dataOutRptPredefined->tableEntry(lTableEntry).charEntry;
                                 }
                             }
                         }
                         // create the actual output table
-                        WriteSubtitle(subTable(jSubTable).name);
-                        WriteTable(state, tableBody, rowHead, columnHead, columnWidth, false, subTable(jSubTable).footnote);
+                        WriteSubtitle(state.dataOutRptPredefined->subTable(jSubTable).name);
+                        WriteTable(state, tableBody, rowHead, columnHead, columnWidth, false, state.dataOutRptPredefined->subTable(jSubTable).footnote);
                         if (sqlite) {
                             sqlite->createSQLiteTabularDataRecords(
-                                tableBody, rowHead, columnHead, reportName(iReportName).name, "Entire Facility", subTable(jSubTable).name);
+                                tableBody, rowHead, columnHead, state.dataOutRptPredefined->reportName(iReportName).name, "Entire Facility", state.dataOutRptPredefined->subTable(jSubTable).name);
                         }
                         if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
                             ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
-                                tableBody, rowHead, columnHead, reportName(iReportName).name, "Entire Facility", subTable(jSubTable).name);
+                                tableBody, rowHead, columnHead, state.dataOutRptPredefined->reportName(iReportName).name, "Entire Facility", state.dataOutRptPredefined->subTable(jSubTable).name);
                         }
                     }
                 }
@@ -11672,21 +11669,21 @@ namespace OutputReportTabular {
                 foundEntry = 0;
                 ++loopLimit;
                 for (iTableEntry = 1; iTableEntry <= state.dataOutRptPredefined->numCompSizeTableEntry; ++iTableEntry) {
-                    if (!CompSizeTableEntry(iTableEntry).written) {
+                    if (!state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).written) {
                         foundEntry = iTableEntry;
                         break;
                     }
                 }
                 if (foundEntry == 0) break; // leave main loop - all items put into tables
                 // clear active items
-                for (auto &e : CompSizeTableEntry)
+                for (auto &e : state.dataOutRptPredefined->CompSizeTableEntry)
                     e.active = false;
                 // make an unwritten item that is of the same type active - these will be the
                 // entries for the particular subtable.
                 for (iTableEntry = 1; iTableEntry <= state.dataOutRptPredefined->numCompSizeTableEntry; ++iTableEntry) {
-                    if (!CompSizeTableEntry(iTableEntry).written) {
-                        if (UtilityRoutines::SameString(CompSizeTableEntry(iTableEntry).typeField, CompSizeTableEntry(foundEntry).typeField)) {
-                            CompSizeTableEntry(iTableEntry).active = true;
+                    if (!state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).written) {
+                        if (UtilityRoutines::SameString(state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).typeField, state.dataOutRptPredefined->CompSizeTableEntry(foundEntry).typeField)) {
+                            state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).active = true;
                         }
                     }
                 }
@@ -11698,8 +11695,8 @@ namespace OutputReportTabular {
                 for (iTableEntry = 1; iTableEntry <= state.dataOutRptPredefined->numCompSizeTableEntry; ++iTableEntry) {
                     // search for descriptions
                     foundDesc = 0;
-                    if (CompSizeTableEntry(iTableEntry).active) {
-                        curDesc = CompSizeTableEntry(iTableEntry).description;
+                    if (state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).active) {
+                        curDesc = state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).description;
                         // look through the list of unique items to see if it matches
                         for (jUnique = 1; jUnique <= numUniqueDesc; ++jUnique) {
                             if (UtilityRoutines::SameString(curDesc, uniqueDesc(jUnique))) {
@@ -11714,7 +11711,7 @@ namespace OutputReportTabular {
                         }
                         // search for objects
                         foundObj = 0;
-                        curObj = CompSizeTableEntry(iTableEntry).nameField;
+                        curObj = state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).nameField;
                         for (jUnique = 1; jUnique <= numUniqueObj; ++jUnique) {
                             if (UtilityRoutines::SameString(curObj, uniqueObj(jUnique))) {
                                 foundObj = jUnique;
@@ -11759,8 +11756,8 @@ namespace OutputReportTabular {
                 // fill the table
                 for (iTableEntry = 1; iTableEntry <= state.dataOutRptPredefined->numCompSizeTableEntry; ++iTableEntry) {
                     // find the row and column for the specific entry
-                    if (CompSizeTableEntry(iTableEntry).active) {
-                        curDesc = CompSizeTableEntry(iTableEntry).description;
+                    if (state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).active) {
+                        curDesc = state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).description;
                         foundDesc = 0;
                         for (jUnique = 1; jUnique <= numUniqueDesc; ++jUnique) {
                             if (UtilityRoutines::SameString(uniqueDesc(jUnique), curDesc)) {
@@ -11768,7 +11765,7 @@ namespace OutputReportTabular {
                                 break;
                             }
                         }
-                        curObj = CompSizeTableEntry(iTableEntry).nameField;
+                        curObj = state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).nameField;
                         foundObj = 0;
                         for (jUnique = 1; jUnique <= numUniqueObj; ++jUnique) {
                             if (UtilityRoutines::SameString(rowHead(jUnique), curObj)) {
@@ -11777,7 +11774,7 @@ namespace OutputReportTabular {
                             }
                         }
                         if ((foundDesc >= 1) && (foundObj >= 1)) {
-                            curValueSI = CompSizeTableEntry(iTableEntry).valField;
+                            curValueSI = state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).valField;
                             if (unitsStyle == unitsStyleInchPound) {
                                 if (colUnitConv(foundDesc) != 0) {
                                     curValue = ConvertIP(colUnitConv(foundDesc), curValueSI);
@@ -11792,14 +11789,14 @@ namespace OutputReportTabular {
                             } else {
                                 tableBody(foundDesc, foundObj) = RealToStr(curValue, 6);
                             }
-                            CompSizeTableEntry(iTableEntry).written = true;
+                            state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).written = true;
                         }
                     }
                 }
                 // write the table
-                WriteSubtitle(CompSizeTableEntry(foundEntry).typeField);
-                if (CompSizeTableEntry(foundEntry).typeField == "AirTerminal:SingleDuct:VAV:Reheat" ||
-                    CompSizeTableEntry(foundEntry).typeField == "AirTerminal:SingleDuct:VAV:NoReheat") {
+                WriteSubtitle(state.dataOutRptPredefined->CompSizeTableEntry(foundEntry).typeField);
+                if (state.dataOutRptPredefined->CompSizeTableEntry(foundEntry).typeField == "AirTerminal:SingleDuct:VAV:Reheat" ||
+                    state.dataOutRptPredefined->CompSizeTableEntry(foundEntry).typeField == "AirTerminal:SingleDuct:VAV:NoReheat") {
                     WriteTable(state, tableBody,
                                rowHead,
                                columnHead,
@@ -11817,7 +11814,7 @@ namespace OutputReportTabular {
                 }
                 if (sqlite) {
                     sqlite->createSQLiteTabularDataRecords(
-                        tableBody, rowHead, columnHead, "ComponentSizingSummary", "Entire Facility", CompSizeTableEntry(foundEntry).typeField);
+                        tableBody, rowHead, columnHead, "ComponentSizingSummary", "Entire Facility", state.dataOutRptPredefined->CompSizeTableEntry(foundEntry).typeField);
                 }
                 if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
                     ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
@@ -11826,7 +11823,7 @@ namespace OutputReportTabular {
                         columnHead,
                         "Component Sizing Summary",
                         "Entire Facility",
-                        CompSizeTableEntry(foundEntry).typeField,
+                        state.dataOutRptPredefined->CompSizeTableEntry(foundEntry).typeField,
                         "User-Specified values were used. Design Size values were used if no User-Specified values were provided.");
                 }
             }
@@ -11895,20 +11892,20 @@ namespace OutputReportTabular {
                 numreceivingfields += ShadowComb(HTS).NumSubSurf;
             }
 
-            ShadowRelate.allocate(numreceivingfields);
+            state.dataOutRptPredefined->ShadowRelate.allocate(numreceivingfields);
             state.dataOutRptPredefined->numShadowRelate = 0;
             for (HTS = 1; HTS <= TotSurfaces; ++HTS) {
                 for (NGSS = 1; NGSS <= ShadowComb(HTS).NumGenSurf; ++NGSS) {
                     ++state.dataOutRptPredefined->numShadowRelate;
-                    ShadowRelate(state.dataOutRptPredefined->numShadowRelate).castSurf = ShadowComb(HTS).GenSurf(NGSS);
-                    ShadowRelate(state.dataOutRptPredefined->numShadowRelate).recSurf = HTS;
-                    ShadowRelate(state.dataOutRptPredefined->numShadowRelate).recKind = recKindSurface;
+                    state.dataOutRptPredefined->ShadowRelate(state.dataOutRptPredefined->numShadowRelate).castSurf = ShadowComb(HTS).GenSurf(NGSS);
+                    state.dataOutRptPredefined->ShadowRelate(state.dataOutRptPredefined->numShadowRelate).recSurf = HTS;
+                    state.dataOutRptPredefined->ShadowRelate(state.dataOutRptPredefined->numShadowRelate).recKind = recKindSurface;
                 }
                 for (NGSS = 1; NGSS <= ShadowComb(HTS).NumSubSurf; ++NGSS) {
                     ++state.dataOutRptPredefined->numShadowRelate;
-                    ShadowRelate(state.dataOutRptPredefined->numShadowRelate).castSurf = ShadowComb(HTS).SubSurf(NGSS);
-                    ShadowRelate(state.dataOutRptPredefined->numShadowRelate).recSurf = HTS;
-                    ShadowRelate(state.dataOutRptPredefined->numShadowRelate).recKind = recKindSubsurface;
+                    state.dataOutRptPredefined->ShadowRelate(state.dataOutRptPredefined->numShadowRelate).castSurf = ShadowComb(HTS).SubSurf(NGSS);
+                    state.dataOutRptPredefined->ShadowRelate(state.dataOutRptPredefined->numShadowRelate).recSurf = HTS;
+                    state.dataOutRptPredefined->ShadowRelate(state.dataOutRptPredefined->numShadowRelate).recKind = recKindSubsurface;
                 }
             }
             assert(numreceivingfields == state.dataOutRptPredefined->numShadowRelate);
@@ -11922,9 +11919,9 @@ namespace OutputReportTabular {
                 typedef std::map<int, std::pair<int, std::vector<std::string const *>>> ShadowMap;
                 ShadowMap shadow_map;
                 for (iShadRel = 1; iShadRel <= state.dataOutRptPredefined->numShadowRelate; ++iShadRel) {
-                    if (ShadowRelate(iShadRel).recKind == iKindRec) {
-                        curRecSurf = ShadowRelate(iShadRel).recSurf;
-                        std::string const &name(Surface(ShadowRelate(iShadRel).castSurf).Name);
+                    if (state.dataOutRptPredefined->ShadowRelate(iShadRel).recKind == iKindRec) {
+                        curRecSurf = state.dataOutRptPredefined->ShadowRelate(iShadRel).recSurf;
+                        std::string const &name(Surface(state.dataOutRptPredefined->ShadowRelate(iShadRel).castSurf).Name);
                         auto &elem(shadow_map[curRecSurf]);            // Creates the entry if not present (and zero-initializes the int in the pair)
                         elem.first += static_cast<int>(name.length()); // Accumulate total of name lengths
                         elem.second.push_back(&name);                  // Add this name

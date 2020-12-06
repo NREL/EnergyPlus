@@ -941,7 +941,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_FanPeak)
     EXPECT_EQ("7/15 18:00:00", OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchFanPkTime, CompName));
 
     // Bonus test for #6949
-    EXPECT_EQ("End Use Subcategory", OutputReportPredefined::columnTag(state->dataOutRptPredefined->pdchFanEndUse).heading);
+    EXPECT_EQ("End Use Subcategory", state->dataOutRptPredefined->columnTag(state->dataOutRptPredefined->pdchFanEndUse).heading);
 }
 TEST_F(EnergyPlusFixture, BaseSizer_SupplyAirTempLessThanZoneTStatTest)
 {
