@@ -6006,6 +6006,8 @@ namespace SolarShading {
                 for (int lay = 1; lay <= CFSMAXNL + 1; ++lay) {
                     SurfWinA(lay, SurfNum) = 0.0;
                 }
+                IntBeamAbsByShadFac(SurfNum) = 0.0;
+                ExtBeamAbsByShadFac(SurfNum) = 0.0;
             }
             int const firstSurfOpaque = Zone(zoneNum).NonWindowSurfaceFirst;
             int const lastSurfOpaque = Zone(zoneNum).NonWindowSurfaceLast;
@@ -6013,6 +6015,7 @@ namespace SolarShading {
                 SurfOpaqAI(SurfNum) = 0.0;
                 SurfOpaqAO(SurfNum) = 0.0;
             }
+
         }
         if (state.dataDaylightingDevicesData->NumOfTDDPipes > 0) {
             for (auto &e : state.dataDaylightingDevicesData->TDDPipe) {
@@ -6778,8 +6781,6 @@ namespace SolarShading {
                 // from this exterior window since the beam-beam transmittance of shades and diffusing glass
                 // is assumed to be zero. The beam-beam transmittance of tubular daylighting devices is also
                 // assumed to be zero.
-                IntBeamAbsByShadFac(SurfNum) = 0.0;
-                ExtBeamAbsByShadFac(SurfNum) = 0.0;
 
                 if (SurfWinWindowModelType(SurfNum) != WindowBSDFModel)
                     if (ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == BGShadeOn || SurfWinSolarDiffusing(SurfNum) ||

@@ -2562,12 +2562,14 @@ namespace HeatBalanceSurfaceManager {
         }
 
 
-        bool currSunIsUp = SunIsUp && (BeamSolarRad + GndSolarRad + DifSolarRad > 0.0);
-        bool sunset = (!currSunIsUp) && PreviousSunIsUp;
-        PreviousSunIsUp = currSunIsUp;
-//        std::cout << "currSunIsUp, " << currSunIsUp << ", sunset, " << sunset << "\n";
+        bool currSolRadPositive = SunIsUp && (BeamSolarRad + GndSolarRad + DifSolarRad > 0.0);
+        bool sunset = (!currSolRadPositive) && PreviousSolRadPositive;
+        bool sunIsUpNoRad = SunIsUp && (!currSolRadPositive);
 
-        if (sunset) { // Sun is down at the current time, reset arrays.
+        PreviousSolRadPositive = currSolRadPositive;
+
+        if (state.dataGlobal->BeginDayFlag || sunIsUpNoRad || sunset) {
+            // Reset at (1) Beginning of simulation (2) sunset time, and SunIsUp but not solar time.
             for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
                 EnclSolQD(zoneNum) = 0.0;
                 EnclSolQDforDaylight(zoneNum) = 0.0;
@@ -2598,7 +2600,7 @@ namespace HeatBalanceSurfaceManager {
             }
         }
 
-        if (currSunIsUp) { // Sun is up, calculate solar quantities
+        if (currSolRadPositive) { // Sun is up, calculate solar quantities
             assert(equal_dimensions(ReflFacBmToBmSolObs, ReflFacBmToDiffSolObs)); // For linear indexing
             assert(equal_dimensions(ReflFacBmToBmSolObs, ReflFacBmToDiffSolGnd)); // For linear indexing
             for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
