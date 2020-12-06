@@ -1175,7 +1175,6 @@ namespace CoolingPanelSimple {
         // Incropera and DeWitt, Fundamentals of Heat and Mass Transfer
 
         // Using/Aliasing
-        using DataEnvironment::OutBaroPress;
         using DataHeatBalance::MRT;
         using DataHeatBalFanSys::MAT;
         using DataHeatBalFanSys::ZoneAirHumRat;
@@ -1259,7 +1258,7 @@ namespace CoolingPanelSimple {
         // iterate like in the low temperature radiant systems because the inlet water condition is known
         // not calculated.  So, we can deal with this upfront rather than after calculation and then more
         // iteration.
-        DewPointTemp = PsyTdpFnWPb(state, ZoneAirHumRat(ZoneNum), OutBaroPress);
+        DewPointTemp = PsyTdpFnWPb(state, ZoneAirHumRat(ZoneNum), state.dataEnvrn->OutBaroPress);
 
         if (waterInletTemp < (DewPointTemp + this->CondDewPtDeltaT) && (CoolingPanelOn)) {
 

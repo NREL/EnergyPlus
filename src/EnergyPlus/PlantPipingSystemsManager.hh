@@ -881,7 +881,7 @@ struct EnergyPlusData;
 
             void DoOneTimeInitializations(EnergyPlusData &state, Circuit * thisCircuit);
 
-            void DoStartOfTimeStepInitializations();
+            void DoStartOfTimeStepInitializations(EnergyPlusData &state);
 
             void DoStartOfTimeStepInitializations(EnergyPlusData &state, Circuit * thisCircuit);
 

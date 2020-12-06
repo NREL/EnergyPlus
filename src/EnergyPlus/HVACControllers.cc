@@ -2830,8 +2830,6 @@ namespace HVACControllers {
         // na
 
         // Using/Aliasing
-        using DataEnvironment::CurEnvirNum;
-        using DataEnvironment::CurMnDy;
         using DataHVACGlobals::FirstTimeStepSysFlag;
         using General::LogicalToInteger;
 
@@ -2858,7 +2856,7 @@ namespace HVACControllers {
               "{},{},{},{},{},{},{},{},{},{},{},{},",
               LogicalToInteger(state.dataGlobal->ZoneSizingCalc),
               LogicalToInteger(state.dataGlobal->SysSizingCalc),
-              CurEnvirNum,
+              state.dataEnvrn->CurEnvirNum,
               LogicalToInteger(state.dataGlobal->WarmupFlag),
               CreateHVACTimeString(state),
               MakeHVACTimeIntervalString(state),
@@ -3002,7 +3000,6 @@ namespace HVACControllers {
         // na
 
         // Using/Aliasing
-        using DataEnvironment::CurEnvirNum;
         using General::LogicalToInteger;
 
         using RootFinder::WriteRootFinderTrace;
@@ -3051,7 +3048,7 @@ namespace HVACControllers {
         // Write iteration stamp
         print(TraceFile,
               "{},{},{},{},{},{},{},{},",
-              CurEnvirNum,
+              state.dataEnvrn->CurEnvirNum,
               LogicalToInteger(state.dataGlobal->WarmupFlag),
               CreateHVACTimeString(state),
               MakeHVACTimeIntervalString(state),
@@ -3171,7 +3168,6 @@ namespace HVACControllers {
         // na
 
         // Using/Aliasing
-        using DataEnvironment::CurMnDy;
         using General::CreateTimeString;
         using General::GetCurrentHVACTime;
 
@@ -3193,7 +3189,7 @@ namespace HVACControllers {
         std::string Buffer;
 
         Buffer = CreateTimeString(GetCurrentHVACTime(state));
-        OutputString = CurMnDy + ' ' + stripped(Buffer);
+        OutputString = state.dataEnvrn->CurMnDy + ' ' + stripped(Buffer);
 
         return OutputString;
     }
@@ -3220,8 +3216,6 @@ namespace HVACControllers {
         // na
 
         // Using/Aliasing
-        using DataEnvironment::EnvironmentName;
-
         // Return value
         std::string OutputString;
 
@@ -3239,7 +3233,7 @@ namespace HVACControllers {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         // na
 
-        OutputString = EnvironmentName + ", " + MakeHVACTimeIntervalString(state);
+        OutputString = state.dataEnvrn->EnvironmentName + ", " + MakeHVACTimeIntervalString(state);
 
         return OutputString;
     }

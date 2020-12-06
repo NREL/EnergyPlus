@@ -272,14 +272,14 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_DefaultState)
     EXPECT_TRUE(DataReportingFlags::MakeMirroredDetachedShading);
     EXPECT_TRUE(DataReportingFlags::MakeMirroredAttachedShading);
     EXPECT_FALSE(DataSystemVariables::ReportDuringWarmup);
-    EXPECT_FALSE(DataEnvironment::DisplayWeatherMissingDataWarnings);
+    EXPECT_FALSE(state->dataEnvrn->DisplayWeatherMissingDataWarnings);
     EXPECT_FALSE(DataSystemVariables::ReportDetailedWarmupConvergence);
     EXPECT_FALSE(DataSystemVariables::ReportDuringHVACSizingSimulation);
 
     // Undocumented ones, see SimulationManager_OutputDiagnostics_UndocumentedFlags
-    EXPECT_FALSE(DataEnvironment::IgnoreSolarRadiation);
-    EXPECT_FALSE(DataEnvironment::IgnoreBeamRadiation);
-    EXPECT_FALSE(DataEnvironment::IgnoreDiffuseRadiation);
+    EXPECT_FALSE(state->dataEnvrn->IgnoreSolarRadiation);
+    EXPECT_FALSE(state->dataEnvrn->IgnoreBeamRadiation);
+    EXPECT_FALSE(state->dataEnvrn->IgnoreDiffuseRadiation);
     EXPECT_FALSE(DataSystemVariables::DeveloperFlag);
     EXPECT_FALSE(DataSystemVariables::TimingFlag);
 
@@ -308,7 +308,7 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_SimpleCase)
     EXPECT_TRUE(DataReportingFlags::MakeMirroredDetachedShading);
     EXPECT_TRUE(DataReportingFlags::MakeMirroredAttachedShading);
     EXPECT_FALSE(DataSystemVariables::ReportDuringWarmup);
-    EXPECT_FALSE(DataEnvironment::DisplayWeatherMissingDataWarnings);
+    EXPECT_FALSE(state->dataEnvrn->DisplayWeatherMissingDataWarnings);
     EXPECT_FALSE(DataSystemVariables::ReportDetailedWarmupConvergence);
     EXPECT_FALSE(DataSystemVariables::ReportDuringHVACSizingSimulation);
 
@@ -348,7 +348,7 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_AllKeys)
     EXPECT_FALSE(DataReportingFlags::MakeMirroredDetachedShading);
     EXPECT_FALSE(DataReportingFlags::MakeMirroredAttachedShading);
     EXPECT_TRUE(DataSystemVariables::ReportDuringWarmup);
-    EXPECT_TRUE(DataEnvironment::DisplayWeatherMissingDataWarnings);
+    EXPECT_TRUE(state->dataEnvrn->DisplayWeatherMissingDataWarnings);
     EXPECT_TRUE(DataSystemVariables::ReportDetailedWarmupConvergence);
     EXPECT_TRUE(DataSystemVariables::ReportDuringHVACSizingSimulation);
 
@@ -386,7 +386,7 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_Unicity)
     EXPECT_TRUE(DataReportingFlags::MakeMirroredDetachedShading);
     EXPECT_TRUE(DataReportingFlags::MakeMirroredAttachedShading);
     EXPECT_FALSE(DataSystemVariables::ReportDuringWarmup);
-    EXPECT_FALSE(DataEnvironment::DisplayWeatherMissingDataWarnings);
+    EXPECT_FALSE(state->dataEnvrn->DisplayWeatherMissingDataWarnings);
     EXPECT_FALSE(DataSystemVariables::ReportDetailedWarmupConvergence);
     EXPECT_FALSE(DataSystemVariables::ReportDuringHVACSizingSimulation);
 
@@ -431,14 +431,14 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_UndocumentedFlags)
     EXPECT_TRUE(DataReportingFlags::MakeMirroredDetachedShading);
     EXPECT_TRUE(DataReportingFlags::MakeMirroredAttachedShading);
     EXPECT_FALSE(DataSystemVariables::ReportDuringWarmup);
-    EXPECT_FALSE(DataEnvironment::DisplayWeatherMissingDataWarnings);
+    EXPECT_FALSE(state->dataEnvrn->DisplayWeatherMissingDataWarnings);
     EXPECT_FALSE(DataSystemVariables::ReportDetailedWarmupConvergence);
     EXPECT_FALSE(DataSystemVariables::ReportDuringHVACSizingSimulation);
 
     // Still works
-    EXPECT_TRUE(DataEnvironment::IgnoreSolarRadiation);
-    EXPECT_TRUE(DataEnvironment::IgnoreBeamRadiation);
-    EXPECT_TRUE(DataEnvironment::IgnoreDiffuseRadiation);
+    EXPECT_TRUE(state->dataEnvrn->IgnoreSolarRadiation);
+    EXPECT_TRUE(state->dataEnvrn->IgnoreBeamRadiation);
+    EXPECT_TRUE(state->dataEnvrn->IgnoreDiffuseRadiation);
     EXPECT_TRUE(DataSystemVariables::DeveloperFlag);
     EXPECT_TRUE(DataSystemVariables::TimingFlag);
 
@@ -470,7 +470,7 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_HasEmpty)
     EXPECT_TRUE(DataReportingFlags::MakeMirroredDetachedShading);
     EXPECT_TRUE(DataReportingFlags::MakeMirroredAttachedShading);
     EXPECT_FALSE(DataSystemVariables::ReportDuringWarmup);
-    EXPECT_FALSE(DataEnvironment::DisplayWeatherMissingDataWarnings);
+    EXPECT_FALSE(state->dataEnvrn->DisplayWeatherMissingDataWarnings);
     EXPECT_FALSE(DataSystemVariables::ReportDetailedWarmupConvergence);
     EXPECT_FALSE(DataSystemVariables::ReportDuringHVACSizingSimulation);
 

@@ -654,8 +654,8 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep)
 
     SolarShading::AllocateModuleArrays(*state);
     SolarShading::DetermineShadowingCombinations(*state);
-    DataEnvironment::DayOfYear_Schedule = 168;
-    DataEnvironment::DayOfWeek = 6;
+    state->dataEnvrn->DayOfYear_Schedule = 168;
+    state->dataEnvrn->DayOfWeek = 6;
     state->dataGlobal->TimeStep = 4;
     state->dataGlobal->HourOfDay = 9;
 
@@ -1050,8 +1050,8 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
 
     SolarShading::AllocateModuleArrays(*state);
     SolarShading::DetermineShadowingCombinations(*state);
-    DataEnvironment::DayOfYear_Schedule = 168;
-    DataEnvironment::DayOfWeek = 6;
+    state->dataEnvrn->DayOfYear_Schedule = 168;
+    state->dataEnvrn->DayOfWeek = 6;
     state->dataGlobal->TimeStep = 4;
     state->dataGlobal->HourOfDay = 9;
     state->dataGlobal->DoingSizing = false;
@@ -1835,8 +1835,8 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonClippingDirect)
 
     SolarShading::AllocateModuleArrays(*state);
     SolarShading::DetermineShadowingCombinations(*state);
-    DataEnvironment::DayOfYear_Schedule = 168;
-    DataEnvironment::DayOfWeek = 6;
+    state->dataEnvrn->DayOfYear_Schedule = 168;
+    state->dataEnvrn->DayOfWeek = 6;
     state->dataGlobal->TimeStep = 4;
     state->dataGlobal->HourOfDay = 9;
 

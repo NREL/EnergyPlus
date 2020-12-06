@@ -1485,7 +1485,6 @@ namespace DataZoneEquipment {
         // na
 
         // Using/Aliasing
-        using DataEnvironment::StdRhoAir;
         using DataHeatBalance::People;
         using DataHeatBalance::TotPeople;
         using DataHeatBalance::Zone;
@@ -1661,7 +1660,7 @@ namespace DataZoneEquipment {
                     DSOAFlowACH = OARequirements(DSOAPtr).OAFlowACH * Zone(ActualZoneNum).Volume / 3600.0;
                     OAVolumeFlowRate = DSOAFlowPeople + DSOAFlowPerZone + DSOAFlowPerArea + DSOAFlowACH;
                 } else {
-                    OAVolumeFlowRate = state.dataContaminantBalance->ZoneSysContDemand(ActualZoneNum).OutputRequiredToCO2SP / StdRhoAir;
+                    OAVolumeFlowRate = state.dataContaminantBalance->ZoneSysContDemand(ActualZoneNum).OutputRequiredToCO2SP / state.dataEnvrn->StdRhoAir;
                 }
 
             } else if (SELECT_CASE_var == ZOAM_ProportionalControlSchOcc || SELECT_CASE_var == ZOAM_ProportionalControlDesOcc) {
@@ -1851,7 +1850,8 @@ namespace DataZoneEquipment {
         return OAVolumeFlowRate;
     }
 
-    void EquipList::getPrioritiesforInletNode(int const inletNodeNum, // Zone inlet node number to match
+    void EquipList::getPrioritiesForInletNode(EnergyPlusData &state,
+                                              int const inletNodeNum, // Zone inlet node number to match
                                               int &coolingPriority,   // Cooling priority num for matching equipment
                                               int &heatingPriority    // Heating priority num for matching equipment
     )
@@ -1859,7 +1859,7 @@ namespace DataZoneEquipment {
         bool equipFound = false;
         for (int equipNum = 1; equipNum <= this->NumOfEquipTypes; ++equipNum) {
             if (this->EquipType_Num(equipNum) == AirDistUnit_Num) {
-                if (inletNodeNum == DataDefineEquip::AirDistUnit(this->EquipIndex(equipNum)).OutletNodeNum) {
+                if (inletNodeNum == state.dataDefineEquipment->AirDistUnit(this->EquipIndex(equipNum)).OutletNodeNum) {
                     equipFound = true;
                 }
             }

@@ -2839,7 +2839,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
 
     RegCoilDesInletTemp = FinalSysSizing(DataSizing::CurSysNum).HeatRetTemp;
     RegCoilDesOutletTemp = DesicDehum(DesicDehumNum).RegenSetPointTemp;
-    RegCoilInletAirMassFlowRate = FinalSysSizing(DataSizing::CurSysNum).DesOutAirVolFlow * DataEnvironment::StdRhoAir;
+    RegCoilInletAirMassFlowRate = FinalSysSizing(DataSizing::CurSysNum).DesOutAirVolFlow * state->dataEnvrn->StdRhoAir;
     RegCoilCapacity = RegCoilInletAirMassFlowRate * PsyCpAirFnW(0.0) * (RegCoilDesOutletTemp - RegCoilDesInletTemp);
 
     for (loop = 1; loop <= NumHeatingCoils; ++loop) {
@@ -4019,7 +4019,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnPrimaryAirSystemTest)
 
     RegCoilDesInletTemp = FinalSysSizing(DataSizing::CurSysNum).HeatOutTemp;
     RegCoilDesOutletTemp = DesicDehum(DesicDehumNum).RegenSetPointTemp;
-    RegCoilInletAirMassFlowRate = FinalSysSizing(DataSizing::CurSysNum).DesMainVolFlow * DataEnvironment::StdRhoAir;
+    RegCoilInletAirMassFlowRate = FinalSysSizing(DataSizing::CurSysNum).DesMainVolFlow * state->dataEnvrn->StdRhoAir;
     RegCoilCapacity = RegCoilInletAirMassFlowRate * PsyCpAirFnW(0.0) * (RegCoilDesOutletTemp - RegCoilDesInletTemp);
 
     for (loop = 1; loop <= NumHeatingCoils; ++loop) {
@@ -5440,7 +5440,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_RegenAirHeaterHWCoilSizingTest)
     DataSizing::FinalSysSizing(DataSizing::CurSysNum).HeatOutTemp = RegCoilDesInletTemp;
     RegCoilDesOutletTemp = DesiccantDehumidifiers::DesicDehum(DesicDehumNum).RegenSetPointTemp;
     DataSizing::FinalSysSizing(DataSizing::CurSysNum).DesMainVolFlow = 1.07;
-    RegCoilInletAirMassFlowRate = DataEnvironment::StdRhoAir * DataSizing::FinalSysSizing(DataSizing::CurSysNum).DesMainVolFlow;
+    RegCoilInletAirMassFlowRate = state->dataEnvrn->StdRhoAir * DataSizing::FinalSysSizing(DataSizing::CurSysNum).DesMainVolFlow;
     RegCoilCapacity = RegCoilInletAirMassFlowRate * PsyCpAirFnW(0.0) * (RegCoilDesOutletTemp - RegCoilDesInletTemp);
 
     // simulate to determine HW coil design capacity
@@ -6684,7 +6684,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_VSCoolingCoilOnPrimaryAirSystemTest)
 
     RegCoilDesInletTemp = FinalSysSizing(DataSizing::CurSysNum).HeatOutTemp;
     RegCoilDesOutletTemp = DesicDehum(DesicDehumNum).RegenSetPointTemp;
-    RegCoilInletAirMassFlowRate = FinalSysSizing(DataSizing::CurSysNum).DesMainVolFlow * DataEnvironment::StdRhoAir;
+    RegCoilInletAirMassFlowRate = FinalSysSizing(DataSizing::CurSysNum).DesMainVolFlow * state->dataEnvrn->StdRhoAir;
     RegCoilCapacity = RegCoilInletAirMassFlowRate * PsyCpAirFnW(0.0) * (RegCoilDesOutletTemp - RegCoilDesInletTemp);
 
     for (loop = 1; loop <= NumHeatingCoils; ++loop) {

@@ -156,19 +156,19 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     DataHVACGlobals::TimeStepSys = 1;
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->MinutesPerTimeStep = 60;
-    DataEnvironment::Month = 1;
-    DataEnvironment::DayOfMonth = 21;
+    state->dataEnvrn->Month = 1;
+    state->dataEnvrn->DayOfMonth = 21;
     state->dataGlobal->HourOfDay = 1;
-    DataEnvironment::DSTIndicator = 0;
-    DataEnvironment::DayOfWeek = 2;
-    DataEnvironment::HolidayIndex = 0;
+    state->dataEnvrn->DSTIndicator = 0;
+    state->dataEnvrn->DayOfWeek = 2;
+    state->dataEnvrn->HolidayIndex = 0;
     state->dataGlobal->WarmupFlag = false;
-    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, 1);
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
     ScheduleManager::UpdateScheduleValues(*state);
     // Initialize zone areas and volumes - too many other things need to be set up to do these in the normal routines
     DataHeatBalance::Zone(1).FloorArea = 232.26;
-    DataEnvironment::StdRhoAir = 1.225;
-    DataEnvironment::OutBaroPress = 101325;
+    state->dataEnvrn->StdRhoAir = 1.225;
+    state->dataEnvrn->OutBaroPress = 101325;
     DataHeatBalance::ZoneIntGain.allocate(1);
 
     SizingManager::GetOARequirements(*state);

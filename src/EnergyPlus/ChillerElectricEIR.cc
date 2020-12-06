@@ -1087,7 +1087,7 @@ namespace ChillerElectricEIR {
                 DataLoopNode::Node(this->CondInletNodeNum).Temp = this->TempRefCondIn;
             } else { // air or evap air condenser
                 // Initialize maximum available condenser flow rate
-                rho = Psychrometrics::PsyRhoAirFnPbTdbW(state, DataEnvironment::StdBaroPress, this->TempRefCondIn, 0.0, RoutineName);
+                rho = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, this->TempRefCondIn, 0.0, RoutineName);
                 this->CondMassFlowRateMax = rho * this->CondVolFlowRate;
 
                 DataLoopNode::Node(this->CondInletNodeNum).MassFlowRate = this->CondMassFlowRateMax;
@@ -1649,8 +1649,8 @@ namespace ChillerElectricEIR {
                     "ElectricEIRChillerModel - CHILLER:ELECTRIC:EIR \"" + this->Name + "\" - Air Cooled Condenser Inlet Temperature below 0C";
                 this->MsgBuffer2 = format("... Outdoor Dry-bulb Condition = {:6.2F} C. Occurrence info = {}, {} {}",
                                           DataLoopNode::Node(this->CondInletNodeNum).Temp,
-                                          DataEnvironment::EnvironmentName,
-                                          DataEnvironment::CurMnDy,
+                                          state.dataEnvrn->EnvironmentName,
+                                          state.dataEnvrn->CurMnDy,
                                           General::CreateSysTimeIntervalString(state));
 
                 this->MsgDataLast = DataLoopNode::Node(this->CondInletNodeNum).Temp;
@@ -1671,8 +1671,8 @@ namespace ChillerElectricEIR {
                     "ElectricEIRChillerModel - CHILLER:ELECTRIC:EIR \"" + this->Name + "\" - Air Cooled Condenser Inlet Temperature below 10C";
                 this->MsgBuffer2 = format("... Outdoor Wet-bulb Condition = {:6.2F} C. Occurrence info = {}, {} {}",
                                           DataLoopNode::Node(this->CondInletNodeNum).Temp,
-                                          DataEnvironment::EnvironmentName,
-                                          DataEnvironment::CurMnDy,
+                                          state.dataEnvrn->EnvironmentName,
+                                          state.dataEnvrn->CurMnDy,
                                           General::CreateSysTimeIntervalString(state));
                 this->MsgDataLast = DataLoopNode::Node(this->CondInletNodeNum).Temp;
             } else {

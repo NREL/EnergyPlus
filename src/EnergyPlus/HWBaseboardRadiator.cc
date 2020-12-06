@@ -759,7 +759,6 @@ namespace HWBaseboardRadiator {
         // and Indirect Fired Water Heaters, January 2007 Edition
 
         // Using/Aliasing
-        using DataEnvironment::StdRhoAir;
         using DataLoopNode::Node;
         using PlantUtilities::InitComponentNodes;
         using PlantUtilities::ScanPlantLoopsForObject;
@@ -859,7 +858,7 @@ namespace HWBaseboardRadiator {
         // Do the Begin Environment initializations
         if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(BaseboardNum)) {
             // Initialize
-            RhoAirStdInit = StdRhoAir;
+            RhoAirStdInit = state.dataEnvrn->StdRhoAir;
             WaterInletNode = HWBaseboard(BaseboardNum).WaterInletNode;
 
             rho = GetDensityGlycol(state,

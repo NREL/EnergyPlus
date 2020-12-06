@@ -50,17 +50,16 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/HybridUnitaryAirConditioners.hh>
 #include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/HybridEvapCoolingModel.hh>
+#include <EnergyPlus/HybridUnitaryAirConditioners.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -293,9 +292,9 @@ namespace HybridUnitaryAirConditioners {
         ZoneHybridUnitaryAirConditioner(UnitNum).InletMassFlowRate = Node(InletNode).MassFlowRate;
 
         // Set the inlet volumetric flow rate from the mass flow rate
-        if (DataEnvironment::StdRhoAir > 1) {
+        if (state.dataEnvrn->StdRhoAir > 1) {
             ZoneHybridUnitaryAirConditioner(UnitNum).InletVolumetricFlowRate =
-                ZoneHybridUnitaryAirConditioner(UnitNum).InletMassFlowRate / DataEnvironment::StdRhoAir;
+                ZoneHybridUnitaryAirConditioner(UnitNum).InletMassFlowRate / state.dataEnvrn->StdRhoAir;
         } else {
             ZoneHybridUnitaryAirConditioner(UnitNum).InletVolumetricFlowRate = ZoneHybridUnitaryAirConditioner(UnitNum).InletMassFlowRate / 1.225;
         }
@@ -368,8 +367,6 @@ namespace HybridUnitaryAirConditioners {
         using DataZoneEnergyDemands::ZoneSysMoistureDemand;
         using namespace DataLoopNode;
         using namespace Psychrometrics;
-        using DataEnvironment::StdRhoAir;
-
         Real64 EnvDryBulbT, AirTempRoom, EnvRelHumm, RoomRelHum, DesignMinVR;
 
         Real64 ZoneCoolingLoad =
@@ -401,8 +398,8 @@ namespace HybridUnitaryAirConditioners {
                                                         UseOccSchFlag,
                                                         UseMinOASchFlag); //[m3/s]
         Real64 DesignMinVRMassFlow = 0;
-        if (StdRhoAir > 1) {
-            DesignMinVRMassFlow = DesignMinVR * StdRhoAir;
+        if (state.dataEnvrn->StdRhoAir > 1) {
+            DesignMinVRMassFlow = DesignMinVR * state.dataEnvrn->StdRhoAir;
         } else {
             DesignMinVRMassFlow = DesignMinVR * 1.225;
         }
@@ -485,7 +482,6 @@ namespace HybridUnitaryAirConditioners {
         using namespace ScheduleManager;
         using BranchNodeConnections::SetUpCompSets;
         using NodeInputManager::GetOnlySingleNode;
-        using namespace DataIPShortCuts; // Data for field names, blank numerics
         using namespace DataLoopNode;
         using DataSizing::OARequirements; // to find DesignSpecification:OutdoorAir pointer
         std::string cCurrentModuleObject;  // Object type for getting and error messages
@@ -652,10 +648,10 @@ namespace HybridUnitaryAirConditioners {
                 ZoneHybridUnitaryAirConditioner(UnitLoop).ScalingFactor = Numbers(4);
                 // the two numbers above are used to generate a overall scaling factor
                 ZoneHybridUnitaryAirConditioner(UnitLoop).ScaledSystemMaximumSupplyAirVolumeFlowRate = Numbers(1) * Numbers(4);
-                if (DataEnvironment::StdRhoAir > 1) {
+                if (state.dataEnvrn->StdRhoAir > 1) {
                     // SystemMaximumSupplyAirFlowRate*ScalingFactor*AirDensity;
                     ZoneHybridUnitaryAirConditioner(UnitLoop).ScaledSystemMaximumSupplyAirMassFlowRate =
-                        ZoneHybridUnitaryAirConditioner(UnitLoop).ScaledSystemMaximumSupplyAirVolumeFlowRate * DataEnvironment::StdRhoAir;
+                        ZoneHybridUnitaryAirConditioner(UnitLoop).ScaledSystemMaximumSupplyAirVolumeFlowRate * state.dataEnvrn->StdRhoAir;
                 } else {
                     ZoneHybridUnitaryAirConditioner(UnitLoop).ScaledSystemMaximumSupplyAirMassFlowRate =
                         ZoneHybridUnitaryAirConditioner(UnitLoop).ScaledSystemMaximumSupplyAirVolumeFlowRate * 1.225;
