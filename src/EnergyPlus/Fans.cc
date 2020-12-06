@@ -66,7 +66,6 @@
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/FaultsManager.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -102,7 +101,6 @@ namespace Fans {
     // Use statements for data only modules
     // Using/Aliasing
     using namespace DataLoopNode;
-    using DataEnvironment::StdRhoAir;
     using DataHVACGlobals::BalancedExhMassFlow;
     using DataHVACGlobals::cFanTypes;
     using DataHVACGlobals::Cooling;
@@ -574,7 +572,7 @@ namespace Fans {
             Fan(FanNum).MotEff = 1.0;
             Fan(FanNum).MotInAirFrac = 1.0;
             Fan(FanNum).MinAirFlowRate = 0.0;
-            Fan(FanNum).RhoAirStdInit = StdRhoAir;
+            Fan(FanNum).RhoAirStdInit = state.dataEnvrn->StdRhoAir;
             Fan(FanNum).MaxAirMassFlowRate = Fan(FanNum).MaxAirFlowRate * Fan(FanNum).RhoAirStdInit;
 
             if (Fan(FanNum).MaxAirFlowRate == 0.0) {
@@ -710,7 +708,7 @@ namespace Fans {
             Fan(FanNum).MaxAirFlowRateIsAutosizable = true;
             //       the following two structure variables are set here, as well as in InitFan, for the Heat Pump:Water Heater object
             //       (Standard Rating procedure may be called before BeginEnvirFlag is set to TRUE, if so MaxAirMassFlowRate = 0)
-            Fan(FanNum).RhoAirStdInit = StdRhoAir;
+            Fan(FanNum).RhoAirStdInit = state.dataEnvrn->StdRhoAir;
             Fan(FanNum).MaxAirMassFlowRate = Fan(FanNum).MaxAirFlowRate * Fan(FanNum).RhoAirStdInit;
 
             Fan(FanNum).MotEff = rNumericArgs(4);
@@ -1088,7 +1086,7 @@ namespace Fans {
             // For all Fan inlet nodes convert the Volume flow to a mass flow
             // unused0909    InNode = Fan(FanNum)%InletNodeNum
             OutNode = Fan(FanNum).OutletNodeNum;
-            Fan(FanNum).RhoAirStdInit = StdRhoAir;
+            Fan(FanNum).RhoAirStdInit = state.dataEnvrn->StdRhoAir;
 
             // Change the Volume Flow Rates to Mass Flow Rates
 
@@ -1267,7 +1265,7 @@ namespace Fans {
             // From PsychRoutines:
             //   w=MAX(dw,1.0d-5)
             //   rhoair = pb/(287.d0*(tdb+DataGlobalConstants::KelvinConv())*(1.0d0+1.6077687d0*w))
-            RhoAir = StdRhoAir;
+            RhoAir = state.dataEnvrn->StdRhoAir;
 
             // Adjust max fan volumetric airflow using fan sizing factor
             FanVolFlow *= Fan(FanNum).FanSizingFactor; //[m3/s at standard conditions]
@@ -1495,7 +1493,7 @@ namespace Fans {
         PreDefTableEntry(pdchFanVolFlow, equipName, FanVolFlow);
         RatedPower = FanVolFlow * Fan(FanNum).DeltaPress / Fan(FanNum).FanEff; // total fan power
         if (Fan(FanNum).FanType_Num != FanType_ComponentModel) {
-            Fan(FanNum).DesignPointFEI = HVACFan::FanSystem::report_fei(FanVolFlow, RatedPower, Fan(FanNum).DeltaPress, StdRhoAir);
+            Fan(FanNum).DesignPointFEI = HVACFan::FanSystem::report_fei(state, FanVolFlow, RatedPower, Fan(FanNum).DeltaPress, state.dataEnvrn->StdRhoAir);
         }
         PreDefTableEntry(pdchFanPwr, equipName, RatedPower);
         if (FanVolFlow != 0.0) {
@@ -2233,10 +2231,6 @@ namespace Fans {
         using CurveManager::CurveValue;
         using CurveManager::GetCurveIndex;
         using namespace OutputReportPredefined;
-        using DataEnvironment::CurMnDy;
-        using DataEnvironment::EnvironmentName;
-        using General::CreateSysTimeIntervalString;
-
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -3088,7 +3082,8 @@ namespace Fans {
         }
     }
 
-    Real64 FanDesDT(int const FanNum,                        // index of fan in Fan array
+    Real64 FanDesDT(EnergyPlusData &state,
+                    int const FanNum,                        // index of fan in Fan array
                     [[maybe_unused]] Real64 const FanVolFlow // fan volumetric flow rate [m3/s]
     )
     {
@@ -3126,7 +3121,7 @@ namespace Fans {
             TotEff = Fan(FanNum).FanEff;
             MotEff = Fan(FanNum).MotEff;
             MotInAirFrac = Fan(FanNum).MotInAirFrac;
-            RhoAir = StdRhoAir;
+            RhoAir = state.dataEnvrn->StdRhoAir;
             CpAir = PsyCpAirFnW(DataPrecisionGlobals::constant_zero);
             DesignDeltaT = (DeltaP / (RhoAir * CpAir * TotEff)) * (MotEff + MotInAirFrac * (1.0 - MotEff));
         } else {

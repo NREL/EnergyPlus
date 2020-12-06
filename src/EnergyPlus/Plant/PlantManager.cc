@@ -2428,7 +2428,6 @@ namespace EnergyPlus {
             // this contains all the initializations
 
             // Using/Aliasing
-            using DataEnvironment::StdBaroPress;
             using HVACInterfaceManager::PlantCommonPipe;
             using ScheduleManager::GetCurrentScheduleValue;
 
@@ -2590,7 +2589,7 @@ namespace EnergyPlus {
 
                                 Node(ComponentInlet).MassFlowRateRequest = 0.0;
                                 Node(ComponentInlet).Quality = StartQuality;
-                                Node(ComponentInlet).Press = StdBaroPress;
+                                Node(ComponentInlet).Press = state.dataEnvrn->StdBaroPress;
                                 Node(ComponentInlet).Enthalpy = StartEnthalpy;
                                 Node(ComponentInlet).HumRat = StartHumRat;
 
@@ -2606,7 +2605,7 @@ namespace EnergyPlus {
                                 Node(ComponentOutlet).MassFlowRateMaxAvail = Node(BranchInlet).MassFlowRateMaxAvail;
                                 Node(ComponentOutlet).MassFlowRateRequest = 0.0;
                                 Node(ComponentOutlet).Quality = StartQuality;
-                                Node(ComponentOutlet).Press = StdBaroPress;
+                                Node(ComponentOutlet).Press = state.dataEnvrn->StdBaroPress;
                                 Node(ComponentOutlet).Enthalpy = StartEnthalpy;
                                 Node(ComponentOutlet).HumRat = StartHumRat;
                             } // COMPONENT LOOP

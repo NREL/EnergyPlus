@@ -3773,7 +3773,6 @@ namespace PackagedTerminalHeatPump {
 
         // Using/Aliasing
         using namespace DataZoneEnergyDemands;
-        using DataEnvironment::StdRhoAir;
         using DataZoneEquipment::CheckZoneEquipmentList;
         using DataZoneEquipment::ZoneEquipInputsFilled;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
@@ -4042,7 +4041,7 @@ namespace PackagedTerminalHeatPump {
             SizePTUnit(state, PTUnitNum);
             MySizeFlag(PTUnitNum) = false;
 
-            RhoAir = StdRhoAir;
+            RhoAir = state.dataEnvrn->StdRhoAir;
             PTUnit(PTUnitNum).MaxCoolAirMassFlow = RhoAir * PTUnit(PTUnitNum).MaxCoolAirVolFlow;
             PTUnit(PTUnitNum).MaxHeatAirMassFlow = RhoAir * PTUnit(PTUnitNum).MaxHeatAirVolFlow;
 
@@ -4301,7 +4300,7 @@ namespace PackagedTerminalHeatPump {
             InNode = PTUnit(PTUnitNum).AirInNode;
             OutNode = PTUnit(PTUnitNum).AirOutNode;
             OutsideAirNode = PTUnit(PTUnitNum).OutsideAirNode;
-            RhoAir = StdRhoAir;
+            RhoAir = state.dataEnvrn->StdRhoAir;
             // set the mass flow rates from the input volume flow rates
             PTUnit(PTUnitNum).MaxCoolAirMassFlow = RhoAir * PTUnit(PTUnitNum).MaxCoolAirVolFlow;
             PTUnit(PTUnitNum).CoolOutAirMassFlow = RhoAir * PTUnit(PTUnitNum).CoolOutAirVolFlow;
@@ -5579,7 +5578,6 @@ namespace PackagedTerminalHeatPump {
         // na
 
         // Using/Aliasing
-        using DataEnvironment::OutDryBulbTemp;
         using General::SolveRoot;
 
         using HeatingCoils::SimulateHeatingCoilComponents;
@@ -5621,7 +5619,7 @@ namespace PackagedTerminalHeatPump {
         PartLoadFrac = 0.0;
 
         if (PTUnit(PTUnitNum).CondenserNodeNum == 0) {
-            OutsideDryBulbTemp = OutDryBulbTemp;
+            OutsideDryBulbTemp = state.dataEnvrn->OutDryBulbTemp;
         } else {
             OutsideDryBulbTemp = Node(PTUnit(PTUnitNum).CondenserNodeNum).Temp;
         }
@@ -5882,7 +5880,6 @@ namespace PackagedTerminalHeatPump {
         // Simulates the unit components sequentially in the air flow direction.
 
         // Using/Aliasing
-        using DataEnvironment::OutDryBulbTemp;
         using DataZoneEquipment::ZoneEquipConfig;
         using DXCoils::SimDXCoil;
 
@@ -5944,7 +5941,7 @@ namespace PackagedTerminalHeatPump {
         ZoneNode = ZoneEquipConfig(ControlledZoneNum).ZoneNode;
         OpMode = PTUnit(PTUnitNum).OpMode;
         if (PTUnit(PTUnitNum).CondenserNodeNum == 0) {
-            OutsideDryBulbTemp = OutDryBulbTemp;
+            OutsideDryBulbTemp = state.dataEnvrn->OutDryBulbTemp;
         } else {
             OutsideDryBulbTemp = Node(PTUnit(PTUnitNum).CondenserNodeNum).Temp;
         }
@@ -7451,7 +7448,6 @@ namespace PackagedTerminalHeatPump {
         // na
 
         // Using/Aliasing
-        using DataEnvironment::OutDryBulbTemp;
         using DataZoneEnergyDemands::CurDeadBandOrSetback;
 
         using General::SolveRoot;
@@ -7769,7 +7765,7 @@ namespace PackagedTerminalHeatPump {
 
             if (PTUnit(PTUnitNum).NumOfSpeedHeating > 0) SpeedNum = PTUnit(PTUnitNum).NumOfSpeedHeating; // maximum heating speed, avoid zero
 
-            if (OutDryBulbTemp <= PTUnit(PTUnitNum).MaxOATSupHeat) {
+            if (state.dataEnvrn->OutDryBulbTemp <= PTUnit(PTUnitNum).MaxOATSupHeat) {
                 SupHeaterLoad = QZnReq - FullOutput;
             } else {
                 SupHeaterLoad = 0.0;
@@ -8129,7 +8125,6 @@ namespace PackagedTerminalHeatPump {
         //  This routine will calcultes MSHP performance based on given system load
 
         // Using/Aliasing
-        using DataEnvironment::OutDryBulbTemp;
         using DataZoneEquipment::ZoneEquipConfig;
         using DXCoils::SimDXCoil;
 
@@ -8178,7 +8173,7 @@ namespace PackagedTerminalHeatPump {
         ZoneNode = ZoneEquipConfig(ControlledZoneNum).ZoneNode;
         OpMode = PTUnit(PTUnitNum).OpMode;
 
-        OutsideDryBulbTemp = OutDryBulbTemp;
+        OutsideDryBulbTemp = state.dataEnvrn->OutDryBulbTemp;
 
         SaveCompressorPLR = 0.0;
         // Set inlet air mass flow rate based on PLR and compressor on/off air flow rates

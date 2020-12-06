@@ -292,9 +292,9 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_AutoSize)
 
     state->dataGlobal->BeginEnvrnFlag = true;
     DataSizing::CurZoneEqNum = 1;
-    DataEnvironment::OutBaroPress = 101325;          // sea level
+    state->dataEnvrn->OutBaroPress = 101325;          // sea level
     DataZoneEquipment::ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
-    DataEnvironment::StdRhoAir = PsyRhoAirFnPbTdbW(*state, DataEnvironment::OutBaroPress, 20.0, 0.0);
+    state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
     ZoneEqSizing.allocate(1);
     ZoneSizingRunDone = true;
     ZoneEqSizing(CurZoneEqNum).DesignSizeFromParent = false;
@@ -345,9 +345,9 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_AutoSize)
         "ZONE1OUTAIR", CurZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr));
 
     EXPECT_DOUBLE_EQ(FinalZoneSizing(CurZoneEqNum).MinOA, OutAirUnit(OAUnitNum).OutAirVolFlow);
-    EXPECT_DOUBLE_EQ(FinalZoneSizing(CurZoneEqNum).MinOA * StdRhoAir, OutAirUnit(OAUnitNum).OutAirMassFlow);
+    EXPECT_DOUBLE_EQ(FinalZoneSizing(CurZoneEqNum).MinOA * state->dataEnvrn->StdRhoAir, OutAirUnit(OAUnitNum).OutAirMassFlow);
     EXPECT_DOUBLE_EQ(FinalZoneSizing(CurZoneEqNum).MinOA, OutAirUnit(OAUnitNum).ExtAirVolFlow);
-    EXPECT_DOUBLE_EQ(FinalZoneSizing(CurZoneEqNum).MinOA * StdRhoAir, OutAirUnit(OAUnitNum).ExtAirMassFlow);
+    EXPECT_DOUBLE_EQ(FinalZoneSizing(CurZoneEqNum).MinOA * state->dataEnvrn->StdRhoAir, OutAirUnit(OAUnitNum).ExtAirMassFlow);
 
     // test that both fans are included in OA unit fan power report
     Real64 SAFanPower = Fans::Fan(1).FanPower;
@@ -548,7 +548,7 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_WaterCoolingCoilAutoSizeTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataEnvironment::OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->MinutesPerTimeStep = 60;
@@ -617,12 +617,12 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_WaterCoolingCoilAutoSizeTest)
     state->dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
 
     state->dataGlobal->HourOfDay = 15;
-    DataEnvironment::DSTIndicator = 0;
-    DataEnvironment::Month = 7;
-    DataEnvironment::DayOfMonth = 21;
-    DataEnvironment::DayOfWeek = 2;
-    DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, state->dataGlobal->HourOfDay);
+    state->dataEnvrn->DSTIndicator = 0;
+    state->dataEnvrn->Month = 7;
+    state->dataEnvrn->DayOfMonth = 21;
+    state->dataEnvrn->DayOfWeek = 2;
+    state->dataEnvrn->HolidayIndex = 0;
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, state->dataGlobal->HourOfDay);
 
     UpdateScheduleValues(*state);
 
@@ -644,11 +644,11 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_WaterCoolingCoilAutoSizeTest)
     FinalZoneSizing(CurZoneEqNum).DesCoolCoilInTemp = 30.0;
     FinalZoneSizing(CurZoneEqNum).DesCoolCoilInHumRat = 0.01;
 
-    DataEnvironment::StdRhoAir = PsyRhoAirFnPbTdbW(*state, OutBaroPress, 30.0, 0.0);
+    state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 30.0, 0.0);
 
     FinalZoneSizing(CurZoneEqNum).CoolDesTemp = 12.8;
     FinalZoneSizing(CurZoneEqNum).CoolDesHumRat = 0.0080;
-    FinalZoneSizing(CurZoneEqNum).DesCoolDens = DataEnvironment::StdRhoAir;
+    FinalZoneSizing(CurZoneEqNum).DesCoolDens = state->dataEnvrn->StdRhoAir;
     FinalZoneSizing(CurZoneEqNum).DesCoolMassFlow = FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow * FinalZoneSizing(CurZoneEqNum).DesCoolDens;
 
     OutAirUnit(OAUnitNum).OAEquip(1).MaxVolWaterFlow = DataSizing::AutoSize;
@@ -853,8 +853,8 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_SteamHeatingCoilAutoSizeTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataEnvironment::StdRhoAir = 1.20;
-    DataEnvironment::OutBaroPress = 101325.0;
+    state->dataEnvrn->StdRhoAir = 1.20;
+    state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->MinutesPerTimeStep = 60;
@@ -923,12 +923,12 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_SteamHeatingCoilAutoSizeTest)
     state->dataWaterCoils->MyUAAndFlowCalcFlag(2) = true;
 
     state->dataGlobal->HourOfDay = 15;
-    DataEnvironment::DSTIndicator = 0;
-    DataEnvironment::Month = 1;
-    DataEnvironment::DayOfMonth = 21;
-    DataEnvironment::DayOfWeek = 2;
-    DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, state->dataGlobal->HourOfDay);
+    state->dataEnvrn->DSTIndicator = 0;
+    state->dataEnvrn->Month = 1;
+    state->dataEnvrn->DayOfMonth = 21;
+    state->dataEnvrn->DayOfWeek = 2;
+    state->dataEnvrn->HolidayIndex = 0;
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, state->dataGlobal->HourOfDay);
 
     UpdateScheduleValues(*state);
 
@@ -950,12 +950,12 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_SteamHeatingCoilAutoSizeTest)
     FinalZoneSizing(CurZoneEqNum).DesHeatCoilInTemp = 5.0;
     FinalZoneSizing(CurZoneEqNum).DesHeatCoilInHumRat = 0.005;
 
-    DataEnvironment::StdRhoAir = PsyRhoAirFnPbTdbW(*state, OutBaroPress, 5.0, 0.0);
+    state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 5.0, 0.0);
     OutAirUnit(OAUnitNum).OAEquip(1).MaxVolWaterFlow = DataSizing::AutoSize;
 
     FinalZoneSizing(CurZoneEqNum).HeatDesTemp = 50.0;
     FinalZoneSizing(CurZoneEqNum).HeatDesHumRat = 0.0050;
-    FinalZoneSizing(CurZoneEqNum).DesHeatDens = DataEnvironment::StdRhoAir;
+    FinalZoneSizing(CurZoneEqNum).DesHeatDens = state->dataEnvrn->StdRhoAir;
     FinalZoneSizing(CurZoneEqNum).DesHeatMassFlow = FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow * FinalZoneSizing(CurZoneEqNum).DesHeatDens;
 
     state->dataGlobal->BeginEnvrnFlag = true;

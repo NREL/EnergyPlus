@@ -1222,7 +1222,6 @@ namespace UnitVentilator {
         // METHODOLOGY EMPLOYED:
         // Uses the status flags to trigger initializations.
 
-        using DataEnvironment::StdRhoAir;
         using DataHVACGlobals::FanType_SimpleOnOff;
         using DataHVACGlobals::ZoneComp;
         using DataHVACGlobals::ZoneCompTurnFansOff;
@@ -1371,7 +1370,7 @@ namespace UnitVentilator {
             HotConNode = state.dataUnitVentilators->UnitVent(UnitVentNum).HotControlNode;
             ColdConNode = state.dataUnitVentilators->UnitVent(UnitVentNum).ColdControlNode;
             OutsideAirNode = state.dataUnitVentilators->UnitVent(UnitVentNum).OutsideAirNode;
-            RhoAir = StdRhoAir;
+            RhoAir = state.dataEnvrn->StdRhoAir;
 
             // set the mass flow rates from the input volume flow rates
             state.dataUnitVentilators->UnitVent(UnitVentNum).MaxAirMassFlow = RhoAir * state.dataUnitVentilators->UnitVent(UnitVentNum).MaxAirVolFlow;
@@ -3892,7 +3891,7 @@ namespace UnitVentilator {
             }
 
             ActualOAMassFlowRate =
-                (std::abs(state.dataUnitVentilators->QZnReq) + (MassFlowRate * std::abs(EnthDiffAcrossFan))) / (PsyCpAirFnW(DataEnvironment::OutHumRat) * (Tinlet - Toutdoor));
+                (std::abs(state.dataUnitVentilators->QZnReq) + (MassFlowRate * std::abs(EnthDiffAcrossFan))) / (PsyCpAirFnW(state.dataEnvrn->OutHumRat) * (Tinlet - Toutdoor));
 
             ActualOAMassFlowRate = max(ActualOAMassFlowRate, (MinOAFrac * MassFlowRate));
             ActualOAMassFlowRate = min(ActualOAMassFlowRate, (MaxOAFrac * MassFlowRate));

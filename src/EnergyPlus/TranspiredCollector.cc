@@ -810,7 +810,7 @@ namespace TranspiredCollector {
 
         // determine average ambient temperature
         Real64 const surfaceArea(sum_sub(Surface, &SurfaceData::Area, state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs));
-        if (!DataEnvironment::IsRain) {
+        if (!state.dataEnvrn->IsRain) {
             Tamb = sum_product_sub(Surface, &SurfaceData::OutDryBulbTemp, &SurfaceData::Area, state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) / surfaceArea;
         } else { // when raining we use wet bulb not drybulb
             Tamb = sum_product_sub(Surface, &SurfaceData::OutWetBulbTemp, &SurfaceData::Area, state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) / surfaceArea;
@@ -853,10 +853,6 @@ namespace TranspiredCollector {
 
         // Using/Aliasing
         using ConvectionCoefficients::InitExteriorConvectionCoeff;
-        using DataEnvironment::IsRain;
-        using DataEnvironment::OutBaroPress;
-        using DataEnvironment::OutHumRat;
-        using DataEnvironment::SkyTemp;
         using DataHeatBalSurface::TH;
         using DataHVACGlobals::TimeStepSys;
         using DataSurfaces::Surface;
@@ -947,7 +943,7 @@ namespace TranspiredCollector {
         // Active UTSC calculation
         // first do common things for both correlations
         Real64 const surfaceArea(sum_sub(Surface, &SurfaceData::Area, state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs));
-        if (!IsRain) {
+        if (!state.dataEnvrn->IsRain) {
             //			Tamb = sum( Surface( UTSC( UTSCNum ).SurfPtrs ).OutDryBulbTemp * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / sum(
             // Surface(  UTSC(  UTSCNum ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
             Tamb = sum_product_sub(Surface, &SurfaceData::OutDryBulbTemp, &SurfaceData::Area, state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) /
@@ -960,9 +956,9 @@ namespace TranspiredCollector {
                    surfaceArea; // Autodesk:F2C++ Functions handle array subscript usage
         }
 
-        RhoAir = PsyRhoAirFnPbTdbW(state, OutBaroPress, Tamb, OutHumRat);
+        RhoAir = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, Tamb, state.dataEnvrn->OutHumRat);
 
-        CpAir = PsyCpAirFnW(OutHumRat);
+        CpAir = PsyCpAirFnW(state.dataEnvrn->OutHumRat);
 
         holeArea = state.dataTranspiredCollector->UTSC(UTSCNum).ActualArea * state.dataTranspiredCollector->UTSC(UTSCNum).Porosity;
 
@@ -1083,7 +1079,7 @@ namespace TranspiredCollector {
             HcWind = 0.0;
         }
 
-        if (IsRain) HcWind = 1000.0;
+        if (state.dataEnvrn->IsRain) HcWind = 1000.0;
 
         HXeff = 0.0; // init
 
@@ -1120,7 +1116,7 @@ namespace TranspiredCollector {
 
         // now calculate collector temperature
 
-        Tscoll = (Isc * SolAbs + HrAtm * Tamb + HrSky * SkyTemp + HrGround * Tamb + HrPlen * Tso + HcWind * Tamb + (Mdot * CpAir / A) * Tamb -
+        Tscoll = (Isc * SolAbs + HrAtm * Tamb + HrSky * state.dataEnvrn->SkyTemp + HrGround * Tamb + HrPlen * Tso + HcWind * Tamb + (Mdot * CpAir / A) * Tamb -
                   (Mdot * CpAir / A) * (1.0 - HXeff) * Tamb + QdotSource) /
                  (HrAtm + HrSky + HrGround + HrPlen + HcWind + (Mdot * CpAir / A) * HXeff);
 
@@ -1151,7 +1147,7 @@ namespace TranspiredCollector {
         state.dataTranspiredCollector->UTSC(UTSCNum).Vsuction = Vsuction;
         state.dataTranspiredCollector->UTSC(UTSCNum).PlenumVelocity = Vplen;
         state.dataTranspiredCollector->UTSC(UTSCNum).SupOutTemp = Taplen;
-        state.dataTranspiredCollector->UTSC(UTSCNum).SupOutHumRat = OutHumRat; // stays the same with sensible heating
+        state.dataTranspiredCollector->UTSC(UTSCNum).SupOutHumRat = state.dataEnvrn->OutHumRat; // stays the same with sensible heating
         state.dataTranspiredCollector->UTSC(UTSCNum).SupOutEnth = PsyHFnTdbW(state.dataTranspiredCollector->UTSC(UTSCNum).SupOutTemp, state.dataTranspiredCollector->UTSC(UTSCNum).SupOutHumRat);
         state.dataTranspiredCollector->UTSC(UTSCNum).SupOutMassFlow = Mdot;
         state.dataTranspiredCollector->UTSC(UTSCNum).SensHeatingRate = SensHeatingRate;
@@ -1194,7 +1190,6 @@ namespace TranspiredCollector {
         // USE STATEMENTS:
 
         // Using/Aliasing
-        using DataEnvironment::OutBaroPress;
         using DataSurfaces::Surface;
         using DataSurfaces::SurfaceData;
         using Psychrometrics::PsyHFnTdbW;
@@ -1236,9 +1231,9 @@ namespace TranspiredCollector {
         // UTSC( UTSCNum ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
         Twbamb = sum_product_sub(Surface, &SurfaceData::OutWetBulbTemp, &SurfaceData::Area, state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) /
                  surfaceArea; // Autodesk:F2C++ Functions handle array subscript usage
-        OutHumRatAmb = PsyWFnTdbTwbPb(state, Tamb, Twbamb, OutBaroPress);
+        OutHumRatAmb = PsyWFnTdbTwbPb(state, Tamb, Twbamb, state.dataEnvrn->OutBaroPress);
 
-        RhoAir = PsyRhoAirFnPbTdbW(state, OutBaroPress, Tamb, OutHumRatAmb);
+        RhoAir = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, Tamb, OutHumRatAmb);
         holeArea = state.dataTranspiredCollector->UTSC(UTSCNum).ActualArea * state.dataTranspiredCollector->UTSC(UTSCNum).Porosity;
 
         AspRat = state.dataTranspiredCollector->UTSC(UTSCNum).Height / state.dataTranspiredCollector->UTSC(UTSCNum).PlenGapThick;

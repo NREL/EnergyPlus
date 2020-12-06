@@ -520,7 +520,7 @@ namespace CTElectricGenerator {
         // (ATAIR) Difference between ambient actual and ambient design temperatures
         Real64 ambientDeltaT;
         if (this->OAInletNode == 0) {
-            ambientDeltaT = DataEnvironment::OutDryBulbTemp - designAirInletTemp;
+            ambientDeltaT = state.dataEnvrn->OutDryBulbTemp - designAirInletTemp;
         } else {
             ambientDeltaT = DataLoopNode::Node(this->OAInletNode).Temp - designAirInletTemp;
         }

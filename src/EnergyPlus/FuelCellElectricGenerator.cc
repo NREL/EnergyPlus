@@ -1587,7 +1587,7 @@ namespace FuelCellElectricGenerator {
 
                 if (SELECT_CASE_var == DataGenerators::WaterInReformMains) {
 
-                    this->WaterSup.TwaterIntoCompress = DataEnvironment::WaterMainsTemp;
+                    this->WaterSup.TwaterIntoCompress = state.dataEnvrn->WaterMainsTemp;
 
                 } else if ((SELECT_CASE_var == DataGenerators::WaterInReformAirNode) || (SELECT_CASE_var == DataGenerators::WaterInReformWaterNode)) {
 

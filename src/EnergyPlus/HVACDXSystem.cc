@@ -829,7 +829,6 @@ namespace HVACDXSystem {
         // na
 
         // Using/Aliasing
-        using DataEnvironment::OutBaroPress;
         using DataHVACGlobals::DoSetPointTest;
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
         using EMSManager::iHumidityRatioMaxSetPoint;
@@ -876,7 +875,7 @@ namespace HVACDXSystem {
                             FrostControlSetPointLimit(state, DXSystemNum,
                                                       DXCoolingSystem(DXSystemNum).DesiredOutletTemp,
                                                       Node(ControlNode).HumRatMax,
-                                                      OutBaroPress,
+                                                      state.dataEnvrn->OutBaroPress,
                                                       DXCoolingSystem(DXSystemNum).DesignMinOutletTemp,
                                                       1);
                         }
@@ -971,7 +970,7 @@ namespace HVACDXSystem {
                     FrostControlSetPointLimit(state, DXSystemNum,
                                               DXCoolingSystem(DXSystemNum).DesiredOutletTemp,
                                               Node(ControlNode).HumRatMax,
-                                              OutBaroPress,
+                                              state.dataEnvrn->OutBaroPress,
                                               DXCoolingSystem(DXSystemNum).DesignMinOutletTemp,
                                               1);
                 }
@@ -996,7 +995,7 @@ namespace HVACDXSystem {
                     FrostControlSetPointLimit(state, DXSystemNum,
                                               Node(ControlNode).TempSetPoint,
                                               Node(ControlNode).HumRatMax,
-                                              OutBaroPress,
+                                              state.dataEnvrn->OutBaroPress,
                                               DXCoolingSystem(DXSystemNum).DesignMinOutletTemp,
                                               1);
                 }
@@ -1007,7 +1006,7 @@ namespace HVACDXSystem {
                         FrostControlSetPointLimit(state, DXSystemNum,
                                                   Node(ControlNode).TempSetPoint,
                                                   Node(ControlNode).HumRatMax,
-                                                  OutBaroPress,
+                                                  state.dataEnvrn->OutBaroPress,
                                                   DXCoolingSystem(DXSystemNum).DesignMinOutletTemp,
                                                   2);
                     }
@@ -1020,7 +1019,7 @@ namespace HVACDXSystem {
                     FrostControlSetPointLimit(state, DXSystemNum,
                                               Node(ControlNode).TempSetPoint,
                                               Node(ControlNode).HumRatMax,
-                                              OutBaroPress,
+                                              state.dataEnvrn->OutBaroPress,
                                               DXCoolingSystem(DXSystemNum).DesignMinOutletTemp,
                                               1);
                 }
@@ -1030,7 +1029,7 @@ namespace HVACDXSystem {
                         FrostControlSetPointLimit(state, DXSystemNum,
                                                   Node(ControlNode).TempSetPoint,
                                                   Node(ControlNode).HumRatMax,
-                                                  OutBaroPress,
+                                                  state.dataEnvrn->OutBaroPress,
                                                   DXCoolingSystem(DXSystemNum).DesignMinOutletTemp,
                                                   2);
                     }
@@ -1072,7 +1071,6 @@ namespace HVACDXSystem {
 
         // Using/Aliasing
         using namespace ScheduleManager;
-        using DataEnvironment::OutBaroPress;
         using DataHVACGlobals::TempControlTol;
         using DXCoils::DXCoilOutletHumRat;
         using DXCoils::DXCoilOutletTemp;

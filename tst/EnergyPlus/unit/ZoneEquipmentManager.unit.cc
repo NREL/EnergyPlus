@@ -138,8 +138,8 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest)
     ZoneEquipConfig(ZoneNum).ReturnNodeAirLoopNum(1) = 0;
     ZoneEquipConfig(ZoneNum).ReturnNodeInletNum(1) = 1;
     // Avoid zero values in volume flow balance check
-    DataEnvironment::StdRhoAir = 1.2;
-    DataEnvironment::OutBaroPress = 100000.0;
+    state->dataEnvrn->StdRhoAir = 1.2;
+    state->dataEnvrn->OutBaroPress = 100000.0;
     Node(ZoneEquipConfig(ZoneNum).ZoneNode).Temp = 20.0;
     Node(ZoneEquipConfig(ZoneNum).ZoneNode).HumRat = 0.004;
 
@@ -416,7 +416,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_MultiCrossMixingTest)
     ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex(*state, "DELTATEMP")).CurrentValue = 2.0;
     ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex(*state, "MINOUTDOORTEMP")).CurrentValue = -100.0;
     ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex(*state, "MAXOUTDOORTEMP")).CurrentValue = 100.0;
-    DataEnvironment::OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
 
     InitSimpleMixingConvectiveHeatGains(*state);
 
@@ -537,8 +537,8 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest2)
     int returnNode3 = ZoneEquipConfig(ZoneNum).ReturnNode(3);
 
     // Avoid zero values in volume flow balance check
-    DataEnvironment::StdRhoAir = 1.2;
-    DataEnvironment::OutBaroPress = 100000.0;
+    state->dataEnvrn->StdRhoAir = 1.2;
+    state->dataEnvrn->OutBaroPress = 100000.0;
     Node(ZoneEquipConfig(ZoneNum).ZoneNode).Temp = 20.0;
     Node(ZoneEquipConfig(ZoneNum).ZoneNode).HumRat = 0.004;
 
@@ -669,8 +669,8 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest3)
     Node(ZoneEquipConfig(ZoneNum).ExhaustNode(1)).MassFlowRate = 0.0;
 
     // Avoid zero values in volume flow balance check
-    DataEnvironment::StdRhoAir = 1.2;
-    DataEnvironment::OutBaroPress = 100000.0;
+    state->dataEnvrn->StdRhoAir = 1.2;
+    state->dataEnvrn->OutBaroPress = 100000.0;
     Node(ZoneEquipConfig(ZoneNum).ZoneNode).Temp = 20.0;
     Node(ZoneEquipConfig(ZoneNum).ZoneNode).HumRat = 0.004;
 
@@ -771,8 +771,8 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest4)
     int returnNode3 = ZoneEquipConfig(ZoneNum).ReturnNode(3);
 
     // Avoid zero values in volume flow balance check
-    DataEnvironment::StdRhoAir = 1.2;
-    DataEnvironment::OutBaroPress = 100000.0;
+    state->dataEnvrn->StdRhoAir = 1.2;
+    state->dataEnvrn->OutBaroPress = 100000.0;
     Node(ZoneEquipConfig(ZoneNum).ZoneNode).Temp = 20.0;
     Node(ZoneEquipConfig(ZoneNum).ZoneNode).HumRat = 0.004;
 
@@ -1360,7 +1360,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformPLR)
     int zoneInlet = UtilityRoutines::FindItemInList("ZONE EQUIP INLET 1", DataLoopNode::NodeID, DataLoopNode::NumOfNodes);
     int coolingPriority = 0;
     int heatingPriority = 0;
-    DataZoneEquipment::ZoneEquipList(1).getPrioritiesforInletNode(zoneInlet, coolingPriority, heatingPriority);
+    DataZoneEquipment::ZoneEquipList(1).getPrioritiesForInletNode(*state, zoneInlet, coolingPriority, heatingPriority);
     EXPECT_EQ(coolingPriority, 1);
     EXPECT_EQ(heatingPriority, 1);
     // DataHVACGlobals::MinAirLoopIterationsAfterFirst should equal 2 for UniformPLR
@@ -1368,7 +1368,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformPLR)
     zoneInlet = UtilityRoutines::FindItemInList("ZONE EQUIP INLET 3", DataLoopNode::NodeID, DataLoopNode::NumOfNodes);
     coolingPriority = 0;
     heatingPriority = 0;
-    DataZoneEquipment::ZoneEquipList(1).getPrioritiesforInletNode(zoneInlet, coolingPriority, heatingPriority);
+    DataZoneEquipment::ZoneEquipList(1).getPrioritiesForInletNode(*state, zoneInlet, coolingPriority, heatingPriority);
     EXPECT_EQ(coolingPriority, 0);
     EXPECT_EQ(heatingPriority, 3);
     // DataHVACGlobals::MinAirLoopIterationsAfterFirst should equal 2 for UniformPLR
@@ -1578,7 +1578,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialUniformPLR)
     int zoneInlet = UtilityRoutines::FindItemInList("ZONE EQUIP INLET 1", DataLoopNode::NodeID, DataLoopNode::NumOfNodes);
     int coolingPriority = 0;
     int heatingPriority = 0;
-    DataZoneEquipment::ZoneEquipList(1).getPrioritiesforInletNode(zoneInlet, coolingPriority, heatingPriority);
+    DataZoneEquipment::ZoneEquipList(1).getPrioritiesForInletNode(*state, zoneInlet, coolingPriority, heatingPriority);
     EXPECT_EQ(coolingPriority, 1);
     EXPECT_EQ(heatingPriority, 1);
     // DataHVACGlobals::MinAirLoopIterationsAfterFirst should equal equipmnum+1 for SequentialUniformPLR
@@ -1586,7 +1586,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialUniformPLR)
     zoneInlet = UtilityRoutines::FindItemInList("ZONE EQUIP INLET 3", DataLoopNode::NodeID, DataLoopNode::NumOfNodes);
     coolingPriority = 0;
     heatingPriority = 0;
-    DataZoneEquipment::ZoneEquipList(1).getPrioritiesforInletNode(zoneInlet, coolingPriority, heatingPriority);
+    DataZoneEquipment::ZoneEquipList(1).getPrioritiesForInletNode(*state, zoneInlet, coolingPriority, heatingPriority);
     EXPECT_EQ(coolingPriority, 0);
     EXPECT_EQ(heatingPriority, 3);
     // DataHVACGlobals::MinAirLoopIterationsAfterFirst should equal equipmnum+1 for SequentialUniformPLR
@@ -1896,7 +1896,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     int zoneInlet = UtilityRoutines::FindItemInList("ZONE EQUIP INLET 1", DataLoopNode::NodeID, DataLoopNode::NumOfNodes);
     int coolingPriority = 0;
     int heatingPriority = 0;
-    DataZoneEquipment::ZoneEquipList(1).getPrioritiesforInletNode(zoneInlet, coolingPriority, heatingPriority);
+    DataZoneEquipment::ZoneEquipList(1).getPrioritiesForInletNode(*state, zoneInlet, coolingPriority, heatingPriority);
     EXPECT_EQ(coolingPriority, 1);
     EXPECT_EQ(heatingPriority, 1);
     // DataHVACGlobals::MinAirLoopIterationsAfterFirst should equal the highest air terminal equipment num for sequential loading
@@ -1904,7 +1904,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     zoneInlet = UtilityRoutines::FindItemInList("ZONE EQUIP INLET 3", DataLoopNode::NodeID, DataLoopNode::NumOfNodes);
     coolingPriority = 0;
     heatingPriority = 0;
-    DataZoneEquipment::ZoneEquipList(1).getPrioritiesforInletNode(zoneInlet, coolingPriority, heatingPriority);
+    DataZoneEquipment::ZoneEquipList(1).getPrioritiesForInletNode(*state, zoneInlet, coolingPriority, heatingPriority);
     EXPECT_EQ(coolingPriority, 3);
     EXPECT_EQ(heatingPriority, 3);
     // DataHVACGlobals::MinAirLoopIterationsAfterFirst should equal the highest air terminal equipment num for sequential loading
@@ -2127,7 +2127,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     int zoneInlet = UtilityRoutines::FindItemInList("ZONE EQUIP INLET 1", DataLoopNode::NodeID, DataLoopNode::NumOfNodes);
     int coolingPriority = 0;
     int heatingPriority = 0;
-    DataZoneEquipment::ZoneEquipList(1).getPrioritiesforInletNode(zoneInlet, coolingPriority, heatingPriority);
+    DataZoneEquipment::ZoneEquipList(1).getPrioritiesForInletNode(*state, zoneInlet, coolingPriority, heatingPriority);
     EXPECT_EQ(coolingPriority, 1);
     EXPECT_EQ(heatingPriority, 1);
     // DataHVACGlobals::MinAirLoopIterationsAfterFirst should equal the highest air terminal equipment num for sequential loading
@@ -2135,7 +2135,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     zoneInlet = UtilityRoutines::FindItemInList("ZONE EQUIP INLET 3", DataLoopNode::NodeID, DataLoopNode::NumOfNodes);
     coolingPriority = 0;
     heatingPriority = 0;
-    DataZoneEquipment::ZoneEquipList(1).getPrioritiesforInletNode(zoneInlet, coolingPriority, heatingPriority);
+    DataZoneEquipment::ZoneEquipList(1).getPrioritiesForInletNode(*state, zoneInlet, coolingPriority, heatingPriority);
     EXPECT_EQ(coolingPriority, 3);
     EXPECT_EQ(heatingPriority, 3);
     // DataHVACGlobals::MinAirLoopIterationsAfterFirst should equal the highest air terminal equipment num for sequential loading
@@ -2167,9 +2167,9 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
 
 TEST_F(EnergyPlusFixture, ZoneEquipmentManager_RezeroZoneSizingArrays) {
 
-    DataEnvironment::TotDesDays = 12;
-    DataEnvironment::TotRunDesPersDays = 3;
-    int totDesDays = DataEnvironment::TotDesDays + DataEnvironment::TotRunDesPersDays;
+    state->dataEnvrn->TotDesDays = 12;
+    state->dataEnvrn->TotRunDesPersDays = 3;
+    int totDesDays = state->dataEnvrn->TotDesDays + state->dataEnvrn->TotRunDesPersDays;
     state->dataGlobal->NumOfZones = 5;
     state->dataZoneEquipmentManager->NumOfTimeStepInDay = 4;
     DataSizing::ZoneSizing.allocate(totDesDays, state->dataGlobal->NumOfZones);
@@ -2178,7 +2178,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_RezeroZoneSizingArrays) {
     DataSizing::CalcFinalZoneSizing.allocate(state->dataGlobal->NumOfZones);
 
     for (int CtrlZoneNum = 1; CtrlZoneNum <= state->dataGlobal->NumOfZones; ++CtrlZoneNum) {
-        for (int DesDayNum = 1; DesDayNum <= DataEnvironment::TotDesDays + DataEnvironment::TotRunDesPersDays; ++DesDayNum) {
+        for (int DesDayNum = 1; DesDayNum <= state->dataEnvrn->TotDesDays + state->dataEnvrn->TotRunDesPersDays; ++DesDayNum) {
             auto &thisSizingType(DataSizing::ZoneSizing(DesDayNum, CtrlZoneNum));
             thisSizingType.ZoneName = "test";
             thisSizingType.ADUName = "test";
@@ -2578,7 +2578,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_RezeroZoneSizingArrays) {
     ZoneEquipmentManager::RezeroZoneSizingArrays(*state);
 
     for ( int CtrlZoneNum = 1; CtrlZoneNum <= state->dataGlobal->NumOfZones; ++CtrlZoneNum ) {
-        for ( int DesDayNum = 1; DesDayNum <= DataEnvironment::TotDesDays + DataEnvironment::TotRunDesPersDays; ++DesDayNum ) {
+        for ( int DesDayNum = 1; DesDayNum <= state->dataEnvrn->TotDesDays + state->dataEnvrn->TotRunDesPersDays; ++DesDayNum ) {
             auto &thisSizingType(DataSizing::ZoneSizing(DesDayNum, CtrlZoneNum));
             //EXPECT_EQ(thisSizingType.ZoneName, "");
             //EXPECT_EQ(thisSizingType.ADUName, "");
