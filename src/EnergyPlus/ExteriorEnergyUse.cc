@@ -114,7 +114,7 @@ namespace ExteriorEnergyUse {
         using ScheduleManager::GetScheduleName;
         using namespace OutputReportPredefined;
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetExteriorEnergyUseInput: ");
+        auto constexpr RoutineName("GetExteriorEnergyUseInput: ");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Item;                       // Item to be "gotten"
@@ -437,7 +437,7 @@ namespace ExteriorEnergyUse {
         }
 
         if (ErrorsFound) {
-            ShowFatalError(state, RoutineName + "Errors found in input.  Program terminates.");
+            ShowFatalError(state, format("{}Errors found in input.  Program terminates.", RoutineName));
         }
     }
 

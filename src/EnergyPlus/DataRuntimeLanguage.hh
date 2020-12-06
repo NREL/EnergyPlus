@@ -73,6 +73,22 @@ namespace DataRuntimeLanguage {
     // Data module should be available to other modules and routines.
     // Thus, all variables in this module must be PUBLIC.
 
+    enum class ErlKeywordParam // keyword parameters for types of Erl statements
+    {
+        KeywordNone,     // statement type not set
+        KeywordReturn,   // Return statement, as in leave program
+        KeywordGoto,     // Goto statement, used in parsing to manage IF-ElseIf-Else-EndIf and nesting
+        KeywordSet,      // Set statement, as in assign RHS to LHS
+        KeywordRun,      // Run statement, used to call a subroutine from a main program
+        KeywordIf,       // If statement, begins an IF-ElseIf-Else-EndIf logic block
+        KeywordElseIf,   // ElseIf statement, begins an ElseIf block
+        KeywordElse,     // Else statement, begins an Else block
+        KeywordEndIf,    // EndIf statement, terminates an IF-ElseIf-Else-EndIf logic block
+        KeywordWhile,    // While statement, begins a While block
+        KeywordEndWhile, // EndWhile statement, terminates a While block
+    };
+
+    // MODULE PARAMETER DEFINITIONS:
     int constexpr ValueNull(0);       // Erl entity type, "Null" value
     int constexpr ValueNumber(1);     // Erl entity type,  hard numeric value
     int constexpr ValueString(2);     // Erl entity type,  character data
@@ -372,12 +388,12 @@ namespace DataRuntimeLanguage {
         // Members
         // nested structure inside ErlStack that holds program instructions
         int LineNum;   // Erl program line number reference
-        int Keyword;   // type of instruction for this line, e.g. KeywordSet, KeywordIf, etc
+        DataRuntimeLanguage::ErlKeywordParam Keyword; // type of instruction for this line, e.g. KeywordSet, KeywordIf, etc
         int Argument1; // Index to a variable, function, expression, or stack
         int Argument2; // Index to a variable, function, expression, or stack
 
         // Default Constructor
-        InstructionType() : LineNum(0), Keyword(0), Argument1(0), Argument2(0)
+        InstructionType() : LineNum(0), Keyword(DataRuntimeLanguage::ErlKeywordParam::KeywordNone), Argument1(0), Argument2(0)
         {
         }
     };

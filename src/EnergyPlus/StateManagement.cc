@@ -169,7 +169,6 @@
 #include <EnergyPlus/PoweredInductionUnits.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/Pumps.hh>
-#include <EnergyPlus/PurchasedAirManager.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
 #include <EnergyPlus/ResultsFramework.hh>
 #include <EnergyPlus/ReturnAirPathManager.hh>
@@ -306,7 +305,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     PoweredInductionUnits::clear_state();
     Psychrometrics::clear_state();
     Pumps::clear_state();
-    PurchasedAirManager::clear_state();
     PVWatts::clear_state();
     clearCoilSelectionReportObj(); // ReportCoilSelection
     ReturnAirPathManager::clear_state();

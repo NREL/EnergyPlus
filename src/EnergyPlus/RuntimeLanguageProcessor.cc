@@ -95,19 +95,6 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
     // MODULE PARAMETER DEFINITIONS:
     int const MaxErrors(20);
 
-    // keyword parameters for types of Erl statements
-    int const KeywordNone(0);      // statement type not set
-    int const KeywordReturn(1);    // Return statement, as in leave program
-    int const KeywordGoto(2);      // Goto statement, used in parsing to manage IF-ElseIf-Else-EndIf and nesting
-    int const KeywordSet(3);       // Set statement, as in assign RHS to LHS
-    int const KeywordRun(4);       // Run statement, used to call a subroutine from a main program
-    int const KeywordIf(5);        // If statement, begins an IF-ElseIf-Else-EndIf logic block
-    int const KeywordElseIf(6);    // ElseIf statement, begins an ElseIf block
-    int const KeywordElse(7);      // Else statement, begins an Else block
-    int const KeywordEndIf(8);     // EndIf statement, terminates an IF-ElseIf-Else-EndIf logic block
-    int const KeywordWhile(9);     // While statement, begins a While block
-    int const KeywordEndWhile(10); // EndWhile statement, terminates a While block
-
     // token type parameters for Erl code parsing
     int const TokenNumber(1);     // matches the ValueNumber
     int const TokenVariable(4);   // matches the ValueVariable
@@ -544,10 +531,10 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                 if (SELECT_CASE_var == "RETURN") {
                     if (DeveloperFlag) print(state.files.debug, "RETURN \"{}\"\n", Line);
                     if (Remainder.empty()) {
-                        InstructionNum = AddInstruction(state, StackNum, LineNum, KeywordReturn);
+                        InstructionNum = AddInstruction(state, StackNum, LineNum, RuntimeLanguageProcessor::ErlKeywordParam::KeywordReturn);
                     } else {
                         ParseExpression(state, Remainder, StackNum, ExpressionNum, Line);
-                        InstructionNum = AddInstruction(state, StackNum, LineNum, KeywordReturn, ExpressionNum);
+                        InstructionNum = AddInstruction(state, StackNum, LineNum, DataRuntimeLanguage::ErlKeywordParam::KeywordReturn, ExpressionNum);
                     }
 
                 } else if (SELECT_CASE_var == "SET") {
@@ -571,7 +558,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                             AddError(state, StackNum, LineNum, "Expression missing for the SET instruction.");
                         } else {
                             ParseExpression(state, Expression, StackNum, ExpressionNum, Line);
-                            InstructionNum = AddInstruction(state, StackNum, LineNum, KeywordSet, VariableNum, ExpressionNum);
+                            InstructionNum = AddInstruction(state, StackNum, LineNum, DataRuntimeLanguage::ErlKeywordParam::KeywordSet, VariableNum, ExpressionNum);
                         }
                     }
 
@@ -588,7 +575,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                         if (StackNum2 == 0) {
                             AddError(state, StackNum, LineNum, "Program or Subroutine name [" + Variable + "] not found for the RUN instruction.");
                         } else {
-                            InstructionNum = AddInstruction(state, StackNum, LineNum, KeywordRun, StackNum2);
+                            InstructionNum = AddInstruction(state, StackNum, LineNum, DataRuntimeLanguage::ErlKeywordParam::KeywordRun, StackNum2);
                         }
                     }
 
@@ -612,7 +599,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                         AddError(state, StackNum, LineNum, "Detected IF nested deeper than is allowed; need to terminate an earlier IF instruction.");
                         break;
                     } else {
-                        InstructionNum = AddInstruction(state, StackNum, LineNum, KeywordIf, ExpressionNum); // Arg2 added at next ELSEIF, ELSE, ENDIF
+                        InstructionNum = AddInstruction(state, StackNum, LineNum, DataRuntimeLanguage::ErlKeywordParam::KeywordIf, ExpressionNum); // Arg2 added at next ELSEIF, ELSE, ENDIF
                         SavedIfInstructionNum(NestedIfDepth) = InstructionNum;
                     }
 
@@ -627,7 +614,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                     }
 
                     // Complete the preceding block with a GOTO instruction
-                    InstructionNum = AddInstruction(state, StackNum, 0, KeywordGoto); // Arg2 is added at the ENDIF
+                    InstructionNum = AddInstruction(state, StackNum, 0, DataRuntimeLanguage::ErlKeywordParam::KeywordGoto); // Arg2 is added at the ENDIF
                     ++NumGotos(NestedIfDepth);
                     if (NumGotos(NestedIfDepth) > ELSEIFLengthAllowed) {
                         AddError(state, StackNum, LineNum, "Detected ELSEIF series that is longer than allowed; terminate earlier IF instruction.");
@@ -644,7 +631,11 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                         ParseExpression(state, Expression, StackNum, ExpressionNum, Line);
                     }
 
-                    InstructionNum = AddInstruction(state, StackNum, LineNum, KeywordIf, ExpressionNum); // Arg2 added at next ELSEIF, ELSE, ENDIF
+                    InstructionNum = AddInstruction(state,
+                                                    StackNum,
+                                                    LineNum,
+                                                    DataRuntimeLanguage::ErlKeywordParam::KeywordIf,
+                                                    ExpressionNum); // Arg2 added at next ELSEIF, ELSE, ENDIF
                     state.dataRuntimeLang->ErlStack(StackNum).Instruction(SavedIfInstructionNum(NestedIfDepth)).Argument2 = InstructionNum;
                     SavedIfInstructionNum(NestedIfDepth) = InstructionNum;
 
@@ -663,7 +654,8 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                     ReadyForElse(NestedIfDepth) = false;
 
                     // Complete the preceding block with a GOTO instruction
-                    InstructionNum = AddInstruction(state, StackNum, 0, KeywordGoto); // Arg2 is added at the ENDIF
+                    InstructionNum =
+                        AddInstruction(state, StackNum, 0, DataRuntimeLanguage::ErlKeywordParam::KeywordGoto); // Arg2 is added at the ENDIF
                     ++NumGotos(NestedIfDepth);
                     if (NumGotos(NestedIfDepth) > ELSEIFLengthAllowed) {
                         AddError(state, StackNum, LineNum, "Detected ELSEIF-ELSE series that is longer than allowed.");
@@ -676,7 +668,8 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                         AddError(state, StackNum, LineNum, "Nothing is allowed to follow the ELSE instruction.");
                     }
 
-                    InstructionNum = AddInstruction(state, StackNum, LineNum, KeywordElse); // can make this into a KeywordIf?
+                    InstructionNum =
+                        AddInstruction(state, StackNum, LineNum, DataRuntimeLanguage::ErlKeywordParam::KeywordElse); // can make this into a KeywordIf?
                     state.dataRuntimeLang->ErlStack(StackNum).Instruction(SavedIfInstructionNum(NestedIfDepth)).Argument2 = InstructionNum;
                     SavedIfInstructionNum(NestedIfDepth) = InstructionNum;
 
@@ -700,7 +693,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                         AddError(state, StackNum, LineNum, "Nothing is allowed to follow the ENDIF instruction.");
                     }
 
-                    InstructionNum = AddInstruction(state, StackNum, LineNum, KeywordEndIf);
+                    InstructionNum = AddInstruction(state, StackNum, LineNum, DataRuntimeLanguage::ErlKeywordParam::KeywordEndIf);
                     state.dataRuntimeLang->ErlStack(StackNum).Instruction(SavedIfInstructionNum(NestedIfDepth)).Argument2 = InstructionNum;
 
                     // Go back and complete all of the GOTOs that terminate each IF and ELSEIF block
@@ -729,7 +722,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                         AddError(state, StackNum, LineNum, "Detected WHILE nested deeper than is allowed; need to terminate an earlier WHILE instruction.");
                         break;
                     } else {
-                        InstructionNum = AddInstruction(state, StackNum, LineNum, KeywordWhile, ExpressionNum);
+                        InstructionNum = AddInstruction(state, StackNum, LineNum, DataRuntimeLanguage::ErlKeywordParam::KeywordWhile, ExpressionNum);
                         SavedWhileInstructionNum = InstructionNum;
                         SavedWhileExpressionNum = ExpressionNum;
                     }
@@ -744,7 +737,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                         AddError(state, StackNum, LineNum, "Nothing is allowed to follow the ENDWHILE instruction.");
                     }
 
-                    InstructionNum = AddInstruction(state, StackNum, LineNum, KeywordEndWhile);
+                    InstructionNum = AddInstruction(state, StackNum, LineNum, DataRuntimeLanguage::ErlKeywordParam::KeywordEndWhile);
                     state.dataRuntimeLang->ErlStack(StackNum).Instruction(SavedWhileInstructionNum).Argument2 = InstructionNum;
                     state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1 = SavedWhileExpressionNum;
                     state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument2 = SavedWhileInstructionNum;
@@ -775,7 +768,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
     int AddInstruction(EnergyPlusData &state,
                        int const StackNum,
                        int const LineNum,
-                       int const Keyword,
+                       DataRuntimeLanguage::ErlKeywordParam Keyword,
                        Optional_int_const Argument1, // Erl variable index
                        Optional_int_const Argument2)
     {
@@ -908,17 +901,16 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
             {
                 auto const SELECT_CASE_var(state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Keyword);
 
-                if (SELECT_CASE_var == KeywordNone) {
+                if (SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::KeywordNone) {
                     // There probably shouldn't be any of these
 
-                } else if (SELECT_CASE_var == KeywordReturn) {
+                } else if (SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::KeywordReturn) {
                     if (state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1 > 0)
                         ReturnValue = EvaluateExpression(state, state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1, seriousErrorFound);
-
                     WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
                     break; // RETURN always terminates an instruction stack
 
-                } else if (SELECT_CASE_var == KeywordSet) {
+                } else if (SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::KeywordSet) {
 
                     ReturnValue = EvaluateExpression(state, state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument2, seriousErrorFound);
                     VariableNum = state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1;
@@ -931,16 +923,15 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
 
                     WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
 
-                } else if (SELECT_CASE_var == KeywordRun) {
+                } else if (SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::KeywordRun) {
                     ReturnValue.Type = ValueString;
                     ReturnValue.String = "";
                     WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
                     ReturnValue = EvaluateStack(state, state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1);
-
-                } else if ((SELECT_CASE_var == KeywordIf) || (SELECT_CASE_var == KeywordElse)) { // same???
+                } else if ((SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::KeywordIf) ||
+                           (SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::KeywordElse)) { // same???
                     ExpressionNum = state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1;
                     InstructionNum2 = state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument2;
-
                     if (ExpressionNum > 0) { // could be 0 if this was an ELSE
                         ReturnValue = EvaluateExpression(state, ExpressionNum, seriousErrorFound);
                         WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
@@ -955,8 +946,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                         ReturnValue.Number = 1.0;
                         WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
                     }
-
-                } else if (SELECT_CASE_var == KeywordGoto) {
+                } else if (SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::KeywordGoto) {
                     InstructionNum = state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1;
 
                     // For debug purposes only...
@@ -966,12 +956,12 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                     continue;
                     // PE if this ever went out of bounds, would the DO loop save it?  or need check here?
 
-                } else if (SELECT_CASE_var == KeywordEndIf) {
+                } else if (SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::KeywordEndIf) {
                     ReturnValue.Type = ValueString;
                     ReturnValue.String = "";
                     WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
 
-                } else if (SELECT_CASE_var == KeywordWhile) {
+                } else if (SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::KeywordWhile) {
                     // evaluate expression at while, skip to past endwhile if not true
                     ExpressionNum = state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1;
                     InstructionNum2 = state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument2;
@@ -982,7 +972,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                         InstructionNum = InstructionNum2;
                         // CYCLE
                     }
-                } else if (SELECT_CASE_var == KeywordEndWhile) {
+                } else if (SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::KeywordEndWhile) {
 
                     // reevaluate expression at While and goto there if true, otherwise continue
                     ExpressionNum = state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1;
@@ -1837,7 +1827,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
         // Object Data
         Array1D<ErlValueType> Operand;
 
-        static std::string const EMSBuiltInFunction("EMS Built-In Function");
+        auto constexpr EMSBuiltInFunction("EMS Built-In Function");
 
         // FLOW:
 
@@ -2613,7 +2603,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
 
         // Locals
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetRuntimeLanguageUserInput: ");
+        auto constexpr RoutineName("GetRuntimeLanguageUserInput: ");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int GlobalNum;
