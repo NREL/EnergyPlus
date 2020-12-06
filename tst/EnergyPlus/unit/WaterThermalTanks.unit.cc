@@ -768,7 +768,7 @@ TEST_F(EnergyPlusFixture, HPWHEnergyBalance)
     DataHVACGlobals::HPWHInletDBTemp = 21.666666666666668;
     DataHVACGlobals::HPWHInletWBTemp = 14.963459972723468;
     HPWH.SetPointTemp = 51.666666666666664;
-    OutputReportPredefined::pdstHeatCoil = -1;
+    state->dataOutRptPredefined->pdstHeatCoil = -1;
     state->dataWaterThermalTanks->mdotAir = 0.0993699992873531;
 
     int GlycolIndex = 0;

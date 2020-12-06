@@ -104,7 +104,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestVentEffLimit)
     SysCoolingEv = 1.0 + Xs - ZoneOAFrac;
     CtrlZoneNum = 1;
     TermUnitFinalZoneSizing(CtrlZoneNum).ZoneVentilationEff = 0.7;
-    LimitZoneVentEff(Xs, VozClg, CtrlZoneNum, SysCoolingEv);
+    LimitZoneVentEff(*state, Xs, VozClg, CtrlZoneNum, SysCoolingEv);
     EXPECT_DOUBLE_EQ(0.7, SysCoolingEv);
     EXPECT_NEAR(0.5516, TermUnitFinalZoneSizing(CtrlZoneNum).ZpzClgByZone, 0.0001);
     EXPECT_NEAR(0.1132, TermUnitFinalZoneSizing(CtrlZoneNum).DesCoolVolFlowMin, 0.0001);
@@ -113,7 +113,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestVentEffLimit)
     SysCoolingEv = 1.0 + Xs - ZoneOAFrac;
     CtrlZoneNum = 2;
     TermUnitFinalZoneSizing(CtrlZoneNum).ZoneVentilationEff = 0.7;
-    LimitZoneVentEff(Xs, VozClg, CtrlZoneNum, SysCoolingEv);
+    LimitZoneVentEff(*state, Xs, VozClg, CtrlZoneNum, SysCoolingEv);
     EXPECT_NEAR(0.7622, SysCoolingEv, .0001);
 
     TermUnitFinalZoneSizing.deallocate();

@@ -5267,24 +5267,24 @@ namespace EnergyPlus::DaylightingManager {
                         }
                     }
                     refName = curRefPt.Name;
-                    PreDefTableEntry(pdchDyLtZone, refName, daylCntrl.ZoneName);
-                    PreDefTableEntry(pdchDyLtCtrlName, refName, daylCntrl.Name);
+                    PreDefTableEntry(state.dataOutRptPredefined->pdchDyLtZone, refName, daylCntrl.ZoneName);
+                    PreDefTableEntry(state.dataOutRptPredefined->pdchDyLtCtrlName, refName, daylCntrl.Name);
                     if (daylCntrl.DaylightMethod == DataDaylighting::iDaylightingMethod::SplitFluxDaylighting) {
-                        PreDefTableEntry(pdchDyLtKind, refName, "SplitFlux");
+                        PreDefTableEntry(state.dataOutRptPredefined->pdchDyLtKind, refName, "SplitFlux");
                     } else {
-                        PreDefTableEntry(pdchDyLtKind, refName, "DElight");
+                        PreDefTableEntry(state.dataOutRptPredefined->pdchDyLtKind, refName, "DElight");
                     }
                     // ( 1=continuous, 2=stepped, 3=continuous/off )
                     if (daylCntrl.LightControlType == DataDaylighting::iLtgCtrlType::Continuous) {
-                        PreDefTableEntry(pdchDyLtCtrlType, refName, "Continuous");
+                        PreDefTableEntry(state.dataOutRptPredefined->pdchDyLtCtrlType, refName, "Continuous");
                     } else if (daylCntrl.LightControlType == DataDaylighting::iLtgCtrlType::Stepped) {
-                        PreDefTableEntry(pdchDyLtCtrlType, refName, "Stepped");
+                        PreDefTableEntry(state.dataOutRptPredefined->pdchDyLtCtrlType, refName, "Stepped");
                     } else if (daylCntrl.LightControlType == DataDaylighting::iLtgCtrlType::ContinuousOff) {
-                        PreDefTableEntry(pdchDyLtCtrlType, refName, "Continuous/Off");
+                        PreDefTableEntry(state.dataOutRptPredefined->pdchDyLtCtrlType, refName, "Continuous/Off");
                     }
-                    PreDefTableEntry(pdchDyLtFrac, refName, daylCntrl.FracZoneDaylit(refPtNum));
-                    PreDefTableEntry(pdchDyLtWInst, refName, rLightLevel);
-                    PreDefTableEntry(pdchDyLtWCtrl, refName, rLightLevel * daylCntrl.FracZoneDaylit(refPtNum));
+                    PreDefTableEntry(state.dataOutRptPredefined->pdchDyLtFrac, refName, daylCntrl.FracZoneDaylit(refPtNum));
+                    PreDefTableEntry(state.dataOutRptPredefined->pdchDyLtWInst, refName, rLightLevel);
+                    PreDefTableEntry(state.dataOutRptPredefined->pdchDyLtWCtrl, refName, rLightLevel * daylCntrl.FracZoneDaylit(refPtNum));
 
                     if (daylCntrl.DaylRefPtAbsCoord(1, refPtNum) < zone.MinimumX || daylCntrl.DaylRefPtAbsCoord(1, refPtNum) > zone.MaximumX) {
                         daylCntrl.DaylRefPtInBounds(refPtNum) = false;

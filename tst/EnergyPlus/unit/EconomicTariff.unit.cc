@@ -443,16 +443,16 @@ TEST_F(EnergyPlusFixture, EconomicTariff_LEEDtariffReporting_Test)
 
     SetPredefinedTables(*state); // need to setup the predefined table entry numbers
 
-    LEEDtariffReporting();
+    LEEDtariffReporting(*state);
 
-    EXPECT_EQ("SecondaryGeneralUnit", RetrievePreDefTableEntry(pdchLeedEtsRtNm, "Electricity"));
-    EXPECT_EQ("SmallCGUnit", RetrievePreDefTableEntry(pdchLeedEtsRtNm, "Natural Gas"));
-    EXPECT_EQ("DistrictCoolingUnit", RetrievePreDefTableEntry(pdchLeedEtsRtNm, "District Cooling"));
-    EXPECT_EQ("DistrictHeatingUnit", RetrievePreDefTableEntry(pdchLeedEtsRtNm, "District Heating"));
+    EXPECT_EQ("SecondaryGeneralUnit", RetrievePreDefTableEntry(state->dataOutRptPredefined->pdchLeedEtsRtNm, "Electricity"));
+    EXPECT_EQ("SmallCGUnit", RetrievePreDefTableEntry(state->dataOutRptPredefined->pdchLeedEtsRtNm, "Natural Gas"));
+    EXPECT_EQ("DistrictCoolingUnit", RetrievePreDefTableEntry(state->dataOutRptPredefined->pdchLeedEtsRtNm, "District Cooling"));
+    EXPECT_EQ("DistrictHeatingUnit", RetrievePreDefTableEntry(state->dataOutRptPredefined->pdchLeedEtsRtNm, "District Heating"));
 
-    EXPECT_EQ("0.855", RetrievePreDefTableEntry(pdchLeedEtsVirt, "Electricity"));
-    EXPECT_EQ("6.391", RetrievePreDefTableEntry(pdchLeedEtsVirt, "District Cooling"));
-    EXPECT_EQ("10.871", RetrievePreDefTableEntry(pdchLeedEtsVirt, "District Heating"));
+    EXPECT_EQ("0.855", RetrievePreDefTableEntry(state->dataOutRptPredefined->pdchLeedEtsVirt, "Electricity"));
+    EXPECT_EQ("6.391", RetrievePreDefTableEntry(state->dataOutRptPredefined->pdchLeedEtsVirt, "District Cooling"));
+    EXPECT_EQ("10.871", RetrievePreDefTableEntry(state->dataOutRptPredefined->pdchLeedEtsVirt, "District Heating"));
 }
 
 TEST_F(EnergyPlusFixture, EconomicTariff_GatherForEconomics)

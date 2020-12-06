@@ -2103,13 +2103,13 @@ namespace ThermalComfort {
             }
             // put in predefined reports
             for (iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
-                PreDefTableEntry(pdchSCwinterClothes, Zone(iZone).Name, state.dataThermalComforts->ThermalComfortInASH55(iZone).totalTimeNotWinter);
-                PreDefTableEntry(pdchSCsummerClothes, Zone(iZone).Name, state.dataThermalComforts->ThermalComfortInASH55(iZone).totalTimeNotSummer);
-                PreDefTableEntry(pdchSCeitherClothes, Zone(iZone).Name, state.dataThermalComforts->ThermalComfortInASH55(iZone).totalTimeNotEither);
+                PreDefTableEntry(state.dataOutRptPredefined->pdchSCwinterClothes, Zone(iZone).Name, state.dataThermalComforts->ThermalComfortInASH55(iZone).totalTimeNotWinter);
+                PreDefTableEntry(state.dataOutRptPredefined->pdchSCsummerClothes, Zone(iZone).Name, state.dataThermalComforts->ThermalComfortInASH55(iZone).totalTimeNotSummer);
+                PreDefTableEntry(state.dataOutRptPredefined->pdchSCeitherClothes, Zone(iZone).Name, state.dataThermalComforts->ThermalComfortInASH55(iZone).totalTimeNotEither);
             }
-            PreDefTableEntry(pdchSCwinterClothes, "Facility", state.dataThermalComforts->TotalAnyZoneTimeNotSimpleASH55Winter);
-            PreDefTableEntry(pdchSCsummerClothes, "Facility", state.dataThermalComforts->TotalAnyZoneTimeNotSimpleASH55Summer);
-            PreDefTableEntry(pdchSCeitherClothes, "Facility", state.dataThermalComforts->TotalAnyZoneTimeNotSimpleASH55Either);
+            PreDefTableEntry(state.dataOutRptPredefined->pdchSCwinterClothes, "Facility", state.dataThermalComforts->TotalAnyZoneTimeNotSimpleASH55Winter);
+            PreDefTableEntry(state.dataOutRptPredefined->pdchSCsummerClothes, "Facility", state.dataThermalComforts->TotalAnyZoneTimeNotSimpleASH55Summer);
+            PreDefTableEntry(state.dataOutRptPredefined->pdchSCeitherClothes, "Facility", state.dataThermalComforts->TotalAnyZoneTimeNotSimpleASH55Either);
             // set value for ABUPS report
             TotalTimeNotSimpleASH55EitherForABUPS = state.dataThermalComforts->TotalAnyZoneTimeNotSimpleASH55Either;
             // reset accumulation for new environment
@@ -2125,16 +2125,16 @@ namespace ThermalComfort {
             {
                 auto const SELECT_CASE_var(state.dataGlobal->KindOfSim);
                 if (SELECT_CASE_var == DataGlobalConstants::KindOfSim::DesignDay) {
-                    addFootNoteSubTable(pdstSimpleComfort, "Aggregated over the Design Days");
+                    addFootNoteSubTable(state.dataOutRptPredefined->pdstSimpleComfort, "Aggregated over the Design Days");
                 } else if (SELECT_CASE_var == DataGlobalConstants::KindOfSim::RunPeriodDesign) {
-                    addFootNoteSubTable(pdstSimpleComfort, "Aggregated over the RunPeriods for Design");
+                    addFootNoteSubTable(state.dataOutRptPredefined->pdstSimpleComfort, "Aggregated over the RunPeriods for Design");
                 } else if (SELECT_CASE_var == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
-                    addFootNoteSubTable(pdstSimpleComfort, "Aggregated over the RunPeriods for Weather");
+                    addFootNoteSubTable(state.dataOutRptPredefined->pdstSimpleComfort, "Aggregated over the RunPeriods for Weather");
                 }
             }
             // report number of occupied hours per week for LEED report
             for (iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
-                PreDefTableEntry(pdchLeedSutHrsWeek, Zone(iZone).Name, 7 * 24 * (state.dataThermalComforts->ZoneOccHrs(iZone) / (state.dataGlobal->NumOfDayInEnvrn * 24)));
+                PreDefTableEntry(state.dataOutRptPredefined->pdchLeedSutHrsWeek, Zone(iZone).Name, 7 * 24 * (state.dataThermalComforts->ZoneOccHrs(iZone) / (state.dataGlobal->NumOfDayInEnvrn * 24)));
             }
         }
     }
@@ -2278,15 +2278,15 @@ namespace ThermalComfort {
         // was EndEnvrnsFlag prior to CR7562
         if (state.dataGlobal->EndDesignDayEnvrnsFlag) {
             for (iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
-                PreDefTableEntry(pdchULnotMetHeat, Zone(iZone).Name, state.dataThermalComforts->ThermalComfortSetPoint(iZone).totalNotMetHeating);
-                PreDefTableEntry(pdchULnotMetCool, Zone(iZone).Name, state.dataThermalComforts->ThermalComfortSetPoint(iZone).totalNotMetCooling);
-                PreDefTableEntry(pdchULnotMetHeatOcc, Zone(iZone).Name, state.dataThermalComforts->ThermalComfortSetPoint(iZone).totalNotMetHeatingOccupied);
-                PreDefTableEntry(pdchULnotMetCoolOcc, Zone(iZone).Name, state.dataThermalComforts->ThermalComfortSetPoint(iZone).totalNotMetCoolingOccupied);
+                PreDefTableEntry(state.dataOutRptPredefined->pdchULnotMetHeat, Zone(iZone).Name, state.dataThermalComforts->ThermalComfortSetPoint(iZone).totalNotMetHeating);
+                PreDefTableEntry(state.dataOutRptPredefined->pdchULnotMetCool, Zone(iZone).Name, state.dataThermalComforts->ThermalComfortSetPoint(iZone).totalNotMetCooling);
+                PreDefTableEntry(state.dataOutRptPredefined->pdchULnotMetHeatOcc, Zone(iZone).Name, state.dataThermalComforts->ThermalComfortSetPoint(iZone).totalNotMetHeatingOccupied);
+                PreDefTableEntry(state.dataOutRptPredefined->pdchULnotMetCoolOcc, Zone(iZone).Name, state.dataThermalComforts->ThermalComfortSetPoint(iZone).totalNotMetCoolingOccupied);
             }
-            PreDefTableEntry(pdchULnotMetHeat, "Facility", state.dataThermalComforts->TotalAnyZoneNotMetHeating);
-            PreDefTableEntry(pdchULnotMetCool, "Facility", state.dataThermalComforts->TotalAnyZoneNotMetCooling);
-            PreDefTableEntry(pdchULnotMetHeatOcc, "Facility", state.dataThermalComforts->TotalAnyZoneNotMetHeatingOccupied);
-            PreDefTableEntry(pdchULnotMetCoolOcc, "Facility", state.dataThermalComforts->TotalAnyZoneNotMetCoolingOccupied);
+            PreDefTableEntry(state.dataOutRptPredefined->pdchULnotMetHeat, "Facility", state.dataThermalComforts->TotalAnyZoneNotMetHeating);
+            PreDefTableEntry(state.dataOutRptPredefined->pdchULnotMetCool, "Facility", state.dataThermalComforts->TotalAnyZoneNotMetCooling);
+            PreDefTableEntry(state.dataOutRptPredefined->pdchULnotMetHeatOcc, "Facility", state.dataThermalComforts->TotalAnyZoneNotMetHeatingOccupied);
+            PreDefTableEntry(state.dataOutRptPredefined->pdchULnotMetCoolOcc, "Facility", state.dataThermalComforts->TotalAnyZoneNotMetCoolingOccupied);
             // set value for ABUPS report
             TotalNotMetHeatingOccupiedForABUPS = state.dataThermalComforts->TotalAnyZoneNotMetHeatingOccupied;
             TotalNotMetCoolingOccupiedForABUPS = state.dataThermalComforts->TotalAnyZoneNotMetCoolingOccupied;
@@ -2307,11 +2307,11 @@ namespace ThermalComfort {
             {
                 auto const SELECT_CASE_var(state.dataGlobal->KindOfSim);
                 if (SELECT_CASE_var == DataGlobalConstants::KindOfSim::DesignDay) {
-                    addFootNoteSubTable(pdstUnmetLoads, "Aggregated over the Design Days");
+                    addFootNoteSubTable(state.dataOutRptPredefined->pdstUnmetLoads, "Aggregated over the Design Days");
                 } else if (SELECT_CASE_var == DataGlobalConstants::KindOfSim::RunPeriodDesign) {
-                    addFootNoteSubTable(pdstUnmetLoads, "Aggregated over the RunPeriods for Design");
+                    addFootNoteSubTable(state.dataOutRptPredefined->pdstUnmetLoads, "Aggregated over the RunPeriods for Design");
                 } else if (SELECT_CASE_var == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
-                    addFootNoteSubTable(pdstUnmetLoads, "Aggregated over the RunPeriods for Weather");
+                    addFootNoteSubTable(state.dataOutRptPredefined->pdstUnmetLoads, "Aggregated over the RunPeriods for Weather");
                 }
             }
         }

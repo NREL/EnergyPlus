@@ -315,7 +315,7 @@ namespace Pumps {
 
     //*************************************************************************!
 
-    void PumpDataForTable(int const NumPump);
+    void PumpDataForTable(EnergyPlusData &state, int const NumPump);
 
     //*************************************************************************!
 

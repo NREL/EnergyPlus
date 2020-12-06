@@ -670,7 +670,7 @@ namespace EconomicTariff {
 
     void setNativeVariables();
 
-    void LEEDtariffReporting();
+    void LEEDtariffReporting(EnergyPlusData &state);
 
     void WriteTabularTariffReports(EnergyPlusData &state);
 

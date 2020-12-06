@@ -3237,7 +3237,7 @@ namespace EconomicTariff {
                 checkMinimumMonthlyCharge(iTariff);
             }
             selectTariff(state);
-            LEEDtariffReporting();
+            LEEDtariffReporting(state);
         }
     }
 
@@ -4024,7 +4024,7 @@ namespace EconomicTariff {
         }
     }
 
-    void LEEDtariffReporting()
+    void LEEDtariffReporting(EnergyPlusData &state)
     {
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   October 2012
@@ -4128,44 +4128,44 @@ namespace EconomicTariff {
                 }
             }
             // names of the rates
-            PreDefTableEntry(pdchLeedEtsRtNm, "Electricity", elecTariffNames);
-            PreDefTableEntry(pdchLeedEtsRtNm, "Natural Gas", gasTariffNames);
-            if (distCoolTotalEne != 0) PreDefTableEntry(pdchLeedEtsRtNm, "District Cooling", distCoolTariffNames);
-            if (distHeatTotalEne != 0) PreDefTableEntry(pdchLeedEtsRtNm, "District Heating", distHeatTariffNames);
-            PreDefTableEntry(pdchLeedEtsRtNm, "Other", othrTariffNames);
+            PreDefTableEntry(state.dataOutRptPredefined->pdchLeedEtsRtNm, "Electricity", elecTariffNames);
+            PreDefTableEntry(state.dataOutRptPredefined->pdchLeedEtsRtNm, "Natural Gas", gasTariffNames);
+            if (distCoolTotalEne != 0) PreDefTableEntry(state.dataOutRptPredefined->pdchLeedEtsRtNm, "District Cooling", distCoolTariffNames);
+            if (distHeatTotalEne != 0) PreDefTableEntry(state.dataOutRptPredefined->pdchLeedEtsRtNm, "District Heating", distHeatTariffNames);
+            PreDefTableEntry(state.dataOutRptPredefined->pdchLeedEtsRtNm, "Other", othrTariffNames);
             // virtual rate
-            if (elecTotalEne != 0) PreDefTableEntry(pdchLeedEtsVirt, "Electricity", elecTotalCost / elecTotalEne, 3);
-            if (gasTotalEne != 0) PreDefTableEntry(pdchLeedEtsVirt, "Natural Gas", gasTotalCost / gasTotalEne, 3);
-            if (otherTotalEne != 0) PreDefTableEntry(pdchLeedEtsVirt, "Other", otherTotalCost / otherTotalEne, 3);
+            if (elecTotalEne != 0) PreDefTableEntry(state.dataOutRptPredefined->pdchLeedEtsVirt, "Electricity", elecTotalCost / elecTotalEne, 3);
+            if (gasTotalEne != 0) PreDefTableEntry(state.dataOutRptPredefined->pdchLeedEtsVirt, "Natural Gas", gasTotalCost / gasTotalEne, 3);
+            if (otherTotalEne != 0) PreDefTableEntry(state.dataOutRptPredefined->pdchLeedEtsVirt, "Other", otherTotalCost / otherTotalEne, 3);
             // units
-            PreDefTableEntry(pdchLeedEtsEneUnt, "Electricity", convEneStrings(elecUnits));
-            PreDefTableEntry(pdchLeedEtsEneUnt, "Natural Gas", convEneStrings(gasUnits));
-            PreDefTableEntry(pdchLeedEtsEneUnt, "Other", convEneStrings(othrUnits));
-            PreDefTableEntry(pdchLeedEtsDemUnt, "Electricity", convDemStrings(elecUnits));
-            PreDefTableEntry(pdchLeedEtsDemUnt, "Natural Gas", convDemStrings(gasUnits) + demWindowStrings(gasDemWindowUnits));
-            PreDefTableEntry(pdchLeedEtsDemUnt, "Other", convDemStrings(othrUnits) + demWindowStrings(othrDemWindowUnits));
+            PreDefTableEntry(state.dataOutRptPredefined->pdchLeedEtsEneUnt, "Electricity", convEneStrings(elecUnits));
+            PreDefTableEntry(state.dataOutRptPredefined->pdchLeedEtsEneUnt, "Natural Gas", convEneStrings(gasUnits));
+            PreDefTableEntry(state.dataOutRptPredefined->pdchLeedEtsEneUnt, "Other", convEneStrings(othrUnits));
+            PreDefTableEntry(state.dataOutRptPredefined->pdchLeedEtsDemUnt, "Electricity", convDemStrings(elecUnits));
+            PreDefTableEntry(state.dataOutRptPredefined->pdchLeedEtsDemUnt, "Natural Gas", convDemStrings(gasUnits) + demWindowStrings(gasDemWindowUnits));
+            PreDefTableEntry(state.dataOutRptPredefined->pdchLeedEtsDemUnt, "Other", convDemStrings(othrUnits) + demWindowStrings(othrDemWindowUnits));
             // total cost
-            PreDefTableEntry(pdchLeedEcsTotal, "Electricity", elecTotalCost, 2);
-            PreDefTableEntry(pdchLeedEcsTotal, "Natural Gas", gasTotalCost, 2);
-            PreDefTableEntry(pdchLeedEcsTotal, "Other", otherTotalCost, 2);
+            PreDefTableEntry(state.dataOutRptPredefined->pdchLeedEcsTotal, "Electricity", elecTotalCost, 2);
+            PreDefTableEntry(state.dataOutRptPredefined->pdchLeedEcsTotal, "Natural Gas", gasTotalCost, 2);
+            PreDefTableEntry(state.dataOutRptPredefined->pdchLeedEcsTotal, "Other", otherTotalCost, 2);
             // show district energy if used
             if (distCoolTotalEne != 0) {
-                PreDefTableEntry(pdchLeedEtsVirt, "District Cooling", distCoolTotalCost / distCoolTotalEne, 3);
-                PreDefTableEntry(pdchLeedEtsEneUnt, "District Cooling", convEneStrings(distCoolUnits));
-                PreDefTableEntry(pdchLeedEtsDemUnt, "District Cooling", convDemStrings(distCoolUnits) + demWindowStrings(distCoolDemWindowUnits));
-                PreDefTableEntry(pdchLeedEcsTotal, "District Cooling", distCoolTotalCost, 2);
+                PreDefTableEntry(state.dataOutRptPredefined->pdchLeedEtsVirt, "District Cooling", distCoolTotalCost / distCoolTotalEne, 3);
+                PreDefTableEntry(state.dataOutRptPredefined->pdchLeedEtsEneUnt, "District Cooling", convEneStrings(distCoolUnits));
+                PreDefTableEntry(state.dataOutRptPredefined->pdchLeedEtsDemUnt, "District Cooling", convDemStrings(distCoolUnits) + demWindowStrings(distCoolDemWindowUnits));
+                PreDefTableEntry(state.dataOutRptPredefined->pdchLeedEcsTotal, "District Cooling", distCoolTotalCost, 2);
             }
             if (distHeatTotalEne != 0) {
-                PreDefTableEntry(pdchLeedEtsVirt, "District Heating", distHeatTotalCost / distHeatTotalEne, 3);
-                PreDefTableEntry(pdchLeedEtsEneUnt, "District Heating", convEneStrings(distHeatUnits));
-                PreDefTableEntry(pdchLeedEtsDemUnt, "District Heating", convDemStrings(distHeatUnits) + demWindowStrings(distHeatDemWindowUnits));
-                PreDefTableEntry(pdchLeedEcsTotal, "District Heating", distHeatTotalCost, 2);
+                PreDefTableEntry(state.dataOutRptPredefined->pdchLeedEtsVirt, "District Heating", distHeatTotalCost / distHeatTotalEne, 3);
+                PreDefTableEntry(state.dataOutRptPredefined->pdchLeedEtsEneUnt, "District Heating", convEneStrings(distHeatUnits));
+                PreDefTableEntry(state.dataOutRptPredefined->pdchLeedEtsDemUnt, "District Heating", convDemStrings(distHeatUnits) + demWindowStrings(distHeatDemWindowUnits));
+                PreDefTableEntry(state.dataOutRptPredefined->pdchLeedEcsTotal, "District Heating", distHeatTotalCost, 2);
             }
             // save the total costs for later to compute process fraction
-            LEEDelecCostTotal = elecTotalCost;
-            LEEDgasCostTotal = gasTotalCost;
-            LEEDothrCostTotal = distCoolTotalCost + distHeatTotalCost + otherTotalCost;
-            PreDefTableEntry(pdchLeedEcsTotal, "Total", elecTotalCost + gasTotalCost + distCoolTotalCost + distHeatTotalCost + otherTotalCost, 2);
+            state.dataOutRptPredefined->LEEDelecCostTotal = elecTotalCost;
+            state.dataOutRptPredefined->LEEDgasCostTotal = gasTotalCost;
+            state.dataOutRptPredefined->LEEDothrCostTotal = distCoolTotalCost + distHeatTotalCost + otherTotalCost;
+            PreDefTableEntry(state.dataOutRptPredefined->pdchLeedEcsTotal, "Total", elecTotalCost + gasTotalCost + distCoolTotalCost + distHeatTotalCost + otherTotalCost, 2);
         }
     }
 

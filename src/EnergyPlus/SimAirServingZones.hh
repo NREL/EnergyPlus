@@ -177,7 +177,8 @@ namespace SimAirServingZones {
 
     Real64 GetHeatingSATempHumRatForSizing(EnergyPlusData &state, int IndexAirLoop);
 
-    void LimitZoneVentEff(Real64 Xs,              // ratio of uncorrected system outdoor air flow rate to the design system supply flow rate
+    void LimitZoneVentEff(EnergyPlusData &state,
+                          Real64 Xs,              // ratio of uncorrected system outdoor air flow rate to the design system supply flow rate
                           Real64 Voz,             // corrected (divided by distribution efficiency) zone outside air flow rate [m3/s]
                           int CtrlZoneNum,        // controlled zone number
                           Real64 &SystemCoolingEv // system ventilation efficiency
