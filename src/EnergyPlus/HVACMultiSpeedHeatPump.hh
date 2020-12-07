@@ -99,7 +99,6 @@ namespace HVACMultiSpeedHeatPump {
     // DERIVED TYPE DEFINITIONS
 
     // MODULE VARIABLE DECLARATIONS:
-    extern int NumMSHeatPumps; // Number of multi speed heat pumps
     extern int AirLoopPass;    // Number of air loop pass
     extern Real64 TempSteamIn; // steam coil steam inlet temperature
 
