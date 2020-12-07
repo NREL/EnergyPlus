@@ -96,8 +96,6 @@ namespace HVACMultiSpeedHeatPump {
     extern int const On;  // normal compressor operation
     extern int const Off; // signal DXCoil that compressor shouldn't run
 
-    // SUBROUTINE SPECIFICATIONS FOR MODULE
-
     // Types
 
     struct MSHeatPumpData
