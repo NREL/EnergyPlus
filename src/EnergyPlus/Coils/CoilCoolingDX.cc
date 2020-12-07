@@ -733,7 +733,7 @@ void CoilCoolingDX::simulate(EnergyPlus::EnergyPlusData &state, int useAlternate
 
     // report out to the coil sizing report if needed
     if (this->reportCoilFinalSizes) {
-        if (!DataGlobals::WarmupFlag && !DataGlobals::DoingHVACSizingSimulations && !DataGlobals::DoingSizing) {
+        if (!state.dataGlobal->WarmupFlag && !state.dataGlobal->DoingHVACSizingSimulations && !state.dataGlobal->DoingSizing) {
 
             // report out final coil sizing info
             Real64 ratedSensCap(0.0);
