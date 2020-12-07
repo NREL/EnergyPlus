@@ -64,7 +64,8 @@ struct EnergyPlusData;
 
 namespace EconomicTariff {
 
-    enum class iEconVarObjType{
+    enum class iEconVarObjType
+    {
         Unknown,
         Tariff,
         Qualify,
@@ -78,28 +79,107 @@ namespace EconomicTariff {
         AssignCompute,
     };
 
-    extern int const conversionUSERDEF;
-    extern int const conversionKWH;
-    extern int const conversionTHERM;
-    extern int const conversionMMBTU; // million btu
-    extern int const conversionMJ;
-    extern int const conversionKBTU;
-    extern int const conversionMCF; // thousand cubic feet
-    extern int const conversionCCF; // hundred cubic feet
-    extern int const conversionM3;  // cubic meter
-    extern int const conversionGAL;
-    extern int const conversionKGAL; // thousand gallons
+    enum class iEconConv
+    {
+        USERDEF,
+        KWH,
+        THERM,
+        MMBTU,         // million btu
+        MJ,
+        KBTU,
+        MCF,           // thousand cubic feet
+        CCF,           // hundred cubic feet
+        M3,            // cubic meter
+        GAL,
+        KGAL,          // thousand gallons
+    };
 
-    extern Array1D_string const convEneStrings;
-    extern Array1D_string const convDemStrings;
+    constexpr std::string_view convEneStrings(iEconConv &e) {
+        switch (e) {
+        case iEconConv::USERDEF:
+            return "";
+        case iEconConv::KWH:
+            return "kWh";
+        case iEconConv::THERM:
+            return "Therm";
+        case iEconConv::MMBTU:
+            return "MMBtu";
+        case iEconConv::MJ:
+            return "MJ";
+        case iEconConv::KBTU:
+            return "kBtu";
+        case iEconConv::MCF:
+            return "MCF";
+        case iEconConv::CCF:
+            return "CCF";\
+        case iEconConv::M3:
+            return "m3";
+        case iEconConv::GAL:
+            return "gal";
+        case iEconConv::KGAL:
+            return "kgal";
+        default:
+            assert(false);
+        }
+    }
 
-    extern int const demandWindowQuarter;
-    extern int const demandWindowHalf;
-    extern int const demandWindowHour;
-    extern int const demandWindowDay;
-    extern int const demandWindowWeek;
+    constexpr std::string_view convDemStrings(iEconConv &e) {
+        switch (e) {
+        case iEconConv::USERDEF:
+            return "";
+        case iEconConv::KWH:
+            return "kW";
+        case iEconConv::THERM:
+            return "Therm";
+        case iEconConv::MMBTU:
+            return "MMBtu";
+        case iEconConv::MJ:
+            return "MJ";
+        case iEconConv::KBTU:
+            return "kBtu";
+        case iEconConv::MCF:
+            return "MCF";
+        case iEconConv::CCF:
+            return "CCF";\
+        case iEconConv::M3:
+            return "m3";
+        case iEconConv::GAL:
+            return "gal";
+        case iEconConv::KGAL:
+            return "kgal";
+        default:
+            assert(false);
+        }
+    }
 
-    extern Array1D_string const demWindowStrings;
+    enum class iDemandWindow
+    {
+        Unassigned,
+        Quarter,
+        Half,
+        Hour,
+        Day,
+        Week,
+    };
+
+    constexpr std::string_view demWindowStrings(iDemandWindow &e) {
+        switch (e) {
+        case iDemandWindow::Unassigned:
+            return "";
+        case iDemandWindow::Quarter:
+            return "/Hr";
+        case iDemandWindow::Half:
+            return "/Hr";
+        case iDemandWindow::Hour:
+            return "/Hr";
+        case iDemandWindow::Day:
+            return "/Day";
+        case iDemandWindow::Week:
+            return "/Wk";
+        default:
+            assert(false);
+        }
+    }
 
     extern int const buyFromUtility;
     extern int const sellToUtility;
@@ -315,7 +395,7 @@ namespace EconomicTariff {
         int kindWaterMtr;           // kind of water meter - 0 (default) is not water, 1 is water
         int kindGasMtr;             // kind of gas meter - 0 (default) is not gas, 1 is gas
         DataGlobalConstants::ResourceType resourceNum;  // based on list of DataGlobalConstants
-        int convChoice;             // enumerated choice index of the conversion factor
+        iEconConv convChoice;             // enumerated choice index of the conversion factor
         Real64 energyConv;          // energy conversion factor
         Real64 demandConv;          // demand conversion factor
         std::string periodSchedule; // name of the period schedule (time of day)
@@ -324,7 +404,7 @@ namespace EconomicTariff {
         int seasonSchIndex;         // index to the season schedule
         std::string monthSchedule;  // name of month schedule (when months end)
         int monthSchIndex;          // index to the month schedule
-        int demandWindow;           // enumerated list of the kind of demand window
+        iDemandWindow demandWindow;           // enumerated list of the kind of demand window
         Real64 demWinTime;          // length of time for the demand window
         Real64 monthChgVal;         // monthly charge value
         int monthChgPt;             // pointer to a variable that contains the monthly charge
@@ -418,8 +498,8 @@ namespace EconomicTariff {
         // Default Constructor
         TariffType()
             : reportMeterIndx(0), kindElectricMtr(0), kindWaterMtr(0), kindGasMtr(0), resourceNum(DataGlobalConstants::ResourceType::None),
-              convChoice(0), energyConv(0.0), demandConv(0.0),
-              periodSchIndex(0), seasonSchIndex(0), monthSchIndex(0), demandWindow(0), demWinTime(0.0), monthChgVal(0.0), monthChgPt(0),
+              convChoice(iEconConv::USERDEF), energyConv(0.0), demandConv(0.0),
+              periodSchIndex(0), seasonSchIndex(0), monthSchIndex(0), demandWindow(iDemandWindow::Unassigned), demWinTime(0.0), monthChgVal(0.0), monthChgPt(0),
               minMonthChgVal(0.0), minMonthChgPt(0), chargeSchIndex(0), baseUseSchIndex(0), buyOrSell(0), firstCategory(0), lastCategory(0),
               ptEnergyCharges(0), ptDemandCharges(0), ptServiceCharges(0), ptBasis(0), ptAdjustment(0), ptSurcharge(0), ptSubtotal(0), ptTaxes(0),
               ptTotal(0), ptNotIncluded(0), firstNative(0), lastNative(0), nativeTotalEnergy(0), nativeTotalDemand(0), nativePeakEnergy(0),

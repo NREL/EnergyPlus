@@ -85,30 +85,6 @@ namespace EconomicTariff {
     using ScheduleManager::GetScheduleIndex;
 
     // ECONOMCIS:TARIFF enumerated lists
-
-    int const conversionUSERDEF(0);
-    int const conversionKWH(1);
-    int const conversionTHERM(2);
-    int const conversionMMBTU(3); // million btu
-    int const conversionMJ(4);
-    int const conversionKBTU(5);
-    int const conversionMCF(6); // thousand cubic feet
-    int const conversionCCF(7); // hundred cubic feet
-    int const conversionM3(8);  // cubic meter
-    int const conversionGAL(9);
-    int const conversionKGAL(10); // thousand gallons
-
-    Array1D_string const convEneStrings({0, 10}, {"", "kWh", "Therm", "MMBtu", "MJ", "kBtu", "MCF", "CCF", "m3", "gal", "kgal"});
-    Array1D_string const convDemStrings({0, 10}, {"", "kW", "Therm", "MMBtu", "MJ", "kBtu", "MCF", "CCF", "m3", "gal", "kgal"});
-
-    int const demandWindowQuarter(1);
-    int const demandWindowHalf(2);
-    int const demandWindowHour(3);
-    int const demandWindowDay(4);
-    int const demandWindowWeek(5);
-
-    Array1D_string const demWindowStrings({0, 5}, {"", "/Hr", "/Hr", "/Hr", "/Day", "/Wk"});
-
     int const buyFromUtility(1);
     int const sellToUtility(2);
     int const netMetering(3);
@@ -274,10 +250,6 @@ namespace EconomicTariff {
 
     int topOfStack(0);
     int sizeStack(0);
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE
 
     // Object Data
     Array1D<EconVarType> econVar;
@@ -496,28 +468,28 @@ namespace EconomicTariff {
             if (tariff(iInObj).kindWaterMtr == kindMeterWater) {
                 // conversion factor
                 if (UtilityRoutines::SameString(cAlphaArgs(3), "USERDEFINED")) {
-                    tariff(iInObj).convChoice = conversionUSERDEF;
+                    tariff(iInObj).convChoice = iEconConv::USERDEF;
                     tariff(iInObj).energyConv = rNumericArgs(1); // energy conversion factor
                     tariff(iInObj).demandConv = rNumericArgs(2); // demand conversion factor
                 } else if (UtilityRoutines::SameString(cAlphaArgs(3), "M3")) {
-                    tariff(iInObj).convChoice = conversionM3;
+                    tariff(iInObj).convChoice = iEconConv::M3;
                     tariff(iInObj).energyConv = 1.0;
                     tariff(iInObj).demandConv = 3600.0;
                 } else if (UtilityRoutines::SameString(cAlphaArgs(3), "CCF")) {
-                    tariff(iInObj).convChoice = conversionCCF;
+                    tariff(iInObj).convChoice = iEconConv::CCF;
                     tariff(iInObj).energyConv = 0.35314666721488586;
                     tariff(iInObj).demandConv = 0.35314666721488586 * 3600;
                 } else if (UtilityRoutines::SameString(cAlphaArgs(3), "GAL")) {
-                    tariff(iInObj).convChoice = conversionGAL;
+                    tariff(iInObj).convChoice = iEconConv::GAL;
                     tariff(iInObj).energyConv = 264.1720523602524;
                     tariff(iInObj).demandConv = 264.1720523602524 * 3600;
                 } else if (UtilityRoutines::SameString(cAlphaArgs(3), "KGAL")) {
-                    tariff(iInObj).convChoice = conversionKGAL;
+                    tariff(iInObj).convChoice = iEconConv::KGAL;
                     tariff(iInObj).energyConv = 0.2641720523602524;
                     tariff(iInObj).demandConv = 0.2641720523602524 * 3600;
                 } else {
                     // ERROR: not a valid conversion, default to M3
-                    tariff(iInObj).convChoice = conversionM3;
+                    tariff(iInObj).convChoice = iEconConv::M3;
                     tariff(iInObj).energyConv = 1.0;
                     tariff(iInObj).demandConv = 3600.0;
                     ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid data");
@@ -529,29 +501,29 @@ namespace EconomicTariff {
                 // THERM is strange for an electric meter but currently I accept but issue a warning
             } else if (tariff(iInObj).kindElectricMtr != kindMeterNotElectric) {
                 if (UtilityRoutines::SameString(cAlphaArgs(3), "USERDEFINED")) {
-                    tariff(iInObj).convChoice = conversionUSERDEF;
+                    tariff(iInObj).convChoice = iEconConv::USERDEF;
                     tariff(iInObj).energyConv = rNumericArgs(1); // energy conversion factor
                     tariff(iInObj).demandConv = rNumericArgs(2); // demand conversion factor
                 } else if (UtilityRoutines::SameString(cAlphaArgs(3), "KWH")) {
-                    tariff(iInObj).convChoice = conversionKWH;
+                    tariff(iInObj).convChoice = iEconConv::KWH;
                     tariff(iInObj).energyConv = 0.0000002778;
                     tariff(iInObj).demandConv = 0.001;
                 } else if (UtilityRoutines::SameString(cAlphaArgs(3), "MJ")) {
-                    tariff(iInObj).convChoice = conversionMJ;
+                    tariff(iInObj).convChoice = iEconConv::MJ;
                     tariff(iInObj).energyConv = 0.000001;
                     tariff(iInObj).demandConv = 0.0036;
                 } else if (UtilityRoutines::SameString(cAlphaArgs(3), "MMBTU")) {
-                    tariff(iInObj).convChoice = conversionMMBTU;
+                    tariff(iInObj).convChoice = iEconConv::MMBTU;
                     tariff(iInObj).energyConv = 9.4781712e-10;
                     tariff(iInObj).demandConv = 0.000003412;
                 } else if (UtilityRoutines::SameString(cAlphaArgs(3), "KBTU")) {
-                    tariff(iInObj).convChoice = conversionKBTU;
+                    tariff(iInObj).convChoice = iEconConv::KBTU;
                     tariff(iInObj).energyConv = 9.4781712e-7;
                     tariff(iInObj).demandConv = 0.003412;
 
                     // We accept the following choices, but issue a warning
                 } else if (UtilityRoutines::SameString(cAlphaArgs(3), "THERM")) {
-                    tariff(iInObj).convChoice = conversionTHERM;
+                    tariff(iInObj).convChoice = iEconConv::THERM;
                     tariff(iInObj).energyConv = 9.4781712e-9;
                     tariff(iInObj).demandConv = 0.00003412;
                     ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" potentially invalid data");
@@ -559,7 +531,7 @@ namespace EconomicTariff {
 
                     // Otherwise, default to kWh
                 } else {
-                    tariff(iInObj).convChoice = conversionKWH;
+                    tariff(iInObj).convChoice = iEconConv::KWH;
                     tariff(iInObj).energyConv = 0.0000002778;
                     tariff(iInObj).demandConv = 0.001;
                     ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid data");
@@ -569,49 +541,49 @@ namespace EconomicTariff {
                 // If it's a gas meter
             } else if (tariff(iInObj).kindGasMtr == kindMeterGas) {
                 if (UtilityRoutines::SameString(cAlphaArgs(3), "USERDEFINED")) {
-                    tariff(iInObj).convChoice = conversionUSERDEF;
+                    tariff(iInObj).convChoice = iEconConv::USERDEF;
                     tariff(iInObj).energyConv = rNumericArgs(1); // energy conversion factor
                     tariff(iInObj).demandConv = rNumericArgs(2); // demand conversion factor
                 } else if (UtilityRoutines::SameString(cAlphaArgs(3), "KWH")) {
-                    tariff(iInObj).convChoice = conversionKWH;
+                    tariff(iInObj).convChoice = iEconConv::KWH;
                     tariff(iInObj).energyConv = 0.0000002778;
                     tariff(iInObj).demandConv = 0.001;
                 } else if (UtilityRoutines::SameString(cAlphaArgs(3), "THERM")) {
-                    tariff(iInObj).convChoice = conversionTHERM;
+                    tariff(iInObj).convChoice = iEconConv::THERM;
                     tariff(iInObj).energyConv = 9.4781712e-9;
                     tariff(iInObj).demandConv = 0.00003412;
                 } else if (UtilityRoutines::SameString(cAlphaArgs(3), "MMBTU")) {
-                    tariff(iInObj).convChoice = conversionMMBTU;
+                    tariff(iInObj).convChoice = iEconConv::MMBTU;
                     tariff(iInObj).energyConv = 9.4781712e-10;
                     tariff(iInObj).demandConv = 0.000003412;
                 } else if (UtilityRoutines::SameString(cAlphaArgs(3), "MJ")) {
-                    tariff(iInObj).convChoice = conversionMJ;
+                    tariff(iInObj).convChoice = iEconConv::MJ;
                     tariff(iInObj).energyConv = 0.000001;
                     tariff(iInObj).demandConv = 0.0036;
                 } else if (UtilityRoutines::SameString(cAlphaArgs(3), "KBTU")) {
-                    tariff(iInObj).convChoice = conversionKBTU;
+                    tariff(iInObj).convChoice = iEconConv::KBTU;
                     tariff(iInObj).energyConv = 9.4781712e-7;
                     tariff(iInObj).demandConv = 0.003412;
 
                     // Volumetric units for natural gas
                     // Actually assuming 1 therm = 1 CCF (= 100 ft^3)
                 } else if (UtilityRoutines::SameString(cAlphaArgs(3), "MCF")) {
-                    tariff(iInObj).convChoice = conversionMCF;
+                    tariff(iInObj).convChoice = iEconConv::MCF;
                     tariff(iInObj).energyConv = 9.4781712e-10;
                     tariff(iInObj).demandConv = 0.000003412;
                 } else if (UtilityRoutines::SameString(cAlphaArgs(3), "CCF")) {
-                    tariff(iInObj).convChoice = conversionCCF;
+                    tariff(iInObj).convChoice = iEconConv::CCF;
                     tariff(iInObj).energyConv = 9.4781712e-9;
                     tariff(iInObj).demandConv = 0.00003412;
                 } else if (UtilityRoutines::SameString(cAlphaArgs(3), "M3")) {
                     // Obtained from converting CCF above to m^3 so the same heat content of natural gas is used (1 therm = 1 CCF)
-                    tariff(iInObj).convChoice = conversionM3;
+                    tariff(iInObj).convChoice = iEconConv::M3;
                     tariff(iInObj).energyConv = 2.6839192e-10;
                     tariff(iInObj).demandConv = 9.6617081E-05;
 
                     // Otherwise, default to kWh
                 } else {
-                    tariff(iInObj).convChoice = conversionKWH;
+                    tariff(iInObj).convChoice = iEconConv::KWH;
                     tariff(iInObj).energyConv = 0.0000002778;
                     tariff(iInObj).demandConv = 0.001;
                     ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid data");
@@ -622,33 +594,33 @@ namespace EconomicTariff {
                 // because we cannot infer the heat content
             } else {
                 if (UtilityRoutines::SameString(cAlphaArgs(3), "USERDEFINED")) {
-                    tariff(iInObj).convChoice = conversionUSERDEF;
+                    tariff(iInObj).convChoice = iEconConv::USERDEF;
                     tariff(iInObj).energyConv = rNumericArgs(1); // energy conversion factor
                     tariff(iInObj).demandConv = rNumericArgs(2); // demand conversion factor
                 } else if (UtilityRoutines::SameString(cAlphaArgs(3), "KWH")) {
-                    tariff(iInObj).convChoice = conversionKWH;
+                    tariff(iInObj).convChoice = iEconConv::KWH;
                     tariff(iInObj).energyConv = 0.0000002778;
                     tariff(iInObj).demandConv = 0.001;
                 } else if (UtilityRoutines::SameString(cAlphaArgs(3), "THERM")) {
-                    tariff(iInObj).convChoice = conversionTHERM;
+                    tariff(iInObj).convChoice = iEconConv::THERM;
                     tariff(iInObj).energyConv = 9.4781712e-9;
                     tariff(iInObj).demandConv = 0.00003412;
                 } else if (UtilityRoutines::SameString(cAlphaArgs(3), "MMBTU")) {
-                    tariff(iInObj).convChoice = conversionMMBTU;
+                    tariff(iInObj).convChoice = iEconConv::MMBTU;
                     tariff(iInObj).energyConv = 9.4781712e-10;
                     tariff(iInObj).demandConv = 0.000003412;
                 } else if (UtilityRoutines::SameString(cAlphaArgs(3), "MJ")) {
-                    tariff(iInObj).convChoice = conversionMJ;
+                    tariff(iInObj).convChoice = iEconConv::MJ;
                     tariff(iInObj).energyConv = 0.000001;
                     tariff(iInObj).demandConv = 0.0036;
                 } else if (UtilityRoutines::SameString(cAlphaArgs(3), "KBTU")) {
-                    tariff(iInObj).convChoice = conversionKBTU;
+                    tariff(iInObj).convChoice = iEconConv::KBTU;
                     tariff(iInObj).energyConv = 9.4781712e-7;
                     tariff(iInObj).demandConv = 0.003412;
 
                     // Otherwise, default to kWh
                 } else {
-                    tariff(iInObj).convChoice = conversionKWH;
+                    tariff(iInObj).convChoice = iEconConv::KWH;
                     tariff(iInObj).energyConv = 0.0000002778;
                     tariff(iInObj).demandConv = 0.001;
                     ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid data");
@@ -699,7 +671,7 @@ namespace EconomicTariff {
                 {
                     auto const SELECT_CASE_var(state.dataGlobal->NumOfTimeStepInHour);
                     if ((SELECT_CASE_var == 1) || (SELECT_CASE_var == 3) || (SELECT_CASE_var == 5) || (SELECT_CASE_var == 15)) {
-                        tariff(iInObj).demandWindow = demandWindowHour;
+                        tariff(iInObj).demandWindow = iDemandWindow::Hour;
                         tariff(iInObj).demWinTime = 1.00;
                         ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid data");
                         ShowContinueError(
@@ -707,7 +679,7 @@ namespace EconomicTariff {
                             format("Demand window of QuarterHour is not consistent with number of timesteps per hour [{}].", state.dataGlobal->NumOfTimeStepInHour));
                         ShowContinueError(state, "Demand window will be set to FullHour, and the simulation continues.");
                     } else if ((SELECT_CASE_var == 2) || (SELECT_CASE_var == 6) || (SELECT_CASE_var == 10) || (SELECT_CASE_var == 30)) {
-                        tariff(iInObj).demandWindow = demandWindowHalf;
+                        tariff(iInObj).demandWindow = iDemandWindow::Half;
                         tariff(iInObj).demWinTime = 0.50;
                         ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid data");
                         ShowContinueError(
@@ -715,7 +687,7 @@ namespace EconomicTariff {
                             format("Demand window of QuarterHour is not consistent with number of timesteps per hour [{}].", state.dataGlobal->NumOfTimeStepInHour));
                         ShowContinueError(state, "Demand window will be set to HalfHour, and the simulation continues.");
                     } else if ((SELECT_CASE_var == 4) || (SELECT_CASE_var == 12) || (SELECT_CASE_var == 20) || (SELECT_CASE_var == 60)) {
-                        tariff(iInObj).demandWindow = demandWindowQuarter;
+                        tariff(iInObj).demandWindow = iDemandWindow::Quarter;
                         tariff(iInObj).demWinTime = 0.25;
                     }
                 }
@@ -723,7 +695,7 @@ namespace EconomicTariff {
                 {
                     auto const SELECT_CASE_var(state.dataGlobal->NumOfTimeStepInHour);
                     if ((SELECT_CASE_var == 1) || (SELECT_CASE_var == 3) || (SELECT_CASE_var == 5) || (SELECT_CASE_var == 15)) {
-                        tariff(iInObj).demandWindow = demandWindowHour;
+                        tariff(iInObj).demandWindow = iDemandWindow::Hour;
                         tariff(iInObj).demWinTime = 1.00;
                         ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid data");
                         ShowContinueError(
@@ -732,31 +704,31 @@ namespace EconomicTariff {
                         ShowContinueError(state, "Demand window will be set to FullHour, and the simulation continues.");
                     } else if ((SELECT_CASE_var == 2) || (SELECT_CASE_var == 4) || (SELECT_CASE_var == 6) || (SELECT_CASE_var == 10) ||
                                (SELECT_CASE_var == 12) || (SELECT_CASE_var == 20) || (SELECT_CASE_var == 30) || (SELECT_CASE_var == 60)) {
-                        tariff(iInObj).demandWindow = demandWindowHalf;
+                        tariff(iInObj).demandWindow = iDemandWindow::Half;
                         tariff(iInObj).demWinTime = 0.50;
                     }
                 }
             } else if (UtilityRoutines::SameString(cAlphaArgs(7), "FullHour")) {
-                tariff(iInObj).demandWindow = demandWindowHour;
+                tariff(iInObj).demandWindow = iDemandWindow::Hour;
                 tariff(iInObj).demWinTime = 1.00;
             } else if (UtilityRoutines::SameString(cAlphaArgs(7), "Day")) {
-                tariff(iInObj).demandWindow = demandWindowDay;
+                tariff(iInObj).demandWindow = iDemandWindow::Day;
                 tariff(iInObj).demWinTime = 24.00;
             } else if (UtilityRoutines::SameString(cAlphaArgs(7), "Week")) {
-                tariff(iInObj).demandWindow = demandWindowWeek;
+                tariff(iInObj).demandWindow = iDemandWindow::Week;
                 tariff(iInObj).demWinTime = 24.0 * 7.0;
             } else {
                 // if not entered default to the same logic as quarter of an hour
                 {
                     auto const SELECT_CASE_var(state.dataGlobal->NumOfTimeStepInHour);
                     if ((SELECT_CASE_var == 1) || (SELECT_CASE_var == 3) || (SELECT_CASE_var == 5) || (SELECT_CASE_var == 15)) {
-                        tariff(iInObj).demandWindow = demandWindowHour;
+                        tariff(iInObj).demandWindow = iDemandWindow::Hour;
                         tariff(iInObj).demWinTime = 1.00;
                     } else if ((SELECT_CASE_var == 2) || (SELECT_CASE_var == 6) || (SELECT_CASE_var == 10) || (SELECT_CASE_var == 30)) {
-                        tariff(iInObj).demandWindow = demandWindowHalf;
+                        tariff(iInObj).demandWindow = iDemandWindow::Half;
                         tariff(iInObj).demWinTime = 0.50;
                     } else if ((SELECT_CASE_var == 4) || (SELECT_CASE_var == 12) || (SELECT_CASE_var == 20) || (SELECT_CASE_var == 60)) {
-                        tariff(iInObj).demandWindow = demandWindowQuarter;
+                        tariff(iInObj).demandWindow = iDemandWindow::Quarter;
                         tariff(iInObj).demWinTime = 0.25;
                     }
                 }
@@ -4050,15 +4022,15 @@ namespace EconomicTariff {
         std::string distCoolTariffNames;
         std::string distHeatTariffNames;
         std::string othrTariffNames;
-        int elecUnits;
-        int gasUnits;
-        int distCoolUnits;
-        int distHeatUnits;
-        int othrUnits;
-        int gasDemWindowUnits;
-        int distCoolDemWindowUnits;
-        int distHeatDemWindowUnits;
-        int othrDemWindowUnits;
+        iEconConv elecUnits;
+        iEconConv gasUnits;
+        iEconConv distCoolUnits;
+        iEconConv distHeatUnits;
+        iEconConv othrUnits;
+        iDemandWindow gasDemWindowUnits;
+        iDemandWindow distCoolDemWindowUnits;
+        iDemandWindow distHeatDemWindowUnits;
+        iDemandWindow othrDemWindowUnits;
         int iTariff;
 
         if (numTariff > 0) {
@@ -4077,13 +4049,13 @@ namespace EconomicTariff {
             distHeatTotalCost = 0.0;
             otherTotalCost = 0.0;
             allTotalCost = 0.0;
-            elecUnits = 0;
-            gasUnits = 0;
-            distCoolUnits = 0;
-            distHeatUnits = 0;
-            othrUnits = 0;
-            gasDemWindowUnits = 0;
-            othrDemWindowUnits = 0;
+            elecUnits = iEconConv::USERDEF;
+            gasUnits = iEconConv::USERDEF;
+            distCoolUnits = iEconConv::USERDEF;
+            distHeatUnits = iEconConv::USERDEF;
+            othrUnits = iEconConv::USERDEF;
+            gasDemWindowUnits = iDemandWindow::Unassigned;
+            othrDemWindowUnits = iDemandWindow::Unassigned;
             elecTariffNames = "";
             gasTariffNames = "";
             distCoolTariffNames = "";
@@ -4135,12 +4107,12 @@ namespace EconomicTariff {
             if (gasTotalEne != 0) PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsVirt, "Natural Gas", gasTotalCost / gasTotalEne, 3);
             if (otherTotalEne != 0) PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsVirt, "Other", otherTotalCost / otherTotalEne, 3);
             // units
-            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsEneUnt, "Electricity", convEneStrings(elecUnits));
-            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsEneUnt, "Natural Gas", convEneStrings(gasUnits));
-            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsEneUnt, "Other", convEneStrings(othrUnits));
-            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsDemUnt, "Electricity", convDemStrings(elecUnits));
-            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsDemUnt, "Natural Gas", convDemStrings(gasUnits) + demWindowStrings(gasDemWindowUnits));
-            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsDemUnt, "Other", convDemStrings(othrUnits) + demWindowStrings(othrDemWindowUnits));
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsEneUnt, "Electricity", format("{}", convEneStrings(elecUnits)));
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsEneUnt, "Natural Gas", format("{}", convEneStrings(gasUnits)));
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsEneUnt, "Other", format("{}", convEneStrings(othrUnits)));
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsDemUnt, "Electricity", format("{}", convDemStrings(elecUnits)));
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsDemUnt, "Natural Gas", format("{}{}", convDemStrings(gasUnits), demWindowStrings(gasDemWindowUnits)));
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsDemUnt, "Other", format("{}{}", convDemStrings(othrUnits), demWindowStrings(othrDemWindowUnits)));
             // total cost
             PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEcsTotal, "Electricity", elecTotalCost, 2);
             PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEcsTotal, "Natural Gas", gasTotalCost, 2);
@@ -4148,14 +4120,14 @@ namespace EconomicTariff {
             // show district energy if used
             if (distCoolTotalEne != 0) {
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsVirt, "District Cooling", distCoolTotalCost / distCoolTotalEne, 3);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsEneUnt, "District Cooling", convEneStrings(distCoolUnits));
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsDemUnt, "District Cooling", convDemStrings(distCoolUnits) + demWindowStrings(distCoolDemWindowUnits));
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsEneUnt, "District Cooling", format("{}", convEneStrings(distCoolUnits)));
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsDemUnt, "District Cooling", format("{}{}", convDemStrings(distCoolUnits), demWindowStrings(distCoolDemWindowUnits)));
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEcsTotal, "District Cooling", distCoolTotalCost, 2);
             }
             if (distHeatTotalEne != 0) {
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsVirt, "District Heating", distHeatTotalCost / distHeatTotalEne, 3);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsEneUnt, "District Heating", convEneStrings(distHeatUnits));
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsDemUnt, "District Heating", convDemStrings(distHeatUnits) + demWindowStrings(distHeatDemWindowUnits));
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsEneUnt, "District Heating", format("{}", convEneStrings(distHeatUnits)));
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsDemUnt, "District Heating", format("{}{}", convDemStrings(distHeatUnits), demWindowStrings(distHeatDemWindowUnits)));
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEcsTotal, "District Heating", distHeatTotalCost, 2);
             }
             // save the total costs for later to compute process fraction
@@ -4405,21 +4377,21 @@ namespace EconomicTariff {
                     }
                     {
                         auto const SELECT_CASE_var(tariff(iTariff).convChoice);
-                        if (SELECT_CASE_var == conversionUSERDEF) {
+                        if (SELECT_CASE_var == iEconConv::USERDEF) {
                             tableBody(1, 7) = "User Defined";
-                        } else if (SELECT_CASE_var == conversionKWH) {
+                        } else if (SELECT_CASE_var == iEconConv::KWH) {
                             tableBody(1, 7) = "kWh";
-                        } else if (SELECT_CASE_var == conversionTHERM) {
+                        } else if (SELECT_CASE_var == iEconConv::THERM) {
                             tableBody(1, 7) = "Therm";
-                        } else if (SELECT_CASE_var == conversionMMBTU) {
+                        } else if (SELECT_CASE_var == iEconConv::MMBTU) {
                             tableBody(1, 7) = "MMBtu";
-                        } else if (SELECT_CASE_var == conversionMJ) {
+                        } else if (SELECT_CASE_var == iEconConv::MJ) {
                             tableBody(1, 7) = "MJ";
-                        } else if (SELECT_CASE_var == conversionKBTU) {
+                        } else if (SELECT_CASE_var == iEconConv::KBTU) {
                             tableBody(1, 7) = "kBtu";
-                        } else if (SELECT_CASE_var == conversionMCF) {
+                        } else if (SELECT_CASE_var == iEconConv::MCF) {
                             tableBody(1, 7) = "MCF";
-                        } else if (SELECT_CASE_var == conversionCCF) {
+                        } else if (SELECT_CASE_var == iEconConv::CCF) {
                             tableBody(1, 7) = "CCF";
                         }
                     }

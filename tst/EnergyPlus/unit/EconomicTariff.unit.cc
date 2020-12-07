@@ -197,7 +197,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GetInput_Test)
     // tariff
     EXPECT_EQ(1, numTariff);
     EXPECT_EQ("EXAMPLEFMC", tariff(1).tariffName);
-    EXPECT_EQ(conversionKWH, tariff(1).convChoice);
+    EXPECT_EQ(iEconConv::KWH, tariff(1).convChoice);
     EXPECT_EQ(37.75, tariff(1).monthChgVal);
 
     // qualify
@@ -276,7 +276,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_Water_DefaultConv_Test)
     EXPECT_EQ(kindMeterNotGas, tariff(1).kindGasMtr);
 
     // Check that if defaults the conversion choice correctly
-    EXPECT_EQ(conversionM3, tariff(1).convChoice);
+    EXPECT_EQ(iEconConv::M3, tariff(1).convChoice);
     EXPECT_EQ(1, tariff(1).energyConv);
     EXPECT_EQ(3600, tariff(1).demandConv);
     EXPECT_EQ(10, tariff(1).monthChgVal);
@@ -318,7 +318,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_Water_CCF_Test)
     EXPECT_EQ(kindMeterNotGas, tariff(1).kindGasMtr);
 
     // Check conversion choice
-    EXPECT_EQ(conversionCCF, tariff(1).convChoice);
+    EXPECT_EQ(iEconConv::CCF, tariff(1).convChoice);
     ASSERT_FLOAT_EQ(0.35314666721488586, tariff(1).energyConv);
 }
 
@@ -359,7 +359,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_Gas_CCF_Test)
 
     // Check conversion choice
 
-    EXPECT_EQ(conversionCCF, tariff(1).convChoice);
+    EXPECT_EQ(iEconConv::CCF, tariff(1).convChoice);
     ASSERT_FLOAT_EQ(9.4781712e-9, tariff(1).energyConv);
 }
 
@@ -400,7 +400,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_Electric_CCF_Test)
     EXPECT_EQ(kindMeterNotGas, tariff(1).kindGasMtr);
 
     // Check conversion choice, should force back to kWh
-    EXPECT_EQ(conversionKWH, tariff(1).convChoice);
+    EXPECT_EQ(iEconConv::KWH, tariff(1).convChoice);
     ASSERT_FLOAT_EQ(0.0000002778, tariff(1).energyConv);
     ASSERT_FLOAT_EQ(0.001, tariff(1).demandConv);
 }
@@ -601,7 +601,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GatherForEconomics)
     // tariff
     EXPECT_EQ(1, EconomicTariff::numTariff);
     EXPECT_EQ("SEASONAL_TARIFF", EconomicTariff::tariff(1).tariffName);
-    EXPECT_EQ(conversionKWH, EconomicTariff::tariff(1).convChoice);
+    EXPECT_EQ(iEconConv::KWH, EconomicTariff::tariff(1).convChoice);
     EXPECT_EQ(0, EconomicTariff::tariff(1).monthChgVal);
     EXPECT_EQ("ELECTRICITY SEASON SCHEDULE", EconomicTariff::tariff(1).seasonSchedule);
 
