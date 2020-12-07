@@ -72,9 +72,7 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
-namespace EnergyPlus {
-
-namespace EconomicTariff {
+namespace EnergyPlus::EconomicTariff {
 
     // MODULE INFORMATION:
     //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
@@ -83,173 +81,6 @@ namespace EconomicTariff {
     //    Compute utility bills for a building based on energy
     //    use estimate.
     using ScheduleManager::GetScheduleIndex;
-
-    // ECONOMCIS:TARIFF enumerated lists
-    int const buyFromUtility(1);
-    int const sellToUtility(2);
-    int const netMetering(3);
-
-    // For several different objects that reference seasons
-    int const seasonWinter(1);
-    int const seasonSpring(2);
-    int const seasonSummer(3);
-    int const seasonFall(4);
-    int const seasonAnnual(5);
-    int const seasonMonthly(6);
-
-    // For AssignVariablePt
-    int const varIsArgument(1); // if used as a value or on right side of expression
-    int const varIsAssigned(2); // if variable is assigned to or on left side of expression
-
-    // For ComputeSteps
-    // All are negative because all variables are positive
-    int const opSUM(-1);
-    int const opMULTIPLY(-2);
-    int const opSUBTRACT(-3);
-    int const opDIVIDE(-4);
-    int const opABSOLUTE(-5);
-    int const opINTEGER(-6);
-    int const opSIGN(-7);
-    int const opROUND(-8);
-    int const opMAXIMUM(-9);
-    int const opMINIMUM(-10);
-    int const opEXCEEDS(-11);
-    int const opANNUALMINIMUM(-12);
-    int const opANNUALMAXIMUM(-13);
-    int const opANNUALSUM(-14);
-    int const opANNUALAVERAGE(-15);
-    int const opANNUALOR(-16);
-    int const opANNUALAND(-17);
-    int const opANNUALMAXIMUMZERO(-18);
-    int const opANNUALMINIMUMZERO(-19);
-    int const opIF(-20);
-    int const opGREATERTHAN(-21);
-    int const opGREATEREQUAL(-22);
-    int const opLESSTHAN(-23);
-    int const opLESSEQUAL(-24);
-    int const opEQUAL(-25);
-    int const opNOTEQUAL(-26);
-    int const opAND(-27);
-    int const opOR(-28);
-    int const opNOT(-29);
-    int const opADD(-30);
-    int const opNOOP(-31); // no operation - just list the operand variables - shown as FROM
-
-    // not predefined variable (user defined name - many variables and all objects)
-    // used in econvar%specific
-    int const varUserDefined(1);
-    int const varNotYetDefined(2);
-
-    // category variables (used in econvar%specific)
-    int const catEnergyCharges(11);
-    int const catDemandCharges(12);
-    int const catServiceCharges(13);
-    int const catBasis(14);
-    int const catAdjustment(15);
-    int const catSurcharge(16);
-    int const catSubtotal(17);
-    int const catTaxes(18);
-    int const catTotal(19);
-    int const catNotIncluded(20);
-
-    // native variables (based on energy and demands from the simulation) used in econvar%specific
-    int const nativeTotalEnergy(101);
-    int const nativeTotalDemand(102);
-    int const nativePeakEnergy(103);
-    int const nativePeakDemand(104);
-    int const nativeShoulderEnergy(105);
-    int const nativeShoulderDemand(106);
-    int const nativeOffPeakEnergy(107);
-    int const nativeOffPeakDemand(108);
-    int const nativeMidPeakEnergy(109);
-    int const nativeMidPeakDemand(110);
-    int const nativePeakExceedsOffPeak(111);
-    int const nativeOffPeakExceedsPeak(112);
-    int const nativePeakExceedsMidPeak(113);
-    int const nativeMidPeakExceedsPeak(114);
-    int const nativePeakExceedsShoulder(115);
-    int const nativeShoulderExceedsPeak(116);
-    int const nativeIsWinter(117);
-    int const nativeIsNotWinter(118);
-    int const nativeIsSpring(119);
-    int const nativeIsNotSpring(120);
-    int const nativeIsSummer(121);
-    int const nativeIsNotSummer(122);
-    int const nativeIsAutumn(123);
-    int const nativeIsNotAutumn(124);
-
-    int const nativePeakAndShoulderEnergy(125);
-    int const nativePeakAndShoulderDemand(126);
-    int const nativePeakAndMidPeakEnergy(127);
-    int const nativePeakAndMidPeakDemand(128);
-    int const nativeShoulderAndOffPeakEnergy(129);
-    int const nativeShoulderAndOffPeakDemand(130);
-    int const nativePeakAndOffPeakEnergy(131);
-    int const nativePeakAndOffPeakDemand(132);
-
-    int const nativeRealTimePriceCosts(133);
-    int const nativeAboveCustomerBaseCosts(134);
-    int const nativeBelowCustomerBaseCosts(135);
-    int const nativeAboveCustomerBaseEnergy(136);
-    int const nativeBelowCustomerBaseEnergy(137);
-
-    int const countPeriod(4);
-    int const MaxNumMonths(12);
-    int const maxNumBlk(15);
-
-    int const periodPeak(1);
-    int const periodShoulder(2);
-    int const periodOffPeak(3);
-    int const periodMidPeak(4);
-
-    int const kindMeterNotElectric(0); // must be zero because testing of >0 done later.
-    int const kindMeterElecSimple(1);
-    int const kindMeterElecProduced(2);
-    int const kindMeterElecPurchased(3);
-    int const kindMeterElecSurplusSold(4);
-    int const kindMeterElecNet(5);
-
-    int const kindMeterNotWater(0);
-    int const kindMeterWater(1);
-
-    int const kindMeterNotGas(0);
-    int const kindMeterGas(1);
-
-    int const varUnitTypeEnergy(1);
-    int const varUnitTypeDemand(2);
-    int const varUnitTypeDimensionless(3);
-    int const varUnitTypeCurrency(4);
-
-    // MODULE PARAMETER DEFINITIONS:
-
-    int numEconVar(0);
-    int sizeEconVar(0);
-
-    // holds the outbound connections for each variable
-    Array1D_int operand; // sized to sizeOperand
-    int numOperand(0);
-    int sizeOperand(0);
-
-    int numTariff(0);
-
-    int numQualify(0);
-
-    int numChargeSimple(0);
-
-    int numChargeBlock(0);
-
-    int numRatchet(0);
-
-    int numComputation(0);
-
-    // list of pointers to variable, 0 end of line, negative indicate operations
-    Array1D_int steps;
-    Array1D_int stepsCopy;
-    int numSteps(0);
-    int sizeSteps(0);
-
-    int topOfStack(0);
-    int sizeStack(0);
 
     // Object Data
     Array1D<EconVarType> econVar;
@@ -297,7 +128,7 @@ namespace EconomicTariff {
             GetInputEconomicsTariff(state, ErrorsFound);
             // do rest of GetInput only if at least one tariff is defined.
             GetInputEconomicsCurrencyType(state, ErrorsFound);
-            if (numTariff >= 1) {
+            if (state.dataEconTariff->numTariff >= 1) {
                 if (!ErrorsFound && displayEconomicResultSummary) AddTOCEntry("Economics Results Summary Report", "Entire Facility");
                 CreateCategoryNativeVariables(state);
                 GetInputEconomicsQualify(state, ErrorsFound);
@@ -362,9 +193,9 @@ namespace EconomicTariff {
         std::string CurrentModuleObject; // for ease in renaming.
 
         CurrentModuleObject = "UtilityCost:Tariff";
-        numTariff = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-        tariff.allocate(numTariff);
-        for (iInObj = 1; iInObj <= numTariff; ++iInObj) {
+        state.dataEconTariff->numTariff = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        tariff.allocate(state.dataEconTariff->numTariff);
+        for (iInObj = 1; iInObj <= state.dataEconTariff->numTariff; ++iInObj) {
             inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           iInObj,
@@ -824,9 +655,9 @@ namespace EconomicTariff {
         std::string CurrentModuleObject; // for ease in renaming.
 
         CurrentModuleObject = "UtilityCost:Qualify";
-        numQualify = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-        qualify.allocate(numQualify);
-        for (iInObj = 1; iInObj <= numQualify; ++iInObj) {
+        state.dataEconTariff->numQualify = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        qualify.allocate(state.dataEconTariff->numQualify);
+        for (iInObj = 1; iInObj <= state.dataEconTariff->numQualify; ++iInObj) {
             inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           iInObj,
@@ -906,9 +737,9 @@ namespace EconomicTariff {
         std::string CurrentModuleObject; // for ease in renaming.
 
         CurrentModuleObject = "UtilityCost:Charge:Simple";
-        numChargeSimple = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-        chargeSimple.allocate(numChargeSimple);
-        for (iInObj = 1; iInObj <= numChargeSimple; ++iInObj) {
+        state.dataEconTariff->numChargeSimple = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        chargeSimple.allocate(state.dataEconTariff->numChargeSimple);
+        for (iInObj = 1; iInObj <= state.dataEconTariff->numChargeSimple; ++iInObj) {
             inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           iInObj,
@@ -981,9 +812,9 @@ namespace EconomicTariff {
 
         CurrentModuleObject = "UtilityCost:Charge:Block";
         hugeNumber = HUGE_(hugeNumber);
-        numChargeBlock = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-        chargeBlock.allocate(numChargeBlock);
-        for (iInObj = 1; iInObj <= numChargeBlock; ++iInObj) {
+        state.dataEconTariff->numChargeBlock = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        chargeBlock.allocate(state.dataEconTariff->numChargeBlock);
+        for (iInObj = 1; iInObj <= state.dataEconTariff->numChargeBlock; ++iInObj) {
             inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           iInObj,
@@ -1080,9 +911,9 @@ namespace EconomicTariff {
         std::string CurrentModuleObject; // for ease in renaming.
 
         CurrentModuleObject = "UtilityCost:Ratchet";
-        numRatchet = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-        ratchet.allocate(numRatchet);
-        for (iInObj = 1; iInObj <= numRatchet; ++iInObj) {
+        state.dataEconTariff->numRatchet = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        ratchet.allocate(state.dataEconTariff->numRatchet);
+        for (iInObj = 1; iInObj <= state.dataEconTariff->numRatchet; ++iInObj) {
             inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           iInObj,
@@ -1224,8 +1055,8 @@ namespace EconomicTariff {
         std::string CurrentModuleObject; // for ease in renaming.
 
         CurrentModuleObject = "UtilityCost:Computation";
-        numComputation = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-        computation.allocate(numTariff); // not the number of Computations but the number of tariffs
+        state.dataEconTariff->numComputation = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        computation.allocate(state.dataEconTariff->numTariff); // not the number of Computations but the number of tariffs
         // set default values for computation
         for (auto &e : computation) {
             e.computeName.clear();
@@ -1233,7 +1064,7 @@ namespace EconomicTariff {
             e.lastStep = -1;
             e.isUserDef = false;
         }
-        for (iInObj = 1; iInObj <= numComputation; ++iInObj) {
+        for (iInObj = 1; iInObj <= state.dataEconTariff->numComputation; ++iInObj) {
             inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           iInObj,
@@ -1257,13 +1088,13 @@ namespace EconomicTariff {
             warnIfNativeVarname(state, cAlphaArgs(1), tariffPt, ErrorsFound, CurrentModuleObject);
             // tariff and computation share the same index, the tariff index
             // so all references are to the tariffPt
-            if (isWithinRange(state, tariffPt, 1, numTariff)) {
+            if (isWithinRange(state, tariffPt, 1, state.dataEconTariff->numTariff)) {
                 computation(tariffPt).computeName = cAlphaArgs(1);
-                computation(tariffPt).firstStep = numSteps + 1;
+                computation(tariffPt).firstStep = state.dataEconTariff->numSteps + 1;
                 for (jLine = 3; jLine <= NumAlphas; ++jLine) {
                     parseComputeLine(state, cAlphaArgs(jLine), tariffPt);
                 }
-                computation(tariffPt).lastStep = numSteps;
+                computation(tariffPt).lastStep = state.dataEconTariff->numSteps;
                 // check to make sure that some steps were defined
                 if (computation(tariffPt).firstStep >= computation(tariffPt).lastStep) {
                     computation(tariffPt).firstStep = 0;
@@ -1374,12 +1205,12 @@ namespace EconomicTariff {
                 ShowWarningError(state, "In UtilityCost:Computation line: " + lineOfCompute);
                 ShowContinueError(state, "  Do not recognize: " + word + " Will skip.");
             } else {
-                incrementSteps();
-                steps(numSteps) = token;
+                incrementSteps(state);
+                state.dataEconTariff->steps(state.dataEconTariff->numSteps) = token;
             }
         }
-        incrementSteps();
-        steps(numSteps) = 0; // at the end of the line show a zero to clear the stack
+        incrementSteps(state);
+        state.dataEconTariff->steps(state.dataEconTariff->numSteps) = 0; // at the end of the line show a zero to clear the stack
     }
 
     void GetLastWord(std::string const &lineOfText, std::string::size_type &endOfScan, std::string &aWord)
@@ -1847,7 +1678,7 @@ namespace EconomicTariff {
         int found;
 
         found = 0;
-        for (iTariff = 1; iTariff <= numTariff; ++iTariff) {
+        for (iTariff = 1; iTariff <= state.dataEconTariff->numTariff; ++iTariff) {
             if (UtilityRoutines::SameString(nameOfTariff, tariff(iTariff).tariffName)) {
                 found = iTariff;
                 break;
@@ -1923,7 +1754,7 @@ namespace EconomicTariff {
         if (UtilityRoutines::SameString(objName, "Total")) throwError = true;
         if (throwError) {
             ErrorsFound = true;
-            if (curTariffIndex >= 1 && curTariffIndex <= numTariff) {
+            if (curTariffIndex >= 1 && curTariffIndex <= state.dataEconTariff->numTariff) {
                 ShowSevereError(state, "UtilityCost:Tariff=\"" + tariff(curTariffIndex).tariffName + "\" invalid referenced name");
                 ShowContinueError(state, curobjName + "=\"" + objName + "\" You cannot name an object using the same name as a native variable.");
             } else {
@@ -1959,7 +1790,7 @@ namespace EconomicTariff {
             inNoSpaces = RemoveSpaces(state, stringIn);
             found = 0;
             if (allocated(econVar)) {
-                for (iVar = 1; iVar <= numEconVar; ++iVar) {
+                for (iVar = 1; iVar <= state.dataEconTariff->numEconVar; ++iVar) {
                     if (econVar(iVar).tariffIndx == tariffPt) {
                         if (UtilityRoutines::SameString(econVar(iVar).name, inNoSpaces)) {
                             found = iVar;
@@ -1975,11 +1806,11 @@ namespace EconomicTariff {
                     if (econVar(found).index == 0) econVar(found).index = objIndex;
                 }
             } else {
-                incrementEconVar();
-                econVar(numEconVar).name = inNoSpaces;
-                econVar(numEconVar).kindOfObj = econObjKind;
-                econVar(numEconVar).index = objIndex;
-                AssignVariablePt = numEconVar;
+                incrementEconVar(state);
+                econVar(state.dataEconTariff->numEconVar).name = inNoSpaces;
+                econVar(state.dataEconTariff->numEconVar).kindOfObj = econObjKind;
+                econVar(state.dataEconTariff->numEconVar).index = objIndex;
+                AssignVariablePt = state.dataEconTariff->numEconVar;
             }
             // now set the flag for the type of usage the variable has
             if (useOfVar == varIsArgument) {
@@ -2000,7 +1831,7 @@ namespace EconomicTariff {
         return AssignVariablePt;
     }
 
-    void incrementEconVar()
+    void incrementEconVar(EnergyPlusData &state)
     {
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   May 2004
@@ -2011,36 +1842,36 @@ namespace EconomicTariff {
 
         if (!allocated(econVar)) {
             econVar.allocate(sizeIncrement);
-            sizeEconVar = sizeIncrement;
-            numEconVar = 1;
+            state.dataEconTariff->sizeEconVar = sizeIncrement;
+            state.dataEconTariff->numEconVar = 1;
         } else {
-            ++numEconVar;
+            ++state.dataEconTariff->numEconVar;
             // if larger than current size grow the array
-            if (numEconVar > sizeEconVar) {
-                econVar.redimension(sizeEconVar += sizeIncrement);
+            if (state.dataEconTariff->numEconVar > state.dataEconTariff->sizeEconVar) {
+                econVar.redimension(state.dataEconTariff->sizeEconVar += sizeIncrement);
             }
         }
         // initialize new record) //Autodesk Most of these match default initialization so not needed
-        econVar(numEconVar).name = "";
-        econVar(numEconVar).tariffIndx = 0;
-        econVar(numEconVar).kindOfObj = iEconVarObjType::Unknown;
-        econVar(numEconVar).index = 0;
-        econVar(numEconVar).values = 0.0;
-        econVar(numEconVar).isArgument = false;
-        econVar(numEconVar).isAssigned = false;
-        econVar(numEconVar).specific = varNotYetDefined;
+        econVar(state.dataEconTariff->numEconVar).name = "";
+        econVar(state.dataEconTariff->numEconVar).tariffIndx = 0;
+        econVar(state.dataEconTariff->numEconVar).kindOfObj = iEconVarObjType::Unknown;
+        econVar(state.dataEconTariff->numEconVar).index = 0;
+        econVar(state.dataEconTariff->numEconVar).values = 0.0;
+        econVar(state.dataEconTariff->numEconVar).isArgument = false;
+        econVar(state.dataEconTariff->numEconVar).isAssigned = false;
+        econVar(state.dataEconTariff->numEconVar).specific = varNotYetDefined;
         //		econVar( numEconVar ).values = 0.0; //Autodesk Already initialized above
         // Autodesk Don't initialize cntMeDependOn
-        econVar(numEconVar).Operator = 0;
-        econVar(numEconVar).firstOperand = 1; // Autodesk Default initialization sets this to 0
-        econVar(numEconVar).lastOperand = 0;
-        econVar(numEconVar).activeNow = false;
-        econVar(numEconVar).isEvaluated = false;
+        econVar(state.dataEconTariff->numEconVar).Operator = 0;
+        econVar(state.dataEconTariff->numEconVar).firstOperand = 1; // Autodesk Default initialization sets this to 0
+        econVar(state.dataEconTariff->numEconVar).lastOperand = 0;
+        econVar(state.dataEconTariff->numEconVar).activeNow = false;
+        econVar(state.dataEconTariff->numEconVar).isEvaluated = false;
         // Autodesk Don't initialize isReported
         // Autodesk Don't initialize varUnitType
     }
 
-    void incrementSteps()
+    void incrementSteps(EnergyPlusData &state)
     {
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   June 2004
@@ -2050,19 +1881,19 @@ namespace EconomicTariff {
 
         int const sizeIncrement(100);
 
-        if (!allocated(steps)) {
-            steps.allocate(sizeIncrement);
-            sizeSteps = sizeIncrement;
-            numSteps = 1;
+        if (!allocated(state.dataEconTariff->steps)) {
+            state.dataEconTariff->steps.allocate(sizeIncrement);
+            state.dataEconTariff->sizeSteps = sizeIncrement;
+            state.dataEconTariff->numSteps = 1;
         } else {
-            ++numSteps;
+            ++state.dataEconTariff->numSteps;
             // if larger than current size grow the array
-            if (numSteps > sizeSteps) {
-                steps.redimension(sizeSteps += sizeIncrement);
+            if (state.dataEconTariff->numSteps > state.dataEconTariff->sizeSteps) {
+                state.dataEconTariff->steps.redimension(state.dataEconTariff->sizeSteps += sizeIncrement);
             }
         }
         // initialize new record
-        steps(numSteps) = 0;
+        state.dataEconTariff->steps(state.dataEconTariff->numSteps) = 0;
     }
 
     std::string RemoveSpaces(EnergyPlusData &state, std::string const &StringIn)
@@ -2098,10 +1929,10 @@ namespace EconomicTariff {
 
         int iTariff;
 
-        for (iTariff = 1; iTariff <= numTariff; ++iTariff) {
+        for (iTariff = 1; iTariff <= state.dataEconTariff->numTariff; ++iTariff) {
             // category variables first
             tariff(iTariff).ptEnergyCharges = AssignVariablePt(state, "EnergyCharges", true, varIsAssigned, catEnergyCharges, iEconVarObjType::Category, 0, iTariff);
-            tariff(iTariff).firstCategory = numEconVar;
+            tariff(iTariff).firstCategory = state.dataEconTariff->numEconVar;
             tariff(iTariff).ptDemandCharges = AssignVariablePt(state, "DemandCharges", true, varIsAssigned, catDemandCharges, iEconVarObjType::Category, 0, iTariff);
             tariff(iTariff).ptServiceCharges = AssignVariablePt(state, "ServiceCharges", true, varIsAssigned, catServiceCharges, iEconVarObjType::Category, 0, iTariff);
             tariff(iTariff).ptBasis = AssignVariablePt(state, "Basis", true, varIsAssigned, catBasis, iEconVarObjType::Category, 0, iTariff);
@@ -2111,10 +1942,10 @@ namespace EconomicTariff {
             tariff(iTariff).ptTaxes = AssignVariablePt(state, "Taxes", true, varIsAssigned, catTaxes, iEconVarObjType::Category, 0, iTariff);
             tariff(iTariff).ptTotal = AssignVariablePt(state, "Total", true, varIsAssigned, catTotal, iEconVarObjType::Category, 0, iTariff);
             tariff(iTariff).ptNotIncluded = AssignVariablePt(state, "NotIncluded", true, varIsAssigned, catNotIncluded, iEconVarObjType::Category, 0, iTariff);
-            tariff(iTariff).lastCategory = numEconVar;
+            tariff(iTariff).lastCategory = state.dataEconTariff->numEconVar;
             // category variables first
             tariff(iTariff).nativeTotalEnergy = AssignVariablePt(state, "TotalEnergy", true, varIsArgument, nativeTotalEnergy, iEconVarObjType::Native, 0, iTariff);
-            tariff(iTariff).firstNative = numEconVar;
+            tariff(iTariff).firstNative = state.dataEconTariff->numEconVar;
             tariff(iTariff).nativeTotalDemand = AssignVariablePt(state, "TotalDemand", true, varIsArgument, nativeTotalDemand, iEconVarObjType::Native, 0, iTariff);
             tariff(iTariff).nativePeakEnergy = AssignVariablePt(state, "PeakEnergy", true, varIsArgument, nativePeakEnergy, iEconVarObjType::Native, 0, iTariff);
             tariff(iTariff).nativePeakDemand = AssignVariablePt(state, "PeakDemand", true, varIsArgument, nativePeakDemand, iEconVarObjType::Native, 0, iTariff);
@@ -2173,7 +2004,7 @@ namespace EconomicTariff {
                 AssignVariablePt(state, "AboveCustomerBaseEnergy", true, varIsArgument, nativeAboveCustomerBaseEnergy, iEconVarObjType::Native, 0, iTariff);
             tariff(iTariff).nativeBelowCustomerBaseEnergy =
                 AssignVariablePt(state, "BelowCustomerBaseEnergy", true, varIsArgument, nativeBelowCustomerBaseEnergy, iEconVarObjType::Native, 0, iTariff);
-            tariff(iTariff).lastNative = numEconVar;
+            tariff(iTariff).lastNative = state.dataEconTariff->numEconVar;
         }
     }
 
@@ -2375,10 +2206,10 @@ namespace EconomicTariff {
         int remainPt;
 
         // for each tariff that does not have a UtilityCost:Computation object go through the variables
-        for (iTariff = 1; iTariff <= numTariff; ++iTariff) {
+        for (iTariff = 1; iTariff <= state.dataEconTariff->numTariff; ++iTariff) {
             if (!computation(iTariff).isUserDef) {
                 // clear all variables so that they are not active
-                for (jVar = 1; jVar <= numEconVar; ++jVar) {
+                for (jVar = 1; jVar <= state.dataEconTariff->numEconVar; ++jVar) {
                     econVar(jVar).activeNow = false;
                 }
                 // make all native variables active
@@ -2386,7 +2217,7 @@ namespace EconomicTariff {
                     econVar(jVar).activeNow = true;
                 }
                 //"clear" the dependOn array
-                numOperand = 0;
+                state.dataEconTariff->numOperand = 0;
                 // Define the preset equations (category sumation)
                 curTotal = tariff(iTariff).ptTotal;
                 curSubtotal = tariff(iTariff).ptSubtotal;
@@ -2394,89 +2225,89 @@ namespace EconomicTariff {
                 // total SUM subtotal taxes
                 econVar(curTotal).Operator = opSUM;
                 econVar(curTotal).activeNow = true;
-                addOperand(curTotal, curSubtotal);
-                addOperand(curTotal, tariff(iTariff).ptTaxes);
+                addOperand(state, curTotal, curSubtotal);
+                addOperand(state, curTotal, tariff(iTariff).ptTaxes);
                 // subtotal SUM basis adjustments surcharges
                 econVar(curSubtotal).Operator = opSUM;
                 econVar(curSubtotal).activeNow = true;
-                addOperand(curSubtotal, curBasis);
-                addOperand(curSubtotal, tariff(iTariff).ptAdjustment);
-                addOperand(curSubtotal, tariff(iTariff).ptSurcharge);
+                addOperand(state, curSubtotal, curBasis);
+                addOperand(state, curSubtotal, tariff(iTariff).ptAdjustment);
+                addOperand(state, curSubtotal, tariff(iTariff).ptSurcharge);
                 // basis SUM EnergyCharges DemandCharges ServiceCharges
                 econVar(curBasis).Operator = opSUM;
                 econVar(curBasis).activeNow = true;
-                addOperand(curBasis, tariff(iTariff).ptEnergyCharges);
-                addOperand(curBasis, tariff(iTariff).ptDemandCharges);
-                addOperand(curBasis, tariff(iTariff).ptServiceCharges);
+                addOperand(state, curBasis, tariff(iTariff).ptEnergyCharges);
+                addOperand(state, curBasis, tariff(iTariff).ptDemandCharges);
+                addOperand(state, curBasis, tariff(iTariff).ptServiceCharges);
                 // set up the equations for other objects
-                addChargesToOperand(iTariff, tariff(iTariff).ptEnergyCharges);
-                addChargesToOperand(iTariff, tariff(iTariff).ptDemandCharges);
-                addChargesToOperand(iTariff, tariff(iTariff).ptServiceCharges);
-                addChargesToOperand(iTariff, tariff(iTariff).ptAdjustment);
-                addChargesToOperand(iTariff, tariff(iTariff).ptSurcharge);
-                addChargesToOperand(iTariff, tariff(iTariff).ptTaxes);
+                addChargesToOperand(state, iTariff, tariff(iTariff).ptEnergyCharges);
+                addChargesToOperand(state, iTariff, tariff(iTariff).ptDemandCharges);
+                addChargesToOperand(state, iTariff, tariff(iTariff).ptServiceCharges);
+                addChargesToOperand(state, iTariff, tariff(iTariff).ptAdjustment);
+                addChargesToOperand(state, iTariff, tariff(iTariff).ptSurcharge);
+                addChargesToOperand(state, iTariff, tariff(iTariff).ptTaxes);
                 // add the real time pricing to the energy charges
                 if (tariff(iTariff).chargeSchIndex != 0) {
-                    addOperand(tariff(iTariff).ptEnergyCharges, tariff(iTariff).nativeRealTimePriceCosts);
+                    addOperand(state, tariff(iTariff).ptEnergyCharges, tariff(iTariff).nativeRealTimePriceCosts);
                 }
                 // now add equations with NOOP to represent each object with its
                 // dependancies
                 // Qualify
-                for (kObj = 1; kObj <= numQualify; ++kObj) {
+                for (kObj = 1; kObj <= state.dataEconTariff->numQualify; ++kObj) {
                     if (qualify(kObj).tariffIndx == iTariff) {
                         curObject = qualify(kObj).namePt;
                         econVar(curObject).Operator = opNOOP;
                         econVar(curObject).activeNow = true;
-                        addOperand(curObject, qualify(kObj).sourcePt);
-                        addOperand(curObject, qualify(kObj).thresholdPt);
+                        addOperand(state, curObject, qualify(kObj).sourcePt);
+                        addOperand(state, curObject, qualify(kObj).thresholdPt);
                     }
                 }
                 // Ratchet
-                for (kObj = 1; kObj <= numRatchet; ++kObj) {
+                for (kObj = 1; kObj <= state.dataEconTariff->numRatchet; ++kObj) {
                     if (ratchet(kObj).tariffIndx == iTariff) {
                         curObject = ratchet(kObj).namePt;
                         econVar(curObject).Operator = opNOOP;
                         econVar(curObject).activeNow = true;
-                        addOperand(curObject, ratchet(kObj).baselinePt);
-                        addOperand(curObject, ratchet(kObj).adjustmentPt);
-                        addOperand(curObject, ratchet(kObj).multiplierPt);
-                        addOperand(curObject, ratchet(kObj).offsetPt);
+                        addOperand(state, curObject, ratchet(kObj).baselinePt);
+                        addOperand(state, curObject, ratchet(kObj).adjustmentPt);
+                        addOperand(state, curObject, ratchet(kObj).multiplierPt);
+                        addOperand(state, curObject, ratchet(kObj).offsetPt);
                     }
                 }
                 // ChargeSimple
-                for (kObj = 1; kObj <= numChargeSimple; ++kObj) {
+                for (kObj = 1; kObj <= state.dataEconTariff->numChargeSimple; ++kObj) {
                     if (chargeSimple(kObj).tariffIndx == iTariff) {
                         curObject = chargeSimple(kObj).namePt;
                         econVar(curObject).Operator = opNOOP;
                         econVar(curObject).activeNow = true;
-                        addOperand(curObject, chargeSimple(kObj).sourcePt);
-                        addOperand(curObject, chargeSimple(kObj).costPerPt);
+                        addOperand(state, curObject, chargeSimple(kObj).sourcePt);
+                        addOperand(state, curObject, chargeSimple(kObj).costPerPt);
                     }
                 }
                 // ChargeBlock
-                for (kObj = 1; kObj <= numChargeBlock; ++kObj) {
+                for (kObj = 1; kObj <= state.dataEconTariff->numChargeBlock; ++kObj) {
                     if (chargeBlock(kObj).tariffIndx == iTariff) {
                         curObject = chargeBlock(kObj).namePt;
                         econVar(curObject).Operator = opNOOP;
                         econVar(curObject).activeNow = true;
-                        addOperand(curObject, chargeBlock(kObj).sourcePt);
-                        addOperand(curObject, chargeBlock(kObj).blkSzMultPt);
+                        addOperand(state, curObject, chargeBlock(kObj).sourcePt);
+                        addOperand(state, curObject, chargeBlock(kObj).blkSzMultPt);
                         for (mBlock = 1; mBlock <= chargeBlock(kObj).numBlk; ++mBlock) {
-                            addOperand(curObject, chargeBlock(kObj).blkSzPt(mBlock));
-                            addOperand(curObject, chargeBlock(kObj).blkCostPt(mBlock));
+                            addOperand(state, curObject, chargeBlock(kObj).blkSzPt(mBlock));
+                            addOperand(state, curObject, chargeBlock(kObj).blkCostPt(mBlock));
                         }
                         // now add a new "equation" for dependency of remainingPt on namePt
                         remainPt = chargeBlock(kObj).remainingPt;
                         if (remainPt > 0) {
                             econVar(remainPt).Operator = opNOOP;
                             econVar(remainPt).activeNow = true;
-                            addOperand(remainPt, curObject);
+                            addOperand(state, remainPt, curObject);
                         }
                     }
                 }
                 // Economic:Variable
                 // make all of the user defined variables as active
-                for (iVar = 1; iVar <= numEconVar; ++iVar) {
+                for (iVar = 1; iVar <= state.dataEconTariff->numEconVar; ++iVar) {
                     if (econVar(iVar).tariffIndx == iTariff) {
                         if (econVar(iVar).kindOfObj == iEconVarObjType::Variable) {
                             econVar(iVar).activeNow = true;
@@ -2489,18 +2320,18 @@ namespace EconomicTariff {
                 }
                 // initialize the computation
                 computation(iTariff).computeName = "Autogenerated - " + tariff(iTariff).tariffName;
-                computation(iTariff).firstStep = numSteps + 1;
+                computation(iTariff).firstStep = state.dataEconTariff->numSteps + 1;
                 computation(iTariff).lastStep = -1; // this will be incremented by addStep
                 computation(iTariff).isUserDef = false;
                 // now all "equations" are defined, treat the variables with the list
                 // of dependancies as a directed acyclic graph and use "count down" algorithm
                 // to do a topological sort of the variables into the order for computation
                 // First, clear the counters
-                for (jVar = 1; jVar <= numEconVar; ++jVar) {
+                for (jVar = 1; jVar <= state.dataEconTariff->numEconVar; ++jVar) {
                     econVar(jVar).cntMeDependOn = 0;
                 }
                 // Second, add up the number of dependancies on each variable
-                for (iVar = 1; iVar <= numEconVar; ++iVar) {
+                for (iVar = 1; iVar <= state.dataEconTariff->numEconVar; ++iVar) {
                     if (econVar(iVar).activeNow) {
                         if (econVar(iVar).lastOperand >= econVar(iVar).firstOperand) {
                             econVar(iVar).cntMeDependOn = 1 + econVar(iVar).lastOperand - econVar(iVar).firstOperand;
@@ -2513,7 +2344,7 @@ namespace EconomicTariff {
                 loopCount = 0;
                 while ((numNoDepend != 0) || (loopCount > 100000)) {
                     numNoDepend = 0;
-                    for (iVar = 1; iVar <= numEconVar; ++iVar) {
+                    for (iVar = 1; iVar <= state.dataEconTariff->numEconVar; ++iVar) {
                         if (econVar(iVar).activeNow) {
                             // find a variable that has no more dangling dependancies
                             if (econVar(iVar).cntMeDependOn == 0) {
@@ -2524,26 +2355,26 @@ namespace EconomicTariff {
                                         // transfer variables and operator to the computation and list of steps
                                         // go through the operands backwards (end of line is evaluated first)
                                         for (kOperand = econVar(iVar).lastOperand; kOperand >= econVar(iVar).firstOperand; --kOperand) {
-                                            incrementSteps();
-                                            steps(numSteps) = operand(kOperand);
+                                            incrementSteps(state);
+                                            state.dataEconTariff->steps(state.dataEconTariff->numSteps) = state.dataEconTariff->operand(kOperand);
                                         }
                                         // append the operator (either SUM or NOOP)
-                                        incrementSteps();
-                                        steps(numSteps) = econVar(iVar).Operator;
+                                        incrementSteps(state);
+                                        state.dataEconTariff->steps(state.dataEconTariff->numSteps) = econVar(iVar).Operator;
                                         // append the variable itself
-                                        incrementSteps();
-                                        steps(numSteps) = iVar;
+                                        incrementSteps(state);
+                                        state.dataEconTariff->steps(state.dataEconTariff->numSteps) = iVar;
                                         // at the end of the line show a zero to clear the stack
-                                        incrementSteps();
-                                        steps(numSteps) = 0;
+                                        incrementSteps(state);
+                                        state.dataEconTariff->steps(state.dataEconTariff->numSteps) = 0;
                                     }
                                 }
                                 // go through each other variable looking for places where this variable is used
                                 // and decrement their counters.
-                                for (jVar = 1; jVar <= numEconVar; ++jVar) {
+                                for (jVar = 1; jVar <= state.dataEconTariff->numEconVar; ++jVar) {
                                     if (econVar(jVar).activeNow) {
                                         for (kOperand = econVar(jVar).firstOperand; kOperand <= econVar(jVar).lastOperand; ++kOperand) {
-                                            referVar = operand(kOperand);
+                                            referVar = state.dataEconTariff->operand(kOperand);
                                             if (iVar == referVar) {
                                                 --econVar(jVar).cntMeDependOn;
                                                 // for each variable that has been decremented to zero increment the counter
@@ -2566,7 +2397,7 @@ namespace EconomicTariff {
                 }
                 // make sure that all variables associated with the tariff are included
                 remainingVarFlag = false;
-                for (iVar = 1; iVar <= numEconVar; ++iVar) {
+                for (iVar = 1; iVar <= state.dataEconTariff->numEconVar; ++iVar) {
                     if (econVar(iVar).activeNow) {
                         remainingVarFlag = true;
                     }
@@ -2575,19 +2406,19 @@ namespace EconomicTariff {
                     ShowWarningError(state, "CreateDefaultComputation: In UtilityCost:Computation: Circular or invalid dependencies found in tariff: " +
                                      tariff(iTariff).tariffName);
                     ShowContinueError(state, "  UtilityCost variables that may have invalid dependencies and the variables they are dependant on.");
-                    for (iVar = 1; iVar <= numEconVar; ++iVar) {
+                    for (iVar = 1; iVar <= state.dataEconTariff->numEconVar; ++iVar) {
                         if (econVar(iVar).tariffIndx == iTariff) {
                             if (econVar(iVar).activeNow) {
                                 ShowContinueError(state, "     " + econVar(iVar).name);
                                 for (kOperand = econVar(iVar).firstOperand; kOperand <= econVar(iVar).lastOperand; ++kOperand) {
-                                    ShowContinueError(state, "        ->  " + econVar(operand(kOperand)).name);
+                                    ShowContinueError(state, "        ->  " + econVar(state.dataEconTariff->operand(kOperand)).name);
                                 }
                             }
                         }
                     }
                 }
                 // set the end of the computations
-                computation(iTariff).lastStep = numSteps;
+                computation(iTariff).lastStep = state.dataEconTariff->numSteps;
                 if (computation(iTariff).firstStep >= computation(iTariff).lastStep) {
                     computation(iTariff).firstStep = 0;
                     computation(iTariff).lastStep = -1;
@@ -2599,7 +2430,7 @@ namespace EconomicTariff {
         }
     }
 
-    void addOperand(int const varMe, int const varOperand)
+    void addOperand(EnergyPlusData &state, int const varMe, int const varOperand)
     {
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   July 2004
@@ -2612,30 +2443,30 @@ namespace EconomicTariff {
         if (varOperand != 0) {
             // increment the numOperand and allocate/reallocate the array
             // if necessary
-            if (!allocated(operand)) {
-                operand.allocate(sizeIncrement);
-                sizeOperand = sizeIncrement;
-                numOperand = 1;
+            if (!allocated(state.dataEconTariff->operand)) {
+                state.dataEconTariff->operand.allocate(sizeIncrement);
+                state.dataEconTariff->sizeOperand = sizeIncrement;
+                state.dataEconTariff->numOperand = 1;
             } else {
-                ++numOperand;
+                ++state.dataEconTariff->numOperand;
                 // if larger than current size grow the array
-                if (numOperand > sizeOperand) {
-                    operand.redimension(sizeOperand += sizeIncrement);
+                if (state.dataEconTariff->numOperand > state.dataEconTariff->sizeOperand) {
+                    state.dataEconTariff->operand.redimension(state.dataEconTariff->sizeOperand += sizeIncrement);
                 }
             }
             // now add the dependancy relationship
-            operand(numOperand) = varOperand;
-            econVar(varMe).lastOperand = numOperand;
+            state.dataEconTariff->operand(state.dataEconTariff->numOperand) = varOperand;
+            econVar(varMe).lastOperand = state.dataEconTariff->numOperand;
             // if it is the first time addOperand was called with the varMe value
             // then set the first pointer as well
             if (varMe != addOperand_prevVarMe) {
-                econVar(varMe).firstOperand = numOperand;
+                econVar(varMe).firstOperand = state.dataEconTariff->numOperand;
                 addOperand_prevVarMe = varMe;
             }
         }
     }
 
-    void addChargesToOperand(int const curTariff, int const curPointer)
+    void addChargesToOperand(EnergyPlusData &state, int const curTariff, int const curPointer)
     {
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   July 2004
@@ -2648,17 +2479,17 @@ namespace EconomicTariff {
 
         econVar(curPointer).Operator = opSUM;
         econVar(curPointer).activeNow = true;
-        for (kObj = 1; kObj <= numChargeSimple; ++kObj) {
+        for (kObj = 1; kObj <= state.dataEconTariff->numChargeSimple; ++kObj) {
             if (chargeSimple(kObj).tariffIndx == curTariff) {
                 if (chargeSimple(kObj).categoryPt == curPointer) {
-                    addOperand(curPointer, chargeSimple(kObj).namePt);
+                    addOperand(state, curPointer, chargeSimple(kObj).namePt);
                 }
             }
         }
-        for (kObj = 1; kObj <= numChargeBlock; ++kObj) {
+        for (kObj = 1; kObj <= state.dataEconTariff->numChargeBlock; ++kObj) {
             if (chargeBlock(kObj).tariffIndx == curTariff) {
                 if (chargeBlock(kObj).categoryPt == curPointer) {
-                    addOperand(curPointer, chargeBlock(kObj).namePt);
+                    addOperand(state, curPointer, chargeBlock(kObj).namePt);
                 }
             }
         }
@@ -2696,8 +2527,8 @@ namespace EconomicTariff {
         Real64 curRTPenergy;   // energy applied to real time price
         Real64 curRTPcost;     // cost for energy for current time
 
-        if (numTariff >= 1) {
-            for (iTariff = 1; iTariff <= numTariff; ++iTariff) {
+        if (state.dataEconTariff->numTariff >= 1) {
+            for (iTariff = 1; iTariff <= state.dataEconTariff->numTariff; ++iTariff) {
                 isGood = false;
                 // if the meter is defined get the value
                 if (tariff(iTariff).reportMeterIndx != 0) {
@@ -2855,34 +2686,34 @@ namespace EconomicTariff {
 
         hugeValue = HUGE_(Real64());
         //  Clear the isEvaluated flags for all economics variables.
-        for (nVar = 1; nVar <= numEconVar; ++nVar) {
+        for (nVar = 1; nVar <= state.dataEconTariff->numEconVar; ++nVar) {
             econVar(nVar).isEvaluated = false;
         }
-        if (numTariff >= 1) {
+        if (state.dataEconTariff->numTariff >= 1) {
             WriteTabularFiles = true;
-            setNativeVariables();
-            for (iTariff = 1; iTariff <= numTariff; ++iTariff) {
+            setNativeVariables(state);
+            for (iTariff = 1; iTariff <= state.dataEconTariff->numTariff; ++iTariff) {
                 for (jStep = computation(iTariff).firstStep; jStep <= computation(iTariff).lastStep; ++jStep) {
-                    curStep = steps(jStep);
+                    curStep = state.dataEconTariff->steps(jStep);
                     {
                         auto const SELECT_CASE_var(curStep);
                         if (SELECT_CASE_var == 0) { // end of line - assign variable and clear stack
                             // if the stack still has two items on it then assign the values to the
                             // pointer otherwise if it follows a NOOP line it will only have one item
                             // that has already been assigned and no further action is required.
-                            if (topOfStack >= 2) {
+                            if (state.dataEconTariff->topOfStack >= 2) {
                                 popStack(state, b, bPt); // pop the variable pointer
                                 popStack(state, a, aPt); // pop the values
-                                if (isWithinRange(state, bPt, 1, numEconVar)) {
+                                if (isWithinRange(state, bPt, 1, state.dataEconTariff->numEconVar)) {
                                     econVar(bPt).values = a;
                                 }
                             }
-                            topOfStack = 0;
+                            state.dataEconTariff->topOfStack = 0;
                         } else if ((SELECT_CASE_var >= 1)) { // all positive values are a reference to an econVar
                             pushStack(state, econVar(curStep).values, curStep);
                         } else if (SELECT_CASE_var == opSUM) {
                             a = 0.0;
-                            for (int kStack = 1, kStack_end = topOfStack; kStack <= kStack_end; ++kStack) { // popStack modifies topOfStack
+                            for (int kStack = 1, kStack_end = state.dataEconTariff->topOfStack; kStack <= kStack_end; ++kStack) { // popStack modifies topOfStack
                                 popStack(state, b, bPt);
                                 a += b;
                             }
@@ -2926,7 +2757,7 @@ namespace EconomicTariff {
                             //          CALL pushStack(c,noVar)
                         } else if (SELECT_CASE_var == opMAXIMUM) {
                             a = -hugeValue;
-                            for (int kStack = 1, kStack_end = topOfStack; kStack <= kStack_end; ++kStack) { // popStack modifies topOfStack
+                            for (int kStack = 1, kStack_end = state.dataEconTariff->topOfStack; kStack <= kStack_end; ++kStack) { // popStack modifies topOfStack
                                 popStack(state, b, bPt);
                                 for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
                                     if (b(lMonth) > a(lMonth)) {
@@ -2937,7 +2768,7 @@ namespace EconomicTariff {
                             pushStack(state, a, noVar);
                         } else if (SELECT_CASE_var == opMINIMUM) {
                             a = hugeValue;
-                            for (int kStack = 1, kStack_end = topOfStack; kStack <= kStack_end; ++kStack) { // popStack modifies topOfStack
+                            for (int kStack = 1, kStack_end = state.dataEconTariff->topOfStack; kStack <= kStack_end; ++kStack) { // popStack modifies topOfStack
                                 popStack(state, b, bPt);
                                 for (lMonth = 1; lMonth <= MaxNumMonths; ++lMonth) {
                                     if (b(lMonth) < a(lMonth)) {
@@ -3186,7 +3017,7 @@ namespace EconomicTariff {
                             pushStack(state, a + b, noVar);
                         } else if (SELECT_CASE_var == opNOOP) {
                             // do nothing but clear the stack
-                            topOfStack = 0;
+                            state.dataEconTariff->topOfStack = 0;
                             // No longer pushing a zero to fix bug
                             // and push zero
                             // a = 0
@@ -3221,17 +3052,17 @@ namespace EconomicTariff {
         curMonthlyArray = monthlyArray;
         if (!allocated(stack)) {
             stack.allocate(sizeIncrement);
-            sizeStack = sizeIncrement;
-            topOfStack = 1;
+            state.dataEconTariff->sizeStack = sizeIncrement;
+            state.dataEconTariff->topOfStack = 1;
         } else {
-            ++topOfStack;
+            ++state.dataEconTariff->topOfStack;
             // if larger than current size grow the array
-            if (topOfStack > sizeStack) {
-                stack.redimension(sizeStack += sizeIncrement);
+            if (state.dataEconTariff->topOfStack > state.dataEconTariff->sizeStack) {
+                stack.redimension(state.dataEconTariff->sizeStack += sizeIncrement);
             }
         }
         // now push the values on to the stack
-        stack(topOfStack).varPt = variablePointer;
+        stack(state.dataEconTariff->topOfStack).varPt = variablePointer;
         // check if variable has been evaluated if it is CHARGE:SIMPLE, CHARGE:BLOCK, RATCHET, or QUALIFY
         // if it has not overwrite the values for monthlyArray with the evaluated values
         if (variablePointer != 0) {
@@ -3278,7 +3109,7 @@ namespace EconomicTariff {
             }
         }
         // now assign
-        stack(topOfStack).values = curMonthlyArray;
+        stack(state.dataEconTariff->topOfStack).values = curMonthlyArray;
     }
 
     void popStack(EnergyPlusData &state, Array1A<Real64> monthlyArray, int &variablePointer)
@@ -3296,16 +3127,16 @@ namespace EconomicTariff {
 
         monthlyArray.dim(MaxNumMonths);
 
-        if (topOfStack >= 1) {
-            variablePointer = stack(topOfStack).varPt;
-            monthlyArray = stack(topOfStack).values;
+        if (state.dataEconTariff->topOfStack >= 1) {
+            variablePointer = stack(state.dataEconTariff->topOfStack).varPt;
+            monthlyArray = stack(state.dataEconTariff->topOfStack).values;
         } else {
             ShowWarningError(state, "UtilityCost:Tariff: stack underflow in calculation of utility bills. On variable: " + econVar(variablePointer).name);
             variablePointer = 0;
             monthlyArray = 0.0;
-            topOfStack = 0;
+            state.dataEconTariff->topOfStack = 0;
         }
-        --topOfStack;
+        --state.dataEconTariff->topOfStack;
     }
 
     void evaluateChargeSimple(EnergyPlusData &state, int const usingVariable)
@@ -3808,7 +3639,7 @@ namespace EconomicTariff {
         }
     }
 
-    void setNativeVariables()
+    void setNativeVariables(EnergyPlusData &state)
     {
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   July 2004
@@ -3823,7 +3654,7 @@ namespace EconomicTariff {
         Real64 bigNumber(0.0); // Autodesk Value not used but suppresses warning about HUGE_() call
 
         bigNumber = HUGE_(bigNumber);
-        for (iTariff = 1; iTariff <= numTariff; ++iTariff) {
+        for (iTariff = 1; iTariff <= state.dataEconTariff->numTariff; ++iTariff) {
             // nativeTotalEnergy
             monthVal = 0.0;
             for (jPeriod = 1; jPeriod <= countPeriod; ++jPeriod) {
@@ -4033,7 +3864,7 @@ namespace EconomicTariff {
         iDemandWindow othrDemWindowUnits;
         int iTariff;
 
-        if (numTariff > 0) {
+        if (state.dataEconTariff->numTariff > 0) {
             elecFacilMeter = GetMeterIndex("ELECTRICITY:FACILITY");
             gasFacilMeter = GetMeterIndex("NATURALGAS:FACILITY");
             distCoolFacilMeter = GetMeterIndex("DISTRICTCOOLING:FACILITY");
@@ -4061,7 +3892,7 @@ namespace EconomicTariff {
             distCoolTariffNames = "";
             distHeatTariffNames = "";
             othrTariffNames = "";
-            for (iTariff = 1; iTariff <= numTariff; ++iTariff) {
+            for (iTariff = 1; iTariff <= state.dataEconTariff->numTariff; ++iTariff) {
                 if (tariff(iTariff).isSelected) {
                     allTotalCost += tariff(iTariff).totalAnnualCost;
                     if (tariff(iTariff).kindElectricMtr >= kindMeterElecSimple) {
@@ -4198,7 +4029,7 @@ namespace EconomicTariff {
             perAreaUnitConv = 1.0;
         }
 
-        if (numTariff > 0) {
+        if (state.dataEconTariff->numTariff > 0) {
             if (displayEconomicResultSummary) {
                 DisplayString(state, "Writing Tariff Reports");
                 for (auto &e : econVar)
@@ -4228,7 +4059,7 @@ namespace EconomicTariff {
                 gasTotalCost = 0.0;
                 otherTotalCost = 0.0;
                 allTotalCost = 0.0;
-                for (iTariff = 1; iTariff <= numTariff; ++iTariff) {
+                for (iTariff = 1; iTariff <= state.dataEconTariff->numTariff; ++iTariff) {
                     if (tariff(iTariff).isSelected) {
                         allTotalCost += tariff(iTariff).totalAnnualCost;
                         if (tariff(iTariff).kindElectricMtr >= kindMeterElecSimple) {
@@ -4273,10 +4104,10 @@ namespace EconomicTariff {
                 columnWidth.deallocate();
                 tableBody.deallocate();
                 //---- Tariff Summary
-                rowHead.allocate(numTariff);
+                rowHead.allocate(state.dataEconTariff->numTariff);
                 columnHead.allocate(6);
                 columnWidth.allocate(6);
-                tableBody.allocate(6, numTariff);
+                tableBody.allocate(6, state.dataEconTariff->numTariff);
                 tableBody = "";
                 columnHead(1) = "Selected";
                 columnHead(2) = "Qualified";
@@ -4284,7 +4115,7 @@ namespace EconomicTariff {
                 columnHead(4) = "Buy or Sell";
                 columnHead(5) = "Group";
                 columnHead(6) = "Annual Cost (~~$~~)";
-                for (iTariff = 1; iTariff <= numTariff; ++iTariff) {
+                for (iTariff = 1; iTariff <= state.dataEconTariff->numTariff; ++iTariff) {
                     rowHead(iTariff) = tariff(iTariff).tariffName;
                     if (tariff(iTariff).isSelected) {
                         tableBody(1, iTariff) = "Yes";
@@ -4334,7 +4165,7 @@ namespace EconomicTariff {
             // Tariff Report
             //---------------------------------
             if (displayTariffReport) {
-                for (iTariff = 1; iTariff <= numTariff; ++iTariff) {
+                for (iTariff = 1; iTariff <= state.dataEconTariff->numTariff; ++iTariff) {
                     WriteReportHeaders("Tariff Report", tariff(iTariff).tariffName, OutputProcessor::StoreType::Averaged);
                     rowHead.allocate(7);
                     columnHead.allocate(1);
@@ -4426,7 +4257,7 @@ namespace EconomicTariff {
                     //---- Charges
                     for (auto &e : econVar)
                         e.activeNow = false;
-                    for (kVar = 1; kVar <= numEconVar; ++kVar) {
+                    for (kVar = 1; kVar <= state.dataEconTariff->numEconVar; ++kVar) {
                         if (econVar(kVar).tariffIndx == iTariff) {
                             if ((econVar(kVar).kindOfObj == iEconVarObjType::ChargeSimple) || (econVar(kVar).kindOfObj == iEconVarObjType::ChargeBlock)) {
                                 econVar(kVar).activeNow = true;
@@ -4437,7 +4268,7 @@ namespace EconomicTariff {
                     //---- Sources for Charges
                     for (auto &e : econVar)
                         e.activeNow = false;
-                    for (kVar = 1; kVar <= numEconVar; ++kVar) {
+                    for (kVar = 1; kVar <= state.dataEconTariff->numEconVar; ++kVar) {
                         if (econVar(kVar).tariffIndx == iTariff) {
                             indexInChg = econVar(kVar).index;
                             if (econVar(kVar).kindOfObj == iEconVarObjType::ChargeSimple) {
@@ -4455,7 +4286,7 @@ namespace EconomicTariff {
                     //---- Rachets
                     for (auto &e : econVar)
                         e.activeNow = false;
-                    for (kVar = 1; kVar <= numEconVar; ++kVar) {
+                    for (kVar = 1; kVar <= state.dataEconTariff->numEconVar; ++kVar) {
                         if (econVar(kVar).tariffIndx == iTariff) {
                             if (econVar(kVar).kindOfObj == iEconVarObjType::Ratchet) {
                                 econVar(kVar).activeNow = true;
@@ -4466,7 +4297,7 @@ namespace EconomicTariff {
                     //---- Qualifies
                     for (auto &e : econVar)
                         e.activeNow = false;
-                    for (kVar = 1; kVar <= numEconVar; ++kVar) {
+                    for (kVar = 1; kVar <= state.dataEconTariff->numEconVar; ++kVar) {
                         if (econVar(kVar).tariffIndx == iTariff) {
                             if (econVar(kVar).kindOfObj == iEconVarObjType::Qualify) {
                                 econVar(kVar).activeNow = true;
@@ -4484,7 +4315,7 @@ namespace EconomicTariff {
                     //---- Other Variables
                     for (auto &e : econVar)
                         e.activeNow = false;
-                    for (kVar = 1; kVar <= numEconVar; ++kVar) {
+                    for (kVar = 1; kVar <= state.dataEconTariff->numEconVar; ++kVar) {
                         if (econVar(kVar).tariffIndx == iTariff) {
                             if (!econVar(kVar).isReported) {
                                 econVar(kVar).activeNow = true;
@@ -4500,7 +4331,7 @@ namespace EconomicTariff {
                     }
                     outString = "";
                     for (lStep = computation(iTariff).firstStep; lStep <= computation(iTariff).lastStep; ++lStep) {
-                        curStep = steps(lStep);
+                        curStep = state.dataEconTariff->steps(lStep);
                         {
                             auto const SELECT_CASE_var(curStep);
                             if (SELECT_CASE_var == 0) { // end of line
@@ -4588,8 +4419,8 @@ namespace EconomicTariff {
 
         int iTariff;
 
-        if (numTariff > 0) {
-            for (iTariff = 1; iTariff <= numTariff; ++iTariff) {
+        if (state.dataEconTariff->numTariff > 0) {
+            for (iTariff = 1; iTariff <= state.dataEconTariff->numTariff; ++iTariff) {
                 {
                     auto const SELECT_CASE_var(tariff(iTariff).buyOrSell);
                     if (SELECT_CASE_var == buyFromUtility) {
@@ -4666,7 +4497,7 @@ namespace EconomicTariff {
         int nCntOfVar;
 
         cntOfVar = 0;
-        for (iVar = 1; iVar <= numEconVar; ++iVar) {
+        for (iVar = 1; iVar <= state.dataEconTariff->numEconVar; ++iVar) {
             if (econVar(iVar).activeNow) {
                 ++cntOfVar;
             }
@@ -4702,7 +4533,7 @@ namespace EconomicTariff {
         }
         nCntOfVar = 0;
         // row names
-        for (iVar = 1; iVar <= numEconVar; ++iVar) {
+        for (iVar = 1; iVar <= state.dataEconTariff->numEconVar; ++iVar) {
             if (econVar(iVar).activeNow) {
                 ++nCntOfVar;
                 if (showCurrencySymbol) {
@@ -4714,7 +4545,7 @@ namespace EconomicTariff {
         }
         // fill the body
         nCntOfVar = 0;
-        for (iVar = 1; iVar <= numEconVar; ++iVar) {
+        for (iVar = 1; iVar <= state.dataEconTariff->numEconVar; ++iVar) {
             if (econVar(iVar).activeNow) {
                 ++nCntOfVar;
                 for (jMonth = 1; jMonth <= 12; ++jMonth) { // note not all months get printed out if more than 12 are used.- need to fix this later
@@ -4735,12 +4566,12 @@ namespace EconomicTariff {
 
                     switch (econVar(iVar).kindOfObj) {
                     case iEconVarObjType::ChargeSimple:
-                        if ((curIndex >= 1) && (curIndex <= numChargeSimple)) {
+                        if ((curIndex >= 1) && (curIndex <= state.dataEconTariff->numChargeSimple)) {
                             curCatPt = chargeSimple(curIndex).categoryPt;
                         }
                         break;
                     case iEconVarObjType::ChargeBlock:
-                        if ((curIndex >= 1) && (curIndex <= numChargeBlock)) {
+                        if ((curIndex >= 1) && (curIndex <= state.dataEconTariff->numChargeBlock)) {
                             curCatPt = chargeBlock(curIndex).categoryPt;
                         }
                         break;
@@ -4748,7 +4579,7 @@ namespace EconomicTariff {
                         break;
                     }
 
-                    if ((curCatPt >= 1) && (curCatPt <= numEconVar)) {
+                    if ((curCatPt >= 1) && (curCatPt <= state.dataEconTariff->numEconVar)) {
                         curCategory = econVar(curCatPt).specific;
                     }
                     {
@@ -4830,11 +4661,11 @@ namespace EconomicTariff {
         int lowestSurplusSoldTariff;
         int lowestNetMeterTariff;
 
-        groupIndex.dimension(numTariff, 0);
+        groupIndex.dimension(state.dataEconTariff->numTariff, 0);
         groupCount = 0;
         numMins = 0;
-        MinTariffIndex.dimension(numTariff, 0);
-        for (iTariff = 1; iTariff <= numTariff; ++iTariff) {
+        MinTariffIndex.dimension(state.dataEconTariff->numTariff, 0);
+        for (iTariff = 1; iTariff <= state.dataEconTariff->numTariff; ++iTariff) {
             // compute the total annual cost of each tariff
             totalVarPt = tariff(iTariff).ptTotal;
             totEneVarPt = tariff(iTariff).nativeTotalEnergy;
@@ -4852,7 +4683,7 @@ namespace EconomicTariff {
                 ++groupCount;
                 groupIndex(iTariff) = groupCount;
                 // set all remaining matching items to the same index
-                for (kTariff = iTariff + 1; kTariff <= numTariff; ++kTariff) {
+                for (kTariff = iTariff + 1; kTariff <= state.dataEconTariff->numTariff; ++kTariff) {
                     if (UtilityRoutines::SameString(tariff(kTariff).groupName, tariff(iTariff).groupName)) {
                         groupIndex(kTariff) = groupCount;
                     }
@@ -4860,7 +4691,7 @@ namespace EconomicTariff {
             }
         }
         // First process the all tariff and identify the lowest cost for each type of meter and group.
-        for (iTariff = 1; iTariff <= numTariff; ++iTariff) {
+        for (iTariff = 1; iTariff <= state.dataEconTariff->numTariff; ++iTariff) {
             if (tariff(iTariff).isQualified) {
                 isFound = false;
                 for (lMin = 1; lMin <= numMins; ++lMin) {
@@ -4881,7 +4712,7 @@ namespace EconomicTariff {
                 }
                 if (!isFound) {
                     ++numMins;
-                    if (numMins > numTariff) {
+                    if (numMins > state.dataEconTariff->numTariff) {
                         ShowWarningError(state, "UtilityCost:Tariff Debugging error numMins greater than numTariff.");
                     }
                     MinTariffIndex(numMins) = iTariff;
@@ -4900,7 +4731,7 @@ namespace EconomicTariff {
             lowestPurchaseTariff = 0;
             lowestSurplusSoldTariff = 0;
             lowestNetMeterTariff = 0;
-            for (iTariff = 1; iTariff <= numTariff; ++iTariff) {
+            for (iTariff = 1; iTariff <= state.dataEconTariff->numTariff; ++iTariff) {
                 if (tariff(iTariff).isQualified) {
                     if (tariff(iTariff).isSelected) {
                         if (groupIndex(iTariff) == mGroup) {
@@ -4991,7 +4822,7 @@ namespace EconomicTariff {
         MinTariffIndex.deallocate();
     }
 
-    void GetMonthlyCostForResource(DataGlobalConstants::ResourceType const inResourceNumber, Array1A<Real64> outMonthlyCosts)
+    void GetMonthlyCostForResource(EnergyPlusData &state, DataGlobalConstants::ResourceType const inResourceNumber, Array1A<Real64> outMonthlyCosts)
     {
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   May 2010
@@ -5006,7 +4837,7 @@ namespace EconomicTariff {
         int totalVarPt;
 
         outMonthlyCosts = 0.0;
-        for (iTariff = 1; iTariff <= numTariff; ++iTariff) {
+        for (iTariff = 1; iTariff <= state.dataEconTariff->numTariff; ++iTariff) {
             if (tariff(iTariff).isSelected) {
                 if (tariff(iTariff).resourceNum == inResourceNumber) {
                     totalVarPt = tariff(iTariff).ptTotal;
@@ -5020,23 +4851,6 @@ namespace EconomicTariff {
 
     void clear_state()
     {
-        numEconVar = 0;
-        sizeEconVar = 0;
-        operand.deallocate();
-        numOperand = 0;
-        sizeOperand = 0;
-        numTariff = 0;
-        numQualify = 0;
-        numChargeSimple = 0;
-        numChargeBlock = 0;
-        numRatchet = 0;
-        numComputation = 0;
-        steps.deallocate();
-        stepsCopy.deallocate();
-        numSteps = 0;
-        sizeSteps = 0;
-        topOfStack = 0;
-        sizeStack = 0;
         econVar.deallocate();
         tariff.deallocate();
         qualify.deallocate();
@@ -5048,7 +4862,5 @@ namespace EconomicTariff {
         Update_GetInput = true;
         addOperand_prevVarMe = 0;
     }
-
-} // namespace EconomicTariff
 
 } // namespace EnergyPlus

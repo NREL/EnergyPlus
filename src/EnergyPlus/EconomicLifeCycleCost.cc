@@ -1304,7 +1304,7 @@ namespace EconomicLifeCycleCost {
         // gather costs from EconomicTariff for each end use
         numResourcesUsed = 0;
         for (auto iResource : DataGlobalConstants::AllResourceTypes) {
-            GetMonthlyCostForResource(iResource, curResourceCosts);
+            GetMonthlyCostForResource(state, iResource, curResourceCosts);
             annualCost = 0.0;
             for (int jMonth = 1; jMonth <= 12; ++jMonth) {
                 resourceCosts.at(jMonth).at(iResource) = curResourceCosts(jMonth);

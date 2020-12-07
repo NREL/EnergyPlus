@@ -517,7 +517,7 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_ExpressAsCashFlows)
     lengthStudyTotalMonths = lengthStudyYears * 12;
 
 
-    numTariff = 1;
+    state->dataEconTariff->numTariff = 1;
     tariff.allocate(1);
     tariff(1).isSelected = true;
     tariff(1).resourceNum = DataGlobalConstants::ResourceType::Electricity;
