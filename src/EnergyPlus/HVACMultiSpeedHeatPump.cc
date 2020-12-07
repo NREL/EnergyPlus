@@ -168,9 +168,6 @@ namespace HVACMultiSpeedHeatPump {
         Cubic,       // Cubic curve type
     };
 
-    // Airflow control for contant fan mode
-    int const UseCompressorOnFlow(1);  // set compressor OFF air flow rate equal to compressor ON air flow rate
-    int const UseCompressorOffFlow(2); // set compressor OFF air flow rate equal to user defined value
     // Compressor operation
     int const On(1);  // normal compressor operation
     int const Off(0); // signal DXCoil that compressor shouldn't run
@@ -1406,9 +1403,9 @@ namespace HVACMultiSpeedHeatPump {
 
             //     AirFlowControl only valid if fan opmode = ContFanCycCoil
             if (MSHeatPump(MSHPNum).IdleVolumeAirRate == 0.0) {
-                MSHeatPump(MSHPNum).AirFlowControl = UseCompressorOnFlow;
+                MSHeatPump(MSHPNum).AirFlowControl = AirflowControl::UseCompressorOnFlow;
             } else {
-                MSHeatPump(MSHPNum).AirFlowControl = UseCompressorOffFlow;
+                MSHeatPump(MSHPNum).AirFlowControl = AirflowControl::UseCompressorOffFlow;
             }
 
             //   Initialize last mode of compressor operation
@@ -4276,7 +4273,7 @@ namespace HVACMultiSpeedHeatPump {
 
         // Set up fan flow rate during compressor off time
         if (MSHeatPump(MSHeatPumpNum).OpMode == ContFanCycCoil && present(SpeedNum)) {
-            if (MSHeatPump(MSHeatPumpNum).AirFlowControl == UseCompressorOnFlow && CompOnMassFlow > 0.0) {
+            if (MSHeatPump(MSHeatPumpNum).AirFlowControl == AirflowControl::UseCompressorOnFlow && CompOnMassFlow > 0.0) {
                 if (MSHeatPump(MSHeatPumpNum).LastMode == ModeOfOperation::HeatingMode) {
                     CompOffMassFlow = MSHeatPump(MSHeatPumpNum).HeatMassFlowRate(SpeedNum);
                     CompOffFlowRatio = MSHeatPump(MSHeatPumpNum).HeatingSpeedRatio(SpeedNum);

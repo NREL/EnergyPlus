@@ -85,9 +85,13 @@ namespace HVACMultiSpeedHeatPump {
         HeatingMode, // System operating mode is heating
     };
 
-    // Airflow control for contant fan mode
-    extern int const UseCompressorOnFlow;  // set compressor OFF air flow rate equal to compressor ON air flow rate
-    extern int const UseCompressorOffFlow; // set compressor OFF air flow rate equal to user defined value
+    // Airflow control for constant fan mode
+    enum class AirflowControl {
+        Unassigned,
+        UseCompressorOnFlow,  // set compressor OFF air flow rate equal to compressor ON air flow rate
+        UseCompressorOffFlow, // set compressor OFF air flow rate equal to user defined value
+    };
+
     // Compressor operation
     extern int const On;  // normal compressor operation
     extern int const Off; // signal DXCoil that compressor shouldn't run
@@ -201,7 +205,7 @@ namespace HVACMultiSpeedHeatPump {
         Real64 HeatRecoveryInletTemp;       // Inlet temperature for heat recovery rate [C]
         Real64 HeatRecoveryOutletTemp;      // Outlet temperature for heat recovery rate [C]
         Real64 HeatRecoveryMassFlowRate;    // Mass flow rate for heat recovery rate [kg/s]
-        int AirFlowControl;                 // fan control mode, UseCompressorOnFlow or UseCompressorOffFlow
+        AirflowControl AirFlowControl;                 // fan control mode, UseCompressorOnFlow or UseCompressorOffFlow
         int ErrIndexCyc;                    // Error index at low speed
         int ErrIndexVar;                    // Error index at high speed
         Real64 LoadLoss;                    // Air distribution system loss
@@ -263,7 +267,7 @@ namespace HVACMultiSpeedHeatPump {
               NumOfSpeedHeating(0), CheckFanFlow(true), LastMode(ModeOfOperation::Unassigned), HeatCoolMode(ModeOfOperation::Unassigned), AirLoopNumber(0), NumControlledZones(0), ZoneInletNode(0),
               CompPartLoadRatio(0.0), FanPartLoadRatio(0.0), TotCoolEnergyRate(0.0), TotHeatEnergyRate(0.0), SensCoolEnergyRate(0.0),
               SensHeatEnergyRate(0.0), LatCoolEnergyRate(0.0), LatHeatEnergyRate(0.0), ElecPower(0.0), LoadMet(0.0), HeatRecoveryRate(0.0),
-              HeatRecoveryInletTemp(0.0), HeatRecoveryOutletTemp(0.0), HeatRecoveryMassFlowRate(0.0), AirFlowControl(0), ErrIndexCyc(0),
+              HeatRecoveryInletTemp(0.0), HeatRecoveryOutletTemp(0.0), HeatRecoveryMassFlowRate(0.0), AirFlowControl(AirflowControl::Unassigned), ErrIndexCyc(0),
               ErrIndexVar(0), LoadLoss(0.0), SuppCoilAirInletNode(0), SuppCoilAirOutletNode(0), SuppHeatCoilType_Num(0), SuppHeatCoilIndex(0),
               SuppCoilControlNode(0), MaxSuppCoilFluidFlow(0.0), SuppCoilOutletNode(0), CoilAirInletNode(0), CoilControlNode(0),
               MaxCoilFluidFlow(0.0), CoilOutletNode(0), HotWaterCoilControlNode(0), HotWaterCoilOutletNode(0), HotWaterCoilNum(0), LoopNum(0),
