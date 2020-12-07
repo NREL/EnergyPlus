@@ -404,7 +404,6 @@ int RunEnergyPlus(EnergyPlus::EnergyPlusData &state, std::string const & filepat
         EnergyPlus::ShowSevereError(state, e.what());
         return EnergyPlus::AbortEnergyPlus(state);
     }
-//    std::cout << "Timer, " << EnergyPlus::DataSurfaces::timer << "\n";
     return wrapUpEnergyPlus(state);
 }
 

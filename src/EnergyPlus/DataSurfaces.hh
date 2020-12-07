@@ -335,8 +335,6 @@ namespace DataSurfaces {
 
     // MODULE VARIABLE DECLARATIONS:
 
-    extern double timer;
-
     extern int TotSurfaces;          // Total number of surfaces (walls, floors, roofs, windows, shading surfaces, etc.--everything)
     extern int TotWindows;           // Total number of windows
     extern int TotComplexWin;        // Total number of windows with complex optical properties
