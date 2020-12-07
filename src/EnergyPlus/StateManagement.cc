@@ -77,7 +77,6 @@
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
-#include <EnergyPlus/DemandManager.hh>
 #include <EnergyPlus/DesiccantDehumidifiers.hh>
 #include <EnergyPlus/DisplacementVentMgr.hh>
 #include <EnergyPlus/DualDuct.hh>
@@ -211,7 +210,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     DataZoneControls::clear_state();
     DataZoneEnergyDemands::clear_state();
     DataZoneEquipment::clear_state();
-    DemandManager::clear_state();
     DesiccantDehumidifiers::clear_state();
     DisplacementVentMgr::clear_state();
     DualDuct::clear_state();
