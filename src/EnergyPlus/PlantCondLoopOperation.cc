@@ -80,9 +80,7 @@
 #include <EnergyPlus/SetPointManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
-namespace EnergyPlus {
-
-namespace PlantCondLoopOperation {
+namespace EnergyPlus::PlantCondLoopOperation {
 
     // MODIFIED       LKL Sep 03: adding integer/pointers for various parts of operation schemes
     // MODIFIED       DEF JUL 10: complete re-write to support new Plant manager
@@ -827,9 +825,9 @@ CurrentModuleObject, PlantOpSchemeName);
         lAlphaBlanks.dimension(NumAlphas, true);
         lNumericBlanks.dimension(NumNums, true);
 
-        if (PlantLoop(LoopNum).TypeOfLoop == Plant) {
+        if (PlantLoop(LoopNum).TypeOfLoop == LoopType::Plant) {
             LoopOpSchemeObj = "PlantEquipmentOperationSchemes";
-        } else if (PlantLoop(LoopNum).TypeOfLoop == Condenser) {
+        } else if (PlantLoop(LoopNum).TypeOfLoop == LoopType::Condenser) {
             LoopOpSchemeObj = "CondenserEquipmentOperationSchemes";
         }
 
@@ -869,7 +867,7 @@ CurrentModuleObject, PlantOpSchemeName);
                             }
 
                             {
-                                auto const plantLoopOperation(CurrentModuleObject); // different op schemes have different lower limit check values
+                                auto const & plantLoopOperation(CurrentModuleObject); // different op schemes have different lower limit check values
 
                                 if (plantLoopOperation == "PlantEquipmentOperation:CoolingLoad" ||
                                     plantLoopOperation == "PlantEquipmentOperation:HeatingLoad" ||
@@ -1023,9 +1021,9 @@ CurrentModuleObject, PlantOpSchemeName);
         lAlphaBlanks.dimension(NumAlphas, true);
         lNumericBlanks.dimension(NumNums, true);
 
-        if (PlantLoop(LoopNum).TypeOfLoop == Plant) {
+        if (PlantLoop(LoopNum).TypeOfLoop == LoopType::Plant) {
             LoopOpSchemeObj = "PlantEquipmentOperationSchemes";
-        } else if (PlantLoop(LoopNum).TypeOfLoop == Condenser) {
+        } else if (PlantLoop(LoopNum).TypeOfLoop == LoopType::Condenser) {
             LoopOpSchemeObj = "CondenserEquipmentOperationSchemes";
         }
 
@@ -1126,7 +1124,7 @@ CurrentModuleObject, PlantOpSchemeName);
         std::string CurrentModuleObject;
         static int TotNumLists(0);
         static Array1D_string EquipListsNameList;
-        static Array1D_int EquipListsTypeList;
+        static Array1D<LoopType> EquipListsTypeList;
         static Array1D_int EquipListsIndexList;
         int iIndex;
         bool firstblank;
@@ -1159,7 +1157,7 @@ CurrentModuleObject, PlantOpSchemeName);
                                                       cAlphaFieldNames,
                                                       cNumericFieldNames);
                         EquipListsNameList(iIndex) = cAlphaArgs(1);
-                        EquipListsTypeList(iIndex) = LoopType_Plant;
+                        EquipListsTypeList(iIndex) = LoopType::Plant;
                         EquipListsIndexList(iIndex) = Num;
                         MachineNum = 2;
                         while (MachineNum <= NumAlphas) {
@@ -1206,7 +1204,7 @@ CurrentModuleObject, PlantOpSchemeName);
                                                       cAlphaFieldNames,
                                                       cNumericFieldNames);
                         EquipListsNameList(iIndex) = cAlphaArgs(1);
-                        EquipListsTypeList(iIndex) = LoopType_Condenser;
+                        EquipListsTypeList(iIndex) = LoopType::Condenser;
                         EquipListsIndexList(iIndex) = Num;
                         MachineNum = 2;
                         while (MachineNum <= NumAlphas) {
@@ -1251,9 +1249,9 @@ CurrentModuleObject, PlantOpSchemeName);
                 // get object item for real this time
                 {
                     auto const SELECT_CASE_var(EquipListsTypeList(Num));
-                    if (SELECT_CASE_var == LoopType_Plant) {
+                    if (SELECT_CASE_var == LoopType::Plant) {
                         CurrentModuleObject = "PlantEquipmentList";
-                    } else if (SELECT_CASE_var == LoopType_Condenser) {
+                    } else if (SELECT_CASE_var == LoopType::Condenser) {
                         CurrentModuleObject = "CondenserEquipmentList";
                     }
                 }
@@ -1350,9 +1348,9 @@ CurrentModuleObject, PlantOpSchemeName);
 
         SchemeNameFound = true;
 
-        if (PlantLoop(LoopNum).TypeOfLoop == Plant) {
+        if (PlantLoop(LoopNum).TypeOfLoop == LoopType::Plant) {
             LoopOpSchemeObj = "PlantEquipmentOperationSchemes";
-        } else if (PlantLoop(LoopNum).TypeOfLoop == Condenser) {
+        } else if (PlantLoop(LoopNum).TypeOfLoop == LoopType::Condenser) {
             LoopOpSchemeObj = "CondenserEquipmentOperationSchemes";
         }
 
@@ -1505,10 +1503,10 @@ CurrentModuleObject, PlantOpSchemeName);
                                         ShowSevereError(state, "Missing temperature setpoint for " + CurrentModuleObject + " named " + cAlphaArgs(1));
                                         ShowContinueError(state, "A temperature setpoint is needed at the node named " +
                                                           PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeName);
-                                        if (PlantLoop(LoopNum).TypeOfLoop == Plant) {
+                                        if (PlantLoop(LoopNum).TypeOfLoop == LoopType::Plant) {
                                             ShowContinueError(state, "PlantLoop=\"" + PlantLoop(LoopNum).Name +
                                                               "\", Plant Loop Demand Calculation Scheme=SingleSetpoint");
-                                        } else if (PlantLoop(LoopNum).TypeOfLoop == Condenser) { // not applicable to Condenser loops
+                                        } else if (PlantLoop(LoopNum).TypeOfLoop == LoopType::Condenser) { // not applicable to Condenser loops
                                         }
                                         ShowContinueError(state, " Use a setpoint manager to place a single temperature setpoint on the node");
                                         ErrorsFound = true;
@@ -1523,10 +1521,10 @@ CurrentModuleObject, PlantOpSchemeName);
                                             ShowSevereError(state, "Missing temperature setpoint for " + CurrentModuleObject + " named " + cAlphaArgs(1));
                                             ShowContinueError(state, "A temperature setpoint is needed at the node named " +
                                                               PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeName);
-                                            if (PlantLoop(LoopNum).TypeOfLoop == Plant) {
+                                            if (PlantLoop(LoopNum).TypeOfLoop == LoopType::Plant) {
                                                 ShowContinueError(state, "PlantLoop=\"" + PlantLoop(LoopNum).Name +
                                                                   "\", Plant Loop Demand Calculation Scheme=SingleSetpoint");
-                                            } else if (PlantLoop(LoopNum).TypeOfLoop == Condenser) { // not applicable to Condenser loops
+                                            } else if (PlantLoop(LoopNum).TypeOfLoop == LoopType::Condenser) { // not applicable to Condenser loops
                                             }
                                             ShowContinueError(state,
                                                 " Use a setpoint manager or EMS actuator to place a single temperature setpoint on node");
@@ -1543,10 +1541,10 @@ CurrentModuleObject, PlantOpSchemeName);
                                                             cAlphaArgs(1));
                                             ShowContinueError(state, "A temperature high setpoint is needed at the node named " +
                                                               PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeName);
-                                            if (PlantLoop(LoopNum).TypeOfLoop == Plant) {
+                                            if (PlantLoop(LoopNum).TypeOfLoop == LoopType::Plant) {
                                                 ShowContinueError(state, "PlantLoop=\"" + PlantLoop(LoopNum).Name +
                                                                   "\", Plant Loop Demand Calculation Scheme=DualSetpointDeadband");
-                                            } else if (PlantLoop(LoopNum).TypeOfLoop == Condenser) { // not applicable to Condenser loops
+                                            } else if (PlantLoop(LoopNum).TypeOfLoop == LoopType::Condenser) { // not applicable to Condenser loops
                                             }
                                             ShowContinueError(state, " Use a setpoint manager to place a dual temperature setpoint on the node");
                                             ErrorsFound = true;
@@ -1562,10 +1560,10 @@ CurrentModuleObject, PlantOpSchemeName);
                                                                 cAlphaArgs(1));
                                                 ShowContinueError(state, "A high temperature setpoint is needed at the node named " +
                                                                   PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeName);
-                                                if (PlantLoop(LoopNum).TypeOfLoop == Plant) {
+                                                if (PlantLoop(LoopNum).TypeOfLoop == LoopType::Plant) {
                                                     ShowContinueError(state, "PlantLoop=\"" + PlantLoop(LoopNum).Name +
                                                                       "\", Plant Loop Demand Calculation Scheme=DualSetpointDeadband");
-                                                } else if (PlantLoop(LoopNum).TypeOfLoop == Condenser) { // not applicable to Condenser loops
+                                                } else if (PlantLoop(LoopNum).TypeOfLoop == LoopType::Condenser) { // not applicable to Condenser loops
                                                 }
                                                 ShowContinueError(state,
                                                     " Use a setpoint manager or EMS actuator to place a dual or high temperature setpoint on node");
@@ -1581,10 +1579,10 @@ CurrentModuleObject, PlantOpSchemeName);
                                                             cAlphaArgs(1));
                                             ShowContinueError(state, "A temperature low setpoint is needed at the node named " +
                                                               PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeName);
-                                            if (PlantLoop(LoopNum).TypeOfLoop == Plant) {
+                                            if (PlantLoop(LoopNum).TypeOfLoop == LoopType::Plant) {
                                                 ShowContinueError(state, "PlantLoop=\"" + PlantLoop(LoopNum).Name +
                                                                   "\", Plant Loop Demand Calculation Scheme=DualSetpointDeadband");
-                                            } else if (PlantLoop(LoopNum).TypeOfLoop == Condenser) { // not applicable to Condenser loops
+                                            } else if (PlantLoop(LoopNum).TypeOfLoop == LoopType::Condenser) { // not applicable to Condenser loops
                                             }
                                             ShowContinueError(state, " Use a setpoint manager to place a dual temperature setpoint on the node");
                                             ErrorsFound = true;
@@ -1604,10 +1602,10 @@ CurrentModuleObject, PlantOpSchemeName);
                                                                 cAlphaArgs(1));
                                                 ShowContinueError(state, "A low temperature setpoint is needed at the node named " +
                                                                   PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeName);
-                                                if (PlantLoop(LoopNum).TypeOfLoop == Plant) {
+                                                if (PlantLoop(LoopNum).TypeOfLoop == LoopType::Plant) {
                                                     ShowContinueError(state, "PlantLoop=\"" + PlantLoop(LoopNum).Name +
                                                                       "\", Plant Loop Demand Calculation Scheme=DualSetpointDeadband");
-                                                } else if (PlantLoop(LoopNum).TypeOfLoop == Condenser) { // not applicable to Condenser loops
+                                                } else if (PlantLoop(LoopNum).TypeOfLoop == LoopType::Condenser) { // not applicable to Condenser loops
                                                 }
                                                 ShowContinueError(state,
                                                     " Use a setpoint manager or EMS actuator to place a dual or low temperature setpoint on node");
@@ -1625,10 +1623,10 @@ CurrentModuleObject, PlantOpSchemeName);
                                                             cAlphaArgs(1));
                                             ShowContinueError(state, "A dual temperaturesetpoint is needed at the node named " +
                                                               PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeName);
-                                            if (PlantLoop(LoopNum).TypeOfLoop == Plant) {
+                                            if (PlantLoop(LoopNum).TypeOfLoop == LoopType::Plant) {
                                                 ShowContinueError(state, "PlantLoop=\"" + PlantLoop(LoopNum).Name +
                                                                   "\", Plant Loop Demand Calculation Scheme=DualSetpointDeadband");
-                                            } else if (PlantLoop(LoopNum).TypeOfLoop == Condenser) { // not applicable to Condenser loops
+                                            } else if (PlantLoop(LoopNum).TypeOfLoop == LoopType::Condenser) { // not applicable to Condenser loops
                                             }
                                             ShowContinueError(state, " Use a setpoint manager to place a dual temperature setpoint on the node");
                                             ErrorsFound = true;
@@ -1644,10 +1642,10 @@ CurrentModuleObject, PlantOpSchemeName);
                                                                 cAlphaArgs(1));
                                                 ShowContinueError(state, "A dual temperature setpoint is needed at the node named " +
                                                                   PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeName);
-                                                if (PlantLoop(LoopNum).TypeOfLoop == Plant) {
+                                                if (PlantLoop(LoopNum).TypeOfLoop == LoopType::Plant) {
                                                     ShowContinueError(state, "PlantLoop=\"" + PlantLoop(LoopNum).Name +
                                                                       "\", Plant Loop Demand Calculation Scheme=DualSetpointDeadband");
-                                                } else if (PlantLoop(LoopNum).TypeOfLoop == Condenser) { // not applicable to Condenser loops
+                                                } else if (PlantLoop(LoopNum).TypeOfLoop == LoopType::Condenser) { // not applicable to Condenser loops
                                                 }
                                                 ShowContinueError(state,
                                                     " Use a setpoint manager or EMS actuator to place a dual temperature setpoint on node");
@@ -1710,9 +1708,9 @@ CurrentModuleObject, PlantOpSchemeName);
 
         SchemeNameFound = true;
 
-        if (PlantLoop(LoopNum).TypeOfLoop == Plant) {
+        if (PlantLoop(LoopNum).TypeOfLoop == LoopType::Plant) {
             LoopOpSchemeObj = "PlantEquipmentOperationSchemes";
-        } else if (PlantLoop(LoopNum).TypeOfLoop == Condenser) {
+        } else if (PlantLoop(LoopNum).TypeOfLoop == LoopType::Condenser) {
             LoopOpSchemeObj = "CondenserEquipmentOperationSchemes";
         }
 
@@ -1922,7 +1920,7 @@ CurrentModuleObject, PlantOpSchemeName);
                             this_equip.BranchNumPtr = BranchNum;
                             this_equip.CompNumPtr = CompNum;
 
-                            if (ValidLoopEquipTypes(ThisTypeOfNum) == LoopType_Plant && this_plant_loop.TypeOfLoop == LoopType_Condenser) {
+                            if (ValidLoopEquipTypes(ThisTypeOfNum) == LoopType::Plant && this_plant_loop.TypeOfLoop == LoopType::Condenser) {
                                 ShowSevereError(state, "InitLoadDistribution: CondenserLoop=\"" + this_plant_loop.Name + "\", Operation Scheme=\"" +
                                                 this_plant_loop.OperationScheme + "\",");
                                 ShowContinueError(state, "Scheme type=" + this_op_scheme.TypeOf + ", Name=\"" + this_op_scheme.Name +
@@ -1932,7 +1930,7 @@ CurrentModuleObject, PlantOpSchemeName);
                                 ShowContinueError(state, "Component name = " + this_equip.Name);
                                 errFlag2 = true;
                             }
-                            if (ValidLoopEquipTypes(ThisTypeOfNum) == LoopType_Condenser && this_plant_loop.TypeOfLoop == LoopType_Plant) {
+                            if (ValidLoopEquipTypes(ThisTypeOfNum) == LoopType::Condenser && this_plant_loop.TypeOfLoop == LoopType::Plant) {
                                 ShowSevereError(state, "InitLoadDistribution: PlantLoop=\"" + this_plant_loop.Name + "\", Operation Scheme=\"" +
                                                 this_plant_loop.OperationScheme + "\",");
                                 ShowContinueError(state, "Scheme type=" + this_op_scheme.TypeOf + ", Name=\"" + this_op_scheme.Name +
@@ -3579,7 +3577,5 @@ CurrentModuleObject, PlantOpSchemeName);
 
     //*END PLANT EMS CONTROL ROUTINES!
     //******************************************************************************
-
-} // namespace PlantCondLoopOperation
 
 } // namespace EnergyPlus

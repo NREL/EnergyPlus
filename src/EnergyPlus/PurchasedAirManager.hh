@@ -378,9 +378,9 @@ namespace PurchasedAirManager {
 } // namespace PurchasedAirManager
 
 struct PurchasedAirManagerData : BaseGlobalStruct {
-    int NumPurchAir;
-    int NumPlenumArrays; // total number of plenum arrays
-    bool GetPurchAirInputFlag;
+    int NumPurchAir = 0;
+    int NumPlenumArrays = 0; // total number of plenum arrays
+    bool GetPurchAirInputFlag = true;
     Array1D_bool CheckEquipName;
     Array1D<PurchasedAirManager::ZonePurchasedAir> PurchAir;                      // Used to specify purchased air parameters
     Array1D<PurchasedAirManager::PurchAirNumericFieldData> PurchAirNumericFields; // Used to save the indices of scalable sizing object for zone HVAC
