@@ -97,18 +97,8 @@ namespace RuntimeLanguageProcessor {
     // MODULE PARAMETER DEFINITIONS:
     int const MaxErrors(20);
 
-    // keyword parameters for types of Erl statements
-    int const KeywordNone(0);      // statement type not set
-    int const KeywordReturn(1);    // Return statement, as in leave program
-    int const KeywordGoto(2);      // Goto statement, used in parsing to manage IF-ElseIf-Else-EndIf and nesting
-    int const KeywordSet(3);       // Set statement, as in assign RHS to LHS
-    int const KeywordRun(4);       // Run statement, used to call a subroutine from a main program
-    int const KeywordIf(5);        // If statement, begins an IF-ElseIf-Else-EndIf logic block
-    int const KeywordElseIf(6);    // ElseIf statement, begins an ElseIf block
-    int const KeywordElse(7);      // Else statement, begins an Else block
-    int const KeywordEndIf(8);     // EndIf statement, terminates an IF-ElseIf-Else-EndIf logic block
-    int const KeywordWhile(9);     // While statement, begins a While block
-    int const KeywordEndWhile(10); // EndWhile statement, terminates a While block
+
+
 
     // token type parameters for Erl code parsing
     int const TokenNumber(1);     // matches the ValueNumber
@@ -232,16 +222,6 @@ namespace RuntimeLanguageProcessor {
         // One time run.  Must be run BEFORE anything gets parsed.
 
         // Using/Aliasing
-        using DataEnvironment::CurEnvirNum;
-        using DataEnvironment::DayOfMonth;
-        using DataEnvironment::DayOfWeek;
-        using DataEnvironment::DayOfYear;
-        using DataEnvironment::DSTIndicator;
-        using DataEnvironment::HolidayIndex;
-        using DataEnvironment::IsRain;
-        using DataEnvironment::Month;
-        using DataEnvironment::SunIsUp;
-        using DataEnvironment::Year;
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
 
@@ -320,14 +300,14 @@ namespace RuntimeLanguageProcessor {
         }
 
         // Update built-in variables
-        ErlVariable(YearVariableNum).Value = SetErlValueNumber(double(Year));
-        ErlVariable(MonthVariableNum).Value = SetErlValueNumber(double(Month));
-        ErlVariable(DayOfMonthVariableNum).Value = SetErlValueNumber(double(DayOfMonth));
-        ErlVariable(DayOfWeekVariableNum).Value = SetErlValueNumber(double(DayOfWeek));
-        ErlVariable(DayOfYearVariableNum).Value = SetErlValueNumber(double(DayOfYear));
+        ErlVariable(YearVariableNum).Value = SetErlValueNumber(double(state.dataEnvrn->Year));
+        ErlVariable(MonthVariableNum).Value = SetErlValueNumber(double(state.dataEnvrn->Month));
+        ErlVariable(DayOfMonthVariableNum).Value = SetErlValueNumber(double(state.dataEnvrn->DayOfMonth));
+        ErlVariable(DayOfWeekVariableNum).Value = SetErlValueNumber(double(state.dataEnvrn->DayOfWeek));
+        ErlVariable(DayOfYearVariableNum).Value = SetErlValueNumber(double(state.dataEnvrn->DayOfYear));
         ErlVariable(TimeStepNumVariableNum).Value = SetErlValueNumber(double(state.dataGlobal->TimeStep));
 
-        ErlVariable(DSTVariableNum).Value = SetErlValueNumber(double(DSTIndicator));
+        ErlVariable(DSTVariableNum).Value = SetErlValueNumber(double(state.dataEnvrn->DSTIndicator));
         // DSTadjust = REAL(DSTIndicator, r64)
         tmpHours = double(state.dataGlobal->HourOfDay - 1); // no, just stay on 0..23+ DSTadjust ! offset by 1 and daylight savings time
         ErlVariable(HourVariableNum).Value = SetErlValueNumber(tmpHours);
@@ -341,20 +321,20 @@ namespace RuntimeLanguageProcessor {
         ErlVariable(CurrentTimeVariableNum).Value = SetErlValueNumber(tmpCurrentTime);
         tmpMinutes = ((tmpCurrentTime - double(state.dataGlobal->HourOfDay - 1)) * 60.0); // -1.0 // off by 1
         ErlVariable(MinuteVariableNum).Value = SetErlValueNumber(tmpMinutes);
-        ErlVariable(HolidayVariableNum).Value = SetErlValueNumber(double(HolidayIndex));
-        if (SunIsUp) {
+        ErlVariable(HolidayVariableNum).Value = SetErlValueNumber(double(state.dataEnvrn->HolidayIndex));
+        if (state.dataEnvrn->SunIsUp) {
             ErlVariable(SunIsUpVariableNum).Value = SetErlValueNumber(1.0);
         } else {
             ErlVariable(SunIsUpVariableNum).Value = SetErlValueNumber(0.0);
         }
-        if (IsRain) {
+        if (state.dataEnvrn->IsRain) {
             ErlVariable(IsRainingVariableNum).Value = SetErlValueNumber(1.0);
         } else {
             ErlVariable(IsRainingVariableNum).Value = SetErlValueNumber(0.0);
         }
         ErlVariable(SystemTimeStepVariableNum).Value = SetErlValueNumber(TimeStepSys);
 
-        tmpCurEnvirNum = double(CurEnvirNum);
+        tmpCurEnvirNum = double(state.dataEnvrn->CurEnvirNum);
         ErlVariable(CurrentEnvironmentPeriodNum).Value = SetErlValueNumber(tmpCurEnvirNum);
         if (state.dataGlobal->WarmupFlag) {
             ErlVariable(WarmUpFlagNum).Value = SetErlValueNumber(1.0);
@@ -556,10 +536,10 @@ namespace RuntimeLanguageProcessor {
                 if (SELECT_CASE_var == "RETURN") {
                     if (DeveloperFlag) print(state.files.debug, "RETURN \"{}\"\n", Line);
                     if (Remainder.empty()) {
-                        InstructionNum = AddInstruction(StackNum, LineNum, KeywordReturn);
+                        InstructionNum = AddInstruction(StackNum, LineNum, RuntimeLanguageProcessor::ErlKeywordParam::KeywordReturn);
                     } else {
                         ParseExpression(state, Remainder, StackNum, ExpressionNum, Line);
-                        InstructionNum = AddInstruction(StackNum, LineNum, KeywordReturn, ExpressionNum);
+                        InstructionNum = AddInstruction(StackNum, LineNum, DataRuntimeLanguage::ErlKeywordParam::KeywordReturn, ExpressionNum);
                     }
 
                 } else if (SELECT_CASE_var == "SET") {
@@ -583,7 +563,7 @@ namespace RuntimeLanguageProcessor {
                             AddError(StackNum, LineNum, "Expression missing for the SET instruction.");
                         } else {
                             ParseExpression(state, Expression, StackNum, ExpressionNum, Line);
-                            InstructionNum = AddInstruction(StackNum, LineNum, KeywordSet, VariableNum, ExpressionNum);
+                            InstructionNum = AddInstruction(StackNum, LineNum, DataRuntimeLanguage::ErlKeywordParam::KeywordSet, VariableNum, ExpressionNum);
                         }
                     }
 
@@ -600,7 +580,7 @@ namespace RuntimeLanguageProcessor {
                         if (StackNum2 == 0) {
                             AddError(StackNum, LineNum, "Program or Subroutine name [" + Variable + "] not found for the RUN instruction.");
                         } else {
-                            InstructionNum = AddInstruction(StackNum, LineNum, KeywordRun, StackNum2);
+                            InstructionNum = AddInstruction(StackNum, LineNum, DataRuntimeLanguage::ErlKeywordParam::KeywordRun, StackNum2);
                         }
                     }
 
@@ -624,7 +604,7 @@ namespace RuntimeLanguageProcessor {
                         AddError(StackNum, LineNum, "Detected IF nested deeper than is allowed; need to terminate an earlier IF instruction.");
                         break;
                     } else {
-                        InstructionNum = AddInstruction(StackNum, LineNum, KeywordIf, ExpressionNum); // Arg2 added at next ELSEIF, ELSE, ENDIF
+                        InstructionNum = AddInstruction(StackNum, LineNum, DataRuntimeLanguage::ErlKeywordParam::KeywordIf, ExpressionNum); // Arg2 added at next ELSEIF, ELSE, ENDIF
                         SavedIfInstructionNum(NestedIfDepth) = InstructionNum;
                     }
 
@@ -639,7 +619,7 @@ namespace RuntimeLanguageProcessor {
                     }
 
                     // Complete the preceding block with a GOTO instruction
-                    InstructionNum = AddInstruction(StackNum, 0, KeywordGoto); // Arg2 is added at the ENDIF
+                    InstructionNum = AddInstruction(StackNum, 0, DataRuntimeLanguage::ErlKeywordParam::KeywordGoto); // Arg2 is added at the ENDIF
                     ++NumGotos(NestedIfDepth);
                     if (NumGotos(NestedIfDepth) > ELSEIFLengthAllowed) {
                         AddError(StackNum, LineNum, "Detected ELSEIF series that is longer than allowed; terminate earlier IF instruction.");
@@ -656,7 +636,10 @@ namespace RuntimeLanguageProcessor {
                         ParseExpression(state, Expression, StackNum, ExpressionNum, Line);
                     }
 
-                    InstructionNum = AddInstruction(StackNum, LineNum, KeywordIf, ExpressionNum); // Arg2 added at next ELSEIF, ELSE, ENDIF
+                    InstructionNum = AddInstruction(StackNum,
+                                                    LineNum,
+                                                    DataRuntimeLanguage::ErlKeywordParam::KeywordIf,
+                                                    ExpressionNum); // Arg2 added at next ELSEIF, ELSE, ENDIF
                     ErlStack(StackNum).Instruction(SavedIfInstructionNum(NestedIfDepth)).Argument2 = InstructionNum;
                     SavedIfInstructionNum(NestedIfDepth) = InstructionNum;
 
@@ -675,7 +658,8 @@ namespace RuntimeLanguageProcessor {
                     ReadyForElse(NestedIfDepth) = false;
 
                     // Complete the preceding block with a GOTO instruction
-                    InstructionNum = AddInstruction(StackNum, 0, KeywordGoto); // Arg2 is added at the ENDIF
+                    InstructionNum =
+                        AddInstruction(StackNum, 0, DataRuntimeLanguage::ErlKeywordParam::KeywordGoto); // Arg2 is added at the ENDIF
                     ++NumGotos(NestedIfDepth);
                     if (NumGotos(NestedIfDepth) > ELSEIFLengthAllowed) {
                         AddError(StackNum, LineNum, "Detected ELSEIF-ELSE series that is longer than allowed.");
@@ -688,7 +672,8 @@ namespace RuntimeLanguageProcessor {
                         AddError(StackNum, LineNum, "Nothing is allowed to follow the ELSE instruction.");
                     }
 
-                    InstructionNum = AddInstruction(StackNum, LineNum, KeywordElse); // can make this into a KeywordIf?
+                    InstructionNum =
+                        AddInstruction(StackNum, LineNum, DataRuntimeLanguage::ErlKeywordParam::KeywordElse); // can make this into a KeywordIf?
                     ErlStack(StackNum).Instruction(SavedIfInstructionNum(NestedIfDepth)).Argument2 = InstructionNum;
                     SavedIfInstructionNum(NestedIfDepth) = InstructionNum;
 
@@ -712,7 +697,7 @@ namespace RuntimeLanguageProcessor {
                         AddError(StackNum, LineNum, "Nothing is allowed to follow the ENDIF instruction.");
                     }
 
-                    InstructionNum = AddInstruction(StackNum, LineNum, KeywordEndIf);
+                    InstructionNum = AddInstruction(StackNum, LineNum, DataRuntimeLanguage::ErlKeywordParam::KeywordEndIf);
                     ErlStack(StackNum).Instruction(SavedIfInstructionNum(NestedIfDepth)).Argument2 = InstructionNum;
 
                     // Go back and complete all of the GOTOs that terminate each IF and ELSEIF block
@@ -741,7 +726,7 @@ namespace RuntimeLanguageProcessor {
                         AddError(StackNum, LineNum, "Detected WHILE nested deeper than is allowed; need to terminate an earlier WHILE instruction.");
                         break;
                     } else {
-                        InstructionNum = AddInstruction(StackNum, LineNum, KeywordWhile, ExpressionNum);
+                        InstructionNum = AddInstruction(StackNum, LineNum, DataRuntimeLanguage::ErlKeywordParam::KeywordWhile, ExpressionNum);
                         SavedWhileInstructionNum = InstructionNum;
                         SavedWhileExpressionNum = ExpressionNum;
                     }
@@ -756,7 +741,7 @@ namespace RuntimeLanguageProcessor {
                         AddError(StackNum, LineNum, "Nothing is allowed to follow the ENDWHILE instruction.");
                     }
 
-                    InstructionNum = AddInstruction(StackNum, LineNum, KeywordEndWhile);
+                    InstructionNum = AddInstruction(StackNum, LineNum, DataRuntimeLanguage::ErlKeywordParam::KeywordEndWhile);
                     ErlStack(StackNum).Instruction(SavedWhileInstructionNum).Argument2 = InstructionNum;
                     ErlStack(StackNum).Instruction(InstructionNum).Argument1 = SavedWhileExpressionNum;
                     ErlStack(StackNum).Instruction(InstructionNum).Argument2 = SavedWhileInstructionNum;
@@ -777,7 +762,7 @@ namespace RuntimeLanguageProcessor {
         if (NestedIfDepth == 1) {
             AddError(StackNum, 0, "Missing an ENDIF instruction needed to terminate an earlier IF instruction.");
         } else if (NestedIfDepth > 1) {
-            AddError(StackNum, 0, "Missing " + fmt::to_string(NestedIfDepth) + " ENDIF instructions needed to terminate earlier IF instructions.");
+            AddError(StackNum, 0, format("Missing {} ENDIF instructions needed to terminate earlier IF instructions.", NestedIfDepth));
         }
 
         //  ALLOCATE(DummyError(ErlStack(StackNum)%NumErrors))
@@ -786,7 +771,7 @@ namespace RuntimeLanguageProcessor {
 
     int AddInstruction(int const StackNum,
                        int const LineNum,
-                       int const Keyword,
+                       DataRuntimeLanguage::ErlKeywordParam Keyword,
                        Optional_int_const Argument1, // Erl variable index
                        Optional_int_const Argument2)
     {
@@ -875,7 +860,7 @@ namespace RuntimeLanguageProcessor {
 
         ErrorNum = ErlStack(StackNum).NumErrors;
         if (LineNum > 0) {
-            ErlStack(StackNum).Error(ErrorNum) = "Line " + fmt::to_string(LineNum) + ":  " + Error + " \"" + ErlStack(StackNum).Line(LineNum) + "\"";
+            ErlStack(StackNum).Error(ErrorNum) = format("Line {}:  {} \"{}\"", LineNum, Error, ErlStack(StackNum).Line(LineNum));
         } else {
             ErlStack(StackNum).Error(ErrorNum) = Error;
         }
@@ -918,17 +903,17 @@ namespace RuntimeLanguageProcessor {
             {
                 auto const SELECT_CASE_var(ErlStack(StackNum).Instruction(InstructionNum).Keyword);
 
-                if (SELECT_CASE_var == KeywordNone) {
+                if (SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::KeywordNone) {
                     // There probably shouldn't be any of these
 
-                } else if (SELECT_CASE_var == KeywordReturn) {
+                } else if (SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::KeywordReturn) {
                     if (ErlStack(StackNum).Instruction(InstructionNum).Argument1 > 0)
                         ReturnValue = EvaluateExpression(state, ErlStack(StackNum).Instruction(InstructionNum).Argument1, seriousErrorFound);
 
                     WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
                     break; // RETURN always terminates an instruction stack
 
-                } else if (SELECT_CASE_var == KeywordSet) {
+                } else if (SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::KeywordSet) {
 
                     ReturnValue = EvaluateExpression(state, ErlStack(StackNum).Instruction(InstructionNum).Argument2, seriousErrorFound);
                     VariableNum = ErlStack(StackNum).Instruction(InstructionNum).Argument1;
@@ -941,13 +926,14 @@ namespace RuntimeLanguageProcessor {
 
                     WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
 
-                } else if (SELECT_CASE_var == KeywordRun) {
+                } else if (SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::KeywordRun) {
                     ReturnValue.Type = ValueString;
                     ReturnValue.String = "";
                     WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
                     ReturnValue = EvaluateStack(state, ErlStack(StackNum).Instruction(InstructionNum).Argument1);
 
-                } else if ((SELECT_CASE_var == KeywordIf) || (SELECT_CASE_var == KeywordElse)) { // same???
+                } else if ((SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::KeywordIf) ||
+                           (SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::KeywordElse)) { // same???
                     ExpressionNum = ErlStack(StackNum).Instruction(InstructionNum).Argument1;
                     InstructionNum2 = ErlStack(StackNum).Instruction(InstructionNum).Argument2;
 
@@ -966,7 +952,7 @@ namespace RuntimeLanguageProcessor {
                         WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
                     }
 
-                } else if (SELECT_CASE_var == KeywordGoto) {
+                } else if (SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::KeywordGoto) {
                     InstructionNum = ErlStack(StackNum).Instruction(InstructionNum).Argument1;
 
                     // For debug purposes only...
@@ -976,12 +962,12 @@ namespace RuntimeLanguageProcessor {
                     continue;
                     // PE if this ever went out of bounds, would the DO loop save it?  or need check here?
 
-                } else if (SELECT_CASE_var == KeywordEndIf) {
+                } else if (SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::KeywordEndIf) {
                     ReturnValue.Type = ValueString;
                     ReturnValue.String = "";
                     WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
 
-                } else if (SELECT_CASE_var == KeywordWhile) {
+                } else if (SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::KeywordWhile) {
                     // evaluate expression at while, skip to past endwhile if not true
                     ExpressionNum = ErlStack(StackNum).Instruction(InstructionNum).Argument1;
                     InstructionNum2 = ErlStack(StackNum).Instruction(InstructionNum).Argument2;
@@ -992,7 +978,7 @@ namespace RuntimeLanguageProcessor {
                         InstructionNum = InstructionNum2;
                         // CYCLE
                     }
-                } else if (SELECT_CASE_var == KeywordEndWhile) {
+                } else if (SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::KeywordEndWhile) {
 
                     // reevaluate expression at While and goto there if true, otherwise continue
                     ExpressionNum = ErlStack(StackNum).Instruction(InstructionNum).Argument1;
@@ -1045,8 +1031,6 @@ namespace RuntimeLanguageProcessor {
         // METHODOLOGY EMPLOYED:
 
         // Using/Aliasing
-        using DataEnvironment::CurMnDy;
-        using DataEnvironment::EnvironmentName;
         using General::CreateSysTimeIntervalString;
 
         // Locals
@@ -1096,7 +1080,7 @@ namespace RuntimeLanguageProcessor {
                 DuringWarmup = " During Sizing, Occurrence info=";
             }
         }
-        TimeString = DuringWarmup + EnvironmentName + ", " + CurMnDy + ' ' + CreateSysTimeIntervalString(state);
+        TimeString = DuringWarmup + state.dataEnvrn->EnvironmentName + ", " + state.dataEnvrn->CurMnDy + ' ' + CreateSysTimeIntervalString(state);
 
         if (OutputFullEMSTrace || (OutputEMSErrors && (ReturnValue.Type == ValueError))) {
             print(state.files.edd, "{},Line {},{},{},{}\n", NameString, LineNumString, LineString, cValueString, TimeString);
@@ -1822,8 +1806,6 @@ namespace RuntimeLanguageProcessor {
         // Using/Aliasing
         using namespace Psychrometrics;
         using CurveManager::CurveValue;
-        using General::RoundSigDigits;
-        using General::TrimSigDigits;
 
         // Return value
         ErlValueType ReturnValue;
@@ -1851,7 +1833,7 @@ namespace RuntimeLanguageProcessor {
         // Object Data
         Array1D<ErlValueType> Operand;
 
-        static std::string const EMSBuiltInFunction("EMS Built-In Function");
+        auto constexpr EMSBuiltInFunction("EMS Built-In Function");
 
         // FLOW:
 
@@ -1992,8 +1974,10 @@ namespace RuntimeLanguageProcessor {
                             if (std::isnan(TestValue)) {
                                 // throw Error
                                 ReturnValue.Type = ValueError;
-                                ReturnValue.Error = "EvaluateExpression: Attempted to raise to power with incompatible numbers: " +
-                                                    TrimSigDigits(Operand(1).Number, 6) + " raised to " + TrimSigDigits(Operand(2).Number, 6);
+                                ReturnValue.Error =
+                                    format("EvaluateExpression: Attempted to raise to power with incompatible numbers: {:.6T} raised to {:.6T}",
+                                           Operand(1).Number,
+                                           Operand(2).Number);
                                 if (!state.dataGlobal->DoingSizing && !state.dataGlobal->KickOffSimulation && !EMSManager::FinishProcessingUserInput) {
                                     seriousErrorFound = true;
                                 }
@@ -2040,8 +2024,8 @@ namespace RuntimeLanguageProcessor {
                             ReturnValue = SetErlValueNumber(0.0);
                         } else {
                             // throw Error
-                            ReturnValue.Error = "EvaluateExpression: Attempted to calculate exponential value of too large a number: " +
-                                                TrimSigDigits(Operand(1).Number, 4);
+                            ReturnValue.Error = format("EvaluateExpression: Attempted to calculate exponential value of too large a number: {:.4T}",
+                                                       Operand(1).Number);
                             ReturnValue.Type = ValueError;
                             if (!state.dataGlobal->DoingSizing && !state.dataGlobal->KickOffSimulation && !EMSManager::FinishProcessingUserInput) {
                                 seriousErrorFound = true;
@@ -2053,8 +2037,7 @@ namespace RuntimeLanguageProcessor {
                         } else {
                             // throw error,
                             ReturnValue.Type = ValueError;
-                            ReturnValue.Error =
-                                "EvaluateExpression: Natural Log of zero or less! ln of value = " + TrimSigDigits(Operand(1).Number, 4);
+                            ReturnValue.Error = format("EvaluateExpression: Natural Log of zero or less! ln of value = {:.4T}", Operand(1).Number);
                             if (!state.dataGlobal->DoingSizing && !state.dataGlobal->KickOffSimulation && !EMSManager::FinishProcessingUserInput) {
                                 seriousErrorFound = true;
                             }
@@ -2238,16 +2221,16 @@ namespace RuntimeLanguageProcessor {
 
                         ShowSevereError(state, "EMS user program found serious problem and is halting simulation");
                         ShowContinueErrorTimeStamp(state, "");
-                        ShowFatalError(state, "EMS user program halted simulation with error code = " + TrimSigDigits(Operand(1).Number, 2));
+                        ShowFatalError(state, format("EMS user program halted simulation with error code = {:.2T}", Operand(1).Number));
                         ReturnValue = SetErlValueNumber(Operand(1).Number); // returns back the error code
                     } else if (SELECT_CASE_var == FuncSevereWarnEp) {
 
-                        ShowSevereError(state, "EMS user program issued severe warning with error code = " + TrimSigDigits(Operand(1).Number, 2));
+                        ShowSevereError(state, format("EMS user program issued severe warning with error code = {:.2T}", Operand(1).Number));
                         ShowContinueErrorTimeStamp(state, "");
                         ReturnValue = SetErlValueNumber(Operand(1).Number); // returns back the error code
                     } else if (SELECT_CASE_var == FuncWarnEp) {
 
-                        ShowWarningError(state, "EMS user program issued warning with error code = " + TrimSigDigits(Operand(1).Number, 2));
+                        ShowWarningError(state, format("EMS user program issued warning with error code = {:.2T}", Operand(1).Number));
                         ShowContinueErrorTimeStamp(state, "");
                         ReturnValue = SetErlValueNumber(Operand(1).Number); // returns back the error code
                     } else if (SELECT_CASE_var == FuncTrendValue) {
@@ -2551,9 +2534,10 @@ namespace RuntimeLanguageProcessor {
             ReturnVal = SetErlValueNumber(TodayTomorrowWeatherSource(iTimeStep, iHour));
         } else {
             ReturnVal.Type = DataRuntimeLanguage::ValueError;
-            ReturnVal.Error = DataRuntimeLanguage::PossibleOperators(FunctionCode).Symbol +
-                              " function called with invalid arguments: Hour=" + General::RoundSigDigits(Operand1, 1) +
-                              ", Timestep=" + General::RoundSigDigits(Operand2, 1);
+            ReturnVal.Error = format("{} function called with invalid arguments: Hour={:.1R}, Timestep={:.1R}",
+                                     DataRuntimeLanguage::PossibleOperators(FunctionCode).Symbol,
+                                     Operand1,
+                                     Operand2);
         }
     }
 
@@ -2571,9 +2555,10 @@ namespace RuntimeLanguageProcessor {
             }
         } else {
             ReturnVal.Type = DataRuntimeLanguage::ValueError;
-            ReturnVal.Error = DataRuntimeLanguage::PossibleOperators(FunctionCode).Symbol +
-                              " function called with invalid arguments: Hour=" + General::RoundSigDigits(Operand1, 1) +
-                              ", Timestep=" + General::RoundSigDigits(Operand2, 1);
+            ReturnVal.Error = format("{} function called with invalid arguments: Hour={:.1R}, Timestep={:.1R}",
+                                     DataRuntimeLanguage::PossibleOperators(FunctionCode).Symbol,
+                                     Operand1,
+                                     Operand2);
         }
     }
 
@@ -2621,11 +2606,10 @@ namespace RuntimeLanguageProcessor {
 
         // Using/Aliasing
         using CurveManager::GetCurveIndex;
-        using General::TrimSigDigits;
 
         // Locals
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetRuntimeLanguageUserInput: ");
+        auto constexpr RoutineName("GetRuntimeLanguageUserInput: ");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int GlobalNum;
@@ -3115,7 +3099,7 @@ namespace RuntimeLanguageProcessor {
                         }
                     } else {
                         ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
-                        ShowContinueError(state, "Invalid " + cNumericFieldNames(1) + '=' + TrimSigDigits(rNumericArgs(1), 2));
+                        ShowContinueError(state, format("Invalid {}={:.2T}", cNumericFieldNames(1), rNumericArgs(1)));
                         ShowContinueError(state, "must be greater than zero");
                         ErrorsFound = true;
                     }
@@ -3777,7 +3761,6 @@ namespace RuntimeLanguageProcessor {
         // na
 
         // Using/Aliasing
-        using General::TrimSigDigits;
 
         // Return value
         std::string String;
@@ -3794,7 +3777,7 @@ namespace RuntimeLanguageProcessor {
                 if (Value.Number == 0.0) {
                     String = "0.0";
                 } else {
-                    String = TrimSigDigits(Value.Number, 6); //(String)
+                    String = format("{:.6T}", Value.Number); //(String)
                 }
 
             } else if (SELECT_CASE_var == ValueString) {

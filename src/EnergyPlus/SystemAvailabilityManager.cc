@@ -72,7 +72,6 @@
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -1713,7 +1712,6 @@ namespace SystemAvailabilityManager {
         // System Availability Manager algorithm.
 
         // Using/Aliasing
-        using General::TrimSigDigits;
 
         {
             auto const SELECT_CASE_var(SysAvailType);
@@ -1828,7 +1826,7 @@ namespace SystemAvailabilityManager {
                 }
 
             } else {
-                ShowSevereError(state, "AvailabilityManager Type not found: " + TrimSigDigits(SysAvailType));
+                ShowSevereError(state, format("AvailabilityManager Type not found: {}", SysAvailType));
                 ShowContinueError(state, "Occurs in Manager=" + SysAvailName);
                 ShowFatalError(state, "Preceding condition causes termination.");
             }
@@ -2298,9 +2296,6 @@ namespace SystemAvailabilityManager {
 
         // Using/Aliasing
         using namespace DataAirLoop;
-        using DataEnvironment::DayOfWeekTomorrow;
-        using DataEnvironment::DayOfYear;
-        using DataEnvironment::DSTIndicator;
         using DataHeatBalFanSys::TempControlType;
         using DataHeatBalFanSys::TempTstatAir;
         using DataHeatBalFanSys::TempZoneThermostatSetPoint;
@@ -2396,9 +2391,9 @@ namespace SystemAvailabilityManager {
             AvailStatus = NoAction;
         } else {
             ScheduleIndex = GetScheduleIndex(state, OptStartMgr.FanSched);
-            JDay = DayOfYear;
+            JDay = state.dataEnvrn->DayOfYear;
             TmrJDay = JDay + 1;
-            TmrDayOfWeek = DayOfWeekTomorrow;
+            TmrDayOfWeek = state.dataEnvrn->DayOfWeekTomorrow;
 
             DayValues.allocate(state.dataGlobal->NumOfTimeStepInHour, 24);
             DayValuesTmr.allocate(state.dataGlobal->NumOfTimeStepInHour, 24);
@@ -2462,7 +2457,7 @@ namespace SystemAvailabilityManager {
                 OptStartData.ActualZoneNum(actZoneNum) = actZoneNum;
             }
 
-            if (DSTIndicator > 0) {
+            if (state.dataEnvrn->DSTIndicator > 0) {
                 --FanStartTime;
                 --FanStartTimeTmr;
             }
@@ -3424,7 +3419,6 @@ namespace SystemAvailabilityManager {
         // value.
 
         using namespace DataAirLoop;
-        using DataEnvironment::OutDryBulbTemp;
         using DataHeatBalFanSys::TempControlType;
         using DataHeatBalFanSys::TempTstatAir;
         using DataHeatBalFanSys::TempZoneThermostatSetPoint;
@@ -3480,7 +3474,7 @@ namespace SystemAvailabilityManager {
             }
             // If the difference between the control zone temperature and the outside temperature is greater than
             // the specified night venting delta T then set the delta T check to TRUE
-            if ((TempTstatAir(ControlZoneNum) - OutDryBulbTemp) > state.dataSystemAvailabilityManager->NVentSysAvailMgrData(SysAvailNum).VentDelT) {
+            if ((TempTstatAir(ControlZoneNum) - state.dataEnvrn->OutDryBulbTemp) > state.dataSystemAvailabilityManager->NVentSysAvailMgrData(SysAvailNum).VentDelT) {
                 DelTCheck = true;
             }
             // If the limit requirements are met turn on night ventilation
@@ -3751,12 +3745,11 @@ namespace SystemAvailabilityManager {
         using NodeInputManager::GetOnlySingleNode;
         using NodeInputManager::MarkNode;
         using namespace DataLoopNode;
-        using General::TrimSigDigits;
+
         using namespace DataIPShortCuts;
         using CurveManager::CurveValue;
         using CurveManager::GetCurveIndex;
         using CurveManager::GetCurveMinMaxValues;
-        using DataContaminantBalance::Contaminant;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("GetHybridVentilationInputs: "); // include trailing blank
@@ -3840,16 +3833,16 @@ namespace SystemAvailabilityManager {
             if (SchedMax > 7.0) {
                 ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
                 ShowContinueError(state, cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) + "\", the maximum schedule value should be 7. However, ");
-                ShowContinueError(state, "the maximum entered value in the schedule is " + TrimSigDigits(SchedMax, 1));
+                ShowContinueError(state, format("the maximum entered value in the schedule is {:.1T}", SchedMax));
                 ErrorsFound = true;
             }
             if (SchedMin < 0.0) {
                 ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
                 ShowContinueError(state, cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) + "the minimum schedule value should be 0. However, ");
-                ShowContinueError(state, "the minimum entered value in the schedule is " + TrimSigDigits(SchedMin, 1));
+                ShowContinueError(state, format("the minimum entered value in the schedule is {:.1T}", SchedMin));
                 ErrorsFound = true;
             }
-            if (SchedMax == 7.0 && !Contaminant.CO2Simulation) {
+            if (SchedMax == 7.0 && !state.dataContaminantBalance->Contaminant.CO2Simulation) {
                 ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
                 ShowContinueError(state, cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) +
                                   "\", When the schedule value is 7, carbon dioxide (CO2) control is requested. ");
@@ -3874,7 +3867,7 @@ namespace SystemAvailabilityManager {
                 if (rNumericArgs(1) > 40.0 || rNumericArgs(1) < 0.0) {
                     ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
                     ShowContinueError(state, cNumericFieldNames(1) + " is beyond the range.");
-                    ShowContinueError(state, "The input value is " + TrimSigDigits(rNumericArgs(1), 0) + ". The allowed value must be >= 0 and <= 40 m/s");
+                    ShowContinueError(state, format("The input value is {:.0T}. The allowed value must be >= 0 and <= 40 m/s", rNumericArgs(1)));
                     ErrorsFound = true;
                 }
             }
@@ -3885,8 +3878,8 @@ namespace SystemAvailabilityManager {
                 if (rNumericArgs(2) > 100.0 || rNumericArgs(2) < -100.0) {
                     ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
                     ShowContinueError(state, cNumericFieldNames(2) + " is beyond the range.");
-                    ShowContinueError(state, "The input value is " + TrimSigDigits(rNumericArgs(2), 0) +
-                                      ". The allowed value must be between -100 C and +100 C");
+                    ShowContinueError(state,
+                                      format("The input value is {:.0T}. The allowed value must be between -100 C and +100 C", rNumericArgs(2)));
                     ErrorsFound = true;
                 }
             }
@@ -3895,8 +3888,8 @@ namespace SystemAvailabilityManager {
                 if (rNumericArgs(3) > 100.0 || rNumericArgs(3) < -100.0) {
                     ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
                     ShowContinueError(state, cNumericFieldNames(3) + " is beyond the range.");
-                    ShowContinueError(state, "The input value is " + TrimSigDigits(rNumericArgs(3), 0) +
-                                      ". The allowed value must be between -100 C and +100 C");
+                    ShowContinueError(state,
+                                      format("The input value is {:.0T}. The allowed value must be between -100 C and +100 C", rNumericArgs(3)));
                     ErrorsFound = true;
                 }
             }
@@ -3904,8 +3897,9 @@ namespace SystemAvailabilityManager {
             if (rNumericArgs(2) >= rNumericArgs(3)) {
                 ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" The " + cNumericFieldNames(2) +
                                 " must be less than the " + cNumericFieldNames(3));
-                ShowContinueError(state, "The " + cNumericFieldNames(2) + " is " + TrimSigDigits(rNumericArgs(2), 0) + ". The " + cNumericFieldNames(3) +
-                                  " is " + TrimSigDigits(rNumericArgs(3), 0) + '.');
+                ShowContinueError(
+                    state,
+                    format("The {} is {:.0T}. The {} is {:.0T}.", cNumericFieldNames(2), rNumericArgs(2), cNumericFieldNames(3), rNumericArgs(3)));
                 ErrorsFound = true;
             }
 
@@ -3915,8 +3909,8 @@ namespace SystemAvailabilityManager {
                 if (rNumericArgs(4) > 300000.0 || rNumericArgs(4) < 0.0) {
                     ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
                     ShowContinueError(state, cNumericFieldNames(4) + " is beyond the range.");
-                    ShowContinueError(state, "The input value is " + TrimSigDigits(rNumericArgs(4), 0) +
-                                      ". The allowed value must be between 0 and 300000 J/kg");
+                    ShowContinueError(state,
+                                      format("The input value is {:.0T}. The allowed value must be between 0 and 300000 J/kg", rNumericArgs(4)));
                     ErrorsFound = true;
                 }
             }
@@ -3925,8 +3919,8 @@ namespace SystemAvailabilityManager {
                 if (rNumericArgs(5) > 300000.0 || rNumericArgs(5) < 0.0) {
                     ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
                     ShowContinueError(state, cNumericFieldNames(5) + " is beyond the range.");
-                    ShowContinueError(state, "The input value is " + TrimSigDigits(rNumericArgs(5), 0) +
-                                      ". The allowed value must be between 0 and 300000 J/kg");
+                    ShowContinueError(state,
+                                      format("The input value is {:.0T}. The allowed value must be between 0 and 300000 J/kg", rNumericArgs(5)));
                     ErrorsFound = true;
                 }
             }
@@ -3934,8 +3928,9 @@ namespace SystemAvailabilityManager {
             if (rNumericArgs(4) >= rNumericArgs(5)) {
                 ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" The " + cNumericFieldNames(4) +
                                 " must be less than the " + cNumericFieldNames(5));
-                ShowContinueError(state, "The " + cNumericFieldNames(4) + " is " + TrimSigDigits(rNumericArgs(4), 0) + ". The " + cNumericFieldNames(5) +
-                                  " is " + TrimSigDigits(rNumericArgs(5), 0) + '.');
+                ShowContinueError(
+                    state,
+                    format("The {} is {:.0T}. The {} is {:.0T}.", cNumericFieldNames(4), rNumericArgs(4), cNumericFieldNames(5), rNumericArgs(5)));
                 ErrorsFound = true;
             }
 
@@ -3945,8 +3940,8 @@ namespace SystemAvailabilityManager {
                 if (rNumericArgs(6) > 100.0 || rNumericArgs(6) < -100.0) {
                     ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
                     ShowContinueError(state, cNumericFieldNames(6) + " is beyond the range.");
-                    ShowContinueError(state, "The input value is " + TrimSigDigits(rNumericArgs(6), 0) +
-                                      ". The allowed value must be between -100 C and +100 C");
+                    ShowContinueError(state,
+                                      format("The input value is {:.0T}. The allowed value must be between -100 C and +100 C", rNumericArgs(6)));
                     ErrorsFound = true;
                 }
             }
@@ -3955,8 +3950,8 @@ namespace SystemAvailabilityManager {
                 if (rNumericArgs(7) > 100.0 || rNumericArgs(7) < -100.0) {
                     ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
                     ShowContinueError(state, cNumericFieldNames(7) + " is beyond the range.");
-                    ShowContinueError(state, "The input value is " + TrimSigDigits(rNumericArgs(7), 0) +
-                                      ". The allowed value must be between -100 C and +100 C");
+                    ShowContinueError(state,
+                                      format("The input value is {:.0T}. The allowed value must be between -100 C and +100 C", rNumericArgs(7)));
                     ErrorsFound = true;
                 }
             }
@@ -3964,8 +3959,9 @@ namespace SystemAvailabilityManager {
             if (rNumericArgs(6) >= rNumericArgs(7)) {
                 ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" The " + cNumericFieldNames(6) +
                                 " must be less than the " + cNumericFieldNames(7));
-                ShowContinueError(state, "The " + cNumericFieldNames(6) + " is " + TrimSigDigits(rNumericArgs(6), 0) + ". The " + cNumericFieldNames(7) +
-                                  " is " + TrimSigDigits(rNumericArgs(7), 0) + '.');
+                ShowContinueError(
+                    state,
+                    format("The {} is {:.0T}. The {} is {:.0T}.", cNumericFieldNames(6), rNumericArgs(6), cNumericFieldNames(7), rNumericArgs(7)));
                 ErrorsFound = true;
             }
 
@@ -3980,7 +3976,7 @@ namespace SystemAvailabilityManager {
             if (SchedMin < 0.0) {
                 ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", Schedule value must be >= 0 in " +
                                 cAlphaFieldNames(6) + "=\"" + cAlphaArgs(6) + "\".");
-                ShowContinueError(state, "The minimum schedule value is " + TrimSigDigits(SchedMin, 1));
+                ShowContinueError(state, format("The minimum schedule value is {:.1T}", SchedMin));
                 ErrorsFound = true;
             }
 
@@ -4005,7 +4001,7 @@ namespace SystemAvailabilityManager {
                         ShowContinueError(state, "The minimum value of " + cAlphaFieldNames(7) +
                                           " must be greater than or equal to 0.0 at the minimum value of wind speed.");
                         ShowContinueError(state, cAlphaFieldNames(7) + "=\"" + cAlphaArgs(7) + "\".");
-                        ShowContinueError(state, "Curve output at the minimum wind speed = " + TrimSigDigits(CurveVal, 3));
+                        ShowContinueError(state, format("Curve output at the minimum wind speed = {:.3T}", CurveVal));
                         ErrorsFound = true;
                     }
                     CurveVal = CurveValue(state, state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).OpeningFactorFWS, CurveMax);
@@ -4014,7 +4010,7 @@ namespace SystemAvailabilityManager {
                         ShowContinueError(state, "The maximum value of " + cAlphaFieldNames(7) +
                                           " must be less than or equal to 1.0 at the maximum value of wind speed.");
                         ShowContinueError(state, cAlphaFieldNames(7) + "=\"" + cAlphaArgs(7) + "\".");
-                        ShowContinueError(state, "Curve output at the maximum wind speed = " + TrimSigDigits(CurveVal, 3));
+                        ShowContinueError(state, format("Curve output at the maximum wind speed = {:.3T}", CurveVal));
                         ErrorsFound = true;
                     }
                     // Check curve type
@@ -4039,14 +4035,14 @@ namespace SystemAvailabilityManager {
                     ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
                     ShowContinueError(state, " For " + cAlphaFieldNames(8) + "=\"" + cAlphaArgs(8) + "\",");
                     ShowContinueError(state, "the maximum schedule value should be 1. However, ");
-                    ShowContinueError(state, "the maximum entered value in the schedule is " + TrimSigDigits(SchedMax, 1));
+                    ShowContinueError(state, format("the maximum entered value in the schedule is {:.1T}", SchedMax));
                     ErrorsFound = true;
                 }
                 if (SchedMin < 0.0) {
                     ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
                     ShowContinueError(state, "For " + cAlphaFieldNames(8) + "=\"" + cAlphaArgs(8) + "\",");
                     ShowContinueError(state, "the minimum schedule value should be 0. However, ");
-                    ShowContinueError(state, "the minimum entered value in the schedule is " + TrimSigDigits(SchedMin, 1));
+                    ShowContinueError(state, format("the minimum entered value in the schedule is {:.1T}", SchedMin));
                     ErrorsFound = true;
                 }
             }
@@ -4066,14 +4062,14 @@ namespace SystemAvailabilityManager {
                     ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
                     ShowContinueError(state, "For " + cAlphaFieldNames(9) + "=\"" + cAlphaArgs(9) + "\",");
                     ShowContinueError(state, "the maximum schedule value should be 1. However, ");
-                    ShowContinueError(state, "the maximum entered value in the schedule is " + TrimSigDigits(SchedMax, 1));
+                    ShowContinueError(state, format("the maximum entered value in the schedule is {:.1T}", SchedMax));
                     ErrorsFound = true;
                 }
                 if (SchedMin < 0.0) {
                     ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
                     ShowContinueError(state, "For " + cAlphaFieldNames(9) + "=\"" + cAlphaArgs(9) + "\",");
                     ShowContinueError(state, "the minimum schedule value should be 0. However, ");
-                    ShowContinueError(state, "the minimum entered value in the schedule is " + TrimSigDigits(SchedMin, 1));
+                    ShowContinueError(state, format("the minimum entered value in the schedule is {:.1T}", SchedMin));
                     ErrorsFound = true;
                 }
             }
@@ -4500,13 +4496,6 @@ namespace SystemAvailabilityManager {
         using AirflowNetworkBalanceManager::GetZoneInfilAirChangeRate;
         using AirflowNetworkBalanceManager::ManageAirflowNetworkBalance;
         using CurveManager::CurveValue;
-        using DataContaminantBalance::ZoneAirCO2;
-        using DataContaminantBalance::ZoneCO2SetPoint;
-        using DataEnvironment::IsRain;
-        using DataEnvironment::OutBaroPress;
-        using DataEnvironment::OutDewPointTemp;
-        using DataEnvironment::OutEnthalpy;
-        using DataEnvironment::OutHumRat;
         using DataHeatBalance::HybridControlTypeClose;
         using DataHeatBalance::HybridControlTypeGlobal;
         using DataHeatBalance::HybridControlTypeIndiv;
@@ -4598,8 +4587,8 @@ namespace SystemAvailabilityManager {
                     // Enthalpy control
                 } else if (SELECT_CASE_var == state.dataSystemAvailabilityManager->HybridVentMode_Enth) {
                     ZoneAirEnthalpy = PsyHFnTdbW(MAT(ZoneNum), ZoneAirHumRat(ZoneNum));
-                    if (OutEnthalpy >= state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).MinOutdoorEnth &&
-                        OutEnthalpy <= state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).MaxOutdoorEnth) {
+                    if (state.dataEnvrn->OutEnthalpy >= state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).MinOutdoorEnth &&
+                        state.dataEnvrn->OutEnthalpy <= state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).MaxOutdoorEnth) {
                         state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl = state.dataSystemAvailabilityManager->HybridVentCtrl_Open;
                     } else {
                         state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl = state.dataSystemAvailabilityManager->HybridVentCtrl_Close;
@@ -4607,8 +4596,8 @@ namespace SystemAvailabilityManager {
 
                     // Dew point control
                 } else if (SELECT_CASE_var == state.dataSystemAvailabilityManager->HybridVentMode_DewPoint) {
-                    if (OutDewPointTemp >= state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).MinOutdoorDewPoint &&
-                        OutDewPointTemp <= state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).MaxOutdoorDewPoint) {
+                    if (state.dataEnvrn->OutDewPointTemp >= state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).MinOutdoorDewPoint &&
+                        state.dataEnvrn->OutDewPointTemp <= state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).MaxOutdoorDewPoint) {
                         state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl = state.dataSystemAvailabilityManager->HybridVentCtrl_Open;
                     } else {
                         state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl = state.dataSystemAvailabilityManager->HybridVentCtrl_Close;
@@ -4669,8 +4658,8 @@ namespace SystemAvailabilityManager {
                     }
 
                 } else if (SELECT_CASE_var == state.dataSystemAvailabilityManager->HybridVentMode_CO2) {
-                    state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).CO2 = ZoneAirCO2(ZoneNum);
-                    if (ZoneAirCO2(ZoneNum) > ZoneCO2SetPoint(ZoneNum)) {
+                    state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).CO2 = state.dataContaminantBalance->ZoneAirCO2(ZoneNum);
+                    if (state.dataContaminantBalance->ZoneAirCO2(ZoneNum) > state.dataContaminantBalance->ZoneCO2SetPoint(ZoneNum)) {
                         if (state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).HybridVentMgrConnectedToAirLoop) {
                             AirLoopNum = state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).AirLoopNum;
                             for (Num = 1; Num <= state.dataAirLoop->PriAirSysAvailMgr(state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).AirLoopNum).NumAvailManagers; ++Num) {
@@ -4757,8 +4746,8 @@ namespace SystemAvailabilityManager {
 
                 // Dew point control mode
                 if (state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).ControlMode == state.dataSystemAvailabilityManager->HybridVentMode_DewPoint) {
-                    ZoneAirRH = PsyRhFnTdbWPb(state, MAT(ZoneNum), ZoneAirHumRat(ZoneNum), OutBaroPress) * 100.0;
-                    ZoneAirDewPoint = PsyTdpFnWPb(state, ZoneAirHumRat(ZoneNum), OutBaroPress);
+                    ZoneAirRH = PsyRhFnTdbWPb(state, MAT(ZoneNum), ZoneAirHumRat(ZoneNum), state.dataEnvrn->OutBaroPress) * 100.0;
+                    ZoneAirDewPoint = PsyTdpFnWPb(state, ZoneAirHumRat(ZoneNum), state.dataEnvrn->OutBaroPress);
                     if (NumHumidityControlZones == 0) {
                         ++state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).DewPointNoRHErrCount;
                         if (state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).DewPointNoRHErrCount < 2) {
@@ -4782,11 +4771,11 @@ namespace SystemAvailabilityManager {
                             ZoneRHHumidifyingSetPoint = GetCurrentScheduleValue(state, HumidityControlZone(HStatZoneNum).HumidifyingSchedIndex);
                             ZoneRHDehumidifyingSetPoint = GetCurrentScheduleValue(state, HumidityControlZone(HStatZoneNum).DehumidifyingSchedIndex);
                             if (ZoneAirRH > ZoneRHDehumidifyingSetPoint) { // Need dehumidification
-                                WSetPoint = PsyWFnTdbRhPb(state, MAT(ZoneNum), (ZoneRHDehumidifyingSetPoint / 100.0), OutBaroPress);
-                                if (WSetPoint < OutHumRat) state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl = state.dataSystemAvailabilityManager->HybridVentCtrl_Close;
+                                WSetPoint = PsyWFnTdbRhPb(state, MAT(ZoneNum), (ZoneRHDehumidifyingSetPoint / 100.0), state.dataEnvrn->OutBaroPress);
+                                if (WSetPoint < state.dataEnvrn->OutHumRat) state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl = state.dataSystemAvailabilityManager->HybridVentCtrl_Close;
                             } else if (ZoneAirRH < ZoneRHHumidifyingSetPoint) { // Need humidification
-                                WSetPoint = PsyWFnTdbRhPb(state, MAT(ZoneNum), (ZoneRHHumidifyingSetPoint / 100.0), OutBaroPress);
-                                if (WSetPoint > OutHumRat) state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl = state.dataSystemAvailabilityManager->HybridVentCtrl_Close;
+                                WSetPoint = PsyWFnTdbRhPb(state, MAT(ZoneNum), (ZoneRHHumidifyingSetPoint / 100.0), state.dataEnvrn->OutBaroPress);
+                                if (WSetPoint > state.dataEnvrn->OutHumRat) state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl = state.dataSystemAvailabilityManager->HybridVentCtrl_Close;
                             } else {
                                 state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl = state.dataSystemAvailabilityManager->HybridVentCtrl_Close;
                             }
@@ -4821,7 +4810,7 @@ namespace SystemAvailabilityManager {
             state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl = state.dataSystemAvailabilityManager->HybridVentCtrl_Close;
         }
 
-        if (IsRain && state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).UseRainIndicator) {
+        if (state.dataEnvrn->IsRain && state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).UseRainIndicator) {
             state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl = state.dataSystemAvailabilityManager->HybridVentCtrl_Close;
         }
         // Sent a signal to the AirflowNetwork to ensure large onpenings are close or open based on this logic
@@ -4926,8 +4915,6 @@ namespace SystemAvailabilityManager {
         // PURPOSE OF THIS SUBROUTINE:
         // This routine was designed to find whether this zone is controlled by hybrid ventilation
         // ventilation control option.
-
-        using General::TrimSigDigits;
 
         // Return value
         bool VentControl; // Set to true if ventilation control in the same zone

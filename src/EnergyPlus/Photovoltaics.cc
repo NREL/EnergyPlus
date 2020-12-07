@@ -157,7 +157,6 @@ namespace Photovoltaics {
         // in this module. provides common entry point for all the models
 
         // Using/Aliasing
-        using General::TrimSigDigits;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PVnum;                      // index of unit in PV array for Equivalent one-diode model
@@ -177,13 +176,20 @@ namespace Photovoltaics {
         } else {
             PVnum = GeneratorIndex;
             if (PVnum > NumPVs || PVnum < 1) {
-                ShowFatalError(state, "SimPhotovoltaicGenerator: Invalid GeneratorIndex passed=" + TrimSigDigits(PVnum) +
-                               ", Number of PVs=" + TrimSigDigits(NumPVs) + ", Generator name=" + GeneratorName);
+                ShowFatalError(state,
+                               format("SimPhotovoltaicGenerator: Invalid GeneratorIndex passed={}, Number of PVs={}, Generator name={}",
+                                      PVnum,
+                                      NumPVs,
+                                      GeneratorName));
             }
             if (CheckEquipName(PVnum)) {
                 if (GeneratorName != PVarray(PVnum).Name) {
-                    ShowFatalError(state, "SimPhotovoltaicGenerator: Invalid GeneratorIndex passed=" + TrimSigDigits(PVnum) +
-                                   ", Generator name=" + GeneratorName + ", stored PV Name for that index=" + PVarray(PVnum).Name);
+                    ShowFatalError(
+                        state,
+                        format("SimPhotovoltaicGenerator: Invalid GeneratorIndex passed={}, Generator name={}, stored PV Name for that index={}",
+                               PVnum,
+                               GeneratorName,
+                               PVarray(PVnum).Name));
                 }
                 CheckEquipName(PVnum) = false;
             }
@@ -293,7 +299,7 @@ namespace Photovoltaics {
         using namespace DataIPShortCuts;
         using DataSurfaces::Surface;
         using namespace DataHeatBalance;
-        using General::RoundSigDigits;
+
         using ScheduleManager::GetScheduleIndex;
         using TranspiredCollector::GetTranspiredCollectorIndex;
 
@@ -374,7 +380,7 @@ namespace Photovoltaics {
                     ShowWarningError(state, "Suspected input problem with " + cAlphaFieldNames(2) + " = " + cAlphaArgs(2));
                     ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs(1));
                     ShowContinueError(state, "Surface used for solar collector faces down");
-                    ShowContinueError(state, "Surface tilt angle (degrees from ground outward normal) = " + RoundSigDigits(Surface(SurfNum).Tilt, 2));
+                    ShowContinueError(state, format("Surface tilt angle (degrees from ground outward normal) = {:.2R}", Surface(SurfNum).Tilt));
                 }
             }
 
@@ -954,8 +960,6 @@ namespace Photovoltaics {
         //    integrated photovoltaics. Solar 2002, Sunrise on the Reliable Energy Economy, June 15-19, 2002 Reno, NV
 
         // Using/Aliasing
-        using DataEnvironment::Elevation;
-        using DataEnvironment::SOLCOS;
         using DataHeatBalance::SurfCosIncidenceAngle;
         using DataHeatBalance::SurfQRadSWOutIncident;
         using DataHeatBalance::SurfQRadSWOutIncidentBeam;
@@ -973,10 +977,10 @@ namespace Photovoltaics {
         PVarray(PVnum).SNLPVinto.IcBeam = SurfQRadSWOutIncidentBeam(ThisSurf);                                  //(W/m2)from DataHeatBalance
         PVarray(PVnum).SNLPVinto.IcDiffuse = SurfQRadSWOutIncident(ThisSurf) - SurfQRadSWOutIncidentBeam(ThisSurf); //(W/ m2)(was kJ/hr m2)
         PVarray(PVnum).SNLPVinto.IncidenceAngle = std::acos(SurfCosIncidenceAngle(ThisSurf)) / DataGlobalConstants::DegToRadians();    // (deg) from dataHeatBalance
-        PVarray(PVnum).SNLPVinto.ZenithAngle = std::acos(SOLCOS(3)) / DataGlobalConstants::DegToRadians();                         //(degrees),
+        PVarray(PVnum).SNLPVinto.ZenithAngle = std::acos(state.dataEnvrn->SOLCOS(3)) / DataGlobalConstants::DegToRadians();                         //(degrees),
         PVarray(PVnum).SNLPVinto.Tamb = Surface(ThisSurf).OutDryBulbTemp;                                   //(deg. C)
         PVarray(PVnum).SNLPVinto.WindSpeed = Surface(ThisSurf).WindSpeed;                                   // (m/s)
-        PVarray(PVnum).SNLPVinto.Altitude = Elevation;                                                      // from DataEnvironment via USE
+        PVarray(PVnum).SNLPVinto.Altitude = state.dataEnvrn->Elevation;                                                      // from DataEnvironment via USE
 
         if (((PVarray(PVnum).SNLPVinto.IcBeam + PVarray(PVnum).SNLPVinto.IcDiffuse) > MinIrradiance) && (RunFlag)) {
 
@@ -1714,7 +1718,6 @@ namespace Photovoltaics {
         // na
 
         // Using/Aliasing
-        using General::RoundSigDigits;
 
         // Return value
         Real64 FUN(0.0);
@@ -1740,8 +1743,8 @@ namespace Photovoltaics {
             ShowSevereError(state, "EquivalentOneDiode Photovoltaic model failed to find maximum power point");
             ShowContinueError(state, "Numerical solver failed trying to take exponential of too large a number");
             ShowContinueError(state, "Check input data in " + cPVEquiv1DiodePerfObjectName);
-            ShowContinueError(state, "VV (voltage) = " + RoundSigDigits(VV, 5));
-            ShowContinueError(state, "II (current) = " + RoundSigDigits(II, 5));
+            ShowContinueError(state, format("VV (voltage) = {:.5R}", VV));
+            ShowContinueError(state, format("II (current) = {:.5R}", II));
             ShowFatalError(state, "FUN: EnergyPlus terminates because of numerical problem in EquivalentOne-Diode PV model");
         }
 
@@ -1768,7 +1771,6 @@ namespace Photovoltaics {
         // na
 
         // Using/Aliasing
-        using General::RoundSigDigits;
 
         // Return value
         Real64 FI(0.0);
@@ -1793,8 +1795,8 @@ namespace Photovoltaics {
             ShowSevereError(state, "EquivalentOneDiode Photovoltaic model failed to find maximum power point");
             ShowContinueError(state, "Numerical solver failed trying to take exponential of too large a number");
             ShowContinueError(state, "Check input data in " + cPVEquiv1DiodePerfObjectName);
-            ShowContinueError(state, "VV (voltage) = " + RoundSigDigits(VV, 5));
-            ShowContinueError(state, "II (current) = " + RoundSigDigits(II, 5));
+            ShowContinueError(state, format("VV (voltage) = {:.5R}", VV));
+            ShowContinueError(state, format("II (current) = {:.5R}", II));
             ShowFatalError(state, "FI: EnergyPlus terminates because of numerical problem in EquivalentOne-Diode PV model");
         }
 
@@ -1821,7 +1823,6 @@ namespace Photovoltaics {
         // na
 
         // Using/Aliasing
-        using General::RoundSigDigits;
 
         // Return value
         Real64 FV(0.0);
@@ -1847,8 +1848,8 @@ namespace Photovoltaics {
             ShowSevereError(state, "EquivalentOneDiode Photovoltaic model failed to find maximum power point");
             ShowContinueError(state, "Numerical solver failed trying to take exponential of too large a number");
             ShowContinueError(state, "Check input data in " + cPVEquiv1DiodePerfObjectName);
-            ShowContinueError(state, "VV (voltage) = " + RoundSigDigits(VV, 5));
-            ShowContinueError(state, "II (current) = " + RoundSigDigits(II, 5));
+            ShowContinueError(state, format("VV (voltage) = {:.5R}", VV));
+            ShowContinueError(state, format("II (current) = {:.5R}", II));
             ShowFatalError(state, "FI: EnergyPlus terminates because of numerical problem in EquivalentOne-Diode PV model");
         }
 

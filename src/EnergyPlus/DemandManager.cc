@@ -66,9 +66,7 @@
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
-namespace EnergyPlus {
-
-namespace DemandManager {
+namespace EnergyPlus::DemandManager {
 
     // MODULE INFORMATION:
     //       AUTHOR         Peter Graham Ellis
@@ -112,12 +110,6 @@ namespace DemandManager {
     int const CheckCanReduce(1);
     int const SetLimit(2);
     int const ClearLimit(3);
-
-    static std::string const BlankString;
-
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE TYPE DECLARATIONS:
 
     // MODULE VARIABLE DECLARATIONS:
     int NumDemandManagerList(0);
@@ -412,7 +404,7 @@ namespace DemandManager {
         NumDemandManagerList = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
         if (NumDemandManagerList > 0) {
-            AlphArray.dimension(NumAlphas, BlankString);
+            AlphArray.dimension(NumAlphas, std::string());
             NumArray.dimension(NumNums, 0.0);
 
             DemandManagerList.allocate(NumDemandManagerList);
@@ -649,7 +641,7 @@ namespace DemandManager {
         using DataHeatBalance::ZoneElectricObjects;
         using DataZoneControls::TempControlledZone;
         using DataZoneControls::TStatObjects;
-        using General::RoundSigDigits;
+
         using MixedAir::GetOAController;
         using ScheduleManager::GetScheduleIndex;
 
@@ -719,7 +711,7 @@ namespace DemandManager {
         NumDemandMgr = NumDemandMgrExtLights + NumDemandMgrLights + NumDemandMgrElecEquip + NumDemandMgrThermostats + NumDemandMgrVentilation;
 
         if (NumDemandMgr > 0) {
-            AlphArray.dimension(MaxAlphas, BlankString);
+            AlphArray.dimension(MaxAlphas, std::string());
             NumArray.dimension(MaxNums, 0.0);
 
             DemandMgr.allocate(NumDemandMgr);
@@ -1177,8 +1169,8 @@ namespace DemandManager {
 
                 if (DemandMgr(MgrNum).LowerLimit > DemandMgr(MgrNum).UpperLimit) {
                     ShowSevereError(state, "Invalid input for " + CurrentModuleObject + " = " + AlphArray(1));
-                    ShowContinueError(state, cNumericFieldNames(2) + " [" + RoundSigDigits(NumArray(2), 2) + "] > " + cNumericFieldNames(3) + " [" +
-                                      RoundSigDigits(NumArray(3), 2) + ']');
+                    ShowContinueError(state,
+                                      format("{} [{:.R2}] > {} [{.R2}]", cNumericFieldNames(2), NumArray(2), cNumericFieldNames(3), NumArray(3)));
                     ShowContinueError(state, cNumericFieldNames(2) + " cannot be greater than " + cNumericFieldNames(3));
                     ErrorsFound = true;
                 }
@@ -1681,7 +1673,6 @@ namespace DemandManager {
         // Standard EnergyPlus methodology.
 
         // Using/Aliasing
-        using DataEnvironment::Month;
         using ScheduleManager::GetCurrentScheduleValue;
 
         // Locals
@@ -1696,7 +1687,7 @@ namespace DemandManager {
 
         // FLOW:
         if (DemandManagerList(ListNum).BillingSchedule == 0) {
-            BillingPeriod = Month;
+            BillingPeriod = state.dataEnvrn->Month;
         } else {
             BillingPeriod = GetCurrentScheduleValue(state, DemandManagerList(ListNum).BillingSchedule);
         }
@@ -1853,17 +1844,17 @@ namespace DemandManager {
 
             } else if (SELECT_CASE_var == ManagerTypeVentilation) {
                 Real64 FlowRate(0);
-                FlowRate = OAGetFlowRate(LoadPtr);
+                FlowRate = OAGetFlowRate(state, LoadPtr);
                 if (Action == CheckCanReduce) {
                     CanReduceDemand = true;
                 } else if (Action == SetLimit) {
                     OASetDemandManagerVentilationState(LoadPtr, true);
                     if (DemandMgr(MgrNum).LimitControl == ManagerLimitFixed) {
-                        OASetDemandManagerVentilationFlow(LoadPtr, DemandMgr(MgrNum).FixedRate);
+                        OASetDemandManagerVentilationFlow(state, LoadPtr, DemandMgr(MgrNum).FixedRate);
                     } else if (DemandMgr(MgrNum).LimitControl == ManagerLimitReductionRatio) {
                         Real64 DemandRate(0);
                         DemandRate = FlowRate * DemandMgr(MgrNum).ReductionRatio;
-                        OASetDemandManagerVentilationFlow(LoadPtr, DemandRate);
+                        OASetDemandManagerVentilationFlow(state, LoadPtr, DemandRate);
                     }
                 } else if (Action == ClearLimit) {
                     OASetDemandManagerVentilationState(LoadPtr, false);
@@ -1915,7 +1906,5 @@ namespace DemandManager {
             GetInput = false;
         }
     }
-
-} // namespace DemandManager
 
 } // namespace EnergyPlus

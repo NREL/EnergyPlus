@@ -50,6 +50,7 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/WaterManager.hh>
 #include <EnergyPlus/DataWater.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -76,19 +77,19 @@ TEST_F(EnergyPlusFixture, WaterManager_NormalAnnualPrecipitation)
     });
     ASSERT_TRUE(process_idf(idf_objects));
 
-    WaterManager::GetWaterManagerInput(state);
+    WaterManager::GetWaterManagerInput(*state);
 
     ScheduleManager::Schedule(1).CurrentValue = 1.0;
 
-    WaterManager::UpdatePrecipitation(state);
+    WaterManager::UpdatePrecipitation(*state);
 
     Real64 ExpectedNomAnnualRain = 0.80771;
     Real64 ExpectedCurrentRate = 1.0 * (0.75 / 0.80771) / DataGlobalConstants::SecInHour();
 
-    Real64 NomAnnualRain = state.dataWaterData->RainFall.NomAnnualRain;
+    Real64 NomAnnualRain = state->dataWaterData->RainFall.NomAnnualRain;
     EXPECT_NEAR(NomAnnualRain, ExpectedNomAnnualRain, 0.000001);
 
-    Real64 CurrentRate = state.dataWaterData->RainFall.CurrentRate;
+    Real64 CurrentRate = state->dataWaterData->RainFall.CurrentRate;
     EXPECT_NEAR(CurrentRate, ExpectedCurrentRate, 0.000001);
 }
 
@@ -109,15 +110,15 @@ TEST_F(EnergyPlusFixture, WaterManager_ZeroAnnualPrecipitation)
         "1;",
     });
     ASSERT_TRUE(process_idf(idf_objects));
-    WaterManager::GetWaterManagerInput(state);
+    WaterManager::GetWaterManagerInput(*state);
 
     ScheduleManager::Schedule(1).CurrentValue = 1.0;
 
-    WaterManager::UpdatePrecipitation(state);
+    WaterManager::UpdatePrecipitation(*state);
 
-    Real64 NomAnnualRain = state.dataWaterData->RainFall.NomAnnualRain;
+    Real64 NomAnnualRain = state->dataWaterData->RainFall.NomAnnualRain;
     EXPECT_NEAR(NomAnnualRain, 0.0, 0.000001);
 
-    Real64 CurrentRate = state.dataWaterData->RainFall.CurrentRate;
+    Real64 CurrentRate = state->dataWaterData->RainFall.CurrentRate;
     EXPECT_NEAR(CurrentRate, 0.0, 0.000001);
 }

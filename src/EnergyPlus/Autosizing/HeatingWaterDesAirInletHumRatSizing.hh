@@ -49,8 +49,12 @@
 #define HeatingWaterDesAirInletHumRatSizing_hh_INCLUDED
 
 #include <EnergyPlus/Autosizing/Base.hh>
+#include <EnergyPlus/Data/BaseData.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
 
 struct HeatingWaterDesAirInletHumRatSizer : BaseSizer
 {

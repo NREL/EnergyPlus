@@ -154,7 +154,6 @@ namespace UnitHeater {
         // Using/Aliasing
         using DataSizing::ZoneEqUnitHeater;
         using DataSizing::ZoneHeatingOnlyFan;
-        using General::TrimSigDigits;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int UnitHeatNum; // index of unit heater being simulated
@@ -175,13 +174,19 @@ namespace UnitHeater {
         } else {
             UnitHeatNum = CompIndex;
             if (UnitHeatNum > state.dataUnitHeaters->NumOfUnitHeats || UnitHeatNum < 1) {
-                ShowFatalError(state, "SimUnitHeater:  Invalid CompIndex passed=" + TrimSigDigits(UnitHeatNum) +
-                               ", Number of Units=" + TrimSigDigits(state.dataUnitHeaters->NumOfUnitHeats) + ", Entered Unit name=" + CompName);
+                ShowFatalError(state,
+                               format("SimUnitHeater:  Invalid CompIndex passed={}, Number of Units={}, Entered Unit name={}",
+                                      UnitHeatNum,
+                                      state.dataUnitHeaters->NumOfUnitHeats,
+                                      CompName));
             }
             if (state.dataUnitHeaters->CheckEquipName(UnitHeatNum)) {
                 if (CompName != state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name) {
-                    ShowFatalError(state, "SimUnitHeater: Invalid CompIndex passed=" + TrimSigDigits(UnitHeatNum) + ", Unit name=" + CompName +
-                                   ", stored Unit Name for that index=" + state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name);
+                    ShowFatalError(state,
+                                   format("SimUnitHeater: Invalid CompIndex passed={}, Unit name={}, stored Unit Name for that index={}",
+                                          UnitHeatNum,
+                                          CompName,
+                                          state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name));
                 }
                 state.dataUnitHeaters->CheckEquipName(UnitHeatNum) = false;
             }
@@ -239,7 +244,7 @@ namespace UnitHeater {
         using Fans::GetFanOutletNode;
         using Fans::GetFanType;
         using Fans::GetFanVolFlow;
-        using General::TrimSigDigits;
+
         using NodeInputManager::GetOnlySingleNode;
         using SteamCoils::GetCoilSteamInletNode;
         using SteamCoils::GetSteamCoilIndex;
@@ -374,9 +379,13 @@ namespace UnitHeater {
                         if (FanVolFlow != AutoSize && state.dataUnitHeaters->UnitHeat(UnitHeatNum).MaxAirVolFlow != AutoSize &&
                             FanVolFlow < state.dataUnitHeaters->UnitHeat(UnitHeatNum).MaxAirVolFlow) {
                             ShowSevereError(state, "Specified in " + CurrentModuleObject + " = " + state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name);
-                            ShowContinueError(state, "...air flow rate (" + TrimSigDigits(FanVolFlow, 7) + ") in fan object " +
-                                              state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanName + " is less than the unit heater maximum supply air flow rate (" +
-                                              TrimSigDigits(state.dataUnitHeaters->UnitHeat(UnitHeatNum).MaxAirVolFlow, 7) + ").");
+                            ShowContinueError(
+                                state,
+                                format(
+                                    "...air flow rate ({:.7T}) in fan object {} is less than the unit heater maximum supply air flow rate ({:.7T}).",
+                                    FanVolFlow,
+                                    state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanName,
+                                    state.dataUnitHeaters->UnitHeat(UnitHeatNum).MaxAirVolFlow));
                             ShowContinueError(state, "...the fan flow rate must be greater than or equal to the unit heater maximum supply air flow rate.");
                             ErrorsFound = true;
                         } else if (FanVolFlow == AutoSize && state.dataUnitHeaters->UnitHeat(UnitHeatNum).MaxAirVolFlow != AutoSize) {
@@ -400,9 +409,12 @@ namespace UnitHeater {
                     if (FanVolFlow != AutoSize && state.dataUnitHeaters->UnitHeat(UnitHeatNum).MaxAirVolFlow != AutoSize &&
                         FanVolFlow < state.dataUnitHeaters->UnitHeat(UnitHeatNum).MaxAirVolFlow) {
                         ShowSevereError(state, "Specified in " + CurrentModuleObject + " = " + state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name);
-                        ShowContinueError(state, "...air flow rate (" + TrimSigDigits(FanVolFlow, 7) + ") in fan object " + state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanName +
-                                          " is less than the unit heater maximum supply air flow rate (" +
-                                          TrimSigDigits(state.dataUnitHeaters->UnitHeat(UnitHeatNum).MaxAirVolFlow, 7) + ").");
+                        ShowContinueError(
+                            state,
+                            format("...air flow rate ({:.7T}) in fan object {} is less than the unit heater maximum supply air flow rate ({:.7T}).",
+                                   FanVolFlow,
+                                   state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanName,
+                                   state.dataUnitHeaters->UnitHeat(UnitHeatNum).MaxAirVolFlow));
                         ShowContinueError(state, "...the fan flow rate must be greater than or equal to the unit heater maximum supply air flow rate.");
                         ErrorsFound = true;
                     } else if (FanVolFlow == AutoSize && state.dataUnitHeaters->UnitHeat(UnitHeatNum).MaxAirVolFlow != AutoSize) {
@@ -678,7 +690,6 @@ namespace UnitHeater {
         // Uses the status flags to trigger initializations.
 
         // Using/Aliasing
-        using DataEnvironment::StdRhoAir;
         using DataHVACGlobals::FanType_SimpleOnOff;
         using DataHVACGlobals::ZoneComp;
         using DataHVACGlobals::ZoneCompTurnFansOff;
@@ -790,7 +801,7 @@ namespace UnitHeater {
             InNode = state.dataUnitHeaters->UnitHeat(UnitHeatNum).AirInNode;
             OutNode = state.dataUnitHeaters->UnitHeat(UnitHeatNum).AirOutNode;
             HotConNode = state.dataUnitHeaters->UnitHeat(UnitHeatNum).HotControlNode;
-            RhoAir = StdRhoAir;
+            RhoAir = state.dataEnvrn->StdRhoAir;
 
             // set the mass flow rates from the input volume flow rates
             state.dataUnitHeaters->UnitHeat(UnitHeatNum).MaxAirMassFlow = RhoAir * state.dataUnitHeaters->UnitHeat(UnitHeatNum).MaxAirVolFlow;
@@ -921,7 +932,7 @@ namespace UnitHeater {
         using DataHVACGlobals::HeatingAirflowSizing;
         using DataHVACGlobals::HeatingCapacitySizing;
         using DataPlant::PlantLoop;
-        using General::RoundSigDigits;
+
         using PlantUtilities::MyPlantSizingIndex;
         using Psychrometrics::CPHW;
         using SteamCoils::GetCoilSteamInletNode;
@@ -1194,10 +1205,10 @@ namespace UnitHeater {
                                 if ((std::abs(MaxVolHotWaterFlowDes - MaxVolHotWaterFlowUser) / MaxVolHotWaterFlowUser) > AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeUnitHeater: Potential issue with equipment sizing for ZoneHVAC:UnitHeater " +
                                                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name);
-                                    ShowContinueError(state, "User-Specified Maximum Hot Water Flow of " + RoundSigDigits(MaxVolHotWaterFlowUser, 5) +
-                                                      " [m3/s]");
-                                    ShowContinueError(state, "differs from Design Size Maximum Hot Water Flow of " +
-                                                      RoundSigDigits(MaxVolHotWaterFlowDes, 5) + " [m3/s]");
+                                    ShowContinueError(state,
+                                                      format("User-Specified Maximum Hot Water Flow of {:.5R} [m3/s]", MaxVolHotWaterFlowUser));
+                                    ShowContinueError(
+                                        state, format("differs from Design Size Maximum Hot Water Flow of {:.5R} [m3/s]", MaxVolHotWaterFlowDes));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -1306,10 +1317,9 @@ namespace UnitHeater {
                                 if ((std::abs(MaxVolHotSteamFlowDes - MaxVolHotSteamFlowUser) / MaxVolHotSteamFlowUser) > AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeUnitHeater: Potential issue with equipment sizing for ZoneHVAC:UnitHeater " +
                                                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name);
-                                    ShowContinueError(state, "User-Specified Maximum Steam Flow of " + RoundSigDigits(MaxVolHotSteamFlowUser, 5) +
-                                                      " [m3/s]");
-                                    ShowContinueError(state, "differs from Design Size Maximum Steam Flow of " + RoundSigDigits(MaxVolHotSteamFlowDes, 5) +
-                                                      " [m3/s]");
+                                    ShowContinueError(state, format("User-Specified Maximum Steam Flow of {:.5R} [m3/s]", MaxVolHotSteamFlowUser));
+                                    ShowContinueError(state,
+                                                      format("differs from Design Size Maximum Steam Flow of {:.5R} [m3/s]", MaxVolHotSteamFlowDes));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }

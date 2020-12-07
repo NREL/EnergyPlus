@@ -123,10 +123,6 @@ namespace WindowEquivalentLayer {
     // Using/Aliasing
     using namespace DataHeatBalance;
     using namespace DataSurfaces;
-    using DataEnvironment::DayOfMonth;
-    using DataEnvironment::Month;
-    using General::TrimSigDigits;
-
     void InitEquivalentLayerWindowCalculations(EnergyPlusData &state)
     {
 
@@ -445,7 +441,7 @@ namespace WindowEquivalentLayer {
         }
         if (!CFSURated) {
             ShowWarningMessage(state, RoutineName + "Fenestration U-Value calculation failed for " + FS.Name);
-            ShowContinueError(state, "...Calculated U-value = " + TrimSigDigits(U, 4));
+            ShowContinueError(state, format("...Calculated U-value = {:.4T}", U));
             ShowContinueError(state, "...Check consistency of inputs");
         }
         UNFRC = U;
@@ -557,8 +553,8 @@ namespace WindowEquivalentLayer {
 
         if (!CFSSHGC) {
             ShowWarningMessage(state, RoutineName + "Solar heat gain coefficient calculation failed for " + FS.Name);
-            ShowContinueError(state, "...Calculated SHGC = " + TrimSigDigits(SHGC, 4));
-            ShowContinueError(state, "...Calculated U-Value = " + TrimSigDigits(UCG, 4));
+            ShowContinueError(state, format("...Calculated SHGC = {:.4T}", SHGC));
+            ShowContinueError(state, format("...Calculated U-Value = {:.4T}", UCG));
             ShowContinueError(state, "...Check consistency of inputs.");
             return;
         }
@@ -662,8 +658,6 @@ namespace WindowEquivalentLayer {
         // uses the solar-thermal routine developed for ASHRAE RP-1311 (ASHWAT Model).
 
         using DataBSDFWindow::noCondition;
-        using DataEnvironment::IsRain;
-        using DataEnvironment::SkyTempKelvin;
         using DataLoopNode::Node;
         using DataZoneEquipment::ZoneEquipConfig;
         using General::InterpSw;
@@ -723,7 +717,7 @@ namespace WindowEquivalentLayer {
         Real64 SrdSurfViewFac; // View factor of a surrounding surface
         Real64 OutSrdIR;
 
-        if (CalcCondition != noCondition) return;
+        if (CalcCondition != DataBSDFWindow::noCondition) return;
 
         ConstrNum = Surface(SurfNum).Construction;
         QXConv = 0.0;
@@ -732,7 +726,7 @@ namespace WindowEquivalentLayer {
         EQLNum = state.dataConstruction->Construct(ConstrNum).EQLConsPtr;
         HcIn = HConvIn(SurfNum); // windows inside surface convective film conductance
 
-        if (CalcCondition == noCondition) {
+        if (CalcCondition == DataBSDFWindow::noCondition) {
             ZoneNum = Surface(SurfNum).Zone;
             SurfNumAdj = Surface(SurfNum).ExtBoundCond;
 
@@ -844,7 +838,7 @@ namespace WindowEquivalentLayer {
                     }
                 }
                 if (Surface(SurfNum).ExtWind) { // Window is exposed to wind (and possibly rain)
-                    if (IsRain) {               // Raining: since wind exposed, outside window surface gets wet
+                    if (state.dataEnvrn->IsRain) {               // Raining: since wind exposed, outside window surface gets wet
                         Tout = Surface(SurfNum).OutWetBulbTemp + DataGlobalConstants::KelvinConv();
                     } else { // Dry
                         Tout = Surface(SurfNum).OutDryBulbTemp + DataGlobalConstants::KelvinConv();
@@ -852,7 +846,7 @@ namespace WindowEquivalentLayer {
                 } else { // Window not exposed to wind
                     Tout = Surface(SurfNum).OutDryBulbTemp + DataGlobalConstants::KelvinConv();
                 }
-                tsky = SkyTempKelvin;
+                tsky = state.dataEnvrn->SkyTempKelvin;
                 Ebout = DataGlobalConstants::StefanBoltzmann() * pow_4(Tout);
                 // ASHWAT model may be slightly different
                 outir = Surface(SurfNum).ViewFactorSkyIR *
@@ -973,7 +967,7 @@ namespace WindowEquivalentLayer {
 
         if (P < -0.05 || P > 1.05) {
             ShowWarningMessage(state, RoutineName + "property value should have been between 0 and 1");
-            ShowContinueError(state, WHAT + "=:  property value is =" + TrimSigDigits(P, 4));
+            ShowContinueError(state, format("{}=:  property value is ={:.4T}", WHAT, P));
             if (P < 0.0) {
                 ShowContinueError(state, "property value is reset to 0.0");
             } else if (P > 1.0) {
@@ -1098,9 +1092,9 @@ namespace WindowEquivalentLayer {
         if (RHO_DD + TAU_DD > 1.0) {
             SumRefAndTran = RHO_DD + TAU_DD;
             ShowWarningMessage(state, RoutineName + "Roller blind diffuse-diffuse properties are inconsistent");
-            ShowContinueError(state, "...The diffuse-diffuse reflectance = " + TrimSigDigits(RHO_DD, 4));
-            ShowContinueError(state, "...The diffuse-diffuse tansmittance = " + TrimSigDigits(TAU_DD, 4));
-            ShowContinueError(state, "...Sum of diffuse reflectance and tansmittance = " + TrimSigDigits(SumRefAndTran, 4));
+            ShowContinueError(state, format("...The diffuse-diffuse reflectance = {:.4T}", RHO_DD));
+            ShowContinueError(state, format("...The diffuse-diffuse tansmittance = {:.4T}", TAU_DD));
+            ShowContinueError(state, format("...Sum of diffuse reflectance and tansmittance = {:.4T}", SumRefAndTran));
             ShowContinueError(state, "...This sum cannot be > 1.0. Transmittance will be reset to 1 minus reflectance");
             TAU_DD = 1.0 - RHO_DD;
         }
@@ -1234,9 +1228,9 @@ namespace WindowEquivalentLayer {
         if (RHO_DD + TAU_DD > 1.0) {
             SumRefAndTran = RHO_DD + TAU_DD;
             ShowWarningMessage(state, RoutineName + "Calculated insect screen diffuse-diffuse properties are inconsistent");
-            ShowContinueError(state, "...The diffuse-diffuse reflectance = " + TrimSigDigits(RHO_DD, 4));
-            ShowContinueError(state, "...The diffuse-diffuse tansmittance = " + TrimSigDigits(TAU_DD, 4));
-            ShowContinueError(state, "...Sum of diffuse reflectance and tansmittance = " + TrimSigDigits(SumRefAndTran, 4));
+            ShowContinueError(state, format("...The diffuse-diffuse reflectance = {:.4T}", RHO_DD));
+            ShowContinueError(state, format("...The diffuse-diffuse tansmittance = {:.4T}", TAU_DD));
+            ShowContinueError(state, format("...Sum of diffuse reflectance and tansmittance = {:.4T}", SumRefAndTran));
             ShowContinueError(state, "...This sum cannot be > 1.0. Transmittance will be reset to 1 minus reflectance");
             TAU_DD = 1.0 - RHO_DD;
         }
@@ -1419,9 +1413,9 @@ namespace WindowEquivalentLayer {
         if (RHO_DD + TAU_DD > 1.0) {
             SumRefAndTran = RHO_DD + TAU_DD;
             ShowWarningMessage(state, RoutineName + "Calculated drape fabric diffuse-diffuse properties are inconsistent");
-            ShowContinueError(state, "...The diffuse-diffuse reflectance = " + TrimSigDigits(RHO_DD, 4));
-            ShowContinueError(state, "...The diffuse-diffuse tansmittance = " + TrimSigDigits(TAU_DD, 4));
-            ShowContinueError(state, "...Sum of diffuse reflectance and tansmittance = " + TrimSigDigits(SumRefAndTran, 4));
+            ShowContinueError(state, format("...The diffuse-diffuse reflectance = {:.4T}", RHO_DD));
+            ShowContinueError(state, format("...The diffuse-diffuse tansmittance = {:.4T}", TAU_DD));
+            ShowContinueError(state, format("...Sum of diffuse reflectance and tansmittance = {:.4T}", SumRefAndTran));
             ShowContinueError(state, "...This sum cannot be > 1.0. Transmittance will be reset to 1 minus reflectance");
             TAU_DD = 1.0 - RHO_DD;
         }
@@ -4787,8 +4781,8 @@ namespace WindowEquivalentLayer {
                 ++FS.WEQLSolverErrorIndex;
                 ShowSevereError(state, "CONSTRUCTION:WINDOWEQUIVALENTLAYER = \"" + FS.Name + "\"");
                 ShowContinueError(state, RoutineName + "Net radiation analysis did not converge");
-                ShowContinueError(state, "...Maximum error is = " + TrimSigDigits(MAXERR, 6));
-                ShowContinueError(state, "...Convergence tolerance is = " + TrimSigDigits(TOL, 6));
+                ShowContinueError(state, format("...Maximum error is = {:.6T}", MAXERR));
+                ShowContinueError(state, format("...Convergence tolerance is = {:.6T}", TOL));
                 ShowContinueErrorTimeStamp(state, "");
             } else {
                 ShowRecurringWarningErrorAtEnd(state, "CONSTRUCTION:WINDOWEQUIVALENTLAYER = \"" + FS.Name + "\"; " + RoutineName +
@@ -5263,8 +5257,8 @@ namespace WindowEquivalentLayer {
         //        ++FS.WEQLSolverErrorIndex;
         //        ShowSevereError(state, "CONSTRUCTION:WINDOWEQUIVALENTLAYER = \"" + FS.Name + "\"");
         //        ShowContinueError(state, RoutineName + "Net radiation analysis did not converge");
-        //        ShowContinueError(state, "...Maximum error is = " + TrimSigDigits(MAXERR, 6));
-        //        ShowContinueError(state, "...Convergence tolerance is = " + TrimSigDigits(TOL, 6));
+        //        ShowContinueError(state, format("...Maximum error is = {:.6T}", MAXERR));
+        //        ShowContinueError(state, format("...Convergence tolerance is = {:.6T}", TOL));
         //        ShowContinueErrorTimeStamp(state, "");
         //    } else {
         //        ShowRecurringWarningErrorAtEnd(state, "CONSTRUCTION:WINDOWEQUIVALENTLAYER = \"" + FS.Name + "\"; " + RoutineName +
@@ -8125,7 +8119,6 @@ namespace WindowEquivalentLayer {
         // Uses the net radiation method developed for ASHWAT fenestration
         // model (ASHRAE RP-1311) by John Wright, the University of WaterLoo
 
-        using DataEnvironment::SOLCOS;
         using DaylightingManager::ProfileAngle;
 
         // Argument array dimensioning
@@ -8151,9 +8144,9 @@ namespace WindowEquivalentLayer {
             for (Lay = 1; Lay <= CFS(EQLNum).NL; ++Lay) {
                 if (IsVBLayer(CFS(EQLNum).L(Lay))) {
                     if (CFS(EQLNum).L(Lay).LTYPE == ltyVBHOR) {
-                        ProfileAngle(SurfNum, SOLCOS, Horizontal, ProfAngVer);
+                        ProfileAngle(SurfNum, state.dataEnvrn->SOLCOS, Horizontal, ProfAngVer);
                     } else if (CFS(EQLNum).L(Lay).LTYPE == ltyVBVER) {
-                        ProfileAngle(SurfNum, SOLCOS, Vertical, ProfAngHor);
+                        ProfileAngle(SurfNum, state.dataEnvrn->SOLCOS, Vertical, ProfAngHor);
                     }
                 }
             }
@@ -8167,9 +8160,9 @@ namespace WindowEquivalentLayer {
                 for (Lay = 1; Lay <= CFS(EQLNum).NL; ++Lay) {
                     if (IsVBLayer(CFS(EQLNum).L(Lay))) {
                         if (CFS(EQLNum).L(Lay).LTYPE == ltyVBHOR) {
-                            ProfileAngle(SurfNum, SOLCOS, Horizontal, ProfAngVer);
+                            ProfileAngle(SurfNum, state.dataEnvrn->SOLCOS, Horizontal, ProfAngVer);
                         } else if (CFS(EQLNum).L(Lay).LTYPE == ltyVBVER) {
-                            ProfileAngle(SurfNum, SOLCOS, Vertical, ProfAngHor);
+                            ProfileAngle(SurfNum, state.dataEnvrn->SOLCOS, Vertical, ProfAngHor);
                         }
                     }
                 }

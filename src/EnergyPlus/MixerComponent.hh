@@ -57,6 +57,9 @@
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+
 namespace MixerComponent {
 
     // Using/Aliasing
@@ -144,7 +147,7 @@ namespace MixerComponent {
     // Beginning of Update subroutines for the Mixer Module
     // *****************************************************************************
 
-    void UpdateAirMixer(int const MixerNum);
+    void UpdateAirMixer(EnergyPlusData &state, int const MixerNum);
 
     //        End of Update subroutines for the Mixer Module
     // *****************************************************************************

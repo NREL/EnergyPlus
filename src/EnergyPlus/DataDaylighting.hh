@@ -63,6 +63,10 @@ namespace EnergyPlus {
 
 namespace DataDaylighting {
 
+    // Two kinds of reference points: used directly in daylighting, used to show illuminance map of zone
+    constexpr int MaxRefPoints(2);       // Maximum number of daylighting reference points, 2
+    constexpr int MaxMapRefPoints(2500); // Maximum number of Illuminance Map Ref Points
+
     enum class SkyType : int
     {
         Clear = 1,
@@ -71,53 +75,29 @@ namespace DataDaylighting {
         Overcast
     };
 
-    // Using/Aliasing
+    enum class iExtWinType {
+        NotInOrAdjZoneExtWin,   // Exterior window is not in a Daylighting:Detailed zone or in an adjacent zone with a shared interior window
+        InZoneExtWin,           // Exterior window is in a Daylighting:Detailed zone
+        AdjZoneExtWin           // Exterior window is in a zone adjacent to a Daylighting:Detailed zone with which it shares an interior window
+    };
 
-    // Data
-    // -only module should be available to other modules and routines.
-    // Thus, all variables in this module must be PUBLIC.
+    enum class iCalledFor {
+        RefPoint,
+        MapPoint
+    };
 
-    // MODULE PARAMETER DEFINITIONS:
-    // Two kinds of reference points: used directly in daylighting, used to show illuminance map of zone
-    extern int const MaxRefPoints;    // Maximum number of daylighting reference points, 2
-    extern int const MaxMapRefPoints; // Maximum number of Illuminance Map Ref Points
-    extern int TotRefPoints;          // number of Daylighting:ReferencePoint objects found
-
-    extern int const NotInOrAdjZoneExtWin; // Exterior window is not in a Daylighting:Detailed zone
-    // or in an adjacent zone with a shared interior window
-    extern int const InZoneExtWin;  // Exterior window is in a Daylighting:Detailed zone
-    extern int const AdjZoneExtWin; // Exterior window is in a zone adjacent to a Daylighting:
-    // Detailed zone with which it shares an interior window
-
-    extern int const CalledForRefPoint;
-    extern int const CalledForMapPoint;
-
-    // Parameters for "DaylightMethod"
-    extern int const NoDaylighting;
-    extern int const SplitFluxDaylighting;
-    extern int const DElightDaylighting;
+    enum class iDaylightingMethod {
+        NoDaylighting,
+        SplitFluxDaylighting,
+        DElightDaylighting
+    };
 
     // Parameters for "Lighting Control Type"
-    extern int const Continuous;
-    extern int const Stepped;
-    extern int const ContinuousOff;
-
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE TYPE DECLARATIONS:
-
-    // INTERFACE BLOCK SPECIFICATIONS: na
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern int TotIllumMaps;
-    extern bool mapResultsToReport; // used when only partial hour has "sun up"
-    extern bool mapResultsReported; // when no map results are ever reported this will still be false
-    extern char MapColSep;          // Character for separating map columns (tab, space, comma)
-
-    extern bool DFSReportSizingDays;
-    extern bool DFSReportAllShadowCalculationDays;
-
-    // Types
+    enum class iLtgCtrlType {
+        Continuous = 1,
+        Stepped = 2,
+        ContinuousOff = 3
+    };
 
     struct IntWinAdjZoneExtWinStruct // nested structure for ZoneDaylight
     {
@@ -137,7 +117,7 @@ namespace DataDaylighting {
         // Members
         std::string Name;                  // Name of the daylighting:controls object
         std::string ZoneName;              // name of the zone where the daylighting:controls object is located
-        int DaylightMethod;                // Type of Daylighting (1=SplitFlux, 2=DElight)
+        DataDaylighting::iDaylightingMethod DaylightMethod;                // Type of Daylighting (1=SplitFlux, 2=DElight)
         int AvailSchedNum;                 // pointer to availability schedule if present
         int TotalDaylRefPoints;            // Number of daylighting reference points in a zone (0,1 or 2)
         Array1D_int DaylRefPtNum;          // Reference number to DaylRefPt array that stores Daylighting:ReferencePoint
@@ -147,7 +127,7 @@ namespace DataDaylighting {
         Array1D_bool DaylRefPtInBounds; // True when coordinates are in bounds of zone coordinates
         Array1D<Real64> FracZoneDaylit; // =0.0  ! Fraction of zone controlled by each reference point
         Array1D<Real64> IllumSetPoint;  // =0.0  ! Illuminance setpoint at each reference point (lux)
-        int LightControlType;           // Lighting control type (same for all reference points)
+        iLtgCtrlType LightControlType;           // Lighting control type (same for all reference points)
         // (1=continuous, 2=stepped, 3=continuous/off)
         int glareRefPtNumber;                      // from field: Glare Calculation Daylighting Reference Point Name
         Real64 ViewAzimuthForGlare;                // View direction relative to window for glare calculation (deg)
@@ -223,10 +203,11 @@ namespace DataDaylighting {
 
         // Default Constructor
         ZoneDaylightCalc()
-            : DaylightMethod(0), AvailSchedNum(0), TotalDaylRefPoints(0), LightControlType(1), ViewAzimuthForGlare(0.0), MaxGlareallowed(0),
-              MinPowerFraction(0.0), MinLightFraction(0.0), LightControlSteps(0), LightControlProbability(0.0), TotalExtWindows(0),
-              AveVisDiffReflect(0.0), ZonePowerReductionFactor(1.0), NumOfIntWinAdjZones(0), NumOfIntWinAdjZoneExtWins(0), NumOfDayltgExtWins(0),
-              MinIntWinSolidAng(0.0), TotInsSurfArea(0.0), FloorVisRefl(0.0), InterReflIllFrIntWins(0.0), AdjZoneHasDayltgCtrl(false), MapCount(0)
+            : DaylightMethod(iDaylightingMethod::NoDaylighting), AvailSchedNum(0), TotalDaylRefPoints(0), LightControlType(iLtgCtrlType::Continuous),
+              glareRefPtNumber(0), ViewAzimuthForGlare(0.0), MaxGlareallowed(0), MinPowerFraction(0.0), MinLightFraction(0.0), LightControlSteps(0),
+              LightControlProbability(0.0), TotalExtWindows(0), AveVisDiffReflect(0.0), DElightGriddingResolution(0.0), ZonePowerReductionFactor(1.0),
+              NumOfIntWinAdjZones(0), NumOfIntWinAdjZoneExtWins(0), NumOfDayltgExtWins(0), MinIntWinSolidAng(0.0), TotInsSurfArea(0.0), FloorVisRefl(0.0),
+              InterReflIllFrIntWins(0.0), AdjZoneHasDayltgCtrl(false), MapCount(0)
         {
         }
     };
@@ -328,16 +309,42 @@ namespace DataDaylighting {
         std::string wndwName;        // Window name
         Real64 feneRota;             // Fenestration Rotation
     };
-    extern int TotDElightCFS; // number of Daylighting:DELight:ComplexFenestration
-
-    // Object Data
-    extern Array1D<ZoneDaylightCalc> ZoneDaylight;
-    extern Array1D<IllumMapData> IllumMap;
-    extern Array1D<MapCalcData> IllumMapCalc;
-    extern Array1D<RefPointData> DaylRefPt;
-    extern Array1D<DElightComplexFeneData> DElightComplexFene;
 
 } // namespace DataDaylighting
+
+struct DaylightingData : BaseGlobalStruct {
+
+    int TotRefPoints = 0;
+    int TotIllumMaps = 0;
+    bool mapResultsToReport = false;            // used when only partial hour has "sun up"
+    bool mapResultsReported = false;            // when no map results are ever reported this will still be false
+    char MapColSep;                             // Character for separating map columns (tab, space, comma)
+    bool DFSReportSizingDays = false;
+    bool DFSReportAllShadowCalculationDays = false;
+    int TotDElightCFS = 0;
+
+    Array1D<DataDaylighting::ZoneDaylightCalc> ZoneDaylight;
+    Array1D<DataDaylighting::IllumMapData> IllumMap;
+    Array1D<DataDaylighting::MapCalcData> IllumMapCalc;
+    Array1D<DataDaylighting::RefPointData> DaylRefPt;
+    Array1D<DataDaylighting::DElightComplexFeneData> DElightComplexFene;
+
+    void clear_state() override
+    {
+        this->TotRefPoints = 0;
+        this->TotIllumMaps = 0;
+        this->mapResultsToReport = false;
+        this->mapResultsReported = false;
+        this->DFSReportSizingDays = false;
+        this->DFSReportAllShadowCalculationDays = false;
+        this->TotDElightCFS = 0;
+        this->ZoneDaylight.deallocate();
+        this->IllumMap.deallocate();
+        this->IllumMapCalc.deallocate();
+        this->DaylRefPt.deallocate();
+        this->DElightComplexFene.deallocate();
+    }
+};
 
 } // namespace EnergyPlus
 

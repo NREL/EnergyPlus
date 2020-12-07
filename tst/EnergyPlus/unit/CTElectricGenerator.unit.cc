@@ -52,6 +52,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/CTElectricGenerator.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -139,9 +140,9 @@ TEST_F(EnergyPlusFixture, CTElectricGenerator_Fueltype)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetCTGeneratorInput(state);
+    GetCTGeneratorInput(*state);
 
-    EXPECT_EQ(state.dataCTElectricGenerator->CTGenerator(1).FuelType, "NaturalGas");
+    EXPECT_EQ(state->dataCTElectricGenerator->CTGenerator(1).FuelType, "NaturalGas");
 }
 
 } // namespace EnergyPlus

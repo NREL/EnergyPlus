@@ -491,9 +491,10 @@ namespace EnergyPlus {
                             ShowSevereError(state, "PipingSystems::" + RoutineName +
                                             ": A pipe was outside of the domain extents after performing corrections for basement or burial depth.");
                             ShowContinueError(state, "Pipe segment name:" + thisSegment->Name);
-                            ShowContinueError(state, "Corrected pipe location: ( x,y )=( " +
-                                              General::TrimSigDigits(thisSegment->PipeLocation.X, 2) + ',' +
-                                              General::TrimSigDigits(thisSegment->PipeLocation.Y, 2) + " )");
+                            ShowContinueError(state,
+                                              format("Corrected pipe location: ( x,y )=( {:.2T},{:.2T} )",
+                                                     thisSegment->PipeLocation.X,
+                                                     thisSegment->PipeLocation.Y));
                         }
                     } // segment loop
                 } // circuit loop
@@ -1673,8 +1674,10 @@ namespace EnergyPlus {
                 // Issue a severe if Inner >= Outer diameter
                 if (thisCircuit.PipeSize.InnerDia >= thisCircuit.PipeSize.OuterDia) {
                     ShowSevereError(state, RoutineName + ": " + ObjName_HorizTrench + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\" has invalid pipe diameters.");
-                    ShowContinueError(state, "Outer diameter [" + General::TrimSigDigits(thisCircuit.PipeSize.OuterDia, 3)
-                            + "] must be greater than inner diameter [" + General::TrimSigDigits(thisCircuit.PipeSize.InnerDia, 3) + "].");
+                    ShowContinueError(state,
+                                      format("Outer diameter [{:.3T}] must be greater than inner diameter [{:.3T}].",
+                                             thisCircuit.PipeSize.OuterDia,
+                                             thisCircuit.PipeSize.InnerDia));
                     ErrorsFound = true;
                 }
 
@@ -1943,8 +1946,7 @@ namespace EnergyPlus {
                 for (int ThisCircuitPipeSegmentCounter = 1;
                      ThisCircuitPipeSegmentCounter <= NumPipeSegments; ++ThisCircuitPipeSegmentCounter) {
                     Segment segment;
-                    segment.Name = "HorizontalTrenchCircuit" + std::to_string(HorizontalGHXCtr) + "Segment" +
-                                   std::to_string(ThisCircuitPipeSegmentCounter);
+                    segment.Name = format("HorizontalTrenchCircuit{}Segment{}", HorizontalGHXCtr, ThisCircuitPipeSegmentCounter);
                     segment.IsActuallyPartOfAHorizontalTrench = true;
                     segment.PipeLocation = PointF(ThisCircuitPipeSegmentCounter * thisInterPipeSpacing,
                                                   thisBurialDepth);
@@ -2281,8 +2283,10 @@ namespace EnergyPlus {
             //       MODIFIED       na
             //       RE-ENGINEERED  na
 
-            ShowSevereError(state, RoutineName + ':' + ObjectName + "=\"" + InstanceName + "\", invalid " + FieldName + "=\"" +
-                            General::TrimSigDigits(FieldEntry, 3) + "\", Condition: " + Condition);
+            ShowSevereError(
+                state,
+                format(
+                    "{}:{}=\"{}\", invalid {}=\"{:.3T}\", Condition: {}", RoutineName, ObjectName, InstanceName, FieldName, FieldEntry, Condition));
             ErrorsFound = true;
         }
 
@@ -4139,7 +4143,7 @@ namespace EnergyPlus {
             //       RE-ENGINEERED  na
 
             // Always do start of time step inits
-            this->DoStartOfTimeStepInitializations();
+            this->DoStartOfTimeStepInitializations(state);
 
             // Begin iterating for this time step
             for (int IterationIndex = 1; IterationIndex <= this->SimControls.MaxIterationsPerTS; ++IterationIndex) {
@@ -4362,9 +4366,9 @@ namespace EnergyPlus {
             Real64 GroundCoverCoefficient;
 
             // retrieve information from E+ globals
-            Latitude_Degrees = DataEnvironment::Latitude;
-            StMeridian_Degrees = -DataEnvironment::TimeZoneMeridian; // Standard meridian, degrees W
-            Longitude_Degrees = -DataEnvironment::Longitude;         // Longitude, degrees W
+            Latitude_Degrees = state.dataEnvrn->Latitude;
+            StMeridian_Degrees = -state.dataEnvrn->TimeZoneMeridian; // Standard meridian, degrees W
+            Longitude_Degrees = -state.dataEnvrn->Longitude;         // Longitude, degrees W
 
             // retrieve any information from input data structure
             GroundCoverCoefficient = this->Moisture.GroundCoverCoefficient;
@@ -4415,9 +4419,9 @@ namespace EnergyPlus {
                         Denominator += (Beta / Resistance);
                     } else if (CurDirection == Direction::PositiveY) {
                         // convection at the surface
-                        if (DataEnvironment::WindSpeed > 0.1) {
+                        if (state.dataEnvrn->WindSpeed > 0.1) {
                             Resistance = 208.0 /
-                                         (AirDensity * AirSpecificHeat * DataEnvironment::WindSpeed * ThisNormalArea);
+                                         (AirDensity * AirSpecificHeat * state.dataEnvrn->WindSpeed * ThisNormalArea);
                             Numerator += (Beta / Resistance) * this->Cur.CurAirTemp;
                             Denominator += (Beta / Resistance);
                         }
@@ -4439,9 +4443,9 @@ namespace EnergyPlus {
                         // debug error, can't get here
                     } else if (CurDirection == Direction::PositiveY) {
                         // convection at the surface
-                        if (DataEnvironment::WindSpeed > 0.1) {
+                        if (state.dataEnvrn->WindSpeed > 0.1) {
                             Resistance = 208.0 /
-                                         (AirDensity * AirSpecificHeat * DataEnvironment::WindSpeed * ThisNormalArea);
+                                         (AirDensity * AirSpecificHeat * state.dataEnvrn->WindSpeed * ThisNormalArea);
                             Numerator += (Beta / Resistance) * this->Cur.CurAirTemp;
                             Denominator += (Beta / Resistance);
                         } else {
@@ -4505,7 +4509,7 @@ namespace EnergyPlus {
                       (std::sin(Solar_Angle_2) - std::sin(Solar_Angle_1)));
 
             // Calculate another Q term...
-            QRAD_SO = (A_s + B_s + 0.00002 * DataEnvironment::Elevation) * QRAD_A;
+            QRAD_SO = (A_s + B_s + 0.00002 * state.dataEnvrn->Elevation) * QRAD_A;
 
             // Correct the Qrad term ... better way??
             if (IncidentSolar_MJhrmin < 0.01) {
@@ -5723,14 +5727,14 @@ namespace EnergyPlus {
             }
         }
 
-        void Domain::DoStartOfTimeStepInitializations() {
+        void Domain::DoStartOfTimeStepInitializations(EnergyPlusData &state) {
             static std::string const RoutineName("PipingSystemCircuit::DoStartOfTimeStepInitializations");
 
             // Update environmental conditions
-            this->Cur.CurAirTemp = DataEnvironment::OutDryBulbTemp;
-            this->Cur.CurWindSpeed = DataEnvironment::WindSpeed;
-            this->Cur.CurRelativeHumidity = DataEnvironment::OutRelHum;
-            this->Cur.CurIncidentSolar = DataEnvironment::BeamSolarRad;
+            this->Cur.CurAirTemp = state.dataEnvrn->OutDryBulbTemp;
+            this->Cur.CurWindSpeed = state.dataEnvrn->WindSpeed;
+            this->Cur.CurRelativeHumidity = state.dataEnvrn->OutRelHum;
+            this->Cur.CurIncidentSolar = state.dataEnvrn->BeamSolarRad;
 
             //'now update cell properties
             auto &cells(this->Cells);
@@ -5794,7 +5798,7 @@ namespace EnergyPlus {
             Real64 FluidPrandtl;
 
             // do the regular, non-circuit related inits
-            this->DoStartOfTimeStepInitializations();
+            this->DoStartOfTimeStepInitializations(state);
 
             // retrieve fluid properties based on the circuit inlet temperature -- which varies during the simulation
             // but need to verify the value of inlet temperature during warm up, etc.
