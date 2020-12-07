@@ -184,8 +184,6 @@ namespace DataErrorTracking {
                                                     MoreDetails_19, MoreDetails_20}); // Details 16 applies to both temperature out of bounds |
                                                                                       // errors.
 
-    int constexpr MaxRecurringErrorMsgLength(250); // Maximum error message length for recurring error messages
-
 } // namespace DataErrorTracking
 
 } // namespace EnergyPlus
