@@ -594,18 +594,6 @@ namespace EconomicTariff {
         }
     };
 
-    // Object Data
-    extern Array1D<EconVarType> econVar;
-    extern Array1D<TariffType> tariff;
-    extern Array1D<QualifyType> qualify;
-    extern Array1D<ChargeSimpleType> chargeSimple;
-    extern Array1D<ChargeBlockType> chargeBlock;
-    extern Array1D<RatchetType> ratchet;
-    extern Array1D<ComputationType> computation;
-    extern Array1D<StackType> stack;
-
-    // Functions
-
     void UpdateUtilityBills(EnergyPlusData &state);
 
     //======================================================================================================================
@@ -713,7 +701,7 @@ namespace EconomicTariff {
 
     void addMonthlyCharge(EnergyPlusData &state, int const usingVariable);
 
-    void checkMinimumMonthlyCharge(int const curTariff);
+    void checkMinimumMonthlyCharge(EnergyPlusData &state, int const curTariff);
 
     void setNativeVariables(EnergyPlusData &state);
 
@@ -723,7 +711,7 @@ namespace EconomicTariff {
 
     void showWarningsBasedOnTotal(EnergyPlusData &state);
 
-    void getMaxAndSum(int const varPointer, Real64 &sumResult, Real64 &maxResult);
+    void getMaxAndSum(EnergyPlusData &state, int const varPointer, Real64 &sumResult, Real64 &maxResult);
 
     void
     ReportEconomicVariable(EnergyPlusData &state, std::string const &titleString, bool const includeCategory, bool const showCurrencySymbol, std::string const &forString);
@@ -731,8 +719,6 @@ namespace EconomicTariff {
     void selectTariff(EnergyPlusData &state);
 
     void GetMonthlyCostForResource(EnergyPlusData &state, DataGlobalConstants::ResourceType const inResourceNumber, Array1A<Real64> outMonthlyCosts);
-
-    void clear_state();
 
 } // namespace EconomicTariff
 
@@ -762,6 +748,18 @@ struct EconomicTariffData : BaseGlobalStruct {
     int topOfStack = 0;
     int sizeStack = 0;
 
+    bool Update_GetInput = true;
+    int addOperand_prevVarMe = 0;
+
+    Array1D<EconomicTariff::EconVarType> econVar;
+    Array1D<EconomicTariff::TariffType> tariff;
+    Array1D<EconomicTariff::QualifyType> qualify;
+    Array1D<EconomicTariff::ChargeSimpleType> chargeSimple;
+    Array1D<EconomicTariff::ChargeBlockType> chargeBlock;
+    Array1D<EconomicTariff::RatchetType> ratchet;
+    Array1D<EconomicTariff::ComputationType> computation;
+    Array1D<EconomicTariff::StackType> stack;
+
     void clear_state() override
     {
         this->numEconVar = 0;
@@ -781,6 +779,16 @@ struct EconomicTariffData : BaseGlobalStruct {
         this->sizeSteps = 0;
         this->topOfStack = 0;
         this->sizeStack = 0;
+        this->Update_GetInput = true;
+        this->addOperand_prevVarMe = 0;
+        this->econVar.deallocate();
+        this->tariff.deallocate();
+        this->qualify.deallocate();
+        this->chargeSimple.deallocate();
+        this->chargeBlock.deallocate();
+        this->ratchet.deallocate();
+        this->computation.deallocate();
+        this->stack.deallocate();
     }
 };
 
