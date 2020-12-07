@@ -99,7 +99,6 @@ namespace HVACMultiSpeedHeatPump {
     // DERIVED TYPE DEFINITIONS
 
     // MODULE VARIABLE DECLARATIONS:
-    extern Real64 TempSteamIn; // steam coil steam inlet temperature
 
     extern std::string CurrentModuleObject; // Object type for getting and error messages
     extern Real64 CompOnMassFlow;           // System air mass flow rate w/ compressor ON
