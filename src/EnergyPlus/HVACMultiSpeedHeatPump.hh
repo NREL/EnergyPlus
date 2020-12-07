@@ -96,21 +96,6 @@ namespace HVACMultiSpeedHeatPump {
     extern int const On;  // normal compressor operation
     extern int const Off; // signal DXCoil that compressor shouldn't run
 
-    // DERIVED TYPE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    extern std::string CurrentModuleObject; // Object type for getting and error messages
-    extern Real64 CompOnMassFlow;           // System air mass flow rate w/ compressor ON
-    extern Real64 CompOffMassFlow;          // System air mass flow rate w/ compressor OFF
-    extern Real64 CompOnFlowRatio;          // fan flow ratio when coil on
-    extern Real64 CompOffFlowRatio;         // fan flow ratio when coil off
-    extern Real64 FanSpeedRatio;            // fan speed ratio passed to on/off fan object
-    extern Real64 SupHeaterLoad;            // load to be met by supplemental heater [W]
-    extern Real64 SaveLoadResidual;         // Saved load residual used to check convergence
-    extern Real64 SaveCompressorPLR;        // holds compressor PLR from active DX coil
-    extern Array1D_bool CheckEquipName;
-
     // SUBROUTINE SPECIFICATIONS FOR MODULE
 
     // Types
