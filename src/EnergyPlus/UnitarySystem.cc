@@ -7305,25 +7305,25 @@ namespace UnitarySystems {
                 }
 
                 if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                    SetupEMSActuator("UnitarySystem",
+                    SetupEMSActuator(state, "UnitarySystem",
                                      state.dataUnitarySystems->unitarySys[sysNum].Name,
                                      "Autosized Supply Air Flow Rate",
                                      "[m3/s]",
                                      state.dataUnitarySystems->unitarySys[sysNum].m_DesignFanVolFlowRateEMSOverrideOn,
                                      state.dataUnitarySystems->unitarySys[sysNum].m_DesignFanVolFlowRateEMSOverrideValue);
-                    SetupEMSActuator("UnitarySystem",
+                    SetupEMSActuator(state, "UnitarySystem",
                                      state.dataUnitarySystems->unitarySys[sysNum].Name,
                                      "Autosized Supply Air Flow Rate During Cooling Operation",
                                      "[m3/s]",
                                      state.dataUnitarySystems->unitarySys[sysNum].m_MaxCoolAirVolFlowEMSOverrideOn,
                                      state.dataUnitarySystems->unitarySys[sysNum].m_MaxCoolAirVolFlowEMSOverrideValue);
-                    SetupEMSActuator("UnitarySystem",
+                    SetupEMSActuator(state, "UnitarySystem",
                                      state.dataUnitarySystems->unitarySys[sysNum].Name,
                                      "Autosized Supply Air Flow Rate During Heating Operation",
                                      "[m3/s]",
                                      state.dataUnitarySystems->unitarySys[sysNum].m_MaxHeatAirVolFlowEMSOverrideOn,
                                      state.dataUnitarySystems->unitarySys[sysNum].m_MaxHeatAirVolFlowEMSOverrideValue);
-                    SetupEMSActuator("UnitarySystem",
+                    SetupEMSActuator(state, "UnitarySystem",
                                      state.dataUnitarySystems->unitarySys[sysNum].Name,
                                      "Autosized Supply Air Flow Rate During No Heating or Cooling Operation",
                                      "[m3/s]",
@@ -7339,13 +7339,13 @@ namespace UnitarySystems {
                         "Unitary HVAC Design Heating Capacity", state.dataUnitarySystems->unitarySys[sysNum].Name, "[W]", state.dataUnitarySystems->unitarySys[sysNum].m_DesignHeatingCapacity);
                     SetupEMSInternalVariable(state,
                         "Unitary HVAC Design Cooling Capacity", state.dataUnitarySystems->unitarySys[sysNum].Name, "[W]", state.dataUnitarySystems->unitarySys[sysNum].m_DesignCoolingCapacity);
-                    SetupEMSActuator("Unitary HVAC",
+                    SetupEMSActuator(state, "Unitary HVAC",
                                      state.dataUnitarySystems->unitarySys[sysNum].Name,
                                      "Sensible Load Request",
                                      "[W]",
                                      state.dataUnitarySystems->unitarySys[sysNum].m_EMSOverrideSensZoneLoadRequest,
                                      state.dataUnitarySystems->unitarySys[sysNum].m_EMSSensibleZoneLoadValue);
-                    SetupEMSActuator("Unitary HVAC",
+                    SetupEMSActuator(state, "Unitary HVAC",
                                      state.dataUnitarySystems->unitarySys[sysNum].Name,
                                      "Moisture Load Request",
                                      "[W]",

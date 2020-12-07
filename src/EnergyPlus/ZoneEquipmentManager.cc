@@ -1144,7 +1144,7 @@ namespace ZoneEquipmentManager {
                                          CalcFinalZoneSizing(CtrlZoneNum).ZoneName,
                                          "[kg/s]",
                                          CalcFinalZoneSizing(CtrlZoneNum).DesHeatMassFlow);
-                SetupEMSActuator("Sizing:Zone",
+                SetupEMSActuator(state, "Sizing:Zone",
                                  CalcFinalZoneSizing(CtrlZoneNum).ZoneName,
                                  "Zone Design Heating Air Mass Flow Rate",
                                  "[kg/s]",
@@ -1160,7 +1160,7 @@ namespace ZoneEquipmentManager {
                                          CalcFinalZoneSizing(CtrlZoneNum).ZoneName,
                                          "[kg/s]",
                                          CalcFinalZoneSizing(CtrlZoneNum).DesCoolMassFlow);
-                SetupEMSActuator("Sizing:Zone",
+                SetupEMSActuator(state, "Sizing:Zone",
                                  CalcFinalZoneSizing(CtrlZoneNum).ZoneName,
                                  "Zone Design Cooling Air Mass Flow Rate",
                                  "[kg/s]",
@@ -1174,7 +1174,7 @@ namespace ZoneEquipmentManager {
                                          CalcFinalZoneSizing(CtrlZoneNum).ZoneName,
                                          "[W]",
                                          CalcFinalZoneSizing(CtrlZoneNum).DesHeatLoad);
-                SetupEMSActuator("Sizing:Zone",
+                SetupEMSActuator(state, "Sizing:Zone",
                                  CalcFinalZoneSizing(CtrlZoneNum).ZoneName,
                                  "Zone Design Heating Load",
                                  "[W]",
@@ -1188,7 +1188,7 @@ namespace ZoneEquipmentManager {
                                          CalcFinalZoneSizing(CtrlZoneNum).ZoneName,
                                          "[W]",
                                          CalcFinalZoneSizing(CtrlZoneNum).DesCoolLoad);
-                SetupEMSActuator("Sizing:Zone",
+                SetupEMSActuator(state, "Sizing:Zone",
                                  CalcFinalZoneSizing(CtrlZoneNum).ZoneName,
                                  "Zone Design Cooling Load",
                                  "[W]",
@@ -1223,7 +1223,7 @@ namespace ZoneEquipmentManager {
                                          CalcFinalZoneSizing(CtrlZoneNum).ZoneName,
                                          "[m3/s]",
                                          CalcFinalZoneSizing(CtrlZoneNum).DesHeatVolFlow);
-                SetupEMSActuator("Sizing:Zone",
+                SetupEMSActuator(state, "Sizing:Zone",
                                  CalcFinalZoneSizing(CtrlZoneNum).ZoneName,
                                  "Zone Design Heating Vol Flow",
                                  "[m3/s]",
@@ -1239,7 +1239,7 @@ namespace ZoneEquipmentManager {
                                          CalcFinalZoneSizing(CtrlZoneNum).ZoneName,
                                          "[m3/s]",
                                          CalcFinalZoneSizing(CtrlZoneNum).DesCoolVolFlow);
-                SetupEMSActuator("Sizing:Zone",
+                SetupEMSActuator(state, "Sizing:Zone",
                                  CalcFinalZoneSizing(CtrlZoneNum).ZoneName,
                                  "Zone Design Cooling Vol Flow",
                                  "[m3/s]",
@@ -2583,7 +2583,6 @@ namespace ZoneEquipmentManager {
         using HWBaseboardRadiator::SimHWBaseboard;
         using HybridUnitaryAirConditioners::SimZoneHybridUnitaryAirConditioners;
         using LowTempRadiantSystem::SimLowTempRadiantSystem;
-        using OutdoorAirUnit::SimOutdoorAirUnit;
         using PackagedTerminalHeatPump::SimPackagedTerminalUnit;
         using PurchasedAirManager::SimPurchasedAir;
         using RefrigeratedCase::SimAirChillerSet;
@@ -3026,7 +3025,7 @@ namespace ZoneEquipmentManager {
                                           LatOutputProvided,
                                           ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr));
                     } else if (SELECT_CASE_var == OutdoorAirUnit_Num) { // 'ZoneHVAC:OutdoorAirUnit'
-                        SimOutdoorAirUnit(state, state.dataZoneEquipmentManager->PrioritySimOrder(EquipTypeNum).EquipName,
+                        OutdoorAirUnit::SimOutdoorAirUnit(state, state.dataZoneEquipmentManager->PrioritySimOrder(EquipTypeNum).EquipName,
                                           ActualZoneNum,
                                           FirstHVACIteration,
                                           SysOutputProvided,

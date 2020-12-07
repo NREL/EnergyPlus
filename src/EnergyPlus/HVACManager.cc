@@ -784,7 +784,7 @@ namespace HVACManager {
             //    CALL CheckPlantLoopData
             SetupReports(state);
             if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                SetupPlantEMSActuators();
+                SetupPlantEMSActuators(state);
             }
 
             if (TotNumLoops > 0) {

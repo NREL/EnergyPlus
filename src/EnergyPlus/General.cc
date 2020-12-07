@@ -3167,12 +3167,6 @@ namespace General {
 
         // Using/Aliasing
         using namespace DataIPShortCuts;
-        using DataRuntimeLanguage::OutputEMSActuatorAvailFull;
-        using DataRuntimeLanguage::OutputEMSActuatorAvailSmall;
-        using DataRuntimeLanguage::OutputEMSErrors;
-        using DataRuntimeLanguage::OutputEMSInternalVarsFull;
-        using DataRuntimeLanguage::OutputEMSInternalVarsSmall;
-        using DataRuntimeLanguage::OutputFullEMSTrace;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumReports;
@@ -3376,25 +3370,25 @@ namespace General {
                     auto const SELECT_CASE_var(cAlphaArgs(1));
 
                     if (SELECT_CASE_var == "NONE") {
-                        OutputEMSActuatorAvailSmall = false;
-                        OutputEMSActuatorAvailFull = false;
+                        state.dataRuntimeLang->OutputEMSActuatorAvailSmall = false;
+                        state.dataRuntimeLang->OutputEMSActuatorAvailFull = false;
                     } else if (SELECT_CASE_var == "NOTBYUNIQUEKEYNAMES") {
-                        OutputEMSActuatorAvailSmall = true;
-                        OutputEMSActuatorAvailFull = false;
+                        state.dataRuntimeLang->OutputEMSActuatorAvailSmall = true;
+                        state.dataRuntimeLang->OutputEMSActuatorAvailFull = false;
                     } else if (SELECT_CASE_var == "VERBOSE") {
-                        OutputEMSActuatorAvailSmall = false;
-                        OutputEMSActuatorAvailFull = true;
+                        state.dataRuntimeLang->OutputEMSActuatorAvailSmall = false;
+                        state.dataRuntimeLang->OutputEMSActuatorAvailFull = true;
 
                     } else if (SELECT_CASE_var == "") {
                         ShowWarningError(state, cCurrentModuleObject + ": Blank " + cAlphaFieldNames(1) + " supplied.");
                         ShowContinueError(state, " Legal values are: \"None\", \"NotByUniqueKeyNames\", \"Verbose\". \"None\" will be used.");
-                        OutputEMSActuatorAvailSmall = false;
-                        OutputEMSActuatorAvailFull = false;
+                        state.dataRuntimeLang->OutputEMSActuatorAvailSmall = false;
+                        state.dataRuntimeLang->OutputEMSActuatorAvailFull = false;
                     } else {
                         ShowWarningError(state, cCurrentModuleObject + ": Invalid " + cAlphaFieldNames(1) + "=\"" + cAlphaArgs(1) + "\" supplied.");
                         ShowContinueError(state, " Legal values are: \"None\", \"NotByUniqueKeyNames\", \"Verbose\". \"None\" will be used.");
-                        OutputEMSActuatorAvailSmall = false;
-                        OutputEMSActuatorAvailFull = false;
+                        state.dataRuntimeLang->OutputEMSActuatorAvailSmall = false;
+                        state.dataRuntimeLang->OutputEMSActuatorAvailFull = false;
                     }
                 }
 
@@ -3402,24 +3396,24 @@ namespace General {
                     auto const SELECT_CASE_var(cAlphaArgs(2));
 
                     if (SELECT_CASE_var == "NONE") {
-                        OutputEMSInternalVarsFull = false;
-                        OutputEMSInternalVarsSmall = false;
+                        state.dataRuntimeLang->OutputEMSInternalVarsFull = false;
+                        state.dataRuntimeLang->OutputEMSInternalVarsSmall = false;
                     } else if (SELECT_CASE_var == "NOTBYUNIQUEKEYNAMES") {
-                        OutputEMSInternalVarsFull = false;
-                        OutputEMSInternalVarsSmall = true;
+                        state.dataRuntimeLang->OutputEMSInternalVarsFull = false;
+                        state.dataRuntimeLang->OutputEMSInternalVarsSmall = true;
                     } else if (SELECT_CASE_var == "VERBOSE") {
-                        OutputEMSInternalVarsFull = true;
-                        OutputEMSInternalVarsSmall = false;
+                        state.dataRuntimeLang->OutputEMSInternalVarsFull = true;
+                        state.dataRuntimeLang->OutputEMSInternalVarsSmall = false;
                     } else if (SELECT_CASE_var == "") {
                         ShowWarningError(state, cCurrentModuleObject + ": Blank " + cAlphaFieldNames(2) + " supplied.");
                         ShowContinueError(state, " Legal values are: \"None\", \"NotByUniqueKeyNames\", \"Verbose\". \"None\" will be used.");
-                        OutputEMSInternalVarsFull = false;
-                        OutputEMSInternalVarsSmall = false;
+                        state.dataRuntimeLang->OutputEMSInternalVarsFull = false;
+                        state.dataRuntimeLang->OutputEMSInternalVarsSmall = false;
                     } else {
                         ShowWarningError(state, cCurrentModuleObject + ": Invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(1) + "\" supplied.");
                         ShowContinueError(state, " Legal values are: \"None\", \"NotByUniqueKeyNames\", \"Verbose\". \"None\" will be used.");
-                        OutputEMSInternalVarsFull = false;
-                        OutputEMSInternalVarsSmall = false;
+                        state.dataRuntimeLang->OutputEMSInternalVarsFull = false;
+                        state.dataRuntimeLang->OutputEMSInternalVarsSmall = false;
                     }
                 }
 
@@ -3427,24 +3421,24 @@ namespace General {
                     auto const SELECT_CASE_var(cAlphaArgs(3));
 
                     if (SELECT_CASE_var == "NONE") {
-                        OutputEMSErrors = false;
-                        OutputFullEMSTrace = false;
+                        state.dataRuntimeLang->OutputEMSErrors = false;
+                        state.dataRuntimeLang->OutputFullEMSTrace = false;
                     } else if (SELECT_CASE_var == "ERRORSONLY") {
-                        OutputEMSErrors = true;
-                        OutputFullEMSTrace = false;
+                        state.dataRuntimeLang->OutputEMSErrors = true;
+                        state.dataRuntimeLang->OutputFullEMSTrace = false;
                     } else if (SELECT_CASE_var == "VERBOSE") {
-                        OutputFullEMSTrace = true;
-                        OutputEMSErrors = true;
+                        state.dataRuntimeLang->OutputFullEMSTrace = true;
+                        state.dataRuntimeLang->OutputEMSErrors = true;
                     } else if (SELECT_CASE_var == "") {
                         ShowWarningError(state, cCurrentModuleObject + ": Blank " + cAlphaFieldNames(3) + " supplied.");
                         ShowContinueError(state, " Legal values are: \"None\", \"ErrorsOnly\", \"Verbose\". \"None\" will be used.");
-                        OutputEMSErrors = false;
-                        OutputFullEMSTrace = false;
+                        state.dataRuntimeLang->OutputEMSErrors = false;
+                        state.dataRuntimeLang->OutputFullEMSTrace = false;
                     } else {
                         ShowWarningError(state, cCurrentModuleObject + ": Invalid " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(1) + "\" supplied.");
                         ShowContinueError(state, " Legal values are: \"None\", \"ErrorsOnly\", \"Verbose\". \"None\" will be used.");
-                        OutputEMSErrors = false;
-                        OutputFullEMSTrace = false;
+                        state.dataRuntimeLang->OutputEMSErrors = false;
+                        state.dataRuntimeLang->OutputFullEMSTrace = false;
                     }
                 }
             }

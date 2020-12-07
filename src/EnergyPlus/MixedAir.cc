@@ -3246,7 +3246,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                             "Outdoor Air Controller Maximum Mass Flow Rate", loopOAController.Name, "[kg/s]", loopOAController.MaxOAMassFlowRate);
                         SetupEMSInternalVariable(state,
                             "Outdoor Air Controller Minimum Mass Flow Rate", loopOAController.Name, "[kg/s]", loopOAController.MinOAMassFlowRate);
-                        SetupEMSActuator("Outdoor Air Controller",
+                        SetupEMSActuator(state, "Outdoor Air Controller",
                                          loopOAController.Name,
                                          "Air Mass Flow Rate",
                                          "[kg/s]",

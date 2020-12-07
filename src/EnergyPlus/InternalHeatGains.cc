@@ -1101,7 +1101,7 @@ namespace InternalHeatGains {
                     }
 
                     if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                        SetupEMSActuator(
+                        SetupEMSActuator(state,
                             "People", People(Loop).Name, "Number of People", "[each]", People(Loop).EMSPeopleOn, People(Loop).EMSNumberOfPeople);
                         SetupEMSInternalVariable(state, "People Count Design Level", People(Loop).Name, "[each]", People(Loop).NumberOfPeople);
                     }
@@ -1577,7 +1577,7 @@ namespace InternalHeatGains {
                     }
 
                     if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                        SetupEMSActuator(
+                        SetupEMSActuator(state,
                             "Lights", Lights(Loop).Name, "Electricity Rate", "[W]", Lights(Loop).EMSLightsOn, Lights(Loop).EMSLightingPower);
                         SetupEMSInternalVariable(state, "Lighting Power Design Level", Lights(Loop).Name, "[W]", Lights(Loop).DesignLevel);
                     } // EMS
@@ -2012,7 +2012,7 @@ namespace InternalHeatGains {
                     }
 
                     if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                        SetupEMSActuator("ElectricEquipment",
+                        SetupEMSActuator(state, "ElectricEquipment",
                                          ZoneElectric(Loop).Name,
                                          "Electricity Rate",
                                          "[W]",
@@ -2430,7 +2430,7 @@ namespace InternalHeatGains {
                     }
 
                     if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                        SetupEMSActuator("GasEquipment",
+                        SetupEMSActuator(state, "GasEquipment",
                                          ZoneGas(Loop).Name,
                                          "NaturalGas Rate",
                                          "[W]",
@@ -2836,7 +2836,7 @@ namespace InternalHeatGains {
                     }
 
                     if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                        SetupEMSActuator("HotWaterEquipment",
+                        SetupEMSActuator(state, "HotWaterEquipment",
                                          ZoneHWEq(Loop).Name,
                                          "District Heating Power Level",
                                          "[W]",
@@ -3240,7 +3240,7 @@ namespace InternalHeatGains {
                     }
 
                     if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                        SetupEMSActuator("SteamEquipment",
+                        SetupEMSActuator(state, "SteamEquipment",
                                          ZoneSteamEq(Loop).Name,
                                          "District Heating Power Level",
                                          "[W]",
@@ -3672,7 +3672,7 @@ namespace InternalHeatGains {
                                             Zone(ZoneOtherEq(Loop).ZonePtr).Name);
                     }
                     if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                        SetupEMSActuator("OtherEquipment",
+                        SetupEMSActuator(state, "OtherEquipment",
                                          ZoneOtherEq(Loop).Name,
                                          "Power Level",
                                          "[W]",
@@ -4631,7 +4631,7 @@ namespace InternalHeatGains {
             }
 
             if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                SetupEMSActuator("ZoneBaseboard:OutdoorTemperatureControlled",
+                SetupEMSActuator(state, "ZoneBaseboard:OutdoorTemperatureControlled",
                                  ZoneBBHeat(Loop).Name,
                                  "Power Level",
                                  "[W]",

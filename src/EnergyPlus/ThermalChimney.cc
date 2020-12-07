@@ -368,7 +368,7 @@ namespace ThermalChimney {
                                 state.dataThermalChimneys->ThermalChimneySys(Loop).Name);
 
             if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                SetupEMSActuator("Zone Thermal Chimney",
+                SetupEMSActuator(state, "Zone Thermal Chimney",
                                  state.dataThermalChimneys->ThermalChimneySys(Loop).Name,
                                  "Air Exchange Flow Rate",
                                  "[m3/s]",

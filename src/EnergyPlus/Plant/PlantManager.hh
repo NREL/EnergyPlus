@@ -64,16 +64,10 @@ struct EnergyPlusData;
 
 namespace PlantManager {
 
-    // Using/Aliasing
-    using DataPlant::BranchData;
-    using DataPlant::MixerData;
-    using DataPlant::SplitterData;
-
     // MODULE PARAMETER DEFINITIONS
-    extern int const Plant;
-    extern int const Condenser;
     extern int const TempSetPt;
     extern int const FlowSetPt;
+
     extern bool InitLoopEquip;
     extern bool GetCompSizFac;
 
@@ -88,7 +82,7 @@ namespace PlantManager {
                           bool &SimZoneEquipment,    // True when zone equipment components need to be (re)simulated
                           bool &SimNonZoneEquipment, // True when non-zone equipment components need to be (re)simulated
                           bool &SimPlantLoops,       // True when some part of Plant needs to be (re)simulated
-                          bool &SimElecCircuits      // True when electic circuits need to be (re)simulated
+                          bool &SimElecCircuits      // True when electric circuits need to be (re)simulated
     );
 
     void GetPlantLoopData(EnergyPlusData &state);

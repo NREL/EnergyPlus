@@ -1253,7 +1253,7 @@ namespace EnergyPlus::SingleDuct {
 
             if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                 // model results related actuators
-                SetupEMSActuator("AirTerminal:SingleDuct:ConstantVolume:NoReheat",
+                SetupEMSActuator(state, "AirTerminal:SingleDuct:ConstantVolume:NoReheat",
                                  state.dataSingleDuct->sd_airterminal(SysNum).SysName,
                                  "Mass Flow Rate",
                                  "[kg/s]",

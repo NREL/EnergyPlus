@@ -10002,25 +10002,25 @@ namespace SurfaceGeometry {
                                 OSCM(OSCMNum).Name);
 
             if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                SetupEMSActuator("Other Side Boundary Conditions",
+                SetupEMSActuator(state, "Other Side Boundary Conditions",
                                  OSCM(OSCMNum).Name,
                                  "Convection Bulk Air Temperature",
                                  "[C]",
                                  OSCM(OSCMNum).EMSOverrideOnTConv,
                                  OSCM(OSCMNum).EMSOverrideTConvValue);
-                SetupEMSActuator("Other Side Boundary Conditions",
+                SetupEMSActuator(state, "Other Side Boundary Conditions",
                                  OSCM(OSCMNum).Name,
                                  "Convection Heat Transfer Coefficient",
                                  "[W/m2-K]",
                                  OSCM(OSCMNum).EMSOverrideOnHConv,
                                  OSCM(OSCMNum).EMSOverrideHConvValue);
-                SetupEMSActuator("Other Side Boundary Conditions",
+                SetupEMSActuator(state, "Other Side Boundary Conditions",
                                  OSCM(OSCMNum).Name,
                                  "Radiation Effective Temperature",
                                  "[C]",
                                  OSCM(OSCMNum).EMSOverrideOnTRad,
                                  OSCM(OSCMNum).EMSOverrideTRadValue);
-                SetupEMSActuator("Other Side Boundary Conditions",
+                SetupEMSActuator(state, "Other Side Boundary Conditions",
                                  OSCM(OSCMNum).Name,
                                  "Radiation Linear Heat Transfer Coefficient",
                                  "[W/m2-K]",

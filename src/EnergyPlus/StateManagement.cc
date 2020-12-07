@@ -67,7 +67,6 @@
 #include <EnergyPlus/DataOutputs.hh>
 #include <EnergyPlus/DataPhotovoltaics.hh>
 #include <EnergyPlus/DataReportingFlags.hh>
-#include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataSurfaceLists.hh>
@@ -78,7 +77,6 @@
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
-#include <EnergyPlus/DemandManager.hh>
 #include <EnergyPlus/DesiccantDehumidifiers.hh>
 #include <EnergyPlus/DisplacementVentMgr.hh>
 #include <EnergyPlus/DualDuct.hh>
@@ -141,7 +139,6 @@
 #include <EnergyPlus/MoistureBalanceEMPDManager.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
-#include <EnergyPlus/OutdoorAirUnit.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
@@ -170,7 +167,6 @@
 #include <EnergyPlus/PoweredInductionUnits.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/Pumps.hh>
-#include <EnergyPlus/PurchasedAirManager.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
 #include <EnergyPlus/ResultsFramework.hh>
 #include <EnergyPlus/ReturnAirPathManager.hh>
@@ -203,7 +199,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     DataPhotovoltaics::clear_state();
     DataPlant::clear_state();
     DataReportingFlags::clear_state();
-    DataRuntimeLanguage::clear_state();
     DataSizing::clear_state();
     DataStringGlobals::clear_state();
     DataSurfaceLists::clear_state();
@@ -214,7 +209,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     DataZoneControls::clear_state();
     DataZoneEnergyDemands::clear_state();
     DataZoneEquipment::clear_state();
-    DemandManager::clear_state();
     DesiccantDehumidifiers::clear_state();
     DisplacementVentMgr::clear_state();
     DualDuct::clear_state();
@@ -281,7 +275,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     MoistureBalanceEMPDManager::clear_state();
     NodeInputManager::clear_state();
     OutAirNodeManager::clear_state();
-    OutdoorAirUnit::clear_state();
     OutputProcessor::clear_state();
     OutputReportPredefined::clear_state();
     OutputReportTabular::clear_state(state);
@@ -308,7 +301,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     PoweredInductionUnits::clear_state();
     Psychrometrics::clear_state();
     Pumps::clear_state();
-    PurchasedAirManager::clear_state();
     PVWatts::clear_state();
     clearCoilSelectionReportObj(); // ReportCoilSelection
     ReturnAirPathManager::clear_state();

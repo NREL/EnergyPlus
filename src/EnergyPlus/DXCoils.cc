@@ -5978,21 +5978,21 @@ namespace DXCoils {
         if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
             // setup EMS sizing actuators for single speed DX
             for (DXCoilNum = 1; DXCoilNum <= NumDoe2DXCoils; ++DXCoilNum) {
-                SetupEMSActuator("Coil:Cooling:DX:SingleSpeed",
+                SetupEMSActuator(state, "Coil:Cooling:DX:SingleSpeed",
                                  DXCoil(DXCoilNum).Name,
                                  "Autosized Rated Air Flow Rate",
                                  "[m3/s]",
                                  DXCoil(DXCoilNum).RatedAirVolFlowRateEMSOverrideON(1),
                                  DXCoil(DXCoilNum).RatedAirVolFlowRateEMSOverrideValue(1));
 
-                SetupEMSActuator("Coil:Cooling:DX:SingleSpeed",
+                SetupEMSActuator(state, "Coil:Cooling:DX:SingleSpeed",
                                  DXCoil(DXCoilNum).Name,
                                  "Autosized Rated Sensible Heat Ratio",
                                  "[W/W]",
                                  DXCoil(DXCoilNum).RatedSHREMSOverrideOn(1),
                                  DXCoil(DXCoilNum).RatedSHREMSOverrideValue(1));
 
-                SetupEMSActuator("Coil:Cooling:DX:SingleSpeed",
+                SetupEMSActuator(state, "Coil:Cooling:DX:SingleSpeed",
                                  DXCoil(DXCoilNum).Name,
                                  "Autosized Rated Total Cooling Capacity",
                                  "[W]",
