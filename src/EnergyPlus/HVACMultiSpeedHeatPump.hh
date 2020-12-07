@@ -78,16 +78,12 @@ namespace HVACMultiSpeedHeatPump {
     extern int const SuppHeatingCoilElec; // Supplymental heating coil type: COIL:ELECTRIC:HEATING
     extern int const SuppHeatingCoilRec;  // Supplymental heating coil type: COIL:ENGINEHEATRECOVERY:HEATING
 
-    // Curve Types
-    extern int const Linear;      // Linear curve type
-    extern int const BiLinear;    // Bi-linear curve type
-    extern int const Quadratic;   // Quadratic curve type
-    extern int const BiQuadratic; // Bi-quadratic curve type
-    extern int const Cubic;       // Cubic curve type
-
     // Mode of operation
-    extern int const CoolingMode; // System operating mode is cooling
-    extern int const HeatingMode; // System operating mode is heating
+    enum class ModeOfOperation {
+        Unassigned,
+        CoolingMode, // System operating mode is cooling
+        HeatingMode, // System operating mode is heating
+    };
 
     // Airflow control for contant fan mode
     extern int const UseCompressorOnFlow;  // set compressor OFF air flow rate equal to compressor ON air flow rate
@@ -186,8 +182,8 @@ namespace HVACMultiSpeedHeatPump {
         Array1D<Real64> HeatingSpeedRatio;  // Fan speed ratio in heating mode
         Array1D<Real64> CoolingSpeedRatio;  // Fan speed ratio in cooling mode
         bool CheckFanFlow;                  // Supply airflow check
-        int LastMode;                       // MSHP operation mode
-        int HeatCoolMode;                   // System operating mode (0 = floating, 1 = cooling, 2 = heating)
+        ModeOfOperation LastMode;           // MSHP operation mode
+        ModeOfOperation HeatCoolMode;       // System operating mode (0 = floating, 1 = cooling, 2 = heating)
         int AirLoopNumber;                  // Air loop served by the engine driven heat pump system
         int NumControlledZones;             // Number of controlled zones for this system
         int ZoneInletNode;                  // Zone inlet node number in the controlled zone
@@ -264,7 +260,7 @@ namespace HVACMultiSpeedHeatPump {
               AuxOnCyclePower(0.0), AuxOffCyclePower(0.0), DesignHeatRecFlowRate(0.0), HeatRecActive(false), HeatRecInletNodeNum(0),
               HeatRecOutletNodeNum(0), MaxHeatRecOutletTemp(0.0), DesignHeatRecMassFlowRate(0.0), HRLoopNum(0), HRLoopSideNum(0), HRBranchNum(0),
               HRCompNum(0), AuxElecPower(0.0), IdleVolumeAirRate(0.0), IdleMassFlowRate(0.0), IdleSpeedRatio(0.0), NumOfSpeedCooling(0),
-              NumOfSpeedHeating(0), CheckFanFlow(true), LastMode(0), HeatCoolMode(0), AirLoopNumber(0), NumControlledZones(0), ZoneInletNode(0),
+              NumOfSpeedHeating(0), CheckFanFlow(true), LastMode(ModeOfOperation::Unassigned), HeatCoolMode(ModeOfOperation::Unassigned), AirLoopNumber(0), NumControlledZones(0), ZoneInletNode(0),
               CompPartLoadRatio(0.0), FanPartLoadRatio(0.0), TotCoolEnergyRate(0.0), TotHeatEnergyRate(0.0), SensCoolEnergyRate(0.0),
               SensHeatEnergyRate(0.0), LatCoolEnergyRate(0.0), LatHeatEnergyRate(0.0), ElecPower(0.0), LoadMet(0.0), HeatRecoveryRate(0.0),
               HeatRecoveryInletTemp(0.0), HeatRecoveryOutletTemp(0.0), HeatRecoveryMassFlowRate(0.0), AirFlowControl(0), ErrIndexCyc(0),
