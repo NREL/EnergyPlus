@@ -1006,13 +1006,15 @@ namespace HeatBalFiniteDiffManager {
                                     "Zone",
                                     "State",
                                     Surface(SurfNum).Name);
-                SetupOutputVariable(state, "CondFD Phase Change Node Conductivity " + TrimSigDigits(Lay) + "",
+                SetupOutputVariable(state,
+                                    format("CondFD Phase Change Node Conductivity {}", Lay),
                                     OutputProcessor::Unit::W_mK,
                                     SurfaceFD(SurfNum).condNodeReport(Lay),
                                     "Zone",
                                     "State",
                                     Surface(SurfNum).Name);
-                SetupOutputVariable(state, "CondFD Phase Change Node Specific Heat " + TrimSigDigits(Lay) + "",
+                SetupOutputVariable(state,
+                                    format("CondFD Phase Change Node Specific Heat {}", Lay),
                                     OutputProcessor::Unit::J_kgK,
                                     SurfaceFD(SurfNum).specHeatNodeReport(Lay),
                                     "Zone",
