@@ -205,7 +205,7 @@ void CoilCoolingDXCurveFitOperatingMode::size(EnergyPlus::EnergyPlusData &state)
     Real64 const ratedInletAirHumRat(0.0111847); // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
     this->ratedEvapAirMassFlowRate =
         this->ratedEvapAirFlowRate *
-        Psychrometrics::PsyRhoAirFnPbTdbW(state, DataEnvironment::StdBaroPress, ratedInletAirTemp, ratedInletAirHumRat, RoutineName);
+        Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, ratedInletAirTemp, ratedInletAirHumRat, RoutineName);
 
     std::string SizingString = "Rated Gross Total Cooling Capacity [W]";
     DataSizing::DataFlowUsedForSizing = this->ratedEvapAirFlowRate;

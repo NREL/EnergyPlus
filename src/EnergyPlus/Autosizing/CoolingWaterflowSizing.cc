@@ -82,7 +82,7 @@ Real64 CoolingWaterflowSizer::size(EnergyPlusData &state, Real64 _originalValue,
                     Real64 DesCoilLoad =
                         this->finalZoneSizing(this->curZoneEqNum).DesCoolMassFlow *
                         (Psychrometrics::PsyHFnTdbW(CoilInTemp, CoilInHumRat) - Psychrometrics::PsyHFnTdbW(CoilOutTemp, CoilOutHumRat));
-                    Real64 DesVolFlow = this->finalZoneSizing(this->curZoneEqNum).DesCoolMassFlow / DataEnvironment::StdRhoAir;
+                    Real64 DesVolFlow = this->finalZoneSizing(this->curZoneEqNum).DesCoolMassFlow / state.dataEnvrn->StdRhoAir;
                     // add fan heat to coil load
                     DesCoilLoad += BaseSizerWithFanHeatInputs::calcFanDesHeatGain(DesVolFlow);
                     if (DesCoilLoad >= DataHVACGlobals::SmallLoad) {

@@ -1113,9 +1113,6 @@ CurrentModuleObjects(CO_OAEqList), ComponentListName);
         // na
 
         // Using/Aliasing
-        using DataEnvironment::OutBaroPress;
-        using DataEnvironment::OutHumRat;
-        using DataEnvironment::StdRhoAir;
         using DataHeatBalFanSys::MAT;
         using DataHeatBalFanSys::ZoneAirHumRat;
         using DataHVACGlobals::ShortenTimeStepSys;
@@ -1252,7 +1249,7 @@ CurrentModuleObjects(CO_OAEqList), ComponentListName);
             OutNode = OutAirUnit(OAUnitNum).AirOutletNode;
             OutsideAirNode = OutAirUnit(OAUnitNum).OutsideAirNode;
             // Outdoor Air flow rate conditions
-            RhoAir = StdRhoAir;
+            RhoAir = state.dataEnvrn->StdRhoAir;
             OAFrac = GetCurrentScheduleValue(state, OutAirUnit(OAUnitNum).OutAirSchedPtr);
             OutAirUnit(OAUnitNum).OutAirMassFlow = RhoAir * OAFrac * OutAirUnit(OAUnitNum).OutAirVolFlow;
             OutAirUnit(OAUnitNum).SMaxAirMassFlow = RhoAir * OAFrac * OutAirUnit(OAUnitNum).SFanMaxAirVolFlow;
@@ -1375,7 +1372,7 @@ CurrentModuleObjects(CO_OAEqList), ComponentListName);
 
         OutNode = OutAirUnit(OAUnitNum).AirOutletNode;
         OutsideAirNode = OutAirUnit(OAUnitNum).OutsideAirNode;
-        RhoAir = StdRhoAir;
+        RhoAir = state.dataEnvrn->StdRhoAir;
         OAFrac = GetCurrentScheduleValue(state, OutAirUnit(OAUnitNum).OutAirSchedPtr);
 
         // set the mass flow rates from the input volume flow rates
@@ -1428,8 +1425,8 @@ CurrentModuleObjects(CO_OAEqList), ComponentListName);
         if (FirstHVACIteration || ShortenTimeStepSys) {
             // Initialize the outside air conditions...
             Node(OutsideAirNode).Temp = Node(OutsideAirNode).OutAirDryBulb;
-            Node(OutsideAirNode).HumRat = OutHumRat;
-            Node(OutsideAirNode).Press = OutBaroPress;
+            Node(OutsideAirNode).HumRat = state.dataEnvrn->OutHumRat;
+            Node(OutsideAirNode).Press = state.dataEnvrn->OutBaroPress;
         }
     }
 
@@ -1452,7 +1449,6 @@ CurrentModuleObjects(CO_OAEqList), ComponentListName);
 
         // Using/Aliasing
         using namespace DataSizing;
-        using DataEnvironment::StdRhoAir;
         using DataHVACGlobals::cFanTypes;
         using DataPlant::PlantLoop;
         using DataPlant::TypeOf_CoilSteamAirHeating;
@@ -1486,7 +1482,7 @@ CurrentModuleObjects(CO_OAEqList), ComponentListName);
         PltSizCoolNum = 0;
         PltSizHeatNum = 0;
         ErrorsFound = false;
-        RhoAir = StdRhoAir;
+        RhoAir = state.dataEnvrn->StdRhoAir;
         IsAutoSize = false;
         OutAirVolFlowDes = 0.0;
         OutAirVolFlowUser = 0.0;
@@ -1708,9 +1704,6 @@ CurrentModuleObjects(CO_OAEqList), ComponentListName);
         // USE STATEMENTS:
 
         // Using/Aliasing
-        using DataEnvironment::CurMnDy;
-        using DataEnvironment::EnvironmentName;
-        using DataEnvironment::OutBaroPress;
         using DataHeatBalFanSys::MAT;
         using DataHeatBalFanSys::ZoneAirHumRat;
         using DataHVACGlobals::ZoneCompTurnFansOff;
@@ -2130,9 +2123,6 @@ CurrentModuleObjects(CO_OAEqList), ComponentListName);
         // USE STATEMENTS:
 
         // Using/Aliasing
-        using DataEnvironment::CurMnDy;
-        using DataEnvironment::EnvironmentName;
-        using DataEnvironment::OutBaroPress;
         using DataHeatBalance::MRT;
         using DataHeatBalFanSys::MAT;
         using DataHeatBalFanSys::ZoneAirHumRat;

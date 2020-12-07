@@ -87,8 +87,6 @@ namespace MixerComponent {
     // Use statements for data only modules
     // Using/Aliasing
     using namespace DataLoopNode;
-    using DataEnvironment::OutBaroPress;
-
     // Use statements for access to subroutines in other modules
 
     // Data

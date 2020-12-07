@@ -462,6 +462,7 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings210240(EnergyPlus::Ene
         if (speed.ratedCOP > 0.0) { // RatedCOP <= 0.0 is trapped in GetInput, but keep this as "safety"
             EIR = EIRTempModFac * EIRFlowModFac / speed.ratedCOP;
         } else {
+            state.dataEnvrn->OutDryBulbTemp = OutdoorUnitInletAirDryBulbTempPLTestPoint[PartLoadTestPoint - 1];
             EIR = 0.0;
         }
 

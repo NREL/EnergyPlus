@@ -2141,8 +2141,6 @@ namespace GroundHeatExchangers {
 
         // Using/Aliasing
         using BranchNodeConnections::TestCompSet;
-        using DataEnvironment::MaxNumberSimYears;
-
         using NodeInputManager::GetOnlySingleNode;
         using PlantUtilities::RegisterPlantCompDesignFlow;
 
@@ -2279,7 +2277,7 @@ namespace GroundHeatExchangers {
                 thisRF->numBoreholes = DataIPShortCuts::rNumericArgs(1);
                 thisRF->gRefRatio = DataIPShortCuts::rNumericArgs(2);
 
-                thisRF->maxSimYears = MaxNumberSimYears;
+                thisRF->maxSimYears = state.dataEnvrn->MaxNumberSimYears;
 
                 int numPreviousFields = 2;
                 int numFields = 0;
@@ -2563,7 +2561,7 @@ namespace GroundHeatExchangers {
                 thisGLHE.myRespFactors->gRefRatio = thisGLHE.bhRadius / thisGLHE.bhLength;
 
                 // Number of simulation years from RunPeriod
-                thisGLHE.myRespFactors->maxSimYears = MaxNumberSimYears;
+                thisGLHE.myRespFactors->maxSimYears = state.dataEnvrn->MaxNumberSimYears;
 
                 // total tube length
                 thisGLHE.totalTubeLength = thisGLHE.myRespFactors->numBoreholes * thisGLHE.myRespFactors->props->bhLength;

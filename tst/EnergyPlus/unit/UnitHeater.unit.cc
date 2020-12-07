@@ -1346,7 +1346,7 @@ TEST_F(EnergyPlusFixture, UnitHeater_SimUnitHeaterTest)
     Node(Fan(1).InletNodeNum).Temp = 16.6;
     Node(Fan(1).InletNodeNum).HumRat = PsyWFnTdbRhPb(*state, 16.6, 0.5, 101325.0, "UnitTest");
     Node(Fan(1).InletNodeNum).Enthalpy = Psychrometrics::PsyHFnTdbW(Node(Fan(1).InletNodeNum).Temp, Node(Fan(1).InletNodeNum).HumRat);
-    DataEnvironment::StdRhoAir = PsyRhoAirFnPbTdbW(*state, 101325.0, 20.0, 0.0);
+    state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, 101325.0, 20.0, 0.0);
 
     WCWaterInletNode = state->dataWaterCoils->WaterCoil(CoilNum).WaterInletNodeNum;
     WCWaterOutletNode = state->dataWaterCoils->WaterCoil(CoilNum).WaterOutletNodeNum;

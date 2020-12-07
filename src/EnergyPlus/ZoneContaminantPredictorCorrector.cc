@@ -102,8 +102,6 @@ namespace ZoneContaminantPredictorCorrector {
     using namespace DataHVACGlobals;
     using namespace DataHeatBalance;
     using namespace DataHeatBalFanSys;
-    using DataEnvironment::OutBaroPress;
-    using DataEnvironment::OutHumRat;
     using namespace Psychrometrics;
     using namespace HybridModel;
     using ScheduleManager::GetCurrentScheduleValue;
@@ -1812,7 +1810,7 @@ namespace ZoneContaminantPredictorCorrector {
 
                 if (ControlledCO2ZoneFlag) {
                     // The density of air
-                    RhoAir = PsyRhoAirFnPbTdbW(state, OutBaroPress, ZT(ZoneNum), ZoneAirHumRat(ZoneNum), RoutineName);
+                    RhoAir = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, ZT(ZoneNum), ZoneAirHumRat(ZoneNum), RoutineName);
 
                     // Calculate Co2 from infiltration + humidity added from latent load
                     // to determine system added/subtracted moisture.
@@ -1919,7 +1917,7 @@ namespace ZoneContaminantPredictorCorrector {
 
                 if (ControlledGCZoneFlag) {
                     // The density of air
-                    RhoAir = PsyRhoAirFnPbTdbW(state, OutBaroPress, ZT(ZoneNum), ZoneAirHumRat(ZoneNum), RoutineName);
+                    RhoAir = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, ZT(ZoneNum), ZoneAirHumRat(ZoneNum), RoutineName);
 
                     // Calculate generic contaminant from infiltration + humidity added from latent load
                     // to determine system added/subtracted moisture.
@@ -2120,9 +2118,6 @@ namespace ZoneContaminantPredictorCorrector {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine inversely solve infiltration airflow rate or people count with zone air CO2 concentration measurements.
 
-        // Using/Aliasing
-        using DataEnvironment::DayOfYear;
-
         static std::string const RoutineName("InverseModelCO2");
 
         Real64 AA(0.0);
@@ -2148,7 +2143,7 @@ namespace ZoneContaminantPredictorCorrector {
 
         Zone(ZoneNum).ZoneMeasuredCO2Concentration = GetCurrentScheduleValue(state, HybridModelZone(ZoneNum).ZoneMeasuredCO2ConcentrationSchedulePtr);
 
-        if (DayOfYear >= HybridModelZone(ZoneNum).HybridStartDayOfYear && DayOfYear <= HybridModelZone(ZoneNum).HybridEndDayOfYear) {
+        if (state.dataEnvrn->DayOfYear >= HybridModelZone(ZoneNum).HybridStartDayOfYear && state.dataEnvrn->DayOfYear <= HybridModelZone(ZoneNum).HybridEndDayOfYear) {
             state.dataContaminantBalance->ZoneAirCO2(ZoneNum) = Zone(ZoneNum).ZoneMeasuredCO2Concentration;
 
             if (HybridModelZone(ZoneNum).InfiltrationCalc_C && UseZoneTimeStepHistory) {
@@ -2180,8 +2175,8 @@ namespace ZoneContaminantPredictorCorrector {
 
                 zone_M_CO2 = Zone(ZoneNum).ZoneMeasuredCO2Concentration;
                 delta_CO2 = (Zone(ZoneNum).ZoneMeasuredCO2Concentration - state.dataContaminantBalance->OutdoorCO2) / 1000;
-                CpAir = PsyCpAirFnW(OutHumRat);
-                AirDensity = PsyRhoAirFnPbTdbW(state, OutBaroPress, Zone(ZoneNum).OutDryBulbTemp, OutHumRat, RoutineNameInfiltration);
+                CpAir = PsyCpAirFnW(state.dataEnvrn->OutHumRat);
+                AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, Zone(ZoneNum).OutDryBulbTemp, state.dataEnvrn->OutHumRat, RoutineNameInfiltration);
 
                 if (Zone(ZoneNum).ZoneMeasuredCO2Concentration == state.dataContaminantBalance->OutdoorCO2) {
                     M_inf = 0.0;
@@ -2278,8 +2273,6 @@ namespace ZoneContaminantPredictorCorrector {
         // for BLAST.
 
         // Using/Aliasing
-        using DataDefineEquip::AirDistUnit;
-        using DataEnvironment::DayOfYear;
         using DataLoopNode::Node;
         using DataZoneEquipment::ZoneEquipConfig;
         //using ZonePlenum::NumZoneReturnPlenums;
@@ -2457,25 +2450,25 @@ namespace ZoneContaminantPredictorCorrector {
                   // add in the leak flow
                 for (ADUListIndex = 1; ADUListIndex <= state.dataZonePlenum->ZoneRetPlenCond(ZoneRetPlenumNum).NumADUs; ++ADUListIndex) {
                     ADUNum = state.dataZonePlenum->ZoneRetPlenCond(ZoneRetPlenumNum).ADUIndex(ADUListIndex);
-                    if (AirDistUnit(ADUNum).UpStreamLeak) {
-                        ADUInNode = AirDistUnit(ADUNum).InletNodeNum;
+                    if (state.dataDefineEquipment->AirDistUnit(ADUNum).UpStreamLeak) {
+                        ADUInNode = state.dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum;
                         if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-                            CO2MassFlowRate += (AirDistUnit(ADUNum).MassFlowRateUpStrLk * Node(ADUInNode).CO2) / ZoneMult;
+                            CO2MassFlowRate += (state.dataDefineEquipment->AirDistUnit(ADUNum).MassFlowRateUpStrLk * Node(ADUInNode).CO2) / ZoneMult;
                         }
                         if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-                            GCMassFlowRate += (AirDistUnit(ADUNum).MassFlowRateUpStrLk * Node(ADUInNode).GenContam) / ZoneMult;
+                            GCMassFlowRate += (state.dataDefineEquipment->AirDistUnit(ADUNum).MassFlowRateUpStrLk * Node(ADUInNode).GenContam) / ZoneMult;
                         }
-                        ZoneMassFlowRate += AirDistUnit(ADUNum).MassFlowRateUpStrLk / ZoneMult;
+                        ZoneMassFlowRate += state.dataDefineEquipment->AirDistUnit(ADUNum).MassFlowRateUpStrLk / ZoneMult;
                     }
-                    if (AirDistUnit(ADUNum).DownStreamLeak) {
-                        ADUOutNode = AirDistUnit(ADUNum).OutletNodeNum;
+                    if (state.dataDefineEquipment->AirDistUnit(ADUNum).DownStreamLeak) {
+                        ADUOutNode = state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum;
                         if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-                            CO2MassFlowRate += (AirDistUnit(ADUNum).MassFlowRateDnStrLk * Node(ADUOutNode).CO2) / ZoneMult;
+                            CO2MassFlowRate += (state.dataDefineEquipment->AirDistUnit(ADUNum).MassFlowRateDnStrLk * Node(ADUOutNode).CO2) / ZoneMult;
                         }
                         if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-                            GCMassFlowRate += (AirDistUnit(ADUNum).MassFlowRateDnStrLk * Node(ADUOutNode).GenContam) / ZoneMult;
+                            GCMassFlowRate += (state.dataDefineEquipment->AirDistUnit(ADUNum).MassFlowRateDnStrLk * Node(ADUOutNode).GenContam) / ZoneMult;
                         }
-                        ZoneMassFlowRate += AirDistUnit(ADUNum).MassFlowRateDnStrLk / ZoneMult;
+                        ZoneMassFlowRate += state.dataDefineEquipment->AirDistUnit(ADUNum).MassFlowRateDnStrLk / ZoneMult;
                     }
                 }
 
@@ -2501,7 +2494,7 @@ namespace ZoneContaminantPredictorCorrector {
             // CO2 balance.  There are 2 cases that should be considered, system
             // operating and system shutdown.
 
-            RhoAir = PsyRhoAirFnPbTdbW(state, OutBaroPress, ZT(ZoneNum), ZoneAirHumRat(ZoneNum), RoutineName);
+            RhoAir = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, ZT(ZoneNum), ZoneAirHumRat(ZoneNum), RoutineName);
             //    RhoAir = state.dataContaminantBalance->ZoneAirDensityCO(ZoneNum)
 
             if (state.dataContaminantBalance->Contaminant.CO2Simulation) state.dataContaminantBalance->ZoneAirDensityCO(ZoneNum) = RhoAir;

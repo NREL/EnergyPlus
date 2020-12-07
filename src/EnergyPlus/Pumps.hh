@@ -66,15 +66,25 @@ namespace Pumps {
 
     // Data
     // MODULE PARAMETER DEFINITIONS:
-    extern int const Continuous;   // Pump control type (pump always running)
-    extern int const Intermittent; // Pump control type (pump runs only when there is a demand)
 
-    extern int const VFDManual;    // VFD control type (Scheduled RPM)
-    extern int const VFDAutomatic; // VFD control type (Variable RPM according to flow request)
+    enum class PumpControlType {
+        Unassigned,
+        Continuous,   // Pump control type (pump always running)
+        Intermittent, // Pump control type (pump runs only when there is a demand)
+    };
 
-    extern int const OptimalScheme;    // Control sequencing for pump bank
-    extern int const SequentialScheme; // Control sequencing for pump bank
-    extern int const UserDefined;      // Control sequencing for pump bank
+    enum class ControlTypeVFD {
+        Unassigned,
+        VFDManual,    // VFD control type (Scheduled RPM)
+        VFDAutomatic, // VFD control type (Variable RPM according to flow request)
+    };
+
+    enum class PumpBankControlSeq {
+        Unassigned,
+        OptimalScheme,    // Control sequencing for pump bank
+        SequentialScheme, // Control sequencing for pump bank
+        UserDefined,      // Control sequencing for pump bank
+    };
 
     extern std::string const cPump_VarSpeed;
     extern int const Pump_VarSpeed;
@@ -129,14 +139,15 @@ namespace Pumps {
         int MinRPMSchedIndex;
         std::string MaxRPMSchedName;
         int MaxRPMSchedIndex;
-        int VFDControlType;   // Integer equivalent of VFDControlType
+        ControlTypeVFD VFDControlType; // VFDControlType
         Real64 MaxRPM;        // Maximum RPM range value - schedule limit
         Real64 MinRPM;        // Minimum RPM range value - schedule limit
         Real64 PumpActualRPM; // RPM recalculated from final flow through the loop
 
         // Default Constructor
         PumpVFDControlData()
-            : ManualRPMSchedIndex(0), LowerPsetSchedIndex(0), UpperPsetSchedIndex(0), MinRPMSchedIndex(0), MaxRPMSchedIndex(0), VFDControlType(0),
+            : ManualRPMSchedIndex(0), LowerPsetSchedIndex(0), UpperPsetSchedIndex(0), MinRPMSchedIndex(0), MaxRPMSchedIndex(0),
+              VFDControlType(ControlTypeVFD::Unassigned),
               MaxRPM(0.0), MinRPM(0.0), PumpActualRPM(0.0)
         {
         }
@@ -155,11 +166,11 @@ namespace Pumps {
         int LoopSideNum;                             // LoopSide index on loop where pump is located
         int BranchNum;                               // branch index on LoopSide where pump is located
         int CompNum;                                 // component index on branch where pump is located
-        int PumpControl;                             // Integer equivalent of PumpControlType
+        PumpControlType PumpControl;                             // Integer equivalent of PumpControlType
         int PumpScheduleIndex;                       // Schedule Pointer
         int InletNodeNum;                            // Node number on the inlet side of the plant
         int OutletNodeNum;                           // Node number on the outlet side of the plant
-        int SequencingScheme;                        // Optimal, Sequential, User-Defined
+        PumpBankControlSeq SequencingScheme;         // Optimal, Sequential, User-Defined
         int FluidIndex;                              // Index for Fluid Properties
         int NumPumpsInBank;                          // Node number on the inlet side of the plant
         int PowerErrIndex1;                          // for recurring errors
@@ -211,8 +222,8 @@ namespace Pumps {
 
         // Default Constructor
         PumpSpecs()
-            : PumpType(0), TypeOf_Num(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), PumpControl(0), PumpScheduleIndex(0), InletNodeNum(0),
-              OutletNodeNum(0), SequencingScheme(0), FluidIndex(0), NumPumpsInBank(0), PowerErrIndex1(0), PowerErrIndex2(0), MinVolFlowRateFrac(0.0),
+            : PumpType(0), TypeOf_Num(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), PumpControl(PumpControlType::Unassigned), PumpScheduleIndex(0), InletNodeNum(0), OutletNodeNum(0), SequencingScheme(PumpBankControlSeq::Unassigned), FluidIndex(0), NumPumpsInBank(0),
+              PowerErrIndex1(0), PowerErrIndex2(0), MinVolFlowRateFrac(0.0),
               NomVolFlowRate(0.0), NomVolFlowRateWasAutoSized(false), MassFlowRateMax(0.0), EMSMassFlowOverrideOn(false), EMSMassFlowValue(0.0),
               NomSteamVolFlowRate(0.0), NomSteamVolFlowRateWasAutoSized(false), MinVolFlowRate(0.0), minVolFlowRateWasAutosized(false),
               MassFlowRateMin(0.0), NomPumpHead(0.0), EMSPressureOverrideOn(false), EMSPressureOverrideValue(0.0), NomPowerUse(0.0),

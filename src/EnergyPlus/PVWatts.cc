@@ -395,17 +395,17 @@ namespace PVWatts {
 
         // process_irradiance
         IrradianceOutput irr_st = processIrradiance(state,
-                                                    DataEnvironment::Year,
-                                                    DataEnvironment::Month,
-                                                    DataEnvironment::DayOfMonth,
+                                                    state.dataEnvrn->Year,
+                                                    state.dataEnvrn->Month,
+                                                    state.dataEnvrn->DayOfMonth,
                                                     state.dataGlobal->HourOfDay - 1,
                                                     (state.dataGlobal->TimeStep - 0.5) * state.dataGlobal->MinutesPerTimeStep,
                                                     state.dataGlobal->TimeStepZone,
                                                     state.dataWeatherManager->WeatherFileLatitude,
                                                     state.dataWeatherManager->WeatherFileLongitude,
                                                     state.dataWeatherManager->WeatherFileTimeZone,
-                                                    DataEnvironment::BeamSolarRad,
-                                                    DataEnvironment::DifSolarRad,
+                                                    state.dataEnvrn->BeamSolarRad,
+                                                    state.dataEnvrn->DifSolarRad,
                                                     albedo);
 
         // powerout
@@ -414,7 +414,7 @@ namespace PVWatts {
             shad_beam = DataHeatBalance::SunlitFrac(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, m_surfaceNum);
         }
         DCPowerOutput pwr_st =
-            powerout(state, shad_beam, 1.0, DataEnvironment::BeamSolarRad, albedo, DataEnvironment::WindSpeed, DataEnvironment::OutDryBulbTemp, irr_st);
+            powerout(state, shad_beam, 1.0, state.dataEnvrn->BeamSolarRad, albedo, state.dataEnvrn->WindSpeed, state.dataEnvrn->OutDryBulbTemp, irr_st);
 
         // Report out
         m_cellTemperature = pwr_st.pvt;
