@@ -50,7 +50,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Coils/CoilCoolingDX.hh>
-
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include "../Coils/CoilCoolingDXFixture.hh"
 
 using namespace EnergyPlus;
@@ -59,7 +59,7 @@ TEST_F( CoilCoolingDXTest, CoilCoolingDXInput )
 {
     std::string idf_objects = this->getCoilObjectString("coolingCoil", false, 2);
     EXPECT_TRUE(process_idf( idf_objects, false ));
-    int coilIndex = CoilCoolingDX::factory(state, "coolingCoil");
+    int coilIndex = CoilCoolingDX::factory(*state, "coolingCoil");
     auto const &thisCoil(coilCoolingDXs[coilIndex]);
     EXPECT_EQ("COOLINGCOIL", thisCoil.name);
     EXPECT_EQ("PERFORMANCEOBJECTNAME", thisCoil.performance.name);

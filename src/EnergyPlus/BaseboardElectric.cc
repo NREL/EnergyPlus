@@ -98,7 +98,6 @@ namespace BaseboardElectric {
         // This subroutine simulates the Electric Baseboard units.
 
         using DataZoneEnergyDemands::ZoneSysEnergyDemand;
-        using General::TrimSigDigits;
 
         int BaseboardNum; // index of unit in baseboard array
         Real64 QZnReq;    // zone load not yet satisfied
@@ -120,13 +119,19 @@ namespace BaseboardElectric {
         } else {
             BaseboardNum = CompIndex;
             if (BaseboardNum > baseboard->NumBaseboards || BaseboardNum < 1) {
-                ShowFatalError(state, "SimElectricBaseboard:  Invalid CompIndex passed=" + TrimSigDigits(BaseboardNum) +
-                               ", Number of Units=" + TrimSigDigits(baseboard->NumBaseboards) + ", Entered Unit name=" + EquipName);
+                ShowFatalError(state,
+                               format("SimElectricBaseboard:  Invalid CompIndex passed={}, Number of Units={}, Entered Unit name={}",
+                                      BaseboardNum,
+                                      baseboard->NumBaseboards,
+                                      EquipName));
             }
             if (baseboard->Baseboard(BaseboardNum).CheckEquipName) {
                 if (EquipName != baseboard->Baseboard(BaseboardNum).EquipName) {
-                    ShowFatalError(state, "SimElectricBaseboard: Invalid CompIndex passed=" + TrimSigDigits(BaseboardNum) + ", Unit name=" + EquipName +
-                                   ", stored Unit Name for that index=" + baseboard->Baseboard(BaseboardNum).EquipName);
+                    ShowFatalError(state,
+                                   format("SimElectricBaseboard: Invalid CompIndex passed={}, Unit name={}, stored Unit Name for that index={}",
+                                          BaseboardNum,
+                                          EquipName,
+                                          baseboard->Baseboard(BaseboardNum).EquipName));
                 }
                 baseboard->Baseboard(BaseboardNum).CheckEquipName = false;
             }
@@ -169,7 +174,6 @@ namespace BaseboardElectric {
         using DataSizing::HeatingDesignCapacity;
         using DataZoneEquipment::BBElectricConvective_Num;
         using DataZoneEquipment::ZoneEquipList;
-        using General::TrimSigDigits;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("GetBaseboardInput: "); // include trailing blank space
@@ -256,8 +260,10 @@ namespace BaseboardElectric {
                         thisBaseboard.ScaledHeatingCapacity = rNumericArgs(iHeatDesignCapacityNumericNum);
                         if (thisBaseboard.ScaledHeatingCapacity < 0.0 && thisBaseboard.ScaledHeatingCapacity != AutoSize) {
                             ShowSevereError(state, cCurrentModuleObject + " = " + thisBaseboard.EquipName);
-                            ShowContinueError(state, "Illegal " + cNumericFieldNames(iHeatDesignCapacityNumericNum) + " = " +
-                                              TrimSigDigits(rNumericArgs(iHeatDesignCapacityNumericNum), 7));
+                            ShowContinueError(state,
+                                              format("Illegal {} = {:.7T}",
+                                                     cNumericFieldNames(iHeatDesignCapacityNumericNum),
+                                                     rNumericArgs(iHeatDesignCapacityNumericNum)));
                             ErrorsFound = true;
                         }
                     } else {
@@ -273,8 +279,10 @@ namespace BaseboardElectric {
                         if (thisBaseboard.ScaledHeatingCapacity <= 0.0) {
                             ShowSevereError(state, cCurrentModuleObject + " = " + thisBaseboard.EquipName);
                             ShowContinueError(state, "Input for " + cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " + cAlphaArgs(iHeatCAPMAlphaNum));
-                            ShowContinueError(state, "Illegal " + cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum) + " = " +
-                                              TrimSigDigits(rNumericArgs(iHeatCapacityPerFloorAreaNumericNum), 7));
+                            ShowContinueError(state,
+                                              format("Illegal {} = {:.7T}",
+                                                     cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum),
+                                                     rNumericArgs(iHeatCapacityPerFloorAreaNumericNum)));
                             ErrorsFound = true;
                         } else if (thisBaseboard.ScaledHeatingCapacity == AutoSize) {
                             ShowSevereError(state, cCurrentModuleObject + " = " + thisBaseboard.EquipName);
@@ -294,8 +302,10 @@ namespace BaseboardElectric {
                         thisBaseboard.ScaledHeatingCapacity = rNumericArgs(iHeatFracOfAutosizedCapacityNumericNum);
                         if (thisBaseboard.ScaledHeatingCapacity < 0.0) {
                             ShowSevereError(state, cCurrentModuleObject + " = " + thisBaseboard.EquipName);
-                            ShowContinueError(state, "Illegal " + cNumericFieldNames(iHeatFracOfAutosizedCapacityNumericNum) + " = " +
-                                              TrimSigDigits(rNumericArgs(iHeatFracOfAutosizedCapacityNumericNum), 7));
+                            ShowContinueError(state,
+                                              format("Illegal {} = {:.7T}",
+                                                     cNumericFieldNames(iHeatFracOfAutosizedCapacityNumericNum),
+                                                     rNumericArgs(iHeatFracOfAutosizedCapacityNumericNum)));
                             ErrorsFound = true;
                         }
                     } else {
@@ -446,7 +456,6 @@ namespace BaseboardElectric {
         using namespace DataSizing;
         using DataHeatBalance::Zone;
         using DataHVACGlobals::HeatingCapacitySizing;
-        using General::RoundSigDigits;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("SizeElectricBaseboard");

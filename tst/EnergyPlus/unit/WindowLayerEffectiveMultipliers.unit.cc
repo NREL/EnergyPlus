@@ -55,6 +55,7 @@
 #include <EnergyPlus/TARCOGParams.hh>
 #include <EnergyPlus/TarcogShading.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 

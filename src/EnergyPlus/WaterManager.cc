@@ -61,7 +61,6 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataWater.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -164,7 +163,7 @@ namespace WaterManager {
         // Using/Aliasing
         using DataHeatBalance::Zone;
         using DataSurfaces::Surface;
-        using General::RoundSigDigits;
+
         using ScheduleManager::CheckScheduleValue;
         using ScheduleManager::CheckScheduleValueMinMax;
         using ScheduleManager::GetScheduleIndex;
@@ -294,10 +293,14 @@ namespace WaterManager {
                             ShowSevereError(state, "Invalid " + cNumericFieldNames(5) + " and/or " + cNumericFieldNames(6));
                             ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                             ShowContinueError(state, cNumericFieldNames(6) + " must be greater than " + cNumericFieldNames(5));
-                            ShowContinueError(state, "Check value for " + cNumericFieldNames(5) + " = " +
-                                              RoundSigDigits(state.dataWaterData->WaterStorage(Item).ValveOnCapacity, 5));
-                            ShowContinueError(state, "which must be lower than " + cNumericFieldNames(6) + " = " +
-                                              RoundSigDigits(state.dataWaterData->WaterStorage(Item).ValveOffCapacity, 5));
+                            ShowContinueError(state,
+                                              format("Check value for {} = {:.5R}",
+                                                     cNumericFieldNames(5),
+                                                     state.dataWaterData->WaterStorage(Item).ValveOnCapacity));
+                            ShowContinueError(state,
+                                              format("which must be lower than {} = {:.5R}",
+                                                     cNumericFieldNames(6),
+                                                     state.dataWaterData->WaterStorage(Item).ValveOffCapacity));
                             ErrorsFound = true;
                         }
                     }
@@ -421,12 +424,12 @@ namespace WaterManager {
                     }
                     state.dataWaterData->RainCollector(Item).LossFactor = rNumericArgs(1);
                     if (state.dataWaterData->RainCollector(Item).LossFactor > 1.0) {
-                        ShowWarningError(state, "Invalid " + cNumericFieldNames(1) + '=' + RoundSigDigits(rNumericArgs(1), 2));
+                        ShowWarningError(state, format("Invalid {}={:.2R}", cNumericFieldNames(1), rNumericArgs(1)));
                         ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                         ShowContinueError(state, "found rain water collection loss factor greater than 1.0, simulation continues");
                     }
                     if (state.dataWaterData->RainCollector(Item).LossFactor < 0.0) {
-                        ShowSevereError(state, "Invalid " + cNumericFieldNames(1) + '=' + RoundSigDigits(rNumericArgs(1), 2));
+                        ShowSevereError(state, format("Invalid {}={:.2R}", cNumericFieldNames(1), rNumericArgs(1)));
                         ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                         ShowContinueError(state, "found rain water collection loss factor less than 0.0");
                         ErrorsFound = true;
@@ -1402,7 +1405,6 @@ namespace WaterManager {
         // starting simple and ignoring well storage and complex rate restrictions.
         // just uses nominal pump rate and power (assuming well designed well).
 
-        using DataEnvironment::GroundTemp_Deep;
         using DataHVACGlobals::TimeStepSys;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -1416,7 +1418,7 @@ namespace WaterManager {
             if (state.dataWaterData->GroundwaterWell(WellNum).VdotRequest >= state.dataWaterData->GroundwaterWell(WellNum).PumpNomVolFlowRate) { // run flat out
                 state.dataWaterData->WaterStorage(state.dataWaterData->GroundwaterWell(WellNum).StorageTankID).VdotAvailSupply(state.dataWaterData->GroundwaterWell(WellNum).StorageTankSupplyARRID) =
                     state.dataWaterData->GroundwaterWell(WellNum).PumpNomVolFlowRate;
-                state.dataWaterData->WaterStorage(state.dataWaterData->GroundwaterWell(WellNum).StorageTankID).TwaterSupply(state.dataWaterData->GroundwaterWell(WellNum).StorageTankSupplyARRID) = GroundTemp_Deep;
+                state.dataWaterData->WaterStorage(state.dataWaterData->GroundwaterWell(WellNum).StorageTankID).TwaterSupply(state.dataWaterData->GroundwaterWell(WellNum).StorageTankSupplyARRID) = state.dataEnvrn->GroundTemp_Deep;
                 VdotDelivered = state.dataWaterData->GroundwaterWell(WellNum).PumpNomVolFlowRate;
                 PumpPower = state.dataWaterData->GroundwaterWell(WellNum).PumpNomPowerUse;
             }
@@ -1425,7 +1427,7 @@ namespace WaterManager {
             if (state.dataWaterData->GroundwaterWell(WellNum).VdotRequest < state.dataWaterData->GroundwaterWell(WellNum).PumpNomVolFlowRate) {
                 state.dataWaterData->WaterStorage(state.dataWaterData->GroundwaterWell(WellNum).StorageTankID).VdotAvailSupply(state.dataWaterData->GroundwaterWell(WellNum).StorageTankSupplyARRID) =
                     state.dataWaterData->GroundwaterWell(WellNum).VdotRequest;
-                state.dataWaterData->WaterStorage(state.dataWaterData->GroundwaterWell(WellNum).StorageTankID).TwaterSupply(state.dataWaterData->GroundwaterWell(WellNum).StorageTankSupplyARRID) = GroundTemp_Deep;
+                state.dataWaterData->WaterStorage(state.dataWaterData->GroundwaterWell(WellNum).StorageTankID).TwaterSupply(state.dataWaterData->GroundwaterWell(WellNum).StorageTankSupplyARRID) = state.dataEnvrn->GroundTemp_Deep;
 
                 VdotDelivered = state.dataWaterData->GroundwaterWell(WellNum).VdotRequest;
                 PumpPower =

@@ -977,7 +977,7 @@ namespace HybridEvapCoolingModel {
 
             oStandBy.ScaledSupply_Air_Mass_Flow_Rate = MsaRatio * ScaledSystemMaximumSupplyAirMassFlowRate;
             oStandBy.Unscaled_Supply_Air_Mass_Flow_Rate = oStandBy.ScaledSupply_Air_Mass_Flow_Rate / ScalingFactor;
-            oStandBy.ScaledSupply_Air_Ventilation_Volume = MsaRatio * ScaledSystemMaximumSupplyAirMassFlowRate / StdRhoAir;
+            oStandBy.ScaledSupply_Air_Ventilation_Volume = MsaRatio * ScaledSystemMaximumSupplyAirMassFlowRate / state.dataEnvrn->StdRhoAir;
             oStandBy.Supply_Air_Mass_Flow_Rate_Ratio = MsaRatio;
             oStandBy.ElectricalPower = Mode0.CalculateCurveVal(state, Tosa, Wosa, Tra, Wra, oStandBy.Unscaled_Supply_Air_Mass_Flow_Rate, OSAF, POWER_CURVE);
             oStandBy.Outdoor_Air_Fraction = OSAF;
@@ -1248,7 +1248,7 @@ namespace HybridEvapCoolingModel {
         // na
 
         // Using/Aliasing
-        using General::RoundSigDigits;
+
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
         // The CStepInputs are defined in the CStepInputs class definition.
@@ -1288,7 +1288,7 @@ namespace HybridEvapCoolingModel {
             return -1;
         } // because it should be fractional, this should only really be possible if its called from a unit test
 
-        Real64 Wosa = PsyWFnTdbRhPb(state, StepIns.Tosa, StepIns.RHosa, OutBaroPress);
+        Real64 Wosa = PsyWFnTdbRhPb(state, StepIns.Tosa, StepIns.RHosa, state.dataEnvrn->OutBaroPress);
         Real64 Wra = PsyWFnTdbRhPb(state, StepIns.Tra, StepIns.RHra, InletPressure);
         bool EnvironmentConditionsMet, EnvironmentConditionsMetOnce, MinVRMet, SAT_OC_Met, SAT_OC_MetOnce, SARH_OC_Met, SAHR_OC_MetOnce;
         EnvironmentConditionsMetOnce = SAT_OC_Met = SAT_OC_MetOnce = SARH_OC_Met = SAHR_OC_MetOnce = false;
@@ -1326,8 +1326,8 @@ namespace HybridEvapCoolingModel {
                         // Calculate the ventilation mass flow rate
                         Real64 Mvent = ScaledMsa * OSAF;
 
-                        if (StdRhoAir > 1) {
-                            Supply_Air_Ventilation_Volume = Mvent / StdRhoAir;
+                        if (state.dataEnvrn->StdRhoAir > 1) {
+                            Supply_Air_Ventilation_Volume = Mvent / state.dataEnvrn->StdRhoAir;
                         } else {
                             Supply_Air_Ventilation_Volume = Mvent / 1.225; // stored as volumetric flow for reporting
                         }
@@ -1400,7 +1400,7 @@ namespace HybridEvapCoolingModel {
                                     Tsa = StepIns.Tosa + FanHeatTemp;
                                 }
 
-                                CandidateSetting.ScaledSupply_Air_Ventilation_Volume = CandidateSetting.ScaledSupply_Air_Mass_Flow_Rate / StdRhoAir;
+                                CandidateSetting.ScaledSupply_Air_Ventilation_Volume = CandidateSetting.ScaledSupply_Air_Mass_Flow_Rate / state.dataEnvrn->StdRhoAir;
                                 CandidateSetting.oMode = Mode;
                                 CandidateSetting.SupplyAirTemperature = Tsa;
                                 CandidateSetting.SupplyAirW = CheckVal_W(state, Wsa, Tsa, OutletPressure);
@@ -1521,7 +1521,7 @@ namespace HybridEvapCoolingModel {
             // Calculate partload fraction required to meet all requirements
             Real64 PartRuntimeFraction = 0;
             PartRuntimeFraction = CalculatePartRuntimeFraction(MinOA_Msa,
-                                                               thisSetting.Supply_Air_Ventilation_Volume * StdRhoAir,
+                                                               thisSetting.Supply_Air_Ventilation_Volume * state.dataEnvrn->StdRhoAir,
                                                                StepIns.RequestedCoolingLoad,
                                                                StepIns.RequestedHeatingLoad,
                                                                SensibleRoomORZone,
@@ -1633,22 +1633,35 @@ namespace HybridEvapCoolingModel {
         // day, so report", but that doesn't seem to exist.
         if ((TimeElapsed > 24) && WarnOnceFlag && !state.dataGlobal->WarmupFlag) {
             if (count_EnvironmentConditionsNotMet > 0)
-                ShowWarningError(state, "In day " + RoundSigDigits((Real64)state.dataGlobal->DayOfSim, 1) + " of simulation, " + Name.c_str() + " was unable to operate for " +
-                                 RoundSigDigits((Real64)count_EnvironmentConditionsNotMet, 1) +
-                                 " timesteps because environment conditions were beyond the allowable operating range for any mode.");
+                ShowWarningError(state,
+                                 format("In day {:.1R} was unable to operate for  of simulation, {}{:.1R} timesteps because environment conditions "
+                                        "were beyond the allowable operating range for any mode.",
+                                        (Real64)state.dataGlobal->DayOfSim,
+                                        Name,
+                                        (Real64)count_EnvironmentConditionsNotMet));
             if (count_SAHR_OC_MetOnce > 0)
-                ShowWarningError(state, "In day " + RoundSigDigits((Real64)state.dataGlobal->DayOfSim, 1) + " of simulation, " + Name.c_str() +
-                                 " failed to meet supply air humidity ratio for " + RoundSigDigits(Real64(count_SAHR_OC_MetOnce), 1) +
-                                 " time steps. For these time steps For these time steps" + Name.c_str() + " was set to mode 0");
+                ShowWarningError(state,
+                                 format("In day {:.1R} of simulation, {} failed to meet supply air humidity ratio for {:.1R} time steps. For these "
+                                        "time steps For these time steps was set to mode 0{}",
+                                        (Real64)state.dataGlobal->DayOfSim,
+                                        Name,
+                                        Real64(count_SAHR_OC_MetOnce),
+                                        Name));
             if (count_SAT_OC_MetOnce > 0)
-                ShowWarningError(state, "In day " + RoundSigDigits((Real64)state.dataGlobal->DayOfSim, 1) + " of simulation, " + Name.c_str() +
-                                 " failed to meet supply air temperature constraints for " + RoundSigDigits(Real64(count_SAT_OC_MetOnce), 1) +
-                                 " time steps. For these time steps For these time steps" + Name.c_str() + " was set to mode 0");
+                ShowWarningError(state,
+                                 format("In day {:.1R} of simulation, {} failed to meet supply air temperature constraints for {:.1R} time steps. "
+                                        "For these time steps For these time steps{} was set to mode 0",
+                                        (Real64)state.dataGlobal->DayOfSim,
+                                        Name,
+                                        Real64(count_SAT_OC_MetOnce),
+                                        Name));
 
-            ShowWarningError(state, "In day " + RoundSigDigits((Real64)state.dataGlobal->DayOfSim, 1) + " of simulation, " + Name.c_str() +
-                             " failed to  satisfy sensible load for " + RoundSigDigits((Real64)count_DidWeNotMeetLoad, 1) +
-                             " time steps. For these time steps settings were selected to provide as much sensible cooling or heating as possible, "
-                             "given other constraints.");
+            ShowWarningError(state,
+                             format("In day {:.1R} of simulation, {} failed to  satisfy sensible load for {:.1R} time steps. For these time steps "
+                                    "settings were selected to provide as much sensible cooling or heating as possible, given other constraints.",
+                                    (Real64)state.dataGlobal->DayOfSim,
+                                    Name,
+                                    (Real64)count_DidWeNotMeetLoad));
 
             count_SAT_OC_MetOnce = 0;
             count_DidWeNotMeetLoad = 0;
@@ -1818,7 +1831,7 @@ namespace HybridEvapCoolingModel {
         StepIns.ZoneDehumidificationLoad = RequestedDeHumdificationLoad;
         StepIns.MinimumOA = DesignMinVR;
         // calculate W humidity ratios for outdoor air and return air
-        Real64 Wosa = PsyWFnTdbRhPb(state, StepIns.Tosa, StepIns.RHosa, OutBaroPress);
+        Real64 Wosa = PsyWFnTdbRhPb(state, StepIns.Tosa, StepIns.RHosa, state.dataEnvrn->OutBaroPress);
         Real64 Wra = PsyWFnTdbRhPb(state, StepIns.Tra, StepIns.RHra, InletPressure);
         // Sets boolean values for each potential conditioning requirement;  CoolingRequested, HeatingRequested, VentilationRequested,
         // DehumidificationRequested, HumidificationRequested
@@ -1867,8 +1880,8 @@ namespace HybridEvapCoolingModel {
         // All powers are calculated in Watts amd energies in Joules
 
         SupplyVentilationVolume = CalculateTimeStepAverage(SYSTEMOUTPUTS::VENTILATION_AIR_V);
-        if (StdRhoAir > 1) {
-            SupplyVentilationAir = SupplyVentilationVolume * StdRhoAir;
+        if (state.dataEnvrn->StdRhoAir > 1) {
+            SupplyVentilationAir = SupplyVentilationVolume * state.dataEnvrn->StdRhoAir;
         } else {
             SupplyVentilationAir = SupplyVentilationVolume * 1.225;
         }
@@ -1883,8 +1896,8 @@ namespace HybridEvapCoolingModel {
         OutletEnthalpy = PsyHFnTdbRhPb(state, OutletTemp, OutletRH, InletPressure);
         OutletMassFlowRate = CalculateTimeStepAverage(SYSTEMOUTPUTS::SUPPLY_MASS_FLOW);
 
-        if (StdRhoAir > 1) {
-            OutletVolumetricFlowRate = OutletMassFlowRate / StdRhoAir;
+        if (state.dataEnvrn->StdRhoAir > 1) {
+            OutletVolumetricFlowRate = OutletMassFlowRate / state.dataEnvrn->StdRhoAir;
         } else {
             OutletVolumetricFlowRate = OutletMassFlowRate / 1.225;
         }

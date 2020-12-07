@@ -466,9 +466,9 @@ template <class InputIterator> void print(InputIterator first, InputIterator las
     std::copy(first, last, std::ostream_iterator<typename std::iterator_traits<InputIterator>::value_type>(*outputStream));
 }
 
-template <typename... Args> std::string format(fmt::string_view format_str, const Args &... args)
+template <typename... Args> std::string format(::fmt::string_view format_str, const Args &... args)
 {
-    return EnergyPlus::vprint(format_str, fmt::make_format_args(args...), sizeof...(Args));
+    return EnergyPlus::vprint(format_str, ::fmt::make_format_args(args...), sizeof...(Args));
 }
 
 } // namespace EnergyPlus

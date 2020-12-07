@@ -244,7 +244,7 @@ namespace EnergyPlus::DataPlant {
         using DataLoopNode::Node;
         using DataLoopNode::NodeID;
         using DataPlant::SupplySide;
-        using General::RoundSigDigits;
+        ;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int LoopInlet;  // plant loop inlet node num.
@@ -261,12 +261,8 @@ namespace EnergyPlus::DataPlant {
                     ShowWarningError(state, "PlantSupplySide: PlantLoop=\"" + this->Name +
                                      "\", Error (CheckLoopExitNode) -- Mass Flow Rate Calculation. Outlet and Inlet differ by more than tolerance.");
                     ShowContinueErrorTimeStamp(state, "");
-                    ShowContinueError(state, "Loop inlet node=" + NodeID(LoopInlet) + ", flowrate=" +
-                                      RoundSigDigits(Node(LoopInlet).MassFlowRate, 4) +
-                                      " kg/s");
-                    ShowContinueError(state, "Loop outlet node=" + NodeID(LoopOutlet) + ", flowrate=" +
-                                      RoundSigDigits(Node(LoopOutlet).MassFlowRate, 4) +
-                                      " kg/s");
+                    ShowContinueError(state, format("Loop inlet node={}, flowrate={:.4R} kg/s", NodeID(LoopInlet), Node(LoopInlet).MassFlowRate));
+                    ShowContinueError(state, format("Loop outlet node={}, flowrate={:.4R} kg/s", NodeID(LoopOutlet), Node(LoopOutlet).MassFlowRate));
                     ShowContinueError(state, "This loop might be helped by a bypass.");
                 }
                 ShowRecurringWarningErrorAtEnd(state, "PlantSupplySide: PlantLoop=\"" + this->Name +

@@ -184,11 +184,9 @@ namespace SurfaceGroundHeatExchanger {
         // Using/Aliasing
         using namespace DataIPShortCuts; // Data for field names, blank numerics
         using BranchNodeConnections::TestCompSet;
-        using DataEnvironment::GroundTemp_Surface;
-        using DataEnvironment::GroundTemp_SurfaceObjInput;
         using FluidProperties::CheckFluidPropertyName;
         using FluidProperties::FindGlycol;
-        using General::RoundSigDigits;
+
         using NodeInputManager::GetOnlySingleNode;
         using namespace DataLoopNode;
 
@@ -266,13 +264,13 @@ namespace SurfaceGroundHeatExchanger {
             state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).TubeSpacing = rNumericArgs(3);
 
             if (rNumericArgs(2) == 0) {
-                ShowSevereError(state, "Invalid " + cNumericFieldNames(2) + '=' + RoundSigDigits(rNumericArgs(2), 2));
+                ShowSevereError(state, format("Invalid {}={:.2R}", cNumericFieldNames(2), rNumericArgs(2)));
                 ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                 ShowContinueError(state, "Value must be greater than 0.0");
                 ErrorsFound = true;
             }
             if (rNumericArgs(3) == 0.0) {
-                ShowSevereError(state, "Invalid " + cNumericFieldNames(3) + '=' + RoundSigDigits(rNumericArgs(3), 2));
+                ShowSevereError(state, format("Invalid {}={:.2R}", cNumericFieldNames(3), rNumericArgs(3)));
                 ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                 ShowContinueError(state, "Value must be greater than 0.0");
                 ErrorsFound = true;
@@ -282,13 +280,13 @@ namespace SurfaceGroundHeatExchanger {
             state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).SurfaceLength = rNumericArgs(4);
             state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).SurfaceWidth = rNumericArgs(5);
             if (rNumericArgs(4) <= 0.0) {
-                ShowSevereError(state, "Invalid " + cNumericFieldNames(4) + '=' + RoundSigDigits(rNumericArgs(4), 2));
+                ShowSevereError(state, format("Invalid {}={:.2R}", cNumericFieldNames(4), rNumericArgs(4)));
                 ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                 ShowContinueError(state, "Value must be greater than 0.0");
                 ErrorsFound = true;
             }
             if (rNumericArgs(5) <= 0.0) {
-                ShowSevereError(state, "Invalid " + cNumericFieldNames(5) + '=' + RoundSigDigits(rNumericArgs(5), 2));
+                ShowSevereError(state, format("Invalid {}={:.2R}", cNumericFieldNames(5), rNumericArgs(5)));
                 ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                 ShowContinueError(state, "Value must be greater than 0.0");
                 ErrorsFound = true;
@@ -390,9 +388,9 @@ namespace SurfaceGroundHeatExchanger {
         }
 
         if (state.dataSurfaceGroundHeatExchangers->NoSurfaceGroundTempObjWarning) {
-            if (!GroundTemp_SurfaceObjInput) {
+            if (!state.dataEnvrn->GroundTemp_SurfaceObjInput) {
                 ShowWarningError(state, "GetSurfaceGroundHeatExchanger: No \"Site:GroundTemperature:Shallow\" were input.");
-                ShowContinueError(state, "Defaults, constant throughout the year of (" + RoundSigDigits(GroundTemp_Surface, 1) + ") will be used.");
+                ShowContinueError(state, format("Defaults, constant throughout the year of ({:.1R}) will be used.", state.dataEnvrn->GroundTemp_Surface));
             }
             state.dataSurfaceGroundHeatExchangers->NoSurfaceGroundTempObjWarning = false;
         }
@@ -518,16 +516,16 @@ namespace SurfaceGroundHeatExchanger {
             this->LastSysTimeElapsed = 0.0;
             this->LastTimeStepSys = 0.0;
             // initialize past weather variables
-            state.dataSurfaceGroundHeatExchangers->PastBeamSolarRad = BeamSolarRad;
-            state.dataSurfaceGroundHeatExchangers->PastSolarDirCosVert = SOLCOS(3);
-            state.dataSurfaceGroundHeatExchangers->PastDifSolarRad = DifSolarRad;
-            state.dataSurfaceGroundHeatExchangers->PastGroundTemp = GroundTemp_Surface;
-            state.dataSurfaceGroundHeatExchangers->PastIsRain = IsRain;
-            state.dataSurfaceGroundHeatExchangers->PastIsSnow = IsSnow;
+            state.dataSurfaceGroundHeatExchangers->PastBeamSolarRad = state.dataEnvrn->BeamSolarRad;
+            state.dataSurfaceGroundHeatExchangers->PastSolarDirCosVert = state.dataEnvrn->SOLCOS(3);
+            state.dataSurfaceGroundHeatExchangers->PastDifSolarRad = state.dataEnvrn->DifSolarRad;
+            state.dataSurfaceGroundHeatExchangers->PastGroundTemp = state.dataEnvrn->GroundTemp_Surface;
+            state.dataSurfaceGroundHeatExchangers->PastIsRain = state.dataEnvrn->IsRain;
+            state.dataSurfaceGroundHeatExchangers->PastIsSnow = state.dataEnvrn->IsSnow;
             state.dataSurfaceGroundHeatExchangers->PastOutDryBulbTemp = OutDryBulbTempAt(state, SurfaceHXHeight);
             state.dataSurfaceGroundHeatExchangers->PastOutWetBulbTemp = OutWetBulbTempAt(state, SurfaceHXHeight);
-            state.dataSurfaceGroundHeatExchangers->PastSkyTemp = SkyTemp;
-            state.dataSurfaceGroundHeatExchangers->PastWindSpeed = WindSpeedAt(SurfaceHXHeight);
+            state.dataSurfaceGroundHeatExchangers->PastSkyTemp = state.dataEnvrn->SkyTemp;
+            state.dataSurfaceGroundHeatExchangers->PastWindSpeed = DataEnvironment::WindSpeedAt(state, SurfaceHXHeight);
             this->MyEnvrnFlag = false;
         }
 
@@ -591,7 +589,6 @@ namespace SurfaceGroundHeatExchanger {
         using DataLoopNode::Node;
         using namespace DataEnvironment;
         using DataPlant::PlantLoop;
-        using General::TrimSigDigits;
 
         Real64 const SurfFluxTol(0.001); // tolerance on the surface fluxes
         Real64 const SrcFluxTol(0.001);  // tolerance on the source flux
@@ -674,8 +671,8 @@ namespace SurfaceGroundHeatExchanger {
                 // Check for non-convergence
                 if (iter > Maxiter) {
                     if (this->ConvErrIndex1 == 0) {
-                        ShowWarningMessage(state, "CalcSurfaceGroundHeatExchanger=\"" + this->Name +
-                                           "\", Did not converge (part 1), Iterations=" + TrimSigDigits(Maxiter));
+                        ShowWarningMessage(
+                            state, format("CalcSurfaceGroundHeatExchanger=\"{}\", Did not converge (part 1), Iterations={}", this->Name, Maxiter));
                         ShowContinueErrorTimeStamp(state, "");
                     }
                     ShowRecurringWarningErrorAtEnd(state, "CalcSurfaceGroundHeatExchanger=\"" + this->Name + "\", Did not converge (part 1)",
@@ -710,16 +707,16 @@ namespace SurfaceGroundHeatExchanger {
             this->LastTimeStepSys = 0.0;
 
             // get current env. conditions
-            state.dataSurfaceGroundHeatExchangers->PastBeamSolarRad = BeamSolarRad;
-            state.dataSurfaceGroundHeatExchangers->PastSolarDirCosVert = SOLCOS(3);
-            state.dataSurfaceGroundHeatExchangers->PastDifSolarRad = DifSolarRad;
-            state.dataSurfaceGroundHeatExchangers->PastGroundTemp = GroundTemp_Surface;
-            state.dataSurfaceGroundHeatExchangers->PastIsRain = IsRain;
-            state.dataSurfaceGroundHeatExchangers->PastIsSnow = IsSnow;
+            state.dataSurfaceGroundHeatExchangers->PastBeamSolarRad = state.dataEnvrn->BeamSolarRad;
+            state.dataSurfaceGroundHeatExchangers->PastSolarDirCosVert = state.dataEnvrn->SOLCOS(3);
+            state.dataSurfaceGroundHeatExchangers->PastDifSolarRad = state.dataEnvrn->DifSolarRad;
+            state.dataSurfaceGroundHeatExchangers->PastGroundTemp = state.dataEnvrn->GroundTemp_Surface;
+            state.dataSurfaceGroundHeatExchangers->PastIsRain = state.dataEnvrn->IsRain;
+            state.dataSurfaceGroundHeatExchangers->PastIsSnow = state.dataEnvrn->IsSnow;
             state.dataSurfaceGroundHeatExchangers->PastOutDryBulbTemp = OutDryBulbTempAt(state, SurfaceHXHeight);
             state.dataSurfaceGroundHeatExchangers->PastOutWetBulbTemp = OutWetBulbTempAt(state, SurfaceHXHeight);
-            state.dataSurfaceGroundHeatExchangers->PastSkyTemp = SkyTemp;
-            state.dataSurfaceGroundHeatExchangers->PastWindSpeed = WindSpeedAt(SurfaceHXHeight);
+            state.dataSurfaceGroundHeatExchangers->PastSkyTemp = state.dataEnvrn->SkyTemp;
+            state.dataSurfaceGroundHeatExchangers->PastWindSpeed = DataEnvironment::WindSpeedAt(state, SurfaceHXHeight);
 
             TempBtm = this->TbtmHistory(1);
             TempTop = this->TtopHistory(1);
@@ -735,7 +732,7 @@ namespace SurfaceGroundHeatExchanger {
                     ++iter1;
                     // update top coefficients
                     CalcTopFluxCoefficents(TempBtm, TempTop);
-                    // calc top surface fluxe
+                    // calc top surface flux
                     FluxTop = this->QtopConstCoef + this->QtopVarCoef * state.dataSurfaceGroundHeatExchangers->SourceFlux;
                     // calc new surface temps
                     CalcTopSurfTemp(-FluxTop,
@@ -759,7 +756,7 @@ namespace SurfaceGroundHeatExchanger {
                         break;
 
                     // calc new surface temps
-                    CalcBottomSurfTemp(FluxBtm, TempB, state.dataSurfaceGroundHeatExchangers->PastOutDryBulbTemp, state.dataSurfaceGroundHeatExchangers->PastOutDryBulbTemp, GroundTemp_Surface);
+                    CalcBottomSurfTemp(FluxBtm, TempB, state.dataSurfaceGroundHeatExchangers->PastOutDryBulbTemp, state.dataSurfaceGroundHeatExchangers->PastOutDryBulbTemp, state.dataEnvrn->GroundTemp_Surface);
                     // under-relax
                     TempBtm = TempBtm * (1.0 - RelaxT) + RelaxT * TempB;
                     // update flux record
@@ -769,8 +766,9 @@ namespace SurfaceGroundHeatExchanger {
                     // Check for non-convergence
                     if (iter1 > Maxiter1) {
                         if (this->ConvErrIndex2 == 0) {
-                            ShowWarningMessage(state, "CalcSurfaceGroundHeatExchanger=\"" + this->Name +
-                                               "\", Did not converge (part 2), Iterations=" + TrimSigDigits(Maxiter));
+                            ShowWarningMessage(
+                                state,
+                                format("CalcSurfaceGroundHeatExchanger=\"{}\", Did not converge (part 2), Iterations={}", this->Name, Maxiter));
                             ShowContinueErrorTimeStamp(state, "");
                         }
                         ShowRecurringWarningErrorAtEnd(state, "CalcSurfaceGroundHeatExchanger=\"" + this->Name + "\", Did not converge (part 2)",
@@ -788,8 +786,8 @@ namespace SurfaceGroundHeatExchanger {
                 // Check for non-convergence
                 if (iter > Maxiter) {
                     if (this->ConvErrIndex3 == 0) {
-                        ShowWarningMessage(state, "CalcSurfaceGroundHeatExchanger=\"" + this->Name +
-                                           "\", Did not converge (part 3), Iterations=" + TrimSigDigits(Maxiter));
+                        ShowWarningMessage(
+                            state, format("CalcSurfaceGroundHeatExchanger=\"{}\", Did not converge (part 3), Iterations={}", this->Name, Maxiter));
                         ShowContinueErrorTimeStamp(state, "");
                     }
                     ShowRecurringWarningErrorAtEnd(state, "CalcSurfaceGroundHeatExchanger=\"" + this->Name + "\", Did not converge (part 3)",
@@ -1056,7 +1054,6 @@ namespace SurfaceGroundHeatExchanger {
         // Using/Aliasing
         using DataPlant::PlantLoop;
         using FluidProperties::GetSpecificHeatGlycol;
-        using General::RoundSigDigits;
 
         // Return value
         Real64 CalcHXEffectTerm;
@@ -1125,8 +1122,11 @@ namespace SurfaceGroundHeatExchanger {
         if (Temperature < 0.0) { // check if fluid is water and would be freezing
             if (PlantLoop(this->LoopNum).FluidIndex == WaterIndex) {
                 if (this->FrozenErrIndex1 == 0) {
-                    ShowWarningMessage(state, "GroundHeatExchanger:Surface=\"" + this->Name +
-                                       "\", water is frozen; Model not valid. Calculated Water Temperature=[" + RoundSigDigits(this->InletTemp, 2) + "] C");
+                    ShowWarningMessage(
+                        state,
+                        format("GroundHeatExchanger:Surface=\"{}\", water is frozen; Model not valid. Calculated Water Temperature=[{:.2R}] C",
+                               this->Name,
+                               this->InletTemp));
                     ShowContinueErrorTimeStamp(state, "");
                 }
                 ShowRecurringWarningErrorAtEnd(state, "GroundHeatExchanger:Surface=\"" + this->Name + "\", water is frozen",

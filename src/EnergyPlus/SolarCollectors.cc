@@ -321,8 +321,8 @@ namespace SolarCollectors {
                                          DataIPShortCuts::cAlphaArgs(3));
                         ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1));
                         ShowContinueError(state, "Surface used for solar collector faces down");
-                        ShowContinueError(state, "Surface tilt angle (degrees from ground outward normal) = " +
-                                          General::RoundSigDigits(DataSurfaces::Surface(SurfNum).Tilt, 2));
+                        ShowContinueError(
+                            state, format("Surface tilt angle (degrees from ground outward normal) = {:.2R}", DataSurfaces::Surface(SurfNum).Tilt));
                     }
 
                     // Check to make sure other solar collectors are not using the same surface
@@ -418,16 +418,14 @@ namespace SolarCollectors {
                 state.dataSolarCollectors->Parameters(ParametersNum).Area = DataIPShortCuts::rNumericArgs(1);
                 if (DataIPShortCuts::rNumericArgs(1) <= 0.0) {
                     ShowSevereError(state, CurrentModuleParamObject + " = " + DataIPShortCuts::cAlphaArgs(1));
-                    ShowContinueError(state, "Illegal " + DataIPShortCuts::cNumericFieldNames(1) + " = " +
-                                      General::RoundSigDigits(DataIPShortCuts::rNumericArgs(1), 2));
+                    ShowContinueError(state, format("Illegal {} = {:.2R}", DataIPShortCuts::cNumericFieldNames(1), DataIPShortCuts::rNumericArgs(1)));
                     ShowContinueError(state, " Collector gross area must be always gretaer than zero.");
                     ErrorsFound = true;
                 }
                 state.dataSolarCollectors->Parameters(ParametersNum).Volume = DataIPShortCuts::rNumericArgs(2);
                 if (DataIPShortCuts::rNumericArgs(2) <= 0.0) {
                     ShowSevereError(state, CurrentModuleParamObject + " = " + DataIPShortCuts::cAlphaArgs(1));
-                    ShowContinueError(state, "Illegal " + DataIPShortCuts::cNumericFieldNames(2) + " = " +
-                                      General::RoundSigDigits(DataIPShortCuts::rNumericArgs(2), 2));
+                    ShowContinueError(state, format("Illegal {} = {:.2R}", DataIPShortCuts::cNumericFieldNames(2), DataIPShortCuts::rNumericArgs(2)));
                     ShowContinueError(state, " Collector water volume must be always gretaer than zero.");
                     ErrorsFound = true;
                 }
@@ -467,8 +465,7 @@ namespace SolarCollectors {
                     state.dataSolarCollectors->Parameters(ParametersNum).EmissOfCover(1) = DataIPShortCuts::rNumericArgs(12);
                 } else {
                     ShowSevereError(state, CurrentModuleParamObject + " = " + DataIPShortCuts::cAlphaArgs(1));
-                    ShowContinueError(state, "Illegal " + DataIPShortCuts::cNumericFieldNames(8) + " = " +
-                                      General::RoundSigDigits(DataIPShortCuts::rNumericArgs(8), 2));
+                    ShowContinueError(state, format("Illegal {} = {:.2R}", DataIPShortCuts::cNumericFieldNames(8), DataIPShortCuts::rNumericArgs(8)));
                     ErrorsFound = true;
                 }
                 // Solar absorptance of the absorber plate
@@ -552,8 +549,8 @@ namespace SolarCollectors {
                                          DataIPShortCuts::cAlphaArgs(3));
                         ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1));
                         ShowContinueError(state, "Surface used for solar collector faces down");
-                        ShowContinueError(state, "Surface tilt angle (degrees from ground outward normal) = " +
-                                          General::RoundSigDigits(DataSurfaces::Surface(SurfNum).Tilt, 2));
+                        ShowContinueError(
+                            state, format("Surface tilt angle (degrees from ground outward normal) = {:.2R}", DataSurfaces::Surface(SurfNum).Tilt));
                     }
 
                     // Check to make sure other solar collectors are not using the same surface
@@ -1699,9 +1696,9 @@ namespace SolarCollectors {
 
         // Calc linearized radiation coefficient between outer cover and the surrounding:
         tempnom = DataSurfaces::Surface(SurfNum).ViewFactorSky * EmissOfOuterCover * DataGlobalConstants::StefanBoltzmann() *
-                  ((TempOuterCover + DataGlobalConstants::KelvinConv()) + DataEnvironment::SkyTempKelvin) *
-                  (pow_2(TempOuterCover + DataGlobalConstants::KelvinConv()) + pow_2(DataEnvironment::SkyTempKelvin));
-        tempdenom = (TempOuterCover - TempOutdoorAir) / (TempOuterCover - DataEnvironment::SkyTemp);
+                  ((TempOuterCover + DataGlobalConstants::KelvinConv()) + state.dataEnvrn->SkyTempKelvin) *
+                  (pow_2(TempOuterCover + DataGlobalConstants::KelvinConv()) + pow_2(state.dataEnvrn->SkyTempKelvin));
+        tempdenom = (TempOuterCover - TempOutdoorAir) / (TempOuterCover - state.dataEnvrn->SkyTemp);
         if (tempdenom < 0.0) {
             // use approximate linearized radiation coefficient
             hRadCoefC2Sky = tempnom;
@@ -1713,9 +1710,9 @@ namespace SolarCollectors {
         }
 
         tempnom = DataSurfaces::Surface(SurfNum).ViewFactorGround * EmissOfOuterCover * DataGlobalConstants::StefanBoltzmann() *
-                  ((TempOuterCover + DataGlobalConstants::KelvinConv()) + DataEnvironment::GroundTempKelvin) *
-                  (pow_2(TempOuterCover + DataGlobalConstants::KelvinConv()) + pow_2(DataEnvironment::GroundTempKelvin));
-        tempdenom = (TempOuterCover - TempOutdoorAir) / (TempOuterCover - DataEnvironment::GroundTemp);
+                  ((TempOuterCover + DataGlobalConstants::KelvinConv()) + state.dataEnvrn->GroundTempKelvin) *
+                  (pow_2(TempOuterCover + DataGlobalConstants::KelvinConv()) + pow_2(state.dataEnvrn->GroundTempKelvin));
+        tempdenom = (TempOuterCover - TempOutdoorAir) / (TempOuterCover - state.dataEnvrn->GroundTemp);
         if (tempdenom < 0.0) {
             // use approximate linearized radiation coefficient
             hRadCoefC2Gnd = tempnom;

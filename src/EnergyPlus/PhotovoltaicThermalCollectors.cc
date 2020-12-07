@@ -271,8 +271,9 @@ namespace PhotovoltaicThermalCollectors {
                     ShowWarningError(state, "Suspected input problem with " + DataIPShortCuts::cAlphaFieldNames(2) + " = " + DataIPShortCuts::cAlphaArgs(2));
                     ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1));
                     ShowContinueError(state, "Surface used for solar collector faces down");
-                    ShowContinueError(state, "Surface tilt angle (degrees from ground outward normal) = " +
-                                      General::RoundSigDigits(DataSurfaces::Surface(PVT(Item).SurfNum).Tilt, 2));
+                    ShowContinueError(
+                        state,
+                        format("Surface tilt angle (degrees from ground outward normal) = {:.2R}", DataSurfaces::Surface(PVT(Item).SurfNum).Tilt));
                 }
 
             } // check surface
@@ -391,7 +392,7 @@ namespace PhotovoltaicThermalCollectors {
                 if (PVT(Item).WorkingFluidType == WorkingFluidEnum::LIQUID) {
                     PlantUtilities::RegisterPlantCompDesignFlow(PVT(Item).PlantInletNodeNum, PVT(Item).DesignVolFlowRate);
                 } else if (PVT(Item).WorkingFluidType == WorkingFluidEnum::AIR) {
-                    PVT(Item).MaxMassFlowRate = PVT(Item).DesignVolFlowRate * DataEnvironment::StdRhoAir;
+                    PVT(Item).MaxMassFlowRate = PVT(Item).DesignVolFlowRate * state.dataEnvrn->StdRhoAir;
                 }
                 PVT(Item).SizingInit = false;
             }
@@ -715,9 +716,8 @@ namespace PhotovoltaicThermalCollectors {
                         if ((std::abs(DesignVolFlowRateDes - DesignVolFlowRateUser) / DesignVolFlowRateUser) >
                             DataSizing::AutoVsHardSizingThreshold) {
                             ShowMessage(state, "SizeSolarCollector: Potential issue with equipment sizing for " + this->Name);
-                            ShowContinueError(state, "User-Specified Design Flow Rate of " + General::RoundSigDigits(DesignVolFlowRateUser, 5) + " [W]");
-                            ShowContinueError(state, "differs from Design Size Design Flow Rate of " + General::RoundSigDigits(DesignVolFlowRateDes, 5) +
-                                              " [W]");
+                            ShowContinueError(state, format("User-Specified Design Flow Rate of {:.5R} [W]", DesignVolFlowRateUser));
+                            ShowContinueError(state, format("differs from Design Size Design Flow Rate of {:.5R} [W]", DesignVolFlowRateDes));
                             ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                             ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                         }
@@ -757,7 +757,7 @@ namespace PhotovoltaicThermalCollectors {
                             }
                         }
                     }
-                    Real64 DesMassFlow = DataEnvironment::StdRhoAir * DesignVolFlowRateDes;
+                    Real64 DesMassFlow = state.dataEnvrn->StdRhoAir * DesignVolFlowRateDes;
                     this->MaxMassFlowRate = DesMassFlow;
                 }
                 if (!HardSizeNoDesRun) {
@@ -779,10 +779,8 @@ namespace PhotovoltaicThermalCollectors {
                                 if ((std::abs(DesignVolFlowRateDes - DesignVolFlowRateUser) / DesignVolFlowRateUser) >
                                     DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeSolarCollector: Potential issue with equipment sizing for " + this->Name);
-                                    ShowContinueError(state, "User-Specified Design Flow Rate of " + General::RoundSigDigits(DesignVolFlowRateUser, 5) +
-                                                      " [W]");
-                                    ShowContinueError(state, "differs from Design Size Design Flow Rate of " +
-                                                      General::RoundSigDigits(DesignVolFlowRateDes, 5) + " [W]");
+                                    ShowContinueError(state, format("User-Specified Design Flow Rate of {:.5R} [W]", DesignVolFlowRateUser));
+                                    ShowContinueError(state, format("differs from Design Size Design Flow Rate of {:.5R} [W]", DesignVolFlowRateDes));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -980,14 +978,14 @@ namespace PhotovoltaicThermalCollectors {
                 if (this->WorkingFluidType == WorkingFluidEnum::AIR) {
                     Real64 Winlet = DataLoopNode::Node(InletNode).HumRat;
                     CpInlet = Psychrometrics::PsyCpAirFnW(Winlet);
-                    WetBulbInlet = Psychrometrics::PsyTwbFnTdbWPb(state, Tinlet, Winlet, DataEnvironment::OutBaroPress, RoutineName);
-                    DewPointInlet = Psychrometrics::PsyTdpFnTdbTwbPb(state, Tinlet, WetBulbInlet, DataEnvironment::OutBaroPress, RoutineName);
+                    WetBulbInlet = Psychrometrics::PsyTwbFnTdbWPb(state, Tinlet, Winlet, state.dataEnvrn->OutBaroPress, RoutineName);
+                    DewPointInlet = Psychrometrics::PsyTdpFnTdbTwbPb(state, Tinlet, WetBulbInlet, state.dataEnvrn->OutBaroPress, RoutineName);
                 } else if (this->WorkingFluidType == WorkingFluidEnum::LIQUID) {
                     CpInlet = Psychrometrics::CPHW(Tinlet);
                 }
 
                 Real64 Tcollector =
-                    (2.0 * mdot * CpInlet * Tinlet + this->AreaCol * (HrGround * DataEnvironment::OutDryBulbTemp + HrSky * DataEnvironment::SkyTemp +
+                    (2.0 * mdot * CpInlet * Tinlet + this->AreaCol * (HrGround * state.dataEnvrn->OutDryBulbTemp + HrSky * state.dataEnvrn->SkyTemp +
                                                                       HrAir * DataSurfaces::Surface(this->SurfNum).OutDryBulbTemp +
                                                                       HcExt * DataSurfaces::Surface(this->SurfNum).OutDryBulbTemp)) /
                     (2.0 * mdot * CpInlet + this->AreaCol * (HrGround + HrSky + HrAir + HcExt));

@@ -4403,8 +4403,6 @@ namespace SystemReports {
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         using namespace DataZoneEnergyDemands;
         using namespace DataGlobalConstants;
-        using DataEnvironment::OutBaroPress;
-        using DataEnvironment::StdRhoAir;
         using DataHeatBalance::ZnAirRpt;
         using DataHeatBalance::Zone;
         using DataHeatBalance::ZonePreDefRep;
@@ -4829,11 +4827,11 @@ namespace SystemReports {
             ZoneOAMass(CtrlZoneNum) = ZoneOAMassFlow(CtrlZoneNum) * TimeStepSys * DataGlobalConstants::SecInHour();
 
             // determine volumetric values from mass flow using standard density (adjusted for elevation)
-            ZoneOAVolFlowStdRho(CtrlZoneNum) = ZoneOAMassFlow(CtrlZoneNum) / StdRhoAir;
+            ZoneOAVolFlowStdRho(CtrlZoneNum) = ZoneOAMassFlow(CtrlZoneNum) / state.dataEnvrn->StdRhoAir;
             ZoneOAVolStdRho(CtrlZoneNum) = ZoneOAVolFlowStdRho(CtrlZoneNum) * TimeStepSys * DataGlobalConstants::SecInHour();
 
             // determine volumetric values from mass flow using current air density for zone (adjusted for elevation)
-            currentZoneAirDensity = PsyRhoAirFnPbTdbW(state, OutBaroPress, MAT(ActualZoneNum), ZoneAirHumRatAvg(ActualZoneNum));
+            currentZoneAirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, MAT(ActualZoneNum), ZoneAirHumRatAvg(ActualZoneNum));
             if (currentZoneAirDensity > 0.0) ZoneOAVolFlowCrntRho(CtrlZoneNum) = ZoneOAMassFlow(CtrlZoneNum) / currentZoneAirDensity;
             ZoneOAVolCrntRho(CtrlZoneNum) = ZoneOAVolFlowCrntRho(CtrlZoneNum) * TimeStepSys * DataGlobalConstants::SecInHour();
             if (ZoneVolume > 0.0) ZoneMechACH(CtrlZoneNum) = (ZoneOAVolCrntRho(CtrlZoneNum) / TimeStepSys) / ZoneVolume;
@@ -5271,12 +5269,12 @@ namespace SystemReports {
                 std::string ChrOut;
                 std::string ChrOut2;
                 if (state.dataAirLoop->AirToOANodeInfo(Count).OASysInletNodeNum > 0) {
-                    ChrOut = std::to_string(state.dataAirLoop->AirToOANodeInfo(Count).OASysInletNodeNum);
+                    ChrOut = fmt::to_string(state.dataAirLoop->AirToOANodeInfo(Count).OASysInletNodeNum);
                 } else {
                     ChrOut = errstring;
                 }
                 if (state.dataAirLoop->AirToOANodeInfo(Count).OASysOutletNodeNum > 0) {
-                    ChrOut2 = std::to_string(state.dataAirLoop->AirToOANodeInfo(Count).OASysOutletNodeNum);
+                    ChrOut2 = fmt::to_string(state.dataAirLoop->AirToOANodeInfo(Count).OASysOutletNodeNum);
                 } else {
                     ChrOut2 = errstring;
                 }

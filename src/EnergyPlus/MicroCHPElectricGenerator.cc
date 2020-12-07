@@ -230,14 +230,14 @@ namespace MicroCHPElectricGenerator {
                 MicroCHPParamInput(CHPParamNum).RadiativeFraction = NumArray(9); // N9 radiative fraction for skin losses
                 MicroCHPParamInput(CHPParamNum).MCeng = NumArray(10);            // N10 Aggregated Thermal Mass of Generator MC_eng
                 if (MicroCHPParamInput(CHPParamNum).MCeng <= 0.0) {
-                    ShowSevereError(state, "Invalid, " + DataIPShortCuts::cNumericFieldNames(10) + " = " + General::RoundSigDigits(NumArray(10), 5));
+                    ShowSevereError(state, format("Invalid, {} = {:.5R}", DataIPShortCuts::cNumericFieldNames(10), NumArray(10)));
                     ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                     ShowContinueError(state, "Thermal mass must be greater than zero");
                     ErrorsFound = true;
                 }
                 MicroCHPParamInput(CHPParamNum).MCcw = NumArray(11); // Aggregated Thermal Mass of Heat Recovery MC_cw
                 if (MicroCHPParamInput(CHPParamNum).MCcw <= 0.0) {
-                    ShowSevereError(state, "Invalid, " + DataIPShortCuts::cNumericFieldNames(11) + " = " + General::RoundSigDigits(NumArray(11), 5));
+                    ShowSevereError(state, format("Invalid, {} = {:.5R}", DataIPShortCuts::cNumericFieldNames(11), NumArray(11)));
                     ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                     ShowContinueError(state, "Thermal mass must be greater than zero");
                     ErrorsFound = true;
@@ -780,7 +780,7 @@ namespace MicroCHPElectricGenerator {
         if (this->ZoneID > 0) {
             thisAmbientTemp = DataHeatBalFanSys::MAT(this->ZoneID);
         } else { // outdoor location, no zone
-            thisAmbientTemp = DataEnvironment::OutDryBulbTemp;
+            thisAmbientTemp = state.dataEnvrn->OutDryBulbTemp;
         }
 
         Real64 Pnetss = 0.0;

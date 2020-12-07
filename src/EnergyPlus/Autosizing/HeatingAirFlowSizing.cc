@@ -46,9 +46,9 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <EnergyPlus/Autosizing/HeatingAirFlowSizing.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
@@ -196,7 +196,7 @@ Real64 HeatingAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, b
                         this->autoSizedValue = this->oaSysEqSizing(this->curOASysNum).HeatingAirVolFlow;
                     } else if (outsideAirSys(this->curOASysNum).AirLoopDOASNum > -1) {
                         this->autoSizedValue = this->airloopDOAS[outsideAirSys(this->curOASysNum).AirLoopDOASNum].SizingMassFlow /
-                                               DataEnvironment::StdRhoAir;
+                                               state.dataEnvrn->StdRhoAir;
                     } else {
                         this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesOutAirVolFlow;
                     }
@@ -246,7 +246,7 @@ Real64 HeatingAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, b
             std::string msg = this->callingRoutine + ' ' + this->compType + ' ' + this->compName + ", Developer Error: Component sizing incomplete.";
             ShowSevereError(state, msg);
             this->addErrorMessage(msg);
-            msg = "SizingString = " + this->sizingString + ", SizingResult = " + General::TrimSigDigits(this->autoSizedValue, 1);
+            msg = format("SizingString = {}, SizingResult = {:.1T}", this->sizingString, this->autoSizedValue);
             ShowContinueError(state, msg);
             this->addErrorMessage(msg);
             errorsFound = true;

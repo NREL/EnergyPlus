@@ -63,7 +63,6 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/FluidProperties.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
@@ -146,9 +145,11 @@ namespace UserDefinedComponents {
 
         } else {
             // throw warning
-            ShowFatalError(state, "SimUserDefinedPlantComponent: did not find where called from loop number called from =" +
-                           General::TrimSigDigits(calledFromLocation.loopNum) +
-                           " , loop side called from =" + General::TrimSigDigits(calledFromLocation.loopSideNum));
+            ShowFatalError(
+                state,
+                format("SimUserDefinedPlantComponent: did not find where called from loop number called from ={} , loop side called from ={}",
+                       calledFromLocation.loopNum,
+                       calledFromLocation.loopSideNum));
         }
     }
 
@@ -246,13 +247,20 @@ namespace UserDefinedComponents {
         } else {
             CompNum = CompIndex;
             if (CompNum < 1 || CompNum > state.dataUserDefinedComponents->NumUserCoils) {
-                ShowFatalError(state, "SimUserDefinedPlantComponent: Invalid CompIndex passed=" + General::TrimSigDigits(CompNum) +
-                               ", Number of units =" + General::TrimSigDigits(state.dataUserDefinedComponents->NumUserCoils) + ", Entered Unit name = " + EquipName);
+                ShowFatalError(state,
+                               format("SimUserDefinedPlantComponent: Invalid CompIndex passed={}, Number of units ={}, Entered Unit name = {}",
+                                      CompNum,
+                                      state.dataUserDefinedComponents->NumUserCoils,
+                                      EquipName));
             }
             if (state.dataUserDefinedComponents->CheckUserCoilName(CompNum)) {
                 if (EquipName != state.dataUserDefinedComponents->UserCoil(CompNum).Name) {
-                    ShowFatalError(state, "SimUserDefinedPlantComponent: Invalid CompIndex passed=" + General::TrimSigDigits(CompNum) +
-                                   ", Unit name=" + EquipName + ", stored unit name for that index=" + state.dataUserDefinedComponents->UserCoil(CompNum).Name);
+                    ShowFatalError(
+                        state,
+                        format("SimUserDefinedPlantComponent: Invalid CompIndex passed={}, Unit name={}, stored unit name for that index={}",
+                               CompNum,
+                               EquipName,
+                               state.dataUserDefinedComponents->UserCoil(CompNum).Name));
                 }
                 state.dataUserDefinedComponents->CheckUserCoilName(CompNum) = false;
             }
@@ -336,13 +344,20 @@ namespace UserDefinedComponents {
         } else {
             CompNum = CompIndex;
             if (CompNum < 1 || CompNum > state.dataUserDefinedComponents->NumUserZoneAir) {
-                ShowFatalError(state, "SimUserDefinedPlantComponent: Invalid CompIndex passed=" + General::TrimSigDigits(CompNum) +
-                               ", Number of units =" + General::TrimSigDigits(state.dataUserDefinedComponents->NumUserZoneAir) + ", Entered Unit name = " + CompName);
+                ShowFatalError(state,
+                               format("SimUserDefinedPlantComponent: Invalid CompIndex passed={}, Number of units ={}, Entered Unit name = {}",
+                                      CompNum,
+                                      state.dataUserDefinedComponents->NumUserZoneAir,
+                                      CompName));
             }
             if (state.dataUserDefinedComponents->CheckUserZoneAirName(CompNum)) {
                 if (CompName != state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).Name) {
-                    ShowFatalError(state, "SimUserDefinedPlantComponent: Invalid CompIndex passed=" + General::TrimSigDigits(CompNum) +
-                                   ", Unit name=" + CompName + ", stored unit name for that index=" + state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).Name);
+                    ShowFatalError(
+                        state,
+                        format("SimUserDefinedPlantComponent: Invalid CompIndex passed={}, Unit name={}, stored unit name for that index={}",
+                               CompNum,
+                               CompName,
+                               state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).Name));
                 }
                 state.dataUserDefinedComponents->CheckUserZoneAirName(CompNum) = false;
             }
@@ -436,13 +451,20 @@ namespace UserDefinedComponents {
         } else {
             CompNum = CompIndex;
             if (CompNum < 1 || CompNum > state.dataUserDefinedComponents->NumUserAirTerminals) {
-                ShowFatalError(state, "SimUserDefinedPlantComponent: Invalid CompIndex passed=" + General::TrimSigDigits(CompNum) +
-                               ", Number of units =" + General::TrimSigDigits(state.dataUserDefinedComponents->NumUserAirTerminals) + ", Entered Unit name = " + CompName);
+                ShowFatalError(state,
+                               format("SimUserDefinedPlantComponent: Invalid CompIndex passed={}, Number of units ={}, Entered Unit name = {}",
+                                      CompNum,
+                                      state.dataUserDefinedComponents->NumUserAirTerminals,
+                                      CompName));
             }
             if (state.dataUserDefinedComponents->CheckUserAirTerminal(CompNum)) {
                 if (CompName != state.dataUserDefinedComponents->UserAirTerminal(CompNum).Name) {
-                    ShowFatalError(state, "SimUserDefinedPlantComponent: Invalid CompIndex passed=" + General::TrimSigDigits(CompNum) +
-                                   ", Unit name=" + CompName + ", stored unit name for that index=" + state.dataUserDefinedComponents->UserAirTerminal(CompNum).Name);
+                    ShowFatalError(
+                        state,
+                        format("SimUserDefinedPlantComponent: Invalid CompIndex passed={}, Unit name={}, stored unit name for that index={}",
+                               CompNum,
+                               CompName,
+                               state.dataUserDefinedComponents->UserAirTerminal(CompNum).Name));
                 }
                 state.dataUserDefinedComponents->CheckUserAirTerminal(CompNum) = false;
             }
@@ -1743,8 +1765,8 @@ namespace UserDefinedComponents {
                 BranchNodeConnections::TestCompSet(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(4), cAlphaArgs(5), "Air Nodes");
 
                 int ADUNum = 0;
-                for (ADUNum = 1; ADUNum <= DataDefineEquip::NumAirDistUnits; ++ADUNum) {
-                    if (state.dataUserDefinedComponents->UserAirTerminal(CompLoop).AirLoop.OutletNodeNum == DataDefineEquip::AirDistUnit(ADUNum).OutletNodeNum) {
+                for (ADUNum = 1; ADUNum <= state.dataDefineEquipment->NumAirDistUnits; ++ADUNum) {
+                    if (state.dataUserDefinedComponents->UserAirTerminal(CompLoop).AirLoop.OutletNodeNum == state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum) {
                         //        AirDistUnit(ADUNum)%InletNodeNum = IndUnitIUNum)%InletNodeNum
                         state.dataUserDefinedComponents->UserAirTerminal(CompLoop).ADUNum = ADUNum;
                     }
@@ -2103,7 +2125,7 @@ namespace UserDefinedComponents {
          this->Loop(LoopNum).InletMassFlowRate = DataLoopNode::Node(this->Loop(LoopNum).InletNodeNum).MassFlowRate;
         this->Loop(LoopNum).InletTemp = DataLoopNode::Node(this->Loop(LoopNum).InletNodeNum).Temp;
         if (this->Air.InletNodeNum > 0) {
-            this->Air.InletRho = Psychrometrics::PsyRhoAirFnPbTdbW(state, DataEnvironment::OutBaroPress,
+            this->Air.InletRho = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress,
                                                                    DataLoopNode::Node(this->Air.InletNodeNum).Temp,
                                                                    DataLoopNode::Node(this->Air.InletNodeNum).HumRat,
                                                                    RoutineName);
@@ -2159,7 +2181,7 @@ namespace UserDefinedComponents {
 
         // fill internal variable targets
         for (int loop = 1; loop <= this->NumAirConnections; ++loop) {
-            this->Air(loop).InletRho = Psychrometrics::PsyRhoAirFnPbTdbW(state, DataEnvironment::OutBaroPress,
+            this->Air(loop).InletRho = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress,
                                                                          DataLoopNode::Node(this->Air(loop).InletNodeNum).Temp,
                                                                          DataLoopNode::Node(this->Air(loop).InletNodeNum).HumRat,
                                                                          RoutineName);
@@ -2240,7 +2262,7 @@ namespace UserDefinedComponents {
         this->RemainingOutputReqToDehumidSP = DataZoneEnergyDemands::ZoneSysMoistureDemand(ZoneNum).RemainingOutputReqToDehumidSP;
         this->RemainingOutputReqToHumidSP = DataZoneEnergyDemands::ZoneSysMoistureDemand(ZoneNum).RemainingOutputReqToHumidSP;
 
-        this->ZoneAir.InletRho = Psychrometrics::PsyRhoAirFnPbTdbW(state, DataEnvironment::OutBaroPress,
+        this->ZoneAir.InletRho = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress,
                                                                    DataLoopNode::Node(this->ZoneAir.InletNodeNum).Temp,
                                                                    DataLoopNode::Node(this->ZoneAir.InletNodeNum).HumRat,
                                                                    RoutineName);
@@ -2249,7 +2271,7 @@ namespace UserDefinedComponents {
         this->ZoneAir.InletHumRat = DataLoopNode::Node(this->ZoneAir.InletNodeNum).HumRat;
 
         if (this->SourceAir.InletNodeNum > 0) {
-            this->SourceAir.InletRho = Psychrometrics::PsyRhoAirFnPbTdbW(state, DataEnvironment::OutBaroPress,
+            this->SourceAir.InletRho = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress,
                                                                          DataLoopNode::Node(this->SourceAir.InletNodeNum).Temp,
                                                                          DataLoopNode::Node(this->SourceAir.InletNodeNum).HumRat,
                                                                          RoutineName);
@@ -2327,7 +2349,7 @@ namespace UserDefinedComponents {
         this->RemainingOutputReqToDehumidSP = DataZoneEnergyDemands::ZoneSysMoistureDemand(ZoneNum).RemainingOutputReqToDehumidSP;
         this->RemainingOutputReqToHumidSP = DataZoneEnergyDemands::ZoneSysMoistureDemand(ZoneNum).RemainingOutputReqToHumidSP;
 
-        this->AirLoop.InletRho = Psychrometrics::PsyRhoAirFnPbTdbW(state, DataEnvironment::OutBaroPress,
+        this->AirLoop.InletRho = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress,
                                                                    DataLoopNode::Node(this->AirLoop.InletNodeNum).Temp,
                                                                    DataLoopNode::Node(this->AirLoop.InletNodeNum).HumRat,
                                                                    RoutineName);
@@ -2336,7 +2358,7 @@ namespace UserDefinedComponents {
         this->AirLoop.InletHumRat = DataLoopNode::Node(this->AirLoop.InletNodeNum).HumRat;
 
         if (this->SourceAir.InletNodeNum > 0) {
-            this->SourceAir.InletRho = Psychrometrics::PsyRhoAirFnPbTdbW(state, DataEnvironment::OutBaroPress,
+            this->SourceAir.InletRho = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress,
                                                                          DataLoopNode::Node(this->SourceAir.InletNodeNum).Temp,
                                                                          DataLoopNode::Node(this->SourceAir.InletNodeNum).HumRat,
                                                                          RoutineName);
