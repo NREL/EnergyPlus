@@ -5699,16 +5699,16 @@ namespace OutputReportTabular {
         print(state.files.audit, variable_fmt, "sizeMonthlyFieldSetInput", sizeMonthlyFieldSetInput);
         print(state.files.audit, variable_fmt, "MonthlyTablesCount", MonthlyTablesCount);
         print(state.files.audit, variable_fmt, "MonthlyColumnsCount", MonthlyColumnsCount);
-        print(state.files.audit, variable_fmt, "state.dataOutRptPredefined->sizeReportName", state.dataOutRptPredefined->sizeReportName);
-        print(state.files.audit, variable_fmt, "state.dataOutRptPredefined->numReportName", state.dataOutRptPredefined->numReportName);
-        print(state.files.audit, variable_fmt, "state.dataOutRptPredefined->sizeSubTable", state.dataOutRptPredefined->sizeSubTable);
-        print(state.files.audit, variable_fmt, "state.dataOutRptPredefined->numSubTable", state.dataOutRptPredefined->numSubTable);
-        print(state.files.audit, variable_fmt, "state.dataOutRptPredefined->sizeColumnTag", state.dataOutRptPredefined->sizeColumnTag);
-        print(state.files.audit, variable_fmt, "state.dataOutRptPredefined->numColumnTag", state.dataOutRptPredefined->numColumnTag);
-        print(state.files.audit, variable_fmt, "state.dataOutRptPredefined->sizeTableEntry", state.dataOutRptPredefined->sizeTableEntry);
-        print(state.files.audit, variable_fmt, "state.dataOutRptPredefined->numTableEntry", state.dataOutRptPredefined->numTableEntry);
-        print(state.files.audit, variable_fmt, "state.dataOutRptPredefined->sizeCompSizeTableEntry", state.dataOutRptPredefined->sizeCompSizeTableEntry);
-        print(state.files.audit, variable_fmt, "state.dataOutRptPredefined->numCompSizeTableEntry", state.dataOutRptPredefined->numCompSizeTableEntry);
+        print(state.files.audit, variable_fmt, "sizeReportName", state.dataOutRptPredefined->sizeReportName);
+        print(state.files.audit, variable_fmt, "numReportName", state.dataOutRptPredefined->numReportName);
+        print(state.files.audit, variable_fmt, "sizeSubTable", state.dataOutRptPredefined->sizeSubTable);
+        print(state.files.audit, variable_fmt, "numSubTable", state.dataOutRptPredefined->numSubTable);
+        print(state.files.audit, variable_fmt, "sizeColumnTag", state.dataOutRptPredefined->sizeColumnTag);
+        print(state.files.audit, variable_fmt, "numColumnTag", state.dataOutRptPredefined->numColumnTag);
+        print(state.files.audit, variable_fmt, "sizeTableEntry", state.dataOutRptPredefined->sizeTableEntry);
+        print(state.files.audit, variable_fmt, "numTableEntry", state.dataOutRptPredefined->numTableEntry);
+        print(state.files.audit, variable_fmt, "sizeCompSizeTableEntry", state.dataOutRptPredefined->sizeCompSizeTableEntry);
+        print(state.files.audit, variable_fmt, "numCompSizeTableEntry", state.dataOutRptPredefined->numCompSizeTableEntry);
     }
 
     void parseStatLine(const std::string &lineIn,
