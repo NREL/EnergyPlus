@@ -531,12 +531,12 @@ namespace PlantCentralGSHP {
                 if (DataPlant::PlantFinalSizesOkayToReport && !this->mySizesReported) {
                     // create predefined report
                     std::string equipName = this->ChillerHeater(NumChillerHeater).Name;
-                    OutputReportPredefined::PreDefTableEntry(
-                        OutputReportPredefined::pdchMechType, equipName, "ChillerHeaterPerformance:Electric:EIR");
-                    OutputReportPredefined::PreDefTableEntry(
-                        OutputReportPredefined::pdchMechNomEff, equipName, this->ChillerHeater(NumChillerHeater).RefCOPCooling);
-                    OutputReportPredefined::PreDefTableEntry(
-                        OutputReportPredefined::pdchMechNomCap, equipName, this->ChillerHeater(NumChillerHeater).RefCapCooling);
+                    OutputReportPredefined::PreDefTableEntry(state,
+                        state.dataOutRptPredefined->pdchMechType, equipName, "ChillerHeaterPerformance:Electric:EIR");
+                    OutputReportPredefined::PreDefTableEntry(state,
+                        state.dataOutRptPredefined->pdchMechNomEff, equipName, this->ChillerHeater(NumChillerHeater).RefCOPCooling);
+                    OutputReportPredefined::PreDefTableEntry(state,
+                        state.dataOutRptPredefined->pdchMechNomCap, equipName, this->ChillerHeater(NumChillerHeater).RefCapCooling);
                 }
 
                 if (ErrorsFound) {

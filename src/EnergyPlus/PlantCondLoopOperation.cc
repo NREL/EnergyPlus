@@ -784,12 +784,6 @@ CurrentModuleObject, PlantOpSchemeName);
         //       PlantEquipmentOperation:OutdoorRelativeHumidity
         //       PlantEquipmentOperation:Uncontrolled
 
-        // Using/Aliasing
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        int const Plant(1);     // Used to identify whether the current loop is Plant
-        int const Condenser(2); // Used to identify whether the current loop is Condenser
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumAlphas;
         int NumNums;
@@ -986,10 +980,6 @@ CurrentModuleObject, PlantOpSchemeName);
         // Using/Aliasing
         using NodeInputManager::GetOnlySingleNode;
         using namespace DataLoopNode;
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        int const Plant(1);     // Used to identify whether the current loop is Plant
-        int const Condenser(2); // Used to identify whether the current loop is Condenser
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumAlphas;
@@ -1319,12 +1309,6 @@ CurrentModuleObject, PlantOpSchemeName);
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
         using ScheduleManager::GetScheduleIndex;
         using SetPointManager::SetUpNewScheduledTESSetPtMgr;
-
-        // Locals
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        int const Plant(1);     // Used to identify whether the current loop is Plant
-        int const Condenser(2); // Used to identify whether the current loop is Condenser
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumAlphas;
@@ -1690,10 +1674,6 @@ CurrentModuleObject, PlantOpSchemeName);
         // Using/Aliasing
         using namespace DataIPShortCuts;
         using namespace DataPlant;
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        int const Plant(1);     // Used to identify whether the current loop is Plant
-        int const Condenser(2); // Used to identify whether the current loop is Condenser
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumAlphas;

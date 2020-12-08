@@ -230,17 +230,17 @@ namespace ExteriorEnergyUse {
                                 EndUseSubcategoryName);
 
             // entries for predefined tables
-            PreDefTableEntry(pdchExLtPower, state.dataExteriorEnergyUse->ExteriorLights(Item).Name, state.dataExteriorEnergyUse->ExteriorLights(Item).DesignLevel);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchExLtPower, state.dataExteriorEnergyUse->ExteriorLights(Item).Name, state.dataExteriorEnergyUse->ExteriorLights(Item).DesignLevel);
             sumDesignLevel += state.dataExteriorEnergyUse->ExteriorLights(Item).DesignLevel;
             if (state.dataExteriorEnergyUse->ExteriorLights(Item).ControlMode == ExteriorEnergyUse::LightControlType::AstroClockOverride) { // photocell/schedule
-                PreDefTableEntry(pdchExLtClock, state.dataExteriorEnergyUse->ExteriorLights(Item).Name, "AstronomicalClock");
-                PreDefTableEntry(pdchExLtSchd, state.dataExteriorEnergyUse->ExteriorLights(Item).Name, "-");
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchExLtClock, state.dataExteriorEnergyUse->ExteriorLights(Item).Name, "AstronomicalClock");
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchExLtSchd, state.dataExteriorEnergyUse->ExteriorLights(Item).Name, "-");
             } else {
-                PreDefTableEntry(pdchExLtClock, state.dataExteriorEnergyUse->ExteriorLights(Item).Name, "Schedule");
-                PreDefTableEntry(pdchExLtSchd, state.dataExteriorEnergyUse->ExteriorLights(Item).Name, GetScheduleName(state, state.dataExteriorEnergyUse->ExteriorLights(Item).SchedPtr));
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchExLtClock, state.dataExteriorEnergyUse->ExteriorLights(Item).Name, "Schedule");
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchExLtSchd, state.dataExteriorEnergyUse->ExteriorLights(Item).Name, GetScheduleName(state, state.dataExteriorEnergyUse->ExteriorLights(Item).SchedPtr));
             }
         }
-        PreDefTableEntry(pdchExLtPower, "Exterior Lighting Total", sumDesignLevel);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchExLtPower, "Exterior Lighting Total", sumDesignLevel);
 
         // =================================  Get Exterior Fuel Equipment
 

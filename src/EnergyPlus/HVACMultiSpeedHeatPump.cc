@@ -160,19 +160,14 @@ namespace HVACMultiSpeedHeatPump {
     int const SuppHeatingCoilRec(3);  // Supplymental heating coil type: COIL:ENGINEHEATRECOVERY:HEATING
 
     // Curve Types
-    int const Linear(1);      // Linear curve type
-    int const BiLinear(2);    // Bi-linear curve type
-    int const Quadratic(3);   // Quadratic curve type
-    int const BiQuadratic(4); // Bi-quadratic curve type
-    int const Cubic(5);       // Cubic curve type
+    enum class CurveType {
+        Linear,      // Linear curve type
+        BiLinear,    // Bi-linear curve type
+        Quadratic,   // Quadratic curve type
+        BiQuadratic, // Bi-quadratic curve type
+        Cubic,       // Cubic curve type
+    };
 
-    // Mode of operation
-    int const CoolingMode(1); // System operating mode is cooling
-    int const HeatingMode(2); // System operating mode is heating
-
-    // Airflow control for contant fan mode
-    int const UseCompressorOnFlow(1);  // set compressor OFF air flow rate equal to compressor ON air flow rate
-    int const UseCompressorOffFlow(2); // set compressor OFF air flow rate equal to user defined value
     // Compressor operation
     int const On(1);  // normal compressor operation
     int const Off(0); // signal DXCoil that compressor shouldn't run
@@ -498,7 +493,7 @@ namespace HVACMultiSpeedHeatPump {
             }
         }
 
-        if (MSHeatPump(MSHeatPumpNum).HeatCoolMode == HeatingMode) {
+        if (MSHeatPump(MSHeatPumpNum).HeatCoolMode == ModeOfOperation::HeatingMode) {
             MSHeatPump(MSHeatPumpNum).TotHeatEnergyRate = std::abs(max(0.0, QTotUnitOut));
             MSHeatPump(MSHeatPumpNum).SensHeatEnergyRate = std::abs(max(0.0, QSensUnitOut));
             MSHeatPump(MSHeatPumpNum).LatHeatEnergyRate = std::abs(max(0.0, (QTotUnitOut - QSensUnitOut)));
@@ -506,7 +501,7 @@ namespace HVACMultiSpeedHeatPump {
             MSHeatPump(MSHeatPumpNum).SensCoolEnergyRate = 0.0;
             MSHeatPump(MSHeatPumpNum).LatCoolEnergyRate = 0.0;
         }
-        if (MSHeatPump(MSHeatPumpNum).HeatCoolMode == CoolingMode) {
+        if (MSHeatPump(MSHeatPumpNum).HeatCoolMode == ModeOfOperation::CoolingMode) {
             MSHeatPump(MSHeatPumpNum).TotCoolEnergyRate = std::abs(min(0.0, QTotUnitOut));
             MSHeatPump(MSHeatPumpNum).SensCoolEnergyRate = std::abs(min(0.0, QSensUnitOut));
             MSHeatPump(MSHeatPumpNum).LatCoolEnergyRate = std::abs(min(0.0, (QTotUnitOut - QSensUnitOut)));
@@ -1408,13 +1403,13 @@ namespace HVACMultiSpeedHeatPump {
 
             //     AirFlowControl only valid if fan opmode = ContFanCycCoil
             if (MSHeatPump(MSHPNum).IdleVolumeAirRate == 0.0) {
-                MSHeatPump(MSHPNum).AirFlowControl = UseCompressorOnFlow;
+                MSHeatPump(MSHPNum).AirFlowControl = AirflowControl::UseCompressorOnFlow;
             } else {
-                MSHeatPump(MSHPNum).AirFlowControl = UseCompressorOffFlow;
+                MSHeatPump(MSHPNum).AirFlowControl = AirflowControl::UseCompressorOffFlow;
             }
 
             //   Initialize last mode of compressor operation
-            MSHeatPump(MSHPNum).LastMode = HeatingMode;
+            MSHeatPump(MSHPNum).LastMode = ModeOfOperation::HeatingMode;
 
             MSHeatPump(MSHPNum).NumOfSpeedHeating = Numbers(9);
             if (MSHeatPump(MSHPNum).NumOfSpeedHeating < 2 || MSHeatPump(MSHPNum).NumOfSpeedHeating > 4) {
@@ -2418,11 +2413,11 @@ namespace HVACMultiSpeedHeatPump {
         if (CurDeadBandOrSetback(ZoneNum)) QZnReq = 0.0;
 
         if (QZnReq > SmallLoad) {
-            MSHeatPump(MSHeatPumpNum).HeatCoolMode = HeatingMode;
+            MSHeatPump(MSHeatPumpNum).HeatCoolMode = ModeOfOperation::HeatingMode;
         } else if (QZnReq < (-1.0 * SmallLoad)) {
-            MSHeatPump(MSHeatPumpNum).HeatCoolMode = CoolingMode;
+            MSHeatPump(MSHeatPumpNum).HeatCoolMode = ModeOfOperation::CoolingMode;
         } else {
-            MSHeatPump(MSHeatPumpNum).HeatCoolMode = 0;
+            MSHeatPump(MSHeatPumpNum).HeatCoolMode = ModeOfOperation::Unassigned;
         }
 
         // Determine the staged status
@@ -2445,11 +2440,11 @@ namespace HVACMultiSpeedHeatPump {
             if (QZnReq > SmallLoad && !CurDeadBandOrSetback(ZoneNum)) {
                 CompOnMassFlow = MSHeatPump(MSHeatPumpNum).HeatMassFlowRate(1);
                 CompOnFlowRatio = MSHeatPump(MSHeatPumpNum).HeatingSpeedRatio(1);
-                MSHeatPump(MSHeatPumpNum).LastMode = HeatingMode;
+                MSHeatPump(MSHeatPumpNum).LastMode = ModeOfOperation::HeatingMode;
             } else if (QZnReq < (-1.0 * SmallLoad) && !CurDeadBandOrSetback(ZoneNum)) {
                 CompOnMassFlow = MSHeatPump(MSHeatPumpNum).CoolMassFlowRate(1);
                 CompOnFlowRatio = MSHeatPump(MSHeatPumpNum).CoolingSpeedRatio(1);
-                MSHeatPump(MSHeatPumpNum).LastMode = CoolingMode;
+                MSHeatPump(MSHeatPumpNum).LastMode = ModeOfOperation::CoolingMode;
             } else {
                 CompOnMassFlow = MSHeatPump(MSHeatPumpNum).IdleMassFlowRate;
                 CompOnFlowRatio = MSHeatPump(MSHeatPumpNum).IdleSpeedRatio;
@@ -2479,7 +2474,7 @@ namespace HVACMultiSpeedHeatPump {
                 Node(MSHeatPump(MSHeatPumpNum).AirInletNodeNum).MassFlowRate = CompOnMassFlow;
                 PartLoadFrac = 0.0;
             } else {
-                if (MSHeatPump(MSHeatPumpNum).HeatCoolMode != 0) {
+                if (MSHeatPump(MSHeatPumpNum).HeatCoolMode != ModeOfOperation::Unassigned) {
                     PartLoadFrac = 1.0;
                 } else {
                     PartLoadFrac = 0.0;
@@ -2495,7 +2490,7 @@ namespace HVACMultiSpeedHeatPump {
 
         // Check availability of DX coils
         if (GetCurrentScheduleValue(state, MSHeatPump(MSHeatPumpNum).AvaiSchedPtr) > 0.0) {
-            if (MSHeatPump(MSHeatPumpNum).HeatCoolMode == CoolingMode) {
+            if (MSHeatPump(MSHeatPumpNum).HeatCoolMode == ModeOfOperation::CoolingMode) {
                 CoilAvailSchPtr = GetDXCoilAvailSchPtr( // TODO: Why isn't this stored on the struct?
                     state,
                     "Coil:Cooling:DX:MultiSpeed",
@@ -2522,7 +2517,7 @@ namespace HVACMultiSpeedHeatPump {
                     }
                 }
             }
-            if (MSHeatPump(MSHeatPumpNum).HeatCoolMode == HeatingMode && MSHeatPump(MSHeatPumpNum).HeatCoilType == MultiSpeedHeatingCoil) {
+            if (MSHeatPump(MSHeatPumpNum).HeatCoolMode == ModeOfOperation::HeatingMode && MSHeatPump(MSHeatPumpNum).HeatCoilType == MultiSpeedHeatingCoil) {
                 CoilAvailSchPtr = GetDXCoilAvailSchPtr(state,
                                                        "Coil:Heating:DX:MultiSpeed",
                                                        MSHeatPump(MSHeatPumpNum).DXHeatCoilName,
@@ -2572,7 +2567,7 @@ namespace HVACMultiSpeedHeatPump {
             return;
         }
 
-        if ((MSHeatPump(MSHeatPumpNum).HeatCoolMode == 0 && MSHeatPump(MSHeatPumpNum).OpMode == CycFanCycCoil) || CompOnMassFlow == 0.0) {
+        if ((MSHeatPump(MSHeatPumpNum).HeatCoolMode == ModeOfOperation::Unassigned && MSHeatPump(MSHeatPumpNum).OpMode == CycFanCycCoil) || CompOnMassFlow == 0.0) {
             QZnReq = 0.0;
             PartLoadFrac = 0.0;
             Node(InNode).MassFlowRate = 0.0;
@@ -2965,14 +2960,14 @@ namespace HVACMultiSpeedHeatPump {
         // Get full load result
         PartLoadFrac = 1.0;
         SpeedRatio = 1.0;
-        if (MSHeatPump(MSHeatPumpNum).HeatCoolMode == HeatingMode) {
+        if (MSHeatPump(MSHeatPumpNum).HeatCoolMode == ModeOfOperation::HeatingMode) {
             SpeedNum = MSHeatPump(MSHeatPumpNum).NumOfSpeedHeating;
             if (MSHeatPump(MSHeatPumpNum).Staged && std::abs(MSHeatPump(MSHeatPumpNum).StageNum) < SpeedNum) {
                 SpeedNum = std::abs(MSHeatPump(MSHeatPumpNum).StageNum);
                 if (SpeedNum == 1) SpeedRatio = 0.0;
             }
         }
-        if (MSHeatPump(MSHeatPumpNum).HeatCoolMode == CoolingMode) {
+        if (MSHeatPump(MSHeatPumpNum).HeatCoolMode == ModeOfOperation::CoolingMode) {
             SpeedNum = MSHeatPump(MSHeatPumpNum).NumOfSpeedCooling;
             if (MSHeatPump(MSHeatPumpNum).Staged && std::abs(MSHeatPump(MSHeatPumpNum).StageNum) < SpeedNum) {
                 SpeedNum = std::abs(MSHeatPump(MSHeatPumpNum).StageNum);
@@ -4088,15 +4083,15 @@ namespace HVACMultiSpeedHeatPump {
 
         MSHeatPump(MSHeatPumpNum).AuxElecPower =
             MSHeatPump(MSHeatPumpNum).AuxOnCyclePower * SaveCompressorPLR + MSHeatPump(MSHeatPumpNum).AuxOffCyclePower * (1.0 - SaveCompressorPLR);
-        if (MSHeatPump(MSHeatPumpNum).HeatCoolMode == CoolingMode) {
+        if (MSHeatPump(MSHeatPumpNum).HeatCoolMode == ModeOfOperation::CoolingMode) {
             MSHeatPumpReport(MSHeatPumpNum).AuxElecCoolConsumption =
                 MSHeatPump(MSHeatPumpNum).AuxOnCyclePower * SaveCompressorPLR * ReportingConstant;
         }
-        if (MSHeatPump(MSHeatPumpNum).HeatCoolMode == HeatingMode) {
+        if (MSHeatPump(MSHeatPumpNum).HeatCoolMode == ModeOfOperation::HeatingMode) {
             MSHeatPumpReport(MSHeatPumpNum).AuxElecHeatConsumption =
                 MSHeatPump(MSHeatPumpNum).AuxOnCyclePower * SaveCompressorPLR * ReportingConstant;
         }
-        if (MSHeatPump(MSHeatPumpNum).LastMode == HeatingMode) {
+        if (MSHeatPump(MSHeatPumpNum).LastMode == ModeOfOperation::HeatingMode) {
             MSHeatPumpReport(MSHeatPumpNum).AuxElecHeatConsumption +=
                 MSHeatPump(MSHeatPumpNum).AuxOffCyclePower * (1.0 - SaveCompressorPLR) * ReportingConstant;
         } else {
@@ -4244,7 +4239,7 @@ namespace HVACMultiSpeedHeatPump {
         MSHPMassFlowRateHigh = 0.0; // Mass flow rate at high speed
 
         if (!CurDeadBandOrSetback(MSHeatPump(MSHeatPumpNum).ControlZoneNum) && present(SpeedNum)) {
-            if (MSHeatPump(MSHeatPumpNum).HeatCoolMode == HeatingMode) {
+            if (MSHeatPump(MSHeatPumpNum).HeatCoolMode == ModeOfOperation::HeatingMode) {
                 if (SpeedNum == 1) {
                     CompOnMassFlow = MSHeatPump(MSHeatPumpNum).HeatMassFlowRate(SpeedNum);
                     CompOnFlowRatio = MSHeatPump(MSHeatPumpNum).HeatingSpeedRatio(SpeedNum);
@@ -4258,7 +4253,7 @@ namespace HVACMultiSpeedHeatPump {
                     MSHPMassFlowRateLow = MSHeatPump(MSHeatPumpNum).HeatMassFlowRate(SpeedNum - 1);
                     MSHPMassFlowRateHigh = MSHeatPump(MSHeatPumpNum).HeatMassFlowRate(SpeedNum);
                 }
-            } else if (MSHeatPump(MSHeatPumpNum).HeatCoolMode == CoolingMode) {
+            } else if (MSHeatPump(MSHeatPumpNum).HeatCoolMode == ModeOfOperation::CoolingMode) {
                 if (SpeedNum == 1) {
                     CompOnMassFlow = MSHeatPump(MSHeatPumpNum).CoolMassFlowRate(SpeedNum);
                     CompOnFlowRatio = MSHeatPump(MSHeatPumpNum).CoolingSpeedRatio(SpeedNum);
@@ -4278,8 +4273,8 @@ namespace HVACMultiSpeedHeatPump {
 
         // Set up fan flow rate during compressor off time
         if (MSHeatPump(MSHeatPumpNum).OpMode == ContFanCycCoil && present(SpeedNum)) {
-            if (MSHeatPump(MSHeatPumpNum).AirFlowControl == UseCompressorOnFlow && CompOnMassFlow > 0.0) {
-                if (MSHeatPump(MSHeatPumpNum).LastMode == HeatingMode) {
+            if (MSHeatPump(MSHeatPumpNum).AirFlowControl == AirflowControl::UseCompressorOnFlow && CompOnMassFlow > 0.0) {
+                if (MSHeatPump(MSHeatPumpNum).LastMode == ModeOfOperation::HeatingMode) {
                     CompOffMassFlow = MSHeatPump(MSHeatPumpNum).HeatMassFlowRate(SpeedNum);
                     CompOffFlowRatio = MSHeatPump(MSHeatPumpNum).HeatingSpeedRatio(SpeedNum);
                 } else {

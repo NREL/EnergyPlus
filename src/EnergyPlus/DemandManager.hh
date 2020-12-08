@@ -48,6 +48,9 @@
 #ifndef DemandManager_hh_INCLUDED
 #define DemandManager_hh_INCLUDED
 
+// C++ Headers
+#include <unordered_map>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 

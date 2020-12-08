@@ -1043,8 +1043,8 @@ namespace PlantHeatExchangerFluidToFluid {
             this->SupplySideLoop.MaxLoad = std::abs(this->HeatTransferRate);
         }
         if (DataPlant::PlantFinalSizesOkayToReport) {
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchMechType, this->Name, "HeatExchanger:FluidToFluid");
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchMechNomCap, this->Name, this->SupplySideLoop.MaxLoad);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechType, this->Name, "HeatExchanger:FluidToFluid");
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechNomCap, this->Name, this->SupplySideLoop.MaxLoad);
         }
     }
 
