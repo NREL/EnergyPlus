@@ -57,6 +57,9 @@
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+
 namespace MixerComponent {
 
     // Using/Aliasing
@@ -115,12 +118,12 @@ namespace MixerComponent {
 
     void clear_state();
 
-    void SimAirMixer(std::string const &CompName, int &CompIndex);
+    void SimAirMixer(EnergyPlusData &state, std::string const &CompName, int &CompIndex);
 
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetMixerInput();
+    void GetMixerInput(EnergyPlusData &state);
 
     // End of Get Input subroutines for the HB Module
     //******************************************************************************
@@ -144,7 +147,7 @@ namespace MixerComponent {
     // Beginning of Update subroutines for the Mixer Module
     // *****************************************************************************
 
-    void UpdateAirMixer(int const MixerNum);
+    void UpdateAirMixer(EnergyPlusData &state, int const MixerNum);
 
     //        End of Update subroutines for the Mixer Module
     // *****************************************************************************
@@ -159,9 +162,9 @@ namespace MixerComponent {
 
     // Beginning of Utility subroutines for the Mixer Component
     // *****************************************************************************
-    void GetZoneMixerIndex(std::string const &MixerName, int &MixerIndex, bool &ErrorsFound, std::string const &ThisObjectType = std::string());
+    void GetZoneMixerIndex(EnergyPlusData &state, std::string const &MixerName, int &MixerIndex, bool &ErrorsFound, std::string const &ThisObjectType = std::string());
 
-    int getZoneMixerIndexFromInletNode(int const &InNodeNum);
+    int getZoneMixerIndexFromInletNode(EnergyPlusData &state, int const &InNodeNum);
 
     // End of Utility subroutines for the Mixer Component
     // *****************************************************************************

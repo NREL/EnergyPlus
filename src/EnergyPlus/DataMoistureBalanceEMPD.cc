@@ -47,7 +47,6 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataMoistureBalanceEMPD.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 
 namespace EnergyPlus {
 
@@ -64,7 +63,6 @@ namespace DataMoistureBalanceEMPD {
     // moisture level at interior surfaces
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
 
     // Data
     // module should be available to other modules and routines.  Thus,

@@ -65,6 +65,7 @@
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::CrossVentMgr;
@@ -74,12 +75,12 @@ TEST_F(EnergyPlusFixture, CrossVentMgr_EvolveParaUCSDCV_Test)
 {
 
     // set up all conditions entering the EvolveParaUCSDCV when using the Issue #5520 test file on hitcount 9925 (where it used to crash)
-    int NumOfZones = 2;
+    state->dataGlobal->NumOfZones = 2;
     int MaxSurf = 2;
 
-    RecInflowRatio.allocate(NumOfZones);
+    RecInflowRatio.allocate(state->dataGlobal->NumOfZones);
 
-    AirflowNetworkSurfaceUCSDCV.allocate({0, MaxSurf}, NumOfZones);
+    AirflowNetworkSurfaceUCSDCV.allocate({0, MaxSurf}, state->dataGlobal->NumOfZones);
     AirflowNetworkSurfaceUCSDCV(1, 1) = 1;
     AirflowNetworkSurfaceUCSDCV(0, 1) = 1;
     AirflowNetworkSurfaceUCSDCV(0, 2) = 2;
@@ -118,9 +119,9 @@ TEST_F(EnergyPlusFixture, CrossVentMgr_EvolveParaUCSDCV_Test)
     EnergyPlus::AirflowNetwork::AirflowNetworkLinkSimu.allocate(1);
     EnergyPlus::AirflowNetwork::AirflowNetworkLinkSimu(1).VolFLOW2 = 27.142934345451458;
 
-    EnergyPlus::DataEnvironment::WindDir = 271.66666666666669;
+    state->dataEnvrn->WindDir = 271.66666666666669;
 
-    EnergyPlus::DataRoomAirModel::AirModel.allocate(NumOfZones);
+    EnergyPlus::DataRoomAirModel::AirModel.allocate(state->dataGlobal->NumOfZones);
 
     EnergyPlus::AirflowNetwork::AirflowNetworkLinkageData.allocate(2);
     EnergyPlus::AirflowNetwork::AirflowNetworkLinkageData(1).CompNum = 1;
@@ -152,24 +153,24 @@ TEST_F(EnergyPlusFixture, CrossVentMgr_EvolveParaUCSDCV_Test)
     EnergyPlus::DataUCSDSharedData::APos_Wall(3) = 8;
     EnergyPlus::DataUCSDSharedData::APos_Wall(4) = 10;
 
-    EnergyPlus::DataRoomAirModel::Droom.allocate(NumOfZones);
+    EnergyPlus::DataRoomAirModel::Droom.allocate(state->dataGlobal->NumOfZones);
     EnergyPlus::DataRoomAirModel::Droom(1) = 13.631070390838719;
 
-    EnergyPlus::DataRoomAirModel::Dstar.allocate(NumOfZones);
+    EnergyPlus::DataRoomAirModel::Dstar.allocate(state->dataGlobal->NumOfZones);
 
-    EnergyPlus::DataRoomAirModel::Ain.allocate(NumOfZones);
+    EnergyPlus::DataRoomAirModel::Ain.allocate(state->dataGlobal->NumOfZones);
 
-    EnergyPlus::DataRoomAirModel::ZoneUCSDCV.allocate(NumOfZones);
+    EnergyPlus::DataRoomAirModel::ZoneUCSDCV.allocate(state->dataGlobal->NumOfZones);
     EnergyPlus::DataRoomAirModel::ZoneUCSDCV(1).ZonePtr = 1;
 
-    EnergyPlus::DataRoomAirModel::JetRecAreaRatio.allocate(NumOfZones);
-    EnergyPlus::DataRoomAirModel::Ujet.allocate(NumOfZones);
-    EnergyPlus::DataRoomAirModel::Urec.allocate(NumOfZones);
-    EnergyPlus::DataRoomAirModel::Qrec.allocate(NumOfZones);
-    EnergyPlus::DataRoomAirModel::Qtot.allocate(NumOfZones);
-    EnergyPlus::DataRoomAirModel::Tin.allocate(NumOfZones);
+    EnergyPlus::DataRoomAirModel::JetRecAreaRatio.allocate(state->dataGlobal->NumOfZones);
+    EnergyPlus::DataRoomAirModel::Ujet.allocate(state->dataGlobal->NumOfZones);
+    EnergyPlus::DataRoomAirModel::Urec.allocate(state->dataGlobal->NumOfZones);
+    EnergyPlus::DataRoomAirModel::Qrec.allocate(state->dataGlobal->NumOfZones);
+    EnergyPlus::DataRoomAirModel::Qtot.allocate(state->dataGlobal->NumOfZones);
+    EnergyPlus::DataRoomAirModel::Tin.allocate(state->dataGlobal->NumOfZones);
 
-    EvolveParaUCSDCV(1);
+    EvolveParaUCSDCV(*state, 1);
 
     EXPECT_NEAR(27.14, CVJetRecFlows(1, 1).Fin, 0.01);
     EXPECT_NEAR(0.871, CVJetRecFlows(1, 1).Uin, 0.001);

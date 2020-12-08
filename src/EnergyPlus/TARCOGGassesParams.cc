@@ -46,7 +46,6 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // EnergyPlus Headers
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/TARCOGGassesParams.hh>
 
 namespace EnergyPlus {
@@ -74,8 +73,6 @@ namespace TARCOGGassesParams {
     // USE STATEMENTS:
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
-
     // Data
     // Max number of gasses
     int const maxgas(10);

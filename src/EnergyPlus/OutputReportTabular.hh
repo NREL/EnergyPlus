@@ -61,16 +61,15 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 
 namespace EnergyPlus {
 
-    // Forward declarations
-    struct CostEstimateManagerData;
-    struct EnergyPlusData;
-    struct ZoneTempPredictorCorrectorData;
+// Forward declarations
+struct EnergyPlusData;
 
 namespace OutputReportTabular {
 
@@ -217,7 +216,12 @@ namespace OutputReportTabular {
     extern bool displayEconomicResultSummary;
     extern bool displayHeatEmissionsSummary;
     extern bool displayEioSummary;
-
+    extern bool displayThermalResilienceSummary;
+    extern bool displayCO2ResilienceSummary;
+    extern bool displayVisualResilienceSummary;
+    extern bool displayThermalResilienceSummaryExplicitly;
+    extern bool displayCO2ResilienceSummaryExplicitly;
+    extern bool displayVisualResilienceSummaryExplicitly;
     // BEPS Report Related Variables
     // From Report:Table:Predefined - BEPS
     // arrays that hold the meter numbers that are initialized at get input
@@ -699,7 +703,9 @@ namespace OutputReportTabular {
     extern Array1D<UnitConvType> UnitConv;
 
     // Functions
-    void clear_state();
+    void clear_state(EnergyPlusData &state);
+
+    std::ofstream & open_tbl_stream(EnergyPlusData &state, int const iStyle, std::string const & filename, bool output_to_file = true);
 
     void UpdateTabularReports(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
 
@@ -711,35 +717,35 @@ namespace OutputReportTabular {
     //======================================================================================================================
     //======================================================================================================================
 
-    void GetInputTabularMonthly();
+    void GetInputTabularMonthly(EnergyPlusData &state);
 
     int AddMonthlyReport(std::string const &inReportName, int const inNumDigitsShown);
 
     void AddMonthlyFieldSetInput(int const inMonthReport, std::string const &inVariMeter, std::string const &inColHead, int const inAggregate);
 
-    void InitializeTabularMonthly();
+    void InitializeTabularMonthly(EnergyPlusData &state);
 
-    bool isInvalidAggregationOrder();
+    bool isInvalidAggregationOrder(EnergyPlusData &state);
 
-    void GetInputTabularTimeBins();
+    void GetInputTabularTimeBins(EnergyPlusData &state);
 
-    bool warningAboutKeyNotFound(int foundIndex, int inObjIndex, std::string const &moduleName);
+    bool warningAboutKeyNotFound(EnergyPlusData &state, int foundIndex, int inObjIndex, std::string const &moduleName);
 
-    void GetInputTabularStyle(IOFiles &ioFiles);
+    void GetInputTabularStyle(EnergyPlusData &state);
 
     int SetUnitsStyleFromString(std::string const &unitStringIn);
 
-    void GetInputOutputTableSummaryReports();
+    void GetInputOutputTableSummaryReports(EnergyPlusData &state);
 
-    bool isCompLoadRepReq();
+    bool isCompLoadRepReq(EnergyPlusData &state);
 
-    bool hasSizingPeriodsDays();
+    bool hasSizingPeriodsDays(EnergyPlusData &state);
 
-    void InitializePredefinedMonthlyTitles();
+    void InitializePredefinedMonthlyTitles(EnergyPlusData &state);
 
     void CreatePredefinedMonthlyReports();
 
-    void GetInputFuelAndPollutionFactors();
+    void GetInputFuelAndPollutionFactors(EnergyPlusData &state);
 
     //======================================================================================================================
     //======================================================================================================================
@@ -749,7 +755,7 @@ namespace OutputReportTabular {
     //======================================================================================================================
     //======================================================================================================================
 
-    void OpenOutputTabularFile();
+    void OpenOutputTabularFile(EnergyPlusData &state);
 
     void CloseOutputTabularFile();
 
@@ -763,17 +769,17 @@ namespace OutputReportTabular {
     //======================================================================================================================
     //======================================================================================================================
 
-    void GatherBinResultsForTimestep(OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
+    void GatherBinResultsForTimestep(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
 
-    void GatherMonthlyResultsForTimestep(OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
+    void GatherMonthlyResultsForTimestep(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
 
     void GatherBEPSResultsForTimestep(OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
 
-    void GatherSourceEnergyEndUseResultsForTimestep(OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
+    void GatherSourceEnergyEndUseResultsForTimestep(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
 
-    void GatherPeakDemandForTimestep(OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
+    void GatherPeakDemandForTimestep(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
 
-    void GatherHeatGainReport(OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
+    void GatherHeatGainReport(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
 
     void GatherHeatEmissionReport(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType);
 
@@ -791,7 +797,7 @@ namespace OutputReportTabular {
 
     void parseStatLine(const std::string & lineIn, StatLineType &lineType, bool & desConditionlinepassed, bool & heatingDesignlinepassed, bool & coolingDesignlinepassed, bool & isKoppen);
 
-    void FillWeatherPredefinedEntries(IOFiles &ioFiles);
+    void FillWeatherPredefinedEntries(EnergyPlusData &state);
 
     std::string GetColumnUsingTabs(std::string const &inString, // Input String
                                    int const colNum             // Column number
@@ -799,56 +805,72 @@ namespace OutputReportTabular {
 
     void FillRemainingPredefinedEntries(EnergyPlusData &state);
 
-    void WriteMonthlyTables(CostEstimateManagerData &dataCostEstimateManager);
+    void WriteMonthlyTables(EnergyPlusData &state);
 
-    void WriteTimeBinTables(CostEstimateManagerData &dataCostEstimateManager);
+    void WriteTimeBinTables(EnergyPlusData &state);
 
-    void WriteBEPSTable(CostEstimateManagerData &dataCostEstimateManager,
-                        ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector);
+    void WriteBEPSTable(EnergyPlusData &state);
 
     std::string ResourceWarningMessage(std::string resource);
 
     Real64 WaterConversionFunct(Real64 WaterTotal, Real64 ConversionFactor);
 
-    void WriteSourceEnergyEndUseSummary(CostEstimateManagerData &dataCostEstimateManager);
+    void WriteSourceEnergyEndUseSummary(EnergyPlusData &state);
 
-    void WriteDemandEndUseSummary(CostEstimateManagerData &dataCostEstimateManager);
+    void WriteDemandEndUseSummary(EnergyPlusData &state);
 
-    void WriteCompCostTable(CostEstimateManagerData &dataCostEstimateManager);
+    void WriteCompCostTable(EnergyPlusData &state);
 
-    void WriteVeriSumTable(CostEstimateManagerData &dataCostEstimateManager, IOFiles &ioFiles);
+    void WriteVeriSumTable(EnergyPlusData &state);
 
-    void WriteAdaptiveComfortTable(CostEstimateManagerData &dataCostEstimateManager);
+    void WriteAdaptiveComfortTable(EnergyPlusData &state);
 
-    void WriteHeatEmissionTable(CostEstimateManagerData &dataCostEstimateManager);
+    void WriteThermalResilienceTables(EnergyPlusData &state);
 
-    void WritePredefinedTables(CostEstimateManagerData &dataCostEstimateManager);
+    void WriteCO2ResilienceTables(EnergyPlusData &state);
 
-    void WriteComponentSizing(CostEstimateManagerData &dataCostEstimateManager);
+    void WriteVisualResilienceTables(EnergyPlusData &state);
 
-    void WriteSurfaceShadowing(CostEstimateManagerData &dataCostEstimateManager);
+    void WriteResilienceBinsTable(EnergyPlusData &state,
+                                  int const columnNum,
+                                  std::vector<int> const &columnHead,
+                                  Array1D<std::vector<Real64>> const &ZoneBins);
 
-    void WriteEioTables(CostEstimateManagerData &dataCostEstimateManager, IOFiles &ioFiles);
+    void WriteSETHoursTable(EnergyPlusData &state,
+                            int const columnNum,
+                            std::vector<std::string> const &columnHead,
+                            Array1D<std::vector<Real64>> const &ZoneBins);
 
-    int unitsFromHeading(std::string &heading);
+    void WriteHeatEmissionTable(EnergyPlusData &state);
+
+    void WritePredefinedTables(EnergyPlusData &state);
+
+    void WriteComponentSizing(EnergyPlusData &state);
+
+    void WriteSurfaceShadowing(EnergyPlusData &state);
+
+    void WriteEioTables(EnergyPlusData &state);
+
+    int unitsFromHeading(EnergyPlusData &state, std::string &heading);
 
     std::vector<std::string> splitCommaString(std::string const &inputString);
 
-    void AddTOCLoadComponentTableSummaries();
+    void AddTOCLoadComponentTableSummaries(EnergyPlusData &state);
 
-    void AllocateLoadComponentArrays();
+    void AllocateLoadComponentArrays(EnergyPlusData &state);
 
     void DeallocateLoadComponentArrays();
 
-    void ComputeLoadComponentDecayCurve(IOFiles &ioFiles);
+    void ComputeLoadComponentDecayCurve(EnergyPlusData &state);
 
-    void GatherComponentLoadsSurface();
+    void GatherComponentLoadsSurface(EnergyPlusData &state);
 
-    void GatherComponentLoadsHVAC();
+    void GatherComponentLoadsHVAC(EnergyPlusData &state);
 
-    void WriteLoadComponentSummaryTables(CostEstimateManagerData &dataCostEstimateManager);
+    void WriteLoadComponentSummaryTables(EnergyPlusData &state);
 
-    void GetDelaySequences(int const &desDaySelected,
+    void GetDelaySequences(EnergyPlusData &state,
+                           int const &desDaySelected,
                            bool const &isCooling,
                            int const &zoneIndex,
                            Array1D<Real64> &peopleDelaySeq,
@@ -862,7 +884,8 @@ namespace OutputReportTabular {
 
     Real64 MovingAvgAtMaxTime(Array1S<Real64> const &dataSeq, int const &numTimeSteps, int const &maxTimeStep);
 
-    void ComputeTableBodyUsingMovingAvg(Array2D<Real64> &resultCells,
+    void ComputeTableBodyUsingMovingAvg(EnergyPlusData &state,
+                                        Array2D<Real64> &resultCells,
                                         Array2D_bool &resultCellsUsed,
                                         int const &desDaySelected,
                                         int const &timeOfMax,
@@ -876,12 +899,12 @@ namespace OutputReportTabular {
                                         Array3D<Real64> const &feneCondInstantSeqLoc,
                                         Array2D<Real64> const &surfDelaySeq);
 
-    void CollectPeakZoneConditions(
+    void CollectPeakZoneConditions(EnergyPlusData &state,
         CompLoadTablesType &compLoad, int const &desDaySelected, int const &timeOfMax, int const &zoneIndex, bool const &isCooling);
 
     void ComputeEngineeringChecks(CompLoadTablesType &compLoad);
 
-    void GetZoneComponentAreas(Array1D<ZompComponentAreasType> &areas);
+    void GetZoneComponentAreas(EnergyPlusData &state, Array1D<ZompComponentAreasType> &areas);
 
     void AddAreaColumnForZone(int const &zoneNum, Array1D<ZompComponentAreasType> const &compAreas, CompLoadTablesType &compLoadTotal);
 
@@ -891,11 +914,11 @@ namespace OutputReportTabular {
 
     void ComputePeakDifference(CompLoadTablesType &compLoad);
 
-    void LoadSummaryUnitConversion(CompLoadTablesType &compLoadTotal);
+    void LoadSummaryUnitConversion(EnergyPlusData &state, CompLoadTablesType &compLoadTotal);
 
-    void CreateListOfZonesForAirLoop(CompLoadTablesType &compLoad, Array1D_int const &zoneToAirLoop, int const &curAirLoop);
+    void CreateListOfZonesForAirLoop(EnergyPlusData &state, CompLoadTablesType &compLoad, Array1D_int const &zoneToAirLoop, int const &curAirLoop);
 
-    void OutputCompLoadSummary(CostEstimateManagerData &dataCostEstimateManager,
+    void OutputCompLoadSummary(EnergyPlusData &state,
                                int const &kind, // zone=1, airloop=2, facility=3
                                CompLoadTablesType const &compLoadCool,
                                CompLoadTablesType const &compLoadHeat,
@@ -907,7 +930,7 @@ namespace OutputReportTabular {
 
     void WriteTextLine(std::string const &lineOfText, Optional_bool_const isBold = _);
 
-    void WriteTable(CostEstimateManagerData &dataCostEstimateManager,
+    void WriteTable(EnergyPlusData &state,
                     Array2S_string const body, // row,column
                     const Array1D_string &rowLabels,
                     const Array1D_string &columnLabels,
@@ -917,7 +940,7 @@ namespace OutputReportTabular {
 
     std::string MakeAnchorName(std::string const &reportString, std::string const &objectString);
 
-    std::string InsertCurrencySymbol(CostEstimateManagerData &dataCostEstimateManager,
+    std::string InsertCurrencySymbol(EnergyPlusData &state,
                                      std::string const &inString, // Input String
                                      bool const isHTML            // True if an HTML string
     );
@@ -928,7 +951,7 @@ namespace OutputReportTabular {
 
     std::string ConvertToEscaped(std::string const &inString); // Input String
 
-    void DetermineBuildingFloorArea();
+    void DetermineBuildingFloorArea(EnergyPlusData &state);
 
     /* Tables with Subcategories in particular have a blank for rowHead for display in the HTML output.
      * This routine will fill up the blanks for output to Sql in particular */
@@ -942,7 +965,7 @@ namespace OutputReportTabular {
     //======================================================================================================================
     //======================================================================================================================
 
-    void ResetTabularReports();
+    void ResetTabularReports(EnergyPlusData &state);
 
     void ResetMonthlyGathering();
 
@@ -954,9 +977,9 @@ namespace OutputReportTabular {
 
     void ResetPeakDemandGathering();
 
-    void ResetHeatGainGathering();
+    void ResetHeatGainGathering(EnergyPlusData &state);
 
-    void ResetRemainingPredefinedEntries();
+    void ResetRemainingPredefinedEntries(EnergyPlusData &state);
 
     void ResetAdaptiveComfort();
 
@@ -1006,7 +1029,7 @@ namespace OutputReportTabular {
 
     std::string GetUnitSubString(std::string const &inString); // Input String
 
-    void LookupSItoIP(std::string const &stringInWithSI, int &unitConvIndex, std::string &stringOutWithIP);
+    void LookupSItoIP(EnergyPlusData &state, std::string const &stringInWithSI, int &unitConvIndex, std::string &stringOutWithIP);
 
     void LookupJtokWH(std::string const &stringInWithJ, int &unitConvIndex, std::string &stringOutWithKWH);
 
@@ -1016,9 +1039,9 @@ namespace OutputReportTabular {
 
     void GetUnitConversion(int const unitConvIndex, Real64 &multiplier, Real64 &offset, std::string &IPunit);
 
-    Real64 getSpecificUnitMultiplier(std::string const &SIunit, std::string const &IPunit);
+    Real64 getSpecificUnitMultiplier(EnergyPlusData &state, std::string const &SIunit, std::string const &IPunit);
 
-    Real64 getSpecificUnitDivider(std::string const &SIunit, std::string const &IPunit);
+    Real64 getSpecificUnitDivider(EnergyPlusData &state, std::string const &SIunit, std::string const &IPunit);
 
     Real64 getSpecificUnitIndex(std::string const &SIunit, std::string const &IPunit);
 

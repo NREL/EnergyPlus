@@ -132,7 +132,9 @@
     No,                      !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
     No,                      !- Run Simulation for Sizing Periods
-    Yes;                     !- Run Simulation for Weather File Run Periods
+    Yes,                     !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
 !-   ===========  ALL OBJECTS IN CLASS: BUILDING ===========
 
@@ -2379,7 +2381,7 @@
 
   Output:Variable,*,Zone Predicted Moisture Load Moisture Transfer Rate,timestep;
 
-  Output:Variable,*,Cooling Coil Electric Energy,timestep;
+  Output:Variable,*,Cooling Coil Electricity Energy,timestep;
 
   Output:Variable,*,Heating Coil Heating Rate,timestep;
 
@@ -2407,29 +2409,29 @@
 
   Output:Variable,*,Refrigeration Case Return Air Latent Rate,timestep;
 
-  Output:Variable,*,Refrigeration Case Evaporator Fan Electric Power,timestep;
+  Output:Variable,*,Refrigeration Case Evaporator Fan Electricity Rate,timestep;
 
-  Output:Variable,*,Refrigeration Case Anti Sweat Electric Power,timestep;
+  Output:Variable,*,Refrigeration Case Anti Sweat Electricity Rate,timestep;
 
-  Output:Variable,*,Refrigeration Case Lighting Electric Power,timestep;
+  Output:Variable,*,Refrigeration Case Lighting Electricity Rate,timestep;
 
-  Output:Variable,*,Refrigeration Case Defrost Electric Power,timestep;
+  Output:Variable,*,Refrigeration Case Defrost Electricity Rate,timestep;
 
   Output:Variable,*,Refrigeration Case Defrost Energy Correction Curve Value,timestep;
 
   Output:Variable,*,Refrigeration Case Latent Credit Curve Value,timestep;
 
-  Output:Variable,*,Refrigeration Compressor Rack Electric Power,timestep;
+  Output:Variable,*,Refrigeration Compressor Rack Electricity Rate,timestep;
 
   Output:Variable,*,Refrigeration Compressor Rack Total Heat Transfer Rate,timestep;
 
   Output:Variable,*,Refrigeration Compressor Rack COP,timestep;
 
-  Output:Variable,*,Zone Lights Electric Energy,timestep;
+  Output:Variable,*,Zone Lights Electricity Energy,timestep;
 
-  Output:Variable,*,Zone Electric Equipment Electric Energy,timestep;
+  Output:Variable,*,Zone Electric Equipment Electricity Energy,timestep;
 
-  Output:Variable,*,Fan Electric Energy,timestep;
+  Output:Variable,*,Fan Electricity Energy,timestep;
 
   Output:Variable,SALESFLOOR OUTLET NODE,System Node Temperature,timestep;
 
@@ -2459,13 +2461,13 @@
 
   Output:Meter:MeterFileOnly,Electricity:Plant,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,monthly;
 
   Output:Meter:MeterFileOnly,Refrigeration:Electricity,monthly;
 
   Output:Meter:MeterFileOnly,InteriorLights:Electricity,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,runperiod;
 
   output:diagnostics,
     displayallwarnings;      !- Key 1

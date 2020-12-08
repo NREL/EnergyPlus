@@ -51,16 +51,19 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataVectorTypes.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+
+#include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::DataVectorTypes;
 using namespace ObjexxFCL;
 
-TEST(VectorTest, Basic)
+TEST_F(EnergyPlusFixture, VectorTest_Basic)
 {
-    ShowMessage("Begin Test: VectorTest, Basic");
+    ShowMessage(*state, "Begin Test: VectorTest, Basic");
     {
         Vector v(0.0, 0.0, 0.0);
         EXPECT_EQ(0.0, v.x);

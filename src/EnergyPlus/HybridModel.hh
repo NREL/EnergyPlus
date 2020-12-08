@@ -57,6 +57,9 @@
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+
 namespace HybridModel {
 
     // Using/Aliasing
@@ -128,7 +131,7 @@ namespace HybridModel {
 
     // Functions
 
-    void GetHybridModelZone();
+    void GetHybridModelZone(EnergyPlusData &state);
 
     void clear_state();
 

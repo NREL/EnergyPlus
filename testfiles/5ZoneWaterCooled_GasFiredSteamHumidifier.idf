@@ -210,7 +210,9 @@
     Yes,                     !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
     No,                      !- Run Simulation for Sizing Periods
-    Yes;                     !- Run Simulation for Weather File Run Periods
+    Yes,                     !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
 ! Using Design Conditions from "Climate Design Data 2009 ASHRAE Handbook"
 
@@ -3630,15 +3632,15 @@
 
   Output:Variable,*,Chiller Evaporator Cooling Rate,hourly;
 
-  Output:Variable,*,Humidifier Gas USe Rate,hourly;
+  Output:Variable,*,Humidifier NaturalGas Rate,hourly;
 
-  Output:Variable,*,Humidifier Gas Use Energy,hourly;
+  Output:Variable,*,Humidifier NaturalGas Energy,hourly;
 
-  Output:Variable,*,Humidifier Auxiliary Electric Power,hourly;
+  Output:Variable,*,Humidifier Auxiliary Electricity Rate,hourly;
 
-  Output:Variable,*,Humidifier Auxiliary Electric Energy,hourly;
+  Output:Variable,*,Humidifier Auxiliary Electricity Energy,hourly;
 
-  Output:Variable,*,Air System Humidifier Gas Energy,hourly;
+  Output:Variable,*,Air System Humidifier NaturalGas Energy,hourly;
 
   Output:VariableDictionary,Regular;
 
@@ -3654,9 +3656,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:Plant,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Plant,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Plant,monthly;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,runperiod;
 
@@ -3668,13 +3670,13 @@
 
   Output:Meter:MeterFileOnly,Electricity:Plant,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:Plant,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:Plant,runperiod;
 
-  Output:Meter,Humidifier:Gas,monthly;
+  Output:Meter,Humidifier:NaturalGas,monthly;
 
-  Output:Meter,Humidifier:Gas,runperiod;
+  Output:Meter,Humidifier:NaturalGas,runperiod;
 
   Output:Meter,Humidifier:Electricity,monthly;
 

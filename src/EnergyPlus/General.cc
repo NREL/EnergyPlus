@@ -55,6 +55,7 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -62,11 +63,11 @@
 #include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 // TODO: move DetermineMinuteForReporting to avoid bringing this one in
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/WeatherManager.hh>
 
 #if defined(_WIN32) && _MSC_VER < 1900
 #define snprintf _snprintf
@@ -134,7 +135,7 @@ namespace General {
     bool LineRpt(false);
     bool VarDict(false);
     bool EMSoutput(false);
-    
+
     void clear_state() {
         GetReportInput = true;
         SurfVert = false;
@@ -1039,9 +1040,6 @@ namespace General {
         // na
 
         // Using/Aliasing
-        using DataGlobals::Pi;
-        using DataGlobals::PiOvr2;
-
         // Return value
         Real64 InterpBlind;
 
@@ -1052,7 +1050,7 @@ namespace General {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETER DEFINITIONS:
-        Real64 const DeltaAngRad(Pi / 36.0); // Profile angle increment (rad)
+        Real64 const DeltaAngRad(DataGlobalConstants::Pi() / 36.0); // Profile angle increment (rad)
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -1064,11 +1062,11 @@ namespace General {
         Real64 InterpFac; // Interpolation factor
         int IAlpha;       // Profile angle index
 
-        if (ProfAng > PiOvr2 || ProfAng < -PiOvr2) {
+        if (ProfAng > DataGlobalConstants::PiOvr2() || ProfAng < -DataGlobalConstants::PiOvr2()) {
             InterpBlind = 0.0;
         } else {
-            IAlpha = 1 + int((ProfAng + PiOvr2) / DeltaAngRad);
-            InterpFac = (ProfAng - (-PiOvr2 + DeltaAngRad * (IAlpha - 1))) / DeltaAngRad;
+            IAlpha = 1 + int((ProfAng + DataGlobalConstants::PiOvr2()) / DeltaAngRad);
+            InterpFac = (ProfAng - (-DataGlobalConstants::PiOvr2() + DeltaAngRad * (IAlpha - 1))) / DeltaAngRad;
             InterpBlind = (1.0 - InterpFac) * PropArray(IAlpha) + InterpFac * PropArray(IAlpha + 1);
         }
         return InterpBlind;
@@ -1094,9 +1092,6 @@ namespace General {
         // REFERENCES:na
 
         // Using/Aliasing
-        using DataGlobals::Pi;
-        using DataGlobals::PiOvr2;
-
         // Return value
         Real64 InterpProfAng;
 
@@ -1104,18 +1099,18 @@ namespace General {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETER DEFINITIONS:
-        Real64 const DeltaAngRad(Pi / 36.0); // Profile angle increment (rad)
+        Real64 const DeltaAngRad(DataGlobalConstants::Pi() / 36.0); // Profile angle increment (rad)
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 InterpFac; // Interpolation factor
         int IAlpha;       // Profile angle index
 
         // DeltaAng = Pi/36
-        if (ProfAng > PiOvr2 || ProfAng < -PiOvr2) {
+        if (ProfAng > DataGlobalConstants::PiOvr2() || ProfAng < -DataGlobalConstants::PiOvr2()) {
             InterpProfAng = 0.0;
         } else {
-            IAlpha = 1 + int((ProfAng + PiOvr2) / DeltaAngRad);
-            InterpFac = (ProfAng - (-PiOvr2 + DeltaAngRad * (IAlpha - 1))) / DeltaAngRad;
+            IAlpha = 1 + int((ProfAng + DataGlobalConstants::PiOvr2()) / DeltaAngRad);
+            InterpFac = (ProfAng - (-DataGlobalConstants::PiOvr2() + DeltaAngRad * (IAlpha - 1))) / DeltaAngRad;
             InterpProfAng = (1.0 - InterpFac) * PropArray(IAlpha) + InterpFac * PropArray(IAlpha + 1);
         }
         return InterpProfAng;
@@ -1146,9 +1141,7 @@ namespace General {
     //
     //		// USE STATEMENTS:
     //		// Using/Aliasing
-    //		using DataGlobals::Pi;
-    //		using DataGlobals::PiOvr2;
-    //		using DataSurfaces::MaxSlatAngs;
+    //		//		//		using DataSurfaces::MaxSlatAngs;
     //
     //		// Return value
     //		Real64 InterpSlatAng;
@@ -1209,7 +1202,6 @@ namespace General {
         // REFERENCES:na
 
         // Using/Aliasing
-        using DataGlobals::Pi;
         using DataSurfaces::MaxSlatAngs;
 
         // Return value
@@ -1219,19 +1211,19 @@ namespace General {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETER DEFINITIONS:
-        static Real64 const DeltaAng(Pi / (double(MaxSlatAngs) - 1.0));
-        static Real64 const DeltaAng_inv((double(MaxSlatAngs) - 1.0) / Pi);
+        static Real64 const DeltaAng(DataGlobalConstants::Pi() / (double(MaxSlatAngs) - 1.0));
+        static Real64 const DeltaAng_inv((double(MaxSlatAngs) - 1.0) / DataGlobalConstants::Pi());
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 InterpFac; // Interpolation factor
         int IBeta;        // Slat angle index
         Real64 SlatAng1;
 
-        if (SlatAng > Pi || SlatAng < 0.0) {
+        if (SlatAng > DataGlobalConstants::Pi() || SlatAng < 0.0) {
             //  InterpSlatAng = 0.0
             //  RETURN
             // END IF
-            SlatAng1 = min(max(SlatAng, 0.0), Pi);
+            SlatAng1 = min(max(SlatAng, 0.0), DataGlobalConstants::Pi());
         } else {
             SlatAng1 = SlatAng;
         }
@@ -1270,8 +1262,6 @@ namespace General {
         // REFERENCES:na
 
         // Using/Aliasing
-        using DataGlobals::Pi;
-        using DataGlobals::PiOvr2;
         using DataSurfaces::MaxSlatAngs;
 
         // Return value
@@ -1284,8 +1274,8 @@ namespace General {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETER DEFINITIONS:
-        Real64 const DeltaProfAng(Pi / 36.0);
-        Real64 const DeltaSlatAng(Pi / (double(MaxSlatAngs) - 1.0));
+        Real64 const DeltaProfAng(DataGlobalConstants::Pi() / 36.0);
+        Real64 const DeltaSlatAng(DataGlobalConstants::Pi() / (double(MaxSlatAngs) - 1.0));
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 ProfAngRatio; // Profile angle interpolation factor
@@ -1301,21 +1291,21 @@ namespace General {
         Real64 SlatAng1;
         Real64 ProfAng1;
 
-        if (SlatAng > Pi || SlatAng < 0.0 || ProfAng > PiOvr2 || ProfAng < -PiOvr2) {
+        if (SlatAng > DataGlobalConstants::Pi() || SlatAng < 0.0 || ProfAng > DataGlobalConstants::PiOvr2() || ProfAng < -DataGlobalConstants::PiOvr2()) {
             //  InterpProfSlatAng = 0.0
             //  RETURN
-            SlatAng1 = min(max(SlatAng, 0.0), Pi);
+            SlatAng1 = min(max(SlatAng, 0.0), DataGlobalConstants::Pi());
 
             // This is not correct, fixed 2/17/2010
             // ProfAng1 = MIN(MAX(SlatAng,-PiOvr2),PiOvr2)
-            ProfAng1 = min(max(ProfAng, -PiOvr2), PiOvr2);
+            ProfAng1 = min(max(ProfAng, -DataGlobalConstants::PiOvr2()), DataGlobalConstants::PiOvr2());
         } else {
             SlatAng1 = SlatAng;
             ProfAng1 = ProfAng;
         }
 
-        IAlpha = int((ProfAng1 + PiOvr2) / DeltaProfAng) + 1;
-        ProfAngRatio = (ProfAng1 + PiOvr2 - (IAlpha - 1) * DeltaProfAng) / DeltaProfAng;
+        IAlpha = int((ProfAng1 + DataGlobalConstants::PiOvr2()) / DeltaProfAng) + 1;
+        ProfAngRatio = (ProfAng1 + DataGlobalConstants::PiOvr2() - (IAlpha - 1) * DeltaProfAng) / DeltaProfAng;
 
         if (VarSlats) { // Variable-angle slats: interpolate in profile angle and slat angle
             IBeta = int(SlatAng1 / DeltaSlatAng) + 1;
@@ -1359,9 +1349,6 @@ namespace General {
         // REFERENCES:na
 
         // Using/Aliasing
-        using DataGlobals::Pi;
-        using DataGlobals::PiOvr2;
-
         // Return value
         Real64 BlindBeamBeamTrans;
 
@@ -1393,7 +1380,7 @@ namespace General {
             fEdge = 0.0;
             fEdge1 = 0.0;
             if (std::abs(std::sin(gamma)) > 0.01) {
-                if ((SlatAng > 0.0 && SlatAng <= PiOvr2 && ProfAng <= SlatAng) || (SlatAng > PiOvr2 && SlatAng <= Pi && ProfAng > -(Pi - SlatAng)))
+                if ((SlatAng > 0.0 && SlatAng <= DataGlobalConstants::PiOvr2() && ProfAng <= SlatAng) || (SlatAng > DataGlobalConstants::PiOvr2() && SlatAng <= DataGlobalConstants::Pi() && ProfAng > -(DataGlobalConstants::Pi() - SlatAng)))
                     fEdge1 =
                         SlatThickness * std::abs(std::sin(gamma)) / ((SlatSeparation + SlatThickness / std::abs(std::sin(SlatAng))) * CosProfAng);
                 fEdge = min(1.0, std::abs(fEdge1));
@@ -1600,30 +1587,6 @@ namespace General {
         return POLY2F;
     }
 
-    std::string TrimSigDigits(Real64 const RealValue, int const SigDigits)
-    {
-        return format("{:.{}T}", RealValue, SigDigits);
-    }
-
-    std::string TrimSigDigits(int const IntegerValue,
-                              Optional_int_const EP_UNUSED(SigDigits) // ignored
-    )
-    {
-        return format("{}", IntegerValue);
-    }
-
-    std::string RoundSigDigits(Real64 const RealValue, int const SigDigits)
-    {
-        return format("{:.{}R}", RealValue, SigDigits);
-    }
-
-    std::string RoundSigDigits(int const IntegerValue,
-                               Optional_int_const EP_UNUSED(SigDigits) // ignored
-    )
-    {
-        return format("{}", IntegerValue);
-    }
-
     std::string RemoveTrailingZeros(std::string const &InputString)
     {
 
@@ -1788,11 +1751,12 @@ namespace General {
         }
     }
 
-    void ProcessDateString(std::string const &String,
+    void ProcessDateString(EnergyPlusData &state,
+                           std::string const &String,
                            int &PMonth,
                            int &PDay,
                            int &PWeekDay,
-                           int &DateType, // DateType found (-1=invalid, 1=month/day, 2=nth day in month, 3=last day in month)
+                           WeatherManager::DateType &DateType, // DateType found (-1=invalid, 1=month/day, 2=nth day in month, 3=last day in month)
                            bool &ErrorsFound,
                            Optional_int PYear)
     {
@@ -1818,33 +1782,33 @@ namespace General {
         int TokenWeekday;
 
         FstNum = int(UtilityRoutines::ProcessNumber(String, errFlag));
-        DateType = -1;
+        DateType = WeatherManager::DateType::InvalidDate;
         if (!errFlag) {
             // Entered single number, do inverse JDay
             if (FstNum == 0) {
                 PMonth = 0;
                 PDay = 0;
-                DateType = 1;
+                DateType = WeatherManager::DateType::MonthDay;
             } else if (FstNum < 0 || FstNum > 366) {
-                ShowSevereError("Invalid Julian date Entered=" + String);
+                ShowSevereError(state, "Invalid Julian date Entered=" + String);
                 ErrorsFound = true;
             } else {
                 InvOrdinalDay(FstNum, PMonth, PDay, 0);
-                DateType = 1;
+                DateType = WeatherManager::DateType::LastDayInMonth;
             }
         } else {
             // Error when processing as number, try x/x
             if (!present(PYear)) {
-                DetermineDateTokens(String, NumTokens, TokenDay, TokenMonth, TokenWeekday, DateType, ErrorsFound);
+                DetermineDateTokens(state, String, NumTokens, TokenDay, TokenMonth, TokenWeekday, DateType, ErrorsFound);
             } else {
                 int TokenYear = 0;
-                DetermineDateTokens(String, NumTokens, TokenDay, TokenMonth, TokenWeekday, DateType, ErrorsFound, TokenYear);
+                DetermineDateTokens(state, String, NumTokens, TokenDay, TokenMonth, TokenWeekday, DateType, ErrorsFound, TokenYear);
                 PYear = TokenYear;
             }
-            if (DateType == 1) {
+            if (DateType == WeatherManager::DateType::MonthDay) {
                 PDay = TokenDay;
                 PMonth = TokenMonth;
-            } else if (DateType == 2 || DateType == 3) {
+            } else if (DateType == WeatherManager::DateType::NthDayInMonth || DateType == WeatherManager::DateType::LastDayInMonth) {
                 // interpret as TokenDay TokenWeekday in TokenMonth
                 PDay = TokenDay;
                 PMonth = TokenMonth;
@@ -1853,12 +1817,13 @@ namespace General {
         }
     }
 
-    void DetermineDateTokens(std::string const &String,
+    void DetermineDateTokens(EnergyPlusData &state,
+                             std::string const &String,
                              int &NumTokens,        // Number of tokens found in string
                              int &TokenDay,         // Value of numeric field found
                              int &TokenMonth,       // Value of Month field found (1=Jan, 2=Feb, etc)
                              int &TokenWeekday,     // Value of Weekday field found (1=Sunday, 2=Monday, etc), 0 if none
-                             int &DateType,         // DateType found (-1=invalid, 1=month/day, 2=nth day in month, 3=last day in month)
+                             WeatherManager::DateType &DateType,         // DateType found (-1=invalid, 1=month/day, 2=nth day in month, 3=last day in month)
                              bool &ErrorsFound,     // Set to true if cannot process this string as a date
                              Optional_int TokenYear // Value of Year if one appears to be present and this argument is present
     )
@@ -1905,7 +1870,7 @@ namespace General {
         TokenDay = 0;
         TokenMonth = 0;
         TokenWeekday = 0;
-        DateType = -1;
+        DateType = WeatherManager::DateType::InvalidDate;
         InternalError = false;
         WkDayInMonth = false;
         if (present(TokenYear)) TokenYear = 0;
@@ -1930,7 +1895,7 @@ namespace General {
 
         strip(CurrentString);
         if (CurrentString == BlankString) {
-            ShowSevereError("Invalid date field=" + String);
+            ShowSevereError(state, "Invalid date field=" + String);
             ErrorsFound = true;
         } else {
             Loop = 0;
@@ -1944,7 +1909,7 @@ namespace General {
                 strip(CurrentString);
             }
             if (not_blank(CurrentString)) {
-                ShowSevereError("Invalid date field=" + String);
+                ShowSevereError(state, "Invalid date field=" + String);
                 ErrorsFound = true;
             } else if (Loop == 2) {
                 // Field must be Day Month or Month Day (if both numeric, mon / day)
@@ -1954,15 +1919,15 @@ namespace General {
                     // Month day, but first field is not numeric, 2nd must be
                     NumField2 = int(UtilityRoutines::ProcessNumber(Fields(2), errFlag));
                     if (errFlag) {
-                        ShowSevereError("Invalid date field=" + String);
+                        ShowSevereError(state, "Invalid date field=" + String);
                         InternalError = true;
                     } else {
                         TokenDay = NumField2;
                     }
                     TokenMonth = UtilityRoutines::FindItemInList(Fields(1).substr(0, 3), Months, 12);
-                    ValidateMonthDay(String, TokenDay, TokenMonth, InternalError);
+                    ValidateMonthDay(state, String, TokenDay, TokenMonth, InternalError);
                     if (!InternalError) {
-                        DateType = 1;
+                        DateType = WeatherManager::DateType::MonthDay;
                     } else {
                         ErrorsFound = true;
                     }
@@ -1972,18 +1937,18 @@ namespace General {
                     if (!errFlag) {
                         TokenMonth = NumField1;
                         TokenDay = NumField2;
-                        ValidateMonthDay(String, TokenDay, TokenMonth, InternalError);
+                        ValidateMonthDay(state, String, TokenDay, TokenMonth, InternalError);
                         if (!InternalError) {
-                            DateType = 1;
+                            DateType = WeatherManager::DateType::MonthDay;
                         } else {
                             ErrorsFound = true;
                         }
                     } else { // 2nd field was not numeric.  Must be Month
                         TokenDay = NumField1;
                         TokenMonth = UtilityRoutines::FindItemInList(Fields(2).substr(0, 3), Months, 12);
-                        ValidateMonthDay(String, TokenDay, TokenMonth, InternalError);
+                        ValidateMonthDay(state, String, TokenDay, TokenMonth, InternalError);
                         if (!InternalError) {
-                            DateType = 1;
+                            DateType = WeatherManager::DateType::MonthDay;
                             NumTokens = 2;
                         } else {
                             ErrorsFound = true;
@@ -2005,12 +1970,12 @@ namespace General {
                             TokenMonth = UtilityRoutines::FindItemInList(Fields(3).substr(0, 3), Months, 12);
                             if (TokenMonth == 0) InternalError = true;
                         }
-                        DateType = 2;
+                        DateType = WeatherManager::DateType::NthDayInMonth;
                         NumTokens = 3;
                         if (TokenDay < 0 || TokenDay > 5) InternalError = true;
                     } else { // first field was not numeric....
                         if (Fields(1) == "LA") {
-                            DateType = 3;
+                            DateType = WeatherManager::DateType::LastDayInMonth;
                             NumTokens = 3;
                             TokenWeekday = UtilityRoutines::FindItemInList(Fields(2).substr(0, 3), Weekdays, 7);
                             if (TokenWeekday == 0) {
@@ -2022,14 +1987,14 @@ namespace General {
                                 if (TokenMonth == 0) InternalError = true;
                             }
                         } else { // error....
-                            ShowSevereError("First date field not numeric, field=" + String);
+                            ShowSevereError(state, "First date field not numeric, field=" + String);
                         }
                     }
                 } else { // mm/dd/yyyy or yyyy/mm/dd
                     NumField1 = int(UtilityRoutines::ProcessNumber(Fields(1), errFlag));
                     NumField2 = int(UtilityRoutines::ProcessNumber(Fields(2), errFlag));
                     NumField3 = int(UtilityRoutines::ProcessNumber(Fields(3), errFlag));
-                    DateType = 1;
+                    DateType = WeatherManager::DateType::MonthDay;
                     // error detection later..
                     if (NumField1 > 100) {
                         if (present(TokenYear)) {
@@ -2047,18 +2012,19 @@ namespace General {
                 }
             } else {
                 // Not enough or too many fields
-                ShowSevereError("Invalid date field=" + String);
+                ShowSevereError(state, "Invalid date field=" + String);
                 ErrorsFound = true;
             }
         }
 
         if (InternalError) {
-            DateType = -1;
+            DateType = WeatherManager::DateType::InvalidDate;
             ErrorsFound = true;
         }
     }
 
-    void ValidateMonthDay(std::string const &String, // REAL(r64) string being processed
+    void ValidateMonthDay(EnergyPlusData &state,
+                          std::string const &String, // REAL(r64) string being processed
                           int const Day,
                           int const Month,
                           bool &ErrorsFound)
@@ -2086,7 +2052,7 @@ namespace General {
             if (Day < 1 || Day > EndMonthDay(Month)) InternalError = true;
         }
         if (InternalError) {
-            ShowSevereError("Invalid Month Day date format=" + String);
+            ShowSevereError(state, "Invalid Month Day date format=" + String);
             ErrorsFound = true;
         } else {
             ErrorsFound = false;
@@ -2271,7 +2237,7 @@ namespace General {
         return BetweenDates;
     }
 
-    std::string CreateSysTimeIntervalString()
+    std::string CreateSysTimeIntervalString(EnergyPlusData &state)
     {
 
         // FUNCTION INFORMATION:
@@ -2291,8 +2257,6 @@ namespace General {
         // na
 
         // Using/Aliasing
-        using DataGlobals::CurrentTime;
-        using DataGlobals::TimeStepZone;
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
 
@@ -2322,7 +2286,7 @@ namespace General {
         //  ActualTimeS=INT(CurrentTime)+(SysTimeElapsed+(CurrentTime - INT(CurrentTime)))
         // CR6902  ActualTimeS=INT(CurrentTime-TimeStepZone)+SysTimeElapsed
         // [DC] TODO: Improve display accuracy up to fractional seconds using hh:mm:ss.0 format
-        ActualTimeS = CurrentTime - TimeStepZone + SysTimeElapsed;
+        ActualTimeS = state.dataGlobal->CurrentTime - state.dataGlobal->TimeStepZone + SysTimeElapsed;
         ActualTimeE = ActualTimeS + TimeStepSys;
         ActualTimeHrS = int(ActualTimeS);
         //  ActualTimeHrE=INT(ActualTimeE)
@@ -2347,14 +2311,15 @@ namespace General {
     }
 
     // returns the Julian date for the first, second, etc. day of week for a given month
-    int nthDayOfWeekOfMonth(int const &dayOfWeek,  // day of week (Sunday=1, Monday=2, ...)
+    int nthDayOfWeekOfMonth(EnergyPlusData &state,
+                            int const &dayOfWeek,  // day of week (Sunday=1, Monday=2, ...)
                             int const &nthTime,    // nth time the day of the week occurs (first monday, third tuesday, ..)
                             int const &monthNumber // January = 1
     )
     {
         // J. Glazer - August 2017
-        int firstDayOfMonth = OrdinalDay(monthNumber, 1, DataEnvironment::CurrentYearIsLeapYear);
-        int dayOfWeekForFirstDay = (DataEnvironment::RunPeriodStartDayOfWeek + firstDayOfMonth - 1) % 7;
+        int firstDayOfMonth = OrdinalDay(monthNumber, 1, state.dataEnvrn->CurrentYearIsLeapYear);
+        int dayOfWeekForFirstDay = (state.dataEnvrn->RunPeriodStartDayOfWeek + firstDayOfMonth - 1) % 7;
         int jdatForNth;
         if (dayOfWeek >= dayOfWeekForFirstDay) {
             jdatForNth = firstDayOfMonth + (dayOfWeek - dayOfWeekForFirstDay) + 7 * (nthTime - 1);
@@ -2454,7 +2419,7 @@ namespace General {
 
     // END SUBROUTINE SaveCompDesWaterFlow
 
-    void Invert3By3Matrix(IOFiles &ioFiles,
+    void Invert3By3Matrix(EnergyPlusData &state,
                           Array2A<Real64> const A, // Input 3X3 Matrix
                           Array2A<Real64> InverseA // Output 3X3 Matrix - Inverse Of A
     )
@@ -2501,7 +2466,7 @@ namespace General {
                       A(1, 2) * A(2, 1) * A(3, 3) - A(1, 3) * A(2, 2) * A(3, 1);
 
         if (std::abs(Determinant) < .1E-12) {
-            ShowFatalError("Determinant = [Zero] in Invert3By3Matrix", OptionalOutputFileRef{ioFiles.eso});
+            ShowFatalError(state, "Determinant = [Zero] in Invert3By3Matrix", OptionalOutputFileRef{state.files.eso});
         }
 
         // Compute Inverse
@@ -2717,7 +2682,7 @@ namespace General {
         Minute = mod(TmpItem, DecHr);
     }
 
-    int DetermineMinuteForReporting(OutputProcessor::TimeStepType t_timeStepType) // kind of reporting, Zone Timestep or System
+    int DetermineMinuteForReporting(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType) // kind of reporting, Zone Timestep or System
     {
 
         // FUNCTION INFORMATION:
@@ -2737,8 +2702,6 @@ namespace General {
         // na
 
         // Using/Aliasing
-        using DataGlobals::CurrentTime;
-        using DataGlobals::TimeStepZone;
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
 
@@ -2763,12 +2726,12 @@ namespace General {
         int ActualTimeHrS;
 
         if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) {
-            ActualTimeS = CurrentTime - TimeStepZone + SysTimeElapsed;
+            ActualTimeS = state.dataGlobal->CurrentTime - state.dataGlobal->TimeStepZone + SysTimeElapsed;
             ActualTimeE = ActualTimeS + TimeStepSys;
             ActualTimeHrS = int(ActualTimeS);
             ActualTimeMin = nint((ActualTimeE - ActualTimeHrS) * FracToMin);
         } else {
-            ActualTimeMin = (CurrentTime - int(CurrentTime)) * FracToMin;
+            ActualTimeMin = (state.dataGlobal->CurrentTime - int(state.dataGlobal->CurrentTime)) * FracToMin;
         }
 
         return ActualTimeMin;
@@ -2872,7 +2835,7 @@ namespace General {
         return LogicalToInteger;
     }
 
-    Real64 GetCurrentHVACTime()
+    Real64 GetCurrentHVACTime(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dimitri Curtil
@@ -2890,9 +2853,6 @@ namespace General {
         // na
 
         // Using/Aliasing
-        using DataGlobals::CurrentTime;
-        using DataGlobals::SecInHour;
-        using DataGlobals::TimeStepZone;
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
 
@@ -2919,13 +2879,13 @@ namespace General {
         // erronously truncate all sub-minute system time steps down to the closest full minute.
         // Maybe later TimeStepZone, TimeStepSys and SysTimeElapsed could also be specified
         // as real.
-        CurrentHVACTime = (CurrentTime - TimeStepZone) + SysTimeElapsed + TimeStepSys;
-        GetCurrentHVACTime = CurrentHVACTime * SecInHour;
+        CurrentHVACTime = (state.dataGlobal->CurrentTime - state.dataGlobal->TimeStepZone) + SysTimeElapsed + TimeStepSys;
+        GetCurrentHVACTime = CurrentHVACTime * DataGlobalConstants::SecInHour();
 
         return GetCurrentHVACTime;
     }
 
-    Real64 GetPreviousHVACTime()
+    Real64 GetPreviousHVACTime(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dimitri Curtil
@@ -2943,9 +2903,6 @@ namespace General {
         // na
 
         // Using/Aliasing
-        using DataGlobals::CurrentTime;
-        using DataGlobals::SecInHour;
-        using DataGlobals::TimeStepZone;
         using DataHVACGlobals::SysTimeElapsed;
 
         // Return value
@@ -2969,13 +2926,13 @@ namespace General {
 
         // This is the correct formula that does not use MinutesPerSystemTimeStep, which would
         // erronously truncate all sub-minute system time steps down to the closest full minute.
-        PreviousHVACTime = (CurrentTime - TimeStepZone) + SysTimeElapsed;
-        GetPreviousHVACTime = PreviousHVACTime * SecInHour;
+        PreviousHVACTime = (state.dataGlobal->CurrentTime - state.dataGlobal->TimeStepZone) + SysTimeElapsed;
+        GetPreviousHVACTime = PreviousHVACTime * DataGlobalConstants::SecInHour();
 
         return GetPreviousHVACTime;
     }
 
-    std::string CreateHVACTimeIntervalString()
+    std::string CreateHVACTimeIntervalString(EnergyPlusData &state)
     {
 
         // FUNCTION INFORMATION:
@@ -3014,7 +2971,7 @@ namespace General {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         // na
 
-        OutputString = CreateTimeIntervalString(GetPreviousHVACTime(), GetCurrentHVACTime());
+        OutputString = CreateTimeIntervalString(GetPreviousHVACTime(state), GetCurrentHVACTime(state));
 
         return OutputString;
     }
@@ -3193,7 +3150,7 @@ namespace General {
     }
 
     void
-    ScanForReports(std::string const &reportName, bool &DoReport, Optional_string_const ReportKey, Optional_string Option1, Optional_string Option2)
+    ScanForReports(EnergyPlusData &state, std::string const &reportName, bool &DoReport, Optional_string_const ReportKey, Optional_string Option1, Optional_string Option2)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3212,7 +3169,6 @@ namespace General {
 
         // Using/Aliasing
         using namespace DataIPShortCuts;
-        using DataGlobals::ShowDecayCurvesInEIO;
         using DataRuntimeLanguage::OutputEMSActuatorAvailFull;
         using DataRuntimeLanguage::OutputEMSActuatorAvailSmall;
         using DataRuntimeLanguage::OutputEMSErrors;
@@ -3236,16 +3192,15 @@ namespace General {
         static std::string LineRptOption1;
         static std::string VarDictOption1;
         static std::string VarDictOption2;
-        //  LOGICAL,SAVE :: SchRpt = .FALSE.
-        //  CHARACTER(len=MaxNameLength) :: SchRptOption
 
         if (GetReportInput) {
 
             cCurrentModuleObject = "Output:Surfaces:List";
 
-            NumReports = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+            NumReports = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
             for (RepNum = 1; RepNum <= NumReports; ++RepNum) {
-                inputProcessor->getObjectItem(cCurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              cCurrentModuleObject,
                                               RepNum,
                                               cAlphaArgs,
                                               NumNames,
@@ -3283,16 +3238,16 @@ namespace General {
 
                     } else if (SELECT_CASE_var == "DECAYCURVESFROMCOMPONENTLOADSSUMMARY") { // Should the Radiant to Convective Decay Curves from the
                                                                                             // load component report appear in the EIO file
-                        ShowDecayCurvesInEIO = true;
+                        state.dataGlobal->ShowDecayCurvesInEIO = true;
 
                     } else if (SELECT_CASE_var == "") {
-                        ShowWarningError(cCurrentModuleObject + ": No " + cAlphaFieldNames(1) + " supplied.");
-                        ShowContinueError(
+                        ShowWarningError(state, cCurrentModuleObject + ": No " + cAlphaFieldNames(1) + " supplied.");
+                        ShowContinueError(state,
                             " Legal values are: \"Lines\", \"Vertices\", \"Details\", \"DetailsWithVertices\", \"CostInfo\", \"ViewFactorIinfo\".");
 
                     } else {
-                        ShowWarningError(cCurrentModuleObject + ": Invalid " + cAlphaFieldNames(1) + "=\"" + cAlphaArgs(1) + "\" supplied.");
-                        ShowContinueError(
+                        ShowWarningError(state, cCurrentModuleObject + ": Invalid " + cAlphaFieldNames(1) + "=\"" + cAlphaArgs(1) + "\" supplied.");
+                        ShowContinueError(state,
                             " Legal values are: \"Lines\", \"Vertices\", \"Details\", \"DetailsWithVertices\", \"CostInfo\", \"ViewFactorIinfo\".");
                     }
                 }
@@ -3300,9 +3255,10 @@ namespace General {
 
             cCurrentModuleObject = "Output:Surfaces:Drawing";
 
-            NumReports = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+            NumReports = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
             for (RepNum = 1; RepNum <= NumReports; ++RepNum) {
-                inputProcessor->getObjectItem(cCurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              cCurrentModuleObject,
                                               RepNum,
                                               cAlphaArgs,
                                               NumNames,
@@ -3333,12 +3289,12 @@ namespace General {
                         VRMLOption2 = cAlphaArgs(3);
 
                     } else if (SELECT_CASE_var == "") {
-                        ShowWarningError(cCurrentModuleObject + ": No " + cAlphaFieldNames(1) + " supplied.");
-                        ShowContinueError(" Legal values are: \"DXF\", \"DXF:WireFrame\", \"VRML\".");
+                        ShowWarningError(state, cCurrentModuleObject + ": No " + cAlphaFieldNames(1) + " supplied.");
+                        ShowContinueError(state, " Legal values are: \"DXF\", \"DXF:WireFrame\", \"VRML\".");
 
                     } else {
-                        ShowWarningError(cCurrentModuleObject + ": Invalid " + cAlphaFieldNames(1) + "=\"" + cAlphaArgs(1) + "\" supplied.");
-                        ShowContinueError(" Legal values are: \"DXF\", \"DXF:WireFrame\", \"VRML\".");
+                        ShowWarningError(state, cCurrentModuleObject + ": Invalid " + cAlphaFieldNames(1) + "=\"" + cAlphaArgs(1) + "\" supplied.");
+                        ShowContinueError(state, " Legal values are: \"DXF\", \"DXF:WireFrame\", \"VRML\".");
                     }
                 }
             }
@@ -3352,9 +3308,10 @@ namespace General {
 
             cCurrentModuleObject = "Output:VariableDictionary";
 
-            NumReports = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+            NumReports = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
             for (RepNum = 1; RepNum <= NumReports; ++RepNum) {
-                inputProcessor->getObjectItem(cCurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              cCurrentModuleObject,
                                               RepNum,
                                               cAlphaArgs,
                                               NumNames,
@@ -3371,9 +3328,10 @@ namespace General {
             }
 
             cCurrentModuleObject = "Output:Constructions";
-            NumReports = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+            NumReports = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
             for (RepNum = 1; RepNum <= NumReports; ++RepNum) {
-                inputProcessor->getObjectItem(cCurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              cCurrentModuleObject,
                                               RepNum,
                                               cAlphaArgs,
                                               NumNames,
@@ -3399,9 +3357,10 @@ namespace General {
             }
 
             cCurrentModuleObject = "Output:EnergyManagementSystem";
-            NumReports = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+            NumReports = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
             for (RepNum = 1; RepNum <= NumReports; ++RepNum) {
-                inputProcessor->getObjectItem(cCurrentModuleObject,
+                inputProcessor->getObjectItem(state,
+                                              cCurrentModuleObject,
                                               RepNum,
                                               cAlphaArgs,
                                               NumNames,
@@ -3429,13 +3388,13 @@ namespace General {
                         OutputEMSActuatorAvailFull = true;
 
                     } else if (SELECT_CASE_var == "") {
-                        ShowWarningError(cCurrentModuleObject + ": Blank " + cAlphaFieldNames(1) + " supplied.");
-                        ShowContinueError(" Legal values are: \"None\", \"NotByUniqueKeyNames\", \"Verbose\". \"None\" will be used.");
+                        ShowWarningError(state, cCurrentModuleObject + ": Blank " + cAlphaFieldNames(1) + " supplied.");
+                        ShowContinueError(state, " Legal values are: \"None\", \"NotByUniqueKeyNames\", \"Verbose\". \"None\" will be used.");
                         OutputEMSActuatorAvailSmall = false;
                         OutputEMSActuatorAvailFull = false;
                     } else {
-                        ShowWarningError(cCurrentModuleObject + ": Invalid " + cAlphaFieldNames(1) + "=\"" + cAlphaArgs(1) + "\" supplied.");
-                        ShowContinueError(" Legal values are: \"None\", \"NotByUniqueKeyNames\", \"Verbose\". \"None\" will be used.");
+                        ShowWarningError(state, cCurrentModuleObject + ": Invalid " + cAlphaFieldNames(1) + "=\"" + cAlphaArgs(1) + "\" supplied.");
+                        ShowContinueError(state, " Legal values are: \"None\", \"NotByUniqueKeyNames\", \"Verbose\". \"None\" will be used.");
                         OutputEMSActuatorAvailSmall = false;
                         OutputEMSActuatorAvailFull = false;
                     }
@@ -3454,13 +3413,13 @@ namespace General {
                         OutputEMSInternalVarsFull = true;
                         OutputEMSInternalVarsSmall = false;
                     } else if (SELECT_CASE_var == "") {
-                        ShowWarningError(cCurrentModuleObject + ": Blank " + cAlphaFieldNames(2) + " supplied.");
-                        ShowContinueError(" Legal values are: \"None\", \"NotByUniqueKeyNames\", \"Verbose\". \"None\" will be used.");
+                        ShowWarningError(state, cCurrentModuleObject + ": Blank " + cAlphaFieldNames(2) + " supplied.");
+                        ShowContinueError(state, " Legal values are: \"None\", \"NotByUniqueKeyNames\", \"Verbose\". \"None\" will be used.");
                         OutputEMSInternalVarsFull = false;
                         OutputEMSInternalVarsSmall = false;
                     } else {
-                        ShowWarningError(cCurrentModuleObject + ": Invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(1) + "\" supplied.");
-                        ShowContinueError(" Legal values are: \"None\", \"NotByUniqueKeyNames\", \"Verbose\". \"None\" will be used.");
+                        ShowWarningError(state, cCurrentModuleObject + ": Invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(1) + "\" supplied.");
+                        ShowContinueError(state, " Legal values are: \"None\", \"NotByUniqueKeyNames\", \"Verbose\". \"None\" will be used.");
                         OutputEMSInternalVarsFull = false;
                         OutputEMSInternalVarsSmall = false;
                     }
@@ -3479,28 +3438,18 @@ namespace General {
                         OutputFullEMSTrace = true;
                         OutputEMSErrors = true;
                     } else if (SELECT_CASE_var == "") {
-                        ShowWarningError(cCurrentModuleObject + ": Blank " + cAlphaFieldNames(3) + " supplied.");
-                        ShowContinueError(" Legal values are: \"None\", \"ErrorsOnly\", \"Verbose\". \"None\" will be used.");
+                        ShowWarningError(state, cCurrentModuleObject + ": Blank " + cAlphaFieldNames(3) + " supplied.");
+                        ShowContinueError(state, " Legal values are: \"None\", \"ErrorsOnly\", \"Verbose\". \"None\" will be used.");
                         OutputEMSErrors = false;
                         OutputFullEMSTrace = false;
                     } else {
-                        ShowWarningError(cCurrentModuleObject + ": Invalid " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(1) + "\" supplied.");
-                        ShowContinueError(" Legal values are: \"None\", \"ErrorsOnly\", \"Verbose\". \"None\" will be used.");
+                        ShowWarningError(state, cCurrentModuleObject + ": Invalid " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(1) + "\" supplied.");
+                        ShowContinueError(state, " Legal values are: \"None\", \"ErrorsOnly\", \"Verbose\". \"None\" will be used.");
                         OutputEMSErrors = false;
                         OutputFullEMSTrace = false;
                     }
                 }
             }
-
-            //    cCurrentModuleObject='Output:Schedules'
-            //    NumReports=inputProcessor->getNumObjectsFound(cCurrentModuleObject)
-            //    DO RepNum=1,NumReports
-            //      CALL inputProcessor->getObjectItem(cCurrentModuleObject,RepNum,cAlphaArgs,NumNames,rNumericArgs,NumNumbers,IOStat,  &
-            //                     AlphaBlank=lAlphaFieldBlanks,NumBlank=lNumericFieldBlanks,  &
-            //                     AlphaFieldNames=cAlphaFieldNames,NumericFieldNames=cNumericFieldNames)
-            //      SchRpt=.TRUE.
-            //      SchRptOption=cAlphaArgs(1)
-            //    ENDDO
 
             GetReportInput = false;
         }
@@ -3561,7 +3510,8 @@ namespace General {
         }
     }
 
-    void CheckCreatedZoneItemName(std::string const &calledFrom,                  // routine called from
+    void CheckCreatedZoneItemName(EnergyPlusData &state,
+                                  std::string const &calledFrom,                  // routine called from
                                   std::string const &CurrentObject,               // object being parsed
                                   std::string const &ZoneName,                    // Zone Name associated
                                   std::string::size_type const MaxZoneNameLength, // maximum length of zonelist zone names
@@ -3591,8 +3541,6 @@ namespace General {
         // na
 
         // Using/Aliasing
-        using DataGlobals::MaxNameLength;
-
         // Argument array dimensioning
 
         // Locals
@@ -3614,25 +3562,28 @@ namespace General {
         std::string::size_type const ItemLength = len(ZoneName) + ItemNameLength;
         ResultName = ZoneName + ' ' + ItemName;
         bool TooLong = false;
-        if (ItemLength > MaxNameLength) {
-            ShowWarningError(calledFrom + CurrentObject + " Combination of ZoneList and Object Name generate a name too long.");
-            ShowContinueError("Object Name=\"" + ItemName + "\".");
-            ShowContinueError("ZoneList/Zone Name=\"" + ZoneName + "\".");
-            ShowContinueError("Item length=[" + RoundSigDigits(int(ItemLength)) + "] > Maximum Length=[" + RoundSigDigits(MaxNameLength) +
-                              "]. You may need to shorten the names.");
-            ShowContinueError("Shortening the Object Name by [" + RoundSigDigits(int(MaxZoneNameLength + 1 + ItemNameLength - MaxNameLength)) +
-                              "] characters will assure uniqueness for this ZoneList.");
-            ShowContinueError("name that will be used (may be needed in reporting)=\"" + ResultName + "\".");
+        if (ItemLength > DataGlobalConstants::MaxNameLength()) {
+            ShowWarningError(state, calledFrom + CurrentObject + " Combination of ZoneList and Object Name generate a name too long.");
+            ShowContinueError(state, "Object Name=\"" + ItemName + "\".");
+            ShowContinueError(state, "ZoneList/Zone Name=\"" + ZoneName + "\".");
+            ShowContinueError(state,
+                              format("Item length=[{}] > Maximum Length=[{}]. You may need to shorten the names.",
+                                     ItemLength,
+                                     DataGlobalConstants::MaxNameLength()));
+            ShowContinueError(state,
+                              format("Shortening the Object Name by [{}] characters will assure uniqueness for this ZoneList.",
+                                     MaxZoneNameLength + 1 + ItemNameLength - DataGlobalConstants::MaxNameLength()));
+            ShowContinueError(state, "name that will be used (may be needed in reporting)=\"" + ResultName + "\".");
             TooLong = true;
         }
 
         int FoundItem = UtilityRoutines::FindItemInList(ResultName, ItemNames, NumItems);
 
         if (FoundItem != 0) {
-            ShowSevereError(calledFrom + CurrentObject + "=\"" + ItemName + "\", Duplicate Generated name encountered.");
-            ShowContinueError("name=\"" + ResultName + "\" has already been generated or entered as " + CurrentObject + " item=[" +
-                              RoundSigDigits(FoundItem) + "].");
-            if (TooLong) ShowContinueError("Duplicate name likely caused by the previous \"too long\" warning.");
+            ShowSevereError(state, calledFrom + CurrentObject + "=\"" + ItemName + "\", Duplicate Generated name encountered.");
+            ShowContinueError(state,
+                              format("name=\"{}\" has already been generated or entered as {} item=[{}].", ResultName, CurrentObject, FoundItem));
+            if (TooLong) ShowContinueError(state, "Duplicate name likely caused by the previous \"too long\" warning.");
             ResultName = "xxxxxxx";
             errFlag = true;
         }
@@ -3655,23 +3606,6 @@ namespace General {
         return results;
     }
 
-    Real64 epexp(Real64 x)
-    {
-        if (x < -70.0) {
-            return 0.0;
-        }
-        return std::exp(x);
-    }
-
-    Real64 epexp(Real64 x, Real64 defaultHigh)
-    {
-        if (x < -70.0) {
-            return 0.0;
-        } else if (x > defaultHigh) {
-            return std::exp(defaultHigh);
-        }
-        return std::exp(x);
-    }
 } // namespace General
 
 } // namespace EnergyPlus

@@ -63,7 +63,9 @@
     Yes,                     !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
     No,                      !- Run Simulation for Sizing Periods
-    Yes;                     !- Run Simulation for Weather File Run Periods
+    Yes,                     !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
   RunPeriod,
     Run Period 1,            !- Name
@@ -4844,7 +4846,7 @@
 
   UtilityCost:Tariff,
     TX_EIAMonthlyRateGas,    !- Name
-    Gas:Facility,            !- Output Meter Name
+    NaturalGas:Facility,     !- Output Meter Name
     MCF,                     !- Conversion Factor Choice
     ,                        !- Energy Conversion Factor
     ,                        !- Demand Conversion Factor
@@ -4906,31 +4908,31 @@
   Output:Table:Monthly,
     Load Center Performance Summary,  !- Name
     2,                       !- Digits After Decimal
-    Electric Load Center Produced Electric Power,  !- Variable or Meter 1 Name
+    Electric Load Center Produced Electricity Rate,  !- Variable or Meter 1 Name
     HoursNonZero,            !- Aggregation Type for Variable or Meter 1
-    Electric Load Center Produced Electric Power,  !- Variable or Meter 2 Name
+    Electric Load Center Produced Electricity Rate,  !- Variable or Meter 2 Name
     SumOrAverageDuringHoursShown;  !- Aggregation Type for Variable or Meter 2
 
   Output:Table:Monthly,
     PV Performance Summary,  !- Name
     2,                       !- Digits After Decimal
-    Generator Produced DC Electric Power,  !- Variable or Meter 1 Name
+    Generator Produced DC Electricity Rate,  !- Variable or Meter 1 Name
     HoursNonZero,            !- Aggregation Type for Variable or Meter 1
-    Generator Produced DC Electric Power,  !- Variable or Meter 2 Name
+    Generator Produced DC Electricity Rate,  !- Variable or Meter 2 Name
     SumOrAverageDuringHoursShown,  !- Aggregation Type for Variable or Meter 2
     Generator PV Array Efficiency,  !- Variable or Meter 3 Name
     SumOrAverageDuringHoursShown,  !- Aggregation Type for Variable or Meter 3
-    Generator Produced DC Electric Energy,  !- Variable or Meter 4 Name
+    Generator Produced DC Electricity Energy,  !- Variable or Meter 4 Name
     SumOrAverageDuringHoursShown;  !- Aggregation Type for Variable or Meter 4
 
   Output:Table:Monthly,
     Inverter Performance Summary,  !- Name
     3,                       !- Digits After Decimal
-    Inverter DC Input Electric Power,  !- Variable or Meter 1 Name
+    Inverter DC Input Electricity Rate,  !- Variable or Meter 1 Name
     HoursNonZero,            !- Aggregation Type for Variable or Meter 1
-    Inverter DC Input Electric Power,  !- Variable or Meter 2 Name
+    Inverter DC Input Electricity Rate,  !- Variable or Meter 2 Name
     SumOrAverageDuringHoursShown,  !- Aggregation Type for Variable or Meter 2
-    Inverter AC Output Electric Power,  !- Variable or Meter 3 Name
+    Inverter AC Output Electricity Rate,  !- Variable or Meter 3 Name
     SumOrAverageDuringHoursShown,  !- Aggregation Type for Variable or Meter 3
     Inverter Thermal Loss Rate,  !- Variable or Meter 4 Name
     SumOrAverageDuringHoursShown,  !- Aggregation Type for Variable or Meter 4
@@ -4960,17 +4962,17 @@
   Output:Table:Monthly,
     AC Power Summary,        !- Name
     3,                       !- Digits After Decimal
-    Facility Total Purchased Electric Power,  !- Variable or Meter 1 Name
+    Facility Total Purchased Electricity Rate,  !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    Facility Net Purchased Electric Power,  !- Variable or Meter 2 Name
+    Facility Net Purchased Electricity Rate,  !- Variable or Meter 2 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 2
-    Facility Total Produced Electric Power,  !- Variable or Meter 3 Name
+    Facility Total Produced Electricity Rate,  !- Variable or Meter 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
-    Facility Total Electric Demand Power,  !- Variable or Meter 4 Name
+    Facility Total Electricity Demand Rate,  !- Variable or Meter 4 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 4
-    Facility Total Building Electric Demand Power,  !- Variable or Meter 5 Name
+    Facility Total Building Electricity Demand Rate,  !- Variable or Meter 5 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 5
-    Facility Total HVAC Electric Demand Power,  !- Variable or Meter 6 Name
+    Facility Total HVAC Electricity Demand Rate,  !- Variable or Meter 6 Name
     SumOrAverage;            !- Aggregation Type for Variable or Meter 6
 
  !!*********************************************
@@ -5225,11 +5227,11 @@
 
   Output:Variable,*,Inverter DC to AC Efficiency,timestep;
 
-  Output:Variable,*,Inverter DC Input Electric Power,timestep;
+  Output:Variable,*,Inverter DC Input Electricity Rate,timestep;
 
-  Output:Variable,*,Inverter DC Input Electric Energy,timestep;
+  Output:Variable,*,Inverter DC Input Electricity Energy,timestep;
 
-  Output:Variable,*,Inverter AC Output Electric Power,timestep;
+  Output:Variable,*,Inverter AC Output Electricity Rate,timestep;
 
   Output:Variable,*,Electric Storage Degradation Fraction,timestep;
 
@@ -5255,43 +5257,43 @@
 
   Output:Variable,*,Electric Storage Total Voltage,timestep;
 
-  Output:Variable,*,Electric Load Center Produced Electric Power,timestep;
+  Output:Variable,*,Electric Load Center Produced Electricity Rate,timestep;
 
-  Output:Variable,*,Electric Load Center Produced Electric Energy,timestep;
+  Output:Variable,*,Electric Load Center Produced Electricity Energy,timestep;
 
   Output:Variable,*,Electric Load Center Produced Thermal Rate,timestep;
 
   Output:Variable,*,Electric Load Center Produced Thermal Energy,timestep;
 
-  Output:Variable,*,Facility Total Purchased Electric Power,timestep;
+  Output:Variable,*,Facility Total Purchased Electricity Rate,timestep;
 
-  Output:Variable,*,Facility Total Purchased Electric Energy,timestep;
+  Output:Variable,*,Facility Total Purchased Electricity Energy,timestep;
 
-  Output:Variable,*,Facility Total Surplus Electric Energy,timestep;
+  Output:Variable,*,Facility Total Surplus Electricity Energy,timestep;
 
-  Output:Variable,*,Facility Net Purchased Electric Power,timestep;
+  Output:Variable,*,Facility Net Purchased Electricity Rate,timestep;
 
-  Output:Variable,*,Facility Net Purchased Electric Energy,timestep;
+  Output:Variable,*,Facility Net Purchased Electricity Energy,timestep;
 
-  Output:Variable,*,Facility Total Building Electric Demand Power,timestep;
+  Output:Variable,*,Facility Total Building Electricity Demand Rate,timestep;
 
-  Output:Variable,*,Facility Total HVAC Electric Demand Power,timestep;
+  Output:Variable,*,Facility Total HVAC Electricity Demand Rate,timestep;
 
-  Output:Variable,*,Facility Total Electric Demand Power,timestep;
+  Output:Variable,*,Facility Total Electricity Demand Rate,timestep;
 
-  Output:Variable,*,Facility Total Produced Electric Power,timestep;
+  Output:Variable,*,Facility Total Produced Electricity Rate,timestep;
 
-  Output:Variable,*,Facility Total Produced Electric Energy,timestep;
+  Output:Variable,*,Facility Total Produced Electricity Energy,timestep;
 
-  Output:Variable,*,Generator Produced DC Electric Power,timestep;
+  Output:Variable,*,Generator Produced DC Electricity Rate,timestep;
 
-  Output:Variable,*,Generator Produced DC Electric Energy,timestep;
+  Output:Variable,*,Generator Produced DC Electricity Energy,timestep;
 
   Output:Variable,*,Generator PV Array Efficiency,timestep;
 
-  Output:Variable,*,Generator Requested Electric Power,timestep;
+  Output:Variable,*,Generator Requested Electricity Rate,timestep;
 
-  Output:Variable,*,Cooling Coil Electric Power,timestep;
+  Output:Variable,*,Cooling Coil Electricity Rate,timestep;
 
   Output:SQLite,
     Simple;                  !- Option Type

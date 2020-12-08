@@ -203,7 +203,9 @@
     No,                      !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
     Yes,                     !- Run Simulation for Sizing Periods
-    Yes;                     !- Run Simulation for Weather File Run Periods
+    Yes,                     !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
   Site:Location,
     Miami Intl Ap_FL_USA Design_Conditions,  !- Name
@@ -2226,7 +2228,7 @@
     0.00165,                 !- Rated Water Flow Rate {m3/s}
     40125.6,                 !- Gross Rated Total Cooling Capacity {W}
     28267.06,                !- Gross Rated Sensible Cooling Capacity {W}
-    7.007757577,             !- Gross Rated Cooling COP
+    7.007757577,             !- Gross Rated Cooling COP {W/W}
     -0.68126221,             !- Total Cooling Capacity Coefficient 1
     1.99529297,              !- Total Cooling Capacity Coefficient 2
     -0.93611888,             !- Total Cooling Capacity Coefficient 3
@@ -2255,7 +2257,7 @@
     1.4,                     !- Rated Air Flow Rate {m3/s}
     0.00165,                 !- Rated Water Flow Rate {m3/s}
     33156.73,                !- Gross Rated Heating Capacity {W}
-    3.167053691,             !- Gross Rated Heating COP
+    3.167053691,             !- Gross Rated Heating COP {W/W}
     -5.50102734,             !- Heating Capacity Coefficient 1
     -0.96688754,             !- Heating Capacity Coefficient 2
     7.70755007,              !- Heating Capacity Coefficient 3
@@ -2507,7 +2509,7 @@
     0.00165,                 !- Rated Water Flow Rate {m3/s}
     41562.8,                 !- Gross Rated Total Cooling Capacity {W}
     29533.53,                !- Gross Rated Sensible Cooling Capacity {W}
-    7.007757577,             !- Gross Rated Cooling COP
+    7.007757577,             !- Gross Rated Cooling COP {W/W}
     -0.68126221,             !- Total Cooling Capacity Coefficient 1
     1.99529297,              !- Total Cooling Capacity Coefficient 2
     -0.93611888,             !- Total Cooling Capacity Coefficient 3
@@ -2536,7 +2538,7 @@
     1.3,                     !- Rated Air Flow Rate {m3/s}
     0.00165,                 !- Rated Water Flow Rate {m3/s}
     35078.365,               !- Gross Rated Heating Capacity {W}
-    3.167053691,             !- Gross Rated Heating COP
+    3.167053691,             !- Gross Rated Heating COP {W/W}
     -5.50102734,             !- Heating Capacity Coefficient 1
     -0.96688754,             !- Heating Capacity Coefficient 2
     7.70755007,              !- Heating Capacity Coefficient 3
@@ -2788,7 +2790,7 @@
     0.00165,                 !- Rated Water Flow Rate {m3/s}
     43125.6,                 !- Gross Rated Total Cooling Capacity {W}
     30267.06,                !- Gross Rated Sensible Cooling Capacity {W}
-    7.007757577,             !- Gross Rated Cooling COP
+    7.007757577,             !- Gross Rated Cooling COP {W/W}
     -0.68126221,             !- Total Cooling Capacity Coefficient 1
     1.99529297,              !- Total Cooling Capacity Coefficient 2
     -0.93611888,             !- Total Cooling Capacity Coefficient 3
@@ -2817,7 +2819,7 @@
     1.3,                     !- Rated Air Flow Rate {m3/s}
     0.00165,                 !- Rated Water Flow Rate {m3/s}
     39156.73,                !- Gross Rated Heating Capacity {W}
-    3.167053691,             !- Gross Rated Heating COP
+    3.167053691,             !- Gross Rated Heating COP {W/W}
     -5.50102734,             !- Heating Capacity Coefficient 1
     -0.96688754,             !- Heating Capacity Coefficient 2
     7.70755007,              !- Heating Capacity Coefficient 3
@@ -3069,7 +3071,7 @@
     0.00165,                 !- Rated Water Flow Rate {m3/s}
     42000.0,                 !- Gross Rated Total Cooling Capacity {W}
     30000.0,                 !- Gross Rated Sensible Cooling Capacity {W}
-    7.007757577,             !- Gross Rated Cooling COP
+    7.007757577,             !- Gross Rated Cooling COP {W/W}
     -0.68126221,             !- Total Cooling Capacity Coefficient 1
     1.99529297,              !- Total Cooling Capacity Coefficient 2
     -0.93611888,             !- Total Cooling Capacity Coefficient 3
@@ -3098,7 +3100,7 @@
     1.4,                     !- Rated Air Flow Rate {m3/s}
     0.00165,                 !- Rated Water Flow Rate {m3/s}
     35000.0,                 !- Gross Rated Heating Capacity {W}
-    3.167053691,             !- Gross Rated Heating COP
+    3.167053691,             !- Gross Rated Heating COP {W/W}
     -5.50102734,             !- Heating Capacity Coefficient 1
     -0.96688754,             !- Heating Capacity Coefficient 2
     7.70755007,              !- Heating Capacity Coefficient 3
@@ -3350,7 +3352,7 @@
     0.0033,                  !- Rated Water Flow Rate {m3/s}
     100000.0,                !- Gross Rated Total Cooling Capacity {W}
     75000.0,                 !- Gross Rated Sensible Cooling Capacity {W}
-    7.007757577,             !- Gross Rated Cooling COP
+    7.007757577,             !- Gross Rated Cooling COP {W/W}
     -0.68126221,             !- Total Cooling Capacity Coefficient 1
     1.99529297,              !- Total Cooling Capacity Coefficient 2
     -0.93611888,             !- Total Cooling Capacity Coefficient 3
@@ -3379,7 +3381,7 @@
     1.5,                     !- Rated Air Flow Rate {m3/s}
     0.0033,                  !- Rated Water Flow Rate {m3/s}
     81000.0,                 !- Gross Rated Heating Capacity {W}
-    3.167053691,             !- Gross Rated Heating COP
+    3.167053691,             !- Gross Rated Heating COP {W/W}
     -5.50102734,             !- Heating Capacity Coefficient 1
     -0.96688754,             !- Heating Capacity Coefficient 2
     7.70755007,              !- Heating Capacity Coefficient 3
@@ -3778,7 +3780,7 @@
 
   Output:Variable,*,Heating Coil Heating Rate,timestep;
 
-  Output:Variable,*,Heating Coil Gas Rate,timestep;
+  Output:Variable,*,Heating Coil NaturalGas Rate,timestep;
 
   Output:Variable,*,Unitary System Dehumidification Induced Heating Demand Rate,timestep;
 
@@ -3808,7 +3810,7 @@
 
   Output:Meter:MeterFileOnly,Electricity:Plant,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,monthly;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,runperiod;
 
@@ -3820,7 +3822,7 @@
 
   Output:Meter:MeterFileOnly,Electricity:Plant,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,runperiod;
 
   OutputControl:Table:Style,
     HTML;                    !- Column Separator

@@ -203,7 +203,9 @@
     Yes,                     !- Do System Sizing Calculation
     Yes,                     !- Do Plant Sizing Calculation
     No,                      !- Run Simulation for Sizing Periods
-    Yes;                     !- Run Simulation for Weather File Run Periods
+    Yes,                     !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
 ! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3°C
 
@@ -3610,7 +3612,7 @@
 
   Output:Variable,*,Zone Air Terminal VAV Damper Position,Hourly;
 
-  Output:Variable,*,Fan Electric Power,Hourly;
+  Output:Variable,*,Fan Electricity Rate,Hourly;
 
   Output:Variable,*,Heating Coil Heating Rate,Hourly;
 
@@ -3628,7 +3630,7 @@
 
   Output:Variable,*,Chiller Condenser Heat Transfer Rate,Hourly;
 
-  Output:Variable,*,Chiller Electric Power,Hourly;
+  Output:Variable,*,Chiller Electricity Rate,Hourly;
 
   Output:Variable,*,Chiller Evaporator Inlet Temperature,Hourly;
 
@@ -3662,9 +3664,9 @@
 
   Output:Variable,*,Ice Thermal Storage Cooling Charge Energy,Hourly;
 
-  Output:Variable,*,Ice Thermal Storage Ancillary Electric Power,Hourly;
+  Output:Variable,*,Ice Thermal Storage Ancillary Electricity Rate,Hourly;
 
-  Output:Variable,*,Ice Thermal Storage Ancillary Electric Energy,Hourly;
+  Output:Variable,*,Ice Thermal Storage Ancillary Electricity Energy,Hourly;
 
   Output:Variable,Main Chiller ChW Outlet,System Node Setpoint Temperature,Hourly;
 
@@ -3676,11 +3678,11 @@
 
   Output:Variable,*,Boiler Heating Rate,Hourly;
 
-  Output:Variable,*,Boiler Gas Rate,Hourly;
+  Output:Variable,*,Boiler NaturalGas Rate,Hourly;
 
   Output:Variable,*,Boiler Efficiency,Hourly;
 
-  Output:Variable,*,Pump Electric Power,Hourly;
+  Output:Variable,*,Pump Electricity Rate,Hourly;
 
   Output:Variable,*,Pump Fluid Heat Gain Rate,Hourly;
 
@@ -3688,7 +3690,7 @@
 
   Output:Variable,*,Cooling Tower Heat Transfer Rate,Hourly;
 
-  Output:Variable,*,Cooling Tower Fan Electric Power,Hourly;
+  Output:Variable,*,Cooling Tower Fan Electricity Rate,Hourly;
 
   Output:VariableDictionary,IDF;
 
@@ -3706,9 +3708,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:Plant,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Plant,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Plant,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,monthly;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,runperiod;
 
@@ -3720,9 +3722,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:Plant,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:Plant,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:Plant,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,runperiod;
 
   OutputControl:Table:Style,
     HTML;                    !- Column Separator
@@ -3761,7 +3763,7 @@
 
   Output:Table:TimeBins,
     *,                       !- Key Value
-    Chiller Electric Power,  !- Variable Name
+    Chiller Electricity Rate,!- Variable Name
     0,                       !- Interval Start
     1000,                    !- Interval Size
     10,                      !- Interval Count
@@ -3769,7 +3771,7 @@
 
   Output:Table:TimeBins,
     *,                       !- Key Value
-    Chiller Electric Power,  !- Variable Name
+    Chiller Electricity Rate,!- Variable Name
     0,                       !- Interval Start
     1000,                    !- Interval Size
     10,                      !- Interval Count
@@ -3785,9 +3787,9 @@
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
     Electricity:Facility,    !- Variable or Meter 2 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 2
-    Gas:Facility,            !- Variable or Meter 3 Name
+    NaturalGas:Facility,     !- Variable or Meter 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
-    Gas:Facility,            !- Variable or Meter 4 Name
+    NaturalGas:Facility,     !- Variable or Meter 4 Name
     Maximum;                 !- Aggregation Type for Variable or Meter 4
 
   Schedule:Compact,

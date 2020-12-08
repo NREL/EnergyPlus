@@ -52,8 +52,9 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    struct EnergyPlusData;
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace ReturnAirPathManager {
 
@@ -75,7 +76,7 @@ namespace ReturnAirPathManager {
 
     void SimReturnAirPath(EnergyPlusData &state);
 
-    void GetReturnAirPathInput();
+    void GetReturnAirPathInput(EnergyPlusData &state);
 
     void InitReturnAirPath(int &ReturnAirPathNum); // unused1208
 

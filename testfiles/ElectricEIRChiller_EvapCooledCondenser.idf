@@ -94,7 +94,7 @@
 ! Coils:                          Coil:Cooling:Water:DetailedGeometry
 ! Pumps:                          Pump:VariableSpeed
 ! Boilers:                        None
-! Chillers:                       Chiller:Electric:EIR (evaporatively cooled condenser), Chiller:ConstantCOP, and 
+! Chillers:                       Chiller:Electric:EIR (evaporatively cooled condenser), Chiller:ConstantCOP, and
 !                                 DistrictCooling. These three chiller types are used in various combinations
 !                                 PlantEquipmentOperation:CoolingLoad object.
 ! Towers:                         NO
@@ -108,7 +108,7 @@
 ! Utility Tariffs:                None
 !
 Version,
-    9.3;                     !- Version Identifier
+    9.4;                     !- Version Identifier
 
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
@@ -2569,12 +2569,12 @@ Output:Variable,
 
 Output:Variable,
     *,                       !- Key Value
-    Chiller Electric Power,  !- Variable Name
+    Chiller Electricity Rate,  !- Variable Name
     timestep;                !- Reporting Frequency
 
 Output:Variable,
     *,                       !- Key Value
-    Chiller Electric Energy, !- Variable Name
+    Chiller Electricity Energy, !- Variable Name
     timestep;                !- Reporting Frequency
 
 Output:Variable,

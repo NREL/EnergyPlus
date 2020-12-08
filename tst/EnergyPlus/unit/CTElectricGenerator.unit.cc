@@ -45,13 +45,14 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-// EnergyPlus::BoilerSteam Unit Tests
+// EnergyPlus::CTElectricGenerator Unit Tests
 
 // Google Test Headers
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
 #include <EnergyPlus/CTElectricGenerator.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -139,9 +140,9 @@ TEST_F(EnergyPlusFixture, CTElectricGenerator_Fueltype)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetCTGeneratorInput(state.dataCTElectricGenerator);
+    GetCTGeneratorInput(*state);
 
-    EXPECT_EQ(state.dataCTElectricGenerator.CTGenerator(1).FuelType, "Gas");
+    EXPECT_EQ(state->dataCTElectricGenerator->CTGenerator(1).FuelType, "NaturalGas");
 }
 
 } // namespace EnergyPlus

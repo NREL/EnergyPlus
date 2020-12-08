@@ -249,7 +249,9 @@
     Yes,                     !- Do System Sizing Calculation
     Yes,                     !- Do Plant Sizing Calculation
     Yes,                     !- Run Simulation for Sizing Periods
-    YES;                     !- Run Simulation for Weather File Run Periods
+    YES,                     !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
 !-   ===========  ALL OBJECTS IN CLASS: BUILDING ===========
 
@@ -28678,7 +28680,7 @@
     3,                       !- Digits After Decimal
     Electricity:HVAC,        !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    Heating:Gas,             !- Variable or Meter 2 Name
+    Heating:NaturalGas,      !- Variable or Meter 2 Name
     SumOrAverage;            !- Aggregation Type for Variable or Meter 2
 
   Output:Table:Monthly,
@@ -28810,13 +28812,13 @@
   Output:Table:Monthly,
     Building Loads - Electric,  !- Name
     2,                       !- Digits After Decimal
-    Zone Lights Electric Energy,  !- Variable or Meter 1 Name
+    Zone Lights Electricity Energy,  !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    Zone Lights Electric Energy,  !- Variable or Meter 2 Name
+    Zone Lights Electricity Energy,  !- Variable or Meter 2 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 2
-    Zone Electric Equipment Electric Energy,  !- Variable or Meter 3 Name
+    Zone Electric Equipment Electricity Energy,  !- Variable or Meter 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
-    Zone Electric Equipment Electric Energy,  !- Variable or Meter 4 Name
+    Zone Electric Equipment Electricity Energy,  !- Variable or Meter 4 Name
     Maximum;                 !- Aggregation Type for Variable or Meter 4
 
   Output:Table:Monthly,
@@ -28840,9 +28842,9 @@
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
     Electricity:Building,    !- Variable or Meter 2 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 2
-    Gas:Building,            !- Variable or Meter 3 Name
+    NaturalGas:Building,     !- Variable or Meter 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
-    Gas:Building,            !- Variable or Meter 4 Name
+    NaturalGas:Building,     !- Variable or Meter 4 Name
     Maximum;                 !- Aggregation Type for Variable or Meter 4
 
   Output:Table:Monthly,
@@ -28880,17 +28882,17 @@
   Output:Table:Monthly,
     Building Energy Performance - Natural Gas,  !- Name
     2,                       !- Digits After Decimal
-    InteriorEquipment:Gas,   !- Variable or Meter 1 Name
+    InteriorEquipment:NaturalGas,  !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    ExteriorEquipment:Gas,   !- Variable or Meter 2 Name
+    ExteriorEquipment:NaturalGas,  !- Variable or Meter 2 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 2
-    Heating:Gas,             !- Variable or Meter 3 Name
+    Heating:NaturalGas,      !- Variable or Meter 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
-    Cooling:Gas,             !- Variable or Meter 4 Name
+    Cooling:NaturalGas,      !- Variable or Meter 4 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 4
-    WaterSystems:Gas,        !- Variable or Meter 5 Name
+    WaterSystems:NaturalGas, !- Variable or Meter 5 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 5
-    Cogeneration:Gas,        !- Variable or Meter 6 Name
+    Cogeneration:NaturalGas, !- Variable or Meter 6 Name
     SumOrAverage;            !- Aggregation Type for Variable or Meter 6
 
   Output:Table:Monthly,
@@ -28977,23 +28979,23 @@
   Output:Table:Monthly,
     Peak Gas Demand,         !- Name
     3,                       !- Digits After Decimal
-    Gas:Facility,            !- Variable or Meter 1 Name
+    NaturalGas:Facility,     !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    Gas:Facility,            !- Variable or Meter 2 Name
+    NaturalGas:Facility,     !- Variable or Meter 2 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 2
-    Gas:HVAC,                !- Variable or Meter 3 Name
+    NaturalGas:HVAC,         !- Variable or Meter 3 Name
     ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 3
-    InteriorEquipment:Gas,   !- Variable or Meter 4 Name
+    InteriorEquipment:NaturalGas,  !- Variable or Meter 4 Name
     ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 4
-    MiscPlugGas:InteriorEquipment:Gas,  !- Variable or Meter 5 Name
+    MiscPlugGas:InteriorEquipment:NaturalGas,  !- Variable or Meter 5 Name
     ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 5
-    Gas:Plant,               !- Variable or Meter 6 Name
+    NaturalGas:Plant,        !- Variable or Meter 6 Name
     ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 6
-    WaterSystems:Gas,        !- Variable or Meter 7 Name
+    WaterSystems:NaturalGas, !- Variable or Meter 7 Name
     ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 7
-    Water Heater:WaterSystems:Gas,  !- Variable or Meter 8 Name
+    Water Heater:WaterSystems:NaturalGas,  !- Variable or Meter 8 Name
     ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 8
-    Heating:Gas,             !- Variable or Meter 9 Name
+    Heating:NaturalGas,      !- Variable or Meter 9 Name
     ValueWhenMaximumOrMinimum;  !- Aggregation Type for Variable or Meter 9
 
 !-   ===========  ALL OBJECTS IN CLASS: CONTROLLER:MECHANICALVENTILATION ===========
@@ -29223,16 +29225,16 @@
 
   Meter:Custom,
     Wired_LTG_Electricity,   !- Name
-    Electricity,             !- Fuel Type
+    Electricity,             !- Resource Type
     ,                        !- Key Name 1
     Wired_LTG;               !- Output Variable or Meter Name 1
 
   Meter:CustomDecrement,
     Wired_Int_EQUIP,         !- Name
-    Electricity,             !- Fuel Type
+    Electricity,             !- Resource Type
     InteriorEquipment:Electricity,  !- Source Meter Name
     Mech_ZN_1_FLR_1_Elevators_Equip,  !- Key Name 1
-    Electric Equipment Electric Energy;  !- Output Variable or Meter Name 1
+    Electric Equipment Electricity Energy;  !- Output Variable or Meter Name 1
 
   ElectricLoadCenter:Transformer,
     Transformer 1,           !- Name
@@ -30639,7 +30641,7 @@
   EnergyManagementSystem:Sensor,
     cCL1_Pod_1_ZN_1_FLR_1_LSr,  !- Name
     Corner_Class_1_Pod_1_ZN_1_FLR_1,  !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     cCL1_Pod_1_ZN_1_FLR_1_OSr,  !- Name
@@ -30655,7 +30657,7 @@
     cCL1_Pod_1_ZN_1_FLR_1_LAr,  !- Name
     Corner_Class_1_Pod_1_ZN_1_FLR_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_cCL1_Pod_1_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -30676,7 +30678,7 @@
   EnergyManagementSystem:Sensor,
     mCl1_Pod_1_ZN_1_FLR_1_LSr,  !- Name
     Mult_Class_1_Pod_1_ZN_1_FLR_1,  !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     mCl1_Pod_1_ZN_1_FLR_1_OSr,  !- Name
@@ -30692,7 +30694,7 @@
     mCl1_Pod_1_ZN_1_FLR_1_LAr,  !- Name
     Mult_Class_1_Pod_1_ZN_1_FLR_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_mCl1_Pod_1_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -30713,7 +30715,7 @@
   EnergyManagementSystem:Sensor,
     cPOD1_ZN_1_FLR_1_LSr,    !- Name
     Corridor_Pod_1_ZN_1_FLR_1,  !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     cPOD1_ZN_1_FLR_1_OSr,    !- Name
@@ -30729,7 +30731,7 @@
     cPOD1_ZN_1_FLR_1_LAr,    !- Name
     Corridor_Pod_1_ZN_1_FLR_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_cPOD1_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -30750,7 +30752,7 @@
   EnergyManagementSystem:Sensor,
     cCL2_Pod_1_ZN_1_FLR_1_LSr,  !- Name
     Corner_Class_2_Pod_1_ZN_1_FLR_1,  !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     cCL2_Pod_1_ZN_1_FLR_1_OSr,  !- Name
@@ -30766,7 +30768,7 @@
     cCL2_Pod_1_ZN_1_FLR_1_LAr,  !- Name
     Corner_Class_2_Pod_1_ZN_1_FLR_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_cCL2_Pod_1_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -30787,7 +30789,7 @@
   EnergyManagementSystem:Sensor,
     mCl2_Pod_1_ZN_1_FLR_1_LSr,  !- Name
     Mult_Class_2_Pod_1_ZN_1_FLR_1,  !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     mCl2_Pod_1_ZN_1_FLR_1_OSr,  !- Name
@@ -30803,7 +30805,7 @@
     mCl2_Pod_1_ZN_1_FLR_1_LAr,  !- Name
     Mult_Class_2_Pod_1_ZN_1_FLR_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_mCl2_Pod_1_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -30824,7 +30826,7 @@
   EnergyManagementSystem:Sensor,
     cCL1_Pod_2_ZN_1_FLR_1_LSr,  !- Name
     Corner_Class_1_Pod_2_ZN_1_FLR_1,  !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     cCL1_Pod_2_ZN_1_FLR_1_OSr,  !- Name
@@ -30840,7 +30842,7 @@
     cCL1_Pod_2_ZN_1_FLR_1_LAr,  !- Name
     Corner_Class_1_Pod_2_ZN_1_FLR_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_cCL1_Pod_2_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -30861,7 +30863,7 @@
   EnergyManagementSystem:Sensor,
     mCl1_Pod_2_ZN_1_FLR_1_LSr,  !- Name
     Mult_Class_1_Pod_2_ZN_1_FLR_1,  !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     mCl1_Pod_2_ZN_1_FLR_1_OSr,  !- Name
@@ -30877,7 +30879,7 @@
     mCl1_Pod_2_ZN_1_FLR_1_LAr,  !- Name
     Mult_Class_1_Pod_2_ZN_1_FLR_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_mCl1_Pod_2_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -30898,7 +30900,7 @@
   EnergyManagementSystem:Sensor,
     cPOD2_ZN_1_FLR_1_LSr,    !- Name
     Corridor_Pod_2_ZN_1_FLR_1,  !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     cPOD2_ZN_1_FLR_1_OSr,    !- Name
@@ -30914,7 +30916,7 @@
     cPOD2_ZN_1_FLR_1_LAr,    !- Name
     Corridor_Pod_2_ZN_1_FLR_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_cPOD2_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -30935,7 +30937,7 @@
   EnergyManagementSystem:Sensor,
     cCL2_Pod_2_ZN_1_FLR_1_LSr,  !- Name
     Corner_Class_2_Pod_2_ZN_1_FLR_1,  !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     cCL2_Pod_2_ZN_1_FLR_1_OSr,  !- Name
@@ -30951,7 +30953,7 @@
     cCL2_Pod_2_ZN_1_FLR_1_LAr,  !- Name
     Corner_Class_2_Pod_2_ZN_1_FLR_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_cCL2_Pod_2_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -30972,7 +30974,7 @@
   EnergyManagementSystem:Sensor,
     mCl2_Pod_2_ZN_1_FLR_1_LSr,  !- Name
     Mult_Class_2_Pod_2_ZN_1_FLR_1,  !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     mCl2_Pod_2_ZN_1_FLR_1_OSr,  !- Name
@@ -30988,7 +30990,7 @@
     mCl2_Pod_2_ZN_1_FLR_1_LAr,  !- Name
     Mult_Class_2_Pod_2_ZN_1_FLR_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_mCl2_Pod_2_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -31009,7 +31011,7 @@
   EnergyManagementSystem:Sensor,
     cCL1_Pod_3_ZN_1_FLR_1_LSr,  !- Name
     Corner_Class_1_Pod_3_ZN_1_FLR_1,  !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     cCL1_Pod_3_ZN_1_FLR_1_OSr,  !- Name
@@ -31025,7 +31027,7 @@
     cCL1_Pod_3_ZN_1_FLR_1_LAr,  !- Name
     Corner_Class_1_Pod_3_ZN_1_FLR_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_cCL1_Pod_3_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -31046,7 +31048,7 @@
   EnergyManagementSystem:Sensor,
     mCl1_Pod_3_ZN_1_FLR_1_LSr,  !- Name
     Mult_Class_1_Pod_3_ZN_1_FLR_1,  !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     mCl1_Pod_3_ZN_1_FLR_1_OSr,  !- Name
@@ -31062,7 +31064,7 @@
     mCl1_Pod_3_ZN_1_FLR_1_LAr,  !- Name
     Mult_Class_1_Pod_3_ZN_1_FLR_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_mCl1_Pod_3_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -31083,7 +31085,7 @@
   EnergyManagementSystem:Sensor,
     cPOD3_ZN_1_FLR_1_LSr,    !- Name
     Corridor_Pod_3_ZN_1_FLR_1,  !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     cPOD3_ZN_1_FLR_1_OSr,    !- Name
@@ -31099,7 +31101,7 @@
     cPOD3_ZN_1_FLR_1_LAr,    !- Name
     Corridor_Pod_3_ZN_1_FLR_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_cPOD3_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -31120,7 +31122,7 @@
   EnergyManagementSystem:Sensor,
     cCL2_Pod_3_ZN_1_FLR_1_LSr,  !- Name
     Corner_Class_2_Pod_3_ZN_1_FLR_1,  !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     cCL2_Pod_3_ZN_1_FLR_1_OSr,  !- Name
@@ -31136,7 +31138,7 @@
     cCL2_Pod_3_ZN_1_FLR_1_LAr,  !- Name
     Corner_Class_2_Pod_3_ZN_1_FLR_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_cCL2_Pod_3_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -31157,7 +31159,7 @@
   EnergyManagementSystem:Sensor,
     mCl2_Pod_3_ZN_1_FLR_1_LSr,  !- Name
     Mult_Class_2_Pod_3_ZN_1_FLR_1,  !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     mCl2_Pod_3_ZN_1_FLR_1_OSr,  !- Name
@@ -31173,7 +31175,7 @@
     mCl2_Pod_3_ZN_1_FLR_1_LAr,  !- Name
     Mult_Class_2_Pod_3_ZN_1_FLR_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_mCl2_Pod_3_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -31194,7 +31196,7 @@
   EnergyManagementSystem:Sensor,
     AUX_GYM_ZN_1_FLR_1_LSr,  !- Name
     AUX_GYM_ZN_1_FLR_1,      !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     AUX_GYM_ZN_1_FLR_1_OSr,  !- Name
@@ -31210,7 +31212,7 @@
     AUX_GYM_ZN_1_FLR_1_LAr,  !- Name
     AUX_GYM_ZN_1_FLR_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_AUX_GYM_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -31231,7 +31233,7 @@
   EnergyManagementSystem:Sensor,
     AUDITORIUM_ZN_1_FLR_1_LSr,  !- Name
     AUDITORIUM_ZN_1_FLR_1,   !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     AUDITORIUM_ZN_1_FLR_1_OSr,  !- Name
@@ -31247,7 +31249,7 @@
     AUDITORIUM_ZN_1_FLR_1_LAr,  !- Name
     AUDITORIUM_ZN_1_FLR_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_AUDITORIUM_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -31268,7 +31270,7 @@
   EnergyManagementSystem:Sensor,
     Main_Corridor_ZN_1_FLR_1_LSr,  !- Name
     Main_Corridor_ZN_1_FLR_1,!- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     Main_Corridor_ZN_1_FLR_1_OSr,  !- Name
@@ -31284,7 +31286,7 @@
     Main_Corridor_ZN_1_FLR_1_LAr,  !- Name
     Main_Corridor_ZN_1_FLR_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_Main_Corridor_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -31305,7 +31307,7 @@
   EnergyManagementSystem:Sensor,
     Lobby_ZN_1_FLR_1_LSr,    !- Name
     Lobby_ZN_1_FLR_1,        !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     Lobby_ZN_1_FLR_1_OSr,    !- Name
@@ -31321,7 +31323,7 @@
     Lobby_ZN_1_FLR_1_LAr,    !- Name
     Lobby_ZN_1_FLR_1_lights, !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_Lobby_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -31342,7 +31344,7 @@
   EnergyManagementSystem:Sensor,
     Mech_ZN_1_FLR_1_LSr,     !- Name
     Mech_ZN_1_FLR_1,         !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     Mech_ZN_1_FLR_1_OSr,     !- Name
@@ -31358,7 +31360,7 @@
     Mech_ZN_1_FLR_1_LAr,     !- Name
     Mech_ZN_1_FLR_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_Mech_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -31379,7 +31381,7 @@
   EnergyManagementSystem:Sensor,
     BATHROOMS_ZN_1_FLR_1_LSr,!- Name
     BATHROOMS_ZN_1_FLR_1,    !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     BATHROOMS_ZN_1_FLR_1_OSr,!- Name
@@ -31395,7 +31397,7 @@
     BATHROOMS_ZN_1_FLR_1_LAr,!- Name
     BATHROOMS_ZN_1_FLR_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_BATHROOMS_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -31416,7 +31418,7 @@
   EnergyManagementSystem:Sensor,
     Offices_ZN_1_FLR_1_LSr,  !- Name
     Offices_ZN_1_FLR_1,      !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     Offices_ZN_1_FLR_1_OSr,  !- Name
@@ -31432,7 +31434,7 @@
     Offices_ZN_1_FLR_1_LAr,  !- Name
     Offices_ZN_1_FLR_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_Offices_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -31453,7 +31455,7 @@
   EnergyManagementSystem:Sensor,
     Gym_ZN_1_FLR_1_LSr,      !- Name
     Gym_ZN_1_FLR_1,          !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     Gym_ZN_1_FLR_1_OSr,      !- Name
@@ -31469,7 +31471,7 @@
     Gym_ZN_1_FLR_1_LAr,      !- Name
     Gym_ZN_1_FLR_1_lights,   !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_Gym_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -31490,7 +31492,7 @@
   EnergyManagementSystem:Sensor,
     Kitchen_ZN_1_FLR_1_LSr,  !- Name
     Kitchen_ZN_1_FLR_1,      !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     Kitchen_ZN_1_FLR_1_OSr,  !- Name
@@ -31506,7 +31508,7 @@
     Kitchen_ZN_1_FLR_1_LAr,  !- Name
     Kitchen_ZN_1_FLR_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_Kitchen_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -31527,7 +31529,7 @@
   EnergyManagementSystem:Sensor,
     Cafeteria_ZN_1_FLR_1_LSr,!- Name
     Cafeteria_ZN_1_FLR_1,    !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     Cafeteria_ZN_1_FLR_1_OSr,!- Name
@@ -31543,7 +31545,7 @@
     Cafeteria_ZN_1_FLR_1_LAr,!- Name
     Cafeteria_ZN_1_FLR_1_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_Cafeteria_ZN_1_FLR_1_Light_EMS_Program,  !- Name
@@ -31565,7 +31567,7 @@
   EnergyManagementSystem:Sensor,
     cCL1_Pod_1_ZN_1_FLR_2_LSr,  !- Name
     Corner_Class_1_Pod_1_ZN_1_FLR_2,  !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     cCL1_Pod_1_ZN_1_FLR_2_OSr,  !- Name
@@ -31581,7 +31583,7 @@
     cCL1_Pod_1_ZN_1_FLR_2_LAr,  !- Name
     Corner_Class_1_Pod_1_ZN_1_FLR_2_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_cCL1_Pod_1_ZN_1_FLR_2_Light_EMS_Program,  !- Name
@@ -31602,7 +31604,7 @@
   EnergyManagementSystem:Sensor,
     mCl1_Pod_1_ZN_1_FLR_2_LSr,  !- Name
     Mult_Class_1_Pod_1_ZN_1_FLR_2,  !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     mCl1_Pod_1_ZN_1_FLR_2_OSr,  !- Name
@@ -31618,7 +31620,7 @@
     mCl1_Pod_1_ZN_1_FLR_2_LAr,  !- Name
     Mult_Class_1_Pod_1_ZN_1_FLR_2_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_mCl1_Pod_1_ZN_1_FLR_2_Light_EMS_Program,  !- Name
@@ -31639,7 +31641,7 @@
   EnergyManagementSystem:Sensor,
     cPOD1_ZN_1_FLR_2_LSr,    !- Name
     Corridor_Pod_1_ZN_1_FLR_2,  !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     cPOD1_ZN_1_FLR_2_OSr,    !- Name
@@ -31655,7 +31657,7 @@
     cPOD1_ZN_1_FLR_2_LAr,    !- Name
     Corridor_Pod_1_ZN_1_FLR_2_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_cPOD1_ZN_1_FLR_2_Light_EMS_Program,  !- Name
@@ -31676,7 +31678,7 @@
   EnergyManagementSystem:Sensor,
     cCL2_Pod_1_ZN_1_FLR_2_LSr,  !- Name
     Corner_Class_2_Pod_1_ZN_1_FLR_2,  !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     cCL2_Pod_1_ZN_1_FLR_2_OSr,  !- Name
@@ -31692,7 +31694,7 @@
     cCL2_Pod_1_ZN_1_FLR_2_LAr,  !- Name
     Corner_Class_2_Pod_1_ZN_1_FLR_2_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_cCL2_Pod_1_ZN_1_FLR_2_Light_EMS_Program,  !- Name
@@ -31713,7 +31715,7 @@
   EnergyManagementSystem:Sensor,
     mCl2_Pod_1_ZN_1_FLR_2_LSr,  !- Name
     Mult_Class_2_Pod_1_ZN_1_FLR_2,  !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     mCl2_Pod_1_ZN_1_FLR_2_OSr,  !- Name
@@ -31729,7 +31731,7 @@
     mCl2_Pod_1_ZN_1_FLR_2_LAr,  !- Name
     Mult_Class_2_Pod_1_ZN_1_FLR_2_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_mCl2_Pod_1_ZN_1_FLR_2_Light_EMS_Program,  !- Name
@@ -31750,7 +31752,7 @@
   EnergyManagementSystem:Sensor,
     cCL1_Pod_2_ZN_1_FLR_2_LSr,  !- Name
     Corner_Class_1_Pod_2_ZN_1_FLR_2,  !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     cCL1_Pod_2_ZN_1_FLR_2_OSr,  !- Name
@@ -31766,7 +31768,7 @@
     cCL1_Pod_2_ZN_1_FLR_2_LAr,  !- Name
     Corner_Class_1_Pod_2_ZN_1_FLR_2_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_cCL1_Pod_2_ZN_1_FLR_2_Light_EMS_Program,  !- Name
@@ -31787,7 +31789,7 @@
   EnergyManagementSystem:Sensor,
     mCl1_Pod_2_ZN_1_FLR_2_LSr,  !- Name
     Mult_Class_1_Pod_2_ZN_1_FLR_2,  !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     mCl1_Pod_2_ZN_1_FLR_2_OSr,  !- Name
@@ -31803,7 +31805,7 @@
     mCl1_Pod_2_ZN_1_FLR_2_LAr,  !- Name
     Mult_Class_1_Pod_2_ZN_1_FLR_2_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_mCl1_Pod_2_ZN_1_FLR_2_Light_EMS_Program,  !- Name
@@ -31824,7 +31826,7 @@
   EnergyManagementSystem:Sensor,
     cPOD2_ZN_1_FLR_2_LSr,    !- Name
     Corridor_Pod_2_ZN_1_FLR_2,  !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     cPOD2_ZN_1_FLR_2_OSr,    !- Name
@@ -31840,7 +31842,7 @@
     cPOD2_ZN_1_FLR_2_LAr,    !- Name
     Corridor_Pod_2_ZN_1_FLR_2_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_cPOD2_ZN_1_FLR_2_Light_EMS_Program,  !- Name
@@ -31861,7 +31863,7 @@
   EnergyManagementSystem:Sensor,
     cCL2_Pod_2_ZN_1_FLR_2_LSr,  !- Name
     Corner_Class_2_Pod_2_ZN_1_FLR_2,  !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     cCL2_Pod_2_ZN_1_FLR_2_OSr,  !- Name
@@ -31877,7 +31879,7 @@
     cCL2_Pod_2_ZN_1_FLR_2_LAr,  !- Name
     Corner_Class_2_Pod_2_ZN_1_FLR_2_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_cCL2_Pod_2_ZN_1_FLR_2_Light_EMS_Program,  !- Name
@@ -31898,7 +31900,7 @@
   EnergyManagementSystem:Sensor,
     mCl2_Pod_2_ZN_1_FLR_2_LSr,  !- Name
     Mult_Class_2_Pod_2_ZN_1_FLR_2,  !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     mCl2_Pod_2_ZN_1_FLR_2_OSr,  !- Name
@@ -31914,7 +31916,7 @@
     mCl2_Pod_2_ZN_1_FLR_2_LAr,  !- Name
     Mult_Class_2_Pod_2_ZN_1_FLR_2_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_mCl2_Pod_2_ZN_1_FLR_2_Light_EMS_Program,  !- Name
@@ -31935,7 +31937,7 @@
   EnergyManagementSystem:Sensor,
     cCL1_Pod_3_ZN_1_FLR_2_LSr,  !- Name
     Corner_Class_1_Pod_3_ZN_1_FLR_2,  !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     cCL1_Pod_3_ZN_1_FLR_2_OSr,  !- Name
@@ -31951,7 +31953,7 @@
     cCL1_Pod_3_ZN_1_FLR_2_LAr,  !- Name
     Corner_Class_1_Pod_3_ZN_1_FLR_2_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_cCL1_Pod_3_ZN_1_FLR_2_Light_EMS_Program,  !- Name
@@ -31972,7 +31974,7 @@
   EnergyManagementSystem:Sensor,
     mCl1_Pod_3_ZN_1_FLR_2_LSr,  !- Name
     Mult_Class_1_Pod_3_ZN_1_FLR_2,  !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     mCl1_Pod_3_ZN_1_FLR_2_OSr,  !- Name
@@ -31988,7 +31990,7 @@
     mCl1_Pod_3_ZN_1_FLR_2_LAr,  !- Name
     Mult_Class_1_Pod_3_ZN_1_FLR_2_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_mCl1_Pod_3_ZN_1_FLR_2_Light_EMS_Program,  !- Name
@@ -32009,7 +32011,7 @@
   EnergyManagementSystem:Sensor,
     cPOD3_ZN_1_FLR_2_LSr,    !- Name
     Corridor_Pod_3_ZN_1_FLR_2,  !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     cPOD3_ZN_1_FLR_2_OSr,    !- Name
@@ -32025,7 +32027,7 @@
     cPOD3_ZN_1_FLR_2_LAr,    !- Name
     Corridor_Pod_3_ZN_1_FLR_2_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_cPOD3_ZN_1_FLR_2_Light_EMS_Program,  !- Name
@@ -32046,7 +32048,7 @@
   EnergyManagementSystem:Sensor,
     cCL2_Pod_3_ZN_1_FLR_2_LSr,  !- Name
     Corner_Class_2_Pod_3_ZN_1_FLR_2,  !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     cCL2_Pod_3_ZN_1_FLR_2_OSr,  !- Name
@@ -32062,7 +32064,7 @@
     cCL2_Pod_3_ZN_1_FLR_2_LAr,  !- Name
     Corner_Class_2_Pod_3_ZN_1_FLR_2_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_cCL2_Pod_3_ZN_1_FLR_2_Light_EMS_Program,  !- Name
@@ -32083,7 +32085,7 @@
   EnergyManagementSystem:Sensor,
     mCl2_Pod_3_ZN_1_FLR_2_LSr,  !- Name
     Mult_Class_2_Pod_3_ZN_1_FLR_2,  !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     mCl2_Pod_3_ZN_1_FLR_2_OSr,  !- Name
@@ -32099,7 +32101,7 @@
     mCl2_Pod_3_ZN_1_FLR_2_LAr,  !- Name
     Mult_Class_2_Pod_3_ZN_1_FLR_2_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_mCl2_Pod_3_ZN_1_FLR_2_Light_EMS_Program,  !- Name
@@ -32120,7 +32122,7 @@
   EnergyManagementSystem:Sensor,
     Main_Corridor_ZN_1_FLR_2_LSr,  !- Name
     Main_Corridor_ZN_1_FLR_2,!- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     Main_Corridor_ZN_1_FLR_2_OSr,  !- Name
@@ -32136,7 +32138,7 @@
     Main_Corridor_ZN_1_FLR_2_LAr,  !- Name
     Main_Corridor_ZN_1_FLR_2_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_Main_Corridor_ZN_1_FLR_2_Light_EMS_Program,  !- Name
@@ -32157,7 +32159,7 @@
   EnergyManagementSystem:Sensor,
     Lobby_ZN_1_FLR_2_LSr,    !- Name
     Lobby_ZN_1_FLR_2,        !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     Lobby_ZN_1_FLR_2_OSr,    !- Name
@@ -32173,7 +32175,7 @@
     Lobby_ZN_1_FLR_2_LAr,    !- Name
     Lobby_ZN_1_FLR_2_lights, !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_Lobby_ZN_1_FLR_2_Light_EMS_Program,  !- Name
@@ -32194,7 +32196,7 @@
   EnergyManagementSystem:Sensor,
     Mech_ZN_1_FLR_2_LSr,     !- Name
     Mech_ZN_1_FLR_2,         !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     Mech_ZN_1_FLR_2_OSr,     !- Name
@@ -32210,7 +32212,7 @@
     Mech_ZN_1_FLR_2_LAr,     !- Name
     Mech_ZN_1_FLR_2_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_Mech_ZN_1_FLR_2_Light_EMS_Program,  !- Name
@@ -32231,7 +32233,7 @@
   EnergyManagementSystem:Sensor,
     BATHROOMS_ZN_1_FLR_2_LSr,!- Name
     BATHROOMS_ZN_1_FLR_2,    !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     BATHROOMS_ZN_1_FLR_2_OSr,!- Name
@@ -32247,7 +32249,7 @@
     BATHROOMS_ZN_1_FLR_2_LAr,!- Name
     BATHROOMS_ZN_1_FLR_2_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_BATHROOMS_ZN_1_FLR_2_Light_EMS_Program,  !- Name
@@ -32268,7 +32270,7 @@
   EnergyManagementSystem:Sensor,
     Offices_ZN_1_FLR_2_LSr,  !- Name
     Offices_ZN_1_FLR_2,      !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     Offices_ZN_1_FLR_2_OSr,  !- Name
@@ -32284,7 +32286,7 @@
     Offices_ZN_1_FLR_2_LAr,  !- Name
     Offices_ZN_1_FLR_2_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_Offices_ZN_1_FLR_2_Light_EMS_Program,  !- Name
@@ -32305,7 +32307,7 @@
   EnergyManagementSystem:Sensor,
     LMC_ZN_1_FLR_2_LSr,      !- Name
     Library_Media_Center_ZN_1_FLR_2,  !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     LMC_ZN_1_FLR_2_OSr,      !- Name
@@ -32321,7 +32323,7 @@
     LMC_ZN_1_FLR_2_LAr,      !- Name
     Library_Media_Center_ZN_1_FLR_2_lights,  !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
-    Electric Power Level;    !- Actuated Component Control Type
+    Electricity Rate;        !- Actuated Component Control Type
 
   EnergyManagementSystem:Program,
     SET_LMC_ZN_1_FLR_2_Light_EMS_Program,  !- Name
@@ -32336,4 +32338,3 @@
     SET_LMC_ZN_1_FLR_2_Light_EMS_Program_Prog_Manager,  !- Name
     BeginTimestepBeforePredictor,  !- EnergyPlus Model Calling Point
     SET_LMC_ZN_1_FLR_2_Light_EMS_Program;  !- Program Name 1
-

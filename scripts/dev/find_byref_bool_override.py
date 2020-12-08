@@ -27,6 +27,7 @@ import os
 import re
 import json
 import glob as gb
+import sys
 import warnings
 
 
@@ -43,10 +44,7 @@ EXPECT_MISSING_HEADER = ['src/EnergyPlus/main.cc',
                          'src/EnergyPlus/test_ep_as_library.cc',
                          'EnergyPlusPgm.cc']
 
-EXPECT_MISSING_NAMESPACE = [
-    'src/EnergyPlus/PythonLibWrapper.cc',
-    'src/EnergyPlus/PythonLibWrapper.hh'
-]
+EXPECT_MISSING_NAMESPACE = []
 
 # Finds a boolean argument passed by reference
 # Optional_bool acts like one, Array_XD_bool is another possibility
@@ -144,6 +142,11 @@ CHECKED_AND_OKED = {
     "EMSManager.cc": {
         "ManageEMS": [
             "anyProgramRan"
+        ]
+    },
+    "Fans.cc": {
+        "FanInputsForDesHeatGain": [
+            "fanCompModel"
         ]
     },
     "FaultsManager.cc": {
@@ -421,7 +424,7 @@ CHECKED_AND_OKED = {
         ],
         # Docstring is explicit
         "ReportWeatherAndTimeInformation": [
-            "PrintEnvrnStamp"
+            "printEnvrnStamp"
         ]
     },
     "WindowAC.cc": {
@@ -802,3 +805,5 @@ if __name__ == '__main__':
     source_files = gb.glob(os.path.join(SRC_DIR, '*.cc'))
     all_errors = get_all_errors(source_files)
     output_errors_to_console(all_errors)
+    if len(all_errors) > 0:
+        sys.exit(1)

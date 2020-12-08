@@ -1003,7 +1003,9 @@
     Yes,                     !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
     Yes,                     !- Run Simulation for Sizing Periods
-    Yes;                     !- Run Simulation for Weather File Run Periods
+    Yes,                     !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
  !  Data Source=ASHRAE 2009 Annual Design Conditions
 
@@ -3433,13 +3435,13 @@
 
   Output:Variable,TU1 VRF DX HEATING COIL,Heating Coil Runtime Fraction,timestep;
 
-  Output:Variable,*,VRF Heat Pump Heating Electric Power,timestep;
+  Output:Variable,*,VRF Heat Pump Heating Electricity Rate,timestep;
 
-  Output:Variable,*,VRF Heat Pump Cooling Electric Power,timestep;
+  Output:Variable,*,VRF Heat Pump Cooling Electricity Rate,timestep;
 
-  Output:Variable,*,VRF Heat Pump Heating Electric Energy,timestep;
+  Output:Variable,*,VRF Heat Pump Heating Electricity Energy,timestep;
 
-  Output:Variable,*,VRF Heat Pump Cooling Electric Energy,timestep;
+  Output:Variable,*,VRF Heat Pump Cooling Electricity Energy,timestep;
 
   Output:Variable,*,VRF Heat Pump Total Cooling Rate,timestep;
 
@@ -3453,25 +3455,25 @@
 
   Output:Variable,*,VRF Heat Pump Operating Mode,timestep;
 
-  Output:Variable,*,VRF Heat Pump Crankcase Heater Electric Power,timestep;
+  Output:Variable,*,VRF Heat Pump Crankcase Heater Electricity Rate,timestep;
 
-  Output:Variable,*,VRF Heat Pump Crankcase Heater Electric Energy,timestep;
+  Output:Variable,*,VRF Heat Pump Crankcase Heater Electricity Energy,timestep;
 
-  Output:Variable,*,VRF Heat Pump Defrost Electric Power,timestep;
+  Output:Variable,*,VRF Heat Pump Defrost Electricity Rate,timestep;
 
-  Output:Variable,*,VRF Heat Pump Defrost Electric Energy,timestep;
+  Output:Variable,*,VRF Heat Pump Defrost Electricity Energy,timestep;
 
   Output:Variable,*,VRF Heat Pump Maximum Capacity Cooling Rate,timestep;
 
   Output:Variable,*,VRF Heat Pump Maximum Capacity Heating Rate,timestep;
 
-  Output:Variable,TU1,Zone VRF Air Terminal Cooling Electric Power,timestep;
+  Output:Variable,TU1,Zone VRF Air Terminal Cooling Electricity Rate,timestep;
 
-  Output:Variable,TU1,Zone VRF Air Terminal Heating Electric Power,timestep;
+  Output:Variable,TU1,Zone VRF Air Terminal Heating Electricity Rate,timestep;
 
-  Output:Variable,TU1,Zone VRF Air Terminal Cooling Electric Energy,timestep;
+  Output:Variable,TU1,Zone VRF Air Terminal Cooling Electricity Energy,timestep;
 
-  Output:Variable,TU1,Zone VRF Air Terminal Heating Electric Energy,timestep;
+  Output:Variable,TU1,Zone VRF Air Terminal Heating Electricity Energy,timestep;
 
   Output:Variable,TU1,Zone VRF Air Terminal Total Cooling Rate,timestep;
 
@@ -3485,7 +3487,7 @@
 
   Output:Variable,TU1,Zone VRF Air Terminal Latent Heating Rate,timestep;
 
-  Output:Variable,TU1 VRF SUPPLY FAN,Fan Electric Power,timestep;
+  Output:Variable,TU1 VRF SUPPLY FAN,Fan Electricity Rate,timestep;
 
   Output:Meter,Cooling:Electricity,monthly;
 

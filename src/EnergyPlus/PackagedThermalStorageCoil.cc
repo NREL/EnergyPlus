@@ -53,16 +53,16 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataWater.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
@@ -71,17 +71,15 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
-#include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/PackagedThermalStorageCoil.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/TempSolveRoot.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -113,17 +111,8 @@ namespace PackagedThermalStorageCoil {
     // na
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataLoopNode;
-    using namespace DataGlobals;
     using namespace Psychrometrics;
-    using DataEnvironment::CurMnDy;
-    using DataEnvironment::EnvironmentName;
-    using DataEnvironment::OutBaroPress;
-    using DataEnvironment::OutDryBulbTemp;
-    using DataEnvironment::OutHumRat;
-    using DataEnvironment::OutWetBulbTemp;
-    using DataEnvironment::StdBaroPress;
     using namespace CurveManager;
 
     // Data
@@ -164,13 +153,14 @@ namespace PackagedThermalStorageCoil {
     int NumTESCoils;
     Array1D_bool CheckEquipName;
     bool GetTESInputFlag(true);
-    bool MyOneTimeFlag(true);  // One time flag used to allocate MyEnvrnFlag and MySizeFlag
+    bool MyOneTimeFlag(true); // One time flag used to allocate MyEnvrnFlag and MySizeFlag
     // SUBROUTINE SPECIFICATIONS FOR MODULE <module_name>:
 
     // Object Data
     Array1D<PackagedTESCoolingCoilStruct> TESCoil;
 
-    void clear_state() {
+    void clear_state()
+    {
         NumTESCoils = 0;
         CheckEquipName.clear();
         GetTESInputFlag = true;
@@ -178,7 +168,8 @@ namespace PackagedThermalStorageCoil {
         TESCoil.clear();
     }
 
-    void SimTESCoil(EnergyPlusData &state, std::string const &CompName, // name of the fan coil unit
+    void SimTESCoil(EnergyPlusData &state,
+                    std::string const &CompName, // name of the fan coil unit
                     int &CompIndex,
                     int const FanOpMode, // allows parent object to control fan mode
                     int &TESOpMode,
@@ -196,7 +187,6 @@ namespace PackagedThermalStorageCoil {
         // <description>
 
         // Using/Aliasing
-        using General::TrimSigDigits;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int TESCoilNum;
@@ -209,19 +199,25 @@ namespace PackagedThermalStorageCoil {
         if (CompIndex == 0) {
             TESCoilNum = UtilityRoutines::FindItemInList(CompName, TESCoil);
             if (TESCoilNum == 0) {
-                ShowFatalError("Thermal Energy Storage Cooling Coil not found=" + CompName);
+                ShowFatalError(state, "Thermal Energy Storage Cooling Coil not found=" + CompName);
             }
             CompIndex = TESCoilNum;
         } else {
             TESCoilNum = CompIndex;
             if (TESCoilNum > NumTESCoils || TESCoilNum < 1) {
-                ShowFatalError("SimTESCoil: Invalid CompIndex passed=" + TrimSigDigits(TESCoilNum) +
-                               ", Number of Thermal Energy Storage Cooling Coil Coils=" + TrimSigDigits(NumTESCoils) + ", Coil name=" + CompName);
+                ShowFatalError(state,
+                               format("SimTESCoil: Invalid CompIndex passed={}, Number of Thermal Energy Storage Cooling Coil Coils={}, Coil name={}",
+                                      TESCoilNum,
+                                      NumTESCoils,
+                                      CompName));
             }
             if (CheckEquipName(TESCoilNum)) {
                 if (!CompName.empty() && CompName != TESCoil(TESCoilNum).Name) {
-                    ShowFatalError("SimTESCoil: Invalid CompIndex passed=" + TrimSigDigits(TESCoilNum) + ", Coil name=" + CompName +
-                                   ", stored Coil Name for that index=" + TESCoil(TESCoilNum).Name);
+                    ShowFatalError(state,
+                                   format("SimTESCoil: Invalid CompIndex passed={}, Coil name={}, stored Coil Name for that index={}",
+                                          TESCoilNum,
+                                          CompName,
+                                          TESCoil(TESCoilNum).Name));
                 }
                 CheckEquipName(TESCoilNum) = false;
             }
@@ -229,23 +225,23 @@ namespace PackagedThermalStorageCoil {
 
         TESOpMode = 1;
 
-        InitTESCoil(state.dataBranchInputManager, TESCoilNum);
+        InitTESCoil(state, TESCoilNum);
 
         TESOpMode = TESCoil(TESCoilNum).CurControlMode;
         {
             auto const SELECT_CASE_var(TESOpMode);
             if (SELECT_CASE_var == OffMode) {
-                CalcTESCoilOffMode(TESCoilNum);
+                CalcTESCoilOffMode(state, TESCoilNum);
             } else if (SELECT_CASE_var == CoolingOnlyMode) {
-                CalcTESCoilCoolingOnlyMode(TESCoilNum, FanOpMode, PartLoadRatio);
+                CalcTESCoilCoolingOnlyMode(state, TESCoilNum, FanOpMode, PartLoadRatio);
             } else if (SELECT_CASE_var == CoolingAndChargeMode) {
-                CalcTESCoilCoolingAndChargeMode(TESCoilNum, FanOpMode, PartLoadRatio);
+                CalcTESCoilCoolingAndChargeMode(state, TESCoilNum, FanOpMode, PartLoadRatio);
             } else if (SELECT_CASE_var == CoolingAndDischargeMode) {
-                CalcTESCoilCoolingAndDischargeMode(TESCoilNum, FanOpMode, PartLoadRatio);
+                CalcTESCoilCoolingAndDischargeMode(state, TESCoilNum, FanOpMode, PartLoadRatio);
             } else if (SELECT_CASE_var == ChargeOnlyMode) {
-                CalcTESCoilChargeOnlyMode(TESCoilNum);
+                CalcTESCoilChargeOnlyMode(state, TESCoilNum);
             } else if (SELECT_CASE_var == DischargeOnlyMode) {
-                CalcTESCoilDischargeOnlyMode(TESCoilNum, PartLoadRatio);
+                CalcTESCoilDischargeOnlyMode(state, TESCoilNum, PartLoadRatio);
             }
         }
     }
@@ -273,7 +269,6 @@ namespace PackagedThermalStorageCoil {
         using FluidProperties::GetFluidSpecificHeatTemperatureLimits;
         using GlobalNames::VerifyUniqueCoilName;
         using NodeInputManager::GetOnlySingleNode;
-        using OutAirNodeManager::CheckOutAirNodeNumber;
         using ScheduleManager::GetScheduleIndex;
         using WaterManager::SetupTankDemandComponent;
         using WaterManager::SetupTankSupplyComponent;
@@ -294,13 +289,14 @@ namespace PackagedThermalStorageCoil {
         int ZoneIndexTrial;
 
         cCurrentModuleObject = "Coil:Cooling:DX:SingleSpeed:ThermalStorage";
-        NumTESCoils = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        NumTESCoils = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         TESCoil.allocate(NumTESCoils);
         CheckEquipName.dimension(NumTESCoils, true);
 
         for (item = 1; item <= NumTESCoils; ++item) {
-            inputProcessor->getObjectItem(cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          cCurrentModuleObject,
                                           item,
                                           cAlphaArgs,
                                           NumAlphas,
@@ -311,19 +307,19 @@ namespace PackagedThermalStorageCoil {
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
-            VerifyUniqueCoilName(cCurrentModuleObject, cAlphaArgs(1), ErrorsFound, cCurrentModuleObject + " Name");
+            VerifyUniqueCoilName(state, cCurrentModuleObject, cAlphaArgs(1), ErrorsFound, cCurrentModuleObject + " Name");
 
             TESCoil(item).Name = cAlphaArgs(1);
             if (lAlphaFieldBlanks(2)) {
-                TESCoil(item).AvailSchedNum = ScheduleAlwaysOn;
+                TESCoil(item).AvailSchedNum = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
-                TESCoil(item).AvailSchedNum = GetScheduleIndex(cAlphaArgs(2));
+                TESCoil(item).AvailSchedNum = GetScheduleIndex(state, cAlphaArgs(2));
                 if (TESCoil(item).AvailSchedNum == 0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                    ShowContinueError("..." + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
+                    ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                    ShowContinueError(state, "..." + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
                     ErrorsFound = true;
                 }
             }
@@ -334,23 +330,23 @@ namespace PackagedThermalStorageCoil {
                 } else if (SELECT_CASE_var == "EMSCONTROLLED") {
                     TESCoil(item).ModeControlType = EMSActuatedOpModes;
                 } else {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                    ShowContinueError("..." + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
-                    ShowContinueError("Available choices are ScheduledModes or EMSControlled");
+                    ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                    ShowContinueError(state, "..." + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
+                    ShowContinueError(state, "Available choices are ScheduledModes or EMSControlled");
                     ErrorsFound = true;
                 }
             }
             if (lAlphaFieldBlanks(4)) {
                 if (TESCoil(item).ModeControlType == ScheduledOpModes) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(cAlphaFieldNames(4) + " is blank but a schedule is needed");
+                    ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                    ShowContinueError(state, cAlphaFieldNames(4) + " is blank but a schedule is needed");
                     ErrorsFound = true;
                 }
             } else {
-                TESCoil(item).ControlModeSchedNum = GetScheduleIndex(cAlphaArgs(4));
+                TESCoil(item).ControlModeSchedNum = GetScheduleIndex(state, cAlphaArgs(4));
                 if (TESCoil(item).ControlModeSchedNum == 0 && TESCoil(item).ModeControlType == ScheduledOpModes) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                    ShowContinueError("..." + cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) + "\".");
+                    ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                    ShowContinueError(state, "..." + cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) + "\".");
                     ErrorsFound = true;
                 }
             }
@@ -361,13 +357,13 @@ namespace PackagedThermalStorageCoil {
                 } else if (SELECT_CASE_var == "WATER") {
                     TESCoil(item).StorageMedia = FluidBased;
                     TESCoil(item).StorageFluidName = "WATER";
-                    TESCoil(item).StorageFluidIndex = FindGlycol("WATER");
+                    TESCoil(item).StorageFluidIndex = FindGlycol(state, "WATER");
                 } else if (SELECT_CASE_var == "USERDEFINEDFLUIDTYPE") {
                     TESCoil(item).StorageMedia = FluidBased;
                 } else {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                    ShowContinueError("..." + cAlphaFieldNames(5) + "=\"" + cAlphaArgs(5) + "\".");
-                    ShowContinueError("Available choices are Ice, Water, or UserDefindedFluidType");
+                    ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                    ShowContinueError(state, "..." + cAlphaFieldNames(5) + "=\"" + cAlphaArgs(5) + "\".");
+                    ShowContinueError(state, "Available choices are Ice, Water, or UserDefindedFluidType");
                     ErrorsFound = true;
                 }
             }
@@ -375,22 +371,22 @@ namespace PackagedThermalStorageCoil {
             if (UtilityRoutines::SameString(cAlphaArgs(5), "USERDEFINEDFLUIDTYPE")) {
                 if (!(lAlphaFieldBlanks(6))) {
                     TESCoil(item).StorageFluidName = cAlphaArgs(6);
-                    if (CheckFluidPropertyName(cAlphaArgs(6)) == 0) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", missing fluid data");
-                        ShowContinueError("Check that fluid property data have been input for fluid name = " + cAlphaArgs(6));
+                    if (CheckFluidPropertyName(state, cAlphaArgs(6)) == 0) {
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", missing fluid data");
+                        ShowContinueError(state, "Check that fluid property data have been input for fluid name = " + cAlphaArgs(6));
                         ErrorsFound = true;
                     } else {
-                        TESCoil(item).StorageFluidIndex = FindGlycol(cAlphaArgs(6));
+                        TESCoil(item).StorageFluidIndex = FindGlycol(state, cAlphaArgs(6));
                         if (TESCoil(item).StorageFluidIndex == 0) {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid fluid data");
-                            ShowContinueError("Check that correct fluid property data have been input for fluid name = " + cAlphaArgs(6));
+                            ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid fluid data");
+                            ShowContinueError(state, "Check that correct fluid property data have been input for fluid name = " + cAlphaArgs(6));
                             ErrorsFound = true;
                         }
                     }
 
                 } else {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                    ShowContinueError("Storage Type is set to UserDefinedFluidType but no name of fluid was entered.");
+                    ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                    ShowContinueError(state, "Storage Type is set to UserDefinedFluidType but no name of fluid was entered.");
                     ErrorsFound = true;
                 }
             }
@@ -398,33 +394,33 @@ namespace PackagedThermalStorageCoil {
             if ((TESCoil(item).StorageMedia == FluidBased) && (!lNumericFieldBlanks(1))) {
                 TESCoil(item).FluidStorageVolume = rNumericArgs(1);
             } else if ((TESCoil(item).StorageMedia == FluidBased) && (lNumericFieldBlanks(1))) {
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                ShowContinueError(cNumericFieldNames(1) + " cannot be blank for Water storage type");
-                ShowContinueError("Enter fluid storage tank volume in m3/s.");
+                ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                ShowContinueError(state, cNumericFieldNames(1) + " cannot be blank for Water storage type");
+                ShowContinueError(state, "Enter fluid storage tank volume in m3/s.");
                 ErrorsFound = true;
             }
 
             if ((TESCoil(item).StorageMedia == IceBased) && (!lNumericFieldBlanks(2))) {
-                if (rNumericArgs(2) == AutoCalculate) {
+                if (rNumericArgs(2) == DataGlobalConstants::AutoCalculate()) {
                     TESCoil(item).IceStorageCapacity = rNumericArgs(2);
                 } else {
                     TESCoil(item).IceStorageCapacity = rNumericArgs(2) * 1.e+09; // input in giga joules, used as joules internally
                 }
             } else if ((TESCoil(item).StorageMedia == IceBased) && (lNumericFieldBlanks(2))) {
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                ShowContinueError(cNumericFieldNames(2) + " cannot be blank for Ice storage type");
-                ShowContinueError("Enter ice storage tank capacity in GJ.");
+                ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                ShowContinueError(state, cNumericFieldNames(2) + " cannot be blank for Ice storage type");
+                ShowContinueError(state, "Enter ice storage tank capacity in GJ.");
                 ErrorsFound = true;
             }
 
             TESCoil(item).StorageCapacitySizingFactor = rNumericArgs(3);
 
-            TESCoil(item).StorageAmbientNodeNum = GetOnlySingleNode(
+            TESCoil(item).StorageAmbientNodeNum = GetOnlySingleNode(state,
                 cAlphaArgs(7), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
 
             ZoneIndexTrial = FindControlledZoneIndexFromSystemNodeNumberForZone(state, TESCoil(item).StorageAmbientNodeNum);
             if (ZoneIndexTrial > 0) { // tank is inside a zone so setup internal gains
-                SetupZoneInternalGain(ZoneIndexTrial,
+                SetupZoneInternalGain(state, ZoneIndexTrial,
                                       "Coil:Cooling:DX:SingleSpeed:ThermalStorage",
                                       TESCoil(item).Name,
                                       IntGainTypeOf_PackagedTESCoilTank,
@@ -435,11 +431,11 @@ namespace PackagedThermalStorageCoil {
             TESCoil(item).RatedFluidTankTemp = rNumericArgs(5);
             TESCoil(item).RatedEvapAirVolFlowRate = rNumericArgs(6);
 
-            TESCoil(item).EvapAirInletNodeNum = GetOnlySingleNode(
+            TESCoil(item).EvapAirInletNodeNum = GetOnlySingleNode(state,
                 cAlphaArgs(8), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
-            TESCoil(item).EvapAirOutletNodeNum = GetOnlySingleNode(
+            TESCoil(item).EvapAirOutletNodeNum = GetOnlySingleNode(state,
                 cAlphaArgs(9), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
-            TestCompSet(cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(8), cAlphaArgs(9), "Air Nodes");
+            TestCompSet(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(8), cAlphaArgs(9), "Air Nodes");
 
             {
                 auto const SELECT_CASE_var(cAlphaArgs(10));
@@ -449,9 +445,9 @@ namespace PackagedThermalStorageCoil {
                     TESCoil(item).CoolingOnlyModeIsAvailable = false;
                 } else {
                     TESCoil(item).CoolingOnlyModeIsAvailable = false;
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                    ShowContinueError("..." + cAlphaFieldNames(10) + "=\"" + cAlphaArgs(10) + "\".");
-                    ShowContinueError("Available choices are Yes or No.");
+                    ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                    ShowContinueError(state, "..." + cAlphaFieldNames(10) + "=\"" + cAlphaArgs(10) + "\".");
+                    ShowContinueError(state, "Available choices are Yes or No.");
                     ErrorsFound = true;
                 }
             }
@@ -462,19 +458,19 @@ namespace PackagedThermalStorageCoil {
                 TESCoil(item).CoolingOnlyRatedSHR = rNumericArgs(8);
                 TESCoil(item).CoolingOnlyRatedCOP = rNumericArgs(9);
 
-                TESCoil(item).CoolingOnlyCapFTempCurve = GetCurveIndex(cAlphaArgs(11));
+                TESCoil(item).CoolingOnlyCapFTempCurve = GetCurveIndex(state, cAlphaArgs(11));
                 if (TESCoil(item).CoolingOnlyCapFTempCurve == 0) {
                     if (lAlphaFieldBlanks(11)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Required " + cAlphaFieldNames(11) + "is blank.");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Required " + cAlphaFieldNames(11) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Not found " + cAlphaFieldNames(11) + "=\"" + cAlphaArgs(11) + "\".");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Not found " + cAlphaFieldNames(11) + "=\"" + cAlphaArgs(11) + "\".");
                     }
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object
-                    ErrorsFound |= CurveManager::CheckCurveDims(
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
                         TESCoil(item).CoolingOnlyCapFTempCurve,   // Curve index
                          {2},                                     // Valid dimensions
                          RoutineName,                             // Routine name
@@ -483,19 +479,19 @@ namespace PackagedThermalStorageCoil {
                          cAlphaFieldNames(11));                   // Field Name
                 }
 
-                TESCoil(item).CoolingOnlyCapFFlowCurve = GetCurveIndex(cAlphaArgs(12));
+                TESCoil(item).CoolingOnlyCapFFlowCurve = GetCurveIndex(state, cAlphaArgs(12));
                 if (TESCoil(item).CoolingOnlyCapFFlowCurve == 0) {
                     if (lAlphaFieldBlanks(12)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Required " + cAlphaFieldNames(12) + "is blank.");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Required " + cAlphaFieldNames(12) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Not found " + cAlphaFieldNames(12) + "=\"" + cAlphaArgs(12) + "\".");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Not found " + cAlphaFieldNames(12) + "=\"" + cAlphaArgs(12) + "\".");
                     }
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, any curve with just x as single independent variable
-                    ErrorsFound |= CurveManager::CheckCurveDims(
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
                         TESCoil(item).CoolingOnlyCapFFlowCurve,   // Curve index
                          {1},                                     // Valid dimensions
                          RoutineName,                             // Routine name
@@ -504,19 +500,19 @@ namespace PackagedThermalStorageCoil {
                          cAlphaFieldNames(12));                   // Field Name
                 }
 
-                TESCoil(item).CoolingOnlyEIRFTempCurve = GetCurveIndex(cAlphaArgs(13));
+                TESCoil(item).CoolingOnlyEIRFTempCurve = GetCurveIndex(state, cAlphaArgs(13));
                 if (TESCoil(item).CoolingOnlyEIRFTempCurve == 0) {
                     if (lAlphaFieldBlanks(13)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Required " + cAlphaFieldNames(13) + "is blank.");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Required " + cAlphaFieldNames(13) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Not found " + cAlphaFieldNames(13) + "=\"" + cAlphaArgs(13) + "\".");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Not found " + cAlphaFieldNames(13) + "=\"" + cAlphaArgs(13) + "\".");
                     }
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object
-                    ErrorsFound |= CurveManager::CheckCurveDims(
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
                         TESCoil(item).CoolingOnlyEIRFTempCurve,   // Curve index
                          {2},                                     // Valid dimensions
                          RoutineName,                             // Routine name
@@ -525,19 +521,19 @@ namespace PackagedThermalStorageCoil {
                          cAlphaFieldNames(13));                   // Field Name
                 }
 
-                TESCoil(item).CoolingOnlyEIRFFlowCurve = GetCurveIndex(cAlphaArgs(14));
+                TESCoil(item).CoolingOnlyEIRFFlowCurve = GetCurveIndex(state, cAlphaArgs(14));
                 if (TESCoil(item).CoolingOnlyEIRFFlowCurve == 0) {
                     if (lAlphaFieldBlanks(14)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Required " + cAlphaFieldNames(14) + "is blank.");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Required " + cAlphaFieldNames(14) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Not found " + cAlphaFieldNames(14) + "=\"" + cAlphaArgs(14) + "\".");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Not found " + cAlphaFieldNames(14) + "=\"" + cAlphaArgs(14) + "\".");
                     }
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, any curve with just x as single independent variable
-                    ErrorsFound |= CurveManager::CheckCurveDims(
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
                         TESCoil(item).CoolingOnlyEIRFFlowCurve,   // Curve index
                          {1},                                     // Valid dimensions
                          RoutineName,                             // Routine name
@@ -546,19 +542,19 @@ namespace PackagedThermalStorageCoil {
                          cAlphaFieldNames(14));                   // Field Name
                 }
 
-                TESCoil(item).CoolingOnlyPLFFPLRCurve = GetCurveIndex(cAlphaArgs(15));
+                TESCoil(item).CoolingOnlyPLFFPLRCurve = GetCurveIndex(state, cAlphaArgs(15));
                 if (TESCoil(item).CoolingOnlyPLFFPLRCurve == 0) {
                     if (lAlphaFieldBlanks(15)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Required " + cAlphaFieldNames(15) + "is blank.");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Required " + cAlphaFieldNames(15) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Not found " + cAlphaFieldNames(15) + "=\"" + cAlphaArgs(15) + "\".");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Not found " + cAlphaFieldNames(15) + "=\"" + cAlphaArgs(15) + "\".");
                     }
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, any curve with just x as single independent variable
-                    ErrorsFound |= CurveManager::CheckCurveDims(
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
                         TESCoil(item).CoolingOnlyPLFFPLRCurve,   // Curve index
                          {1},                                     // Valid dimensions
                          RoutineName,                             // Routine name
@@ -567,19 +563,19 @@ namespace PackagedThermalStorageCoil {
                          cAlphaFieldNames(15));                   // Field Name
                 }
 
-                TESCoil(item).CoolingOnlySHRFTempCurve = GetCurveIndex(cAlphaArgs(16));
+                TESCoil(item).CoolingOnlySHRFTempCurve = GetCurveIndex(state, cAlphaArgs(16));
                 if (TESCoil(item).CoolingOnlySHRFTempCurve == 0) {
                     if (lAlphaFieldBlanks(16)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Required " + cAlphaFieldNames(16) + "is blank.");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Required " + cAlphaFieldNames(16) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Not found " + cAlphaFieldNames(16) + "=\"" + cAlphaArgs(16) + "\".");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Not found " + cAlphaFieldNames(16) + "=\"" + cAlphaArgs(16) + "\".");
                     }
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object
-                    ErrorsFound |= CurveManager::CheckCurveDims(
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
                         TESCoil(item).CoolingOnlySHRFTempCurve,   // Curve index
                          {2},                                     // Valid dimensions
                          RoutineName,                             // Routine name
@@ -588,19 +584,19 @@ namespace PackagedThermalStorageCoil {
                          cAlphaFieldNames(16));                   // Field Name
                 }
 
-                TESCoil(item).CoolingOnlySHRFFlowCurve = GetCurveIndex(cAlphaArgs(17));
+                TESCoil(item).CoolingOnlySHRFFlowCurve = GetCurveIndex(state, cAlphaArgs(17));
                 if (TESCoil(item).CoolingOnlySHRFFlowCurve == 0) {
                     if (lAlphaFieldBlanks(17)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Required " + cAlphaFieldNames(17) + "is blank.");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Required " + cAlphaFieldNames(17) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Not found " + cAlphaFieldNames(17) + "=\"" + cAlphaArgs(17) + "\".");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Not found " + cAlphaFieldNames(17) + "=\"" + cAlphaArgs(17) + "\".");
                     }
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, any curve with just x as single independent variable
-                    ErrorsFound |= CurveManager::CheckCurveDims(
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
                         TESCoil(item).CoolingOnlySHRFFlowCurve,   // Curve index
                          {1},                                     // Valid dimensions
                          RoutineName,                             // Routine name
@@ -618,9 +614,9 @@ namespace PackagedThermalStorageCoil {
                     TESCoil(item).CoolingAndChargeModeAvailable = false;
                 } else {
                     TESCoil(item).CoolingAndChargeModeAvailable = false;
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                    ShowContinueError("..." + cAlphaFieldNames(18) + "=\"" + cAlphaArgs(18) + "\".");
-                    ShowContinueError("Available choices are Yes or No.");
+                    ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                    ShowContinueError(state, "..." + cAlphaFieldNames(18) + "=\"" + cAlphaArgs(18) + "\".");
+                    ShowContinueError(state, "Available choices are Yes or No.");
                     ErrorsFound = true;
                 }
             }
@@ -635,19 +631,19 @@ namespace PackagedThermalStorageCoil {
                 TESCoil(item).CoolingAndChargeCoolingRatedCOP = rNumericArgs(15);            // Coefficient of performance , for cooling [W/W]
                 TESCoil(item).CoolingAndChargeChargingRatedCOP = rNumericArgs(16);           // Coefficient of performance , for charging [W/W]
 
-                TESCoil(item).CoolingAndChargeCoolingCapFTempCurve = GetCurveIndex(cAlphaArgs(19));
+                TESCoil(item).CoolingAndChargeCoolingCapFTempCurve = GetCurveIndex(state, cAlphaArgs(19));
                 if (TESCoil(item).CoolingAndChargeCoolingCapFTempCurve == 0) {
                     if (lAlphaFieldBlanks(19)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Required " + cAlphaFieldNames(19) + "is blank.");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Required " + cAlphaFieldNames(19) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Not found " + cAlphaFieldNames(19) + "=\"" + cAlphaArgs(19) + "\".");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Not found " + cAlphaFieldNames(19) + "=\"" + cAlphaArgs(19) + "\".");
                     }
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object
-                    ErrorsFound |= CurveManager::CheckCurveDims(
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
                          TESCoil(item).CoolingAndChargeCoolingCapFTempCurve,   // Curve index
                          {3},                                     // Valid dimensions
                          RoutineName,                             // Routine name
@@ -656,19 +652,19 @@ namespace PackagedThermalStorageCoil {
                          cAlphaFieldNames(19));                   // Field Name
                 }
 
-                TESCoil(item).CoolingAndChargeCoolingCapFFlowCurve = GetCurveIndex(cAlphaArgs(20));
+                TESCoil(item).CoolingAndChargeCoolingCapFFlowCurve = GetCurveIndex(state, cAlphaArgs(20));
                 if (TESCoil(item).CoolingAndChargeCoolingCapFFlowCurve == 0) {
                     if (lAlphaFieldBlanks(20)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Required " + cAlphaFieldNames(20) + "is blank.");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Required " + cAlphaFieldNames(20) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Not found " + cAlphaFieldNames(20) + "=\"" + cAlphaArgs(20) + "\".");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Not found " + cAlphaFieldNames(20) + "=\"" + cAlphaArgs(20) + "\".");
                     }
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, any curve with just x as single independent variable
-                    ErrorsFound |= CurveManager::CheckCurveDims(
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
                          TESCoil(item).CoolingAndChargeCoolingCapFFlowCurve,   // Curve index
                          {1},                                     // Valid dimensions
                          RoutineName,                             // Routine name
@@ -676,19 +672,19 @@ namespace PackagedThermalStorageCoil {
                          TESCoil(item).Name,                      // Object Name
                          cAlphaFieldNames(20));                   // Field Name
                 }
-                TESCoil(item).CoolingAndChargeCoolingEIRFTempCurve = GetCurveIndex(cAlphaArgs(21));
+                TESCoil(item).CoolingAndChargeCoolingEIRFTempCurve = GetCurveIndex(state, cAlphaArgs(21));
                 if (TESCoil(item).CoolingAndChargeCoolingEIRFTempCurve == 0) {
                     if (lAlphaFieldBlanks(21)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Required " + cAlphaFieldNames(21) + "is blank.");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Required " + cAlphaFieldNames(21) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Not found " + cAlphaFieldNames(21) + "=\"" + cAlphaArgs(21) + "\".");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Not found " + cAlphaFieldNames(21) + "=\"" + cAlphaArgs(21) + "\".");
                     }
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object
-                    ErrorsFound |= CurveManager::CheckCurveDims(
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
                          TESCoil(item).CoolingAndChargeCoolingEIRFTempCurve,   // Curve index
                          {3},                                     // Valid dimensions
                          RoutineName,                             // Routine name
@@ -697,19 +693,19 @@ namespace PackagedThermalStorageCoil {
                          cAlphaFieldNames(21));                   // Field Name
                 }
 
-                TESCoil(item).CoolingAndChargeCoolingEIRFFlowCurve = GetCurveIndex(cAlphaArgs(22));
+                TESCoil(item).CoolingAndChargeCoolingEIRFFlowCurve = GetCurveIndex(state, cAlphaArgs(22));
                 if (TESCoil(item).CoolingAndChargeCoolingEIRFFlowCurve == 0) {
                     if (lAlphaFieldBlanks(22)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Required " + cAlphaFieldNames(22) + "is blank.");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Required " + cAlphaFieldNames(22) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Not found " + cAlphaFieldNames(22) + "=\"" + cAlphaArgs(22) + "\".");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Not found " + cAlphaFieldNames(22) + "=\"" + cAlphaArgs(22) + "\".");
                     }
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, any curve with just x as single independent variable
-                    ErrorsFound |= CurveManager::CheckCurveDims(
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
                          TESCoil(item).CoolingAndChargeCoolingEIRFFlowCurve,   // Curve index
                          {1},                                     // Valid dimensions
                          RoutineName,                             // Routine name
@@ -718,19 +714,19 @@ namespace PackagedThermalStorageCoil {
                          cAlphaFieldNames(22));                   // Field Name
                 }
 
-                TESCoil(item).CoolingAndChargeCoolingPLFFPLRCurve = GetCurveIndex(cAlphaArgs(23));
+                TESCoil(item).CoolingAndChargeCoolingPLFFPLRCurve = GetCurveIndex(state, cAlphaArgs(23));
                 if (TESCoil(item).CoolingAndChargeCoolingPLFFPLRCurve == 0) {
                     if (lAlphaFieldBlanks(23)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Required " + cAlphaFieldNames(23) + "is blank.");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Required " + cAlphaFieldNames(23) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Not found " + cAlphaFieldNames(23) + "=\"" + cAlphaArgs(23) + "\".");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Not found " + cAlphaFieldNames(23) + "=\"" + cAlphaArgs(23) + "\".");
                     }
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, any curve with just x as single independent variable
-                    ErrorsFound |= CurveManager::CheckCurveDims(
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
                          TESCoil(item).CoolingAndChargeCoolingPLFFPLRCurve,   // Curve index
                          {1},                                     // Valid dimensions
                          RoutineName,                             // Routine name
@@ -739,19 +735,19 @@ namespace PackagedThermalStorageCoil {
                          cAlphaFieldNames(23));                   // Field Name
                 }
 
-                TESCoil(item).CoolingAndChargeChargingCapFTempCurve = GetCurveIndex(cAlphaArgs(24));
+                TESCoil(item).CoolingAndChargeChargingCapFTempCurve = GetCurveIndex(state, cAlphaArgs(24));
                 if (TESCoil(item).CoolingAndChargeChargingCapFTempCurve == 0) {
                     if (lAlphaFieldBlanks(24)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Required " + cAlphaFieldNames(24) + "is blank.");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Required " + cAlphaFieldNames(24) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Not found " + cAlphaFieldNames(24) + "=\"" + cAlphaArgs(24) + "\".");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Not found " + cAlphaFieldNames(24) + "=\"" + cAlphaArgs(24) + "\".");
                     }
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object
-                    ErrorsFound |= CurveManager::CheckCurveDims(
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
                          TESCoil(item).CoolingAndChargeChargingCapFTempCurve,   // Curve index
                          {3},                                     // Valid dimensions
                          RoutineName,                             // Routine name
@@ -760,19 +756,19 @@ namespace PackagedThermalStorageCoil {
                          cAlphaFieldNames(24));                   // Field Name
                 }
 
-                TESCoil(item).CoolingAndChargeChargingCapFEvapPLRCurve = GetCurveIndex(cAlphaArgs(25));
+                TESCoil(item).CoolingAndChargeChargingCapFEvapPLRCurve = GetCurveIndex(state, cAlphaArgs(25));
                 if (TESCoil(item).CoolingAndChargeChargingCapFEvapPLRCurve == 0) {
                     if (lAlphaFieldBlanks(25)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Required " + cAlphaFieldNames(25) + "is blank.");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Required " + cAlphaFieldNames(25) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Not found " + cAlphaFieldNames(25) + "=\"" + cAlphaArgs(25) + "\".");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Not found " + cAlphaFieldNames(25) + "=\"" + cAlphaArgs(25) + "\".");
                     }
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, any curve with just x as single independent variable
-                    ErrorsFound |= CurveManager::CheckCurveDims(
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
                          TESCoil(item).CoolingAndChargeChargingCapFEvapPLRCurve,   // Curve index
                          {1},                                     // Valid dimensions
                          RoutineName,                             // Routine name
@@ -781,19 +777,19 @@ namespace PackagedThermalStorageCoil {
                          cAlphaFieldNames(25));                   // Field Name
                 }
 
-                TESCoil(item).CoolingAndChargeChargingEIRFTempCurve = GetCurveIndex(cAlphaArgs(26));
+                TESCoil(item).CoolingAndChargeChargingEIRFTempCurve = GetCurveIndex(state, cAlphaArgs(26));
                 if (TESCoil(item).CoolingAndChargeChargingEIRFTempCurve == 0) {
                     if (lAlphaFieldBlanks(26)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Required " + cAlphaFieldNames(26) + "is blank.");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Required " + cAlphaFieldNames(26) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Not found " + cAlphaFieldNames(26) + "=\"" + cAlphaArgs(26) + "\".");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Not found " + cAlphaFieldNames(26) + "=\"" + cAlphaArgs(26) + "\".");
                     }
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object
-                    ErrorsFound |= CurveManager::CheckCurveDims(
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
                          TESCoil(item).CoolingAndChargeChargingEIRFTempCurve,   // Curve index
                          {3},                                     // Valid dimensions
                          RoutineName,                             // Routine name
@@ -802,19 +798,19 @@ namespace PackagedThermalStorageCoil {
                          cAlphaFieldNames(26));                   // Field Name
                 }
 
-                TESCoil(item).CoolingAndChargeChargingEIRFFLowCurve = GetCurveIndex(cAlphaArgs(27));
+                TESCoil(item).CoolingAndChargeChargingEIRFFLowCurve = GetCurveIndex(state, cAlphaArgs(27));
                 if (TESCoil(item).CoolingAndChargeChargingEIRFFLowCurve == 0) {
                     if (lAlphaFieldBlanks(27)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Required " + cAlphaFieldNames(27) + "is blank.");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Required " + cAlphaFieldNames(27) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Not found " + cAlphaFieldNames(27) + "=\"" + cAlphaArgs(27) + "\".");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Not found " + cAlphaFieldNames(27) + "=\"" + cAlphaArgs(27) + "\".");
                     }
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, any curve with just x as single independent variable
-                    ErrorsFound |= CurveManager::CheckCurveDims(
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
                          TESCoil(item).CoolingAndChargeChargingEIRFFLowCurve,   // Curve index
                          {1},                                     // Valid dimensions
                          RoutineName,                             // Routine name
@@ -823,19 +819,19 @@ namespace PackagedThermalStorageCoil {
                          cAlphaFieldNames(27));                   // Field Name
                 }
 
-                TESCoil(item).CoolingAndChargeChargingPLFFPLRCurve = GetCurveIndex(cAlphaArgs(28));
+                TESCoil(item).CoolingAndChargeChargingPLFFPLRCurve = GetCurveIndex(state, cAlphaArgs(28));
                 if (TESCoil(item).CoolingAndChargeChargingPLFFPLRCurve == 0) {
                     if (lAlphaFieldBlanks(28)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Required " + cAlphaFieldNames(28) + "is blank.");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Required " + cAlphaFieldNames(28) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Not found " + cAlphaFieldNames(28) + "=\"" + cAlphaArgs(28) + "\".");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Not found " + cAlphaFieldNames(28) + "=\"" + cAlphaArgs(28) + "\".");
                     }
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, any curve with just x as single independent variable
-                    ErrorsFound |= CurveManager::CheckCurveDims(
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
                          TESCoil(item).CoolingAndChargeChargingPLFFPLRCurve,   // Curve index
                          {1},                                     // Valid dimensions
                          RoutineName,                             // Routine name
@@ -844,19 +840,19 @@ namespace PackagedThermalStorageCoil {
                          cAlphaFieldNames(28));                   // Field Name
                 }
 
-                TESCoil(item).CoolingAndChargeSHRFTempCurve = GetCurveIndex(cAlphaArgs(29));
+                TESCoil(item).CoolingAndChargeSHRFTempCurve = GetCurveIndex(state, cAlphaArgs(29));
                 if (TESCoil(item).CoolingAndChargeSHRFTempCurve == 0) {
                     if (lAlphaFieldBlanks(29)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Required " + cAlphaFieldNames(29) + "is blank.");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Required " + cAlphaFieldNames(29) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Not found " + cAlphaFieldNames(29) + "=\"" + cAlphaArgs(29) + "\".");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Not found " + cAlphaFieldNames(29) + "=\"" + cAlphaArgs(29) + "\".");
                     }
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object
-                    ErrorsFound |= CurveManager::CheckCurveDims(
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
                          TESCoil(item).CoolingAndChargeSHRFTempCurve,   // Curve index
                          {2, 3},                                  // Valid dimensions
                          RoutineName,                             // Routine name
@@ -865,19 +861,19 @@ namespace PackagedThermalStorageCoil {
                          cAlphaFieldNames(29));                   // Field Name
                 }
 
-                TESCoil(item).CoolingAndChargeSHRFFlowCurve = GetCurveIndex(cAlphaArgs(30));
+                TESCoil(item).CoolingAndChargeSHRFFlowCurve = GetCurveIndex(state, cAlphaArgs(30));
                 if (TESCoil(item).CoolingAndChargeSHRFFlowCurve == 0) {
                     if (lAlphaFieldBlanks(30)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Required " + cAlphaFieldNames(30) + "is blank.");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Required " + cAlphaFieldNames(30) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Not found " + cAlphaFieldNames(30) + "=\"" + cAlphaArgs(30) + "\".");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Not found " + cAlphaFieldNames(30) + "=\"" + cAlphaArgs(30) + "\".");
                     }
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, any curve with just x as single independent variable
-                    ErrorsFound |= CurveManager::CheckCurveDims(
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
                          TESCoil(item).CoolingAndChargeSHRFFlowCurve,   // Curve index
                          {1},                                     // Valid dimensions
                          RoutineName,                             // Routine name
@@ -896,9 +892,9 @@ namespace PackagedThermalStorageCoil {
                     TESCoil(item).CoolingAndDischargeModeAvailable = false;
                 } else {
                     TESCoil(item).CoolingAndDischargeModeAvailable = false;
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                    ShowContinueError("..." + cAlphaFieldNames(31) + "=\"" + cAlphaArgs(31) + "\".");
-                    ShowContinueError("Available choices are Yes or No.");
+                    ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                    ShowContinueError(state, "..." + cAlphaFieldNames(31) + "=\"" + cAlphaArgs(31) + "\".");
+                    ShowContinueError(state, "Available choices are Yes or No.");
                     ErrorsFound = true;
                 }
             }
@@ -913,19 +909,19 @@ namespace PackagedThermalStorageCoil {
                 TESCoil(item).CoolingAndDischargeCoolingRatedCOP = rNumericArgs(22);               // Coefficient of performance , for cooling [W/W]
                 TESCoil(item).CoolingAndDischargeDischargingRatedCOP = rNumericArgs(23);           // Coefficient of performance , for charging [W/W]
 
-                TESCoil(item).CoolingAndDischargeCoolingCapFTempCurve = GetCurveIndex(cAlphaArgs(32));
+                TESCoil(item).CoolingAndDischargeCoolingCapFTempCurve = GetCurveIndex(state, cAlphaArgs(32));
                 if (TESCoil(item).CoolingAndDischargeCoolingCapFTempCurve == 0) {
                     if (lAlphaFieldBlanks(32)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Required " + cAlphaFieldNames(32) + "is blank.");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Required " + cAlphaFieldNames(32) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Not found " + cAlphaFieldNames(32) + "=\"" + cAlphaArgs(32) + "\".");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Not found " + cAlphaFieldNames(32) + "=\"" + cAlphaArgs(32) + "\".");
                     }
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object
-                    ErrorsFound |= CurveManager::CheckCurveDims(
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
                          TESCoil(item).CoolingAndDischargeCoolingCapFTempCurve,   // Curve index
                          {3},                                     // Valid dimensions
                          RoutineName,                             // Routine name
@@ -934,19 +930,19 @@ namespace PackagedThermalStorageCoil {
                          cAlphaFieldNames(32));                   // Field Name
                 }
 
-                TESCoil(item).CoolingAndDischargeCoolingCapFFlowCurve = GetCurveIndex(cAlphaArgs(33));
+                TESCoil(item).CoolingAndDischargeCoolingCapFFlowCurve = GetCurveIndex(state, cAlphaArgs(33));
                 if (TESCoil(item).CoolingAndDischargeCoolingCapFFlowCurve == 0) {
                     if (lAlphaFieldBlanks(33)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Required " + cAlphaFieldNames(33) + "is blank.");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Required " + cAlphaFieldNames(33) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Not found " + cAlphaFieldNames(33) + "=\"" + cAlphaArgs(33) + "\".");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Not found " + cAlphaFieldNames(33) + "=\"" + cAlphaArgs(33) + "\".");
                     }
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, any curve with just x as single independent variable
-                    ErrorsFound |= CurveManager::CheckCurveDims(
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
                          TESCoil(item).CoolingAndDischargeCoolingCapFFlowCurve,   // Curve index
                          {1},                                     // Valid dimensions
                          RoutineName,                             // Routine name
@@ -955,19 +951,19 @@ namespace PackagedThermalStorageCoil {
                          cAlphaFieldNames(33));                   // Field Name
                 }
 
-                TESCoil(item).CoolingAndDischargeCoolingEIRFTempCurve = GetCurveIndex(cAlphaArgs(34));
+                TESCoil(item).CoolingAndDischargeCoolingEIRFTempCurve = GetCurveIndex(state, cAlphaArgs(34));
                 if (TESCoil(item).CoolingAndDischargeCoolingEIRFTempCurve == 0) {
                     if (lAlphaFieldBlanks(34)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Required " + cAlphaFieldNames(34) + "is blank.");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Required " + cAlphaFieldNames(34) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Not found " + cAlphaFieldNames(34) + "=\"" + cAlphaArgs(34) + "\".");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Not found " + cAlphaFieldNames(34) + "=\"" + cAlphaArgs(34) + "\".");
                     }
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object
-                    ErrorsFound |= CurveManager::CheckCurveDims(
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
                          TESCoil(item).CoolingAndDischargeCoolingEIRFTempCurve,   // Curve index
                          {3},                                     // Valid dimensions
                          RoutineName,                             // Routine name
@@ -976,19 +972,19 @@ namespace PackagedThermalStorageCoil {
                          cAlphaFieldNames(34));                   // Field Name
                 }
 
-                TESCoil(item).CoolingAndDischargeCoolingEIRFFlowCurve = GetCurveIndex(cAlphaArgs(35));
+                TESCoil(item).CoolingAndDischargeCoolingEIRFFlowCurve = GetCurveIndex(state, cAlphaArgs(35));
                 if (TESCoil(item).CoolingAndDischargeCoolingEIRFFlowCurve == 0) {
                     if (lAlphaFieldBlanks(35)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Required " + cAlphaFieldNames(35) + "is blank.");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Required " + cAlphaFieldNames(35) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Not found " + cAlphaFieldNames(35) + "=\"" + cAlphaArgs(35) + "\".");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Not found " + cAlphaFieldNames(35) + "=\"" + cAlphaArgs(35) + "\".");
                     }
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, any curve with just x as single independent variable
-                    ErrorsFound |= CurveManager::CheckCurveDims(
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
                          TESCoil(item).CoolingAndDischargeCoolingEIRFFlowCurve,   // Curve index
                          {1},                                     // Valid dimensions
                          RoutineName,                             // Routine name
@@ -997,19 +993,19 @@ namespace PackagedThermalStorageCoil {
                          cAlphaFieldNames(35));                   // Field Name
                 }
 
-                TESCoil(item).CoolingAndDischargeCoolingPLFFPLRCurve = GetCurveIndex(cAlphaArgs(36));
+                TESCoil(item).CoolingAndDischargeCoolingPLFFPLRCurve = GetCurveIndex(state, cAlphaArgs(36));
                 if (TESCoil(item).CoolingAndDischargeCoolingPLFFPLRCurve == 0) {
                     if (lAlphaFieldBlanks(36)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Required " + cAlphaFieldNames(36) + "is blank.");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Required " + cAlphaFieldNames(36) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Not found " + cAlphaFieldNames(36) + "=\"" + cAlphaArgs(36) + "\".");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Not found " + cAlphaFieldNames(36) + "=\"" + cAlphaArgs(36) + "\".");
                     }
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, any curve with just x as single independent variable
-                    ErrorsFound |= CurveManager::CheckCurveDims(
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
                          TESCoil(item).CoolingAndDischargeCoolingPLFFPLRCurve,   // Curve index
                          {1},                                     // Valid dimensions
                          RoutineName,                             // Routine name
@@ -1018,19 +1014,19 @@ namespace PackagedThermalStorageCoil {
                          cAlphaFieldNames(36));                   // Field Name
                 }
 
-                TESCoil(item).CoolingAndDischargeDischargingCapFTempCurve = GetCurveIndex(cAlphaArgs(37));
+                TESCoil(item).CoolingAndDischargeDischargingCapFTempCurve = GetCurveIndex(state, cAlphaArgs(37));
                 if (TESCoil(item).CoolingAndDischargeDischargingCapFTempCurve == 0) {
                     if (lAlphaFieldBlanks(37)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Required " + cAlphaFieldNames(37) + "is blank.");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Required " + cAlphaFieldNames(37) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Not found " + cAlphaFieldNames(37) + "=\"" + cAlphaArgs(37) + "\".");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Not found " + cAlphaFieldNames(37) + "=\"" + cAlphaArgs(37) + "\".");
                     }
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object
-                    ErrorsFound |= CurveManager::CheckCurveDims(
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
                          TESCoil(item).CoolingAndDischargeDischargingCapFTempCurve,   // Curve index
                          {3},                                     // Valid dimensions
                          RoutineName,                             // Routine name
@@ -1039,19 +1035,19 @@ namespace PackagedThermalStorageCoil {
                          cAlphaFieldNames(37));                   // Field Name
                 }
 
-                TESCoil(item).CoolingAndDischargeDischargingCapFFlowCurve = GetCurveIndex(cAlphaArgs(38));
+                TESCoil(item).CoolingAndDischargeDischargingCapFFlowCurve = GetCurveIndex(state, cAlphaArgs(38));
                 if (TESCoil(item).CoolingAndDischargeDischargingCapFFlowCurve == 0) {
                     if (lAlphaFieldBlanks(38)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Required " + cAlphaFieldNames(38) + "is blank.");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Required " + cAlphaFieldNames(38) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Not found " + cAlphaFieldNames(38) + "=\"" + cAlphaArgs(38) + "\".");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Not found " + cAlphaFieldNames(38) + "=\"" + cAlphaArgs(38) + "\".");
                     }
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, any curve with just x as single independent variable
-                    ErrorsFound |= CurveManager::CheckCurveDims(
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
                          TESCoil(item).CoolingAndDischargeDischargingCapFFlowCurve,   // Curve index
                          {1},                                     // Valid dimensions
                          RoutineName,                             // Routine name
@@ -1060,19 +1056,19 @@ namespace PackagedThermalStorageCoil {
                          cAlphaFieldNames(38));                   // Field Name
                 }
 
-                TESCoil(item).CoolingAndDischargeDischargingCapFEvapPLRCurve = GetCurveIndex(cAlphaArgs(39));
+                TESCoil(item).CoolingAndDischargeDischargingCapFEvapPLRCurve = GetCurveIndex(state, cAlphaArgs(39));
                 if (TESCoil(item).CoolingAndDischargeDischargingCapFEvapPLRCurve == 0) {
                     if (lAlphaFieldBlanks(39)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Required " + cAlphaFieldNames(39) + "is blank.");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Required " + cAlphaFieldNames(39) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Not found " + cAlphaFieldNames(39) + "=\"" + cAlphaArgs(39) + "\".");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Not found " + cAlphaFieldNames(39) + "=\"" + cAlphaArgs(39) + "\".");
                     }
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, any curve with just x as single independent variable
-                    ErrorsFound |= CurveManager::CheckCurveDims(
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
                          TESCoil(item).CoolingAndDischargeDischargingCapFEvapPLRCurve,   // Curve index
                          {1},                                     // Valid dimensions
                          RoutineName,                             // Routine name
@@ -1081,19 +1077,19 @@ namespace PackagedThermalStorageCoil {
                          cAlphaFieldNames(39));                   // Field Name
                 }
 
-                TESCoil(item).CoolingAndDischargeDischargingEIRFTempCurve = GetCurveIndex(cAlphaArgs(40));
+                TESCoil(item).CoolingAndDischargeDischargingEIRFTempCurve = GetCurveIndex(state, cAlphaArgs(40));
                 if (TESCoil(item).CoolingAndDischargeDischargingEIRFTempCurve == 0) {
                     if (lAlphaFieldBlanks(40)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Required " + cAlphaFieldNames(40) + "is blank.");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Required " + cAlphaFieldNames(40) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Not found " + cAlphaFieldNames(40) + "=\"" + cAlphaArgs(40) + "\".");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Not found " + cAlphaFieldNames(40) + "=\"" + cAlphaArgs(40) + "\".");
                     }
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object
-                    ErrorsFound |= CurveManager::CheckCurveDims(
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
                          TESCoil(item).CoolingAndDischargeDischargingEIRFTempCurve,   // Curve index
                          {3},                                     // Valid dimensions
                          RoutineName,                             // Routine name
@@ -1102,19 +1098,19 @@ namespace PackagedThermalStorageCoil {
                          cAlphaFieldNames(40));                   // Field Name
                 }
 
-                TESCoil(item).CoolingAndDischargeDischargingEIRFFLowCurve = GetCurveIndex(cAlphaArgs(41));
+                TESCoil(item).CoolingAndDischargeDischargingEIRFFLowCurve = GetCurveIndex(state, cAlphaArgs(41));
                 if (TESCoil(item).CoolingAndDischargeDischargingEIRFFLowCurve == 0) {
                     if (lAlphaFieldBlanks(41)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Required " + cAlphaFieldNames(41) + "is blank.");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Required " + cAlphaFieldNames(41) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Not found " + cAlphaFieldNames(41) + "=\"" + cAlphaArgs(41) + "\".");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Not found " + cAlphaFieldNames(41) + "=\"" + cAlphaArgs(41) + "\".");
                     }
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, any curve with just x as single independent variable
-                    ErrorsFound |= CurveManager::CheckCurveDims(
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
                          TESCoil(item).CoolingAndDischargeDischargingEIRFFLowCurve,   // Curve index
                          {1},                                     // Valid dimensions
                          RoutineName,                             // Routine name
@@ -1123,19 +1119,19 @@ namespace PackagedThermalStorageCoil {
                          cAlphaFieldNames(41));                   // Field Name
                 }
 
-                TESCoil(item).CoolingAndDischargeDischargingPLFFPLRCurve = GetCurveIndex(cAlphaArgs(42));
+                TESCoil(item).CoolingAndDischargeDischargingPLFFPLRCurve = GetCurveIndex(state, cAlphaArgs(42));
                 if (TESCoil(item).CoolingAndDischargeDischargingPLFFPLRCurve == 0) {
                     if (lAlphaFieldBlanks(42)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Required " + cAlphaFieldNames(42) + "is blank.");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Required " + cAlphaFieldNames(42) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Not found " + cAlphaFieldNames(42) + "=\"" + cAlphaArgs(42) + "\".");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Not found " + cAlphaFieldNames(42) + "=\"" + cAlphaArgs(42) + "\".");
                     }
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, any curve with just x as single independent variable
-                    ErrorsFound |= CurveManager::CheckCurveDims(
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
                          TESCoil(item).CoolingAndDischargeDischargingPLFFPLRCurve,   // Curve index
                          {1},                                     // Valid dimensions
                          RoutineName,                             // Routine name
@@ -1144,19 +1140,19 @@ namespace PackagedThermalStorageCoil {
                          cAlphaFieldNames(42));                   // Field Name
                 }
 
-                TESCoil(item).CoolingAndDischargeSHRFTempCurve = GetCurveIndex(cAlphaArgs(43));
+                TESCoil(item).CoolingAndDischargeSHRFTempCurve = GetCurveIndex(state, cAlphaArgs(43));
                 if (TESCoil(item).CoolingAndDischargeSHRFTempCurve == 0) {
                     if (lAlphaFieldBlanks(43)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Required " + cAlphaFieldNames(43) + "is blank.");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Required " + cAlphaFieldNames(43) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Not found " + cAlphaFieldNames(43) + "=\"" + cAlphaArgs(43) + "\".");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Not found " + cAlphaFieldNames(43) + "=\"" + cAlphaArgs(43) + "\".");
                     }
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object
-                    ErrorsFound |= CurveManager::CheckCurveDims(
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
                          TESCoil(item).CoolingAndDischargeSHRFTempCurve,   // Curve index
                          {2, 3},                                  // Valid dimensions
                          RoutineName,                             // Routine name
@@ -1165,19 +1161,19 @@ namespace PackagedThermalStorageCoil {
                          cAlphaFieldNames(43));                   // Field Name
                 }
 
-                TESCoil(item).CoolingAndDischargeSHRFFlowCurve = GetCurveIndex(cAlphaArgs(44));
+                TESCoil(item).CoolingAndDischargeSHRFFlowCurve = GetCurveIndex(state, cAlphaArgs(44));
                 if (TESCoil(item).CoolingAndDischargeSHRFFlowCurve == 0) {
                     if (lAlphaFieldBlanks(44)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Required " + cAlphaFieldNames(44) + "is blank.");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Required " + cAlphaFieldNames(44) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Not found " + cAlphaFieldNames(44) + "=\"" + cAlphaArgs(44) + "\".");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Not found " + cAlphaFieldNames(44) + "=\"" + cAlphaArgs(44) + "\".");
                     }
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, any curve with just x as single independent variable
-                    ErrorsFound |= CurveManager::CheckCurveDims(
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
                          TESCoil(item).CoolingAndDischargeSHRFFlowCurve,   // Curve index
                          {1},                                     // Valid dimensions
                          RoutineName,                             // Routine name
@@ -1196,9 +1192,9 @@ namespace PackagedThermalStorageCoil {
                     TESCoil(item).ChargeOnlyModeAvailable = false;
                 } else {
                     TESCoil(item).ChargeOnlyModeAvailable = false;
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                    ShowContinueError("..." + cAlphaFieldNames(45) + "=\"" + cAlphaArgs(45) + "\".");
-                    ShowContinueError("Available choices are Yes or No.");
+                    ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                    ShowContinueError(state, "..." + cAlphaFieldNames(45) + "=\"" + cAlphaArgs(45) + "\".");
+                    ShowContinueError(state, "Available choices are Yes or No.");
                     ErrorsFound = true;
                 }
             }
@@ -1209,19 +1205,19 @@ namespace PackagedThermalStorageCoil {
                 TESCoil(item).ChargeOnlyRatedCapacitySizingFactor = rNumericArgs(25); // sizing factor for charging capacity []
                 TESCoil(item).ChargeOnlyRatedCOP = rNumericArgs(26);                  // coefficient of performance at rating conditions [W/W]
 
-                TESCoil(item).ChargeOnlyChargingCapFTempCurve = GetCurveIndex(cAlphaArgs(46));
+                TESCoil(item).ChargeOnlyChargingCapFTempCurve = GetCurveIndex(state, cAlphaArgs(46));
                 if (TESCoil(item).ChargeOnlyChargingCapFTempCurve == 0) {
                     if (lAlphaFieldBlanks(46)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Required " + cAlphaFieldNames(46) + "is blank.");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Required " + cAlphaFieldNames(46) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Not found " + cAlphaFieldNames(46) + "=\"" + cAlphaArgs(46) + "\".");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Not found " + cAlphaFieldNames(46) + "=\"" + cAlphaArgs(46) + "\".");
                     }
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object
-                    ErrorsFound |= CurveManager::CheckCurveDims(
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
                          TESCoil(item).ChargeOnlyChargingCapFTempCurve,   // Curve index
                          {2},                                     // Valid dimensions
                          RoutineName,                             // Routine name
@@ -1230,19 +1226,19 @@ namespace PackagedThermalStorageCoil {
                          cAlphaFieldNames(46));                   // Field Name
                 }
 
-                TESCoil(item).ChargeOnlyChargingEIRFTempCurve = GetCurveIndex(cAlphaArgs(47));
+                TESCoil(item).ChargeOnlyChargingEIRFTempCurve = GetCurveIndex(state, cAlphaArgs(47));
                 if (TESCoil(item).ChargeOnlyChargingEIRFTempCurve == 0) {
                     if (lAlphaFieldBlanks(47)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Required " + cAlphaFieldNames(47) + "is blank.");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Required " + cAlphaFieldNames(47) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Not found " + cAlphaFieldNames(47) + "=\"" + cAlphaArgs(47) + "\".");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Not found " + cAlphaFieldNames(47) + "=\"" + cAlphaArgs(47) + "\".");
                     }
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object
-                    ErrorsFound |= CurveManager::CheckCurveDims(
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
                          TESCoil(item).ChargeOnlyChargingEIRFTempCurve,   // Curve index
                          {2},                                     // Valid dimensions
                          RoutineName,                             // Routine name
@@ -1261,9 +1257,9 @@ namespace PackagedThermalStorageCoil {
                     TESCoil(item).DischargeOnlyModeAvailable = false;
                 } else {
                     TESCoil(item).DischargeOnlyModeAvailable = false;
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                    ShowContinueError("..." + cAlphaFieldNames(48) + "=\"" + cAlphaArgs(48) + "\".");
-                    ShowContinueError("Available choices are Yes or No.");
+                    ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                    ShowContinueError(state, "..." + cAlphaFieldNames(48) + "=\"" + cAlphaArgs(48) + "\".");
+                    ShowContinueError(state, "Available choices are Yes or No.");
                     ErrorsFound = true;
                 }
             }
@@ -1274,19 +1270,19 @@ namespace PackagedThermalStorageCoil {
                 TESCoil(item).DischargeOnlyRatedSHR = rNumericArgs(29);                      // sensible heat ratio (sens cap/total cap)
                 TESCoil(item).DischargeOnlyRatedCOP = rNumericArgs(30);                      // coefficient of performance  for discharging [W/W]
 
-                TESCoil(item).DischargeOnlyCapFTempCurve = GetCurveIndex(cAlphaArgs(49));
+                TESCoil(item).DischargeOnlyCapFTempCurve = GetCurveIndex(state, cAlphaArgs(49));
                 if (TESCoil(item).DischargeOnlyCapFTempCurve == 0) {
                     if (lAlphaFieldBlanks(49)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Required " + cAlphaFieldNames(49) + "is blank.");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Required " + cAlphaFieldNames(49) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Not found " + cAlphaFieldNames(49) + "=\"" + cAlphaArgs(49) + "\".");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Not found " + cAlphaFieldNames(49) + "=\"" + cAlphaArgs(49) + "\".");
                     }
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object
-                    ErrorsFound |= CurveManager::CheckCurveDims(
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
                          TESCoil(item).DischargeOnlyCapFTempCurve,   // Curve index
                          {2},                                     // Valid dimensions
                          RoutineName,                             // Routine name
@@ -1295,19 +1291,19 @@ namespace PackagedThermalStorageCoil {
                          cAlphaFieldNames(49));                   // Field Name
                 }
 
-                TESCoil(item).DischargeOnlyCapFFlowCurve = GetCurveIndex(cAlphaArgs(50));
+                TESCoil(item).DischargeOnlyCapFFlowCurve = GetCurveIndex(state, cAlphaArgs(50));
                 if (TESCoil(item).DischargeOnlyCapFFlowCurve == 0) {
                     if (lAlphaFieldBlanks(50)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Required " + cAlphaFieldNames(50) + "is blank.");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Required " + cAlphaFieldNames(50) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Not found " + cAlphaFieldNames(50) + "=\"" + cAlphaArgs(50) + "\".");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Not found " + cAlphaFieldNames(50) + "=\"" + cAlphaArgs(50) + "\".");
                     }
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, any curve with just x as single independent variable
-                    ErrorsFound |= CurveManager::CheckCurveDims(
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
                          TESCoil(item).DischargeOnlyCapFFlowCurve,   // Curve index
                          {1},                                     // Valid dimensions
                          RoutineName,                             // Routine name
@@ -1316,19 +1312,19 @@ namespace PackagedThermalStorageCoil {
                          cAlphaFieldNames(50));                   // Field Name
                 }
 
-                TESCoil(item).DischargeOnlyEIRFTempCurve = GetCurveIndex(cAlphaArgs(51));
+                TESCoil(item).DischargeOnlyEIRFTempCurve = GetCurveIndex(state, cAlphaArgs(51));
                 if (TESCoil(item).DischargeOnlyEIRFTempCurve == 0) {
                     if (lAlphaFieldBlanks(51)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Required " + cAlphaFieldNames(51) + "is blank.");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Required " + cAlphaFieldNames(51) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Not found " + cAlphaFieldNames(51) + "=\"" + cAlphaArgs(51) + "\".");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Not found " + cAlphaFieldNames(51) + "=\"" + cAlphaArgs(51) + "\".");
                     }
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object
-                    ErrorsFound |= CurveManager::CheckCurveDims(
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
                          TESCoil(item).DischargeOnlyEIRFTempCurve,   // Curve index
                          {2},                                     // Valid dimensions
                          RoutineName,                             // Routine name
@@ -1337,19 +1333,19 @@ namespace PackagedThermalStorageCoil {
                          cAlphaFieldNames(51));                   // Field Name
                 }
 
-                TESCoil(item).DischargeOnlyEIRFFlowCurve = GetCurveIndex(cAlphaArgs(52));
+                TESCoil(item).DischargeOnlyEIRFFlowCurve = GetCurveIndex(state, cAlphaArgs(52));
                 if (TESCoil(item).DischargeOnlyEIRFFlowCurve == 0) {
                     if (lAlphaFieldBlanks(52)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Required " + cAlphaFieldNames(52) + "is blank.");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Required " + cAlphaFieldNames(52) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Not found " + cAlphaFieldNames(52) + "=\"" + cAlphaArgs(52) + "\".");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Not found " + cAlphaFieldNames(52) + "=\"" + cAlphaArgs(52) + "\".");
                     }
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, any curve with just x as single independent variable
-                    ErrorsFound |= CurveManager::CheckCurveDims(
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
                          TESCoil(item).DischargeOnlyEIRFFlowCurve,   // Curve index
                          {1},                                     // Valid dimensions
                          RoutineName,                             // Routine name
@@ -1358,19 +1354,19 @@ namespace PackagedThermalStorageCoil {
                          cAlphaFieldNames(52));                   // Field Name
                 }
 
-                TESCoil(item).DischargeOnlyPLFFPLRCurve = GetCurveIndex(cAlphaArgs(53));
+                TESCoil(item).DischargeOnlyPLFFPLRCurve = GetCurveIndex(state, cAlphaArgs(53));
                 if (TESCoil(item).DischargeOnlyPLFFPLRCurve == 0) {
                     if (lAlphaFieldBlanks(53)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Required " + cAlphaFieldNames(53) + "is blank.");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Required " + cAlphaFieldNames(53) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Not found " + cAlphaFieldNames(53) + "=\"" + cAlphaArgs(53) + "\".");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Not found " + cAlphaFieldNames(53) + "=\"" + cAlphaArgs(53) + "\".");
                     }
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, any curve with just x as single independent variable
-                    ErrorsFound |= CurveManager::CheckCurveDims(
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
                          TESCoil(item).DischargeOnlyPLFFPLRCurve,   // Curve index
                          {1},                                     // Valid dimensions
                          RoutineName,                             // Routine name
@@ -1379,19 +1375,19 @@ namespace PackagedThermalStorageCoil {
                          cAlphaFieldNames(53));                   // Field Name
                 }
 
-                TESCoil(item).DischargeOnlySHRFTempCurve = GetCurveIndex(cAlphaArgs(54));
+                TESCoil(item).DischargeOnlySHRFTempCurve = GetCurveIndex(state, cAlphaArgs(54));
                 if (TESCoil(item).DischargeOnlySHRFTempCurve == 0) {
                     if (lAlphaFieldBlanks(54)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Required " + cAlphaFieldNames(54) + "is blank.");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Required " + cAlphaFieldNames(54) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Not found " + cAlphaFieldNames(54) + "=\"" + cAlphaArgs(54) + "\".");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Not found " + cAlphaFieldNames(54) + "=\"" + cAlphaArgs(54) + "\".");
                     }
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object
-                    ErrorsFound |= CurveManager::CheckCurveDims(
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
                          TESCoil(item).DischargeOnlySHRFTempCurve,   // Curve index
                          {2, 3},                                  // Valid dimensions
                          RoutineName,                             // Routine name
@@ -1400,19 +1396,19 @@ namespace PackagedThermalStorageCoil {
                          cAlphaFieldNames(54));                   // Field Name
                 }
 
-                TESCoil(item).DischargeOnlySHRFFLowCurve = GetCurveIndex(cAlphaArgs(55));
+                TESCoil(item).DischargeOnlySHRFFLowCurve = GetCurveIndex(state, cAlphaArgs(55));
                 if (TESCoil(item).DischargeOnlySHRFFLowCurve == 0) {
                     if (lAlphaFieldBlanks(55)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Required " + cAlphaFieldNames(55) + "is blank.");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Required " + cAlphaFieldNames(55) + "is blank.");
                     } else {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                        ShowContinueError("Not found " + cAlphaFieldNames(55) + "=\"" + cAlphaArgs(55) + "\".");
+                        ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                        ShowContinueError(state, "Not found " + cAlphaFieldNames(55) + "=\"" + cAlphaArgs(55) + "\".");
                     }
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, any curve with just x as single independent variable
-                    ErrorsFound |= CurveManager::CheckCurveDims(
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
                          TESCoil(item).DischargeOnlySHRFFLowCurve,   // Curve index
                          {1},                                     // Valid dimensions
                          RoutineName,                             // Routine name
@@ -1426,7 +1422,7 @@ namespace PackagedThermalStorageCoil {
             TESCoil(item).AncillaryControlsPower = rNumericArgs(31);
             TESCoil(item).ColdWeatherMinimumTempLimit = rNumericArgs(32);
             TESCoil(item).ColdWeatherAncillaryPower = rNumericArgs(33);
-            TESCoil(item).CondAirInletNodeNum = GetOnlySingleNode(cAlphaArgs(56),
+            TESCoil(item).CondAirInletNodeNum = GetOnlySingleNode(state, cAlphaArgs(56),
                                                                   ErrorsFound,
                                                                   cCurrentModuleObject,
                                                                   TESCoil(item).Name,
@@ -1434,7 +1430,7 @@ namespace PackagedThermalStorageCoil {
                                                                   NodeConnectionType_OutsideAirReference,
                                                                   1,
                                                                   ObjectIsNotParent);
-            TESCoil(item).CondAirOutletNodeNum = GetOnlySingleNode(cAlphaArgs(57),
+            TESCoil(item).CondAirOutletNodeNum = GetOnlySingleNode(state, cAlphaArgs(57),
                                                                    ErrorsFound,
                                                                    cCurrentModuleObject,
                                                                    TESCoil(item).Name,
@@ -1453,9 +1449,9 @@ namespace PackagedThermalStorageCoil {
                 } else if (SELECT_CASE_var == "EVAPORATIVELYCOOLED") {
                     TESCoil(item).CondenserType = EvapCooled;
                 } else {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(cAlphaFieldNames(58) + "=\"" + cAlphaArgs(58) + "\".");
-                    ShowContinueError("Available choices are AirCooled or EvaporativelyCooled.");
+                    ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                    ShowContinueError(state, cAlphaFieldNames(58) + "=\"" + cAlphaArgs(58) + "\".");
+                    ShowContinueError(state, "Available choices are AirCooled or EvaporativelyCooled.");
                     ErrorsFound = true;
                 }
             }
@@ -1465,12 +1461,12 @@ namespace PackagedThermalStorageCoil {
             TESCoil(item).BasinHeaterSetpointTemp = rNumericArgs(39);
 
             if (lAlphaFieldBlanks(59)) {
-                TESCoil(item).BasinHeaterAvailSchedNum = ScheduleAlwaysOn;
+                TESCoil(item).BasinHeaterAvailSchedNum = DataGlobalConstants::ScheduleAlwaysOn();
             } else {
-                TESCoil(item).BasinHeaterAvailSchedNum = GetScheduleIndex(cAlphaArgs(59));
+                TESCoil(item).BasinHeaterAvailSchedNum = GetScheduleIndex(state, cAlphaArgs(59));
                 if (TESCoil(item).BasinHeaterAvailSchedNum == 0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                    ShowContinueError("..." + cAlphaFieldNames(59) + "=\"" + cAlphaArgs(59) + "\".");
+                    ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                    ShowContinueError(state, "..." + cAlphaFieldNames(59) + "=\"" + cAlphaArgs(59) + "\".");
                     ErrorsFound = true;
                 }
             }
@@ -1480,7 +1476,7 @@ namespace PackagedThermalStorageCoil {
             } else {
                 TESCoil(item).EvapWaterSupplyName = cAlphaArgs(60);
                 TESCoil(item).EvapWaterSupplyMode = WaterSupplyFromTank;
-                SetupTankDemandComponent(TESCoil(item).Name,
+                SetupTankDemandComponent(state, TESCoil(item).Name,
                                          cCurrentModuleObject,
                                          TESCoil(item).EvapWaterSupplyName,
                                          ErrorsFound,
@@ -1493,7 +1489,7 @@ namespace PackagedThermalStorageCoil {
             } else {
                 TESCoil(item).CondensateCollectName = cAlphaArgs(61);
                 TESCoil(item).CondensateCollectMode = CondensateToTank;
-                SetupTankSupplyComponent(TESCoil(item).Name,
+                SetupTankSupplyComponent(state, TESCoil(item).Name,
                                          cCurrentModuleObject,
                                          TESCoil(item).CondensateCollectName,
                                          ErrorsFound,
@@ -1502,7 +1498,7 @@ namespace PackagedThermalStorageCoil {
             }
 
             if (!lAlphaFieldBlanks(62)) {
-                TESCoil(item).TESPlantInletNodeNum = GetOnlySingleNode(
+                TESCoil(item).TESPlantInletNodeNum = GetOnlySingleNode(state,
                     cAlphaArgs(62), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent);
 
                 TESCoil(item).TESPlantConnectionAvailable = true;
@@ -1510,7 +1506,7 @@ namespace PackagedThermalStorageCoil {
                 TESCoil(item).TESPlantConnectionAvailable = false;
             }
             if (!lAlphaFieldBlanks(63)) {
-                TESCoil(item).TESPlantOutletNodeNum = GetOnlySingleNode(cAlphaArgs(63),
+                TESCoil(item).TESPlantOutletNodeNum = GetOnlySingleNode(state, cAlphaArgs(63),
                                                                         ErrorsFound,
                                                                         cCurrentModuleObject,
                                                                         cAlphaArgs(1),
@@ -1520,13 +1516,13 @@ namespace PackagedThermalStorageCoil {
                                                                         ObjectIsNotParent);
             } else {
                 if (TESCoil(item).TESPlantConnectionAvailable) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
-                    ShowContinueError("..." + cAlphaFieldNames(63) + " cannot be blank.");
+                    ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
+                    ShowContinueError(state, "..." + cAlphaFieldNames(63) + " cannot be blank.");
                     ErrorsFound = true;
                 }
             }
             if (TESCoil(item).TESPlantConnectionAvailable) {
-                TestCompSet(cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(62), cAlphaArgs(63), "Water Nodes");
+                TestCompSet(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(62), cAlphaArgs(63), "Water Nodes");
             }
 
             if (!lNumericFieldBlanks(40)) {
@@ -1540,27 +1536,27 @@ namespace PackagedThermalStorageCoil {
                     TESCoil(item).MinimumFluidTankTempLimit = rNumericArgs(42);
                 } else {
 
-                    GetFluidDensityTemperatureLimits(TESCoil(item).StorageFluidIndex, TminRho, TmaxRho);
-                    GetFluidSpecificHeatTemperatureLimits(TESCoil(item).StorageFluidIndex, TminCp, TmaxCp);
+                    GetFluidDensityTemperatureLimits(state, TESCoil(item).StorageFluidIndex, TminRho, TmaxRho);
+                    GetFluidSpecificHeatTemperatureLimits(state, TESCoil(item).StorageFluidIndex, TminCp, TmaxCp);
                     TESCoil(item).MinimumFluidTankTempLimit = max(TminRho, TminCp);
                 }
                 if (!lNumericFieldBlanks(43)) {
                     TESCoil(item).MaximumFluidTankTempLimit = rNumericArgs(43);
                 } else {
-                    GetFluidDensityTemperatureLimits(TESCoil(item).StorageFluidIndex, TminRho, TmaxRho);
-                    GetFluidSpecificHeatTemperatureLimits(TESCoil(item).StorageFluidIndex, TminCp, TmaxCp);
+                    GetFluidDensityTemperatureLimits(state, TESCoil(item).StorageFluidIndex, TminRho, TmaxRho);
+                    GetFluidSpecificHeatTemperatureLimits(state, TESCoil(item).StorageFluidIndex, TminCp, TmaxCp);
                     TESCoil(item).MaximumFluidTankTempLimit = min(TmaxRho, TmaxCp);
                 }
             }
         }
 
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + "Errors found in getting " + cCurrentModuleObject + " input. Preceding condition(s) causes termination.");
+            ShowFatalError(state, RoutineName + "Errors found in getting " + cCurrentModuleObject + " input. Preceding condition(s) causes termination.");
         }
 
         // setup reporting
         for (item = 1; item <= NumTESCoils; ++item) {
-            SetupOutputVariable("Cooling Coil Operating Mode Index",
+            SetupOutputVariable(state, "Cooling Coil Operating Mode Index",
                                 OutputProcessor::Unit::None,
                                 TESCoil(item).CurControlMode,
                                 "System",
@@ -1568,13 +1564,13 @@ namespace PackagedThermalStorageCoil {
                                 TESCoil(item).Name);
 
             // cCurrentModuleObject = "Coil:Cooling:DX:SingleSpeed:ThermalStorage"
-            SetupOutputVariable("Cooling Coil Total Cooling Rate",
+            SetupOutputVariable(state, "Cooling Coil Total Cooling Rate",
                                 OutputProcessor::Unit::W,
                                 TESCoil(item).EvapTotCoolingRate,
                                 "System",
                                 "Average",
                                 TESCoil(item).Name);
-            SetupOutputVariable("Cooling Coil Total Cooling Energy",
+            SetupOutputVariable(state, "Cooling Coil Total Cooling Energy",
                                 OutputProcessor::Unit::J,
                                 TESCoil(item).EvapTotCoolingEnergy,
                                 "System",
@@ -1585,86 +1581,86 @@ namespace PackagedThermalStorageCoil {
                                 "COOLINGCOILS",
                                 _,
                                 "System");
-            SetupOutputVariable("Cooling Coil Sensible Cooling Rate",
+            SetupOutputVariable(state, "Cooling Coil Sensible Cooling Rate",
                                 OutputProcessor::Unit::W,
                                 TESCoil(item).EvapSensCoolingRate,
                                 "System",
                                 "Average",
                                 TESCoil(item).Name);
-            SetupOutputVariable("Cooling Coil Sensible Cooling Energy",
+            SetupOutputVariable(state, "Cooling Coil Sensible Cooling Energy",
                                 OutputProcessor::Unit::J,
                                 TESCoil(item).EvapSensCoolingEnergy,
                                 "System",
                                 "Sum",
                                 TESCoil(item).Name);
-            SetupOutputVariable("Cooling Coil Latent Cooling Rate",
+            SetupOutputVariable(state, "Cooling Coil Latent Cooling Rate",
                                 OutputProcessor::Unit::W,
                                 TESCoil(item).EvapLatCoolingRate,
                                 "System",
                                 "Average",
                                 TESCoil(item).Name);
-            SetupOutputVariable("Cooling Coil Latent Cooling Energy",
+            SetupOutputVariable(state, "Cooling Coil Latent Cooling Energy",
                                 OutputProcessor::Unit::J,
                                 TESCoil(item).EvapLatCoolingEnergy,
                                 "System",
                                 "Sum",
                                 TESCoil(item).Name);
-            SetupOutputVariable(
-                "Cooling Coil Electric Power", OutputProcessor::Unit::W, TESCoil(item).ElecCoolingPower, "System", "Average", TESCoil(item).Name);
-            SetupOutputVariable("Cooling Coil Electric Energy",
+            SetupOutputVariable(state,
+                "Cooling Coil Electricity Rate", OutputProcessor::Unit::W, TESCoil(item).ElecCoolingPower, "System", "Average", TESCoil(item).Name);
+            SetupOutputVariable(state, "Cooling Coil Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 TESCoil(item).ElecCoolingEnergy,
                                 "System",
                                 "Sum",
                                 TESCoil(item).Name,
                                 _,
-                                "Electric",
+                                "Electricity",
                                 "COOLING",
                                 _,
                                 "System");
 
-            SetupOutputVariable(
+            SetupOutputVariable(state,
                 "Cooling Coil Runtime Fraction", OutputProcessor::Unit::None, TESCoil(item).RuntimeFraction, "System", "Average", TESCoil(item).Name);
-            SetupOutputVariable("Cooling Coil Cold Weather Protection Electric Energy",
+            SetupOutputVariable(state, "Cooling Coil Cold Weather Protection Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 TESCoil(item).ElectColdWeatherEnergy,
                                 "System",
                                 "Sum",
                                 TESCoil(item).Name,
                                 _,
-                                "Electric",
+                                "Electricity",
                                 "COOLING",
                                 "Thermal Protection",
                                 "System");
-            SetupOutputVariable("Cooling Coil Cold Weather Protection Electric Power",
+            SetupOutputVariable(state, "Cooling Coil Cold Weather Protection Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 TESCoil(item).ElectColdWeatherPower,
                                 "System",
                                 "Average",
                                 TESCoil(item).Name);
 
-            SetupOutputVariable("Cooling Coil Thermal Storage Mechanical Heat Transfer Rate",
+            SetupOutputVariable(state, "Cooling Coil Thermal Storage Mechanical Heat Transfer Rate",
                                 OutputProcessor::Unit::W,
                                 TESCoil(item).QdotTES,
                                 "System",
                                 "Average",
                                 TESCoil(item).Name);
 
-            SetupOutputVariable("Cooling Coil Thermal Storage Mechanical Heat Transfer Energy",
+            SetupOutputVariable(state, "Cooling Coil Thermal Storage Mechanical Heat Transfer Energy",
                                 OutputProcessor::Unit::J,
                                 TESCoil(item).Q_TES,
                                 "System",
                                 "Sum",
                                 TESCoil(item).Name);
 
-            SetupOutputVariable("Cooling Coil Thermal Storage Ambient Heat Transfer Rate",
+            SetupOutputVariable(state, "Cooling Coil Thermal Storage Ambient Heat Transfer Rate",
                                 OutputProcessor::Unit::W,
                                 TESCoil(item).QdotAmbient,
                                 "System",
                                 "Average",
                                 TESCoil(item).Name);
 
-            SetupOutputVariable("Cooling Coil Thermal Storage Ambient Heat Transfer Energy",
+            SetupOutputVariable(state, "Cooling Coil Thermal Storage Ambient Heat Transfer Energy",
                                 OutputProcessor::Unit::J,
                                 TESCoil(item).Q_Ambient,
                                 "System",
@@ -1672,13 +1668,13 @@ namespace PackagedThermalStorageCoil {
                                 TESCoil(item).Name);
 
             if (TESCoil(item).TESPlantConnectionAvailable) {
-                SetupOutputVariable("Cooling Coil Thermal Storage Plant Heat Transfer Rate",
+                SetupOutputVariable(state, "Cooling Coil Thermal Storage Plant Heat Transfer Rate",
                                     OutputProcessor::Unit::W,
                                     TESCoil(item).QdotPlant,
                                     "System",
                                     "Average",
                                     TESCoil(item).Name);
-                SetupOutputVariable("Cooling Coil Thermal Storage Plant Heat Transfer Energy",
+                SetupOutputVariable(state, "Cooling Coil Thermal Storage Plant Heat Transfer Energy",
                                     OutputProcessor::Unit::J,
                                     TESCoil(item).Q_Plant,
                                     "System",
@@ -1687,7 +1683,7 @@ namespace PackagedThermalStorageCoil {
             }
 
             if (TESCoil(item).CondenserType == EvapCooled) {
-                SetupOutputVariable("Cooling Coil Condenser Inlet Temperature",
+                SetupOutputVariable(state, "Cooling Coil Condenser Inlet Temperature",
                                     OutputProcessor::Unit::C,
                                     TESCoil(item).CondInletTemp,
                                     "System",
@@ -1695,7 +1691,7 @@ namespace PackagedThermalStorageCoil {
                                     TESCoil(item).Name);
 
                 if (TESCoil(item).EvapWaterSupplyMode == WaterSupplyFromMains) {
-                    SetupOutputVariable("Cooling Coil Evaporative Condenser Water Volume",
+                    SetupOutputVariable(state, "Cooling Coil Evaporative Condenser Water Volume",
                                         OutputProcessor::Unit::m3,
                                         TESCoil(item).EvapWaterConsump,
                                         "System",
@@ -1706,7 +1702,7 @@ namespace PackagedThermalStorageCoil {
                                         "Cooling",
                                         _,
                                         "System");
-                    SetupOutputVariable("Cooling Coil Evaporative Condenser Mains Supply Water Volume",
+                    SetupOutputVariable(state, "Cooling Coil Evaporative Condenser Mains Supply Water Volume",
                                         OutputProcessor::Unit::m3,
                                         TESCoil(item).EvapWaterConsump,
                                         "System",
@@ -1718,7 +1714,7 @@ namespace PackagedThermalStorageCoil {
                                         _,
                                         "System");
                 } else if (TESCoil(item).EvapWaterSupplyMode == WaterSupplyFromTank) {
-                    SetupOutputVariable("Cooling Coil Evaporative Condenser Storage Tank Water Volume",
+                    SetupOutputVariable(state, "Cooling Coil Evaporative Condenser Storage Tank Water Volume",
                                         OutputProcessor::Unit::m3,
                                         TESCoil(item).EvapWaterConsump,
                                         "System",
@@ -1729,7 +1725,7 @@ namespace PackagedThermalStorageCoil {
                                         "Cooling",
                                         _,
                                         "System");
-                    SetupOutputVariable("Cooling Coil Evaporative Condenser Starved Water Volume",
+                    SetupOutputVariable(state, "Cooling Coil Evaporative Condenser Starved Water Volume",
                                         OutputProcessor::Unit::m3,
                                         TESCoil(item).EvapWaterStarvMakup,
                                         "System",
@@ -1740,7 +1736,7 @@ namespace PackagedThermalStorageCoil {
                                         "Cooling",
                                         _,
                                         "System");
-                    SetupOutputVariable("Cooling Coil Evaporative Condenser Starved Mains Water Volume",
+                    SetupOutputVariable(state, "Cooling Coil Evaporative Condenser Starved Mains Water Volume",
                                         OutputProcessor::Unit::m3,
                                         TESCoil(item).EvapWaterStarvMakup,
                                         "System",
@@ -1753,45 +1749,45 @@ namespace PackagedThermalStorageCoil {
                                         "System");
                 }
 
-                SetupOutputVariable("Cooling Coil Evaporative Condenser Pump Electric Power",
+                SetupOutputVariable(state, "Cooling Coil Evaporative Condenser Pump Electricity Rate",
                                     OutputProcessor::Unit::W,
                                     TESCoil(item).EvapCondPumpElecPower,
                                     "System",
                                     "Average",
                                     TESCoil(item).Name);
-                SetupOutputVariable("Cooling Coil Evaporative Condenser Pump Electric Energy",
+                SetupOutputVariable(state, "Cooling Coil Evaporative Condenser Pump Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     TESCoil(item).EvapCondPumpElecConsumption,
                                     "System",
                                     "Sum",
                                     TESCoil(item).Name,
                                     _,
-                                    "Electric",
+                                    "Electricity",
                                     "COOLING",
                                     _,
                                     "System");
 
-                SetupOutputVariable("Cooling Coil Basin Heater Electric Power",
+                SetupOutputVariable(state, "Cooling Coil Basin Heater Electricity Rate",
                                     OutputProcessor::Unit::W,
                                     TESCoil(item).ElectEvapCondBasinHeaterPower,
                                     "System",
                                     "Average",
                                     TESCoil(item).Name);
-                SetupOutputVariable("Cooling Coil Basin Heater Electric Energy",
+                SetupOutputVariable(state, "Cooling Coil Basin Heater Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     TESCoil(item).ElectEvapCondBasinHeaterEnergy,
                                     "System",
                                     "Sum",
                                     TESCoil(item).Name,
                                     _,
-                                    "Electric",
+                                    "Electricity",
                                     "COOLING",
                                     "Thermal Protection",
                                     "System");
             }
 
             if (TESCoil(item).StorageMedia == FluidBased) {
-                SetupOutputVariable("Cooling Coil Fluid Thermal Storage End Temperature",
+                SetupOutputVariable(state, "Cooling Coil Fluid Thermal Storage End Temperature",
                                     OutputProcessor::Unit::C,
                                     TESCoil(item).FluidTankTempFinal,
                                     "System",
@@ -1799,7 +1795,7 @@ namespace PackagedThermalStorageCoil {
                                     TESCoil(item).Name);
 
             } else if (TESCoil(item).StorageMedia == IceBased) {
-                SetupOutputVariable("Cooling Coil Ice Thermal Storage End Fraction",
+                SetupOutputVariable(state, "Cooling Coil Ice Thermal Storage End Fraction",
                                     OutputProcessor::Unit::None,
                                     TESCoil(item).IceFracRemain,
                                     "System",
@@ -1808,7 +1804,7 @@ namespace PackagedThermalStorageCoil {
             }
         }
 
-        if (AnyEnergyManagementSystemInModel) {
+        if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
             for (item = 1; item <= NumTESCoils; ++item) {
                 // setup EMS actuator for control mode
                 SetupEMSActuator("Coil:Cooling:DX:SingleSpeed:ThermalStorage",
@@ -1821,7 +1817,7 @@ namespace PackagedThermalStorageCoil {
         }
     }
 
-    void InitTESCoil(BranchInputManagerData &dataBranchInputManager, int &TESCoilNum)
+    void InitTESCoil(EnergyPlusData &state, int &TESCoilNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1842,7 +1838,7 @@ namespace PackagedThermalStorageCoil {
         // Using/Aliasing
         using DataPlant::PlantLoop;
         using DataPlant::TypeOf_PackagedTESCoolingCoil;
-        using General::RoundSigDigits;
+
         using PlantUtilities::ScanPlantLoopsForObject;
         using ScheduleManager::GetCurrentScheduleValue;
 
@@ -1887,11 +1883,11 @@ namespace PackagedThermalStorageCoil {
 
             if (TESCoil(TESCoilNum).TESPlantConnectionAvailable) {
                 errFlag = false;
-                ScanPlantLoopsForObject(dataBranchInputManager, TESCoil(TESCoilNum).Name, TypeOf_PackagedTESCoolingCoil, plloopnum, lsnum, brnum, cpnum, errFlag);
+                ScanPlantLoopsForObject(state, TESCoil(TESCoilNum).Name, TypeOf_PackagedTESCoolingCoil, plloopnum, lsnum, brnum, cpnum, errFlag);
 
                 // double check node names match
                 if (errFlag) {
-                    ShowFatalError("InitTESCoil: Program terminated due to previous condition(s).");
+                    ShowFatalError(state, "InitTESCoil: Program terminated due to previous condition(s).");
                 }
                 TESCoil(TESCoilNum).TESPlantLoopNum = plloopnum;
                 TESCoil(TESCoilNum).TESPlantLoopSideNum = lsnum;
@@ -1900,22 +1896,22 @@ namespace PackagedThermalStorageCoil {
 
                 if ((PlantLoop(plloopnum).LoopSide(lsnum).Branch(brnum).Comp(cpnum).NodeNumIn != TESCoil(TESCoilNum).TESPlantInletNodeNum) ||
                     (PlantLoop(plloopnum).LoopSide(lsnum).Branch(brnum).Comp(cpnum).NodeNumOut != TESCoil(TESCoilNum).TESPlantOutletNodeNum)) {
-                    ShowSevereError("InitTESCoil: Coil:Cooling:DX:SingleSpeed:ThermalStorage =\"" + TESCoil(TESCoilNum).Name +
+                    ShowSevereError(state, "InitTESCoil: Coil:Cooling:DX:SingleSpeed:ThermalStorage =\"" + TESCoil(TESCoilNum).Name +
                                     "\", non-matching plant nodes.");
-                    ShowContinueError("...in Branch=\"" +
+                    ShowContinueError(state, "...in Branch=\"" +
                                       PlantLoop(TESCoil(TESCoilNum).TESPlantLoopNum)
                                           .LoopSide(TESCoil(TESCoilNum).TESPlantLoopSideNum)
                                           .Branch(TESCoil(TESCoilNum).TESPlantBranchNum)
                                           .Name +
                                       "\", Component referenced with:");
-                    ShowContinueError("...Inlet Node=\"" + NodeID(PlantLoop(plloopnum).LoopSide(lsnum).Branch(brnum).Comp(cpnum).NodeNumIn));
-                    ShowContinueError("...Outlet Node=\"" + NodeID(PlantLoop(plloopnum).LoopSide(lsnum).Branch(brnum).Comp(cpnum).NodeNumOut));
-                    ShowContinueError("...TES Inlet Node=\"" + NodeID(TESCoil(TESCoilNum).TESPlantInletNodeNum));
-                    ShowContinueError("...TES Outlet Node=\"" + NodeID(TESCoil(TESCoilNum).TESPlantOutletNodeNum));
+                    ShowContinueError(state, "...Inlet Node=\"" + NodeID(PlantLoop(plloopnum).LoopSide(lsnum).Branch(brnum).Comp(cpnum).NodeNumIn));
+                    ShowContinueError(state, "...Outlet Node=\"" + NodeID(PlantLoop(plloopnum).LoopSide(lsnum).Branch(brnum).Comp(cpnum).NodeNumOut));
+                    ShowContinueError(state, "...TES Inlet Node=\"" + NodeID(TESCoil(TESCoilNum).TESPlantInletNodeNum));
+                    ShowContinueError(state, "...TES Outlet Node=\"" + NodeID(TESCoil(TESCoilNum).TESPlantOutletNodeNum));
                     errFlag = true;
                 }
                 if (errFlag) {
-                    ShowFatalError("InitTESCoil: Program terminated due to previous condition(s).");
+                    ShowFatalError(state, "InitTESCoil: Program terminated due to previous condition(s).");
                 }
 
             } // any plant connection to TES
@@ -1924,12 +1920,12 @@ namespace PackagedThermalStorageCoil {
 
         if (MySizeFlag(TESCoilNum)) {
 
-            SizeTESCoil(TESCoilNum);
+            SizeTESCoil(state, TESCoilNum);
 
             MySizeFlag(TESCoilNum) = false;
         }
 
-        if (BeginEnvrnFlag && MyEnvrnFlag(TESCoilNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(TESCoilNum)) {
             TESCoil(TESCoilNum).CurControlMode = OffMode;
             TESCoil(TESCoilNum).QdotPlant = 0.0;
             TESCoil(TESCoilNum).Q_Plant = 0.0;
@@ -1959,9 +1955,9 @@ namespace PackagedThermalStorageCoil {
             MyEnvrnFlag(TESCoilNum) = false;
         }
 
-        if (!BeginEnvrnFlag) MyEnvrnFlag(TESCoilNum) = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) MyEnvrnFlag(TESCoilNum) = true;
 
-        if (MyWarmupFlag(TESCoilNum) && (!WarmupFlag)) {
+        if (MyWarmupFlag(TESCoilNum) && (!state.dataGlobal->WarmupFlag)) {
             // reset to initial condition once warm up is over.
             TESCoil(TESCoilNum).IceFracRemain = 0.0;
             TESCoil(TESCoilNum).IceFracRemainLastTimestep = 0.0;
@@ -1970,12 +1966,12 @@ namespace PackagedThermalStorageCoil {
             MyWarmupFlag(TESCoilNum) = false;
         }
 
-        if (WarmupFlag) MyWarmupFlag(TESCoilNum) = true;
+        if (state.dataGlobal->WarmupFlag) MyWarmupFlag(TESCoilNum) = true;
 
         // determine control mode
-        if (GetCurrentScheduleValue(TESCoil(TESCoilNum).AvailSchedNum) != 0.0) {
+        if (GetCurrentScheduleValue(state, TESCoil(TESCoilNum).AvailSchedNum) != 0.0) {
             if (TESCoil(TESCoilNum).ModeControlType == ScheduledOpModes) {
-                tmpSchedValue = GetCurrentScheduleValue(TESCoil(TESCoilNum).ControlModeSchedNum);
+                tmpSchedValue = GetCurrentScheduleValue(state, TESCoil(TESCoilNum).ControlModeSchedNum);
                 TESCoil(TESCoilNum).CurControlMode = int(tmpSchedValue);
                 // check if value is valid
                 {
@@ -1987,12 +1983,12 @@ namespace PackagedThermalStorageCoil {
                     } else {
                         TESCoil(TESCoilNum).CurControlMode = OffMode;
                         if (TESCoil(TESCoilNum).ControlModeErrorIndex == 0) {
-                            ShowSevereMessage("InitTESCoil: Invalid control schedule value for operating mode");
-                            ShowContinueError("Occurs for Coil:Cooling:DX:SingleSpeed:ThermalStorage name = " + TESCoil(TESCoilNum).Name);
-                            ShowContinueError("Value returned from schedule =" + RoundSigDigits(tmpSchedValue, 8));
-                            ShowContinueError("Operating mode will be set to Off, and the simulation continues");
+                            ShowSevereMessage(state, "InitTESCoil: Invalid control schedule value for operating mode");
+                            ShowContinueError(state, "Occurs for Coil:Cooling:DX:SingleSpeed:ThermalStorage name = " + TESCoil(TESCoilNum).Name);
+                            ShowContinueError(state, format("Value returned from schedule ={:.8R}", tmpSchedValue));
+                            ShowContinueError(state, "Operating mode will be set to Off, and the simulation continues");
                         }
-                        ShowRecurringSevereErrorAtEnd("InitTESCoil: Invalid control schedule value for TES operating mode, set to Off",
+                        ShowRecurringSevereErrorAtEnd(state, "InitTESCoil: Invalid control schedule value for TES operating mode, set to Off",
                                                       TESCoil(TESCoilNum).ControlModeErrorIndex,
                                                       tmpSchedValue,
                                                       tmpSchedValue);
@@ -2009,53 +2005,53 @@ namespace PackagedThermalStorageCoil {
 
                         } else if (SELECT_CASE_var == CoolingOnlyMode) {
                             if (!(TESCoil(TESCoilNum).CoolingOnlyModeIsAvailable)) {
-                                ShowSevereMessage("InitTESCoil: Invalid control value for operating mode");
-                                ShowContinueError("Occurs for Coil:Cooling:DX:SingleSpeed:ThermalStorage name = " + TESCoil(TESCoilNum).Name);
-                                ShowContinueError("Value returned from EMS indicates Cooling Only Mode but that mode is not available.");
-                                ShowContinueError("Operating mode will be set to Off, and the simulation continues");
+                                ShowSevereMessage(state, "InitTESCoil: Invalid control value for operating mode");
+                                ShowContinueError(state, "Occurs for Coil:Cooling:DX:SingleSpeed:ThermalStorage name = " + TESCoil(TESCoilNum).Name);
+                                ShowContinueError(state, "Value returned from EMS indicates Cooling Only Mode but that mode is not available.");
+                                ShowContinueError(state, "Operating mode will be set to Off, and the simulation continues");
                                 TESCoil(TESCoilNum).CurControlMode = OffMode;
                             }
                         } else if (SELECT_CASE_var == CoolingAndChargeMode) {
                             if (!(TESCoil(TESCoilNum).CoolingAndChargeModeAvailable)) {
-                                ShowSevereMessage("InitTESCoil: Invalid control value for operating mode");
-                                ShowContinueError("Occurs for Coil:Cooling:DX:SingleSpeed:ThermalStorage name = " + TESCoil(TESCoilNum).Name);
-                                ShowContinueError("Value returned from EMS indicates Cooling And Charge Mode but that mode is not available.");
-                                ShowContinueError("Operating mode will be set to Off, and the simulation continues");
+                                ShowSevereMessage(state, "InitTESCoil: Invalid control value for operating mode");
+                                ShowContinueError(state, "Occurs for Coil:Cooling:DX:SingleSpeed:ThermalStorage name = " + TESCoil(TESCoilNum).Name);
+                                ShowContinueError(state, "Value returned from EMS indicates Cooling And Charge Mode but that mode is not available.");
+                                ShowContinueError(state, "Operating mode will be set to Off, and the simulation continues");
                                 TESCoil(TESCoilNum).CurControlMode = OffMode;
                             }
                         } else if (SELECT_CASE_var == CoolingAndDischargeMode) {
                             if (!(TESCoil(TESCoilNum).CoolingAndDischargeModeAvailable)) {
-                                ShowSevereMessage("InitTESCoil: Invalid control value for operating mode");
-                                ShowContinueError("Occurs for Coil:Cooling:DX:SingleSpeed:ThermalStorage name = " + TESCoil(TESCoilNum).Name);
-                                ShowContinueError("Value returned from EMS indicates Cooling And Discharge Mode but that mode is not available.");
-                                ShowContinueError("Operating mode will be set to Off, and the simulation continues");
+                                ShowSevereMessage(state, "InitTESCoil: Invalid control value for operating mode");
+                                ShowContinueError(state, "Occurs for Coil:Cooling:DX:SingleSpeed:ThermalStorage name = " + TESCoil(TESCoilNum).Name);
+                                ShowContinueError(state, "Value returned from EMS indicates Cooling And Discharge Mode but that mode is not available.");
+                                ShowContinueError(state, "Operating mode will be set to Off, and the simulation continues");
                                 TESCoil(TESCoilNum).CurControlMode = OffMode;
                             }
                         } else if (SELECT_CASE_var == ChargeOnlyMode) {
                             if (!(TESCoil(TESCoilNum).ChargeOnlyModeAvailable)) {
-                                ShowSevereMessage("InitTESCoil: Invalid control value for operating mode");
-                                ShowContinueError("Occurs for Coil:Cooling:DX:SingleSpeed:ThermalStorage name = " + TESCoil(TESCoilNum).Name);
-                                ShowContinueError("Value returned from EMS indicates Charge Only Mode but that mode is not available.");
-                                ShowContinueError("Operating mode will be set to Off, and the simulation continues");
+                                ShowSevereMessage(state, "InitTESCoil: Invalid control value for operating mode");
+                                ShowContinueError(state, "Occurs for Coil:Cooling:DX:SingleSpeed:ThermalStorage name = " + TESCoil(TESCoilNum).Name);
+                                ShowContinueError(state, "Value returned from EMS indicates Charge Only Mode but that mode is not available.");
+                                ShowContinueError(state, "Operating mode will be set to Off, and the simulation continues");
                                 TESCoil(TESCoilNum).CurControlMode = OffMode;
                             }
                         } else if (SELECT_CASE_var == DischargeOnlyMode) {
                             if (!(TESCoil(TESCoilNum).DischargeOnlyModeAvailable)) {
-                                ShowSevereMessage("InitTESCoil: Invalid control value for operating mode");
-                                ShowContinueError("Occurs for Coil:Cooling:DX:SingleSpeed:ThermalStorage name = " + TESCoil(TESCoilNum).Name);
-                                ShowContinueError("Value returned from EMS indicates Discharge Only Mode but that mode is not available.");
-                                ShowContinueError("Operating mode will be set to Off, and the simulation continues");
+                                ShowSevereMessage(state, "InitTESCoil: Invalid control value for operating mode");
+                                ShowContinueError(state, "Occurs for Coil:Cooling:DX:SingleSpeed:ThermalStorage name = " + TESCoil(TESCoilNum).Name);
+                                ShowContinueError(state, "Value returned from EMS indicates Discharge Only Mode but that mode is not available.");
+                                ShowContinueError(state, "Operating mode will be set to Off, and the simulation continues");
                                 TESCoil(TESCoilNum).CurControlMode = OffMode;
                             }
                         } else {
                             TESCoil(TESCoilNum).CurControlMode = OffMode;
                             if (TESCoil(TESCoilNum).ControlModeErrorIndex == 0) {
-                                ShowSevereMessage("InitTESCoil: Invalid control value for operating mode");
-                                ShowContinueError("Occurs for Coil:Cooling:DX:SingleSpeed:ThermalStorage name = " + TESCoil(TESCoilNum).Name);
-                                ShowContinueError("Value returned from EMS =" + RoundSigDigits(TESCoil(TESCoilNum).EMSControlModeValue, 8));
-                                ShowContinueError("Operating mode will be set to Off, and the simulation continues");
+                                ShowSevereMessage(state, "InitTESCoil: Invalid control value for operating mode");
+                                ShowContinueError(state, "Occurs for Coil:Cooling:DX:SingleSpeed:ThermalStorage name = " + TESCoil(TESCoilNum).Name);
+                                ShowContinueError(state, format("Value returned from EMS ={:.8R}", TESCoil(TESCoilNum).EMSControlModeValue));
+                                ShowContinueError(state, "Operating mode will be set to Off, and the simulation continues");
                             }
-                            ShowRecurringSevereErrorAtEnd("InitTESCoil: Invalid control schedule value for TES operating mode, set to Off",
+                            ShowRecurringSevereErrorAtEnd(state, "InitTESCoil: Invalid control schedule value for TES operating mode, set to Off",
                                                           TESCoil(TESCoilNum).ControlModeErrorIndex,
                                                           TESCoil(TESCoilNum).EMSControlModeValue,
                                                           TESCoil(TESCoilNum).EMSControlModeValue);
@@ -2093,7 +2089,7 @@ namespace PackagedThermalStorageCoil {
         TESCoil(TESCoilNum).ElectEvapCondBasinHeaterEnergy = 0.0;
     }
 
-    void SizeTESCoil(int &TESCoilNum)
+    void SizeTESCoil(EnergyPlusData &state, int &TESCoilNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2107,12 +2103,8 @@ namespace PackagedThermalStorageCoil {
 
         // Using/Aliasing
         using namespace DataSizing;
-        using DataAirSystems::PrimaryAirSystem;
-        using DataEnvironment::StdRhoAir;
-        using ReportSizingManager::ReportSizingOutput;
         using namespace OutputReportPredefined;
         using CurveManager::CurveValue;
-        using DataGlobals::SecInHour;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
 
@@ -2144,14 +2136,14 @@ namespace PackagedThermalStorageCoil {
         if (TESCoil(TESCoilNum).RatedEvapAirVolFlowRate == AutoSize) {
 
             if (CurSysNum > 0) {
-                CheckSysSizing("Coil:Cooling:DX:SingleSpeed:ThermalStorage", TESCoil(TESCoilNum).Name);
+                CheckSysSizing(state, "Coil:Cooling:DX:SingleSpeed:ThermalStorage", TESCoil(TESCoilNum).Name);
                 if (CurOASysNum > 0) {
                     TESCoil(TESCoilNum).RatedEvapAirVolFlowRate = FinalSysSizing(CurSysNum).DesOutAirVolFlow;
                 } else {
                     TESCoil(TESCoilNum).RatedEvapAirVolFlowRate = FinalSysSizing(CurSysNum).DesMainVolFlow;
                 }
             } else if (CurZoneEqNum > 0) {
-                CheckZoneSizing("Coil:Cooling:DX:SingleSpeed:ThermalStorage", TESCoil(TESCoilNum).Name);
+                CheckZoneSizing(state, "Coil:Cooling:DX:SingleSpeed:ThermalStorage", TESCoil(TESCoilNum).Name);
                 TESCoil(TESCoilNum).RatedEvapAirVolFlowRate =
                     max(FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow, FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow);
             }
@@ -2159,28 +2151,28 @@ namespace PackagedThermalStorageCoil {
             if (TESCoil(TESCoilNum).RatedEvapAirVolFlowRate < SmallAirVolFlow) {
                 TESCoil(TESCoilNum).RatedEvapAirVolFlowRate = 0.0;
             }
-            ReportSizingOutput("Coil:Cooling:DX:SingleSpeed:ThermalStorage",
-                               TESCoil(TESCoilNum).Name,
-                               "Rated Evaporator Air Flow Rate [m3/s]",
-                               TESCoil(TESCoilNum).RatedEvapAirVolFlowRate);
+            BaseSizer::reportSizerOutput(state, "Coil:Cooling:DX:SingleSpeed:ThermalStorage",
+                                         TESCoil(TESCoilNum).Name,
+                                         "Rated Evaporator Air Flow Rate [m3/s]",
+                                         TESCoil(TESCoilNum).RatedEvapAirVolFlowRate);
         }
 
-        TESCoil(TESCoilNum).RatedEvapAirMassFlowRate = StdRhoAir * TESCoil(TESCoilNum).RatedEvapAirVolFlowRate;
+        TESCoil(TESCoilNum).RatedEvapAirMassFlowRate = state.dataEnvrn->StdRhoAir * TESCoil(TESCoilNum).RatedEvapAirVolFlowRate;
 
-        if (TESCoil(TESCoilNum).CondenserAirVolumeFlow == AutoCalculate) {
+        if (TESCoil(TESCoilNum).CondenserAirVolumeFlow == DataGlobalConstants::AutoCalculate()) {
             TESCoil(TESCoilNum).CondenserAirVolumeFlow =
                 TESCoil(TESCoilNum).RatedEvapAirVolFlowRate * TESCoil(TESCoilNum).CondenserAirFlowSizingFactor;
-            ReportSizingOutput("Coil:Cooling:DX:SingleSpeed:ThermalStorage",
-                               TESCoil(TESCoilNum).Name,
-                               "Condenser Air Flow Rate [m3/s]",
-                               TESCoil(TESCoilNum).CondenserAirVolumeFlow);
+            BaseSizer::reportSizerOutput(state, "Coil:Cooling:DX:SingleSpeed:ThermalStorage",
+                                         TESCoil(TESCoilNum).Name,
+                                         "Condenser Air Flow Rate [m3/s]",
+                                         TESCoil(TESCoilNum).CondenserAirVolumeFlow);
         }
 
-        TESCoil(TESCoilNum).CondenserAirMassFlow = StdRhoAir * TESCoil(TESCoilNum).CondenserAirVolumeFlow;
+        TESCoil(TESCoilNum).CondenserAirMassFlow = state.dataEnvrn->StdRhoAir * TESCoil(TESCoilNum).CondenserAirVolumeFlow;
 
         if (TESCoil(TESCoilNum).CoolingOnlyRatedTotCap == AutoSize) {
             if (CurSysNum > 0) {
-                CheckSysSizing("Coil:Cooling:DX:SingleSpeed:ThermalStorage", TESCoil(TESCoilNum).Name);
+                CheckSysSizing(state, "Coil:Cooling:DX:SingleSpeed:ThermalStorage", TESCoil(TESCoilNum).Name);
                 VolFlowRate = TESCoil(TESCoilNum).RatedEvapAirVolFlowRate;
                 if (VolFlowRate >= SmallAirVolFlow) {
                     if (CurOASysNum > 0) { // coil is in the OA stream
@@ -2193,7 +2185,7 @@ namespace PackagedThermalStorageCoil {
                         //     MixHumRat = FinalSysSizing(CurSysNum)%MixHumRatAtCoolPeak
                         SupTemp = FinalSysSizing(CurSysNum).CoolSupTemp;
                         SupHumRat = FinalSysSizing(CurSysNum).CoolSupHumRat;
-                        if (PrimaryAirSystem(CurSysNum).NumOACoolCoils == 0) { // there is no precooling of the OA stream
+                        if (state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).NumOACoolCoils == 0) { // there is no precooling of the OA stream
                             MixTemp = FinalSysSizing(CurSysNum).MixTempAtCoolPeak;
                             MixHumRat = FinalSysSizing(CurSysNum).MixHumRatAtCoolPeak;
                         } else { // there is precooling of OA stream
@@ -2210,11 +2202,11 @@ namespace PackagedThermalStorageCoil {
                         }
                     }
                     OutTemp = FinalSysSizing(CurSysNum).OutTempAtCoolPeak;
-                    rhoair = PsyRhoAirFnPbTdbW(StdBaroPress, MixTemp, MixHumRat, RoutineName);
+                    rhoair = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, MixTemp, MixHumRat, RoutineName);
                     MixEnth = PsyHFnTdbW(MixTemp, MixHumRat);
-                    MixWetBulb = PsyTwbFnTdbWPb(MixTemp, MixHumRat, StdBaroPress, RoutineName);
+                    MixWetBulb = PsyTwbFnTdbWPb(state, MixTemp, MixHumRat, state.dataEnvrn->StdBaroPress, RoutineName);
                     SupEnth = PsyHFnTdbW(SupTemp, SupHumRat);
-                    TotCapTempModFac = CurveValue(TESCoil(TESCoilNum).CoolingOnlyCapFTempCurve, MixWetBulb, OutTemp);
+                    TotCapTempModFac = CurveValue(state, TESCoil(TESCoilNum).CoolingOnlyCapFTempCurve, MixWetBulb, OutTemp);
                     CoolCapAtPeak = max(0.0, (rhoair * VolFlowRate * (MixEnth - SupEnth)));
                     if (TotCapTempModFac > 0.0) {
                         TESCoil(TESCoilNum).CoolingOnlyRatedTotCap = CoolCapAtPeak / TotCapTempModFac;
@@ -2226,7 +2218,7 @@ namespace PackagedThermalStorageCoil {
                     TESCoil(TESCoilNum).CoolingOnlyRatedTotCap = 0.0;
                 }
             } else if (CurZoneEqNum > 0) {
-                CheckZoneSizing("Coil:Cooling:DX:SingleSpeed:ThermalStorage", TESCoil(TESCoilNum).Name);
+                CheckZoneSizing(state, "Coil:Cooling:DX:SingleSpeed:ThermalStorage", TESCoil(TESCoilNum).Name);
                 VolFlowRate = TESCoil(TESCoilNum).RatedEvapAirVolFlowRate;
                 if (VolFlowRate >= SmallAirVolFlow) {
                     if (ZoneEqDXCoil) {
@@ -2250,11 +2242,11 @@ namespace PackagedThermalStorageCoil {
                     } else {
                         OutTemp = 0.0;
                     }
-                    rhoair = PsyRhoAirFnPbTdbW(StdBaroPress, MixTemp, MixHumRat, RoutineName);
+                    rhoair = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, MixTemp, MixHumRat, RoutineName);
                     MixEnth = PsyHFnTdbW(MixTemp, MixHumRat);
-                    MixWetBulb = PsyTwbFnTdbWPb(MixTemp, MixHumRat, StdBaroPress, RoutineName);
+                    MixWetBulb = PsyTwbFnTdbWPb(state, MixTemp, MixHumRat, state.dataEnvrn->StdBaroPress, RoutineName);
                     SupEnth = PsyHFnTdbW(SupTemp, SupHumRat);
-                    TotCapTempModFac = CurveValue(TESCoil(TESCoilNum).CoolingOnlyCapFTempCurve, MixWetBulb, OutTemp);
+                    TotCapTempModFac = CurveValue(state, TESCoil(TESCoilNum).CoolingOnlyCapFTempCurve, MixWetBulb, OutTemp);
                     CoolCapAtPeak = max(0.0, (rhoair * VolFlowRate * (MixEnth - SupEnth)));
                     if (TotCapTempModFac > 0.0) {
                         TESCoil(TESCoilNum).CoolingOnlyRatedTotCap = CoolCapAtPeak / TotCapTempModFac;
@@ -2267,108 +2259,108 @@ namespace PackagedThermalStorageCoil {
                 }
             }
 
-            ReportSizingOutput("Coil:Cooling:DX:SingleSpeed:ThermalStorage",
-                               TESCoil(TESCoilNum).Name,
-                               "Cooling Only Mode Rated Total Evaporator Cooling Capacity [W]",
-                               TESCoil(TESCoilNum).CoolingOnlyRatedTotCap);
+            BaseSizer::reportSizerOutput(state, "Coil:Cooling:DX:SingleSpeed:ThermalStorage",
+                                         TESCoil(TESCoilNum).Name,
+                                         "Cooling Only Mode Rated Total Evaporator Cooling Capacity [W]",
+                                         TESCoil(TESCoilNum).CoolingOnlyRatedTotCap);
         }
 
-        if (TESCoil(TESCoilNum).CoolingAndChargeModeAvailable && (TESCoil(TESCoilNum).CoolingAndChargeRatedTotCap == AutoCalculate)) {
+        if (TESCoil(TESCoilNum).CoolingAndChargeModeAvailable && (TESCoil(TESCoilNum).CoolingAndChargeRatedTotCap == DataGlobalConstants::AutoCalculate())) {
             TESCoil(TESCoilNum).CoolingAndChargeRatedTotCap =
                 TESCoil(TESCoilNum).CoolingOnlyRatedTotCap * TESCoil(TESCoilNum).CoolingAndChargeRatedTotCapSizingFactor;
-            ReportSizingOutput("Coil:Cooling:DX:SingleSpeed:ThermalStorage",
-                               TESCoil(TESCoilNum).Name,
-                               "Cooling And Charge Mode Rated Total Evaporator Cooling Capacity [W]",
-                               TESCoil(TESCoilNum).CoolingAndChargeRatedTotCap);
+            BaseSizer::reportSizerOutput(state, "Coil:Cooling:DX:SingleSpeed:ThermalStorage",
+                                         TESCoil(TESCoilNum).Name,
+                                         "Cooling And Charge Mode Rated Total Evaporator Cooling Capacity [W]",
+                                         TESCoil(TESCoilNum).CoolingAndChargeRatedTotCap);
         }
 
-        if (TESCoil(TESCoilNum).CoolingAndChargeModeAvailable && (TESCoil(TESCoilNum).CoolingAndChargeRatedChargeCap == AutoCalculate)) {
+        if (TESCoil(TESCoilNum).CoolingAndChargeModeAvailable && (TESCoil(TESCoilNum).CoolingAndChargeRatedChargeCap == DataGlobalConstants::AutoCalculate())) {
             TESCoil(TESCoilNum).CoolingAndChargeRatedChargeCap =
                 TESCoil(TESCoilNum).CoolingOnlyRatedTotCap * TESCoil(TESCoilNum).CoolingAndChargeRatedChargeCapSizingFactor;
-            ReportSizingOutput("Coil:Cooling:DX:SingleSpeed:ThermalStorage",
-                               TESCoil(TESCoilNum).Name,
-                               "Cooling And Charge Mode Rated Storage Charging Capacity [W]",
-                               TESCoil(TESCoilNum).CoolingAndChargeRatedChargeCap);
+            BaseSizer::reportSizerOutput(state, "Coil:Cooling:DX:SingleSpeed:ThermalStorage",
+                                         TESCoil(TESCoilNum).Name,
+                                         "Cooling And Charge Mode Rated Storage Charging Capacity [W]",
+                                         TESCoil(TESCoilNum).CoolingAndChargeRatedChargeCap);
         }
 
-        if (TESCoil(TESCoilNum).CoolingAndDischargeModeAvailable && (TESCoil(TESCoilNum).CoolingAndDischargeRatedTotCap == AutoCalculate)) {
+        if (TESCoil(TESCoilNum).CoolingAndDischargeModeAvailable && (TESCoil(TESCoilNum).CoolingAndDischargeRatedTotCap == DataGlobalConstants::AutoCalculate())) {
             TESCoil(TESCoilNum).CoolingAndDischargeRatedTotCap =
                 TESCoil(TESCoilNum).CoolingOnlyRatedTotCap * TESCoil(TESCoilNum).CoolingAndDischargeRatedTotCapSizingFactor;
-            ReportSizingOutput("Coil:Cooling:DX:SingleSpeed:ThermalStorage",
-                               TESCoil(TESCoilNum).Name,
-                               "Cooling And Discharge Mode Rated Total Evaporator Cooling Capacity [W]",
-                               TESCoil(TESCoilNum).CoolingAndDischargeRatedTotCap);
+            BaseSizer::reportSizerOutput(state, "Coil:Cooling:DX:SingleSpeed:ThermalStorage",
+                                         TESCoil(TESCoilNum).Name,
+                                         "Cooling And Discharge Mode Rated Total Evaporator Cooling Capacity [W]",
+                                         TESCoil(TESCoilNum).CoolingAndDischargeRatedTotCap);
         }
 
-        if (TESCoil(TESCoilNum).CoolingAndDischargeModeAvailable && (TESCoil(TESCoilNum).CoolingAndDischargeRatedDischargeCap == AutoCalculate)) {
+        if (TESCoil(TESCoilNum).CoolingAndDischargeModeAvailable && (TESCoil(TESCoilNum).CoolingAndDischargeRatedDischargeCap == DataGlobalConstants::AutoCalculate())) {
             TESCoil(TESCoilNum).CoolingAndDischargeRatedDischargeCap =
                 TESCoil(TESCoilNum).CoolingOnlyRatedTotCap * TESCoil(TESCoilNum).CoolingAndDischargeRatedDischargeCapSizingFactor;
-            ReportSizingOutput("Coil:Cooling:DX:SingleSpeed:ThermalStorage",
-                               TESCoil(TESCoilNum).Name,
-                               "Cooling And Discharge Mode Rated Storage Discharging Capacity [W]",
-                               TESCoil(TESCoilNum).CoolingAndDischargeRatedDischargeCap);
+            BaseSizer::reportSizerOutput(state, "Coil:Cooling:DX:SingleSpeed:ThermalStorage",
+                                         TESCoil(TESCoilNum).Name,
+                                         "Cooling And Discharge Mode Rated Storage Discharging Capacity [W]",
+                                         TESCoil(TESCoilNum).CoolingAndDischargeRatedDischargeCap);
         }
 
-        if (TESCoil(TESCoilNum).ChargeOnlyModeAvailable && (TESCoil(TESCoilNum).ChargeOnlyRatedCapacity == AutoCalculate)) {
+        if (TESCoil(TESCoilNum).ChargeOnlyModeAvailable && (TESCoil(TESCoilNum).ChargeOnlyRatedCapacity == DataGlobalConstants::AutoCalculate())) {
             TESCoil(TESCoilNum).ChargeOnlyRatedCapacity =
                 TESCoil(TESCoilNum).CoolingOnlyRatedTotCap * TESCoil(TESCoilNum).ChargeOnlyRatedCapacitySizingFactor;
-            ReportSizingOutput("Coil:Cooling:DX:SingleSpeed:ThermalStorage",
-                               TESCoil(TESCoilNum).Name,
-                               "Charge Only Mode Rated Storage Charging Capacity [W]",
-                               TESCoil(TESCoilNum).ChargeOnlyRatedCapacity);
+            BaseSizer::reportSizerOutput(state, "Coil:Cooling:DX:SingleSpeed:ThermalStorage",
+                                         TESCoil(TESCoilNum).Name,
+                                         "Charge Only Mode Rated Storage Charging Capacity [W]",
+                                         TESCoil(TESCoilNum).ChargeOnlyRatedCapacity);
         }
 
-        if (TESCoil(TESCoilNum).DischargeOnlyModeAvailable && (TESCoil(TESCoilNum).DischargeOnlyRatedDischargeCap == AutoCalculate)) {
+        if (TESCoil(TESCoilNum).DischargeOnlyModeAvailable && (TESCoil(TESCoilNum).DischargeOnlyRatedDischargeCap == DataGlobalConstants::AutoCalculate())) {
             TESCoil(TESCoilNum).DischargeOnlyRatedDischargeCap =
                 TESCoil(TESCoilNum).CoolingOnlyRatedTotCap * TESCoil(TESCoilNum).DischargeOnlyRatedDischargeCapSizingFactor;
-            ReportSizingOutput("Coil:Cooling:DX:SingleSpeed:ThermalStorage",
-                               TESCoil(TESCoilNum).Name,
-                               "Discharge Only Mode Rated Storage Discharging Capacity [W]",
-                               TESCoil(TESCoilNum).DischargeOnlyRatedDischargeCap);
+            BaseSizer::reportSizerOutput(state, "Coil:Cooling:DX:SingleSpeed:ThermalStorage",
+                                         TESCoil(TESCoilNum).Name,
+                                         "Discharge Only Mode Rated Storage Discharging Capacity [W]",
+                                         TESCoil(TESCoilNum).DischargeOnlyRatedDischargeCap);
         }
 
-        if ((TESCoil(TESCoilNum).StorageMedia == FluidBased) && (TESCoil(TESCoilNum).FluidStorageVolume == AutoCalculate)) {
+        if ((TESCoil(TESCoilNum).StorageMedia == FluidBased) && (TESCoil(TESCoilNum).FluidStorageVolume == DataGlobalConstants::AutoCalculate())) {
             // for fluid tanks, assume a 10C deltaT or diff between max and min, whichever is smaller
             deltaT = min(FluidTankSizingDeltaT, (TESCoil(TESCoilNum).MaximumFluidTankTempLimit - TESCoil(TESCoilNum).MinimumFluidTankTempLimit));
 
             rho = GetDensityGlycol(
-                TESCoil(TESCoilNum).StorageFluidName, DataGlobals::CWInitConvTemp, TESCoil(TESCoilNum).StorageFluidIndex, calcTESWaterStorageTank);
+                state, TESCoil(TESCoilNum).StorageFluidName, DataGlobalConstants::CWInitConvTemp(), TESCoil(TESCoilNum).StorageFluidIndex, calcTESWaterStorageTank);
             Cp = GetSpecificHeatGlycol(
-                TESCoil(TESCoilNum).StorageFluidName, DataGlobals::CWInitConvTemp, TESCoil(TESCoilNum).StorageFluidIndex, calcTESWaterStorageTank);
+                state, TESCoil(TESCoilNum).StorageFluidName, DataGlobalConstants::CWInitConvTemp(), TESCoil(TESCoilNum).StorageFluidIndex, calcTESWaterStorageTank);
             if (TESCoil(TESCoilNum).DischargeOnlyRatedDischargeCap > 0.0 && TESCoil(TESCoilNum).DischargeOnlyModeAvailable) {
                 TESCoil(TESCoilNum).FluidStorageVolume =
-                    (TESCoil(TESCoilNum).DischargeOnlyRatedDischargeCap * TESCoil(TESCoilNum).StorageCapacitySizingFactor * SecInHour) /
+                    (TESCoil(TESCoilNum).DischargeOnlyRatedDischargeCap * TESCoil(TESCoilNum).StorageCapacitySizingFactor * DataGlobalConstants::SecInHour()) /
                     (rho * Cp * deltaT);
             } else {
                 TESCoil(TESCoilNum).FluidStorageVolume =
-                    (TESCoil(TESCoilNum).CoolingOnlyRatedTotCap * TESCoil(TESCoilNum).StorageCapacitySizingFactor * SecInHour) / (rho * Cp * deltaT);
+                    (TESCoil(TESCoilNum).CoolingOnlyRatedTotCap * TESCoil(TESCoilNum).StorageCapacitySizingFactor * DataGlobalConstants::SecInHour()) / (rho * Cp * deltaT);
             }
-            ReportSizingOutput("Coil:Cooling:DX:SingleSpeed:ThermalStorage",
-                               TESCoil(TESCoilNum).Name,
-                               "Fluid Storage Volume [m3]",
-                               TESCoil(TESCoilNum).FluidStorageVolume);
+            BaseSizer::reportSizerOutput(state, "Coil:Cooling:DX:SingleSpeed:ThermalStorage",
+                                         TESCoil(TESCoilNum).Name,
+                                         "Fluid Storage Volume [m3]",
+                                         TESCoil(TESCoilNum).FluidStorageVolume);
         }
-        if ((TESCoil(TESCoilNum).StorageMedia == IceBased) && (TESCoil(TESCoilNum).IceStorageCapacity == AutoCalculate)) {
+        if ((TESCoil(TESCoilNum).StorageMedia == IceBased) && (TESCoil(TESCoilNum).IceStorageCapacity == DataGlobalConstants::AutoCalculate())) {
 
             if (TESCoil(TESCoilNum).DischargeOnlyRatedDischargeCap > 0.0 && TESCoil(TESCoilNum).DischargeOnlyModeAvailable) {
                 TESCoil(TESCoilNum).IceStorageCapacity =
-                    TESCoil(TESCoilNum).DischargeOnlyRatedDischargeCap * TESCoil(TESCoilNum).StorageCapacitySizingFactor * SecInHour;
+                    TESCoil(TESCoilNum).DischargeOnlyRatedDischargeCap * TESCoil(TESCoilNum).StorageCapacitySizingFactor * DataGlobalConstants::SecInHour();
             } else {
                 TESCoil(TESCoilNum).IceStorageCapacity =
-                    TESCoil(TESCoilNum).CoolingOnlyRatedTotCap * TESCoil(TESCoilNum).StorageCapacitySizingFactor * SecInHour;
+                    TESCoil(TESCoilNum).CoolingOnlyRatedTotCap * TESCoil(TESCoilNum).StorageCapacitySizingFactor * DataGlobalConstants::SecInHour();
             }
-            ReportSizingOutput("Coil:Cooling:DX:SingleSpeed:ThermalStorage",
-                               TESCoil(TESCoilNum).Name,
-                               "Ice Storage Capacity [GJ]",
-                               TESCoil(TESCoilNum).IceStorageCapacity / 1.e+09);
+            BaseSizer::reportSizerOutput(state, "Coil:Cooling:DX:SingleSpeed:ThermalStorage",
+                                         TESCoil(TESCoilNum).Name,
+                                         "Ice Storage Capacity [GJ]",
+                                         TESCoil(TESCoilNum).IceStorageCapacity / 1.e+09);
         }
 
         if ((TESCoil(TESCoilNum).CondenserType == EvapCooled) && (TESCoil(TESCoilNum).EvapCondPumpElecNomPower == AutoSize)) {
             TESCoil(TESCoilNum).EvapCondPumpElecNomPower = TESCoil(TESCoilNum).CoolingOnlyRatedTotCap * 0.004266; // w/w (15 w/ton)
-            ReportSizingOutput("Coil:Cooling:DX:SingleSpeed:ThermalStorage",
-                               TESCoil(TESCoilNum).Name,
-                               "Evaporative Condenser Pump Rated Power Consumption [W]",
-                               TESCoil(TESCoilNum).EvapCondPumpElecNomPower);
+            BaseSizer::reportSizerOutput(state, "Coil:Cooling:DX:SingleSpeed:ThermalStorage",
+                                         TESCoil(TESCoilNum).Name,
+                                         "Evaporative Condenser Pump Rated Power Consumption [W]",
+                                         TESCoil(TESCoilNum).EvapCondPumpElecNomPower);
         }
 
         PreDefTableEntry(pdchCoolCoilType, TESCoil(TESCoilNum).Name, "Coil:Cooling:DX:SingleSpeed:ThermalStorage");
@@ -2384,7 +2376,7 @@ namespace PackagedThermalStorageCoil {
         PreDefTableEntry(pdchCoolCoilNomEff, TESCoil(TESCoilNum).Name, TESCoil(TESCoilNum).CoolingOnlyRatedCOP);
     }
 
-    void CalcTESCoilOffMode(int const TESCoilNum)
+    void CalcTESCoilOffMode(EnergyPlusData &state, int const TESCoilNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2421,14 +2413,14 @@ namespace PackagedThermalStorageCoil {
         Real64 StandbyAncillaryPower;
 
         // coil is off; just pass through conditions
-        if (GetCurrentScheduleValue(TESCoil(TESCoilNum).AvailSchedNum) != 0.0) {
+        if (GetCurrentScheduleValue(state, TESCoil(TESCoilNum).AvailSchedNum) != 0.0) {
             StandbyAncillaryPower = TESCoil(TESCoilNum).AncillaryControlsPower;
         } else {
             StandbyAncillaryPower = 0.0;
         }
 
         TESCoil(TESCoilNum).ElecCoolingPower = StandbyAncillaryPower;
-        TESCoil(TESCoilNum).ElecCoolingEnergy = StandbyAncillaryPower * TimeStepSys * SecInHour;
+        TESCoil(TESCoilNum).ElecCoolingEnergy = StandbyAncillaryPower * TimeStepSys * DataGlobalConstants::SecInHour();
 
         Node(TESCoil(TESCoilNum).EvapAirOutletNodeNum).Temp = Node(TESCoil(TESCoilNum).EvapAirInletNodeNum).Temp;
         Node(TESCoil(TESCoilNum).EvapAirOutletNodeNum).HumRat = Node(TESCoil(TESCoilNum).EvapAirInletNodeNum).HumRat;
@@ -2455,18 +2447,18 @@ namespace PackagedThermalStorageCoil {
         TESCoil(TESCoilNum).QdotTES = 0.0;
         TESCoil(TESCoilNum).Q_TES = 0.0;
 
-        UpdateTEStorage(TESCoilNum);
+        UpdateTEStorage(state, TESCoilNum);
 
         TESCoil(TESCoilNum).CondInletTemp = Node(TESCoil(TESCoilNum).CondAirInletNodeNum).Temp;
 
-        UpdateColdWeatherProtection(TESCoilNum);
+        UpdateColdWeatherProtection(state, TESCoilNum);
 
         if (TESCoil(TESCoilNum).CondenserType == EvapCooled) {
-            UpdateEvaporativeCondenserBasinHeater(TESCoilNum);
+            UpdateEvaporativeCondenserBasinHeater(state, TESCoilNum);
         }
     }
 
-    void CalcTESCoilCoolingOnlyMode(int const TESCoilNum, int const EP_UNUSED(FanOpMode), Real64 const PartLoadRatio)
+    void CalcTESCoilCoolingOnlyMode(EnergyPlusData &state, int const TESCoilNum, [[maybe_unused]] int const FanOpMode, Real64 const PartLoadRatio)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2560,9 +2552,9 @@ namespace PackagedThermalStorageCoil {
         if (TESCoil(TESCoilNum).CondenserType == AirCooled) {
             CondAirSidePressure = Node(TESCoil(TESCoilNum).CondAirInletNodeNum).Press;
             if (CondAirSidePressure == DefaultNodeValues.Press) {
-                CondInletTemp = OutDryBulbTemp;
-                CondInletHumRat = OutHumRat;
-                CondAirSidePressure = OutBaroPress;
+                CondInletTemp = state.dataEnvrn->OutDryBulbTemp;
+                CondInletHumRat = state.dataEnvrn->OutHumRat;
+                CondAirSidePressure = state.dataEnvrn->OutBaroPress;
             } else {
                 CondInletTemp = Node(TESCoil(TESCoilNum).CondAirInletNodeNum).Temp;
                 CondInletHumRat = Node(TESCoil(TESCoilNum).CondAirInletNodeNum).HumRat;
@@ -2571,40 +2563,40 @@ namespace PackagedThermalStorageCoil {
         } else if (TESCoil(TESCoilNum).CondenserType == EvapCooled) {
             CondAirSidePressure = Node(TESCoil(TESCoilNum).CondAirInletNodeNum).Press;
             if (CondAirSidePressure == DefaultNodeValues.Press) {
-                OutdoorDryBulb = OutDryBulbTemp;
-                OutdoorHumRat = OutHumRat;
-                CondAirSidePressure = OutBaroPress;
-                OutdoorWetBulb = OutWetBulbTemp;
+                OutdoorDryBulb = state.dataEnvrn->OutDryBulbTemp;
+                OutdoorHumRat = state.dataEnvrn->OutHumRat;
+                CondAirSidePressure = state.dataEnvrn->OutBaroPress;
+                OutdoorWetBulb = state.dataEnvrn->OutWetBulbTemp;
             } else {
                 OutdoorDryBulb = Node(TESCoil(TESCoilNum).CondAirInletNodeNum).Temp;
                 OutdoorHumRat = Node(TESCoil(TESCoilNum).CondAirInletNodeNum).HumRat;
-                OutdoorWetBulb = PsyTwbFnTdbWPb(OutdoorDryBulb, OutdoorHumRat, CondAirSidePressure, RoutineName);
+                OutdoorWetBulb = PsyTwbFnTdbWPb(state, OutdoorDryBulb, OutdoorHumRat, CondAirSidePressure, RoutineName);
             }
             CondAirMassFlow = TESCoil(TESCoilNum).CondenserAirMassFlow;
             // direct evap cool model
             CondInletTemp = OutdoorWetBulb + (OutdoorDryBulb - OutdoorWetBulb) * (1.0 - TESCoil(TESCoilNum).EvapCondEffect);
-            CondInletHumRat = PsyWFnTdbTwbPb(CondInletTemp, OutdoorWetBulb, CondAirSidePressure, RoutineName);
+            CondInletHumRat = PsyWFnTdbTwbPb(state, CondInletTemp, OutdoorWetBulb, CondAirSidePressure, RoutineName);
         }
 
         EvapAirMassFlow = Node(TESCoil(TESCoilNum).EvapAirInletNodeNum).MassFlowRate;
         EvapInletDryBulb = Node(TESCoil(TESCoilNum).EvapAirInletNodeNum).Temp;
         EvapInletHumRat = Node(TESCoil(TESCoilNum).EvapAirInletNodeNum).HumRat;
-        EvapInletWetBulb = PsyTwbFnTdbWPb(EvapInletDryBulb, EvapInletHumRat, OutBaroPress, RoutineName);
+        EvapInletWetBulb = PsyTwbFnTdbWPb(state, EvapInletDryBulb, EvapInletHumRat, state.dataEnvrn->OutBaroPress, RoutineName);
         EvapInletEnthalpy = Node(TESCoil(TESCoilNum).EvapAirInletNodeNum).Enthalpy;
         CoilMightBeDry = false;
 
         if ((EvapAirMassFlow > SmallMassFlow) && (PartLoadRatio > 0.0)) { // coil is running
 
             AirMassFlowRatio = EvapAirMassFlow / TESCoil(TESCoilNum).RatedEvapAirMassFlowRate;
-            TotCapTempModFac = CurveValue(TESCoil(TESCoilNum).CoolingOnlyCapFTempCurve, EvapInletWetBulb, CondInletTemp);
+            TotCapTempModFac = CurveValue(state, TESCoil(TESCoilNum).CoolingOnlyCapFTempCurve, EvapInletWetBulb, CondInletTemp);
             TotCapTempModFac = max(0.0, TotCapTempModFac); // could warn if negative, DXcoil does
-            TotCapFlowModFac = CurveValue(TESCoil(TESCoilNum).CoolingOnlyCapFFlowCurve, AirMassFlowRatio);
+            TotCapFlowModFac = CurveValue(state, TESCoil(TESCoilNum).CoolingOnlyCapFFlowCurve, AirMassFlowRatio);
             TotCapFlowModFac = max(0.0, TotCapFlowModFac); // could warn if negative, DXcoil does
             TotCap = TESCoil(TESCoilNum).CoolingOnlyRatedTotCap * TotCapTempModFac * TotCapFlowModFac;
             // now see if coil might be running dry
             PartLoadOutAirEnth = EvapInletEnthalpy - (TotCap * PartLoadRatio) / EvapAirMassFlow;
             PartLoadDryCoilOutAirTemp = PsyTdbFnHW(PartLoadOutAirEnth, EvapInletHumRat);
-            if (PartLoadDryCoilOutAirTemp > PsyTsatFnHPb(PartLoadOutAirEnth, OutBaroPress, RoutineName)) {
+            if (PartLoadDryCoilOutAirTemp > PsyTsatFnHPb(state, PartLoadOutAirEnth, state.dataEnvrn->OutBaroPress, RoutineName)) {
                 CoilMightBeDry = true;
                 // find wADP, humidity ratio at apparatus dewpoint and inlet hum rat that would have dry coil
                 DryCoilTestEvapInletHumRat = EvapInletHumRat;
@@ -2612,16 +2604,16 @@ namespace PackagedThermalStorageCoil {
                 Counter = 0;
                 Converged = false;
                 while (!Converged) {
-                    TotCapTempModFac = CurveValue(TESCoil(TESCoilNum).CoolingOnlyCapFTempCurve, DryCoilTestEvapInletWetBulb, CondInletTemp);
+                    TotCapTempModFac = CurveValue(state, TESCoil(TESCoilNum).CoolingOnlyCapFTempCurve, DryCoilTestEvapInletWetBulb, CondInletTemp);
                     TotCapTempModFac = max(0.0, TotCapTempModFac); // could warn if negative, DXcoil does
-                    TotCapFlowModFac = CurveValue(TESCoil(TESCoilNum).CoolingOnlyCapFFlowCurve, AirMassFlowRatio);
+                    TotCapFlowModFac = CurveValue(state, TESCoil(TESCoilNum).CoolingOnlyCapFFlowCurve, AirMassFlowRatio);
                     TotCapFlowModFac = max(0.0, TotCapFlowModFac); // could warn if negative, DXcoil does
                     TotCap = TESCoil(TESCoilNum).CoolingOnlyRatedTotCap * TotCapTempModFac * TotCapFlowModFac;
 
                     // coil bypass factor = 0.0
                     hADP = EvapInletEnthalpy - (TotCap / EvapAirMassFlow);
-                    tADP = PsyTsatFnHPb(hADP, OutBaroPress, RoutineName);
-                    wADP = min(EvapInletHumRat, PsyWFnTdbH(tADP, hADP, RoutineName));
+                    tADP = PsyTsatFnHPb(state, hADP, state.dataEnvrn->OutBaroPress, RoutineName);
+                    wADP = min(EvapInletHumRat, PsyWFnTdbH(state, tADP, hADP, RoutineName));
                     hTinwADP = PsyHFnTdbW(EvapInletDryBulb, wADP);
                     if ((EvapInletEnthalpy - hADP) > 1.e-10) {
                         SHRadp = min((hTinwADP - hADP) / (EvapInletEnthalpy - hADP), 1.0);
@@ -2634,7 +2626,7 @@ namespace PackagedThermalStorageCoil {
                         werror = (DryCoilTestEvapInletHumRat - wADP) / DryCoilTestEvapInletHumRat;
 
                         DryCoilTestEvapInletHumRat = RelaxationFactor * wADP + (1.0 - RelaxationFactor) * DryCoilTestEvapInletHumRat;
-                        DryCoilTestEvapInletWetBulb = PsyTwbFnTdbWPb(EvapInletDryBulb, DryCoilTestEvapInletHumRat, OutBaroPress, RoutineName);
+                        DryCoilTestEvapInletWetBulb = PsyTwbFnTdbWPb(state, EvapInletDryBulb, DryCoilTestEvapInletHumRat, state.dataEnvrn->OutBaroPress, RoutineName);
 
                         ++Counter;
                         if (std::abs(werror) <= Tolerance) {
@@ -2648,8 +2640,8 @@ namespace PackagedThermalStorageCoil {
                 }
             }
 
-            SHRTempFac = CurveValue(TESCoil(TESCoilNum).CoolingOnlySHRFTempCurve, EvapInletWetBulb, EvapInletDryBulb);
-            SHRFlowFac = CurveValue(TESCoil(TESCoilNum).CoolingOnlySHRFFlowCurve, AirMassFlowRatio);
+            SHRTempFac = CurveValue(state, TESCoil(TESCoilNum).CoolingOnlySHRFTempCurve, EvapInletWetBulb, EvapInletDryBulb);
+            SHRFlowFac = CurveValue(state, TESCoil(TESCoilNum).CoolingOnlySHRFFlowCurve, AirMassFlowRatio);
             SHR = TESCoil(TESCoilNum).CoolingOnlyRatedSHR * SHRTempFac * SHRFlowFac;
             SHR = min(SHR, 1.0); // warn maybe
             SHR = max(SHR, 0.0); // warn maybe
@@ -2660,7 +2652,7 @@ namespace PackagedThermalStorageCoil {
                     SHR = SHRadp;
                 }
             }
-            PLF = CurveValue(TESCoil(TESCoilNum).CoolingOnlyPLFFPLRCurve, PartLoadRatio);
+            PLF = CurveValue(state, TESCoil(TESCoilNum).CoolingOnlyPLFFPLRCurve, PartLoadRatio);
             if (PLF >= PartLoadRatio && PLF > 0.0) {
                 RuntimeFraction = PartLoadRatio / PLF;
             } else {
@@ -2671,26 +2663,26 @@ namespace PackagedThermalStorageCoil {
 
             hTinwout = EvapInletEnthalpy - (1.0 - SHR) * (TotCap / EvapAirMassFlow);
             // The following will often throw psych warnings for neg w, suppress warnings because error condition is handled in next IF
-            FullLoadOutAirHumRat = PsyWFnTdbH(EvapInletDryBulb, hTinwout, RoutineName, true);
+            FullLoadOutAirHumRat = PsyWFnTdbH(state, EvapInletDryBulb, hTinwout, RoutineName, true);
             FullLoadOutAirTemp = PsyTdbFnHW(FullLoadOutAirEnth, FullLoadOutAirHumRat);
             // Check for saturation error and modify temperature at constant enthalpy
-            if (FullLoadOutAirTemp < PsyTsatFnHPb(FullLoadOutAirEnth, OutBaroPress, RoutineName)) {
-                FullLoadOutAirTemp = PsyTsatFnHPb(FullLoadOutAirEnth, OutBaroPress, RoutineName);
-                FullLoadOutAirHumRat = PsyWFnTdbH(FullLoadOutAirTemp, FullLoadOutAirEnth, RoutineName);
+            if (FullLoadOutAirTemp < PsyTsatFnHPb(state, FullLoadOutAirEnth, state.dataEnvrn->OutBaroPress, RoutineName)) {
+                FullLoadOutAirTemp = PsyTsatFnHPb(state, FullLoadOutAirEnth, state.dataEnvrn->OutBaroPress, RoutineName);
+                FullLoadOutAirHumRat = PsyWFnTdbH(state, FullLoadOutAirTemp, FullLoadOutAirEnth, RoutineName);
             }
 
             // Continuous fan, cycling compressor
             EvapOutletAirEnthalpy = ((PartLoadRatio)*FullLoadOutAirEnth + (1.0 - (PartLoadRatio)) * EvapInletEnthalpy);
             EvapOutletAirHumRat = ((PartLoadRatio)*FullLoadOutAirHumRat + (1.0 - (PartLoadRatio)) * EvapInletHumRat);
             EvapOutletAirTemp = PsyTdbFnHW(EvapOutletAirEnthalpy, EvapOutletAirHumRat);
-            if (EvapOutletAirTemp < PsyTsatFnHPb(EvapOutletAirEnthalpy, OutBaroPress, RoutineName)) {
-                EvapOutletAirTemp = PsyTsatFnHPb(EvapOutletAirEnthalpy, OutBaroPress, RoutineName);
-                EvapOutletAirHumRat = PsyWFnTdbH(EvapOutletAirTemp, EvapOutletAirEnthalpy, RoutineName);
+            if (EvapOutletAirTemp < PsyTsatFnHPb(state, EvapOutletAirEnthalpy, state.dataEnvrn->OutBaroPress, RoutineName)) {
+                EvapOutletAirTemp = PsyTsatFnHPb(state, EvapOutletAirEnthalpy, state.dataEnvrn->OutBaroPress, RoutineName);
+                EvapOutletAirHumRat = PsyWFnTdbH(state, EvapOutletAirTemp, EvapOutletAirEnthalpy, RoutineName);
             }
             // Calculate electricity consumed. First, get EIR modifying factors for off-rated conditions
-            EIRTempModFac = CurveValue(TESCoil(TESCoilNum).CoolingOnlyEIRFTempCurve, EvapInletWetBulb, CondInletTemp);
+            EIRTempModFac = CurveValue(state, TESCoil(TESCoilNum).CoolingOnlyEIRFTempCurve, EvapInletWetBulb, CondInletTemp);
             EIRTempModFac = max(EIRTempModFac, 0.0);
-            EIRFlowModFac = CurveValue(TESCoil(TESCoilNum).CoolingOnlyEIRFFlowCurve, AirMassFlowRatio);
+            EIRFlowModFac = CurveValue(state, TESCoil(TESCoilNum).CoolingOnlyEIRFFlowCurve, AirMassFlowRatio);
             EIRFlowModFac = max(EIRFlowModFac, 0.0);
             EIR = EIRTempModFac * EIRFlowModFac / TESCoil(TESCoilNum).CoolingOnlyRatedCOP;
 
@@ -2714,25 +2706,25 @@ namespace PackagedThermalStorageCoil {
             Node(TESCoil(TESCoilNum).CondAirOutletNodeNum).Enthalpy = CondOutletEnthalpy;
 
             TESCoil(TESCoilNum).ElecCoolingPower = ElecCoolingPower + TESCoil(TESCoilNum).AncillaryControlsPower;
-            TESCoil(TESCoilNum).ElecCoolingEnergy = TESCoil(TESCoilNum).ElecCoolingPower * TimeStepSys * SecInHour;
+            TESCoil(TESCoilNum).ElecCoolingEnergy = TESCoil(TESCoilNum).ElecCoolingPower * TimeStepSys * DataGlobalConstants::SecInHour();
 
             TESCoil(TESCoilNum).RuntimeFraction = RuntimeFraction;
             TESCoil(TESCoilNum).CondenserRuntimeFraction = RuntimeFraction;
             TESCoil(TESCoilNum).EvapTotCoolingRate = TotCap * RuntimeFraction; // double check this
-            TESCoil(TESCoilNum).EvapTotCoolingEnergy = TotCap * RuntimeFraction * TimeStepSys * SecInHour;
+            TESCoil(TESCoilNum).EvapTotCoolingEnergy = TotCap * RuntimeFraction * TimeStepSys * DataGlobalConstants::SecInHour();
             MinAirHumRat = min(Node(TESCoil(TESCoilNum).EvapAirOutletNodeNum).HumRat, Node(TESCoil(TESCoilNum).EvapAirInletNodeNum).HumRat);
             TESCoil(TESCoilNum).EvapSensCoolingRate =
                 EvapAirMassFlow * (PsyHFnTdbW(EvapInletDryBulb, MinAirHumRat) - PsyHFnTdbW(EvapOutletAirTemp, MinAirHumRat));
             if (TESCoil(TESCoilNum).EvapSensCoolingRate > TESCoil(TESCoilNum).EvapTotCoolingRate) {
                 TESCoil(TESCoilNum).EvapSensCoolingRate = TESCoil(TESCoilNum).EvapTotCoolingRate;
             }
-            TESCoil(TESCoilNum).EvapSensCoolingEnergy = TESCoil(TESCoilNum).EvapSensCoolingRate * TimeStepSys * SecInHour;
+            TESCoil(TESCoilNum).EvapSensCoolingEnergy = TESCoil(TESCoilNum).EvapSensCoolingRate * TimeStepSys * DataGlobalConstants::SecInHour();
             TESCoil(TESCoilNum).EvapLatCoolingRate = TESCoil(TESCoilNum).EvapTotCoolingRate - TESCoil(TESCoilNum).EvapSensCoolingRate;
-            TESCoil(TESCoilNum).EvapLatCoolingEnergy = TESCoil(TESCoilNum).EvapLatCoolingRate * TimeStepSys * SecInHour;
+            TESCoil(TESCoilNum).EvapLatCoolingEnergy = TESCoil(TESCoilNum).EvapLatCoolingRate * TimeStepSys * DataGlobalConstants::SecInHour();
 
         } else { // coil is off; just pass through conditions
             TESCoil(TESCoilNum).ElecCoolingPower = TESCoil(TESCoilNum).AncillaryControlsPower;
-            TESCoil(TESCoilNum).ElecCoolingEnergy = TESCoil(TESCoilNum).ElecCoolingPower * TimeStepSys * SecInHour;
+            TESCoil(TESCoilNum).ElecCoolingEnergy = TESCoil(TESCoilNum).ElecCoolingPower * TimeStepSys * DataGlobalConstants::SecInHour();
             TESCoil(TESCoilNum).RuntimeFraction = 0.0;
             TESCoil(TESCoilNum).CondenserRuntimeFraction = 0.0;
             Node(TESCoil(TESCoilNum).EvapAirOutletNodeNum).Temp = Node(TESCoil(TESCoilNum).EvapAirInletNodeNum).Temp;
@@ -2760,19 +2752,20 @@ namespace PackagedThermalStorageCoil {
         TESCoil(TESCoilNum).QdotTES = 0.0;
         TESCoil(TESCoilNum).Q_TES = 0.0;
 
-        UpdateTEStorage(TESCoilNum);
+        UpdateTEStorage(state, TESCoilNum);
 
         TESCoil(TESCoilNum).CondInletTemp = CondInletTemp;
 
-        UpdateColdWeatherProtection(TESCoilNum);
+        UpdateColdWeatherProtection(state, TESCoilNum);
 
         if (TESCoil(TESCoilNum).CondenserType == EvapCooled) {
-            UpdateEvaporativeCondenserBasinHeater(TESCoilNum);
-            UpdateEvaporativeCondenserWaterUse(TESCoilNum, CondInletHumRat, TESCoil(TESCoilNum).CondAirInletNodeNum);
+            UpdateEvaporativeCondenserBasinHeater(state, TESCoilNum);
+            UpdateEvaporativeCondenserWaterUse(state, TESCoilNum, CondInletHumRat, TESCoil(TESCoilNum).CondAirInletNodeNum);
         }
     }
 
-    void CalcTESCoilCoolingAndChargeMode(int const TESCoilNum, int const EP_UNUSED(FanOpMode), Real64 const PartLoadRatio)
+    void
+    CalcTESCoilCoolingAndChargeMode(EnergyPlusData &state, int const TESCoilNum, [[maybe_unused]] int const FanOpMode, Real64 const PartLoadRatio)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2882,9 +2875,9 @@ namespace PackagedThermalStorageCoil {
         if (TESCoil(TESCoilNum).CondenserType == AirCooled) {
             CondAirSidePressure = Node(TESCoil(TESCoilNum).CondAirInletNodeNum).Press;
             if (CondAirSidePressure == DefaultNodeValues.Press) {
-                CondInletTemp = OutDryBulbTemp;
-                CondInletHumRat = OutHumRat;
-                CondAirSidePressure = OutBaroPress;
+                CondInletTemp = state.dataEnvrn->OutDryBulbTemp;
+                CondInletHumRat = state.dataEnvrn->OutHumRat;
+                CondAirSidePressure = state.dataEnvrn->OutBaroPress;
             } else {
                 CondInletTemp = Node(TESCoil(TESCoilNum).CondAirInletNodeNum).Temp;
                 CondInletHumRat = Node(TESCoil(TESCoilNum).CondAirInletNodeNum).HumRat;
@@ -2893,25 +2886,25 @@ namespace PackagedThermalStorageCoil {
         } else if (TESCoil(TESCoilNum).CondenserType == EvapCooled) {
             CondAirSidePressure = Node(TESCoil(TESCoilNum).CondAirInletNodeNum).Press;
             if (CondAirSidePressure == DefaultNodeValues.Press) {
-                OutdoorDryBulb = OutDryBulbTemp;
-                OutdoorHumRat = OutHumRat;
-                CondAirSidePressure = OutBaroPress;
-                OutdoorWetBulb = OutWetBulbTemp;
+                OutdoorDryBulb = state.dataEnvrn->OutDryBulbTemp;
+                OutdoorHumRat = state.dataEnvrn->OutHumRat;
+                CondAirSidePressure = state.dataEnvrn->OutBaroPress;
+                OutdoorWetBulb = state.dataEnvrn->OutWetBulbTemp;
             } else {
                 OutdoorDryBulb = Node(TESCoil(TESCoilNum).CondAirInletNodeNum).Temp;
                 OutdoorHumRat = Node(TESCoil(TESCoilNum).CondAirInletNodeNum).HumRat;
-                OutdoorWetBulb = PsyTwbFnTdbWPb(OutdoorDryBulb, OutdoorHumRat, CondAirSidePressure, RoutineName);
+                OutdoorWetBulb = PsyTwbFnTdbWPb(state, OutdoorDryBulb, OutdoorHumRat, CondAirSidePressure, RoutineName);
             }
             CondAirMassFlow = TESCoil(TESCoilNum).CondenserAirMassFlow;
             // direct evap cool model
             CondInletTemp = OutdoorWetBulb + (OutdoorDryBulb - OutdoorWetBulb) * (1.0 - TESCoil(TESCoilNum).EvapCondEffect);
-            CondInletHumRat = PsyWFnTdbTwbPb(CondInletTemp, OutdoorWetBulb, CondAirSidePressure, RoutineName);
+            CondInletHumRat = PsyWFnTdbTwbPb(state, CondInletTemp, OutdoorWetBulb, CondAirSidePressure, RoutineName);
         }
 
         EvapAirMassFlow = Node(TESCoil(TESCoilNum).EvapAirInletNodeNum).MassFlowRate;
         EvapInletDryBulb = Node(TESCoil(TESCoilNum).EvapAirInletNodeNum).Temp;
         EvapInletHumRat = Node(TESCoil(TESCoilNum).EvapAirInletNodeNum).HumRat;
-        EvapInletWetBulb = PsyTwbFnTdbWPb(EvapInletDryBulb, EvapInletHumRat, OutBaroPress, RoutineName);
+        EvapInletWetBulb = PsyTwbFnTdbWPb(state, EvapInletDryBulb, EvapInletHumRat, state.dataEnvrn->OutBaroPress, RoutineName);
         EvapInletEnthalpy = Node(TESCoil(TESCoilNum).EvapAirInletNodeNum).Enthalpy;
         CoilMightBeDry = false;
 
@@ -2920,11 +2913,11 @@ namespace PackagedThermalStorageCoil {
             if ((sTES > TESCoil(TESCoilNum).MinimumFluidTankTempLimit) && (sTES < TESCoil(TESCoilNum).MaximumFluidTankTempLimit)) {
                 TESCanBeCharged = true;
                 // find charge limit to reach limits
-                rho = GetDensityGlycol(TESCoil(TESCoilNum).StorageFluidName, sTES, TESCoil(TESCoilNum).StorageFluidIndex, RoutineName);
+                rho = GetDensityGlycol(state, TESCoil(TESCoilNum).StorageFluidName, sTES, TESCoil(TESCoilNum).StorageFluidIndex, RoutineName);
                 TankMass = rho * TESCoil(TESCoilNum).FluidStorageVolume;
-                CpTank = GetSpecificHeatGlycol(TESCoil(TESCoilNum).StorageFluidName, sTES, TESCoil(TESCoilNum).StorageFluidIndex, RoutineName);
+                CpTank = GetSpecificHeatGlycol(state, TESCoil(TESCoilNum).StorageFluidName, sTES, TESCoil(TESCoilNum).StorageFluidIndex, RoutineName);
                 // simple linear approximation of DT/Dt term in McpDT/Dt
-                QdotChargeLimit = TankMass * CpTank * (sTES - TESCoil(TESCoilNum).MinimumFluidTankTempLimit) / (TimeStepSys * SecInHour);
+                QdotChargeLimit = TankMass * CpTank * (sTES - TESCoil(TESCoilNum).MinimumFluidTankTempLimit) / (TimeStepSys * DataGlobalConstants::SecInHour());
             } else {
                 TESCanBeCharged = false;
             }
@@ -2933,7 +2926,7 @@ namespace PackagedThermalStorageCoil {
             if (sTES < 1.0) {
                 TESCanBeCharged = true;
                 // find charge limit to reach limit
-                QdotChargeLimit = (1.0 - sTES) * TESCoil(TESCoilNum).IceStorageCapacity / (TimeStepSys * SecInHour);
+                QdotChargeLimit = (1.0 - sTES) * TESCoil(TESCoilNum).IceStorageCapacity / (TimeStepSys * DataGlobalConstants::SecInHour());
             } else {
                 TESCanBeCharged = false;
             }
@@ -2942,15 +2935,15 @@ namespace PackagedThermalStorageCoil {
         if ((EvapAirMassFlow > SmallMassFlow) && (PartLoadRatio > 0.0)) { // coil is running
 
             AirMassFlowRatio = EvapAirMassFlow / TESCoil(TESCoilNum).RatedEvapAirMassFlowRate;
-            EvapTotCapTempModFac = CurveValue(TESCoil(TESCoilNum).CoolingAndChargeCoolingCapFTempCurve, EvapInletWetBulb, CondInletTemp, sTES);
+            EvapTotCapTempModFac = CurveValue(state, TESCoil(TESCoilNum).CoolingAndChargeCoolingCapFTempCurve, EvapInletWetBulb, CondInletTemp, sTES);
             EvapTotCapTempModFac = max(0.0, EvapTotCapTempModFac); // could warn if negative, DXcoil does
-            EvapTotCapFlowModFac = CurveValue(TESCoil(TESCoilNum).CoolingAndChargeCoolingCapFFlowCurve, AirMassFlowRatio);
+            EvapTotCapFlowModFac = CurveValue(state, TESCoil(TESCoilNum).CoolingAndChargeCoolingCapFFlowCurve, AirMassFlowRatio);
             EvapTotCapFlowModFac = max(0.0, EvapTotCapFlowModFac); // could warn if negative, DXcoil does
             EvapTotCap = TESCoil(TESCoilNum).CoolingAndChargeRatedTotCap * EvapTotCapTempModFac * EvapTotCapFlowModFac;
             // now see if coil is running dry
             PartLoadOutAirEnth = EvapInletEnthalpy - (EvapTotCap * PartLoadRatio) / EvapAirMassFlow;
             PartLoadDryCoilOutAirTemp = PsyTdbFnHW(PartLoadOutAirEnth, EvapInletHumRat);
-            if (PartLoadDryCoilOutAirTemp > PsyTsatFnHPb(PartLoadOutAirEnth, OutBaroPress, RoutineName)) {
+            if (PartLoadDryCoilOutAirTemp > PsyTsatFnHPb(state, PartLoadOutAirEnth, state.dataEnvrn->OutBaroPress, RoutineName)) {
                 CoilMightBeDry = true;
                 // find wADP, humidity ratio at apparatus dewpoint and inlet hum rat that would have dry coil
                 DryCoilTestEvapInletHumRat = EvapInletHumRat;
@@ -2959,15 +2952,15 @@ namespace PackagedThermalStorageCoil {
                 Converged = false;
                 while (!Converged) {
                     EvapTotCapTempModFac =
-                        CurveValue(TESCoil(TESCoilNum).CoolingAndChargeCoolingCapFTempCurve, DryCoilTestEvapInletWetBulb, CondInletTemp, sTES);
+                        CurveValue(state, TESCoil(TESCoilNum).CoolingAndChargeCoolingCapFTempCurve, DryCoilTestEvapInletWetBulb, CondInletTemp, sTES);
                     EvapTotCapTempModFac = max(0.0, EvapTotCapTempModFac); // could warn if negative, DXcoil does
-                    EvapTotCapFlowModFac = CurveValue(TESCoil(TESCoilNum).CoolingAndChargeCoolingCapFFlowCurve, AirMassFlowRatio);
+                    EvapTotCapFlowModFac = CurveValue(state, TESCoil(TESCoilNum).CoolingAndChargeCoolingCapFFlowCurve, AirMassFlowRatio);
                     EvapTotCapFlowModFac = max(0.0, EvapTotCapFlowModFac); // could warn if negative, DXcoil does
                     EvapTotCap = TESCoil(TESCoilNum).CoolingAndChargeRatedTotCap * EvapTotCapTempModFac * EvapTotCapFlowModFac;
                     // coil bypass factor = 0.0
                     hADP = EvapInletEnthalpy - (EvapTotCap / EvapAirMassFlow);
-                    tADP = PsyTsatFnHPb(hADP, OutBaroPress, RoutineName);
-                    wADP = min(EvapInletHumRat, PsyWFnTdbH(tADP, hADP, RoutineName));
+                    tADP = PsyTsatFnHPb(state, hADP, state.dataEnvrn->OutBaroPress, RoutineName);
+                    wADP = min(EvapInletHumRat, PsyWFnTdbH(state, tADP, hADP, RoutineName));
                     hTinwADP = PsyHFnTdbW(EvapInletDryBulb, wADP);
                     if ((EvapInletEnthalpy - hADP) > 1.e-10) {
                         SHRadp = min((hTinwADP - hADP) / (EvapInletEnthalpy - hADP), 1.0);
@@ -2980,7 +2973,7 @@ namespace PackagedThermalStorageCoil {
                         werror = (DryCoilTestEvapInletHumRat - wADP) / DryCoilTestEvapInletHumRat;
 
                         DryCoilTestEvapInletHumRat = RelaxationFactor * wADP + (1.0 - RelaxationFactor) * DryCoilTestEvapInletHumRat;
-                        DryCoilTestEvapInletWetBulb = PsyTwbFnTdbWPb(EvapInletDryBulb, DryCoilTestEvapInletHumRat, OutBaroPress, RoutineName);
+                        DryCoilTestEvapInletWetBulb = PsyTwbFnTdbWPb(state, EvapInletDryBulb, DryCoilTestEvapInletHumRat, state.dataEnvrn->OutBaroPress, RoutineName);
 
                         ++Counter;
                         if (std::abs(werror) <= Tolerance) {
@@ -2994,13 +2987,13 @@ namespace PackagedThermalStorageCoil {
                 }
             }
             {
-                if (CurveManager::PerfCurve(TESCoil(TESCoilNum).CoolingAndChargeSHRFTempCurve).NumDims == 2) {
-                    SHRTempFac = CurveValue(TESCoil(TESCoilNum).CoolingAndChargeSHRFTempCurve, EvapInletWetBulb, EvapInletDryBulb);
+                if (state.dataCurveManager->PerfCurve(TESCoil(TESCoilNum).CoolingAndChargeSHRFTempCurve).NumDims == 2) {
+                    SHRTempFac = CurveValue(state, TESCoil(TESCoilNum).CoolingAndChargeSHRFTempCurve, EvapInletWetBulb, EvapInletDryBulb);
                 } else {
-                    SHRTempFac = CurveValue(TESCoil(TESCoilNum).CoolingAndChargeSHRFTempCurve, EvapInletWetBulb, EvapInletDryBulb, sTES);
+                    SHRTempFac = CurveValue(state, TESCoil(TESCoilNum).CoolingAndChargeSHRFTempCurve, EvapInletWetBulb, EvapInletDryBulb, sTES);
                 }
             }
-            SHRFlowFac = CurveValue(TESCoil(TESCoilNum).CoolingAndChargeSHRFFlowCurve, AirMassFlowRatio);
+            SHRFlowFac = CurveValue(state, TESCoil(TESCoilNum).CoolingAndChargeSHRFFlowCurve, AirMassFlowRatio);
             SHR = TESCoil(TESCoilNum).CoolingAndChargeRatedSHR * SHRTempFac * SHRFlowFac;
             SHR = min(SHR, 1.0); // warn maybe
             SHR = max(SHR, 0.0); // warn maybe
@@ -3011,7 +3004,7 @@ namespace PackagedThermalStorageCoil {
                     SHR = SHRadp;
                 }
             }
-            PLF = CurveValue(TESCoil(TESCoilNum).CoolingAndChargeCoolingPLFFPLRCurve, PartLoadRatio);
+            PLF = CurveValue(state, TESCoil(TESCoilNum).CoolingAndChargeCoolingPLFFPLRCurve, PartLoadRatio);
             if (PLF >= PartLoadRatio && PLF > 0.0) {
                 EvapRuntimeFraction = PartLoadRatio / PLF;
             } else {
@@ -3019,19 +3012,19 @@ namespace PackagedThermalStorageCoil {
             }
 
             // Calculate electricity consumed. First, get EIR modifying factors for off-rated conditions
-            EIRTempModFac = CurveValue(TESCoil(TESCoilNum).CoolingAndChargeCoolingEIRFTempCurve, EvapInletWetBulb, CondInletTemp, sTES);
+            EIRTempModFac = CurveValue(state, TESCoil(TESCoilNum).CoolingAndChargeCoolingEIRFTempCurve, EvapInletWetBulb, CondInletTemp, sTES);
             EIRTempModFac = max(EIRTempModFac, 0.0);
-            EIRFlowModFac = CurveValue(TESCoil(TESCoilNum).CoolingAndChargeCoolingEIRFFlowCurve, AirMassFlowRatio);
+            EIRFlowModFac = CurveValue(state, TESCoil(TESCoilNum).CoolingAndChargeCoolingEIRFFlowCurve, AirMassFlowRatio);
             EIRFlowModFac = max(EIRFlowModFac, 0.0);
             EIR = EIRTempModFac * EIRFlowModFac / TESCoil(TESCoilNum).CoolingAndChargeCoolingRatedCOP;
 
             EvapElecCoolingPower = EvapTotCap * EIR * EvapRuntimeFraction;
 
             if (TESCanBeCharged) {
-                ChargeCapModFac = CurveValue(TESCoil(TESCoilNum).CoolingAndChargeChargingCapFTempCurve, EvapInletWetBulb, CondInletTemp, sTES);
+                ChargeCapModFac = CurveValue(state, TESCoil(TESCoilNum).CoolingAndChargeChargingCapFTempCurve, EvapInletWetBulb, CondInletTemp, sTES);
                 ChargeCapModFac = max(0.0, ChargeCapModFac);
 
-                ChargeCapPLRModFac = CurveValue(TESCoil(TESCoilNum).CoolingAndChargeChargingCapFEvapPLRCurve, PartLoadRatio);
+                ChargeCapPLRModFac = CurveValue(state, TESCoil(TESCoilNum).CoolingAndChargeChargingCapFEvapPLRCurve, PartLoadRatio);
                 ChargeCapPLRModFac = max(0.0, ChargeCapPLRModFac);
 
                 TotChargeCap = TESCoil(TESCoilNum).CoolingAndChargeRatedChargeCap * ChargeCapModFac * ChargeCapPLRModFac;
@@ -3041,9 +3034,9 @@ namespace PackagedThermalStorageCoil {
                 } else {
                     ChargeRuntimeFraction = 1.0;
                 }
-                ChargeEIRTempModFac = CurveValue(TESCoil(TESCoilNum).CoolingAndChargeChargingEIRFTempCurve, EvapInletWetBulb, CondInletTemp, sTES);
+                ChargeEIRTempModFac = CurveValue(state, TESCoil(TESCoilNum).CoolingAndChargeChargingEIRFTempCurve, EvapInletWetBulb, CondInletTemp, sTES);
                 ChargeEIRTempModFac = max(0.0, ChargeEIRTempModFac);
-                ChargeEIRFlowModFac = CurveValue(TESCoil(TESCoilNum).CoolingAndChargeChargingEIRFFLowCurve, AirMassFlowRatio);
+                ChargeEIRFlowModFac = CurveValue(state, TESCoil(TESCoilNum).CoolingAndChargeChargingEIRFFLowCurve, AirMassFlowRatio);
                 ChargeEIRFlowModFac = max(0.0, ChargeEIRFlowModFac);
                 ChargeEIR = (ChargeEIRTempModFac * ChargeEIRFlowModFac) / TESCoil(TESCoilNum).CoolingAndChargeChargingRatedCOP;
                 ChargeElectricCoolingPower = TotChargeCap * ChargeEIR;
@@ -3060,21 +3053,21 @@ namespace PackagedThermalStorageCoil {
 
             hTinwout = EvapInletEnthalpy - (1.0 - SHR) * (EvapTotCap / EvapAirMassFlow);
             // The following will often throw psych warnings for neg w, suppress warnings because error condition is handled in next IF
-            FullLoadOutAirHumRat = PsyWFnTdbH(EvapInletDryBulb, hTinwout, RoutineName, true);
+            FullLoadOutAirHumRat = PsyWFnTdbH(state, EvapInletDryBulb, hTinwout, RoutineName, true);
             FullLoadOutAirTemp = PsyTdbFnHW(FullLoadOutAirEnth, FullLoadOutAirHumRat);
             // Check for saturation error and modify temperature at constant enthalpy
-            if (FullLoadOutAirTemp < PsyTsatFnHPb(FullLoadOutAirEnth, OutBaroPress, RoutineName)) {
-                FullLoadOutAirTemp = PsyTsatFnHPb(FullLoadOutAirEnth, OutBaroPress, RoutineName);
-                FullLoadOutAirHumRat = PsyWFnTdbH(FullLoadOutAirTemp, FullLoadOutAirEnth, RoutineName);
+            if (FullLoadOutAirTemp < PsyTsatFnHPb(state, FullLoadOutAirEnth, state.dataEnvrn->OutBaroPress, RoutineName)) {
+                FullLoadOutAirTemp = PsyTsatFnHPb(state, FullLoadOutAirEnth, state.dataEnvrn->OutBaroPress, RoutineName);
+                FullLoadOutAirHumRat = PsyWFnTdbH(state, FullLoadOutAirTemp, FullLoadOutAirEnth, RoutineName);
             }
 
             // Continuous fan, cycling compressor
             EvapOutletAirEnthalpy = ((PartLoadRatio)*FullLoadOutAirEnth + (1.0 - (PartLoadRatio)) * EvapInletEnthalpy);
             EvapOutletAirHumRat = ((PartLoadRatio)*FullLoadOutAirHumRat + (1.0 - (PartLoadRatio)) * EvapInletHumRat);
             EvapOutletAirTemp = PsyTdbFnHW(EvapOutletAirEnthalpy, EvapOutletAirHumRat);
-            if (EvapOutletAirTemp < PsyTsatFnHPb(EvapOutletAirEnthalpy, OutBaroPress, RoutineName)) {
-                EvapOutletAirTemp = PsyTsatFnHPb(EvapOutletAirEnthalpy, OutBaroPress, RoutineName);
-                EvapOutletAirHumRat = PsyWFnTdbH(EvapOutletAirTemp, EvapOutletAirEnthalpy, RoutineName);
+            if (EvapOutletAirTemp < PsyTsatFnHPb(state, EvapOutletAirEnthalpy, state.dataEnvrn->OutBaroPress, RoutineName)) {
+                EvapOutletAirTemp = PsyTsatFnHPb(state, EvapOutletAirEnthalpy, state.dataEnvrn->OutBaroPress, RoutineName);
+                EvapOutletAirHumRat = PsyWFnTdbH(state, EvapOutletAirTemp, EvapOutletAirEnthalpy, RoutineName);
             }
 
             Node(TESCoil(TESCoilNum).EvapAirOutletNodeNum).Temp = EvapOutletAirTemp;
@@ -3095,7 +3088,7 @@ namespace PackagedThermalStorageCoil {
             Node(TESCoil(TESCoilNum).CondAirOutletNodeNum).Enthalpy = CondOutletEnthalpy;
 
             TESCoil(TESCoilNum).ElecCoolingPower = EvapElecCoolingPower + ChargeElectricCoolingPower + TESCoil(TESCoilNum).AncillaryControlsPower;
-            TESCoil(TESCoilNum).ElecCoolingEnergy = TESCoil(TESCoilNum).ElecCoolingPower * TimeStepSys * SecInHour;
+            TESCoil(TESCoilNum).ElecCoolingEnergy = TESCoil(TESCoilNum).ElecCoolingPower * TimeStepSys * DataGlobalConstants::SecInHour();
 
             TESCoil(TESCoilNum).RuntimeFraction = EvapRuntimeFraction;
             if (ChargeRuntimeFraction > 0.0) {
@@ -3105,24 +3098,24 @@ namespace PackagedThermalStorageCoil {
             }
 
             TESCoil(TESCoilNum).EvapTotCoolingRate = EvapTotCap * EvapRuntimeFraction; // double check this
-            TESCoil(TESCoilNum).EvapTotCoolingEnergy = EvapTotCap * EvapRuntimeFraction * TimeStepSys * SecInHour;
+            TESCoil(TESCoilNum).EvapTotCoolingEnergy = EvapTotCap * EvapRuntimeFraction * TimeStepSys * DataGlobalConstants::SecInHour();
             MinAirHumRat = min(Node(TESCoil(TESCoilNum).EvapAirOutletNodeNum).HumRat, Node(TESCoil(TESCoilNum).EvapAirInletNodeNum).HumRat);
             TESCoil(TESCoilNum).EvapSensCoolingRate =
                 EvapAirMassFlow * (PsyHFnTdbW(EvapInletDryBulb, MinAirHumRat) - PsyHFnTdbW(EvapOutletAirTemp, MinAirHumRat));
             if (TESCoil(TESCoilNum).EvapSensCoolingRate > TESCoil(TESCoilNum).EvapTotCoolingRate) {
                 TESCoil(TESCoilNum).EvapSensCoolingRate = TESCoil(TESCoilNum).EvapTotCoolingRate;
             }
-            TESCoil(TESCoilNum).EvapSensCoolingEnergy = TESCoil(TESCoilNum).EvapSensCoolingRate * TimeStepSys * SecInHour;
+            TESCoil(TESCoilNum).EvapSensCoolingEnergy = TESCoil(TESCoilNum).EvapSensCoolingRate * TimeStepSys * DataGlobalConstants::SecInHour();
             TESCoil(TESCoilNum).EvapLatCoolingRate = TESCoil(TESCoilNum).EvapTotCoolingRate - TESCoil(TESCoilNum).EvapSensCoolingRate;
-            TESCoil(TESCoilNum).EvapLatCoolingEnergy = TESCoil(TESCoilNum).EvapLatCoolingRate * TimeStepSys * SecInHour;
+            TESCoil(TESCoilNum).EvapLatCoolingEnergy = TESCoil(TESCoilNum).EvapLatCoolingRate * TimeStepSys * DataGlobalConstants::SecInHour();
 
         } else {                   // Evap off, but may still charge
             if (TESCanBeCharged) { // coil is running to charge but not to cool at evaporator
                 AirMassFlowRatio = EvapAirMassFlow / TESCoil(TESCoilNum).RatedEvapAirMassFlowRate;
-                ChargeCapModFac = CurveValue(TESCoil(TESCoilNum).CoolingAndChargeChargingCapFTempCurve, EvapInletWetBulb, CondInletTemp, sTES);
+                ChargeCapModFac = CurveValue(state, TESCoil(TESCoilNum).CoolingAndChargeChargingCapFTempCurve, EvapInletWetBulb, CondInletTemp, sTES);
                 ChargeCapModFac = max(0.0, ChargeCapModFac);
 
-                ChargeCapPLRModFac = CurveValue(TESCoil(TESCoilNum).CoolingAndChargeChargingCapFEvapPLRCurve, PartLoadRatio);
+                ChargeCapPLRModFac = CurveValue(state, TESCoil(TESCoilNum).CoolingAndChargeChargingCapFEvapPLRCurve, PartLoadRatio);
                 ChargeCapPLRModFac = max(0.0, ChargeCapPLRModFac);
 
                 TotChargeCap = TESCoil(TESCoilNum).CoolingAndChargeRatedChargeCap * ChargeCapModFac * ChargeCapPLRModFac;
@@ -3132,9 +3125,9 @@ namespace PackagedThermalStorageCoil {
                 } else {
                     ChargeRuntimeFraction = 1.0;
                 }
-                ChargeEIRTempModFac = CurveValue(TESCoil(TESCoilNum).CoolingAndChargeChargingEIRFTempCurve, EvapInletWetBulb, CondInletTemp, sTES);
+                ChargeEIRTempModFac = CurveValue(state, TESCoil(TESCoilNum).CoolingAndChargeChargingEIRFTempCurve, EvapInletWetBulb, CondInletTemp, sTES);
                 ChargeEIRTempModFac = max(0.0, ChargeEIRTempModFac);
-                ChargeEIRFlowModFac = CurveValue(TESCoil(TESCoilNum).CoolingAndChargeChargingEIRFFLowCurve, AirMassFlowRatio);
+                ChargeEIRFlowModFac = CurveValue(state, TESCoil(TESCoilNum).CoolingAndChargeChargingEIRFFLowCurve, AirMassFlowRatio);
                 ChargeEIRFlowModFac = max(0.0, ChargeEIRFlowModFac);
                 ChargeEIR = (ChargeEIRTempModFac * ChargeEIRFlowModFac) / TESCoil(TESCoilNum).CoolingAndChargeChargingRatedCOP;
                 ChargeElectricCoolingPower = TotChargeCap * ChargeEIR;
@@ -3147,7 +3140,7 @@ namespace PackagedThermalStorageCoil {
             }
 
             TESCoil(TESCoilNum).ElecCoolingPower = ChargeElectricCoolingPower + TESCoil(TESCoilNum).AncillaryControlsPower;
-            TESCoil(TESCoilNum).ElecCoolingEnergy = TESCoil(TESCoilNum).ElecCoolingPower * TimeStepSys * SecInHour;
+            TESCoil(TESCoilNum).ElecCoolingEnergy = TESCoil(TESCoilNum).ElecCoolingPower * TimeStepSys * DataGlobalConstants::SecInHour();
 
             TESCoil(TESCoilNum).RuntimeFraction = 0.0;
             Node(TESCoil(TESCoilNum).EvapAirOutletNodeNum).Temp = Node(TESCoil(TESCoilNum).EvapAirInletNodeNum).Temp;
@@ -3189,21 +3182,22 @@ namespace PackagedThermalStorageCoil {
         }
 
         TESCoil(TESCoilNum).QdotTES = -TotChargeCap;
-        TESCoil(TESCoilNum).Q_TES = TESCoil(TESCoilNum).QdotTES * TimeStepSys * SecInHour;
+        TESCoil(TESCoilNum).Q_TES = TESCoil(TESCoilNum).QdotTES * TimeStepSys * DataGlobalConstants::SecInHour();
 
-        UpdateTEStorage(TESCoilNum);
+        UpdateTEStorage(state, TESCoilNum);
 
         TESCoil(TESCoilNum).CondInletTemp = CondInletTemp;
 
-        UpdateColdWeatherProtection(TESCoilNum);
+        UpdateColdWeatherProtection(state, TESCoilNum);
 
         if (TESCoil(TESCoilNum).CondenserType == EvapCooled) {
-            UpdateEvaporativeCondenserBasinHeater(TESCoilNum);
-            UpdateEvaporativeCondenserWaterUse(TESCoilNum, CondInletHumRat, TESCoil(TESCoilNum).CondAirInletNodeNum);
+            UpdateEvaporativeCondenserBasinHeater(state, TESCoilNum);
+            UpdateEvaporativeCondenserWaterUse(state, TESCoilNum, CondInletHumRat, TESCoil(TESCoilNum).CondAirInletNodeNum);
         }
     }
 
-    void CalcTESCoilCoolingAndDischargeMode(int const TESCoilNum, int const EP_UNUSED(FanOpMode), Real64 const PartLoadRatio)
+    void
+    CalcTESCoilCoolingAndDischargeMode(EnergyPlusData &state, int const TESCoilNum, [[maybe_unused]] int const FanOpMode, Real64 const PartLoadRatio)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3316,9 +3310,9 @@ namespace PackagedThermalStorageCoil {
         if (TESCoil(TESCoilNum).CondenserType == AirCooled) {
             CondAirSidePressure = Node(TESCoil(TESCoilNum).CondAirInletNodeNum).Press;
             if (CondAirSidePressure == DefaultNodeValues.Press) {
-                CondInletTemp = OutDryBulbTemp;
-                CondInletHumRat = OutHumRat;
-                CondAirSidePressure = OutBaroPress;
+                CondInletTemp = state.dataEnvrn->OutDryBulbTemp;
+                CondInletHumRat = state.dataEnvrn->OutHumRat;
+                CondAirSidePressure = state.dataEnvrn->OutBaroPress;
             } else {
                 CondInletTemp = Node(TESCoil(TESCoilNum).CondAirInletNodeNum).Temp;
                 CondInletHumRat = Node(TESCoil(TESCoilNum).CondAirInletNodeNum).HumRat;
@@ -3327,24 +3321,24 @@ namespace PackagedThermalStorageCoil {
         } else if (TESCoil(TESCoilNum).CondenserType == EvapCooled) {
             CondAirSidePressure = Node(TESCoil(TESCoilNum).CondAirInletNodeNum).Press;
             if (CondAirSidePressure == DefaultNodeValues.Press) {
-                OutdoorDryBulb = OutDryBulbTemp;
-                OutdoorHumRat = OutHumRat;
-                CondAirSidePressure = OutBaroPress;
-                OutdoorWetBulb = OutWetBulbTemp;
+                OutdoorDryBulb = state.dataEnvrn->OutDryBulbTemp;
+                OutdoorHumRat = state.dataEnvrn->OutHumRat;
+                CondAirSidePressure = state.dataEnvrn->OutBaroPress;
+                OutdoorWetBulb = state.dataEnvrn->OutWetBulbTemp;
             } else {
                 OutdoorDryBulb = Node(TESCoil(TESCoilNum).CondAirInletNodeNum).Temp;
                 OutdoorHumRat = Node(TESCoil(TESCoilNum).CondAirInletNodeNum).HumRat;
-                OutdoorWetBulb = PsyTwbFnTdbWPb(OutdoorDryBulb, OutdoorHumRat, CondAirSidePressure, RoutineName);
+                OutdoorWetBulb = PsyTwbFnTdbWPb(state, OutdoorDryBulb, OutdoorHumRat, CondAirSidePressure, RoutineName);
             }
             CondAirMassFlow = TESCoil(TESCoilNum).CondenserAirMassFlow;
             // direct evap cool model
             CondInletTemp = OutdoorWetBulb + (OutdoorDryBulb - OutdoorWetBulb) * (1.0 - TESCoil(TESCoilNum).EvapCondEffect);
-            CondInletHumRat = PsyWFnTdbTwbPb(CondInletTemp, OutdoorWetBulb, CondAirSidePressure, RoutineName);
+            CondInletHumRat = PsyWFnTdbTwbPb(state, CondInletTemp, OutdoorWetBulb, CondAirSidePressure, RoutineName);
         }
         EvapAirMassFlow = Node(TESCoil(TESCoilNum).EvapAirInletNodeNum).MassFlowRate;
         EvapInletDryBulb = Node(TESCoil(TESCoilNum).EvapAirInletNodeNum).Temp;
         EvapInletHumRat = Node(TESCoil(TESCoilNum).EvapAirInletNodeNum).HumRat;
-        EvapInletWetBulb = PsyTwbFnTdbWPb(EvapInletDryBulb, EvapInletHumRat, OutBaroPress, RoutineName);
+        EvapInletWetBulb = PsyTwbFnTdbWPb(state, EvapInletDryBulb, EvapInletHumRat, state.dataEnvrn->OutBaroPress, RoutineName);
         EvapInletEnthalpy = Node(TESCoil(TESCoilNum).EvapAirInletNodeNum).Enthalpy;
         CoilMightBeDry = false;
 
@@ -3352,11 +3346,11 @@ namespace PackagedThermalStorageCoil {
             sTES = TESCoil(TESCoilNum).FluidTankTempFinalLastTimestep;
             if ((sTES >= TESCoil(TESCoilNum).MinimumFluidTankTempLimit) && (sTES < TESCoil(TESCoilNum).MaximumFluidTankTempLimit)) {
                 TESHasSomeCharge = true;
-                rho = GetDensityGlycol(TESCoil(TESCoilNum).StorageFluidName, sTES, TESCoil(TESCoilNum).StorageFluidIndex, RoutineName);
+                rho = GetDensityGlycol(state, TESCoil(TESCoilNum).StorageFluidName, sTES, TESCoil(TESCoilNum).StorageFluidIndex, RoutineName);
                 TankMass = rho * TESCoil(TESCoilNum).FluidStorageVolume;
-                CpTank = GetSpecificHeatGlycol(TESCoil(TESCoilNum).StorageFluidName, sTES, TESCoil(TESCoilNum).StorageFluidIndex, RoutineName);
+                CpTank = GetSpecificHeatGlycol(state, TESCoil(TESCoilNum).StorageFluidName, sTES, TESCoil(TESCoilNum).StorageFluidIndex, RoutineName);
                 // simple linear approximation of DT/Dt term in McpDT/Dt
-                QdotDischargeLimit = TankMass * CpTank * (TESCoil(TESCoilNum).MaximumFluidTankTempLimit - sTES) / (TimeStepSys * SecInHour);
+                QdotDischargeLimit = TankMass * CpTank * (TESCoil(TESCoilNum).MaximumFluidTankTempLimit - sTES) / (TimeStepSys * DataGlobalConstants::SecInHour());
             } else {
                 TESHasSomeCharge = false;
             }
@@ -3365,7 +3359,7 @@ namespace PackagedThermalStorageCoil {
             if (sTES > 0.0) {
                 TESHasSomeCharge = true;
                 // discharge limit
-                QdotDischargeLimit = (sTES)*TESCoil(TESCoilNum).IceStorageCapacity / (TimeStepSys * SecInHour);
+                QdotDischargeLimit = (sTES)*TESCoil(TESCoilNum).IceStorageCapacity / (TimeStepSys * DataGlobalConstants::SecInHour());
             } else {
                 TESHasSomeCharge = false;
             }
@@ -3374,15 +3368,15 @@ namespace PackagedThermalStorageCoil {
         if ((EvapAirMassFlow > SmallMassFlow) && (PartLoadRatio > 0.0)) { // coil is running
 
             AirMassFlowRatio = EvapAirMassFlow / TESCoil(TESCoilNum).RatedEvapAirMassFlowRate;
-            EvapTotCapTempModFac = CurveValue(TESCoil(TESCoilNum).CoolingAndDischargeCoolingCapFTempCurve, EvapInletWetBulb, CondInletTemp, sTES);
+            EvapTotCapTempModFac = CurveValue(state, TESCoil(TESCoilNum).CoolingAndDischargeCoolingCapFTempCurve, EvapInletWetBulb, CondInletTemp, sTES);
             EvapTotCapTempModFac = max(0.0, EvapTotCapTempModFac); // could warn if negative, DXcoil does
-            EvapTotCapFlowModFac = CurveValue(TESCoil(TESCoilNum).CoolingAndDischargeCoolingCapFFlowCurve, AirMassFlowRatio);
+            EvapTotCapFlowModFac = CurveValue(state, TESCoil(TESCoilNum).CoolingAndDischargeCoolingCapFFlowCurve, AirMassFlowRatio);
             EvapTotCapFlowModFac = max(0.0, EvapTotCapFlowModFac); // could warn if negative, DXcoil does
             EvapTotCap = TESCoil(TESCoilNum).CoolingAndDischargeRatedTotCap * EvapTotCapTempModFac * EvapTotCapFlowModFac;
             // now see if coil is running dry
             PartLoadOutAirEnth = EvapInletEnthalpy - (EvapTotCap * PartLoadRatio) / EvapAirMassFlow;
             PartLoadDryCoilOutAirTemp = PsyTdbFnHW(PartLoadOutAirEnth, EvapInletHumRat);
-            if (PartLoadDryCoilOutAirTemp > PsyTsatFnHPb(PartLoadOutAirEnth, OutBaroPress, RoutineName)) {
+            if (PartLoadDryCoilOutAirTemp > PsyTsatFnHPb(state, PartLoadOutAirEnth, state.dataEnvrn->OutBaroPress, RoutineName)) {
                 CoilMightBeDry = true;
                 // find wADP, humidity ratio at apparatus dewpoint and inlet hum rat that would have dry coil
                 DryCoilTestEvapInletHumRat = EvapInletHumRat;
@@ -3391,15 +3385,15 @@ namespace PackagedThermalStorageCoil {
                 Converged = false;
                 while (!Converged) {
                     EvapTotCapTempModFac =
-                        CurveValue(TESCoil(TESCoilNum).CoolingAndDischargeCoolingCapFTempCurve, DryCoilTestEvapInletWetBulb, CondInletTemp, sTES);
+                        CurveValue(state, TESCoil(TESCoilNum).CoolingAndDischargeCoolingCapFTempCurve, DryCoilTestEvapInletWetBulb, CondInletTemp, sTES);
                     EvapTotCapTempModFac = max(0.0, EvapTotCapTempModFac); // could warn if negative, DXcoil does
-                    EvapTotCapFlowModFac = CurveValue(TESCoil(TESCoilNum).CoolingAndDischargeCoolingCapFFlowCurve, AirMassFlowRatio);
+                    EvapTotCapFlowModFac = CurveValue(state, TESCoil(TESCoilNum).CoolingAndDischargeCoolingCapFFlowCurve, AirMassFlowRatio);
                     EvapTotCapFlowModFac = max(0.0, EvapTotCapFlowModFac); // could warn if negative, DXcoil does
                     EvapTotCap = TESCoil(TESCoilNum).CoolingAndDischargeRatedTotCap * EvapTotCapTempModFac * EvapTotCapFlowModFac;
                     // coil bypass factor = 0.0
                     hADP = EvapInletEnthalpy - (EvapTotCap / EvapAirMassFlow);
-                    tADP = PsyTsatFnHPb(hADP, OutBaroPress, RoutineName);
-                    wADP = min(EvapInletHumRat, PsyWFnTdbH(tADP, hADP, RoutineName));
+                    tADP = PsyTsatFnHPb(state, hADP, state.dataEnvrn->OutBaroPress, RoutineName);
+                    wADP = min(EvapInletHumRat, PsyWFnTdbH(state, tADP, hADP, RoutineName));
                     hTinwADP = PsyHFnTdbW(EvapInletDryBulb, wADP);
                     if ((EvapInletEnthalpy - hADP) > 1.e-10) {
                         SHRadp = min((hTinwADP - hADP) / (EvapInletEnthalpy - hADP), 1.0);
@@ -3412,7 +3406,7 @@ namespace PackagedThermalStorageCoil {
                         werror = (DryCoilTestEvapInletHumRat - wADP) / DryCoilTestEvapInletHumRat;
 
                         DryCoilTestEvapInletHumRat = RelaxationFactor * wADP + (1.0 - RelaxationFactor) * DryCoilTestEvapInletHumRat;
-                        DryCoilTestEvapInletWetBulb = PsyTwbFnTdbWPb(EvapInletDryBulb, DryCoilTestEvapInletHumRat, OutBaroPress, RoutineName);
+                        DryCoilTestEvapInletWetBulb = PsyTwbFnTdbWPb(state, EvapInletDryBulb, DryCoilTestEvapInletHumRat, state.dataEnvrn->OutBaroPress, RoutineName);
 
                         ++Counter;
                         if (std::abs(werror) <= Tolerance) {
@@ -3426,13 +3420,13 @@ namespace PackagedThermalStorageCoil {
                 }
             }
             {
-                if (CurveManager::PerfCurve(TESCoil(TESCoilNum).CoolingAndDischargeSHRFTempCurve).NumDims == 2) {
-                    SHRTempFac = CurveValue(TESCoil(TESCoilNum).CoolingAndDischargeSHRFTempCurve, EvapInletWetBulb, EvapInletDryBulb);
+                if (state.dataCurveManager->PerfCurve(TESCoil(TESCoilNum).CoolingAndDischargeSHRFTempCurve).NumDims == 2) {
+                    SHRTempFac = CurveValue(state, TESCoil(TESCoilNum).CoolingAndDischargeSHRFTempCurve, EvapInletWetBulb, EvapInletDryBulb);
                 } else {
-                    SHRTempFac = CurveValue(TESCoil(TESCoilNum).CoolingAndDischargeSHRFTempCurve, EvapInletWetBulb, EvapInletDryBulb, sTES);
+                    SHRTempFac = CurveValue(state, TESCoil(TESCoilNum).CoolingAndDischargeSHRFTempCurve, EvapInletWetBulb, EvapInletDryBulb, sTES);
                 }
             }
-            SHRFlowFac = CurveValue(TESCoil(TESCoilNum).CoolingAndDischargeSHRFFlowCurve, AirMassFlowRatio);
+            SHRFlowFac = CurveValue(state, TESCoil(TESCoilNum).CoolingAndDischargeSHRFFlowCurve, AirMassFlowRatio);
             SHR = TESCoil(TESCoilNum).CoolingAndDischargeRatedSHR * SHRTempFac * SHRFlowFac;
             SHR = min(SHR, 1.0); // warn maybe
             SHR = max(SHR, 0.0); // warn maybe
@@ -3443,16 +3437,16 @@ namespace PackagedThermalStorageCoil {
                     SHR = SHRadp;
                 }
             }
-            PLF = CurveValue(TESCoil(TESCoilNum).CoolingAndDischargeCoolingPLFFPLRCurve, PartLoadRatio);
+            PLF = CurveValue(state, TESCoil(TESCoilNum).CoolingAndDischargeCoolingPLFFPLRCurve, PartLoadRatio);
             if (PLF >= PartLoadRatio && PLF > 0.0) {
                 EvapRuntimeFraction = PartLoadRatio / PLF;
             } else {
                 EvapRuntimeFraction = 1.0; // warn maybe
             }
             // Calculate electricity consumed. First, get EIR modifying factors for off-rated conditions
-            EIRTempModFac = CurveValue(TESCoil(TESCoilNum).CoolingAndDischargeCoolingEIRFTempCurve, EvapInletWetBulb, CondInletTemp, sTES);
+            EIRTempModFac = CurveValue(state, TESCoil(TESCoilNum).CoolingAndDischargeCoolingEIRFTempCurve, EvapInletWetBulb, CondInletTemp, sTES);
             EIRTempModFac = max(EIRTempModFac, 0.0);
-            EIRFlowModFac = CurveValue(TESCoil(TESCoilNum).CoolingAndDischargeCoolingEIRFFlowCurve, AirMassFlowRatio);
+            EIRFlowModFac = CurveValue(state, TESCoil(TESCoilNum).CoolingAndDischargeCoolingEIRFFlowCurve, AirMassFlowRatio);
             EIRFlowModFac = max(EIRFlowModFac, 0.0);
             EIR = EIRTempModFac * EIRFlowModFac / TESCoil(TESCoilNum).CoolingAndDischargeCoolingRatedCOP;
 
@@ -3460,12 +3454,12 @@ namespace PackagedThermalStorageCoil {
 
             if (TESHasSomeCharge) {
                 DischargeCapTempModFac =
-                    CurveValue(TESCoil(TESCoilNum).CoolingAndDischargeDischargingCapFTempCurve, EvapInletWetBulb, CondInletTemp, sTES);
+                    CurveValue(state, TESCoil(TESCoilNum).CoolingAndDischargeDischargingCapFTempCurve, EvapInletWetBulb, CondInletTemp, sTES);
                 DischargeCapTempModFac = max(0.0, DischargeCapTempModFac);
-                DischargeCapFlowModFac = CurveValue(TESCoil(TESCoilNum).CoolingAndDischargeDischargingCapFFlowCurve, AirMassFlowRatio);
+                DischargeCapFlowModFac = CurveValue(state, TESCoil(TESCoilNum).CoolingAndDischargeDischargingCapFFlowCurve, AirMassFlowRatio);
                 DischargeCapFlowModFac = max(0.0, DischargeCapFlowModFac);
 
-                DischargePLF = CurveValue(TESCoil(TESCoilNum).CoolingAndDischargeDischargingCapFEvapPLRCurve, PartLoadRatio);
+                DischargePLF = CurveValue(state, TESCoil(TESCoilNum).CoolingAndDischargeDischargingCapFEvapPLRCurve, PartLoadRatio);
                 if (DischargePLF >= PartLoadRatio && DischargePLF > 0.0) {
                     DischargeRuntimeFraction = PartLoadRatio / DischargePLF;
                 } else {
@@ -3478,9 +3472,9 @@ namespace PackagedThermalStorageCoil {
                     TotDischargeCap = min(TotDischargeCap, QdotDischargeLimit);
                 }
                 DischargeEIRTempModFac =
-                    CurveValue(TESCoil(TESCoilNum).CoolingAndDischargeDischargingEIRFTempCurve, EvapInletWetBulb, CondInletTemp, sTES);
+                    CurveValue(state, TESCoil(TESCoilNum).CoolingAndDischargeDischargingEIRFTempCurve, EvapInletWetBulb, CondInletTemp, sTES);
                 DischargeEIRTempModFac = max(0.0, DischargeEIRTempModFac);
-                DischargeEIRFlowModFac = CurveValue(TESCoil(TESCoilNum).CoolingAndDischargeDischargingEIRFFLowCurve, AirMassFlowRatio);
+                DischargeEIRFlowModFac = CurveValue(state, TESCoil(TESCoilNum).CoolingAndDischargeDischargingEIRFFLowCurve, AirMassFlowRatio);
                 DischargeEIRFlowModFac = max(0.0, DischargeEIRFlowModFac);
 
                 DischargeEIR = (DischargeEIRTempModFac * DischargeEIRFlowModFac) / TESCoil(TESCoilNum).CoolingAndDischargeDischargingRatedCOP;
@@ -3499,20 +3493,20 @@ namespace PackagedThermalStorageCoil {
 
             hTinwout = EvapInletEnthalpy - (1.0 - SHR) * (TotCap / EvapAirMassFlow);
             // The following will often throw psych warnings for neg w, suppress warnings because error condition is handled in next IF
-            FullLoadOutAirHumRat = PsyWFnTdbH(EvapInletDryBulb, hTinwout, RoutineName, true);
+            FullLoadOutAirHumRat = PsyWFnTdbH(state, EvapInletDryBulb, hTinwout, RoutineName, true);
             FullLoadOutAirTemp = PsyTdbFnHW(FullLoadOutAirEnth, FullLoadOutAirHumRat);
             // Check for saturation error and modify temperature at constant enthalpy
-            if (FullLoadOutAirTemp < PsyTsatFnHPb(FullLoadOutAirEnth, OutBaroPress, RoutineName)) {
-                FullLoadOutAirTemp = PsyTsatFnHPb(FullLoadOutAirEnth, OutBaroPress, RoutineName);
-                FullLoadOutAirHumRat = PsyWFnTdbH(FullLoadOutAirTemp, FullLoadOutAirEnth, RoutineName);
+            if (FullLoadOutAirTemp < PsyTsatFnHPb(state, FullLoadOutAirEnth, state.dataEnvrn->OutBaroPress, RoutineName)) {
+                FullLoadOutAirTemp = PsyTsatFnHPb(state, FullLoadOutAirEnth, state.dataEnvrn->OutBaroPress, RoutineName);
+                FullLoadOutAirHumRat = PsyWFnTdbH(state, FullLoadOutAirTemp, FullLoadOutAirEnth, RoutineName);
             }
             // Continuous fan, cycling compressor
             EvapOutletAirEnthalpy = ((PartLoadRatio)*FullLoadOutAirEnth + (1.0 - (PartLoadRatio)) * EvapInletEnthalpy);
             EvapOutletAirHumRat = ((PartLoadRatio)*FullLoadOutAirHumRat + (1.0 - (PartLoadRatio)) * EvapInletHumRat);
             EvapOutletAirTemp = PsyTdbFnHW(EvapOutletAirEnthalpy, EvapOutletAirHumRat);
-            if (EvapOutletAirTemp < PsyTsatFnHPb(EvapOutletAirEnthalpy, OutBaroPress, RoutineName)) {
-                EvapOutletAirTemp = PsyTsatFnHPb(EvapOutletAirEnthalpy, OutBaroPress, RoutineName);
-                EvapOutletAirHumRat = PsyWFnTdbH(EvapOutletAirTemp, EvapOutletAirEnthalpy, RoutineName);
+            if (EvapOutletAirTemp < PsyTsatFnHPb(state, EvapOutletAirEnthalpy, state.dataEnvrn->OutBaroPress, RoutineName)) {
+                EvapOutletAirTemp = PsyTsatFnHPb(state, EvapOutletAirEnthalpy, state.dataEnvrn->OutBaroPress, RoutineName);
+                EvapOutletAirHumRat = PsyWFnTdbH(state, EvapOutletAirTemp, EvapOutletAirEnthalpy, RoutineName);
             }
 
             Node(TESCoil(TESCoilNum).EvapAirOutletNodeNum).Temp = EvapOutletAirTemp;
@@ -3533,27 +3527,27 @@ namespace PackagedThermalStorageCoil {
             Node(TESCoil(TESCoilNum).CondAirOutletNodeNum).Enthalpy = CondOutletEnthalpy;
 
             TESCoil(TESCoilNum).ElecCoolingPower = EvapElecCoolingPower + DischargeElectricCoolingPower + TESCoil(TESCoilNum).AncillaryControlsPower;
-            TESCoil(TESCoilNum).ElecCoolingEnergy = TESCoil(TESCoilNum).ElecCoolingPower * TimeStepSys * SecInHour;
+            TESCoil(TESCoilNum).ElecCoolingEnergy = TESCoil(TESCoilNum).ElecCoolingPower * TimeStepSys * DataGlobalConstants::SecInHour();
             TESCoil(TESCoilNum).RuntimeFraction =
                 (EvapTotCap * EvapRuntimeFraction + TotDischargeCap * DischargeRuntimeFraction) / (EvapTotCap + TotDischargeCap);
 
             TESCoil(TESCoilNum).EvapTotCoolingRate = EvapTotCap * EvapRuntimeFraction + TotDischargeCap * DischargeRuntimeFraction;
-            TESCoil(TESCoilNum).EvapTotCoolingEnergy = TESCoil(TESCoilNum).EvapTotCoolingRate * TimeStepSys * SecInHour;
+            TESCoil(TESCoilNum).EvapTotCoolingEnergy = TESCoil(TESCoilNum).EvapTotCoolingRate * TimeStepSys * DataGlobalConstants::SecInHour();
             MinAirHumRat = min(Node(TESCoil(TESCoilNum).EvapAirOutletNodeNum).HumRat, Node(TESCoil(TESCoilNum).EvapAirInletNodeNum).HumRat);
             TESCoil(TESCoilNum).EvapSensCoolingRate =
                 EvapAirMassFlow * (PsyHFnTdbW(EvapInletDryBulb, MinAirHumRat) - PsyHFnTdbW(EvapOutletAirTemp, MinAirHumRat));
             if (TESCoil(TESCoilNum).EvapSensCoolingRate > TESCoil(TESCoilNum).EvapTotCoolingRate) {
                 TESCoil(TESCoilNum).EvapSensCoolingRate = TESCoil(TESCoilNum).EvapTotCoolingRate;
             }
-            TESCoil(TESCoilNum).EvapSensCoolingEnergy = TESCoil(TESCoilNum).EvapSensCoolingRate * TimeStepSys * SecInHour;
+            TESCoil(TESCoilNum).EvapSensCoolingEnergy = TESCoil(TESCoilNum).EvapSensCoolingRate * TimeStepSys * DataGlobalConstants::SecInHour();
             TESCoil(TESCoilNum).EvapLatCoolingRate = TESCoil(TESCoilNum).EvapTotCoolingRate - TESCoil(TESCoilNum).EvapSensCoolingRate;
-            TESCoil(TESCoilNum).EvapLatCoolingEnergy = TESCoil(TESCoilNum).EvapLatCoolingRate * TimeStepSys * SecInHour;
+            TESCoil(TESCoilNum).EvapLatCoolingEnergy = TESCoil(TESCoilNum).EvapLatCoolingRate * TimeStepSys * DataGlobalConstants::SecInHour();
 
         } else { // coil is off; just pass through conditions
             TESCoil(TESCoilNum).QdotTES = 0.0;
 
             TESCoil(TESCoilNum).ElecCoolingPower = TESCoil(TESCoilNum).AncillaryControlsPower;
-            TESCoil(TESCoilNum).ElecCoolingEnergy = TESCoil(TESCoilNum).ElecCoolingPower * TimeStepSys * SecInHour;
+            TESCoil(TESCoilNum).ElecCoolingEnergy = TESCoil(TESCoilNum).ElecCoolingPower * TimeStepSys * DataGlobalConstants::SecInHour();
             TESCoil(TESCoilNum).RuntimeFraction = 0.0;
 
             TESCoil(TESCoilNum).RuntimeFraction = 0.0;
@@ -3580,18 +3574,18 @@ namespace PackagedThermalStorageCoil {
                 PsyHFnTdbW(Node(TESCoil(TESCoilNum).CondAirOutletNodeNum).Temp, Node(TESCoil(TESCoilNum).CondAirOutletNodeNum).HumRat);
             TESCoil(TESCoilNum).CondInletTemp = Node(TESCoil(TESCoilNum).CondAirInletNodeNum).Temp;
         }
-        TESCoil(TESCoilNum).Q_TES = TESCoil(TESCoilNum).QdotTES * TimeStepSys * SecInHour;
-        UpdateTEStorage(TESCoilNum);
+        TESCoil(TESCoilNum).Q_TES = TESCoil(TESCoilNum).QdotTES * TimeStepSys * DataGlobalConstants::SecInHour();
+        UpdateTEStorage(state, TESCoilNum);
 
-        UpdateColdWeatherProtection(TESCoilNum);
+        UpdateColdWeatherProtection(state, TESCoilNum);
 
         if (TESCoil(TESCoilNum).CondenserType == EvapCooled) {
-            UpdateEvaporativeCondenserBasinHeater(TESCoilNum);
-            UpdateEvaporativeCondenserWaterUse(TESCoilNum, CondInletHumRat, TESCoil(TESCoilNum).CondAirInletNodeNum);
+            UpdateEvaporativeCondenserBasinHeater(state, TESCoilNum);
+            UpdateEvaporativeCondenserWaterUse(state, TESCoilNum, CondInletHumRat, TESCoil(TESCoilNum).CondAirInletNodeNum);
         }
     }
 
-    void CalcTESCoilChargeOnlyMode(int const TESCoilNum)
+    void CalcTESCoilChargeOnlyMode(EnergyPlusData &state, int const TESCoilNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3665,9 +3659,9 @@ namespace PackagedThermalStorageCoil {
         if (TESCoil(TESCoilNum).CondenserType == AirCooled) {
             CondAirSidePressure = Node(TESCoil(TESCoilNum).CondAirInletNodeNum).Press;
             if (CondAirSidePressure == DefaultNodeValues.Press) {
-                CondInletTemp = OutDryBulbTemp;
-                CondInletHumRat = OutHumRat;
-                CondAirSidePressure = OutBaroPress;
+                CondInletTemp = state.dataEnvrn->OutDryBulbTemp;
+                CondInletHumRat = state.dataEnvrn->OutHumRat;
+                CondAirSidePressure = state.dataEnvrn->OutBaroPress;
             } else {
                 CondInletTemp = Node(TESCoil(TESCoilNum).CondAirInletNodeNum).Temp;
                 CondInletHumRat = Node(TESCoil(TESCoilNum).CondAirInletNodeNum).HumRat;
@@ -3676,19 +3670,19 @@ namespace PackagedThermalStorageCoil {
         } else if (TESCoil(TESCoilNum).CondenserType == EvapCooled) {
             CondAirSidePressure = Node(TESCoil(TESCoilNum).CondAirInletNodeNum).Press;
             if (CondAirSidePressure == DefaultNodeValues.Press) {
-                OutdoorDryBulb = OutDryBulbTemp;
-                OutdoorHumRat = OutHumRat;
-                CondAirSidePressure = OutBaroPress;
-                OutdoorWetBulb = OutWetBulbTemp;
+                OutdoorDryBulb = state.dataEnvrn->OutDryBulbTemp;
+                OutdoorHumRat = state.dataEnvrn->OutHumRat;
+                CondAirSidePressure = state.dataEnvrn->OutBaroPress;
+                OutdoorWetBulb = state.dataEnvrn->OutWetBulbTemp;
             } else {
                 OutdoorDryBulb = Node(TESCoil(TESCoilNum).CondAirInletNodeNum).Temp;
                 OutdoorHumRat = Node(TESCoil(TESCoilNum).CondAirInletNodeNum).HumRat;
-                OutdoorWetBulb = PsyTwbFnTdbWPb(OutdoorDryBulb, OutdoorHumRat, CondAirSidePressure, RoutineName);
+                OutdoorWetBulb = PsyTwbFnTdbWPb(state, OutdoorDryBulb, OutdoorHumRat, CondAirSidePressure, RoutineName);
             }
             CondAirMassFlow = TESCoil(TESCoilNum).CondenserAirMassFlow;
             // direct evap cool model
             CondInletTemp = OutdoorWetBulb + (OutdoorDryBulb - OutdoorWetBulb) * (1.0 - TESCoil(TESCoilNum).EvapCondEffect);
-            CondInletHumRat = PsyWFnTdbTwbPb(CondInletTemp, OutdoorWetBulb, CondAirSidePressure, RoutineName);
+            CondInletHumRat = PsyWFnTdbTwbPb(state, CondInletTemp, OutdoorWetBulb, CondAirSidePressure, RoutineName);
         }
 
         if (TESCoil(TESCoilNum).StorageMedia == FluidBased) {
@@ -3696,11 +3690,11 @@ namespace PackagedThermalStorageCoil {
             if ((sTES > TESCoil(TESCoilNum).MinimumFluidTankTempLimit) && (sTES < TESCoil(TESCoilNum).MaximumFluidTankTempLimit)) {
                 TESCanBeCharged = true;
                 // find charge limit to reach limits
-                rho = GetDensityGlycol(TESCoil(TESCoilNum).StorageFluidName, sTES, TESCoil(TESCoilNum).StorageFluidIndex, RoutineName);
+                rho = GetDensityGlycol(state, TESCoil(TESCoilNum).StorageFluidName, sTES, TESCoil(TESCoilNum).StorageFluidIndex, RoutineName);
                 TankMass = rho * TESCoil(TESCoilNum).FluidStorageVolume;
-                CpTank = GetSpecificHeatGlycol(TESCoil(TESCoilNum).StorageFluidName, sTES, TESCoil(TESCoilNum).StorageFluidIndex, RoutineName);
+                CpTank = GetSpecificHeatGlycol(state, TESCoil(TESCoilNum).StorageFluidName, sTES, TESCoil(TESCoilNum).StorageFluidIndex, RoutineName);
                 // simple linear approximation of DT/Dt term in McpDT/Dt
-                QdotChargeLimit = TankMass * CpTank * (sTES - TESCoil(TESCoilNum).MinimumFluidTankTempLimit) / (TimeStepSys * SecInHour);
+                QdotChargeLimit = TankMass * CpTank * (sTES - TESCoil(TESCoilNum).MinimumFluidTankTempLimit) / (TimeStepSys * DataGlobalConstants::SecInHour());
             } else {
                 TESCanBeCharged = false;
             }
@@ -3709,7 +3703,7 @@ namespace PackagedThermalStorageCoil {
             if (sTES < 1.0) {
                 TESCanBeCharged = true;
                 // find charge limit to reach limit
-                QdotChargeLimit = (1.0 - sTES) * TESCoil(TESCoilNum).IceStorageCapacity / (TimeStepSys * SecInHour);
+                QdotChargeLimit = (1.0 - sTES) * TESCoil(TESCoilNum).IceStorageCapacity / (TimeStepSys * DataGlobalConstants::SecInHour());
             } else {
                 TESCanBeCharged = false;
             }
@@ -3718,7 +3712,7 @@ namespace PackagedThermalStorageCoil {
         }
 
         if (TESCanBeCharged) { // coil is running
-            CapModFac = CurveValue(TESCoil(TESCoilNum).ChargeOnlyChargingCapFTempCurve, CondInletTemp, sTES);
+            CapModFac = CurveValue(state, TESCoil(TESCoilNum).ChargeOnlyChargingCapFTempCurve, CondInletTemp, sTES);
             CapModFac = max(0.0, CapModFac);
             TotCap = TESCoil(TESCoilNum).ChargeOnlyRatedCapacity * CapModFac;
             if (TotCap > QdotChargeLimit) {
@@ -3727,7 +3721,7 @@ namespace PackagedThermalStorageCoil {
             } else {
                 TESCoil(TESCoilNum).RuntimeFraction = 1.0;
             }
-            EIRModFac = CurveValue(TESCoil(TESCoilNum).ChargeOnlyChargingEIRFTempCurve, CondInletTemp, sTES);
+            EIRModFac = CurveValue(state, TESCoil(TESCoilNum).ChargeOnlyChargingEIRFTempCurve, CondInletTemp, sTES);
             EIRModFac = max(0.0, EIRModFac);
             EIR = EIRModFac / TESCoil(TESCoilNum).ChargeOnlyRatedCOP;
             ElecCoolingPower = TotCap * EIR;
@@ -3741,13 +3735,13 @@ namespace PackagedThermalStorageCoil {
             Node(TESCoil(TESCoilNum).CondAirOutletNodeNum).Enthalpy = CondOutletEnthalpy;
 
             TESCoil(TESCoilNum).ElecCoolingPower = ElecCoolingPower + TESCoil(TESCoilNum).AncillaryControlsPower;
-            TESCoil(TESCoilNum).ElecCoolingEnergy = TESCoil(TESCoilNum).ElecCoolingPower * TimeStepSys * SecInHour;
+            TESCoil(TESCoilNum).ElecCoolingEnergy = TESCoil(TESCoilNum).ElecCoolingPower * TimeStepSys * DataGlobalConstants::SecInHour();
 
             TESCoil(TESCoilNum).QdotTES = -TotCap; // negative for cooling
 
         } else { // not running
             TESCoil(TESCoilNum).ElecCoolingPower = TESCoil(TESCoilNum).AncillaryControlsPower;
-            TESCoil(TESCoilNum).ElecCoolingEnergy = TESCoil(TESCoilNum).ElecCoolingPower * TimeStepSys * SecInHour;
+            TESCoil(TESCoilNum).ElecCoolingEnergy = TESCoil(TESCoilNum).ElecCoolingPower * TimeStepSys * DataGlobalConstants::SecInHour();
             TESCoil(TESCoilNum).RuntimeFraction = 0.0;
             TESCoil(TESCoilNum).QdotTES = 0.0;
             Node(TESCoil(TESCoilNum).CondAirOutletNodeNum).Temp = Node(TESCoil(TESCoilNum).CondAirInletNodeNum).Temp;
@@ -3757,7 +3751,7 @@ namespace PackagedThermalStorageCoil {
             Node(TESCoil(TESCoilNum).CondAirOutletNodeNum).Enthalpy =
                 PsyHFnTdbW(Node(TESCoil(TESCoilNum).CondAirOutletNodeNum).Temp, Node(TESCoil(TESCoilNum).CondAirOutletNodeNum).HumRat);
         }
-        TESCoil(TESCoilNum).Q_TES = TESCoil(TESCoilNum).QdotTES * TimeStepSys * SecInHour;
+        TESCoil(TESCoilNum).Q_TES = TESCoil(TESCoilNum).QdotTES * TimeStepSys * DataGlobalConstants::SecInHour();
 
         TESCoil(TESCoilNum).EvapTotCoolingRate = 0.0;
         TESCoil(TESCoilNum).EvapTotCoolingEnergy = 0.0;
@@ -3766,17 +3760,17 @@ namespace PackagedThermalStorageCoil {
         TESCoil(TESCoilNum).EvapLatCoolingRate = 0.0;
         TESCoil(TESCoilNum).EvapLatCoolingEnergy = 0.0;
 
-        UpdateTEStorage(TESCoilNum);
+        UpdateTEStorage(state, TESCoilNum);
 
-        UpdateColdWeatherProtection(TESCoilNum);
+        UpdateColdWeatherProtection(state, TESCoilNum);
 
         if (TESCoil(TESCoilNum).CondenserType == EvapCooled) {
-            UpdateEvaporativeCondenserBasinHeater(TESCoilNum);
-            UpdateEvaporativeCondenserWaterUse(TESCoilNum, CondInletHumRat, TESCoil(TESCoilNum).CondAirInletNodeNum);
+            UpdateEvaporativeCondenserBasinHeater(state, TESCoilNum);
+            UpdateEvaporativeCondenserWaterUse(state, TESCoilNum, CondInletHumRat, TESCoil(TESCoilNum).CondAirInletNodeNum);
         }
     }
 
-    void CalcTESCoilDischargeOnlyMode(int const TESCoilNum, Real64 const PartLoadRatio)
+    void CalcTESCoilDischargeOnlyMode(EnergyPlusData &state, int const TESCoilNum, Real64 const PartLoadRatio)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3871,7 +3865,7 @@ namespace PackagedThermalStorageCoil {
         EvapAirMassFlow = Node(TESCoil(TESCoilNum).EvapAirInletNodeNum).MassFlowRate;
         EvapInletDryBulb = Node(TESCoil(TESCoilNum).EvapAirInletNodeNum).Temp;
         EvapInletHumRat = Node(TESCoil(TESCoilNum).EvapAirInletNodeNum).HumRat;
-        EvapInletWetBulb = PsyTwbFnTdbWPb(EvapInletDryBulb, EvapInletHumRat, OutBaroPress, RoutineName);
+        EvapInletWetBulb = PsyTwbFnTdbWPb(state, EvapInletDryBulb, EvapInletHumRat, state.dataEnvrn->OutBaroPress, RoutineName);
         EvapInletEnthalpy = Node(TESCoil(TESCoilNum).EvapAirInletNodeNum).Enthalpy;
         CoilMightBeDry = false;
 
@@ -3879,11 +3873,11 @@ namespace PackagedThermalStorageCoil {
             sTES = TESCoil(TESCoilNum).FluidTankTempFinalLastTimestep;
             if ((sTES >= TESCoil(TESCoilNum).MinimumFluidTankTempLimit) && (sTES < TESCoil(TESCoilNum).MaximumFluidTankTempLimit)) {
                 TESHasSomeCharge = true;
-                rho = GetDensityGlycol(TESCoil(TESCoilNum).StorageFluidName, sTES, TESCoil(TESCoilNum).StorageFluidIndex, StorageTankName);
+                rho = GetDensityGlycol(state, TESCoil(TESCoilNum).StorageFluidName, sTES, TESCoil(TESCoilNum).StorageFluidIndex, StorageTankName);
                 TankMass = rho * TESCoil(TESCoilNum).FluidStorageVolume;
-                CpTank = GetSpecificHeatGlycol(TESCoil(TESCoilNum).StorageFluidName, sTES, TESCoil(TESCoilNum).StorageFluidIndex, StorageTankName);
+                CpTank = GetSpecificHeatGlycol(state, TESCoil(TESCoilNum).StorageFluidName, sTES, TESCoil(TESCoilNum).StorageFluidIndex, StorageTankName);
                 // simple linear approximation of DT/Dt term in McpDT/Dt
-                QdotDischargeLimit = TankMass * CpTank * (TESCoil(TESCoilNum).MaximumFluidTankTempLimit - sTES) / (TimeStepSys * SecInHour);
+                QdotDischargeLimit = TankMass * CpTank * (TESCoil(TESCoilNum).MaximumFluidTankTempLimit - sTES) / (TimeStepSys * DataGlobalConstants::SecInHour());
             } else {
                 TESHasSomeCharge = false;
             }
@@ -3892,7 +3886,7 @@ namespace PackagedThermalStorageCoil {
             if (sTES > 0.0) {
                 TESHasSomeCharge = true;
                 // discharge limit
-                QdotDischargeLimit = (sTES)*TESCoil(TESCoilNum).IceStorageCapacity / (TimeStepSys * SecInHour);
+                QdotDischargeLimit = (sTES)*TESCoil(TESCoilNum).IceStorageCapacity / (TimeStepSys * DataGlobalConstants::SecInHour());
             } else {
                 TESHasSomeCharge = false;
             }
@@ -3901,22 +3895,22 @@ namespace PackagedThermalStorageCoil {
         if ((EvapAirMassFlow > SmallMassFlow) && (PLR > 0.0) && TESHasSomeCharge) { // coil is running
             AirMassFlowRatio = EvapAirMassFlow / TESCoil(TESCoilNum).RatedEvapAirMassFlowRate;
 
-            TotCapTempModFac = CurveValue(TESCoil(TESCoilNum).DischargeOnlyCapFTempCurve, EvapInletWetBulb, sTES);
+            TotCapTempModFac = CurveValue(state, TESCoil(TESCoilNum).DischargeOnlyCapFTempCurve, EvapInletWetBulb, sTES);
             TotCapTempModFac = max(0.0, TotCapTempModFac);
-            TotCapFlowModFac = CurveValue(TESCoil(TESCoilNum).DischargeOnlyCapFFlowCurve, AirMassFlowRatio);
+            TotCapFlowModFac = CurveValue(state, TESCoil(TESCoilNum).DischargeOnlyCapFFlowCurve, AirMassFlowRatio);
             TotCapFlowModFac = max(0.0, TotCapFlowModFac);
             TotCap = TESCoil(TESCoilNum).DischargeOnlyRatedDischargeCap * TotCapTempModFac * TotCapFlowModFac;
 
-            PLF = CurveValue(TESCoil(TESCoilNum).DischargeOnlyPLFFPLRCurve, PLR);
+            PLF = CurveValue(state, TESCoil(TESCoilNum).DischargeOnlyPLFFPLRCurve, PLR);
             if (PLF >= PLR && PLF > 0.0) {
                 RuntimeFraction = PLR / PLF;
             } else {
                 RuntimeFraction = 1.0; // warn maybe
             }
             // Calculate electricity consumed. First, get EIR modifying factors for off-rated conditions
-            EIRTempModFac = CurveValue(TESCoil(TESCoilNum).DischargeOnlyEIRFTempCurve, EvapInletWetBulb, sTES);
+            EIRTempModFac = CurveValue(state, TESCoil(TESCoilNum).DischargeOnlyEIRFTempCurve, EvapInletWetBulb, sTES);
             EIRTempModFac = max(EIRTempModFac, 0.0);
-            EIRFlowModFac = CurveValue(TESCoil(TESCoilNum).DischargeOnlyEIRFFlowCurve, AirMassFlowRatio);
+            EIRFlowModFac = CurveValue(state, TESCoil(TESCoilNum).DischargeOnlyEIRFFlowCurve, AirMassFlowRatio);
             EIRFlowModFac = max(EIRFlowModFac, 0.0);
             EIR = EIRTempModFac * EIRFlowModFac / TESCoil(TESCoilNum).DischargeOnlyRatedCOP;
 
@@ -3932,7 +3926,7 @@ namespace PackagedThermalStorageCoil {
             // now see if coil is running dry
             PartLoadOutAirEnth = EvapInletEnthalpy - (TotCap * PartLoadRatio) / EvapAirMassFlow;
             PartLoadDryCoilOutAirTemp = PsyTdbFnHW(PartLoadOutAirEnth, EvapInletHumRat);
-            if (PartLoadDryCoilOutAirTemp > PsyTsatFnHPb(PartLoadOutAirEnth, OutBaroPress, RoutineName)) {
+            if (PartLoadDryCoilOutAirTemp > PsyTsatFnHPb(state, PartLoadOutAirEnth, state.dataEnvrn->OutBaroPress, RoutineName)) {
                 CoilMightBeDry = true;
                 // find wADP, humidity ratio at apparatus dewpoint and inlet hum rat that would have dry coil
                 DryCoilTestEvapInletHumRat = EvapInletHumRat;
@@ -3940,15 +3934,15 @@ namespace PackagedThermalStorageCoil {
                 Counter = 0;
                 Converged = false;
                 while (!Converged) {
-                    TotCapTempModFac = CurveValue(TESCoil(TESCoilNum).DischargeOnlyCapFTempCurve, DryCoilTestEvapInletWetBulb, sTES);
+                    TotCapTempModFac = CurveValue(state, TESCoil(TESCoilNum).DischargeOnlyCapFTempCurve, DryCoilTestEvapInletWetBulb, sTES);
                     TotCapTempModFac = max(0.0, TotCapTempModFac);
-                    TotCapFlowModFac = CurveValue(TESCoil(TESCoilNum).DischargeOnlyCapFFlowCurve, AirMassFlowRatio);
+                    TotCapFlowModFac = CurveValue(state, TESCoil(TESCoilNum).DischargeOnlyCapFFlowCurve, AirMassFlowRatio);
                     TotCapFlowModFac = max(0.0, TotCapFlowModFac);
                     TotCap = TESCoil(TESCoilNum).DischargeOnlyRatedDischargeCap * TotCapTempModFac * TotCapFlowModFac;
                     // coil bypass factor = 0.0
                     hADP = EvapInletEnthalpy - (TotCap / EvapAirMassFlow);
-                    tADP = PsyTsatFnHPb(hADP, OutBaroPress, RoutineName);
-                    wADP = min(EvapInletHumRat, PsyWFnTdbH(tADP, hADP, RoutineName));
+                    tADP = PsyTsatFnHPb(state, hADP, state.dataEnvrn->OutBaroPress, RoutineName);
+                    wADP = min(EvapInletHumRat, PsyWFnTdbH(state, tADP, hADP, RoutineName));
                     hTinwADP = PsyHFnTdbW(EvapInletDryBulb, wADP);
                     if ((EvapInletEnthalpy - hADP) > 1.e-10) {
                         SHRadp = min((hTinwADP - hADP) / (EvapInletEnthalpy - hADP), 1.0);
@@ -3961,7 +3955,7 @@ namespace PackagedThermalStorageCoil {
                         werror = (DryCoilTestEvapInletHumRat - wADP) / DryCoilTestEvapInletHumRat;
 
                         DryCoilTestEvapInletHumRat = RelaxationFactor * wADP + (1.0 - RelaxationFactor) * DryCoilTestEvapInletHumRat;
-                        DryCoilTestEvapInletWetBulb = PsyTwbFnTdbWPb(EvapInletDryBulb, DryCoilTestEvapInletHumRat, OutBaroPress, RoutineName);
+                        DryCoilTestEvapInletWetBulb = PsyTwbFnTdbWPb(state, EvapInletDryBulb, DryCoilTestEvapInletHumRat, state.dataEnvrn->OutBaroPress, RoutineName);
 
                         ++Counter;
                         if (std::abs(werror) <= Tolerance) {
@@ -3975,14 +3969,14 @@ namespace PackagedThermalStorageCoil {
                 }
             } // coil will be wet so use SHR curves
             {
-                if (CurveManager::PerfCurve(TESCoil(TESCoilNum).DischargeOnlySHRFTempCurve).NumDims == 2) {
-                    SHRTempFac = CurveValue(TESCoil(TESCoilNum).DischargeOnlySHRFTempCurve, EvapInletWetBulb, EvapInletDryBulb);
+                if (state.dataCurveManager->PerfCurve(TESCoil(TESCoilNum).DischargeOnlySHRFTempCurve).NumDims == 2) {
+                    SHRTempFac = CurveValue(state, TESCoil(TESCoilNum).DischargeOnlySHRFTempCurve, EvapInletWetBulb, EvapInletDryBulb);
                 } else {
-                    SHRTempFac = CurveValue(TESCoil(TESCoilNum).DischargeOnlySHRFTempCurve, EvapInletWetBulb, EvapInletDryBulb, sTES);
+                    SHRTempFac = CurveValue(state, TESCoil(TESCoilNum).DischargeOnlySHRFTempCurve, EvapInletWetBulb, EvapInletDryBulb, sTES);
                 }
             }
 
-            SHRFlowFac = CurveValue(TESCoil(TESCoilNum).DischargeOnlySHRFFLowCurve, AirMassFlowRatio);
+            SHRFlowFac = CurveValue(state, TESCoil(TESCoilNum).DischargeOnlySHRFFLowCurve, AirMassFlowRatio);
             SHR = TESCoil(TESCoilNum).DischargeOnlyRatedSHR * SHRTempFac * SHRFlowFac;
             SHR = min(SHR, 1.0); // warn maybe
             SHR = max(SHR, 0.0); // warn maybe
@@ -3998,21 +3992,21 @@ namespace PackagedThermalStorageCoil {
 
             hTinwout = EvapInletEnthalpy - (1.0 - SHR) * (TotCap / EvapAirMassFlow);
             // The following will often throw psych warnings for neg w, suppress warnings because error condition is handled in next IF
-            FullLoadOutAirHumRat = PsyWFnTdbH(EvapInletDryBulb, hTinwout, RoutineName, true);
+            FullLoadOutAirHumRat = PsyWFnTdbH(state, EvapInletDryBulb, hTinwout, RoutineName, true);
             FullLoadOutAirTemp = PsyTdbFnHW(FullLoadOutAirEnth, FullLoadOutAirHumRat);
             // Check for saturation error and modify temperature at constant enthalpy
-            if (FullLoadOutAirTemp < PsyTsatFnHPb(FullLoadOutAirEnth, OutBaroPress, RoutineName)) {
-                FullLoadOutAirTemp = PsyTsatFnHPb(FullLoadOutAirEnth, OutBaroPress, RoutineName);
-                FullLoadOutAirHumRat = PsyWFnTdbH(FullLoadOutAirTemp, FullLoadOutAirEnth, RoutineName);
+            if (FullLoadOutAirTemp < PsyTsatFnHPb(state, FullLoadOutAirEnth, state.dataEnvrn->OutBaroPress, RoutineName)) {
+                FullLoadOutAirTemp = PsyTsatFnHPb(state, FullLoadOutAirEnth, state.dataEnvrn->OutBaroPress, RoutineName);
+                FullLoadOutAirHumRat = PsyWFnTdbH(state, FullLoadOutAirTemp, FullLoadOutAirEnth, RoutineName);
             }
 
             // Continuous fan, cycling compressor
             EvapOutletAirEnthalpy = ((PLR)*FullLoadOutAirEnth + (1.0 - (PLR)) * EvapInletEnthalpy);
             EvapOutletAirHumRat = ((PLR)*FullLoadOutAirHumRat + (1.0 - (PLR)) * EvapInletHumRat);
             EvapOutletAirTemp = PsyTdbFnHW(EvapOutletAirEnthalpy, EvapOutletAirHumRat);
-            if (EvapOutletAirTemp < PsyTsatFnHPb(EvapOutletAirEnthalpy, OutBaroPress, RoutineName)) {
-                EvapOutletAirTemp = PsyTsatFnHPb(EvapOutletAirEnthalpy, OutBaroPress, RoutineName);
-                EvapOutletAirHumRat = PsyWFnTdbH(EvapOutletAirTemp, EvapOutletAirEnthalpy, RoutineName);
+            if (EvapOutletAirTemp < PsyTsatFnHPb(state, EvapOutletAirEnthalpy, state.dataEnvrn->OutBaroPress, RoutineName)) {
+                EvapOutletAirTemp = PsyTsatFnHPb(state, EvapOutletAirEnthalpy, state.dataEnvrn->OutBaroPress, RoutineName);
+                EvapOutletAirHumRat = PsyWFnTdbH(state, EvapOutletAirTemp, EvapOutletAirEnthalpy, RoutineName);
             }
 
             Node(TESCoil(TESCoilNum).EvapAirOutletNodeNum).Temp = EvapOutletAirTemp;
@@ -4022,19 +4016,19 @@ namespace PackagedThermalStorageCoil {
             Node(TESCoil(TESCoilNum).EvapAirOutletNodeNum).MassFlowRateMinAvail = Node(TESCoil(TESCoilNum).EvapAirInletNodeNum).MassFlowRateMinAvail;
             Node(TESCoil(TESCoilNum).EvapAirOutletNodeNum).MassFlowRateMaxAvail = Node(TESCoil(TESCoilNum).EvapAirInletNodeNum).MassFlowRateMaxAvail;
             TESCoil(TESCoilNum).ElecCoolingPower = ElecCoolingPower + TESCoil(TESCoilNum).AncillaryControlsPower;
-            TESCoil(TESCoilNum).ElecCoolingEnergy = TESCoil(TESCoilNum).ElecCoolingPower * TimeStepSys * SecInHour;
+            TESCoil(TESCoilNum).ElecCoolingEnergy = TESCoil(TESCoilNum).ElecCoolingPower * TimeStepSys * DataGlobalConstants::SecInHour();
             TESCoil(TESCoilNum).RuntimeFraction = RuntimeFraction;
             TESCoil(TESCoilNum).EvapTotCoolingRate = TotCap * RuntimeFraction; // double check this
-            TESCoil(TESCoilNum).EvapTotCoolingEnergy = TotCap * RuntimeFraction * TimeStepSys * SecInHour;
+            TESCoil(TESCoilNum).EvapTotCoolingEnergy = TotCap * RuntimeFraction * TimeStepSys * DataGlobalConstants::SecInHour();
             MinAirHumRat = min(Node(TESCoil(TESCoilNum).EvapAirOutletNodeNum).HumRat, Node(TESCoil(TESCoilNum).EvapAirInletNodeNum).HumRat);
             TESCoil(TESCoilNum).EvapSensCoolingRate =
                 EvapAirMassFlow * (PsyHFnTdbW(EvapInletDryBulb, MinAirHumRat) - PsyHFnTdbW(EvapOutletAirTemp, MinAirHumRat));
             if (TESCoil(TESCoilNum).EvapSensCoolingRate > TESCoil(TESCoilNum).EvapTotCoolingRate) {
                 TESCoil(TESCoilNum).EvapSensCoolingRate = TESCoil(TESCoilNum).EvapTotCoolingRate;
             }
-            TESCoil(TESCoilNum).EvapSensCoolingEnergy = TESCoil(TESCoilNum).EvapSensCoolingRate * TimeStepSys * SecInHour;
+            TESCoil(TESCoilNum).EvapSensCoolingEnergy = TESCoil(TESCoilNum).EvapSensCoolingRate * TimeStepSys * DataGlobalConstants::SecInHour();
             TESCoil(TESCoilNum).EvapLatCoolingRate = TESCoil(TESCoilNum).EvapTotCoolingRate - TESCoil(TESCoilNum).EvapSensCoolingRate;
-            TESCoil(TESCoilNum).EvapLatCoolingEnergy = TESCoil(TESCoilNum).EvapLatCoolingRate * TimeStepSys * SecInHour;
+            TESCoil(TESCoilNum).EvapLatCoolingEnergy = TESCoil(TESCoilNum).EvapLatCoolingRate * TimeStepSys * DataGlobalConstants::SecInHour();
 
             TESCoil(TESCoilNum).QdotTES = TotCap * RuntimeFraction + ElecCoolingPower; // all heat rejection into storage
 
@@ -4042,7 +4036,7 @@ namespace PackagedThermalStorageCoil {
             TESCoil(TESCoilNum).QdotTES = 0.0;
 
             TESCoil(TESCoilNum).ElecCoolingPower = TESCoil(TESCoilNum).AncillaryControlsPower;
-            TESCoil(TESCoilNum).ElecCoolingEnergy = TESCoil(TESCoilNum).ElecCoolingPower * TimeStepSys * SecInHour;
+            TESCoil(TESCoilNum).ElecCoolingEnergy = TESCoil(TESCoilNum).ElecCoolingPower * TimeStepSys * DataGlobalConstants::SecInHour();
             TESCoil(TESCoilNum).RuntimeFraction = 0.0;
 
             TESCoil(TESCoilNum).RuntimeFraction = 0.0;
@@ -4070,19 +4064,20 @@ namespace PackagedThermalStorageCoil {
         Node(TESCoil(TESCoilNum).CondAirOutletNodeNum).Enthalpy =
             PsyHFnTdbW(Node(TESCoil(TESCoilNum).CondAirOutletNodeNum).Temp, Node(TESCoil(TESCoilNum).CondAirOutletNodeNum).HumRat);
         TESCoil(TESCoilNum).CondInletTemp = Node(TESCoil(TESCoilNum).CondAirInletNodeNum).Temp;
-        TESCoil(TESCoilNum).Q_TES = TESCoil(TESCoilNum).QdotTES * TimeStepSys * SecInHour;
-        UpdateTEStorage(TESCoilNum);
+        TESCoil(TESCoilNum).Q_TES = TESCoil(TESCoilNum).QdotTES * TimeStepSys * DataGlobalConstants::SecInHour();
+        UpdateTEStorage(state, TESCoilNum);
 
-        UpdateColdWeatherProtection(TESCoilNum);
+        UpdateColdWeatherProtection(state, TESCoilNum);
 
         if (TESCoil(TESCoilNum).CondenserType == EvapCooled) {
-            UpdateEvaporativeCondenserBasinHeater(TESCoilNum);
+            UpdateEvaporativeCondenserBasinHeater(state, TESCoilNum);
             UpdateEvaporativeCondenserWaterUse(
-                TESCoilNum, Node(TESCoil(TESCoilNum).CondAirInletNodeNum).HumRat, TESCoil(TESCoilNum).CondAirInletNodeNum);
+                state, TESCoilNum, Node(TESCoil(TESCoilNum).CondAirInletNodeNum).HumRat, TESCoil(TESCoilNum).CondAirInletNodeNum);
         }
     }
 
-    void ControlTESIceStorageTankCoil(EnergyPlusData &state, std::string const &CoilName,      // child object coil name
+    void ControlTESIceStorageTankCoil(EnergyPlusData &state,
+                                      std::string const &CoilName,      // child object coil name
                                       int CoilIndex,                    // child object coil index
                                       std::string SystemType,           // parent object system type
                                       int const FanOpMode,              // parent object fan operating mode
@@ -4118,7 +4113,7 @@ namespace PackagedThermalStorageCoil {
         // na
 
         // Using/Aliasing
-        using General::RoundSigDigits;
+
         using General::SolveRoot;
         using TempSolveRoot::SolveRoot;
 
@@ -4192,19 +4187,19 @@ namespace PackagedThermalStorageCoil {
                     Par(3) = TESOpMode;
                     Par(4) = OutletNode;
                     Par(5) = double(FanOpMode);
-                    SolveRoot(Acc, MaxIte, SolFlag, PartLoadFrac, TESCoilResidualFunction, 0.0, 1.0, Par);
+                    TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFlag, PartLoadFrac, TESCoilResidualFunction, 0.0, 1.0, Par);
                     if (SolFlag == -1) {
-                        if (!WarmupFlag) {
+                        if (!state.dataGlobal->WarmupFlag) {
                             if (SensPLRIter < 1) {
                                 ++SensPLRIter;
-                                ShowWarningError(SystemType +
+                                ShowWarningError(state, SystemType +
                                                  " - Iteration limit exceeded calculating DX unit sensible part-load ratio for unit = " + CoilName);
-                                ShowContinueError("Estimated part-load ratio  = " + RoundSigDigits((ReqOutput / FullOutput), 3));
-                                ShowContinueError("Calculated part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
-                                ShowContinueErrorTimeStamp(
+                                ShowContinueError(state, format("Estimated part-load ratio  = {:.3R}", ReqOutput / FullOutput));
+                                ShowContinueError(state, format("Calculated part-load ratio = {:.3R}", PartLoadFrac));
+                                ShowContinueErrorTimeStamp(state,
                                     "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
                             }
-                            ShowRecurringWarningErrorAtEnd(SystemType + " \"" + CoilName +
+                            ShowRecurringWarningErrorAtEnd(state, SystemType + " \"" + CoilName +
                                                                "\" - Iteration limit exceeded calculating sensible part-load ratio error continues. "
                                                                "Sensible PLR statistics follow.",
                                                            SensPLRIterIndex,
@@ -4213,18 +4208,18 @@ namespace PackagedThermalStorageCoil {
                         }
                     } else if (SolFlag == -2) {
                         PartLoadFrac = ReqOutput / FullOutput;
-                        if (!WarmupFlag) {
+                        if (!state.dataGlobal->WarmupFlag) {
                             if (SensPLRFail < 1) {
                                 ++SensPLRFail;
-                                ShowWarningError(
+                                ShowWarningError(state,
                                     SystemType +
                                     " - DX unit sensible part-load ratio calculation failed: part-load ratio limits exceeded, for unit = " +
                                     CoilName);
-                                ShowContinueError("Estimated part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
-                                ShowContinueErrorTimeStamp(
+                                ShowContinueError(state, format("Estimated part-load ratio = {:.3R}", PartLoadFrac));
+                                ShowContinueErrorTimeStamp(state,
                                     "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
                             }
-                            ShowRecurringWarningErrorAtEnd(
+                            ShowRecurringWarningErrorAtEnd(state,
                                 SystemType + " \"" + CoilName +
                                     "\" - DX unit sensible part-load ratio calculation failed error continues. Sensible PLR statistics follow.",
                                 SensPLRFailIndex,
@@ -4259,19 +4254,19 @@ namespace PackagedThermalStorageCoil {
                         Par(3) = TESOpMode;
                         Par(4) = OutletNode;
                         Par(5) = double(FanOpMode);
-                        SolveRoot(HumRatAcc, MaxIte, SolFlag, PartLoadFrac, TESCoilHumRatResidualFunction, 0.0, 1.0, Par);
+                        TempSolveRoot::SolveRoot(state, HumRatAcc, MaxIte, SolFlag, PartLoadFrac, TESCoilHumRatResidualFunction, 0.0, 1.0, Par);
                         if (SolFlag == -1) {
-                            if (!WarmupFlag) {
+                            if (!state.dataGlobal->WarmupFlag) {
                                 if (LatPLRIter < 1) {
                                     ++LatPLRIter;
-                                    ShowWarningError(SystemType +
+                                    ShowWarningError(state, SystemType +
                                                      " - Iteration limit exceeded calculating DX unit latent part-load ratio for unit = " + CoilName);
-                                    ShowContinueError("Estimated part-load ratio   = " + RoundSigDigits((ReqOutput / FullOutput), 3));
-                                    ShowContinueError("Calculated part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
-                                    ShowContinueErrorTimeStamp(
+                                    ShowContinueError(state, format("Estimated part-load ratio   = {:.3R}", ReqOutput / FullOutput));
+                                    ShowContinueError(state, format("Calculated part-load ratio = {:.3R}", PartLoadFrac));
+                                    ShowContinueErrorTimeStamp(state,
                                         "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
                                 }
-                                ShowRecurringWarningErrorAtEnd(SystemType + " \"" + CoilName +
+                                ShowRecurringWarningErrorAtEnd(state, SystemType + " \"" + CoilName +
                                                                    "\" - Iteration limit exceeded calculating latent part-load ratio error "
                                                                    "continues. Latent PLR statistics follow.",
                                                                LatPLRIterIndex,
@@ -4285,18 +4280,18 @@ namespace PackagedThermalStorageCoil {
                             } else {
                                 PartLoadFrac = 1.0;
                             }
-                            if (!WarmupFlag) {
+                            if (!state.dataGlobal->WarmupFlag) {
                                 if (LatPLRFail < 1) {
                                     ++LatPLRFail;
-                                    ShowWarningError(
+                                    ShowWarningError(state,
                                         SystemType +
                                         " - DX unit latent part-load ratio calculation failed: part-load ratio limits exceeded, for unit = " +
                                         CoilName);
-                                    ShowContinueError("Estimated part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
-                                    ShowContinueErrorTimeStamp(
+                                    ShowContinueError(state, format("Estimated part-load ratio = {:.3R}", PartLoadFrac));
+                                    ShowContinueErrorTimeStamp(state,
                                         "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
                                 }
-                                ShowRecurringWarningErrorAtEnd(
+                                ShowRecurringWarningErrorAtEnd(state,
                                     SystemType + " \"" + CoilName +
                                         "\" - DX unit latent part-load ratio calculation failed error continues. Latent PLR statistics follow.",
                                     LatPLRFailIndex,
@@ -4316,7 +4311,8 @@ namespace PackagedThermalStorageCoil {
         }
     }
 
-    Real64 TESCoilResidualFunction(Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 TESCoilResidualFunction(EnergyPlusData &state,
+                                   Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                    Array1D<Real64> const &Par  // par(1) = DX coil number
     )
     {
@@ -4379,13 +4375,13 @@ namespace PackagedThermalStorageCoil {
         {
             auto const SELECT_CASE_var(TESOpMode);
             if (SELECT_CASE_var == CoolingOnlyMode) {
-                CalcTESCoilCoolingOnlyMode(CoilIndex, FanOpMode, PartLoadRatio);
+                CalcTESCoilCoolingOnlyMode(state, CoilIndex, FanOpMode, PartLoadRatio);
             } else if (SELECT_CASE_var == CoolingAndChargeMode) {
-                CalcTESCoilCoolingAndChargeMode(CoilIndex, FanOpMode, PartLoadRatio);
+                CalcTESCoilCoolingAndChargeMode(state, CoilIndex, FanOpMode, PartLoadRatio);
             } else if (SELECT_CASE_var == CoolingAndDischargeMode) {
-                CalcTESCoilCoolingAndDischargeMode(CoilIndex, FanOpMode, PartLoadRatio);
+                CalcTESCoilCoolingAndDischargeMode(state, CoilIndex, FanOpMode, PartLoadRatio);
             } else if (SELECT_CASE_var == DischargeOnlyMode) {
-                CalcTESCoilDischargeOnlyMode(CoilIndex, PartLoadRatio);
+                CalcTESCoilDischargeOnlyMode(state, CoilIndex, PartLoadRatio);
             }
         }
 
@@ -4395,7 +4391,8 @@ namespace PackagedThermalStorageCoil {
         return Residuum;
     }
 
-    Real64 TESCoilHumRatResidualFunction(Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 TESCoilHumRatResidualFunction(EnergyPlusData &state,
+                                         Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                          Array1D<Real64> const &Par  // par(1) = DX coil number
     )
     {
@@ -4458,13 +4455,13 @@ namespace PackagedThermalStorageCoil {
         {
             auto const SELECT_CASE_var(TESOpMode);
             if (SELECT_CASE_var == CoolingOnlyMode) {
-                CalcTESCoilCoolingOnlyMode(CoilIndex, FanOpMode, PartLoadRatio);
+                CalcTESCoilCoolingOnlyMode(state, CoilIndex, FanOpMode, PartLoadRatio);
             } else if (SELECT_CASE_var == CoolingAndChargeMode) {
-                CalcTESCoilCoolingAndChargeMode(CoilIndex, FanOpMode, PartLoadRatio);
+                CalcTESCoilCoolingAndChargeMode(state, CoilIndex, FanOpMode, PartLoadRatio);
             } else if (SELECT_CASE_var == CoolingAndDischargeMode) {
-                CalcTESCoilCoolingAndDischargeMode(CoilIndex, FanOpMode, PartLoadRatio);
+                CalcTESCoilCoolingAndDischargeMode(state, CoilIndex, FanOpMode, PartLoadRatio);
             } else if (SELECT_CASE_var == DischargeOnlyMode) {
-                CalcTESCoilDischargeOnlyMode(CoilIndex, PartLoadRatio);
+                CalcTESCoilDischargeOnlyMode(state, CoilIndex, PartLoadRatio);
             }
         }
 
@@ -4474,7 +4471,7 @@ namespace PackagedThermalStorageCoil {
         return Residuum;
     }
 
-    void UpdateTEStorage(int const TESCoilNum)
+    void UpdateTEStorage(EnergyPlusData &state, int const TESCoilNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -4510,13 +4507,13 @@ namespace PackagedThermalStorageCoil {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // na
         if (TESCoil(TESCoilNum).StorageMedia == FluidBased) {
-            CalcTESWaterStorageTank(TESCoilNum);
+            CalcTESWaterStorageTank(state, TESCoilNum);
         } else if (TESCoil(TESCoilNum).StorageMedia == IceBased) {
-            CalcTESIceStorageTank(TESCoilNum);
+            CalcTESIceStorageTank(state, TESCoilNum);
         }
     }
 
-    void CalcTESWaterStorageTank(int const TESCoilNum)
+    void CalcTESWaterStorageTank(EnergyPlusData &state, int const TESCoilNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -4535,10 +4532,6 @@ namespace PackagedThermalStorageCoil {
         // na
 
         // Using/Aliasing
-        using DataBranchAirLoopPlant::MassFlowTolerance;
-        using DataGlobals::HourOfDay;
-        using DataGlobals::TimeStep;
-        using DataGlobals::TimeStepZone;
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
         using DataPlant::PlantLoop;
@@ -4580,10 +4573,10 @@ namespace PackagedThermalStorageCoil {
         Real64 QdotTES;            // heat exchange directly into tank from charging system [W]
         Real64 NewOutletTemp;      // calculated new tankoutlet temp (C)
 
-        SecInTimeStep = TimeStepSys * SecInHour;
+        SecInTimeStep = TimeStepSys * DataGlobalConstants::SecInHour();
         TimeRemaining = SecInTimeStep;
 
-        TimeElapsed = HourOfDay + TimeStep * TimeStepZone + SysTimeElapsed;
+        TimeElapsed = state.dataGlobal->HourOfDay + state.dataGlobal->TimeStep * state.dataGlobal->TimeStepZone + SysTimeElapsed;
 
         if (TESCoil(TESCoilNum).TimeElapsed != TimeElapsed) {
             TESCoil(TESCoilNum).FluidTankTempFinalLastTimestep = TESCoil(TESCoilNum).FluidTankTempFinal;
@@ -4594,9 +4587,9 @@ namespace PackagedThermalStorageCoil {
         AmbientTemp = Node(TESCoil(TESCoilNum).StorageAmbientNodeNum).Temp;
         UseInletTemp = Node(TESCoil(TESCoilNum).TESPlantInletNodeNum).Temp;
         SourceInletTemp = TESCoil(TESCoilNum).FluidTankTempFinalLastTimestep;
-        rho = GetDensityGlycol(TESCoil(TESCoilNum).StorageFluidName, TankTemp, TESCoil(TESCoilNum).StorageFluidIndex, RoutineName);
+        rho = GetDensityGlycol(state, TESCoil(TESCoilNum).StorageFluidName, TankTemp, TESCoil(TESCoilNum).StorageFluidIndex, RoutineName);
         TankMass = rho * TESCoil(TESCoilNum).FluidStorageVolume;
-        CpTank = GetSpecificHeatGlycol(TESCoil(TESCoilNum).StorageFluidName, TankTemp, TESCoil(TESCoilNum).StorageFluidIndex, RoutineName);
+        CpTank = GetSpecificHeatGlycol(state, TESCoil(TESCoilNum).StorageFluidName, TankTemp, TESCoil(TESCoilNum).StorageFluidIndex, RoutineName);
 
         if (TESCoil(TESCoilNum).TESPlantConnectionAvailable) {
             UseMassFlowRate = Node(TESCoil(TESCoilNum).TESPlantInletNodeNum).MassFlowRate * TESCoil(TESCoilNum).TESPlantEffectiveness;
@@ -4608,30 +4601,30 @@ namespace PackagedThermalStorageCoil {
         QdotTES = TESCoil(TESCoilNum).QdotTES;
 
         NewTankTemp = WaterThermalTanks::WaterThermalTankData::CalcTankTemp(TankTemp,
-                                   AmbientTemp,
-                                   UseInletTemp,
-                                   SourceInletTemp,
-                                   TankMass,
-                                   CpTank,
-                                   UseMassFlowRate,
-                                   SourceMassFlowRate,
-                                   LossCoeff,
-                                   QdotTES,
-                                   TimeRemaining);
+                                                                            AmbientTemp,
+                                                                            UseInletTemp,
+                                                                            SourceInletTemp,
+                                                                            TankMass,
+                                                                            CpTank,
+                                                                            UseMassFlowRate,
+                                                                            SourceMassFlowRate,
+                                                                            LossCoeff,
+                                                                            QdotTES,
+                                                                            TimeRemaining);
 
         TESCoil(TESCoilNum).FluidTankTempFinal = NewTankTemp;
 
         if (TESCoil(TESCoilNum).TESPlantConnectionAvailable) {
-            CpPlantConnection = GetSpecificHeatGlycol(PlantLoop(TESCoil(TESCoilNum).TESPlantLoopNum).FluidName,
+            CpPlantConnection = GetSpecificHeatGlycol(state, PlantLoop(TESCoil(TESCoilNum).TESPlantLoopNum).FluidName,
                                                       Node(TESCoil(TESCoilNum).TESPlantInletNodeNum).Temp,
                                                       PlantLoop(TESCoil(TESCoilNum).TESPlantLoopNum).FluidIndex,
                                                       calcTESIceStorageTank);
 
             TESCoil(TESCoilNum).QdotPlant = Node(TESCoil(TESCoilNum).TESPlantInletNodeNum).MassFlowRate * CpPlantConnection *
                                             TESCoil(TESCoilNum).TESPlantEffectiveness * (UseInletTemp - NewTankTemp);
-            TESCoil(TESCoilNum).Q_Plant = TESCoil(TESCoilNum).QdotPlant * TimeStepSys * SecInHour;
+            TESCoil(TESCoilNum).Q_Plant = TESCoil(TESCoilNum).QdotPlant * TimeStepSys * DataGlobalConstants::SecInHour();
             // now get correct outlet temp with actual massflow (not modified by effectiveness)
-            if (Node(TESCoil(TESCoilNum).TESPlantInletNodeNum).MassFlowRate > MassFlowTolerance) {
+            if (Node(TESCoil(TESCoilNum).TESPlantInletNodeNum).MassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
                 NewOutletTemp =
                     UseInletTemp - TESCoil(TESCoilNum).QdotPlant / (Node(TESCoil(TESCoilNum).TESPlantInletNodeNum).MassFlowRate * CpPlantConnection);
             } else {
@@ -4641,22 +4634,22 @@ namespace PackagedThermalStorageCoil {
         }
 
         deltaTsum = WaterThermalTankData::CalcTempIntegral(TankTemp,
-                                     NewTankTemp,
-                                     AmbientTemp,
-                                     UseInletTemp,
-                                     SourceInletTemp,
-                                     TankMass,
-                                     CpTank,
-                                     UseMassFlowRate,
-                                     SourceMassFlowRate,
-                                     LossCoeff,
-                                     QdotTES,
-                                     TimeRemaining);
+                                                           NewTankTemp,
+                                                           AmbientTemp,
+                                                           UseInletTemp,
+                                                           SourceInletTemp,
+                                                           TankMass,
+                                                           CpTank,
+                                                           UseMassFlowRate,
+                                                           SourceMassFlowRate,
+                                                           LossCoeff,
+                                                           QdotTES,
+                                                           TimeRemaining);
         TESCoil(TESCoilNum).QdotAmbient = (LossCoeff * (AmbientTemp * TimeRemaining - deltaTsum)) / SecInTimeStep;
-        TESCoil(TESCoilNum).Q_Ambient = TESCoil(TESCoilNum).QdotAmbient * TimeStepSys * SecInHour;
+        TESCoil(TESCoilNum).Q_Ambient = TESCoil(TESCoilNum).QdotAmbient * TimeStepSys * DataGlobalConstants::SecInHour();
     }
 
-    void CalcTESIceStorageTank(int const TESCoilNum)
+    void CalcTESIceStorageTank(EnergyPlusData &state, int const TESCoilNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -4675,10 +4668,6 @@ namespace PackagedThermalStorageCoil {
         // na
 
         // Using/Aliasing
-        using DataBranchAirLoopPlant::MassFlowTolerance;
-        using DataGlobals::HourOfDay;
-        using DataGlobals::TimeStep;
-        using DataGlobals::TimeStepZone;
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
         using DataPlant::PlantLoop;
@@ -4703,7 +4692,7 @@ namespace PackagedThermalStorageCoil {
         Real64 TimeElapsed;   // Fraction of the current hour that has elapsed (h)
         Real64 NewOutletTemp; // calculated new tankoutlet temp (C)
 
-        TimeElapsed = HourOfDay + TimeStep * TimeStepZone + SysTimeElapsed;
+        TimeElapsed = state.dataGlobal->HourOfDay + state.dataGlobal->TimeStep * state.dataGlobal->TimeStepZone + SysTimeElapsed;
 
         if (TESCoil(TESCoilNum).TimeElapsed != TimeElapsed) {
             TESCoil(TESCoilNum).IceFracRemainLastTimestep = TESCoil(TESCoilNum).IceFracRemain;
@@ -4712,7 +4701,7 @@ namespace PackagedThermalStorageCoil {
 
         // update plant connection (if any)
         if (TESCoil(TESCoilNum).TESPlantConnectionAvailable) {
-            Cp = GetSpecificHeatGlycol(PlantLoop(TESCoil(TESCoilNum).TESPlantLoopNum).FluidName,
+            Cp = GetSpecificHeatGlycol(state, PlantLoop(TESCoil(TESCoilNum).TESPlantLoopNum).FluidName,
                                        Node(TESCoil(TESCoilNum).TESPlantInletNodeNum).Temp,
                                        PlantLoop(TESCoil(TESCoilNum).TESPlantLoopNum).FluidIndex,
                                        RoutineName);
@@ -4720,9 +4709,9 @@ namespace PackagedThermalStorageCoil {
             TESCoil(TESCoilNum).QdotPlant = Node(TESCoil(TESCoilNum).TESPlantInletNodeNum).MassFlowRate * Cp *
                                             TESCoil(TESCoilNum).TESPlantEffectiveness *
                                             (Node(TESCoil(TESCoilNum).TESPlantInletNodeNum).Temp - FreezingTemp);
-            TESCoil(TESCoilNum).Q_Plant = TESCoil(TESCoilNum).QdotPlant * TimeStepSys * SecInHour;
+            TESCoil(TESCoilNum).Q_Plant = TESCoil(TESCoilNum).QdotPlant * TimeStepSys * DataGlobalConstants::SecInHour();
             // now get correct outlet temp with actual massflow (not modified by effectiveness)
-            if (Node(TESCoil(TESCoilNum).TESPlantInletNodeNum).MassFlowRate > MassFlowTolerance) {
+            if (Node(TESCoil(TESCoilNum).TESPlantInletNodeNum).MassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
                 NewOutletTemp = Node(TESCoil(TESCoilNum).TESPlantInletNodeNum).Temp +
                                 TESCoil(TESCoilNum).QdotPlant / (Node(TESCoil(TESCoilNum).TESPlantInletNodeNum).MassFlowRate * Cp);
             } else {
@@ -4737,22 +4726,22 @@ namespace PackagedThermalStorageCoil {
         // update ambient heat transfer
 
         TESCoil(TESCoilNum).QdotAmbient = TESCoil(TESCoilNum).StorageUA * (Node(TESCoil(TESCoilNum).StorageAmbientNodeNum).Temp - FreezingTemp);
-        TESCoil(TESCoilNum).Q_Ambient = TESCoil(TESCoilNum).QdotAmbient * TimeStepSys * SecInHour;
+        TESCoil(TESCoilNum).Q_Ambient = TESCoil(TESCoilNum).QdotAmbient * TimeStepSys * DataGlobalConstants::SecInHour();
 
         QdotIce = TESCoil(TESCoilNum).QdotPlant + TESCoil(TESCoilNum).QdotAmbient + TESCoil(TESCoilNum).QdotTES;
 
         if (QdotIce < 0.0) { // charging ice level
             TESCoil(TESCoilNum).IceFracRemain = TESCoil(TESCoilNum).IceFracRemainLastTimestep +
-                                                std::abs(QdotIce) / (TESCoil(TESCoilNum).IceStorageCapacity / (TimeStepSys * SecInHour));
+                                                std::abs(QdotIce) / (TESCoil(TESCoilNum).IceStorageCapacity / (TimeStepSys * DataGlobalConstants::SecInHour()));
             if (TESCoil(TESCoilNum).IceFracRemain > 1.0) TESCoil(TESCoilNum).IceFracRemain = 1.0;
         } else { // not charging,but discharging
             TESCoil(TESCoilNum).IceFracRemain =
-                TESCoil(TESCoilNum).IceFracRemainLastTimestep - QdotIce / (TESCoil(TESCoilNum).IceStorageCapacity / (TimeStepSys * SecInHour));
+                TESCoil(TESCoilNum).IceFracRemainLastTimestep - QdotIce / (TESCoil(TESCoilNum).IceStorageCapacity / (TimeStepSys * DataGlobalConstants::SecInHour()));
             if (TESCoil(TESCoilNum).IceFracRemain < 0.0) TESCoil(TESCoilNum).IceFracRemain = 0.0;
         }
     }
 
-    void UpdateColdWeatherProtection(int const TESCoilNum)
+    void UpdateColdWeatherProtection(EnergyPlusData &state, int const TESCoilNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -4789,16 +4778,16 @@ namespace PackagedThermalStorageCoil {
         // na
 
         if ((Node(TESCoil(TESCoilNum).StorageAmbientNodeNum).Temp < TESCoil(TESCoilNum).ColdWeatherMinimumTempLimit) &&
-            (GetCurrentScheduleValue(TESCoil(TESCoilNum).AvailSchedNum) != 0.0)) {
+            (GetCurrentScheduleValue(state, TESCoil(TESCoilNum).AvailSchedNum) != 0.0)) {
             TESCoil(TESCoilNum).ElectColdWeatherPower = TESCoil(TESCoilNum).ColdWeatherAncillaryPower;
 
         } else {
             TESCoil(TESCoilNum).ElectColdWeatherPower = 0.0;
         }
-        TESCoil(TESCoilNum).ElectColdWeatherEnergy = TESCoil(TESCoilNum).ElectColdWeatherPower * TimeStepSys * SecInHour;
+        TESCoil(TESCoilNum).ElectColdWeatherEnergy = TESCoil(TESCoilNum).ElectColdWeatherPower * TimeStepSys * DataGlobalConstants::SecInHour();
     }
 
-    void UpdateEvaporativeCondenserBasinHeater(int const TESCoilNum)
+    void UpdateEvaporativeCondenserBasinHeater(EnergyPlusData &state, int const TESCoilNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -4833,15 +4822,16 @@ namespace PackagedThermalStorageCoil {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // na
-        CalcBasinHeaterPower(TESCoil(TESCoilNum).BasinHeaterPowerFTempDiff,
+        CalcBasinHeaterPower(state,
+                             TESCoil(TESCoilNum).BasinHeaterPowerFTempDiff,
                              TESCoil(TESCoilNum).BasinHeaterAvailSchedNum,
                              TESCoil(TESCoilNum).BasinHeaterSetpointTemp,
                              TESCoil(TESCoilNum).ElectEvapCondBasinHeaterPower);
 
-        TESCoil(TESCoilNum).ElectEvapCondBasinHeaterEnergy = TESCoil(TESCoilNum).ElectEvapCondBasinHeaterPower * TimeStepSys * SecInHour;
+        TESCoil(TESCoilNum).ElectEvapCondBasinHeaterEnergy = TESCoil(TESCoilNum).ElectEvapCondBasinHeaterPower * TimeStepSys * DataGlobalConstants::SecInHour();
     }
 
-    void UpdateEvaporativeCondenserWaterUse(int const TESCoilNum, Real64 const HumRatAfterEvap, int const InletNodeNum)
+    void UpdateEvaporativeCondenserWaterUse(EnergyPlusData &state, int const TESCoilNum, Real64 const HumRatAfterEvap, int const InletNodeNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -4860,7 +4850,6 @@ namespace PackagedThermalStorageCoil {
         // na
 
         // Using/Aliasing
-        using DataWater::WaterStorage;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -4884,13 +4873,13 @@ namespace PackagedThermalStorageCoil {
 
         // Set the demand request for supply water from water storage tank (if needed)
         if (TESCoil(TESCoilNum).EvapWaterSupplyMode == WaterSupplyFromTank) {
-            WaterStorage(TESCoil(TESCoilNum).EvapWaterSupTankID).VdotRequestDemand(TESCoil(TESCoilNum).EvapWaterTankDemandARRID) =
+            state.dataWaterData->WaterStorage(TESCoil(TESCoilNum).EvapWaterSupTankID).VdotRequestDemand(TESCoil(TESCoilNum).EvapWaterTankDemandARRID) =
                 TESCoil(TESCoilNum).EvapWaterConsumpRate;
         }
 
         // check if should be starved by restricted flow from tank
         if (TESCoil(TESCoilNum).EvapWaterSupplyMode == WaterSupplyFromTank) {
-            AvailWaterRate = WaterStorage(TESCoil(TESCoilNum).EvapWaterSupTankID).VdotAvailDemand(TESCoil(TESCoilNum).EvapWaterTankDemandARRID);
+            AvailWaterRate = state.dataWaterData->WaterStorage(TESCoil(TESCoilNum).EvapWaterSupTankID).VdotAvailDemand(TESCoil(TESCoilNum).EvapWaterTankDemandARRID);
             if (AvailWaterRate < TESCoil(TESCoilNum).EvapWaterConsumpRate) {
                 TESCoil(TESCoilNum).EvapWaterStarvMakupRate = TESCoil(TESCoilNum).EvapWaterConsumpRate - AvailWaterRate;
                 TESCoil(TESCoilNum).EvapWaterConsumpRate = AvailWaterRate;
@@ -4899,13 +4888,14 @@ namespace PackagedThermalStorageCoil {
             }
         }
 
-        TESCoil(TESCoilNum).EvapWaterConsump = TESCoil(TESCoilNum).EvapWaterConsumpRate * TimeStepSys * SecInHour;
-        TESCoil(TESCoilNum).EvapWaterStarvMakup = TESCoil(TESCoilNum).EvapWaterStarvMakupRate * TimeStepSys * SecInHour;
+        TESCoil(TESCoilNum).EvapWaterConsump = TESCoil(TESCoilNum).EvapWaterConsumpRate * TimeStepSys * DataGlobalConstants::SecInHour();
+        TESCoil(TESCoilNum).EvapWaterStarvMakup = TESCoil(TESCoilNum).EvapWaterStarvMakupRate * TimeStepSys * DataGlobalConstants::SecInHour();
         TESCoil(TESCoilNum).EvapCondPumpElecPower = TESCoil(TESCoilNum).EvapCondPumpElecNomPower * TESCoil(TESCoilNum).CondenserRuntimeFraction;
-        TESCoil(TESCoilNum).EvapCondPumpElecConsumption = TESCoil(TESCoilNum).EvapCondPumpElecPower * TimeStepSys * SecInHour;
+        TESCoil(TESCoilNum).EvapCondPumpElecConsumption = TESCoil(TESCoilNum).EvapCondPumpElecPower * TimeStepSys * DataGlobalConstants::SecInHour();
     }
 
-    void GetTESCoilIndex(EnergyPlusData &state, std::string const &CoilName, int &CoilIndex, bool &ErrorsFound, Optional_string_const CurrentModuleObject)
+    void
+    GetTESCoilIndex(EnergyPlusData &state, std::string const &CoilName, int &CoilIndex, bool &ErrorsFound, Optional_string_const CurrentModuleObject)
     {
 
         // SUBROUTINE INFORMATION:
@@ -4932,15 +4922,16 @@ namespace PackagedThermalStorageCoil {
 
         if (CoilIndex == 0) {
             if (present(CurrentModuleObject)) {
-                ShowSevereError(CurrentModuleObject() + ", GetTESCoilIndex: TES Cooling Coil not found=" + CoilName);
+                ShowSevereError(state, CurrentModuleObject() + ", GetTESCoilIndex: TES Cooling Coil not found=" + CoilName);
             } else {
-                ShowSevereError("GetTESCoilIndex: TES Cooling Coil not found=" + CoilName);
+                ShowSevereError(state, "GetTESCoilIndex: TES Cooling Coil not found=" + CoilName);
             }
             ErrorsFound = true;
         }
     }
 
-    void GetTESCoilAirInletNode(EnergyPlusData &state, std::string const &CoilName, int &CoilAirInletNode, bool &ErrorsFound, std::string const &CurrentModuleObject)
+    void GetTESCoilAirInletNode(
+        EnergyPlusData &state, std::string const &CoilName, int &CoilAirInletNode, bool &ErrorsFound, std::string const &CurrentModuleObject)
     {
 
         // SUBROUTINE INFORMATION:
@@ -4969,7 +4960,7 @@ namespace PackagedThermalStorageCoil {
         }
 
         if (CoilIndex == 0) {
-            ShowSevereError(CurrentModuleObject + ", GetTESCoilAirInletNode: TES Cooling Coil not found=" + CoilName);
+            ShowSevereError(state, CurrentModuleObject + ", GetTESCoilAirInletNode: TES Cooling Coil not found=" + CoilName);
             ErrorsFound = true;
             CoilAirInletNode = 0;
         } else {
@@ -4977,7 +4968,8 @@ namespace PackagedThermalStorageCoil {
         }
     }
 
-    void GetTESCoilAirOutletNode(EnergyPlusData &state, std::string const &CoilName, int &CoilAirOutletNode, bool &ErrorsFound, std::string const &CurrentModuleObject)
+    void GetTESCoilAirOutletNode(
+        EnergyPlusData &state, std::string const &CoilName, int &CoilAirOutletNode, bool &ErrorsFound, std::string const &CurrentModuleObject)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5006,7 +4998,7 @@ namespace PackagedThermalStorageCoil {
         }
 
         if (CoilIndex == 0) {
-            ShowSevereError(CurrentModuleObject + ", GetTESCoilAirOutletNode: TES Cooling Coil not found=" + CoilName);
+            ShowSevereError(state, CurrentModuleObject + ", GetTESCoilAirOutletNode: TES Cooling Coil not found=" + CoilName);
             ErrorsFound = true;
             CoilAirOutletNode = 0;
         } else {
@@ -5014,7 +5006,8 @@ namespace PackagedThermalStorageCoil {
         }
     }
 
-    void GetTESCoilCoolingCapacity(EnergyPlusData &state, std::string const &CoilName, Real64 &CoilCoolCapacity, bool &ErrorsFound, std::string const &CurrentModuleObject)
+    void GetTESCoilCoolingCapacity(
+        EnergyPlusData &state, std::string const &CoilName, Real64 &CoilCoolCapacity, bool &ErrorsFound, std::string const &CurrentModuleObject)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5043,7 +5036,7 @@ namespace PackagedThermalStorageCoil {
         }
 
         if (CoilIndex == 0) {
-            ShowSevereError(CurrentModuleObject + ", GetTESCoilCoolingCapacity: TES Cooling Coil not found=" + CoilName);
+            ShowSevereError(state, CurrentModuleObject + ", GetTESCoilCoolingCapacity: TES Cooling Coil not found=" + CoilName);
             ErrorsFound = true;
             CoilCoolCapacity = 0.0;
         } else {
@@ -5059,7 +5052,8 @@ namespace PackagedThermalStorageCoil {
         }
     }
 
-    void GetTESCoilCoolingAirFlowRate(EnergyPlusData &state, std::string const &CoilName, Real64 &CoilCoolAirFlow, bool &ErrorsFound, std::string const &CurrentModuleObject)
+    void GetTESCoilCoolingAirFlowRate(
+        EnergyPlusData &state, std::string const &CoilName, Real64 &CoilCoolAirFlow, bool &ErrorsFound, std::string const &CurrentModuleObject)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5088,7 +5082,7 @@ namespace PackagedThermalStorageCoil {
         }
 
         if (CoilIndex == 0) {
-            ShowSevereError(CurrentModuleObject + ", GetTESCoilCoolingCapacity: TES Cooling Coil not found=" + CoilName);
+            ShowSevereError(state, CurrentModuleObject + ", GetTESCoilCoolingCapacity: TES Cooling Coil not found=" + CoilName);
             ErrorsFound = true;
             CoilCoolAirFlow = 0.0;
         } else {

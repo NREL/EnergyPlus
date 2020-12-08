@@ -55,6 +55,7 @@
 #include <EnergyPlus/Material.hh>
 #include "Fixtures/SQLiteFixture.hh"
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 
@@ -117,10 +118,10 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createSQLiteEnvironmentPeriodRecord)
     EnergyPlus::sqlite->sqliteBegin();
     // There needs to be a simulation record otherwise the foreign key constraint will fail
     EnergyPlus::sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
-    EnergyPlus::sqlite->createSQLiteEnvironmentPeriodRecord(1, "CHICAGO ANN HTG 99.6% CONDNS DB", 1);
-    EnergyPlus::sqlite->createSQLiteEnvironmentPeriodRecord(2, "CHICAGO ANN CLG .4% CONDNS WB=>MDB", 1, 1);
-    EnergyPlus::sqlite->createSQLiteEnvironmentPeriodRecord(3, "CHICAGO ANN HTG 99.6% CONDNS DB", 2);
-    EnergyPlus::sqlite->createSQLiteEnvironmentPeriodRecord(4, "CHICAGO ANN CLG .4% CONDNS WB=>MDB", 3, 1);
+    EnergyPlus::sqlite->createSQLiteEnvironmentPeriodRecord(1, "CHICAGO ANN HTG 99.6% CONDNS DB", DataGlobalConstants::KindOfSim::DesignDay);
+    EnergyPlus::sqlite->createSQLiteEnvironmentPeriodRecord(2, "CHICAGO ANN CLG .4% CONDNS WB=>MDB", DataGlobalConstants::KindOfSim::DesignDay, 1);
+    EnergyPlus::sqlite->createSQLiteEnvironmentPeriodRecord(3, "CHICAGO ANN HTG 99.6% CONDNS DB", DataGlobalConstants::KindOfSim::RunPeriodDesign);
+    EnergyPlus::sqlite->createSQLiteEnvironmentPeriodRecord(4, "CHICAGO ANN CLG .4% CONDNS WB=>MDB", DataGlobalConstants::KindOfSim::RunPeriodWeather, 1);
     auto result = queryResult("SELECT * FROM EnvironmentPeriods;", "EnvironmentPeriods");
     EnergyPlus::sqlite->sqliteCommit();
 
@@ -136,9 +137,9 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createSQLiteEnvironmentPeriodRecord)
 
     EnergyPlus::sqlite->sqliteBegin();
     // This should fail to insert due to foreign key constraint
-    EnergyPlus::sqlite->createSQLiteEnvironmentPeriodRecord(5, "CHICAGO ANN HTG 99.6% CONDNS DB", 1, 100);
+    EnergyPlus::sqlite->createSQLiteEnvironmentPeriodRecord(5, "CHICAGO ANN HTG 99.6% CONDNS DB", DataGlobalConstants::KindOfSim::DesignDay, 100);
     // This should fail to insert due to duplicate primary key
-    EnergyPlus::sqlite->createSQLiteEnvironmentPeriodRecord(4, "CHICAGO ANN CLG .4% CONDNS WB=>MDB", 1, 1);
+    EnergyPlus::sqlite->createSQLiteEnvironmentPeriodRecord(4, "CHICAGO ANN CLG .4% CONDNS WB=>MDB", DataGlobalConstants::KindOfSim::DesignDay, 1);
     result = queryResult("SELECT * FROM EnvironmentPeriods;", "EnvironmentPeriods");
     EnergyPlus::sqlite->sqliteCommit();
 
@@ -209,7 +210,7 @@ TEST_F(SQLiteFixture, SQLiteProcedures_informationalErrorRecords)
     // There needs to be a simulation record otherwise the foreign key constraint will fail
     EnergyPlus::sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
-    ShowMessage("This is an informational message");
+    ShowMessage(*state, "This is an informational message");
 
     auto result = queryResult("SELECT * FROM Errors;", "Errors");
     EnergyPlus::sqlite->sqliteCommit();

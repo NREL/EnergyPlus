@@ -48,7 +48,9 @@
     YES,                     !- Do System Sizing Calculation
     NO,                      !- Do Plant Sizing Calculation
     YES,                     !- Run Simulation for Sizing Periods
-    NO;                      !- Run Simulation for Weather File Run Periods
+    NO,                      !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
   Building,
     Ref Bldg Stand-alone Retail New2004_v1.3_5.0,  !- Name
@@ -3784,7 +3786,7 @@
 
   UtilityCost:Tariff,
     IN_EIAMonthlyRateGas,    !- Name
-    Gas:Facility,            !- Output Meter Name
+    NaturalGas:Facility,     !- Output Meter Name
     MCF,                     !- Conversion Factor Choice
     ,                        !- Energy Conversion Factor
     ,                        !- Demand Conversion Factor
@@ -7748,7 +7750,7 @@
   EnergyManagementSystem:Sensor,
     QdotElec_1,              !- Name
     PSZ-AC:1_CoolC DXCoil,   !- Output:Variable or Output:Meter Index Key Name
-    Cooling Coil Electric Power;  !- Output:Variable or Output:Meter Name
+    Cooling Coil Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     QdotEvap_2,              !- Name
@@ -7758,7 +7760,7 @@
   EnergyManagementSystem:Sensor,
     QdotElec_2,              !- Name
     PSZ-AC:2_CoolC DXCoil,   !- Output:Variable or Output:Meter Index Key Name
-    Cooling Coil Electric Power;  !- Output:Variable or Output:Meter Name
+    Cooling Coil Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     QdotEvap_3,              !- Name
@@ -7768,7 +7770,7 @@
   EnergyManagementSystem:Sensor,
     QdotElec_3,              !- Name
     PSZ-AC:3_CoolC DXCoil,   !- Output:Variable or Output:Meter Index Key Name
-    Cooling Coil Electric Power;  !- Output:Variable or Output:Meter Name
+    Cooling Coil Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     QdotEvap_4,              !- Name
@@ -7778,7 +7780,7 @@
   EnergyManagementSystem:Sensor,
     QdotElec_4,              !- Name
     PSZ-AC:4_CoolC DXCoil,   !- Output:Variable or Output:Meter Index Key Name
-    Cooling Coil Electric Power;  !- Output:Variable or Output:Meter Name
+    Cooling Coil Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:GlobalVariable,
     QdotCond;                !- Erl Variable 1 Name
@@ -8104,15 +8106,15 @@
 
   Output:Variable,*,Cooling Coil Latent Cooling Energy,hourly;
 
-  Output:Variable,*,Cooling Coil Electric Power,hourly;
+  Output:Variable,*,Cooling Coil Electricity Rate,hourly;
 
-  Output:Variable,*,Cooling Coil Electric Energy,hourly;
+  Output:Variable,*,Cooling Coil Electricity Energy,hourly;
 
   Output:Variable,*,Cooling Coil Runtime Fraction,hourly;
 
-  Output:Variable,*,Cooling Coil Cold Weather Protection Electric Energy,hourly;
+  Output:Variable,*,Cooling Coil Cold Weather Protection Electricity Energy,hourly;
 
-  Output:Variable,*,Cooling Coil Cold Weather Protection Electric Power,hourly;
+  Output:Variable,*,Cooling Coil Cold Weather Protection Electricity Rate,hourly;
 
   Output:Variable,*,Cooling Coil Thermal Storage Mechanical Heat Transfer Rate,hourly;
 
@@ -8132,13 +8134,13 @@
 
   Output:Variable,*,Cooling Coil Evaporative Condenser Mains Supply Water Volume,hourly;
 
-  Output:Variable,*,Cooling Coil Evaporative Condenser Pump Electric Power,hourly;
+  Output:Variable,*,Cooling Coil Evaporative Condenser Pump Electricity Rate,hourly;
 
-  Output:Variable,*,Cooling Coil Evaporative Condenser Pump Electric Energy,hourly;
+  Output:Variable,*,Cooling Coil Evaporative Condenser Pump Electricity Energy,hourly;
 
-  Output:Variable,*,Cooling Coil Basin Heater Electric Power,hourly;
+  Output:Variable,*,Cooling Coil Basin Heater Electricity Rate,hourly;
 
-  Output:Variable,*,Cooling Coil Basin Heater Electric Energy,hourly;
+  Output:Variable,*,Cooling Coil Basin Heater Electricity Energy,hourly;
 
   Output:Variable,*,Cooling Coil Ice Thermal Storage End Fraction,hourly;
 
@@ -8156,9 +8158,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:Plant,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Plant,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Plant,monthly;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,runperiod;
 
@@ -8170,7 +8172,7 @@
 
   Output:Meter:MeterFileOnly,Electricity:Plant,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:Plant,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:Plant,runperiod;
 

@@ -127,7 +127,9 @@
     No,                      !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
     Yes,                     !- Run Simulation for Sizing Periods
-    No;                      !- Run Simulation for Weather File Run Periods
+    No,                      !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
   RunPeriod,
     Run Period 1,            !- Name
@@ -1305,9 +1307,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:HVAC,monthly;
 
-  Output:Meter:MeterFileOnly,FuelOil#2:Facility,monthly;
+  Output:Meter:MeterFileOnly,FuelOilNo2:Facility,monthly;
 
-  Output:Meter:MeterFileOnly,FuelOil#2:HVAC,monthly;
+  Output:Meter:MeterFileOnly,FuelOilNo2:HVAC,monthly;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,runperiod;
 
@@ -1317,9 +1319,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:HVAC,runperiod;
 
-  Output:Meter:MeterFileOnly,FuelOil#2:Facility,runperiod;
+  Output:Meter:MeterFileOnly,FuelOilNo2:Facility,runperiod;
 
-  Output:Meter:MeterFileOnly,FuelOil#2:HVAC,runperiod;
+  Output:Meter:MeterFileOnly,FuelOilNo2:HVAC,runperiod;
 
   Output:VariableDictionary,Regular;
 

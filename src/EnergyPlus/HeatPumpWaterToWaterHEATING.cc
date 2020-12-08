@@ -54,11 +54,9 @@
 // EnergyPlus Headers
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
-#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
@@ -92,16 +90,6 @@ namespace HeatPumpWaterToWaterHEATING {
     // Which are obtained using Parameter Estimation technique.
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
-    using DataGlobals::BeginEnvrnFlag;
-    using DataGlobals::BeginSimFlag;
-    using DataGlobals::DayOfSim;
-    using DataGlobals::HourOfDay;
-    using DataGlobals::KelvinConv;
-    using DataGlobals::SecInHour;
-    using DataGlobals::TimeStep;
-    using DataGlobals::TimeStepZone;
-    using DataGlobals::WarmupFlag;
     using namespace DataLoopNode;
 
     // MODULE PARAMETER DEFINITIONS
@@ -123,9 +111,9 @@ namespace HeatPumpWaterToWaterHEATING {
         GSHP.deallocate();
     }
 
-    PlantComponent *GshpPeHeatingSpecs::factory(const std::string& objectName) {
+    PlantComponent *GshpPeHeatingSpecs::factory(EnergyPlusData &state, const std::string& objectName) {
         if (GetWWHPHeatingInput) {
-            GetGshpInput();
+            GetGshpInput(state);
             GetWWHPHeatingInput = false;
         }
         for (auto &wwhp : GSHP) {
@@ -134,23 +122,24 @@ namespace HeatPumpWaterToWaterHEATING {
             }
         }
         // If we didn't find it, fatal
-        ShowFatalError(
+        ShowFatalError(state,
                 "WWHPHeatingFactory: Error getting inputs for heat pump named: " + objectName); // LCOV_EXCL_LINE
         // Shut up the compiler
         return nullptr; // LCOV_EXCL_LINE
     }
 
-
-    void GshpPeHeatingSpecs::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad,
-                                      bool EP_UNUSED(RunFlag)) {
+    void GshpPeHeatingSpecs::simulate(
+        EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, [[maybe_unused]] bool RunFlag)
+    {
 
         // Simulate the model for the Demand "MyLoad"
         if (calledFromLocation.loopNum == this->LoadLoopNum) { // chilled water loop
-            this->initialize();
-            this->calculate(CurLoad);
+            this->initialize(state);
+            this->calculate(state, CurLoad);
             this->update();
         } else if (calledFromLocation.loopNum == this->SourceLoopNum) { // condenser loop
-            PlantUtilities::UpdateChillerComponentCondenserSide(this->SourceLoopNum,
+            PlantUtilities::UpdateChillerComponentCondenserSide(state,
+                                                                this->SourceLoopNum,
                                                                 this->SourceLoopSideNum,
                                                                 DataPlant::TypeOf_HPWaterEFHeating,
                                                                 this->SourceSideInletNodeNum,
@@ -161,24 +150,27 @@ namespace HeatPumpWaterToWaterHEATING {
                                                                 this->SourceSideWaterMassFlowRate,
                                                                 FirstHVACIteration);
         } else {
-            ShowFatalError("SimHPWatertoWaterHEATING:: Invalid loop connection " + ModuleCompName + ", Requested Unit=" + this->Name);
+            ShowFatalError(state, "SimHPWatertoWaterHEATING:: Invalid loop connection " + ModuleCompName + ", Requested Unit=" + this->Name);
         }
     }
 
-    void GshpPeHeatingSpecs::getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation),
+    void GshpPeHeatingSpecs::getDesignCapacities([[maybe_unused]] EnergyPlusData &state,
+                                                 [[maybe_unused]] const PlantLocation &calledFromLocation,
                                                  Real64 &MaxLoad,
                                                  Real64 &MinLoad,
-                                                 Real64 &OptLoad) {
+                                                 Real64 &OptLoad)
+    {
         MinLoad = this->NomCap * this->MinPartLoadRat;
         MaxLoad = this->NomCap * this->MaxPartLoadRat;
         OptLoad = this->NomCap * this->OptPartLoadRat;
     }
 
-    void GshpPeHeatingSpecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation)) {
+    void GshpPeHeatingSpecs::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation)
+    {
         if (this->plantScanFlag) {
             // Locate the heating on the plant loops for later usage
             bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(state.dataBranchInputManager,
+            PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
                                                     DataPlant::TypeOf_HPWaterPEHeating,
                                                     this->SourceLoopNum,
@@ -191,7 +183,7 @@ namespace HeatPumpWaterToWaterHEATING {
                                                     _,
                                                     this->SourceSideInletNodeNum,
                                                     _);
-            PlantUtilities::ScanPlantLoopsForObject(state.dataBranchInputManager,
+            PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
                                                     DataPlant::TypeOf_HPWaterPEHeating,
                                                     this->LoadLoopNum,
@@ -205,7 +197,7 @@ namespace HeatPumpWaterToWaterHEATING {
                                                     this->LoadSideInletNodeNum,
                                                     _);
             if (errFlag) {
-                ShowFatalError("InitGshp: Program terminated due to previous condition(s).");
+                ShowFatalError(state, "InitGshp: Program terminated due to previous condition(s).");
             }
 
             PlantUtilities::InterConnectTwoPlantLoopSides(this->LoadLoopNum,
@@ -218,10 +210,9 @@ namespace HeatPumpWaterToWaterHEATING {
         }
     }
 
-
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "readability-magic-numbers"
-    void GetGshpInput()
+    void GetGshpInput(EnergyPlusData &state)
     {
         //       SUBROUTINE INFORMATION:
         //       AUTHOR:
@@ -253,10 +244,10 @@ namespace HeatPumpWaterToWaterHEATING {
 
         static bool ErrorsFound(false);
 
-        NumGSHPs = inputProcessor->getNumObjectsFound(ModuleCompName);
+        NumGSHPs = inputProcessor->getNumObjectsFound(state, ModuleCompName);
 
         if (NumGSHPs <= 0) {
-            ShowSevereError(ModuleCompName + ": No Equipment found");
+            ShowSevereError(state, ModuleCompName + ": No Equipment found");
             ErrorsFound = true;
         }
 
@@ -264,8 +255,8 @@ namespace HeatPumpWaterToWaterHEATING {
         GSHP.allocate(NumGSHPs);
 
         for (GSHPNum = 1; GSHPNum <= NumGSHPs; ++GSHPNum) {
-            inputProcessor->getObjectItem(ModuleCompNameUC, GSHPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat);
-            UtilityRoutines::IsNameEmpty(AlphArray(1), ModuleCompNameUC, ErrorsFound);
+            inputProcessor->getObjectItem(state, ModuleCompNameUC, GSHPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat);
+            UtilityRoutines::IsNameEmpty(state, AlphArray(1), ModuleCompNameUC, ErrorsFound);
 
             GSHP(GSHPNum).Name = AlphArray(1);
 
@@ -273,7 +264,7 @@ namespace HeatPumpWaterToWaterHEATING {
 
             GSHP(GSHPNum).COP = NumArray(1);
             if (NumArray(1) == 0.0) {
-                ShowSevereError(ModuleCompName + ":COP = 0.0, Heatpump=" + AlphArray(1));
+                ShowSevereError(state, ModuleCompName + ":COP = 0.0, Heatpump=" + AlphArray(1));
                 ErrorsFound = true;
             }
 
@@ -288,60 +279,60 @@ namespace HeatPumpWaterToWaterHEATING {
 
             GSHP(GSHPNum).LoadSideVolFlowRate = NumArray(6);
             if (NumArray(6) == 0.0) {
-                ShowSevereError(ModuleCompName + ":Load Side Flow Rate = 0.0, Heatpump=" + AlphArray(1));
+                ShowSevereError(state, ModuleCompName + ":Load Side Flow Rate = 0.0, Heatpump=" + AlphArray(1));
                 ErrorsFound = true;
             }
 
             GSHP(GSHPNum).SourceSideVolFlowRate = NumArray(7);
             if (NumArray(7) == 0.0) {
-                ShowSevereError(ModuleCompName + ":Source Side Flow Rate = 0.0, Heatpump=" + AlphArray(1));
+                ShowSevereError(state, ModuleCompName + ":Source Side Flow Rate = 0.0, Heatpump=" + AlphArray(1));
                 ErrorsFound = true;
             }
 
             GSHP(GSHPNum).LoadSideUACoeff = NumArray(8);
             if (NumArray(8) == 0.0) {
-                ShowSevereError(ModuleCompName + ":Load Side Heat Transfer Coeffcient = 0.0, Heatpump=" + AlphArray(1));
+                ShowSevereError(state, ModuleCompName + ":Load Side Heat Transfer Coeffcient = 0.0, Heatpump=" + AlphArray(1));
                 ErrorsFound = true;
             }
 
             GSHP(GSHPNum).SourceSideUACoeff = NumArray(9);
             if (NumArray(9) == 0.0) {
-                ShowSevereError(ModuleCompName + ":Source Side Heat Transfer Coeffcient = 0.0, Heatpump=" + AlphArray(1));
+                ShowSevereError(state, ModuleCompName + ":Source Side Heat Transfer Coeffcient = 0.0, Heatpump=" + AlphArray(1));
                 ErrorsFound = true;
             }
 
             GSHP(GSHPNum).CompPistonDisp = NumArray(10);
             if (NumArray(10) == 0.0) {
-                ShowSevereError(ModuleCompName + ":Compressor Piston displacement/Storke = 0.0, Heatpump=" + AlphArray(1));
+                ShowSevereError(state, ModuleCompName + ":Compressor Piston displacement/Storke = 0.0, Heatpump=" + AlphArray(1));
                 ErrorsFound = true;
             }
 
             GSHP(GSHPNum).CompClearanceFactor = NumArray(11);
             if (NumArray(11) == 0.0) {
-                ShowSevereError(ModuleCompName + ":Compressor Clearance Factor = 0.0, Heatpump=" + AlphArray(1));
+                ShowSevereError(state, ModuleCompName + ":Compressor Clearance Factor = 0.0, Heatpump=" + AlphArray(1));
                 ErrorsFound = true;
             }
 
             GSHP(GSHPNum).CompSucPressDrop = NumArray(12);
             if (NumArray(12) == 0.0) {
-                ShowSevereError(ModuleCompName + ": Pressure Drop = 0.0, Heatpump=" + AlphArray(1));
+                ShowSevereError(state, ModuleCompName + ": Pressure Drop = 0.0, Heatpump=" + AlphArray(1));
                 ErrorsFound = true;
             }
 
             GSHP(GSHPNum).SuperheatTemp = NumArray(13);
             if (NumArray(13) == 0.0) {
-                ShowSevereError(ModuleCompName + ":Source Side SuperHeat = 0.0, Heatpump=" + AlphArray(1));
+                ShowSevereError(state, ModuleCompName + ":Source Side SuperHeat = 0.0, Heatpump=" + AlphArray(1));
                 ErrorsFound = true;
             }
 
             GSHP(GSHPNum).PowerLosses = NumArray(14);
             if (NumArray(14) == 0.0) {
-                ShowSevereError(ModuleCompName + ":Compressor Power Loss = 0.0, Heatpump=" + AlphArray(1));
+                ShowSevereError(state, ModuleCompName + ":Compressor Power Loss = 0.0, Heatpump=" + AlphArray(1));
                 ErrorsFound = true;
             }
             GSHP(GSHPNum).LossFactor = NumArray(15);
             if (NumArray(15) == 0.0) {
-                ShowSevereError(ModuleCompName + ":Efficiency = 0.0, Heatpump=" + AlphArray(1));
+                ShowSevereError(state, ModuleCompName + ":Efficiency = 0.0, Heatpump=" + AlphArray(1));
                 ErrorsFound = true;
             }
 
@@ -357,21 +348,21 @@ namespace HeatPumpWaterToWaterHEATING {
                 // CALL ShowWarningError(ModuleCompName//': Low Pressure Cut Off= 0.0 Heat Pump'//TRIM(AlphArray(1)))
             }
 
-            GSHP(GSHPNum).SourceSideInletNodeNum = GetOnlySingleNode(
+            GSHP(GSHPNum).SourceSideInletNodeNum = GetOnlySingleNode(state,
                 AlphArray(2), ErrorsFound, ModuleCompName, AlphArray(1), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
 
-            GSHP(GSHPNum).SourceSideOutletNodeNum = GetOnlySingleNode(
+            GSHP(GSHPNum).SourceSideOutletNodeNum = GetOnlySingleNode(state,
                 AlphArray(3), ErrorsFound, ModuleCompName, AlphArray(1), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
 
-            GSHP(GSHPNum).LoadSideInletNodeNum = GetOnlySingleNode(
+            GSHP(GSHPNum).LoadSideInletNodeNum = GetOnlySingleNode(state,
                 AlphArray(4), ErrorsFound, ModuleCompName, AlphArray(1), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent);
 
-            GSHP(GSHPNum).LoadSideOutletNodeNum = GetOnlySingleNode(
+            GSHP(GSHPNum).LoadSideOutletNodeNum = GetOnlySingleNode(state,
                 AlphArray(5), ErrorsFound, ModuleCompName, AlphArray(1), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent);
 
             // Test node sets
-            TestCompSet(ModuleCompNameUC, AlphArray(1), AlphArray(2), AlphArray(3), "Condenser Water Nodes");
-            TestCompSet(ModuleCompNameUC, AlphArray(1), AlphArray(4), AlphArray(5), "Hot Water Nodes");
+            TestCompSet(state, ModuleCompNameUC, AlphArray(1), AlphArray(2), AlphArray(3), "Condenser Water Nodes");
+            TestCompSet(state, ModuleCompNameUC, AlphArray(1), AlphArray(4), AlphArray(5), "Hot Water Nodes");
 
             // save the design source side flow rate for use by plant loop sizing algorithms
             RegisterPlantCompDesignFlow(GSHP(GSHPNum).SourceSideInletNodeNum, 0.5 * GSHP(GSHPNum).SourceSideVolFlowRate);
@@ -379,23 +370,23 @@ namespace HeatPumpWaterToWaterHEATING {
         }
 
         if (ErrorsFound) {
-            ShowFatalError("Errors Found in getting " + ModuleCompNameUC + " Input");
+            ShowFatalError(state, "Errors Found in getting " + ModuleCompNameUC + " Input");
         }
 
-        GSHPRefrigIndex = FindRefrigerant(GSHPRefrigerant);
+        GSHPRefrigIndex = FindRefrigerant(state, GSHPRefrigerant);
         if (GSHPRefrigIndex == 0) {
-            ShowFatalError("Refrigerant for HeatPump:WaterToWater Heating not found, should have been=" + GSHPRefrigerant);
+            ShowFatalError(state, "Refrigerant for HeatPump:WaterToWater Heating not found, should have been=" + GSHPRefrigerant);
         }
 
         // CurrentModuleObject='HeatPump:WaterToWater:ParameterEstimation:Heating'
         for (GSHPNum = 1; GSHPNum <= NumGSHPs; ++GSHPNum) {
-            SetupOutputVariable("Heat Pump Electric Power",
+            SetupOutputVariable(state, "Heat Pump Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 GSHP(GSHPNum).Power,
                                 "System",
                                 "Average",
                                 GSHP(GSHPNum).Name);
-            SetupOutputVariable("Heat Pump Electric Energy",
+            SetupOutputVariable(state, "Heat Pump Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 GSHP(GSHPNum).Energy,
                                 "System",
@@ -407,63 +398,63 @@ namespace HeatPumpWaterToWaterHEATING {
                                 _,
                                 "Plant");
 
-            SetupOutputVariable("Heat Pump Load Side Heat Transfer Rate",
+            SetupOutputVariable(state, "Heat Pump Load Side Heat Transfer Rate",
                                 OutputProcessor::Unit::W,
                                 GSHP(GSHPNum).QLoad,
                                 "System",
                                 "Average",
                                 GSHP(GSHPNum).Name);
-            SetupOutputVariable("Heat Pump Load Side Heat Transfer Energy",
+            SetupOutputVariable(state, "Heat Pump Load Side Heat Transfer Energy",
                                 OutputProcessor::Unit::J,
                                 GSHP(GSHPNum).QLoadEnergy,
                                 "System",
                                 "Sum",
                                 GSHP(GSHPNum).Name);
 
-            SetupOutputVariable("Heat Pump Source Side Heat Transfer Rate",
+            SetupOutputVariable(state, "Heat Pump Source Side Heat Transfer Rate",
                                 OutputProcessor::Unit::W,
                                 GSHP(GSHPNum).QSource,
                                 "System",
                                 "Average",
                                 GSHP(GSHPNum).Name);
-            SetupOutputVariable("Heat Pump Source Side Heat Transfer Energy",
+            SetupOutputVariable(state, "Heat Pump Source Side Heat Transfer Energy",
                                 OutputProcessor::Unit::J,
                                 GSHP(GSHPNum).QSourceEnergy,
                                 "System",
                                 "Sum",
                                 GSHP(GSHPNum).Name);
 
-            SetupOutputVariable("Heat Pump Load Side Outlet Temperature",
+            SetupOutputVariable(state, "Heat Pump Load Side Outlet Temperature",
                                 OutputProcessor::Unit::C,
                                 GSHP(GSHPNum).LoadSideWaterOutletTemp,
                                 "System",
                                 "Average",
                                 GSHP(GSHPNum).Name);
-            SetupOutputVariable("Heat Pump Load Side Inlet Temperature",
+            SetupOutputVariable(state, "Heat Pump Load Side Inlet Temperature",
                                 OutputProcessor::Unit::C,
                                 GSHP(GSHPNum).LoadSideWaterInletTemp,
                                 "System",
                                 "Average",
                                 GSHP(GSHPNum).Name);
-            SetupOutputVariable("Heat Pump Source Side Outlet Temperature",
+            SetupOutputVariable(state, "Heat Pump Source Side Outlet Temperature",
                                 OutputProcessor::Unit::C,
                                 GSHP(GSHPNum).SourceSideWaterOutletTemp,
                                 "System",
                                 "Average",
                                 GSHP(GSHPNum).Name);
-            SetupOutputVariable("Heat Pump Source Side Inlet Temperature",
+            SetupOutputVariable(state, "Heat Pump Source Side Inlet Temperature",
                                 OutputProcessor::Unit::C,
                                 GSHP(GSHPNum).SourceSideWaterInletTemp,
                                 "System",
                                 "Average",
                                 GSHP(GSHPNum).Name);
-            SetupOutputVariable("Heat Pump Load Side Mass Flow Rate",
+            SetupOutputVariable(state, "Heat Pump Load Side Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
                                 GSHP(GSHPNum).LoadSideWaterMassFlowRate,
                                 "System",
                                 "Average",
                                 GSHP(GSHPNum).Name);
-            SetupOutputVariable("Heat Pump Source Side Mass Flow Rate",
+            SetupOutputVariable(state, "Heat Pump Source Side Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
                                 GSHP(GSHPNum).SourceSideWaterMassFlowRate,
                                 "System",
@@ -473,7 +464,7 @@ namespace HeatPumpWaterToWaterHEATING {
     }
 #pragma clang diagnostic pop
 
-    void GshpPeHeatingSpecs::initialize()
+    void GshpPeHeatingSpecs::initialize(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -487,7 +478,7 @@ namespace HeatPumpWaterToWaterHEATING {
         static std::string const RoutineName("InitGshp");
 
         // For each new environment
-        if (BeginEnvrnFlag && this->beginEnvironFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && this->beginEnvironFlag) {
             this->QLoad = 0.0;
             this->QSource = 0.0;
             this->Power = 0.0;
@@ -504,8 +495,9 @@ namespace HeatPumpWaterToWaterHEATING {
             this->MustRun = true;
 
             this->beginEnvironFlag = false;
-            Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->LoadLoopNum).FluidName,
-                                                           DataGlobals::CWInitConvTemp,
+            Real64 rho = FluidProperties::GetDensityGlycol(state,
+                                                           DataPlant::PlantLoop(this->LoadLoopNum).FluidName,
+                                                           DataGlobalConstants::CWInitConvTemp(),
                                                            DataPlant::PlantLoop(this->LoadLoopNum).FluidIndex,
                                                            RoutineName);
             this->LoadSideDesignMassFlow = this->LoadSideVolFlowRate * rho;
@@ -519,8 +511,9 @@ namespace HeatPumpWaterToWaterHEATING {
                                                this->LoadBranchNum,
                                                this->LoadCompNum);
 
-            rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->SourceLoopNum).FluidName,
-                                                    DataGlobals::CWInitConvTemp,
+            rho = FluidProperties::GetDensityGlycol(state,
+                                                    DataPlant::PlantLoop(this->SourceLoopNum).FluidName,
+                                                    DataGlobalConstants::CWInitConvTemp(),
                                                     DataPlant::PlantLoop(this->SourceLoopNum).FluidIndex,
                                                     RoutineName);
             this->SourceSideDesignMassFlow = this->SourceSideVolFlowRate * rho;
@@ -538,7 +531,7 @@ namespace HeatPumpWaterToWaterHEATING {
             Node(this->SourceSideInletNodeNum).Temp = Node(this->SourceSideOutletNodeNum).TempSetPoint + 30.0;
         }
 
-        if (!BeginEnvrnFlag) this->beginEnvironFlag = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) this->beginEnvironFlag = true;
 
         // On every call
         this->Running = 0;
@@ -550,7 +543,7 @@ namespace HeatPumpWaterToWaterHEATING {
         this->QSource = 0.0;
     }
 
-    void GshpPeHeatingSpecs::calculate(Real64 &MyLoad)
+    void GshpPeHeatingSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR
@@ -562,9 +555,8 @@ namespace HeatPumpWaterToWaterHEATING {
         // Using/Aliasing
         using DataHVACGlobals::SysTimeElapsed;
         using namespace FluidProperties;
-        using DataBranchAirLoopPlant::MassFlowTolerance;
         using DataPlant::PlantLoop;
-        using General::TrimSigDigits;
+
         using PlantUtilities::SetComponentFlowRate;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -598,7 +590,7 @@ namespace HeatPumpWaterToWaterHEATING {
 
         // CALCULATE THE SIMULATION TIME
         Real64 const hoursInDay = 24.0;
-        CurrentSimTime = (DayOfSim - 1) * hoursInDay + HourOfDay - 1 + (TimeStep - 1) * TimeStepZone + SysTimeElapsed;
+        CurrentSimTime = (state.dataGlobal->DayOfSim - 1) * hoursInDay + state.dataGlobal->HourOfDay - 1 + (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone + SysTimeElapsed;
 
         if (MyLoad > 0.0) {
             this->MustRun = true;
@@ -614,7 +606,7 @@ namespace HeatPumpWaterToWaterHEATING {
         // Set flows if the heat pump is not running
         if (!this->MustRun) {
             this->LoadSideWaterMassFlowRate = 0.0;
-            SetComponentFlowRate(this->LoadSideWaterMassFlowRate,
+            SetComponentFlowRate(state, this->LoadSideWaterMassFlowRate,
                                  this->LoadSideInletNodeNum,
                                  this->LoadSideOutletNodeNum,
                                  this->LoadLoopNum,
@@ -622,7 +614,7 @@ namespace HeatPumpWaterToWaterHEATING {
                                  this->LoadBranchNum,
                                  this->LoadCompNum);
             this->SourceSideWaterMassFlowRate = 0.0;
-            SetComponentFlowRate(this->SourceSideWaterMassFlowRate,
+            SetComponentFlowRate(state, this->SourceSideWaterMassFlowRate,
                                  this->SourceSideInletNodeNum,
                                  this->SourceSideOutletNodeNum,
                                  this->SourceLoopNum,
@@ -645,7 +637,7 @@ namespace HeatPumpWaterToWaterHEATING {
         } else { // the heat pump must run, request design flow
 
             this->LoadSideWaterMassFlowRate = this->LoadSideDesignMassFlow;
-            SetComponentFlowRate(this->LoadSideWaterMassFlowRate,
+            SetComponentFlowRate(state, this->LoadSideWaterMassFlowRate,
                                  this->LoadSideInletNodeNum,
                                  this->LoadSideOutletNodeNum,
                                  this->LoadLoopNum,
@@ -654,7 +646,7 @@ namespace HeatPumpWaterToWaterHEATING {
                                  this->LoadCompNum);
 
             this->SourceSideWaterMassFlowRate = this->SourceSideDesignMassFlow;
-            SetComponentFlowRate(this->SourceSideWaterMassFlowRate,
+            SetComponentFlowRate(state, this->SourceSideWaterMassFlowRate,
                                  this->SourceSideInletNodeNum,
                                  this->SourceSideOutletNodeNum,
                                  this->SourceLoopNum,
@@ -662,9 +654,9 @@ namespace HeatPumpWaterToWaterHEATING {
                                  this->SourceBranchNum,
                                  this->SourceCompNum);
             // if there's no flow, turn the "heat pump off"
-            if (this->LoadSideWaterMassFlowRate < MassFlowTolerance || this->SourceSideWaterMassFlowRate < MassFlowTolerance) {
+            if (this->LoadSideWaterMassFlowRate < DataBranchAirLoopPlant::MassFlowTolerance || this->SourceSideWaterMassFlowRate < DataBranchAirLoopPlant::MassFlowTolerance) {
                 this->LoadSideWaterMassFlowRate = 0.0;
-                SetComponentFlowRate(this->LoadSideWaterMassFlowRate,
+                SetComponentFlowRate(state, this->LoadSideWaterMassFlowRate,
                                      this->LoadSideInletNodeNum,
                                      this->LoadSideOutletNodeNum,
                                      this->LoadLoopNum,
@@ -672,7 +664,7 @@ namespace HeatPumpWaterToWaterHEATING {
                                      this->LoadBranchNum,
                                      this->LoadCompNum);
                 this->SourceSideWaterMassFlowRate = 0.0;
-                SetComponentFlowRate(this->SourceSideWaterMassFlowRate,
+                SetComponentFlowRate(state, this->SourceSideWaterMassFlowRate,
                                      this->SourceSideInletNodeNum,
                                      this->SourceSideOutletNodeNum,
                                      this->SourceLoopNum,
@@ -709,13 +701,14 @@ namespace HeatPumpWaterToWaterHEATING {
         Real64 initialQLoad = 0.0;
         int IterationCount = 0;
 
-        Real64 CpSourceSide = GetSpecificHeatGlycol(PlantLoop(this->SourceLoopNum).FluidName,
+        Real64 CpSourceSide = GetSpecificHeatGlycol(state,
+                                                    PlantLoop(this->SourceLoopNum).FluidName,
                                                     this->SourceSideWaterInletTemp,
                                                     PlantLoop(this->SourceLoopNum).FluidIndex,
                                                     RoutineName);
 
         Real64 CpLoadSide = GetSpecificHeatGlycol(
-            PlantLoop(this->LoadLoopNum).FluidName, this->LoadSideWaterInletTemp, PlantLoop(this->LoadLoopNum).FluidIndex, RoutineName);
+            state, PlantLoop(this->LoadLoopNum).FluidName, this->LoadSideWaterInletTemp, PlantLoop(this->LoadLoopNum).FluidIndex, RoutineName);
 
         // Determine effectiveness of Source Side (the Evaporator in heating mode)
         Real64 SourceSideEffect = 1.0 - std::exp(-this->SourceSideUACoeff / (CpSourceSide * this->SourceSideWaterMassFlowRate));
@@ -731,21 +724,24 @@ namespace HeatPumpWaterToWaterHEATING {
             Real64 LoadSideTemp = this->LoadSideWaterInletTemp + initialQLoad / (LoadSideEffect * CpLoadSide * this->LoadSideWaterMassFlowRate);
 
             // Determine the evaporating and condensing pressures
-            Real64 SourceSidePressure = GetSatPressureRefrig(GSHPRefrigerant, SourceSideTemp, GSHPRefrigIndex, RoutineNameSourceSideTemp);
-            Real64 LoadSidePressure = GetSatPressureRefrig(GSHPRefrigerant, LoadSideTemp, GSHPRefrigIndex, RoutineNameLoadSideTemp);
+            Real64 SourceSidePressure = GetSatPressureRefrig(state, GSHPRefrigerant, SourceSideTemp, GSHPRefrigIndex, RoutineNameSourceSideTemp);
+            Real64 LoadSidePressure = GetSatPressureRefrig(state, GSHPRefrigerant, LoadSideTemp, GSHPRefrigIndex, RoutineNameLoadSideTemp);
 
             // check cutoff pressures
             if (SourceSidePressure < this->LowPressCutoff) {
-                ShowSevereError(ModuleCompName + "=\"" + this->Name + "\" Heating Source Side Pressure Less than the Design Minimum");
-                ShowContinueError("Source Side Pressure=" + TrimSigDigits(SourceSidePressure, 2) +
-                                  " and user specified Design Minimum Pressure=" + TrimSigDigits(this->LowPressCutoff, 2));
-                ShowFatalError("Preceding Conditions cause termination.");
+                ShowSevereError(state, ModuleCompName + "=\"" + this->Name + "\" Heating Source Side Pressure Less than the Design Minimum");
+                ShowContinueError(state,
+                                  format("Source Side Pressure={:.2T} and user specified Design Minimum Pressure={:.2T}",
+                                         SourceSidePressure,
+                                         this->LowPressCutoff));
+                ShowFatalError(state, "Preceding Conditions cause termination.");
             }
             if (LoadSidePressure > this->HighPressCutoff) {
-                ShowSevereError(ModuleCompName + "=\"" + this->Name + "\" Heating Load Side Pressure greater than the Design Maximum");
-                ShowContinueError("Load Side Pressure=" + TrimSigDigits(LoadSidePressure, 2) +
-                                  " and user specified Design Maximum Pressure=" + TrimSigDigits(this->HighPressCutoff, 2));
-                ShowFatalError("Preceding Conditions cause termination.");
+                ShowSevereError(state, ModuleCompName + "=\"" + this->Name + "\" Heating Load Side Pressure greater than the Design Maximum");
+                ShowContinueError(
+                    state,
+                    format("Load Side Pressure={:.2T} and user specified Design Maximum Pressure={:.2T}", LoadSidePressure, this->HighPressCutoff));
+                ShowFatalError(state, "Preceding Conditions cause termination.");
             }
 
             // Determine Suction Pressure at compressor inlet
@@ -754,38 +750,41 @@ namespace HeatPumpWaterToWaterHEATING {
             Real64 DischargePr = LoadSidePressure + this->CompSucPressDrop;
             // check cutoff pressures
             if (SuctionPr < this->LowPressCutoff) {
-                ShowSevereError(ModuleCompName + "=\"" + this->Name + "\" Heating Suction Pressure Less than the Design Minimum");
-                ShowContinueError("Heating Suction Pressure=" + TrimSigDigits(SuctionPr, 2) +
-                                  " and user specified Design Minimum Pressure=" + TrimSigDigits(this->LowPressCutoff, 2));
-                ShowFatalError("Preceding Conditions cause termination.");
+                ShowSevereError(state, ModuleCompName + "=\"" + this->Name + "\" Heating Suction Pressure Less than the Design Minimum");
+                ShowContinueError(
+                    state,
+                    format("Heating Suction Pressure={:.2T} and user specified Design Minimum Pressure={:.2T}", SuctionPr, this->LowPressCutoff));
+                ShowFatalError(state, "Preceding Conditions cause termination.");
             }
             if (DischargePr > this->HighPressCutoff) {
-                ShowSevereError(ModuleCompName + "=\"" + this->Name + "\" Heating Discharge Pressure greater than the Design Maximum");
-                ShowContinueError("Heating Discharge Pressure=" + TrimSigDigits(DischargePr, 2) +
-                                  " and user specified Design Maximum Pressure=" + TrimSigDigits(this->HighPressCutoff, 2));
-                ShowFatalError("Preceding Conditions cause termination.");
+                ShowSevereError(state, ModuleCompName + "=\"" + this->Name + "\" Heating Discharge Pressure greater than the Design Maximum");
+                ShowContinueError(state,
+                                  format("Heating Discharge Pressure={:.2T} and user specified Design Maximum Pressure={:.2T}",
+                                         DischargePr,
+                                         this->HighPressCutoff));
+                ShowFatalError(state, "Preceding Conditions cause termination.");
             }
 
             // Determine the Source Side Outlet Enthalpy
             Real64 qualOne = 1.0;
-            Real64 SourceSideOutletEnth = GetSatEnthalpyRefrig(GSHPRefrigerant, SourceSideTemp, qualOne, GSHPRefrigIndex, RoutineNameSourceSideTemp);
+            Real64 SourceSideOutletEnth = GetSatEnthalpyRefrig(state, GSHPRefrigerant, SourceSideTemp, qualOne, GSHPRefrigIndex, RoutineNameSourceSideTemp);
 
             // Determine Load Side Outlet Enthalpy
             Real64 qualZero = 0.0;
-            Real64 LoadSideOutletEnth = GetSatEnthalpyRefrig(GSHPRefrigerant, LoadSideTemp, qualZero, GSHPRefrigIndex, RoutineNameLoadSideTemp);
+            Real64 LoadSideOutletEnth = GetSatEnthalpyRefrig(state, GSHPRefrigerant, LoadSideTemp, qualZero, GSHPRefrigIndex, RoutineNameLoadSideTemp);
 
             // Determine superheated temperature of the Source Side outlet/compressor inlet
             Real64 CompressInletTemp = SourceSideTemp + this->SuperheatTemp;
             // Determine the enathalpy of the super heated fluid at Source Side outlet
             Real64 SuperHeatEnth =
-                GetSupHeatEnthalpyRefrig(GSHPRefrigerant, CompressInletTemp, SourceSidePressure, GSHPRefrigIndex, RoutineNameCompressInletTemp);
+                GetSupHeatEnthalpyRefrig(state, GSHPRefrigerant, CompressInletTemp, SourceSidePressure, GSHPRefrigIndex, RoutineNameCompressInletTemp);
 
             // Determining the suction state of the fluid from inlet state involves interation
             // Method employed...
             // Determine the saturated temp at suction pressure, shoot out into the superheated region find the enthalpy
             // check that with the inlet enthalpy ( as suction loss is isenthalpic). Iterate till desired accuracy is reached
 
-            CompSuctionSatTemp = GetSatTemperatureRefrig(GSHPRefrigerant, SuctionPr, GSHPRefrigIndex, RoutineNameSuctionPr);
+            CompSuctionSatTemp = GetSatTemperatureRefrig(state, GSHPRefrigerant, SuctionPr, GSHPRefrigIndex, RoutineNameSuctionPr);
 
             Real64 T110 = CompSuctionSatTemp;
             // Shoot into the super heated region
@@ -795,7 +794,7 @@ namespace HeatPumpWaterToWaterHEATING {
             while (true) {
                 CompSuctionTemp = 0.5 * (T110 + T111);
 
-                CompSuctionEnth = GetSupHeatEnthalpyRefrig(GSHPRefrigerant, CompSuctionTemp, SuctionPr, GSHPRefrigIndex, RoutineNameCompSuctionTemp);
+                CompSuctionEnth = GetSupHeatEnthalpyRefrig(state, GSHPRefrigerant, CompSuctionTemp, SuctionPr, GSHPRefrigIndex, RoutineNameCompSuctionTemp);
                 if (std::abs(CompSuctionEnth - SuperHeatEnth) / SuperHeatEnth < 0.0001) {
                     goto LOOP_exit;
                 }
@@ -809,7 +808,7 @@ namespace HeatPumpWaterToWaterHEATING {
         LOOP_exit:;
 
             // Determine the Mass flow rate of refrigerant
-            CompSuctionDensity = GetSupHeatDensityRefrig(GSHPRefrigerant, CompSuctionTemp, SuctionPr, GSHPRefrigIndex, RoutineNameCompSuctionTemp);
+            CompSuctionDensity = GetSupHeatDensityRefrig(state, GSHPRefrigerant, CompSuctionTemp, SuctionPr, GSHPRefrigIndex, RoutineNameCompSuctionTemp);
             Real64 MassRef = this->CompPistonDisp * CompSuctionDensity * (1.0 + this->CompClearanceFactor - this->CompClearanceFactor * std::pow(DischargePr / SuctionPr, 1.0 / gamma));
 
             // Find the  Source Side Heat Transfer
@@ -825,16 +824,16 @@ namespace HeatPumpWaterToWaterHEATING {
             // convergence and iteration limit check
             if (std::abs((this->QLoad - initialQLoad) / (initialQLoad + SmallNum)) < HeatBalTol || IterationCount > IterationLimit) {
                 if (IterationCount > IterationLimit) {
-                    ShowWarningError(ModuleCompName + " did not converge");
-                    ShowContinueErrorTimeStamp("");
-                    ShowContinueError("Heatpump Name = " + this->Name);
-                    ShowContinueError(format("Heat Inbalance (%)             = {:S}", std::abs(100.0 * (this->QLoad - initialQLoad) / (initialQLoad + SmallNum))));
-                    ShowContinueError(format("Load-side heat transfer rate   = {:S}", this->QLoad));
-                    ShowContinueError(format("Source-side heat transfer rate = {:S}", this->QSource));
-                    ShowContinueError(format("Source-side mass flow rate     = {:S}", this->SourceSideWaterMassFlowRate));
-                    ShowContinueError(format("Load-side mass flow rate       = {:S}", this->LoadSideWaterMassFlowRate));
-                    ShowContinueError(format("Source-side inlet temperature  = {:S}", this->SourceSideWaterInletTemp));
-                    ShowContinueError(format("Load-side inlet temperature    = {:S}", this->LoadSideWaterInletTemp));
+                    ShowWarningError(state, ModuleCompName + " did not converge");
+                    ShowContinueErrorTimeStamp(state, "");
+                    ShowContinueError(state, "Heatpump Name = " + this->Name);
+                    ShowContinueError(state, format("Heat Inbalance (%)             = {:S}", std::abs(100.0 * (this->QLoad - initialQLoad) / (initialQLoad + SmallNum))));
+                    ShowContinueError(state, format("Load-side heat transfer rate   = {:S}", this->QLoad));
+                    ShowContinueError(state, format("Source-side heat transfer rate = {:S}", this->QSource));
+                    ShowContinueError(state, format("Source-side mass flow rate     = {:S}", this->SourceSideWaterMassFlowRate));
+                    ShowContinueError(state, format("Load-side mass flow rate       = {:S}", this->LoadSideWaterMassFlowRate));
+                    ShowContinueError(state, format("Source-side inlet temperature  = {:S}", this->SourceSideWaterInletTemp));
+                    ShowContinueError(state, format("Load-side inlet temperature    = {:S}", this->LoadSideWaterInletTemp));
                 }
                 goto LOOPLoadEnth_exit;
 
@@ -894,7 +893,7 @@ namespace HeatPumpWaterToWaterHEATING {
             // set node flow rates;  for these load based models
             // assume that the sufficient Source Side flow rate available
 
-            Real64 const ReportingConstant = DataHVACGlobals::TimeStepSys * SecInHour;
+            Real64 const ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
 
             this->Energy = this->Power * ReportingConstant;
             this->QSourceEnergy = QSource * ReportingConstant;

@@ -55,14 +55,16 @@
 #include <EnergyPlus/TARCOGParams.hh>
 #include <EnergyPlus/TarcogShading.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+
+#include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::TarcogShading;
 using namespace EnergyPlus::TARCOGParams;
 
-TEST(WindowRoutines, EffectiveOpennessHorizontalVenetianBlind_0_deg)
+TEST_F(EnergyPlusFixture, WindowRoutines_EffectiveOpennessHorizontalVenetianBlind_0_deg)
 {
-    EnergyPlus::ShowMessage("Begin Test: Effective openness, horizontal venetian blind 0 deg slat.");
     {
         int const nlayer = 1;
         Real64 const width = 1;
@@ -93,9 +95,8 @@ TEST(WindowRoutines, EffectiveOpennessHorizontalVenetianBlind_0_deg)
     }
 }
 
-TEST(WindowRoutines, EffectiveOpennessVerticalVenetianBlind_0_deg)
+TEST_F(EnergyPlusFixture, WindowRoutines_EffectiveOpennessVerticalVenetianBlind_0_deg)
 {
-    EnergyPlus::ShowMessage("Begin Test: Effective openness, vertical venetian blind 0 deg slat.");
     {
         int const nlayer = 1;
         Real64 const width = 1;
@@ -126,9 +127,8 @@ TEST(WindowRoutines, EffectiveOpennessVerticalVenetianBlind_0_deg)
     }
 }
 
-TEST(WindowRoutines, EffectiveOpennessHorizontalVenetianBlind_45_deg)
+TEST_F(EnergyPlusFixture, WindowRoutines_EffectiveOpennessHorizontalVenetianBlind_45_deg)
 {
-    EnergyPlus::ShowMessage("Begin Test: Effective openness, horizontal venetian blind 45 deg slat.");
     {
         int const nlayer = 1;
         Real64 const width = 1;
@@ -159,9 +159,8 @@ TEST(WindowRoutines, EffectiveOpennessHorizontalVenetianBlind_45_deg)
     }
 }
 
-TEST(WindowRoutines, EffectiveOpennessVerticalVenetianBlind_45_deg)
+TEST_F(EnergyPlusFixture, WindowRoutines_EffectiveOpennessVerticalVenetianBlind_45_deg)
 {
-    EnergyPlus::ShowMessage("Begin Test: Effective openness, vertical venetian blind 45 deg slat.");
     {
         int const nlayer = 1;
         Real64 const width = 1;
@@ -192,9 +191,8 @@ TEST(WindowRoutines, EffectiveOpennessVerticalVenetianBlind_45_deg)
     }
 }
 
-TEST(WindowRoutines, EffectiveOpennessOtherShades)
+TEST_F(EnergyPlusFixture, WindowRoutines_EffectiveOpennessOtherShades)
 {
-    EnergyPlus::ShowMessage("Begin Test: Effective openness, other shades.");
     {
         int const nlayer = 1;
         Real64 const width = 1;

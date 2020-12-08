@@ -59,7 +59,7 @@
 namespace EnergyPlus {
 
 // Forward declarations
-struct CostEstimateManagerData;
+struct EnergyPlusData;
 
 namespace EconomicTariff {
 
@@ -309,9 +309,9 @@ namespace EconomicTariff {
         std::string reportMeter;    // name of the report meter
         int reportMeterIndx;        // index of the report meter
         int kindElectricMtr;        // kind of electric meter - see enumerated list above, 0 is not electric
-        int kindWaterMtr;           // kinf of water meter - 0 (default) is not water, 1 is water
-        int kindGasMtr;             // kinf of gas meter - 0 (default) is not gas, 1 is gas
-        int resourceNum;            // based on list of DataGlobalConstants
+        int kindWaterMtr;           // kind of water meter - 0 (default) is not water, 1 is water
+        int kindGasMtr;             // kind of gas meter - 0 (default) is not gas, 1 is gas
+        DataGlobalConstants::ResourceType resourceNum;  // based on list of DataGlobalConstants
         int convChoice;             // enumerated choice index of the conversion factor
         Real64 energyConv;          // energy conversion factor
         Real64 demandConv;          // demand conversion factor
@@ -414,7 +414,8 @@ namespace EconomicTariff {
 
         // Default Constructor
         TariffType()
-            : reportMeterIndx(0), kindElectricMtr(0), kindWaterMtr(0), kindGasMtr(0), resourceNum(0), convChoice(0), energyConv(0.0), demandConv(0.0),
+            : reportMeterIndx(0), kindElectricMtr(0), kindWaterMtr(0), kindGasMtr(0), resourceNum(DataGlobalConstants::ResourceType::None),
+              convChoice(0), energyConv(0.0), demandConv(0.0),
               periodSchIndex(0), seasonSchIndex(0), monthSchIndex(0), demandWindow(0), demWinTime(0.0), monthChgVal(0.0), monthChgPt(0),
               minMonthChgVal(0.0), minMonthChgPt(0), chargeSchIndex(0), baseUseSchIndex(0), buyOrSell(0), firstCategory(0), lastCategory(0),
               ptEnergyCharges(0), ptDemandCharges(0), ptServiceCharges(0), ptBasis(0), ptAdjustment(0), ptSurcharge(0), ptSubtotal(0), ptTaxes(0),
@@ -557,7 +558,7 @@ namespace EconomicTariff {
 
     // Functions
 
-    void UpdateUtilityBills(CostEstimateManagerData &dataCostEstimateManager);
+    void UpdateUtilityBills(EnergyPlusData &state);
 
     //======================================================================================================================
     //======================================================================================================================
@@ -567,35 +568,36 @@ namespace EconomicTariff {
     //======================================================================================================================
     //======================================================================================================================
 
-    void GetInputEconomicsTariff(bool &ErrorsFound); // true if errors found during getting input objects.
+    void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound); // true if errors found during getting input objects.
 
-    void GetInputEconomicsQualify(bool &ErrorsFound); // true if errors found during getting input objects.
+    void GetInputEconomicsQualify(EnergyPlusData &state, bool &ErrorsFound); // true if errors found during getting input objects.
 
-    void GetInputEconomicsChargeSimple(bool &ErrorsFound); // true if errors found during getting input objects.
+    void GetInputEconomicsChargeSimple(EnergyPlusData &state, bool &ErrorsFound); // true if errors found during getting input objects.
 
-    void GetInputEconomicsChargeBlock(bool &ErrorsFound); // true if errors found during getting input objects.
+    void GetInputEconomicsChargeBlock(EnergyPlusData &state, bool &ErrorsFound); // true if errors found during getting input objects.
 
-    void GetInputEconomicsRatchet(bool &ErrorsFound); // true if errors found during getting input objects.
+    void GetInputEconomicsRatchet(EnergyPlusData &state, bool &ErrorsFound); // true if errors found during getting input objects.
 
-    void GetInputEconomicsVariable(bool &ErrorsFound); // true if errors found during getting input objects.
+    void GetInputEconomicsVariable(EnergyPlusData &state, bool &ErrorsFound); // true if errors found during getting input objects.
 
-    void GetInputEconomicsComputation(bool &ErrorsFound); // true if errors found during getting input objects.
+    void GetInputEconomicsComputation(EnergyPlusData &state, bool &ErrorsFound); // true if errors found during getting input objects.
 
-    void GetInputEconomicsCurrencyType(CostEstimateManagerData &dataCostEstimateManager, bool &ErrorsFound); // true if errors found during getting input objects.
+    void GetInputEconomicsCurrencyType(EnergyPlusData &state, bool &ErrorsFound); // true if errors found during getting input objects.
 
-    void parseComputeLine(std::string const &lineOfCompute, int const fromTariff);
+    void parseComputeLine(EnergyPlusData &state, std::string const &lineOfCompute, int const fromTariff);
 
     void GetLastWord(std::string const &lineOfText, std::string::size_type &endOfScan, std::string &aWord);
 
-    void initializeMonetaryUnit(CostEstimateManagerData &dataCostEstimateManager);
+    void initializeMonetaryUnit(EnergyPlusData &state);
 
-    int LookUpSeason(std::string const &nameOfSeason, std::string const &nameOfReferingObj);
+    int LookUpSeason(EnergyPlusData &state, std::string const &nameOfSeason, std::string const &nameOfReferingObj);
 
-    int FindTariffIndex(std::string const &nameOfTariff, std::string const &nameOfReferingObj, bool &ErrorsFound, std::string const &nameOfCurObj);
+    int FindTariffIndex(EnergyPlusData &state, std::string const &nameOfTariff, std::string const &nameOfReferingObj, bool &ErrorsFound, std::string const &nameOfCurObj);
 
-    void warnIfNativeVarname(std::string const &objName, int const curTariffIndex, bool &ErrorsFound, std::string const &curobjName);
+    void warnIfNativeVarname(EnergyPlusData &state, std::string const &objName, int const curTariffIndex, bool &ErrorsFound, std::string const &curobjName);
 
-    int AssignVariablePt(std::string const &stringIn,
+    int AssignVariablePt(EnergyPlusData &state,
+                         std::string const &stringIn,
                          bool const flagIfNotNumeric,
                          int const useOfVar,
                          int const varSpecific,
@@ -607,9 +609,9 @@ namespace EconomicTariff {
 
     void incrementSteps();
 
-    std::string RemoveSpaces(std::string const &StringIn);
+    std::string RemoveSpaces(EnergyPlusData &state, std::string const &StringIn);
 
-    void CreateCategoryNativeVariables();
+    void CreateCategoryNativeVariables(EnergyPlusData &state);
 
     int lookupOperator(std::string const &opString);
 
@@ -621,11 +623,11 @@ namespace EconomicTariff {
     //======================================================================================================================
     //======================================================================================================================
 
-    void CreateDefaultComputation();
+    void CreateDefaultComputation(EnergyPlusData &state);
 
-    void addOperand(int const varMe, int const varOperand);
+    void addOperand(int varMe, int varOperand);
 
-    void addChargesToOperand(int const curTariff, int const curPointer);
+    void addChargesToOperand(int curTariff, int curPointer);
 
     //======================================================================================================================
     //======================================================================================================================
@@ -635,9 +637,9 @@ namespace EconomicTariff {
     //======================================================================================================================
     //======================================================================================================================
 
-    void GatherForEconomics();
+    void GatherForEconomics(EnergyPlusData &state);
 
-    bool isWithinRange(int const testVal, int const minThreshold, int const maxThreshold);
+    bool isWithinRange(EnergyPlusData &state, int const testVal, int const minThreshold, int const maxThreshold);
 
     //======================================================================================================================
     //======================================================================================================================
@@ -647,21 +649,21 @@ namespace EconomicTariff {
     //======================================================================================================================
     //======================================================================================================================
 
-    void ComputeTariff();
+    void ComputeTariff(EnergyPlusData &state);
 
-    void pushStack(Array1A<Real64> const monthlyArray, int const variablePointer);
+    void pushStack(EnergyPlusData &state, Array1A<Real64> const monthlyArray, int const variablePointer);
 
-    void popStack(Array1A<Real64> monthlyArray, int &variablePointer);
+    void popStack(EnergyPlusData &state, Array1A<Real64> monthlyArray, int &variablePointer);
 
-    void evaluateChargeSimple(int const usingVariable);
+    void evaluateChargeSimple(EnergyPlusData &state, int const usingVariable);
 
-    void evaluateChargeBlock(int const usingVariable);
+    void evaluateChargeBlock(EnergyPlusData &state, int const usingVariable);
 
-    void evaluateRatchet(int const usingVariable);
+    void evaluateRatchet(EnergyPlusData &state, int const usingVariable);
 
-    void evaluateQualify(int const usingVariable);
+    void evaluateQualify(EnergyPlusData &state, int const usingVariable);
 
-    void addMonthlyCharge(int const usingVariable);
+    void addMonthlyCharge(EnergyPlusData &state, int const usingVariable);
 
     void checkMinimumMonthlyCharge(int const curTariff);
 
@@ -669,18 +671,18 @@ namespace EconomicTariff {
 
     void LEEDtariffReporting();
 
-    void WriteTabularTariffReports(CostEstimateManagerData &dataCostEstimateManager);
+    void WriteTabularTariffReports(EnergyPlusData &state);
 
-    void showWarningsBasedOnTotal();
+    void showWarningsBasedOnTotal(EnergyPlusData &state);
 
     void getMaxAndSum(int const varPointer, Real64 &sumResult, Real64 &maxResult);
 
     void
-    ReportEconomicVariable(CostEstimateManagerData &dataCostEstimateManager, std::string const &titleString, bool const includeCategory, bool const showCurrencySymbol, std::string const &forString);
+    ReportEconomicVariable(EnergyPlusData &state, std::string const &titleString, bool const includeCategory, bool const showCurrencySymbol, std::string const &forString);
 
-    void selectTariff();
+    void selectTariff(EnergyPlusData &state);
 
-    void GetMonthlyCostForResource(int const inResourceNumber, Array1A<Real64> outMonthlyCosts);
+    void GetMonthlyCostForResource(DataGlobalConstants::ResourceType const inResourceNumber, Array1A<Real64> outMonthlyCosts);
 
     void clear_state();
 

@@ -115,7 +115,9 @@
     NO,                      !- Do System Sizing Calculation
     NO,                      !- Do Plant Sizing Calculation
     NO,                      !- Run Simulation for Sizing Periods
-    YES;                     !- Run Simulation for Weather File Run Periods
+    YES,                     !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
   Site:WaterMainsTemperature,
     CORRELATION,             !- Calculation Method
@@ -672,13 +674,13 @@
 
   Output:Variable,*,Water Heater Heater 2 Runtime Fraction,hourly;
 
-  Output:Variable,*,Water Heater Electric Power,hourly;
+  Output:Variable,*,Water Heater Electricity Rate,hourly;
 
-  Output:Variable,*,Water Heater Off Cycle Parasitic Electric Power,hourly;
+  Output:Variable,*,Water Heater Off Cycle Parasitic Electricity Rate,hourly;
 
-  Output:Variable,*,Water Heater On Cycle Parasitic Electric Power,hourly;
+  Output:Variable,*,Water Heater On Cycle Parasitic Electricity Rate,hourly;
 
-  Output:Variable,*,Cooling Coil Water Heating Electric Power,hourly;
+  Output:Variable,*,Cooling Coil Water Heating Electricity Rate,hourly;
 
   Output:Variable,*,Cooling Coil Total Water Heating Rate,hourly;
 
