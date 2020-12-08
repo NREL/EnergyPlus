@@ -2241,12 +2241,12 @@ WindowMaterial:SimpleGlazingSystem,
 
     SurfaceGeometry::SetupZoneGeometry(*state, FoundError); // this calls GetSurfaceData()
     EXPECT_FALSE(FoundError);
-    SolarShading::AllocateModuleArrays(*state);
 
     state->dataGlobal->BeginSimFlag = true;
     HeatBalanceManager::InitHeatBalance(*state);
     EXPECT_FALSE(FoundError);
 
+    SolarShading::AllocateModuleArrays(*state);
     SolarShading::DetermineShadowingCombinations(*state);
 
     std::string error_string = delimited_string({"** Severe  ** Problem in interior solar distribution calculation (CHKBKS)"});

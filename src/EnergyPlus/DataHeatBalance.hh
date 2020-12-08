@@ -580,9 +580,8 @@ namespace DataHeatBalance {
     extern Array3D<Real64> SunlitFracWithoutReveal; // For a window with reveal, the sunlit fraction
     // without shadowing by the reveal
     extern Array3D<Real64> CosIncAng; // TimeStep cosine of beam radiation incidence angle on surface
-    extern Array1D<Real64> SurfCosIncTimestep; // Cosine of beam radiation incidence angle on surface at the current timestep
-    extern Array1D<Real64> SurfSunlitFracTimestep; // Fraction of heat transfer surface that is sunlit at the current timestep
-
+//    extern Array1D<Real64> SurfCosIncTimestep; // Cosine of beam radiation incidence angle on surface at the current timestep
+//    extern Array1D<Real64> SurfSunlitFracTimestep; // Fraction of heat transfer surface that is sunlit at the current timestep
 
     extern Array4D_int BackSurfaces;  // For a given hour and timestep, a list of up to 20 surfaces receiving
     // beam solar radiation from a given exterior window
@@ -2207,7 +2206,7 @@ namespace DataHeatBalance {
     // Needed for unit tests, should not be normally called.
     void clear_state();
 
-    void SetSolarParameterAt(EnergyPlusData &state);
+//    void SetSolarParameterAt(EnergyPlusData &state);
 
     void SetZoneOutBulbTempAt(EnergyPlusData &state);
 
