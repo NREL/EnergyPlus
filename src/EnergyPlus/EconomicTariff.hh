@@ -120,6 +120,7 @@ namespace EconomicTariff {
             return "kgal";
         default:
             assert(false);
+            return "";
         }
     }
 
@@ -149,6 +150,7 @@ namespace EconomicTariff {
             return "kgal";
         default:
             assert(false);
+            return "";
         }
     }
 
@@ -167,9 +169,7 @@ namespace EconomicTariff {
         case iDemandWindow::Unassigned:
             return "";
         case iDemandWindow::Quarter:
-            return "/Hr";
         case iDemandWindow::Half:
-            return "/Hr";
         case iDemandWindow::Hour:
             return "/Hr";
         case iDemandWindow::Day:
@@ -178,6 +178,7 @@ namespace EconomicTariff {
             return "/Wk";
         default:
             assert(false);
+            return "";
         }
     }
 
