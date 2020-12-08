@@ -171,16 +171,15 @@ namespace WaterManager {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Item;                       // Item to be "gotten"
-        static int NumAlphas(0);        // Number of Alphas for each GetObjectItem call
-        static int NumNumbers(0);       // Number of Numbers for each GetObjectItem call
-        static int IOStatus(0);         // Used in GetObjectItem
+        int NumAlphas(0);        // Number of Alphas for each GetObjectItem call
+        int NumNumbers(0);       // Number of Numbers for each GetObjectItem call
+        int IOStatus(0);         // Used in GetObjectItem
         bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
-        static int MaxNumAlphas(0);  // argument for call to GetObjectDefMaxArgs
-        static int MaxNumNumbers(0); // argument for call to GetObjectDefMaxArgs
-        static int TotalArgs(0);     // argument for call to GetObjectDefMaxArgs
-        static int alphaOffset(0);
-        static int SurfNum(0);
-        static std::string objNameMsg;
+        int MaxNumAlphas(0);  // argument for call to GetObjectDefMaxArgs
+        int MaxNumNumbers(0); // argument for call to GetObjectDefMaxArgs
+        int TotalArgs(0);     // argument for call to GetObjectDefMaxArgs
+        int alphaOffset(0);
+        std::string objNameMsg;
         Array1D_string cAlphaFieldNames;
         Array1D_string cNumericFieldNames;
         Array1D_bool lNumericFieldBlanks;
@@ -188,12 +187,6 @@ namespace WaterManager {
         Array1D_string cAlphaArgs;
         Array1D<Real64> rNumericArgs;
         std::string cCurrentModuleObject;
-        static Real64 tmpMax(0.0);
-        static Real64 tmpMin(0.0);
-        static Real64 tmpNumerator(0.0);
-        static Real64 tmpArea(0.0);
-        static Real64 tmpDenominator(0.0);
-        static int ThisSurf(0);
         int NumIrrigation;
         int Dummy;
 
@@ -332,14 +325,14 @@ namespace WaterManager {
                             ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                             ErrorsFound = true;
                         }
-                        tmpMin = GetScheduleMinValue(state, state.dataWaterData->WaterStorage(Item).TempSchedID);
+                        Real64 tmpMin = GetScheduleMinValue(state, state.dataWaterData->WaterStorage(Item).TempSchedID);
                         if (tmpMin < 0.0) {
                             ShowSevereError(state, "Invalid " + cAlphaFieldNames(7) + '=' + cAlphaArgs(7));
                             ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                             ShowContinueError(state, "Found storage tank temperature schedule value less than 0.0 in " + objNameMsg);
                             ErrorsFound = true;
                         }
-                        tmpMax = GetScheduleMaxValue(state, state.dataWaterData->WaterStorage(Item).TempSchedID);
+                        Real64 tmpMax = GetScheduleMaxValue(state, state.dataWaterData->WaterStorage(Item).TempSchedID);
                         if (tmpMax > 100.0) {
                             ShowSevereError(state, "Invalid " + cAlphaFieldNames(7) + '=' + cAlphaArgs(7));
                             ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
@@ -462,7 +455,7 @@ namespace WaterManager {
                     state.dataWaterData->RainCollector(Item).NumCollectSurfs = NumAlphas - alphaOffset;
                     state.dataWaterData->RainCollector(Item).SurfName.allocate(state.dataWaterData->RainCollector(Item).NumCollectSurfs);
                     state.dataWaterData->RainCollector(Item).SurfID.allocate(state.dataWaterData->RainCollector(Item).NumCollectSurfs);
-                    for (SurfNum = 1; SurfNum <= state.dataWaterData->RainCollector(Item).NumCollectSurfs; ++SurfNum) {
+                    for (int SurfNum = 1; SurfNum <= state.dataWaterData->RainCollector(Item).NumCollectSurfs; ++SurfNum) {
                         state.dataWaterData->RainCollector(Item).SurfName(SurfNum) = cAlphaArgs(SurfNum + alphaOffset);
                         state.dataWaterData->RainCollector(Item).SurfID(SurfNum) = UtilityRoutines::FindItemInList(cAlphaArgs(SurfNum + alphaOffset), Surface);
                         if (state.dataWaterData->RainCollector(Item).SurfID(SurfNum) == 0) {
@@ -473,11 +466,11 @@ namespace WaterManager {
                     }
 
                     // now setup horizontal surface area
-                    tmpArea = 0.0;
-                    tmpNumerator = 0.0;
-                    tmpDenominator = 0.0;
-                    for (SurfNum = 1; SurfNum <= state.dataWaterData->RainCollector(Item).NumCollectSurfs; ++SurfNum) {
-                        ThisSurf = state.dataWaterData->RainCollector(Item).SurfID(SurfNum);
+                    Real64 tmpArea = 0.0;
+                    Real64 tmpNumerator = 0.0;
+                    Real64 tmpDenominator = 0.0;
+                    for (int SurfNum = 1; SurfNum <= state.dataWaterData->RainCollector(Item).NumCollectSurfs; ++SurfNum) {
+                        int ThisSurf = state.dataWaterData->RainCollector(Item).SurfID(SurfNum);
                         tmpArea += Surface(ThisSurf).GrossArea * Surface(ThisSurf).CosTilt;
                         tmpNumerator += Surface(ThisSurf).Centroid.z * Surface(ThisSurf).GrossArea;
                         tmpDenominator += Surface(ThisSurf).GrossArea;
@@ -949,24 +942,21 @@ namespace WaterManager {
         using ScheduleManager::GetCurrentScheduleValue;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static Real64 OrigVdotDemandRequest(0.0);
-        static Real64 TotVdotDemandAvail(0.0);
-        static Real64 OrigVolDemandRequest(0.0);
-        static Real64 TotVolDemandAvail(0.0);
-        static Real64 OrigVdotSupplyAvail(0.0);
-        static Real64 TotVdotSupplyAvail(0.0);
-        static Real64 TotVolSupplyAvail(0.0);
-        static Real64 overflowVdot(0.0);
-        static Real64 overflowVol(0.0);
-        static Real64 overflowTwater(0.0);
-        static Real64 NetVdotAdd(0.0);
-        static Real64 NetVolAdd(0.0);
-        static Real64 FillVolRequest(0.0);
-        static Real64 TotVolAllowed(0.0);
-        static Real64 AvailVolume(0.0);
-        static Real64 underflowVdot(0.0);
-        static Real64 VolumePredict(0.0);
-        static Real64 OverFillVolume(0.0);
+        Real64 OrigVdotDemandRequest(0.0);
+        Real64 TotVdotDemandAvail(0.0);
+        Real64 OrigVolDemandRequest(0.0);
+        Real64 TotVolDemandAvail(0.0);
+        Real64 OrigVdotSupplyAvail(0.0);
+        Real64 TotVdotSupplyAvail(0.0);
+        Real64 TotVolSupplyAvail(0.0);
+        Real64 overflowVdot(0.0);
+        Real64 overflowVol(0.0);
+        Real64 NetVdotAdd(0.0);
+        Real64 NetVolAdd(0.0);
+        Real64 FillVolRequest(0.0);
+        Real64 TotVolAllowed(0.0);
+        Real64 underflowVdot(0.0);
+        Real64 VolumePredict(0.0);
 
         if (state.dataGlobal->BeginTimeStepFlag) {
             // initializations are done in UpdateWaterManager
@@ -982,7 +972,7 @@ namespace WaterManager {
         if (TotVdotSupplyAvail > state.dataWaterData->WaterStorage(TankNum).MaxInFlowRate) {
             // pipe/filter rate constraints on inlet
             overflowVdot = TotVdotSupplyAvail - state.dataWaterData->WaterStorage(TankNum).MaxInFlowRate;
-            overflowTwater =
+            state.dataWaterManager->overflowTwater =
                 sum(state.dataWaterData->WaterStorage(TankNum).VdotAvailSupply * state.dataWaterData->WaterStorage(TankNum).TwaterSupply) / sum(state.dataWaterData->WaterStorage(TankNum).VdotAvailSupply);
             TotVdotSupplyAvail = state.dataWaterData->WaterStorage(TankNum).MaxInFlowRate;
         }
@@ -1013,8 +1003,8 @@ namespace WaterManager {
         TotVolAllowed = state.dataWaterData->WaterStorage(TankNum).MaxCapacity - state.dataWaterData->WaterStorage(TankNum).LastTimeStepVolume;
         if (VolumePredict > state.dataWaterData->WaterStorage(TankNum).MaxCapacity) { // too much
             // added overflow to inlet rate limit, new temperature model
-            OverFillVolume = (VolumePredict - state.dataWaterData->WaterStorage(TankNum).MaxCapacity);
-            overflowTwater = (overflowTwater * overflowVol + OverFillVolume * state.dataWaterData->WaterStorage(TankNum).Twater) / (overflowVol + OverFillVolume);
+            Real64 OverFillVolume = (VolumePredict - state.dataWaterData->WaterStorage(TankNum).MaxCapacity);
+            state.dataWaterManager->overflowTwater = (state.dataWaterManager->overflowTwater * overflowVol + OverFillVolume * state.dataWaterData->WaterStorage(TankNum).Twater) / (overflowVol + OverFillVolume);
             overflowVol += OverFillVolume;
             NetVolAdd -= OverFillVolume;
             NetVdotAdd = NetVolAdd / (TimeStepSys * DataGlobalConstants::SecInHour);
@@ -1023,7 +1013,7 @@ namespace WaterManager {
 
         // Is tank too low to meet the request?
         if (VolumePredict < 0.0) {
-            AvailVolume = state.dataWaterData->WaterStorage(TankNum).LastTimeStepVolume + TotVolSupplyAvail;
+            Real64 AvailVolume = state.dataWaterData->WaterStorage(TankNum).LastTimeStepVolume + TotVolSupplyAvail;
             AvailVolume = max(0.0, AvailVolume);
             TotVolDemandAvail = AvailVolume;
             TotVdotDemandAvail = AvailVolume / (TimeStepSys * DataGlobalConstants::SecInHour);
@@ -1081,7 +1071,7 @@ namespace WaterManager {
         state.dataWaterData->WaterStorage(TankNum).ThisTimeStepVolume = state.dataWaterData->WaterStorage(TankNum).LastTimeStepVolume + NetVolAdd;
         state.dataWaterData->WaterStorage(TankNum).VdotOverflow = overflowVol / (TimeStepSys * DataGlobalConstants::SecInHour);
         state.dataWaterData->WaterStorage(TankNum).VolOverflow = overflowVol;
-        state.dataWaterData->WaterStorage(TankNum).TwaterOverflow = overflowTwater;
+        state.dataWaterData->WaterStorage(TankNum).TwaterOverflow = state.dataWaterManager->overflowTwater;
         state.dataWaterData->WaterStorage(TankNum).NetVdot = NetVolAdd / (TimeStepSys * DataGlobalConstants::SecInHour);
         state.dataWaterData->WaterStorage(TankNum).MainsDrawVol = state.dataWaterData->WaterStorage(TankNum).MainsDrawVdot * (TimeStepSys * DataGlobalConstants::SecInHour);
         state.dataWaterData->WaterStorage(TankNum).VdotToTank = TotVdotSupplyAvail;

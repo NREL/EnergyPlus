@@ -777,12 +777,12 @@ namespace ZoneEquipmentManager {
         int ZoneSizNum;                  // zone sizing input index
         Real64 TotPeopleInZone;          // total (maximum) number of people in a zone
         int PeopleNum;                   // index of People structure
-        static Real64 OAFromPeople(0.0); // min OA calculated from zone occupancy [m3/s]
-        static Real64 OAFromArea(0.0);   // min OA calculated from zone area and OA flow per area [m3/s]
+        Real64 OAFromPeople(0.0); // min OA calculated from zone occupancy [m3/s]
+        Real64 OAFromArea(0.0);   // min OA calculated from zone area and OA flow per area [m3/s]
         int ZoneIndex;                   // index of Zone Sizing zone name in zone array
         int ZoneSizIndex;                // zone sizing do loop index
         bool ErrorsFound(false);  // Set to true if errors in input, fatal at end of routine
-        static Real64 SchMax(0.0);       // maximum people multiplier value
+        Real64 SchMax(0.0);       // maximum people multiplier value
         Real64 OAVolumeFlowRate;         // outside air flow rate (m3/s)
         bool UseOccSchFlag;              // flag to use occupancy schedule when calculating OA
         bool UseMinOASchFlag;            // flag to use min OA schedule when calculating OA

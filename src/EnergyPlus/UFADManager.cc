@@ -117,7 +117,6 @@ namespace UFADManager {
 
     // Data
     // MODULE VARIABLE DECLARATIONS:
-    static std::string const BlankString;
 
     void ManageUCSDUFModels(EnergyPlusData &state,
                             int const ZoneNum,      // index number for the specified zone
@@ -187,8 +186,6 @@ namespace UFADManager {
         static Array1D_bool MySizeFlag;
         static Real64 NumShadesDown(0.0);
         int UINum;             // index to underfloor interior zone model data
-        static int Ctd(0);     // DO loop index
-        static int SurfNum(0); // surface data structure index
 
         // Do the one time initializations
         if (state.dataUFADManager->MyOneTimeFlag) {
@@ -210,8 +207,8 @@ namespace UFADManager {
         state.dataRoomAirMod->ZoneUFGamma(ZoneNum) = 0.0;
         state.dataRoomAirMod->ZoneUFPowInPlumes(ZoneNum) = 0.0;
         NumShadesDown = 0.0;
-        for (Ctd = PosZ_Window((ZoneNum - 1) * 2 + 1); Ctd <= PosZ_Window((ZoneNum - 1) * 2 + 2); ++Ctd) {
-            SurfNum = APos_Window(Ctd);
+        for (int Ctd = PosZ_Window((ZoneNum - 1) * 2 + 1); Ctd <= PosZ_Window((ZoneNum - 1) * 2 + 2); ++Ctd) {
+            int SurfNum = APos_Window(Ctd);
             if (SurfNum == 0) continue;
             if (Surface(SurfNum).ExtBoundCond == ExternalEnvironment || Surface(SurfNum).ExtBoundCond == OtherSideCoefNoCalcExt ||
                 Surface(SurfNum).ExtBoundCond == OtherSideCoefCalcExt || Surface(SurfNum).ExtBoundCond == OtherSideCondModeledExt) {
@@ -254,8 +251,6 @@ namespace UFADManager {
         using DataSizing::AutoSize;
 
         int UINum;                            // index to underfloor interior zone model data
-        static int Ctd(0);                    // DO loop index
-        static int SurfNum(0);                // surface data structure index
         static Real64 NumberOfOccupants(0.0); // design number of occupants in the zone
         static Real64 NumberOfPlumes(0.0);    // design number of plumes in the zone
         static Real64 ZoneElecConv(0.0);      // zone elec equip design convective gain [W]
@@ -267,7 +262,7 @@ namespace UFADManager {
         if (ZoneModelType == DataRoomAirModel::RoomAirModel::UCSDUFI) {
             UINum = state.dataRoomAirMod->ZoneUFPtr(ZoneNum);
             NumberOfOccupants = 0.0;
-            for (Ctd = 1; Ctd <= TotPeople; ++Ctd) {
+            for (int Ctd = 1; Ctd <= TotPeople; ++Ctd) {
                 if (People(Ctd).ZonePtr == ZoneNum) {
                     NumberOfOccupants += People(Ctd).NumberOfPeople;
                 }
@@ -376,30 +371,30 @@ namespace UFADManager {
                     NumberOfPlumes = 1.0;
                 }
                 ZoneElecConv = 0.0;
-                for (Ctd = 1; Ctd <= TotElecEquip; ++Ctd) {
+                for (int Ctd = 1; Ctd <= TotElecEquip; ++Ctd) {
                     if (ZoneElectric(Ctd).ZonePtr == ZoneNum) {
                         ZoneElecConv += ZoneElectric(Ctd).DesignLevel * ZoneElectric(Ctd).FractionConvected;
                     }
                 }
                 ZoneGasConv = 0.0;
-                for (Ctd = 1; Ctd <= TotGasEquip; ++Ctd) {
+                for (int Ctd = 1; Ctd <= TotGasEquip; ++Ctd) {
                     if (ZoneGas(Ctd).ZonePtr == ZoneNum) {
                         ZoneGasConv += ZoneGas(Ctd).DesignLevel * ZoneGas(Ctd).FractionConvected;
                     }
                 }
                 ZoneOthEqConv = 0.0;
-                for (Ctd = 1; Ctd <= TotOthEquip; ++Ctd) {
+                for (int Ctd = 1; Ctd <= TotOthEquip; ++Ctd) {
                     if (ZoneOtherEq(Ctd).ZonePtr == ZoneNum) {
                         ZoneOthEqConv += ZoneOtherEq(Ctd).DesignLevel * ZoneOtherEq(Ctd).FractionConvected;
                     }
                 }
                 ZoneHWEqConv = 0.0;
-                for (Ctd = 1; Ctd <= TotHWEquip; ++Ctd) {
+                for (int Ctd = 1; Ctd <= TotHWEquip; ++Ctd) {
                     if (ZoneHWEq(Ctd).ZonePtr == ZoneNum) {
                         ZoneHWEqConv += ZoneHWEq(Ctd).DesignLevel * ZoneHWEq(Ctd).FractionConvected;
                     }
                 }
-                for (Ctd = 1; Ctd <= TotStmEquip; ++Ctd) {
+                for (int Ctd = 1; Ctd <= TotStmEquip; ++Ctd) {
                     ZoneSteamEqConv = 0.0;
                     if (ZoneSteamEq(Ctd).ZonePtr == ZoneNum) {
                         ZoneSteamEqConv += ZoneSteamEq(Ctd).DesignLevel * ZoneSteamEq(Ctd).FractionConvected;
@@ -428,8 +423,8 @@ namespace UFADManager {
         if (ZoneModelType == DataRoomAirModel::RoomAirModel::UCSDUFE) {
             UINum = state.dataRoomAirMod->ZoneUFPtr(ZoneNum);
             // calculate total window width in zone
-            for (Ctd = PosZ_Window((ZoneNum - 1) * 2 + 1); Ctd <= PosZ_Window((ZoneNum - 1) * 2 + 2); ++Ctd) {
-                SurfNum = APos_Window(Ctd);
+            for (int Ctd = PosZ_Window((ZoneNum - 1) * 2 + 1); Ctd <= PosZ_Window((ZoneNum - 1) * 2 + 2); ++Ctd) {
+                int SurfNum = APos_Window(Ctd);
                 if (SurfNum == 0) continue;
                 if (Surface(SurfNum).ExtBoundCond == ExternalEnvironment || Surface(SurfNum).ExtBoundCond == OtherSideCoefNoCalcExt ||
                     Surface(SurfNum).ExtBoundCond == OtherSideCoefCalcExt || Surface(SurfNum).ExtBoundCond == OtherSideCondModeledExt) {
@@ -443,7 +438,7 @@ namespace UFADManager {
                 ShowContinueError(state, "  The zone will be treated as a UFAD interior zone");
             }
             NumberOfOccupants = 0.0;
-            for (Ctd = 1; Ctd <= TotPeople; ++Ctd) {
+            for (int Ctd = 1; Ctd <= TotPeople; ++Ctd) {
                 if (People(Ctd).ZonePtr == ZoneNum) {
                     NumberOfOccupants += People(Ctd).NumberOfPeople;
                 }
@@ -551,30 +546,30 @@ namespace UFADManager {
                     NumberOfPlumes = 1.0;
                 }
                 ZoneElecConv = 0.0;
-                for (Ctd = 1; Ctd <= TotElecEquip; ++Ctd) {
+                for (int Ctd = 1; Ctd <= TotElecEquip; ++Ctd) {
                     if (ZoneElectric(Ctd).ZonePtr == ZoneNum) {
                         ZoneElecConv += ZoneElectric(Ctd).DesignLevel;
                     }
                 }
                 ZoneGasConv = 0.0;
-                for (Ctd = 1; Ctd <= TotGasEquip; ++Ctd) {
+                for (int Ctd = 1; Ctd <= TotGasEquip; ++Ctd) {
                     if (ZoneGas(Ctd).ZonePtr == ZoneNum) {
                         ZoneGasConv += ZoneGas(Ctd).DesignLevel;
                     }
                 }
                 ZoneOthEqConv = 0.0;
-                for (Ctd = 1; Ctd <= TotOthEquip; ++Ctd) {
+                for (int Ctd = 1; Ctd <= TotOthEquip; ++Ctd) {
                     if (ZoneOtherEq(Ctd).ZonePtr == ZoneNum) {
                         ZoneOthEqConv += ZoneOtherEq(Ctd).DesignLevel;
                     }
                 }
                 ZoneHWEqConv = 0.0;
-                for (Ctd = 1; Ctd <= TotHWEquip; ++Ctd) {
+                for (int Ctd = 1; Ctd <= TotHWEquip; ++Ctd) {
                     if (ZoneHWEq(Ctd).ZonePtr == ZoneNum) {
                         ZoneHWEqConv += ZoneHWEq(Ctd).DesignLevel;
                     }
                 }
-                for (Ctd = 1; Ctd <= TotStmEquip; ++Ctd) {
+                for (int Ctd = 1; Ctd <= TotStmEquip; ++Ctd) {
                     ZoneSteamEqConv = 0.0;
                     if (ZoneSteamEq(Ctd).ZonePtr == ZoneNum) {
                         ZoneSteamEqConv += ZoneSteamEq(Ctd).DesignLevel;
@@ -932,7 +927,7 @@ namespace UFADManager {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool MIXFLAG(false); // if true treat as a mixed zone
+        bool MIXFLAG(false); // if true treat as a mixed zone
         Real64 CeilingHeight;       // zone ceiling height above floor [m]
         int UINum;                  // index to underfloor interior zone model data
         Real64 GainsFrac;           // fraction of occupied subzone heat gains that remain in the subzone;
@@ -943,7 +938,7 @@ namespace UFADManager {
         Real64 TempDiffCritRep;     // Minimum temperature difference between upper and occupied subzones for reporting
         Real64 ConvGainsOccSubzone; // convective heat gains into the lower (occupied) subzone [W]
         Real64 ConvGainsUpSubzone;  // convective heat gains into the upper subzone [W]
-        Real64 ConvGains;           // total zone convective gains (exclusing surfaces) [W]
+        Real64 ConvGains;           // total zone convective gains (excluding surfaces) [W]
         int ZoneEquipConfigNum;     // ZoneEquipConfig index for this UFAD zone
         Real64 SumSysMCp;           // Sum of system mass flow rate * specific heat for this zone [W/K]
         Real64 SumSysMCpT;          // Sum of system mass flow rate * specific heat * temperature for this zone [W]
@@ -958,7 +953,7 @@ namespace UFADManager {
         Real64 MCpT_Total;          // total mass flow rate * specific heat* temp for this zone [W]
         Real64 NumberOfPlumes;
         Real64 PowerInPlumes;             // [W]
-        static Real64 PowerPerPlume(0.0); // power generating each plume [W]
+        Real64 PowerPerPlume(0.0); // power generating each plume [W]
         Real64 HeightFrac;                // Fractional height of transition between occupied and upper subzones
         Real64 TotSysFlow;                // [m3/s]
         Real64 NumDiffusersPerPlume;
@@ -977,9 +972,7 @@ namespace UFADManager {
         Real64 HeightOccupiedSubzoneAve; // Height of center of occupied air subzone
         Real64 ZoneMult;                 // total zone multiplier
         int ZoneNodeNum;                 // node number of the HVAC zone node
-        static Real64 TempDepCoef(0.0);  // Formerly CoefSumha, coef in zone temp equation with dimensions of h*A
-        static Real64 TempIndCoef(0.0);  // Formerly CoefSumhat, coef in zone temp equation with dimensions of h*A(T1
-        static Array1D_int IntGainTypesOccupied(29,
+        Array1D_int IntGainTypesOccupied(29,
                                                 {IntGainTypeOf_People,
                                                  IntGainTypeOf_WaterHeaterMixed,
                                                  IntGainTypeOf_WaterHeaterStratified,
@@ -1010,7 +1003,7 @@ namespace UFADManager {
                                                  IntGainTypeOf_RefrigerationSecondaryPipe,
                                                  IntGainTypeOf_RefrigerationWalkIn});
 
-        static Array1D_int IntGainTypesUpSubzone(2, {IntGainTypeOf_DaylightingDeviceTubular, IntGainTypeOf_Lights});
+        Array1D_int IntGainTypesUpSubzone(2, {IntGainTypeOf_DaylightingDeviceTubular, IntGainTypeOf_Lights});
         Real64 RetAirGains;
 
         // Exact solution or Euler method
@@ -1175,8 +1168,9 @@ namespace UFADManager {
 
                 AirCap = state.dataRoomAirMod->AIRRATOC(ZoneNum);
                 TempHistTerm = AirCap * (3.0 * state.dataRoomAirMod->ZTM1OC(ZoneNum) - (3.0 / 2.0) * state.dataRoomAirMod->ZTM2OC(ZoneNum) + (1.0 / 3.0) * state.dataRoomAirMod->ZTM3OC(ZoneNum));
-                TempDepCoef = GainsFrac * state.dataUFADManager->HA_OC + MCp_Total;
-                TempIndCoef =
+                // Formerly CoefSumha, coef in zone temp equation with dimensions of h*A
+                Real64 TempDepCoef = GainsFrac * state.dataUFADManager->HA_OC + MCp_Total;
+                Real64 TempIndCoef =
                     GainsFrac * (ConvGains + state.dataUFADManager->HAT_OC + state.dataUFADManager->HAT_MX - state.dataUFADManager->HA_MX * state.dataRoomAirMod->ZTMX(ZoneNum)) + MCpT_Total + NonAirSystemResponse(ZoneNum) / ZoneMult;
                 {
                     auto const SELECT_CASE_var(ZoneAirSolutionAlgo);
@@ -1241,8 +1235,9 @@ namespace UFADManager {
             TempHistTerm = AirCap * (3.0 * ZTM1(ZoneNum) - (3.0 / 2.0) * ZTM2(ZoneNum) + (1.0 / 3.0) * ZTM3(ZoneNum));
 
             for (Ctd = 1; Ctd <= 3; ++Ctd) {
-                TempDepCoef = state.dataUFADManager->HA_MX + state.dataUFADManager->HA_OC + MCp_Total;
-                TempIndCoef = ConvGains + state.dataUFADManager->HAT_MX + state.dataUFADManager->HAT_OC + MCpT_Total;
+                Real64 TempDepCoef = state.dataUFADManager->HA_MX + state.dataUFADManager->HA_OC + MCp_Total;
+                // Formerly CoefSumhat, coef in zone temp equation with dimensions of h*A(T1
+                Real64 TempIndCoef = ConvGains + state.dataUFADManager->HAT_MX + state.dataUFADManager->HAT_OC + MCpT_Total;
                 {
                     auto const SELECT_CASE_var(ZoneAirSolutionAlgo);
                     if (SELECT_CASE_var == Use3rdOrder) {
@@ -1404,7 +1399,7 @@ namespace UFADManager {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool MIXFLAG(false); // if true treat as a mixed zone
+        bool MIXFLAG(false); // if true treat as a mixed zone
         Real64 CeilingHeight;       // zone ceiling height above floor [m]
         int UINum;                  // index to underfloor interior zone model data
         Real64 GainsFrac;           // fraction of occupied subzone heat gains that remain in the subzone;
@@ -1430,9 +1425,9 @@ namespace UFADManager {
         Real64 MCpT_Total;          // total mass flow rate * specific heat* temp for this zone [W]
         Real64 NumberOfPlumes;
         Real64 PowerInPlumes;             // [W]
-        static Real64 PowerPerPlume(0.0); // power carried by each plume [W]
+        Real64 PowerPerPlume(0.0); // power carried by each plume [W]
         Real64 PowerInPlumesPerMeter;     // Power in Plumes per meter of window length [W/m]
-        static Real64 NumDiffusersPerPlume(0.0);
+        Real64 NumDiffusersPerPlume(0.0);
         Real64 HeightFrac; // Fractional height of transition between occupied and upper subzones
         Real64 TotSysFlow; // [m3/s]
         Real64 NumDiffusers;

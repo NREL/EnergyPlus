@@ -697,7 +697,6 @@ namespace WindTurbine {
         bool wsStatFound;             // logical noting that wind stats were found
         bool warningShown;            // true if the <365 warning has already been shown
         Array1D<Real64> MonthWS(12);
-        static Real64 AnnualTMYWS(0.0); // Annual average wind speed in stat file
         Real64 LocalTMYWS;              // Annual average wind speed at the rotor height
 
         // Estimate average annual wind speed once
@@ -751,7 +750,7 @@ namespace WindTurbine {
                     if (wsStatFound) break;
                 }
                 if (wsStatFound) {
-                    AnnualTMYWS = sum(MonthWS) / 12.0;
+                    state.dataWindTurbine->AnnualTMYWS = sum(MonthWS) / 12.0;
                 } else {
                     ShowWarningError(state,
                         "InitWindTurbine: stat file did not include Wind Speed statistics. TMY Wind Speed adjusted at the height is used.");
@@ -763,13 +762,13 @@ namespace WindTurbine {
             state.dataWindTurbine->MyOneTimeFlag = false;
         }
 
-        state.dataWindTurbine->WindTurbineSys(WindTurbineNum).AnnualTMYWS = AnnualTMYWS;
+        state.dataWindTurbine->WindTurbineSys(WindTurbineNum).AnnualTMYWS = state.dataWindTurbine->AnnualTMYWS;
 
         // Factor differences between TMY wind data and local wind data once
-        if (AnnualTMYWS > 0.0 && state.dataWindTurbine->WindTurbineSys(WindTurbineNum).WSFactor == 0.0 && state.dataWindTurbine->WindTurbineSys(WindTurbineNum).LocalAnnualAvgWS > 0) {
+        if (state.dataWindTurbine->AnnualTMYWS > 0.0 && state.dataWindTurbine->WindTurbineSys(WindTurbineNum).WSFactor == 0.0 && state.dataWindTurbine->WindTurbineSys(WindTurbineNum).LocalAnnualAvgWS > 0) {
             // Convert the annual wind speed to the local wind speed at the height of the local station, then factor
             LocalTMYWS =
-                AnnualTMYWS * state.dataEnvrn->WeatherFileWindModCoeff * std::pow(state.dataWindTurbine->WindTurbineSys(WindTurbineNum).HeightForLocalWS / state.dataEnvrn->SiteWindBLHeight, state.dataEnvrn->SiteWindExp);
+                state.dataWindTurbine->AnnualTMYWS * state.dataEnvrn->WeatherFileWindModCoeff * std::pow(state.dataWindTurbine->WindTurbineSys(WindTurbineNum).HeightForLocalWS / state.dataEnvrn->SiteWindBLHeight, state.dataEnvrn->SiteWindExp);
             state.dataWindTurbine->WindTurbineSys(WindTurbineNum).WSFactor = LocalTMYWS / state.dataWindTurbine->WindTurbineSys(WindTurbineNum).LocalAnnualAvgWS;
         }
         // Assign factor of 1.0 if no stat file or no input of local average wind speed

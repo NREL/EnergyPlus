@@ -118,45 +118,13 @@ namespace WindowComplexManager {
 
         using namespace Vectors;
 
-        static int IBasis(0);   // Index for identifying basis in BasisList
-        static int ISurf(0);    // Index for sorting thru Surface array
-        static int IConst(0);   // Index for accessing Construct array
-        static int IState(0);   // Index identifying the window state for a particular window
-        static int IWind(0);    // Index identifying a window in the dataWindowComplexManager.WindowList
-        static int I(0);        // general purpose index
-        static int J(0);        // general purpose index
-        static int JSurf(0);    // back surface number
         int BaseSurf;           // base surface number (used in finding back surface)
-        static int K(0);        // general purpose index
-        static int KBkSurf(0);  // back surface index
-        static int KBasis(0);   // secondary reference to a basis index
-        static int NumBasis(0); // Number of unique bases (No. in BasisList)
-        static int NBkSurf(0);  // Local variable for the number of back surfaces
         int NumStates;          // Local variable for the number of states
-        static int MatrixNo(0); // Index of Basis matrix
         Array1D<Real64> Thetas; // temp array holding theta values
         Array1D_int NPhis;      // temp array holding number of phis for a given theta
         Array1D<Real64> V(3);   // vector array
         Real64 VLen;            // Length of vector array
         int NHold;              // No. values in the Temporary array
-
-        if (state.dataWindowComplexManager->resetAbunchOfStuff) {
-            IBasis = 0;
-            ISurf = 0;
-            IConst = 0;
-            IState = 0;
-            IWind = 0;
-            I = 0;
-            J = 0;
-            JSurf = 0;
-            K = 0;
-            KBkSurf = 0;
-            KBasis = 0;
-            NumBasis = 0;
-            NBkSurf = 0;
-            MatrixNo = 0;
-            state.dataWindowComplexManager->resetAbunchOfStuff = false;
-        }
 
         struct TempBasisIdx
         {
@@ -183,21 +151,21 @@ namespace WindowComplexManager {
         //            definition or additional definition of a state type with non-square matrices, then the loop
         //            below should be modified to enter both of the bases into the basis list.
 
-        for (IConst = state.dataBSDFWindow->FirstBSDF; IConst <= state.dataBSDFWindow->FirstBSDF + state.dataBSDFWindow->TotComplexFenStates - 1; ++IConst) {
-            MatrixNo = state.dataConstruction->Construct(IConst).BSDFInput.BasisMatIndex;
-            if (NumBasis == 0) {
-                NumBasis = 1;
+        for (int IConst = state.dataBSDFWindow->FirstBSDF; IConst <= state.dataBSDFWindow->FirstBSDF + state.dataBSDFWindow->TotComplexFenStates - 1; ++IConst) {
+            state.dataWindowComplexManager->MatrixNo = state.dataConstruction->Construct(IConst).BSDFInput.BasisMatIndex;
+            if (state.dataWindowComplexManager->NumBasis == 0) {
+                state.dataWindowComplexManager->NumBasis = 1;
                 ConstructBasis(state, IConst, state.dataWindowComplexManager->BasisList(1));
             } else {
-                for (IBasis = 1; IBasis <= NumBasis; ++IBasis) {
-                    if (MatrixNo == state.dataWindowComplexManager->BasisList(IBasis).BasisMatIndex) goto BsLoop_loop;
+                for (int IBasis = 1; IBasis <= state.dataWindowComplexManager->NumBasis; ++IBasis) {
+                    if (state.dataWindowComplexManager->MatrixNo == state.dataWindowComplexManager->BasisList(IBasis).BasisMatIndex) goto BsLoop_loop;
                 }
-                ++NumBasis;
-                ConstructBasis(state, IConst, state.dataWindowComplexManager->BasisList(NumBasis));
+                ++state.dataWindowComplexManager->NumBasis;
+                ConstructBasis(state, IConst, state.dataWindowComplexManager->BasisList(state.dataWindowComplexManager->NumBasis));
             }
         BsLoop_loop:;
         }
-        state.dataWindowComplexManager->BasisList.redimension(NumBasis);
+        state.dataWindowComplexManager->BasisList.redimension(state.dataWindowComplexManager->NumBasis);
         //  Proceed to set up geometry for complex fenestration states
         state.dataBSDFWindow->ComplexWind.allocate(TotSurfaces); // Set up companion array to SurfaceWindow to hold window
         //     geometry for each state.  This is an allocatable array of
@@ -208,8 +176,8 @@ namespace WindowComplexManager {
         //     control specifications
         state.dataWindowComplexManager->WindowList.allocate(TotSurfaces);                           // Temporary allocation
         state.dataWindowComplexManager->WindowStateList.allocate(state.dataBSDFWindow->TotComplexFenStates, TotSurfaces); // Temporary allocation
-        for (ISurf = 1; ISurf <= TotSurfaces; ++ISurf) {
-            IConst = Surface(ISurf).Construction;
+        for (int ISurf = 1; ISurf <= TotSurfaces; ++ISurf) {
+            int IConst = Surface(ISurf).Construction;
             if (IConst == 0) continue; // This is true for overhangs (Shading:Zone:Detailed)
             if (!(state.dataConstruction->Construct(IConst).TypeIsWindow && (state.dataConstruction->Construct(IConst).WindowTypeBSDF))) continue; // Only BSDF windows
             // Simon Check: Thermal construction removed
@@ -230,7 +198,7 @@ namespace WindowComplexManager {
             state.dataWindowComplexManager->WindowStateList(NumStates, state.dataWindowComplexManager->NumComplexWind).Konst = IConst;
             // Simon Check: ThermalConstruction assigned to current construction
             // state.dataWindowComplexManager->WindowStateList(NumComplexWind, NumStates)%ThermConst = ThConst
-            for (I = 1; I <= NumBasis; ++I) { // Find basis in Basis List
+            for (int I = 1; I <= state.dataWindowComplexManager->NumBasis; ++I) { // Find basis in Basis List
                 if (state.dataConstruction->Construct(IConst).BSDFInput.BasisMatIndex == state.dataWindowComplexManager->BasisList(I).BasisMatIndex) {
                     state.dataWindowComplexManager->WindowStateList(NumStates, state.dataWindowComplexManager->NumComplexWind).IncBasisIndx = I; // Note: square property matrices
                     state.dataWindowComplexManager->WindowStateList(NumStates, state.dataWindowComplexManager->NumComplexWind).TrnBasisIndx = I; //   assumption
@@ -256,7 +224,7 @@ namespace WindowComplexManager {
         // Note:  code below assumes identical incoming and outgoing bases; following code will
         //   need revision if this assumption relaxed
 
-        for (IWind = 1; IWind <= state.dataWindowComplexManager->NumComplexWind; ++IWind) { // Search window list for repeated bases
+        for (int IWind = 1; IWind <= state.dataWindowComplexManager->NumComplexWind; ++IWind) { // Search window list for repeated bases
             if (state.dataWindowComplexManager->WindowList(IWind).NumStates > 1) {
                 IHold.allocate(state.dataWindowComplexManager->WindowList(IWind).NumStates);
                 NHold = 1;
@@ -265,12 +233,12 @@ namespace WindowComplexManager {
                 // If the Mth new basis found is basis B in the basis list, and it
                 // first occurs in the WindowStateList  in state N, then IHold(M)%Basis=B
                 // and IHold(M)%State=N
-                for (K = 1; K <= NumBasis; ++K) {
+                for (int K = 1; K <= state.dataWindowComplexManager->NumBasis; ++K) {
                     if (K > NHold) break;
-                    KBasis = IHold(K).Basis;
-                    J = IHold(K).State;
+                    int KBasis = IHold(K).Basis;
+                    int J = IHold(K).State;
                     state.dataWindowComplexManager->InitBSDFWindowsOnce = true;
-                    for (I = J + 1; I <= state.dataWindowComplexManager->WindowList(IWind).NumStates; ++I) { // See if subsequent states have the same basis
+                    for (int I = J + 1; I <= state.dataWindowComplexManager->WindowList(IWind).NumStates; ++I) { // See if subsequent states have the same basis
                         if ((state.dataWindowComplexManager->WindowStateList(I, state.dataWindowComplexManager->NumComplexWind).InitInc == state.dataWindowComplexManager->Calculate_Geometry) &&
                             (state.dataWindowComplexManager->WindowStateList(I, state.dataWindowComplexManager->NumComplexWind).IncBasisIndx == KBasis)) {
                             // Note:  square property matrices (same inc & trn bases) assumption
@@ -297,8 +265,8 @@ namespace WindowComplexManager {
 
         //  Now go through window list and window state list and calculate or copy the
         //   geometry information for each window, state
-        for (IWind = 1; IWind <= state.dataWindowComplexManager-> NumComplexWind; ++IWind) {
-            ISurf = state.dataWindowComplexManager->WindowList(IWind).SurfNo;
+        for (int IWind = 1; IWind <= state.dataWindowComplexManager-> NumComplexWind; ++IWind) {
+            int ISurf = state.dataWindowComplexManager->WindowList(IWind).SurfNo;
             NumStates = state.dataWindowComplexManager->WindowList(IWind).NumStates;
             // ALLOCATE(SurfaceWindow( ISurf )%ComplexFen)    !activate the BSDF window description
             //  for this surface
@@ -310,15 +278,15 @@ namespace WindowComplexManager {
             // Tilt = WindowList( IWind ).Tilt;
             // Get the number of back surfaces for this window
             BaseSurf = Surface(ISurf).BaseSurf; // ShadowComb is organized by base surface
-            NBkSurf = ShadowComb(BaseSurf).NumBackSurf;
+            int NBkSurf = ShadowComb(BaseSurf).NumBackSurf;
             state.dataBSDFWindow->ComplexWind(ISurf).NBkSurf = NBkSurf;
             // Define the back surface directions
             state.dataBSDFWindow->ComplexWind(ISurf).sWinSurf.allocate(NBkSurf);
             state.dataBSDFWindow->ComplexWind(ISurf).sdotN.allocate(NBkSurf);
             // Define the unit vectors pointing from the window center to the back surface centers
-            for (KBkSurf = 1; KBkSurf <= NBkSurf; ++KBkSurf) {
+            for (int KBkSurf = 1; KBkSurf <= NBkSurf; ++KBkSurf) {
                 BaseSurf = Surface(ISurf).BaseSurf;             // ShadowComb is organized by base surface
-                JSurf = ShadowComb(BaseSurf).BackSurf(KBkSurf); // these are all proper back surfaces
+                int JSurf = ShadowComb(BaseSurf).BackSurf(KBkSurf); // these are all proper back surfaces
                 V = Surface(JSurf).Centroid - Surface(ISurf).Centroid;
                 VLen = magnitude(V);
                 // Define the unit vector from the window center to the back
@@ -327,10 +295,10 @@ namespace WindowComplexManager {
                 // Define the back surface cosine(incident angle)
                 state.dataBSDFWindow->ComplexWind(ISurf).sdotN(KBkSurf) = dot(V, Surface(JSurf).OutNormVec) / VLen;
             }
-            for (IState = 1; IState <= NumStates; ++IState) {
+            for (int IState = 1; IState <= NumStates; ++IState) {
                 // The following assumes identical incoming and outgoing bases.  The logic will need to be
                 //  redesigned if this assumption is relaxed
-                IConst = state.dataWindowComplexManager->WindowStateList(IState, IWind).Konst;
+                int IConst = state.dataWindowComplexManager->WindowStateList(IState, IWind).Konst;
                 // ThConst = WindowStateList ( IWind , IState )%ThermConst
                 SurfaceWindow(ISurf).ComplexFen.State(IState).Konst = IConst;
                 // SurfaceWindow(ISurf)%ComplexFen%State(IState)%ThermConst = ThConst
@@ -354,10 +322,10 @@ namespace WindowComplexManager {
             } // State loop
         }     // Complex Window loop
         //  Allocate all beam-dependent complex fenestration quantities
-        for (IWind = 1; IWind <= state.dataWindowComplexManager-> NumComplexWind; ++IWind) {
-            ISurf = state.dataWindowComplexManager->WindowList(IWind).SurfNo;
+        for (int IWind = 1; IWind <= state.dataWindowComplexManager-> NumComplexWind; ++IWind) {
+            int ISurf = state.dataWindowComplexManager->WindowList(IWind).SurfNo;
             NumStates = state.dataWindowComplexManager->WindowList(IWind).NumStates;
-            for (IState = 1; IState <= NumStates; ++IState) {
+            for (int IState = 1; IState <= NumStates; ++IState) {
                 AllocateCFSStateHourlyData(state, ISurf, IState);
             } // State loop
         }     // Complex Window loop
@@ -888,16 +856,16 @@ namespace WindowComplexManager {
 
         using namespace Vectors;
 
-        static int ISurf(0);     // Index for sorting thru Surface array
-                                 //		static int IConst( 0 ); // Index for accessing Construct array
-        static int IState(0);    // Index identifying the window state for a particular window
-        static int IWind(0);     // Index identifying a window in the WindowList
-        static int NumStates(0); // local copy of no of states
+//       ISurf(0);     // Index for sorting thru Surface array
+//                     //		static int IConst( 0 ); // Index for accessing Construct array
+//       IState(0);    // Index identifying the window state for a particular window
+//       IWind(0);     // Index identifying a window in the WindowList
+//       NumStates(0); // local copy of no of states
 
-        for (IWind = 1; IWind <= state.dataWindowComplexManager-> NumComplexWind; ++IWind) {
-            ISurf = state.dataWindowComplexManager->WindowList(IWind).SurfNo;
-            NumStates = state.dataWindowComplexManager->WindowList(IWind).NumStates;
-            for (IState = 1; IState <= NumStates; ++IState) {
+        for (int IWind = 1; IWind <= state.dataWindowComplexManager-> NumComplexWind; ++IWind) {
+            int ISurf = state.dataWindowComplexManager->WindowList(IWind).SurfNo;
+            int NumStates = state.dataWindowComplexManager->WindowList(IWind).NumStates;
+            for (int IState = 1; IState <= NumStates; ++IState) {
                 // IConst = WindowStateList ( IWind , IState )%Konst
                 SurfaceWindow(ISurf).ComplexFen.State(IState).Konst = state.dataWindowComplexManager->WindowStateList(IState, IWind).Konst;
                 CalcWindowStaticProperties(

@@ -103,9 +103,6 @@
 namespace EnergyPlus {
 namespace UnitarySystems {
 
-    bool myOneTimeFlag(true);
-    bool getInputFlag(true);
-
     static std::string const fluidNameSteam("STEAM");
     static std::string const blankString("");
 
@@ -489,9 +486,9 @@ namespace UnitarySystems {
         static std::string const routineName("InitUnitarySystems");
         bool errorsFound = false; // error flag for mining functions
 
-        if (myOneTimeFlag) {
+        if (state.dataUnitarySystems->myOneTimeFlag) {
             // initialize or allocate something once
-            myOneTimeFlag = false;
+            state.dataUnitarySystems->myOneTimeFlag = false;
         }
 
         if (!state.dataGlobal->SysSizingCalc && this->m_MySizingCheckFlag && !this->m_ThisSysInputShouldBeGotten) {

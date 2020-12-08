@@ -555,6 +555,25 @@ namespace WindowManager {
         bool HasWindows = false;
         bool HasComplexWindows = false;
         bool HasEQLWindows = false; // equivalent layer window defined
+        Real64 SimpleGlazingSHGC = 0.0;    // value of SHGC for simple glazing system block model
+        Real64 SimpleGlazingU = 0.0;       // value of U-factor for simple glazing system block model
+        Real64 tmpTrans = 0.0;             // solar transmittance calculated from spectral data
+        Real64 tmpTransVis = 0.0;          // visible transmittance calculated from spectral data
+        Real64 tmpReflectSolBeamFront = 0.0;
+        Real64 tmpReflectSolBeamBack = 0.0;
+        Real64 tmpReflectVisBeamFront = 0.0;
+        Real64 tmpReflectVisBeamBack = 0.0;
+
+        // Debug
+//        Array1D<Real64> DbgTheta = Array1D<Real64>(11, {0.0, 10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 82.5, 89.5});
+//        Array1D<Real64> DbgTSol = Array1D<Real64>(11, 0.0);
+//        Array1D<Real64> DbgRbSol = Array1D<Real64>(11, 0.0);
+//        Array1D<Real64> DbgTVis = Array1D<Real64>(11, 0.0);
+//        Array2D<Real64> DbgFtAbs = Array2D<Real64>(5, 11, 0.0);
+//        Array2D<Real64> DbgBkAbs = Array2D<Real64>(5, 11, 0.0);
+//        Array1D<Real64> DbgFTAbsDiff = Array1D<Real64>(5, 0.0);
+//        Array1D<Real64> DbgBkAbsDiff = Array1D<Real64>(5, 0.0);
+        // EndDebug
 
         void clear_state() override {
             this->wle = Array1D<Real64>(nume, {0.3000, 0.3050, 0.3100, 0.3150, 0.3200, 0.3250, 0.3300, 0.3350, 0.3400, 0.3450, 0.3500, 0.3600, 0.3700, 0.3800,
@@ -679,6 +698,22 @@ namespace WindowManager {
             this->HasWindows = false;
             this->HasComplexWindows = false;
             this->HasEQLWindows = false; // equivalent layer window defined
+            this->SimpleGlazingSHGC = 0.0;
+            this->SimpleGlazingU = 0.0;
+            this->tmpTrans = 0.0;             // solar transmittance calculated from spectral data
+            this->tmpTransVis = 0.0;          // visible transmittance calculated from spectral data
+            this->tmpReflectSolBeamFront = 0.0;
+            this->tmpReflectSolBeamBack = 0.0;
+            this->tmpReflectVisBeamFront = 0.0;
+            this->tmpReflectVisBeamBack = 0.0;
+//            this->DbgTheta = Array1D<Real64>(11, {0.0, 10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 82.5, 89.5});
+//            this->DbgTSol = Array1D<Real64>(11, 0.0);
+//            this->DbgRbSol = Array1D<Real64>(11, 0.0);
+//            this->DbgTVis = Array1D<Real64>(11, 0.0);
+//            this->DbgFtAbs = Array2D<Real64>(5, 11, 0.0);
+//            this->DbgBkAbs = Array2D<Real64>(5, 11, 0.0);
+//            this->DbgFTAbsDiff = Array1D<Real64>(5, 0.0);
+//            this->DbgBkAbsDiff = Array1D<Real64>(5, 0.0);
         }
 
         // Default Constructor
@@ -788,6 +823,12 @@ namespace WindowManager {
             CosPhiIndepVar = 0.0;
             LayerNum.allocate(5); // Glass layer number
             LayerNum = 0;
+            SimpleGlazingSHGC = 0.0;
+            SimpleGlazingU = 0.0;
+            tmpReflectSolBeamFront = 0.0;
+            tmpReflectSolBeamBack = 0.0;
+            tmpReflectVisBeamFront = 0.0;
+            tmpReflectVisBeamBack = 0.0;
         }
     };
 

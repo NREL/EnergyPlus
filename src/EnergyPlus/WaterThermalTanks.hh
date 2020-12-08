@@ -596,6 +596,7 @@ namespace WaterThermalTanks {
         bool scanPlantLoopsFlag;
 
         int callerLoopNum;
+        int waterIndex;
 
         // Default Constructor
         WaterThermalTankData()
@@ -630,7 +631,8 @@ namespace WaterThermalTanks {
               OffCycParaEnergyToTank(0.0), OnCycParaFuelEnergy(0.0), OnCycParaEnergyToTank(0.0), NetHeatTransferEnergy(0.0), FirstRecoveryDone(false),
               FirstRecoveryFuel(0.0), HeatPumpNum(0), DesuperheaterNum(0), ShowSetPointWarning(true), MaxCycleErrorIndex(0), FreezingErrorIndex(0),
               FluidIndex(0), MyOneTimeFlagWH(true), MyTwoTimeFlagWH(true), MyEnvrnFlag(true), WarmupFlag(false), SetLoopIndexFlag(true),
-              AlreadyReported(false), AlreadyRated(false), MyHPSizeFlag(true), CheckWTTEquipName(true), myOneTimeInitFlag(true), scanPlantLoopsFlag(true), callerLoopNum(0)
+              AlreadyReported(false), AlreadyRated(false), MyHPSizeFlag(true), CheckWTTEquipName(true), myOneTimeInitFlag(true), scanPlantLoopsFlag(true),
+              callerLoopNum(0), waterIndex(1)
         {
         }
 

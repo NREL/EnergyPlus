@@ -302,26 +302,6 @@ namespace WindowManager {
         Array1D<Real64> W3(3);
         Array1D<Real64> W21(3); // W1-W2, W3-W2, resp. (m)
         Array1D<Real64> W23(3);
-        static Real64 SimpleGlazingSHGC(0.0);    // value of SHGC for simple glazing system block model
-        static Real64 SimpleGlazingU(0.0);       // value of U-factor for simple glazing system block model
-        static Real64 tmpTrans(0.0);             // solar transmittance calculated from spectral data
-        static Real64 tmpTransVis(0.0);          // visible transmittance calculated from spectral data
-        static Real64 tmpReflectSolBeamFront(0.0);
-        static Real64 tmpReflectSolBeamBack(0.0);
-        static Real64 tmpReflectVisBeamFront(0.0);
-        static Real64 tmpReflectVisBeamBack(0.0);
-
-        // Debug
-        static Array1D<Real64> DbgTheta(11, {0.0, 10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 82.5, 89.5});
-        static Array1D<Real64> DbgTSol(11, 0.0);
-        static Array1D<Real64> DbgRbSol(11, 0.0);
-        static Array1D<Real64> DbgTVis(11, 0.0);
-        static Array2D<Real64> DbgFtAbs(5, 11, 0.0);
-        static Array2D<Real64> DbgBkAbs(5, 11, 0.0);
-        static Array1D<Real64> DbgFTAbsDiff(5, 0.0);
-        static Array1D<Real64> DbgBkAbsDiff(5, 0.0);
-
-        // EndDebug
 
         W5InitGlassParameters(state);
 
@@ -366,8 +346,8 @@ namespace WindowManager {
             if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group == WindowSimpleGlazing) {
                 // what if outside layer is shade, blind, or screen?
                 state.dataWindowManager->lSimpleGlazingSystem = true;
-                SimpleGlazingSHGC = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).SimpleWindowSHGC;
-                SimpleGlazingU = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).SimpleWindowUfactor;
+                state.dataWindowManager->SimpleGlazingSHGC = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).SimpleWindowSHGC;
+                state.dataWindowManager->SimpleGlazingU = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).SimpleWindowUfactor;
             }
 
             if (has_prefix(state.dataConstruction->Construct(ConstrNum).Name, "BARECONSTRUCTIONWITHSTORMWIN") ||
@@ -507,10 +487,9 @@ namespace WindowManager {
                         state.dataWindowManager->rbb(IGlass, ILam) = SpectralData(SpecDataNum).ReflBack(ILam);
                     }
 
-                    // TH 8/26/2010, CR 8206
                     // If there is spectral data for between-glass shades or blinds, calc the average spectral properties for use.
                     if (state.dataWindowManager->BGFlag) {
-                        // 5/16/2012 CR 8793. Add warning message for the glazing defined with full spectral data.
+                        // Add warning message for the glazing defined with full spectral data.
                         ShowWarningError(state, "Window glazing material \"" + state.dataMaterial->Material(LayPtr).Name +
                                          "\" was defined with full spectral data and has been converted to average spectral data");
                         ShowContinueError(state, "due to its use with between-glass shades or blinds of the window construction \"" +
@@ -521,23 +500,23 @@ namespace WindowManager {
                                           "material) using the full spectral data.");
                         // calc Trans, TransVis, ReflectSolBeamFront, ReflectSolBeamBack, ReflectVisBeamFront, ReflectVisBeamBack
                         //  assuming wlt same as wle
-                        SolarSprectrumAverage(state, state.dataWindowManager->t, tmpTrans);
-                        SolarSprectrumAverage(state, state.dataWindowManager->rff, tmpReflectSolBeamFront);
-                        SolarSprectrumAverage(state, state.dataWindowManager->rbb, tmpReflectSolBeamBack);
+                        SolarSprectrumAverage(state, state.dataWindowManager->t, state.dataWindowManager->tmpTrans);
+                        SolarSprectrumAverage(state, state.dataWindowManager->rff, state.dataWindowManager->tmpReflectSolBeamFront);
+                        SolarSprectrumAverage(state, state.dataWindowManager->rbb, state.dataWindowManager->tmpReflectSolBeamBack);
 
                         // visible properties
-                        VisibleSprectrumAverage(state, state.dataWindowManager->t, tmpTransVis);
-                        VisibleSprectrumAverage(state, state.dataWindowManager->rff, tmpReflectVisBeamFront);
-                        VisibleSprectrumAverage(state, state.dataWindowManager->rbb, tmpReflectVisBeamBack);
+                        VisibleSprectrumAverage(state, state.dataWindowManager->t, state.dataWindowManager->tmpTransVis);
+                        VisibleSprectrumAverage(state, state.dataWindowManager->rff, state.dataWindowManager->tmpReflectVisBeamFront);
+                        VisibleSprectrumAverage(state, state.dataWindowManager->rbb, state.dataWindowManager->tmpReflectVisBeamBack);
 
                         // set this material to average spectral data
                         state.dataMaterial->Material(LayPtr).GlassSpectralDataPtr = 0;
-                        state.dataMaterial->Material(LayPtr).Trans = tmpTrans;
-                        state.dataMaterial->Material(LayPtr).TransVis = tmpTransVis;
-                        state.dataMaterial->Material(LayPtr).ReflectSolBeamFront = tmpReflectSolBeamFront;
-                        state.dataMaterial->Material(LayPtr).ReflectSolBeamBack = tmpReflectSolBeamBack;
-                        state.dataMaterial->Material(LayPtr).ReflectVisBeamFront = tmpReflectVisBeamFront;
-                        state.dataMaterial->Material(LayPtr).ReflectVisBeamBack = tmpReflectVisBeamBack;
+                        state.dataMaterial->Material(LayPtr).Trans = state.dataWindowManager->tmpTrans;
+                        state.dataMaterial->Material(LayPtr).TransVis = state.dataWindowManager->tmpTransVis;
+                        state.dataMaterial->Material(LayPtr).ReflectSolBeamFront = state.dataWindowManager->tmpReflectSolBeamFront;
+                        state.dataMaterial->Material(LayPtr).ReflectSolBeamBack = state.dataWindowManager->tmpReflectSolBeamBack;
+                        state.dataMaterial->Material(LayPtr).ReflectVisBeamFront = state.dataWindowManager->tmpReflectVisBeamFront;
+                        state.dataMaterial->Material(LayPtr).ReflectVisBeamBack = state.dataWindowManager->tmpReflectVisBeamBack;
                         SpecDataNum = 0;
                     }
                 }
@@ -577,23 +556,23 @@ namespace WindowManager {
                             state.dataWindowManager->rff(IGlass, ILam) = CurveManager::CurveValue(state, state.dataMaterial->Material(LayPtr).GlassSpecAngFRefleDataPtr, 0.0, lam);
                             state.dataWindowManager->rbb(IGlass, ILam) = CurveManager::CurveValue(state, state.dataMaterial->Material(LayPtr).GlassSpecAngBRefleDataPtr, 0.0, lam);
                         }
-                        SolarSprectrumAverage(state, state.dataWindowManager->t, tmpTrans);
-                        SolarSprectrumAverage(state, state.dataWindowManager->rff, tmpReflectSolBeamFront);
-                        SolarSprectrumAverage(state, state.dataWindowManager->rbb, tmpReflectSolBeamBack);
+                        SolarSprectrumAverage(state, state.dataWindowManager->t, state.dataWindowManager->tmpTrans);
+                        SolarSprectrumAverage(state, state.dataWindowManager->rff, state.dataWindowManager->tmpReflectSolBeamFront);
+                        SolarSprectrumAverage(state, state.dataWindowManager->rbb, state.dataWindowManager->tmpReflectSolBeamBack);
 
                         // visible properties
-                        VisibleSprectrumAverage(state, state.dataWindowManager->t, tmpTransVis);
-                        VisibleSprectrumAverage(state, state.dataWindowManager->rff, tmpReflectVisBeamFront);
-                        VisibleSprectrumAverage(state, state.dataWindowManager->rbb, tmpReflectVisBeamBack);
+                        VisibleSprectrumAverage(state, state.dataWindowManager->t, state.dataWindowManager->tmpTransVis);
+                        VisibleSprectrumAverage(state, state.dataWindowManager->rff, state.dataWindowManager->tmpReflectVisBeamFront);
+                        VisibleSprectrumAverage(state, state.dataWindowManager->rbb, state.dataWindowManager->tmpReflectVisBeamBack);
 
                         // set this material to average spectral data
                         state.dataMaterial->Material(LayPtr).GlassSpectralAndAngle = false;
-                        state.dataMaterial->Material(LayPtr).Trans = tmpTrans;
-                        state.dataMaterial->Material(LayPtr).TransVis = tmpTransVis;
-                        state.dataMaterial->Material(LayPtr).ReflectSolBeamFront = tmpReflectSolBeamFront;
-                        state.dataMaterial->Material(LayPtr).ReflectSolBeamBack = tmpReflectSolBeamBack;
-                        state.dataMaterial->Material(LayPtr).ReflectVisBeamFront = tmpReflectVisBeamFront;
-                        state.dataMaterial->Material(LayPtr).ReflectVisBeamBack = tmpReflectVisBeamBack;
+                        state.dataMaterial->Material(LayPtr).Trans = state.dataWindowManager->tmpTrans;
+                        state.dataMaterial->Material(LayPtr).TransVis = state.dataWindowManager->tmpTransVis;
+                        state.dataMaterial->Material(LayPtr).ReflectSolBeamFront = state.dataWindowManager->tmpReflectSolBeamFront;
+                        state.dataMaterial->Material(LayPtr).ReflectSolBeamBack = state.dataWindowManager->tmpReflectSolBeamBack;
+                        state.dataMaterial->Material(LayPtr).ReflectVisBeamFront = state.dataWindowManager->tmpReflectVisBeamFront;
+                        state.dataMaterial->Material(LayPtr).ReflectVisBeamBack = state.dataWindowManager->tmpReflectVisBeamBack;
                         SpecDataNum = 0;
                     }
                 }
@@ -634,8 +613,8 @@ namespace WindowManager {
                                               state.dataWindowManager->rfPhi(IGlass, ILam),
                                               state.dataWindowManager->rbPhi(IGlass, ILam),
                                               state.dataWindowManager->lSimpleGlazingSystem,
-                                              SimpleGlazingSHGC,
-                                              SimpleGlazingU);
+                                              state.dataWindowManager->SimpleGlazingSHGC,
+                                              state.dataWindowManager->SimpleGlazingU);
                         }
                     } else {
                         for (ILam = 1; ILam <= (int)state.dataWindowManager->wle.size(); ++ILam) {
@@ -827,8 +806,8 @@ namespace WindowManager {
                                               state.dataWindowManager->rfPhi(IGlass, ILam),
                                               state.dataWindowManager->rbPhi(IGlass, ILam),
                                               state.dataWindowManager->lSimpleGlazingSystem,
-                                              SimpleGlazingSHGC,
-                                              SimpleGlazingU);
+                                              state.dataWindowManager->SimpleGlazingSHGC,
+                                              state.dataWindowManager->SimpleGlazingU);
                         }
                     } else {
                         for (ILam = 1; ILam <= (int)state.dataWindowManager->wle.size(); ++ILam) {
