@@ -131,8 +131,6 @@ The metadata to remain same, so it was taken out to improve readability.
 
 ## Baseboard:RadiantConvective:Steam Objects ####
 
-### Proposed
-
 **ZoneHVAC:Baseboard:RadiantConvective:Steam:Design,**
 
            \memo Design parameters for ZoneHVAC:Baseboard:RadiantConvective objects
