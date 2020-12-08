@@ -811,6 +811,9 @@ struct UnitarySystemsData : BaseGlobalStruct {
     std::vector<UnitarySystems::UnitarySys> unitarySys;
     std::vector<UnitarySystems::DesignSpecMSHP> designSpecMSHP;
 
+    bool myOneTimeFlag = true;
+    bool getInputFlag = true;
+
     void clear_state() override
     {
         numUnitarySystems = 0;
@@ -841,6 +844,8 @@ struct UnitarySystemsData : BaseGlobalStruct {
         getInputOnceFlag = true;
         unitarySys.clear();
         if (designSpecMSHP.size() > 0) designSpecMSHP.clear();
+        myOneTimeFlag = true;
+        getInputFlag = true;
     }
 
     // Default Constructor
