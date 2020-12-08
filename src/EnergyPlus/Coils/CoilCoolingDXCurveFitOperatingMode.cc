@@ -284,7 +284,7 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(EnergyPlus::EnergyPlu
     auto &thisspeed(this->speeds[max(speedNum - 1, 0)]);
 
     if (condInletNode.Press <= 0.0) {
-        condInletNode.Press = DataEnvironment::OutBaroPress;
+        condInletNode.Press = state.dataEnvrn->OutBaroPress;
     }
     if (this->condenserType == CondenserType::AIRCOOLED) {
         this->condInletTemp = condInletNode.Temp;

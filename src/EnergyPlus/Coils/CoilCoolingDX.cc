@@ -799,14 +799,14 @@ void CoilCoolingDX::simulate(EnergyPlus::EnergyPlusData &state, int useAlternate
             dummyCondInlet.Press = condInletNode.Press; // for now; TODO: Investigate
 
             // overriding outdoor conditions temporarily
-            Real64 holdOutDryBulbTemp = DataEnvironment::OutDryBulbTemp;
-            Real64 holdOutHumRat = DataEnvironment::OutHumRat;
-            Real64 holdOutWetBulb = DataEnvironment::OutWetBulbTemp;
-            Real64 holdOutBaroPress = DataEnvironment::OutBaroPress;
-            DataEnvironment::OutDryBulbTemp = RatedOutdoorAirTemp;
-            DataEnvironment::OutWetBulbTemp = ratedOutdoorAirWetBulb;
-            DataEnvironment::OutBaroPress = DataEnvironment::StdPressureSeaLevel; // assume rating is for sea level.
-            DataEnvironment::OutHumRat =
+            Real64 holdOutDryBulbTemp = state.dataEnvrn->OutDryBulbTemp;
+            Real64 holdOutHumRat = state.dataEnvrn->OutHumRat;
+            Real64 holdOutWetBulb = state.dataEnvrn->OutWetBulbTemp;
+            Real64 holdOutBaroPress = state.dataEnvrn->OutBaroPress;
+            state.dataEnvrn->OutDryBulbTemp = RatedOutdoorAirTemp;
+            state.dataEnvrn->OutWetBulbTemp = ratedOutdoorAirWetBulb;
+            state.dataEnvrn->OutBaroPress = DataEnvironment::StdPressureSeaLevel; // assume rating is for sea level.
+            state.dataEnvrn->OutHumRat =
                 Psychrometrics::PsyWFnTdbTwbPb(state, RatedOutdoorAirTemp, ratedOutdoorAirWetBulb, DataEnvironment::StdPressureSeaLevel, RoutineName);
 
             this->performance.simulate(state,
@@ -822,10 +822,10 @@ void CoilCoolingDX::simulate(EnergyPlus::EnergyPlusData &state, int useAlternate
                                        dummySingleMode);
 
             // reset outdoor conditions back to previous state
-            DataEnvironment::OutDryBulbTemp = holdOutDryBulbTemp;
-            DataEnvironment::OutWetBulbTemp = holdOutWetBulb;
-            DataEnvironment::OutBaroPress = holdOutBaroPress;
-            DataEnvironment::OutHumRat = holdOutHumRat;
+            state.dataEnvrn->OutDryBulbTemp = holdOutDryBulbTemp;
+            state.dataEnvrn->OutWetBulbTemp = holdOutWetBulb;
+            state.dataEnvrn->OutBaroPress = holdOutBaroPress;
+            state.dataEnvrn->OutHumRat = holdOutHumRat;
 
             Real64 const coolingRate = dummyEvapInlet.MassFlowRate * (dummyEvapInlet.Enthalpy - dummyEvapOutlet.Enthalpy);
             Real64 const thisMinAirHumRat = min(dummyEvapInlet.HumRat, dummyEvapOutlet.HumRat);

@@ -388,11 +388,11 @@ TEST_F(EnergyPlusFixture, CoilDXCoolingVsMultiSpeed_CycFanCycCoil)
     auto &constantcurve2 = state->dataCurveManager->PerfCurve(2);
     auto &AirInletNode = DataLoopNode::Node(1);
     auto &AirOutletNode = DataLoopNode::Node(2);
-    DataEnvironment::StdBaroPress = 101325.0;
+    state->dataEnvrn->StdBaroPress = 101325.0;
     Real64 ratedInletAirTemp = 26.6667;
     Real64 ratedInletAirHumRat = 0.0111847;
     std::string routineName = "MultiSpeedDXCoolingCoilOutputTestvsCoilDXCooling";
-    Real64 ratedRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, DataEnvironment::StdBaroPress, ratedInletAirTemp, ratedInletAirHumRat, routineName);
+    Real64 ratedRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->StdBaroPress, ratedInletAirTemp, ratedInletAirHumRat, routineName);
 
     Coil.DXCoilType_Num = DataHVACGlobals::CoilDX_MultiSpeedCooling;
     Coil.DXCoilType = "Coil:Cooling:DX:MultiSpeed";
@@ -485,11 +485,11 @@ TEST_F(EnergyPlusFixture, CoilDXCoolingVsMultiSpeed_CycFanCycCoil)
     AirOutletNode.HumRat = Coil.InletAirHumRat;
     AirOutletNode.Enthalpy = Coil.InletAirEnthalpy;
     // outside air condition
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::OutDryBulbTemp = 35.0;
-    DataEnvironment::OutHumRat = 0.0120;
-    DataEnvironment::WindSpeed = 5.0;
-    DataEnvironment::WindDir = 0.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->OutDryBulbTemp = 35.0;
+    state->dataEnvrn->OutHumRat = 0.0120;
+    state->dataEnvrn->WindSpeed = 5.0;
+    state->dataEnvrn->WindDir = 0.0;
     int SpeedNum = 2;
     int FanOpMode = DataHVACGlobals::CycFanCycCoil;
     int CompOp = 1;
@@ -804,11 +804,11 @@ TEST_F(EnergyPlusFixture, CoilDXCoolingVsMultiSpeed_ContFanCycCoil)
     auto& constantcurve2 = state->dataCurveManager->PerfCurve(2);
     auto& AirInletNode = DataLoopNode::Node(1);
     auto& AirOutletNode = DataLoopNode::Node(2);
-    DataEnvironment::StdBaroPress = 101325.0;
+    state->dataEnvrn->StdBaroPress = 101325.0;
     Real64 ratedInletAirTemp = 26.6667;
     Real64 ratedInletAirHumRat = 0.0111847;
     std::string routineName = "MultiSpeedDXCoolingCoilOutputTestvsCoilDXCooling";
-    Real64 ratedRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, DataEnvironment::StdBaroPress, ratedInletAirTemp, ratedInletAirHumRat, routineName);
+    Real64 ratedRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->StdBaroPress, ratedInletAirTemp, ratedInletAirHumRat, routineName);
 
     Coil.DXCoilType_Num = DataHVACGlobals::CoilDX_MultiSpeedCooling;
     Coil.DXCoilType = "Coil:Cooling:DX:MultiSpeed";
@@ -902,11 +902,11 @@ TEST_F(EnergyPlusFixture, CoilDXCoolingVsMultiSpeed_ContFanCycCoil)
     AirOutletNode.HumRat = Coil.InletAirHumRat;
     AirOutletNode.Enthalpy = Coil.InletAirEnthalpy;
     // outside air condition
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::OutDryBulbTemp = 35.0;
-    DataEnvironment::OutHumRat = 0.0120;
-    DataEnvironment::WindSpeed = 5.0;
-    DataEnvironment::WindDir = 0.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->OutDryBulbTemp = 35.0;
+    state->dataEnvrn->OutHumRat = 0.0120;
+    state->dataEnvrn->WindSpeed = 5.0;
+    state->dataEnvrn->WindDir = 0.0;
     int SpeedNum = 2;
     int FanOpMode = DataHVACGlobals::ContFanCycCoil;
     int CompOp = 1;
@@ -1220,11 +1220,11 @@ TEST_F(EnergyPlusFixture, CoilDXMultiSpeed_SpeedCheck_CycFanCycCoil)
     auto& constantcurve2 = state->dataCurveManager->PerfCurve(2);
     auto& AirInletNode = DataLoopNode::Node(1);
     auto& AirOutletNode = DataLoopNode::Node(2);
-    DataEnvironment::StdBaroPress = 101325.0;
+    state->dataEnvrn->StdBaroPress = 101325.0;
     Real64 ratedInletAirTemp = 26.6667;
     Real64 ratedInletAirHumRat = 0.0111847;
     std::string routineName = "MultiSpeedDXCoolingCoilOutputTestvsCoilDXCooling";
-    Real64 ratedRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, DataEnvironment::StdBaroPress, ratedInletAirTemp, ratedInletAirHumRat, routineName);
+    Real64 ratedRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->StdBaroPress, ratedInletAirTemp, ratedInletAirHumRat, routineName);
 
     Coil.DXCoilType_Num = DataHVACGlobals::CoilDX_MultiSpeedCooling;
     Coil.DXCoilType = "Coil:Cooling:DX:MultiSpeed";
@@ -1317,11 +1317,11 @@ TEST_F(EnergyPlusFixture, CoilDXMultiSpeed_SpeedCheck_CycFanCycCoil)
     AirOutletNode.HumRat = Coil.InletAirHumRat;
     AirOutletNode.Enthalpy = Coil.InletAirEnthalpy;
     // outside air condition
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::OutDryBulbTemp = 35.0;
-    DataEnvironment::OutHumRat = 0.0120;
-    DataEnvironment::WindSpeed = 5.0;
-    DataEnvironment::WindDir = 0.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->OutDryBulbTemp = 35.0;
+    state->dataEnvrn->OutHumRat = 0.0120;
+    state->dataEnvrn->WindSpeed = 5.0;
+    state->dataEnvrn->WindDir = 0.0;
     int FanOpMode = DataHVACGlobals::CycFanCycCoil;
     int CompOp = 1;
     int SingleMode = 0;
@@ -1452,11 +1452,11 @@ TEST_F(EnergyPlusFixture, CoilDXMultiSpeed_SpeedCheck_ContFanCycCoil)
     auto& constantcurve2 = state->dataCurveManager->PerfCurve(2);
     auto& AirInletNode = DataLoopNode::Node(1);
     auto& AirOutletNode = DataLoopNode::Node(2);
-    DataEnvironment::StdBaroPress = 101325.0;
+    state->dataEnvrn->StdBaroPress = 101325.0;
     Real64 ratedInletAirTemp = 26.6667;
     Real64 ratedInletAirHumRat = 0.0111847;
     std::string routineName = "MultiSpeedDXCoolingCoilOutputTestvsCoilDXCooling";
-    Real64 ratedRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, DataEnvironment::StdBaroPress, ratedInletAirTemp, ratedInletAirHumRat, routineName);
+    Real64 ratedRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->StdBaroPress, ratedInletAirTemp, ratedInletAirHumRat, routineName);
 
     Coil.DXCoilType_Num = DataHVACGlobals::CoilDX_MultiSpeedCooling;
     Coil.DXCoilType = "Coil:Cooling:DX:MultiSpeed";
@@ -1549,11 +1549,11 @@ TEST_F(EnergyPlusFixture, CoilDXMultiSpeed_SpeedCheck_ContFanCycCoil)
     AirOutletNode.HumRat = Coil.InletAirHumRat;
     AirOutletNode.Enthalpy = Coil.InletAirEnthalpy;
     // outside air condition
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::OutDryBulbTemp = 35.0;
-    DataEnvironment::OutHumRat = 0.0120;
-    DataEnvironment::WindSpeed = 5.0;
-    DataEnvironment::WindDir = 0.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->OutDryBulbTemp = 35.0;
+    state->dataEnvrn->OutHumRat = 0.0120;
+    state->dataEnvrn->WindSpeed = 5.0;
+    state->dataEnvrn->WindDir = 0.0;
     int FanOpMode = DataHVACGlobals::ContFanCycCoil;
     int CompOp = 1;
     int SingleMode = 0;
