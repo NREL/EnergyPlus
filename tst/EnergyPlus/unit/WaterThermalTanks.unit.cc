@@ -5318,3 +5318,113 @@ TEST_F(EnergyPlusFixture, StratifiedTank_WarningNumberOfNodes_ExpectedWarning)
 
     EXPECT_TRUE(compare_err_stream(error_string));
 }
+
+TEST_F(EnergyPlusFixture, StratifiedTank_GetInput)
+{
+    using DataHVACGlobals::SysTimeElapsed;
+    using DataHVACGlobals::TimeStepSys;
+
+    std::string const idf_objects = delimited_string({
+        "Schedule:Constant, Hot Water Demand Schedule, , 1.0;",
+        "Schedule:Constant, Ambient Temp Schedule, , 20.0;",
+        "Schedule:Constant, Inlet Water Temperature, , 10.0;",
+        "Schedule:Constant, Hot Water Setpoint Temp Schedule, , 48.89;",
+
+        "WaterHeater:Stratified,",
+        "  Stratified Tank,         !- Name",
+        "  DHW,                     !- End-Use Subcategory",
+        "  0.17,                    !- Tank Volume {m3}",
+        "  1.4,                     !- Tank Height {m}",
+        "  VerticalCylinder,        !- Tank Shape",
+        "  10.01,                   !- Tank Perimeter {m}",
+        "  82.2222,                 !- Maximum Temperature Limit {C}",
+        "  MasterSlave,             !- Heater Priority Control",
+        "  Hot Water Setpoint Temp Schedule,  !- Heater 1 Setpoint Temperature Schedule Name",
+        "  2.0,                     !- Heater 1 Deadband Temperature Difference {deltaC}",
+        "  4500,                    !- Heater 1 Capacity {W}",
+        "  1.0,                     !- Heater 1 Height {m}",
+        "  Hot Water Setpoint Temp Schedule,  !- Heater 2 Setpoint Temperature Schedule Name",
+        "  5.0,                     !- Heater 2 Deadband Temperature Difference {deltaC}",
+        "  4502,                    !- Heater 2 Capacity {W}",
+        "  0.0,                     !- Heater 2 Height {m}",
+        "  FuelOilNo1,              !- Heater Fuel Type",
+        "  0.971,                   !- Heater Thermal Efficiency",
+        "  0.07,                    !- Off Cycle Parasitic Fuel Consumption Rate {W}",
+        "  FuelOilNo2,              !- Off Cycle Parasitic Fuel Type",
+        "  ,                        !- Off Cycle Parasitic Heat Fraction to Tank",
+        "  ,                        !- Off Cycle Parasitic Height {m}",
+        "  ,                        !- On Cycle Parasitic Fuel Consumption Rate {W}",
+        "  OtherFuel1,              !- On Cycle Parasitic Fuel Type",
+        "  ,                        !- On Cycle Parasitic Heat Fraction to Tank",
+        "  ,                        !- On Cycle Parasitic Height {m}",
+        "  SCHEDULE,                !- Ambient Temperature Indicator",
+        "  Ambient Temp Schedule,   !- Ambient Temperature Schedule Name",
+        "  ,                        !- Ambient Temperature Zone Name",
+        "  ,                        !- Ambient Temperature Outdoor Air Node Name",
+        "  0,                       !- Uniform Skin Loss Coefficient per Unit Area to Ambient Temperature {W/m2-K}",
+        "  ,                        !- Skin Loss Fraction to Zone",
+        "  ,                        !- Off Cycle Flue Loss Coefficient to Ambient Temperature {W/K}",
+        "  ,                        !- Off Cycle Flue Loss Fraction to Zone",
+        "  0.000189,                !- Peak Use Flow Rate {m3/s}",
+        "  Hot Water Demand Schedule,  !- Use Flow Rate Fraction Schedule Name",
+        "  Inlet Water Temperature,                        !- Cold Water Supply Temperature Schedule Name",
+        "  ,                        !- Use Side Inlet Node Name",
+        "  ,                        !- Use Side Outlet Node Name",
+        "  ,                        !- Use Side Effectiveness",
+        "  1.0,                        !- Use Side Inlet Height {m}",
+        "  0.5,                        !- Use Side Outlet Height {m}",
+        "  ,                        !- Source Side Inlet Node Name",
+        "  ,                        !- Source Side Outlet Node Name",
+        "  ,                        !- Source Side Effectiveness",
+        "  ,                        !- Source Side Inlet Height {m}",
+        "  ,                        !- Source Side Outlet Height {m}",
+        "  FIXED,                   !- Inlet Mode",
+        "  ,                        !- Use Side Design Flow Rate {m3/s}",
+        "  ,                        !- Source Side Design Flow Rate {m3/s}",
+        "  ,                        !- Indirect Water Heating Recovery Time {hr}",
+        "  10,                      !- Number of Nodes",
+        "  0.1;                     !- Additional Destratification Conductivity {W/m-K}",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(*state));
+
+    compare_err_stream("", true);
+
+    WaterThermalTanks::WaterThermalTankData &Tank = state->dataWaterThermalTanks->WaterThermalTank(1);
+
+
+    EXPECT_EQ("STRATIFIED TANK", Tank.Name);
+    EXPECT_EQ("DHW", Tank.EndUseSubcategoryName);
+    EXPECT_EQ(0.17, Tank.Volume);
+    EXPECT_EQ(1.4, Tank.Height);
+    EXPECT_EQ(WaterThermalTanks::TankShapeEnum::VertCylinder, Tank.Shape);
+    // Tank perimeter isn't read unless the TankShape is "OTHER"
+    EXPECT_EQ(0.0, Tank.Perimeter);
+    EXPECT_EQ(82.2222, Tank.TankTempLimit);
+    EXPECT_EQ(WaterThermalTanks::PriorityEnum::MasterSlave, Tank.ControlType);
+
+    // Hot Water Setpoint Temp Schedule = 4th per above
+    EXPECT_EQ(ScheduleManager::GetScheduleIndex(*state, "HOT WATER SETPOINT TEMP SCHEDULE"), Tank.SetPointTempSchedule);
+
+    EXPECT_EQ(2.0, Tank.DeadBandDeltaTemp);
+    EXPECT_EQ(4500, Tank.MaxCapacity);
+    EXPECT_FALSE(Tank.MaxCapacityWasAutoSized);
+    EXPECT_EQ(1.0, Tank.HeaterHeight1);
+
+    EXPECT_EQ(ScheduleManager::GetScheduleIndex(*state, "HOT WATER SETPOINT TEMP SCHEDULE"), Tank.SetPointTempSchedule2);
+
+    EXPECT_EQ(5.0, Tank.DeadBandDeltaTemp2);
+    EXPECT_EQ(4502, Tank.MaxCapacity2);
+    EXPECT_FALSE(Tank.MaxCapacityWasAutoSized);
+    EXPECT_EQ(0.0, Tank.HeaterHeight2);
+
+    EXPECT_EQ("FuelOilNo1", Tank.FuelType);
+    EXPECT_EQ(0.971, Tank.Efficiency);
+    EXPECT_EQ(0.07, Tank.OffCycParaLoad);
+    EXPECT_EQ("FuelOilNo2", Tank.OffCycParaFuelType);
+    EXPECT_EQ("OtherFuel1", Tank.OnCycParaFuelType);
+    EXPECT_EQ(WaterThermalTanks::AmbientTempEnum::Schedule, Tank.AmbientTempIndicator);
+}
