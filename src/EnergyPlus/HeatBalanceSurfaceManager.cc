@@ -941,34 +941,34 @@ namespace HeatBalanceSurfaceManager {
                     if ((SELECT_CASE_var == SurfaceClass::Wall) || (SELECT_CASE_var == SurfaceClass::Floor) || (SELECT_CASE_var == SurfaceClass::Roof)) {
                         surfName = Surface(iSurf).Name;
                         curCons = Surface(iSurf).Construction;
-                        PreDefTableEntry(pdchOpCons, surfName, state.dataConstruction->Construct(curCons).Name);
-                        PreDefTableEntry(pdchOpRefl, surfName, 1 - state.dataConstruction->Construct(curCons).OutsideAbsorpSolar);
-                        PreDefTableEntry(pdchOpUfactNoFilm, surfName, NominalU(Surface(iSurf).Construction), 3);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOpCons, surfName, state.dataConstruction->Construct(curCons).Name);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOpRefl, surfName, 1 - state.dataConstruction->Construct(curCons).OutsideAbsorpSolar);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOpUfactNoFilm, surfName, NominalU(Surface(iSurf).Construction), 3);
                         mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier;
-                        PreDefTableEntry(pdchOpGrArea, surfName, Surface(iSurf).GrossArea * mult);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOpGrArea, surfName, Surface(iSurf).GrossArea * mult);
                         computedNetArea(iSurf) += Surface(iSurf).GrossArea * mult;
                         curAzimuth = Surface(iSurf).Azimuth;
                         // Round to two decimals, like the display in tables
                         // (PreDefTableEntry uses a fortran style write, that rounds rather than trim)
                         curAzimuth = round(curAzimuth * 100.0) / 100.0;
-                        PreDefTableEntry(pdchOpAzimuth, surfName, curAzimuth);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOpAzimuth, surfName, curAzimuth);
                         curTilt = Surface(iSurf).Tilt;
-                        PreDefTableEntry(pdchOpTilt, surfName, curTilt);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOpTilt, surfName, curTilt);
                         if ((curTilt >= 60.0) && (curTilt < 180.0)) {
                             if ((curAzimuth >= 315.0) || (curAzimuth < 45.0)) {
-                                PreDefTableEntry(pdchOpDir, surfName, "N");
+                                PreDefTableEntry(state, state.dataOutRptPredefined->pdchOpDir, surfName, "N");
                             } else if ((curAzimuth >= 45.0) && (curAzimuth < 135.0)) {
-                                PreDefTableEntry(pdchOpDir, surfName, "E");
+                                PreDefTableEntry(state, state.dataOutRptPredefined->pdchOpDir, surfName, "E");
                             } else if ((curAzimuth >= 135.0) && (curAzimuth < 225.0)) {
-                                PreDefTableEntry(pdchOpDir, surfName, "S");
+                                PreDefTableEntry(state, state.dataOutRptPredefined->pdchOpDir, surfName, "S");
                             } else if ((curAzimuth >= 225.0) && (curAzimuth < 315.0)) {
-                                PreDefTableEntry(pdchOpDir, surfName, "W");
+                                PreDefTableEntry(state, state.dataOutRptPredefined->pdchOpDir, surfName, "W");
                             }
                         }
                     } else if ((SELECT_CASE_var == SurfaceClass::Window) || (SELECT_CASE_var == SurfaceClass::TDD_Dome)) {
                         surfName = Surface(iSurf).Name;
                         curCons = Surface(iSurf).Construction;
-                        PreDefTableEntry(pdchFenCons, surfName, state.dataConstruction->Construct(curCons).Name);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenCons, surfName, state.dataConstruction->Construct(curCons).Name);
                         zonePt = Surface(iSurf).Zone;
                         mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier * Surface(iSurf).Multiplier;
                         // include the frame area if present
@@ -986,18 +986,18 @@ namespace HeatBalanceSurfaceManager {
                                            FrameDivider(frameDivNum).VertDividers * Surface(iSurf).Height -
                                            FrameDivider(frameDivNum).HorDividers * FrameDivider(frameDivNum).VertDividers *
                                                FrameDivider(frameDivNum).DividerWidth);
-                            PreDefTableEntry(pdchFenFrameConductance, surfName, FrameDivider(frameDivNum).FrameConductance, 3);
-                            PreDefTableEntry(pdchFenDividerConductance, surfName, FrameDivider(frameDivNum).DividerConductance, 3);
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenFrameConductance, surfName, FrameDivider(frameDivNum).FrameConductance, 3);
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenDividerConductance, surfName, FrameDivider(frameDivNum).DividerConductance, 3);
                         }
                         windowAreaWMult = windowArea * mult;
-                        PreDefTableEntry(pdchFenAreaOf1, surfName, windowArea);
-                        PreDefTableEntry(pdchFenFrameAreaOf1, surfName, frameArea);
-                        PreDefTableEntry(pdchFenDividerAreaOf1, surfName, dividerArea);
-                        PreDefTableEntry(pdchFenGlassAreaOf1, surfName, windowArea - (frameArea + dividerArea));
-                        PreDefTableEntry(pdchFenArea, surfName, windowAreaWMult);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenAreaOf1, surfName, windowArea);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenFrameAreaOf1, surfName, frameArea);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenDividerAreaOf1, surfName, dividerArea);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenGlassAreaOf1, surfName, windowArea - (frameArea + dividerArea));
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenArea, surfName, windowAreaWMult);
                         computedNetArea(Surface(iSurf).BaseSurf) -= windowAreaWMult;
                         nomUfact = NominalU(Surface(iSurf).Construction);
-                        PreDefTableEntry(pdchFenUfact, surfName, nomUfact, 3);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenUfact, surfName, nomUfact, 3);
                         // if the construction report is requested the SummerSHGC is already calculated
                         if (state.dataConstruction->Construct(curCons).SummerSHGC != 0) {
                             SHGCSummer = state.dataConstruction->Construct(curCons).SummerSHGC;
@@ -1008,26 +1008,26 @@ namespace HeatBalanceSurfaceManager {
                                 CalcNominalWindowCond(state, curCons, 2, nomCond, SHGCSummer, TransSolNorm, TransVisNorm, errFlag);
                             }
                         }
-                        PreDefTableEntry(pdchFenSHGC, surfName, SHGCSummer, 3);
-                        PreDefTableEntry(pdchFenVisTr, surfName, TransVisNorm, 3);
-                        PreDefTableEntry(pdchFenParent, surfName, Surface(iSurf).BaseSurfName);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenSHGC, surfName, SHGCSummer, 3);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenVisTr, surfName, TransVisNorm, 3);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenParent, surfName, Surface(iSurf).BaseSurfName);
                         curAzimuth = Surface(iSurf).Azimuth;
                         // Round to two decimals, like the display in tables
                         curAzimuth = round(curAzimuth * 100.0) / 100.0;
-                        PreDefTableEntry(pdchFenAzimuth, surfName, curAzimuth);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenAzimuth, surfName, curAzimuth);
                         isNorth = false;
                         curTilt = Surface(iSurf).Tilt;
-                        PreDefTableEntry(pdchFenTilt, surfName, curTilt);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenTilt, surfName, curTilt);
                         if ((curTilt >= 60.0) && (curTilt < 180.0)) {
                             if ((curAzimuth >= 315.0) || (curAzimuth < 45.0)) {
-                                PreDefTableEntry(pdchFenDir, surfName, "N");
+                                PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenDir, surfName, "N");
                                 isNorth = true;
                             } else if ((curAzimuth >= 45.0) && (curAzimuth < 135.0)) {
-                                PreDefTableEntry(pdchFenDir, surfName, "E");
+                                PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenDir, surfName, "E");
                             } else if ((curAzimuth >= 135.0) && (curAzimuth < 225.0)) {
-                                PreDefTableEntry(pdchFenDir, surfName, "S");
+                                PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenDir, surfName, "S");
                             } else if ((curAzimuth >= 225.0) && (curAzimuth < 315.0)) {
-                                PreDefTableEntry(pdchFenDir, surfName, "W");
+                                PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenDir, surfName, "W");
                             }
                         }
                         curWSC = Surface(iSurf).activeWindowShadingControl;
@@ -1049,75 +1049,75 @@ namespace HeatBalanceSurfaceManager {
                         }
                         // shading
                         if (Surface(iSurf).HasShadeControl) {
-                            PreDefTableEntry(pdchFenSwitchable, surfName, "Yes");
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenSwitchable, surfName, "Yes");
                             // shading report
-                            PreDefTableEntry(pdchWscName, surfName, WindowShadingControl(curWSC).Name);
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscName, surfName, WindowShadingControl(curWSC).Name);
                             {
                                 auto const SELECT_CASE_var1(WindowShadingControl(curWSC).ShadingType);
                                 if (SELECT_CASE_var1 == WSC_ST_NoShade) {
-                                    PreDefTableEntry(pdchWscShading, surfName, "No Shade");
+                                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscShading, surfName, "No Shade");
                                 } else if (SELECT_CASE_var1 == WSC_ST_InteriorShade) {
-                                    PreDefTableEntry(pdchWscShading, surfName, "Interior Shade");
+                                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscShading, surfName, "Interior Shade");
                                 } else if (SELECT_CASE_var1 == WSC_ST_SwitchableGlazing) {
-                                    PreDefTableEntry(pdchWscShading, surfName, "Switchable Glazing");
+                                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscShading, surfName, "Switchable Glazing");
                                 } else if (SELECT_CASE_var1 == WSC_ST_ExteriorShade) {
-                                    PreDefTableEntry(pdchWscShading, surfName, "Exterior Shade");
+                                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscShading, surfName, "Exterior Shade");
                                 } else if (SELECT_CASE_var1 == WSC_ST_InteriorBlind) {
-                                    PreDefTableEntry(pdchWscShading, surfName, "Interior Blind");
+                                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscShading, surfName, "Interior Blind");
                                 } else if (SELECT_CASE_var1 == WSC_ST_ExteriorBlind) {
-                                    PreDefTableEntry(pdchWscShading, surfName, "Exterior Blind");
+                                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscShading, surfName, "Exterior Blind");
                                 } else if (SELECT_CASE_var1 == WSC_ST_BetweenGlassShade) {
-                                    PreDefTableEntry(pdchWscShading, surfName, "Between Glass Shade");
+                                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscShading, surfName, "Between Glass Shade");
                                 } else if (SELECT_CASE_var1 == WSC_ST_BetweenGlassBlind) {
-                                    PreDefTableEntry(pdchWscShading, surfName, "Between Glass Blind");
+                                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscShading, surfName, "Between Glass Blind");
                                 } else if (SELECT_CASE_var1 == WSC_ST_ExteriorScreen) {
-                                    PreDefTableEntry(pdchWscShading, surfName, "Exterior Screen");
+                                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscShading, surfName, "Exterior Screen");
                                 }
                             }
                             {
                                 auto const SELECT_CASE_var1(WindowShadingControl(curWSC).ShadingControlType);
                                 if (SELECT_CASE_var1 == WSCT_AlwaysOn) {
-                                    PreDefTableEntry(pdchWscControl, surfName, "AlwaysOn");
+                                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscControl, surfName, "AlwaysOn");
                                 } else if (SELECT_CASE_var1 == WSCT_AlwaysOff) {
-                                    PreDefTableEntry(pdchWscControl, surfName, "AlwaysOff");
+                                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscControl, surfName, "AlwaysOff");
                                 } else if (SELECT_CASE_var1 == WSCT_OnIfScheduled) {
-                                    PreDefTableEntry(pdchWscControl, surfName, "OnIfScheduleAllows");
+                                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscControl, surfName, "OnIfScheduleAllows");
                                 } else if (SELECT_CASE_var1 == WSCT_HiSolar) {
-                                    PreDefTableEntry(pdchWscControl, surfName, "OnIfHighSolarOnWindow");
+                                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscControl, surfName, "OnIfHighSolarOnWindow");
                                 } else if (SELECT_CASE_var1 == WSCT_HiHorzSolar) {
-                                    PreDefTableEntry(pdchWscControl, surfName, "OnIfHighHorizontalSolar");
+                                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscControl, surfName, "OnIfHighHorizontalSolar");
                                 } else if (SELECT_CASE_var1 == WSCT_HiOutAirTemp) {
-                                    PreDefTableEntry(pdchWscControl, surfName, "OnIfHighOutdoorAirTemperature");
+                                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscControl, surfName, "OnIfHighOutdoorAirTemperature");
                                 } else if (SELECT_CASE_var1 == WSCT_HiZoneAirTemp) {
-                                    PreDefTableEntry(pdchWscControl, surfName, "OnIfHighZoneAirTemperature");
+                                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscControl, surfName, "OnIfHighZoneAirTemperature");
                                 } else if (SELECT_CASE_var1 == WSCT_HiZoneCooling) {
-                                    PreDefTableEntry(pdchWscControl, surfName, "OnIfHighZoneCooling");
+                                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscControl, surfName, "OnIfHighZoneCooling");
                                 } else if (SELECT_CASE_var1 == WSCT_HiGlare) {
-                                    PreDefTableEntry(pdchWscControl, surfName, "OnIfHighGlare");
+                                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscControl, surfName, "OnIfHighGlare");
                                 } else if (SELECT_CASE_var1 == WSCT_MeetDaylIlumSetp) {
-                                    PreDefTableEntry(pdchWscControl, surfName, "MeetDaylightIlluminanceSetpoint");
+                                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscControl, surfName, "MeetDaylightIlluminanceSetpoint");
                                 } else if (SELECT_CASE_var1 == WSCT_OnNightLoOutTemp_OffDay) {
-                                    PreDefTableEntry(pdchWscControl, surfName, "OnNightIfLowOutdoorTempAndOffDay");
+                                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscControl, surfName, "OnNightIfLowOutdoorTempAndOffDay");
                                 } else if (SELECT_CASE_var1 == WSCT_OnNightLoInTemp_OffDay) {
-                                    PreDefTableEntry(pdchWscControl, surfName, "OnNightIfLowInsideTempAndOffDay");
+                                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscControl, surfName, "OnNightIfLowInsideTempAndOffDay");
                                 } else if (SELECT_CASE_var1 == WSCT_OnNightIfHeating_OffDay) {
-                                    PreDefTableEntry(pdchWscControl, surfName, "OnNightIfHeatingAndOffDay");
+                                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscControl, surfName, "OnNightIfHeatingAndOffDay");
                                 } else if (SELECT_CASE_var1 == WSCT_OnNightLoOutTemp_OnDayCooling) {
-                                    PreDefTableEntry(pdchWscControl, surfName, "OnNightIfLowOutdoorTempAndOnDayIfCooling");
+                                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscControl, surfName, "OnNightIfLowOutdoorTempAndOnDayIfCooling");
                                 } else if (SELECT_CASE_var1 == WSCT_OnNightIfHeating_OnDayCooling) {
-                                    PreDefTableEntry(pdchWscControl, surfName, "OnNightIfHeatingAndOnDayIfCooling");
+                                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscControl, surfName, "OnNightIfHeatingAndOnDayIfCooling");
                                 } else if (SELECT_CASE_var1 == WSCT_OffNight_OnDay_HiSolarWindow) {
-                                    PreDefTableEntry(pdchWscControl, surfName, "OffNightAndOnDayIfCoolingAndHighSolarOnWindow");
+                                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscControl, surfName, "OffNightAndOnDayIfCoolingAndHighSolarOnWindow");
                                 } else if (SELECT_CASE_var1 == WSCT_OnNight_OnDay_HiSolarWindow) {
-                                    PreDefTableEntry(pdchWscControl, surfName, "OnNightAndOnDayIfCoolingAndHighSolarOnWindow");
+                                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscControl, surfName, "OnNightAndOnDayIfCoolingAndHighSolarOnWindow");
                                 } else if (SELECT_CASE_var1 == WSCT_OnHiOutTemp_HiSolarWindow) {
-                                    PreDefTableEntry(pdchWscControl, surfName, "OnIfHighOutdoorAirTempAndHighSolarOnWindow");
+                                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscControl, surfName, "OnIfHighOutdoorAirTempAndHighSolarOnWindow");
                                 } else if (SELECT_CASE_var1 == WSCT_OnHiOutTemp_HiHorzSolar) {
-                                    PreDefTableEntry(pdchWscControl, surfName, "OnIfHighOutdoorAirTempAndHighHorizontalSolar");
+                                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscControl, surfName, "OnIfHighOutdoorAirTempAndHighHorizontalSolar");
                                 } else if (SELECT_CASE_var1 == WSCT_OnHiZoneTemp_HiSolarWindow) {
-                                    PreDefTableEntry(pdchWscControl, surfName, "OnIfHighZoneAirTempAndHighSolarOnWindow");
+                                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscControl, surfName, "OnIfHighZoneAirTempAndHighSolarOnWindow");
                                 } else if (SELECT_CASE_var1 == WSCT_OnHiZoneTemp_HiHorzSolar) {
-                                    PreDefTableEntry(pdchWscControl, surfName, "OnIfHighZoneAirTempAndHighHorizontalSolar");
+                                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscControl, surfName, "OnIfHighZoneAirTempAndHighHorizontalSolar");
                                 }
                             }
 
@@ -1131,24 +1131,24 @@ namespace HeatBalanceSurfaceManager {
                                 if (!names.empty()) names.append("; ");
                                 names.append(state.dataConstruction->Construct(construction).Name);
                             }
-                            PreDefTableEntry(pdchWscShadCons, surfName, names);
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscShadCons, surfName, names);
 
                             if (WindowShadingControl(curWSC).GlareControlIsActive) {
-                                PreDefTableEntry(pdchWscGlare, surfName, "Yes");
+                                PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscGlare, surfName, "Yes");
                             } else {
-                                PreDefTableEntry(pdchWscGlare, surfName, "No");
+                                PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscGlare, surfName, "No");
                             }
                         } else {
-                            PreDefTableEntry(pdchFenSwitchable, surfName, "No");
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenSwitchable, surfName, "No");
                         }
                     } else if (SELECT_CASE_var == SurfaceClass::Door) {
                         surfName = Surface(iSurf).Name;
                         curCons = Surface(iSurf).Construction;
-                        PreDefTableEntry(pdchDrCons, surfName, state.dataConstruction->Construct(curCons).Name);
-                        PreDefTableEntry(pdchDrUfactNoFilm, surfName, NominalU(Surface(iSurf).Construction), 3);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchDrCons, surfName, state.dataConstruction->Construct(curCons).Name);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchDrUfactNoFilm, surfName, NominalU(Surface(iSurf).Construction), 3);
                         mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier;
-                        PreDefTableEntry(pdchDrGrArea, surfName, Surface(iSurf).GrossArea * mult);
-                        PreDefTableEntry(pdchDrParent, surfName, Surface(iSurf).BaseSurfName);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchDrGrArea, surfName, Surface(iSurf).GrossArea * mult);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchDrParent, surfName, Surface(iSurf).BaseSurfName);
                         computedNetArea(Surface(iSurf).BaseSurf) -= Surface(iSurf).GrossArea * mult;
                     }
                 }
@@ -1158,28 +1158,28 @@ namespace HeatBalanceSurfaceManager {
                 if ((Surface(iSurf).Class == SurfaceClass::Wall) || (Surface(iSurf).Class == SurfaceClass::Floor) || (Surface(iSurf).Class == SurfaceClass::Roof)) {
                     surfName = Surface(iSurf).Name;
                     curCons = Surface(iSurf).Construction;
-                    PreDefTableEntry(pdchIntOpCons, surfName, state.dataConstruction->Construct(curCons).Name);
-                    PreDefTableEntry(pdchIntOpRefl, surfName, 1 - state.dataConstruction->Construct(curCons).OutsideAbsorpSolar);
-                    PreDefTableEntry(pdchIntOpUfactNoFilm, surfName, NominalU(Surface(iSurf).Construction), 3);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchIntOpCons, surfName, state.dataConstruction->Construct(curCons).Name);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchIntOpRefl, surfName, 1 - state.dataConstruction->Construct(curCons).OutsideAbsorpSolar);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchIntOpUfactNoFilm, surfName, NominalU(Surface(iSurf).Construction), 3);
                     mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier;
-                    PreDefTableEntry(pdchIntOpGrArea, surfName, Surface(iSurf).GrossArea * mult);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchIntOpGrArea, surfName, Surface(iSurf).GrossArea * mult);
                     computedNetArea(iSurf) += Surface(iSurf).GrossArea * mult;
                     curAzimuth = Surface(iSurf).Azimuth;
                     // Round to two decimals, like the display in tables
                     // (PreDefTableEntry uses a fortran style write, that rounds rather than trim)
                     curAzimuth = round(curAzimuth * 100.0) / 100.0;
-                    PreDefTableEntry(pdchIntOpAzimuth, surfName, curAzimuth);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchIntOpAzimuth, surfName, curAzimuth);
                     curTilt = Surface(iSurf).Tilt;
-                    PreDefTableEntry(pdchIntOpTilt, surfName, curTilt);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchIntOpTilt, surfName, curTilt);
                     if ((curTilt >= 60.0) && (curTilt < 180.0)) {
                         if ((curAzimuth >= 315.0) || (curAzimuth < 45.0)) {
-                            PreDefTableEntry(pdchIntOpDir, surfName, "N");
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchIntOpDir, surfName, "N");
                         } else if ((curAzimuth >= 45.0) && (curAzimuth < 135.0)) {
-                            PreDefTableEntry(pdchIntOpDir, surfName, "E");
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchIntOpDir, surfName, "E");
                         } else if ((curAzimuth >= 135.0) && (curAzimuth < 225.0)) {
-                            PreDefTableEntry(pdchIntOpDir, surfName, "S");
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchIntOpDir, surfName, "S");
                         } else if ((curAzimuth >= 225.0) && (curAzimuth < 315.0)) {
-                            PreDefTableEntry(pdchIntOpDir, surfName, "W");
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchIntOpDir, surfName, "W");
                         }
                     }
                 // interior window report
@@ -1187,7 +1187,7 @@ namespace HeatBalanceSurfaceManager {
                     if (!has_prefix(Surface(iSurf).Name, "iz-")) { // don't count created interzone surfaces that are mirrors of other surfaces
                         surfName = Surface(iSurf).Name;
                         curCons = Surface(iSurf).Construction;
-                        PreDefTableEntry(pdchIntFenCons, surfName, state.dataConstruction->Construct(curCons).Name);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchIntFenCons, surfName, state.dataConstruction->Construct(curCons).Name);
                         zonePt = Surface(iSurf).Zone;
                         mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier * Surface(iSurf).Multiplier;
                         // include the frame area if present
@@ -1199,11 +1199,11 @@ namespace HeatBalanceSurfaceManager {
                             windowArea += frameArea;
                         }
                         windowAreaWMult = windowArea * mult;
-                        PreDefTableEntry(pdchIntFenAreaOf1, surfName, windowArea);
-                        PreDefTableEntry(pdchIntFenArea, surfName, windowAreaWMult);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchIntFenAreaOf1, surfName, windowArea);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchIntFenArea, surfName, windowAreaWMult);
                         computedNetArea(Surface(iSurf).BaseSurf) -= windowAreaWMult;
                         nomUfact = NominalU(Surface(iSurf).Construction);
-                        PreDefTableEntry(pdchIntFenUfact, surfName, nomUfact, 3);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchIntFenUfact, surfName, nomUfact, 3);
                         // if the construction report is requested the SummerSHGC is already calculated
                         if (state.dataConstruction->Construct(curCons).SummerSHGC != 0) {
                             SHGCSummer = state.dataConstruction->Construct(curCons).SummerSHGC;
@@ -1214,9 +1214,9 @@ namespace HeatBalanceSurfaceManager {
                                 CalcNominalWindowCond(state, curCons, 2, nomCond, SHGCSummer, TransSolNorm, TransVisNorm, errFlag);
                             }
                         }
-                        PreDefTableEntry(pdchIntFenSHGC, surfName, SHGCSummer, 3);
-                        PreDefTableEntry(pdchIntFenVisTr, surfName, TransVisNorm, 3);
-                        PreDefTableEntry(pdchIntFenParent, surfName, Surface(iSurf).BaseSurfName);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchIntFenSHGC, surfName, SHGCSummer, 3);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchIntFenVisTr, surfName, TransVisNorm, 3);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchIntFenParent, surfName, Surface(iSurf).BaseSurfName);
                         // compute totals for area weighted averages
                         intFenTotArea += windowAreaWMult;
                         intUfactArea += nomUfact * windowAreaWMult;
@@ -1226,11 +1226,11 @@ namespace HeatBalanceSurfaceManager {
                 } else if (Surface(iSurf).Class == SurfaceClass::Door) {
                     surfName = Surface(iSurf).Name;
                     curCons = Surface(iSurf).Construction;
-                    PreDefTableEntry(pdchIntDrCons, surfName, state.dataConstruction->Construct(curCons).Name);
-                    PreDefTableEntry(pdchIntDrUfactNoFilm, surfName, NominalU(Surface(iSurf).Construction), 3);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchIntDrCons, surfName, state.dataConstruction->Construct(curCons).Name);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchIntDrUfactNoFilm, surfName, NominalU(Surface(iSurf).Construction), 3);
                     mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier;
-                    PreDefTableEntry(pdchIntDrGrArea, surfName, Surface(iSurf).GrossArea * mult);
-                    PreDefTableEntry(pdchIntDrParent, surfName, Surface(iSurf).BaseSurfName);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchIntDrGrArea, surfName, Surface(iSurf).GrossArea * mult);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchIntDrParent, surfName, Surface(iSurf).BaseSurfName);
                     computedNetArea(Surface(iSurf).BaseSurf) -= Surface(iSurf).GrossArea * mult;
                 }
             }
@@ -1268,88 +1268,88 @@ namespace HeatBalanceSurfaceManager {
                 (Surface(iSurf).ExtBoundCond == GroundFCfactorMethod) || (Surface(iSurf).ExtBoundCond == KivaFoundation)) {
                 if ((SurfaceClass == SurfaceClass::Wall) || (SurfaceClass == SurfaceClass::Floor) || (SurfaceClass == SurfaceClass::Roof)) {
                     surfName = Surface(iSurf).Name;
-                    PreDefTableEntry(pdchOpNetArea, surfName, computedNetArea(iSurf));
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchOpNetArea, surfName, computedNetArea(iSurf));
                 }
             }else {
                 if ((SurfaceClass == SurfaceClass::Wall) || (SurfaceClass == SurfaceClass::Floor) || (SurfaceClass == SurfaceClass::Roof)) {
                     surfName = Surface(iSurf).Name;
-                    PreDefTableEntry(pdchIntOpNetArea, surfName, computedNetArea(iSurf));
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchIntOpNetArea, surfName, computedNetArea(iSurf));
                 }
             }// interior surfaces
         }
         // total
-        PreDefTableEntry(pdchFenArea, "Total or Average", fenTotArea);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenArea, "Total or Average", fenTotArea);
         if (fenTotArea > 0.0) {
-            PreDefTableEntry(pdchFenUfact, "Total or Average", ufactArea / fenTotArea, 3);
-            PreDefTableEntry(pdchFenSHGC, "Total or Average", shgcArea / fenTotArea, 3);
-            PreDefTableEntry(pdchFenVisTr, "Total or Average", vistranArea / fenTotArea, 3);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenUfact, "Total or Average", ufactArea / fenTotArea, 3);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenSHGC, "Total or Average", shgcArea / fenTotArea, 3);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenVisTr, "Total or Average", vistranArea / fenTotArea, 3);
         } else {
-            PreDefTableEntry(pdchFenUfact, "Total or Average", "-");
-            PreDefTableEntry(pdchFenSHGC, "Total or Average", "-");
-            PreDefTableEntry(pdchFenVisTr, "Total or Average", "-");
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenUfact, "Total or Average", "-");
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenSHGC, "Total or Average", "-");
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenVisTr, "Total or Average", "-");
         }
         // north
-        PreDefTableEntry(pdchFenArea, "North Total or Average", fenTotAreaNorth);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenArea, "North Total or Average", fenTotAreaNorth);
         if (fenTotAreaNorth > 0.0) {
-            PreDefTableEntry(pdchFenUfact, "North Total or Average", ufactAreaNorth / fenTotAreaNorth, 3);
-            PreDefTableEntry(pdchFenSHGC, "North Total or Average", shgcAreaNorth / fenTotAreaNorth, 3);
-            PreDefTableEntry(pdchFenVisTr, "North Total or Average", vistranAreaNorth / fenTotAreaNorth, 3);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenUfact, "North Total or Average", ufactAreaNorth / fenTotAreaNorth, 3);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenSHGC, "North Total or Average", shgcAreaNorth / fenTotAreaNorth, 3);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenVisTr, "North Total or Average", vistranAreaNorth / fenTotAreaNorth, 3);
         } else {
-            PreDefTableEntry(pdchFenUfact, "North Total or Average", "-");
-            PreDefTableEntry(pdchFenSHGC, "North Total or Average", "-");
-            PreDefTableEntry(pdchFenVisTr, "North Total or Average", "-");
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenUfact, "North Total or Average", "-");
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenSHGC, "North Total or Average", "-");
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenVisTr, "North Total or Average", "-");
         }
         // non-north
-        PreDefTableEntry(pdchFenArea, "Non-North Total or Average", fenTotAreaNonNorth);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenArea, "Non-North Total or Average", fenTotAreaNonNorth);
         if (fenTotAreaNonNorth > 0.0) {
-            PreDefTableEntry(pdchFenUfact, "Non-North Total or Average", ufactAreaNonNorth / fenTotAreaNonNorth, 3);
-            PreDefTableEntry(pdchFenSHGC, "Non-North Total or Average", shgcAreaNonNorth / fenTotAreaNonNorth, 3);
-            PreDefTableEntry(pdchFenVisTr, "Non-North Total or Average", vistranAreaNonNorth / fenTotAreaNonNorth, 3);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenUfact, "Non-North Total or Average", ufactAreaNonNorth / fenTotAreaNonNorth, 3);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenSHGC, "Non-North Total or Average", shgcAreaNonNorth / fenTotAreaNonNorth, 3);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenVisTr, "Non-North Total or Average", vistranAreaNonNorth / fenTotAreaNonNorth, 3);
         } else {
-            PreDefTableEntry(pdchFenUfact, "Non-North Total or Average", "-");
-            PreDefTableEntry(pdchFenSHGC, "Non-North Total or Average", "-");
-            PreDefTableEntry(pdchFenVisTr, "Non-North Total or Average", "-");
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenUfact, "Non-North Total or Average", "-");
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenSHGC, "Non-North Total or Average", "-");
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenVisTr, "Non-North Total or Average", "-");
         }
         // interior fenestration totals
-        PreDefTableEntry(pdchIntFenArea, "Total or Average", intFenTotArea);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchIntFenArea, "Total or Average", intFenTotArea);
         if (intFenTotArea > 0.0) {
-            PreDefTableEntry(pdchIntFenUfact, "Total or Average", intUfactArea / intFenTotArea, 3);
-            PreDefTableEntry(pdchIntFenSHGC, "Total or Average", intShgcArea / intFenTotArea, 3);
-            PreDefTableEntry(pdchIntFenVisTr, "Total or Average", intVistranArea / intFenTotArea, 3);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchIntFenUfact, "Total or Average", intUfactArea / intFenTotArea, 3);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchIntFenSHGC, "Total or Average", intShgcArea / intFenTotArea, 3);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchIntFenVisTr, "Total or Average", intVistranArea / intFenTotArea, 3);
         } else {
-            PreDefTableEntry(pdchIntFenUfact, "Total or Average", "-");
-            PreDefTableEntry(pdchIntFenSHGC, "Total or Average", "-");
-            PreDefTableEntry(pdchIntFenVisTr, "Total or Average", "-");
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchIntFenUfact, "Total or Average", "-");
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchIntFenSHGC, "Total or Average", "-");
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchIntFenVisTr, "Total or Average", "-");
         }
         // counts
-        PreDefTableEntry(pdchSurfCntTot, "Wall", numSurfaces(int(SurfaceClass::Wall)));
-        PreDefTableEntry(pdchSurfCntExt, "Wall", numExtSurfaces(int(SurfaceClass::Wall)));
-        PreDefTableEntry(pdchSurfCntTot, "Floor", numSurfaces(int(SurfaceClass::Floor)));
-        PreDefTableEntry(pdchSurfCntExt, "Floor", numExtSurfaces(int(SurfaceClass::Floor)));
-        PreDefTableEntry(pdchSurfCntTot, "Roof", numSurfaces(int(SurfaceClass::Roof)));
-        PreDefTableEntry(pdchSurfCntExt, "Roof", numExtSurfaces(int(SurfaceClass::Roof)));
-        PreDefTableEntry(pdchSurfCntTot, "Internal Mass", numSurfaces(int(SurfaceClass::IntMass)));
-        PreDefTableEntry(pdchSurfCntExt, "Internal Mass", numExtSurfaces(int(SurfaceClass::IntMass)));
-        PreDefTableEntry(pdchSurfCntTot, "Building Detached Shading", numSurfaces(int(SurfaceClass::Detached_B)));
-        PreDefTableEntry(pdchSurfCntExt, "Building Detached Shading", numExtSurfaces(int(SurfaceClass::Detached_B)));
-        PreDefTableEntry(pdchSurfCntTot, "Fixed Detached Shading", numSurfaces(int(SurfaceClass::Detached_F)));
-        PreDefTableEntry(pdchSurfCntExt, "Fixed Detached Shading", numExtSurfaces(int(SurfaceClass::Detached_F)));
-        PreDefTableEntry(pdchSurfCntTot, "Window", numSurfaces(int(SurfaceClass::Window)));
-        PreDefTableEntry(pdchSurfCntExt, "Window", numExtSurfaces(int(SurfaceClass::Window)));
-        PreDefTableEntry(pdchSurfCntTot, "Door", numSurfaces(int(SurfaceClass::Door)));
-        PreDefTableEntry(pdchSurfCntExt, "Door", numExtSurfaces(int(SurfaceClass::Door)));
-        PreDefTableEntry(pdchSurfCntTot, "Glass Door", numSurfaces(int(SurfaceClass::GlassDoor)));
-        PreDefTableEntry(pdchSurfCntExt, "Glass Door", numExtSurfaces(int(SurfaceClass::GlassDoor)));
-        PreDefTableEntry(pdchSurfCntTot, "Shading", numSurfaces(int(SurfaceClass::Shading)));
-        PreDefTableEntry(pdchSurfCntExt, "Shading", numExtSurfaces(int(SurfaceClass::Shading)));
-        PreDefTableEntry(pdchSurfCntTot, "Overhang", numSurfaces(int(SurfaceClass::Overhang)));
-        PreDefTableEntry(pdchSurfCntExt, "Overhang", numExtSurfaces(int(SurfaceClass::Overhang)));
-        PreDefTableEntry(pdchSurfCntTot, "Fin", numSurfaces(int(SurfaceClass::Fin)));
-        PreDefTableEntry(pdchSurfCntExt, "Fin", numExtSurfaces(int(SurfaceClass::Fin)));
-        PreDefTableEntry(pdchSurfCntTot, "Tubular Daylighting Device Dome", numSurfaces(int(SurfaceClass::TDD_Dome)));
-        PreDefTableEntry(pdchSurfCntExt, "Tubular Daylighting Device Dome", numExtSurfaces(int(SurfaceClass::TDD_Dome)));
-        PreDefTableEntry(pdchSurfCntTot, "Tubular Daylighting Device Diffuser", numSurfaces(int(SurfaceClass::TDD_Diffuser)));
-        PreDefTableEntry(pdchSurfCntExt, "Tubular Daylighting Device Diffuser", numExtSurfaces(int(SurfaceClass::TDD_Diffuser)));
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSurfCntTot, "Wall", numSurfaces(int(SurfaceClass::Wall)));
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSurfCntExt, "Wall", numExtSurfaces(int(SurfaceClass::Wall)));
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSurfCntTot, "Floor", numSurfaces(int(SurfaceClass::Floor)));
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSurfCntExt, "Floor", numExtSurfaces(int(SurfaceClass::Floor)));
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSurfCntTot, "Roof", numSurfaces(int(SurfaceClass::Roof)));
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSurfCntExt, "Roof", numExtSurfaces(int(SurfaceClass::Roof)));
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSurfCntTot, "Internal Mass", numSurfaces(int(SurfaceClass::IntMass)));
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSurfCntExt, "Internal Mass", numExtSurfaces(int(SurfaceClass::IntMass)));
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSurfCntTot, "Building Detached Shading", numSurfaces(int(SurfaceClass::Detached_B)));
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSurfCntExt, "Building Detached Shading", numExtSurfaces(int(SurfaceClass::Detached_B)));
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSurfCntTot, "Fixed Detached Shading", numSurfaces(int(SurfaceClass::Detached_F)));
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSurfCntExt, "Fixed Detached Shading", numExtSurfaces(int(SurfaceClass::Detached_F)));
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSurfCntTot, "Window", numSurfaces(int(SurfaceClass::Window)));
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSurfCntExt, "Window", numExtSurfaces(int(SurfaceClass::Window)));
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSurfCntTot, "Door", numSurfaces(int(SurfaceClass::Door)));
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSurfCntExt, "Door", numExtSurfaces(int(SurfaceClass::Door)));
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSurfCntTot, "Glass Door", numSurfaces(int(SurfaceClass::GlassDoor)));
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSurfCntExt, "Glass Door", numExtSurfaces(int(SurfaceClass::GlassDoor)));
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSurfCntTot, "Shading", numSurfaces(int(SurfaceClass::Shading)));
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSurfCntExt, "Shading", numExtSurfaces(int(SurfaceClass::Shading)));
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSurfCntTot, "Overhang", numSurfaces(int(SurfaceClass::Overhang)));
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSurfCntExt, "Overhang", numExtSurfaces(int(SurfaceClass::Overhang)));
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSurfCntTot, "Fin", numSurfaces(int(SurfaceClass::Fin)));
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSurfCntExt, "Fin", numExtSurfaces(int(SurfaceClass::Fin)));
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSurfCntTot, "Tubular Daylighting Device Dome", numSurfaces(int(SurfaceClass::TDD_Dome)));
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSurfCntExt, "Tubular Daylighting Device Dome", numExtSurfaces(int(SurfaceClass::TDD_Dome)));
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSurfCntTot, "Tubular Daylighting Device Diffuser", numSurfaces(int(SurfaceClass::TDD_Diffuser)));
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchSurfCntExt, "Tubular Daylighting Device Diffuser", numExtSurfaces(int(SurfaceClass::TDD_Diffuser)));
     }
 
     void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)

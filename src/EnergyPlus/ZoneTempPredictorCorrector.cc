@@ -7664,73 +7664,73 @@ namespace ZoneTempPredictorCorrector {
         for (int SingleTempHeatingControlNum = 1; SingleTempHeatingControlNum <= state.dataZoneTempPredictorCorrector->NumSingleTempHeatingControls; ++SingleTempHeatingControlNum) {
             if (std::find(uniqSch.begin(), uniqSch.end(), state.dataZoneTempPredictorCorrector->SetPointSingleHeating(SingleTempHeatingControlNum).TempSchedIndex) == uniqSch.end()) {
                 uniqSch.emplace_back(state.dataZoneTempPredictorCorrector->SetPointSingleHeating(SingleTempHeatingControlNum).TempSchedIndex);
-                PreDefTableEntry(pdChLeedSchStPtFirstObjUsed,
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdChLeedSchStPtFirstObjUsed,
                                  state.dataZoneTempPredictorCorrector->SetPointSingleHeating(SingleTempHeatingControlNum).TempSchedName,
                                  state.dataZoneTempPredictorCorrector->SetPointSingleHeating(SingleTempHeatingControlNum).Name);
 
                 std::tie(setPointAt11, numDays, monthAssumed) =
                     temperatureAndCountInSch(state, state.dataZoneTempPredictorCorrector->SetPointSingleHeating(SingleTempHeatingControlNum).TempSchedIndex, false, wednesday, 11);
-                PreDefTableEntry(pdchLeedSchStPt11amWednesday, state.dataZoneTempPredictorCorrector->SetPointSingleHeating(SingleTempHeatingControlNum).TempSchedName, setPointAt11);
-                PreDefTableEntry(pdchLeedSchStPt11amWedCnt, state.dataZoneTempPredictorCorrector->SetPointSingleHeating(SingleTempHeatingControlNum).TempSchedName, numDays);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSchStPt11amWednesday, state.dataZoneTempPredictorCorrector->SetPointSingleHeating(SingleTempHeatingControlNum).TempSchedName, setPointAt11);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSchStPt11amWedCnt, state.dataZoneTempPredictorCorrector->SetPointSingleHeating(SingleTempHeatingControlNum).TempSchedName, numDays);
 
                 std::tie(setPointAt23, numDays, monthAssumed) =
                     temperatureAndCountInSch(state, state.dataZoneTempPredictorCorrector->SetPointSingleHeating(SingleTempHeatingControlNum).TempSchedIndex, false, wednesday, 23);
-                PreDefTableEntry(pdchLeedSchStPt11pmWednesday, state.dataZoneTempPredictorCorrector->SetPointSingleHeating(SingleTempHeatingControlNum).TempSchedName, setPointAt23);
-                PreDefTableEntry(pdchLeedSchStPt11pmWedCnt, state.dataZoneTempPredictorCorrector->SetPointSingleHeating(SingleTempHeatingControlNum).TempSchedName, numDays);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSchStPt11pmWednesday, state.dataZoneTempPredictorCorrector->SetPointSingleHeating(SingleTempHeatingControlNum).TempSchedName, setPointAt23);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSchStPt11pmWedCnt, state.dataZoneTempPredictorCorrector->SetPointSingleHeating(SingleTempHeatingControlNum).TempSchedName, numDays);
 
-                PreDefTableEntry(pdChLeedSchStPtMonthUsed, state.dataZoneTempPredictorCorrector->SetPointSingleHeating(SingleTempHeatingControlNum).TempSchedName, monthAssumed);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdChLeedSchStPtMonthUsed, state.dataZoneTempPredictorCorrector->SetPointSingleHeating(SingleTempHeatingControlNum).TempSchedName, monthAssumed);
             }
         }
         for (int SingleTempCoolingControlNum = 1; SingleTempCoolingControlNum <= state.dataZoneTempPredictorCorrector->NumSingleTempCoolingControls; ++SingleTempCoolingControlNum) {
             if (std::find(uniqSch.begin(), uniqSch.end(), state.dataZoneTempPredictorCorrector->SetPointSingleCooling(SingleTempCoolingControlNum).TempSchedIndex) == uniqSch.end()) {
                 uniqSch.emplace_back(state.dataZoneTempPredictorCorrector->SetPointSingleCooling(SingleTempCoolingControlNum).TempSchedIndex);
-                PreDefTableEntry(pdChLeedSchStPtFirstObjUsed,
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdChLeedSchStPtFirstObjUsed,
                                  state.dataZoneTempPredictorCorrector->SetPointSingleCooling(SingleTempCoolingControlNum).TempSchedName,
                                  state.dataZoneTempPredictorCorrector->SetPointSingleCooling(SingleTempCoolingControlNum).Name);
 
                 std::tie(setPointAt11, numDays, monthAssumed) =
                     temperatureAndCountInSch(state, state.dataZoneTempPredictorCorrector->SetPointSingleCooling(SingleTempCoolingControlNum).TempSchedIndex, true, wednesday, 11);
-                PreDefTableEntry(pdchLeedSchStPt11amWednesday, state.dataZoneTempPredictorCorrector->SetPointSingleCooling(SingleTempCoolingControlNum).TempSchedName, setPointAt11);
-                PreDefTableEntry(pdchLeedSchStPt11amWedCnt, state.dataZoneTempPredictorCorrector->SetPointSingleCooling(SingleTempCoolingControlNum).TempSchedName, numDays);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSchStPt11amWednesday, state.dataZoneTempPredictorCorrector->SetPointSingleCooling(SingleTempCoolingControlNum).TempSchedName, setPointAt11);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSchStPt11amWedCnt, state.dataZoneTempPredictorCorrector->SetPointSingleCooling(SingleTempCoolingControlNum).TempSchedName, numDays);
 
                 std::tie(setPointAt23, numDays, monthAssumed) =
                     temperatureAndCountInSch(state, state.dataZoneTempPredictorCorrector->SetPointSingleCooling(SingleTempCoolingControlNum).TempSchedIndex, true, wednesday, 23);
-                PreDefTableEntry(pdchLeedSchStPt11pmWednesday, state.dataZoneTempPredictorCorrector->SetPointSingleCooling(SingleTempCoolingControlNum).TempSchedName, setPointAt23);
-                PreDefTableEntry(pdchLeedSchStPt11pmWedCnt, state.dataZoneTempPredictorCorrector->SetPointSingleCooling(SingleTempCoolingControlNum).TempSchedName, numDays);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSchStPt11pmWednesday, state.dataZoneTempPredictorCorrector->SetPointSingleCooling(SingleTempCoolingControlNum).TempSchedName, setPointAt23);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSchStPt11pmWedCnt, state.dataZoneTempPredictorCorrector->SetPointSingleCooling(SingleTempCoolingControlNum).TempSchedName, numDays);
 
-                PreDefTableEntry(pdChLeedSchStPtMonthUsed, state.dataZoneTempPredictorCorrector->SetPointSingleCooling(SingleTempCoolingControlNum).TempSchedName, monthAssumed);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdChLeedSchStPtMonthUsed, state.dataZoneTempPredictorCorrector->SetPointSingleCooling(SingleTempCoolingControlNum).TempSchedName, monthAssumed);
             }
         }
         for (int SingleTempHeatCoolControlNum = 1; SingleTempHeatCoolControlNum <= state.dataZoneTempPredictorCorrector->NumSingleTempHeatCoolControls; ++SingleTempHeatCoolControlNum) {
             if (std::find(uniqSch.begin(), uniqSch.end(), state.dataZoneTempPredictorCorrector->SetPointSingleHeatCool(SingleTempHeatCoolControlNum).TempSchedIndex) == uniqSch.end()) {
                 uniqSch.emplace_back(state.dataZoneTempPredictorCorrector->SetPointSingleHeatCool(SingleTempHeatCoolControlNum).TempSchedIndex);
-                PreDefTableEntry(pdChLeedSchStPtFirstObjUsed,
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdChLeedSchStPtFirstObjUsed,
                                  state.dataZoneTempPredictorCorrector->SetPointSingleHeatCool(SingleTempHeatCoolControlNum).TempSchedName,
                                  state.dataZoneTempPredictorCorrector->SetPointSingleHeatCool(SingleTempHeatCoolControlNum).Name);
 
                 std::string schNm = state.dataZoneTempPredictorCorrector->SetPointSingleHeatCool(SingleTempHeatCoolControlNum).TempSchedName + " (summer)";
                 std::tie(setPointAt11, numDays, monthAssumed) =
                     temperatureAndCountInSch(state, state.dataZoneTempPredictorCorrector->SetPointSingleHeatCool(SingleTempHeatCoolControlNum).TempSchedIndex, true, wednesday, 11);
-                PreDefTableEntry(pdchLeedSchStPt11amWednesday, schNm, setPointAt11);
-                PreDefTableEntry(pdchLeedSchStPt11amWedCnt, schNm, numDays);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSchStPt11amWednesday, schNm, setPointAt11);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSchStPt11amWedCnt, schNm, numDays);
 
                 std::tie(setPointAt23, numDays, monthAssumed) =
                     temperatureAndCountInSch(state, state.dataZoneTempPredictorCorrector->SetPointSingleHeatCool(SingleTempHeatCoolControlNum).TempSchedIndex, true, wednesday, 23);
-                PreDefTableEntry(pdchLeedSchStPt11pmWednesday, schNm, setPointAt23);
-                PreDefTableEntry(pdchLeedSchStPt11pmWedCnt, schNm, numDays);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSchStPt11pmWednesday, schNm, setPointAt23);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSchStPt11pmWedCnt, schNm, numDays);
 
                 schNm = state.dataZoneTempPredictorCorrector->SetPointSingleHeatCool(SingleTempHeatCoolControlNum).TempSchedName + " (winter)";
                 std::tie(setPointAt11, numDays, monthAssumed2) =
                     temperatureAndCountInSch(state, state.dataZoneTempPredictorCorrector->SetPointSingleHeatCool(SingleTempHeatCoolControlNum).TempSchedIndex, false, wednesday, 11);
-                PreDefTableEntry(pdchLeedSchStPt11amWednesday, schNm, setPointAt11);
-                PreDefTableEntry(pdchLeedSchStPt11amWedCnt, schNm, numDays);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSchStPt11amWednesday, schNm, setPointAt11);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSchStPt11amWedCnt, schNm, numDays);
 
                 std::tie(setPointAt23, numDays, monthAssumed2) =
                     temperatureAndCountInSch(state, state.dataZoneTempPredictorCorrector->SetPointSingleHeatCool(SingleTempHeatCoolControlNum).TempSchedIndex, false, wednesday, 23);
-                PreDefTableEntry(pdchLeedSchStPt11pmWednesday, schNm, setPointAt23);
-                PreDefTableEntry(pdchLeedSchStPt11pmWedCnt, schNm, numDays);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSchStPt11pmWednesday, schNm, setPointAt23);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSchStPt11pmWedCnt, schNm, numDays);
 
-                PreDefTableEntry(pdChLeedSchStPtMonthUsed,
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdChLeedSchStPtMonthUsed,
                                  state.dataZoneTempPredictorCorrector->SetPointSingleHeatCool(SingleTempHeatCoolControlNum).TempSchedName,
                                  monthAssumed + " and " + monthAssumed2);
             }
@@ -7738,39 +7738,39 @@ namespace ZoneTempPredictorCorrector {
         for (int DualTempHeatCoolControlNum = 1; DualTempHeatCoolControlNum <= state.dataZoneTempPredictorCorrector->NumDualTempHeatCoolControls; ++DualTempHeatCoolControlNum) {
             if (std::find(uniqSch.begin(), uniqSch.end(), state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).HeatTempSchedIndex) == uniqSch.end()) {
                 uniqSch.emplace_back(state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).HeatTempSchedIndex);
-                PreDefTableEntry(pdChLeedSchStPtFirstObjUsed,
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdChLeedSchStPtFirstObjUsed,
                                  state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).HeatTempSetptSchedName,
                                  state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).Name);
 
                 std::tie(setPointAt11, numDays, monthAssumed) =
                     temperatureAndCountInSch(state, state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).HeatTempSchedIndex, false, wednesday, 11);
-                PreDefTableEntry(pdchLeedSchStPt11amWednesday, state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).HeatTempSetptSchedName, setPointAt11);
-                PreDefTableEntry(pdchLeedSchStPt11amWedCnt, state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).HeatTempSetptSchedName, numDays);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSchStPt11amWednesday, state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).HeatTempSetptSchedName, setPointAt11);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSchStPt11amWedCnt, state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).HeatTempSetptSchedName, numDays);
 
                 std::tie(setPointAt23, numDays, monthAssumed) =
                     temperatureAndCountInSch(state, state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).HeatTempSchedIndex, false, wednesday, 23);
-                PreDefTableEntry(pdchLeedSchStPt11pmWednesday, state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).HeatTempSetptSchedName, setPointAt23);
-                PreDefTableEntry(pdchLeedSchStPt11pmWedCnt, state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).HeatTempSetptSchedName, numDays);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSchStPt11pmWednesday, state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).HeatTempSetptSchedName, setPointAt23);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSchStPt11pmWedCnt, state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).HeatTempSetptSchedName, numDays);
 
-                PreDefTableEntry(pdChLeedSchStPtMonthUsed, state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).HeatTempSetptSchedName, monthAssumed);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdChLeedSchStPtMonthUsed, state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).HeatTempSetptSchedName, monthAssumed);
             }
             if (std::find(uniqSch.begin(), uniqSch.end(), state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).CoolTempSchedIndex) == uniqSch.end()) {
                 uniqSch.emplace_back(state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).CoolTempSchedIndex);
-                PreDefTableEntry(pdChLeedSchStPtFirstObjUsed,
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdChLeedSchStPtFirstObjUsed,
                                  state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).CoolTempSetptSchedName,
                                  state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).Name);
 
                 std::tie(setPointAt11, numDays, monthAssumed) =
                     temperatureAndCountInSch(state, state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).CoolTempSchedIndex, true, wednesday, 11);
-                PreDefTableEntry(pdchLeedSchStPt11amWednesday, state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).CoolTempSetptSchedName, setPointAt11);
-                PreDefTableEntry(pdchLeedSchStPt11amWedCnt, state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).CoolTempSetptSchedName, numDays);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSchStPt11amWednesday, state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).CoolTempSetptSchedName, setPointAt11);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSchStPt11amWedCnt, state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).CoolTempSetptSchedName, numDays);
 
                 std::tie(setPointAt23, numDays, monthAssumed) =
                     temperatureAndCountInSch(state, state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).CoolTempSchedIndex, true, wednesday, 23);
-                PreDefTableEntry(pdchLeedSchStPt11pmWednesday, state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).CoolTempSetptSchedName, setPointAt23);
-                PreDefTableEntry(pdchLeedSchStPt11pmWedCnt, state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).CoolTempSetptSchedName, numDays);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSchStPt11pmWednesday, state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).CoolTempSetptSchedName, setPointAt23);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSchStPt11pmWedCnt, state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).CoolTempSetptSchedName, numDays);
 
-                PreDefTableEntry(pdChLeedSchStPtMonthUsed, state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).CoolTempSetptSchedName, monthAssumed);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdChLeedSchStPtMonthUsed, state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).CoolTempSetptSchedName, monthAssumed);
             }
         }
     }

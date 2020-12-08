@@ -180,7 +180,7 @@ TEST_F(EnergyPlusFixture, SimAirServingZones_LimitZoneVentEff)
     Real64 SysCoolingEv = 1.0 + Xs - ZoneOAFrac; // System level ventilation effectiveness for cooling (from SimAirServingZone::UpdateSysSizing right
                                                  // before call to LimitZoneVentEff)
     Real64 StartingSysCoolingEv = SysCoolingEv;
-    LimitZoneVentEff(Xs, VozClg, CtrlZoneNum, SysCoolingEv);
+    LimitZoneVentEff(*state, Xs, VozClg, CtrlZoneNum, SysCoolingEv);
     EXPECT_EQ(StartingSysCoolingEv, SysCoolingEv);
     EXPECT_EQ(StartingDesCoolVolFlow, TermUnitFinalZoneSizing(CtrlZoneNum).DesCoolVolFlow);
     EXPECT_EQ(StartingDesCoolVolFlowMin, TermUnitFinalZoneSizing(CtrlZoneNum).DesCoolVolFlowMin);
@@ -200,7 +200,7 @@ TEST_F(EnergyPlusFixture, SimAirServingZones_LimitZoneVentEff)
     SysCoolingEv = 1.0 + Xs - ZoneOAFrac; // System level ventilation effectiveness for cooling (from SimAirServingZone::UpdateSysSizing right before
                                           // call to LimitZoneVentEff)
     StartingSysCoolingEv = SysCoolingEv;
-    LimitZoneVentEff(Xs, VozClg, CtrlZoneNum, SysCoolingEv);
+    LimitZoneVentEff(*state, Xs, VozClg, CtrlZoneNum, SysCoolingEv);
     EXPECT_EQ(TermUnitFinalZoneSizing(CtrlZoneNum).ZoneVentilationEff, SysCoolingEv);
     EXPECT_EQ(StartingDesCoolVolFlow, TermUnitFinalZoneSizing(CtrlZoneNum).DesCoolVolFlow);
     EXPECT_NEAR(0.2857, TermUnitFinalZoneSizing(CtrlZoneNum).DesCoolVolFlowMin, 0.001);
@@ -220,7 +220,7 @@ TEST_F(EnergyPlusFixture, SimAirServingZones_LimitZoneVentEff)
     SysCoolingEv = 1.0 + Xs - ZoneOAFrac; // System level ventilation effectiveness for cooling (from SimAirServingZone::UpdateSysSizing right before
                                           // call to LimitZoneVentEff)
     StartingSysCoolingEv = SysCoolingEv;
-    LimitZoneVentEff(Xs, VozClg, CtrlZoneNum, SysCoolingEv);
+    LimitZoneVentEff(*state, Xs, VozClg, CtrlZoneNum, SysCoolingEv);
     EXPECT_EQ(TermUnitFinalZoneSizing(CtrlZoneNum).ZoneVentilationEff, SysCoolingEv);
     EXPECT_NEAR(2.2857, TermUnitFinalZoneSizing(CtrlZoneNum).DesCoolVolFlow, 0.001);
     EXPECT_NEAR(2.2857, TermUnitFinalZoneSizing(CtrlZoneNum).DesCoolVolFlowMin, 0.001);

@@ -1163,8 +1163,8 @@ namespace InternalHeatGains {
             if (Zone(Loop).isNominalControlled) { // conditioned zones only
                 if (Zone(Loop).TotOccupants > 0.0) {
                     Zone(Loop).isNominalOccupied = true;
-                    PreDefTableEntry(pdchOaoNomNumOcc1, Zone(Loop).Name, Zone(Loop).TotOccupants);
-                    PreDefTableEntry(pdchOaoNomNumOcc2, Zone(Loop).Name, Zone(Loop).TotOccupants);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaoNomNumOcc1, Zone(Loop).Name, Zone(Loop).TotOccupants);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaoNomNumOcc2, Zone(Loop).Name, Zone(Loop).TotOccupants);
                 }
             }
         }
@@ -1608,28 +1608,28 @@ namespace InternalHeatGains {
                     mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier;
                     sumArea += Zone(zonePt).FloorArea * mult;
                     sumPower += Lights(Loop).DesignLevel * mult;
-                    PreDefTableEntry(pdchInLtZone, liteName, Zone(zonePt).Name);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtZone, liteName, Zone(zonePt).Name);
                     if (Zone(zonePt).FloorArea > 0.0) {
-                        PreDefTableEntry(pdchInLtDens, liteName, Lights(Loop).DesignLevel / Zone(zonePt).FloorArea, 4);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtDens, liteName, Lights(Loop).DesignLevel / Zone(zonePt).FloorArea, 4);
                     } else {
-                        PreDefTableEntry(pdchInLtDens, liteName, DataPrecisionGlobals::constant_zero, 4);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtDens, liteName, DataPrecisionGlobals::constant_zero, 4);
                     }
-                    PreDefTableEntry(pdchInLtArea, liteName, Zone(zonePt).FloorArea * mult);
-                    PreDefTableEntry(pdchInLtPower, liteName, Lights(Loop).DesignLevel * mult);
-                    PreDefTableEntry(pdchInLtEndUse, liteName, Lights(Loop).EndUseSubcategory);
-                    PreDefTableEntry(pdchInLtSchd, liteName, GetScheduleName(state, Lights(Loop).SchedPtr));
-                    PreDefTableEntry(pdchInLtRetAir, liteName, Lights(Loop).FractionReturnAir, 4);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtArea, liteName, Zone(zonePt).FloorArea * mult);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtPower, liteName, Lights(Loop).DesignLevel * mult);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtEndUse, liteName, Lights(Loop).EndUseSubcategory);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtSchd, liteName, GetScheduleName(state, Lights(Loop).SchedPtr));
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtRetAir, liteName, Lights(Loop).FractionReturnAir, 4);
                 } // Item1 - zones
             }     // Item = Number of Lights Objects
         }         // TotLights > 0 check
         // add total line to lighting summary table
         if (sumArea > 0.0) {
-            PreDefTableEntry(pdchInLtDens, "Interior Lighting Total", sumPower / sumArea, 4); //** line 792
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtDens, "Interior Lighting Total", sumPower / sumArea, 4); //** line 792
         } else {
-            PreDefTableEntry(pdchInLtDens, "Interior Lighting Total", DataPrecisionGlobals::constant_zero, 4);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtDens, "Interior Lighting Total", DataPrecisionGlobals::constant_zero, 4);
         }
-        PreDefTableEntry(pdchInLtArea, "Interior Lighting Total", sumArea);
-        PreDefTableEntry(pdchInLtPower, "Interior Lighting Total", sumPower);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtArea, "Interior Lighting Total", sumArea);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtPower, "Interior Lighting Total", sumPower);
 
         RepVarSet = true;
         CurrentModuleObject = "ElectricEquipment";

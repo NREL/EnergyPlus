@@ -576,43 +576,43 @@ void PlantCoinicidentAnalysis::ResolveDesignFlowRate(EnergyPlusData& state, int 
 
     // report to sizing summary table called Plant Loop Coincident Design Fluid Flow Rates
 
-    PreDefTableEntry(pdchPlantSizPrevVdot, PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration, previousVolDesignFlowRate, 6);
-    PreDefTableEntry(pdchPlantSizMeasVdot, PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration, newFoundVolFlowRate, 6);
-    PreDefTableEntry(pdchPlantSizCalcVdot, PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration, newVolDesignFlowRate, 6);
+    PreDefTableEntry(state, state.dataOutRptPredefined->pdchPlantSizPrevVdot, PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration, previousVolDesignFlowRate, 6);
+    PreDefTableEntry(state, state.dataOutRptPredefined->pdchPlantSizMeasVdot, PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration, newFoundVolFlowRate, 6);
+    PreDefTableEntry(state, state.dataOutRptPredefined->pdchPlantSizCalcVdot, PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration, newVolDesignFlowRate, 6);
 
     if (setNewSizes) {
-        PreDefTableEntry(pdchPlantSizCoincYesNo, PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration, "Yes");
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchPlantSizCoincYesNo, PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration, "Yes");
     } else {
-        PreDefTableEntry(pdchPlantSizCoincYesNo, PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration, "No");
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchPlantSizCoincYesNo, PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration, "No");
     }
 
     if (!nullStampProblem) {
         if (!changedByDemand && !CheckTimeStampForNull(newFoundMassFlowRateTimeStamp)) { // bug fix #5665
             if (newFoundMassFlowRateTimeStamp.envrnNum > 0) {                            // protect against invalid index
-                PreDefTableEntry(pdchPlantSizDesDay,
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchPlantSizDesDay,
                                  PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration,
                                  state.dataWeatherManager->Environment(newFoundMassFlowRateTimeStamp.envrnNum).Title);
             }
-            PreDefTableEntry(
-                pdchPlantSizPkTimeDayOfSim, PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration, newFoundMassFlowRateTimeStamp.dayOfSim);
-            PreDefTableEntry(
-                pdchPlantSizPkTimeHour, PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration, newFoundMassFlowRateTimeStamp.hourOfDay - 1);
-            PreDefTableEntry(pdchPlantSizPkTimeMin,
+            PreDefTableEntry(state,
+                state.dataOutRptPredefined->pdchPlantSizPkTimeDayOfSim, PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration, newFoundMassFlowRateTimeStamp.dayOfSim);
+            PreDefTableEntry(state,
+                state.dataOutRptPredefined->pdchPlantSizPkTimeHour, PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration, newFoundMassFlowRateTimeStamp.hourOfDay - 1);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchPlantSizPkTimeMin,
                              PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration,
                              newFoundMassFlowRateTimeStamp.stepStartMinute,
                              0);
         } else if (changedByDemand && !CheckTimeStampForNull(NewFoundMaxDemandTimeStamp)) { // bug fix #5665
             if (NewFoundMaxDemandTimeStamp.envrnNum > 0) {                                  // protect against invalid index
-                PreDefTableEntry(pdchPlantSizDesDay,
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchPlantSizDesDay,
                                  PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration,
                                  state.dataWeatherManager->Environment(NewFoundMaxDemandTimeStamp.envrnNum).Title);
             }
-            PreDefTableEntry(
-                pdchPlantSizPkTimeDayOfSim, PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration, NewFoundMaxDemandTimeStamp.dayOfSim);
-            PreDefTableEntry(
-                pdchPlantSizPkTimeHour, PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration, NewFoundMaxDemandTimeStamp.hourOfDay - 1);
-            PreDefTableEntry(
-                pdchPlantSizPkTimeMin, PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration, NewFoundMaxDemandTimeStamp.stepStartMinute, 0);
+            PreDefTableEntry(state,
+                state.dataOutRptPredefined->pdchPlantSizPkTimeDayOfSim, PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration, NewFoundMaxDemandTimeStamp.dayOfSim);
+            PreDefTableEntry(state,
+                state.dataOutRptPredefined->pdchPlantSizPkTimeHour, PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration, NewFoundMaxDemandTimeStamp.hourOfDay - 1);
+            PreDefTableEntry(state,
+                state.dataOutRptPredefined->pdchPlantSizPkTimeMin, PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration, NewFoundMaxDemandTimeStamp.stepStartMinute, 0);
         }
     }
 }

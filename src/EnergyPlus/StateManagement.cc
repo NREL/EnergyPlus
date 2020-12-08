@@ -82,7 +82,6 @@
 #include <EnergyPlus/DualDuct.hh>
 #include <EnergyPlus/EarthTube.hh>
 #include <EnergyPlus/EconomicLifeCycleCost.hh>
-#include <EnergyPlus/EconomicTariff.hh>
 #include <EnergyPlus/ElectricBaseboardRadiator.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/EvaporativeCoolers.hh>
@@ -140,7 +139,6 @@
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
-#include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/OutputReportTabularAnnual.hh>
 #include <EnergyPlus/OutsideEnergySources.hh>
@@ -216,7 +214,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     clearFacilityElectricPowerServiceObject();
     EarthTube::clear_state();
     EconomicLifeCycleCost::clear_state();
-    EconomicTariff::clear_state();
     ElectricBaseboardRadiator::clear_state();
     EvaporativeCoolers::clear_state();
     EvaporativeFluidCoolers::clear_state();
@@ -276,7 +273,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     NodeInputManager::clear_state();
     OutAirNodeManager::clear_state();
     OutputProcessor::clear_state();
-    OutputReportPredefined::clear_state();
     OutputReportTabular::clear_state(state);
     OutputReportTabularAnnual::clear_state();
     OutsideEnergySources::clear_state();

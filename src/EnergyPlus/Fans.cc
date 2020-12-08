@@ -1487,21 +1487,21 @@ namespace Fans {
 
         // cpw31Aug2010 Rearrange order to match table and use FanVolFlow to calculate RatedPower
         // ALSO generates values if Component Model fan, for which DeltaPress and FanEff vary with flow
-        PreDefTableEntry(pdchFanType, equipName, Fan(FanNum).FanType);
-        PreDefTableEntry(pdchFanTotEff, equipName, Fan(FanNum).FanEff);
-        PreDefTableEntry(pdchFanDeltaP, equipName, Fan(FanNum).DeltaPress);
-        PreDefTableEntry(pdchFanVolFlow, equipName, FanVolFlow);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanType, equipName, Fan(FanNum).FanType);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanTotEff, equipName, Fan(FanNum).FanEff);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanDeltaP, equipName, Fan(FanNum).DeltaPress);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanVolFlow, equipName, FanVolFlow);
         RatedPower = FanVolFlow * Fan(FanNum).DeltaPress / Fan(FanNum).FanEff; // total fan power
         if (Fan(FanNum).FanType_Num != FanType_ComponentModel) {
             Fan(FanNum).DesignPointFEI = HVACFan::FanSystem::report_fei(state, FanVolFlow, RatedPower, Fan(FanNum).DeltaPress, state.dataEnvrn->StdRhoAir);
         }
-        PreDefTableEntry(pdchFanPwr, equipName, RatedPower);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanPwr, equipName, RatedPower);
         if (FanVolFlow != 0.0) {
-            PreDefTableEntry(pdchFanPwrPerFlow, equipName, RatedPower / FanVolFlow);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanPwrPerFlow, equipName, RatedPower / FanVolFlow);
         }
-        PreDefTableEntry(pdchFanMotorIn, equipName, Fan(FanNum).MotInAirFrac);
-        PreDefTableEntry(pdchFanEndUse, equipName, Fan(FanNum).EndUseSubcategoryName);
-        PreDefTableEntry(OutputReportPredefined::pdchFanEnergyIndex, equipName, Fan(FanNum).DesignPointFEI);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanMotorIn, equipName, Fan(FanNum).MotInAirFrac);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanEndUse, equipName, Fan(FanNum).EndUseSubcategoryName);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanEnergyIndex, equipName, Fan(FanNum).DesignPointFEI);
 
         NVPerfNum = Fan(FanNum).NVPerfNum;
         if (NVPerfNum > 0) {

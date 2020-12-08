@@ -354,7 +354,7 @@ void ElectricPowerServiceManager::getPowerManagerInput(EnergyPlusData &state)
         SetupOutputVariable(state, "Facility Total Produced Electricity Rate", OutputProcessor::Unit::W, electProdRate_, "System", "Average", name_);
         SetupOutputVariable(state, "Facility Total Produced Electricity Energy", OutputProcessor::Unit::J, electricityProd_, "System", "Sum", name_);
 
-        reportPVandWindCapacity();
+        reportPVandWindCapacity(state);
 
         sumUpNumberOfStorageDevices();
 
@@ -459,7 +459,7 @@ void ElectricPowerServiceManager::updateWholeBuildingRecords(EnergyPlusData &sta
     electricityNet_ = electricityNetRate_ * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
 }
 
-void ElectricPowerServiceManager::reportPVandWindCapacity()
+void ElectricPowerServiceManager::reportPVandWindCapacity(EnergyPlusData &state)
 {
     // LEED report
     pvTotalCapacity_ = 0.0;
@@ -477,8 +477,8 @@ void ElectricPowerServiceManager::reportPVandWindCapacity()
         }
     }
     // put in total capacity for PV and Wind for LEED report
-    OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchLeedRenRatCap, "Photovoltaic", pvTotalCapacity_ / 1000, 2);
-    OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchLeedRenRatCap, "Wind", windTotalCapacity_ / 1000, 2);
+    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedRenRatCap, "Photovoltaic", pvTotalCapacity_ / 1000, 2);
+    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedRenRatCap, "Wind", windTotalCapacity_ / 1000, 2);
 
     // future work: this legacy approach is relying on the correct power output to have been placed in the Generator list.  There could be a
     // difference between this control input and the actual size of the systems as defined in the generator objects themselves.  This method should be

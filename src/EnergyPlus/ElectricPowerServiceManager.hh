@@ -711,7 +711,7 @@ private: // Methods
 
     void updateWholeBuildingRecords(EnergyPlusData &state);
 
-    void reportPVandWindCapacity();
+    void reportPVandWindCapacity(EnergyPlusData &state);
 
     void sumUpNumberOfStorageDevices();
 

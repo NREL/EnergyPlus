@@ -8003,60 +8003,60 @@ namespace DXCoils {
             auto const SELECT_CASE_var(DXCoil(DXCoilNum).DXCoilType_Num);
             if ((SELECT_CASE_var == CoilDX_CoolingSingleSpeed) || (SELECT_CASE_var == CoilDX_CoolingTwoSpeed) ||
                 (SELECT_CASE_var == CoilDX_CoolingTwoStageWHumControl) || (SELECT_CASE_var == CoilDX_MultiSpeedCooling)) {
-                PreDefTableEntry(pdchCoolCoilType, equipName, DXCoil(DXCoilNum).DXCoilType);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilType, equipName, DXCoil(DXCoilNum).DXCoilType);
                 if (DXCoil(DXCoilNum).NumOfSpeeds == 0) {
                     if (DXCoil(DXCoilNum).NumCapacityStages == 1) {
-                        PreDefTableEntry(pdchCoolCoilTotCap, equipName, DXCoil(DXCoilNum).RatedTotCap(1));
-                        PreDefTableEntry(pdchCoolCoilSensCap, equipName, DXCoil(DXCoilNum).RatedTotCap(1) * DXCoil(DXCoilNum).RatedSHR(1));
-                        PreDefTableEntry(pdchCoolCoilLatCap,
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilTotCap, equipName, DXCoil(DXCoilNum).RatedTotCap(1));
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilSensCap, equipName, DXCoil(DXCoilNum).RatedTotCap(1) * DXCoil(DXCoilNum).RatedSHR(1));
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilLatCap,
                                          equipName,
                                          DXCoil(DXCoilNum).RatedTotCap(1) - DXCoil(DXCoilNum).RatedTotCap(1) * DXCoil(DXCoilNum).RatedSHR(1));
-                        PreDefTableEntry(pdchCoolCoilSHR, equipName, DXCoil(DXCoilNum).RatedSHR(1));
-                        PreDefTableEntry(pdchCoolCoilNomEff, equipName, DXCoil(DXCoilNum).RatedCOP(1));
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilSHR, equipName, DXCoil(DXCoilNum).RatedSHR(1));
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilNomEff, equipName, DXCoil(DXCoilNum).RatedCOP(1));
                     } else {
-                        PreDefTableEntry(pdchCoolCoilTotCap, equipName, DXCoil(DXCoilNum).RatedTotCap(2));
-                        PreDefTableEntry(pdchCoolCoilSensCap, equipName, DXCoil(DXCoilNum).RatedTotCap(2) * DXCoil(DXCoilNum).RatedSHR(2));
-                        PreDefTableEntry(pdchCoolCoilLatCap,
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilTotCap, equipName, DXCoil(DXCoilNum).RatedTotCap(2));
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilSensCap, equipName, DXCoil(DXCoilNum).RatedTotCap(2) * DXCoil(DXCoilNum).RatedSHR(2));
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilLatCap,
                                          equipName,
                                          DXCoil(DXCoilNum).RatedTotCap(2) - DXCoil(DXCoilNum).RatedTotCap(2) * DXCoil(DXCoilNum).RatedSHR(2));
-                        PreDefTableEntry(pdchCoolCoilSHR, equipName, DXCoil(DXCoilNum).RatedSHR(2));
-                        PreDefTableEntry(pdchCoolCoilNomEff, equipName, DXCoil(DXCoilNum).RatedCOP(2));
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilSHR, equipName, DXCoil(DXCoilNum).RatedSHR(2));
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilNomEff, equipName, DXCoil(DXCoilNum).RatedCOP(2));
                     }
                 } else {
                     for (Mode = 1; Mode <= DXCoil(DXCoilNum).NumOfSpeeds; ++Mode) {
-                        PreDefTableEntry(pdchCoolCoilTotCap, equipName, DXCoil(DXCoilNum).MSRatedTotCap(Mode));
-                        PreDefTableEntry(pdchCoolCoilSensCap, equipName, DXCoil(DXCoilNum).MSRatedTotCap(Mode) * DXCoil(DXCoilNum).MSRatedSHR(Mode));
-                        PreDefTableEntry(pdchCoolCoilLatCap,
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilTotCap, equipName, DXCoil(DXCoilNum).MSRatedTotCap(Mode));
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilSensCap, equipName, DXCoil(DXCoilNum).MSRatedTotCap(Mode) * DXCoil(DXCoilNum).MSRatedSHR(Mode));
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilLatCap,
                                          equipName,
                                          DXCoil(DXCoilNum).MSRatedTotCap(Mode) -
                                              DXCoil(DXCoilNum).MSRatedTotCap(Mode) * DXCoil(DXCoilNum).MSRatedSHR(Mode));
-                        PreDefTableEntry(pdchCoolCoilSHR, equipName, DXCoil(DXCoilNum).MSRatedSHR(Mode));
-                        PreDefTableEntry(pdchCoolCoilNomEff, equipName, DXCoil(DXCoilNum).MSRatedCOP(Mode));
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilSHR, equipName, DXCoil(DXCoilNum).MSRatedSHR(Mode));
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilNomEff, equipName, DXCoil(DXCoilNum).MSRatedCOP(Mode));
                     }
                 }
-                addFootNoteSubTable(
-                    pdstCoolCoil,
+                addFootNoteSubTable(state,
+                    state.dataOutRptPredefined->pdstCoolCoil,
                     "Nominal values are gross at rated conditions, i.e., the supply air fan heat and electric power NOT accounted for.");
 
             } else if ((SELECT_CASE_var == CoilDX_HeatingEmpirical) || (SELECT_CASE_var == CoilDX_MultiSpeedHeating) ||
                        (SELECT_CASE_var == CoilDX_HeatPumpWaterHeaterPumped) || (SELECT_CASE_var == CoilDX_HeatPumpWaterHeaterWrapped)) {
-                PreDefTableEntry(pdchHeatCoilType, equipName, DXCoil(DXCoilNum).DXCoilType);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilType, equipName, DXCoil(DXCoilNum).DXCoilType);
                 if (DXCoil(DXCoilNum).NumOfSpeeds == 0) {
                     if (DXCoil(DXCoilNum).NumCapacityStages == 1) {
-                        PreDefTableEntry(pdchHeatCoilNomCap, equipName, DXCoil(DXCoilNum).RatedTotCap(1));
-                        PreDefTableEntry(pdchHeatCoilNomEff, equipName, DXCoil(DXCoilNum).RatedCOP(1));
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilNomCap, equipName, DXCoil(DXCoilNum).RatedTotCap(1));
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilNomEff, equipName, DXCoil(DXCoilNum).RatedCOP(1));
                     } else {
-                        PreDefTableEntry(pdchHeatCoilNomCap, equipName, DXCoil(DXCoilNum).RatedTotCap(2));
-                        PreDefTableEntry(pdchHeatCoilNomEff, equipName, DXCoil(DXCoilNum).RatedCOP(2));
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilNomCap, equipName, DXCoil(DXCoilNum).RatedTotCap(2));
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilNomEff, equipName, DXCoil(DXCoilNum).RatedCOP(2));
                     }
                 } else {
                     for (Mode = 1; Mode <= DXCoil(DXCoilNum).NumOfSpeeds; ++Mode) {
-                        PreDefTableEntry(pdchHeatCoilNomCap, equipName, DXCoil(DXCoilNum).MSRatedTotCap(Mode));
-                        PreDefTableEntry(pdchHeatCoilNomEff, equipName, DXCoil(DXCoilNum).MSRatedCOP(Mode));
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilNomCap, equipName, DXCoil(DXCoilNum).MSRatedTotCap(Mode));
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilNomEff, equipName, DXCoil(DXCoilNum).MSRatedCOP(Mode));
                     }
                 }
-                addFootNoteSubTable(
-                    pdstHeatCoil,
+                addFootNoteSubTable(state,
+                    state.dataOutRptPredefined->pdstHeatCoil,
                     "Nominal values are gross at rated conditions, i.e., the supply air fan heat and electric power NOT accounted for.");
             }
         }
@@ -13977,23 +13977,23 @@ namespace DXCoils {
         if (CalcTwoSpeedDXCoilStandardRatingOneTimeEIOHeaderWrite) {
             print(state.files.eio, Header);
             CalcTwoSpeedDXCoilStandardRatingOneTimeEIOHeaderWrite = false;
-            pdstVAVDXCoolCoil = newPreDefSubTable(pdrEquip, "VAV DX Cooling Standard Rating Details");
-            pdchVAVDXCoolCoilType = newPreDefColumn(pdstVAVDXCoolCoil, "DX Cooling Coil Type");
-            pdchVAVDXFanName = newPreDefColumn(pdstVAVDXCoolCoil, "Assocated Fan");
-            pdchVAVDXCoolCoilNetCapSI = newPreDefColumn(pdstVAVDXCoolCoil, "Net Cooling Capacity [W]");
-            pdchVAVDXCoolCoilCOP = newPreDefColumn(pdstVAVDXCoolCoil, "COP [W/W]");
-            pdchVAVDXCoolCoilEERIP = newPreDefColumn(pdstVAVDXCoolCoil, "EER [Btu/W-h]");
-            pdchVAVDXCoolCoilIEERIP = newPreDefColumn(pdstVAVDXCoolCoil, "IEER [Btu/W-h]");
-            pdchVAVDXCoolCoilMdotA = newPreDefColumn(pdstVAVDXCoolCoil, "Supply Air Flow 100% [kg/s]");
-            pdchVAVDXCoolCoilCOP_B = newPreDefColumn(pdstVAVDXCoolCoil, "COP 75% Capacity [W/W]");
-            pdchVAVDXCoolCoilEER_B_IP = newPreDefColumn(pdstVAVDXCoolCoil, "EER 75% Capacity [Btu/W-h]");
-            pdchVAVDXCoolCoilMdotB = newPreDefColumn(pdstVAVDXCoolCoil, "Supply Air Flow 75% [kg/s]");
-            pdchVAVDXCoolCoilCOP_C = newPreDefColumn(pdstVAVDXCoolCoil, "COP 50% Capacity [W/W]");
-            pdchVAVDXCoolCoilEER_C_IP = newPreDefColumn(pdstVAVDXCoolCoil, "EER 50% Capacity [Btu/W-h]");
-            pdchVAVDXCoolCoilMdotC = newPreDefColumn(pdstVAVDXCoolCoil, "Supply Air Flow 50% [kg/s]");
-            pdchVAVDXCoolCoilCOP_D = newPreDefColumn(pdstVAVDXCoolCoil, "COP 25% Capacity [W/W]");
-            pdchVAVDXCoolCoilEER_D_IP = newPreDefColumn(pdstVAVDXCoolCoil, "EER 25% Capacity [Btu/W-h]");
-            pdchVAVDXCoolCoilMdotD = newPreDefColumn(pdstVAVDXCoolCoil, "Supply Air Flow 25% [kg/s]");
+            state.dataOutRptPredefined->pdstVAVDXCoolCoil = newPreDefSubTable(state, state.dataOutRptPredefined->pdrEquip, "VAV DX Cooling Standard Rating Details");
+            state.dataOutRptPredefined->pdchVAVDXCoolCoilType = newPreDefColumn(state, state.dataOutRptPredefined->pdstVAVDXCoolCoil, "DX Cooling Coil Type");
+            state.dataOutRptPredefined->pdchVAVDXFanName = newPreDefColumn(state, state.dataOutRptPredefined->pdstVAVDXCoolCoil, "Assocated Fan");
+            state.dataOutRptPredefined->pdchVAVDXCoolCoilNetCapSI = newPreDefColumn(state, state.dataOutRptPredefined->pdstVAVDXCoolCoil, "Net Cooling Capacity [W]");
+            state.dataOutRptPredefined->pdchVAVDXCoolCoilCOP = newPreDefColumn(state, state.dataOutRptPredefined->pdstVAVDXCoolCoil, "COP [W/W]");
+            state.dataOutRptPredefined->pdchVAVDXCoolCoilEERIP = newPreDefColumn(state, state.dataOutRptPredefined->pdstVAVDXCoolCoil, "EER [Btu/W-h]");
+            state.dataOutRptPredefined->pdchVAVDXCoolCoilIEERIP = newPreDefColumn(state, state.dataOutRptPredefined->pdstVAVDXCoolCoil, "IEER [Btu/W-h]");
+            state.dataOutRptPredefined->pdchVAVDXCoolCoilMdotA = newPreDefColumn(state, state.dataOutRptPredefined->pdstVAVDXCoolCoil, "Supply Air Flow 100% [kg/s]");
+            state.dataOutRptPredefined->pdchVAVDXCoolCoilCOP_B = newPreDefColumn(state, state.dataOutRptPredefined->pdstVAVDXCoolCoil, "COP 75% Capacity [W/W]");
+            state.dataOutRptPredefined->pdchVAVDXCoolCoilEER_B_IP = newPreDefColumn(state, state.dataOutRptPredefined->pdstVAVDXCoolCoil, "EER 75% Capacity [Btu/W-h]");
+            state.dataOutRptPredefined->pdchVAVDXCoolCoilMdotB = newPreDefColumn(state, state.dataOutRptPredefined->pdstVAVDXCoolCoil, "Supply Air Flow 75% [kg/s]");
+            state.dataOutRptPredefined->pdchVAVDXCoolCoilCOP_C = newPreDefColumn(state, state.dataOutRptPredefined->pdstVAVDXCoolCoil, "COP 50% Capacity [W/W]");
+            state.dataOutRptPredefined->pdchVAVDXCoolCoilEER_C_IP = newPreDefColumn(state, state.dataOutRptPredefined->pdstVAVDXCoolCoil, "EER 50% Capacity [Btu/W-h]");
+            state.dataOutRptPredefined->pdchVAVDXCoolCoilMdotC = newPreDefColumn(state, state.dataOutRptPredefined->pdstVAVDXCoolCoil, "Supply Air Flow 50% [kg/s]");
+            state.dataOutRptPredefined->pdchVAVDXCoolCoilCOP_D = newPreDefColumn(state, state.dataOutRptPredefined->pdstVAVDXCoolCoil, "COP 25% Capacity [W/W]");
+            state.dataOutRptPredefined->pdchVAVDXCoolCoilEER_D_IP = newPreDefColumn(state, state.dataOutRptPredefined->pdstVAVDXCoolCoil, "EER 25% Capacity [Btu/W-h]");
+            state.dataOutRptPredefined->pdchVAVDXCoolCoilMdotD = newPreDefColumn(state, state.dataOutRptPredefined->pdstVAVDXCoolCoil, "Supply Air Flow 25% [kg/s]");
 
             // determine footnote content
             countStaticInputs = 0;
@@ -14005,13 +14005,13 @@ namespace DXCoils {
             }
 
             if (countStaticInputs == NumDXMulSpeedCoils) {
-                addFootNoteSubTable(pdstVAVDXCoolCoil, "Packaged VAV unit ratings per ANSI/AHRI Standard 340/360-2007 with Addenda 1 and 2");
+                addFootNoteSubTable(state, state.dataOutRptPredefined->pdstVAVDXCoolCoil, "Packaged VAV unit ratings per ANSI/AHRI Standard 340/360-2007 with Addenda 1 and 2");
             } else if (countStaticInputs == 0) {
-                addFootNoteSubTable(pdstVAVDXCoolCoil,
+                addFootNoteSubTable(state, state.dataOutRptPredefined->pdstVAVDXCoolCoil,
                                     "Indoor-coil-only unit ratings per ANSI/AHRI Standard 340/360-2007 with Addenda 1 and 2, with "
                                     "supply fan specific power at 365 {{W/1000cfm}} (773.3 {{W/(m3/s)}})");
             } else { // both
-                addFootNoteSubTable(pdstVAVDXCoolCoil,
+                addFootNoteSubTable(state, state.dataOutRptPredefined->pdstVAVDXCoolCoil,
                                     "Packaged VAV unit ratings per ANSI/AHRI Standard 340/360-2007 with Addenda 1 and 2, "
                                     "indoor-coil-only units with supply fan specific power at 365 {{W/1000cfm}} (773.3 {{W/(m3/s)}})");
             }
@@ -14047,37 +14047,37 @@ namespace DXCoils {
               SupAirMdot_TestPoint(3),
               SupAirMdot_TestPoint(4));
 
-        PreDefTableEntry(pdchDXCoolCoilType, DXCoil(DXCoilNum).Name, "Coil:Cooling:DX:TwoSpeed");
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilType, DXCoil(DXCoilNum).Name, "Coil:Cooling:DX:TwoSpeed");
         // W to tons
-        PreDefTableEntry(pdchDXCoolCoilNetCapSI, DXCoil(DXCoilNum).Name, NetCoolingCapRated, 1);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilNetCapSI, DXCoil(DXCoilNum).Name, NetCoolingCapRated, 1);
         // These will convert with a factor of 1 which is ok
-        PreDefTableEntry(pdchDXCoolCoilCOP, DXCoil(DXCoilNum).Name, EER_TestPoint_SI(1), 2);
-        PreDefTableEntry(pdchDXCoolCoilEERIP, DXCoil(DXCoilNum).Name, EER_TestPoint_IP(1), 2);
-        PreDefTableEntry(pdchDXCoolCoilIEERIP, DXCoil(DXCoilNum).Name, IEER, 2);
-        PreDefTableEntry(pdchDXCoolCoilSEERUserIP, DXCoil(DXCoilNum).Name, "N/A");
-        PreDefTableEntry(pdchDXCoolCoilSEERStandardIP, DXCoil(DXCoilNum).Name, "N/A");
-        addFootNoteSubTable(pdstDXCoolCoil, "ANSI/AHRI ratings include supply fan");
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilCOP, DXCoil(DXCoilNum).Name, EER_TestPoint_SI(1), 2);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilEERIP, DXCoil(DXCoilNum).Name, EER_TestPoint_IP(1), 2);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilIEERIP, DXCoil(DXCoilNum).Name, IEER, 2);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilSEERUserIP, DXCoil(DXCoilNum).Name, "N/A");
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilSEERStandardIP, DXCoil(DXCoilNum).Name, "N/A");
+        addFootNoteSubTable(state, state.dataOutRptPredefined->pdstDXCoolCoil, "ANSI/AHRI ratings include supply fan");
 
-        PreDefTableEntry(pdchVAVDXCoolCoilType, DXCoil(DXCoilNum).Name, "Coil:Cooling:DX:TwoSpeed");
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchVAVDXCoolCoilType, DXCoil(DXCoilNum).Name, "Coil:Cooling:DX:TwoSpeed");
         if (DXCoil(DXCoilNum).RateWithInternalStaticAndFanObject) {
-            PreDefTableEntry(pdchVAVDXFanName, DXCoil(DXCoilNum).Name, DXCoil(DXCoilNum).SupplyFanName);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchVAVDXFanName, DXCoil(DXCoilNum).Name, DXCoil(DXCoilNum).SupplyFanName);
         } else {
-            PreDefTableEntry(pdchVAVDXFanName, DXCoil(DXCoilNum).Name, "None");
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchVAVDXFanName, DXCoil(DXCoilNum).Name, "None");
         }
-        PreDefTableEntry(pdchVAVDXCoolCoilNetCapSI, DXCoil(DXCoilNum).Name, NetCoolingCapRated, 2);
-        PreDefTableEntry(pdchVAVDXCoolCoilCOP, DXCoil(DXCoilNum).Name, EER_TestPoint_SI(1), 2);
-        PreDefTableEntry(pdchVAVDXCoolCoilIEERIP, DXCoil(DXCoilNum).Name, IEER, 2);
-        PreDefTableEntry(pdchVAVDXCoolCoilEERIP, DXCoil(DXCoilNum).Name, EER_TestPoint_IP(1), 2);
-        PreDefTableEntry(pdchVAVDXCoolCoilMdotA, DXCoil(DXCoilNum).Name, SupAirMdot_TestPoint(1), 4);
-        PreDefTableEntry(pdchVAVDXCoolCoilCOP_B, DXCoil(DXCoilNum).Name, EER_TestPoint_SI(2), 2);
-        PreDefTableEntry(pdchVAVDXCoolCoilEER_B_IP, DXCoil(DXCoilNum).Name, EER_TestPoint_IP(2), 2);
-        PreDefTableEntry(pdchVAVDXCoolCoilMdotB, DXCoil(DXCoilNum).Name, SupAirMdot_TestPoint(2), 4);
-        PreDefTableEntry(pdchVAVDXCoolCoilCOP_C, DXCoil(DXCoilNum).Name, EER_TestPoint_SI(3), 2);
-        PreDefTableEntry(pdchVAVDXCoolCoilEER_C_IP, DXCoil(DXCoilNum).Name, EER_TestPoint_IP(3), 2);
-        PreDefTableEntry(pdchVAVDXCoolCoilMdotC, DXCoil(DXCoilNum).Name, SupAirMdot_TestPoint(3), 4);
-        PreDefTableEntry(pdchVAVDXCoolCoilCOP_D, DXCoil(DXCoilNum).Name, EER_TestPoint_SI(4), 2);
-        PreDefTableEntry(pdchVAVDXCoolCoilEER_D_IP, DXCoil(DXCoilNum).Name, EER_TestPoint_IP(4), 2);
-        PreDefTableEntry(pdchVAVDXCoolCoilMdotD, DXCoil(DXCoilNum).Name, SupAirMdot_TestPoint(4), 4);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchVAVDXCoolCoilNetCapSI, DXCoil(DXCoilNum).Name, NetCoolingCapRated, 2);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchVAVDXCoolCoilCOP, DXCoil(DXCoilNum).Name, EER_TestPoint_SI(1), 2);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchVAVDXCoolCoilIEERIP, DXCoil(DXCoilNum).Name, IEER, 2);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchVAVDXCoolCoilEERIP, DXCoil(DXCoilNum).Name, EER_TestPoint_IP(1), 2);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchVAVDXCoolCoilMdotA, DXCoil(DXCoilNum).Name, SupAirMdot_TestPoint(1), 4);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchVAVDXCoolCoilCOP_B, DXCoil(DXCoilNum).Name, EER_TestPoint_SI(2), 2);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchVAVDXCoolCoilEER_B_IP, DXCoil(DXCoilNum).Name, EER_TestPoint_IP(2), 2);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchVAVDXCoolCoilMdotB, DXCoil(DXCoilNum).Name, SupAirMdot_TestPoint(2), 4);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchVAVDXCoolCoilCOP_C, DXCoil(DXCoilNum).Name, EER_TestPoint_SI(3), 2);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchVAVDXCoolCoilEER_C_IP, DXCoil(DXCoilNum).Name, EER_TestPoint_IP(3), 2);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchVAVDXCoolCoilMdotC, DXCoil(DXCoilNum).Name, SupAirMdot_TestPoint(3), 4);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchVAVDXCoolCoilCOP_D, DXCoil(DXCoilNum).Name, EER_TestPoint_SI(4), 2);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchVAVDXCoolCoilEER_D_IP, DXCoil(DXCoilNum).Name, EER_TestPoint_IP(4), 2);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchVAVDXCoolCoilMdotD, DXCoil(DXCoilNum).Name, SupAirMdot_TestPoint(4), 4);
 
         state.dataEnvrn->OutDryBulbTemp = heldOutDryBulb; // reset the outdoor dry bulb when done with it
     }

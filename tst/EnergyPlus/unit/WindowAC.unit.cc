@@ -473,10 +473,10 @@ TEST_F(EnergyPlusFixture, WindowAC_VStest1)
     EXPECT_NEAR(qDotMet, -295.0, 0.1);
 
     // #8124 Retrieve zero value data without heating loads
-    EXPECT_EQ("0.0", OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchZnHtCalcDesLd, "WEST ZONE"));
-    EXPECT_EQ("0.0", OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchZnHtCalcDesAirFlow, "WEST ZONE"));
-    EXPECT_EQ("0.0", OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchZnHtUserDesAirFlow, "WEST ZONE"));
-    EXPECT_EQ("N/A", OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchZnHtDesDay, "WEST ZONE"));
-    EXPECT_EQ("N/A", OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchZnHtPkTime, "WEST ZONE"));
+    EXPECT_EQ("0.0", OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchZnHtCalcDesLd, "WEST ZONE"));
+    EXPECT_EQ("0.0", OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchZnHtCalcDesAirFlow, "WEST ZONE"));
+    EXPECT_EQ("0.0", OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchZnHtUserDesAirFlow, "WEST ZONE"));
+    EXPECT_EQ("N/A", OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchZnHtDesDay, "WEST ZONE"));
+    EXPECT_EQ("N/A", OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchZnHtPkTime, "WEST ZONE"));
 
 }
