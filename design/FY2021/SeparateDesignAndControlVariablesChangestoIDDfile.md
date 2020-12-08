@@ -96,7 +96,7 @@ The metadata to remain same, so it was taken out to improve readability.
 
 ## Baseboard:RadiantConvective:Water Objects ####
 
-**ZoneHVAC:Baseboard:RadiantConvective:Water,**
+**ZoneHVAC:Baseboard:RadiantConvective:Water:Design,**
 
            \memo Design parameters for ZoneHVAC:Baseboard:RadiantConvective objects
       A1 ,  \field Name
@@ -133,7 +133,7 @@ The metadata to remain same, so it was taken out to improve readability.
 
 ### Proposed
 
-**ZoneHVAC:Baseboard:RadiantConvective:Steam,**
+**ZoneHVAC:Baseboard:RadiantConvective:Steam:Design,**
 
            \memo Design parameters for ZoneHVAC:Baseboard:RadiantConvective objects
       A1 ,  \field Name
