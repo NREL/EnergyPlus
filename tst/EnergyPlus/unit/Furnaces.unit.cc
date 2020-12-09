@@ -113,7 +113,7 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     Furnace(FurnaceNum).MSHeatingSpeedRatio.allocate(3);
     Furnace(FurnaceNum).MSCoolingSpeedRatio.allocate(3);
 
-    Furnace(FurnaceNum).LastMode = HeatingMode;
+    Furnace(FurnaceNum).LastMode = Furnaces::ModeOfOperation::HeatingMode;
     Furnace(FurnaceNum).IdleMassFlowRate = 0.2;
     Furnace(FurnaceNum).IdleSpeedRatio = 0.2;
     Furnace(FurnaceNum).FanAvailSchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
@@ -247,7 +247,7 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     Real64 onOffAirFlowRatio = 1.0;
     bool hXUnitOn = false;
 
-    DataEnvironment::OutDryBulbTemp = 35.0;
+    state->dataEnvrn->OutDryBulbTemp = 35.0;
     Furnace(FurnaceNum).WatertoAirHPType = 1; // switch to water to air heat pump
     Furnace(FurnaceNum).FurnaceType_Num = 6;
     Furnace(FurnaceNum).NodeNumOfControlledZone = 1; // use inlet node as surrogate for zone node number

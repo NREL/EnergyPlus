@@ -136,12 +136,6 @@ namespace ZoneEquipmentManager {
 
     // Using/Aliasing
     using namespace DataSizing;
-    using DataEnvironment::CurEnvirNum;
-    using DataEnvironment::EnvironmentName;
-    using DataEnvironment::OutDryBulbTemp;
-    using DataEnvironment::OutHumRat;
-    using DataEnvironment::TotDesDays;
-    using DataEnvironment::TotRunDesPersDays;
     using namespace DataZoneEquipment;
     // Use statements for access to subroutines in other modules
     using Psychrometrics::PsyCpAirFnW;
@@ -233,11 +227,6 @@ namespace ZoneEquipmentManager {
         // This subroutine initializes the zone equipment prior to simulation.
 
         // Using/Aliasing
-        using DataContaminantBalance::Contaminant;
-        using DataContaminantBalance::OutdoorCO2;
-        using DataContaminantBalance::OutdoorGC;
-        using DataEnvironment::OutBaroPress;
-        using DataEnvironment::OutHumRat;
         using DataHVACGlobals::NoAction;
         using DataHVACGlobals::NumOfSizingTypes;
         using DataHVACGlobals::ZoneComp;
@@ -303,14 +292,14 @@ namespace ZoneEquipmentManager {
                 Node(ZoneNodeNum).Temp = 20.0;
                 Node(ZoneNodeNum).MassFlowRate = 0.0;
                 Node(ZoneNodeNum).Quality = 1.0;
-                Node(ZoneNodeNum).Press = OutBaroPress;
-                Node(ZoneNodeNum).HumRat = OutHumRat;
+                Node(ZoneNodeNum).Press = state.dataEnvrn->OutBaroPress;
+                Node(ZoneNodeNum).HumRat = state.dataEnvrn->OutHumRat;
                 Node(ZoneNodeNum).Enthalpy = PsyHFnTdbW(Node(ZoneNodeNum).Temp, Node(ZoneNodeNum).HumRat);
-                if (Contaminant.CO2Simulation) {
-                    Node(ZoneNodeNum).CO2 = OutdoorCO2;
+                if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
+                    Node(ZoneNodeNum).CO2 = state.dataContaminantBalance->OutdoorCO2;
                 }
-                if (Contaminant.GenericContamSimulation) {
-                    Node(ZoneNodeNum).GenContam = OutdoorGC;
+                if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
+                    Node(ZoneNodeNum).GenContam = state.dataContaminantBalance->OutdoorGC;
                 }
 
                 for (ZoneInNode = 1; ZoneInNode <= ZoneEquipConfig(ControlledZoneNum).NumInletNodes; ++ZoneInNode) {
@@ -319,14 +308,14 @@ namespace ZoneEquipmentManager {
                     Node(InNodeNum).Temp = 20.0;
                     Node(InNodeNum).MassFlowRate = 0.0;
                     Node(InNodeNum).Quality = 1.0;
-                    Node(InNodeNum).Press = OutBaroPress;
-                    Node(InNodeNum).HumRat = OutHumRat;
+                    Node(InNodeNum).Press = state.dataEnvrn->OutBaroPress;
+                    Node(InNodeNum).HumRat = state.dataEnvrn->OutHumRat;
                     Node(InNodeNum).Enthalpy = PsyHFnTdbW(Node(InNodeNum).Temp, Node(InNodeNum).HumRat);
-                    if (Contaminant.CO2Simulation) {
-                        Node(InNodeNum).CO2 = OutdoorCO2;
+                    if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
+                        Node(InNodeNum).CO2 = state.dataContaminantBalance->OutdoorCO2;
                     }
-                    if (Contaminant.GenericContamSimulation) {
-                        Node(InNodeNum).GenContam = OutdoorGC;
+                    if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
+                        Node(InNodeNum).GenContam = state.dataContaminantBalance->OutdoorGC;
                     }
                 }
 
@@ -336,14 +325,14 @@ namespace ZoneEquipmentManager {
                     Node(ExhNodeNum).Temp = 20.0;
                     Node(ExhNodeNum).MassFlowRate = 0.0;
                     Node(ExhNodeNum).Quality = 1.0;
-                    Node(ExhNodeNum).Press = OutBaroPress;
-                    Node(ExhNodeNum).HumRat = OutHumRat;
+                    Node(ExhNodeNum).Press = state.dataEnvrn->OutBaroPress;
+                    Node(ExhNodeNum).HumRat = state.dataEnvrn->OutHumRat;
                     Node(ExhNodeNum).Enthalpy = PsyHFnTdbW(Node(ExhNodeNum).Temp, Node(ExhNodeNum).HumRat);
-                    if (Contaminant.CO2Simulation) {
-                        Node(ExhNodeNum).CO2 = OutdoorCO2;
+                    if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
+                        Node(ExhNodeNum).CO2 = state.dataContaminantBalance->OutdoorCO2;
                     }
-                    if (Contaminant.GenericContamSimulation) {
-                        Node(ExhNodeNum).GenContam = OutdoorGC;
+                    if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
+                        Node(ExhNodeNum).GenContam = state.dataContaminantBalance->OutdoorGC;
                     }
                 }
 
@@ -355,14 +344,14 @@ namespace ZoneEquipmentManager {
                         Node(returnNode).Temp = 20.0;
                         Node(returnNode).MassFlowRate = 0.0;
                         Node(returnNode).Quality = 1.0;
-                        Node(returnNode).Press = OutBaroPress;
-                        Node(returnNode).HumRat = OutHumRat;
+                        Node(returnNode).Press = state.dataEnvrn->OutBaroPress;
+                        Node(returnNode).HumRat = state.dataEnvrn->OutHumRat;
                         Node(returnNode).Enthalpy = PsyHFnTdbW(Node(returnNode).Temp, Node(returnNode).HumRat);
-                        if (Contaminant.CO2Simulation) {
-                            Node(returnNode).CO2 = OutdoorCO2;
+                        if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
+                            Node(returnNode).CO2 = state.dataContaminantBalance->OutdoorCO2;
                         }
-                        if (Contaminant.GenericContamSimulation) {
-                            Node(returnNode).GenContam = OutdoorGC;
+                        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
+                            Node(returnNode).GenContam = state.dataContaminantBalance->OutdoorGC;
                         }
                     }
                 }
@@ -393,10 +382,10 @@ namespace ZoneEquipmentManager {
                     Node(ExhNodeNum).MassFlowRate = 0.0;
                     Node(ExhNodeNum).MassFlowRateMaxAvail = 0.0;
                     Node(ExhNodeNum).MassFlowRateMinAvail = 0.0;
-                    if (Contaminant.CO2Simulation) {
+                    if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
                         Node(ExhNodeNum).CO2 = Node(ZoneNodeNum).CO2;
                     }
-                    if (Contaminant.GenericContamSimulation) {
+                    if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
                         Node(ExhNodeNum).GenContam = Node(ZoneNodeNum).GenContam;
                     }
                 }
@@ -432,7 +421,6 @@ namespace ZoneEquipmentManager {
         // and saves the results in the zone sizing data arrays.
 
         // Using/Aliasing
-        using DataEnvironment::StdBaroPress;
         using DataHeatBalFanSys::NonAirSystemResponse;
         using DataHeatBalFanSys::SysDepZoneLoads;
         using DataHeatBalFanSys::TempZoneThermostatSetPoint;
@@ -506,11 +494,11 @@ namespace ZoneEquipmentManager {
                     ShowFatalError(state, "Previous severe error causes abort ");
                 }
                 // set the DOAS mass flow rate and supply temperature and humidity ratio
-                HR90H = PsyWFnTdbRhPb(state, CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).DOASHighSetpoint, 0.9, StdBaroPress);
-                HR90L = PsyWFnTdbRhPb(state, CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).DOASLowSetpoint, 0.9, StdBaroPress);
+                HR90H = PsyWFnTdbRhPb(state, CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).DOASHighSetpoint, 0.9, state.dataEnvrn->StdBaroPress);
+                HR90L = PsyWFnTdbRhPb(state, CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).DOASLowSetpoint, 0.9, state.dataEnvrn->StdBaroPress);
                 DOASMassFlowRate = CalcFinalZoneSizing(ControlledZoneNum).MinOA;
-                CalcDOASSupCondsForSizing(state, OutDryBulbTemp,
-                                          OutHumRat,
+                CalcDOASSupCondsForSizing(state, state.dataEnvrn->OutDryBulbTemp,
+                                          state.dataEnvrn->OutHumRat,
                                           CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).DOASControlStrategy,
                                           CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).DOASLowSetpoint,
                                           CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).DOASHighSetpoint,
@@ -629,10 +617,10 @@ namespace ZoneEquipmentManager {
                 CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).HeatZoneTemp = 0.0;
                 CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).HeatZoneHumRat = 0.0;
             }
-            CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).HeatOutTemp = OutDryBulbTemp;
-            CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).HeatOutHumRat = OutHumRat;
-            CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).CoolOutTemp = OutDryBulbTemp;
-            CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).CoolOutHumRat = OutHumRat;
+            CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).HeatOutTemp = state.dataEnvrn->OutDryBulbTemp;
+            CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).HeatOutHumRat = state.dataEnvrn->OutHumRat;
+            CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).CoolOutTemp = state.dataEnvrn->OutDryBulbTemp;
+            CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).CoolOutHumRat = state.dataEnvrn->OutHumRat;
 
             if (SupplyAirNode > 0) {
                 Node(SupplyAirNode).Temp = Temp;
@@ -837,12 +825,12 @@ namespace ZoneEquipmentManager {
         // Put Auto Sizing of Sizing:Zone inputs here!
         AutoCalcDOASControlStrategy(state);
 
-        ZoneSizing.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfZones);
+        ZoneSizing.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->NumOfZones);
         FinalZoneSizing.allocate(state.dataGlobal->NumOfZones);
-        CalcZoneSizing.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfZones);
+        CalcZoneSizing.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->NumOfZones);
         CalcFinalZoneSizing.allocate(state.dataGlobal->NumOfZones);
         TermUnitFinalZoneSizing.allocate(DataSizing::NumAirTerminalUnits);
-        DesDayWeath.allocate(TotDesDays + TotRunDesPersDays);
+        DesDayWeath.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays);
         NumOfTimeStepInDay = state.dataGlobal->NumOfTimeStepInHour * 24;
         state.dataZoneEquipmentManager->AvgData.allocate(NumOfTimeStepInDay);
         CoolPeakDateHrMin.allocate(state.dataGlobal->NumOfZones);
@@ -856,7 +844,7 @@ namespace ZoneEquipmentManager {
         ZoneSizThermSetPtHi = 0.0;
         ZoneSizThermSetPtLo = 1000.0;
 
-        for (DesDayNum = 1; DesDayNum <= TotDesDays + TotRunDesPersDays; ++DesDayNum) {
+        for (DesDayNum = 1; DesDayNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DesDayNum) {
             DesDayWeath(DesDayNum).Temp.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
             DesDayWeath(DesDayNum).HumRat.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
             DesDayWeath(DesDayNum).Press.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
@@ -865,7 +853,7 @@ namespace ZoneEquipmentManager {
             DesDayWeath(DesDayNum).Press = 0.0;
         }
         // Fill zone sizing arrays from input array
-        for (DesDayNum = 1; DesDayNum <= TotDesDays + TotRunDesPersDays; ++DesDayNum) {
+        for (DesDayNum = 1; DesDayNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DesDayNum) {
             for (CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
                 if (!ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
                 ZoneSizing(DesDayNum, CtrlZoneNum).ZoneName = ZoneEquipConfig(CtrlZoneNum).ZoneName;
@@ -1337,7 +1325,7 @@ namespace ZoneEquipmentManager {
             FinalZoneSizing(CtrlZoneNum).InpDesHeatAirFlow *= Zone(ZoneIndex).Multiplier * Zone(ZoneIndex).ListMultiplier;
             CalcFinalZoneSizing(CtrlZoneNum).InpDesHeatAirFlow *= Zone(ZoneIndex).Multiplier * Zone(ZoneIndex).ListMultiplier;
 
-            for (DesDayNum = 1; DesDayNum <= TotDesDays + TotRunDesPersDays; ++DesDayNum) {
+            for (DesDayNum = 1; DesDayNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DesDayNum) {
                 ZoneSizing(DesDayNum, CtrlZoneNum).MinOA = FinalZoneSizing(CtrlZoneNum).MinOA;
                 CalcZoneSizing(DesDayNum, CtrlZoneNum).MinOA = CalcFinalZoneSizing(CtrlZoneNum).MinOA;
                 ZoneSizing(DesDayNum, CtrlZoneNum).DesCoolMinAirFlow2 = FinalZoneSizing(CtrlZoneNum).DesCoolMinAirFlow2;
@@ -1382,7 +1370,7 @@ namespace ZoneEquipmentManager {
         DisplayString(state, "Re-zeroing zone sizing arrays");
 
         for (int ctrlZoneNum = 1; ctrlZoneNum <= state.dataGlobal->NumOfZones; ++ctrlZoneNum) {
-            for (int desDayNum = 1; desDayNum <= TotDesDays + TotRunDesPersDays; ++desDayNum) {
+            for (int desDayNum = 1; desDayNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++desDayNum) {
                 ZoneSizing(desDayNum, ctrlZoneNum).zeroMemberData();
                 CalcZoneSizing(desDayNum, ctrlZoneNum).zeroMemberData();
             }
@@ -1410,8 +1398,6 @@ namespace ZoneEquipmentManager {
         // CallIndicator = 4 (EndZoneSizingCalc) write out results
 
         // Using/Aliasing
-        using DataEnvironment::StdBaroPress;
-        using DataEnvironment::StdRhoAir;
         using DataHeatBalFanSys::TempZoneThermostatSetPoint;
         using DataHeatBalFanSys::ZoneThermostatSetPointHi;
         using DataHeatBalFanSys::ZoneThermostatSetPointLo;
@@ -1456,10 +1442,10 @@ namespace ZoneEquipmentManager {
 
                     if (!ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
 
-                    CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).CoolDesDay = EnvironmentName;
-                    CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatDesDay = EnvironmentName;
-                    CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).DesHeatDens = StdRhoAir;
-                    CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).DesCoolDens = StdRhoAir;
+                    CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).CoolDesDay = state.dataEnvrn->EnvironmentName;
+                    CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatDesDay = state.dataEnvrn->EnvironmentName;
+                    CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).DesHeatDens = state.dataEnvrn->StdRhoAir;
+                    CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).DesCoolDens = state.dataEnvrn->StdRhoAir;
                     CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatDDNum = CurOverallSimDay;
                     CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).CoolDDNum = CurOverallSimDay;
                 }
@@ -1678,7 +1664,7 @@ namespace ZoneEquipmentManager {
                         CalcFinalZoneSizing(CtrlZoneNum).DesHeatCoilInTemp = CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).DesHeatCoilInTemp;
                         CalcFinalZoneSizing(CtrlZoneNum).DesHeatCoilInHumRat = CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).DesHeatCoilInHumRat;
                     } else {
-                        CalcFinalZoneSizing(CtrlZoneNum).DesHeatDens = StdRhoAir;
+                        CalcFinalZoneSizing(CtrlZoneNum).DesHeatDens = state.dataEnvrn->StdRhoAir;
                         // save design heating load when the there is design heating load and the design heating volume flow rate is zero, i.e., when
                         // design heating volume flow rate is set to zero due to heating supply air temp less than zone thermostat temperature
                         if (CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).DesHeatLoad > CalcFinalZoneSizing(CtrlZoneNum).DesHeatLoad) {
@@ -1731,7 +1717,7 @@ namespace ZoneEquipmentManager {
                         CalcFinalZoneSizing(CtrlZoneNum).DesCoolCoilInTemp = CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).DesCoolCoilInTemp;
                         CalcFinalZoneSizing(CtrlZoneNum).DesCoolCoilInHumRat = CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).DesCoolCoilInHumRat;
                     } else {
-                        CalcFinalZoneSizing(CtrlZoneNum).DesCoolDens = StdRhoAir;
+                        CalcFinalZoneSizing(CtrlZoneNum).DesCoolDens = state.dataEnvrn->StdRhoAir;
                         // save design cooling load when the there is design cooling load and the design cooling volume flow rate is zero, i.e., when
                         // design cooling volume flow rate is set to zero due to cooling supply air temp greater than zone thermostat temperature
                         if (CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).DesCoolLoad > CalcFinalZoneSizing(CtrlZoneNum).DesCoolLoad) {
@@ -2093,7 +2079,7 @@ namespace ZoneEquipmentManager {
                     z.DesCoolCoilInHumRat = c.DesCoolCoilInHumRat;
                 }
 
-                for (DesDayNum = 1; DesDayNum <= TotDesDays + TotRunDesPersDays; ++DesDayNum) {
+                for (DesDayNum = 1; DesDayNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DesDayNum) {
                     for (CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
                         if (!ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
                         for (TimeStepIndex = 1; TimeStepIndex <= state.dataZoneEquipmentManager->NumOfTimeStepInDay; ++TimeStepIndex) {
@@ -2192,7 +2178,7 @@ namespace ZoneEquipmentManager {
                             FinalZoneSizing(CtrlZoneNum).DesCoolMassFlow =
                                 FinalZoneSizing(CtrlZoneNum).DesCoolVolFlow * FinalZoneSizing(CtrlZoneNum).DesCoolDens;
                         }
-                        for (DDNum = 1; DDNum <= TotDesDays + TotRunDesPersDays; ++DDNum) {
+                        for (DDNum = 1; DDNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DDNum) {
                             if (ZoneSizing(DDNum, CtrlZoneNum).DesCoolVolFlow > 0.0) {
                                 TimeStepAtPeak = ZoneSizing(DDNum, CtrlZoneNum).TimeStepNumAtCoolMax;
                                 ZoneSizing(DDNum, CtrlZoneNum).DesCoolVolFlow = CalcZoneSizing(DDNum, CtrlZoneNum).DesCoolVolFlow * TotCoolSizMult;
@@ -2241,7 +2227,7 @@ namespace ZoneEquipmentManager {
                                 FinalZoneSizing(CtrlZoneNum).CoolFlowSeqNoOA(TimeStepIndex) = MaxOfMinCoolMassFlowNoOA;
                             }
                         }
-                        for (DDNum = 1; DDNum <= TotDesDays + TotRunDesPersDays; ++DDNum) {
+                        for (DDNum = 1; DDNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DDNum) {
                             ZoneSizing(DDNum, CtrlZoneNum).DesCoolVolFlowNoOA = ZoneSizing(DDNum, CtrlZoneNum).DesCoolVolFlow;
                             ZoneSizing(DDNum, CtrlZoneNum).DesCoolMassFlowNoOA = ZoneSizing(DDNum, CtrlZoneNum).DesCoolMassFlow;
                             MaxOfMinCoolVolFlowNoOA =
@@ -2283,7 +2269,7 @@ namespace ZoneEquipmentManager {
                                 FinalZoneSizing(CtrlZoneNum).CoolFlowSeq(TimeStepIndex) = MaxOfMinCoolMassFlow;
                             }
                         }
-                        for (DDNum = 1; DDNum <= TotDesDays + TotRunDesPersDays; ++DDNum) {
+                        for (DDNum = 1; DDNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DDNum) {
                             MaxOfMinCoolVolFlow = max(ZoneSizing(DDNum, CtrlZoneNum).DesCoolMinAirFlow,
                                                       ZoneSizing(DDNum, CtrlZoneNum).DesCoolMinAirFlow,
                                                       ZoneSizing(DDNum, CtrlZoneNum).MinOA);
@@ -2303,7 +2289,7 @@ namespace ZoneEquipmentManager {
                     // check for flow rate having been set (by MinOA or other min) but no timestep at max
                     //        IF (FinalZoneSizing(CtrlZoneNum)%DesCoolMassFlow > 0.0d0 .AND. &
                     if ((FinalZoneSizing(CtrlZoneNum).TimeStepNumAtCoolMax == 0 || FinalZoneSizing(CtrlZoneNum).CoolDDNum == 0)) {
-                        for (DDNum = 1; DDNum <= TotDesDays + TotRunDesPersDays; ++DDNum) {
+                        for (DDNum = 1; DDNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DDNum) {
                             ZoneSizing(DDNum, CtrlZoneNum).TimeStepNumAtCoolMax = 1;
                             TimeStepAtPeak = ZoneSizing(DDNum, CtrlZoneNum).TimeStepNumAtCoolMax;
                             for (TimeStepIndex = 1; TimeStepIndex <= state.dataZoneEquipmentManager->NumOfTimeStepInDay; ++TimeStepIndex) {
@@ -2317,7 +2303,7 @@ namespace ZoneEquipmentManager {
                         FinalZoneSizing(CtrlZoneNum).CoolDDNum = 1;
                         TimeStepAtPeakF = FinalZoneSizing(CtrlZoneNum).TimeStepNumAtCoolMax;
                         DDNumF = FinalZoneSizing(CtrlZoneNum).CoolDDNum;
-                        for (DDNum = 1; DDNum <= TotDesDays + TotRunDesPersDays; ++DDNum) {
+                        for (DDNum = 1; DDNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DDNum) {
                             TimeStepAtPeak = ZoneSizing(DDNum, CtrlZoneNum).TimeStepNumAtCoolMax;
                             if (DesDayWeath(DDNum).Temp(TimeStepAtPeak) > DesDayWeath(DDNumF).Temp(TimeStepAtPeakF)) {
                                 DDNumF = DDNum;
@@ -2343,7 +2329,7 @@ namespace ZoneEquipmentManager {
                             if (FinalZoneSizing(CtrlZoneNum).ZoneHumRatAtCoolPeak > 0.0) {
                                 FinalZoneSizing(CtrlZoneNum).ZoneHumRatAtCoolPeak =
                                     min(FinalZoneSizing(CtrlZoneNum).ZoneHumRatAtCoolPeak,
-                                        PsyWFnTdpPb(state, FinalZoneSizing(CtrlZoneNum).ZoneTempAtCoolPeak, StdBaroPress, RoutineName));
+                                        PsyWFnTdpPb(state, FinalZoneSizing(CtrlZoneNum).ZoneTempAtCoolPeak, state.dataEnvrn->StdBaroPress, RoutineName));
 
                             } else {
                                 FinalZoneSizing(CtrlZoneNum).ZoneHumRatAtCoolPeak = ZoneSizing(DDNumF, CtrlZoneNum).CoolDesHumRat;
@@ -2403,7 +2389,7 @@ namespace ZoneEquipmentManager {
                             FinalZoneSizing(CtrlZoneNum).DesHeatMassFlow =
                                 FinalZoneSizing(CtrlZoneNum).DesHeatVolFlow * FinalZoneSizing(CtrlZoneNum).DesHeatDens;
                         }
-                        for (DDNum = 1; DDNum <= TotDesDays + TotRunDesPersDays; ++DDNum) {
+                        for (DDNum = 1; DDNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DDNum) {
                             if (ZoneSizing(DDNum, CtrlZoneNum).DesHeatVolFlow > 0.0) {
                                 TimeStepAtPeak = ZoneSizing(DDNum, CtrlZoneNum).TimeStepNumAtHeatMax;
                                 ZoneSizing(DDNum, CtrlZoneNum).DesHeatVolFlow = CalcZoneSizing(DDNum, CtrlZoneNum).DesHeatVolFlow * TotHeatSizMult;
@@ -2449,7 +2435,7 @@ namespace ZoneEquipmentManager {
                             FinalZoneSizing(CtrlZoneNum).HeatFlowSeq(TimeStepIndex) = MinOAMass;
                         }
                     }
-                    for (DDNum = 1; DDNum <= TotDesDays + TotRunDesPersDays; ++DDNum) {
+                    for (DDNum = 1; DDNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DDNum) {
                         MinOAMass = ZoneSizing(DDNum, CtrlZoneNum).MinOA * ZoneSizing(DDNum, CtrlZoneNum).DesHeatDens;
                         if (ZoneSizing(DDNum, CtrlZoneNum).MinOA > ZoneSizing(DDNum, CtrlZoneNum).DesHeatVolFlow) {
                             ZoneSizing(DDNum, CtrlZoneNum).DesHeatVolFlow = ZoneSizing(DDNum, CtrlZoneNum).MinOA;
@@ -2465,7 +2451,7 @@ namespace ZoneEquipmentManager {
                     // check for flow rate having been set (by MinOA or other min) but no timestep at max
                     //        IF (FinalZoneSizing(CtrlZoneNum)%DesHeatMassFlow > 0.0d0 .AND. &
                     if ((FinalZoneSizing(CtrlZoneNum).TimeStepNumAtHeatMax == 0 || FinalZoneSizing(CtrlZoneNum).HeatDDNum == 0)) {
-                        for (DDNum = 1; DDNum <= TotDesDays + TotRunDesPersDays; ++DDNum) {
+                        for (DDNum = 1; DDNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DDNum) {
                             ZoneSizing(DDNum, CtrlZoneNum).TimeStepNumAtHeatMax = 1;
                             TimeStepAtPeak = ZoneSizing(DDNum, CtrlZoneNum).TimeStepNumAtHeatMax;
                             for (TimeStepIndex = 1; TimeStepIndex <= state.dataZoneEquipmentManager->NumOfTimeStepInDay; ++TimeStepIndex) {
@@ -2479,7 +2465,7 @@ namespace ZoneEquipmentManager {
                         FinalZoneSizing(CtrlZoneNum).HeatDDNum = 1;
                         TimeStepAtPeakF = FinalZoneSizing(CtrlZoneNum).TimeStepNumAtHeatMax;
                         DDNumF = FinalZoneSizing(CtrlZoneNum).HeatDDNum;
-                        for (DDNum = 1; DDNum <= TotDesDays + TotRunDesPersDays; ++DDNum) {
+                        for (DDNum = 1; DDNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DDNum) {
                             TimeStepAtPeak = ZoneSizing(DDNum, CtrlZoneNum).TimeStepNumAtHeatMax;
                             if (DesDayWeath(DDNum).Temp(TimeStepAtPeak) < DesDayWeath(DDNumF).Temp(TimeStepAtPeakF)) {
                                 DDNumF = DDNum;
@@ -2508,7 +2494,7 @@ namespace ZoneEquipmentManager {
                             if (FinalZoneSizing(CtrlZoneNum).ZoneHumRatAtHeatPeak > 0.0) {
                                 FinalZoneSizing(CtrlZoneNum).ZoneHumRatAtHeatPeak =
                                     min(FinalZoneSizing(CtrlZoneNum).ZoneHumRatAtHeatPeak,
-                                        PsyWFnTdpPb(state, FinalZoneSizing(CtrlZoneNum).ZoneTempAtHeatPeak, StdBaroPress, RoutineName));
+                                        PsyWFnTdpPb(state, FinalZoneSizing(CtrlZoneNum).ZoneTempAtHeatPeak, state.dataEnvrn->StdBaroPress, RoutineName));
                             } else {
                                 FinalZoneSizing(CtrlZoneNum).ZoneHumRatAtHeatPeak = ZoneSizing(DDNumF, CtrlZoneNum).HeatDesHumRat;
                             }
@@ -3900,13 +3886,13 @@ namespace ZoneEquipmentManager {
         BuildingZoneMixingFlowOld = 0.0;
 
         // Total loop supply and recirc flows (these have been zeroed earlier in InitZoneEquipment
-        for (int airDistUnit = 1; airDistUnit <= DataDefineEquip::NumAirDistUnits; ++airDistUnit) {
-            int airLoop = DataDefineEquip::AirDistUnit(airDistUnit).AirLoopNum;
+        for (int airDistUnit = 1; airDistUnit <= state.dataDefineEquipment->NumAirDistUnits; ++airDistUnit) {
+            int airLoop = state.dataDefineEquipment->AirDistUnit(airDistUnit).AirLoopNum;
             if (airLoop > 0) {
-                state.dataAirLoop->AirLoopFlow(airLoop).SupFlow += DataDefineEquip::AirDistUnit(airDistUnit).MassFlowRateSup;
-                state.dataAirLoop->AirLoopFlow(airLoop).RecircFlow += DataDefineEquip::AirDistUnit(airDistUnit).MassFlowRatePlenInd;
+                state.dataAirLoop->AirLoopFlow(airLoop).SupFlow += state.dataDefineEquipment->AirDistUnit(airDistUnit).MassFlowRateSup;
+                state.dataAirLoop->AirLoopFlow(airLoop).RecircFlow += state.dataDefineEquipment->AirDistUnit(airDistUnit).MassFlowRatePlenInd;
                 state.dataAirLoop->AirLoopFlow(airLoop).LeakFlow +=
-                    DataDefineEquip::AirDistUnit(airDistUnit).MassFlowRateDnStrLk + DataDefineEquip::AirDistUnit(airDistUnit).MassFlowRateUpStrLk;
+                    state.dataDefineEquipment->AirDistUnit(airDistUnit).MassFlowRateDnStrLk + state.dataDefineEquipment->AirDistUnit(airDistUnit).MassFlowRateUpStrLk;
             }
         }
 
@@ -4142,9 +4128,9 @@ namespace ZoneEquipmentManager {
                                 // Re-check on volume basis - use current zone density for incoming, standard density for HVAC sys
                                 Real64 zoneTemp = Node(thisZoneEquip.ZoneNode).Temp;
                                 Real64 zoneHumRat = Node(thisZoneEquip.ZoneNode).HumRat;
-                                Real64 rhoZone = PsyRhoAirFnPbTdbW(state, DataEnvironment::OutBaroPress, zoneTemp, zoneHumRat, "CalcZoneMassBalance");
+                                Real64 rhoZone = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, zoneTemp, zoneHumRat, "CalcZoneMassBalance");
                                 Real64 incomingVolFlow = incomingFlow / rhoZone;
-                                Real64 sysUnbalancedVolFlow = sysUnbalancedFlow / DataEnvironment::StdRhoAir;
+                                Real64 sysUnbalancedVolFlow = sysUnbalancedFlow / state.dataEnvrn->StdRhoAir;
                                 Real64 unbalancedVolFlow = max(0.0, sysUnbalancedVolFlow - incomingVolFlow);
                                 if (unbalancedVolFlow > DataHVACGlobals::SmallAirVolFlow) {
                                     ShowWarningError(state, "In zone " + thisZoneEquip.ZoneName +
@@ -4152,9 +4138,9 @@ namespace ZoneEquipmentManager {
                                     ShowContinueErrorTimeStamp(state, "");
                                     ShowContinueError(state,
                                                       format("  Flows [m3/s]: Inlets: {:.6R}  Unbalanced exhausts: {:.6R}  Returns: {:.6R}",
-                                                             thisZoneEquip.TotInletAirMassFlowRate / DataEnvironment::StdRhoAir,
-                                                             sysUnbalExhaust / DataEnvironment::StdRhoAir,
-                                                             totalZoneReturnMassFlow / DataEnvironment::StdRhoAir));
+                                                             thisZoneEquip.TotInletAirMassFlowRate / state.dataEnvrn->StdRhoAir,
+                                                             sysUnbalExhaust / state.dataEnvrn->StdRhoAir,
+                                                             totalZoneReturnMassFlow / state.dataEnvrn->StdRhoAir));
                                     ShowContinueError(state,
                                                       format("  Infiltration: {:.6R}  Zone Ventilation: {:.6R}  Mixing (incoming): {:.6R}",
                                                              DataHeatBalFanSys::OAMFL(actualZone) / rhoZone,
@@ -4165,7 +4151,7 @@ namespace ZoneEquipmentManager {
                                         format(
                                             "  Imbalance (excess outflow): {:.6R}  Total system OA flow (for all airloops serving this zone): {:.6R}",
                                             unbalancedVolFlow,
-                                            thisZoneEquip.TotAvailAirLoopOA / DataEnvironment::StdRhoAir));
+                                            thisZoneEquip.TotAvailAirLoopOA / state.dataEnvrn->StdRhoAir));
                                     ShowContinueError(state, "  This error will only be reported once per zone.");
                                     thisZoneEquip.FlowError = true;
                                 }
@@ -4233,8 +4219,8 @@ namespace ZoneEquipmentManager {
                         // Zone return node could carry supply flow to zone without leaks plus any induced flow from plenum (but don't include other
                         // secondary flows from exhaust nodes)
                         inletMassFlow =
-                            DataDefineEquip::AirDistUnit(ADUNum).MassFlowRateZSup + DataDefineEquip::AirDistUnit(ADUNum).MassFlowRatePlenInd;
-                        maxMinNodeNum = DataDefineEquip::AirDistUnit(ADUNum).OutletNodeNum;
+                            state.dataDefineEquipment->AirDistUnit(ADUNum).MassFlowRateZSup + state.dataDefineEquipment->AirDistUnit(ADUNum).MassFlowRatePlenInd;
+                        maxMinNodeNum = state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum;
                     } else if (inletNum > 0) {
                         // If not connected to an ADU, then use the inlet node flow
                         inletMassFlow = DataLoopNode::Node(thisZoneEquip.InletNode(inletNum)).MassFlowRate;
@@ -4339,8 +4325,6 @@ namespace ZoneEquipmentManager {
         // Energy Balance.
 
         // Using/Aliasing
-        using DataContaminantBalance::Contaminant;
-        using DataEnvironment::OutBaroPress;
         using DataHeatBalance::RefrigCaseCredit;
         using DataHeatBalance::Zone;
         using DataHeatBalFanSys::SysDepZoneLoads;
@@ -4422,7 +4406,7 @@ namespace ZoneEquipmentManager {
                     for (SurfNum = Zone(ActualZoneNum).SurfaceFirst; SurfNum <= Zone(ActualZoneNum).SurfaceLast; ++SurfNum) {
                         if (DataSurfaces::SurfWinAirflowThisTS(SurfNum) > 0.0 &&
                             DataSurfaces::SurfWinAirflowDestination(SurfNum) == AirFlowWindow_Destination_ReturnAir) {
-                            FlowThisTS = PsyRhoAirFnPbTdbW(state, OutBaroPress, DataSurfaces::SurfWinTAirflowGapOutlet(SurfNum), Node(ZoneNode).HumRat) *
+                            FlowThisTS = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, DataSurfaces::SurfWinTAirflowGapOutlet(SurfNum), Node(ZoneNode).HumRat) *
                                          DataSurfaces::SurfWinAirflowThisTS(SurfNum) * Surface(SurfNum).Width;
                             WinGapFlowToRA += FlowThisTS;
                             WinGapFlowTtoRA += FlowThisTS * DataSurfaces::SurfWinTAirflowGapOutlet(SurfNum);
@@ -4501,8 +4485,8 @@ namespace ZoneEquipmentManager {
 
                 Node(ReturnNode).Enthalpy = PsyHFnTdbW(Node(ReturnNode).Temp, Node(ReturnNode).HumRat);
 
-                if (Contaminant.CO2Simulation) Node(ReturnNode).CO2 = Node(ZoneNode).CO2;
-                if (Contaminant.GenericContamSimulation) Node(ReturnNode).GenContam = Node(ZoneNode).GenContam;
+                if (state.dataContaminantBalance->Contaminant.CO2Simulation) Node(ReturnNode).CO2 = Node(ZoneNode).CO2;
+                if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) Node(ReturnNode).GenContam = Node(ZoneNode).GenContam;
 
             } // End of check for a return air node, which implies a return air system.
 
@@ -4525,7 +4509,6 @@ namespace ZoneEquipmentManager {
         // to the air loop side, allowing for multiple return air nodes
 
         // Using/Aliasing
-        using DataConvergParams::CalledFromAirSystemDemandSide;
         using DataHVACGlobals::NumPrimaryAirSys;
         using HVACInterfaceManager::UpdateHVACInterface;
 
@@ -4539,7 +4522,7 @@ namespace ZoneEquipmentManager {
             for (RetAirPathNum = 1; RetAirPathNum <= state.dataAirLoop->AirToZoneNodeInfo(ZoneGroupNum).NumReturnNodes; ++RetAirPathNum) {
                 UpdateHVACInterface(state,
                                     ZoneGroupNum,
-                                    CalledFromAirSystemDemandSide,
+                                    DataConvergParams::iCalledFrom::AirSystemDemandSide,
                                     state.dataAirLoop->AirToZoneNodeInfo(ZoneGroupNum).ZoneEquipReturnNodeNum(RetAirPathNum),
                                     state.dataAirLoop->AirToZoneNodeInfo(ZoneGroupNum).AirLoopReturnNodeNum(RetAirPathNum),
                                     SimAir);
@@ -4569,18 +4552,9 @@ namespace ZoneEquipmentManager {
         // This subroutine calculates the air component of the heat balance.
 
         // Using/Aliasing
-        using DataEnvironment::OutBaroPress;
-        using DataEnvironment::OutEnthalpy;
-        using DataEnvironment::OutHumRat;
-        using DataEnvironment::WindSpeed;
         using namespace DataHeatBalFanSys;
         using namespace DataHeatBalance;
         using CoolTower::ManageCoolTower;
-        using DataContaminantBalance::Contaminant;
-        using DataContaminantBalance::MixingMassFlowCO2;
-        using DataContaminantBalance::MixingMassFlowGC;
-        using DataContaminantBalance::ZoneAirCO2;
-        using DataContaminantBalance::ZoneAirGC;
         using DataHeatBalance::Ventilation;
         using DataHVACGlobals::CycleOn;
         using DataHVACGlobals::CycleOnZoneFansOnly;
@@ -4695,8 +4669,8 @@ namespace ZoneEquipmentManager {
         MixingMassFlowXHumRat = 0.0;
         CrossMixingReportFlag = false;
         MixingReportFlag = false;
-        if (Contaminant.CO2Simulation && TotMixing + TotCrossMixing + TotRefDoorMixing > 0) MixingMassFlowCO2 = 0.0;
-        if (Contaminant.GenericContamSimulation && TotMixing + TotCrossMixing + TotRefDoorMixing > 0) MixingMassFlowGC = 0.0;
+        if (state.dataContaminantBalance->Contaminant.CO2Simulation && TotMixing + TotCrossMixing + TotRefDoorMixing > 0) state.dataContaminantBalance->MixingMassFlowCO2 = 0.0;
+        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation && TotMixing + TotCrossMixing + TotRefDoorMixing > 0) state.dataContaminantBalance->MixingMassFlowGC = 0.0;
 
         IVF = 0.0;
         MCPTI = 0.0;
@@ -4766,10 +4740,10 @@ namespace ZoneEquipmentManager {
                 HumRatExt = Node(Zone(NZ).LinkedOutAirNode).HumRat;
                 EnthalpyExt = Node(Zone(NZ).LinkedOutAirNode).Enthalpy;
             } else {
-                HumRatExt = OutHumRat;
-                EnthalpyExt = OutEnthalpy;
+                HumRatExt = state.dataEnvrn->OutHumRat;
+                EnthalpyExt = state.dataEnvrn->OutEnthalpy;
             }
-            AirDensity = PsyRhoAirFnPbTdbW(state, OutBaroPress, TempExt, HumRatExt);
+            AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, TempExt, HumRatExt);
             CpAir = PsyCpAirFnW(HumRatExt);
             // Hybrid ventilation global control
             if (Ventilation(j).HybridControlType == HybridControlTypeGlobal && Ventilation(j).HybridControlMasterNum > 0) {
@@ -5075,7 +5049,7 @@ namespace ZoneEquipmentManager {
                     //            Per Jan 17, 2008 conference call, agreed to use average conditions for Rho, Cp and Hfg
                     //             RhoAirM = PsyRhoAirFnPbTdbW(state, OutBaroPress,tzm,ZHumRat(m))
                     //             MCP=Mixing(J)%DesiredAirFlowRate * PsyCpAirFnW(ZHumRat(m),tzm) * RhoAirM
-                    AirDensity = PsyRhoAirFnPbTdbW(state, OutBaroPress, (TZN + TZM) / 2.0, (ZHumRat(n) + ZHumRat(m)) / 2.0);
+                    AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, (TZN + TZM) / 2.0, (ZHumRat(n) + ZHumRat(m)) / 2.0);
                     CpAir = PsyCpAirFnW((ZHumRat(n) + ZHumRat(m)) / 2.0); // Use average conditions
 
                     Mixing(j).DesiredAirFlowRate = Mixing(j).DesiredAirFlowRateSaved;
@@ -5093,11 +5067,11 @@ namespace ZoneEquipmentManager {
                     // Now to determine the moisture conditions
                     MixingMassFlowZone(n) += Mixing(j).DesiredAirFlowRate * AirDensity;
                     MixingMassFlowXHumRat(n) += Mixing(j).DesiredAirFlowRate * AirDensity * ZHumRat(m);
-                    if (Contaminant.CO2Simulation) {
-                        MixingMassFlowCO2(n) += Mixing(j).DesiredAirFlowRate * AirDensity * ZoneAirCO2(m);
+                    if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
+                        state.dataContaminantBalance->MixingMassFlowCO2(n) += Mixing(j).DesiredAirFlowRate * AirDensity * state.dataContaminantBalance->ZoneAirCO2(m);
                     }
-                    if (Contaminant.GenericContamSimulation) {
-                        MixingMassFlowGC(n) += Mixing(j).DesiredAirFlowRate * AirDensity * ZoneAirGC(m);
+                    if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
+                        state.dataContaminantBalance->MixingMassFlowGC(n) += Mixing(j).DesiredAirFlowRate * AirDensity * state.dataContaminantBalance->ZoneAirGC(m);
                     }
                     MixingReportFlag(j) = true;
                 }
@@ -5106,7 +5080,7 @@ namespace ZoneEquipmentManager {
                 if (TZM > TZN + TD) {
                     //             RhoAirM = PsyRhoAirFnPbTdbW(state, OutBaroPress,tzm,ZHumRat(m))
                     //             MCP=Mixing(J)%DesiredAirFlowRate * PsyCpAirFnW(ZHumRat(m),tzm) * RhoAirM
-                    AirDensity = PsyRhoAirFnPbTdbW(state, OutBaroPress, (TZN + TZM) / 2.0, (ZHumRat(n) + ZHumRat(m)) / 2.0); // Use avg conditions
+                    AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, (TZN + TZM) / 2.0, (ZHumRat(n) + ZHumRat(m)) / 2.0); // Use avg conditions
                     CpAir = PsyCpAirFnW((ZHumRat(n) + ZHumRat(m)) / 2.0);                                             // Use average conditions
 
                     Mixing(j).DesiredAirFlowRate = Mixing(j).DesiredAirFlowRateSaved;
@@ -5123,11 +5097,11 @@ namespace ZoneEquipmentManager {
                     // Now to determine the moisture conditions
                     MixingMassFlowZone(n) += Mixing(j).DesiredAirFlowRate * AirDensity;
                     MixingMassFlowXHumRat(n) += Mixing(j).DesiredAirFlowRate * AirDensity * ZHumRat(m);
-                    if (Contaminant.CO2Simulation) {
-                        MixingMassFlowCO2(n) += Mixing(j).DesiredAirFlowRate * AirDensity * ZoneAirCO2(m);
+                    if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
+                        state.dataContaminantBalance->MixingMassFlowCO2(n) += Mixing(j).DesiredAirFlowRate * AirDensity * state.dataContaminantBalance->ZoneAirCO2(m);
                     }
-                    if (Contaminant.GenericContamSimulation) {
-                        MixingMassFlowGC(n) += Mixing(j).DesiredAirFlowRate * AirDensity * ZoneAirGC(m);
+                    if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
+                        state.dataContaminantBalance->MixingMassFlowGC(n) += Mixing(j).DesiredAirFlowRate * AirDensity * state.dataContaminantBalance->ZoneAirGC(m);
                     }
                     MixingReportFlag(j) = true;
                 }
@@ -5136,7 +5110,7 @@ namespace ZoneEquipmentManager {
                 //          RhoAirM = PsyRhoAirFnPbTdbW(state, OutBaroPress,tzm,ZHumRat(m))
                 //          MCP=Mixing(J)%DesiredAirFlowRate * PsyCpAirFnW(ZHumRat(m),tzm) * RhoAirM
                 AirDensity =
-                    PsyRhoAirFnPbTdbW(state, OutBaroPress, (TZN + TZM) / 2.0, (ZHumRat(n) + ZHumRat(m)) / 2.0, RoutineNameMixing); // Use avg conditions
+                    PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, (TZN + TZM) / 2.0, (ZHumRat(n) + ZHumRat(m)) / 2.0, RoutineNameMixing); // Use avg conditions
                 CpAir = PsyCpAirFnW((ZHumRat(n) + ZHumRat(m)) / 2.0);                                                       // Use average conditions
 
                 Mixing(j).DesiredAirFlowRate = Mixing(j).DesiredAirFlowRateSaved;
@@ -5153,11 +5127,11 @@ namespace ZoneEquipmentManager {
                 // Now to determine the moisture conditions
                 MixingMassFlowZone(n) += Mixing(j).DesiredAirFlowRate * AirDensity;
                 MixingMassFlowXHumRat(n) += Mixing(j).DesiredAirFlowRate * AirDensity * ZHumRat(m);
-                if (Contaminant.CO2Simulation) {
-                    MixingMassFlowCO2(n) += Mixing(j).DesiredAirFlowRate * AirDensity * ZoneAirCO2(m);
+                if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
+                    state.dataContaminantBalance->MixingMassFlowCO2(n) += Mixing(j).DesiredAirFlowRate * AirDensity * state.dataContaminantBalance->ZoneAirCO2(m);
                 }
-                if (Contaminant.GenericContamSimulation) {
-                    MixingMassFlowGC(n) += Mixing(j).DesiredAirFlowRate * AirDensity * ZoneAirGC(m);
+                if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
+                    state.dataContaminantBalance->MixingMassFlowGC(n) += Mixing(j).DesiredAirFlowRate * AirDensity * state.dataContaminantBalance->ZoneAirGC(m);
                 }
                 MixingReportFlag(j) = true;
             }
@@ -5271,7 +5245,7 @@ namespace ZoneEquipmentManager {
                     //                                      SET COEFFICIENTS .
                     Tavg = (TZN + TZM) / 2.0;
                     Wavg = (ZHumRat(n) + ZHumRat(m)) / 2.0;
-                    AirDensity = PsyRhoAirFnPbTdbW(state, OutBaroPress, Tavg, Wavg, RoutineNameCrossMixing);
+                    AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, Tavg, Wavg, RoutineNameCrossMixing);
                     CpAir = PsyCpAirFnW(Wavg);
                     MCPxN = CrossMixing(j).DesiredAirFlowRate * CpAir * AirDensity;
                     MCPM(n) += MCPxN;
@@ -5287,13 +5261,13 @@ namespace ZoneEquipmentManager {
 
                     MixingMassFlowZone(n) += CrossMixing(j).DesiredAirFlowRate * AirDensity;
                     MixingMassFlowXHumRat(n) += CrossMixing(j).DesiredAirFlowRate * AirDensity * ZHumRat(m);
-                    if (Contaminant.CO2Simulation) {
-                        MixingMassFlowCO2(m) += CrossMixing(j).DesiredAirFlowRate * AirDensity * ZoneAirCO2(n);
-                        MixingMassFlowCO2(n) += CrossMixing(j).DesiredAirFlowRate * AirDensity * ZoneAirCO2(m);
+                    if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
+                        state.dataContaminantBalance->MixingMassFlowCO2(m) += CrossMixing(j).DesiredAirFlowRate * AirDensity * state.dataContaminantBalance->ZoneAirCO2(n);
+                        state.dataContaminantBalance->MixingMassFlowCO2(n) += CrossMixing(j).DesiredAirFlowRate * AirDensity * state.dataContaminantBalance->ZoneAirCO2(m);
                     }
-                    if (Contaminant.GenericContamSimulation) {
-                        MixingMassFlowGC(m) += CrossMixing(j).DesiredAirFlowRate * AirDensity * ZoneAirGC(n);
-                        MixingMassFlowGC(n) += CrossMixing(j).DesiredAirFlowRate * AirDensity * ZoneAirGC(m);
+                    if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
+                        state.dataContaminantBalance->MixingMassFlowGC(m) += CrossMixing(j).DesiredAirFlowRate * AirDensity * state.dataContaminantBalance->ZoneAirGC(n);
+                        state.dataContaminantBalance->MixingMassFlowGC(n) += CrossMixing(j).DesiredAirFlowRate * AirDensity * state.dataContaminantBalance->ZoneAirGC(m);
                     }
                 }
             }
@@ -5311,13 +5285,13 @@ namespace ZoneEquipmentManager {
                     TZoneB = ZMAT(ZoneB);
                     HumRatZoneA = ZHumRat(ZoneA);
                     HumRatZoneB = ZHumRat(ZoneB);
-                    AirDensityZoneA = PsyRhoAirFnPbTdbW(state, OutBaroPress, TZoneA, HumRatZoneA, RoutineNameRefrigerationDoorMixing);
+                    AirDensityZoneA = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, TZoneA, HumRatZoneA, RoutineNameRefrigerationDoorMixing);
                     CpAirZoneA = PsyCpAirFnW(HumRatZoneA);
-                    AirDensityZoneB = PsyRhoAirFnPbTdbW(state, OutBaroPress, TZoneB, HumRatZoneB, RoutineNameRefrigerationDoorMixing);
+                    AirDensityZoneB = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, TZoneB, HumRatZoneB, RoutineNameRefrigerationDoorMixing);
                     CpAirZoneB = PsyCpAirFnW(HumRatZoneB);
                     Tavg = (TZoneA + TZoneB) / 2.0;
                     Wavg = (HumRatZoneA + HumRatZoneB) / 2.0;
-                    AirDensityAvg = PsyRhoAirFnPbTdbW(state, OutBaroPress, Tavg, Wavg, RoutineNameRefrigerationDoorMixing);
+                    AirDensityAvg = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, Tavg, Wavg, RoutineNameRefrigerationDoorMixing);
 
                     if (RefDoorMixing(ZoneA).EMSRefDoorMixingOn(j)) {
                         MassFlowDryAir = RefDoorMixing(ZoneA).VolRefDoorFlowRate(j) * AirDensityAvg;
@@ -5369,13 +5343,13 @@ namespace ZoneEquipmentManager {
                     MixingMassFlowXHumRat(ZoneB) += MassFlowXHumRatToB;
 
                     // Now to determine the CO2 and generic contaminant conditions
-                    if (Contaminant.CO2Simulation) {
-                        MixingMassFlowCO2(ZoneA) += MassFlowToA * ZoneAirCO2(ZoneB);
-                        MixingMassFlowCO2(ZoneB) += MassFlowToB * ZoneAirCO2(ZoneA);
+                    if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
+                        state.dataContaminantBalance->MixingMassFlowCO2(ZoneA) += MassFlowToA * state.dataContaminantBalance->ZoneAirCO2(ZoneB);
+                        state.dataContaminantBalance->MixingMassFlowCO2(ZoneB) += MassFlowToB * state.dataContaminantBalance->ZoneAirCO2(ZoneA);
                     }
-                    if (Contaminant.GenericContamSimulation) {
-                        MixingMassFlowCO2(ZoneA) += MassFlowToA * ZoneAirGC(ZoneB);
-                        MixingMassFlowCO2(ZoneB) += MassFlowToB * ZoneAirGC(ZoneA);
+                    if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
+                        state.dataContaminantBalance->MixingMassFlowCO2(ZoneA) += MassFlowToA * state.dataContaminantBalance->ZoneAirGC(ZoneB);
+                        state.dataContaminantBalance->MixingMassFlowCO2(ZoneB) += MassFlowToB * state.dataContaminantBalance->ZoneAirGC(ZoneA);
                     }
 
                 } // J=1,RefDoorMixing(ZoneA)%NumRefDoorConnections
@@ -5395,10 +5369,10 @@ namespace ZoneEquipmentManager {
             if (Zone(NZ).HasLinkedOutAirNode) {
                 HumRatExt = Node(Zone(NZ).LinkedOutAirNode).HumRat;
             } else {
-                HumRatExt = OutHumRat;
+                HumRatExt = state.dataEnvrn->OutHumRat;
             }
 
-            AirDensity = PsyRhoAirFnPbTdbW(state, OutBaroPress, TempExt, HumRatExt, RoutineNameInfiltration);
+            AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, TempExt, HumRatExt, RoutineNameInfiltration);
             CpAir = PsyCpAirFnW(HumRatExt);
 
             // CR7751  should maybe use code below, indoor conditions instead of outdoor conditions
@@ -5434,7 +5408,7 @@ namespace ZoneEquipmentManager {
                     Infiltration(j).MassFlowRate = Infiltration(j).VolumeFlowRate * AirDensity;
                 } else if (SELECT_CASE_var == InfiltrationShermanGrimsrud) {
                     // Sherman Grimsrud model as formulated in ASHRAE HoF
-                    WindSpeedExt = WindSpeed; // formulated to use wind at Meterological Station rather than local
+                    WindSpeedExt = state.dataEnvrn->WindSpeed; // formulated to use wind at Meterological Station rather than local
                     IVF = GetCurrentScheduleValue(state, Infiltration(j).SchedPtr) * Infiltration(j).LeakageArea / 1000.0 *
                           std::sqrt(Infiltration(j).BasicStackCoefficient * std::abs(TempExt - ZMAT(NZ)) +
                                     Infiltration(j).BasicWindCoefficient * pow_2(WindSpeedExt));
@@ -5520,7 +5494,7 @@ namespace ZoneEquipmentManager {
                     }
                 }
                 NZ = ZoneAirBalance(j).ZonePtr;
-                AirDensity = PsyRhoAirFnPbTdbW(state, OutBaroPress, Zone(NZ).OutDryBulbTemp, HumRatExt, RoutineNameZoneAirBalance);
+                AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, Zone(NZ).OutDryBulbTemp, HumRatExt, RoutineNameZoneAirBalance);
                 CpAir = PsyCpAirFnW(HumRatExt);
                 ZoneAirBalance(j).ERVMassFlowRate *= AirDensity;
                 MDotOA(NZ) =

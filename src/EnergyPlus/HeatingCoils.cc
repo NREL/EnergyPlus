@@ -312,7 +312,7 @@ namespace HeatingCoils {
         }
 
         // Update the current HeatingCoil to the outlet nodes
-        UpdateHeatingCoil(CoilNum);
+        UpdateHeatingCoil(state, CoilNum);
 
         // Report the current HeatingCoil
         ReportHeatingCoil(state, CoilNum);
@@ -1887,7 +1887,6 @@ namespace HeatingCoils {
 
         // Using/Aliasing
         using CurveManager::CurveValue;
-        using DataEnvironment::OutBaroPress;
         using DataHVACGlobals::ElecHeatingCoilPower;
         using DataHVACGlobals::MSHPMassFlowRateHigh;
         using DataHVACGlobals::MSHPMassFlowRateLow;
@@ -1955,7 +1954,7 @@ namespace HeatingCoils {
         InletAirEnthalpy = HeatingCoil(CoilNum).InletAirEnthalpy;
         InletAirHumRat = HeatingCoil(CoilNum).InletAirHumRat;
 
-        OutdoorPressure = OutBaroPress;
+        OutdoorPressure = state.dataEnvrn->OutBaroPress;
 
         if ((AirMassFlow > 0.0) && (GetCurrentScheduleValue(state, HeatingCoil(CoilNum).SchedPtr) > 0.0) && ((CycRatio > 0.0) || (SpeedRatio > 0.0))) {
 
@@ -2314,7 +2313,6 @@ namespace HeatingCoils {
 
         // Using/Aliasing
         using CurveManager::CurveValue;
-        using DataEnvironment::OutBaroPress;
         using DataHVACGlobals::ElecHeatingCoilPower;
         using DataHVACGlobals::MSHPMassFlowRateHigh;
         using DataHVACGlobals::MSHPMassFlowRateLow;
@@ -2384,7 +2382,7 @@ namespace HeatingCoils {
         InletAirEnthalpy = HeatingCoil(CoilNum).InletAirEnthalpy;
         InletAirHumRat = HeatingCoil(CoilNum).InletAirHumRat;
 
-        OutdoorPressure = OutBaroPress;
+        OutdoorPressure = state.dataEnvrn->OutBaroPress;
 
         if ((AirMassFlow > 0.0) && (GetCurrentScheduleValue(state, HeatingCoil(CoilNum).SchedPtr) > 0.0) && ((CycRatio > 0.0) || (SpeedRatio > 0.0))) {
 
@@ -2778,7 +2776,7 @@ namespace HeatingCoils {
     // Beginning of Update subroutines for the HeatingCoil Module
     // *****************************************************************************
 
-    void UpdateHeatingCoil(int const CoilNum)
+    void UpdateHeatingCoil(EnergyPlusData &state, int const CoilNum)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
@@ -2796,8 +2794,6 @@ namespace HeatingCoils {
         // na
 
         // Using/Aliasing
-        using DataContaminantBalance::Contaminant;
-
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -2831,11 +2827,11 @@ namespace HeatingCoils {
         Node(AirOutletNode).MassFlowRateMinAvail = Node(AirInletNode).MassFlowRateMinAvail;
         Node(AirOutletNode).MassFlowRateMaxAvail = Node(AirInletNode).MassFlowRateMaxAvail;
 
-        if (Contaminant.CO2Simulation) {
+        if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
             Node(AirOutletNode).CO2 = Node(AirInletNode).CO2;
         }
 
-        if (Contaminant.GenericContamSimulation) {
+        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
             Node(AirOutletNode).GenContam = Node(AirInletNode).GenContam;
         }
     }

@@ -195,14 +195,6 @@ namespace SimulationManager {
         // na
 
         // Using/Aliasing
-        using DataEnvironment::CurMnDy;
-        using DataEnvironment::CurrentOverallSimDay;
-        using DataEnvironment::CurrentYearIsLeapYear;
-        using DataEnvironment::EndMonthFlag;
-        using DataEnvironment::EnvironmentName;
-        using DataEnvironment::TotalOverallSimDays;
-        using DataEnvironment::TotDesDays;
-        using DataEnvironment::TotRunDesPersDays;
         using DataHVACGlobals::TimeStepSys;
 
         using BranchInputManager::ManageBranchInput;
@@ -472,7 +464,7 @@ namespace SimulationManager {
 
             if (sqlite) {
                 sqlite->sqliteBegin();
-                sqlite->createSQLiteEnvironmentPeriodRecord(DataEnvironment::CurEnvirNum, DataEnvironment::EnvironmentName, state.dataGlobal->KindOfSim);
+                sqlite->createSQLiteEnvironmentPeriodRecord(state.dataEnvrn->CurEnvirNum, state.dataEnvrn->EnvironmentName, state.dataGlobal->KindOfSim);
                 sqlite->sqliteCommit();
             }
 
@@ -490,12 +482,12 @@ namespace SimulationManager {
                 state.dataGlobal->beginEnvrnWarmStartFlag = false;
             }
             state.dataGlobal->EndEnvrnFlag = false;
-            EndMonthFlag = false;
+            state.dataEnvrn->EndMonthFlag = false;
             state.dataGlobal->WarmupFlag = true;
             state.dataGlobal->DayOfSim = 0;
             state.dataGlobal->DayOfSimChr = "0";
             NumOfWarmupDays = 0;
-            if (CurrentYearIsLeapYear) {
+            if (state.dataEnvrn->CurrentYearIsLeapYear) {
                 if (state.dataGlobal->NumOfDayInEnvrn <= 366) {
                     isFinalYear = true;
                 }
@@ -518,8 +510,8 @@ namespace SimulationManager {
                 ++state.dataGlobal->DayOfSim;
                 state.dataGlobal->DayOfSimChr = fmt::to_string(state.dataGlobal->DayOfSim);
                 if (!state.dataGlobal->WarmupFlag) {
-                    ++CurrentOverallSimDay;
-                    DisplaySimDaysProgress(state, CurrentOverallSimDay, TotalOverallSimDays);
+                    ++state.dataEnvrn->CurrentOverallSimDay;
+                    DisplaySimDaysProgress(state, state.dataEnvrn->CurrentOverallSimDay, state.dataEnvrn->TotalOverallSimDays);
                 } else {
                     state.dataGlobal->DayOfSimChr = "0";
                 }
@@ -532,18 +524,18 @@ namespace SimulationManager {
                     DisplayString(state, "Warming up {" + cWarmupDay + '}');
                 } else if (state.dataGlobal->DayOfSim == 1) {
                     if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
-                        DisplayString(state, "Starting Simulation at " + DataEnvironment::CurMnDyYr + " for " + EnvironmentName);
+                        DisplayString(state, "Starting Simulation at " + state.dataEnvrn->CurMnDyYr + " for " + state.dataEnvrn->EnvironmentName);
                     } else {
-                        DisplayString(state, "Starting Simulation at " + DataEnvironment::CurMnDy + " for " + EnvironmentName);
+                        DisplayString(state, "Starting Simulation at " + state.dataEnvrn->CurMnDy + " for " + state.dataEnvrn->EnvironmentName);
                     }
                     static constexpr auto Format_700("Environment:WarmupDays,{:3}\n");
                     print(state.files.eio, Format_700, NumOfWarmupDays);
                     ResetAccumulationWhenWarmupComplete();
                 } else if (DisplayPerfSimulationFlag) {
                     if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
-                        DisplayString(state, "Continuing Simulation at " + DataEnvironment::CurMnDyYr + " for " + EnvironmentName);
+                        DisplayString(state, "Continuing Simulation at " + state.dataEnvrn->CurMnDyYr + " for " + state.dataEnvrn->EnvironmentName);
                     } else {
-                        DisplayString(state, "Continuing Simulation at " + DataEnvironment::CurMnDy + " for " + EnvironmentName);
+                        DisplayString(state, "Continuing Simulation at " + state.dataEnvrn->CurMnDy + " for " + state.dataEnvrn->EnvironmentName);
                     }
                     DisplayPerfSimulationFlag = false;
                 }
@@ -570,8 +562,8 @@ namespace SimulationManager {
                             WeatherManager::UpdateUnderwaterBoundaries(state);
                         }
 
-                        if (DataEnvironment::varyingLocationSchedIndexLat > 0 || DataEnvironment::varyingLocationSchedIndexLong > 0 ||
-                            DataEnvironment::varyingOrientationSchedIndex > 0) {
+                        if (state.dataEnvrn->varyingLocationSchedIndexLat > 0 || state.dataEnvrn->varyingLocationSchedIndexLong > 0 ||
+                            state.dataEnvrn->varyingOrientationSchedIndex > 0) {
                             WeatherManager::UpdateLocationAndOrientation(state);
                         }
 
@@ -628,7 +620,7 @@ namespace SimulationManager {
 
         state.dataGlobal->WarmupFlag = false;
         if (!SimsDone && state.dataGlobal->DoDesDaySim) {
-            if ((TotDesDays + TotRunDesPersDays) == 0) { // if sum is 0, then there was no sizing done.
+            if ((state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays) == 0) { // if sum is 0, then there was no sizing done.
                 ShowWarningError(state, "ManageSimulation: SizingPeriod:* were requested in SimulationControl but no SizingPeriod:* objects in input.");
             }
         }
@@ -703,12 +695,7 @@ namespace SimulationManager {
 
         // Using/Aliasing
         using DataStringGlobals::MatchVersion;
-        using namespace DataConvergParams;
         using namespace DataSystemVariables;
-        using DataEnvironment::DisplayWeatherMissingDataWarnings;
-        using DataEnvironment::IgnoreBeamRadiation;
-        using DataEnvironment::IgnoreDiffuseRadiation;
-        using DataEnvironment::IgnoreSolarRadiation;
         using DataHVACGlobals::deviationFromSetPtThresholdClg;
         using DataHVACGlobals::deviationFromSetPtThresholdHtg;
         using DataHVACGlobals::LimitNumSysSteps;
@@ -986,34 +973,34 @@ namespace SimulationManager {
             if (MinInt < 0 || MinInt > 60) {
                 ShowWarningError(state,
                                  format("{}: Requested {} ({}) invalid. Set to 1 minute.", CurrentModuleObject, cNumericFieldNames(1), MinInt));
-                MinTimeStepSys = 1.0 / 60.0;
+                state.dataConvergeParams->MinTimeStepSys = 1.0 / 60.0;
             } else if (MinInt == 0) { // Set to TimeStepZone
-                MinTimeStepSys = state.dataGlobal->TimeStepZone;
+                state.dataConvergeParams->MinTimeStepSys = state.dataGlobal->TimeStepZone;
             } else {
-                MinTimeStepSys = double(MinInt) / 60.0;
+                state.dataConvergeParams->MinTimeStepSys = double(MinInt) / 60.0;
             }
-            MaxIter = int(Number(2));
-            if (MaxIter <= 0) {
-                MaxIter = 20;
+            state.dataConvergeParams->MaxIter = int(Number(2));
+            if (state.dataConvergeParams->MaxIter <= 0) {
+                state.dataConvergeParams->MaxIter = 20;
             }
-            if (!lNumericFieldBlanks(3)) MinPlantSubIterations = int(Number(3));
-            if (!lNumericFieldBlanks(4)) MaxPlantSubIterations = int(Number(4));
+            if (!lNumericFieldBlanks(3)) state.dataConvergeParams->MinPlantSubIterations = int(Number(3));
+            if (!lNumericFieldBlanks(4)) state.dataConvergeParams->MaxPlantSubIterations = int(Number(4));
             // trap bad values
-            if (MinPlantSubIterations < 1) MinPlantSubIterations = 1;
-            if (MaxPlantSubIterations < 3) MaxPlantSubIterations = 3;
-            if (MinPlantSubIterations > MaxPlantSubIterations) MaxPlantSubIterations = MinPlantSubIterations + 1;
+            if (state.dataConvergeParams->MinPlantSubIterations < 1) state.dataConvergeParams->MinPlantSubIterations = 1;
+            if (state.dataConvergeParams->MaxPlantSubIterations < 3) state.dataConvergeParams->MaxPlantSubIterations = 3;
+            if (state.dataConvergeParams->MinPlantSubIterations > state.dataConvergeParams->MaxPlantSubIterations) state.dataConvergeParams->MaxPlantSubIterations = state.dataConvergeParams->MinPlantSubIterations + 1;
 
         } else if (Num == 0) {
-            MinTimeStepSys = 1.0 / 60.0;
-            MaxIter = 20;
-            MinPlantSubIterations = 2;
-            MaxPlantSubIterations = 8;
+            state.dataConvergeParams->MinTimeStepSys = 1.0 / 60.0;
+            state.dataConvergeParams->MaxIter = 20;
+            state.dataConvergeParams->MinPlantSubIterations = 2;
+            state.dataConvergeParams->MaxPlantSubIterations = 8;
         } else {
             ShowSevereError(state, "Too many " + CurrentModuleObject + " Objects found.");
             ErrorsFound = true;
         }
 
-        LimitNumSysSteps = int(state.dataGlobal->TimeStepZone / MinTimeStepSys);
+        LimitNumSysSteps = int(state.dataGlobal->TimeStepZone / state.dataConvergeParams->MinTimeStepSys);
 
         DebugOutput = false;
         EvenDuringWarmup = false;
@@ -1085,13 +1072,13 @@ namespace SimulationManager {
                             } else if (UtilityRoutines::SameString(diagnosticName, "ReportDuringWarmup")) {
                                 ReportDuringWarmup = true;
                             } else if (UtilityRoutines::SameString(diagnosticName, "DisplayWeatherMissingDataWarnings")) {
-                                DisplayWeatherMissingDataWarnings = true;
+                                state.dataEnvrn->DisplayWeatherMissingDataWarnings = true;
                             } else if (UtilityRoutines::SameString(diagnosticName, "IgnoreSolarRadiation")) { // TODO: Not a valid key choice
-                                IgnoreSolarRadiation = true;
+                                state.dataEnvrn->IgnoreSolarRadiation = true;
                             } else if (UtilityRoutines::SameString(diagnosticName, "IgnoreBeamRadiation")) { // TODO: Not a valid key choice
-                                IgnoreBeamRadiation = true;
+                                state.dataEnvrn->IgnoreBeamRadiation = true;
                             } else if (UtilityRoutines::SameString(diagnosticName, "IgnoreDiffuseRadiation")) { // TODO: Not a valid key choice
-                                IgnoreDiffuseRadiation = true;
+                                state.dataEnvrn->IgnoreDiffuseRadiation = true;
                             } else if (UtilityRoutines::SameString(diagnosticName, "DeveloperFlag")) { // TODO: Not a valid key choice
                                 DeveloperFlag = true;
                             } else if (UtilityRoutines::SameString(diagnosticName, "TimingFlag")) { // TODO: Not a valid key choice
@@ -1269,10 +1256,10 @@ namespace SimulationManager {
                     } else if (overrideModeValue == "ADVANCED") {
                         bool advancedModeUsed = false;
                         if (fields.find("maxzonetempdiff") != fields.end()) { // not required field, has default value
-                            DataConvergParams::MaxZoneTempDiff = fields.at("maxzonetempdiff");
+                            state.dataConvergeParams->MaxZoneTempDiff = fields.at("maxzonetempdiff");
                             ShowWarningError(state,
                                              format("PerformancePrecisionTradeoffs using the Advanced Override Mode, MaxZoneTempDiff set to: {:.4R}",
-                                                    DataConvergParams::MaxZoneTempDiff));
+                                                    state.dataConvergeParams->MaxZoneTempDiff));
                             advancedModeUsed = true;
                         }
                         if (fields.find("maxalloweddeltemp") != fields.end()) { // not required field, has default value
@@ -1314,7 +1301,7 @@ namespace SimulationManager {
                     if (overrideBeginEnvResetSuppress) {
                         ShowWarningError(state, "Due to PerformancePrecisionTradeoffs Override Mode, the Begin Environment Reset Mode has been changed to "
                                          "SuppressAllBeginEnvironmentResets.");
-                        DataEnvironment::forceBeginEnvResetSuppress = true;
+                        state.dataEnvrn->forceBeginEnvResetSuppress = true;
                     }
                     if (overrideSystemTimestep) {
                         ShowWarningError(state,
@@ -1323,13 +1310,13 @@ namespace SimulationManager {
                         if (MinTimeStepSysOverrideValue > state.dataGlobal->MinutesPerTimeStep) {
                             MinTimeStepSysOverrideValue = state.dataGlobal->MinutesPerTimeStep;
                         }
-                        MinTimeStepSys = MinTimeStepSysOverrideValue / 60.0;
-                        LimitNumSysSteps = int(state.dataGlobal->TimeStepZone / MinTimeStepSys);
+                        state.dataConvergeParams->MinTimeStepSys = MinTimeStepSysOverrideValue / 60.0;
+                        LimitNumSysSteps = int(state.dataGlobal->TimeStepZone / state.dataConvergeParams->MinTimeStepSys);
                     }
                     if (overrideMaxZoneTempDiff) {
                         ShowWarningError(state,
                             "Due to PerformancePrecisionTradeoffs Override Mode, internal variable MaxZoneTempDiff will be set to 1.0 .");
-                        DataConvergParams::MaxZoneTempDiff = 1.0;
+                        state.dataConvergeParams->MaxZoneTempDiff = 1.0;
                     }
                     if (overrideMaxAllowedDelTemp) {
                         ShowWarningError(state,
@@ -1356,9 +1343,9 @@ namespace SimulationManager {
               "{}\n",
               "! <System Convergence Limits>, Minimum System TimeStep {minutes}, Max HVAC Iterations, Minimum Plant "
               "Iterations, Maximum Plant Iterations");
-        MinInt = MinTimeStepSys * 60.0;
+        MinInt = state.dataConvergeParams->MinTimeStepSys * 60.0;
         static constexpr auto Format_733(" System Convergence Limits, {}, {}, {}, {}\n");
-        print(state.files.eio, Format_733, MinInt, MaxIter, MinPlantSubIterations, MaxPlantSubIterations);
+        print(state.files.eio, Format_733, MinInt, state.dataConvergeParams->MaxIter, state.dataConvergeParams->MinPlantSubIterations, state.dataConvergeParams->MaxPlantSubIterations);
 
         if (state.dataGlobal->DoZoneSizing) {
             Alphas(1) = "Yes";
@@ -1425,13 +1412,13 @@ namespace SimulationManager {
             Alphas(5) = "No";
         }
         Alphas(6) = fmt::to_string(DataHeatBalance::MinNumberOfWarmupDays);
-        if (DataEnvironment::forceBeginEnvResetSuppress) {
+        if (state.dataEnvrn->forceBeginEnvResetSuppress) {
             Alphas(7) = "Yes";
         } else {
             Alphas(7) = "No";
         }
-        Alphas(8) = format("{:.1R}", DataConvergParams::MinTimeStepSys * 60.0);
-        Alphas(9) = format("{:.3R}", DataConvergParams::MaxZoneTempDiff);
+        Alphas(8) = format("{:.1R}", state.dataConvergeParams->MinTimeStepSys * 60.0);
+        Alphas(9) = format("{:.3R}", state.dataConvergeParams->MaxZoneTempDiff);
         Alphas(10) = format("{:.4R}", DataHeatBalance::MaxAllowedDelTemp);
         std::string pptHeader = "! <Performance Precision Tradeoffs>, Use Coil Direct Simulation, "
                                 "Zone Radiant Exchange Algorithm, Override Mode, Number of Timestep In Hour, "
@@ -1488,9 +1475,9 @@ namespace SimulationManager {
         UtilityRoutines::appendPerfLog(state, "Override Mode", currentOverrideModeValue);
         UtilityRoutines::appendPerfLog(state, "Number of Timesteps per Hour", fmt::to_string(state.dataGlobal->NumOfTimeStepInHour));
         UtilityRoutines::appendPerfLog(state, "Minimum Number of Warmup Days", fmt::to_string(DataHeatBalance::MinNumberOfWarmupDays));
-        UtilityRoutines::appendPerfLog(state, "SuppressAllBeginEnvironmentResets", bool_to_string(DataEnvironment::forceBeginEnvResetSuppress));
-        UtilityRoutines::appendPerfLog(state, "Minimum System Timestep", format("{:.1R}", DataConvergParams::MinTimeStepSys * 60.0));
-        UtilityRoutines::appendPerfLog(state, "MaxZoneTempDiff", format("{:.2R}", DataConvergParams::MaxZoneTempDiff));
+        UtilityRoutines::appendPerfLog(state, "SuppressAllBeginEnvironmentResets", bool_to_string(state.dataEnvrn->forceBeginEnvResetSuppress));
+        UtilityRoutines::appendPerfLog(state, "Minimum System Timestep", format("{:.1R}", state.dataConvergeParams->MinTimeStepSys * 60.0));
+        UtilityRoutines::appendPerfLog(state, "MaxZoneTempDiff", format("{:.2R}", state.dataConvergeParams->MaxZoneTempDiff));
         UtilityRoutines::appendPerfLog(state, "MaxAllowedDelTemp", format("{:.4R}", DataHeatBalance::MaxAllowedDelTemp));
     }
 
@@ -2067,8 +2054,6 @@ namespace SimulationManager {
 
         // Using/Aliasing
         using CostEstimateManager::SimCostEstimate;
-        using DataEnvironment::EndMonthFlag;
-        using DataEnvironment::EnvironmentName;
         using ExteriorEnergyUse::ManageExteriorEnergyUse;
 
         using PlantPipingSystemsManager::CheckIfAnyBasements;
@@ -2086,7 +2071,7 @@ namespace SimulationManager {
 
             state.dataGlobal->BeginEnvrnFlag = true;
             state.dataGlobal->EndEnvrnFlag = false;
-            EndMonthFlag = false;
+            state.dataEnvrn->EndMonthFlag = false;
             state.dataGlobal->WarmupFlag = true;
             state.dataGlobal->DayOfSim = 0;
 
@@ -2101,7 +2086,7 @@ namespace SimulationManager {
 
             state.dataGlobal->TimeStep = 1;
 
-            if (DeveloperFlag) DisplayString(state, "Initializing Simulation - timestep 1:" + EnvironmentName);
+            if (DeveloperFlag) DisplayString(state, "Initializing Simulation - timestep 1:" + state.dataEnvrn->EnvironmentName);
 
             state.dataGlobal->BeginTimeStepFlag = true;
 
@@ -2118,7 +2103,7 @@ namespace SimulationManager {
             state.dataGlobal->BeginFullSimFlag = false;
 
             //          ! do another timestep=1
-            if (DeveloperFlag) DisplayString(state, "Initializing Simulation - 2nd timestep 1:" + EnvironmentName);
+            if (DeveloperFlag) DisplayString(state, "Initializing Simulation - 2nd timestep 1:" + state.dataEnvrn->EnvironmentName);
 
             ManageWeather(state);
 
@@ -2132,7 +2117,7 @@ namespace SimulationManager {
             state.dataGlobal->TimeStep = state.dataGlobal->NumOfTimeStepInHour;
             state.dataGlobal->EndEnvrnFlag = true;
 
-            if (DeveloperFlag) DisplayString(state, "Initializing Simulation - hour 24 timestep 1:" + EnvironmentName);
+            if (DeveloperFlag) DisplayString(state, "Initializing Simulation - hour 24 timestep 1:" + state.dataEnvrn->EnvironmentName);
             ManageWeather(state);
 
             ManageExteriorEnergyUse(state);
@@ -3118,13 +3103,10 @@ void Resimulate(EnergyPlusData &state,
     using HVACManager::SimHVAC;
     using RefrigeratedCase::ManageRefrigeratedCaseRacks;
     using ZoneTempPredictorCorrector::ManageZoneAirUpdates;
-    // using HVACManager::CalcAirFlowSimple;
-    using DataContaminantBalance::Contaminant;
     using DataHeatBalance::ZoneAirMassFlow;
     using DataHVACGlobals::UseZoneTimeStepHistory; // , InitDSwithZoneHistory
     using ZoneContaminantPredictorCorrector::ManageZoneContaminanUpdates;
     using namespace ZoneEquipmentManager;
-    // using ZoneEquipmentManager::CalcAirFlowSimple;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 ZoneTempChange(0.0); // Dummy variable needed for calling ManageZoneAirUpdates
@@ -3153,10 +3135,10 @@ void Resimulate(EnergyPlusData &state,
     if (ResimHVAC) {
         // HVAC simulation
         ManageZoneAirUpdates(state, iGetZoneSetPoints, ZoneTempChange, false, UseZoneTimeStepHistory, 0.0);
-        if (Contaminant.SimulateContaminants) ManageZoneContaminanUpdates(state, iGetZoneSetPoints, false, UseZoneTimeStepHistory, 0.0);
+        if (state.dataContaminantBalance->Contaminant.SimulateContaminants) ManageZoneContaminanUpdates(state, iGetZoneSetPoints, false, UseZoneTimeStepHistory, 0.0);
         CalcAirFlowSimple(state, 0, ZoneAirMassFlow.EnforceZoneMassBalance);
         ManageZoneAirUpdates(state, iPredictStep, ZoneTempChange, false, UseZoneTimeStepHistory, 0.0);
-        if (Contaminant.SimulateContaminants) ManageZoneContaminanUpdates(state, iPredictStep, false, UseZoneTimeStepHistory, 0.0);
+        if (state.dataContaminantBalance->Contaminant.SimulateContaminants) ManageZoneContaminanUpdates(state, iPredictStep, false, UseZoneTimeStepHistory, 0.0);
         SimHVAC(state);
 
         ++DemandManagerHVACIterations;

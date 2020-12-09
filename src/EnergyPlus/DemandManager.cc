@@ -1673,7 +1673,6 @@ namespace EnergyPlus::DemandManager {
         // Standard EnergyPlus methodology.
 
         // Using/Aliasing
-        using DataEnvironment::Month;
         using ScheduleManager::GetCurrentScheduleValue;
 
         // Locals
@@ -1688,7 +1687,7 @@ namespace EnergyPlus::DemandManager {
 
         // FLOW:
         if (DemandManagerList(ListNum).BillingSchedule == 0) {
-            BillingPeriod = Month;
+            BillingPeriod = state.dataEnvrn->Month;
         } else {
             BillingPeriod = GetCurrentScheduleValue(state, DemandManagerList(ListNum).BillingSchedule);
         }
@@ -1845,17 +1844,17 @@ namespace EnergyPlus::DemandManager {
 
             } else if (SELECT_CASE_var == ManagerTypeVentilation) {
                 Real64 FlowRate(0);
-                FlowRate = OAGetFlowRate(LoadPtr);
+                FlowRate = OAGetFlowRate(state, LoadPtr);
                 if (Action == CheckCanReduce) {
                     CanReduceDemand = true;
                 } else if (Action == SetLimit) {
                     OASetDemandManagerVentilationState(LoadPtr, true);
                     if (DemandMgr(MgrNum).LimitControl == ManagerLimitFixed) {
-                        OASetDemandManagerVentilationFlow(LoadPtr, DemandMgr(MgrNum).FixedRate);
+                        OASetDemandManagerVentilationFlow(state, LoadPtr, DemandMgr(MgrNum).FixedRate);
                     } else if (DemandMgr(MgrNum).LimitControl == ManagerLimitReductionRatio) {
                         Real64 DemandRate(0);
                         DemandRate = FlowRate * DemandMgr(MgrNum).ReductionRatio;
-                        OASetDemandManagerVentilationFlow(LoadPtr, DemandRate);
+                        OASetDemandManagerVentilationFlow(state, LoadPtr, DemandRate);
                     }
                 } else if (Action == ClearLimit) {
                     OASetDemandManagerVentilationState(LoadPtr, false);

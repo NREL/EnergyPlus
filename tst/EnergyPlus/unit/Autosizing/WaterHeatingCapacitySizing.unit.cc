@@ -58,7 +58,7 @@ namespace EnergyPlus {
 TEST_F(AutoSizingFixture, WaterHeatingCapacitySizingGauntlet)
 {
     // this global state is what would be set up by E+ currently
-    DataEnvironment::StdRhoAir = 1.2;
+    state->dataEnvrn->StdRhoAir = 1.2;
     static std::string const routineName("WaterHeatingCapacitySizingGauntlet");
 
     EnergyPlus::DataSizing::ZoneEqSizing.allocate(1);
@@ -148,7 +148,7 @@ TEST_F(AutoSizingFixture, WaterHeatingCapacitySizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(10286.73, sizedValue, 0.01);
-    EXPECT_NEAR(1.2, DataEnvironment::StdRhoAir, 0.01);
+    EXPECT_NEAR(1.2, state->dataEnvrn->StdRhoAir, 0.01);
     sizer.autoSizedValue = 0.0; // reset for next test
 
     // Test 3 - Zone Equipment, Zone Eq Fan Coil

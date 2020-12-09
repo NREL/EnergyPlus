@@ -138,8 +138,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_CalcOutsideSurfTemp)
     DataSurfaces::Surface(SurfNum).Area = 10.0;
     DataSurfaces::Surface(SurfNum).MaterialMovInsulExt = 1;
 
-    DataEnvironment::SkyTemp = 23.0;
-    DataEnvironment::OutDryBulbTemp = 23.0;
+    state->dataEnvrn->SkyTemp = 23.0;
+    state->dataEnvrn->OutDryBulbTemp = 23.0;
 
     DataHeatBalSurface::QdotRadOutRep.allocate(SurfNum);
     DataHeatBalSurface::QdotRadOutRepPerArea.allocate(SurfNum);
@@ -722,7 +722,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
 
     DataSizing::ZoneEqSizing.allocate(1);
     DataHeatBalance::Zone(1).SystemZoneNodeNumber = 5;
-    DataEnvironment::OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
     DataHeatBalFanSys::MAT.allocate(1); // Zone temperature C
     DataHeatBalFanSys::MAT(1) = 24.0;
     DataHeatBalFanSys::ZoneAirHumRat.allocate(1);
@@ -1258,7 +1258,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
 
     DataSizing::ZoneEqSizing.allocate(1);
     DataHeatBalance::Zone(1).SystemZoneNodeNumber = 5;
-    DataEnvironment::OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
     DataHeatBalFanSys::MAT.allocate(1); // Zone temperature C
     DataHeatBalFanSys::MAT(1) = 24.0;
     DataHeatBalFanSys::ZoneAirHumRat.allocate(1);
@@ -1833,7 +1833,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
 
     DataSizing::ZoneEqSizing.allocate(1);
     DataHeatBalance::Zone(1).SystemZoneNodeNumber = 5;
-    DataEnvironment::OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
     DataHeatBalFanSys::MAT.allocate(1); // Zone temperature C
     DataHeatBalFanSys::MAT(1) = 24.0;
     DataHeatBalFanSys::ZoneAirHumRat.allocate(1);
@@ -2392,7 +2392,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
 
     DataSizing::ZoneEqSizing.allocate(1);
     DataHeatBalance::Zone(1).SystemZoneNodeNumber = 5;
-    DataEnvironment::OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
     DataHeatBalFanSys::MAT.allocate(1); // Zone temperature C
     DataHeatBalFanSys::MAT(1) = 24.0;
     DataHeatBalFanSys::ZoneAirHumRat.allocate(1);
@@ -2543,17 +2543,17 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_OutsideSurfHeatBalanceWhenRa
     DataSurfaces::Surface(1).OutDryBulbTemp = 7.2;
 
     // If Rain Flag = on, GetQdotConvOutRep uses Outdoor Air Wet Bulb Temp.
-    DataEnvironment::IsRain = true;
+    state->dataEnvrn->IsRain = true;
     Real64 ExpectedQconvPerArea1 = -1000 * (6.71793958923051 - 6.66143784594778);
 
-    EXPECT_NEAR(ExpectedQconvPerArea1, GetQdotConvOutRepPerArea(1), 0.01);
+    EXPECT_NEAR(ExpectedQconvPerArea1, GetQdotConvOutRepPerArea(*state, 1), 0.01);
 
     // Otherwise, GetQdotConvOutRep uses Outdoor Air Dry Bulb Temp.
-    DataEnvironment::IsRain = false;
+    state->dataEnvrn->IsRain = false;
     DataHeatBalSurface::HcExtSurf(1) = 5.65361106051348;
     Real64 ExpectedQconvPerArea2 = -5.65361106051348 * (6.71793958923051 - 7.2);
 
-    EXPECT_NEAR(ExpectedQconvPerArea2, GetQdotConvOutRepPerArea(1), 0.01);
+    EXPECT_NEAR(ExpectedQconvPerArea2, GetQdotConvOutRepPerArea(*state, 1), 0.01);
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInterzoneRadFactorCalc)
@@ -2617,12 +2617,12 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     state->dataGlobal->NumOfZones = 1;
     state->dataGlobal->KindOfSim = DataGlobalConstants::KindOfSim::RunPeriodWeather;
     OutputReportTabular::displayThermalResilienceSummary = true;
-    DataEnvironment::Month = 7;
-    DataEnvironment::DayOfMonth = 1;
+    state->dataEnvrn->Month = 7;
+    state->dataEnvrn->DayOfMonth = 1;
 
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->TimeStepZone = 1;
-    DataEnvironment::OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
 
     state->dataGlobal->NumOfZones = 1;
     DataHeatBalance::Zone.allocate(state->dataGlobal->NumOfZones);
@@ -2751,24 +2751,24 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
 
     DataHeatBalFanSys::ZoneCO2LevelHourBins.allocate(state->dataGlobal->NumOfZones);
     DataHeatBalFanSys::ZoneCO2LevelOccuHourBins.allocate(state->dataGlobal->NumOfZones);
-    DataContaminantBalance::ZoneAirCO2Avg.allocate(state->dataGlobal->NumOfZones);
-    DataContaminantBalance::Contaminant.CO2Simulation = true;
+    state->dataContaminantBalance->ZoneAirCO2Avg.allocate(state->dataGlobal->NumOfZones);
+    state->dataContaminantBalance->Contaminant.CO2Simulation = true;
     ScheduleManager::Schedule(1).CurrentValue = 1;
     OutputReportTabular::displayCO2ResilienceSummary = true;
-    DataContaminantBalance::ZoneAirCO2Avg(1) = 1100;
+    state->dataContaminantBalance->ZoneAirCO2Avg(1) = 1100;
     ReportCO2Resilience(*state);
     EXPECT_EQ(1, DataHeatBalFanSys::ZoneCO2LevelHourBins(1)[1]);
     EXPECT_EQ(2, DataHeatBalFanSys::ZoneCO2LevelOccuHourBins(1)[1]);
 
     DataHeatBalFanSys::ZoneLightingLevelHourBins.allocate(state->dataGlobal->NumOfZones);
     DataHeatBalFanSys::ZoneLightingLevelOccuHourBins.allocate(state->dataGlobal->NumOfZones);
-    DataDaylighting::ZoneDaylight.allocate(state->dataGlobal->NumOfZones);
-    DataDaylighting::ZoneDaylight(1).DaylightMethod = DataDaylighting::SplitFluxDaylighting;
-    DataDaylighting::ZoneDaylight(1).DaylIllumAtRefPt.allocate(1);
-    DataDaylighting::ZoneDaylight(1).IllumSetPoint.allocate(1);
-    DataDaylighting::ZoneDaylight(1).ZonePowerReductionFactor = 0.5;
-    DataDaylighting::ZoneDaylight(1).DaylIllumAtRefPt(1) = 300;
-    DataDaylighting::ZoneDaylight(1).IllumSetPoint(1) = 400;
+    state->dataDaylightingData->ZoneDaylight.allocate(state->dataGlobal->NumOfZones);
+    state->dataDaylightingData->ZoneDaylight(1).DaylightMethod = DataDaylighting::iDaylightingMethod::SplitFluxDaylighting;
+    state->dataDaylightingData->ZoneDaylight(1).DaylIllumAtRefPt.allocate(1);
+    state->dataDaylightingData->ZoneDaylight(1).IllumSetPoint.allocate(1);
+    state->dataDaylightingData->ZoneDaylight(1).ZonePowerReductionFactor = 0.5;
+    state->dataDaylightingData->ZoneDaylight(1).DaylIllumAtRefPt(1) = 300;
+    state->dataDaylightingData->ZoneDaylight(1).IllumSetPoint(1) = 400;
     OutputReportTabular::displayVisualResilienceSummary = true;
 
     ReportVisualResilience(*state);
@@ -3105,10 +3105,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBInterzoneWindow)
     // bypass internal solar distribution at night
     DataHeatBalSurface::InterZoneWindow = false;
     DataHeatBalance::ZoneBmSolFrIntWinsRep(1) = 10.0;
-    DataEnvironment::SunIsUp = false;
+    state->dataEnvrn->SunIsUp = false;
     InitIntSolarDistribution(*state);
     EXPECT_EQ(0.0, DataHeatBalance::SurfIntBmIncInsSurfIntensRep(1));
-    DataEnvironment::SunIsUp = true;
+    state->dataEnvrn->SunIsUp = true;
     InitIntSolarDistribution(*state);
     EXPECT_NEAR(1.666667, DataHeatBalance::SurfIntBmIncInsSurfIntensRep(1), 0.00001);
 }

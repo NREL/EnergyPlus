@@ -96,7 +96,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcPerSolarBeamTest)
 
     state->dataGlobal->TimeStep = 1;
     TotSurfaces = 3;
-    MaxBkSurf = 3;
+    state->dataBSDFWindow->MaxBkSurf = 3;
     SurfaceWindow.allocate(TotSurfaces);
     SunlitFracHR.allocate(24, TotSurfaces);
     SunlitFrac.allocate(NumTimeSteps, 24, TotSurfaces);
@@ -105,8 +105,8 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcPerSolarBeamTest)
     CosIncAngHR.allocate(24, TotSurfaces);
     CosIncAng.allocate(NumTimeSteps, 24, TotSurfaces);
     SurfOpaqAO.allocate(TotSurfaces);
-    BackSurfaces.allocate(NumTimeSteps, 24, MaxBkSurf, TotSurfaces);
-    OverlapAreas.allocate(NumTimeSteps, 24, MaxBkSurf, TotSurfaces);
+    BackSurfaces.allocate(NumTimeSteps, 24, state->dataBSDFWindow->MaxBkSurf, TotSurfaces);
+    OverlapAreas.allocate(NumTimeSteps, 24, state->dataBSDFWindow->MaxBkSurf, TotSurfaces);
 
     // Test non-integrated option first, CalcPerSolarBeam should set OutProjSLFracMult and InOutProjSLFracMult to 1.0 for all hours
     for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
@@ -654,8 +654,8 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep)
 
     SolarShading::AllocateModuleArrays(*state);
     SolarShading::DetermineShadowingCombinations(*state);
-    DataEnvironment::DayOfYear_Schedule = 168;
-    DataEnvironment::DayOfWeek = 6;
+    state->dataEnvrn->DayOfYear_Schedule = 168;
+    state->dataEnvrn->DayOfWeek = 6;
     state->dataGlobal->TimeStep = 4;
     state->dataGlobal->HourOfDay = 9;
 
@@ -1050,8 +1050,8 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
 
     SolarShading::AllocateModuleArrays(*state);
     SolarShading::DetermineShadowingCombinations(*state);
-    DataEnvironment::DayOfYear_Schedule = 168;
-    DataEnvironment::DayOfWeek = 6;
+    state->dataEnvrn->DayOfYear_Schedule = 168;
+    state->dataEnvrn->DayOfWeek = 6;
     state->dataGlobal->TimeStep = 4;
     state->dataGlobal->HourOfDay = 9;
     state->dataGlobal->DoingSizing = false;
@@ -1070,9 +1070,9 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
     state->dataSolarShading->CalcSkyDifShading = false;
 
     ScheduleManager::UpdateScheduleValues(*state);
-    DataBSDFWindow::SUNCOSTS(4, 9, 1) = 0.1;
-    DataBSDFWindow::SUNCOSTS(4, 9, 2) = 0.1;
-    DataBSDFWindow::SUNCOSTS(4, 9, 3) = 0.1;
+    state->dataBSDFWindow->SUNCOSTS(4, 9, 1) = 0.1;
+    state->dataBSDFWindow->SUNCOSTS(4, 9, 2) = 0.1;
+    state->dataBSDFWindow->SUNCOSTS(4, 9, 3) = 0.1;
     FigureSolarBeamAtTimestep(*state, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep);
 
     EXPECT_TRUE(DataSystemVariables::shadingMethod == DataSystemVariables::ShadingMethod::Scheduled);
@@ -1835,8 +1835,8 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonClippingDirect)
 
     SolarShading::AllocateModuleArrays(*state);
     SolarShading::DetermineShadowingCombinations(*state);
-    DataEnvironment::DayOfYear_Schedule = 168;
-    DataEnvironment::DayOfWeek = 6;
+    state->dataEnvrn->DayOfYear_Schedule = 168;
+    state->dataEnvrn->DayOfWeek = 6;
     state->dataGlobal->TimeStep = 4;
     state->dataGlobal->HourOfDay = 9;
 

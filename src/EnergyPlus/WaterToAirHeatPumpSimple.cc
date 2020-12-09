@@ -117,8 +117,6 @@ namespace WaterToAirHeatPumpSimple {
     // Using/Aliasing
     using namespace DataLoopNode;
     using namespace DataSizing;
-    using DataEnvironment::OutBaroPress;
-    using DataEnvironment::StdBaroPress;
     using DataHeatBalance::HeatReclaimSimple_WAHPCoil;
     using DataHVACGlobals::ContFanCycCoil;
     using DataHVACGlobals::Cooling;
@@ -991,14 +989,14 @@ namespace WaterToAirHeatPumpSimple {
 
             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).AirMassFlowRate =
                 state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedAirVolFlowRate *
-                PsyRhoAirFnPbTdbW(state, StdBaroPress, Node(AirInletNode).Temp, Node(AirInletNode).HumRat, RoutineName);
+                PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, Node(AirInletNode).Temp, Node(AirInletNode).HumRat, RoutineName);
             // If air flow is less than 25% rated flow. Then set air flow to the 25% of rated conditions
             if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).AirMassFlowRate <
                 0.25 * state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedAirVolFlowRate *
-                    PsyRhoAirFnPbTdbW(state, StdBaroPress, Node(AirInletNode).Temp, Node(AirInletNode).HumRat, RoutineName)) {
+                    PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, Node(AirInletNode).Temp, Node(AirInletNode).HumRat, RoutineName)) {
                 state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).AirMassFlowRate =
                     0.25 * state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedAirVolFlowRate *
-                    PsyRhoAirFnPbTdbW(state, StdBaroPress, Node(AirInletNode).Temp, Node(AirInletNode).HumRat, RoutineName);
+                    PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, Node(AirInletNode).Temp, Node(AirInletNode).HumRat, RoutineName);
             }
             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WaterFlowMode = true;
         } else { // heat pump is off
@@ -1329,7 +1327,7 @@ namespace WaterToAirHeatPumpSimple {
                         SupTemp = min(MixTemp, SupTemp);
                         SupHumRat = min(MixHumRat, SupHumRat);
                         OutTemp = FinalSysSizing(CurSysNum).OutTempAtCoolPeak;
-                        rhoair = PsyRhoAirFnPbTdbW(state, StdBaroPress, MixTemp, MixHumRat, RoutineName);
+                        rhoair = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, MixTemp, MixHumRat, RoutineName);
                         MixEnth = PsyHFnTdbW(MixTemp, MixHumRat);
                         SupEnth = PsyHFnTdbW(SupTemp, SupHumRat);
                         TotalCapCoeff1 = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).TotalCoolCap1;
@@ -1362,7 +1360,7 @@ namespace WaterToAirHeatPumpSimple {
                         }
                         CoolCapAtPeak = (rhoair * VolFlowRate * (MixEnth - SupEnth)) + FanCoolLoad;
                         CoolCapAtPeak = max(0.0, CoolCapAtPeak);
-                        MixWetBulb = PsyTwbFnTdbWPb(state, MixTemp, MixHumRat, StdBaroPress, RoutineName);
+                        MixWetBulb = PsyTwbFnTdbWPb(state, MixTemp, MixHumRat, state.dataEnvrn->StdBaroPress, RoutineName);
                         ratioTWB = (MixWetBulb + 273.15) / 283.15;
                         // rated condenser water inlet temperature of 85F
                         ratioTS = (((85.0 - 32.0) / 1.8) + 273.15) / 283.15;
@@ -1419,7 +1417,7 @@ namespace WaterToAirHeatPumpSimple {
                         } else {
                             OutTemp = 0.0;
                         }
-                        rhoair = PsyRhoAirFnPbTdbW(state, StdBaroPress, MixTemp, MixHumRat, RoutineName);
+                        rhoair = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, MixTemp, MixHumRat, RoutineName);
                         MixEnth = PsyHFnTdbW(MixTemp, MixHumRat);
                         SupEnth = PsyHFnTdbW(SupTemp, SupHumRat);
                         TotalCapCoeff1 = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).TotalCoolCap1;
@@ -1451,7 +1449,7 @@ namespace WaterToAirHeatPumpSimple {
                         }
                         CoolCapAtPeak = (rhoair * VolFlowRate * (MixEnth - SupEnth)) + FanCoolLoad;
                         CoolCapAtPeak = max(0.0, CoolCapAtPeak);
-                        MixWetBulb = PsyTwbFnTdbWPb(state, MixTemp, MixHumRat, StdBaroPress, RoutineName);
+                        MixWetBulb = PsyTwbFnTdbWPb(state, MixTemp, MixHumRat, state.dataEnvrn->StdBaroPress, RoutineName);
                         ratioTWB = (MixWetBulb + 273.15) / 283.15;
                         // rated condenser water inlet temperature of 85F
                         ratioTS = (((85.0 - 32.0) / 1.8) + 273.15) / 283.15;
@@ -1521,7 +1519,7 @@ namespace WaterToAirHeatPumpSimple {
                         SupTemp = min(MixTemp, SupTemp);
                         SupHumRat = min(MixHumRat, SupHumRat);
                         OutTemp = FinalSysSizing(CurSysNum).OutTempAtCoolPeak;
-                        rhoair = PsyRhoAirFnPbTdbW(state, StdBaroPress, MixTemp, MixHumRat, RoutineName);
+                        rhoair = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, MixTemp, MixHumRat, RoutineName);
                         MixEnth = PsyHFnTdbW(MixTemp, MixHumRat);
                         SupEnth = PsyHFnTdbW(SupTemp, MixHumRat);
                         SensCapCoeff1 = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).SensCoolCap1;
@@ -1558,7 +1556,7 @@ namespace WaterToAirHeatPumpSimple {
                         // it was calculated using m.cp.dT
                         SensCapAtPeak = (rhoair * VolFlowRate * (MixEnth - SupEnth)) + FanCoolLoad;
                         SensCapAtPeak = max(0.0, SensCapAtPeak);
-                        MixWetBulb = PsyTwbFnTdbWPb(state, MixTemp, MixHumRat, StdBaroPress, RoutineName);
+                        MixWetBulb = PsyTwbFnTdbWPb(state, MixTemp, MixHumRat, state.dataEnvrn->StdBaroPress, RoutineName);
                         ratioTDB = (MixTemp + 273.15) / 283.15;
                         ratioTWB = (MixWetBulb + 273.15) / 283.15;
                         // rated condenser water inlet temperature of 85F
@@ -1608,7 +1606,7 @@ namespace WaterToAirHeatPumpSimple {
                         } else {
                             OutTemp = 0.0;
                         }
-                        rhoair = PsyRhoAirFnPbTdbW(state, StdBaroPress, MixTemp, MixHumRat, RoutineName);
+                        rhoair = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, MixTemp, MixHumRat, RoutineName);
                         MixEnth = PsyHFnTdbW(MixTemp, MixHumRat);
                         SupEnth = PsyHFnTdbW(SupTemp, MixHumRat);
                         SensCapCoeff1 = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).SensCoolCap1;
@@ -1645,7 +1643,7 @@ namespace WaterToAirHeatPumpSimple {
                         // it was calculated using m.cp.dT
                         SensCapAtPeak = (rhoair * VolFlowRate * (MixEnth - SupEnth)) + FanCoolLoad;
                         SensCapAtPeak = max(0.0, SensCapAtPeak);
-                        MixWetBulb = PsyTwbFnTdbWPb(state, MixTemp, MixHumRat, StdBaroPress, RoutineName);
+                        MixWetBulb = PsyTwbFnTdbWPb(state, MixTemp, MixHumRat, state.dataEnvrn->StdBaroPress, RoutineName);
                         ratioTDB = (MixTemp + 273.15) / 283.15;
                         ratioTWB = (MixWetBulb + 273.15) / 283.15;
                         // rated condenser water inlet temperature of 85F
@@ -2181,7 +2179,7 @@ namespace WaterToAirHeatPumpSimple {
             CpAir_Init = PsyCpAirFnW(LoadSideInletHumRat_Init);
             state.dataWaterToAirHeatPumpSimple->firstTime = false;
         }
-        LoadSideInletWBTemp_Init = PsyTwbFnTdbWPb(state, LoadSideInletDBTemp_Init, LoadSideInletHumRat_Init, OutBaroPress, RoutineName);
+        LoadSideInletWBTemp_Init = PsyTwbFnTdbWPb(state, LoadSideInletDBTemp_Init, LoadSideInletHumRat_Init, state.dataEnvrn->OutBaroPress, RoutineName);
 
         //  LOAD LOCAL VARIABLES FROM DATA STRUCTURE (for code readability)
 
@@ -2248,7 +2246,7 @@ namespace WaterToAirHeatPumpSimple {
         // Set indoor air conditions to the actual condition
         LoadSideInletDBTemp_Unit = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).InletAirDBTemp;
         LoadSideInletHumRat_Unit = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).InletAirHumRat;
-        LoadSideInletWBTemp_Unit = PsyTwbFnTdbWPb(state, LoadSideInletDBTemp_Unit, LoadSideInletHumRat_Unit, OutBaroPress, RoutineName);
+        LoadSideInletWBTemp_Unit = PsyTwbFnTdbWPb(state, LoadSideInletDBTemp_Unit, LoadSideInletHumRat_Unit, state.dataEnvrn->OutBaroPress, RoutineName);
         LoadSideInletEnth_Unit = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).InletAirEnthalpy;
         CpAir_Unit = PsyCpAirFnW(LoadSideInletHumRat_Unit);
 
@@ -2274,7 +2272,7 @@ namespace WaterToAirHeatPumpSimple {
             ratioTWB = ((state.dataWaterToAirHeatPumpSimple->LoadSideInletWBTemp + state.dataWaterToAirHeatPumpSimple->CelsiustoKelvin) / Tref);
             ratioTS = ((state.dataWaterToAirHeatPumpSimple->SourceSideInletTemp + state.dataWaterToAirHeatPumpSimple->CelsiustoKelvin) / Tref);
             ratioVL = (state.dataWaterToAirHeatPumpSimple->LoadSideMassFlowRate /
-                       (AirVolFlowRateRated * PsyRhoAirFnPbTdbW(state, StdBaroPress, state.dataWaterToAirHeatPumpSimple->LoadSideInletDBTemp, state.dataWaterToAirHeatPumpSimple->LoadSideInletHumRat, RoutineName)));
+                       (AirVolFlowRateRated * PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, state.dataWaterToAirHeatPumpSimple->LoadSideInletDBTemp, state.dataWaterToAirHeatPumpSimple->LoadSideInletHumRat, RoutineName)));
 
             if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).DesignWaterMassFlowRate > 0.0) {
                 ratioVS = (state.dataWaterToAirHeatPumpSimple->SourceSideMassFlowRate) / (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).DesignWaterMassFlowRate);
@@ -2518,7 +2516,7 @@ namespace WaterToAirHeatPumpSimple {
         state.dataWaterToAirHeatPumpSimple->LoadSideInletDBTemp = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).InletAirDBTemp;
         state.dataWaterToAirHeatPumpSimple->LoadSideInletHumRat = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).InletAirHumRat;
 
-        state.dataWaterToAirHeatPumpSimple->LoadSideInletWBTemp = PsyTwbFnTdbWPb(state, state.dataWaterToAirHeatPumpSimple->LoadSideInletDBTemp, state.dataWaterToAirHeatPumpSimple->LoadSideInletHumRat, OutBaroPress, RoutineName);
+        state.dataWaterToAirHeatPumpSimple->LoadSideInletWBTemp = PsyTwbFnTdbWPb(state, state.dataWaterToAirHeatPumpSimple->LoadSideInletDBTemp, state.dataWaterToAirHeatPumpSimple->LoadSideInletHumRat, state.dataEnvrn->OutBaroPress, RoutineName);
         state.dataWaterToAirHeatPumpSimple->LoadSideInletEnth = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).InletAirEnthalpy;
         CpAir = PsyCpAirFnW(state.dataWaterToAirHeatPumpSimple->LoadSideInletHumRat);
         state.dataWaterToAirHeatPumpSimple->SourceSideMassFlowRate = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WaterMassFlowRate;
@@ -2545,7 +2543,7 @@ namespace WaterToAirHeatPumpSimple {
         ratioTDB = ((state.dataWaterToAirHeatPumpSimple->LoadSideInletDBTemp + state.dataWaterToAirHeatPumpSimple->CelsiustoKelvin) / Tref);
         ratioTS = ((state.dataWaterToAirHeatPumpSimple->SourceSideInletTemp + state.dataWaterToAirHeatPumpSimple->CelsiustoKelvin) / Tref);
         ratioVL =
-            (state.dataWaterToAirHeatPumpSimple->LoadSideMassFlowRate / (AirVolFlowRateRated * PsyRhoAirFnPbTdbW(state, StdBaroPress, state.dataWaterToAirHeatPumpSimple->LoadSideInletDBTemp, state.dataWaterToAirHeatPumpSimple->LoadSideInletHumRat, RoutineName)));
+            (state.dataWaterToAirHeatPumpSimple->LoadSideMassFlowRate / (AirVolFlowRateRated * PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, state.dataWaterToAirHeatPumpSimple->LoadSideInletDBTemp, state.dataWaterToAirHeatPumpSimple->LoadSideInletHumRat, RoutineName)));
         if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).DesignWaterMassFlowRate > 0.0) {
             ratioVS = (state.dataWaterToAirHeatPumpSimple->SourceSideMassFlowRate) / (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).DesignWaterMassFlowRate);
         } else {
@@ -2662,7 +2660,6 @@ namespace WaterToAirHeatPumpSimple {
         // na
 
         // Using/Aliasing
-        using DataContaminantBalance::Contaminant;
         using DataHVACGlobals::TimeStepSys;
         using PlantUtilities::SafeCopyPlantNode;
 
@@ -2742,10 +2739,10 @@ namespace WaterToAirHeatPumpSimple {
         state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).EnergyLatent = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).QLatent * ReportingConstant;
         state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).EnergySource = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).QSource * ReportingConstant;
 
-        if (Contaminant.CO2Simulation) {
+        if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
             Node(AirOutletNode).CO2 = Node(AirInletNode).CO2;
         }
-        if (Contaminant.GenericContamSimulation) {
+        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
             Node(AirOutletNode).GenContam = Node(AirInletNode).GenContam;
         }
 

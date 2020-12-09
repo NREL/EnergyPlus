@@ -133,7 +133,7 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc)
 
     // Set up conditions
     state->dataGlobal->TimeStepZone = 0.25;
-    DataEnvironment::OutBaroPress = 101325.;
+    state->dataEnvrn->OutBaroPress = 101325.;
     DataMoistureBalanceEMPD::RVSurface(1) = 0.007077173214149593;
     DataMoistureBalanceEMPD::RVSurfaceOld(1) = DataMoistureBalanceEMPD::RVSurface(1);
     DataMoistureBalance::HMassConvInFD(1) = 0.0016826898264131584;
@@ -259,7 +259,7 @@ TEST_F(EnergyPlusFixture, EMPDRcoating)
 
     // Set up conditions
     state->dataGlobal->TimeStepZone = 0.25;
-    DataEnvironment::OutBaroPress = 101325.;
+    state->dataEnvrn->OutBaroPress = 101325.;
     DataMoistureBalanceEMPD::RVSurface(1) = 0.007077173214149593;
     DataMoistureBalanceEMPD::RVSurfaceOld(1) = DataMoistureBalanceEMPD::RVSurface(1);
     DataMoistureBalance::HMassConvInFD(1) = 0.0016826898264131584;
@@ -351,7 +351,7 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc_Slope)
 
     // Set up conditions
     state->dataGlobal->TimeStepZone = 0.25;
-    DataEnvironment::OutBaroPress = 101325.;
+    state->dataEnvrn->OutBaroPress = 101325.;
     DataMoistureBalanceEMPD::RVSurface(surfNum) = 0.0070277983586713262;
     DataMoistureBalanceEMPD::RVSurfaceOld(surfNum) = DataMoistureBalanceEMPD::RVSurface( surfNum );
     DataMoistureBalance::HMassConvInFD(surfNum) = 0.0016826898264131584;

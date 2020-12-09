@@ -324,7 +324,7 @@ void CoilCoolingDXCurveFitPerformance::calculate(EnergyPlus::EnergyPlusData &sta
     Real64 reportingConstant = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
 
     // calculate crankcase heater operation
-    if (DataEnvironment::OutDryBulbTemp < this->maxOutdoorDrybulbForBasin) {
+    if (state.dataEnvrn->OutDryBulbTemp < this->maxOutdoorDrybulbForBasin) {
         this->crankcaseHeaterPower = this->crankcaseHeaterCap;
     } else {
         this->crankcaseHeaterPower = 0.0;
@@ -336,12 +336,12 @@ void CoilCoolingDXCurveFitPerformance::calculate(EnergyPlus::EnergyPlusData &sta
     if (this->evapCondBasinHeatSchedulIndex > 0) {
         Real64 currentBasinHeaterAvail = ScheduleManager::GetCurrentScheduleValue(state, this->evapCondBasinHeatSchedulIndex);
         if (this->evapCondBasinHeatCap > 0.0 && currentBasinHeaterAvail > 0.0) {
-            this->basinHeaterPower = max(0.0, this->evapCondBasinHeatCap * (this->evapCondBasinHeatSetpoint - DataEnvironment::OutDryBulbTemp));
+            this->basinHeaterPower = max(0.0, this->evapCondBasinHeatCap * (this->evapCondBasinHeatSetpoint - state.dataEnvrn->OutDryBulbTemp));
         }
     } else {
         // If schedule does not exist, basin heater operates anytime outdoor dry-bulb temp is below setpoint
         if (this->evapCondBasinHeatCap > 0.0) {
-            this->basinHeaterPower = max(0.0, this->evapCondBasinHeatCap * (this->evapCondBasinHeatSetpoint - DataEnvironment::OutDryBulbTemp));
+            this->basinHeaterPower = max(0.0, this->evapCondBasinHeatCap * (this->evapCondBasinHeatSetpoint - state.dataEnvrn->OutDryBulbTemp));
         }
     }
     this->basinHeaterPower *= (1.0 - this->RTF);
@@ -438,7 +438,7 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(EnergyPlus::EnergyPlu
             DataLoopNode::Node(fanOutletNode).MassFlowRate = this->normalMode.ratedEvapAirFlowRate;
             DataLoopNode::Node(fanInletNode).Temp = CoolingCoilInletAirDryBulbTempRated;
             DataLoopNode::Node(fanInletNode).HumRat = Psychrometrics::PsyWFnTdbTwbPb(state,
-                CoolingCoilInletAirDryBulbTempRated, CoolingCoilInletAirWetBulbTempRated, DataEnvironment::OutBaroPress, RoutineName);
+                CoolingCoilInletAirDryBulbTempRated, CoolingCoilInletAirWetBulbTempRated, state.dataEnvrn->OutBaroPress, RoutineName);
             DataLoopNode::Node(fanInletNode).Enthalpy =
                 Psychrometrics::PsyHFnTdbW(CoolingCoilInletAirDryBulbTempRated, DataLoopNode::Node(fanInletNode).HumRat);
             if (supplyFanType == DataHVACGlobals::FanType_SystemModelObject) {
@@ -502,7 +502,7 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(EnergyPlus::EnergyPlu
     evapInlet.MassFlowRate = this->normalMode.ratedEvapAirMassFlowRate;
     evapInlet.MassFlowRateMax = this->normalMode.ratedEvapAirMassFlowRate;
     evapInlet.Temp = 26.7;
-    evapInlet.HumRat = Psychrometrics::PsyWFnTdbTwbPb(state, 26.7, 19.4, DataEnvironment::OutBaroPress, RoutineName);
+    evapInlet.HumRat = Psychrometrics::PsyWFnTdbTwbPb(state, 26.7, 19.4, state.dataEnvrn->OutBaroPress, RoutineName);
     evapInlet.Enthalpy = Psychrometrics::PsyHFnTdbW(26.7, evapInlet.HumRat);
     condInlet.Temp = OutdoorUnitInletAirDryBulbTempRated;
     int speedNum = 1;
@@ -517,11 +517,11 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(EnergyPlus::EnergyPlu
     for (int PartLoadTestPoint = 1; PartLoadTestPoint <= 3; ++PartLoadTestPoint) {
         // determine minimum unloading capacity fraction at point B conditions.
         Real64 heldOutdoorDB =
-            DataEnvironment::OutDryBulbTemp; // TODO: Ugly, shared, potential race condition, blah. Shouldn't we just get from the condInletNode!?
+            state.dataEnvrn->OutDryBulbTemp; // TODO: Ugly, shared, potential race condition, blah. Shouldn't we just get from the condInletNode!?
         if (condInletNodeIndex != 0) {
             DataLoopNode::Node(condInletNodeIndex).Temp = OutdoorUnitInletAirDryBulbTempPLTestPoint[PartLoadTestPoint - 1];
         } else {
-            DataEnvironment::OutDryBulbTemp = OutdoorUnitInletAirDryBulbTempPLTestPoint[PartLoadTestPoint - 1];
+            state.dataEnvrn->OutDryBulbTemp = OutdoorUnitInletAirDryBulbTempPLTestPoint[PartLoadTestPoint - 1];
         }
 
         Real64 TargetNetCapacity = NetCapacityFactorPLTestPoint[PartLoadTestPoint - 1] * NetCoolingCapRated;
@@ -565,7 +565,7 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(EnergyPlus::EnergyPlu
                            par);
 
         // reset outdoor dry bulb, this is gross
-        DataEnvironment::OutDryBulbTemp = heldOutdoorDB;
+        state.dataEnvrn->OutDryBulbTemp = heldOutdoorDB;
 
         if (SolverFlag == -1) {
             ShowWarningError(state, "CalcTwoSpeedDXCoilStandardRating: air flow rate solver failed. Iteration limit exceeded ");
@@ -586,7 +586,7 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(EnergyPlus::EnergyPlu
             SupAirMdot_TestPoint[PartLoadTestPoint] = PartLoadAirMassFlowRate;
             Real64 AirMassFlowRatio = PartLoadAirMassFlowRate / this->normalMode.ratedEvapAirMassFlowRate;
             Real64 const SupplyAirHumRat = Psychrometrics::PsyWFnTdbTwbPb(state,
-                CoolingCoilInletAirDryBulbTempRated, CoolingCoilInletAirWetBulbTempRated, DataEnvironment::OutBaroPress, RoutineName);
+                CoolingCoilInletAirDryBulbTempRated, CoolingCoilInletAirWetBulbTempRated, state.dataEnvrn->OutBaroPress, RoutineName);
 
             if (this->unitStatic > 0.0) {
                 FanStaticPressureRise = this->unitStatic + (ExternalStatic * pow_2(AirMassFlowRatio));
@@ -841,9 +841,9 @@ CoilCoolingDXCurveFitPerformance::calcIEERResidual(EnergyPlus::EnergyPlusData &s
         AirMassFlowRatio = 0.0;
     }
     Real64 const SupplyAirHumRat =
-        Psychrometrics::PsyWFnTdbTwbPb(state, IndoorUnitInletDryBulb, IndoorUnitInletWetBulb, DataEnvironment::OutBaroPress, RoutineName);
+        Psychrometrics::PsyWFnTdbTwbPb(state, IndoorUnitInletDryBulb, IndoorUnitInletWetBulb, state.dataEnvrn->OutBaroPress, RoutineName);
     Real64 const SupplyAirRho =
-        Psychrometrics::PsyRhoAirFnPbTdbW(state, DataEnvironment::OutBaroPress, IndoorUnitInletDryBulb, SupplyAirHumRat, RoutineName);
+        Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, IndoorUnitInletDryBulb, SupplyAirHumRat, RoutineName);
 
     SupplyAirVolFlowRate = SupplyAirMassFlowRate / SupplyAirRho;
 
@@ -854,7 +854,7 @@ CoilCoolingDXCurveFitPerformance::calcIEERResidual(EnergyPlus::EnergyPlusData &s
         DataLoopNode::Node(FanOutletNodeNum).MassFlowRate = SupplyAirMassFlowRate;
         DataLoopNode::Node(FanInletNodeNum).Temp = IndoorUnitInletDryBulb;
         DataLoopNode::Node(FanInletNodeNum).HumRat =
-            Psychrometrics::PsyWFnTdbTwbPb(state, IndoorUnitInletDryBulb, IndoorUnitInletWetBulb, DataEnvironment::OutBaroPress, RoutineName);
+            Psychrometrics::PsyWFnTdbTwbPb(state, IndoorUnitInletDryBulb, IndoorUnitInletWetBulb, state.dataEnvrn->OutBaroPress, RoutineName);
         DataLoopNode::Node(FanInletNodeNum).Enthalpy = Psychrometrics::PsyHFnTdbW(IndoorUnitInletDryBulb, DataLoopNode::Node(FanInletNodeNum).HumRat);
         if (supplyFanTypeNum == DataHVACGlobals::FanType_SystemModelObject) {
             HVACFan::fanObjs[supplyFanIndex]->simulate(state, _, true, false, FanStaticPressureRise);
@@ -894,7 +894,7 @@ CoilCoolingDXCurveFitPerformance::calcIEERResidual(EnergyPlus::EnergyPlusData &s
     evapInlet.MassFlowRate = SupplyAirMassFlowRate;
     evapInlet.MassFlowRateMax = SupplyAirMassFlowRate;
     evapInlet.Temp = 26.7;
-    evapInlet.HumRat = Psychrometrics::PsyWFnTdbTwbPb(state, 26.7, 19.4, DataEnvironment::OutBaroPress, RoutineName);
+    evapInlet.HumRat = Psychrometrics::PsyWFnTdbTwbPb(state, 26.7, 19.4, state.dataEnvrn->OutBaroPress, RoutineName);
     evapInlet.Enthalpy = Psychrometrics::PsyHFnTdbW(26.7, evapInlet.HumRat);
     int speedNum = (int)this->normalMode.speeds.size();
     int fanOpMode = DataHVACGlobals::CycFanCycCoil;

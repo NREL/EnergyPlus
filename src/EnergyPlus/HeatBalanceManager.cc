@@ -148,15 +148,6 @@ namespace HeatBalanceManager {
     using namespace DataHeatBalSurface;
     using namespace DataRoomAirModel;
     using namespace DataIPShortCuts;
-    using DataContaminantBalance::Contaminant;
-    using DataContaminantBalance::OutdoorCO2;
-    using DataContaminantBalance::OutdoorGC;
-    using DataContaminantBalance::ZoneAirCO2;
-    using DataContaminantBalance::ZoneAirCO2Avg;
-    using DataContaminantBalance::ZoneAirCO2Temp;
-    using DataContaminantBalance::ZoneAirGC;
-    using DataContaminantBalance::ZoneAirGCAvg;
-    using DataContaminantBalance::ZoneAirGCTemp;
     using DataSurfaces::CalcSolRefl;
     using DataSurfaces::DividedLite;
     using DataSurfaces::FrameDivider;
@@ -746,29 +737,29 @@ namespace HeatBalanceManager {
             BuildingAzimuth = mod(BuildingNumbers(1), 360.0);
             // Terrain
             if (AlphaName(2) == "COUNTRY" || AlphaName(2) == "1") {
-                SiteWindExp = 0.14;
-                SiteWindBLHeight = 270.0;
+                state.dataEnvrn->SiteWindExp = 0.14;
+                state.dataEnvrn->SiteWindBLHeight = 270.0;
                 AlphaName(2) = "Country";
             } else if (AlphaName(2) == "SUBURBS" || AlphaName(2) == "2" || AlphaName(2) == "SUBURB") {
-                SiteWindExp = 0.22;
-                SiteWindBLHeight = 370.0;
+                state.dataEnvrn->SiteWindExp = 0.22;
+                state.dataEnvrn->SiteWindBLHeight = 370.0;
                 AlphaName(2) = "Suburbs";
             } else if (AlphaName(2) == "CITY" || AlphaName(2) == "3") {
-                SiteWindExp = 0.33;
-                SiteWindBLHeight = 460.0;
+                state.dataEnvrn->SiteWindExp = 0.33;
+                state.dataEnvrn->SiteWindBLHeight = 460.0;
                 AlphaName(2) = "City";
             } else if (AlphaName(2) == "OCEAN") {
-                SiteWindExp = 0.10;
-                SiteWindBLHeight = 210.0;
+                state.dataEnvrn->SiteWindExp = 0.10;
+                state.dataEnvrn->SiteWindBLHeight = 210.0;
                 AlphaName(2) = "Ocean";
             } else if (AlphaName(2) == "URBAN") {
-                SiteWindExp = 0.22;
-                SiteWindBLHeight = 370.0;
+                state.dataEnvrn->SiteWindExp = 0.22;
+                state.dataEnvrn->SiteWindBLHeight = 370.0;
                 AlphaName(2) = "Urban";
             } else {
                 ShowSevereError(state, RoutineName + CurrentModuleObject + ": " + cAlphaFieldNames(2) + " invalid=" + AlphaName(2));
-                SiteWindExp = 0.14;
-                SiteWindBLHeight = 270.0;
+                state.dataEnvrn->SiteWindExp = 0.14;
+                state.dataEnvrn->SiteWindBLHeight = 270.0;
                 AlphaName(2) = AlphaName(2) + "-invalid";
                 ErrorsFound = true;
             }
@@ -1180,25 +1171,25 @@ namespace HeatBalanceManager {
                 {
                     auto const SELECT_CASE_var(AlphaName(1));
                     if (SELECT_CASE_var == "YES") {
-                        Contaminant.CO2Simulation = true;
-                        Contaminant.SimulateContaminants = true;
+                        state.dataContaminantBalance->Contaminant.CO2Simulation = true;
+                        state.dataContaminantBalance->Contaminant.SimulateContaminants = true;
                     } else if (SELECT_CASE_var == "NO") {
-                        Contaminant.CO2Simulation = false;
+                        state.dataContaminantBalance->Contaminant.CO2Simulation = false;
                     } else {
-                        Contaminant.CO2Simulation = false;
+                        state.dataContaminantBalance->Contaminant.CO2Simulation = false;
                         AlphaName(1) = "NO";
                         ShowWarningError(state, CurrentModuleObject + ": Invalid input of " + cAlphaFieldNames(1) + ". The default choice is assigned = NO");
                     }
                 }
             }
-            if (NumAlpha == 1 && Contaminant.CO2Simulation) {
-                if (Contaminant.CO2Simulation) {
+            if (NumAlpha == 1 && state.dataContaminantBalance->Contaminant.CO2Simulation) {
+                if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
                     ShowSevereError(state, CurrentModuleObject + ", " + cAlphaFieldNames(2) + " is required and not given.");
                     ErrorsFound = true;
                 }
-            } else if (NumAlpha > 1 && Contaminant.CO2Simulation) {
-                Contaminant.CO2OutdoorSchedPtr = GetScheduleIndex(state, AlphaName(2));
-                if (Contaminant.CO2OutdoorSchedPtr == 0) {
+            } else if (NumAlpha > 1 && state.dataContaminantBalance->Contaminant.CO2Simulation) {
+                state.dataContaminantBalance->Contaminant.CO2OutdoorSchedPtr = GetScheduleIndex(state, AlphaName(2));
+                if (state.dataContaminantBalance->Contaminant.CO2OutdoorSchedPtr == 0) {
                     ShowSevereError(state, CurrentModuleObject + ", " + cAlphaFieldNames(2) + " not found: " + AlphaName(2));
                     ErrorsFound = true;
                 }
@@ -1207,33 +1198,33 @@ namespace HeatBalanceManager {
                 {
                     auto const SELECT_CASE_var(AlphaName(3));
                     if (SELECT_CASE_var == "YES") {
-                        Contaminant.GenericContamSimulation = true;
-                        if (!Contaminant.CO2Simulation) Contaminant.SimulateContaminants = true;
+                        state.dataContaminantBalance->Contaminant.GenericContamSimulation = true;
+                        if (!state.dataContaminantBalance->Contaminant.CO2Simulation) state.dataContaminantBalance->Contaminant.SimulateContaminants = true;
                     } else if (SELECT_CASE_var == "NO") {
-                        Contaminant.GenericContamSimulation = false;
+                        state.dataContaminantBalance->Contaminant.GenericContamSimulation = false;
                     } else {
-                        Contaminant.GenericContamSimulation = false;
+                        state.dataContaminantBalance->Contaminant.GenericContamSimulation = false;
                         AlphaName(3) = "NO";
                         ShowWarningError(state, CurrentModuleObject + ": Invalid input of " + cAlphaFieldNames(3) + ". The default choice is assigned = NO");
                     }
                 }
-                if (NumAlpha == 3 && Contaminant.GenericContamSimulation) {
-                    if (Contaminant.GenericContamSimulation) {
+                if (NumAlpha == 3 && state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
+                    if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
                         ShowSevereError(state, CurrentModuleObject + ", " + cAlphaFieldNames(4) + " is required and not given.");
                         ErrorsFound = true;
                     }
-                } else if (NumAlpha > 3 && Contaminant.GenericContamSimulation) {
-                    Contaminant.GenericContamOutdoorSchedPtr = GetScheduleIndex(state, AlphaName(4));
-                    if (Contaminant.GenericContamOutdoorSchedPtr == 0) {
+                } else if (NumAlpha > 3 && state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
+                    state.dataContaminantBalance->Contaminant.GenericContamOutdoorSchedPtr = GetScheduleIndex(state, AlphaName(4));
+                    if (state.dataContaminantBalance->Contaminant.GenericContamOutdoorSchedPtr == 0) {
                         ShowSevereError(state, CurrentModuleObject + ", " + cAlphaFieldNames(4) + " not found: " + AlphaName(4));
                         ErrorsFound = true;
                     }
                 }
             }
         } else {
-            Contaminant.SimulateContaminants = false;
-            Contaminant.CO2Simulation = false;
-            Contaminant.GenericContamSimulation = false;
+            state.dataContaminantBalance->Contaminant.SimulateContaminants = false;
+            state.dataContaminantBalance->Contaminant.CO2Simulation = false;
+            state.dataContaminantBalance->Contaminant.GenericContamSimulation = false;
             AlphaName(1) = "NO";
             AlphaName(3) = "NO";
         }
@@ -1244,7 +1235,7 @@ namespace HeatBalanceManager {
             "! <Zone Air Carbon Dioxide Balance Simulation>, Simulation {{Yes/No}}, Carbon Dioxide Concentration\n");
         print(state.files.eio, Format_728);
         static constexpr auto Format_730(" Zone Air Carbon Dioxide Balance Simulation, {},{}\n");
-        if (Contaminant.SimulateContaminants && Contaminant.CO2Simulation) {
+        if (state.dataContaminantBalance->Contaminant.SimulateContaminants && state.dataContaminantBalance->Contaminant.CO2Simulation) {
             print(state.files.eio, Format_730, "Yes", AlphaName(1));
         } else {
             print(state.files.eio, Format_730, "No", "N/A");
@@ -1254,7 +1245,7 @@ namespace HeatBalanceManager {
             "! <Zone Air Generic Contaminant Balance Simulation>, Simulation {{Yes/No}}, Generic Contaminant Concentration\n");
         static constexpr auto Format_731(" Zone Air Generic Contaminant Balance Simulation, {},{}\n");
         print(state.files.eio, Format_729);
-        if (Contaminant.SimulateContaminants && Contaminant.GenericContamSimulation) {
+        if (state.dataContaminantBalance->Contaminant.SimulateContaminants && state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
             print(state.files.eio, Format_731, "Yes", AlphaName(3));
         } else {
             print(state.files.eio, Format_731, "No", "N/A");
@@ -1302,12 +1293,12 @@ namespace HeatBalanceManager {
                         ZoneAirMassFlow.InfiltrationTreatment = AddInfiltrationFlow;
                         ZoneAirMassFlow.EnforceZoneMassBalance = true;
                         AlphaName(2) = "AddInfiltrationFlow";
-                        if (!Contaminant.CO2Simulation) Contaminant.SimulateContaminants = true;
+                        if (!state.dataContaminantBalance->Contaminant.CO2Simulation) state.dataContaminantBalance->Contaminant.SimulateContaminants = true;
                     } else if (SELECT_CASE_var == "ADJUSTINFILTRATIONFLOW") {
                         ZoneAirMassFlow.InfiltrationTreatment = AdjustInfiltrationFlow;
                         ZoneAirMassFlow.EnforceZoneMassBalance = true;
                         AlphaName(2) = "AddInfiltrationFlow";
-                        if (!Contaminant.CO2Simulation) Contaminant.SimulateContaminants = true;
+                        if (!state.dataContaminantBalance->Contaminant.CO2Simulation) state.dataContaminantBalance->Contaminant.SimulateContaminants = true;
                     } else if (SELECT_CASE_var == "NONE") {
                         ZoneAirMassFlow.InfiltrationTreatment = NoInfiltrationFlow;
                         AlphaName(2) = "None";
@@ -1462,9 +1453,9 @@ namespace HeatBalanceManager {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
 
-            if (NumNums > 0) SiteWindExp = NumArray(1);
-            if (NumNums > 1) SiteWindBLHeight = NumArray(2);
-            if (NumNums > 2) SiteTempGradient = NumArray(3);
+            if (NumNums > 0) state.dataEnvrn->SiteWindExp = NumArray(1);
+            if (NumNums > 1) state.dataEnvrn->SiteWindBLHeight = NumArray(2);
+            if (NumNums > 2) state.dataEnvrn->SiteTempGradient = NumArray(3);
 
         } else if (NumObjects > 1) {
             ShowSevereError(state, "Too many " + CurrentModuleObject + " objects, only 1 allowed.");
@@ -1475,7 +1466,7 @@ namespace HeatBalanceManager {
             // be overridden by a Site Atmospheric Variation Object.
             // SiteWindExp = 0.22
             // SiteWindBLHeight = 370.0
-            SiteTempGradient = 0.0065;
+            state.dataEnvrn->SiteTempGradient = 0.0065;
         }
 
         // Write to the initialization output file
@@ -1483,7 +1474,7 @@ namespace HeatBalanceManager {
             "! <Environment:Site Atmospheric Variation>,Wind Speed Profile Exponent {{}},Wind Speed Profile Boundary "
             "Layer Thickness {{m}},Air Temperature Gradient Coefficient {{K/m}}\n");
 
-        print(state.files.eio, Format_720, SiteWindExp, SiteWindBLHeight, SiteTempGradient);
+        print(state.files.eio, Format_720, state.dataEnvrn->SiteWindExp, state.dataEnvrn->SiteWindBLHeight, state.dataEnvrn->SiteTempGradient);
     }
 
     void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if errors found in input
@@ -4230,7 +4221,6 @@ namespace HeatBalanceManager {
 
         // Using/Aliasing
         using namespace DataStringGlobals;
-        using DataBSDFWindow::TotComplexFenStates;
 
         // If UniqueConstructionNames size, then input has already been gotten
         if (UniqueConstructNames.size()) return;
@@ -4276,14 +4266,14 @@ namespace HeatBalanceManager {
             NoCfactorConstructionsUsed = false;
         }
 
-        TotComplexFenStates = inputProcessor->getNumObjectsFound(state, "Construction:ComplexFenestrationState");
+        state.dataBSDFWindow->TotComplexFenStates = inputProcessor->getNumObjectsFound(state, "Construction:ComplexFenestrationState");
         TotWindow5Constructs = inputProcessor->getNumObjectsFound(state, "Construction:WindowDataFile");
         TotWinEquivLayerConstructs = inputProcessor->getNumObjectsFound(state, "Construction:WindowEquivalentLayer");
 
         WConstructNames.allocate(TotWindow5Constructs);
 
         TotConstructs = TotRegConstructs + TotFfactorConstructs + TotCfactorConstructs + TotSourceConstructs + totAirBoundaryConstructs +
-                        TotComplexFenStates + TotWinEquivLayerConstructs;
+                        state.dataBSDFWindow->TotComplexFenStates + TotWinEquivLayerConstructs;
 
         NominalRforNominalUCalculation.dimension(TotConstructs, 0.0);
         NominalU.dimension(TotConstructs, 0.0);
@@ -4417,12 +4407,12 @@ namespace HeatBalanceManager {
         }
 
         // Added BG 6/2010 for complex fenestration
-        if (TotComplexFenStates > 0) {
+        if (state.dataBSDFWindow->TotComplexFenStates > 0) {
             SetupComplexFenestrationStateInput(state, ConstrNum, ErrorsFound);
             if (ErrorsFound) {
                 ShowSevereError(state, "Errors found in processing complex fenestration input");
             }
-            TotRegConstructs += TotComplexFenStates;
+            TotRegConstructs += state.dataBSDFWindow->TotComplexFenStates;
         }
 
         ConstrNum = 0;
@@ -4745,8 +4735,6 @@ namespace HeatBalanceManager {
         // IDD Definition for Zone object
 
         // Using/Aliasing
-        using DataDaylighting::ZoneDaylight;
-
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -4778,7 +4766,7 @@ namespace HeatBalanceManager {
         Zone.allocate(state.dataGlobal->NumOfZones);
         DataViewFactorInformation::ZoneRadiantInfo.allocate(state.dataGlobal->NumOfZones);
         DataViewFactorInformation::ZoneSolarInfo.allocate(state.dataGlobal->NumOfZones);
-        ZoneDaylight.allocate(state.dataGlobal->NumOfZones);
+        state.dataDaylightingData->ZoneDaylight.allocate(state.dataGlobal->NumOfZones);
 
         ZoneLoop = 0;
 
@@ -5120,8 +5108,6 @@ namespace HeatBalanceManager {
         // IDD Definition for Zone object
 
         // Using/Aliasing
-        using DataDaylighting::ZoneDaylight;
-
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -5369,9 +5355,9 @@ namespace HeatBalanceManager {
                 for (int TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
                     static constexpr auto ShdFracFmt1(" {:02}/{:02} {:02}:{:02},");
                         if (TS == state.dataGlobal->NumOfTimeStepInHour) {
-                            print(state.files.shade, ShdFracFmt1, Month, DayOfMonth, iHour, 0);
+                            print(state.files.shade, ShdFracFmt1, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, iHour, 0);
                         } else {
-                            print(state.files.shade, ShdFracFmt1, Month, DayOfMonth, iHour - 1, (60 / state.dataGlobal->NumOfTimeStepInHour) * TS);
+                            print(state.files.shade, ShdFracFmt1, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, iHour - 1, (60 / state.dataGlobal->NumOfTimeStepInHour) * TS);
                         }
                     for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
                         static constexpr auto ShdFracFmt2("{:10.8F},");
@@ -5385,12 +5371,12 @@ namespace HeatBalanceManager {
         // Initialize zone outdoor environmental variables
         // Bulk Initialization for Temperatures & WindSpeed
         // using the zone, modify the zone  Dry/Wet BulbTemps
-        SetZoneOutBulbTempAt();
+        SetZoneOutBulbTempAt(state);
         CheckZoneOutBulbTempAt(state);
 
         // set zone level wind dir to global value
-        SetZoneWindSpeedAt();
-        SetZoneWindDirAt();
+        SetZoneWindSpeedAt(state);
+        SetZoneWindDirAt(state);
 
         // Set zone data to linked air node value if defined.
         if (state.dataGlobal->AnyLocalEnvironmentsInModel) {
@@ -5539,17 +5525,17 @@ namespace HeatBalanceManager {
         CTMFL.dimension(state.dataGlobal->NumOfZones, 0.0);
         MDotCPOA.dimension(state.dataGlobal->NumOfZones, 0.0);
         MDotOA.dimension(state.dataGlobal->NumOfZones, 0.0);
-        if (Contaminant.CO2Simulation) {
-            OutdoorCO2 = GetCurrentScheduleValue(state, Contaminant.CO2OutdoorSchedPtr);
-            ZoneAirCO2.dimension(state.dataGlobal->NumOfZones, OutdoorCO2);
-            ZoneAirCO2Temp.dimension(state.dataGlobal->NumOfZones, OutdoorCO2);
-            ZoneAirCO2Avg.dimension(state.dataGlobal->NumOfZones, OutdoorCO2);
+        if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
+            state.dataContaminantBalance->OutdoorCO2 = GetCurrentScheduleValue(state, state.dataContaminantBalance->Contaminant.CO2OutdoorSchedPtr);
+            state.dataContaminantBalance->ZoneAirCO2.dimension(state.dataGlobal->NumOfZones, state.dataContaminantBalance->OutdoorCO2);
+            state.dataContaminantBalance->ZoneAirCO2Temp.dimension(state.dataGlobal->NumOfZones, state.dataContaminantBalance->OutdoorCO2);
+            state.dataContaminantBalance->ZoneAirCO2Avg.dimension(state.dataGlobal->NumOfZones, state.dataContaminantBalance->OutdoorCO2);
         }
-        if (Contaminant.GenericContamSimulation) {
-            OutdoorGC = GetCurrentScheduleValue(state, Contaminant.GenericContamOutdoorSchedPtr);
-            ZoneAirGC.dimension(state.dataGlobal->NumOfZones, OutdoorGC);
-            ZoneAirGCTemp.dimension(state.dataGlobal->NumOfZones, OutdoorGC);
-            ZoneAirGCAvg.dimension(state.dataGlobal->NumOfZones, OutdoorGC);
+        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
+            state.dataContaminantBalance->OutdoorGC = GetCurrentScheduleValue(state, state.dataContaminantBalance->Contaminant.GenericContamOutdoorSchedPtr);
+            state.dataContaminantBalance->ZoneAirGC.dimension(state.dataGlobal->NumOfZones, state.dataContaminantBalance->OutdoorGC);
+            state.dataContaminantBalance->ZoneAirGCTemp.dimension(state.dataGlobal->NumOfZones, state.dataContaminantBalance->OutdoorGC);
+            state.dataContaminantBalance->ZoneAirGCAvg.dimension(state.dataGlobal->NumOfZones, state.dataContaminantBalance->OutdoorGC);
         }
         MaxTempPrevDay.dimension(state.dataGlobal->NumOfZones, 0.0);
         MinTempPrevDay.dimension(state.dataGlobal->NumOfZones, 0.0);
@@ -5787,10 +5773,10 @@ namespace HeatBalanceManager {
                             ShowContinueError(state, "Warmup Convergence failing during sizing.");
                             SizingWarmupConvergenceWarning = true;
                         }
-                        if (RunPeriodEnvironment) {
-                            ShowContinueError(state, "...Environment(RunPeriod)=\"" + EnvironmentName + "\"");
+                        if (state.dataEnvrn->RunPeriodEnvironment) {
+                            ShowContinueError(state, "...Environment(RunPeriod)=\"" + state.dataEnvrn->EnvironmentName + "\"");
                         } else {
-                            ShowContinueError(state, "...Environment(SizingPeriod)=\"" + EnvironmentName + "\"");
+                            ShowContinueError(state, "...Environment(SizingPeriod)=\"" + state.dataEnvrn->EnvironmentName + "\"");
                         }
 
                         ShowContinueError(state,
@@ -5917,7 +5903,7 @@ namespace HeatBalanceManager {
             TempZoneRptStdDev = 0.0;
             LoadZoneRptStdDev = 0.0;
 
-            if (RunPeriodEnvironment) {
+            if (state.dataEnvrn->RunPeriodEnvironment) {
                 EnvHeader = "RunPeriod:";
             } else {
                 EnvHeader = "SizingPeriod:";
@@ -5946,7 +5932,7 @@ namespace HeatBalanceManager {
                 print(state.files.eio,
                       Format_731,
                       Zone(ZoneNum).Name,
-                      EnvHeader + ' ' + EnvironmentName,
+                      EnvHeader + ' ' + state.dataEnvrn->EnvironmentName,
                       AverageZoneTemp,
                       StdDevZoneTemp,
                       PassFail(WarmupConvergenceValues(ZoneNum).PassFlag(1)),
@@ -6022,12 +6008,12 @@ namespace HeatBalanceManager {
             UpdateTabularReports(state, OutputProcessor::TimeStepType::TimeStepZone);
             UpdateUtilityBills(state);
         } else if (!state.dataGlobal->KickOffSimulation && state.dataGlobal->DoOutputReporting && ReportDuringWarmup) {
-            if (state.dataGlobal->BeginDayFlag && !PrintEnvrnStampWarmupPrinted) {
-                PrintEnvrnStampWarmup = true;
-                PrintEnvrnStampWarmupPrinted = true;
+            if (state.dataGlobal->BeginDayFlag && !state.dataEnvrn->PrintEnvrnStampWarmupPrinted) {
+                state.dataEnvrn->PrintEnvrnStampWarmup = true;
+                state.dataEnvrn->PrintEnvrnStampWarmupPrinted = true;
             }
-            if (!state.dataGlobal->BeginDayFlag) PrintEnvrnStampWarmupPrinted = false;
-            if (PrintEnvrnStampWarmup) {
+            if (!state.dataGlobal->BeginDayFlag) state.dataEnvrn->PrintEnvrnStampWarmupPrinted = false;
+            if (state.dataEnvrn->PrintEnvrnStampWarmup) {
                 if (PrintEndDataDictionary && state.dataGlobal->DoOutputReporting) {
                     static constexpr auto EndOfHeaderString("End of Data Dictionary"); // End of data dictionary marker
                     print(state.files.eso, "{}\n", EndOfHeaderString);
@@ -6039,21 +6025,21 @@ namespace HeatBalanceManager {
                     print(state.files.eso,
                           EnvironmentStampFormatStr,
                           "1",
-                          "Warmup {" + cWarmupDay + "} " + EnvironmentName,
-                          Latitude,
-                          Longitude,
-                          TimeZoneNumber,
-                          Elevation);
+                          "Warmup {" + cWarmupDay + "} " + state.dataEnvrn->EnvironmentName,
+                          state.dataEnvrn->Latitude,
+                          state.dataEnvrn->Longitude,
+                          state.dataEnvrn->TimeZoneNumber,
+                          state.dataEnvrn->Elevation);
 
                     print(state.files.mtr,
                           EnvironmentStampFormatStr,
                           "1",
-                          "Warmup {" + cWarmupDay + "} " + EnvironmentName,
-                          Latitude,
-                          Longitude,
-                          TimeZoneNumber,
-                          Elevation);
-                    PrintEnvrnStampWarmup = false;
+                          "Warmup {" + cWarmupDay + "} " + state.dataEnvrn->EnvironmentName,
+                          state.dataEnvrn->Latitude,
+                          state.dataEnvrn->Longitude,
+                          state.dataEnvrn->TimeZoneNumber,
+                          state.dataEnvrn->Elevation);
+                    state.dataEnvrn->PrintEnvrnStampWarmup = false;
                 }
             }
             CalcMoreNodeInfo(state);
@@ -7193,7 +7179,7 @@ namespace HeatBalanceManager {
             DateOff = StormWindow(StormWinNum).DateOff - 1;
             // Note: Dateon = Dateoff is not allowed and will have produced an error in getinput.
             if (DateOff == 0) DateOff = 366;
-            if (BetweenDates(DayOfYear_Schedule, StormWindow(StormWinNum).DateOn, DateOff)) {
+            if (BetweenDates(state.dataEnvrn->DayOfYear_Schedule, StormWindow(StormWinNum).DateOn, DateOff)) {
                 StormWinFlag = 1;
             } else {
                 StormWinFlag = 0;
@@ -8614,10 +8600,10 @@ namespace HeatBalanceManager {
 
         // Reading WindowThermalModel:Params
         cCurrentModuleObject = "WindowThermalModel:Params";
-        TotThermalModels = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
-        WindowThermalModel.allocate(TotThermalModels);
+        state.dataBSDFWindow->TotThermalModels = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        WindowThermalModel.allocate(state.dataBSDFWindow->TotThermalModels);
 
-        for (Loop = 1; Loop <= TotThermalModels; ++Loop) {
+        for (Loop = 1; Loop <= state.dataBSDFWindow->TotThermalModels; ++Loop) {
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           Loop,
@@ -8726,7 +8712,7 @@ namespace HeatBalanceManager {
 
         // Reading Construction:ComplexFenestrationState
         locCurrentModuleObject = "Construction:ComplexFenestrationState";
-        TotComplexFenStates = inputProcessor->getNumObjectsFound(state, locCurrentModuleObject);
+        state.dataBSDFWindow->TotComplexFenStates = inputProcessor->getNumObjectsFound(state, locCurrentModuleObject);
 
         inputProcessor->getObjectDefMaxArgs(state, locCurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
         if (!allocated(locAlphaFieldNames)) locAlphaFieldNames.allocate(NumAlphas);
@@ -8736,8 +8722,8 @@ namespace HeatBalanceManager {
         if (!allocated(locAlphaArgs)) locAlphaArgs.allocate(NumAlphas);
         if (!allocated(locNumericArgs)) locNumericArgs.allocate(NumNumbers);
 
-        FirstBSDF = ConstrNum + 1; // Location of first BSDF construction input (They will be consecutive)
-        for (Loop = 1; Loop <= TotComplexFenStates; ++Loop) {
+        state.dataBSDFWindow->FirstBSDF = ConstrNum + 1; // Location of first BSDF construction input (They will be consecutive)
+        for (Loop = 1; Loop <= state.dataBSDFWindow->TotComplexFenStates; ++Loop) {
             inputProcessor->getObjectItem(state,
                                           locCurrentModuleObject,
                                           Loop,
@@ -8774,9 +8760,9 @@ namespace HeatBalanceManager {
             {
                 auto const SELECT_CASE_var(locAlphaArgs(2)); // Basis Type Keyword
                 if (SELECT_CASE_var == "LBNLWINDOW") {
-                    state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisType = BasisType_WINDOW;
+                    state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisType = DataBSDFWindow::BasisType_WINDOW;
                 } else if (SELECT_CASE_var == "USERDEFINED") {
-                    state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisType = BasisType_Custom;
+                    state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisType = DataBSDFWindow::BasisType_Custom;
                 } else {
                     // throw error
                     ErrorsFound = true;
@@ -8789,9 +8775,9 @@ namespace HeatBalanceManager {
             {
                 auto const SELECT_CASE_var(locAlphaArgs(3)); // Basis Symmetry Keyword
                 if (SELECT_CASE_var == "AXISYMMETRIC") {
-                    state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisSymmetryType = BasisSymmetry_Axisymmetric;
+                    state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisSymmetryType = DataBSDFWindow::BasisSymmetry_Axisymmetric;
                 } else if (SELECT_CASE_var == "NONE") {
-                    state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisSymmetryType = BasisSymmetry_None;
+                    state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisSymmetryType = DataBSDFWindow::BasisSymmetry_None;
                 } else {
                     // throw error
                     ErrorsFound = true;
@@ -8829,7 +8815,7 @@ namespace HeatBalanceManager {
             }
             state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisMat.allocate(NumCols, NumRows);
             Get2DMatrix(state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisMatIndex, state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisMat);
-            if (state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisType == BasisType_WINDOW)
+            if (state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisType == DataBSDFWindow::BasisType_WINDOW)
                 CalculateBasisLength(state, state.dataConstruction->Construct(ConstrNum).BSDFInput, ConstrNum, state.dataConstruction->Construct(ConstrNum).BSDFInput.NBasis);
 
             // determine number of layers and optical layers
@@ -8849,7 +8835,7 @@ namespace HeatBalanceManager {
                 ShowContinueError(state, locAlphaArgs(1) + " is missing some of the layers or/and gaps.");
             }
 
-            if (state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisSymmetryType == BasisSymmetry_None) {
+            if (state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisSymmetryType == DataBSDFWindow::BasisSymmetry_None) {
                 // Non-Symmetric basis
 
                 NBasis = state.dataConstruction->Construct(ConstrNum).BSDFInput.NBasis;
@@ -8877,7 +8863,7 @@ namespace HeatBalanceManager {
                     ShowContinueError(state, "Solar front transmittance matrix \"" + locAlphaArgs(6) + "\" must have the same number of rows and columns.");
                 }
 
-                if (state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisType == BasisType_Custom) {
+                if (state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisType == DataBSDFWindow::BasisType_Custom) {
                     state.dataConstruction->Construct(ConstrNum).BSDFInput.NBasis = NumRows; // For custom basis, no rows in transmittance
                                                                      // matrix defines the basis length
                 }
@@ -9099,7 +9085,7 @@ namespace HeatBalanceManager {
             } else {
                 // Axisymmetric basis
                 NBasis = state.dataConstruction->Construct(ConstrNum).BSDFInput.NBasis; // Basis length has already been calculated
-                BSDFTempMtrx.allocate(NBasis, 1);
+                state.dataBSDFWindow->BSDFTempMtrx.allocate(NBasis, 1);
 
                 // *******************************************************************************
                 // Solar front transmittance
@@ -9131,11 +9117,11 @@ namespace HeatBalanceManager {
                                     ", object. Referenced Matrix:TwoDimension is missing from the input file.");
                     ShowContinueError(state, "Solar front transmittance Matrix:TwoDimension = \"" + locAlphaArgs(6) + "\" is missing from the input file.");
                 } else {
-                    Get2DMatrix(state.dataConstruction->Construct(ConstrNum).BSDFInput.SolFrtTransIndex, BSDFTempMtrx);
+                    Get2DMatrix(state.dataConstruction->Construct(ConstrNum).BSDFInput.SolFrtTransIndex, state.dataBSDFWindow->BSDFTempMtrx);
 
                     state.dataConstruction->Construct(ConstrNum).BSDFInput.SolFrtTrans = 0.0;
                     for (I = 1; I <= NBasis; ++I) {
-                        state.dataConstruction->Construct(ConstrNum).BSDFInput.SolFrtTrans(I, I) = BSDFTempMtrx(I, 1);
+                        state.dataConstruction->Construct(ConstrNum).BSDFInput.SolFrtTrans(I, I) = state.dataBSDFWindow->BSDFTempMtrx(I, 1);
                     }
                 }
 
@@ -9169,10 +9155,10 @@ namespace HeatBalanceManager {
                                     ", object. Referenced Matrix:TwoDimension is missing from the input file.");
                     ShowContinueError(state, "Solar back reflectance Matrix:TwoDimension = \"" + locAlphaArgs(7) + "\" is missing from the input file.");
                 } else {
-                    Get2DMatrix(state.dataConstruction->Construct(ConstrNum).BSDFInput.SolBkReflIndex, BSDFTempMtrx);
+                    Get2DMatrix(state.dataConstruction->Construct(ConstrNum).BSDFInput.SolBkReflIndex, state.dataBSDFWindow->BSDFTempMtrx);
                     state.dataConstruction->Construct(ConstrNum).BSDFInput.SolBkRefl = 0.0;
                     for (I = 1; I <= NBasis; ++I) {
-                        state.dataConstruction->Construct(ConstrNum).BSDFInput.SolBkRefl(I, I) = BSDFTempMtrx(I, 1);
+                        state.dataConstruction->Construct(ConstrNum).BSDFInput.SolBkRefl(I, I) = state.dataBSDFWindow->BSDFTempMtrx(I, 1);
                     }
                 }
 
@@ -9208,10 +9194,10 @@ namespace HeatBalanceManager {
                     ShowContinueError(state, "Visible front transmittance Matrix:TwoDimension = \"" + locAlphaArgs(8) +
                                       "\" is missing from the input file.");
                 } else {
-                    Get2DMatrix(state.dataConstruction->Construct(ConstrNum).BSDFInput.VisFrtTransIndex, BSDFTempMtrx);
+                    Get2DMatrix(state.dataConstruction->Construct(ConstrNum).BSDFInput.VisFrtTransIndex, state.dataBSDFWindow->BSDFTempMtrx);
                     state.dataConstruction->Construct(ConstrNum).BSDFInput.VisFrtTrans = 0.0;
                     for (I = 1; I <= NBasis; ++I) {
-                        state.dataConstruction->Construct(ConstrNum).BSDFInput.VisFrtTrans(I, I) = BSDFTempMtrx(I, 1);
+                        state.dataConstruction->Construct(ConstrNum).BSDFInput.VisFrtTrans(I, I) = state.dataBSDFWindow->BSDFTempMtrx(I, 1);
                     }
                 }
 
@@ -9245,10 +9231,10 @@ namespace HeatBalanceManager {
                                     ", object. Referenced Matrix:TwoDimension is missing from the input file.");
                     ShowContinueError(state, "Visible back reflectance Matrix:TwoDimension = \"" + locAlphaArgs(9) + "\" is missing from the input file.");
                 } else {
-                    Get2DMatrix(state.dataConstruction->Construct(ConstrNum).BSDFInput.VisBkReflIndex, BSDFTempMtrx);
+                    Get2DMatrix(state.dataConstruction->Construct(ConstrNum).BSDFInput.VisBkReflIndex, state.dataBSDFWindow->BSDFTempMtrx);
                     state.dataConstruction->Construct(ConstrNum).BSDFInput.VisBkRefl = 0.0;
                     for (I = 1; I <= NBasis; ++I) {
-                        state.dataConstruction->Construct(ConstrNum).BSDFInput.VisBkRefl(I, I) = BSDFTempMtrx(I, 1);
+                        state.dataConstruction->Construct(ConstrNum).BSDFInput.VisBkRefl(I, I) = state.dataBSDFWindow->BSDFTempMtrx(I, 1);
                     }
                 }
 
@@ -9367,7 +9353,7 @@ namespace HeatBalanceManager {
                     } // if (Mod(Layer, 2) <> 0) then
                 }
 
-                BSDFTempMtrx.deallocate();
+                state.dataBSDFWindow->BSDFTempMtrx.deallocate();
             }
             state.dataConstruction->Construct(ConstrNum).TypeIsWindow = true;
             state.dataConstruction->Construct(ConstrNum).WindowTypeBSDF = true;

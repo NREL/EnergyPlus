@@ -1349,8 +1349,6 @@ namespace HVACControllers {
 
         // Using/Aliasing
         using namespace DataSizing;
-        using DataConvergParams::HVACEnergyToler;
-        using DataConvergParams::HVACTemperatureToler;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1395,9 +1393,9 @@ namespace HVACControllers {
             //   with a temperature tolerance that won't exceed the loop energy error tolerance (10 W).
             // Finally we need to take into account the fact that somebody might change the energy tolerance.
             ControllerProps(ControlNum).Offset =
-                (0.001 / (2100.0 * max(ControllerProps(ControlNum).MaxVolFlowActuated, SmallWaterVolFlow))) * (HVACEnergyToler / 10.0);
+                (0.001 / (2100.0 * max(ControllerProps(ControlNum).MaxVolFlowActuated, SmallWaterVolFlow))) * (DataConvergParams::HVACEnergyToler / 10.0);
             // do not let the controller tolerance exceed 1/10 of the loop temperature tolerance.
-            ControllerProps(ControlNum).Offset = min(0.1 * HVACTemperatureToler, ControllerProps(ControlNum).Offset);
+            ControllerProps(ControlNum).Offset = min(0.1 * DataConvergParams::HVACTemperatureToler, ControllerProps(ControlNum).Offset);
             BaseSizer::reportSizerOutput(state, ControllerProps(ControlNum).ControllerType,
                                          ControllerProps(ControlNum).ControllerName,
                                          "Controller Convergence Tolerance",
@@ -2832,8 +2830,6 @@ namespace HVACControllers {
         // na
 
         // Using/Aliasing
-        using DataEnvironment::CurEnvirNum;
-        using DataEnvironment::CurMnDy;
         using DataHVACGlobals::FirstTimeStepSysFlag;
         using General::LogicalToInteger;
 
@@ -2860,7 +2856,7 @@ namespace HVACControllers {
               "{},{},{},{},{},{},{},{},{},{},{},{},",
               LogicalToInteger(state.dataGlobal->ZoneSizingCalc),
               LogicalToInteger(state.dataGlobal->SysSizingCalc),
-              CurEnvirNum,
+              state.dataEnvrn->CurEnvirNum,
               LogicalToInteger(state.dataGlobal->WarmupFlag),
               CreateHVACTimeString(state),
               MakeHVACTimeIntervalString(state),
@@ -3004,7 +3000,6 @@ namespace HVACControllers {
         // na
 
         // Using/Aliasing
-        using DataEnvironment::CurEnvirNum;
         using General::LogicalToInteger;
 
         using RootFinder::WriteRootFinderTrace;
@@ -3053,7 +3048,7 @@ namespace HVACControllers {
         // Write iteration stamp
         print(TraceFile,
               "{},{},{},{},{},{},{},{},",
-              CurEnvirNum,
+              state.dataEnvrn->CurEnvirNum,
               LogicalToInteger(state.dataGlobal->WarmupFlag),
               CreateHVACTimeString(state),
               MakeHVACTimeIntervalString(state),
@@ -3173,7 +3168,6 @@ namespace HVACControllers {
         // na
 
         // Using/Aliasing
-        using DataEnvironment::CurMnDy;
         using General::CreateTimeString;
         using General::GetCurrentHVACTime;
 
@@ -3195,7 +3189,7 @@ namespace HVACControllers {
         std::string Buffer;
 
         Buffer = CreateTimeString(GetCurrentHVACTime(state));
-        OutputString = CurMnDy + ' ' + stripped(Buffer);
+        OutputString = state.dataEnvrn->CurMnDy + ' ' + stripped(Buffer);
 
         return OutputString;
     }
@@ -3222,8 +3216,6 @@ namespace HVACControllers {
         // na
 
         // Using/Aliasing
-        using DataEnvironment::EnvironmentName;
-
         // Return value
         std::string OutputString;
 
@@ -3241,7 +3233,7 @@ namespace HVACControllers {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         // na
 
-        OutputString = EnvironmentName + ", " + MakeHVACTimeIntervalString(state);
+        OutputString = state.dataEnvrn->EnvironmentName + ", " + MakeHVACTimeIntervalString(state);
 
         return OutputString;
     }

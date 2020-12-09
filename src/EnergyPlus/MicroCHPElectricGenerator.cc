@@ -780,7 +780,7 @@ namespace MicroCHPElectricGenerator {
         if (this->ZoneID > 0) {
             thisAmbientTemp = DataHeatBalFanSys::MAT(this->ZoneID);
         } else { // outdoor location, no zone
-            thisAmbientTemp = DataEnvironment::OutDryBulbTemp;
+            thisAmbientTemp = state.dataEnvrn->OutDryBulbTemp;
         }
 
         Real64 Pnetss = 0.0;

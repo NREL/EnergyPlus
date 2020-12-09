@@ -578,7 +578,7 @@ namespace HeatRecovery {
 
     void FrostControl(EnergyPlusData &state, int const ExNum); // number of the current heat exchanger being simulated
 
-    void UpdateHeatRecovery(int const ExNum); // number of the current heat exchanger being simulated
+    void UpdateHeatRecovery(EnergyPlusData &state, int const ExNum); // number of the current heat exchanger being simulated
 
     void ReportHeatRecovery(int const ExNum); // number of the current heat exchanger being simulated
 

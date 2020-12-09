@@ -2721,7 +2721,6 @@ namespace EconomicTariff {
         //   holding the data that will be used by the tariff
         //   calculation.
 
-        using DataEnvironment::Month;
         using ScheduleManager::GetCurrentScheduleValue;
 
         int iTariff;
@@ -2772,10 +2771,10 @@ namespace EconomicTariff {
                     } else {
                         // #7814 - Have to be careful with DST. tariff::seasonForMonth is overwritten at each timestep, and only the last value is
                         // retained, so make sure to capture the right one
-                        if ((state.dataGlobal->HourOfDay + DataEnvironment::DSTIndicator) <= 24) {
-                            curMonth = DataEnvironment::Month;
+                        if ((state.dataGlobal->HourOfDay + state.dataEnvrn->DSTIndicator) <= 24) {
+                            curMonth = state.dataEnvrn->Month;
                         } else {
-                            curMonth = DataEnvironment::MonthTomorrow;
+                            curMonth = state.dataEnvrn->MonthTomorrow;
                         }
                     }
                     if (isWithinRange(state, curSeason, 1, 5)) {
