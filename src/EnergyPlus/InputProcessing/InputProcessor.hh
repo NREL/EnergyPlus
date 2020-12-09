@@ -95,7 +95,7 @@ public:
         return p;
     }
 
-    template <typename T> T *objectFactory(EnergyPlusData &state)
+    template <typename T> T *objectFactory()
     {
         T *p = data->objectFactory<T>();
         if (p != nullptr) return p;
@@ -110,7 +110,7 @@ public:
 
     void markObjectAsUsed(const std::string &objectType, const std::string &objectName);
 
-    void processInput(EnergyPlusData &state);
+    void processInput();
 
     int getNumSectionsFound(std::string const &SectionWord);
 
@@ -178,11 +178,11 @@ public:
 
     void preProcessorCheck(EnergyPlusData &state, bool &PreP_Fatal); // True if a preprocessor flags a fatal error
 
-    void preScanReportingVariables(EnergyPlusData &state);
+    void preScanReportingVariables();
 
-    void reportIDFRecordsStats(EnergyPlusData &state);
+    void reportIDFRecordsStats();
 
-    void reportOrphanRecordObjects(EnergyPlusData &state);
+    void reportOrphanRecordObjects();
 
     const json &getObjectInstances(std::string const &ObjType);
 
@@ -269,9 +269,9 @@ private:
 
     std::vector<std::string> const &validationWarnings();
 
-    bool checkVersionMatch(EnergyPlusData &state);
+    bool checkVersionMatch();
 
-    bool processErrors(EnergyPlusData &state);
+    bool processErrors();
 
     json const &getFields(EnergyPlusData &state, std::string const &objectType, std::string const &objectName);
 

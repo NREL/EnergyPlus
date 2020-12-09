@@ -348,7 +348,7 @@ namespace ResultsFramework {
 
         virtual ~ResultsFramework() = default;
 
-        void setupOutputOptions(EnergyPlusData &state);
+        void setupOutputOptions();
 
         bool timeSeriesEnabled() const;
 
@@ -388,7 +388,7 @@ namespace ResultsFramework {
         MeterDataFrame SMMeters = MeterDataFrame("RunPeriod");
         MeterDataFrame YRMeters = MeterDataFrame("Yearly");
 
-        void writeOutputs(EnergyPlusData &state);
+        void writeOutputs();
 
         void addReportVariable(std::string const &keyedValue,
                                std::string const &variableName,
@@ -417,7 +417,7 @@ namespace ResultsFramework {
 
         void writeReport(JsonOutputStreams &jsonOutputStreams);
 
-        void writeCSVOutput(EnergyPlusData &state);
+        void writeCSVOutput();
 
     private:
         friend class EnergyPlus::EnergyPlusFixture;

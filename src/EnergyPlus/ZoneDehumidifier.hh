@@ -144,7 +144,7 @@ namespace ZoneDehumidifier {
                              int &CompIndex                 // Index to the zone dehumidifier
     );
 
-    void GetZoneDehumidifierInput(EnergyPlusData &state);
+    void GetZoneDehumidifierInput();
 
     void InitZoneDehumidifier(EnergyPlusData &state, int const ZoneDehumNum); // Number of the current zone dehumidifier being simulated
 

@@ -247,7 +247,7 @@ struct EnergyPlusData;
                                Real64 &LatOutputProvided,     // Latent add/removal supplied by window AC (kg/s), dehumid = negative
                                int &CompIndex);
 
-        void GetOutdoorAirUnitInputs(EnergyPlusData &state);
+        void GetOutdoorAirUnitInputs();
 
         void InitOutdoorAirUnit(EnergyPlusData &state, int OAUnitNum,          // index for the current outdoor air unit
                                 int ZoneNum,            // number of zone being served

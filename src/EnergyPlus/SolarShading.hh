@@ -93,13 +93,13 @@ namespace SolarShading {
         }
     };
 
-    void InitSolarCalculations(EnergyPlusData &state);
+    void InitSolarCalculations();
 
-    void GetShadowingInput(EnergyPlusData &state);
+    void GetShadowingInput();
 
-    void AllocateModuleArrays(EnergyPlusData &state);
+    void AllocateModuleArrays();
 
-    void AnisoSkyViewFactors(EnergyPlusData &state);
+    void AnisoSkyViewFactors();
 
     void CHKBKS(EnergyPlusData &state, int const NBS, // Surface Number of the potential back surface
                 int const NRS  // Surface Number of the potential shadow receiving surface
@@ -123,7 +123,7 @@ namespace SolarShading {
                                 bool const ignorey,
                                 bool const ignorez);
 
-    void ComputeIntSolarAbsorpFactors(EnergyPlusData &state);
+    void ComputeIntSolarAbsorpFactors();
 
     void CLIP(EnergyPlusData &state, int const NVT, Array1D<Real64> &XVT, Array1D<Real64> &YVT, Array1D<Real64> &ZVT);
 
@@ -198,7 +198,7 @@ namespace SolarShading {
 
     void FigureSolarBeamAtTimestep(EnergyPlusData &state, int const iHour, int const iTimeStep);
 
-    void DetermineShadowingCombinations(EnergyPlusData &state);
+    void DetermineShadowingCombinations();
 
     void SHADOW(EnergyPlusData &state,
                 int const iHour, // Hour index
@@ -227,13 +227,13 @@ namespace SolarShading {
                                    int const TS     // Time step Index
     );
 
-    void CalcInteriorSolarDistribution(EnergyPlusData &state);
+    void CalcInteriorSolarDistribution();
 
-    void CalcAbsorbedOnExteriorOpaqueSurfaces(EnergyPlusData &state);
+    void CalcAbsorbedOnExteriorOpaqueSurfaces();
 
-    void CalcInteriorSolarDistributionWCE(EnergyPlusData &state);
+    void CalcInteriorSolarDistributionWCE();
 
-    void CalcInteriorSolarDistributionWCESimple(EnergyPlusData &state);
+    void CalcInteriorSolarDistributionWCESimple();
 
     int WindowScheduledSolarAbs(int const SurfNum, // Surface number
                                 int const ConstNum // Construction number
@@ -243,7 +243,7 @@ namespace SolarShading {
                                  int const ConstNum // Construction number
     );
 
-    void PerformSolarCalculations(EnergyPlusData &state);
+    void PerformSolarCalculations();
 
     void SHDRVL(EnergyPlusData &state, int const HTSS,  // Heat transfer surface number of the subsurface
                 int const SBSNR, // Subsurface number
@@ -271,30 +271,30 @@ namespace SolarShading {
               Real64 const CosSolarDeclin  // Cosine of the Solar declination (current day)
     );
 
-    void WindowShadingManager(EnergyPlusData &state);
+    void WindowShadingManager();
 
     int selectActiveWindowShadingControlIndex(EnergyPlusData &state, int curSurface);
 
-    void WindowGapAirflowControl(EnergyPlusData &state);
+    void WindowGapAirflowControl();
 
-    void SkyDifSolarShading(EnergyPlusData &state);
+    void SkyDifSolarShading();
 
-    void CalcWindowProfileAngles(EnergyPlusData &state);
+    void CalcWindowProfileAngles();
 
     void CalcFrameDividerShadow(EnergyPlusData &state, int const SurfNum,  // Surface number
                                 int const FrDivNum, // Frame/divider number
                                 int const HourNum   // Hour number
     );
 
-    void CalcBeamSolarOnWinRevealSurface(EnergyPlusData &state);
+    void CalcBeamSolarOnWinRevealSurface();
 
-    void ReportSurfaceShading(EnergyPlusData &state);
+    void ReportSurfaceShading();
 
-    void ReportSurfaceErrors(EnergyPlusData &state);
+    void ReportSurfaceErrors();
 
-    void ComputeWinShadeAbsorpFactors(EnergyPlusData &state);
+    void ComputeWinShadeAbsorpFactors();
 
-    void CalcWinTransDifSolInitialDistribution(EnergyPlusData &state);
+    void CalcWinTransDifSolInitialDistribution();
 
     void CalcInteriorWinTransDifSolInitialDistribution(
         EnergyPlusData &state,
@@ -309,7 +309,7 @@ namespace SolarShading {
                                   int const ISurf                    // Surface number of the complex fenestration
     );
 
-    void TimestepInitComplexFenestration(EnergyPlusData &state);
+    void TimestepInitComplexFenestration();
 
 } // namespace SolarShading
 

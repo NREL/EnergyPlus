@@ -78,10 +78,10 @@ struct CoilCoolingDX
 {
     CoilCoolingDX() = default;
     static int factory(EnergyPlusData &state, std::string const &coilName);
-    static void getInput(EnergyPlusData &state);
+    static void getInput();
     static void clear_state();
     void instantiateFromInputSpec(EnergyPlusData &state, const CoilCoolingDXInputSpecification &input_data);
-    void oneTimeInit(EnergyPlusData &state);
+    void oneTimeInit();
     void simulate(EnergyPlusData &state, int useAlternateMode, Real64 PLR, int speedNum, Real64 speedRatio, int fanOpMode, Real64 LoadSHR = -1.0);
     void setData(int fanIndex, int fanType, std::string const &fanName, int airLoopNum);
     void getFixedData(int &evapInletNodeIndex,
@@ -95,7 +95,7 @@ struct CoilCoolingDX
                             std::vector<Real64> &normalModeFlowRates,
                             std::vector<Real64> &normalModeRatedCapacities);
     static void inline passThroughNodeData(DataLoopNode::NodeData &in, DataLoopNode::NodeData &out);
-    void size(EnergyPlusData &state);
+    void size();
 
     CoilCoolingDXInputSpecification original_input_specs;
     std::string name;

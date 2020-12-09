@@ -128,7 +128,7 @@ namespace PlantLoadProfile {
 
         void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation) override;
 
-        void InitPlantProfile(EnergyPlusData &state);
+        void InitPlantProfile();
 
         void UpdatePlantProfile();
 
@@ -139,7 +139,7 @@ namespace PlantLoadProfile {
     extern Array1D<PlantProfileData> PlantProfile;
 
     // This could be static inside the class
-    void GetPlantProfileInput(EnergyPlusData &state);
+    void GetPlantProfileInput();
 
     // As could this
     void clear_state();

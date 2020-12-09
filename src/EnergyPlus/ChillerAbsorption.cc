@@ -111,8 +111,9 @@ namespace ChillerAbsorption {
     const char * fluidNameWater = "WATER";
     const char * fluidNameSteam = "STEAM";
 
-    PlantComponent *BLASTAbsorberSpecs::factory(EnergyPlusData &state, std::string const &objectName)
+    PlantComponent *BLASTAbsorberSpecs::factory(std::string const &objectName)
     {
+        GET_STATE_HERE
         // Process the input data
         if (state.dataChillerAbsorber->getInput) {
             GetBLASTAbsorberInput(state);
@@ -130,8 +131,9 @@ namespace ChillerAbsorption {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void BLASTAbsorberSpecs::simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
+    void BLASTAbsorberSpecs::simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
     {
+        GET_STATE_HERE
 
         this->EquipFlowCtrl = DataPlant::PlantLoop(calledFromLocation.loopNum).LoopSide(calledFromLocation.loopSideNum).Branch(calledFromLocation.branchNum).Comp(calledFromLocation.compNum).FlowCtrl;
 
@@ -181,8 +183,9 @@ namespace ChillerAbsorption {
         }
     }
 
-    void BLASTAbsorberSpecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &calledFromLocation)
+    void BLASTAbsorberSpecs::onInitLoopEquip(const PlantLocation &calledFromLocation)
     {
+        GET_STATE_HERE
         bool runFlag = true;
         Real64 myLoad = 0.0;
 
@@ -193,8 +196,9 @@ namespace ChillerAbsorption {
         }
     }
 
-    void BLASTAbsorberSpecs::getDesignCapacities(EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
+    void BLASTAbsorberSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
     {
+        GET_STATE_HERE
         if (calledFromLocation.loopNum == this->CWLoopNum) {
             this->sizeChiller(state);
             MinLoad = this->NomCap * this->MinPartLoadRat;
@@ -217,8 +221,9 @@ namespace ChillerAbsorption {
         tempDesCondIn = this->TempDesCondIn;
     }
 
-    void GetBLASTAbsorberInput(EnergyPlusData &state)
+    void GetBLASTAbsorberInput()
     {
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Dan Fisher
         //       DATE WRITTEN:    April 1998
@@ -484,8 +489,9 @@ namespace ChillerAbsorption {
         }
     }
 
-    void BLASTAbsorberSpecs::setupOutputVars(EnergyPlusData &state)
+    void BLASTAbsorberSpecs::setupOutputVars()
     {
+        GET_STATE_HERE
         SetupOutputVariable(state, "Chiller Electricity Rate", OutputProcessor::Unit::W, this->Report.PumpingPower, "System", "Average", this->Name);
         SetupOutputVariable(state, "Chiller Electricity Energy",
                             OutputProcessor::Unit::J,
@@ -585,8 +591,7 @@ namespace ChillerAbsorption {
         }
     }
 
-    void BLASTAbsorberSpecs::initialize(EnergyPlusData &state,
-                                        bool RunFlag, // TRUE when chiller operating
+    void BLASTAbsorberSpecs::initialize(bool RunFlag, // TRUE when chiller operating
                                         Real64 MyLoad)
     {
 
@@ -849,9 +854,9 @@ namespace ChillerAbsorption {
         }
     }
 
-    void BLASTAbsorberSpecs::sizeChiller(EnergyPlusData &state)
+    void BLASTAbsorberSpecs::sizeChiller()
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   March 2008
@@ -1351,8 +1356,9 @@ namespace ChillerAbsorption {
         }
     }
 
-    void BLASTAbsorberSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, bool RunFlag)
+    void BLASTAbsorberSpecs::calculate(Real64 &MyLoad, bool RunFlag)
     {
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
         //       DATE WRITTEN   Sept. 1998

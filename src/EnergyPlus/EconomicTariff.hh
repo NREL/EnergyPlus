@@ -595,7 +595,7 @@ namespace EconomicTariff {
         }
     };
 
-    void UpdateUtilityBills(EnergyPlusData &state);
+    void UpdateUtilityBills();
 
     //======================================================================================================================
     //======================================================================================================================
@@ -625,7 +625,7 @@ namespace EconomicTariff {
 
     void GetLastWord(std::string const &lineOfText, std::string::size_type &endOfScan, std::string &aWord);
 
-    void initializeMonetaryUnit(EnergyPlusData &state);
+    void initializeMonetaryUnit();
 
     int LookUpSeason(EnergyPlusData &state, std::string const &nameOfSeason, std::string const &nameOfReferingObj);
 
@@ -642,13 +642,13 @@ namespace EconomicTariff {
                          int const objIndex,
                          int const tariffPt);
 
-    void incrementEconVar(EnergyPlusData &state);
+    void incrementEconVar();
 
-    void incrementSteps(EnergyPlusData &state);
+    void incrementSteps();
 
     std::string RemoveSpaces(EnergyPlusData &state, std::string const &StringIn);
 
-    void CreateCategoryNativeVariables(EnergyPlusData &state);
+    void CreateCategoryNativeVariables();
 
     int lookupOperator(std::string const &opString);
 
@@ -660,7 +660,7 @@ namespace EconomicTariff {
     //======================================================================================================================
     //======================================================================================================================
 
-    void CreateDefaultComputation(EnergyPlusData &state);
+    void CreateDefaultComputation();
 
     void addOperand(EnergyPlusData &state, int varMe, int varOperand);
 
@@ -674,7 +674,7 @@ namespace EconomicTariff {
     //======================================================================================================================
     //======================================================================================================================
 
-    void GatherForEconomics(EnergyPlusData &state);
+    void GatherForEconomics();
 
     bool isWithinRange(EnergyPlusData &state, int const testVal, int const minThreshold, int const maxThreshold);
 
@@ -686,7 +686,7 @@ namespace EconomicTariff {
     //======================================================================================================================
     //======================================================================================================================
 
-    void ComputeTariff(EnergyPlusData &state);
+    void ComputeTariff();
 
     void pushStack(EnergyPlusData &state, Array1A<Real64> const monthlyArray, int const variablePointer);
 
@@ -704,20 +704,20 @@ namespace EconomicTariff {
 
     void checkMinimumMonthlyCharge(EnergyPlusData &state, int const curTariff);
 
-    void setNativeVariables(EnergyPlusData &state);
+    void setNativeVariables();
 
-    void LEEDtariffReporting(EnergyPlusData &state);
+    void LEEDtariffReporting();
 
-    void WriteTabularTariffReports(EnergyPlusData &state);
+    void WriteTabularTariffReports();
 
-    void showWarningsBasedOnTotal(EnergyPlusData &state);
+    void showWarningsBasedOnTotal();
 
     void getMaxAndSum(EnergyPlusData &state, int const varPointer, Real64 &sumResult, Real64 &maxResult);
 
     void
     ReportEconomicVariable(EnergyPlusData &state, std::string const &titleString, bool const includeCategory, bool const showCurrencySymbol, std::string const &forString);
 
-    void selectTariff(EnergyPlusData &state);
+    void selectTariff();
 
     void GetMonthlyCostForResource(EnergyPlusData &state, DataGlobalConstants::ResourceType const inResourceNumber, Array1A<Real64> outMonthlyCosts);
 

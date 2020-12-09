@@ -74,7 +74,7 @@ namespace EnergyPlus::BranchNodeConnections {
     using namespace DataLoopNode;
     using namespace DataBranchNodeConnections;
 
-    void RegisterNodeConnection(EnergyPlusData &state, int const NodeNumber,                // Number for this Node
+    void RegisterNodeConnection(int const NodeNumber,                // Number for this Node
                                 std::string const &NodeName,         // Name of this Node
                                 std::string const &ObjectType,       // Type of object this Node is connected to (e.g. Chiller:Electric)
                                 std::string const &ObjectName,       // Name of object this Node is connected to (e.g. MyChiller)
@@ -184,7 +184,7 @@ namespace EnergyPlus::BranchNodeConnections {
         }
     }
 
-    void OverrideNodeConnectionType(EnergyPlusData &state, int const NodeNumber,              // Number for this Node
+    void OverrideNodeConnectionType(int const NodeNumber,              // Number for this Node
                                     std::string const &NodeName,       // Name of this Node
                                     std::string const &ObjectType,     // Type of object this Node is connected to (e.g. Chiller:Electric)
                                     std::string const &ObjectName,     // Name of object this Node is connected to (e.g. MyChiller)
@@ -260,7 +260,7 @@ namespace EnergyPlus::BranchNodeConnections {
         return IsValid;
     }
 
-    void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound)
+    void CheckNodeConnections(bool &ErrorsFound)
     {
 
         // SUBROUTINE INFORMATION:
@@ -649,7 +649,7 @@ namespace EnergyPlus::BranchNodeConnections {
         state.dataBranchNodeConnections->NumNodeConnectionErrors += ErrorCounter;
     }
 
-    bool IsParentObject(EnergyPlusData &state, std::string const &ComponentType, std::string const &ComponentName)
+    bool IsParentObject(std::string const &ComponentType, std::string const &ComponentName)
     {
 
         // FUNCTION INFORMATION:
@@ -686,7 +686,7 @@ namespace EnergyPlus::BranchNodeConnections {
         return IsParent;
     }
 
-    int WhichParentSet(EnergyPlusData &state, std::string const &ComponentType, std::string const &ComponentName)
+    int WhichParentSet(std::string const &ComponentType, std::string const &ComponentName)
     {
 
         // FUNCTION INFORMATION:
@@ -716,7 +716,7 @@ namespace EnergyPlus::BranchNodeConnections {
         return WhichOne;
     }
 
-    void GetParentData(EnergyPlusData &state, std::string const &ComponentType,
+    void GetParentData(std::string const &ComponentType,
                        std::string const &ComponentName,
                        std::string &InletNodeName,
                        int &InletNodeNum,
@@ -773,7 +773,7 @@ namespace EnergyPlus::BranchNodeConnections {
         if (ErrInObject) ErrorsFound = true;
     }
 
-    bool IsParentObjectCompSet(EnergyPlusData &state, std::string const &ComponentType, std::string const &ComponentName)
+    bool IsParentObjectCompSet(std::string const &ComponentType, std::string const &ComponentName)
     {
 
         // FUNCTION INFORMATION:
@@ -805,7 +805,7 @@ namespace EnergyPlus::BranchNodeConnections {
         return IsParent;
     }
 
-    int WhichCompSet(EnergyPlusData &state, std::string const &ComponentType, std::string const &ComponentName)
+    int WhichCompSet(std::string const &ComponentType, std::string const &ComponentName)
     {
 
         // FUNCTION INFORMATION:
@@ -838,7 +838,7 @@ namespace EnergyPlus::BranchNodeConnections {
         return WhichOne;
     }
 
-    int GetNumChildren(EnergyPlusData &state, std::string const &ComponentType, std::string const &ComponentName)
+    int GetNumChildren(std::string const &ComponentType, std::string const &ComponentName)
     {
 
         // FUNCTION INFORMATION:
@@ -871,7 +871,7 @@ namespace EnergyPlus::BranchNodeConnections {
         return NumChildren;
     }
 
-    void GetComponentData(EnergyPlusData &state, std::string const &ComponentType,
+    void GetComponentData(std::string const &ComponentType,
                           std::string const &ComponentName,
                           bool &IsParent,                    // true or false
                           int &NumInlets,
@@ -961,7 +961,7 @@ namespace EnergyPlus::BranchNodeConnections {
         if (ErrInObject) ErrorsFound = true;
     }
 
-    void GetChildrenData(EnergyPlusData &state, std::string const &ComponentType,
+    void GetChildrenData(std::string const &ComponentType,
                          std::string const &ComponentName,
                          int &NumChildren,
                          Array1D_string &ChildrenCType,
@@ -1103,7 +1103,7 @@ namespace EnergyPlus::BranchNodeConnections {
         if (ErrInObject) ErrorsFound = true;
     }
 
-    void SetUpCompSets(EnergyPlusData &state, std::string const &ParentType,    // Parent Object Type
+    void SetUpCompSets(std::string const &ParentType,    // Parent Object Type
                        std::string const &ParentName,    // Parent Object Name
                        std::string const &CompType,      // Component Type
                        std::string const &CompName,      // Component Name
@@ -1263,7 +1263,7 @@ namespace EnergyPlus::BranchNodeConnections {
         }
     }
 
-    void TestInletOutletNodes(EnergyPlusData &state, [[maybe_unused]] bool &ErrorsFound)
+    void TestInletOutletNodes([[maybe_unused]] bool &ErrorsFound)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1325,7 +1325,7 @@ namespace EnergyPlus::BranchNodeConnections {
         AlreadyNoted.deallocate();
     }
 
-    void TestCompSet(EnergyPlusData &state, std::string const &CompType,   // Component Type
+    void TestCompSet(std::string const &CompType,   // Component Type
                      std::string const &CompName,   // Component Name
                      std::string const &InletNode,  // Inlet Node Name
                      std::string const &OutletNode, // Outlet Node Name
@@ -1390,7 +1390,7 @@ namespace EnergyPlus::BranchNodeConnections {
         }
     }
 
-    void TestCompSetInletOutletNodes(EnergyPlusData &state, bool &ErrorsFound)
+    void TestCompSetInletOutletNodes(bool &ErrorsFound)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1435,7 +1435,7 @@ namespace EnergyPlus::BranchNodeConnections {
         AlreadyNoted.deallocate();
     }
 
-    void GetNodeConnectionType(EnergyPlusData &state, int const NodeNumber, Array1D_int &NodeConnectType, bool &errFlag)
+    void GetNodeConnectionType(int const NodeNumber, Array1D_int &NodeConnectType, bool &errFlag)
     {
 
         // FUNCTION INFORMATION:

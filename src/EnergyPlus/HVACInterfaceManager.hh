@@ -156,7 +156,7 @@ namespace HVACInterfaceManager {
 
     void ManageTwoWayCommonPipe(EnergyPlusData &state, int const LoopNum, int const LoopSide, Real64 const TankOutletTemp);
 
-    void SetupCommonPipes(EnergyPlusData &state);
+    void SetupCommonPipes();
 
 } // namespace HVACInterfaceManager
 

@@ -177,7 +177,7 @@ namespace SurfaceGroundHeatExchanger {
 
         static PlantComponent *factory(EnergyPlusData &state, int objectType, std::string objectName);
 
-        void InitSurfaceGroundHeatExchanger(EnergyPlusData &state);
+        void InitSurfaceGroundHeatExchanger();
 
         //==============================================================================
 
@@ -204,7 +204,7 @@ namespace SurfaceGroundHeatExchanger {
 
         //==============================================================================
 
-        Real64 CalcSourceFlux(EnergyPlusData &state); // component number
+        Real64 CalcSourceFlux(); // component number
 
         //==============================================================================
 
@@ -247,14 +247,14 @@ namespace SurfaceGroundHeatExchanger {
 
         //==============================================================================
 
-        void UpdateSurfaceGroundHeatExchngr(EnergyPlusData &state); // Index for the surface
+        void UpdateSurfaceGroundHeatExchngr(); // Index for the surface
 
         //==============================================================================
 
-        void ReportSurfaceGroundHeatExchngr(EnergyPlusData &state); // Index for the surface under consideration
+        void ReportSurfaceGroundHeatExchngr(); // Index for the surface under consideration
     };
 
-    void GetSurfaceGroundHeatExchanger(EnergyPlusData &state);
+    void GetSurfaceGroundHeatExchanger();
 
     //==============================================================================
 

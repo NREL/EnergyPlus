@@ -115,11 +115,11 @@ namespace PlantComponentTemperatureSources {
 
         void initialize(EnergyPlusData &state, Real64 &MyLoad);
 
-        void setupOutputVars(EnergyPlusData &state);
+        void setupOutputVars();
 
-        void autosize(EnergyPlusData &state);
+        void autosize();
 
-        void calculate(EnergyPlusData &state);
+        void calculate();
 
         void update();
 
@@ -137,7 +137,7 @@ namespace PlantComponentTemperatureSources {
     // Object Data
     extern Array1D<WaterSourceSpecs> WaterSource; // dimension to number of machines
 
-    void GetWaterSourceInput(EnergyPlusData &state);
+    void GetWaterSourceInput();
 
     // object data
     extern Array1D<WaterSourceSpecs> WaterSource;

@@ -103,13 +103,13 @@ namespace PlantValves {
                                  Real64 &MinLoad,
                                  Real64 &OptLoad) override;
 
-        void initialize(EnergyPlusData &state);
+        void initialize();
 
-        void calculate(EnergyPlusData &state);
+        void calculate();
 
     };
 
-    void GetPlantValvesInput(EnergyPlusData &state);
+    void GetPlantValvesInput();
 
 } // namespace PlantValves
 

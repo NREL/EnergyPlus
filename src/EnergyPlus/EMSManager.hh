@@ -102,7 +102,7 @@ namespace EMSManager {
         BeginZoneTimestepBeforeSetCurrentWeather
     };
 
-    void CheckIfAnyEMS(EnergyPlusData &state);
+    void CheckIfAnyEMS();
 
     void ManageEMS(EnergyPlusData &state,
                    EMSCallFrom iCalledFrom,  // indicates where subroutine was called from, parameters in DataGlobals.
@@ -112,21 +112,21 @@ namespace EMSManager {
 
     void InitEMS(EnergyPlusData &state, EMSCallFrom iCalledFrom); // indicates where subroutine was called from, parameters in DataGlobals.
 
-    void ReportEMS(EnergyPlusData &state);
+    void ReportEMS();
 
-    void GetEMSInput(EnergyPlusData &state);
+    void GetEMSInput();
 
     void ProcessEMSInput(EnergyPlusData &state, bool reportErrors); // .  If true, then report out errors ,otherwise setup what we can
 
     void GetVariableTypeAndIndex(EnergyPlusData &state, std::string const &VarName, std::string const &VarKeyName, int &VarType, int &VarIndex);
 
-    void EchoOutActuatorKeyChoices(EnergyPlusData &state);
+    void EchoOutActuatorKeyChoices();
 
-    void EchoOutInternalVariableChoices(EnergyPlusData &state);
+    void EchoOutInternalVariableChoices();
 
-    void SetupNodeSetPointsAsActuators(EnergyPlusData &state);
+    void SetupNodeSetPointsAsActuators();
 
-    void UpdateEMSTrendVariables(EnergyPlusData &state);
+    void UpdateEMSTrendVariables();
 
     std::string controlTypeName(SPControlType SetPointType); // Maps int to the std::string equivalent
                                                          // (eg iTemperatureSetPoint => "Temperature Setpoint")
@@ -145,25 +145,25 @@ namespace EMSManager {
                                         int nodeNum, // index of node being checked.
                                         std::string const &varName);
 
-    void SetupPrimaryAirSystemAvailMgrAsActuators(EnergyPlusData &state);
+    void SetupPrimaryAirSystemAvailMgrAsActuators();
 
-    void SetupWindowShadingControlActuators(EnergyPlusData &state);
+    void SetupWindowShadingControlActuators();
 
-    void SetupThermostatActuators(EnergyPlusData &state);
+    void SetupThermostatActuators();
 
-    void SetupSurfaceConvectionActuators(EnergyPlusData &state);
+    void SetupSurfaceConvectionActuators();
 
-    void SetupSurfaceConstructionActuators(EnergyPlusData &state);
+    void SetupSurfaceConstructionActuators();
 
-    void SetupSurfaceOutdoorBoundaryConditionActuators(EnergyPlusData &state);
+    void SetupSurfaceOutdoorBoundaryConditionActuators();
 
-    void SetupZoneOutdoorBoundaryConditionActuators(EnergyPlusData &state);
+    void SetupZoneOutdoorBoundaryConditionActuators();
 
-    void SetupZoneInfoAsInternalDataAvail(EnergyPlusData &state);
+    void SetupZoneInfoAsInternalDataAvail();
 
-    void checkForUnusedActuatorsAtEnd(EnergyPlusData &state);
+    void checkForUnusedActuatorsAtEnd();
 
-    void checkSetpointNodesAtEnd(EnergyPlusData &state);
+    void checkSetpointNodesAtEnd();
 
 } // namespace EMSManager
 

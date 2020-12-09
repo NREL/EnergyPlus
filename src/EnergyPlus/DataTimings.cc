@@ -306,8 +306,9 @@ namespace DataTimings {
 #endif
     }
 
-    Real64 epGetTimeUsed(EnergyPlusData &state, std::string const &ctimingElementstring)
+    Real64 epGetTimeUsed(std::string const &ctimingElementstring)
     {
+        GET_STATE_HERE
 
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
@@ -342,9 +343,9 @@ namespace DataTimings {
         return totalTimeUsed;
     }
 
-    Real64 epGetTimeUsedperCall(EnergyPlusData &state, std::string const &ctimingElementstring)
+    Real64 epGetTimeUsedperCall(std::string const &ctimingElementstring)
     {
-
+        GET_STATE_HERE
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   January 2012
@@ -383,8 +384,9 @@ namespace DataTimings {
         return averageTimeUsed;
     }
 
-    Real64 eptime(EnergyPlusData &state)
+    Real64 eptime()
     {
+        GET_STATE_HERE
 
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie

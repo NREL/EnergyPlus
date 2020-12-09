@@ -153,7 +153,7 @@ namespace UnitHeater {
                        Real64 &LatOutputProvided,     // Latent add/removal supplied by window AC (kg/s), dehumid = negative
                        int &CompIndex);
 
-    void GetUnitHeaterInput(EnergyPlusData &state);
+    void GetUnitHeaterInput();
 
     void InitUnitHeater(EnergyPlusData &state, int const UnitHeatNum,        // index for the current unit heater
                         int const ZoneNum,            // number of zone being served

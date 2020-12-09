@@ -153,11 +153,11 @@ namespace CoolingPanelSimple {
         {
         }
 
-        void CalcCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum);
+        void CalcCoolingPanel(int const CoolingPanelNum);
 
-        void SetCoolingPanelControlTemp(EnergyPlusData &state, Real64 &ControlTemp, int ZoneNum);
+        void SetCoolingPanelControlTemp(Real64 &ControlTemp, int ZoneNum);
 
-        bool SizeCoolingPanelUA(EnergyPlusData &state);
+        bool SizeCoolingPanelUA();
 
         void ReportCoolingPanel();
     };
@@ -174,25 +174,24 @@ namespace CoolingPanelSimple {
         ~CoolingPanelSysNumericFieldData() = default;
     };
 
-    void SimCoolingPanel(EnergyPlusData &state, std::string const &EquipName,
+    void SimCoolingPanel(std::string const &EquipName,
                          int ActualZoneNum,
                          int ControlledZoneNum,
                          bool FirstHVACIteration,
                          Real64 &PowerMet,
                          int &CompIndex);
 
-    void GetCoolingPanelInput(EnergyPlusData &state);
+    void GetCoolingPanelInput();
 
-    void InitCoolingPanel(EnergyPlusData &state, int CoolingPanelNum, int ControlledZoneNumSub, bool FirstHVACIteration);
+    void InitCoolingPanel(int CoolingPanelNum, int ControlledZoneNumSub, bool FirstHVACIteration);
 
-    void SizeCoolingPanel(EnergyPlusData &state, int CoolingPanelNum);
+    void SizeCoolingPanel(int CoolingPanelNum);
 
-    void UpdateCoolingPanel(EnergyPlusData &state, int CoolingPanelNum);
+    void UpdateCoolingPanel(int CoolingPanelNum);
 
-    void UpdateCoolingPanelSourceValAvg(EnergyPlusData &state,
-                                        bool &CoolingPanelSysOn); // .TRUE. if the radiant system has run this zone time step
+    void UpdateCoolingPanelSourceValAvg(bool &CoolingPanelSysOn); // .TRUE. if the radiant system has run this zone time step
 
-    void DistributeCoolingPanelRadGains(EnergyPlusData &state);
+    void DistributeCoolingPanelRadGains();
 
     Real64 SumHATsurf(int ZoneNum); // Zone number
 

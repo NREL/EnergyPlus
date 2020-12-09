@@ -351,7 +351,7 @@ namespace EvaporativeCoolers {
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetEvapInput(EnergyPlusData &state);
+    void GetEvapInput();
 
     // End of Get Input subroutines for the HB Module
     //******************************************************************************
@@ -451,7 +451,7 @@ namespace EvaporativeCoolers {
                                       int &CompIndex                  // index to zone hvac unit
     );
 
-    void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state);
+    void GetInputZoneEvaporativeCoolerUnit();
 
     void InitZoneEvaporativeCoolerUnit(EnergyPlusData &state, int UnitNum, // unit number
                                        int ZoneNum  // number of zone being served

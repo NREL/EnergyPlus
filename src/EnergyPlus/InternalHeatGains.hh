@@ -71,15 +71,15 @@ namespace InternalHeatGains {
 
     void ManageInternalHeatGains(EnergyPlusData &state, Optional_bool_const InitOnly = _); // when true, just calls the get input, if appropriate and returns.
 
-    void GetInternalHeatGainsInput(EnergyPlusData &state);
+    void GetInternalHeatGainsInput();
 
-    void InitInternalHeatGains(EnergyPlusData &state);
+    void InitInternalHeatGains();
 
-    void CheckReturnAirHeatGain(EnergyPlusData &state);
+    void CheckReturnAirHeatGain();
 
-    void CalcZoneITEq(EnergyPlusData &state);
+    void CalcZoneITEq();
 
-    void ReportInternalHeatGains(EnergyPlusData &state);
+    void ReportInternalHeatGains();
 
     Real64 GetDesignLightingLevelForZone(EnergyPlusData &state, int const WhichZone); // name of zone
 
@@ -174,7 +174,7 @@ namespace InternalHeatGains {
     void SumAllInternalGenericContamGains(int const ZoneNum, // zone index pointer for which zone to sum gains for
                                           Real64 &SumGCGainRate);
 
-    void GatherComponentLoadsIntGain(EnergyPlusData &state);
+    void GatherComponentLoadsIntGain();
 
 } // namespace InternalHeatGains
 

@@ -82,7 +82,7 @@ namespace RoomAirModelAirflowNetwork {
         void CalcRoomAirModelAirflowNetwork(EnergyPlusData &state, int const ThisRoomAirNode); // index number for the specified zone and room air node
 
         //*****************************************************************************************
-        void UpdateRoomAirModelAirflowNetwork(EnergyPlusData &state); // index number for the specified zone
+        void UpdateRoomAirModelAirflowNetwork(); // index number for the specified zone
 
         //*****************************************************************************************
         void CalcNodeSums(EnergyPlusData &state, int const RoomAirNode); // index number for the specified zone and room air node
@@ -90,7 +90,7 @@ namespace RoomAirModelAirflowNetwork {
         //*****************************************************************************************
         void SumNonAirSystemResponseForNode(EnergyPlusData &state, int const RoomAirNode); // index number for the specified zone and room air node
         //*****************************************************************************************
-        void SumSystemDepResponseForNode(EnergyPlusData &state); // index number for the specified zone and room air node
+        void SumSystemDepResponseForNode(); // index number for the specified zone and room air node
 
         //*****************************************************************************************
 

@@ -114,11 +114,11 @@ namespace SimAirServingZones {
                         bool &SimZoneEquipment         // TRUE means zone equipment must be (re) simulated
     );
 
-    void GetAirPathData(EnergyPlusData &state);
+    void GetAirPathData();
 
     void InitAirLoops(EnergyPlusData &state, bool FirstHVACIteration); // TRUE if first full HVAC iteration in an HVAC timestep
 
-    void ConnectReturnNodes(EnergyPlusData &state);
+    void ConnectReturnNodes();
 
     void SimAirLoops(EnergyPlusData &state, bool FirstHVACIteration, bool &SimZoneEquipment);
 
@@ -161,13 +161,13 @@ namespace SimAirServingZones {
                         bool &SysReSim    // Set to TRUE if mass balance fails and re-simulation is needed
     );
 
-    void SizeAirLoops(EnergyPlusData &state);
+    void SizeAirLoops();
 
     void SizeAirLoopBranches(EnergyPlusData &state, int AirLoopNum, int BranchNum);
 
-    void SetUpSysSizingArrays(EnergyPlusData &state);
+    void SetUpSysSizingArrays();
 
-    void SizeSysOutdoorAir(EnergyPlusData &state);
+    void SizeSysOutdoorAir();
 
     void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator CallIndicator);
 

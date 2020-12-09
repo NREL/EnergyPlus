@@ -129,9 +129,9 @@ namespace PondGroundHeatExchanger {
 
         void InitPondGroundHeatExchanger(EnergyPlusData &state, bool FirstHVACIteration);
 
-        void setupOutputVars(EnergyPlusData &state);
+        void setupOutputVars();
 
-        void CalcPondGroundHeatExchanger(EnergyPlusData &state);
+        void CalcPondGroundHeatExchanger();
 
         Real64 CalcTotalFLux(EnergyPlusData &state, Real64 PondBulkTemp // pond temp for this flux calculation
         );
@@ -142,9 +142,9 @@ namespace PondGroundHeatExchanger {
                                  Real64 massFlowRate       // Mass flow rate, in kg/s
         );
 
-        Real64 CalcSolarFlux(EnergyPlusData &state) const;
+        Real64 CalcSolarFlux() const;
 
-        void UpdatePondGroundHeatExchanger(EnergyPlusData &state);
+        void UpdatePondGroundHeatExchanger();
 
         void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation) override;
 
@@ -155,7 +155,7 @@ namespace PondGroundHeatExchanger {
 
     void clear_state();
 
-    void GetPondGroundHeatExchanger(EnergyPlusData &state);
+    void GetPondGroundHeatExchanger();
 
 } // namespace PondGroundHeatExchanger
 

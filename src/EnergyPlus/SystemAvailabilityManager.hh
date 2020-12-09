@@ -357,11 +357,11 @@ namespace SystemAvailabilityManager {
         }
     };
 
-    void ManageSystemAvailability(EnergyPlusData &state);
+    void ManageSystemAvailability();
 
-    void GetSysAvailManagerInputs(EnergyPlusData &state);
+    void GetSysAvailManagerInputs();
 
-    void GetSysAvailManagerListInputs(EnergyPlusData &state);
+    void GetSysAvailManagerListInputs();
 
     void GetPlantAvailabilityManager(EnergyPlusData &state,
                                      std::string const &AvailabilityListName, // name that should be an Availability Manager List Name
@@ -383,7 +383,7 @@ namespace SystemAvailabilityManager {
                                       bool &ErrorsFound        // true if certain errors are detected here
     );
 
-    void InitSysAvailManagers(EnergyPlusData &state);
+    void InitSysAvailManagers();
 
     void SimSysAvailManager(EnergyPlusData &state,
                             int const SysAvailType,
@@ -464,11 +464,11 @@ namespace SystemAvailabilityManager {
 
     int ValidateAndSetSysAvailabilityManagerType(EnergyPlusData &state, std::string const &AvailMgrName); // name to validate
 
-    void ManageHybridVentilation(EnergyPlusData &state);
+    void ManageHybridVentilation();
 
-    void GetHybridVentilationInputs(EnergyPlusData &state);
+    void GetHybridVentilationInputs();
 
-    void InitHybridVentSysAvailMgr(EnergyPlusData &state);
+    void InitHybridVentSysAvailMgr();
 
     void CalcHybridVentSysAvailMgr(EnergyPlusData &state,
                                    int const SysAvailNum,              // number of the current scheduled system availability manager

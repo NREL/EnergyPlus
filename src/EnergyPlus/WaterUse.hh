@@ -140,11 +140,11 @@ namespace WaterUse {
             DrainTemp = 0.0;
         }
 
-        void CalcEquipmentFlowRates(EnergyPlusData &state);
+        void CalcEquipmentFlowRates();
 
-        void CalcEquipmentDrainTemp(EnergyPlusData &state);
+        void CalcEquipmentDrainTemp();
 
-        void setupOutputVars(EnergyPlusData &state);
+        void setupOutputVars();
     };
 
     struct WaterConnectionsType : PlantComponent
@@ -229,28 +229,28 @@ namespace WaterUse {
 
         void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void InitConnections(EnergyPlusData &state);
+        void InitConnections();
 
         void CalcConnectionsFlowRates(EnergyPlusData &state, bool FirstHVACIteration);
 
-        void CalcConnectionsDrainTemp(EnergyPlusData &state);
+        void CalcConnectionsDrainTemp();
 
-        void CalcConnectionsHeatRecovery(EnergyPlusData &state);
+        void CalcConnectionsHeatRecovery();
 
         void UpdateWaterConnections();
 
-        void ReportWaterUse(EnergyPlusData &state);
+        void ReportWaterUse();
 
         void setupOutputVars([[maybe_unused]] EnergyPlusData &state);
     };
 
     void SimulateWaterUse(EnergyPlusData &state, bool FirstHVACIteration);
 
-    void GetWaterUseInput(EnergyPlusData &state);
+    void GetWaterUseInput();
 
-    void ReportStandAloneWaterUse(EnergyPlusData &state);
+    void ReportStandAloneWaterUse();
 
-    void CalcWaterUseZoneGains(EnergyPlusData &state);
+    void CalcWaterUseZoneGains();
 
 } // namespace WaterUse
 

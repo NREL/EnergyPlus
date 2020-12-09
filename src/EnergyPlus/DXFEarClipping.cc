@@ -174,8 +174,7 @@ namespace DXFEarClipping {
         return rModulus;
     }
 
-    int Triangulate(EnergyPlusData &state,
-                    int const nsides, // number of sides to polygon
+    int Triangulate(int const nsides, // number of sides to polygon
                     Array1D<Vector> &polygon,
                     Array1D<dTriangle> &outtriangles,
                     Real64 const surfazimuth,    // surface azimuth angle (outward facing normal)
@@ -184,7 +183,7 @@ namespace DXFEarClipping {
                     DataSurfaces::SurfaceClass surfclass          // surface class
     )
     {
-
+        GET_STATE_HERE
         // Subroutine information:
         //       Author         Linda Lawrie
         //       Date written   October 2005
@@ -509,8 +508,7 @@ namespace DXFEarClipping {
         return inside;
     }
 
-    void generate_ears(EnergyPlusData &state,
-                       int const nvert, // number of vertices in polygon
+    void generate_ears(int const nvert, // number of vertices in polygon
                        Array1D<Vector_2d> &vertex,
                        Array1D_int &ears,       // number of ears possible (dimensioned to nvert)
                        int &nears,              // number of ears found
@@ -522,7 +520,7 @@ namespace DXFEarClipping {
                        Array1D_int &earvert,    // vertex indicators for first ear
                        Array1D<Real64> &rangles)
     {
-
+        GET_STATE_HERE
         // Subroutine information:
         //       Author         Linda Lawrie
         //       Date written   October 2005

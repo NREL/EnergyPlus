@@ -73,7 +73,7 @@ namespace WindowEquivalentLayer {
     // Using/Aliasing
     using namespace DataWindowEquivalentLayer;
 
-    void InitEquivalentLayerWindowCalculations(EnergyPlusData &state);
+    void InitEquivalentLayerWindowCalculations();
 
     void SetEquivalentLayerWindowProperties(EnergyPlusData &state, int const ConstrNum);
 

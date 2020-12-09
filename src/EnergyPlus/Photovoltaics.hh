@@ -94,7 +94,7 @@ namespace Photovoltaics {
 
     // *************
 
-    void GetPVInput(EnergyPlusData &state);
+    void GetPVInput();
 
     int GetPVZone(EnergyPlusData &state, int const SurfNum);
 

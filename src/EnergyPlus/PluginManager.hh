@@ -82,8 +82,8 @@ namespace PluginManagement {
 
     void registerNewCallback(EnergyPlusData &state, EMSManager::EMSCallFrom iCalledFrom, const std::function<void (void *)>& f);
     void runAnyRegisteredCallbacks(EnergyPlusData &state, EMSManager::EMSCallFrom iCalledFrom, bool &anyRan);
-    void onBeginEnvironment(EnergyPlusData &state);
-    std::string pythonStringForUsage(EnergyPlusData &state);
+    void onBeginEnvironment();
+    std::string pythonStringForUsage();
 
     void clear_state();
 
@@ -107,11 +107,11 @@ namespace PluginManagement {
         // instances is done for the day, and shutdown should only be called when you are ready to destruct all the instances.  The things that happen
         // inside setup() and shutdown() are related to un-managed memory, and it's tricky to manage inside existing constructor/move operations, so they
         // are split out into these explicitly called methods.
-        void setup(EnergyPlusData &state);
+        void setup();
         void shutdown() const;
 
         // methods
-        static void reportPythonError(EnergyPlusData &state);
+        static void reportPythonError();
         bool run(EnergyPlusData &state, EMSManager::EMSCallFrom iCallingPoint) const; // calls main() on this plugin instance
 
         // plugin calling point hooks
@@ -178,13 +178,13 @@ namespace PluginManagement {
 
     class PluginManager {
     public:
-        explicit PluginManager(EnergyPlusData &state);
+        explicit PluginManager();
         ~PluginManager();
 
-        static int numActiveCallbacks(EnergyPlusData &state);
+        static int numActiveCallbacks();
         static void addToPythonPath(EnergyPlusData &state, const std::string& path, bool userDefinedPath);
         static std::string sanitizedPath(std::string path); // intentionally not a const& string
-        static void setupOutputVariables(EnergyPlusData &state);
+        static void setupOutputVariables();
 
         int maxGlobalVariableIndex = -1;
         void addGlobalVariable(EnergyPlusData &state, const std::string& name);
@@ -202,11 +202,11 @@ namespace PluginManagement {
         static Real64 getTrendVariableSum(EnergyPlusData &state, int handle, int count);
         static Real64 getTrendVariableDirection(EnergyPlusData &state, int handle, int count);
 
-        static void updatePluginValues(EnergyPlusData &state);
+        static void updatePluginValues();
 
         static int getLocationOfUserDefinedPlugin(EnergyPlusData &state, std::string const &programName);
         static void runSingleUserDefinedPlugin(EnergyPlusData &state, int index);
-        static bool anyUnexpectedPluginObjects(EnergyPlusData &state);
+        static bool anyUnexpectedPluginObjects();
     };
 
     struct PluginTrendVariable {

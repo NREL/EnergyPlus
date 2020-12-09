@@ -113,7 +113,7 @@ namespace OutsideEnergySources {
 
         void calculate(EnergyPlusData &state, bool runFlag, Real64 curLoad);
 
-        void size(EnergyPlusData &state);
+        void size();
 
     };
 
@@ -123,7 +123,7 @@ namespace OutsideEnergySources {
     // Functions
     void clear_state();
 
-    void GetOutsideEnergySourcesInput(EnergyPlusData &state);
+    void GetOutsideEnergySourcesInput();
 
     void InitSimVars(int EnergySourceNum, Real64 MyLoad);
 

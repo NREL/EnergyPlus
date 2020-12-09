@@ -738,8 +738,9 @@ namespace DataSurfaces {
         }
     }
 
-    void SurfaceData::SetOutBulbTempAt(EnergyPlusData &state)
+    void SurfaceData::SetOutBulbTempAt()
     {
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Noel Keen (LBL)/Linda Lawrie
         //       DATE WRITTEN   August 2010
@@ -768,8 +769,9 @@ namespace DataSurfaces {
         }
     }
 
-    void SurfaceData::SetWindSpeedAt(EnergyPlusData &state, Real64 const fac)
+    void SurfaceData::SetWindSpeedAt(Real64 const fac)
     {
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   June 2013
@@ -809,8 +811,9 @@ namespace DataSurfaces {
         WindDir = fac;
     }
 
-    Real64 SurfaceData::getInsideAirTemperature(EnergyPlusData &state, const int t_SurfNum) const
+    Real64 SurfaceData::getInsideAirTemperature(const int t_SurfNum) const
     {
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
         //       DATE WRITTEN   June 2016
@@ -876,8 +879,9 @@ namespace DataSurfaces {
         return value;
     }
 
-    Real64 SurfaceData::getOutsideAirTemperature(EnergyPlusData &state, const int t_SurfNum) const
+    Real64 SurfaceData::getOutsideAirTemperature(const int t_SurfNum) const
     {
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
         //       DATE WRITTEN   June 2016
@@ -914,8 +918,9 @@ namespace DataSurfaces {
         return temperature;
     }
 
-    Real64 SurfaceData::getOutsideIR(EnergyPlusData &state, const int t_SurfNum) const
+    Real64 SurfaceData::getOutsideIR(const int t_SurfNum) const
     {
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
         //       DATE WRITTEN   July 2016
@@ -979,8 +984,9 @@ namespace DataSurfaces {
         return  SurfQRadSWOutIncidentSkyDiffuse(t_SurfNum) + SurfQRadSWOutIncidentGndDiffuse(t_SurfNum) + QS(Surface(t_SurfNum).SolarEnclIndex);
     }
 
-    int SurfaceData::getTotLayers(EnergyPlusData &state) const
+    int SurfaceData::getTotLayers() const
     {
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
         //       DATE WRITTEN   August 2016
@@ -1097,8 +1103,9 @@ namespace DataSurfaces {
         }
     }
 
-    Real64 SurfaceData::get_average_height(EnergyPlusData &state) const
+    Real64 SurfaceData::get_average_height() const
     {
+        GET_STATE_HERE
         if (std::abs(SinTilt) < 1.e-4) {
             return 0.0;
         }
@@ -1420,15 +1427,17 @@ namespace DataSurfaces {
         SurfWinTDDPipeNum.clear();
     }
 
-    void SetSurfaceOutBulbTempAt(EnergyPlusData &state)
+    void SetSurfaceOutBulbTempAt()
     {
+        GET_STATE_HERE
         for (auto &surface : Surface) {
             surface.SetOutBulbTempAt(state);
         }
     }
 
-    void CheckSurfaceOutBulbTempAt(EnergyPlusData &state)
+    void CheckSurfaceOutBulbTempAt()
     {
+        GET_STATE_HERE
         // Using/Aliasing
         using DataEnvironment::SetOutBulbTempAt_error;
 
@@ -1439,16 +1448,18 @@ namespace DataSurfaces {
         }
     }
 
-    void SetSurfaceWindSpeedAt(EnergyPlusData &state)
+    void SetSurfaceWindSpeedAt()
     {
+        GET_STATE_HERE
         Real64 const fac(state.dataEnvrn->WindSpeed * state.dataEnvrn->WeatherFileWindModCoeff * std::pow(state.dataEnvrn->SiteWindBLHeight, -state.dataEnvrn->SiteWindExp));
         for (auto &surface : Surface) {
             surface.SetWindSpeedAt(state, fac);
         }
     }
 
-    void SetSurfaceWindDirAt(EnergyPlusData &state)
+    void SetSurfaceWindDirAt()
     {
+        GET_STATE_HERE
         // Using/Aliasing
         for (auto &surface : Surface) {
             surface.SetWindDirAt(state.dataEnvrn->WindDir);

@@ -199,14 +199,13 @@ namespace DataSystemVariables {
 
     // Functions
 
-    void CheckForActualFileName(EnergyPlusData &state,
-                                std::string const &originalInputFileName, // name as input for object
+    void CheckForActualFileName(std::string const &originalInputFileName, // name as input for object
                                 bool &FileFound,                          // Set to true if file found and is in CheckedFileName
                                 std::string &CheckedFileName,             // Blank if not found.
                                 const std::string contextString           //
     )
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   October 2011
@@ -331,8 +330,8 @@ namespace DataSystemVariables {
         firstTime = true;
     }
 
-    void processEnvironmentVariables(EnergyPlusData &state) {
-
+    void processEnvironmentVariables() {
+        GET_STATE_HERE
         static std::string cEnvValue;
 
         get_environment_variable(DDOnlyEnvVar, cEnvValue);

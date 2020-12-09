@@ -84,9 +84,9 @@ namespace BaseboardElectric {
     constexpr Real64 SimpConvAirFlowSpeed(0.5); // m/s
 
     void SimElectricBaseboard(
-        EnergyPlusData &state, std::string const &EquipName, int const ActualZoneNum, int const ControlledZoneNum, Real64 &PowerMet, int &CompIndex)
+        std::string const &EquipName, int const ActualZoneNum, int const ControlledZoneNum, Real64 &PowerMet, int &CompIndex)
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   Nov 2001
@@ -149,9 +149,9 @@ namespace BaseboardElectric {
         baseboard->Baseboard(BaseboardNum).ElecUseLoad = baseboard->Baseboard(BaseboardNum).ElecUseRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
     }
 
-    void GetBaseboardInput(EnergyPlusData &state)
+    void GetBaseboardInput()
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   Nov 2001
@@ -372,9 +372,9 @@ namespace BaseboardElectric {
         }
     }
 
-    void InitBaseboard(EnergyPlusData &state, int const BaseboardNum, int const ControlledZoneNum)
+    void InitBaseboard(int const BaseboardNum, int const ControlledZoneNum)
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   Nov 2001
@@ -433,9 +433,9 @@ namespace BaseboardElectric {
         baseboard->Baseboard(BaseboardNum).AirInletHumRat = Node(ZoneNode).HumRat;
     }
 
-    void SizeElectricBaseboard(EnergyPlusData &state, int const BaseboardNum)
+    void SizeElectricBaseboard(int const BaseboardNum)
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   February 2002
@@ -523,8 +523,9 @@ namespace BaseboardElectric {
         }
     }
 
-    void SimElectricConvective(EnergyPlusData &state, int const BaseboardNum, Real64 const LoadMet)
+    void SimElectricConvective(int const BaseboardNum, Real64 const LoadMet)
     {
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   Nov 2001

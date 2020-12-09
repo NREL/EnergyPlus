@@ -88,15 +88,15 @@ namespace ZoneEquipmentManager {
                              bool &SimAir                       // Eventually set to true via SimZoneEquipment if AirLoop must be resimulated
     );
 
-    void GetZoneEquipment(EnergyPlusData &state);
+    void GetZoneEquipment();
 
     void InitZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration); // unused 1208
 
-    void SizeZoneEquipment(EnergyPlusData &state);
+    void SizeZoneEquipment();
 
-    void SetUpZoneSizingArrays(EnergyPlusData &state);
+    void SetUpZoneSizingArrays();
 
-    void RezeroZoneSizingArrays(EnergyPlusData &state);
+    void RezeroZoneSizingArrays();
 
     void UpdateZoneSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator const CallIndicator);
 
@@ -148,7 +148,7 @@ namespace ZoneEquipmentManager {
                                    Real64 &DOASSupHR    // DOAS Supply Humidity ratio [kg Water / kg Dry Air]
     );
 
-    void AutoCalcDOASControlStrategy(EnergyPlusData &state);
+    void AutoCalcDOASControlStrategy();
 
     void ReportZoneSizingDOASInputs(EnergyPlusData &state,
                                     std::string const &ZoneName,         // the name of the zone

@@ -103,14 +103,14 @@ namespace CoolingPanelSimple {
     // MODULE PARAMETER DEFINITIONS
     std::string const cCMO_CoolingPanel_Simple("ZoneHVAC:CoolingPanel:RadiantConvective:Water");
 
-    void SimCoolingPanel(EnergyPlusData &state, std::string const &EquipName,
+    void SimCoolingPanel(std::string const &EquipName,
                          int const ActualZoneNum,
                          int const ControlledZoneNum,
                          bool const FirstHVACIteration,
                          Real64 &PowerMet,
                          int &CompIndex)
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   Aug 2014
@@ -209,9 +209,9 @@ namespace CoolingPanelSimple {
         }
     }
 
-    void GetCoolingPanelInput(EnergyPlusData &state)
+    void GetCoolingPanelInput()
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   Aug 2014
@@ -696,9 +696,9 @@ namespace CoolingPanelSimple {
         }
     }
 
-    void InitCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum, int const ControlledZoneNumSub, bool const FirstHVACIteration)
+    void InitCoolingPanel(int const CoolingPanelNum, int const ControlledZoneNumSub, bool const FirstHVACIteration)
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   Sept 2014
@@ -874,8 +874,9 @@ namespace CoolingPanelSimple {
         ThisCP.RadEnergy = 0.0;
     }
 
-    void SizeCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum)
+    void SizeCoolingPanel(int const CoolingPanelNum)
     {
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   Sept 2016
@@ -1086,9 +1087,9 @@ namespace CoolingPanelSimple {
         if (!SizeCoolingPanelUASuccess) ShowFatalError(state, "SizeCoolingPanelUA: Program terminated for previous conditions.");
     }
 
-    bool CoolingPanelParams::SizeCoolingPanelUA(EnergyPlusData &state)
+    bool CoolingPanelParams::SizeCoolingPanelUA()
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   June 2017
@@ -1158,8 +1159,9 @@ namespace CoolingPanelSimple {
         return SizeCoolingPanelUA;
     }
 
-    void CoolingPanelParams::CalcCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum)
+    void CoolingPanelParams::CalcCoolingPanel(int const CoolingPanelNum)
     {
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   Sept 2014
@@ -1447,9 +1449,9 @@ namespace CoolingPanelSimple {
         this->RadPower = RadHeat;
     }
 
-    void CoolingPanelParams::SetCoolingPanelControlTemp(EnergyPlusData &state, Real64 &ControlTemp, int const ZoneNum)
+    void CoolingPanelParams::SetCoolingPanelControlTemp(Real64 &ControlTemp, int const ZoneNum)
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   July 2016
@@ -1482,9 +1484,9 @@ namespace CoolingPanelSimple {
         }
     }
 
-    void UpdateCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum)
+    void UpdateCoolingPanel(int const CoolingPanelNum)
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   Sept 2014
@@ -1533,10 +1535,9 @@ namespace CoolingPanelSimple {
         ThisOutNode.MassFlowRateMax = ThisCP.WaterMassFlowRateMax;
     }
 
-    void UpdateCoolingPanelSourceValAvg(EnergyPlusData &state,
-                                        bool &CoolingPanelSysOn) // .TRUE. if the radiant system has run this zone time step
+    void UpdateCoolingPanelSourceValAvg(bool &CoolingPanelSysOn) // .TRUE. if the radiant system has run this zone time step
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   Sept 2014
@@ -1579,9 +1580,9 @@ namespace CoolingPanelSimple {
         DistributeCoolingPanelRadGains(state); // CoolingPanelRadSource has been modified so we need to redistribute gains
     }
 
-    void DistributeCoolingPanelRadGains(EnergyPlusData &state)
+    void DistributeCoolingPanelRadGains()
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   Sept 2014

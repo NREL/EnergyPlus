@@ -260,7 +260,7 @@ namespace IntegratedHeatPump {
                 Optional<Real64 const> OnOffAirFlowRat = _ // ratio of comp on to comp off air flow rate
     );
 
-    void GetIHPInput(EnergyPlusData &state);
+    void GetIHPInput();
 
     void SizeIHP(EnergyPlusData &state, int const CoilNum);
 
@@ -297,7 +297,7 @@ namespace IntegratedHeatPump {
                                  bool const IsCallbyWH // whether the call from the water heating loop or air loop, true = from water heating loop
     );
 
-    bool IHPInModel(EnergyPlusData &state);
+    bool IHPInModel();
 
     int GetCoilIndexIHP(EnergyPlusData &state,
                         std::string const &CoilType, // must match coil types in this module

@@ -249,38 +249,38 @@ namespace ChillerReformulatedEIR {
         {
         }
 
-        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
+        static PlantComponent *factory(std::string const &objectName);
 
-        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void getDesignCapacities(EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+        void getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
         void getDesignTemperatures(Real64 &TempDesCondIn, Real64 &TempDesEvapOut) override;
 
         void getSizingFactor(Real64 &sizFac) override;
 
-        void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation) override;
+        void onInitLoopEquip(const PlantLocation &calledFromLocation) override;
 
-        void initialize(EnergyPlusData &state, bool RunFlag, Real64 MyLoad);
+        void initialize(bool RunFlag, Real64 MyLoad);
 
-        void setupOutputVars(EnergyPlusData &state);
+        void setupOutputVars();
 
-        void size(EnergyPlusData &state);
+        void size();
 
-        void control(EnergyPlusData &state, Real64 &MyLoad, bool RunFlag, bool FirstIteration);
+        void control(Real64 &MyLoad, bool RunFlag, bool FirstIteration);
 
-        void calculate(EnergyPlusData &state, Real64 &MyLoad, bool RunFlag, Real64 FalsiCondOutTemp);
+        void calculate(Real64 &MyLoad, bool RunFlag, Real64 FalsiCondOutTemp);
 
-        void calcHeatRecovery(EnergyPlusData &state, Real64 &QCond, Real64 CondMassFlow, Real64 condInletTemp, Real64 &QHeatRec);
+        void calcHeatRecovery(Real64 &QCond, Real64 CondMassFlow, Real64 condInletTemp, Real64 &QHeatRec);
 
         void update(Real64 MyLoad, bool RunFlag);
 
-        void checkMinMaxCurveBoundaries(EnergyPlusData &state, bool FirstIteration);
+        void checkMinMaxCurveBoundaries(bool FirstIteration);
 
-        Real64 condOutTempResidual(EnergyPlusData &state, Real64 FalsiCondOutTemp, Array1D<Real64> const &Par);
+        Real64 condOutTempResidual(Real64 FalsiCondOutTemp, Array1D<Real64> const &Par);
     };
 
-    void GetElecReformEIRChillerInput(EnergyPlusData &state);
+    void GetElecReformEIRChillerInput();
 
 } // namespace ChillerReformulatedEIR
 

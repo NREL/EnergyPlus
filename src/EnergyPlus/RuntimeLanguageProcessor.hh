@@ -167,9 +167,9 @@ namespace RuntimeLanguageProcessor {
     // Functions
     void clear_state();
 
-    void InitializeRuntimeLanguage(EnergyPlusData &state);
+    void InitializeRuntimeLanguage();
 
-    void BeginEnvrnInitializeRuntimeLanguage(EnergyPlusData &state);
+    void BeginEnvrnInitializeRuntimeLanguage();
 
     void ParseStack(EnergyPlusData &state, int const StackNum);
 
@@ -206,7 +206,7 @@ namespace RuntimeLanguageProcessor {
 
     int ProcessTokens(EnergyPlusData &state, const Array1D<TokenType> &TokenIN, int const NumTokensIN, int const StackNum, std::string const &ParsingString);
 
-    int NewExpression(EnergyPlusData &state);
+    int NewExpression();
 
     ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, bool &seriousErrorFound);
 
@@ -220,9 +220,9 @@ namespace RuntimeLanguageProcessor {
 
     int TodayTomorrowWeather(EnergyPlusData &state, int hour, int timestep, Array2D<bool> &TodayTomorrowWeatherSource, int &value);
 
-    void GetRuntimeLanguageUserInput(EnergyPlusData &state);
+    void GetRuntimeLanguageUserInput();
 
-    void ReportRuntimeLanguage(EnergyPlusData &state);
+    void ReportRuntimeLanguage();
 
     ErlValueType SetErlValueNumber(Real64 const Number, Optional<ErlValueType const> OrigValue = _);
 
@@ -236,7 +236,7 @@ namespace RuntimeLanguageProcessor {
 
     int NewEMSVariable(EnergyPlusData &state, std::string const &VariableName, int const StackNum, Optional<ErlValueType const> Value = _);
 
-    void SetupPossibleOperators(EnergyPlusData &state);
+    void SetupPossibleOperators();
 
     void ExternalInterfaceSetErlVariable(EnergyPlusData &state,
                                          int const varNum,  // The variable index to be written during run time

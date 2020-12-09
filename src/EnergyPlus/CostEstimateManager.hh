@@ -139,13 +139,13 @@ namespace CostEstimateManager {
         }
     };
 
-    void SimCostEstimate(EnergyPlusData &state);
+    void SimCostEstimate();
 
-    void GetCostEstimateInput(EnergyPlusData &state);
+    void GetCostEstimateInput();
 
-    void CheckCostEstimateInput(EnergyPlusData &state, bool &ErrorsFound); // Set to true if errors in input, fatal at end of routine
+    void CheckCostEstimateInput(bool &ErrorsFound); // Set to true if errors in input, fatal at end of routine
 
-    void CalcCostEstimate(EnergyPlusData &state);
+    void CalcCostEstimate();
 
 } // namespace CostEstimateManager
 

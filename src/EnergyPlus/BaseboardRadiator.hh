@@ -129,25 +129,24 @@ namespace BaseboardRadiator {
         BaseboardParamsNumericFieldData() = default;
     };
 
-    void SimBaseboard(EnergyPlusData &state, std::string const &EquipName,
+    void SimBaseboard(std::string const &EquipName,
                       int ActualZoneNum,
                       int ControlledZoneNum,
                       bool FirstHVACIteration,
                       Real64 &PowerMet,
                       int &CompIndex);
 
-    void GetBaseboardInput(EnergyPlusData &state);
+    void GetBaseboardInput();
 
-    void InitBaseboard(EnergyPlusData &state, int BaseboardNum, int ControlledZoneNumSub);
+    void InitBaseboard(int BaseboardNum, int ControlledZoneNumSub);
 
-    void SizeBaseboard(EnergyPlusData &state, int BaseboardNum);
+    void SizeBaseboard(int BaseboardNum);
 
-    void SimHWConvective(EnergyPlusData &state, int &BaseboardNum, Real64 &LoadMet);
+    void SimHWConvective(int &BaseboardNum, Real64 &LoadMet);
 
-    void UpdateBaseboard(EnergyPlusData &state, int &BaseboardNum);
+    void UpdateBaseboard(int &BaseboardNum);
 
-    Real64 HWBaseboardUAResidual(EnergyPlusData &state,
-                                 Real64 UA,           // UA of coil
+    Real64 HWBaseboardUAResidual(Real64 UA,           // UA of coil
                                  Array1D<Real64> const &Par // par(1) = design coil load [W]
     );
 

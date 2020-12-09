@@ -270,23 +270,23 @@ namespace GroundHeatExchangers {
                   updateCurSimTime(true), triggerDesignDayReset(false) {
         }
 
-        virtual void calcGFunctions(EnergyPlusData &state) = 0;
+        virtual void calcGFunctions() = 0;
 
         void calcAggregateLoad();
 
-        void updateGHX(EnergyPlusData &state);
+        void updateGHX();
 
-        void calcGroundHeatExchanger(EnergyPlusData &state);
+        void calcGroundHeatExchanger();
 
         inline bool isEven(int val);
 
         Real64 interpGFunc(Real64);
 
-        void makeThisGLHECacheAndCompareWithFileCache(EnergyPlusData &state);
+        void makeThisGLHECacheAndCompareWithFileCache();
 
         virtual void makeThisGLHECacheStruct() = 0;
 
-        virtual void readCacheFileAndCompareWithThisGLHECache(EnergyPlusData &state) = 0;
+        virtual void readCacheFileAndCompareWithThisGLHECache() = 0;
 
         void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation) override;
 
@@ -297,9 +297,9 @@ namespace GroundHeatExchangers {
 
         virtual Real64 getGFunc(Real64) = 0;
 
-        virtual void initGLHESimVars(EnergyPlusData &state) = 0;
+        virtual void initGLHESimVars() = 0;
 
-        virtual Real64 calcHXResistance(EnergyPlusData &state) = 0;
+        virtual Real64 calcHXResistance() = 0;
 
         virtual void getAnnualTimeConstant() = 0;
     };
@@ -341,15 +341,15 @@ namespace GroundHeatExchangers {
         doubleIntegral(std::shared_ptr<GLHEVertSingleStruct> const &bh_i,
                        std::shared_ptr<GLHEVertSingleStruct> const &bh_j, Real64 const &currTime);
 
-        void calcShortTimestepGFunctions(EnergyPlusData &state);
+        void calcShortTimestepGFunctions();
 
-        void calcLongTimestepGFunctions(EnergyPlusData &state);
+        void calcLongTimestepGFunctions();
 
-        void calcGFunctions(EnergyPlusData &state);
+        void calcGFunctions();
 
-        Real64 calcHXResistance(EnergyPlusData &state);
+        Real64 calcHXResistance();
 
-        void initGLHESimVars(EnergyPlusData &state);
+        void initGLHESimVars();
 
         void getAnnualTimeConstant();
 
@@ -357,23 +357,23 @@ namespace GroundHeatExchangers {
 
         void makeThisGLHECacheStruct();
 
-        void readCacheFileAndCompareWithThisGLHECache(EnergyPlusData &state);
+        void readCacheFileAndCompareWithThisGLHECache();
 
-        void writeGLHECacheToFile(EnergyPlusData &state);
+        void writeGLHECacheToFile();
 
-        Real64 calcBHAverageResistance(EnergyPlusData &state);
+        Real64 calcBHAverageResistance();
 
-        Real64 calcBHTotalInternalResistance(EnergyPlusData &state);
+        Real64 calcBHTotalInternalResistance();
 
-        Real64 calcBHGroutResistance(EnergyPlusData &state);
+        Real64 calcBHGroutResistance();
 
         Real64 calcPipeConductionResistance();
 
-        Real64 calcPipeConvectionResistance(EnergyPlusData &state);
+        Real64 calcPipeConvectionResistance();
 
         Real64 frictionFactor(Real64 reynoldsNum);
 
-        Real64 calcPipeResistance(EnergyPlusData &state);
+        Real64 calcPipeResistance();
 
         void combineShortAndLongTimestepGFunctions();
     };
@@ -407,11 +407,11 @@ namespace GroundHeatExchangers {
                   trenchSpacing(0.0), numCoils(0), monthOfMinSurfTemp(0), maxSimYears(0.0), minSurfTemp(0.0) {
         }
 
-        Real64 calcHXResistance(EnergyPlusData &state) override;
+        Real64 calcHXResistance() override;
 
-        void calcGFunctions(EnergyPlusData &state) override;
+        void calcGFunctions() override;
 
-        void initGLHESimVars(EnergyPlusData &state) override;
+        void initGLHESimVars() override;
 
         void getAnnualTimeConstant() override;
 
@@ -436,12 +436,12 @@ namespace GroundHeatExchangers {
 
         void makeThisGLHECacheStruct() override;
 
-        void readCacheFileAndCompareWithThisGLHECache(EnergyPlusData &state) override;
+        void readCacheFileAndCompareWithThisGLHECache() override;
     };
 
     void clear_state();
 
-    void GetGroundHeatExchangerInput(EnergyPlusData &state);
+    void GetGroundHeatExchangerInput();
 
     std::shared_ptr<GLHEResponseFactorsStruct>
     BuildAndGetResponseFactorObjectFromArray(std::shared_ptr<GLHEVertArrayStruct> const &arrayObjectPtr);

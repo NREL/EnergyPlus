@@ -67,11 +67,11 @@ namespace ZoneContaminantPredictorCorrector {
                                      Real64 const PriorTimeStep // the old value for timestep length is passed for possible use in interpolating
     );
 
-    void GetZoneContaminanInputs(EnergyPlusData &state);
+    void GetZoneContaminanInputs();
 
-    void GetZoneContaminanSetPoints(EnergyPlusData &state);
+    void GetZoneContaminanSetPoints();
 
-    void InitZoneContSetPoints(EnergyPlusData &state);
+    void InitZoneContSetPoints();
 
     void PredictZoneContaminants(EnergyPlusData &state,
                                  bool const ShortenTimeStepSys,
@@ -79,11 +79,11 @@ namespace ZoneContaminantPredictorCorrector {
                                  Real64 const PriorTimeStep         // the old value for timestep length is passed for possible use in interpolating
     );
 
-    void PushZoneTimestepHistories(EnergyPlusData &state);
+    void PushZoneTimestepHistories();
 
-    void PushSystemTimestepHistories(EnergyPlusData &state);
+    void PushSystemTimestepHistories();
 
-    void RevertZoneTimestepHistories(EnergyPlusData &state);
+    void RevertZoneTimestepHistories();
 
     void InverseModelCO2(EnergyPlusData &state, int const ZoneNum,           // Zone number
                          Real64 &CO2Gain,             // Zone total CO2 gain

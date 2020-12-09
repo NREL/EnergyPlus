@@ -59,15 +59,15 @@ struct EnergyPlusData;
 
 namespace CrossVentMgr {
 
-    void ManageUCSDCVModel(EnergyPlusData &state, int ZoneNum);
+    void ManageUCSDCVModel(int ZoneNum);
 
-    void InitUCSDCV(EnergyPlusData &state, int ZoneNum);
+    void InitUCSDCV(int ZoneNum);
 
-    void HcUCSDCV(EnergyPlusData &state, int ZoneNum);
+    void HcUCSDCV(int ZoneNum);
 
-    void EvolveParaUCSDCV(EnergyPlusData &state, int ZoneNum);
+    void EvolveParaUCSDCV(int ZoneNum);
 
-    void CalcUCSDCV(EnergyPlusData &state, int ZoneNum);
+    void CalcUCSDCV(int ZoneNum);
 
 } // namespace CrossVentMgr
 

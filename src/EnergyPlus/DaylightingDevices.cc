@@ -176,9 +176,9 @@ namespace DaylightingDevices {
     using DataSurfaces::SurfaceClass;
     using DataSurfaces::TotSurfaces;
 
-    void InitDaylightingDevices(EnergyPlusData &state)
+    void InitDaylightingDevices()
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   May 2003
@@ -435,9 +435,9 @@ namespace DaylightingDevices {
         }
     }
 
-    void GetTDDInput(EnergyPlusData &state)
+    void GetTDDInput()
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   May 2003
@@ -707,9 +707,9 @@ namespace DaylightingDevices {
         }
     }
 
-    void GetShelfInput(EnergyPlusData &state)
+    void GetShelfInput()
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   August 2003
@@ -994,9 +994,9 @@ namespace DaylightingDevices {
         return CalcPipeTransBeam;
     }
 
-    Real64 CalcTDDTransSolIso(EnergyPlusData &state, int const PipeNum) // TDD pipe object number
+    Real64 CalcTDDTransSolIso(int const PipeNum) // TDD pipe object number
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   July 2003
@@ -1059,9 +1059,9 @@ namespace DaylightingDevices {
         return CalcTDDTransSolIso;
     }
 
-    Real64 CalcTDDTransSolHorizon(EnergyPlusData &state, int const PipeNum) // TDD pipe object number
+    Real64 CalcTDDTransSolHorizon(int const PipeNum) // TDD pipe object number
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   July 2003
@@ -1131,12 +1131,11 @@ namespace DaylightingDevices {
         return CalcTDDTransSolHorizon;
     }
 
-    Real64 CalcTDDTransSolAniso(EnergyPlusData &state,
-                                int const PipeNum, // TDD pipe object number
+    Real64 CalcTDDTransSolAniso(int const PipeNum, // TDD pipe object number
                                 Real64 const COSI  // Cosine of the incident angle
     )
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   July 2003
@@ -1211,13 +1210,12 @@ namespace DaylightingDevices {
         return CalcTDDTransSolAniso;
     }
 
-    Real64 TransTDD(EnergyPlusData &state,
-                    int const PipeNum,      // TDD pipe object number
+    Real64 TransTDD(int const PipeNum,      // TDD pipe object number
                     Real64 const COSI,      // Cosine of the incident angle
                     DataDaylightingDevices::iRadType const RadiationType // Radiation type flag
     )
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   May 2003
@@ -1295,12 +1293,11 @@ namespace DaylightingDevices {
         return TransTDD;
     }
 
-    Real64 InterpolatePipeTransBeam(EnergyPlusData &state,
-                                    Real64 const COSI,               // Cosine of the incident angle
+    Real64 InterpolatePipeTransBeam(Real64 const COSI,               // Cosine of the incident angle
                                     const Array1D<Real64> &transBeam // Table of beam transmittance vs. cosine angle
     )
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   July 2003
@@ -1350,9 +1347,9 @@ namespace DaylightingDevices {
         return InterpolatePipeTransBeam;
     }
 
-    int FindTDDPipe(EnergyPlusData &state, int const WinNum)
+    int FindTDDPipe(int const WinNum)
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   May 2003
@@ -1397,9 +1394,9 @@ namespace DaylightingDevices {
         return FindTDDPipe;
     }
 
-    void DistributeTDDAbsorbedSolar(EnergyPlusData &state)
+    void DistributeTDDAbsorbedSolar()
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   July 2003
@@ -1466,9 +1463,9 @@ namespace DaylightingDevices {
         }
     }
 
-    void CalcViewFactorToShelf(EnergyPlusData &state, int const ShelfNum) // Daylighting shelf object number
+    void CalcViewFactorToShelf(int const ShelfNum) // Daylighting shelf object number
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   August 2003
@@ -1546,9 +1543,9 @@ namespace DaylightingDevices {
         state.dataDaylightingDevicesData->Shelf(ShelfNum).ViewFactor = (1.0 / (DataGlobalConstants::Pi * M)) * (E1 + 0.25 * std::log(E2 * E3 * E4));
     }
 
-    void FigureTDDZoneGains(EnergyPlusData &state)
+    void FigureTDDZoneGains()
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   Dec 2011

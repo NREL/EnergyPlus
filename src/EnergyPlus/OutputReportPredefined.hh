@@ -162,7 +162,7 @@ namespace OutputReportPredefined {
         }
     };
 
-    void SetPredefinedTables(EnergyPlusData &state);
+    void SetPredefinedTables();
 
     // Creates an entry for predefined tables when the entry
     // is a real variable. numSigDigits defaults to 2, and if supplied must be in [0-9]
@@ -175,7 +175,7 @@ namespace OutputReportPredefined {
 
     std::string RetrievePreDefTableEntry(EnergyPlusData &state, int const columnIndex, std::string const &objName);
 
-    void incrementTableEntry(EnergyPlusData &state);
+    void incrementTableEntry();
 
     void
     AddCompSizeTableEntry(EnergyPlusData &state, std::string const &FieldType, std::string const &FieldName, std::string const &FieldDescription, Real64 const FieldValue);

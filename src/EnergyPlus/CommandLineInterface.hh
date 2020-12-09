@@ -63,7 +63,7 @@ struct EnergyPlusData;
 namespace CommandLineInterface {
 
     // Process command line arguments
-    int ENERGYPLUSLIB_API ProcessArgs(EnergyPlusData &state, int argc, const char *argv[]);
+    int ENERGYPLUSLIB_API ProcessArgs(int argc, const char *argv[]);
 
     void ReadINIFile(InputFile &inputFile,               // Unit number of the opened INI file
                      std::string const &Heading,         // Heading for the parameters ('[heading]')
@@ -71,7 +71,7 @@ namespace CommandLineInterface {
                      std::string &DataOut                // Output from the retrieval
     );
 
-    int runReadVarsESO(EnergyPlusData &state);
+    int runReadVarsESO();
 
 } // namespace CommandLineInterface
 

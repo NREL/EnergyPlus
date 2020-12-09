@@ -277,7 +277,7 @@ namespace VentilatedSlab {
                            Real64 &LatOutputProvided,     // Latent add/removal supplied by window AC (kg/s), dehumid = negative
                            int &CompIndex);
 
-    void GetVentilatedSlabInput(EnergyPlusData &state);
+    void GetVentilatedSlabInput();
 
     void InitVentilatedSlab(EnergyPlusData &state, int const Item,               // index for the current ventilated slab
                             int const VentSlabZoneNum,    // number of zone being served

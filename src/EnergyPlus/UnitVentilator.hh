@@ -213,7 +213,7 @@ namespace UnitVentilator {
                            Real64 &LatOutputProvided,     // Latent add/removal supplied by window AC (kg/s), dehumid = negative
                            int &CompIndex);
 
-    void GetUnitVentilatorInput(EnergyPlusData &state);
+    void GetUnitVentilatorInput();
 
     void InitUnitVentilator(EnergyPlusData &state, int const UnitVentNum,         // index for the current unit ventilator
                             bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep

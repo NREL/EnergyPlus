@@ -514,7 +514,7 @@ namespace WeatherManager {
     // Functions
     void ManageWeather(EnergyPlusData& state);
 
-    void ResetEnvironmentCounter(EnergyPlusData &state);
+    void ResetEnvironmentCounter();
 
     bool GetNextEnvironment(EnergyPlusData &state, bool &Available, bool &ErrorsFound);
 
@@ -522,15 +522,15 @@ namespace WeatherManager {
     AddDesignSetToEnvironmentStruct(EnergyPlusData &state, int HVACSizingIterCount // Counter for number of times HVAC Sizing Simulation of Design Period set is being rerun
     );
 
-    bool CheckIfAnyUnderwaterBoundaries(EnergyPlusData &state);
+    bool CheckIfAnyUnderwaterBoundaries();
 
     Real64 calculateWaterBoundaryConvectionCoefficient(Real64 curWaterTemp, Real64 curWaterVelocity, Real64 distanceFromLeadingEdge);
 
-    void UpdateUnderwaterBoundaries(EnergyPlusData &state);
+    void UpdateUnderwaterBoundaries();
 
-    void ReadVariableLocationOrientation(EnergyPlusData &state);
+    void ReadVariableLocationOrientation();
 
-    void UpdateLocationAndOrientation(EnergyPlusData &state);
+    void UpdateLocationAndOrientation();
 
     void SetupWeekDaysByMonth(EnergyPlusData &state, int StMon, int StDay, int StWeekDay, Array1D_int &WeekDays);
 
@@ -554,9 +554,9 @@ namespace WeatherManager {
 
     void InitializeWeather(EnergyPlusData &state, bool &printEnvrnStamp); // Set to true when the environment header should be printed
 
-    void UpdateWeatherData(EnergyPlusData &state);
+    void UpdateWeatherData();
 
-    void SetCurrentWeather(EnergyPlusData &state);
+    void SetCurrentWeather();
 
     void ReadWeatherForDay(EnergyPlusData &state,
                            int DayToRead,          // =1 when starting out, otherwise signifies next day
@@ -632,7 +632,7 @@ namespace WeatherManager {
                         Real64 &IGlbH                     // returned: global irradiance on horiz surface, W/m2
     );
 
-    void AllocateWeatherData(EnergyPlusData &state);
+    void AllocateWeatherData();
 
     void CalculateDailySolarCoeffs(EnergyPlusData &state,
                                    int DayOfYear,                 // Day of year (1 - 366)
@@ -661,20 +661,20 @@ namespace WeatherManager {
                               bool ProcessHeader // Set to true when headers should be processed (rather than just read)
     );
 
-    void CloseWeatherFile(EnergyPlusData &state);
+    void CloseWeatherFile();
 
     void ResolveLocationInformation(EnergyPlusData &state, bool &ErrorsFound); // Set to true if no location evident
 
-    void CheckLocationValidity(EnergyPlusData &state);
+    void CheckLocationValidity();
 
-    void CheckWeatherFileValidity(EnergyPlusData &state);
+    void CheckWeatherFileValidity();
 
-    void ReportOutputFileHeaders(EnergyPlusData &state);
+    void ReportOutputFileHeaders();
 
     void ReportWeatherAndTimeInformation(EnergyPlusData &state,
                                          bool &printEnvrnStamp); // Set to true when the environment header should be printed
 
-    void ReadUserWeatherInput(EnergyPlusData &state);
+    void ReadUserWeatherInput();
 
     void GetRunPeriodData(EnergyPlusData &state, int &nRunPeriods, // Total number of Run Periods requested
                           bool &ErrorsFound);
@@ -683,7 +683,7 @@ namespace WeatherManager {
 
     void GetSpecialDayPeriodData(EnergyPlusData &state, bool &ErrorsFound); // will be set to true if severe errors are found in inputs
 
-    void CalcSpecialDayTypes(EnergyPlusData &state);
+    void CalcSpecialDayTypes();
 
     void GetDSTData(EnergyPlusData &state, bool &ErrorsFound); // will be set to true if severe errors are found in inputs
 
@@ -702,7 +702,7 @@ namespace WeatherManager {
 
     void GetWaterMainsTemperatures(EnergyPlusData &state, bool &ErrorsFound);
 
-    void CalcWaterMainsTemp(EnergyPlusData &state);
+    void CalcWaterMainsTemp();
 
     Real64 WaterMainsTempFromCorrelation(EnergyPlusData &state,
                                          Real64 AnnualOAAvgDryBulbTemp,        // annual average OA drybulb temperature
@@ -711,7 +711,7 @@ namespace WeatherManager {
 
     void GetWeatherStation(EnergyPlusData &state, bool &ErrorsFound);
 
-    void DayltgCurrentExtHorizIllum(EnergyPlusData &state);
+    void DayltgCurrentExtHorizIllum();
 
     void DayltgLuminousEfficacy(EnergyPlusData &state,
                                 Real64 &DiffLumEff, // Luminous efficacy of sky diffuse solar radiation (lum/W)
@@ -722,13 +722,13 @@ namespace WeatherManager {
 
     void ProcessEPWHeader(EnergyPlusData &state, std::string const &HeaderString, std::string &Line, bool &ErrorsFound);
 
-    void SkipEPlusWFHeader(EnergyPlusData &state);
+    void SkipEPlusWFHeader();
 
-    void ReportMissing_RangeData(EnergyPlusData &state);
+    void ReportMissing_RangeData();
 
-    void SetupInterpolationValues(EnergyPlusData &state);
+    void SetupInterpolationValues();
 
-    void SetupEnvironmentTypes(EnergyPlusData &state);
+    void SetupEnvironmentTypes();
 
     bool isLeapYear(int Year);
 
@@ -770,12 +770,12 @@ namespace WeatherManager {
               MonthlyDailyAverageDryBulbTemp(12, 0.0)
         {
         }
-        void CalcAnnualAndMonthlyDryBulbTemp(EnergyPlusData &state); // true if this is CorrelationFromWeatherFile
+        void CalcAnnualAndMonthlyDryBulbTemp(); // true if this is CorrelationFromWeatherFile
     };
 
     extern AnnualMonthlyDryBulbWeatherData OADryBulbAverage;
 
-    void ReportWaterMainsTempParameters(EnergyPlusData &state);
+    void ReportWaterMainsTempParameters();
     void calcSky(EnergyPlusData &state, Real64 &TmrHorizIRSky, Real64 &TmrSkyTemp, Real64 OpaqueSkyCover, Real64 DryBulb, Real64 DewPoint, Real64 RelHum, Real64 IRHoriz);
 
 } // namespace WeatherManager

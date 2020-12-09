@@ -106,7 +106,7 @@ namespace HVACFan {
 
         Real64 maxAirMassFlowRate() const;
 
-        Real64 getFanDesignTemperatureRise(EnergyPlusData &state) const;
+        Real64 getFanDesignTemperatureRise() const;
 
         Real64 getFanDesignHeatGain(EnergyPlusData &state, Real64 const FanVolFlow);
 
@@ -149,9 +149,9 @@ namespace HVACFan {
         static Real64 report_fei(EnergyPlusData &state, Real64 const designFlowRate, Real64 const designElecPower, Real64 const designDeltaPress, Real64 inletRhoAir);
 
     private: // methods
-        void init(EnergyPlusData &state);
+        void init();
 
-        void set_size(EnergyPlusData &state);
+        void set_size();
 
         void calcSimpleSystemFan(EnergyPlusData &state,
                                  Optional<Real64 const> flowFraction, // Flow fraction for entire timestep (not used if flow ratios are present)
@@ -163,7 +163,7 @@ namespace HVACFan {
                                  Optional<Real64 const> pressureRise2 // Pressure difference to use for operating mode 2
         );
 
-        void update(EnergyPlusData &state) const;
+        void update() const;
 
         void report();
 

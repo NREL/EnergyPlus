@@ -998,9 +998,9 @@ private:
 
 extern std::unique_ptr<SQLite> sqlite;
 
-std::unique_ptr<SQLite> CreateSQLiteDatabase(EnergyPlusData &state);
+std::unique_ptr<SQLite> CreateSQLiteDatabase();
 
-void CreateSQLiteZoneExtendedOutput(EnergyPlusData &state);
+void CreateSQLiteZoneExtendedOutput();
 
 struct SQLiteProceduresData : BaseGlobalStruct {
 

@@ -427,7 +427,7 @@ namespace PackagedThermalStorageCoil {
                     Optional<Real64 const> PartLoadRatio = _ // part load ratio (for single speed cycling unit)
     );
 
-    void GetTESCoilInput(EnergyPlusData &state);
+    void GetTESCoilInput();
 
     void InitTESCoil(EnergyPlusData &state, int &TESCoilNum);
 

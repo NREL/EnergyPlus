@@ -132,7 +132,7 @@ namespace NodeInputManager {
                      Optional_string_const InputFieldName = _      // Input Field Name
     );
 
-    void SetupNodeVarsForReporting(EnergyPlusData &state);
+    void SetupNodeVarsForReporting();
 
     void GetNodeListsInput(EnergyPlusData &state, bool &ErrorsFound);                // Set to true when requested Node List not found, unchanged otherwise
 
@@ -163,7 +163,7 @@ namespace NodeInputManager {
 
     void EndUniqueNodeCheck(EnergyPlusData &state, std::string const &ContextName);
 
-    void CalcMoreNodeInfo(EnergyPlusData &state);
+    void CalcMoreNodeInfo();
 
     void MarkNode(int const NodeNumber, // Node Number to be marked
                   std::string const &ObjectType,

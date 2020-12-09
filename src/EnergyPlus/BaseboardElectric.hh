@@ -104,15 +104,15 @@ namespace BaseboardElectric {
         BaseboardNumericFieldData() = default;
     };
 
-    void SimElectricBaseboard(EnergyPlusData &state, std::string const &EquipName, int ActualZoneNum, int ControlledZoneNum, Real64 &PowerMet, int &CompIndex);
+    void SimElectricBaseboard(std::string const &EquipName, int ActualZoneNum, int ControlledZoneNum, Real64 &PowerMet, int &CompIndex);
 
-    void GetBaseboardInput(EnergyPlusData &state);
+    void GetBaseboardInput();
 
-    void InitBaseboard(EnergyPlusData &state, int BaseboardNum, int ControlledZoneNum);
+    void InitBaseboard(int BaseboardNum, int ControlledZoneNum);
 
-    void SizeElectricBaseboard(EnergyPlusData &state, int BaseboardNum);
+    void SizeElectricBaseboard(int BaseboardNum);
 
-    void SimElectricConvective(EnergyPlusData &state, int BaseboardNum, Real64 LoadMet);
+    void SimElectricConvective(int BaseboardNum, Real64 LoadMet);
 
 } // namespace BaseboardElectric
 

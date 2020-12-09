@@ -60,9 +60,9 @@
 
 namespace EnergyPlus {
 
-void DisplayString(EnergyPlusData &state, std::string const &String) // String to be displayed
+void DisplayString(std::string const &String) // String to be displayed
 {
-
+    GET_STATE_HERE
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda Lawrie
     //       DATE WRITTEN   Version 1.0
@@ -100,9 +100,9 @@ void DisplayString(EnergyPlusData &state, std::string const &String) // String t
     std::cout << String << std::endl;
 }
 
-void DisplayString(EnergyPlusData &state, char const *String) // String to be displayed
+void DisplayString(char const *String) // String to be displayed
 {
-
+    GET_STATE_HERE
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda Lawrie
     //       DATE WRITTEN   Version 1.0
@@ -141,12 +141,11 @@ void DisplayString(EnergyPlusData &state, char const *String) // String to be di
     std::cout << String << std::endl;
 }
 
-void DisplayNumberAndString(EnergyPlusData &state,
-                            int const Number,         // number to be displayed
+void DisplayNumberAndString(int const Number,         // number to be displayed
                             std::string const &String // String to be displayed
 )
 {
-
+    GET_STATE_HERE
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda Lawrie
     //       DATE WRITTEN   Version 1.0
@@ -187,12 +186,11 @@ void DisplayNumberAndString(EnergyPlusData &state,
     std::cout << String << ' ' << Number << std::endl;
 }
 
-void DisplaySimDaysProgress(EnergyPlusData &state,
-                            int const CurrentSimDay, // Current Simulation Day
+void DisplaySimDaysProgress(int const CurrentSimDay, // Current Simulation Day
                             int const TotalSimDays   // Total number of Simulation Days
 )
 {
-
+    GET_STATE_HERE
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda Lawrie
     //       DATE WRITTEN   Version 1.0

@@ -187,7 +187,7 @@ namespace HWBaseboardRadiator {
                         Real64 &PowerMet,
                         int &CompIndex);
 
-    void GetHWBaseboardInput(EnergyPlusData &state);
+    void GetHWBaseboardInput();
 
     void InitHWBaseboard(EnergyPlusData &state, int const BaseboardNum, int const ControlledZoneNumSub, bool const FirstHVACIteration);
 
@@ -199,7 +199,7 @@ namespace HWBaseboardRadiator {
 
     void UpdateBBRadSourceValAvg(EnergyPlusData &state, bool &HWBaseboardSysOn); // .TRUE. if the radiant system has run this zone time step
 
-    void DistributeBBRadGains(EnergyPlusData &state);
+    void DistributeBBRadGains();
 
     void ReportHWBaseboard(int const BaseboardNum);
 

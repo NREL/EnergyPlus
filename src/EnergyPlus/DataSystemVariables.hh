@@ -170,8 +170,7 @@ namespace DataSystemVariables {
 
     // Functions
 
-    void CheckForActualFileName(EnergyPlusData &state,
-                                std::string const &originalInputFileName, // name as input for object
+    void CheckForActualFileName(std::string const &originalInputFileName, // name as input for object
                                 bool &FileFound,                          // Set to true if file found and is in CheckedFileName
                                 std::string &foundFileName,             // Blank if not found.
                                 const std::string contextString = std::string()
@@ -180,7 +179,7 @@ namespace DataSystemVariables {
     // Needed for unit tests, should not be normally called.
     void clear_state();
 
-    void processEnvironmentVariables(EnergyPlusData &state);
+    void processEnvironmentVariables();
 
 } // namespace DataSystemVariables
 

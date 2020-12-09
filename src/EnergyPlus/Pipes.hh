@@ -99,7 +99,7 @@ namespace Pipes {
     // Functions
     void clear_state();
 
-    void GetPipeInput(EnergyPlusData &state);
+    void GetPipeInput();
 
 } // namespace Pipes
 

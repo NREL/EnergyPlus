@@ -157,7 +157,7 @@ namespace TranspiredCollector {
                                 int &CompIndex               // component index (to reduce string compares during simulation)
     );
 
-    void GetTranspiredCollectorInput(EnergyPlusData &state);
+    void GetTranspiredCollectorInput();
 
     void InitTranspiredCollector(EnergyPlusData &state, int const UTSCNum); // compindex already checked in calling routine
 

@@ -192,9 +192,9 @@ namespace DualDuct {
         {
         }
 
-        void InitDualDuct(EnergyPlusData &state, bool const FirstHVACIteration);
+        void InitDualDuct(bool const FirstHVACIteration);
 
-        void SizeDualDuct(EnergyPlusData &state);
+        void SizeDualDuct();
 
         // End Initialization Section of the Module
         //******************************************************************************
@@ -202,19 +202,17 @@ namespace DualDuct {
         // Begin Algorithm Section of the Module
         //******************************************************************************
 
-        void SimDualDuctConstVol(EnergyPlusData &state, int const ZoneNum, int const ZoneNodeNum);
+        void SimDualDuctConstVol(int const ZoneNum, int const ZoneNodeNum);
 
-        void SimDualDuctVarVol(EnergyPlusData &state, int const ZoneNum, int const ZoneNodeNum);
+        void SimDualDuctVarVol(int const ZoneNum, int const ZoneNodeNum);
 
-        void SimDualDuctVAVOutdoorAir(EnergyPlusData &state, int const ZoneNum, int const ZoneNodeNum);
+        void SimDualDuctVAVOutdoorAir(int const ZoneNum, int const ZoneNodeNum);
 
-        void CalcOAMassFlow(EnergyPlusData &state,
-                            Real64 &SAMassFlow,   // outside air based on optional user input
+        void CalcOAMassFlow(Real64 &SAMassFlow,   // outside air based on optional user input
                             Real64 &AirLoopOAFrac // outside air based on optional user input
         );
 
-        void CalcOAOnlyMassFlow(EnergyPlusData &state,
-                                Real64 &OAMassFlow,               // outside air flow from user input kg/s
+        void CalcOAOnlyMassFlow(Real64 &OAMassFlow,               // outside air flow from user input kg/s
                                 Optional<Real64> MaxOAVolFlow = _ // design level for outside air m3/s
         );
 
@@ -224,9 +222,9 @@ namespace DualDuct {
         // Beginning of Update subroutines for the Damper Module
         // *****************************************************************************
 
-        void CalcOutdoorAirVolumeFlowRate(EnergyPlusData &state);
+        void CalcOutdoorAirVolumeFlowRate();
 
-        void UpdateDualDuct(EnergyPlusData &state);
+        void UpdateDualDuct();
 
         //        End of Update subroutines for the Damper Module
         // *****************************************************************************
@@ -243,19 +241,19 @@ namespace DualDuct {
 
     // Functions
 
-    void SimulateDualDuct(EnergyPlusData &state, std::string const &CompName, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum, int &CompIndex);
+    void SimulateDualDuct(std::string const &CompName, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum, int &CompIndex);
 
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetDualDuctInput(EnergyPlusData &state);
+    void GetDualDuctInput();
 
     // End of Get Input subroutines for the Module
     //******************************************************************************
 
-    void ReportDualDuctConnections(EnergyPlusData &state);
+    void ReportDualDuctConnections();
 
-    void GetDualDuctOutdoorAirRecircUse(EnergyPlusData &state, std::string const &CompTypeName, std::string const &CompName, bool &RecircIsUsed);
+    void GetDualDuctOutdoorAirRecircUse(std::string const &CompTypeName, std::string const &CompName, bool &RecircIsUsed);
 
     //        End of Reporting subroutines for the Damper Module
     // *****************************************************************************

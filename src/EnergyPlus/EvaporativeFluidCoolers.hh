@@ -252,7 +252,7 @@ namespace EvaporativeFluidCoolers {
 
         static PlantComponent *factory(EnergyPlusData &state, int objectType, std::string const &objectName);
 
-        void setupOutputVars(EnergyPlusData &state);
+        void setupOutputVars();
 
         void getSizingFactor(Real64 &_SizFac) override;
 
@@ -260,19 +260,19 @@ namespace EvaporativeFluidCoolers {
 
         void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void InitEvapFluidCooler(EnergyPlusData &state);
+        void InitEvapFluidCooler();
 
-        void SizeEvapFluidCooler(EnergyPlusData &state);
+        void SizeEvapFluidCooler();
 
-        void CalculateWaterUsage(EnergyPlusData &state);
+        void CalculateWaterUsage();
 
-        void UpdateEvapFluidCooler(EnergyPlusData &state);
+        void UpdateEvapFluidCooler();
 
         void ReportEvapFluidCooler(bool RunFlag);
 
-        void CalcSingleSpeedEvapFluidCooler(EnergyPlusData &state);
+        void CalcSingleSpeedEvapFluidCooler();
 
-        void CalcTwoSpeedEvapFluidCooler(EnergyPlusData &state);
+        void CalcTwoSpeedEvapFluidCooler();
 
         Real64 SimpleEvapFluidCoolerUAResidual(EnergyPlusData &state, Real64 UA, Array1D<Real64> const &Par);
 
@@ -284,7 +284,7 @@ namespace EvaporativeFluidCoolers {
     // Object Data
     extern Array1D<EvapFluidCoolerSpecs> SimpleEvapFluidCooler; // dimension to number of machines
 
-    void GetEvapFluidCoolerInput(EnergyPlusData &state);
+    void GetEvapFluidCoolerInput();
 
     void clear_state();
 

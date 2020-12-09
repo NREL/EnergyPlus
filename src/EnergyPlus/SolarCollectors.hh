@@ -226,9 +226,9 @@ namespace SolarCollectors {
 
         static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
-        void setupOutputVars(EnergyPlusData &state);
+        void setupOutputVars();
 
-        void initialize(EnergyPlusData &state);
+        void initialize();
 
         void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
@@ -241,13 +241,13 @@ namespace SolarCollectors {
                                     Optional<Real64> RefSysDiffuse = _ // cover system solar reflectance from inner to outer cover
         );
 
-        void CalcSolarCollector(EnergyPlusData &state);
+        void CalcSolarCollector();
 
-        void CalcICSSolarCollector(EnergyPlusData &state);
+        void CalcICSSolarCollector();
 
         void CalcTransAbsorProduct(EnergyPlusData &state, Real64 IncidAngle);
 
-        void CalcHeatTransCoeffAndCoverTemp(EnergyPlusData &state);
+        void CalcHeatTransCoeffAndCoverTemp();
 
         static void ICSCollectorAnalyticalSolution(EnergyPlusData &state, Real64 SecInTimeStep,     // seconds in a time step
                                                    Real64 a1,                // coefficient of ODE for Tp
@@ -279,12 +279,12 @@ namespace SolarCollectors {
 
         static void GetExtVentedCavityIndex(EnergyPlusData &state, int SurfacePtr, int &VentCavIndex);
 
-        void update(EnergyPlusData &state);
+        void update();
 
         void report();
     };
 
-    void GetSolarCollectorInput(EnergyPlusData &state);
+    void GetSolarCollectorInput();
 
 } // namespace SolarCollectors
 

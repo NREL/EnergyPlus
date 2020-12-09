@@ -135,8 +135,9 @@ namespace CurveManager {
         }
     }
 
-    void ResetPerformanceCurveOutput(EnergyPlusData &state)
+    void ResetPerformanceCurveOutput()
     {
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   August 2010
@@ -158,8 +159,7 @@ namespace CurveManager {
         }
     }
 
-    Real64 CurveValue(EnergyPlusData &state,
-                      int const CurveIndex,        // index of curve in curve array
+    Real64 CurveValue(int const CurveIndex,        // index of curve in curve array
                       Real64 const Var1,           // 1st independent variable
                       Optional<Real64 const> Var2, // 2nd independent variable
                       Optional<Real64 const> Var3, // 3rd independent variable
@@ -168,6 +168,7 @@ namespace CurveManager {
                       Optional<Real64 const> Var6  // 6th independent variable
     )
     {
+        GET_STATE_HERE
 
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
@@ -221,8 +222,9 @@ namespace CurveManager {
         return CurveValue;
     }
 
-    void GetCurveInput(EnergyPlusData &state)
+    void GetCurveInput()
     {
+        GET_STATE_HERE
         // wrapper for GetInput to allow unit testing when fatal inputs are detected - follow pattern from GetSetPointManagerInputs()
         bool GetInputErrorsFound = false;
 
@@ -234,8 +236,9 @@ namespace CurveManager {
         }
     }
 
-    void GetCurveInputData(EnergyPlusData &state, bool &ErrorsFound)
+    void GetCurveInputData(bool &ErrorsFound)
     {
+        GET_STATE_HERE
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
@@ -1990,7 +1993,8 @@ namespace CurveManager {
         state.dataCurveManager->btwxtManager.tableFiles.clear();
     }
 
-    int BtwxtManager::getGridIndex(EnergyPlusData &state, std::string &indVarListName, bool &ErrorsFound) {
+    int BtwxtManager::getGridIndex(std::string &indVarListName, bool &ErrorsFound) {
+        GET_STATE_HERE
         int gridIndex = -1;
         if (gridMap.count(indVarListName)) {
             gridIndex = gridMap.at(indVarListName);
@@ -2030,8 +2034,9 @@ namespace CurveManager {
         tableFiles.clear();
     }
 
-    bool TableFile::load(EnergyPlusData &state, std::string path)
+    bool TableFile::load(std::string path)
     {
+        GET_STATE_HERE
         filePath = path;
         bool fileFound;
         std::string fullPath;
@@ -2075,7 +2080,8 @@ namespace CurveManager {
         return false;
     }
 
-    std::vector<double>& TableFile::getArray(EnergyPlusData &state, std::pair<std::size_t, std::size_t> colAndRow) {
+    std::vector<double>& TableFile::getArray(std::pair<std::size_t, std::size_t> colAndRow) {
+        GET_STATE_HERE
         if (!arrays.count(colAndRow)) {
             // create the column from the data if it doesn't exist already
             std::size_t col = colAndRow.first;  // 0 indexed
@@ -2111,8 +2117,9 @@ namespace CurveManager {
         return arrays.at(colAndRow);
     }
 
-    void InitCurveReporting(EnergyPlusData &state)
+    void InitCurveReporting()
     {
+        GET_STATE_HERE
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
@@ -2244,14 +2251,14 @@ namespace CurveManager {
         }
     }
 
-    Real64 PerformanceCurveObject(EnergyPlusData &state,
-                                  int const CurveIndex,        // index of curve in curve array
+    Real64 PerformanceCurveObject(int const CurveIndex,        // index of curve in curve array
                                   Real64 const Var1,           // 1st independent variable
                                   Optional<Real64 const> Var2, // 2nd independent variable
                                   Optional<Real64 const> Var3, // 3rd independent variable
                                   Optional<Real64 const> Var4  // 4th independent variable
     )
     {
+        GET_STATE_HERE
 
         // FUNCTION INFORMATION:
         //       AUTHOR         Fred Buhl
@@ -2363,8 +2370,7 @@ namespace CurveManager {
         return CurveValue;
     }
 
-    Real64 BtwxtTableInterpolation(EnergyPlusData &state,
-                                   int const CurveIndex,        // index of curve in curve array
+    Real64 BtwxtTableInterpolation(int const CurveIndex,        // index of curve in curve array
                                    Real64 const Var1,           // 1st independent variable
                                    Optional<Real64 const> Var2, // 2nd independent variable
                                    Optional<Real64 const> Var3, // 3rd independent variable
@@ -2373,6 +2379,7 @@ namespace CurveManager {
                                    Optional<Real64 const> Var6  // 6th independent variable
     )
     {
+        GET_STATE_HERE
       // TODO: Generalize for N-dims
       Real64 var = Var1;
       var = max(min(var, state.dataCurveManager->PerfCurve(CurveIndex).Var1Max), state.dataCurveManager->PerfCurve(CurveIndex).Var1Min);
@@ -2486,14 +2493,14 @@ namespace CurveManager {
         return IsCurveOutputTypeValid;
     }
 
-    bool CheckCurveDims(EnergyPlusData &state,
-                        int const CurveIndex,
+    bool CheckCurveDims(int const CurveIndex,
                         std::vector<int> validDims,
                         std::string routineName,
                         std::string objectType,
                         std::string objectName,
                         std::string curveFieldText)
     {
+        GET_STATE_HERE
         // Returns true if errors found
         int curveDim = state.dataCurveManager->PerfCurve(CurveIndex).NumDims;
         if (std::find(validDims.begin(),validDims.end(), curveDim) != validDims.end()) {
@@ -2516,9 +2523,9 @@ namespace CurveManager {
         }
     }
 
-    std::string GetCurveName(EnergyPlusData &state, int const CurveIndex) // index of curve in curve array
+    std::string GetCurveName(int const CurveIndex) // index of curve in curve array
     {
-
+        GET_STATE_HERE
         // FUNCTION INFORMATION:
         //       AUTHOR         Bereket Nigusse
         //       DATE WRITTEN   May 2010
@@ -2539,8 +2546,9 @@ namespace CurveManager {
         return GetCurveName;
     }
 
-    int GetCurveIndex(EnergyPlusData &state, std::string const &CurveName) // name of the curve
+    int GetCurveIndex(std::string const &CurveName) // name of the curve
     {
+        GET_STATE_HERE
 
         // FUNCTION INFORMATION:
         //       AUTHOR         Fred Buhl
@@ -2576,12 +2584,12 @@ namespace CurveManager {
     // This utility function grabs a curve index and performs the
     // error checking
 
-    int GetCurveCheck(EnergyPlusData &state,
-                      std::string const &alph, // curve name
+    int GetCurveCheck(std::string const &alph, // curve name
                       bool &errFlag,
                       std::string const &ObjName // parent object of curve
     )
     {
+        GET_STATE_HERE
 
         // FUNCTION INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -2604,8 +2612,7 @@ namespace CurveManager {
         return GetCurveCheckOut;
     }
 
-    void GetCurveMinMaxValues(EnergyPlusData &state,
-                              int const CurveIndex,     // index of curve in curve array
+    void GetCurveMinMaxValues(int const CurveIndex,     // index of curve in curve array
                               Real64 &Var1Min,          // Minimum values of 1st independent variable
                               Real64 &Var1Max,          // Maximum values of 1st independent variable
                               Optional<Real64> Var2Min, // Minimum values of 2nd independent variable
@@ -2614,7 +2621,7 @@ namespace CurveManager {
                               Optional<Real64> Var3Max  // Maximum values of 2nd independent variable
     )
     {
-
+        GET_STATE_HERE
         // FUNCTION INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   July 2006
@@ -2633,13 +2640,13 @@ namespace CurveManager {
         if (present(Var3Max)) Var3Max = state.dataCurveManager->PerfCurve(CurveIndex).Var3Max;
     }
 
-    void SetCurveOutputMinMaxValues(EnergyPlusData &state,
-                                    int const CurveIndex,            // index of curve in curve array
+    void SetCurveOutputMinMaxValues(int const CurveIndex,            // index of curve in curve array
                                     bool &ErrorsFound,               // TRUE when errors occur
                                     Optional<Real64 const> CurveMin, // Minimum value of curve output
                                     Optional<Real64 const> CurveMax  // Maximum values of curve output
     )
     {
+        GET_STATE_HERE
 
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad
@@ -2674,8 +2681,9 @@ namespace CurveManager {
         }
     }
 
-    void GetPressureSystemInput(EnergyPlusData &state)
+    void GetPressureSystemInput()
     {
+        GET_STATE_HERE
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Edwin Lee
@@ -2741,12 +2749,11 @@ namespace CurveManager {
         }
     }
 
-    void GetPressureCurveTypeAndIndex(EnergyPlusData &state,
-                                      std::string const &PressureCurveName, // name of the curve
+    void GetPressureCurveTypeAndIndex(std::string const &PressureCurveName, // name of the curve
                                       DataBranchAirLoopPlant::PressureCurveType &PressureCurveType,
                                       int &PressureCurveIndex)
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Edwin Lee
         //       DATE WRITTEN   August 2009
@@ -2828,12 +2835,12 @@ namespace CurveManager {
         PressureCurveType = DataBranchAirLoopPlant::PressureCurveType::Error;
     }
 
-    Real64 PressureCurveValue(EnergyPlusData &state,
-                              int const PressureCurveIndex,
+    Real64 PressureCurveValue(int const PressureCurveIndex,
                               Real64 const MassFlow,
                               Real64 const Density,
                               Real64 const Viscosity)
     {
+        GET_STATE_HERE
 
         // FUNCTION INFORMATION:
         //       AUTHOR         Edwin Lee
@@ -2908,8 +2915,9 @@ namespace CurveManager {
         return PressureCurveValue;
     }
 
-    Real64 CalculateMoodyFrictionFactor(EnergyPlusData &state, Real64 const ReynoldsNumber, Real64 const RoughnessRatio)
+    Real64 CalculateMoodyFrictionFactor(Real64 const ReynoldsNumber, Real64 const RoughnessRatio)
     {
+        GET_STATE_HERE
 
         // FUNCTION INFORMATION:
         //       AUTHOR         Edwin Lee
@@ -2973,8 +2981,7 @@ namespace CurveManager {
         return CalculateMoodyFrictionFactor;
     }
 
-    void checkCurveIsNormalizedToOne(EnergyPlusData &state,
-                                     std::string const callingRoutineObj, // calling routine with object type
+    void checkCurveIsNormalizedToOne(std::string const callingRoutineObj, // calling routine with object type
                                      std::string const objectName,        // parent object where curve is used
                                      int const curveIndex,                // index to curve object
                                      std::string const cFieldName,        // object field name
@@ -2986,7 +2993,7 @@ namespace CurveManager {
                                      Optional<Real64 const> Var5          // 5th independent variable
     )
     {
-
+        GET_STATE_HERE
         // FUNCTION INFORMATION:
         //       AUTHOR         R. Raustad
         //       DATE WRITTEN   May 2017

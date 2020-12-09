@@ -83,7 +83,7 @@ enum class GeneratorType {
     PVWatts
 };
 
-void initializeElectricPowerServiceZoneGains(EnergyPlusData &state);
+void initializeElectricPowerServiceZoneGains();
 
 class DCtoACInverter
 // This class is for modelling a power conversion device that takes DC power in and produces AC power out.
@@ -126,7 +126,7 @@ public: // Methods
     std::string const &name() const;
 
 private: // Methods
-    void calcEfficiency(EnergyPlusData &state);
+    void calcEfficiency();
 
 private:               // data
     std::string name_; // user identifier
@@ -191,7 +191,7 @@ public: // Methods
     std::string const &name() const;
 
 private: // methods
-    void calcEfficiency(EnergyPlusData &state);
+    void calcEfficiency();
 
 private: // data
     enum class ConverterModelType : int
@@ -235,7 +235,7 @@ public: // methods
     // Constructor
     ElectricStorage(EnergyPlusData &state, std::string const &objectName);
 
-    void timeCheckAndUpdate(EnergyPlusData &state);
+    void timeCheckAndUpdate();
 
     void simulate(EnergyPlusData &state,
                   Real64 &powerCharge,
@@ -410,7 +410,7 @@ public: // methods
 
     void manageTransformers(EnergyPlusData &state, Real64 const surplusPowerOutFromLoadCenters);
 
-    void setupMeterIndices(EnergyPlusData &state);
+    void setupMeterIndices();
 
     void reinitAtBeginEnvironment();
 
@@ -548,7 +548,7 @@ public: // Methods
 
     void manageElecLoadCenter(EnergyPlusData &state, bool const firstHVACIteration, Real64 &remainingPowerDemand);
 
-    void setupLoadCenterMeterIndices(EnergyPlusData &state);
+    void setupLoadCenterMeterIndices();
 
     void reinitAtBeginEnvironment();
 
@@ -558,14 +558,14 @@ public: // Methods
 
     std::string const &generatorListName() const;
 
-    void updateLoadCenterGeneratorRecords(EnergyPlusData &state);
+    void updateLoadCenterGeneratorRecords();
 
 private: // Methods
     void dispatchGenerators(EnergyPlusData &state, bool const firstHVACIteration, Real64 &remainingPowerDemand);
 
     void dispatchStorage(EnergyPlusData &state, Real64 const remainingPowerDemand);
 
-    Real64 calcLoadCenterThermalLoad(EnergyPlusData &state); // returns heat rate called for from cogenerator(watts)
+    Real64 calcLoadCenterThermalLoad(); // returns heat rate called for from cogenerator(watts)
 
 public: // data public for unit test
     enum class ElectricBussType : int
@@ -700,22 +700,22 @@ public: // Methods
 
     void reinitZoneGainsAtBeginEnvironment();
 
-    void verifyCustomMetersElecPowerMgr(EnergyPlusData &state);
+    void verifyCustomMetersElecPowerMgr();
 
 private: // Methods
-    void getPowerManagerInput(EnergyPlusData &state);
+    void getPowerManagerInput();
 
-    void setupMeterIndices(EnergyPlusData &state);
+    void setupMeterIndices();
 
     void reinitAtBeginEnvironment();
 
-    void updateWholeBuildingRecords(EnergyPlusData &state);
+    void updateWholeBuildingRecords();
 
-    void reportPVandWindCapacity(EnergyPlusData &state);
+    void reportPVandWindCapacity();
 
     void sumUpNumberOfStorageDevices();
 
-    void checkLoadCenters(EnergyPlusData &state);
+    void checkLoadCenters();
 
 public: // data
     bool newEnvironmentInternalGainsFlag;

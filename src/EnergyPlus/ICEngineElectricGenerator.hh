@@ -163,7 +163,7 @@ namespace ICEngineElectricGenerator {
 
         void update();
 
-        void setupOutputVars(EnergyPlusData &state);
+        void setupOutputVars();
 
         void getDesignCapacities(EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
@@ -172,7 +172,7 @@ namespace ICEngineElectricGenerator {
 
     extern Array1D<ICEngineGeneratorSpecs> ICEngineGenerator; // dimension to number of machines
 
-    void GetICEngineGeneratorInput(EnergyPlusData &state);
+    void GetICEngineGeneratorInput();
 
 } // namespace ICEngineElectricGenerator
 

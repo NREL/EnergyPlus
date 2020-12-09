@@ -197,7 +197,7 @@ namespace HighTempRadiantSystem {
 
     void UpdateHTRadSourceValAvg(EnergyPlusData &state, bool &HighTempRadSysOn); // .TRUE. if the radiant system has run this zone time step
 
-    void DistributeHTRadGains(EnergyPlusData &state);
+    void DistributeHTRadGains();
 
     void
     ReportHighTempRadiantSystem(EnergyPlusData &state, int RadSysNum); // Index for the low temperature radiant system under consideration within the derived types

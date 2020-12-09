@@ -160,11 +160,11 @@ namespace PlantHeatExchangerFluidToFluid {
 
         void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void setupOutputVars(EnergyPlusData &state);
+        void setupOutputVars();
 
-        void initialize(EnergyPlusData &state);
+        void initialize();
 
-        void size(EnergyPlusData &state);
+        void size();
 
         void calculate(EnergyPlusData &state, Real64 SupSideMdot, Real64 DmdSideMdot);
 
@@ -181,7 +181,7 @@ namespace PlantHeatExchangerFluidToFluid {
     // Object Data
     extern Array1D<HeatExchangerStruct> FluidHX;
 
-    void GetFluidHeatExchangerInput(EnergyPlusData &state);
+    void GetFluidHeatExchangerInput();
 
     void clear_state();
 

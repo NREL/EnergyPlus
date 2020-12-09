@@ -69,13 +69,13 @@ namespace EnergyPlus {
 class InputOutputFile;
 struct EnergyPlusData;
 
-int AbortEnergyPlus(EnergyPlusData &state);
+int AbortEnergyPlus();
 
-void CloseMiscOpenFiles(EnergyPlusData &state);
+void CloseMiscOpenFiles();
 
 void CloseOutOpenFiles();
 
-int EndEnergyPlus(EnergyPlusData &state);
+int EndEnergyPlus();
 
 int FindUnitNumber(std::string const &FileName); // File name to be searched.
 
@@ -201,9 +201,9 @@ void StoreRecurringErrorMessage(EnergyPlusData &state,
 
 void ShowErrorMessage(EnergyPlusData &state, std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
 
-void SummarizeErrors(EnergyPlusData &state);
+void SummarizeErrors();
 
-void ShowRecurringErrors(EnergyPlusData &state);
+void ShowRecurringErrors();
 
 namespace UtilityRoutines {
 

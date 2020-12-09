@@ -124,14 +124,13 @@ namespace BoilerSteam {
         {
         }
 
-        void initialize(EnergyPlusData &state);
+        void initialize();
 
-        void setupOutputVars(EnergyPlusData &state);
+        void setupOutputVars();
 
-        void autosize(EnergyPlusData &state);
+        void autosize();
 
-        void calculate(EnergyPlusData &state,
-                       Real64 &MyLoad,   // W - hot water demand to be met by boiler
+        void calculate(Real64 &MyLoad,   // W - hot water demand to be met by boiler
                        bool RunFlag,     // TRUE if boiler operating
                        DataBranchAirLoopPlant::ControlTypeEnum EquipFlowCtrl // Flow control mode for the equipment
         );
@@ -141,18 +140,18 @@ namespace BoilerSteam {
                     bool FirstHVACIteration // TRUE if First iteration of simulation
         );
 
-        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void getDesignCapacities(EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+        void getDesignCapacities([[maybe_unused]] const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
         void getSizingFactor(Real64 &sizFac) override;
 
-        void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation) override;
+        void onInitLoopEquip([[maybe_unused]] const PlantLocation &calledFromLocation) override;
 
-        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
+        static PlantComponent *factory(std::string const &objectName);
     };
 
-    void GetBoilerInput(EnergyPlusData &state);
+    void GetBoilerInput();
 
 } // namespace BoilerSteam
 

@@ -410,15 +410,14 @@ namespace DataZoneEquipment {
         {
         }
 
-        void getPrioritiesForInletNode(EnergyPlusData &state,
-                                       int const inletNodeNum, // Zone inlet node number to match
+        void getPrioritiesForInletNode(int const inletNodeNum, // Zone inlet node number to match
                                        int &coolingPriority,   // Cooling priority num for matching equipment
                                        int &heatingPriority    // Heating priority num for matching equipment
         );
 
-        Real64 SequentialHeatingFraction(EnergyPlusData &state, int equipNum);
+        Real64 SequentialHeatingFraction(int equipNum);
 
-        Real64 SequentialCoolingFraction(EnergyPlusData &state, int equipNum);
+        Real64 SequentialCoolingFraction(int equipNum);
     };
 
     struct ControlList
@@ -489,36 +488,33 @@ namespace DataZoneEquipment {
     // Needed for unit tests, should not be normally called.
     void clear_state();
 
-    void GetZoneEquipmentData(EnergyPlusData &state);
+    void GetZoneEquipmentData();
 
-    void GetZoneEquipmentData1(EnergyPlusData &state);
+    void GetZoneEquipmentData1();
 
-    void SetupZoneEquipmentForConvectionFlowRegime(EnergyPlusData &state);
+    void SetupZoneEquipmentForConvectionFlowRegime();
 
-    bool CheckZoneEquipmentList(EnergyPlusData &state,
-                                std::string const &ComponentType, // Type of component
+    bool CheckZoneEquipmentList(std::string const &ComponentType, // Type of component
                                 std::string const &ComponentName, // Name of component
                                 Optional_int CtrlZoneNum = _);
 
-    int GetControlledZoneIndex(EnergyPlusData &state, std::string const &ZoneName); // Zone name to match into Controlled Zone structure
+    int GetControlledZoneIndex(std::string const &ZoneName); // Zone name to match into Controlled Zone structure
 
-    int FindControlledZoneIndexFromSystemNodeNumberForZone(EnergyPlusData &state, int const TrialZoneNodeNum); // Node number to match into Controlled Zone structure
+    int FindControlledZoneIndexFromSystemNodeNumberForZone(int const TrialZoneNodeNum); // Node number to match into Controlled Zone structure
 
-    int GetSystemNodeNumberForZone(EnergyPlusData &state, std::string const &ZoneName); // Zone name to match into Controlled Zone structure
+    int GetSystemNodeNumberForZone(std::string const &ZoneName); // Zone name to match into Controlled Zone structure
 
-    int GetReturnAirNodeForZone(EnergyPlusData &state, std::string const &ZoneName,             // Zone name to match into Controlled Zone structure
+    int GetReturnAirNodeForZone(std::string const &ZoneName,             // Zone name to match into Controlled Zone structure
                                 std::string const &NodeName,             // Return air node name to match (may be blank)
                                 std::string const &calledFromDescription // String identifying the calling function and object
     );
 
-    int GetReturnNumForZone(EnergyPlusData &state,
-                            std::string const &ZoneName, // Zone name to match into Controlled Zone structure
+    int GetReturnNumForZone(std::string const &ZoneName, // Zone name to match into Controlled Zone structure
                             std::string const &NodeName  // Return air node name to match (may be blank)
     );
 
     Real64
-    CalcDesignSpecificationOutdoorAir(EnergyPlusData &state,
-                                      int const DSOAPtr,          // Pointer to DesignSpecification:OutdoorAir object
+    CalcDesignSpecificationOutdoorAir(int const DSOAPtr,          // Pointer to DesignSpecification:OutdoorAir object
                                       int const ActualZoneNum,    // Zone index
                                       bool const UseOccSchFlag,   // Zone occupancy schedule will be used instead of using total zone occupancy
                                       bool const UseMinOASchFlag, // Use min OA schedule in DesignSpecification:OutdoorAir object

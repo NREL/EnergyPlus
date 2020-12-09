@@ -155,8 +155,8 @@ namespace HVACSingleDuctInduc {
               DesHeatingLoad(0.0), CtrlZoneNum(0), CtrlZoneInNodeIndex(0), AirLoopNum(0), OutdoorAirFlowRate(0.0)
         {
         }
-        void ReportIndUnit(EnergyPlusData &state);
-        void CalcOutdoorAirVolumeFlowRate(EnergyPlusData &state);
+        void ReportIndUnit();
+        void CalcOutdoorAirVolumeFlowRate();
     };
 
     // Object Data
@@ -173,7 +173,7 @@ namespace HVACSingleDuctInduc {
                     int &CompIndex                 // which terminal unit in data structure
     );
 
-    void GetIndUnits(EnergyPlusData &state);
+    void GetIndUnits();
 
     void InitIndUnit(EnergyPlusData &state,
                      int const IUNum,              // number of the current induction unit being simulated

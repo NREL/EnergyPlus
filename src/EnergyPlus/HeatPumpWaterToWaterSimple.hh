@@ -200,7 +200,7 @@ namespace HeatPumpWaterToWaterSimple {
 
         static void clear_state();
 
-        static void GetWatertoWaterHPInput(EnergyPlusData &state);
+        static void GetWatertoWaterHPInput();
 
         void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) override;
 
@@ -215,9 +215,9 @@ namespace HeatPumpWaterToWaterSimple {
                                 Real64 const MyLoad // Demand Load
         );
 
-        void sizeCoolingWaterToWaterHP(EnergyPlusData &state);
+        void sizeCoolingWaterToWaterHP();
 
-        void sizeHeatingWaterToWaterHP(EnergyPlusData &state);
+        void sizeHeatingWaterToWaterHP();
 
         void CalcWatertoWaterHPCooling(EnergyPlusData &state, Real64 const MyLoad); // Operating Load
 

@@ -703,7 +703,7 @@ namespace OutputReportTabular {
     extern Array1D<UnitConvType> UnitConv;
 
     // Functions
-    void clear_state(EnergyPlusData &state);
+    void clear_state();
 
     std::ofstream & open_tbl_stream(EnergyPlusData &state, int const iStyle, std::string const & filename, bool output_to_file = true);
 
@@ -717,35 +717,35 @@ namespace OutputReportTabular {
     //======================================================================================================================
     //======================================================================================================================
 
-    void GetInputTabularMonthly(EnergyPlusData &state);
+    void GetInputTabularMonthly();
 
     int AddMonthlyReport(std::string const &inReportName, int const inNumDigitsShown);
 
     void AddMonthlyFieldSetInput(int const inMonthReport, std::string const &inVariMeter, std::string const &inColHead, int const inAggregate);
 
-    void InitializeTabularMonthly(EnergyPlusData &state);
+    void InitializeTabularMonthly();
 
-    bool isInvalidAggregationOrder(EnergyPlusData &state);
+    bool isInvalidAggregationOrder();
 
-    void GetInputTabularTimeBins(EnergyPlusData &state);
+    void GetInputTabularTimeBins();
 
     bool warningAboutKeyNotFound(EnergyPlusData &state, int foundIndex, int inObjIndex, std::string const &moduleName);
 
-    void GetInputTabularStyle(EnergyPlusData &state);
+    void GetInputTabularStyle();
 
     int SetUnitsStyleFromString(std::string const &unitStringIn);
 
-    void GetInputOutputTableSummaryReports(EnergyPlusData &state);
+    void GetInputOutputTableSummaryReports();
 
-    bool isCompLoadRepReq(EnergyPlusData &state);
+    bool isCompLoadRepReq();
 
-    bool hasSizingPeriodsDays(EnergyPlusData &state);
+    bool hasSizingPeriodsDays();
 
-    void InitializePredefinedMonthlyTitles(EnergyPlusData &state);
+    void InitializePredefinedMonthlyTitles();
 
     void CreatePredefinedMonthlyReports();
 
-    void GetInputFuelAndPollutionFactors(EnergyPlusData &state);
+    void GetInputFuelAndPollutionFactors();
 
     //======================================================================================================================
     //======================================================================================================================
@@ -755,11 +755,11 @@ namespace OutputReportTabular {
     //======================================================================================================================
     //======================================================================================================================
 
-    void OpenOutputTabularFile(EnergyPlusData &state);
+    void OpenOutputTabularFile();
 
     void CloseOutputTabularFile();
 
-    void WriteTableOfContents(EnergyPlusData &state);
+    void WriteTableOfContents();
 
     //======================================================================================================================
     //======================================================================================================================
@@ -783,7 +783,7 @@ namespace OutputReportTabular {
 
     void GatherHeatEmissionReport(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType);
 
-    void CalcHeatEmissionReport(EnergyPlusData &state);
+    void CalcHeatEmissionReport();
 
     //======================================================================================================================
     //======================================================================================================================
@@ -793,43 +793,43 @@ namespace OutputReportTabular {
     //======================================================================================================================
     //======================================================================================================================
 
-    void WriteTabularReports(EnergyPlusData &state);
+    void WriteTabularReports();
 
     void parseStatLine(const std::string & lineIn, StatLineType &lineType, bool & desConditionlinepassed, bool & heatingDesignlinepassed, bool & coolingDesignlinepassed, bool & isKoppen);
 
-    void FillWeatherPredefinedEntries(EnergyPlusData &state);
+    void FillWeatherPredefinedEntries();
 
     std::string GetColumnUsingTabs(std::string const &inString, // Input String
                                    int const colNum             // Column number
     );
 
-    void FillRemainingPredefinedEntries(EnergyPlusData &state);
+    void FillRemainingPredefinedEntries();
 
-    void WriteMonthlyTables(EnergyPlusData &state);
+    void WriteMonthlyTables();
 
-    void WriteTimeBinTables(EnergyPlusData &state);
+    void WriteTimeBinTables();
 
-    void WriteBEPSTable(EnergyPlusData &state);
+    void WriteBEPSTable();
 
     std::string ResourceWarningMessage(std::string resource);
 
     Real64 WaterConversionFunct(Real64 WaterTotal, Real64 ConversionFactor);
 
-    void WriteSourceEnergyEndUseSummary(EnergyPlusData &state);
+    void WriteSourceEnergyEndUseSummary();
 
-    void WriteDemandEndUseSummary(EnergyPlusData &state);
+    void WriteDemandEndUseSummary();
 
-    void WriteCompCostTable(EnergyPlusData &state);
+    void WriteCompCostTable();
 
-    void WriteVeriSumTable(EnergyPlusData &state);
+    void WriteVeriSumTable();
 
-    void WriteAdaptiveComfortTable(EnergyPlusData &state);
+    void WriteAdaptiveComfortTable();
 
-    void WriteThermalResilienceTables(EnergyPlusData &state);
+    void WriteThermalResilienceTables();
 
-    void WriteCO2ResilienceTables(EnergyPlusData &state);
+    void WriteCO2ResilienceTables();
 
-    void WriteVisualResilienceTables(EnergyPlusData &state);
+    void WriteVisualResilienceTables();
 
     void WriteResilienceBinsTable(EnergyPlusData &state,
                                   int const columnNum,
@@ -841,33 +841,33 @@ namespace OutputReportTabular {
                             std::vector<std::string> const &columnHead,
                             Array1D<std::vector<Real64>> const &ZoneBins);
 
-    void WriteHeatEmissionTable(EnergyPlusData &state);
+    void WriteHeatEmissionTable();
 
-    void WritePredefinedTables(EnergyPlusData &state);
+    void WritePredefinedTables();
 
-    void WriteComponentSizing(EnergyPlusData &state);
+    void WriteComponentSizing();
 
-    void WriteSurfaceShadowing(EnergyPlusData &state);
+    void WriteSurfaceShadowing();
 
-    void WriteEioTables(EnergyPlusData &state);
+    void WriteEioTables();
 
     int unitsFromHeading(EnergyPlusData &state, std::string &heading);
 
     std::vector<std::string> splitCommaString(std::string const &inputString);
 
-    void AddTOCLoadComponentTableSummaries(EnergyPlusData &state);
+    void AddTOCLoadComponentTableSummaries();
 
-    void AllocateLoadComponentArrays(EnergyPlusData &state);
+    void AllocateLoadComponentArrays();
 
     void DeallocateLoadComponentArrays();
 
-    void ComputeLoadComponentDecayCurve(EnergyPlusData &state);
+    void ComputeLoadComponentDecayCurve();
 
-    void GatherComponentLoadsSurface(EnergyPlusData &state);
+    void GatherComponentLoadsSurface();
 
-    void GatherComponentLoadsHVAC(EnergyPlusData &state);
+    void GatherComponentLoadsHVAC();
 
-    void WriteLoadComponentSummaryTables(EnergyPlusData &state);
+    void WriteLoadComponentSummaryTables();
 
     void GetDelaySequences(EnergyPlusData &state,
                            int const &desDaySelected,
@@ -951,7 +951,7 @@ namespace OutputReportTabular {
 
     std::string ConvertToEscaped(std::string const &inString); // Input String
 
-    void DetermineBuildingFloorArea(EnergyPlusData &state);
+    void DetermineBuildingFloorArea();
 
     /* Tables with Subcategories in particular have a blank for rowHead for display in the HTML output.
      * This routine will fill up the blanks for output to Sql in particular */
@@ -965,7 +965,7 @@ namespace OutputReportTabular {
     //======================================================================================================================
     //======================================================================================================================
 
-    void ResetTabularReports(EnergyPlusData &state);
+    void ResetTabularReports();
 
     void ResetMonthlyGathering();
 
@@ -977,9 +977,9 @@ namespace OutputReportTabular {
 
     void ResetPeakDemandGathering();
 
-    void ResetHeatGainGathering(EnergyPlusData &state);
+    void ResetHeatGainGathering();
 
-    void ResetRemainingPredefinedEntries(EnergyPlusData &state);
+    void ResetRemainingPredefinedEntries();
 
     void ResetAdaptiveComfort();
 

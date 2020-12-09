@@ -109,7 +109,7 @@ struct CoilCoolingDXCurveFitPerformance
     CoilCoolingDXCurveFitPerformanceInputSpecification original_input_specs;
     CoilCoolingDXCurveFitPerformance() = default;
     explicit CoilCoolingDXCurveFitPerformance(EnergyPlusData &state, const std::string &name);
-    void size(EnergyPlusData &state);
+    void size();
     void setOperMode(EnergyPlusData &state, CoilCoolingDXCurveFitOperatingMode &currentMode, int const mode);
 
     std::string name;

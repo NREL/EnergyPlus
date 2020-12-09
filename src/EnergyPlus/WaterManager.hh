@@ -62,15 +62,15 @@ struct EnergyPlusData;
 
 namespace WaterManager {
 
-    void ManageWater(EnergyPlusData &state);
+    void ManageWater();
 
-    void ManageWaterInits(EnergyPlusData &state);
+    void ManageWaterInits();
 
-    void GetWaterManagerInput(EnergyPlusData &state);
+    void GetWaterManagerInput();
 
-    void UpdatePrecipitation(EnergyPlusData &state);
+    void UpdatePrecipitation();
 
-    void UpdateIrrigation(EnergyPlusData &state);
+    void UpdateIrrigation();
 
     void CalcWaterStorageTank(EnergyPlusData &state, int const TankNum); // Index of storage tank
 
@@ -109,7 +109,7 @@ namespace WaterManager {
 
     void CalcGroundwaterWell(EnergyPlusData &state, int const WellNum); // Index of well
 
-    void UpdateWaterManager(EnergyPlusData &state);
+    void UpdateWaterManager();
 
 } // namespace WaterManager
 

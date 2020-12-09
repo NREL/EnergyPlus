@@ -71,7 +71,7 @@ namespace ZoneAirLoopEquipmentManager {
                                     int &ControlledZoneNum,
                                     int &CompIndex);
 
-    void GetZoneAirLoopEquipment(EnergyPlusData &state);
+    void GetZoneAirLoopEquipment();
 
     void InitZoneAirLoopEquipment(EnergyPlusData &state, int const AirDistUnitNum, int const ControlledZoneNum, int const ActualZoneNum);
 

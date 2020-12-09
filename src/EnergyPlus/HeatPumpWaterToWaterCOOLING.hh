@@ -165,7 +165,7 @@ namespace HeatPumpWaterToWaterCOOLING {
 
         void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation) override;
 
-        void initialize(EnergyPlusData &state);
+        void initialize();
 
         void calculate(EnergyPlusData &state, Real64 &MyLoad);
 
@@ -177,7 +177,7 @@ namespace HeatPumpWaterToWaterCOOLING {
 
     void clear_state();
 
-    void GetGshpInput(EnergyPlusData &state);
+    void GetGshpInput();
 
 } // namespace HeatPumpWaterToWaterCOOLING
 

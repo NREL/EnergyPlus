@@ -114,9 +114,9 @@ namespace DElightManagerF {
     // USE STATEMENTS:
     using namespace DataDElight;
 
-    void DElightInputGenerator(EnergyPlusData &state)
+    void DElightInputGenerator()
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Robert J. Hitchcock
         //       DATE WRITTEN   August 2003
@@ -684,8 +684,9 @@ namespace DElightManagerF {
         delightdaylightcoefficients(dLatitude, &iErrorFlag);
     }
 
-    void GetInputDElightComplexFenestration(EnergyPlusData &state, bool &ErrorsFound)
+    void GetInputDElightComplexFenestration(bool &ErrorsFound)
     {
+        GET_STATE_HERE
         // Perform GetInput function for the Daylighting:DELight:ComplexFenestration object
         // Glazer - July 2016
 
@@ -734,9 +735,9 @@ namespace DElightManagerF {
         }
     }
 
-    void CheckForGeometricTransform(EnergyPlusData &state, bool &doTransform, Real64 &OldAspectRatio, Real64 &NewAspectRatio)
+    void CheckForGeometricTransform(bool &doTransform, Real64 &OldAspectRatio, Real64 &NewAspectRatio)
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   February 2009

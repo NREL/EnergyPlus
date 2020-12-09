@@ -210,7 +210,7 @@ namespace SingleDuct {
 
         void InitSys(EnergyPlusData &state, bool FirstHVACIteration);
 
-        void SizeSys(EnergyPlusData &state);
+        void SizeSys();
 
         void SimVAV(EnergyPlusData &state, bool FirstHVACIteration, int ZoneNum, int ZoneNodeNum);
 
@@ -232,13 +232,13 @@ namespace SingleDuct {
 
         static Real64 VAVVSHCFanOnResidual(EnergyPlusData &state, Real64 HeatingFrac, Array1D<Real64> const &Par);
 
-        void SimConstVolNoReheat(EnergyPlusData &state);
+        void SimConstVolNoReheat();
 
-        void CalcOutdoorAirVolumeFlowRate(EnergyPlusData &state);
+        void CalcOutdoorAirVolumeFlowRate();
 
-        void UpdateSys(EnergyPlusData &state) const;
+        void UpdateSys() const;
 
-        void ReportSys(EnergyPlusData &state);
+        void ReportSys();
 
     };
 
@@ -299,7 +299,7 @@ namespace SingleDuct {
 
     void SimulateSingleDuct(EnergyPlusData &state, std::string const &CompName, bool FirstHVACIteration, int ZoneNum, int ZoneNodeNum, int &CompIndex);
 
-    void GetSysInput(EnergyPlusData &state);
+    void GetSysInput();
 
     void GetHVACSingleDuctSysIndex(EnergyPlusData &state, std::string const &SDSName,
                                    int &SDSIndex,
@@ -311,7 +311,7 @@ namespace SingleDuct {
 
     void SimATMixer(EnergyPlusData &state, std::string const &SysName, bool FirstHVACIteration, int &SysIndex);
 
-    void GetATMixers(EnergyPlusData &state);
+    void GetATMixers();
 
     void CalcATMixer(EnergyPlusData &state, int SysNum);
 

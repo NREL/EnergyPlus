@@ -187,7 +187,7 @@ namespace HVACStandAloneERV {
                           int &CompIndex                 // pointer to correct component
     );
 
-    void GetStandAloneERV(EnergyPlusData &state);
+    void GetStandAloneERV();
 
     void InitStandAloneERV(EnergyPlusData &state, int const StandAloneERVNum,   // number of the current Stand Alone ERV unit being simulated
                            int const ZoneNum,            // number of zone being served unused1208

@@ -319,7 +319,7 @@ namespace HVACControllers {
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetControllerInput(EnergyPlusData &state);
+    void GetControllerInput();
 
     // End of Get Input subroutines for the Module
     //******************************************************************************
@@ -390,7 +390,7 @@ namespace HVACControllers {
                                 int const AirLoopControlNum // Controller index on this air loop
     );
 
-    void DumpAirLoopStatistics(EnergyPlusData &state);
+    void DumpAirLoopStatistics();
 
     void WriteAirLoopStatistics(InputOutputFile &statisticsFile, DefinePrimaryAirSystem const &ThisPrimaryAirSystem, AirLoopStatsType const &ThisAirLoopStats);
 
@@ -424,15 +424,15 @@ namespace HVACControllers {
                                    int const Operation, // Operation to execute
                                    bool const IsConvergedFlag);
 
-    std::string CreateHVACTimeString(EnergyPlusData &state);
+    std::string CreateHVACTimeString();
 
-    std::string CreateHVACStepFullString(EnergyPlusData &state);
+    std::string CreateHVACStepFullString();
 
-    std::string MakeHVACTimeIntervalString(EnergyPlusData &state);
+    std::string MakeHVACTimeIntervalString();
 
     //        End of Tracing subroutines for the Controller Module
 
-    void CheckControllerListOrder(EnergyPlusData &state);
+    void CheckControllerListOrder();
 
     void CheckCoilWaterInletNode(EnergyPlusData &state,
                                  int const WaterInletNodeNum, // input actuator node number

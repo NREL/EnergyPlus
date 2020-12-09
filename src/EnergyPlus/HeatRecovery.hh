@@ -540,7 +540,7 @@ namespace HeatRecovery {
                          Optional_int_const CompanionCoilType_Num = _ // cooling coil type of coil
     );
 
-    void GetHeatRecoveryInput(EnergyPlusData &state);
+    void GetHeatRecoveryInput();
 
     void InitHeatRecovery(EnergyPlusData &state, int const ExchNum, // number of the current heat exchanger being simulated
                           int const CompanionCoilIndex,

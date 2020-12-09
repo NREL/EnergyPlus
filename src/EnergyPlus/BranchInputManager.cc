@@ -93,9 +93,9 @@ namespace BranchInputManager {
     const char * cMIXER("Connector:Mixer");
     const char * cSPLITTER("Connector:Splitter");
 
-    void ManageBranchInput(EnergyPlusData &state)
+    void ManageBranchInput()
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   Nov 2004
@@ -121,15 +121,14 @@ namespace BranchInputManager {
     //   Routines that "get" data from internal branch management structure
     //==================================================================================
 
-    void GetBranchList(EnergyPlusData &state,
-                       std::string const &LoopName,       // Name of Loop Branch List is on
+    void GetBranchList(std::string const &LoopName,       // Name of Loop Branch List is on
                        std::string const &BranchListName, // Branch List Name from Input
                        int &NumBranchNames,               // Number of Branches for this Branch List
                        Array1D_string &BranchNames,       // Names of Branches on this Branch List
                        std::string const &LoopType        // Type of Loop Branch list is on
     )
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   October 1999
@@ -186,9 +185,9 @@ namespace BranchInputManager {
         }
     }
 
-    int NumBranchesInBranchList(EnergyPlusData &state, std::string const &BranchListName)
+    int NumBranchesInBranchList(std::string const &BranchListName)
     {
-
+        GET_STATE_HERE
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   July 2003
@@ -221,8 +220,7 @@ namespace BranchInputManager {
         return NumBranchesInBranchList;
     }
 
-    void GetBranchData(EnergyPlusData &state,
-                       std::string const &LoopName,         // Loop Name of this Branch
+    void GetBranchData(std::string const &LoopName,         // Loop Name of this Branch
                        std::string const &BranchName,       // Requested Branch Name
                        DataBranchAirLoopPlant::PressureCurveType &PressCurveType,                 // Index of a pressure curve object
                        int &PressCurveIndex,                // Index of a pressure curve object
@@ -235,7 +233,7 @@ namespace BranchInputManager {
                        Array1D_int &CompOutletNodeNums,     // Component Outlet Node Numbers for each item on Branch
                        bool &ErrorsFound)
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   October 1999
@@ -282,9 +280,9 @@ namespace BranchInputManager {
         BComponents.deallocate();
     }
 
-    int NumCompsInBranch(EnergyPlusData &state, std::string const &BranchName)
+    int NumCompsInBranch(std::string const &BranchName)
     {
-
+        GET_STATE_HERE
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   July 2003
@@ -317,9 +315,9 @@ namespace BranchInputManager {
         return NumCompsInBranch;
     }
 
-    int GetAirBranchIndex(EnergyPlusData &state, std::string const &CompType, std::string const &CompName)
+    int GetAirBranchIndex(std::string const &CompType, std::string const &CompName)
     {
-
+        GET_STATE_HERE
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   April 2013
@@ -363,14 +361,13 @@ namespace BranchInputManager {
         return GetAirBranchIndex;
     }
 
-    void GetBranchFanTypeName(EnergyPlusData &state,
-                              int const BranchNum,
+    void GetBranchFanTypeName(int const BranchNum,
                               std::string &FanType,
                               std::string &FanName,
                               bool &ErrFound // Set to true if error found, false otherwise
     )
     {
-
+        GET_STATE_HERE
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   April 2013
@@ -421,8 +418,7 @@ namespace BranchInputManager {
         }
     }
 
-    void GetInternalBranchData(EnergyPlusData &state,
-                               std::string const &LoopName,         // Loop Name for Branch
+    void GetInternalBranchData(std::string const &LoopName,         // Loop Name for Branch
                                std::string const &BranchName,       // Requested Branch Name
                                DataBranchAirLoopPlant::PressureCurveType &PressCurveType,                 // Index of pressure curve object
                                int &PressCurveIndex,                // Index of pressure curve object
@@ -431,7 +427,7 @@ namespace BranchInputManager {
                                bool &ErrorsFound                    // True when Loop Name is already assigned and this not same loop
     )
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   October 1999
@@ -478,15 +474,14 @@ namespace BranchInputManager {
         }
     }
 
-    void GetNumSplitterMixerInConntrList(EnergyPlusData &state,
-                                         std::string const &LoopName,          // Loop Name for this Splitter (used in error message)
+    void GetNumSplitterMixerInConntrList(std::string const &LoopName,          // Loop Name for this Splitter (used in error message)
                                          std::string const &ConnectorListName, // Requested Connector List Name
                                          int &numSplitters,                    // Number of splitters in the loop
                                          int &numMixers,                       // Number of mixers in the loop
                                          bool &ErrorsFound                     // if no connector list
     )
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Sankaranarayanan K P
         //       DATE WRITTEN   April 2005
@@ -518,13 +513,12 @@ namespace BranchInputManager {
         }
     }
 
-    void GetConnectorList(EnergyPlusData &state,
-                          std::string const &ConnectorListName, // Requested Connector List
+    void GetConnectorList(std::string const &ConnectorListName, // Requested Connector List
                           ConnectorData &Connectoid,            // Returned Connector Data
                           Optional_int_const NumInList          // Number of the current connector in the list of connectors
     )
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   October 1999
@@ -581,8 +575,7 @@ namespace BranchInputManager {
         }
     }
 
-    void GetLoopMixer(EnergyPlusData &state,
-                      std::string const &LoopName,          // Loop Name for Mixer
+    void GetLoopMixer(std::string const &LoopName,          // Loop Name for Mixer
                       std::string const &ConnectorListName, // Requested Connector List Name
                       std::string &MixerName,               // Name of Mixer
                       bool &IsMixer,                        // True when Mixer is on this connector, false otherwise
@@ -596,7 +589,7 @@ namespace BranchInputManager {
                       Optional_int MixerNumber            // Mixer number for this specific splitter
     )
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   October 1999
@@ -722,8 +715,7 @@ namespace BranchInputManager {
         }
     }
 
-    void GetLoopSplitter(EnergyPlusData &state,
-                         std::string const &LoopName,          // Loop Name for this Splitter
+    void GetLoopSplitter(std::string const &LoopName,          // Loop Name for this Splitter
                          std::string const &ConnectorListName, // Requested Connector List Name
                          std::string &SplitterName,            // Name of Splitter
                          bool &IsSplitter,                     // True if splitter on this connector list, false otherwise
@@ -737,7 +729,7 @@ namespace BranchInputManager {
                          Optional_int SplitterNumber         // splitter number for this specific splitter
     )
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   October 1999
@@ -867,9 +859,9 @@ namespace BranchInputManager {
         }
     }
 
-    std::string GetFirstBranchInletNodeName(EnergyPlusData &state, std::string const &BranchListName) // Branch List name to search
+    std::string GetFirstBranchInletNodeName(std::string const &BranchListName) // Branch List name to search
     {
-
+        GET_STATE_HERE
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   November 2004
@@ -910,9 +902,9 @@ namespace BranchInputManager {
         return InletNodeName;
     }
 
-    std::string GetLastBranchOutletNodeName(EnergyPlusData &state, std::string const &BranchListName) // Branch List name to search
+    std::string GetLastBranchOutletNodeName(std::string const &BranchListName) // Branch List name to search
     {
-
+        GET_STATE_HERE
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   August 2003
@@ -957,9 +949,9 @@ namespace BranchInputManager {
     //   Routines that get the input for the internal branch management structure
     //==================================================================================
 
-    void GetBranchInput(EnergyPlusData &state)
+    void GetBranchInput()
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   October 1999
@@ -1068,8 +1060,7 @@ namespace BranchInputManager {
         }
     }
 
-    void GetSingleBranchInput(EnergyPlusData &state,
-                              std::string const &RoutineName,
+    void GetSingleBranchInput(std::string const &RoutineName,
                               int const BCount,
                               Array1D_string &Alphas,
                               Array1D_string &cAlphaFields,
@@ -1077,6 +1068,7 @@ namespace BranchInputManager {
                               Array1D_int &NodeNums,
                               Array1D_bool &lAlphaBlanks)
     {
+        GET_STATE_HERE
         // Using
         using CurveManager::GetPressureCurveTypeAndIndex;
 
@@ -1220,8 +1212,9 @@ namespace BranchInputManager {
         state.dataBranchInputManager->Branch(BCount).NumOfComponents = NumInComps;
     }
 
-    void GetBranchListInput(EnergyPlusData &state)
+    void GetBranchListInput()
     {
+        GET_STATE_HERE
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
@@ -1363,9 +1356,9 @@ namespace BranchInputManager {
         lNumericBlanks.deallocate();
     }
 
-    void GetConnectorListInput(EnergyPlusData &state)
+    void GetConnectorListInput()
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   October 1999
@@ -1625,9 +1618,9 @@ namespace BranchInputManager {
         }
     }
 
-    void GetSplitterInput(EnergyPlusData &state)
+    void GetSplitterInput()
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   Sept 2005 (moved from GetLoopSplitter)
@@ -1856,9 +1849,9 @@ namespace BranchInputManager {
         }
     }
 
-    void GetMixerInput(EnergyPlusData &state)
+    void GetMixerInput()
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   Sept 2005 (moved from GetLoopMixer)
@@ -2088,15 +2081,14 @@ namespace BranchInputManager {
         }
     }
 
-    void FindPlantLoopBranchConnection(EnergyPlusData &state,
-                                       std::string const &BranchListName,
+    void FindPlantLoopBranchConnection(std::string const &BranchListName,
                                        std::string &FoundPlantLoopName,
                                        int &FoundPlantLoopNum,
                                        std::string &FoundSupplyDemand,
                                        Real64 &FoundVolFlowRate,
                                        bool &MatchedPlantLoop)
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   October 2007
@@ -2151,15 +2143,14 @@ namespace BranchInputManager {
         Numbers.deallocate();
     }
 
-    void FindCondenserLoopBranchConnection(EnergyPlusData &state,
-                                           std::string const &BranchListName,
+    void FindCondenserLoopBranchConnection(std::string const &BranchListName,
                                            std::string &FoundCondLoopName,
                                            int &FoundCondLoopNum,
                                            std::string &FoundSupplyDemand,
                                            Real64 &FoundVolFlowRate,
                                            bool &MatchedCondLoop)
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   February 2008
@@ -2211,15 +2202,14 @@ namespace BranchInputManager {
         Numbers.deallocate();
     }
 
-    void FindAirLoopBranchConnection(EnergyPlusData &state,
-                                     std::string const &BranchListName,
+    void FindAirLoopBranchConnection(std::string const &BranchListName,
                                      std::string &FoundAirLoopName,
                                      int &FoundAirLoopNum,
                                      std::string &FoundAir,
                                      Real64 &FoundVolFlowRate,
                                      bool &MatchedAirLoop)
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   February 2008
@@ -2266,14 +2256,13 @@ namespace BranchInputManager {
         Numbers.deallocate();
     }
 
-    void FindAirPlantCondenserLoopFromBranchList(EnergyPlusData &state,
-                                                 std::string const &BranchListName, // Branch List Name
+    void FindAirPlantCondenserLoopFromBranchList(std::string const &BranchListName, // Branch List Name
                                                  std::string &LoopType,             // LoopType (if found, Plant,Condenser or Air)
                                                  std::string &LoopSupplyDemandAir,  // Supply if "Supply" or Demand if "Demand" or Air if "Air"
                                                  bool &MatchedLoop                  // true if found
     )
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   February 2008
@@ -2332,13 +2321,12 @@ namespace BranchInputManager {
     //   Routines that test branch integrity
     //==================================================================================
 
-    void AuditBranches(EnergyPlusData &state,
-                       bool const mustprint,           // true if the warning should be printed.
+    void AuditBranches(bool const mustprint,           // true if the warning should be printed.
                        Optional_string_const CompType, // when mustprint (ScanPlantLoop)  use CompType in error message and scan
                        Optional_string_const CompName  // when mustprint (ScanPlantLoop)  use CompName in error message and scan
     )
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   November 2011
@@ -2401,9 +2389,9 @@ namespace BranchInputManager {
         }
     }
 
-    void TestBranchIntegrity(EnergyPlusData &state, bool &ErrFound)
+    void TestBranchIntegrity(bool &ErrFound)
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   November 2001

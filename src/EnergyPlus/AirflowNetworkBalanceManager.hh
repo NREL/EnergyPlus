@@ -100,17 +100,16 @@ namespace AirflowNetworkBalanceManager {
 
     // Functions
 
-    void ManageAirflowNetworkBalance(EnergyPlusData &state,
-                                     Optional_bool_const FirstHVACIteration = _, // True when solution technique on first iteration
+    void ManageAirflowNetworkBalance(Optional_bool_const FirstHVACIteration = _, // True when solution technique on first iteration
                                      Optional_int_const Iter = _,                // Iteration number
                                      Optional_bool ResimulateAirZone = _         // True when solution technique on third iteration
     );
 
-    void GetAirflowNetworkInput(EnergyPlusData &state);
+    void GetAirflowNetworkInput();
 
-    void AllocateAndInitData(EnergyPlusData &state);
+    void AllocateAndInitData();
 
-    void CalcAirflowNetworkAirBalance(EnergyPlusData &state);
+    void CalcAirflowNetworkAirBalance();
 
     Real64 CalcDuctInsideConvResist(Real64 Tair, // Average air temperature
                                     Real64 mdot, // Mass flow rate
@@ -118,8 +117,7 @@ namespace AirflowNetworkBalanceManager {
                                     Real64 hIn   // User defined convection coefficient
     );
 
-    Real64 CalcDuctOutsideConvResist(EnergyPlusData &state,
-                                     Real64 Ts,      // Surface temperature
+    Real64 CalcDuctOutsideConvResist(Real64 Ts,      // Surface temperature
                                      Real64 Tamb,    // Free air temperature
                                      Real64 Wamb,    // Free air humidity ratio
                                      Real64 Pamb,    // Free air barometric pressure
@@ -128,8 +126,7 @@ namespace AirflowNetworkBalanceManager {
                                      Real64 hOut     // User defined convection coefficient
     );
 
-    Real64 CalcWindPressure(EnergyPlusData &state,
-                            int curve,           // Curve index, change this to pointer after curve refactor
+    Real64 CalcWindPressure(int curve,           // Curve index, change this to pointer after curve refactor
                             bool symmetricCurve, // True if the curve is symmetric (0 to 180)
                             bool relativeAngle,  // True if the Cp curve angle is measured relative to the surface
                             Real64 azimuth,      // Azimuthal angle of surface
@@ -139,43 +136,41 @@ namespace AirflowNetworkBalanceManager {
                             Real64 humRat        // Air node humidity ratio
     );
 
-    void CalcAirflowNetworkHeatBalance(EnergyPlusData &state);
+    void CalcAirflowNetworkHeatBalance();
 
-    void CalcAirflowNetworkMoisBalance(EnergyPlusData &state);
+    void CalcAirflowNetworkMoisBalance();
 
-    void CalcAirflowNetworkCO2Balance(EnergyPlusData &state);
+    void CalcAirflowNetworkCO2Balance();
 
-    void CalcAirflowNetworkGCBalance(EnergyPlusData &state);
+    void CalcAirflowNetworkGCBalance();
 
-    void MRXINV(EnergyPlusData &state, int NORDER);
+    void MRXINV(int NORDER);
 
-    void ReportAirflowNetwork(EnergyPlusData &state);
+    void ReportAirflowNetwork();
 
-    void UpdateAirflowNetwork(EnergyPlusData &state, Optional_bool_const FirstHVACIteration = _); // True when solution technique on first iteration
+    void UpdateAirflowNetwork(Optional_bool_const FirstHVACIteration = _); // True when solution technique on first iteration
 
-    void AirflowNetworkVentingControl(EnergyPlusData &state,
-                                      int i,       // AirflowNetwork surface number
+    void AirflowNetworkVentingControl(int i,       // AirflowNetwork surface number
                                       Real64 &OpenFactor // Window or door opening factor (used to calculate airflow)
     );
 
-    void AssignFanAirLoopNum(EnergyPlusData &state);
+    void AssignFanAirLoopNum();
 
-    void ValidateDistributionSystem(EnergyPlusData &state);
+    void ValidateDistributionSystem();
 
-    void ValidateFanFlowRate(EnergyPlusData &state); // Catch a fan flow rate from EPlus input file and add a flag for VAV terminal damper
+    void ValidateFanFlowRate(); // Catch a fan flow rate from EPlus input file and add a flag for VAV terminal damper
 
-    void ValidateExhaustFanInput(EnergyPlusData &state);
+    void ValidateExhaustFanInput();
 
-    void HybridVentilationControl(EnergyPlusData &state);
+    void HybridVentilationControl();
 
-    void CalcSingleSidedCps(EnergyPlusData &state, std::vector<std::vector<Real64>> &valsByFacade, int numWindDirs = 36);
+    void CalcSingleSidedCps(std::vector<std::vector<Real64>> &valsByFacade, int numWindDirs = 36);
 
-    Real64 GetZoneInfilAirChangeRate(EnergyPlusData &state, int ZoneNum); // hybrid ventilation system controlled zone number
+    Real64 GetZoneInfilAirChangeRate(int ZoneNum); // hybrid ventilation system controlled zone number
 
-    int GetAirLoopNumber(EnergyPlusData &state, int NodeNumber); // Get air loop number for each distribution node and linkage
+    int GetAirLoopNumber(int NodeNumber); // Get air loop number for each distribution node and linkage
 
-    Real64 AFNPressureResidual(EnergyPlusData &state,
-                               Real64 ExFanMassFlowRate,
+    Real64 AFNPressureResidual(Real64 ExFanMassFlowRate,
                                Array1D<Real64> const &Par); // Residual function using Regula Falsi
 
     // derived class or struct
@@ -205,27 +200,25 @@ namespace AirflowNetworkBalanceManager {
         {
         }
 
-        void calc(EnergyPlusData &state,
-                  int ZoneNum,
+        void calc(int ZoneNum,
                   Real64 TimeOpenDuration,
                   Real64 TimeCloseDuration,
                   int &OpeningStatus,
                   int &OpeningProbStatus,
                   int &ClosingProbStatus); // function to perform calculations
 
-        bool openingProbability(EnergyPlusData &state,
-                                int ZoneNum,
+        bool openingProbability(int ZoneNum,
                                 Real64 TimeCloseDuration); // function to perform calculations of opening probability
 
-        bool closingProbability(EnergyPlusData &state, Real64 TimeCloseDuration); // function to perform calculations of closing probability
+        bool closingProbability(Real64 TimeCloseDuration); // function to perform calculations of closing probability
     };
 
 } // namespace AirflowNetworkBalanceManager
 
     struct AirflowNetworkBalanceManagerData : BaseGlobalStruct {
 
-        void initialize(EnergyPlusData &state);
-        void calculateWindPressureCoeffs(EnergyPlusData &state);
+        void initialize();
+        void calculateWindPressureCoeffs();
 
         Array1D<AirflowNetworkBalanceManager::OccupantVentilationControlProp> OccupantVentilationControl;
         Array1D_int SplitterNodeNumbers;

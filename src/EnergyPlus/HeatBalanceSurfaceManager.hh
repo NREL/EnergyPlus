@@ -83,32 +83,32 @@ namespace HeatBalanceSurfaceManager {
     // Functions
     void clear_state();
 
-    void ManageSurfaceHeatBalance(EnergyPlusData &state);
+    void ManageSurfaceHeatBalance();
 
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitSurfaceHeatBalance(EnergyPlusData &state);
+    void InitSurfaceHeatBalance();
 
-    void GatherForPredefinedReport(EnergyPlusData &state);
+    void GatherForPredefinedReport();
 
-    void AllocateSurfaceHeatBalArrays(EnergyPlusData &state);
+    void AllocateSurfaceHeatBalArrays();
 
-    void InitThermalAndFluxHistories(EnergyPlusData &state);
+    void InitThermalAndFluxHistories();
 
-    void InitSolarHeatGains(EnergyPlusData &state);
+    void InitSolarHeatGains();
 
-    void InitIntSolarDistribution(EnergyPlusData &state);
+    void InitIntSolarDistribution();
 
-    void ComputeIntThermalAbsorpFactors(EnergyPlusData &state);
+    void ComputeIntThermalAbsorpFactors();
 
-    void ComputeIntSWAbsorpFactors(EnergyPlusData &state);
+    void ComputeIntSWAbsorpFactors();
 
     void ComputeDifSolExcZonesWIZWindows(EnergyPlusData &state, int NumberOfEnclosures); // Number of solar enclosures
 
-    void InitEMSControlledSurfaceProperties(EnergyPlusData &state);
+    void InitEMSControlledSurfaceProperties();
 
-    void InitEMSControlledConstructions(EnergyPlusData &state);
+    void InitEMSControlledConstructions();
 
     // End Initialization Section of the Module
     //******************************************************************************
@@ -119,9 +119,9 @@ namespace HeatBalanceSurfaceManager {
     // Beginning of Record Keeping subroutines for the HB Module
     // *****************************************************************************
 
-    void UpdateFinalSurfaceHeatBalance(EnergyPlusData &state);
+    void UpdateFinalSurfaceHeatBalance();
 
-    void UpdateThermalHistories(EnergyPlusData &state);
+    void UpdateThermalHistories();
 
     void CalculateZoneMRT(EnergyPlusData &state, Optional_int_const ZoneToResimulate = _); // if passed in, then only calculate surfaces that have this zone
 
@@ -131,17 +131,17 @@ namespace HeatBalanceSurfaceManager {
     // Beginning of Reporting subroutines for the HB Module
     // *****************************************************************************
 
-    void ReportSurfaceHeatBalance(EnergyPlusData &state);
+    void ReportSurfaceHeatBalance();
 
-    void ReportIntMovInsInsideSurfTemp(EnergyPlusData &state);
+    void ReportIntMovInsInsideSurfTemp();
 
-    void CalcThermalResilience(EnergyPlusData &state);
+    void CalcThermalResilience();
 
-    void ReportThermalResilience(EnergyPlusData &state);
+    void ReportThermalResilience();
 
-    void ReportCO2Resilience(EnergyPlusData &state);
+    void ReportCO2Resilience();
 
-    void ReportVisualResilience(EnergyPlusData &state);
+    void ReportVisualResilience();
 
     // End of Reporting subroutines for the HB Module
 
@@ -185,7 +185,7 @@ namespace HeatBalanceSurfaceManager {
 
     void CalcExteriorVentedCavity(EnergyPlusData &state, int SurfNum); // index of surface
 
-    void GatherComponentLoadsSurfAbsFact(EnergyPlusData &state);
+    void GatherComponentLoadsSurfAbsFact();
 
 } // namespace HeatBalanceSurfaceManager
 

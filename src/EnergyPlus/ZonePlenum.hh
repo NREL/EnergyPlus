@@ -166,7 +166,7 @@ namespace ZonePlenum {
                           Optional_bool PlenumInletChanged = _        // Autodesk:OPTIONAL Used without PRESENT check
     );
 
-    void GetZonePlenumInput(EnergyPlusData &state);
+    void GetZonePlenumInput();
 
     void InitAirZoneReturnPlenum(EnergyPlusData &state, int const ZonePlenumNum);
 

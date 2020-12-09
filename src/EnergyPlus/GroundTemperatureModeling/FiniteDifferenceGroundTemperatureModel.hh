@@ -133,9 +133,9 @@ public:
 
     static std::shared_ptr<FiniteDiffGroundTempsModel> FiniteDiffGTMFactory(EnergyPlusData &state, int objectType, std::string objectName);
 
-    void getWeatherData(EnergyPlusData &state);
+    void getWeatherData();
 
-    void initAndSim(EnergyPlusData &state);
+    void initAndSim();
 
     void developMesh();
 

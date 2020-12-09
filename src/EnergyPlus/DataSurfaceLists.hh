@@ -131,11 +131,11 @@ namespace DataSurfaceLists {
 
     void clear_state();
 
-    void GetSurfaceListsInputs(EnergyPlusData &state);
+    void GetSurfaceListsInputs();
 
-    int GetNumberOfSurfaceLists(EnergyPlusData &state);
+    int GetNumberOfSurfaceLists();
 
-    int GetNumberOfSurfListVentSlab(EnergyPlusData &state);
+    int GetNumberOfSurfListVentSlab();
 
 } // namespace DataSurfaceLists
 

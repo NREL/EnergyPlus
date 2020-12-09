@@ -76,7 +76,7 @@ namespace SizingManager {
         }
     };
 
-    void ManageSizing(EnergyPlusData &state);
+    void ManageSizing();
 
     bool CalcdoLoadComponentPulseNow(EnergyPlusData &state,
                                      bool isPulseZoneSizing,
@@ -85,13 +85,13 @@ namespace SizingManager {
                                      int TimeStep,
                                      DataGlobalConstants::KindOfSim KindOfSim);
 
-    void ManageSystemSizingAdjustments(EnergyPlusData &state);
+    void ManageSystemSizingAdjustments();
 
-    void ManageSystemVentilationAdjustments(EnergyPlusData &state);
+    void ManageSystemVentilationAdjustments();
 
-    void DetermineSystemPopulationDiversity(EnergyPlusData &state);
+    void DetermineSystemPopulationDiversity();
 
-    void GetOARequirements(EnergyPlusData &state);
+    void GetOARequirements();
 
     void ProcessInputOARequirements(EnergyPlusData &state,
                                     std::string const &cCurrentModuleObject,
@@ -107,22 +107,22 @@ namespace SizingManager {
                                     bool &ErrorsFound                        // If errors found in input
     );
 
-    void GetZoneAirDistribution(EnergyPlusData &state);
+    void GetZoneAirDistribution();
 
-    void GetZoneHVACSizing(EnergyPlusData &state);
+    void GetZoneHVACSizing();
 
-    void GetAirTerminalSizing(EnergyPlusData &state);
+    void GetAirTerminalSizing();
 
-    void GetSizingParams(EnergyPlusData &state);
+    void GetSizingParams();
 
-    void GetZoneSizingInput(EnergyPlusData &state);
+    void GetZoneSizingInput();
 
     void
     GetZoneAndZoneListNames(EnergyPlusData &state, bool &ErrorsFound, int &NumZones, Array1D_string &ZoneNames, int &NumZoneLists, Array1D<ZoneListData> &ZoneListNames);
 
-    void GetSystemSizingInput(EnergyPlusData &state);
+    void GetSystemSizingInput();
 
-    void GetPlantSizingInput(EnergyPlusData &state);
+    void GetPlantSizingInput();
 
     void SetupZoneSizing(EnergyPlusData &state, bool &ErrorsFound);
 
@@ -159,7 +159,7 @@ namespace SizingManager {
 
     void UpdateFacilitySizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator CallIndicator);
 
-    void UpdateTermUnitFinalZoneSizing(EnergyPlusData &state);
+    void UpdateTermUnitFinalZoneSizing();
 
 } // namespace SizingManager
 

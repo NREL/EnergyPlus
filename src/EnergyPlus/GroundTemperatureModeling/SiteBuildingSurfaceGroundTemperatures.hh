@@ -79,7 +79,7 @@ public:
     static std::shared_ptr<SiteBuildingSurfaceGroundTemps>
     BuildingSurfaceGTMFactory(EnergyPlusData &state, int objectType, std::string objectName);
 
-    Real64 getGroundTemp(EnergyPlusData &state) override;
+    Real64 getGroundTemp() override;
 
     Real64 getGroundTempAtTimeInSeconds(EnergyPlusData &state, Real64 const depth, Real64 const timeInSecondsOfSim) override;
 

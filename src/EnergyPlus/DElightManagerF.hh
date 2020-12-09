@@ -60,13 +60,13 @@ struct EnergyPlusData;
 
 namespace DElightManagerF {
 
-    void DElightInputGenerator(EnergyPlusData &state);
+    void DElightInputGenerator();
 
     void GenerateDElightDaylightCoefficients(Real64 &dLatitude, int &iErrorFlag);
 
-    void GetInputDElightComplexFenestration(EnergyPlusData &state, bool &ErrorsFound);
+    void GetInputDElightComplexFenestration(bool &ErrorsFound);
 
-    void CheckForGeometricTransform(EnergyPlusData &state, bool &doTransform, Real64 &OldAspectRatio, Real64 &NewAspectRatio);
+    void CheckForGeometricTransform(bool &doTransform, Real64 &OldAspectRatio, Real64 &NewAspectRatio);
 
     std::string ReplaceBlanksWithUnderscores(std::string const &InputString);
 

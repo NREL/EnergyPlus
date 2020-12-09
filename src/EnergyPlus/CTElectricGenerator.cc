@@ -97,8 +97,9 @@ namespace CTElectricGenerator {
     // All CT Generator models are based on a polynomial fit of Generator
     // performance data.
 
-    PlantComponent *CTGeneratorData::factory(EnergyPlusData &state, std::string const &objectName)
+    PlantComponent *CTGeneratorData::factory(std::string const &objectName)
     {
+        GET_STATE_HERE
         // Process the input data for generators if it hasn't been done already
         if (state.dataCTElectricGenerator->getCTInputFlag) {
             GetCTGeneratorInput(state);
@@ -118,12 +119,12 @@ namespace CTElectricGenerator {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void CTGeneratorData::simulate([[maybe_unused]] EnergyPlusData &state,
-                                   [[maybe_unused]] const EnergyPlus::PlantLocation &calledFromLocation,
+    void CTGeneratorData::simulate([[maybe_unused]] const EnergyPlus::PlantLocation &calledFromLocation,
                                    [[maybe_unused]] bool FirstHVACIteration,
                                    [[maybe_unused]] Real64 &CurLoad,
                                    [[maybe_unused]] bool RunFlag)
     {
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
         //       DATE WRITTEN   Sept. 2000
@@ -139,8 +140,9 @@ namespace CTElectricGenerator {
         // calls from the ElectricPowerServiceManger call the init and calculation worker functions directly.
     }
 
-    void GetCTGeneratorInput(EnergyPlusData &state)
+    void GetCTGeneratorInput()
     {
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Dan Fisher
         //       DATE WRITTEN:    April 2000
@@ -338,8 +340,9 @@ namespace CTElectricGenerator {
         }
     }
 
-    void CTGeneratorData::setupOutputVars(EnergyPlusData &state)
+    void CTGeneratorData::setupOutputVars()
     {
+        GET_STATE_HERE
         SetupOutputVariable(state, "Generator Produced AC Electricity Rate", OutputProcessor::Unit::W, this->ElecPowerGenerated, "System", "Average", this->Name);
 
         SetupOutputVariable(state, "Generator Produced AC Electricity Energy",
@@ -426,11 +429,11 @@ namespace CTElectricGenerator {
         }
     }
 
-    void CTGeneratorData::CalcCTGeneratorModel(EnergyPlusData &state,
-                                               bool const RunFlag,  // TRUE when Generator operating
+    void CTGeneratorData::CalcCTGeneratorModel(bool const RunFlag,  // TRUE when Generator operating
                                                Real64 const MyLoad, // Generator demand
                                                bool const FirstHVACIteration)
     {
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
         //       DATE WRITTEN   Sept. 2000
@@ -649,10 +652,10 @@ namespace CTElectricGenerator {
         }
     }
 
-    void CTGeneratorData::InitCTGenerators(EnergyPlusData &state,
-                                           bool const RunFlag, // TRUE when Generator operating
+    void CTGeneratorData::InitCTGenerators(bool const RunFlag, // TRUE when Generator operating
                                            bool const FirstHVACIteration)
     {
+        GET_STATE_HERE
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher

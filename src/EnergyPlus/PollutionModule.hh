@@ -429,18 +429,18 @@ namespace PollutionModule {
 
     void clear_state();
 
-    void CalculatePollution(EnergyPlusData &state);
+    void CalculatePollution();
 
     // Get Input Section of the Module
     //******************************************************************************
 
-    void SetupPollutionCalculations(EnergyPlusData &state);
+    void SetupPollutionCalculations();
 
-    void GetPollutionFactorInput(EnergyPlusData &state);
+    void GetPollutionFactorInput();
 
-    void SetupPollutionMeterReporting(EnergyPlusData &state);
+    void SetupPollutionMeterReporting();
 
-    void CheckPollutionMeterReporting(EnergyPlusData &state);
+    void CheckPollutionMeterReporting();
 
     void CheckFFSchedule(EnergyPlusData &state,
                          std::string const &currentModuleObject, // the module Object
@@ -454,7 +454,7 @@ namespace PollutionModule {
     // End of Get Input subroutines for the Pollution Module
     //******************************************************************************
 
-    void CalcPollution(EnergyPlusData &state);
+    void CalcPollution();
 
     void ReadEnergyMeters();
 

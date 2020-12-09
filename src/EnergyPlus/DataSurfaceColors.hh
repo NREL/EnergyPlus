@@ -105,7 +105,7 @@ namespace DataSurfaceColors {
                                     Optional_string_const ColorType = _ // for now, must be DXF
     );
 
-    void SetUpSchemeColors(EnergyPlusData &state, std::string const &SchemeName, Optional_string_const ColorType = _);
+    void SetUpSchemeColors(std::string const &SchemeName, Optional_string_const ColorType = _);
 
 } // namespace DataSurfaceColors
 

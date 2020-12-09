@@ -95,9 +95,9 @@ namespace HeatBalanceIntRadExchange {
                                      int const SurfNum              // surface number of surface being investigated
     );
 
-    void InitInteriorRadExchange(EnergyPlusData &state);
+    void InitInteriorRadExchange();
 
-    void InitSolarViewFactors(EnergyPlusData &state);
+    void InitSolarViewFactors();
 
     void AlignInputViewFactors(EnergyPlusData &state,
                                std::string const &cCurrentModuleObject, // Object type

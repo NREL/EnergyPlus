@@ -98,7 +98,7 @@ namespace WindowManager {
     // Initialize window optical properties with Windows-CalcEngine routines that are BSDF based
     //void InitWCE_BSDFOpticalData();
 
-    void InitWCE_SimplifiedOpticalData(EnergyPlusData &state);
+    void InitWCE_SimplifiedOpticalData();
 
     std::shared_ptr<SingleLayerOptics::CBSDFLayer> getBSDFLayer(EnergyPlusData &state,
                                                                 const Material::MaterialProperties & t_Material,
@@ -118,10 +118,10 @@ namespace WindowManager {
         CWCEMaterialFactory(const Material::MaterialProperties & t_Material,
                             const FenestrationCommon::WavelengthRange t_Range);
 
-        std::shared_ptr<SingleLayerOptics::CMaterial> getMaterial(EnergyPlusData &state);
+        std::shared_ptr<SingleLayerOptics::CMaterial> getMaterial();
 
     protected:
-        virtual void init(EnergyPlusData &state) = 0;
+        virtual void init() = 0;
         std::shared_ptr<SingleLayerOptics::CMaterial> m_Material;
         Material::MaterialProperties m_MaterialProperties;
         FenestrationCommon::WavelengthRange m_Range;
@@ -138,7 +138,7 @@ namespace WindowManager {
                                      const FenestrationCommon::WavelengthRange t_Range);
 
     private:
-        void init(EnergyPlusData &state) override;
+        void init() override;
     };
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -269,12 +269,12 @@ namespace WindowManager {
         CWCELayerFactory(const Material::MaterialProperties & t_Material,
             const FenestrationCommon::WavelengthRange t_Range);
 
-        std::shared_ptr<SingleLayerOptics::CBSDFLayer> getBSDFLayer(EnergyPlusData &state);
-        std::shared_ptr<SingleLayerOptics::CScatteringLayer> getLayer(EnergyPlusData &state);
+        std::shared_ptr<SingleLayerOptics::CBSDFLayer> getBSDFLayer();
+        std::shared_ptr<SingleLayerOptics::CScatteringLayer> getLayer();
 
     protected:
         // void init();
-        std::pair<std::shared_ptr<SingleLayerOptics::CMaterial>, std::shared_ptr<SingleLayerOptics::ICellDescription>> init(EnergyPlusData &state);
+        std::pair<std::shared_ptr<SingleLayerOptics::CMaterial>, std::shared_ptr<SingleLayerOptics::ICellDescription>> init();
 
         virtual void createMaterialFactory() = 0;
         std::shared_ptr<SingleLayerOptics::ICellDescription> getCellDescription() const;

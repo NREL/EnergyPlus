@@ -180,9 +180,9 @@ namespace ZoneTempPredictorCorrector {
                               Real64 const PriorTimeStep         // the old value for timestep length is passed for possible use in interpolating
     );
 
-    void GetZoneAirSetPoints(EnergyPlusData &state);
+    void GetZoneAirSetPoints();
 
-    void InitZoneAirSetPoints(EnergyPlusData &state);
+    void InitZoneAirSetPoints();
 
     void PredictSystemLoads(EnergyPlusData &state,
                             bool const ShortenTimeStepSys,
@@ -190,7 +190,7 @@ namespace ZoneTempPredictorCorrector {
                             Real64 const PriorTimeStep         // the old value for timestep length is passed for possible use in interpolating
     );
 
-    void CalcZoneAirTempSetPoints(EnergyPlusData &state);
+    void CalcZoneAirTempSetPoints();
 
     void CalculateMonthlyRunningAverageDryBulb(EnergyPlusData &state, Array1D<Real64> &runningAverageASH, Array1D<Real64> &runningAverageCEN);
 
@@ -231,11 +231,11 @@ namespace ZoneTempPredictorCorrector {
                             Real64 const PriorTimeStep         // the old value for timestep length is passed for possible use in interpolating
     );
 
-    void PushZoneTimestepHistories(EnergyPlusData &state);
+    void PushZoneTimestepHistories();
 
-    void PushSystemTimestepHistories(EnergyPlusData &state);
+    void PushSystemTimestepHistories();
 
-    void RevertZoneTimestepHistories(EnergyPlusData &state);
+    void RevertZoneTimestepHistories();
 
     void CorrectZoneHumRat(EnergyPlusData &state, int const ZoneNum);
 
@@ -309,7 +309,7 @@ namespace ZoneTempPredictorCorrector {
 
     bool VerifyControlledZoneForThermostat(std::string const &ZoneName); // Zone to verify
 
-    void DetectOscillatingZoneTemp(EnergyPlusData &state);
+    void DetectOscillatingZoneTemp();
 
     void AdjustAirSetPointsforOpTempCntrl(EnergyPlusData &state, int const TempControlledZoneID, int const ActualZoneNum, Real64 &ZoneAirSetPoint);
 

@@ -234,7 +234,7 @@ namespace HVACDXSystem {
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetDXCoolingSystemInput(EnergyPlusData &state);
+    void GetDXCoolingSystemInput();
 
     // End of Get Input subroutines for the Module
     //******************************************************************************

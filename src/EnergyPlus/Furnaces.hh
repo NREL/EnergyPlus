@@ -338,7 +338,7 @@ namespace Furnaces {
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetFurnaceInput(EnergyPlusData &state);
+    void GetFurnaceInput();
 
     // End of Get Input subroutines for this Module
     //******************************************************************************

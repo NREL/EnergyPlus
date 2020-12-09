@@ -144,18 +144,18 @@ namespace HeatBalanceManager {
     // Needed for unit tests, should not be normally called.
     void clear_state();
 
-    void ManageHeatBalance(EnergyPlusData &state);
+    void ManageHeatBalance();
 
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetHeatBalanceInput(EnergyPlusData &state);
+    void GetHeatBalanceInput();
 
     void CheckUsedConstructions(EnergyPlusData &state, bool &ErrorsFound);
 
-    bool CheckValidSimulationObjects(EnergyPlusData &state);
+    bool CheckValidSimulationObjects();
 
-    void SetPreConstructionInputParameters(EnergyPlusData &state);
+    void SetPreConstructionInputParameters();
 
     void GetProjectControlData(EnergyPlusData &state, bool &ErrorsFound); // Set to true if errors detected during getting data
 
@@ -199,9 +199,9 @@ namespace HeatBalanceManager {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitHeatBalance(EnergyPlusData &state);
+    void InitHeatBalance();
 
-    void AllocateHeatBalArrays(EnergyPlusData &state);
+    void AllocateHeatBalArrays();
 
     // End Initialization Section of the Module
     //******************************************************************************
@@ -209,13 +209,13 @@ namespace HeatBalanceManager {
     // Beginning of Record Keeping subroutines for the HB Module
     // *****************************************************************************
 
-    void RecKeepHeatBalance(EnergyPlusData &state);
+    void RecKeepHeatBalance();
 
-    void CheckWarmupConvergence(EnergyPlusData &state);
+    void CheckWarmupConvergence();
 
-    void ReportWarmupConvergence(EnergyPlusData &state);
+    void ReportWarmupConvergence();
 
-    void UpdateWindowFaceTempsNonBSDFWin(EnergyPlusData &state);
+    void UpdateWindowFaceTempsNonBSDFWin();
 
     //        End of Record Keeping subroutines for the HB Module
     // *****************************************************************************
@@ -223,11 +223,11 @@ namespace HeatBalanceManager {
     // Beginning of Reporting subroutines for the HB Module
     // *****************************************************************************
 
-    void ReportHeatBalance(EnergyPlusData &state);
+    void ReportHeatBalance();
 
     //        End of Reporting subroutines for the HB Module
 
-    void OpenShadingFile(EnergyPlusData &state);
+    void OpenShadingFile();
 
     void GetFrameAndDividerData(EnergyPlusData &state, bool &ErrorsFound); // set to true if errors found in input
 
@@ -239,7 +239,7 @@ namespace HeatBalanceManager {
                                bool &ErrorsFound                           // True if there is a problem with the entry requested from the data file
     );
 
-    void SetStormWindowControl(EnergyPlusData &state);
+    void SetStormWindowControl();
 
     void CreateFCfactorConstructions(EnergyPlusData &state,
                                      int &ConstrNum,   // Counter for Constructions
@@ -267,7 +267,7 @@ namespace HeatBalanceManager {
                                             int &ConstrNum, // num of construction items thus far
                                             bool &ErrorsFound);
 
-    void InitConductionTransferFunctions(EnergyPlusData &state);
+    void InitConductionTransferFunctions();
 
 } // namespace HeatBalanceManager
 

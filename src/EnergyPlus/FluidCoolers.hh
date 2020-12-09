@@ -168,13 +168,13 @@ namespace FluidCoolers {
         {
         }
 
-        void initialize(EnergyPlusData &state);
+        void initialize();
 
-        void setupOutputVars(EnergyPlusData &state);
+        void setupOutputVars();
 
-        void size(EnergyPlusData &state);
+        void size();
 
-        void update(EnergyPlusData &state);
+        void update();
 
         void report(bool RunFlag);
 
@@ -190,9 +190,9 @@ namespace FluidCoolers {
                                     Array1D<std::string> const &cNumericFieldNames,
                                     Array1D<std::string> const &cAlphaFieldNames);
 
-        void calcSingleSpeed(EnergyPlusData &state);
+        void calcSingleSpeed();
 
-        void calcTwoSpeed(EnergyPlusData &state);
+        void calcTwoSpeed();
 
         void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
@@ -209,7 +209,7 @@ namespace FluidCoolers {
 
     extern Array1D<FluidCoolerspecs> SimpleFluidCooler; // dimension to number of machines
 
-    void GetFluidCoolerInput(EnergyPlusData &state);
+    void GetFluidCoolerInput();
 
     void CalcFluidCoolerOutlet(EnergyPlusData &state, int FluidCoolerNum, Real64 _WaterMassFlowRate, Real64 AirFlowRate, Real64 UAdesign, Real64 &_OutletWaterTemp);
 

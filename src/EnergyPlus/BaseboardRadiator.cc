@@ -108,15 +108,14 @@ namespace BaseboardRadiator {
 
     static std::string const cCMO_BBRadiator_Water("ZoneHVAC:Baseboard:Convective:Water");
 
-    void SimBaseboard(EnergyPlusData &state,
-                      std::string const &EquipName,
+    void SimBaseboard(std::string const &EquipName,
                       int const ActualZoneNum,
                       int const ControlledZoneNum,
                       bool const FirstHVACIteration,
                       Real64 &PowerMet,
                       int &CompIndex)
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Russ Taylor
         //       DATE WRITTEN   Nov 1997
@@ -243,9 +242,9 @@ namespace BaseboardRadiator {
         baseboard->Baseboard(BaseboardNum).Energy = baseboard->Baseboard(BaseboardNum).Power * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
     }
 
-    void GetBaseboardInput(EnergyPlusData &state)
+    void GetBaseboardInput()
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Russ Taylor
         //       DATE WRITTEN   Nov 1997
@@ -507,9 +506,9 @@ namespace BaseboardRadiator {
         }
     }
 
-    void InitBaseboard(EnergyPlusData &state, int const BaseboardNum, int const ControlledZoneNumSub)
+    void InitBaseboard(int const BaseboardNum, int const ControlledZoneNumSub)
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Russ Taylor
         //       DATE WRITTEN   Nov 1997
@@ -627,8 +626,9 @@ namespace BaseboardRadiator {
         baseboard->Baseboard(BaseboardNum).AirInletHumRat = Node(ZoneNode).HumRat;
     }
 
-    void SizeBaseboard(EnergyPlusData &state, int const BaseboardNum)
+    void SizeBaseboard(int const BaseboardNum)
     {
+        GET_STATE_HERE
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
@@ -1003,8 +1003,9 @@ namespace BaseboardRadiator {
         }
     }
 
-    void SimHWConvective(EnergyPlusData &state, int &BaseboardNum, Real64 &LoadMet)
+    void SimHWConvective(int &BaseboardNum, Real64 &LoadMet)
     {
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Russ Taylor
         //       DATE WRITTEN   Nov 1997
@@ -1140,8 +1141,9 @@ namespace BaseboardRadiator {
         baseboard->Baseboard(BaseboardNum).AirMassFlowRate = AirMassFlowRate;
     }
 
-    void UpdateBaseboard(EnergyPlusData &state, int &BaseboardNum)
+    void UpdateBaseboard(int &BaseboardNum)
     {
+        GET_STATE_HERE
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Russ Taylor
@@ -1169,12 +1171,11 @@ namespace BaseboardRadiator {
         Node(WaterOutletNode).Enthalpy = baseboard->Baseboard(BaseboardNum).WaterOutletEnthalpy;
     }
 
-    Real64 HWBaseboardUAResidual(EnergyPlusData &state,
-                                 Real64 const UA,           // UA of coil
+    Real64 HWBaseboardUAResidual(Real64 const UA,           // UA of coil
                                  Array1D<Real64> const &Par // par(1) = design coil load [W]
     )
     {
-
+        GET_STATE_HERE
         // FUNCTION INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   February 2002

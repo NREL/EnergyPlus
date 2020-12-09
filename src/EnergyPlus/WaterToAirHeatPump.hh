@@ -174,7 +174,7 @@ namespace WaterToAirHeatPump {
                          int const CompOp,
                          Real64 const PartLoadRatio);
 
-    void GetWatertoAirHPInput(EnergyPlusData &state);
+    void GetWatertoAirHPInput();
 
     void InitWatertoAirHP(EnergyPlusData &state,
                           int const HPNum, // index to main heat pump data structure

@@ -142,19 +142,18 @@ namespace CTElectricGenerator {
         {
         }
 
-        void simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void setupOutputVars(EnergyPlusData &state);
+        void setupOutputVars();
 
-        void InitCTGenerators(EnergyPlusData &state,
-                              bool RunFlag, bool FirstHVACIteration);
+        void InitCTGenerators(bool RunFlag, bool FirstHVACIteration);
 
-        void CalcCTGeneratorModel(EnergyPlusData &state, bool RunFlag, Real64 MyLoad, bool FirstHVACIteration);
+        void CalcCTGeneratorModel(bool RunFlag, Real64 MyLoad, bool FirstHVACIteration);
 
-        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
+        static PlantComponent *factory(std::string const &objectName);
     };
 
-    void GetCTGeneratorInput(EnergyPlusData &state);
+    void GetCTGeneratorInput();
 
 } // namespace CTElectricGenerator
 

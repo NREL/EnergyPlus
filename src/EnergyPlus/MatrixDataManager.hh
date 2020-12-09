@@ -112,7 +112,7 @@ namespace MatrixDataManager {
 
     // Functions
 
-    void GetMatrixInput(EnergyPlusData &state);
+    void GetMatrixInput();
 
     int MatrixIndex(EnergyPlusData &state, std::string const &MatrixName);
 

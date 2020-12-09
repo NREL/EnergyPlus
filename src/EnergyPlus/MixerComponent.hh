@@ -124,7 +124,7 @@ namespace MixerComponent {
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetMixerInput(EnergyPlusData &state);
+    void GetMixerInput();
 
     // End of Get Input subroutines for the HB Module
     //******************************************************************************

@@ -167,7 +167,7 @@ namespace PoweredInductionUnits {
         {
         }
 
-        void CalcOutdoorAirVolumeFlowRate(EnergyPlusData &state);
+        void CalcOutdoorAirVolumeFlowRate();
     };
 
     // Object Data
@@ -184,7 +184,7 @@ namespace PoweredInductionUnits {
                 int &CompIndex                 // PIU Index in PIU names
     );
 
-    void GetPIUs(EnergyPlusData &state);
+    void GetPIUs();
 
     void InitPIU(EnergyPlusData &state,
                  int const PIUNum,             // number of the current fan coil unit being simulated

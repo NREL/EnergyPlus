@@ -120,13 +120,13 @@ namespace EcoRoofManager {
 
     // Functions
 
-    void CalcEcoRoof(EnergyPlusData &state,
-                     int const SurfNum, // Indicator of Surface Number for the current surface
+    void CalcEcoRoof(int const SurfNum, // Indicator of Surface Number for the current surface
                      int const ZoneNum, // Indicator for zone number where the current surface
                      int &ConstrNum,    // Indicator for construction index for the current surface
                      Real64 &TempExt    // Exterior temperature boundary condition
     )
     {
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION
         //     AUTHOR          David Sailor and Toan Pham
         //     DATE WRITTEN    January 2007
@@ -660,8 +660,7 @@ namespace EcoRoofManager {
         TempExt = Tgold;
     }
 
-    void UpdateSoilProps(EnergyPlusData &state,
-                         Real64 &Moisture,
+    void UpdateSoilProps(Real64 &Moisture,
                          Real64 &MeanRootMoisture,
                          Real64 const MoistureMax,
                          Real64 const MoistureResidual,
@@ -676,6 +675,7 @@ namespace EcoRoofManager {
                          [[maybe_unused]] Real64 const Qsoil // unused1208
     )
     {
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION
         //     AUTHOR          David Sailor
         //     DATE WRITTEN    Jan 2007

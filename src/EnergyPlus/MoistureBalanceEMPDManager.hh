@@ -98,9 +98,9 @@ namespace MoistureBalanceEMPDManager {
                                Material::MaterialProperties const &mat // material
     );
 
-    void GetMoistureBalanceEMPDInput(EnergyPlusData &state);
+    void GetMoistureBalanceEMPDInput();
 
-    void InitMoistureBalanceEMPD(EnergyPlusData &state);
+    void InitMoistureBalanceEMPD();
 
     void CalcMoistureBalanceEMPD(EnergyPlusData &state,
                                  int const SurfNum,
@@ -113,7 +113,7 @@ namespace MoistureBalanceEMPDManager {
 
     void UpdateMoistureBalanceEMPD(int const SurfNum); // Surface number
 
-    void ReportMoistureBalanceEMPD(EnergyPlusData &state);
+    void ReportMoistureBalanceEMPD();
 
 } // namespace MoistureBalanceEMPDManager
 

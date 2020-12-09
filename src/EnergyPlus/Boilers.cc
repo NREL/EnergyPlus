@@ -93,8 +93,9 @@ namespace EnergyPlus::Boilers {
     // METHODOLOGY EMPLOYED:
     // The BLAST/DOE-2 empirical model based on mfg. data
 
-    PlantComponent *BoilerSpecs::factory(EnergyPlusData &state, std::string const &objectName)
+    PlantComponent *BoilerSpecs::factory(std::string const &objectName)
     {
+        GET_STATE_HERE
         // Process the input data for boilers if it hasn't been done already
         if (state.dataBoilers->getBoilerInputFlag) {
             GetBoilerInput(state);
@@ -112,24 +113,24 @@ namespace EnergyPlus::Boilers {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void BoilerSpecs::simulate(EnergyPlusData &state,
-                               [[maybe_unused]] const PlantLocation &calledFromLocation,
+    void BoilerSpecs::simulate([[maybe_unused]] const PlantLocation &calledFromLocation,
                                [[maybe_unused]] bool const FirstHVACIteration,
                                Real64 &CurLoad,
                                bool const RunFlag)
     {
+        GET_STATE_HERE
         auto &sim_component(DataPlant::PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).Branch(this->BranchNum).Comp(this->CompNum));
         this->InitBoiler(state);
         this->CalcBoilerModel(state, CurLoad, RunFlag, sim_component.FlowCtrl);
         this->UpdateBoilerRecords(CurLoad, RunFlag);
     }
 
-    void BoilerSpecs::getDesignCapacities([[maybe_unused]] EnergyPlusData &state,
-                                          [[maybe_unused]] const PlantLocation &calledFromLocation,
+    void BoilerSpecs::getDesignCapacities([[maybe_unused]] const PlantLocation &calledFromLocation,
                                           Real64 &MaxLoad,
                                           Real64 &MinLoad,
                                           Real64 &OptLoad)
     {
+        GET_STATE_HERE
         MinLoad = this->NomCap * this->MinPartLoadRat;
         MaxLoad = this->NomCap * this->MaxPartLoadRat;
         OptLoad = this->NomCap * this->OptPartLoadRat;
@@ -140,14 +141,16 @@ namespace EnergyPlus::Boilers {
         SizFactor = this->SizFac;
     }
 
-    void BoilerSpecs::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation)
+    void BoilerSpecs::onInitLoopEquip([[maybe_unused]] const PlantLocation &calledFromLocation)
     {
+        GET_STATE_HERE
         this->InitBoiler(state);
         this->SizeBoiler(state);
     }
 
-    void GetBoilerInput(EnergyPlusData &state)
+    void GetBoilerInput()
     {
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Dan Fisher
         //       DATE WRITTEN:    April 1998
@@ -354,8 +357,9 @@ namespace EnergyPlus::Boilers {
         }
     }
 
-    void BoilerSpecs::SetupOutputVars(EnergyPlusData &state)
+    void BoilerSpecs::SetupOutputVars()
     {
+        GET_STATE_HERE
         SetupOutputVariable(state, "Boiler Heating Rate", OutputProcessor::Unit::W, this->BoilerLoad, "System", "Average", this->Name);
         SetupOutputVariable(state, "Boiler Heating Energy",
                             OutputProcessor::Unit::J,
@@ -403,8 +407,9 @@ namespace EnergyPlus::Boilers {
         }
     }
 
-    void BoilerSpecs::InitBoiler(EnergyPlusData &state) // number of the current boiler being simulated
+    void BoilerSpecs::InitBoiler() // number of the current boiler being simulated
     {
+        GET_STATE_HERE
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
@@ -526,8 +531,9 @@ namespace EnergyPlus::Boilers {
         }
     }
 
-    void BoilerSpecs::SizeBoiler(EnergyPlusData &state)
+    void BoilerSpecs::SizeBoiler()
     {
+        GET_STATE_HERE
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
@@ -684,12 +690,12 @@ namespace EnergyPlus::Boilers {
         }
     }
 
-    void BoilerSpecs::CalcBoilerModel(EnergyPlusData &state,
-                                      Real64 const MyLoad,    // W - hot water demand to be met by boiler
+    void BoilerSpecs::CalcBoilerModel(Real64 const MyLoad,    // W - hot water demand to be met by boiler
                                       bool const RunFlag,     // TRUE if boiler operating
                                       DataBranchAirLoopPlant::ControlTypeEnum const EquipFlowCtrl // Flow control mode for the equipment
     )
     {
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
         //       DATE WRITTEN   April 1999

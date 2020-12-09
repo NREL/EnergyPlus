@@ -155,7 +155,7 @@ namespace HVACCooledBeam {
         {
         }
 
-        void CalcOutdoorAirVolumeFlowRate(EnergyPlusData &state);
+        void CalcOutdoorAirVolumeFlowRate();
     };
 
     // Object Data
@@ -174,7 +174,7 @@ namespace HVACCooledBeam {
                      Real64 &NonAirSysOutput        // convective cooling by the beam system [W]
     );
 
-    void GetCoolBeams(EnergyPlusData &state);
+    void GetCoolBeams();
 
     void InitCoolBeam(EnergyPlusData &state,
                       int CBNum,              // number of the current cooled beam unit being simulated

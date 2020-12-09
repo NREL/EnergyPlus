@@ -285,9 +285,9 @@ namespace EconomicLifeCycleCost {
 
     // Functions
 
-    void GetInputForLifeCycleCost(EnergyPlusData &state);
+    void GetInputForLifeCycleCost();
 
-    void ComputeLifeCycleCostAndReport(EnergyPlusData &state);
+    void ComputeLifeCycleCostAndReport();
 
     //======================================================================================================================
     //======================================================================================================================
@@ -297,15 +297,15 @@ namespace EconomicLifeCycleCost {
     //======================================================================================================================
     //======================================================================================================================
 
-    void GetInputLifeCycleCostParameters(EnergyPlusData &state);
+    void GetInputLifeCycleCostParameters();
 
-    void GetInputLifeCycleCostRecurringCosts(EnergyPlusData &state);
+    void GetInputLifeCycleCostRecurringCosts();
 
-    void GetInputLifeCycleCostNonrecurringCost(EnergyPlusData &state);
+    void GetInputLifeCycleCostNonrecurringCost();
 
-    void GetInputLifeCycleCostUsePriceEscalation(EnergyPlusData &state);
+    void GetInputLifeCycleCostUsePriceEscalation();
 
-    void GetInputLifeCycleCostUseAdjustment(EnergyPlusData &state);
+    void GetInputLifeCycleCostUseAdjustment();
 
     int MonthToMonthNumber(std::string const &inMonthString, int const inDefaultMonth);
 
@@ -317,7 +317,7 @@ namespace EconomicLifeCycleCost {
     //======================================================================================================================
     //======================================================================================================================
 
-    void ExpressAsCashFlows(EnergyPlusData &state);
+    void ExpressAsCashFlows();
 
     void ComputeEscalatedEnergyCosts();
 
@@ -333,7 +333,7 @@ namespace EconomicLifeCycleCost {
     //======================================================================================================================
     //======================================================================================================================
 
-    void WriteTabularLifeCycleCostReport(EnergyPlusData &state);
+    void WriteTabularLifeCycleCostReport();
 
     void clear_state();
 

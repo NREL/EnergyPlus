@@ -77,9 +77,9 @@ namespace HVACManager {
     // Functions
     void clear_state();
 
-    void ManageHVAC(EnergyPlusData &state);
+    void ManageHVAC();
 
-    void SimHVAC(EnergyPlusData &state);
+    void SimHVAC();
 
     void SimSelectedEquipment(EnergyPlusData &state, bool &SimAirLoops,         // True when the air loops need to be (re)simulated
                               bool &SimZoneEquipment,    // True when zone equipment components need to be (re)simulated
@@ -89,25 +89,25 @@ namespace HVACManager {
                               bool &FirstHVACIteration,  // True when solution technique on first iteration
                               bool const LockPlantFlows);
 
-    void ResetTerminalUnitFlowLimits(EnergyPlusData &state);
+    void ResetTerminalUnitFlowLimits();
 
-    void ResolveAirLoopFlowLimits(EnergyPlusData &state);
+    void ResolveAirLoopFlowLimits();
 
     void ResolveLockoutFlags(EnergyPlusData &state, bool &SimAir); // TRUE means air loops must be (re)simulated
 
-    void ResetHVACControl(EnergyPlusData &state);
+    void ResetHVACControl();
 
     void ResetNodeData();
 
     void UpdateZoneListAndGroupLoads();
 
-    void ReportAirHeatBalance(EnergyPlusData &state);
+    void ReportAirHeatBalance();
 
-    void SetHeatToReturnAirFlag(EnergyPlusData &state);
+    void SetHeatToReturnAirFlag();
 
-    void UpdateZoneInletConvergenceLog(EnergyPlusData &state);
+    void UpdateZoneInletConvergenceLog();
 
-    void CheckAirLoopFlowBalance(EnergyPlusData &state);
+    void CheckAirLoopFlowBalance();
 
 } // namespace HVACManager
 

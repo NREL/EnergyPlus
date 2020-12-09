@@ -373,7 +373,7 @@ namespace PackagedTerminalHeatPump {
                    Real64 &QLatUnitOut            // Latent delivered capacity [kg/s], dehumidification = negative
     );
 
-    void GetPTUnit(EnergyPlusData &state);
+    void GetPTUnit();
 
     void InitPTUnit(EnergyPlusData &state, int const PTUnitNum,           // number of the current PTHP unit being simulated
                     int const ZoneNum,             // zone number where the current PTHP unit is located

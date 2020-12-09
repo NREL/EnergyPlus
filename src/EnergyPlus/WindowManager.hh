@@ -78,13 +78,13 @@ namespace WindowManager {
     //   Optical Calculation Routines
     //   Heat Balance Routines
 
-    void InitWindowOpticalCalculations(EnergyPlusData &state);
+    void InitWindowOpticalCalculations();
 
-    void InitGlassOpticalCalculations(EnergyPlusData &state);
+    void InitGlassOpticalCalculations();
 
     //*****************************************************************************************
 
-    void W5InitGlassParameters(EnergyPlusData &state);
+    void W5InitGlassParameters();
 
     //****************************************************************************
     // WINDOW 5 Optical Calculation Subroutines
@@ -345,19 +345,19 @@ namespace WindowManager {
 
     //****************************************************************************
 
-    void StartingWinTempsForNominalCond(EnergyPlusData &state);
+    void StartingWinTempsForNominalCond();
 
     //****************************************************************************
 
-    void ReportGlass(EnergyPlusData &state);
+    void ReportGlass();
 
     //*************************************************************************************
 
-    void CalcWindowBlindProperties(EnergyPlusData &state);
+    void CalcWindowBlindProperties();
 
     //*************************************************************************************
 
-    void CalcWindowScreenProperties(EnergyPlusData &state);
+    void CalcWindowScreenProperties();
 
     void BlindOpticsDiffuse(EnergyPlusData &state, int const BlindNum,      // Blind number
                             int const ISolVis,       // 1 = solar and IR calculation; 2 = visible calculation
@@ -406,11 +406,11 @@ namespace WindowManager {
 
     // added for custom solar or visible spectrum
 
-    void CheckAndReadCustomSprectrumData(EnergyPlusData &state);
+    void CheckAndReadCustomSprectrumData();
 
     //*****************************************************************************************
 
-    void initWindowModel(EnergyPlusData &state);
+    void initWindowModel();
 
     //*****************************************************************************************
 

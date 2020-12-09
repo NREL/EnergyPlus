@@ -97,23 +97,23 @@ namespace SolarReflectionManager {
         }
     };
 
-    void InitSolReflRecSurf(EnergyPlusData &state);
+    void InitSolReflRecSurf();
 
     //=====================================================================================================
 
-    void CalcBeamSolDiffuseReflFactors(EnergyPlusData &state);
+    void CalcBeamSolDiffuseReflFactors();
 
     void FigureBeamSolDiffuseReflFactors(EnergyPlusData &state, int const iHour);
 
     //=================================================================================================
 
-    void CalcBeamSolSpecularReflFactors(EnergyPlusData &state);
+    void CalcBeamSolSpecularReflFactors();
 
     void FigureBeamSolSpecularReflFactors(EnergyPlusData &state, int const iHour);
 
     //=================================================================================================
 
-    void CalcSkySolDiffuseReflFactors(EnergyPlusData &state);
+    void CalcSkySolDiffuseReflFactors();
 
 } // namespace SolarReflectionManager
 

@@ -221,9 +221,9 @@ namespace UserDefinedComponents {
         {
         }
 
-        void initialize(EnergyPlusData &state);
+        void initialize();
 
-        void report(EnergyPlusData &state);
+        void report();
     };
 
     struct UserZoneHVACForcedAirComponentStruct
@@ -255,7 +255,7 @@ namespace UserDefinedComponents {
 
         void initialize(EnergyPlusData &state, int ZoneNum);
 
-        void report(EnergyPlusData &state);
+        void report();
     };
 
     struct UserAirTerminalComponentStruct
@@ -289,7 +289,7 @@ namespace UserDefinedComponents {
 
         void initialize(EnergyPlusData &state, int ZoneNum);
 
-        void report(EnergyPlusData &state);
+        void report();
     };
 
     void SimCoilUserDefined(EnergyPlusData &state,
@@ -310,9 +310,9 @@ namespace UserDefinedComponents {
     void SimAirTerminalUserDefined(EnergyPlusData &state,
                                    std::string const &CompName, bool FirstHVACIteration, int ZoneNum, int ZoneNodeNum, int &CompIndex);
 
-    void GetUserDefinedPlantComponents(EnergyPlusData &state);
+    void GetUserDefinedPlantComponents();
 
-    void GetUserDefinedComponents(EnergyPlusData &state);
+    void GetUserDefinedComponents();
 
     void GetUserDefinedCoilIndex(EnergyPlusData &state, std::string const &CoilName, int &CoilIndex, bool &ErrorsFound, std::string const &CurrentModuleObject);
 

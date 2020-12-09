@@ -66,8 +66,9 @@ namespace CommandLineInterface {
     using namespace FileSystem;
     using namespace ez;
 
-    int ProcessArgs(EnergyPlusData &state, int argc, const char *argv[])
+    int ProcessArgs(int argc, const char *argv[])
     {
+        GET_STATE_HERE
         typedef std::string::size_type size_type;
 
         // Expand long-name options using "=" sign into two arguments
@@ -728,8 +729,9 @@ namespace CommandLineInterface {
         }
     }
 
-    int runReadVarsESO(EnergyPlusData &state)
+    int runReadVarsESO()
     {
+        GET_STATE_HERE
         std::string readVarsPath = exeDirectory + "ReadVarsESO" + exeExtension;
 
         if (!fileExists(readVarsPath)) {

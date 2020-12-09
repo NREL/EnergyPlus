@@ -132,7 +132,7 @@ namespace HybridModel {
 
     // Functions
 
-    void GetHybridModelZone(EnergyPlusData &state);
+    void GetHybridModelZone();
 
     void clear_state();
 

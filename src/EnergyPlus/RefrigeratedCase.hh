@@ -433,7 +433,7 @@ namespace RefrigeratedCase {
             StoredEnergy = 0.0;
         }
 
-        void CalculateCase(EnergyPlusData &state); // Absolute pointer to refrigerated case
+        void CalculateCase(); // Absolute pointer to refrigerated case
     };
 
     struct RefrigRackData : PlantComponent
@@ -557,7 +557,7 @@ namespace RefrigeratedCase {
 
         void UpdateCondenser();
 
-        void CalcRackSystem(EnergyPlusData &state);
+        void CalcRackSystem();
 
         void ReportRackSystem(EnergyPlusData &state, int RackNum);
 
@@ -725,9 +725,9 @@ namespace RefrigeratedCase {
 
         void CalculateCondensers(EnergyPlusData &state, int SysNum);
 
-        void CalculateCompressors(EnergyPlusData &state);
+        void CalculateCompressors();
 
-        void CalculateSubcoolers(EnergyPlusData &state);
+        void CalculateSubcoolers();
     };
 
     struct TransRefrigSystemData
@@ -876,7 +876,7 @@ namespace RefrigeratedCase {
 
         void CalcGasCooler(EnergyPlusData &state, int SysNum);
 
-        void CalculateTransCompressors(EnergyPlusData &state);
+        void CalculateTransCompressors();
     };
 
     struct CaseAndWalkInListDef // Derived Type for CaseAndWalkIn Lists
@@ -1445,7 +1445,7 @@ namespace RefrigeratedCase {
             ElecDefrostConsumption = 0.0;
         }
 
-        void CalculateWalkIn(EnergyPlusData &state);
+        void CalculateWalkIn();
     };
 
     struct CaseWIZoneReportData
@@ -1645,7 +1645,7 @@ namespace RefrigeratedCase {
         {
         }
 
-        void CalculateAirChillerSets(EnergyPlusData &state);
+        void CalculateAirChillerSets();
     };
 
     struct CoilCreditData // used to sum impact of all coils within a zone
@@ -1697,19 +1697,19 @@ namespace RefrigeratedCase {
 
     // Functions
 
-    void ManageRefrigeratedCaseRacks(EnergyPlusData &state);
+    void ManageRefrigeratedCaseRacks();
 
-    void GetRefrigerationInput(EnergyPlusData &state);
+    void GetRefrigerationInput();
 
-    void SetupReportInput(EnergyPlusData &state);
+    void SetupReportInput();
 
-    void InitRefrigeration(EnergyPlusData &state);
+    void InitRefrigeration();
 
-    void InitRefrigerationPlantConnections(EnergyPlusData &state);
+    void InitRefrigerationPlantConnections();
 
-    void SimulateDetailedRefrigerationSystems(EnergyPlusData &state);
+    void SimulateDetailedRefrigerationSystems();
 
-    void SimulateDetailedTransRefrigSystems(EnergyPlusData &state);
+    void SimulateDetailedTransRefrigSystems();
 
     void GetRefrigeratedRackIndex(EnergyPlusData &state, std::string const &Name,
                                   int &IndexPtr,
@@ -1718,11 +1718,11 @@ namespace RefrigeratedCase {
                                   Optional_string_const ThisObjectType = _,
                                   const Optional_bool_const &SuppressWarning = _);
 
-    void ReportRefrigerationComponents(EnergyPlusData &state);
+    void ReportRefrigerationComponents();
 
-    void SumZoneImpacts(EnergyPlusData &state);
+    void SumZoneImpacts();
 
-    void CheckRefrigerationInput(EnergyPlusData &state);
+    void CheckRefrigerationInput();
 
     void SimAirChillerSet(EnergyPlusData &state,
                           std::string const &AirChillerSetName,
@@ -1741,9 +1741,9 @@ namespace RefrigeratedCase {
                         Real64 AvailableTotalLoad // Load that system or secondary loop is able to serve [W]
     );
 
-    void FigureRefrigerationZoneGains(EnergyPlusData &state);
+    void FigureRefrigerationZoneGains();
 
-    void ZeroHVACValues(EnergyPlusData &state);
+    void ZeroHVACValues();
 
 } // namespace RefrigeratedCase
 

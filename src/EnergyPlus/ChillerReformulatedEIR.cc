@@ -115,8 +115,9 @@ namespace ChillerReformulatedEIR {
     // 1. Hydeman, M., P. Sreedharan, N. Webb, and S. Blanc. 2002. "Development and Testing of a Reformulated
     //    Regression-Based Electric Chiller Model". ASHRAE Transactions, HI-02-18-2, Vol 108, Part 2, pp. 1118-1127.
 
-    PlantComponent *ReformulatedEIRChillerSpecs::factory(EnergyPlusData &state, std::string const &objectName)
+    PlantComponent *ReformulatedEIRChillerSpecs::factory(std::string const &objectName)
     {
+        GET_STATE_HERE
         // Process the input data if it hasn't been done already
         if (state.dataChillerReformulatedEIR->GetInputREIR) {
             GetElecReformEIRChillerInput(state);
@@ -135,8 +136,9 @@ namespace ChillerReformulatedEIR {
     }
 
     void ReformulatedEIRChillerSpecs::getDesignCapacities(
-        [[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
+        const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
     {
+        GET_STATE_HERE
         if (calledFromLocation.loopNum == this->CWLoopNum) {
             MinLoad = this->RefCap * this->MinPartLoadRat;
             MaxLoad = this->RefCap * this->MaxPartLoadRat;
@@ -159,8 +161,9 @@ namespace ChillerReformulatedEIR {
         sizFac = this->SizFac;
     }
 
-    void ReformulatedEIRChillerSpecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &calledFromLocation)
+    void ReformulatedEIRChillerSpecs::onInitLoopEquip(const PlantLocation &calledFromLocation)
     {
+        GET_STATE_HERE
         bool runFlag = true;
         Real64 myLoad = 0.0;
         this->initialize(state, runFlag, myLoad);
@@ -170,8 +173,9 @@ namespace ChillerReformulatedEIR {
         }
     }
 
-    void ReformulatedEIRChillerSpecs::simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
+    void ReformulatedEIRChillerSpecs::simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
     {
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   July 2004
@@ -215,8 +219,9 @@ namespace ChillerReformulatedEIR {
         }
     }
 
-    void GetElecReformEIRChillerInput(EnergyPlusData &state)
+    void GetElecReformEIRChillerInput()
     {
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Lixing Gu, FSEC
         //       DATE WRITTEN:    July 2006
@@ -615,8 +620,9 @@ namespace ChillerReformulatedEIR {
         }
     }
 
-    void ReformulatedEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
+    void ReformulatedEIRChillerSpecs::setupOutputVars()
     {
+        GET_STATE_HERE
         SetupOutputVariable(state, "Chiller Part Load Ratio", OutputProcessor::Unit::None, this->ChillerPartLoadRatio, "System", "Average", this->Name);
 
         SetupOutputVariable(state, "Chiller Cycling Ratio", OutputProcessor::Unit::None, this->ChillerCyclingRatio, "System", "Average", this->Name);
@@ -726,8 +732,9 @@ namespace ChillerReformulatedEIR {
         }
     }
 
-    void ReformulatedEIRChillerSpecs::initialize(EnergyPlusData &state, bool const RunFlag, Real64 const MyLoad)
+    void ReformulatedEIRChillerSpecs::initialize(bool const RunFlag, Real64 const MyLoad)
     {
+        GET_STATE_HERE
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu, FSEC
@@ -991,8 +998,9 @@ namespace ChillerReformulatedEIR {
         }
     }
 
-    void ReformulatedEIRChillerSpecs::size(EnergyPlusData &state)
+    void ReformulatedEIRChillerSpecs::size()
     {
+        GET_STATE_HERE
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
@@ -1487,9 +1495,9 @@ namespace ChillerReformulatedEIR {
         }
     }
 
-    void ReformulatedEIRChillerSpecs::control(EnergyPlusData &state, Real64 &MyLoad, bool const RunFlag, bool const FirstIteration)
+    void ReformulatedEIRChillerSpecs::control(Real64 &MyLoad, bool const RunFlag, bool const FirstIteration)
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu, FSEC
         //       DATE WRITTEN   July 2006
@@ -1623,13 +1631,13 @@ namespace ChillerReformulatedEIR {
         }
     }
 
-    void ReformulatedEIRChillerSpecs::calcHeatRecovery(EnergyPlusData &state,
-                                                       Real64 &QCond,              // Current condenser load [W]
+    void ReformulatedEIRChillerSpecs::calcHeatRecovery(Real64 &QCond,              // Current condenser load [W]
                                                        Real64 const CondMassFlow,  // Current condenser mass flow [kg/s]
                                                        Real64 const condInletTemp, // Current condenser inlet temp [C]
                                                        Real64 &QHeatRec            // Amount of heat recovered [W]
     )
     {
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Lixing Gu, FSEC
         //       DATE WRITTEN:    July 2006
@@ -1772,9 +1780,9 @@ namespace ChillerReformulatedEIR {
         }
     }
 
-    Real64 ReformulatedEIRChillerSpecs::condOutTempResidual(EnergyPlusData &state, Real64 const FalsiCondOutTemp, Array1D<Real64> const &Par)
+    Real64 ReformulatedEIRChillerSpecs::condOutTempResidual(Real64 const FalsiCondOutTemp, Array1D<Real64> const &Par)
     {
-
+        GET_STATE_HERE
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   May 2006
@@ -1797,9 +1805,9 @@ namespace ChillerReformulatedEIR {
         return CondOutTempResidual;
     }
 
-    void ReformulatedEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, bool const RunFlag, Real64 const FalsiCondOutTemp)
+    void ReformulatedEIRChillerSpecs::calculate(Real64 &MyLoad, bool const RunFlag, Real64 const FalsiCondOutTemp)
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu, FSEC
         //       DATE WRITTEN   July 2006
@@ -2297,8 +2305,9 @@ namespace ChillerReformulatedEIR {
         }
     }
 
-    void ReformulatedEIRChillerSpecs::checkMinMaxCurveBoundaries(EnergyPlusData &state, bool const FirstIteration)
+    void ReformulatedEIRChillerSpecs::checkMinMaxCurveBoundaries(bool const FirstIteration)
     {
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          R Raustad, FSEC
         //       DATE WRITTEN:    August 2006

@@ -108,8 +108,9 @@ namespace EnergyPlus::DataSurfaceLists {
         SlabList.deallocate();
     }
 
-    void GetSurfaceListsInputs(EnergyPlusData &state)
+    void GetSurfaceListsInputs()
     {
+        GET_STATE_HERE
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
@@ -366,8 +367,9 @@ namespace EnergyPlus::DataSurfaceLists {
         if (ErrorsFound) ShowFatalError(state, "GetSurfaceListsInputs: Program terminates due to preceding conditions.");
     }
 
-    int GetNumberOfSurfaceLists(EnergyPlusData &state)
+    int GetNumberOfSurfaceLists()
     {
+        GET_STATE_HERE
 
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
@@ -414,8 +416,9 @@ namespace EnergyPlus::DataSurfaceLists {
         return NumberOfSurfaceLists;
     }
 
-    int GetNumberOfSurfListVentSlab(EnergyPlusData &state)
+    int GetNumberOfSurfListVentSlab()
     {
+        GET_STATE_HERE
 
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie

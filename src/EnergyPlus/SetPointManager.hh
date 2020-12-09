@@ -264,7 +264,7 @@ namespace SetPointManager {
         {
         }
 
-        void calculate(EnergyPlusData &state);
+        void calculate();
     };
 
     struct DefineSchedDualSetPointManager : SPBase // Derived type for Scheduled Dual Setpoint Manager
@@ -285,7 +285,7 @@ namespace SetPointManager {
         {
         }
 
-        void calculate(EnergyPlusData &state);
+        void calculate();
     };
 
     struct DefineOutsideAirSetPointManager : SPBase // Derived type for Outside Air Setpoint Manager Data
@@ -314,7 +314,7 @@ namespace SetPointManager {
         {
         }
 
-        void calculate(EnergyPlusData &state);
+        void calculate();
 
         Real64 CalcSetPoint(Real64 OutLowTemp, Real64 OutHighTemp, Real64 OutDryBulbTemp, Real64 SetTempAtOutLow, Real64 SetTempAtOutHigh);
     };
@@ -346,7 +346,7 @@ namespace SetPointManager {
         {
         }
 
-        void calculate(EnergyPlusData &state);
+        void calculate();
     };
 
     struct DefineSZHeatingSetPointManager : SPBase // Derived type for the Single Zone Heating Setpoint Manager data
@@ -454,7 +454,7 @@ namespace SetPointManager {
         {
         }
 
-        void calculate(EnergyPlusData &state);
+        void calculate();
     };
 
     struct DefineOAPretreatSetPointManager : SPBase
@@ -480,7 +480,7 @@ namespace SetPointManager {
         {
         }
 
-        void calculate(EnergyPlusData &state);
+        void calculate();
     };
 
     struct DefineWarmestSetPointManager : SPBase
@@ -501,7 +501,7 @@ namespace SetPointManager {
         {
         }
 
-        void calculate(EnergyPlusData &state);
+        void calculate();
     };
 
     struct DefineColdestSetPointManager : SPBase
@@ -522,7 +522,7 @@ namespace SetPointManager {
         {
         }
 
-        void calculate(EnergyPlusData &state);
+        void calculate();
     };
 
     struct DefWarmestSetPtManagerTempFlow : SPBase
@@ -549,7 +549,7 @@ namespace SetPointManager {
         {
         }
 
-        void calculate(EnergyPlusData &state);
+        void calculate();
     };
 
     struct DefRABFlowSetPointManager : SPBase
@@ -576,7 +576,7 @@ namespace SetPointManager {
         {
         }
 
-        void calculate(EnergyPlusData &state);
+        void calculate();
     };
 
     struct DefMultiZoneAverageCoolingSetPointManager : SPBase // derived type for SetpointManager:Multizone:Cooling:Average data
@@ -595,7 +595,7 @@ namespace SetPointManager {
         {
         }
 
-        void calculate(EnergyPlusData &state);
+        void calculate();
     };
 
     struct DefMultiZoneAverageHeatingSetPointManager : SPBase // derived type for SetpointManager:Multizone:Heating:Average data
@@ -614,7 +614,7 @@ namespace SetPointManager {
         {
         }
 
-        void calculate(EnergyPlusData &state);
+        void calculate();
     };
 
     struct DefMultiZoneAverageMinHumSetPointManager : SPBase // derived type for SetpointManager:MultiZone:MinimumHumidity:Average data
@@ -633,7 +633,7 @@ namespace SetPointManager {
         {
         }
 
-        void calculate(EnergyPlusData &state);
+        void calculate();
     };
 
     struct DefMultiZoneAverageMaxHumSetPointManager : SPBase // derived type for SetpointManager:MultiZone:MaximumHumidity:Average data
@@ -652,7 +652,7 @@ namespace SetPointManager {
         {
         }
 
-        void calculate(EnergyPlusData &state);
+        void calculate();
     };
 
     struct DefMultiZoneMinHumSetPointManager : SPBase // derived type for SetpointManager:MultiZone:Humidity:Minimum data
@@ -671,7 +671,7 @@ namespace SetPointManager {
         {
         }
 
-        void calculate(EnergyPlusData &state);
+        void calculate();
     };
 
     struct DefMultiZoneMaxHumSetPointManager : SPBase // derived type for SetpointManager:MultiZone:Humidity:Maximum data
@@ -690,7 +690,7 @@ namespace SetPointManager {
         {
         }
 
-        void calculate(EnergyPlusData &state);
+        void calculate();
     };
 
     struct DefineFollowOATempSetPointManager : SPBase
@@ -711,7 +711,7 @@ namespace SetPointManager {
         {
         }
 
-        void calculate(EnergyPlusData &state);
+        void calculate();
     };
 
     struct DefineFollowSysNodeTempSetPointManager : SPBase
@@ -758,7 +758,7 @@ namespace SetPointManager {
         {
         }
 
-        void calculate(EnergyPlusData &state);
+        void calculate();
     };
 
     struct DefineCondEntSetPointManager : SPBase // derived type for SetpointManager:CondenserEnteringReset data
@@ -792,7 +792,7 @@ namespace SetPointManager {
         {
         }
 
-        void calculate(EnergyPlusData &state);
+        void calculate();
     };
 
     struct DefineIdealCondEntSetPointManager : SPBase // derived type for SetpointManager:CondenserEnteringReset:Ideal data
@@ -836,11 +836,11 @@ namespace SetPointManager {
         {
         }
 
-        void calculate(EnergyPlusData &state);
+        void calculate();
 
-        void SetupMeteredVarsForSetPt(EnergyPlusData &state);
+        void SetupMeteredVarsForSetPt();
 
-        Real64 calculateCurrentEnergyUsage(EnergyPlusData &state);
+        Real64 calculateCurrentEnergyUsage();
 
         void setupSetPointAndFlags(Real64 &TotEnergy,
                                    Real64 &TotEnergyPre,
@@ -963,28 +963,28 @@ namespace SetPointManager {
         }
 
         // Calculation method
-        void calculate(EnergyPlusData &state);
+        void calculate();
     };
 
     void clear_state();
 
-    void ManageSetPoints(EnergyPlusData &state);
+    void ManageSetPoints();
 
-    void GetSetPointManagerInputs(EnergyPlusData &state); // wrapper for GetInput to accomodate unit testing
+    void GetSetPointManagerInputs(); // wrapper for GetInput to accomodate unit testing
 
     void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound);
 
     void VerifySetPointManagers(EnergyPlusData &state, bool &ErrorsFound); // flag to denote node conflicts in input. !unused1208
 
-    void InitSetPointManagers(EnergyPlusData &state);
+    void InitSetPointManagers();
 
-    void SimSetPointManagers(EnergyPlusData &state);
+    void SimSetPointManagers();
 
-    void UpdateSetPointManagers(EnergyPlusData &state);
+    void UpdateSetPointManagers();
 
-    void UpdateMixedAirSetPoints(EnergyPlusData &state);
+    void UpdateMixedAirSetPoints();
 
-    void UpdateOAPretreatSetPoints(EnergyPlusData &state);
+    void UpdateOAPretreatSetPoints();
 
     int getSPMBasedOnNode(EnergyPlusData &state, int NodeNum, iCtrlVarType SetPtType, SetPointManagerType SMPType, CtrlNodeType ctrlOrRefNode);
 
@@ -994,7 +994,7 @@ namespace SetPointManager {
 
     void ResetHumidityRatioCtrlVarType(EnergyPlusData &state, int NodeNum);
 
-    void CheckIfAnyIdealCondEntSetPoint(EnergyPlusData &state);
+    void CheckIfAnyIdealCondEntSetPoint();
 
     iCtrlVarType GetHumidityRatioVariableType(EnergyPlusData &state, int CntrlNodeNum);
 

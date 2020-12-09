@@ -616,7 +616,7 @@ namespace DXCoils {
                             int const FanOpMode // allows parent object to control fan mode
     );
 
-    void GetDXCoils(EnergyPlusData &state);
+    void GetDXCoils();
 
     void InitDXCoil(EnergyPlusData &state, int const DXCoilNum); // number of the current DX coil unit being simulated
 

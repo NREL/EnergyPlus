@@ -231,7 +231,7 @@ namespace SystemReports {
 
     // Functions
 
-    void InitEnergyReports(EnergyPlusData &state);
+    void InitEnergyReports();
 
     void FindFirstLastPtr(EnergyPlusData &state, int &LoopType, int &LoopNum, int &ArrayCount, int &LoopCount, bool &ConnectionFlag);
 
@@ -298,9 +298,9 @@ namespace SystemReports {
                                         int const PlantBranch,
                                         int const PlantComp);
 
-    void AllocateAndSetUpVentReports(EnergyPlusData &state);
+    void AllocateAndSetUpVentReports();
 
-    void CreateEnergyReportStructure(EnergyPlusData &state);
+    void CreateEnergyReportStructure();
 
     // End Initialization Section of the Module
     //******************************************************************************
@@ -308,7 +308,7 @@ namespace SystemReports {
     // Beginning of Reporting subroutines for the SimAir Module
     // *****************************************************************************
 
-    void ReportSystemEnergyUse(EnergyPlusData &state);
+    void ReportSystemEnergyUse();
 
     void CalcSystemEnergyUse(EnergyPlusData &state,
                              bool const CompLoadFlag,
@@ -318,7 +318,7 @@ namespace SystemReports {
                              Real64 const CompLoad,
                              Real64 const CompEnergy);
 
-    void ReportMaxVentilationLoads(EnergyPlusData &state);
+    void ReportMaxVentilationLoads();
 
     void MatchPlantSys(EnergyPlusData &state,
                        int const AirLoopNum, // counter for zone air distribution inlets
@@ -334,7 +334,7 @@ namespace SystemReports {
                              int &MatchComp               // Component number of the match
     );
 
-    void ReportAirLoopConnections(EnergyPlusData &state);
+    void ReportAirLoopConnections();
 
     //        End of Reporting subroutines for the SimAir Module
     // *****************************************************************************

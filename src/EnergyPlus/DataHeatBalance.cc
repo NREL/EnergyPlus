@@ -1112,8 +1112,9 @@ namespace DataHeatBalance {
         zeroPointerVal = 0;
     }
 
-    void ZoneData::SetOutBulbTempAt(EnergyPlusData &state)
+    void ZoneData::SetOutBulbTempAt()
     {
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Noel Keen (LBL)/Linda Lawrie
         //       DATE WRITTEN   August 2010
@@ -1142,8 +1143,9 @@ namespace DataHeatBalance {
         }
     }
 
-    void ZoneData::SetWindSpeedAt(EnergyPlusData &state, Real64 const fac)
+    void ZoneData::SetWindSpeedAt(Real64 const fac)
     {
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   June 2013
@@ -1173,15 +1175,17 @@ namespace DataHeatBalance {
         WindDir = fac;
     }
 
-    void SetZoneOutBulbTempAt(EnergyPlusData &state)
+    void SetZoneOutBulbTempAt()
     {
+        GET_STATE_HERE
         for (auto &zone : Zone) {
             zone.SetOutBulbTempAt(state);
         }
     }
 
-    void CheckZoneOutBulbTempAt(EnergyPlusData &state)
+    void CheckZoneOutBulbTempAt()
     {
+        GET_STATE_HERE
         // Using/Aliasing
         using DataEnvironment::SetOutBulbTempAt_error;
 
@@ -1192,16 +1196,18 @@ namespace DataHeatBalance {
         }
     }
 
-    void SetZoneWindSpeedAt(EnergyPlusData &state)
+    void SetZoneWindSpeedAt()
     {
+        GET_STATE_HERE
         Real64 const fac(state.dataEnvrn->WindSpeed * state.dataEnvrn->WeatherFileWindModCoeff * std::pow(state.dataEnvrn->SiteWindBLHeight, -state.dataEnvrn->SiteWindExp));
         for (auto &zone : Zone) {
             zone.SetWindSpeedAt(state, fac);
         }
     }
 
-    void SetZoneWindDirAt(EnergyPlusData &state)
+    void SetZoneWindDirAt()
     {
+        GET_STATE_HERE
         // Using/Aliasing
         Real64 const fac(state.dataEnvrn->WindDir);
         for (auto &zone : Zone) {
@@ -1209,11 +1215,11 @@ namespace DataHeatBalance {
         }
     }
 
-    void CheckAndSetConstructionProperties(EnergyPlusData &state,
-                                           int const ConstrNum, // Construction number to be set/checked
+    void CheckAndSetConstructionProperties(int const ConstrNum, // Construction number to be set/checked
                                            bool &ErrorsFound    // error flag that is set when certain errors have occurred
     )
     {
+        GET_STATE_HERE
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
@@ -1633,11 +1639,10 @@ namespace DataHeatBalance {
         }
     }
 
-    int AssignReverseConstructionNumber(EnergyPlusData &state,
-                                        int const ConstrNum, // Existing Construction number of first surface
+    int AssignReverseConstructionNumber(int const ConstrNum, // Existing Construction number of first surface
                                         bool &ErrorsFound)
     {
-
+        GET_STATE_HERE
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   December 2006
@@ -1743,13 +1748,12 @@ namespace DataHeatBalance {
         return NewConstrNum;
     }
 
-    void AddVariableSlatBlind(EnergyPlusData &state,
-                              int const inBlindNumber, // current Blind Number/pointer to name
+    void AddVariableSlatBlind(int const inBlindNumber, // current Blind Number/pointer to name
                               int &outBlindNumber,     // resultant Blind Number to pass back
                               bool &errFlag            // error flag should one be needed
     )
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   September 2009
@@ -1863,14 +1867,13 @@ namespace DataHeatBalance {
         }
     }
 
-    void CalcScreenTransmittance(EnergyPlusData &state,
-                                 int const SurfaceNum,
+    void CalcScreenTransmittance(int const SurfaceNum,
                                  Optional<Real64 const> Phi,     // Optional sun altitude relative to surface outward normal (radians)
                                  Optional<Real64 const> Theta,   // Optional sun azimuth relative to surface outward normal (radians)
                                  Optional_int_const ScreenNumber // Optional screen number
     )
     {
-
+        GET_STATE_HERE
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   May 2006
@@ -2353,8 +2356,9 @@ namespace DataHeatBalance {
         return NominalUwithConvCoeffs;
     }
 
-    void SetFlagForWindowConstructionWithShadeOrBlindLayer(EnergyPlusData &state)
+    void SetFlagForWindowConstructionWithShadeOrBlindLayer()
     {
+        GET_STATE_HERE
 
         // PURPOSE OF THIS SUBROUTINE:
         // check fenestrations with shading control and set a flag to true if its construction has

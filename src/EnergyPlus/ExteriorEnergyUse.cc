@@ -73,9 +73,9 @@ namespace ExteriorEnergyUse {
     // affect simulation results for the energy usage in a building but may affect the "metered"
     // usage of a facility.
 
-    void ManageExteriorEnergyUse(EnergyPlusData &state)
+    void ManageExteriorEnergyUse()
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   January 2001
@@ -93,9 +93,9 @@ namespace ExteriorEnergyUse {
         ExteriorEnergyUse::ReportExteriorEnergyUse(state);
     }
 
-    void GetExteriorEnergyUseInput(EnergyPlusData &state)
+    void GetExteriorEnergyUseInput()
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   January 2001
@@ -441,8 +441,7 @@ namespace ExteriorEnergyUse {
         }
     }
 
-    void ValidateFuelType(EnergyPlusData &state,
-                          ExteriorEnergyUse::ExteriorFuelUsage &FuelTypeNumber,                    // Fuel Type to be set in structure.
+    void ValidateFuelType(ExteriorEnergyUse::ExteriorFuelUsage &FuelTypeNumber,                    // Fuel Type to be set in structure.
                           std::string const &FuelTypeAlpha,       // Fuel Type String
                           std::string &FuelTypeString,            // Standardized Fuel Type String (for variable naming)
                           std::string const &CurrentModuleObject, // object being parsed
@@ -450,7 +449,7 @@ namespace ExteriorEnergyUse {
                           std::string const &CurrentName          // current object name being parsed
     )
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   January 2001
@@ -518,9 +517,9 @@ namespace ExteriorEnergyUse {
         }
     }
 
-    void ReportExteriorEnergyUse(EnergyPlusData &state)
+    void ReportExteriorEnergyUse()
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   January 2001

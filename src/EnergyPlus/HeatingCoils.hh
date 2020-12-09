@@ -221,7 +221,7 @@ namespace HeatingCoils {
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetHeatingCoilInput(EnergyPlusData &state);
+    void GetHeatingCoilInput();
 
     // End of Get Input subroutines for the HB Module
     //******************************************************************************

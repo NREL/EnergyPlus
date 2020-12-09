@@ -66,7 +66,7 @@ namespace RoomAirModelManager {
 
     void ManageAirModel(EnergyPlusData &state, int &ZoneNum);
 
-    void GetAirModelDatas(EnergyPlusData &state);
+    void GetAirModelDatas();
 
     void GetUserDefinedPatternData(EnergyPlusData &state, bool &ErrorsFound); // True if errors found during this get input routine
 

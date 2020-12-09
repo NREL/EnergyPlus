@@ -146,9 +146,9 @@ namespace EnergyPlus::DaylightingManager {
     using namespace DataHeatBalance;
     using namespace DataSurfaces;
 
-    void DayltgAveInteriorReflectance(EnergyPlusData &state, int &ZoneNum) // Zone number
+    void DayltgAveInteriorReflectance(int &ZoneNum) // Zone number
     {
-
+    GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
         //       DATE WRITTEN   July 1997
@@ -313,9 +313,9 @@ namespace EnergyPlus::DaylightingManager {
         }
     }
 
-    void CalcDayltgCoefficients(EnergyPlusData &state)
+    void CalcDayltgCoefficients()
     {
-
+                GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
         //       DATE WRITTEN   July 1997
@@ -710,9 +710,9 @@ namespace EnergyPlus::DaylightingManager {
         }     // zone loop
     }
 
-    void CalcDayltgCoeffsRefMapPoints(EnergyPlusData &state, int const ZoneNum)
+    void CalcDayltgCoeffsRefMapPoints(int const ZoneNum)
     {
-
+                            GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   October 2004
@@ -797,9 +797,9 @@ namespace EnergyPlus::DaylightingManager {
         }
     }
 
-    void CalcDayltgCoeffsRefPoints(EnergyPlusData &state, int const ZoneNum)
+    void CalcDayltgCoeffsRefPoints(int const ZoneNum)
     {
-
+            GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   April 2012
@@ -1194,9 +1194,9 @@ namespace EnergyPlus::DaylightingManager {
         } // End of reference point loop, IL
     }
 
-    void CalcDayltgCoeffsMapPoints(EnergyPlusData &state, int const ZoneNum)
+    void CalcDayltgCoeffsMapPoints(int const ZoneNum)
     {
-
+                GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   April 2012
@@ -1594,8 +1594,7 @@ namespace EnergyPlus::DaylightingManager {
         } // MapNum
     }
 
-    void FigureDayltgCoeffsAtPointsSetupForWindow(EnergyPlusData &state,
-                                                  int const ZoneNum,
+    void FigureDayltgCoeffsAtPointsSetupForWindow(int const ZoneNum,
                                                   int const iRefPoint,
                                                   int const loopwin,
                                                   DataDaylighting::iCalledFor const CalledFrom,          // indicate  which type of routine called this routine
@@ -1631,6 +1630,7 @@ namespace EnergyPlus::DaylightingManager {
                                                   //		Optional< Real64 > MapWindowSolidAngAtRefPt, //Inactive
                                                   Optional<Real64> MapWindowSolidAngAtRefPtWtd)
     {
+                                                  GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   November 2012, refactor from legacy code by Fred Winklemann
@@ -2047,7 +2047,6 @@ namespace EnergyPlus::DaylightingManager {
     }
 
     void FigureDayltgCoeffsAtPointsForWindowElements(
-        EnergyPlusData &state,
         int const ZoneNum,
         int const iRefPoint,
         int const loopwin,
@@ -2093,7 +2092,7 @@ namespace EnergyPlus::DaylightingManager {
         //		Optional< Real64 > MapWindowSolidAngAtRefPt, //Inactive
         Optional<Real64> MapWindowSolidAngAtRefPtWtd)
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   November 2012, refactor from legacy code by Fred Winklemann
@@ -2372,8 +2371,7 @@ namespace EnergyPlus::DaylightingManager {
         } // End of check if COSB > 0
     }
 
-    void InitializeCFSDaylighting(EnergyPlusData &state,
-                                  int const ZoneNum,               // Current zone number
+    void InitializeCFSDaylighting(int const ZoneNum,               // Current zone number
                                   int const IWin,                  // Complex fenestration number
                                   int const NWX,                   // Number of horizontal divisions
                                   int const NWY,                   // Number of vertical divisions
@@ -2383,6 +2381,7 @@ namespace EnergyPlus::DaylightingManager {
                                   DataDaylighting::iCalledFor const CalledFrom,
                                   Optional_int_const MapNum)
     {
+            GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
         //       DATE WRITTEN   April 2013
@@ -2576,8 +2575,7 @@ namespace EnergyPlus::DaylightingManager {
         }
     }
 
-    void InitializeCFSStateData(EnergyPlusData &state,
-                                DataBSDFWindow::BSDFRefPoints &StateRefPoint,
+    void InitializeCFSStateData(DataBSDFWindow::BSDFRefPoints &StateRefPoint,
                                 DataBSDFWindow::BSDFRefPointsGeomDescr &DaylghtGeomDescr,
                                 [[maybe_unused]] int const ZoneNum, // Current zone number
                                 int const iWin,
@@ -2598,6 +2596,7 @@ namespace EnergyPlus::DaylightingManager {
                                 [[maybe_unused]] DataDaylighting::iCalledFor const CalledFrom,
                                 [[maybe_unused]] Optional_int_const MapNum)
     {
+                GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
         //       DATE WRITTEN   June 2013
@@ -2962,8 +2961,7 @@ namespace EnergyPlus::DaylightingManager {
         }
     }
 
-    void CFSRefPointSolidAngle(EnergyPlusData &state,
-                               Vector3<Real64> const &RefPoint,
+    void CFSRefPointSolidAngle(Vector3<Real64> const &RefPoint,
                                Vector3<Real64> const &RWin,
                                Vector3<Real64> const &WNorm,
                                DataBSDFWindow::BSDFRefPoints &RefPointMap,
@@ -2974,6 +2972,7 @@ namespace EnergyPlus::DaylightingManager {
                                int const curWinEl,
                                Real64 const WinElArea)
     {
+            GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
         //       DATE WRITTEN   June 2013
@@ -3027,9 +3026,10 @@ namespace EnergyPlus::DaylightingManager {
         RefPointGeomMap.SolidAngle(curWinEl) = WinElArea * CosB / (Dist * Dist);
     }
 
-    void CFSRefPointPosFactor(EnergyPlusData &state,
+    void CFSRefPointPosFactor(
         Vector3<Real64> const &RefPoint, DataBSDFWindow::BSDFRefPoints &RefPointMap, int const iWin, int const CurFenState, int const NTrnBasis, Real64 const AZVIEW)
     {
+    GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
         //       DATE WRITTEN   June 2013
@@ -3223,7 +3223,6 @@ namespace EnergyPlus::DaylightingManager {
     }
 
     void FigureDayltgCoeffsAtPointsForSunPosition(
-        EnergyPlusData &state,
         int const ZoneNum,
         int const iRefPoint,
         int const iXelement,
@@ -3262,7 +3261,7 @@ namespace EnergyPlus::DaylightingManager {
         Optional_int_const MapNum,
         Optional<Real64 const> MapWindowSolidAngAtRefPtWtd)
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   November 2012, refactor from legacy code by Fred Winklemann
@@ -3932,8 +3931,7 @@ namespace EnergyPlus::DaylightingManager {
         }
     }
 
-    void FigureRefPointDayltgFactorsToAddIllums(EnergyPlusData &state,
-                                                int const ZoneNum,
+    void FigureRefPointDayltgFactorsToAddIllums(int const ZoneNum,
                                                 int const iRefPoint,
                                                 int const iHour,
                                                 int &ISunPos,
@@ -3944,7 +3942,7 @@ namespace EnergyPlus::DaylightingManager {
                                                 int const ICtrl // Window control counter
     )
     {
-
+                GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith, Oct 2012, derived from legacy code by Fred Winkelmann
         //       DATE WRITTEN   Oct. 2012
@@ -4079,8 +4077,7 @@ namespace EnergyPlus::DaylightingManager {
         } // End of sky type loop, ISky
     }
 
-    void FigureMapPointDayltgFactorsToAddIllums(EnergyPlusData &state,
-                                                int const ZoneNum,
+    void FigureMapPointDayltgFactorsToAddIllums(int const ZoneNum,
                                                 int const MapNum,
                                                 int const iMapPoint,
                                                 int const iHour,
@@ -4091,7 +4088,7 @@ namespace EnergyPlus::DaylightingManager {
                                                 int const ICtrl // Window control counter
     )
     {
-
+                    GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith, Oct 2012, derived from legacy code by Fred Winkelmann, Peter Ellis, Linda Lawrie
         //       DATE WRITTEN   Nov. 2012
@@ -4225,9 +4222,9 @@ namespace EnergyPlus::DaylightingManager {
         } // End of sky type loop, ISky
     }
 
-    void GetDaylightingParametersInput(EnergyPlusData &state)
+    void GetDaylightingParametersInput()
     {
-
+                    GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   Oct 2004
@@ -4535,8 +4532,9 @@ namespace EnergyPlus::DaylightingManager {
         if (ErrorsFound) ShowFatalError(state, "Program terminated for above reasons");
     }
 
-    void GetInputIlluminanceMap(EnergyPlusData &state, bool &ErrorsFound)
+    void GetInputIlluminanceMap(bool &ErrorsFound)
     {
+    GET_STATE_HERE
         // Perform the GetInput function for the Output:IlluminanceMap
         // Glazer - June 2016 (moved from GetDaylightingControls)
         using namespace DataIPShortCuts;
@@ -4943,10 +4941,10 @@ namespace EnergyPlus::DaylightingManager {
         if (ErrorsFound) return;
     }
 
-    void GetDaylightingControls(EnergyPlusData &state,
-                                int const TotDaylightingControls, // Total daylighting inputs
+    void GetDaylightingControls(int const TotDaylightingControls, // Total daylighting inputs
                                 bool &ErrorsFound)
     {
+    GET_STATE_HERE
         //       AUTHOR         Fred Winkelmann
         //       DATE WRITTEN   March 2002
         //       MODIFIED       Glazer - July 2016 - Move geometry transformation portion, rearrange input, allow more than three reference points
@@ -5177,8 +5175,9 @@ namespace EnergyPlus::DaylightingManager {
         }
     }
 
-    void GeometryTransformForDaylighting(EnergyPlusData &state)
+    void GeometryTransformForDaylighting()
     {
+        GET_STATE_HERE
         //       AUTHOR         Fred Winkelmann
         //       DATE WRITTEN   March 2002
         //       MODIFIED       Glazer - July 2016 - separated this from GetInput function
@@ -5345,8 +5344,9 @@ namespace EnergyPlus::DaylightingManager {
         }
     }
 
-    void GetInputDayliteRefPt(EnergyPlusData &state, bool &ErrorsFound)
+    void GetInputDayliteRefPt(bool &ErrorsFound)
     {
+                        GET_STATE_HERE
         // Perform GetInput function for the Daylighting:ReferencePoint object
         // Glazer - July 2016
         using namespace DataIPShortCuts;
@@ -5384,8 +5384,9 @@ namespace EnergyPlus::DaylightingManager {
         }
     }
 
-    bool doesDayLightingUseDElight(EnergyPlusData &state)
+    bool doesDayLightingUseDElight()
     {
+        GET_STATE_HERE
         for (auto &znDayl : state.dataDaylightingData->ZoneDaylight) {
             if (znDayl.DaylightMethod == DataDaylighting::iDaylightingMethod::DElightDaylighting) {
                 return true;
@@ -5394,8 +5395,9 @@ namespace EnergyPlus::DaylightingManager {
         return false;
     }
 
-    void CheckTDDsAndLightShelvesInDaylitZones(EnergyPlusData &state)
+    void CheckTDDsAndLightShelvesInDaylitZones()
     {
+    GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   Dec 2007
@@ -5470,8 +5472,9 @@ namespace EnergyPlus::DaylightingManager {
         if (ErrorsFound) ShowFatalError(state, "CheckTDDsAndLightShelvesInDaylitZones: Errors in DAYLIGHTING input.");
     }
 
-    void AssociateWindowShadingControlWithDaylighting(EnergyPlusData &state)
+    void AssociateWindowShadingControlWithDaylighting()
     {
+    GET_STATE_HERE
         for (int iShadeCtrl = 1; iShadeCtrl <= TotWinShadingControl; ++iShadeCtrl) {
             int found = -1;
             for (int jZone = 1; jZone <= state.dataGlobal->NumOfZones; ++jZone) {
@@ -5490,9 +5493,9 @@ namespace EnergyPlus::DaylightingManager {
         }
     }
 
-    void GetLightWellData(EnergyPlusData &state, bool &ErrorsFound) // If errors found in input
+    void GetLightWellData(bool &ErrorsFound) // If errors found in input
     {
-
+            GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
         //       DATE WRITTEN   Apr 2004
@@ -5591,14 +5594,13 @@ namespace EnergyPlus::DaylightingManager {
         } // End of loop over light well objects
     }
 
-    void DayltgGlare(EnergyPlusData &state,
-                     int &IL,        // Reference point index: 1=first ref pt, 2=second ref pt
+    void DayltgGlare(int &IL,        // Reference point index: 1=first ref pt, 2=second ref pt
                      Real64 &BLUM,   // Window background (surround) luminance (cd/m2)
                      Real64 &GLINDX, // Glare index
                      int &ZoneNum    // Zone number
     )
     {
-
+                GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
         //       DATE WRITTEN   July 1997
@@ -5669,12 +5671,11 @@ namespace EnergyPlus::DaylightingManager {
         GLINDX = max(0.0, GLINDX);
     }
 
-    void DayltgGlareWithIntWins(EnergyPlusData &state,
-                                Array1D<Real64> &GLINDX, // Glare index
+    void DayltgGlareWithIntWins(Array1D<Real64> &GLINDX, // Glare index
                                 int const ZoneNum        // Zone number
     )
     {
-
+    GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
         //       DATE WRITTEN   March 2004
@@ -5748,12 +5749,11 @@ namespace EnergyPlus::DaylightingManager {
         }
     }
 
-    void DayltgExtHorizIllum(EnergyPlusData &state,
-                             Array1A<Real64> HISK, // Horizontal illuminance from sky for different sky types
+    void DayltgExtHorizIllum(Array1A<Real64> HISK, // Horizontal illuminance from sky for different sky types
                              Real64 &HISU          // Horizontal illuminance from sun for unit beam normal
     )
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
         //       DATE WRITTEN   July 1997
@@ -5841,15 +5841,14 @@ namespace EnergyPlus::DaylightingManager {
         HISU = state.dataDaylightingManager->SPHSUN * 1.0;
     }
 
-    void DayltgHitObstruction(EnergyPlusData &state,
-                              int const IHOUR,           // Hour number
+    void DayltgHitObstruction(int const IHOUR,           // Hour number
                               int const IWin,            // Window index
                               Vector3<Real64> const &R1, // Origin of ray (m)
                               Vector3<Real64> const &RN, // Unit vector along ray
                               Real64 &ObTrans            // Product of solar transmittances of exterior obstructions
     )
     {
-
+    GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
         //       DATE WRITTEN   July 1997
@@ -6121,8 +6120,9 @@ namespace EnergyPlus::DaylightingManager {
         }
     }
 
-    void DayltgInteriorIllum(EnergyPlusData &state, int &ZoneNum) // Zone number
+    void DayltgInteriorIllum(int &ZoneNum) // Zone number
     {
+        GET_STATE_HERE
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
@@ -7109,9 +7109,9 @@ namespace EnergyPlus::DaylightingManager {
         }
     }
 
-    void DayltgInteriorTDDIllum(EnergyPlusData &state)
+    void DayltgInteriorTDDIllum()
     {
-
+                        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   October 2006
@@ -7193,8 +7193,9 @@ namespace EnergyPlus::DaylightingManager {
         } // PipeNum
     }
 
-    void DayltgElecLightingControl(EnergyPlusData &state, int &ZoneNum) // Zone number
+    void DayltgElecLightingControl(int &ZoneNum) // Zone number
     {
+        GET_STATE_HERE
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
@@ -7431,14 +7432,13 @@ namespace EnergyPlus::DaylightingManager {
         return DayltgGlarePositionFactor;
     }
 
-    void DayltgInterReflectedIllum(EnergyPlusData &state,
-                                   int const ISunPos, // Sun position counter; used to avoid calculating various
+    void DayltgInterReflectedIllum(int const ISunPos, // Sun position counter; used to avoid calculating various
                                    int const IHR,     // Hour of day
                                    int const ZoneNum, // Zone number
                                    int const IWin     // Window index
     )
     {
-
+    GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
         //       DATE WRITTEN   July 1997
@@ -8383,8 +8383,7 @@ namespace EnergyPlus::DaylightingManager {
         }
     }
 
-    void ComplexFenestrationLuminances(EnergyPlusData &state,
-                                       int const IWin,
+    void ComplexFenestrationLuminances(int const IWin,
                                        int const WinEl,
                                        int const NBasis,
                                        int const IHR,
@@ -8395,7 +8394,7 @@ namespace EnergyPlus::DaylightingManager {
                                        DataDaylighting::iCalledFor const CalledFrom,
                                        Optional_int_const MapNum)
     {
-
+            GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
         //       DATE WRITTEN   June 2013
@@ -8548,8 +8547,7 @@ namespace EnergyPlus::DaylightingManager {
         }
     }
 
-    void DayltgInterReflectedIllumComplexFenestration(EnergyPlusData &state,
-                                                      int const IWin,      // Window index
+    void DayltgInterReflectedIllumComplexFenestration(int const IWin,      // Window index
                                                       int const WinEl,     // Current window element counter
                                                       int const IHR,       // Hour of day
                                                       int const ZoneNum,   // Zone number
@@ -8557,7 +8555,7 @@ namespace EnergyPlus::DaylightingManager {
                                                       DataDaylighting::iCalledFor const CalledFrom,
                                                       Optional_int_const MapNum)
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
         //       DATE WRITTEN   April 2013
@@ -8712,8 +8710,7 @@ namespace EnergyPlus::DaylightingManager {
         if (allocated(ElementLuminanceSunDisk)) ElementLuminanceSunDisk.deallocate();
     }
 
-    void DayltgDirectIllumComplexFenestration(EnergyPlusData &state,
-                                              int const IWin,                     // Window index
+    void DayltgDirectIllumComplexFenestration(int const IWin,                     // Window index
                                               int const WinEl,                    // Current window element counter
                                               int const IHR,                      // Hour of day
                                               [[maybe_unused]] int const ZoneNum, // Zone number
@@ -8721,7 +8718,7 @@ namespace EnergyPlus::DaylightingManager {
                                               DataDaylighting::iCalledFor const CalledFrom,
                                               Optional_int_const MapNum)
     {
-
+    GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
         //       DATE WRITTEN   June 2013
@@ -8832,8 +8829,7 @@ namespace EnergyPlus::DaylightingManager {
         // AVWLSUdisk(1,IHR) = AVWLSUdisk(1,IHR) + WinLumSUdisk
     }
 
-    void DayltgDirectSunDiskComplexFenestration(EnergyPlusData &state,
-                                                int const iWin,                     // Window index
+    void DayltgDirectSunDiskComplexFenestration(int const iWin,                     // Window index
                                                 [[maybe_unused]] int const ZoneNum, // Zone number
                                                 int const iHour,                    // Hour of day
                                                 int const iRefPoint,
@@ -8843,7 +8839,7 @@ namespace EnergyPlus::DaylightingManager {
                                                 Optional_int_const MapNum,
                                                 Optional<Real64 const> MapWindowSolidAngAtRefPtWtd)
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
         //       DATE WRITTEN   June 2013
@@ -8960,12 +8956,11 @@ namespace EnergyPlus::DaylightingManager {
         state.dataDaylightingManager->EDIRSUdisk(iHour, 1) = ELumSunDisk;
     }
 
-    Real64 DayltgSkyLuminance(EnergyPlusData &state,
-                              int const ISky,     // Sky type: 1=clear, 2=clear turbid, 3=intermediate, 4=overcast
+    Real64 DayltgSkyLuminance(int const ISky,     // Sky type: 1=clear, 2=clear turbid, 3=intermediate, 4=overcast
                               Real64 const THSKY, // Azimuth and altitude of sky element (radians)
                               Real64 const PHSKY)
     {
-
+    GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
         //       DATE WRITTEN   July 1997
@@ -9255,15 +9250,14 @@ namespace EnergyPlus::DaylightingManager {
         }
     }
 
-    void DayltgSurfaceLumFromSun(EnergyPlusData &state,
-                                 int const IHR,                    // Hour number
+    void DayltgSurfaceLumFromSun(int const IHR,                    // Hour number
                                  Vector3<Real64> const &Ray,       // Ray from window to reflecting surface (m)
                                  int const ReflSurfNum,            // Number of surface for which luminance is being calculated
                                  Vector3<Real64> const &ReflHitPt, // Point on ReflSurfNum for luminance calculation (m)
                                  Real64 &LumAtReflHitPtFrSun       // Luminance at ReflHitPt from beam solar reflection for unit
     )
     {
-
+            GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
         //       DATE WRITTEN   November 2003
@@ -9345,9 +9339,9 @@ namespace EnergyPlus::DaylightingManager {
         LumAtReflHitPtFrSun = CosIncAngAtHitPt * DiffVisRefl / DataGlobalConstants::Pi;
     }
 
-    void DayltgInteriorMapIllum(EnergyPlusData &state, int &ZoneNum) // Zone number
+    void DayltgInteriorMapIllum(int &ZoneNum) // Zone number
     {
-
+    GET_STATE_HERE
         // *****super modified version of DayltgInteriorIllum by Peter Graham Ellis
         // *****removes all control code, just calculates illum and glare with previously determined control settings
         // *****this should be packaged into a subroutine called from 2 places
@@ -9825,9 +9819,9 @@ namespace EnergyPlus::DaylightingManager {
         }
     }
 
-    void ReportIllumMap(EnergyPlusData &state, int const MapNum)
+    void ReportIllumMap(int const MapNum)
     {
-
+            GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Ellis
         //       DATE WRITTEN   May 2003
@@ -10034,9 +10028,9 @@ namespace EnergyPlus::DaylightingManager {
         }         // not Warmup
     }
 
-    void CloseReportIllumMaps(EnergyPlusData &state)
+    void CloseReportIllumMaps()
     {
-
+                GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   June 2003
@@ -10107,9 +10101,9 @@ namespace EnergyPlus::DaylightingManager {
         }
     }
 
-    void CloseDFSFile(EnergyPlusData &state)
+    void CloseDFSFile()
     {
-
+            GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   August 2010
@@ -10147,9 +10141,9 @@ namespace EnergyPlus::DaylightingManager {
         state.files.dfs.close();
     }
 
-    void DayltgSetupAdjZoneListsAndPointers(EnergyPlusData &state)
+    void DayltgSetupAdjZoneListsAndPointers()
     {
-
+    GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
         //       DATE WRITTEN   Feb. 2004
@@ -10486,8 +10480,9 @@ namespace EnergyPlus::DaylightingManager {
         ZoneExtWin.deallocate();
     }
 
-    void CreateShadeDeploymentOrder(EnergyPlusData &state, int &ZoneNum)
+    void CreateShadeDeploymentOrder(int &ZoneNum)
     {
+    GET_STATE_HERE
         // J. Glazer - 2018
         // create sorted list for shade deployment order
         // first step is to create a sortable list of WindowShadingControl objects by sequence
@@ -10522,8 +10517,9 @@ namespace EnergyPlus::DaylightingManager {
         }
     }
 
-    void MapShadeDeploymentOrderToLoopNumber(EnergyPlusData &state, int &ZoneNum)
+    void MapShadeDeploymentOrderToLoopNumber(int &ZoneNum)
     {
+                GET_STATE_HERE
         // J. Glazer - 2018
         // Allow a way to map back to the original "loop" index that is used in many other places in the
         // ZoneDayLight data structure when traversing the list in the order of the window shaded deployment
@@ -10557,8 +10553,9 @@ namespace EnergyPlus::DaylightingManager {
         }
     }
 
-    void DayltgInterReflIllFrIntWins(EnergyPlusData &state, int &ZoneNum) // Zone number
+    void DayltgInterReflIllFrIntWins(int &ZoneNum) // Zone number
     {
+                GET_STATE_HERE
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
@@ -10609,9 +10606,9 @@ namespace EnergyPlus::DaylightingManager {
         state.dataDaylightingData->ZoneDaylight(ZoneNum).InterReflIllFrIntWins += BmInterReflIll;
     }
 
-    void CalcMinIntWinSolidAngs(EnergyPlusData &state)
+    void CalcMinIntWinSolidAngs()
     {
-
+    GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
         //       DATE WRITTEN   Feb. 2004
@@ -10732,9 +10729,9 @@ namespace EnergyPlus::DaylightingManager {
         }     // End of loop over zones
     }
 
-    void CheckForGeometricTransform(EnergyPlusData &state, bool &doTransform, Real64 &OldAspectRatio, Real64 &NewAspectRatio)
+    void CheckForGeometricTransform(bool &doTransform, Real64 &OldAspectRatio, Real64 &NewAspectRatio)
     {
-
+                            GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   February 2009
@@ -10808,8 +10805,7 @@ namespace EnergyPlus::DaylightingManager {
         }
     }
 
-    void WriteDaylightMapTitle(EnergyPlusData &state,
-                               int const mapNum,
+    void WriteDaylightMapTitle(int const mapNum,
                                InputOutputFile &mapFile,
                                std::string const &mapName,
                                std::string const &environmentName,
@@ -10818,6 +10814,7 @@ namespace EnergyPlus::DaylightingManager {
                                std::string const &refPt2,
                                Real64 const zcoord)
     {
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Greg Stark
         //       DATE WRITTEN   Sept 2008

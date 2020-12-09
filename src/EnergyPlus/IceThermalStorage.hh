@@ -158,9 +158,9 @@ namespace IceThermalStorage {
 
         void simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void InitSimpleIceStorage(EnergyPlusData &state);
+        void InitSimpleIceStorage();
 
-        void CalcIceStorageDormant(EnergyPlusData &state);
+        void CalcIceStorageDormant();
 
         void CalcIceStorageCapacity(Real64 &MaxCap, Real64 &MinCap, Real64 &OptCap);
 
@@ -168,7 +168,7 @@ namespace IceThermalStorage {
 
         void CalcQiceDischageMax(Real64 &QiceMin);
 
-        void CalcIceStorageCharge(EnergyPlusData &state);
+        void CalcIceStorageCharge();
 
         void CalcQiceChargeMaxByChiller(Real64 &QiceMaxByChiller);
 
@@ -180,7 +180,7 @@ namespace IceThermalStorage {
 
         void RecordOutput(Real64 myLoad, bool RunFlag);
 
-        void setupOutputVars(EnergyPlusData &state);
+        void setupOutputVars();
     };
 
     struct DetailedIceStorageData : PlantComponent
@@ -257,15 +257,15 @@ namespace IceThermalStorage {
 
         void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void InitDetailedIceStorage(EnergyPlusData &state);
+        void InitDetailedIceStorage();
 
-        void SimDetailedIceStorage(EnergyPlusData &state);
+        void SimDetailedIceStorage();
 
         void UpdateDetailedIceStorage();
 
         void ReportDetailedIceStorage();
 
-        void setupOutputVars(EnergyPlusData &state);
+        void setupOutputVars();
     };
 
     // Object Data
@@ -275,7 +275,7 @@ namespace IceThermalStorage {
     // Static Functions
     void clear_state();
 
-    void GetIceStorageInput(EnergyPlusData &state);
+    void GetIceStorageInput();
 
     Real64 CalcDetIceStorLMTDstar(Real64 Tin,  // ice storage unit inlet temperature
                                   Real64 Tout, // ice storage unit outlet (setpoint) temperature

@@ -110,8 +110,9 @@ namespace ChillerIndirectAbsorption {
     const char * fluidNameSteam = "STEAM";
     const char * fluidNameWater = "WATER";
 
-    PlantComponent *IndirectAbsorberSpecs::factory(EnergyPlusData &state, std::string const &objectName)
+    PlantComponent *IndirectAbsorberSpecs::factory(std::string const &objectName)
     {
+        GET_STATE_HERE
         // Process the input data
         if (state.dataChillerIndirectAbsorption->GetInput) {
             GetIndirectAbsorberInput(state);
@@ -129,8 +130,9 @@ namespace ChillerIndirectAbsorption {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void IndirectAbsorberSpecs::simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
+    void IndirectAbsorberSpecs::simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
     {
+        GET_STATE_HERE
         if (calledFromLocation.loopNum == this->CWLoopNum) {
 
             this->initialize(state, RunFlag, CurLoad);
@@ -176,8 +178,9 @@ namespace ChillerIndirectAbsorption {
     }
 
     void IndirectAbsorberSpecs::getDesignCapacities(
-        [[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
+        const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
     {
+        GET_STATE_HERE
         if (calledFromLocation.loopNum == this->CWLoopNum) {
             MinLoad = this->NomCap * this->MinPartLoadRat;
             MaxLoad = this->NomCap * this->MaxPartLoadRat;
@@ -194,8 +197,9 @@ namespace ChillerIndirectAbsorption {
         sizFac = this->SizFac;
     }
 
-    void IndirectAbsorberSpecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &calledFromLocation)
+    void IndirectAbsorberSpecs::onInitLoopEquip(const PlantLocation &calledFromLocation)
     {
+        GET_STATE_HERE
         bool runFlag = true;
         Real64 myLoad = 0.0;
 
@@ -206,8 +210,9 @@ namespace ChillerIndirectAbsorption {
         }
     }
 
-    void GetIndirectAbsorberInput(EnergyPlusData &state)
+    void GetIndirectAbsorberInput()
     {
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          R. Raustad (FSEC)
         //       DATE WRITTEN:    May 2008
@@ -558,8 +563,9 @@ namespace ChillerIndirectAbsorption {
         }
     }
 
-    void IndirectAbsorberSpecs::setupOutputVars(EnergyPlusData &state)
+    void IndirectAbsorberSpecs::setupOutputVars()
     {
+        GET_STATE_HERE
         SetupOutputVariable(state, "Chiller Electricity Rate", OutputProcessor::Unit::W, this->Report.PumpingPower, "System", "Average", this->Name);
 
         SetupOutputVariable(state, "Chiller Electricity Energy",
@@ -679,8 +685,9 @@ namespace ChillerIndirectAbsorption {
         }
     }
 
-    void IndirectAbsorberSpecs::initialize(EnergyPlusData &state, bool RunFlag, Real64 MyLoad)
+    void IndirectAbsorberSpecs::initialize(bool RunFlag, Real64 MyLoad)
     {
+        GET_STATE_HERE
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
@@ -927,9 +934,9 @@ namespace ChillerIndirectAbsorption {
         }
     }
 
-    void IndirectAbsorberSpecs::sizeChiller(EnergyPlusData &state)
+    void IndirectAbsorberSpecs::sizeChiller()
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         R. Raustad (FSEC)
         //       DATE WRITTEN   May 2008
@@ -1488,8 +1495,9 @@ namespace ChillerIndirectAbsorption {
         }
     }
 
-    void IndirectAbsorberSpecs::calculate(EnergyPlusData &state, Real64 const MyLoad, bool const RunFlag)
+    void IndirectAbsorberSpecs::calculate(Real64 const MyLoad, bool const RunFlag)
     {
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         R. Raustad (FSEC)
         //       DATE WRITTEN   May 2008

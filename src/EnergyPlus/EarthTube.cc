@@ -118,9 +118,9 @@ namespace EarthTube {
         ZnRptET.deallocate();
     }
 
-    void ManageEarthTube(EnergyPlusData &state)
+    void ManageEarthTube()
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Kwang Ho Lee
         //       DATE WRITTEN   November 2005
@@ -146,9 +146,9 @@ namespace EarthTube {
         ReportEarthTube(state);
     }
 
-    void GetEarthTube(EnergyPlusData &state, bool &ErrorsFound) // If errors found in input
+    void GetEarthTube(bool &ErrorsFound) // If errors found in input
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Kwang Ho Lee
         //       DATE WRITTEN   November 2005
@@ -520,13 +520,12 @@ namespace EarthTube {
         }
     }
 
-    void CheckEarthTubesInZones(EnergyPlusData &state,
-                                std::string const ZoneName,  // name of zone for error reporting
+    void CheckEarthTubesInZones(std::string const ZoneName,  // name of zone for error reporting
                                 std::string const FieldName, // name of earth tube in input
                                 bool &ErrorsFound            // Found a problem
     )
     {
-
+        GET_STATE_HERE
         int Loop;
         int Loop1;
 
@@ -543,9 +542,9 @@ namespace EarthTube {
         }
     }
 
-    void CalcEarthTube(EnergyPlusData &state)
+    void CalcEarthTube()
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Kwang Ho Lee
         //       DATE WRITTEN   November 2005
@@ -673,12 +672,11 @@ namespace EarthTube {
         }
     }
 
-    void CalcEarthTubeHumRat(EnergyPlusData &state,
-                             int const Loop, // EarthTube number (index)
+    void CalcEarthTubeHumRat(int const Loop, // EarthTube number (index)
                              int const NZ    // Zone number (index)
     )
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Kwang Ho Lee
         //       DATE WRITTEN   November 2005
@@ -734,9 +732,9 @@ namespace EarthTube {
         EAMFLxHumRat(NZ) = EAMFL(NZ) * InsideHumRat;
     }
 
-    void ReportEarthTube(EnergyPlusData &state)
+    void ReportEarthTube()
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Kwang Ho Lee
         //       DATE WRITTEN   November 2005

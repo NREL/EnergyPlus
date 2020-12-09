@@ -110,7 +110,7 @@ namespace HeatBalanceKivaManager {
         Real64 zoneAssumedTemperature;
         void initGround(EnergyPlusData &state, const KivaWeatherData &kivaWeather);
         void setInitialBoundaryConditions(EnergyPlusData &state, const KivaWeatherData &kivaWeather, const int date, const int hour, const int timestep);
-        void setBoundaryConditions(EnergyPlusData &state);
+        void setBoundaryConditions();
         void plotDomain();
         Real64 floorWeight;
         int constructionNum = 0;
@@ -129,14 +129,14 @@ namespace HeatBalanceKivaManager {
     public:
         KivaManager();
         virtual ~KivaManager();
-        void readWeatherData(EnergyPlusData &state);
-        bool setupKivaInstances(EnergyPlusData &state);
-        void initKivaInstances(EnergyPlusData &state);
-        void calcKivaInstances(EnergyPlusData &state);
-        void defineDefaultFoundation(EnergyPlusData &state);
+        void readWeatherData();
+        bool setupKivaInstances();
+        void initKivaInstances();
+        void calcKivaInstances();
+        void defineDefaultFoundation();
         void addDefaultFoundation();
         int findFoundation(std::string const &name);
-        void calcKivaSurfaceResults(EnergyPlusData &state);
+        void calcKivaSurfaceResults();
 
         KivaWeatherData kivaWeather;
         FoundationKiva defaultFoundation;

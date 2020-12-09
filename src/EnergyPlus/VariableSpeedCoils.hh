@@ -351,7 +351,7 @@ namespace VariableSpeedCoils {
                                Optional<Real64 const> OnOffAirFlowRat = _ // ratio of comp on to comp off air flow rate
     );
 
-    void GetVarSpeedCoilInput(EnergyPlusData &state);
+    void GetVarSpeedCoilInput();
 
     // Beginning Initialization Section of the Module
     //******************************************************************************

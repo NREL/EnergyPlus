@@ -581,7 +581,7 @@ namespace OutputProcessor {
     // Needed for unit tests, should not be normally called.
     void clear_state();
 
-    void InitializeOutput(EnergyPlusData &state);
+    void InitializeOutput();
 
     void SetupTimePointers(EnergyPlusData &state, std::string const &IndexKey, // Which timestep is being set up, 'Zone'=1, 'HVAC'=2
                            Real64 &TimeStep             // The timestep variable.  Used to get the address
@@ -603,7 +603,7 @@ namespace OutputProcessor {
                       int const MaxIndx                // Max number (from previous routine) for this variable
     );
 
-    void GetReportVariableInput(EnergyPlusData &state);
+    void GetReportVariableInput();
 
     ReportingFrequency determineFrequency(EnergyPlusData &state, std::string const &FreqString);
 
@@ -653,7 +653,7 @@ namespace OutputProcessor {
     // The following routines implement Energy Meters in EnergyPlus.
     // *****************************************************************************
 
-    void InitializeMeters(EnergyPlusData &state);
+    void InitializeMeters();
 
     void GetCustomMeterInput(EnergyPlusData &state, bool &ErrorsFound);
 
@@ -742,11 +742,11 @@ namespace OutputProcessor {
 
     void ReportYRMeters(EnergyPlusData &state, bool PrintTimeStampToSQL);
 
-    void ReportForTabularReports(EnergyPlusData &state);
+    void ReportForTabularReports();
 
     std::string DateToStringWithMonth(int const codedDate); // word containing encoded month, day, hour, minute
 
-    void ReportMeterDetails(EnergyPlusData &state);
+    void ReportMeterDetails();
 
     // *****************************************************************************
     // End of routines for Energy Meters implementation in EnergyPlus.
@@ -968,9 +968,9 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
 
 void AssignReportNumber(int &ReportNumber);
 
-void GenOutputVariablesAuditReport(EnergyPlusData &state);
+void GenOutputVariablesAuditReport();
 
-void UpdateMeterReporting(EnergyPlusData &state);
+void UpdateMeterReporting();
 
 void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
                                             int const WhichMeter,              // Which meter number
@@ -1050,7 +1050,7 @@ bool ReportingThisVariable(std::string const &RepVarName);
 
 void InitPollutionMeterReporting(EnergyPlusData &state, std::string const &ReportFreqName);
 
-void ProduceRDDMDD(EnergyPlusData &state);
+void ProduceRDDMDD();
 
 void AddToOutputVariableList(std::string const &VarName, // Variable Name
                              OutputProcessor::TimeStepType const TimeStepType,
@@ -1060,7 +1060,7 @@ void AddToOutputVariableList(std::string const &VarName, // Variable Name
                              Optional_string_const customUnitName = _ // the custom name for the units from EMS definition of units
 );
 
-int initErrorFile(EnergyPlusData &state);
+int initErrorFile();
 
 struct OutputProcessorData : BaseGlobalStruct {
 

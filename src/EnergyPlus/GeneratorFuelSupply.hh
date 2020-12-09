@@ -77,7 +77,7 @@ namespace GeneratorFuelSupply {
 
     void clear_state();
 
-    void GetGeneratorFuelSupplyInput(EnergyPlusData &state);
+    void GetGeneratorFuelSupplyInput();
 
     //******************************************************************************
 

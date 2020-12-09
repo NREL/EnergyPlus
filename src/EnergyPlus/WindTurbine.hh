@@ -158,7 +158,7 @@ namespace WindTurbine {
                                Real64 &ThermalPower,
                                Real64 &ThermalEnergy);
 
-    void GetWindTurbineInput(EnergyPlusData &state);
+    void GetWindTurbineInput();
 
     void InitWindTurbine(EnergyPlusData &state, int WindTurbineNum);
 

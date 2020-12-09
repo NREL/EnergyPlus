@@ -89,8 +89,9 @@ namespace BoilerSteam {
 
     const char *fluidNameSteam = "STEAM";
 
-    PlantComponent *BoilerSpecs::factory(EnergyPlusData &state, std::string const &objectName)
+    PlantComponent *BoilerSpecs::factory(std::string const &objectName)
     {
+        GET_STATE_HERE
         // Process the input data for boilers if it hasn't been done already
         if (state.dataBoilerSteam->getSteamBoilerInput) {
             GetBoilerInput(state);
@@ -110,8 +111,9 @@ namespace BoilerSteam {
     }
 
     void BoilerSpecs::simulate(
-        EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
+        [[maybe_unused]] const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
     {
+        GET_STATE_HERE
         this->initialize(state);
         auto &sim_component(DataPlant::PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).Branch(this->BranchNum).Comp(this->CompNum));
         this->calculate(state, CurLoad, RunFlag, sim_component.FlowCtrl);
@@ -119,8 +121,9 @@ namespace BoilerSteam {
     }
 
     void
-    BoilerSpecs::getDesignCapacities([[maybe_unused]] EnergyPlusData &state, const PlantLocation &, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
+    BoilerSpecs::getDesignCapacities(const PlantLocation &, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
     {
+        GET_STATE_HERE
         MinLoad = this->NomCap * this->MinPartLoadRat;
         MaxLoad = this->NomCap * this->MaxPartLoadRat;
         OptLoad = this->NomCap * this->OptPartLoadRat;
@@ -131,14 +134,16 @@ namespace BoilerSteam {
         sizFac = this->SizFac;
     }
 
-    void BoilerSpecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &)
+    void BoilerSpecs::onInitLoopEquip(const PlantLocation &)
     {
+        GET_STATE_HERE
         this->initialize(state);
         this->autosize(state);
     }
 
-    void GetBoilerInput(EnergyPlusData &state)
+    void GetBoilerInput()
     {
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rahul Chillar
         //       DATE WRITTEN   Dec 2004
@@ -293,8 +298,9 @@ namespace BoilerSteam {
         }
     }
 
-    void BoilerSpecs::initialize(EnergyPlusData &state) // number of the current electric chiller being simulated
+    void BoilerSpecs::initialize() // number of the current electric chiller being simulated
     {
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rahul Chillar
         //       DATE WRITTEN   Dec 2004
@@ -421,8 +427,9 @@ namespace BoilerSteam {
         }
     }
 
-    void BoilerSpecs::setupOutputVars(EnergyPlusData &state)
+    void BoilerSpecs::setupOutputVars()
     {
+        GET_STATE_HERE
         SetupOutputVariable(state, "Boiler Heating Rate", OutputProcessor::Unit::W, this->BoilerLoad, "System", "Average", this->Name);
         SetupOutputVariable(state, "Boiler Heating Energy",
                             OutputProcessor::Unit::J,
@@ -454,8 +461,9 @@ namespace BoilerSteam {
         SetupOutputVariable(state, "Boiler Steam Mass Flow Rate", OutputProcessor::Unit::kg_s, this->BoilerMassFlowRate, "System", "Average", this->Name);
     }
 
-    void BoilerSpecs::autosize(EnergyPlusData &state)
+    void BoilerSpecs::autosize()
     {
+        GET_STATE_HERE
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rahul Chillar
@@ -548,12 +556,12 @@ namespace BoilerSteam {
         }
     }
 
-    void BoilerSpecs::calculate(EnergyPlusData &state,
-                                Real64 &MyLoad,         // W - hot water demand to be met by boiler
+    void BoilerSpecs::calculate(Real64 &MyLoad,         // W - hot water demand to be met by boiler
                                 bool const RunFlag,     // TRUE if boiler operating
                                 DataBranchAirLoopPlant::ControlTypeEnum const EquipFlowCtrl // Flow control mode for the equipment
     )
     {
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rahul Chillar
         //       DATE WRITTEN   Dec 2004

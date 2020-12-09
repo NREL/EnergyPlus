@@ -310,7 +310,7 @@ namespace FanCoilUnits {
                         Real64 &LatOutputProvided,     // Latent add/removal supplied by window AC (kg/s), dehumid = negative
                         int &CompIndex);
 
-    void GetFanCoilUnits(EnergyPlusData &state);
+    void GetFanCoilUnits();
 
     void InitFanCoilUnits(EnergyPlusData &state, int const FanCoilNum,         // number of the current fan coil unit being simulated
                           int const ZoneNum,            // number of zone being served

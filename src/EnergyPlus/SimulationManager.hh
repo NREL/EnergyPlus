@@ -60,37 +60,37 @@ struct EnergyPlusData;
 
 namespace SimulationManager {
 
-    void ManageSimulation(EnergyPlusData &state);
+    void ManageSimulation();
 
-    void GetProjectData(EnergyPlusData &state);
+    void GetProjectData();
 
     void writeIntialPerfLogValues(EnergyPlusData &state, std::string const &currentOverrideModeValue);
 
     std::string bool_to_string(bool logical);
 
-    void CheckForMisMatchedEnvironmentSpecifications(EnergyPlusData &state);
+    void CheckForMisMatchedEnvironmentSpecifications();
 
-    void CheckForRequestedReporting(EnergyPlusData &state);
+    void CheckForRequestedReporting();
 
     std::unique_ptr<std::ostream> OpenStreamFile(EnergyPlusData &state, const std::string &fileName);
 
-    void OpenOutputFiles(EnergyPlusData &state);
+    void OpenOutputFiles();
 
     void OpenOutputJsonFiles(EnergyPlusData &state, JsonOutputStreams &jsonOutputStreams);
 
-    void CloseOutputFiles(EnergyPlusData &state);
+    void CloseOutputFiles();
 
     void SetupSimulation(EnergyPlusData &state, bool &ErrorsFound);
 
-    void ReportNodeConnections(EnergyPlusData &state);
+    void ReportNodeConnections();
 
-    void ReportLoopConnections(EnergyPlusData &state);
+    void ReportLoopConnections();
 
-    void ReportParentChildren(EnergyPlusData &state);
+    void ReportParentChildren();
 
-    void ReportCompSetMeterVariables(EnergyPlusData &state);
+    void ReportCompSetMeterVariables();
 
-    void PostIPProcessing(EnergyPlusData &state);
+    void PostIPProcessing();
 
 } // namespace SimulationManager
 

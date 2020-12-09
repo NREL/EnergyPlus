@@ -239,7 +239,7 @@ public:
     }
 
 public: // methods
-    void finishCoilSummaryReportTable(EnergyPlusData &state);
+    void finishCoilSummaryReportTable();
 
     void setCoilFinalSizes(EnergyPlusData &state, std::string const &coilName,    // user-defined name of the coil
                            std::string const &coilObjName, //  coil object name, e.g., Coil:Cooling:Water
@@ -426,11 +426,11 @@ private: // methods
 
     void doZoneEqSetup(EnergyPlusData &state, int const coilVecIndex);
 
-    void doFinalProcessingOfCoilData(EnergyPlusData &state);
+    void doFinalProcessingOfCoilData();
 
-    void writeCoilSelectionOutput(EnergyPlusData &state);
+    void writeCoilSelectionOutput();
 
-    void writeCoilSelectionOutput2(EnergyPlusData &state);
+    void writeCoilSelectionOutput2();
 
     int getIndexForOrCreateDataObjFromCoilName(EnergyPlusData &state, std::string const &coilName, // user-defined name of the coil
                                                std::string const &coilType  // idf input object class name of coil

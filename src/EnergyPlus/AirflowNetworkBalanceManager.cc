@@ -170,13 +170,12 @@ namespace AirflowNetworkBalanceManager {
 
     int constexpr NumOfVentCtrTypes(6);        // Number of zone level venting control types
 
-    void ManageAirflowNetworkBalance(EnergyPlusData &state,
-                                     Optional_bool_const FirstHVACIteration, // True when solution technique on first iteration
+    void ManageAirflowNetworkBalance(Optional_bool_const FirstHVACIteration, // True when solution technique on first iteration
                                      Optional_int_const Iter,                // Iteration number
                                      Optional_bool ResimulateAirZone         // True when solution technique on third iteration
     )
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   July 28, 2005
@@ -321,8 +320,10 @@ namespace AirflowNetworkBalanceManager {
         UpdateAirflowNetwork(state, FirstHVACIteration);
     }
 
-    static bool getAirflowElementInput(EnergyPlusData &state)
+    static bool getAirflowElementInput()
     {
+        GET_STATE_HERE
+
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason DeGraw
         //       DATE WRITTEN   Oct. 2018
@@ -1492,8 +1493,9 @@ namespace AirflowNetworkBalanceManager {
         return success;
     }
 
-    void GetAirflowNetworkInput(EnergyPlusData &state)
+    void GetAirflowNetworkInput()
     {
+        GET_STATE_HERE
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
@@ -4756,8 +4758,9 @@ namespace AirflowNetworkBalanceManager {
 
 }
 
-    void AirflowNetworkBalanceManagerData::initialize(EnergyPlusData &state)
+    void AirflowNetworkBalanceManagerData::initialize()
     {
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   Aug. 2003
@@ -5024,9 +5027,9 @@ namespace AirflowNetworkBalanceManager {
 
 namespace AirflowNetworkBalanceManager {
 
-    void AllocateAndInitData(EnergyPlusData &state)
+    void AllocateAndInitData()
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   Aug. 2003
@@ -5683,8 +5686,9 @@ namespace AirflowNetworkBalanceManager {
         }
     }
 
-    void CalcAirflowNetworkAirBalance(EnergyPlusData &state)
+    void CalcAirflowNetworkAirBalance()
     {
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   Oct. 2005
@@ -6069,11 +6073,11 @@ namespace AirflowNetworkBalanceManager {
         }
     }
 
-    Real64 AFNPressureResidual(EnergyPlusData &state,
-                               Real64 const ControllerMassFlowRate, // Pressure setpoint
+    Real64 AFNPressureResidual(Real64 const ControllerMassFlowRate, // Pressure setpoint
                                Array1D<Real64> const &Par           // par(1) = PressureSet
     )
     {
+                    GET_STATE_HERE
         // FUNCTION INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   April 2016
@@ -6116,8 +6120,9 @@ namespace AirflowNetworkBalanceManager {
         return AFNPressureResidual;
     }
 
-    static int makeTable(EnergyPlusData &state, const std::string &name, const int gridIndex, const std::vector<Real64> &y)
+    static int makeTable(const std::string &name, const int gridIndex, const std::vector<Real64> &y)
     {
+    GET_STATE_HERE
         // Add a new table and performance curve
         std::string contextString = "CalcWindPressureCoeffs: Creating table \"" + name + "\"";
         std::pair<EnergyPlusData*, std::string> callbackPair{&state, contextString};
@@ -6146,9 +6151,9 @@ namespace AirflowNetworkBalanceManager {
 
 }
 
-    void AirflowNetworkBalanceManagerData::calculateWindPressureCoeffs(EnergyPlusData &state)
+    void AirflowNetworkBalanceManagerData::calculateWindPressureCoeffs()
     {
-
+    GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
         //       DATE WRITTEN   May 2003
@@ -6463,8 +6468,7 @@ namespace AirflowNetworkBalanceManager {
 
 namespace AirflowNetworkBalanceManager {
 
-    Real64 CalcWindPressure(EnergyPlusData &state,
-                            int const curve,           // Curve index, change this to pointer after curve refactor
+    Real64 CalcWindPressure(int const curve,           // Curve index, change this to pointer after curve refactor
                             bool const symmetricCurve, // True if the curve is symmetric (0 to 180)
                             bool const relativeAngle,  // True if the Cp curve angle is measured relative to the surface
                             Real64 const azimuth,      // Azimuthal angle of surface
@@ -6474,7 +6478,7 @@ namespace AirflowNetworkBalanceManager {
                             Real64 const humRat        // Air node humidity ratio
     )
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   Oct. 2005
@@ -6562,8 +6566,7 @@ namespace AirflowNetworkBalanceManager {
         }
     }
 
-    Real64 CalcDuctOutsideConvResist(EnergyPlusData &state,
-                                     Real64 const Ts,      // Surface temperature
+    Real64 CalcDuctOutsideConvResist(Real64 const Ts,      // Surface temperature
                                      Real64 const Tamb,    // Free air temperature
                                      Real64 const Wamb,    // Free air humidity ratio
                                      Real64 const Pamb,    // Free air barometric pressure
@@ -6572,6 +6575,7 @@ namespace AirflowNetworkBalanceManager {
                                      Real64 const hOut     // User defined convection coefficient
     )
     {
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Matt Mitchell, Tony Fontanini
         //       DATE WRITTEN   Feb. 2017
@@ -6651,8 +6655,9 @@ namespace AirflowNetworkBalanceManager {
         }
     }
 
-    void CalcAirflowNetworkHeatBalance(EnergyPlusData &state)
+    void CalcAirflowNetworkHeatBalance()
     {
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   Oct. 2005
@@ -7134,8 +7139,9 @@ namespace AirflowNetworkBalanceManager {
         }
     }
 
-    void CalcAirflowNetworkMoisBalance(EnergyPlusData &state)
+    void CalcAirflowNetworkMoisBalance()
     {
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   Oct. 2005
@@ -7417,8 +7423,9 @@ namespace AirflowNetworkBalanceManager {
         }
     }
 
-    void CalcAirflowNetworkCO2Balance(EnergyPlusData &state)
+    void CalcAirflowNetworkCO2Balance()
     {
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   June. 2010
@@ -7627,8 +7634,9 @@ namespace AirflowNetworkBalanceManager {
         }
     }
 
-    void CalcAirflowNetworkGCBalance(EnergyPlusData &state)
+    void CalcAirflowNetworkGCBalance()
     {
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   Jan. 2012
@@ -7837,9 +7845,9 @@ namespace AirflowNetworkBalanceManager {
         }
     }
 
-    void MRXINV(EnergyPlusData &state, int const NORDER)
+    void MRXINV(int const NORDER)
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   Oct. 2005
@@ -7911,9 +7919,9 @@ namespace AirflowNetworkBalanceManager {
         }
     }
 
-    void ReportAirflowNetwork(EnergyPlusData &state)
+    void ReportAirflowNetwork()
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   2/1/04
@@ -8593,9 +8601,9 @@ namespace AirflowNetworkBalanceManager {
         }
     }
 
-    void UpdateAirflowNetwork(EnergyPlusData &state, Optional_bool_const FirstHVACIteration) // True when solution technique on first iteration
+    void UpdateAirflowNetwork(Optional_bool_const FirstHVACIteration) // True when solution technique on first iteration
     {
-
+                        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   12/10/05
@@ -9200,11 +9208,11 @@ namespace AirflowNetworkBalanceManager {
         }
     }
 
-    void AirflowNetworkVentingControl(EnergyPlusData &state,
-                                      int const i,       // AirflowNetwork surface number
+    void AirflowNetworkVentingControl(int const i,       // AirflowNetwork surface number
                                       Real64 &OpenFactor // Window or door opening factor (used to calculate airflow)
     )
     {
+            GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
         //       DATE WRITTEN   April 2003
@@ -9431,8 +9439,9 @@ namespace AirflowNetworkBalanceManager {
         }
     }
 
-    void AssignFanAirLoopNum(EnergyPlusData &state)
+    void AssignFanAirLoopNum()
     {
+        GET_STATE_HERE
         // Assign the system Fan AirLoop Number based on the zone inlet node
 
         for (int i = 1; i <= AirflowNetworkNumOfZones; i++) {
@@ -9449,9 +9458,9 @@ namespace AirflowNetworkBalanceManager {
         }
     }
 
-    void ValidateDistributionSystem(EnergyPlusData &state)
+    void ValidateDistributionSystem()
     {
-
+                        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   Oct. 2005
@@ -10274,9 +10283,9 @@ namespace AirflowNetworkBalanceManager {
         }
     }
 
-    void ValidateFanFlowRate(EnergyPlusData &state)
+    void ValidateFanFlowRate()
     {
-
+        GET_STATE_HERE
         // Catch a fan flow rate from EPlus input file and add a flag for VAV terminal damper
         for (int i = 1; i <= AirflowNetworkNumOfLinks; ++i) {
             {
@@ -10303,9 +10312,9 @@ namespace AirflowNetworkBalanceManager {
         }
     }
 
-    void ValidateExhaustFanInput(EnergyPlusData &state)
+    void ValidateExhaustFanInput()
     {
-
+                        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   Dec. 2006
@@ -10426,9 +10435,9 @@ namespace AirflowNetworkBalanceManager {
         } // End if OneTimeFlag
     }
 
-    void HybridVentilationControl(EnergyPlusData &state)
+    void HybridVentilationControl()
     {
-
+            GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   Dec. 2006
@@ -10545,8 +10554,9 @@ namespace AirflowNetworkBalanceManager {
         }
     }
 
-    void CalcSingleSidedCps(EnergyPlusData &state, std::vector<std::vector<Real64>> &valsByFacade, int numWindDir)
+    void CalcSingleSidedCps(std::vector<std::vector<Real64>> &valsByFacade, int numWindDir)
     {
+                GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Sam Brunswick
         //       DATE WRITTEN   September 2013
@@ -10887,9 +10897,9 @@ namespace AirflowNetworkBalanceManager {
         }
     }
 
-    Real64 GetZoneInfilAirChangeRate(EnergyPlusData &state, int const ZoneNum) // hybrid ventilation system controlled zone number
+    Real64 GetZoneInfilAirChangeRate(int const ZoneNum) // hybrid ventilation system controlled zone number
     {
-
+                    GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   May. 2007
@@ -10918,8 +10928,9 @@ namespace AirflowNetworkBalanceManager {
         return ACH;
     }
 
-    int GetAirLoopNumber(EnergyPlusData &state, int const NodeNumber) // Get air loop number for each distribution node and linkage
+    int GetAirLoopNumber(int const NodeNumber) // Get air loop number for each distribution node and linkage
     {
+    GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   Feb. 2018
@@ -11224,14 +11235,14 @@ namespace AirflowNetworkBalanceManager {
         return AirLoopNumber;
     }
 
-    void OccupantVentilationControlProp::calc(EnergyPlusData &state,
-                                              int const ZoneNum,
+    void OccupantVentilationControlProp::calc(int const ZoneNum,
                                               Real64 const TimeOpenDuration,
                                               Real64 const TimeCloseDuration,
                                               int &OpeningStatus,
                                               int &OpeningProbStatus,
                                               int &ClosingProbStatus)
     {
+    GET_STATE_HERE
         using DataHeatBalance::MRT;
 
         Real64 Tcomfort;    // Thermal comfort temperature
@@ -11293,10 +11304,10 @@ namespace AirflowNetworkBalanceManager {
         }
     }
 
-    bool OccupantVentilationControlProp::openingProbability(EnergyPlusData &state,
-                                                            int const ZoneNum,
+    bool OccupantVentilationControlProp::openingProbability(int const ZoneNum,
                                                             Real64 const TimeCloseDuration) // function to perform calculations of opening probability
     {
+        GET_STATE_HERE
         using DataHeatBalance::ZoneIntGain;
         using DataHeatBalFanSys::TempControlType;
         using DataHeatBalFanSys::ZoneThermostatSetPointHi;
@@ -11352,8 +11363,9 @@ namespace AirflowNetworkBalanceManager {
         }
     }
 
-    bool OccupantVentilationControlProp::closingProbability(EnergyPlusData &state, Real64 const TimeOpenDuration) // function to perform calculations of closing probability
+    bool OccupantVentilationControlProp::closingProbability(Real64 const TimeOpenDuration) // function to perform calculations of closing probability
     {
+            GET_STATE_HERE
         Real64 SchValue;
         Real64 RandomValue;
 

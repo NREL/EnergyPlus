@@ -168,30 +168,27 @@ namespace EarthTube {
     // Functions
     void clear_state();
 
-    void ManageEarthTube(EnergyPlusData &state);
+    void ManageEarthTube();
 
-    void GetEarthTube(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
+    void GetEarthTube(bool &ErrorsFound); // If errors found in input
 
-    void CheckEarthTubesInZones(EnergyPlusData &state,
-                                std::string const ZoneName,  // name of zone for error reporting
+    void CheckEarthTubesInZones(std::string const ZoneName,  // name of zone for error reporting
                                 std::string const FieldName, // name of earth tube in input
                                 bool &ErrorsFound            // Found a problem
     );
 
-    void CheckEarthTubesInZones(EnergyPlusData &state,
-                                std::string const ZoneName,  // name of zone for error reporting
+    void CheckEarthTubesInZones(std::string const ZoneName,  // name of zone for error reporting
                                 std::string const FieldName, // name of earth tube in input
                                 bool &ErrorsFound            // Found a problem
     );
 
-    void CalcEarthTube(EnergyPlusData &state);
+    void CalcEarthTube();
 
-    void CalcEarthTubeHumRat(EnergyPlusData &state,
-                             int const Loop, // EarthTube number (index)
+    void CalcEarthTubeHumRat(int const Loop, // EarthTube number (index)
                              int const NZ    // Zone number (index)
     );
 
-    void ReportEarthTube(EnergyPlusData &state);
+    void ReportEarthTube();
 
     //        End of Module Subroutines for EarthTube
 

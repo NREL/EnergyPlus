@@ -87,8 +87,9 @@ namespace EnergyPlus {
 
 namespace AirLoopHVACDOAS {
 
-    void AirLoopDOAS::SimAirLoopHVACDOAS(EnergyPlusData &state, bool const FirstHVACIteration, int &CompIndex)
+    void AirLoopDOAS::SimAirLoopHVACDOAS(bool const FirstHVACIteration, int &CompIndex)
     {
+        GET_STATE_HERE
 
         // Obtains and Allocates unitary system related parameters from input file
         if (state.dataAirLoopHVACDOAS->GetInputOnceFlag) {
@@ -116,9 +117,9 @@ namespace AirLoopHVACDOAS {
         this->CalcAirLoopDOAS(state, FirstHVACIteration);
     }
 
-    AirLoopMixer *AirLoopMixer::factory(EnergyPlusData &state, int object_num, std::string const &objectName)
+    AirLoopMixer *AirLoopMixer::factory(int object_num, std::string const &objectName)
     {
-
+        GET_STATE_HERE
         if (state.dataAirLoopHVACDOAS->getAirLoopMixerInputOnceFlag) {
             AirLoopMixer::getAirLoopMixer(state);
             state.dataAirLoopHVACDOAS->getAirLoopMixerInputOnceFlag = false;
@@ -136,8 +137,9 @@ namespace AirLoopHVACDOAS {
         return nullptr;
     }
 
-    void AirLoopMixer::getAirLoopMixer(EnergyPlusData &state)
+    void AirLoopMixer::getAirLoopMixer()
     {
+        GET_STATE_HERE
         using DataLoopNode::NodeID;
 
         bool errorsFound(false);
@@ -228,7 +230,8 @@ namespace AirLoopHVACDOAS {
         }
     }
 
-    int getAirLoopMixerIndex(EnergyPlusData &state, std::string const &objectName) {
+    int getAirLoopMixerIndex(std::string const &objectName) {
+        GET_STATE_HERE
         if (state.dataAirLoopHVACDOAS->getAirLoopMixerInputOnceFlag) {
             AirLoopMixer::getAirLoopMixer(state);
             state.dataAirLoopHVACDOAS->getAirLoopMixerInputOnceFlag = false;
@@ -246,9 +249,9 @@ namespace AirLoopHVACDOAS {
         return index;
     }
 
-    AirLoopSplitter *AirLoopSplitter::factory(EnergyPlusData &state, int object_num, std::string const &objectName)
+    AirLoopSplitter *AirLoopSplitter::factory(int object_num, std::string const &objectName)
     {
-
+        GET_STATE_HERE
         if (state.dataAirLoopHVACDOAS->getAirLoopSplitterInputOnceFlag) {
             AirLoopSplitter::getAirLoopSplitter(state);
             state.dataAirLoopHVACDOAS->getAirLoopSplitterInputOnceFlag = false;
@@ -275,7 +278,8 @@ namespace AirLoopHVACDOAS {
         this->InletTemp = Temp;
     }
 
-    int getAirLoopSplitterIndex(EnergyPlusData &state, std::string const &objectName) {
+    int getAirLoopSplitterIndex(std::string const &objectName) {
+        GET_STATE_HERE
         if (state.dataAirLoopHVACDOAS->getAirLoopSplitterInputOnceFlag) {
             AirLoopSplitter::getAirLoopSplitter(state);
             state.dataAirLoopHVACDOAS->getAirLoopSplitterInputOnceFlag = false;
@@ -293,8 +297,9 @@ namespace AirLoopHVACDOAS {
         return index;
     }
 
-    void AirLoopSplitter::getAirLoopSplitter(EnergyPlusData &state)
+    void AirLoopSplitter::getAirLoopSplitter()
     {
+        GET_STATE_HERE
         using DataLoopNode::NodeID;
 
         bool errorsFound(false);
@@ -350,9 +355,9 @@ namespace AirLoopHVACDOAS {
         }
     } // namespace AirLoopSplitter
 
-    void AirLoopDOAS::getAirLoopDOASInput(EnergyPlusData &state)
+    void AirLoopDOAS::getAirLoopDOASInput()
     {
-
+        GET_STATE_HERE
         using ScheduleManager::GetScheduleIndex;
 
         bool errorsFound(false);
@@ -789,8 +794,9 @@ namespace AirLoopHVACDOAS {
         }
     }
 
-    void AirLoopDOAS::initAirLoopDOAS(EnergyPlusData &state, bool const FirstHVACIteration)
+    void AirLoopDOAS::initAirLoopDOAS(bool const FirstHVACIteration)
     {
+        GET_STATE_HERE
         int LoopOA;
         int NodeNum;
         Real64 SchAvailValue;
@@ -893,8 +899,9 @@ namespace AirLoopHVACDOAS {
         }
     }
 
-    void AirLoopDOAS::CalcAirLoopDOAS(EnergyPlusData &state, bool const FirstHVACIteration)
+    void AirLoopDOAS::CalcAirLoopDOAS(bool const FirstHVACIteration)
     {
+        GET_STATE_HERE
         using MixedAir::ManageOutsideAirSystem;
 
         this->m_CompPointerAirLoopMixer->CalcAirLoopMixer();
@@ -914,8 +921,9 @@ namespace AirLoopHVACDOAS {
         this->m_CompPointerAirLoopSplitter->CalcAirLoopSplitter(Temp, HumRat);
     }
 
-    void AirLoopDOAS::SizingAirLoopDOAS(EnergyPlusData &state)
+    void AirLoopDOAS::SizingAirLoopDOAS()
     {
+        GET_STATE_HERE
         Real64 sizingMassFlow = 0;
         int AirLoopNum;
 
@@ -951,16 +959,18 @@ namespace AirLoopHVACDOAS {
         DataSizing::CurOASysNum = this->m_OASystemNum;
     }
 
-    void getAirLoopHVACDOASInput(EnergyPlusData &state)
+    void getAirLoopHVACDOASInput()
     {
+        GET_STATE_HERE
         if (state.dataAirLoopHVACDOAS->GetInputOnceFlag) {
             AirLoopDOAS::getAirLoopDOASInput(state);
             state.dataAirLoopHVACDOAS->GetInputOnceFlag = false;
         }
     }
 
-    void AirLoopDOAS::GetDesignDayConditions(EnergyPlusData &state)
+    void AirLoopDOAS::GetDesignDayConditions()
     {
+        GET_STATE_HERE
 
         int const summerDesignDayTypeIndex(9);
         int const winterDesignDayTypeIndex(10);
@@ -997,8 +1007,9 @@ namespace AirLoopHVACDOAS {
         }
     }
 
-    void CheckConvergence(EnergyPlusData &state)
+    void CheckConvergence()
     {
+        GET_STATE_HERE
 
         Real64 maxDiff;
         Real64 Diff;

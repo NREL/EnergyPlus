@@ -81,11 +81,11 @@ namespace OutAirNodeManager {
     // Needed for unit tests, should not be normally called.
     void clear_state();
 
-    void SetOutAirNodes(EnergyPlusData &state);
+    void SetOutAirNodes();
 
-    void GetOutAirNodesInput(EnergyPlusData &state);
+    void GetOutAirNodesInput();
 
-    void InitOutAirNodes(EnergyPlusData &state);
+    void InitOutAirNodes();
 
     bool CheckOutAirNodeNumber(EnergyPlusData &state, int const NodeNumber); // Number of node to check to see if in Outside Air list
 

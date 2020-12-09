@@ -96,7 +96,7 @@ namespace SplitterComponent {
     void
     SimAirLoopSplitter(EnergyPlusData &state, std::string const &CompName, bool const FirstHVACIteration, bool const FirstCall, bool &SplitterInletChanged, int &CompIndex);
 
-    void GetSplitterInput(EnergyPlusData &state);
+    void GetSplitterInput();
 
     void InitAirLoopSplitter(EnergyPlusData &state, int const SplitterNum, bool const FirstHVACIteration, bool const FirstCall);
 

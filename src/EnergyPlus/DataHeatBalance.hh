@@ -809,9 +809,9 @@ namespace DataHeatBalance {
         {
         }
 
-        void SetOutBulbTempAt(EnergyPlusData &state);
+        void SetOutBulbTempAt();
 
-        void SetWindSpeedAt(EnergyPlusData &state, Real64 fac);
+        void SetWindSpeedAt(Real64 fac);
 
         void SetWindDirAt(Real64 fac);
     };
@@ -2204,31 +2204,27 @@ namespace DataHeatBalance {
     // Needed for unit tests, should not be normally called.
     void clear_state();
 
-    void SetZoneOutBulbTempAt(EnergyPlusData &state);
+    void SetZoneOutBulbTempAt();
 
-    void CheckZoneOutBulbTempAt(EnergyPlusData &state);
+    void CheckZoneOutBulbTempAt();
 
-    void SetZoneWindSpeedAt(EnergyPlusData &state);
+    void SetZoneWindSpeedAt();
 
-    void SetZoneWindDirAt(EnergyPlusData &state);
+    void SetZoneWindDirAt();
 
-    void CheckAndSetConstructionProperties(EnergyPlusData &state,
-                                           int ConstrNum, // Construction number to be set/checked
+    void CheckAndSetConstructionProperties(int ConstrNum, // Construction number to be set/checked
                                            bool &ErrorsFound    // error flag that is set when certain errors have occurred
     );
 
-    int AssignReverseConstructionNumber(EnergyPlusData &state,
-                                        int ConstrNum, // Existing Construction number of first surface
+    int AssignReverseConstructionNumber(int ConstrNum, // Existing Construction number of first surface
                                         bool &ErrorsFound);
 
-    void AddVariableSlatBlind(EnergyPlusData &state,
-                              int inBlindNumber, // current Blind Number/pointer to name
+    void AddVariableSlatBlind(int inBlindNumber, // current Blind Number/pointer to name
                               int &outBlindNumber,     // resultant Blind Number to pass back
                               bool &errFlag            // error flag should one be needed
     );
 
-    void CalcScreenTransmittance(EnergyPlusData &state,
-                                 int SurfaceNum,
+    void CalcScreenTransmittance(int SurfaceNum,
                                  Optional<Real64 const> Phi = _,     // Optional sun altitude relative to surface outward normal (radians)
                                  Optional<Real64 const> Theta = _,   // Optional sun azimuth relative to surface outward normal (radians)
                                  Optional_int_const ScreenNumber = _ // Optional screen number
@@ -2240,7 +2236,7 @@ namespace DataHeatBalance {
                                          bool &isValid      // returns true if result is valid
     );
 
-    void SetFlagForWindowConstructionWithShadeOrBlindLayer(EnergyPlusData &state);
+    void SetFlagForWindowConstructionWithShadeOrBlindLayer();
 
 } // namespace DataHeatBalance
 

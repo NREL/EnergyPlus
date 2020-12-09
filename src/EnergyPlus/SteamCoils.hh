@@ -154,7 +154,7 @@ namespace SteamCoils {
                                      Optional_int_const FanOpMode = _,
                                      Optional<Real64 const> PartLoadRatio = _);
 
-    void GetSteamCoilInput(EnergyPlusData &state);
+    void GetSteamCoilInput();
 
     void InitSteamCoil(EnergyPlusData &state, int const CoilNum, bool const FirstHVACIteration);
 

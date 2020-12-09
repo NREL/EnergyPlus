@@ -81,7 +81,7 @@ namespace SurfaceGeometry {
 
     void SetupZoneGeometry(EnergyPlusData &state, bool &ErrorsFound);
 
-    void AllocateModuleArrays(EnergyPlusData &state);
+    void AllocateModuleArrays();
 
     void AllocateSurfaceWindows(int NumSurfaces);
 
@@ -217,7 +217,7 @@ namespace SurfaceGeometry {
                                int &SurfNum       // Count of Current SurfaceNumber
     );
 
-    int GetNumIntMassSurfaces(EnergyPlusData &state); // Number of Internal Mass Surfaces to obtain
+    int GetNumIntMassSurfaces(); // Number of Internal Mass Surfaces to obtain
 
     void GetShadingSurfReflectanceData(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
 
@@ -345,7 +345,7 @@ namespace SurfaceGeometry {
                                               // Surface().shadedConstructionList, and Surface().shadedStormWinConstructionList
     );
 
-    void CreateStormWindowConstructions(EnergyPlusData &state);
+    void CreateStormWindowConstructions();
 
     int createAirMaterialFromDistance(EnergyPlusData &state, Real64 distance, std::string namePrefix); //return new material number
 
@@ -369,9 +369,9 @@ namespace SurfaceGeometry {
                                 int const NSides   // Number of sides to figure
     );
 
-    void CalcSurfaceCentroid(EnergyPlusData &state);
+    void CalcSurfaceCentroid();
 
-    void SetupShadeSurfacesForSolarCalcs(EnergyPlusData &state);
+    void SetupShadeSurfacesForSolarCalcs();
 
     void SetupEnclosuresAndAirBoundaries(EnergyPlusData &state,
                                          Array1D<DataViewFactorInformation::ZoneViewFactorInformation> &Enclosures, // Radiant or Solar Enclosures

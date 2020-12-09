@@ -111,8 +111,9 @@ namespace CondenserLoopTowers {
     std::string const cCoolingTower_VariableSpeed("CoolingTower:VariableSpeed");
     std::string const cCoolingTower_VariableSpeedMerkel("CoolingTower:VariableSpeed:Merkel");
 
-    PlantComponent *CoolingTower::factory(EnergyPlusData &state, std::string const &objectName)
+    PlantComponent *CoolingTower::factory(std::string const &objectName)
     {
+        GET_STATE_HERE
         // Process the input data for towers if it hasn't been done already
         if (state.dataCondenserLoopTowers->GetInput) {
             GetTowerInput(state);
@@ -130,12 +131,12 @@ namespace CondenserLoopTowers {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void CoolingTower::simulate(EnergyPlusData &state,
-                                [[maybe_unused]] const PlantLocation &calledFromLocation,
+    void CoolingTower::simulate([[maybe_unused]] const PlantLocation &calledFromLocation,
                                 [[maybe_unused]] bool const FirstHVACIteration,
                                 Real64 &CurLoad,
                                 bool const RunFlag)
     {
+        GET_STATE_HERE
         this->initialize(state);
         if (this->TowerType_Num == DataPlant::TypeOf_CoolingTower_SingleSpd) {
             this->calculateSingleSpeedTower(state);
@@ -151,12 +152,12 @@ namespace CondenserLoopTowers {
         this->report(RunFlag);
     }
 
-    void CoolingTower::getDesignCapacities([[maybe_unused]] EnergyPlusData &state,
-                                           [[maybe_unused]] const PlantLocation &calledFromLocation,
+    void CoolingTower::getDesignCapacities([[maybe_unused]] const PlantLocation &calledFromLocation,
                                            Real64 &MaxLoad,
                                            Real64 &MinLoad,
                                            Real64 &OptLoad)
     {
+        GET_STATE_HERE
         MinLoad = 0.0;
         MaxLoad = this->TowerNominalCapacity * this->HeatRejectCapNomCapSizingRatio;
         OptLoad = this->TowerNominalCapacity;
@@ -167,8 +168,9 @@ namespace CondenserLoopTowers {
         SizFactor = this->SizFac;
     }
 
-    void CoolingTower::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation)
+    void CoolingTower::onInitLoopEquip([[maybe_unused]] const PlantLocation &calledFromLocation)
     {
+        GET_STATE_HERE
         this->initialize(state);
         if (this->TowerType_Num == DataPlant::TypeOf_CoolingTower_VarSpdMerkel) {
             this->SizeVSMerkelTower(state);
@@ -177,8 +179,9 @@ namespace CondenserLoopTowers {
         }
     }
 
-    void GetTowerInput(EnergyPlusData &state)
+    void GetTowerInput()
     {
+        GET_STATE_HERE
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Dan Fisher
@@ -1829,8 +1832,9 @@ namespace CondenserLoopTowers {
         }
     }
 
-    void CoolingTower::initialize(EnergyPlusData &state)
+    void CoolingTower::initialize()
     {
+        GET_STATE_HERE
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
@@ -1929,8 +1933,9 @@ namespace CondenserLoopTowers {
         this->airFlowRateRatio = 0.0;
     }
 
-    void CoolingTower::setupOutputVariables(EnergyPlusData &state)
+    void CoolingTower::setupOutputVariables()
     {
+        GET_STATE_HERE
         // Set up output variables CurrentModuleObject='CoolingTower:SingleSpeed'
         if (this->TowerType_Num == DataPlant::TypeOf_CoolingTower_SingleSpd) {
             SetupOutputVariable(state, "Cooling Tower Inlet Temperature", OutputProcessor::Unit::C, this->InletWaterTemp, "System", "Average", this->Name);
@@ -2170,8 +2175,9 @@ namespace CondenserLoopTowers {
         SetupOutputVariable(state, "Cooling Tower Water Blowdown Volume", OutputProcessor::Unit::m3, this->BlowdownVol, "System", "Sum", this->Name);
     }
 
-    void CoolingTower::SizeTower(EnergyPlusData &state)
+    void CoolingTower::SizeTower()
     {
+        GET_STATE_HERE
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
@@ -3091,8 +3097,9 @@ namespace CondenserLoopTowers {
         }
     }
 
-    void CoolingTower::SizeVSMerkelTower(EnergyPlusData &state)
+    void CoolingTower::SizeVSMerkelTower()
     {
+        GET_STATE_HERE
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         <author>
@@ -3969,8 +3976,9 @@ namespace CondenserLoopTowers {
         }
     } // namespace CondenserLoopTowers
 
-    void CoolingTower::calculateSingleSpeedTower(EnergyPlusData &state)
+    void CoolingTower::calculateSingleSpeedTower()
     {
+        GET_STATE_HERE
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
@@ -4277,8 +4285,9 @@ namespace CondenserLoopTowers {
         this->airFlowRateRatio = (AirFlowRate * this->NumCell) / this->HighSpeedAirFlowRate;
     }
 
-    void CoolingTower::calculateTwoSpeedTower(EnergyPlusData &state)
+    void CoolingTower::calculateTwoSpeedTower()
     {
+        GET_STATE_HERE
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
@@ -4516,8 +4525,9 @@ namespace CondenserLoopTowers {
         this->airFlowRateRatio = (AirFlowRate * this->NumCell) / this->HighSpeedAirFlowRate;
     }
 
-    void CoolingTower::calculateVariableSpeedTower(EnergyPlusData &state)
+    void CoolingTower::calculateVariableSpeedTower()
     {
+        GET_STATE_HERE
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
@@ -4849,8 +4859,9 @@ namespace CondenserLoopTowers {
         }
     }
 
-    void CoolingTower::calculateMerkelVariableSpeedTower(EnergyPlusData &state, Real64 &MyLoad)
+    void CoolingTower::calculateMerkelVariableSpeedTower(Real64 &MyLoad)
     {
+        GET_STATE_HERE
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B.Griffith
@@ -5105,12 +5116,11 @@ namespace CondenserLoopTowers {
         }
     }
 
-    Real64 CoolingTower::residualMerkelLoad(EnergyPlusData &state,
-                                            Real64 airFlowRateRatioLocal,  // fan speed ratio (1.0 is continuous, 0.0 is off)
+    Real64 CoolingTower::residualMerkelLoad(Real64 airFlowRateRatioLocal,  // fan speed ratio (1.0 is continuous, 0.0 is off)
                                             Array1D<Real64> const &Par // par(1) = Tower number
     )
     {
-
+        GET_STATE_HERE
         // FUNCTION INFORMATION:
         //       AUTHOR         <author>
         //       DATE WRITTEN   <date_written>
@@ -5149,8 +5159,9 @@ namespace CondenserLoopTowers {
         return std::abs(TargetLoad) - Qdot;
     }
 
-    Real64 CoolingTower::calculateSimpleTowerOutletTemp(EnergyPlusData &state, Real64 const waterMassFlowRate, Real64 const AirFlowRate, Real64 const UAdesign)
+    Real64 CoolingTower::calculateSimpleTowerOutletTemp(Real64 const waterMassFlowRate, Real64 const AirFlowRate, Real64 const UAdesign)
     {
+        GET_STATE_HERE
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
@@ -5261,13 +5272,12 @@ namespace CondenserLoopTowers {
         return OutletWaterTempLocal;
     }
 
-    Real64 CoolingTower::calculateVariableTowerOutletTemp(EnergyPlusData &state,
-                                                          Real64 const WaterFlowRateRatio, // current water flow rate ratio (capped if applicable)
+    Real64 CoolingTower::calculateVariableTowerOutletTemp(Real64 const WaterFlowRateRatio, // current water flow rate ratio (capped if applicable)
                                                           Real64 const airFlowRateRatioLocal,  // current air flow rate ratio
                                                           Real64 const Twb // current inlet air wet-bulb temperature (C, capped if applicable)
     )
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   Feb. 2005
@@ -5334,13 +5344,13 @@ namespace CondenserLoopTowers {
         return OutletWaterTempLocal;
     }
 
-    Real64 CoolingTower::calculateVariableSpeedApproach(EnergyPlusData &state,
-                                                        Real64 const PctWaterFlow,  // Water flow ratio of cooling tower
+    Real64 CoolingTower::calculateVariableSpeedApproach(Real64 const PctWaterFlow,  // Water flow ratio of cooling tower
                                                         Real64 const airFlowRatioLocal, // Air flow ratio of cooling tower
                                                         Real64 const Twb,           // Inlet air wet-bulb temperature [C]
                                                         Real64 const Tr // Cooling tower range (outlet water temp minus inlet air wet-bulb temp) [C]
     )
     {
+        GET_STATE_HERE
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   Feb. 2005
@@ -5411,8 +5421,7 @@ namespace CondenserLoopTowers {
         return approach;
     }
 
-    void CoolingTower::checkModelBounds(EnergyPlusData &state,
-                                        Real64 Twb,                      // current inlet air wet-bulb temperature (C)
+    void CoolingTower::checkModelBounds(Real64 Twb,                      // current inlet air wet-bulb temperature (C)
                                         Real64 Tr,                       // requested range temperature for current time step (C)
                                         Real64 Ta,                       // requested approach temperature for current time step (C)
                                         Real64 WaterFlowRateRatio,       // current water flow rate ratio at water inlet node
@@ -5422,7 +5431,7 @@ namespace CondenserLoopTowers {
                                         Real64 &WaterFlowRateRatioCapped // bounded value of water flow rate ratio
     )
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   Feb 2005
@@ -5650,11 +5659,11 @@ namespace CondenserLoopTowers {
         }
     }
 
-    Real64 CoolingTower::residualUA(EnergyPlusData &state,
-                                    Real64 UA,                 // UA of cooling tower
+    Real64 CoolingTower::residualUA(Real64 UA,                 // UA of cooling tower
                                     Array1D<Real64> const &Par // par(1) = design tower load [W]
     )
     {
+        GET_STATE_HERE
         // FUNCTION INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   May 2002
@@ -5680,11 +5689,11 @@ namespace CondenserLoopTowers {
         return (Par(1) - CoolingOutput) / Par(1);
     }
 
-    Real64 CoolingTower::residualTr(EnergyPlusData &state,
-                                    Real64 Trange,             // cooling tower range temperature [C]
+    Real64 CoolingTower::residualTr(Real64 Trange,             // cooling tower range temperature [C]
                                     Array1D<Real64> const &Par // par(1) = tower number
     )
     {
+        GET_STATE_HERE
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   Feb 2005
@@ -5714,11 +5723,11 @@ namespace CondenserLoopTowers {
         return (InletAirWB + Tapproach + Trange) - DataLoopNode::Node(this->WaterInletNodeNum).Temp;
     }
 
-    Real64 CoolingTower::residualTa(EnergyPlusData &state,
-                                    Real64 FlowRatio,          // water or air flow ratio of cooling tower
+    Real64 CoolingTower::residualTa(Real64 FlowRatio,          // water or air flow ratio of cooling tower
                                     Array1D<Real64> const &Par // par(1) = tower number
     )
     {
+        GET_STATE_HERE
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   Feb 2005
@@ -5757,8 +5766,9 @@ namespace CondenserLoopTowers {
         return TapproachDesired - TapproachActual;
     }
 
-    void CoolingTower::calculateWaterUsage(EnergyPlusData &state)
+    void CoolingTower::calculateWaterUsage()
     {
+        GET_STATE_HERE
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
@@ -5887,8 +5897,9 @@ namespace CondenserLoopTowers {
         this->StarvedMakeUpVol = StarvedVdot * (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour);
     }
 
-    void CoolingTower::update(EnergyPlusData &state)
+    void CoolingTower::update()
     {
+        GET_STATE_HERE
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Dan Fisher

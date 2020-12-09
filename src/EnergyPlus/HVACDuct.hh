@@ -105,7 +105,7 @@ namespace HVACDuct {
                  int &CompIndex                 // index of duct component
     );
 
-    void GetDuctInput(EnergyPlusData &state);
+    void GetDuctInput();
 
     void InitDuct(EnergyPlusData &state, int DuctNum); // number of the current duct being simulated
 

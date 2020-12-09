@@ -85,19 +85,19 @@ namespace PlantManager {
                           bool &SimElecCircuits      // True when electric circuits need to be (re)simulated
     );
 
-    void GetPlantLoopData(EnergyPlusData &state);
+    void GetPlantLoopData();
 
-    void GetPlantInput(EnergyPlusData &state);
+    void GetPlantInput();
 
-    void SetupReports(EnergyPlusData &state);
+    void SetupReports();
 
     void InitializeLoops(EnergyPlusData &state, bool FirstHVACIteration); // true if first iteration of the simulation
 
-    void ReInitPlantLoopsAtFirstHVACIteration(EnergyPlusData &state);
+    void ReInitPlantLoopsAtFirstHVACIteration();
 
     void UpdateNodeThermalHistory();
 
-    void CheckPlantOnAbort(EnergyPlusData &state);
+    void CheckPlantOnAbort();
 
     void InitOneTimePlantSizingInfo(int LoopNum); // loop being initialized for sizing
 
@@ -108,15 +108,15 @@ namespace PlantManager {
 
     void SetupInitialPlantCallingOrder();
 
-    void RevisePlantCallingOrder(EnergyPlusData &state);
+    void RevisePlantCallingOrder();
 
     int FindLoopSideInCallingOrder(int LoopNum, int LoopSide);
 
-    void SetupBranchControlTypes(EnergyPlusData &state);
+    void SetupBranchControlTypes();
 
-    void CheckIfAnyPlant(EnergyPlusData &state);
+    void CheckIfAnyPlant();
 
-    void CheckOngoingPlantWarnings(EnergyPlusData &state);
+    void CheckOngoingPlantWarnings();
 
 } // namespace PlantManager
 

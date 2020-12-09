@@ -144,7 +144,7 @@ namespace DataPlant {
 
         void CheckLoopExitNode(EnergyPlusData &state, bool FirstHVACIteration);
 
-        void CalcUnmetPlantDemand(EnergyPlusData &state);
+        void CalcUnmetPlantDemand();
 
     };
 } // namespace DataPlant

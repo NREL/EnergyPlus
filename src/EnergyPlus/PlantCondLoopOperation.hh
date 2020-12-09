@@ -99,7 +99,7 @@ namespace PlantCondLoopOperation {
 
     void GetPlantOperationInput(EnergyPlusData &state, bool &GetInputOK);
 
-    void GetOperationSchemeInput(EnergyPlusData &state);
+    void GetOperationSchemeInput();
 
     void FindRangeBasedOrUncontrolledInput(EnergyPlusData &state,
                                            std::string &CurrentModuleObject, // for ease in renaming
@@ -222,7 +222,7 @@ namespace PlantCondLoopOperation {
     // Begin Plant EMS Control Routines
     //******************************************************************************
 
-    void SetupPlantEMSActuators(EnergyPlusData &state);
+    void SetupPlantEMSActuators();
 
     void ActivateEMSControls(EnergyPlusData &state, int const LoopNum, int const LoopSideNum, int const BranchNum, int const CompNum, bool &LoopShutDownFlag);
 

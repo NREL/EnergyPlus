@@ -147,7 +147,7 @@ namespace SteamBaseboardRadiator {
                            Real64 &PowerMet,
                            int &CompIndex);
 
-    void GetSteamBaseboardInput(EnergyPlusData &state);
+    void GetSteamBaseboardInput();
 
     void InitSteamBaseboard(EnergyPlusData &state, int const BaseboardNum, int const ControlledZoneNumSub, bool const FirstHVACIteration);
 
@@ -159,7 +159,7 @@ namespace SteamBaseboardRadiator {
 
     void UpdateBBSteamRadSourceValAvg(EnergyPlusData &state, bool &SteamBaseboardSysOn); // .TRUE. if the radiant system has run this zone time step
 
-    void DistributeBBSteamRadGains(EnergyPlusData &state);
+    void DistributeBBSteamRadGains();
 
     void ReportSteamBaseboard(EnergyPlusData &state, int const BaseboardNum);
 

@@ -83,7 +83,7 @@ struct CoilCoolingDXCurveFitOperatingMode
     std::string object_name = "Coil:Cooling:DX:CurveFit:OperatingMode";
 
     void instantiateFromInputSpec(EnergyPlusData &state, CoilCoolingDXCurveFitOperatingModeInputSpecification input_data);
-    void size(EnergyPlusData &state);
+    void size();
     CoilCoolingDXCurveFitOperatingModeInputSpecification original_input_specs;
     CoilCoolingDXCurveFitOperatingMode() = default;
     explicit CoilCoolingDXCurveFitOperatingMode(EnergyPlusData &state, const std::string& name_to_find);

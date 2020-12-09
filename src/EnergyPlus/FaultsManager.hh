@@ -179,7 +179,7 @@ namespace FaultsManager {
         virtual ~FaultProperties() = default;
 
     public:
-        Real64 CalFaultOffsetAct(EnergyPlusData &state);
+        Real64 CalFaultOffsetAct();
     };
 
     struct FaultPropertiesEconomizer : public FaultProperties // Class for fault models related with economizer
@@ -256,7 +256,7 @@ namespace FaultsManager {
         // Real64 CalFaultyCoilFoulingFactor();
 
         // Calculate the Fault Fraction based on Availability and Severity Schedules
-        Real64 FaultFraction(EnergyPlusData &state);
+        Real64 FaultFraction();
     };
 
     struct FaultPropertiesAirFilter : public FaultProperties // Class for FaultModel:Fouling:AirFilter, derived from FaultProperties
@@ -282,7 +282,7 @@ namespace FaultsManager {
         virtual ~FaultPropertiesAirFilter() = default;
 
     public:
-        bool CheckFaultyAirFilterFanCurve(EnergyPlusData &state);
+        bool CheckFaultyAirFilterFanCurve();
     };
 
     struct FaultPropertiesCoilSAT : public FaultProperties // Class for FaultModel:TemperatureSensorOffset:CoilSupplyAir
@@ -348,7 +348,7 @@ namespace FaultsManager {
         }
 
     public:
-        Real64 CalFaultyTowerFoulingFactor(EnergyPlusData &state);
+        Real64 CalFaultyTowerFoulingFactor();
     };
 
     struct FaultPropertiesFouling : public FaultProperties // Class for FaultModel:Fouling
@@ -362,7 +362,7 @@ namespace FaultsManager {
         }
 
     public:
-        Real64 CalFoulingFactor(EnergyPlusData &state); // To calculate the dynamic fouling factor
+        Real64 CalFoulingFactor(); // To calculate the dynamic fouling factor
     };
 
     struct FaultPropertiesBoilerFouling : public FaultPropertiesFouling // Class for FaultModel:Fouling:Boiler
@@ -417,7 +417,7 @@ namespace FaultsManager {
 
     // Functions
 
-    void CheckAndReadFaults(EnergyPlusData &state);
+    void CheckAndReadFaults();
 
     void clear_state();
 

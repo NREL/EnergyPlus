@@ -157,9 +157,9 @@ namespace Humidifiers {
         {
         }
 
-        void InitHumidifier(EnergyPlusData &state); // number of the current humidifier being simulated
+        void InitHumidifier(); // number of the current humidifier being simulated
 
-        void SizeHumidifier(EnergyPlusData &state); // number of the current humidifier being sized
+        void SizeHumidifier(); // number of the current humidifier being sized
 
         void ControlHumidifier(EnergyPlusData &state, Real64 &WaterAddNeeded // moisture addition rate needed to meet minimum humidity ratio setpoint [kg/s]
         );
@@ -170,9 +170,9 @@ namespace Humidifiers {
         void CalcGasSteamHumidifier(EnergyPlusData &state, Real64 const WaterAddNeeded // moisture addition rate set by controller [kg/s]
         );
 
-        void UpdateReportWaterSystem(EnergyPlusData &state); // number of the current humidifier being simulated
+        void UpdateReportWaterSystem(); // number of the current humidifier being simulated
 
-        void UpdateHumidifier(EnergyPlusData &state); // number of the current humidifier being simulated
+        void UpdateHumidifier(); // number of the current humidifier being simulated
 
         void ReportHumidifier(); // number of the current humidifier being simulated
     };
@@ -192,7 +192,7 @@ namespace Humidifiers {
                        int &CompIndex                 // Pointer to Humidifier Unit
     );
 
-    void GetHumidifierInput(EnergyPlusData &state);
+    void GetHumidifierInput();
 
     int GetAirInletNodeNum(EnergyPlusData &state, std::string const &HumidifierName,
         bool &ErrorsFound

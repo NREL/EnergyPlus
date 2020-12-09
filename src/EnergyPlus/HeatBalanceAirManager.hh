@@ -76,12 +76,12 @@ namespace HeatBalanceAirManager {
     // Functions
     void clear_state();
 
-    void ManageAirHeatBalance(EnergyPlusData &state);
+    void ManageAirHeatBalance();
 
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetAirHeatBalanceInput(EnergyPlusData &state);
+    void GetAirHeatBalanceInput();
 
     void GetAirFlowFlag(EnergyPlusData &state, bool &ErrorsFound); // Set to true if errors found
 
@@ -100,11 +100,11 @@ namespace HeatBalanceAirManager {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitAirHeatBalance(EnergyPlusData &state);
+    void InitAirHeatBalance();
 
-    void InitSimpleMixingConvectiveHeatGains(EnergyPlusData &state);
+    void InitSimpleMixingConvectiveHeatGains();
 
-    void initializeForExternalHVACManager(EnergyPlusData &state);
+    void initializeForExternalHVACManager();
 
     // END Initialization Section of the Module
     //******************************************************************************
@@ -112,11 +112,11 @@ namespace HeatBalanceAirManager {
     // Begin Algorithm Section of the Module
     //******************************************************************************
 
-    void CalcHeatBalanceAir(EnergyPlusData &state);
+    void CalcHeatBalanceAir();
 
     // END Algorithm Section of the Module
 
-    void ReportZoneMeanAirTemp(EnergyPlusData &state);
+    void ReportZoneMeanAirTemp();
 
 } // namespace HeatBalanceAirManager
 

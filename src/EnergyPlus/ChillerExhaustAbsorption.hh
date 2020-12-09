@@ -215,34 +215,34 @@ namespace ChillerExhaustAbsorption {
         {
         }
 
-        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
+        static PlantComponent *factory(std::string const &objectName);
 
-        void simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void getDesignCapacities(EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+        void getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
         void getSizingFactor(Real64 &SizFac) override;
 
-        void onInitLoopEquip(EnergyPlusData &state, const PlantLocation &calledFromLocation) override;
+        void onInitLoopEquip(const PlantLocation &calledFromLocation) override;
 
         void getDesignTemperatures(Real64 &TempDesCondIn, Real64 &TempDesEvapOut) override;
 
-        void initialize(EnergyPlusData &state);
+        void initialize();
 
-        void setupOutputVariables(EnergyPlusData &state);
+        void setupOutputVariables();
 
-        void size(EnergyPlusData &state);
+        void size();
 
-        void calcChiller(EnergyPlusData &state, Real64 &MyLoad);
+        void calcChiller(Real64 &MyLoad);
 
-        void calcHeater(EnergyPlusData &state, Real64 &MyLoad, bool RunFlag);
+        void calcHeater(Real64 &MyLoad, bool RunFlag);
 
         void updateCoolRecords(Real64 MyLoad, bool RunFlag);
 
         void updateHeatRecords(Real64 MyLoad, bool RunFlag);
     };
 
-    void GetExhaustAbsorberInput(EnergyPlusData &state);
+    void GetExhaustAbsorberInput();
 
 } // namespace ChillerExhaustAbsorption
 

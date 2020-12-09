@@ -181,7 +181,7 @@ namespace PVWatts {
                          size_t surfaceNum = 0,
                          Real64 groundCoverageRatio = 0.4);
 
-        void setupOutputVariables(EnergyPlusData &state);
+        void setupOutputVariables();
 
         Real64 getDCSystemCapacity();
         ModuleType getModuleType();
@@ -198,7 +198,7 @@ namespace PVWatts {
         void setCellTemperature(Real64 cellTemp);
         void setPlaneOfArrayIrradiance(Real64 poa);
 
-        void calc(EnergyPlusData &state);
+        void calc();
 
         void getResults(Real64 &GeneratorPower, Real64 &GeneratorEnergy, Real64 &ThermalPower, Real64 &ThermalEnergy);
 

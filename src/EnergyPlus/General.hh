@@ -265,7 +265,7 @@ namespace General {
                       int const EndDate    // End date in sequence
     );
 
-    std::string CreateSysTimeIntervalString(EnergyPlusData &state);
+    std::string CreateSysTimeIntervalString();
 
     int nthDayOfWeekOfMonth(EnergyPlusData &state,
                             int const &dayOfWeek,  // day of week (Sunday=1, Monday=2, ...)
@@ -332,11 +332,11 @@ namespace General {
 
     int LogicalToInteger(bool const Flag);
 
-    Real64 GetCurrentHVACTime(EnergyPlusData &state);
+    Real64 GetCurrentHVACTime();
 
-    Real64 GetPreviousHVACTime(EnergyPlusData &state);
+    Real64 GetPreviousHVACTime();
 
-    std::string CreateHVACTimeIntervalString(EnergyPlusData &state);
+    std::string CreateHVACTimeIntervalString();
 
     std::string CreateTimeString(Real64 const Time); // Time in seconds
 

@@ -59,44 +59,41 @@ struct EnergyPlusData;
 
 namespace DaylightingDevices {
 
-    void InitDaylightingDevices(EnergyPlusData &state);
+    void InitDaylightingDevices();
 
-    void GetTDDInput(EnergyPlusData &state);
+    void GetTDDInput();
 
-    void GetShelfInput(EnergyPlusData &state);
+    void GetShelfInput();
 
     Real64 CalcPipeTransBeam(Real64 const R,    // Reflectance of surface, constant (can be made R = f(theta) later)
                              Real64 const A,    // Aspect ratio, L / d
                              Real64 const Theta // Angle of entry in radians
     );
 
-    Real64 CalcTDDTransSolIso(EnergyPlusData &state, int const PipeNum); // TDD pipe object number
+    Real64 CalcTDDTransSolIso(int const PipeNum); // TDD pipe object number
 
-    Real64 CalcTDDTransSolHorizon(EnergyPlusData &state, int const PipeNum); // TDD pipe object number
+    Real64 CalcTDDTransSolHorizon(int const PipeNum); // TDD pipe object number
 
-    Real64 CalcTDDTransSolAniso(EnergyPlusData &state,
-                                int const PipeNum, // TDD pipe object number
+    Real64 CalcTDDTransSolAniso(int const PipeNum, // TDD pipe object number
                                 Real64 const COSI  // Cosine of the incident angle
     );
 
-    Real64 TransTDD(EnergyPlusData &state,
-                    int const PipeNum,      // TDD pipe object number
+    Real64 TransTDD(int const PipeNum,      // TDD pipe object number
                     Real64 const COSI,      // Cosine of the incident angle
                     DataDaylightingDevices::iRadType const RadiationType // Radiation type flag
     );
 
-    Real64 InterpolatePipeTransBeam(EnergyPlusData &state,
-                                    Real64 const COSI,               // Cosine of the incident angle
+    Real64 InterpolatePipeTransBeam(Real64 const COSI,               // Cosine of the incident angle
                                     const Array1D<Real64> &transBeam // Table of beam transmittance vs. cosine angle
     );
 
-    int FindTDDPipe(EnergyPlusData &state, int const WinNum);
+    int FindTDDPipe(int const WinNum);
 
-    void DistributeTDDAbsorbedSolar(EnergyPlusData &state);
+    void DistributeTDDAbsorbedSolar();
 
-    void CalcViewFactorToShelf(EnergyPlusData &state, int const ShelfNum); // Daylighting shelf object number
+    void CalcViewFactorToShelf(int const ShelfNum); // Daylighting shelf object number
 
-    void FigureTDDZoneGains(EnergyPlusData &state);
+    void FigureTDDZoneGains();
 
 } // namespace DaylightingDevices
 

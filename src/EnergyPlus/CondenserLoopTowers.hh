@@ -390,49 +390,46 @@ namespace CondenserLoopTowers {
         {
         }
 
-        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void getDesignCapacities(EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+        void getDesignCapacities([[maybe_unused]] const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
         void getSizingFactor(Real64 &SizFac) override;
 
-        void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation) override;
+        void onInitLoopEquip([[maybe_unused]] const PlantLocation &calledFromLocation) override;
 
-        void initialize(EnergyPlusData &state);
+        void initialize();
 
-        void setupOutputVariables(EnergyPlusData &state);
+        void setupOutputVariables();
 
-        void SizeTower(EnergyPlusData &state);
+        void SizeTower();
 
-        void SizeVSMerkelTower(EnergyPlusData &state);
+        void SizeVSMerkelTower();
 
-        void calculateSingleSpeedTower(EnergyPlusData &state);
+        void calculateSingleSpeedTower();
 
-        void calculateTwoSpeedTower(EnergyPlusData &state);
+        void calculateTwoSpeedTower();
 
-        void calculateMerkelVariableSpeedTower(EnergyPlusData &state, Real64 &MyLoad);
+        void calculateMerkelVariableSpeedTower(Real64 &MyLoad);
 
-        void calculateVariableSpeedTower(EnergyPlusData &state);
+        void calculateVariableSpeedTower();
 
-        Real64 calculateSimpleTowerOutletTemp(EnergyPlusData &state, Real64 waterMassFlowRate, Real64 AirFlowRate, Real64 UAdesign);
+        Real64 calculateSimpleTowerOutletTemp(Real64 waterMassFlowRate, Real64 AirFlowRate, Real64 UAdesign);
 
-        Real64 calculateVariableTowerOutletTemp(EnergyPlusData &state,
-                                                Real64 WaterFlowRateRatio, // current water flow rate ratio (capped if applicable)
+        Real64 calculateVariableTowerOutletTemp(Real64 WaterFlowRateRatio, // current water flow rate ratio (capped if applicable)
                                                 Real64 airFlowRateRatioLocal, // current air flow rate ratio
                                                 Real64 Twb                 // current inlet air wet-bulb temperature (C, capped if applicable)
         );
 
-        void calculateWaterUsage(EnergyPlusData &state);
+        void calculateWaterUsage();
 
-        Real64 calculateVariableSpeedApproach(EnergyPlusData &state,
-                                              Real64 PctWaterFlow,  // Water flow ratio of cooling tower
+        Real64 calculateVariableSpeedApproach(Real64 PctWaterFlow,  // Water flow ratio of cooling tower
                                               Real64 airFlowRatioLocal, // Air flow ratio of cooling tower
                                               Real64 Twb,           // Inlet air wet-bulb temperature [C]
                                               Real64 Tr             // Cooling tower range (outlet water temp minus inlet air wet-bulb temp) [C]
         );
 
-        void checkModelBounds(EnergyPlusData &state,
-                              Real64 Twb,                      // current inlet air wet-bulb temperature (C)
+        void checkModelBounds(Real64 Twb,                      // current inlet air wet-bulb temperature (C)
                               Real64 Tr,                       // requested range temperature for current time step (C)
                               Real64 Ta,                       // requested approach temperature for current time step (C)
                               Real64 WaterFlowRateRatio,       // current water flow rate ratio at water inlet node
@@ -442,34 +439,30 @@ namespace CondenserLoopTowers {
                               Real64 &WaterFlowRateRatioCapped // bounded value of water flow rate ratio
         );
 
-        void update(EnergyPlusData &state);
+        void update();
 
         void report(bool RunFlag);
 
-        Real64 residualUA(EnergyPlusData &state,
-                          Real64 UA,                 // UA of cooling tower
+        Real64 residualUA(Real64 UA,                 // UA of cooling tower
                           Array1D<Real64> const &Par // par(1) = design tower load [W]
         );
 
-        Real64 residualTa(EnergyPlusData &state,
-                          Real64 FlowRatio,          // water or air flow ratio of cooling tower
+        Real64 residualTa(Real64 FlowRatio,          // water or air flow ratio of cooling tower
                           Array1D<Real64> const &Par // par(1) = tower number
         );
 
-        Real64 residualTr(EnergyPlusData &state,
-                          Real64 Trange,             // cooling tower range temperature [C]
+        Real64 residualTr(Real64 Trange,             // cooling tower range temperature [C]
                           Array1D<Real64> const &Par // par(1) = tower number
         );
 
-        Real64 residualMerkelLoad(EnergyPlusData &state,
-                                  Real64 airFlowRateRatioLocal,  // fan speed ratio (1.0 is continuous, 0.0 is off)
+        Real64 residualMerkelLoad(Real64 airFlowRateRatioLocal,  // fan speed ratio (1.0 is continuous, 0.0 is off)
                                   Array1D<Real64> const &Par // par(1) = Tower number
         );
 
-        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
+        static PlantComponent *factory(std::string const &objectName);
     };
 
-    void GetTowerInput(EnergyPlusData &state);
+    void GetTowerInput();
 
 } // namespace CondenserLoopTowers
 

@@ -860,8 +860,7 @@ namespace DataSizing {
         firstPassFlag = false;
     }
 
-    void GetCoilDesFlowT(EnergyPlusData &state,
-                         int SysNum,           // central air system index
+    void GetCoilDesFlowT(int SysNum,           // central air system index
                          Real64 CpAir,         // specific heat to be used in calculations [J/kgC]
                          Real64 &DesFlow,      // returned design mass flow [kg/s]
                          Real64 &DesExitTemp,  // returned design coil exit temperature [kg/s]

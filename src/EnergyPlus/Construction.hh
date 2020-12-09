@@ -311,7 +311,7 @@ namespace Construction {
             s0.allocate(3, 4);
         }
 
-        void calculateTransferFunction(EnergyPlusData &state, bool & ErrorsFound, bool & DoCTFErrorReport);
+        void calculateTransferFunction(bool & ErrorsFound, bool & DoCTFErrorReport);
 
         void calculateExponentialMatrix(); // Time step of the resulting CTFs
 
@@ -321,11 +321,11 @@ namespace Construction {
 
         void calculateFinalCoefficients();
 
-        void reportTransferFunction(EnergyPlusData &state, int const cCounter);
+        void reportTransferFunction(int const cCounter);
 
-        bool isGlazingConstruction(EnergyPlusData &state) const;
+        bool isGlazingConstruction() const;
 
-        Real64 setUserTemperatureLocationPerpendicular(EnergyPlusData &state, Real64 userValue);
+        Real64 setUserTemperatureLocationPerpendicular(Real64 userValue);
 
         void setNodeSourceAndUserTemp(Array1D_int & Nodes);
     };

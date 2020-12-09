@@ -202,7 +202,7 @@ namespace WaterToAirHeatPumpSimple {
     // MODULE SUBROUTINES:
     //*************************************************************************
 
-    void GetSimpleWatertoAirHPInput(EnergyPlusData &state);
+    void GetSimpleWatertoAirHPInput();
 
     // Beginning Initialization Section of the Module
     //******************************************************************************

@@ -187,9 +187,9 @@ namespace DataSurfaceColors {
         return WasSet;
     }
 
-    void SetUpSchemeColors(EnergyPlusData &state, std::string const &SchemeName, Optional_string_const ColorType)
+    void SetUpSchemeColors(std::string const &SchemeName, Optional_string_const ColorType)
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   August 2007

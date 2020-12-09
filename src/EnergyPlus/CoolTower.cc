@@ -88,8 +88,9 @@ namespace CoolTower {
     // Using/Aliasing
     using namespace DataHeatBalance;
 
-    void ManageCoolTower(EnergyPlusData &state)
+    void ManageCoolTower()
     {
+        GET_STATE_HERE
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Daeho Kang
@@ -118,8 +119,9 @@ namespace CoolTower {
         ReportCoolTower(state);
     }
 
-    void GetCoolTower(EnergyPlusData &state)
+    void GetCoolTower()
     {
+        GET_STATE_HERE
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Daeho Kang
@@ -504,8 +506,9 @@ namespace CoolTower {
         }
     }
 
-    void CalcCoolTower(EnergyPlusData &state)
+    void CalcCoolTower()
     {
+        GET_STATE_HERE
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Daeho Kang
@@ -663,8 +666,9 @@ namespace CoolTower {
         }
     }
 
-    void UpdateCoolTower(EnergyPlusData &state)
+    void UpdateCoolTower()
     {
+        GET_STATE_HERE
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard J. Liesen
@@ -698,8 +702,9 @@ namespace CoolTower {
         }
     }
 
-    void ReportCoolTower(EnergyPlusData &state)
+    void ReportCoolTower()
     {
+        GET_STATE_HERE
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Daeho Kang

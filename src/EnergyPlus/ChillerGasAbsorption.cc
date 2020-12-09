@@ -111,8 +111,9 @@ namespace ChillerGasAbsorption {
 
 
 
-    PlantComponent *GasAbsorberSpecs::factory(EnergyPlusData &state, std::string const &objectName)
+    PlantComponent *GasAbsorberSpecs::factory(std::string const &objectName)
     {
+        GET_STATE_HERE
         // Process the input data if it hasn't been done already
         if (state.dataChillerGasAbsorption->getGasAbsorberInputs) {
             GetGasAbsorberInput(state);
@@ -130,9 +131,9 @@ namespace ChillerGasAbsorption {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void GasAbsorberSpecs::simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
+    void GasAbsorberSpecs::simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
     {
-
+        GET_STATE_HERE
         // kind of a hacky way to find the location of this, but it's what plantloopequip was doing
         int BranchInletNodeNum =
             DataPlant::PlantLoop(calledFromLocation.loopNum).LoopSide(calledFromLocation.loopSideNum).Branch(calledFromLocation.branchNum).NodeNumIn;
@@ -173,8 +174,9 @@ namespace ChillerGasAbsorption {
         }
     }
 
-    void GasAbsorberSpecs::getDesignCapacities(EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
+    void GasAbsorberSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
     {
+        GET_STATE_HERE
         // kind of a hacky way to find the location of this, but it's what plantloopequip was doing
         int BranchInletNodeNum =
             DataPlant::PlantLoop(calledFromLocation.loopNum).LoopSide(calledFromLocation.loopSideNum).Branch(calledFromLocation.branchNum).NodeNumIn;
@@ -204,8 +206,9 @@ namespace ChillerGasAbsorption {
         _SizFac = this->SizFac;
     }
 
-    void GasAbsorberSpecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &calledFromLocation)
+    void GasAbsorberSpecs::onInitLoopEquip(const PlantLocation &calledFromLocation)
     {
+        GET_STATE_HERE
         this->initialize(state);
 
         // kind of a hacky way to find the location of this, but it's what plantloopequip was doing
@@ -231,8 +234,9 @@ namespace ChillerGasAbsorption {
         TempCondInDesign = this->TempDesCondReturn;
     }
 
-    void GetGasAbsorberInput(EnergyPlusData &state)
+    void GetGasAbsorberInput()
     {
+        GET_STATE_HERE
         //       AUTHOR:          Jason Glazer
         //       DATE WRITTEN:    March 2001
         // This routine will get the input
@@ -469,8 +473,9 @@ namespace ChillerGasAbsorption {
         }
     }
 
-    void GasAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
+    void GasAbsorberSpecs::setupOutputVariables()
     {
+        GET_STATE_HERE
         std::string &ChillerName = this->Name;
 
         SetupOutputVariable(state, "Chiller Heater Evaporator Cooling Rate", OutputProcessor::Unit::W, this->CoolingLoad, "System", "Average", ChillerName);
@@ -617,8 +622,9 @@ namespace ChillerGasAbsorption {
             "Chiller Heater Runtime Fraction", OutputProcessor::Unit::None, this->FractionOfPeriodRunning, "System", "Average", ChillerName);
     }
 
-    void GasAbsorberSpecs::initialize(EnergyPlusData &state)
+    void GasAbsorberSpecs::initialize()
     {
+        GET_STATE_HERE
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   June 2003
 
@@ -883,8 +889,9 @@ namespace ChillerGasAbsorption {
         }
     }
 
-    void GasAbsorberSpecs::size(EnergyPlusData &state)
+    void GasAbsorberSpecs::size()
     {
+        GET_STATE_HERE
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   June 2003
         //       MODIFIED       November 2013 Daeho Kang, add component sizing table entries
@@ -1241,8 +1248,9 @@ namespace ChillerGasAbsorption {
         }
     }
 
-    void GasAbsorberSpecs::calculateChiller(EnergyPlusData &state, Real64 &MyLoad)
+    void GasAbsorberSpecs::calculateChiller(Real64 &MyLoad)
     {
+        GET_STATE_HERE
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   March 2001
 
@@ -1614,8 +1622,9 @@ namespace ChillerGasAbsorption {
         this->ElectricPower = lCoolElectricPower + lHeatElectricPower;
     }
 
-    void GasAbsorberSpecs::calculateHeater(EnergyPlusData &state, Real64 &MyLoad, bool const RunFlag)
+    void GasAbsorberSpecs::calculateHeater(Real64 &MyLoad, bool const RunFlag)
     {
+        GET_STATE_HERE
         //       AUTHOR         Jason Glazer and Michael J. Witte
         //       DATE WRITTEN   March 2001
         // Simulate a direct fired (gas consuming) absorption chiller using

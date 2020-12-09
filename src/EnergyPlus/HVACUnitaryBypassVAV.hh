@@ -322,7 +322,7 @@ namespace HVACUnitaryBypassVAV {
                   bool &HXUnitOn                 // flag to enable heat exchanger
     );
 
-    void GetCBVAV(EnergyPlusData &state);
+    void GetCBVAV();
 
     void InitCBVAV(EnergyPlusData &state, int const CBVAVNum,            // Index of the current CBVAV unit being simulated
                    bool const FirstHVACIteration, // TRUE if first HVAC iteration

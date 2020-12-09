@@ -63,12 +63,12 @@ struct EnergyPlusData;
 
 namespace AirLoopHVACDOAS {
 
-    void CheckConvergence(EnergyPlusData &state);
+    void CheckConvergence();
 
     struct AirLoopMixer
     {
         std::string name;
-        static AirLoopMixer *factory(EnergyPlusData &state, int object_type_of_num, std::string const &objectName);
+        static AirLoopMixer *factory(int object_type_of_num, std::string const &objectName);
         int numOfInletNodes;
         int m_AirLoopMixer_Num;
         int OutletNodeNum;
@@ -84,14 +84,14 @@ namespace AirLoopHVACDOAS {
 
         ~AirLoopMixer() = default; // destructor
 
-        static void getAirLoopMixer(EnergyPlusData &state);
+        static void getAirLoopMixer();
         void CalcAirLoopMixer();
     };
 
     struct AirLoopSplitter
     {
         std::string name;
-        static AirLoopSplitter *factory(EnergyPlusData &state, int object_type_of_num, std::string const &objectName);
+        static AirLoopSplitter *factory(int object_type_of_num, std::string const &objectName);
         int numOfOutletNodes;
         int m_AirLoopSplitter_Num;
         std::string InletNodeName;
@@ -106,7 +106,7 @@ namespace AirLoopHVACDOAS {
 
         ~AirLoopSplitter() = default; // destructor
 
-        static void getAirLoopSplitter(EnergyPlusData &state);
+        static void getAirLoopSplitter();
         void CalcAirLoopSplitter(Real64 Temp, Real64 Humrat);
     };
 
@@ -188,22 +188,22 @@ namespace AirLoopHVACDOAS {
 
         ~AirLoopDOAS() = default; // destructor
 
-        static void getAirLoopDOASInput(EnergyPlusData &state);
+        static void getAirLoopDOASInput();
 
-        void SimAirLoopHVACDOAS(EnergyPlusData &state, bool firstHVACIteration, int &CompIndex);
+        void SimAirLoopHVACDOAS(bool firstHVACIteration, int &CompIndex);
 
-        void initAirLoopDOAS(EnergyPlusData &state, bool FirstHVACIteration);
+        void initAirLoopDOAS(bool FirstHVACIteration);
 
-        void CalcAirLoopDOAS(EnergyPlusData &state, bool FirstHVACIteration);
+        void CalcAirLoopDOAS(bool FirstHVACIteration);
 
-        void SizingAirLoopDOAS(EnergyPlusData &state);
+        void SizingAirLoopDOAS();
 
-        void GetDesignDayConditions(EnergyPlusData &state);
+        void GetDesignDayConditions();
     };
 
-    int getAirLoopMixerIndex(EnergyPlusData &state, std::string const &objectName);
-    int getAirLoopSplitterIndex(EnergyPlusData &state, std::string const &objectName);
-    void getAirLoopHVACDOASInput(EnergyPlusData &state);
+    int getAirLoopMixerIndex(std::string const &objectName);
+    int getAirLoopSplitterIndex(std::string const &objectName);
+    void getAirLoopHVACDOASInput();
 
 } // namespace AirLoopHVACDOAS
 

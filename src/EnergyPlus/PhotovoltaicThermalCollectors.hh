@@ -168,15 +168,15 @@ namespace PhotovoltaicThermalCollectors {
 
         void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void setupReportVars(EnergyPlusData &state);
+        void setupReportVars();
 
         void initialize(EnergyPlusData &state, bool FirstHVACIteration);
 
-        void size(EnergyPlusData &state);
+        void size();
 
         void control();
 
-        void calculate(EnergyPlusData &state);
+        void calculate();
 
         void update();
     };
@@ -185,7 +185,7 @@ namespace PhotovoltaicThermalCollectors {
 
     void clear_state();
 
-    void GetPVTcollectorsInput(EnergyPlusData &state);
+    void GetPVTcollectorsInput();
 
     void simPVTfromOASys(EnergyPlusData &state, int index, bool FirstHVACIteration);
 

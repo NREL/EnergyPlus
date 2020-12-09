@@ -161,7 +161,7 @@ namespace HVACHXAssistedCoolingCoil {
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetHXAssistedCoolingCoilInput(EnergyPlusData &state);
+    void GetHXAssistedCoolingCoilInput();
 
     // End of Get Input subroutines for this Module
     //******************************************************************************

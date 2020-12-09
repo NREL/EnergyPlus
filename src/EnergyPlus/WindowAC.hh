@@ -157,7 +157,7 @@ namespace WindowAC {
                      int &CompIndex                 // component index
     );
 
-    void GetWindowAC(EnergyPlusData &state);
+    void GetWindowAC();
 
     void InitWindowAC(EnergyPlusData &state, int const WindACNum,          // number of the current window AC unit being simulated
                       Real64 &QZnReq,               // zone load (modified as needed) (W)

@@ -111,7 +111,7 @@ namespace WindowComplexManager {
 
     //void clear_state();
 
-    void InitBSDFWindows(EnergyPlusData &state);
+    void InitBSDFWindows();
 
     void AllocateCFSStateHourlyData(EnergyPlusData &state,
                                     int const iSurf, // Surface number
@@ -125,9 +125,9 @@ namespace WindowComplexManager {
 
     void CheckCFSStates(EnergyPlusData &state, int const iSurf); // Surface number
 
-    void InitComplexWindows(EnergyPlusData &state);
+    void InitComplexWindows();
 
-    void UpdateComplexWindows(EnergyPlusData &state);
+    void UpdateComplexWindows();
 
     void CFSShadeAndBeamInitialization(EnergyPlusData &state,
                                        int const iSurf, // Window surface number
@@ -144,7 +144,7 @@ namespace WindowComplexManager {
                                        int const TS                       // Timestep number
     );
 
-    void CalcStaticProperties(EnergyPlusData &state);
+    void CalcStaticProperties();
 
     void CalculateBasisLength(EnergyPlusData &state,
                               BSDFWindowInputStruct const &Input, // BSDF data input struct for this construction
@@ -152,7 +152,7 @@ namespace WindowComplexManager {
                               int &NBasis                         // Calculated Basis length
     );
 
-    void DetermineMaxBackSurfaces(EnergyPlusData &state);
+    void DetermineMaxBackSurfaces();
 
     void ConstructBasis(EnergyPlusData &state,
                         int const IConst, // Index for accessing Construct array

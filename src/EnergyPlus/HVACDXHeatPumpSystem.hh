@@ -154,7 +154,7 @@ namespace HVACDXHeatPumpSystem {
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetDXHeatPumpSystemInput(EnergyPlusData &state);
+    void GetDXHeatPumpSystemInput();
 
     // End of Get Input subroutines for the Module
     //******************************************************************************

@@ -85,7 +85,7 @@ namespace UnitarySystems {
         int m_DesignSpecMSHPType_Num;
         bool m_SingleModeFlag;
 
-        static void getDesignSpecMSHP(EnergyPlusData &state);
+        static void getDesignSpecMSHP();
         static void getDesignSpecMSHPdata([[maybe_unused]] EnergyPlusData &state, bool errorsFound);
     };
 
@@ -563,7 +563,7 @@ namespace UnitarySystems {
 
         void reportUnitarySystem(EnergyPlusData &state, int const AirLoopNum);
 
-        void unitarySystemHeatRecovery(EnergyPlusData &state);
+        void unitarySystemHeatRecovery();
 
         void controlUnitarySystemtoSP(EnergyPlusData &state, int const AirLoopNum,          // Primary air loop number
                                       bool const FirstHVACIteration, // True when first HVAC iteration

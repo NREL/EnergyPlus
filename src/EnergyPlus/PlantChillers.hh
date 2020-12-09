@@ -189,7 +189,7 @@ namespace PlantChillers {
 
         virtual void initialize(EnergyPlusData &state, bool RunFlag, Real64 MyLoad) = 0;
 
-        virtual void size(EnergyPlusData &state) = 0;
+        virtual void size() = 0;
     };
 
     struct ElectricChillerSpecs : BaseChillerSpecs
@@ -234,9 +234,9 @@ namespace PlantChillers {
         {
         }
 
-        static void getInput(EnergyPlusData &state);
+        static void getInput();
 
-        void setupOutputVariables(EnergyPlusData &state);
+        void setupOutputVariables();
 
         static ElectricChillerSpecs *factory(EnergyPlusData &state, std::string const &chillerName);
 
@@ -244,7 +244,7 @@ namespace PlantChillers {
 
         void initialize(EnergyPlusData &state, bool RunFlag, Real64 MyLoad) override;
 
-        void size(EnergyPlusData &state) override;
+        void size() override;
 
         void calculate(EnergyPlusData &state,
                        Real64 &MyLoad,   // operating load
@@ -335,15 +335,15 @@ namespace PlantChillers {
 
         static EngineDrivenChillerSpecs *factory(EnergyPlusData &state, std::string const &chillerName);
 
-        static void getInput(EnergyPlusData &state);
+        static void getInput();
 
         void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void setupOutputVariables(EnergyPlusData &state);
+        void setupOutputVariables();
 
         void initialize(EnergyPlusData &state, bool RunFlag, Real64 MyLoad) override;
 
-        void size(EnergyPlusData &state) override;
+        void size() override;
 
         void calculate(EnergyPlusData &state,
                        Real64 &MyLoad,   // operating load
@@ -429,15 +429,15 @@ namespace PlantChillers {
 
         static GTChillerSpecs *factory(EnergyPlusData &state, std::string const &chillerName);
 
-        static void getInput(EnergyPlusData &state);
+        static void getInput();
 
         void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void setupOutputVariables(EnergyPlusData &state);
+        void setupOutputVariables();
 
         void initialize(EnergyPlusData &state, bool RunFlag, Real64 MyLoad) override;
 
-        void size(EnergyPlusData &state) override;
+        void size() override;
 
         void calculate(EnergyPlusData &state,
                        Real64 &MyLoad,   // operating load
@@ -462,15 +462,15 @@ namespace PlantChillers {
 
         static ConstCOPChillerSpecs *factory(EnergyPlusData &state, std::string const &chillerName);
 
-        static void getInput(EnergyPlusData &state);
+        static void getInput();
 
         void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void setupOutputVariables(EnergyPlusData &state);
+        void setupOutputVariables();
 
         void initialize(EnergyPlusData &state, bool RunFlag, Real64 MyLoad) override;
 
-        void size(EnergyPlusData &state) override;
+        void size() override;
 
         void calculate(EnergyPlusData &state, Real64 &MyLoad, bool RunFlag, DataBranchAirLoopPlant::ControlTypeEnum EquipFlowCtrl);
 

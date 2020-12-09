@@ -59,17 +59,15 @@ namespace EnergyPlus {
 // Forward declarations
 struct EnergyPlusData;
 
-void DisplayString(EnergyPlusData &state, std::string const &String); // String to be displayed
+void DisplayString(std::string const &String); // String to be displayed
 
-void DisplayString(EnergyPlusData &state, char const *String); // String to be displayed
+void DisplayString(char const *String); // String to be displayed
 
-void DisplayNumberAndString(EnergyPlusData &state,
-                            int const Number,         // number to be displayed
+void DisplayNumberAndString(int const Number,         // number to be displayed
                             std::string const &String // String to be displayed
 );
 
-void DisplaySimDaysProgress(EnergyPlusData &state,
-                            int const CurrentSimDay, // Current Simulation Day
+void DisplaySimDaysProgress(int const CurrentSimDay, // Current Simulation Day
                             int const TotalSimDays   // Total number of Simulation Days
 );
 

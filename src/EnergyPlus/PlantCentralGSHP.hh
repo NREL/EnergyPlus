@@ -403,7 +403,7 @@ namespace PlantCentralGSHP {
 
         void getDesignCapacities(EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
-        void setupOutputVars(EnergyPlusData &state);
+        void setupOutputVars();
 
         void initialize(EnergyPlusData &state,
                         Real64 MyLoad, // Demand Load
@@ -412,13 +412,13 @@ namespace PlantCentralGSHP {
 
         void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void SizeWrapper(EnergyPlusData &state);
+        void SizeWrapper();
 
         void CalcWrapperModel(EnergyPlusData &state, Real64 &MyLoad, int LoopNum);
 
-        void CalcChillerModel(EnergyPlusData &state);
+        void CalcChillerModel();
 
-        void CalcChillerHeaterModel(EnergyPlusData &state);
+        void CalcChillerHeaterModel();
 
         void UpdateChillerHeaterRecords();
 
@@ -433,9 +433,9 @@ namespace PlantCentralGSHP {
 
     void clear_state();
 
-    void GetWrapperInput(EnergyPlusData &state);
+    void GetWrapperInput();
 
-    void GetChillerHeaterInput(EnergyPlusData &state);
+    void GetChillerHeaterInput();
 
 } // namespace PlantCentralGSHP
 

@@ -219,14 +219,14 @@ namespace MicroturbineElectricGenerator {
 
         void UpdateMTGeneratorRecords();
 
-        void setupOutputVars(EnergyPlusData &state);
+        void setupOutputVars();
 
         static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
     };
 
     extern Array1D<MTGeneratorSpecs> MTGenerator; // dimension to number of generators
 
-    void GetMTGeneratorInput(EnergyPlusData &state);
+    void GetMTGeneratorInput();
 
 } // namespace MicroturbineElectricGenerator
 

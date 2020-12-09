@@ -90,7 +90,7 @@ namespace DataOutputs {
     // Types
     struct OutputReportingVariables
     {
-        OutputReportingVariables(EnergyPlusData &state, std::string const &KeyValue, std::string const &VariableName);
+        OutputReportingVariables(std::string const &KeyValue, std::string const &VariableName);
 
         std::string const key;
         std::string const variableName;

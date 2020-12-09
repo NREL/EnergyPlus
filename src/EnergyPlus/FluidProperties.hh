@@ -382,7 +382,7 @@ namespace FluidProperties {
 
     void InitializeGlycRoutines();
 
-    void GetFluidPropertiesData(EnergyPlusData &state);
+    void GetFluidPropertiesData();
 
     //*****************************************************************************
 
@@ -416,11 +416,11 @@ namespace FluidProperties {
 
     //*****************************************************************************
 
-    void ReportAndTestGlycols(EnergyPlusData &state);
+    void ReportAndTestGlycols();
 
     //*****************************************************************************
 
-    void ReportAndTestRefrigerants(EnergyPlusData &state);
+    void ReportAndTestRefrigerants();
 
     //*****************************************************************************
 
@@ -586,7 +586,7 @@ namespace FluidProperties {
 
     //*****************************************************************************
 
-    void GetInterpValue_error(EnergyPlusData &state);
+    void GetInterpValue_error();
 
     inline Real64 GetInterpValue(EnergyPlusData &state,
                                  Real64 const Tact, // actual temperature at which we want the property of interest
@@ -702,7 +702,7 @@ namespace FluidProperties {
 
     int CheckFluidPropertyName(EnergyPlusData &state, std::string const &NameToCheck); // Name from input(?) to be checked against valid FluidPropertyNames
 
-    void ReportOrphanFluids(EnergyPlusData &state);
+    void ReportOrphanFluids();
 
     void ReportFatalGlycolErrors(EnergyPlusData &state,
                                  int NumGlycols,           // Number of Glycols in input/data

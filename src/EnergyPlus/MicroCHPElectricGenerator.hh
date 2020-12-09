@@ -207,11 +207,11 @@ namespace MicroCHPElectricGenerator {
 
         void onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation) override;
 
-        void setupOutputVars(EnergyPlusData &state);
+        void setupOutputVars();
 
-        void InitMicroCHPNoNormalizeGenerators(EnergyPlusData &state);
+        void InitMicroCHPNoNormalizeGenerators();
 
-        void CalcUpdateHeatRecovery(EnergyPlusData &state);
+        void CalcUpdateHeatRecovery();
 
         void CalcMicroCHPNoNormalizeGeneratorModel(EnergyPlusData &state,
                                                    bool RunFlagElectCenter, // TRUE when Generator operating
@@ -220,12 +220,12 @@ namespace MicroCHPElectricGenerator {
                                                    Real64 MyThermalLoad,
                                                    bool FirstHVACIteration);
 
-        void UpdateMicroCHPGeneratorRecords(EnergyPlusData &state);
+        void UpdateMicroCHPGeneratorRecords();
 
         static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
     };
 
-    void GetMicroCHPGeneratorInput(EnergyPlusData &state);
+    void GetMicroCHPGeneratorInput();
 
     Real64 FuncDetermineEngineTemp(Real64 TcwOut,   // hot water leaving temp
                                    Real64 MCeng,    // Fictitious mass and heat capacity of engine
@@ -259,7 +259,7 @@ namespace MicroCHPElectricGenerator {
                                      Real64 MdotCpcw    // mass flow and specific heat of coolant water
     );
 
-    void FigureMicroCHPZoneGains(EnergyPlusData &state);
+    void FigureMicroCHPZoneGains();
 
     void clear_state();
 

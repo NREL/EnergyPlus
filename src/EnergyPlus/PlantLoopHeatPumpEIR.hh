@@ -156,27 +156,27 @@ namespace EIRPlantLoopHeatPumps {
 
         void doPhysics(EnergyPlusData &state, Real64 currentLoad);
 
-        void sizeLoadSide(EnergyPlusData &state);
+        void sizeLoadSide();
 
-        void sizeSrcSideWSHP(EnergyPlusData &state);
+        void sizeSrcSideWSHP();
 
-        void sizeSrcSideASHP(EnergyPlusData &state);
+        void sizeSrcSideASHP();
 
-        Real64 getLoadSideOutletSetPointTemp(EnergyPlusData &state) const;
+        Real64 getLoadSideOutletSetPointTemp() const;
 
-        void setOperatingFlowRatesASHP(EnergyPlusData &state);
+        void setOperatingFlowRatesASHP();
 
-        void setOperatingFlowRatesWSHP(EnergyPlusData &state);
+        void setOperatingFlowRatesWSHP();
 
         void resetReportingVariables();
 
         static PlantComponent *factory(EnergyPlusData &state, int hp_type_of_num, const std::string& hp_name);
 
-        static void pairUpCompanionCoils(EnergyPlusData &state);
+        static void pairUpCompanionCoils();
 
-        static void processInputForEIRPLHP(EnergyPlusData &state);
+        static void processInputForEIRPLHP();
 
-        static void checkConcurrentOperation(EnergyPlusData &state);
+        static void checkConcurrentOperation();
 
         static Real64 add(Real64 const a, Real64 const b)
         {

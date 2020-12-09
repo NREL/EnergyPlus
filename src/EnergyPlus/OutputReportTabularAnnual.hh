@@ -75,15 +75,15 @@ namespace OutputReportTabularAnnual {
 
     // these functions are not in the class and act as an interface between procedural code and object oriented
 
-    void GetInputTabularAnnual(EnergyPlusData &state);
+    void GetInputTabularAnnual();
 
-    void checkAggregationOrderForAnnual(EnergyPlusData &state);
+    void checkAggregationOrderForAnnual();
 
     void GatherAnnualResultsForTimeStep(EnergyPlusData &state, OutputProcessor::TimeStepType kindOfTypeStep);
 
     void ResetAnnualGathering();
 
-    void WriteAnnualTables(EnergyPlusData &state);
+    void WriteAnnualTables();
 
     void AddAnnualTableOfContents(std::ostream &);
 
@@ -114,9 +114,9 @@ namespace OutputReportTabularAnnual {
 
         void addFieldSet(std::string, std::string, AnnualFieldSet::AggregationKind, int);
 
-        void setupGathering(EnergyPlusData &state);
+        void setupGathering();
 
-        bool invalidAggregationOrder(EnergyPlusData &state);
+        bool invalidAggregationOrder();
 
         void gatherForTimestep(EnergyPlusData &state, OutputProcessor::TimeStepType kindOfTypeStep);
 
@@ -149,7 +149,7 @@ namespace OutputReportTabularAnnual {
 
         Real64 getSecondsInTimeStep(EnergyPlusData &state, OutputProcessor::TimeStepType kindOfTimeStep);
 
-        void computeBinColumns(EnergyPlusData &state);
+        void computeBinColumns();
 
         std::vector<std::string> setupAggString();
 

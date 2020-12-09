@@ -116,7 +116,7 @@ namespace FourPipeBeam {
         init(EnergyPlusData &state, bool const FirstHVACIteration // TRUE if first air loop solution this HVAC step         MAYBE THIS SHOULD HAVE A DEFAULT ARG OF = false
         );
 
-        void set_size(EnergyPlusData &state);
+        void set_size();
 
         Real64 residualSizing(EnergyPlusData &state, Real64 const airFlow // primary supply air flow rate in kg/s
         );
@@ -126,7 +126,7 @@ namespace FourPipeBeam {
                      Real64 &NonAirSysOutput        // convective cooling by the beam system [W]
         );
 
-        void calc(EnergyPlusData &state);
+        void calc();
 
         Real64 residualCooling(EnergyPlusData &state, Real64 const cWaterFlow // chilled water flow rate in kg/s
         );
@@ -134,11 +134,11 @@ namespace FourPipeBeam {
         Real64 residualHeating(EnergyPlusData &state, Real64 const hWaterFlow // hot water flow rate in kg/s
         );
 
-        void update(EnergyPlusData &state) const;
+        void update() const;
 
-        void report(EnergyPlusData &state);
+        void report();
 
-        void CalcOutdoorAirVolumeFlowRate(EnergyPlusData &state);
+        void CalcOutdoorAirVolumeFlowRate();
 
     private:                      // data
         int coolingAvailSchedNum; // index to schedule for cooling availability

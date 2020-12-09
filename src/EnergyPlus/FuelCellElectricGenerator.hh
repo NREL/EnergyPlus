@@ -544,11 +544,11 @@ namespace FuelCellElectricGenerator {
 
         static PlantComponent *factory_exhaust(EnergyPlusData &state, std::string const &objectName);
 
-        void initialize(EnergyPlusData &state);
+        void initialize();
 
         void getDesignCapacities(EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
-        void setupOutputVars(EnergyPlusData &state);
+        void setupOutputVars();
 
         void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
@@ -586,7 +586,7 @@ namespace FuelCellElectricGenerator {
 
         void CalcFuelCellAuxHeater();
 
-        void CalcFuelCellGenHeatRecovery(EnergyPlusData &state);
+        void CalcFuelCellGenHeatRecovery();
 
         void CalcFuelCellGeneratorModel(EnergyPlusData &state, bool RunFlag, Real64 MyLoad, bool FirstHVACIteration);
 
@@ -605,14 +605,14 @@ namespace FuelCellElectricGenerator {
                                   Real64 MyLoad, // demand on electric generator
                                   bool FirstHVACIteration);
 
-        void UpdateFuelCellGeneratorRecords(EnergyPlusData &state);
+        void UpdateFuelCellGeneratorRecords();
     };
 
     void clear_state();
 
-    void getFuelCellInput(EnergyPlusData &state);
+    void getFuelCellInput();
 
-    void FigureFuelCellZoneGains(EnergyPlusData &state);
+    void FigureFuelCellZoneGains();
 
     extern bool getFuelCellInputFlag;
     extern int NumFuelCellGenerators;

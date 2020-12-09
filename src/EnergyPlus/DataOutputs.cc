@@ -170,9 +170,10 @@ namespace DataOutputs {
                        UtilityRoutines::case_insensitive_comparator> OutputVariablesForSimulation;
     // Functions
 
-    OutputReportingVariables::OutputReportingVariables(EnergyPlusData &state, std::string const &KeyValue, std::string const &VariableName)
+    OutputReportingVariables::OutputReportingVariables(std::string const &KeyValue, std::string const &VariableName)
         : key(KeyValue), variableName(VariableName)
     {
+        GET_STATE_HERE
         if (KeyValue == "*") return;
         for (auto const &c : KeyValue) {
             if (c == ' ' || c == '_' || std::isalnum(c)) continue;

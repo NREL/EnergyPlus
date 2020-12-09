@@ -136,15 +136,15 @@ namespace CoolTower {
         }
     };
 
-    void ManageCoolTower(EnergyPlusData &state);
+    void ManageCoolTower();
 
-    void GetCoolTower(EnergyPlusData &state);
+    void GetCoolTower();
 
-    void CalcCoolTower(EnergyPlusData &state);
+    void CalcCoolTower();
 
-    void UpdateCoolTower(EnergyPlusData &state);
+    void UpdateCoolTower();
 
-    void ReportCoolTower(EnergyPlusData &state);
+    void ReportCoolTower();
 
 } // namespace CoolTower
 

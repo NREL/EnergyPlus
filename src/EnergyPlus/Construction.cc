@@ -58,8 +58,8 @@ namespace EnergyPlus {
 
 namespace Construction {
 
-    void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool & ErrorsFound, bool & DoCTFErrorReport) {
-
+    void ConstructionProps::calculateTransferFunction(bool & ErrorsFound, bool & DoCTFErrorReport) {
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Russ Taylor
         //       DATE WRITTEN   June 1990
@@ -1896,8 +1896,8 @@ namespace Construction {
         Rold.deallocate();
     }
 
-    void ConstructionProps::reportTransferFunction(EnergyPlusData &state, int const cCounter) {
-
+    void ConstructionProps::reportTransferFunction(int const cCounter) {
+        GET_STATE_HERE
         static constexpr auto Format_700{" Construction CTF,{},{:4},{:4},{:4},{:8.3F},{:15.4N},{:8.3F},{:8.3F},{:8.3F},{:8.3F},{}\n"};
         print(state.files.eio,
               Format_700,
@@ -1986,8 +1986,9 @@ namespace Construction {
         }
     }
 
-    bool ConstructionProps::isGlazingConstruction(EnergyPlusData &state) const
+    bool ConstructionProps::isGlazingConstruction() const
     {
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
         //       DATE WRITTEN   September 2016
@@ -2005,8 +2006,9 @@ namespace Construction {
                MaterialGroup == DataHeatBalance::WindowSimpleGlazing;
     }
 
-    Real64 ConstructionProps::setUserTemperatureLocationPerpendicular(EnergyPlusData &state, Real64 userValue)
+    Real64 ConstructionProps::setUserTemperatureLocationPerpendicular(Real64 userValue)
     {
+        GET_STATE_HERE
         if (userValue < 0.0) {
             ShowWarningError(state, "Construction:InternalSource has a perpendicular temperature location parameter that is less than zero.");
             ShowContinueError(state, "Construction=" + this->Name + " has this error.  The parameter has been reset to 0.");

@@ -67,17 +67,17 @@ namespace DataEnvironment {
     Real64 constexpr SunIsUpValue(0.00001);           // if Cos Zenith Angle of the sun is >= this value, the sun is "up"
     Real64 constexpr StdPressureSeaLevel(101325.0);   // Standard barometric pressure at sea level (Pa)
 
-    Real64 OutDryBulbTempAt(EnergyPlusData &state, Real64 Z); // Height above ground (m)
+    Real64 OutDryBulbTempAt(Real64 Z); // Height above ground (m)
 
-    Real64 OutWetBulbTempAt(EnergyPlusData &state, Real64 Z); // Height above ground (m)
+    Real64 OutWetBulbTempAt(Real64 Z); // Height above ground (m)
 
-    Real64 OutDewPointTempAt(EnergyPlusData &state, Real64 Z); // Height above ground (m)
+    Real64 OutDewPointTempAt(Real64 Z); // Height above ground (m)
 
-    Real64 WindSpeedAt(EnergyPlusData &state, Real64 Z); // Height above ground (m)
+    Real64 WindSpeedAt(Real64 Z); // Height above ground (m)
 
-    Real64 OutBaroPressAt(EnergyPlusData &state, Real64 Z); // Height above ground (m)
+    Real64 OutBaroPressAt(Real64 Z); // Height above ground (m)
 
-    void SetOutBulbTempAt_error(EnergyPlusData &state, std::string const &Settings, Real64 max_height, std::string const &SettingsName);
+    void SetOutBulbTempAt_error(std::string const &Settings, Real64 max_height, std::string const &SettingsName);
 
 } // namespace DataEnvironment
 

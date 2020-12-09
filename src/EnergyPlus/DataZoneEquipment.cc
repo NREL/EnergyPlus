@@ -216,8 +216,9 @@ namespace DataZoneEquipment {
         CalcDesignSpecificationOutdoorAirOneTimeFlag = true;
     }
 
-    void GetZoneEquipmentData(EnergyPlusData &state)
+    void GetZoneEquipmentData()
     {
+        GET_STATE_HERE
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
@@ -256,8 +257,9 @@ namespace DataZoneEquipment {
         GetZoneEquipmentData1(state);
     }
 
-    void GetZoneEquipmentData1(EnergyPlusData &state)
+    void GetZoneEquipmentData1()
     {
+        GET_STATE_HERE
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Russ Taylor
@@ -1168,8 +1170,9 @@ namespace DataZoneEquipment {
         }
     }
 
-    void SetupZoneEquipmentForConvectionFlowRegime(EnergyPlusData &state)
+    void SetupZoneEquipmentForConvectionFlowRegime()
     {
+        GET_STATE_HERE
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
@@ -1210,12 +1213,11 @@ namespace DataZoneEquipment {
         }
     }
 
-    bool CheckZoneEquipmentList(EnergyPlusData &state,
-                                std::string const &ComponentType, // Type of component
+    bool CheckZoneEquipmentList(std::string const &ComponentType, // Type of component
                                 std::string const &ComponentName, // Name of component
                                 Optional_int CtrlZoneNum)
     {
-
+        GET_STATE_HERE
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   May 2007
@@ -1257,9 +1259,9 @@ namespace DataZoneEquipment {
         return IsOnList;
     }
 
-    int GetControlledZoneIndex(EnergyPlusData &state, std::string const &ZoneName) // Zone name to match into Controlled Zone structure
+    int GetControlledZoneIndex(std::string const &ZoneName) // Zone name to match into Controlled Zone structure
     {
-
+        GET_STATE_HERE
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   March 2008
@@ -1283,9 +1285,10 @@ namespace DataZoneEquipment {
         return ControlledZoneIndex;
     }
 
-    int FindControlledZoneIndexFromSystemNodeNumberForZone(EnergyPlusData &state, int const TrialZoneNodeNum) // Node number to match into Controlled Zone structure
+    int FindControlledZoneIndexFromSystemNodeNumberForZone(int const TrialZoneNodeNum) // Node number to match into Controlled Zone structure
     {
 
+        GET_STATE_HERE
         // FUNCTION INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   August 2013
@@ -1323,9 +1326,9 @@ namespace DataZoneEquipment {
         return ControlledZoneIndex;
     }
 
-    int GetSystemNodeNumberForZone(EnergyPlusData &state, std::string const &ZoneName) // Zone name to match into Controlled Zone structure
+    int GetSystemNodeNumberForZone(std::string const &ZoneName) // Zone name to match into Controlled Zone structure
     {
-
+        GET_STATE_HERE
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   March 2008
@@ -1358,12 +1361,12 @@ namespace DataZoneEquipment {
         return SystemZoneNodeNumber;
     }
 
-    int GetReturnAirNodeForZone(EnergyPlusData &state, std::string const &ZoneName,             // Zone name to match into Controlled Zone structure
+    int GetReturnAirNodeForZone(std::string const &ZoneName,             // Zone name to match into Controlled Zone structure
                                 std::string const &NodeName,             // Return air node name to match (may be blank)
                                 std::string const &calledFromDescription // String identifying the calling function and object
     )
     {
-
+        GET_STATE_HERE
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   March 2008
@@ -1415,11 +1418,11 @@ namespace DataZoneEquipment {
         return ReturnAirNodeNumber;
     }
 
-    int GetReturnNumForZone(EnergyPlusData &state, std::string const &ZoneName, // Zone name to match into Controlled Zone structure
+    int GetReturnNumForZone(std::string const &ZoneName, // Zone name to match into Controlled Zone structure
                             std::string const &NodeName  // Return air node name to match (may be blank)
     )
     {
-
+        GET_STATE_HERE
         // PURPOSE OF THIS FUNCTION:
         // This function returns the zone return number (not the node number) for the indicated
         // zone and node name.  If NodeName is blank, return 1 (the first return node)
@@ -1457,8 +1460,7 @@ namespace DataZoneEquipment {
         return ReturnIndex;
     }
 
-    Real64 CalcDesignSpecificationOutdoorAir(EnergyPlusData &state,
-                                             int const DSOAPtr,          // Pointer to DesignSpecification:OutdoorAir object
+    Real64 CalcDesignSpecificationOutdoorAir(int const DSOAPtr,          // Pointer to DesignSpecification:OutdoorAir object
                                              int const ActualZoneNum,    // Zone index
                                              bool const UseOccSchFlag,   // Zone occupancy schedule will be used instead of using total zone occupancy
                                              bool const UseMinOASchFlag, // Use min OA schedule in DesignSpecification:OutdoorAir object
@@ -1466,7 +1468,7 @@ namespace DataZoneEquipment {
                                              Optional_bool_const MaxOAVolFlowFlag // TRUE when calculation uses occupancy schedule  (e.g., dual duct)
     )
     {
-
+        GET_STATE_HERE
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   October 2012
@@ -1850,12 +1852,12 @@ namespace DataZoneEquipment {
         return OAVolumeFlowRate;
     }
 
-    void EquipList::getPrioritiesForInletNode(EnergyPlusData &state,
-                                              int const inletNodeNum, // Zone inlet node number to match
+    void EquipList::getPrioritiesForInletNode(int const inletNodeNum, // Zone inlet node number to match
                                               int &coolingPriority,   // Cooling priority num for matching equipment
                                               int &heatingPriority    // Heating priority num for matching equipment
     )
     {
+        GET_STATE_HERE
         bool equipFound = false;
         for (int equipNum = 1; equipNum <= this->NumOfEquipTypes; ++equipNum) {
             if (this->EquipType_Num(equipNum) == AirDistUnit_Num) {
@@ -1889,13 +1891,15 @@ namespace DataZoneEquipment {
         DataHVACGlobals::MinAirLoopIterationsAfterFirst = minIterations;
     }
 
-    Real64 EquipList::SequentialHeatingFraction(EnergyPlusData &state, const int equipNum)
+    Real64 EquipList::SequentialHeatingFraction(const int equipNum)
     {
+        GET_STATE_HERE
         return ScheduleManager::GetCurrentScheduleValue(state, SequentialHeatingFractionSchedPtr(equipNum));
     }
 
-    Real64 EquipList::SequentialCoolingFraction(EnergyPlusData &state, const int equipNum)
+    Real64 EquipList::SequentialCoolingFraction(const int equipNum)
     {
+        GET_STATE_HERE
         return ScheduleManager::GetCurrentScheduleValue(state, SequentialCoolingFractionSchedPtr(equipNum));
     }
 

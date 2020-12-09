@@ -161,7 +161,7 @@ namespace DataPlant {
         {
         }
 
-        void ValidateFlowControlPaths(EnergyPlusData &state);
+        void ValidateFlowControlPaths();
 
         Real64 DetermineLoopSideFlowRate(EnergyPlusData &state, int ThisSideInletNode, Real64 ThisSideLoopFlowRequest);
 

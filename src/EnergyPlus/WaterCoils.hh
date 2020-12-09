@@ -256,7 +256,7 @@ namespace WaterCoils {
                                      Optional_int_const FanOpMode = _,
                                      Optional<Real64 const> PartLoadRatio = _);
 
-    void GetWaterCoilInput(EnergyPlusData &state);
+    void GetWaterCoilInput();
 
     void InitWaterCoil(EnergyPlusData &state, int const CoilNum, bool const FirstHVACIteration);
 

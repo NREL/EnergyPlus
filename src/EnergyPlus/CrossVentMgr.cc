@@ -100,9 +100,9 @@ namespace CrossVentMgr {
     Real64 constexpr CrecFlow1(0.415); // First correlation constant for the recirculation flow rate
     Real64 constexpr CrecFlow2(0.466); // Second correlation constant for the recirculation flow rate
 
-    void ManageUCSDCVModel(EnergyPlusData &state,
-                           int const ZoneNum) // index number for the specified zone
+    void ManageUCSDCVModel(int const ZoneNum) // index number for the specified zone
     {
+        GET_STATE_HERE
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         G. Carrilho da Graca
@@ -121,8 +121,9 @@ namespace CrossVentMgr {
         CalcUCSDCV(state, ZoneNum);
     }
 
-    void InitUCSDCV(EnergyPlusData &state, int const ZoneNum)
+    void InitUCSDCV(int const ZoneNum)
     {
+        GET_STATE_HERE
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         G. Carrilho da Graca
@@ -154,9 +155,9 @@ namespace CrossVentMgr {
         }
     }
 
-    void HcUCSDCV(EnergyPlusData &state,
-                  int const ZoneNum)
+    void HcUCSDCV(int const ZoneNum)
     {
+        GET_STATE_HERE
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         G. Carrilho da Graca
@@ -307,8 +308,9 @@ namespace CrossVentMgr {
         }
     }
 
-    void EvolveParaUCSDCV(EnergyPlusData &state, int const ZoneNum)
+    void EvolveParaUCSDCV(int const ZoneNum)
     {
+        GET_STATE_HERE
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         G. Carrilho da Graca
@@ -711,9 +713,9 @@ namespace CrossVentMgr {
         }
     }
 
-    void CalcUCSDCV(EnergyPlusData &state,
-                    int const ZoneNum) // Which Zonenum
+    void CalcUCSDCV(int const ZoneNum) // Which Zonenum
     {
+        GET_STATE_HERE
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         G. Carrilho da Graca

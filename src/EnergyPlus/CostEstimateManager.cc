@@ -90,8 +90,9 @@ namespace CostEstimateManager {
     // Create report using utility subroutines taken from OutputReportTabular (by J.Glazer)
 
     // Using/Aliasing
-    void SimCostEstimate(EnergyPlusData &state)
+    void SimCostEstimate()
     {
+        GET_STATE_HERE
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         BGriffith
@@ -116,8 +117,9 @@ namespace CostEstimateManager {
         }
     }
 
-    void GetCostEstimateInput(EnergyPlusData &state)
+    void GetCostEstimateInput()
     {
+        GET_STATE_HERE
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         BGriffith
@@ -219,8 +221,9 @@ namespace CostEstimateManager {
         }
     }
 
-    void CheckCostEstimateInput(EnergyPlusData &state, bool &ErrorsFound) // Set to true if errors in input, fatal at end of routine
+    void CheckCostEstimateInput(bool &ErrorsFound) // Set to true if errors in input, fatal at end of routine
     {
+        GET_STATE_HERE
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         BGriffith
@@ -477,8 +480,9 @@ namespace CostEstimateManager {
         }
     }
 
-    void CalcCostEstimate(EnergyPlusData &state)
+    void CalcCostEstimate()
     {
+        GET_STATE_HERE
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         BGriffith

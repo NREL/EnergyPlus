@@ -440,9 +440,9 @@ namespace HVACVariableRefrigerantFlow {
 
         static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
-        void SizeVRFCondenser(EnergyPlusData &state);
+        void SizeVRFCondenser();
 
-        void CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state);
+        void CalcVRFCondenser_FluidTCtrl();
 
         void CalcVRFIUTeTc_FluidTCtrl();
 
@@ -891,7 +891,7 @@ namespace HVACVariableRefrigerantFlow {
 
     void CalcVRFCondenser(EnergyPlusData &state, int VRFCond);
 
-    void GetVRFInput(EnergyPlusData &state);
+    void GetVRFInput();
 
     void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound // flag for errors in GetInput
     );

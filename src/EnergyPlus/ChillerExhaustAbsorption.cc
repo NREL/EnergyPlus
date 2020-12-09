@@ -112,8 +112,9 @@ namespace ChillerExhaustAbsorption {
     //    Development of the original(GasAbsoptionChiller) module was funded by the Gas Research Institute.
     //    (Please see copyright and disclaimer information at end of module)
 
-    PlantComponent *ExhaustAbsorberSpecs::factory(EnergyPlusData &state, std::string const &objectName)
+    PlantComponent *ExhaustAbsorberSpecs::factory(std::string const &objectName)
     {
+        GET_STATE_HERE
         // Process the input data if it hasn't been done already
         if (state.dataChillerExhaustAbsorption->Sim_GetInput) {
             GetExhaustAbsorberInput(state);
@@ -131,9 +132,9 @@ namespace ChillerExhaustAbsorption {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void ExhaustAbsorberSpecs::simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
+    void ExhaustAbsorberSpecs::simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
     {
-
+        GET_STATE_HERE
         // kind of a hacky way to find the location of this, but it's what plantloopequip was doing
         int BranchInletNodeNum =
             DataPlant::PlantLoop(calledFromLocation.loopNum).LoopSide(calledFromLocation.loopSideNum).Branch(calledFromLocation.branchNum).NodeNumIn;
@@ -171,9 +172,9 @@ namespace ChillerExhaustAbsorption {
         }
     }
 
-    void ExhaustAbsorberSpecs::getDesignCapacities(EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
+    void ExhaustAbsorberSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
     {
-
+        GET_STATE_HERE
         // kind of a hacky way to find the location of this, but it's what plantloopequip was doing
         int BranchInletNodeNum =
             DataPlant::PlantLoop(calledFromLocation.loopNum).LoopSide(calledFromLocation.loopSideNum).Branch(calledFromLocation.branchNum).NodeNumIn;
@@ -204,8 +205,9 @@ namespace ChillerExhaustAbsorption {
         _SizFac = this->SizFac;
     }
 
-    void ExhaustAbsorberSpecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &calledFromLocation)
+    void ExhaustAbsorberSpecs::onInitLoopEquip(const PlantLocation &calledFromLocation)
     {
+        GET_STATE_HERE
         this->initialize(state);
 
         // kind of a hacky way to find the location of this, but it's what plantloopequip was doing
@@ -225,8 +227,9 @@ namespace ChillerExhaustAbsorption {
         TempDesCondIn = this->TempDesCondReturn;
     }
 
-    void GetExhaustAbsorberInput(EnergyPlusData &state)
+    void GetExhaustAbsorberInput()
     {
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Jason Glazer
         //       DATE WRITTEN:    March 2001
@@ -470,8 +473,9 @@ namespace ChillerExhaustAbsorption {
         }
     }
 
-    void ExhaustAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
+    void ExhaustAbsorberSpecs::setupOutputVariables()
     {
+        GET_STATE_HERE
         std::string const ChillerName = this->Name;
 
         SetupOutputVariable(state, "Chiller Heater Evaporator Cooling Rate", OutputProcessor::Unit::W, this->CoolingLoad, "System", "Average", ChillerName);
@@ -617,8 +621,9 @@ namespace ChillerExhaustAbsorption {
                             ChillerName);
     }
 
-    void ExhaustAbsorberSpecs::initialize(EnergyPlusData &state)
+    void ExhaustAbsorberSpecs::initialize()
     {
+        GET_STATE_HERE
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
@@ -889,8 +894,9 @@ namespace ChillerExhaustAbsorption {
         }
     }
 
-    void ExhaustAbsorberSpecs::size(EnergyPlusData &state)
+    void ExhaustAbsorberSpecs::size()
     {
+        GET_STATE_HERE
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
@@ -1249,9 +1255,9 @@ namespace ChillerExhaustAbsorption {
         }
     }
 
-    void ExhaustAbsorberSpecs::calcChiller(EnergyPlusData &state, Real64 &MyLoad)
+    void ExhaustAbsorberSpecs::calcChiller(Real64 &MyLoad)
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   March 2001
@@ -1680,9 +1686,9 @@ namespace ChillerExhaustAbsorption {
         this->ElectricPower = lCoolElectricPower + lHeatElectricPower;
     }
 
-    void ExhaustAbsorberSpecs::calcHeater(EnergyPlusData &state, Real64 &MyLoad, bool RunFlag)
+    void ExhaustAbsorberSpecs::calcHeater(Real64 &MyLoad, bool RunFlag)
     {
-
+        GET_STATE_HERE
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer and Michael J. Witte
         //       DATE WRITTEN   March 2001

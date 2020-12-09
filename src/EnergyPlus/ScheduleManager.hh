@@ -194,7 +194,7 @@ namespace ScheduleManager {
     // Needed for unit tests, should not be normally called.
     void clear_state();
 
-    void ProcessScheduleInput(EnergyPlusData &state);
+    void ProcessScheduleInput();
 
     void ReportScheduleDetails(EnergyPlusData &state, int const LevelOfDetail); // =1: hourly; =2: timestep; = 3: make IDF excerpt
 
@@ -203,7 +203,7 @@ namespace ScheduleManager {
 
     // Updates each schedule value to the current timestep
     // Uses EMS value if actuated, otherwise calls LookUpScheduleValue with ThisHour=DataGlobals::HourOfDay, ThisTimeStep=DataGlobals::TimeStep
-    void UpdateScheduleValues(EnergyPlusData &state);
+    void UpdateScheduleValues();
 
     // Looks up a given Schedule value for an hour & timestep, minding whether DST is enabled or not
     Real64 LookUpScheduleValue(EnergyPlusData &state,
@@ -317,9 +317,9 @@ namespace ScheduleManager {
 
     std::string GetScheduleName(EnergyPlusData &state, int const ScheduleIndex);
 
-    void ReportScheduleValues(EnergyPlusData &state);
+    void ReportScheduleValues();
 
-    void ReportOrphanSchedules(EnergyPlusData &state);
+    void ReportOrphanSchedules();
 
     Real64 ScheduleAnnualFullLoadHours(EnergyPlusData &state,
                                        int const ScheduleIndex,  // Which Schedule being tested

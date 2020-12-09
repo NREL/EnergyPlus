@@ -68,8 +68,9 @@ namespace EnergyPlus::DataEnvironment {
     // to the "environment" (i.e. current date data, tomorrow's date data, and
     // current weather variables)
 
-    Real64 OutDryBulbTempAt(EnergyPlusData &state, Real64 const Z) // Height above ground (m)
+    Real64 OutDryBulbTempAt(Real64 const Z) // Height above ground (m)
     {
+        GET_STATE_HERE
 
         // FUNCTION INFORMATION:
         //       AUTHOR         Peter Graham Ellis
@@ -116,8 +117,9 @@ namespace EnergyPlus::DataEnvironment {
         return LocalOutDryBulbTemp;
     }
 
-    Real64 OutWetBulbTempAt(EnergyPlusData &state, Real64 const Z) // Height above ground (m)
+    Real64 OutWetBulbTempAt(Real64 const Z) // Height above ground (m)
     {
+        GET_STATE_HERE
 
         // FUNCTION INFORMATION:
         //       AUTHOR         Peter Graham Ellis
@@ -159,8 +161,9 @@ namespace EnergyPlus::DataEnvironment {
         return LocalOutWetBulbTemp;
     }
 
-    Real64 OutDewPointTempAt(EnergyPlusData &state, Real64 const Z) // Height above ground (m)
+    Real64 OutDewPointTempAt(Real64 const Z) // Height above ground (m)
     {
+        GET_STATE_HERE
 
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
@@ -203,8 +206,9 @@ namespace EnergyPlus::DataEnvironment {
         return LocalOutDewPointTemp;
     }
 
-    Real64 WindSpeedAt(EnergyPlusData &state, Real64 const Z) // Height above ground (m)
+    Real64 WindSpeedAt(Real64 const Z) // Height above ground (m)
     {
+        GET_STATE_HERE
 
         // FUNCTION INFORMATION:
         //       AUTHOR         Peter Graham Ellis
@@ -239,8 +243,9 @@ namespace EnergyPlus::DataEnvironment {
         return LocalWindSpeed;
     }
 
-    Real64 OutBaroPressAt(EnergyPlusData &state, Real64 const Z) // Height above ground (m)
+    Real64 OutBaroPressAt(Real64 const Z) // Height above ground (m)
     {
+        GET_STATE_HERE
 
         // FUNCTION INFORMATION:
         //       AUTHOR         Daeho Kang
@@ -284,8 +289,9 @@ namespace EnergyPlus::DataEnvironment {
         return LocalAirPressure;
     }
 
-    void SetOutBulbTempAt_error(EnergyPlusData &state, std::string const &Settings, Real64 const max_height, std::string const &SettingsName)
+    void SetOutBulbTempAt_error(std::string const &Settings, Real64 const max_height, std::string const &SettingsName)
     {
+        GET_STATE_HERE
         // Using/Aliasing
 
         ShowSevereError(state, "SetOutBulbTempAt: " + Settings + " Outdoor Temperatures < -100 C");
@@ -298,8 +304,9 @@ namespace EnergyPlus::DataEnvironment {
     }
 
     void
-    SetWindSpeedAt(EnergyPlusData &state, int const NumItems, const Array1D<Real64> &Heights, Array1D<Real64> &LocalWindSpeed, [[maybe_unused]] std::string const &Settings)
+    SetWindSpeedAt(int const NumItems, const Array1D<Real64> &Heights, Array1D<Real64> &LocalWindSpeed, [[maybe_unused]] std::string const &Settings)
     {
+        GET_STATE_HERE
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie

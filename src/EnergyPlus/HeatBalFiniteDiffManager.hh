@@ -198,11 +198,11 @@ namespace HeatBalFiniteDiffManager {
                                  Real64 &TempSurfOutTmp // Outside Surface Temperature of each Heat Transfer Surface
     );
 
-    void GetCondFDInput(EnergyPlusData &state);
+    void GetCondFDInput();
 
-    void InitHeatBalFiniteDiff(EnergyPlusData &state);
+    void InitHeatBalFiniteDiff();
 
-    void InitialInitHeatBalFiniteDiff(EnergyPlusData &state);
+    void InitialInitHeatBalFiniteDiff();
 
     void CalcHeatBalFiniteDiff(EnergyPlusData &state,
                                int const Surf,
@@ -210,7 +210,7 @@ namespace HeatBalFiniteDiffManager {
                                Real64 &TempSurfOutTmp // Outside Surface Temperature of each Heat Transfer Surface
     );
 
-    void ReportFiniteDiffInits(EnergyPlusData &state);
+    void ReportFiniteDiffInits();
 
     void CalcNodeHeatFlux(EnergyPlusData &state,
                           int const Surf,    // surface number

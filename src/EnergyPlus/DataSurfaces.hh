@@ -957,19 +957,19 @@ namespace DataSurfaces {
             // Set Precomputed Parameters
         void set_computed_geometry();
 
-        void SetOutBulbTempAt(EnergyPlusData &state);
+        void SetOutBulbTempAt();
 
         void SetWindDirAt(Real64 const fac);
 
-        void SetWindSpeedAt(EnergyPlusData &state, Real64 const fac);
+        void SetWindSpeedAt(Real64 const fac);
 
-        Real64 getInsideAirTemperature(EnergyPlusData &state, const int t_SurfNum) const;
+        Real64 getInsideAirTemperature(const int t_SurfNum) const;
 
         static Real64 getInsideIR(const int t_SurfNum);
 
-        Real64 getOutsideAirTemperature(EnergyPlusData &state, const int t_SurfNum) const;
+        Real64 getOutsideAirTemperature(const int t_SurfNum) const;
 
-        Real64 getOutsideIR(EnergyPlusData &state, const int t_SurfNum) const;
+        Real64 getOutsideIR(const int t_SurfNum) const;
 
         static Real64 getSWIncident(const int t_SurfNum);
 
@@ -977,9 +977,9 @@ namespace DataSurfaces {
 
         static Real64 getSWDiffuseIncident(const int t_SurfNum);
 
-        int getTotLayers(EnergyPlusData &state) const;
+        int getTotLayers() const;
 
-        Real64 get_average_height(EnergyPlusData &state) const;
+        Real64 get_average_height() const;
 
     private: // Methods
              // Computed Shape Category
@@ -1453,13 +1453,13 @@ namespace DataSurfaces {
     // Needed for unit tests, should not be normally called.
     void clear_state();
 
-    void SetSurfaceOutBulbTempAt(EnergyPlusData &state);
+    void SetSurfaceOutBulbTempAt();
 
-    void CheckSurfaceOutBulbTempAt(EnergyPlusData &state);
+    void CheckSurfaceOutBulbTempAt();
 
-    void SetSurfaceWindSpeedAt(EnergyPlusData &state);
+    void SetSurfaceWindSpeedAt();
 
-    void SetSurfaceWindDirAt(EnergyPlusData &state);
+    void SetSurfaceWindDirAt();
 
     Real64 AbsFrontSide(int SurfNum);
 

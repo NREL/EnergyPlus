@@ -166,7 +166,7 @@ namespace ThermalComfort {
     void ManageThermalComfort(EnergyPlusData &state,
                               bool const InitializeOnly); // when called from ZTPC and calculations aren't needed
 
-    void InitThermalComfort(EnergyPlusData &state);
+    void InitThermalComfort();
 
     void CalcThermalComfortFanger(EnergyPlusData &state,
                                   Optional_int_const PNum = _,     // People number for thermal comfort control
@@ -174,9 +174,9 @@ namespace ThermalComfort {
                                   Optional<Real64> PMVResult = _   // PMV value for thermal comfort control
     );
 
-    void CalcThermalComfortPierce(EnergyPlusData &state);
+    void CalcThermalComfortPierce();
 
-    void CalcThermalComfortKSU(EnergyPlusData &state);
+    void CalcThermalComfortKSU();
 
     void DERIV(EnergyPlusData &state, int &TempIndiceNum,         // Number of temperature indices  unused1208
                Array1D<Real64> &Temp,      // Temperature unused1208
@@ -185,7 +185,7 @@ namespace ThermalComfort {
 
     void RKG(EnergyPlusData &state, int &NEQ, Real64 &H, Real64 &X, Array1D<Real64> &Y, Array1D<Real64> &DY, Array1D<Real64> &C);
 
-    void GetAngleFactorList(EnergyPlusData &state);
+    void GetAngleFactorList();
 
     Real64 CalcAngleFactorMRT(EnergyPlusData &state, int const AngleFacNum);
 
@@ -195,13 +195,13 @@ namespace ThermalComfort {
 
     Real64 CalcRadTemp(EnergyPlusData &state, int const PeopleListNum); // Type of MRT calculation (zone averaged or surface weighted)
 
-    void CalcThermalComfortSimpleASH55(EnergyPlusData &state);
+    void CalcThermalComfortSimpleASH55();
 
-    void ResetThermalComfortSimpleASH55(EnergyPlusData &state);
+    void ResetThermalComfortSimpleASH55();
 
-    void CalcIfSetPointMet(EnergyPlusData &state);
+    void CalcIfSetPointMet();
 
-    void ResetSetPointMet(EnergyPlusData &state);
+    void ResetSetPointMet();
 
     void CalcThermalComfortAdaptiveASH55(
         EnergyPlusData &state,
@@ -217,7 +217,7 @@ namespace ThermalComfort {
         Optional<Real64 const> avgdrybulb = _ // approximate avg drybulb for design day.  will be used as previous period in design day
     );
 
-    void DynamicClothingModel(EnergyPlusData &state);
+    void DynamicClothingModel();
 
 } // namespace ThermalComfort
 

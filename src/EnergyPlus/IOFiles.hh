@@ -248,7 +248,7 @@ public:
     {
         OutputControl() = default;
 
-        void getInput(EnergyPlusData &state);
+        void getInput();
 
         bool csv = false;
         bool mtr = true;

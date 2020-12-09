@@ -313,9 +313,9 @@ namespace MixedAir {
         void CalcOAEconomizer(EnergyPlusData &state,
             int const AirLoopNum, Real64 const OutAirMinFrac, Real64 &OASignal, bool &HighHumidityOperationFlag, bool const FirstHVACIteration);
 
-        void SizeOAController(EnergyPlusData &state);
+        void SizeOAController();
 
-        void UpdateOAController(EnergyPlusData &state);
+        void UpdateOAController();
 
         void Checksetpoints(EnergyPlusData &state,
                             Real64 const OutAirMinFrac,   // Local variable used to calculate min OA fraction
@@ -465,13 +465,13 @@ namespace MixedAir {
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetOutsideAirSysInputs(EnergyPlusData &state);
+    void GetOutsideAirSysInputs();
 
-    void GetOAControllerInputs(EnergyPlusData &state);
+    void GetOAControllerInputs();
 
-    void AllocateOAControllers(EnergyPlusData &state);
+    void AllocateOAControllers();
 
-    void GetOAMixerInputs(EnergyPlusData &state);
+    void GetOAMixerInputs();
 
     void ProcessOAControllerInputs(EnergyPlusData &state, std::string const &CurrentModuleObject,
                                    int const OutAirNum,
@@ -541,9 +541,9 @@ namespace MixedAir {
                                       bool &ErrorsFound               // set to true if problem
     );
 
-    int GetNumOAMixers(EnergyPlusData &state);
+    int GetNumOAMixers();
 
-    int GetNumOAControllers(EnergyPlusData &state);
+    int GetNumOAControllers();
 
     int GetOAMixerReliefNodeNumber(EnergyPlusData &state, int const OAMixerNum); // Which Mixer
 
@@ -577,7 +577,7 @@ namespace MixedAir {
 
     void CheckOAControllerName(EnergyPlusData &state, std::string &OAControllerName, std::string const &ObjectType, std::string const &FieldName, bool &ErrorsFound);
 
-    int GetNumOASystems(EnergyPlusData &state);
+    int GetNumOASystems();
 
     int GetOACompListNumber(EnergyPlusData &state, int const OASysNum); // OA Sys Number
 

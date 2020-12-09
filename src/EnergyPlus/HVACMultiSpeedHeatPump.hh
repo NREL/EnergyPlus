@@ -306,7 +306,7 @@ namespace HVACMultiSpeedHeatPump {
 
     //******************************************************************************
 
-    void GetMSHeatPumpInput(EnergyPlusData &state);
+    void GetMSHeatPumpInput();
 
     //******************************************************************************
 
