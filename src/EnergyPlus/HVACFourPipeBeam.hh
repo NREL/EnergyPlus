@@ -133,7 +133,7 @@ namespace FourPipeBeam {
         Real64 residualHeating(EnergyPlusData &state, Real64 const hWaterFlow // hot water flow rate in kg/s
         );
 
-        void update() const;
+        void update(EnergyPlusData &state) const;
 
         void report(EnergyPlusData &state);
 

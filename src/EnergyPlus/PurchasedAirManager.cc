@@ -120,10 +120,6 @@ namespace PurchasedAirManager {
     // Use statements for data only modules
     // Using/Aliasing
     using namespace DataHVACGlobals;
-    using DataEnvironment::OutBaroPress;
-    using DataEnvironment::OutEnthalpy;
-    using DataEnvironment::OutHumRat;
-    using DataEnvironment::StdRhoAir;
     using DataHeatBalFanSys::ZoneAirHumRat;
     using DataHeatBalFanSys::ZoneThermostatSetPointHi;
     using DataHeatBalFanSys::ZoneThermostatSetPointLo;
@@ -296,7 +292,6 @@ namespace PurchasedAirManager {
         using OutAirNodeManager::CheckAndAddAirNodeNumber;
         using namespace DataLoopNode;
         using namespace DataIPShortCuts;
-        using DataContaminantBalance::Contaminant;
         using DataSizing::OARequirements; // to find DesignSpecification:OutdoorAir pointer
         using DataSizing::ZoneHVACSizing;
         using DataZoneEquipment::ZoneEquipConfig;
@@ -579,7 +574,7 @@ namespace PurchasedAirManager {
                     } else if (UtilityRoutines::SameString(cAlphaArgs(14), "OccupancySchedule")) {
                         PurchAir(PurchAirNum).DCVType = OccupancySchedule;
                     } else if (UtilityRoutines::SameString(cAlphaArgs(14), "CO2Setpoint")) {
-                        if (Contaminant.CO2Simulation) {
+                        if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
                             PurchAir(PurchAirNum).DCVType = CO2SetPoint;
                         } else {
                             PurchAir(PurchAirNum).DCVType = NoDCV;
@@ -1261,12 +1256,12 @@ namespace PurchasedAirManager {
         if (state.dataGlobal->BeginEnvrnFlag && InitPurchasedAirMyEnvrnFlag(PurchAirNum)) {
 
             if ((PurchAir(PurchAirNum).HeatingLimit == LimitFlowRate) || (PurchAir(PurchAirNum).HeatingLimit == LimitFlowRateAndCapacity)) {
-                PurchAir(PurchAirNum).MaxHeatMassFlowRate = StdRhoAir * PurchAir(PurchAirNum).MaxHeatVolFlowRate;
+                PurchAir(PurchAirNum).MaxHeatMassFlowRate = state.dataEnvrn->StdRhoAir * PurchAir(PurchAirNum).MaxHeatVolFlowRate;
             } else {
                 PurchAir(PurchAirNum).MaxHeatMassFlowRate = 0.0;
             }
             if ((PurchAir(PurchAirNum).CoolingLimit == LimitFlowRate) || (PurchAir(PurchAirNum).CoolingLimit == LimitFlowRateAndCapacity)) {
-                PurchAir(PurchAirNum).MaxCoolMassFlowRate = StdRhoAir * PurchAir(PurchAirNum).MaxCoolVolFlowRate;
+                PurchAir(PurchAirNum).MaxCoolMassFlowRate = state.dataEnvrn->StdRhoAir * PurchAir(PurchAirNum).MaxCoolVolFlowRate;
             } else {
                 PurchAir(PurchAirNum).MaxCoolMassFlowRate = 0.0;
             }
@@ -2003,7 +1998,6 @@ namespace PurchasedAirManager {
         // na
 
         // Using/Aliasing
-        using DataContaminantBalance::Contaminant;
         using DataHeatBalance::Zone;
         using DataHeatBalFanSys::TempControlType;
         using DataHVACGlobals::ForceOff;
@@ -2163,7 +2157,7 @@ namespace PurchasedAirManager {
                 // Check if OA flow rate greater than max cooling airflow limit
                 if (((PurchAir(PurchAirNum).CoolingLimit == LimitFlowRate) || (PurchAir(PurchAirNum).CoolingLimit == LimitFlowRateAndCapacity)) &&
                     (OAMassFlowRate > PurchAir(PurchAirNum).MaxCoolMassFlowRate)) {
-                    OAVolFlowRate = OAMassFlowRate / StdRhoAir;
+                    OAVolFlowRate = OAMassFlowRate / state.dataEnvrn->StdRhoAir;
                     if (PurchAir(PurchAirNum).OAFlowMaxCoolOutputError < 1) {
                         ++PurchAir(PurchAirNum).OAFlowMaxCoolOutputError;
                         ShowWarningError(state,
@@ -2352,7 +2346,7 @@ namespace PurchasedAirManager {
 
                     //   Limit supply humidity ratio to saturation at supply outlet temp
                     SupplyHumRatOrig = SupplyHumRat;
-                    SupplyHumRatSat = PsyWFnTdbRhPb(state, SupplyTemp, 1.0, OutBaroPress, RoutineName);
+                    SupplyHumRatSat = PsyWFnTdbRhPb(state, SupplyTemp, 1.0, state.dataEnvrn->OutBaroPress, RoutineName);
                     SupplyHumRat = min(SupplyHumRatOrig, SupplyHumRatSat);
                     SupplyEnthalpy = PsyHFnTdbW(SupplyTemp, SupplyHumRat);
 
@@ -2402,9 +2396,9 @@ namespace PurchasedAirManager {
                                 // Limit supply humidity ratio to saturation at supply outlet temp
                                 // If saturation exceeded, then honor capacity limit and set to dew point at supplyenthalpy
                                 SupplyHumRatOrig = SupplyHumRat;
-                                SupplyHumRatSat = PsyWFnTdbRhPb(state, SupplyTemp, 1.0, OutBaroPress, RoutineName);
+                                SupplyHumRatSat = PsyWFnTdbRhPb(state, SupplyTemp, 1.0, state.dataEnvrn->OutBaroPress, RoutineName);
                                 if (SupplyHumRatSat < SupplyHumRatOrig) {
-                                    SupplyTemp = PsyTsatFnHPb(state, SupplyEnthalpy, OutBaroPress, RoutineName);
+                                    SupplyTemp = PsyTsatFnHPb(state, SupplyEnthalpy, state.dataEnvrn->OutBaroPress, RoutineName);
                                     // This is the cooling mode, so SupplyTemp can't be more than MixedAirTemp
                                     SupplyTemp = min(SupplyTemp, MixedAirTemp);
                                     SupplyHumRat = PsyWFnTdbH(state, SupplyTemp, SupplyEnthalpy, RoutineName);
@@ -2450,7 +2444,7 @@ namespace PurchasedAirManager {
                 // Check if OA flow rate greater than max heating airflow limit
                 if (((PurchAir(PurchAirNum).HeatingLimit == LimitFlowRate) || (PurchAir(PurchAirNum).HeatingLimit == LimitFlowRateAndCapacity)) &&
                     (OAMassFlowRate > PurchAir(PurchAirNum).MaxHeatMassFlowRate)) {
-                    OAVolFlowRate = OAMassFlowRate / StdRhoAir;
+                    OAVolFlowRate = OAMassFlowRate / state.dataEnvrn->StdRhoAir;
                     if (PurchAir(PurchAirNum).OAFlowMaxHeatOutputError < 1) {
                         ++PurchAir(PurchAirNum).OAFlowMaxHeatOutputError;
                         ShowWarningError(state,
@@ -2642,7 +2636,7 @@ namespace PurchasedAirManager {
 
                     //   Limit supply humidity ratio to saturation at supply outlet temp
                     SupplyHumRatOrig = SupplyHumRat;
-                    SupplyHumRat = min(SupplyHumRat, PsyWFnTdbRhPb(state, SupplyTemp, 1.0, OutBaroPress, RoutineName));
+                    SupplyHumRat = min(SupplyHumRat, PsyWFnTdbRhPb(state, SupplyTemp, 1.0, state.dataEnvrn->OutBaroPress, RoutineName));
                     SupplyEnthalpy = PsyHFnTdbW(SupplyTemp, SupplyHumRat);
 
                 } else { // SupplyMassFlowRate is zero
@@ -2696,7 +2690,7 @@ namespace PurchasedAirManager {
 
                 // Double-check if saturation exceeded, then thow warning, shouldn't happen here, don't reset, just warn
                 SupplyHumRatOrig = SupplyHumRat;
-                SupplyHumRatSat = PsyWFnTdbRhPb(state, SupplyTemp, 1.0, OutBaroPress, RoutineName);
+                SupplyHumRatSat = PsyWFnTdbRhPb(state, SupplyTemp, 1.0, state.dataEnvrn->OutBaroPress, RoutineName);
                 DeltaHumRat = SupplyHumRatOrig - SupplyHumRatSat;
                 if (DeltaHumRat > SmallDeltaHumRat) {
                     if (PurchAir(PurchAirNum).SaturationOutputError < 1) {
@@ -2738,7 +2732,7 @@ namespace PurchasedAirManager {
                     PurchAir(PurchAirNum).OASenOutput = 0.0;
                     PurchAir(PurchAirNum).OALatOutput = 0.0;
                 }
-                if (Contaminant.CO2Simulation) {
+                if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
                     if (PurchAir(PurchAirNum).OutdoorAir) {
                         Node(InNodeNum).CO2 =
                             ((SupplyMassFlowRate - OAMassFlowRate) * Node(RecircNodeNum).CO2 + OAMassFlowRate * Node(OANodeNum).CO2) /
@@ -2747,7 +2741,7 @@ namespace PurchasedAirManager {
                         Node(InNodeNum).CO2 = Node(RecircNodeNum).CO2;
                     }
                 }
-                if (Contaminant.GenericContamSimulation) {
+                if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
                     if (PurchAir(PurchAirNum).OutdoorAir) {
                         Node(InNodeNum).GenContam =
                             ((SupplyMassFlowRate - OAMassFlowRate) * Node(RecircNodeNum).GenContam + OAMassFlowRate * Node(OANodeNum).GenContam) /
@@ -2768,10 +2762,10 @@ namespace PurchasedAirManager {
                 PurchAir(PurchAirNum).OALatOutput = 0.0;
                 PurchAir(PurchAirNum).FinalMixedAirTemp = Node(RecircNodeNum).Temp;
                 PurchAir(PurchAirNum).FinalMixedAirHumRat = Node(RecircNodeNum).HumRat;
-                if (Contaminant.CO2Simulation) {
+                if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
                     Node(InNodeNum).CO2 = Node(ZoneNodeNum).CO2;
                 }
-                if (Contaminant.GenericContamSimulation) {
+                if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
                     Node(InNodeNum).GenContam = Node(ZoneNodeNum).GenContam;
                 }
             }
@@ -2791,10 +2785,10 @@ namespace PurchasedAirManager {
             Node(InNodeNum).Temp = Node(ZoneNodeNum).Temp;
             Node(InNodeNum).HumRat = Node(ZoneNodeNum).HumRat;
             Node(InNodeNum).Enthalpy = Node(ZoneNodeNum).Enthalpy;
-            if (Contaminant.CO2Simulation) {
+            if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
                 Node(InNodeNum).CO2 = Node(ZoneNodeNum).CO2;
             }
-            if (Contaminant.GenericContamSimulation) {
+            if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
                 Node(InNodeNum).GenContam = Node(ZoneNodeNum).GenContam;
             }
 
@@ -2815,9 +2809,9 @@ namespace PurchasedAirManager {
         }
 
         PurchAir(PurchAirNum).OutdoorAirMassFlowRate = OAMassFlowRate;
-        PurchAir(PurchAirNum).OutdoorAirVolFlowRateStdRho = OAMassFlowRate / StdRhoAir;
+        PurchAir(PurchAirNum).OutdoorAirVolFlowRateStdRho = OAMassFlowRate / state.dataEnvrn->StdRhoAir;
         PurchAir(PurchAirNum).SupplyAirMassFlowRate = SupplyMassFlowRate;
-        PurchAir(PurchAirNum).SupplyAirVolFlowRateStdRho = SupplyMassFlowRate / StdRhoAir;
+        PurchAir(PurchAirNum).SupplyAirVolFlowRateStdRho = SupplyMassFlowRate / state.dataEnvrn->StdRhoAir;
 
         if (PurchAir(PurchAirNum).PlenumExhaustAirNodeNum > 0) {
             Node(PurchAir(PurchAirNum).PlenumExhaustAirNodeNum).MassFlowRate = SupplyMassFlowRate;
@@ -2848,8 +2842,6 @@ namespace PurchasedAirManager {
         // REFERENCES:
 
         // Using/Aliasing
-        using DataContaminantBalance::ZoneSysContDemand;
-        using DataEnvironment::StdRhoAir;
         using DataHeatBalance::Zone;
         using DataZoneEquipment::CalcDesignSpecificationOutdoorAir;
 
@@ -2878,11 +2870,11 @@ namespace PurchasedAirManager {
             }
             OAVolumeFlowRate =
                 CalcDesignSpecificationOutdoorAir(state, PurchAir(PurchAirNum).OARequirementsPtr, ActualZoneNum, UseOccSchFlag, UseMinOASchFlag);
-            OAMassFlowRate = OAVolumeFlowRate * StdRhoAir;
+            OAMassFlowRate = OAVolumeFlowRate * state.dataEnvrn->StdRhoAir;
 
             // If DCV with CO2SetPoint then check required OA flow to meet CO2 setpoint
             if (PurchAir(PurchAirNum).DCVType == CO2SetPoint) {
-                OAMassFlowRate = max(OAMassFlowRate, ZoneSysContDemand(ActualZoneNum).OutputRequiredToCO2SP);
+                OAMassFlowRate = max(OAMassFlowRate, state.dataContaminantBalance->ZoneSysContDemand(ActualZoneNum).OutputRequiredToCO2SP);
             }
 
             if (OAMassFlowRate <= VerySmallMassFlow) OAMassFlowRate = 0.0;
@@ -2992,8 +2984,8 @@ namespace PurchasedAirManager {
                     OAAfterHtRecHumRat = OAInletHumRat + PurchAir(PurchAirNum).HtRecLatEff * (RecircHumRat - OAInletHumRat);
                 OAAfterHtRecEnthalpy = PsyHFnTdbW(OAAfterHtRecTemp, OAAfterHtRecHumRat);
                 //   Check for saturation in supply outlet and reset temp, then humidity ratio at constant enthalpy
-                if (PsyTsatFnHPb(state, OAAfterHtRecEnthalpy, OutBaroPress, RoutineName) > OAAfterHtRecTemp) {
-                    OAAfterHtRecTemp = PsyTsatFnHPb(state, OAAfterHtRecEnthalpy, OutBaroPress, RoutineName);
+                if (PsyTsatFnHPb(state, OAAfterHtRecEnthalpy, state.dataEnvrn->OutBaroPress, RoutineName) > OAAfterHtRecTemp) {
+                    OAAfterHtRecTemp = PsyTsatFnHPb(state, OAAfterHtRecEnthalpy, state.dataEnvrn->OutBaroPress, RoutineName);
                     OAAfterHtRecHumRat = PsyWFnTdbH(state, OAAfterHtRecTemp, OAAfterHtRecEnthalpy, RoutineName);
                 }
             }

@@ -100,7 +100,7 @@ TEST_F(EnergyPlusFixture, Humidifiers_Sizing)
     FinalSysSizing(CurSysNum).HeatSupHumRat = 0.10;
 
     // autosize nominal gas use rate
-    OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
     thisHum.SizeHumidifier(*state);
     EXPECT_DOUBLE_EQ(4.00E-5, thisHum.NomCapVol);
     EXPECT_DOUBLE_EQ(0.040000010708118504, thisHum.NomCap);
@@ -134,7 +134,7 @@ TEST_F(EnergyPlusFixture, Humidifiers_AutoSizing)
     FinalSysSizing(CurSysNum).CoolSupHumRat = 0.07;
     FinalSysSizing(CurSysNum).HeatSupHumRat = 0.10;
 
-    OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
     // volumetric capacity autosize unit test
     thisHum.NomCapVol = AutoSize;
     CurZoneEqNum = 0; // size it based on system
@@ -179,7 +179,7 @@ TEST_F(EnergyPlusFixture, Humidifiers_EnergyUse)
     // resize the humidifier nominal capacity and gas use rate
     thisHum.NomCapVol = 4.00E-5;
     thisHum.NomPower = 103710;
-    OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
     thisHum.SizeHumidifier(*state);
     EXPECT_DOUBLE_EQ(0.040000010708118504, thisHum.NomCap);
     EXPECT_DOUBLE_EQ(103710.42776358133, thisHum.NomPower);
@@ -190,7 +190,7 @@ TEST_F(EnergyPlusFixture, Humidifiers_EnergyUse)
     thisHum.AirInEnthalpy = 25000.0;
     thisHum.InletWaterTempOption = 1;
     thisHum.CurMakeupWaterTemp = 20.0;
-    OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
 
     thisHum.CalcGasSteamHumidifier(*state, 0.040000010708118504);
     EXPECT_DOUBLE_EQ(103710.42776358133, thisHum.GasUseRate);
@@ -273,7 +273,7 @@ TEST_F(EnergyPlusFixture, Humidifiers_ThermalEfficiency)
     thisHum.AirInEnthalpy = 25000.0;
     thisHum.InletWaterTempOption = 1;
     thisHum.CurMakeupWaterTemp = 20.0;
-    OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
 
     std::string const idf_objects = delimited_string({
         "  Curve:Quadratic,",

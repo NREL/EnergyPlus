@@ -120,7 +120,6 @@ namespace EvaporativeCoolers {
     // Use statements for data only modules
     // Using/Aliasing
     using namespace DataLoopNode;
-    using DataEnvironment::OutBaroPress;
     using namespace ScheduleManager;
     using namespace Psychrometrics;
     using namespace DataGlobalConstants;
@@ -941,10 +940,6 @@ namespace EvaporativeCoolers {
         // na
 
         // Using/Aliasing
-        using DataEnvironment::OutAirDensity;
-        using DataEnvironment::OutDryBulbTemp;
-        using DataEnvironment::OutEnthalpy;
-        using DataEnvironment::OutWetBulbTemp;
         using DataHVACGlobals::DoSetPointTest;
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
         using EMSManager::iTemperatureSetPoint;
@@ -1016,13 +1011,13 @@ namespace EvaporativeCoolers {
         // Transfer the node data to EvapCond data structure
         InletNode = EvapCond(EvapCoolNum).InletNode;
 
-        RhoAir = PsyRhoAirFnPbTdbW(state, OutBaroPress, Node(InletNode).Temp, Node(InletNode).HumRat);
+        RhoAir = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, Node(InletNode).Temp, Node(InletNode).HumRat);
 
         // set the volume flow rates from the input mass flow rates
         EvapCond(EvapCoolNum).VolFlowRate = Node(InletNode).MassFlowRate / RhoAir;
 
         // Calculate the entering wet bulb temperature for inlet conditions
-        EvapCond(EvapCoolNum).InletWetBulbTemp = PsyTwbFnTdbWPb(state, Node(InletNode).Temp, Node(InletNode).HumRat, OutBaroPress);
+        EvapCond(EvapCoolNum).InletWetBulbTemp = PsyTwbFnTdbWPb(state, Node(InletNode).Temp, Node(InletNode).HumRat, state.dataEnvrn->OutBaroPress);
 
         // Set all of the inlet mass flow variables from the nodes
         EvapCond(EvapCoolNum).InletMassFlowRate = Node(InletNode).MassFlowRate;
@@ -1054,13 +1049,13 @@ namespace EvaporativeCoolers {
             EvapCond(EvapCoolNum).SecInletEnthalpy = Node(SecInletNode).Enthalpy;
             EvapCond(EvapCoolNum).SecInletPressure = Node(SecInletNode).Press;
         } else {
-            EvapCond(EvapCoolNum).SecInletMassFlowRate = EvapCond(EvapCoolNum).IndirectVolFlowRate * OutAirDensity;
-            EvapCond(EvapCoolNum).SecInletMassFlowRateMaxAvail = EvapCond(EvapCoolNum).IndirectVolFlowRate * OutAirDensity;
+            EvapCond(EvapCoolNum).SecInletMassFlowRate = EvapCond(EvapCoolNum).IndirectVolFlowRate * state.dataEnvrn->OutAirDensity;
+            EvapCond(EvapCoolNum).SecInletMassFlowRateMaxAvail = EvapCond(EvapCoolNum).IndirectVolFlowRate * state.dataEnvrn->OutAirDensity;
             EvapCond(EvapCoolNum).SecInletMassFlowRateMinAvail = 0.0;
-            EvapCond(EvapCoolNum).SecInletTemp = OutDryBulbTemp;
-            EvapCond(EvapCoolNum).SecInletHumRat = PsyWFnTdbTwbPb(state, OutDryBulbTemp, OutWetBulbTemp, OutBaroPress);
-            EvapCond(EvapCoolNum).SecInletEnthalpy = OutEnthalpy;
-            EvapCond(EvapCoolNum).SecInletPressure = OutBaroPress;
+            EvapCond(EvapCoolNum).SecInletTemp = state.dataEnvrn->OutDryBulbTemp;
+            EvapCond(EvapCoolNum).SecInletHumRat = PsyWFnTdbTwbPb(state, state.dataEnvrn->OutDryBulbTemp, state.dataEnvrn->OutWetBulbTemp, state.dataEnvrn->OutBaroPress);
+            EvapCond(EvapCoolNum).SecInletEnthalpy = state.dataEnvrn->OutEnthalpy;
+            EvapCond(EvapCoolNum).SecInletPressure = state.dataEnvrn->OutBaroPress;
         }
         // Set the energy consumption to zero each time through for reporting
         EvapCond(EvapCoolNum).EvapCoolerEnergy = 0.0;
@@ -1723,7 +1718,7 @@ namespace EvaporativeCoolers {
 
             EvapCond(EvapCoolNum).OuletWetBulbTemp = EvapCond(EvapCoolNum).InletWetBulbTemp;
 
-            EvapCond(EvapCoolNum).OutletHumRat = PsyWFnTdbTwbPb(state, EvapCond(EvapCoolNum).OutletTemp, TEWB, OutBaroPress);
+            EvapCond(EvapCoolNum).OutletHumRat = PsyWFnTdbTwbPb(state, EvapCond(EvapCoolNum).OutletTemp, TEWB, state.dataEnvrn->OutBaroPress);
 
             EvapCond(EvapCoolNum).OutletEnthalpy = PsyHFnTdbW(EvapCond(EvapCoolNum).OutletTemp, EvapCond(EvapCoolNum).OutletHumRat);
 
@@ -1854,7 +1849,7 @@ namespace EvaporativeCoolers {
             //***************************************************************************
             EffHX = EvapCond(EvapCoolNum).IndirectHXEffectiveness;
             CpAir = PsyCpAirFnW(EvapCond(EvapCoolNum).InletHumRat);
-            RhoAir = PsyRhoAirFnPbTdbW(state, OutBaroPress, EvapCond(EvapCoolNum).InletTemp, EvapCond(EvapCoolNum).InletHumRat);
+            RhoAir = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, EvapCond(EvapCoolNum).InletTemp, EvapCond(EvapCoolNum).InletHumRat);
             CFMAir = EvapCond(EvapCoolNum).VolFlowRate;         // Volume Flow Rate Primary Side
             CFMSec = EvapCond(EvapCoolNum).IndirectVolFlowRate; // Volume Flolw Rate Secondary Side
 
@@ -1868,7 +1863,7 @@ namespace EvaporativeCoolers {
             //                  CALCULATE THE WET BULB TEMP in the primary system air USING PSYCH ROUTINES
             // There is a constant humidity ratio across the primary side but a reduction in the dry bulb temp
             EvapCond(EvapCoolNum).OuletWetBulbTemp =
-                PsyTwbFnTdbWPb(state, EvapCond(EvapCoolNum).OutletTemp, EvapCond(EvapCoolNum).InletHumRat, OutBaroPress);
+                PsyTwbFnTdbWPb(state, EvapCond(EvapCoolNum).OutletTemp, EvapCond(EvapCoolNum).InletHumRat, state.dataEnvrn->OutBaroPress);
             //***************************************************************************
             //   TEMP LEAVING DRY BULB IS CALCULATED FROM SATURATION EFFICIENCY AS THE
             //   DRY BULB TEMP APPROACHES THE WET BULB TEMP. WET BULB TEMP IS CONSTANT
@@ -2021,7 +2016,7 @@ namespace EvaporativeCoolers {
             //                  CALCULATE THE WET BULB TEMP in the primary system air using PSYCH ROUTINES
             // There is a constant humidity ratio across the primary side but a reduction in the dry bulb temp
             EvapCond(EvapCoolNum).OuletWetBulbTemp =
-                PsyTwbFnTdbWPb(state, EvapCond(EvapCoolNum).OutletTemp, EvapCond(EvapCoolNum).InletHumRat, OutBaroPress);
+                PsyTwbFnTdbWPb(state, EvapCond(EvapCoolNum).OutletTemp, EvapCond(EvapCoolNum).InletHumRat, state.dataEnvrn->OutBaroPress);
             //***************************************************************************
             //                  CALCULATE other outlet properties using PSYCH ROUTINES
             EvapCond(EvapCoolNum).OutletHumRat = EvapCond(EvapCoolNum).InletHumRat;
@@ -2050,7 +2045,7 @@ namespace EvaporativeCoolers {
             //             H2O [m3/s] = (QHX [J/s])/(2,500,000 [J/kgWater] * RhoWater [kgWater/m3])
             //******************
             //***** FIRST calculate the heat exchange on the primary air side**********
-            RhoAir = PsyRhoAirFnPbTdbW(state, OutBaroPress, EvapCond(EvapCoolNum).InletTemp, EvapCond(EvapCoolNum).InletHumRat);
+            RhoAir = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, EvapCond(EvapCoolNum).InletTemp, EvapCond(EvapCoolNum).InletHumRat);
             QHX = PartLoadRatio * CFMAir * RhoAir * (EvapCond(EvapCoolNum).InletEnthalpy - EvapCond(EvapCoolNum).OutletEnthalpy);
 
             RhoWater = RhoH2O(EvapCond(EvapCoolNum).SecInletTemp);
@@ -2209,9 +2204,6 @@ namespace EvaporativeCoolers {
 
         // Using/Aliasing
         using CurveManager::CurveValue;
-        using DataEnvironment::OutBaroPress;
-        using DataEnvironment::OutDryBulbTemp;
-
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -2284,8 +2276,8 @@ namespace EvaporativeCoolers {
             TertNode = EvapCond(EvapCoolNum).TertiaryInletNode;
             if (TertNode == 0) {
                 SecondaryInletDryBulbTemp = EvapCond(EvapCoolNum).SecInletTemp;
-                SecondaryInletWetBulbTemp = PsyTwbFnTdbWPb(state, EvapCond(EvapCoolNum).SecInletTemp, EvapCond(EvapCoolNum).SecInletHumRat, OutBaroPress);
-                SecondaryInletDewPointTemp = PsyTdpFnTdbTwbPb(state, EvapCond(EvapCoolNum).SecInletTemp, SecondaryInletWetBulbTemp, OutBaroPress);
+                SecondaryInletWetBulbTemp = PsyTwbFnTdbWPb(state, EvapCond(EvapCoolNum).SecInletTemp, EvapCond(EvapCoolNum).SecInletHumRat, state.dataEnvrn->OutBaroPress);
+                SecondaryInletDewPointTemp = PsyTdpFnTdbTwbPb(state, EvapCond(EvapCoolNum).SecInletTemp, SecondaryInletWetBulbTemp, state.dataEnvrn->OutBaroPress);
                 SecondaryInletHumRatio = EvapCond(EvapCoolNum).SecInletHumRat;
 
             } else {
@@ -2295,7 +2287,7 @@ namespace EvaporativeCoolers {
                 TertHumRate = Node(TertNode).HumRat;
                 TertTemp = Node(TertNode).Temp;
                 // is Node pressure available or better? using outdoor pressure for now
-                TertRho = PsyRhoAirFnPbTdbW(state, OutBaroPress, TertTemp, TertHumRate);
+                TertRho = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, TertTemp, TertHumRate);
                 TertVdot = TertMdot / TertRho;
 
                 SecVdot = TotalVolFlow - TertVdot;
@@ -2303,13 +2295,13 @@ namespace EvaporativeCoolers {
                 if (SecVdot < 0.0) { // all tertiary/releif air e.g. econonizer wide open
                     SecVdot = 0.0;
                     SecondaryInletDryBulbTemp = TertTemp;
-                    SecondaryInletWetBulbTemp = PsyTwbFnTdbWPb(state, TertTemp, TertHumRate, OutBaroPress);
-                    SecondaryInletDewPointTemp = PsyTdpFnTdbTwbPb(state, TertTemp, SecondaryInletWetBulbTemp, OutBaroPress);
+                    SecondaryInletWetBulbTemp = PsyTwbFnTdbWPb(state, TertTemp, TertHumRate, state.dataEnvrn->OutBaroPress);
+                    SecondaryInletDewPointTemp = PsyTdpFnTdbTwbPb(state, TertTemp, SecondaryInletWetBulbTemp, state.dataEnvrn->OutBaroPress);
                     SecondaryInletHumRatio = TertHumRate;
                 } else {
 
                     // First determine mass flow of OA,  in secondary
-                    SecRho = PsyRhoAirFnPbTdbW(state, OutBaroPress, EvapCond(EvapCoolNum).SecInletTemp, EvapCond(EvapCoolNum).SecInletHumRat);
+                    SecRho = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, EvapCond(EvapCoolNum).SecInletTemp, EvapCond(EvapCoolNum).SecInletHumRat);
                     SecMdot = SecRho * SecVdot;
                     // Mass balance on moisture to get outlet air humidity ratio
                     // this mixing takes place before wet media.
@@ -2326,8 +2318,8 @@ namespace EvaporativeCoolers {
 
                     PurgeTemp = PsyTdbFnHW(PurgeEnthalpy, PurgeHumRat);
                     SecondaryInletDryBulbTemp = PurgeTemp;
-                    SecondaryInletWetBulbTemp = PsyTwbFnTdbWPb(state, PurgeTemp, PurgeHumRat, OutBaroPress);
-                    SecondaryInletDewPointTemp = PsyTdpFnTdbTwbPb(state, PurgeTemp, SecondaryInletWetBulbTemp, OutBaroPress);
+                    SecondaryInletWetBulbTemp = PsyTwbFnTdbWPb(state, PurgeTemp, PurgeHumRat, state.dataEnvrn->OutBaroPress);
+                    SecondaryInletDewPointTemp = PsyTdpFnTdbTwbPb(state, PurgeTemp, SecondaryInletWetBulbTemp, state.dataEnvrn->OutBaroPress);
                     SecondaryInletHumRatio = PurgeHumRat;
                 }
             }
@@ -2382,7 +2374,7 @@ namespace EvaporativeCoolers {
                 //                  CALCULATE THE WET BULB TEMP in the primary system air using PSYCH ROUTINES
                 // There is a constant humidity ratio across the primary side but a reduction in the dry bulb temp
                 EvapCond(EvapCoolNum).OuletWetBulbTemp =
-                    PsyTwbFnTdbWPb(state, EvapCond(EvapCoolNum).OutletTemp, EvapCond(EvapCoolNum).InletHumRat, OutBaroPress);
+                    PsyTwbFnTdbWPb(state, EvapCond(EvapCoolNum).OutletTemp, EvapCond(EvapCoolNum).InletHumRat, state.dataEnvrn->OutBaroPress);
                 //***************************************************************************
                 //                  CALCULATE other outlet propertiesusing PSYCH ROUTINES
                 EvapCond(EvapCoolNum).OutletHumRat = EvapCond(EvapCoolNum).InletHumRat;
@@ -2393,10 +2385,10 @@ namespace EvaporativeCoolers {
                 //             H2O [m3/s] = (QHX [J/s])/(2,500,000 [J/kgWater] * RhoWater [kgWater/m3])
                 //******************
                 //***** FIRST calculate the heat exchange on the primary air side**********
-                RhoAir = PsyRhoAirFnPbTdbW(state, OutBaroPress, EvapCond(EvapCoolNum).InletTemp, EvapCond(EvapCoolNum).InletHumRat);
+                RhoAir = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, EvapCond(EvapCoolNum).InletTemp, EvapCond(EvapCoolNum).InletHumRat);
                 QHX = CFMAir * RhoAir * (EvapCond(EvapCoolNum).InletEnthalpy - EvapCond(EvapCoolNum).OutletEnthalpy);
 
-                RhoWater = RhoH2O(OutDryBulbTemp);
+                RhoWater = RhoH2O(state.dataEnvrn->OutDryBulbTemp);
                 EvapVdot = (QHX) / (2500000.0 * RhoWater);
                 DriftVdot = EvapVdot * EvapCond(EvapCoolNum).DriftFraction;
                 if (EvapCond(EvapCoolNum).BlowDownRatio > 0.0) {
@@ -2460,8 +2452,6 @@ namespace EvaporativeCoolers {
 
         // Using/Aliasing
         using CurveManager::CurveValue;
-        using DataEnvironment::OutBaroPress;
-        using DataEnvironment::OutDryBulbTemp;
         using DataHVACGlobals::SmallLoad;
 
         using General::SolveRoot;
@@ -2519,7 +2509,7 @@ namespace EvaporativeCoolers {
         TEDB = EvapCond(EvapCoolNum).InletTemp;
         TEWB = EvapCond(EvapCoolNum).InletWetBulbTemp;
         SysTempSetPoint = EvapCond(EvapCoolNum).DesiredOutletTemp;
-        SecRho = PsyRhoAirFnPbTdbW(state, OutBaroPress, InletDryBulbTempSec, InletHumRatioSec);
+        SecRho = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, InletDryBulbTempSec, InletHumRatioSec);
         MassFlowRateSecMax = SecRho * EvapCond(EvapCoolNum).IndirectVolFlowRate;
         CalcIndirectRDDEvapCoolerOutletTemp(state, EvapCoolNum, WetFull, MassFlowRateSecMax, InletDryBulbTempSec, InletWetBulbTempSec, InletHumRatioSec);
         TdbOutSysWetMin = EvapCond(EvapCoolNum).OutletTemp;
@@ -2797,10 +2787,10 @@ namespace EvaporativeCoolers {
         if (EvapCond(EvapCoolNum).EvapCoolerRDDOperatingMode != None) {
             // There is a constant humidity ratio across the primary side but a reduction in the dry bulb temp
             EvapCond(EvapCoolNum).OuletWetBulbTemp =
-                PsyTwbFnTdbWPb(state, EvapCond(EvapCoolNum).OutletTemp, EvapCond(EvapCoolNum).InletHumRat, OutBaroPress);
+                PsyTwbFnTdbWPb(state, EvapCond(EvapCoolNum).OutletTemp, EvapCond(EvapCoolNum).InletHumRat, state.dataEnvrn->OutBaroPress);
             EvapCond(EvapCoolNum).OutletHumRat = EvapCond(EvapCoolNum).InletHumRat;
             EvapCond(EvapCoolNum).OutletEnthalpy = PsyHFnTdbW(EvapCond(EvapCoolNum).OutletTemp, EvapCond(EvapCoolNum).OutletHumRat);
-            RhoAir = PsyRhoAirFnPbTdbW(state, OutBaroPress, EvapCond(EvapCoolNum).InletTemp, EvapCond(EvapCoolNum).InletHumRat);
+            RhoAir = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, EvapCond(EvapCoolNum).InletTemp, EvapCond(EvapCoolNum).InletHumRat);
             QHX = EvapCond(EvapCoolNum).VolFlowRate * RhoAir * (EvapCond(EvapCoolNum).InletEnthalpy - EvapCond(EvapCoolNum).OutletEnthalpy);
             if (QHX > SmallLoad) {
                 // get secondary air outlet condition
@@ -2813,7 +2803,7 @@ namespace EvaporativeCoolers {
                                                 InletHumRatioSec,
                                                 QHX,
                                                 QHXLatent);
-                RhoWater = RhoH2O(OutDryBulbTemp); // this if it is at the outside air inlet node condition
+                RhoWater = RhoH2O(state.dataEnvrn->OutDryBulbTemp); // this if it is at the outside air inlet node condition
                 hfg = PsyHfgAirFnWTdb(InletHumRatioSec, InletDryBulbTempSec);
                 EvapVdot = (QHXLatent) / (hfg * RhoWater);
                 DriftVdot = EvapVdot * EvapCond(EvapCoolNum).DriftFraction;
@@ -3026,8 +3016,8 @@ namespace EvaporativeCoolers {
             FlowRatio = 1.0;
         }
         if (AirMassFlowSec > 0.0) {
-            RhoAirSec = PsyRhoAirFnPbTdbW(state, OutBaroPress, EDBTSec, EHumRatSec);
-            RhoAirSys = PsyRhoAirFnPbTdbW(state, OutBaroPress, EvapCond(EvapCoolNum).InletTemp, EvapCond(EvapCoolNum).InletHumRat);
+            RhoAirSec = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, EDBTSec, EHumRatSec);
+            RhoAirSys = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, EvapCond(EvapCoolNum).InletTemp, EvapCond(EvapCoolNum).InletHumRat);
             if (DryOrWetOperatingMode == DryModulated || DryOrWetOperatingMode == DryFull) {
                 if (EvapCond(EvapCoolNum).DrybulbEffecCurveIndex > 0) {
                     EffModDryMode = CurveValue(state, EvapCond(EvapCoolNum).DrybulbEffecCurveIndex, FlowRatio);
@@ -3113,7 +3103,6 @@ namespace EvaporativeCoolers {
         // CalculateWaterUsage routine of cooling towers for wet operation mode
 
         // Using/Aliasing
-        using DataEnvironment::OutBaroPress;
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyHfgAirFnWTdb;
         using Psychrometrics::PsyWFnTdbH;
@@ -3144,14 +3133,14 @@ namespace EvaporativeCoolers {
                 CpAirSec = PsyCpAirFnW(EHumRatSec);
                 EvapCond(EvapCoolNum).SecOutletTemp = EDBTSec + QHXTotal / AirMassFlowSec / CpAirSec;
                 EvapCond(EvapCoolNum).SecOutletEnthalpy = PsyHFnTdbW(EvapCond(EvapCoolNum).SecOutletTemp, EHumRatSec);
-                EvapCond(EvapCoolNum).SecOuletWetBulbTemp = PsyTwbFnTdbWPb(state, EvapCond(EvapCoolNum).SecOutletTemp, EHumRatSec, OutBaroPress);
+                EvapCond(EvapCoolNum).SecOuletWetBulbTemp = PsyTwbFnTdbWPb(state, EvapCond(EvapCoolNum).SecOutletTemp, EHumRatSec, state.dataEnvrn->OutBaroPress);
             } else if ((OperatingMode == WetModulated || OperatingMode == WetFull)) {
                 SecOutletEnthalpy = EvapCond(EvapCoolNum).SecInletEnthalpy + QHXTotal / AirMassFlowSec;
                 SecOutletAirHumRat = PsyWFnTdbH(state, EDBTSec, SecOutletEnthalpy); // assumes a constant temperature moisture addition
                 EvapCond(EvapCoolNum).SecOutletTemp = EDBTSec;
                 EvapCond(EvapCoolNum).SecOutletHumRat = SecOutletAirHumRat;
                 EvapCond(EvapCoolNum).SecOutletEnthalpy = SecOutletEnthalpy;
-                EvapCond(EvapCoolNum).SecOuletWetBulbTemp = PsyTwbFnTdbWPb(state, EvapCond(EvapCoolNum).SecOutletTemp, SecOutletAirHumRat, OutBaroPress);
+                EvapCond(EvapCoolNum).SecOuletWetBulbTemp = PsyTwbFnTdbWPb(state, EvapCond(EvapCoolNum).SecOutletTemp, SecOutletAirHumRat, state.dataEnvrn->OutBaroPress);
                 hfg = PsyHfgAirFnWTdb(EHumRatSec, EDBTSec);
                 QHXLatent = min(QHXTotal, AirMassFlowSec * (SecOutletAirHumRat - EHumRatSec) * hfg);
             } else {
@@ -3332,27 +3321,27 @@ namespace EvaporativeCoolers {
             if (PartLoad == 1.0) {
                 EvapCond(EvapCoolNum).OutletTemp = TEDB - ((TEDB - TEWB) * SatEff);
                 EvapCond(EvapCoolNum).OuletWetBulbTemp = TEWB;
-                EvapCond(EvapCoolNum).OutletHumRat = PsyWFnTdbTwbPb(state, EvapCond(EvapCoolNum).OutletTemp, TEWB, OutBaroPress);
+                EvapCond(EvapCoolNum).OutletHumRat = PsyWFnTdbTwbPb(state, EvapCond(EvapCoolNum).OutletTemp, TEWB, state.dataEnvrn->OutBaroPress);
                 EvapCond(EvapCoolNum).OutletEnthalpy = PsyHFnTdbW(EvapCond(EvapCoolNum).OutletTemp, EvapCond(EvapCoolNum).OutletHumRat);
             } else if ((PartLoad < 1.0) && (PartLoad > 0.0)) {
                 // assume perfect control Use PLF for energy consumption
                 if (EvapCond(EvapCoolNum).DesiredOutletTemp < TEDB) {
                     EvapCond(EvapCoolNum).OutletTemp = EvapCond(EvapCoolNum).DesiredOutletTemp;
                     EvapCond(EvapCoolNum).OuletWetBulbTemp = TEWB;
-                    EvapCond(EvapCoolNum).OutletHumRat = PsyWFnTdbTwbPb(state, EvapCond(EvapCoolNum).OutletTemp, TEWB, OutBaroPress);
+                    EvapCond(EvapCoolNum).OutletHumRat = PsyWFnTdbTwbPb(state, EvapCond(EvapCoolNum).OutletTemp, TEWB, state.dataEnvrn->OutBaroPress);
 
                     EvapCond(EvapCoolNum).OutletEnthalpy = PsyHFnTdbW(EvapCond(EvapCoolNum).OutletTemp, EvapCond(EvapCoolNum).OutletHumRat);
                 } else { // do no cooling
                     EvapCond(EvapCoolNum).OutletTemp = TEDB;
                     EvapCond(EvapCoolNum).OuletWetBulbTemp = TEWB;
-                    EvapCond(EvapCoolNum).OutletHumRat = PsyWFnTdbTwbPb(state, EvapCond(EvapCoolNum).OutletTemp, TEWB, OutBaroPress);
+                    EvapCond(EvapCoolNum).OutletHumRat = PsyWFnTdbTwbPb(state, EvapCond(EvapCoolNum).OutletTemp, TEWB, state.dataEnvrn->OutBaroPress);
                     EvapCond(EvapCoolNum).OutletEnthalpy = PsyHFnTdbW(EvapCond(EvapCoolNum).OutletTemp, EvapCond(EvapCoolNum).OutletHumRat);
                 }
             } else {
                 // part load set to zero so no cooling
                 EvapCond(EvapCoolNum).OutletTemp = TEDB;
                 EvapCond(EvapCoolNum).OuletWetBulbTemp = TEWB;
-                EvapCond(EvapCoolNum).OutletHumRat = PsyWFnTdbTwbPb(state, EvapCond(EvapCoolNum).OutletTemp, TEWB, OutBaroPress);
+                EvapCond(EvapCoolNum).OutletHumRat = PsyWFnTdbTwbPb(state, EvapCond(EvapCoolNum).OutletTemp, TEWB, state.dataEnvrn->OutBaroPress);
                 EvapCond(EvapCoolNum).OutletEnthalpy = PsyHFnTdbW(EvapCond(EvapCoolNum).OutletTemp, EvapCond(EvapCoolNum).OutletHumRat);
             }
 
@@ -3425,30 +3414,8 @@ namespace EvaporativeCoolers {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine needs a description.
-
-        // METHODOLOGY EMPLOYED:
-        // Needs description, as appropriate.
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using namespace DataWater;
-        using DataContaminantBalance::Contaminant;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int OutletNode;
@@ -3502,11 +3469,11 @@ namespace EvaporativeCoolers {
             }
         }
 
-        if (Contaminant.CO2Simulation) {
+        if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
             Node(OutletNode).CO2 = Node(InletNode).CO2;
         }
 
-        if (Contaminant.GenericContamSimulation) {
+        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
             Node(OutletNode).GenContam = Node(InletNode).GenContam;
         }
     }
@@ -4087,7 +4054,6 @@ namespace EvaporativeCoolers {
         // na
 
         // Using/Aliasing
-        using DataEnvironment::StdRhoAir;
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::ZoneComp;
         using DataSizing::AutoSize;
@@ -4201,7 +4167,7 @@ namespace EvaporativeCoolers {
         // Do the Begin Environment initializations
         if (state.dataGlobal->BeginEnvrnFlag && ZoneEvapUnit(UnitNum).MyEnvrn) {
 
-            ZoneEvapUnit(UnitNum).DesignAirMassFlowRate = StdRhoAir * ZoneEvapUnit(UnitNum).DesignAirVolumeFlowRate;
+            ZoneEvapUnit(UnitNum).DesignAirMassFlowRate = state.dataEnvrn->StdRhoAir * ZoneEvapUnit(UnitNum).DesignAirVolumeFlowRate;
             Node(ZoneEvapUnit(UnitNum).OAInletNodeNum).MassFlowRateMax = ZoneEvapUnit(UnitNum).DesignAirMassFlowRate;
             Node(ZoneEvapUnit(UnitNum).OAInletNodeNum).MassFlowRateMin = 0.0;
             Node(ZoneEvapUnit(UnitNum).OAInletNodeNum).MassFlowRateMinAvail = 0.0;

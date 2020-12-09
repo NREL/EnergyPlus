@@ -222,7 +222,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFil
     // Process inputs
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataEnvironment::StdRhoAir = 1.2;
+    state->dataEnvrn->StdRhoAir = 1.2;
 
     // Run CheckAndReadFaults which will call GetFanInput if not done yet
     EXPECT_NO_THROW(CheckAndReadFaults(*state));
@@ -311,7 +311,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFil
     // Process inputs
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataEnvironment::StdRhoAir = 1.2;
+    state->dataEnvrn->StdRhoAir = 1.2;
 
     // Run CheckAndReadFaults which will call GetFanInput if not done yet
     EXPECT_NO_THROW(CheckAndReadFaults(*state));
@@ -899,8 +899,8 @@ TEST_F(EnergyPlusFixture, FaultsManager_FoulingCoil_AssignmentAndCalc)
     // Read schedule values
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->HourOfDay = 1;
-    DataEnvironment::DayOfWeek = 1;
-    DataEnvironment::DayOfYear_Schedule = 1;
+    state->dataEnvrn->DayOfWeek = 1;
+    state->dataEnvrn->DayOfYear_Schedule = 1;
     ScheduleManager::UpdateScheduleValues(*state);
 
     EXPECT_EQ(2, FaultsManager::NumFouledCoil);

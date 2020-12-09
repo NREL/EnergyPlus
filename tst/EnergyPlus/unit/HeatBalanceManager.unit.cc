@@ -542,8 +542,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     Node.allocate(8);
 
     // Avoid zero values in volume flow balance check
-    DataEnvironment::StdRhoAir = 1.2;
-    DataEnvironment::OutBaroPress = 100000.0;
+    state->dataEnvrn->StdRhoAir = 1.2;
+    state->dataEnvrn->OutBaroPress = 100000.0;
     Node(ZoneEquipConfig(1).ZoneNode).Temp = 20.0;
     Node(ZoneEquipConfig(1).ZoneNode).HumRat = 0.004;
     Node(ZoneEquipConfig(2).ZoneNode).Temp = 20.0;
@@ -1259,7 +1259,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
 
     // Set up
     OutAirNodeManager::GetOutAirNodesInput(*state);
-    DataEnvironment::OutBaroPress = 101325;
+    state->dataEnvrn->OutBaroPress = 101325;
     ScheduleManager::Schedule(1).CurrentValue = 25.0;
     ScheduleManager::Schedule(2).CurrentValue = 20.0;
     ScheduleManager::Schedule(3).CurrentValue = 1.5;
@@ -1288,10 +1288,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
     DataLoopNode::Node(1).OutAirWetBulbSchedNum = 0;
     DataLoopNode::Node(1).OutAirWindSpeedSchedNum = 0;
     DataLoopNode::Node(1).OutAirWindDirSchedNum = 0;
-    DataEnvironment::OutDryBulbTemp = 25.0;
-    DataEnvironment::OutWetBulbTemp = 20.0;
-    DataEnvironment::WindSpeed = 1.5;
-    DataEnvironment::WindDir = 90.0;
+    state->dataEnvrn->OutDryBulbTemp = 25.0;
+    state->dataEnvrn->OutWetBulbTemp = 20.0;
+    state->dataEnvrn->WindSpeed = 1.5;
+    state->dataEnvrn->WindDir = 90.0;
 
     InitHeatBalance(*state);
 
@@ -1585,7 +1585,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionTest)
     EXPECT_EQ(DataSurfaces::Surface(winSurfNum).Construction, win1ConstNum);
     Real64 transSol = DataSurfaces::SurfWinSysSolTransmittance(winSurfNum);
     EXPECT_GT(transSol, 0.8);
-    Real64 refPtIllum = DataDaylighting::ZoneDaylight(1).DaylIllumAtRefPt(1);
+    Real64 refPtIllum = state->dataDaylightingData->ZoneDaylight(1).DaylIllumAtRefPt(1);
     EXPECT_GT(refPtIllum, 3000.0);
 
     // Test 2 - Set time of day to afternoon - should use low transmittance window
@@ -1600,7 +1600,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionTest)
     EXPECT_EQ(DataSurfaces::Surface(winSurfNum).Construction, win2ConstNum);
     transSol = DataSurfaces::SurfWinSysSolTransmittance(winSurfNum);
     EXPECT_LT(transSol, 0.2);
-    refPtIllum = DataDaylighting::ZoneDaylight(1).DaylIllumAtRefPt(1);
+    refPtIllum = state->dataDaylightingData->ZoneDaylight(1).DaylIllumAtRefPt(1);
     EXPECT_LT(refPtIllum, 1000.0);
 }
 

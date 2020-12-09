@@ -3534,8 +3534,6 @@ namespace OutputReportTabular {
         // na
 
         // Using/Aliasing
-        using DataEnvironment::EnvironmentName;
-        using DataEnvironment::WeatherFileLocationTitle;
         using DataHeatBalance::BuildingName;
         using DataStringGlobals::VerString;
 
@@ -3569,10 +3567,10 @@ namespace OutputReportTabular {
                     tbl_stream << "Tabular Output Report in Format: " << curDel << "Comma\n";
                     tbl_stream << '\n';
                     tbl_stream << "Building:" << curDel << BuildingName << '\n';
-                    if (EnvironmentName == WeatherFileLocationTitle) {
-                        tbl_stream << "Environment:" << curDel << EnvironmentName << '\n';
+                    if (state.dataEnvrn->EnvironmentName == state.dataEnvrn->WeatherFileLocationTitle) {
+                        tbl_stream << "Environment:" << curDel << state.dataEnvrn->EnvironmentName << '\n';
                     } else {
-                        tbl_stream << "Environment:" << curDel << EnvironmentName << " ** " << WeatherFileLocationTitle << '\n';
+                        tbl_stream << "Environment:" << curDel << state.dataEnvrn->EnvironmentName << " ** " << state.dataEnvrn->WeatherFileLocationTitle << '\n';
                     }
                     tbl_stream << '\n';
                 } else if (TableStyle(iStyle) == tableStyleTab) {
@@ -3582,10 +3580,10 @@ namespace OutputReportTabular {
                     tbl_stream << "Tabular Output Report in Format: " << curDel << "Tab\n";
                     tbl_stream << '\n';
                     tbl_stream << "Building:" << curDel << BuildingName << '\n';
-                    if (EnvironmentName == WeatherFileLocationTitle) {
-                        tbl_stream << "Environment:" << curDel << EnvironmentName << '\n';
+                    if (state.dataEnvrn->EnvironmentName == state.dataEnvrn->WeatherFileLocationTitle) {
+                        tbl_stream << "Environment:" << curDel << state.dataEnvrn->EnvironmentName << '\n';
                     } else {
-                        tbl_stream << "Environment:" << curDel << EnvironmentName << " ** " << WeatherFileLocationTitle << '\n';
+                        tbl_stream << "Environment:" << curDel << state.dataEnvrn->EnvironmentName << " ** " << state.dataEnvrn->WeatherFileLocationTitle << '\n';
                     }
                     tbl_stream << '\n';
                 } else if (TableStyle(iStyle) == tableStyleHTML) {
@@ -3594,10 +3592,10 @@ namespace OutputReportTabular {
                     tbl_stream << "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\"http://www.w3.org/TR/html4/loose.dtd\">\n";
                     tbl_stream << "<html>\n";
                     tbl_stream << "<head>\n";
-                    if (EnvironmentName == WeatherFileLocationTitle) {
-                        tbl_stream << "<title> " << BuildingName << ' ' << EnvironmentName << '\n';
+                    if (state.dataEnvrn->EnvironmentName == state.dataEnvrn->WeatherFileLocationTitle) {
+                        tbl_stream << "<title> " << BuildingName << ' ' << state.dataEnvrn->EnvironmentName << '\n';
                     } else {
-                        tbl_stream << "<title> " << BuildingName << ' ' << EnvironmentName << " ** " << WeatherFileLocationTitle << '\n';
+                        tbl_stream << "<title> " << BuildingName << ' ' << state.dataEnvrn->EnvironmentName << " ** " << state.dataEnvrn->WeatherFileLocationTitle << '\n';
                     }
                     tbl_stream << "  " << std::setw(4) << td(1) << '-' << std::setfill('0') << std::setw(2) << td(2) << '-' << std::setw(2) << td(3)
                                << '\n';
@@ -3612,10 +3610,10 @@ namespace OutputReportTabular {
                     tbl_stream << "<p>Program Version:<b>" << VerString << "</b></p>\n";
                     tbl_stream << "<p>Tabular Output Report in Format: <b>HTML</b></p>\n";
                     tbl_stream << "<p>Building: <b>" << BuildingName << "</b></p>\n";
-                    if (EnvironmentName == WeatherFileLocationTitle) {
-                        tbl_stream << "<p>Environment: <b>" << EnvironmentName << "</b></p>\n";
+                    if (state.dataEnvrn->EnvironmentName == state.dataEnvrn->WeatherFileLocationTitle) {
+                        tbl_stream << "<p>Environment: <b>" << state.dataEnvrn->EnvironmentName << "</b></p>\n";
                     } else {
-                        tbl_stream << "<p>Environment: <b>" << EnvironmentName << " ** " << WeatherFileLocationTitle << "</b></p>\n";
+                        tbl_stream << "<p>Environment: <b>" << state.dataEnvrn->EnvironmentName << " ** " << state.dataEnvrn->WeatherFileLocationTitle << "</b></p>\n";
                     }
                     tbl_stream << "<p>Simulation Timestamp: <b>" << std::setw(4) << td(1) << '-' << std::setfill('0') << std::setw(2) << td(2) << '-'
                                << std::setw(2) << td(3) << '\n';
@@ -3627,8 +3625,8 @@ namespace OutputReportTabular {
                     tbl_stream << "<?xml version=\"1.0\"?>\n";
                     tbl_stream << "<EnergyPlusTabularReports>\n";
                     tbl_stream << "  <BuildingName>" << BuildingName << "</BuildingName>\n";
-                    tbl_stream << "  <EnvironmentName>" << EnvironmentName << "</EnvironmentName>\n";
-                    tbl_stream << "  <WeatherFileLocationTitle>" << WeatherFileLocationTitle << "</WeatherFileLocationTitle>\n";
+                    tbl_stream << "  <EnvironmentName>" << state.dataEnvrn->EnvironmentName << "</EnvironmentName>\n";
+                    tbl_stream << "  <WeatherFileLocationTitle>" << state.dataEnvrn->WeatherFileLocationTitle << "</WeatherFileLocationTitle>\n";
                     tbl_stream << "  <ProgramVersion>" << VerString << "</ProgramVersion>\n";
                     tbl_stream << "  <SimulationTimestamp>\n";
                     tbl_stream << "    <Date>\n";
@@ -3648,10 +3646,10 @@ namespace OutputReportTabular {
                     tbl_stream << "Tabular Output Report in Format: " << curDel << "Fixed\n";
                     tbl_stream << '\n';
                     tbl_stream << "Building:        " << BuildingName << '\n';
-                    if (EnvironmentName == WeatherFileLocationTitle) {
-                        tbl_stream << "Environment:     " << EnvironmentName << '\n';
+                    if (state.dataEnvrn->EnvironmentName == state.dataEnvrn->WeatherFileLocationTitle) {
+                        tbl_stream << "Environment:     " << state.dataEnvrn->EnvironmentName << '\n';
                     } else {
-                        tbl_stream << "Environment:     " << EnvironmentName << " ** " << WeatherFileLocationTitle << '\n';
+                        tbl_stream << "Environment:     " << state.dataEnvrn->EnvironmentName << " ** " << state.dataEnvrn->WeatherFileLocationTitle << '\n';
                     }
                     tbl_stream << '\n';
                 }
@@ -3925,7 +3923,6 @@ namespace OutputReportTabular {
         //   timestep to the appropriate bin.
 
         // Using/Aliasing
-        using DataEnvironment::Month;
         using DataHVACGlobals::TimeStepSys;
         using ScheduleManager::GetCurrentScheduleValue;
 
@@ -4015,15 +4012,15 @@ namespace OutputReportTabular {
                         // check if the value is above the maximum or below the minimum value
                         // first before binning the value within the range.
                         if (curValue < curIntervalStart) {
-                            BinResultsBelow(repIndex).mnth(Month) += elapsedTime;
+                            BinResultsBelow(repIndex).mnth(state.dataEnvrn->Month) += elapsedTime;
                             BinResultsBelow(repIndex).hrly(state.dataGlobal->HourOfDay) += elapsedTime;
                         } else if (curValue >= topValue) {
-                            BinResultsAbove(repIndex).mnth(Month) += elapsedTime;
+                            BinResultsAbove(repIndex).mnth(state.dataEnvrn->Month) += elapsedTime;
                             BinResultsAbove(repIndex).hrly(state.dataGlobal->HourOfDay) += elapsedTime;
                         } else {
                             // determine which bin the results are in
                             binNum = int((curValue - curIntervalStart) / curIntervalSize) + 1;
-                            BinResults(binNum, repIndex).mnth(Month) += elapsedTime;
+                            BinResults(binNum, repIndex).mnth(state.dataEnvrn->Month) += elapsedTime;
                             BinResults(binNum, repIndex).hrly(state.dataGlobal->HourOfDay) += elapsedTime;
                         }
                         // add to statistics array
@@ -4055,8 +4052,6 @@ namespace OutputReportTabular {
         //   holding the data that will be reported later.
 
         // Using/Aliasing
-        using DataEnvironment::DayOfMonth;
-        using DataEnvironment::Month;
         using DataHVACGlobals::TimeStepSys;
         using General::DetermineMinuteForReporting;
         using General::EncodeMonDayHrMin;
@@ -4144,7 +4139,7 @@ namespace OutputReportTabular {
         } else {
             elapsedTime = state.dataGlobal->TimeStepZone;
         }
-        IsMonthGathered(Month) = true;
+        IsMonthGathered(state.dataEnvrn->Month) = true;
         for (iTable = 1; iTable <= MonthlyTablesCount; ++iTable) {
             activeMinMax = false;     // at the beginning of the new timestep
             activeHoursShown = false; // fix by JG addressing CR6482
@@ -4162,9 +4157,9 @@ namespace OutputReportTabular {
                     curVarNum = MonthlyColumnsVarNum(curCol);
                     curValue = GetInternalVariableValue(state, curTypeOfVar, curVarNum);
                     // Get the value from the result array
-                    oldResultValue = MonthlyColumns(curCol).reslt(Month);
-                    oldTimeStamp = MonthlyColumns(curCol).timeStamp(Month);
-                    oldDuration = MonthlyColumns(curCol).duration(Month);
+                    oldResultValue = MonthlyColumns(curCol).reslt(state.dataEnvrn->Month);
+                    oldTimeStamp = MonthlyColumns(curCol).timeStamp(state.dataEnvrn->Month);
+                    oldDuration = MonthlyColumns(curCol).duration(state.dataEnvrn->Month);
                     // Zero the revised values (as default if not set later in SELECT)
                     newResultValue = 0.0;
                     newTimeStamp = 0;
@@ -4175,7 +4170,7 @@ namespace OutputReportTabular {
                     //      minuteCalculated = (CurrentTime - INT(CurrentTime))*60
                     //      IF (t_timeStepType .EQ. OutputProcessor::TimeStepType::TimeStepSystem) minuteCalculated = minuteCalculated +
                     //      SysTimeElapsed * 60 minuteCalculated = INT((TimeStep-1) * TimeStepZone * 60) + INT((SysTimeElapsed + TimeStepSys) * 60)
-                    EncodeMonDayHrMin(timestepTimeStamp, Month, DayOfMonth, state.dataGlobal->HourOfDay, minuteCalculated);
+                    EncodeMonDayHrMin(timestepTimeStamp, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, minuteCalculated);
                     // perform the selected aggregation type
                     // use next lines since it is faster was: SELECT CASE (MonthlyColumns(curCol)%aggType)
                     {
@@ -4281,9 +4276,9 @@ namespace OutputReportTabular {
                     // new columns. This skips the aggregation types that don't even get
                     // triggered now such as valueWhenMinMax and all the agg*HoursShown
                     if (activeNewValue) {
-                        MonthlyColumns(curCol).reslt(Month) = newResultValue;
-                        MonthlyColumns(curCol).timeStamp(Month) = newTimeStamp;
-                        MonthlyColumns(curCol).duration(Month) = newDuration;
+                        MonthlyColumns(curCol).reslt(state.dataEnvrn->Month) = newResultValue;
+                        MonthlyColumns(curCol).timeStamp(state.dataEnvrn->Month) = newTimeStamp;
+                        MonthlyColumns(curCol).duration(state.dataEnvrn->Month) = newDuration;
                     }
                     // if a minimum or maximum value was set this timeStep then
                     // scan the remaining columns of the table looking for values
@@ -4311,7 +4306,7 @@ namespace OutputReportTabular {
                                             scanValue /= state.dataGlobal->TimeStepZoneSec;
                                         }
                                     }
-                                    MonthlyColumns(scanColumn).reslt(Month) = scanValue;
+                                    MonthlyColumns(scanColumn).reslt(state.dataEnvrn->Month) = scanValue;
                                 } else {
                                     // do nothing
                                 }
@@ -4326,7 +4321,7 @@ namespace OutputReportTabular {
                             scanTypeOfVar = MonthlyColumns(scanColumn).typeOfVar;
                             scanVarNum = MonthlyColumns(scanColumn).varNum;
                             scanValue = GetInternalVariableValue(state, scanTypeOfVar, scanVarNum);
-                            oldScanValue = MonthlyColumns(scanColumn).reslt(Month);
+                            oldScanValue = MonthlyColumns(scanColumn).reslt(state.dataEnvrn->Month);
                             {
                                 auto const SELECT_CASE_var(MonthlyColumns(scanColumn).aggType);
                                 if ((SELECT_CASE_var == aggTypeHoursZero) || (SELECT_CASE_var == aggTypeHoursNonZero)) {
@@ -4341,12 +4336,12 @@ namespace OutputReportTabular {
                                 } else if (SELECT_CASE_var == aggTypeSumOrAverageHoursShown) {
                                     // this case is when the value should be set
                                     if (MonthlyColumns(scanColumn).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
-                                        MonthlyColumns(scanColumn).reslt(Month) = oldScanValue + scanValue;
+                                        MonthlyColumns(scanColumn).reslt(state.dataEnvrn->Month) = oldScanValue + scanValue;
                                     } else {
                                         // for averaging - weight by elapsed time
-                                        MonthlyColumns(scanColumn).reslt(Month) = oldScanValue + scanValue * elapsedTime;
+                                        MonthlyColumns(scanColumn).reslt(state.dataEnvrn->Month) = oldScanValue + scanValue * elapsedTime;
                                     }
-                                    MonthlyColumns(scanColumn).duration(Month) += elapsedTime;
+                                    MonthlyColumns(scanColumn).duration(state.dataEnvrn->Month) += elapsedTime;
                                 } else if (SELECT_CASE_var == aggTypeMaximumDuringHoursShown) {
                                     if (MonthlyColumns(scanColumn).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
                                         if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) {
@@ -4356,8 +4351,8 @@ namespace OutputReportTabular {
                                         }
                                     }
                                     if (scanValue > oldScanValue) {
-                                        MonthlyColumns(scanColumn).reslt(Month) = scanValue;
-                                        MonthlyColumns(scanColumn).timeStamp(Month) = timestepTimeStamp;
+                                        MonthlyColumns(scanColumn).reslt(state.dataEnvrn->Month) = scanValue;
+                                        MonthlyColumns(scanColumn).timeStamp(state.dataEnvrn->Month) = timestepTimeStamp;
                                     }
                                 } else if (SELECT_CASE_var == aggTypeMinimumDuringHoursShown) {
                                     if (MonthlyColumns(scanColumn).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
@@ -4368,8 +4363,8 @@ namespace OutputReportTabular {
                                         }
                                     }
                                     if (scanValue < oldScanValue) {
-                                        MonthlyColumns(scanColumn).reslt(Month) = scanValue;
-                                        MonthlyColumns(scanColumn).timeStamp(Month) = timestepTimeStamp;
+                                        MonthlyColumns(scanColumn).reslt(state.dataEnvrn->Month) = scanValue;
+                                        MonthlyColumns(scanColumn).timeStamp(state.dataEnvrn->Month) = timestepTimeStamp;
                                     }
                                 } else {
                                     // do nothing
@@ -4716,8 +4711,6 @@ namespace OutputReportTabular {
         // na
 
         // Using/Aliasing
-        using DataEnvironment::DayOfMonth;
-        using DataEnvironment::Month;
         using DataStringGlobals::CharComma;
         using DataStringGlobals::CharSpace;
         using DataStringGlobals::CharTab;
@@ -4758,7 +4751,7 @@ namespace OutputReportTabular {
                         // save the time that the peak demand occurred
                         //        minuteCalculated = (CurrentTime - INT(CurrentTime))*60
                         minuteCalculated = DetermineMinuteForReporting(state, t_timeStepType);
-                        EncodeMonDayHrMin(timestepTimeStamp, Month, DayOfMonth, state.dataGlobal->HourOfDay, minuteCalculated);
+                        EncodeMonDayHrMin(timestepTimeStamp, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, minuteCalculated);
                         gatherDemandTimeStamp(iResource) = timestepTimeStamp;
                         // if new peak demand is set, then gather all of the end use values at this particular
                         // time to find the components of the peak demand
@@ -4854,7 +4847,6 @@ namespace OutputReportTabular {
         // the output variables and data structures shown.
 
         // Using/Aliasing
-        using DataEnvironment::WeatherFileLocationTitle;
         using DataHeatBalance::BuildingPreDefRep;
         using DataHeatBalance::NumRefrigCondensers;
         using DataHeatBalance::NumRefrigeratedRacks;
@@ -4892,8 +4884,8 @@ namespace OutputReportTabular {
         static int iTank(0);
         static int iRef(0);
 
-        static Real64 H2OHtOfVap_HVAC = Psychrometrics::PsyHgAirFnWTdb(DataEnvironment::OutHumRat, DataEnvironment::OutDryBulbTemp);
-        static Real64 RhoWater = Psychrometrics::RhoH2O(DataEnvironment::OutDryBulbTemp);
+        static Real64 H2OHtOfVap_HVAC = Psychrometrics::PsyHgAirFnWTdb(state.dataEnvrn->OutHumRat, state.dataEnvrn->OutDryBulbTemp);
+        static Real64 RhoWater = Psychrometrics::RhoH2O(state.dataEnvrn->OutDryBulbTemp);
         Real64 TimeStepSysSec = TimeStepSys * DataGlobalConstants::SecInHour();
         SysTotalHVACReliefHeatLoss = 0;
         SysTotalHVACRejectHeatLoss = 0;
@@ -5117,10 +5109,6 @@ namespace OutputReportTabular {
         // The peak reports follow a similar example.
 
         // Using/Aliasing
-        using DataDefineEquip::AirDistUnit;
-        using DataDefineEquip::NumAirDistUnits;
-        using DataEnvironment::DayOfMonth;
-        using DataEnvironment::Month;
         using DataHeatBalance::BuildingPreDefRep;
         using DataHeatBalance::ZnAirRpt;
         using DataHeatBalance::ZnRpt;
@@ -5186,14 +5174,14 @@ namespace OutputReportTabular {
         //--------------------
         // HVAC annual heating by ATU
         // HVAC annual cooling by ATU
-        for (iunit = 1; iunit <= NumAirDistUnits; ++iunit) {
+        for (iunit = 1; iunit <= state.dataDefineEquipment->NumAirDistUnits; ++iunit) {
             // HVAC equipment should already have the multipliers included, no "* mult" needed (assumes autosized or multiplied hard-sized air flow).
-            curZone = AirDistUnit(iunit).ZoneNum;
+            curZone = state.dataDefineEquipment->AirDistUnit(iunit).ZoneNum;
             if ((curZone > 0) && (curZone <= state.dataGlobal->NumOfZones)) {
-                ZonePreDefRep(curZone).SHGSAnHvacATUHt += AirDistUnit(iunit).HeatGain;
-                ZonePreDefRep(curZone).SHGSAnHvacATUCl -= AirDistUnit(iunit).CoolGain;
-                ATUHeat(curZone) += AirDistUnit(iunit).HeatRate;
-                ATUCool(curZone) -= AirDistUnit(iunit).CoolRate;
+                ZonePreDefRep(curZone).SHGSAnHvacATUHt += state.dataDefineEquipment->AirDistUnit(iunit).HeatGain;
+                ZonePreDefRep(curZone).SHGSAnHvacATUCl -= state.dataDefineEquipment->AirDistUnit(iunit).CoolGain;
+                ATUHeat(curZone) += state.dataDefineEquipment->AirDistUnit(iunit).HeatRate;
+                ATUCool(curZone) -= state.dataDefineEquipment->AirDistUnit(iunit).CoolRate;
             }
         }
         timeStepRatio = TimeStepSys / state.dataGlobal->TimeStepZone; // the fraction of the zone time step used by the system timestep
@@ -5317,7 +5305,7 @@ namespace OutputReportTabular {
                     //      ActualTimeHrS=INT(ActualTimeS)
                     //      ActualTimeMin=NINT((ActualtimeE - ActualTimeHrS)*FracToMin)
                     ActualTimeMin = DetermineMinuteForReporting(state, t_timeStepType);
-                    EncodeMonDayHrMin(timestepTimeStamp, Month, DayOfMonth, state.dataGlobal->HourOfDay, ActualTimeMin);
+                    EncodeMonDayHrMin(timestepTimeStamp, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, ActualTimeMin);
                     ZonePreDefRep(iZone).htPtTimeStamp = timestepTimeStamp;
                     // HVAC Input Sensible Air Heating
                     // HVAC Input Sensible Air Cooling
@@ -5396,7 +5384,7 @@ namespace OutputReportTabular {
                     //      ActualTimeHrS=INT(ActualTimeS)
                     //      ActualTimeMin=NINT((ActualtimeE - ActualTimeHrS)*FracToMin)
                     ActualTimeMin = DetermineMinuteForReporting(state, t_timeStepType);
-                    EncodeMonDayHrMin(timestepTimeStamp, Month, DayOfMonth, state.dataGlobal->HourOfDay, ActualTimeMin);
+                    EncodeMonDayHrMin(timestepTimeStamp, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, ActualTimeMin);
                     ZonePreDefRep(iZone).clPtTimeStamp = timestepTimeStamp;
                     // HVAC Input Sensible Air Heating
                     // HVAC Input Sensible Air Cooling
@@ -5487,7 +5475,7 @@ namespace OutputReportTabular {
             //  ActualTimeHrS=INT(ActualTimeS)
             //  ActualTimeMin=NINT((ActualtimeE - ActualTimeHrS)*FracToMin)
             ActualTimeMin = DetermineMinuteForReporting(state, t_timeStepType);
-            EncodeMonDayHrMin(timestepTimeStamp, Month, DayOfMonth, state.dataGlobal->HourOfDay, ActualTimeMin);
+            EncodeMonDayHrMin(timestepTimeStamp, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, ActualTimeMin);
             BuildingPreDefRep.htPtTimeStamp = timestepTimeStamp;
             // reset building level results to zero prior to accumulating across zones
             BuildingPreDefRep.SHGSHtHvacHt = 0.0;
@@ -5575,7 +5563,7 @@ namespace OutputReportTabular {
             //  ActualTimeHrS=INT(ActualTimeS)
             //  ActualTimeMin=NINT((ActualtimeE - ActualTimeHrS)*FracToMin)
             ActualTimeMin = DetermineMinuteForReporting(state, t_timeStepType);
-            EncodeMonDayHrMin(timestepTimeStamp, Month, DayOfMonth, state.dataGlobal->HourOfDay, ActualTimeMin);
+            EncodeMonDayHrMin(timestepTimeStamp, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, ActualTimeMin);
             BuildingPreDefRep.clPtTimeStamp = timestepTimeStamp;
             // reset building level results to zero prior to accumulating across zones
             BuildingPreDefRep.SHGSClHvacHt = 0.0;
@@ -6397,10 +6385,6 @@ namespace OutputReportTabular {
         //   any additional report entries for the predefined reports.
 
         // Using/Aliasing
-        using DataEnvironment::CurrentYearIsLeapYear;
-        using DataEnvironment::EnvironmentName;
-        using DataEnvironment::RunPeriodStartDayOfWeek;
-        using DataEnvironment::WeatherFileLocationTitle;
         using DataHeatBalance::BuildingPreDefRep;
         using DataHeatBalance::Lights;
         using DataHeatBalance::TotLights;
@@ -6449,7 +6433,7 @@ namespace OutputReportTabular {
         static Real64 totalInfilRem(0.0);
         static Real64 totalOtherRem(0.0);
 
-        StartOfWeek = RunPeriodStartDayOfWeek;
+        StartOfWeek = state.dataEnvrn->RunPeriodStartDayOfWeek;
         if (StartOfWeek == 0) StartOfWeek = 2; // if the first day of the week has not been set yet, assume monday
 
         // Interior Connected Lighting Power
@@ -6463,7 +6447,7 @@ namespace OutputReportTabular {
                 PreDefTableEntry(pdchInLtCond, Lights(iLight).Name, "N");
             }
             PreDefTableEntry(
-                pdchInLtAvgHrSchd, Lights(iLight).Name, ScheduleAverageHoursPerWeek(state, Lights(iLight).SchedPtr, StartOfWeek, CurrentYearIsLeapYear));
+                pdchInLtAvgHrSchd, Lights(iLight).Name, ScheduleAverageHoursPerWeek(state, Lights(iLight).SchedPtr, StartOfWeek, state.dataEnvrn->CurrentYearIsLeapYear));
             // average operating hours per week
             if (gatherElapsedTimeBEPS > 0) {
                 HrsPerWeek = 24 * 7 * Lights(iLight).SumTimeNotZeroCons / gatherElapsedTimeBEPS;
@@ -6485,7 +6469,7 @@ namespace OutputReportTabular {
             if (state.dataExteriorEnergyUse->ExteriorLights(iLight).ControlMode == ExteriorEnergyUse::LightControlType::ScheduleOnly) { // photocell/schedule
                 PreDefTableEntry(pdchExLtAvgHrSchd,
                                  state.dataExteriorEnergyUse->ExteriorLights(iLight).Name,
-                                 ScheduleAverageHoursPerWeek(state, state.dataExteriorEnergyUse->ExteriorLights(iLight).SchedPtr, StartOfWeek, CurrentYearIsLeapYear));
+                                 ScheduleAverageHoursPerWeek(state, state.dataExteriorEnergyUse->ExteriorLights(iLight).SchedPtr, StartOfWeek, state.dataEnvrn->CurrentYearIsLeapYear));
             }
             // average operating hours per week
             if (gatherElapsedTimeBEPS > 0) {
@@ -6764,10 +6748,10 @@ namespace OutputReportTabular {
         // LEED Report
         // 1.1A-General Information
         // CALL PreDefTableEntry(pdchLeedGenData,'Principal Heating Source','-')
-        if (EnvironmentName == WeatherFileLocationTitle) {
-            PreDefTableEntry(pdchLeedGenData, "Weather File", EnvironmentName);
+        if (state.dataEnvrn->EnvironmentName == state.dataEnvrn->WeatherFileLocationTitle) {
+            PreDefTableEntry(pdchLeedGenData, "Weather File", state.dataEnvrn->EnvironmentName);
         } else {
-            PreDefTableEntry(pdchLeedGenData, "Weather File", EnvironmentName + " ** " + WeatherFileLocationTitle);
+            PreDefTableEntry(pdchLeedGenData, "Weather File", state.dataEnvrn->EnvironmentName + " ** " + state.dataEnvrn->WeatherFileLocationTitle);
         }
 
         // CALL PreDefTableEntry(pdchLeedGenData,'Climate Zone','-')
@@ -6784,9 +6768,9 @@ namespace OutputReportTabular {
             std::string curSchType = ScheduleManager::GetScheduleType(state, iSch);
             if (UtilityRoutines::SameString(curSchType, "FRACTION")) {
                 PreDefTableEntry(
-                    pdchLeedEflhEflh, curSchName, ScheduleManager::ScheduleAnnualFullLoadHours(state, iSch, StartOfWeek, CurrentYearIsLeapYear), 0);
+                    pdchLeedEflhEflh, curSchName, ScheduleManager::ScheduleAnnualFullLoadHours(state, iSch, StartOfWeek, state.dataEnvrn->CurrentYearIsLeapYear), 0);
                 PreDefTableEntry(
-                    pdchLeedEflhNonZerHrs, curSchName, ScheduleManager::ScheduleHoursGT1perc(state, iSch, StartOfWeek, CurrentYearIsLeapYear), 0);
+                    pdchLeedEflhNonZerHrs, curSchName, ScheduleManager::ScheduleHoursGT1perc(state, iSch, StartOfWeek, state.dataEnvrn->CurrentYearIsLeapYear), 0);
             }
         }
         // fill the LEED setpoint table
@@ -10255,13 +10239,6 @@ namespace OutputReportTabular {
         // na
 
         // Using/Aliasing
-        using DataEnvironment::Elevation;
-        using DataEnvironment::EnvironmentName;
-        using DataEnvironment::Latitude;
-        using DataEnvironment::Longitude;
-        using DataEnvironment::RunPeriodStartDayOfWeek;
-        using DataEnvironment::TimeZoneNumber;
-        using DataEnvironment::WeatherFileLocationTitle;
         using DataHeatBalance::BuildingAzimuth;
         using DataHeatBalance::BuildingRotationAppendixG;
         using DataHeatBalance::Lights;
@@ -10479,12 +10456,12 @@ namespace OutputReportTabular {
             tableBody = "";
 
             tableBody(1, 1) = VerString;                               // program
-            tableBody(1, 2) = EnvironmentName;                         // runperiod name
-            tableBody(1, 3) = WeatherFileLocationTitle;                // weather
-            tableBody(1, 4) = RealToStr(Latitude, 2);                  // latitude
-            tableBody(1, 5) = RealToStr(Longitude, 2);                 // longitude
-            tableBody(1, 6) = RealToStr(Elevation * m_unitConv, 2);    // Elevation
-            tableBody(1, 7) = RealToStr(TimeZoneNumber, 2);            // Time Zone
+            tableBody(1, 2) = state.dataEnvrn->EnvironmentName;                         // runperiod name
+            tableBody(1, 3) = state.dataEnvrn->WeatherFileLocationTitle;                // weather
+            tableBody(1, 4) = RealToStr(state.dataEnvrn->Latitude, 2);                  // latitude
+            tableBody(1, 5) = RealToStr(state.dataEnvrn->Longitude, 2);                 // longitude
+            tableBody(1, 6) = RealToStr(state.dataEnvrn->Elevation * m_unitConv, 2);    // Elevation
+            tableBody(1, 7) = RealToStr(state.dataEnvrn->TimeZoneNumber, 2);            // Time Zone
             tableBody(1, 8) = RealToStr(BuildingAzimuth, 2);           // north axis angle
             tableBody(1, 9) = RealToStr(BuildingRotationAppendixG, 2); // Rotation for Appendix G
             tableBody(1, 10) = RealToStr(gatherElapsedTimeBEPS, 2);    // hours simulated
@@ -11341,7 +11318,7 @@ namespace OutputReportTabular {
         using DataHeatBalFanSys::ZoneLightingLevelOccuHourBins;
 
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-            if (DataDaylighting::ZoneDaylight(ZoneNum).DaylightMethod == DataDaylighting::NoDaylighting) {
+            if (state.dataDaylightingData->ZoneDaylight(ZoneNum).DaylightMethod == DataDaylighting::iDaylightingMethod::NoDaylighting) {
                 if (displayVisualResilienceSummaryExplicitly) {
                     ShowWarningError(state, "Writing Annual Visual Resilience Summary - Lighting Level Hours reports: "
                                      "Zone Average Daylighting Reference Point Illuminance output is required, "
@@ -12240,8 +12217,6 @@ namespace OutputReportTabular {
         // USE STATEMENTS:
         // na
         // Using/Aliasing
-        using DataEnvironment::TotDesDays;
-        using DataEnvironment::TotRunDesPersDays;
         using DataSurfaces::TotSurfaces;
 
         // Locals
@@ -12261,79 +12236,79 @@ namespace OutputReportTabular {
 
         if (AllocateLoadComponentArraysDoAllocate) {
             // For many of the following arrays the last dimension is the number of environments and is same as sizing arrays
-            radiantPulseTimestep.allocate({0, TotDesDays + TotRunDesPersDays}, state.dataGlobal->NumOfZones);
+            radiantPulseTimestep.allocate({0, state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays}, state.dataGlobal->NumOfZones);
             radiantPulseTimestep = 0;
-            radiantPulseReceived.allocate({0, TotDesDays + TotRunDesPersDays}, TotSurfaces);
+            radiantPulseReceived.allocate({0, state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays}, TotSurfaces);
             radiantPulseReceived = 0.0;
-            loadConvectedNormal.allocate(TotDesDays + TotRunDesPersDays, {0, state.dataGlobal->NumOfTimeStepInHour * 24}, TotSurfaces);
+            loadConvectedNormal.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, {0, state.dataGlobal->NumOfTimeStepInHour * 24}, TotSurfaces);
             loadConvectedNormal = 0.0;
-            loadConvectedWithPulse.allocate(TotDesDays + TotRunDesPersDays, {0, state.dataGlobal->NumOfTimeStepInHour * 24}, TotSurfaces);
+            loadConvectedWithPulse.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, {0, state.dataGlobal->NumOfTimeStepInHour * 24}, TotSurfaces);
             loadConvectedWithPulse = 0.0;
-            netSurfRadSeq.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, TotSurfaces);
+            netSurfRadSeq.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, TotSurfaces);
             netSurfRadSeq = 0.0;
             decayCurveCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24, TotSurfaces);
             decayCurveCool = 0.0;
             decayCurveHeat.allocate(state.dataGlobal->NumOfTimeStepInHour * 24, TotSurfaces);
             decayCurveHeat = 0.0;
-            ITABSFseq.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, TotSurfaces);
+            ITABSFseq.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, TotSurfaces);
             ITABSFseq = 0.0;
-            TMULTseq.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataGlobal->NumOfZones);
+            TMULTseq.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataGlobal->NumOfZones);
             TMULTseq = 0.0;
-            peopleInstantSeq.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataGlobal->NumOfZones);
+            peopleInstantSeq.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataGlobal->NumOfZones);
             peopleInstantSeq = 0.0;
-            peopleLatentSeq.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataGlobal->NumOfZones);
+            peopleLatentSeq.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataGlobal->NumOfZones);
             peopleLatentSeq = 0.0;
-            peopleRadSeq.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataGlobal->NumOfZones);
+            peopleRadSeq.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataGlobal->NumOfZones);
             peopleRadSeq = 0.0;
-            lightInstantSeq.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataGlobal->NumOfZones);
+            lightInstantSeq.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataGlobal->NumOfZones);
             lightInstantSeq = 0.0;
-            lightRetAirSeq.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataGlobal->NumOfZones);
+            lightRetAirSeq.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataGlobal->NumOfZones);
             lightRetAirSeq = 0.0;
-            lightLWRadSeq.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataGlobal->NumOfZones);
+            lightLWRadSeq.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataGlobal->NumOfZones);
             lightLWRadSeq = 0.0;
-            lightSWRadSeq.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, TotSurfaces);
+            lightSWRadSeq.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, TotSurfaces);
             lightSWRadSeq = 0.0;
-            equipInstantSeq.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataGlobal->NumOfZones);
+            equipInstantSeq.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataGlobal->NumOfZones);
             equipInstantSeq = 0.0;
-            equipLatentSeq.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataGlobal->NumOfZones);
+            equipLatentSeq.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataGlobal->NumOfZones);
             equipLatentSeq = 0.0;
-            equipRadSeq.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataGlobal->NumOfZones);
+            equipRadSeq.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataGlobal->NumOfZones);
             equipRadSeq = 0.0;
-            refrigInstantSeq.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataGlobal->NumOfZones);
+            refrigInstantSeq.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataGlobal->NumOfZones);
             refrigInstantSeq = 0.0;
-            refrigRetAirSeq.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataGlobal->NumOfZones);
+            refrigRetAirSeq.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataGlobal->NumOfZones);
             refrigRetAirSeq = 0.0;
-            refrigLatentSeq.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataGlobal->NumOfZones);
+            refrigLatentSeq.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataGlobal->NumOfZones);
             refrigLatentSeq = 0.0;
-            waterUseInstantSeq.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataGlobal->NumOfZones);
+            waterUseInstantSeq.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataGlobal->NumOfZones);
             waterUseInstantSeq = 0.0;
-            waterUseLatentSeq.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataGlobal->NumOfZones);
+            waterUseLatentSeq.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataGlobal->NumOfZones);
             waterUseLatentSeq = 0.0;
-            hvacLossInstantSeq.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataGlobal->NumOfZones);
+            hvacLossInstantSeq.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataGlobal->NumOfZones);
             hvacLossInstantSeq = 0.0;
-            hvacLossRadSeq.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataGlobal->NumOfZones);
+            hvacLossRadSeq.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataGlobal->NumOfZones);
             hvacLossRadSeq = 0.0;
-            powerGenInstantSeq.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataGlobal->NumOfZones);
+            powerGenInstantSeq.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataGlobal->NumOfZones);
             powerGenInstantSeq = 0.0;
-            powerGenRadSeq.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataGlobal->NumOfZones);
+            powerGenRadSeq.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataGlobal->NumOfZones);
             powerGenRadSeq = 0.0;
-            infilInstantSeq.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataGlobal->NumOfZones);
+            infilInstantSeq.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataGlobal->NumOfZones);
             infilInstantSeq = 0.0;
-            infilLatentSeq.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataGlobal->NumOfZones);
+            infilLatentSeq.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataGlobal->NumOfZones);
             infilLatentSeq = 0.0;
-            zoneVentInstantSeq.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataGlobal->NumOfZones);
+            zoneVentInstantSeq.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataGlobal->NumOfZones);
             zoneVentInstantSeq = 0.0;
-            zoneVentLatentSeq.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataGlobal->NumOfZones);
+            zoneVentLatentSeq.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataGlobal->NumOfZones);
             zoneVentLatentSeq = 0.0;
-            interZoneMixInstantSeq.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataGlobal->NumOfZones);
+            interZoneMixInstantSeq.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataGlobal->NumOfZones);
             interZoneMixInstantSeq = 0.0;
-            interZoneMixLatentSeq.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataGlobal->NumOfZones);
+            interZoneMixLatentSeq.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataGlobal->NumOfZones);
             interZoneMixLatentSeq = 0.0;
-            feneCondInstantSeq.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataGlobal->NumOfZones);
+            feneCondInstantSeq.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataGlobal->NumOfZones);
             feneCondInstantSeq = 0.0;
             //  ALLOCATE(feneSolarInstantSeq(NumOfZones,NumOfTimeStepInHour*24,TotDesDays+TotRunDesPersDays))
             //  feneSolarInstantSeq = 0.0d0
-            feneSolarRadSeq.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, TotSurfaces);
+            feneSolarRadSeq.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, TotSurfaces);
             feneSolarRadSeq = 0.0;
             AllocateLoadComponentArraysDoAllocate = false;
         }
@@ -12360,8 +12335,6 @@ namespace OutputReportTabular {
         // USE STATEMENTS:
         // na
         // Using/Aliasing
-        using DataEnvironment::TotDesDays;
-        using DataEnvironment::TotRunDesPersDays;
         using DataSurfaces::TotSurfaces;
 
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -13319,8 +13292,6 @@ namespace OutputReportTabular {
                            Array3D<Real64> &feneCondInstantSeq,
                            Array2D<Real64> &surfDelaySeq)
     {
-        using DataEnvironment::TotDesDays;
-        using DataEnvironment::TotRunDesPersDays;
         using DataHeatBalance::Zone;
         using DataSurfaces::Surface;
 
@@ -13328,7 +13299,7 @@ namespace OutputReportTabular {
         static Array3D_bool adjFenDone;
 
         if (!initAdjFenDone) {
-            adjFenDone.allocate(TotDesDays + TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataGlobal->NumOfZones);
+            adjFenDone.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataGlobal->NumOfZones);
             adjFenDone = false;
             initAdjFenDone = true;
         }

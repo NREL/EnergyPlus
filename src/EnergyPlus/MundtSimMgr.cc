@@ -438,7 +438,6 @@ namespace MundtSimMgr {
         // na
 
         // Using/Aliasing
-        using DataEnvironment::OutBaroPress;
         using DataHeatBalance::HConvIn;
         using DataHeatBalance::Zone;
         using DataHeatBalFanSys::MAT;
@@ -502,7 +501,7 @@ namespace MundtSimMgr {
 
         // supply air flowrate is the same as zone air flowrate
         ZoneNode = Zone(ZoneNum).SystemZoneNodeNumber;
-        ZoneAirDensity = PsyRhoAirFnPbTdbW(state, OutBaroPress, MAT(ZoneNum), PsyWFnTdpPb(state, MAT(ZoneNum), OutBaroPress));
+        ZoneAirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, MAT(ZoneNum), PsyWFnTdpPb(state, MAT(ZoneNum), state.dataEnvrn->OutBaroPress));
         ZoneMassFlowRate = Node(ZoneNode).MassFlowRate;
         SupplyAirVolumeRate = ZoneMassFlowRate / ZoneAirDensity;
         if (ZoneMassFlowRate <= 0.0001) {

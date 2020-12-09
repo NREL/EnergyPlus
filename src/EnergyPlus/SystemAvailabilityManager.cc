@@ -72,7 +72,6 @@
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -2297,9 +2296,6 @@ namespace SystemAvailabilityManager {
 
         // Using/Aliasing
         using namespace DataAirLoop;
-        using DataEnvironment::DayOfWeekTomorrow;
-        using DataEnvironment::DayOfYear;
-        using DataEnvironment::DSTIndicator;
         using DataHeatBalFanSys::TempControlType;
         using DataHeatBalFanSys::TempTstatAir;
         using DataHeatBalFanSys::TempZoneThermostatSetPoint;
@@ -2395,9 +2391,9 @@ namespace SystemAvailabilityManager {
             AvailStatus = NoAction;
         } else {
             ScheduleIndex = GetScheduleIndex(state, OptStartMgr.FanSched);
-            JDay = DayOfYear;
+            JDay = state.dataEnvrn->DayOfYear;
             TmrJDay = JDay + 1;
-            TmrDayOfWeek = DayOfWeekTomorrow;
+            TmrDayOfWeek = state.dataEnvrn->DayOfWeekTomorrow;
 
             DayValues.allocate(state.dataGlobal->NumOfTimeStepInHour, 24);
             DayValuesTmr.allocate(state.dataGlobal->NumOfTimeStepInHour, 24);
@@ -2461,7 +2457,7 @@ namespace SystemAvailabilityManager {
                 OptStartData.ActualZoneNum(actZoneNum) = actZoneNum;
             }
 
-            if (DSTIndicator > 0) {
+            if (state.dataEnvrn->DSTIndicator > 0) {
                 --FanStartTime;
                 --FanStartTimeTmr;
             }
@@ -3423,7 +3419,6 @@ namespace SystemAvailabilityManager {
         // value.
 
         using namespace DataAirLoop;
-        using DataEnvironment::OutDryBulbTemp;
         using DataHeatBalFanSys::TempControlType;
         using DataHeatBalFanSys::TempTstatAir;
         using DataHeatBalFanSys::TempZoneThermostatSetPoint;
@@ -3479,7 +3474,7 @@ namespace SystemAvailabilityManager {
             }
             // If the difference between the control zone temperature and the outside temperature is greater than
             // the specified night venting delta T then set the delta T check to TRUE
-            if ((TempTstatAir(ControlZoneNum) - OutDryBulbTemp) > state.dataSystemAvailabilityManager->NVentSysAvailMgrData(SysAvailNum).VentDelT) {
+            if ((TempTstatAir(ControlZoneNum) - state.dataEnvrn->OutDryBulbTemp) > state.dataSystemAvailabilityManager->NVentSysAvailMgrData(SysAvailNum).VentDelT) {
                 DelTCheck = true;
             }
             // If the limit requirements are met turn on night ventilation
@@ -3755,7 +3750,6 @@ namespace SystemAvailabilityManager {
         using CurveManager::CurveValue;
         using CurveManager::GetCurveIndex;
         using CurveManager::GetCurveMinMaxValues;
-        using DataContaminantBalance::Contaminant;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("GetHybridVentilationInputs: "); // include trailing blank
@@ -3848,7 +3842,7 @@ namespace SystemAvailabilityManager {
                 ShowContinueError(state, format("the minimum entered value in the schedule is {:.1T}", SchedMin));
                 ErrorsFound = true;
             }
-            if (SchedMax == 7.0 && !Contaminant.CO2Simulation) {
+            if (SchedMax == 7.0 && !state.dataContaminantBalance->Contaminant.CO2Simulation) {
                 ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
                 ShowContinueError(state, cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) +
                                   "\", When the schedule value is 7, carbon dioxide (CO2) control is requested. ");
@@ -4502,13 +4496,6 @@ namespace SystemAvailabilityManager {
         using AirflowNetworkBalanceManager::GetZoneInfilAirChangeRate;
         using AirflowNetworkBalanceManager::ManageAirflowNetworkBalance;
         using CurveManager::CurveValue;
-        using DataContaminantBalance::ZoneAirCO2;
-        using DataContaminantBalance::ZoneCO2SetPoint;
-        using DataEnvironment::IsRain;
-        using DataEnvironment::OutBaroPress;
-        using DataEnvironment::OutDewPointTemp;
-        using DataEnvironment::OutEnthalpy;
-        using DataEnvironment::OutHumRat;
         using DataHeatBalance::HybridControlTypeClose;
         using DataHeatBalance::HybridControlTypeGlobal;
         using DataHeatBalance::HybridControlTypeIndiv;
@@ -4600,8 +4587,8 @@ namespace SystemAvailabilityManager {
                     // Enthalpy control
                 } else if (SELECT_CASE_var == state.dataSystemAvailabilityManager->HybridVentMode_Enth) {
                     ZoneAirEnthalpy = PsyHFnTdbW(MAT(ZoneNum), ZoneAirHumRat(ZoneNum));
-                    if (OutEnthalpy >= state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).MinOutdoorEnth &&
-                        OutEnthalpy <= state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).MaxOutdoorEnth) {
+                    if (state.dataEnvrn->OutEnthalpy >= state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).MinOutdoorEnth &&
+                        state.dataEnvrn->OutEnthalpy <= state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).MaxOutdoorEnth) {
                         state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl = state.dataSystemAvailabilityManager->HybridVentCtrl_Open;
                     } else {
                         state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl = state.dataSystemAvailabilityManager->HybridVentCtrl_Close;
@@ -4609,8 +4596,8 @@ namespace SystemAvailabilityManager {
 
                     // Dew point control
                 } else if (SELECT_CASE_var == state.dataSystemAvailabilityManager->HybridVentMode_DewPoint) {
-                    if (OutDewPointTemp >= state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).MinOutdoorDewPoint &&
-                        OutDewPointTemp <= state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).MaxOutdoorDewPoint) {
+                    if (state.dataEnvrn->OutDewPointTemp >= state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).MinOutdoorDewPoint &&
+                        state.dataEnvrn->OutDewPointTemp <= state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).MaxOutdoorDewPoint) {
                         state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl = state.dataSystemAvailabilityManager->HybridVentCtrl_Open;
                     } else {
                         state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl = state.dataSystemAvailabilityManager->HybridVentCtrl_Close;
@@ -4671,8 +4658,8 @@ namespace SystemAvailabilityManager {
                     }
 
                 } else if (SELECT_CASE_var == state.dataSystemAvailabilityManager->HybridVentMode_CO2) {
-                    state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).CO2 = ZoneAirCO2(ZoneNum);
-                    if (ZoneAirCO2(ZoneNum) > ZoneCO2SetPoint(ZoneNum)) {
+                    state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).CO2 = state.dataContaminantBalance->ZoneAirCO2(ZoneNum);
+                    if (state.dataContaminantBalance->ZoneAirCO2(ZoneNum) > state.dataContaminantBalance->ZoneCO2SetPoint(ZoneNum)) {
                         if (state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).HybridVentMgrConnectedToAirLoop) {
                             AirLoopNum = state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).AirLoopNum;
                             for (Num = 1; Num <= state.dataAirLoop->PriAirSysAvailMgr(state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).AirLoopNum).NumAvailManagers; ++Num) {
@@ -4759,8 +4746,8 @@ namespace SystemAvailabilityManager {
 
                 // Dew point control mode
                 if (state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).ControlMode == state.dataSystemAvailabilityManager->HybridVentMode_DewPoint) {
-                    ZoneAirRH = PsyRhFnTdbWPb(state, MAT(ZoneNum), ZoneAirHumRat(ZoneNum), OutBaroPress) * 100.0;
-                    ZoneAirDewPoint = PsyTdpFnWPb(state, ZoneAirHumRat(ZoneNum), OutBaroPress);
+                    ZoneAirRH = PsyRhFnTdbWPb(state, MAT(ZoneNum), ZoneAirHumRat(ZoneNum), state.dataEnvrn->OutBaroPress) * 100.0;
+                    ZoneAirDewPoint = PsyTdpFnWPb(state, ZoneAirHumRat(ZoneNum), state.dataEnvrn->OutBaroPress);
                     if (NumHumidityControlZones == 0) {
                         ++state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).DewPointNoRHErrCount;
                         if (state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).DewPointNoRHErrCount < 2) {
@@ -4784,11 +4771,11 @@ namespace SystemAvailabilityManager {
                             ZoneRHHumidifyingSetPoint = GetCurrentScheduleValue(state, HumidityControlZone(HStatZoneNum).HumidifyingSchedIndex);
                             ZoneRHDehumidifyingSetPoint = GetCurrentScheduleValue(state, HumidityControlZone(HStatZoneNum).DehumidifyingSchedIndex);
                             if (ZoneAirRH > ZoneRHDehumidifyingSetPoint) { // Need dehumidification
-                                WSetPoint = PsyWFnTdbRhPb(state, MAT(ZoneNum), (ZoneRHDehumidifyingSetPoint / 100.0), OutBaroPress);
-                                if (WSetPoint < OutHumRat) state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl = state.dataSystemAvailabilityManager->HybridVentCtrl_Close;
+                                WSetPoint = PsyWFnTdbRhPb(state, MAT(ZoneNum), (ZoneRHDehumidifyingSetPoint / 100.0), state.dataEnvrn->OutBaroPress);
+                                if (WSetPoint < state.dataEnvrn->OutHumRat) state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl = state.dataSystemAvailabilityManager->HybridVentCtrl_Close;
                             } else if (ZoneAirRH < ZoneRHHumidifyingSetPoint) { // Need humidification
-                                WSetPoint = PsyWFnTdbRhPb(state, MAT(ZoneNum), (ZoneRHHumidifyingSetPoint / 100.0), OutBaroPress);
-                                if (WSetPoint > OutHumRat) state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl = state.dataSystemAvailabilityManager->HybridVentCtrl_Close;
+                                WSetPoint = PsyWFnTdbRhPb(state, MAT(ZoneNum), (ZoneRHHumidifyingSetPoint / 100.0), state.dataEnvrn->OutBaroPress);
+                                if (WSetPoint > state.dataEnvrn->OutHumRat) state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl = state.dataSystemAvailabilityManager->HybridVentCtrl_Close;
                             } else {
                                 state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl = state.dataSystemAvailabilityManager->HybridVentCtrl_Close;
                             }
@@ -4823,7 +4810,7 @@ namespace SystemAvailabilityManager {
             state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl = state.dataSystemAvailabilityManager->HybridVentCtrl_Close;
         }
 
-        if (IsRain && state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).UseRainIndicator) {
+        if (state.dataEnvrn->IsRain && state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).UseRainIndicator) {
             state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl = state.dataSystemAvailabilityManager->HybridVentCtrl_Close;
         }
         // Sent a signal to the AirflowNetwork to ensure large onpenings are close or open based on this logic

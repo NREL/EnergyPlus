@@ -54,6 +54,7 @@
 #include <ObjexxFCL/Array3D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataVectorTypes.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -64,42 +65,19 @@ namespace DataBSDFWindow {
     // Using/Aliasing
     using DataVectorTypes::Vector;
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
+    constexpr int BasisType_WINDOW = 1;
+    constexpr int BasisType_Custom = 2;
 
-    extern int const BasisType_WINDOW;
-    extern int const BasisType_Custom;
-
-    extern int const BasisSymmetry_Axisymmetric;
-    extern int const BasisSymmetry_None;
+    constexpr int BasisSymmetry_Axisymmetric = 1;
+    constexpr int BasisSymmetry_None = 2;
 
     // Thermal calculations for complex fenestration can be used to generate reports for standard cases
     // noCondition is used when performing timestep calculations
-    // summerCondtion will override certain parameters so that produced results are matching standard summer WINDOW (software) results
-    // winterCondition will override certain parameters so that produced resuls are matching standard winter WINDOW (software) results
-    extern int const noCondition;
-    extern int const summerCondition;
-    extern int const winterCondition;
-
-    // DERIVED TYPE DEFINITIONS:
-
-    // Structure to keep reference points coefficients for different reference points and illuminance maps
-
-    // Allocation of complex fenestration data:  SurfaceWindow(:)%ComplexFen is a structure of type BSDFWindowDescript
-    // defined in DataSurfaces.  ComplexWind(:) is an array of type BSDF WindowGeomDescr defined as a module
-    // variable in WindowComplexManager
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    extern int TotComplexFenStates; // Number of complex fenestration construction definitions
-    extern int FirstBSDF;           // Location of first complex fenestration construction definition in Constr array
-    extern int MaxBkSurf;           // was 20    Maximum number of back surfaces in solar overlap & interior solar distribution
-    extern int TotThermalModels;    // Number of thermal models
-    // calculation
-    extern Array3D<Real64> SUNCOSTS;     // Timestep values of solar direction cosines
-    extern Array2D<Real64> BSDFTempMtrx; // Temporary matrix for holding axisymmetric input
-
-    // Types
+    // summerCondtion will override certain parameters so that produced results are matching standard summer WINDOW  = software results
+    // winterCondition will override certain parameters so that produced results are matching standard winter WINDOW  = software results
+    constexpr int noCondition = 0;
+    constexpr int summerCondition = 1;
+    constexpr int winterCondition = 2;
 
     struct BasisElemDescr
     {
@@ -125,7 +103,9 @@ namespace DataBSDFWindow {
         // These indices are in the BasisElement array, which matches the row/column of the matrix
 
         // Default Constructor
-        BasisElemDescr()
+        BasisElemDescr() :
+              Theta(0.0), Phi(0.0), dTheta(0.0), dPhi(0.0), UpprTheta(0.0), LwrTheta(0.0), UpprPhi(0.0), LwrPhi(0.0), INNbInL(0), INNbInH(0),
+              INNbOutL(0), INNbOutH(0), INNbLft(0), INNbRt(0)
         {
         }
     };
@@ -137,7 +117,8 @@ namespace DataBSDFWindow {
         Real64 Azimuth;  // Azimuth is measured from positive x counter clockwise. Its range is from -pi to pi
 
         // Default Constructor
-        BSDFDaylghtPosition()
+        BSDFDaylghtPosition() :
+            Altitude(0.0), Azimuth(0.0)
         {
         }
 
@@ -215,10 +196,10 @@ namespace DataBSDFWindow {
         Array2D<Real64>
             ARhoVisOverlap; // Overlap areas multiplied with surface reflectance for each outgoing direction (Trn) (no of outgoing dir, NBKSurf)
         Array1D<Real64> AveRhoVisOverlap; // Average visible reflectance from overlap surface which originates from one outgoing direction
-        bool InitState;                   // Flag for marking that state needs to be initalized
+        bool InitState;                   // Flag for marking that state needs to be initialized
 
         // Default Constructor
-        BSDFGeomDescr() : InitState(true)
+        BSDFGeomDescr() : NSkyUnobs(0), NGndUnobs(0), NSky(0), NGnd(0), NReflSurf(0), InitState(true)
         {
         }
     };
@@ -244,9 +225,7 @@ namespace DataBSDFWindow {
         Array1D<Real64> RefPtIntPosFac; // position factors for intersections from reference point to window for each outgoing direction (NTrnBasis)
 
         // Default Constructor
-        BSDFRefPoints()
-        {
-        }
+        BSDFRefPoints() = default;
     };
 
     struct BSDFDaylghtGeomDescr
@@ -257,9 +236,7 @@ namespace DataBSDFWindow {
         Array1D<BSDFRefPoints> RefPoint; // keep reference points daylight coefficients (# of reference points)
 
         // Default Constructor
-        BSDFDaylghtGeomDescr()
-        {
-        }
+        BSDFDaylghtGeomDescr() = default;
     };
 
     struct BSDFBkSurfDescr
@@ -275,9 +252,7 @@ namespace DataBSDFWindow {
         // Complex Fenestration; they depend on the sun direction if the back surface window is a regular window
 
         // Default Constructor
-        BSDFBkSurfDescr()
-        {
-        }
+        BSDFBkSurfDescr() = default;
     };
 
     struct BSDFStateDescr
@@ -322,7 +297,9 @@ namespace DataBSDFWindow {
         Array1D<Real64> IntegratedBkTrans; // Integrated back layer transmittance (for each back direction)
 
         // Default Constructor
-        BSDFStateDescr() : Konst(0), WinSkyTrans(0.0), WinSkyGndTrans(0.0), WinBkHemRefl(0.0), WinBkHemVisRefl(0.0), NLayers(0)
+        BSDFStateDescr() :
+              Konst(0), WinDiffTrans(0.0), WinDiffVisTrans(0.0), WinSkyTrans(0.0), WinSkyGndTrans(0.0), WinBkHemRefl(0.0),
+              WinBkHemVisRefl(0.0), NLayers(0)
         {
         }
     };
@@ -334,9 +311,7 @@ namespace DataBSDFWindow {
         Array1D<Vector> SolidAngleVec; // unit vector from reference point towards center of window element (# window el)
 
         // Default Constructor
-        BSDFRefPointsGeomDescr()
-        {
-        }
+        BSDFRefPointsGeomDescr() = default;
     };
 
     struct BSDFWindowGeomDescr
@@ -354,13 +329,12 @@ namespace DataBSDFWindow {
         Array1D<Real64> sdotN;                     // Dot product of unit vector s with back surface normal
         // here s is vector from center of window to center of back surface
         // Function of the following subsumed by using an index of 0 if no beam incidence
-        // REAL(r64), DIMENSION(: , : ), ALLOCATABLE  ::  SolBmWt  !Intensity wt for beam radiation (Hour, timestep)
         Array2D<BSDFRefPointsGeomDescr>
             IlluminanceMap; // array to keep bsdf coefficients for different illuminance maps (# of illuminance maps, # of reference points)
         Array1D<BSDFRefPointsGeomDescr> RefPoint; // keep reference points daylight coefficients (# of reference points)
 
         // Default Constructor
-        BSDFWindowGeomDescr() : DaylightingInitialized(false), NBkSurf(0)
+        BSDFWindowGeomDescr() : NumStates(0), DaylightingInitialized(false), NBkSurf(0)
         {
         }
     };
@@ -384,7 +358,7 @@ namespace DataBSDFWindow {
         Array1D<BSDFStateDescr> State; // State description, dimensioned with number of states
 
         // Default Constructor
-        BSDFWindowDescript() : CurrentState(1)
+        BSDFWindowDescript() : NumStates(0), CurrentState(1)
         {
         }
     };
@@ -433,8 +407,6 @@ namespace DataBSDFWindow {
         int VisBkReflNrows;          // No. rows in matrix
         int VisBkReflNcols;          // No. columns in matrix
         Array2D<Real64> VisBkRefl;   // Back visible reflectance matrix
-        // INTEGER   :: ThermalConstruction  !Pointer to location in Construct array of thermal construction for the state
-        // (to be implemented)
         int NumLayers;
         Array1D<BSDFLayerAbsorpStruct> Layer;
 
@@ -447,10 +419,30 @@ namespace DataBSDFWindow {
         }
     };
 
-    // Object Data
-    extern Array1D<BSDFWindowGeomDescr> ComplexWind; // Window geometry structure: set in CalcPerSolarBeam/SolarShading
-
 } // namespace DataBSDFWindow
+
+struct BSDFWindowData : BaseGlobalStruct {
+
+    int TotComplexFenStates = 0; // Number of complex fenestration construction definitions
+    int FirstBSDF = 0;           // Location of first complex fenestration construction definition in Constr array
+    int MaxBkSurf = 20;          // was 20    Maximum number of back surfaces in solar overlap & interior solar distribution
+    int TotThermalModels = 0;    // Number of thermal models
+
+    // calculation
+    Array3D<Real64> SUNCOSTS = Array3D<Real64>(60, 24, 3); // Timestep values of solar direction cosines
+    Array2D<Real64> BSDFTempMtrx;        // Temporary matrix for holding axisymmetric input
+    Array1D<DataBSDFWindow::BSDFWindowGeomDescr> ComplexWind; // Window geometry structure: set in CalcPerSolarBeam/SolarShading
+
+    void clear_state() override {
+        this->TotComplexFenStates = 0;
+        this->FirstBSDF = 0;
+        this->MaxBkSurf = 20;
+        this->TotThermalModels = 0;
+        this->SUNCOSTS = Array3D<Real64>(60, 24, 3);
+        this->BSDFTempMtrx.deallocate();
+        this->ComplexWind.deallocate();
+    }
+};
 
 } // namespace EnergyPlus
 

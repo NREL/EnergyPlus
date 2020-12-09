@@ -277,7 +277,7 @@ namespace HVACFan {
 
         } // end if power was autosized
 
-        m_rhoAirStdInit = DataEnvironment::StdRhoAir;
+        m_rhoAirStdInit = state.dataEnvrn->StdRhoAir;
         m_maxAirMassFlowRate = designAirVolFlowRate * m_rhoAirStdInit;
 
         // calculate total fan system efficiency at design, else set to 1 to avoid div by zero
@@ -308,7 +308,7 @@ namespace HVACFan {
             }
         }
         Real64 rhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, DataLoopNode::Node(inletNodeNum).Press, m_inletAirTemp, m_inletAirHumRat);
-        m_designPointFEI = report_fei(designAirVolFlowRate, designElecPower, deltaPress, rhoAir);
+        m_designPointFEI = report_fei(state, designAirVolFlowRate, designElecPower, deltaPress, rhoAir);
 
         OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchFanType, name, m_fanType);
         OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchFanTotEff, name, m_fanTotalEff);
@@ -327,7 +327,7 @@ namespace HVACFan {
         m_objSizingFlag = false;
     }
 
-    Real64 FanSystem::report_fei(Real64 const designFlowRate, Real64 const designElecPower, Real64 const designDeltaPress, Real64 inletRhoAir)
+    Real64 FanSystem::report_fei(EnergyPlusData &state, Real64 const designFlowRate, Real64 const designElecPower, Real64 const designDeltaPress, Real64 inletRhoAir)
     {
         // PURPOSE OF THIS SUBROUTINE:
         // Calculate the Fan Energy Index
@@ -336,9 +336,9 @@ namespace HVACFan {
         // ANSI/AMCA Standard 207-17: Fan System Efficiency and Fan System Input Power Calculation, 2017.
         // AANSI / AMCA Standard 208 - 18: Calculation of the Fan Energy Index, 2018.
 
-        assert(DataEnvironment::StdRhoAir > 0.0);
+        assert(state.dataEnvrn->StdRhoAir > 0.0);
         // Calculate reference fan shaft power
-        Real64 refFanShaftPower = (designFlowRate + 0.118) * (designDeltaPress + 100 * inletRhoAir / DataEnvironment::StdRhoAir) / (1000 * 0.66);
+        Real64 refFanShaftPower = (designFlowRate + 0.118) * (designDeltaPress + 100 * inletRhoAir / state.dataEnvrn->StdRhoAir) / (1000 * 0.66);
 
         // Calculate reference reference fan transmission efficiency
         Real64 refFanTransEff = 0.96 * pow((refFanShaftPower / (refFanShaftPower + 1.64)), 0.05);
@@ -1054,10 +1054,10 @@ namespace HVACFan {
         // make sure inlet has the same mass flow
         DataLoopNode::Node(inletNodeNum).MassFlowRate = m_outletAirMassFlowRate;
 
-        if (DataContaminantBalance::Contaminant.CO2Simulation) {
+        if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
             DataLoopNode::Node(outletNodeNum).CO2 = DataLoopNode::Node(inletNodeNum).CO2;
         }
-        if (DataContaminantBalance::Contaminant.GenericContamSimulation) {
+        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
             DataLoopNode::Node(outletNodeNum).GenContam = DataLoopNode::Node(inletNodeNum).GenContam;
         }
 

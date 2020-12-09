@@ -123,9 +123,6 @@ namespace WindowEquivalentLayer {
     // Using/Aliasing
     using namespace DataHeatBalance;
     using namespace DataSurfaces;
-    using DataEnvironment::DayOfMonth;
-    using DataEnvironment::Month;
-
     void InitEquivalentLayerWindowCalculations(EnergyPlusData &state)
     {
 
@@ -661,8 +658,6 @@ namespace WindowEquivalentLayer {
         // uses the solar-thermal routine developed for ASHRAE RP-1311 (ASHWAT Model).
 
         using DataBSDFWindow::noCondition;
-        using DataEnvironment::IsRain;
-        using DataEnvironment::SkyTempKelvin;
         using DataLoopNode::Node;
         using DataZoneEquipment::ZoneEquipConfig;
         using General::InterpSw;
@@ -722,7 +717,7 @@ namespace WindowEquivalentLayer {
         Real64 SrdSurfViewFac; // View factor of a surrounding surface
         Real64 OutSrdIR;
 
-        if (CalcCondition != noCondition) return;
+        if (CalcCondition != DataBSDFWindow::noCondition) return;
 
         ConstrNum = Surface(SurfNum).Construction;
         QXConv = 0.0;
@@ -731,7 +726,7 @@ namespace WindowEquivalentLayer {
         EQLNum = state.dataConstruction->Construct(ConstrNum).EQLConsPtr;
         HcIn = HConvIn(SurfNum); // windows inside surface convective film conductance
 
-        if (CalcCondition == noCondition) {
+        if (CalcCondition == DataBSDFWindow::noCondition) {
             ZoneNum = Surface(SurfNum).Zone;
             SurfNumAdj = Surface(SurfNum).ExtBoundCond;
 
@@ -843,7 +838,7 @@ namespace WindowEquivalentLayer {
                     }
                 }
                 if (Surface(SurfNum).ExtWind) { // Window is exposed to wind (and possibly rain)
-                    if (IsRain) {               // Raining: since wind exposed, outside window surface gets wet
+                    if (state.dataEnvrn->IsRain) {               // Raining: since wind exposed, outside window surface gets wet
                         Tout = Surface(SurfNum).OutWetBulbTemp + DataGlobalConstants::KelvinConv();
                     } else { // Dry
                         Tout = Surface(SurfNum).OutDryBulbTemp + DataGlobalConstants::KelvinConv();
@@ -851,7 +846,7 @@ namespace WindowEquivalentLayer {
                 } else { // Window not exposed to wind
                     Tout = Surface(SurfNum).OutDryBulbTemp + DataGlobalConstants::KelvinConv();
                 }
-                tsky = SkyTempKelvin;
+                tsky = state.dataEnvrn->SkyTempKelvin;
                 Ebout = DataGlobalConstants::StefanBoltzmann() * pow_4(Tout);
                 // ASHWAT model may be slightly different
                 outir = Surface(SurfNum).ViewFactorSkyIR *
@@ -8124,7 +8119,6 @@ namespace WindowEquivalentLayer {
         // Uses the net radiation method developed for ASHWAT fenestration
         // model (ASHRAE RP-1311) by John Wright, the University of WaterLoo
 
-        using DataEnvironment::SOLCOS;
         using DaylightingManager::ProfileAngle;
 
         // Argument array dimensioning
@@ -8150,9 +8144,9 @@ namespace WindowEquivalentLayer {
             for (Lay = 1; Lay <= CFS(EQLNum).NL; ++Lay) {
                 if (IsVBLayer(CFS(EQLNum).L(Lay))) {
                     if (CFS(EQLNum).L(Lay).LTYPE == ltyVBHOR) {
-                        ProfileAngle(SurfNum, SOLCOS, Horizontal, ProfAngVer);
+                        ProfileAngle(SurfNum, state.dataEnvrn->SOLCOS, Horizontal, ProfAngVer);
                     } else if (CFS(EQLNum).L(Lay).LTYPE == ltyVBVER) {
-                        ProfileAngle(SurfNum, SOLCOS, Vertical, ProfAngHor);
+                        ProfileAngle(SurfNum, state.dataEnvrn->SOLCOS, Vertical, ProfAngHor);
                     }
                 }
             }
@@ -8166,9 +8160,9 @@ namespace WindowEquivalentLayer {
                 for (Lay = 1; Lay <= CFS(EQLNum).NL; ++Lay) {
                     if (IsVBLayer(CFS(EQLNum).L(Lay))) {
                         if (CFS(EQLNum).L(Lay).LTYPE == ltyVBHOR) {
-                            ProfileAngle(SurfNum, SOLCOS, Horizontal, ProfAngVer);
+                            ProfileAngle(SurfNum, state.dataEnvrn->SOLCOS, Horizontal, ProfAngVer);
                         } else if (CFS(EQLNum).L(Lay).LTYPE == ltyVBVER) {
-                            ProfileAngle(SurfNum, SOLCOS, Vertical, ProfAngHor);
+                            ProfileAngle(SurfNum, state.dataEnvrn->SOLCOS, Vertical, ProfAngHor);
                         }
                     }
                 }

@@ -612,28 +612,34 @@ Real64 getPluginTrendVariableDirection(EnergyPlusState state, int handle, int co
 }
 
 
-int year(EnergyPlusState) {
-    return EnergyPlus::DataEnvironment::Year;
+int year(EnergyPlusState state) {
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    return thisState->dataEnvrn->Year;
 }
 
-int month(EnergyPlusState) {
-    return EnergyPlus::DataEnvironment::Month;
+int month(EnergyPlusState state) {
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    return thisState->dataEnvrn->Month;
 }
 
-int dayOfMonth(EnergyPlusState) {
-    return EnergyPlus::DataEnvironment::DayOfMonth;
+int dayOfMonth(EnergyPlusState state) {
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    return thisState->dataEnvrn->DayOfMonth;
 }
 
-int dayOfWeek(EnergyPlusState) {
-    return EnergyPlus::DataEnvironment::DayOfWeek;
+int dayOfWeek(EnergyPlusState state) {
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    return thisState->dataEnvrn->DayOfWeek;
 }
 
-int dayOfYear(EnergyPlusState) {
-    return EnergyPlus::DataEnvironment::DayOfYear;
+int dayOfYear(EnergyPlusState state) {
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    return thisState->dataEnvrn->DayOfYear;
 }
 
-int daylightSavingsTimeIndicator(EnergyPlusState) {
-    return EnergyPlus::DataEnvironment::DSTIndicator;
+int daylightSavingsTimeIndicator(EnergyPlusState state) {
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    return thisState->dataEnvrn->DSTIndicator;
 }
 
 int hour(EnergyPlusState state) {
@@ -673,20 +679,23 @@ int zoneTimeStepNum([[maybe_unused]] EnergyPlusState state)
     return thisState->dataGlobal->TimeStep;
 }
 
-int holidayIndex(EnergyPlusState) {
-    return EnergyPlus::DataEnvironment::HolidayIndex;
+int holidayIndex(EnergyPlusState state) {
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    return thisState->dataEnvrn->HolidayIndex;
 }
 
-int sunIsUp(EnergyPlusState) { // maintain response convention from previous (EMS) implementation
-    if (EnergyPlus::DataEnvironment::SunIsUp) {
+int sunIsUp(EnergyPlusState state) { // maintain response convention from previous (EMS) implementation
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    if (thisState->dataEnvrn->SunIsUp) {
         return 1;
     } else {
         return 0;
     }
 }
 
-int isRaining(EnergyPlusState) {
-    if (EnergyPlus::DataEnvironment::IsRain) {
+int isRaining(EnergyPlusState state) {
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    if (thisState->dataEnvrn->IsRain) {
         return 1;
     } else {
         return 0;
@@ -711,8 +720,9 @@ Real64 systemTimeStep(EnergyPlusState) {
     return EnergyPlus::DataHVACGlobals::TimeStepSys;
 }
 
-int currentEnvironmentNum(EnergyPlusState) {
-    return EnergyPlus::DataEnvironment::CurEnvirNum;
+int currentEnvironmentNum(EnergyPlusState state) {
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    return thisState->dataEnvrn->CurEnvirNum;
 }
 
 int kindOfSim(EnergyPlusState state) {

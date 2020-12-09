@@ -127,7 +127,7 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_SizeHVACWaterToAir)
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).SensCoolCap6 = 0.0;
 
     DesDayWeath(1).Temp(15) = 32.0;
-    StdBaroPress = 101325.0;
+    state->dataEnvrn->StdBaroPress = 101325.0;
     ZoneEqDXCoil = true;
 
     WaterToAirHeatPumpSimple::SizeHVACWaterToAir(*state, HPNum);
@@ -258,7 +258,7 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimple_TestWaterFlowControl)
     Real64 OnOffAirFlowRatio(1.0);
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).LoopNum = 1;
 
-    DataEnvironment::OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
 
     InitSimpleWatertoAirHP(*state, HPNum, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio,
                            FirstHVACIteration);

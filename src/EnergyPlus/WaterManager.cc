@@ -1405,7 +1405,6 @@ namespace WaterManager {
         // starting simple and ignoring well storage and complex rate restrictions.
         // just uses nominal pump rate and power (assuming well designed well).
 
-        using DataEnvironment::GroundTemp_Deep;
         using DataHVACGlobals::TimeStepSys;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -1419,7 +1418,7 @@ namespace WaterManager {
             if (state.dataWaterData->GroundwaterWell(WellNum).VdotRequest >= state.dataWaterData->GroundwaterWell(WellNum).PumpNomVolFlowRate) { // run flat out
                 state.dataWaterData->WaterStorage(state.dataWaterData->GroundwaterWell(WellNum).StorageTankID).VdotAvailSupply(state.dataWaterData->GroundwaterWell(WellNum).StorageTankSupplyARRID) =
                     state.dataWaterData->GroundwaterWell(WellNum).PumpNomVolFlowRate;
-                state.dataWaterData->WaterStorage(state.dataWaterData->GroundwaterWell(WellNum).StorageTankID).TwaterSupply(state.dataWaterData->GroundwaterWell(WellNum).StorageTankSupplyARRID) = GroundTemp_Deep;
+                state.dataWaterData->WaterStorage(state.dataWaterData->GroundwaterWell(WellNum).StorageTankID).TwaterSupply(state.dataWaterData->GroundwaterWell(WellNum).StorageTankSupplyARRID) = state.dataEnvrn->GroundTemp_Deep;
                 VdotDelivered = state.dataWaterData->GroundwaterWell(WellNum).PumpNomVolFlowRate;
                 PumpPower = state.dataWaterData->GroundwaterWell(WellNum).PumpNomPowerUse;
             }
@@ -1428,7 +1427,7 @@ namespace WaterManager {
             if (state.dataWaterData->GroundwaterWell(WellNum).VdotRequest < state.dataWaterData->GroundwaterWell(WellNum).PumpNomVolFlowRate) {
                 state.dataWaterData->WaterStorage(state.dataWaterData->GroundwaterWell(WellNum).StorageTankID).VdotAvailSupply(state.dataWaterData->GroundwaterWell(WellNum).StorageTankSupplyARRID) =
                     state.dataWaterData->GroundwaterWell(WellNum).VdotRequest;
-                state.dataWaterData->WaterStorage(state.dataWaterData->GroundwaterWell(WellNum).StorageTankID).TwaterSupply(state.dataWaterData->GroundwaterWell(WellNum).StorageTankSupplyARRID) = GroundTemp_Deep;
+                state.dataWaterData->WaterStorage(state.dataWaterData->GroundwaterWell(WellNum).StorageTankID).TwaterSupply(state.dataWaterData->GroundwaterWell(WellNum).StorageTankSupplyARRID) = state.dataEnvrn->GroundTemp_Deep;
 
                 VdotDelivered = state.dataWaterData->GroundwaterWell(WellNum).VdotRequest;
                 PumpPower =
